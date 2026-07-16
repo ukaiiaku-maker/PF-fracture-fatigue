@@ -143,7 +143,13 @@ def _continuum_emit(
     sigma_tip = max(float(stress_Pa), 0.0)
     sigma_effective = np.maximum(sigma_tip - sigma_back, 0.0)
     lam_site = np.maximum(
-        np.asarray(self.manifest.emission.rate(sigma_effective, T_K), dtype=float),
+        np.asarray(
+            [
+                self.emission_rate_per_site(float(sigma_s), T_K)
+                for sigma_s in sigma_effective
+            ],
+            dtype=float,
+        ),
         0.0,
     )
 
