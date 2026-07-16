@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.1.1"
-description = "Anisotropic multifront Arrhenius sharp-front fracture and fatigue with kinetic moving-tip continuum source activity"
+version = "10.1.2"
+description = "Anisotropic multifront Arrhenius sharp-front fracture and fatigue with aggregate-channel moving-tip source activity"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
