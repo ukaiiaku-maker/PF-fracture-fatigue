@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   publish:
-    if: github.event_name != 'pull_request' || github.head_ref == 'v10.0-unified-sharp-front-mpz'
+    if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'v10.0-')
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
