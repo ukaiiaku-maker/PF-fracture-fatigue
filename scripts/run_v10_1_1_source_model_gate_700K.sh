@@ -11,8 +11,11 @@ T_K=${T_K:-700}
 CLASSES=${CLASSES:-"weakT DBTT"}
 SOURCE_MODELS=${SOURCE_MODELS:-"continuum finite_sites"}
 TARGET_EXT_UM=${TARGET_EXT_UM:-10}
-STEPS=${STEPS:-30000}
-OUTROOT=${OUTROOT:-runs/v10_1_1_source_model_gate_700K_10um_v1}
+# The validated cases complete in <150 outer steps.  A 500-step ceiling prevents
+# a failed source law from loading indefinitely to nonphysical K values.
+STEPS=${STEPS:-500}
+K_FIRST_MAX_MPA_SQRT_M=${K_FIRST_MAX_MPA_SQRT_M:-100}
+OUTROOT=${OUTROOT:-runs/v10_1_2_source_model_gate_700K_10um_v1}
 
 NX=${NX:-48}
 NY=${NY:-96}
@@ -50,7 +53,7 @@ for SOURCE_MODEL in $SOURCE_MODELS; do
     OUTDIR="$OUTROOT/$SOURCE_MODEL/$CLASS/T${T_K}_th${THETA}"
     mkdir -p "$OUTDIR"
     echo "========================================================================"
-    echo "v10.1.1 source gate: source=$SOURCE_MODEL class=$CLASS T=${T_K}K target=${TARGET_EXT_UM}um"
+    echo "v10.1.2 source gate: source=$SOURCE_MODEL class=$CLASS T=${T_K}K target=${TARGET_EXT_UM}um"
     echo "out=$OUTDIR"
     echo "========================================================================"
 
@@ -80,21 +83,46 @@ for SOURCE_MODEL in $SOURCE_MODELS; do
       status=FAILED
     fi
 
-    "$PYTHON_BIN" - "$OUTDIR/v10_1_driver_modes.json" "$SOURCE_MODEL" <<'PY'
-import json, pathlib, sys
-path = pathlib.Path(sys.argv[1])
-expected = sys.argv[2]
-data = json.loads(path.read_text())
-assert data["tip_source_model"] == expected, data
-assert data["finite_distributed_source_inventory"] is False, data
+    if [[ "$status" == COMPLETE ]]; then
+      if ! "$PYTHON_BIN" - \
+        "$OUTDIR/v10_1_driver_modes.json" \
+        "$OUTDIR/summary.json" \
+        "$SOURCE_MODEL" \
+        "$TARGET_EXT_UM" \
+        "$DA_CHECKPOINT_M" \
+        "$K_FIRST_MAX_MPA_SQRT_M" <<'PY'
+import json, math, pathlib, sys
+
+mode_path = pathlib.Path(sys.argv[1])
+summary_path = pathlib.Path(sys.argv[2])
+expected_source = sys.argv[3]
+target_um = float(sys.argv[4])
+da_m = float(sys.argv[5])
+kmax = float(sys.argv[6])
+
+modes = json.loads(mode_path.read_text())
+assert modes["tip_source_model"] == expected_source, modes
+assert modes["finite_distributed_source_inventory"] is False, modes
+
+summary = json.loads(summary_path.read_text())
+assert summary and isinstance(summary, list), summary
+row = summary[0]
+minimum_advances = max(1, math.ceil(target_um / (da_m * 1.0e6) - 1.0e-12))
+assert int(row["n_advances"]) >= minimum_advances, row
+kc = float(row["Kc_first_MPa_sqrt_m"])
+assert math.isfinite(kc) and 0.0 < kc <= kmax, row
 PY
+      then
+        status=FAILED
+      fi
+    fi
 
     printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
       "$SOURCE_MODEL" "$CLASS" "$T_K" "$TARGET_EXT_UM" "$status" "$OUTDIR" \
       >> "$MANIFEST"
 
     if [[ "$status" != COMPLETE ]]; then
-      echo "ERROR: $SOURCE_MODEL/$CLASS failed; see $OUTDIR" >&2
+      echo "ERROR: $SOURCE_MODEL/$CLASS failed or did not reach the required crack advance; see $OUTDIR" >&2
       exit 1
     fi
   done
