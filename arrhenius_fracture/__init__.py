@@ -1,9 +1,17 @@
 """Arrhenius sharp-front fracture and fatigue with unified MPZ state."""
 
-__version__ = "10.0.2.1"
+__version__ = "10.1.0"
 
 from .material_manifest import MaterialManifest
 from .unified_mpz import MPZConfig, UnifiedMPZState
 from .unified_front import UnifiedMPZFrontEngine
+from .kinetic_tip_cell import KineticMovingTipFrontEngine, KineticTipConfig
 
-__all__ = ["MaterialManifest", "MPZConfig", "UnifiedMPZState", "UnifiedMPZFrontEngine"]
+__all__ = [
+    "MaterialManifest",
+    "MPZConfig",
+    "UnifiedMPZState",
+    "UnifiedMPZFrontEngine",
+    "KineticMovingTipFrontEngine",
+    "KineticTipConfig",
+]
