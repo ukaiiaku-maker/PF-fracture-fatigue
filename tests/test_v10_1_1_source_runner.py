@@ -27,4 +27,4 @@ def test_continuum_gate_audits_local_emission_backstress():
     assert 'tip_source_backstress_shear_Pa' in text
     assert 'tip_source_backstress_equivalent_Pa' in text
     assert 'tip_source_effective_emission_stress_Pa' in text
-    assert 'eff <= sig' in text
+    assert 'tip_source_backstress_equivalent_Pa"]) for r in records) > 0.0' in text
