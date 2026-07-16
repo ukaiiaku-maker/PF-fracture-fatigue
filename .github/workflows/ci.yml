@@ -19,6 +19,19 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install -e ".[test]"
       - run: python -m compileall -q arrhenius_fracture
-      - env:
+      - name: Integrated preflight
+        env:
           OUT: runs/ci_preflight
-        run: bash scripts/run_v10_preflight.sh
+        run: |
+          set +e
+          bash scripts/run_v10_preflight.sh > ci_preflight.log 2>&1
+          rc=$?
+          cat ci_preflight.log
+          exit $rc
+      - name: Upload preflight transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v10-ci-preflight-${{ github.run_id }}
+          path: ci_preflight.log
+          if-no-files-found: warn
