@@ -29,7 +29,7 @@ def test_progression_uses_validated_transfer_modes_and_resolved_mesh():
 
 def test_progression_does_not_mislabel_da_as_numerical_convergence():
     text = (SCRIPTS / "run_v10_0_2_three_class_progression.sh").read_text()
-    assert "v10.0.2 requires DA_PHYS_M=5e-6" in text
+    assert "requires DA_PHYS_M=5e-6" in text
     assert "Physical renewal length and numerical geometry substep" in text
 
 
@@ -37,5 +37,7 @@ def test_wake_ablation_is_true_on_off_routing():
     text = (SCRIPTS / "run_v10_0_2_three_class_progression.sh").read_text()
     assert 'if [[ "$WAKE_SHIELDING" == "1" ]]' in text
     assert "wake_args+=(--wake-shielding)" in text
+    assert "wake_args+=(--no-wake-shielding)" in text
+    assert "wake routing audit failed" in text
     ablation = (SCRIPTS / "run_v10_0_2_wake_ablation_700K.sh").read_text()
     assert "for WAKE in 1 0" in ablation
