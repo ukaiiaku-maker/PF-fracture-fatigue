@@ -6,10 +6,14 @@ T_K=${T_K:-700}
 TARGET_EXT_UM=${TARGET_EXT_UM:-10}
 STEPS=${STEPS:-12000}
 BULK_PLASTICITY_MODE=${BULK_PLASTICITY_MODE:-tip_only}
-DIRECTIONAL_J_MODE=${DIRECTIONAL_J_MODE:-abs_forward}
+DIRECTIONAL_J_MODE=${DIRECTIONAL_J_MODE:-root_signed}
 
+if [[ "$BULK_PLASTICITY_MODE" != "tip_only" ]]; then
+  echo "ERROR: v10.0.1 validates only BULK_PLASTICITY_MODE=tip_only." >&2
+  exit 2
+fi
 if [[ "$DIRECTIONAL_J_MODE" == "abs_forward" && "${MAX_FRONTS:-1}" != "1" ]]; then
-  echo "ERROR: abs_forward is restricted to the one-front material-transfer gate." >&2
+  echo "ERROR: abs_forward is restricted to a one-front diagnostic." >&2
   exit 2
 fi
 
