@@ -9,7 +9,7 @@ from arrhenius_fracture.kinetic_tip_cell import (
     KineticTipConfig,
 )
 from arrhenius_fracture.material_manifest import MaterialManifest, default_manifest_path
-from arrhenius_fracture.sharp_front_v10_1 import _prepare_args
+from arrhenius_fracture.sharp_front_v10_1 import _prepare_args_v101
 from arrhenius_fracture.unified_mpz import MPZConfig
 
 
@@ -118,7 +118,7 @@ def test_at_most_one_checkpoint_per_outer_state():
 
 
 def test_v101_cli_controls_are_removed_before_legacy_parser():
-    args, bulk, jmode, kmode, cfg = _prepare_args([
+    args, bulk, jmode, kmode, cfg = _prepare_args_v101([
         "--material-class", "weakT",
         "--tip-kinetics-mode", "moving_velocity",
         "--no-active-shielding",
