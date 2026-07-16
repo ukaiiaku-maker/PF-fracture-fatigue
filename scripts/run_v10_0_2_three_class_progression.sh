@@ -36,16 +36,12 @@ PRINT_EVERY=${PRINT_EVERY:-25}
 SAVE_SNAPSHOTS=${SAVE_SNAPSHOTS:-10}
 SNAPSHOT_BY_EXT_UM=${SNAPSHOT_BY_EXT_UM:-5}
 
-# v10.0.2 still uses one variable for both the calibrated physical renewal
-# length and the accepted geometry increment.  Changing it would alter the
-# kinetics, not merely the numerical resolution.  Keep the validated 5 um
-# renewal until those two lengths are separated in a later implementation.
 "$PYTHON_BIN" - "$DA_PHYS_M" <<'PY'
 import math, sys
 value = float(sys.argv[1])
 if not math.isclose(value, 5.0e-6, rel_tol=0.0, abs_tol=1.0e-15):
     raise SystemExit(
-        "v10.0.2 requires DA_PHYS_M=5e-6. "
+        "v10.0.2.1 requires DA_PHYS_M=5e-6. "
         "Physical renewal length and numerical geometry substep are not yet separated."
     )
 PY
@@ -78,18 +74,19 @@ for T_K in $TEMPS; do
     )
     if [[ "$WAKE_SHIELDING" == "1" ]]; then
       wake_args+=(--wake-shielding)
+    else
+      wake_args+=(--no-wake-shielding)
     fi
 
     echo "========================================================================"
-    echo "v10.0.2 progression: class=$CLASS T=${T_K}K target=${TARGET_EXT_UM}um wake=$WAKE_SHIELDING"
+    echo "v10.0.2.1 progression: class=$CLASS T=${T_K}K target=${TARGET_EXT_UM}um wake=$WAKE_SHIELDING"
     echo "out=$OUTDIR"
     echo "========================================================================"
 
     status=COMPLETE
     if ! "$PYTHON_BIN" -m arrhenius_fracture.sharp_front_v10_1 \
       --mode 2d --material-class "$CLASS" --temperatures "$T_K" \
-      --bulk-plasticity-mode tip_only \
-      --directional-j-mode root_signed \
+      --bulk-plasticity-mode tip_only --directional-j-mode root_signed \
       --steps "$STEPS" --nx "$NX" --ny "$NY" \
       --dU "$DU" --dt "$DT" --n-stagger "$N_STAGGER" \
       --tip-h-fine "$TIP_H_FINE" --tip-ratio "$TIP_RATIO" \
@@ -104,6 +101,16 @@ for T_K in $TEMPS; do
       --out "$OUTDIR"; then
       status=FAILED
     fi
+
+    "$PYTHON_BIN" - "$OUTDIR/run_args.json" "$WAKE_SHIELDING" <<'PY'
+import json, pathlib, sys
+path = pathlib.Path(sys.argv[1])
+expected = bool(int(sys.argv[2]))
+data = json.loads(path.read_text())
+actual = bool(data.get("wake_shielding"))
+if actual != expected:
+    raise SystemExit(f"wake routing audit failed: expected {expected}, run_args has {actual}: {path}")
+PY
 
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
       "$T_K" "$CLASS" "$WAKE_SHIELDING" "$TARGET_EXT_UM" "$DA_PHYS_M" "$status" "$OUTDIR" \
