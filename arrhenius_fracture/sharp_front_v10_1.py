@@ -128,8 +128,30 @@ _ORIGINAL_MPZ_DIAGNOSTICS = UnifiedMPZState.diagnostics
 
 
 def _diagnostics_with_csv_aliases(self, G: float, nu: float, b: float, r0: float):
-    """Map current active/wake fields onto the inherited long-run CSV keys."""
+    """Map the effective v10.1 shielding state onto inherited CSV keys."""
     data = _ORIGINAL_MPZ_DIAGNOSTICS(self, G, nu, b, r0)
+    cfg = getattr(UnifiedMPZState, "_v101_shield_cfg", None)
+    if cfg is not None:
+        self.cfg.mobile_shield_fraction = float(cfg.mobile_shield_fraction)
+        active_raw = self._shielding_raw(
+            self.retained, self.mobile, self.x, G, nu, b
+        )
+        if not cfg.active_shielding:
+            active = 0.0
+        elif cfg.signed_active_shielding:
+            active = float(active_raw)
+        else:
+            active = max(float(active_raw), 0.0)
+        if bool(self.cfg.wake_shielding):
+            wake_raw = float(self.cfg.wake_shield_projection) * self._shielding_raw(
+                self.wake_retained, self.wake_mobile, self.wake_x, G, nu, b
+            )
+            wake = float(wake_raw) if cfg.signed_active_shielding else max(float(wake_raw), 0.0)
+        else:
+            wake = 0.0
+        data["mpz_active_K_shield_Pa_sqrt_m"] = active
+        data["mpz_wake_K_shield_Pa_sqrt_m"] = wake
+        data["mpz_total_K_shield_Pa_sqrt_m"] = active + wake
     data["mpz_K_shield_Pa_sqrt_m"] = float(data["mpz_total_K_shield_Pa_sqrt_m"])
     data["mpz_wake_retained_total"] = float(data["mpz_wake_retained_count"])
     data["mpz_local_slip_count"] = float(self.local_slip_count())
@@ -196,11 +218,14 @@ def main(argv=None):
     original_diag = UnifiedMPZState.diagnostics
     original_advance = UnifiedMPZState.advance
     original_engine = sharp_front.UnifiedMPZFrontEngine
+    had_shield_cfg = hasattr(UnifiedMPZState, "_v101_shield_cfg")
+    old_shield_cfg = getattr(UnifiedMPZState, "_v101_shield_cfg", None)
     try:
         plasticity.update_plasticity = _tip_only_update_plasticity
         UnifiedMPZState.diagnostics = _diagnostics_with_csv_aliases
         if kinetics_mode == "moving_velocity":
             UnifiedMPZState.advance = fractional_moving_frame_advance
+            UnifiedMPZState._v101_shield_cfg = tip_cfg
             KineticMovingTipFrontEngine.configure_default(tip_cfg)
             KineticMovingTipFrontEngine.reset_audit()
             sharp_front.UnifiedMPZFrontEngine = KineticMovingTipFrontEngine
@@ -220,6 +245,10 @@ def main(argv=None):
         UnifiedMPZState.diagnostics = original_diag
         UnifiedMPZState.advance = original_advance
         sharp_front.UnifiedMPZFrontEngine = original_engine
+        if had_shield_cfg:
+            UnifiedMPZState._v101_shield_cfg = old_shield_cfg
+        elif hasattr(UnifiedMPZState, "_v101_shield_cfg"):
+            delattr(UnifiedMPZState, "_v101_shield_cfg")
 
 
 if __name__ == "__main__":
