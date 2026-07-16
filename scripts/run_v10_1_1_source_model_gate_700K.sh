@@ -11,11 +11,11 @@ T_K=${T_K:-700}
 CLASSES=${CLASSES:-"weakT DBTT"}
 SOURCE_MODELS=${SOURCE_MODELS:-"continuum finite_sites"}
 TARGET_EXT_UM=${TARGET_EXT_UM:-10}
-# The validated cases complete in <150 outer steps.  A 500-step ceiling prevents
-# a failed source law from loading indefinitely to nonphysical K values.
+# Validated moving-tip cases complete in <150 outer steps. A 500-step ceiling
+# prevents a failed source law from loading indefinitely to nonphysical K.
 STEPS=${STEPS:-500}
 K_FIRST_MAX_MPA_SQRT_M=${K_FIRST_MAX_MPA_SQRT_M:-100}
-OUTROOT=${OUTROOT:-runs/v10_1_2_source_model_gate_700K_10um_v1}
+OUTROOT=${OUTROOT:-runs/v10_1_3_source_model_gate_700K_10um_v1}
 
 NX=${NX:-48}
 NY=${NY:-96}
@@ -53,7 +53,7 @@ for SOURCE_MODEL in $SOURCE_MODELS; do
     OUTDIR="$OUTROOT/$SOURCE_MODEL/$CLASS/T${T_K}_th${THETA}"
     mkdir -p "$OUTDIR"
     echo "========================================================================"
-    echo "v10.1.2 source gate: source=$SOURCE_MODEL class=$CLASS T=${T_K}K target=${TARGET_EXT_UM}um"
+    echo "v10.1.3 source gate: source=$SOURCE_MODEL class=$CLASS T=${T_K}K target=${TARGET_EXT_UM}um"
     echo "out=$OUTDIR"
     echo "========================================================================"
 
@@ -87,6 +87,7 @@ for SOURCE_MODEL in $SOURCE_MODELS; do
       if ! "$PYTHON_BIN" - \
         "$OUTDIR/v10_1_driver_modes.json" \
         "$OUTDIR/summary.json" \
+        "$OUTDIR/kinetic_tip_cell_audit_v101.json" \
         "$SOURCE_MODEL" \
         "$TARGET_EXT_UM" \
         "$DA_CHECKPOINT_M" \
@@ -95,10 +96,11 @@ import json, math, pathlib, sys
 
 mode_path = pathlib.Path(sys.argv[1])
 summary_path = pathlib.Path(sys.argv[2])
-expected_source = sys.argv[3]
-target_um = float(sys.argv[4])
-da_m = float(sys.argv[5])
-kmax = float(sys.argv[6])
+audit_path = pathlib.Path(sys.argv[3])
+expected_source = sys.argv[4]
+target_um = float(sys.argv[5])
+da_m = float(sys.argv[6])
+kmax = float(sys.argv[7])
 
 modes = json.loads(mode_path.read_text())
 assert modes["tip_source_model"] == expected_source, modes
@@ -111,6 +113,26 @@ minimum_advances = max(1, math.ceil(target_um / (da_m * 1.0e6) - 1.0e-12))
 assert int(row["n_advances"]) >= minimum_advances, row
 kc = float(row["Kc_first_MPa_sqrt_m"])
 assert math.isfinite(kc) and 0.0 < kc <= kmax, row
+
+if expected_source == "continuum":
+    audit = json.loads(audit_path.read_text())
+    records = audit.get("records", [])
+    assert records, audit
+    required = (
+        "tip_source_local_density_m2",
+        "tip_source_backstress_shear_Pa",
+        "tip_source_backstress_equivalent_Pa",
+        "tip_source_effective_emission_stress_Pa",
+    )
+    for record in records:
+        for key in required:
+            value = float(record[key])
+            assert math.isfinite(value) and value >= 0.0, (key, value, record)
+    assert max(float(r["tip_source_backstress_equivalent_Pa"]) for r in records) > 0.0
+    for record in records:
+        eff = float(record["tip_source_effective_emission_stress_Pa"])
+        sig = max(float(record["sigma_tip_Pa"]), 0.0)
+        assert eff <= sig + max(1.0e-8 * max(sig, 1.0), 1.0), record
 PY
       then
         status=FAILED
