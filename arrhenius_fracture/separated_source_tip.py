@@ -1,8 +1,8 @@
 """Strict separation of opening, cleavage, and emission stress channels.
 
 The FEM/J-derived opening stress is never reduced by the local Taylor back
-stress.  Elastic dislocation shielding remains in the cleavage channel through
-``K_shield``.  The local Taylor back stress acts only inside the continuum
+stress. Elastic dislocation shielding remains in the cleavage channel through
+``K_shield``. The local Taylor back stress acts only inside the continuum
 source emission law.
 """
 from __future__ import annotations
@@ -11,7 +11,6 @@ import math
 
 import numpy as np
 
-from .config import EV_TO_J
 from .continuum_source_tip import (
     ContinuumSourceKineticTipEngine as _BackstressContinuumEngine,
     source_diagnostics,
@@ -23,10 +22,10 @@ class SeparatedSourceKineticTipEngine(_BackstressContinuumEngine):
     """Continuum source engine with three explicit tip-stress channels.
 
     ``sigma_opening_tip`` is obtained directly from the FEM/J-derived K and the
-    current blunted radius.  ``sigma_cleave`` is inherited from ``sigma_tip``
-    and therefore includes elastic K shielding.  Plastic evolution receives
-    only ``sigma_opening_tip``; the local Taylor back stress is subtracted later
-    and only by the continuum emission law.
+    current blunted radius. ``sigma_cleave`` is inherited from ``sigma_tip`` and
+    therefore includes elastic K shielding. Plastic evolution receives only
+    ``sigma_opening_tip``; the local Taylor back stress is subtracted later and
+    only by the continuum emission law.
     """
 
     separated_tip_stress_channels = True
@@ -50,7 +49,7 @@ class SeparatedSourceKineticTipEngine(_BackstressContinuumEngine):
             opening_stress = self.sigma_opening_tip(float(current_K))
 
         # Bypass the immediate parent wrapper so that the validated kinetic
-        # plastic integrator receives the unshielded opening stress.  The MPZ
+        # plastic integrator receives the unshielded opening stress. The MPZ
         # emission method then subtracts the local Taylor back stress exactly
         # once, while cleavage continues to use the shielded stress computed by
         # the moving-tip integrator.
@@ -87,9 +86,6 @@ class SeparatedSourceKineticTipEngine(_BackstressContinuumEngine):
         result["lambda_e"] = float(
             result.get("tip_source_emission_rate_s", result.get("lambda_e", 0.0))
         )
-        result["G_emit_eV"] = float(
-            np.asarray(self.manifest.emission.values_eV(emit_effective, 1.0))
-        ) if False else result.get("G_emit_eV", 0.0)
 
         if type(self)._audit_records:
             record = type(self)._audit_records[-1]
@@ -103,13 +99,7 @@ class SeparatedSourceKineticTipEngine(_BackstressContinuumEngine):
 
     def step(self, K, T, dt):
         self._separated_current_K_Pa_sqrt_m = max(float(K), 0.0)
-        try:
-            result = super().step(K, T, dt)
-        finally:
-            # Keep the most recent K only for diagnostics; every subsequent step
-            # overwrites it before any plastic evolution occurs.
-            pass
-
+        result = super().step(K, T, dt)
         result = self._rewrite_monotonic_channel_diagnostics(result, float(K))
         emit_effective = float(
             result.get("tip_source_effective_emission_stress_Pa", 0.0)
@@ -121,7 +111,7 @@ class SeparatedSourceKineticTipEngine(_BackstressContinuumEngine):
 
     def cycle_step_waveform(self, controller, waveform, T_K: float,
                             requested_cycles=None, force_cycles=None):
-        # Fatigue retains the existing cycle-block approximation.  Set the
+        # Fatigue retains the existing cycle-block approximation. Set the
         # opening channel from Kmax so the local Taylor back stress is still
         # emission-only; a future phase-resolved source update can refine this.
         self._separated_current_K_Pa_sqrt_m = max(float(waveform.Kmax), 0.0)
