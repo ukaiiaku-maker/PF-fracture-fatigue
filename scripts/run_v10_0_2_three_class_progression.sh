@@ -37,9 +37,8 @@ SAVE_SNAPSHOTS=${SAVE_SNAPSHOTS:-10}
 SNAPSHOT_BY_EXT_UM=${SNAPSHOT_BY_EXT_UM:-5}
 
 # v10.0.2 still uses one variable for both the calibrated physical renewal
-# length and the accepted geometry increment.  Changing it would alter the
-# kinetics, not merely the numerical resolution.  Keep the validated 5 um
-# renewal until those two lengths are separated in a later implementation.
+# length and the accepted geometry increment. Changing it would alter the
+# kinetics, not merely the numerical resolution.
 "$PYTHON_BIN" - "$DA_PHYS_M" <<'PY'
 import math, sys
 value = float(sys.argv[1])
@@ -78,6 +77,9 @@ for T_K in $TEMPS; do
     )
     if [[ "$WAKE_SHIELDING" == "1" ]]; then
       wake_args+=(--wake-shielding)
+    else
+      # BooleanOptionalAction defaults to true; omission is not an ablation.
+      wake_args+=(--no-wake-shielding)
     fi
 
     echo "========================================================================"
@@ -104,6 +106,17 @@ for T_K in $TEMPS; do
       --out "$OUTDIR"; then
       status=FAILED
     fi
+
+    # Refuse a mislabeled ablation even if the solver itself completed.
+    "$PYTHON_BIN" - "$OUTDIR/run_args.json" "$WAKE_SHIELDING" <<'PY'
+import json, pathlib, sys
+path = pathlib.Path(sys.argv[1])
+expected = bool(int(sys.argv[2]))
+data = json.loads(path.read_text())
+actual = bool(data.get("wake_shielding"))
+if actual != expected:
+    raise SystemExit(f"wake routing audit failed: expected {expected}, run_args has {actual}: {path}")
+PY
 
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
       "$T_K" "$CLASS" "$WAKE_SHIELDING" "$TARGET_EXT_UM" "$DA_PHYS_M" "$status" "$OUTDIR" \
