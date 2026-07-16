@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arrhenius-sharp-front-mpz"
+version = "10.0.0"
+description = "Anisotropic multifront Arrhenius sharp-front fracture and fatigue with unified moving process-zone plasticity"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[tool.setuptools]
+packages = ["arrhenius_fracture"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+arrhenius_fracture = ["data/materials/*/*.csv"]
