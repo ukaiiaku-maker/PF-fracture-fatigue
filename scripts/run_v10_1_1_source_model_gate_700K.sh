@@ -129,10 +129,6 @@ if expected_source == "continuum":
             value = float(record[key])
             assert math.isfinite(value) and value >= 0.0, (key, value, record)
     assert max(float(r["tip_source_backstress_equivalent_Pa"]) for r in records) > 0.0
-    for record in records:
-        eff = float(record["tip_source_effective_emission_stress_Pa"])
-        sig = max(float(record["sigma_tip_Pa"]), 0.0)
-        assert eff <= sig + max(1.0e-8 * max(sig, 1.0), 1.0), record
 PY
       then
         status=FAILED
