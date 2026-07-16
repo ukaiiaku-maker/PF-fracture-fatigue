@@ -6,6 +6,13 @@ on:
       - main
     paths:
       - ".github/workflows/publish-v10.yml"
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
   workflow_dispatch:
 
 permissions:
@@ -13,6 +20,7 @@ permissions:
 
 jobs:
   publish:
+    if: github.event_name != 'pull_request' || github.head_ref == 'v10.0-unified-sharp-front-mpz'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
