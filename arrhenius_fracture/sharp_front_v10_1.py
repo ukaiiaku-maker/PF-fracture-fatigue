@@ -9,6 +9,7 @@ from typing import Iterable
 import numpy as np
 
 from . import plasticity, sharp_front
+from .fractional_moving_frame import fractional_moving_frame_advance
 from .kinetic_tip_cell import KineticMovingTipFrontEngine, KineticTipConfig
 from .unified_mpz import UnifiedMPZState
 
@@ -167,6 +168,7 @@ def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str,
         "kinetic_velocity_scale": cfg.velocity_scale,
         "kinetic_max_action_substep": cfg.max_action_substep,
         "kinetic_max_translation_substep_m": cfg.max_translation_substep_m,
+        "fractional_moving_frame": kinetics_mode == "moving_velocity",
     }
     (path / "v10_1_driver_modes.json").write_text(json.dumps(payload, indent=2))
     if kinetics_mode == "moving_velocity":
@@ -192,11 +194,13 @@ def main(argv=None):
 
     original_update = plasticity.update_plasticity
     original_diag = UnifiedMPZState.diagnostics
+    original_advance = UnifiedMPZState.advance
     original_engine = sharp_front.UnifiedMPZFrontEngine
     try:
         plasticity.update_plasticity = _tip_only_update_plasticity
         UnifiedMPZState.diagnostics = _diagnostics_with_csv_aliases
         if kinetics_mode == "moving_velocity":
+            UnifiedMPZState.advance = fractional_moving_frame_advance
             KineticMovingTipFrontEngine.configure_default(tip_cfg)
             KineticMovingTipFrontEngine.reset_audit()
             sharp_front.UnifiedMPZFrontEngine = KineticMovingTipFrontEngine
@@ -214,6 +218,7 @@ def main(argv=None):
     finally:
         plasticity.update_plasticity = original_update
         UnifiedMPZState.diagnostics = original_diag
+        UnifiedMPZState.advance = original_advance
         sharp_front.UnifiedMPZFrontEngine = original_engine
 
 
