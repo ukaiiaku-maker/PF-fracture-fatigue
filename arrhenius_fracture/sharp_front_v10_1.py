@@ -1,4 +1,4 @@
-"""Safeguarded v10.1 entry point for the kinetic moving-tip MPZ solver."""
+"""Safeguarded v10.1.1 entry point for the kinetic moving-tip MPZ solver."""
 from __future__ import annotations
 
 import json
@@ -9,6 +9,10 @@ from typing import Iterable
 import numpy as np
 
 from . import plasticity, sharp_front
+from .continuum_source_tip import (
+    ContinuumSourceKineticTipEngine,
+    SOURCE_MODEL as CONTINUUM_SOURCE_MODEL,
+)
 from .fractional_moving_frame import fractional_moving_frame_advance
 from .kinetic_tip_cell import KineticMovingTipFrontEngine, KineticTipConfig
 from .unified_mpz import UnifiedMPZState
@@ -118,9 +122,28 @@ def _prepare_args_v101(argv: Iterable[str]) -> tuple[list[str], str, str, str, K
     return args, bulk_mode, j_mode, kinetics_mode, cfg
 
 
+def _prepare_args_v1011(
+    argv: Iterable[str],
+) -> tuple[list[str], str, str, str, KineticTipConfig, str]:
+    args = list(argv)
+    source_model = _pop_value(args, "--tip-source-model", "continuum").strip().lower()
+    aliases = {
+        "continuum": "continuum",
+        "minimal_continuum": "continuum",
+        CONTINUUM_SOURCE_MODEL: "continuum",
+        "finite": "finite_sites",
+        "finite_sites": "finite_sites",
+        "legacy": "finite_sites",
+    }
+    if source_model not in aliases:
+        raise SystemExit("--tip-source-model must be continuum or finite_sites")
+    parsed, bulk_mode, j_mode, kinetics_mode, cfg = _prepare_args_v101(args)
+    return parsed, bulk_mode, j_mode, kinetics_mode, cfg, aliases[source_model]
+
+
 def _prepare_args(argv: Iterable[str]) -> tuple[list[str], str, str]:
     """Backward-compatible v10.0.1 parser interface used by existing tests/tools."""
-    args, bulk_mode, j_mode, _kinetics_mode, _cfg = _prepare_args_v101(argv)
+    args, bulk_mode, j_mode, _kinetics_mode, _cfg, _source = _prepare_args_v1011(argv)
     return args, bulk_mode, j_mode
 
 
@@ -155,11 +178,23 @@ def _diagnostics_with_csv_aliases(self, G: float, nu: float, b: float, r0: float
     data["mpz_K_shield_Pa_sqrt_m"] = float(data["mpz_total_K_shield_Pa_sqrt_m"])
     data["mpz_wake_retained_total"] = float(data["mpz_wake_retained_count"])
     data["mpz_local_slip_count"] = float(self.local_slip_count())
+    data["mpz_tip_source_model"] = str(getattr(self, "source_model", "legacy_finite_sites"))
+    data["mpz_tip_source_activity_mean"] = float(
+        np.mean(getattr(self, "tip_source_activity", np.ones(self.n_systems)))
+    )
+    data["mpz_tip_source_effective_multiplicity"] = float(
+        getattr(self, "continuum_source_last_effective_multiplicity", np.sum(self.available_sites))
+    )
+    data["mpz_tip_source_hardening_factor"] = float(
+        getattr(self, "continuum_source_last_hardening", 1.0)
+    )
     return data
 
 
-def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str,
-                      kinetics_mode: str, cfg: KineticTipConfig) -> None:
+def _write_mode_audit(
+    args: list[str], bulk_mode: str, j_mode: str, kinetics_mode: str,
+    cfg: KineticTipConfig, source_model: str, engine_cls,
+) -> None:
     out = _option_value(args, "--out")
     if not out:
         return
@@ -180,8 +215,12 @@ def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str,
     )
     payload = {
         **legacy_payload,
-        "schema": "v10.1_driver_modes",
+        "schema": "v10.1.1_driver_modes",
         "tip_kinetics_mode": kinetics_mode,
+        "tip_source_model": source_model,
+        "distributed_source_representation": "continuum_peierls_taylor_storage",
+        "finite_distributed_source_inventory": False,
+        "source_sites_per_system_role": "legacy_rate_multiplicity_only",
         "tip_plasticity_enabled": cfg.plasticity_enabled,
         "active_shielding_enabled": cfg.active_shielding,
         "signed_active_shielding": cfg.signed_active_shielding,
@@ -193,14 +232,24 @@ def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str,
         "fractional_moving_frame": kinetics_mode == "moving_velocity",
     }
     (path / "v10_1_driver_modes.json").write_text(json.dumps(payload, indent=2))
+    (path / "v10_1_1_source_model.json").write_text(json.dumps({
+        "schema": "v10.1.1_minimal_source_model",
+        "tip_source_model": source_model,
+        "tip_activity_state": "one dimensionless activity per crystallographic system",
+        "activity_exhaustion": "Arrhenius emission",
+        "activity_recovery_time": "Peierls clearing velocity / current blunted tip radius",
+        "activity_recovery_geometry": "crack advance / current blunted tip radius",
+        "hardening_feedback": "near-tip retained Taylor forest / promoted correlation density",
+        "new_fitted_source_parameters": 0,
+    }, indent=2))
     if kinetics_mode == "moving_velocity":
         (path / "kinetic_tip_cell_audit_v101.json").write_text(
-            json.dumps(KineticMovingTipFrontEngine.audit_payload(), indent=2)
+            json.dumps(engine_cls.audit_payload(), indent=2)
         )
 
 
 def main(argv=None):
-    args, bulk_mode, j_mode, kinetics_mode, tip_cfg = _prepare_args_v101(
+    args, bulk_mode, j_mode, kinetics_mode, tip_cfg, source_model = _prepare_args_v1011(
         sys.argv[1:] if argv is None else argv
     )
     if "--material-class" not in args and "--material-manifest" not in args:
@@ -214,6 +263,11 @@ def main(argv=None):
             "kinetics are not yet mapped to the promoted material manifest."
         )
 
+    engine_cls = (
+        ContinuumSourceKineticTipEngine
+        if source_model == "continuum"
+        else KineticMovingTipFrontEngine
+    )
     original_update = plasticity.update_plasticity
     original_diag = UnifiedMPZState.diagnostics
     original_advance = UnifiedMPZState.advance
@@ -226,19 +280,22 @@ def main(argv=None):
         if kinetics_mode == "moving_velocity":
             UnifiedMPZState.advance = fractional_moving_frame_advance
             UnifiedMPZState._v101_shield_cfg = tip_cfg
-            KineticMovingTipFrontEngine.configure_default(tip_cfg)
-            KineticMovingTipFrontEngine.reset_audit()
-            sharp_front.UnifiedMPZFrontEngine = KineticMovingTipFrontEngine
+            engine_cls.configure_default(tip_cfg)
+            engine_cls.reset_audit()
+            sharp_front.UnifiedMPZFrontEngine = engine_cls
         wake_mode = _resolved_wake_shielding(args)
         print(
-            f"  v10.1 driving modes: bulk_plasticity={bulk_mode}, "
+            f"  v10.1.1 driving modes: bulk_plasticity={bulk_mode}, "
             f"directional_J={j_mode}, tip_kinetics={kinetics_mode}, "
+            f"tip_source_model={source_model}, "
             f"tip_plasticity={int(tip_cfg.plasticity_enabled)}, "
             f"active_shielding={int(tip_cfg.active_shielding)}, "
             f"wake_shielding={int(wake_mode)}"
         )
         result = sharp_front.main(args)
-        _write_mode_audit(args, bulk_mode, j_mode, kinetics_mode, tip_cfg)
+        _write_mode_audit(
+            args, bulk_mode, j_mode, kinetics_mode, tip_cfg, source_model, engine_cls
+        )
         return result
     finally:
         plasticity.update_plasticity = original_update
