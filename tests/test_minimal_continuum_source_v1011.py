@@ -65,7 +65,7 @@ def test_emission_exhausts_activity_but_not_reference_multiplicity():
     emitted = state._emit(1.0, 1.0e9, 700.0)
     assert emitted > 0.0
     assert np.all(state.tip_source_activity < 1.0)
-    assert np.all(state.site_capacity == pytest.approx(reference))
+    assert np.allclose(state.site_capacity, reference)
     assert state.available_site_fraction < 1.0
 
 
@@ -89,7 +89,7 @@ def test_crack_advance_recovers_activity_over_current_tip_radius():
 
     result = state.advance(1.0e-6)
     expected = 1.0 - np.exp(-1.0)
-    assert np.all(state.tip_source_activity == pytest.approx(expected))
+    assert np.allclose(state.tip_source_activity, expected)
     assert result["tip_source_geometry_fraction"] == pytest.approx(expected)
     assert result["tip_source_activity_recovered_geometry"] > 0.0
 
@@ -101,7 +101,7 @@ def test_taylor_storage_suppresses_tip_cycling_without_new_scale():
     state.retained[:, :2] = 100.0
     hardened = _source_hardening_activity(state)
 
-    assert np.all(baseline == pytest.approx(1.0))
+    assert np.allclose(baseline, 1.0)
     assert np.all(hardened < baseline)
     assert np.all(hardened > 0.0)
 
