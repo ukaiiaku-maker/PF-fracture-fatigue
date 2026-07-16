@@ -81,11 +81,14 @@ A separate environment is strongly recommended because the older project uses
 the same Python package namespace:
 
 ```bash
-conda create -n arrhenius-sharp-front-v10 python=3.12 numpy scipy matplotlib pytest -y
+conda create -n arrhenius-sharp-front-v10 python=3.12 pip numpy scipy matplotlib pytest -y
 conda activate arrhenius-sharp-front-v10
 python -m pip install -e . --no-deps
 python -m pytest -q
 ```
+
+`pip` is listed explicitly because some minimal Conda Python environments do not
+install it automatically.
 
 Verify import provenance:
 
@@ -106,6 +109,10 @@ Every printed path must lie inside this repository.
 ```bash
 OUT=runs/v10_0_1_preflight bash scripts/run_v10_preflight.sh
 ```
+
+The preflight anchors itself to the repository root and puts the current checkout
+first on `PYTHONPATH`, so it is not dependent on the shell's working directory or
+on an older editable installation.
 
 At 700 K the constitutive audit should show:
 
