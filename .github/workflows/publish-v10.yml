@@ -28,6 +28,8 @@ jobs:
             "$work"
           cd "$work"
 
+          sed -i "/p.add_argument('--mpz-n-bins', type=int, default=200)/d" \
+            .bootstrap/materialize_v10.py
           python .bootstrap/materialize_v10.py
           python -m pip install -q -e ".[test]"
           OUT=runs/ci_preflight bash scripts/run_v10_preflight.sh
