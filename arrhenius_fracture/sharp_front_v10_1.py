@@ -1,24 +1,24 @@
-"""v10.0.1 sharp-front entry point with explicit bulk-plasticity and J-sign modes.
+"""v10.0.1 production entry point for the unified sharp-front MPZ solver.
 
-The v10.0 material-transfer gate unintentionally advanced the legacy full-field
-plasticity model even though that model was not parameterized from the promoted
-ceramic/weakT/DBTT manifest.  It also inherited the legacy directional-J sign
-tracker, whose sign was fixed by the first numerically nonzero J value.
+The v10.0 two-dimensional gate could silently mix this repository with modules
+from the older ``arrhenius-fem-czm`` editable installation because both projects
+used the ``arrhenius_fracture`` namespace.  It also advanced a legacy full-field
+bulk plasticity model that was not parameterized from the promoted material
+manifest.
 
-This wrapper keeps the complete anisotropic/multifront solver, but makes those
-two choices explicit:
+v10.0.1 therefore makes the validated baseline explicit:
 
-* ``tip_only``: the unified active/wake MPZ is the only plastic state advanced.
-  The FEM remains elastic outside the MPZ.  This is the required first material-
-  transfer gate and is not a removal of the full-field capability.
-* ``full_field``: retain the existing full-field plasticity update for audit and
-  later manifest-coupled development.
-* ``abs_forward``: use |J| only after the existing global-forward candidate
-  filter.  This mode is restricted to the one-front transfer gate.
-* ``root_signed``: retain the signed directional-J convention used for branching.
+* the unified active/wake MPZ is the plastic state used by monotonic and fatigue
+  fracture during the initial transfer gates;
+* the surrounding FEM is elastic until a manifest-coupled full-field model is
+  implemented and audited;
+* signed directional J remains the production convention for anisotropy and
+  branching.  ``abs_forward`` is retained only as a one-front diagnostic.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
 import sys
 from typing import Iterable
 
@@ -28,7 +28,6 @@ from . import plasticity, sharp_front
 
 
 def _pop_value(args: list[str], option: str, default: str) -> str:
-    """Remove one ``--option value`` or ``--option=value`` pair from argv."""
     prefix = option + "="
     for i, token in enumerate(list(args)):
         if token.startswith(prefix):
@@ -44,6 +43,16 @@ def _pop_value(args: list[str], option: str, default: str) -> str:
     return default
 
 
+def _option_value(args: list[str], option: str, default: str | None = None) -> str | None:
+    prefix = option + "="
+    for i, token in enumerate(args):
+        if token.startswith(prefix):
+            return token[len(prefix):]
+        if token == option and i + 1 < len(args):
+            return args[i + 1]
+    return default
+
+
 def _tip_only_update_plasticity(
     ep_gp,
     rho_gp,
@@ -55,12 +64,7 @@ def _tip_only_update_plasticity(
     disl_cfg,
     return_info: bool = False,
 ):
-    """No-op bulk update used while the unified MPZ supplies tip plasticity.
-
-    Arrays are copied because the production update mutates ``ep_gp`` in place;
-    returning independent arrays preserves the transaction semantics expected by
-    the adaptive load-step rollback.
-    """
+    """Transactional no-op for the unparameterized surrounding bulk field."""
     ep_out = np.asarray(ep_gp, dtype=float).copy()
     rho_out = np.asarray(rho_gp, dtype=float).copy()
     dot_ep = np.zeros_like(rho_out)
@@ -88,6 +92,21 @@ def _prepare_args(argv: Iterable[str]) -> tuple[list[str], str, str]:
     return args, bulk_mode, j_mode
 
 
+def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str) -> None:
+    out = _option_value(args, "--out")
+    if not out:
+        return
+    path = Path(out)
+    path.mkdir(parents=True, exist_ok=True)
+    (path / "v10_0_1_driver_modes.json").write_text(json.dumps({
+        "schema": "v10_0_1_driver_modes",
+        "bulk_plasticity_mode": bulk_mode,
+        "directional_j_mode": j_mode,
+        "legacy_full_field_enabled": False,
+        "dependency_closed_sharp_backend": True,
+    }, indent=2))
+
+
 def main(argv=None):
     args, bulk_mode, j_mode = _prepare_args(
         sys.argv[1:] if argv is None else argv
@@ -97,16 +116,23 @@ def main(argv=None):
             "v10.0.1 requires --material-class {ceramic,weakT,DBTT} "
             "or --material-manifest PATH"
         )
+    if bulk_mode == "full_field":
+        raise SystemExit(
+            "v10.0.1 blocks --bulk-plasticity-mode full_field: the inherited "
+            "bulk kinetics are not yet mapped to the promoted material manifest. "
+            "Use tip_only for the validated unified-MPZ baseline."
+        )
 
     original_update = plasticity.update_plasticity
     try:
-        if bulk_mode == "tip_only":
-            plasticity.update_plasticity = _tip_only_update_plasticity
+        plasticity.update_plasticity = _tip_only_update_plasticity
         print(
             f"  v10.0.1 driving modes: bulk_plasticity={bulk_mode}, "
             f"directional_J={j_mode}"
         )
-        return sharp_front.main(args)
+        result = sharp_front.main(args)
+        _write_mode_audit(args, bulk_mode, j_mode)
+        return result
     finally:
         plasticity.update_plasticity = original_update
 
