@@ -1,9 +1,10 @@
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 
 import numpy as np
 import pytest
 
 from arrhenius_fracture.config import EV_TO_J
+from arrhenius_fracture.fractional_moving_frame import fractional_moving_frame_advance
 from arrhenius_fracture.kinetic_tip_cell import (
     KineticMovingTipFrontEngine,
     KineticTipConfig,
@@ -28,6 +29,7 @@ def _engine(cfg: KineticTipConfig) -> KineticMovingTipFrontEngine:
         fcfg, None, None, 80.0e9, 0.3, 2.5e-10, manifest,
         MPZConfig(length_m=20.0e-6, n_bins=40, wake_length_m=20.0e-6),
     )
+    eng.mpz.advance = MethodType(fractional_moving_frame_advance, eng.mpz)
     eng.lambda_cleave = lambda sig, T: (2.0, 2.0, 1.0 * EV_TO_J)
     eng.lambda_emit = lambda sig, T: (0.0, sig, 1.0 * EV_TO_J)
     return eng
@@ -80,6 +82,22 @@ def test_source_exposure_occurs_during_partial_advance():
     assert before == 0.0
     assert eng.mpz.available_site_fraction > 0.0
     assert result["source_sites_refreshed"] > 0.0
+
+
+def test_fractional_substeps_accumulate_on_mpz_grid():
+    eng = _engine(KineticTipConfig(
+        plasticity_enabled=False,
+        active_shielding=False,
+        max_action_substep=0.02,
+        max_translation_substep_m=0.1e-6,
+    ))
+    eng.mpz.mobile[0, 2] = 1.0
+    initial_first_moment = float(np.sum(eng.mpz.mobile[0] * eng.mpz.x))
+    for _ in range(2):
+        eng.step(0.0, 700.0, 0.01)
+    final_first_moment = float(np.sum(eng.mpz.mobile[0] * eng.mpz.x))
+    assert final_first_moment < initial_first_moment
+    assert eng.mpz.advance_total_m == pytest.approx(0.2e-6)
 
 
 def test_active_mobile_population_has_switchable_signed_shielding():
