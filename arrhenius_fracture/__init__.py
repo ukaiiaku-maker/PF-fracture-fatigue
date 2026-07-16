@@ -1,6 +1,6 @@
 """Arrhenius sharp-front fracture and fatigue with unified MPZ state."""
 
-__version__ = "10.0.0"
+__version__ = "10.0.1"
 
 from .material_manifest import MaterialManifest
 from .unified_mpz import MPZConfig, UnifiedMPZState

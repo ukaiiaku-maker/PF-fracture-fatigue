@@ -1,13 +1,13 @@
 # PF-fracture-fatigue: v10 unified sharp-front MPZ
 
 This repository is the clean sharp-front successor to the mixed legacy
-`PF-Fatigue_code` archive.  The production fracture path does **not** evolve an
-AT1 or AT2 phase field.  A binary broken-material indicator is retained only
-for stiffness removal and crack-path representation.
+`PF-Fatigue_code` archive. The production fracture path does **not** evolve an
+AT1 or AT2 phase field. A binary broken-material indicator is retained only for
+stiffness removal and crack-path representation.
 
 The active architecture is:
 
-```
+```text
 anisotropic FEM + directional J
     -> absolute Arrhenius cleavage and emission hazards
     -> unified finite-source active/wake moving process zone
@@ -16,80 +16,133 @@ anisotropic FEM + directional J
     -> same-load FEM/J recomputation and optional multifront branching
 ```
 
-## Integrated v10.0 baseline
+## v10.0.1 correction
 
-The first public baseline implements development items 1--5 as one unit:
+The original v10.0 two-dimensional gate was not dependency closed. Because the
+older `arrhenius-fem-czm` editable distribution used the same
+`arrhenius_fracture` namespace, a local environment could silently obtain
+`crack_backend` and `coalescence` from the older checkout. That mixed execution
+also advanced a legacy full-field plasticity model that was not parameterized
+from the promoted ceramic/weakT/DBTT manifest.
 
-1. **Sanitized production stack.** Only the dependency-closed sharp-front FEM,
-   mesh, crystal, J-integral, plasticity, fatigue, and postprocessing modules
-   are included. Peridynamics, S-N initiation variants, mixed legacy patch
-   scripts, and AT2 scientific entry points are excluded.
-2. **Portable promoted manifests.** The exact promoted ceramic, weakT, and DBTT
-   CSV rows are vendored under `arrhenius_fracture/data/materials`.
-3. **Unified monotonic/fatigue MPZ state.** Both loading modes use the same
-   finite source inventory, independent-shape EXP-floor emission/Peierls/Taylor
-   kinetics, encounter/Taylor retention, recovery, transport, blunting, signed
-   active shielding, and persistent signed wake.
+v10.0.1 corrects this by:
+
+- vendoring a sharp-wake-only crack backend with no cohesive/CZM imports;
+- vendoring geometry-only crack-path coalescence;
+- testing that every production module resolves inside the current checkout;
+- using the unified active/wake MPZ as the plastic state in the initial 2-D gates;
+- leaving the surrounding FEM elastic until a manifest-coupled full-field model
+  is implemented and audited;
+- retaining signed directional J as the production anisotropy/branching
+  convention;
+- recording `v10_0_1_driver_modes.json` in every 2-D output directory.
+
+A clean anisotropic regression gives a monotonically increasing signed-J drive
+before the first event. The one-front `abs_forward` diagnostic gives the same
+values, demonstrating that directional-J sign clipping was not the failure.
+
+## Integrated baseline
+
+1. **Sanitized production stack.** The repository contains the sharp-front FEM,
+   mesh, crystal, J-integral, unified MPZ, fatigue, and postprocessing modules.
+   Peridynamics, S-N initiation variants, AT2 scientific entry points, and CZM
+   geometry are excluded.
+2. **Portable promoted manifests.** The promoted ceramic, weakT, and DBTT CSV
+   rows are vendored under `arrhenius_fracture/data/materials`.
+3. **Unified monotonic/fatigue MPZ state.** The active model uses finite source
+   inventories, independent EXP-floor emission/Peierls/Taylor kinetics,
+   encounter/Taylor retention, recovery, transport, blunting, signed active
+   shielding, and a persistent signed wake.
 4. **One-renewal geometry transactions.** A front accepts at most one physical
    `da` increment per FEM/J state. Excess cleavage action remains in `B` for the
-   post-advance equilibrium state; it is never converted into several geometry
-   jumps under one field solve.
-5. **Matched-stress constitutive audit.** The preflight verifies absolute
-   cleavage, emission, retention, source exhaustion, and shielding before any
-   two-dimensional interpretation.
+   next equilibrium state.
+5. **Matched-stress constitutive audit.** The required preflight verifies
+   cleavage, emission, retention, source exhaustion, and shielding before a 2-D
+   result is interpreted.
 
-## Capabilities retained from the sharp-front archive
+## Capabilities retained
 
 - cubic anisotropic plane-strain elasticity and arbitrary crystal rotation;
 - crystallographic cleavage-plane competition;
 - signed directional and cluster/local J decomposition;
-- multifront branching, branch lineage, starvation/stagnation controls;
-- multi-tip graded remeshing and field-state transfer;
-- monotonic loading and cycle-block fatigue;
-- full cyclic mechanics options in the two-dimensional sharp-front driver;
-- stochastic/first-passage-compatible front clocks and deterministic mean mode.
+- multifront branching, lineage, starvation, stagnation, and coalescence;
+- multi-tip graded remeshing and state transfer;
+- monotonic first-passage loading and cycle-block fatigue;
+- conservative branch splitting without duplication of source, mobile,
+  retained, slip, or wake inventories.
 
-The v10 front engine conservatively splits state at branch birth so no source,
-mobile, retained, slip, or wake inventory is duplicated.
+The legacy full-field bulk/cyclic plasticity source remains available for future
+porting, but v10.0.1 deliberately blocks it until its barriers and carrier state
+are mapped to the promoted material manifest.
 
 ## Installation
 
+A separate environment is strongly recommended because the older project uses
+the same Python package namespace:
+
 ```bash
-conda activate arrhenius-fem-czm
+conda create -n arrhenius-sharp-front-v10 python=3.12 pip numpy scipy matplotlib pytest -y
+conda activate arrhenius-sharp-front-v10
 python -m pip install -e . --no-deps
 python -m pytest -q
 ```
 
+`pip` is listed explicitly because some minimal Conda Python environments do not
+install it automatically.
+
+Verify import provenance:
+
+```bash
+python - <<'PY'
+from pathlib import Path
+import arrhenius_fracture
+from arrhenius_fracture import crack_backend, coalescence, sharp_front
+for module in (arrhenius_fracture, crack_backend, coalescence, sharp_front):
+    print(module.__name__, Path(module.__file__).resolve())
+PY
+```
+
+Every printed path must lie inside this repository.
+
 ## Required preflight
 
 ```bash
-OUT=runs/v10_preflight bash scripts/run_v10_preflight.sh
+OUT=runs/v10_0_1_preflight bash scripts/run_v10_preflight.sh
 ```
 
-This writes `matched_stress_v10.csv/json` and runs a ceramic first-passage
-K-ramp. At 700 K the constitutive audit should show the qualitative ordering:
+The preflight anchors itself to the repository root and puts the current checkout
+first on `PYTHONPATH`, so it is not dependent on the shell's working directory or
+on an older editable installation.
+
+At 700 K the constitutive audit should show:
 
 - ceramic: negligible emission during the cleavage waiting time;
-- weakT: source inventory exhausted rapidly, finite retained population;
+- weakT: rapid source exhaustion and a finite retained population;
 - DBTT: still faster emission and a materially different retention response.
 
 ## Initial two-dimensional gate
 
 ```bash
-OUTROOT=runs/v10_three_class_700K_10um_v1 \
+OUTROOT=runs/v10_0_1_three_class_700K_10um_v1 \
 TARGET_EXT_UM=10 \
 bash scripts/run_v10_three_class_700K_gate.sh
 ```
 
-This gate intentionally uses one front to isolate material transfer. It does
-not remove branching from the solver.
+This gate intentionally uses one active front and
+`BULK_PLASTICITY_MODE=tip_only` to isolate transfer of the promoted material
+physics. It does not remove anisotropy or branching from the solver.
 
 ## Branching gate
+
+Run only after the three-class transfer gate passes:
 
 ```bash
 CLASS=DBTT T_K=700 TARGET_EXT_UM=20 \
 bash scripts/run_v10_branching_gate.sh
 ```
+
+The branching gate uses `root_signed` directional J and the full multifront
+inventory.
 
 ## Fatigue gate
 
@@ -99,41 +152,33 @@ bash scripts/run_v10_fatigue_gate.sh
 ```
 
 The standalone fatigue controller delegates to the same `UnifiedMPZState` used
-by monotonic fracture. The two-dimensional `sharp_front_v10` driver also
-retains the archive's full cyclic-mechanics and multifront fatigue path.
+by monotonic fracture and does not impose a Paris law.
 
 ## Physical conventions
 
 - Cleavage and emission use the promoted independent EXP-floor surfaces.
 - Peierls and Taylor barriers have independent enthalpy, entropy, alpha, and n.
-- Peierls motion creates geometric obstacle encounters; Taylor completion
-  releases retained dislocations. There is no independent legacy trap barrier.
+- Peierls motion creates obstacle encounters; Taylor completion releases
+  retained dislocations.
 - Wake slip is conserved and audited but does not create bridging or
   transformation toughening.
 - Only signed mobile/retained line fields contribute to active/wake shielding.
-- No empirical scalar backstress, `N_sat`, or cohesive work is active in v10.
-- Crack advance remains event driven. It is not an AT2 evolution and not a
-  continuous expected-velocity approximation.
+- No empirical scalar backstress, `N_sat`, cohesive work, or AT2 fracture
+  criterion is active.
+- Crack advance remains an event-driven first-passage process.
 
 ## Validation status
 
-Completed locally before repository publication:
+Validated for v10.0.1:
 
-- Python compilation;
-- nine integrated unit tests;
+- clean editable installation and import-provenance gate;
+- compilation and integrated unit tests;
 - matched-stress three-class constitutive audit;
 - ceramic one-dimensional first-passage run;
-- anisotropic two-dimensional FEM/J smoke;
+- dependency-closed anisotropic 2-D signed-J driving regression;
+- sharp-wake backend and branch-state conservation;
 - standalone fatigue smoke using the unified state.
 
-Long-growth R-curves, branch-state convergence, crack-quantum convergence, and
-publication fatigue calculations are not yet validated. They should begin only
-after the 10 um three-class gate passes.
-
-## Provenance
-
-The geometry/FEM/multifront implementation was sanitized from the user-supplied
-sharp-front hazard archive. The promoted material rows and unified MPZ
-constitutive structure were ported from the Arrhenius FEM-CZM-MPZ development
-line. The new repository deliberately separates these active components from
-legacy AT2, peridynamics, and S-N code.
+Long-growth R-curves, mature branch-state convergence, crack-quantum
+convergence, manifest-coupled full-field plasticity, and publication fatigue
+calculations remain future gates.
