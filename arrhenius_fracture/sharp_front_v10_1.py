@@ -82,7 +82,7 @@ def _tip_only_update_plasticity(
     return ep_out, rho_out, dot_ep
 
 
-def _prepare_args(argv: Iterable[str]) -> tuple[list[str], str, str, str, KineticTipConfig]:
+def _prepare_args_v101(argv: Iterable[str]) -> tuple[list[str], str, str, str, KineticTipConfig]:
     args = list(argv)
     bulk_mode = _pop_value(args, "--bulk-plasticity-mode", "tip_only").strip().lower()
     j_mode = _pop_value(args, "--directional-j-mode", "root_signed").strip().lower()
@@ -117,6 +117,12 @@ def _prepare_args(argv: Iterable[str]) -> tuple[list[str], str, str, str, Kineti
     return args, bulk_mode, j_mode, kinetics_mode, cfg
 
 
+def _prepare_args(argv: Iterable[str]) -> tuple[list[str], str, str]:
+    """Backward-compatible v10.0.1 parser interface used by existing tests/tools."""
+    args, bulk_mode, j_mode, _kinetics_mode, _cfg = _prepare_args_v101(argv)
+    return args, bulk_mode, j_mode
+
+
 _ORIGINAL_MPZ_DIAGNOSTICS = UnifiedMPZState.diagnostics
 
 
@@ -136,12 +142,23 @@ def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str,
         return
     path = Path(out)
     path.mkdir(parents=True, exist_ok=True)
-    (path / "v10_1_driver_modes.json").write_text(json.dumps({
-        "schema": "v10.1_driver_modes",
+    wake_mode = _resolved_wake_shielding(args)
+    legacy_payload = {
+        "schema": "v10_0_2_1_driver_modes",
         "bulk_plasticity_mode": bulk_mode,
         "directional_j_mode": j_mode,
+        "wake_shielding": wake_mode,
+        "legacy_full_field_enabled": False,
+        "dependency_closed_sharp_backend": True,
+        "mpz_csv_diagnostic_aliases_enabled": True,
+    }
+    (path / "v10_0_1_driver_modes.json").write_text(
+        json.dumps(legacy_payload, indent=2)
+    )
+    payload = {
+        **legacy_payload,
+        "schema": "v10.1_driver_modes",
         "tip_kinetics_mode": kinetics_mode,
-        "wake_shielding": _resolved_wake_shielding(args),
         "tip_plasticity_enabled": cfg.plasticity_enabled,
         "active_shielding_enabled": cfg.active_shielding,
         "signed_active_shielding": cfg.signed_active_shielding,
@@ -150,10 +167,8 @@ def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str,
         "kinetic_velocity_scale": cfg.velocity_scale,
         "kinetic_max_action_substep": cfg.max_action_substep,
         "kinetic_max_translation_substep_m": cfg.max_translation_substep_m,
-        "legacy_full_field_enabled": False,
-        "dependency_closed_sharp_backend": True,
-        "mpz_csv_diagnostic_aliases_enabled": True,
-    }, indent=2))
+    }
+    (path / "v10_1_driver_modes.json").write_text(json.dumps(payload, indent=2))
     if kinetics_mode == "moving_velocity":
         (path / "kinetic_tip_cell_audit_v101.json").write_text(
             json.dumps(KineticMovingTipFrontEngine.audit_payload(), indent=2)
@@ -161,7 +176,7 @@ def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str,
 
 
 def main(argv=None):
-    args, bulk_mode, j_mode, kinetics_mode, tip_cfg = _prepare_args(
+    args, bulk_mode, j_mode, kinetics_mode, tip_cfg = _prepare_args_v101(
         sys.argv[1:] if argv is None else argv
     )
     if "--material-class" not in args and "--material-manifest" not in args:
