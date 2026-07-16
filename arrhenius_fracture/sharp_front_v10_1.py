@@ -1,4 +1,4 @@
-"""Safeguarded production entry point for the unified sharp-front MPZ solver."""
+"""Safeguarded v10.1 entry point for the kinetic moving-tip MPZ solver."""
 from __future__ import annotations
 
 import json
@@ -9,6 +9,7 @@ from typing import Iterable
 import numpy as np
 
 from . import plasticity, sharp_front
+from .kinetic_tip_cell import KineticMovingTipFrontEngine, KineticTipConfig
 from .unified_mpz import UnifiedMPZState
 
 
@@ -26,6 +27,20 @@ def _pop_value(args: list[str], option: str, default: str) -> str:
             del args[i:i + 2]
             return value
     return default
+
+
+def _pop_toggle(args: list[str], positive: str, negative: str, default: bool) -> bool:
+    value = bool(default)
+    kept: list[str] = []
+    for token in args:
+        if token == positive:
+            value = True
+        elif token == negative:
+            value = False
+        else:
+            kept.append(token)
+    args[:] = kept
+    return value
 
 
 def _option_value(args: list[str], option: str, default: str | None = None) -> str | None:
@@ -67,17 +82,39 @@ def _tip_only_update_plasticity(
     return ep_out, rho_out, dot_ep
 
 
-def _prepare_args(argv: Iterable[str]) -> tuple[list[str], str, str]:
+def _prepare_args(argv: Iterable[str]) -> tuple[list[str], str, str, str, KineticTipConfig]:
     args = list(argv)
     bulk_mode = _pop_value(args, "--bulk-plasticity-mode", "tip_only").strip().lower()
     j_mode = _pop_value(args, "--directional-j-mode", "root_signed").strip().lower()
+    kinetics_mode = _pop_value(args, "--tip-kinetics-mode", "moving_velocity").strip().lower()
     if bulk_mode not in {"tip_only", "full_field"}:
         raise SystemExit("--bulk-plasticity-mode must be tip_only or full_field")
     if j_mode not in {"abs_forward", "root_signed"}:
         raise SystemExit("--directional-j-mode must be abs_forward or root_signed")
+    if kinetics_mode not in {"moving_velocity", "legacy_jump"}:
+        raise SystemExit("--tip-kinetics-mode must be moving_velocity or legacy_jump")
     if j_mode == "abs_forward" and "--allow-abs-directional-J" not in args:
         args.append("--allow-abs-directional-J")
-    return args, bulk_mode, j_mode
+
+    cfg = KineticTipConfig(
+        enabled=kinetics_mode == "moving_velocity",
+        plasticity_enabled=_pop_toggle(args, "--tip-plasticity", "--no-tip-plasticity", True),
+        active_shielding=_pop_toggle(args, "--active-shielding", "--no-active-shielding", True),
+        signed_active_shielding=_pop_toggle(
+            args, "--signed-active-shielding", "--no-signed-active-shielding", True
+        ),
+        mobile_shield_fraction=float(_pop_value(args, "--mobile-shield-fraction", "1.0")),
+        packet_length_m=float(_pop_value(args, "--kinetic-packet-length-m", "2.5e-10")),
+        velocity_scale=float(_pop_value(args, "--kinetic-velocity-scale", "1.0")),
+        max_action_substep=float(_pop_value(args, "--kinetic-max-action-substep", "0.02")),
+        max_translation_substep_m=float(
+            _pop_value(args, "--kinetic-max-translation-substep-m", "1e-7")
+        ),
+        min_substep_s=float(_pop_value(args, "--kinetic-min-substep-s", "1e-15")),
+        max_internal_steps=int(_pop_value(args, "--kinetic-max-internal-steps", "20000")),
+        coupling_scheme=_pop_value(args, "--kinetic-coupling-scheme", "strang").strip().lower(),
+    ).validate()
+    return args, bulk_mode, j_mode, kinetics_mode, cfg
 
 
 _ORIGINAL_MPZ_DIAGNOSTICS = UnifiedMPZState.diagnostics
@@ -92,25 +129,41 @@ def _diagnostics_with_csv_aliases(self, G: float, nu: float, b: float, r0: float
     return data
 
 
-def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str) -> None:
+def _write_mode_audit(args: list[str], bulk_mode: str, j_mode: str,
+                      kinetics_mode: str, cfg: KineticTipConfig) -> None:
     out = _option_value(args, "--out")
     if not out:
         return
     path = Path(out)
     path.mkdir(parents=True, exist_ok=True)
-    (path / "v10_0_1_driver_modes.json").write_text(json.dumps({
-        "schema": "v10_0_2_1_driver_modes",
+    (path / "v10_1_driver_modes.json").write_text(json.dumps({
+        "schema": "v10.1_driver_modes",
         "bulk_plasticity_mode": bulk_mode,
         "directional_j_mode": j_mode,
+        "tip_kinetics_mode": kinetics_mode,
         "wake_shielding": _resolved_wake_shielding(args),
+        "tip_plasticity_enabled": cfg.plasticity_enabled,
+        "active_shielding_enabled": cfg.active_shielding,
+        "signed_active_shielding": cfg.signed_active_shielding,
+        "mobile_shield_fraction": cfg.mobile_shield_fraction,
+        "packet_length_m": cfg.packet_length_m,
+        "kinetic_velocity_scale": cfg.velocity_scale,
+        "kinetic_max_action_substep": cfg.max_action_substep,
+        "kinetic_max_translation_substep_m": cfg.max_translation_substep_m,
         "legacy_full_field_enabled": False,
         "dependency_closed_sharp_backend": True,
         "mpz_csv_diagnostic_aliases_enabled": True,
     }, indent=2))
+    if kinetics_mode == "moving_velocity":
+        (path / "kinetic_tip_cell_audit_v101.json").write_text(
+            json.dumps(KineticMovingTipFrontEngine.audit_payload(), indent=2)
+        )
 
 
 def main(argv=None):
-    args, bulk_mode, j_mode = _prepare_args(sys.argv[1:] if argv is None else argv)
+    args, bulk_mode, j_mode, kinetics_mode, tip_cfg = _prepare_args(
+        sys.argv[1:] if argv is None else argv
+    )
     if "--material-class" not in args and "--material-manifest" not in args:
         raise SystemExit(
             "v10 requires --material-class {ceramic,weakT,DBTT} "
@@ -124,20 +177,29 @@ def main(argv=None):
 
     original_update = plasticity.update_plasticity
     original_diag = UnifiedMPZState.diagnostics
+    original_engine = sharp_front.UnifiedMPZFrontEngine
     try:
         plasticity.update_plasticity = _tip_only_update_plasticity
         UnifiedMPZState.diagnostics = _diagnostics_with_csv_aliases
+        if kinetics_mode == "moving_velocity":
+            KineticMovingTipFrontEngine.configure_default(tip_cfg)
+            KineticMovingTipFrontEngine.reset_audit()
+            sharp_front.UnifiedMPZFrontEngine = KineticMovingTipFrontEngine
         wake_mode = _resolved_wake_shielding(args)
         print(
-            f"  v10.0.2.1 driving modes: bulk_plasticity={bulk_mode}, "
-            f"directional_J={j_mode}, wake_shielding={int(wake_mode)}"
+            f"  v10.1 driving modes: bulk_plasticity={bulk_mode}, "
+            f"directional_J={j_mode}, tip_kinetics={kinetics_mode}, "
+            f"tip_plasticity={int(tip_cfg.plasticity_enabled)}, "
+            f"active_shielding={int(tip_cfg.active_shielding)}, "
+            f"wake_shielding={int(wake_mode)}"
         )
         result = sharp_front.main(args)
-        _write_mode_audit(args, bulk_mode, j_mode)
+        _write_mode_audit(args, bulk_mode, j_mode, kinetics_mode, tip_cfg)
         return result
     finally:
         plasticity.update_plasticity = original_update
         UnifiedMPZState.diagnostics = original_diag
+        sharp_front.UnifiedMPZFrontEngine = original_engine
 
 
 if __name__ == "__main__":
