@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from arrhenius_fracture import plasticity
 from arrhenius_fracture import sharp_front_v10_1 as driver
@@ -47,9 +48,17 @@ def test_main_restores_bulk_update(monkeypatch):
     result = driver.main([
         "--material-class", "weakT",
         "--bulk-plasticity-mode", "tip_only",
-        "--directional-j-mode", "abs_forward",
+        "--directional-j-mode", "root_signed",
     ])
     assert result == 7
     assert seen["patched"] is True
-    assert "--allow-abs-directional-J" in seen["args"]
+    assert "--allow-abs-directional-J" not in seen["args"]
     assert plasticity.update_plasticity is original
+
+
+def test_unparameterized_full_field_is_blocked():
+    with pytest.raises(SystemExit, match="not yet mapped"):
+        driver.main([
+            "--material-class", "DBTT",
+            "--bulk-plasticity-mode", "full_field",
+        ])
