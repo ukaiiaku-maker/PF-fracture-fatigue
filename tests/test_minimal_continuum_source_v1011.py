@@ -6,7 +6,8 @@ import pytest
 from arrhenius_fracture.continuum_source_tip import (
     ContinuumSourceKineticTipEngine,
     SOURCE_MODEL,
-    _source_hardening_activity,
+    _local_emission_backstress_Pa,
+    _local_tip_density_m2,
 )
 from arrhenius_fracture.kinetic_tip_cell import KineticTipConfig
 from arrhenius_fracture.material_manifest import MaterialManifest, default_manifest_path
@@ -72,14 +73,14 @@ def test_emission_exhausts_activity_but_not_reference_multiplicity():
 def test_aggregate_channel_saturates_at_clearing_not_multiplicity_times_clearing():
     eng = _engine()
     state = eng.mpz
-    # Make the low-rate multiplicity enormous.  A correct aggregate channel still
-    # permits at most one initial firing plus k_clear*dt repeats per system.
     state.reference_source_multiplicity = 1.0e6
     state.site_capacity[:] = 1.0e6
     state.available_sites[:] = 1.0e6
     state.emission_rate_per_site = lambda stress, T: 1.0e9
-    state._transport_rates = lambda *args, **kwargs: _constant_transport(state, 1.0e-6)
-    state._continuum_tip_radius_m = 1.0e-6  # k_clear = 1 s^-1
+    state._transport_rates = lambda *args, **kwargs: _constant_transport(
+        state, 1.0e-6
+    )
+    state._continuum_tip_radius_m = 1.0e-6
 
     dt = 10.0
     emitted = state._emit(dt, 1.0e9, 700.0)
@@ -93,7 +94,9 @@ def test_peierls_clearing_reactivates_tip_channels():
     state = eng.mpz
     state.tip_source_activity[:] = 0.0
     state.emission_rate_per_site = lambda stress, T: 0.0
-    state._transport_rates = lambda *args, **kwargs: _constant_transport(state, 2.0e-6)
+    state._transport_rates = lambda *args, **kwargs: _constant_transport(
+        state, 2.0e-6
+    )
     state._continuum_tip_radius_m = 1.0e-6
 
     state._emit(1.0, 1.0e9, 700.0)
@@ -113,20 +116,58 @@ def test_crack_advance_recovers_activity_over_current_tip_radius():
     assert result["tip_source_activity_recovered_geometry"] > 0.0
 
 
-def test_mobile_and_retained_crowding_suppress_tip_cycling_without_new_scale():
+def test_mobile_and_retained_density_generate_taylor_backstress():
     eng = _engine()
     state = eng.mpz
-    baseline = _source_hardening_activity(state)
+
+    rho0 = _local_tip_density_m2(state)
+    rho0b, tau0, sigma0 = _local_emission_backstress_Pa(state)
+    assert np.allclose(rho0, 0.0)
+    assert np.allclose(rho0b, 0.0)
+    assert np.allclose(tau0, 0.0)
+    assert np.allclose(sigma0, 0.0)
 
     state.mobile[:, :2] = 50.0
-    mobile_hardened = _source_hardening_activity(state)
+    rho_m, tau_m, sigma_m = _local_emission_backstress_Pa(state)
     state.retained[:, :2] = 50.0
-    total_hardened = _source_hardening_activity(state)
+    rho_t, tau_t, sigma_t = _local_emission_backstress_Pa(state)
 
-    assert np.allclose(baseline, 1.0)
-    assert np.all(mobile_hardened < baseline)
-    assert np.all(total_hardened < mobile_hardened)
-    assert np.all(total_hardened > 0.0)
+    assert np.all(rho_m > 0.0)
+    assert np.all(tau_m > 0.0)
+    assert np.all(sigma_m > 0.0)
+    assert np.all(rho_t > rho_m)
+    assert np.all(tau_t > tau_m)
+    assert np.all(sigma_t > sigma_m)
+    assert np.allclose(
+        tau_t,
+        state._continuum_G_Pa
+        * abs(state._continuum_b)
+        * np.sqrt(rho_t),
+    )
+
+
+def test_backstress_reduces_arrhenius_emission_driving_stress():
+    clean = _engine().mpz
+    crowded = _engine().mpz
+    for state in (clean, crowded):
+        state._transport_rates = lambda *args, _state=state, **kwargs: (
+            _constant_transport(_state, 0.0)
+        )
+        state.emission_rate_per_site = lambda stress, T: max(stress, 0.0) / 1.0e9
+
+    crowded.mobile[:, :2] = 100.0
+    applied = 1.0e9
+    dt = 1.0e-4
+
+    emitted_clean = clean._emit(dt, applied, 700.0)
+    emitted_crowded = crowded._emit(dt, applied, 700.0)
+
+    assert crowded.continuum_source_last_sigma_back_Pa > 0.0
+    assert (
+        crowded.continuum_source_last_sigma_emit_effective_Pa
+        < clean.continuum_source_last_sigma_emit_effective_Pa
+    )
+    assert emitted_crowded < emitted_clean
 
 
 def test_v1011_cli_defaults_to_continuum_and_strips_option():

@@ -19,3 +19,12 @@ def test_source_gate_fails_fast_on_no_advance_or_absurd_initiation_toughness():
     assert 'row["n_advances"]' in text
     assert 'row["Kc_first_MPa_sqrt_m"]' in text
     assert 'did not reach the required crack advance' in text
+
+
+def test_continuum_gate_audits_local_emission_backstress():
+    text = Path("scripts/run_v10_1_1_source_model_gate_700K.sh").read_text()
+    assert 'tip_source_local_density_m2' in text
+    assert 'tip_source_backstress_shear_Pa' in text
+    assert 'tip_source_backstress_equivalent_Pa' in text
+    assert 'tip_source_effective_emission_stress_Pa' in text
+    assert 'tip_source_backstress_equivalent_Pa"]) for r in records) > 0.0' in text
