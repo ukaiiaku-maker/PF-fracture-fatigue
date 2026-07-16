@@ -2,15 +2,15 @@
 
 Distributed plasticity remains a continuum Peierls--Taylor transport/storage
 problem.  No spatial or discrete distributed-source inventory is introduced.
-The only source state is a dimensionless activity fraction for each
-crystallographic tip channel.  It is exhausted by Arrhenius emission and
-recovers when emitted material clears the tip or when crack advance renews the
-local geometry over the current blunted tip radius.
+The only source state is one dimensionless activity fraction for each
+crystallographic tip channel.  It is exhausted by the aggregate Arrhenius
+nucleation hazard and recovers when emitted material clears the tip or when
+crack advance renews the local geometry over the current blunted tip radius.
 
 The manifest ``source_sites_per_system`` is retained only as the already
-calibrated rate multiplicity.  It is not a finite population and is never
-consumed.  The evolving effective multiplicity is obtained from the activity
-fraction and the near-tip Taylor forest state.
+calibrated low-rate hazard multiplicity.  It is placed inside the aggregate
+channel hazard; it is not interpreted as that many independently recycling
+channels and is never consumed as a finite population.
 """
 from __future__ import annotations
 
@@ -24,33 +24,45 @@ from .fractional_moving_frame import fractional_moving_frame_advance
 from .kinetic_tip_cell import KineticMovingTipFrontEngine
 
 
-SOURCE_MODEL = "minimal_continuum_peierls_taylor"
+SOURCE_MODEL = "minimal_continuum_aggregate_tip_channel"
 
 
 def _source_hardening_activity(state) -> np.ndarray:
-    """Return a parameter-free Taylor-storage suppression factor per system.
+    """Return a parameter-free Taylor crowding factor per tip system.
 
-    Only forest density created above the configured background floor suppresses
-    source cycling.  The existing promoted Taylor correlation density supplies
-    the normalization, so this introduces no new fitted hardening scale.
+    Mobile and retained dislocations in the source-zone bins both reduce tip
+    cycling.  The promoted Taylor correlation density supplies the only scale,
+    so no additional hardening or source-density parameter is introduced.
     """
     nsrc = max(min(int(state.cfg.source_bin_count), state.n_bins), 1)
     width = max(float(state.cfg.blunting_length_m), state.dx, 1.0e-12)
-    stored = np.sum(np.maximum(state.retained[:, :nsrc], 0.0), axis=1)
-    excess_rho = stored / max(nsrc * state.dx * width, 1.0e-30)
+    near_tip = (
+        np.maximum(state.mobile[:, :nsrc], 0.0)
+        + np.maximum(state.retained[:, :nsrc], 0.0)
+    )
+    line_count = np.sum(near_tip, axis=1)
+    excess_rho = line_count / max(nsrc * state.dx * width, 1.0e-30)
     rho_c = max(float(state.manifest.taylor_corr_rho_c_m2), 1.0)
     return 1.0 / (1.0 + np.sqrt(np.maximum(excess_rho, 0.0) / rho_c))
 
 
 def _continuum_emit(self, dt: float, stress_Pa: float, T_K: float,
                     system_weights: np.ndarray | None = None) -> float:
-    """Cycle tip-attached emission channels without a finite source inventory.
+    """Cycle one aggregate tip channel per crystallographic system.
 
-    Each channel alternates between available and clearing states.  The firing
-    rate is the promoted Arrhenius emission rate, reduced by the evolving Taylor
-    forest.  The recovery rate is the Peierls transport velocity divided by the
-    current tip radius.  The two-state occupancy equation is integrated exactly
-    over ``dt``.
+    For system ``s`` the aggregate nucleation hazard is
+
+        Lambda_s = M_ref * lambda_site * h_s * w_s,
+
+    where ``M_ref`` is the promoted legacy multiplicity and ``h_s`` is the
+    current Taylor crowding factor.  The activity satisfies
+
+        dq_s/dt = k_clear (1-q_s) - Lambda_s q_s.
+
+    This equation is integrated exactly.  Crucially, the high-hazard emission
+    throughput saturates at ``k_clear`` per crystallographic channel, not at
+    ``M_ref * k_clear``.  The earlier v10.1.1 placement of ``M_ref`` outside the
+    occupancy equation created the observed runaway shielding state.
     """
     dt = max(float(dt), 0.0)
     if dt <= 0.0:
@@ -70,7 +82,7 @@ def _continuum_emit(self, dt: float, stress_Pa: float, T_K: float,
     clear_rate = velocity_clear / radius
 
     hardening = _source_hardening_activity(self)
-    lam0 = max(self.emission_rate_per_site(stress_Pa, T_K), 0.0)
+    lam_site = max(self.emission_rate_per_site(stress_Pa, T_K), 0.0)
     weights = np.ones(self.n_systems, dtype=float)
     if system_weights is not None:
         raw = np.maximum(np.asarray(system_weights, dtype=float).reshape(-1), 0.0)
@@ -82,9 +94,10 @@ def _continuum_emit(self, dt: float, stress_Pa: float, T_K: float,
         else:
             weights[:] = 0.0
 
-    firing = lam0 * hardening * weights
+    reference = max(float(self.reference_source_multiplicity), 0.0)
+    aggregate_hazard = reference * lam_site * hardening * weights
     activity0 = np.clip(np.asarray(self.tip_source_activity, dtype=float), 0.0, 1.0)
-    total_rate = firing + clear_rate
+    total_rate = aggregate_hazard + clear_rate
     qeq = np.divide(
         clear_rate,
         total_rate,
@@ -100,8 +113,17 @@ def _continuum_emit(self, dt: float, stress_Pa: float, T_K: float,
     )
     activity1 = np.clip(qeq + (activity0 - qeq) * decay, 0.0, 1.0)
 
-    reference = max(float(self.reference_source_multiplicity), 0.0)
-    emitted_system = np.maximum(reference * firing * integral_q, 0.0)
+    emitted_system = np.maximum(aggregate_hazard * integral_q, 0.0)
+    # One initially active aggregate channel may fire once, after which repeated
+    # events are limited by physical clearing.  This fail-fast invariant catches
+    # any future reintroduction of parallel-channel multiplication.
+    throughput_bound = np.maximum(activity0 + clear_rate * dt, 0.0)
+    tolerance = 1.0e-10 * np.maximum(1.0, throughput_bound)
+    if np.any(emitted_system > throughput_bound + tolerance):
+        raise RuntimeError(
+            "aggregate tip-source throughput exceeded activity-plus-clearing bound"
+        )
+
     self.tip_source_activity = activity1
     self.available_sites = reference * activity1 * hardening
 
@@ -113,7 +135,11 @@ def _continuum_emit(self, dt: float, stress_Pa: float, T_K: float,
     self.continuum_source_last_clear_rate_s = clear_rate
     self.continuum_source_last_hardening = float(np.mean(hardening))
     self.continuum_source_last_effective_multiplicity = float(np.sum(self.available_sites))
-    self.continuum_source_last_emission_rate_s = float(np.sum(reference * firing * activity0))
+    self.continuum_source_last_emission_rate_s = float(
+        np.sum(aggregate_hazard * activity0)
+    )
+    self.continuum_source_last_aggregate_hazard_s = float(np.sum(aggregate_hazard))
+    self.continuum_source_last_throughput_bound = float(np.sum(throughput_bound))
     return emitted
 
 
@@ -151,7 +177,7 @@ def _continuum_advance(self, distance_m: float) -> dict[str, float]:
 
 
 def install_minimal_continuum_source(state, b: float) -> None:
-    """Install the minimal source law on one unified MPZ state instance."""
+    """Install the aggregate-channel law on one unified MPZ state instance."""
     reference = max(float(state.manifest.source_sites_per_system), 0.0)
     state.source_model = SOURCE_MODEL
     state.reference_source_multiplicity = reference
@@ -164,6 +190,8 @@ def install_minimal_continuum_source(state, b: float) -> None:
     state.continuum_source_last_hardening = 1.0
     state.continuum_source_last_effective_multiplicity = float(np.sum(state.available_sites))
     state.continuum_source_last_emission_rate_s = 0.0
+    state.continuum_source_last_aggregate_hazard_s = 0.0
+    state.continuum_source_last_throughput_bound = float(state.n_systems)
     state._emit = MethodType(_continuum_emit, state)
     state.advance = MethodType(_continuum_advance, state)
 
@@ -178,6 +206,8 @@ def source_diagnostics(state) -> dict[str, Any]:
         "tip_source_hardening_factor": float(getattr(state, "continuum_source_last_hardening", 1.0)),
         "tip_source_clear_rate_s": float(getattr(state, "continuum_source_last_clear_rate_s", 0.0)),
         "tip_source_emission_rate_s": float(getattr(state, "continuum_source_last_emission_rate_s", 0.0)),
+        "tip_source_aggregate_hazard_s": float(getattr(state, "continuum_source_last_aggregate_hazard_s", 0.0)),
+        "tip_source_throughput_bound_step": float(getattr(state, "continuum_source_last_throughput_bound", 0.0)),
     }
 
 

@@ -69,6 +69,25 @@ def test_emission_exhausts_activity_but_not_reference_multiplicity():
     assert state.available_site_fraction < 1.0
 
 
+def test_aggregate_channel_saturates_at_clearing_not_multiplicity_times_clearing():
+    eng = _engine()
+    state = eng.mpz
+    # Make the low-rate multiplicity enormous.  A correct aggregate channel still
+    # permits at most one initial firing plus k_clear*dt repeats per system.
+    state.reference_source_multiplicity = 1.0e6
+    state.site_capacity[:] = 1.0e6
+    state.available_sites[:] = 1.0e6
+    state.emission_rate_per_site = lambda stress, T: 1.0e9
+    state._transport_rates = lambda *args, **kwargs: _constant_transport(state, 1.0e-6)
+    state._continuum_tip_radius_m = 1.0e-6  # k_clear = 1 s^-1
+
+    dt = 10.0
+    emitted = state._emit(dt, 1.0e9, 700.0)
+    physical_bound = state.n_systems * (1.0 + dt)
+    assert emitted <= physical_bound * (1.0 + 1.0e-10)
+    assert emitted > 0.5 * physical_bound
+
+
 def test_peierls_clearing_reactivates_tip_channels():
     eng = _engine()
     state = eng.mpz
@@ -94,16 +113,20 @@ def test_crack_advance_recovers_activity_over_current_tip_radius():
     assert result["tip_source_activity_recovered_geometry"] > 0.0
 
 
-def test_taylor_storage_suppresses_tip_cycling_without_new_scale():
+def test_mobile_and_retained_crowding_suppress_tip_cycling_without_new_scale():
     eng = _engine()
     state = eng.mpz
     baseline = _source_hardening_activity(state)
-    state.retained[:, :2] = 100.0
-    hardened = _source_hardening_activity(state)
+
+    state.mobile[:, :2] = 50.0
+    mobile_hardened = _source_hardening_activity(state)
+    state.retained[:, :2] = 50.0
+    total_hardened = _source_hardening_activity(state)
 
     assert np.allclose(baseline, 1.0)
-    assert np.all(hardened < baseline)
-    assert np.all(hardened > 0.0)
+    assert np.all(mobile_hardened < baseline)
+    assert np.all(total_hardened < mobile_hardened)
+    assert np.all(total_hardened > 0.0)
 
 
 def test_v1011_cli_defaults_to_continuum_and_strips_option():
