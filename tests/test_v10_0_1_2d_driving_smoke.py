@@ -1,18 +1,19 @@
 from __future__ import annotations
 
+import json
 import re
 
 from arrhenius_fracture import sharp_front_v10_1
 
 
-def test_tip_only_abs_forward_keeps_2d_drive_nonzero(tmp_path, capsys):
+def test_tip_only_root_signed_keeps_2d_drive_nonzero(tmp_path, capsys):
     out = tmp_path / "drive"
     sharp_front_v10_1.main([
         "--mode", "2d",
         "--material-class", "ceramic",
         "--temperatures", "700",
         "--bulk-plasticity-mode", "tip_only",
-        "--directional-j-mode", "abs_forward",
+        "--directional-j-mode", "root_signed",
         "--steps", "12",
         "--nx", "16",
         "--ny", "32",
@@ -42,8 +43,11 @@ def test_tip_only_abs_forward_keeps_2d_drive_nonzero(tmp_path, capsys):
     text = capsys.readouterr().out
     values = [float(v) for v in re.findall(r"KJ=\s*([0-9.eE+-]+)", text)]
     assert len(values) >= 6, text
-    positive = [v for v in values if v > 0.0]
-    assert len(positive) >= 4, text
-    first_positive = next(i for i, v in enumerate(values) if v > 0.0)
-    assert all(v > 0.0 for v in values[first_positive:]), text
+    first_positive = next(i for i, value in enumerate(values) if value > 0.0)
+    assert all(value > 0.0 for value in values[first_positive:]), text
     assert values[-1] > values[first_positive], text
+
+    modes = json.loads((out / "v10_0_1_driver_modes.json").read_text())
+    assert modes["bulk_plasticity_mode"] == "tip_only"
+    assert modes["directional_j_mode"] == "root_signed"
+    assert modes["legacy_full_field_enabled"] is False
