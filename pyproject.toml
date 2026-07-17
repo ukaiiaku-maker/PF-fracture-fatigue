@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.1.9"
-description = "Scale-preserving bounded post-initiation tip-geometry source-capacity feedback"
+version = "10.1.9.1"
+description = "Scale-preserving post-initiation tip-geometry source feedback referenced to r0"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
