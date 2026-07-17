@@ -1,17 +1,17 @@
 """Threshold-correlated crack-growth rewards for the stochastic hazard pilot.
 
 The v10.1.7.2 pilot randomizes the integrated cleavage-hazard threshold but keeps
-one fixed geometric reward per renewal.  Consequently all realizations visit the
-same 5 micrometre geometry sequence.  This module adds an opt-in renewal-reward
+one fixed geometric reward per renewal. Consequently all realizations visit the
+same 5 micrometre geometry sequence. This module adds an opt-in renewal-reward
 pilot in which the threshold also sets the total crack advance of that event.
 
 For an exponential threshold Xi with deterministic reference Xi_det = 1,
 
     L_event = L0 * clip(Xi, q_min, q_max) / E[clip(Xi, q_min, q_max)].
 
-The normalization preserves the mean checkpoint length.  The same Xi controls
+The normalization preserves the mean checkpoint length. The same Xi controls
 waiting time and event size, so under constant lambda the renewal-reward mean
-velocity remains L0*lambda.  No noise is added to K, J, barriers, shielding,
+velocity remains L0*lambda. No noise is added to K, J, barriers, shielding,
 back stress, source capacity, or any material parameter.
 """
 from __future__ import annotations
@@ -31,7 +31,7 @@ AVALANCHE_SCHEMA = "v10.1.7.3_threshold_correlated_event_length"
 @dataclass
 class AvalancheLengthConfig:
     mode: str = "fixed"
-    minimum_factor: float = 0.2
+    minimum_factor: float = 0.5
     maximum_factor: float = 4.0
     geometry_subsegment_fraction: float = 0.1
 
@@ -57,7 +57,7 @@ def clipped_exponential_mean(minimum_factor: float, maximum_factor: float) -> fl
 def threshold_event_length_factor(
     threshold_action: float,
     mode: str = "threshold_scaled",
-    minimum_factor: float = 0.2,
+    minimum_factor: float = 0.5,
     maximum_factor: float = 4.0,
     deterministic_threshold: bool = False,
 ) -> float:
@@ -96,7 +96,7 @@ class StochasticAvalancheDiagnosticTipEngine(StochasticHazardDiagnosticTipEngine
     def configure_avalanche(
         cls,
         mode: str = "fixed",
-        minimum_factor: float = 0.2,
+        minimum_factor: float = 0.5,
         maximum_factor: float = 4.0,
         geometry_subsegment_fraction: float = 0.1,
     ) -> None:
@@ -115,7 +115,7 @@ class StochasticAvalancheDiagnosticTipEngine(StochasticHazardDiagnosticTipEngine
         payload["stochastic_avalanche"] = {
             "schema": AVALANCHE_SCHEMA,
             **asdict(cfg),
-            "length_reference": "deterministic_integrated_hazard_threshold_one",
+            "length_reference": "driver_final_physical_checkpoint",
             "mean_length_preserved": True,
             "noise_added_to_K": False,
             "noise_added_to_barriers": False,
@@ -128,12 +128,16 @@ class StochasticAvalancheDiagnosticTipEngine(StochasticHazardDiagnosticTipEngine
         self.avalanche_cfg = copy.deepcopy(
             type(self)._avalanche_config_default
         ).validate()
+        # The 2-D driver assigns its final mesh-independent da_phys after engine
+        # construction. This provisional value is synchronized lazily before the
+        # first kinetic integration; it must not be treated as authoritative yet.
         self.avalanche_base_checkpoint_m = max(float(self.f.da), 1.0e-30)
         self.avalanche_event_length_factor = 1.0
         self.avalanche_event_advance_m = self.avalanche_base_checkpoint_m
         self.avalanche_last_completed_advance_m = 0.0
         self.avalanche_last_completed_factor = 0.0
         self.avalanche_event_length_history: list[float] = []
+        self.avalanche_checkpoint_synchronized = False
         self._set_current_event_length()
 
     def clone_split(self, daughter_fraction=0.5):
@@ -151,6 +155,9 @@ class StochasticAvalancheDiagnosticTipEngine(StochasticHazardDiagnosticTipEngine
         child.avalanche_event_length_history = list(
             self.avalanche_event_length_history
         )
+        child.avalanche_checkpoint_synchronized = bool(
+            self.avalanche_checkpoint_synchronized
+        )
         return child
 
     def _set_current_event_length(self) -> None:
@@ -167,8 +174,45 @@ class StochasticAvalancheDiagnosticTipEngine(StochasticHazardDiagnosticTipEngine
             self.avalanche_base_checkpoint_m * self.avalanche_event_length_factor
         )
 
+    def _synchronize_driver_checkpoint_length(self) -> None:
+        """Adopt the final physical checkpoint assigned by the 2-D driver.
+
+        The inherited front engine is constructed before ``run_2d`` applies
+        ``eng.f.da = da_phys``. Capturing ``self.f.da`` only in ``__init__`` therefore
+        retained the inherited 20 micrometre default even when the campaign requested
+        a 5 micrometre physical checkpoint. Synchronize once, before any stochastic
+        event has progressed, and reject later checkpoint mutation.
+        """
+        configured = max(float(self.f.da), 1.0e-30)
+        same = math.isclose(
+            configured,
+            float(self.avalanche_base_checkpoint_m),
+            rel_tol=1.0e-12,
+            abs_tol=1.0e-18,
+        )
+        if self.avalanche_checkpoint_synchronized and same:
+            return
+
+        event_started = (
+            bool(self.avalanche_event_length_history)
+            or int(getattr(self, "hazard_event_index", 0)) > 0
+            or abs(float(getattr(self, "B", 0.0))) > 1.0e-12
+            or abs(float(getattr(self, "hazard_action_current", 0.0))) > 1.0e-12
+        )
+        if event_started and not same:
+            raise RuntimeError(
+                "physical checkpoint length changed after stochastic event evolution "
+                f"began: old={self.avalanche_base_checkpoint_m:.9e} m, "
+                f"new={configured:.9e} m"
+            )
+
+        self.avalanche_base_checkpoint_m = configured
+        self.avalanche_checkpoint_synchronized = True
+        self._set_current_event_length()
+
     def _integrate_coupled(self, *args, **kwargs) -> dict[str, Any]:
         """Use the current event reward as the checkpoint length for one event."""
+        self._synchronize_driver_checkpoint_length()
         event_length = float(self.avalanche_event_advance_m)
         event_factor = float(self.avalanche_event_length_factor)
         base = float(self.f.da)
@@ -220,6 +264,10 @@ class StochasticAvalancheDiagnosticTipEngine(StochasticHazardDiagnosticTipEngine
             "avalanche_base_checkpoint_m": float(
                 self.avalanche_base_checkpoint_m
             ),
+            "avalanche_checkpoint_synchronized": bool(
+                self.avalanche_checkpoint_synchronized
+            ),
+            "avalanche_driver_checkpoint_m": float(self.f.da),
             "avalanche_minimum_factor": float(
                 self.avalanche_cfg.minimum_factor
             ),
