@@ -19,7 +19,7 @@ def _analyzer_module():
 
 
 def test_version_is_v1016():
-    assert arrhenius_fracture.__version__ == "10.1.7"
+    assert arrhenius_fracture.__version__ == "10.1.8"
 
 
 def test_entry_point_changes_no_constitutive_temperature_law():
