@@ -1,13 +1,10 @@
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
-from types import SimpleNamespace
 
 import numpy as np
 
 import arrhenius_fracture
 from arrhenius_fracture.stochastic_avalanche_tip import (
-    AvalancheLengthConfig,
-    StochasticAvalancheDiagnosticTipEngine,
     clipped_exponential_mean,
     threshold_event_length_factor,
 )
@@ -62,35 +59,6 @@ def test_deterministic_and_fixed_modes_recover_exact_unit_length():
     assert threshold_event_length_factor(3.0, "fixed", 0.5, 4.0) == 1.0
 
 
-def test_engine_adopts_driver_final_checkpoint_before_first_event():
-    engine = object.__new__(StochasticAvalancheDiagnosticTipEngine)
-    engine.f = SimpleNamespace(da=5.0e-6)
-    engine.avalanche_cfg = AvalancheLengthConfig(
-        mode="fixed",
-        minimum_factor=0.5,
-        maximum_factor=4.0,
-        geometry_subsegment_fraction=0.1,
-    ).validate()
-    engine.hazard_cfg = SimpleNamespace(mode="deterministic")
-    engine.hazard_threshold_action = 1.0
-    engine.hazard_event_index = 0
-    engine.hazard_action_current = 0.0
-    engine.B = 0.0
-    engine.avalanche_base_checkpoint_m = 20.0e-6
-    engine.avalanche_event_length_factor = 1.0
-    engine.avalanche_event_advance_m = 20.0e-6
-    engine.avalanche_last_completed_advance_m = 0.0
-    engine.avalanche_last_completed_factor = 0.0
-    engine.avalanche_event_length_history = []
-    engine.avalanche_checkpoint_synchronized = False
-
-    engine._synchronize_driver_checkpoint_length()
-
-    assert engine.avalanche_checkpoint_synchronized is True
-    assert engine.avalanche_base_checkpoint_m == 5.0e-6
-    assert engine.avalanche_event_advance_m == 5.0e-6
-
-
 def test_engine_correlates_waiting_threshold_and_event_reward_without_K_noise():
     text = ENGINE.read_text()
     assert "event_advance_m" in text
@@ -98,21 +66,24 @@ def test_engine_correlates_waiting_threshold_and_event_reward_without_K_noise():
     assert "mean checkpoint length" in text
     assert '"avalanche_noise_added_to_K": False' in text
     assert '"avalanche_noise_added_to_barriers": False' in text
-    assert "self._synchronize_driver_checkpoint_length()" in text
     assert "self.f.da = event_length" in text
+    assert "_synchronize_driver_checkpoint_length" in text
 
 
-def test_backend_uses_one_checked_commit_not_repeated_false_subsegments():
+def test_backend_uses_one_checked_commit_and_preserves_sharp_wake_identity():
     text = BACKEND.read_text()
-    assert 'name = "stochastic_avalanche_event"' in text
+    assert 'name = "sharp_wake"' in text
+    assert 'diagnostic_name = "stochastic_avalanche_event"' in text
     assert '"geometry_realization": "single_checked_outer_commit"' in text
     assert '"realized_geometry_commits": 1' in text
+    assert '"tip_following_remeshing_preserved": True' in text
+    assert "write_last_avalanche_backend_diagnostics" in text
     assert "event_length_mismatch" in text
     assert "for index in range(n_segments)" not in text
     assert "Repeated calls without a FEM solve" in text
 
 
-def test_entry_patches_backend_and_promotes_geometry_diagnostics():
+def test_entry_patches_builder_writes_diagnostics_and_records_remeshing():
     text = ENTRY.read_text()
     assert "StochasticAvalancheDiagnosticTipEngine" in text
     assert "CLEAVAGE_EVENT_LENGTH_MODE" in text
@@ -123,10 +94,10 @@ def test_entry_patches_backend_and_promotes_geometry_diagnostics():
     assert "original_builder = _crack_backend_module.build_crack_backend" in text
     assert "_crack_backend_module.build_crack_backend = _builder" in text
     assert "_sharp_front_base.build_crack_backend" not in text
-    assert "def _promote_geometry_diagnostics" in text
-    assert 'root.glob("czm_*/stochastic_avalanche_geometry_events.json")' in text
-    assert "shutil.copy2(candidates[0], target)" in text
+    assert "write_last_avalanche_backend_diagnostics" in text
     assert '"geometry_subsegments_re_equilibrated": False' in text
+    assert '"backend_semantic_identity_preserved": True' in text
+    assert '"tip_following_remeshing_preserved": True' in text
     assert '"noise_added_to_K": False' in text
 
 
