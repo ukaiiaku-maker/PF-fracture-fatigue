@@ -148,7 +148,7 @@ def test_backend_synchronizes_driver_endpoint_to_variable_event_length():
         avalanche_tip.clear_pending_geometry_events()
 
 
-def test_entry_patches_builder_writes_diagnostics_and_records_remeshing():
+def test_entry_patches_builder_writes_diagnostics_and_records_event_semantics():
     text = ENTRY.read_text()
     assert "StochasticAvalancheDiagnosticTipEngine" in text
     assert "CLEAVAGE_EVENT_LENGTH_MODE" in text
@@ -160,6 +160,10 @@ def test_entry_patches_builder_writes_diagnostics_and_records_remeshing():
     assert "_crack_backend_module.build_crack_backend = _builder" in text
     assert "_sharp_front_base.build_crack_backend" not in text
     assert "write_last_avalanche_backend_diagnostics" in text
+    assert "_rewrite_summary_event_semantics" in text
+    assert '"n_geometry_events"' in text
+    assert '"n_equivalent_checkpoints_exact"' in text
+    assert '"n_advances_semantics": "rounded_path_length_over_nominal_checkpoint"' in text
     assert '"geometry_subsegments_re_equilibrated": False' in text
     assert '"backend_semantic_identity_preserved": True' in text
     assert '"tip_following_remeshing_preserved": True' in text
@@ -187,6 +191,13 @@ def test_runner_includes_controls_live_reporting_and_consistency_validation():
     assert "projected_extension_m" in text
     assert "geometry_path_m" in text
     assert 'event.get("driver_endpoint_synchronized") is True' in text
+    assert "len(geometry) == len(fired)" in text
+    assert "equivalent_exact = geometry_path_m / da_m" in text
+    assert 'int(row.get("n_advances", -1)) == equivalent_rounded' in text
+    assert '"n_geometry_events": int(len(geometry))' in text
+    assert "No FEM rerun is needed" in text
+    assert 'int(row.get("n_advances", 0)) == len(geometry)' not in text
+    assert "equivalent_checkpoints=" in text
     assert "VALIDATION " in text
 
 
