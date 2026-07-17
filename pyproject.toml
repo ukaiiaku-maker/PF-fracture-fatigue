@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.1.7"
-description = "DBTT developed-state tuning with cumulative source, retention, and residence diagnostics"
+version = "10.1.7.1"
+description = "Final three-class 300-1100 K production sweep with developed-state diagnostics"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
