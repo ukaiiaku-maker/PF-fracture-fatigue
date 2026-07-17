@@ -7,12 +7,17 @@ its damage-band resolution, so nominal 0.5 micrometre requests were promoted to
 approximately 2 micrometres and a nominal 5 micrometre event became 20
 micrometres.
 
-This wrapper now performs one geometry commit per sampled event and verifies that
-the backend realized the requested length. It deliberately preserves the
+This wrapper performs one geometry commit per sampled event and verifies that the
+backend realized the requested length. It deliberately preserves the
 ``sharp_wake`` semantic backend identity because the 2-D driver uses that name to
-enable tip-following remeshing and the sharp-wake endpoint convention. Extra
-pilot diagnostics are written through an explicit registry hook rather than by
-changing the backend name.
+enable tip-following remeshing. The same driver also treats the ``p1`` array it
+passes to a sharp-wake backend as the authoritative new front position. A
+variable-length wrapper must therefore update that array transactionally to the
+actual event endpoint; otherwise the damage wake, kinetic moving frame, and front
+position follow different crack lengths.
+
+Extra pilot diagnostics are written through an explicit registry hook rather
+than by changing the backend name.
 """
 from __future__ import annotations
 
@@ -34,8 +39,8 @@ class AvalancheSubsegmentBackend:
     """Wrap sharp-wake with one checked geometry commit per variable event."""
 
     # This is a behavioral identity in sharp_front.py, not merely a display label.
-    # Keeping it equal to sharp_wake preserves tip-following remeshing, endpoint
-    # handling, and all other sharp-wake driver semantics.
+    # Keeping it equal to sharp_wake preserves tip-following remeshing and the
+    # sharp-wake endpoint convention.
     name = "sharp_wake"
     diagnostic_name = "stochastic_avalanche_event"
 
@@ -62,13 +67,39 @@ class AvalancheSubsegmentBackend:
     def __getattr__(self, name: str):
         return getattr(self.base_backend, name)
 
+    def _rollback_base_log(self) -> None:
+        """Undo the base backend's diagnostic append after a vetoed transaction."""
+        log = getattr(self.base_backend, "advance_log", None)
+        if isinstance(log, list) and log:
+            log.pop()
+
+    @staticmethod
+    def _mutable_driver_endpoint(value: Any) -> np.ndarray | None:
+        """Return the driver's writable endpoint array, or ``None`` if unsupported."""
+        if not isinstance(value, np.ndarray):
+            return None
+        if value.shape != (2,) or not value.flags.writeable:
+            return None
+        return value
+
     def advance(self, **kwargs) -> CrackAdvanceResult:
         mesh0 = kwargs["mesh"]
         boundary0 = kwargs["boundary"]
         damage0 = np.asarray(kwargs["damage"], dtype=float)
         displacement0 = np.asarray(kwargs["displacement"], dtype=float)
         p0 = np.asarray(kwargs["p0"], dtype=float)
-        p1_requested = np.asarray(kwargs["p1"], dtype=float)
+
+        # ``sharp_front._advance_polyline`` retains this exact ndarray and, for a
+        # backend named sharp_wake, uses it as the authoritative front endpoint
+        # after ``advance`` returns. Keep the reference and update it only after a
+        # successful checked geometry transaction.
+        driver_endpoint = self._mutable_driver_endpoint(kwargs["p1"])
+        if driver_endpoint is None:
+            return CrackAdvanceResult(
+                mesh0, boundary0, damage0, displacement0, 0.0, False,
+                reason="driver_endpoint_not_mutable",
+            )
+        p1_requested = np.asarray(driver_endpoint, dtype=float).copy()
         direction = np.asarray(kwargs.get("direction", p1_requested - p0), dtype=float)
         norm = float(np.linalg.norm(direction))
         if norm <= 0.0:
@@ -126,6 +157,7 @@ class AvalancheSubsegmentBackend:
             # Return the original transaction state. The caller will restore the
             # completed hazard event rather than silently accepting a different
             # crack-growth reward.
+            self._rollback_base_log()
             return CrackAdvanceResult(
                 mesh0, boundary0, damage0, displacement0, 0.0, False,
                 angle_error_deg=float(result.angle_error_deg),
@@ -137,6 +169,17 @@ class AvalancheSubsegmentBackend:
             )
 
         endpoint = p0 + moved * direction
+        driver_endpoint[...] = endpoint
+        endpoint_error = float(np.linalg.norm(np.asarray(driver_endpoint) - endpoint))
+        if endpoint_error > max(self.absolute_length_tolerance_m, 1.0e-15):
+            self._rollback_base_log()
+            return CrackAdvanceResult(
+                mesh0, boundary0, damage0, displacement0, 0.0, False,
+                angle_error_deg=float(result.angle_error_deg),
+                selected_edge_length=float(result.selected_edge_length),
+                reason=f"driver_endpoint_sync_failed:error={endpoint_error:.9e}",
+            )
+
         row = {
             "event_index": len(self.advance_log),
             "front_id": int(kwargs.get("front_id", 0)),
@@ -144,6 +187,10 @@ class AvalancheSubsegmentBackend:
             "y0": float(p0[1]),
             "x1": float(endpoint[0]),
             "y1": float(endpoint[1]),
+            "driver_requested_x1": float(p1_requested[0]),
+            "driver_requested_y1": float(p1_requested[1]),
+            "driver_endpoint_synchronized": True,
+            "driver_endpoint_sync_error_m": endpoint_error,
             "requested_fixed_length_m": fixed_requested_length,
             "requested_event_advance_m": event_requested_length,
             "event_advance_m": moved,
