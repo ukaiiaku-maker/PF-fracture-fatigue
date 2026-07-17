@@ -29,40 +29,44 @@ E[\operatorname{clip}(\Xi,a,b)]
 =a+e^{-a}-e^{-b}.
 \]
 
-The default values are
+The corrected pilot defaults are
 
 ```text
 L0 = 5 micrometres
-q_min = 0.2
+q_min = 0.5
 q_max = 4.0
 ```
 
-so individual event lengths are bounded at approximately 1--20 micrometres before normalization, while the ensemble mean remains 5 micrometres. Under constant cleavage rate, using the same threshold for waiting time and reward preserves the long-time mean velocity \(L_0\lambda_c\).
+so individual event lengths remain broad while avoiding requested geometry events below the reliable sharp-wake realization scale. The ensemble mean remains 5 micrometres. Under constant cleavage rate, using the same threshold for waiting time and reward preserves the long-time mean velocity \(L_0\lambda_c\).
 
 No random perturbation is added to K, J, the cleavage or emission barriers, source capacity, back stress, shielding, blunting, or any material parameter.
 
-## Geometry subsegments
+## Geometry realization
 
-Each completed event is realized through equal sharp-wake geometry subsegments. The default subsegment fraction is 0.1, giving ten subsegments per event regardless of its total length.
+The first implementation attempted to call the sharp-wake backend ten times inside one outer FEM solve. That was invalid because the backend has a finite minimum realizable damage increment: nominal 0.5 micrometre requests were promoted to approximately 2 micrometres, creating a 20 micrometre event from a nominal 5 micrometre event.
 
-The existing kinetic MPZ integration remains finer than this geometry subdivision:
+The corrected pilot performs one checked geometry commit per sampled event. The requested and realized lengths must agree within 5% or 1 nm, whichever is larger. A mismatch vetoes the geometry transaction rather than silently changing the crack-growth reward.
 
-```text
-maximum cleavage-action substep = 0.01
-maximum MPZ translation substep = 5e-8 m = 0.05 micrometres
-```
+The input `EVENT_SUBSEGMENT_FRACTION` is retained only as a record of the desired future driver-level subdivision. It is not used to claim that mechanics was re-equilibrated at 10% increments.
 
-The ten geometry subsegments are committed during one outer geometry transaction. The FEM field is **not** re-equilibrated between these subsegments in this initial pilot. The next outer solve sees the completed event geometry. This limitation is written explicitly to the audit and geometry-event files.
+True 10% subincrements require:
+
+1. commit one fraction of the event;
+2. reassemble and solve the FEM field;
+3. recompute J/K and the tip state;
+4. commit the next fraction at unchanged external time/load unless the avalanche arrests.
+
+That driver-level lifecycle is outside this initial pilot.
 
 ## Controls
 
 The runner executes three cases:
 
-1. `fixed_original`: v10.1.7.2 deterministic threshold and one fixed 5 micrometre geometry event.
-2. `segmented_deterministic`: deterministic threshold and fixed 5 micrometre reward, realized through ten geometry subsegments.
-3. `stochastic_avalanche`: exponential threshold and threshold-scaled variable reward, also realized through ten geometry subsegments.
+1. `fixed_original`: v10.1.7.2 deterministic threshold and the original fixed 5 micrometre geometry event.
+2. `segmented_deterministic`: retained directory name for the deterministic variable-event-backend control; it must realize one checked 5 micrometre commit and match the original response.
+3. `stochastic_avalanche`: exponential threshold and threshold-scaled variable reward, realized as one checked geometry commit per event.
 
-The segmented deterministic case isolates any response caused solely by geometry subdivision.
+The deterministic wrapper control isolates any response caused by routing through the variable-event backend.
 
 ## Scope restrictions
 
@@ -78,6 +82,29 @@ monotonic loading
 
 The event descriptor queue is single-front/FIFO and is not branch-safe. Geometry-veto rollback for a variable event has not been generalized to all topology backends. Do not use this branch for adaptive CZM, branching, fatigue, or production temperature sweeps.
 
+## Live reporting
+
+The runner exports `PYTHONUNBUFFERED=1`, launches Python with `-u`, and prints timestamped messages for:
+
+```text
+CAMPAIGN START
+CASE START
+SOLVER PID
+HEARTBEAT
+CASE COMPLETE
+CASE FAILED
+ANALYSIS START / COMPLETE
+CAMPAIGN COMPLETE / FAILED
+```
+
+The default heartbeat interval is 60 seconds and can be changed with
+
+```text
+HEARTBEAT_SECONDS=15
+```
+
+`tail -F` is recommended so the monitor continues following the output file if it is recreated.
+
 ## Running
 
 ```bash
@@ -86,13 +113,14 @@ CLASS=DBTT \
 TEMP_K=700 \
 SEEDS="1 2" \
 TARGET_EXT_UM=200 \
-EVENT_MIN_FACTOR=0.2 \
+EVENT_MIN_FACTOR=0.5 \
 EVENT_MAX_FACTOR=4.0 \
 EVENT_SUBSEGMENT_FRACTION=0.1 \
+HEARTBEAT_SECONDS=15 \
 bash scripts/run_v10_1_7_3_stochastic_avalanche_pilot.sh
 ```
 
-The runner is resume-safe and validates completed cases before skipping them.
+The runner is resume-safe. It validates the completed fixed control, deletes stale products from invalid cases, and reruns only the failed or incomplete cases.
 
 ## Outputs
 
@@ -107,23 +135,23 @@ stochastic_avalanche_event_length_distribution.png
 stochastic_avalanche_threshold_vs_length.png
 ```
 
-Each segmented run also writes
+Each variable-event-backend run also writes
 
 ```text
 stochastic_avalanche_geometry_events.json
 ```
 
-with the event length, threshold, number of subsegments, and whether mechanics was re-equilibrated between subsegments.
+with requested and realized event lengths, their error, threshold, desired future subdivision count, actual geometry-commit count, and whether mechanics was re-equilibrated.
 
 ## Acceptance checks
 
-The analyzer separates discretization effects from stochastic event-size effects. The default gates are:
+The analyzer separates wrapper effects from stochastic event-size effects. The default gates are:
 
-- segmented deterministic response differs from the original fixed response by no more than 2% of the deterministic K range;
+- deterministic wrapper-control response differs from the original fixed response by no more than 2% of the deterministic K range;
 - stochastic ensemble mean bias is no more than 5%;
 - sampled mean event length lies within 20% of 5 micrometres;
 - event-length coefficient of variation is at least 0.30;
 - mean 10--90% K band is at least 0.25 MPa sqrt(m);
-- mean detrended correlation to the segmented deterministic curve is at most 0.98.
+- mean detrended correlation to the deterministic wrapper control is at most 0.98.
 
-Failure of these gates is informative. A large segmented-control shift means geometry subdivision itself changed the response. A large ensemble bias means the renewal-reward coupling is not mean-preserving in the evolving system. Persistently high correlation means the geometry/compliance waveform still dominates despite variable event sizes.
+Failure of these gates is informative. A large deterministic-control shift means the event backend itself changed the response. A large ensemble bias means the renewal-reward coupling is not mean-preserving in the evolving system. Persistently high correlation means the geometry/compliance waveform still dominates despite variable event sizes.
