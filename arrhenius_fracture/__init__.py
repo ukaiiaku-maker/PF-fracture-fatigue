@@ -1,6 +1,6 @@
 """Arrhenius sharp-front fracture and fatigue with unified MPZ state."""
 
-__version__ = "10.1.5"
+__version__ = "10.1.6"
 
 from .material_manifest import MaterialManifest
 from .unified_mpz import MPZConfig, UnifiedMPZState
@@ -11,7 +11,7 @@ from .separated_source_tip import SeparatedSourceKineticTipEngine
 from .campaign_calibrated_tip import CampaignCalibratedTipEngine
 
 # Preserve the v10.1.4 public continuum class by default. The protected
-# sharp_front_v10_1_5 entry point switches only its own process to the
+# sharp_front_v10_1_5/v10_1_6 entry points switch only their own process to the
 # campaign-calibrated implementation.
 _continuum_source_tip.ContinuumSourceKineticTipEngine = (
     SeparatedSourceKineticTipEngine
