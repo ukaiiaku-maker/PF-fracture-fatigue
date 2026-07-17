@@ -15,7 +15,7 @@ TARGET_EXT_UM=${TARGET_EXT_UM:-10}
 # prevents a failed source law from loading indefinitely to nonphysical K.
 STEPS=${STEPS:-500}
 K_FIRST_MAX_MPA_SQRT_M=${K_FIRST_MAX_MPA_SQRT_M:-100}
-OUTROOT=${OUTROOT:-runs/v10_1_3_source_model_gate_700K_10um_v1}
+OUTROOT=${OUTROOT:-runs/v10_1_4_source_model_gate_700K_10um_v1}
 
 NX=${NX:-48}
 NY=${NY:-96}
@@ -53,7 +53,7 @@ for SOURCE_MODEL in $SOURCE_MODELS; do
     OUTDIR="$OUTROOT/$SOURCE_MODEL/$CLASS/T${T_K}_th${THETA}"
     mkdir -p "$OUTDIR"
     echo "========================================================================"
-    echo "v10.1.3 source gate: source=$SOURCE_MODEL class=$CLASS T=${T_K}K target=${TARGET_EXT_UM}um"
+    echo "v10.1.4 source gate: source=$SOURCE_MODEL class=$CLASS T=${T_K}K target=${TARGET_EXT_UM}um"
     echo "out=$OUTDIR"
     echo "========================================================================"
 
@@ -123,11 +123,22 @@ if expected_source == "continuum":
         "tip_source_backstress_shear_Pa",
         "tip_source_backstress_equivalent_Pa",
         "tip_source_effective_emission_stress_Pa",
+        "sigma_opening_tip_Pa",
+        "sigma_cleave_eff_Pa",
+        "sigma_emission_backstress_Pa",
+        "sigma_emission_effective_Pa",
     )
     for record in records:
         for key in required:
             value = float(record[key])
             assert math.isfinite(value) and value >= 0.0, (key, value, record)
+        opening = float(record["sigma_opening_tip_Pa"])
+        reported = float(record["sigma_tip_Pa"])
+        emit_eff = float(record["sigma_emission_effective_Pa"])
+        assert bool(record["stress_channels_separated"]), record
+        assert math.isclose(reported, opening, rel_tol=1.0e-12, abs_tol=1.0e-6), record
+        assert emit_eff <= opening + max(1.0e-9 * opening, 1.0e-3), record
+    assert max(float(r["sigma_opening_tip_Pa"]) for r in records) > 0.0
     assert max(float(r["tip_source_backstress_equivalent_Pa"]) for r in records) > 0.0
 PY
       then
