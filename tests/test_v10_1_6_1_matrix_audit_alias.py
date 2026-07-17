@@ -20,7 +20,7 @@ def _repair_module():
 
 
 def test_version_is_v10161():
-    assert arrhenius_fracture.__version__ == "10.1.7.2"
+    assert arrhenius_fracture.__version__ == "10.1.7.3"
 
 
 def test_refresh_scale_alias_is_written_without_removing_canonical_key(tmp_path: Path):
