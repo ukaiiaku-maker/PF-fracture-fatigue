@@ -1,4 +1,4 @@
-"""v10.1.9 bounded tip-geometry/source-capacity feedback entry point."""
+"""v10.1.9.1 bounded tip-geometry/source-capacity feedback entry point."""
 from __future__ import annotations
 
 import json
@@ -55,12 +55,14 @@ def _rewrite_mode_audits(args: list[str]) -> None:
         if canonical is not None:
             payload["campaign_refresh_scale"] = canonical
         payload.update({
-            "schema": "v10.1.9_geometry_source_feedback_driver_modes",
+            "schema": "v10.1.9.1_geometry_source_feedback_driver_modes",
             "developed_state_diagnostics": True,
             "geometry_source_feedback": True,
             "geometry_source_schema": GEOMETRY_SCHEMA,
             "geometry_source_gain": GEOMETRY_SOURCE_GAIN,
-            "geometry_reference": "effective radius at first crack advance",
+            "geometry_reference": "original unblunted radius r0",
+            "geometry_feedback_armed_only_after_first_advance": True,
+            "geometry_running_maximum_blunting": True,
             "first_passage_feedback_disabled": True,
             "temperature_dependent_geometry_parameter": False,
             "wake_primary_toughening_state": False,
@@ -71,9 +73,9 @@ def _rewrite_mode_audits(args: list[str]) -> None:
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     print(
-        "  v10.1.9 geometry source feedback: "
-        f"gain={GEOMETRY_SOURCE_GAIN:g}, first-passage feedback disabled, "
-        "campaign budget and Arrhenius barriers preserved"
+        "  v10.1.9.1 geometry source feedback: "
+        f"gain={GEOMETRY_SOURCE_GAIN:g}, armed after first passage, "
+        "blunting referenced to r0 with irreversible running maximum"
     )
     result = _campaign.main(args)
     _rewrite_mode_audits(args)
