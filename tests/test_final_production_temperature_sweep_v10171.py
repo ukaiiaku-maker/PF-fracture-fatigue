@@ -19,7 +19,7 @@ def _analyzer_module():
 
 
 def test_version_is_v10171():
-    assert arrhenius_fracture.__version__ == "10.1.7.2"
+    assert arrhenius_fracture.__version__ == "10.1.7.3"
 
 
 def test_production_runner_defaults_to_three_classes_nine_temperatures_and_500um():
