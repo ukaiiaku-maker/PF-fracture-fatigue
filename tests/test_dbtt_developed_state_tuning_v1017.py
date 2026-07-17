@@ -20,7 +20,7 @@ def _analyzer_module():
 
 
 def test_version_is_v1017():
-    assert arrhenius_fracture.__version__ == "10.1.9"
+    assert arrhenius_fracture.__version__ == "10.1.9.1"
 
 
 def test_runner_defaults_to_nine_candidates_and_two_temperatures():
