@@ -37,9 +37,9 @@ SOURCE_MODEL = "campaign_calibrated_tip_budget"
 def _campaign_local_density_m2(state) -> np.ndarray:
     """Near-tip mobile-plus-retained density on the fixed promoted MPZ scale.
 
-    The averaging length is not allowed to expand with the blunted radius.  That
+    The averaging length is not allowed to expand with the blunted radius. That
     previous feedback diluted the density precisely when a large emitted cloud
-    should have increased the emission back stress.  The existing MPZ
+    should have increased the emission back stress. The existing MPZ
     blunting-length/grid scale supplies the local averaging volume and adds no
     new fitted length.
     """
@@ -81,7 +81,7 @@ def _campaign_emit(
     """Consume a bounded continuum tip-source budget.
 
     No Peierls time-clearing term replenishes source capacity while the crack is
-    stationary.  Peierls/Taylor kinetics still transport and store the emitted
+    stationary. Peierls/Taylor kinetics still transport and store the emitted
     distributed population, which supplies the evolving local back stress.
     """
     dt = max(float(dt), 0.0)
@@ -144,6 +144,11 @@ def _campaign_emit(
 def _campaign_advance(self, distance_m: float) -> dict[str, float]:
     before = np.asarray(self.available_sites, dtype=float).copy()
     result = fractional_moving_frame_advance(self, distance_m)
+
+    # The generic fractional mover retains the legacy linear source refresh.
+    # Undo that bookkeeping and apply only the campaign exponential recovery
+    # below so source capacity is not replenished twice.
+    self.available_sites = before.copy()
 
     d = max(float(distance_m), 0.0)
     refresh_scale = max(float(getattr(self, "_campaign_refresh_scale", 1.0)), 1.0e-12)
