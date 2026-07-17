@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Analyze the v10.1.9 DBTT geometry/source-capacity matrix."""
+"""Analyze the v10.1.9.1 DBTT geometry/source-capacity matrix."""
 from __future__ import annotations
 
 import argparse
@@ -67,6 +67,13 @@ def _load_case(case_dir: Path, kind: str, temperature: float,
 
     K_init = event_K[0]
     late_event = event_K[-min(3, len(event_K)):]
+    capacity_ratios = [
+        _float(r.get("geometry_source_capacity_ratio"), 1.0) for r in records
+    ]
+    running_blunting = [
+        _float(r.get("geometry_source_running_max_normalized_blunting"), 0.0)
+        for r in records
+    ]
     return {
         "kind": kind,
         "temperature_K": temperature,
@@ -77,18 +84,27 @@ def _load_case(case_dir: Path, kind: str, temperature: float,
         "R_rise_late_MPa_sqrt_m": float(np.mean(late_event)) - K_init,
         "R_rise_peak_MPa_sqrt_m": max(event_K) - K_init,
         "n_advances": int(summary.get("n_advances", len(event_K))),
+        "first_feedback_armed": bool(first.get("geometry_source_feedback_armed", False)),
         "first_reference_radius_m": _float(first.get("geometry_source_reference_radius_m")),
+        "first_r0_m": _float(first.get("geometry_source_r0_m")),
+        "first_advance_radius_m": _float(first.get("geometry_source_first_advance_radius_m")),
         "first_capacity_ratio": _float(first.get("geometry_source_capacity_ratio"), 1.0),
         "first_cumulative_exposed": _float(first.get("geometry_source_cumulative_exposed"), 0.0),
         "late_capacity_ratio": _mean(late, "geometry_source_capacity_ratio"),
-        "max_capacity_ratio": max(_float(r.get("geometry_source_capacity_ratio"), 1.0) for r in records),
+        "max_capacity_ratio": max(capacity_ratios),
         "final_cumulative_exposed": _last(records, "geometry_source_cumulative_exposed"),
         "late_normalized_blunting": _mean(late, "geometry_source_normalized_blunting"),
+        "late_running_max_normalized_blunting": _mean(
+            late, "geometry_source_running_max_normalized_blunting"
+        ),
+        "max_running_normalized_blunting": max(running_blunting),
         "late_active_mean": _mean(late, "developed_state_active_count"),
         "late_retained_mean": _mean(late, "developed_state_retained_count"),
         "late_mobile_mean": _mean(late, "developed_state_mobile_count"),
         "late_backstress_GPa": _mean(late, "sigma_emission_backstress_Pa") / 1.0e9,
-        "late_K_shield_MPa_sqrt_m": _mean(late, "campaign_active_K_shield_effective_Pa_sqrt_m") / 1.0e6,
+        "late_K_shield_MPa_sqrt_m": _mean(
+            late, "campaign_active_K_shield_effective_Pa_sqrt_m"
+        ) / 1.0e6,
         "cumulative_emitted": _last(records, "developed_state_cumulative_emitted"),
         "cumulative_refreshed": _last(records, "developed_state_cumulative_refreshed"),
         "event_K_MPa_sqrt_m": event_K,
@@ -99,17 +115,26 @@ def _pair(full: dict[str, Any], baseline: dict[str, Any]) -> dict[str, Any]:
     row = {k: v for k, v in full.items() if k != "event_K_MPa_sqrt_m"}
     row.update({
         "baseline_K_init_MPa_sqrt_m": baseline["K_init_MPa_sqrt_m"],
-        "plastic_initiation_shift_MPa_sqrt_m": full["K_init_MPa_sqrt_m"] - baseline["K_init_MPa_sqrt_m"],
-        "plastic_R_rise_final_MPa_sqrt_m": full["R_rise_final_MPa_sqrt_m"] - baseline["R_rise_final_MPa_sqrt_m"],
-        "plastic_R_rise_late_MPa_sqrt_m": full["R_rise_late_MPa_sqrt_m"] - baseline["R_rise_late_MPa_sqrt_m"],
-        "plastic_R_rise_peak_MPa_sqrt_m": full["R_rise_peak_MPa_sqrt_m"] - baseline["R_rise_peak_MPa_sqrt_m"],
+        "plastic_initiation_shift_MPa_sqrt_m": (
+            full["K_init_MPa_sqrt_m"] - baseline["K_init_MPa_sqrt_m"]
+        ),
+        "plastic_R_rise_final_MPa_sqrt_m": (
+            full["R_rise_final_MPa_sqrt_m"] - baseline["R_rise_final_MPa_sqrt_m"]
+        ),
+        "plastic_R_rise_late_MPa_sqrt_m": (
+            full["R_rise_late_MPa_sqrt_m"] - baseline["R_rise_late_MPa_sqrt_m"]
+        ),
+        "plastic_R_rise_peak_MPa_sqrt_m": (
+            full["R_rise_peak_MPa_sqrt_m"] - baseline["R_rise_peak_MPa_sqrt_m"]
+        ),
     })
     return row
 
 
 def _rank(paired: list[dict[str, Any]], temperatures: list[float],
           low_limit: float, high_min: float, emergence_min: float,
-          first_passage_relative_tolerance: float) -> list[dict[str, Any]]:
+          first_passage_relative_tolerance: float,
+          activation_ratio_tolerance: float = 1.0e-6) -> list[dict[str, Any]]:
     low_T, high_T = min(temperatures), max(temperatures)
     grouped: dict[float, dict[float, dict[str, Any]]] = {}
     for row in paired:
@@ -129,11 +154,25 @@ def _rank(paired: list[dict[str, Any]], temperatures: list[float],
         low_rise = float(low["plastic_R_rise_late_MPa_sqrt_m"])
         high_rise = float(high["plastic_R_rise_late_MPa_sqrt_m"])
         emergence = high_rise - low_rise
-        low_init_dev = abs(float(low["K_init_MPa_sqrt_m"]) - float(control[low_T]["K_init_MPa_sqrt_m"]))
-        high_init_dev = abs(float(high["K_init_MPa_sqrt_m"]) - float(control[high_T]["K_init_MPa_sqrt_m"]))
-        low_tol = first_passage_relative_tolerance * max(abs(float(control[low_T]["K_init_MPa_sqrt_m"])), 1.0e-12)
-        high_tol = first_passage_relative_tolerance * max(abs(float(control[high_T]["K_init_MPa_sqrt_m"])), 1.0e-12)
+        low_init_dev = abs(
+            float(low["K_init_MPa_sqrt_m"])
+            - float(control[low_T]["K_init_MPa_sqrt_m"])
+        )
+        high_init_dev = abs(
+            float(high["K_init_MPa_sqrt_m"])
+            - float(control[high_T]["K_init_MPa_sqrt_m"])
+        )
+        low_tol = first_passage_relative_tolerance * max(
+            abs(float(control[low_T]["K_init_MPa_sqrt_m"])), 1.0e-12
+        )
+        high_tol = first_passage_relative_tolerance * max(
+            abs(float(control[high_T]["K_init_MPa_sqrt_m"])), 1.0e-12
+        )
         first_passage_pass = low_init_dev <= low_tol and high_init_dev <= high_tol
+        high_feedback_activated = (
+            gain == 0.0
+            or float(high["max_capacity_ratio"]) > 1.0 + activation_ratio_tolerance
+        )
         score = high_rise - 1.5 * abs(low_rise) + 0.05 * (
             float(high["late_active_mean"]) - float(low["late_active_mean"])
         )
@@ -149,6 +188,9 @@ def _rank(paired: list[dict[str, Any]], temperatures: list[float],
             "first_passage_preserved": first_passage_pass,
             "low_late_capacity_ratio": low["late_capacity_ratio"],
             "high_late_capacity_ratio": high["late_capacity_ratio"],
+            "low_max_capacity_ratio": low["max_capacity_ratio"],
+            "high_max_capacity_ratio": high["max_capacity_ratio"],
+            "high_feedback_activated": high_feedback_activated,
             "low_final_cumulative_exposed": low["final_cumulative_exposed"],
             "high_final_cumulative_exposed": high["final_cumulative_exposed"],
             "low_late_active_mean": low["late_active_mean"],
@@ -156,7 +198,9 @@ def _rank(paired: list[dict[str, Any]], temperatures: list[float],
             "late_active_contrast": high["late_active_mean"] - low["late_active_mean"],
             "low_late_retained_mean": low["late_retained_mean"],
             "high_late_retained_mean": high["late_retained_mean"],
-            "late_retained_contrast": high["late_retained_mean"] - low["late_retained_mean"],
+            "late_retained_contrast": (
+                high["late_retained_mean"] - low["late_retained_mean"]
+            ),
             "low_late_backstress_GPa": low["late_backstress_GPa"],
             "high_late_backstress_GPa": high["late_backstress_GPa"],
             "low_late_K_shield_MPa_sqrt_m": low["late_K_shield_MPa_sqrt_m"],
@@ -168,16 +212,36 @@ def _rank(paired: list[dict[str, Any]], temperatures: list[float],
         row["emergence_pass"] = emergence >= emergence_min
         row["candidate_pass"] = bool(
             row["first_passage_preserved"]
+            and row["high_feedback_activated"]
             and row["low_T_guardrail_pass"]
             and row["high_T_developed_pass"]
             and row["emergence_pass"]
         )
         ranked.append(row)
 
-    ranked.sort(key=lambda r: (bool(r["candidate_pass"]), float(r["score"])), reverse=True)
+    ranked.sort(
+        key=lambda r: (bool(r["candidate_pass"]), float(r["score"])), reverse=True
+    )
     for i, row in enumerate(ranked, 1):
         row["rank"] = i
     return ranked
+
+
+def _activation_assessment(
+    ranked: list[dict[str, Any]], activation_ratio_tolerance: float
+) -> dict[str, Any]:
+    nonzero = [r for r in ranked if float(r["geometry_gain"]) > 0.0]
+    active = [
+        r for r in nonzero
+        if float(r["high_max_capacity_ratio"]) > 1.0 + activation_ratio_tolerance
+    ]
+    return {
+        "activation_ratio_tolerance": activation_ratio_tolerance,
+        "nonzero_candidate_count": len(nonzero),
+        "active_high_temperature_candidate_count": len(active),
+        "nonzero_high_temperature_feedback_active": bool(active),
+        "inactive_parameter_matrix": bool(nonzero) and not bool(active),
+    }
 
 
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -236,6 +300,7 @@ def main() -> None:
     parser.add_argument("--high-min", type=float, default=1.0)
     parser.add_argument("--emergence-min", type=float, default=1.0)
     parser.add_argument("--first-passage-relative-tolerance", type=float, default=0.01)
+    parser.add_argument("--activation-ratio-tolerance", type=float, default=1.0e-6)
     args = parser.parse_args()
 
     root = args.root
@@ -262,7 +327,9 @@ def main() -> None:
             full = _load_case(path, "full", temperature, gain)
             case_rows.append(full)
             paired.append(_pair(full, baselines[temperature]))
-            event_payload["full"][tag][f"{temperature:g}"] = full["event_K_MPa_sqrt_m"]
+            event_payload["full"][tag][f"{temperature:g}"] = full[
+                "event_K_MPa_sqrt_m"
+            ]
 
     ranked = _rank(
         paired,
@@ -271,13 +338,17 @@ def main() -> None:
         args.high_min,
         args.emergence_min,
         args.first_passage_relative_tolerance,
+        args.activation_ratio_tolerance,
     )
+    activation = _activation_assessment(ranked, args.activation_ratio_tolerance)
     _write_csv(root / "geometry_source_case_summary.csv", case_rows)
     _write_csv(root / "geometry_source_temperature_summary.csv", paired)
     _write_csv(root / "geometry_source_ranking.csv", ranked)
-    (root / "geometry_source_event_K.json").write_text(json.dumps(event_payload, indent=2))
+    (root / "geometry_source_event_K.json").write_text(
+        json.dumps(event_payload, indent=2)
+    )
     assessment = {
-        "schema": "v10.1.9_geometry_source_feedback_matrix",
+        "schema": "v10.1.9.1_geometry_source_feedback_matrix",
         "temperatures_K": temperatures,
         "geometry_gains": gains,
         "thresholds": {
@@ -285,16 +356,26 @@ def main() -> None:
             "high_late_plastic_R_rise_min_MPa_sqrt_m": args.high_min,
             "emergence_min_MPa_sqrt_m": args.emergence_min,
             "first_passage_relative_tolerance": args.first_passage_relative_tolerance,
+            "activation_ratio_tolerance": args.activation_ratio_tolerance,
         },
+        "feedback_activation": activation,
         "best_candidate": ranked[0] if ranked else None,
         "passing_candidates": [r for r in ranked if r["candidate_pass"]],
-        "overall_pass": any(r["candidate_pass"] for r in ranked),
+        "overall_pass": (
+            not activation["inactive_parameter_matrix"]
+            and any(r["candidate_pass"] for r in ranked)
+        ),
     }
-    (root / "geometry_source_assessment.json").write_text(json.dumps(assessment, indent=2))
+    (root / "geometry_source_assessment.json").write_text(
+        json.dumps(assessment, indent=2)
+    )
     _plot(root, ranked)
 
     print("\nGeometry/source feedback ranking")
-    print("rank  gain  low_R  high_R  emergence  cap_low  cap_high  active_delta  first_pass  pass")
+    print(
+        "rank  gain  low_R  high_R  emergence  cap_low  cap_high  "
+        "maxcap_high  active_delta  first_pass  pass"
+    )
     for row in ranked:
         print(
             f"{row['rank']:4d}  {row['geometry_gain']:4g}  "
@@ -303,12 +384,19 @@ def main() -> None:
             f"{row['R_rise_emergence_MPa_sqrt_m']:9.3f}  "
             f"{row['low_late_capacity_ratio']:7.3f}  "
             f"{row['high_late_capacity_ratio']:8.3f}  "
+            f"{row['high_max_capacity_ratio']:11.3f}  "
             f"{row['late_active_contrast']:12.3f}  "
             f"{str(row['first_passage_preserved']):>10s}  "
             f"{str(row['candidate_pass']):>5s}"
         )
     print(f"\nassessment: {'PASS' if assessment['overall_pass'] else 'REVIEW'}")
     print(root / "geometry_source_assessment.json")
+
+    if activation["inactive_parameter_matrix"]:
+        raise SystemExit(
+            "inactive-parameter matrix: no nonzero geometry gain increased the "
+            "high-temperature source-capacity ratio"
+        )
 
 
 if __name__ == "__main__":
