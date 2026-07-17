@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.1.6.1"
-description = "Campaign-calibrated moving-tip source budget with emergent temperature-response validation and matrix audit compatibility"
+version = "10.1.7"
+description = "DBTT developed-state tuning with cumulative source, retention, and residence diagnostics"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
