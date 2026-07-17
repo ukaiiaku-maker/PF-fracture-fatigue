@@ -5,6 +5,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
 cd "$REPO_ROOT"
 export PYTHONPATH="$REPO_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONUNBUFFERED=1
 
 PYTHON_BIN=${PYTHON_BIN:-python}
 CLASS=${CLASS:-DBTT}
@@ -12,9 +13,10 @@ TEMP_K=${TEMP_K:-700}
 SEEDS=${SEEDS:-"1 2"}
 TARGET_EXT_UM=${TARGET_EXT_UM:-200}
 STEPS=${STEPS:-6000}
-PRINT_EVERY=${PRINT_EVERY:-200}
+PRINT_EVERY=${PRINT_EVERY:-100}
 OUTROOT=${OUTROOT:-runs/v10_1_7_3_stochastic_avalanche_DBTT_700K_200um_v1}
 FORCE=${FORCE:-0}
+HEARTBEAT_SECONDS=${HEARTBEAT_SECONDS:-60}
 
 CAMPAIGN_BACKSTRESS_SCALE=${CAMPAIGN_BACKSTRESS_SCALE:-1.0}
 CAMPAIGN_REFRESH_SCALE=${CAMPAIGN_REFRESH_SCALE:-1.0}
@@ -39,7 +41,7 @@ PACKET_LENGTH_M=${PACKET_LENGTH_M:-2.5e-10}
 MOBILE_SHIELD_FRACTION=${MOBILE_SHIELD_FRACTION:-1.0}
 KINETIC_MAX_ACTION_SUBSTEP=${KINETIC_MAX_ACTION_SUBSTEP:-0.01}
 KINETIC_MAX_TRANSLATION_SUBSTEP_M=${KINETIC_MAX_TRANSLATION_SUBSTEP_M:-5e-8}
-EVENT_MIN_FACTOR=${EVENT_MIN_FACTOR:-0.2}
+EVENT_MIN_FACTOR=${EVENT_MIN_FACTOR:-0.5}
 EVENT_MAX_FACTOR=${EVENT_MAX_FACTOR:-4.0}
 EVENT_SUBSEGMENT_FRACTION=${EVENT_SUBSEGMENT_FRACTION:-0.1}
 
@@ -47,6 +49,27 @@ export CAMPAIGN_BACKSTRESS_SCALE CAMPAIGN_REFRESH_SCALE
 mkdir -p "$OUTROOT"
 MANIFEST="$OUTROOT/stochastic_avalanche_pilot_manifest.tsv"
 printf 'case_type\tmode\tseed\tclass\ttemperature_K\ttarget_ext_um\tstatus\toutdir\n' > "$MANIFEST"
+
+stamp() {
+  date '+%Y-%m-%d %H:%M:%S'
+}
+
+report() {
+  printf '[%s] %s\n' "$(stamp)" "$*"
+}
+
+CAMPAIGN_STATE=FAILED
+CAMPAIGN_START=$(date +%s)
+finish_report() {
+  local rc=$?
+  local elapsed=$(( $(date +%s) - CAMPAIGN_START ))
+  if [[ "$CAMPAIGN_STATE" == COMPLETE && "$rc" -eq 0 ]]; then
+    report "CAMPAIGN COMPLETE elapsed=${elapsed}s root=$OUTROOT"
+  else
+    report "CAMPAIGN FAILED rc=$rc elapsed=${elapsed}s root=$OUTROOT"
+  fi
+}
+trap finish_report EXIT
 
 validate_case() {
   local outdir=$1
@@ -110,11 +133,25 @@ if case_type == "fixed_original":
 else:
     lengths = [float(r["avalanche_event_advance_m"]) for r in fired]
     assert all(math.isfinite(x) and x > 0.0 for x in lengths), lengths
+
+    geometry_path = root / "stochastic_avalanche_geometry_events.json"
+    assert geometry_path.is_file(), geometry_path
+    geometry = json.loads(geometry_path.read_text())
+    assert len(geometry) == len(fired), (len(geometry), len(fired))
+    for event in geometry:
+        requested = float(event["requested_event_advance_m"])
+        realized = float(event["event_advance_m"])
+        assert int(event.get("realized_geometry_commits", 0)) == 1, event
+        assert event.get("geometry_realization") == "single_checked_outer_commit", event
+        tolerance = max(1.0e-9, 0.05 * requested)
+        assert abs(realized - requested) <= tolerance, event
+
     if case_type == "segmented_deterministic":
         assert all(abs(x - da_m) <= 1.0e-12 * max(da_m, 1.0) for x in lengths), lengths
     else:
-        lo = da_m * min_factor * 0.99
-        hi = da_m * max_factor * 1.01
+        norm = min_factor + math.exp(-min_factor) - math.exp(-max_factor)
+        lo = da_m * min_factor / norm * 0.99
+        hi = da_m * max_factor / norm * 1.01
         assert all(lo <= x <= hi for x in lengths), (lo, hi, lengths)
         assert any(abs(x - da_m) > 1.0e-3 * da_m for x in lengths), lengths
         assert all(r.get("stochastic_avalanche_length_enabled") is True for r in records)
@@ -144,6 +181,44 @@ common_flags() {
     --print-every "$PRINT_EVERY" --save-snapshots "$SAVE_SNAPSHOTS"
 }
 
+run_solver_with_heartbeat() {
+  local case_type=$1
+  local mode=$2
+  local seed=$3
+  local entry=$4
+  local length_mode=$5
+  local outdir=$6
+  shift 6
+  local -a flags=("$@")
+
+  env \
+    PYTHONUNBUFFERED=1 \
+    CLEAVAGE_HAZARD_MODE="$mode" \
+    CLEAVAGE_HAZARD_SEED="$seed" \
+    CLEAVAGE_EVENT_LENGTH_MODE="$length_mode" \
+    CLEAVAGE_EVENT_MIN_FACTOR="$EVENT_MIN_FACTOR" \
+    CLEAVAGE_EVENT_MAX_FACTOR="$EVENT_MAX_FACTOR" \
+    CLEAVAGE_EVENT_SUBSEGMENT_FRACTION="$EVENT_SUBSEGMENT_FRACTION" \
+    "$PYTHON_BIN" -u -m "$entry" "${flags[@]}" --out "$outdir" &
+  local solver_pid=$!
+  local start=$(date +%s)
+  report "SOLVER PID=$solver_pid case=$case_type seed=$seed"
+
+  while kill -0 "$solver_pid" 2>/dev/null; do
+    sleep "$HEARTBEAT_SECONDS"
+    if kill -0 "$solver_pid" 2>/dev/null; then
+      local elapsed=$(( $(date +%s) - start ))
+      report "HEARTBEAT case=$case_type seed=$seed pid=$solver_pid elapsed=${elapsed}s"
+    fi
+  done
+
+  set +e
+  wait "$solver_pid"
+  local rc=$?
+  set -e
+  return "$rc"
+}
+
 run_case() {
   local case_type=$1
   local mode=$2
@@ -152,30 +227,27 @@ run_case() {
   local length_mode=$5
   local outdir=$6
   local status=COMPLETE
+  local case_start=$(date +%s)
 
-  mkdir -p "$outdir"
-  echo "========================================================================"
-  echo "v10.1.7.3 avalanche pilot: case=$case_type mode=$mode seed=$seed"
-  echo "class=$CLASS T=${TEMP_K}K target=${TARGET_EXT_UM}um out=$outdir"
-  echo "========================================================================"
+  report "CASE START case=$case_type mode=$mode seed=$seed class=$CLASS T=${TEMP_K}K target=${TARGET_EXT_UM}um"
+  report "CASE OUTDIR $outdir"
 
   if [[ "$FORCE" != 1 ]] && validate_case "$outdir" "$case_type" "$mode" "$seed" >/dev/null 2>&1; then
-    echo "SKIP validated complete case: $outdir"
     status=EXISTING
+    report "CASE SKIP validated-complete case=$case_type seed=$seed"
   else
-    rm -f "$outdir/summary.json" "$outdir/kinetic_tip_cell_audit_v101.json"
+    # Remove every stale product from a failed or invalid case.  In particular,
+    # never retain geometry-event diagnostics from the superseded 20-um bug.
+    rm -rf "$outdir"
+    mkdir -p "$outdir"
     local -a FLAGS=()
     while IFS= read -r flag; do
       FLAGS+=("$flag")
     done < <(common_flags)
-    if ! env \
-      CLEAVAGE_HAZARD_MODE="$mode" \
-      CLEAVAGE_HAZARD_SEED="$seed" \
-      CLEAVAGE_EVENT_LENGTH_MODE="$length_mode" \
-      CLEAVAGE_EVENT_MIN_FACTOR="$EVENT_MIN_FACTOR" \
-      CLEAVAGE_EVENT_MAX_FACTOR="$EVENT_MAX_FACTOR" \
-      CLEAVAGE_EVENT_SUBSEGMENT_FRACTION="$EVENT_SUBSEGMENT_FRACTION" \
-      "$PYTHON_BIN" -m "$entry" "${FLAGS[@]}" --out "$outdir"; then
+
+    if ! run_solver_with_heartbeat \
+      "$case_type" "$mode" "$seed" "$entry" "$length_mode" "$outdir" \
+      "${FLAGS[@]}"; then
       status=FAILED
     elif ! validate_case "$outdir" "$case_type" "$mode" "$seed"; then
       status=FAILED
@@ -185,16 +257,27 @@ run_case() {
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
     "$case_type" "$mode" "$seed" "$CLASS" "$TEMP_K" "$TARGET_EXT_UM" "$status" "$outdir" \
     >> "$MANIFEST"
+
+  local elapsed=$(( $(date +%s) - case_start ))
   if [[ "$status" == FAILED ]]; then
-    echo "ERROR: avalanche pilot case failed validation: $case_type seed=$seed" >&2
+    report "CASE FAILED case=$case_type seed=$seed elapsed=${elapsed}s"
     exit 1
   fi
+  report "CASE COMPLETE case=$case_type seed=$seed status=$status elapsed=${elapsed}s"
 }
+
+N_SEEDS=0
+for _seed in $SEEDS; do N_SEEDS=$((N_SEEDS + 1)); done
+report "CAMPAIGN START class=$CLASS T=${TEMP_K}K target=${TARGET_EXT_UM}um stochastic_seeds=$N_SEEDS"
+report "CONFIG mean_event=${DA_CHECKPOINT_M}m factor_bounds=[$EVENT_MIN_FACTOR,$EVENT_MAX_FACTOR] heartbeat=${HEARTBEAT_SECONDS}s"
 
 run_case fixed_original deterministic 0 \
   arrhenius_fracture.sharp_front_v10_1_7_2 fixed \
   "$OUTROOT/fixed_original/T${TEMP_K}_th${THETA}"
 
+# This is retained as the deterministic control for the variable-event backend.
+# The backend now makes one checked 5-um geometry commit; it does not claim ten
+# re-equilibrated subincrements.
 run_case segmented_deterministic deterministic 0 \
   arrhenius_fracture.sharp_front_v10_1_7_3 fixed \
   "$OUTROOT/segmented_deterministic/T${TEMP_K}_th${THETA}"
@@ -205,11 +288,13 @@ for SEED in $SEEDS; do
     "$OUTROOT/stochastic_avalanche/seed_${SEED}/T${TEMP_K}_th${THETA}"
 done
 
-"$PYTHON_BIN" scripts/analyze_v10_1_7_3_stochastic_avalanche_pilot.py \
+report "ANALYSIS START"
+"$PYTHON_BIN" -u scripts/analyze_v10_1_7_3_stochastic_avalanche_pilot.py \
   --root "$OUTROOT" --class "$CLASS" --temperature "$TEMP_K" \
   --seeds $SEEDS --theta "$THETA" --base-checkpoint-um "$("$PYTHON_BIN" - <<PY
 print(float("$DA_CHECKPOINT_M") * 1.0e6)
 PY
 )"
-
-echo "wrote $MANIFEST"
+report "ANALYSIS COMPLETE"
+report "MANIFEST $MANIFEST"
+CAMPAIGN_STATE=COMPLETE
