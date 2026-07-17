@@ -17,7 +17,7 @@ ANALYZER = ROOT / "scripts" / "analyze_v10_1_7_2_stochastic_hazard_pilot.py"
 
 
 def test_version_is_v10172():
-    assert arrhenius_fracture.__version__ == "10.1.7.2"
+    assert arrhenius_fracture.__version__ == "10.1.7.3"
 
 
 def test_deterministic_threshold_is_exactly_one():
