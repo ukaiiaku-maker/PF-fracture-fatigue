@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import shutil
 import sys
 
 from . import continuum_source_tip
@@ -71,6 +72,28 @@ def _option_value(args: list[str], name: str) -> str | None:
     return None
 
 
+def _promote_geometry_diagnostics(args: list[str]) -> None:
+    """Copy the backend diagnostic from ``czm_<T>/`` to the case root.
+
+    The generic 2-D driver writes non-``sharp_wake`` backend diagnostics into a
+    temperature-tagged subdirectory. The pilot runner and analyzer use one case
+    directory per temperature, so expose a stable case-root path as well.
+    """
+    out = _option_value(args, "--out")
+    if not out:
+        return
+    root = Path(out)
+    target = root / "stochastic_avalanche_geometry_events.json"
+    candidates = sorted(root.glob("czm_*/stochastic_avalanche_geometry_events.json"))
+    if len(candidates) != 1:
+        raise RuntimeError(
+            "expected exactly one nested avalanche geometry diagnostic under "
+            f"{root}, found {len(candidates)}"
+        )
+    shutil.copy2(candidates[0], target)
+    print(f"  promoted avalanche geometry diagnostics to {target}")
+
+
 def _rewrite_audits(args: list[str]) -> None:
     out = _option_value(args, "--out")
     if not out:
@@ -97,6 +120,7 @@ def _rewrite_audits(args: list[str]) -> None:
         "geometry_subsegments_re_equilibrated": False,
         "geometry_realization": "single_checked_outer_commit",
         "requested_subsegment_fraction_metadata_only": True,
+        "geometry_diagnostics_promoted_to_case_root": True,
         "constitutive_material_change_from_v10_1_7_1": False,
         "stochastic_geometry_reward_change_from_v10_1_7_2": True,
         "noise_added_to_K": False,
@@ -134,6 +158,7 @@ def main(argv=None):
             f"requested_future_subsegment_fraction={EVENT_SUBSEGMENT_FRACTION:g}"
         )
         result = _campaign.main(args)
+        _promote_geometry_diagnostics(args)
         _rewrite_audits(args)
         return result
     finally:
