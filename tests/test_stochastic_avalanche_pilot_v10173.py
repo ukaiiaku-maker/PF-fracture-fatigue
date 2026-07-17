@@ -4,6 +4,9 @@ from pathlib import Path
 import numpy as np
 
 import arrhenius_fracture
+from arrhenius_fracture import stochastic_avalanche_tip as avalanche_tip
+from arrhenius_fracture.crack_backend import CrackAdvanceResult
+from arrhenius_fracture.stochastic_avalanche_backend import AvalancheSubsegmentBackend
 from arrhenius_fracture.stochastic_avalanche_tip import (
     clipped_exponential_mean,
     threshold_event_length_factor,
@@ -77,10 +80,72 @@ def test_backend_uses_one_checked_commit_and_preserves_sharp_wake_identity():
     assert '"geometry_realization": "single_checked_outer_commit"' in text
     assert '"realized_geometry_commits": 1' in text
     assert '"tip_following_remeshing_preserved": True' in text
+    assert '"driver_endpoint_synchronized": True' in text
+    assert "driver_endpoint[...] = endpoint" in text
     assert "write_last_avalanche_backend_diagnostics" in text
     assert "event_length_mismatch" in text
     assert "for index in range(n_segments)" not in text
     assert "Repeated calls without a FEM solve" in text
+
+
+def test_backend_synchronizes_driver_endpoint_to_variable_event_length():
+    class DummySharpWake:
+        name = "sharp_wake"
+
+        def __init__(self):
+            self.cohesive_network = None
+            self.advance_log = []
+
+        def advance(self, **kwargs):
+            p0 = np.asarray(kwargs["p0"], dtype=float)
+            p1 = np.asarray(kwargs["p1"], dtype=float)
+            moved = float(np.linalg.norm(p1 - p0))
+            self.advance_log.append({
+                "x0": float(p0[0]),
+                "y0": float(p0[1]),
+                "x1": float(p1[0]),
+                "y1": float(p1[1]),
+            })
+            return CrackAdvanceResult(
+                mesh=kwargs["mesh"],
+                boundary=kwargs["boundary"],
+                damage=np.asarray(kwargs["damage"], dtype=float).copy(),
+                displacement=np.asarray(kwargs["displacement"], dtype=float).copy(),
+                moved=moved,
+                inserted=True,
+                reason="ok",
+            )
+
+    avalanche_tip.clear_pending_geometry_events()
+    avalanche_tip._PENDING_GEOMETRY_EVENTS.append({
+        "event_advance_m": 8.0e-6,
+        "event_length_factor": 1.6,
+        "threshold_action": 1.6,
+        "hazard_seed": 7,
+        "hazard_event_index": 0,
+        "geometry_subsegment_fraction": 0.1,
+    })
+    try:
+        driver_endpoint = np.array([5.0e-6, 0.0])
+        backend = AvalancheSubsegmentBackend(DummySharpWake())
+        result = backend.advance(
+            mesh=object(),
+            boundary=object(),
+            damage=np.zeros(1),
+            displacement=np.zeros(1),
+            p0=np.zeros(2),
+            p1=driver_endpoint,
+            direction=np.array([1.0, 0.0]),
+            front_id=0,
+            kill_r=1.0e-6,
+        )
+        assert result.inserted
+        assert np.isclose(result.moved, 8.0e-6)
+        assert np.allclose(driver_endpoint, [8.0e-6, 0.0])
+        assert backend.advance_log[-1]["driver_endpoint_synchronized"] is True
+        assert backend.advance_log[-1]["driver_endpoint_sync_error_m"] <= 1.0e-15
+    finally:
+        avalanche_tip.clear_pending_geometry_events()
 
 
 def test_entry_patches_builder_writes_diagnostics_and_records_remeshing():
@@ -101,7 +166,7 @@ def test_entry_patches_builder_writes_diagnostics_and_records_remeshing():
     assert '"noise_added_to_K": False' in text
 
 
-def test_runner_includes_controls_live_heartbeat_and_unbuffered_python():
+def test_runner_includes_controls_live_reporting_and_consistency_validation():
     text = RUNNER.read_text()
     assert 'SEEDS=${SEEDS:-"1 2"}' in text
     assert 'TARGET_EXT_UM=${TARGET_EXT_UM:-200}' in text
@@ -118,6 +183,11 @@ def test_runner_includes_controls_live_heartbeat_and_unbuffered_python():
     assert "segmented_deterministic" in text
     assert "stochastic_avalanche" in text
     assert "--crack-backend sharp_wake" in text
+    assert 'header.index("crack_extension_m")' in text
+    assert "projected_extension_m" in text
+    assert "geometry_path_m" in text
+    assert 'event.get("driver_endpoint_synchronized") is True' in text
+    assert "VALIDATION " in text
 
 
 def test_analyzer_separates_geometry_wrapper_bias_from_stochastic_decorrelation():
