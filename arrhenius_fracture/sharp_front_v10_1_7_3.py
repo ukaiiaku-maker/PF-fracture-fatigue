@@ -10,8 +10,10 @@ lifecycle.
 from __future__ import annotations
 
 import json
+import math
 import os
 from pathlib import Path
+import statistics
 import sys
 
 from . import continuum_source_tip
@@ -92,6 +94,63 @@ def _write_geometry_diagnostics(args: list[str]) -> None:
     print(f"  wrote avalanche geometry diagnostics to {target}")
 
 
+def _rewrite_summary_event_semantics(args: list[str]) -> None:
+    """Add explicit event-count and equivalent-checkpoint fields to summary.json.
+
+    The legacy 2-D summary field ``n_advances`` is not an event counter. For a
+    deflecting front the driver accumulates ``moved / da_phys`` and rounds the
+    total, so it is an equivalent nominal-checkpoint count. That equals the event
+    count only when every event is exactly ``da_phys``. Variable stochastic event
+    rewards require both quantities to be recorded separately.
+    """
+    out = _option_value(args, "--out")
+    if not out:
+        return
+    root = Path(out)
+    geometry_path = root / "stochastic_avalanche_geometry_events.json"
+    summary_path = root / "summary.json"
+    if not geometry_path.is_file() or not summary_path.is_file():
+        return
+
+    geometry = json.loads(geometry_path.read_text())
+    summary = json.loads(summary_path.read_text())
+    if not isinstance(geometry, list) or not geometry:
+        raise RuntimeError("stochastic avalanche geometry diagnostics contain no events")
+    if not isinstance(summary, list) or not summary:
+        raise RuntimeError("summary.json contains no rows")
+
+    lengths = [max(float(row.get("event_advance_m", 0.0)), 0.0) for row in geometry]
+    if not all(math.isfinite(value) and value > 0.0 for value in lengths):
+        raise RuntimeError("geometry diagnostics contain a nonpositive event length")
+    fixed_lengths = [
+        float(row.get("requested_fixed_length_m", 0.0))
+        for row in geometry
+        if math.isfinite(float(row.get("requested_fixed_length_m", 0.0)))
+        and float(row.get("requested_fixed_length_m", 0.0)) > 0.0
+    ]
+    if not fixed_lengths:
+        raise RuntimeError("geometry diagnostics contain no nominal checkpoint length")
+
+    nominal_checkpoint_m = float(statistics.median(fixed_lengths))
+    path_length_m = float(sum(lengths))
+    projected_extension_m = float(geometry[-1]["x1"]) - float(geometry[0]["x0"])
+    equivalent_exact = path_length_m / nominal_checkpoint_m
+    equivalent_rounded = int(round(equivalent_exact))
+
+    row = summary[0]
+    row.update({
+        "n_geometry_events": int(len(geometry)),
+        "n_equivalent_checkpoints_exact": float(equivalent_exact),
+        "n_equivalent_checkpoints_rounded": int(equivalent_rounded),
+        "nominal_checkpoint_length_m": float(nominal_checkpoint_m),
+        "geometry_path_length_m": float(path_length_m),
+        "geometry_projected_extension_m": float(projected_extension_m),
+        "n_advances_semantics": "rounded_path_length_over_nominal_checkpoint",
+        "n_geometry_events_semantics": "accepted_cleavage_renewals_and_geometry_commits",
+    })
+    summary_path.write_text(json.dumps(summary, indent=2))
+
+
 def _rewrite_audits(args: list[str]) -> None:
     out = _option_value(args, "--out")
     if not out:
@@ -122,6 +181,8 @@ def _rewrite_audits(args: list[str]) -> None:
         "backend_semantic_identity": "sharp_wake",
         "backend_semantic_identity_preserved": True,
         "tip_following_remeshing_preserved": True,
+        "summary_n_advances_semantics": "rounded_path_length_over_nominal_checkpoint",
+        "summary_has_explicit_geometry_event_count": True,
         "constitutive_material_change_from_v10_1_7_1": False,
         "stochastic_geometry_reward_change_from_v10_1_7_2": True,
         "noise_added_to_K": False,
@@ -161,6 +222,7 @@ def main(argv=None):
         )
         result = _campaign.main(args)
         _write_geometry_diagnostics(args)
+        _rewrite_summary_event_semantics(args)
         _rewrite_audits(args)
         return result
     finally:
