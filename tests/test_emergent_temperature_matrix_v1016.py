@@ -19,7 +19,7 @@ def _analyzer_module():
 
 
 def test_version_is_v1016():
-    assert arrhenius_fracture.__version__ == "10.1.7"
+    assert arrhenius_fracture.__version__ == "10.1.7.1"
 
 
 def test_entry_point_changes_no_constitutive_temperature_law():
@@ -55,30 +55,18 @@ def test_ablation_metric_is_initiation_referenced_before_subtraction():
     module = _analyzer_module()
     rows = [
         {
-            "class": "DBTT",
-            "temperature_K": 300.0,
-            "mode": "full",
-            "K_init_MPa_sqrt_m": 10.0,
-            "R_rise_final_MPa_sqrt_m": 3.0,
-            "R_rise_late_MPa_sqrt_m": 2.0,
-            "R_rise_peak_MPa_sqrt_m": 4.0,
-            "max_active_population": 5.0,
-            "max_emission_backstress_GPa": 1.0,
-            "max_active_K_shield_MPa_sqrt_m": 0.5,
-            "r_eff_over_r0_at_initiation": 2.0,
+            "class": "DBTT", "temperature_K": 300.0, "mode": "full",
+            "K_init_MPa_sqrt_m": 10.0, "R_rise_final_MPa_sqrt_m": 3.0,
+            "R_rise_late_MPa_sqrt_m": 2.0, "R_rise_peak_MPa_sqrt_m": 4.0,
+            "max_active_population": 5.0, "max_emission_backstress_GPa": 1.0,
+            "max_active_K_shield_MPa_sqrt_m": 0.5, "r_eff_over_r0_at_initiation": 2.0,
         },
         {
-            "class": "DBTT",
-            "temperature_K": 300.0,
-            "mode": "plasticity_off",
-            "K_init_MPa_sqrt_m": 8.0,
-            "R_rise_final_MPa_sqrt_m": 2.5,
-            "R_rise_late_MPa_sqrt_m": 1.5,
-            "R_rise_peak_MPa_sqrt_m": 3.5,
-            "max_active_population": 0.0,
-            "max_emission_backstress_GPa": 0.0,
-            "max_active_K_shield_MPa_sqrt_m": 0.0,
-            "r_eff_over_r0_at_initiation": 1.0,
+            "class": "DBTT", "temperature_K": 300.0, "mode": "plasticity_off",
+            "K_init_MPa_sqrt_m": 8.0, "R_rise_final_MPa_sqrt_m": 2.5,
+            "R_rise_late_MPa_sqrt_m": 1.5, "R_rise_peak_MPa_sqrt_m": 3.5,
+            "max_active_population": 0.0, "max_emission_backstress_GPa": 0.0,
+            "max_active_K_shield_MPa_sqrt_m": 0.0, "r_eff_over_r0_at_initiation": 1.0,
         },
     ]
     paired = module._paired_rows(rows)
@@ -100,12 +88,7 @@ def test_assessment_requires_dbtt_emergence_and_flat_other_classes():
         {"class": "ceramic", "temperature_K": 300.0, "plastic_R_rise_late_MPa_sqrt_m": 0.0},
         {"class": "ceramic", "temperature_K": 1100.0, "plastic_R_rise_late_MPa_sqrt_m": 0.1},
     ]
-    assessment = module._assessment(
-        paired,
-        dbtt_low_max=0.5,
-        dbtt_min_emergence=1.0,
-        flat_max_span=1.0,
-    )
+    assessment = module._assessment(paired, dbtt_low_max=0.5, dbtt_min_emergence=1.0, flat_max_span=1.0)
     assert assessment["DBTT"]["low_T_weak"]
     assert assessment["DBTT"]["high_T_emergent"]
     assert assessment["weakT"]["comparatively_temperature_flat"]
