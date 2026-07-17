@@ -40,7 +40,7 @@ def test_matrix_uses_one_common_scale_pair_for_all_temperatures():
     assert text.count("CAMPAIGN_REFRESH_SCALE=${CAMPAIGN_REFRESH_SCALE:-1.0}") == 1
     assert "arrhenius_fracture.sharp_front_v10_1_6" in text
     assert "--material-class \"$CLASS\" --temperatures \"$T_K\"" in text
-    assert "temperature-dependent" in text
+    assert "per-temperature" in text
 
 
 def test_matrix_contains_matched_no_plasticity_ablation():
