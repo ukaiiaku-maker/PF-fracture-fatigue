@@ -12,12 +12,14 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-import shutil
 import sys
 
 from . import continuum_source_tip
 from . import crack_backend as _crack_backend_module
-from .stochastic_avalanche_backend import build_avalanche_backend
+from .stochastic_avalanche_backend import (
+    build_avalanche_backend,
+    write_last_avalanche_backend_diagnostics,
+)
 from .stochastic_avalanche_tip import (
     AVALANCHE_SCHEMA,
     StochasticAvalancheDiagnosticTipEngine,
@@ -72,26 +74,22 @@ def _option_value(args: list[str], name: str) -> str | None:
     return None
 
 
-def _promote_geometry_diagnostics(args: list[str]) -> None:
-    """Copy the backend diagnostic from ``czm_<T>/`` to the case root.
+def _write_geometry_diagnostics(args: list[str]) -> None:
+    """Write wrapper diagnostics explicitly while retaining ``name=sharp_wake``.
 
-    The generic 2-D driver writes non-``sharp_wake`` backend diagnostics into a
-    temperature-tagged subdirectory. The pilot runner and analyzer use one case
-    directory per temperature, so expose a stable case-root path as well.
+    ``sharp_front.py`` uses the backend name to select tip-following remeshing and
+    endpoint semantics. The pilot must therefore not masquerade as a different
+    backend merely to trigger the generic non-sharp diagnostic hook.
     """
     out = _option_value(args, "--out")
     if not out:
         return
     root = Path(out)
+    write_last_avalanche_backend_diagnostics(str(root))
     target = root / "stochastic_avalanche_geometry_events.json"
-    candidates = sorted(root.glob("czm_*/stochastic_avalanche_geometry_events.json"))
-    if len(candidates) != 1:
-        raise RuntimeError(
-            "expected exactly one nested avalanche geometry diagnostic under "
-            f"{root}, found {len(candidates)}"
-        )
-    shutil.copy2(candidates[0], target)
-    print(f"  promoted avalanche geometry diagnostics to {target}")
+    if not target.is_file():
+        raise RuntimeError(f"avalanche geometry diagnostic was not written: {target}")
+    print(f"  wrote avalanche geometry diagnostics to {target}")
 
 
 def _rewrite_audits(args: list[str]) -> None:
@@ -120,7 +118,10 @@ def _rewrite_audits(args: list[str]) -> None:
         "geometry_subsegments_re_equilibrated": False,
         "geometry_realization": "single_checked_outer_commit",
         "requested_subsegment_fraction_metadata_only": True,
-        "geometry_diagnostics_promoted_to_case_root": True,
+        "geometry_diagnostics_written_to_case_root": True,
+        "backend_semantic_identity": "sharp_wake",
+        "backend_semantic_identity_preserved": True,
+        "tip_following_remeshing_preserved": True,
         "constitutive_material_change_from_v10_1_7_1": False,
         "stochastic_geometry_reward_change_from_v10_1_7_2": True,
         "noise_added_to_K": False,
@@ -155,10 +156,11 @@ def main(argv=None):
             f"event_length={EVENT_LENGTH_MODE} bounds="
             f"[{EVENT_MIN_FACTOR:g},{EVENT_MAX_FACTOR:g}] "
             "geometry=single_checked_outer_commit "
+            "backend_semantics=sharp_wake remeshing=preserved "
             f"requested_future_subsegment_fraction={EVENT_SUBSEGMENT_FRACTION:g}"
         )
         result = _campaign.main(args)
-        _promote_geometry_diagnostics(args)
+        _write_geometry_diagnostics(args)
         _rewrite_audits(args)
         return result
     finally:
