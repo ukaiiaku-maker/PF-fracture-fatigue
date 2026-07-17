@@ -77,13 +77,17 @@ def test_backend_realizes_each_event_as_ten_equal_geometry_subsegments():
     assert 'name = "stochastic_avalanche_segmented"' in text
 
 
-def test_entry_patches_only_versioned_process_and_records_limits():
+def test_entry_patches_crack_backend_defining_module_and_records_limits():
     text = ENTRY.read_text()
     assert "StochasticAvalancheDiagnosticTipEngine" in text
     assert "CLEAVAGE_EVENT_LENGTH_MODE" in text
     assert "CLEAVAGE_EVENT_MIN_FACTOR" in text
     assert "CLEAVAGE_EVENT_MAX_FACTOR" in text
     assert "CLEAVAGE_EVENT_SUBSEGMENT_FRACTION" in text
+    assert "from . import crack_backend as _crack_backend_module" in text
+    assert "original_builder = _crack_backend_module.build_crack_backend" in text
+    assert "_crack_backend_module.build_crack_backend = _builder" in text
+    assert "_sharp_front_base.build_crack_backend" not in text
     assert '"geometry_subsegments_re_equilibrated": False' in text
     assert '"noise_added_to_K": False' in text
 
