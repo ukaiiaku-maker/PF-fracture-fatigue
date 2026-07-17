@@ -164,7 +164,10 @@ run_case() {
     status=EXISTING
   else
     rm -f "$outdir/summary.json" "$outdir/kinetic_tip_cell_audit_v101.json"
-    mapfile -t FLAGS < <(common_flags)
+    local -a FLAGS=()
+    while IFS= read -r flag; do
+      FLAGS+=("$flag")
+    done < <(common_flags)
     if ! env \
       CLEAVAGE_HAZARD_MODE="$mode" \
       CLEAVAGE_HAZARD_SEED="$seed" \
