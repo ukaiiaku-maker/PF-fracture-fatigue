@@ -251,6 +251,19 @@ class StochasticAvalancheDiagnosticTipEngine(StochasticHazardDiagnosticTipEngine
 
     def step(self, K, T, dt):
         result = super().step(K, T, dt)
+        fired = bool(result.get("fired", False))
+        result["avalanche_event_advance_m"] = (
+            float(self.avalanche_last_completed_advance_m) if fired else 0.0
+        )
+        result["avalanche_event_length_factor"] = (
+            float(self.avalanche_last_completed_factor) if fired else 0.0
+        )
+        result["avalanche_current_event_advance_m"] = float(
+            self.avalanche_event_advance_m
+        )
+        result["avalanche_current_event_length_factor"] = float(
+            self.avalanche_event_length_factor
+        )
         result["kinetic_checkpoint_progress_m"] = (
             float(self.B) * float(self.avalanche_event_advance_m)
         )
