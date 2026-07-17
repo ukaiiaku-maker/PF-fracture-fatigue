@@ -1,6 +1,6 @@
 """Arrhenius sharp-front fracture and fatigue with unified MPZ state."""
 
-__version__ = "10.1.7.2"
+__version__ = "10.1.7.3"
 
 from .material_manifest import MaterialManifest
 from .unified_mpz import MPZConfig, UnifiedMPZState
@@ -13,6 +13,10 @@ from .developed_state_diagnostic_tip import DevelopedStateDiagnosticTipEngine
 from .stochastic_hazard_tip import (
     HazardThresholdConfig,
     StochasticHazardDiagnosticTipEngine,
+)
+from .stochastic_avalanche_tip import (
+    AvalancheLengthConfig,
+    StochasticAvalancheDiagnosticTipEngine,
 )
 
 # Preserve the separated public continuum class by default. Protected versioned
@@ -36,4 +40,6 @@ __all__ = [
     "DevelopedStateDiagnosticTipEngine",
     "HazardThresholdConfig",
     "StochasticHazardDiagnosticTipEngine",
+    "AvalancheLengthConfig",
+    "StochasticAvalancheDiagnosticTipEngine",
 ]

@@ -1,0 +1,233 @@
+"""v10.1.7.3 threshold-correlated stochastic avalanche-length pilot.
+
+This version retains the v10.1.7.1 material/source/back-stress/shielding model and
+the v10.1.7.2 stochastic integrated-hazard threshold. It adds an opt-in event
+reward: the stochastic threshold sets the total crack advance associated with
+that renewal. One checked sharp-wake geometry commit realizes each event; true
+re-equilibrated subincrements are intentionally deferred to a driver-level
+lifecycle.
+"""
+from __future__ import annotations
+
+import json
+import math
+import os
+from pathlib import Path
+import statistics
+import sys
+
+from . import continuum_source_tip
+from . import crack_backend as _crack_backend_module
+from .stochastic_avalanche_backend import (
+    build_avalanche_backend,
+    write_last_avalanche_backend_diagnostics,
+)
+from .stochastic_avalanche_tip import (
+    AVALANCHE_SCHEMA,
+    StochasticAvalancheDiagnosticTipEngine,
+)
+from . import sharp_front_v10_1_5 as _campaign
+
+
+HAZARD_MODE = os.environ.get("CLEAVAGE_HAZARD_MODE", "deterministic").strip().lower()
+HAZARD_SEED = int(os.environ.get("CLEAVAGE_HAZARD_SEED", "0"))
+HAZARD_MIN_THRESHOLD = float(
+    os.environ.get("CLEAVAGE_HAZARD_MIN_THRESHOLD", "1e-12")
+)
+EVENT_LENGTH_MODE = os.environ.get(
+    "CLEAVAGE_EVENT_LENGTH_MODE", "fixed"
+).strip().lower()
+EVENT_MIN_FACTOR = float(os.environ.get("CLEAVAGE_EVENT_MIN_FACTOR", "0.5"))
+EVENT_MAX_FACTOR = float(os.environ.get("CLEAVAGE_EVENT_MAX_FACTOR", "4.0"))
+EVENT_SUBSEGMENT_FRACTION = float(
+    os.environ.get("CLEAVAGE_EVENT_SUBSEGMENT_FRACTION", "0.1")
+)
+
+StochasticAvalancheDiagnosticTipEngine.configure_campaign(
+    _campaign.BACKSTRESS_SCALE,
+    _campaign.REFRESH_SCALE,
+)
+StochasticAvalancheDiagnosticTipEngine.configure_hazard(
+    HAZARD_MODE,
+    HAZARD_SEED,
+    HAZARD_MIN_THRESHOLD,
+)
+StochasticAvalancheDiagnosticTipEngine.configure_avalanche(
+    EVENT_LENGTH_MODE,
+    EVENT_MIN_FACTOR,
+    EVENT_MAX_FACTOR,
+    EVENT_SUBSEGMENT_FRACTION,
+)
+continuum_source_tip.ContinuumSourceKineticTipEngine = (
+    StochasticAvalancheDiagnosticTipEngine
+)
+_campaign._protected.ContinuumSourceKineticTipEngine = (
+    StochasticAvalancheDiagnosticTipEngine
+)
+
+
+def _option_value(args: list[str], name: str) -> str | None:
+    prefix = name + "="
+    for i, token in enumerate(args):
+        if token.startswith(prefix):
+            return token[len(prefix):]
+        if token == name and i + 1 < len(args):
+            return args[i + 1]
+    return None
+
+
+def _write_geometry_diagnostics(args: list[str]) -> None:
+    """Write wrapper diagnostics explicitly while retaining ``name=sharp_wake``.
+
+    ``sharp_front.py`` uses the backend name to select tip-following remeshing and
+    endpoint semantics. The pilot must therefore not masquerade as a different
+    backend merely to trigger the generic non-sharp diagnostic hook.
+    """
+    out = _option_value(args, "--out")
+    if not out:
+        return
+    root = Path(out)
+    write_last_avalanche_backend_diagnostics(str(root))
+    target = root / "stochastic_avalanche_geometry_events.json"
+    if not target.is_file():
+        raise RuntimeError(f"avalanche geometry diagnostic was not written: {target}")
+    print(f"  wrote avalanche geometry diagnostics to {target}")
+
+
+def _rewrite_summary_event_semantics(args: list[str]) -> None:
+    """Add explicit event-count and equivalent-checkpoint fields to summary.json.
+
+    The legacy 2-D summary field ``n_advances`` is not an event counter. For a
+    deflecting front the driver accumulates ``moved / da_phys`` and rounds the
+    total, so it is an equivalent nominal-checkpoint count. That equals the event
+    count only when every event is exactly ``da_phys``. Variable stochastic event
+    rewards require both quantities to be recorded separately.
+    """
+    out = _option_value(args, "--out")
+    if not out:
+        return
+    root = Path(out)
+    geometry_path = root / "stochastic_avalanche_geometry_events.json"
+    summary_path = root / "summary.json"
+    if not geometry_path.is_file() or not summary_path.is_file():
+        return
+
+    geometry = json.loads(geometry_path.read_text())
+    summary = json.loads(summary_path.read_text())
+    if not isinstance(geometry, list) or not geometry:
+        raise RuntimeError("stochastic avalanche geometry diagnostics contain no events")
+    if not isinstance(summary, list) or not summary:
+        raise RuntimeError("summary.json contains no rows")
+
+    lengths = [max(float(row.get("event_advance_m", 0.0)), 0.0) for row in geometry]
+    if not all(math.isfinite(value) and value > 0.0 for value in lengths):
+        raise RuntimeError("geometry diagnostics contain a nonpositive event length")
+    fixed_lengths = [
+        float(row.get("requested_fixed_length_m", 0.0))
+        for row in geometry
+        if math.isfinite(float(row.get("requested_fixed_length_m", 0.0)))
+        and float(row.get("requested_fixed_length_m", 0.0)) > 0.0
+    ]
+    if not fixed_lengths:
+        raise RuntimeError("geometry diagnostics contain no nominal checkpoint length")
+
+    nominal_checkpoint_m = float(statistics.median(fixed_lengths))
+    path_length_m = float(sum(lengths))
+    projected_extension_m = float(geometry[-1]["x1"]) - float(geometry[0]["x0"])
+    equivalent_exact = path_length_m / nominal_checkpoint_m
+    equivalent_rounded = int(round(equivalent_exact))
+
+    row = summary[0]
+    row.update({
+        "n_geometry_events": int(len(geometry)),
+        "n_equivalent_checkpoints_exact": float(equivalent_exact),
+        "n_equivalent_checkpoints_rounded": int(equivalent_rounded),
+        "nominal_checkpoint_length_m": float(nominal_checkpoint_m),
+        "geometry_path_length_m": float(path_length_m),
+        "geometry_projected_extension_m": float(projected_extension_m),
+        "n_advances_semantics": "rounded_path_length_over_nominal_checkpoint",
+        "n_geometry_events_semantics": "accepted_cleavage_renewals_and_geometry_commits",
+    })
+    summary_path.write_text(json.dumps(summary, indent=2))
+
+
+def _rewrite_audits(args: list[str]) -> None:
+    out = _option_value(args, "--out")
+    if not out:
+        return
+    root = Path(out)
+    mode_path = root / "v10_1_driver_modes.json"
+    if not mode_path.exists():
+        return
+    payload = json.loads(mode_path.read_text())
+    canonical = payload.get("campaign_refresh_length_scale")
+    if canonical is not None:
+        payload["campaign_refresh_scale"] = canonical
+    payload.update({
+        "schema": "v10.1.7.3_stochastic_avalanche_length_pilot",
+        "developed_state_diagnostics": True,
+        "stochastic_avalanche_schema": AVALANCHE_SCHEMA,
+        "cleavage_hazard_mode": HAZARD_MODE,
+        "cleavage_hazard_seed": HAZARD_SEED,
+        "cleavage_event_length_mode": EVENT_LENGTH_MODE,
+        "cleavage_event_min_factor": EVENT_MIN_FACTOR,
+        "cleavage_event_max_factor": EVENT_MAX_FACTOR,
+        "cleavage_event_subsegment_fraction": EVENT_SUBSEGMENT_FRACTION,
+        "mean_event_length_preserved": True,
+        "geometry_subsegments_re_equilibrated": False,
+        "geometry_realization": "single_checked_outer_commit",
+        "requested_subsegment_fraction_metadata_only": True,
+        "geometry_diagnostics_written_to_case_root": True,
+        "backend_semantic_identity": "sharp_wake",
+        "backend_semantic_identity_preserved": True,
+        "tip_following_remeshing_preserved": True,
+        "summary_n_advances_semantics": "rounded_path_length_over_nominal_checkpoint",
+        "summary_has_explicit_geometry_event_count": True,
+        "constitutive_material_change_from_v10_1_7_1": False,
+        "stochastic_geometry_reward_change_from_v10_1_7_2": True,
+        "noise_added_to_K": False,
+        "noise_added_to_barriers": False,
+        "geometry_source_feedback": False,
+        "forward_spatial_source_field": False,
+    })
+    mode_path.write_text(json.dumps(payload, indent=2))
+
+
+def main(argv=None):
+    args = list(sys.argv[1:] if argv is None else argv)
+
+    # sharp_front imports build_crack_backend locally from crack_backend inside
+    # its 2-D driver. Patch the defining module rather than assuming the symbol
+    # is exposed as an attribute of arrhenius_fracture.sharp_front.
+    original_builder = _crack_backend_module.build_crack_backend
+
+    def _builder(local_args, geom):
+        return build_avalanche_backend(
+            local_args,
+            geom,
+            original_builder,
+            default_subsegment_fraction=EVENT_SUBSEGMENT_FRACTION,
+        )
+
+    _crack_backend_module.build_crack_backend = _builder
+    try:
+        print(
+            "  v10.1.7.3 avalanche pilot: "
+            f"hazard={HAZARD_MODE} seed={HAZARD_SEED} "
+            f"event_length={EVENT_LENGTH_MODE} bounds="
+            f"[{EVENT_MIN_FACTOR:g},{EVENT_MAX_FACTOR:g}] "
+            "geometry=single_checked_outer_commit "
+            "backend_semantics=sharp_wake remeshing=preserved "
+            f"requested_future_subsegment_fraction={EVENT_SUBSEGMENT_FRACTION:g}"
+        )
+        result = _campaign.main(args)
+        _write_geometry_diagnostics(args)
+        _rewrite_summary_event_semantics(args)
+        _rewrite_audits(args)
+        return result
+    finally:
+        _crack_backend_module.build_crack_backend = original_builder
+
+
+if __name__ == "__main__":
+    main()
