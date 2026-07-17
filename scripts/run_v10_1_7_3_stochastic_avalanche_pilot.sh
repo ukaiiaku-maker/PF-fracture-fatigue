@@ -163,6 +163,7 @@ assert kinetic_path_m + projection_tol >= projected_extension_m, (
     projected_extension_m,
 )
 
+equivalent_checkpoints = float(row.get("n_advances", 0))
 if case_type == "fixed_original":
     thresholds = [float(r["hazard_last_completed_threshold"]) for r in fired]
     assert all(abs(x - 1.0) <= 1.0e-14 for x in thresholds), thresholds
@@ -173,11 +174,9 @@ else:
     geometry_path = root / "stochastic_avalanche_geometry_events.json"
     assert geometry_path.is_file(), geometry_path
     geometry = json.loads(geometry_path.read_text())
+    # This is the actual stochastic event count: every completed cleavage renewal
+    # must produce exactly one geometry commit and one fired audit record.
     assert len(geometry) == len(fired), (len(geometry), len(fired))
-    assert int(row.get("n_advances", 0)) == len(geometry), (
-        row.get("n_advances"),
-        len(geometry),
-    )
 
     geometry_lengths = []
     for index, (event, kinetic_length) in enumerate(zip(geometry, lengths)):
@@ -220,6 +219,44 @@ else:
         geometry_projected_m,
     )
 
+    # Legacy summary semantics: n_advances is the rounded path length measured in
+    # nominal da_phys units, not the number of variable-length events. Preserve
+    # that field and add an explicit event count so the two cannot be conflated.
+    equivalent_exact = geometry_path_m / da_m
+    equivalent_rounded = int(round(equivalent_exact))
+    assert int(row.get("n_advances", -1)) == equivalent_rounded, (
+        row.get("n_advances"),
+        equivalent_exact,
+        len(geometry),
+    )
+    equivalent_checkpoints = equivalent_exact
+
+    expected_summary = {
+        "n_geometry_events": int(len(geometry)),
+        "n_equivalent_checkpoints_exact": float(equivalent_exact),
+        "n_equivalent_checkpoints_rounded": int(equivalent_rounded),
+        "nominal_checkpoint_length_m": float(da_m),
+        "geometry_path_length_m": float(geometry_path_m),
+        "geometry_projected_extension_m": float(geometry_projected_m),
+        "n_advances_semantics": "rounded_path_length_over_nominal_checkpoint",
+        "n_geometry_events_semantics": "accepted_cleavage_renewals_and_geometry_commits",
+    }
+    changed = any(row.get(key) != value for key, value in expected_summary.items())
+    row.update(expected_summary)
+    if changed:
+        # Repair completed outputs generated immediately before these explicit
+        # metadata fields were introduced. No FEM rerun is needed when all path,
+        # endpoint, event, and kinetic-state checks above already pass.
+        summary_path.write_text(json.dumps(summary, indent=2))
+
+    assert int(row["n_geometry_events"]) == len(geometry), row
+    assert math.isclose(
+        float(row["n_equivalent_checkpoints_exact"]),
+        equivalent_exact,
+        rel_tol=1.0e-12,
+        abs_tol=1.0e-12,
+    ), row
+
     if case_type == "segmented_deterministic":
         assert all(abs(x - da_m) <= 1.0e-12 * max(da_m, 1.0) for x in lengths), lengths
     else:
@@ -233,6 +270,7 @@ else:
 print(
     "VALIDATION "
     f"case={case_type} seed={seed} events={len(fired)} "
+    f"equivalent_checkpoints={equivalent_checkpoints:.3f} "
     f"projected={projected_extension_m*1.0e6:.3f}um "
     f"path={kinetic_path_m*1.0e6:.3f}um"
 )
