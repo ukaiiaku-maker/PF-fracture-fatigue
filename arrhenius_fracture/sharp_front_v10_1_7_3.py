@@ -13,7 +13,7 @@ from pathlib import Path
 import sys
 
 from . import continuum_source_tip
-from . import sharp_front as _sharp_front_base
+from . import crack_backend as _crack_backend_module
 from .stochastic_avalanche_backend import build_avalanche_backend
 from .stochastic_avalanche_tip import (
     AVALANCHE_SCHEMA,
@@ -105,7 +105,11 @@ def _rewrite_audits(args: list[str]) -> None:
 
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
-    original_builder = _sharp_front_base.build_crack_backend
+
+    # sharp_front imports build_crack_backend locally from crack_backend inside
+    # its 2-D driver.  Patch the defining module rather than assuming the symbol
+    # is exposed as an attribute of arrhenius_fracture.sharp_front.
+    original_builder = _crack_backend_module.build_crack_backend
 
     def _builder(local_args, geom):
         return build_avalanche_backend(
@@ -115,7 +119,7 @@ def main(argv=None):
             default_subsegment_fraction=EVENT_SUBSEGMENT_FRACTION,
         )
 
-    _sharp_front_base.build_crack_backend = _builder
+    _crack_backend_module.build_crack_backend = _builder
     try:
         print(
             "  v10.1.7.3 avalanche pilot: "
@@ -128,7 +132,7 @@ def main(argv=None):
         _rewrite_audits(args)
         return result
     finally:
-        _sharp_front_base.build_crack_backend = original_builder
+        _crack_backend_module.build_crack_backend = original_builder
 
 
 if __name__ == "__main__":
