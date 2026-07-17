@@ -1,9 +1,11 @@
 """v10.1.7.3 threshold-correlated stochastic avalanche-length pilot.
 
 This version retains the v10.1.7.1 material/source/back-stress/shielding model and
-the v10.1.7.2 stochastic integrated-hazard threshold.  It adds an opt-in event
+the v10.1.7.2 stochastic integrated-hazard threshold. It adds an opt-in event
 reward: the stochastic threshold sets the total crack advance associated with
-that renewal, while a segmented sharp-wake wrapper realizes the event geometry.
+that renewal. One checked sharp-wake geometry commit realizes each event; true
+re-equilibrated subincrements are intentionally deferred to a driver-level
+lifecycle.
 """
 from __future__ import annotations
 
@@ -30,7 +32,7 @@ HAZARD_MIN_THRESHOLD = float(
 EVENT_LENGTH_MODE = os.environ.get(
     "CLEAVAGE_EVENT_LENGTH_MODE", "fixed"
 ).strip().lower()
-EVENT_MIN_FACTOR = float(os.environ.get("CLEAVAGE_EVENT_MIN_FACTOR", "0.2"))
+EVENT_MIN_FACTOR = float(os.environ.get("CLEAVAGE_EVENT_MIN_FACTOR", "0.5"))
 EVENT_MAX_FACTOR = float(os.environ.get("CLEAVAGE_EVENT_MAX_FACTOR", "4.0"))
 EVENT_SUBSEGMENT_FRACTION = float(
     os.environ.get("CLEAVAGE_EVENT_SUBSEGMENT_FRACTION", "0.1")
@@ -93,6 +95,8 @@ def _rewrite_audits(args: list[str]) -> None:
         "cleavage_event_subsegment_fraction": EVENT_SUBSEGMENT_FRACTION,
         "mean_event_length_preserved": True,
         "geometry_subsegments_re_equilibrated": False,
+        "geometry_realization": "single_checked_outer_commit",
+        "requested_subsegment_fraction_metadata_only": True,
         "constitutive_material_change_from_v10_1_7_1": False,
         "stochastic_geometry_reward_change_from_v10_1_7_2": True,
         "noise_added_to_K": False,
@@ -107,7 +111,7 @@ def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
 
     # sharp_front imports build_crack_backend locally from crack_backend inside
-    # its 2-D driver.  Patch the defining module rather than assuming the symbol
+    # its 2-D driver. Patch the defining module rather than assuming the symbol
     # is exposed as an attribute of arrhenius_fracture.sharp_front.
     original_builder = _crack_backend_module.build_crack_backend
 
@@ -126,7 +130,8 @@ def main(argv=None):
             f"hazard={HAZARD_MODE} seed={HAZARD_SEED} "
             f"event_length={EVENT_LENGTH_MODE} bounds="
             f"[{EVENT_MIN_FACTOR:g},{EVENT_MAX_FACTOR:g}] "
-            f"subsegment_fraction={EVENT_SUBSEGMENT_FRACTION:g}"
+            "geometry=single_checked_outer_commit "
+            f"requested_future_subsegment_fraction={EVENT_SUBSEGMENT_FRACTION:g}"
         )
         result = _campaign.main(args)
         _rewrite_audits(args)
