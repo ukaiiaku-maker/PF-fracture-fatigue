@@ -20,7 +20,7 @@ def _repair_module():
 
 
 def test_version_is_v10161():
-    assert arrhenius_fracture.__version__ == "10.1.7"
+    assert arrhenius_fracture.__version__ == "10.1.7.1"
 
 
 def test_refresh_scale_alias_is_written_without_removing_canonical_key(tmp_path: Path):
@@ -28,9 +28,7 @@ def test_refresh_scale_alias_is_written_without_removing_canonical_key(tmp_path:
     out.mkdir()
     path = out / "v10_1_driver_modes.json"
     path.write_text(json.dumps({"campaign_refresh_length_scale": 1.25}))
-
     _write_refresh_scale_alias(["--out", str(out)])
-
     payload = json.loads(path.read_text())
     assert payload["campaign_refresh_length_scale"] == 1.25
     assert payload["campaign_refresh_scale"] == 1.25
@@ -47,9 +45,7 @@ def test_existing_case_repair_adds_alias(tmp_path: Path):
     case.mkdir(parents=True)
     path = case / "v10_1_driver_modes.json"
     path.write_text(json.dumps({"campaign_refresh_length_scale": 1.0}))
-
     scanned, changed = _repair_module().repair(tmp_path)
-
     payload = json.loads(path.read_text())
     assert scanned == 1
     assert changed == 1
