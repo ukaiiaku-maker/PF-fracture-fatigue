@@ -31,7 +31,7 @@ def test_version_is_v10173():
 
 
 def test_clipped_exponential_mean_matches_sampling():
-    a, b = 0.2, 4.0
+    a, b = 0.5, 4.0
     rng = np.random.default_rng(9317)
     sample = np.clip(rng.exponential(1.0, size=500000), a, b)
     exact = clipped_exponential_mean(a, b)
@@ -39,7 +39,7 @@ def test_clipped_exponential_mean_matches_sampling():
 
 
 def test_threshold_scaled_lengths_are_bounded_and_mean_preserving():
-    a, b = 0.2, 4.0
+    a, b = 0.5, 4.0
     rng = np.random.default_rng(7721)
     thresholds = rng.exponential(1.0, size=200000)
     factors = np.asarray([
@@ -54,9 +54,9 @@ def test_threshold_scaled_lengths_are_bounded_and_mean_preserving():
 
 def test_deterministic_and_fixed_modes_recover_exact_unit_length():
     assert threshold_event_length_factor(
-        0.01, "threshold_scaled", 0.2, 4.0, deterministic_threshold=True
+        0.01, "threshold_scaled", 0.5, 4.0, deterministic_threshold=True
     ) == 1.0
-    assert threshold_event_length_factor(3.0, "fixed", 0.2, 4.0) == 1.0
+    assert threshold_event_length_factor(3.0, "fixed", 0.5, 4.0) == 1.0
 
 
 def test_engine_correlates_waiting_threshold_and_event_reward_without_K_noise():
@@ -69,12 +69,14 @@ def test_engine_correlates_waiting_threshold_and_event_reward_without_K_noise():
     assert "self.f.da = event_length" in text
 
 
-def test_backend_realizes_each_event_as_ten_equal_geometry_subsegments():
+def test_backend_uses_one_checked_commit_not_repeated_false_subsegments():
     text = BACKEND.read_text()
-    assert "n_segments = max(int(math.ceil(1.0 / fraction)), 1)" in text
-    assert "segment_length = total_length / n_segments" in text
-    assert "mechanics_re_equilibrated_between_subsegments" in text
-    assert 'name = "stochastic_avalanche_segmented"' in text
+    assert 'name = "stochastic_avalanche_event"' in text
+    assert '"geometry_realization": "single_checked_outer_commit"' in text
+    assert '"realized_geometry_commits": 1' in text
+    assert "event_length_mismatch" in text
+    assert "for index in range(n_segments)" not in text
+    assert "Repeated calls without a FEM solve" in text
 
 
 def test_entry_patches_crack_backend_defining_module_and_records_limits():
@@ -92,20 +94,26 @@ def test_entry_patches_crack_backend_defining_module_and_records_limits():
     assert '"noise_added_to_K": False' in text
 
 
-def test_runner_includes_fixed_segmented_and_stochastic_controls():
+def test_runner_includes_controls_live_heartbeat_and_unbuffered_python():
     text = RUNNER.read_text()
     assert 'SEEDS=${SEEDS:-"1 2"}' in text
     assert 'TARGET_EXT_UM=${TARGET_EXT_UM:-200}' in text
-    assert 'EVENT_MIN_FACTOR=${EVENT_MIN_FACTOR:-0.2}' in text
+    assert 'EVENT_MIN_FACTOR=${EVENT_MIN_FACTOR:-0.5}' in text
     assert 'EVENT_MAX_FACTOR=${EVENT_MAX_FACTOR:-4.0}' in text
     assert 'EVENT_SUBSEGMENT_FRACTION=${EVENT_SUBSEGMENT_FRACTION:-0.1}' in text
+    assert 'HEARTBEAT_SECONDS=${HEARTBEAT_SECONDS:-60}' in text
+    assert "PYTHONUNBUFFERED=1" in text
+    assert '"$PYTHON_BIN" -u -m' in text
+    assert "HEARTBEAT case=" in text
+    assert "CASE COMPLETE" in text
+    assert "CAMPAIGN COMPLETE" in text
     assert "fixed_original" in text
     assert "segmented_deterministic" in text
     assert "stochastic_avalanche" in text
     assert "--crack-backend sharp_wake" in text
 
 
-def test_analyzer_separates_segmentation_bias_from_stochastic_decorrelation():
+def test_analyzer_separates_geometry_wrapper_bias_from_stochastic_decorrelation():
     text = ANALYZER.read_text()
     assert "segmented_control_normalized_rms_percent_of_fixed_range" in text
     assert "mean_detrended_seed_correlation_to_segmented_deterministic" in text
