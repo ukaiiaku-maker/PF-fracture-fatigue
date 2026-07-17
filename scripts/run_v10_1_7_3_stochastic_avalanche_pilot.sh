@@ -94,7 +94,13 @@ max_factor = float(sys.argv[9])
 summary_path = root / "summary.json"
 audit_path = root / "kinetic_tip_cell_audit_v101.json"
 mode_path = root / "v10_1_driver_modes.json"
-if not (summary_path.is_file() and audit_path.is_file() and mode_path.is_file()):
+step_paths = sorted(root.glob("steps_*K.csv"))
+if not (
+    summary_path.is_file()
+    and audit_path.is_file()
+    and mode_path.is_file()
+    and len(step_paths) == 1
+):
     raise SystemExit(1)
 
 modes = json.loads(mode_path.read_text())
@@ -108,6 +114,8 @@ else:
     assert modes.get("cleavage_hazard_mode") == mode, modes
     assert int(modes.get("cleavage_hazard_seed", -1)) == seed, modes
     assert modes.get("geometry_subsegments_re_equilibrated") is False, modes
+    assert modes.get("backend_semantic_identity") == "sharp_wake", modes
+    assert modes.get("tip_following_remeshing_preserved") is True, modes
 
 summary = json.loads(summary_path.read_text())
 assert summary and isinstance(summary, list), summary
@@ -121,11 +129,39 @@ records = audit.get("records", [])
 assert records, audit
 fired = [r for r in records if bool(r.get("fired", False))]
 assert fired, audit
-final_extension_um = max(
+kinetic_path_m = max(
     float(r.get("kinetic_micro_advance_total_m", r.get("micro_advance_total_m", 0.0)))
     for r in records
-) * 1.0e6
-assert final_extension_um + 1.0e-6 >= target_um, (final_extension_um, target_um)
+)
+assert math.isfinite(kinetic_path_m) and kinetic_path_m > 0.0, kinetic_path_m
+
+# The 2-D stopping criterion is projected ligament-direction extension, not MPZ
+# path arclength. Validate against the exact crack_extension_m column used by the
+# solver instead of treating kinetic arclength as the stopping coordinate.
+lines = [line.strip() for line in step_paths[0].read_text().splitlines() if line.strip()]
+assert len(lines) >= 2, step_paths[0]
+header = [token.strip() for token in lines[0].lstrip("# ").split(",")]
+idx_ext = header.index("crack_extension_m")
+projected_values = []
+for line in lines[1:]:
+    values = line.split(",")
+    if len(values) <= idx_ext:
+        continue
+    value = float(values[idx_ext])
+    if math.isfinite(value):
+        projected_values.append(value)
+assert projected_values, step_paths[0]
+projected_extension_m = max(projected_values)
+assert projected_extension_m + 1.0e-12 >= target_um * 1.0e-6, (
+    projected_extension_m * 1.0e6,
+    target_um,
+)
+# A path arclength cannot be shorter than its positive x projection.
+projection_tol = max(5.0e-9, 5.0e-6 * max(kinetic_path_m, projected_extension_m))
+assert kinetic_path_m + projection_tol >= projected_extension_m, (
+    kinetic_path_m,
+    projected_extension_m,
+)
 
 if case_type == "fixed_original":
     thresholds = [float(r["hazard_last_completed_threshold"]) for r in fired]
@@ -138,13 +174,51 @@ else:
     assert geometry_path.is_file(), geometry_path
     geometry = json.loads(geometry_path.read_text())
     assert len(geometry) == len(fired), (len(geometry), len(fired))
-    for event in geometry:
+    assert int(row.get("n_advances", 0)) == len(geometry), (
+        row.get("n_advances"),
+        len(geometry),
+    )
+
+    geometry_lengths = []
+    for index, (event, kinetic_length) in enumerate(zip(geometry, lengths)):
         requested = float(event["requested_event_advance_m"])
         realized = float(event["event_advance_m"])
+        geometry_lengths.append(realized)
         assert int(event.get("realized_geometry_commits", 0)) == 1, event
         assert event.get("geometry_realization") == "single_checked_outer_commit", event
+        assert event.get("backend_semantic_identity") == "sharp_wake", event
+        assert event.get("tip_following_remeshing_preserved") is True, event
+        assert event.get("driver_endpoint_synchronized") is True, event
         tolerance = max(1.0e-9, 0.05 * requested)
         assert abs(realized - requested) <= tolerance, event
+        assert abs(realized - kinetic_length) <= max(1.0e-9, 1.0e-6 * realized), (
+            event,
+            kinetic_length,
+        )
+        if index > 0:
+            previous = geometry[index - 1]
+            continuity = math.hypot(
+                float(event["x0"]) - float(previous["x1"]),
+                float(event["y0"]) - float(previous["y1"]),
+            )
+            assert continuity <= 5.0e-9, (index, continuity, previous, event)
+
+    geometry_path_m = sum(geometry_lengths)
+    path_tol = max(5.0e-9, 5.0e-6 * max(geometry_path_m, kinetic_path_m))
+    assert abs(geometry_path_m - kinetic_path_m) <= path_tol, (
+        geometry_path_m,
+        kinetic_path_m,
+    )
+
+    geometry_projected_m = float(geometry[-1]["x1"]) - float(geometry[0]["x0"])
+    assert abs(geometry_projected_m - projected_extension_m) <= projection_tol, (
+        geometry_projected_m,
+        projected_extension_m,
+    )
+    assert geometry_path_m + path_tol >= geometry_projected_m, (
+        geometry_path_m,
+        geometry_projected_m,
+    )
 
     if case_type == "segmented_deterministic":
         assert all(abs(x - da_m) <= 1.0e-12 * max(da_m, 1.0) for x in lengths), lengths
@@ -155,6 +229,13 @@ else:
         assert all(lo <= x <= hi for x in lengths), (lo, hi, lengths)
         assert any(abs(x - da_m) > 1.0e-3 * da_m for x in lengths), lengths
         assert all(r.get("stochastic_avalanche_length_enabled") is True for r in records)
+
+print(
+    "VALIDATION "
+    f"case={case_type} seed={seed} events={len(fired)} "
+    f"projected={projected_extension_m*1.0e6:.3f}um "
+    f"path={kinetic_path_m*1.0e6:.3f}um"
+)
 PY
 }
 
@@ -236,8 +317,9 @@ run_case() {
     status=EXISTING
     report "CASE SKIP validated-complete case=$case_type seed=$seed"
   else
-    # Remove every stale product from a failed or invalid case.  In particular,
-    # never retain geometry-event diagnostics from the superseded 20-um bug.
+    # Remove every stale product from a failed or invalid case. Never retain
+    # geometry-event diagnostics from either the superseded 20-um multiplication
+    # bug or the variable-event/front-endpoint desynchronization bug.
     rm -rf "$outdir"
     mkdir -p "$outdir"
     local -a FLAGS=()
