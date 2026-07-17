@@ -1,17 +1,18 @@
 """Geometry realization for the stochastic avalanche-length pilot.
 
 The first v10.1.7.3 implementation attempted to realize one event by repeatedly
-calling the sharp-wake backend with ten small requested increments.  That is not
+calling the sharp-wake backend with ten small requested increments. That is not
 valid: the sharp-wake backend has a finite realizable increment associated with
 its damage-band resolution, so nominal 0.5 micrometre requests were promoted to
 approximately 2 micrometres and a nominal 5 micrometre event became 20
 micrometres.
 
 This wrapper now performs one geometry commit per sampled event and verifies that
-the backend realized the requested length.  The event-length stochasticity is
-therefore tested without a hidden geometry multiplication.  True 10-percent
-subincrements require a driver-level FEM re-equilibration loop and are explicitly
-not claimed here.
+the backend realized the requested length. It deliberately preserves the
+``sharp_wake`` semantic backend identity because the 2-D driver uses that name to
+enable tip-following remeshing and the sharp-wake endpoint convention. Extra
+pilot diagnostics are written through an explicit registry hook rather than by
+changing the backend name.
 """
 from __future__ import annotations
 
@@ -26,10 +27,17 @@ from .crack_backend import CrackAdvanceResult
 from .stochastic_avalanche_tip import pop_pending_geometry_event
 
 
+_LAST_AVALANCHE_BACKEND = None
+
+
 class AvalancheSubsegmentBackend:
     """Wrap sharp-wake with one checked geometry commit per variable event."""
 
-    name = "stochastic_avalanche_event"
+    # This is a behavioral identity in sharp_front.py, not merely a display label.
+    # Keeping it equal to sharp_wake preserves tip-following remeshing, endpoint
+    # handling, and all other sharp-wake driver semantics.
+    name = "sharp_wake"
+    diagnostic_name = "stochastic_avalanche_event"
 
     def __init__(
         self,
@@ -93,7 +101,7 @@ class AvalancheSubsegmentBackend:
         fraction = min(max(fraction, 1.0e-6), 1.0)
         requested_subsegments = max(int(math.ceil(1.0 / fraction)), 1)
 
-        # One geometry call is deliberate.  Repeated calls without a FEM solve in
+        # One geometry call is deliberate. Repeated calls without a FEM solve in
         # between are not physical subincrements and can multiply the crack length
         # when the backend has a finite minimum realizable increment.
         target = p0 + event_requested_length * direction
@@ -115,7 +123,7 @@ class AvalancheSubsegmentBackend:
             self.relative_length_tolerance * event_requested_length,
         )
         if abs(length_error) > tolerance:
-            # Return the original transaction state.  The caller will restore the
+            # Return the original transaction state. The caller will restore the
             # completed hazard event rather than silently accepting a different
             # crack-growth reward.
             return CrackAdvanceResult(
@@ -167,6 +175,8 @@ class AvalancheSubsegmentBackend:
             "realized_geometry_commits": 1,
             "mechanics_re_equilibrated_between_subsegments": False,
             "geometry_realization": "single_checked_outer_commit",
+            "backend_semantic_identity": "sharp_wake",
+            "tip_following_remeshing_preserved": True,
         }
         self.advance_log.append(row)
 
@@ -195,20 +205,31 @@ class AvalancheSubsegmentBackend:
         )
 
 
+def write_last_avalanche_backend_diagnostics(out_dir: str) -> None:
+    """Write diagnostics for the backend built in the current one-case process."""
+    if _LAST_AVALANCHE_BACKEND is None:
+        raise RuntimeError("no stochastic avalanche backend was constructed")
+    _LAST_AVALANCHE_BACKEND.write_diagnostics(out_dir)
+
+
 def build_avalanche_backend(
     args,
     geom,
     original_builder: Callable,
     default_subsegment_fraction: float = 0.1,
 ):
+    global _LAST_AVALANCHE_BACKEND
     base = original_builder(args, geom)
-    return AvalancheSubsegmentBackend(
+    wrapped = AvalancheSubsegmentBackend(
         base,
         default_subsegment_fraction=default_subsegment_fraction,
     )
+    _LAST_AVALANCHE_BACKEND = wrapped
+    return wrapped
 
 
 __all__ = [
     "AvalancheSubsegmentBackend",
     "build_avalanche_backend",
+    "write_last_avalanche_backend_diagnostics",
 ]
