@@ -1,0 +1,36 @@
+name: Verify v10.2.4 2-D-calibrated reduced campaign
+
+on:
+  push:
+    branches:
+      - v10.2.4-2d-calibrated-reduced-campaign
+  pull_request:
+    branches:
+      - v10.2.3-shared-reduced-state-equivalence
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package and tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Compile v10.2.4 tools
+        run: |
+          python -m compileall -q \
+            arrhenius_fracture/mechanical_closure_v1024.py \
+            arrhenius_fracture/reduced_campaign_v1024.py \
+            scripts/build_v10_2_4_mechanical_atlas.py \
+            scripts/run_v10_2_4_reduced_campaign.py
+          bash -n scripts/run_v10_2_4_2d_calibrated_campaign.sh
+      - name: Run focused tests
+        run: |
+          python -m pytest -q \
+            tests/test_2d_calibrated_campaign_v1024.py \
+            tests/test_reduced_shared_state_v1023.py \
+            tests/test_physical_shielding_v1022.py
