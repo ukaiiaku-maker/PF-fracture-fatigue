@@ -32,6 +32,7 @@ SELECTED_TESTS=(
   tests/test_interaction_integral_v1026.py
   tests/test_state_resolved_kernel_v1026.py
   tests/test_unit_slip_perturbation_v1026.py
+  tests/test_shared_entry_v1026.py
   tests/test_signed_burgers_shared_v1025.py
   tests/test_shared_entry_v1025.py
   tests/test_v1024_campaign_stopped.py
@@ -66,7 +67,7 @@ cat > "$OUTROOT/software_gate.json" <<JSON
     "mechanical_slip_ribbon_normalization": true,
     "state_envelope_interpolation": true,
     "kernel_extrapolation_rejected": true,
-    "shared_monotonic_fatigue_signed_core_retained": true
+    "shared_monotonic_fatigue_state_resolved_engine": true
   },
   "pass": true
 }
