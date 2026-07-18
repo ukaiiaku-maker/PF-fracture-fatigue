@@ -89,15 +89,24 @@ def test_backstress_density_kernel_does_not_dilute_with_blunted_radius():
     assert np.all(rho_1 > 0.0)
 
 
-def test_active_cleavage_shielding_is_bounded_by_promoted_manifest_value():
+def test_active_cleavage_shielding_uses_uncapped_shared_core():
     eng = _engine()
     eng.mpz.mobile[:, :2] = 1.0e9
     raw = eng._active_shielding_raw_uncapped()
     effective = eng._active_shielding_signed()
-    cap = eng.manifest.max_K_shield_MPa_sqrt_m * 1.0e6
+    legacy_reference = eng.manifest.max_K_shield_MPa_sqrt_m * 1.0e6
+    diagnostics = eng._campaign_diagnostics()
 
-    assert abs(raw) > cap
-    assert abs(effective) == pytest.approx(cap)
+    assert abs(raw) > legacy_reference
+    assert effective == pytest.approx(raw)
+    assert diagnostics["campaign_active_K_shield_raw_Pa_sqrt_m"] == pytest.approx(raw)
+    assert diagnostics["campaign_active_K_shield_effective_Pa_sqrt_m"] == pytest.approx(raw)
+    assert diagnostics["campaign_active_K_shield_cap_Pa_sqrt_m"] == pytest.approx(0.0)
+    assert diagnostics["campaign_legacy_K_shield_cap_reference_Pa_sqrt_m"] == pytest.approx(
+        legacy_reference
+    )
+    assert diagnostics["campaign_shielding_cap_applied"] is False
+    assert diagnostics["campaign_shielding_population_limited"] is True
 
 
 def test_campaign_diagnostics_identify_no_temporal_recycling():
