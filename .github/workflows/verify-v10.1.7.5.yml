@@ -1,0 +1,56 @@
+name: Verify v10.1.7.5 reduced-candidate transfer gate
+
+on:
+  push:
+    branches:
+      - v10.1.7.5-reduced-candidate-transfer-gate
+  pull_request:
+    branches:
+      - v10.1.7.4-anisotropic-emission-pilot
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package and tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pytest pandas
+      - name: Compile transfer-gate files
+        run: |
+          python -m compileall -q \
+            arrhenius_fracture/sharp_front_v10_1_7_5.py \
+            scripts/prepare_v10_1_7_5_candidate_transfer.py \
+            scripts/analyze_v10_1_7_5_reduced_candidate_transfer.py
+          bash -n scripts/run_v10_1_7_5_reduced_candidate_transfer_gate.sh
+      - name: Test transfer manifest preparation
+        run: |
+          set -o pipefail
+          python -m pytest -vv -s \
+            tests/test_reduced_candidate_transfer_v10175.py::test_preparation_builds_two_endpoints_six_modes_and_true_blunting_ablation \
+            2>&1 | tee /tmp/transfer-preparation-test.log
+      - name: Upload transfer preparation failure log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: transfer-preparation-test-log
+          path: /tmp/transfer-preparation-test.log
+      - name: Test transfer scope guard
+        run: |
+          python -m pytest -q \
+            tests/test_reduced_candidate_transfer_v10175.py::test_transfer_scope_requires_deterministic_single_front_tip_only
+      - name: Test zero-valued ablation overrides
+        run: |
+          python -m pytest -q \
+            tests/test_reduced_candidate_transfer_v10175.py::test_zero_backstress_and_zero_forest_overrides_are_allowed
+      - name: Test transfer mechanism scoring
+        run: |
+          python -m pytest -q \
+            tests/test_reduced_candidate_transfer_v10175.py::test_transfer_scoring_prefers_emission_blunting_without_background_or_shielding
+      - name: Run inherited anisotropic-emission tests
+        run: |
+          python -m pytest -q tests/test_anisotropic_emission_v10174.py
