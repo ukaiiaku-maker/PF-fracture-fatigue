@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.2.6"
-description = "State-resolved signed-dislocation kernel generation shared by monotonic fracture and fatigue"
+version = "10.2.7"
+description = "Exact state-resolved signed reduced calibration for DBTT and weakT R-curves"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
