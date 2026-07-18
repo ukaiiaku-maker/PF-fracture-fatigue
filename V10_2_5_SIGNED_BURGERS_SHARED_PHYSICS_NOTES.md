@@ -76,11 +76,18 @@ The required artifact schema is
 `v10.2.5_2d_unit_signed_shielding_kernel`.
 
 For every active/wake system and spatial bin, the 2-D calculation must apply both
-positive and negative unit signed perturbations and record
+positive and negative unit signed perturbations. The builder computes the
+shielding contribution using the same sign convention as the production engine:
 
 ```
-H[s,i] = delta_K_tip / delta_signed_line_content.
+delta_K_shield = K_tip_base - K_tip_perturbed
+H[s,i] = delta_K_shield / delta_signed_line_content
+K_tip = K_applied - K_shield
 ```
+
+Thus positive `H*N_signed` shields the crack and negative `H*N_signed`
+antishields it. The response table supplies both `K_tip_base_Pa_sqrt_m` and
+`K_tip_perturbed_Pa_sqrt_m`; an ambiguous precomputed delta-K is not accepted.
 
 `scripts/build_v10_2_5_signed_shielding_kernel.py` requires both signs and checks
 that their normalized responses are antisymmetric/linear within a specified
