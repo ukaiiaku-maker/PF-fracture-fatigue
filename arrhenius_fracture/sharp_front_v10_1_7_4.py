@@ -174,6 +174,13 @@ def main(argv=None):
         raise SystemExit(
             "v10.1.7.4 requires --material-class or --material-manifest"
         )
+    max_fronts = int(_option_value(args, "--max-fronts", "32"))
+    if max_fronts != 1 or "--crystal-branch" in args:
+        raise SystemExit(
+            "v10.1.7.4 is a single-front anisotropic-emission pilot; "
+            "use --max-fronts 1 and do not enable --crystal-branch. "
+            "A front-keyed tensor-drive cache is required before branching."
+        )
 
     use_avalanche_backend = _env_bool(
         "ANISOTROPIC_USE_AVALANCHE_BACKEND", True
