@@ -33,4 +33,4 @@ jobs:
           python -m pytest -q \
             tests/test_reduced_shared_state_v1023.py \
             tests/test_physical_shielding_v1022.py \
-            tests/test_anisotropic_transport_v10175.py
+            tests/test_transport_comparison_v10175.py
