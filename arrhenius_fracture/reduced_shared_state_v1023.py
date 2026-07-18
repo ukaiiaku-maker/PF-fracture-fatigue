@@ -1,31 +1,29 @@
 """v10.2.3 shared-state reduced model consistent with the v10.2.2 2-D front.
 
-This module is deliberately not a new phenomenological zero-dimensional model.
-It executes the same production material manifest, spatial ``UnifiedMPZState``,
-finite campaign source budget, anisotropic emission law, validated transport
-operator, Taylor back stress, accumulated-slip blunting, recovery, escape, and
-moving-frame translation used by the v10.2.2 2-D solver.
+This is not a second phenomenological one-dimensional constitutive model.  It
+executes the production ``MaterialManifest``, spatial ``UnifiedMPZState``, finite
+campaign source budget, anisotropic emission law, promoted transport operator,
+Taylor back stress, accumulated-slip blunting, recovery, escape, moving-frame
+translation, and uncapped signed shielding used by v10.2.2.
 
 Only the mechanical closure is reduced:
 
-* ``replay`` consumes an externally recorded 2-D schedule and is intended for
-  exact constitutive-state equivalence tests;
-* ``monotonic`` prescribes a scalar K ramp and supplied channel drive factors.
-  This is a cheap calibration surrogate, but its mechanics approximation is
-  explicit and audited rather than hidden in a separate constitutive model.
+* ``monotonic`` prescribes a scalar K ramp and externally supplied channel drive
+  factors;
+* ``replay`` consumes a recorded 2-D sequence of K, temperature, timestep, and
+  channel factors and calls the same production coupled ``engine.step`` method.
 
-The legacy manifest shielding cap is never used in kinetics. Effective shielding
-is always the raw signed elastic field, matching v10.2.2.
+The legacy manifest shielding cap is retained only as provenance.  It is never
+used in the kinetics or cleavage stress.
 """
 from __future__ import annotations
 
-from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 import csv
 import json
 import math
 from pathlib import Path
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 from typing import Any, Iterable
 
 import numpy as np
@@ -54,9 +52,9 @@ VALID_MODES = {
     "backstress_off",
 }
 
-# Mean tensor-derived factors observed in the theta=45 degree deterministic
-# transfer scouts. They are a mechanical closure input, not a fitted material
-# parameter. Replay mode should supply the actual 2-D factor history instead.
+# Mean factors observed in the theta=45-degree deterministic 2-D transfer scouts.
+# They are part of the reduced mechanical closure, not fitted material parameters.
+# Exact replay supplies the actual factor history from the corresponding 2-D run.
 DEFAULT_THETA45_DRIVE_FACTORS = (0.132886, 0.008596)
 
 
@@ -88,6 +86,7 @@ class SharedReducedConfig:
     max_action_substep: float = 0.01
     max_translation_substep_m: float = 5.0e-8
     max_internal_steps: int = 20000
+    max_outer_steps: int = 2_000_000
 
     def validate(self) -> "SharedReducedConfig":
         if self.Kdot_MPa_sqrt_m_s <= 0.0:
@@ -106,8 +105,12 @@ class SharedReducedConfig:
             raise ValueError("source_bin_count must be positive")
         if self.G_Pa <= 0.0 or self.b_m <= 0.0:
             raise ValueError("G and b must be positive")
+        if self.max_internal_steps < 1 or self.max_outer_steps < 1:
+            raise ValueError("internal and outer step limits must be positive")
         factors = tuple(float(value) for value in self.drive_factors)
-        if len(factors) != 2 or any(value < 0.0 or not math.isfinite(value) for value in factors):
+        if len(factors) != 2 or any(
+            value < 0.0 or not math.isfinite(value) for value in factors
+        ):
             raise ValueError("exactly two finite nonnegative drive factors are required")
         self.drive_factors = factors
         mode = str(self.transport_mode).strip().lower().replace("-", "_")
@@ -145,6 +148,17 @@ def fallback_manifest_path(candidate_id: str) -> Path:
     if not path.is_file():
         raise FileNotFoundError(path)
     return path
+
+
+def load_manifest(
+    *,
+    candidate_id: str | None = None,
+    manifest_path: str | Path | None = None,
+) -> MaterialManifest:
+    if bool(candidate_id) == bool(manifest_path):
+        raise ValueError("provide exactly one of candidate_id or manifest_path")
+    path = fallback_manifest_path(str(candidate_id)) if candidate_id else Path(manifest_path)
+    return MaterialManifest.from_csv(path)
 
 
 def _front_config(cfg: SharedReducedConfig) -> SimpleNamespace:
@@ -192,6 +206,10 @@ def _tip_config(cfg: SharedReducedConfig, mode: str) -> KineticTipConfig:
     ).validate()
 
 
+def _zero_shielding(self) -> float:
+    return 0.0
+
+
 def build_shared_engine(
     manifest: MaterialManifest,
     cfg: SharedReducedConfig,
@@ -199,7 +217,7 @@ def build_shared_engine(
     mode: str = "full",
     drive_factors: Iterable[float] | None = None,
 ) -> CampaignCalibratedTipEngine:
-    """Construct the production moving-MPZ engine without a FEM object."""
+    """Construct the production moving-MPZ engine without constructing a FEM."""
     cfg = cfg.validate()
     mode = str(mode).strip().lower()
     if mode not in VALID_MODES:
@@ -218,8 +236,8 @@ def build_shared_engine(
     engine.tip_cfg = _tip_config(cfg, mode)
     engine.mpz.cfg.mobile_shield_fraction = float(cfg.mobile_shield_fraction)
 
-    # Reinstall explicitly so the mode-specific backstress scale is auditable and
-    # independent of any process-global class default inherited from a prior run.
+    # Reinstall explicitly so the mode-specific backstress scale is independent
+    # of process-global class defaults from any preceding calculation.
     install_campaign_calibrated_source(
         engine.mpz,
         float(cfg.b_m),
@@ -237,8 +255,8 @@ def build_shared_engine(
     )
     install_anisotropic_campaign_emission(engine.mpz, anisotropic_cfg)
     if cfg.transport_mode == VALIDATED_SCALAR_TRANSPORT:
-        # Exactly mirror v10.2.2's promoted transport mode: anisotropic emission
-        # remains installed, while the inherited common transport operator is used.
+        # Mirror v10.2.2's promoted path: retain the anisotropic finite-source
+        # emitter but use the inherited validated common transport operator.
         engine.mpz.evolve = inherited_evolve
 
     factors = np.asarray(
@@ -254,10 +272,35 @@ def build_shared_engine(
     engine.mpz._anisotropic_drive_factors = factors.copy()
     engine.mpz._anisotropic_drive_reliable = True
     engine.mpz._anisotropic_drive_serial = 0
+
+    # CampaignCalibratedTipEngine historically overrode the base method without
+    # consulting tip_cfg.active_shielding.  Bind the diagnostic ablation directly
+    # to this instance so shielding_off is an actual mechanics ablation, not a
+    # parser label.  The raw field is still recorded for comparison.
+    if mode in {"plasticity_off", "shielding_off"}:
+        engine._active_shielding_signed = MethodType(_zero_shielding, engine)
+        engine._wake_shielding_signed = MethodType(_zero_shielding, engine)
+
     engine._shared_reduced_mode = mode
-    engine._shared_reduced_mechanics_closure = "prescribed_K_and_channel_drive_factors"
+    engine._shared_reduced_mechanics_closure = (
+        "prescribed_K_and_channel_drive_factors"
+    )
     engine._shared_reduced_transport_mode = cfg.transport_mode
     return engine
+
+
+def _state_arrays(engine: CampaignCalibratedTipEngine) -> dict[str, np.ndarray]:
+    state = engine.mpz
+    return {
+        "mobile": np.asarray(state.mobile, dtype=float).copy(),
+        "retained": np.asarray(state.retained, dtype=float).copy(),
+        "accumulated_slip": np.asarray(state.accumulated_slip, dtype=float).copy(),
+        "available_sites": np.asarray(state.available_sites, dtype=float).copy(),
+        "site_capacity": np.asarray(state.site_capacity, dtype=float).copy(),
+        "wake_mobile": np.asarray(state.wake_mobile, dtype=float).copy(),
+        "wake_retained": np.asarray(state.wake_retained, dtype=float).copy(),
+        "wake_slip": np.asarray(state.wake_slip, dtype=float).copy(),
+    }
 
 
 def _field_snapshot(engine: CampaignCalibratedTipEngine) -> dict[str, Any]:
@@ -266,11 +309,19 @@ def _field_snapshot(engine: CampaignCalibratedTipEngine) -> dict[str, Any]:
     active_effective = float(engine._active_shielding_signed())
     factors = np.asarray(state._anisotropic_drive_factors, dtype=float)
     sigma_back = np.asarray(
-        getattr(state, "anisotropic_last_sigma_back_by_system_Pa", np.zeros(state.n_systems)),
+        getattr(
+            state,
+            "anisotropic_last_sigma_back_by_system_Pa",
+            np.zeros(state.n_systems),
+        ),
         dtype=float,
     )
     sigma_emit = np.asarray(
-        getattr(state, "anisotropic_last_sigma_emit_by_system_Pa", np.zeros(state.n_systems)),
+        getattr(
+            state,
+            "anisotropic_last_sigma_emit_by_system_Pa",
+            np.zeros(state.n_systems),
+        ),
         dtype=float,
     )
     return {
@@ -295,6 +346,22 @@ def _field_snapshot(engine: CampaignCalibratedTipEngine) -> dict[str, Any]:
     }
 
 
+def _raw_effective_consistent(history: list[dict[str, Any]], mode: str) -> bool:
+    if mode == "shielding_off":
+        return True
+    return bool(
+        all(
+            abs(float(row["raw_minus_effective_Pa_sqrt_m"]))
+            <= max(
+                1.0e-6,
+                1.0e-12
+                * max(abs(float(row["K_shield_raw_Pa_sqrt_m"])), 1.0),
+            )
+            for row in history
+        )
+    )
+
+
 def run_monotonic_shared_front(
     manifest: MaterialManifest,
     temperature_K: float,
@@ -302,7 +369,7 @@ def run_monotonic_shared_front(
     *,
     mode: str = "full",
 ) -> dict[str, Any]:
-    """Run a cheap prescribed-K first-passage calculation with shared state code."""
+    """Run prescribed-K first passage while using the production state engine."""
     cfg = cfg.validate()
     engine = build_shared_engine(manifest, cfg, mode=mode)
     target_advances = max(
@@ -311,59 +378,78 @@ def run_monotonic_shared_front(
     )
     K_left = 0.0
     history: list[dict[str, Any]] = []
-    internal_steps = 0
+    outer_step = 0
 
     with install_uncapped_physical_shielding():
         while K_left < cfg.Kmax_MPa_sqrt_m and engine.n_adv < target_advances:
-            internal_steps += 1
-            if internal_steps > 2_000_000:
+            outer_step += 1
+            if outer_step > int(cfg.max_outer_steps):
                 raise RuntimeError("shared reduced front exceeded outer-step limit")
             dK = min(
                 float(cfg.max_dK_step_MPa_sqrt_m),
                 float(cfg.Kmax_MPa_sqrt_m) - K_left,
             )
-            dt = dK / float(cfg.Kdot_MPa_sqrt_m_s)
+            dt_requested = dK / float(cfg.Kdot_MPa_sqrt_m_s)
             K_mid = K_left + 0.5 * dK
-            result = engine.step(K_mid * 1.0e6, float(temperature_K), dt)
-            consumed = float(result.get("kinetic_dt_consumed_s", dt))
-            consumed = min(max(consumed, 0.0), dt)
-            K_event = K_left + float(cfg.Kdot_MPa_sqrt_m_s) * consumed
-            if not bool(result.get("fired", False)):
-                K_event = K_left + dK
-            snapshot = {
-                "outer_step": internal_steps,
-                "time_s": float(engine.t),
-                "K_MPa_sqrt_m": float(K_event),
-                "temperature_K": float(temperature_K),
-                "mode": mode,
-                "fired": bool(result.get("fired", False)),
-                "checkpoint_progress_action": float(engine.B),
-                "checkpoint_advances": int(engine.n_adv),
-                "micro_advance_total_m": float(engine.micro_advance_total_m),
-                "sigma_opening_Pa": float(engine.sigma_opening_tip(K_mid * 1.0e6)),
-                "sigma_cleave_Pa": float(
-                    result.get("sigma_cleave_eff_Pa", result.get("sigma_tip", 0.0))
-                ),
-                "lambda_cleave_s": float(result.get("lambda_c", 0.0)),
-                "dN_emit": float(result.get("dN_emit", result.get("dN_emit_raw", 0.0))),
-                "dN_trapped": float(result.get("dN_trapped", 0.0)),
-                "dN_recovered": float(result.get("dN_recovered", 0.0)),
-                "dN_escaped": float(result.get("dN_escaped", 0.0)),
-                **_field_snapshot(engine),
-            }
-            history.append(snapshot)
-            K_left = float(K_event)
-            if bool(result.get("fired", False)):
-                # The engine localizes the event and may leave part of the outer
-                # increment unused. Continue only when more checkpoints are needed.
-                if engine.n_adv >= target_advances:
-                    break
-                if consumed <= 0.0:
-                    K_left += min(dK, 1.0e-12)
+            result = engine.step(K_mid * 1.0e6, float(temperature_K), dt_requested)
+            consumed = min(
+                max(float(result.get("kinetic_dt_consumed_s", dt_requested)), 0.0),
+                dt_requested,
+            )
+            fired = bool(result.get("fired", False))
+            K_right = (
+                K_left + float(cfg.Kdot_MPa_sqrt_m_s) * consumed
+                if fired
+                else K_left + dK
+            )
+            history.append(
+                {
+                    "outer_step": outer_step,
+                    "time_s": float(engine.t),
+                    "dt_requested_s": float(dt_requested),
+                    "dt_consumed_s": float(consumed),
+                    "K_input_MPa_sqrt_m": float(K_mid),
+                    "K_MPa_sqrt_m": float(K_right),
+                    "temperature_K": float(temperature_K),
+                    "mode": mode,
+                    "fired": fired,
+                    "checkpoint_progress_action": float(engine.B),
+                    "checkpoint_advances": int(engine.n_adv),
+                    "micro_advance_step_m": float(
+                        result.get("kinetic_micro_advance_step_m", 0.0)
+                    ),
+                    "micro_advance_total_m": float(engine.micro_advance_total_m),
+                    "sigma_opening_Pa": float(
+                        engine.sigma_opening_tip(K_mid * 1.0e6)
+                    ),
+                    "sigma_cleave_Pa": float(
+                        result.get(
+                            "sigma_cleave_eff_Pa",
+                            result.get("sigma_tip", 0.0),
+                        )
+                    ),
+                    "lambda_cleave_s": float(result.get("lambda_c", 0.0)),
+                    "dN_emit": float(
+                        result.get("dN_emit", result.get("dN_emit_raw", 0.0))
+                    ),
+                    "dN_trapped": float(result.get("dN_trapped", 0.0)),
+                    "dN_recovered": float(result.get("dN_recovered", 0.0)),
+                    "dN_escaped": float(result.get("dN_escaped", 0.0)),
+                    **_field_snapshot(engine),
+                }
+            )
+            K_left = float(K_right)
+            if fired and engine.n_adv >= target_advances:
+                break
+            if fired and consumed <= 0.0:
+                K_left += min(dK, 1.0e-12)
 
-    final = history[-1] if history else {}
     reached = engine.n_adv >= target_advances
-    result = {
+    first = next(
+        (float(row["K_MPa_sqrt_m"]) for row in history if row["fired"]),
+        None,
+    )
+    return {
         "schema": MODEL_ID,
         "candidate_id": manifest.candidate_id,
         "material_class": manifest.name,
@@ -371,66 +457,88 @@ def run_monotonic_shared_front(
         "mode": mode,
         "temperature_K": float(temperature_K),
         "status": "complete" if reached else "incomplete",
-        "K_first_MPa_sqrt_m": (
-            next(
-                (float(row["K_MPa_sqrt_m"]) for row in history if row["fired"]),
-                None,
-            )
-        ),
+        "K_first_MPa_sqrt_m": first,
         "checkpoint_advances": int(engine.n_adv),
         "target_checkpoint_advances": int(target_advances),
         "micro_advance_total_m": float(engine.micro_advance_total_m),
-        "outer_steps": int(internal_steps),
+        "outer_steps": int(outer_step),
         "history": history,
-        "final_state": final,
+        "_final_arrays": _state_arrays(engine),
         "config": asdict(cfg),
-        "mechanics_closure": "prescribed scalar K ramp plus supplied channel drive factors",
+        "mechanics_closure": (
+            "prescribed scalar K ramp plus supplied channel drive factors"
+        ),
         "state_evolution_source": "production v10.2.2 moving MPZ classes",
         "constitutive_K_shield_clip_applied": False,
+        "shielding_ablation": mode == "shielding_off",
         "legacy_manifest_cap_reference_MPa_sqrt_m": float(
             manifest.max_K_shield_MPa_sqrt_m
         ),
         "legacy_manifest_cap_used_in_kinetics": False,
-        "raw_equals_effective": bool(
-            all(
-                abs(float(row["raw_minus_effective_Pa_sqrt_m"]))
-                <= max(1.0e-6, 1.0e-12 * max(abs(float(row["K_shield_raw_Pa_sqrt_m"])), 1.0))
-                for row in history
-            )
+        "raw_equals_effective_when_shielding_active": _raw_effective_consistent(
+            history, mode
         ),
     }
-    return result
 
 
-def _read_replay_schedule(path: str | Path) -> list[dict[str, float]]:
+def _read_replay_schedule(path: str | Path) -> list[dict[str, Any]]:
     with Path(path).open(newline="") as handle:
         rows = list(csv.DictReader(handle))
     if not rows:
         raise ValueError(f"empty replay schedule: {path}")
-    required = {"dt_s", "temperature_K", "K_Pa_sqrt_m", "advance_m"}
+    required = {"dt_s", "temperature_K", "K_Pa_sqrt_m"}
     missing = required.difference(rows[0])
     if missing:
         raise ValueError(f"replay schedule is missing columns: {sorted(missing)}")
-    parsed: list[dict[str, float]] = []
+    parsed: list[dict[str, Any]] = []
     for index, row in enumerate(rows):
-        item = {key: float(row[key]) for key in required}
-        item["drive_factor_0"] = float(row.get("drive_factor_0", DEFAULT_THETA45_DRIVE_FACTORS[0]))
-        item["drive_factor_1"] = float(row.get("drive_factor_1", DEFAULT_THETA45_DRIVE_FACTORS[1]))
-        item["row_index"] = float(index)
+        item: dict[str, Any] = {
+            "row_index": index,
+            "dt_s": float(row["dt_s"]),
+            "temperature_K": float(row["temperature_K"]),
+            "K_Pa_sqrt_m": float(row["K_Pa_sqrt_m"]),
+            "drive_factor_0": float(
+                row.get("drive_factor_0", DEFAULT_THETA45_DRIVE_FACTORS[0])
+            ),
+            "drive_factor_1": float(
+                row.get("drive_factor_1", DEFAULT_THETA45_DRIVE_FACTORS[1])
+            ),
+        }
+        for name in (
+            "expected_micro_advance_step_m",
+            "expected_micro_advance_total_m",
+            "expected_K_shield_effective_Pa_sqrt_m",
+            "expected_mobile_count",
+            "expected_retained_count",
+        ):
+            raw = row.get(name)
+            item[name] = (
+                float(raw) if raw not in {None, "", "nan", "NaN"} else math.nan
+            )
+        expected_fired = row.get("expected_fired")
+        item["expected_fired"] = (
+            None
+            if expected_fired in {None, ""}
+            else str(expected_fired).strip().lower() in {"1", "true", "yes"}
+        )
         parsed.append(item)
     return parsed
 
 
 def replay_shared_state(
     manifest: MaterialManifest,
-    schedule: str | Path | list[dict[str, float]],
+    schedule: str | Path | list[dict[str, Any]],
     cfg: SharedReducedConfig,
     *,
     mode: str = "full",
 ) -> dict[str, Any]:
-    """Replay a recorded 2-D K/drive/advance schedule through shared state code."""
+    """Replay recorded 2-D outer engine calls through the production step method."""
     cfg = cfg.validate()
-    rows = _read_replay_schedule(schedule) if isinstance(schedule, (str, Path)) else list(schedule)
+    rows = (
+        _read_replay_schedule(schedule)
+        if isinstance(schedule, (str, Path))
+        else list(schedule)
+    )
     engine = build_shared_engine(manifest, cfg, mode=mode)
     history: list[dict[str, Any]] = []
 
@@ -439,39 +547,72 @@ def replay_shared_state(
             dt = max(float(row["dt_s"]), 0.0)
             T = float(row["temperature_K"])
             K = max(float(row["K_Pa_sqrt_m"]), 0.0)
-            advance = max(float(row.get("advance_m", 0.0)), 0.0)
             factors = np.asarray(
-                [row.get("drive_factor_0", cfg.drive_factors[0]), row.get("drive_factor_1", cfg.drive_factors[1])],
+                [
+                    row.get("drive_factor_0", cfg.drive_factors[0]),
+                    row.get("drive_factor_1", cfg.drive_factors[1]),
+                ],
                 dtype=float,
             )
             if np.any(factors < 0.0) or np.any(~np.isfinite(factors)):
-                raise ValueError(f"invalid drive factors at replay row {index}: {factors}")
+                raise ValueError(
+                    f"invalid drive factors at replay row {index}: {factors}"
+                )
             engine.mpz._anisotropic_drive_factors = factors.copy()
-            engine._separated_current_K_Pa_sqrt_m = K
-            opening_stress = engine.sigma_opening_tip(K)
-            plastic = (
-                engine.mpz.evolve(dt, T, opening_stress, cfg.b_m)
-                if mode != "plasticity_off" and dt > 0.0
-                else {}
+            result = engine.step(K, T, dt)
+            snapshot = {
+                "row_index": index,
+                "dt_s": dt,
+                "temperature_K": T,
+                "K_Pa_sqrt_m": K,
+                "fired": bool(result.get("fired", False)),
+                "micro_advance_step_m": float(
+                    result.get("kinetic_micro_advance_step_m", 0.0)
+                ),
+                "micro_advance_total_m": float(engine.micro_advance_total_m),
+                "sigma_opening_Pa": float(engine.sigma_opening_tip(K)),
+                "sigma_cleave_Pa": float(
+                    result.get("sigma_cleave_eff_Pa", result.get("sigma_tip", 0.0))
+                ),
+                "lambda_cleave_s": float(result.get("lambda_c", 0.0)),
+                "dN_emit": float(
+                    result.get("dN_emit", result.get("dN_emit_raw", 0.0))
+                ),
+                "dN_trapped": float(result.get("dN_trapped", 0.0)),
+                "dN_recovered": float(result.get("dN_recovered", 0.0)),
+                "dN_escaped": float(result.get("dN_escaped", 0.0)),
+                **_field_snapshot(engine),
+            }
+            for expected_name, actual_name in (
+                ("expected_micro_advance_step_m", "micro_advance_step_m"),
+                ("expected_micro_advance_total_m", "micro_advance_total_m"),
+                (
+                    "expected_K_shield_effective_Pa_sqrt_m",
+                    "K_shield_effective_Pa_sqrt_m",
+                ),
+                ("expected_mobile_count", "mobile_count"),
+                ("expected_retained_count", "retained_count"),
+            ):
+                expected = float(row.get(expected_name, math.nan))
+                snapshot[f"error_{actual_name}"] = (
+                    float(snapshot[actual_name]) - expected
+                    if math.isfinite(expected)
+                    else math.nan
+                )
+            expected_fired = row.get("expected_fired")
+            snapshot["fired_matches_expected"] = (
+                True
+                if expected_fired is None
+                else bool(snapshot["fired"]) == bool(expected_fired)
             )
-            moved = engine.mpz.advance(advance) if advance > 0.0 else {}
-            history.append(
-                {
-                    "row_index": index,
-                    "dt_s": dt,
-                    "temperature_K": T,
-                    "K_Pa_sqrt_m": K,
-                    "advance_m": advance,
-                    "sigma_opening_Pa": float(opening_stress),
-                    "dN_emit": float(plastic.get("dN_emit", 0.0)),
-                    "dN_trapped": float(plastic.get("dN_trapped", 0.0)),
-                    "dN_recovered": float(plastic.get("dN_recovered", 0.0)),
-                    "dN_escaped": float(plastic.get("dN_escaped", 0.0)),
-                    "source_sites_refreshed": float(moved.get("source_sites_refreshed", 0.0)),
-                    **_field_snapshot(engine),
-                }
-            )
+            history.append(snapshot)
 
+    finite_errors = [
+        abs(float(value))
+        for row in history
+        for key, value in row.items()
+        if key.startswith("error_") and math.isfinite(float(value))
+    ]
     return {
         "schema": MODEL_ID,
         "replay_mode": True,
@@ -479,17 +620,23 @@ def replay_shared_state(
         "mode": mode,
         "n_schedule_rows": len(rows),
         "history": history,
+        "_final_arrays": _state_arrays(engine),
         "config": asdict(cfg),
+        "mechanics_closure": "recorded 2-D K, dt, T, and channel-factor schedule",
         "state_evolution_source": "production v10.2.2 moving MPZ classes",
         "constitutive_K_shield_clip_applied": False,
-        "legacy_manifest_cap_used_in_kinetics": False,
-        "raw_equals_effective": bool(
-            all(
-                abs(float(row["raw_minus_effective_Pa_sqrt_m"]))
-                <= max(1.0e-6, 1.0e-12 * max(abs(float(row["K_shield_raw_Pa_sqrt_m"])), 1.0))
-                for row in history
-            )
+        "shielding_ablation": mode == "shielding_off",
+        "legacy_manifest_cap_reference_MPa_sqrt_m": float(
+            manifest.max_K_shield_MPa_sqrt_m
         ),
+        "legacy_manifest_cap_used_in_kinetics": False,
+        "raw_equals_effective_when_shielding_active": _raw_effective_consistent(
+            history, mode
+        ),
+        "all_fired_flags_match": all(
+            bool(row["fired_matches_expected"]) for row in history
+        ),
+        "maximum_abs_scalar_replay_error": max(finite_errors, default=0.0),
     }
 
 
@@ -497,9 +644,13 @@ def write_shared_result(result: dict[str, Any], out: str | Path) -> None:
     root = Path(out)
     root.mkdir(parents=True, exist_ok=True)
     history = list(result.get("history", []))
+    arrays = dict(result.get("_final_arrays", {}))
     payload = dict(result)
     payload.pop("history", None)
-    (root / "shared_reduced_summary.json").write_text(json.dumps(payload, indent=2))
+    payload.pop("_final_arrays", None)
+    (root / "shared_reduced_summary.json").write_text(
+        json.dumps(payload, indent=2)
+    )
     (root / "shared_reduced_audit.json").write_text(
         json.dumps(
             {
@@ -507,19 +658,31 @@ def write_shared_result(result: dict[str, Any], out: str | Path) -> None:
                 "candidate_id": result.get("candidate_id"),
                 "mode": result.get("mode"),
                 "state_evolution_source": result.get("state_evolution_source"),
-                "mechanics_closure": result.get("mechanics_closure", "2-D replay schedule"),
+                "mechanics_closure": result.get("mechanics_closure"),
                 "constitutive_K_shield_clip_applied": False,
+                "shielding_ablation": bool(result.get("shielding_ablation", False)),
                 "legacy_manifest_cap_used_in_kinetics": False,
-                "raw_equals_effective": bool(result.get("raw_equals_effective", False)),
+                "raw_equals_effective_when_shielding_active": bool(
+                    result.get("raw_equals_effective_when_shielding_active", False)
+                ),
                 "fallback_role": result.get("fallback_role"),
                 "n_history_rows": len(history),
+                "spatial_final_state_saved": bool(arrays),
             },
             indent=2,
         )
     )
+    if arrays:
+        np.savez_compressed(root / "shared_reduced_final_state.npz", **arrays)
     if history:
-        fields = list(history[0])
-        with (root / "shared_reduced_history.csv").open("w", newline="") as handle:
+        fields: list[str] = []
+        for row in history:
+            for key in row:
+                if key not in fields:
+                    fields.append(key)
+        with (root / "shared_reduced_history.csv").open(
+            "w", newline=""
+        ) as handle:
             writer = csv.DictWriter(handle, fieldnames=fields)
             writer.writeheader()
             writer.writerows(history)
@@ -550,6 +713,7 @@ __all__ = [
     "build_shared_engine",
     "fallback_manifest_path",
     "fallback_registry",
+    "load_manifest",
     "replay_shared_state",
     "run_monotonic_shared_front",
     "write_shared_result",
