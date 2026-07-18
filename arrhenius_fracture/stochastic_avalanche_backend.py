@@ -1,28 +1,22 @@
 """Geometry realization for the stochastic avalanche-length pilot.
 
-The first v10.1.7.3 implementation attempted to realize one event by repeatedly
-calling the sharp-wake backend with ten small requested increments. That is not
-valid: the sharp-wake backend has a finite realizable increment associated with
-its damage-band resolution, so nominal 0.5 micrometre requests were promoted to
-approximately 2 micrometres and a nominal 5 micrometre event became 20
-micrometres.
+The stochastic pilot uses one checked sharp-wake geometry commit per completed
+renewal. Repeated calls without a FEM solve are not physical subincrements and
+can multiply the realized crack length when a backend has a finite geometry
+resolution.
 
-This wrapper performs one geometry commit per sampled event and verifies that the
-backend realized the requested length. It deliberately preserves the
-``sharp_wake`` semantic backend identity because the 2-D driver uses that name to
-enable tip-following remeshing. The same driver also treats the ``p1`` array it
-passes to a sharp-wake backend as the authoritative new front position. A
-variable-length wrapper must therefore update that array transactionally to the
-actual event endpoint; otherwise the damage wake, kinetic moving frame, and front
-position follow different crack lengths.
-
-Extra pilot diagnostics are written through an explicit registry hook rather
-than by changing the backend name.
+A crucial regression requirement is that deterministic/fixed mode reproduce the
+unwrapped sharp-wake transaction exactly. In that mode this wrapper now passes
+the original ``p0``, ``p1`` and ``direction`` objects directly to the base
+backend and does not normalize or reconstruct the endpoint. Stochastic variable
+lengths still replace the requested endpoint transactionally and synchronize the
+driver-owned endpoint after the checked commit.
 """
 from __future__ import annotations
 
 import json
 import math
+import os
 from pathlib import Path
 from typing import Any, Callable
 
@@ -35,12 +29,17 @@ from .stochastic_avalanche_tip import pop_pending_geometry_event
 _LAST_AVALANCHE_BACKEND = None
 
 
+def _deterministic_fixed_mode() -> bool:
+    """Return whether geometry must be an exact pass-through regression control."""
+    hazard_mode = os.environ.get("CLEAVAGE_HAZARD_MODE", "deterministic").strip().lower()
+    length_mode = os.environ.get("CLEAVAGE_EVENT_LENGTH_MODE", "fixed").strip().lower()
+    return hazard_mode == "deterministic" and length_mode == "fixed"
+
+
 class AvalancheSubsegmentBackend:
     """Wrap sharp-wake with one checked geometry commit per variable event."""
 
     # This is a behavioral identity in sharp_front.py, not merely a display label.
-    # Keeping it equal to sharp_wake preserves tip-following remeshing and the
-    # sharp-wake endpoint convention.
     name = "sharp_wake"
     diagnostic_name = "stochastic_avalanche_event"
 
@@ -82,6 +81,27 @@ class AvalancheSubsegmentBackend:
             return None
         return value
 
+    def _failed(
+        self,
+        mesh,
+        boundary,
+        damage,
+        displacement,
+        reason: str,
+        result: CrackAdvanceResult | None = None,
+    ) -> CrackAdvanceResult:
+        return CrackAdvanceResult(
+            mesh,
+            boundary,
+            damage,
+            displacement,
+            0.0,
+            False,
+            angle_error_deg=float(getattr(result, "angle_error_deg", 0.0)),
+            selected_edge_length=float(getattr(result, "selected_edge_length", 0.0)),
+            reason=reason,
+        )
+
     def advance(self, **kwargs) -> CrackAdvanceResult:
         mesh0 = kwargs["mesh"]
         boundary0 = kwargs["boundary"]
@@ -89,37 +109,44 @@ class AvalancheSubsegmentBackend:
         displacement0 = np.asarray(kwargs["displacement"], dtype=float)
         p0 = np.asarray(kwargs["p0"], dtype=float)
 
-        # ``sharp_front._advance_polyline`` retains this exact ndarray and, for a
-        # backend named sharp_wake, uses it as the authoritative front endpoint
-        # after ``advance`` returns. Keep the reference and update it only after a
-        # successful checked geometry transaction.
+        # sharp_front retains this exact ndarray and uses it as the authoritative
+        # front endpoint for a backend named sharp_wake.
         driver_endpoint = self._mutable_driver_endpoint(kwargs["p1"])
         if driver_endpoint is None:
-            return CrackAdvanceResult(
-                mesh0, boundary0, damage0, displacement0, 0.0, False,
-                reason="driver_endpoint_not_mutable",
+            return self._failed(
+                mesh0, boundary0, damage0, displacement0,
+                "driver_endpoint_not_mutable",
             )
+
         p1_requested = np.asarray(driver_endpoint, dtype=float).copy()
-        direction = np.asarray(kwargs.get("direction", p1_requested - p0), dtype=float)
-        norm = float(np.linalg.norm(direction))
-        if norm <= 0.0:
-            return CrackAdvanceResult(
-                mesh0, boundary0, damage0, displacement0, 0.0, False,
-                reason="zero_direction",
+        fixed_vector = p1_requested - p0
+        fixed_requested_length = float(np.linalg.norm(fixed_vector))
+        if not math.isfinite(fixed_requested_length) or fixed_requested_length <= 0.0:
+            return self._failed(
+                mesh0, boundary0, damage0, displacement0,
+                "nonpositive_fixed_length",
             )
-        direction /= norm
+
+        raw_direction = np.asarray(
+            kwargs.get("direction", fixed_vector), dtype=float
+        ).copy()
+        direction_norm = float(np.linalg.norm(raw_direction))
+        if not math.isfinite(direction_norm) or direction_norm <= 0.0:
+            return self._failed(
+                mesh0, boundary0, damage0, displacement0,
+                "zero_direction",
+            )
 
         descriptor = pop_pending_geometry_event()
-        fixed_requested_length = float(np.linalg.norm(p1_requested - p0))
-        event_requested_length = (
+        kinetic_event_length = (
             float(descriptor["event_advance_m"])
             if descriptor is not None
             else fixed_requested_length
         )
-        if not math.isfinite(event_requested_length) or event_requested_length <= 0.0:
-            return CrackAdvanceResult(
-                mesh0, boundary0, damage0, displacement0, 0.0, False,
-                reason="nonpositive_event_length",
+        if not math.isfinite(kinetic_event_length) or kinetic_event_length <= 0.0:
+            return self._failed(
+                mesh0, boundary0, damage0, displacement0,
+                "nonpositive_event_length",
             )
 
         fraction = (
@@ -132,19 +159,31 @@ class AvalancheSubsegmentBackend:
         fraction = min(max(fraction, 1.0e-6), 1.0)
         requested_subsegments = max(int(math.ceil(1.0 / fraction)), 1)
 
-        # One geometry call is deliberate. Repeated calls without a FEM solve in
-        # between are not physical subincrements and can multiply the crack length
-        # when the backend has a finite minimum realizable increment.
-        target = p0 + event_requested_length * direction
-        call = dict(kwargs)
-        call.update({"p0": p0, "p1": target, "direction": direction})
-        result = self.base_backend.advance(**call)
+        # The deterministic control must be bitwise-equivalent at the geometry
+        # transaction boundary. Do not normalize direction, allocate a replacement
+        # endpoint, or write back a reconstructed endpoint in this mode.
+        deterministic_passthrough = bool(descriptor is not None and _deterministic_fixed_mode())
+        if deterministic_passthrough:
+            event_requested_length = fixed_requested_length
+            result = self.base_backend.advance(**kwargs)
+            endpoint = np.asarray(driver_endpoint, dtype=float).copy()
+            transaction_mode = "exact_driver_passthrough"
+        else:
+            # One geometry call is deliberate. Repeated calls without a FEM solve in
+            # between are not physical subincrements and can multiply crack length.
+            direction = raw_direction / direction_norm
+            event_requested_length = kinetic_event_length
+            target = p0 + event_requested_length * direction
+            call = dict(kwargs)
+            call.update({"p0": p0, "p1": target, "direction": direction})
+            result = self.base_backend.advance(**call)
+            endpoint = p0 + float(result.moved) * direction
+            transaction_mode = "variable_length_endpoint_replacement"
+
         if not result.inserted or result.moved <= 0.0:
-            return CrackAdvanceResult(
-                mesh0, boundary0, damage0, displacement0, 0.0, False,
-                angle_error_deg=float(result.angle_error_deg),
-                selected_edge_length=float(result.selected_edge_length),
-                reason=f"event_geometry:{result.reason}",
+            return self._failed(
+                mesh0, boundary0, damage0, displacement0,
+                f"event_geometry:{result.reason}", result,
             )
 
         moved = float(result.moved)
@@ -154,32 +193,27 @@ class AvalancheSubsegmentBackend:
             self.relative_length_tolerance * event_requested_length,
         )
         if abs(length_error) > tolerance:
-            # Return the original transaction state. The caller will restore the
-            # completed hazard event rather than silently accepting a different
-            # crack-growth reward.
             self._rollback_base_log()
-            return CrackAdvanceResult(
-                mesh0, boundary0, damage0, displacement0, 0.0, False,
-                angle_error_deg=float(result.angle_error_deg),
-                selected_edge_length=float(result.selected_edge_length),
-                reason=(
-                    "event_length_mismatch:"
-                    f"requested={event_requested_length:.9e},realized={moved:.9e}"
-                ),
+            return self._failed(
+                mesh0, boundary0, damage0, displacement0,
+                "event_length_mismatch:"
+                f"requested={event_requested_length:.9e},realized={moved:.9e}",
+                result,
             )
 
-        endpoint = p0 + moved * direction
-        driver_endpoint[...] = endpoint
+        if not deterministic_passthrough:
+            driver_endpoint[...] = endpoint
+
         endpoint_error = float(np.linalg.norm(np.asarray(driver_endpoint) - endpoint))
         if endpoint_error > max(self.absolute_length_tolerance_m, 1.0e-15):
             self._rollback_base_log()
-            return CrackAdvanceResult(
-                mesh0, boundary0, damage0, displacement0, 0.0, False,
-                angle_error_deg=float(result.angle_error_deg),
-                selected_edge_length=float(result.selected_edge_length),
-                reason=f"driver_endpoint_sync_failed:error={endpoint_error:.9e}",
+            return self._failed(
+                mesh0, boundary0, damage0, displacement0,
+                f"driver_endpoint_sync_failed:error={endpoint_error:.9e}",
+                result,
             )
 
+        endpoint_adjustment = float(np.linalg.norm(endpoint - p1_requested))
         row = {
             "event_index": len(self.advance_log),
             "front_id": int(kwargs.get("front_id", 0)),
@@ -191,7 +225,13 @@ class AvalancheSubsegmentBackend:
             "driver_requested_y1": float(p1_requested[1]),
             "driver_endpoint_synchronized": True,
             "driver_endpoint_sync_error_m": endpoint_error,
+            "driver_direction_norm": direction_norm,
+            "deterministic_geometry_passthrough": deterministic_passthrough,
+            "requested_endpoint_preserved": bool(endpoint_adjustment <= 1.0e-15),
+            "endpoint_adjustment_m": endpoint_adjustment,
+            "geometry_transaction_mode": transaction_mode,
             "requested_fixed_length_m": fixed_requested_length,
+            "kinetic_event_advance_m": kinetic_event_length,
             "requested_event_advance_m": event_requested_length,
             "event_advance_m": moved,
             "event_length_error_m": length_error,
