@@ -23,30 +23,47 @@ def _fake_engine(raw: float, legacy_cap_MPa: float = 1.0):
     return engine
 
 
-def test_uncapped_field_can_exceed_legacy_manifest_reference():
+def test_shared_core_uncapped_without_fatigue_runner_context():
+    """Monotonic temperature sweeps call the same permanently uncapped engine."""
     engine = _fake_engine(2.5e6, legacy_cap_MPa=1.0)
-    original = CampaignCalibratedTipEngine._active_shielding_signed
-    with install_uncapped_physical_shielding():
-        assert engine._active_shielding_signed() == 2.5e6
-    assert CampaignCalibratedTipEngine._active_shielding_signed is original
+    assert engine._active_shielding_signed() == 2.5e6
 
 
-def test_diagnostics_record_raw_equal_effective_without_clip():
+def test_shared_core_diagnostics_keep_legacy_cap_reference_only():
+    engine = _fake_engine(-3.0e6, legacy_cap_MPa=1.0)
+    diagnostics = engine._campaign_diagnostics()
+    assert diagnostics["campaign_active_K_shield_raw_Pa_sqrt_m"] == -3.0e6
+    assert diagnostics["campaign_active_K_shield_effective_Pa_sqrt_m"] == -3.0e6
+    assert diagnostics["campaign_active_K_shield_cap_Pa_sqrt_m"] == 0.0
+    assert diagnostics["campaign_legacy_K_shield_cap_reference_Pa_sqrt_m"] == 1.0e6
+    assert diagnostics["campaign_shielding_cap_applied"] is False
+    assert diagnostics["campaign_shielding_population_limited"] is True
+
+
+def test_fatigue_audit_context_collects_without_patching_physics():
     reset_physical_shielding_audit()
     engine = _fake_engine(-3.0e6, legacy_cap_MPa=1.0)
-    with install_uncapped_physical_shielding():
-        diagnostics = engine._campaign_diagnostics()
-        assert diagnostics["campaign_active_K_shield_raw_Pa_sqrt_m"] == -3.0e6
-        assert diagnostics["campaign_active_K_shield_effective_Pa_sqrt_m"] == -3.0e6
-        assert diagnostics["campaign_active_K_shield_cap_Pa_sqrt_m"] == 0.0
-        assert diagnostics["campaign_legacy_K_shield_cap_reference_Pa_sqrt_m"] == 1.0e6
-        assert diagnostics["campaign_shielding_cap_applied"] is False
+    original_active = CampaignCalibratedTipEngine._active_shielding_signed
 
+    with install_uncapped_physical_shielding():
+        assert CampaignCalibratedTipEngine._active_shielding_signed is original_active
+        diagnostics = engine._campaign_diagnostics()
+        assert diagnostics["campaign_active_K_shield_effective_Pa_sqrt_m"] == -3.0e6
+
+    assert CampaignCalibratedTipEngine._active_shielding_signed is original_active
     audit = physical_shielding_audit_payload()
     assert audit["constitutive_K_shield_clip_applied"] is False
+    assert audit["constitutive_location"] == "CampaignCalibratedTipEngine_shared_by_monotonic_and_fatigue"
     assert audit["n_samples_above_legacy_cap_reference"] == 1
     assert audit["maximum_abs_raw_minus_effective_Pa_sqrt_m"] == 0.0
     assert audit["maximum_raw_to_legacy_cap_ratio"] == 3.0
+
+
+def test_campaign_class_audit_declares_uncapped_shared_core():
+    campaign = CampaignCalibratedTipEngine.audit_payload()["campaign_calibration"]
+    assert campaign["shielding_cap_from_manifest"] is False
+    assert campaign["legacy_shielding_cap_reference_from_manifest"] is True
+    assert campaign["shielding_saturation"] == "population_dynamics_only"
 
 
 def test_no_new_fitted_saturation_parameter_is_introduced():

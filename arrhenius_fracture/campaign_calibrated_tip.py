@@ -13,10 +13,11 @@ and it recovers only as new crack-tip material/geometry is exposed:
     dS_s = (S0_s - S_s) [1 - exp(-da / L_refresh)].
 
 The promoted source_sites_per_system fixes S0, source_refresh_length_m fixes the
-reference recovery length, c_blunt keeps its original role, and
-max_K_shield_MPa_sqrt_m bounds active cleavage shielding as in the campaign.
-Two dimensionless calibration scales are exposed: one for the local Taylor back
-stress and one for the source-refresh length.
+reference recovery length, and c_blunt keeps its original role.  The historical
+max_K_shield_MPa_sqrt_m manifest value is retained only as a diagnostic reference;
+it does not bound the signed elastic shielding field.  Two dimensionless
+calibration scales are exposed: one for the local Taylor back stress and one for
+the source-refresh length.
 """
 from __future__ import annotations
 
@@ -32,6 +33,7 @@ from .kinetic_tip_cell import KineticMovingTipFrontEngine
 
 
 SOURCE_MODEL = "campaign_calibrated_tip_budget"
+SHIELDING_MODEL = "signed_linear_elastic_population_limited_uncapped"
 
 
 def _campaign_local_density_m2(state) -> np.ndarray:
@@ -191,9 +193,11 @@ def install_campaign_calibrated_source(
     state._campaign_G_Pa = max(float(G_Pa), 0.0)
     state._campaign_backstress_scale = max(float(backstress_scale), 0.0)
     state._campaign_refresh_scale = max(float(refresh_scale), 1.0e-12)
-    state._campaign_max_K_shield_Pa_sqrt_m = max(
-        float(state.manifest.max_K_shield_MPa_sqrt_m), 0.0
-    ) * 1.0e6
+    legacy_cap = max(float(state.manifest.max_K_shield_MPa_sqrt_m), 0.0) * 1.0e6
+    state._campaign_legacy_max_K_shield_reference_Pa_sqrt_m = legacy_cap
+    # Compatibility field retained for downstream readers.  A value of zero means
+    # no constitutive cap is active; the old manifest value is diagnostic only.
+    state._campaign_max_K_shield_Pa_sqrt_m = 0.0
     state.continuum_source_last_clear_rate_s = 0.0
     state.continuum_source_last_effective_multiplicity = float(np.sum(state.available_sites))
     state.continuum_source_last_emission_rate_s = 0.0
@@ -234,7 +238,10 @@ class CampaignCalibratedTipEngine(SeparatedSourceKineticTipEngine):
             "backstress_scale": cls._campaign_backstress_scale_default,
             "refresh_length_scale": cls._campaign_refresh_scale_default,
             "source_budget_from_manifest": True,
-            "shielding_cap_from_manifest": True,
+            "shielding_cap_from_manifest": False,
+            "legacy_shielding_cap_reference_from_manifest": True,
+            "shielding_model": SHIELDING_MODEL,
+            "shielding_saturation": "population_dynamics_only",
             "temporal_source_recycling": False,
         }
         return payload
@@ -253,15 +260,13 @@ class CampaignCalibratedTipEngine(SeparatedSourceKineticTipEngine):
         return float(KineticMovingTipFrontEngine._active_shielding_signed(self))
 
     def _active_shielding_signed(self) -> float:
-        raw = self._active_shielding_raw_uncapped()
-        cap = max(float(self.manifest.max_K_shield_MPa_sqrt_m), 0.0) * 1.0e6
-        if cap <= 0.0:
-            return raw
-        return float(np.clip(raw, -cap, cap))
+        """Return the signed elastic superposition without an artificial bound."""
+        return self._active_shielding_raw_uncapped()
 
     def _campaign_diagnostics(self) -> dict[str, Any]:
         raw = self._active_shielding_raw_uncapped()
         effective = self._active_shielding_signed()
+        legacy_cap = max(float(self.manifest.max_K_shield_MPa_sqrt_m), 0.0) * 1.0e6
         return {
             "campaign_source_model": SOURCE_MODEL,
             "campaign_backstress_scale": self._campaign_backstress_scale_default,
@@ -273,7 +278,11 @@ class CampaignCalibratedTipEngine(SeparatedSourceKineticTipEngine):
             "campaign_source_refresh_fraction": float(self.mpz.campaign_source_last_refresh_fraction),
             "campaign_active_K_shield_raw_Pa_sqrt_m": raw,
             "campaign_active_K_shield_effective_Pa_sqrt_m": effective,
-            "campaign_active_K_shield_cap_Pa_sqrt_m": max(float(self.manifest.max_K_shield_MPa_sqrt_m), 0.0) * 1.0e6,
+            "campaign_active_K_shield_cap_Pa_sqrt_m": 0.0,
+            "campaign_legacy_K_shield_cap_reference_Pa_sqrt_m": legacy_cap,
+            "campaign_shielding_cap_applied": False,
+            "campaign_shielding_population_limited": True,
+            "campaign_shielding_model": SHIELDING_MODEL,
             "campaign_temporal_source_recycling": False,
         }
 

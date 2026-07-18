@@ -50,7 +50,7 @@ def _rewrite_mode_audits(args: list[str]) -> None:
     if mode_path.exists():
         payload = json.loads(mode_path.read_text())
         payload.update({
-            "schema": "v10.1.5_campaign_calibrated_driver_modes",
+            "schema": "v10.2.3_shared_core_uncapped_driver_modes",
             "tip_source_model": "campaign_calibrated",
             "tip_source_model_internal": SOURCE_MODEL,
             "source_sites_per_system_role": "promoted_initial_continuum_tip_budget",
@@ -58,7 +58,10 @@ def _rewrite_mode_audits(args: list[str]) -> None:
             "source_recovery_geometry": "crack_advance_over_promoted_refresh_length",
             "campaign_backstress_scale": BACKSTRESS_SCALE,
             "campaign_refresh_length_scale": REFRESH_SCALE,
-            "manifest_K_shield_cap_enabled": True,
+            "manifest_K_shield_cap_enabled": False,
+            "legacy_manifest_K_shield_cap_reference_only": True,
+            "active_shielding_saturation": "population_dynamics_only",
+            "shared_monotonic_and_fatigue_core": True,
         })
         mode_path.write_text(json.dumps(payload, indent=2))
 
@@ -66,7 +69,7 @@ def _rewrite_mode_audits(args: list[str]) -> None:
     if source_path.exists():
         payload = json.loads(source_path.read_text())
         payload.update({
-            "schema": "v10.1.5_campaign_calibrated_source_model",
+            "schema": "v10.2.3_shared_core_uncapped_source_model",
             "tip_source_model": "campaign_calibrated",
             "tip_source_state": "bounded continuum capacity per crystallographic system",
             "initial_capacity": "manifest.source_sites_per_system",
@@ -74,7 +77,10 @@ def _rewrite_mode_audits(args: list[str]) -> None:
             "activity_recovery_time": "none",
             "activity_recovery_geometry": "manifest.source_refresh_length_m times campaign scale",
             "emission_feedback": "local Taylor back stress from mobile plus retained density",
-            "cleavage_shielding_bound": "manifest.max_K_shield_MPa_sqrt_m",
+            "cleavage_shielding_bound": "none; signed raw elastic dislocation field",
+            "legacy_manifest_K_shield_cap_reference_only": True,
+            "active_shielding_saturation": "population_dynamics_only",
+            "shared_monotonic_and_fatigue_core": True,
             "campaign_backstress_scale": BACKSTRESS_SCALE,
             "campaign_refresh_length_scale": REFRESH_SCALE,
             "new_dimensional_parameters": 0,
@@ -85,10 +91,10 @@ def _rewrite_mode_audits(args: list[str]) -> None:
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     print(
-        "  v10.1.5 campaign calibration: "
+        "  v10.2.3 campaign calibration: "
         f"backstress_scale={BACKSTRESS_SCALE:g}, "
         f"refresh_scale={REFRESH_SCALE:g}, "
-        "temporal_source_recycling=0"
+        "temporal_source_recycling=0, constitutive_K_shield_cap=off"
     )
     result = _protected.main(args)
     _rewrite_mode_audits(args)
