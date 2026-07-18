@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -156,8 +157,24 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    args.out.mkdir(parents=True, exist_ok=True)
-    cases = prepare(pd.read_csv(args.source), list(args.candidates), args.out)
+    source_path = args.source.resolve()
+    out_path = args.out.resolve()
+    out_path.mkdir(parents=True, exist_ok=True)
+    candidates = list(args.candidates)
+    cases = prepare(pd.read_csv(source_path), candidates, out_path)
+
+    provenance = {
+        "schema": "v10.1.7.5_transfer_preparation",
+        "source": str(source_path),
+        "source_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+        "candidate_ids": candidates,
+        "n_candidates": len(candidates),
+        "n_modes": len(MODES),
+        "n_endpoints_per_candidate": 2,
+        "n_cases": int(len(cases)),
+    }
+    (out_path / "transfer_preparation.json").write_text(json.dumps(provenance, indent=2))
+
     print(
         cases.groupby(["candidate_id", "transition_bracket"], as_index=False).agg(
             endpoint_temperatures=("T_K", lambda x: json.dumps(sorted(set(float(v) for v in x)))),
@@ -165,7 +182,7 @@ def main() -> None:
         ).to_string(index=False),
         flush=True,
     )
-    print(f"wrote {len(cases)} cases to {args.out / 'transfer_cases.tsv'}", flush=True)
+    print(f"wrote {len(cases)} cases to {out_path / 'transfer_cases.tsv'}", flush=True)
 
 
 if __name__ == "__main__":
