@@ -1,7 +1,7 @@
 """Prescribed fixed-DeltaK waveform control for v10.2.1 fatigue runs.
 
 The current v10 fatigue validation stage uses tip-only bulk mechanics and the
-scalar K-waveform surrogate.  In that setting the physically controlled fatigue
+scalar K-waveform surrogate. In that setting the physically controlled fatigue
 quantity is best prescribed directly: the FEM supplies crack geometry,
 directional J information, and normalized tensor shape, while the front kinetics
 receive an exactly fixed local DeltaK waveform after every stochastic geometry
@@ -39,7 +39,9 @@ class FixedDeltaKConfig:
     def target_Kmax_Pa_sqrt_m(self, R: float) -> float:
         R = float(R)
         if not 0.0 <= R < 1.0:
-            raise ValueError("v10.2.1 fixed-DeltaK control currently requires 0 <= R < 1")
+            raise ValueError(
+                "v10.2.1 fixed-DeltaK control currently requires 0 <= R < 1"
+            )
         return self.target_deltaK_Pa_sqrt_m / max(1.0 - R, 1.0e-300)
 
 
@@ -79,7 +81,7 @@ def make_fixed_deltaK_waveform_factory(
     original: Callable[..., Any],
     config: FixedDeltaKConfig,
 ) -> Callable[..., Any]:
-    """Return a constructor that replaces incoming Kmax by the target DeltaK value."""
+    """Return a constructor that replaces incoming Kmax by the target DeltaK."""
     cfg = FixedDeltaKConfig(config.target_deltaK_MPa_sqrt_m).validate()
     signature = inspect.signature(original)
 
@@ -127,22 +129,24 @@ def make_fixed_deltaK_waveform_factory(
 def install_fixed_deltaK_waveform(
     target_deltaK_MPa_sqrt_m: float,
 ) -> Iterator[FixedDeltaKConfig]:
-    """Temporarily prescribe DeltaK for every fatigue waveform in the 2-D driver."""
+    """Temporarily prescribe DeltaK for every fatigue waveform in the 2-D driver.
+
+    ``sharp_front.run_2d`` imports ``FatigueWaveform`` from ``fatigue_v1`` when
+    fatigue setup is entered. Patching that defining module before dispatch is
+    therefore sufficient; ``sharp_front`` does not expose a module-level
+    ``FatigueWaveform`` symbol.
+    """
     from . import fatigue_v1
-    from . import sharp_front
 
     cfg = FixedDeltaKConfig(target_deltaK_MPa_sqrt_m).validate()
     reset_fixed_deltaK_audit(cfg)
 
-    original_driver = sharp_front.FatigueWaveform
     original_module = fatigue_v1.FatigueWaveform
-    factory = make_fixed_deltaK_waveform_factory(original_driver, cfg)
-    sharp_front.FatigueWaveform = factory
+    factory = make_fixed_deltaK_waveform_factory(original_module, cfg)
     fatigue_v1.FatigueWaveform = factory
     try:
         yield cfg
     finally:
-        sharp_front.FatigueWaveform = original_driver
         fatigue_v1.FatigueWaveform = original_module
 
 
