@@ -72,6 +72,7 @@ def test_family_rejects_extrapolation():
 
 
 def _write_builder_inputs(tmp_path: Path, two_magnitudes=True):
+    tmp_path.mkdir(parents=True, exist_ok=True)
     response = tmp_path / "responses.csv"
     normalization = tmp_path / "normalization.json"
     fields = [
