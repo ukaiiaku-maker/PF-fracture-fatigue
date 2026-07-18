@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import pytest
 
@@ -9,6 +11,7 @@ from arrhenius_fracture.fixed_deltaK_v1021 import (
     make_fixed_deltaK_waveform_factory,
     reset_fixed_deltaK_audit,
 )
+from arrhenius_fracture.sharp_front_v10_2_1 import _normalize_output_semantics
 
 
 def test_target_kmax_is_derived_from_deltaK_and_R():
@@ -50,3 +53,31 @@ def test_invalid_R_is_rejected():
         cfg.target_Kmax_Pa_sqrt_m(1.0)
     with pytest.raises(ValueError):
         cfg.target_Kmax_Pa_sqrt_m(-0.1)
+
+
+def test_probe_K_is_not_retained_as_fatigue_toughness(tmp_path):
+    (tmp_path / "summary.json").write_text(json.dumps([{
+        "T": 700.0,
+        "Kc_first_MPa_sqrt_m": 0.366,
+        "n_advances": 6,
+        "mode": "brittle",
+    }]))
+    (tmp_path / "steps_700K.csv").write_text(
+        "step,Uapp_m,KJ_Pa_sqrtm,fatigue_cycles,da_block_m\n"
+        "1,2e-7,3.66e5,10,0\n"
+    )
+    (tmp_path / "toughness_vs_temperature.png").write_bytes(b"not-a-real-png")
+
+    result = _normalize_output_semantics(tmp_path, 24.0, 0.1)
+    summary = json.loads((tmp_path / "summary.json").read_text())[0]
+    assert summary["Kc_first_MPa_sqrt_m"] is None
+    assert summary["KJ_probe_at_first_event_MPa_sqrt_m"] == 0.366
+    assert summary["fatigue_DeltaK_MPa_sqrt_m"] == 24.0
+    assert np.isclose(summary["fatigue_Kmax_MPa_sqrt_m"], 24.0 / 0.9)
+    assert summary["mode"] == "fatigue_propagated"
+
+    header = (tmp_path / "steps_700K.csv").read_text().splitlines()[0]
+    assert "KJ_probe_Pa_sqrtm" in header
+    assert "fatigue_DeltaK_target_Pa_sqrtm" in header
+    assert not (tmp_path / "toughness_vs_temperature.png").exists()
+    assert result["summary_Kc_first_suppressed"] is True
