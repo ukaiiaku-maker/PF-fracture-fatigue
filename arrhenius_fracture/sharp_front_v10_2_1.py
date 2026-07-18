@@ -19,8 +19,6 @@ from .fixed_deltaK_v1021 import (
     fixed_deltaK_audit_payload,
     install_fixed_deltaK_waveform,
 )
-from . import sharp_front_v10_1_7_3 as _avalanche
-from . import sharp_front_v10_2_0 as _fatigue
 
 
 def _pop_value(args: list[str], name: str) -> str:
@@ -57,8 +55,17 @@ def _ensure_toggle(args: list[str], positive: str, negative: str) -> None:
 
 @contextmanager
 def _allow_right_censored_stochastic_summary():
-    """Make zero-event fixed-DeltaK cases valid right-censored observations."""
-    original = _avalanche._rewrite_summary_event_semantics
+    """Make zero-event fixed-DeltaK cases valid right-censored observations.
+
+    Import the avalanche execution stack lazily. Older campaign entry points
+    intentionally replace the public continuum-engine symbol at import time;
+    importing them during pytest collection contaminates unrelated source-model
+    tests. Runtime entry-point imports are safe because each simulation is a
+    dedicated process and the replacement is part of the selected v10 campaign.
+    """
+    from . import sharp_front_v10_1_7_3 as avalanche
+
+    original = avalanche._rewrite_summary_event_semantics
 
     def tolerant(args: list[str]) -> None:
         out = _option_value(args, "--out")
@@ -84,11 +91,11 @@ def _allow_right_censored_stochastic_summary():
                 return
         return original(args)
 
-    _avalanche._rewrite_summary_event_semantics = tolerant
+    avalanche._rewrite_summary_event_semantics = tolerant
     try:
         yield
     finally:
-        _avalanche._rewrite_summary_event_semantics = original
+        avalanche._rewrite_summary_event_semantics = original
 
 
 @contextmanager
@@ -259,10 +266,16 @@ def main(argv=None):
         "control=prescribed_local_K FEM=held_shape_probe"
     )
 
+    # Import the campaign execution stack only when running the entry point.
+    # Several inherited modules intentionally patch engine symbols at import
+    # time; keeping these imports out of module scope prevents pytest collection
+    # from changing unrelated source-model tests.
+    from . import sharp_front_v10_2_0 as fatigue
+
     with install_fixed_deltaK_waveform(target_deltaK):
         with _allow_right_censored_stochastic_summary():
             with _fixed_deltaK_console_semantics(target_deltaK, R):
-                result = _fatigue.main(args)
+                result = fatigue.main(args)
     audit = _write_audit(args, target_deltaK)
     print(
         "  fixed-DeltaK semantics: "
