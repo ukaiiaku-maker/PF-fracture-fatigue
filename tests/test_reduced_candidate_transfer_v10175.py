@@ -13,13 +13,15 @@ from arrhenius_fracture.sharp_front_v10_1_7_5 import (
 from scripts.analyze_v10_1_7_5_reduced_candidate_transfer import _candidate_summary
 from scripts.prepare_v10_1_7_5_candidate_transfer import (
     MODES,
-    REQUIRED_FIELDS,
+    REQUIRED_SOURCE_FIELDS,
     prepare,
 )
 
 
 def _candidate_row(candidate_id: str, temperatures: list[float], c_blunt: float = 2.0):
-    row = {name: 1.0 for name in REQUIRED_FIELDS}
+    # Deliberately reproduce the v9.10.4 ranking schema: the fixed shielding cap
+    # is absent because it was a ReducedFrontSettings value, not a search variable.
+    row = {name: 1.0 for name in REQUIRED_SOURCE_FIELDS}
     row.update(
         {
             "candidate_id": candidate_id,
@@ -38,6 +40,8 @@ def test_preparation_builds_two_endpoints_six_modes_and_true_blunting_ablation(t
             _candidate_row("DBTT_A0000353", [700.0, 733.3, 766.7, 800.0]),
         ]
     )
+    assert "max_K_shield_MPa_sqrt_m" not in source.columns
+
     cases = prepare(source, ["DBTT_A0003408", "DBTT_A0000353"], tmp_path)
     assert len(cases) == 24
     assert set(cases["mode"]) == set(MODES)
@@ -63,6 +67,13 @@ def test_preparation_builds_two_endpoints_six_modes_and_true_blunting_ablation(t
     )
     assert float(full.c_blunt.iloc[0]) == 2.0
     assert float(blunt.c_blunt.iloc[0]) == 0.0
+    assert float(full.max_K_shield_MPa_sqrt_m.iloc[0]) == 1.0
+    assert float(blunt.max_K_shield_MPa_sqrt_m.iloc[0]) == 1.0
+
+    provenance = json.loads((tmp_path / "fixed_field_provenance.json").read_text())
+    cap = provenance["fields"]["max_K_shield_MPa_sqrt_m"]
+    assert cap["value"] == 1.0
+    assert "ReducedFrontSettings" in cap["provenance"]
 
 
 def test_transfer_scope_requires_deterministic_single_front_tip_only(monkeypatch):
