@@ -88,7 +88,10 @@ def test_backend_uses_one_checked_commit_and_preserves_sharp_wake_identity():
     assert "Repeated calls without a FEM solve" in text
 
 
-def test_backend_synchronizes_driver_endpoint_to_variable_event_length():
+def test_backend_synchronizes_driver_endpoint_to_variable_event_length(monkeypatch):
+    monkeypatch.setenv("CLEAVAGE_HAZARD_MODE", "exponential")
+    monkeypatch.setenv("CLEAVAGE_EVENT_LENGTH_MODE", "threshold_scaled")
+
     class DummySharpWake:
         name = "sharp_wake"
 
