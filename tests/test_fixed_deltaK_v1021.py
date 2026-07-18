@@ -29,11 +29,14 @@ def test_factory_replaces_incoming_kmax_exactly():
     assert np.isclose(audit["incoming_Kmax_min_Pa_sqrt_m"], 99.0e6)
 
 
-def test_context_patches_defining_module_and_restores_symbol():
+def test_context_patches_runtime_import_and_restores_symbol():
     original_module = fatigue_v1.FatigueWaveform
     with install_fixed_deltaK_waveform(24.0):
         assert fatigue_v1.FatigueWaveform is not original_module
-        wave = fatigue_v1.FatigueWaveform(
+        from arrhenius_fracture.fatigue_v1 import FatigueWaveform as DriverWaveform
+
+        assert DriverWaveform is fatigue_v1.FatigueWaveform
+        wave = DriverWaveform(
             Kmax=1.0e6, R=0.2, frequency_Hz=500.0, closure_clip=True
         )
         assert np.isclose(wave.DeltaK, 24.0e6)
