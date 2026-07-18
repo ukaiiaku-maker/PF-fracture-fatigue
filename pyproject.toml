@@ -7,7 +7,7 @@ name = "arrhenius-sharp-front-mpz"
 version = "10.1.7.3"
 description = "Threshold-correlated stochastic crack-growth avalanche pilot"
 requires-python = ">=3.10"
-dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
+dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7", "pandas>=2.0"]
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
