@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Build portable PF material manifests from reduced-model candidate rows."""
+"""Build portable PF material manifests from reduced-model candidate rows.
+
+The v9.10.4 narrow-DBTT campaign searched 29 constitutive parameters.  The
+active-shielding cap was not one of them: ``ReducedFrontSettings`` fixed
+``max_K_shield_MPa_sqrt_m=1.0`` for every candidate.  Consequently the ranking
+CSV may omit that column.  This transfer utility injects the documented fixed
+campaign value and records its provenance rather than inferring a cap from a
+measured shielding response.
+"""
 from __future__ import annotations
 
 import argparse
@@ -7,10 +15,11 @@ import hashlib
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 
-REQUIRED_FIELDS = (
+REQUIRED_SOURCE_FIELDS = (
     "candidate_id",
     "cleave_G00_eV",
     "cleave_gT_eV_per_K",
@@ -43,8 +52,15 @@ REQUIRED_FIELDS = (
     "retained_recovery_rate_s",
     "source_refresh_length_um",
     "c_blunt",
-    "max_K_shield_MPa_sqrt_m",
 )
+
+FIXED_REDUCED_CAMPAIGN_FIELDS = {
+    "max_K_shield_MPa_sqrt_m": 1.0,
+}
+
+MANIFEST_FIELDS = REQUIRED_SOURCE_FIELDS + tuple(FIXED_REDUCED_CAMPAIGN_FIELDS)
+# Backward-compatible export used by the focused tests and external utilities.
+REQUIRED_FIELDS = MANIFEST_FIELDS
 
 MODES = (
     "full",
@@ -73,12 +89,36 @@ def _temperature_schedule(row: pd.Series) -> list[float]:
     raise ValueError(f"candidate {row.get('candidate_id')} has no transition schedule")
 
 
-def prepare(source: pd.DataFrame, candidate_ids: list[str], out: Path) -> pd.DataFrame:
-    missing_fields = sorted(set(REQUIRED_FIELDS).difference(source.columns))
+def _normalize_source(source: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, str]]:
+    missing_fields = sorted(set(REQUIRED_SOURCE_FIELDS).difference(source.columns))
     if missing_fields:
         raise ValueError(f"source is missing required manifest fields: {missing_fields}")
 
-    selected = source[source.candidate_id.astype(str).isin(candidate_ids)].copy()
+    normalized = source.copy()
+    provenance: dict[str, str] = {}
+    for field, fixed_value in FIXED_REDUCED_CAMPAIGN_FIELDS.items():
+        if field not in normalized.columns:
+            normalized[field] = float(fixed_value)
+            provenance[field] = "v9.10.4 ReducedFrontSettings fixed campaign value"
+        else:
+            numeric = pd.to_numeric(normalized[field], errors="coerce")
+            if numeric.isna().any() or not np.all(np.isfinite(numeric.to_numpy(dtype=float))):
+                raise ValueError(f"source column {field!r} contains non-finite values")
+            if (numeric < 0.0).any():
+                raise ValueError(f"source column {field!r} must be nonnegative")
+            normalized[field] = numeric.astype(float)
+            provenance[field] = "source column"
+    return normalized, provenance
+
+
+def prepare(
+    source: pd.DataFrame,
+    candidate_ids: list[str],
+    out: Path,
+) -> pd.DataFrame:
+    normalized, fixed_field_provenance = _normalize_source(source)
+
+    selected = normalized[normalized.candidate_id.astype(str).isin(candidate_ids)].copy()
     missing_candidates = sorted(set(candidate_ids).difference(selected.candidate_id.astype(str)))
     if missing_candidates:
         raise ValueError(f"source is missing candidates: {missing_candidates}")
@@ -101,7 +141,7 @@ def prepare(source: pd.DataFrame, candidate_ids: list[str], out: Path) -> pd.Dat
         candidate_root = manifest_root / candidate
         candidate_root.mkdir(parents=True, exist_ok=True)
 
-        base = {field: row[field] for field in REQUIRED_FIELDS}
+        base = {field: row[field] for field in MANIFEST_FIELDS}
         base["target_class"] = "DBTT"
         base["candidate_id"] = candidate
         base_manifest = candidate_root / "candidate.csv"
@@ -143,6 +183,21 @@ def prepare(source: pd.DataFrame, candidate_ids: list[str], out: Path) -> pd.Dat
     cases.to_csv(out / "transfer_cases.csv", index=False)
     cases.to_csv(out / "transfer_cases.tsv", index=False, sep="\t")
     selected.drop(columns=["_order"]).to_csv(out / "selected_candidate_rows.csv", index=False)
+    (out / "fixed_field_provenance.json").write_text(
+        json.dumps(
+            {
+                "schema": "v10.1.7.5_fixed_reduced_campaign_fields",
+                "fields": {
+                    field: {
+                        "value": float(selected[field].iloc[0]),
+                        "provenance": fixed_field_provenance[field],
+                    }
+                    for field in FIXED_REDUCED_CAMPAIGN_FIELDS
+                },
+            },
+            indent=2,
+        )
+    )
     return cases
 
 
@@ -172,6 +227,7 @@ def main() -> None:
         "n_modes": len(MODES),
         "n_endpoints_per_candidate": 2,
         "n_cases": int(len(cases)),
+        "fixed_campaign_fields": str(out_path / "fixed_field_provenance.json"),
     }
     (out_path / "transfer_preparation.json").write_text(json.dumps(provenance, indent=2))
 
@@ -180,6 +236,11 @@ def main() -> None:
             endpoint_temperatures=("T_K", lambda x: json.dumps(sorted(set(float(v) for v in x)))),
             n_cases=("mode", "count"),
         ).to_string(index=False),
+        flush=True,
+    )
+    print(
+        "fixed transfer field: max_K_shield_MPa_sqrt_m=1.0 "
+        "(v9.10.4 ReducedFrontSettings)",
         flush=True,
     )
     print(f"wrote {len(cases)} cases to {out_path / 'transfer_cases.tsv'}", flush=True)
