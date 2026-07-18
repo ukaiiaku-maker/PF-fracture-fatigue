@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.1.7.3"
-description = "Threshold-correlated stochastic crack-growth avalanche pilot"
+version = "10.2.3"
+description = "Shared-state cap-free reduced and 2-D fracture equivalence"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 

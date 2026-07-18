@@ -1,0 +1,37 @@
+name: Verify v10.2.3 shared reduced-state equivalence
+
+on:
+  push:
+    branches:
+      - v10.2.3-shared-reduced-state-equivalence
+  pull_request:
+    branches:
+      - v10.2.2-uncapped-physical-shielding
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package and tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Compile shared-state tools
+        run: |
+          python -m compileall -q \
+            arrhenius_fracture/reduced_shared_state_v1023.py \
+            arrhenius_fracture/state_equivalence_trace_v1023.py \
+            arrhenius_fracture/sharp_front_v10_2_3.py \
+            scripts/run_v10_2_3_shared_reduced.py \
+            scripts/compare_v10_2_3_shared_state_replay.py
+          bash -n scripts/run_v10_2_3_shared_state_equivalence_gate.sh
+      - name: Run focused shared-state tests
+        run: |
+          python -m pytest -q \
+            tests/test_reduced_shared_state_v1023.py \
+            tests/test_physical_shielding_v1022.py \
+            tests/test_transport_comparison_v10175.py
