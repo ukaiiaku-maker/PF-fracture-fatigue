@@ -134,7 +134,7 @@ def prepare(source: pd.DataFrame, candidate_ids: list[str], out: Path) -> pd.Dat
                         "backstress_scale": 0.0 if mode == "backstress_off" else 1.0,
                         "forest_density_floor_override_m2": 0.0
                         if mode == "background_field_off"
-                        else "",
+                        else "default",
                     }
                 )
 
