@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.2.4"
-description = "Cap-free 2-D-calibrated shared-state DBTT parameter campaign"
+version = "10.2.6"
+description = "State-resolved signed-dislocation kernel generation shared by monotonic fracture and fatigue"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
