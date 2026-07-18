@@ -5,17 +5,18 @@ replaces the temporary constant anisotropic factors used by the monotonic
 reduced runner with a candidate-independent interpolation of factors measured
 by the production 2-D tensor probe.
 
-Only geometric/mechanical coordinates are used: applied K and continuous crack
-progress within the current checkpoint.  Material parameters are never inputs
-to the closure.  Extrapolation is explicit and audited; promoted candidates
-must still pass cap-free 2-D endpoint validation.
+The tensor factors are ratios of resolved shear to opening-stress amplitude.
+Under the elastic scaling used by the production probe, they are load-amplitude
+independent.  The closure therefore interpolates only against continuous crack
+progress, which represents the evolving crack/damage geometry.  Applied K is
+retained as an audit coordinate but is not used as a fitted material-dependent
+input.  Promoted candidates must still pass cap-free 2-D endpoint validation.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 import csv
 import json
-import math
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -43,27 +44,35 @@ class ClosureEvaluation:
 
 
 class TensorDriveAtlas:
-    """Inverse-distance interpolation of production 2-D tensor factors."""
+    """Inverse-distance interpolation of production 2-D tensor factors.
+
+    Only continuous crack progress enters the interpolation.  K is excluded
+    because the production factors are normalized tensor-shape ratios.
+    """
 
     def __init__(self, samples: Iterable[AtlasSample], neighbors: int = 12):
         self.samples = list(samples)
         if len(self.samples) < 2:
             raise ValueError("tensor-drive atlas requires at least two samples")
         self.neighbors = max(1, min(int(neighbors), len(self.samples)))
-        self._x = np.asarray(
-            [[row.K_MPa_sqrt_m, row.progress] for row in self.samples], dtype=float
-        )
+        self._progress = np.asarray([row.progress for row in self.samples], dtype=float)
+        self._K = np.asarray([row.K_MPa_sqrt_m for row in self.samples], dtype=float)
         self._y = np.asarray(
             [[row.factor_0, row.factor_1] for row in self.samples], dtype=float
         )
-        if np.any(~np.isfinite(self._x)) or np.any(~np.isfinite(self._y)):
+        if (
+            np.any(~np.isfinite(self._progress))
+            or np.any(~np.isfinite(self._K))
+            or np.any(~np.isfinite(self._y))
+        ):
             raise ValueError("atlas contains non-finite values")
         if np.any(self._y < 0.0):
             raise ValueError("tensor drive factors must be nonnegative")
-        self._xmin = np.min(self._x, axis=0)
-        self._xmax = np.max(self._x, axis=0)
-        span = self._xmax - self._xmin
-        self._scale = np.where(span > 1.0e-12, span, 1.0)
+        self._pmin = float(np.min(self._progress))
+        self._pmax = float(np.max(self._progress))
+        self._pscale = max(self._pmax - self._pmin, 1.0)
+        self._Kmin = float(np.min(self._K))
+        self._Kmax = float(np.max(self._K))
         self.evaluation_count = 0
         self.outside_support_count = 0
         self.maximum_normalized_distance = 0.0
@@ -86,16 +95,15 @@ class TensorDriveAtlas:
         return cls(samples, neighbors=neighbors)
 
     def evaluate(self, K_MPa_sqrt_m: float, progress: float) -> ClosureEvaluation:
-        query = np.asarray(
-            [max(float(K_MPa_sqrt_m), 0.0), float(np.clip(progress, 0.0, 1.0))],
-            dtype=float,
-        )
-        outside = bool(np.any(query < self._xmin) or np.any(query > self._xmax))
-        distance = np.linalg.norm((self._x - query[None, :]) / self._scale, axis=1)
+        del K_MPa_sqrt_m  # amplitude cancels from the normalized tensor factor
+        query = float(np.clip(progress, 0.0, 1.0))
+        outside = bool(query < self._pmin or query > self._pmax)
+        distance = np.abs(self._progress - query) / self._pscale
         order = np.argsort(distance)[: self.neighbors]
         selected = distance[order]
         if selected[0] <= 1.0e-14:
-            value = self._y[order[0]].copy()
+            exact = order[np.isclose(selected, selected[0], rtol=0.0, atol=1.0e-14)]
+            value = np.mean(self._y[exact], axis=0)
         else:
             weight = 1.0 / np.maximum(selected, 1.0e-12) ** 2
             weight /= np.sum(weight)
@@ -118,8 +126,11 @@ class TensorDriveAtlas:
             "schema": MODEL_ID,
             "sample_count": len(self.samples),
             "neighbors": self.neighbors,
-            "K_support_MPa_sqrt_m": [float(self._xmin[0]), float(self._xmax[0])],
-            "progress_support": [float(self._xmin[1]), float(self._xmax[1])],
+            "K_observed_MPa_sqrt_m": [self._Kmin, self._Kmax],
+            "K_used_as_interpolation_coordinate": False,
+            "progress_support": [self._pmin, self._pmax],
+            "interpolation_coordinate": "continuous_crack_progress",
+            "tensor_factor_scale_invariant": True,
             "evaluation_count": int(self.evaluation_count),
             "outside_support_count": int(self.outside_support_count),
             "outside_support_fraction": (
