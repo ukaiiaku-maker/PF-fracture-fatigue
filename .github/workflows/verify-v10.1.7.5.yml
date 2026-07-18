@@ -19,7 +19,7 @@ jobs:
       - name: Install package and tests
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e . pytest
+          python -m pip install -e . pytest pandas
       - name: Compile transfer-gate files
         run: |
           python -m compileall -q \
