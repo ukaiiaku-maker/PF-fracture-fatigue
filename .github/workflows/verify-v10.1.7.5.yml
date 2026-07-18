@@ -29,8 +29,16 @@ jobs:
           bash -n scripts/run_v10_1_7_5_reduced_candidate_transfer_gate.sh
       - name: Test transfer manifest preparation
         run: |
-          python -m pytest -q \
-            tests/test_reduced_candidate_transfer_v10175.py::test_preparation_builds_two_endpoints_six_modes_and_true_blunting_ablation
+          set -o pipefail
+          python -m pytest -vv -s \
+            tests/test_reduced_candidate_transfer_v10175.py::test_preparation_builds_two_endpoints_six_modes_and_true_blunting_ablation \
+            2>&1 | tee /tmp/transfer-preparation-test.log
+      - name: Upload transfer preparation failure log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: transfer-preparation-test-log
+          path: /tmp/transfer-preparation-test.log
       - name: Test transfer scope guard
         run: |
           python -m pytest -q \
