@@ -28,6 +28,7 @@ jobs:
             arrhenius_fracture/sharp_front_v10_2_3.py \
             scripts/run_v10_2_3_shared_reduced.py \
             scripts/compare_v10_2_3_shared_state_replay.py
+          bash -n scripts/run_v10_2_3_shared_state_equivalence_gate.sh
       - name: Run focused shared-state tests
         run: |
           python -m pytest -q \
