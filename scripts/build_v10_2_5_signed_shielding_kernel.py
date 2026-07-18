@@ -3,11 +3,13 @@
 
 Input CSV columns:
   region, system, bin, x_m, burgers_sign,
-  delta_K_tip_Pa_sqrt_m, delta_signed_line_content
+  K_tip_base_Pa_sqrt_m, K_tip_perturbed_Pa_sqrt_m,
+  delta_signed_line_content
 
-Each active/wake channel-bin must contain both Burgers signs.  Dividing the 2-D
-response by signed line content should produce the same coefficient for the two
-signs; violation of that antisymmetry/linearity check aborts generation.
+Each active/wake channel-bin must contain both Burgers signs. Dividing the 2-D
+shielding contribution by signed line content should produce the same coefficient
+for the two signs; violation of that antisymmetry/linearity check aborts
+generation.
 """
 from __future__ import annotations
 
@@ -66,7 +68,8 @@ def main() -> None:
         rows = list(csv.DictReader(handle))
     required = {
         "region", "system", "bin", "x_m", "burgers_sign",
-        "delta_K_tip_Pa_sqrt_m", "delta_signed_line_content",
+        "K_tip_base_Pa_sqrt_m", "K_tip_perturbed_Pa_sqrt_m",
+        "delta_signed_line_content",
     }
     if not rows:
         raise SystemExit("empty 2-D unit-response table")
@@ -84,12 +87,16 @@ def main() -> None:
         x_m = float(row["x_m"])
         sign = int(float(row["burgers_sign"]))
         content = float(row["delta_signed_line_content"])
-        delta_K = float(row["delta_K_tip_Pa_sqrt_m"])
+        K_base = float(row["K_tip_base_Pa_sqrt_m"])
+        K_perturbed = float(row["K_tip_perturbed_Pa_sqrt_m"])
+        # Engine convention: K_tip = K_applied - K_shield. Therefore a
+        # perturbation that lowers K_tip has positive shielding contribution.
+        delta_K_shield = K_base - K_perturbed
         if sign not in {-1, 1} or not math.isfinite(content) or content == 0.0:
             raise SystemExit("each unit response requires a nonzero signed line content and sign +/-1")
         if math.copysign(1.0, content) != float(sign):
             raise SystemExit("delta_signed_line_content sign disagrees with burgers_sign")
-        coefficient = delta_K / content
+        coefficient = delta_K_shield / content
         groups[(region, system, bin_index, x_m)].append((sign, coefficient))
 
     n_systems = max(key[1] for key in groups) + 1
@@ -160,6 +167,7 @@ def main() -> None:
         "normalization_is_mechanically_derived": True,
         "fitted_attenuation_factor": False,
         "kernel_source": args.kernel_source,
+        "K_sign_convention": "K_shield = K_tip_base - K_tip_perturbed; K_tip = K_applied - K_shield",
         "normalization_source": normalization["normalization_source"],
         "normalization_artifact": str(args.normalization.resolve()),
         "unit_response_table": str(args.responses.resolve()),
