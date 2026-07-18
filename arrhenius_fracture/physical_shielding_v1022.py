@@ -1,25 +1,19 @@
-"""v10.2.2 uncapped dislocation shielding.
+"""Audit support for uncapped population-limited dislocation shielding.
 
-The v10.1 campaign wrapper clipped the linearly superposed dislocation-induced
-stress-intensity contribution to a fitted manifest value.  This module removes
-that constitutive clip.  Shielding is instead limited only by the modeled
-population physics: finite source capacity, Taylor back stress on emission,
-Peierls--Taylor transport and escape, retained-population recovery, and
-moving-frame transfer into the wake.
-
-The old manifest value is retained only as a diagnostic reference so cap
-exceedance can be quantified without affecting the kinetics.
+The constitutive law now lives directly in ``CampaignCalibratedTipEngine`` so
+monotonic temperature-dependent fracture and cyclic fatigue use the same signed
+elastic superposition.  This module only collects per-run audit samples and
+retains the historical manifest cap as a diagnostic reference.
 """
 from __future__ import annotations
 
 from contextlib import contextmanager
 import json
-import math
 from pathlib import Path
 from typing import Any
 
 
-MODEL_ID = "v10.2.2_uncapped_population_limited_shielding"
+MODEL_ID = "v10.2.3_shared_core_uncapped_population_limited_shielding"
 _SAMPLES: list[dict[str, float]] = []
 
 
@@ -54,6 +48,7 @@ def physical_shielding_audit_payload() -> dict[str, Any]:
     return {
         "schema": MODEL_ID,
         "shielding_law": "signed_linear_elastic_superposition_from_evolving_dislocation_population",
+        "constitutive_location": "CampaignCalibratedTipEngine_shared_by_monotonic_and_fatigue",
         "constitutive_K_shield_clip_applied": False,
         "legacy_manifest_cap_used_in_kinetics": False,
         "legacy_manifest_cap_retained_as_diagnostic_reference": True,
@@ -77,31 +72,28 @@ def physical_shielding_audit_payload() -> dict[str, Any]:
 
 @contextmanager
 def install_uncapped_physical_shielding():
-    """Temporarily replace the campaign hard cap by the raw shielding field."""
+    """Collect shielding diagnostics; do not alter the constitutive law.
+
+    The name is retained for runner compatibility.  Unlike v10.2.2, this context
+    manager no longer monkey-patches ``_active_shielding_signed``.  The shared
+    campaign engine is already uncapped for every loading path.
+    """
     from .campaign_calibrated_tip import CampaignCalibratedTipEngine
 
-    original_active = CampaignCalibratedTipEngine._active_shielding_signed
     original_diagnostics = CampaignCalibratedTipEngine._campaign_diagnostics
 
-    def uncapped_active(self) -> float:
-        return float(self._active_shielding_raw_uncapped())
-
-    def uncapped_diagnostics(self) -> dict[str, Any]:
+    def audited_diagnostics(self) -> dict[str, Any]:
         payload = dict(original_diagnostics(self))
-        raw = float(self._active_shielding_raw_uncapped())
-        effective = float(self._active_shielding_signed())
-        legacy_cap = _legacy_cap_reference_Pa_sqrt_m(self)
-        payload.update(
-            {
-                "campaign_active_K_shield_raw_Pa_sqrt_m": raw,
-                "campaign_active_K_shield_effective_Pa_sqrt_m": effective,
-                "campaign_active_K_shield_cap_Pa_sqrt_m": 0.0,
-                "campaign_legacy_K_shield_cap_reference_Pa_sqrt_m": legacy_cap,
-                "campaign_shielding_cap_applied": False,
-                "campaign_shielding_population_limited": True,
-                "campaign_shielding_model_id": MODEL_ID,
-            }
+        raw = float(payload["campaign_active_K_shield_raw_Pa_sqrt_m"])
+        effective = float(payload["campaign_active_K_shield_effective_Pa_sqrt_m"])
+        legacy_cap = float(
+            payload.get(
+                "campaign_legacy_K_shield_cap_reference_Pa_sqrt_m",
+                _legacy_cap_reference_Pa_sqrt_m(self),
+            )
         )
+        if bool(payload.get("campaign_shielding_cap_applied", False)):
+            raise RuntimeError("shared campaign tip engine unexpectedly applied a shielding cap")
         _SAMPLES.append(
             {
                 "raw_Pa_sqrt_m": raw,
@@ -109,14 +101,13 @@ def install_uncapped_physical_shielding():
                 "legacy_cap_reference_Pa_sqrt_m": legacy_cap,
             }
         )
+        payload["campaign_shielding_model_id"] = MODEL_ID
         return payload
 
-    CampaignCalibratedTipEngine._active_shielding_signed = uncapped_active
-    CampaignCalibratedTipEngine._campaign_diagnostics = uncapped_diagnostics
+    CampaignCalibratedTipEngine._campaign_diagnostics = audited_diagnostics
     try:
         yield
     finally:
-        CampaignCalibratedTipEngine._active_shielding_signed = original_active
         CampaignCalibratedTipEngine._campaign_diagnostics = original_diagnostics
 
 
@@ -163,6 +154,7 @@ def write_physical_shielding_audit(root: str | Path) -> dict[str, Any]:
             "manifest_K_shield_cap_enabled": False,
             "legacy_manifest_K_shield_cap_reference_only": True,
             "active_shielding_saturation": "population_dynamics_only",
+            "shared_monotonic_and_fatigue_core": True,
         },
     )
     _rewrite_json_if_present(
@@ -172,6 +164,7 @@ def write_physical_shielding_audit(root: str | Path) -> dict[str, Any]:
             "cleavage_shielding_bound": "none; signed raw elastic dislocation field",
             "legacy_manifest_K_shield_cap_reference_only": True,
             "new_dimensional_saturation_parameters": 0,
+            "shared_monotonic_and_fatigue_core": True,
         },
     )
 
