@@ -43,20 +43,45 @@ ANISOTROPIC_SCHMID_REFERENCE=${ANISOTROPIC_SCHMID_REFERENCE:-0.5}
 ANISOTROPIC_SHARED_FOREST_DENSITY=${ANISOTROPIC_SHARED_FOREST_DENSITY:-1}
 ANISOTROPIC_REQUIRE_RELIABLE_PROBE=${ANISOTROPIC_REQUIRE_RELIABLE_PROBE:-1}
 
-if [[ -e "$OUTROOT" ]]; then
-  echo "ERROR: OUTROOT already exists: $OUTROOT"
-  echo "Use a new versioned OUTROOT, or rerun with the same root only after confirming it belongs to this transfer gate."
-  exit 1
-fi
-mkdir -p "$OUTROOT"
-
-"$PYTHON_BIN" scripts/prepare_v10_1_7_5_candidate_transfer.py \
-  --source "$SOURCE" \
-  --out "$OUTROOT" \
-  --candidates $CANDIDATES
-
 CASE_TABLE="$OUTROOT/transfer_cases.tsv"
+PREPARATION="$OUTROOT/transfer_preparation.json"
 RUN_MANIFEST="$OUTROOT/transfer_run_manifest.tsv"
+
+if [[ -e "$OUTROOT" ]]; then
+  if [[ "$RESUME_VALIDATED" != 1 ]]; then
+    echo "ERROR: OUTROOT already exists and RESUME_VALIDATED is not enabled: $OUTROOT"
+    exit 1
+  fi
+  test -f "$CASE_TABLE" || { echo "ERROR: missing $CASE_TABLE"; exit 1; }
+  test -f "$PREPARATION" || { echo "ERROR: missing $PREPARATION"; exit 1; }
+  "$PYTHON_BIN" - "$PREPARATION" "$SOURCE" $CANDIDATES <<'PY'
+import hashlib
+import json
+import pathlib
+import sys
+
+preparation = json.loads(pathlib.Path(sys.argv[1]).read_text())
+source = pathlib.Path(sys.argv[2]).resolve()
+candidates = sys.argv[3:]
+assert preparation["schema"] == "v10.1.7.5_transfer_preparation"
+assert source.is_file(), source
+assert preparation["source_sha256"] == hashlib.sha256(source.read_bytes()).hexdigest()
+assert preparation["candidate_ids"] == candidates, (preparation["candidate_ids"], candidates)
+assert preparation["n_cases"] == 24, preparation
+PY
+  echo "RESUME: validated existing transfer preparation in $OUTROOT"
+else
+  mkdir -p "$OUTROOT"
+  "$PYTHON_BIN" scripts/prepare_v10_1_7_5_candidate_transfer.py \
+    --source "$SOURCE" \
+    --out "$OUTROOT" \
+    --candidates $CANDIDATES
+fi
+
+if [[ -f "$RUN_MANIFEST" ]]; then
+  stamp_backup=$(date '+%Y%m%dT%H%M%S')
+  cp "$RUN_MANIFEST" "$OUTROOT/transfer_run_manifest.previous_${stamp_backup}.tsv"
+fi
 printf 'candidate_id\ttransition_bracket\tendpoint\tT_K\tmode\tstatus\toutdir\n' > "$RUN_MANIFEST"
 
 stamp() { date '+%Y-%m-%d %H:%M:%S'; }
@@ -121,7 +146,7 @@ assert transfer_data["anisotropic_avalanche_backend"] is False
 assert transfer_data["single_front"] is True
 assert transfer_data["bulk_plasticity_mode"] == "tip_only"
 assert abs(float(transfer_data["backstress_scale"]) - expected_backstress) <= 1e-12
-if expected_forest_text:
+if expected_forest_text != "default":
     assert abs(float(transfer_data["forest_density_floor_override_m2"]) - float(expected_forest_text)) <= 1e-12
 else:
     assert transfer_data["forest_density_floor_override_m2"] is None
@@ -200,6 +225,11 @@ run_case() {
     flags+=(--no-active-shielding)
   fi
 
+  local forest_env=""
+  if [[ "$forest_floor" != "default" ]]; then
+    forest_env=$forest_floor
+  fi
+
   report "CASE START candidate=$candidate bracket=$bracket endpoint=$endpoint mode=$mode T=${temperature}K out=$outdir"
   local start
   start=$(date +%s)
@@ -209,7 +239,7 @@ run_case() {
     CAMPAIGN_BACKSTRESS_SCALE=1 \
     CAMPAIGN_REFRESH_SCALE=1 \
     V10175_BACKSTRESS_SCALE="$backstress" \
-    V10175_FOREST_DENSITY_FLOOR_M2="$forest_floor" \
+    V10175_FOREST_DENSITY_FLOOR_M2="$forest_env" \
     CLEAVAGE_HAZARD_MODE=deterministic \
     CLEAVAGE_HAZARD_SEED=0 \
     CLEAVAGE_EVENT_LENGTH_MODE=fixed \
