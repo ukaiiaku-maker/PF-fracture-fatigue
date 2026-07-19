@@ -220,13 +220,20 @@ class PhysicalFEMCapture(_TraceCapture):
             request = self._matching_request(float(T), coordinates)
             if request is not None:
                 h_tip = float(self.latest_assembly["mesh"].hbar_tip)
-                process_zone = float(engine.mpz.length_m)
+                process_zone = float(getattr(engine.f, "L_pz", 0.0))
+                if not math.isfinite(process_zone) or process_zone <= 0.0:
+                    raise RuntimeError(
+                        "production signed-kernel capture requires a positive physical "
+                        "front process-zone length engine.f.L_pz"
+                    )
                 elements = process_zone / max(h_tip, 1.0e-30)
                 check = {
                     "state_id": request.state_id,
                     "temperature_K": float(T),
                     "hbar_tip_m": h_tip,
                     "process_zone_length_m": process_zone,
+                    "process_zone_length_source": "engine.f.L_pz",
+                    "reduced_mpz_domain_length_not_used_for_mesh_gate": True,
                     "elements_per_process_zone": elements,
                     "minimum_required": self.minimum_elements_per_process_zone,
                     "passed": elements >= self.minimum_elements_per_process_zone,
@@ -257,6 +264,7 @@ class PhysicalFEMCapture(_TraceCapture):
                 "minimum_elements_per_process_zone": (
                     self.minimum_elements_per_process_zone
                 ),
+                "mesh_gate_process_zone_source": "engine.f.L_pz",
                 "mesh_gate_checks": self.mesh_gate_checks,
             }
         )
