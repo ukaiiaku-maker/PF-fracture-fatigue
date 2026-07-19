@@ -170,6 +170,21 @@ def main() -> None:
     if len(extensions) < 2:
         raise SystemExit("extension-only atlas requires at least two frozen geometries")
 
+    projection.update(
+        {
+            "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+            "kernel_opening_compatibility_coordinate": (
+                OPENING_COMPATIBILITY_COORDINATE
+            ),
+            "active_physical_kernel_axes": [
+                "cumulative_crack_path_extension_m"
+            ],
+            "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+            "opening_strength_fraction_used_for_spatial_interpolation": False,
+            "finite_radius_fem_geometry_claimed": False,
+        }
+    )
+
     review = None
     if args.independent_review is not None:
         review = _load_review(args.independent_review)
@@ -215,17 +230,19 @@ def main() -> None:
                 "audit_sha256": _sha256(path.with_suffix(".audit.json")),
             }
         )
-    invariance_audits = [
-        {
-            "path": str(path.resolve()),
-            "sha256": _sha256(path),
-            "parent_state_id": json.loads(path.read_text())["parent_state_id"],
-            "maximum_relative_load_variation": json.loads(path.read_text())["checks"][
-                "maximum_relative_load_variation"
-            ],
-        }
-        for path in args.load_invariance
-    ]
+    invariance_audits = []
+    for path in args.load_invariance:
+        report = json.loads(path.read_text())
+        invariance_audits.append(
+            {
+                "path": str(path.resolve()),
+                "sha256": _sha256(path),
+                "parent_state_id": report["parent_state_id"],
+                "maximum_relative_load_variation": report["checks"][
+                    "maximum_relative_load_variation"
+                ],
+            }
+        )
     base_gates = dict(payload.get("authorization_gates", {}))
     real_gates = {
         "physical_fem_station_inputs_present": bool(physical_audits),
@@ -293,6 +310,8 @@ def main() -> None:
             "direct_fem_measurements_exist_only_at_recorded_station_indices": True,
             "analytical_r_eff_used_for_interpolation": False,
             "opening_strength_fraction_used_for_interpolation": False,
+            "finite_radius_fem_kernel_claimed": False,
+            "fem_tip_geometry_blunted": False,
         }
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
