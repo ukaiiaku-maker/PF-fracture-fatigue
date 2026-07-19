@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.2.8"
-description = "Staged analytical, exact first-passage, R-curve, and 2-D parameterization"
+version = "10.2.9"
+description = "Quality-diverse staged analytical, first-passage, R-curve, and 2-D parameterization"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
