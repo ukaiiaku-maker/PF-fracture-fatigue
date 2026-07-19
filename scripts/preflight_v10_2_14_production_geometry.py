@@ -43,7 +43,8 @@ def main() -> None:
             {
                 "project_id": arrhenius_fracture.PROJECT_ID,
                 "project_repository": arrhenius_fracture.PROJECT_REPOSITORY,
-                "package_version": arrhenius_fracture.__version__,
+                "project_release": arrhenius_fracture.PROJECT_RELEASE,
+                "protected_public_api_version": arrhenius_fracture.__version__,
                 "package_root": str(PACKAGE_ROOT),
                 "repository_local_import_verified": True,
                 "response_model": RESPONSE_ID,
