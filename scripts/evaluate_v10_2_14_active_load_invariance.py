@@ -4,6 +4,14 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import sys
+
+# Permit direct execution from a clean repository checkout without requiring an
+# editable installation first.  Python otherwise places only scripts/ at
+# sys.path[0], so the sibling arrhenius_fracture package is not importable.
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from arrhenius_fracture.frozen_geometry_load_invariance_v10213 import (
     evaluate_frozen_geometry_load_invariance,
@@ -38,22 +46,34 @@ def main() -> None:
             args.minimum_residual_stiffness_fraction
         ),
     )
-    print(json.dumps({
-        "schema": payload["schema"],
-        "parent_state_id": payload["parent_state_id"],
-        "load_invariance_passed": payload["load_invariance_passed"],
-        "active_kernel_mechanically_measured": payload[
-            "active_kernel_mechanically_measured"
-        ],
-        "wake_shielding_supported": payload["wake_shielding_supported"],
-        "maximum_within_load_relative_spread": payload["checks"][
-            "maximum_within_load_relative_spread"
-        ],
-        "maximum_relative_load_variation": payload["checks"][
-            "maximum_relative_load_variation"
-        ],
-        "report": str((args.outroot / "frozen_geometry_load_invariance.json").resolve()),
-    }, indent=2))
+    print(
+        json.dumps(
+            {
+                "schema": payload["schema"],
+                "parent_state_id": payload["parent_state_id"],
+                "load_invariance_passed": payload["load_invariance_passed"],
+                "active_kernel_mechanically_measured": payload[
+                    "active_kernel_mechanically_measured"
+                ],
+                "wake_shielding_supported": payload[
+                    "wake_shielding_supported"
+                ],
+                "maximum_within_load_relative_spread": payload["checks"][
+                    "maximum_within_load_relative_spread"
+                ],
+                "maximum_relative_load_variation": payload["checks"][
+                    "maximum_relative_load_variation"
+                ],
+                "report": str(
+                    (
+                        args.outroot
+                        / "frozen_geometry_load_invariance.json"
+                    ).resolve()
+                ),
+            },
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":
