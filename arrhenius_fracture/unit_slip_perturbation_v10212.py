@@ -79,13 +79,11 @@ def _clip_source_surface_overlap(
 ) -> tuple[np.ndarray, dict[str, Any]]:
     """Remove only source-side ribbon area that lies outside the intact body.
 
-    The stiffness-killed crack is a free surface, so imposing plastic strain in
-    those elements is incorrect.  A finite-width ribbon launched from that
-    surface will nevertheless overlap killed element centroids near its source
-    on a discrete mesh.  Such overlap is clipped without renormalizing the
-    requested Burgers line content.  Any damaged element beyond a short
-    source-side allowance, or any damaged terminal element, indicates that the
-    ribbon crosses the crack and is rejected.
+    Source-side clipping is applied before terminal validation.  This ordering is
+    essential for the first FEM-resolved station, where the discrete source and
+    terminal support windows can touch.  Damage in that overlap belongs to the
+    crack/free-surface source and is clipped; damaged support strictly beyond the
+    source allowance remains a hard terminal/interior error.
     """
     allowed_damage = float(maximum_damaged_area_fraction)
     if not 0.0 <= allowed_damage < 1.0:
@@ -131,12 +129,27 @@ def _clip_source_surface_overlap(
     terminal = selected & (longitudinal >= length - terminal_span)
     if not np.any(terminal):
         raise ValueError("signed slip ribbon has no FEM support at its terminal line")
-    if np.any(damaged & terminal):
+
+    # A damaged terminal element that is also inside the source allowance is a
+    # discrete representation of the crack/free surface and is clipped below.
+    # Only terminal damage strictly beyond that allowance represents a damaged
+    # terminal dislocation.
+    tolerance = max(1.0e-12, 1.0e-10 * max(length, width, h_tip, 1.0))
+    terminal_damaged_outside_source = (
+        damaged
+        & terminal
+        & (longitudinal > source_limit + tolerance)
+    )
+    if np.any(terminal_damaged_outside_source):
         raise ValueError(
             "signed slip ribbon terminal lies in stiffness-killed crack material"
         )
 
-    interior_damaged = damaged & (longitudinal > source_limit)
+    interior_damaged = (
+        damaged
+        & (longitudinal > source_limit + tolerance)
+        & ~terminal
+    )
     if np.any(interior_damaged):
         worst = float(np.max(longitudinal[interior_damaged]))
         raise ValueError(
@@ -145,13 +158,19 @@ def _clip_source_surface_overlap(
             f"source allowance={source_limit:.6g} m"
         )
 
-    source_clipped = damaged & (longitudinal <= source_limit)
+    source_clipped = damaged & (longitudinal <= source_limit + tolerance)
     corrected[:, source_clipped] = 0.0
     retained = np.any(np.abs(corrected) > 0.0, axis=0)
     if not np.any(retained):
         raise ValueError("source-surface clipping removed the complete slip ribbon")
-    if not np.any(retained & terminal):
+
+    retained_terminal = retained & terminal
+    if not np.any(retained_terminal):
         raise ValueError("source-surface clipping removed terminal ribbon support")
+    if np.any(element_damage[retained_terminal] > allowed_damage):
+        raise ValueError(
+            "signed slip ribbon terminal lies in stiffness-killed crack material"
+        )
 
     retained_area = float(np.sum(area[retained]))
     residual_damage_fraction = float(
