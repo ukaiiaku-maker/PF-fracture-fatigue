@@ -54,6 +54,24 @@ def equilibrated_base_state(
     )
 
 
+def _ribbon_damage_fraction(mesh, d: np.ndarray, increment: np.ndarray) -> float:
+    selected = np.any(np.abs(np.asarray(increment, dtype=float)) > 0.0, axis=0)
+    if not np.any(selected):
+        raise ValueError("signed slip ribbon selects no elements")
+    damage = np.asarray(d, dtype=float).reshape(-1)
+    if damage.size == int(mesh.nn):
+        element_damage = np.mean(damage[np.asarray(mesh.elems, dtype=int)], axis=1)
+    elif damage.size == int(mesh.ne):
+        element_damage = damage
+    else:
+        raise ValueError("damage field size is incompatible with the FEM mesh")
+    area = np.asarray(mesh.area_e, dtype=float)
+    selected_area = float(np.sum(area[selected]))
+    if selected_area <= 0.0:
+        raise ValueError("signed slip ribbon has zero represented area")
+    return float(np.sum(area[selected] * np.clip(element_damage[selected], 0.0, 1.0)) / selected_area)
+
+
 def interaction_response(
     *,
     mesh,
@@ -74,11 +92,27 @@ def interaction_response(
     crack_segments=None,
     exclude_radius_m: float = 0.0,
     cohesive_network=None,
+    maximum_damaged_area_fraction: float = 0.05,
 ) -> dict[str, Any]:
     """Evaluate one signed line perturbation about an equilibrated fixed crack."""
     increment, perturbation_audit = slip_ribbon_eigenstrain_increment(
         mesh, perturbation
     )
+    damaged_fraction = _ribbon_damage_fraction(mesh, d, increment)
+    allowed_damage = float(maximum_damaged_area_fraction)
+    if not 0.0 <= allowed_damage < 1.0:
+        raise ValueError("maximum_damaged_area_fraction must lie in [0,1)")
+    if damaged_fraction > allowed_damage:
+        raise ValueError(
+            "signed slip ribbon lies in stiffness-killed crack material: "
+            f"damaged area fraction={damaged_fraction:.6g}, allowed={allowed_damage:.6g}"
+        )
+    perturbation_audit = {
+        **perturbation_audit,
+        "damaged_area_fraction": damaged_fraction,
+        "maximum_allowed_damaged_area_fraction": allowed_damage,
+        "ribbon_in_intact_material": True,
+    }
     perturbed_ep = np.asarray(baseline_ep_gp, dtype=float) + increment
     perturbed = solve_fixed_crack_state(
         mesh=mesh,
