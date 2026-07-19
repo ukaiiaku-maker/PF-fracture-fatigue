@@ -1,11 +1,10 @@
 """v10.2.14 physical signed-slip perturbation evaluator.
 
-The geometric ribbon starts at the physical crack surface.  Its eigenstrain is
-removed only from elements that are mechanically killed according to the same
-residual-stiffness law used by the FEM.  Signed SIFs are extracted with the
-v10.2.14 intrinsic-isotropy interaction integral, which derives consistent
-elastic constants from the supplied stiffness matrix and still rejects genuine
-anisotropy.
+The ribbon endpoint is used exactly.  Triangle/ribbon overlap is integrated by
+area fraction, so a graded mesh no longer requires a centroid on the slip ray
+and distinct MPZ bins cannot silently collapse onto one FEM endpoint.  The
+source remains at the crack surface, stiffness-killed overlap is removed, and a
+nonzero mechanically supported terminal neighborhood is required.
 """
 from __future__ import annotations
 
@@ -17,14 +16,17 @@ from .interaction_integral_v10214 import (
     MODEL_ID as INTERACTION_INTEGRAL_MODEL_ID,
     compute_signed_interaction_integral,
 )
+from .slip_ribbon_overlap_v10214 import (
+    RibbonOverlapSupport,
+    overlap_weighted_slip_ribbon_increment,
+)
 from .unit_slip_perturbation_v1026 import (
     MODEL_ID as RIBBON_MODEL_ID,
     SlipRibbonPerturbation,
-    slip_ribbon_eigenstrain_increment,
     solve_fixed_crack_state,
 )
 
-MODEL_ID = "v10.2.14_physical_signed_slip_stiffness_masked_intrinsic_isotropy_interaction_integral"
+MODEL_ID = "v10.2.14_physical_signed_slip_exact_overlap_intrinsic_isotropy"
 DEFAULT_STIFFNESS_KAPPA = 1.0e-6
 DEFAULT_MINIMUM_RESIDUAL_STIFFNESS_FRACTION = 1.0e-3
 
@@ -74,7 +76,6 @@ def element_residual_stiffness_fraction(
     *,
     stiffness_kappa: float = DEFAULT_STIFFNESS_KAPPA,
 ) -> np.ndarray:
-    """Return the exact scalar degradation used by ``assemble_mechanics``."""
     kappa = float(stiffness_kappa)
     if not np.isfinite(kappa) or kappa < 0.0:
         raise ValueError("stiffness_kappa must be finite and nonnegative")
@@ -86,6 +87,7 @@ def _mask_killed_ribbon_elements(
     mesh,
     d: np.ndarray,
     increment: np.ndarray,
+    support: RibbonOverlapSupport,
     *,
     minimum_residual_stiffness_fraction: float,
     stiffness_kappa: float,
@@ -93,9 +95,13 @@ def _mask_killed_ribbon_elements(
     value = np.asarray(increment, dtype=float).copy()
     if value.ndim != 2 or value.shape[1] != int(mesh.ne):
         raise ValueError("slip-ribbon increment must have shape (nstrain, mesh.ne)")
-    selected_before = np.any(np.abs(value) > 0.0, axis=0)
+    overlap = np.asarray(support.overlap_area_e_m2, dtype=float)
+    terminal_overlap = np.asarray(support.terminal_overlap_area_e_m2, dtype=float)
+    if overlap.shape != (int(mesh.ne),) or terminal_overlap.shape != (int(mesh.ne),):
+        raise ValueError("ribbon-overlap support is incompatible with the FEM mesh")
+    selected_before = overlap > 0.0
     if not np.any(selected_before):
-        raise ValueError("signed slip ribbon selects no elements")
+        raise ValueError("signed slip ribbon has no geometric FEM overlap")
 
     threshold = float(minimum_residual_stiffness_fraction)
     if not np.isfinite(threshold) or not 0.0 <= threshold < 1.0:
@@ -107,18 +113,23 @@ def _mask_killed_ribbon_elements(
     )
     killed = residual < threshold
     value[:, killed] = 0.0
-    selected_after = np.any(np.abs(value) > 0.0, axis=0)
-    if not np.any(selected_after):
+    supported = selected_before & ~killed
+    if not np.any(supported):
         raise ValueError(
-            "signed slip ribbon has no mechanically supported FEM elements after "
+            "signed slip ribbon has no mechanically supported FEM overlap after "
             "stiffness masking"
         )
+    supported_terminal_area = float(np.sum(terminal_overlap[~killed]))
+    if supported_terminal_area <= 1.0e-30:
+        raise ValueError(
+            "signed slip ribbon endpoint has no mechanically supported FEM overlap; "
+            "the requested MPZ station is not represented by the production mesh"
+        )
 
-    area = np.asarray(mesh.area_e, dtype=float)
-    area_before = float(np.sum(area[selected_before]))
-    area_after = float(np.sum(area[selected_after]))
-    killed_area = float(np.sum(area[selected_before & killed]))
-    supported_residual = residual[selected_after]
+    geometric_area = float(np.sum(overlap))
+    supported_area = float(np.sum(overlap[~killed]))
+    killed_area = float(np.sum(overlap[killed]))
+    terminal_geometric_area = float(np.sum(terminal_overlap))
     return value, {
         "stiffness_mask_model": "g=(1-element_mean_damage)^2+kappa",
         "stiffness_kappa": float(stiffness_kappa),
@@ -126,26 +137,28 @@ def _mask_killed_ribbon_elements(
         "selected_elements_before_stiffness_mask": int(
             np.count_nonzero(selected_before)
         ),
-        "selected_elements_after_stiffness_mask": int(
-            np.count_nonzero(selected_after)
-        ),
+        "selected_elements_after_stiffness_mask": int(np.count_nonzero(supported)),
         "stiffness_killed_selected_elements": int(
             np.count_nonzero(selected_before & killed)
         ),
-        "selected_area_before_stiffness_mask_m2": area_before,
-        "selected_area_after_stiffness_mask_m2": area_after,
-        "stiffness_killed_selected_area_m2": killed_area,
-        "stiffness_killed_selected_area_fraction": (
-            killed_area / area_before if area_before > 0.0 else 0.0
-        ),
+        "geometric_overlap_area_before_stiffness_mask_m2": geometric_area,
+        "supported_overlap_area_after_stiffness_mask_m2": supported_area,
+        "stiffness_killed_overlap_area_m2": killed_area,
+        "stiffness_killed_overlap_area_fraction": killed_area
+        / max(geometric_area, 1.0e-30),
+        "terminal_geometric_overlap_area_m2": terminal_geometric_area,
+        "terminal_supported_overlap_area_m2": supported_terminal_area,
+        "terminal_supported_fraction": supported_terminal_area
+        / max(terminal_geometric_area, 1.0e-30),
         "minimum_supported_residual_stiffness_fraction": float(
-            np.min(supported_residual)
+            np.min(residual[supported])
         ),
         "maximum_supported_residual_stiffness_fraction": float(
-            np.max(supported_residual)
+            np.max(residual[supported])
         ),
         "surface_overlap_is_clipped_not_relocated": True,
         "partially_damaged_load_bearing_elements_retained": True,
+        "mechanically_supported_terminal_required": True,
     }
 
 
@@ -174,19 +187,33 @@ def interaction_response(
     ),
     stiffness_kappa: float = DEFAULT_STIFFNESS_KAPPA,
 ) -> dict[str, Any]:
-    raw_increment, perturbation_audit = slip_ribbon_eigenstrain_increment(
-        mesh, perturbation
+    raw_increment, perturbation_audit, support = (
+        overlap_weighted_slip_ribbon_increment(mesh, perturbation)
     )
     increment, stiffness_audit = _mask_killed_ribbon_elements(
         mesh,
         d,
         raw_increment,
+        support,
         minimum_residual_stiffness_fraction=(
             minimum_residual_stiffness_fraction
         ),
         stiffness_kappa=stiffness_kappa,
     )
-    perturbation_audit = {**perturbation_audit, **stiffness_audit}
+    requested_area = max(
+        float(perturbation_audit["requested_ribbon_area_m2"]), 1.0e-30
+    )
+    supported_area = float(
+        stiffness_audit["supported_overlap_area_after_stiffness_mask_m2"]
+    )
+    perturbation_audit = {
+        **perturbation_audit,
+        **stiffness_audit,
+        "mesh_area_ratio": supported_area / requested_area,
+        "mesh_area_ratio_semantics": (
+            "mechanically_supported_exact_overlap_area/requested_ribbon_area"
+        ),
+    }
 
     perturbed_ep = np.asarray(baseline_ep_gp, dtype=float) + increment
     perturbed = solve_fixed_crack_state(
@@ -238,7 +265,9 @@ def interaction_response(
         "delta_signed_line_content": content,
         "K_I_base_Pa_sqrt_m": float(base_K.K_I_Pa_sqrt_m),
         "K_I_perturbed_Pa_sqrt_m": float(perturbed_K.K_I_Pa_sqrt_m),
-        "K_II_base_Pa_sqrt_m": float(base_K.K_II_Pa_sqrt_m),
+        "K_II_base_Pa_sqrt_m": float(base_K.K_II_base_Pa_sqrt_m)
+        if hasattr(base_K, "K_II_base_Pa_sqrt_m")
+        else float(base_K.K_II_Pa_sqrt_m),
         "K_II_perturbed_Pa_sqrt_m": float(perturbed_K.K_II_Pa_sqrt_m),
         "H_I_Pa_sqrt_m_per_signed_line": float(
             (base_K.K_I_Pa_sqrt_m - perturbed_K.K_I_Pa_sqrt_m) / content
