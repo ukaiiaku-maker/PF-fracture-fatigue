@@ -7,9 +7,11 @@ production state and never uses a fitted population-to-shielding coefficient.
 
 A ribbon may start at a stiffness-killed crack/free surface.  Elements that lie
 outside the surviving body at that source end are clipped from the imposed
-eigenstrain.  Clipping is permitted only in a short source-side zone; damaged
-material in the ribbon interior or at the terminal dislocation remains a hard
-error.
+eigenstrain.  A finite-width terminal footprint may likewise include neighboring
+killed crack-surface elements even when the terminal centroid itself is intact.
+Those terminal fringe elements are clipped only after the actual endpoint support
+is verified intact.  Damaged material in the ribbon interior and a genuinely
+damaged terminal endpoint remain hard errors.
 """
 from __future__ import annotations
 
@@ -28,7 +30,7 @@ from .unit_slip_perturbation_v1026 import (
     solve_fixed_crack_state,
 )
 
-MODEL_ID = "v10.2.13_physical_signed_slip_source_surface_clipping"
+MODEL_ID = "v10.2.13_physical_signed_slip_surface_footprint_clipping"
 
 
 def equilibrated_base_state(
@@ -77,13 +79,13 @@ def _clip_source_surface_overlap(
     *,
     maximum_damaged_area_fraction: float,
 ) -> tuple[np.ndarray, dict[str, Any]]:
-    """Remove only source-side ribbon area that lies outside the intact body.
+    """Clip outside-body portions of a finite-width free-surface slip ribbon.
 
-    Source-side clipping is applied before terminal validation.  This ordering is
-    essential for the first FEM-resolved station, where the discrete source and
-    terminal support windows can touch.  Damage in that overlap belongs to the
-    crack/free-surface source and is clipped; damaged support strictly beyond the
-    source allowance remains a hard terminal/interior error.
+    The endpoint selected by the station constructor is an intact FEM centroid.
+    Its inclusion is the physical terminal-support test.  Neighboring damaged
+    elements in the finite-width terminal footprint are outside-body fringe and
+    may be removed; a damaged endpoint or damage between the source and terminal
+    footprints remains a hard failure.
     """
     allowed_damage = float(maximum_damaged_area_fraction)
     if not 0.0 <= allowed_damage < 1.0:
@@ -114,6 +116,7 @@ def _clip_source_surface_overlap(
         np.asarray(mesh.elems, dtype=int)
     ].mean(axis=1)
     longitudinal = (centroids - start[None, :]) @ tangent
+    endpoint_distance = np.linalg.norm(centroids - end[None, :], axis=1)
 
     damaged = selected & (element_damage > allowed_damage)
     h_tip = max(float(getattr(mesh, "hbar_tip", 0.0)), 0.0)
@@ -126,50 +129,74 @@ def _clip_source_surface_overlap(
         0.25 * length,
         max(0.5 * width, h_tip, 1.0e-12),
     )
-    terminal = selected & (longitudinal >= length - terminal_span)
+    tolerance = max(
+        128.0 * np.finfo(float).eps
+        * max(
+            float(np.max(np.abs(start))),
+            float(np.max(np.abs(end))),
+            length,
+            width,
+            h_tip,
+            1.0,
+        ),
+        1.0e-15,
+    )
+    terminal = selected & (
+        longitudinal >= length - terminal_span - tolerance
+    )
     if not np.any(terminal):
         raise ValueError("signed slip ribbon has no FEM support at its terminal line")
 
-    # A damaged terminal element that is also inside the source allowance is a
-    # discrete representation of the crack/free surface and is clipped below.
-    # Only terminal damage strictly beyond that allowance represents a damaged
-    # terminal dislocation.
-    tolerance = max(1.0e-12, 1.0e-10 * max(length, width, h_tip, 1.0))
-    terminal_damaged_outside_source = (
-        damaged
-        & terminal
-        & (longitudinal > source_limit + tolerance)
+    selected_indices = np.flatnonzero(selected)
+    endpoint_index = int(
+        selected_indices[
+            int(np.argmin(endpoint_distance[selected_indices]))
+        ]
     )
-    if np.any(terminal_damaged_outside_source):
+    endpoint_support_distance = float(endpoint_distance[endpoint_index])
+    endpoint_support_limit = max(h_tip, 0.5 * width, tolerance)
+    if endpoint_support_distance > endpoint_support_limit + tolerance:
+        raise ValueError(
+            "signed slip ribbon has no FEM centroid sufficiently close to its "
+            f"terminal endpoint: distance={endpoint_support_distance:.6g} m, "
+            f"limit={endpoint_support_limit:.6g} m"
+        )
+    if element_damage[endpoint_index] > allowed_damage:
         raise ValueError(
             "signed slip ribbon terminal lies in stiffness-killed crack material"
         )
 
-    interior_damaged = (
-        damaged
-        & (longitudinal > source_limit + tolerance)
-        & ~terminal
+    source_clipped = damaged & (
+        longitudinal <= source_limit + tolerance
     )
+    terminal_fringe_clipped = (
+        damaged
+        & terminal
+        & ~source_clipped
+    )
+    interior_damaged = damaged & ~source_clipped & ~terminal_fringe_clipped
     if np.any(interior_damaged):
         worst = float(np.max(longitudinal[interior_damaged]))
         raise ValueError(
             "signed slip ribbon crosses stiffness-killed crack material away from "
-            f"its source: furthest damaged longitudinal position={worst:.6g} m, "
-            f"source allowance={source_limit:.6g} m"
+            f"its free-surface footprints: furthest damaged longitudinal "
+            f"position={worst:.6g} m, source allowance={source_limit:.6g} m"
         )
 
-    source_clipped = damaged & (longitudinal <= source_limit + tolerance)
-    corrected[:, source_clipped] = 0.0
+    clipped = source_clipped | terminal_fringe_clipped
+    corrected[:, clipped] = 0.0
     retained = np.any(np.abs(corrected) > 0.0, axis=0)
     if not np.any(retained):
-        raise ValueError("source-surface clipping removed the complete slip ribbon")
+        raise ValueError("surface clipping removed the complete slip ribbon")
+    if not retained[endpoint_index]:
+        raise ValueError("surface clipping removed the intact terminal endpoint")
 
     retained_terminal = retained & terminal
     if not np.any(retained_terminal):
-        raise ValueError("source-surface clipping removed terminal ribbon support")
-    if np.any(element_damage[retained_terminal] > allowed_damage):
+        raise ValueError("surface clipping removed terminal ribbon support")
+    if not np.any(element_damage[retained_terminal] <= allowed_damage):
         raise ValueError(
-            "signed slip ribbon terminal lies in stiffness-killed crack material"
+            "signed slip ribbon terminal has no intact FEM support"
         )
 
     retained_area = float(np.sum(area[retained]))
@@ -179,12 +206,13 @@ def _clip_source_surface_overlap(
     )
     if residual_damage_fraction > allowed_damage + 1.0e-12:
         raise ValueError(
-            "signed slip ribbon retains excessive damaged material after source "
+            "signed slip ribbon retains excessive damaged material after surface "
             f"clipping: fraction={residual_damage_fraction:.6g}, "
             f"allowed={allowed_damage:.6g}"
         )
 
-    clipped_area = float(np.sum(area[source_clipped]))
+    source_clipped_area = float(np.sum(area[source_clipped]))
+    terminal_clipped_area = float(np.sum(area[terminal_fringe_clipped]))
     return corrected, {
         "raw_selected_elements": int(np.sum(selected)),
         "selected_elements_after_source_clipping": int(np.sum(retained)),
@@ -195,11 +223,28 @@ def _clip_source_surface_overlap(
         "maximum_allowed_damaged_area_fraction": allowed_damage,
         "source_surface_clipping_applied": bool(np.any(source_clipped)),
         "source_surface_clipped_elements": int(np.sum(source_clipped)),
-        "source_surface_clipped_area_m2": clipped_area,
-        "source_surface_clipped_area_fraction": clipped_area / raw_area,
+        "source_surface_clipped_area_m2": source_clipped_area,
+        "source_surface_clipped_area_fraction": source_clipped_area / raw_area,
+        "terminal_surface_clipping_applied": bool(
+            np.any(terminal_fringe_clipped)
+        ),
+        "terminal_surface_clipped_elements": int(
+            np.sum(terminal_fringe_clipped)
+        ),
+        "terminal_surface_clipped_area_m2": terminal_clipped_area,
+        "terminal_surface_clipped_area_fraction": (
+            terminal_clipped_area / raw_area
+        ),
+        "surface_clipped_area_fraction": (
+            source_clipped_area + terminal_clipped_area
+        ) / raw_area,
         "source_surface_longitudinal_allowance_m": source_limit,
         "terminal_support_span_m": terminal_span,
-        "terminal_in_intact_material": True,
+        "terminal_endpoint_element": endpoint_index,
+        "terminal_endpoint_support_distance_m": endpoint_support_distance,
+        "terminal_endpoint_support_limit_m": endpoint_support_limit,
+        "terminal_endpoint_in_intact_material": True,
+        "terminal_fringe_clipping_requires_intact_endpoint": True,
         "interior_crossing_rejected": True,
         "ribbon_in_intact_material": True,
     }
@@ -254,7 +299,7 @@ def interaction_response(
         "represented_area_m2": represented_area,
         "mesh_area_ratio": represented_area / requested_area,
         "normalization_after_surface_clipping": (
-            "requested signed line content unchanged; killed crack-surface "
+            "requested signed line content unchanged; killed free-surface "
             "elements carry no eigenstrain"
         ),
     }
