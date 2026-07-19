@@ -1,9 +1,9 @@
-"""Generate production-mesh active signed responses at FEM-resolved stations.
+"""Generate production-mesh active signed responses at exact MPZ stations.
 
-v10.2.14 deliberately limits the mechanically measured operator to the active
-process zone.  The current scalar wake state does not retain the two-dimensional
-position required to replay a persistent signed wake after crack deflection, so
-wake rows are neither generated nor silently approximated.
+v10.2.14 limits the measured operator to the active process zone.  Every MPZ
+station is mapped to its exact point on the selected slip ray.  Triangle/ribbon
+overlap integration supplies mesh support without snapping endpoints to element
+centroids.  Duplicate or displaced station geometry fails closed.
 """
 from __future__ import annotations
 
@@ -27,12 +27,11 @@ from .unit_slip_perturbation_v10212 import (
     DEFAULT_STIFFNESS_KAPPA,
     INTERACTION_INTEGRAL_MODEL_ID,
     SlipRibbonPerturbation,
-    element_residual_stiffness_fraction,
     equilibrated_base_state,
     interaction_response,
 )
 
-MODEL_ID = "v10.2.14_production_mesh_active_signed_spatial_station_responses"
+MODEL_ID = "v10.2.14_exact_endpoint_active_signed_spatial_station_responses"
 
 
 def _unit(values) -> np.ndarray:
@@ -58,53 +57,6 @@ def _station_indices(coordinates: tuple[float, ...], minimum_spacing_m: float) -
     return selected
 
 
-def _nearest_supported_terminal(
-    *,
-    mesh,
-    damage: np.ndarray,
-    tip: np.ndarray,
-    ray: np.ndarray,
-    nominal: np.ndarray,
-    minimum_distance_m: float,
-    width_m: float,
-    minimum_residual_stiffness_fraction: float,
-    stiffness_kappa: float,
-) -> tuple[np.ndarray, dict]:
-    centroids = np.asarray(mesh.nodes, dtype=float)[
-        np.asarray(mesh.elems, dtype=int)
-    ].mean(axis=1)
-    residual = element_residual_stiffness_fraction(
-        mesh, damage, stiffness_kappa=stiffness_kappa
-    )
-    offset = centroids - tip[None, :]
-    longitudinal = offset @ ray
-    transverse_vector = offset - longitudinal[:, None] * ray[None, :]
-    transverse = np.linalg.norm(transverse_vector, axis=1)
-    h_tip = max(float(mesh.hbar_tip), 1.0e-15)
-    corridor = max(float(width_m) + h_tip, 2.0 * h_tip)
-    supported = (
-        (residual >= float(minimum_residual_stiffness_fraction))
-        & (longitudinal >= float(minimum_distance_m))
-        & (transverse <= corridor)
-    )
-    indices = np.flatnonzero(supported)
-    if indices.size == 0:
-        raise ValueError(
-            "no mechanically supported FEM terminal is available on the active "
-            "slip ray"
-        )
-    geometric_error = np.linalg.norm(centroids[indices] - nominal[None, :], axis=1)
-    order = np.lexsort((transverse[indices], geometric_error))
-    index = int(indices[int(order[0])])
-    return centroids[index].copy(), {
-        "terminal_element": index,
-        "terminal_longitudinal_m": float(longitudinal[index]),
-        "terminal_transverse_m": float(transverse[index]),
-        "terminal_residual_stiffness_fraction": float(residual[index]),
-        "terminal_corridor_half_width_m": float(corridor),
-    }
-
-
 def _active_ribbon_geometry(
     *,
     system: int,
@@ -118,31 +70,27 @@ def _active_ribbon_geometry(
     minimum_residual_stiffness_fraction: float,
     stiffness_kappa: float,
 ) -> tuple[np.ndarray, np.ndarray, dict]:
+    del damage, minimum_residual_stiffness_fraction, stiffness_kappa
     slip = _unit(slip_direction)
     ray = slip if float(slip @ forward) >= 0.0 else -slip
     resolution = max(float(width_m), 2.0 * float(mesh.hbar_tip), 1.0e-12)
-    requested_distance = max(float(x_m), 0.0)
-    distance = max(requested_distance, 4.0 * resolution)
-    start = np.asarray(tip, dtype=float).copy()
-    nominal_end = start + distance * ray
-    end, terminal = _nearest_supported_terminal(
-        mesh=mesh,
-        damage=damage,
-        tip=start,
-        ray=ray,
-        nominal=nominal_end,
-        minimum_distance_m=3.0 * resolution,
-        width_m=width_m,
-        minimum_residual_stiffness_fraction=(
-            minimum_residual_stiffness_fraction
-        ),
-        stiffness_kappa=stiffness_kappa,
-    )
-    length = float(np.linalg.norm(end - start))
-    if length < 2.0 * resolution:
+    requested_distance = float(x_m)
+    if not math.isfinite(requested_distance) or requested_distance <= 0.0:
+        raise ValueError("active MPZ station distance must be positive and finite")
+    if requested_distance < 2.0 * resolution:
         raise ValueError(
-            f"active ribbon for system {system} is not mesh resolved: "
-            f"length={length:.6g}, resolution={resolution:.6g}"
+            f"active station for system {system} is below mesh resolution: "
+            f"x={requested_distance:.6g}, required={2.0 * resolution:.6g}"
+        )
+    start = np.asarray(tip, dtype=float).copy()
+    end = start + requested_distance * ray
+    actual_distance = float(np.linalg.norm(end - start))
+    endpoint_error = abs(actual_distance - requested_distance)
+    tolerance = max(1.0e-15, 1.0e-12 * requested_distance)
+    if endpoint_error > tolerance:
+        raise RuntimeError(
+            "exact active-station endpoint construction failed: "
+            f"requested={requested_distance:.9e}, actual={actual_distance:.9e}"
         )
     return start, end, {
         "region": "active",
@@ -150,13 +98,17 @@ def _active_ribbon_geometry(
         "requested_x_m": requested_distance,
         "start_xy_m": start.tolist(),
         "end_xy_m": end.tolist(),
-        "actual_ribbon_length_m": length,
+        "actual_ribbon_length_m": actual_distance,
+        "endpoint_mapping_error_m": endpoint_error,
         "mesh_resolution_m": float(mesh.hbar_tip),
         "placement_resolution_m": resolution,
         "source_is_physical_crack_surface_tip": True,
         "source_relocated_into_intact_material": False,
-        "active_coordinate_semantics": "distance_along_system_slip_ray_from_current_tip",
-        **terminal,
+        "active_coordinate_semantics": (
+            "exact_distance_along_system_slip_ray_from_current_tip"
+        ),
+        "endpoint_snapped_to_element_centroid": False,
+        "requested_endpoint_used_exactly": True,
     }
 
 
@@ -171,6 +123,35 @@ def _snapshot_crack_segments(meta: SnapshotMetadata, mesh) -> list[tuple[np.ndar
         np.ptp(mesh.nodes[:, 0]) + np.ptp(mesh.nodes[:, 1])
     )
     return [(tip - max(domain_length, meta.interaction_ell_m) * forward, tip)]
+
+
+def _validate_station_geometry(placements: list[dict]) -> dict:
+    errors = [abs(float(row["endpoint_mapping_error_m"])) for row in placements]
+    duplicate_failures = []
+    for system in sorted({int(row["system"]) for row in placements}):
+        rows = sorted(
+            (row for row in placements if int(row["system"]) == system),
+            key=lambda row: int(row["bin"]),
+        )
+        requested = np.asarray([row["requested_x_m"] for row in rows], dtype=float)
+        actual = np.asarray([row["actual_ribbon_length_m"] for row in rows], dtype=float)
+        if np.any(np.diff(requested) <= 0.0):
+            raise ValueError(f"system {system} requested stations are not strictly increasing")
+        if np.any(np.diff(actual) <= 0.0):
+            duplicate_failures.append(system)
+        tolerance = np.maximum(1.0e-15, 1.0e-12 * requested)
+        if np.any(np.abs(actual - requested) > tolerance):
+            raise RuntimeError(f"system {system} contains displaced active endpoints")
+    if duplicate_failures:
+        raise RuntimeError(
+            "distinct active MPZ bins collapsed onto duplicate FEM endpoints for "
+            f"systems {duplicate_failures}"
+        )
+    return {
+        "exact_endpoint_mapping_passed": True,
+        "distinct_requested_stations_have_distinct_endpoints": True,
+        "maximum_endpoint_mapping_error_m": max(errors, default=0.0),
+    }
 
 
 def generate_station_responses(
@@ -233,6 +214,7 @@ def generate_station_responses(
 
     rows = []
     placements = []
+    interaction_fit = None
     for system, (slip, normal) in enumerate(
         zip(channel_directions, channel_normals)
     ):
@@ -252,7 +234,7 @@ def generate_station_responses(
                 ),
                 stiffness_kappa=stiffness_kappa,
             )
-            placements.append({**placement, "bin": int(bin_index)})
+            placement_response_audit = None
             for sign in (-1, 1):
                 for magnitude in values:
                     perturbation = SlipRibbonPerturbation(
@@ -291,6 +273,49 @@ def generate_station_responses(
                         stiffness_kappa=stiffness_kappa,
                     )
                     audit = response["perturbation"]
+                    if placement_response_audit is None:
+                        placement_response_audit = {
+                            key: audit[key]
+                            for key in (
+                                "integration_scheme",
+                                "selected_elements",
+                                "mesh_area_ratio",
+                                "mesh_area_ratio_semantics",
+                                "terminal_window_m",
+                                "terminal_geometric_overlap_area_m2",
+                                "terminal_supported_overlap_area_m2",
+                                "terminal_supported_fraction",
+                                "stiffness_killed_overlap_area_fraction",
+                            )
+                        }
+                    fit = response["base_interaction_integral"].get(
+                        "intrinsic_isotropic_fit"
+                    )
+                    if fit is not None:
+                        if interaction_fit is None:
+                            interaction_fit = fit
+                        elif not np.allclose(
+                            [
+                                interaction_fit["derived_E_Pa"],
+                                interaction_fit["derived_poisson"],
+                                interaction_fit[
+                                    "maximum_relative_intrinsic_isotropy_residual"
+                                ],
+                            ],
+                            [
+                                fit["derived_E_Pa"],
+                                fit["derived_poisson"],
+                                fit[
+                                    "maximum_relative_intrinsic_isotropy_residual"
+                                ],
+                            ],
+                            rtol=1.0e-12,
+                            atol=1.0e-18,
+                        ):
+                            raise RuntimeError(
+                                "interaction-integral elastic fit changed within one "
+                                "fixed snapshot"
+                            )
                     rows.append(
                         {
                             "state_id": meta.state_id,
@@ -322,9 +347,19 @@ def generate_station_responses(
                             "mesh_area_ratio": audit["mesh_area_ratio"],
                         }
                     )
+            if placement_response_audit is None:
+                raise RuntimeError("active station generated no perturbation response")
+            placements.append(
+                {
+                    **placement,
+                    "bin": int(bin_index),
+                    **placement_response_audit,
+                }
+            )
 
     if not rows:
         raise ValueError("no active signed FEM response rows were generated")
+    station_geometry = _validate_station_geometry(placements)
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     with out_csv.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=RESPONSE_COLUMNS)
@@ -346,7 +381,19 @@ def generate_station_responses(
         "ribbon_width_m": width,
         "perturbation_magnitudes": values,
         "placements": placements,
+        **station_geometry,
+        "minimum_terminal_supported_overlap_area_m2": min(
+            float(row["terminal_supported_overlap_area_m2"])
+            for row in placements
+        ),
+        "minimum_mechanically_supported_mesh_area_ratio": min(
+            float(row["mesh_area_ratio"]) for row in placements
+        ),
+        "maximum_mechanically_supported_mesh_area_ratio": max(
+            float(row["mesh_area_ratio"]) for row in placements
+        ),
         "interaction_integral_schema": INTERACTION_INTEGRAL_MODEL_ID,
+        "intrinsic_isotropic_fit": interaction_fit,
         "minimum_residual_stiffness_fraction": float(
             minimum_residual_stiffness_fraction
         ),
@@ -369,4 +416,9 @@ def generate_station_responses(
     return report
 
 
-__all__ = ["MODEL_ID", "generate_station_responses"]
+__all__ = [
+    "MODEL_ID",
+    "_active_ribbon_geometry",
+    "_validate_station_geometry",
+    "generate_station_responses",
+]
