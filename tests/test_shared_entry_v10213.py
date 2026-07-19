@@ -44,6 +44,7 @@ def test_monotonic_and_fatigue_install_identical_v10213_engine(monkeypatch):
     seen = []
 
     def fake_main(args):
+        max_fronts_index = args.index("--max-fronts")
         seen.append(
             (
                 shared_entry._anisotropic.AnisotropicStochasticAvalancheTipEngine
@@ -51,6 +52,7 @@ def test_monotonic_and_fatigue_install_identical_v10213_engine(monkeypatch):
                 shared_entry._entry74.AnisotropicStochasticAvalancheTipEngine
                 is shared_entry.StateResolvedSignedBurgersTipEngine,
                 "--fatigue-cycles" in args,
+                args[max_fronts_index + 1],
             )
         )
         return "ok"
@@ -60,7 +62,10 @@ def test_monotonic_and_fatigue_install_identical_v10213_engine(monkeypatch):
     assert shared_entry.main(
         ["--signed-kernel-family", "family.json", "--fatigue-cycles"]
     ) == "ok"
-    assert seen == [(True, True, False), (True, True, True)]
+    assert seen == [
+        (True, True, False, "1"),
+        (True, True, True, "1"),
+    ]
     assert (
         shared_entry._anisotropic.AnisotropicStochasticAvalancheTipEngine
         is original_anisotropic
@@ -74,3 +79,23 @@ def test_parameter_campaign_fails_closed_without_extension_only_authorization(mo
     monkeypatch.setenv("PARAMETER_CAMPAIGN", "1")
     with pytest.raises(SystemExit, match="has not authorized"):
         shared_entry.main(["--signed-kernel-family", "family.json"])
+
+
+def test_branching_and_multiple_fronts_are_outside_v10213_atlas_envelope():
+    with pytest.raises(SystemExit, match="single unbranched front"):
+        shared_entry.main(
+            [
+                "--signed-kernel-family",
+                "family.json",
+                "--crystal-branch",
+            ]
+        )
+    with pytest.raises(SystemExit, match="requires --max-fronts 1"):
+        shared_entry.main(
+            [
+                "--signed-kernel-family",
+                "family.json",
+                "--max-fronts",
+                "2",
+            ]
+        )
