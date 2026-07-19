@@ -15,11 +15,8 @@ from . import anisotropic_emission_v10174 as _anisotropic
 from . import fem as _fem
 from . import sharp_front_v10_1_7_4 as _entry74
 from . import sharp_front_v10_1_7_5 as _transport
-from .physical_fem_capture_v10212 import (
-    MODEL_ID,
-    PhysicalFEMCapture,
-    load_capture_requests,
-)
+from .physical_fem_capture_v10212 import MODEL_ID, load_capture_requests
+from .physical_fem_capture_trace_v10212 import PhysicalFEMCapture
 
 
 def _pop_value(args: list[str], option: str) -> str | None:
@@ -107,7 +104,8 @@ def main(argv=None):
                     "atlas_outroot": str(root.resolve()),
                     "allow_incomplete": allow_incomplete,
                     "capture": audit,
-                    "next_step": "evaluate each captured snapshot with scripts/evaluate_v10_2_12_signed_snapshot.py",
+                    "reachable_state_trace": audit.get("reachable_state_trace"),
+                    "next_step": "select reachable opening/extension states, then evaluate each captured snapshot with scripts/evaluate_v10_2_12_signed_snapshot.py",
                 },
                 indent=2,
             )
