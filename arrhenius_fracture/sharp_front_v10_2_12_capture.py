@@ -68,14 +68,28 @@ def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     state_table = _pop_value(args, "--atlas-state-table")
     outroot = _pop_value(args, "--atlas-outroot")
+    trajectory_only = "--atlas-trajectory-only" in args
+    if trajectory_only:
+        args.remove("--atlas-trajectory-only")
     allow_incomplete = "--allow-incomplete-atlas-capture" in args
     if allow_incomplete:
         args.remove("--allow-incomplete-atlas-capture")
-    if not state_table or not outroot:
-        raise SystemExit(
-            "v10.2.12 capture requires --atlas-state-table PATH and --atlas-outroot PATH"
-        )
-    requests = load_capture_requests(state_table)
+    if not outroot:
+        raise SystemExit("v10.2.12 capture requires --atlas-outroot PATH")
+    if trajectory_only:
+        if state_table:
+            raise SystemExit(
+                "--atlas-trajectory-only must not be combined with --atlas-state-table"
+            )
+        requests = []
+        allow_incomplete = True
+    else:
+        if not state_table:
+            raise SystemExit(
+                "snapshot capture requires --atlas-state-table PATH; use "
+                "--atlas-trajectory-only for discovery"
+            )
+        requests = load_capture_requests(state_table)
     capture = PhysicalFEMCapture(requests, outroot)
     _force_capture_modes(args)
 
@@ -90,6 +104,7 @@ def main(argv=None):
     try:
         print(
             "  v10.2.12 physical FEM atlas capture: "
+            f"mode={'trajectory_only' if trajectory_only else 'snapshot_capture'} "
             f"requests={len(requests)} unsigned_shielding=disabled "
             "kinetics_path=production fem_path=production parameterization=blocked"
         )
@@ -100,12 +115,21 @@ def main(argv=None):
             json.dumps(
                 {
                     "schema": MODEL_ID,
-                    "state_table": str(Path(state_table).resolve()),
+                    "capture_mode": (
+                        "trajectory_only" if trajectory_only else "snapshot_capture"
+                    ),
+                    "state_table": (
+                        str(Path(state_table).resolve()) if state_table else None
+                    ),
                     "atlas_outroot": str(root.resolve()),
                     "allow_incomplete": allow_incomplete,
                     "capture": audit,
                     "reachable_state_trace": audit.get("reachable_state_trace"),
-                    "next_step": "select reachable opening/extension states, then evaluate each captured snapshot with scripts/evaluate_v10_2_12_signed_snapshot.py",
+                    "next_step": (
+                        "select a Cartesian opening/extension state grid from the reachable trace"
+                        if trajectory_only
+                        else "evaluate each captured snapshot with scripts/evaluate_v10_2_12_signed_snapshot.py"
+                    ),
                 },
                 indent=2,
             )
