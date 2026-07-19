@@ -1,0 +1,29 @@
+name: Legacy phase-field inventory audit
+
+on:
+  push:
+    branches:
+      - v10.2.9-pf-czm-consistency-hardening
+
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inventory legacy phase-field references
+        shell: bash
+        run: |
+          set +e
+          find . -path './.git' -prune -o -type f -print | sort > all_files.txt
+          grep -RIlE --exclude-dir=.git --exclude='legacy-phasefield-audit.yml' '(AT[-_ ]?[12]|at[-_ ]?[12])' . | sort > legacy_phasefield_files.txt
+          grep -RInE --exclude-dir=.git --exclude='legacy-phasefield-audit.yml' '(AT[-_ ]?[12]|at[-_ ]?[12])' . > legacy_phasefield_matches.txt
+          grep -Ei '(AT[-_ ]?[12]|at[-_ ]?[12])' all_files.txt > legacy_phasefield_filenames.txt
+          true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pf-legacy-phasefield-inventory-${{ github.run_id }}
+          path: |
+            legacy_phasefield_files.txt
+            legacy_phasefield_matches.txt
+            legacy_phasefield_filenames.txt
+          if-no-files-found: error
