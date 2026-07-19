@@ -83,6 +83,11 @@ class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
 
         compatibility = copy.deepcopy(payload)
         compatibility["schema"] = V10212_SCHEMA
+        compatibility.setdefault("finite_radius_fem_kernel_claimed", False)
+        compatibility.setdefault(
+            "kernel_radius_compatibility_coordinate",
+            KERNEL_RADIUS_COMPATIBILITY_COORDINATE,
+        )
         with tempfile.TemporaryDirectory(prefix="v10214_family_load_") as temp_dir:
             temporary = Path(temp_dir) / "v10212_compatibility.json"
             temporary.write_text(json.dumps(compatibility))
