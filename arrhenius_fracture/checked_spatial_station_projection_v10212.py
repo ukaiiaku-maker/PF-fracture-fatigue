@@ -1,9 +1,9 @@
-"""Provenance-checked wrapper around the v10.2.12 station projection.
+"""Provenance-checked wrapper around measured-station projection.
 
-The PF ``r_eff`` variable is an analytical local-tip stress/blunting state, not a
-geometric coordinate of the fixed-crack FEM problem. It remains in the physical
-snapshot audit, but the shielding atlas compatibility coordinate is held at one.
-The actual interpolation axes are opening fraction and crack extension.
+The PF ``r_eff`` variable is an analytical local-tip state rather than a fixed-
+geometry coordinate.  The projection therefore retains the constant radius
+compatibility coordinate while requiring one reviewed signed interaction-
+integral implementation for every measured response.
 """
 from __future__ import annotations
 
@@ -11,14 +11,14 @@ import csv
 from pathlib import Path
 from typing import Any, Iterable
 
-from .interaction_integral_v1029 import MODEL_ID as REQUIRED_INTERACTION_SCHEMA
+from .interaction_integral_v10214 import MODEL_ID as REQUIRED_INTERACTION_SCHEMA
 from .spatial_station_projection_v10212 import (
     MODEL_ID as PROJECTION_MODEL_ID,
     STATION_SCHEMA,
     expand_station_response_files as _expand_station_response_files,
 )
 
-MODEL_ID = "v10.2.12_checked_measured_station_to_mpz_grid_projection"
+MODEL_ID = "v10.2.14_checked_measured_station_to_mpz_grid_projection"
 KERNEL_RADIUS_COMPATIBILITY_COORDINATE = 1.0
 
 
@@ -62,12 +62,15 @@ def _collapse_radius_axis(expanded: list[dict[str, Any]]) -> dict[str, Any]:
         owner = coordinate_owners.setdefault(coordinate, state_id)
         if owner != state_id:
             raise ValueError(
-                "two physical snapshots collapse to the same opening/extension kernel state: "
-                f"{owner!r} and {state_id!r} at {coordinate}; keep one reviewed state"
+                "two physical snapshots collapse to the same opening/extension "
+                f"kernel state: {owner!r} and {state_id!r} at {coordinate}; "
+                "keep one reviewed state"
             )
     return {
         "kernel_radius_axis_policy": "disabled_constant_compatibility",
-        "kernel_radius_compatibility_coordinate": KERNEL_RADIUS_COMPATIBILITY_COORDINATE,
+        "kernel_radius_compatibility_coordinate": (
+            KERNEL_RADIUS_COMPATIBILITY_COORDINATE
+        ),
         "observed_analytical_r_eff_over_r0_values": observed,
         "observed_analytical_r_eff_over_r0_min": min(observed),
         "observed_analytical_r_eff_over_r0_max": max(observed),
@@ -112,6 +115,7 @@ def expand_station_response_files(
         "interaction_integral_schema": REQUIRED_INTERACTION_SCHEMA,
         "single_interaction_integral_schema_required": True,
         "projected_schema_matches_measured_schema": True,
+        "intrinsic_stiffness_isotropy_required": True,
     }
     return expanded, physical_inputs, report
 
