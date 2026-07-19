@@ -77,6 +77,10 @@ class PhysicalFEMCapture(_BaseCapture):
         super().before_engine_step(engine, K, T)
 
     def _write_trace(self) -> Path:
+        if not self.coordinate_trace:
+            raise RuntimeError(
+                "physical atlas discovery captured no reliable FEM/tensor-probe states"
+            )
         path = self.outroot / "reachable_physical_state_trace.csv"
         with path.open("w", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=TRACE_FIELDS)
