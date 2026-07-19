@@ -1,9 +1,9 @@
 # PF-fracture-fatigue: v10 unified sharp-front MPZ
 
 This repository is the clean sharp-front successor to the mixed legacy
-`PF-Fatigue_code` archive. The production fracture path does **not** evolve an
-AT1 or AT2 phase field. A binary broken-material indicator is retained only for
-stiffness removal and crack-path representation.
+`PF-Fatigue_code` archive. The production fracture path is a discrete,
+event-driven sharp interface. A binary broken-material indicator is retained
+only for stiffness removal and crack-path representation.
 
 The active architecture is:
 
@@ -45,8 +45,8 @@ values, demonstrating that directional-J sign clipping was not the failure.
 
 1. **Sanitized production stack.** The repository contains the sharp-front FEM,
    mesh, crystal, J-integral, unified MPZ, fatigue, and postprocessing modules.
-   Peridynamics, S-N initiation variants, AT2 scientific entry points, and CZM
-   geometry are excluded.
+   Peridynamics, S-N initiation variants, legacy variational-fracture entry
+   points, and CZM geometry are excluded.
 2. **Portable promoted manifests.** The promoted ceramic, weakT, and DBTT CSV
    rows are vendored under `arrhenius_fracture/data/materials`.
 3. **Unified monotonic/fatigue MPZ state.** The active model uses finite source
@@ -163,8 +163,8 @@ by monotonic fracture and does not impose a Paris law.
 - Wake slip is conserved and audited but does not create bridging or
   transformation toughening.
 - Only signed mobile/retained line fields contribute to active/wake shielding.
-- No empirical scalar backstress, `N_sat`, cohesive work, or AT2 fracture
-  criterion is active.
+- No empirical scalar backstress, `N_sat`, cohesive work, or smeared
+  variational-fracture criterion is active.
 - Crack advance remains an event-driven first-passage process.
 
 ## Validation status

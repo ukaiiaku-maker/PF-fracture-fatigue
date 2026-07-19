@@ -1,20 +1,14 @@
-"""v10.2.2 uncapped dislocation shielding.
+"""v10.2.2 uncapped-shielding audit compatibility.
 
-The v10.1 campaign wrapper clipped the linearly superposed dislocation-induced
-stress-intensity contribution to a fitted manifest value.  This module removes
-that constitutive clip.  Shielding is instead limited only by the modeled
-population physics: finite source capacity, Taylor back stress on emission,
-Peierls--Taylor transport and escape, retained-population recovery, and
-moving-frame transfer into the wake.
-
-The old manifest value is retained only as a diagnostic reference so cap
-exceedance can be quantified without affecting the kinetics.
+The constitutive law now lives permanently in the shared campaign-calibrated
+engine and is uncapped for monotonic fracture and fatigue alike.  This module no
+longer replaces any constitutive method.  It only records raw/effective samples
+and rewrites historical audit files so older runners remain interpretable.
 """
 from __future__ import annotations
 
 from contextlib import contextmanager
 import json
-import math
 from pathlib import Path
 from typing import Any
 
@@ -41,7 +35,10 @@ def physical_shielding_audit_payload() -> dict[str, Any]:
         abs(float(row["raw_Pa_sqrt_m"]) - float(row["effective_Pa_sqrt_m"]))
         for row in _SAMPLES
     ]
-    legacy = [max(float(row["legacy_cap_reference_Pa_sqrt_m"]), 0.0) for row in _SAMPLES]
+    legacy = [
+        max(float(row["legacy_cap_reference_Pa_sqrt_m"]), 0.0)
+        for row in _SAMPLES
+    ]
     exceed = [
         bool(cap > 0.0 and value > cap)
         for value, cap in zip(raw, legacy)
@@ -57,6 +54,7 @@ def physical_shielding_audit_payload() -> dict[str, Any]:
         "constitutive_K_shield_clip_applied": False,
         "legacy_manifest_cap_used_in_kinetics": False,
         "legacy_manifest_cap_retained_as_diagnostic_reference": True,
+        "diagnostic_context_modifies_constitutive_method": False,
         "population_saturation_controls": [
             "finite_crack_tip_source_capacity",
             "Taylor_backstress_reduces_emission_rate",
@@ -77,16 +75,12 @@ def physical_shielding_audit_payload() -> dict[str, Any]:
 
 @contextmanager
 def install_uncapped_physical_shielding():
-    """Temporarily replace the campaign hard cap by the raw shielding field."""
+    """Record shielding diagnostics without changing the shared constitutive law."""
     from .campaign_calibrated_tip import CampaignCalibratedTipEngine
 
-    original_active = CampaignCalibratedTipEngine._active_shielding_signed
     original_diagnostics = CampaignCalibratedTipEngine._campaign_diagnostics
 
-    def uncapped_active(self) -> float:
-        return float(self._active_shielding_raw_uncapped())
-
-    def uncapped_diagnostics(self) -> dict[str, Any]:
+    def audited_diagnostics(self) -> dict[str, Any]:
         payload = dict(original_diagnostics(self))
         raw = float(self._active_shielding_raw_uncapped())
         effective = float(self._active_shielding_signed())
@@ -100,6 +94,7 @@ def install_uncapped_physical_shielding():
                 "campaign_shielding_cap_applied": False,
                 "campaign_shielding_population_limited": True,
                 "campaign_shielding_model_id": MODEL_ID,
+                "campaign_diagnostic_context_constitutive_patch": False,
             }
         )
         _SAMPLES.append(
@@ -111,12 +106,10 @@ def install_uncapped_physical_shielding():
         )
         return payload
 
-    CampaignCalibratedTipEngine._active_shielding_signed = uncapped_active
-    CampaignCalibratedTipEngine._campaign_diagnostics = uncapped_diagnostics
+    CampaignCalibratedTipEngine._campaign_diagnostics = audited_diagnostics
     try:
         yield
     finally:
-        CampaignCalibratedTipEngine._active_shielding_signed = original_active
         CampaignCalibratedTipEngine._campaign_diagnostics = original_diagnostics
 
 

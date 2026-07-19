@@ -30,9 +30,9 @@ class GeometryConfig:
 class MeshConfig:
     """Mesh parameters.
 
-    By default the phase-field length is tied to the mesh,
+    By default the regularization length is tied to the mesh,
     ell = ell_factor*hbar.  For convergence studies, set ell_absolute_m
-    to keep the physical phase-field/process-zone length fixed while h is
+    to keep the physical process-zone length fixed while h is
     refined.  In that case ell_factor is used only for reporting.
     """
     nx: int = 80               # nodes in x
@@ -526,46 +526,11 @@ class AutoStopConfig:
 
 
 @dataclass
-class PhaseFieldConfig:
-    """Phase-field fracture parameters."""
+class FractureResistanceConfig:
+    """Intrinsic fracture-resistance regularization parameters."""
     Gc_baseline: float = 1.0   # baseline fracture energy [J/m²]
-    kappa: float = 1e-6        # residual stiffness in degradation
-    Gc0_athermal: float = 7.0  # athermal cleavage energy 2*gamma_s [J/m²] (W)
+    Gc0_athermal: float = 7.0  # athermal cleavage energy 2*gamma_s [J/m²]
     K_floor: float = 0.2e6     # minimum toughness [Pa*sqrt(m)]
-
-    # Emergent process-zone toughening from plastic work.  The legacy
-    # implementation used a direct algebraic mapping Gc_local = Gc0 + eta*Wp*ell.
-    # That is useful as an ablation but can double-count plastic work as both
-    # dissipation and fracture resistance.  The default below uses an internal
-    # shielding/toughening state q_Gc(x) [J/m^2].  Accepted plastic work near the
-    # crack/process zone drives q_Gc; q_Gc has explicit storage/dissipation
-    # diagnostics and enters Gc_local = Gc0 + q_Gc.
-    plastic_work_to_Gc_efficiency: float = 0.05
-    Gc_local_cap_factor: float = 100.0
-    wp_gc_coupling_mode: Literal['off', 'direct', 'state'] = 'state'
-    toughening_front_only: bool = True
-    toughening_wake_weight: float = 0.25
-    toughening_storage_coeff: float = 0.05
-    toughening_dissipation_coeff: float = 0.02
-    toughening_relax_per_step: float = 0.0
-    toughening_include_in_energy_audit: bool = True
-
-    # Damage-evolution stabilization.  The older code used dt*Gamma0 with
-    # Gamma0=1e6 and dt=1 s, so any positive AT2 drive forced d -> 1 almost
-    # immediately.  That makes the crack run through the J-annulus before it
-    # can be measured.  For quasi-static fracture, the variational AT2 solution
-    # should dominate; the extra Model-A kinetic drive is optional and off by
-    # default.  A per-stagger cap keeps damage growth resolvable in snapshots.
-    use_kinetic_damage_drive: bool = False
-    max_damage_increment_per_stagger: float = 0.03
-    damage_drive_cap: float = 20.0
-    # Optional irreversible AT2 damage dissipation diagnostic/sink.  This is
-    # useful when crack growth is hazard-driven and a crack jump releases elastic
-    # energy over one quasi-static increment.  The term is
-    #   D_frac += integral (Gc/(2 ell)) * d_mid * Delta d dV.
-    include_fracture_dissipation_audit: bool = True
-
-    # Gc regularization
     regularization: Literal['floor_and_ceiling', 'floor_only', 'none'] = 'floor_and_ceiling'
 
 
@@ -789,7 +754,7 @@ class TipMemoryConfig:
 
     The memory changes only the local crack-tip stress/energy amplification used
     by the fracture update.  It does not introduce a second fracture barrier,
-    does not modify intrinsic Gc, and does not change the PF mobility.
+    does not modify intrinsic Gc, and does not alter the sharp-front event kinetics.
     """
     enabled: bool = True
     mode: Literal['off', 'weak_stage1', 'stage1'] = 'stage1'
@@ -829,7 +794,7 @@ class TipMemoryConfig:
     lambda_tip: float = 5.0
     kappa_tip_max: float = 4.0
 
-    # Coupling of the amplified local stress to the PF damage drive.  Energy
+    # Coupling of the amplified local stress to the local event drive.  Energy
     # density scales approximately as stress^2, so exponent=2 is the default.
     couple_to_damage_drive: bool = True
     drive_exponent: float = 2.0
@@ -898,8 +863,8 @@ class ProcessZoneKineticsConfig:
     # the whole dislocation cloud.  When True (default) the G_stored_release that
     # is subtracted from Gc_net is multiplied by the strict crack-front weight,
     # the same mask already applied to the crack-drive force.  Without this, a
-    # broad high-rho zone collapses Gc everywhere and AT2 produces a diffuse
-    # damage cloud instead of a connected crack.
+    # broad high-rho zone collapses resistance throughout the body and produces
+    # diffuse failure instead of a connected sharp crack.
     crack_stored_release_front_masked: bool = True
 
     # Emission / mobility / storage separation.  Tip nucleation creates an
@@ -966,115 +931,6 @@ class ProcessZoneKineticsConfig:
     # Crack advance erases/convects crack-tip memory and shielding.
     crack_advance_memory_erasure: float = 1.0
 
-    # Arrhenius crack-growth hazard.  The variational AT2 phase-field solution
-    # is used as the thermodynamic target, but advance toward that target is
-    # controlled by a crack-growth event probability based on
-    #     G_eff = G_app - G_shield + G_stored_release.
-    # This is the crack-opening analogue of the time-cone formulation: at low
-    # drive, crack advance is statistical; at high drive, the barrier collapses
-    # and the update approaches deterministic AT2.
-    crack_hazard_enabled: bool = False
-    crack_hazard_model: Literal['arrhenius', 'eyring'] = 'arrhenius'
-    # ratio: legacy G_eff/Gc barrier collapse.
-    # resolved_stress: paper-aligned first-passage hazard using the resolved
-    # near-tip stress in the fracture barrier G*_f(sigma_tip,T).
-    crack_hazard_drive: Literal['ratio', 'resolved_stress'] = 'ratio'
-    crack_first_passage: bool = False     # accumulate B=integral(lambda dt) instead of re-rolling each step
-    crack_B_target: float = 1.0           # first-passage threshold B~1
-    crack_B_cap: float = 5.0              # numerical cap for accumulated action
-    crack_B_reset_damage: float = 0.95    # reset B in fully damaged wake
-    # --- Correlated (multi-hit) cleavage renewal ---
-    # Advancing the front by one increment requires m cooperative activated
-    # events (kink-pair nucleations / bond ruptures over a front correlation
-    # length) within one renewal window tau_c, instead of a single Poisson
-    # event.  Effective completed-event rate:
-    #     lambda_eff = P[>= m events at rate lambda in tau_c] / tau_c
-    #                = gammainc(m, lambda*tau_c) / tau_c   (regularized lower)
-    # m=1 recovers the independent Poisson clock exactly in the lambda*tau_c<<1
-    # limit and is capped at the renewal bound 1/tau_c.  Sub-threshold (flank)
-    # rates are suppressed combinatorially ~ (lambda*tau_c)^m / m!, which
-    # concentrates advance at the peak-stress node -> straight cracks.
-    crack_multihit_m: float = 1.0         # cooperative hit count (1 = off/Poisson)
-    crack_multihit_tau_s: float = 1e-9    # renewal window tau_c [s]
-    # --- Sub-critical action relaxation (annealing) ---
-    # dB/dt = lambda - B/tau_relax: action accumulated below threshold anneals
-    # instead of ratcheting forever (an atomistically sharp tip below threshold
-    # heals; it does not store a cleavage fuse).  <=0 disables (legacy ratchet).
-    crack_B_relax_time_s: float = 0.0
-    # --- Crack advance coupling mode ---
-    # 'gate'  (legacy): hazard probability P gates advance toward the
-    #         variational AT2 target, d <- d + P*(d_pf - d).  If the smeared
-    #         drive H/Hc has not reached threshold, d_pf ~ d and the crack
-    #         STALLS even with P=1 (B at cap): the de-smeared sigma_tip lives
-    #         only inside the hazard, not in the AT2 target.
-    # 'source': a completed first-passage event (B >= B_target on the
-    #         connected front) IS the sub-grid bond rupture; fired nodes are
-    #         driven to d=1 and the AT2 solve relaxes the profile.  Crack
-    #         advance is then controlled by the hazard clock (the physics),
-    #         with AT2 supplying only regularization.
-    crack_advance_mode: Literal['gate', 'source'] = 'gate'
-    crack_fire_front_weight_min: float = 0.5  # min front weight for a fired node to break (blocks remote nucleation)
-    crack_fire_griffith_frac: float = 1.0     # source mode: fired node breaks only if G_eff >= frac*Gc_net (energy license); <=0 disables
-    # Fired cleavage events consume the local blunting toughening q_blunt
-    # (fraction per fired stagger).  Cleavage re-initiates sharply ahead of the
-    # blunted tip and cuts through the R-curve halo; without this the
-    # variational target can freeze (Gc_local halo) with B at cap.  The
-    # consumed q is re-booked from toughening storage to dissipation
-    # (energy-conserving).  0 disables (legacy).
-    crack_fire_consume_toughening_frac: float = 0.0
-    crack_fire_consume_radius_factor: float = 1.5
-    crack_fired_gc_relief: float = 0.05  # Gc_local multiplier at fired nodes
-    crack_fire_connect_dthr: float = 0.8   # connectivity threshold for the crack component
-    crack_fire_connect_layers: int = 2
-    crack_source_fw_min: float = 0.3      # front-weight floor for SOURCE firing (flank/wake exclusion)     # frontier width (node layers) eligible to fire  # Gc_local multiplier at fired nodes in source mode (cleavage resistance collapse)  # consumption footprint radius in units of ell around fired nodes
-    crack_resolved_stress_scale: float = 1.0  # multiplier on resolved/amplified tip stress
-    # Process-zone de-smearing of the resolved tip stress (resolved_stress drive).
-    # The FEM/AT2 field is smoothed over ell; the Arrhenius fracture instability
-    # is driven by the stress at the physical process-zone radius r_pz, so the
-    # tip stress is intensified by chi = sqrt(ell/r_pz) (mesh-objective).  r_pz
-    # sets the emergent brittle toughness.  Disabled when <= 0.
-    crack_process_zone_r_pz_m: float = 0.0
-    crack_desmear_max: float = 1e3            # cap on the de-smearing factor chi
-    crack_sigma_cap_Pa: float = 0.0           # optional cohesive/spinodal ceiling on tip stress (<=0 = off)
-    # --- Crack-tip dislocation EMISSION (Rice-Thomson competition) ---
-    # The native exp_floor barrier is a dislocation surface-nucleation barrier
-    # (nanopillar fits), so it is the natural crack-tip EMISSION barrier.  At the
-    # same stress-concentrated tip stress as cleavage, an emission first-passage
-    # hazard competes with the cleavage hazard: when emission wins it injects
-    # emitted-dislocation density rho_emit at the front, which shields the tip
-    # through the SAME elastic backstress path as the bulk process zone
-    # (G_shield = cshield*tau_back(rho_emit)^2/E'*ell), lowering the cleavage
-    # driving force (blunting/ductile).  The emission barrier's entropy/height is
-    # the knob that sets the DBTT temperature.  Disabled by default.
-    crack_emission_enabled: bool = False
-    crack_emission_eta0: float = 1e12          # [1/s] emission attempt frequency
-    crack_emission_B_target: float = 1.0       # emission first-passage threshold
-    crack_emission_rho_max: float = 1e15       # [1/m^2] saturation emitted density at the tip
-    crack_emission_energy_scale: float = 1.0   # exp_floor energy scale for emission (1.0 = native nanopillar)
-    crack_emission_entropy_scale: float = 1.0  # exp_floor entropy scale for emission (DBTT knob; <1 reduces |S|)
-    crack_emission_stress_scale: float = 1.0   # exp_floor stress scale for emission
-    crack_emission_backstress_alpha: float = 0.35  # alpha in tau_back = alpha*G*b*sqrt(rho_emit)
-    crack_eta0: float = 1e12              # [1/s] attempt frequency for crack advance events
-    crack_H0_eV: float = 1.0              # zero-drive crack-growth activation barrier [eV]
-    crack_drive_exponent: float = 2.0     # barrier collapse exponent vs G_eff/Gc_net
-    crack_probability_cap: float = 0.05   # keeps crack event increments resolvable
-    crack_drive_scale: float = 1.0        # multiplier on G_eff/Gc_net in the hazard
-    # When enabled, the crack phase-field target is driven by the same shielded
-    # effective crack driving force used by the hazard:
-    #     G_eff = G_app - G_shield + G_stored_release.
-    # This allows a stored-energy-degraded process-zone path to become a crack
-    # growth target even while the elastic AT2 history alone is still weak.
-    crack_use_effective_drive: bool = True
-    crack_effective_drive_mix: float = 1.0  # 0=diagnostic only, 1=fully use G_eff at front
-    # Strict localization for the degraded effective crack drive.  These prevent
-    # stored-energy release from acting as a broad bulk phase-field damage source.
-    crack_front_radius_factor: float = 1.25
-    crack_front_grad_threshold: float = 0.50
-    crack_front_dmax: float = 0.92
-    crack_front_wake_dmax: float = 0.85
-    crack_front_wake_width: float = 0.10
-    crack_eyring_volume_factor: float = 1.0 # dimensionless Eyring bias multiplier
-    shield_crack_drive: bool = True
 
 
 @dataclass
@@ -1154,7 +1010,7 @@ class SimulationConfig:
     fracture_barrier: FractureBarrier = field(default_factory=FractureBarrier)
     loading: LoadingConfig = field(default_factory=LoadingConfig)
     auto_stop: AutoStopConfig = field(default_factory=AutoStopConfig)
-    phase_field: PhaseFieldConfig = field(default_factory=PhaseFieldConfig)
+    fracture_resistance: FractureResistanceConfig = field(default_factory=FractureResistanceConfig)
     dislocations: DislocationConfig = field(default_factory=DislocationConfig)
     tip_memory: TipMemoryConfig = field(default_factory=TipMemoryConfig)
     process_zone: ProcessZoneKineticsConfig = field(default_factory=ProcessZoneKineticsConfig)
@@ -1211,7 +1067,7 @@ def make_dbtt_config() -> SimulationConfig:
         S0_neg_kB=3.0, sigma0_S_GPa=2.0,
         use_negative_entropy=True,
     )
-    cfg.phase_field.regularization = 'none'
+    cfg.fracture_resistance.regularization = 'none'
     return cfg
 
 
@@ -1230,7 +1086,7 @@ def make_ceramic_config() -> SimulationConfig:
         S0_neg_kB=1.0, sigma0_S_GPa=5.0,
         use_negative_entropy=False,
     )
-    cfg.phase_field.regularization = 'floor_only'
+    cfg.fracture_resistance.regularization = 'floor_only'
     return cfg
 
 
@@ -1245,8 +1101,8 @@ def make_cohesive_dbtt_config() -> SimulationConfig:
         length_factor=0.02,
         use_emission=True,
     )
-    cfg.phase_field.regularization = 'none'
-    cfg.phase_field.Gc_baseline = 7.0
+    cfg.fracture_resistance.regularization = 'none'
+    cfg.fracture_resistance.Gc_baseline = 7.0
     return cfg
 
 
@@ -1300,9 +1156,9 @@ def make_emergent_config() -> SimulationConfig:
     cfg.plasticity_barrier.psiV = 0.70
 
     # Constant intrinsic fracture energy (W cleavage: 2*gamma_s ≈ 7 J/m²)
-    cfg.phase_field.Gc_baseline = 7.0
-    cfg.phase_field.Gc0_athermal = 7.0
-    cfg.phase_field.regularization = 'none'
+    cfg.fracture_resistance.Gc_baseline = 7.0
+    cfg.fracture_resistance.Gc0_athermal = 7.0
+    cfg.fracture_resistance.regularization = 'none'
 
     # Quasi-static loading: dt * dU must give strain rate << plastic flow rate
     # Max plastic flow rate: eta0*(b/delta)^4 ~ 0.14/s at rho0=5e12
@@ -1337,14 +1193,9 @@ def make_emergent_config() -> SimulationConfig:
 
     # Emergent plastic shielding should be conservative because the explicit
     # plastic update overestimates Wp before stress relaxation.
-    cfg.phase_field.plastic_work_to_Gc_efficiency = 0.05
-    cfg.phase_field.Gc_local_cap_factor = 100.0
 
     # Stabilize damage evolution so the crack does not jump through the
     # entire J-integral annulus in one pseudo-time increment.
-    cfg.phase_field.use_kinetic_damage_drive = False
-    cfg.phase_field.max_damage_increment_per_stagger = 0.03
-    cfg.phase_field.damage_drive_cap = 20.0
 
     # Tip memory: enable to see blunting/sharpening effects
     cfg.tip_memory.enabled = True

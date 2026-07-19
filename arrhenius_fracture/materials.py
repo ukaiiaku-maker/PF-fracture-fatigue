@@ -12,7 +12,7 @@ import numpy as np
 from typing import Callable, Optional
 from .config import (
     KB, EV_TO_J, ElasticProperties, PlasticityBarrier,
-    FractureBarrier, HazardConfig, PhaseFieldConfig
+    FractureBarrier, HazardConfig, FractureResistanceConfig
 )
 
 
@@ -157,11 +157,11 @@ class FractureModel:
     """
 
     def __init__(self, barrier: FractureBarrier, mat: ElasticProperties,
-                 hazard: HazardConfig = None, pf: PhaseFieldConfig = None):
+                 hazard: HazardConfig = None, resistance: FractureResistanceConfig = None):
         self.fb = barrier
         self.mat = mat
         self.hazard = hazard or HazardConfig()
-        self.pf = pf or PhaseFieldConfig()
+        self.fracture = resistance or FractureResistanceConfig()
         self._Kdot_eff = None  # calibrated on first use
         self._T_cal = None
 
@@ -174,7 +174,7 @@ class FractureModel:
         Kc_ref = self.toughness_lambertw(T_cal, r0)
         self._T_cal = T_cal
 
-        if T_cal <= 0 or Kc_ref <= self.pf.K_floor:
+        if T_cal <= 0 or Kc_ref <= self.fracture.K_floor:
             self._Kdot_eff = 1.0  # fallback
             return
 
@@ -201,8 +201,8 @@ class FractureModel:
         """
         Compute effective fracture energy Gc(T).
 
-        This is the SINGLE point where Arrhenius barrier physics enters
-        the phase-field fracture model. The PF mobility is constant.
+        This is the single point where Arrhenius barrier physics enters
+        the intrinsic sharp-front fracture resistance.
 
         Parameters
         ----------
@@ -229,14 +229,14 @@ class FractureModel:
         Gc_arr = Kc**2 / self.mat.Eprime
 
         # Regularize
-        Gc0 = self.pf.Gc0_athermal
-        Gc_floor = max(self.pf.Gc_baseline,
-                       (self.pf.K_floor**2) / self.mat.Eprime)
+        Gc0 = self.fracture.Gc0_athermal
+        Gc_floor = max(self.fracture.Gc_baseline,
+                       (self.fracture.K_floor**2) / self.mat.Eprime)
         Gc_ceiling = Gc0
 
-        if self.pf.regularization == 'floor_and_ceiling':
+        if self.fracture.regularization == 'floor_and_ceiling':
             return np.clip(Gc_arr, Gc_floor, Gc_ceiling)
-        elif self.pf.regularization == 'floor_only':
+        elif self.fracture.regularization == 'floor_only':
             return max(Gc_floor, Gc_arr)
         else:
             return max(1e-30, Gc_arr)
@@ -262,12 +262,12 @@ class FractureModel:
         if T <= 0:
             # At T=0, only athermal channel
             K0_lat = haz.K0_lattice_MPa * 1e6
-            return max(K0_lat, self.pf.K_floor)
+            return max(K0_lat, self.fracture.K_floor)
 
         Kdot_eff = max(self._Kdot_eff, 1e-30)
 
         # K grid
-        K_max = max(5 * self.pf.K_floor, 50e6)
+        K_max = max(5 * self.fracture.K_floor, 50e6)
         NK = 4000
         K = np.linspace(0, K_max, NK)
         sigma = phi_tip * K
@@ -314,7 +314,7 @@ class FractureModel:
                 np.exp((K0_lat - m) / dK_lat)
             )
 
-        return max(Kc_eff, self.pf.K_floor)
+        return max(Kc_eff, self.fracture.K_floor)
 
     def toughness_lambertw(self, T: float, r0: float) -> float:
         """
@@ -331,7 +331,7 @@ class FractureModel:
         beta = 1.0 / self.fb.sigma0_v
 
         if T <= 0:
-            return self.pf.K_floor
+            return self.fracture.K_floor
 
         arg = -beta * KB * T / v0
         arg = max(arg, -1/np.e + 1e-12)
@@ -347,7 +347,7 @@ class FractureModel:
         phi_tip = 1.0 / np.sqrt(2 * np.pi * max(r0, 1e-12))
         Kc = sig_star / phi_tip  # note: phi_tip is the inverse factor
 
-        return max(Kc, self.pf.K_floor)
+        return max(Kc, self.fracture.K_floor)
 
 
 def _lambertw_newton(z: float, tol: float = 1e-12, maxiter: int = 50) -> float:
