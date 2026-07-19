@@ -1,12 +1,11 @@
 """v10.2.14 physical signed-slip perturbation evaluator.
 
-The fixed-crack FEM uses a nodal damage field only to degrade stiffness through
-``g=(1-d_e)^2+kappa``.  A surface-emitted slip ribbon is therefore allowed to
-start on the crack surface and to overlap the fully killed crack band, but the
-represented eigenstrain is applied only in elements that still carry a
-specified minimum residual stiffness.  This preserves the intended
-surface-terminated dislocation topology without treating partially damaged,
-load-bearing process-zone elements as voids.
+The geometric ribbon starts at the physical crack surface.  Its eigenstrain is
+removed only from elements that are mechanically killed according to the same
+residual-stiffness law used by the FEM.  Signed SIFs are extracted with the
+v10.2.14 intrinsic-isotropy interaction integral, which derives consistent
+elastic constants from the supplied stiffness matrix and still rejects genuine
+anisotropy.
 """
 from __future__ import annotations
 
@@ -14,7 +13,7 @@ from typing import Any
 
 import numpy as np
 
-from .interaction_integral_v1029 import (
+from .interaction_integral_v10214 import (
     MODEL_ID as INTERACTION_INTEGRAL_MODEL_ID,
     compute_signed_interaction_integral,
 )
@@ -25,7 +24,7 @@ from .unit_slip_perturbation_v1026 import (
     solve_fixed_crack_state,
 )
 
-MODEL_ID = "v10.2.14_physical_signed_slip_stiffness_masked_analytic_interaction_integral"
+MODEL_ID = "v10.2.14_physical_signed_slip_stiffness_masked_intrinsic_isotropy_interaction_integral"
 DEFAULT_STIFFNESS_KAPPA = 1.0e-6
 DEFAULT_MINIMUM_RESIDUAL_STIFFNESS_FRACTION = 1.0e-3
 
@@ -91,13 +90,6 @@ def _mask_killed_ribbon_elements(
     minimum_residual_stiffness_fraction: float,
     stiffness_kappa: float,
 ) -> tuple[np.ndarray, dict[str, Any]]:
-    """Remove eigenstrain only from mechanically killed elements.
-
-    The geometric ribbon may originate on a crack surface and may therefore
-    overlap the killed crack band.  Those elements already have negligible
-    stiffness and cannot represent physical line content.  Partially damaged
-    elements are retained according to the same degradation law as the FEM.
-    """
     value = np.asarray(increment, dtype=float).copy()
     if value.ndim != 2 or value.shape[1] != int(mesh.ne):
         raise ValueError("slip-ribbon increment must have shape (nstrain, mesh.ne)")
@@ -182,7 +174,6 @@ def interaction_response(
     ),
     stiffness_kappa: float = DEFAULT_STIFFNESS_KAPPA,
 ) -> dict[str, Any]:
-    """Evaluate one signed line perturbation about an equilibrated fixed crack."""
     raw_increment, perturbation_audit = slip_ribbon_eigenstrain_increment(
         mesh, perturbation
     )
@@ -211,33 +202,27 @@ def interaction_response(
         Uy_bot=Uy_bot,
         cohesive_network=cohesive_network,
     )
-    base_K = compute_signed_interaction_integral(
-        mesh,
-        base_state["u"],
-        base_state["sigma_gp"],
-        d,
-        crack_tip,
-        crack_direction,
-        mat,
-        interaction_ell_m,
+    common = dict(
+        mesh=mesh,
+        d=d,
+        crack_tip=crack_tip,
+        crack_direction=crack_direction,
+        mat=mat,
+        ell=interaction_ell_m,
         cfg=interaction_cfg,
         crack_segments=crack_segments,
         exclude_radius=exclude_radius_m,
         D=D,
     )
+    base_K = compute_signed_interaction_integral(
+        u=base_state["u"],
+        sigma_gp=base_state["sigma_gp"],
+        **common,
+    )
     perturbed_K = compute_signed_interaction_integral(
-        mesh,
-        perturbed["u"],
-        perturbed["sigma_gp"],
-        d,
-        crack_tip,
-        crack_direction,
-        mat,
-        interaction_ell_m,
-        cfg=interaction_cfg,
-        crack_segments=crack_segments,
-        exclude_radius=exclude_radius_m,
-        D=D,
+        u=perturbed["u"],
+        sigma_gp=perturbed["sigma_gp"],
+        **common,
     )
     content = float(perturbation.signed_line_content)
     if content == 0.0:
