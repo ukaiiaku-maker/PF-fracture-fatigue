@@ -12,7 +12,7 @@ PYTHON_BIN=${PYTHON_BIN:-python}
 
 case "$MODE" in
   normalization)
-    : "${ENGINE_CONFIG:?Set ENGINE_CONFIG to a captured complete engine JSON}"
+    : "${ENGINE_CONFIG:?Set ENGINE_CONFIG to snapshot.json or a complete engine JSON}"
     : "${OUT:?Set OUT to a new normalization JSON}"
     MINIMUM_SPACING_B=${MINIMUM_SPACING_B:-10}
     MAXIMUM_SPACING_B=${MAXIMUM_SPACING_B:-100}
@@ -45,19 +45,26 @@ case "$MODE" in
     ;;
   evaluate)
     : "${SNAPSHOT:?Set SNAPSHOT to one captured state directory}"
-    : "${OUT:?Set OUT to a new signed-response CSV}"
+    : "${OUT:?Set OUT to a new measured-station response CSV}"
     MAGNITUDES=${MAGNITUDES:-"0.25 0.50"}
     args=(--snapshot "$SNAPSHOT" --out "$OUT" --magnitudes "$MAGNITUDES")
     if [[ -n "${RIBBON_WIDTH_M:-}" ]]; then
       args+=(--ribbon-width-m "$RIBBON_WIDTH_M")
     fi
+    if [[ -n "${MINIMUM_STATION_SPACING_M:-}" ]]; then
+      args+=(--minimum-station-spacing-m "$MINIMUM_STATION_SPACING_M")
+    fi
     exec "$PYTHON_BIN" scripts/evaluate_v10_2_12_signed_snapshot.py "${args[@]}"
     ;;
   build-review|authorize)
-    : "${RESPONSES:?Set RESPONSES to a space-separated list of physical response CSVs}"
+    : "${RESPONSES:?Set RESPONSES to a space-separated list of measured-station CSVs}"
     : "${NORMALIZATION:?Set NORMALIZATION to the v10.2.12 mechanics normalization JSON}"
     : "${OUT:?Set OUT to a new atlas JSON}"
-    args=(--normalization "$NORMALIZATION" --out "$OUT")
+    SPATIAL_CV_TOL=${SPATIAL_CV_TOL:-0.10}
+    args=(
+      --normalization "$NORMALIZATION" --out "$OUT"
+      --spatial-cross-validation-tolerance "$SPATIAL_CV_TOL"
+    )
     for path in $RESPONSES; do
       args+=(--responses "$path")
     done
