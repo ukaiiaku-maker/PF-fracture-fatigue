@@ -135,13 +135,16 @@ class ExtensionOnlySigned2DShieldingKernelFamily(_V10212Family):
             raise ValueError("observed analytical radius must be positive and finite")
         if not np.isfinite(observed_opening) or not 0.0 <= observed_opening <= 1.0:
             raise ValueError("observed opening fraction must lie in [0,1]")
-        self._last_observed_analytical_r_eff_over_r0 = observed_r
-        self._last_observed_opening_strength_fraction = observed_opening
-        return super()._prepare_query(
+        query = super()._prepare_query(
             KERNEL_RADIUS_COMPATIBILITY_COORDINATE,
             OPENING_COMPATIBILITY_COORDINATE,
             float(crack_extension_m),
         )
+        # The v10.2.12 compatibility resolver records the forced radius. Restore
+        # the actual runtime diagnostics after the compatibility query is built.
+        self._last_observed_analytical_r_eff_over_r0 = observed_r
+        self._last_observed_opening_strength_fraction = observed_opening
+        return query
 
     def audit_payload(self) -> dict[str, Any]:
         payload = super().audit_payload()
