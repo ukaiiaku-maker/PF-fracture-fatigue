@@ -1,6 +1,17 @@
-"""Arrhenius sharp-front fracture and fatigue with unified MPZ state."""
+"""Arrhenius sharp-front PF fracture and fatigue with unified MPZ state.
 
+This repository currently shares the historical top-level package name
+``arrhenius_fracture`` with the separate Arrhenius_FEM_CZM_MPZ distribution.
+The explicit identity constants allow launchers to fail closed instead of
+silently importing the other editable installation.
+"""
+
+# Historical public API version retained for protected v10.1 entry-point tests.
 __version__ = "10.1.7.3"
+PROJECT_RELEASE = "10.2.14"
+PROJECT_ID = "PF-fracture-fatigue"
+PROJECT_REPOSITORY = "ukaiiaku-maker/PF-fracture-fatigue"
+PACKAGE_NAMESPACE = "arrhenius_fracture"
 
 from .material_manifest import MaterialManifest
 from .unified_mpz import MPZConfig, UnifiedMPZState
@@ -19,15 +30,17 @@ from .stochastic_avalanche_tip import (
     StochasticAvalancheDiagnosticTipEngine,
 )
 
-# Preserve the separated public continuum class by default. Protected versioned
-# entry points switch only their own process to campaign, diagnostic, or pilot
-# engines.
 _continuum_source_tip.ContinuumSourceKineticTipEngine = (
     SeparatedSourceKineticTipEngine
 )
 ContinuumSourceKineticTipEngine = SeparatedSourceKineticTipEngine
 
 __all__ = [
+    "__version__",
+    "PROJECT_RELEASE",
+    "PROJECT_ID",
+    "PROJECT_REPOSITORY",
+    "PACKAGE_NAMESPACE",
     "MaterialManifest",
     "MPZConfig",
     "UnifiedMPZState",
