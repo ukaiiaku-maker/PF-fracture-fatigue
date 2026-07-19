@@ -1,9 +1,10 @@
 """Validate measured signed stations and project them onto the reduced MPZ grid.
 
-The v10.2.12 measured active+wake schema remains supported.  v10.2.14 adds a
-fail-closed active-only schema: active curves are measured and cross-validated,
-while every wake coefficient is generated as an explicit exact zero because the
-current scalar wake state cannot represent two-dimensional signed line positions.
+The v10.2.12 measured active+wake schema remains supported. v10.2.14 adds a
+fail-closed active-only schema: active curves are measured at exact physical
+endpoints and cross-validated, while every wake coefficient is generated as an
+explicit exact zero because the current scalar wake state cannot represent
+two-dimensional signed line positions.
 """
 from __future__ import annotations
 
@@ -21,7 +22,7 @@ from .physical_fem_snapshot_v10212 import RESPONSE_COLUMNS
 MODEL_ID = "v10.2.14_measured_active_station_to_mpz_grid_projection"
 STATION_SCHEMA = "v10.2.12_fem_resolved_signed_spatial_station_responses"
 ACTIVE_ONLY_STATION_SCHEMA = (
-    "v10.2.14_production_mesh_active_signed_spatial_station_responses"
+    "v10.2.14_exact_endpoint_active_signed_spatial_station_responses"
 )
 ACCEPTED_STATION_SCHEMAS = {STATION_SCHEMA, ACTIVE_ONLY_STATION_SCHEMA}
 
@@ -218,6 +219,11 @@ def expand_station_response_files(
                 and audit.get("wake_shielding_supported") is False
             )
         )
+        if active_only:
+            if audit.get("exact_endpoint_mapping_passed") is not True:
+                raise ValueError(f"{audit_path} lacks the exact endpoint-mapping gate")
+            if audit.get("distinct_requested_stations_have_distinct_endpoints") is not True:
+                raise ValueError(f"{audit_path} contains collapsed active endpoints")
         with path.open(newline="") as handle:
             reader = csv.DictReader(handle)
             rows = list(reader)
