@@ -1,9 +1,9 @@
 """Provenance-checked wrapper around measured-station projection.
 
-The PF ``r_eff`` variable is an analytical local-tip state rather than a fixed-
-geometry coordinate.  The projection therefore retains the constant radius
-compatibility coordinate while requiring one reviewed signed interaction-
-integral implementation for every measured response.
+Archived v10.2.12 atlases retain the reviewed v10.2.9 isotropic interaction
+schema.  New v10.2.14 production responses use intrinsic stiffness isotropy.
+A build may use either reviewed schema, but mixing schemas within one response
+set is prohibited.
 """
 from __future__ import annotations
 
@@ -11,7 +11,8 @@ import csv
 from pathlib import Path
 from typing import Any, Iterable
 
-from .interaction_integral_v10214 import MODEL_ID as REQUIRED_INTERACTION_SCHEMA
+from .interaction_integral_v1029 import MODEL_ID as LEGACY_INTERACTION_SCHEMA
+from .interaction_integral_v10214 import MODEL_ID as INTRINSIC_INTERACTION_SCHEMA
 from .spatial_station_projection_v10212 import (
     MODEL_ID as PROJECTION_MODEL_ID,
     STATION_SCHEMA,
@@ -19,6 +20,11 @@ from .spatial_station_projection_v10212 import (
 )
 
 MODEL_ID = "v10.2.14_checked_measured_station_to_mpz_grid_projection"
+REQUIRED_INTERACTION_SCHEMA = INTRINSIC_INTERACTION_SCHEMA
+ACCEPTED_INTERACTION_SCHEMAS = {
+    LEGACY_INTERACTION_SCHEMA,
+    INTRINSIC_INTERACTION_SCHEMA,
+}
 KERNEL_RADIUS_COMPATIBILITY_COORDINATE = 1.0
 
 
@@ -89,11 +95,13 @@ def expand_station_response_files(
 ):
     resolved_paths = [Path(path) for path in paths]
     schemas = _interaction_schemas(resolved_paths)
-    if schemas != {REQUIRED_INTERACTION_SCHEMA}:
+    if len(schemas) != 1 or not schemas.issubset(ACCEPTED_INTERACTION_SCHEMAS):
         raise ValueError(
-            "all measured station responses must use exactly "
-            f"{REQUIRED_INTERACTION_SCHEMA}; found {sorted(schemas)}"
+            "measured station responses must use one uniform reviewed interaction "
+            f"schema from {sorted(ACCEPTED_INTERACTION_SCHEMAS)}; "
+            f"found {sorted(schemas)}"
         )
+    selected_schema = next(iter(schemas))
     expanded, physical_inputs, report = _expand_station_response_files(
         resolved_paths, **kwargs
     )
@@ -112,10 +120,13 @@ def expand_station_response_files(
         **radius_audit,
         "schema": MODEL_ID,
         "underlying_projection_schema": PROJECTION_MODEL_ID,
-        "interaction_integral_schema": REQUIRED_INTERACTION_SCHEMA,
+        "interaction_integral_schema": selected_schema,
+        "accepted_interaction_integral_schemas": sorted(
+            ACCEPTED_INTERACTION_SCHEMAS
+        ),
         "single_interaction_integral_schema_required": True,
         "projected_schema_matches_measured_schema": True,
-        "intrinsic_stiffness_isotropy_required": True,
+        "intrinsic_stiffness_isotropy_required_for_v10214": True,
     }
     return expanded, physical_inputs, report
 
@@ -123,7 +134,10 @@ def expand_station_response_files(
 __all__ = [
     "MODEL_ID",
     "STATION_SCHEMA",
+    "LEGACY_INTERACTION_SCHEMA",
+    "INTRINSIC_INTERACTION_SCHEMA",
     "REQUIRED_INTERACTION_SCHEMA",
+    "ACCEPTED_INTERACTION_SCHEMAS",
     "KERNEL_RADIUS_COMPATIBILITY_COORDINATE",
     "expand_station_response_files",
 ]
