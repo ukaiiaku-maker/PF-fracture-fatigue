@@ -11,11 +11,11 @@ import subprocess
 import sys
 import tempfile
 
-from arrhenius_fracture.mechanics_normalization_v10212 import MODEL_ID as NORMALIZATION_MODEL_ID
-from arrhenius_fracture.physical_fem_snapshot_v10212 import RESPONSE_COLUMNS
-from arrhenius_fracture.spatial_station_projection_v10212 import (
+from arrhenius_fracture.checked_spatial_station_projection_v10212 import (
     expand_station_response_files,
 )
+from arrhenius_fracture.mechanics_normalization_v10212 import MODEL_ID as NORMALIZATION_MODEL_ID
+from arrhenius_fracture.physical_fem_snapshot_v10212 import RESPONSE_COLUMNS
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_BUILDER = ROOT / "scripts" / "build_v10_2_9_state_resolved_kernel_family.py"
@@ -159,6 +159,9 @@ def main() -> None:
         ),
         "subelement_rows_not_claimed_as_direct_fem": bool(
             projection.get("subelement_rows_claimed_as_direct_fem") is False
+        ),
+        "interaction_integral_provenance_consistent": bool(
+            projection.get("projected_schema_matches_measured_schema") is True
         ),
         "mechanics_derived_activation_to_line_normalization": True,
         "mechanics_derived_source_capacity_bounds": True,
