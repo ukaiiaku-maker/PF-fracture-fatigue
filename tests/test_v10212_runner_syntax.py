@@ -8,6 +8,7 @@ def test_v10212_python_files_parse():
         "arrhenius_fracture/checked_spatial_station_projection_v10212.py",
         "arrhenius_fracture/mechanics_normalization_v10212.py",
         "arrhenius_fracture/physical_fem_capture_v10212.py",
+        "arrhenius_fracture/physical_fem_capture_trace_v10212.py",
         "arrhenius_fracture/physical_fem_snapshot_v10212.py",
         "arrhenius_fracture/physical_fem_station_responses_v10212.py",
         "arrhenius_fracture/sharp_front_v10_2_12.py",
