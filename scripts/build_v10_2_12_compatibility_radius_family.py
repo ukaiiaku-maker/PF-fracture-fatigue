@@ -10,23 +10,135 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from typing import Any
+
+import numpy as np
 
 from arrhenius_fracture.checked_spatial_station_projection_v10212 import (
     KERNEL_RADIUS_COMPATIBILITY_COORDINATE,
 )
-from scripts.build_v10_2_9_state_resolved_kernel_family import (
-    II_MODEL_ID,
-    SCHEMA,
-    _boundary_assessment,
-)
+from arrhenius_fracture.interaction_integral_v1029 import MODEL_ID as II_MODEL_ID
+from arrhenius_fracture.signed_kernel_family_v1029 import SCHEMA, STATE_AXES
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_BUILDER = ROOT / "scripts" / "build_v10_2_6_state_resolved_kernel_family.py"
 MODEL_ID = "v10.2.12_opening_extension_family_with_constant_radius_coordinate"
+
+
+def _levels(states: list[dict[str, Any]], axis: str) -> list[float]:
+    return sorted({float(state[axis]) for state in states})
+
+
+def _state_map(states: list[dict[str, Any]]) -> dict[tuple[float, float, float], dict[str, Any]]:
+    return {
+        tuple(float(state[name]) for name in STATE_AXES): state for state in states
+    }
+
+
+def _kernel_arrays(state: dict[str, Any]):
+    for key in (
+        "active_kernel_I_Pa_sqrt_m_per_signed_line",
+        "wake_kernel_I_Pa_sqrt_m_per_signed_line",
+        "active_kernel_II_Pa_sqrt_m_per_signed_line",
+        "wake_kernel_II_Pa_sqrt_m_per_signed_line",
+    ):
+        yield key, np.asarray(state.get(key, []), dtype=float)
+
+
+def _relative_pair_variation(
+    boundary: dict[str, Any], interior: dict[str, Any], floor_fraction: float
+) -> float:
+    worst = 0.0
+    for (name_a, a), (name_b, b) in zip(
+        _kernel_arrays(boundary), _kernel_arrays(interior)
+    ):
+        if name_a != name_b or a.shape != b.shape:
+            raise SystemExit("boundary-state kernel shapes are inconsistent")
+        if a.size == 0:
+            continue
+        floor = max(float(np.max(np.abs(a))) * floor_fraction, 1.0e-12)
+        relative = np.abs(b - a) / np.maximum(np.abs(a), floor)
+        worst = max(worst, float(np.max(relative)))
+    return worst
+
+
+def _boundary_assessment(
+    payload: dict[str, Any], *, tolerance: float, floor_fraction: float
+) -> dict[str, Any]:
+    states = list(payload["states"])
+    r_levels = _levels(states, "r_eff_over_r0")
+    opening_levels = _levels(states, "opening_strength_fraction")
+    extension_levels = _levels(states, "crack_extension_m")
+    expected = len(r_levels) * len(opening_levels) * len(extension_levels)
+    mapping = _state_map(states)
+    complete = len(states) == expected and len(mapping) == expected
+    if complete:
+        for r in r_levels:
+            for opening in opening_levels:
+                for extension in extension_levels:
+                    complete = complete and (r, opening, extension) in mapping
+    if not complete:
+        raise SystemExit(
+            "state atlas is not a complete Cartesian opening-extension grid"
+        )
+    if len(r_levels) != 1 or not math.isclose(
+        r_levels[0],
+        KERNEL_RADIUS_COMPATIBILITY_COORDINATE,
+        rel_tol=0.0,
+        abs_tol=1.0e-15,
+    ):
+        raise SystemExit("compatibility-radius family requires exactly one radius level")
+    if len(opening_levels) < 3:
+        raise SystemExit("opening boundary validation requires at least three levels")
+
+    lower_variations = []
+    upper_variations = []
+    for extension in extension_levels:
+        radius = r_levels[0]
+        lower_variations.append(
+            _relative_pair_variation(
+                mapping[(radius, opening_levels[0], extension)],
+                mapping[(radius, opening_levels[1], extension)],
+                floor_fraction,
+            )
+        )
+        upper_variations.append(
+            _relative_pair_variation(
+                mapping[(radius, opening_levels[-1], extension)],
+                mapping[(radius, opening_levels[-2], extension)],
+                floor_fraction,
+            )
+        )
+    lower_worst = max(lower_variations, default=math.inf)
+    upper_worst = max(upper_variations, default=math.inf)
+    physical_coverage = bool(opening_levels[0] <= 0.05 and opening_levels[-1] >= 0.95)
+    return {
+        "policy": (
+            "validated_boundary_saturation"
+            if physical_coverage and lower_worst <= tolerance and upper_worst <= tolerance
+            else "strict"
+        ),
+        "opening_levels": opening_levels,
+        "physical_opening_interval_covered": physical_coverage,
+        "lower_boundary_max_relative_change_to_next_level": lower_worst,
+        "upper_boundary_max_relative_change_to_next_level": upper_worst,
+        "boundary_stationarity_tolerance": float(tolerance),
+        "lower_boundary_validated": bool(
+            physical_coverage and lower_worst <= tolerance
+        ),
+        "upper_boundary_validated": bool(
+            physical_coverage and upper_worst <= tolerance
+        ),
+        "complete_cartesian_state_grid": True,
+        "complete_cartesian_opening_extension_grid": True,
+        "n_expected_states": expected,
+        "n_actual_states": len(states),
+    }
 
 
 def main() -> None:
