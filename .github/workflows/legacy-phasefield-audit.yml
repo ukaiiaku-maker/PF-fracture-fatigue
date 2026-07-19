@@ -17,15 +17,17 @@ jobs:
         shell: bash
         run: |
           set +e
+          git archive --format=tar.gz -o branch_source.tar.gz HEAD
           find . -path './.git' -prune -o -type f -print | sort > all_files.txt
-          grep -RIlE --exclude-dir=.git --exclude='legacy-phasefield-audit.yml' '(AT[-_ ]?[12]|at[-_ ]?[12])' . | sort > legacy_phasefield_files.txt
-          grep -RInE --exclude-dir=.git --exclude='legacy-phasefield-audit.yml' '(AT[-_ ]?[12]|at[-_ ]?[12])' . > legacy_phasefield_matches.txt
-          grep -Ei '(AT[-_ ]?[12]|at[-_ ]?[12])' all_files.txt > legacy_phasefield_filenames.txt
+          grep -RIlEi --exclude-dir=.git --exclude='legacy-phasefield-audit.yml' '(^|[^[:alnum:]_])AT[-_ ]?[12]([^[:alnum:]_]|$)' . | sort > legacy_phasefield_files.txt
+          grep -RInEi --exclude-dir=.git --exclude='legacy-phasefield-audit.yml' '(^|[^[:alnum:]_])AT[-_ ]?[12]([^[:alnum:]_]|$)' . > legacy_phasefield_matches.txt
+          grep -Ei '(^|/)(AT[-_ ]?[12]|at[-_ ]?[12])([^[:alnum:]_]|$)' all_files.txt > legacy_phasefield_filenames.txt
           true
       - uses: actions/upload-artifact@v4
         with:
           name: pf-legacy-phasefield-inventory-${{ github.run_id }}
           path: |
+            branch_source.tar.gz
             legacy_phasefield_files.txt
             legacy_phasefield_matches.txt
             legacy_phasefield_filenames.txt
