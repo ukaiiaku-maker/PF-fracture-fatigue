@@ -35,7 +35,7 @@ case "$MODE" in
     EXTRA_ARGS=${EXTRA_ARGS:-}
     # Capture mode intentionally disables inherited unsigned shielding internally.
     # shellcheck disable=SC2086
-    exec "$PYTHON_BIN" -m arrhenius_fracture.sharp_front_v10_2_12 \
+    exec "$PYTHON_BIN" -m arrhenius_fracture.sharp_front_v10_2_12_capture \
       --atlas-state-table "$STATE_TABLE" \
       --atlas-outroot "$ATLAS_OUTROOT" \
       --mode 2d --material-manifest "$MATERIAL_MANIFEST" \
