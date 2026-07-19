@@ -30,7 +30,7 @@ from .unit_slip_perturbation_v10212 import (
     interaction_response,
 )
 
-MODEL_ID = "v10.2.12_fem_resolved_signed_spatial_station_responses"
+MODEL_ID = "v10.2.13_fem_resolved_signed_spatial_station_responses"
 
 
 def _unit(values) -> np.ndarray:
@@ -113,8 +113,14 @@ def _ribbon_geometry(
     slip = _unit(slip_direction)
     geometric_ray = slip if float(slip @ forward) >= 0.0 else -slip
     resolution = max(float(width_m), 2.0 * float(mesh.hbar_tip), 1.0e-12)
-    distance = max(float(x_m), resolution)
+    requested_distance = max(float(x_m), 0.0)
     if region == "active":
+        # The first reduced bin can be closer to the crack tip than the continuum
+        # mesh can represent.  Use the nearest FEM-resolved terminal whose support
+        # is separated from the source clipping window; the requested reduced-grid
+        # coordinate remains recorded for the later reviewed projection.
+        minimum_resolved_length = 4.0 * resolution
+        distance = max(requested_distance, minimum_resolved_length)
         nominal_end = tip + distance * geometric_ray
         end = _nearest_intact_centroid(
             mesh=mesh,
@@ -126,6 +132,8 @@ def _ribbon_geometry(
         )
         start = tip.copy()
     else:
+        minimum_resolved_length = resolution
+        distance = max(requested_distance, minimum_resolved_length)
         face = tip - distance * forward
         side_projection = float(slip @ crack_normal)
         side_sign = 1.0 if side_projection >= 0.0 else -1.0
@@ -169,6 +177,9 @@ def _ribbon_geometry(
         "region": region,
         "system": int(system),
         "requested_x_m": float(x_m),
+        "requested_distance_m": requested_distance,
+        "minimum_fem_resolved_ribbon_length_m": minimum_resolved_length,
+        "fem_resolution_extension_applied": bool(distance > requested_distance + 1.0e-15),
         "start_xy_m": start.tolist(),
         "end_xy_m": end.tolist(),
         "actual_ribbon_length_m": float(np.linalg.norm(end - start)),
