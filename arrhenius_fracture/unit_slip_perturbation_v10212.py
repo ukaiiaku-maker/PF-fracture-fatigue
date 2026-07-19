@@ -4,6 +4,12 @@ This module reuses the mechanically normalized slip ribbon from v10.2.6 but
 forces every base and perturbed SIF extraction through the hardened v10.2.9
 analytic-gradient interaction integral.  It never modifies the accepted
 production state and never uses a fitted population-to-shielding coefficient.
+
+A ribbon may start at a stiffness-killed crack/free surface.  Elements that lie
+outside the surviving body at that source end are clipped from the imposed
+eigenstrain.  Clipping is permitted only in a short source-side zone; damaged
+material in the ribbon interior or at the terminal dislocation remains a hard
+error.
 """
 from __future__ import annotations
 
@@ -22,7 +28,7 @@ from .unit_slip_perturbation_v1026 import (
     solve_fixed_crack_state,
 )
 
-MODEL_ID = "v10.2.12_physical_signed_slip_analytic_interaction_integral"
+MODEL_ID = "v10.2.13_physical_signed_slip_source_surface_clipping"
 
 
 def equilibrated_base_state(
@@ -54,22 +60,130 @@ def equilibrated_base_state(
     )
 
 
-def _ribbon_damage_fraction(mesh, d: np.ndarray, increment: np.ndarray) -> float:
-    selected = np.any(np.abs(np.asarray(increment, dtype=float)) > 0.0, axis=0)
-    if not np.any(selected):
-        raise ValueError("signed slip ribbon selects no elements")
+def _element_damage(mesh, d: np.ndarray) -> np.ndarray:
     damage = np.asarray(d, dtype=float).reshape(-1)
     if damage.size == int(mesh.nn):
-        element_damage = np.mean(damage[np.asarray(mesh.elems, dtype=int)], axis=1)
-    elif damage.size == int(mesh.ne):
-        element_damage = damage
-    else:
-        raise ValueError("damage field size is incompatible with the FEM mesh")
+        return np.mean(damage[np.asarray(mesh.elems, dtype=int)], axis=1)
+    if damage.size == int(mesh.ne):
+        return damage.copy()
+    raise ValueError("damage field size is incompatible with the FEM mesh")
+
+
+def _clip_source_surface_overlap(
+    mesh,
+    d: np.ndarray,
+    increment: np.ndarray,
+    perturbation: SlipRibbonPerturbation,
+    *,
+    maximum_damaged_area_fraction: float,
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Remove only source-side ribbon area that lies outside the intact body.
+
+    The stiffness-killed crack is a free surface, so imposing plastic strain in
+    those elements is incorrect.  A finite-width ribbon launched from that
+    surface will nevertheless overlap killed element centroids near its source
+    on a discrete mesh.  Such overlap is clipped without renormalizing the
+    requested Burgers line content.  Any damaged element beyond a short
+    source-side allowance, or any damaged terminal element, indicates that the
+    ribbon crosses the crack and is rejected.
+    """
+    allowed_damage = float(maximum_damaged_area_fraction)
+    if not 0.0 <= allowed_damage < 1.0:
+        raise ValueError("maximum_damaged_area_fraction must lie in [0,1)")
+
+    corrected = np.asarray(increment, dtype=float).copy()
+    selected = np.any(np.abs(corrected) > 0.0, axis=0)
+    if not np.any(selected):
+        raise ValueError("signed slip ribbon selects no elements")
+
+    element_damage = _element_damage(mesh, d)
     area = np.asarray(mesh.area_e, dtype=float)
-    selected_area = float(np.sum(area[selected]))
-    if selected_area <= 0.0:
+    raw_area = float(np.sum(area[selected]))
+    if raw_area <= 0.0:
         raise ValueError("signed slip ribbon has zero represented area")
-    return float(np.sum(area[selected] * np.clip(element_damage[selected], 0.0, 1.0)) / selected_area)
+    raw_damage_fraction = float(
+        np.sum(area[selected] * np.clip(element_damage[selected], 0.0, 1.0))
+        / raw_area
+    )
+
+    p = perturbation.validate()
+    start = np.asarray(p.start_xy_m, dtype=float).reshape(2)
+    end = np.asarray(p.end_xy_m, dtype=float).reshape(2)
+    tangent = end - start
+    length = float(np.linalg.norm(tangent))
+    tangent /= length
+    centroids = np.asarray(mesh.nodes, dtype=float)[
+        np.asarray(mesh.elems, dtype=int)
+    ].mean(axis=1)
+    longitudinal = (centroids - start[None, :]) @ tangent
+
+    damaged = selected & (element_damage > allowed_damage)
+    h_tip = max(float(getattr(mesh, "hbar_tip", 0.0)), 0.0)
+    width = float(p.width_m)
+    source_limit = min(
+        0.75 * length,
+        max(2.0 * width, 3.0 * h_tip, 1.0e-12),
+    )
+    terminal_span = min(
+        0.25 * length,
+        max(0.5 * width, h_tip, 1.0e-12),
+    )
+    terminal = selected & (longitudinal >= length - terminal_span)
+    if not np.any(terminal):
+        raise ValueError("signed slip ribbon has no FEM support at its terminal line")
+    if np.any(damaged & terminal):
+        raise ValueError(
+            "signed slip ribbon terminal lies in stiffness-killed crack material"
+        )
+
+    interior_damaged = damaged & (longitudinal > source_limit)
+    if np.any(interior_damaged):
+        worst = float(np.max(longitudinal[interior_damaged]))
+        raise ValueError(
+            "signed slip ribbon crosses stiffness-killed crack material away from "
+            f"its source: furthest damaged longitudinal position={worst:.6g} m, "
+            f"source allowance={source_limit:.6g} m"
+        )
+
+    source_clipped = damaged & (longitudinal <= source_limit)
+    corrected[:, source_clipped] = 0.0
+    retained = np.any(np.abs(corrected) > 0.0, axis=0)
+    if not np.any(retained):
+        raise ValueError("source-surface clipping removed the complete slip ribbon")
+    if not np.any(retained & terminal):
+        raise ValueError("source-surface clipping removed terminal ribbon support")
+
+    retained_area = float(np.sum(area[retained]))
+    residual_damage_fraction = float(
+        np.sum(area[retained] * np.clip(element_damage[retained], 0.0, 1.0))
+        / retained_area
+    )
+    if residual_damage_fraction > allowed_damage + 1.0e-12:
+        raise ValueError(
+            "signed slip ribbon retains excessive damaged material after source "
+            f"clipping: fraction={residual_damage_fraction:.6g}, "
+            f"allowed={allowed_damage:.6g}"
+        )
+
+    clipped_area = float(np.sum(area[source_clipped]))
+    return corrected, {
+        "raw_selected_elements": int(np.sum(selected)),
+        "selected_elements_after_source_clipping": int(np.sum(retained)),
+        "raw_represented_area_m2": raw_area,
+        "represented_area_after_source_clipping_m2": retained_area,
+        "raw_damaged_area_fraction": raw_damage_fraction,
+        "damaged_area_fraction": residual_damage_fraction,
+        "maximum_allowed_damaged_area_fraction": allowed_damage,
+        "source_surface_clipping_applied": bool(np.any(source_clipped)),
+        "source_surface_clipped_elements": int(np.sum(source_clipped)),
+        "source_surface_clipped_area_m2": clipped_area,
+        "source_surface_clipped_area_fraction": clipped_area / raw_area,
+        "source_surface_longitudinal_allowance_m": source_limit,
+        "terminal_support_span_m": terminal_span,
+        "terminal_in_intact_material": True,
+        "interior_crossing_rejected": True,
+        "ribbon_in_intact_material": True,
+    }
 
 
 def interaction_response(
@@ -98,20 +212,32 @@ def interaction_response(
     increment, perturbation_audit = slip_ribbon_eigenstrain_increment(
         mesh, perturbation
     )
-    damaged_fraction = _ribbon_damage_fraction(mesh, d, increment)
-    allowed_damage = float(maximum_damaged_area_fraction)
-    if not 0.0 <= allowed_damage < 1.0:
-        raise ValueError("maximum_damaged_area_fraction must lie in [0,1)")
-    if damaged_fraction > allowed_damage:
-        raise ValueError(
-            "signed slip ribbon lies in stiffness-killed crack material: "
-            f"damaged area fraction={damaged_fraction:.6g}, allowed={allowed_damage:.6g}"
-        )
+    increment, clipping_audit = _clip_source_surface_overlap(
+        mesh,
+        d,
+        increment,
+        perturbation,
+        maximum_damaged_area_fraction=maximum_damaged_area_fraction,
+    )
+    represented_area = clipping_audit[
+        "represented_area_after_source_clipping_m2"
+    ]
+    requested_area = max(
+        float(perturbation_audit.get("requested_ribbon_area_m2", 0.0)),
+        1.0e-30,
+    )
     perturbation_audit = {
         **perturbation_audit,
-        "damaged_area_fraction": damaged_fraction,
-        "maximum_allowed_damaged_area_fraction": allowed_damage,
-        "ribbon_in_intact_material": True,
+        **clipping_audit,
+        "selected_elements": clipping_audit[
+            "selected_elements_after_source_clipping"
+        ],
+        "represented_area_m2": represented_area,
+        "mesh_area_ratio": represented_area / requested_area,
+        "normalization_after_surface_clipping": (
+            "requested signed line content unchanged; killed crack-surface "
+            "elements carry no eigenstrain"
+        ),
     }
     perturbed_ep = np.asarray(baseline_ep_gp, dtype=float) + increment
     perturbed = solve_fixed_crack_state(
