@@ -53,6 +53,14 @@ def _finite_positive(value: Any, name: str) -> float:
     return result
 
 
+def _snap_near_integer(value: float) -> float:
+    """Remove binary roundoff before converting an exact geometric ratio to count."""
+    nearest = float(round(float(value)))
+    if math.isclose(float(value), nearest, rel_tol=1.0e-12, abs_tol=1.0e-12):
+        return nearest
+    return float(value)
+
+
 def derive_mechanical_normalization(
     engine_payload: dict[str, Any],
     *,
@@ -88,8 +96,10 @@ def derive_mechanical_normalization(
 
     minimum_spacing_m = float(assumptions.minimum_spacing_b) * b_m
     maximum_spacing_m = float(assumptions.maximum_spacing_b) * b_m
-    lower = max(int(math.floor(source_length / maximum_spacing_m)), 1)
-    upper = max(int(math.ceil(source_length / minimum_spacing_m)), lower)
+    lower_ratio = _snap_near_integer(source_length / maximum_spacing_m)
+    upper_ratio = _snap_near_integer(source_length / minimum_spacing_m)
+    lower = max(int(math.floor(lower_ratio)), 1)
+    upper = max(int(math.ceil(upper_ratio)), lower)
     activation_to_line = packet_length_m / b_m
 
     historical = engine_payload.get("material_manifest", {})
@@ -106,7 +116,7 @@ def derive_mechanical_normalization(
 
     return {
         "schema": MODEL_ID,
-        "normalization_source": "front_thickness_source_geometry",
+        "normalization_source": "process_zone_geometry_and_line_spacing",
         "mechanical_line_content_source": "kinetic_packet_displacement_divided_by_burgers_magnitude",
         "activation_to_line_content_by_system": [
             float(activation_to_line) for _ in range(n_systems)
