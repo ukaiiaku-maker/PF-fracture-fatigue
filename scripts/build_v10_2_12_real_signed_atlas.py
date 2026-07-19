@@ -13,6 +13,9 @@ import tempfile
 
 from arrhenius_fracture.mechanics_normalization_v10212 import MODEL_ID as NORMALIZATION_MODEL_ID
 from arrhenius_fracture.physical_fem_snapshot_v10212 import RESPONSE_COLUMNS
+from arrhenius_fracture.spatial_station_projection_v10212 import (
+    expand_station_response_files,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_BUILDER = ROOT / "scripts" / "build_v10_2_9_state_resolved_kernel_family.py"
@@ -40,34 +43,6 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _load_response(path: Path) -> tuple[list[dict[str, str]], dict]:
-    if not path.is_file():
-        raise SystemExit(f"response table is missing: {path}")
-    with path.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        rows = list(reader)
-        fields = tuple(reader.fieldnames or ())
-    missing = sorted(set(RESPONSE_COLUMNS).difference(fields))
-    if missing:
-        raise SystemExit(f"{path} is missing response columns {missing}")
-    if not rows:
-        raise SystemExit(f"response table is empty: {path}")
-    audit_path = path.with_suffix(".audit.json")
-    if not audit_path.is_file():
-        raise SystemExit(f"physical response audit is missing: {audit_path}")
-    audit = json.loads(audit_path.read_text())
-    required = {
-        "physical_fem_responses_generated": True,
-        "production_parameterization_allowed": False,
-        "fem_tip_geometry_blunted": False,
-        "r_eff_is_analytical_tip_state": True,
-    }
-    failed = [key for key, value in required.items() if audit.get(key) is not value]
-    if failed:
-        raise SystemExit(f"{audit_path} fails physical-response provenance checks: {failed}")
-    return rows, audit
-
-
 def _review(path: Path) -> dict:
     if not path.is_file():
         raise SystemExit(f"independent review is missing: {path}")
@@ -92,6 +67,7 @@ def main() -> None:
     parser.add_argument("--relative-linearity-tolerance", type=float, default=0.03)
     parser.add_argument("--fixed-kernel-tolerance", type=float, default=0.05)
     parser.add_argument("--boundary-stationarity-tolerance", type=float, default=0.05)
+    parser.add_argument("--spatial-cross-validation-tolerance", type=float, default=0.10)
     args = parser.parse_args()
     if args.out.exists():
         raise SystemExit(f"refusing to overwrite {args.out}")
@@ -102,21 +78,34 @@ def main() -> None:
         raise SystemExit(
             f"normalization must use {NORMALIZATION_MODEL_ID}; got {normalization.get('schema')!r}"
         )
+    if normalization.get("normalization_source") != "process_zone_geometry_and_line_spacing":
+        raise SystemExit("source capacity must be derived from process-zone geometry and line spacing")
     if normalization.get("fitted_to_toughness_or_fatigue") is not False:
         raise SystemExit("normalization must not be fitted to toughness or fatigue")
     if normalization.get("shielding_attenuation_factor_fitted") is not False:
         raise SystemExit("a fitted shielding attenuation factor is prohibited")
 
-    combined_rows = []
+    try:
+        expanded_rows, physical_inputs, projection = expand_station_response_files(
+            args.responses,
+            relative_linearity_tolerance=args.relative_linearity_tolerance,
+            spatial_cross_validation_tolerance=args.spatial_cross_validation_tolerance,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        raise SystemExit(str(exc)) from exc
+    if not expanded_rows:
+        raise SystemExit("no projected MPZ-grid rows were produced")
     audits = []
-    state_ids = set()
-    for path in args.responses:
-        rows, audit = _load_response(path)
-        combined_rows.extend(rows)
-        audits.append({"path": str(path.resolve()), "sha256": _sha256(path), "audit": audit})
-        state_ids.update(row["state_id"] for row in rows)
-    if len(state_ids) < 1:
-        raise SystemExit("no physical FEM states were supplied")
+    for item in physical_inputs:
+        path = Path(item["path"])
+        audits.append(
+            {
+                **item,
+                "sha256": _sha256(path),
+                "audit_sha256": _sha256(path.with_suffix(".audit.json")),
+            }
+        )
+    state_ids = sorted({str(row["state_id"]) for row in expanded_rows})
 
     review = None
     if args.authorize_production_parameterization:
@@ -128,17 +117,17 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory(prefix="v10212_atlas_") as temp_dir:
         temp = Path(temp_dir)
-        combined = temp / "combined_physical_responses.csv"
-        with combined.open("w", newline="") as handle:
+        projected = temp / "projected_full_mpz_grid_responses.csv"
+        with projected.open("w", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=RESPONSE_COLUMNS)
             writer.writeheader()
-            writer.writerows(combined_rows)
+            writer.writerows(expanded_rows)
         intermediate = temp / "v1029_intermediate.json"
         command = [
             sys.executable,
             str(BASE_BUILDER),
             "--responses",
-            str(combined),
+            str(projected),
             "--normalization",
             str(args.normalization),
             "--out",
@@ -157,15 +146,25 @@ def main() -> None:
 
     base_gates = dict(payload.get("authorization_gates", {}))
     real_gates = {
-        "physical_fem_snapshots_present": bool(audits),
-        "all_response_rows_use_physical_snapshot_evaluator": all(
-            audit["audit"].get("physical_fem_responses_generated") is True for audit in audits
+        "physical_fem_station_inputs_present": bool(audits),
+        "measured_stations_distinguished_from_projected_grid": all(
+            item["audit"].get("responses_are_measured_stations_not_full_grid") is True
+            for item in audits
+        ),
+        "physical_signed_and_multi_amplitude_linearity_passed": bool(
+            projection.get("physical_linearity_checks")
+        ),
+        "spatial_projection_cross_validation_passed": bool(
+            projection.get("spatial_cross_validation_passed", False)
+        ),
+        "subelement_rows_not_claimed_as_direct_fem": bool(
+            projection.get("subelement_rows_claimed_as_direct_fem") is False
         ),
         "mechanics_derived_activation_to_line_normalization": True,
         "mechanics_derived_source_capacity_bounds": True,
         "no_fitted_shielding_attenuation": True,
         "r_eff_axis_declared_analytical_not_fem_geometry": all(
-            audit["audit"].get("r_eff_is_analytical_tip_state") is True for audit in audits
+            item["audit"].get("r_eff_is_analytical_tip_state") is True for item in audits
         ),
         "base_v10_2_9_kernel_gates_passed": all(base_gates.values()),
         "independent_review_complete": review is not None,
@@ -181,7 +180,8 @@ def main() -> None:
         {
             "schema": MODEL_ID,
             "physical_response_inputs": audits,
-            "physical_state_ids": sorted(state_ids),
+            "physical_state_ids": state_ids,
+            "measured_station_projection": projection,
             "normalization_path": str(args.normalization.resolve()),
             "normalization_sha256": _sha256(args.normalization),
             "normalization_schema": NORMALIZATION_MODEL_ID,
@@ -202,6 +202,8 @@ def main() -> None:
             ),
             "finite_radius_fem_kernel_claimed": False,
             "cohesive_network_snapshots_supported": False,
+            "full_mpz_grid_values_are_spatial_projection": True,
+            "direct_fem_measurements_exist_only_at_recorded_station_indices": True,
         }
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -211,7 +213,11 @@ def main() -> None:
             {
                 "out": str(args.out),
                 "states": len(state_ids),
-                "rows": len(combined_rows),
+                "physical_measured_rows": projection["physical_measured_row_count"],
+                "projected_full_grid_rows": projection["projected_full_grid_row_count"],
+                "spatial_cross_validation_passed": projection[
+                    "spatial_cross_validation_passed"
+                ],
                 "base_gates": base_gates,
                 "real_atlas_gates": real_gates,
                 "production_parameterization_allowed": payload[
