@@ -31,7 +31,7 @@ def _line_mesh(x, *, hbar_tip=0.10):
 
 
 def test_active_source_starts_after_contiguous_tip_damage_band():
-    mesh = _line_mesh([0.20, 0.55, 0.90, 1.25, 1.60, 1.95, 2.40])
+    mesh = _line_mesh([0.20, 0.38, 0.56, 0.74, 0.92, 1.15, 1.55])
     damage = np.asarray([1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0])
     start, audit = _active_surface_entry(
         mesh=mesh,
@@ -41,14 +41,14 @@ def test_active_source_starts_after_contiguous_tip_damage_band():
         ray=np.asarray([1.0, 0.0]),
         width_m=0.20,
     )
-    assert start[0] == pytest.approx(1.95)
-    assert audit["tip_connected_damage_extent_m"] > 1.60
+    assert start[0] == pytest.approx(1.15)
+    assert audit["tip_connected_damage_extent_m"] > 0.92
     assert audit["tip_connected_damaged_centroid_count"] == 5
     assert audit["separated_damage_is_not_absorbed_into_source"] is True
 
 
 def test_separated_damage_cluster_is_not_absorbed_into_source_entry():
-    mesh = _line_mesh([0.20, 0.45, 0.80, 1.60, 1.90, 2.30])
+    mesh = _line_mesh([0.20, 0.38, 0.65, 1.20, 1.50, 1.90])
     damage = np.asarray([1.0, 1.0, 0.0, 1.0, 0.0, 0.0])
     start, audit = _active_surface_entry(
         mesh=mesh,
@@ -58,14 +58,14 @@ def test_separated_damage_cluster_is_not_absorbed_into_source_entry():
         ray=np.asarray([1.0, 0.0]),
         width_m=0.20,
     )
-    assert start[0] == pytest.approx(0.80)
+    assert start[0] == pytest.approx(0.65)
     assert audit["tip_connected_damaged_centroid_count"] == 2
     assert audit["tip_connected_damage_extent_m"] < 1.0
 
 
 def test_ribbon_geometry_uses_actual_entry_and_clipper_accepts_source_band_case():
     mesh = _line_mesh(
-        [0.20, 0.55, 0.90, 1.25, 1.60, 1.95, 2.40, 2.80, 3.20],
+        [0.20, 0.38, 0.56, 0.74, 0.92, 1.15, 1.55, 1.95, 2.35],
         hbar_tip=0.10,
     )
     damage = np.asarray([1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0])
@@ -80,8 +80,8 @@ def test_ribbon_geometry_uses_actual_entry_and_clipper_accepts_source_band_case(
         forward=np.asarray([1.0, 0.0]),
         slip_direction=np.asarray([1.0, 0.0]),
     )
-    assert start[0] == pytest.approx(1.95)
-    assert end[0] >= 2.80
+    assert start[0] == pytest.approx(1.15)
+    assert end[0] == pytest.approx(1.95)
     assert audit["nominal_tip_coordinate_used_as_ribbon_source"] is False
 
     perturbation = SlipRibbonPerturbation(
