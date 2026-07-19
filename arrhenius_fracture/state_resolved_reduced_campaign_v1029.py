@@ -59,6 +59,41 @@ class StateResolvedProductionConfig(_base.StateResolvedProductionConfig):
             _base.StateResolvedSignedShieldingKernelFamily = saved_family
             _base.StateResolvedSignedBurgersTipEngine = saved_engine
 
+    def parity_report(self, engine, *, mode: str):
+        report = super().parity_report(engine, mode=mode)
+        report.update(
+            {
+                "schema": MODEL_ID,
+                "same_v10_2_9_engine_class": isinstance(
+                    engine, StateResolvedSignedBurgersTipEngine
+                ),
+                "effective_opening_fixed_point_active": bool(
+                    getattr(engine, "effective_opening_fixed_point_active", False)
+                ),
+                "kernel_state_opening_drive": "effective_K_after_signed_shielding",
+                "K_shield_cap_present": False,
+            }
+        )
+        report.pop("same_v10_2_6_engine_class", None)
+        if not report["same_v10_2_9_engine_class"]:
+            report["differences"].append(
+                {
+                    "path": "engine_class",
+                    "expected": "StateResolvedSignedBurgersTipEngine_v10.2.9",
+                    "actual": type(engine).__name__,
+                }
+            )
+        if not report["effective_opening_fixed_point_active"]:
+            report["differences"].append(
+                {
+                    "path": "effective_opening_fixed_point_active",
+                    "expected": True,
+                    "actual": False,
+                }
+            )
+        report["passed"] = not report["differences"]
+        return report
+
 
 ReducedCampaignControl = _base.ReducedCampaignControl
 run_reduced_r_curve = _base.run_reduced_r_curve
