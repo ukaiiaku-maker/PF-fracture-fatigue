@@ -6,7 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
-from arrhenius_fracture.physical_fem_snapshot_v10212 import generate_signed_responses
+from arrhenius_fracture.physical_fem_station_responses_v10212 import generate_station_responses
 
 
 def _magnitudes(raw: str) -> list[float]:
@@ -19,12 +19,14 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--magnitudes", type=_magnitudes, default=[0.25, 0.5])
     parser.add_argument("--ribbon-width-m", type=float)
+    parser.add_argument("--minimum-station-spacing-m", type=float)
     args = parser.parse_args()
-    report = generate_signed_responses(
+    report = generate_station_responses(
         args.snapshot,
         out_csv=args.out,
         magnitudes=args.magnitudes,
         ribbon_width_m=args.ribbon_width_m,
+        minimum_station_spacing_m=args.minimum_station_spacing_m,
     )
     print(json.dumps(report, indent=2))
 
