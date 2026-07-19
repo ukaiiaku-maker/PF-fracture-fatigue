@@ -5,16 +5,16 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from arrhenius_fracture.capture_audit_repair_v10213 import (
+    repair_capture_audits,
+    repair_multitemperature_geometry_summary,
+)
 from arrhenius_fracture.frozen_geometry_load_invariance_v10213 import (
     _validate_coefficients,
 )
 from arrhenius_fracture.physical_fem_capture_v10213 import (
     PhysicalFEMCapture,
     load_extension_capture_requests,
-)
-from arrhenius_fracture.sharp_front_v10_2_13_capture import (
-    _repair_capture_audits,
-    _repair_multitemperature_geometry_summary,
 )
 from arrhenius_fracture.signed_kernel_family_v10213 import (
     SCHEMA,
@@ -104,6 +104,8 @@ def test_extension_only_family_ignores_runtime_opening_and_radius(tmp_path):
     audit = family.audit_payload()
     assert audit["opening_strength_fraction_used_for_interpolation"] is False
     assert audit["last_observed_opening_strength_fraction"] == pytest.approx(0.95)
+    assert audit["last_observed_analytical_r_eff_over_r0"] == pytest.approx(50.0)
+    assert audit["last_query"][0] == pytest.approx(1.0)
     assert audit["last_query"][1] == pytest.approx(0.0)
 
 
@@ -226,7 +228,7 @@ def test_multitemperature_geometry_summary_is_assigned_only_to_last_temperature(
     ]
     (root / "stochastic_avalanche_geometry_events.json").write_text(json.dumps(geometry))
     (root / "sharp_wake_advance_log.csv").write_text("event_index\n1\n2\n")
-    repair = _repair_multitemperature_geometry_summary(root)
+    repair = repair_multitemperature_geometry_summary(root)
     summary = json.loads((root / "summary.json").read_text())
     assert repair["geometry_diagnostics_temperature_K"] == 1200.0
     assert "n_geometry_events" not in summary[0]
@@ -251,7 +253,7 @@ def test_capture_audit_rewrite_removes_stale_cap_claims(tmp_path):
                 }
             )
         )
-    _repair_capture_audits(root)
+    repair_capture_audits(root)
     for name in (
         "v10_1_driver_modes.json",
         "v10_1_1_source_model.json",
