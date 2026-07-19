@@ -1,8 +1,9 @@
-"""Capture accepted 2-D FEM equilibria for v10.2.12 kernel generation.
+"""Capture accepted 2-D FEM equilibria for active signed-kernel generation.
 
-The capture hooks observe the existing production solve; they do not implement a
-second mechanics path.  A state is copied immediately before the front engine
-advances its kinetic state, after the current tensor probe has been constructed.
+The capture hooks observe the production solve.  v10.2.14 stores the actual
+post-Dirichlet equilibrium displacement, never claims a physical scalar wake
+kernel, and accepts an optional production crack polyline from the anisotropic
+mechanics observer.
 """
 from __future__ import annotations
 
@@ -18,7 +19,7 @@ import numpy as np
 from .anisotropic_emission_v10174 import OBSERVER as DRIVE_OBSERVER
 from .physical_fem_snapshot_v10212 import SnapshotMetadata, save_snapshot
 
-MODEL_ID = "v10.2.12_live_production_fem_state_capture"
+MODEL_ID = "v10.2.14_live_production_fem_state_capture"
 
 
 @dataclass(frozen=True)
@@ -37,14 +38,9 @@ class CaptureRequest:
         if not str(self.state_id).strip():
             raise ValueError("state_id must be nonempty")
         for name in (
-            "temperature_K",
-            "r_eff_over_r0",
-            "opening_strength_fraction",
-            "crack_extension_m",
-            "r_tolerance",
-            "opening_tolerance",
-            "extension_tolerance_m",
-            "interaction_ell_m",
+            "temperature_K", "r_eff_over_r0", "opening_strength_fraction",
+            "crack_extension_m", "r_tolerance", "opening_tolerance",
+            "extension_tolerance_m", "interaction_ell_m",
         ):
             value = float(getattr(self, name))
             if not math.isfinite(value):
@@ -71,15 +67,9 @@ def load_capture_requests(path: str | Path) -> list[CaptureRequest]:
     if not rows:
         raise ValueError("capture request table is empty")
     required = {
-        "state_id",
-        "temperature_K",
-        "r_eff_over_r0",
-        "opening_strength_fraction",
-        "crack_extension_m",
-        "r_tolerance",
-        "opening_tolerance",
-        "extension_tolerance_m",
-        "interaction_ell_m",
+        "state_id", "temperature_K", "r_eff_over_r0",
+        "opening_strength_fraction", "crack_extension_m", "r_tolerance",
+        "opening_tolerance", "extension_tolerance_m", "interaction_ell_m",
     }
     missing = sorted(required.difference(rows[0]))
     if missing:
@@ -141,7 +131,23 @@ def _engine_payload(engine) -> dict[str, Any]:
         "capture_loading_path": "mechanics_only_shielding_disabled",
         "local_strength_sigma_cap_is_not_Kshield_cap": True,
         "constitutive_K_shield_cap_applied": False,
+        "active_kernel_supported": True,
+        "wake_kernel_supported": False,
     }
+
+
+def _coerce_crack_path(drive: dict[str, Any], tip_xy: tuple[float, float]) -> tuple[tuple[float, float], ...]:
+    raw = drive.get("crack_path_xy_m", ())
+    try:
+        path = tuple(tuple(float(v) for v in row) for row in raw)
+    except Exception:
+        path = ()
+    if path and len(path) >= 2:
+        end = np.asarray(path[-1], dtype=float)
+        tip = np.asarray(tip_xy, dtype=float)
+        if np.linalg.norm(end - tip) <= max(1.0e-9, 1.0e-6 * np.linalg.norm(tip)):
+            return path
+    return ()
 
 
 class PhysicalFEMCapture:
@@ -156,6 +162,7 @@ class PhysicalFEMCapture:
         self.latest_boundary = None
         self.latest_Uy_top = 0.0
         self.latest_Uy_bot = 0.0
+        self.latest_solved_u: np.ndarray | None = None
         self.solve_serial = 0
         self.assembly_serial = 0
         self.attempts = 0
@@ -176,7 +183,7 @@ class PhysicalFEMCapture:
                         cohesive = args[9]
                     self.latest_assembly = {
                         "mesh": args[0],
-                        "u": np.asarray(args[1], dtype=float).copy(),
+                        "u_input": np.asarray(args[1], dtype=float).copy(),
                         "ep_gp": np.asarray(args[2], dtype=float).copy(),
                         "rho_gp": np.asarray(args[3], dtype=float).copy(),
                         "d": np.asarray(args[4], dtype=float).copy(),
@@ -201,6 +208,7 @@ class PhysicalFEMCapture:
             self.latest_boundary = args[3]
             self.latest_Uy_top = float(args[4])
             self.latest_Uy_bot = float(args[5])
+            self.latest_solved_u = np.asarray(result[0], dtype=float).copy()
             self.solve_serial += 1
             return result
 
@@ -226,7 +234,12 @@ class PhysicalFEMCapture:
 
     def before_engine_step(self, engine, K: float, T: float) -> None:
         self.attempts += 1
-        if not self.pending or self.latest_assembly is None or self.latest_boundary is None:
+        if (
+            not self.pending
+            or self.latest_assembly is None
+            or self.latest_boundary is None
+            or self.latest_solved_u is None
+        ):
             return
         drive = DRIVE_OBSERVER.latest_drive
         if not isinstance(drive, dict) or not bool(drive.get("reliable", False)):
@@ -255,13 +268,14 @@ class PhysicalFEMCapture:
         cohesive = assembly.get("cohesive_network")
         if cohesive is not None:
             raise RuntimeError(
-                "cohesive-network state is not serializable in v10.2.12; "
-                "use the sharp-front PF backend for atlas collection"
+                "cohesive-network state is not serializable; use the sharp-front PF "
+                "backend for atlas collection"
             )
         directions = tuple(tuple(row) for row in drive["trace_directions"])
         normals = tuple(tuple(row) for row in drive["trace_normals"])
         tip_xy = tuple(float(value) for value in drive["tip_xy_m"])
         front_direction = tuple(float(value) for value in drive["front_direction"])
+        crack_path = _coerce_crack_path(drive, tip_xy)
         material = assembly["mat"]
         metadata = SnapshotMetadata(
             state_id=request.state_id,
@@ -280,15 +294,17 @@ class PhysicalFEMCapture:
             channel_directions=directions,
             channel_normals=normals,
             material={
-                "E": float(material.E),
-                "nu": float(material.nu),
-                "b": float(material.b),
-                "Tm": float(material.Tm),
+                "E": float(material.E), "nu": float(material.nu),
+                "b": float(material.b), "Tm": float(material.Tm),
             },
             engine_config=_engine_payload(engine),
             fem_tip_geometry_blunted=False,
             r_eff_is_analytical_tip_state=True,
             cohesive_network_present=False,
+            crack_path_xy_m=crack_path,
+            displacement_state="post_dirichlet_equilibrium",
+            active_kernel_supported=True,
+            wake_kernel_supported=False,
         )
         root = self.outroot / request.state_id
         payload = save_snapshot(
@@ -296,7 +312,7 @@ class PhysicalFEMCapture:
             metadata=metadata,
             mesh=assembly["mesh"],
             boundary=self.latest_boundary,
-            u=assembly["u"],
+            u=self.latest_solved_u,
             ep_gp=assembly["ep_gp"],
             rho_gp=assembly["rho_gp"],
             d=assembly["d"],
@@ -310,6 +326,10 @@ class PhysicalFEMCapture:
             "solve_serial": self.solve_serial,
             "drive_serial": int(drive.get("drive_serial", -1)),
             "payload": payload,
+            "post_dirichlet_equilibrium_displacement_saved": True,
+            "crack_path_serialized": bool(crack_path),
+            "active_kernel_supported": True,
+            "wake_kernel_supported": False,
         }
 
     def wrap_engine_step(self, original: Callable) -> Callable:
@@ -328,18 +348,16 @@ class PhysicalFEMCapture:
             "pending_state_ids": [request.state_id for request in self.pending],
             "capture_attempts": self.attempts,
             "states": self.captured,
-            "same_production_fem_path_observed": True,
-            "production_state_mutated": False,
-            "shielding_disabled_during_mechanics_collection": True,
-            "fem_tip_geometry_blunted": False,
-            "r_eff_axis_is_analytical_tip_state": True,
-            "parameterization_authorized": False,
+            "post_dirichlet_equilibrium_displacement_saved": True,
+            "active_kernel_supported": True,
+            "wake_kernel_supported": False,
+            "production_parameterization_allowed": False,
         }
-        (self.outroot / "capture_complete.json").write_text(json.dumps(payload, indent=2))
+        (self.outroot / "capture_manifest.json").write_text(json.dumps(payload, indent=2))
         if require_complete and self.pending:
             raise RuntimeError(
-                "physical FEM capture did not reach requested states: "
-                + ", ".join(request.state_id for request in self.pending)
+                "physical FEM state capture is incomplete; pending="
+                + ",".join(request.state_id for request in self.pending)
             )
         return payload
 
