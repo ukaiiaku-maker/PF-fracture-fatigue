@@ -49,6 +49,24 @@ def _option_value(args: list[str], name: str) -> str | None:
     return None
 
 
+def _force_single_front_validity_envelope(args: list[str]) -> None:
+    if any(
+        token == "--crystal-branch" or token.startswith("--crystal-branch=")
+        for token in args
+    ):
+        raise SystemExit(
+            "v10.2.13 signed atlas is validated only for a single unbranched front; "
+            "generate and review a branch-resolved atlas before enabling branching"
+        )
+    supplied = _pop_value(args, "--max-fronts")
+    if supplied is not None and int(supplied) != 1:
+        raise SystemExit(
+            "v10.2.13 signed atlas requires --max-fronts 1; branching and multiple "
+            "front geometries are outside the validated kernel envelope"
+        )
+    args.extend(["--max-fronts", "1"])
+
+
 def _bool_env(name: str, default: bool = False) -> bool:
     raw = os.environ.get(name)
     if raw is None:
@@ -83,6 +101,8 @@ def _write_audit(args: list[str], family, transport_mode: str) -> None:
             "opening_strength_fraction_used_for_interpolation": False,
             "opening_strength_fraction_retained_as_diagnostic": True,
             "analytical_r_eff_used_for_interpolation": False,
+            "single_front_unbranched_geometry_only": True,
+            "maximum_fronts_forced": 1,
             "local_cohesive_strength_sigma_cap_preserved": True,
             "local_strength_limit_is_not_Kshield_cap": True,
             "constitutive_K_shield_cap_applied": False,
@@ -99,6 +119,7 @@ def _write_audit(args: list[str], family, transport_mode: str) -> None:
 
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
+    _force_single_front_validity_envelope(args)
     family_path = _pop_value(
         args,
         "--signed-kernel-family",
@@ -144,7 +165,7 @@ def main(argv=None):
         print(
             "  v10.2.13 real signed 2-D atlas: "
             f"loading={loading} transport={transport_mode} states={len(family.states)} "
-            "axis=cumulative_path_extension opening=diagnostic Kcap=off"
+            "axis=cumulative_path_extension opening=diagnostic fronts=1 Kcap=off"
         )
         with trace_context as trace:
             result = _transport.main(args)
