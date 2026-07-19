@@ -15,6 +15,36 @@ def _floats(text: str):
     return [float(value) for value in str(text).replace(",", " ").split()]
 
 
+def _persist_provenance(payload: dict, snapshot: Path, outroot: Path) -> dict:
+    source = snapshot.expanduser().resolve()
+    source_metadata = json.loads((source / "snapshot.json").read_text())
+    for case in payload.get("generated_load_cases", []):
+        audit_path = Path(case["audit"])
+        audit = json.loads(audit_path.read_text())
+        scale = float(case["load_scale"])
+        audit.update(
+            {
+                "snapshot": str(source),
+                "source_snapshot_schema": source_metadata.get("schema"),
+                "frozen_geometry_parent_state_id": payload["parent_state_id"],
+                "frozen_geometry_load_scale": scale,
+                "scaled_Uy_top_m": float(source_metadata["Uy_top_m"]) * scale,
+                "scaled_Uy_bot_m": float(source_metadata["Uy_bot_m"]) * scale,
+                "transient_scaled_snapshot_path_persisted": False,
+                "scaled_state_reconstructed_from_source_snapshot": True,
+            }
+        )
+        audit_path.write_text(json.dumps(audit, indent=2))
+        case["station_report"] = audit
+    payload["source_snapshot"] = str(source)
+    payload["transient_scaled_snapshot_paths_persisted"] = False
+    payload["scaled_states_reconstructible_from_source_snapshot"] = True
+    (outroot / "frozen_geometry_load_invariance.json").write_text(
+        json.dumps(payload, indent=2)
+    )
+    return payload
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--snapshot", type=Path, required=True)
@@ -38,6 +68,7 @@ def main() -> None:
         load_invariance_tolerance=args.load_invariance_tolerance,
         significance_floor_fraction=args.significance_floor_fraction,
     )
+    payload = _persist_provenance(payload, args.snapshot, args.outroot)
     print(
         json.dumps(
             {
