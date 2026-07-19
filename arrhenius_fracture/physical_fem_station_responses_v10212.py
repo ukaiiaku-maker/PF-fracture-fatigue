@@ -1,8 +1,8 @@
 """Generate physical signed responses only at FEM-resolved spatial stations.
 
-The reduced MPZ grid may be much finer than the continuum mesh.  This module
+The reduced MPZ grid may be much finer than the continuum mesh. This module
 therefore measures unit signed-slip responses at distinct, mesh-resolved
-stations and records the complete reduced grid separately.  Projection from the
+stations and records the complete reduced grid separately. Projection from the
 measured stations to that grid is performed later by the reviewed atlas builder;
 sub-element response rows are never presented as direct FEM measurements.
 """
@@ -30,7 +30,7 @@ from .unit_slip_perturbation_v10212 import (
     interaction_response,
 )
 
-MODEL_ID = "v10.2.12_fem_resolved_signed_spatial_station_responses"
+MODEL_ID = "v10.2.13_fem_resolved_signed_spatial_station_responses"
 
 
 def _unit(values) -> np.ndarray:
@@ -97,6 +97,141 @@ def _nearest_intact_centroid(
     return centroids[indices[int(np.argmin(distances))]].copy()
 
 
+def _ray_coordinates(
+    centroids: np.ndarray,
+    origin: np.ndarray,
+    ray: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    offset = centroids - origin[None, :]
+    longitudinal = offset @ ray
+    transverse = np.linalg.norm(
+        offset - longitudinal[:, None] * ray[None, :], axis=1
+    )
+    return longitudinal, transverse
+
+
+def _active_surface_entry(
+    *,
+    mesh,
+    damage: np.ndarray,
+    tip: np.ndarray,
+    forward: np.ndarray,
+    ray: np.ndarray,
+    width_m: float,
+) -> tuple[np.ndarray, dict]:
+    """Locate where a slip ray actually enters surviving material.
+
+    The nominal crack tip lies inside a finite stiffness-killed band on a discrete
+    mesh. A ribbon launched directly from that coordinate can therefore traverse
+    several damaged elements before entering the body. Only the contiguous
+    damaged cluster attached to the tip is treated as the free-surface source;
+    separated damaged clusters remain interior crossings and are rejected later.
+    """
+    centroids = np.asarray(mesh.nodes, dtype=float)[
+        np.asarray(mesh.elems, dtype=int)
+    ].mean(axis=1)
+    de = _element_damage(mesh, damage)
+    h_tip = max(float(getattr(mesh, "hbar_tip", 0.0)), 1.0e-15)
+    width = float(width_m)
+    longitudinal, transverse = _ray_coordinates(centroids, tip, ray)
+    forward_distance = (centroids - tip[None, :]) @ forward
+
+    corridor = max(0.5 * width + h_tip, 1.5 * h_tip)
+    connectivity_gap = max(width, 2.0 * h_tip)
+    tolerance = max(
+        128.0 * np.finfo(float).eps
+        * max(float(np.max(np.abs(tip))), width, h_tip, 1.0),
+        1.0e-15,
+    )
+
+    attached_damage = np.sort(
+        longitudinal[
+            (de >= 0.05)
+            & (longitudinal >= -h_tip - tolerance)
+            & (transverse <= corridor + tolerance)
+        ]
+    )
+    source_extent = 0.0
+    attached_count = 0
+    for coordinate in attached_damage:
+        coordinate = float(coordinate)
+        if coordinate <= source_extent + connectivity_gap + tolerance:
+            source_extent = max(source_extent, coordinate + 0.5 * h_tip)
+            attached_count += 1
+        else:
+            break
+
+    intact = (
+        (de < 0.05)
+        & (forward_distance > 0.0)
+        & (longitudinal >= source_extent - tolerance)
+        & (transverse <= corridor + tolerance)
+    )
+    indices = np.flatnonzero(intact)
+    if indices.size == 0:
+        raise ValueError(
+            "no intact FEM support is available where the active slip ray exits "
+            "the tip-connected crack band"
+        )
+    order = np.lexsort((transverse[indices], longitudinal[indices]))
+    index = int(indices[int(order[0])])
+    start = centroids[index].copy()
+    start_longitudinal = float(longitudinal[index])
+    return start, {
+        "active_source_entry_method": "first_intact_centroid_after_tip_connected_damage_band",
+        "active_source_entry_element": index,
+        "active_source_entry_longitudinal_m": start_longitudinal,
+        "active_source_entry_transverse_m": float(transverse[index]),
+        "tip_connected_damage_extent_m": float(source_extent),
+        "tip_connected_damaged_centroid_count": int(attached_count),
+        "source_connectivity_gap_m": float(connectivity_gap),
+        "source_ray_corridor_half_width_m": float(corridor),
+        "separated_damage_is_not_absorbed_into_source": True,
+    }
+
+
+def _nearest_intact_terminal_on_ray(
+    *,
+    mesh,
+    damage: np.ndarray,
+    tip: np.ndarray,
+    forward: np.ndarray,
+    ray: np.ndarray,
+    nominal_longitudinal_m: float,
+    minimum_longitudinal_m: float,
+    width_m: float,
+) -> tuple[np.ndarray, dict]:
+    centroids = np.asarray(mesh.nodes, dtype=float)[
+        np.asarray(mesh.elems, dtype=int)
+    ].mean(axis=1)
+    de = _element_damage(mesh, damage)
+    h_tip = max(float(getattr(mesh, "hbar_tip", 0.0)), 1.0e-15)
+    longitudinal, transverse = _ray_coordinates(centroids, tip, ray)
+    forward_distance = (centroids - tip[None, :]) @ forward
+    corridor = max(float(width_m) + h_tip, 2.0 * h_tip)
+    admissible = (
+        (de < 0.05)
+        & (forward_distance > 0.0)
+        & (longitudinal >= float(minimum_longitudinal_m))
+        & (transverse <= corridor)
+    )
+    indices = np.flatnonzero(admissible)
+    if indices.size == 0:
+        raise ValueError(
+            "no intact FEM centroid is available for the active ribbon terminal "
+            "beyond the resolved source entry"
+        )
+    score = np.abs(longitudinal[indices] - float(nominal_longitudinal_m))
+    order = np.lexsort((transverse[indices], score))
+    index = int(indices[int(order[0])])
+    return centroids[index].copy(), {
+        "active_terminal_element": index,
+        "active_terminal_longitudinal_m": float(longitudinal[index]),
+        "active_terminal_transverse_m": float(transverse[index]),
+        "active_terminal_ray_corridor_half_width_m": float(corridor),
+    }
+
+
 def _ribbon_geometry(
     *,
     region: str,
@@ -113,19 +248,44 @@ def _ribbon_geometry(
     slip = _unit(slip_direction)
     geometric_ray = slip if float(slip @ forward) >= 0.0 else -slip
     resolution = max(float(width_m), 2.0 * float(mesh.hbar_tip), 1.0e-12)
-    distance = max(float(x_m), resolution)
+    requested_distance = max(float(x_m), 0.0)
+    placement_audit: dict = {}
+
     if region == "active":
-        nominal_end = tip + distance * geometric_ray
-        end = _nearest_intact_centroid(
+        start, source_audit = _active_surface_entry(
             mesh=mesh,
             damage=damage,
-            nominal=nominal_end,
             tip=tip,
             forward=forward,
-            region="active",
+            ray=geometric_ray,
+            width_m=width_m,
         )
-        start = tip.copy()
+        start_longitudinal = float((start - tip) @ geometric_ray)
+        minimum_resolved_length = 4.0 * resolution
+        nominal_terminal_longitudinal = max(
+            requested_distance,
+            start_longitudinal + minimum_resolved_length,
+        )
+        minimum_terminal_longitudinal = (
+            start_longitudinal + 0.75 * minimum_resolved_length
+        )
+        end, terminal_audit = _nearest_intact_terminal_on_ray(
+            mesh=mesh,
+            damage=damage,
+            tip=tip,
+            forward=forward,
+            ray=geometric_ray,
+            nominal_longitudinal_m=nominal_terminal_longitudinal,
+            minimum_longitudinal_m=minimum_terminal_longitudinal,
+            width_m=width_m,
+        )
+        distance = nominal_terminal_longitudinal
+        placement_audit.update(source_audit)
+        placement_audit.update(terminal_audit)
+        placement_audit["nominal_tip_coordinate_used_as_ribbon_source"] = False
     else:
+        minimum_resolved_length = resolution
+        distance = max(requested_distance, minimum_resolved_length)
         face = tip - distance * forward
         side_projection = float(slip @ crack_normal)
         side_sign = 1.0 if side_projection >= 0.0 else -1.0
@@ -163,18 +323,26 @@ def _ribbon_geometry(
                 crack_normal=crack_normal,
                 side_sign=side_sign,
             )
-    if float(np.linalg.norm(end - start)) <= 0.0:
+
+    actual_length = float(np.linalg.norm(end - start))
+    if actual_length <= 0.0:
         raise ValueError(f"degenerate {region} ribbon geometry for system {system}")
     return start, end, {
         "region": region,
         "system": int(system),
         "requested_x_m": float(x_m),
+        "requested_distance_m": requested_distance,
+        "minimum_fem_resolved_ribbon_length_m": minimum_resolved_length,
+        "fem_resolution_extension_applied": bool(
+            distance > requested_distance + 1.0e-15
+        ),
         "start_xy_m": start.tolist(),
         "end_xy_m": end.tolist(),
-        "actual_ribbon_length_m": float(np.linalg.norm(end - start)),
+        "actual_ribbon_length_m": actual_length,
         "mesh_resolution_m": float(mesh.hbar_tip),
         "placement_resolution_m": resolution,
         "slip_direction_sign_preserved": True,
+        **placement_audit,
     }
 
 
@@ -193,7 +361,9 @@ def generate_station_responses(
     if out_csv.exists():
         raise FileExistsError(f"refusing to overwrite {out_csv}")
     values = sorted({float(value) for value in magnitudes})
-    if len(values) < 2 or any(not math.isfinite(value) or value <= 0.0 for value in values):
+    if len(values) < 2 or any(
+        not math.isfinite(value) or value <= 0.0 for value in values
+    ):
         raise ValueError("at least two positive perturbation magnitudes are required")
     width = (
         max(2.0 * float(data["mesh"].hbar_tip), 10.0 * float(data["mat"].b))
@@ -211,69 +381,116 @@ def generate_station_responses(
         raise ValueError("minimum station spacing must be positive and finite")
 
     base = equilibrated_base_state(
-        mesh=data["mesh"], boundary=data["boundary"], baseline_u=data["u"],
-        baseline_ep_gp=data["ep_gp"], rho_gp=data["rho_gp"], d=data["d"],
-        D=data["D"], mat=data["mat"], Uy_top=meta.Uy_top_m, Uy_bot=meta.Uy_bot_m,
+        mesh=data["mesh"],
+        boundary=data["boundary"],
+        baseline_u=data["u"],
+        baseline_ep_gp=data["ep_gp"],
+        rho_gp=data["rho_gp"],
+        d=data["d"],
+        D=data["D"],
+        mat=data["mat"],
+        Uy_top=meta.Uy_top_m,
+        Uy_bot=meta.Uy_bot_m,
     )
     tip = np.asarray(meta.crack_tip_xy_m, dtype=float)
     forward = _unit(meta.crack_direction)
-    domain_length = float(np.ptp(data["mesh"].nodes[:, 0]) + np.ptp(data["mesh"].nodes[:, 1]))
-    crack_segments = [(tip - max(domain_length, meta.interaction_ell_m) * forward, tip)]
+    domain_length = float(
+        np.ptp(data["mesh"].nodes[:, 0]) + np.ptp(data["mesh"].nodes[:, 1])
+    )
+    crack_segments = [
+        (tip - max(domain_length, meta.interaction_ell_m) * forward, tip)
+    ]
     channel_directions = [_unit(row) for row in meta.channel_directions]
     channel_normals = [_unit(row) for row in meta.channel_normals]
-    region_grids = {"active": tuple(meta.active_x_m), "wake": tuple(meta.wake_x_m)}
+    region_grids = {
+        "active": tuple(meta.active_x_m),
+        "wake": tuple(meta.wake_x_m),
+    }
     station_map = {
-        region: _station_indices(grid, station_spacing) for region, grid in region_grids.items()
+        region: _station_indices(grid, station_spacing)
+        for region, grid in region_grids.items()
     }
     rows = []
     placements = []
     for region, grid in region_grids.items():
-        for system, (slip, normal) in enumerate(zip(channel_directions, channel_normals)):
+        for system, (slip, normal) in enumerate(
+            zip(channel_directions, channel_normals)
+        ):
             for bin_index in station_map[region]:
                 x_m = float(grid[bin_index])
                 start, end, placement = _ribbon_geometry(
-                    region=region, system=system, x_m=x_m, width_m=width,
-                    mesh=data["mesh"], damage=data["d"], tip=tip, forward=forward,
+                    region=region,
+                    system=system,
+                    x_m=x_m,
+                    width_m=width,
+                    mesh=data["mesh"],
+                    damage=data["d"],
+                    tip=tip,
+                    forward=forward,
                     slip_direction=slip,
                 )
                 placements.append({**placement, "bin": int(bin_index)})
                 for sign in (-1, 1):
                     for magnitude in values:
                         perturbation = SlipRibbonPerturbation(
-                            system=system, region=region, bin_index=bin_index,
-                            start_xy_m=start, end_xy_m=end, slip_direction=slip,
-                            plane_normal=normal, width_m=width,
+                            system=system,
+                            region=region,
+                            bin_index=bin_index,
+                            start_xy_m=start,
+                            end_xy_m=end,
+                            slip_direction=slip,
+                            plane_normal=normal,
+                            width_m=width,
                             burgers_m=float(data["mat"].b),
                             signed_line_content=float(sign) * magnitude,
                         )
                         response = interaction_response(
-                            mesh=data["mesh"], base_state=base,
-                            baseline_ep_gp=data["ep_gp"], rho_gp=data["rho_gp"],
-                            d=data["d"], D=data["D"], mat=data["mat"],
-                            boundary=data["boundary"], Uy_top=meta.Uy_top_m,
-                            Uy_bot=meta.Uy_bot_m, crack_tip=tip,
-                            crack_direction=forward, interaction_ell_m=meta.interaction_ell_m,
-                            perturbation=perturbation, interaction_cfg=interaction_cfg,
+                            mesh=data["mesh"],
+                            base_state=base,
+                            baseline_ep_gp=data["ep_gp"],
+                            rho_gp=data["rho_gp"],
+                            d=data["d"],
+                            D=data["D"],
+                            mat=data["mat"],
+                            boundary=data["boundary"],
+                            Uy_top=meta.Uy_top_m,
+                            Uy_bot=meta.Uy_bot_m,
+                            crack_tip=tip,
+                            crack_direction=forward,
+                            interaction_ell_m=meta.interaction_ell_m,
+                            perturbation=perturbation,
+                            interaction_cfg=interaction_cfg,
                             crack_segments=crack_segments,
                             exclude_radius_m=meta.exclude_radius_m,
                         )
                         audit = response["perturbation"]
-                        rows.append({
-                            "state_id": meta.state_id,
-                            "r_eff_over_r0": meta.r_eff_over_r0,
-                            "opening_strength_fraction": meta.opening_strength_fraction,
-                            "crack_extension_m": meta.crack_extension_m,
-                            "region": region, "system": system, "bin": bin_index,
-                            "x_m": x_m, "burgers_sign": sign,
-                            "delta_signed_line_content": float(sign) * magnitude,
-                            "K_I_base_Pa_sqrt_m": response["K_I_base_Pa_sqrt_m"],
-                            "K_I_perturbed_Pa_sqrt_m": response["K_I_perturbed_Pa_sqrt_m"],
-                            "K_II_base_Pa_sqrt_m": response["K_II_base_Pa_sqrt_m"],
-                            "K_II_perturbed_Pa_sqrt_m": response["K_II_perturbed_Pa_sqrt_m"],
-                            "interaction_integral_schema": INTERACTION_INTEGRAL_MODEL_ID,
-                            "ribbon_width_m": width,
-                            "mesh_area_ratio": audit["mesh_area_ratio"],
-                        })
+                        rows.append(
+                            {
+                                "state_id": meta.state_id,
+                                "r_eff_over_r0": meta.r_eff_over_r0,
+                                "opening_strength_fraction": meta.opening_strength_fraction,
+                                "crack_extension_m": meta.crack_extension_m,
+                                "region": region,
+                                "system": system,
+                                "bin": bin_index,
+                                "x_m": x_m,
+                                "burgers_sign": sign,
+                                "delta_signed_line_content": float(sign) * magnitude,
+                                "K_I_base_Pa_sqrt_m": response["K_I_base_Pa_sqrt_m"],
+                                "K_I_perturbed_Pa_sqrt_m": response[
+                                    "K_I_perturbed_Pa_sqrt_m"
+                                ],
+                                "K_II_base_Pa_sqrt_m": response[
+                                    "K_II_base_Pa_sqrt_m"
+                                ],
+                                "K_II_perturbed_Pa_sqrt_m": response[
+                                    "K_II_perturbed_Pa_sqrt_m"
+                                ],
+                                "interaction_integral_schema": INTERACTION_INTEGRAL_MODEL_ID,
+                                "ribbon_width_m": width,
+                                "mesh_area_ratio": audit["mesh_area_ratio"],
+                            }
+                        )
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     with out_csv.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=RESPONSE_COLUMNS)
@@ -304,4 +521,9 @@ def generate_station_responses(
     return report
 
 
-__all__ = ["MODEL_ID", "generate_station_responses"]
+__all__ = [
+    "MODEL_ID",
+    "_active_surface_entry",
+    "_ribbon_geometry",
+    "generate_station_responses",
+]

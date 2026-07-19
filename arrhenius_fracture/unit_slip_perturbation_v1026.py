@@ -106,10 +106,22 @@ def slip_ribbon_eigenstrain_increment(
     longitudinal = relative @ tangent
     closest = start[None, :] + longitudinal[:, None] * tangent[None, :]
     transverse = np.linalg.norm(centroids - closest, axis=1)
+    coordinate_scale = max(
+        float(np.max(np.abs(start))),
+        float(np.max(np.abs(end))),
+        length,
+        float(p.width_m),
+        float(getattr(mesh, "hbar_tip", 0.0)),
+        1.0,
+    )
+    selection_tolerance = max(
+        128.0 * np.finfo(float).eps * coordinate_scale,
+        1.0e-15,
+    )
     selected = (
-        (longitudinal >= 0.0)
-        & (longitudinal <= length)
-        & (transverse <= 0.5 * float(p.width_m))
+        (longitudinal >= -selection_tolerance)
+        & (longitudinal <= length + selection_tolerance)
+        & (transverse <= 0.5 * float(p.width_m) + selection_tolerance)
     )
     if not np.any(selected):
         raise ValueError(
@@ -141,6 +153,8 @@ def slip_ribbon_eigenstrain_increment(
         "requested_ribbon_area_m2": length * float(p.width_m),
         "mesh_area_ratio": represented_area
         / max(length * float(p.width_m), 1.0e-30),
+        "geometric_selection_tolerance_m": selection_tolerance,
+        "endpoint_inclusion_is_tolerance_aware": True,
     }
 
 
@@ -189,11 +203,11 @@ def solve_fixed_crack_state(
     )
     return {
         "u": u_equilibrium,
+        "reaction_top": float(reaction),
         "sigma_gp": sigma,
         "sigma_eq_gp": sigma_eq,
         "sigma1_gp": sigma1,
-        "psi_e_gp": psi,
-        "reaction_top": float(reaction),
+        "psi_gp": psi,
     }
 
 
@@ -218,12 +232,29 @@ def evaluate_signed_slip_perturbation(
     exclude_radius_m: float = 0.0,
     cohesive_network=None,
 ) -> dict[str, Any]:
-    """Compute base and perturbed signed SIFs at fixed geometry and loading."""
+    """Evaluate baseline and one signed perturbation at fixed crack geometry."""
     base = solve_fixed_crack_state(
         mesh=mesh,
         boundary=boundary,
         u=baseline_u,
         ep_gp=baseline_ep_gp,
+        rho_gp=rho_gp,
+        d=d,
+        D=D,
+        mat=mat,
+        Uy_top=Uy_top,
+        Uy_bot=Uy_bot,
+        cohesive_network=cohesive_network,
+    )
+    increment, perturbation_audit = slip_ribbon_eigenstrain_increment(
+        mesh, perturbation
+    )
+    perturbed_ep = np.asarray(baseline_ep_gp, dtype=float) + increment
+    perturbed = solve_fixed_crack_state(
+        mesh=mesh,
+        boundary=boundary,
+        u=base["u"],
+        ep_gp=perturbed_ep,
         rho_gp=rho_gp,
         d=d,
         D=D,
@@ -246,23 +277,6 @@ def evaluate_signed_slip_perturbation(
         exclude_radius=exclude_radius_m,
         D=D,
     )
-    increment, perturbation_audit = slip_ribbon_eigenstrain_increment(
-        mesh, perturbation
-    )
-    perturbed_ep = np.asarray(baseline_ep_gp, dtype=float) + increment
-    perturbed = solve_fixed_crack_state(
-        mesh=mesh,
-        boundary=boundary,
-        u=base["u"],
-        ep_gp=perturbed_ep,
-        rho_gp=rho_gp,
-        d=d,
-        D=D,
-        mat=mat,
-        Uy_top=Uy_top,
-        Uy_bot=Uy_bot,
-        cohesive_network=cohesive_network,
-    )
     perturbed_K = compute_signed_interaction_integral(
         mesh,
         perturbed["u"],
@@ -278,6 +292,8 @@ def evaluate_signed_slip_perturbation(
         D=D,
     )
     content = float(perturbation.signed_line_content)
+    if content == 0.0:
+        raise ValueError("signed line content must be nonzero")
     return {
         "schema": MODEL_ID,
         "region": str(perturbation.region),
@@ -285,22 +301,21 @@ def evaluate_signed_slip_perturbation(
         "bin": int(perturbation.bin_index),
         "burgers_sign": 1 if content > 0.0 else -1,
         "delta_signed_line_content": content,
-        "K_I_base_Pa_sqrt_m": base_K.K_I_Pa_sqrt_m,
-        "K_I_perturbed_Pa_sqrt_m": perturbed_K.K_I_Pa_sqrt_m,
-        "K_II_base_Pa_sqrt_m": base_K.K_II_Pa_sqrt_m,
-        "K_II_perturbed_Pa_sqrt_m": perturbed_K.K_II_Pa_sqrt_m,
-        "H_I_Pa_sqrt_m_per_signed_line": (
-            base_K.K_I_Pa_sqrt_m - perturbed_K.K_I_Pa_sqrt_m
-        )
-        / content,
-        "H_II_Pa_sqrt_m_per_signed_line": (
-            base_K.K_II_Pa_sqrt_m - perturbed_K.K_II_Pa_sqrt_m
-        )
-        / content,
-        "base_reaction_top": base["reaction_top"],
-        "perturbed_reaction_top": perturbed["reaction_top"],
+        "K_I_base_Pa_sqrt_m": float(base_K.K_I_Pa_sqrt_m),
+        "K_I_perturbed_Pa_sqrt_m": float(perturbed_K.K_I_Pa_sqrt_m),
+        "K_II_base_Pa_sqrt_m": float(base_K.K_II_Pa_sqrt_m),
+        "K_II_perturbed_Pa_sqrt_m": float(perturbed_K.K_II_Pa_sqrt_m),
+        "H_I_Pa_sqrt_m_per_signed_line": float(
+            (base_K.K_I_Pa_sqrt_m - perturbed_K.K_I_Pa_sqrt_m) / content
+        ),
+        "H_II_Pa_sqrt_m_per_signed_line": float(
+            (base_K.K_II_Pa_sqrt_m - perturbed_K.K_II_Pa_sqrt_m) / content
+        ),
+        "base_reaction_top": float(base["reaction_top"]),
+        "perturbed_reaction_top": float(perturbed["reaction_top"]),
         "fixed_crack_geometry": True,
         "fixed_external_displacement": True,
+        "production_state_not_mutated": True,
         "perturbation": perturbation_audit,
         "base_interaction_integral": base_K.diagnostics,
         "perturbed_interaction_integral": perturbed_K.diagnostics,

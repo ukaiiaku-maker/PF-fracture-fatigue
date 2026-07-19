@@ -14,6 +14,10 @@ from .physical_fem_snapshot_v10212 import RESPONSE_COLUMNS
 
 MODEL_ID = "v10.2.12_measured_station_to_mpz_grid_projection"
 STATION_SCHEMA = "v10.2.12_fem_resolved_signed_spatial_station_responses"
+ACCEPTED_STATION_SCHEMAS = {
+    STATION_SCHEMA,
+    "v10.2.13_fem_resolved_signed_spatial_station_responses",
+}
 
 
 def _finite(row: dict[str, str], name: str) -> float:
@@ -137,8 +141,12 @@ def expand_station_response_files(
         if not audit_path.is_file():
             raise FileNotFoundError(audit_path)
         audit = json.loads(audit_path.read_text())
-        if audit.get("schema") != STATION_SCHEMA:
-            raise ValueError(f"{audit_path} must use {STATION_SCHEMA}")
+        schema = str(audit.get("schema", ""))
+        if schema not in ACCEPTED_STATION_SCHEMAS:
+            raise ValueError(
+                f"{audit_path} must use one of {sorted(ACCEPTED_STATION_SCHEMAS)}; "
+                f"got {schema!r}"
+            )
         if audit.get("physical_fem_responses_generated") is not True:
             raise ValueError(f"{audit_path} is not a physical FEM response audit")
         if audit.get("responses_are_measured_stations_not_full_grid") is not True:
@@ -303,8 +311,14 @@ def expand_station_response_files(
         "spatial_cross_validation_passed": bool(
             all_cv_available and worst_cv_error <= float(spatial_cross_validation_tolerance)
         ),
+        "accepted_station_audit_schemas": sorted(ACCEPTED_STATION_SCHEMAS),
     }
     return expanded_rows, physical_inputs, report
 
 
-__all__ = ["MODEL_ID", "STATION_SCHEMA", "expand_station_response_files"]
+__all__ = [
+    "MODEL_ID",
+    "STATION_SCHEMA",
+    "ACCEPTED_STATION_SCHEMAS",
+    "expand_station_response_files",
+]
