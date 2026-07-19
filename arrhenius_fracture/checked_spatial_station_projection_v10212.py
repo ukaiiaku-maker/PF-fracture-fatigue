@@ -1,9 +1,9 @@
 """Provenance-checked wrapper around measured-station projection.
 
 Archived v10.2.12 atlases retain the reviewed v10.2.9 isotropic interaction
-schema.  New v10.2.14 production responses use intrinsic stiffness isotropy.
-A build may use either reviewed schema, but mixing schemas within one response
-set is prohibited.
+schema. New v10.2.14 production responses use intrinsic stiffness isotropy. A
+build may use either reviewed schema, but mixing schemas within one response set
+is prohibited.
 """
 from __future__ import annotations
 
@@ -97,8 +97,8 @@ def expand_station_response_files(
     schemas = _interaction_schemas(resolved_paths)
     if len(schemas) != 1 or not schemas.issubset(ACCEPTED_INTERACTION_SCHEMAS):
         raise ValueError(
-            "measured station responses must use one uniform reviewed interaction "
-            f"schema from {sorted(ACCEPTED_INTERACTION_SCHEMAS)}; "
+            "measured station responses must use exactly one uniform reviewed "
+            f"interaction schema from {sorted(ACCEPTED_INTERACTION_SCHEMAS)}; "
             f"found {sorted(schemas)}"
         )
     selected_schema = next(iter(schemas))
