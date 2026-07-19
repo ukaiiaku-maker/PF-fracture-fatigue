@@ -1,11 +1,9 @@
 """
 Sharp-front dual-hazard fracture driver.
 
-This module REPLACES the AT2 <-> hazard coupling layer (source mode, Griffith
-license, consume halo, frontier gates, fired-memory relief) with a single
-crack-advance law.  The phase-field d is retained ONLY as a stiffness-kill
-indicator for broken material; it never evolves variationally and there is no
-second fracture criterion to reconcile.
+This module implements one mesh-independent, event-driven crack-advance law.
+The broken-material field ``d`` is retained only as a stiffness-kill indicator;
+it never evolves through a second fracture criterion.
 
 Architecture
 ------------
@@ -696,7 +694,7 @@ def run_1d(args):
 
     results = []
     print("=" * 72)
-    print("  SHARP-FRONT 1D K-RAMP  (single advance law; no AT2, no gates)")
+    print("  SHARP-FRONT 1D K-RAMP  (single event-driven advance law)")
     print(f"  Kdot = {args.Kdot} MPa*sqrt(m)/s   dt = {dt} s   K_max = {args.Kmax} MPa*sqrt(m)")
     print("=" * 72)
 
@@ -889,8 +887,8 @@ def _render_field_snapshots(out, T, mesh, snaps, max_cols=4):
 def _render_diagnostics(out, T, hist):
     """Per-temperature diagnostic suite (sharp-front analogues of the legacy
     main.py plots).  Only quantities that genuinely exist in the sharp-front
-    model are plotted; the AT2-specific panels (local-Gc toughening state,
-    M_tip amplification, phase-field energy, plasticity-projection fractions)
+    model are plotted; legacy smeared-damage panels (local-resistance state,
+    tip amplification, diffuse energy, plasticity-projection fractions)
     have no analogue here and are deliberately omitted.
     """
     try:

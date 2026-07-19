@@ -1,9 +1,8 @@
 """
-Domain-integral J-integral computation for phase-field fracture.
+Domain-integral J-integral computation for a discrete sharp crack.
 
-Implements the Shih-Moran-Nakamura (1986) domain integral formulation
-adapted for AT2 phase-field models, following the approach of
-Molnár & Gravouil (2017) and Kristensen & Martínez-Pañeda (2020).
+Implements the Shih-Moran-Nakamura (1986) domain integral formulation with
+damage-based element exclusion and branch-safe line-of-sight segmentation.
 
 This is the KEY MISSING PIECE from the original MATLAB code, which
 used a crude W_ext / Da_projected estimate that conflates process zone
@@ -71,7 +70,7 @@ def compute_J_integral(
     where q is a smooth weight function: q=1 on an inner contour,
     q=0 on an outer contour, and varies smoothly between them.
 
-    For a phase-field crack, we:
+    For a discrete crack represented by a broken-material field, we:
     1. Locate the effective crack tip from the damage field
     2. Define an annular integration domain around the tip
     3. Use a plateau weight function q(r)
@@ -87,7 +86,7 @@ def compute_J_integral(
     crack_tip : [x, y] coordinates of crack tip
     crack_direction : unit vector of crack growth direction
     mat : elastic properties
-    ell : phase-field length scale
+    ell : process-zone reference length
     cfg : J-integral configuration
 
     Returns
@@ -199,7 +198,7 @@ def compute_J_integral(
         # Eshelby integrand dotted with ∂q/∂x
         integrand = np.dot(sigma_gradu_e1, dqdx) - W * np.dot(e1, dqdx)
 
-        # Phase-field correction: exclude fully damaged elements
+        # Broken-material correction: exclude fully failed elements
         # The J-integral should be computed on the undamaged region
         de = d[conn]
         dgp = np.mean(de)
@@ -228,8 +227,8 @@ def compute_J_integral(
 
     # Convert to KJ.  The sign of the domain integral depends on the
     # q-field convention and crack-direction convention.  Earlier versions
-    # silently clipped negative J to zero, which made elastic AT2 tests report
-    # KJ_domain=0 even when the magnitude of the energy-release rate was nonzero.
+    # silently clipped negative J to zero, which made elastic sign-convention
+    # tests report KJ_domain=0 even when the energy-release magnitude was nonzero.
     # Store the signed value in info, but use |J| for the energy-release metric.
     Eprime = mat.Eprime
     J_signed = J_value
@@ -308,7 +307,7 @@ def compute_crack_advance(
     Returns
     -------
     Da_projected : projected (x-direction) crack advance [m]
-    Gamma_total : total crack surface from AT2 functional [m per unit thickness]
+    Gamma_total : total represented crack extension [m per unit thickness]
     branch_factor : Gamma_total / Da_projected (≥1, >1 means branching)
     """
     x = mesh.nodes[:, 0]
@@ -320,8 +319,8 @@ def compute_crack_advance(
     else:
         Da_projected = 1e-12
 
-    # Total crack surface is computed externally from AT2 energy
-    # Here we just return the projected advance
+    # The current sharp-front implementation reports projected advance
+    # for both extension measures.
     return Da_projected, Da_projected, 1.0
 
 

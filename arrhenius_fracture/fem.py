@@ -75,7 +75,7 @@ def assemble_mechanics(
     # Elastic strain
     eps_e = eps_tot - ep_gp.T  # (ne, 3), ep_gp is (3, ne)
 
-    # Phase-field degradation per element
+    # Broken-material stiffness degradation per element
     dgp = np.mean(d[conn], axis=1)  # (ne,)
     g_d = (1 - dgp)**2 + kappa      # (ne,)
 
@@ -147,7 +147,7 @@ def stress_state(mesh: TriMesh, u: np.ndarray, ep_gp: np.ndarray,
                  kappa: float = 1e-6):
     """Recompute (sigma_gp, sigma_eq_gp, sigma1_gp, psi_e_gp) at the CURRENT
     displacement without assembling K.  Used after the mechanics solve so the
-    plastic update / hazard drive / phase-field target all see the
+    plastic update, event drive, and equilibrium solve all see the
     EQUILIBRIUM stress rather than the pre-solve stale field."""
     conn = mesh.elems
     edofs = np.zeros((mesh.ne, 6), dtype=int)
@@ -260,7 +260,7 @@ def elastic_energy_densities(mesh: TriMesh, u: np.ndarray, ep_gp: np.ndarray,
     """Return stored and undegraded elastic energy densities.
 
     ``assemble_mechanics`` returns ``psi_e_gp`` as the positive undegraded
-    tensile energy used to drive AT2 damage.  That is not the stored mechanical
+    tensile energy diagnostic.  That is not the stored mechanical
     energy of the degraded body.  For a thermodynamic audit the stored energy
     must use the stress that actually appears in the equilibrium solve:
 
@@ -333,39 +333,3 @@ def _project_scalar(mesh: TriMesh, val_gp: np.ndarray) -> np.ndarray:
 
     return acc / np.maximum(wacc, 1e-30)
 
-
-def assemble_pf_matrices(mesh: TriMesh) -> Tuple[sparse.csr_matrix, sparse.csr_matrix]:
-    """
-    Assemble phase-field mass and stiffness matrices (vectorized).
-
-    Returns Md (mass) and Kd (stiffness) for the AT2 functional.
-    """
-    nn = mesh.nn
-    ne = mesh.ne
-    conn = mesh.elems  # (ne, 3)
-
-    N = np.array([1/3, 1/3, 1/3])
-    A = mesh.area_e  # (ne,)
-
-    # Mass: M_ij = N_i * N_j * A (outer product, same for all elements)
-    NNT = np.outer(N, N)  # (3, 3)
-    Me_all = NNT[None, :, :] * A[:, None, None]  # (ne, 3, 3)
-
-    # Stiffness: K_ij = (dNdx^T @ dNdx) * A
-    # dNdx_e is (ne, 2, 3)
-    Ke_all = np.einsum('eji,ejk->eik', mesh.dNdx_e, mesh.dNdx_e) * A[:, None, None]
-
-    # Build row/col indices
-    ii = conn[:, :, None].repeat(3, axis=2)  # (ne, 3, 3)
-    jj = conn[:, None, :].repeat(3, axis=1)  # (ne, 3, 3)
-
-    Md = sparse.csr_matrix(
-        (Me_all.ravel(), (ii.ravel(), jj.ravel())),
-        shape=(nn, nn)
-    )
-    Kd = sparse.csr_matrix(
-        (Ke_all.ravel(), (ii.ravel(), jj.ravel())),
-        shape=(nn, nn)
-    )
-
-    return Md, Kd
