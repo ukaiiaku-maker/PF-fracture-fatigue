@@ -6,12 +6,25 @@ import json
 from pathlib import Path
 import sys
 
-# Permit direct execution from a clean repository checkout without requiring an
-# editable installation first.  Python otherwise places only scripts/ at
-# sys.path[0], so the sibling arrhenius_fracture package is not importable.
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
+
+import arrhenius_fracture
+
+_EXPECTED_PROJECT = "PF-fracture-fatigue"
+_PACKAGE_ROOT = Path(arrhenius_fracture.__file__).resolve().parent
+if getattr(arrhenius_fracture, "PROJECT_ID", None) != _EXPECTED_PROJECT:
+    raise RuntimeError(
+        "wrong arrhenius_fracture distribution imported: expected "
+        f"{_EXPECTED_PROJECT!r}, got "
+        f"{getattr(arrhenius_fracture, 'PROJECT_ID', None)!r} from {_PACKAGE_ROOT}"
+    )
+if _PACKAGE_ROOT != REPOSITORY_ROOT / "arrhenius_fracture":
+    raise RuntimeError(
+        "stale editable arrhenius_fracture import detected: expected "
+        f"{REPOSITORY_ROOT / 'arrhenius_fracture'}, got {_PACKAGE_ROOT}"
+    )
 
 from arrhenius_fracture.frozen_geometry_load_invariance_v10213 import (
     evaluate_frozen_geometry_load_invariance,
@@ -64,6 +77,8 @@ def main() -> None:
                 "maximum_relative_load_variation": payload["checks"][
                     "maximum_relative_load_variation"
                 ],
+                "project_id": arrhenius_fracture.PROJECT_ID,
+                "package_root": str(_PACKAGE_ROOT),
                 "report": str(
                     (
                         args.outroot
