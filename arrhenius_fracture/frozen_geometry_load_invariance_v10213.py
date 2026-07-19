@@ -1,13 +1,9 @@
-"""Frozen-geometry load-invariance validation for signed shielding kernels.
+"""Frozen-geometry load-invariance validation for active signed kernels.
 
-The sharp-front FEM body is linear elastic for atlas collection.  At fixed crack
-geometry and fixed internal fields, a unit signed-slip influence coefficient
-must therefore be independent of the externally imposed displacement.  This
-module evaluates the same serialized FEM snapshot at several load scales and
-fails closed if the normalized mode-I or mode-II response changes materially.
-
-Opening is consequently treated as a validation coordinate, not automatically
-as a production interpolation axis.
+At fixed crack geometry and internal fields, the linear-elastic influence of a
+unit active signed-slip perturbation must be independent of the external load.
+v10.2.14 deliberately excludes the scalar wake from this validation because the
+current wake state does not preserve two-dimensional line positions.
 """
 from __future__ import annotations
 
@@ -24,7 +20,7 @@ import numpy as np
 from .physical_fem_snapshot_v10212 import RESPONSE_COLUMNS, load_snapshot
 from .physical_fem_station_responses_v10212 import generate_station_responses
 
-MODEL_ID = "v10.2.13_frozen_geometry_load_invariance"
+MODEL_ID = "v10.2.14_active_frozen_geometry_load_invariance"
 LOAD_RESPONSE_COLUMNS = tuple(RESPONSE_COLUMNS) + (
     "parent_state_id",
     "load_scale",
@@ -53,6 +49,8 @@ def _scaled_snapshot(source: Path, destination: Path, scale: float) -> dict[str,
     payload["frozen_geometry_parent_state_id"] = parent_state_id
     payload["frozen_geometry_load_scale"] = float(scale)
     payload["opening_value_is_linear_load_proxy"] = True
+    payload["active_kernel_supported"] = True
+    payload["wake_kernel_supported"] = False
     metadata_path.write_text(json.dumps(payload, indent=2))
     return {
         "parent_state_id": parent_state_id,
@@ -80,12 +78,12 @@ def _validate_coefficients(
     load_invariance_tolerance: float,
     significance_floor_fraction: float,
 ) -> dict[str, Any]:
+    if any(str(row.get("region", "")) != "active" for row in rows):
+        raise ValueError("v10.2.14 load invariance accepts active response rows only")
     grouped: dict[tuple[Any, ...], dict[float, list[float]]] = {}
     for row in rows:
         spatial = (
-            str(row["region"]),
-            int(row["system"]),
-            int(row["bin"]),
+            str(row["region"]), int(row["system"]), int(row["bin"]),
             float(row["x_m"]),
         )
         scale = float(row["load_scale"])
@@ -94,7 +92,7 @@ def _validate_coefficients(
                 _coefficient(row, mode)
             )
     if not grouped:
-        raise ValueError("no signed response coefficients were generated")
+        raise ValueError("no active signed response coefficients were generated")
 
     scale_means: dict[tuple[Any, ...], dict[float, float]] = {}
     within_load_checks = []
@@ -108,19 +106,13 @@ def _validate_coefficients(
             global_maximum = max(global_maximum, abs(mean), float(np.max(np.abs(array))))
             denominator = max(abs(mean), 1.0e-30)
             relative_spread = float(np.max(np.abs(array - mean)) / denominator)
-            within_load_checks.append(
-                {
-                    "region": key[0],
-                    "system": key[1],
-                    "bin": key[2],
-                    "x_m": key[3],
-                    "mode": key[4],
-                    "load_scale": scale,
-                    "coefficient_mean": mean,
-                    "maximum_relative_sign_amplitude_spread": relative_spread,
-                    "passed": relative_spread <= float(linearity_tolerance),
-                }
-            )
+            within_load_checks.append({
+                "region": key[0], "system": key[1], "bin": key[2],
+                "x_m": key[3], "mode": key[4], "load_scale": scale,
+                "coefficient_mean": mean,
+                "maximum_relative_sign_amplitude_spread": relative_spread,
+                "passed": relative_spread <= float(linearity_tolerance),
+            })
         scale_means[key] = means
 
     floor = max(global_maximum * float(significance_floor_fraction), 1.0e-12)
@@ -132,21 +124,16 @@ def _validate_coefficients(
         reference = float(np.median(values))
         relative = np.abs(values - reference) / max(abs(reference), floor)
         worst = float(np.max(relative))
-        load_checks.append(
-            {
-                "region": key[0],
-                "system": key[1],
-                "bin": key[2],
-                "x_m": key[3],
-                "mode": key[4],
-                "reference_coefficient": reference,
-                "coefficients_by_load_scale": {
-                    f"{scale:.12g}": value for scale, value in sorted(means.items())
-                },
-                "maximum_relative_load_variation": worst,
-                "passed": worst <= float(load_invariance_tolerance),
-            }
-        )
+        load_checks.append({
+            "region": key[0], "system": key[1], "bin": key[2],
+            "x_m": key[3], "mode": key[4],
+            "reference_coefficient": reference,
+            "coefficients_by_load_scale": {
+                f"{scale:.12g}": value for scale, value in sorted(means.items())
+            },
+            "maximum_relative_load_variation": worst,
+            "passed": worst <= float(load_invariance_tolerance),
+        })
 
     within_passed = all(item["passed"] for item in within_load_checks)
     load_passed = all(item["passed"] for item in load_checks)
@@ -181,6 +168,7 @@ def evaluate_frozen_geometry_load_invariance(
     linearity_tolerance: float = 0.03,
     load_invariance_tolerance: float = 0.05,
     significance_floor_fraction: float = 1.0e-3,
+    minimum_residual_stiffness_fraction: float = 1.0e-3,
 ) -> dict[str, Any]:
     source = Path(snapshot_root).expanduser().resolve()
     if not (source / "snapshot.json").is_file():
@@ -206,46 +194,47 @@ def evaluate_frozen_geometry_load_invariance(
     original_meta = original["metadata"]
     combined_rows: list[dict[str, Any]] = []
     generated = []
-    with tempfile.TemporaryDirectory(prefix="v10213_frozen_geometry_") as temporary:
+    with tempfile.TemporaryDirectory(prefix="v10214_active_frozen_geometry_") as temporary:
         temporary_root = Path(temporary)
         for scale in scales:
             scaled_root = temporary_root / f"snapshot_{_scale_token(scale)}"
             metadata = _scaled_snapshot(source, scaled_root, scale)
-            response_path = out / f"station_responses_load_{_scale_token(scale)}.csv"
+            response_path = out / f"active_station_responses_load_{_scale_token(scale)}.csv"
             report = generate_station_responses(
                 scaled_root,
                 out_csv=response_path,
                 magnitudes=perturbation_magnitudes,
                 ribbon_width_m=ribbon_width_m,
                 minimum_station_spacing_m=minimum_station_spacing_m,
+                minimum_residual_stiffness_fraction=(
+                    minimum_residual_stiffness_fraction
+                ),
             )
+            if report.get("wake_shielding_supported") is not False:
+                raise RuntimeError("active-only evaluator unexpectedly enabled wake shielding")
             rows = list(csv.DictReader(response_path.open(newline="")))
             for row in rows:
-                row.update(
-                    {
-                        "parent_state_id": metadata["parent_state_id"],
-                        "load_scale": float(scale),
-                        "captured_opening_strength_fraction": metadata[
-                            "captured_opening_strength_fraction"
-                        ],
-                        "scaled_opening_proxy": metadata["scaled_opening_proxy"],
-                        "cumulative_crack_path_extension_m": float(
-                            original_meta.crack_extension_m
-                        ),
-                    }
-                )
+                row.update({
+                    "parent_state_id": metadata["parent_state_id"],
+                    "load_scale": float(scale),
+                    "captured_opening_strength_fraction": metadata[
+                        "captured_opening_strength_fraction"
+                    ],
+                    "scaled_opening_proxy": metadata["scaled_opening_proxy"],
+                    "cumulative_crack_path_extension_m": float(
+                        original_meta.crack_extension_m
+                    ),
+                })
             combined_rows.extend(rows)
-            generated.append(
-                {
-                    "load_scale": scale,
-                    "responses": str(response_path.resolve()),
-                    "audit": str(response_path.with_suffix(".audit.json").resolve()),
-                    "response_rows": len(rows),
-                    "station_report": report,
-                }
-            )
+            generated.append({
+                "load_scale": scale,
+                "responses": str(response_path.resolve()),
+                "audit": str(response_path.with_suffix(".audit.json").resolve()),
+                "response_rows": len(rows),
+                "station_report": report,
+            })
 
-    combined_path = out / "frozen_geometry_load_sweep_responses.csv"
+    combined_path = out / "active_frozen_geometry_load_sweep_responses.csv"
     with combined_path.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=LOAD_RESPONSE_COLUMNS)
         writer.writeheader()
@@ -276,6 +265,12 @@ def evaluate_frozen_geometry_load_invariance(
         "fixed_internal_fields": True,
         "opening_is_validation_coordinate": True,
         "opening_is_production_interpolation_axis": False,
+        "active_kernel_mechanically_measured": True,
+        "wake_kernel_mechanically_measured": False,
+        "wake_shielding_supported": False,
+        "minimum_residual_stiffness_fraction": float(
+            minimum_residual_stiffness_fraction
+        ),
         "checks": checks,
         "load_invariance_passed": passed,
         "production_parameterization_allowed": False,
@@ -285,7 +280,7 @@ def evaluate_frozen_geometry_load_invariance(
     )
     if not passed:
         raise RuntimeError(
-            "frozen-geometry signed shielding response is not load invariant; "
+            "active frozen-geometry signed shielding response is not load invariant; "
             "inspect the generated audit before building a production atlas"
         )
     return payload
