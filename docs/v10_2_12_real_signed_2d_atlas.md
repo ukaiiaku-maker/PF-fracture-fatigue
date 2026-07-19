@@ -6,9 +6,15 @@ This workflow generates the physical shielding closure required by the shared si
 
 The shared state stores positive and negative dislocation-line content separately. Unsigned content controls density-dependent transport, recovery, Taylor back stress, and blunting. Signed content controls shielding and antishielding through the measured interaction operator.
 
-The PF/FEM crack geometry remains a sharp stiffness-kill front. The engine variable `r_eff` is an analytical local-tip stress/blunting state; it is not a finite-radius FEM crack geometry. Captured states may be indexed by `r_eff/r0` to test whether the 2-D influence operator changes with that analytical state, but the artifact must not be described as a finite-radius geometric kernel.
+The PF/FEM crack geometry remains a sharp stiffness-kill front. The engine variable `r_eff` is an analytical local-tip stress/blunting state; it is **not** a finite-radius FEM crack geometry. It may be used to select and audit captured trajectories, but it is not a physical interpolation axis of the 2-D shielding kernel.
 
-The reduced MPZ grid is usually finer than the continuum FEM mesh. Direct FEM perturbations are therefore evaluated only at distinct, mesh-resolved spatial stations. The full active/wake MPZ-grid operator is an audited piecewise-linear projection from those measured stations. Projected sub-element values are never labeled as direct FEM measurements.
+For compatibility with the existing three-coordinate family schema, every built kernel state stores `r_eff_over_r0 = 1`. The production resolver replaces the runtime analytical radius by this constant before interpolation while retaining the actual runtime value in diagnostics. The physical atlas grid is therefore:
+
+```text
+opening_strength_fraction × crack_extension_m
+```
+
+The reduced MPZ grid is usually finer than the continuum FEM mesh. Direct FEM perturbations are evaluated only at distinct, mesh-resolved spatial stations. The full active/wake MPZ-grid operator is an audited piecewise-linear projection from those measured stations. Projected sub-element values are never labeled as direct FEM measurements.
 
 ## 1. Create a state request table
 
@@ -18,7 +24,7 @@ Required columns:
 state_id,temperature_K,r_eff_over_r0,opening_strength_fraction,crack_extension_m,r_tolerance,opening_tolerance,extension_tolerance_m,interaction_ell_m
 ```
 
-The table should cover the intended production envelope. A complete Cartesian state grid is required by the v10.2.9 state-family builder. One monotonic trajectory may not pass every requested combination, so collect states in several versioned runs and combine their measured-station response tables later.
+`r_eff_over_r0` and `r_tolerance` select an observed trajectory state only. After physical responses are measured, the builder collapses that non-geometric coordinate to the constant compatibility value. The retained kernel states must form a complete Cartesian grid in opening fraction and crack extension. Do not keep two snapshots with the same opening/extension coordinates merely because their analytical `r_eff` values differ.
 
 ## 2. Capture accepted physical FEM states
 
@@ -36,7 +42,7 @@ EXTRA_ARGS="--steps 1200 --tip-h-fine 7e-7 --L-pz 1e-6" \
 bash scripts/run_v10_2_12_real_signed_atlas.sh
 ```
 
-Each captured state contains the mesh, connectivity, accepted displacement, plastic-strain and density fields, damage field, stiffness tensor, boundary sets, imposed displacement, local crack direction, slip-channel directions/normals, active/wake MPZ coordinates, material properties, and complete shared-engine configuration.
+The runner uses `arrhenius_fracture.sharp_front_v10_2_12_capture`. Each snapshot contains the mesh, connectivity, accepted displacement, plastic-strain and density fields, damage field, stiffness tensor, boundary sets, imposed displacement, local crack direction, signed slip-channel directions/normals, active/wake MPZ coordinates, material properties, and complete engine configuration.
 
 Capture fails closed if a requested state is not reached. `--allow-incomplete-atlas-capture` is diagnostic only. Cohesive-network snapshots are rejected until cohesive internal state has an explicit serializer.
 
@@ -61,13 +67,13 @@ The ribbon plastic shear is fixed by
 gamma = signed_line_content * b / ribbon_width
 ```
 
-so the imposed displacement discontinuity equals `signed_line_content * b`. Positive and negative Burgers signs use the exact serialized slip-direction convention. Active ribbons terminate in intact material ahead of the tip. Wake ribbons originate in intact crack-face-adjacent material rather than inside stiffness-killed crack elements. Any ribbon with more than 5% damage-weighted represented area is rejected.
+so the imposed displacement discontinuity equals `signed_line_content * b`. Positive and negative Burgers signs use the exact serialized slip-direction convention. Active ribbons terminate in intact material ahead of the tip. Wake ribbons originate in intact crack-face-adjacent material rather than inside stiffness-killed crack elements. A ribbon with more than 5% damage-weighted represented area is rejected.
 
-The base and perturbed equilibria use fixed crack geometry and fixed external displacement. Signed mode-I and mode-II responses use the v10.2.9 analytic-gradient, C1-Hermite interaction integral. Both Burgers signs and at least two perturbation magnitudes are mandatory.
+The base and perturbed equilibria use fixed crack geometry and fixed external displacement. Signed mode-I and mode-II responses use the v10.2.9 analytic-gradient, C1-Hermite interaction integral. Both Burgers signs and at least two perturbation magnitudes are mandatory. Every measured file must carry that exact reviewed interaction-integral schema.
 
 ## 4. Build the mechanics-derived normalization
 
-The normalization command can read the captured `snapshot.json` directly:
+The normalization command reads the captured `snapshot.json` directly:
 
 ```bash
 MODE=normalization \
@@ -97,16 +103,18 @@ OUT=runs/v10_2_12_real_signed_atlas_review_v1.json \
 bash scripts/run_v10_2_12_real_signed_atlas.sh
 ```
 
-The builder first validates the directly measured station rows:
+The builder validates the directly measured station rows:
 
 - positive/negative antisymmetry after division by signed line content;
 - multi-amplitude linearity;
+- one exact interaction-integral schema;
 - intact-material ribbon placement;
 - endpoint coverage of each active/wake spatial grid;
 - at least three measured stations per curve;
-- leave-one-out error for the piecewise-linear spatial projection.
+- leave-one-out error for the piecewise-linear spatial projection;
+- one unique physical state per opening/extension coordinate.
 
-It then projects the measured coefficients onto the complete MPZ grid and passes that explicit representation through the existing v10.2.9 complete-grid, state-envelope, and boundary-stationarity gates. The output remains unauthorized.
+It then projects the measured coefficients onto the complete MPZ grid, sets the compatibility radius coordinate to one, and applies the complete opening/extension grid and boundary-stationarity gates. The output remains unauthorized.
 
 Independent review must also cover contour-radius stability, mesh/ribbon convergence, source normalization, exact reduced/2-D replay, and monotonic-fracture plus cyclic-fatigue validation using the same artifact.
 
@@ -126,6 +134,34 @@ bash scripts/run_v10_2_12_real_signed_atlas.sh
 
 Authorization fails if any physical, numerical, spatial-projection, normalization, replay, or shared-loading-path gate is incomplete.
 
+## 7. Use the same artifact for monotonic fracture and fatigue
+
+Monotonic example:
+
+```bash
+python -m arrhenius_fracture.sharp_front_v10_2_12 \
+  --signed-kernel-family kernels/v10_2_12_real_signed_2d_atlas_authorized.json \
+  --mode 2d \
+  --material-manifest /absolute/path/to/material.csv \
+  --temperatures 300 700 1200 \
+  --out runs/v10_2_12_monotonic_v1 \
+  --crystal-aniso --crystal-theta-deg 45
+```
+
+Fatigue uses the same entry point, engine class, family loader, fixed-point solution, signed populations, source normalization, and atlas:
+
+```bash
+python -m arrhenius_fracture.sharp_front_v10_2_12 \
+  --signed-kernel-family kernels/v10_2_12_real_signed_2d_atlas_authorized.json \
+  --mode 2d --fatigue-cycles \
+  --material-manifest /absolute/path/to/material.csv \
+  --temperatures 700 \
+  --out runs/v10_2_12_fatigue_v1 \
+  --crystal-aniso --crystal-theta-deg 45
+```
+
+Setting `PARAMETER_CAMPAIGN=1` blocks either loading path unless the artifact explicitly authorizes production parameterization.
+
 ## Required convergence matrix
 
 At minimum, repeat representative states with:
@@ -138,6 +174,6 @@ At minimum, repeat representative states with:
 - at least three spatial stations per active/wake/system curve;
 - low/intermediate/high opening states;
 - at least two crack extensions;
-- states spanning the attained analytical `r_eff/r0` range.
+- observed analytical `r_eff/r0` values reported as diagnostics, not treated as an interpolation dimension.
 
-A fixed kernel is acceptable only if the measured state variation remains below the reviewed tolerance. Otherwise retain the interpolated state-resolved family. No response may be clipped or renormalized to force either result.
+A fixed opening/extension kernel is acceptable only if measured state variation remains below the reviewed tolerance. Otherwise retain the interpolated opening/extension family. No response may be clipped or renormalized to force either result.
