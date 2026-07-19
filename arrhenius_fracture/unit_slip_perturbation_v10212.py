@@ -1,9 +1,12 @@
-"""v10.2.12 physical signed-slip perturbation evaluator.
+"""v10.2.14 physical signed-slip perturbation evaluator.
 
-This module reuses the mechanically normalized slip ribbon from v10.2.6 but
-forces every base and perturbed SIF extraction through the hardened v10.2.9
-analytic-gradient interaction integral.  It never modifies the accepted
-production state and never uses a fitted population-to-shielding coefficient.
+The fixed-crack FEM uses a nodal damage field only to degrade stiffness through
+``g=(1-d_e)^2+kappa``.  A surface-emitted slip ribbon is therefore allowed to
+start on the crack surface and to overlap the fully killed crack band, but the
+represented eigenstrain is applied only in elements that still carry a
+specified minimum residual stiffness.  This preserves the intended
+surface-terminated dislocation topology without treating partially damaged,
+load-bearing process-zone elements as voids.
 """
 from __future__ import annotations
 
@@ -22,7 +25,9 @@ from .unit_slip_perturbation_v1026 import (
     solve_fixed_crack_state,
 )
 
-MODEL_ID = "v10.2.12_physical_signed_slip_analytic_interaction_integral"
+MODEL_ID = "v10.2.14_physical_signed_slip_stiffness_masked_analytic_interaction_integral"
+DEFAULT_STIFFNESS_KAPPA = 1.0e-6
+DEFAULT_MINIMUM_RESIDUAL_STIFFNESS_FRACTION = 1.0e-3
 
 
 def equilibrated_base_state(
@@ -54,22 +59,102 @@ def equilibrated_base_state(
     )
 
 
-def _ribbon_damage_fraction(mesh, d: np.ndarray, increment: np.ndarray) -> float:
-    selected = np.any(np.abs(np.asarray(increment, dtype=float)) > 0.0, axis=0)
-    if not np.any(selected):
-        raise ValueError("signed slip ribbon selects no elements")
+def _element_damage(mesh, d: np.ndarray) -> np.ndarray:
     damage = np.asarray(d, dtype=float).reshape(-1)
+    elems = np.asarray(mesh.elems, dtype=int)
     if damage.size == int(mesh.nn):
-        element_damage = np.mean(damage[np.asarray(mesh.elems, dtype=int)], axis=1)
-    elif damage.size == int(mesh.ne):
-        element_damage = damage
-    else:
-        raise ValueError("damage field size is incompatible with the FEM mesh")
+        return np.mean(damage[elems], axis=1)
+    if damage.size == int(mesh.ne):
+        return damage.copy()
+    raise ValueError("damage field size is incompatible with the FEM mesh")
+
+
+def element_residual_stiffness_fraction(
+    mesh,
+    d: np.ndarray,
+    *,
+    stiffness_kappa: float = DEFAULT_STIFFNESS_KAPPA,
+) -> np.ndarray:
+    """Return the exact scalar degradation used by ``assemble_mechanics``."""
+    kappa = float(stiffness_kappa)
+    if not np.isfinite(kappa) or kappa < 0.0:
+        raise ValueError("stiffness_kappa must be finite and nonnegative")
+    de = np.clip(_element_damage(mesh, d), 0.0, 1.0)
+    return (1.0 - de) ** 2 + kappa
+
+
+def _mask_killed_ribbon_elements(
+    mesh,
+    d: np.ndarray,
+    increment: np.ndarray,
+    *,
+    minimum_residual_stiffness_fraction: float,
+    stiffness_kappa: float,
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Remove eigenstrain only from mechanically killed elements.
+
+    The geometric ribbon may originate on a crack surface and may therefore
+    overlap the killed crack band.  Those elements already have negligible
+    stiffness and cannot represent physical line content.  Partially damaged
+    elements are retained according to the same degradation law as the FEM.
+    """
+    value = np.asarray(increment, dtype=float).copy()
+    if value.ndim != 2 or value.shape[1] != int(mesh.ne):
+        raise ValueError("slip-ribbon increment must have shape (nstrain, mesh.ne)")
+    selected_before = np.any(np.abs(value) > 0.0, axis=0)
+    if not np.any(selected_before):
+        raise ValueError("signed slip ribbon selects no elements")
+
+    threshold = float(minimum_residual_stiffness_fraction)
+    if not np.isfinite(threshold) or not 0.0 <= threshold < 1.0:
+        raise ValueError(
+            "minimum_residual_stiffness_fraction must lie in [0,1)"
+        )
+    residual = element_residual_stiffness_fraction(
+        mesh, d, stiffness_kappa=stiffness_kappa
+    )
+    killed = residual < threshold
+    value[:, killed] = 0.0
+    selected_after = np.any(np.abs(value) > 0.0, axis=0)
+    if not np.any(selected_after):
+        raise ValueError(
+            "signed slip ribbon has no mechanically supported FEM elements after "
+            "stiffness masking"
+        )
+
     area = np.asarray(mesh.area_e, dtype=float)
-    selected_area = float(np.sum(area[selected]))
-    if selected_area <= 0.0:
-        raise ValueError("signed slip ribbon has zero represented area")
-    return float(np.sum(area[selected] * np.clip(element_damage[selected], 0.0, 1.0)) / selected_area)
+    area_before = float(np.sum(area[selected_before]))
+    area_after = float(np.sum(area[selected_after]))
+    killed_area = float(np.sum(area[selected_before & killed]))
+    supported_residual = residual[selected_after]
+    return value, {
+        "stiffness_mask_model": "g=(1-element_mean_damage)^2+kappa",
+        "stiffness_kappa": float(stiffness_kappa),
+        "minimum_residual_stiffness_fraction": threshold,
+        "selected_elements_before_stiffness_mask": int(
+            np.count_nonzero(selected_before)
+        ),
+        "selected_elements_after_stiffness_mask": int(
+            np.count_nonzero(selected_after)
+        ),
+        "stiffness_killed_selected_elements": int(
+            np.count_nonzero(selected_before & killed)
+        ),
+        "selected_area_before_stiffness_mask_m2": area_before,
+        "selected_area_after_stiffness_mask_m2": area_after,
+        "stiffness_killed_selected_area_m2": killed_area,
+        "stiffness_killed_selected_area_fraction": (
+            killed_area / area_before if area_before > 0.0 else 0.0
+        ),
+        "minimum_supported_residual_stiffness_fraction": float(
+            np.min(supported_residual)
+        ),
+        "maximum_supported_residual_stiffness_fraction": float(
+            np.max(supported_residual)
+        ),
+        "surface_overlap_is_clipped_not_relocated": True,
+        "partially_damaged_load_bearing_elements_retained": True,
+    }
 
 
 def interaction_response(
@@ -92,27 +177,26 @@ def interaction_response(
     crack_segments=None,
     exclude_radius_m: float = 0.0,
     cohesive_network=None,
-    maximum_damaged_area_fraction: float = 0.05,
+    minimum_residual_stiffness_fraction: float = (
+        DEFAULT_MINIMUM_RESIDUAL_STIFFNESS_FRACTION
+    ),
+    stiffness_kappa: float = DEFAULT_STIFFNESS_KAPPA,
 ) -> dict[str, Any]:
     """Evaluate one signed line perturbation about an equilibrated fixed crack."""
-    increment, perturbation_audit = slip_ribbon_eigenstrain_increment(
+    raw_increment, perturbation_audit = slip_ribbon_eigenstrain_increment(
         mesh, perturbation
     )
-    damaged_fraction = _ribbon_damage_fraction(mesh, d, increment)
-    allowed_damage = float(maximum_damaged_area_fraction)
-    if not 0.0 <= allowed_damage < 1.0:
-        raise ValueError("maximum_damaged_area_fraction must lie in [0,1)")
-    if damaged_fraction > allowed_damage:
-        raise ValueError(
-            "signed slip ribbon lies in stiffness-killed crack material: "
-            f"damaged area fraction={damaged_fraction:.6g}, allowed={allowed_damage:.6g}"
-        )
-    perturbation_audit = {
-        **perturbation_audit,
-        "damaged_area_fraction": damaged_fraction,
-        "maximum_allowed_damaged_area_fraction": allowed_damage,
-        "ribbon_in_intact_material": True,
-    }
+    increment, stiffness_audit = _mask_killed_ribbon_elements(
+        mesh,
+        d,
+        raw_increment,
+        minimum_residual_stiffness_fraction=(
+            minimum_residual_stiffness_fraction
+        ),
+        stiffness_kappa=stiffness_kappa,
+    )
+    perturbation_audit = {**perturbation_audit, **stiffness_audit}
+
     perturbed_ep = np.asarray(baseline_ep_gp, dtype=float) + increment
     perturbed = solve_fixed_crack_state(
         mesh=mesh,
@@ -192,6 +276,9 @@ __all__ = [
     "MODEL_ID",
     "INTERACTION_INTEGRAL_MODEL_ID",
     "SlipRibbonPerturbation",
+    "DEFAULT_STIFFNESS_KAPPA",
+    "DEFAULT_MINIMUM_RESIDUAL_STIFFNESS_FRACTION",
+    "element_residual_stiffness_fraction",
     "equilibrated_base_state",
     "interaction_response",
 ]
