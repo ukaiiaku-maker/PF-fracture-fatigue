@@ -71,7 +71,7 @@ def test_both_45_degree_crystal_active_ribbons_keep_exact_surface_source_and_end
             stiffness_kappa=1.0e-6,
         )
         assert np.allclose(start, tip)
-        assert np.linalg.norm(end - start) == np.testing.assert_allclose(
+        np.testing.assert_allclose(
             np.linalg.norm(end - start), requested, rtol=1.0e-12, atol=1.0e-15
         )
         assert audit["source_is_physical_crack_surface_tip"] is True
