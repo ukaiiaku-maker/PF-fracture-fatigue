@@ -14,8 +14,8 @@ case "$MODE" in
   normalization)
     : "${ENGINE_CONFIG:?Set ENGINE_CONFIG to snapshot.json or a complete engine JSON}"
     : "${OUT:?Set OUT to a new normalization JSON}"
-    MINIMUM_SPACING_B=${MINIMUM_SPACING_B:-10}
-    MAXIMUM_SPACING_B=${MAXIMUM_SPACING_B:-100}
+    : "${MINIMUM_SPACING_B:?Set MINIMUM_SPACING_B to the reviewed minimum source spacing in b}"
+    : "${MAXIMUM_SPACING_B:?Set MAXIMUM_SPACING_B to the reviewed maximum source spacing in b}"
     args=(
       --engine-config "$ENGINE_CONFIG" --out "$OUT"
       --minimum-spacing-b "$MINIMUM_SPACING_B"
