@@ -23,10 +23,11 @@ def _fake_engine(raw: float, legacy_cap_MPa: float = 1.0):
     return engine
 
 
-def test_uncapped_field_can_exceed_legacy_manifest_reference():
+def test_uncapped_field_can_exceed_legacy_manifest_reference_without_method_patch():
     engine = _fake_engine(2.5e6, legacy_cap_MPa=1.0)
     original = CampaignCalibratedTipEngine._active_shielding_signed
     with install_uncapped_physical_shielding():
+        assert CampaignCalibratedTipEngine._active_shielding_signed is original
         assert engine._active_shielding_signed() == 2.5e6
     assert CampaignCalibratedTipEngine._active_shielding_signed is original
 
@@ -34,16 +35,20 @@ def test_uncapped_field_can_exceed_legacy_manifest_reference():
 def test_diagnostics_record_raw_equal_effective_without_clip():
     reset_physical_shielding_audit()
     engine = _fake_engine(-3.0e6, legacy_cap_MPa=1.0)
+    original = CampaignCalibratedTipEngine._active_shielding_signed
     with install_uncapped_physical_shielding():
+        assert CampaignCalibratedTipEngine._active_shielding_signed is original
         diagnostics = engine._campaign_diagnostics()
         assert diagnostics["campaign_active_K_shield_raw_Pa_sqrt_m"] == -3.0e6
         assert diagnostics["campaign_active_K_shield_effective_Pa_sqrt_m"] == -3.0e6
         assert diagnostics["campaign_active_K_shield_cap_Pa_sqrt_m"] == 0.0
         assert diagnostics["campaign_legacy_K_shield_cap_reference_Pa_sqrt_m"] == 1.0e6
         assert diagnostics["campaign_shielding_cap_applied"] is False
+        assert diagnostics["campaign_diagnostic_context_constitutive_patch"] is False
 
     audit = physical_shielding_audit_payload()
     assert audit["constitutive_K_shield_clip_applied"] is False
+    assert audit["diagnostic_context_modifies_constitutive_method"] is False
     assert audit["n_samples_above_legacy_cap_reference"] == 1
     assert audit["maximum_abs_raw_minus_effective_Pa_sqrt_m"] == 0.0
     assert audit["maximum_raw_to_legacy_cap_ratio"] == 3.0
