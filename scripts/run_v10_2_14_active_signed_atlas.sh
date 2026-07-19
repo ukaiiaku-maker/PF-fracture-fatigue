@@ -5,6 +5,17 @@ MODE=${MODE:-load-invariance}
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$ROOT_DIR"
 
+EXPECTED_CONDA_ENV=${CONDA_ENV:-arrhenius-sharp-front-v10}
+ACTIVE_CONDA_ENV=${CONDA_DEFAULT_ENV:-}
+if [[ "$ACTIVE_CONDA_ENV" != "$EXPECTED_CONDA_ENV" ]]; then
+  echo "ERROR: activate conda environment '$EXPECTED_CONDA_ENV' before running." >&2
+  echo "Current environment: '${ACTIVE_CONDA_ENV:-none}'" >&2
+  exit 2
+fi
+
+# Keep direct script execution independent of a previous editable installation.
+export PYTHONPATH="$ROOT_DIR${PYTHONPATH:+:$PYTHONPATH}"
+
 case "$MODE" in
   load-invariance)
     : "${SNAPSHOT:?SNAPSHOT is required}"
