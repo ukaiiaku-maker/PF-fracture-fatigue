@@ -58,7 +58,7 @@ def test_source_side_killed_elements_are_clipped_not_rejected():
     assert audit["source_surface_clipping_applied"] is True
     assert audit["source_surface_clipped_elements"] == 2
     assert audit["source_surface_clipped_area_fraction"] == pytest.approx(0.5)
-    assert audit["terminal_in_intact_material"] is True
+    assert audit["terminal_endpoint_in_intact_material"] is True
 
 
 def test_short_ribbon_clips_source_terminal_window_overlap_before_guarding_terminal():
@@ -92,7 +92,47 @@ def test_short_ribbon_clips_source_terminal_window_overlap_before_guarding_termi
     )
     assert np.allclose(corrected[:, :2], 0.0)
     assert np.allclose(corrected[:, 2], 1.0)
-    assert audit["terminal_in_intact_material"] is True
+    assert audit["terminal_endpoint_in_intact_material"] is True
+
+
+def test_damaged_terminal_footprint_fringe_is_clipped_when_endpoint_is_intact():
+    points = np.asarray(
+        [[0.10, 0.0], [0.30, 0.0], [0.82, 0.08], [0.90, 0.0]],
+        dtype=float,
+    )
+    mesh = SimpleNamespace(
+        nodes=points,
+        elems=np.asarray([[i, i, i] for i in range(points.shape[0])], dtype=int),
+        area_e=np.ones(points.shape[0]),
+        nn=points.shape[0],
+        ne=points.shape[0],
+        hbar_tip=0.05,
+    )
+    perturbation = SlipRibbonPerturbation(
+        system=0,
+        region="active",
+        bin_index=0,
+        start_xy_m=np.asarray([0.0, 0.0]),
+        end_xy_m=np.asarray([0.90, 0.0]),
+        slip_direction=np.asarray([1.0, 0.0]),
+        plane_normal=np.asarray([0.0, 1.0]),
+        width_m=0.20,
+        burgers_m=2.5e-10,
+        signed_line_content=0.5,
+    )
+    corrected, audit = _clip_source_surface_overlap(
+        mesh,
+        np.asarray([0.0, 0.0, 1.0, 0.0]),
+        np.ones((3, 4), dtype=float),
+        perturbation,
+        maximum_damaged_area_fraction=0.05,
+    )
+    assert np.allclose(corrected[:, 2], 0.0)
+    assert np.allclose(corrected[:, 3], 1.0)
+    assert audit["terminal_surface_clipping_applied"] is True
+    assert audit["terminal_surface_clipped_elements"] == 1
+    assert audit["terminal_endpoint_element"] == 3
+    assert audit["terminal_endpoint_in_intact_material"] is True
 
 
 def test_first_active_station_is_extended_to_fem_resolved_terminal_distance():
