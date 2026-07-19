@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - v10.2.9-pf-czm-consistency-hardening
+  pull_request:
+    branches:
+      - v10.2.8-staged-analytical-firstpass-rcurve-2d
 
 jobs:
   inventory:
