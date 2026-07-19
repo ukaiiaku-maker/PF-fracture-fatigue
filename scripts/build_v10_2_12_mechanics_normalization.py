@@ -21,8 +21,18 @@ def main() -> None:
         help="Complete engine JSON or a captured snapshot.json containing engine_config",
     )
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--minimum-spacing-b", type=float, default=10.0)
-    parser.add_argument("--maximum-spacing-b", type=float, default=100.0)
+    parser.add_argument(
+        "--minimum-spacing-b",
+        type=float,
+        required=True,
+        help="Reviewed minimum admissible source spacing in Burgers magnitudes",
+    )
+    parser.add_argument(
+        "--maximum-spacing-b",
+        type=float,
+        required=True,
+        help="Reviewed maximum admissible source spacing in Burgers magnitudes",
+    )
     parser.add_argument("--source-region-length-m", type=float)
     args = parser.parse_args()
     if args.out.exists():
@@ -41,6 +51,7 @@ def main() -> None:
     payload = derive_mechanical_normalization(payload_in, assumptions=assumptions)
     payload["input_json"] = str(args.engine_config.resolve())
     payload["input_was_snapshot"] = "engine_config" in raw
+    payload["source_spacing_bounds_explicitly_supplied"] = True
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, indent=2))
     print(json.dumps({"out": str(args.out), **payload}, indent=2))
