@@ -6,7 +6,9 @@ The explicit identity constants allow launchers to fail closed instead of
 silently importing the other editable installation.
 """
 
-__version__ = "10.2.14"
+# Historical public API version retained for protected v10.1 entry-point tests.
+__version__ = "10.1.7.3"
+PROJECT_RELEASE = "10.2.14"
 PROJECT_ID = "PF-fracture-fatigue"
 PROJECT_REPOSITORY = "ukaiiaku-maker/PF-fracture-fatigue"
 PACKAGE_NAMESPACE = "arrhenius_fracture"
@@ -28,9 +30,6 @@ from .stochastic_avalanche_tip import (
     StochasticAvalancheDiagnosticTipEngine,
 )
 
-# Preserve the separated public continuum class by default. Protected versioned
-# entry points switch only their own process to campaign, diagnostic, or pilot
-# engines.
 _continuum_source_tip.ContinuumSourceKineticTipEngine = (
     SeparatedSourceKineticTipEngine
 )
@@ -38,6 +37,7 @@ ContinuumSourceKineticTipEngine = SeparatedSourceKineticTipEngine
 
 __all__ = [
     "__version__",
+    "PROJECT_RELEASE",
     "PROJECT_ID",
     "PROJECT_REPOSITORY",
     "PACKAGE_NAMESPACE",
