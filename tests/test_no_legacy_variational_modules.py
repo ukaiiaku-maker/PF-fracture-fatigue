@@ -1,3 +1,4 @@
+"""Prevent reintroduction of the removed variational fracture subsystem."""
 from pathlib import Path
 
 
