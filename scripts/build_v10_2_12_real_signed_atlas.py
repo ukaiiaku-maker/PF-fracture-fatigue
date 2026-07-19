@@ -12,13 +12,14 @@ import sys
 import tempfile
 
 from arrhenius_fracture.checked_spatial_station_projection_v10212 import (
+    KERNEL_RADIUS_COMPATIBILITY_COORDINATE,
     expand_station_response_files,
 )
 from arrhenius_fracture.mechanics_normalization_v10212 import MODEL_ID as NORMALIZATION_MODEL_ID
 from arrhenius_fracture.physical_fem_snapshot_v10212 import RESPONSE_COLUMNS
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE_BUILDER = ROOT / "scripts" / "build_v10_2_9_state_resolved_kernel_family.py"
+BASE_BUILDER = ROOT / "scripts" / "build_v10_2_12_compatibility_radius_family.py"
 MODEL_ID = "v10.2.12_real_signed_state_resolved_2d_shielding_atlas"
 REVIEW_SCHEMA = "v10.2.12_independent_real_signed_atlas_review"
 REVIEW_CHECKS = (
@@ -95,6 +96,12 @@ def main() -> None:
         raise SystemExit(str(exc)) from exc
     if not expanded_rows:
         raise SystemExit("no projected MPZ-grid rows were produced")
+    projected_radii = {float(row["r_eff_over_r0"]) for row in expanded_rows}
+    if projected_radii != {KERNEL_RADIUS_COMPATIBILITY_COORDINATE}:
+        raise SystemExit(
+            "projected rows did not collapse the non-geometric radius axis to the "
+            f"compatibility coordinate {KERNEL_RADIUS_COMPATIBILITY_COORDINATE}"
+        )
     audits = []
     for item in physical_inputs:
         path = Path(item["path"])
@@ -122,7 +129,7 @@ def main() -> None:
             writer = csv.DictWriter(handle, fieldnames=RESPONSE_COLUMNS)
             writer.writeheader()
             writer.writerows(expanded_rows)
-        intermediate = temp / "v1029_intermediate.json"
+        intermediate = temp / "v10212_compatibility_radius_intermediate.json"
         command = [
             sys.executable,
             str(BASE_BUILDER),
@@ -163,13 +170,19 @@ def main() -> None:
         "interaction_integral_provenance_consistent": bool(
             projection.get("projected_schema_matches_measured_schema") is True
         ),
+        "analytical_radius_axis_disabled": bool(
+            projection.get("kernel_radius_axis_policy")
+            == "disabled_constant_compatibility"
+        ),
+        "single_radius_compatibility_coordinate": projected_radii
+        == {KERNEL_RADIUS_COMPATIBILITY_COORDINATE},
         "mechanics_derived_activation_to_line_normalization": True,
         "mechanics_derived_source_capacity_bounds": True,
         "no_fitted_shielding_attenuation": True,
-        "r_eff_axis_declared_analytical_not_fem_geometry": all(
+        "r_eff_declared_observed_diagnostic_not_fem_geometry": all(
             item["audit"].get("r_eff_is_analytical_tip_state") is True for item in audits
         ),
-        "base_v10_2_9_kernel_gates_passed": all(base_gates.values()),
+        "base_opening_extension_kernel_gates_passed": all(base_gates.values()),
         "independent_review_complete": review is not None,
     }
     all_gates = all(real_gates.values())
@@ -198,10 +211,19 @@ def main() -> None:
             "signed_burgers_population_required": True,
             "source_sites_are_nucleation_opportunities": True,
             "population_units": "signed_dislocation_line_content",
+            "kernel_radius_axis_policy": "disabled_constant_compatibility",
+            "kernel_radius_compatibility_coordinate": (
+                KERNEL_RADIUS_COMPATIBILITY_COORDINATE
+            ),
+            "active_physical_kernel_axes": [
+                "opening_strength_fraction",
+                "crack_extension_m",
+            ],
+            "analytical_r_eff_used_for_interpolation": False,
             "fem_tip_geometry_blunted": False,
             "r_eff_axis_interpretation": (
-                "analytical local-tip stress/blunting state sampled during the physical FEM run; "
-                "not a finite-radius FEM crack geometry"
+                "observed analytical local-tip stress/blunting state retained only "
+                "as capture diagnostics; not a finite-radius FEM geometry or kernel axis"
             ),
             "finite_radius_fem_kernel_claimed": False,
             "cohesive_network_snapshots_supported": False,
@@ -221,6 +243,7 @@ def main() -> None:
                 "spatial_cross_validation_passed": projection[
                     "spatial_cross_validation_passed"
                 ],
+                "kernel_radius_axis_policy": payload["kernel_radius_axis_policy"],
                 "base_gates": base_gates,
                 "real_atlas_gates": real_gates,
                 "production_parameterization_allowed": payload[
