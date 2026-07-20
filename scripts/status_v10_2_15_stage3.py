@@ -11,7 +11,7 @@ import subprocess
 from typing import Any
 
 DEFAULT_OUTROOT = Path(
-    "runs/v10_2_15_stage3_four_option_monotonic_500um_theta45_1x_v1"
+    "runs/v10_2_15_stage3_existing_2d_parameter_overlay_500um_theta45_1x_v1"
 )
 
 
@@ -143,7 +143,7 @@ def main() -> int:
         counts["queued"] += 1
 
     state = str(status.get("state", "unknown"))
-    if launcher_pid is None and state in {"starting", "assembling", "running"}:
+    if launcher_pid is None and state in {"starting", "assembling", "preflighting", "running"}:
         state = "stopped_or_failed"
     if not status and launcher_pid is None:
         state = "not_running"
@@ -152,6 +152,12 @@ def main() -> int:
     print(f"  state:       {state}")
     print(f"  launcher:    {'alive PID ' + str(launcher_pid) if launcher_pid else 'not running'}")
     print(f"  outroot:     {outroot}")
+    if status.get("final_2d_entry"):
+        print(f"  2-D entry:   {status['final_2d_entry']}")
+    if "parameter_overlay_only" in status:
+        print(f"  overlay:     parameters only={bool(status['parameter_overlay_only'])}")
+    if "signed_atlas_used" in status:
+        print(f"  signed atlas:{bool(status['signed_atlas_used'])}")
     if status.get("message"):
         print(f"  message:     {status['message']}")
     if status.get("updated_utc"):
