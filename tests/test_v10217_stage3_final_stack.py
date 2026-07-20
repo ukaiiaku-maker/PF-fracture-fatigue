@@ -125,6 +125,7 @@ def test_stage3_shell_launchers_parse():
     for relative in (
         "scripts/run_v10_2_17_stage3_monotonic_temperature_sweep.sh",
         "scripts/run_v10_2_17_stage3_overnight.sh",
+        "scripts/freeze_v10_2_17_runtime_bundle.sh",
     ):
         completed = subprocess.run(
             ["bash", "-n", str(root / relative)],
@@ -146,12 +147,12 @@ def test_runner_declares_final_stack_and_unique_seeds():
     assert "state_resolved_signed_engine_v10214" in text
 
 
-def test_overnight_uses_exact_endpoint_builder_and_audits_projection():
+def test_overnight_reuses_local_family_without_legacy_mechanics_inputs():
     root = Path(__file__).resolve().parents[1]
     text = (root / "scripts/run_v10_2_17_stage3_overnight.sh").read_text()
+    assert "runtime_inputs/v10_2_17/v10_2_14_active_only_campaign_family.json" in text
+    assert "reusing signed family" in text
+    assert "external_mechanics_inputs_required_for_this_launch" in text
+    assert "stale editable import" in text
     assert "build_v10_2_14_campaign_ready_active_only_atlas_v2.py" in text
-    assert "build_v10_2_14_campaign_ready_active_only_atlas.py" not in text.replace(
-        "build_v10_2_14_campaign_ready_active_only_atlas_v2.py", ""
-    )
-    assert "spatial_cross_validation_not_required_for_two_endpoint_active_curves" in text
-    assert "all_active_curves_have_exact_endpoint_coverage" in text
+    assert "if [[ -f \"$FAMILY_JSON\" ]]" in text
