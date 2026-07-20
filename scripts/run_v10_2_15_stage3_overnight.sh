@@ -19,8 +19,11 @@ STEPS=${STEPS:-300000}
 TARGET_EXT_UM=${TARGET_EXT_UM:-500}
 THETA=${THETA:-45}
 SKIP_FINISHED=${SKIP_FINISHED:-1}
+RUNTIME_PREFLIGHT=${RUNTIME_PREFLIGHT:-1}
 MECHANICS_ROOT=${MECHANICS_ROOT:-$OUTROOT/mechanics}
 FAMILY=${SIGNED_KERNEL_FAMILY_JSON:-$MECHANICS_ROOT/v10_2_14_active_only_campaign_family.json}
+PREFLIGHT_ROOT=${PREFLIGHT_ROOT:-${OUTROOT}_runtime_preflight_v1}
+PREFLIGHT_MARKER="$PREFLIGHT_ROOT/RUNTIME_PREFLIGHT_PASSED"
 STATUS_FILE="$OUTROOT/overnight_status.json"
 PID_FILE="$OUTROOT/overnight_launcher.pid"
 PHASE=starting
@@ -75,6 +78,35 @@ if [[ ! -f "$FAMILY" ]]; then
     --out "$FAMILY"
 else
   echo "[stage3] reusing kernel family: $FAMILY"
+fi
+
+if [[ "$RUNTIME_PREFLIGHT" == "1" && ! -f "$PREFLIGHT_MARKER" ]]; then
+  PHASE=runtime_preflight
+  write_status preflighting "Initializing all four Stage 3 MPZ grids with the assembled atlas"
+  echo "[stage3] runtime preflight: four options at 700 K, one FEM step each"
+  rm -rf "$PREFLIGHT_ROOT"
+  set +e
+  env \
+    MODE=smoke \
+    SIGNED_KERNEL_FAMILY_JSON="$FAMILY" \
+    OUTROOT="$PREFLIGHT_ROOT" \
+    MAX_JOBS=1 \
+    TEMPS_SMOKE=700 \
+    STEPS_SMOKE=1 \
+    TARGET_EXT_UM_SMOKE=5 \
+    SAVE_SNAPSHOTS_SMOKE=0 \
+    SNAPSHOT_BY_EXT_UM_SMOKE=5 \
+    THETA="$THETA" \
+    SKIP_FINISHED=0 \
+    bash scripts/run_v10_2_15_stage3_monotonic_temperature_sweep_macos.sh
+  preflight_rc=$?
+  set -e
+  if [[ "$preflight_rc" -ne 0 ]]; then
+    echo "[stage3] runtime preflight failed; full campaign was not started" >&2
+    exit "$preflight_rc"
+  fi
+  touch "$PREFLIGHT_MARKER"
+  echo "[stage3] runtime preflight passed for 200-bin and 80-bin options"
 fi
 
 PHASE=campaign
