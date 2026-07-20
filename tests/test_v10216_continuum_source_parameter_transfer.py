@@ -87,12 +87,12 @@ def test_reference_multiplicity_is_not_consumed_by_emission():
     state.emission_rate_per_site = lambda stress, T: 1.0e9
     state._continuum_tip_radius_m = 1.0e-6
 
-    for _ in range(20):
+    for _ in range(50):
         state._emit(10.0, 1.0e9, 700.0)
 
-    # Clearing allows repeated throughput, so cumulative emission can exceed the
-    # nominal multiplicity.  The multiplicity itself remains unchanged.
-    assert state.emitted_total > float(np.sum(capacity0))
+    # Clearing allows repeated throughput, so cumulative emission must exceed the
+    # nominal multiplicity by a wide margin.  The multiplicity itself is fixed.
+    assert state.emitted_total > 2.0 * float(np.sum(capacity0))
     assert state.reference_source_multiplicity == pytest.approx(reference)
     assert np.allclose(state.site_capacity, capacity0)
     assert state.campaign_source_budget_consumed_total == pytest.approx(0.0)
