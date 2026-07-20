@@ -115,21 +115,35 @@ def _write_v10216_audit(
 def main(argv: list[str] | None = None):
     args = list(sys.argv[1:] if argv is None else argv)
     original_install = _anisotropic.install_anisotropic_campaign_emission
-    original_writer = _base._write_overlay_audit
+    original_model_id = _base.MODEL_ID
     _anisotropic.install_anisotropic_campaign_emission = (
         install_anisotropic_continuum_emission
     )
-    _base._write_overlay_audit = _write_v10216_audit
+    _base.MODEL_ID = MODEL_ID
     try:
+        selected, manifest_path, selection_audit_path = (
+            _base._prepare_parameter_option(args)
+        )
+        _base._force_stage3_validity_envelope(args)
         print(
-            "  v10.2.16 parameter overlay: "
+            "  v10.2.16 parameter overlay only: "
+            f"entry={FINAL_2D_ENTRY} option={selected.option_key} "
+            f"candidate={selected.candidate_id} "
+            f"mpz={selected.mpz_length_um:g}um/{selected.mpz_n_bins}bins "
             "source=continuum_activity_clearing "
             "finite_inventory=0 multiplicity_consumed=0"
         )
-        return _base.main(args)
+        result = _base._final_2d.main(args)
+        _write_v10216_audit(
+            args,
+            selected,
+            manifest_path,
+            selection_audit_path,
+        )
+        return result
     finally:
         _anisotropic.install_anisotropic_campaign_emission = original_install
-        _base._write_overlay_audit = original_writer
+        _base.MODEL_ID = original_model_id
 
 
 if __name__ == "__main__":
