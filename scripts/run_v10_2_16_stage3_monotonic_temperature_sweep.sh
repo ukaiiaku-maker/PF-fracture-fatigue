@@ -32,6 +32,65 @@ for old, new in replacements.items():
         raise SystemExit(f"upstream launcher changed; missing expected text: {old!r}")
     text = text.replace(old, new)
 
+old_skip = '''  mkdir -p "$case_root"
+  if [[ "$SKIP_FINISHED" == "1" && -f "$case_root/stage3_case_status.json" ]]; then
+    echo "SKIP finished: $option T=${temperature}K"
+    return 0
+  fi
+  rm -f "$case_root/RUN_FAILED" "$case_root/exit_code.txt"
+'''
+new_skip = '''  mkdir -p "$case_root"
+  if [[ "$SKIP_FINISHED" == "1" && -f "$case_root/stage3_case_status.json" ]]; then
+    if "$PYTHON_BIN" - "$case_root/stage3_case_status.json" "$TARGET_EXT_UM" <<'PY_STATUS'
+import json
+import math
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+target = float(sys.argv[2])
+try:
+    payload = json.loads(path.read_text())
+    complete = payload.get("complete") is True
+    status = payload.get("status") == "complete_target_extension"
+    recorded_target = float(payload.get("target_extension_um"))
+    target_matches = math.isclose(recorded_target, target, rel_tol=0.0, abs_tol=1.0e-9)
+except Exception:
+    complete = status = target_matches = False
+raise SystemExit(0 if complete and status and target_matches else 1)
+PY_STATUS
+    then
+      echo "SKIP complete: $option T=${temperature}K target=${TARGET_EXT_UM}um"
+      return 0
+    fi
+  fi
+
+  # A solver interrupted by a full disk cannot be resumed from its partially
+  # written arrays. Preserve a compact diagnostic tail, then restart that case
+  # from a clean directory. Verified complete cases returned above are untouched.
+  if find "$case_root" -mindepth 1 -maxdepth 1 -print -quit | grep -q .; then
+    local interrupted_logs="$OUTROOT/interrupted_case_logs"
+    local interrupted_log="$interrupted_logs/${option}_T${temperature}K.log"
+    mkdir -p "$interrupted_logs"
+    {
+      echo "interrupted_case=$option/T${temperature}K"
+      echo "restart_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      echo "previous_case_root=$case_root"
+      if [[ -f "$log" ]]; then
+        echo "--- final 200 lines of previous run.log ---"
+        tail -n 200 "$log"
+      fi
+    } > "$interrupted_log"
+    echo "RESTART clean: $option T=${temperature}K; diagnostic=$interrupted_log"
+    rm -rf "$case_root"
+    mkdir -p "$case_root"
+  fi
+  rm -f "$case_root/RUN_FAILED" "$case_root/exit_code.txt"
+'''
+if old_skip not in text:
+    raise SystemExit("upstream launcher changed; restart/skip block not found")
+text = text.replace(old_skip, new_skip, 1)
+
 old_run = '''  "${cmd[@]}" > "$log" 2>&1
   rc=$?
 '''
