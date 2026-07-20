@@ -25,6 +25,14 @@ if [[ -n "$ENGINE_CONFIG_SOURCE" && -f "$ENGINE_CONFIG_SOURCE" ]]; then
   cp -p "$ENGINE_CONFIG_SOURCE" "$BUNDLE_DIR/v10_2_3_2d_engine_config.json"
 fi
 
+python --version > "$BUNDLE_DIR/python_version.txt" 2>&1
+python -m pip freeze > "$BUNDLE_DIR/pip_freeze.txt"
+if command -v conda >/dev/null 2>&1; then
+  conda env export --from-history > "$BUNDLE_DIR/conda_environment_from_history.yml" || true
+fi
+git rev-parse HEAD > "$BUNDLE_DIR/git_commit.txt"
+git status --short > "$BUNDLE_DIR/git_status.txt"
+
 BUNDLE_DIR="$BUNDLE_DIR" DEST_FAMILY="$DEST_FAMILY" ROOT="$ROOT" python - <<'PY'
 from __future__ import annotations
 import hashlib
@@ -66,10 +74,16 @@ def digest(path: Path) -> str:
             h.update(block)
     return h.hexdigest()
 
-files = [family_path]
-engine = bundle / "v10_2_3_2d_engine_config.json"
-if engine.is_file():
-    files.append(engine)
+artifact_names = [
+    "v10_2_14_active_only_campaign_family.json",
+    "v10_2_3_2d_engine_config.json",
+    "python_version.txt",
+    "pip_freeze.txt",
+    "conda_environment_from_history.yml",
+    "git_commit.txt",
+    "git_status.txt",
+]
+files = [bundle / name for name in artifact_names if (bundle / name).is_file()]
 payload = {
     "schema": "v10.2.17_self_contained_runtime_bundle",
     "repository_root": str(root),
@@ -78,7 +92,8 @@ payload = {
     "family_states": len(family.states),
     "production_parameterization_allowed": True,
     "external_legacy_install_required_to_resume": False,
-    "external_mechanics_inputs_required_to_rebuild_family": not engine.is_file(),
+    "external_mechanics_inputs_required_only_to_rebuild_family_from_raw_responses": True,
+    "engine_config_preserved_for_provenance": (bundle / "v10_2_3_2d_engine_config.json").is_file(),
     "required_code_files": [str(path.relative_to(root)) for path in required],
     "artifacts": [
         {"path": str(path.relative_to(root)), "sha256": digest(path), "bytes": path.stat().st_size}
