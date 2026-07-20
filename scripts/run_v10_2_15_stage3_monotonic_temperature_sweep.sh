@@ -9,9 +9,8 @@ MODE=${MODE:-full}
 PYTHON_BIN=${PYTHON_BIN:-python}
 CONDA_ENV=${CONDA_ENV:-arrhenius-sharp-front-v10}
 ACTIVE_CONDA_ENV=${CONDA_DEFAULT_ENV:-}
-OUTROOT=${OUTROOT:-runs/v10_2_15_stage3_four_option_monotonic_500um_theta45_1x_v1}
+OUTROOT=${OUTROOT:-runs/v10_2_15_stage3_existing_2d_parameter_overlay_500um_theta45_1x_v1}
 PARAMETER_REGISTRY=${PARAMETER_REGISTRY:-$ROOT_DIR/arrhenius_fracture/data/materials/MPZ_v9_11_1_parameter_registry.csv}
-SIGNED_KERNEL_FAMILY_JSON=${SIGNED_KERNEL_FAMILY_JSON:-}
 OPTIONS=${OPTIONS:-"ceramic_primary weakT_primary dbtt_primary peak_primary"}
 TEMPS=${TEMPS:-"300 400 500 600 700 800 900 1000 1100 1200"}
 THETA=${THETA:-45}
@@ -63,12 +62,6 @@ if [[ ! -f "$PARAMETER_REGISTRY" ]]; then
   echo "ERROR: parameter registry not found: $PARAMETER_REGISTRY" >&2
   exit 2
 fi
-if [[ "$MODE" != "plan" ]]; then
-  if [[ -z "$SIGNED_KERNEL_FAMILY_JSON" || ! -f "$SIGNED_KERNEL_FAMILY_JSON" ]]; then
-    echo "ERROR: set SIGNED_KERNEL_FAMILY_JSON to the completed v10.2.14 active-only family JSON." >&2
-    exit 2
-  fi
-fi
 if ! [[ "$MAX_JOBS" =~ ^[1-9][0-9]*$ ]]; then
   echo "ERROR: MAX_JOBS must be a positive integer" >&2
   exit 2
@@ -79,7 +72,6 @@ export CLEAVAGE_HAZARD_MODE=deterministic
 export CLEAVAGE_EVENT_LENGTH_MODE=fixed
 export ANISOTROPIC_TRANSPORT_MODE=validated_scalar
 export ANISOTROPIC_USE_AVALANCHE_BACKEND=1
-export SIGNED_KERNEL_FAMILY_JSON
 
 "$PYTHON_BIN" - <<'PY'
 import arrhenius_fracture
@@ -133,16 +125,18 @@ if [[ "$MODE" == "full" && "$ALLOW_PARTIAL" != "1" && "$N_CASES" -ne 40 ]]; then
 fi
 
 cat <<EOF
-Stage 3 plan
-  mode:         $MODE
-  cases:        $N_CASES
-  options:      $OPTIONS
-  temperatures: $TEMPS
-  target:       $TARGET_EXT_UM um
-  theta:        $THETA deg
-  max jobs:     $MAX_JOBS
-  output:       $OUTROOT
-  plan:         $PLAN
+Stage 3 existing-2D parameter-overlay plan
+  final entry:   arrhenius_fracture.sharp_front_v10_1_7_5
+  physics:       unchanged; exact material-manifest overlay only
+  mode:          $MODE
+  cases:         $N_CASES
+  options:       $OPTIONS
+  temperatures:  $TEMPS
+  target:        $TARGET_EXT_UM um
+  theta:         $THETA deg
+  max jobs:      $MAX_JOBS
+  output:        $OUTROOT
+  plan:          $PLAN
 EOF
 
 if [[ "$DRY_RUN" == "1" ]]; then
@@ -156,9 +150,11 @@ FAILURES=0
 
 terminate_children() {
   local pid
-  for pid in "${PIDS[@]}"; do
-    kill "$pid" 2>/dev/null || true
-  done
+  if [[ ${#PIDS[@]} -gt 0 ]]; then
+    for pid in "${PIDS[@]}"; do
+      kill "$pid" 2>/dev/null || true
+    done
+  fi
 }
 trap terminate_children INT TERM
 
@@ -183,8 +179,13 @@ reap_finished() {
       fi
     fi
   done
-  PIDS=("${new_pids[@]}")
-  LABELS=("${new_labels[@]}")
+  if [[ ${#new_pids[@]} -gt 0 ]]; then
+    PIDS=("${new_pids[@]}")
+    LABELS=("${new_labels[@]}")
+  else
+    PIDS=()
+    LABELS=()
+  fi
 }
 
 wait_for_slot() {
@@ -210,13 +211,13 @@ run_case() {
     echo "SKIP finished: $option T=${temperature}K"
     return 0
   fi
+  rm -f "$case_root/RUN_FAILED" "$case_root/exit_code.txt"
 
   local cmd=(
     "$PYTHON_BIN" -m arrhenius_fracture.sharp_front_v10_2_15
     --mode 2d
     --parameter-registry "$PARAMETER_REGISTRY"
     --parameter-option "$option"
-    --signed-kernel-family "$SIGNED_KERNEL_FAMILY_JSON"
     --temperatures "$temperature"
     --steps "$STEPS"
     --nx "$NX" --ny "$NY"
@@ -257,13 +258,12 @@ run_case() {
     echo '#!/usr/bin/env bash'
     printf 'CLEAVAGE_HAZARD_MODE=deterministic CLEAVAGE_EVENT_LENGTH_MODE=fixed '
     printf 'ANISOTROPIC_TRANSPORT_MODE=validated_scalar '
-    printf 'SIGNED_KERNEL_FAMILY_JSON=%q ' "$SIGNED_KERNEL_FAMILY_JSON"
     printf '%q ' "${cmd[@]}"
     printf '\n'
   } > "$command_file"
   chmod +x "$command_file"
 
-  echo "START: $option candidate=$candidate T=${temperature}K mpz=${mpz_length}um/${mpz_bins}bins"
+  echo "START: $option candidate=$candidate T=${temperature}K mpz=${mpz_length}um/${mpz_bins}bins entry=v10.1.7.5"
   "${cmd[@]}" > "$log" 2>&1
   rc=$?
   echo "$rc" > "$case_root/exit_code.txt"
