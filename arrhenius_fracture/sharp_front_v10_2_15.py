@@ -1,10 +1,9 @@
-"""v10.2.15 Stage 3 four-option monotonic production entry.
+"""v10.2.15 Stage 3 parameter overlay for the final accepted 2-D model.
 
-Combines the mechanically measured v10.2.14 active-only signed FEM kernel
-family with one exact row from the v9.11.1 MPZ parameter registry. Restricted
-to deterministic, fixed-length, single-front, branching-disabled monotonic
-calculations. Wake state may remain in kinetic bookkeeping, but wake shielding
-is disabled because no measured signed 2-D wake operator is available.
+This entry changes only the selected material manifest and the option-specific
+MPZ length/bin count. It executes ``sharp_front_v10_1_7_5`` directly and does
+not replace the tip engine, source lifecycle, transport operator, shielding
+law, crack geometry, or mechanics observer.
 """
 from __future__ import annotations
 
@@ -14,9 +13,8 @@ from pathlib import Path
 import sys
 from typing import Any
 
-from . import anisotropic_emission_v10174 as _anisotropic
-from . import sharp_front_v10_1_7_4 as _entry74
-from . import sharp_front_v10_1_7_5 as _transport
+from . import sharp_front_v10_1_7_5 as _final_2d
+from . import zero_event_summary_v10215 as _zero_event_summary  # noqa: F401
 from .parameter_registry_v9111 import (
     CANONICAL_STAGE3_OPTIONS,
     SelectedResponseOption,
@@ -25,14 +23,9 @@ from .parameter_registry_v9111 import (
     write_compatibility_manifest,
     write_selection_audit,
 )
-from .signed_kernel_family_v10214 import ActiveOnlySigned2DShieldingKernelFamily
-from .state_equivalence_trace_v1025 import capture_exact_signed_trace, write_exact_signed_trace
-from .state_resolved_signed_engine_v10214 import (
-    MODEL_ID as ENGINE_MODEL_ID,
-    StateResolvedSignedBurgersTipEngine,
-)
 
-MODEL_ID = "v10.2.15_stage3_four_option_active_only_signed"
+MODEL_ID = "v10.2.15_stage3_existing_2d_parameter_overlay"
+FINAL_2D_ENTRY = "arrhenius_fracture.sharp_front_v10_1_7_5"
 
 
 def _pop_value(args: list[str], name: str, default: str | None = None) -> str | None:
@@ -114,7 +107,7 @@ def _force_stage3_validity_envelope(args: list[str]) -> None:
         raise SystemExit("v10.2.15 Stage 3 requires --max-fronts 1")
     _set_value_option(args, "--max-fronts", 1)
     if "--wake-shielding" in args:
-        raise SystemExit("v10.2.15 has no measured wake kernel; use --no-wake-shielding")
+        raise SystemExit("Stage 3 requires the requested no-wake-shielding configuration")
     _set_toggle(args, "--wake-shielding", "--no-wake-shielding", False)
     mobile_fraction = _option_value(args, "--mobile-shield-fraction")
     if mobile_fraction is not None and abs(float(mobile_fraction)) > 1.0e-15:
@@ -148,7 +141,8 @@ def _prepare_parameter_option(args: list[str]) -> tuple[SelectedResponseOption, 
     output_root = Path(out_value).expanduser().resolve()
     output_root.mkdir(parents=True, exist_ok=True)
     registry_value = _pop_value(
-        args, "--parameter-registry",
+        args,
+        "--parameter-registry",
         os.environ.get("PARAMETER_REGISTRY", str(default_registry_path())),
     )
     option_key = _pop_value(args, "--parameter-option", os.environ.get("PARAMETER_OPTION"))
@@ -169,49 +163,48 @@ def _prepare_parameter_option(args: list[str]) -> tuple[SelectedResponseOption, 
         compatibility_manifest=manifest_path,
         extra={
             "model_id": MODEL_ID,
-            "canonical_stage3_option": True,
-            "single_front_unbranched_monotonic": True,
-            "mobile_shield_fraction": 0.0,
-            "wake_shielding_enabled": False,
-            "parameter_values_refit_in_2d": False,
+            "final_2d_entry": FINAL_2D_ENTRY,
+            "parameter_overlay_only": True,
+            "tip_engine_replaced": False,
+            "source_lifecycle_replaced": False,
+            "transport_operator_replaced": False,
+            "shielding_law_replaced": False,
+            "geometry_backend_replaced": False,
+            "material_parameter_refit_in_2d": False,
         },
     )
     return selected, manifest_path, audit_path
 
 
-def _write_run_audit(
+def _write_overlay_audit(
     args: list[str],
-    family: ActiveOnlySigned2DShieldingKernelFamily,
     selected: SelectedResponseOption,
     manifest_path: Path,
     selection_audit_path: Path,
-    transport_mode: str,
 ) -> None:
     out = _option_value(args, "--out")
     if not out:
         return
-    root = Path(out)
-    payload = StateResolvedSignedBurgersTipEngine.audit_payload()
-    payload.update({
+    payload = {
         "schema": MODEL_ID,
-        "engine_model_id": ENGINE_MODEL_ID,
-        "loading_path": "monotonic",
-        "same_engine_for_monotonic_and_fatigue": True,
-        "transport_mode": transport_mode,
-        "single_front_unbranched_geometry_only": True,
-        "maximum_fronts_forced": 1,
-        "active_kernel_mechanically_measured": True,
-        "wake_kernel_mechanically_measured": False,
-        "wake_shielding_supported": False,
-        "wake_shielding_enabled": False,
-        "constitutive_K_shield_cap_applied": False,
-        "mobile_shield_fraction": 0.0,
-        "parameter_option": selected.audit_payload(),
+        "final_2d_entry": FINAL_2D_ENTRY,
+        "parameter_overlay_only": True,
+        "selected_option": selected.audit_payload(),
         "selected_material_manifest": str(manifest_path),
         "parameter_selection_audit": str(selection_audit_path),
-        "state_resolved_kernel_family": family.audit_payload(),
-    })
-    (root / "v10_2_15_stage3_shared_physics.json").write_text(
+        "physics_stack": {
+            "campaign_calibrated_source_budget": "preserved",
+            "tensor_resolved_anisotropic_emission": "preserved",
+            "validated_scalar_peierls_taylor_transport": "preserved",
+            "source_depletion_and_crack_advance_refresh": "preserved",
+            "local_mobile_retained_backstress": "preserved",
+            "sharp_wake_geometry_backend": "preserved",
+            "tip_engine_substitution": False,
+            "signed_atlas_substitution": False,
+        },
+    }
+    root = Path(out)
+    (root / "v10_2_15_existing_2d_parameter_overlay.json").write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n"
     )
 
@@ -220,58 +213,15 @@ def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     selected, manifest_path, selection_audit_path = _prepare_parameter_option(args)
     _force_stage3_validity_envelope(args)
-    family_path = _pop_value(
-        args, "--signed-kernel-family", os.environ.get("SIGNED_KERNEL_FAMILY_JSON")
+    print(
+        "  v10.2.15 parameter overlay only: "
+        f"entry={FINAL_2D_ENTRY} option={selected.option_key} "
+        f"candidate={selected.candidate_id} "
+        f"mpz={selected.mpz_length_um:g}um/{selected.mpz_n_bins}bins"
     )
-    if not family_path:
-        raise SystemExit(
-            "v10.2.15 requires --signed-kernel-family PATH or SIGNED_KERNEL_FAMILY_JSON"
-        )
-    family = ActiveOnlySigned2DShieldingKernelFamily.from_json(family_path)
-    if family.metadata.get("production_parameterization_allowed") is not True:
-        raise SystemExit(
-            "v10.2.15 Stage 3 requires a production-authorized v10.2.14 "
-            "active-only signed kernel family"
-        )
-    transport_mode = _transport.normalize_transport_mode(os.environ.get("ANISOTROPIC_TRANSPORT_MODE"))
-    StateResolvedSignedBurgersTipEngine.configure_state_resolved_physics(
-        family,
-        transport_mode,
-        fixed_point_tolerance=float(os.environ.get("SIGNED_KERNEL_FIXED_POINT_TOL", "1e-8")),
-        fixed_point_max_iterations=int(os.environ.get("SIGNED_KERNEL_FIXED_POINT_MAX_ITER", "80")),
-        fixed_point_damping=float(os.environ.get("SIGNED_KERNEL_FIXED_POINT_DAMPING", "0.5")),
-    )
-    original_anisotropic = _anisotropic.AnisotropicStochasticAvalancheTipEngine
-    original_entry = _entry74.AnisotropicStochasticAvalancheTipEngine
-    _anisotropic.AnisotropicStochasticAvalancheTipEngine = StateResolvedSignedBurgersTipEngine
-    _entry74.AnisotropicStochasticAvalancheTipEngine = StateResolvedSignedBurgersTipEngine
-    capture = os.environ.get("SIGNED_STATE_TRACE", "0").strip().lower() not in {
-        "0", "false", "no", "off"
-    }
-    trace_context = capture_exact_signed_trace() if capture else None
-    try:
-        print(
-            "  v10.2.15 Stage 3: "
-            f"option={selected.option_key} candidate={selected.candidate_id} "
-            f"mpz={selected.mpz_length_um:g}um/{selected.mpz_n_bins}bins "
-            f"transport={transport_mode} fronts=1 wake_shield=0 mobile_shield=0"
-        )
-        if trace_context is None:
-            result = _transport.main(args)
-            trace = None
-        else:
-            with trace_context as trace:
-                result = _transport.main(args)
-        _write_run_audit(
-            args, family, selected, manifest_path, selection_audit_path, transport_mode
-        )
-        out = _option_value(args, "--out")
-        if capture and trace is not None and out:
-            write_exact_signed_trace(trace, out)
-        return result
-    finally:
-        _anisotropic.AnisotropicStochasticAvalancheTipEngine = original_anisotropic
-        _entry74.AnisotropicStochasticAvalancheTipEngine = original_entry
+    result = _final_2d.main(args)
+    _write_overlay_audit(args, selected, manifest_path, selection_audit_path)
+    return result
 
 
 if __name__ == "__main__":
