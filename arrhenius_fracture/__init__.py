@@ -8,7 +8,7 @@ silently importing the other editable installation.
 
 # Historical public API version retained for protected v10.1 entry-point tests.
 __version__ = "10.1.7.3"
-PROJECT_RELEASE = "10.2.15"
+PROJECT_RELEASE = "10.2.16"
 PROJECT_ID = "PF-fracture-fatigue"
 PROJECT_REPOSITORY = "ukaiiaku-maker/PF-fracture-fatigue"
 PACKAGE_NAMESPACE = "arrhenius_fracture"
