@@ -1,0 +1,15 @@
+{
+  "schema": "v10.2.13_independent_extension_only_real_signed_atlas_review",
+  "reviewer": "",
+  "reviewed_utc": "",
+  "physical_fem_snapshots_reviewed": false,
+  "frozen_geometry_load_invariance_reviewed": false,
+  "signed_and_multi_amplitude_linearity_reviewed": false,
+  "interaction_integral_contour_stability_reviewed": false,
+  "mesh_ribbon_and_station_convergence_reviewed": false,
+  "cumulative_path_extension_semantics_reviewed": false,
+  "source_normalization_reviewed": false,
+  "exact_replay_reviewed": false,
+  "full_2d_fracture_and_fatigue_validation_reviewed": false,
+  "notes": "Set a check to true only after reviewing the corresponding completed evidence. Authorization is intentionally impossible while any check remains false."
+}
