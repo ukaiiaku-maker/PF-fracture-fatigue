@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import sys
 
 import numpy as np
 
@@ -12,6 +13,7 @@ SCRIPT = ROOT / "scripts" / "plot_v10_2_17_stage3_temperature_metrics.py"
 SPEC = importlib.util.spec_from_file_location("v10217_plotter", SCRIPT)
 assert SPEC is not None and SPEC.loader is not None
 PLOTTER = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = PLOTTER
 SPEC.loader.exec_module(PLOTTER)
 
 
