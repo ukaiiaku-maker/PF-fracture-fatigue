@@ -6,6 +6,7 @@ import argparse
 import csv
 import importlib.util
 import json
+import sys
 from dataclasses import asdict
 from pathlib import Path
 
@@ -20,6 +21,9 @@ SPEC = importlib.util.spec_from_file_location("v10217_metrics", BASE_SCRIPT)
 if SPEC is None or SPEC.loader is None:
     raise RuntimeError(f"could not import {BASE_SCRIPT}")
 BASE = importlib.util.module_from_spec(SPEC)
+# Python 3.12 dataclasses resolves annotations through sys.modules while the
+# imported module is executing.  Register the module before exec_module.
+sys.modules[SPEC.name] = BASE
 SPEC.loader.exec_module(BASE)
 
 OPTIONS = (
@@ -49,6 +53,23 @@ def _write_csv(path: Path, rows: list[dict]) -> None:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
+
+
+def _v10218_selection(case_root: Path) -> dict:
+    path = case_root / "v10_2_18_dbtt_parameter_selection.json"
+    return json.loads(path.read_text()) if path.is_file() else {}
+
+
+def _target_extension_um(case_root: Path) -> float | None:
+    path = case_root / "stage3_case_status.json"
+    if not path.is_file():
+        return None
+    value = json.loads(path.read_text()).get("target_extension_um")
+    return None if value is None else float(value)
+
+
+def _target_text(target_extension_um: float | None) -> str:
+    return "end" if target_extension_um is None else f"{target_extension_um:g} µm"
 
 
 def _transition_diagnostics(option: str, rows: list) -> dict:
@@ -121,10 +142,17 @@ def _plot_metric(rows: list, metric: str, ylabel: str, path: Path, formats: list
     return written
 
 
-def _plot_three_panel(rows: list, path: Path, formats: list[str], dpi: int) -> list[str]:
+def _plot_three_panel(
+    rows: list,
+    path: Path,
+    formats: list[str],
+    dpi: int,
+    target_extension_um: float | None,
+) -> list[str]:
+    target = _target_text(target_extension_um)
     specs = (
         ("K_initial_MPa_sqrt_m", r"$K_{initial}$ (MPa$\sqrt{m}$)"),
-        ("K_end_MPa_sqrt_m", r"$K_{20\,\mu m}$ (MPa$\sqrt{m}$)"),
+        ("K_end_MPa_sqrt_m", rf"$K_{{{target}}}$ (MPa$\sqrt{{m}}$)"),
         ("Rcurve_slope_MPa_sqrt_m_per_100um", r"Early R-curve slope (MPa$\sqrt{m}$ per 100 $\mu$m)"),
     )
     fig, axes = plt.subplots(1, 3, figsize=(17.0, 4.8), constrained_layout=True)
@@ -143,9 +171,9 @@ def _plot_three_panel(rows: list, path: Path, formats: list[str], dpi: int) -> l
     axes[0].legend(frameon=False, fontsize=8)
     written = []
     for fmt in formats:
-        target = path.with_suffix(f".{fmt}")
-        fig.savefig(target, dpi=dpi, bbox_inches="tight")
-        written.append(str(target))
+        output = path.with_suffix(f".{fmt}")
+        fig.savefig(output, dpi=dpi, bbox_inches="tight")
+        written.append(str(output))
     plt.close(fig)
     return written
 
@@ -165,9 +193,20 @@ def main() -> None:
     metrics = []
     events = []
     failures = []
+    target_values: set[float] = set()
     for case in sorted(root.glob("*/T*_th*_seed*")):
         try:
             metric, case_events = BASE.analyze_case(case)
+            selection = _v10218_selection(case)
+            if selection:
+                metric.option_key = str(selection.get("option_key", metric.option_key))
+                metric.option_label = LABELS.get(metric.option_key, metric.option_key)
+                metric.candidate_id = str(selection.get("candidate_id", metric.candidate_id))
+                for event in case_events:
+                    event["option_key"] = metric.option_key
+            target_value = _target_extension_um(case)
+            if target_value is not None:
+                target_values.add(target_value)
             if metric.status != "complete_target_extension":
                 raise ValueError(f"case status is {metric.status}")
             if metric.option_key not in OPTIONS:
@@ -182,6 +221,9 @@ def main() -> None:
         raise SystemExit(f"analysis failed for {len(failures)} case(s)")
     if len(metrics) != 40:
         raise SystemExit(f"expected 40 complete cases; analyzed {len(metrics)}")
+    if len(target_values) > 1:
+        raise SystemExit(f"mixed target extensions found: {sorted(target_values)}")
+    target_extension_um = next(iter(target_values)) if target_values else None
 
     metrics.sort(key=lambda r: (OPTIONS.index(r.option_key), r.temperature_K))
     metric_rows = [asdict(r) for r in metrics]
@@ -197,15 +239,17 @@ def main() -> None:
         json.dumps(diagnostics, indent=2, sort_keys=True) + "\n"
     )
 
+    target = _target_text(target_extension_um)
     plots = []
     plots += _plot_metric(metrics, "K_initial_MPa_sqrt_m", r"$K_{initial}$ (MPa$\sqrt{m}$)", outdir / "K_initial_vs_temperature_all_DBTT_candidates", args.formats, args.dpi)
-    plots += _plot_metric(metrics, "K_end_MPa_sqrt_m", r"$K_{end}$ (MPa$\sqrt{m}$)", outdir / "K_end_vs_temperature_all_DBTT_candidates", args.formats, args.dpi)
+    plots += _plot_metric(metrics, "K_end_MPa_sqrt_m", rf"$K_{{{target}}}$ (MPa$\sqrt{{m}}$)", outdir / "K_end_vs_temperature_all_DBTT_candidates", args.formats, args.dpi)
     plots += _plot_metric(metrics, "Rcurve_slope_MPa_sqrt_m_per_100um", r"Early R-curve slope (MPa$\sqrt{m}$ per 100 $\mu$m)", outdir / "early_Rcurve_slope_vs_temperature_all_DBTT_candidates", args.formats, args.dpi)
-    plots += _plot_three_panel(metrics, outdir / "DBTT_candidate_short_screen_3panel", args.formats, args.dpi)
+    plots += _plot_three_panel(metrics, outdir / "DBTT_candidate_short_screen_3panel", args.formats, args.dpi, target_extension_um)
 
     manifest = {
         "schema": "v10.2.18_dbtt_candidate_short_screen_analysis",
         "cases_analyzed": len(metrics),
+        "target_extension_um": target_extension_um,
         "common_random_number_design": True,
         "definitions": {
             "K_initial": "summary.json Kc_first_MPa_sqrt_m",
@@ -215,7 +259,12 @@ def main() -> None:
         "plots": plots,
     }
     (outdir / "analysis_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
-    print(json.dumps({"cases_analyzed": len(metrics), "output_dir": str(outdir), "plots": len(plots)}, sort_keys=True))
+    print(json.dumps({
+        "cases_analyzed": len(metrics),
+        "target_extension_um": target_extension_um,
+        "output_dir": str(outdir),
+        "plots": len(plots),
+    }, sort_keys=True))
 
 
 if __name__ == "__main__":
