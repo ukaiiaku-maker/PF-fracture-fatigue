@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import sys
 
 import numpy as np
@@ -66,3 +67,14 @@ def test_extracts_initial_end_and_path_length_slope(tmp_path: Path):
     expected_slope = np.polyfit([0.0, 50.0, 100.0], [10.0, 10.0, 12.0], 1)[0]
     assert np.isclose(metric.Rcurve_slope_MPa_sqrt_m_per_um, expected_slope)
     assert np.isclose(metric.Rcurve_slope_MPa_sqrt_m_per_100um, 100.0 * expected_slope)
+
+
+def test_plotting_launcher_parses():
+    launcher = ROOT / "scripts" / "run_v10_2_17_stage3_plotting.sh"
+    completed = subprocess.run(
+        ["bash", "-n", str(launcher)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
