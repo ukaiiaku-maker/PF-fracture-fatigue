@@ -28,6 +28,7 @@ from .continuum_source_tip import (
 
 MODEL_ID = "v10.2.16_anisotropic_continuum_source_parameter_transfer"
 SOURCE_MODEL = "minimal_continuum_local_emission_backstress_anisotropic"
+_ORIGINAL_ANISOTROPIC_INSTALL = _anisotropic.install_anisotropic_campaign_emission
 
 
 def _anisotropic_continuum_emit(
@@ -188,7 +189,7 @@ def install_anisotropic_continuum_emission(
 
     # Reuse the audited tensor-drive and transport initialization, then replace
     # only its finite-site emission method with the continuum activity equation.
-    _anisotropic.install_anisotropic_campaign_emission(state, config)
+    _ORIGINAL_ANISOTROPIC_INSTALL(state, config)
     state._emit = MethodType(_anisotropic_continuum_emit, state)
     state.source_model = SOURCE_MODEL
     state.continuum_source_reference_model = CONTINUUM_SOURCE_MODEL
