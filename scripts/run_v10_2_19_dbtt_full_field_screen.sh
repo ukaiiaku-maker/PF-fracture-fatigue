@@ -16,7 +16,7 @@ MODE=${MODE:-smoke}
 case "$MODE" in
   smoke)
     DEFAULT_OUTROOT=runs/v10_2_19_dbtt_full_field_smoke_10um_theta45_v1
-    DEFAULT_TEMPS="700 900"
+    DEFAULT_TEMPS="800 900 1000"
     DEFAULT_TARGET=10
     DEFAULT_STEPS=50000
     DEFAULT_NO_PLOTS=0
