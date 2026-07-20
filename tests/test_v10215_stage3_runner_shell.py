@@ -15,5 +15,7 @@ def test_stage3_runner_shell_syntax_and_matrix_defaults():
     assert '--no-wake-shielding' in text
     assert '--mobile-shield-fraction 0' in text
     assert 'arrhenius_fracture.sharp_front_v10_2_15' in text
-    assert 'if [[ "$MODE" != "plan" ]]; then' in text
-    assert 'set SIGNED_KERNEL_FAMILY_JSON to the completed v10.2.14 active-only family JSON' in text
+    assert 'arrhenius_fracture.sharp_front_v10_1_7_5' in text
+    assert 'physics:       unchanged; exact material-manifest overlay only' in text
+    assert 'SIGNED_KERNEL_FAMILY_JSON' not in text
+    assert '--signed-kernel-family' not in text
