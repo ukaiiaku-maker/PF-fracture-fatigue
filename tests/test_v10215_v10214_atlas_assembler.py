@@ -14,7 +14,7 @@ def test_v10214_atlas_assembler_parses_and_is_fail_closed():
     assert "--independent-review" in text
     assert "--authorize-production-parameterization" in text
     assert "mechanics_rerun_performed\": False" in text
-    assert "production_parameterization_allowed") is not True" in text
+    assert 'payload.get("production_parameterization_allowed") is not True' in text
     assert "refusing active-only promotion" in text
 
 
