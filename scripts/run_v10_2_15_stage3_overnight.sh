@@ -37,7 +37,7 @@ write_status() {
   local exit_code=${3:-}
   STATUS_FILE="$STATUS_FILE" STATE="$state" MESSAGE="$message" EXIT_CODE="$exit_code" \
   OUTROOT_VALUE="$OUTROOT" FAMILY_VALUE="$FAMILY" MAX_JOBS_VALUE="$MAX_JOBS" \
-  LAUNCHER_PID="$$" python - <<'PY'
+  PREFLIGHT_ROOT_VALUE="$PREFLIGHT_ROOT" LAUNCHER_PID="$$" python - <<'PY'
 import json
 import os
 from datetime import datetime, timezone
@@ -52,6 +52,7 @@ payload = {
     "launcher_pid": int(os.environ["LAUNCHER_PID"]),
     "outroot": os.environ["OUTROOT_VALUE"],
     "family": os.environ["FAMILY_VALUE"],
+    "preflight_root": os.environ["PREFLIGHT_ROOT_VALUE"],
     "max_jobs": int(os.environ["MAX_JOBS_VALUE"]),
 }
 if os.environ.get("EXIT_CODE", ""):
@@ -103,6 +104,10 @@ if [[ "$RUNTIME_PREFLIGHT" == "1" && ! -f "$PREFLIGHT_MARKER" ]]; then
   set -e
   if [[ "$preflight_rc" -ne 0 ]]; then
     echo "[stage3] runtime preflight failed; full campaign was not started" >&2
+    python scripts/status_v10_2_15_stage3.py \
+      --outroot "$PREFLIGHT_ROOT" \
+      --failed-tail 80 \
+      --tail 5 || true
     exit "$preflight_rc"
   fi
   touch "$PREFLIGHT_MARKER"
