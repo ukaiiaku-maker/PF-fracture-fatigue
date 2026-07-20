@@ -89,6 +89,33 @@ def test_dbtt_and_peak_80_bin_50um_runtime_binding():
     assert audit["runtime_grid_binding"]["runtime_active_bins"] == 80
 
 
+def test_sparse_validated_source_count_is_not_rejected_as_geometric_minimum():
+    family = _family()
+    family.source_capacity_bounds[:] = np.asarray([[3600.0, 36000.0], [3600.0, 36000.0]])
+    state = _state(100.0e-6, 200)
+    state.site_capacity = np.asarray([2.4387841773917582, 2.4387841773917582])
+    family.validate_state(state)
+    assert np.all(family.source_capacity_bounds[:, 0] == 0.0)
+    assert np.all(family.source_capacity_bounds[:, 1] == 36000.0)
+    binding = family.metadata["runtime_source_capacity_binding"]
+    assert binding["runtime_source_sites_per_system"] == state.site_capacity.tolist()
+    assert binding["geometric_lower_bound_used_as_constitutive_minimum"] is False
+    assert binding["activation_to_line_content_unchanged"] is True
+
+
+def test_mechanical_upper_source_capacity_bound_remains_enforced():
+    family = _family()
+    family.source_capacity_bounds[:] = np.asarray([[3600.0, 36000.0], [3600.0, 36000.0]])
+    state = _state(50.0e-6, 80)
+    state.site_capacity = np.asarray([40000.0, 40000.0])
+    try:
+        family.validate_state(state)
+    except ValueError as exc:
+        assert "outside the mechanically derived source-capacity range" in str(exc)
+    else:
+        raise AssertionError("mechanical upper source-capacity bound must remain enforced")
+
+
 def test_binding_rejects_runtime_grid_beyond_measured_support():
     family = _family()
     state = _state(120.0e-6, 200)
