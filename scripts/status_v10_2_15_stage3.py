@@ -55,11 +55,21 @@ def _last_nonempty_line(path: Path) -> str:
     return next((line for line in reversed(lines) if line), "")
 
 
+def _tail(path: Path, count: int) -> list[str]:
+    if count <= 0 or not path.is_file():
+        return []
+    try:
+        return path.read_text(errors="replace").splitlines()[-count:]
+    except OSError:
+        return []
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--outroot", type=Path, default=DEFAULT_OUTROOT)
     parser.add_argument("--log", type=Path)
     parser.add_argument("--tail", type=int, default=12)
+    parser.add_argument("--failed-tail", type=int, default=20)
     args = parser.parse_args()
 
     outroot = args.outroot.expanduser().resolve()
@@ -101,8 +111,10 @@ def main() -> int:
         "queued": 0,
     }
     active_rows: list[tuple[str, str]] = []
+    failed_rows: list[tuple[str, Path, str]] = []
     for row in planned:
         case_root = Path(row["case_root"]).expanduser().resolve()
+        label = f"{row['option_key']} T={row['temperature_K']}K"
         case_status = _load_json(case_root / "stage3_case_status.json")
         if case_status:
             category = {
@@ -113,17 +125,20 @@ def main() -> int:
             if category:
                 counts[category] += 1
                 continue
-        if (case_root / "RUN_FAILED").is_file():
-            counts["failed"] += 1
-            continue
         if str(case_root) in process_table:
             counts["active"] += 1
-            active_rows.append(
-                (
-                    f"{row['option_key']} T={row['temperature_K']}K",
-                    _last_nonempty_line(case_root / "run.log"),
-                )
-            )
+            active_rows.append((label, _last_nonempty_line(case_root / "run.log")))
+            continue
+        if (case_root / "RUN_FAILED").is_file():
+            counts["failed"] += 1
+            exit_code = ""
+            exit_path = case_root / "exit_code.txt"
+            if exit_path.is_file():
+                try:
+                    exit_code = exit_path.read_text().strip()
+                except OSError:
+                    pass
+            failed_rows.append((label, case_root / "run.log", exit_code))
             continue
         counts["queued"] += 1
 
@@ -155,10 +170,17 @@ def main() -> int:
             suffix = f" | {line}" if line else ""
             print(f"    - {label}{suffix}")
 
+    if failed_rows:
+        print("  failed cases:")
+        for label, case_log, exit_code in failed_rows:
+            suffix = f" exit={exit_code}" if exit_code else ""
+            print(f"    - {label}{suffix}")
+            for line in _tail(case_log, args.failed_tail):
+                print(f"        {line}")
+
     if log_path.is_file() and args.tail > 0:
-        lines = log_path.read_text(errors="replace").splitlines()[-args.tail :]
         print(f"  latest log ({log_path}):")
-        for line in lines:
+        for line in _tail(log_path, args.tail):
             print(f"    {line}")
 
     return 0 if launcher_pid is not None or state == "complete" else 1
