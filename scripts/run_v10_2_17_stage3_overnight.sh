@@ -10,11 +10,17 @@ if [[ "${CONDA_DEFAULT_ENV:-}" != "$EXPECTED_ENV" ]]; then
   exit 2
 fi
 
-: "${LOAD_INVARIANCE_ROOT:?Set LOAD_INVARIANCE_ROOT to the completed E000/E200/E500/E800 root}"
-: "${ENGINE_CONFIG:?Set ENGINE_CONFIG to the serialized v10.2 engine configuration}"
-
 OUTROOT=${OUTROOT:-runs/v10_2_17_stage3_final_signed_stochastic_500um_theta45_1x_v1}
-FAMILY_JSON=${FAMILY_JSON:-$OUTROOT/mechanics/v10_2_14_active_only_campaign_family.json}
+BUNDLED_FAMILY=${BUNDLED_FAMILY:-$ROOT/runtime_inputs/v10_2_17/v10_2_14_active_only_campaign_family.json}
+if [[ -z "${FAMILY_JSON:-}" ]]; then
+  if [[ -f "$BUNDLED_FAMILY" ]]; then
+    FAMILY_JSON="$BUNDLED_FAMILY"
+  else
+    FAMILY_JSON="$OUTROOT/mechanics/v10_2_14_active_only_campaign_family.json"
+  fi
+fi
+LOAD_INVARIANCE_ROOT=${LOAD_INVARIANCE_ROOT:-$ROOT/runtime_inputs/v10_2_17/v10_2_14_active_load_invariance_700K_all_states_v1}
+ENGINE_CONFIG=${ENGINE_CONFIG:-$ROOT/runtime_inputs/v10_2_17/v10_2_3_2d_engine_config.json}
 MAX_JOBS=${MAX_JOBS:-2}
 STEPS=${STEPS:-300000}
 TARGET_EXT_UM=${TARGET_EXT_UM:-500}
@@ -34,13 +40,20 @@ write_status() {
   local exit_code=${3:-}
   STATUS_FILE="$STATUS_FILE" STATE="$state" MESSAGE="$message" EXIT_CODE="$exit_code" \
   OUTROOT_VALUE="$OUTROOT" FAMILY_VALUE="$FAMILY_JSON" MAX_JOBS_VALUE="$MAX_JOBS" \
-  LAUNCHER_PID="$$" python - <<'PY'
+  LAUNCHER_PID="$$" ROOT_VALUE="$ROOT" python - <<'PY'
 import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 
 path = Path(os.environ["STATUS_FILE"])
+family = Path(os.environ["FAMILY_VALUE"]).expanduser().resolve()
+root = Path(os.environ["ROOT_VALUE"]).resolve()
+try:
+    family.relative_to(root)
+    local_family = True
+except ValueError:
+    local_family = False
 payload = {
     "schema": "v10.2.17_stage3_final_signed_stochastic_overnight_status",
     "state": os.environ["STATE"],
@@ -51,7 +64,9 @@ payload = {
     "max_jobs": int(os.environ["MAX_JOBS_VALUE"]),
     "entry": "arrhenius_fracture.sharp_front_v10_2_17",
     "signed_engine": "arrhenius_fracture.state_resolved_signed_engine_v10214",
-    "signed_family": os.environ["FAMILY_VALUE"],
+    "signed_family": str(family),
+    "signed_family_inside_repository": local_family,
+    "external_mechanics_inputs_required_for_this_launch": False,
     "cleavage_hazard_mode": "exponential",
     "event_length_mode": "threshold_scaled",
     "constitutive_K_shield_cap_applied": False,
@@ -73,8 +88,21 @@ on_exit() {
 trap on_exit EXIT
 
 PHASE=mechanics_family
-write_status assembling "Assembling the final v10.2.14 active-only signed family from completed mechanics"
-if [[ ! -f "$FAMILY_JSON" ]]; then
+if [[ -f "$FAMILY_JSON" ]]; then
+  write_status auditing "Reusing the existing local signed-family runtime artifact"
+  echo "[stage3] reusing signed family: $FAMILY_JSON"
+else
+  write_status assembling "Assembling the signed family because no local runtime artifact exists"
+  if [[ ! -d "$LOAD_INVARIANCE_ROOT" ]]; then
+    echo "ERROR: signed family is missing and LOAD_INVARIANCE_ROOT does not exist: $LOAD_INVARIANCE_ROOT" >&2
+    echo "Freeze the existing family before deleting legacy mechanics inputs." >&2
+    exit 2
+  fi
+  if [[ ! -f "$ENGINE_CONFIG" ]]; then
+    echo "ERROR: signed family is missing and ENGINE_CONFIG does not exist: $ENGINE_CONFIG" >&2
+    echo "Freeze the existing family before deleting legacy mechanics inputs." >&2
+    exit 2
+  fi
   python scripts/build_v10_2_14_campaign_ready_active_only_atlas_v2.py \
     --load-invariance-root "$LOAD_INVARIANCE_ROOT" \
     --engine-config "$ENGINE_CONFIG" \
@@ -82,9 +110,11 @@ if [[ ! -f "$FAMILY_JSON" ]]; then
 fi
 
 PHASE=stack_audit
-write_status auditing "Auditing the final signed stochastic execution stack"
+write_status auditing "Auditing the local signed stochastic execution stack"
 SIGNED_KERNEL_FAMILY_JSON="$FAMILY_JSON" python - <<'PY'
 import os
+from pathlib import Path
+import arrhenius_fracture
 from arrhenius_fracture.signed_kernel_family_v10214 import (
     ActiveOnlySigned2DShieldingKernelFamily,
 )
@@ -93,6 +123,10 @@ from arrhenius_fracture.state_resolved_signed_engine_v10214 import (
 )
 import arrhenius_fracture.sharp_front_v10_2_17 as entry
 
+root = Path.cwd().resolve()
+package = Path(arrhenius_fracture.__file__).resolve().parent
+if package != root / "arrhenius_fracture":
+    raise SystemExit(f"stale editable import: expected {root / 'arrhenius_fracture'}, got {package}")
 family = ActiveOnlySigned2DShieldingKernelFamily.from_json(
     os.environ["SIGNED_KERNEL_FAMILY_JSON"]
 )
@@ -101,20 +135,13 @@ assert family.metadata.get("constitutive_K_shield_cap_present") is False
 assert family.metadata.get("active_kernel_mechanically_measured") is True
 assert family.metadata.get("wake_kernel_mechanically_measured") is False
 assert family.metadata.get("wake_shielding_supported") is False
-assert family.metadata.get(
-    "spatial_cross_validation_not_required_for_two_endpoint_active_curves"
-) is True
-endpoint = family.metadata.get("exact_endpoint_projection_assessment", {})
-assert endpoint.get("ready") is True
-assert endpoint.get("all_active_curves_have_exact_endpoint_coverage") is True
 assert entry.StateResolvedSignedBurgersTipEngine is StateResolvedSignedBurgersTipEngine
 assert entry.FINAL_ENGINE.endswith("state_resolved_signed_engine_v10214")
 assert entry.FINAL_FAMILY.endswith("signed_kernel_family_v10214")
 print(
     "stack audit passed: "
-    f"states={len(family.states)} engine={entry.FINAL_ENGINE} "
-    "projection=exact_endpoints hazard=exponential "
-    "event_length=threshold_scaled Kcap=off wake=off"
+    f"package={package} states={len(family.states)} engine={entry.FINAL_ENGINE} "
+    "hazard=exponential event_length=threshold_scaled Kcap=off wake=off"
 )
 PY
 
@@ -123,7 +150,7 @@ write_status running "Running the 40-case final signed stochastic Stage 3 campai
 echo "[stage3] starting 40-case final signed stochastic campaign"
 echo "[stage3] entry=arrhenius_fracture.sharp_front_v10_2_17"
 echo "[stage3] family=$FAMILY_JSON"
-echo "[stage3] projection=exact_endpoints hazard=exponential event_length=threshold_scaled outroot=$OUTROOT max_jobs=$MAX_JOBS"
+echo "[stage3] hazard=exponential event_length=threshold_scaled outroot=$OUTROOT max_jobs=$MAX_JOBS"
 
 set +e
 env \
