@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import subprocess
+import sys
 
 from arrhenius_fracture import sharp_front_v10_2_18 as entry
 from arrhenius_fracture.parameter_registry_v9111 import select_option
@@ -55,8 +56,27 @@ def test_runner_and_analyzer_parse_and_preserve_v10217_controls():
     assert "--no-wake-shielding" in text
     assert "--target-crack-extension-um \"$TARGET_EXT_UM\"" in text
     compiled = subprocess.run(
-        ["python", "-m", "py_compile", str(analyzer), str(root / "arrhenius_fracture" / "sharp_front_v10_2_18.py")],
+        [sys.executable, "-m", "py_compile", str(analyzer), str(root / "arrhenius_fracture" / "sharp_front_v10_2_18.py")],
         capture_output=True,
         text=True,
     )
     assert compiled.returncode == 0, compiled.stderr
+
+    # --help imports and executes the wrapper far enough to catch the Python 3.12
+    # dataclass/sys.modules failure that py_compile alone cannot detect.
+    imported = subprocess.run(
+        [sys.executable, str(analyzer), "--help"],
+        capture_output=True,
+        text=True,
+    )
+    assert imported.returncode == 0, imported.stderr
+    assert "--outroot" in imported.stdout
+
+
+def test_analyzer_reads_v10218_selection_and_infers_target_metadata():
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "scripts" / "plot_v10_2_18_dbtt_candidate_screen.py").read_text()
+    assert "sys.modules[SPEC.name] = BASE" in text
+    assert "v10_2_18_dbtt_parameter_selection.json" in text
+    assert "target_extension_um" in text
+    assert "mixed target extensions found" in text
