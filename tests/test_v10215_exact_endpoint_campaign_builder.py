@@ -76,6 +76,8 @@ def test_endpoint_gate_rejects_missing_last_endpoint():
     assert ready is False
 
 
-def test_overnight_launcher_uses_endpoint_builder():
+def test_existing_2d_overnight_launcher_does_not_use_endpoint_builder():
     text = Path("scripts/run_v10_2_15_stage3_overnight.sh").read_text()
-    assert "build_v10_2_14_campaign_ready_active_only_atlas_v2.py" in text
+    assert "build_v10_2_14_campaign_ready_active_only_atlas_v2.py" not in text
+    assert "SIGNED_KERNEL_FAMILY_JSON" not in text
+    assert "arrhenius_fracture.sharp_front_v10_1_7_5" in text
