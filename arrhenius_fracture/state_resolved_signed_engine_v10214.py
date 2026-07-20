@@ -5,9 +5,12 @@ from pathlib import Path
 from typing import Any
 
 # v10.2.15 Stage 3 permits the mechanically measured physical-x atlas to be
-# evaluated on the selected 80- or 200-bin MPZ discretization.  Importing this
+# evaluated on the selected 80- or 200-bin MPZ discretization. Importing this
 # module installs the binding before any engine instance validates the family.
 from . import runtime_grid_binding_v10215 as _runtime_grid_binding  # noqa: F401
+# A zero-event 2-D run is a valid initialization or right-censored result. The
+# legacy avalanche summary adapter must not convert that result into exit code 1.
+from . import zero_event_summary_v10215 as _zero_event_summary  # noqa: F401
 from .signed_burgers_shared_v1025 import VALIDATED_SCALAR_TRANSPORT
 from .signed_kernel_family_v10214 import (
     ActiveOnlySigned2DShieldingKernelFamily,
@@ -67,6 +70,7 @@ class StateResolvedSignedBurgersTipEngine(_V10212Engine):
             "runtime_mpz_grid_binding": (
                 "piecewise_linear_in_physical_x_before_engine_installation"
             ),
+            "zero_event_summary_is_valid": True,
             "family": family.audit_payload() if family is not None else None,
         }
         return payload
