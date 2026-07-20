@@ -69,7 +69,7 @@ PHASE=atlas_assembly
 write_status assembling "Assembling active-only kernel from completed E-state mechanics"
 if [[ ! -f "$FAMILY" ]]; then
   echo "[stage3] assembling active-only kernel from completed E-state mechanics"
-  python scripts/build_v10_2_14_campaign_ready_active_only_atlas.py \
+  python scripts/build_v10_2_14_campaign_ready_active_only_atlas_v2.py \
     --load-invariance-root "$LOAD_INVARIANCE_ROOT" \
     --engine-config "$ENGINE_CONFIG" \
     --out "$FAMILY"
