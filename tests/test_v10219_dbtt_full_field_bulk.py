@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import json
-import math
 from pathlib import Path
 import subprocess
 
@@ -153,6 +151,31 @@ def test_runner_parses_and_preserves_matched_screen_controls():
     assert "DEFAULT_TARGET=50" in text
     assert "DEFAULT_TEMPS=\"300 400 500 600 700 800 900 1000 1100 1200\"" in text
     assert "v10_2_19_full_field_bulk_audit.json" in text
+
+
+def test_python_entry_runner_and_comparison_scripts_execute_help():
+    root = Path(__file__).resolve().parents[1]
+    targets = (
+        root / "arrhenius_fracture" / "emission_derived_plasticity.py",
+        root / "arrhenius_fracture" / "sharp_front_v10_2_19.py",
+        root / "scripts" / "compare_v10_2_18_tip_only_v10_2_19_full_field.py",
+    )
+    compiled = subprocess.run(
+        ["python", "-m", "py_compile", *map(str, targets)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert compiled.returncode == 0, compiled.stderr
+    comparison = subprocess.run(
+        ["python", str(targets[-1]), "--help"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert comparison.returncode == 0, comparison.stderr
+    assert "--tip-only-root" in comparison.stdout
+    assert "--full-field-root" in comparison.stdout
 
 
 def test_source_declares_real_update_audit_and_no_independent_fit():
