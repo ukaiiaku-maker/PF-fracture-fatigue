@@ -92,7 +92,7 @@ env \
   TARGET_EXT_UM="$TARGET_EXT_UM" \
   THETA="$THETA" \
   SKIP_FINISHED="$SKIP_FINISHED" \
-  bash scripts/run_v10_2_15_stage3_monotonic_temperature_sweep.sh
+  bash scripts/run_v10_2_15_stage3_monotonic_temperature_sweep_macos.sh
 rc=$?
 set -e
 
