@@ -75,7 +75,7 @@ trap on_exit EXIT
 PHASE=mechanics_family
 write_status assembling "Assembling the final v10.2.14 active-only signed family from completed mechanics"
 if [[ ! -f "$FAMILY_JSON" ]]; then
-  python scripts/build_v10_2_14_campaign_ready_active_only_atlas.py \
+  python scripts/build_v10_2_14_campaign_ready_active_only_atlas_v2.py \
     --load-invariance-root "$LOAD_INVARIANCE_ROOT" \
     --engine-config "$ENGINE_CONFIG" \
     --out "$FAMILY_JSON"
@@ -101,13 +101,20 @@ assert family.metadata.get("constitutive_K_shield_cap_present") is False
 assert family.metadata.get("active_kernel_mechanically_measured") is True
 assert family.metadata.get("wake_kernel_mechanically_measured") is False
 assert family.metadata.get("wake_shielding_supported") is False
+assert family.metadata.get(
+    "spatial_cross_validation_not_required_for_two_endpoint_active_curves"
+) is True
+endpoint = family.metadata.get("exact_endpoint_projection_assessment", {})
+assert endpoint.get("ready") is True
+assert endpoint.get("all_active_curves_have_exact_endpoint_coverage") is True
 assert entry.StateResolvedSignedBurgersTipEngine is StateResolvedSignedBurgersTipEngine
 assert entry.FINAL_ENGINE.endswith("state_resolved_signed_engine_v10214")
 assert entry.FINAL_FAMILY.endswith("signed_kernel_family_v10214")
 print(
     "stack audit passed: "
     f"states={len(family.states)} engine={entry.FINAL_ENGINE} "
-    "hazard=exponential event_length=threshold_scaled Kcap=off wake=off"
+    "projection=exact_endpoints hazard=exponential "
+    "event_length=threshold_scaled Kcap=off wake=off"
 )
 PY
 
@@ -116,7 +123,7 @@ write_status running "Running the 40-case final signed stochastic Stage 3 campai
 echo "[stage3] starting 40-case final signed stochastic campaign"
 echo "[stage3] entry=arrhenius_fracture.sharp_front_v10_2_17"
 echo "[stage3] family=$FAMILY_JSON"
-echo "[stage3] hazard=exponential event_length=threshold_scaled outroot=$OUTROOT max_jobs=$MAX_JOBS"
+echo "[stage3] projection=exact_endpoints hazard=exponential event_length=threshold_scaled outroot=$OUTROOT max_jobs=$MAX_JOBS"
 
 set +e
 env \
