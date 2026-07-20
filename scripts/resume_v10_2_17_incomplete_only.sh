@@ -18,6 +18,7 @@ STEPS=${STEPS:-300000}
 THETA=${THETA:-45}
 NO_PLOTS=${NO_PLOTS:-0}
 KEEP_INCOMPLETE_BACKUPS=${KEEP_INCOMPLETE_BACKUPS:-1}
+SCAN_ONLY=${SCAN_ONLY:-0}
 
 PLAN="$OUTROOT/stage3_campaign_plan.tsv"
 RESUME_PLAN="$OUTROOT/resume_incomplete_plan.tsv"
@@ -85,6 +86,11 @@ exec 3<&-
 echo "Verified complete cases: $complete_count"
 echo "Cases requiring rerun:   $resume_count"
 echo "Resume plan:             $RESUME_PLAN"
+
+if [[ "$SCAN_ONLY" == 1 ]]; then
+  echo "SCAN_ONLY=1: no simulations were started."
+  exit 0
+fi
 
 if [[ "$resume_count" -eq 0 ]]; then
   python scripts/summarize_v10_2_15_stage3.py --outroot "$OUTROOT"
