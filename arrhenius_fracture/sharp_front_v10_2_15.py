@@ -228,6 +228,11 @@ def main(argv=None):
             "v10.2.15 requires --signed-kernel-family PATH or SIGNED_KERNEL_FAMILY_JSON"
         )
     family = ActiveOnlySigned2DShieldingKernelFamily.from_json(family_path)
+    if family.metadata.get("production_parameterization_allowed") is not True:
+        raise SystemExit(
+            "v10.2.15 Stage 3 requires a production-authorized v10.2.14 "
+            "active-only signed kernel family"
+        )
     transport_mode = _transport.normalize_transport_mode(os.environ.get("ANISOTROPIC_TRANSPORT_MODE"))
     StateResolvedSignedBurgersTipEngine.configure_state_resolved_physics(
         family,
