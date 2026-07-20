@@ -22,6 +22,61 @@ SCHEMA = "v10.2.14_active_only_real_signed_2d_shielding_atlas"
 OPENING_COMPATIBILITY_COORDINATE = 0.0
 
 
+def _resample_rows(
+    source_x: np.ndarray,
+    values: np.ndarray,
+    target_x: np.ndarray,
+) -> np.ndarray:
+    """Evaluate one measured spatial operator on another cell-centre grid.
+
+    The atlas stores a physical kernel as a function of distance from the tip;
+    the number of atlas stations is therefore not a constitutive state variable.
+    Runtime MPZ grids may be finer, or may cover a shorter physical process zone.
+    Linear interpolation is used in the measured interval.  A target cell centre
+    may extend from the first/last source centre to the corresponding physical
+    cell boundary, in which case the nearest measured slope is used.
+    """
+    sx = np.asarray(source_x, dtype=float).reshape(-1)
+    tx = np.asarray(target_x, dtype=float).reshape(-1)
+    matrix = np.asarray(values, dtype=float)
+    if matrix.ndim != 2 or matrix.shape[1] != sx.size:
+        raise ValueError("kernel rows do not match source spatial coordinates")
+    if sx.size < 2:
+        raise ValueError("runtime grid binding requires at least two atlas stations")
+    if tx.size < 1:
+        return np.zeros((matrix.shape[0], 0), dtype=float)
+    if np.any(~np.isfinite(sx)) or np.any(~np.isfinite(tx)) or np.any(~np.isfinite(matrix)):
+        raise ValueError("runtime grid binding requires finite coordinates and kernels")
+    if np.any(np.diff(sx) <= 0.0) or np.any(np.diff(tx) <= 0.0):
+        raise ValueError("spatial coordinates must be strictly increasing")
+
+    left_dx = float(sx[1] - sx[0])
+    right_dx = float(sx[-1] - sx[-2])
+    left_boundary = float(sx[0] - 0.5 * left_dx)
+    right_boundary = float(sx[-1] + 0.5 * right_dx)
+    tolerance = max(1.0e-15, 1.0e-10 * max(abs(left_boundary), abs(right_boundary), 1.0))
+    if float(tx[0]) < left_boundary - tolerance or float(tx[-1]) > right_boundary + tolerance:
+        raise ValueError(
+            "runtime MPZ grid lies outside the measured active-kernel support: "
+            f"target=[{tx[0]:.9e},{tx[-1]:.9e}] "
+            f"support=[{left_boundary:.9e},{right_boundary:.9e}]"
+        )
+
+    output = np.empty((matrix.shape[0], tx.size), dtype=float)
+    for system, row in enumerate(matrix):
+        interpolated = np.interp(tx, sx, row)
+        left = tx < sx[0]
+        right = tx > sx[-1]
+        if np.any(left):
+            slope = float((row[1] - row[0]) / left_dx)
+            interpolated[left] = row[0] + slope * (tx[left] - sx[0])
+        if np.any(right):
+            slope = float((row[-1] - row[-2]) / right_dx)
+            interpolated[right] = row[-1] + slope * (tx[right] - sx[-1])
+        output[system] = interpolated
+    return output
+
+
 class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
     """Interpolate active FEM kernels by cumulative crack-path extension.
 
@@ -125,6 +180,7 @@ class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
         family._last_boundary_action = "none"
         family._last_observed_analytical_r_eff_over_r0 = 1.0
         family._last_observed_opening_strength_fraction = 0.0
+        family._runtime_grid_binding = None
         family._validate_complete_grid()
         return family
 
@@ -134,6 +190,73 @@ class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
         family._last_observed_analytical_r_eff_over_r0 = 1.0
         family._last_observed_opening_strength_fraction = 0.0
         return family
+
+    def bind_to_state_grid(self, state) -> "ActiveOnlySigned2DShieldingKernelFamily":
+        """Return a per-engine family evaluated on the runtime MPZ discretization."""
+        if int(state.n_systems) != self.n_systems:
+            raise ValueError(
+                f"runtime MPZ systems {state.n_systems} != atlas systems {self.n_systems}"
+            )
+        target_active = np.asarray(state.x, dtype=float).copy()
+        target_wake = np.asarray(state.wake_x, dtype=float).copy()
+        source_active = self.active_x_m.copy()
+        source_wake = self.wake_x_m.copy()
+        bound_states = []
+        for kernel_state in self.states:
+            bound_states.append(
+                KernelState(
+                    state_id=kernel_state.state_id,
+                    coordinates=kernel_state.coordinates.copy(),
+                    active_I=_resample_rows(
+                        source_active, kernel_state.active_I, target_active
+                    ),
+                    wake_I=np.zeros((self.n_systems, target_wake.size), dtype=float),
+                    active_II=_resample_rows(
+                        source_active, kernel_state.active_II, target_active
+                    ),
+                    wake_II=np.zeros((self.n_systems, target_wake.size), dtype=float),
+                    metadata={
+                        **copy.deepcopy(kernel_state.metadata),
+                        "runtime_grid_resampled": True,
+                        "source_active_bins": int(source_active.size),
+                        "runtime_active_bins": int(target_active.size),
+                    },
+                )
+            )
+        bound = type(self)(
+            states=bound_states,
+            active_x_m=target_active,
+            wake_x_m=target_wake,
+            activation_to_line_content=self.activation_to_line_content.copy(),
+            source_capacity_bounds=self.source_capacity_bounds.copy(),
+            fixed_kernel_assessment=copy.deepcopy(self.fixed_kernel_assessment),
+            interpolation=copy.deepcopy(self.interpolation),
+            metadata={
+                **copy.deepcopy(self.metadata),
+                "runtime_grid_binding": {
+                    "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+                    "source_active_bins": int(source_active.size),
+                    "runtime_active_bins": int(target_active.size),
+                    "source_active_x_min_m": float(source_active[0]),
+                    "source_active_x_max_m": float(source_active[-1]),
+                    "runtime_active_x_min_m": float(target_active[0]),
+                    "runtime_active_x_max_m": float(target_active[-1]),
+                    "runtime_wake_bins": int(target_wake.size),
+                    "active_interpolation": "piecewise_linear_in_physical_x",
+                    "wake_operator": "identically_zero",
+                },
+            },
+            source_path=self.source_path,
+        )
+        bound._opening_boundary_policy = copy.deepcopy(self._opening_boundary_policy)
+        bound._last_boundary_action = "none"
+        bound._last_observed_analytical_r_eff_over_r0 = 1.0
+        bound._last_observed_opening_strength_fraction = 0.0
+        bound._runtime_grid_binding = copy.deepcopy(
+            bound.metadata["runtime_grid_binding"]
+        )
+        bound._validate_complete_grid()
+        return bound
 
     def _prepare_query(
         self,
@@ -171,6 +294,9 @@ class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
                 "wake_kernel_mechanically_measured": False,
                 "wake_shielding_supported": False,
                 "wake_kernel_forced_zero": True,
+                "runtime_grid_binding": copy.deepcopy(
+                    getattr(self, "_runtime_grid_binding", None)
+                ),
             }
         )
         return payload
