@@ -63,9 +63,11 @@ if [[ ! -f "$PARAMETER_REGISTRY" ]]; then
   echo "ERROR: parameter registry not found: $PARAMETER_REGISTRY" >&2
   exit 2
 fi
-if [[ -z "$SIGNED_KERNEL_FAMILY_JSON" || ! -f "$SIGNED_KERNEL_FAMILY_JSON" ]]; then
-  echo "ERROR: set SIGNED_KERNEL_FAMILY_JSON to the completed v10.2.14 active-only family JSON." >&2
-  exit 2
+if [[ "$MODE" != "plan" ]]; then
+  if [[ -z "$SIGNED_KERNEL_FAMILY_JSON" || ! -f "$SIGNED_KERNEL_FAMILY_JSON" ]]; then
+    echo "ERROR: set SIGNED_KERNEL_FAMILY_JSON to the completed v10.2.14 active-only family JSON." >&2
+    exit 2
+  fi
 fi
 if ! [[ "$MAX_JOBS" =~ ^[1-9][0-9]*$ ]]; then
   echo "ERROR: MAX_JOBS must be a positive integer" >&2
