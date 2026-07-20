@@ -65,8 +65,6 @@ def _force_full_field_envelope(args: list[str]) -> int:
         raise SystemExit(
             f"v10.2.19 requires --bulk-plasticity-mode {BULK_MODE}; got {requested!r}"
         )
-    # Let v10.2.17 validate every other Stage-3 control using its frozen policy,
-    # then replace only the bulk-mode value that it normally forces to tip_only.
     _stage3._remove_value_option(args, "--bulk-plasticity-mode")
     seed = _ORIGINAL_FORCE_ENVELOPE(args)
     _stage3._set_value_option(args, "--bulk-plasticity-mode", BULK_MODE)
@@ -96,6 +94,14 @@ def _rewrite_full_field_mode_audits(
 ) -> None:
     if not _ACTIVE_BULK_MAPPING:
         raise RuntimeError("full-field run finished without installing exact bulk kinetics")
+    calls = max(int(update_audit.get("calls", 0)), 1)
+    update_audit = dict(update_audit)
+    update_audit["fraction_calls_with_nonzero_accepted_strain"] = (
+        float(update_audit.get("calls_with_nonzero_accepted_strain", 0)) / calls
+    )
+    update_audit["fraction_calls_with_increment_limiter"] = (
+        float(update_audit.get("calls_with_increment_limiter", 0)) / calls
+    )
     common = {
         "bulk_plasticity_mode": BULK_MODE,
         "full_field_bulk_enabled": True,
@@ -155,7 +161,10 @@ def _full_field_protected_main(argv=None):
 
     audit: dict[str, Any] = {
         "calls": 0,
+        "bulk_pt_active_calls": 0,
         "calls_with_nonzero_accepted_strain": 0,
+        "calls_with_increment_limiter": 0,
+        "limited_gauss_point_count": 0,
         "accepted_equivalent_strain_sum": 0.0,
         "accepted_equivalent_strain_max": 0.0,
         "accepted_plastic_work_density_sum_Pa": 0.0,
@@ -176,12 +185,19 @@ def _full_field_protected_main(argv=None):
         )
         if len(result) >= 4 and isinstance(result[3], dict):
             info = result[3]
+            if bool(info.get("bulk_pt_active", False)):
+                audit["bulk_pt_active_calls"] += 1
             dep = np.asarray(info.get("dep_eq_accepted_gp", 0.0), dtype=float)
             work = np.asarray(info.get("dWp_accepted_gp", 0.0), dtype=float)
+            limited = np.asarray(info.get("dep_eq_limited_gp", 0.0), dtype=float)
             dep_sum = float(np.sum(np.maximum(dep, 0.0)))
             dep_max = float(np.max(np.maximum(dep, 0.0))) if dep.size else 0.0
+            n_limited = int(np.count_nonzero(limited > 0.5))
             if dep_max > 0.0:
                 audit["calls_with_nonzero_accepted_strain"] += 1
+            if n_limited > 0:
+                audit["calls_with_increment_limiter"] += 1
+                audit["limited_gauss_point_count"] += n_limited
             audit["accepted_equivalent_strain_sum"] += dep_sum
             audit["accepted_equivalent_strain_max"] = max(
                 float(audit["accepted_equivalent_strain_max"]), dep_max
@@ -192,8 +208,6 @@ def _full_field_protected_main(argv=None):
         return result
 
     try:
-        # This wrapper delegates to the production update; unlike tip_only it is
-        # not a no-op.  The wrapper exists solely to prove activity in each case.
         _plasticity.update_plasticity = audited_update
         _protected.UnifiedMPZState.diagnostics = _protected._diagnostics_with_csv_aliases
         if kinetics_mode == "moving_velocity":
