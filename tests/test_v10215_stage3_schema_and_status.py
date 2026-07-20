@@ -36,11 +36,12 @@ def test_stage3_status_script_parses_and_reports_missing_run(tmp_path: Path):
     assert "launcher:    not running" in completed.stdout
 
 
-def test_overnight_launcher_writes_durable_status():
+def test_overnight_launcher_writes_durable_status_without_atlas_phase():
     text = Path("scripts/run_v10_2_15_stage3_overnight.sh").read_text()
     assert "overnight_status.json" in text
     assert "overnight_launcher.pid" in text
-    assert "write_status assembling" in text
     assert "write_status running" in text
     assert "write_status complete" in text
     assert "write_status failed" in text
+    assert "write_status assembling" not in text
+    assert "PHASE=atlas_assembly" not in text
