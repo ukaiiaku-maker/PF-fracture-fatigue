@@ -6,11 +6,15 @@ over 50 um for DBTT/peak. This module makes the v10.2.14 family evaluate its
 physical spatial operator on the runtime cell-centre grid before the shared
 signed-population engine validates and installs it.
 
-The mechanics normalization also reports a dense geometric *possible-position*
-range based on 10--100 b spacing. Its lower value is not a constitutive minimum
-number of active nucleation sites. Stage 3 preserves the finite source count in
-the validated v9.11.1 material row while retaining the mechanics-derived upper
-capacity check and activation-to-line-content conversion.
+The final accepted 2-D source law does not interpret
+``manifest.source_sites_per_system`` as a count of geometrically packed source
+positions. It is the promoted reference continuum hazard budget S0. The active
+budget S(t) is depleted by Arrhenius emission, coupled to the evolving local
+mobile-plus-retained field through Taylor back stress, and refreshed only when
+crack advance exposes fresh tip geometry. Therefore the geometric 10--100 b
+possible-position interval stored in the mechanics-normalization artifact is
+audit metadata only and must not gate S0. The activation-to-signed-line-content
+conversion remains mechanically derived and unchanged.
 """
 from __future__ import annotations
 
@@ -23,30 +27,44 @@ from .signed_kernel_family_v10214 import ActiveOnlySigned2DShieldingKernelFamily
 _ORIGINAL_VALIDATE_STATE = ActiveOnlySigned2DShieldingKernelFamily.validate_state
 
 
-def _preserve_sparse_registry_source_capacity(self, state) -> None:
-    capacity = np.asarray(state.site_capacity, dtype=float).reshape(-1)
-    if capacity.shape != (int(state.n_systems),):
-        raise ValueError("runtime source capacity must have one value per system")
-    if np.any(~np.isfinite(capacity)) or np.any(capacity < 0.0):
-        raise ValueError("runtime source capacity must be finite and nonnegative")
+def _preserve_final_2d_continuum_source_budget(self, state) -> None:
+    reference_budget = np.asarray(state.site_capacity, dtype=float).reshape(-1)
+    if reference_budget.shape != (int(state.n_systems),):
+        raise ValueError("runtime continuum source budget must have one value per system")
+    if np.any(~np.isfinite(reference_budget)) or np.any(reference_budget < 0.0):
+        raise ValueError("runtime continuum source budget must be finite and nonnegative")
 
-    bounds = np.asarray(self.source_capacity_bounds, dtype=float).copy()
-    if bounds.shape != (int(state.n_systems), 2):
-        raise ValueError("atlas source-capacity bounds have the wrong shape")
-    original = bounds.copy()
-    # A sparse active-source population may be below the dense geometric count.
-    # The mechanically derived upper bound remains enforced.
-    bounds[:, 0] = 0.0
-    self.source_capacity_bounds = bounds
+    geometric_bounds = np.asarray(self.source_capacity_bounds, dtype=float).copy()
+    if geometric_bounds.shape != (int(state.n_systems), 2):
+        raise ValueError("atlas source-position audit bounds have the wrong shape")
+    if np.any(~np.isfinite(geometric_bounds)):
+        raise ValueError("atlas source-position audit bounds must be finite")
+
+    # The inherited family validator expects numerical bounds. Supply permissive
+    # bounds only for that legacy interface; they are not a constitutive law.
+    runtime_bounds = np.column_stack(
+        (
+            np.zeros(int(state.n_systems), dtype=float),
+            np.maximum(geometric_bounds[:, 1], reference_budget),
+        )
+    )
+    self.source_capacity_bounds = runtime_bounds
     self.metadata = {
         **copy.deepcopy(self.metadata),
-        "runtime_source_capacity_binding": {
-            "model_id": "v10.2.15_preserve_validated_registry_source_sites",
-            "runtime_source_sites_per_system": capacity.tolist(),
-            "original_geometric_possible_position_bounds": original.tolist(),
-            "runtime_validation_bounds": bounds.tolist(),
-            "geometric_lower_bound_used_as_constitutive_minimum": False,
-            "mechanical_upper_capacity_bound_retained": True,
+        "runtime_source_budget_binding": {
+            "model_id": "v10.2.15_preserve_final_2d_continuum_source_budget",
+            "source_model": "campaign_calibrated_tip_budget",
+            "reference_continuum_hazard_budget_S0_per_system": (
+                reference_budget.tolist()
+            ),
+            "active_budget_evolves_in_time": True,
+            "emission_depletes_active_budget": True,
+            "local_mobile_retained_field_controls_backstress": True,
+            "crack_advance_refreshes_budget_over_manifest_length": True,
+            "stationary_temporal_recycling": False,
+            "geometric_possible_position_bounds_audit_only": geometric_bounds.tolist(),
+            "geometric_bounds_used_as_constitutive_S0_limits": False,
+            "legacy_validator_bounds": runtime_bounds.tolist(),
             "activation_to_line_content_unchanged": True,
         },
     }
@@ -69,7 +87,7 @@ def _runtime_grid_validate_state(self, state) -> None:
         bound = self.bind_to_state_grid(state)
         self.__dict__.clear()
         self.__dict__.update(bound.__dict__)
-    _preserve_sparse_registry_source_capacity(self, state)
+    _preserve_final_2d_continuum_source_budget(self, state)
     _ORIGINAL_VALIDATE_STATE(self, state)
 
 
