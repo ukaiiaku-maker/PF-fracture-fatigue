@@ -11,9 +11,9 @@ import sys
 import tempfile
 
 from arrhenius_fracture.checked_spatial_station_projection_v10212 import (
+    ACCEPTED_INTERACTION_SCHEMAS,
     KERNEL_RADIUS_COMPATIBILITY_COORDINATE,
 )
-from arrhenius_fracture.interaction_integral_v1029 import MODEL_ID as II_MODEL_ID
 from arrhenius_fracture.signed_kernel_family_v1029 import SCHEMA as V1029_SCHEMA
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,11 +40,18 @@ def main() -> None:
         rows = list(csv.DictReader(handle))
     if not rows:
         raise SystemExit("empty extension-only response table")
-    schemas = {str(row.get("interaction_integral_schema", "")) for row in rows}
-    if schemas != {II_MODEL_ID}:
+
+    schemas = {
+        str(row.get("interaction_integral_schema", "")).strip() for row in rows
+    }
+    if len(schemas) != 1 or not schemas.issubset(ACCEPTED_INTERACTION_SCHEMAS):
         raise SystemExit(
-            f"all responses must use {II_MODEL_ID}; incompatible schemas={sorted(schemas)}"
+            "all responses must use exactly one supported interaction-integral "
+            f"schema from {sorted(ACCEPTED_INTERACTION_SCHEMAS)}; "
+            f"incompatible schemas={sorted(schemas)}"
         )
+    selected_interaction_schema = next(iter(schemas))
+
     radii = {float(row["r_eff_over_r0"]) for row in rows}
     openings = {float(row["opening_strength_fraction"]) for row in rows}
     extensions = {float(row["crack_extension_m"]) for row in rows}
@@ -96,13 +103,17 @@ def main() -> None:
         "single_constant_opening_compatibility_level": True,
         "multiple_cumulative_crack_path_extensions": len(extensions) >= 2,
         "analytic_interaction_integral_provenance": True,
+        "uniform_supported_interaction_integral_schema": True,
     }
     payload.update(
         {
             "schema": V1029_SCHEMA,
             "analytic_auxiliary_gradients": True,
             "hermite_domain_weight": True,
-            "interaction_integral_schema": II_MODEL_ID,
+            "interaction_integral_schema": selected_interaction_schema,
+            "accepted_interaction_integral_schemas": sorted(
+                ACCEPTED_INTERACTION_SCHEMAS
+            ),
             "complete_cartesian_state_grid": True,
             "kernel_radius_axis_policy": "disabled_constant_compatibility",
             "kernel_radius_compatibility_coordinate": (
@@ -139,6 +150,7 @@ def main() -> None:
                 "out": str(args.out),
                 "n_states": len(payload["states"]),
                 "extension_levels_m": sorted(extensions),
+                "interaction_integral_schema": selected_interaction_schema,
                 "authorization_gates": gates,
                 "production_parameterization_allowed": False,
             },
