@@ -4,6 +4,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+# v10.2.15 Stage 3 permits the mechanically measured physical-x atlas to be
+# evaluated on the selected 80- or 200-bin MPZ discretization.  Importing this
+# module installs the binding before any engine instance validates the family.
+from . import runtime_grid_binding_v10215 as _runtime_grid_binding  # noqa: F401
 from .signed_burgers_shared_v1025 import VALIDATED_SCALAR_TRANSPORT
 from .signed_kernel_family_v10214 import (
     ActiveOnlySigned2DShieldingKernelFamily,
@@ -60,6 +64,9 @@ class StateResolvedSignedBurgersTipEngine(_V10212Engine):
             "active_kernel_mechanically_measured": True,
             "wake_kernel_mechanically_measured": False,
             "wake_shielding_enabled": False,
+            "runtime_mpz_grid_binding": (
+                "piecewise_linear_in_physical_x_before_engine_installation"
+            ),
             "family": family.audit_payload() if family is not None else None,
         }
         return payload
@@ -75,6 +82,9 @@ class StateResolvedSignedBurgersTipEngine(_V10212Engine):
                 "state_resolved_active_kernel_mechanically_measured": True,
                 "state_resolved_wake_kernel_mechanically_measured": False,
                 "state_resolved_wake_shielding_enabled": False,
+                "state_resolved_runtime_grid_binding": (
+                    "piecewise_linear_in_physical_x"
+                ),
             }
         )
         return payload
