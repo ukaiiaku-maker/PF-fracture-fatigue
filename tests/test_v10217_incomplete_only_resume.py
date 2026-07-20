@@ -22,3 +22,12 @@ def test_incomplete_only_resume_shell_parses_and_uses_result_classification():
     assert "ALLOW_PARTIAL=1" in text
     assert "SKIP_FINISHED=0" in text
     assert "NO_PLOTS=\"$NO_PLOTS\"" in text
+
+
+def test_classifier_reads_solver_plain_header_crack_path():
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "scripts" / "classify_v10_2_15_stage3_case.py").read_text()
+    assert "np.genfromtxt" in text
+    assert "names=True" in text
+    assert "crack_path_file" in text
+    assert 'case_root / f"crack_path_{int(round(temperature_K))}K.csv"' in text
