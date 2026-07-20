@@ -21,9 +21,52 @@ THETA=${THETA:-45}
 SKIP_FINISHED=${SKIP_FINISHED:-1}
 MECHANICS_ROOT=${MECHANICS_ROOT:-$OUTROOT/mechanics}
 FAMILY=${SIGNED_KERNEL_FAMILY_JSON:-$MECHANICS_ROOT/v10_2_14_active_only_campaign_family.json}
+STATUS_FILE="$OUTROOT/overnight_status.json"
+PID_FILE="$OUTROOT/overnight_launcher.pid"
+PHASE=starting
 
 mkdir -p "$MECHANICS_ROOT" "$OUTROOT"
+echo "$$" > "$PID_FILE"
 
+write_status() {
+  local state=$1
+  local message=$2
+  local exit_code=${3:-}
+  STATUS_FILE="$STATUS_FILE" STATE="$state" MESSAGE="$message" EXIT_CODE="$exit_code" \
+  OUTROOT_VALUE="$OUTROOT" FAMILY_VALUE="$FAMILY" MAX_JOBS_VALUE="$MAX_JOBS" \
+  LAUNCHER_PID="$$" python - <<'PY'
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+
+path = Path(os.environ["STATUS_FILE"])
+payload = {
+    "schema": "v10.2.15_stage3_overnight_status",
+    "state": os.environ["STATE"],
+    "message": os.environ["MESSAGE"],
+    "updated_utc": datetime.now(timezone.utc).isoformat(),
+    "launcher_pid": int(os.environ["LAUNCHER_PID"]),
+    "outroot": os.environ["OUTROOT_VALUE"],
+    "family": os.environ["FAMILY_VALUE"],
+    "max_jobs": int(os.environ["MAX_JOBS_VALUE"]),
+}
+if os.environ.get("EXIT_CODE", ""):
+    payload["exit_code"] = int(os.environ["EXIT_CODE"])
+path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+PY
+}
+
+on_exit() {
+  local rc=$?
+  if [[ "$rc" -ne 0 ]]; then
+    write_status failed "Stage 3 launcher failed during $PHASE" "$rc" || true
+  fi
+}
+trap on_exit EXIT
+
+PHASE=atlas_assembly
+write_status assembling "Assembling active-only kernel from completed E-state mechanics"
 if [[ ! -f "$FAMILY" ]]; then
   echo "[stage3] assembling active-only kernel from completed E-state mechanics"
   python scripts/build_v10_2_14_campaign_ready_active_only_atlas.py \
@@ -34,10 +77,13 @@ else
   echo "[stage3] reusing kernel family: $FAMILY"
 fi
 
+PHASE=campaign
+write_status running "Running 40-case full 2-D Stage 3 campaign"
 echo "[stage3] starting 40-case full 2-D campaign"
 echo "[stage3] outroot=$OUTROOT max_jobs=$MAX_JOBS family=$FAMILY"
 
-exec env \
+set +e
+env \
   MODE=full \
   SIGNED_KERNEL_FAMILY_JSON="$FAMILY" \
   OUTROOT="$OUTROOT" \
@@ -47,3 +93,17 @@ exec env \
   THETA="$THETA" \
   SKIP_FINISHED="$SKIP_FINISHED" \
   bash scripts/run_v10_2_15_stage3_monotonic_temperature_sweep.sh
+rc=$?
+set -e
+
+if [[ "$rc" -eq 0 ]]; then
+  PHASE=complete
+  write_status complete "All Stage 3 cases finished and campaign summary was written" 0
+  trap - EXIT
+  exit 0
+fi
+
+PHASE=campaign
+write_status failed "Stage 3 campaign exited with failures" "$rc"
+trap - EXIT
+exit "$rc"
