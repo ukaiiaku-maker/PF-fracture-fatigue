@@ -144,3 +144,14 @@ def test_runner_declares_final_stack_and_unique_seeds():
     assert "CLEAVAGE_HAZARD_SEED" in text
     assert "signed-active-shielding" in text
     assert "state_resolved_signed_engine_v10214" in text
+
+
+def test_overnight_uses_exact_endpoint_builder_and_audits_projection():
+    root = Path(__file__).resolve().parents[1]
+    text = (root / "scripts/run_v10_2_17_stage3_overnight.sh").read_text()
+    assert "build_v10_2_14_campaign_ready_active_only_atlas_v2.py" in text
+    assert "build_v10_2_14_campaign_ready_active_only_atlas.py" not in text.replace(
+        "build_v10_2_14_campaign_ready_active_only_atlas_v2.py", ""
+    )
+    assert "spatial_cross_validation_not_required_for_two_endpoint_active_curves" in text
+    assert "all_active_curves_have_exact_endpoint_coverage" in text
