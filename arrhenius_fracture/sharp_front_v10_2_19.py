@@ -94,6 +94,8 @@ def _rewrite_full_field_mode_audits(
     out: Path,
     update_audit: dict[str, Any],
 ) -> None:
+    if not _ACTIVE_BULK_MAPPING:
+        raise RuntimeError("full-field run finished without installing exact bulk kinetics")
     common = {
         "bulk_plasticity_mode": BULK_MODE,
         "full_field_bulk_enabled": True,
@@ -136,8 +138,8 @@ def _full_field_protected_main(argv=None):
         raise SystemExit(f"v10.2.19 expected bulk mode {BULK_MODE}; got {bulk_mode!r}")
     if "--material-class" not in args and "--material-manifest" not in args:
         raise SystemExit("v10.2.19 requires a selected material manifest")
-    if _ACTIVE_MANIFEST is None or not _ACTIVE_BULK_MAPPING:
-        raise RuntimeError("exact manifest-to-bulk mapping was not installed")
+    if _ACTIVE_MANIFEST is None:
+        raise RuntimeError("selected manifest was not prepared")
 
     engine_cls = (
         _protected.ContinuumSourceKineticTipEngine
