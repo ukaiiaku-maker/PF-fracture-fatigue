@@ -138,16 +138,37 @@ def test_audit_fails_closed_on_source_semantics():
     assert payload["crack_geometry_changed"] is False
 
 
-def test_entry_patches_only_anisotropic_source_installer(monkeypatch):
+def test_entry_patches_only_anisotropic_source_installer(monkeypatch, tmp_path: Path):
     original = anisotropic.install_anisotropic_campaign_emission
     observed = {}
+
+    class Selected:
+        option_key = "dbtt_primary"
+        candidate_id = "candidate"
+        mpz_length_um = 50.0
+        mpz_n_bins = 80
+
+        def audit_payload(self):
+            return {"option_key": self.option_key, "candidate_id": self.candidate_id}
+
+    manifest = tmp_path / "manifest.csv"
+    selection = tmp_path / "selection.json"
+    manifest.write_text("a\n1\n")
+    selection.write_text("{}\n")
+
+    monkeypatch.setattr(
+        entry._base,
+        "_prepare_parameter_option",
+        lambda args: (Selected(), manifest, selection),
+    )
+    monkeypatch.setattr(entry._base, "_force_stage3_validity_envelope", lambda args: None)
 
     def fake_main(args):
         observed["installer"] = anisotropic.install_anisotropic_campaign_emission
         observed["args"] = list(args)
         return "ok"
 
-    monkeypatch.setattr(entry._base, "main", fake_main)
+    monkeypatch.setattr(entry._base._final_2d, "main", fake_main)
     result = entry.main(["--example", "1"])
     assert result == "ok"
     assert observed["installer"] is install_anisotropic_continuum_emission
