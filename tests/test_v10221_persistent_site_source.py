@@ -55,16 +55,17 @@ def test_reference_area_reproduces_top1_multiplicity():
 
 
 def test_backstress_solver_blocks_without_inventory():
+    prefactor = 50.0
     result = solve_backstress_limited_activations(
         multiplicity=3.5e5,
         dt_s=1.0,
         drive_stress_Pa=1.0e9,
         rho_initial_m2=1.0e14,
         rho_increment_per_activation_m2=1.0e11,
-        backstress_prefactor_Pa_sqrt_m2=100.0,
+        backstress_prefactor_Pa_sqrt_m2=prefactor,
         rate_function=lambda sigma: 1.0e4 * math.exp(sigma / 1.0e9),
     )
-    block = (((1.0e9 / 100.0) ** 2) - 1.0e14) / 1.0e11
+    block = (((1.0e9 / prefactor) ** 2) - 1.0e14) / 1.0e11
     assert 0.0 < result < block
 
 
