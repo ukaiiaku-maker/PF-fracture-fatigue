@@ -43,6 +43,7 @@ def solve_backstress_limited_activations(
     rho0 = max(float(rho_initial_m2), 0.0)
     rho_per = max(float(rho_increment_per_activation_m2), 0.0)
     kback = max(float(backstress_prefactor_Pa_sqrt_m2), 0.0)
+    tol = max(float(tolerance), 1.0e-15)
     if M <= 0.0 or dt <= 0.0 or drive <= 0.0:
         return 0.0
     if rho_per <= 0.0 or kback <= 0.0:
@@ -87,20 +88,36 @@ def solve_backstress_limited_activations(
     if r_hi_inside <= 0.0:
         return upper
 
-    hi = hi_inside
-    scale = max(upper, 1.0)
+    # Because the rate decreases monotonically as backstress accumulates, the
+    # unrelaxed explicit increment M*lambda(sigma0)*dt is an upper bound on any
+    # interior implicit root.  Using it avoids scaling numerical accuracy by a
+    # distant mechanical blocking limit.
+    explicit_upper = M * rate0 * dt
+    hi = min(hi_inside, explicit_upper)
+    r_hi = residual(hi)
+    if r_hi < 0.0:
+        # This should be impossible for a monotone rate law, but retaining the
+        # mechanically valid inside endpoint makes the solver fail-safe.
+        hi = hi_inside
+        r_hi = r_hi_inside
+
+    hi_scale = max(abs(hi), 1.0)
+    if abs(r_hi) <= tol * hi_scale:
+        return min(max(hi, 0.0), upper)
+
     for _ in range(int(max_iterations)):
         mid = 0.5 * (lo + hi)
         value = residual(mid)
-        if (
-            abs(value) <= float(tolerance) * scale
-            or (hi - lo) <= float(tolerance) * scale
-        ):
+        root_scale = max(abs(mid), 1.0)
+        if abs(value) <= tol * root_scale:
             return min(max(mid, 0.0), upper)
         if value > 0.0:
             hi = mid
         else:
             lo = mid
+        interval_scale = max(abs(lo), abs(hi), 1.0)
+        if (hi - lo) <= tol * interval_scale:
+            return min(max(0.5 * (lo + hi), 0.0), upper)
     return min(max(0.5 * (lo + hi), 0.0), upper)
 
 
