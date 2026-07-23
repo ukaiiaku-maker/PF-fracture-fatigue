@@ -188,12 +188,11 @@ def main(argv=None):
             selection = json.loads(
                 (Path(out) / "v10_2_22_parameter_selection.json").read_text()
             )
-            selected_payload = selection.get("selected_option", {})
             payload = {
                 "schema": MODEL_ID,
                 "base_commit_model": "v10.2.21/v10.2.18 signed 2-D stack",
-                "selected_option": selected_payload.get("option_key"),
-                "selected_candidate": selected_payload.get("candidate_id"),
+                "selected_option": selection.get("option_key"),
+                "selected_candidate": selection.get("candidate_id"),
                 "persistent_sites": True,
                 "finite_source_inventory": False,
                 "source_refresh": False,
