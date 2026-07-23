@@ -116,6 +116,9 @@ PY
   echo "$rc" > "$case_root/exit_code.txt"
   if [[ "$rc" -ne 0 ]]; then
     echo "simulation_exit_$rc" > "$case_root/RUN_FAILED"
+    echo "--- T=${T}K failure log tail ---" >&2
+    tail -n 100 "$log" >&2 || true
+    echo "--- end failure log tail ---" >&2
     return "$rc"
   fi
 
@@ -123,6 +126,7 @@ PY
     --case-root "$case_root" \
     --target-extension-um "$TARGET_EXT_UM" >> "$log" 2>&1 || {
       echo "classification_failed" > "$case_root/RUN_FAILED"
+      tail -n 100 "$log" >&2 || true
       return 1
     }
 
@@ -136,6 +140,7 @@ PY
 )
   if [[ "$complete" != 1 ]]; then
     echo "incomplete_smoke" > "$case_root/RUN_FAILED"
+    tail -n 100 "$log" >&2 || true
     return 1
   fi
   rm -f "$case_root/RUN_FAILED"
@@ -147,7 +152,9 @@ labels=()
 failures=0
 
 reap() {
-  local next_pids=() next_labels=()
+  local -a next_pids next_labels
+  next_pids=()
+  next_labels=()
   local i rc
   for ((i=0; i<${#pids[@]}; i++)); do
     if kill -0 "${pids[$i]}" 2>/dev/null; then
@@ -161,8 +168,12 @@ reap() {
       fi
     fi
   done
-  pids=("${next_pids[@]}")
-  labels=("${next_labels[@]}")
+  pids=()
+  labels=()
+  if [[ ${#next_pids[@]} -gt 0 ]]; then
+    pids=("${next_pids[@]}")
+    labels=("${next_labels[@]}")
+  fi
 }
 
 for T in $TEMPS; do
