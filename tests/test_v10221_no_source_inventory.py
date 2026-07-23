@@ -3,9 +3,12 @@ from types import SimpleNamespace
 import numpy as np
 
 import arrhenius_fracture.persistent_site_source_v10221 as model
+from arrhenius_fracture.persistent_site_bracket_fix_v10221 import (
+    solve_backstress_limited_activations,
+)
 
 
-def test_emission_adds_signed_line_content_without_consuming_sites(monkeypatch):
+def _state(*, rho_site0_m2=1.0e12, shear_modulus_Pa=1.0e9):
     state = SimpleNamespace()
     state.n_systems = 1
     state.n_bins = 4
@@ -19,7 +22,7 @@ def test_emission_adds_signed_line_content_without_consuming_sites(monkeypatch):
         taylor_stress_fraction=1.0,
     )
     state._persistent_site_cfg = model.PersistentSiteConfig(
-        rho_site0_m2=1.0e12,
+        rho_site0_m2=rho_site0_m2,
         reference_source_area_m2=1.0e-12,
         reference_front_width_m=1.0e-6,
         reference_density_m2=5.0e12,
@@ -29,7 +32,7 @@ def test_emission_adds_signed_line_content_without_consuming_sites(monkeypatch):
     state._persistent_r0_m = 1.0e-6
     state._persistent_b = 2.5e-10
     state._persistent_active_arc_factor = 1.0
-    state._campaign_G_Pa = 1.0e9
+    state._campaign_G_Pa = shear_modulus_Pa
     state._campaign_b = 2.5e-10
     state._campaign_backstress_scale = 1.0
     state._anisotropic_drive_reliable = True
@@ -54,8 +57,10 @@ def test_emission_adds_signed_line_content_without_consuming_sites(monkeypatch):
     state.signed_source_activations_total = 0.0
     state.signed_line_content_emitted_total = 0.0
     state.blunted_radius = lambda r0, b: r0
-    state.emission_rate_per_site = lambda stress, temperature: 1.0
+    return state
 
+
+def _install_common(monkeypatch):
     monkeypatch.setattr(model, "_drive_factors_for_state", lambda obj: np.array([1.0]))
     monkeypatch.setattr(
         model,
@@ -76,6 +81,13 @@ def test_emission_adds_signed_line_content_without_consuming_sites(monkeypatch):
         )
 
     monkeypatch.setattr(model, "_sync_active", sync)
+
+
+def test_emission_adds_signed_line_content_without_consuming_sites(monkeypatch):
+    state = _state()
+    state.emission_rate_per_site = lambda stress, temperature: 1.0
+    _install_common(monkeypatch)
+
     before = state.available_sites.copy()
     emitted = model._persistent_emit(state, 1.0e-3, 1.0e6, 300.0)
 
@@ -83,3 +95,25 @@ def test_emission_adds_signed_line_content_without_consuming_sites(monkeypatch):
     assert np.sum(state.mobile_positive) > 0.0
     assert np.array_equal(state.available_sites, before)
     assert np.all(state.tip_source_activity == 1.0)
+
+
+def test_high_hazard_hits_backstress_gate_without_consuming_sites(monkeypatch):
+    state = _state(rho_site0_m2=1.0e16, shear_modulus_Pa=1.0e9)
+    state.emission_rate_per_site = (
+        lambda stress, temperature: 1.0e11 if stress > 0.0 else 0.0
+    )
+    _install_common(monkeypatch)
+    monkeypatch.setattr(
+        model,
+        "solve_backstress_limited_activations",
+        solve_backstress_limited_activations,
+    )
+
+    before = state.available_sites.copy()
+    emitted = model._persistent_emit(state, 1.0e-3, 1.0e6, 900.0)
+
+    assert emitted > 0.0
+    assert np.sum(state.mobile_positive) > 0.0
+    assert np.array_equal(state.available_sites, before)
+    assert np.all(state.tip_source_activity == 1.0)
+    assert state.persistent_site_last_sigma_effective_final_Pa[0] <= 1.0
