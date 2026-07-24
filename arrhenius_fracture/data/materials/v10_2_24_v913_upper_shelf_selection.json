@@ -1,0 +1,113 @@
+{
+  "schema": "v10.2.24_v913_upper_shelf_selection",
+  "source": "v9_13_zeroD_promoted_1d_384_50um_v2/one_d_screen/ranked_candidates.csv",
+  "response": "K at 50 um versus temperature",
+  "temperatures_K": [700, 800, 900, 950, 1000, 1050, 1100, 1200, 1300, 1400],
+  "eligibility": {
+    "direction_correct_1d": true,
+    "directional_dbtt_gain_min_MPa_sqrt_m": 5.0,
+    "peak_like_1d": false,
+    "peak_like_threshold_MPa_sqrt_m": 5.0,
+    "high_temperature_band_K": [1200, 1300, 1400],
+    "low_temperature_band_K": [700],
+    "persistence_min": 0.7
+  },
+  "eligible_candidates": 32,
+  "ranking": [
+    "directional_dbtt_gain descending",
+    "high_temperature_plateau descending",
+    "candidate_id ascending"
+  ],
+  "selected": [
+    {
+      "shelf_rank": 1,
+      "candidate_id": "v913_zeroD_sobol_0086420",
+      "original_search_rank": 224,
+      "directional_dbtt_gain_MPa_sqrt_m": 16.39615208874929,
+      "high_temperature_plateau_MPa_sqrt_m": 42.00316537816216,
+      "peak_prominence_MPa_sqrt_m": 0.8962289223250437,
+      "persistence": 0.9791085879663604
+    },
+    {
+      "shelf_rank": 2,
+      "candidate_id": "v913_zeroD_sobol_0009771",
+      "original_search_rank": 305,
+      "directional_dbtt_gain_MPa_sqrt_m": 15.779880829829835,
+      "high_temperature_plateau_MPa_sqrt_m": 43.11288596171124,
+      "peak_prominence_MPa_sqrt_m": 0.2505299669547369,
+      "persistence": 0.9942225500092782
+    },
+    {
+      "shelf_rank": 3,
+      "candidate_id": "v913_zeroD_sobol_0088403",
+      "original_search_rank": 217,
+      "directional_dbtt_gain_MPa_sqrt_m": 15.647147376955155,
+      "high_temperature_plateau_MPa_sqrt_m": 41.575941843582896,
+      "peak_prominence_MPa_sqrt_m": 0.973142784133458,
+      "persistence": 0.9771289372580402
+    },
+    {
+      "shelf_rank": 4,
+      "candidate_id": "v913_zeroD_sobol_0202500",
+      "original_search_rank": 52,
+      "directional_dbtt_gain_MPa_sqrt_m": 15.434914362252352,
+      "high_temperature_plateau_MPa_sqrt_m": 41.138348877682056,
+      "peak_prominence_MPa_sqrt_m": 4.715910387765632,
+      "persistence": 0.894028407526355
+    },
+    {
+      "shelf_rank": 5,
+      "candidate_id": "v913_zeroD_sobol_0196804",
+      "original_search_rank": 172,
+      "directional_dbtt_gain_MPa_sqrt_m": 13.6327715708675,
+      "high_temperature_plateau_MPa_sqrt_m": 38.10393559287687,
+      "peak_prominence_MPa_sqrt_m": 1.413432326540196,
+      "persistence": 0.9636356867419106
+    },
+    {
+      "shelf_rank": 6,
+      "candidate_id": "v913_zeroD_sobol_0162507",
+      "original_search_rank": 183,
+      "directional_dbtt_gain_MPa_sqrt_m": 12.792103646348648,
+      "high_temperature_plateau_MPa_sqrt_m": 40.81747312391323,
+      "peak_prominence_MPa_sqrt_m": 1.28870823981336,
+      "persistence": 0.9691377204302628
+    },
+    {
+      "shelf_rank": 7,
+      "candidate_id": "v913_zeroD_sobol_0027268",
+      "original_search_rank": 163,
+      "directional_dbtt_gain_MPa_sqrt_m": 10.273696997625224,
+      "high_temperature_plateau_MPa_sqrt_m": 34.361145358640115,
+      "peak_prominence_MPa_sqrt_m": 1.5959391954758075,
+      "persistence": 0.95460002438117
+    },
+    {
+      "shelf_rank": 8,
+      "candidate_id": "v913_zeroD_sobol_0011131",
+      "original_search_rank": 261,
+      "directional_dbtt_gain_MPa_sqrt_m": 9.646155001039167,
+      "high_temperature_plateau_MPa_sqrt_m": 46.2489967788347,
+      "peak_prominence_MPa_sqrt_m": 0.5899043893186615,
+      "persistence": 0.9873300997775792
+    },
+    {
+      "shelf_rank": 9,
+      "candidate_id": "v913_zeroD_sobol_0073460",
+      "original_search_rank": 252,
+      "directional_dbtt_gain_MPa_sqrt_m": 9.62317796430384,
+      "high_temperature_plateau_MPa_sqrt_m": 36.43166435743712,
+      "peak_prominence_MPa_sqrt_m": 0.6405645930312716,
+      "persistence": 0.9827211740117616
+    },
+    {
+      "shelf_rank": 10,
+      "candidate_id": "v913_zeroD_sobol_0134035",
+      "original_search_rank": 70,
+      "directional_dbtt_gain_MPa_sqrt_m": 9.583138274633551,
+      "high_temperature_plateau_MPa_sqrt_m": 33.754690659401824,
+      "peak_prominence_MPa_sqrt_m": 3.265865677175377,
+      "persistence": 0.9096269642206808
+    }
+  ]
+}
