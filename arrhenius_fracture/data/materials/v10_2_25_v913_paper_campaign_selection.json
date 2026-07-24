@@ -1,0 +1,120 @@
+{
+  "schema": "v10.2.25_v913_paper_campaign_selection_v1",
+  "purpose": "Final reduced candidate set for the 2-D fracture campaign used in the paper.",
+  "selection_date": "2026-07-24",
+  "physics_contract": {
+    "base_model": "v10.2.22 audited persistent-site sharp-front model",
+    "parameter_transfer_only": true,
+    "stochastic_cleavage": true,
+    "common_random_seed_used_for_selection": 3621,
+    "target_extension_used_for_selection_um": 50.0,
+    "persistent_sites": true,
+    "finite_source_inventory": false,
+    "source_refresh": false,
+    "explicit_recovery": false,
+    "physical_front_width": true
+  },
+  "source_registries": [
+    "v10_2_23_v913_top10_persistent_site_registry.csv",
+    "v10_2_24_v913_top10_upper_shelf_registry.csv"
+  ],
+  "primary_candidates": [
+    {
+      "paper_order": 1,
+      "option_key": "v913_paper_peak01_0242980_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0242980",
+      "response_class": "peak_like",
+      "paper_role": "primary",
+      "interpretation": "Delayed abrupt peak centered at 1100 K with strong high-temperature softening.",
+      "K50_2d_peak_temperature_K": 1100.0,
+      "K50_2d_peak_prominence_MPa_sqrt_m": 10.420205993431189,
+      "K50_2d_directional_dbtt_gain_MPa_sqrt_m": 3.5520725726448283,
+      "K50_2d_shelf_persistence": 0.7308093087035243,
+      "K50_2d_rehardening": false,
+      "intended_topology_retained": true
+    },
+    {
+      "paper_order": 2,
+      "option_key": "v913_paper_peak02_0127508_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0127508",
+      "response_class": "peak_like",
+      "paper_role": "primary",
+      "interpretation": "Relatively narrow intermediate-temperature peak centered at 1050 K in 2-D.",
+      "K50_2d_peak_temperature_K": 1050.0,
+      "K50_2d_peak_prominence_MPa_sqrt_m": 10.795939410300498,
+      "K50_2d_directional_dbtt_gain_MPa_sqrt_m": 6.507558325227741,
+      "K50_2d_shelf_persistence": 0.8009774679463548,
+      "K50_2d_rehardening": false,
+      "intended_topology_retained": true
+    },
+    {
+      "paper_order": 3,
+      "option_key": "v913_paper_peak03_0115460_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0115460",
+      "response_class": "peak_like",
+      "paper_role": "primary",
+      "interpretation": "Broad smooth toughness peak; 2-D peak shifted from 1000 K to 950 K.",
+      "K50_2d_peak_temperature_K": 950.0,
+      "K50_2d_peak_prominence_MPa_sqrt_m": 10.352974135561254,
+      "K50_2d_directional_dbtt_gain_MPa_sqrt_m": 16.08795866014109,
+      "K50_2d_shelf_persistence": 0.8389126835023011,
+      "K50_2d_rehardening": false,
+      "intended_topology_retained": true
+    },
+    {
+      "paper_order": 4,
+      "option_key": "v913_paper_dbtt01_0202500_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0202500",
+      "response_class": "classic_dbtt_upper_shelf",
+      "paper_role": "primary",
+      "interpretation": "Preferred classical DBTT example: low-temperature shelf, sharp transition near 1000 K, and stable upper shelf.",
+      "K50_2d_peak_temperature_K": 1050.0,
+      "K50_2d_peak_prominence_MPa_sqrt_m": 3.522576222292514,
+      "K50_2d_directional_dbtt_gain_MPa_sqrt_m": 16.114470304016066,
+      "K50_2d_upper_shelf_MPa_sqrt_m": 41.80877132699444,
+      "K50_2d_shelf_persistence": 0.9222927088487154,
+      "K50_2d_rehardening": false,
+      "intended_topology_retained": true
+    },
+    {
+      "paper_order": 5,
+      "option_key": "v913_paper_dbtt02_0088403_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0088403",
+      "response_class": "classic_dbtt_upper_shelf",
+      "paper_role": "primary",
+      "interpretation": "Earlier transition into a particularly flat and persistent upper shelf.",
+      "K50_2d_peak_temperature_K": 950.0,
+      "K50_2d_peak_prominence_MPa_sqrt_m": 0.9867987931195614,
+      "K50_2d_directional_dbtt_gain_MPa_sqrt_m": 16.32340560439653,
+      "K50_2d_upper_shelf_MPa_sqrt_m": 42.27668970644885,
+      "K50_2d_shelf_persistence": 0.9771909564544383,
+      "K50_2d_rehardening": false,
+      "intended_topology_retained": true
+    }
+  ],
+  "secondary_candidates": [
+    {
+      "paper_order": 6,
+      "option_key": "v913_paper_control01_0086420_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0086420",
+      "response_class": "dbtt_with_high_temperature_rehardening",
+      "paper_role": "secondary_control",
+      "interpretation": "Strong DBTT-like rise with a later dip and high-temperature recovery; retained as a nonclassical rehardening control.",
+      "K50_2d_peak_temperature_K": 1050.0,
+      "K50_2d_peak_prominence_MPa_sqrt_m": 0.4110568896359936,
+      "K50_2d_directional_dbtt_gain_MPa_sqrt_m": 17.51946549790286,
+      "K50_2d_upper_shelf_MPa_sqrt_m": 43.109919815714456,
+      "K50_2d_shelf_persistence": 0.9905549709415079,
+      "K50_2d_post_transition_drop_MPa_sqrt_m": 10.744339255355044,
+      "K50_2d_late_rebound_MPa_sqrt_m": 10.649813224104982,
+      "K50_2d_rehardening": true,
+      "intended_topology_retained": false
+    }
+  ],
+  "counts": {
+    "primary_peak_like": 3,
+    "primary_classic_dbtt_upper_shelf": 2,
+    "secondary_rehardening_control": 1,
+    "total": 6
+  }
+}
