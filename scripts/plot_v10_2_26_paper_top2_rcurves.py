@@ -12,15 +12,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-CASE_RE = re.compile(r"T(?P<T>\d+(?:\.\d+)?)K_th(?P<theta>[-+0-9.]+)_seed(?P<seed>\d+)$")
-CHECKPOINTS_UM = (10.0, 25.0, 50.0, 75.0, 100.0)
+CASE_RE = re.compile(
+    r"T(?P<T>\d+(?:\.\d+)?)K_th(?P<theta>[-+0-9.]+)_seed(?P<seed>\d+)$"
+)
+CHECKPOINTS_UM = (10.0, 25.0, 50.0, 75.0, 100.0, 200.0, 300.0, 400.0, 500.0)
 
 
 def _load_steps(case: Path) -> tuple[np.ndarray, Path]:
     files = sorted(case.glob("steps_*K.csv"))
     if len(files) != 1:
         raise RuntimeError(f"expected one steps CSV in {case}; found {files}")
-    data = np.atleast_1d(np.genfromtxt(files[0], delimiter=",", names=True, dtype=float))
+    data = np.atleast_1d(
+        np.genfromtxt(files[0], delimiter=",", names=True, dtype=float)
+    )
     names = set(data.dtype.names or ())
     required = {"KJ_Pa_sqrtm", "crack_extension_m", "da_block_m", "n_fire"}
     missing = required - names
@@ -176,6 +180,25 @@ def _selection_metadata(case: Path, option: str) -> dict[str, str]:
     }
 
 
+def _campaign_target(outroot: Path, override: float | None) -> float:
+    if override is not None:
+        return float(override)
+    manifest = outroot / "v10_2_26_campaign_manifest.json"
+    if manifest.exists():
+        payload = json.loads(manifest.read_text())
+        value = payload.get("target_crack_extension_um")
+        if value is not None:
+            return float(value)
+    return 500.0
+
+
+def _target_tag(target_um: float) -> str:
+    rounded = round(float(target_um))
+    if np.isclose(target_um, rounded, rtol=0.0, atol=1.0e-9):
+        return str(int(rounded))
+    return f"{target_um:g}".replace(".", "p")
+
+
 def _plot_event_intervals(
     ax,
     pre: np.ndarray,
@@ -219,9 +242,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--outroot", required=True)
     parser.add_argument("--plot-dir", default=None)
+    parser.add_argument("--target-extension-um", type=float, default=None)
     args = parser.parse_args()
 
     outroot = Path(args.outroot).expanduser().resolve()
+    target_extension_um = _campaign_target(outroot, args.target_extension_um)
+    target_tag = _target_tag(target_extension_um)
     plot_dir = (
         Path(args.plot_dir).expanduser().resolve()
         if args.plot_dir
@@ -259,6 +285,7 @@ def main() -> int:
                 "interpretation": metadata["interpretation"],
                 "temperature_K": temperature,
                 "seed": int(match.group("seed")),
+                "campaign_target_extension_um": target_extension_um,
                 "steps_file": str(source),
                 "n_events": int(pre.size),
                 "final_event_start_extension_um": float(pre[-1]),
@@ -267,7 +294,9 @@ def main() -> int:
                 "K_first_MPa_sqrt_m": float(resistance[0]),
             }
             for target in CHECKPOINTS_UM:
-                value = _resistance_at_extension(pre, post, resistance, target, achieved)
+                value = _resistance_at_extension(
+                    pre, post, resistance, target, achieved
+                )
                 row[f"K_{int(target)}um_MPa_sqrt_m"] = value
                 row[f"deltaK_{int(target)}um_from_first_MPa_sqrt_m"] = (
                     value - resistance[0] if np.isfinite(value) else float("nan")
@@ -276,15 +305,15 @@ def main() -> int:
             row.update(_persistent_diagnostics(case))
             records.append(row)
 
-            fig, ax = plt.subplots(figsize=(6.8, 5.0))
+            fig, ax = plt.subplots(figsize=(7.0, 5.1))
             _plot_event_intervals(
                 ax,
                 pre,
                 post,
                 resistance,
                 marker="o",
-                markersize=4.5,
-                linewidth=1.5,
+                markersize=3.5,
+                linewidth=1.2,
             )
             ax.set_xlabel("Crack extension, Δa (µm)")
             ax.set_ylabel("Event resistance, K (MPa√m)")
@@ -308,7 +337,7 @@ def main() -> int:
     cmap = plt.get_cmap("turbo")
     for option in options:
         available = [T for T in temperatures if (option, T) in curves]
-        fig, ax = plt.subplots(figsize=(7.8, 5.6))
+        fig, ax = plt.subplots(figsize=(8.0, 5.8))
         for index, temperature in enumerate(available):
             pre, post, resistance = curves[(option, temperature)]
             color = cmap(index / max(len(available) - 1, 1))
@@ -318,8 +347,8 @@ def main() -> int:
                 post,
                 resistance,
                 marker="o",
-                markersize=3.4,
-                linewidth=1.2,
+                markersize=2.8,
+                linewidth=1.0,
                 color=color,
                 label=f"{temperature:g} K",
             )
@@ -337,7 +366,7 @@ def main() -> int:
     markers = ["o", "s", "^", "D", "v", "P", "X"]
     for temperature in temperatures:
         available = [option for option in options if (option, temperature) in curves]
-        fig, ax = plt.subplots(figsize=(7.4, 5.4))
+        fig, ax = plt.subplots(figsize=(7.6, 5.5))
         for index, option in enumerate(available):
             pre, post, resistance = curves[(option, temperature)]
             _plot_event_intervals(
@@ -346,8 +375,8 @@ def main() -> int:
                 post,
                 resistance,
                 marker=markers[index % len(markers)],
-                markersize=4.0,
-                linewidth=1.3,
+                markersize=3.2,
+                linewidth=1.1,
                 label=labels.get(option, option),
             )
         ax.set_xlabel("Crack extension, Δa (µm)")
@@ -371,16 +400,20 @@ def main() -> int:
         ),
     )
     fieldnames = list(records[0])
-    summary_csv = outroot / "v10_2_26_paper_top2_100um_summary.csv"
+    summary_stem = f"v10_2_26_paper_top2_{target_tag}um_summary"
+    summary_csv = outroot / f"{summary_stem}.csv"
     with summary_csv.open("w", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(records)
 
-    (outroot / "v10_2_26_paper_top2_100um_summary.json").write_text(
+    (outroot / f"{summary_stem}.json").write_text(
         json.dumps(records, indent=2, sort_keys=True) + "\n"
     )
-    print(f"Wrote {len(records)} case summaries and R-curve plots to {plot_dir}")
+    print(
+        f"Wrote {len(records)} case summaries and R-curve plots to {plot_dir}; "
+        f"summary={summary_csv}"
+    )
     return 0
 
 
