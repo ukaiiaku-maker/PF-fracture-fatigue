@@ -183,10 +183,11 @@ def _summary(material_class: str, metadata: dict[str, Any]) -> str:
 
 def validate_template(rows: list[dict[str, str]]) -> tuple[list[str], dict[str, str]]:
     fields = list(rows[0])
-    missing = sorted(set(ACTIVE_FIELDS) | METADATA_FIELDS - set(fields))
+    required = set(ACTIVE_FIELDS) | METADATA_FIELDS
+    missing = sorted(required - set(fields))
     if missing:
         raise RuntimeError(f"template registry lacks fields: {missing}")
-    fixed_fields = [field for field in fields if field not in set(ACTIVE_FIELDS) | METADATA_FIELDS]
+    fixed_fields = [field for field in fields if field not in required]
     template = rows[0]
     for row in rows[1:]:
         differing = [field for field in fixed_fields if row[field] != template[field]]
