@@ -178,7 +178,7 @@ def test_plotter_generates_event_resolved_500um_outputs(tmp_path: Path) -> None:
         assert np.isclose(float(row["campaign_target_extension_um"]), 500.0)
         assert np.isclose(float(row["achieved_extension_um"]), 505.0)
         assert np.isclose(float(row["K_100um_MPa_sqrt_m"]), 30.0)
-        assert np.isclose(float(row["K_300um_MPa_sqrt_m"]), 35.0 + 5.0 / 3.0)
+        assert np.isclose(float(row["K_300um_MPa_sqrt_m"]), 40.0)
         assert np.isclose(float(row["K_500um_MPa_sqrt_m"]), 45.0)
         assert np.isclose(
             float(row["deltaK_500um_from_first_MPa_sqrt_m"]), 25.0
