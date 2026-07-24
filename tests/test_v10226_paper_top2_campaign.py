@@ -25,6 +25,12 @@ def test_runner_contract() -> None:
     assert 'TARGET_EXT_UM=${TARGET_EXT_UM:-500}' in text
     assert 'STEPS=${STEPS:-1000000}' in text
     assert 'SAVE_SNAPSHOTS=${SAVE_SNAPSHOTS:-12}' in text
+    assert 'SEED_OPTION_STRIDE=${SEED_OPTION_STRIDE:-1000000}' in text
+    assert 'SEED_TEMPERATURE_STRIDE=${SEED_TEMPERATURE_STRIDE:-1009}' in text
+    assert '"stochastic_cleavage_hazard": True' in text
+    assert '"common_random_numbers": False' in text
+    assert 'CLEAVAGE_HAZARD_SEED="$case_seed"' in text
+    assert 'v10_2_26_case_seed_map.csv' in text
     assert '--save-snapshots "$SAVE_SNAPSHOTS"' in text
     assert '--snapshot-cols "$SNAPSHOT_COLS"' in text
     assert '--target-extension-um "$TARGET_EXT_UM"' in text
@@ -53,8 +59,9 @@ def _write_case(
     candidate: str,
     response_class: str,
     temperature: int,
+    seed: int,
 ) -> None:
-    case = outroot / option / f"T{temperature}K_th45_seed3621"
+    case = outroot / option / f"T{temperature}K_th45_seed{seed}"
     case.mkdir(parents=True)
     (case / "COMPLETE").write_text("\n")
     fields = [
@@ -114,7 +121,13 @@ def test_plotter_generates_event_resolved_500um_outputs(tmp_path: Path) -> None:
     outroot = tmp_path / "campaign"
     outroot.mkdir()
     (outroot / "v10_2_26_campaign_manifest.json").write_text(
-        json.dumps({"target_crack_extension_um": 500.0})
+        json.dumps(
+            {
+                "target_crack_extension_um": 500.0,
+                "stochastic_cleavage_hazard": True,
+                "common_random_numbers": False,
+            }
+        )
     )
     cases = (
         (
@@ -128,9 +141,19 @@ def test_plotter_generates_event_resolved_500um_outputs(tmp_path: Path) -> None:
             "classic_dbtt_upper_shelf",
         ),
     )
-    for option, candidate, response_class in cases:
-        for temperature in (900, 1100):
-            _write_case(outroot, option, candidate, response_class, temperature)
+    expected_seeds: set[int] = set()
+    for option_index, (option, candidate, response_class) in enumerate(cases):
+        for temperature_index, temperature in enumerate((900, 1100)):
+            seed = 3621 + option_index * 1_000_000 + temperature_index * 1009
+            expected_seeds.add(seed)
+            _write_case(
+                outroot,
+                option,
+                candidate,
+                response_class,
+                temperature,
+                seed,
+            )
 
     env = dict(os.environ)
     env["MPLBACKEND"] = "Agg"
@@ -146,6 +169,7 @@ def test_plotter_generates_event_resolved_500um_outputs(tmp_path: Path) -> None:
         )
     )
     assert len(summary) == 4
+    assert {int(row["seed"]) for row in summary} == expected_seeds
     assert {row["candidate_id"] for row in summary} == {
         "v913_zeroD_sobol_0242980",
         "v913_zeroD_sobol_0202500",
