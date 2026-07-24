@@ -11,7 +11,7 @@ import numpy as np
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RUNNER = ROOT / "scripts" / "run_v10_2_26_paper_top2_100um_temperature_sweep.sh"
+RUNNER = ROOT / "scripts" / "run_v10_2_26_paper_top2_500um_temperature_sweep.sh"
 PLOTTER = ROOT / "scripts" / "plot_v10_2_26_paper_top2_rcurves.py"
 
 
@@ -22,12 +22,27 @@ def test_runner_contract() -> None:
         'OPTIONS=${OPTIONS:-"v913_paper_peak01_0242980_persistent_sites '
         'v913_paper_dbtt01_0202500_persistent_sites"}'
     ) in text
-    assert 'TARGET_EXT_UM=${TARGET_EXT_UM:-100}' in text
-    assert 'SAVE_SNAPSHOTS=${SAVE_SNAPSHOTS:-8}' in text
+    assert 'TARGET_EXT_UM=${TARGET_EXT_UM:-500}' in text
+    assert 'STEPS=${STEPS:-1000000}' in text
+    assert 'SAVE_SNAPSHOTS=${SAVE_SNAPSHOTS:-12}' in text
     assert '--save-snapshots "$SAVE_SNAPSHOTS"' in text
     assert '--snapshot-cols "$SNAPSHOT_COLS"' in text
+    assert '--target-extension-um "$TARGET_EXT_UM"' in text
     assert "--no-plots" not in text
-    for temperature in ("950", "1000", "1050", "1100", "1150", "1200", "1250", "1300"):
+    for temperature in (
+        "300",
+        "600",
+        "800",
+        "900",
+        "950",
+        "1000",
+        "1050",
+        "1100",
+        "1150",
+        "1200",
+        "1250",
+        "1300",
+    ):
         assert temperature in text
     subprocess.run(["bash", "-n", str(RUNNER)], check=True)
 
@@ -53,8 +68,10 @@ def _write_case(
     ]
     rows = [
         [20.0e6, 20.0e-6, 20.0e-6, 1.0, 0.5e9, 1.0, 0.01e6],
-        [30.0e6, 60.0e-6, 40.0e-6, 1.0, 1.5e9, 1.0, -0.02e6],
-        [40.0e6, 105.0e-6, 45.0e-6, 1.0, 2.0e9, 1.0, 0.03e6],
+        [30.0e6, 100.0e-6, 80.0e-6, 1.0, 1.0e9, 1.0, -0.02e6],
+        [35.0e6, 250.0e-6, 150.0e-6, 1.0, 1.5e9, 1.0, 0.02e6],
+        [40.0e6, 400.0e-6, 150.0e-6, 1.0, 1.8e9, 1.0, -0.03e6],
+        [45.0e6, 505.0e-6, 105.0e-6, 1.0, 2.0e9, 1.0, 0.03e6],
     ]
     with (case / f"steps_{temperature}K.csv").open("w", newline="") as stream:
         writer = csv.writer(stream)
@@ -93,8 +110,12 @@ def _write_case(
     )
 
 
-def test_plotter_generates_event_resolved_outputs(tmp_path: Path) -> None:
+def test_plotter_generates_event_resolved_500um_outputs(tmp_path: Path) -> None:
     outroot = tmp_path / "campaign"
+    outroot.mkdir()
+    (outroot / "v10_2_26_campaign_manifest.json").write_text(
+        json.dumps({"target_crack_extension_um": 500.0})
+    )
     cases = (
         (
             "v913_paper_peak01_0242980_persistent_sites",
@@ -121,7 +142,7 @@ def test_plotter_generates_event_resolved_outputs(tmp_path: Path) -> None:
 
     summary = list(
         csv.DictReader(
-            (outroot / "v10_2_26_paper_top2_100um_summary.csv").open(newline="")
+            (outroot / "v10_2_26_paper_top2_500um_summary.csv").open(newline="")
         )
     )
     assert len(summary) == 4
@@ -130,10 +151,13 @@ def test_plotter_generates_event_resolved_outputs(tmp_path: Path) -> None:
         "v913_zeroD_sobol_0202500",
     }
     for row in summary:
-        assert np.isclose(float(row["achieved_extension_um"]), 105.0)
-        assert np.isclose(float(row["K_100um_MPa_sqrt_m"]), 40.0)
+        assert np.isclose(float(row["campaign_target_extension_um"]), 500.0)
+        assert np.isclose(float(row["achieved_extension_um"]), 505.0)
+        assert np.isclose(float(row["K_100um_MPa_sqrt_m"]), 30.0)
+        assert np.isclose(float(row["K_300um_MPa_sqrt_m"]), 35.0 + 5.0 / 3.0)
+        assert np.isclose(float(row["K_500um_MPa_sqrt_m"]), 45.0)
         assert np.isclose(
-            float(row["deltaK_100um_from_first_MPa_sqrt_m"]), 20.0
+            float(row["deltaK_500um_from_first_MPa_sqrt_m"]), 25.0
         )
         assert np.isclose(float(row["min_available_site_fraction"]), 1.0)
         assert np.isclose(float(row["min_front_width_um"]), 1.0)
