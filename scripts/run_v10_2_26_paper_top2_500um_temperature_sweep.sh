@@ -12,13 +12,15 @@ if [[ "${CONDA_DEFAULT_ENV:-}" != "$CONDA_ENV" ]]; then
   exit 2
 fi
 
-OUTROOT=${OUTROOT:-runs/v10_2_26_paper_top2_500um_theta45_crn3621_v1}
+OUTROOT=${OUTROOT:-runs/v10_2_26_paper_top2_500um_theta45_varseed_base3621_v1}
 FAMILY_JSON=${FAMILY_JSON:-$ROOT/runtime_inputs/v10_2_17/v10_2_14_active_only_campaign_family.json}
 REGISTRY=${REGISTRY:-$ROOT/arrhenius_fracture/data/materials/v10_2_25_v913_paper_campaign_registry.csv}
 OPTIONS=${OPTIONS:-"v913_paper_peak01_0242980_persistent_sites v913_paper_dbtt01_0202500_persistent_sites"}
 TEMPS=${TEMPS:-"300 600 800 900 950 1000 1050 1100 1150 1200 1250 1300"}
 MAX_JOBS=${MAX_JOBS:-2}
 HAZARD_SEED=${HAZARD_SEED:-3621}
+SEED_OPTION_STRIDE=${SEED_OPTION_STRIDE:-1000000}
+SEED_TEMPERATURE_STRIDE=${SEED_TEMPERATURE_STRIDE:-1009}
 TARGET_EXT_UM=${TARGET_EXT_UM:-500}
 STEPS=${STEPS:-1000000}
 THETA=${THETA:-45}
@@ -48,14 +50,15 @@ mkdir -p "$OUTROOT"
 OUTROOT="$OUTROOT" OPTIONS="$OPTIONS" TEMPS="$TEMPS" TARGET_EXT_UM="$TARGET_EXT_UM" \
 THETA="$THETA" HAZARD_SEED="$HAZARD_SEED" SAVE_SNAPSHOTS="$SAVE_SNAPSHOTS" \
 SNAPSHOT_COLS="$SNAPSHOT_COLS" REGISTRY="$REGISTRY" FAMILY_JSON="$FAMILY_JSON" \
-STEPS="$STEPS" "$PYTHON_BIN" - <<'PY'
+STEPS="$STEPS" SEED_OPTION_STRIDE="$SEED_OPTION_STRIDE" \
+SEED_TEMPERATURE_STRIDE="$SEED_TEMPERATURE_STRIDE" "$PYTHON_BIN" - <<'PY'
 import json
 import os
 from pathlib import Path
 
 root = Path(os.environ["OUTROOT"]).resolve()
 payload = {
-    "schema": "v10.2.26_paper_top2_500um_rcurve_campaign_v1",
+    "schema": "v10.2.26_paper_top2_500um_rcurve_campaign_v2_distinct_stochastic_seeds",
     "model_entry": "arrhenius_fracture.sharp_front_v10_2_25_audited",
     "parameter_registry": str(Path(os.environ["REGISTRY"]).resolve()),
     "signed_kernel_family": str(Path(os.environ["FAMILY_JSON"]).resolve()),
@@ -64,8 +67,17 @@ payload = {
     "target_crack_extension_um": float(os.environ["TARGET_EXT_UM"]),
     "maximum_steps": int(os.environ["STEPS"]),
     "crystal_theta_deg": float(os.environ["THETA"]),
-    "cleavage_hazard_seed": int(os.environ["HAZARD_SEED"]),
-    "common_random_numbers": True,
+    "stochastic_cleavage_hazard": True,
+    "cleavage_hazard_mode": os.environ.get("CLEAVAGE_HAZARD_MODE", "exponential"),
+    "base_cleavage_hazard_seed": int(os.environ["HAZARD_SEED"]),
+    "common_random_numbers": False,
+    "case_seed_rule": (
+        "base_seed + option_index*seed_option_stride + "
+        "temperature_index*seed_temperature_stride"
+    ),
+    "seed_option_stride": int(os.environ["SEED_OPTION_STRIDE"]),
+    "seed_temperature_stride": int(os.environ["SEED_TEMPERATURE_STRIDE"]),
+    "case_seed_map": str((root / "v10_2_26_case_seed_map.csv").resolve()),
     "save_snapshots": int(os.environ["SAVE_SNAPSHOTS"]),
     "snapshot_columns": int(os.environ["SNAPSHOT_COLS"]),
     "plots_enabled": True,
@@ -85,7 +97,8 @@ PY
 run_case() {
   local option=$1
   local T=$2
-  local case_root="$OUTROOT/$option/T${T}K_th${THETA}_seed${HAZARD_SEED}"
+  local case_seed=$3
+  local case_root="$OUTROOT/$option/T${T}K_th${THETA}_seed${case_seed}"
   local log="$case_root/run.log"
   mkdir -p "$case_root"
 
@@ -103,7 +116,7 @@ except Exception:
 PY
 )
     if [[ "$complete" == 1 ]]; then
-      echo "SKIP complete: option=${option} T=${T}K"
+      echo "SKIP complete: option=${option} T=${T}K seed=${case_seed}"
       return 0
     fi
   fi
@@ -148,22 +161,22 @@ PY
   {
     echo '#!/usr/bin/env bash'
     printf 'PERSISTENT_SOURCE_MIN_WIDTH_UM=%q ' "$PERSISTENT_SOURCE_MIN_WIDTH_UM"
-    printf 'CLEAVAGE_HAZARD_SEED=%q ' "$HAZARD_SEED"
+    printf 'CLEAVAGE_HAZARD_SEED=%q ' "$case_seed"
     printf '%q ' "${cmd[@]}"
     printf '\n'
   } > "$case_root/command.sh"
   chmod +x "$case_root/command.sh"
 
-  echo "START: option=${option} T=${T}K seed=${HAZARD_SEED} target=${TARGET_EXT_UM}um"
+  echo "START: option=${option} T=${T}K seed=${case_seed} target=${TARGET_EXT_UM}um stochastic_hazard=1"
   env \
-    CLEAVAGE_HAZARD_SEED="$HAZARD_SEED" \
+    CLEAVAGE_HAZARD_SEED="$case_seed" \
     PERSISTENT_SOURCE_MIN_WIDTH_UM="$PERSISTENT_SOURCE_MIN_WIDTH_UM" \
     "${cmd[@]}" > "$log" 2>&1
   local rc=$?
   echo "$rc" > "$case_root/exit_code.txt"
   if [[ "$rc" -ne 0 ]]; then
     echo "simulation_exit_$rc" > "$case_root/RUN_FAILED"
-    echo "--- option=${option} T=${T}K failure log tail ---" >&2
+    echo "--- option=${option} T=${T}K seed=${case_seed} failure log tail ---" >&2
     tail -n 100 "$log" >&2 || true
     echo "--- end failure log tail ---" >&2
     return "$rc"
@@ -192,7 +205,7 @@ PY
     return 1
   fi
   rm -f "$case_root/RUN_FAILED"
-  echo "FINISHED: option=${option} T=${T}K"
+  echo "FINISHED: option=${option} T=${T}K seed=${case_seed}"
 }
 
 pids=()
@@ -224,13 +237,29 @@ reap() {
   fi
 }
 
+seed_map="$OUTROOT/v10_2_26_case_seed_map.csv"
+printf 'option_index,temperature_index,option,temperature_K,seed\n' > "$seed_map"
+
+option_index=0
 for option in $OPTIONS; do
+  temperature_index=0
   for T in $TEMPS; do
+    case_seed=$((
+      HAZARD_SEED
+      + option_index * SEED_OPTION_STRIDE
+      + temperature_index * SEED_TEMPERATURE_STRIDE
+    ))
+    printf '%d,%d,%s,%s,%d\n' \
+      "$option_index" "$temperature_index" "$option" "$T" "$case_seed" \
+      >> "$seed_map"
+
     while [[ ${#pids[@]} -ge $MAX_JOBS ]]; do sleep 2; reap; done
-    run_case "$option" "$T" &
+    run_case "$option" "$T" "$case_seed" &
     pids+=("$!")
-    labels+=("${option}:T${T}K")
+    labels+=("${option}:T${T}K:seed${case_seed}")
+    temperature_index=$((temperature_index + 1))
   done
+  option_index=$((option_index + 1))
 done
 while [[ ${#pids[@]} -gt 0 ]]; do sleep 2; reap; done
 
