@@ -1,0 +1,135 @@
+{
+  "schema": "v10.2.27_v913_four_class_paper_selection_v1",
+  "source_commit": "0a340f6feb8de47200b7733fe8f1d9663c75a43e",
+  "candidate_count": 4,
+  "canonical_option_order": [
+    "v913_paper_peak01_0242980_persistent_sites",
+    "v913_paper_dbtt01_0202500_persistent_sites",
+    "v913_paper_weakT01_0129902_persistent_sites",
+    "v913_paper_ceramic01_0077080_persistent_sites"
+  ],
+  "paper_class_order": [
+    "peak",
+    "DBTT",
+    "weakT_FCC_like",
+    "ceramic_like"
+  ],
+  "active_parameter_fields": [
+    "Tref_K",
+    "cleave_G00_eV",
+    "cleave_gT_eV_per_K",
+    "cleave_sigc0_GPa",
+    "cleave_sT_GPa_per_K",
+    "cleave_exp_a",
+    "cleave_exp_n",
+    "cleave_floor_frac",
+    "emit_G00_eV",
+    "emit_gT_eV_per_K",
+    "emit_sigc0_GPa",
+    "emit_sT_GPa_per_K",
+    "emit_exp_a",
+    "emit_exp_n",
+    "emit_floor_frac",
+    "peierls_H0_eV",
+    "peierls_activation_entropy_kB",
+    "peierls_exp_a",
+    "peierls_exp_n",
+    "peierls_nu0_s",
+    "taylor_H0_eV",
+    "taylor_activation_entropy_kB",
+    "taylor_exp_a",
+    "taylor_exp_n",
+    "taylor_nu0_s",
+    "rho_source0_m2",
+    "taylor_corr_rho_c_m2",
+    "taylor_corr_scale",
+    "c_blunt"
+  ],
+  "source_active_parameter_fingerprint_sha256": "eeb992cb8f956351833ff148d7611c8fc9e210f2a02eb44a00caa85558001fc5",
+  "source_registry_sha256": "760ce58801c978b5d9f06be151b8d3e8be46debfa0ef3a8df8dee390cbcc4bf3",
+  "mechanics_changed": false,
+  "source_closure_changed": false,
+  "stochastic_cleavage_law_changed": false,
+  "fixed_closure": {
+    "persistent_sites": true,
+    "finite_source_inventory": false,
+    "source_depletion_on_emission": false,
+    "source_refresh_on_crack_advance": false,
+    "explicit_recovery": false,
+    "dynamic_tip_radius": true,
+    "dynamic_front_width": true
+  },
+  "primary_candidates": [
+    {
+      "candidate_id": "v913_zeroD_sobol_0242980",
+      "option_key": "v913_paper_peak01_0242980_persistent_sites",
+      "material_class_2d": "peak",
+      "paper_material_class": "peak",
+      "response_class": "peak_like",
+      "paper_role": "primary_peak",
+      "selection_role": "paper primary",
+      "interpretation": "Delayed abrupt peak centered at 1100 K with strong high-temperature softening.",
+      "source": "v10.2.25 accepted 2-D transfer"
+    },
+    {
+      "candidate_id": "v913_zeroD_sobol_0202500",
+      "option_key": "v913_paper_dbtt01_0202500_persistent_sites",
+      "material_class_2d": "DBTT",
+      "paper_material_class": "DBTT",
+      "response_class": "classic_dbtt_upper_shelf",
+      "paper_role": "primary_dbtt",
+      "selection_role": "paper primary",
+      "interpretation": "Preferred classical DBTT example: low-temperature shelf, sharp transition near 1000 K, and stable upper shelf.",
+      "source": "v10.2.25 accepted 2-D transfer"
+    },
+    {
+      "candidate_id": "v913_zeroD_sobol_0129902",
+      "option_key": "v913_paper_weakT01_0129902_persistent_sites",
+      "material_class_2d": "weakT",
+      "paper_material_class": "weakT_FCC_like",
+      "response_class": "weak_temperature_fcc_like",
+      "paper_role": "primary_weak_temperature_fcc_like",
+      "selection_role": "paper primary",
+      "final_class_rank": 1,
+      "oneD_selection_score": 0.7597379308647852,
+      "oneD_strict_gate_passed": true,
+      "interpretation": "Strict 100 um 1-D weak-temperature/FCC-like primary selected by minimum class score.",
+      "source": "v9.13 strict five-temperature 100 um 1-D final selection"
+    },
+    {
+      "candidate_id": "v913_zeroD_sobol_0077080",
+      "option_key": "v913_paper_ceramic01_0077080_persistent_sites",
+      "material_class_2d": "ceramic",
+      "paper_material_class": "ceramic_like",
+      "response_class": "ceramic_like",
+      "paper_role": "primary_ceramic_like",
+      "selection_role": "paper primary",
+      "final_class_rank": 1,
+      "oneD_selection_score": 3.160949060037216,
+      "oneD_strict_gate_passed": true,
+      "interpretation": "Strict 100 um 1-D ceramic-like primary selected by minimum class score.",
+      "source": "v9.13 strict five-temperature 100 um 1-D final selection"
+    }
+  ],
+  "weakT_ceramic_backup_candidates": [
+    {
+      "candidate_id": "v913_zeroD_sobol_0008816",
+      "option_key": "v913_paper_weakT02_0008816_persistent_sites",
+      "paper_material_class": "weakT_FCC_like",
+      "final_class_rank": 2,
+      "oneD_selection_score": 0.9141747458565108,
+      "oneD_strict_gate_passed": true,
+      "selection_role": "paper backup"
+    },
+    {
+      "candidate_id": "v913_zeroD_sobol_0008536",
+      "option_key": "v913_paper_ceramic02_0008536_persistent_sites",
+      "paper_material_class": "ceramic_like",
+      "final_class_rank": 2,
+      "oneD_selection_score": 3.175770280307412,
+      "oneD_strict_gate_passed": true,
+      "selection_role": "paper backup"
+    }
+  ],
+  "transfer_policy": "Exact active-row transfer only; no fitting, transformation, rounding, rescaling, temperature shifting, or substitution of inactive legacy source/recovery coordinates. Backups remain metadata only and are not production classes."
+}
