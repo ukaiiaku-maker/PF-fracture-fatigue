@@ -25,7 +25,13 @@ SOURCE_REGISTRY = (
 
 
 def _write_mechanics_only_manifest(source_registry: Path, destination: Path) -> Path:
-    """Create an internal geometry driver, not a scientific material reference."""
+    """Create an internal geometry driver, not a scientific material reference.
+
+    The artificial cleavage surface is dormant at zero stress but becomes active
+    under the FEM loading ramp. Its 1.2 eV floor remains slow enough that adaptive
+    stepping cannot produce a multi-event jump at the minimum step fraction. This
+    makes every fixed 5 um geometry increment observable by the snapshot matcher.
+    """
     with source_registry.open(newline="") as stream:
         reader = csv.DictReader(stream)
         rows = list(reader)
@@ -39,18 +45,18 @@ def _write_mechanics_only_manifest(source_registry: Path, destination: Path) -> 
         "material_class": "mechanics_only",
         "role": "internal deterministic geometry construction",
         "mechanism_summary": (
-            "Artificial low-barrier cleavage and suppressed emission used only "
+            "Artificial stress-triggered cleavage and suppressed emission used only "
             "to advance an unshielded single front through prescribed geometries."
         ),
         "validation_status": "not a material parameterization",
         "target_class": "mechanics_only",
-        "cleave_G00_eV": "0.02",
+        "cleave_G00_eV": "4.0",
         "cleave_gT_eV_per_K": "0",
-        "cleave_sigc0_GPa": "1",
+        "cleave_sigc0_GPa": "2.0",
         "cleave_sT_GPa_per_K": "0",
-        "cleave_exp_a": "1",
-        "cleave_exp_n": "1",
-        "cleave_floor_frac": "0.5",
+        "cleave_exp_a": "1.0",
+        "cleave_exp_n": "1.0",
+        "cleave_floor_frac": "0.30",
         "emit_G00_eV": "100",
         "emit_gT_eV_per_K": "0",
         "emit_sigc0_GPa": "100",
@@ -173,7 +179,7 @@ def main() -> int:
         raise SystemExit("theta produces zero projected-extension cosine")
     projected_stop_um = atlas_max_um * cosine + 4.0 * da_um
     estimated_advances = int(math.ceil(atlas_max_um / da_um))
-    steps = max(2000, 5 * estimated_advances + 1000)
+    steps = max(4000, 12 * estimated_advances + 2000)
 
     command = [
         sys.executable, "-u", "-m", "arrhenius_fracture.sharp_front_v10_2_13_capture",
@@ -207,6 +213,7 @@ def main() -> int:
         "--crystal-material", "w", "--j-decomposition", "cluster",
         "--max-fronts", "1", "--crack-backend", "sharp_wake",
         "--adaptive-events", "--adaptive-event-target", "0.15",
+        "--adaptive-min-frac", "1e-10",
         "--print-every", "100", "--save-snapshots", "0", "--no-plots",
     ]
     environment = os.environ.copy()
@@ -239,7 +246,7 @@ def main() -> int:
             f"capture completed {payload.get('captured_states')} of {len(rows)} states"
         )
     manifest_payload = {
-        "schema": "v10.2.27_current_configuration_kernel_capture_v2",
+        "schema": "v10.2.27_current_configuration_kernel_capture_v3",
         "mechanical_configuration": configuration.canonical_payload(),
         "mechanical_configuration_fingerprint": configuration.fingerprint(),
         "trajectory_driver": {
@@ -247,6 +254,17 @@ def main() -> int:
             "capture_temperature_K": capture_temperature,
             "scientific_material_reference_condition": False,
             "existing_material_parameterization_required": False,
+            "cleavage_surface": {
+                "G00_eV": 4.0,
+                "sigc0_GPa": 2.0,
+                "exp_a": 1.0,
+                "exp_n": 1.0,
+                "floor_fraction": 0.30,
+                "zero_stress_thermally_dormant": True,
+            },
+            "emission_suppressed": True,
+            "adaptive_event_target": 0.15,
+            "adaptive_minimum_fraction": 1.0e-10,
         },
         "requested_target_extension_um": float(args.target_extension_um),
         "required_kernel_path_extension_um": float(args.required_max_extension_um),
