@@ -14,8 +14,8 @@ SELECTION_RECORD = Path(__file__).resolve().parent / "data" / "materials" / "v10
 VALID_OPTIONS = {
     "v913_paper_peak01_0242980_persistent_sites": "v913_zeroD_sobol_0242980",
     "v913_paper_dbtt01_0202500_persistent_sites": "v913_zeroD_sobol_0202500",
-    "v913_paper_weakT01_0257068_persistent_sites": "v913_zeroD_sobol_0257068",
-    "v913_paper_ceramic01_0189364_persistent_sites": "v913_zeroD_sobol_0189364",
+    "v913_paper_weakT01_0129902_persistent_sites": "v913_zeroD_sobol_0129902",
+    "v913_paper_ceramic01_0077080_persistent_sites": "v913_zeroD_sobol_0077080",
 }
 PersistentSiteStateResolvedTipEngine = _base.PersistentSiteStateResolvedTipEngine
 _SOURCE_SELECT_OPTION = _base.select_option
@@ -24,8 +24,10 @@ _SOURCE_SELECT_OPTION = _base.select_option
 def _select_option_four_class(*args, **kwargs):
     selected = _SOURCE_SELECT_OPTION(*args, **kwargs)
     source_class = selected.material_class.strip().lower()
-    if source_class not in {"dbtt", "weakt", "ceramic"}:
+    if source_class not in {"peak", "dbtt", "weakt", "ceramic"}:
         raise ValueError(f"unexpected v10.2.27 material class: {selected.material_class!r}")
+    # The inherited v10.2.22 loader exposes only its DBTT mechanics route.  Keep the
+    # exact paper class in selected.row while normalizing only the legacy loader tag.
     if source_class == "dbtt":
         return selected
     return replace(selected, material_class="DBTT")
@@ -77,6 +79,9 @@ def main(argv=None):
                 "paper_campaign_selection_record": str(SELECTION_RECORD),
                 "parameter_registry": str(DEFAULT_REGISTRY),
                 "parameter_registry_sha256": campaign.get("installed_registry_sha256"),
+                "source_active_parameter_fingerprint_sha256": campaign.get(
+                    "source_active_parameter_fingerprint_sha256"
+                ),
                 "source_material_class": exact_row.get("material_class"),
                 "base_loader_material_class": parameter_selection.get("material_class"),
                 "base_loader_class_normalization_only": True,
