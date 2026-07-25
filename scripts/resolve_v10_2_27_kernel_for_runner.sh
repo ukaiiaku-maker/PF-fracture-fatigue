@@ -9,7 +9,7 @@ THETA=${THETA:-30}
 TARGET_EXT_UM=${TARGET_EXT_UM:-1000}
 BRANCHING_MODE=${BRANCHING_MODE:-single_front}
 MAX_FRONTS=${MAX_FRONTS:-1}
-MECHANICAL_PROFILE=${MECHANICAL_PROFILE:-v10_2_27_default_single_front_frontfix}
+MECHANICAL_PROFILE=${MECHANICAL_PROFILE:-}
 KERNEL_RESOLUTION_MODE=${KERNEL_RESOLUTION_MODE:-auto}
 DA_PHYS_UM=${DA_PHYS_UM:-5}
 CLEAVAGE_EVENT_MIN_FACTOR=${CLEAVAGE_EVENT_MIN_FACTOR:-0.5}
@@ -21,13 +21,18 @@ ARGS=(
   --target-extension-um "$TARGET_EXT_UM"
   --branching-mode "$BRANCHING_MODE"
   --maximum-fronts "$MAX_FRONTS"
-  --mechanical-profile "$MECHANICAL_PROFILE"
   --mode "$KERNEL_RESOLUTION_MODE"
   --da-phys-um "$DA_PHYS_UM"
   --event-minimum-factor "$CLEAVAGE_EVENT_MIN_FACTOR"
   --event-maximum-factor "$CLEAVAGE_EVENT_MAX_FACTOR"
   --margin-events "$KERNEL_MARGIN_EVENTS"
 )
+
+if [[ -n "$MECHANICAL_PROFILE" ]]; then
+  ARGS+=(--mechanical-profile "$MECHANICAL_PROFILE")
+elif [[ -z "${MECHANICAL_CONFIG:-}" ]]; then
+  ARGS+=(--mechanical-profile v10_2_27_default_single_front_frontfix)
+fi
 
 if [[ -n "${FAMILY_JSON:-}" ]]; then
   if [[ -f "$FAMILY_JSON" ]]; then
