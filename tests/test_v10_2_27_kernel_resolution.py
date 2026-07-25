@@ -5,15 +5,12 @@ from pathlib import Path
 import subprocess
 import sys
 
-import pytest
-
 from arrhenius_fracture.kernel_configuration_v10227 import (
     MechanicalKernelConfiguration,
 )
 from arrhenius_fracture.kernel_registry_v10227 import (
     family_physics_fingerprint,
     load_registry,
-    select_recipe,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,31 +22,53 @@ def test_kernel_fingerprint_excludes_temperature_when_mechanics_are_fixed():
     assert first.fingerprint() == second.fingerprint()
 
 
-def test_kernel_fingerprint_changes_with_orientation_and_topology():
+def test_kernel_fingerprint_changes_with_orientation_topology_and_geometry():
     base = MechanicalKernelConfiguration()
-    rotated = MechanicalKernelConfiguration(theta_deg=45.0)
-    branched = MechanicalKernelConfiguration(
-        branching_mode="topology_cached", maximum_fronts=2
+    variants = (
+        MechanicalKernelConfiguration(theta_deg=15.0),
+        MechanicalKernelConfiguration(theta_deg=18.0),
+        MechanicalKernelConfiguration(
+            branching_mode="topology_cached", maximum_fronts=2
+        ),
+        MechanicalKernelConfiguration(process_zone_length_m=100.0e-6),
+        MechanicalKernelConfiguration(process_zone_bins=40),
+        MechanicalKernelConfiguration(mesh_nx=48),
+        MechanicalKernelConfiguration(tip_h_fine_m=0.5e-6),
+        MechanicalKernelConfiguration(interaction_length_m=4.0e-6),
     )
-    assert base.fingerprint() != rotated.fingerprint()
-    assert base.fingerprint() != branched.fingerprint()
+    for variant in variants:
+        assert base.fingerprint() != variant.fingerprint()
 
 
-def test_material_or_seed_fields_do_not_change_mechanical_identity():
+def test_mechanical_configuration_contains_current_mesh_and_process_zone():
+    cfg = MechanicalKernelConfiguration()
+    assert cfg.process_zone_length_m == 50.0e-6
+    assert cfg.process_zone_bins == 80
+    assert cfg.mesh_nx == 36
+    assert cfg.mesh_ny == 72
+    assert cfg.tip_h_fine_m == 1.0e-6
+    assert cfg.da_phys_m == 5.0e-6
+
+
+def test_material_seed_and_target_do_not_change_mechanical_identity():
     base = MechanicalKernelConfiguration()
     payload = base.canonical_payload()
     payload["material_option"] = "not_a_mechanical_field"
     payload["hazard_seed"] = 928374
-    payload["target_extension_um"] = 2500.0
+    payload["target_extension_um"] = 3000.0
     enriched = MechanicalKernelConfiguration.from_mapping(payload)
     assert enriched.fingerprint() == base.fingerprint()
 
 
-def test_unknown_configuration_fields_fail_closed():
+def test_unknown_mechanical_key_fails_closed():
     payload = MechanicalKernelConfiguration().canonical_payload()
-    payload["mystery_parameter"] = 42
-    with pytest.raises(ValueError, match="unknown mechanical-configuration keys"):
+    payload["misspelled_mesh_setting"] = 7
+    try:
         MechanicalKernelConfiguration.from_mapping(payload)
+    except ValueError as exc:
+        assert "unknown mechanical-configuration keys" in str(exc)
+    else:
+        raise AssertionError("unknown mechanical key was silently accepted")
 
 
 def test_path_independent_family_physics_fingerprint(tmp_path: Path):
@@ -70,25 +89,16 @@ def test_path_independent_family_physics_fingerprint(tmp_path: Path):
     assert family_physics_fingerprint(first_path) == family_physics_fingerprint(second_path)
 
 
-def test_default_theta30_recipe_is_exactly_registered():
+def test_tracked_registry_does_not_require_archives():
     registry = load_registry(ROOT / "artifacts" / "v10_2_27_kernel_registry.json")
-    configuration = MechanicalKernelConfiguration().canonical_payload()
-    recipe = select_recipe(registry, configuration)
-    assert recipe is not None
-    assert recipe["builder"] == "portable_mechanics_artifacts"
-    assert recipe["normalization_policy"] == "derive_v10.2.12_from_snapshot_engine_config"
-
-    changed_crack = MechanicalKernelConfiguration(
-        initial_crack_length_m=2.5e-4
-    ).canonical_payload()
-    changed_mesh = MechanicalKernelConfiguration(
-        mesh_policy_id="different_mesh"
-    ).canonical_payload()
-    assert select_recipe(registry, changed_crack) is None
-    assert select_recipe(registry, changed_mesh) is None
+    assert registry["recipes"] == []
+    assert registry["policy"]["portable_archives_are_required_inputs"] is False
+    assert registry["policy"]["default_resolution"] == (
+        "recalculate_from_current_mechanical_configuration"
+    )
 
 
-def test_official_runners_resolve_kernels_instead_of_hardcoding_run_paths():
+def test_official_runners_resolve_instead_of_hardcoding_run_paths():
     for relative in (
         "scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves_validated.sh",
         "scripts/run_v10_2_27_replace_weakT_ceramic_1000um.sh",
@@ -98,13 +108,59 @@ def test_official_runners_resolve_kernels_instead_of_hardcoding_run_paths():
         assert "FAMILY_JSON=${FAMILY_JSON:-$ROOT/runs/" not in text
 
 
-def test_portable_builder_derives_normalization_from_snapshot_engine_configuration():
-    text = (
-        ROOT / "scripts" / "build_v10_2_27_kernel_from_mechanics_artifacts.py"
+def test_default_builder_recalculates_capture_and_load_invariance():
+    builder = (
+        ROOT / "scripts" / "build_v10_2_27_kernel_for_configuration.sh"
     ).read_text()
-    assert "derive_mechanical_normalization" in text
-    assert "portable_path_relocation" in text
-    assert "--normalization" in text
+    assert "capture_v10_2_27_kernel_states_for_configuration.py" in builder
+    assert "RECALCULATE frozen FEM states" in builder
+    assert "RECALCULATE load invariance" in builder
+    assert "KERNEL_CAPTURE_COMMAND:?" not in builder
+
+
+def test_capture_uses_current_registry_geometry_not_historical_archive():
+    capture = (
+        ROOT / "scripts" / "capture_v10_2_27_kernel_states_for_configuration.py"
+    ).read_text()
+    assert "v10_2_27_v913_four_class_paper_registry.csv" in capture
+    assert '"--mpz-length-um"' in capture
+    assert '"--mpz-n-bins"' in capture
+    assert '"--no-tip-plasticity"' in capture
+    assert '"CLEAVAGE_HAZARD_MODE": "deterministic"' in capture
+    assert "internally_generated_mechanics_only_manifest" in capture
+    assert "trajectory-option" not in capture
+
+
+def test_optional_archives_require_exact_configuration_provenance():
+    text = (
+        ROOT / "scripts" / "build_v10_2_27_kernel_from_current_mechanics.py"
+    ).read_text()
+    assert "kernel_capture_manifest.json" in text
+    assert "Legacy archives cannot be assumed compatible" in text
+    assert "expected_configuration_fingerprint" in text
+
+
+def test_current_registry_geometry_is_50um_80bins():
+    import csv
+
+    path = (
+        ROOT
+        / "arrhenius_fracture"
+        / "data"
+        / "materials"
+        / "v10_2_27_v913_four_class_paper_registry.csv"
+    )
+    with path.open(newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    assert {float(row["L_pz_um_recommended"]) for row in rows} == {50.0}
+    assert {int(float(row["n_bins_recommended"])) for row in rows} == {80}
+
+
+def test_resolver_rebuilds_when_requested_coverage_is_longer():
+    text = (ROOT / "scripts" / "ensure_v10_2_27_signed_kernel.py").read_text()
+    assert "cached coverage is too short" in text
+    assert "_clear_generated_cache" in text
+    assert '"resolution": "recalculated"' in text
 
 
 def test_branching_cannot_fall_back_to_single_front_atlas(tmp_path: Path):
