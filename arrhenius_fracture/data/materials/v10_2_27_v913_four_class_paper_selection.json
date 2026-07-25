@@ -46,7 +46,8 @@
     "c_blunt"
   ],
   "source_active_parameter_fingerprint_sha256": "eeb992cb8f956351833ff148d7611c8fc9e210f2a02eb44a00caa85558001fc5",
-  "source_registry_sha256": "760ce58801c978b5d9f06be151b8d3e8be46debfa0ef3a8df8dee390cbcc4bf3",
+  "source_registry_sha256": null,
+  "source_registry_sha256_note": "The source commit used a different CSV serialization. Equality is enforced by exact option/candidate/class rows and the authoritative active-parameter fingerprint.",
   "mechanics_changed": false,
   "source_closure_changed": false,
   "stochastic_cleavage_law_changed": false,
