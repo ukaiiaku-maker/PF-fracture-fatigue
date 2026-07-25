@@ -87,6 +87,7 @@ def validate_family(
     *,
     expected_file_sha256: str | None = None,
     expected_physics_fingerprint: str | None = None,
+    expected_configuration_fingerprint: str | None = None,
 ) -> dict[str, Any]:
     source = Path(path).expanduser().resolve()
     if not source.is_file():
@@ -94,6 +95,14 @@ def validate_family(
     file_sha = sha256_file(source)
     if expected_file_sha256 is not None and file_sha != expected_file_sha256:
         raise ValueError(f"kernel family SHA mismatch: {file_sha} != {expected_file_sha256}")
+    payload = json.loads(source.read_text())
+    configuration_fingerprint = payload.get("mechanical_configuration_fingerprint")
+    if expected_configuration_fingerprint is not None:
+        if configuration_fingerprint != expected_configuration_fingerprint:
+            raise ValueError(
+                "kernel family mechanical-configuration fingerprint mismatch: "
+                f"{configuration_fingerprint!r} != {expected_configuration_fingerprint!r}"
+            )
     family = ActiveOnlySigned2DShieldingKernelFamily.from_json(source)
     if family.metadata.get("schema") != FAMILY_SCHEMA:
         raise ValueError("kernel family schema mismatch")
@@ -124,6 +133,7 @@ def validate_family(
         "maximum_extension_um": maximum_um,
         "state_count": len(family.states),
         "schema": FAMILY_SCHEMA,
+        "configuration_fingerprint": configuration_fingerprint,
     }
 
 
@@ -168,6 +178,7 @@ def select_entry(
                 path,
                 expected_file_sha256=entry.get("family_sha256"),
                 expected_physics_fingerprint=entry.get("physics_fingerprint"),
+                expected_configuration_fingerprint=configuration_fingerprint,
             )
         except (FileNotFoundError, ValueError):
             continue
