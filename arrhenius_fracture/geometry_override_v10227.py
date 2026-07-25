@@ -1,19 +1,21 @@
-"""Environment-driven specimen geometry override for v10.2.27 mechanics.
+"""Environment-driven mechanical geometry and elasticity override for v10.2.27.
 
-The low-level sharp-front driver historically hard-coded the default specimen in
-``make_emergent_config``. This installer makes specimen dimensions part of the
-same explicit mechanical configuration used by the kernel resolver, without
-changing material kinetics or the fracture law.
+The low-level sharp-front driver historically obtained specimen dimensions and
+cubic tungsten constants from module defaults. This installer makes those values
+follow the same resolved mechanical configuration used to construct the signed
+kernel, without changing material kinetics or the fracture law.
 """
 from __future__ import annotations
 
 import os
 from typing import Callable
 
+from . import crystal
 from . import sharp_front
 
-MODEL_ID = "v10.2.27_explicit_specimen_geometry_override"
+MODEL_ID = "v10.2.27_explicit_mechanical_geometry_override"
 _ORIGINAL: Callable | None = None
+_ORIGINAL_ELASTICITY: tuple[float, float, float] | None = None
 _INSTALLED = False
 
 
@@ -25,14 +27,27 @@ def _positive_env(name: str, default: float) -> float:
     return value
 
 
+def _apply_elasticity_environment() -> None:
+    c11 = _positive_env("V10227_CRYSTAL_C11_PA", crystal.W_C11)
+    c12 = _positive_env("V10227_CRYSTAL_C12_PA", crystal.W_C12)
+    c44 = _positive_env("V10227_CRYSTAL_C44_PA", crystal.W_C44)
+    if c11 <= c12:
+        raise ValueError("resolved cubic elasticity requires C11 > C12")
+    crystal.W_C11 = c11
+    crystal.W_C12 = c12
+    crystal.W_C44 = c44
+
+
 def install_geometry_override() -> None:
-    global _ORIGINAL, _INSTALLED
+    global _ORIGINAL, _ORIGINAL_ELASTICITY, _INSTALLED
     if _INSTALLED:
         return
     _ORIGINAL = sharp_front.make_emergent_config
+    _ORIGINAL_ELASTICITY = (crystal.W_C11, crystal.W_C12, crystal.W_C44)
 
     def configured():
         assert _ORIGINAL is not None
+        _apply_elasticity_environment()
         cfg = _ORIGINAL()
         cfg.geometry.Lx = _positive_env("V10227_SPECIMEN_LX_M", cfg.geometry.Lx)
         cfg.geometry.Ly = _positive_env("V10227_SPECIMEN_LY_M", cfg.geometry.Ly)
@@ -52,12 +67,15 @@ def install_geometry_override() -> None:
 
 
 def restore_geometry_override() -> None:
-    global _ORIGINAL, _INSTALLED
+    global _ORIGINAL, _ORIGINAL_ELASTICITY, _INSTALLED
     if not _INSTALLED:
         return
     assert _ORIGINAL is not None
     sharp_front.make_emergent_config = _ORIGINAL
+    if _ORIGINAL_ELASTICITY is not None:
+        crystal.W_C11, crystal.W_C12, crystal.W_C44 = _ORIGINAL_ELASTICITY
     _ORIGINAL = None
+    _ORIGINAL_ELASTICITY = None
     _INSTALLED = False
 
 
@@ -73,6 +91,9 @@ def audit_payload() -> dict[str, object]:
         "notch_half_thickness_m": float(
             os.environ.get("V10227_NOTCH_HALF_THICKNESS_M", "0") or 0.0
         ),
+        "crystal_C11_Pa": float(os.environ.get("V10227_CRYSTAL_C11_PA", "0") or 0.0),
+        "crystal_C12_Pa": float(os.environ.get("V10227_CRYSTAL_C12_PA", "0") or 0.0),
+        "crystal_C44_Pa": float(os.environ.get("V10227_CRYSTAL_C44_PA", "0") or 0.0),
     }
 
 
