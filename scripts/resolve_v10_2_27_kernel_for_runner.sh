@@ -11,6 +11,7 @@ BRANCHING_MODE=${BRANCHING_MODE:-single_front}
 MAX_FRONTS=${MAX_FRONTS:-1}
 MECHANICAL_PROFILE=${MECHANICAL_PROFILE:-v10_2_27_current_single_front_frontfix}
 KERNEL_RESOLUTION_MODE=${KERNEL_RESOLUTION_MODE:-auto}
+DA_PHYS_OVERRIDE=${DA_PHYS_UM-}
 DA_PHYS_UM=${DA_PHYS_UM:-5}
 CLEAVAGE_EVENT_MIN_FACTOR=${CLEAVAGE_EVENT_MIN_FACTOR:-0.5}
 CLEAVAGE_EVENT_MAX_FACTOR=${CLEAVAGE_EVENT_MAX_FACTOR:-4.0}
@@ -49,7 +50,7 @@ if [[ -n "${MECHANICAL_CONFIG:-}" ]]; then
     ARGS+=(--minimum-elements-per-process-zone "$KERNEL_MIN_ELEMENTS_PER_PZ")
   [[ -n "${KERNEL_INTERACTION_LENGTH_UM:-}" ]] && \
     ARGS+=(--interaction-length-um "$KERNEL_INTERACTION_LENGTH_UM")
-  [[ -n "${DA_PHYS_UM:-}" ]] && ARGS+=(--da-phys-um "$DA_PHYS_UM")
+  [[ -n "$DA_PHYS_OVERRIDE" ]] && ARGS+=(--da-phys-um "$DA_PHYS_OVERRIDE")
 else
   SOURCE_REGISTRY=${KERNEL_PARAMETER_REGISTRY:-$ROOT/arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv}
   read -r REGISTRY_PZ_UM REGISTRY_PZ_BINS < <(
