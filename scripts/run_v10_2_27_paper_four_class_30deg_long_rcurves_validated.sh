@@ -5,7 +5,7 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$ROOT"
 
 PYTHON_BIN=${PYTHON_BIN:-python}
-OUTROOT=${OUTROOT:-runs/v10_2_27_paper_four_class_1000um_theta30_varseed_base3621_v1}
+OUTROOT=${OUTROOT:-runs/v10_2_27_paper_four_class_1000um_theta30_current_kernel_varseed3621_v1}
 TARGET_EXT_UM=${TARGET_EXT_UM:-1000}
 THETA=${THETA:-30}
 DA_PHYS_UM=${DA_PHYS_UM:-5}
@@ -21,7 +21,7 @@ FAMILY_JSON=$(
   PYTHON_BIN="$PYTHON_BIN" \
   FAMILY_JSON="${FAMILY_JSON:-}" \
   MECHANICAL_CONFIG="${MECHANICAL_CONFIG:-}" \
-  MECHANICAL_PROFILE="${MECHANICAL_PROFILE:-}" \
+  MECHANICAL_PROFILE="${MECHANICAL_PROFILE:-v10_2_27_current_single_front_frontfix}" \
   KERNEL_RESOLUTION_MODE="${KERNEL_RESOLUTION_MODE:-auto}" \
   KERNEL_BUILD_COMMAND="${KERNEL_BUILD_COMMAND:-}" \
   KERNEL_SNAPSHOT_ARCHIVE="${KERNEL_SNAPSHOT_ARCHIVE:-}" \
@@ -54,7 +54,7 @@ echo "Resolved signed-kernel family: $FAMILY_JSON"
   --margin-events "$KERNEL_MARGIN_EVENTS" \
   --output "$OUTROOT/v10_2_27_signed_kernel_coverage_audit.json"
 
-bash scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves.sh "$@"
+bash scripts/run_v10_2_27_full_current_kernel_four_class.sh "$@"
 
 "$PYTHON_BIN" scripts/plot_v10_2_27_paper_four_class_K_vs_temperature.py \
   --outroot "$OUTROOT" \
