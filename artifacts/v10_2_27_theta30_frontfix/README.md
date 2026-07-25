@@ -51,15 +51,38 @@ The original uploaded ZIP had SHA-256:
 
 `bd21814144b8d8523e0419eb01022242a841c294a6e779b4cd2868850c158263`
 
+## Canonical load-invariance archive
+
+Expected path:
+
+`artifacts/v10_2_27_theta30_frontfix/v10_2_27_active_load_invariance_700K_theta30_frontfix_E000_E1200_v2.zip`
+
+Canonical archive SHA-256:
+
+`e71d9dcae52129a175100fa56f3f0445105536598bc21d160624c75b5b52b919`
+
+The archive contains all six accepted frozen-geometry mechanics evaluations. For each state it includes:
+
+- `active_station_responses_load_0p5.csv` and audit;
+- `active_station_responses_load_1.csv` and audit;
+- `active_station_responses_load_1p5.csv` and audit;
+- `active_frozen_geometry_load_sweep_responses.csv`;
+- `frozen_geometry_load_invariance.json`.
+
+Every state has 320 measured station responses at each load. The reports require physical FEM responses, successful load invariance, a mechanically measured active kernel, and no supported wake-shielding kernel.
+
+The original uploaded ZIP had SHA-256:
+
+`2d7030f6e4921475fd7a4ab1927bc19feaf8b114212b5f0befe5911adc46303f`
+
 ## Remaining canonical artifacts
 
-The snapshot archive is necessary but not sufficient to reproduce the accepted family fingerprint
+The snapshot and load-invariance archives are necessary but not sufficient to reproduce the accepted family fingerprint
 
 `35710f0c2f003bea5367d101f0ad27bc93625b0a631dc3f139c6af6a6cfaafbb`.
 
-The following must also be tracked after deterministic reconstruction:
+The following must still be tracked after deterministic reconstruction:
 
-- six-state load-invariance response CSV files and audit JSON files;
 - the mechanically derived normalization JSON;
 - `v10_2_27_theta30_active_only_campaign_family_frontfix_E1200_v2.json`;
 - `v10_2_27_signed_kernel_coverage_audit.json`;
