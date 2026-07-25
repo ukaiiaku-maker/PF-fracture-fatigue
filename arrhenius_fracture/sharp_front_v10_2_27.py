@@ -61,14 +61,16 @@ def _remove_value_option(args: list[str], option: str) -> None:
         index += 1
 
 
-def _resolve_signed_kernel(args: list[str]) -> None:
+def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
     supplied = _option_value(
         args,
         "--signed-kernel-family",
         os.environ.get("SIGNED_KERNEL_FAMILY_JSON"),
     )
     if supplied and Path(supplied).expanduser().is_file():
-        return
+        resolved = str(Path(supplied).expanduser().resolve())
+        os.environ["SIGNED_KERNEL_FAMILY_JSON"] = resolved
+        return resolved, False
     if supplied:
         print(
             f"Ignoring stale signed-kernel path and resolving mechanically: {supplied}",
@@ -102,14 +104,12 @@ def _resolve_signed_kernel(args: list[str]) -> None:
         branching_mode,
         "--maximum-fronts",
         str(maximum_fronts),
-        "--mechanical-profile",
-        os.environ.get(
-            "MECHANICAL_PROFILE",
-            "v10_2_27_default_single_front_frontfix",
-        ),
         "--mode",
         os.environ.get("KERNEL_RESOLUTION_MODE", "auto"),
     ]
+    mechanical_profile = os.environ.get("MECHANICAL_PROFILE", "").strip()
+    if mechanical_profile:
+        command.extend(["--mechanical-profile", mechanical_profile])
     optional = (
         ("MECHANICAL_CONFIG", "--mechanical-config"),
         ("KERNEL_BUILD_COMMAND", "--builder-command"),
@@ -138,8 +138,10 @@ def _resolve_signed_kernel(args: list[str]) -> None:
     family = completed.stdout.strip().splitlines()[-1] if completed.stdout.strip() else ""
     if not family or not Path(family).is_file():
         raise SystemExit(f"kernel resolver did not return a valid family path: {family!r}")
+    family = str(Path(family).resolve())
     args.extend(["--signed-kernel-family", family])
     os.environ["SIGNED_KERNEL_FAMILY_JSON"] = family
+    return family, True
 
 
 def main(argv=None):
@@ -155,7 +157,7 @@ def main(argv=None):
     if installed_order != expected_order:
         raise RuntimeError(f"v10.2.27 option order mismatch: {installed_order!r} != {expected_order!r}")
 
-    _resolve_signed_kernel(args)
+    resolved_family, resolved_automatically = _resolve_signed_kernel(args)
 
     original_registry = _base.DEFAULT_REGISTRY
     original_options = _base.VALID_OPTIONS
@@ -205,8 +207,8 @@ def main(argv=None):
                 "source_refresh": False,
                 "explicit_recovery": False,
                 "front_width_grid_independent": True,
-                "signed_kernel_resolved_automatically": True,
-                "signed_kernel_family": os.environ.get("SIGNED_KERNEL_FAMILY_JSON"),
+                "signed_kernel_resolved_automatically": resolved_automatically,
+                "signed_kernel_family": resolved_family,
             }
             (root / "v10_2_27_paper_four_class_parameter_transfer.json").write_text(
                 json.dumps(payload, indent=2, sort_keys=True) + "\n"
