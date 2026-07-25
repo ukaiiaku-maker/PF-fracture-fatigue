@@ -3,7 +3,9 @@ from __future__ import annotations
 
 from dataclasses import replace
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
 
 from . import sharp_front_v10_2_22 as _base
@@ -26,11 +28,118 @@ def _select_option_four_class(*args, **kwargs):
     source_class = selected.material_class.strip().lower()
     if source_class not in {"peak", "dbtt", "weakt", "ceramic"}:
         raise ValueError(f"unexpected v10.2.27 material class: {selected.material_class!r}")
-    # The inherited v10.2.22 loader exposes only its DBTT mechanics route.  Keep the
+    # The inherited v10.2.22 loader exposes only its DBTT mechanics route. Keep the
     # exact paper class in selected.row while normalizing only the legacy loader tag.
     if source_class == "dbtt":
         return selected
     return replace(selected, material_class="DBTT")
+
+
+def _option_value(args: list[str], option: str, default: str | None = None) -> str | None:
+    prefix = option + "="
+    for index, token in enumerate(args):
+        if token.startswith(prefix):
+            return token[len(prefix):]
+        if token == option and index + 1 < len(args):
+            return args[index + 1]
+    return default
+
+
+def _remove_value_option(args: list[str], option: str) -> None:
+    prefix = option + "="
+    index = 0
+    while index < len(args):
+        token = args[index]
+        if token.startswith(prefix):
+            del args[index]
+            continue
+        if token == option:
+            del args[index]
+            if index < len(args):
+                del args[index]
+            continue
+        index += 1
+
+
+def _resolve_signed_kernel(args: list[str]) -> None:
+    supplied = _option_value(
+        args,
+        "--signed-kernel-family",
+        os.environ.get("SIGNED_KERNEL_FAMILY_JSON"),
+    )
+    if supplied and Path(supplied).expanduser().is_file():
+        return
+    if supplied:
+        print(
+            f"Ignoring stale signed-kernel path and resolving mechanically: {supplied}",
+            file=sys.stderr,
+        )
+    _remove_value_option(args, "--signed-kernel-family")
+
+    theta = float(_option_value(args, "--crystal-theta-deg", os.environ.get("THETA", "30")))
+    target = float(
+        _option_value(
+            args,
+            "--target-crack-extension-um",
+            os.environ.get("TARGET_EXT_UM", "1000"),
+        )
+    )
+    maximum_fronts = int(_option_value(args, "--max-fronts", "1"))
+    branching_mode = (
+        "topology_cached"
+        if "--crystal-branch" in args or maximum_fronts > 1
+        else "single_front"
+    )
+    root = Path(__file__).resolve().parents[1]
+    command = [
+        sys.executable,
+        str(root / "scripts" / "ensure_v10_2_27_signed_kernel.py"),
+        "--theta-deg",
+        f"{theta:.17g}",
+        "--target-extension-um",
+        f"{target:.17g}",
+        "--branching-mode",
+        branching_mode,
+        "--maximum-fronts",
+        str(maximum_fronts),
+        "--mechanical-profile",
+        os.environ.get(
+            "MECHANICAL_PROFILE",
+            "v10_2_27_default_single_front_frontfix",
+        ),
+        "--mode",
+        os.environ.get("KERNEL_RESOLUTION_MODE", "auto"),
+    ]
+    optional = (
+        ("MECHANICAL_CONFIG", "--mechanical-config"),
+        ("KERNEL_BUILD_COMMAND", "--builder-command"),
+        ("KERNEL_SNAPSHOT_ARCHIVE", "--snapshot-archive"),
+        ("KERNEL_LOAD_INVARIANCE_ARCHIVE", "--load-invariance-archive"),
+    )
+    for environment_name, command_option in optional:
+        value = os.environ.get(environment_name, "").strip()
+        if value:
+            command.extend([command_option, value])
+    completed = subprocess.run(
+        command,
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if completed.stderr:
+        print(completed.stderr, end="", file=sys.stderr)
+    if completed.returncode != 0:
+        raise SystemExit(
+            "automatic signed-kernel resolution failed:\n"
+            + completed.stdout
+            + completed.stderr
+        )
+    family = completed.stdout.strip().splitlines()[-1] if completed.stdout.strip() else ""
+    if not family or not Path(family).is_file():
+        raise SystemExit(f"kernel resolver did not return a valid family path: {family!r}")
+    args.extend(["--signed-kernel-family", family])
+    os.environ["SIGNED_KERNEL_FAMILY_JSON"] = family
 
 
 def main(argv=None):
@@ -45,6 +154,8 @@ def main(argv=None):
     expected_order = list(VALID_OPTIONS)
     if installed_order != expected_order:
         raise RuntimeError(f"v10.2.27 option order mismatch: {installed_order!r} != {expected_order!r}")
+
+    _resolve_signed_kernel(args)
 
     original_registry = _base.DEFAULT_REGISTRY
     original_options = _base.VALID_OPTIONS
@@ -94,6 +205,8 @@ def main(argv=None):
                 "source_refresh": False,
                 "explicit_recovery": False,
                 "front_width_grid_independent": True,
+                "signed_kernel_resolved_automatically": True,
+                "signed_kernel_family": os.environ.get("SIGNED_KERNEL_FAMILY_JSON"),
             }
             (root / "v10_2_27_paper_four_class_parameter_transfer.json").write_text(
                 json.dumps(payload, indent=2, sort_keys=True) + "\n"
