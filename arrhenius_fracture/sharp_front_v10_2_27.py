@@ -78,6 +78,15 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
         )
     _remove_value_option(args, "--signed-kernel-family")
 
+    mechanical_config = os.environ.get("MECHANICAL_CONFIG", "").strip()
+    official_profile = os.environ.get("PARAMETER_CAMPAIGN", "0") == "1"
+    if not mechanical_config and not official_profile:
+        raise SystemExit(
+            "automatic v10.2.27 kernel resolution outside the fixed paper runner requires "
+            "MECHANICAL_CONFIG. This prevents an arbitrary direct module invocation from "
+            "being treated as the default theta=30 specimen/mesh/crack configuration."
+        )
+
     theta = float(_option_value(args, "--crystal-theta-deg", os.environ.get("THETA", "30")))
     target = float(
         _option_value(
