@@ -61,21 +61,33 @@ def _remove_value_option(args: list[str], option: str) -> None:
         index += 1
 
 
+def _append_cli_mechanics(command: list[str], args: list[str]) -> None:
+    mappings = (
+        ("--mpz-length-um", "--process-zone-length-um", 1.0),
+        ("--mpz-n-bins", "--process-zone-bins", 1.0),
+        ("--nx", "--mesh-nx", 1.0),
+        ("--ny", "--mesh-ny", 1.0),
+        ("--tip-h-fine", "--tip-h-fine-um", 1.0e6),
+        ("--tip-ratio", "--tip-ratio", 1.0),
+        ("--da-phys", "--da-phys-um", 1.0e6),
+    )
+    for source, destination, scale in mappings:
+        raw = _option_value(args, source)
+        if raw is None:
+            continue
+        if destination in {"--process-zone-bins", "--mesh-nx", "--mesh-ny"}:
+            value = str(int(round(float(raw))))
+        else:
+            value = f"{float(raw) * scale:.17g}"
+        command.extend([destination, value])
+
+
 def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
     supplied = _option_value(
         args,
         "--signed-kernel-family",
         os.environ.get("SIGNED_KERNEL_FAMILY_JSON"),
     )
-    if supplied and Path(supplied).expanduser().is_file():
-        resolved = str(Path(supplied).expanduser().resolve())
-        os.environ["SIGNED_KERNEL_FAMILY_JSON"] = resolved
-        return resolved, False
-    if supplied:
-        print(
-            f"Ignoring stale signed-kernel path and resolving mechanically: {supplied}",
-            file=sys.stderr,
-        )
     _remove_value_option(args, "--signed-kernel-family")
 
     mechanical_config = os.environ.get("MECHANICAL_CONFIG", "").strip()
@@ -84,7 +96,7 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
         raise SystemExit(
             "automatic v10.2.27 kernel resolution outside the fixed paper runner requires "
             "MECHANICAL_CONFIG. This prevents an arbitrary direct module invocation from "
-            "being treated as the default theta=30 specimen/mesh/crack configuration."
+            "being treated as the default specimen/mesh/crack configuration."
         )
 
     theta = float(_option_value(args, "--crystal-theta-deg", os.environ.get("THETA", "30")))
@@ -116,6 +128,7 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
         "--mode",
         os.environ.get("KERNEL_RESOLUTION_MODE", "auto"),
     ]
+    _append_cli_mechanics(command, args)
     mechanical_profile = os.environ.get("MECHANICAL_PROFILE", "").strip()
     if mechanical_profile:
         command.extend(["--mechanical-profile", mechanical_profile])
@@ -124,11 +137,26 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
         ("KERNEL_BUILD_COMMAND", "--builder-command"),
         ("KERNEL_SNAPSHOT_ARCHIVE", "--snapshot-archive"),
         ("KERNEL_LOAD_INVARIANCE_ARCHIVE", "--load-invariance-archive"),
+        ("KERNEL_ATLAS_ANCHOR_SPACING_UM", "--atlas-anchor-spacing-um"),
+        ("KERNEL_INTERACTION_LENGTH_UM", "--interaction-length-um"),
+        ("KERNEL_MIN_ELEMENTS_PER_PZ", "--minimum-elements-per-process-zone"),
     )
     for environment_name, command_option in optional:
         value = os.environ.get(environment_name, "").strip()
         if value:
             command.extend([command_option, value])
+    if supplied:
+        source = Path(supplied).expanduser()
+        if source.is_file():
+            command.extend(["--family-override", str(source.resolve())])
+        elif os.environ.get("KERNEL_STRICT_FAMILY_OVERRIDE", "0") == "1":
+            raise SystemExit(f"explicit signed-kernel family is missing: {source}")
+        else:
+            print(
+                f"Ignoring stale signed-kernel path; recalculating if needed: {source}",
+                file=sys.stderr,
+            )
+
     completed = subprocess.run(
         command,
         cwd=root,
@@ -150,7 +178,8 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
     family = str(Path(family).resolve())
     args.extend(["--signed-kernel-family", family])
     os.environ["SIGNED_KERNEL_FAMILY_JSON"] = family
-    return family, True
+    automatically = not bool(supplied and Path(supplied).expanduser().is_file())
+    return family, automatically
 
 
 def main(argv=None):
