@@ -13,6 +13,8 @@ DA_PHYS_UM=${DA_PHYS_UM:-5}
 CLEAVAGE_EVENT_MIN_FACTOR=${CLEAVAGE_EVENT_MIN_FACTOR:-0.5}
 CLEAVAGE_EVENT_MAX_FACTOR=${CLEAVAGE_EVENT_MAX_FACTOR:-4.0}
 KERNEL_MARGIN_EVENTS=${KERNEL_MARGIN_EVENTS:-1}
+YOUNGS_MODULUS_PA=${YOUNGS_MODULUS_PA:-410e9}
+POISSON_RATIO=${POISSON_RATIO:-0.28}
 
 mkdir -p "$OUTROOT"
 
@@ -31,3 +33,9 @@ bash scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves.sh "$@"
 "$PYTHON_BIN" scripts/plot_v10_2_27_paper_four_class_K_vs_temperature.py \
   --outroot "$OUTROOT" \
   --target-extension-um "$TARGET_EXT_UM"
+
+"$PYTHON_BIN" scripts/plot_v10_2_27_paper_four_class_J_vs_temperature.py \
+  --outroot "$OUTROOT" \
+  --target-extension-um "$TARGET_EXT_UM" \
+  --youngs-modulus-pa "$YOUNGS_MODULUS_PA" \
+  --poisson-ratio "$POISSON_RATIO"
