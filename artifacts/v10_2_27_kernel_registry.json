@@ -1,0 +1,24 @@
+{
+  "schema": "v10.2.27_kernel_registry_v1",
+  "entries": [],
+  "recipes": [
+    {
+      "id": "theta30_frontfix_E000_E1200_v2_portable_mechanics",
+      "match": {
+        "profile_id": "v10_2_27_default_single_front_frontfix",
+        "theta_deg": 30.0,
+        "branching_mode": "single_front",
+        "maximum_fronts": 1
+      },
+      "provider_mode": "single_front",
+      "builder": "portable_mechanics_artifacts",
+      "snapshot_archive": "artifacts/v10_2_27_theta30_frontfix/v10_2_27_frozen_geometry_snapshots_700K_theta30_frontfix_E000_E1200_v2.zip",
+      "snapshot_archive_sha256": "8a4bc221447aa98e8b56b3a1797f42224b6c1bda4da124c37ab2448fd8e4b5ae",
+      "load_invariance_archive": "artifacts/v10_2_27_theta30_frontfix/v10_2_27_active_load_invariance_700K_theta30_frontfix_E000_E1200_v2.zip",
+      "load_invariance_archive_sha256": "e71d9dcae52129a175100fa56f3f0445105536598bc21d160624c75b5b52b919",
+      "legacy_family_file_sha256": "35710f0c2f003bea5367d101f0ad27bc93625b0a631dc3f139c6af6a6cfaafbb",
+      "normalization_policy": "derive_v10.2.12_from_snapshot_engine_config",
+      "notes": "Portable rebuild recipe for the accepted unbranched theta=30 degree mechanics. The raw legacy family SHA included run-location provenance; new cache entries validate both file integrity and a path-independent physics fingerprint."
+    }
+  ]
+}
