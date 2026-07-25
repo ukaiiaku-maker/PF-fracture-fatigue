@@ -68,7 +68,11 @@ class MechanicalKernelConfiguration:
     branching_mode: str = "single_front"
     maximum_fronts: int = 1
     mechanics_backend: str = "v10.2.27_sharp_front_fem"
-    specimen_geometry_id: str = "v10.2.27_default_specimen"
+    specimen_geometry_id: str = "v10.2.27_rectangular_single_edge_notch"
+    specimen_length_x_m: float = 2.0e-3
+    specimen_length_y_m: float = 4.0e-3
+    initial_crack_length_m: float = 0.5e-3
+    notch_half_thickness_m: float = 0.08e-3
     boundary_condition_id: str = "v10.2.27_mode_I_displacement"
     mesh_policy_id: str = "v10.2.27_front_direction_fix_mesh"
     mesh_nx: int = 36
@@ -88,7 +92,6 @@ class MechanicalKernelConfiguration:
     normalization_policy: str = "derive_v10.2.12_from_captured_engine_config"
     elasticity_policy: str = "runtime_engine_configuration"
     kernel_provider_id: str = "v10.2.27_current_configuration_fem_recalculation_v1"
-    initial_crack_length_m: float | None = None
     temperature_dependent_mechanics: bool = False
     temperature_K: float | None = None
     extra: Mapping[str, Any] = field(default_factory=dict)
@@ -112,6 +115,10 @@ class MechanicalKernelConfiguration:
             if int(getattr(self, name)) < 2:
                 raise ValueError(f"{name} must be at least two")
         for name in (
+            "specimen_length_x_m",
+            "specimen_length_y_m",
+            "initial_crack_length_m",
+            "notch_half_thickness_m",
             "tip_h_fine_m",
             "tip_ratio",
             "process_zone_length_m",
@@ -123,10 +130,10 @@ class MechanicalKernelConfiguration:
             value = float(getattr(self, name))
             if not math.isfinite(value) or value <= 0.0:
                 raise ValueError(f"{name} must be positive and finite")
-        if self.initial_crack_length_m is not None:
-            value = float(self.initial_crack_length_m)
-            if not math.isfinite(value) or value <= 0.0:
-                raise ValueError("initial_crack_length_m must be positive and finite")
+        if self.initial_crack_length_m >= self.specimen_length_x_m:
+            raise ValueError("initial_crack_length_m must be smaller than specimen_length_x_m")
+        if 2.0 * self.notch_half_thickness_m >= self.specimen_length_y_m:
+            raise ValueError("notch thickness must be smaller than specimen_length_y_m")
         if self.temperature_dependent_mechanics:
             if self.temperature_K is None or not math.isfinite(float(self.temperature_K)):
                 raise ValueError(
