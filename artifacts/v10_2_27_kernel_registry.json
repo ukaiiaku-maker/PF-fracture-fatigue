@@ -7,8 +7,24 @@
       "match": {
         "profile_id": "v10_2_27_default_single_front_frontfix",
         "theta_deg": 30.0,
+        "nominal_crack_angle_deg": 0.0,
         "branching_mode": "single_front",
-        "maximum_fronts": 1
+        "maximum_fronts": 1,
+        "mechanics_backend": "v10.2.27_sharp_front_fem",
+        "specimen_geometry_id": "v10.2.27_default_specimen",
+        "boundary_condition_id": "v10.2.27_mode_I_displacement",
+        "mesh_policy_id": "v10.2.27_front_direction_fix_mesh",
+        "process_zone_policy_id": "dynamic_tip_radius_physical_front_width",
+        "active_station_policy_id": "v10.2.14_measured_active_stations",
+        "signed_channel_convention": "v10.2.27_signed_mobile_retained_channels",
+        "front_direction_convention": "v10.2.27_front_direction_fix",
+        "normalization_policy": "derive_v10.2.12_from_snapshot_engine_config",
+        "elasticity_policy": "runtime_engine_configuration",
+        "initial_crack_length_m": null,
+        "interaction_length_m": null,
+        "temperature_dependent_mechanics": false,
+        "temperature_K": null,
+        "extra": {}
       },
       "provider_mode": "single_front",
       "builder": "portable_mechanics_artifacts",
@@ -18,7 +34,7 @@
       "load_invariance_archive_sha256": "e71d9dcae52129a175100fa56f3f0445105536598bc21d160624c75b5b52b919",
       "legacy_family_file_sha256": "35710f0c2f003bea5367d101f0ad27bc93625b0a631dc3f139c6af6a6cfaafbb",
       "normalization_policy": "derive_v10.2.12_from_snapshot_engine_config",
-      "notes": "Portable rebuild recipe for the accepted unbranched theta=30 degree mechanics. The raw legacy family SHA included run-location provenance; new cache entries validate both file integrity and a path-independent physics fingerprint."
+      "notes": "Exact portable rebuild recipe for the accepted unbranched theta=30 degree mechanics. Any change in orientation, crack geometry, specimen/BC identity, mesh/process-zone policy, station convention, interaction length, elasticity policy, or topology requires a different cache entry or builder."
     }
   ]
 }
