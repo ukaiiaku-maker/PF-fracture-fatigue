@@ -17,6 +17,7 @@ fi
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py --check-only
 "$PYTHON_BIN" -m pytest -q \
   tests/test_v10_2_27_paper_four_class_campaign.py \
-  tests/test_v10_2_27_signed_kernel_coverage.py
+  tests/test_v10_2_27_signed_kernel_coverage.py \
+  tests/test_v10_2_27_extended_active_only_atlas.py
 
 echo "v10.2.27 four-class campaign installation and preflight checks passed."
