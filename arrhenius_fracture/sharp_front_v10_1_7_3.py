@@ -102,6 +102,11 @@ def _rewrite_summary_event_semantics(args: list[str]) -> None:
     total, so it is an equivalent nominal-checkpoint count. That equals the event
     count only when every event is exactly ``da_phys``. Variable stochastic event
     rewards require both quantities to be recorded separately.
+
+    A valid no-fracture run has an empty geometry-event list and zero advances.
+    That state is recorded explicitly rather than treated as a postprocessing
+    failure, which is required for initial-state FEM snapshot capture and other
+    subcritical smoke tests.
     """
     out = _option_value(args, "--out")
     if not out:
@@ -114,19 +119,56 @@ def _rewrite_summary_event_semantics(args: list[str]) -> None:
 
     geometry = json.loads(geometry_path.read_text())
     summary = json.loads(summary_path.read_text())
-    if not isinstance(geometry, list) or not geometry:
-        raise RuntimeError("stochastic avalanche geometry diagnostics contain no events")
+    if not isinstance(geometry, list):
+        raise RuntimeError("stochastic avalanche geometry diagnostics must be a list")
     if not isinstance(summary, list) or not summary:
         raise RuntimeError("summary.json contains no rows")
 
-    lengths = [max(float(row.get("event_advance_m", 0.0)), 0.0) for row in geometry]
+    row = summary[0]
+    if not geometry:
+        advances = float(row.get("n_advances", 0.0))
+        if not math.isfinite(advances) or abs(advances) > 1.0e-12:
+            raise RuntimeError(
+                "empty stochastic geometry diagnostics are inconsistent with "
+                f"n_advances={advances:.12g}"
+            )
+        nominal_raw = _option_value(args, "--da-phys")
+        if nominal_raw is None:
+            raise RuntimeError(
+                "a zero-event summary requires --da-phys to record the nominal "
+                "checkpoint length"
+            )
+        nominal_checkpoint_m = float(nominal_raw)
+        if not math.isfinite(nominal_checkpoint_m) or nominal_checkpoint_m <= 0.0:
+            raise RuntimeError("--da-phys must be positive and finite")
+        row.update(
+            {
+                "n_geometry_events": 0,
+                "n_equivalent_checkpoints_exact": 0.0,
+                "n_equivalent_checkpoints_rounded": 0,
+                "nominal_checkpoint_length_m": nominal_checkpoint_m,
+                "geometry_path_length_m": 0.0,
+                "geometry_projected_extension_m": 0.0,
+                "n_advances_semantics": (
+                    "rounded_path_length_over_nominal_checkpoint"
+                ),
+                "n_geometry_events_semantics": (
+                    "accepted_cleavage_renewals_and_geometry_commits"
+                ),
+                "zero_geometry_events_validated_against_zero_advances": True,
+            }
+        )
+        summary_path.write_text(json.dumps(summary, indent=2))
+        return
+
+    lengths = [max(float(item.get("event_advance_m", 0.0)), 0.0) for item in geometry]
     if not all(math.isfinite(value) and value > 0.0 for value in lengths):
         raise RuntimeError("geometry diagnostics contain a nonpositive event length")
     fixed_lengths = [
-        float(row.get("requested_fixed_length_m", 0.0))
-        for row in geometry
-        if math.isfinite(float(row.get("requested_fixed_length_m", 0.0)))
-        and float(row.get("requested_fixed_length_m", 0.0)) > 0.0
+        float(item.get("requested_fixed_length_m", 0.0))
+        for item in geometry
+        if math.isfinite(float(item.get("requested_fixed_length_m", 0.0)))
+        and float(item.get("requested_fixed_length_m", 0.0)) > 0.0
     ]
     if not fixed_lengths:
         raise RuntimeError("geometry diagnostics contain no nominal checkpoint length")
@@ -137,7 +179,6 @@ def _rewrite_summary_event_semantics(args: list[str]) -> None:
     equivalent_exact = path_length_m / nominal_checkpoint_m
     equivalent_rounded = int(round(equivalent_exact))
 
-    row = summary[0]
     row.update({
         "n_geometry_events": int(len(geometry)),
         "n_equivalent_checkpoints_exact": float(equivalent_exact),
