@@ -5,11 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from arrhenius_fracture import anisotropic_emission_v10174 as inherited
-from arrhenius_fracture.anisotropic_front_direction_fix_v10227 import (
-    DEFAULT_MINIMUM_ALIGNMENT_COSINE,
-    infer_front_direction,
-)
+from arrhenius_fracture import anisotropic_front_direction_fix_v10227 as front_fix
 
 
 @dataclass
@@ -51,8 +47,8 @@ def test_transverse_pca_is_replaced_by_wake_to_tip_direction():
     damage = np.ones(mesh.ne)
     tip = np.array([1.0, 0.0])
 
-    inherited_direction = inherited.infer_front_direction(mesh, damage, tip, 1.0)
-    fixed_direction = infer_front_direction(mesh, damage, tip, 1.0)
+    inherited_direction = front_fix._ORIGINAL_INFER(mesh, damage, tip, 1.0)
+    fixed_direction = front_fix.infer_front_direction(mesh, damage, tip, 1.0)
 
     assert abs(float(inherited_direction @ np.array([1.0, 0.0]))) < 0.1
     assert float(fixed_direction @ np.array([1.0, 0.0])) > 0.999
@@ -65,10 +61,10 @@ def test_wake_aligned_pca_is_preserved():
     damage = np.ones(mesh.ne)
     tip = np.array([1.0, 0.0])
 
-    fixed_direction = infer_front_direction(mesh, damage, tip, 1.0)
+    fixed_direction = front_fix.infer_front_direction(mesh, damage, tip, 1.0)
 
     assert float(fixed_direction @ np.array([1.0, 0.0])) > 0.999
-    assert 0.0 < DEFAULT_MINIMUM_ALIGNMENT_COSINE < 1.0
+    assert 0.0 < front_fix.DEFAULT_MINIMUM_ALIGNMENT_COSINE < 1.0
 
 
 def test_campaign_and_capture_entries_install_fix():
