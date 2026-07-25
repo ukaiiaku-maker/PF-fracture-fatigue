@@ -22,6 +22,12 @@ EXPECTED_CANDIDATES = [
     "v913_zeroD_sobol_0257068",
     "v913_zeroD_sobol_0189364",
 ]
+EXPECTED_SOURCE_CLASSES = {
+    "v913_paper_peak01_0242980_persistent_sites": "DBTT",
+    "v913_paper_dbtt01_0202500_persistent_sites": "DBTT",
+    "v913_paper_weakT01_0257068_persistent_sites": "weakT",
+    "v913_paper_ceramic01_0189364_persistent_sites": "ceramic",
+}
 FORBIDDEN = {
     "weakT_primary",
     "weakT_restart00_candidate00",
@@ -57,6 +63,9 @@ def test_generated_registry_exact_order_and_candidates(tmp_path: Path) -> None:
         rows = list(csv.DictReader(stream))
     assert [row["option_key"] for row in rows] == EXPECTED_OPTIONS
     assert [row["candidate_id"] for row in rows] == EXPECTED_CANDIDATES
+    assert {row["option_key"]: row["material_class"] for row in rows} == (
+        EXPECTED_SOURCE_CLASSES
+    )
     assert not FORBIDDEN.intersection(
         value for row in rows for value in row.values()
     )
@@ -79,6 +88,36 @@ def test_entry_has_stable_four_option_mapping() -> None:
     assert list(entry.VALID_OPTIONS.values()) == EXPECTED_CANDIDATES
     assert entry.MODEL_ID.startswith("v10.2.27")
     assert entry.DEFAULT_REGISTRY.name == "v10_2_27_paper_four_class_registry.csv"
+
+
+def test_entry_normalizes_only_legacy_loader_class(tmp_path: Path) -> None:
+    from arrhenius_fracture import sharp_front_v10_2_27 as entry
+
+    registry = tmp_path / "four_class.csv"
+    selection = tmp_path / "four_class.json"
+    subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "install_v10_2_27_four_class_registry.py"),
+            "--output-registry",
+            str(registry),
+            "--output-selection",
+            str(selection),
+        ],
+        cwd=ROOT,
+        check=True,
+    )
+
+    for option, source_class in EXPECTED_SOURCE_CLASSES.items():
+        selected = entry._select_option_four_class(
+            option,
+            registry,
+            canonical_stage3_only=False,
+        )
+        assert selected.material_class == "DBTT"
+        assert selected.row["material_class"] == source_class
+        assert selected.option_key == option
+        assert selected.candidate_id == entry.VALID_OPTIONS[option]
 
 
 def test_seed_contract_has_48_unique_seeds() -> None:
