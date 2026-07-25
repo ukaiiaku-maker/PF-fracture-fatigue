@@ -38,8 +38,8 @@ def _validate_artifacts(
     manifest_path = snapshot_root / "kernel_capture_manifest.json"
     if not manifest_path.is_file():
         raise ValueError(
-            "snapshot mechanics lack a v10.2.27 configuration manifest. Legacy "
-            "archives cannot be assumed compatible; recalculate from the requested "
+            "snapshot mechanics lack a v10.2.27 configuration manifest. "
+            "Legacy archives cannot be assumed compatible; recalculate from the requested "
             "mechanical configuration instead."
         )
     manifest = json.loads(manifest_path.read_text())
