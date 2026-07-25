@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Resolve, restore, or build the signed FEM kernel required by a campaign.
 
-Production runners request a mechanical configuration and coverage; they do not
-require a pre-existing FAMILY_JSON pathname.
+This is the user-facing kernel contract. Production runners request a
+mechanical configuration and coverage; they do not require a pre-existing
+FAMILY_JSON pathname.
 """
 from __future__ import annotations
 
@@ -32,7 +33,6 @@ from arrhenius_fracture.kernel_registry_v10227 import (  # noqa: E402
     resolve_repo_path,
     select_entry,
     select_recipe,
-    sha256_file,
     update_local_registry,
     validate_family,
 )
@@ -71,17 +71,14 @@ def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
         ).canonical_payload()
     payload.update(
         {
-            "profile_id": args.mechanical_profile
-            or payload.get("profile_id", DEFAULT_PROFILE_ID),
+            "profile_id": args.mechanical_profile or payload.get("profile_id", DEFAULT_PROFILE_ID),
             "theta_deg": float(args.theta_deg),
             "branching_mode": args.branching_mode,
             "maximum_fronts": int(args.maximum_fronts),
         }
     )
     if args.initial_crack_length_um is not None:
-        payload["initial_crack_length_m"] = (
-            float(args.initial_crack_length_um) * 1.0e-6
-        )
+        payload["initial_crack_length_m"] = float(args.initial_crack_length_um) * 1.0e-6
     if args.interaction_length_um is not None:
         payload["interaction_length_m"] = float(args.interaction_length_um) * 1.0e-6
     if args.temperature_dependent_mechanics:
@@ -144,13 +141,9 @@ def main() -> int:
     parser.add_argument("--temperature-dependent-mechanics", action="store_true")
     parser.add_argument("--temperature-K", type=float)
     parser.add_argument("--family-override", type=Path)
+    parser.add_argument("--mode", choices=("auto", "reuse-only", "build"), default="auto")
     parser.add_argument(
-        "--mode", choices=("auto", "reuse-only", "build"), default="auto"
-    )
-    parser.add_argument(
-        "--cache-root",
-        type=Path,
-        default=ROOT / "runs" / "v10_2_27_kernel_cache",
+        "--cache-root", type=Path, default=ROOT / "runs" / "v10_2_27_kernel_cache"
     )
     parser.add_argument(
         "--tracked-registry",
@@ -183,8 +176,7 @@ def main() -> int:
         if not _coverage_ok(audit, required_um):
             raise SystemExit(
                 "explicit kernel override lacks required coverage: "
-                f"maximum={audit['maximum_extension_um']:.9g} um, "
-                f"required={required_um:.9g} um"
+                f"maximum={audit['maximum_extension_um']:.9g} um, required={required_um:.9g} um"
             )
         result = {
             "resolution": "explicit_override",
@@ -209,8 +201,7 @@ def main() -> int:
     with kernel_lock(lock_path):
         cache_dir.mkdir(parents=True, exist_ok=True)
         config_path.write_text(
-            json.dumps(configuration.canonical_payload(), indent=2, sort_keys=True)
-            + "\n"
+            json.dumps(configuration.canonical_payload(), indent=2, sort_keys=True) + "\n"
         )
 
         if args.mode == "build" and family_out.exists():
@@ -268,19 +259,7 @@ def main() -> int:
         if args.mode == "reuse-only":
             raise SystemExit(
                 "no validated kernel covers the requested mechanical configuration; "
-                f"configuration_fingerprint={fingerprint}, "
-                f"required_max_extension_um={required_um:.9g}"
-            )
-
-        if (
-            configuration.branching_mode != "single_front"
-            or configuration.maximum_fronts != 1
-        ):
-            raise SystemExit(
-                "no branch-aware kernel provider is registered for this configuration. "
-                "A fixed single-front extension atlas cannot represent branch interaction; "
-                "register a topology_cached or direct_fem builder. "
-                f"configuration_fingerprint={fingerprint}"
+                f"configuration_fingerprint={fingerprint}, required_max_extension_um={required_um:.9g}"
             )
 
         recipe = select_recipe(tracked_registry, configuration.canonical_payload())
@@ -290,9 +269,7 @@ def main() -> int:
             if snapshot_archive is None and recipe.get("snapshot_archive"):
                 snapshot_archive = resolve_repo_path(ROOT, recipe["snapshot_archive"])
             if load_archive is None and recipe.get("load_invariance_archive"):
-                load_archive = resolve_repo_path(
-                    ROOT, recipe["load_invariance_archive"]
-                )
+                load_archive = resolve_repo_path(ROOT, recipe["load_invariance_archive"])
 
         if snapshot_archive is not None and load_archive is not None:
             missing = [
@@ -302,22 +279,18 @@ def main() -> int:
             ]
             if missing:
                 raise SystemExit(
-                    "registered mechanics artifacts are missing; restore or commit these "
-                    "compact inputs rather than searching for an old run directory: "
-                    + ", ".join(missing)
+                    "registered mechanics artifacts are missing; restore or commit these compact "
+                    "inputs rather than searching for an old run directory: " + ", ".join(missing)
                 )
             if recipe is not None:
+                from arrhenius_fracture.kernel_registry_v10227 import sha256_file
+
                 expected_snapshot_sha = recipe.get("snapshot_archive_sha256")
                 expected_load_sha = recipe.get("load_invariance_archive_sha256")
-                if (
-                    expected_snapshot_sha
-                    and sha256_file(snapshot_archive) != expected_snapshot_sha
-                ):
+                if expected_snapshot_sha and sha256_file(snapshot_archive) != expected_snapshot_sha:
                     raise SystemExit("registered snapshot archive SHA-256 mismatch")
                 if expected_load_sha and sha256_file(load_archive) != expected_load_sha:
-                    raise SystemExit(
-                        "registered load-invariance archive SHA-256 mismatch"
-                    )
+                    raise SystemExit("registered load-invariance archive SHA-256 mismatch")
             _emit(
                 "Building signed kernel from portable mechanics artifacts for "
                 f"configuration {fingerprint[:12]}"
@@ -325,11 +298,7 @@ def main() -> int:
             _run_builder(
                 [
                     sys.executable,
-                    str(
-                        ROOT
-                        / "scripts"
-                        / "build_v10_2_27_kernel_from_mechanics_artifacts.py"
-                    ),
+                    str(ROOT / "scripts" / "build_v10_2_27_kernel_from_mechanics_artifacts.py"),
                     "--snapshot-archive",
                     str(Path(snapshot_archive).expanduser().resolve()),
                     "--load-invariance-archive",
@@ -363,9 +332,12 @@ def main() -> int:
                     "V10227_KERNEL_CACHE_DIR": str(cache_dir),
                     "V10227_KERNEL_FAMILY_OUT": str(family_out),
                     "V10227_KERNEL_REQUIRED_MAX_EXTENSION_UM": f"{required_um:.17g}",
-                    "V10227_KERNEL_TARGET_EXTENSION_UM": (
-                        f"{args.target_extension_um:.17g}"
-                    ),
+                    "V10227_KERNEL_TARGET_EXTENSION_UM": f"{args.target_extension_um:.17g}",
+                    "V10227_KERNEL_THETA_DEG": f"{args.theta_deg:.17g}",
+                    "V10227_KERNEL_DA_PHYS_UM": f"{args.da_phys_um:.17g}",
+                    "V10227_KERNEL_EVENT_MINIMUM_FACTOR": f"{args.event_minimum_factor:.17g}",
+                    "V10227_KERNEL_EVENT_MAXIMUM_FACTOR": f"{args.event_maximum_factor:.17g}",
+                    "V10227_KERNEL_MARGIN_EVENTS": f"{args.margin_events:.17g}",
                 }
             )
             _emit(
@@ -373,6 +345,13 @@ def main() -> int:
                 f"{fingerprint[:12]}"
             )
             _run_builder(shlex.split(args.builder_command), env=environment)
+        elif configuration.branching_mode != "single_front" or configuration.maximum_fronts != 1:
+            raise SystemExit(
+                "no branch-aware kernel provider is registered for this configuration. "
+                "A fixed single-front extension atlas cannot represent branch interaction; "
+                "register a topology_cached or direct_fem builder through --builder-command. "
+                f"configuration_fingerprint={fingerprint}"
+            )
         else:
             raise SystemExit(
                 "no kernel or automatic builder is registered for the requested mechanical "
@@ -386,8 +365,7 @@ def main() -> int:
         if not _coverage_ok(audit, required_um):
             raise SystemExit(
                 "newly built kernel lacks required coverage: "
-                f"maximum={audit['maximum_extension_um']:.9g} um, "
-                f"required={required_um:.9g} um"
+                f"maximum={audit['maximum_extension_um']:.9g} um, required={required_um:.9g} um"
             )
         entry = {
             "configuration_fingerprint": fingerprint,
