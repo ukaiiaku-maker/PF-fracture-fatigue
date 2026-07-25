@@ -1,8 +1,8 @@
-"""Canonical mechanical-configuration identity for v10.2.27 shielding kernels.
+"""Canonical mechanical identity for v10.2.27 signed FEM shielding kernels.
 
-Material kinetics, temperatures with fixed mechanics, random seeds, and plotting
-settings deliberately do not enter this identity. The fingerprint represents
-only the mechanical problem whose signed FEM response is being cached.
+Only quantities that can change the static FEM response or the crack geometry
+used to sample it belong in this identity. Material kinetics, stochastic seeds,
+plotting settings, and the requested coverage do not.
 """
 from __future__ import annotations
 
@@ -13,8 +13,8 @@ import math
 from pathlib import Path
 from typing import Any, Mapping
 
-SCHEMA = "v10.2.27_mechanical_kernel_configuration_v1"
-DEFAULT_PROFILE_ID = "v10_2_27_default_single_front_frontfix"
+SCHEMA = "v10.2.27_mechanical_kernel_configuration_v2"
+DEFAULT_PROFILE_ID = "v10_2_27_current_single_front_frontfix"
 NON_MECHANICAL_KEYS = {
     "candidate_id",
     "hazard_seed",
@@ -68,14 +68,24 @@ class MechanicalKernelConfiguration:
     specimen_geometry_id: str = "v10.2.27_default_specimen"
     boundary_condition_id: str = "v10.2.27_mode_I_displacement"
     mesh_policy_id: str = "v10.2.27_front_direction_fix_mesh"
+    mesh_nx: int = 36
+    mesh_ny: int = 72
+    tip_h_fine_m: float = 1.0e-6
+    tip_ratio: float = 1.20
     process_zone_policy_id: str = "dynamic_tip_radius_physical_front_width"
+    process_zone_length_m: float = 50.0e-6
+    process_zone_bins: int = 80
     active_station_policy_id: str = "v10.2.14_measured_active_stations"
+    interaction_length_m: float = 2.0e-6
+    atlas_anchor_spacing_m: float = 200.0e-6
+    minimum_elements_per_process_zone: float = 3.0
+    da_phys_m: float = 5.0e-6
     signed_channel_convention: str = "v10.2.27_signed_mobile_retained_channels"
     front_direction_convention: str = "v10.2.27_front_direction_fix"
-    normalization_policy: str = "derive_v10.2.12_from_snapshot_engine_config"
+    normalization_policy: str = "derive_v10.2.12_from_captured_engine_config"
     elasticity_policy: str = "runtime_engine_configuration"
+    kernel_provider_id: str = "v10.2.27_current_configuration_fem_recalculation_v1"
     initial_crack_length_m: float | None = None
-    interaction_length_m: float | None = None
     temperature_dependent_mechanics: bool = False
     temperature_K: float | None = None
     extra: Mapping[str, Any] = field(default_factory=dict)
@@ -95,10 +105,25 @@ class MechanicalKernelConfiguration:
             raise ValueError("single_front mode requires maximum_fronts=1")
         if self.branching_mode != "single_front" and int(self.maximum_fronts) < 2:
             raise ValueError("branch-aware modes require maximum_fronts>=2")
-        for name in ("initial_crack_length_m", "interaction_length_m"):
-            value = getattr(self, name)
-            if value is not None and (not math.isfinite(float(value)) or float(value) <= 0.0):
-                raise ValueError(f"{name} must be positive and finite when supplied")
+        for name in ("mesh_nx", "mesh_ny", "process_zone_bins"):
+            if int(getattr(self, name)) < 2:
+                raise ValueError(f"{name} must be at least two")
+        for name in (
+            "tip_h_fine_m",
+            "tip_ratio",
+            "process_zone_length_m",
+            "interaction_length_m",
+            "atlas_anchor_spacing_m",
+            "minimum_elements_per_process_zone",
+            "da_phys_m",
+        ):
+            value = float(getattr(self, name))
+            if not math.isfinite(value) or value <= 0.0:
+                raise ValueError(f"{name} must be positive and finite")
+        if self.initial_crack_length_m is not None:
+            value = float(self.initial_crack_length_m)
+            if not math.isfinite(value) or value <= 0.0:
+                raise ValueError("initial_crack_length_m must be positive and finite")
         if self.temperature_dependent_mechanics:
             if self.temperature_K is None or not math.isfinite(float(self.temperature_K)):
                 raise ValueError(
