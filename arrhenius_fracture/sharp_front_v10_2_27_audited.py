@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 from . import sharp_front_v10_2_27 as _entry
+from .anisotropic_front_direction_fix_v10227 import (
+    install_front_direction_fix,
+)
 from .persistent_site_audited_engine_v10221 import (
     AuditedPersistentSiteStateResolvedTipEngine,
 )
@@ -12,6 +15,7 @@ from .persistent_site_physical_width_v10222 import install_physical_front_width
 
 
 def main(argv=None):
+    install_front_direction_fix()
     install_backstress_complementarity_fix()
     install_physical_front_width()
     original = _entry.PersistentSiteStateResolvedTipEngine
