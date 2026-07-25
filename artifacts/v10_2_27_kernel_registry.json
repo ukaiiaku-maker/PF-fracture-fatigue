@@ -1,40 +1,16 @@
 {
   "schema": "v10.2.27_kernel_registry_v1",
   "entries": [],
-  "recipes": [
-    {
-      "id": "theta30_frontfix_E000_E1200_v2_portable_mechanics",
-      "match": {
-        "profile_id": "v10_2_27_default_single_front_frontfix",
-        "theta_deg": 30.0,
-        "nominal_crack_angle_deg": 0.0,
-        "branching_mode": "single_front",
-        "maximum_fronts": 1,
-        "mechanics_backend": "v10.2.27_sharp_front_fem",
-        "specimen_geometry_id": "v10.2.27_default_specimen",
-        "boundary_condition_id": "v10.2.27_mode_I_displacement",
-        "mesh_policy_id": "v10.2.27_front_direction_fix_mesh",
-        "process_zone_policy_id": "dynamic_tip_radius_physical_front_width",
-        "active_station_policy_id": "v10.2.14_measured_active_stations",
-        "signed_channel_convention": "v10.2.27_signed_mobile_retained_channels",
-        "front_direction_convention": "v10.2.27_front_direction_fix",
-        "normalization_policy": "derive_v10.2.12_from_snapshot_engine_config",
-        "elasticity_policy": "runtime_engine_configuration",
-        "initial_crack_length_m": null,
-        "interaction_length_m": null,
-        "temperature_dependent_mechanics": false,
-        "temperature_K": null,
-        "extra": {}
-      },
-      "provider_mode": "single_front",
-      "builder": "portable_mechanics_artifacts",
-      "snapshot_archive": "artifacts/v10_2_27_theta30_frontfix/v10_2_27_frozen_geometry_snapshots_700K_theta30_frontfix_E000_E1200_v2.zip",
-      "snapshot_archive_sha256": "8a4bc221447aa98e8b56b3a1797f42224b6c1bda4da124c37ab2448fd8e4b5ae",
-      "load_invariance_archive": "artifacts/v10_2_27_theta30_frontfix/v10_2_27_active_load_invariance_700K_theta30_frontfix_E000_E1200_v2.zip",
-      "load_invariance_archive_sha256": "e71d9dcae52129a175100fa56f3f0445105536598bc21d160624c75b5b52b919",
-      "legacy_family_file_sha256": "35710f0c2f003bea5367d101f0ad27bc93625b0a631dc3f139c6af6a6cfaafbb",
-      "normalization_policy": "derive_v10.2.12_from_snapshot_engine_config",
-      "notes": "Exact portable rebuild recipe for the accepted unbranched theta=30 degree mechanics. Any change in orientation, crack geometry, specimen/BC identity, mesh/process-zone policy, station convention, interaction length, elasticity policy, or topology requires a different cache entry or builder."
-    }
-  ]
+  "recipes": [],
+  "policy": {
+    "default_resolution": "recalculate_from_current_mechanical_configuration",
+    "historical_reference_condition_required": false,
+    "portable_archives_are_optional_cache_accelerators": true,
+    "portable_archives_are_required_inputs": false,
+    "legacy_archives_without_configuration_fingerprint_are_rejected": true,
+    "target_extension_is_coverage_not_configuration_identity": true,
+    "single_front_missing_kernel_action": "capture_current_geometry_then_recalculate_load_invariance",
+    "branching_missing_kernel_action": "require_topology_cached_or_direct_fem_provider"
+  },
+  "notes": "No tracked archive recipe is authoritative. Missing or short single-front kernels are regenerated from the requested theta, mesh, process-zone geometry, interaction length, elasticity policy, and coverage."
 }
