@@ -23,6 +23,7 @@ fi
   tests/test_v10_2_27_zero_event_summary.py \
   tests/test_v10_2_27_K_vs_temperature_postprocess.py \
   tests/test_v10_2_27_J_vs_temperature_postprocess.py \
-  tests/test_v10_2_27_kernel_resolution.py
+  tests/test_v10_2_27_kernel_resolution.py \
+  tests/test_v10_2_27_kernel_runtime_contract.py
 
 echo "v10.2.27 four-class campaign installation and preflight checks passed."
