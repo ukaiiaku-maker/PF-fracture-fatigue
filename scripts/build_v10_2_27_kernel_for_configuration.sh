@@ -129,4 +129,4 @@ else
   ARGS+=(--load-invariance-root "$LOAD_ROOT")
 fi
 
-exec "$PYTHON_BIN" scripts/build_v10_2_27_kernel_from_mechanics_artifacts.py "${ARGS[@]}"
+exec "$PYTHON_BIN" scripts/build_v10_2_27_kernel_from_current_mechanics.py "${ARGS[@]}"
