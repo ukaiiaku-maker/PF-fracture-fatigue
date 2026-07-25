@@ -31,3 +31,7 @@ bash scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves.sh "$@"
 "$PYTHON_BIN" scripts/plot_v10_2_27_paper_four_class_K_vs_temperature.py \
   --outroot "$OUTROOT" \
   --target-extension-um "$TARGET_EXT_UM"
+
+"$PYTHON_BIN" scripts/plot_v10_2_27_paper_four_class_J_energy_vs_temperature.py \
+  --outroot "$OUTROOT" \
+  --target-extension-um "$TARGET_EXT_UM"
