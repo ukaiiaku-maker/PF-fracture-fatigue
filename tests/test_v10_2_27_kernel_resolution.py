@@ -5,6 +5,8 @@ from pathlib import Path
 import subprocess
 import sys
 
+import pytest
+
 from arrhenius_fracture.kernel_configuration_v10227 import (
     MechanicalKernelConfiguration,
 )
@@ -43,6 +45,13 @@ def test_material_or_seed_fields_do_not_change_mechanical_identity():
     assert enriched.fingerprint() == base.fingerprint()
 
 
+def test_unknown_configuration_fields_fail_closed():
+    payload = MechanicalKernelConfiguration().canonical_payload()
+    payload["mystery_parameter"] = 42
+    with pytest.raises(ValueError, match="unknown mechanical-configuration keys"):
+        MechanicalKernelConfiguration.from_mapping(payload)
+
+
 def test_path_independent_family_physics_fingerprint(tmp_path: Path):
     common = {
         "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
@@ -61,13 +70,22 @@ def test_path_independent_family_physics_fingerprint(tmp_path: Path):
     assert family_physics_fingerprint(first_path) == family_physics_fingerprint(second_path)
 
 
-def test_default_theta30_recipe_is_registered():
+def test_default_theta30_recipe_is_exactly_registered():
     registry = load_registry(ROOT / "artifacts" / "v10_2_27_kernel_registry.json")
     configuration = MechanicalKernelConfiguration().canonical_payload()
     recipe = select_recipe(registry, configuration)
     assert recipe is not None
     assert recipe["builder"] == "portable_mechanics_artifacts"
     assert recipe["normalization_policy"] == "derive_v10.2.12_from_snapshot_engine_config"
+
+    changed_crack = MechanicalKernelConfiguration(
+        initial_crack_length_m=2.5e-4
+    ).canonical_payload()
+    changed_mesh = MechanicalKernelConfiguration(
+        mesh_policy_id="different_mesh"
+    ).canonical_payload()
+    assert select_recipe(registry, changed_crack) is None
+    assert select_recipe(registry, changed_mesh) is None
 
 
 def test_official_runners_resolve_kernels_instead_of_hardcoding_run_paths():
