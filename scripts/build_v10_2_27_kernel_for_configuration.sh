@@ -26,7 +26,7 @@ EVENT_MINIMUM_FACTOR=${V10227_KERNEL_EVENT_MINIMUM_FACTOR:-${CLEAVAGE_EVENT_MIN_
 EVENT_MAXIMUM_FACTOR=${V10227_KERNEL_EVENT_MAXIMUM_FACTOR:-${CLEAVAGE_EVENT_MAX_FACTOR:-4.0}}
 MARGIN_EVENTS=${V10227_KERNEL_MARGIN_EVENTS:-${KERNEL_MARGIN_EVENTS:-1}}
 
-read -r THETA BRANCHING_MODE MAX_FRONTS CAPTURE_TEMPERATURE_K C11 C12 C44 < <(
+read -r THETA BRANCHING_MODE MAX_FRONTS CAPTURE_TEMPERATURE_K C11 C12 C44 PZ_LENGTH_M < <(
   "$PYTHON_BIN" - "$CONFIG" <<'PY'
 import json
 import sys
@@ -40,6 +40,7 @@ print(
     payload["crystal_C11_Pa"],
     payload["crystal_C12_Pa"],
     payload["crystal_C44_Pa"],
+    payload["process_zone_length_m"],
 )
 PY
 )
@@ -106,7 +107,7 @@ if [[ -z "$LOAD_ARCHIVE" && -z "$LOAD_ROOT" ]]; then
     state=$(basename "$state_root")
     destination="$LOAD_ROOT/$state"
     found=$((found + 1))
-    echo "RECALCULATE load invariance: $state" >&2
+    echo "RECALCULATE load invariance endpoints: $state" >&2
     "$PYTHON_BIN" scripts/evaluate_v10_2_14_active_load_invariance.py \
       --snapshot "$state_root" \
       --outroot "$destination" \
@@ -114,7 +115,8 @@ if [[ -z "$LOAD_ARCHIVE" && -z "$LOAD_ROOT" ]]; then
       --magnitudes 0.25 0.50 \
       --linearity-tolerance 0.03 \
       --load-invariance-tolerance 0.05 \
-      --minimum-residual-stiffness-fraction 0.001
+      --minimum-residual-stiffness-fraction 0.001 \
+      --minimum-station-spacing-m "$PZ_LENGTH_M"
   done < <(find "$SNAPSHOT_ROOT" -mindepth 2 -maxdepth 2 -name snapshot.json -type f | sort)
   if [[ "$found" -lt 2 ]]; then
     echo "ERROR: current-configuration capture produced fewer than two frozen states" >&2
