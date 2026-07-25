@@ -13,7 +13,7 @@ import math
 from pathlib import Path
 from typing import Any, Mapping
 
-SCHEMA = "v10.2.27_mechanical_kernel_configuration_v2"
+SCHEMA = "v10.2.27_mechanical_kernel_configuration_v3"
 DEFAULT_PROFILE_ID = "v10_2_27_current_single_front_frontfix"
 PROFILE_ALIASES = {
     "v10_2_27_default_single_front_frontfix": DEFAULT_PROFILE_ID,
@@ -90,7 +90,10 @@ class MechanicalKernelConfiguration:
     signed_channel_convention: str = "v10.2.27_signed_mobile_retained_channels"
     front_direction_convention: str = "v10.2.27_front_direction_fix"
     normalization_policy: str = "derive_v10.2.12_from_captured_engine_config"
-    elasticity_policy: str = "runtime_engine_configuration"
+    elasticity_policy: str = "cubic_plane_strain_explicit_constants"
+    crystal_C11_Pa: float = 523.0e9
+    crystal_C12_Pa: float = 203.0e9
+    crystal_C44_Pa: float = 160.0e9
     kernel_provider_id: str = "v10.2.27_current_configuration_fem_recalculation_v1"
     temperature_dependent_mechanics: bool = False
     temperature_K: float | None = None
@@ -126,10 +129,15 @@ class MechanicalKernelConfiguration:
             "atlas_anchor_spacing_m",
             "minimum_elements_per_process_zone",
             "da_phys_m",
+            "crystal_C11_Pa",
+            "crystal_C12_Pa",
+            "crystal_C44_Pa",
         ):
             value = float(getattr(self, name))
             if not math.isfinite(value) or value <= 0.0:
                 raise ValueError(f"{name} must be positive and finite")
+        if self.crystal_C11_Pa <= self.crystal_C12_Pa:
+            raise ValueError("cubic elasticity requires crystal_C11_Pa > crystal_C12_Pa")
         if self.initial_crack_length_m >= self.specimen_length_x_m:
             raise ValueError("initial_crack_length_m must be smaller than specimen_length_x_m")
         if 2.0 * self.notch_half_thickness_m >= self.specimen_length_y_m:
