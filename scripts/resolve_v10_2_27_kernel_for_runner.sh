@@ -28,9 +28,11 @@ ARGS=(
   --margin-events "$KERNEL_MARGIN_EVENTS"
 )
 
-if [[ -n "$MECHANICAL_PROFILE" ]]; then
+if [[ -n "${MECHANICAL_CONFIG:-}" && "${MECHANICAL_PROFILE_OVERRIDE:-0}" != "1" ]]; then
+  : # Preserve the profile embedded in the explicit mechanical configuration.
+elif [[ -n "$MECHANICAL_PROFILE" ]]; then
   ARGS+=(--mechanical-profile "$MECHANICAL_PROFILE")
-elif [[ -z "${MECHANICAL_CONFIG:-}" ]]; then
+else
   ARGS+=(--mechanical-profile v10_2_27_default_single_front_frontfix)
 fi
 
