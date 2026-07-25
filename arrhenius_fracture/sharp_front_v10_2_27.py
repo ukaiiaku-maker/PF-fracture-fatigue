@@ -28,8 +28,6 @@ def _select_option_four_class(*args, **kwargs):
     source_class = selected.material_class.strip().lower()
     if source_class not in {"peak", "dbtt", "weakt", "ceramic"}:
         raise ValueError(f"unexpected v10.2.27 material class: {selected.material_class!r}")
-    # The inherited v10.2.22 loader exposes only its DBTT mechanics route. Keep the
-    # exact paper class in selected.row while normalizing only the legacy loader tag.
     if source_class == "dbtt":
         return selected
     return replace(selected, material_class="DBTT")
@@ -71,15 +69,40 @@ def _append_cli_mechanics(command: list[str], args: list[str]) -> None:
         ("--tip-ratio", "--tip-ratio", 1.0),
         ("--da-phys", "--da-phys-um", 1.0e6),
     )
+    integers = {"--process-zone-bins", "--mesh-nx", "--mesh-ny"}
     for source, destination, scale in mappings:
         raw = _option_value(args, source)
         if raw is None:
             continue
-        if destination in {"--process-zone-bins", "--mesh-nx", "--mesh-ny"}:
-            value = str(int(round(float(raw))))
-        else:
-            value = f"{float(raw) * scale:.17g}"
+        value = (
+            str(int(round(float(raw))))
+            if destination in integers
+            else f"{float(raw) * scale:.17g}"
+        )
         command.extend([destination, value])
+
+
+def _install_resolved_geometry(family: Path) -> None:
+    payload = json.loads(family.read_text())
+    configuration = payload.get("mechanical_configuration")
+    if not isinstance(configuration, dict):
+        raise SystemExit(
+            "resolved signed-kernel family lacks explicit mechanical configuration"
+        )
+    mapping = {
+        "specimen_length_x_m": "V10227_SPECIMEN_LX_M",
+        "specimen_length_y_m": "V10227_SPECIMEN_LY_M",
+        "initial_crack_length_m": "V10227_INITIAL_CRACK_LENGTH_M",
+        "notch_half_thickness_m": "V10227_NOTCH_HALF_THICKNESS_M",
+    }
+    for key, environment_name in mapping.items():
+        value = configuration.get(key)
+        if value is None:
+            raise SystemExit(f"resolved mechanical configuration lacks {key}")
+        os.environ[environment_name] = f"{float(value):.17g}"
+    os.environ["V10227_MECHANICAL_CONFIGURATION_FINGERPRINT"] = str(
+        payload.get("mechanical_configuration_fingerprint", "")
+    )
 
 
 def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
@@ -90,13 +113,19 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
     )
     _remove_value_option(args, "--signed-kernel-family")
 
+    supplied_path = Path(supplied).expanduser() if supplied else None
     mechanical_config = os.environ.get("MECHANICAL_CONFIG", "").strip()
+    if not mechanical_config and supplied_path is not None and supplied_path.is_file():
+        sibling = supplied_path.resolve().parent / "mechanical_configuration.json"
+        if sibling.is_file():
+            mechanical_config = str(sibling)
+
     official_profile = os.environ.get("PARAMETER_CAMPAIGN", "0") == "1"
     if not mechanical_config and not official_profile:
         raise SystemExit(
             "automatic v10.2.27 kernel resolution outside the fixed paper runner requires "
-            "MECHANICAL_CONFIG. This prevents an arbitrary direct module invocation from "
-            "being treated as the default specimen/mesh/crack configuration."
+            "MECHANICAL_CONFIG. This prevents an arbitrary invocation from being treated "
+            "as the default specimen/mesh/crack configuration."
         )
 
     theta = float(_option_value(args, "--crystal-theta-deg", os.environ.get("THETA", "30")))
@@ -132,28 +161,32 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
     mechanical_profile = os.environ.get("MECHANICAL_PROFILE", "").strip()
     if mechanical_profile:
         command.extend(["--mechanical-profile", mechanical_profile])
+    if mechanical_config:
+        command.extend(["--mechanical-config", mechanical_config])
     optional = (
-        ("MECHANICAL_CONFIG", "--mechanical-config"),
         ("KERNEL_BUILD_COMMAND", "--builder-command"),
         ("KERNEL_SNAPSHOT_ARCHIVE", "--snapshot-archive"),
         ("KERNEL_LOAD_INVARIANCE_ARCHIVE", "--load-invariance-archive"),
         ("KERNEL_ATLAS_ANCHOR_SPACING_UM", "--atlas-anchor-spacing-um"),
         ("KERNEL_INTERACTION_LENGTH_UM", "--interaction-length-um"),
         ("KERNEL_MIN_ELEMENTS_PER_PZ", "--minimum-elements-per-process-zone"),
+        ("SPECIMEN_LENGTH_X_UM", "--specimen-length-x-um"),
+        ("SPECIMEN_LENGTH_Y_UM", "--specimen-length-y-um"),
+        ("INITIAL_CRACK_LENGTH_UM", "--initial-crack-length-um"),
+        ("NOTCH_HALF_THICKNESS_UM", "--notch-half-thickness-um"),
     )
     for environment_name, command_option in optional:
         value = os.environ.get(environment_name, "").strip()
         if value:
             command.extend([command_option, value])
-    if supplied:
-        source = Path(supplied).expanduser()
-        if source.is_file():
-            command.extend(["--family-override", str(source.resolve())])
+    if supplied_path is not None:
+        if supplied_path.is_file():
+            command.extend(["--family-override", str(supplied_path.resolve())])
         elif os.environ.get("KERNEL_STRICT_FAMILY_OVERRIDE", "0") == "1":
-            raise SystemExit(f"explicit signed-kernel family is missing: {source}")
+            raise SystemExit(f"explicit signed-kernel family is missing: {supplied_path}")
         else:
             print(
-                f"Ignoring stale signed-kernel path; recalculating if needed: {source}",
+                f"Ignoring stale signed-kernel path; recalculating if needed: {supplied_path}",
                 file=sys.stderr,
             )
 
@@ -172,14 +205,16 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
             + completed.stdout
             + completed.stderr
         )
-    family = completed.stdout.strip().splitlines()[-1] if completed.stdout.strip() else ""
-    if not family or not Path(family).is_file():
-        raise SystemExit(f"kernel resolver did not return a valid family path: {family!r}")
-    family = str(Path(family).resolve())
-    args.extend(["--signed-kernel-family", family])
-    os.environ["SIGNED_KERNEL_FAMILY_JSON"] = family
-    automatically = not bool(supplied and Path(supplied).expanduser().is_file())
-    return family, automatically
+    family_text = completed.stdout.strip().splitlines()[-1] if completed.stdout.strip() else ""
+    family = Path(family_text).expanduser()
+    if not family.is_file():
+        raise SystemExit(f"kernel resolver did not return a valid family path: {family_text!r}")
+    family = family.resolve()
+    _install_resolved_geometry(family)
+    args.extend(["--signed-kernel-family", str(family)])
+    os.environ["SIGNED_KERNEL_FAMILY_JSON"] = str(family)
+    automatically = not bool(supplied_path is not None and supplied_path.is_file())
+    return str(family), automatically
 
 
 def main(argv=None):
@@ -247,6 +282,9 @@ def main(argv=None):
                 "front_width_grid_independent": True,
                 "signed_kernel_resolved_automatically": resolved_automatically,
                 "signed_kernel_family": resolved_family,
+                "mechanical_configuration_fingerprint": os.environ.get(
+                    "V10227_MECHANICAL_CONFIGURATION_FINGERPRINT"
+                ),
             }
             (root / "v10_2_27_paper_four_class_parameter_transfer.json").write_text(
                 json.dumps(payload, indent=2, sort_keys=True) + "\n"
