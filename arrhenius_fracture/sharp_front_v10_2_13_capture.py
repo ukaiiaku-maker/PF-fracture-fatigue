@@ -16,6 +16,10 @@ from .capture_audit_repair_v10213 import (
     repair_capture_audits,
     repair_multitemperature_geometry_summary,
 )
+from .geometry_override_v10227 import (
+    install_geometry_override,
+    restore_geometry_override,
+)
 from .physical_fem_capture_v10213 import (
     MODEL_ID,
     PhysicalFEMCapture,
@@ -80,6 +84,7 @@ def _force_capture_modes(args: list[str]) -> None:
 
 def main(argv=None):
     install_front_direction_fix()
+    install_geometry_override()
     args = list(sys.argv[1:] if argv is None else argv)
     state_table = _pop_value(args, "--atlas-state-table")
     outroot = _pop_value(args, "--atlas-outroot")
@@ -157,7 +162,7 @@ def main(argv=None):
                     "next_step": (
                         "select frozen crack-path extensions and validate load invariance"
                         if trajectory_only
-                        else "run scripts/evaluate_v10_2_13_frozen_geometry_load_invariance.py for every snapshot"
+                        else "run load-invariance evaluation for every snapshot"
                     ),
                 },
                 indent=2,
@@ -168,6 +173,7 @@ def main(argv=None):
         engine_type.step = original_step
         _entry74.wrap_assemble_mechanics = original_factory
         _fem.solve_dirichlet = original_solve
+        restore_geometry_override()
 
 
 if __name__ == "__main__":
