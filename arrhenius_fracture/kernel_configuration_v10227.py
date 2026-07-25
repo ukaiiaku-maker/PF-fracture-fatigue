@@ -104,6 +104,7 @@ class MechanicalKernelConfiguration:
                 raise ValueError(
                     "temperature_K is required when temperature_dependent_mechanics is true"
                 )
+        _normalize(dict(self.extra))
         return self
 
     def canonical_payload(self) -> dict[str, Any]:
@@ -126,8 +127,13 @@ class MechanicalKernelConfiguration:
         for key in list(source):
             if key in NON_MECHANICAL_KEYS:
                 source.pop(key)
-        unknown = {key: source.pop(key) for key in list(source) if key not in known}
-        extra.update(unknown)
+        unknown = sorted(key for key in source if key not in known)
+        if unknown:
+            raise ValueError(
+                "unknown mechanical-configuration keys: "
+                + ", ".join(unknown)
+                + "; put deliberate mechanical extensions inside the explicit 'extra' object"
+            )
         source["extra"] = extra
         return cls(**source).validate()
 
