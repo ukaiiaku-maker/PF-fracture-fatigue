@@ -49,7 +49,7 @@ FAMILY_JSON=$(
   PYTHON_BIN="$PYTHON_BIN" \
   FAMILY_JSON="${FAMILY_JSON:-}" \
   MECHANICAL_CONFIG="${MECHANICAL_CONFIG:-}" \
-  MECHANICAL_PROFILE="${MECHANICAL_PROFILE:-v10_2_27_default_single_front_frontfix}" \
+  MECHANICAL_PROFILE="${MECHANICAL_PROFILE:-v10_2_27_current_single_front_frontfix}" \
   KERNEL_RESOLUTION_MODE="${KERNEL_RESOLUTION_MODE:-auto}" \
   KERNEL_BUILD_COMMAND="${KERNEL_BUILD_COMMAND:-}" \
   KERNEL_SNAPSHOT_ARCHIVE="${KERNEL_SNAPSHOT_ARCHIVE:-}" \
@@ -74,6 +74,22 @@ echo "Resolved signed-kernel family: $FAMILY_JSON"
 
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py --check-only
+
+# Partial replacement is scientifically valid only when retained peak/DBTT cases
+# were produced with the exact same mechanical configuration. Older cases that
+# predate the fingerprint audit cannot be mixed with a newly recalculated kernel.
+# shellcheck disable=SC2086
+"$PYTHON_BIN" scripts/check_v10_2_27_retained_kernel_compatibility.py \
+  --family "$FAMILY_JSON" \
+  --outroot "$OUTROOT" \
+  --options \
+    v913_paper_peak01_0242980_persistent_sites \
+    v913_paper_dbtt01_0202500_persistent_sites \
+  --temperatures $TEMPS \
+  --theta-deg "$THETA" \
+  --base-seed "$HAZARD_SEED" \
+  --seed-option-stride "$SEED_OPTION_STRIDE" \
+  --seed-temperature-stride "$SEED_TEMPERATURE_STRIDE"
 
 OUTROOT="$OUTROOT" TEMPS="$TEMPS" TARGET_EXT_UM="$TARGET_EXT_UM" THETA="$THETA" \
 HAZARD_SEED="$HAZARD_SEED" SEED_OPTION_STRIDE="$SEED_OPTION_STRIDE" \
