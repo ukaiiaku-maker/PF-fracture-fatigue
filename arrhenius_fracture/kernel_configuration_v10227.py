@@ -13,11 +13,17 @@ import math
 from pathlib import Path
 from typing import Any, Mapping
 
-SCHEMA = "v10.2.27_mechanical_kernel_configuration_v3"
+SCHEMA = "v10.2.27_mechanical_kernel_configuration_v4"
 DEFAULT_PROFILE_ID = "v10_2_27_current_single_front_frontfix"
 PROFILE_ALIASES = {
     "v10_2_27_default_single_front_frontfix": DEFAULT_PROFILE_ID,
 }
+# The exact-endpoint response uses a ribbon whose placement-resolution threshold
+# is four times the actual tip element scale.  The graded mesh hbar_tip is modestly
+# larger than --tip-h-fine, so an eightfold safety factor relative to the first
+# bin centre keeps bin zero mechanically resolvable without relying on a fragile
+# equality at the gate.
+ACTIVE_ENDPOINT_TIP_H_SAFETY_FACTOR = 8.0
 NON_MECHANICAL_KEYS = {
     "candidate_id",
     "hazard_seed",
@@ -34,6 +40,21 @@ NON_MECHANICAL_KEYS = {
     "target_extension_um",
     "temperatures_K",
 }
+
+
+def endpoint_resolving_tip_h_fine_m(
+    process_zone_length_m: float,
+    process_zone_bins: int,
+) -> float:
+    """Maximum requested graded-tip spacing for exact active-bin-zero mechanics."""
+    length = float(process_zone_length_m)
+    bins = int(process_zone_bins)
+    if not math.isfinite(length) or length <= 0.0:
+        raise ValueError("process-zone length must be positive and finite")
+    if bins < 2:
+        raise ValueError("process-zone bins must be at least two")
+    first_bin_center = length / (2.0 * bins)
+    return first_bin_center / ACTIVE_ENDPOINT_TIP_H_SAFETY_FACTOR
 
 
 def _normalize(value: Any) -> Any:
@@ -60,6 +81,9 @@ def canonical_json_bytes(payload: Mapping[str, Any]) -> bytes:
     ).encode("utf-8")
 
 
+_DEFAULT_ENDPOINT_TIP_H_M = endpoint_resolving_tip_h_fine_m(50.0e-6, 80)
+
+
 @dataclass(frozen=True)
 class MechanicalKernelConfiguration:
     profile_id: str = DEFAULT_PROFILE_ID
@@ -74,15 +98,15 @@ class MechanicalKernelConfiguration:
     initial_crack_length_m: float = 0.5e-3
     notch_half_thickness_m: float = 0.08e-3
     boundary_condition_id: str = "v10.2.27_mode_I_displacement"
-    mesh_policy_id: str = "v10.2.27_front_direction_fix_mesh"
+    mesh_policy_id: str = "v10.2.27_endpoint_resolved_front_direction_fix_mesh"
     mesh_nx: int = 36
     mesh_ny: int = 72
-    tip_h_fine_m: float = 1.0e-6
+    tip_h_fine_m: float = _DEFAULT_ENDPOINT_TIP_H_M
     tip_ratio: float = 1.20
     process_zone_policy_id: str = "dynamic_tip_radius_physical_front_width"
     process_zone_length_m: float = 50.0e-6
     process_zone_bins: int = 80
-    active_station_policy_id: str = "v10.2.14_measured_active_stations"
+    active_station_policy_id: str = "v10.2.14_exact_first_last_active_stations"
     interaction_length_m: float = 2.0e-6
     atlas_anchor_spacing_m: float = 200.0e-6
     minimum_elements_per_process_zone: float = 3.0
@@ -94,7 +118,7 @@ class MechanicalKernelConfiguration:
     crystal_C11_Pa: float = 523.0e9
     crystal_C12_Pa: float = 203.0e9
     crystal_C44_Pa: float = 160.0e9
-    kernel_provider_id: str = "v10.2.27_current_configuration_fem_recalculation_v1"
+    kernel_provider_id: str = "v10.2.27_current_configuration_fem_recalculation_v2"
     temperature_dependent_mechanics: bool = False
     temperature_K: float | None = None
     extra: Mapping[str, Any] = field(default_factory=dict)
@@ -138,6 +162,18 @@ class MechanicalKernelConfiguration:
                 raise ValueError(f"{name} must be positive and finite")
         if self.crystal_C11_Pa <= self.crystal_C12_Pa:
             raise ValueError("cubic elasticity requires crystal_C11_Pa > crystal_C12_Pa")
+        maximum_tip_h = endpoint_resolving_tip_h_fine_m(
+            self.process_zone_length_m,
+            self.process_zone_bins,
+        )
+        if self.tip_h_fine_m > maximum_tip_h * (1.0 + 1.0e-12):
+            first_center = self.process_zone_length_m / (2.0 * self.process_zone_bins)
+            raise ValueError(
+                "tip_h_fine_m is too coarse for exact active-bin-zero mechanics: "
+                f"tip_h_fine_m={self.tip_h_fine_m:.9g}, "
+                f"maximum={maximum_tip_h:.9g}, first_bin_center={first_center:.9g}. "
+                "Reduce the tip spacing or reduce the active-bin count."
+            )
         if self.initial_crack_length_m >= self.specimen_length_x_m:
             raise ValueError("initial_crack_length_m must be smaller than specimen_length_x_m")
         if 2.0 * self.notch_half_thickness_m >= self.specimen_length_y_m:
@@ -196,8 +232,10 @@ __all__ = [
     "SCHEMA",
     "DEFAULT_PROFILE_ID",
     "PROFILE_ALIASES",
+    "ACTIVE_ENDPOINT_TIP_H_SAFETY_FACTOR",
     "NON_MECHANICAL_KEYS",
     "MechanicalKernelConfiguration",
     "canonical_json_bytes",
+    "endpoint_resolving_tip_h_fine_m",
     "load_configuration",
 ]
