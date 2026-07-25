@@ -10,10 +10,19 @@ installer, but normalizes the installed metadata to the four canonical labels:
 """
 from __future__ import annotations
 
+import importlib.util
+from pathlib import Path
 from typing import Any
 
-import install_v913_four_class_paper_selection as _base
 
+_BASE_PATH = Path(__file__).with_name("install_v913_four_class_paper_selection.py")
+_SPEC = importlib.util.spec_from_file_location(
+    "install_v913_four_class_paper_selection_base", _BASE_PATH
+)
+if _SPEC is None or _SPEC.loader is None:
+    raise RuntimeError(f"could not load base installer: {_BASE_PATH}")
+_base = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_base)
 
 _ORIGINAL_INSTALL_ROWS = _base.install_rows
 _EXPECTED_LABEL_BY_OPTION = {
