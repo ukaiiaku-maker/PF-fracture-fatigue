@@ -51,7 +51,6 @@ ARGS=(
   --target-extension-um "$TARGET_EXT_UM"
   --branching-mode "$BRANCHING_MODE"
   --maximum-fronts "$MAX_FRONTS"
-  --mechanical-profile "$MECHANICAL_PROFILE"
   --mode "$KERNEL_RESOLUTION_MODE"
   --da-phys-um "$DA_PHYS_UM"
   --event-minimum-factor "$CLEAVAGE_EVENT_MIN_FACTOR"
@@ -68,18 +67,28 @@ ARGS=(
   --interaction-length-um "$KERNEL_INTERACTION_LENGTH_UM"
 )
 
-if [[ -n "${FAMILY_JSON:-}" ]]; then
-  if [[ -f "$FAMILY_JSON" ]]; then
-    ARGS+=(--family-override "$FAMILY_JSON")
-  elif [[ "${KERNEL_STRICT_FAMILY_OVERRIDE:-0}" == "1" ]]; then
-    echo "ERROR: explicit FAMILY_JSON does not exist: $FAMILY_JSON" >&2
-    exit 2
-  else
-    echo "Ignoring stale FAMILY_JSON; the current mechanical kernel will be recalculated if absent" >&2
+if [[ -n "${MECHANICAL_CONFIG:-}" && "${MECHANICAL_PROFILE_OVERRIDE:-0}" != 1 ]]; then
+  ARGS+=(--mechanical-config "$MECHANICAL_CONFIG")
+else
+  ARGS+=(--mechanical-profile "$MECHANICAL_PROFILE")
+  if [[ -n "${MECHANICAL_CONFIG:-}" ]]; then
+    ARGS+=(--mechanical-config "$MECHANICAL_CONFIG")
   fi
 fi
-if [[ -n "${MECHANICAL_CONFIG:-}" ]]; then
-  ARGS+=(--mechanical-config "$MECHANICAL_CONFIG")
+
+# FAMILY_JSON is commonly inherited from an older campaign shell. It is not an
+# input to normal automatic resolution. Use an override only when explicitly
+# requested; otherwise the current configuration is resolved/recalculated.
+if [[ -n "${FAMILY_JSON:-}" ]]; then
+  if [[ "${KERNEL_USE_FAMILY_OVERRIDE:-0}" == 1 || "${KERNEL_STRICT_FAMILY_OVERRIDE:-0}" == 1 ]]; then
+    if [[ ! -f "$FAMILY_JSON" ]]; then
+      echo "ERROR: requested family override does not exist: $FAMILY_JSON" >&2
+      exit 2
+    fi
+    ARGS+=(--family-override "$FAMILY_JSON")
+  else
+    echo "Ignoring inherited FAMILY_JSON; resolving from the current mechanical configuration" >&2
+  fi
 fi
 if [[ -n "${KERNEL_BUILD_COMMAND:-}" ]]; then
   ARGS+=(--builder-command "$KERNEL_BUILD_COMMAND")
@@ -91,10 +100,19 @@ fi
 if [[ -n "${KERNEL_LOAD_INVARIANCE_ARCHIVE:-}" ]]; then
   ARGS+=(--load-invariance-archive "$KERNEL_LOAD_INVARIANCE_ARCHIVE")
 fi
+if [[ -n "${SPECIMEN_LENGTH_X_UM:-}" ]]; then
+  ARGS+=(--specimen-length-x-um "$SPECIMEN_LENGTH_X_UM")
+fi
+if [[ -n "${SPECIMEN_LENGTH_Y_UM:-}" ]]; then
+  ARGS+=(--specimen-length-y-um "$SPECIMEN_LENGTH_Y_UM")
+fi
 if [[ -n "${INITIAL_CRACK_LENGTH_UM:-}" ]]; then
   ARGS+=(--initial-crack-length-um "$INITIAL_CRACK_LENGTH_UM")
 fi
-if [[ "${TEMPERATURE_DEPENDENT_MECHANICS:-0}" == "1" ]]; then
+if [[ -n "${NOTCH_HALF_THICKNESS_UM:-}" ]]; then
+  ARGS+=(--notch-half-thickness-um "$NOTCH_HALF_THICKNESS_UM")
+fi
+if [[ "${TEMPERATURE_DEPENDENT_MECHANICS:-0}" == 1 ]]; then
   : "${KERNEL_TEMPERATURE_K:?Set KERNEL_TEMPERATURE_K when TEMPERATURE_DEPENDENT_MECHANICS=1}"
   ARGS+=(--temperature-dependent-mechanics --temperature-K "$KERNEL_TEMPERATURE_K")
 fi
