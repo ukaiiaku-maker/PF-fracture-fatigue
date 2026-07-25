@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.2.15"
-description = "Four-option Stage 3 monotonic campaign with active-only signed shielding"
+version = "10.2.27"
+description = "Audited four-class 30 degree stochastic long-crack PF/sharp-front campaign"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
@@ -19,4 +19,4 @@ packages = ["arrhenius_fracture"]
 testpaths = ["tests"]
 
 [tool.setuptools.package-data]
-arrhenius_fracture = ["data/materials/*/*.csv"]
+arrhenius_fracture = ["data/materials/*.csv", "data/materials/*.json", "data/materials/*/*.csv", "data/materials/*/*.json"]
