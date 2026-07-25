@@ -15,6 +15,9 @@ from typing import Any, Mapping
 
 SCHEMA = "v10.2.27_mechanical_kernel_configuration_v2"
 DEFAULT_PROFILE_ID = "v10_2_27_current_single_front_frontfix"
+PROFILE_ALIASES = {
+    "v10_2_27_default_single_front_frontfix": DEFAULT_PROFILE_ID,
+}
 NON_MECHANICAL_KEYS = {
     "candidate_id",
     "hazard_seed",
@@ -159,6 +162,9 @@ class MechanicalKernelConfiguration:
                 + ", ".join(unknown)
                 + "; put deliberate mechanical extensions inside the explicit 'extra' object"
             )
+        if "profile_id" in source:
+            profile = str(source["profile_id"])
+            source["profile_id"] = PROFILE_ALIASES.get(profile, profile)
         source["extra"] = extra
         return cls(**source).validate()
 
@@ -174,6 +180,7 @@ def load_configuration(path: str | Path) -> MechanicalKernelConfiguration:
 __all__ = [
     "SCHEMA",
     "DEFAULT_PROFILE_ID",
+    "PROFILE_ALIASES",
     "NON_MECHANICAL_KEYS",
     "MechanicalKernelConfiguration",
     "canonical_json_bytes",
