@@ -80,26 +80,64 @@ def _append_cli_mechanics(command: list[str], args: list[str]) -> None:
             else f"{float(raw) * scale:.17g}"
         )
         command.extend([destination, value])
+    for option in ("--crystal-C11", "--crystal-C12", "--crystal-C44"):
+        if _option_value(args, option) is not None:
+            raise SystemExit(
+                f"{option} must be recorded in MECHANICAL_CONFIG so the stiffness "
+                "tensor is fingerprinted before kernel construction"
+            )
 
 
-def _install_resolved_geometry(family: Path) -> None:
+def _force_value_option(args: list[str], option: str, value: str) -> None:
+    _remove_value_option(args, option)
+    args.extend([option, value])
+
+
+def _install_resolved_mechanics(family: Path, args: list[str]) -> None:
     payload = json.loads(family.read_text())
     configuration = payload.get("mechanical_configuration")
     if not isinstance(configuration, dict):
         raise SystemExit(
             "resolved signed-kernel family lacks explicit mechanical configuration"
         )
-    mapping = {
+    environment_mapping = {
         "specimen_length_x_m": "V10227_SPECIMEN_LX_M",
         "specimen_length_y_m": "V10227_SPECIMEN_LY_M",
         "initial_crack_length_m": "V10227_INITIAL_CRACK_LENGTH_M",
         "notch_half_thickness_m": "V10227_NOTCH_HALF_THICKNESS_M",
+        "crystal_C11_Pa": "V10227_CRYSTAL_C11_PA",
+        "crystal_C12_Pa": "V10227_CRYSTAL_C12_PA",
+        "crystal_C44_Pa": "V10227_CRYSTAL_C44_PA",
     }
-    for key, environment_name in mapping.items():
+    for key, environment_name in environment_mapping.items():
         value = configuration.get(key)
         if value is None:
             raise SystemExit(f"resolved mechanical configuration lacks {key}")
         os.environ[environment_name] = f"{float(value):.17g}"
+
+    runtime_options = (
+        ("mesh_nx", "--nx", lambda value: str(int(value))),
+        ("mesh_ny", "--ny", lambda value: str(int(value))),
+        ("tip_h_fine_m", "--tip-h-fine", lambda value: f"{float(value):.17g}"),
+        ("tip_ratio", "--tip-ratio", lambda value: f"{float(value):.17g}"),
+        (
+            "process_zone_length_m",
+            "--mpz-length-um",
+            lambda value: f"{1.0e6 * float(value):.17g}",
+        ),
+        ("process_zone_bins", "--mpz-n-bins", lambda value: str(int(value))),
+        ("da_phys_m", "--da-phys", lambda value: f"{float(value):.17g}"),
+        ("theta_deg", "--crystal-theta-deg", lambda value: f"{float(value):.17g}"),
+        ("crystal_C11_Pa", "--crystal-C11", lambda value: f"{float(value):.17g}"),
+        ("crystal_C12_Pa", "--crystal-C12", lambda value: f"{float(value):.17g}"),
+        ("crystal_C44_Pa", "--crystal-C44", lambda value: f"{float(value):.17g}"),
+    )
+    for key, option, formatter in runtime_options:
+        value = configuration.get(key)
+        if value is None:
+            raise SystemExit(f"resolved mechanical configuration lacks {key}")
+        _force_value_option(args, option, formatter(value))
+
     os.environ["V10227_MECHANICAL_CONFIGURATION_FINGERPRINT"] = str(
         payload.get("mechanical_configuration_fingerprint", "")
     )
@@ -157,9 +195,13 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
         "--mode",
         os.environ.get("KERNEL_RESOLUTION_MODE", "auto"),
     ]
-    _append_cli_mechanics(command, args)
+    # A supplied cache family or explicit configuration already defines the full
+    # mechanics. Launcher CLI defaults are forced from the resolved family later
+    # and must not overwrite that identity during validation.
+    if not mechanical_config:
+        _append_cli_mechanics(command, args)
     mechanical_profile = os.environ.get("MECHANICAL_PROFILE", "").strip()
-    if mechanical_profile:
+    if mechanical_profile and not mechanical_config:
         command.extend(["--mechanical-profile", mechanical_profile])
     if mechanical_config:
         command.extend(["--mechanical-config", mechanical_config])
@@ -210,7 +252,7 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
     if not family.is_file():
         raise SystemExit(f"kernel resolver did not return a valid family path: {family_text!r}")
     family = family.resolve()
-    _install_resolved_geometry(family)
+    _install_resolved_mechanics(family, args)
     args.extend(["--signed-kernel-family", str(family)])
     os.environ["SIGNED_KERNEL_FAMILY_JSON"] = str(family)
     automatically = not bool(supplied_path is not None and supplied_path.is_file())
