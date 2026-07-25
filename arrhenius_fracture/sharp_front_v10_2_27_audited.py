@@ -13,6 +13,10 @@ from .energy_ledger_output_v10227 import (
     restore_energy_ledger_output,
     write_energy_ledger_audit,
 )
+from .geometry_override_v10227 import (
+    install_geometry_override,
+    restore_geometry_override,
+)
 from .persistent_site_audited_engine_v10221 import (
     AuditedPersistentSiteStateResolvedTipEngine,
 )
@@ -37,6 +41,7 @@ def main(argv=None):
     install_front_direction_fix()
     install_backstress_complementarity_fix()
     install_physical_front_width()
+    install_geometry_override()
     install_energy_ledger_output()
     original = _entry.PersistentSiteStateResolvedTipEngine
     _entry.PersistentSiteStateResolvedTipEngine = (
@@ -50,6 +55,7 @@ def main(argv=None):
         return result
     finally:
         restore_energy_ledger_output()
+        restore_geometry_override()
         _entry.PersistentSiteStateResolvedTipEngine = original
 
 
