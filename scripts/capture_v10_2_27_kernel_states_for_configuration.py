@@ -148,7 +148,9 @@ def main() -> int:
         shutil.rmtree(run_out, ignore_errors=True)
     elif snapshot_out.exists() or run_out.exists():
         raise SystemExit("capture output exists; resolver must request a forced rebuild")
-    snapshot_out.mkdir(parents=True, exist_ok=True)
+    # PhysicalFEMCapture owns creation of snapshot_out and intentionally rejects
+    # any pre-existing output root. Create only its parent here.
+    snapshot_out.parent.mkdir(parents=True, exist_ok=True)
     run_out.mkdir(parents=True, exist_ok=True)
 
     capture_temperature = (
