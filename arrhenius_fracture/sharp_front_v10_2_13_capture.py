@@ -9,6 +9,9 @@ from . import anisotropic_emission_v10174 as _anisotropic
 from . import fem as _fem
 from . import sharp_front_v10_1_7_4 as _entry74
 from . import sharp_front_v10_1_7_5 as _transport
+from .anisotropic_front_direction_fix_v10227 import (
+    install_front_direction_fix,
+)
 from .capture_audit_repair_v10213 import (
     repair_capture_audits,
     repair_multitemperature_geometry_summary,
@@ -76,6 +79,7 @@ def _force_capture_modes(args: list[str]) -> None:
 
 
 def main(argv=None):
+    install_front_direction_fix()
     args = list(sys.argv[1:] if argv is None else argv)
     state_table = _pop_value(args, "--atlas-state-table")
     outroot = _pop_value(args, "--atlas-outroot")
