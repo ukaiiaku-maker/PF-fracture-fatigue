@@ -14,7 +14,7 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
-def test_kj_to_j_plane_strain_conversion():
+def test_kj_to_j_plane_strain_conversion_is_elastic_configurational_only():
     effective_modulus = 1.0e9
     values = MODULE.kj_to_j_kj_m2(np.array([1.0e6, 2.0e6]), effective_modulus)
     assert np.allclose(values, [1.0, 4.0])
@@ -40,10 +40,9 @@ def test_j_average_rejects_incomplete_target():
     assert np.isnan(value)
 
 
-def test_validated_runner_invokes_j_temperature_postprocessor():
+def test_validated_runner_does_not_auto_invoke_elastic_j_conversion():
     runner = (
         ROOT / "scripts" / "run_v10_2_27_paper_four_class_30deg_long_rcurves_validated.sh"
     ).read_text()
-    assert "plot_v10_2_27_paper_four_class_J_vs_temperature.py" in runner
-    assert "--youngs-modulus-pa" in runner
-    assert "--poisson-ratio" in runner
+    assert "plot_v10_2_27_paper_four_class_J_vs_temperature.py" not in runner
+    assert "plot_v10_2_27_paper_four_class_K_vs_temperature.py" in runner
