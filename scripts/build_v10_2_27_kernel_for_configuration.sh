@@ -26,13 +26,21 @@ EVENT_MINIMUM_FACTOR=${V10227_KERNEL_EVENT_MINIMUM_FACTOR:-${CLEAVAGE_EVENT_MIN_
 EVENT_MAXIMUM_FACTOR=${V10227_KERNEL_EVENT_MAXIMUM_FACTOR:-${CLEAVAGE_EVENT_MAX_FACTOR:-4.0}}
 MARGIN_EVENTS=${V10227_KERNEL_MARGIN_EVENTS:-${KERNEL_MARGIN_EVENTS:-1}}
 
-read -r THETA BRANCHING_MODE MAX_FRONTS CAPTURE_TEMPERATURE_K < <(
+read -r THETA BRANCHING_MODE MAX_FRONTS CAPTURE_TEMPERATURE_K C11 C12 C44 < <(
   "$PYTHON_BIN" - "$CONFIG" <<'PY'
 import json
 import sys
 payload = json.loads(open(sys.argv[1]).read())
 temperature = payload.get("temperature_K") if payload.get("temperature_dependent_mechanics") else 700.0
-print(payload["theta_deg"], payload["branching_mode"], payload["maximum_fronts"], temperature)
+print(
+    payload["theta_deg"],
+    payload["branching_mode"],
+    payload["maximum_fronts"],
+    temperature,
+    payload["crystal_C11_Pa"],
+    payload["crystal_C12_Pa"],
+    payload["crystal_C44_Pa"],
+)
 PY
 )
 
@@ -41,6 +49,13 @@ if [[ "$BRANCHING_MODE" != single_front || "$MAX_FRONTS" != 1 ]]; then
   echo "Register a topology_cached or direct_fem builder for this configuration." >&2
   exit 4
 fi
+
+# The capture entry installs the environment-driven mechanics override before
+# constructing the FEM configuration. Export the exact stiffness tensor recorded
+# in the configuration fingerprint.
+export V10227_CRYSTAL_C11_PA="$C11"
+export V10227_CRYSTAL_C12_PA="$C12"
+export V10227_CRYSTAL_C44_PA="$C44"
 
 SNAPSHOT_ROOT=${KERNEL_SNAPSHOT_ROOT:-}
 SNAPSHOT_ARCHIVE=${KERNEL_SNAPSHOT_ARCHIVE:-}
