@@ -100,7 +100,7 @@ if errors:
 print("Accepted peak/DBTT preflight passed: 24 cases")
 PY
 
-PATCHED_RUNNER=$(mktemp /tmp/v10_2_27_final_four_class_runner.XXXXXX.sh)
+PATCHED_RUNNER=$(mktemp "$ROOT/scripts/.v10_2_27_final_four_class_runner.XXXXXX.sh")
 trap 'rm -f "$PATCHED_RUNNER"' EXIT
 
 BASE_RUNNER="$BASE_RUNNER" PATCHED_RUNNER="$PATCHED_RUNNER" "$PYTHON_BIN" - <<'PY'
