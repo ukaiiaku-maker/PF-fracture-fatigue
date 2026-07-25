@@ -16,9 +16,44 @@ CLEAVAGE_EVENT_MIN_FACTOR=${CLEAVAGE_EVENT_MIN_FACTOR:-0.5}
 CLEAVAGE_EVENT_MAX_FACTOR=${CLEAVAGE_EVENT_MAX_FACTOR:-4.0}
 KERNEL_MARGIN_EVENTS=${KERNEL_MARGIN_EVENTS:-1}
 
-SOURCE_REGISTRY=${KERNEL_PARAMETER_REGISTRY:-$ROOT/arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv}
-read -r REGISTRY_PZ_UM REGISTRY_PZ_BINS < <(
-  "$PYTHON_BIN" - "$SOURCE_REGISTRY" <<'PY'
+ARGS=(
+  --theta-deg "$THETA"
+  --target-extension-um "$TARGET_EXT_UM"
+  --branching-mode "$BRANCHING_MODE"
+  --maximum-fronts "$MAX_FRONTS"
+  --mode "$KERNEL_RESOLUTION_MODE"
+  --event-minimum-factor "$CLEAVAGE_EVENT_MIN_FACTOR"
+  --event-maximum-factor "$CLEAVAGE_EVENT_MAX_FACTOR"
+  --margin-events "$KERNEL_MARGIN_EVENTS"
+)
+
+if [[ -n "${MECHANICAL_CONFIG:-}" ]]; then
+  ARGS+=(--mechanical-config "$MECHANICAL_CONFIG")
+  if [[ "${MECHANICAL_PROFILE_OVERRIDE:-0}" == 1 ]]; then
+    ARGS+=(--mechanical-profile "$MECHANICAL_PROFILE")
+  fi
+  # Explicit override variables remain available for deliberate one-off changes,
+  # but no registry/default value silently replaces a field from the JSON file.
+  [[ -n "${KERNEL_PROCESS_ZONE_LENGTH_UM:-}" ]] && \
+    ARGS+=(--process-zone-length-um "$KERNEL_PROCESS_ZONE_LENGTH_UM")
+  [[ -n "${KERNEL_PROCESS_ZONE_BINS:-}" ]] && \
+    ARGS+=(--process-zone-bins "$KERNEL_PROCESS_ZONE_BINS")
+  [[ -n "${KERNEL_MESH_NX:-}" ]] && ARGS+=(--mesh-nx "$KERNEL_MESH_NX")
+  [[ -n "${KERNEL_MESH_NY:-}" ]] && ARGS+=(--mesh-ny "$KERNEL_MESH_NY")
+  [[ -n "${KERNEL_TIP_H_FINE_UM:-}" ]] && \
+    ARGS+=(--tip-h-fine-um "$KERNEL_TIP_H_FINE_UM")
+  [[ -n "${KERNEL_TIP_RATIO:-}" ]] && ARGS+=(--tip-ratio "$KERNEL_TIP_RATIO")
+  [[ -n "${KERNEL_ATLAS_ANCHOR_SPACING_UM:-}" ]] && \
+    ARGS+=(--atlas-anchor-spacing-um "$KERNEL_ATLAS_ANCHOR_SPACING_UM")
+  [[ -n "${KERNEL_MIN_ELEMENTS_PER_PZ:-}" ]] && \
+    ARGS+=(--minimum-elements-per-process-zone "$KERNEL_MIN_ELEMENTS_PER_PZ")
+  [[ -n "${KERNEL_INTERACTION_LENGTH_UM:-}" ]] && \
+    ARGS+=(--interaction-length-um "$KERNEL_INTERACTION_LENGTH_UM")
+  [[ -n "${DA_PHYS_UM:-}" ]] && ARGS+=(--da-phys-um "$DA_PHYS_UM")
+else
+  SOURCE_REGISTRY=${KERNEL_PARAMETER_REGISTRY:-$ROOT/arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv}
+  read -r REGISTRY_PZ_UM REGISTRY_PZ_BINS < <(
+    "$PYTHON_BIN" - "$SOURCE_REGISTRY" <<'PY'
 import csv
 import sys
 from pathlib import Path
@@ -34,46 +69,20 @@ if len(lengths) != 1 or len(bins) != 1:
     )
 print(next(iter(lengths)), next(iter(bins)))
 PY
-)
-
-KERNEL_PROCESS_ZONE_LENGTH_UM=${KERNEL_PROCESS_ZONE_LENGTH_UM:-$REGISTRY_PZ_UM}
-KERNEL_PROCESS_ZONE_BINS=${KERNEL_PROCESS_ZONE_BINS:-$REGISTRY_PZ_BINS}
-KERNEL_MESH_NX=${KERNEL_MESH_NX:-36}
-KERNEL_MESH_NY=${KERNEL_MESH_NY:-72}
-KERNEL_TIP_H_FINE_UM=${KERNEL_TIP_H_FINE_UM:-1}
-KERNEL_TIP_RATIO=${KERNEL_TIP_RATIO:-1.20}
-KERNEL_ATLAS_ANCHOR_SPACING_UM=${KERNEL_ATLAS_ANCHOR_SPACING_UM:-200}
-KERNEL_MIN_ELEMENTS_PER_PZ=${KERNEL_MIN_ELEMENTS_PER_PZ:-3}
-KERNEL_INTERACTION_LENGTH_UM=${KERNEL_INTERACTION_LENGTH_UM:-2}
-
-ARGS=(
-  --theta-deg "$THETA"
-  --target-extension-um "$TARGET_EXT_UM"
-  --branching-mode "$BRANCHING_MODE"
-  --maximum-fronts "$MAX_FRONTS"
-  --mode "$KERNEL_RESOLUTION_MODE"
-  --da-phys-um "$DA_PHYS_UM"
-  --event-minimum-factor "$CLEAVAGE_EVENT_MIN_FACTOR"
-  --event-maximum-factor "$CLEAVAGE_EVENT_MAX_FACTOR"
-  --margin-events "$KERNEL_MARGIN_EVENTS"
-  --process-zone-length-um "$KERNEL_PROCESS_ZONE_LENGTH_UM"
-  --process-zone-bins "$KERNEL_PROCESS_ZONE_BINS"
-  --mesh-nx "$KERNEL_MESH_NX"
-  --mesh-ny "$KERNEL_MESH_NY"
-  --tip-h-fine-um "$KERNEL_TIP_H_FINE_UM"
-  --tip-ratio "$KERNEL_TIP_RATIO"
-  --atlas-anchor-spacing-um "$KERNEL_ATLAS_ANCHOR_SPACING_UM"
-  --minimum-elements-per-process-zone "$KERNEL_MIN_ELEMENTS_PER_PZ"
-  --interaction-length-um "$KERNEL_INTERACTION_LENGTH_UM"
-)
-
-if [[ -n "${MECHANICAL_CONFIG:-}" && "${MECHANICAL_PROFILE_OVERRIDE:-0}" != 1 ]]; then
-  ARGS+=(--mechanical-config "$MECHANICAL_CONFIG")
-else
-  ARGS+=(--mechanical-profile "$MECHANICAL_PROFILE")
-  if [[ -n "${MECHANICAL_CONFIG:-}" ]]; then
-    ARGS+=(--mechanical-config "$MECHANICAL_CONFIG")
-  fi
+  )
+  ARGS+=(
+    --mechanical-profile "$MECHANICAL_PROFILE"
+    --da-phys-um "$DA_PHYS_UM"
+    --process-zone-length-um "${KERNEL_PROCESS_ZONE_LENGTH_UM:-$REGISTRY_PZ_UM}"
+    --process-zone-bins "${KERNEL_PROCESS_ZONE_BINS:-$REGISTRY_PZ_BINS}"
+    --mesh-nx "${KERNEL_MESH_NX:-36}"
+    --mesh-ny "${KERNEL_MESH_NY:-72}"
+    --tip-h-fine-um "${KERNEL_TIP_H_FINE_UM:-1}"
+    --tip-ratio "${KERNEL_TIP_RATIO:-1.20}"
+    --atlas-anchor-spacing-um "${KERNEL_ATLAS_ANCHOR_SPACING_UM:-200}"
+    --minimum-elements-per-process-zone "${KERNEL_MIN_ELEMENTS_PER_PZ:-3}"
+    --interaction-length-um "${KERNEL_INTERACTION_LENGTH_UM:-2}"
+  )
 fi
 
 # FAMILY_JSON is commonly inherited from an older campaign shell. It is not an
