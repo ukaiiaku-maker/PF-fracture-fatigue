@@ -78,12 +78,15 @@ PY
     --process-zone-bins "${KERNEL_PROCESS_ZONE_BINS:-$REGISTRY_PZ_BINS}"
     --mesh-nx "${KERNEL_MESH_NX:-36}"
     --mesh-ny "${KERNEL_MESH_NY:-72}"
-    --tip-h-fine-um "${KERNEL_TIP_H_FINE_UM:-1}"
     --tip-ratio "${KERNEL_TIP_RATIO:-1.20}"
     --atlas-anchor-spacing-um "${KERNEL_ATLAS_ANCHOR_SPACING_UM:-200}"
     --minimum-elements-per-process-zone "${KERNEL_MIN_ELEMENTS_PER_PZ:-3}"
     --interaction-length-um "${KERNEL_INTERACTION_LENGTH_UM:-2}"
   )
+  # With no explicit override, the Python entry derives the tip spacing from the
+  # first active-bin centre so exact bin-zero FEM mechanics are resolvable.
+  [[ -n "${KERNEL_TIP_H_FINE_UM:-}" ]] && \
+    ARGS+=(--tip-h-fine-um "$KERNEL_TIP_H_FINE_UM")
 fi
 
 # FAMILY_JSON is commonly inherited from an older campaign shell. It is not an
