@@ -12,7 +12,6 @@ if [[ "${CONDA_DEFAULT_ENV:-}" != "$CONDA_ENV" ]]; then
 fi
 
 OUTROOT=${OUTROOT:-$ROOT/runs/v10_2_27_paper_four_class_1000um_theta30_frontfix_family35710f_varseed3621_v1}
-FAMILY_JSON=${FAMILY_JSON:-$ROOT/runs/v10_2_27_theta30_signed_kernel_atlas_frontfix_E1200_v2/v10_2_27_theta30_active_only_campaign_family_frontfix_E1200_v2.json}
 TEMPS=${TEMPS:-"300 600 800 900 950 1000 1050 1100 1150 1200 1250 1300"}
 TARGET_EXT_UM=${TARGET_EXT_UM:-1000}
 THETA=${THETA:-30}
@@ -26,13 +25,18 @@ SNAPSHOT_COLS=${SNAPSHOT_COLS:-5}
 SKIP_FINISHED=${SKIP_FINISHED:-1}
 RESTART_INCOMPLETE=${RESTART_INCOMPLETE:-1}
 PERSISTENT_SOURCE_MIN_WIDTH_UM=${PERSISTENT_SOURCE_MIN_WIDTH_UM:-0}
+DA_PHYS_UM=${DA_PHYS_UM:-5}
+CLEAVAGE_EVENT_MIN_FACTOR=${CLEAVAGE_EVENT_MIN_FACTOR:-0.5}
+CLEAVAGE_EVENT_MAX_FACTOR=${CLEAVAGE_EVENT_MAX_FACTOR:-4.0}
+KERNEL_MARGIN_EVENTS=${KERNEL_MARGIN_EVENTS:-1}
+BRANCHING_MODE=${BRANCHING_MODE:-single_front}
+MAX_FRONTS=${MAX_FRONTS:-1}
 
 OPTIONS="v913_paper_peak01_0242980_persistent_sites v913_paper_dbtt01_0202500_persistent_sites v913_paper_weakT01_0129902_persistent_sites v913_paper_ceramic01_0077080_persistent_sites"
 OLD_WEAK="v913_paper_weakT01_0257068_persistent_sites"
 OLD_CERAMIC="v913_paper_ceramic01_0189364_persistent_sites"
 BASE_RUNNER="$ROOT/scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves.sh"
 
-[[ -f "$FAMILY_JSON" ]] || { echo "ERROR: missing signed-kernel family: $FAMILY_JSON" >&2; exit 2; }
 [[ -f "$BASE_RUNNER" ]] || { echo "ERROR: missing base runner: $BASE_RUNNER" >&2; exit 2; }
 [[ -d "$OUTROOT" ]] || { echo "ERROR: campaign root does not exist: $OUTROOT" >&2; exit 2; }
 if [[ -e "$OUTROOT/$OLD_WEAK" || -e "$OUTROOT/$OLD_CERAMIC" ]]; then
@@ -40,6 +44,33 @@ if [[ -e "$OUTROOT/$OLD_WEAK" || -e "$OUTROOT/$OLD_CERAMIC" ]]; then
   echo "Archive them outside OUTROOT before launching replacement cases." >&2
   exit 2
 fi
+
+FAMILY_JSON=$(
+  PYTHON_BIN="$PYTHON_BIN" \
+  FAMILY_JSON="${FAMILY_JSON:-}" \
+  MECHANICAL_CONFIG="${MECHANICAL_CONFIG:-}" \
+  MECHANICAL_PROFILE="${MECHANICAL_PROFILE:-v10_2_27_default_single_front_frontfix}" \
+  KERNEL_RESOLUTION_MODE="${KERNEL_RESOLUTION_MODE:-auto}" \
+  KERNEL_BUILD_COMMAND="${KERNEL_BUILD_COMMAND:-}" \
+  KERNEL_SNAPSHOT_ARCHIVE="${KERNEL_SNAPSHOT_ARCHIVE:-}" \
+  KERNEL_LOAD_INVARIANCE_ARCHIVE="${KERNEL_LOAD_INVARIANCE_ARCHIVE:-}" \
+  INITIAL_CRACK_LENGTH_UM="${INITIAL_CRACK_LENGTH_UM:-}" \
+  KERNEL_INTERACTION_LENGTH_UM="${KERNEL_INTERACTION_LENGTH_UM:-}" \
+  TEMPERATURE_DEPENDENT_MECHANICS="${TEMPERATURE_DEPENDENT_MECHANICS:-0}" \
+  KERNEL_TEMPERATURE_K="${KERNEL_TEMPERATURE_K:-}" \
+  TARGET_EXT_UM="$TARGET_EXT_UM" \
+  THETA="$THETA" \
+  BRANCHING_MODE="$BRANCHING_MODE" \
+  MAX_FRONTS="$MAX_FRONTS" \
+  DA_PHYS_UM="$DA_PHYS_UM" \
+  CLEAVAGE_EVENT_MIN_FACTOR="$CLEAVAGE_EVENT_MIN_FACTOR" \
+  CLEAVAGE_EVENT_MAX_FACTOR="$CLEAVAGE_EVENT_MAX_FACTOR" \
+  KERNEL_MARGIN_EVENTS="$KERNEL_MARGIN_EVENTS" \
+  bash scripts/resolve_v10_2_27_kernel_for_runner.sh
+)
+export FAMILY_JSON
+
+echo "Resolved signed-kernel family: $FAMILY_JSON"
 
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py --check-only
