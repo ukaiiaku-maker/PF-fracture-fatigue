@@ -31,7 +31,7 @@ from .unit_slip_perturbation_v10212 import (
     interaction_response,
 )
 
-MODEL_ID = "v10.2.14_exact_endpoint_active_signed_spatial_station_responses"
+MODEL_ID = "v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses"
 
 
 def _unit(values) -> np.ndarray:
@@ -42,18 +42,41 @@ def _unit(values) -> np.ndarray:
     return vector / norm
 
 
-def _station_indices(coordinates: tuple[float, ...], minimum_spacing_m: float) -> list[int]:
+def _station_indices(
+    coordinates: tuple[float, ...],
+    minimum_spacing_m: float,
+    minimum_distance_m: float = 0.0,
+) -> list[int]:
+    """Select exact physical stations that are both resolved and mutually spaced.
+
+    Stations below ``minimum_distance_m`` are omitted rather than relocated.  This
+    preserves the exact MPZ coordinate semantics while preventing an unresolvable
+    first bin from aborting an otherwise valid frozen-mesh kernel measurement.
+    """
     x = np.asarray(coordinates, dtype=float)
     if x.size == 0:
         return []
     if np.any(~np.isfinite(x)) or np.any(np.diff(x) < 0.0):
         raise ValueError("MPZ coordinates must be finite and nondecreasing")
-    selected = [0]
-    for index in range(1, x.size - 1):
-        if float(x[index] - x[selected[-1]]) >= minimum_spacing_m:
-            selected.append(index)
-    if x.size > 1 and selected[-1] != x.size - 1:
-        selected.append(x.size - 1)
+    spacing = float(minimum_spacing_m)
+    minimum_distance = float(minimum_distance_m)
+    if not math.isfinite(spacing) or spacing <= 0.0:
+        raise ValueError("minimum station spacing must be positive and finite")
+    if not math.isfinite(minimum_distance) or minimum_distance < 0.0:
+        raise ValueError("minimum station distance must be finite and nonnegative")
+
+    tolerance = max(1.0e-15, 1.0e-12 * max(abs(minimum_distance), 1.0))
+    eligible = np.flatnonzero(x + tolerance >= minimum_distance).astype(int)
+    if eligible.size == 0:
+        return []
+
+    selected = [int(eligible[0])]
+    for index in eligible[1:-1]:
+        if float(x[int(index)] - x[selected[-1]]) >= spacing:
+            selected.append(int(index))
+    last = int(eligible[-1])
+    if selected[-1] != last:
+        selected.append(last)
     return selected
 
 
@@ -191,6 +214,10 @@ def generate_station_responses(
     )
     if not math.isfinite(station_spacing) or station_spacing <= 0.0:
         raise ValueError("minimum station spacing must be positive and finite")
+    placement_resolution = max(
+        float(width), 2.0 * float(data["mesh"].hbar_tip), 1.0e-12
+    )
+    minimum_station_distance = 2.0 * placement_resolution
 
     base = equilibrated_base_state(
         mesh=data["mesh"],
@@ -210,7 +237,23 @@ def generate_station_responses(
     channel_directions = [_unit(row) for row in meta.channel_directions]
     channel_normals = [_unit(row) for row in meta.channel_normals]
     active_grid = tuple(meta.active_x_m)
-    active_stations = _station_indices(active_grid, station_spacing)
+    active_stations = _station_indices(
+        active_grid,
+        station_spacing,
+        minimum_distance_m=minimum_station_distance,
+    )
+    if not active_stations:
+        maximum = max((float(value) for value in active_grid), default=math.nan)
+        raise ValueError(
+            "no exact active MPZ station is measurable on the frozen mesh: "
+            f"minimum_required={minimum_station_distance:.6g}, "
+            f"maximum_available={maximum:.6g}"
+        )
+    skipped_below_resolution = [
+        index
+        for index, value in enumerate(active_grid)
+        if float(value) < minimum_station_distance
+    ]
 
     rows = []
     placements = []
@@ -378,6 +421,14 @@ def generate_station_responses(
         "full_wake_grid_x_m": list(meta.wake_x_m),
         "measured_station_indices": {"active": active_stations, "wake": []},
         "minimum_station_spacing_m": station_spacing,
+        "minimum_measurable_active_station_distance_m": minimum_station_distance,
+        "active_station_bins_skipped_below_mesh_resolution": (
+            skipped_below_resolution
+        ),
+        "active_station_x_m_skipped_below_mesh_resolution": [
+            float(active_grid[index]) for index in skipped_below_resolution
+        ],
+        "active_stations_relocated_or_snapped": False,
         "ribbon_width_m": width,
         "perturbation_magnitudes": values,
         "placements": placements,
@@ -419,6 +470,7 @@ def generate_station_responses(
 __all__ = [
     "MODEL_ID",
     "_active_ribbon_geometry",
+    "_station_indices",
     "_validate_station_geometry",
     "generate_station_responses",
 ]
