@@ -44,6 +44,7 @@ jobs:
             tests/test_v10227_no_synthetic_kernel_capture.py \
             tests/test_v10227_reuse_mode_guard.py \
             tests/test_v10_2_27_capture_physics_invariance.py \
+            tests/test_v10_2_27_capture_physics_contract.py \
             tests/test_v10_2_27_kernel_resolution.py \
             tests/test_v10_2_27_capture_output_contract.py
       - name: Validate production and kernel shell scripts
