@@ -1,4 +1,4 @@
-name: Verify v10.2.27 station schema compatibility
+name: Verify v10.2.27 frozen physics contract
 
 on:
   push:
@@ -20,19 +20,21 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e . pytest pandas matplotlib scipy
-      - name: Compile kernel response paths
+      - name: Compile production and kernel response paths
         run: |
           python -m py_compile \
             arrhenius_fracture/physical_fem_station_responses_v10212.py \
             arrhenius_fracture/frozen_geometry_load_invariance_v10213.py \
+            arrhenius_fracture/kernel_resolver_v10227.py \
             scripts/evaluate_v10_2_14_active_load_invariance.py \
             scripts/ensure_v10_2_27_signed_kernel.py
-      - name: Test mesh resolution, schema, and reuse guard
+      - name: Test frozen physics and cache safety
         run: |
           python -m pytest -q \
-            tests/test_v10227_mesh_resolved_active_station_selection.py \
             tests/test_v10227_station_response_schema_compatibility.py \
+            tests/test_v10227_no_synthetic_kernel_capture.py \
             tests/test_v10227_reuse_mode_guard.py
-      - name: Validate kernel builder shell
+      - name: Validate production and kernel shell scripts
         run: |
           bash -n scripts/build_v10_2_27_kernel_for_configuration.sh
+          bash -n scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves.sh
