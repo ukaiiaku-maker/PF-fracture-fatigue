@@ -60,8 +60,6 @@ kernel_resolution="$OUTROOT/v10_2_28_kernel_resolution.json"
   --mesh-ny 72 \
   --tip-h-fine-um 1 \
   --tip-ratio 1.20 \
-  --measurement-tip-h-fine-um 1 \
-  --measurement-tip-ratio 1.20 \
   --da-phys-um 5 \
   --mode auto \
   --cache-root "$KERNEL_CACHE_ROOT" \
