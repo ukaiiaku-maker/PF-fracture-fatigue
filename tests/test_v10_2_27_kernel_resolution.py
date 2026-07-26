@@ -7,6 +7,7 @@ import sys
 
 from arrhenius_fracture.kernel_configuration_v10227 import (
     MechanicalKernelConfiguration,
+    endpoint_resolving_tip_h_fine_m,
 )
 from arrhenius_fracture.kernel_registry_v10227 import (
     family_physics_fingerprint,
@@ -49,7 +50,7 @@ def test_kernel_fingerprint_changes_with_orientation_topology_and_geometry():
         MechanicalKernelConfiguration(process_zone_length_m=100.0e-6),
         MechanicalKernelConfiguration(process_zone_bins=40),
         MechanicalKernelConfiguration(mesh_nx=48),
-        MechanicalKernelConfiguration(tip_h_fine_m=0.5e-6),
+        MechanicalKernelConfiguration(tip_h_fine_m=0.5 * base.tip_h_fine_m),
         MechanicalKernelConfiguration(interaction_length_m=4.0e-6),
         MechanicalKernelConfiguration(specimen_length_x_m=3.0e-3),
     )
@@ -63,11 +64,21 @@ def test_mechanical_configuration_contains_current_mesh_process_zone_and_specime
     assert cfg.process_zone_bins == 80
     assert cfg.mesh_nx == 36
     assert cfg.mesh_ny == 72
-    assert cfg.tip_h_fine_m == 1.0e-6
+    assert cfg.tip_h_fine_m == endpoint_resolving_tip_h_fine_m(50.0e-6, 80)
     assert cfg.da_phys_m == 5.0e-6
     assert cfg.specimen_length_x_m == 2.0e-3
     assert cfg.specimen_length_y_m == 4.0e-3
     assert cfg.initial_crack_length_m == 0.5e-3
+    assert cfg.active_station_policy_id == "v10.2.14_exact_first_last_active_stations"
+
+
+def test_coarse_tip_mesh_is_rejected_before_fem_capture():
+    try:
+        MechanicalKernelConfiguration(tip_h_fine_m=1.0e-6)
+    except ValueError as exc:
+        assert "too coarse for exact active-bin-zero mechanics" in str(exc)
+    else:
+        raise AssertionError("under-resolved active endpoint was accepted")
 
 
 def test_material_seed_and_target_fields_do_not_directly_change_identity():
@@ -167,6 +178,7 @@ def test_runner_resolver_ignores_inherited_family_by_default():
     assert "Ignoring inherited FAMILY_JSON" in text
     assert "KERNEL_USE_FAMILY_OVERRIDE" in text
     assert "MECHANICAL_PROFILE_OVERRIDE" in text
+    assert 'KERNEL_TIP_H_FINE_UM:-1' not in text
 
 
 def test_default_builder_recalculates_capture_and_load_invariance():
@@ -175,7 +187,8 @@ def test_default_builder_recalculates_capture_and_load_invariance():
     ).read_text()
     assert "capture_v10_2_27_kernel_states_for_configuration.py" in builder
     assert "RECALCULATE frozen FEM states" in builder
-    assert "RECALCULATE load invariance" in builder
+    assert "RECALCULATE load invariance endpoints" in builder
+    assert '--minimum-station-spacing-m "$PZ_LENGTH_M"' in builder
     assert "KERNEL_CAPTURE_COMMAND:?" not in builder
 
 
