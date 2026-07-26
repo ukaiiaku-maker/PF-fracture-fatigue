@@ -26,6 +26,16 @@ if _PACKAGE_ROOT != REPOSITORY_ROOT / "arrhenius_fracture":
         f"{REPOSITORY_ROOT / 'arrhenius_fracture'}, got {_PACKAGE_ROOT}"
     )
 
+from arrhenius_fracture import physical_fem_station_responses_v10212 as _station_responses
+
+# v10.2.27 changes only which exact MPZ stations are measurable on the frozen
+# mesh.  The response payload remains the established v10.2.14 contract used by
+# the mechanical-source reviewer and active-only atlas builder.
+_STATION_RESPONSE_SCHEMA = (
+    "v10.2.14_exact_endpoint_active_signed_spatial_station_responses"
+)
+_station_responses.MODEL_ID = _STATION_RESPONSE_SCHEMA
+
 from arrhenius_fracture.frozen_geometry_load_invariance_v10213 import (
     evaluate_frozen_geometry_load_invariance,
 )
@@ -63,6 +73,7 @@ def main() -> None:
         json.dumps(
             {
                 "schema": payload["schema"],
+                "station_response_schema": _STATION_RESPONSE_SCHEMA,
                 "parent_state_id": payload["parent_state_id"],
                 "load_invariance_passed": payload["load_invariance_passed"],
                 "active_kernel_mechanically_measured": payload[
