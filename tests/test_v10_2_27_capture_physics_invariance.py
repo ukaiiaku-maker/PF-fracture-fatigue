@@ -28,6 +28,17 @@ def test_capture_reconstruction_has_no_front_or_mpz_kinetic_entry_points():
     assert "solve_dirichlet(" in text
 
 
+def test_capture_entry_does_not_rewrite_production_physics_flags():
+    text = (
+        ROOT / "arrhenius_fracture" / "sharp_front_v10_2_13_capture.py"
+    ).read_text()
+    assert "_force_capture_modes" not in text
+    assert 'args.extend(["--no-active-shielding"' not in text
+    assert "physics_overrides=none" in text
+    assert "production_parameterization_observed_not_modified" in text
+    assert "_validate_single_front_capture" in text
+
+
 def test_capture_hook_enforces_bitwise_production_state_invariance():
     text = (
         ROOT / "arrhenius_fracture" / "physical_fem_capture_v10212.py"
