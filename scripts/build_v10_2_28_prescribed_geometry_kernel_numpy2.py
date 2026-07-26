@@ -18,25 +18,29 @@ from arrhenius_fracture.prescribed_geometry_numpy2_compat_v10228 import (
 install_numpy2_orientation_compat()
 
 _original_run = subprocess.run
-_original_assembler = str(
-    ROOT / "scripts" / "build_v10_2_27_extended_active_only_atlas.py"
+_original_mechanics_builder = str(
+    ROOT / "scripts" / "build_v10_2_27_kernel_from_mechanics_artifacts.py"
 )
-_finite_assembler = str(
-    ROOT / "scripts" / "build_v10_2_27_extended_active_only_atlas_finite_metadata.py"
+_v10228_mechanics_builder = str(
+    ROOT / "scripts" / "build_v10_2_27_kernel_from_mechanics_artifacts_v10228.py"
 )
 
 
-def _run_with_finite_atlas_metadata(command, *args, **kwargs):
+def _run_with_v10228_mechanics_adapter(command, *args, **kwargs):
     if isinstance(command, (list, tuple)):
         patched = list(command)
+        replacements = 0
         for index, token in enumerate(patched):
-            if str(token) == _original_assembler:
-                patched[index] = _finite_assembler
+            if str(token) == _original_mechanics_builder:
+                patched[index] = _v10228_mechanics_builder
+                replacements += 1
+        if replacements > 1:
+            raise RuntimeError("mechanics-artifact builder appeared more than once in command")
         command = patched
     return _original_run(command, *args, **kwargs)
 
 
-subprocess.run = _run_with_finite_atlas_metadata
+subprocess.run = _run_with_v10228_mechanics_adapter
 try:
     runpy.run_path(
         str(ROOT / "scripts" / "build_v10_2_28_prescribed_geometry_kernel.py"),
