@@ -6,6 +6,8 @@ from pathlib import Path
 import subprocess
 import sys
 
+import pytest
+
 from arrhenius_fracture.kernel_configuration_v10227 import (
     MechanicalKernelConfiguration,
 )
@@ -54,7 +56,11 @@ def test_state_table_uses_regular_anchors_and_exact_final_coverage(tmp_path: Pat
     extensions_um = [
         1.0e6 * float(row["cumulative_crack_path_extension_m"]) for row in rows
     ]
-    assert extensions_um == [0.0, 200.0, 400.0, 600.0, 800.0, 1000.0, 1175.0]
+    assert extensions_um == pytest.approx(
+        [0.0, 200.0, 400.0, 600.0, 800.0, 1000.0, 1175.0],
+        rel=0.0,
+        abs=1.0e-9,
+    )
     tolerance_um = 1.0e6 * float(rows[0]["extension_tolerance_m"])
     assert 18.0 < tolerance_um < 20.0
     assert all(
