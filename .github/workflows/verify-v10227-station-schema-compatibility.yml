@@ -36,6 +36,7 @@ jobs:
             scripts/write_v10_2_27_production_capture_state_table.py \
             scripts/check_v10_2_27_capture_seed_family.py \
             scripts/check_v10_2_27_capture_physics_contract.py \
+            scripts/compare_v10_2_27_kernel_families.py \
             scripts/build_v10_2_27_kernel_from_current_mechanics.py \
             scripts/evaluate_v10_2_14_active_load_invariance.py \
             scripts/ensure_v10_2_27_signed_kernel.py
@@ -48,6 +49,7 @@ jobs:
             tests/test_v10_2_27_capture_physics_invariance.py \
             tests/test_v10_2_27_capture_physics_contract.py \
             tests/test_v10_2_27_accepted_production_capture_adapter.py \
+            tests/test_v10_2_27_kernel_self_consistency.py \
             tests/test_v10_2_27_kernel_resolution.py \
             tests/test_v10_2_27_capture_output_contract.py
       - name: Validate production and kernel shell scripts
