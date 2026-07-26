@@ -78,7 +78,7 @@ elif [[ -z "$SNAPSHOT_ROOT" ]]; then
   fi
   SNAPSHOT_ROOT="$CACHE_DIR/snapshots"
   # PhysicalFEMCapture owns creation of the output root and rejects pre-existing
-  # directories.  Clear any failed partial state and create only the parent.
+  # directories. Clear failed partial state and create only the parent.
   rm -rf "$SNAPSHOT_ROOT"
   mkdir -p "$(dirname "$SNAPSHOT_ROOT")"
   export V10227_KERNEL_CAPTURE_OUTROOT="$SNAPSHOT_ROOT"
@@ -101,6 +101,10 @@ fi
 if [[ -n "$SNAPSHOT_ROOT" && -z "$SNAPSHOT_ARCHIVE" ]]; then
   echo "AUDIT exact active endpoint resolution" >&2
   "$PYTHON_BIN" scripts/check_v10_2_27_active_endpoint_resolution.py \
+    --snapshot-root "$SNAPSHOT_ROOT" \
+    --mechanical-config "$CONFIG"
+  echo "AUDIT accepted production capture physics" >&2
+  "$PYTHON_BIN" scripts/check_v10_2_27_capture_physics_contract.py \
     --snapshot-root "$SNAPSHOT_ROOT" \
     --mechanical-config "$CONFIG"
 fi
