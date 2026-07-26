@@ -208,7 +208,9 @@ def test_capture_hook_separates_trajectory_physics_from_measurement_mesh():
     assert "production_engine_state_bitwise_unchanged" in base
     assert "measurement_reconstruction_called_mpz_advance" in base
     assert "--atlas-measurement-tip-h-fine" in entry
-    assert "production_kinetics=unchanged" in entry
+    assert "AuditedPersistentSiteStateResolvedTipEngine" in entry
+    assert "_run_current_paper_stack" in entry
+    assert "engine=audited_persistent_site" in entry
 
 
 def test_optional_archives_require_exact_configuration_and_capture_provenance():
@@ -220,6 +222,7 @@ def test_optional_archives_require_exact_configuration_and_capture_provenance():
     assert "expected_configuration_fingerprint" in text
     assert "production_engine_state_bitwise_unchanged" in text
     assert "measurement_reconstruction_called_mpz_advance" in text
+    assert "check_v10_2_27_capture_physics_contract.py" in text
 
 
 def test_current_registry_geometry_is_50um_80bins():
