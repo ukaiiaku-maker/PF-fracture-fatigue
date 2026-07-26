@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify exact active-bin-zero perturbations are resolved by captured FEM meshes."""
+"""Verify active-bin-zero perturbations on capture-only measurement meshes."""
 from __future__ import annotations
 
 import argparse
@@ -31,24 +31,39 @@ def main() -> int:
     rows = []
     for metadata_path in sorted(snapshot_root.glob("*/snapshot.json")):
         state_root = metadata_path.parent
+        metadata = json.loads(metadata_path.read_text())
         data = load_snapshot(state_root)
         hbar_tip = float(data["mesh"].hbar_tip)
         burgers = float(data["mat"].b)
         placement_resolution = max(2.0 * hbar_tip, 10.0 * burgers, 1.0e-12)
         required_distance = 2.0 * placement_resolution
+        provenance_hbar = float(
+            metadata.get("measurement_mesh_hbar_tip_m", float("nan"))
+        )
         passed = bool(
             math.isfinite(hbar_tip)
             and hbar_tip > 0.0
+            and math.isfinite(provenance_hbar)
+            and math.isclose(hbar_tip, provenance_hbar, rel_tol=1.0e-12, abs_tol=1.0e-18)
+            and metadata.get("endpoint_mesh_reconstructed") is True
             and first_center + 1.0e-15 >= required_distance
         )
         rows.append(
             {
                 "state_id": state_root.name,
                 "first_active_bin_center_m": first_center,
-                "hbar_tip_m": hbar_tip,
+                "requested_measurement_tip_h_fine_m": (
+                    configuration.measurement_tip_h_fine_m
+                ),
+                "actual_measurement_hbar_tip_m": hbar_tip,
+                "provenance_measurement_hbar_tip_m": provenance_hbar,
+                "trajectory_hbar_tip_m": metadata.get("trajectory_mesh_hbar_tip_m"),
                 "burgers_m": burgers,
                 "placement_resolution_m": placement_resolution,
                 "minimum_resolvable_active_station_m": required_distance,
+                "endpoint_mesh_reconstructed": metadata.get(
+                    "endpoint_mesh_reconstructed"
+                ),
                 "passed": passed,
             }
         )
@@ -56,12 +71,18 @@ def main() -> int:
         raise SystemExit("active-endpoint resolution audit requires at least two snapshots")
 
     payload = {
-        "schema": "v10.2.27_active_endpoint_resolution_audit_v1",
+        "schema": "v10.2.27_capture_measurement_endpoint_resolution_audit_v2",
         "mechanical_configuration_fingerprint": configuration.fingerprint(),
         "active_station_policy_id": configuration.active_station_policy_id,
+        "production_tip_h_fine_m": configuration.tip_h_fine_m,
+        "requested_measurement_tip_h_fine_m": (
+            configuration.measurement_tip_h_fine_m
+        ),
         "first_active_bin_center_m": first_center,
         "state_count": len(rows),
         "all_states_passed": all(row["passed"] for row in rows),
+        "production_mesh_controls_endpoint_resolution": False,
+        "capture_measurement_mesh_controls_endpoint_resolution": True,
         "states": rows,
     }
     output = (
@@ -75,10 +96,11 @@ def main() -> int:
     if not payload["all_states_passed"]:
         worst = max(rows, key=lambda row: row["minimum_resolvable_active_station_m"])
         raise SystemExit(
-            "captured FEM mesh cannot resolve active bin zero: "
+            "capture-only FEM measurement mesh cannot resolve active bin zero: "
             f"first_center={first_center:.9g} m, "
             f"required={worst['minimum_resolvable_active_station_m']:.9g} m. "
-            "Reduce tip_h_fine_m and recalculate the configuration."
+            "Reduce measurement_tip_h_fine_m and recalculate the capture snapshots; "
+            "do not alter the production trajectory mesh solely for this audit."
         )
     return 0
 
