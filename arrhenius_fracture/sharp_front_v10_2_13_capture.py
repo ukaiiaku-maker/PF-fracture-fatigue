@@ -13,6 +13,7 @@ import sys
 
 from . import anisotropic_emission_v10174 as _anisotropic
 from . import fem as _fem
+from . import physical_fem_capture_v10212 as _capture_base
 from . import sharp_front_v10_1_7_4 as _entry74
 from . import sharp_front_v10_1_7_5 as _transport
 from .anisotropic_front_direction_fix_v10227 import install_front_direction_fix
@@ -105,6 +106,36 @@ def _measurement_mesh_config(args: list[str]) -> FrozenMeasurementMeshConfig | N
     ).validate()
 
 
+def _transparent_engine_payload(original):
+    def wrapped(engine):
+        payload = original(engine)
+        payload.update({
+            "capture_loading_path": "accepted_production_state_observer",
+            "capture_physics_overrides": [],
+            "production_parameterization_observed_not_modified": True,
+            "active_shielding_observed": bool(
+                getattr(getattr(engine, "tip_cfg", None), "active_shielding", False)
+            ),
+            "signed_active_shielding_observed": bool(
+                getattr(getattr(engine, "tip_cfg", None), "signed_active_shielding", False)
+            ),
+            "wake_shielding_observed": bool(
+                getattr(getattr(getattr(engine, "mpz", None), "cfg", None), "wake_shielding", False)
+            ),
+            "tip_kinetics_mode_observed": (
+                "moving_velocity"
+                if bool(getattr(engine, "kinetic_tip_cell_active", False))
+                else "legacy_checkpoint"
+            ),
+            "moving_process_zone_advection_observed": bool(
+                hasattr(getattr(engine, "mpz", None), "advance")
+            ),
+        })
+        return payload
+
+    return wrapped
+
+
 def main(argv=None):
     install_front_direction_fix()
     install_geometry_override()
@@ -150,9 +181,11 @@ def main(argv=None):
     original_step = engine_type.step
     original_factory = _entry74.wrap_assemble_mechanics
     original_solve = _fem.solve_dirichlet
+    original_engine_payload = _capture_base._engine_payload
     _entry74.wrap_assemble_mechanics = capture.wrap_assemble_factory(original_factory)
     _fem.solve_dirichlet = capture.wrap_solve_dirichlet(original_solve)
     engine_type.step = capture.wrap_engine_step(original_step)
+    _capture_base._engine_payload = _transparent_engine_payload(original_engine_payload)
     try:
         print(
             "  v10.2.27 physical FEM atlas capture: "
@@ -204,6 +237,7 @@ def main(argv=None):
         )
         return result
     finally:
+        _capture_base._engine_payload = original_engine_payload
         engine_type.step = original_step
         _entry74.wrap_assemble_mechanics = original_factory
         _fem.solve_dirichlet = original_solve
