@@ -1,10 +1,15 @@
-"""v10.2.13 extension-only physical FEM capture semantics.
+"""v10.2.27 extension-only physical FEM capture semantics.
 
-Snapshot requests target cumulative crack-path extension only.  The production
+Snapshot requests target cumulative crack-path extension only. The production
 trajectory retains its original moving-tip mesh and kinetic/advection physics.
 When configured, a matched state is cloned onto a separate endpoint-resolved
 measurement mesh by the base capture class; that reconstruction cannot advance
 or mutate the production process zone.
+
+Extension matching is first-crossing based. A state is eligible only after the
+accepted production trajectory reaches the requested path extension, and the
+overshoot must remain inside the request tolerance. This avoids early-state bias
+for stochastic variable-length crack events.
 """
 from __future__ import annotations
 
@@ -24,7 +29,7 @@ from .physical_fem_capture_v10212 import (
 )
 from .physical_fem_capture_trace_v10212 import PhysicalFEMCapture as _TraceCapture
 
-MODEL_ID = "v10.2.27_extension_only_capture_with_measurement_clone"
+MODEL_ID = "v10.2.27_extension_only_first_crossing_capture_with_measurement_clone"
 TRACE_FIELDS = (
     "trace_index",
     "temperature_K",
@@ -66,6 +71,7 @@ def load_extension_capture_requests(path: str | Path) -> list[CaptureRequest]:
         raise ValueError(f"extension capture table is missing columns {missing}")
     result = []
     seen = set()
+    previous_by_temperature: dict[float, float] = {}
     for row in rows:
         state_id = str(row["state_id"]).strip()
         if not state_id or state_id in seen:
@@ -82,12 +88,20 @@ def load_extension_capture_requests(path: str | Path) -> list[CaptureRequest]:
             extension_tolerance_m=float(row["extension_tolerance_m"]),
             interaction_ell_m=float(row["interaction_ell_m"]),
         ).validate()
+        previous = previous_by_temperature.get(request.temperature_K)
+        if previous is not None and request.crack_extension_m <= previous:
+            raise ValueError(
+                "extension capture requests must be strictly increasing within each "
+                f"temperature; {request.state_id}={request.crack_extension_m:.9g} m "
+                f"after {previous:.9g} m"
+            )
+        previous_by_temperature[request.temperature_K] = request.crack_extension_m
         result.append(request)
     return result
 
 
 class PhysicalFEMCapture(_TraceCapture):
-    """Reachable-state trace plus extension-only snapshot matching."""
+    """Reachable-state trace plus first-crossing extension snapshot matching."""
 
     def __init__(
         self,
@@ -111,16 +125,20 @@ class PhysicalFEMCapture(_TraceCapture):
         self.mesh_gate_checks: list[dict[str, Any]] = []
 
     def _matching_request(self, temperature: float, coordinates: dict[str, float]):
-        candidates = []
         extension = float(coordinates["crack_extension_m"])
+        candidates: list[tuple[float, CaptureRequest]] = []
         for request in self.pending:
             if not math.isclose(
                 float(temperature), request.temperature_K, rel_tol=0.0, abs_tol=1.0e-8
             ):
                 continue
-            error = abs(extension - request.crack_extension_m)
-            if error <= request.extension_tolerance_m:
-                candidates.append((error, request))
+            overshoot = extension - request.crack_extension_m
+            epsilon = max(1.0e-15, 1.0e-12 * max(abs(extension), 1.0))
+            if overshoot >= -epsilon and overshoot <= request.extension_tolerance_m:
+                candidates.append((request.crack_extension_m, request))
+        # Select the earliest crossed pending anchor, not the numerically nearest
+        # anchor. State-table construction guarantees an event cannot cross two
+        # adjacent anchors in one accepted production increment.
         return min(candidates, key=lambda item: item[0])[1] if candidates else None
 
     def _trace_coordinates(self, engine, K: float, T: float) -> None:
@@ -196,6 +214,8 @@ class PhysicalFEMCapture(_TraceCapture):
             "kernel_radius_axis_policy": "disabled_constant_compatibility",
             "opening_axis_policy": "validation_only_until_load_invariance_passes",
             "production_kernel_candidate_axis": "cumulative_crack_path_extension_m",
+            "snapshot_match_policy": "first_accepted_state_at_or_above_anchor",
+            "snapshot_overshoot_bound": "extension_tolerance_m",
             "legacy_crack_extension_m_alias": "cumulative_crack_path_extension_m",
             "projected_extension_recorded_separately": True,
             "purpose": "select frozen crack geometries for load-invariance validation",
@@ -234,9 +254,18 @@ class PhysicalFEMCapture(_TraceCapture):
                         "front process-zone length engine.f.L_pz"
                     )
                 elements = process_zone / max(h_tip, 1.0e-30)
+                overshoot = coordinates["crack_extension_m"] - request.crack_extension_m
                 gate = {
                     "state_id": request.state_id,
                     "temperature_K": float(T),
+                    "requested_crack_path_extension_m": request.crack_extension_m,
+                    "actual_crack_path_extension_m": coordinates["crack_extension_m"],
+                    "first_crossing_overshoot_m": overshoot,
+                    "maximum_allowed_overshoot_m": request.extension_tolerance_m,
+                    "first_crossing_policy_passed": (
+                        overshoot >= -1.0e-15
+                        and overshoot <= request.extension_tolerance_m
+                    ),
                     "trajectory_hbar_tip_m": h_tip,
                     "process_zone_length_m": process_zone,
                     "process_zone_length_source": "engine.f.L_pz",
@@ -252,26 +281,38 @@ class PhysicalFEMCapture(_TraceCapture):
                         f"L_pz/h_tip={elements:.6g} < "
                         f"{self.minimum_elements_per_process_zone:.6g}"
                     )
+                if not gate["first_crossing_policy_passed"]:
+                    raise RuntimeError(
+                        "production trajectory missed a capture anchor within the "
+                        f"admissible overshoot: state={request.state_id}, "
+                        f"overshoot={overshoot:.9g} m, "
+                        f"maximum={request.extension_tolerance_m:.9g} m"
+                    )
         record = _BaseCapture.before_engine_step(self, engine, K, T)
         if record is not None and gate is not None:
             provenance = record.get("measurement_provenance", {})
-            gate.update({
-                "measurement_hbar_tip_m": float(
-                    provenance.get("measurement_mesh_hbar_tip_m", gate["trajectory_hbar_tip_m"])
-                ),
-                "endpoint_mesh_reconstructed": bool(
-                    provenance.get("endpoint_mesh_reconstructed", False)
-                ),
-                "production_engine_state_bitwise_unchanged": bool(
-                    provenance.get("production_engine_state_bitwise_unchanged", False)
-                ),
-                "production_fractional_moving_frame_preserved": bool(
-                    provenance.get("production_fractional_moving_frame_preserved", False)
-                ),
-                "production_mobile_kinetic_solver_preserved": bool(
-                    provenance.get("production_mobile_kinetic_solver_preserved", False)
-                ),
-            })
+            gate.update(
+                {
+                    "measurement_hbar_tip_m": float(
+                        provenance.get(
+                            "measurement_mesh_hbar_tip_m",
+                            gate["trajectory_hbar_tip_m"],
+                        )
+                    ),
+                    "endpoint_mesh_reconstructed": bool(
+                        provenance.get("endpoint_mesh_reconstructed", False)
+                    ),
+                    "production_engine_state_bitwise_unchanged": bool(
+                        provenance.get("production_engine_state_bitwise_unchanged", False)
+                    ),
+                    "production_fractional_moving_frame_preserved": bool(
+                        provenance.get("production_fractional_moving_frame_preserved", False)
+                    ),
+                    "production_mobile_kinetic_solver_preserved": bool(
+                        provenance.get("production_mobile_kinetic_solver_preserved", False)
+                    ),
+                }
+            )
         return record
 
     def finalize(self, *, require_complete: bool = True) -> dict[str, Any]:
@@ -286,6 +327,7 @@ class PhysicalFEMCapture(_TraceCapture):
                     "temperature_K",
                     "cumulative_crack_path_extension_m",
                 ],
+                "snapshot_match_policy": "first_accepted_state_at_or_above_anchor",
                 "opening_is_snapshot_matching_coordinate": False,
                 "analytical_r_eff_is_snapshot_matching_coordinate": False,
                 "minimum_elements_per_process_zone": (
@@ -293,6 +335,10 @@ class PhysicalFEMCapture(_TraceCapture):
                 ),
                 "trajectory_mesh_gate_process_zone_source": "engine.f.L_pz",
                 "mesh_gate_checks": self.mesh_gate_checks,
+                "all_first_crossing_checks_passed": all(
+                    row.get("first_crossing_policy_passed") is True
+                    for row in self.mesh_gate_checks
+                ),
                 "production_moving_process_zone_physics_preserved": True,
                 "measurement_mesh_is_capture_only": True,
             }
