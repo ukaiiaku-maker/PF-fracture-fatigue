@@ -288,25 +288,35 @@ fi
 
 FINAL_SELECTION="$FINAL_SNAPSHOT_ROOT/kernel_self_consistency_selection.json"
 "$PYTHON_BIN" - \
-  "$FINAL_SELECTION" "$CONFIG" "$ORIGINAL_SEED" "$ORIGINAL_SEED_SHA" \
+  "$FINAL_SELECTION" "$CONFIG" "$ORIGINAL_SEED_SHA" \
   "$FINAL_ITERATION" "$FINAL_CANDIDATE" "${COMPARISON_FILES[@]}" <<'PY'
 import hashlib
 import json
 from pathlib import Path
 import sys
-selection, config, original, original_sha, iteration, candidate, *comparisons = sys.argv[1:]
+
+selection, config, original_sha, iteration, candidate, *comparisons = sys.argv[1:]
+config_path = Path(config).resolve()
 candidate_path = Path(candidate).resolve()
+configuration = json.loads(config_path.read_text())
+comparison_payloads = [json.loads(Path(path).read_text()) for path in comparisons]
+if not comparison_payloads or comparison_payloads[-1].get("converged") is not True:
+    raise SystemExit("final self-consistency comparison is absent or unconverged")
+candidate_sha = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
+if comparison_payloads[-1].get("current_family_sha256") != candidate_sha:
+    raise SystemExit("final comparison does not identify the converged candidate family")
+
+from arrhenius_fracture.kernel_configuration_v10227 import MechanicalKernelConfiguration
+fingerprint = MechanicalKernelConfiguration.from_mapping(configuration).fingerprint()
 payload = {
-    "schema": "v10.2.27_kernel_self_consistency_selection_v1",
-    "mechanical_configuration": str(Path(config).resolve()),
-    "initial_bootstrap_family": str(Path(original).resolve()),
+    "schema": "v10.2.27_kernel_self_consistency_selection_v2",
+    "mechanical_configuration_fingerprint": fingerprint,
     "initial_bootstrap_family_sha256": original_sha,
     "converged": True,
     "converged_iteration": int(iteration),
     "minimum_target_family_passes": 2,
-    "converged_candidate_family": str(candidate_path),
-    "converged_candidate_family_sha256": hashlib.sha256(candidate_path.read_bytes()).hexdigest(),
-    "comparison_audits": [str(Path(path).resolve()) for path in comparisons],
+    "converged_candidate_family_sha256": candidate_sha,
+    "comparisons": comparison_payloads,
 }
 Path(selection).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 PY
@@ -353,7 +363,7 @@ import sys
 ) = sys.argv[1:]
 selection_payload = json.loads(Path(selection).read_text())
 payload = {
-    "schema": "v10.2.27_kernel_self_consistency_manifest_v1",
+    "schema": "v10.2.27_kernel_self_consistency_manifest_v2",
     "converged": True,
     "converged_iteration": int(converged_iteration),
     "maximum_iterations": int(max_iterations),
