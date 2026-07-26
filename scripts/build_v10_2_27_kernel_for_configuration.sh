@@ -77,13 +77,25 @@ elif [[ -z "$SNAPSHOT_ROOT" ]]; then
     exit 5
   fi
   SNAPSHOT_ROOT="$CACHE_DIR/snapshots"
-  mkdir -p "$SNAPSHOT_ROOT"
+  # PhysicalFEMCapture owns creation of the output root and rejects pre-existing
+  # directories.  Clear any failed partial state and create only the parent.
+  rm -rf "$SNAPSHOT_ROOT"
+  mkdir -p "$(dirname "$SNAPSHOT_ROOT")"
   export V10227_KERNEL_CAPTURE_OUTROOT="$SNAPSHOT_ROOT"
   export V10227_KERNEL_CAPTURE_THETA_DEG="$THETA"
   export V10227_KERNEL_CAPTURE_TARGET_EXTENSION_UM="$TARGET_EXT_UM"
   export V10227_KERNEL_CAPTURE_REQUIRED_MAX_EXTENSION_UM="$REQUIRED_EXT_UM"
+  export V10227_KERNEL_CAPTURE_TEMPERATURE_K="$CAPTURE_TEMPERATURE_K"
   echo "CAPTURE accepted production states with registered command" >&2
   bash -lc "$KERNEL_CAPTURE_COMMAND"
+  if [[ ! -f "$SNAPSHOT_ROOT/capture_complete.json" ]]; then
+    echo "ERROR: registered production capture did not create capture_complete.json" >&2
+    exit 2
+  fi
+  if [[ ! -f "$SNAPSHOT_ROOT/kernel_capture_manifest.json" ]]; then
+    echo "ERROR: registered production capture did not create kernel_capture_manifest.json" >&2
+    exit 2
+  fi
 fi
 
 if [[ -n "$SNAPSHOT_ROOT" && -z "$SNAPSHOT_ARCHIVE" ]]; then
