@@ -32,6 +32,7 @@ EVENT_MINIMUM_FACTOR=${CLEAVAGE_EVENT_MIN_FACTOR:-0.5}
 EVENT_MAXIMUM_FACTOR=${CLEAVAGE_EVENT_MAX_FACTOR:-4.0}
 EVENT_SUBSEGMENT_FRACTION=${CLEAVAGE_EVENT_SUBSEGMENT_FRACTION:-0.1}
 PERSISTENT_SOURCE_MIN_WIDTH_UM=${PERSISTENT_SOURCE_MIN_WIDTH_UM:-0}
+EXPECTED_SEED_SHA256=${KERNEL_CAPTURE_SEED_FAMILY_EXPECTED_SHA256:-}
 
 for required in "$CONFIG" "$SEED_FAMILY" "$REGISTRY"; do
   [[ -f "$required" ]] || { echo "ERROR: missing required input: $required" >&2; exit 2; }
@@ -87,7 +88,7 @@ PY
   --event-maximum-factor "$EVENT_MAXIMUM_FACTOR" \
   --output "$STATE_TABLE"
 
-read -r MAX_ANCHOR_UM PROJECTED_STOP_UM < <(
+read -r MAX_ANCHOR_UM PROJECTED_STOP_UM REQUIRED_SEED_PATH_UM < <(
   "$PYTHON_BIN" - "$STATE_TABLE" "$THETA" "$DA_M" <<'PY'
 import csv
 import math
@@ -96,11 +97,14 @@ path, theta, da_m = sys.argv[1:]
 with open(path, newline="") as stream:
     rows = list(csv.DictReader(stream))
 maximum_um = max(float(row["cumulative_crack_path_extension_m"]) for row in rows) * 1.0e6
-projected_stop_um = (
-    maximum_um * abs(math.cos(math.radians(float(theta))))
-    + 4.0 * float(da_m) * 1.0e6
-)
-print(maximum_um, projected_stop_um)
+cosine = abs(math.cos(math.radians(float(theta))))
+if cosine <= 1.0e-12:
+    raise SystemExit("capture theta has zero projected-extension cosine")
+# Continue by four outer checkpoint lengths after the final anchor so the next
+# engine-step observer can serialize the first accepted state that crossed it.
+projected_stop_um = maximum_um * cosine + 4.0 * float(da_m) * 1.0e6
+required_seed_path_um = projected_stop_um / cosine
+print(maximum_um, projected_stop_um, required_seed_path_um)
 PY
 )
 
@@ -112,6 +116,18 @@ import sys
 print(hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest())
 PY
 )
+if [[ -n "$EXPECTED_SEED_SHA256" && "$SEED_FAMILY_SHA256" != "$EXPECTED_SEED_SHA256" ]]; then
+  echo "ERROR: capture bootstrap family SHA-256 mismatch" >&2
+  echo "Expected: $EXPECTED_SEED_SHA256" >&2
+  echo "Actual:   $SEED_FAMILY_SHA256" >&2
+  exit 2
+fi
+
+"$PYTHON_BIN" scripts/check_v10_2_27_capture_seed_family.py \
+  --family "$SEED_FAMILY" \
+  --required-path-extension-um "$REQUIRED_SEED_PATH_UM" \
+  --output "$RUN_ROOT/capture_seed_family_audit.json"
+
 export V10227_KERNEL_CAPTURE_SEED_FAMILY="$SEED_FAMILY"
 export V10227_KERNEL_CAPTURE_SEED_FAMILY_SHA256="$SEED_FAMILY_SHA256"
 
@@ -184,7 +200,7 @@ cmd=(
 } > "$RUN_ROOT/command.sh"
 chmod +x "$RUN_ROOT/command.sh"
 
-"$PYTHON_BIN" - "$RUN_ROOT" "$CONFIG" "$STATE_TABLE" "$SEED_FAMILY" "$SEED_FAMILY_SHA256" "$REGISTRY" "$KERNEL_CAPTURE_PARAMETER_OPTION" "$KERNEL_CAPTURE_HAZARD_SEED" "$MAX_ANCHOR_UM" "$PROJECTED_STOP_UM" <<'PY'
+"$PYTHON_BIN" - "$RUN_ROOT" "$CONFIG" "$STATE_TABLE" "$SEED_FAMILY" "$SEED_FAMILY_SHA256" "$REGISTRY" "$KERNEL_CAPTURE_PARAMETER_OPTION" "$KERNEL_CAPTURE_HAZARD_SEED" "$MAX_ANCHOR_UM" "$PROJECTED_STOP_UM" "$REQUIRED_SEED_PATH_UM" <<'PY'
 import json
 from pathlib import Path
 import sys
@@ -199,21 +215,25 @@ import sys
     seed,
     maximum_anchor,
     projected_stop,
+    required_seed_path,
 ) = sys.argv[1:]
 payload = {
-    "schema": "v10.2.27_accepted_production_kernel_capture_command_v2",
+    "schema": "v10.2.27_accepted_production_kernel_capture_command_v3",
     "mechanical_configuration": str(Path(config).resolve()),
     "state_table": str(Path(state_table).resolve()),
     "seed_signed_kernel_family": str(Path(family).resolve()),
     "seed_signed_kernel_family_sha256": family_sha,
+    "seed_family_audit": str(Path(run_root, "capture_seed_family_audit.json").resolve()),
     "parameter_registry": str(Path(registry).resolve()),
     "parameter_option": option,
     "hazard_seed": int(seed),
     "maximum_anchor_extension_um": float(maximum_anchor),
     "projected_stop_extension_um": float(projected_stop),
+    "required_seed_family_path_extension_um": float(required_seed_path),
     "production_entry": "audited v10.2.27 persistent-site paper stack",
     "stochastic_first_passage": True,
     "variable_event_lengths": True,
+    "capture_match_policy": "first accepted state at or above each path anchor",
     "front_state_model": "moving_pz",
     "tip_kinetics_mode": "moving_velocity",
     "persistent_site_source": True,
@@ -233,6 +253,7 @@ printf '  option: %s\n' "$KERNEL_CAPTURE_PARAMETER_OPTION"
 printf '  temperature: %s K\n' "$V10227_KERNEL_CAPTURE_TEMPERATURE_K"
 printf '  seed family SHA256: %s\n' "$SEED_FAMILY_SHA256"
 printf '  anchors through: %s um\n' "$MAX_ANCHOR_UM"
+printf '  required seed coverage: %s um\n' "$REQUIRED_SEED_PATH_UM"
 printf '  capture root: %s\n' "$SNAPSHOT_ROOT"
 
 "${cmd[@]}" 2>&1 | tee "$RUN_ROOT/run.log"
@@ -246,3 +267,6 @@ cp "$RUN_ROOT/command.sh" "$SNAPSHOT_ROOT/accepted_production_capture_command.sh
 cp \
   "$RUN_ROOT/accepted_production_capture_command.json" \
   "$SNAPSHOT_ROOT/accepted_production_capture_command.json"
+cp \
+  "$RUN_ROOT/capture_seed_family_audit.json" \
+  "$SNAPSHOT_ROOT/capture_seed_family_audit.json"
