@@ -57,6 +57,34 @@ for forbidden in \
   fi
 done
 
+# If the final family is absent, any generated products already present in this
+# fingerprint directory came from an interrupted build. Preserve them for audit
+# while moving them out of the active build paths before retrying.
+if [[ ! -f "$FAMILY_OUT" ]]; then
+  stamp=$(date -u +%Y%m%dT%H%M%SZ)
+  quarantine="$CACHE_DIR/incomplete_builds/$stamp"
+  moved=0
+  for generated in \
+    prescribed_geometry_snapshots \
+    load_invariance \
+    portable_assembly \
+    portable_load_invariance_reports \
+    mechanics_normalization.json \
+    coverage_audit.json \
+    direct_kernel_validation_manifest.json \
+    kernel_build_manifest.json; do
+    source="$CACHE_DIR/$generated"
+    if [[ -e "$source" ]]; then
+      mkdir -p "$quarantine"
+      mv "$source" "$quarantine/"
+      moved=1
+    fi
+  done
+  if [[ "$moved" -eq 1 ]]; then
+    echo "Quarantined incomplete direct-kernel build products at $quarantine" >&2
+  fi
+fi
+
 exec "$PYTHON_BIN" scripts/build_v10_2_28_prescribed_geometry_kernel.py \
   --mechanical-config "$CONFIG" \
   --outroot "$CACHE_DIR" \
