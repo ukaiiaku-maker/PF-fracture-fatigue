@@ -19,9 +19,9 @@ SPEC.loader.exec_module(MODULE)
 
 def test_locked_tungsten_cubic_tensor_gives_expected_isotropic_moduli():
     E, nu = MODULE._isotropic_moduli_from_cubic(523.0e9, 203.0e9, 160.0e9)
-    assert E / 1.0e9 == pytest.approx(409.4770642201835)
+    assert E / 1.0e9 == pytest.approx(409.4765840220386)
     assert nu == pytest.approx(0.2796143250688705)
-    assert E / (1.0 - nu * nu) / 1.0e9 == pytest.approx(444.2073170731707)
+    assert E / (1.0 - nu * nu) / 1.0e9 == pytest.approx(444.20650095602295)
 
 
 def test_non_zener_one_tensor_requires_explicit_effective_modulus():
