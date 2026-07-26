@@ -27,6 +27,16 @@ from .physical_fem_snapshot_v10212 import SnapshotMetadata, save_snapshot
 MODEL_ID = "v10.2.27_live_production_state_capture_with_frozen_measurement_clone"
 
 
+class CaptureCompleteStop(RuntimeError):
+    """Internal control signal raised after the final accepted state is saved."""
+
+    def __init__(self, state_id: str):
+        self.state_id = str(state_id)
+        super().__init__(
+            f"accepted production capture completed at state {self.state_id}"
+        )
+
+
 @dataclass(frozen=True)
 class CaptureRequest:
     state_id: str
@@ -476,7 +486,9 @@ class PhysicalFEMCapture:
 
     def wrap_engine_step(self, original: Callable) -> Callable:
         def wrapped(engine, K, T, dt):
-            self.before_engine_step(engine, K, T)
+            record = self.before_engine_step(engine, K, T)
+            if record is not None and not self.pending:
+                raise CaptureCompleteStop(record["payload"]["state_id"])
             return original(engine, K, T, dt)
 
         wrapped.__name__ = getattr(original, "__name__", "step")
@@ -498,6 +510,7 @@ class PhysicalFEMCapture:
             "capture_reconstruction_is_measurement_only": True,
             "post_dirichlet_equilibrium_displacement_saved": True,
             "resolved_crack_path_serialized_for_measurement": True,
+            "capture_stops_before_postfinal_kernel_query": True,
             "active_kernel_supported": True,
             "wake_kernel_supported": False,
             "production_parameterization_allowed": False,
@@ -513,6 +526,7 @@ class PhysicalFEMCapture:
 
 __all__ = [
     "MODEL_ID",
+    "CaptureCompleteStop",
     "CaptureRequest",
     "PhysicalFEMCapture",
     "load_capture_requests",
