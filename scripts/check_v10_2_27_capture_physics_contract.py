@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed audit of accepted-production kernel capture physics."""
+"""Fail-closed audit of accepted v10.2.27 production kernel capture."""
 from __future__ import annotations
 
 import argparse
@@ -15,6 +15,8 @@ from arrhenius_fracture.kernel_configuration_v10227 import load_configuration
 
 
 REQUIRED_TRAJECTORY_FLAGS = (
+    "audited_persistent_site_engine_preserved",
+    "persistent_site_source_preserved",
     "stochastic_first_passage_preserved",
     "variable_event_length_preserved",
     "moving_process_zone_physics_preserved",
@@ -22,7 +24,10 @@ REQUIRED_TRAJECTORY_FLAGS = (
     "mobile_kinetic_solver_preserved",
     "active_shielding_preserved",
     "signed_active_shielding_preserved",
+    "wake_shielding_remains_disabled",
     "production_parameterization_observed_not_modified",
+    "trajectory_seed_family_required_to_break_kernel_build_cycle",
+    "trajectory_seed_family_used_only_for_production_state_evolution",
 )
 REQUIRED_SNAPSHOT_FLAGS = {
     "trajectory_state_cloned": True,
@@ -66,6 +71,8 @@ def main() -> int:
     failed_trajectory = [
         name for name in REQUIRED_TRAJECTORY_FLAGS if trajectory.get(name) is not True
     ]
+    if trajectory.get("driver") != "audited_v10_2_27_persistent_site_production_stack":
+        failed_trajectory.append("driver")
     if trajectory.get("capture_physics_overrides") != []:
         failed_trajectory.append("capture_physics_overrides")
     if trajectory.get("observed_hazard_modes") != ["exponential"]:
@@ -74,10 +81,15 @@ def main() -> int:
         failed_trajectory.append("observed_event_length_modes")
     if trajectory.get("observed_tip_kinetics_modes") != ["moving_velocity"]:
         failed_trajectory.append("observed_tip_kinetics_modes")
+    seed_sha = str(trajectory.get("trajectory_seed_signed_kernel_family_sha256", ""))
+    if len(seed_sha) != 64 or any(character not in "0123456789abcdef" for character in seed_sha):
+        failed_trajectory.append("trajectory_seed_signed_kernel_family_sha256")
+    if not str(trajectory.get("trajectory_seed_signed_kernel_family", "")).strip():
+        failed_trajectory.append("trajectory_seed_signed_kernel_family")
     if failed_trajectory:
         raise SystemExit(
             "accepted-production capture physics contract failed: "
-            + ",".join(failed_trajectory)
+            + ",".join(sorted(set(failed_trajectory)))
         )
 
     rows = []
@@ -91,6 +103,8 @@ def main() -> int:
         engine = dict(payload.get("engine_config", {}))
         observed = {
             "capture_loading_path": engine.get("capture_loading_path"),
+            "persistent_site_engine": engine.get("persistent_site_engine_observed"),
+            "persistent_site_source": engine.get("persistent_site_source_observed"),
             "cleavage_hazard_mode": engine.get("cleavage_hazard_mode_observed"),
             "cleavage_event_length_mode": engine.get(
                 "cleavage_event_length_mode_observed"
@@ -100,17 +114,21 @@ def main() -> int:
             "signed_active_shielding": engine.get(
                 "signed_active_shielding_observed"
             ),
+            "wake_shielding": engine.get("wake_shielding_observed"),
             "moving_process_zone_advection": engine.get(
                 "moving_process_zone_advection_observed"
             ),
         }
         expected_observed = {
-            "capture_loading_path": "accepted_production_state_observer",
+            "capture_loading_path": "accepted_v10_2_27_production_state_observer",
+            "persistent_site_engine": True,
+            "persistent_site_source": True,
             "cleavage_hazard_mode": "exponential",
             "cleavage_event_length_mode": "threshold_scaled",
             "tip_kinetics_mode": "moving_velocity",
             "active_shielding": True,
             "signed_active_shielding": True,
+            "wake_shielding": False,
             "moving_process_zone_advection": True,
         }
         failures.extend(
@@ -122,19 +140,21 @@ def main() -> int:
         after = payload.get("production_engine_state_sha256_after")
         if not before or before != after:
             failures.append("production_engine_state_sha256")
-        rows.append({
-            "state_id": payload.get("state_id", path.parent.name),
-            "snapshot": str(path),
-            "observed": observed,
-            "failures": sorted(set(failures)),
-            "passed": not failures,
-        })
+        rows.append(
+            {
+                "state_id": payload.get("state_id", path.parent.name),
+                "snapshot": str(path),
+                "observed": observed,
+                "failures": sorted(set(failures)),
+                "passed": not failures,
+            }
+        )
     if len(rows) < 2:
         raise SystemExit("capture physics audit requires at least two snapshot states")
     failed_states = [row["state_id"] for row in rows if not row["passed"]]
 
     result = {
-        "schema": "v10.2.27_accepted_production_capture_physics_audit_v1",
+        "schema": "v10.2.27_accepted_production_capture_physics_audit_v2",
         "mechanical_configuration_fingerprint": expected,
         "snapshot_root": str(root),
         "state_count": len(rows),
