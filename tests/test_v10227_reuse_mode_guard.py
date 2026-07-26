@@ -17,7 +17,7 @@ SPEC.loader.exec_module(MODULE)
 def test_build_mode_rejects_snapshot_root_reuse(monkeypatch):
     monkeypatch.setenv("KERNEL_SNAPSHOT_ROOT", "/tmp/preserved_snapshots")
     with pytest.raises(SystemExit, match="cannot be combined"):
-        MODULE._install_automatic_endpoint_resolution([
+        MODULE._validate_cache_mode([
             "--theta-deg", "18",
             "--target-extension-um", "50",
             "--mode", "build",
@@ -27,7 +27,7 @@ def test_build_mode_rejects_snapshot_root_reuse(monkeypatch):
 def test_build_mode_rejects_load_root_reuse(monkeypatch):
     monkeypatch.setenv("KERNEL_LOAD_INVARIANCE_ROOT", "/tmp/preserved_loads")
     with pytest.raises(SystemExit, match="cannot be combined"):
-        MODULE._install_automatic_endpoint_resolution([
+        MODULE._validate_cache_mode([
             "--theta-deg", "18",
             "--target-extension-um", "50",
             "--mode", "build",
@@ -36,9 +36,8 @@ def test_build_mode_rejects_load_root_reuse(monkeypatch):
 
 def test_auto_mode_allows_snapshot_root_reuse(monkeypatch):
     monkeypatch.setenv("KERNEL_SNAPSHOT_ROOT", "/tmp/preserved_snapshots")
-    result = MODULE._install_automatic_endpoint_resolution([
+    MODULE._validate_cache_mode([
         "--theta-deg", "18",
         "--target-extension-um", "50",
         "--mode", "auto",
     ])
-    assert "--tip-h-fine-um" in result
