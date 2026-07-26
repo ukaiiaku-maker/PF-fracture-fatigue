@@ -35,7 +35,8 @@ def test_launchers_have_valid_bash_syntax():
 def test_generic_alias_delegates_to_backward_compatible_implementation():
     source = LAUNCHER.read_text()
     assert IMPLEMENTATION.name in source
-    assert 'exec bash "$ROOT/scripts/' in source
+    assert 'source "$ROOT/scripts/' in source
+    assert "export -f mktemp" not in source
 
 
 def test_launcher_uses_current_canonical_four_class_rows():
