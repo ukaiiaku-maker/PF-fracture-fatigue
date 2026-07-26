@@ -13,10 +13,14 @@ from arrhenius_fracture.kernel_normalization_contract_v10228 import (
     DEFAULT_KINETIC_PACKET_LENGTH_M,
     KernelNormalizationContract,
 )
+from arrhenius_fracture.kernel_resolver_v10227 import (
+    required_max_extension_um as legacy_required_max_extension_um,
+)
 from arrhenius_fracture.kernel_resolver_v10228 import (
     BUILD_SCHEMA,
     VALIDATION_SCHEMA,
     _validate_direct_evidence,
+    required_max_extension_um,
 )
 from arrhenius_fracture.prescribed_geometry_kernel_v10228 import (
     plan_prescribed_geometry_anchors,
@@ -53,6 +57,22 @@ def test_normalization_contract_preserves_current_production_defaults():
     assert contract.activation_to_line_content == pytest.approx(
         KineticTipConfig().packet_length_m / ElasticProperties().b
     )
+
+
+def test_direct_coverage_adds_one_physical_checkpoint_guard():
+    kwargs = {
+        "target_extension_um": 1000.0,
+        "theta_deg": 15.0,
+        "da_phys_um": 5.0,
+        "event_minimum_factor": 0.5,
+        "event_maximum_factor": 4.0,
+        "margin_events": 1.0,
+    }
+    legacy = legacy_required_max_extension_um(**kwargs)
+    guarded = required_max_extension_um(**kwargs)
+    assert guarded == pytest.approx(legacy + 5.0, rel=0.0, abs=1.0e-12)
+    assert legacy < 1055.0955538978697
+    assert guarded > 1055.0955538978697
 
 
 def test_anchor_plan_is_geometric_and_seed_free():
