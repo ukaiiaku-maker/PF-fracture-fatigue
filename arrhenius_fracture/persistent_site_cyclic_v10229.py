@@ -190,7 +190,9 @@ class PersistentSiteCyclicTipEngine(PersistentSiteStateResolvedTipEngine):
             float(waveform.Kmax),
             T_K,
             dt_requested,
-            stress_override=float(pred.avg_sigma_emit_eff),
+            # Pass the cycle-averaged opening stress. The persistent-source law
+            # applies anisotropic drive factors and Taylor backstress exactly once.
+            stress_override=float(pred.avg_sigma_tip),
             lambda_override=lambda_avg,
         )
         cycles_consumed = cycle_count_from_consumed_time(
