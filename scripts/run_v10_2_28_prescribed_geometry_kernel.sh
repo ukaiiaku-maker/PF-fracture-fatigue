@@ -57,9 +57,6 @@ for forbidden in \
   fi
 done
 
-# If the final family is absent, any generated products already present in this
-# fingerprint directory came from an interrupted build. Preserve them for audit
-# while moving them out of the active build paths before retrying.
 if [[ ! -f "$FAMILY_OUT" ]]; then
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
   quarantine="$CACHE_DIR/incomplete_builds/$stamp"
@@ -85,7 +82,7 @@ if [[ ! -f "$FAMILY_OUT" ]]; then
   fi
 fi
 
-exec "$PYTHON_BIN" scripts/build_v10_2_28_prescribed_geometry_kernel.py \
+exec "$PYTHON_BIN" scripts/build_v10_2_28_prescribed_geometry_kernel_numpy2.py \
   --mechanical-config "$CONFIG" \
   --outroot "$CACHE_DIR" \
   --family-out "$FAMILY_OUT" \
