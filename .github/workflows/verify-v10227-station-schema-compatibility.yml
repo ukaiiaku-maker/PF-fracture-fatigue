@@ -33,6 +33,8 @@ jobs:
             arrhenius_fracture/frozen_geometry_load_invariance_v10213.py \
             arrhenius_fracture/kernel_configuration_v10227.py \
             arrhenius_fracture/kernel_resolver_v10227.py \
+            scripts/write_v10_2_27_production_capture_state_table.py \
+            scripts/check_v10_2_27_capture_seed_family.py \
             scripts/check_v10_2_27_capture_physics_contract.py \
             scripts/build_v10_2_27_kernel_from_current_mechanics.py \
             scripts/evaluate_v10_2_14_active_load_invariance.py \
@@ -45,10 +47,12 @@ jobs:
             tests/test_v10227_reuse_mode_guard.py \
             tests/test_v10_2_27_capture_physics_invariance.py \
             tests/test_v10_2_27_capture_physics_contract.py \
+            tests/test_v10_2_27_accepted_production_capture_adapter.py \
             tests/test_v10_2_27_kernel_resolution.py \
             tests/test_v10_2_27_capture_output_contract.py
       - name: Validate production and kernel shell scripts
         run: |
           bash -n scripts/build_v10_2_27_kernel_for_configuration.sh
+          bash -n scripts/run_v10_2_27_accepted_production_kernel_capture.sh
           bash -n scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves.sh
           bash -n scripts/run_v10_2_27_physics_frozen_single_case_smoke.sh
