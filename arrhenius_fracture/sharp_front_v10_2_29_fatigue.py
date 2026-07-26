@@ -8,6 +8,10 @@ import sys
 from . import sharp_front_v10_2_17 as _stage3
 from . import sharp_front_v10_2_27 as _paper
 from . import sharp_front_v10_2_28 as _entry
+from .fatigue_controller_delegate_v10229 import (
+    install_engine_native_cycle_preview,
+    restore_engine_native_cycle_preview,
+)
 from .fatigue_driver_cycle_accounting_v10229 import (
     install_consumed_cycle_accounting,
     restore_consumed_cycle_accounting,
@@ -114,13 +118,17 @@ def main(argv=None):
     )
     _paper.PersistentSiteStateResolvedTipEngine = PersistentSiteStateResolvedTipEngine
     _entry.MODEL_ID = MODEL_ID
-    install_consumed_cycle_accounting()
+    install_engine_native_cycle_preview()
     try:
-        result = _entry.main(args)
-        _write_fatigue_audit(args)
-        return result
+        install_consumed_cycle_accounting()
+        try:
+            result = _entry.main(args)
+            _write_fatigue_audit(args)
+            return result
+        finally:
+            restore_consumed_cycle_accounting()
     finally:
-        restore_consumed_cycle_accounting()
+        restore_engine_native_cycle_preview()
         _entry.MODEL_ID = original_model_id
         _paper.PersistentSiteStateResolvedTipEngine = original_engine
         _stage3._force_stage3_validity_envelope = original_validity
