@@ -37,6 +37,9 @@ for required in "$CONFIG" "$SEED_FAMILY" "$REGISTRY"; do
   [[ -f "$required" ]] || { echo "ERROR: missing required input: $required" >&2; exit 2; }
 done
 
+"$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py
+"$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py --check-only
+
 CACHE_DIR=${V10227_KERNEL_CACHE_DIR:-$(dirname "$SNAPSHOT_ROOT")}
 STATE_TABLE="$CACHE_DIR/accepted_production_capture_state_table.csv"
 RUN_ROOT="$CACHE_DIR/accepted_production_capture_run"
@@ -93,7 +96,10 @@ path, theta, da_m = sys.argv[1:]
 with open(path, newline="") as stream:
     rows = list(csv.DictReader(stream))
 maximum_um = max(float(row["cumulative_crack_path_extension_m"]) for row in rows) * 1.0e6
-projected_stop_um = maximum_um * abs(math.cos(math.radians(float(theta)))) + 4.0 * float(da_m) * 1.0e6
+projected_stop_um = (
+    maximum_um * abs(math.cos(math.radians(float(theta))))
+    + 4.0 * float(da_m) * 1.0e6
+)
 print(maximum_um, projected_stop_um)
 PY
 )
@@ -195,7 +201,7 @@ import sys
     projected_stop,
 ) = sys.argv[1:]
 payload = {
-    "schema": "v10.2.27_accepted_production_kernel_capture_command_v1",
+    "schema": "v10.2.27_accepted_production_kernel_capture_command_v2",
     "mechanical_configuration": str(Path(config).resolve()),
     "state_table": str(Path(state_table).resolve()),
     "seed_signed_kernel_family": str(Path(family).resolve()),
@@ -205,10 +211,13 @@ payload = {
     "hazard_seed": int(seed),
     "maximum_anchor_extension_um": float(maximum_anchor),
     "projected_stop_extension_um": float(projected_stop),
+    "production_entry": "audited v10.2.27 persistent-site paper stack",
     "stochastic_first_passage": True,
     "variable_event_lengths": True,
     "front_state_model": "moving_pz",
     "tip_kinetics_mode": "moving_velocity",
+    "persistent_site_source": True,
+    "physical_front_width": True,
     "active_shielding": True,
     "signed_active_shielding": True,
     "wake_shielding": False,
@@ -227,3 +236,13 @@ printf '  anchors through: %s um\n' "$MAX_ANCHOR_UM"
 printf '  capture root: %s\n' "$SNAPSHOT_ROOT"
 
 "${cmd[@]}" 2>&1 | tee "$RUN_ROOT/run.log"
+
+for required in \
+  "$SNAPSHOT_ROOT/capture_complete.json" \
+  "$SNAPSHOT_ROOT/kernel_capture_manifest.json"; do
+  [[ -f "$required" ]] || { echo "ERROR: capture did not create $required" >&2; exit 2; }
+done
+cp "$RUN_ROOT/command.sh" "$SNAPSHOT_ROOT/accepted_production_capture_command.sh"
+cp \
+  "$RUN_ROOT/accepted_production_capture_command.json" \
+  "$SNAPSHOT_ROOT/accepted_production_capture_command.json"
