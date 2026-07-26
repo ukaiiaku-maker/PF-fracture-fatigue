@@ -139,6 +139,18 @@ def _transparent_engine_payload(original):
             "capture_loading_path": "accepted_production_state_observer",
             "capture_physics_overrides": [],
             "production_parameterization_observed_not_modified": True,
+            "cleavage_hazard_mode_observed": str(
+                os.environ.get("CLEAVAGE_HAZARD_MODE", "")
+            ).strip().lower(),
+            "cleavage_event_length_mode_observed": str(
+                os.environ.get("CLEAVAGE_EVENT_LENGTH_MODE", "")
+            ).strip().lower(),
+            "cleavage_event_min_factor_observed": str(
+                os.environ.get("CLEAVAGE_EVENT_MIN_FACTOR", "")
+            ).strip(),
+            "cleavage_event_max_factor_observed": str(
+                os.environ.get("CLEAVAGE_EVENT_MAX_FACTOR", "")
+            ).strip(),
             "active_shielding_observed": bool(
                 getattr(getattr(engine, "tip_cfg", None), "active_shielding", False)
             ),
@@ -162,6 +174,16 @@ def _transparent_engine_payload(original):
     return wrapped
 
 
+def _observed_engine_payloads(audit: dict) -> list[dict]:
+    result = []
+    for record in dict(audit.get("states", {})).values():
+        payload = dict(record.get("payload", {}))
+        engine = payload.get("engine_config")
+        if isinstance(engine, dict):
+            result.append(engine)
+    return result
+
+
 def _write_kernel_capture_manifest(
     root: Path,
     *,
@@ -182,20 +204,66 @@ def _write_kernel_capture_manifest(
             "resolver/capture mechanical-configuration fingerprint mismatch: "
             f"{fingerprint} != {expected}"
         )
+    if measurement_config is None:
+        raise RuntimeError(
+            "resolver-driven kernel capture requires a capture-only measurement mesh"
+        )
+
+    engines = _observed_engine_payloads(audit)
+    if not engines:
+        raise RuntimeError("kernel capture manifest has no observed engine payloads")
+    hazard_modes = {str(row.get("cleavage_hazard_mode_observed", "")) for row in engines}
+    event_modes = {str(row.get("cleavage_event_length_mode_observed", "")) for row in engines}
+    kinetic_modes = {str(row.get("tip_kinetics_mode_observed", "")) for row in engines}
+    stochastic = hazard_modes == {"exponential"}
+    variable_events = event_modes == {"threshold_scaled"}
+    moving_kinetics = kinetic_modes == {"moving_velocity"}
+    moving_advection = all(
+        row.get("moving_process_zone_advection_observed") is True for row in engines
+    )
+    active_shielding = all(
+        row.get("active_shielding_observed") is True for row in engines
+    )
+    signed_shielding = all(
+        row.get("signed_active_shielding_observed") is True for row in engines
+    )
+    parameterization_unchanged = all(
+        row.get("production_parameterization_observed_not_modified") is True
+        and row.get("capture_physics_overrides") == []
+        for row in engines
+    )
+    required = {
+        "stochastic_first_passage_preserved": stochastic,
+        "variable_event_length_preserved": variable_events,
+        "moving_process_zone_physics_preserved": moving_kinetics and moving_advection,
+        "fractional_moving_frame_preserved": moving_kinetics and moving_advection,
+        "mobile_kinetic_solver_preserved": moving_kinetics,
+        "active_shielding_preserved": active_shielding,
+        "signed_active_shielding_preserved": signed_shielding,
+        "production_parameterization_observed_not_modified": parameterization_unchanged,
+    }
+    failed = [name for name, passed in required.items() if not passed]
+    if failed:
+        raise RuntimeError(
+            "registered kernel capture did not preserve the production physics contract: "
+            + ",".join(failed)
+            + f"; hazard_modes={sorted(hazard_modes)}, event_modes={sorted(event_modes)}, "
+            + f"kinetic_modes={sorted(kinetic_modes)}"
+        )
+
     payload = {
-        "schema": "v10.2.27_accepted_production_state_kernel_capture_v1",
+        "schema": "v10.2.27_accepted_production_state_kernel_capture_v2",
         "mechanical_configuration": configuration.canonical_payload(),
         "mechanical_configuration_fingerprint": expected,
         "trajectory_driver": {
             "driver": "registered_accepted_production_command",
-            "scientific_material_reference_condition": False,
-            "production_parameterization_observed_not_modified": True,
+            "historical_reference_condition_required": False,
+            "accepted_production_parameterization_observed": True,
             "capture_physics_overrides": [],
-            "stochastic_first_passage_preserved": True,
-            "variable_event_length_preserved": True,
-            "moving_process_zone_physics_preserved": True,
-            "fractional_moving_frame_preserved": True,
-            "mobile_kinetic_solver_preserved": True,
+            "observed_hazard_modes": sorted(hazard_modes),
+            "observed_event_length_modes": sorted(event_modes),
+            "observed_tip_kinetics_modes": sorted(kinetic_modes),
+            **required,
         },
         "measurement_snapshot": {
             "capture_only": True,
@@ -203,9 +271,7 @@ def _write_kernel_capture_manifest(
             "plasticity_frozen": True,
             "kinetics_not_advanced": True,
             "endpoint_mesh_re_equilibrated": True,
-            "measurement_mesh_config": (
-                None if measurement_config is None else measurement_config.as_dict()
-            ),
+            "measurement_mesh_config": measurement_config.as_dict(),
         },
         "state_table": None if state_table is None else str(Path(state_table).resolve()),
         "captured_states": int(audit.get("captured_states", 0)),
