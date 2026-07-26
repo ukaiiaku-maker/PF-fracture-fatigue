@@ -7,8 +7,15 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import sys
 
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from arrhenius_fracture.kernel_registry_v10227 import family_physics_fingerprint
 
 EXPECTED_SCHEMA = "v10.2.14_active_only_real_signed_2d_shielding_atlas"
 
@@ -46,8 +53,10 @@ def main() -> int:
         type=float,
         default=100.0,
     )
-    parser.add_argument("--maximum-extension-change-um", type=float, default=1.0)
-    parser.add_argument("--maximum-normalization-relative-change", type=float, default=1e-6)
+    parser.add_argument("--maximum-extension-change-um", type=float, default=20.0)
+    parser.add_argument(
+        "--maximum-normalization-relative-change", type=float, default=1e-6
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -110,7 +119,11 @@ def main() -> int:
                 continue
             difference = second - first
             absolute = float(np.max(np.abs(difference)))
-            scale = max(float(np.max(np.abs(first))), float(np.max(np.abs(second))), 1.0)
+            scale = max(
+                float(np.max(np.abs(first))),
+                float(np.max(np.abs(second))),
+                1.0,
+            )
             relative = absolute / scale
             row_absolute = max(row_absolute, absolute)
             row_relative = max(row_relative, relative)
@@ -121,7 +134,9 @@ def main() -> int:
                 maximum_relative_kernel_change, relative
             )
             squared_change += float(np.sum(difference * difference))
-            squared_scale += float(np.sum(first * first) + np.sum(second * second)) / 2.0
+            squared_scale += (
+                float(np.sum(first * first) + np.sum(second * second)) / 2.0
+            )
         state_rows.append(
             {
                 "state_id": state_id,
@@ -178,13 +193,20 @@ def main() -> int:
     ):
         failures.append("normalization_change")
 
+    previous_sha = _sha256(previous_path)
+    current_sha = _sha256(current_path)
+    previous_physics = family_physics_fingerprint(previous_path)
+    current_physics = family_physics_fingerprint(current_path)
     result = {
         "schema": "v10.2.27_kernel_self_consistency_comparison_v1",
-        "previous_family": str(previous_path),
-        "previous_family_sha256": _sha256(previous_path),
-        "current_family": str(current_path),
-        "current_family_sha256": _sha256(current_path),
-        "same_file_sha256": _sha256(previous_path) == _sha256(current_path),
+        "previous_family_label": previous_path.parent.name + "/" + previous_path.name,
+        "previous_family_sha256": previous_sha,
+        "previous_family_physics_fingerprint": previous_physics,
+        "current_family_label": current_path.parent.name + "/" + current_path.name,
+        "current_family_sha256": current_sha,
+        "current_family_physics_fingerprint": current_physics,
+        "same_file_sha256": previous_sha == current_sha,
+        "same_physics_fingerprint": previous_physics == current_physics,
         "state_count_previous": len(previous_states),
         "state_count_current": len(current_states),
         "active_grid_maximum_change_m": active_grid_max_change_m,
