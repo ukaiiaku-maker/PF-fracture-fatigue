@@ -93,6 +93,13 @@ elif [[ -z "$SNAPSHOT_ROOT" ]]; then
   fi
 fi
 
+if [[ -n "$SNAPSHOT_ROOT" && -z "$SNAPSHOT_ARCHIVE" ]]; then
+  echo "AUDIT exact active endpoint resolution" >&2
+  "$PYTHON_BIN" scripts/check_v10_2_27_active_endpoint_resolution.py \
+    --snapshot-root "$SNAPSHOT_ROOT" \
+    --mechanical-config "$CONFIG"
+fi
+
 if [[ -z "$LOAD_ARCHIVE" && -z "$LOAD_ROOT" ]]; then
   if [[ -z "$SNAPSHOT_ROOT" ]]; then
     echo "ERROR: load-invariance recalculation requires captured snapshot states" >&2
