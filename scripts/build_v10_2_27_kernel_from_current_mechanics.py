@@ -34,7 +34,9 @@ SELF_CONSISTENCY_SCHEMA = "v10.2.27_kernel_self_consistency_selection_v2"
 
 def _is_sha256(value: Any) -> bool:
     text = str(value or "")
-    return len(text) == 64 and all(character in "0123456789abcdef" for character in text)
+    return len(text) == 64 and all(
+        character in "0123456789abcdef" for character in text
+    )
 
 
 def _validate_self_consistency_selection(
@@ -79,6 +81,11 @@ def _validate_self_consistency_selection(
     candidate_sha = payload.get("converged_candidate_family_sha256")
     if not _is_sha256(candidate_sha):
         failures.append("converged_candidate_family_sha256")
+    candidate_physics = payload.get(
+        "converged_candidate_family_physics_fingerprint"
+    )
+    if not _is_sha256(candidate_physics):
+        failures.append("converged_candidate_family_physics_fingerprint")
     bootstrap_sha = payload.get("initial_bootstrap_family_sha256")
     if not _is_sha256(bootstrap_sha):
         failures.append("initial_bootstrap_family_sha256")
@@ -96,7 +103,12 @@ def _validate_self_consistency_selection(
                 "v10.2.27_kernel_self_consistency_comparison_v1"
             ):
                 failures.append(f"comparisons_{index}_schema")
-            for name in ("previous_family_sha256", "current_family_sha256"):
+            for name in (
+                "previous_family_sha256",
+                "current_family_sha256",
+                "previous_family_physics_fingerprint",
+                "current_family_physics_fingerprint",
+            ):
                 if not _is_sha256(comparison.get(name)):
                     failures.append(f"comparisons_{index}_{name}")
         final = comparisons[-1] if comparisons else {}
@@ -104,6 +116,8 @@ def _validate_self_consistency_selection(
             failures.append("final_comparison_converged")
         if final.get("current_family_sha256") != candidate_sha:
             failures.append("final_comparison_candidate_sha256")
+        if final.get("current_family_physics_fingerprint") != candidate_physics:
+            failures.append("final_comparison_candidate_physics_fingerprint")
 
     if failures:
         raise ValueError(
@@ -201,7 +215,9 @@ def _validate_artifacts(
                 f"{row['state_id']} MPZ bins mismatch: "
                 f"{mpz.get('n_bins')} != {configuration.process_zone_bins}"
             )
-        if len(metadata.get("active_x_m", [])) != int(configuration.process_zone_bins):
+        if len(metadata.get("active_x_m", [])) != int(
+            configuration.process_zone_bins
+        ):
             raise ValueError(
                 f"{row['state_id']} active station count does not match "
                 f"process_zone_bins={configuration.process_zone_bins}"
@@ -245,8 +261,12 @@ def _validate_artifacts(
             raise ValueError(
                 f"{row['state_id']} uses a nonzero crack reconstruction width floor"
             )
-        measurement_h = float(metadata.get("measurement_mesh_hbar_tip_m", float("nan")))
-        trajectory_h = float(metadata.get("trajectory_mesh_hbar_tip_m", float("nan")))
+        measurement_h = float(
+            metadata.get("measurement_mesh_hbar_tip_m", float("nan"))
+        )
+        trajectory_h = float(
+            metadata.get("trajectory_mesh_hbar_tip_m", float("nan"))
+        )
         if not math.isfinite(measurement_h) or measurement_h <= 0.0:
             raise ValueError(f"{row['state_id']} lacks a finite measurement hbar_tip")
         if not math.isfinite(trajectory_h) or trajectory_h <= 0.0:
@@ -299,7 +319,10 @@ def main() -> int:
     args = parser.parse_args()
 
     configuration = load_configuration(args.mechanical_config)
-    if configuration.branching_mode != "single_front" or configuration.maximum_fronts != 1:
+    if (
+        configuration.branching_mode != "single_front"
+        or configuration.maximum_fronts != 1
+    ):
         raise SystemExit("current built-in kernel provider is single-front only")
 
     outroot = args.outroot.expanduser().resolve()
@@ -383,12 +406,21 @@ def main() -> int:
         family_out,
         expected_configuration_fingerprint=configuration.fingerprint(),
     )
+    if self_consistency.get("validated") is True:
+        expected_physics = self_consistency["selection"][
+            "converged_candidate_family_physics_fingerprint"
+        ]
+        if audit["physics_fingerprint"] != expected_physics:
+            raise ValueError(
+                "canonical family does not match the converged target-family physics: "
+                f"{audit['physics_fingerprint']} != {expected_physics}"
+            )
 
     manifest_path = outroot / "kernel_build_manifest.json"
     manifest = json.loads(manifest_path.read_text()) if manifest_path.is_file() else {}
     manifest.update(
         {
-            "schema": "v10.2.27_current_configuration_kernel_build_v4",
+            "schema": "v10.2.27_current_configuration_kernel_build_v5",
             "configuration": configuration.canonical_payload(),
             "configuration_fingerprint": configuration.fingerprint(),
             "family": audit["family"],
