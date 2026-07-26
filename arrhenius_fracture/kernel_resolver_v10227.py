@@ -31,8 +31,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def required_max_extension_um(
-    *, target_extension_um: float, theta_deg: float, da_phys_um: float,
-    event_minimum_factor: float, event_maximum_factor: float,
+    *,
+    target_extension_um: float,
+    theta_deg: float,
+    da_phys_um: float,
+    event_minimum_factor: float,
+    event_maximum_factor: float,
     margin_events: float,
 ) -> float:
     cosine = abs(math.cos(math.radians(float(theta_deg))))
@@ -59,12 +63,15 @@ def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
         )
     )
     payload = base.canonical_payload()
-    payload.update({
-        "profile_id": args.mechanical_profile or payload.get("profile_id", DEFAULT_PROFILE_ID),
-        "theta_deg": float(args.theta_deg),
-        "branching_mode": args.branching_mode,
-        "maximum_fronts": int(args.maximum_fronts),
-    })
+    payload.update(
+        {
+            "profile_id": args.mechanical_profile
+            or payload.get("profile_id", DEFAULT_PROFILE_ID),
+            "theta_deg": float(args.theta_deg),
+            "branching_mode": args.branching_mode,
+            "maximum_fronts": int(args.maximum_fronts),
+        }
+    )
     optional = {
         "specimen_length_x_m": (args.specimen_length_x_um, 1.0e-6),
         "specimen_length_y_m": (args.specimen_length_y_um, 1.0e-6),
@@ -80,7 +87,8 @@ def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
         "measurement_tip_ratio": (args.measurement_tip_ratio, 1.0),
         "atlas_anchor_spacing_m": (args.atlas_anchor_spacing_um, 1.0e-6),
         "minimum_elements_per_process_zone": (
-            args.minimum_elements_per_process_zone, 1.0
+            args.minimum_elements_per_process_zone,
+            1.0,
         ),
         "da_phys_m": (args.da_phys_um, 1.0e-6),
         "interaction_length_m": (args.interaction_length_um, 1.0e-6),
@@ -92,9 +100,6 @@ def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
         converted = float(value) * scale
         payload[key] = int(round(converted)) if key in integers else converted
 
-    # Generated configurations derive the capture-only endpoint mesh from the
-    # requested active-grid discretization.  The production trajectory spacing is
-    # independent and remains whatever tip_h_fine_m explicitly records.
     if not explicit_config and args.measurement_tip_h_fine_um is None:
         payload["measurement_tip_h_fine_m"] = endpoint_resolving_tip_h_fine_m(
             float(payload["process_zone_length_m"]),
@@ -102,7 +107,9 @@ def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
         )
     if args.temperature_dependent_mechanics:
         if args.temperature_K is None:
-            raise ValueError("--temperature-K is required with temperature-dependent mechanics")
+            raise ValueError(
+                "--temperature-K is required with temperature-dependent mechanics"
+            )
         payload["temperature_dependent_mechanics"] = True
         payload["temperature_K"] = float(args.temperature_K)
 
@@ -127,10 +134,6 @@ def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
     required_Lx = preliminary.initial_crack_length_m + x_reach_m + buffer_m
     required_Ly = 2.0 * (y_reach_m + buffer_m)
 
-    # Target extension is normally only a coverage coordinate. The specimen
-    # becomes a new mechanical configuration only when the default domain is too
-    # short or too shallow. Thus 2000/3000 um runs are generated rather than
-    # accidentally extrapolated beyond the 2 x 4 mm reference specimen.
     if not explicit_config:
         if args.specimen_length_x_um is None:
             payload["specimen_length_x_m"] = max(
@@ -144,12 +147,14 @@ def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
     if resolved.specimen_length_x_m + 1.0e-12 < required_Lx:
         raise ValueError(
             "requested coverage does not fit configured specimen Lx: "
-            f"{1e6 * resolved.specimen_length_x_m:.9g} < {1e6 * required_Lx:.9g} um"
+            f"{1e6 * resolved.specimen_length_x_m:.9g} < "
+            f"{1e6 * required_Lx:.9g} um"
         )
     if resolved.specimen_length_y_m + 1.0e-12 < required_Ly:
         raise ValueError(
             "requested tilted path does not fit configured specimen Ly: "
-            f"{1e6 * resolved.specimen_length_y_m:.9g} < {1e6 * required_Ly:.9g} um"
+            f"{1e6 * resolved.specimen_length_y_m:.9g} < "
+            f"{1e6 * required_Ly:.9g} um"
         )
     return resolved
 
@@ -170,7 +175,12 @@ def _emit(message: str) -> None:
 
 def _run_builder(command: list[str], env: dict[str, str]) -> None:
     completed = subprocess.run(
-        command, cwd=ROOT, env=env, text=True, capture_output=True, check=False
+        command,
+        cwd=ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
     )
     if completed.stdout:
         _emit(completed.stdout.rstrip())
@@ -182,39 +192,133 @@ def _run_builder(command: list[str], env: dict[str, str]) -> None:
         )
 
 
+def _validate_promotion_evidence(
+    cache_dir: Path,
+    audit: dict[str, Any],
+    configuration_fingerprint: str,
+) -> dict[str, Any]:
+    build_path = cache_dir / "kernel_build_manifest.json"
+    consistency_path = cache_dir / "kernel_self_consistency_manifest.json"
+    if not build_path.is_file() or not consistency_path.is_file():
+        raise ValueError(
+            "cached family lacks fixed-point promotion manifests; recalculate the kernel"
+        )
+    build = json.loads(build_path.read_text())
+    consistency = json.loads(consistency_path.read_text())
+    failures: list[str] = []
+    if build.get("schema") != "v10.2.27_current_configuration_kernel_build_v5":
+        failures.append("kernel_build_manifest_schema")
+    if build.get("configuration_fingerprint") != configuration_fingerprint:
+        failures.append("kernel_build_configuration_fingerprint")
+    if build.get("family_sha256") != audit["file_sha256"]:
+        failures.append("kernel_build_family_sha256")
+    if build.get("family_physics_fingerprint") != audit["physics_fingerprint"]:
+        failures.append("kernel_build_family_physics_fingerprint")
+    if build.get("production_parameterization_promotion_allowed") is not True:
+        failures.append("production_parameterization_promotion_allowed")
+    self_consistency = dict(build.get("self_consistency", {}))
+    if self_consistency.get("validated") is not True:
+        failures.append("kernel_build_self_consistency_validated")
+    selection = dict(self_consistency.get("selection") or {})
+    if selection.get("converged") is not True:
+        failures.append("kernel_build_selection_converged")
+    if selection.get("converged_candidate_family_physics_fingerprint") != audit[
+        "physics_fingerprint"
+    ]:
+        failures.append("kernel_build_selection_physics_fingerprint")
+
+    if consistency.get("schema") != "v10.2.27_kernel_self_consistency_manifest_v3":
+        failures.append("self_consistency_manifest_schema")
+    if consistency.get("converged") is not True:
+        failures.append("self_consistency_manifest_converged")
+    if consistency.get("canonical_family_sha256") != audit["file_sha256"]:
+        failures.append("self_consistency_canonical_family_sha256")
+    if consistency.get("canonical_family_physics_fingerprint") != audit[
+        "physics_fingerprint"
+    ]:
+        failures.append("self_consistency_canonical_physics_fingerprint")
+    embedded = dict(consistency.get("selection") or {})
+    if embedded != selection:
+        failures.append("self_consistency_selection_mismatch")
+
+    if failures:
+        raise ValueError(
+            "kernel promotion evidence is invalid: "
+            + ", ".join(sorted(set(failures)))
+        )
+    return {
+        "kernel_build_manifest": str(build_path),
+        "kernel_self_consistency_manifest": str(consistency_path),
+        "converged_iteration": consistency.get("converged_iteration"),
+        "production_parameterization_promotion_allowed": True,
+    }
+
+
+def _registry_entry_is_promoted(
+    entry: dict[str, Any], audit: dict[str, Any]
+) -> bool:
+    return bool(
+        entry.get("production_parameterization_promotion_allowed") is True
+        and entry.get("self_consistency_physics_fingerprint")
+        == audit["physics_fingerprint"]
+    )
+
+
 def _clear_generated_cache(cache_dir: Path) -> None:
     for name in (
-        "family.json", "mechanics_normalization.json", "coverage_audit.json",
-        "kernel_build_manifest.json", "portable_load_invariance_reports",
-        "snapshots", "load_invariance", "capture",
+        "family.json",
+        "mechanics_normalization.json",
+        "coverage_audit.json",
+        "kernel_build_manifest.json",
+        "kernel_self_consistency_manifest.json",
+        "portable_load_invariance_reports",
+        "self_consistency",
+        "snapshots",
+        "load_invariance",
+        "capture",
     ):
         path = cache_dir / name
         shutil.rmtree(path) if path.is_dir() else path.unlink(missing_ok=True)
 
 
 def _builder_environment(
-    *, configuration_path: Path, fingerprint: str, cache_dir: Path,
-    family_out: Path, required_um: float,
-    configuration: MechanicalKernelConfiguration, args: argparse.Namespace,
+    *,
+    configuration_path: Path,
+    fingerprint: str,
+    cache_dir: Path,
+    family_out: Path,
+    required_um: float,
+    configuration: MechanicalKernelConfiguration,
+    args: argparse.Namespace,
 ) -> dict[str, str]:
     environment = os.environ.copy()
-    environment.update({
-        "V10227_KERNEL_CONFIGURATION": str(configuration_path),
-        "V10227_KERNEL_CONFIGURATION_FINGERPRINT": fingerprint,
-        "V10227_KERNEL_CACHE_DIR": str(cache_dir),
-        "V10227_KERNEL_FAMILY_OUT": str(family_out),
-        "V10227_KERNEL_REQUIRED_MAX_EXTENSION_UM": f"{required_um:.17g}",
-        "V10227_KERNEL_TARGET_EXTENSION_UM": f"{args.target_extension_um:.17g}",
-        "V10227_KERNEL_THETA_DEG": f"{args.theta_deg:.17g}",
-        "V10227_KERNEL_DA_PHYS_UM": f"{1e6 * configuration.da_phys_m:.17g}",
-        "V10227_KERNEL_EVENT_MINIMUM_FACTOR": f"{args.event_minimum_factor:.17g}",
-        "V10227_KERNEL_EVENT_MAXIMUM_FACTOR": f"{args.event_maximum_factor:.17g}",
-        "V10227_KERNEL_MARGIN_EVENTS": f"{args.margin_events:.17g}",
-        "V10227_SPECIMEN_LX_M": f"{configuration.specimen_length_x_m:.17g}",
-        "V10227_SPECIMEN_LY_M": f"{configuration.specimen_length_y_m:.17g}",
-        "V10227_INITIAL_CRACK_LENGTH_M": f"{configuration.initial_crack_length_m:.17g}",
-        "V10227_NOTCH_HALF_THICKNESS_M": f"{configuration.notch_half_thickness_m:.17g}",
-    })
+    environment.update(
+        {
+            "V10227_KERNEL_CONFIGURATION": str(configuration_path),
+            "V10227_KERNEL_CONFIGURATION_FINGERPRINT": fingerprint,
+            "V10227_KERNEL_CACHE_DIR": str(cache_dir),
+            "V10227_KERNEL_FAMILY_OUT": str(family_out),
+            "V10227_KERNEL_REQUIRED_MAX_EXTENSION_UM": f"{required_um:.17g}",
+            "V10227_KERNEL_TARGET_EXTENSION_UM": f"{args.target_extension_um:.17g}",
+            "V10227_KERNEL_THETA_DEG": f"{args.theta_deg:.17g}",
+            "V10227_KERNEL_DA_PHYS_UM": f"{1e6 * configuration.da_phys_m:.17g}",
+            "V10227_KERNEL_EVENT_MINIMUM_FACTOR": (
+                f"{args.event_minimum_factor:.17g}"
+            ),
+            "V10227_KERNEL_EVENT_MAXIMUM_FACTOR": (
+                f"{args.event_maximum_factor:.17g}"
+            ),
+            "V10227_KERNEL_MARGIN_EVENTS": f"{args.margin_events:.17g}",
+            "V10227_SPECIMEN_LX_M": f"{configuration.specimen_length_x_m:.17g}",
+            "V10227_SPECIMEN_LY_M": f"{configuration.specimen_length_y_m:.17g}",
+            "V10227_INITIAL_CRACK_LENGTH_M": (
+                f"{configuration.initial_crack_length_m:.17g}"
+            ),
+            "V10227_NOTCH_HALF_THICKNESS_M": (
+                f"{configuration.notch_half_thickness_m:.17g}"
+            ),
+        }
+    )
     if args.snapshot_archive is not None:
         environment["KERNEL_SNAPSHOT_ARCHIVE"] = str(args.snapshot_archive.resolve())
     if args.load_invariance_archive is not None:
@@ -254,13 +358,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--temperature-dependent-mechanics", action="store_true")
     parser.add_argument("--temperature-K", type=float)
     parser.add_argument("--family-override", type=Path)
-    parser.add_argument("--mode", choices=("auto", "reuse-only", "build"), default="auto")
     parser.add_argument(
-        "--cache-root", type=Path,
+        "--mode", choices=("auto", "reuse-only", "build"), default="auto"
+    )
+    parser.add_argument(
+        "--cache-root",
+        type=Path,
         default=ROOT / "runs" / "v10_2_27_kernel_cache",
     )
     parser.add_argument(
-        "--tracked-registry", type=Path,
+        "--tracked-registry",
+        type=Path,
         default=ROOT / "artifacts" / "v10_2_27_kernel_registry.json",
     )
     parser.add_argument("--builder-command")
@@ -277,7 +385,9 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if (args.snapshot_archive is None) != (args.load_invariance_archive is None):
-        raise SystemExit("optional snapshot/load-invariance archives must be supplied together")
+        raise SystemExit(
+            "optional snapshot/load-invariance archives must be supplied together"
+        )
 
     configuration = _configuration(args)
     fingerprint = configuration.fingerprint()
@@ -300,9 +410,14 @@ def main(argv: list[str] | None = None) -> int:
             "resolution": "explicit_override",
             "configuration_fingerprint": fingerprint,
             "required_max_extension_um": required_um,
+            "explicit_override_self_consistency_not_inferred": True,
             **audit,
         }
-        print(json.dumps(result, indent=2, sort_keys=True) if args.json else audit["family"])
+        print(
+            json.dumps(result, indent=2, sort_keys=True)
+            if args.json
+            else audit["family"]
+        )
         return 0
 
     cache_root = args.cache_root.expanduser().resolve()
@@ -316,7 +431,8 @@ def main(argv: list[str] | None = None) -> int:
     with kernel_lock(lock_path):
         cache_dir.mkdir(parents=True, exist_ok=True)
         config_path.write_text(
-            json.dumps(configuration.canonical_payload(), indent=2, sort_keys=True) + "\n"
+            json.dumps(configuration.canonical_payload(), indent=2, sort_keys=True)
+            + "\n"
         )
         rebuild_reason = "explicit build requested" if args.mode == "build" else None
         if family_out.is_file() and args.mode != "build":
@@ -325,24 +441,35 @@ def main(argv: list[str] | None = None) -> int:
                     family_out,
                     expected_configuration_fingerprint=fingerprint,
                 )
+                promotion = _validate_promotion_evidence(
+                    cache_dir, audit, fingerprint
+                )
                 if _coverage_ok(audit, required_um):
                     result = {
                         "resolution": "local_cache",
                         "configuration_fingerprint": fingerprint,
                         "required_max_extension_um": required_um,
+                        "promotion_evidence": promotion,
                         **audit,
                     }
-                    print(json.dumps(result, indent=2, sort_keys=True) if args.json else audit["family"])
+                    print(
+                        json.dumps(result, indent=2, sort_keys=True)
+                        if args.json
+                        else audit["family"]
+                    )
                     return 0
                 rebuild_reason = (
                     "cached coverage is too short: "
                     f"{audit['maximum_extension_um']:.9g} < {required_um:.9g} um"
                 )
             except (FileNotFoundError, ValueError) as exc:
-                rebuild_reason = f"cached family is invalid: {exc}"
+                rebuild_reason = f"cached family is invalid or unpromoted: {exc}"
 
         if rebuild_reason is None and args.mode != "build":
-            for registry in (tracked_registry, _read_local_registry(local_registry_path)):
+            for registry in (
+                tracked_registry,
+                _read_local_registry(local_registry_path),
+            ):
                 selected = select_entry(
                     registry,
                     configuration_fingerprint=fingerprint,
@@ -358,29 +485,49 @@ def main(argv: list[str] | None = None) -> int:
                     expected_physics_fingerprint=entry.get("physics_fingerprint"),
                     expected_configuration_fingerprint=fingerprint,
                 )
+                if not _registry_entry_is_promoted(entry, audit):
+                    _emit(
+                        "Ignoring registry family without matching fixed-point "
+                        f"promotion evidence: {source}"
+                    )
+                    continue
                 result = {
-                    "resolution": "tracked_registry" if registry is tracked_registry else "local_registry",
+                    "resolution": (
+                        "tracked_registry"
+                        if registry is tracked_registry
+                        else "local_registry"
+                    ),
                     "configuration_fingerprint": fingerprint,
                     "required_max_extension_um": required_um,
+                    "production_parameterization_promotion_allowed": True,
                     **audit,
                 }
-                print(json.dumps(result, indent=2, sort_keys=True) if args.json else audit["family"])
+                print(
+                    json.dumps(result, indent=2, sort_keys=True)
+                    if args.json
+                    else audit["family"]
+                )
                 return 0
         if args.mode == "reuse-only":
-            raise SystemExit("no validated kernel covers the requested mechanical configuration")
+            raise SystemExit(
+                "no validated and self-consistently promoted kernel covers the "
+                "requested mechanical configuration"
+            )
         if (
             configuration.branching_mode != "single_front"
             or configuration.maximum_fronts != 1
         ) and not args.builder_command:
             raise SystemExit(
                 "no branch-aware kernel provider is registered for this configuration. "
-                "Register a topology_cached or direct_fem provider through --builder-command."
+                "Register a topology_cached or direct_fem provider through "
+                "--builder-command."
             )
         if rebuild_reason:
             _emit(f"Recalculating signed FEM kernel because {rebuild_reason}")
             _clear_generated_cache(cache_dir)
             config_path.write_text(
-                json.dumps(configuration.canonical_payload(), indent=2, sort_keys=True) + "\n"
+                json.dumps(configuration.canonical_payload(), indent=2, sort_keys=True)
+                + "\n"
             )
 
         environment = _builder_environment(
@@ -396,16 +543,21 @@ def main(argv: list[str] | None = None) -> int:
             command = shlex.split(args.builder_command)
             _emit(f"Executing registered kernel provider for {fingerprint[:12]}")
         else:
-            command = ["bash", str(ROOT / "scripts" / "build_v10_2_27_kernel_for_configuration.sh")]
+            command = [
+                "bash",
+                str(ROOT / "scripts" / "build_v10_2_27_kernel_for_configuration.sh"),
+            ]
             _emit(
-                "Recalculating snapshots, load invariance, normalization, and signed "
-                f"kernel for configuration {fingerprint[:12]}"
+                "Recalculating production captures, load invariance, normalization, "
+                "and self-consistent signed kernel for configuration "
+                f"{fingerprint[:12]}"
             )
         _run_builder(command, environment)
         audit = validate_family(
             family_out,
             expected_configuration_fingerprint=fingerprint,
         )
+        promotion = _validate_promotion_evidence(cache_dir, audit, fingerprint)
         if not _coverage_ok(audit, required_um):
             raise SystemExit("newly recalculated kernel lacks required coverage")
         entry = {
@@ -417,16 +569,32 @@ def main(argv: list[str] | None = None) -> int:
             "minimum_extension_um": audit["minimum_extension_um"],
             "maximum_extension_um": audit["maximum_extension_um"],
             "provider_mode": configuration.branching_mode,
+            "production_parameterization_promotion_allowed": True,
+            "self_consistency_physics_fingerprint": audit["physics_fingerprint"],
+            "self_consistency_converged_iteration": promotion[
+                "converged_iteration"
+            ],
         }
         update_local_registry(local_registry_path, entry)
         result = {
             "resolution": "recalculated",
             "configuration_fingerprint": fingerprint,
             "required_max_extension_um": required_um,
+            "promotion_evidence": promotion,
             **audit,
         }
-        print(json.dumps(result, indent=2, sort_keys=True) if args.json else audit["family"])
+        print(
+            json.dumps(result, indent=2, sort_keys=True)
+            if args.json
+            else audit["family"]
+        )
         return 0
 
 
-__all__ = ["build_parser", "main", "required_max_extension_um", "_configuration"]
+__all__ = [
+    "build_parser",
+    "main",
+    "required_max_extension_um",
+    "_configuration",
+    "_validate_promotion_evidence",
+]
