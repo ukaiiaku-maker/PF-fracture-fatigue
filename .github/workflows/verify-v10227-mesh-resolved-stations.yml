@@ -25,7 +25,8 @@ jobs:
           python -m py_compile \
             arrhenius_fracture/physical_fem_station_responses_v10212.py \
             arrhenius_fracture/frozen_geometry_load_invariance_v10213.py \
-            arrhenius_fracture/kernel_resolver_v10227.py
+            arrhenius_fracture/kernel_resolver_v10227.py \
+            scripts/ensure_v10_2_27_signed_kernel.py
       - name: Test exact mesh-resolved station selection
         run: |
           python -m pytest -q \
@@ -33,4 +34,3 @@ jobs:
       - name: Validate kernel builder shell
         run: |
           bash -n scripts/build_v10_2_27_kernel_for_configuration.sh
-          bash -n scripts/ensure_v10_2_27_signed_kernel.py 2>/dev/null || true
