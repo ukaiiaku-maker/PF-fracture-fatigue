@@ -13,16 +13,17 @@ import math
 from pathlib import Path
 from typing import Any, Mapping
 
-SCHEMA = "v10.2.27_mechanical_kernel_configuration_v5"
+SCHEMA = "v10.2.27_mechanical_kernel_configuration_v6"
 DEFAULT_PROFILE_ID = "v10_2_27_current_single_front_frontfix"
 PROFILE_ALIASES = {
     "v10_2_27_default_single_front_frontfix": DEFAULT_PROFILE_ID,
 }
-# The exact-endpoint response uses a ribbon whose placement-resolution threshold
-# is four times the actual tip element scale.  The graded measurement-mesh
-# hbar_tip is modestly larger than --measurement-tip-h-fine, so an eightfold
-# safety factor relative to the first bin centre keeps bin zero resolvable.
-ACTIVE_ENDPOINT_TIP_H_SAFETY_FACTOR = 8.0
+# The exact-endpoint response requires the first active-bin centre to lie at least
+# four actual hbar_tip values ahead of the crack tip. Archived mesh measurements
+# show actual hbar_tip can be about 7.21 times the requested graded tip_h_fine.
+# A factor of 40 therefore supplies both the four-hbar requirement and a useful
+# margin without changing the production trajectory mesh.
+ACTIVE_ENDPOINT_TIP_H_SAFETY_FACTOR = 40.0
 NON_MECHANICAL_KEYS = {
     "candidate_id",
     "hazard_seed",
@@ -100,7 +101,7 @@ class MechanicalKernelConfiguration:
     mesh_policy_id: str = "v10.2.27_production_evolution_plus_endpoint_measurement_mesh"
     mesh_nx: int = 36
     mesh_ny: int = 72
-    # Production trajectory mesh.  This retains the 1-D-to-2-D calibrated
+    # Production trajectory mesh. This retains the 1-D-to-2-D calibrated
     # moving-tip physics and is not tightened merely to measure a kernel endpoint.
     tip_h_fine_m: float = 1.0e-6
     tip_ratio: float = 1.20
@@ -123,7 +124,7 @@ class MechanicalKernelConfiguration:
     crystal_C11_Pa: float = 523.0e9
     crystal_C12_Pa: float = 203.0e9
     crystal_C44_Pa: float = 160.0e9
-    kernel_provider_id: str = "v10.2.27_current_configuration_fem_recalculation_v3"
+    kernel_provider_id: str = "v10.2.27_current_configuration_fem_recalculation_v4"
     temperature_dependent_mechanics: bool = False
     temperature_K: float | None = None
     extra: Mapping[str, Any] = field(default_factory=dict)
