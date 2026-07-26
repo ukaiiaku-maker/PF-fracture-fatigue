@@ -10,6 +10,9 @@ def test_default_kernel_builder_cannot_invoke_mechanics_only_capture():
     assert "automatic mechanics-only kernel capture is disabled" in text
     assert "KERNEL_CAPTURE_COMMAND" in text
     assert "capture_v10_2_27_kernel_states_for_configuration.py" not in text
+    assert not Path(
+        "scripts/capture_v10_2_27_kernel_states_for_configuration.py"
+    ).exists()
 
 
 def test_production_runner_retains_stochastic_moving_pz_contract():
