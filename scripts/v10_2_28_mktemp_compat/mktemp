@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -eq 1 && "$1" == *".v10_2_28_four_class_orientation_scheduler.XXXXXX.sh" ]]; then
+  template=$1
+  directory=$(dirname "$template")
+  basename_value=$(basename "$template")
+  prefix=${basename_value%%XXXXXX*}
+  suffix=${basename_value#*XXXXXX}
+  exec python - "$directory" "$prefix" "$suffix" <<'PY'
+import os
+from pathlib import Path
+import sys
+import tempfile
+
+root = Path(sys.argv[1]).resolve()
+prefix = sys.argv[2]
+suffix = sys.argv[3]
+root.mkdir(parents=True, exist_ok=True)
+fd, path = tempfile.mkstemp(prefix=prefix, suffix=suffix, dir=root)
+os.close(fd)
+print(path)
+PY
+fi
+
+exec /usr/bin/mktemp "$@"
