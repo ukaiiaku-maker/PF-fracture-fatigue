@@ -1,14 +1,15 @@
 """Capture accepted 2-D FEM equilibria for active signed-kernel generation.
 
-The capture hooks observe the production solve.  v10.2.14 stores the actual
-post-Dirichlet equilibrium displacement, never claims a physical scalar wake
-kernel, and accepts an optional production crack polyline from the anisotropic
-mechanics observer.
+The capture hooks observe the production solve.  v10.2.27 can optionally clone a
+matched trajectory state onto a separate endpoint-resolved measurement mesh.  The
+clone is re-equilibrated with plasticity and kinetics frozen; the production
+front engine and moving process zone are never advanced or mutated by capture.
 """
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, is_dataclass
 import csv
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -17,9 +18,13 @@ from typing import Any, Callable
 import numpy as np
 
 from .anisotropic_emission_v10174 import OBSERVER as DRIVE_OBSERVER
+from .frozen_measurement_reconstruction_v10227 import (
+    FrozenMeasurementMeshConfig,
+    reconstruct_frozen_measurement_state,
+)
 from .physical_fem_snapshot_v10212 import SnapshotMetadata, save_snapshot
 
-MODEL_ID = "v10.2.14_live_production_fem_state_capture"
+MODEL_ID = "v10.2.27_live_production_state_capture_with_frozen_measurement_clone"
 
 
 @dataclass(frozen=True)
@@ -133,6 +138,7 @@ def _engine_payload(engine) -> dict[str, Any]:
         "constitutive_K_shield_cap_applied": False,
         "active_kernel_supported": True,
         "wake_kernel_supported": False,
+        "production_moving_process_zone_physics_preserved": True,
     }
 
 
@@ -150,13 +156,59 @@ def _coerce_crack_path(drive: dict[str, Any], tip_xy: tuple[float, float]) -> tu
     return ()
 
 
+def _digest_array(hasher, name: str, value: Any) -> None:
+    array = np.ascontiguousarray(np.asarray(value))
+    hasher.update(name.encode("utf-8"))
+    hasher.update(str(array.dtype).encode("ascii"))
+    hasher.update(str(array.shape).encode("ascii"))
+    hasher.update(array.tobytes())
+
+
+def _engine_kinetic_state_digest(engine) -> str:
+    """Hash the production state that capture is forbidden to mutate."""
+    hasher = hashlib.sha256()
+    for name in (
+        "B", "N_em", "W_emit", "t", "a_adv", "n_adv",
+        "micro_advance_total_m", "checkpoint_advance_total_m",
+        "packet_count_mean_total", "packet_variance_total_m2",
+    ):
+        hasher.update(name.encode("utf-8"))
+        hasher.update(repr(getattr(engine, name, None)).encode("utf-8"))
+    mpz = engine.mpz
+    for name in (
+        "mobile", "retained", "accumulated_slip", "available_sites",
+        "wake_mobile", "wake_retained", "wake_slip",
+    ):
+        if hasattr(mpz, name):
+            _digest_array(hasher, f"mpz.{name}", getattr(mpz, name))
+    for name in (
+        "advance_total_m", "wake_discarded_mobile_total",
+        "wake_discarded_retained_total", "wake_discarded_slip_total",
+        "escaped_total", "recovered_total",
+    ):
+        hasher.update(f"mpz.{name}".encode("utf-8"))
+        hasher.update(repr(getattr(mpz, name, None)).encode("utf-8"))
+    return hasher.hexdigest()
+
+
 class PhysicalFEMCapture:
-    def __init__(self, requests: list[CaptureRequest], outroot: str | Path):
+    def __init__(
+        self,
+        requests: list[CaptureRequest],
+        outroot: str | Path,
+        *,
+        measurement_mesh_config: FrozenMeasurementMeshConfig | None = None,
+    ):
         self.requests = [request.validate() for request in requests]
         self.outroot = Path(outroot)
         if self.outroot.exists():
             raise FileExistsError(f"refusing to overwrite {self.outroot}")
         self.outroot.mkdir(parents=True)
+        self.measurement_mesh_config = (
+            measurement_mesh_config.validate()
+            if measurement_mesh_config is not None
+            else None
+        )
         self.captured: dict[str, dict[str, Any]] = {}
         self.latest_assembly: dict[str, Any] | None = None
         self.latest_boundary = None
@@ -232,7 +284,7 @@ class PhysicalFEMCapture:
                 candidates.append((score, request))
         return min(candidates, key=lambda item: item[0])[1] if candidates else None
 
-    def before_engine_step(self, engine, K: float, T: float) -> None:
+    def before_engine_step(self, engine, K: float, T: float) -> dict[str, Any] | None:
         self.attempts += 1
         if (
             not self.pending
@@ -240,12 +292,12 @@ class PhysicalFEMCapture:
             or self.latest_boundary is None
             or self.latest_solved_u is None
         ):
-            return
+            return None
         drive = DRIVE_OBSERVER.latest_drive
         if not isinstance(drive, dict) or not bool(drive.get("reliable", False)):
-            return
+            return None
         if int(drive.get("mechanics_serial", -1)) != int(DRIVE_OBSERVER.mechanics_serial):
-            return
+            return None
         sigma_local = float(engine.sigma_tip(K))
         r0 = max(float(engine.f.r0), 1.0e-30)
         r_eff = max(float(engine.r_eff()), r0)
@@ -263,7 +315,7 @@ class PhysicalFEMCapture:
         }
         request = self._matching_request(float(T), coordinates)
         if request is None:
-            return
+            return None
         assembly = self.latest_assembly
         cohesive = assembly.get("cohesive_network")
         if cohesive is not None:
@@ -277,6 +329,52 @@ class PhysicalFEMCapture:
         front_direction = tuple(float(value) for value in drive["front_direction"])
         crack_path = _coerce_crack_path(drive, tip_xy)
         material = assembly["mat"]
+
+        kinetic_digest_before = _engine_kinetic_state_digest(engine)
+        if self.measurement_mesh_config is None:
+            state = {
+                "mesh": assembly["mesh"],
+                "boundary": self.latest_boundary,
+                "u": self.latest_solved_u,
+                "ep_gp": assembly["ep_gp"],
+                "rho_gp": assembly["rho_gp"],
+                "d": assembly["d"],
+                "D": assembly["D"],
+                "audit": {
+                    "trajectory_state_cloned": False,
+                    "production_state_mutated": False,
+                    "plasticity_frozen": True,
+                    "kinetics_not_advanced": True,
+                    "moving_process_zone_not_advanced": True,
+                    "endpoint_mesh_reconstructed": False,
+                    "endpoint_mesh_re_equilibrated": False,
+                    "trajectory_mesh_hbar_tip_m": float(assembly["mesh"].hbar_tip),
+                    "measurement_mesh_hbar_tip_m": float(assembly["mesh"].hbar_tip),
+                },
+            }
+        else:
+            state = reconstruct_frozen_measurement_state(
+                source_mesh=assembly["mesh"],
+                source_boundary=self.latest_boundary,
+                source_u=self.latest_solved_u,
+                source_ep_gp=assembly["ep_gp"],
+                source_rho_gp=assembly["rho_gp"],
+                source_d=assembly["d"],
+                D=assembly["D"],
+                material=material,
+                Uy_top_m=self.latest_Uy_top,
+                Uy_bot_m=self.latest_Uy_bot,
+                crack_tip_xy_m=tip_xy,
+                crack_path_xy_m=crack_path,
+                config=self.measurement_mesh_config,
+            )
+        kinetic_digest_after = _engine_kinetic_state_digest(engine)
+        if kinetic_digest_after != kinetic_digest_before:
+            raise RuntimeError(
+                "capture-only endpoint reconstruction mutated the production moving-tip "
+                "or process-zone kinetic state"
+            )
+
         metadata = SnapshotMetadata(
             state_id=request.state_id,
             r_eff_over_r0=float(coordinates["r_eff_over_r0"]),
@@ -288,7 +386,7 @@ class PhysicalFEMCapture:
             crack_tip_xy_m=tip_xy,
             crack_direction=front_direction,
             interaction_ell_m=float(request.interaction_ell_m),
-            exclude_radius_m=max(float(assembly["mesh"].hbar_tip), 0.0),
+            exclude_radius_m=max(float(state["mesh"].hbar_tip), 0.0),
             active_x_m=tuple(float(value) for value in engine.mpz.x),
             wake_x_m=tuple(float(value) for value in engine.mpz.wake_x),
             channel_directions=directions,
@@ -310,15 +408,28 @@ class PhysicalFEMCapture:
         payload = save_snapshot(
             root,
             metadata=metadata,
-            mesh=assembly["mesh"],
-            boundary=self.latest_boundary,
-            u=self.latest_solved_u,
-            ep_gp=assembly["ep_gp"],
-            rho_gp=assembly["rho_gp"],
-            d=assembly["d"],
-            D=assembly["D"],
+            mesh=state["mesh"],
+            boundary=state["boundary"],
+            u=state["u"],
+            ep_gp=state["ep_gp"],
+            rho_gp=state["rho_gp"],
+            d=state["d"],
+            D=state["D"],
         )
-        self.captured[request.state_id] = {
+        provenance = {
+            **dict(state["audit"]),
+            "production_engine_state_sha256_before": kinetic_digest_before,
+            "production_engine_state_sha256_after": kinetic_digest_after,
+            "production_engine_state_bitwise_unchanged": True,
+            "production_fractional_moving_frame_preserved": True,
+            "production_mobile_kinetic_solver_preserved": True,
+            "measurement_reconstruction_called_engine_step": False,
+            "measurement_reconstruction_called_mpz_evolve": False,
+            "measurement_reconstruction_called_mpz_advance": False,
+        }
+        payload.update(provenance)
+        (root / "snapshot.json").write_text(json.dumps(payload, indent=2))
+        record = {
             "requested": asdict(request),
             "actual": coordinates,
             "snapshot": str(root),
@@ -326,11 +437,14 @@ class PhysicalFEMCapture:
             "solve_serial": self.solve_serial,
             "drive_serial": int(drive.get("drive_serial", -1)),
             "payload": payload,
+            "measurement_provenance": provenance,
             "post_dirichlet_equilibrium_displacement_saved": True,
             "crack_path_serialized": bool(crack_path),
             "active_kernel_supported": True,
             "wake_kernel_supported": False,
         }
+        self.captured[request.state_id] = record
+        return record
 
     def wrap_engine_step(self, original: Callable) -> Callable:
         def wrapped(engine, K, T, dt):
@@ -348,6 +462,12 @@ class PhysicalFEMCapture:
             "pending_state_ids": [request.state_id for request in self.pending],
             "capture_attempts": self.attempts,
             "states": self.captured,
+            "measurement_mesh_config": (
+                None if self.measurement_mesh_config is None
+                else self.measurement_mesh_config.as_dict()
+            ),
+            "production_moving_process_zone_physics_preserved": True,
+            "capture_reconstruction_is_measurement_only": True,
             "post_dirichlet_equilibrium_displacement_saved": True,
             "active_kernel_supported": True,
             "wake_kernel_supported": False,
