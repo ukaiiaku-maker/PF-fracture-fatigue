@@ -2,6 +2,7 @@
 """Command-line entry point for v10.2.27 mechanical kernel resolution."""
 from __future__ import annotations
 
+import os
 import sys
 
 from arrhenius_fracture.kernel_configuration_v10227 import (
@@ -20,6 +21,19 @@ def _option(argv: list[str], name: str, default: str) -> str:
     return argv[index + 1]
 
 
+def _validate_cache_mode(argv: list[str]) -> None:
+    mode = _option(argv, "--mode", "auto")
+    snapshot_root = str(os.environ.get("KERNEL_SNAPSHOT_ROOT", "")).strip()
+    load_root = str(os.environ.get("KERNEL_LOAD_INVARIANCE_ROOT", "")).strip()
+    if mode == "build" and (snapshot_root or load_root):
+        raise SystemExit(
+            "--mode build clears generated cache directories before launching the "
+            "kernel builder and cannot be combined with KERNEL_SNAPSHOT_ROOT or "
+            "KERNEL_LOAD_INVARIANCE_ROOT. Use --mode auto for artifact reuse, or "
+            "unset the reuse roots for a clean recalculation."
+        )
+
+
 def _install_automatic_endpoint_resolution(argv: list[str]) -> list[str]:
     """Add a resolvable graded-tip spacing for generated configurations.
 
@@ -28,6 +42,7 @@ def _install_automatic_endpoint_resolution(argv: list[str]) -> list[str]:
     active grid, so changing process-zone length or bin count remains automatic.
     """
     result = list(argv)
+    _validate_cache_mode(result)
     if "--mechanical-config" in result or "--tip-h-fine-um" in result:
         return result
     length_um = float(_option(result, "--process-zone-length-um", "50"))
