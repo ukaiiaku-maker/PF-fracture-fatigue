@@ -1,10 +1,10 @@
-"""v10.2.13 physical FEM capture semantics.
+"""v10.2.13 extension-only physical FEM capture semantics.
 
-Snapshot requests target cumulative crack-path extension only.  Opening and the
-analytical ``r_eff`` are recorded diagnostics, not matching coordinates.  A
-production snapshot is rejected unless the FEM process zone has at least the
-requested number of tip elements; trajectory discovery remains available on a
-coarser mesh because it does not create kernel data.
+Snapshot requests target cumulative crack-path extension only.  The production
+trajectory retains its original moving-tip mesh and kinetic/advection physics.
+When configured, a matched state is cloned onto a separate endpoint-resolved
+measurement mesh by the base capture class; that reconstruction cannot advance
+or mutate the production process zone.
 """
 from __future__ import annotations
 
@@ -17,13 +17,14 @@ from typing import Any
 import numpy as np
 
 from .anisotropic_emission_v10174 import OBSERVER as DRIVE_OBSERVER
+from .frozen_measurement_reconstruction_v10227 import FrozenMeasurementMeshConfig
 from .physical_fem_capture_v10212 import (
     CaptureRequest,
     PhysicalFEMCapture as _BaseCapture,
 )
 from .physical_fem_capture_trace_v10212 import PhysicalFEMCapture as _TraceCapture
 
-MODEL_ID = "v10.2.13_extension_only_physical_fem_capture"
+MODEL_ID = "v10.2.27_extension_only_capture_with_measurement_clone"
 TRACE_FIELDS = (
     "trace_index",
     "temperature_K",
@@ -94,8 +95,13 @@ class PhysicalFEMCapture(_TraceCapture):
         outroot: str | Path,
         *,
         minimum_elements_per_process_zone: float = 3.0,
+        measurement_mesh_config: FrozenMeasurementMeshConfig | None = None,
     ):
-        super().__init__(requests, outroot)
+        super().__init__(
+            requests,
+            outroot,
+            measurement_mesh_config=measurement_mesh_config,
+        )
         minimum = float(minimum_elements_per_process_zone)
         if not math.isfinite(minimum) or minimum < 1.0:
             raise ValueError("minimum process-zone resolution must be at least one")
@@ -170,7 +176,7 @@ class PhysicalFEMCapture(_TraceCapture):
             "projected_x_extension_m",
         )
         if any(not math.isfinite(float(row[name])) for name in numeric):
-            raise RuntimeError("non-finite coordinate in v10.2.13 reachable-state trace")
+            raise RuntimeError("non-finite coordinate in v10.2.27 reachable-state trace")
         self.coordinate_trace.append(row)
 
     def _write_trace(self) -> Path:
@@ -199,8 +205,9 @@ class PhysicalFEMCapture(_TraceCapture):
         )
         return path
 
-    def before_engine_step(self, engine, K: float, T: float) -> None:
+    def before_engine_step(self, engine, K: float, T: float) -> dict[str, Any] | None:
         self._trace_coordinates(engine, K, T)
+        gate = None
         if self.pending and self.latest_assembly is not None:
             r0 = max(float(engine.f.r0), 1.0e-30)
             r_eff = max(float(engine.r_eff()), r0)
@@ -227,25 +234,45 @@ class PhysicalFEMCapture(_TraceCapture):
                         "front process-zone length engine.f.L_pz"
                     )
                 elements = process_zone / max(h_tip, 1.0e-30)
-                check = {
+                gate = {
                     "state_id": request.state_id,
                     "temperature_K": float(T),
-                    "hbar_tip_m": h_tip,
+                    "trajectory_hbar_tip_m": h_tip,
                     "process_zone_length_m": process_zone,
                     "process_zone_length_source": "engine.f.L_pz",
                     "reduced_mpz_domain_length_not_used_for_mesh_gate": True,
-                    "elements_per_process_zone": elements,
+                    "trajectory_elements_per_process_zone": elements,
                     "minimum_required": self.minimum_elements_per_process_zone,
-                    "passed": elements >= self.minimum_elements_per_process_zone,
+                    "trajectory_gate_passed": elements >= self.minimum_elements_per_process_zone,
                 }
-                self.mesh_gate_checks.append(check)
-                if not check["passed"]:
+                self.mesh_gate_checks.append(gate)
+                if not gate["trajectory_gate_passed"]:
                     raise RuntimeError(
-                        "production signed-kernel snapshot is under-resolved: "
+                        "production trajectory process zone is under-resolved: "
                         f"L_pz/h_tip={elements:.6g} < "
                         f"{self.minimum_elements_per_process_zone:.6g}"
                     )
-        _BaseCapture.before_engine_step(self, engine, K, T)
+        record = _BaseCapture.before_engine_step(self, engine, K, T)
+        if record is not None and gate is not None:
+            provenance = record.get("measurement_provenance", {})
+            gate.update({
+                "measurement_hbar_tip_m": float(
+                    provenance.get("measurement_mesh_hbar_tip_m", gate["trajectory_hbar_tip_m"])
+                ),
+                "endpoint_mesh_reconstructed": bool(
+                    provenance.get("endpoint_mesh_reconstructed", False)
+                ),
+                "production_engine_state_bitwise_unchanged": bool(
+                    provenance.get("production_engine_state_bitwise_unchanged", False)
+                ),
+                "production_fractional_moving_frame_preserved": bool(
+                    provenance.get("production_fractional_moving_frame_preserved", False)
+                ),
+                "production_mobile_kinetic_solver_preserved": bool(
+                    provenance.get("production_mobile_kinetic_solver_preserved", False)
+                ),
+            })
+        return record
 
     def finalize(self, *, require_complete: bool = True) -> dict[str, Any]:
         trace_path = self._write_trace()
@@ -264,8 +291,10 @@ class PhysicalFEMCapture(_TraceCapture):
                 "minimum_elements_per_process_zone": (
                     self.minimum_elements_per_process_zone
                 ),
-                "mesh_gate_process_zone_source": "engine.f.L_pz",
+                "trajectory_mesh_gate_process_zone_source": "engine.f.L_pz",
                 "mesh_gate_checks": self.mesh_gate_checks,
+                "production_moving_process_zone_physics_preserved": True,
+                "measurement_mesh_is_capture_only": True,
             }
         )
         (self.outroot / "capture_complete.json").write_text(
