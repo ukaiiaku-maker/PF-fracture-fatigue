@@ -29,6 +29,96 @@ if SPEC is None or SPEC.loader is None:
 BASE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(BASE)
 
+SELF_CONSISTENCY_SCHEMA = "v10.2.27_kernel_self_consistency_selection_v2"
+
+
+def _is_sha256(value: Any) -> bool:
+    text = str(value or "")
+    return len(text) == 64 and all(character in "0123456789abcdef" for character in text)
+
+
+def _validate_self_consistency_selection(
+    snapshot_root: Path,
+    configuration: MechanicalKernelConfiguration,
+    *,
+    allow_unconverged_capture: bool,
+) -> dict[str, Any]:
+    """Require portable evidence of at least two converging target-family passes."""
+    selection_path = snapshot_root / "kernel_self_consistency_selection.json"
+    if allow_unconverged_capture:
+        if selection_path.exists():
+            raise ValueError(
+                "provisional iteration capture unexpectedly contains a final "
+                "kernel_self_consistency_selection.json"
+            )
+        return {
+            "schema": "v10.2.27_provisional_kernel_iteration_v1",
+            "validated": False,
+            "allow_unconverged_capture": True,
+            "selection": None,
+        }
+    if not selection_path.is_file():
+        raise ValueError(
+            "accepted production snapshots lack kernel_self_consistency_selection.json. "
+            "A single capture/build pass cannot be promoted; run the bounded "
+            "production-capture fixed-point workflow."
+        )
+    payload = json.loads(selection_path.read_text())
+    failures: list[str] = []
+    if payload.get("schema") != SELF_CONSISTENCY_SCHEMA:
+        failures.append("schema")
+    if payload.get("converged") is not True:
+        failures.append("converged")
+    if int(payload.get("minimum_target_family_passes", 0)) < 2:
+        failures.append("minimum_target_family_passes")
+    if int(payload.get("converged_iteration", -1)) < 1:
+        failures.append("converged_iteration")
+    expected_fingerprint = configuration.fingerprint()
+    if payload.get("mechanical_configuration_fingerprint") != expected_fingerprint:
+        failures.append("mechanical_configuration_fingerprint")
+    candidate_sha = payload.get("converged_candidate_family_sha256")
+    if not _is_sha256(candidate_sha):
+        failures.append("converged_candidate_family_sha256")
+    bootstrap_sha = payload.get("initial_bootstrap_family_sha256")
+    if not _is_sha256(bootstrap_sha):
+        failures.append("initial_bootstrap_family_sha256")
+
+    comparisons = payload.get("comparisons")
+    if not isinstance(comparisons, list) or not comparisons:
+        failures.append("comparisons")
+        comparisons = []
+    else:
+        for index, comparison in enumerate(comparisons):
+            if not isinstance(comparison, dict):
+                failures.append(f"comparisons_{index}_type")
+                continue
+            if comparison.get("schema") != (
+                "v10.2.27_kernel_self_consistency_comparison_v1"
+            ):
+                failures.append(f"comparisons_{index}_schema")
+            for name in ("previous_family_sha256", "current_family_sha256"):
+                if not _is_sha256(comparison.get(name)):
+                    failures.append(f"comparisons_{index}_{name}")
+        final = comparisons[-1] if comparisons else {}
+        if final.get("converged") is not True:
+            failures.append("final_comparison_converged")
+        if final.get("current_family_sha256") != candidate_sha:
+            failures.append("final_comparison_candidate_sha256")
+
+    if failures:
+        raise ValueError(
+            "kernel self-consistency selection is invalid: "
+            + ", ".join(sorted(set(failures)))
+            + f"; selection={selection_path}"
+        )
+    return {
+        "schema": SELF_CONSISTENCY_SCHEMA,
+        "validated": True,
+        "allow_unconverged_capture": False,
+        "selection_path": str(selection_path),
+        "selection": payload,
+    }
+
 
 def _validate_artifacts(
     snapshot_root: Path,
@@ -138,6 +228,8 @@ def _validate_artifacts(
             "measurement_reconstruction_called_engine_step": False,
             "measurement_reconstruction_called_mpz_evolve": False,
             "measurement_reconstruction_called_mpz_advance": False,
+            "source_damage_field_interpolated": False,
+            "endpoint_caps_excluded": True,
         }
         for key, expected in required_provenance.items():
             if metadata.get(key) is not expected:
@@ -145,6 +237,14 @@ def _validate_artifacts(
                     f"{row['state_id']} capture provenance mismatch for {key}: "
                     f"{metadata.get(key)!r} != {expected!r}"
                 )
+        if metadata.get("ahead_of_tip_killed_elements") != 0:
+            raise ValueError(
+                f"{row['state_id']} has reconstructed damage ahead of the accepted tip"
+            )
+        if metadata.get("kill_radius_floor_m") != 0.0:
+            raise ValueError(
+                f"{row['state_id']} uses a nonzero crack reconstruction width floor"
+            )
         measurement_h = float(metadata.get("measurement_mesh_hbar_tip_m", float("nan")))
         trajectory_h = float(metadata.get("trajectory_mesh_hbar_tip_m", float("nan")))
         if not math.isfinite(measurement_h) or measurement_h <= 0.0:
@@ -195,6 +295,7 @@ def main() -> int:
     parser.add_argument("--event-minimum-factor", type=float, default=0.5)
     parser.add_argument("--event-maximum-factor", type=float, default=4.0)
     parser.add_argument("--margin-events", type=float, default=1.0)
+    parser.add_argument("--allow-unconverged-capture", action="store_true")
     args = parser.parse_args()
 
     configuration = load_configuration(args.mechanical_config)
@@ -219,14 +320,21 @@ def main() -> int:
             workspace=workspace,
             kind="load_invariance",
         )
-        _run([
-            sys.executable,
-            str(ROOT / "scripts" / "check_v10_2_27_capture_physics_contract.py"),
-            "--snapshot-root",
-            str(snapshot_root),
-            "--mechanical-config",
-            str(args.mechanical_config.expanduser().resolve()),
-        ])
+        self_consistency = _validate_self_consistency_selection(
+            snapshot_root,
+            configuration,
+            allow_unconverged_capture=bool(args.allow_unconverged_capture),
+        )
+        _run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "check_v10_2_27_capture_physics_contract.py"),
+                "--snapshot-root",
+                str(snapshot_root),
+                "--mechanical-config",
+                str(args.mechanical_config.expanduser().resolve()),
+            ]
+        )
         states = BASE._state_records(snapshot_root, load_root)
         _validate_artifacts(snapshot_root, states, configuration)
 
@@ -280,7 +388,7 @@ def main() -> int:
     manifest = json.loads(manifest_path.read_text()) if manifest_path.is_file() else {}
     manifest.update(
         {
-            "schema": "v10.2.27_current_configuration_kernel_build_v3",
+            "schema": "v10.2.27_current_configuration_kernel_build_v4",
             "configuration": configuration.canonical_payload(),
             "configuration_fingerprint": configuration.fingerprint(),
             "family": audit["family"],
@@ -289,6 +397,10 @@ def main() -> int:
             "historical_reference_condition_required": False,
             "production_moving_process_zone_physics_preserved": True,
             "capture_endpoint_reconstruction_is_measurement_only": True,
+            "self_consistency": self_consistency,
+            "production_parameterization_promotion_allowed": bool(
+                self_consistency.get("validated", False)
+            ),
         }
     )
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
