@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 import subprocess
 
@@ -22,14 +23,17 @@ case "$first" in *.sh) ;; *) exit 11 ;; esac
 case "$second" in *.sh) ;; *) exit 12 ;; esac
 rm -f "$first" "$second"
 '''
+    environment = dict(os.environ)
+    environment.update(
+        {
+            "LAUNCHER": str(LAUNCHER),
+            "TMPROOT": str(tmp_path),
+        }
+    )
     completed = subprocess.run(
         ["bash", "-c", command],
         cwd=ROOT,
-        env={
-            "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "LAUNCHER": str(LAUNCHER),
-            "TMPROOT": str(tmp_path),
-        },
+        env=environment,
         text=True,
         capture_output=True,
         check=False,
