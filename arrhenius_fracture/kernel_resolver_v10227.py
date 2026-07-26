@@ -15,6 +15,7 @@ from typing import Any
 from .kernel_configuration_v10227 import (
     DEFAULT_PROFILE_ID,
     MechanicalKernelConfiguration,
+    endpoint_resolving_tip_h_fine_m,
     load_configuration,
 )
 from .kernel_registry_v10227 import (
@@ -75,6 +76,8 @@ def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
         "mesh_ny": (args.mesh_ny, 1.0),
         "tip_h_fine_m": (args.tip_h_fine_um, 1.0e-6),
         "tip_ratio": (args.tip_ratio, 1.0),
+        "measurement_tip_h_fine_m": (args.measurement_tip_h_fine_um, 1.0e-6),
+        "measurement_tip_ratio": (args.measurement_tip_ratio, 1.0),
         "atlas_anchor_spacing_m": (args.atlas_anchor_spacing_um, 1.0e-6),
         "minimum_elements_per_process_zone": (
             args.minimum_elements_per_process_zone, 1.0
@@ -88,6 +91,15 @@ def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
             continue
         converted = float(value) * scale
         payload[key] = int(round(converted)) if key in integers else converted
+
+    # Generated configurations derive the capture-only endpoint mesh from the
+    # requested active-grid discretization.  The production trajectory spacing is
+    # independent and remains whatever tip_h_fine_m explicitly records.
+    if not explicit_config and args.measurement_tip_h_fine_um is None:
+        payload["measurement_tip_h_fine_m"] = endpoint_resolving_tip_h_fine_m(
+            float(payload["process_zone_length_m"]),
+            int(payload["process_zone_bins"]),
+        )
     if args.temperature_dependent_mechanics:
         if args.temperature_K is None:
             raise ValueError("--temperature-K is required with temperature-dependent mechanics")
@@ -235,6 +247,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mesh-ny", type=int)
     parser.add_argument("--tip-h-fine-um", type=float)
     parser.add_argument("--tip-ratio", type=float)
+    parser.add_argument("--measurement-tip-h-fine-um", type=float)
+    parser.add_argument("--measurement-tip-ratio", type=float)
     parser.add_argument("--atlas-anchor-spacing-um", type=float)
     parser.add_argument("--minimum-elements-per-process-zone", type=float)
     parser.add_argument("--temperature-dependent-mechanics", action="store_true")
