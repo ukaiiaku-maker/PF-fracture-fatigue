@@ -12,6 +12,9 @@ def _add_persistent_fields(engine, result: dict) -> dict:
         getattr(engine.mpz, "continuum_source_last_aggregate_hazard_s", 0.0)
     )
     geometry = dict(getattr(engine.mpz, "persistent_site_last_geometry", {}))
+    Kmax = max(float(result.get("Kmax_Pa_sqrt_m", 0.0)), 0.0)
+    result["sigma_tip"] = float(result.get("sigma_tip", engine.sigma_tip(Kmax)))
+    result["r_eff"] = float(result.get("r_eff", engine.r_eff()))
     result["sigma_back"] = sigma_back
     result["sigma_back_pre_renewal"] = sigma_back
     result["lambda_e"] = aggregate_hazard
