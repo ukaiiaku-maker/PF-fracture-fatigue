@@ -13,6 +13,16 @@ assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
+MECHANICS_WRAPPER = (
+    ROOT / "scripts" / "build_v10_2_27_kernel_from_mechanics_artifacts_v10228.py"
+)
+MECHANICS_SPEC = importlib.util.spec_from_file_location(
+    "mechanics_artifact_adapter_v10228", MECHANICS_WRAPPER
+)
+assert MECHANICS_SPEC is not None and MECHANICS_SPEC.loader is not None
+MECHANICS_MODULE = importlib.util.module_from_spec(MECHANICS_SPEC)
+MECHANICS_SPEC.loader.exec_module(MECHANICS_MODULE)
+
 
 def _endpoint_payload() -> dict:
     return {
@@ -98,9 +108,34 @@ def test_generic_maximum_relative_error_outside_projection_path_is_fatal():
         MODULE._sanitize({"maximum_relative_error": math.inf})
 
 
-def test_direct_builder_routes_extended_assembler_through_metadata_wrapper():
+def test_child_mechanics_wrapper_rewrites_exact_assembler_command():
+    command = [
+        "python",
+        str(MECHANICS_MODULE.ORIGINAL_ASSEMBLER),
+        "--out",
+        "family.json",
+    ]
+    patched = MECHANICS_MODULE.rewrite_assembler_command(command)
+    assert patched is not command
+    assert patched[1] == str(MECHANICS_MODULE.FINITE_ASSEMBLER)
+    assert command[1] == str(MECHANICS_MODULE.ORIGINAL_ASSEMBLER)
+
+
+def test_child_mechanics_wrapper_leaves_unrelated_commands_unchanged():
+    command = ["python", "unrelated.py"]
+    patched = MECHANICS_MODULE.rewrite_assembler_command(command)
+    assert patched == command
+
+
+def test_direct_builder_routes_mechanics_child_through_v10228_adapter():
     source = (
         ROOT / "scripts" / "build_v10_2_28_prescribed_geometry_kernel_numpy2.py"
     ).read_text()
+    assert "build_v10_2_27_kernel_from_mechanics_artifacts_v10228.py" in source
+    assert "subprocess.run = _run_with_v10228_mechanics_adapter" in source
+
+
+def test_child_adapter_routes_extended_assembler_through_metadata_wrapper():
+    source = MECHANICS_WRAPPER.read_text()
     assert "build_v10_2_27_extended_active_only_atlas_finite_metadata.py" in source
-    assert "subprocess.run = _run_with_finite_atlas_metadata" in source
+    assert "subprocess.run = run_with_finite_atlas_metadata" in source
