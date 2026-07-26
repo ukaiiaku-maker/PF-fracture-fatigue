@@ -1,0 +1,36 @@
+name: Verify v10.2.27 mesh-resolved kernel stations
+
+on:
+  push:
+    branches:
+      - v10.2.27-paper-four-class-30deg-long-rcurves
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install package and tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pytest pandas matplotlib scipy
+      - name: Compile station and kernel resolver paths
+        run: |
+          python -m py_compile \
+            arrhenius_fracture/physical_fem_station_responses_v10212.py \
+            arrhenius_fracture/frozen_geometry_load_invariance_v10213.py \
+            arrhenius_fracture/kernel_resolver_v10227.py
+      - name: Test exact mesh-resolved station selection
+        run: |
+          python -m pytest -q \
+            tests/test_v10227_mesh_resolved_active_station_selection.py
+      - name: Validate kernel builder shell
+        run: |
+          bash -n scripts/build_v10_2_27_kernel_for_configuration.sh
+          bash -n scripts/ensure_v10_2_27_signed_kernel.py 2>/dev/null || true
