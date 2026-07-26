@@ -28,6 +28,19 @@ def test_capture_reconstruction_has_no_front_or_mpz_kinetic_entry_points():
     assert "solve_dirichlet(" in text
 
 
+def test_capture_entry_runs_the_audited_v10227_production_stack():
+    text = (
+        ROOT / "arrhenius_fracture" / "sharp_front_v10_2_13_capture.py"
+    ).read_text()
+    assert "AuditedPersistentSiteStateResolvedTipEngine" in text
+    assert "install_backstress_complementarity_fix" in text
+    assert "install_physical_front_width" in text
+    assert "_run_current_paper_stack" in text
+    assert "_paper._base.main(args)" in text
+    assert "sharp_front_v10_1_7_5 as _transport" not in text
+    assert "_transport.main(args)" not in text
+
+
 def test_capture_entry_does_not_rewrite_production_physics_flags():
     text = (
         ROOT / "arrhenius_fracture" / "sharp_front_v10_2_13_capture.py"
