@@ -8,6 +8,7 @@ branch topology is rejected rather than silently rewritten.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -26,6 +27,7 @@ from .geometry_override_v10227 import (
     install_geometry_override,
     restore_geometry_override,
 )
+from .kernel_configuration_v10227 import load_configuration
 from .physical_fem_capture_v10213 import (
     MODEL_ID,
     PhysicalFEMCapture,
@@ -73,6 +75,23 @@ def _validate_single_front_capture(args: list[str]) -> None:
         )
 
 
+def _from_kernel_configuration() -> FrozenMeasurementMeshConfig | None:
+    source = str(os.environ.get("V10227_KERNEL_CONFIGURATION", "")).strip()
+    if not source:
+        return None
+    configuration = load_configuration(source)
+    return FrozenMeasurementMeshConfig(
+        specimen_length_x_m=configuration.specimen_length_x_m,
+        specimen_length_y_m=configuration.specimen_length_y_m,
+        initial_crack_length_m=configuration.initial_crack_length_m,
+        notch_half_thickness_m=configuration.notch_half_thickness_m,
+        mesh_nx=configuration.mesh_nx,
+        mesh_ny=configuration.mesh_ny,
+        tip_h_fine_m=configuration.measurement_tip_h_fine_m,
+        tip_ratio=configuration.measurement_tip_ratio,
+    ).validate()
+
+
 def _measurement_mesh_config(args: list[str]) -> FrozenMeasurementMeshConfig | None:
     names = {
         "specimen_length_x_m": "--atlas-specimen-length-x",
@@ -87,14 +106,14 @@ def _measurement_mesh_config(args: list[str]) -> FrozenMeasurementMeshConfig | N
     values = {name: _pop_value(args, option) for name, option in names.items()}
     supplied = [name for name, value in values.items() if value is not None]
     if not supplied:
-        return None
+        return _from_kernel_configuration()
     missing = [name for name, value in values.items() if value is None]
     if missing:
         raise SystemExit(
             "capture-only measurement mesh requires a complete configuration; missing="
             + ",".join(missing)
         )
-    return FrozenMeasurementMeshConfig(
+    result = FrozenMeasurementMeshConfig(
         specimen_length_x_m=float(values["specimen_length_x_m"]),
         specimen_length_y_m=float(values["specimen_length_y_m"]),
         initial_crack_length_m=float(values["initial_crack_length_m"]),
@@ -104,6 +123,13 @@ def _measurement_mesh_config(args: list[str]) -> FrozenMeasurementMeshConfig | N
         tip_h_fine_m=float(values["tip_h_fine_m"]),
         tip_ratio=float(values["tip_ratio"]),
     ).validate()
+    configured = _from_kernel_configuration()
+    if configured is not None and result.as_dict() != configured.as_dict():
+        raise SystemExit(
+            "explicit atlas measurement-mesh options do not match the resolver's "
+            "mechanical configuration"
+        )
+    return result
 
 
 def _transparent_engine_payload(original):
@@ -134,6 +160,61 @@ def _transparent_engine_payload(original):
         return payload
 
     return wrapped
+
+
+def _write_kernel_capture_manifest(
+    root: Path,
+    *,
+    audit: dict,
+    measurement_config: FrozenMeasurementMeshConfig | None,
+    state_table: str | None,
+) -> dict | None:
+    source = str(os.environ.get("V10227_KERNEL_CONFIGURATION", "")).strip()
+    fingerprint = str(
+        os.environ.get("V10227_KERNEL_CONFIGURATION_FINGERPRINT", "")
+    ).strip()
+    if not source:
+        return None
+    configuration = load_configuration(source)
+    expected = configuration.fingerprint()
+    if fingerprint and fingerprint != expected:
+        raise RuntimeError(
+            "resolver/capture mechanical-configuration fingerprint mismatch: "
+            f"{fingerprint} != {expected}"
+        )
+    payload = {
+        "schema": "v10.2.27_accepted_production_state_kernel_capture_v1",
+        "mechanical_configuration": configuration.canonical_payload(),
+        "mechanical_configuration_fingerprint": expected,
+        "trajectory_driver": {
+            "driver": "registered_accepted_production_command",
+            "scientific_material_reference_condition": False,
+            "production_parameterization_observed_not_modified": True,
+            "capture_physics_overrides": [],
+            "stochastic_first_passage_preserved": True,
+            "variable_event_length_preserved": True,
+            "moving_process_zone_physics_preserved": True,
+            "fractional_moving_frame_preserved": True,
+            "mobile_kinetic_solver_preserved": True,
+        },
+        "measurement_snapshot": {
+            "capture_only": True,
+            "trajectory_state_cloned": True,
+            "plasticity_frozen": True,
+            "kinetics_not_advanced": True,
+            "endpoint_mesh_re_equilibrated": True,
+            "measurement_mesh_config": (
+                None if measurement_config is None else measurement_config.as_dict()
+            ),
+        },
+        "state_table": None if state_table is None else str(Path(state_table).resolve()),
+        "captured_states": int(audit.get("captured_states", 0)),
+        "snapshot_root": str(root.resolve()),
+    }
+    (root / "kernel_capture_manifest.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    )
+    return payload
 
 
 def main(argv=None):
@@ -204,6 +285,12 @@ def main(argv=None):
             repair = repair_multitemperature_geometry_summary(mechanics_root)
         audit = capture.finalize(require_complete=not allow_incomplete)
         root = Path(outroot)
+        kernel_manifest = _write_kernel_capture_manifest(
+            root,
+            audit=audit,
+            measurement_config=measurement_config,
+            state_table=state_table,
+        )
         (root / "v10_2_13_capture_entry.json").write_text(
             json.dumps(
                 {
@@ -223,6 +310,7 @@ def main(argv=None):
                     "production_parameterization_observed_not_modified": True,
                     "production_moving_process_zone_physics_preserved": True,
                     "measurement_reconstruction_is_capture_only": True,
+                    "kernel_capture_manifest": kernel_manifest,
                     "allow_incomplete": allow_incomplete,
                     "capture": audit,
                     "mechanics_output_repair": repair,
