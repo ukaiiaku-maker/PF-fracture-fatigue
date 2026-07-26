@@ -114,8 +114,17 @@ def test_extension_capture_uses_first_crossing_not_symmetric_nearest(tmp_path: P
 def _write_seed_family(path: Path, maximum_um: float, *, authorized: bool = True) -> None:
     payload = {
         "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
-        "metadata": {"production_parameterization_allowed": authorized},
+        "production_parameterization_allowed": authorized,
+        "campaign_parameterization_allowed": authorized,
         "active_kernel_mechanically_measured": True,
+        "candidate_independent": True,
+        "same_kernel_family_for_monotonic_and_fatigue": True,
+        "frozen_geometry_load_invariance_passed": True,
+        "normalization_is_mechanically_derived": True,
+        "positive_and_negative_perturbations": True,
+        "multi_amplitude_validation_passed": True,
+        "wake_shielding_supported": False,
+        "wake_kernel_forced_zero": True,
         "wake_kernel_mechanically_measured": False,
         "states": [
             {"state_id": "E0", "crack_extension_m": 0.0},
@@ -148,6 +157,9 @@ def test_seed_family_checker_requires_authorization_and_coverage(tmp_path: Path)
     audit = json.loads((tmp_path / "audit.json").read_text())
     assert audit["passed"] is True
     assert audit["maximum_path_extension_um"] == 1200.0
+    assert audit["observed_authorization_gates"][
+        "production_parameterization_allowed"
+    ] is True
 
     _write_seed_family(family, 1190.0, authorized=False)
     failed = subprocess.run(
