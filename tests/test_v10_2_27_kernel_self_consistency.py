@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -12,6 +13,9 @@ from arrhenius_fracture.kernel_configuration_v10227 import (
     MechanicalKernelConfiguration,
 )
 from arrhenius_fracture.kernel_registry_v10227 import family_physics_fingerprint
+from arrhenius_fracture.kernel_resolver_v10227 import (
+    _validate_promotion_evidence,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPARATOR = ROOT / "scripts" / "compare_v10_2_27_kernel_families.py"
@@ -120,7 +124,7 @@ def test_comparator_rejects_material_kernel_change(tmp_path: Path):
 
 
 def _selection(configuration: MechanicalKernelConfiguration, candidate: Path) -> dict:
-    candidate_sha = __import__("hashlib").sha256(candidate.read_bytes()).hexdigest()
+    candidate_sha = hashlib.sha256(candidate.read_bytes()).hexdigest()
     candidate_physics = family_physics_fingerprint(candidate)
     comparison = {
         "schema": "v10.2.27_kernel_self_consistency_comparison_v1",
@@ -203,4 +207,64 @@ def test_provisional_iteration_rejects_accidental_final_selection(tmp_path: Path
             snapshots,
             configuration,
             allow_unconverged_capture=True,
+        )
+
+
+def test_resolver_rejects_cache_without_promotion_manifests(tmp_path: Path):
+    candidate = tmp_path / "family.json"
+    _family(candidate)
+    audit = {
+        "file_sha256": hashlib.sha256(candidate.read_bytes()).hexdigest(),
+        "physics_fingerprint": family_physics_fingerprint(candidate),
+    }
+    with pytest.raises(ValueError, match="lacks fixed-point promotion manifests"):
+        _validate_promotion_evidence(tmp_path, audit, "f" * 64)
+
+
+def test_resolver_accepts_only_matching_promotion_manifests(tmp_path: Path):
+    configuration = MechanicalKernelConfiguration()
+    candidate = tmp_path / "family.json"
+    _family(candidate)
+    family_sha = hashlib.sha256(candidate.read_bytes()).hexdigest()
+    physics = family_physics_fingerprint(candidate)
+    selection = _selection(configuration, candidate)
+    build_manifest = {
+        "schema": "v10.2.27_current_configuration_kernel_build_v5",
+        "configuration_fingerprint": configuration.fingerprint(),
+        "family_sha256": family_sha,
+        "family_physics_fingerprint": physics,
+        "production_parameterization_promotion_allowed": True,
+        "self_consistency": {
+            "validated": True,
+            "selection": selection,
+        },
+    }
+    consistency_manifest = {
+        "schema": "v10.2.27_kernel_self_consistency_manifest_v3",
+        "converged": True,
+        "converged_iteration": 1,
+        "canonical_family_sha256": family_sha,
+        "canonical_family_physics_fingerprint": physics,
+        "selection": selection,
+    }
+    (tmp_path / "kernel_build_manifest.json").write_text(
+        json.dumps(build_manifest, indent=2, sort_keys=True) + "\n"
+    )
+    (tmp_path / "kernel_self_consistency_manifest.json").write_text(
+        json.dumps(consistency_manifest, indent=2, sort_keys=True) + "\n"
+    )
+    audit = {"file_sha256": family_sha, "physics_fingerprint": physics}
+    result = _validate_promotion_evidence(
+        tmp_path, audit, configuration.fingerprint()
+    )
+    assert result["production_parameterization_promotion_allowed"] is True
+    assert result["converged_iteration"] == 1
+
+    consistency_manifest["canonical_family_physics_fingerprint"] = "e" * 64
+    (tmp_path / "kernel_self_consistency_manifest.json").write_text(
+        json.dumps(consistency_manifest, indent=2, sort_keys=True) + "\n"
+    )
+    with pytest.raises(ValueError, match="canonical_physics_fingerprint"):
+        _validate_promotion_evidence(
+            tmp_path, audit, configuration.fingerprint()
         )
