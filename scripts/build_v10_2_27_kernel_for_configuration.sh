@@ -51,9 +51,6 @@ if [[ "$BRANCHING_MODE" != single_front || "$MAX_FRONTS" != 1 ]]; then
   exit 4
 fi
 
-# The capture entry installs the environment-driven mechanics override before
-# constructing the FEM configuration. Export the exact stiffness tensor recorded
-# in the configuration fingerprint.
 export V10227_CRYSTAL_C11_PA="$C11"
 export V10227_CRYSTAL_C12_PA="$C12"
 export V10227_CRYSTAL_C44_PA="$C44"
@@ -70,27 +67,23 @@ if [[ -n "$SNAPSHOT_ARCHIVE" || -n "$LOAD_ARCHIVE" ]]; then
   fi
   echo "OPTIONAL CACHE: using explicitly supplied portable mechanics archives" >&2
 elif [[ -z "$SNAPSHOT_ROOT" ]]; then
-  SNAPSHOT_ROOT="$CACHE_DIR/snapshots"
-  if [[ -n "${KERNEL_CAPTURE_COMMAND:-}" ]]; then
-    mkdir -p "$SNAPSHOT_ROOT"
-    export V10227_KERNEL_CAPTURE_OUTROOT="$SNAPSHOT_ROOT"
-    export V10227_KERNEL_CAPTURE_THETA_DEG="$THETA"
-    export V10227_KERNEL_CAPTURE_TARGET_EXTENSION_UM="$TARGET_EXT_UM"
-    export V10227_KERNEL_CAPTURE_REQUIRED_MAX_EXTENSION_UM="$REQUIRED_EXT_UM"
-    echo "CAPTURE kernel states with registered override: $KERNEL_CAPTURE_COMMAND" >&2
-    bash -lc "$KERNEL_CAPTURE_COMMAND"
-  else
-    echo "RECALCULATE frozen FEM states from the current mechanical configuration" >&2
-    "$PYTHON_BIN" scripts/capture_v10_2_27_kernel_states_for_configuration.py \
-      --mechanical-config "$CONFIG" \
-      --snapshot-out "$SNAPSHOT_ROOT" \
-      --run-out "$CACHE_DIR/capture" \
-      --required-max-extension-um "$REQUIRED_EXT_UM" \
-      --target-extension-um "$TARGET_EXT_UM" \
-      --theta-deg "$THETA" \
-      --capture-temperature-K "$CAPTURE_TEMPERATURE_K" \
-      --force
+  if [[ -z "${KERNEL_CAPTURE_COMMAND:-}" ]]; then
+    echo "ERROR: automatic mechanics-only kernel capture is disabled." >&2
+    echo "The production model requires stochastic first passage, variable event" >&2
+    echo "lengths, and kinetically advected moving-PZ state. Supply either:" >&2
+    echo "  KERNEL_SNAPSHOT_ROOT plus optional KERNEL_LOAD_INVARIANCE_ROOT," >&2
+    echo "  paired portable snapshot/load-invariance archives, or" >&2
+    echo "  KERNEL_CAPTURE_COMMAND that captures accepted production states." >&2
+    exit 5
   fi
+  SNAPSHOT_ROOT="$CACHE_DIR/snapshots"
+  mkdir -p "$SNAPSHOT_ROOT"
+  export V10227_KERNEL_CAPTURE_OUTROOT="$SNAPSHOT_ROOT"
+  export V10227_KERNEL_CAPTURE_THETA_DEG="$THETA"
+  export V10227_KERNEL_CAPTURE_TARGET_EXTENSION_UM="$TARGET_EXT_UM"
+  export V10227_KERNEL_CAPTURE_REQUIRED_MAX_EXTENSION_UM="$REQUIRED_EXT_UM"
+  echo "CAPTURE accepted production states with registered command" >&2
+  bash -lc "$KERNEL_CAPTURE_COMMAND"
 fi
 
 if [[ -n "$SNAPSHOT_ROOT" && -z "$SNAPSHOT_ARCHIVE" ]]; then
@@ -126,7 +119,7 @@ if [[ -z "$LOAD_ARCHIVE" && -z "$LOAD_ROOT" ]]; then
       --minimum-station-spacing-m "$PZ_LENGTH_M"
   done < <(find "$SNAPSHOT_ROOT" -mindepth 2 -maxdepth 2 -name snapshot.json -type f | sort)
   if [[ "$found" -lt 2 ]]; then
-    echo "ERROR: current-configuration capture produced fewer than two frozen states" >&2
+    echo "ERROR: production capture supplied fewer than two frozen states" >&2
     exit 2
   fi
 fi
