@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 import sys
 
@@ -45,6 +46,13 @@ REQUIRED_SNAPSHOT_FLAGS = {
     "measurement_reconstruction_called_engine_step": False,
     "measurement_reconstruction_called_mpz_evolve": False,
     "measurement_reconstruction_called_mpz_advance": False,
+    "source_damage_field_interpolated": False,
+    "endpoint_caps_excluded": True,
+}
+ALLOWED_PATH_SOURCES = {
+    "initial_notch_only",
+    "accepted_production_polyline",
+    "verified_straight_single_front_tip_displacement",
 }
 
 
@@ -82,7 +90,9 @@ def main() -> int:
     if trajectory.get("observed_tip_kinetics_modes") != ["moving_velocity"]:
         failed_trajectory.append("observed_tip_kinetics_modes")
     seed_sha = str(trajectory.get("trajectory_seed_signed_kernel_family_sha256", ""))
-    if len(seed_sha) != 64 or any(character not in "0123456789abcdef" for character in seed_sha):
+    if len(seed_sha) != 64 or any(
+        character not in "0123456789abcdef" for character in seed_sha
+    ):
         failed_trajectory.append("trajectory_seed_signed_kernel_family_sha256")
     if not str(trajectory.get("trajectory_seed_signed_kernel_family", "")).strip():
         failed_trajectory.append("trajectory_seed_signed_kernel_family")
@@ -140,11 +150,51 @@ def main() -> int:
         after = payload.get("production_engine_state_sha256_after")
         if not before or before != after:
             failures.append("production_engine_state_sha256")
+
+        try:
+            extension = float(payload.get("crack_extension_m"))
+        except (TypeError, ValueError):
+            extension = math.nan
+            failures.append("crack_extension_m")
+        crack_path = payload.get("crack_path_xy_m", [])
+        path_source = payload.get("crack_path_source")
+        ahead_killed = payload.get("ahead_of_tip_killed_elements")
+        kill_floor = payload.get("kill_radius_floor_m")
+        if path_source not in ALLOWED_PATH_SOURCES:
+            failures.append("crack_path_source")
+        if not math.isfinite(extension) or extension < 0.0:
+            failures.append("crack_extension_m")
+        elif extension > 1.0e-12:
+            if not isinstance(crack_path, list) or len(crack_path) < 2:
+                failures.append("resolved_nonzero_crack_path")
+            if path_source == "initial_notch_only":
+                failures.append("nonzero_initial_notch_only")
+        if ahead_killed != 0:
+            failures.append("ahead_of_tip_killed_elements")
+        if kill_floor != 0.0:
+            failures.append("kill_radius_floor_m")
+        if payload.get("measurement_damage_source") != (
+            "initial_notch_plus_resolved_crack_path"
+        ):
+            failures.append("measurement_damage_source")
+
+        geometry = {
+            "crack_extension_m": extension,
+            "crack_path_points": len(crack_path) if isinstance(crack_path, list) else 0,
+            "crack_path_source": path_source,
+            "straight_single_front_path_synthesized": payload.get(
+                "straight_single_front_path_synthesized"
+            ),
+            "endpoint_caps_excluded": payload.get("endpoint_caps_excluded"),
+            "ahead_of_tip_killed_elements": ahead_killed,
+            "kill_radius_floor_m": kill_floor,
+        }
         rows.append(
             {
                 "state_id": payload.get("state_id", path.parent.name),
                 "snapshot": str(path),
                 "observed": observed,
+                "geometry": geometry,
                 "failures": sorted(set(failures)),
                 "passed": not failures,
             }
@@ -154,7 +204,7 @@ def main() -> int:
     failed_states = [row["state_id"] for row in rows if not row["passed"]]
 
     result = {
-        "schema": "v10.2.27_accepted_production_capture_physics_audit_v2",
+        "schema": "v10.2.27_accepted_production_capture_physics_audit_v3",
         "mechanical_configuration_fingerprint": expected,
         "snapshot_root": str(root),
         "state_count": len(rows),
