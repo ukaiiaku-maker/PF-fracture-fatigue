@@ -43,14 +43,49 @@ class AuditedPersistentSiteCyclicTipEngine(PersistentSiteCyclicTipEngine):
     def cycle_step_waveform(
         self, controller, waveform, T_K: float, requested_cycles=None, force_cycles=None
     ):
-        result = super().cycle_step_waveform(
-            controller,
-            waveform,
-            T_K,
-            requested_cycles=requested_cycles,
-            force_cycles=force_cycles,
+        result = _add_persistent_fields(
+            self,
+            super().cycle_step_waveform(
+                controller,
+                waveform,
+                T_K,
+                requested_cycles=requested_cycles,
+                force_cycles=force_cycles,
+            ),
         )
-        return _add_persistent_fields(self, result)
+        type(self)._audit_records.append(
+            {
+                "engine_id": int(getattr(self, "_engine_id", -1)),
+                "loading_mode": "cyclic",
+                "time_s": float(result.get("time_s", self.t)),
+                "temperature_K": float(T_K),
+                "cycles_requested": float(result.get("cycles_requested", 0.0)),
+                "cycles_consumed": float(result.get("cycles_consumed", 0.0)),
+                "cycles_unused": float(result.get("cycles_unused", 0.0)),
+                "event_localized": bool(result.get("cycle_event_localized", False)),
+                "fired": bool(result.get("fired", False)),
+                "B": float(result.get("B", self.B)),
+                "persistent_sigma_back_Pa": float(result["sigma_back"]),
+                "persistent_aggregate_emission_hazard_s": float(
+                    result["persistent_site_aggregate_hazard_s"]
+                ),
+                "persistent_site_multiplicity_per_system": float(
+                    result["persistent_site_multiplicity_per_system"]
+                ),
+                "persistent_site_front_width_m": float(
+                    result["persistent_site_front_width_m"]
+                ),
+                "persistent_site_source_area_m2": float(
+                    result["persistent_site_source_area_m2"]
+                ),
+                "persistent_tip_radius_m": float(result["persistent_tip_radius_m"]),
+                "persistent_source_inventory_active": False,
+                "persistent_source_refresh_active": False,
+                "explicit_recovery_active": False,
+                "engine_native_cycle_predictor": True,
+            }
+        )
+        return result
 
 
 __all__ = ["AuditedPersistentSiteCyclicTipEngine"]
