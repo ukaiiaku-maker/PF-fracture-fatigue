@@ -16,6 +16,7 @@ from .capture_audit_repair_v10213 import (
     repair_capture_audits,
     repair_multitemperature_geometry_summary,
 )
+from .frozen_measurement_reconstruction_v10227 import FrozenMeasurementMeshConfig
 from .geometry_override_v10227 import (
     install_geometry_override,
     restore_geometry_override,
@@ -82,6 +83,39 @@ def _force_capture_modes(args: list[str]) -> None:
     args.extend(["--no-active-shielding", "--no-wake-shielding", "--max-fronts", "1"])
 
 
+def _measurement_mesh_config(args: list[str]) -> FrozenMeasurementMeshConfig | None:
+    names = {
+        "specimen_length_x_m": "--atlas-specimen-length-x",
+        "specimen_length_y_m": "--atlas-specimen-length-y",
+        "initial_crack_length_m": "--atlas-initial-crack-length",
+        "notch_half_thickness_m": "--atlas-notch-half-thickness",
+        "mesh_nx": "--atlas-measurement-mesh-nx",
+        "mesh_ny": "--atlas-measurement-mesh-ny",
+        "tip_h_fine_m": "--atlas-measurement-tip-h-fine",
+        "tip_ratio": "--atlas-measurement-tip-ratio",
+    }
+    values = {name: _pop_value(args, option) for name, option in names.items()}
+    supplied = [name for name, value in values.items() if value is not None]
+    if not supplied:
+        return None
+    missing = [name for name, value in values.items() if value is None]
+    if missing:
+        raise SystemExit(
+            "capture-only measurement mesh requires a complete configuration; missing="
+            + ",".join(missing)
+        )
+    return FrozenMeasurementMeshConfig(
+        specimen_length_x_m=float(values["specimen_length_x_m"]),
+        specimen_length_y_m=float(values["specimen_length_y_m"]),
+        initial_crack_length_m=float(values["initial_crack_length_m"]),
+        notch_half_thickness_m=float(values["notch_half_thickness_m"]),
+        mesh_nx=int(values["mesh_nx"]),
+        mesh_ny=int(values["mesh_ny"]),
+        tip_h_fine_m=float(values["tip_h_fine_m"]),
+        tip_ratio=float(values["tip_ratio"]),
+    ).validate()
+
+
 def main(argv=None):
     install_front_direction_fix()
     install_geometry_override()
@@ -91,6 +125,7 @@ def main(argv=None):
     minimum_resolution = float(
         _pop_value(args, "--minimum-elements-per-process-zone") or 3.0
     )
+    measurement_config = _measurement_mesh_config(args)
     trajectory_only = "--atlas-trajectory-only" in args
     if trajectory_only:
         args.remove("--atlas-trajectory-only")
@@ -117,6 +152,7 @@ def main(argv=None):
         requests,
         outroot,
         minimum_elements_per_process_zone=minimum_resolution,
+        measurement_mesh_config=measurement_config,
     )
     _force_capture_modes(args)
 
@@ -129,11 +165,12 @@ def main(argv=None):
     engine_type.step = capture.wrap_engine_step(original_step)
     try:
         print(
-            "  v10.2.13 physical FEM atlas capture: "
+            "  v10.2.27 physical FEM atlas capture: "
             f"mode={'trajectory_only' if trajectory_only else 'extension_snapshot_capture'} "
             f"requests={len(requests)} unsigned_shielding=disabled "
             f"minimum_Lpz_over_h={minimum_resolution:g} "
-            "opening=validation_only parameterization=blocked"
+            f"measurement_clone={'enabled' if measurement_config is not None else 'disabled'} "
+            "production_kinetics=unchanged opening=validation_only parameterization=blocked"
         )
         result = _transport.main(args)
         mechanics_root_value = _option_value(args, "--out")
@@ -156,6 +193,11 @@ def main(argv=None):
                     ),
                     "atlas_outroot": str(root.resolve()),
                     "minimum_elements_per_process_zone": minimum_resolution,
+                    "measurement_mesh_config": (
+                        None if measurement_config is None else measurement_config.as_dict()
+                    ),
+                    "production_moving_process_zone_physics_preserved": True,
+                    "measurement_reconstruction_is_capture_only": True,
                     "allow_incomplete": allow_incomplete,
                     "capture": audit,
                     "mechanics_output_repair": repair,
