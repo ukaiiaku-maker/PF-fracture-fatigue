@@ -39,10 +39,13 @@ def _write_capture(root: Path) -> Path:
         json.dumps(configuration.canonical_payload(), indent=2, sort_keys=True) + "\n"
     )
     trajectory = {
+        "driver": "audited_v10_2_27_persistent_site_production_stack",
         "capture_physics_overrides": [],
         "observed_hazard_modes": ["exponential"],
         "observed_event_length_modes": ["threshold_scaled"],
         "observed_tip_kinetics_modes": ["moving_velocity"],
+        "audited_persistent_site_engine_preserved": True,
+        "persistent_site_source_preserved": True,
         "stochastic_first_passage_preserved": True,
         "variable_event_length_preserved": True,
         "moving_process_zone_physics_preserved": True,
@@ -50,7 +53,12 @@ def _write_capture(root: Path) -> Path:
         "mobile_kinetic_solver_preserved": True,
         "active_shielding_preserved": True,
         "signed_active_shielding_preserved": True,
+        "wake_shielding_remains_disabled": True,
         "production_parameterization_observed_not_modified": True,
+        "trajectory_seed_signed_kernel_family": "/portable/bootstrap/family.json",
+        "trajectory_seed_signed_kernel_family_sha256": "c" * 64,
+        "trajectory_seed_family_required_to_break_kernel_build_cycle": True,
+        "trajectory_seed_family_used_only_for_production_state_evolution": True,
     }
     (root / "kernel_capture_manifest.json").write_text(
         json.dumps(
@@ -65,12 +73,15 @@ def _write_capture(root: Path) -> Path:
         + "\n"
     )
     engine = {
-        "capture_loading_path": "accepted_production_state_observer",
+        "capture_loading_path": "accepted_v10_2_27_production_state_observer",
+        "persistent_site_engine_observed": True,
+        "persistent_site_source_observed": True,
         "cleavage_hazard_mode_observed": "exponential",
         "cleavage_event_length_mode_observed": "threshold_scaled",
         "tip_kinetics_mode_observed": "moving_velocity",
         "active_shielding_observed": True,
         "signed_active_shielding_observed": True,
+        "wake_shielding_observed": False,
         "moving_process_zone_advection_observed": True,
     }
     for index in range(2):
