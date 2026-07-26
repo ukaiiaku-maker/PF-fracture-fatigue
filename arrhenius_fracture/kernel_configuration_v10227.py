@@ -123,6 +123,9 @@ class MechanicalKernelConfiguration:
     temperature_K: float | None = None
     extra: Mapping[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        self.validate()
+
     def validate(self) -> "MechanicalKernelConfiguration":
         if not str(self.profile_id).strip():
             raise ValueError("profile_id must be non-empty")
