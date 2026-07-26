@@ -38,3 +38,4 @@ jobs:
         run: |
           bash -n scripts/build_v10_2_27_kernel_for_configuration.sh
           bash -n scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves.sh
+          bash -n scripts/run_v10_2_27_physics_frozen_single_case_smoke.sh
