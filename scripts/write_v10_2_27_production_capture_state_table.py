@@ -56,18 +56,32 @@ def main() -> int:
         args.event_minimum_factor,
         args.event_maximum_factor,
     )
-    # The production trajectory uses variable stochastic event lengths.  Capture
+    # The production trajectory uses variable stochastic event lengths. Capture
     # the nearest accepted equilibrium within one maximum admissible event of the
     # nominal anchor instead of requiring an artificial fixed 5 um landing.
     tolerance_um = max(1.05 * maximum_event_um, 0.51 * da_um, 1.0e-3)
+    if spacing_um <= 2.0 * tolerance_um:
+        raise SystemExit(
+            "production capture anchor windows overlap: "
+            f"spacing={spacing_um:.9g} um, tolerance={tolerance_um:.9g} um. "
+            "Increase atlas_anchor_spacing_m or narrow the admissible event range."
+        )
     tolerance_m = tolerance_um * 1.0e-6
 
     rows = []
+    state_ids = set()
     for index in range(count + 1):
         extension_um = index * spacing_um
+        state_id = f"E{int(round(extension_um)):07d}"
+        if state_id in state_ids:
+            raise SystemExit(
+                "capture anchor state IDs are not unique at micrometre precision; "
+                "increase atlas_anchor_spacing_m"
+            )
+        state_ids.add(state_id)
         rows.append(
             {
-                "state_id": f"E{int(round(extension_um)):07d}",
+                "state_id": state_id,
                 "temperature_K": temperature,
                 "cumulative_crack_path_extension_m": extension_um * 1.0e-6,
                 "extension_tolerance_m": tolerance_m,
