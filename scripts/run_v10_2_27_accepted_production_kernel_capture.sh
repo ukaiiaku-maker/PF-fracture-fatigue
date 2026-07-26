@@ -23,7 +23,7 @@ fi
 CONFIG=$(cd "$(dirname "$V10227_KERNEL_CONFIGURATION")" && pwd)/$(basename "$V10227_KERNEL_CONFIGURATION")
 SNAPSHOT_ROOT=$(cd "$(dirname "$V10227_KERNEL_CAPTURE_OUTROOT")" && pwd)/$(basename "$V10227_KERNEL_CAPTURE_OUTROOT")
 SEED_FAMILY=$(cd "$(dirname "$KERNEL_CAPTURE_SEED_FAMILY")" && pwd)/$(basename "$KERNEL_CAPTURE_SEED_FAMILY")
-REGISTRY=${KERNEL_CAPTURE_PARAMETER_REGISTRY:-$ROOT/arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv}
+REGISTRY=${KERNEL_CAPTURE_PARAMETER_REGISTRY:-$ROOT/arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv}
 STEPS=${KERNEL_CAPTURE_STEPS:-2000000}
 D_U=${KERNEL_CAPTURE_DU_M:-2e-7}
 DT=${KERNEL_CAPTURE_DT_S:-8.4}
@@ -34,12 +34,13 @@ EVENT_SUBSEGMENT_FRACTION=${CLEAVAGE_EVENT_SUBSEGMENT_FRACTION:-0.1}
 PERSISTENT_SOURCE_MIN_WIDTH_UM=${PERSISTENT_SOURCE_MIN_WIDTH_UM:-0}
 EXPECTED_SEED_SHA256=${KERNEL_CAPTURE_SEED_FAMILY_EXPECTED_SHA256:-}
 
-for required in "$CONFIG" "$SEED_FAMILY" "$REGISTRY"; do
+for required in "$CONFIG" "$SEED_FAMILY"; do
   [[ -f "$required" ]] || { echo "ERROR: missing required input: $required" >&2; exit 2; }
 done
 
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py --check-only
+[[ -f "$REGISTRY" ]] || { echo "ERROR: missing generated production registry: $REGISTRY" >&2; exit 2; }
 
 CACHE_DIR=${V10227_KERNEL_CACHE_DIR:-$(dirname "$SNAPSHOT_ROOT")}
 STATE_TABLE="$CACHE_DIR/accepted_production_capture_state_table.csv"
@@ -76,8 +77,8 @@ with open(path, newline="") as stream:
 matches = [row for row in rows if row.get("option_key") == option]
 if len(matches) != 1:
     raise SystemExit(
-        f"accepted production option must occur exactly once in registry: {option!r}; "
-        f"matches={len(matches)}"
+        f"accepted production option must occur exactly once in generated registry: "
+        f"{option!r}; matches={len(matches)}"
     )
 row = matches[0]
 length_um = float(row["L_pz_um_recommended"])
@@ -228,13 +229,14 @@ import sys
     required_seed_path,
 ) = sys.argv[1:]
 payload = {
-    "schema": "v10.2.27_accepted_production_kernel_capture_command_v3",
+    "schema": "v10.2.27_accepted_production_kernel_capture_command_v4",
     "mechanical_configuration": str(Path(config).resolve()),
     "state_table": str(Path(state_table).resolve()),
     "seed_signed_kernel_family": str(Path(family).resolve()),
     "seed_signed_kernel_family_sha256": family_sha,
     "seed_family_audit": str(Path(run_root, "capture_seed_family_audit.json").resolve()),
     "parameter_registry": str(Path(registry).resolve()),
+    "parameter_registry_is_generated_v10_2_27_registry": True,
     "parameter_option": option,
     "hazard_seed": int(seed),
     "maximum_anchor_extension_um": float(maximum_anchor),
