@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write fixed-extension anchors for accepted production-state kernel capture."""
+"""Write first-crossing anchors for accepted production-state kernel capture."""
 from __future__ import annotations
 
 import argparse
@@ -49,29 +49,35 @@ def main() -> int:
         _round_up(1.0e6 * configuration.atlas_anchor_spacing_m, da_um),
         da_um,
     )
-    maximum_um = _round_up(required_um, spacing_um)
-    count = max(int(round(maximum_um / spacing_um)), 1)
+    final_anchor_um = _round_up(required_um, da_um)
     maximum_event_um = _maximum_event_um(
         da_um,
         args.event_minimum_factor,
         args.event_maximum_factor,
     )
-    # The production trajectory uses variable stochastic event lengths. Capture
-    # the nearest accepted equilibrium within one maximum admissible event of the
-    # nominal anchor instead of requiring an artificial fixed 5 um landing.
     tolerance_um = max(1.05 * maximum_event_um, 0.51 * da_um, 1.0e-3)
-    if spacing_um <= 2.0 * tolerance_um:
-        raise SystemExit(
-            "production capture anchor windows overlap: "
-            f"spacing={spacing_um:.9g} um, tolerance={tolerance_um:.9g} um. "
-            "Increase atlas_anchor_spacing_m or narrow the admissible event range."
-        )
-    tolerance_m = tolerance_um * 1.0e-6
 
+    anchors_um = [0.0]
+    next_anchor = spacing_um
+    while next_anchor < final_anchor_um - 1.0e-9:
+        anchors_um.append(next_anchor)
+        next_anchor += spacing_um
+    if final_anchor_um > anchors_um[-1] + 1.0e-9:
+        anchors_um.append(final_anchor_um)
+
+    gaps = [right - left for left, right in zip(anchors_um[:-1], anchors_um[1:])]
+    if gaps and min(gaps) <= maximum_event_um * (1.0 + 1.0e-12):
+        raise SystemExit(
+            "a production event could cross more than one capture anchor: "
+            f"minimum_gap={min(gaps):.9g} um, "
+            f"maximum_event={maximum_event_um:.9g} um. "
+            "Increase atlas_anchor_spacing_m or narrow the event range."
+        )
+
+    tolerance_m = tolerance_um * 1.0e-6
     rows = []
     state_ids = set()
-    for index in range(count + 1):
-        extension_um = index * spacing_um
+    for extension_um in anchors_um:
         state_id = f"E{int(round(extension_um)):07d}"
         if state_id in state_ids:
             raise SystemExit(
@@ -99,9 +105,10 @@ def main() -> int:
     print(f"state_table={output}")
     print(f"state_count={len(rows)}")
     print(f"anchor_spacing_um={spacing_um:.17g}")
-    print(f"maximum_extension_um={maximum_um:.17g}")
+    print(f"required_extension_um={required_um:.17g}")
+    print(f"final_anchor_extension_um={final_anchor_um:.17g}")
     print(f"maximum_event_um={maximum_event_um:.17g}")
-    print(f"extension_tolerance_um={tolerance_um:.17g}")
+    print(f"maximum_first_crossing_overshoot_um={tolerance_um:.17g}")
     return 0
 
 
