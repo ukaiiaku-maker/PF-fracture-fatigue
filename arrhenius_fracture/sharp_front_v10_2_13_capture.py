@@ -3,7 +3,7 @@
 The production trajectory is the audited v10.2.27 persistent-site paper stack.
 Capture does not alter stochastic first passage, variable event lengths, source
 kinetics, signed shielding, moving-process-zone advection, front-width physics,
-or the selected material parameterization.  At a requested accepted state, the
+or the selected material parameterization. At a requested accepted state, the
 capture hook clones the converged trajectory state onto a separate endpoint-
 resolved measurement mesh and performs only a frozen-state elastic equilibrium
 solve.
@@ -209,12 +209,7 @@ def _transparent_engine_payload(original):
 
 
 def _run_current_paper_stack(args: list[str]):
-    """Run the current paper engine with an explicit bootstrap kernel family.
-
-    This mirrors ``sharp_front_v10_2_27.main`` after kernel resolution.  It avoids
-    a circular request to build the new kernel while retaining the complete
-    v10.2.27 material, persistent-site, and signed-engine stack.
-    """
+    """Run the current paper engine with an explicit bootstrap kernel family."""
     if not _paper.DEFAULT_REGISTRY.is_file() or not _paper.SELECTION_RECORD.is_file():
         raise FileNotFoundError(
             "missing generated v10.2.27 registry or selection record; run "
@@ -400,7 +395,7 @@ def _write_kernel_capture_manifest(
         )
 
     payload = {
-        "schema": "v10.2.27_accepted_production_state_kernel_capture_v3",
+        "schema": "v10.2.27_accepted_production_state_kernel_capture_v4",
         "mechanical_configuration": configuration.canonical_payload(),
         "mechanical_configuration_fingerprint": expected,
         "trajectory_driver": {
@@ -493,14 +488,35 @@ def main(argv=None):
             f"measurement_clone={'enabled' if measurement_config is not None else 'disabled'} "
             "engine=audited_persistent_site physics_overrides=none"
         )
-        result = _run_current_paper_stack(args)
+        early_stop = None
+        try:
+            result = _run_current_paper_stack(args)
+        except _capture_base.CaptureCompleteStop as exc:
+            result = 0
+            early_stop = {
+                "intentional": True,
+                "state_id": exc.state_id,
+                "reason": "final accepted equilibrium serialized before next kernel query",
+            }
+            print(
+                "  capture complete: stopped after final accepted equilibrium "
+                f"{exc.state_id}"
+            )
+
         mechanics_root_value = _option_value(args, "--out")
         mechanics_root = Path(mechanics_root_value) if mechanics_root_value else None
         repair = None
-        if mechanics_root is not None:
+        if mechanics_root is not None and early_stop is None:
             write_energy_ledger_audit(mechanics_root)
             repair_capture_audits(mechanics_root)
             repair = repair_multitemperature_geometry_summary(mechanics_root)
+        elif mechanics_root is not None:
+            repair = {
+                "skipped": True,
+                "reason": "intentional capture completion before production-run finalizers",
+                "mechanics_root": str(mechanics_root.resolve()),
+            }
+
         audit = capture.finalize(require_complete=not allow_incomplete)
         root = Path(outroot)
         kernel_manifest = _write_kernel_capture_manifest(
@@ -529,6 +545,8 @@ def main(argv=None):
                     "production_parameterization_observed_not_modified": True,
                     "production_moving_process_zone_physics_preserved": True,
                     "measurement_reconstruction_is_capture_only": True,
+                    "capture_terminated_after_final_equilibrium": early_stop is not None,
+                    "capture_early_stop": early_stop,
                     "kernel_capture_manifest": kernel_manifest,
                     "allow_incomplete": allow_incomplete,
                     "capture": audit,
