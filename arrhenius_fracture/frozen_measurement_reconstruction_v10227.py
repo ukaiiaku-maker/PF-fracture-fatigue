@@ -1,8 +1,8 @@
 """Capture-only reconstruction of endpoint-resolved frozen FEM states.
 
-This module is deliberately isolated from the production moving-tip solver.  It
+This module is deliberately isolated from the production moving-tip solver. It
 never receives a front engine and therefore cannot advance hazard clocks,
-process-zone kinetics, source populations, or moving-frame advection.  It clones
+process-zone kinetics, source populations, or moving-frame advection. It clones
 an already accepted trajectory state onto a separate graded measurement mesh,
 reapplies the frozen sharp crack, and performs a fixed-plastic-state elastic
 Dirichlet equilibrium solve for signed-kernel measurement.
@@ -20,7 +20,7 @@ from .config import GeometryConfig, MeshConfig
 from .fem import assemble_mechanics, solve_dirichlet
 from .mesh import make_boundary_data, make_tri_mesh
 
-MODEL_ID = "v10.2.27_capture_only_endpoint_mesh_reconstruction_v1"
+MODEL_ID = "v10.2.27_capture_only_endpoint_mesh_reconstruction_v2"
 
 
 @dataclass(frozen=True)
@@ -34,7 +34,10 @@ class FrozenMeasurementMeshConfig:
     tip_h_fine_m: float
     tip_ratio: float
     mesh_seed: int = 42
-    kill_radius_floor_m: float = 0.5e-6
+    # Zero means a one-local-element-wide damaged trace on the reconstructed mesh.
+    # A positive value is an explicit mechanical configuration choice and is
+    # fingerprinted through the serialized measurement configuration.
+    kill_radius_floor_m: float = 0.0
 
     def validate(self) -> "FrozenMeasurementMeshConfig":
         for name in (
@@ -44,11 +47,13 @@ class FrozenMeasurementMeshConfig:
             "notch_half_thickness_m",
             "tip_h_fine_m",
             "tip_ratio",
-            "kill_radius_floor_m",
         ):
             value = float(getattr(self, name))
             if not math.isfinite(value) or value <= 0.0:
                 raise ValueError(f"{name} must be positive and finite")
+        floor = float(self.kill_radius_floor_m)
+        if not math.isfinite(floor) or floor < 0.0:
+            raise ValueError("kill_radius_floor_m must be nonnegative and finite")
         if int(self.mesh_nx) < 2 or int(self.mesh_ny) < 2:
             raise ValueError("measurement mesh_nx and mesh_ny must be at least two")
         if self.initial_crack_length_m >= self.specimen_length_x_m:
@@ -118,19 +123,50 @@ def _reapply_frozen_sharp_crack(
         length2 = float(segment @ segment)
         if length2 <= 1.0e-30:
             continue
-        fraction = np.clip(((centroids - p0[None, :]) @ segment) / length2, 0.0, 1.0)
+        raw_fraction = ((centroids - p0[None, :]) @ segment) / length2
+        fraction = np.clip(raw_fraction, 0.0, 1.0)
         projection = p0[None, :] + fraction[:, None] * segment[None, :]
         distance2 = np.sum((centroids - projection) ** 2, axis=1)
         radius = np.maximum(kill_radius, 0.7 * element_radius)
-        selected = distance2 <= radius ** 2
+        # Exclude endpoint caps. In particular, no centroid ahead of the final
+        # accepted crack tip may be damaged merely because it lies inside a disk
+        # around the clipped segment endpoint.
+        within_segment = (raw_fraction >= 0.0) & (raw_fraction <= 1.0)
+        selected = within_segment & (distance2 <= radius ** 2)
         killed_elements |= selected
         if np.any(selected):
             damage[mesh.elems[selected]] = 1.0
+
+    ahead_killed = 0
+    maximum_ahead_projection = 0.0
+    if len(path) >= 2:
+        last = path[-1] - path[-2]
+        norm = float(np.linalg.norm(last))
+        if norm > 1.0e-30:
+            direction = last / norm
+            ahead_projection = (centroids - crack_tip_xy_m[None, :]) @ direction
+            threshold = max(0.25 * float(mesh.hbar_tip), 1.0e-12)
+            ahead = killed_elements & (ahead_projection > threshold)
+            ahead_killed = int(np.count_nonzero(ahead))
+            maximum_ahead_projection = (
+                float(np.max(ahead_projection[ahead])) if ahead_killed else 0.0
+            )
+            if ahead_killed:
+                raise RuntimeError(
+                    "capture-only crack reconstruction damaged elements ahead of the "
+                    f"accepted tip: count={ahead_killed}, "
+                    f"maximum_projection={maximum_ahead_projection:.9g} m"
+                )
 
     return damage, {
         "crack_path_points": len(path),
         "killed_elements": int(np.count_nonzero(killed_elements)),
         "kill_radius_m": kill_radius,
+        "kill_radius_floor_m": float(kill_radius_floor_m),
+        "crack_damage_trace_width_policy": "one_local_measurement_element",
+        "endpoint_caps_excluded": True,
+        "ahead_of_tip_killed_elements": ahead_killed,
+        "maximum_ahead_of_tip_killed_projection_m": maximum_ahead_projection,
         "initial_notch_reapplied": True,
         "accepted_crack_polyline_reapplied": bool(len(path) >= 2),
     }
@@ -154,15 +190,20 @@ def reconstruct_frozen_measurement_state(
 ) -> dict[str, Any]:
     """Clone one accepted trajectory state onto an endpoint-resolved mesh.
 
-    The source arrays are read-only inputs.  Plastic strain and dislocation-density
+    The source arrays are read-only inputs. Plastic strain and dislocation-density
     fields are transferred by nearest old-element inheritance, then held fixed.
-    Only the linear elastic equilibrium displacement is recomputed.
+    The production damage field is deliberately not interpolated: the accepted
+    sharp crack polyline and initial notch are reconstructed explicitly. Only the
+    linear elastic equilibrium displacement is recomputed.
     """
     config = config.validate()
     tip = np.asarray(tuple(crack_tip_xy_m), dtype=float).reshape(2)
     if not np.all(np.isfinite(tip)):
         raise ValueError("crack tip must be finite")
     path = _unit_rows(crack_path_xy_m)
+    source_damage = np.asarray(source_d, dtype=float)
+    if source_damage.ndim != 1 or source_damage.size != source_mesh.nn:
+        raise ValueError("source damage field is inconsistent with the trajectory mesh")
 
     geometry = GeometryConfig(
         Lx=float(config.specimen_length_x_m),
@@ -198,7 +239,7 @@ def reconstruct_frozen_measurement_state(
         kill_radius_floor_m=float(config.kill_radius_floor_m),
     )
 
-    # Fixed-state elastic reconstruction only.  No plasticity update, front-engine
+    # Fixed-state elastic reconstruction only. No plasticity update, front-engine
     # step, MPZ evolve, MPZ advance, source update, or hazard integration occurs.
     K, Rint, *_ = assemble_mechanics(
         measurement_mesh,
@@ -248,6 +289,9 @@ def reconstruct_frozen_measurement_state(
         "trajectory_mesh_elements": int(source_mesh.ne),
         "measurement_mesh_elements": int(measurement_mesh.ne),
         "transferred_parent_elements": int(len(element_parent_map)),
+        "source_damage_field_interpolated": False,
+        "source_damage_field_used_for_shape_validation_only": True,
+        "measurement_damage_source": "initial_notch_plus_accepted_crack_polyline",
         "elastic_reaction_force": float(reaction),
         "postsolve_internal_force_norm": float(np.linalg.norm(R_check)),
         "measurement_mesh_config": config.as_dict(),
