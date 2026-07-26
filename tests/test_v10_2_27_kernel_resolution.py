@@ -65,6 +65,7 @@ def test_mechanical_configuration_separates_production_and_measurement_meshes():
     assert cfg.measurement_tip_h_fine_m == endpoint_resolving_tip_h_fine_m(
         50.0e-6, 80
     )
+    assert cfg.measurement_tip_h_fine_m == 7.8125e-9
     assert cfg.measurement_tip_h_fine_m < cfg.tip_h_fine_m
     assert cfg.da_phys_m == 5.0e-6
     assert cfg.specimen_length_x_m == 2.0e-3
@@ -183,14 +184,21 @@ def test_runner_resolver_ignores_inherited_family_by_default():
     assert "MECHANICAL_PROFILE_OVERRIDE" in text
 
 
-def test_default_builder_requires_accepted_production_capture_then_recalculates_kernel():
+def test_default_builder_uses_bounded_production_capture_fixed_point():
     builder = (
         ROOT / "scripts" / "build_v10_2_27_kernel_for_configuration.sh"
     ).read_text()
     assert "automatic mechanics-only kernel capture is disabled" in builder
     assert "KERNEL_CAPTURE_COMMAND" in builder
+    assert "KERNEL_CAPTURE_SEED_FAMILY" in builder
+    assert "SELF-CONSISTENCY iteration" in builder
+    assert "compare_v10_2_27_kernel_families.py" in builder
+    assert "kernel_self_consistency_selection.json" in builder
+    assert "--allow-unconverged-capture" in builder
+    assert "FINAL_PHYSICS" in builder
+    assert "CANDIDATE_PHYSICS" in builder
+    assert 'if [[ "$FINAL_SHA" != "$CANDIDATE_SHA" ]]' not in builder
     assert "capture_v10_2_27_kernel_states_for_configuration.py" not in builder
-    assert "CAPTURE accepted production states with registered command" in builder
     assert "RECALCULATE load invariance endpoints" in builder
     assert '--minimum-station-spacing-m "$PZ_LENGTH_M"' in builder
 
@@ -207,13 +215,15 @@ def test_capture_hook_separates_trajectory_physics_from_measurement_mesh():
     assert "_engine_kinetic_state_digest" in base
     assert "production_engine_state_bitwise_unchanged" in base
     assert "measurement_reconstruction_called_mpz_advance" in base
+    assert "CaptureCompleteStop" in base
+    assert "capture_stops_before_postfinal_kernel_query" in base
     assert "--atlas-measurement-tip-h-fine" in entry
     assert "AuditedPersistentSiteStateResolvedTipEngine" in entry
     assert "_run_current_paper_stack" in entry
     assert "engine=audited_persistent_site" in entry
 
 
-def test_optional_archives_require_exact_configuration_and_capture_provenance():
+def test_optional_archives_require_exact_configuration_capture_and_convergence():
     text = (
         ROOT / "scripts" / "build_v10_2_27_kernel_from_current_mechanics.py"
     ).read_text()
@@ -223,6 +233,10 @@ def test_optional_archives_require_exact_configuration_and_capture_provenance():
     assert "production_engine_state_bitwise_unchanged" in text
     assert "measurement_reconstruction_called_mpz_advance" in text
     assert "check_v10_2_27_capture_physics_contract.py" in text
+    assert "kernel_self_consistency_selection.json" in text
+    assert "single capture/build pass cannot be promoted" in text
+    assert "converged_candidate_family_physics_fingerprint" in text
+    assert "production_parameterization_promotion_allowed" in text
 
 
 def test_current_registry_geometry_is_50um_80bins():
@@ -230,7 +244,7 @@ def test_current_registry_geometry_is_50um_80bins():
 
     path = (
         ROOT / "arrhenius_fracture" / "data" / "materials"
-        / "v10_2_27_v913_four_class_paper_registry.csv"
+        / "v10_2_27_paper_four_class_registry.csv"
     )
     with path.open(newline="") as stream:
         rows = list(csv.DictReader(stream))
