@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 import sys
 
@@ -28,13 +29,48 @@ if _PACKAGE_ROOT != REPOSITORY_ROOT / "arrhenius_fracture":
 
 from arrhenius_fracture import physical_fem_station_responses_v10212 as _station_responses
 
-# v10.2.27 changes only which exact MPZ stations are measurable on the frozen
-# mesh.  The response payload remains the established v10.2.14 contract used by
-# the mechanical-source reviewer and active-only atlas builder.
 _STATION_RESPONSE_SCHEMA = (
     "v10.2.14_exact_endpoint_active_signed_spatial_station_responses"
 )
+
+
+def _exact_first_last_station_indices(
+    coordinates: tuple[float, ...],
+    minimum_spacing_m: float,
+    minimum_distance_m: float = 0.0,
+) -> list[int]:
+    """Restore the frozen v10.2.14 active-station selection contract.
+
+    The first and last exact MPZ bins are always retained.  Intermediate bins are
+    selected only by the established spacing rule.  ``minimum_distance_m`` is
+    accepted for call compatibility but may not omit, move, or snap physical bins.
+    If bin zero is not resolvable, exact endpoint construction fails closed later.
+    """
+    values = [float(value) for value in coordinates]
+    if not values:
+        return []
+    if any(not math.isfinite(value) for value in values):
+        raise ValueError("MPZ coordinates must be finite")
+    if any(right < left for left, right in zip(values, values[1:])):
+        raise ValueError("MPZ coordinates must be nondecreasing")
+    spacing = float(minimum_spacing_m)
+    if not math.isfinite(spacing) or spacing <= 0.0:
+        raise ValueError("minimum station spacing must be positive and finite")
+    minimum_distance = float(minimum_distance_m)
+    if not math.isfinite(minimum_distance) or minimum_distance < 0.0:
+        raise ValueError("minimum station distance must be finite and nonnegative")
+
+    selected = [0]
+    for index in range(1, len(values) - 1):
+        if values[index] - values[selected[-1]] >= spacing:
+            selected.append(index)
+    if len(values) > 1 and selected[-1] != len(values) - 1:
+        selected.append(len(values) - 1)
+    return selected
+
+
 _station_responses.MODEL_ID = _STATION_RESPONSE_SCHEMA
+_station_responses._station_indices = _exact_first_last_station_indices
 
 from arrhenius_fracture.frozen_geometry_load_invariance_v10213 import (
     evaluate_frozen_geometry_load_invariance,
@@ -74,6 +110,7 @@ def main() -> None:
             {
                 "schema": payload["schema"],
                 "station_response_schema": _STATION_RESPONSE_SCHEMA,
+                "active_station_policy": "exact_first_last_no_omission",
                 "parent_state_id": payload["parent_state_id"],
                 "load_invariance_passed": payload["load_invariance_passed"],
                 "active_kernel_mechanically_measured": payload[
