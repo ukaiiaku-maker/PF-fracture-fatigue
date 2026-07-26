@@ -54,6 +54,16 @@ def _validate_artifacts(
         )
     if manifest.get("mechanical_configuration") != configuration.canonical_payload():
         raise ValueError("snapshot mechanical-configuration payload does not match request")
+    measurement_manifest = dict(manifest.get("measurement_snapshot", {}))
+    for key in (
+        "capture_only",
+        "trajectory_state_cloned",
+        "plasticity_frozen",
+        "kinetics_not_advanced",
+        "endpoint_mesh_re_equilibrated",
+    ):
+        if measurement_manifest.get(key) is not True:
+            raise ValueError(f"capture manifest lacks required measurement invariant {key}")
 
     for row in states:
         metadata = json.loads(Path(row["snapshot_json"]).read_text())
@@ -87,6 +97,11 @@ def _validate_artifacts(
                 float(configuration.interaction_length_m),
                 1.0e-12,
             ),
+            "trajectory_tip_h_fine_m": (
+                float(metadata.get("trajectory_mesh_hbar_tip_m", float("nan"))),
+                float(metadata.get("trajectory_mesh_hbar_tip_m", float("nan"))),
+                0.0,
+            ),
         }
         for name, (actual, expected, tolerance) in checks.items():
             if not math.isfinite(actual) or not math.isclose(
@@ -112,6 +127,35 @@ def _validate_artifacts(
             raise ValueError(f"{row['state_id']} does not support the active kernel")
         if metadata.get("wake_kernel_supported") is not False:
             raise ValueError(f"{row['state_id']} unexpectedly supports wake shielding")
+        required_provenance = {
+            "trajectory_state_cloned": True,
+            "production_state_mutated": False,
+            "plasticity_frozen": True,
+            "kinetics_not_advanced": True,
+            "hazard_clocks_not_advanced": True,
+            "moving_process_zone_not_advanced": True,
+            "fractional_moving_frame_not_called": True,
+            "endpoint_mesh_reconstructed": True,
+            "endpoint_mesh_re_equilibrated": True,
+            "production_engine_state_bitwise_unchanged": True,
+            "production_fractional_moving_frame_preserved": True,
+            "production_mobile_kinetic_solver_preserved": True,
+            "measurement_reconstruction_called_engine_step": False,
+            "measurement_reconstruction_called_mpz_evolve": False,
+            "measurement_reconstruction_called_mpz_advance": False,
+        }
+        for key, expected in required_provenance.items():
+            if metadata.get(key) is not expected:
+                raise ValueError(
+                    f"{row['state_id']} capture provenance mismatch for {key}: "
+                    f"{metadata.get(key)!r} != {expected!r}"
+                )
+        measurement_h = float(metadata.get("measurement_mesh_hbar_tip_m", float("nan")))
+        trajectory_h = float(metadata.get("trajectory_mesh_hbar_tip_m", float("nan")))
+        if not math.isfinite(measurement_h) or measurement_h <= 0.0:
+            raise ValueError(f"{row['state_id']} lacks a finite measurement hbar_tip")
+        if not math.isfinite(trajectory_h) or trajectory_h <= 0.0:
+            raise ValueError(f"{row['state_id']} lacks a finite trajectory hbar_tip")
         if configuration.temperature_dependent_mechanics:
             actual_temperature = float(metadata.get("temperature_K", float("nan")))
             if not math.isclose(
@@ -219,6 +263,8 @@ def main() -> int:
             "kernel_provider_id": configuration.kernel_provider_id,
             "kernel_recalculated_from_current_configuration": True,
             "historical_reference_condition_required": False,
+            "production_moving_process_zone_physics_preserved": True,
+            "capture_endpoint_reconstruction_is_measurement_only": True,
         }
     )
     family_out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
@@ -231,13 +277,15 @@ def main() -> int:
     manifest = json.loads(manifest_path.read_text()) if manifest_path.is_file() else {}
     manifest.update(
         {
-            "schema": "v10.2.27_current_configuration_kernel_build_v2",
+            "schema": "v10.2.27_current_configuration_kernel_build_v3",
             "configuration": configuration.canonical_payload(),
             "configuration_fingerprint": configuration.fingerprint(),
             "family": audit["family"],
             "family_sha256": audit["file_sha256"],
             "family_physics_fingerprint": audit["physics_fingerprint"],
             "historical_reference_condition_required": False,
+            "production_moving_process_zone_physics_preserved": True,
+            "capture_endpoint_reconstruction_is_measurement_only": True,
         }
     )
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
