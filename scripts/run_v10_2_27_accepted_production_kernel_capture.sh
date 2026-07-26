@@ -66,10 +66,11 @@ print(
 PY
 )
 
-"$PYTHON_BIN" - "$REGISTRY" "$KERNEL_CAPTURE_PARAMETER_OPTION" <<'PY'
+"$PYTHON_BIN" - "$REGISTRY" "$KERNEL_CAPTURE_PARAMETER_OPTION" "$PZ_UM" "$PZ_BINS" <<'PY'
 import csv
+import math
 import sys
-path, option = sys.argv[1:]
+path, option, expected_length_um, expected_bins = sys.argv[1:]
 with open(path, newline="") as stream:
     rows = list(csv.DictReader(stream))
 matches = [row for row in rows if row.get("option_key") == option]
@@ -77,6 +78,17 @@ if len(matches) != 1:
     raise SystemExit(
         f"accepted production option must occur exactly once in registry: {option!r}; "
         f"matches={len(matches)}"
+    )
+row = matches[0]
+length_um = float(row["L_pz_um_recommended"])
+bins = int(float(row["n_bins_recommended"]))
+if not math.isclose(length_um, float(expected_length_um), rel_tol=0.0, abs_tol=1.0e-12):
+    raise SystemExit(
+        f"capture option process-zone length mismatch: {length_um} != {expected_length_um} um"
+    )
+if bins != int(expected_bins):
+    raise SystemExit(
+        f"capture option process-zone bins mismatch: {bins} != {expected_bins}"
     )
 PY
 
@@ -100,8 +112,6 @@ maximum_um = max(float(row["cumulative_crack_path_extension_m"]) for row in rows
 cosine = abs(math.cos(math.radians(float(theta))))
 if cosine <= 1.0e-12:
     raise SystemExit("capture theta has zero projected-extension cosine")
-# Continue by four outer checkpoint lengths after the final anchor so the next
-# engine-step observer can serialize the first accepted state that crossed it.
 projected_stop_um = maximum_um * cosine + 4.0 * float(da_m) * 1.0e6
 required_seed_path_um = projected_stop_um / cosine
 print(maximum_um, projected_stop_um, required_seed_path_um)
