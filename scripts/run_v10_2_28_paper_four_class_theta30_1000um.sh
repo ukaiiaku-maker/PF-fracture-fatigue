@@ -37,8 +37,8 @@ target = float(os.environ["TARGET_EXT_UM"])
 theta = float(os.environ["THETA"])
 if not math.isclose(target, 1000.0, rel_tol=0.0, abs_tol=1.0e-12):
     raise SystemExit("ERROR: this production launcher is fixed to 1000 um crack extension")
-if not math.isclose(theta, 30.0, rel_tol=0.0, abs_tol=1.0e-12):
-    raise SystemExit("ERROR: this production launcher is fixed to theta=30 degrees")
+if not math.isfinite(theta):
+    raise SystemExit("ERROR: THETA must be finite")
 PY
 
 mkdir -p "$OUTROOT"
@@ -118,7 +118,7 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 payload = {
-    "schema": "v10.2.28_paper_four_class_theta30_1000um_campaign_lock_v1",
+    "schema": "v10.2.28_paper_four_class_orientation_1000um_campaign_lock_v1",
     "model_entry": "arrhenius_fracture.sharp_front_v10_2_28_audited",
     "target_quantity": "cumulative_crack_path_extension",
     "target_crack_extension_um": float(os.environ["TARGET_EXT_UM"]),
@@ -156,7 +156,7 @@ fi
 
 source_scheduler="$ROOT/scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves.sh"
 source_plotter="$ROOT/scripts/plot_v10_2_27_paper_four_class_rcurves.py"
-generated_scheduler=$(mktemp "$ROOT/scripts/.v10_2_28_four_class_scheduler.XXXXXX.sh")
+generated_scheduler=$(mktemp "$ROOT/scripts/.v10_2_28_four_class_orientation_scheduler.XXXXXX.sh")
 generated_plotter="$OUTROOT/v10_2_28_generated_plotter.py"
 cleanup() {
   rm -f "$generated_scheduler"
