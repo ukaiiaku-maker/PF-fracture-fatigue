@@ -148,8 +148,6 @@ def main() -> int:
         shutil.rmtree(run_out, ignore_errors=True)
     elif snapshot_out.exists() or run_out.exists():
         raise SystemExit("capture output exists; resolver must request a forced rebuild")
-    # PhysicalFEMCapture owns creation of snapshot_out and intentionally rejects
-    # any pre-existing output root. Create only its parent here.
     snapshot_out.parent.mkdir(parents=True, exist_ok=True)
     run_out.mkdir(parents=True, exist_ok=True)
 
@@ -189,6 +187,18 @@ def main() -> int:
         "--atlas-outroot", str(snapshot_out),
         "--minimum-elements-per-process-zone",
         f"{configuration.minimum_elements_per_process_zone:.17g}",
+        # Capture-only endpoint mesh. These options are consumed by the capture
+        # wrapper and are never forwarded into the production trajectory parser.
+        "--atlas-specimen-length-x", f"{configuration.specimen_length_x_m:.17g}",
+        "--atlas-specimen-length-y", f"{configuration.specimen_length_y_m:.17g}",
+        "--atlas-initial-crack-length", f"{configuration.initial_crack_length_m:.17g}",
+        "--atlas-notch-half-thickness", f"{configuration.notch_half_thickness_m:.17g}",
+        "--atlas-measurement-mesh-nx", str(configuration.mesh_nx),
+        "--atlas-measurement-mesh-ny", str(configuration.mesh_ny),
+        "--atlas-measurement-tip-h-fine",
+        f"{configuration.measurement_tip_h_fine_m:.17g}",
+        "--atlas-measurement-tip-ratio",
+        f"{configuration.measurement_tip_ratio:.17g}",
         "--mode", "2d",
         "--material-manifest", str(mechanics_manifest),
         "--temperatures", f"{capture_temperature:.17g}",
@@ -197,6 +207,7 @@ def main() -> int:
         "--nx", str(configuration.mesh_nx),
         "--ny", str(configuration.mesh_ny),
         "--dU", "2e-7", "--dt", "8.4", "--n-stagger", "2",
+        # Production trajectory mesh: this remains the calibrated moving-tip mesh.
         "--tip-h-fine", f"{configuration.tip_h_fine_m:.17g}",
         "--tip-ratio", f"{configuration.tip_ratio:.17g}",
         "--da-phys", f"{configuration.da_phys_m:.17g}",
@@ -248,7 +259,7 @@ def main() -> int:
             f"capture completed {payload.get('captured_states')} of {len(rows)} states"
         )
     manifest_payload = {
-        "schema": "v10.2.27_current_configuration_kernel_capture_v3",
+        "schema": "v10.2.27_current_configuration_kernel_capture_v4",
         "mechanical_configuration": configuration.canonical_payload(),
         "mechanical_configuration_fingerprint": configuration.fingerprint(),
         "trajectory_driver": {
@@ -256,6 +267,10 @@ def main() -> int:
             "capture_temperature_K": capture_temperature,
             "scientific_material_reference_condition": False,
             "existing_material_parameterization_required": False,
+            "production_tip_h_fine_m": configuration.tip_h_fine_m,
+            "moving_process_zone_physics_preserved": True,
+            "fractional_moving_frame_preserved": True,
+            "mobile_kinetic_solver_preserved": True,
             "cleavage_surface": {
                 "G00_eV": 4.0,
                 "sigc0_GPa": 2.0,
@@ -267,6 +282,15 @@ def main() -> int:
             "emission_suppressed": True,
             "adaptive_event_target": 0.15,
             "adaptive_minimum_fraction": 1.0e-10,
+        },
+        "measurement_snapshot": {
+            "capture_only": True,
+            "trajectory_state_cloned": True,
+            "plasticity_frozen": True,
+            "kinetics_not_advanced": True,
+            "endpoint_mesh_re_equilibrated": True,
+            "measurement_tip_h_fine_m": configuration.measurement_tip_h_fine_m,
+            "measurement_tip_ratio": configuration.measurement_tip_ratio,
         },
         "requested_target_extension_um": float(args.target_extension_um),
         "required_kernel_path_extension_um": float(args.required_max_extension_um),
