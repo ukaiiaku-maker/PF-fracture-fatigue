@@ -152,6 +152,7 @@ for theta, fingerprint in fingerprints:
 unique_by_theta = {next(iter(values)) for values in by_theta.values()}
 if len(by_theta) > 1 and len(unique_by_theta) != len(by_theta):
     raise SystemExit("different orientations unexpectedly produced the same mechanical fingerprint")
+comparison_applicable = len(by_theta) > 1
 payload = {
     "schema": "v10.2.28_direct_kernel_orientation_coverage_smoke_v1",
     "passed": True,
@@ -159,8 +160,9 @@ payload = {
     "theta_values_deg": sorted(by_theta),
     "target_extensions_um": sorted({row["target_extension_um"] for row in rows}),
     "all_cache_reuse_verified": True,
+    "orientation_fingerprint_comparison_applicable": comparison_applicable,
     "different_orientation_fingerprints_verified": (
-        len(by_theta) <= 1 or len(unique_by_theta) == len(by_theta)
+        comparison_applicable and len(unique_by_theta) == len(by_theta)
     ),
     "records": rows,
 }
