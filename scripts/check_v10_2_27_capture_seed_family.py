@@ -9,6 +9,20 @@ import math
 from pathlib import Path
 
 EXPECTED_SCHEMA = "v10.2.14_active_only_real_signed_2d_shielding_atlas"
+REQUIRED_TRUTHS = {
+    "production_parameterization_allowed": True,
+    "campaign_parameterization_allowed": True,
+    "active_kernel_mechanically_measured": True,
+    "candidate_independent": True,
+    "same_kernel_family_for_monotonic_and_fatigue": True,
+    "frozen_geometry_load_invariance_passed": True,
+    "normalization_is_mechanically_derived": True,
+    "positive_and_negative_perturbations": True,
+    "multi_amplitude_validation_passed": True,
+    "wake_shielding_supported": False,
+    "wake_kernel_forced_zero": True,
+    "wake_kernel_mechanically_measured": False,
+}
 
 
 def main() -> int:
@@ -29,16 +43,14 @@ def main() -> int:
     failures = []
     if payload.get("schema") != EXPECTED_SCHEMA:
         failures.append("family_schema")
-    metadata = dict(payload.get("metadata", {}))
-    if metadata.get("production_parameterization_allowed") is not True:
-        failures.append("production_parameterization_allowed")
-    if payload.get("active_kernel_mechanically_measured") is not True:
-        failures.append("active_kernel_mechanically_measured")
-    if payload.get("wake_kernel_mechanically_measured") not in {False, None}:
-        failures.append("wake_kernel_mechanically_measured")
+    for key, expected in REQUIRED_TRUTHS.items():
+        if payload.get(key) is not expected:
+            failures.append(key)
 
     extensions = []
+    state_ids = []
     for index, state in enumerate(payload.get("states", [])):
+        state_ids.append(str(state.get("state_id", f"state_{index}")))
         try:
             extension = float(state["crack_extension_m"])
         except (KeyError, TypeError, ValueError):
@@ -62,16 +74,15 @@ def main() -> int:
             failures.append("required_path_extension_coverage")
 
     result = {
-        "schema": "v10.2.27_capture_seed_family_audit_v1",
+        "schema": "v10.2.27_capture_seed_family_audit_v2",
         "family": str(family),
         "family_sha256": hashlib.sha256(family.read_bytes()).hexdigest(),
         "family_schema": payload.get("schema"),
-        "production_parameterization_allowed": metadata.get(
-            "production_parameterization_allowed"
-        ),
-        "active_kernel_mechanically_measured": payload.get(
-            "active_kernel_mechanically_measured"
-        ),
+        "required_authorization_gates": REQUIRED_TRUTHS,
+        "observed_authorization_gates": {
+            key: payload.get(key) for key in REQUIRED_TRUTHS
+        },
+        "state_ids": state_ids,
         "state_count": len(extensions),
         "minimum_path_extension_um": minimum_um,
         "maximum_path_extension_um": maximum_um,
@@ -95,7 +106,8 @@ def main() -> int:
     output.write_text(text)
     if failures:
         raise SystemExit(
-            "capture bootstrap family failed validation: " + ",".join(result["failures"])
+            "capture bootstrap family failed validation: "
+            + ",".join(result["failures"])
         )
     return 0
 
