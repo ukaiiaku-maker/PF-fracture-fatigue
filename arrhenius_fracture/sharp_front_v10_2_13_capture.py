@@ -1,4 +1,10 @@
-"""v10.2.13 physical FEM capture with extension-only matching and audit repair."""
+"""v10.2.13 physical FEM capture with extension-only matching and audit repair.
+
+The capture entry is a transparent observer.  It does not alter hazard modes,
+shielding flags, moving-process-zone kinetics, source laws, or material
+parameters.  The fixed-extension atlas remains single-front only, so unsupported
+branch topology is rejected rather than silently rewritten.
+"""
 from __future__ import annotations
 
 import json
@@ -9,9 +15,7 @@ from . import anisotropic_emission_v10174 as _anisotropic
 from . import fem as _fem
 from . import sharp_front_v10_1_7_4 as _entry74
 from . import sharp_front_v10_1_7_5 as _transport
-from .anisotropic_front_direction_fix_v10227 import (
-    install_front_direction_fix,
-)
+from .anisotropic_front_direction_fix_v10227 import install_front_direction_fix
 from .capture_audit_repair_v10213 import (
     repair_capture_audits,
     repair_multitemperature_geometry_summary,
@@ -54,33 +58,18 @@ def _option_value(args: list[str], option: str) -> str | None:
     return None
 
 
-def _remove_option(args: list[str], option: str, takes_value: bool = False) -> None:
-    prefix = option + "="
-    index = 0
-    while index < len(args):
-        token = args[index]
-        if token.startswith(prefix):
-            del args[index]
-            continue
-        if token == option:
-            del args[index]
-            if takes_value and index < len(args):
-                del args[index]
-            continue
-        index += 1
+def _has_flag(args: list[str], option: str) -> bool:
+    return option in args or any(token.startswith(option + "=") for token in args)
 
 
-def _force_capture_modes(args: list[str]) -> None:
-    for option in (
-        "--active-shielding",
-        "--no-active-shielding",
-        "--wake-shielding",
-        "--no-wake-shielding",
-        "--crystal-branch",
-    ):
-        _remove_option(args, option)
-    _remove_option(args, "--max-fronts", takes_value=True)
-    args.extend(["--no-active-shielding", "--no-wake-shielding", "--max-fronts", "1"])
+def _validate_single_front_capture(args: list[str]) -> None:
+    max_fronts_raw = _option_value(args, "--max-fronts")
+    maximum_fronts = 1 if max_fronts_raw is None else int(max_fronts_raw)
+    if _has_flag(args, "--crystal-branch") or maximum_fronts != 1:
+        raise SystemExit(
+            "extension-indexed signed-kernel capture is single-front only; "
+            "branching requires a topology_cached or direct_fem provider"
+        )
 
 
 def _measurement_mesh_config(args: list[str]) -> FrozenMeasurementMeshConfig | None:
@@ -148,13 +137,14 @@ def main(argv=None):
                 "--atlas-trajectory-only for discovery"
             )
         requests = load_extension_capture_requests(state_table)
+
+    _validate_single_front_capture(args)
     capture = PhysicalFEMCapture(
         requests,
         outroot,
         minimum_elements_per_process_zone=minimum_resolution,
         measurement_mesh_config=measurement_config,
     )
-    _force_capture_modes(args)
 
     engine_type = _anisotropic.AnisotropicStochasticAvalancheTipEngine
     original_step = engine_type.step
@@ -167,10 +157,10 @@ def main(argv=None):
         print(
             "  v10.2.27 physical FEM atlas capture: "
             f"mode={'trajectory_only' if trajectory_only else 'extension_snapshot_capture'} "
-            f"requests={len(requests)} unsigned_shielding=disabled "
-            f"minimum_Lpz_over_h={minimum_resolution:g} "
+            f"requests={len(requests)} minimum_Lpz_over_h={minimum_resolution:g} "
             f"measurement_clone={'enabled' if measurement_config is not None else 'disabled'} "
-            "production_kinetics=unchanged opening=validation_only parameterization=blocked"
+            "physics_overrides=none production_kinetics=unchanged "
+            "parameterization=observed_not_modified"
         )
         result = _transport.main(args)
         mechanics_root_value = _option_value(args, "--out")
@@ -196,6 +186,8 @@ def main(argv=None):
                     "measurement_mesh_config": (
                         None if measurement_config is None else measurement_config.as_dict()
                     ),
+                    "capture_physics_overrides": [],
+                    "production_parameterization_observed_not_modified": True,
                     "production_moving_process_zone_physics_preserved": True,
                     "measurement_reconstruction_is_capture_only": True,
                     "allow_incomplete": allow_incomplete,
