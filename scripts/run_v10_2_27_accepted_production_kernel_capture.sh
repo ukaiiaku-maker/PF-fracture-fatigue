@@ -113,8 +113,12 @@ maximum_um = max(float(row["cumulative_crack_path_extension_m"]) for row in rows
 cosine = abs(math.cos(math.radians(float(theta))))
 if cosine <= 1.0e-12:
     raise SystemExit("capture theta has zero projected-extension cosine")
+# This stop is deliberately beyond the final anchor, but the capture observer
+# raises CaptureCompleteStop immediately after serializing that equilibrium and
+# before another seed-family query. Strict seed coverage is therefore required
+# only through the final path anchor.
 projected_stop_um = maximum_um * cosine + 4.0 * float(da_m) * 1.0e6
-required_seed_path_um = projected_stop_um / cosine
+required_seed_path_um = maximum_um
 print(maximum_um, projected_stop_um, required_seed_path_um)
 PY
 )
@@ -229,7 +233,7 @@ import sys
     required_seed_path,
 ) = sys.argv[1:]
 payload = {
-    "schema": "v10.2.27_accepted_production_kernel_capture_command_v4",
+    "schema": "v10.2.27_accepted_production_kernel_capture_command_v5",
     "mechanical_configuration": str(Path(config).resolve()),
     "state_table": str(Path(state_table).resolve()),
     "seed_signed_kernel_family": str(Path(family).resolve()),
@@ -242,6 +246,7 @@ payload = {
     "maximum_anchor_extension_um": float(maximum_anchor),
     "projected_stop_extension_um": float(projected_stop),
     "required_seed_family_path_extension_um": float(required_seed_path),
+    "capture_stops_before_postfinal_kernel_query": True,
     "production_entry": "audited v10.2.27 persistent-site paper stack",
     "stochastic_first_passage": True,
     "variable_event_lengths": True,
