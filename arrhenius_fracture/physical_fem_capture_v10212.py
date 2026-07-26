@@ -1,7 +1,7 @@
 """Capture accepted 2-D FEM equilibria for active signed-kernel generation.
 
-The capture hooks observe the production solve.  v10.2.27 can optionally clone a
-matched trajectory state onto a separate endpoint-resolved measurement mesh.  The
+The capture hooks observe the production solve. v10.2.27 can optionally clone a
+matched trajectory state onto a separate endpoint-resolved measurement mesh. The
 clone is re-equilibrated with plasticity and kinetics frozen; the production
 front engine and moving process zone are never advanced or mutated by capture.
 """
@@ -132,8 +132,14 @@ def _engine_payload(engine) -> dict[str, Any]:
         "poisson": float(engine.nu),
         "b_m": float(engine.b),
         "material_manifest": manifest.as_dict() if manifest is not None else {},
-        "transport_mode": str(getattr(engine.mpz, "_signed_transport_mode", getattr(engine.mpz, "_anisotropic_transport_mode", "validated_scalar"))),
-        "capture_loading_path": "mechanics_only_shielding_disabled",
+        "transport_mode": str(
+            getattr(
+                engine.mpz,
+                "_signed_transport_mode",
+                getattr(engine.mpz, "_anisotropic_transport_mode", "validated_scalar"),
+            )
+        ),
+        "capture_loading_path": "capture_entry_must_replace_with_observed_path",
         "local_strength_sigma_cap_is_not_Kshield_cap": True,
         "constitutive_K_shield_cap_applied": False,
         "active_kernel_supported": True,
@@ -142,7 +148,9 @@ def _engine_payload(engine) -> dict[str, Any]:
     }
 
 
-def _coerce_crack_path(drive: dict[str, Any], tip_xy: tuple[float, float]) -> tuple[tuple[float, float], ...]:
+def _coerce_crack_path(
+    drive: dict[str, Any], tip_xy: tuple[float, float]
+) -> tuple[tuple[float, float], ...]:
     raw = drive.get("crack_path_xy_m", ())
     try:
         path = tuple(tuple(float(v) for v in row) for row in raw)
@@ -270,12 +278,21 @@ class PhysicalFEMCapture:
     def _matching_request(self, temperature: float, coordinates: dict[str, float]):
         candidates = []
         for request in self.pending:
-            if not math.isclose(float(temperature), request.temperature_K, rel_tol=0.0, abs_tol=1.0e-8):
+            if not math.isclose(
+                float(temperature), request.temperature_K, rel_tol=0.0, abs_tol=1.0e-8
+            ):
                 continue
             dr = abs(coordinates["r_eff_over_r0"] - request.r_eff_over_r0)
-            do = abs(coordinates["opening_strength_fraction"] - request.opening_strength_fraction)
+            do = abs(
+                coordinates["opening_strength_fraction"]
+                - request.opening_strength_fraction
+            )
             de = abs(coordinates["crack_extension_m"] - request.crack_extension_m)
-            if dr <= request.r_tolerance and do <= request.opening_tolerance and de <= request.extension_tolerance_m:
+            if (
+                dr <= request.r_tolerance
+                and do <= request.opening_tolerance
+                and de <= request.extension_tolerance_m
+            ):
                 score = (
                     dr / max(request.r_tolerance, 1.0e-30)
                     + do / max(request.opening_tolerance, 1.0e-30)
@@ -306,7 +323,9 @@ class PhysicalFEMCapture:
             raise RuntimeError("physical state capture requires the local strength sigma_cap")
         coordinates = {
             "r_eff_over_r0": r_eff / r0,
-            "opening_strength_fraction": min(max(sigma_local / sigma_cap, 0.0), 1.0),
+            "opening_strength_fraction": min(
+                max(sigma_local / sigma_cap, 0.0), 1.0
+            ),
             "crack_extension_m": max(
                 float(getattr(engine, "micro_advance_total_m", 0.0)),
                 float(getattr(engine.mpz, "advance_total_m", 0.0)),
@@ -327,7 +346,7 @@ class PhysicalFEMCapture:
         normals = tuple(tuple(row) for row in drive["trace_normals"])
         tip_xy = tuple(float(value) for value in drive["tip_xy_m"])
         front_direction = tuple(float(value) for value in drive["front_direction"])
-        crack_path = _coerce_crack_path(drive, tip_xy)
+        supplied_crack_path = _coerce_crack_path(drive, tip_xy)
         material = assembly["mat"]
 
         kinetic_digest_before = _engine_kinetic_state_digest(engine)
@@ -340,6 +359,7 @@ class PhysicalFEMCapture:
                 "rho_gp": assembly["rho_gp"],
                 "d": assembly["d"],
                 "D": assembly["D"],
+                "crack_path_xy_m": supplied_crack_path,
                 "audit": {
                     "trajectory_state_cloned": False,
                     "production_state_mutated": False,
@@ -365,7 +385,8 @@ class PhysicalFEMCapture:
                 Uy_top_m=self.latest_Uy_top,
                 Uy_bot_m=self.latest_Uy_bot,
                 crack_tip_xy_m=tip_xy,
-                crack_path_xy_m=crack_path,
+                crack_path_xy_m=supplied_crack_path,
+                crack_extension_m=float(coordinates["crack_extension_m"]),
                 config=self.measurement_mesh_config,
             )
         kinetic_digest_after = _engine_kinetic_state_digest(engine)
@@ -375,6 +396,10 @@ class PhysicalFEMCapture:
                 "or process-zone kinetic state"
             )
 
+        resolved_crack_path = tuple(
+            tuple(float(value) for value in row)
+            for row in state.get("crack_path_xy_m", supplied_crack_path)
+        )
         metadata = SnapshotMetadata(
             state_id=request.state_id,
             r_eff_over_r0=float(coordinates["r_eff_over_r0"]),
@@ -392,14 +417,16 @@ class PhysicalFEMCapture:
             channel_directions=directions,
             channel_normals=normals,
             material={
-                "E": float(material.E), "nu": float(material.nu),
-                "b": float(material.b), "Tm": float(material.Tm),
+                "E": float(material.E),
+                "nu": float(material.nu),
+                "b": float(material.b),
+                "Tm": float(material.Tm),
             },
             engine_config=_engine_payload(engine),
             fem_tip_geometry_blunted=False,
             r_eff_is_analytical_tip_state=True,
             cohesive_network_present=False,
-            crack_path_xy_m=crack_path,
+            crack_path_xy_m=resolved_crack_path,
             displacement_state="post_dirichlet_equilibrium",
             active_kernel_supported=True,
             wake_kernel_supported=False,
@@ -439,7 +466,8 @@ class PhysicalFEMCapture:
             "payload": payload,
             "measurement_provenance": provenance,
             "post_dirichlet_equilibrium_displacement_saved": True,
-            "crack_path_serialized": bool(crack_path),
+            "production_crack_path_available": bool(supplied_crack_path),
+            "resolved_crack_path_serialized": bool(resolved_crack_path),
             "active_kernel_supported": True,
             "wake_kernel_supported": False,
         }
@@ -469,6 +497,7 @@ class PhysicalFEMCapture:
             "production_moving_process_zone_physics_preserved": True,
             "capture_reconstruction_is_measurement_only": True,
             "post_dirichlet_equilibrium_displacement_saved": True,
+            "resolved_crack_path_serialized_for_measurement": True,
             "active_kernel_supported": True,
             "wake_kernel_supported": False,
             "production_parameterization_allowed": False,
