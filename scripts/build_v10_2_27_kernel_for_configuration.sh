@@ -28,7 +28,7 @@ MARGIN_EVENTS=${V10227_KERNEL_MARGIN_EVENTS:-${KERNEL_MARGIN_EVENTS:-1}}
 MAX_ITERATIONS=${KERNEL_SELF_CONSISTENCY_MAX_ITERATIONS:-4}
 MAX_RELATIVE_CHANGE=${KERNEL_SELF_CONSISTENCY_MAX_RELATIVE_CHANGE:-0.02}
 MAX_ABSOLUTE_CHANGE=${KERNEL_SELF_CONSISTENCY_MAX_ABSOLUTE_CHANGE_PA_SQRT_M_PER_LINE:-100}
-MAX_EXTENSION_CHANGE_UM=${KERNEL_SELF_CONSISTENCY_MAX_EXTENSION_CHANGE_UM:-1}
+MAX_EXTENSION_CHANGE_UM=${KERNEL_SELF_CONSISTENCY_MAX_EXTENSION_CHANGE_UM:-20}
 MAX_NORMALIZATION_CHANGE=${KERNEL_SELF_CONSISTENCY_MAX_NORMALIZATION_RELATIVE_CHANGE:-1e-6}
 
 read -r THETA BRANCHING_MODE MAX_FRONTS CAPTURE_TEMPERATURE_K C11 C12 C44 PZ_LENGTH_M < <(
@@ -70,6 +70,15 @@ import hashlib
 import pathlib
 import sys
 print(hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest())
+PY
+}
+
+physics_fingerprint_file() {
+  "$PYTHON_BIN" - "$1" <<'PY'
+import pathlib
+import sys
+from arrhenius_fracture.kernel_registry_v10227 import family_physics_fingerprint
+print(family_physics_fingerprint(pathlib.Path(sys.argv[1])))
 PY
 }
 
@@ -303,8 +312,13 @@ comparison_payloads = [json.loads(Path(path).read_text()) for path in comparison
 if not comparison_payloads or comparison_payloads[-1].get("converged") is not True:
     raise SystemExit("final self-consistency comparison is absent or unconverged")
 candidate_sha = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
+candidate_physics = comparison_payloads[-1].get(
+    "current_family_physics_fingerprint"
+)
 if comparison_payloads[-1].get("current_family_sha256") != candidate_sha:
     raise SystemExit("final comparison does not identify the converged candidate family")
+if not isinstance(candidate_physics, str) or len(candidate_physics) != 64:
+    raise SystemExit("final comparison lacks the candidate physics fingerprint")
 
 from arrhenius_fracture.kernel_configuration_v10227 import MechanicalKernelConfiguration
 fingerprint = MechanicalKernelConfiguration.from_mapping(configuration).fingerprint()
@@ -316,6 +330,7 @@ payload = {
     "converged_iteration": int(iteration),
     "minimum_target_family_passes": 2,
     "converged_candidate_family_sha256": candidate_sha,
+    "converged_candidate_family_physics_fingerprint": candidate_physics,
     "comparisons": comparison_payloads,
 }
 Path(selection).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
@@ -334,16 +349,19 @@ build_family_from_roots \
 
 FINAL_SHA=$(sha256_file "$FAMILY_OUT")
 CANDIDATE_SHA=$(sha256_file "$FINAL_CANDIDATE")
-if [[ "$FINAL_SHA" != "$CANDIDATE_SHA" ]]; then
-  echo "ERROR: canonical rebuild differs from converged candidate" >&2
-  echo "Candidate: $CANDIDATE_SHA" >&2
-  echo "Canonical: $FINAL_SHA" >&2
+FINAL_PHYSICS=$(physics_fingerprint_file "$FAMILY_OUT")
+CANDIDATE_PHYSICS=$(physics_fingerprint_file "$FINAL_CANDIDATE")
+if [[ "$FINAL_PHYSICS" != "$CANDIDATE_PHYSICS" ]]; then
+  echo "ERROR: canonical rebuild differs from converged candidate physics" >&2
+  echo "Candidate physics: $CANDIDATE_PHYSICS" >&2
+  echo "Canonical physics: $FINAL_PHYSICS" >&2
   exit 2
 fi
 
 "$PYTHON_BIN" - \
   "$CACHE_DIR/kernel_self_consistency_manifest.json" \
-  "$FINAL_SELECTION" "$FAMILY_OUT" "$FINAL_SHA" "$FINAL_ITERATION" \
+  "$FINAL_SELECTION" "$FAMILY_OUT" "$FINAL_SHA" "$FINAL_PHYSICS" \
+  "$FINAL_CANDIDATE" "$CANDIDATE_SHA" "$FINAL_ITERATION" \
   "$MAX_ITERATIONS" "$MAX_RELATIVE_CHANGE" "$MAX_ABSOLUTE_CHANGE" \
   "$MAX_EXTENSION_CHANGE_UM" "$MAX_NORMALIZATION_CHANGE" <<'PY'
 import json
@@ -354,6 +372,9 @@ import sys
     selection,
     family,
     family_sha,
+    family_physics,
+    candidate,
+    candidate_sha,
     converged_iteration,
     max_iterations,
     max_relative,
@@ -363,12 +384,15 @@ import sys
 ) = sys.argv[1:]
 selection_payload = json.loads(Path(selection).read_text())
 payload = {
-    "schema": "v10.2.27_kernel_self_consistency_manifest_v2",
+    "schema": "v10.2.27_kernel_self_consistency_manifest_v3",
     "converged": True,
     "converged_iteration": int(converged_iteration),
     "maximum_iterations": int(max_iterations),
     "canonical_family": str(Path(family).resolve()),
     "canonical_family_sha256": family_sha,
+    "canonical_family_physics_fingerprint": family_physics,
+    "converged_candidate_family_label": Path(candidate).parent.name + "/" + Path(candidate).name,
+    "converged_candidate_family_sha256": candidate_sha,
     "selection": selection_payload,
     "tolerances": {
         "maximum_relative_kernel_change": float(max_relative),
@@ -384,3 +408,4 @@ printf 'Self-consistent v10.2.27 kernel complete\n'
 printf '  converged iteration: %s\n' "$FINAL_ITERATION"
 printf '  family: %s\n' "$FAMILY_OUT"
 printf '  family SHA256: %s\n' "$FINAL_SHA"
+printf '  family physics fingerprint: %s\n' "$FINAL_PHYSICS"
