@@ -20,7 +20,7 @@ from .config import GeometryConfig, MeshConfig
 from .fem import assemble_mechanics, solve_dirichlet
 from .mesh import make_boundary_data, make_tri_mesh
 
-MODEL_ID = "v10.2.27_capture_only_endpoint_mesh_reconstruction_v2"
+MODEL_ID = "v10.2.27_capture_only_endpoint_mesh_reconstruction_v3"
 
 
 @dataclass(frozen=True)
@@ -34,9 +34,6 @@ class FrozenMeasurementMeshConfig:
     tip_h_fine_m: float
     tip_ratio: float
     mesh_seed: int = 42
-    # Zero means a one-local-element-wide damaged trace on the reconstructed mesh.
-    # A positive value is an explicit mechanical configuration choice and is
-    # fingerprinted through the serialized measurement configuration.
     kill_radius_floor_m: float = 0.0
 
     def validate(self) -> "FrozenMeasurementMeshConfig":
@@ -77,6 +74,95 @@ def _unit_rows(path: Iterable[Iterable[float]]) -> tuple[np.ndarray, ...]:
     return tuple(rows)
 
 
+def _path_length(path: tuple[np.ndarray, ...]) -> float:
+    return float(
+        sum(np.linalg.norm(right - left) for left, right in zip(path[:-1], path[1:]))
+    )
+
+
+def _resolve_crack_path(
+    path: tuple[np.ndarray, ...],
+    *,
+    geometry: GeometryConfig,
+    crack_tip_xy_m: np.ndarray,
+    crack_extension_m: float,
+    trajectory_hbar_tip_m: float,
+) -> tuple[tuple[np.ndarray, ...], dict[str, Any]]:
+    extension = float(crack_extension_m)
+    if not math.isfinite(extension) or extension < 0.0:
+        raise ValueError("crack_extension_m must be nonnegative and finite")
+    initial_tip = np.array([geometry.a0, 0.0], dtype=float)
+    direct_length = float(np.linalg.norm(crack_tip_xy_m - initial_tip))
+    tolerance = max(
+        2.0 * float(trajectory_hbar_tip_m),
+        1.0e-9,
+        1.0e-6 * max(extension, direct_length, 1.0e-12),
+    )
+
+    if path:
+        if len(path) < 2:
+            raise RuntimeError("serialized crack path must contain at least two points")
+        start_gap = float(np.linalg.norm(path[0] - initial_tip))
+        end_gap = float(np.linalg.norm(path[-1] - crack_tip_xy_m))
+        length = _path_length(path)
+        if start_gap > tolerance:
+            raise RuntimeError(
+                "serialized crack path is disconnected from the initial notch tip: "
+                f"gap={start_gap:.9g} m, tolerance={tolerance:.9g} m"
+            )
+        if end_gap > tolerance:
+            raise RuntimeError(
+                "serialized crack path does not end at the accepted crack tip: "
+                f"gap={end_gap:.9g} m, tolerance={tolerance:.9g} m"
+            )
+        if abs(length - extension) > tolerance:
+            raise RuntimeError(
+                "serialized crack-path length does not match cumulative extension: "
+                f"path_length={length:.9g} m, extension={extension:.9g} m, "
+                f"tolerance={tolerance:.9g} m"
+            )
+        return path, {
+            "crack_path_source": "accepted_production_polyline",
+            "accepted_production_polyline_available": True,
+            "straight_single_front_path_synthesized": False,
+            "crack_path_length_m": length,
+            "direct_tip_displacement_m": direct_length,
+            "crack_path_extension_consistency_tolerance_m": tolerance,
+        }
+
+    if extension <= tolerance and direct_length <= tolerance:
+        return (), {
+            "crack_path_source": "initial_notch_only",
+            "accepted_production_polyline_available": False,
+            "straight_single_front_path_synthesized": False,
+            "crack_path_length_m": 0.0,
+            "direct_tip_displacement_m": direct_length,
+            "crack_path_extension_consistency_tolerance_m": tolerance,
+        }
+
+    # The current v10.2.27 campaign is single-front, nonbranching, and follows a
+    # fixed straight 30-degree path, but the legacy observer does not serialize a
+    # polyline. A straight segment is therefore admissible only when the direct
+    # notch-tip displacement equals the cumulative path extension. A tortuous
+    # state cannot satisfy this test and must provide an explicit polyline.
+    if abs(direct_length - extension) > tolerance:
+        raise RuntimeError(
+            "nonzero capture lacks a production crack polyline and is not provably "
+            "straight single-front growth: "
+            f"direct_tip_displacement={direct_length:.9g} m, "
+            f"cumulative_extension={extension:.9g} m, tolerance={tolerance:.9g} m"
+        )
+    resolved = (initial_tip, crack_tip_xy_m.copy())
+    return resolved, {
+        "crack_path_source": "verified_straight_single_front_tip_displacement",
+        "accepted_production_polyline_available": False,
+        "straight_single_front_path_synthesized": True,
+        "crack_path_length_m": direct_length,
+        "direct_tip_displacement_m": direct_length,
+        "crack_path_extension_consistency_tolerance_m": tolerance,
+    }
+
+
 def _transfer_element_fields(old_mesh, new_mesh, ep_gp, rho_gp):
     old_centroids = old_mesh.nodes[old_mesh.elems].mean(axis=1)
     new_centroids = new_mesh.nodes[new_mesh.elems].mean(axis=1)
@@ -107,13 +193,6 @@ def _reapply_frozen_sharp_crack(
     damage[(x <= geometry.a0) & (np.abs(y) <= geometry.notch_half_thickness)] = 1.0
 
     path = crack_path_xy_m
-    extension = float(np.linalg.norm(crack_tip_xy_m - np.array([geometry.a0, 0.0])))
-    if len(path) < 2 and extension > max(2.0 * mesh.hbar_tip, 1.0e-9):
-        raise RuntimeError(
-            "endpoint reconstruction requires the accepted production crack polyline "
-            "for a nonzero crack extension"
-        )
-
     centroids = mesh.nodes[mesh.elems].mean(axis=1)
     element_radius = np.sqrt(np.maximum(mesh.area_e, 1.0e-30))
     kill_radius = max(float(mesh.hbar_tip), float(kill_radius_floor_m))
@@ -128,9 +207,6 @@ def _reapply_frozen_sharp_crack(
         projection = p0[None, :] + fraction[:, None] * segment[None, :]
         distance2 = np.sum((centroids - projection) ** 2, axis=1)
         radius = np.maximum(kill_radius, 0.7 * element_radius)
-        # Exclude endpoint caps. In particular, no centroid ahead of the final
-        # accepted crack tip may be damaged merely because it lies inside a disk
-        # around the clipped segment endpoint.
         within_segment = (raw_fraction >= 0.0) & (raw_fraction <= 1.0)
         selected = within_segment & (distance2 <= radius ** 2)
         killed_elements |= selected
@@ -168,7 +244,7 @@ def _reapply_frozen_sharp_crack(
         "ahead_of_tip_killed_elements": ahead_killed,
         "maximum_ahead_of_tip_killed_projection_m": maximum_ahead_projection,
         "initial_notch_reapplied": True,
-        "accepted_crack_polyline_reapplied": bool(len(path) >= 2),
+        "accepted_or_verified_crack_path_reapplied": bool(len(path) >= 2),
     }
 
 
@@ -186,21 +262,15 @@ def reconstruct_frozen_measurement_state(
     Uy_bot_m: float,
     crack_tip_xy_m: Iterable[float],
     crack_path_xy_m: Iterable[Iterable[float]],
+    crack_extension_m: float,
     config: FrozenMeasurementMeshConfig,
 ) -> dict[str, Any]:
-    """Clone one accepted trajectory state onto an endpoint-resolved mesh.
-
-    The source arrays are read-only inputs. Plastic strain and dislocation-density
-    fields are transferred by nearest old-element inheritance, then held fixed.
-    The production damage field is deliberately not interpolated: the accepted
-    sharp crack polyline and initial notch are reconstructed explicitly. Only the
-    linear elastic equilibrium displacement is recomputed.
-    """
+    """Clone one accepted trajectory state onto an endpoint-resolved mesh."""
     config = config.validate()
     tip = np.asarray(tuple(crack_tip_xy_m), dtype=float).reshape(2)
     if not np.all(np.isfinite(tip)):
         raise ValueError("crack tip must be finite")
-    path = _unit_rows(crack_path_xy_m)
+    supplied_path = _unit_rows(crack_path_xy_m)
     source_damage = np.asarray(source_d, dtype=float)
     if source_damage.ndim != 1 or source_damage.size != source_mesh.nn:
         raise ValueError("source damage field is inconsistent with the trajectory mesh")
@@ -210,6 +280,13 @@ def reconstruct_frozen_measurement_state(
         Ly=float(config.specimen_length_y_m),
         a0=float(config.initial_crack_length_m),
         notch_half_thickness=float(config.notch_half_thickness_m),
+    )
+    path, path_audit = _resolve_crack_path(
+        supplied_path,
+        geometry=geometry,
+        crack_tip_xy_m=tip,
+        crack_extension_m=float(crack_extension_m),
+        trajectory_hbar_tip_m=float(source_mesh.hbar_tip),
     )
     mesh_cfg = MeshConfig(
         nx=int(config.mesh_nx),
@@ -239,8 +316,6 @@ def reconstruct_frozen_measurement_state(
         kill_radius_floor_m=float(config.kill_radius_floor_m),
     )
 
-    # Fixed-state elastic reconstruction only. No plasticity update, front-engine
-    # step, MPZ evolve, MPZ advance, source update, or hazard integration occurs.
     K, Rint, *_ = assemble_mechanics(
         measurement_mesh,
         u_initial,
@@ -291,10 +366,11 @@ def reconstruct_frozen_measurement_state(
         "transferred_parent_elements": int(len(element_parent_map)),
         "source_damage_field_interpolated": False,
         "source_damage_field_used_for_shape_validation_only": True,
-        "measurement_damage_source": "initial_notch_plus_accepted_crack_polyline",
+        "measurement_damage_source": "initial_notch_plus_resolved_crack_path",
         "elastic_reaction_force": float(reaction),
         "postsolve_internal_force_norm": float(np.linalg.norm(R_check)),
         "measurement_mesh_config": config.as_dict(),
+        **path_audit,
         **crack_audit,
     }
     return {
@@ -305,6 +381,7 @@ def reconstruct_frozen_measurement_state(
         "rho_gp": rho_gp,
         "d": damage,
         "D": np.asarray(D, dtype=float).copy(),
+        "crack_path_xy_m": tuple(tuple(float(value) for value in row) for row in path),
         "audit": audit,
     }
 
