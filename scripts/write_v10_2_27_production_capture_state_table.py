@@ -19,11 +19,20 @@ def _round_up(value: float, quantum: float) -> float:
     return math.ceil((value - 1.0e-12 * quantum) / quantum) * quantum
 
 
+def _maximum_event_um(da_um: float, minimum_factor: float, maximum_factor: float) -> float:
+    lower = max(float(minimum_factor), 0.0)
+    upper = max(float(maximum_factor), lower)
+    clipped_mean = max(lower + math.exp(-lower) - math.exp(-upper), 1.0e-300)
+    return float(da_um) * upper / clipped_mean
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mechanical-config", type=Path, required=True)
     parser.add_argument("--required-max-extension-um", type=float, required=True)
     parser.add_argument("--temperature-K", type=float, required=True)
+    parser.add_argument("--event-minimum-factor", type=float, default=0.5)
+    parser.add_argument("--event-maximum-factor", type=float, default=4.0)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -42,7 +51,16 @@ def main() -> int:
     )
     maximum_um = _round_up(required_um, spacing_um)
     count = max(int(round(maximum_um / spacing_um)), 1)
-    tolerance_m = max(0.51 * da_um, 1.0e-3) * 1.0e-6
+    maximum_event_um = _maximum_event_um(
+        da_um,
+        args.event_minimum_factor,
+        args.event_maximum_factor,
+    )
+    # The production trajectory uses variable stochastic event lengths.  Capture
+    # the nearest accepted equilibrium within one maximum admissible event of the
+    # nominal anchor instead of requiring an artificial fixed 5 um landing.
+    tolerance_um = max(1.05 * maximum_event_um, 0.51 * da_um, 1.0e-3)
+    tolerance_m = tolerance_um * 1.0e-6
 
     rows = []
     for index in range(count + 1):
@@ -68,6 +86,8 @@ def main() -> int:
     print(f"state_count={len(rows)}")
     print(f"anchor_spacing_um={spacing_um:.17g}")
     print(f"maximum_extension_um={maximum_um:.17g}")
+    print(f"maximum_event_um={maximum_event_um:.17g}")
+    print(f"extension_tolerance_um={tolerance_um:.17g}")
     return 0
 
 
