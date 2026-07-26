@@ -97,11 +97,6 @@ def _validate_artifacts(
                 float(configuration.interaction_length_m),
                 1.0e-12,
             ),
-            "trajectory_tip_h_fine_m": (
-                float(metadata.get("trajectory_mesh_hbar_tip_m", float("nan"))),
-                float(metadata.get("trajectory_mesh_hbar_tip_m", float("nan"))),
-                0.0,
-            ),
         }
         for name, (actual, expected, tolerance) in checks.items():
             if not math.isfinite(actual) or not math.isclose(
@@ -224,6 +219,14 @@ def main() -> int:
             workspace=workspace,
             kind="load_invariance",
         )
+        _run([
+            sys.executable,
+            str(ROOT / "scripts" / "check_v10_2_27_capture_physics_contract.py"),
+            "--snapshot-root",
+            str(snapshot_root),
+            "--mechanical-config",
+            str(args.mechanical_config.expanduser().resolve()),
+        ])
         states = BASE._state_records(snapshot_root, load_root)
         _validate_artifacts(snapshot_root, states, configuration)
 
