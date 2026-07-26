@@ -29,6 +29,11 @@ SNAPSHOT_FLAGS = {
     "measurement_reconstruction_called_engine_step": False,
     "measurement_reconstruction_called_mpz_evolve": False,
     "measurement_reconstruction_called_mpz_advance": False,
+    "source_damage_field_interpolated": False,
+    "endpoint_caps_excluded": True,
+    "ahead_of_tip_killed_elements": 0,
+    "kill_radius_floor_m": 0.0,
+    "measurement_damage_source": "initial_notch_plus_resolved_crack_path",
 }
 
 
@@ -84,7 +89,30 @@ def _write_capture(root: Path) -> Path:
         "wake_shielding_observed": False,
         "moving_process_zone_advection_observed": True,
     }
-    for index in range(2):
+    initial_tip = [configuration.initial_crack_length_m, 0.0]
+    extension = 200.0e-6
+    direction = [0.8660254037844386, 0.5]
+    advanced_tip = [
+        initial_tip[0] + extension * direction[0],
+        initial_tip[1] + extension * direction[1],
+    ]
+    geometry = (
+        {
+            "crack_extension_m": 0.0,
+            "crack_path_xy_m": [],
+            "crack_path_source": "initial_notch_only",
+            "straight_single_front_path_synthesized": False,
+        },
+        {
+            "crack_extension_m": extension,
+            "crack_path_xy_m": [initial_tip, advanced_tip],
+            "crack_path_source": (
+                "verified_straight_single_front_tip_displacement"
+            ),
+            "straight_single_front_path_synthesized": True,
+        },
+    )
+    for index, geometry_payload in enumerate(geometry):
         state = root / f"E{index:03d}"
         state.mkdir()
         payload = {
@@ -93,6 +121,7 @@ def _write_capture(root: Path) -> Path:
             "production_engine_state_sha256_before": "a" * 64,
             "production_engine_state_sha256_after": "a" * 64,
             **SNAPSHOT_FLAGS,
+            **geometry_payload,
         }
         (state / "snapshot.json").write_text(
             json.dumps(payload, indent=2, sort_keys=True) + "\n"
@@ -124,6 +153,10 @@ def test_capture_physics_contract_accepts_observed_production_state(tmp_path: Pa
     audit = json.loads((tmp_path / "capture_physics_contract_audit.json").read_text())
     assert audit["all_states_passed"] is True
     assert audit["state_count"] == 2
+    assert audit["states"][0]["geometry"]["crack_path_source"] == (
+        "initial_notch_only"
+    )
+    assert audit["states"][1]["geometry"]["crack_path_points"] == 2
 
 
 def test_capture_physics_contract_rejects_mutated_mpz_state(tmp_path: Path):
@@ -136,3 +169,17 @@ def test_capture_physics_contract_rejects_mutated_mpz_state(tmp_path: Path):
     completed = _run(tmp_path, config)
     assert completed.returncode != 0
     assert "production_engine_state_sha256" in (completed.stdout + completed.stderr)
+
+
+def test_capture_physics_contract_rejects_ahead_tip_damage(tmp_path: Path):
+    config = _write_capture(tmp_path)
+    snapshot = tmp_path / "E001" / "snapshot.json"
+    payload = json.loads(snapshot.read_text())
+    payload["ahead_of_tip_killed_elements"] = 1
+    snapshot.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+    completed = _run(tmp_path, config)
+    assert completed.returncode != 0
+    assert "ahead_of_tip_killed_elements" in (
+        completed.stdout + completed.stderr
+    )
