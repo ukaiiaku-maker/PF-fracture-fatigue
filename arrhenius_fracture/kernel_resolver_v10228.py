@@ -30,10 +30,21 @@ _LEGACY_VALIDATE_PROMOTION = _legacy._validate_promotion_evidence
 _LEGACY_REGISTRY_PROMOTION = _legacy._registry_entry_is_promoted
 _LEGACY_CLEAR_CACHE = _legacy._clear_generated_cache
 _LEGACY_VALIDATE_FAMILY = _legacy.validate_family
+_LEGACY_REQUIRED_MAX_EXTENSION = _legacy.required_max_extension_um
 
 
 def required_max_extension_um(**kwargs) -> float:
-    return _legacy.required_max_extension_um(**kwargs)
+    """Return strict coverage with one extra physical checkpoint of guard space.
+
+    The v10.2.27 bound covers the target projection plus one maximum stochastic
+    event.  The moving process-zone state can begin resolving the next partial
+    checkpoint before the outer driver observes the completed target event.  Add
+    one full ``da_phys`` checkpoint so strict interpolation never depends on
+    floating-point endpoint coincidence or clips a legitimate final-state query.
+    """
+    base = _LEGACY_REQUIRED_MAX_EXTENSION(**kwargs)
+    checkpoint = max(float(kwargs.get("da_phys_um", 0.0)), 0.0)
+    return base + checkpoint
 
 
 def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
@@ -214,6 +225,7 @@ def main(argv: list[str] | None = None) -> int:
             ]
         )
 
+    _legacy.required_max_extension_um = required_max_extension_um
     _legacy._configuration = _configuration
     _legacy._validate_promotion_evidence = _validate_direct_evidence
     _legacy._registry_entry_is_promoted = _registry_entry_is_direct
@@ -222,6 +234,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return _legacy.main(arguments)
     finally:
+        _legacy.required_max_extension_um = _LEGACY_REQUIRED_MAX_EXTENSION
         _legacy._configuration = _LEGACY_CONFIGURATION
         _legacy._validate_promotion_evidence = _LEGACY_VALIDATE_PROMOTION
         _legacy._registry_entry_is_promoted = _LEGACY_REGISTRY_PROMOTION
