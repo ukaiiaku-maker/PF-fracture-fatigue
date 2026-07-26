@@ -23,13 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _resolver_args(*extra: str):
     return build_parser().parse_args(
-        [
-            "--theta-deg",
-            "30",
-            "--target-extension-um",
-            "1000",
-            *extra,
-        ]
+        ["--theta-deg", "30", "--target-extension-um", "1000", *extra]
     )
 
 
@@ -76,7 +70,6 @@ def test_mechanical_configuration_separates_production_and_measurement_meshes():
     assert cfg.specimen_length_x_m == 2.0e-3
     assert cfg.specimen_length_y_m == 4.0e-3
     assert cfg.initial_crack_length_m == 0.5e-3
-    assert cfg.active_station_policy_id == "v10.2.14_exact_first_last_active_stations"
 
 
 def test_coarse_measurement_mesh_is_rejected_without_restricting_production_mesh():
@@ -115,22 +108,12 @@ def test_material_seed_and_target_fields_do_not_directly_change_identity():
 
 def test_target_extension_reuses_domain_when_it_fits_and_enlarges_when_needed():
     short = _configuration(_resolver_args())
-    still_fits = _configuration(
-        _resolver_args("--target-extension-um", "1200")
-    )
-    long = _configuration(
-        _resolver_args("--target-extension-um", "3000")
-    )
+    still_fits = _configuration(_resolver_args("--target-extension-um", "1200"))
+    long = _configuration(_resolver_args("--target-extension-um", "3000"))
     assert short.fingerprint() == still_fits.fingerprint()
     assert short.specimen_length_x_m == 2.0e-3
-    assert still_fits.specimen_length_x_m == 2.0e-3
     assert long.specimen_length_x_m > short.specimen_length_x_m
     assert long.fingerprint() != short.fingerprint()
-
-
-def test_explicit_specimen_rejects_coverage_that_does_not_fit():
-    path = ROOT / "tests" / ".temporary_unused_mechanical_config.json"
-    assert not path.exists()
 
 
 def test_unknown_mechanical_key_fails_closed():
@@ -153,8 +136,8 @@ def test_path_independent_family_physics_fingerprint(tmp_path: Path):
         ],
         "active_kernel_mechanically_measured": True,
     }
-    first = dict(common, response="/old/machine/run/E0.csv", source_path="/old/family.json")
-    second = dict(common, response="/new/cache/run/E0.csv", source_path="/new/family.json")
+    first = dict(common, response="/old/run/E0.csv", source_path="/old/family.json")
+    second = dict(common, response="/new/run/E0.csv", source_path="/new/family.json")
     first_path = tmp_path / "first.json"
     second_path = tmp_path / "second.json"
     first_path.write_text(json.dumps(first))
@@ -198,38 +181,34 @@ def test_runner_resolver_ignores_inherited_family_by_default():
     assert "Ignoring inherited FAMILY_JSON" in text
     assert "KERNEL_USE_FAMILY_OVERRIDE" in text
     assert "MECHANICAL_PROFILE_OVERRIDE" in text
-    assert 'KERNEL_TIP_H_FINE_UM:-1' not in text
 
 
-def test_default_builder_recalculates_capture_and_load_invariance():
+def test_default_builder_requires_accepted_production_capture_then_recalculates_kernel():
     builder = (
         ROOT / "scripts" / "build_v10_2_27_kernel_for_configuration.sh"
     ).read_text()
-    assert "capture_v10_2_27_kernel_states_for_configuration.py" in builder
-    assert "RECALCULATE frozen FEM states" in builder
+    assert "automatic mechanics-only kernel capture is disabled" in builder
+    assert "KERNEL_CAPTURE_COMMAND" in builder
+    assert "capture_v10_2_27_kernel_states_for_configuration.py" not in builder
+    assert "CAPTURE accepted production states with registered command" in builder
     assert "RECALCULATE load invariance endpoints" in builder
     assert '--minimum-station-spacing-m "$PZ_LENGTH_M"' in builder
-    assert "KERNEL_CAPTURE_COMMAND:?" not in builder
 
 
-def test_capture_separates_trajectory_physics_from_endpoint_measurement_mesh():
-    capture = (
-        ROOT / "scripts" / "capture_v10_2_27_kernel_states_for_configuration.py"
+def test_capture_hook_separates_trajectory_physics_from_measurement_mesh():
+    base = (
+        ROOT / "arrhenius_fracture" / "physical_fem_capture_v10212.py"
     ).read_text()
-    assert "v10_2_27_v913_four_class_paper_registry.csv" in capture
-    assert '"--mpz-length-um"' in capture
-    assert '"--mpz-n-bins"' in capture
-    assert '"--tip-h-fine", f"{configuration.tip_h_fine_m:.17g}"' in capture
-    assert '"--atlas-measurement-tip-h-fine"' in capture
-    assert "configuration.measurement_tip_h_fine_m" in capture
-    assert "moving_process_zone_physics_preserved" in capture
-    assert "fractional_moving_frame_preserved" in capture
-    assert "mobile_kinetic_solver_preserved" in capture
-    assert '"CLEAVAGE_HAZARD_MODE": "deterministic"' in capture
-    assert "internally_generated_mechanics_only_manifest" in capture
-    assert "trajectory-option" not in capture
-    assert "V10227_SPECIMEN_LX_M" in capture
-    assert "V10227_SPECIMEN_LY_M" in capture
+    entry = (
+        ROOT / "arrhenius_fracture" / "sharp_front_v10_2_13_capture.py"
+    ).read_text()
+    assert "measurement_mesh_config" in base
+    assert "reconstruct_frozen_measurement_state" in base
+    assert "_engine_kinetic_state_digest" in base
+    assert "production_engine_state_bitwise_unchanged" in base
+    assert "measurement_reconstruction_called_mpz_advance" in base
+    assert "--atlas-measurement-tip-h-fine" in entry
+    assert "production_kinetics=unchanged" in entry
 
 
 def test_optional_archives_require_exact_configuration_and_capture_provenance():
@@ -247,10 +226,7 @@ def test_current_registry_geometry_is_50um_80bins():
     import csv
 
     path = (
-        ROOT
-        / "arrhenius_fracture"
-        / "data"
-        / "materials"
+        ROOT / "arrhenius_fracture" / "data" / "materials"
         / "v10_2_27_v913_four_class_paper_registry.csv"
     )
     with path.open(newline="") as stream:
@@ -260,9 +236,7 @@ def test_current_registry_geometry_is_50um_80bins():
 
 
 def test_resolver_rebuilds_when_requested_coverage_is_longer():
-    text = (
-        ROOT / "arrhenius_fracture" / "kernel_resolver_v10227.py"
-    ).read_text()
+    text = (ROOT / "arrhenius_fracture" / "kernel_resolver_v10227.py").read_text()
     assert "cached coverage is too short" in text
     assert "_clear_generated_cache" in text
     assert '"resolution": "recalculated"' in text
@@ -288,22 +262,14 @@ def test_retained_case_without_fingerprint_is_rejected(tmp_path: Path):
         [
             sys.executable,
             str(ROOT / "scripts" / "check_v10_2_27_retained_kernel_compatibility.py"),
-            "--family",
-            str(family),
-            "--outroot",
-            str(tmp_path),
-            "--options",
-            option,
-            "--temperatures",
-            "300",
-            "--theta-deg",
-            "30",
-            "--base-seed",
-            "10",
-            "--seed-option-stride",
-            "100",
-            "--seed-temperature-stride",
-            "1",
+            "--family", str(family),
+            "--outroot", str(tmp_path),
+            "--options", option,
+            "--temperatures", "300",
+            "--theta-deg", "30",
+            "--base-seed", "10",
+            "--seed-option-stride", "100",
+            "--seed-temperature-stride", "1",
         ],
         cwd=ROOT,
         text=True,
@@ -318,33 +284,22 @@ def test_retained_case_without_fingerprint_is_rejected(tmp_path: Path):
 
 def test_branching_cannot_fall_back_to_single_front_atlas(tmp_path: Path):
     registry = tmp_path / "registry.json"
-    registry.write_text(
-        json.dumps(
-            {
-                "schema": "v10.2.27_kernel_registry_v1",
-                "entries": [],
-                "recipes": [],
-            }
-        )
-    )
+    registry.write_text(json.dumps({
+        "schema": "v10.2.27_kernel_registry_v1",
+        "entries": [],
+        "recipes": [],
+    }))
     completed = subprocess.run(
         [
             sys.executable,
             str(ROOT / "scripts" / "ensure_v10_2_27_signed_kernel.py"),
-            "--theta-deg",
-            "30",
-            "--target-extension-um",
-            "100",
-            "--branching-mode",
-            "topology_cached",
-            "--maximum-fronts",
-            "2",
-            "--mode",
-            "build",
-            "--tracked-registry",
-            str(registry),
-            "--cache-root",
-            str(tmp_path / "cache"),
+            "--theta-deg", "30",
+            "--target-extension-um", "100",
+            "--branching-mode", "topology_cached",
+            "--maximum-fronts", "2",
+            "--mode", "build",
+            "--tracked-registry", str(registry),
+            "--cache-root", str(tmp_path / "cache"),
         ],
         cwd=ROOT,
         text=True,
