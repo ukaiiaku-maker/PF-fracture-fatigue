@@ -58,10 +58,19 @@ def test_launcher_locks_requested_geometry_and_direct_provider():
         assert token in source
 
 
+def test_launcher_uses_resolver_endpoint_measurement_mesh():
+    source = LAUNCHER.read_text()
+    assert "--measurement-tip-h-fine-um" not in source
+    assert "--measurement-tip-ratio" not in source
+    resolver = (ROOT / "arrhenius_fracture" / "kernel_resolver_v10227.py").read_text()
+    assert "endpoint_resolving_tip_h_fine_m" in resolver
+    assert "if not explicit_config and args.measurement_tip_h_fine_um is None" in resolver
+
+
 def test_launcher_prebuilds_before_cases_and_supports_preflight_only():
     source = LAUNCHER.read_text()
     ensure_index = source.index("scripts/ensure_v10_2_28_signed_kernel.py")
-    scheduler_index = source.index("bash \"$generated_scheduler\"")
+    scheduler_index = source.index('bash "$generated_scheduler"')
     assert ensure_index < scheduler_index
     assert "PREFLIGHT_ONLY=${PREFLIGHT_ONLY:-0}" in source
     assert "PREFLIGHT_COMPLETE: direct kernel locked" in source
