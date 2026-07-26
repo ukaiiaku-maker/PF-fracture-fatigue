@@ -1,9 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
+import numpy as np
+import pytest
+
+from arrhenius_fracture.config import GeometryConfig
 from arrhenius_fracture.frozen_measurement_reconstruction_v10227 import (
     FrozenMeasurementMeshConfig,
+    _reapply_frozen_sharp_crack,
+    _resolve_crack_path,
 )
 from arrhenius_fracture.kernel_configuration_v10227 import (
     MechanicalKernelConfiguration,
@@ -96,3 +103,67 @@ def test_measurement_mesh_configuration_is_independent_of_production_spacing():
     assert configuration.tip_h_fine_m == 1.0e-6
     assert measurement.tip_h_fine_m == configuration.measurement_tip_h_fine_m
     assert measurement.tip_h_fine_m < configuration.tip_h_fine_m
+    assert measurement.kill_radius_floor_m == 0.0
+
+
+def test_missing_polyline_is_synthesized_only_for_verified_straight_growth():
+    geometry = GeometryConfig(Lx=2.0, Ly=2.0, a0=0.5, notch_half_thickness=0.08)
+    direction = np.array([np.cos(np.pi / 6.0), np.sin(np.pi / 6.0)])
+    tip = np.array([geometry.a0, 0.0]) + 0.2 * direction
+    path, audit = _resolve_crack_path(
+        (),
+        geometry=geometry,
+        crack_tip_xy_m=tip,
+        crack_extension_m=0.2,
+        trajectory_hbar_tip_m=1.0e-3,
+    )
+    assert len(path) == 2
+    assert np.allclose(path[0], [geometry.a0, 0.0])
+    assert np.allclose(path[-1], tip)
+    assert audit["straight_single_front_path_synthesized"] is True
+    assert audit["crack_path_source"] == (
+        "verified_straight_single_front_tip_displacement"
+    )
+
+    with pytest.raises(RuntimeError, match="not provably straight"):
+        _resolve_crack_path(
+            (),
+            geometry=geometry,
+            crack_tip_xy_m=tip,
+            crack_extension_m=0.25,
+            trajectory_hbar_tip_m=1.0e-3,
+        )
+
+
+def test_reconstructed_crack_trace_never_kills_elements_ahead_of_tip():
+    nodes = np.array(
+        [
+            [0.80, -0.01],
+            [0.80, 0.01],
+            [0.90, 0.00],
+            [1.10, -0.01],
+            [1.10, 0.01],
+            [1.20, 0.00],
+        ]
+    )
+    mesh = SimpleNamespace(
+        nodes=nodes,
+        elems=np.array([[0, 1, 2], [3, 4, 5]], dtype=int),
+        area_e=np.array([1.0e-4, 1.0e-4]),
+        hbar_tip=0.05,
+        ne=2,
+        nn=6,
+    )
+    geometry = GeometryConfig(Lx=2.0, Ly=2.0, a0=0.2, notch_half_thickness=0.01)
+    path = (np.array([0.2, 0.0]), np.array([1.0, 0.0]))
+    damage, audit = _reapply_frozen_sharp_crack(
+        mesh,
+        geometry=geometry,
+        crack_tip_xy_m=np.array([1.0, 0.0]),
+        crack_path_xy_m=path,
+        kill_radius_floor_m=0.0,
+    )
+    assert np.all(damage[:3] == 1.0)
+    assert np.all(damage[3:] == 0.0)
+    assert audit["endpoint_caps_excluded"] is True
+    assert audit["ahead_of_tip_killed_elements"] == 0
