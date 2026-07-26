@@ -156,7 +156,9 @@ fi
 
 source_scheduler="$ROOT/scripts/run_v10_2_27_paper_four_class_30deg_long_rcurves.sh"
 source_plotter="$ROOT/scripts/plot_v10_2_27_paper_four_class_rcurves.py"
-generated_scheduler=$(mktemp "$ROOT/scripts/.v10_2_28_four_class_orientation_scheduler.XXXXXX.sh")
+generated_scheduler_base=$(mktemp "$ROOT/scripts/.v10_2_28_four_class_orientation_scheduler.XXXXXX")
+generated_scheduler="${generated_scheduler_base}.sh"
+mv "$generated_scheduler_base" "$generated_scheduler"
 generated_plotter="$OUTROOT/v10_2_28_generated_plotter.py"
 cleanup() {
   rm -f "$generated_scheduler"
