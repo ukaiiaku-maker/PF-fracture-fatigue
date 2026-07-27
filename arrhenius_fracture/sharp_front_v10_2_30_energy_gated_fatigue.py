@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 
 from . import crystal as _crystal
+from . import fatigue_v1 as _fatigue_v1
 from . import fem as _fem
 from . import hazard_energy_event_gate_v10230 as _energy_gate
 from . import sharp_front_v10_1_7_3 as _avalanche
@@ -16,6 +17,7 @@ from .hazard_energy_event_gate_v10230 import (
     build_energy_gated_avalanche_backend,
     config_from_environment,
     reset_runtime_state,
+    set_latest_probe_K,
     wrap_assemble_mechanics,
     wrap_cleave_direction_competition,
     wrap_cleavage_branch_candidates,
@@ -25,9 +27,9 @@ from .hazard_energy_event_gate_mesh_consistent_v10230 import (
     MODEL_ID as MESH_SEARCH_MODEL_ID,
     energy_gate_event_length_mesh_consistent,
 )
-from .persistent_site_cyclic_energy_gated_eventload_v10230 import (
-    EventLoadConsistentHazardEnergyGatedPersistentSiteCyclicTipEngine,
-    MODEL_ID as EVENT_LOAD_ENGINE_MODEL_ID,
+from .persistent_site_cyclic_energy_gated_corrected_v10230 import (
+    CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine,
+    MODEL_ID as CORRECTED_ENGINE_MODEL_ID,
 )
 
 
@@ -48,6 +50,22 @@ def _option_value(args: list[str], name: str) -> str | None:
     return None
 
 
+def _observed_waveform_factory(original):
+    """Capture the incoming FEM probe K before fixed-DeltaK replacement."""
+
+    def observed(*args, **kwargs):
+        incoming = kwargs.get("Kmax")
+        if incoming is None and args:
+            incoming = args[0]
+        if incoming is not None:
+            set_latest_probe_K(float(incoming))
+        return original(*args, **kwargs)
+
+    observed.__name__ = getattr(original, "__name__", "ObservedFatigueWaveform")
+    observed.__doc__ = getattr(original, "__doc__", None)
+    return observed
+
+
 def _write_audit(args: list[str]) -> None:
     out = _option_value(args, "--out")
     if not out:
@@ -62,22 +80,26 @@ def _write_audit(args: list[str]) -> None:
                 "arrhenius_fracture.sharp_front_v10_2_29_fatigue_audited"
             ),
             "transactional_engine": (
-                "EventLoadConsistentHazardEnergyGatedPersistentSiteCyclicTipEngine"
+                "CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine"
             ),
-            "transactional_engine_model_id": EVENT_LOAD_ENGINE_MODEL_ID,
+            "transactional_engine_model_id": CORRECTED_ENGINE_MODEL_ID,
             "event_length_search_model_id": MESH_SEARCH_MODEL_ID,
             "persistent_site_source": True,
             "anisotropic_direction_competition": True,
             "four_class_registry_preserved": True,
             "parameter_refit": False,
-            "cleavage_first_passage_changed": False,
+            "cleavage_first_passage_rate_changed": False,
+            "continuum_energy_comparison_diagnostic_only": True,
+            "continuum_energy_comparison_affects_hazard": False,
             "stochastic_proposal_distribution_changed": False,
             "event_length_commit_changed": True,
             "moving_mpz_and_geometry_commit_atomic": True,
             "waiting_cycle_tip_translation": False,
+            "zero_length_hazard_attempts_consumed": True,
             "energy_gate_event_load": "Kmax_geometry_transaction_load",
             "energy_gate_barrier_load": "Kmax_geometry_transaction_load",
             "phase_resolved_hazard_integration_preserved": True,
+            "fixed_deltaK_probe_K_captured_before_waveform_replacement": True,
             "mesh_resolved_geometry_commit_required": True,
             "directional_J_subgrid_value_used_for_search_only": True,
             "athermal_fracture_parameter_active": False,
@@ -105,6 +127,7 @@ def main(argv=None):
     original_compete = _crystal.cleave_direction_competition
     original_discrete = _crystal.cleavage_branch_candidates
     original_energy_search = _energy_gate.energy_gate_event_length
+    original_waveform = _fatigue_v1.FatigueWaveform
 
     OBSERVER.original_assemble = original_assemble
     _fem.assemble_mechanics = wrap_assemble_mechanics(original_assemble)
@@ -118,8 +141,9 @@ def main(argv=None):
         energy_gate_event_length_mesh_consistent
     )
     _v10229.AuditedCoupledPersistentSiteCyclicTipEngine = (
-        EventLoadConsistentHazardEnergyGatedPersistentSiteCyclicTipEngine
+        CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine
     )
+    _fatigue_v1.FatigueWaveform = _observed_waveform_factory(original_waveform)
 
     def gated_builder(
         local_args,
@@ -142,7 +166,8 @@ def main(argv=None):
             "trigger=cleavage_first_passage "
             "resistance=gamma_rel*m_hits*DeltaG_eff/b^2 "
             "event=min(stochastic_proposal,energy_arrest) "
-            "event_load=Kmax mesh_commit=required Gc0_athermal=off"
+            "event_load=Kmax continuum_gate=diagnostic_only "
+            "mesh_commit=required Gc0_athermal=off"
         )
         result = _v10229.main(args)
         out = _option_value(args, "--out")
@@ -152,6 +177,7 @@ def main(argv=None):
         return result
     finally:
         _avalanche.build_avalanche_backend = original_avalanche_builder
+        _fatigue_v1.FatigueWaveform = original_waveform
         _v10229.AuditedCoupledPersistentSiteCyclicTipEngine = original_engine
         _energy_gate.energy_gate_event_length = original_energy_search
         _crystal.cleavage_branch_candidates = original_discrete
