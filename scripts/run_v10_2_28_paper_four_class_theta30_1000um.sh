@@ -219,8 +219,7 @@ if strict_header not in scheduler:
     raise SystemExit("ERROR: scheduler strict-mode header changed")
 scheduler = scheduler.replace(strict_header, "set -euo pipefail", 1)
 
-subset_validation = '''options = os.environ["OPTIONS"].split()
-expected_options = [
+subset_validation = '''expected_options = [
     "v913_paper_peak01_0242980_persistent_sites",
     "v913_paper_dbtt01_0202500_persistent_sites",
     "v913_paper_weakT01_0129902_persistent_sites",
@@ -236,15 +235,16 @@ if unknown_options:
 option_indices = [expected_options.index(value) for value in options]
 if option_indices != sorted(option_indices):
     raise SystemExit(f"ERROR: OPTIONS subset must retain canonical order: {expected_options}")'''
-validation_start_marker = '''options = os.environ["OPTIONS"].split()
-expected_options = [
+validation_start_marker = '''expected_options = [
 '''
 validation_end_marker = '''
 
 registry_path = Path(os.environ["REGISTRY"]).resolve()'''
-validation_start = scheduler.find(validation_start_marker)
+options_marker = 'options = os.environ["OPTIONS"].split()'
+options_position = scheduler.find(options_marker)
+validation_start = scheduler.find(validation_start_marker, options_position)
 validation_end = scheduler.find(validation_end_marker, validation_start)
-if validation_start < 0 or validation_end < 0:
+if options_position < 0 or validation_start < 0 or validation_end < 0:
     raise SystemExit("ERROR: scheduler canonical option validation changed")
 original_validation = scheduler[validation_start:validation_end]
 required_validation_tokens = (
