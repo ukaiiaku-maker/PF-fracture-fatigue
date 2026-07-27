@@ -18,15 +18,20 @@ python -m compileall -q \
   arrhenius_fracture/hazard_energy_backend_audit_v10230.py \
   arrhenius_fracture/sharp_front_v10_2_30_hazard_energy_gated.py \
   arrhenius_fracture/sharp_front_v10_2_30_hazard_energy_gated_audited.py \
+  scripts/build_v10_2_30_rate_enabled_orientation_launcher.py \
   tests/test_v10_2_30_hazard_energy_gate.py \
   tests/test_v10_2_30_differential_gate_contract.py \
-  tests/test_v10_2_30_dynamic_hazard_dissipation.py
+  tests/test_v10_2_30_dynamic_hazard_dissipation.py \
+  tests/test_v10_2_30_gated_rate_launchers.py
 
 bash -n \
   scripts/run_v10_2_28_paper_four_class_1000um_orientation_rate.sh \
   scripts/run_v10_2_28_theta45_loading_rate_sweep.sh \
   scripts/run_v10_2_29_300K_growth_gate.sh \
-  scripts/run_v10_2_29_300K_validation.sh
+  scripts/run_v10_2_29_300K_validation.sh \
+  scripts/run_v10_2_30_paper_four_class_orientation_rate.sh \
+  scripts/run_v10_2_30_theta45_loading_rate_sweep.sh \
+  scripts/run_v10_2_30_theta45_four_class_gate_screen.sh
 
 python -m pytest -q \
   tests/test_v10_2_28_direct_kernel_provider.py \
@@ -43,4 +48,5 @@ python -m pytest -q \
   tests/test_v10_2_29_validation_scripts.py \
   tests/test_v10_2_30_hazard_energy_gate.py \
   tests/test_v10_2_30_differential_gate_contract.py \
-  tests/test_v10_2_30_dynamic_hazard_dissipation.py
+  tests/test_v10_2_30_dynamic_hazard_dissipation.py \
+  tests/test_v10_2_30_gated_rate_launchers.py
