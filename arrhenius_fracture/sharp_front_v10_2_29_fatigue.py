@@ -16,10 +16,12 @@ from .fatigue_driver_cycle_accounting_v10229 import (
     install_consumed_cycle_accounting,
     restore_consumed_cycle_accounting,
 )
-from .persistent_site_cyclic_v10229 import PersistentSiteCyclicTipEngine
+from .persistent_site_cyclic_coupled_v10229 import (
+    CoupledPersistentSiteCyclicTipEngine,
+)
 
 MODEL_ID = "v10.2.29_hazard_cyclic_fatigue_long_growth"
-PersistentSiteStateResolvedTipEngine = PersistentSiteCyclicTipEngine
+PersistentSiteStateResolvedTipEngine = CoupledPersistentSiteCyclicTipEngine
 
 
 def _has_option(args: list[str], name: str) -> bool:
@@ -92,6 +94,8 @@ def _write_fatigue_audit(args: list[str]) -> None:
         "source_refresh": False,
         "explicit_recovery": False,
         "engine_native_cycle_predictor": True,
+        "state_coupled_cleavage_hazard": True,
+        "cleavage_hazard_frozen_within_cycle_block": False,
         "legacy_fatigue_barrier_predictor_used": False,
         "duplicate_spatial_fatigue_state": False,
         "full_field_cyclic_mechanics": False,
