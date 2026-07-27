@@ -194,7 +194,6 @@ GENERATED_SCHEDULER="$generated_scheduler" GENERATED_PLOTTER="$generated_plotter
 OUTROOT="$OUTROOT" "$PYTHON_BIN" - <<'PY'
 import os
 from pathlib import Path
-import re
 
 source_scheduler = Path(os.environ["SOURCE_SCHEDULER"])
 source_plotter = Path(os.environ["SOURCE_PLOTTER"])
@@ -237,22 +236,28 @@ if unknown_options:
 option_indices = [expected_options.index(value) for value in options]
 if option_indices != sorted(option_indices):
     raise SystemExit(f"ERROR: OPTIONS subset must retain canonical order: {expected_options}")'''
-canonical_pattern = re.compile(
-    r'options = os\.environ\["OPTIONS"\]\.split\(\)\n'
-    r'expected_options = \[\n'
-    r'(?:    "[^"]+",\n){4}'
-    r'\]\n'
-    r'if options != expected_options:\n'
-    r'    raise SystemExit\(f"ERROR: OPTIONS must retain canonical order: '
-    r'\{expected_options\}"\)'
-)
-scheduler, replacement_count = canonical_pattern.subn(
-    subset_validation,
-    scheduler,
-    count=1,
-)
-if replacement_count != 1:
+validation_start_marker = '''options = os.environ["OPTIONS"].split()
+expected_options = [
+'''
+validation_end_marker = '''
+
+registry_path = Path(os.environ["REGISTRY"]).resolve()'''
+validation_start = scheduler.find(validation_start_marker)
+validation_end = scheduler.find(validation_end_marker, validation_start)
+if validation_start < 0 or validation_end < 0:
     raise SystemExit("ERROR: scheduler canonical option validation changed")
+original_validation = scheduler[validation_start:validation_end]
+required_validation_tokens = (
+    "if options != expected_options:",
+    "ERROR: OPTIONS must retain canonical order",
+)
+if any(token not in original_validation for token in required_validation_tokens):
+    raise SystemExit("ERROR: scheduler canonical option validation changed")
+scheduler = (
+    scheduler[:validation_start]
+    + subset_validation
+    + scheduler[validation_end:]
+)
 
 seed_loop = "for option_index, option in enumerate(options):"
 if seed_loop not in scheduler:
