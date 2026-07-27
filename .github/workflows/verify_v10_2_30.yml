@@ -1,0 +1,35 @@
+name: Verify v10.2.30 hazard-energy-gated fatigue
+
+on:
+  push:
+    branches:
+      - v10.2.30-hazard-energy-gated-fatigue-events
+  pull_request:
+    branches:
+      - v10.2.29-hazard-cyclic-fatigue-long-growth
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pytest
+      - name: Compile v10.2.30 modules
+        run: |
+          python -m py_compile \
+            arrhenius_fracture/hazard_energy_event_gate_v10230.py \
+            arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py \
+            arrhenius_fracture/sharp_front_v10_2_30_energy_gated_fatigue.py \
+            arrhenius_fracture/sharp_front_v10_2_30_fixed_deltaK.py
+      - name: Run v10.2.30 regressions
+        run: |
+          python -m pytest -q --tb=short \
+            tests/test_v10_2_30_hazard_energy_gate.py \
+            tests/test_v10_2_30_entry_wiring.py \
+            tests/test_v10_2_29_coupled_transient_prepost.py
