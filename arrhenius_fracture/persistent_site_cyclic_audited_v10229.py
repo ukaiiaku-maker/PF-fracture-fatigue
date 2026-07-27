@@ -1,7 +1,19 @@
 """Audit adapter for the v10.2.29 persistent-site cyclic engine."""
 from __future__ import annotations
 
+import math
+
 from .persistent_site_cyclic_v10229 import PersistentSiteCyclicTipEngine
+
+
+def _finite_nonnegative(value, default: float = 0.0) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return float(default)
+    if not math.isfinite(number) or number < 0.0:
+        return float(default)
+    return number
 
 
 def _add_persistent_fields(engine, result: dict) -> dict:
@@ -35,6 +47,91 @@ def _add_persistent_fields(engine, result: dict) -> dict:
     result["persistent_source_refresh_active"] = False
     result["explicit_recovery_active"] = False
     return result
+
+
+def _cycle_block_audit_fields(controller, engine, result: dict) -> dict:
+    """Return JSON-safe diagnostics for adaptive cycle-block selection."""
+    cfg = controller.cfg
+    candidate_limits = {}
+    for key, value in dict(result.get("cycle_candidate_limits", {})).items():
+        number = _finite_nonnegative(value, default=-1.0)
+        if number >= 0.0:
+            candidate_limits[str(key)] = number
+
+    targets = {
+        "cleavage_clock": _finite_nonnegative(getattr(cfg, "target_dB", 0.0)),
+        "stored_pz": _finite_nonnegative(getattr(cfg, "target_dN_store", 0.0)),
+        "emitted_pz": _finite_nonnegative(getattr(cfg, "target_dN_emit", 0.0)),
+        "mobile_pz": _finite_nonnegative(getattr(cfg, "target_dN_mobile", 0.0)),
+        "escape_pz": _finite_nonnegative(getattr(cfg, "target_dN_escape", 0.0)),
+        "peierls_clock": _finite_nonnegative(
+            getattr(cfg, "target_dN_peierls", 0.0)
+        ),
+        "taylor_clock": _finite_nonnegative(
+            getattr(cfg, "target_dN_taylor", 0.0)
+        ),
+    }
+    predictor = {
+        "cleavage_clock": _finite_nonnegative(result.get("mu_cleave_pred", 0.0)),
+        "stored_pz": _finite_nonnegative(result.get("store_per_cycle", 0.0)),
+        "emitted_pz": _finite_nonnegative(result.get("mu_emit", 0.0)),
+        "mobile_pz": _finite_nonnegative(result.get("mobile_per_cycle", 0.0)),
+        "escape_pz": _finite_nonnegative(result.get("escape_per_cycle", 0.0)),
+        "peierls_clock": _finite_nonnegative(
+            result.get("peierls_per_cycle", 0.0)
+        ),
+        "taylor_clock": _finite_nonnegative(
+            result.get("taylor_per_cycle", 0.0)
+        ),
+    }
+    requested = _finite_nonnegative(result.get("cycles_requested", 0.0))
+    consumed = _finite_nonnegative(result.get("cycles_consumed", 0.0))
+    fraction = consumed / requested if requested > 0.0 else 0.0
+
+    return {
+        "cycle_block_mode": str(
+            getattr(cfg, "cycle_block_mode", "unknown") or "unknown"
+        ),
+        "cycle_limiter": str(result.get("cycle_limiter", "unknown")),
+        "cycle_unlimited": _finite_nonnegative(
+            result.get("cycle_unlimited", requested)
+        ),
+        "cycle_candidate_limits": candidate_limits,
+        "cycle_target_increments": targets,
+        "cycle_predicted_increments_per_cycle": predictor,
+        "cycles_consumed_fraction": fraction,
+        "cycle_min_block_cycles": _finite_nonnegative(
+            getattr(cfg, "min_block_cycles", 0.0)
+        ),
+        "cycle_max_block_cycles": _finite_nonnegative(
+            getattr(cfg, "max_block_cycles", 0.0)
+        ),
+        "cycle_nominal_block_cycles": _finite_nonnegative(
+            getattr(cfg, "block_cycles", 0.0)
+        ),
+        "state_N_em": _finite_nonnegative(result.get("N_em", 0.0)),
+        "state_mobile_count": _finite_nonnegative(
+            getattr(engine.mpz, "mobile_count", 0.0)
+        ),
+        "state_retained_count": _finite_nonnegative(
+            getattr(engine.mpz, "retained_count", 0.0)
+        ),
+        "state_emitted_total": _finite_nonnegative(
+            getattr(engine.mpz, "emitted_total", 0.0)
+        ),
+        "state_escaped_total": _finite_nonnegative(
+            getattr(engine.mpz, "escaped_total", 0.0)
+        ),
+        "state_micro_advance_total_m": _finite_nonnegative(
+            getattr(engine, "micro_advance_total_m", 0.0)
+        ),
+        "state_active_K_shield_signed_Pa_sqrt_m": float(
+            result.get("kinetic_active_K_shield_signed_Pa_sqrt_m", 0.0)
+        ),
+        "state_wake_K_shield_signed_Pa_sqrt_m": float(
+            result.get("kinetic_wake_K_shield_signed_Pa_sqrt_m", 0.0)
+        ),
+    }
 
 
 class AuditedPersistentSiteCyclicTipEngine(PersistentSiteCyclicTipEngine):
@@ -86,9 +183,14 @@ class AuditedPersistentSiteCyclicTipEngine(PersistentSiteCyclicTipEngine):
                 "persistent_source_refresh_active": False,
                 "explicit_recovery_active": False,
                 "engine_native_cycle_predictor": True,
+                **_cycle_block_audit_fields(controller, self, result),
             }
         )
         return result
 
 
-__all__ = ["AuditedPersistentSiteCyclicTipEngine"]
+__all__ = [
+    "AuditedPersistentSiteCyclicTipEngine",
+    "_add_persistent_fields",
+    "_cycle_block_audit_fields",
+]
