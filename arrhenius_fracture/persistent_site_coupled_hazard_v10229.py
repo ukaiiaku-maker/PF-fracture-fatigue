@@ -155,11 +155,9 @@ def _state_target_ratio(
 def _log_span(values: list[float]) -> float:
     positive = [max(float(value), 0.0) for value in values]
     high = max(positive, default=0.0)
-    low = min(positive, default=0.0)
     if high <= 0.0:
         return 0.0
-    if low <= 0.0:
-        return math.inf
+    low = max(min(positive, default=0.0), 1.0e-300)
     return math.log10(high / low)
 
 
