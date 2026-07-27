@@ -40,11 +40,18 @@ def _write_audit(args: list[str], target_deltaK: float) -> dict:
         data = json.loads(geometry_path.read_text())
         if isinstance(data, list):
             events = data
-    energy_events = []
+    energy_attempts = []
     if energy_path.is_file():
         data = json.loads(energy_path.read_text())
         if isinstance(data, list):
-            energy_events = data
+            energy_attempts = data
+    energy_commits = [
+        row
+        for row in energy_attempts
+        if bool(row.get("inserted", False))
+        and float(row.get("event_advance_m", 0.0)) > 0.0
+    ]
+    energy_arrests = [row for row in energy_attempts if row not in energy_commits]
 
     payload = fixed_deltaK_audit_payload()
     payload.update(
@@ -85,12 +92,21 @@ def _write_audit(args: list[str], target_deltaK: float) -> dict:
             "source_refresh": False,
             "explicit_recovery": False,
             "state_coupled_cleavage_hazard": True,
-            "cleavage_first_passage_only_trigger": True,
+            "cleavage_first_passage_is_only_stochastic_trigger": True,
+            "hazard_derived_continuum_admissibility_active": True,
             "transactional_tip_translation": True,
             "stochastic_geometry_events": len(events),
-            "hazard_energy_gated_events": len(energy_events),
+            "hazard_energy_gate_attempts": len(energy_attempts),
+            "hazard_energy_gated_events": len(energy_commits),
+            "hazard_energy_arrested_attempts": len(energy_arrests),
             "censor_status": (
-                "propagated" if energy_events else "right_censored_no_event"
+                "propagated"
+                if energy_commits
+                else (
+                    "right_censored_energy_arrested"
+                    if energy_arrests
+                    else "right_censored_no_event"
+                )
             ),
             "Gc0_athermal_active": False,
             "independent_fracture_energy_active": False,
@@ -161,7 +177,8 @@ def main(argv=None):
     audit = _write_audit(args, target_deltaK)
     print(
         "  fixed-DeltaK v10.2.30 audit: "
-        f"events={audit.get('hazard_energy_gated_events', 0)} "
+        f"committed={audit.get('hazard_energy_gated_events', 0)} "
+        f"arrested={audit.get('hazard_energy_arrested_attempts', 0)} "
         f"status={audit.get('censor_status', 'unknown')}"
     )
     return result
