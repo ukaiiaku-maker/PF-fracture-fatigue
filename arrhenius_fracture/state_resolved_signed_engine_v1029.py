@@ -8,9 +8,15 @@ same implementation for monotonic fracture and every fatigue phase point.
 from __future__ import annotations
 
 import math
+import os
 from pathlib import Path
 from typing import Any
 
+from .kernel_extension_coordinate_v10228 import (
+    _COORDINATE_MODE,
+    ProjectedLigamentEquivalentCoordinate,
+    selected_direction_x,
+)
 from .signed_burgers_shared_v1025 import (
     CHANNEL_RESOLVED_TRANSPORT,
     VALIDATED_SCALAR_TRANSPORT,
@@ -101,16 +107,60 @@ class StateResolvedSignedBurgersTipEngine(_V1026Engine):
         self._effective_K_tip_Pa_sqrt_m = 0.0
         self._opening_sigma_uncapped_Pa = 0.0
         self._opening_sigma_local_Pa = 0.0
+        self._kernel_extension_coordinate_mode = str(
+            os.environ.get("SIGNED_KERNEL_EXTENSION_COORDINATE", "cumulative_path")
+        ).strip().lower()
+        nominal_text = os.environ.get("SIGNED_KERNEL_NOMINAL_FORWARD_COS", "1")
+        try:
+            self._kernel_nominal_forward_cosine = float(nominal_text)
+        except ValueError as exc:
+            raise RuntimeError(
+                "SIGNED_KERNEL_NOMINAL_FORWARD_COS must be numeric"
+            ) from exc
+        if (
+            self._kernel_extension_coordinate_mode == _COORDINATE_MODE
+            and (
+                not math.isfinite(self._kernel_nominal_forward_cosine)
+                or self._kernel_nominal_forward_cosine <= 1.0e-12
+            )
+        ):
+            raise RuntimeError(
+                "projected-ligament kernel coordinate requires "
+                "SIGNED_KERNEL_NOMINAL_FORWARD_COS>0"
+            )
+        self._kernel_projected_coordinate = ProjectedLigamentEquivalentCoordinate()
+        self._kernel_raw_path_extension_m = 0.0
+        self._kernel_projected_ligament_extension_m = 0.0
+        self._kernel_extension_coordinate_m = 0.0
         super().__init__(*args, **kwargs)
 
-    def _geometric_state(self) -> tuple[float, float, float, float]:
-        r0 = max(float(self.f.r0), 1.0e-30)
-        r_eff = max(float(self.r_eff()), r0)
-        extension = max(
+    def _resolved_kernel_extension(self) -> float:
+        raw_extension = max(
             float(getattr(self, "micro_advance_total_m", 0.0)),
             float(getattr(self.mpz, "advance_total_m", 0.0)),
             0.0,
         )
+        self._kernel_raw_path_extension_m = raw_extension
+        if self._kernel_extension_coordinate_mode != _COORDINATE_MODE:
+            self._kernel_projected_ligament_extension_m = raw_extension
+            self._kernel_extension_coordinate_m = raw_extension
+            return raw_extension
+
+        extension = self._kernel_projected_coordinate.update(
+            raw_path_extension_m=raw_extension,
+            selected_direction_x_value=selected_direction_x(),
+            nominal_forward_cosine=self._kernel_nominal_forward_cosine,
+        )
+        self._kernel_projected_ligament_extension_m = float(
+            self._kernel_projected_coordinate.projected_anchor_m
+        )
+        self._kernel_extension_coordinate_m = float(extension)
+        return float(extension)
+
+    def _geometric_state(self) -> tuple[float, float, float, float]:
+        r0 = max(float(self.f.r0), 1.0e-30)
+        r_eff = max(float(self.r_eff()), r0)
+        extension = self._resolved_kernel_extension()
         sigma_cap = float(self.f.sigma_cap)
         if sigma_cap <= 0.0:
             raise RuntimeError(
@@ -257,6 +307,21 @@ class StateResolvedSignedBurgersTipEngine(_V1026Engine):
                 ),
                 "state_resolved_opening_boundary_action": getattr(
                     self._state_kernel_family, "_last_boundary_action", "none"
+                ),
+                "state_resolved_kernel_extension_coordinate_mode": str(
+                    self._kernel_extension_coordinate_mode
+                ),
+                "state_resolved_kernel_raw_path_extension_m": float(
+                    self._kernel_raw_path_extension_m
+                ),
+                "state_resolved_kernel_projected_ligament_extension_m": float(
+                    self._kernel_projected_ligament_extension_m
+                ),
+                "state_resolved_kernel_extension_coordinate_m": float(
+                    self._kernel_extension_coordinate_m
+                ),
+                "state_resolved_kernel_nominal_forward_cosine": float(
+                    self._kernel_nominal_forward_cosine
                 ),
             }
         )
