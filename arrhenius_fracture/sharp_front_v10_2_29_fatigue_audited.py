@@ -14,7 +14,9 @@ from .energy_ledger_output_v10227 import (
 )
 from .geometry_override_v10227 import install_geometry_override, restore_geometry_override
 from .persistent_site_bracket_fix_v10221 import install_backstress_complementarity_fix
-from .persistent_site_cyclic_audited_v10229 import AuditedPersistentSiteCyclicTipEngine
+from .persistent_site_cyclic_coupled_audited_v10229 import (
+    AuditedCoupledPersistentSiteCyclicTipEngine,
+)
 from .persistent_site_physical_width_v10222 import install_physical_front_width
 
 
@@ -43,7 +45,9 @@ def main(argv=None):
     install_geometry_override()
     install_energy_ledger_output()
     original = _entry.PersistentSiteStateResolvedTipEngine
-    _entry.PersistentSiteStateResolvedTipEngine = AuditedPersistentSiteCyclicTipEngine
+    _entry.PersistentSiteStateResolvedTipEngine = (
+        AuditedCoupledPersistentSiteCyclicTipEngine
+    )
     try:
         result = _entry.main(args)
         out = _option_value(args, "--out")
