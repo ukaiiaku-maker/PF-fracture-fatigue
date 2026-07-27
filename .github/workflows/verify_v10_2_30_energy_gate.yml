@@ -1,0 +1,42 @@
+name: Verify v10.2.30 hazard-energy-gated fatigue
+
+on:
+  push:
+    branches:
+      - v10.2.30-hazard-energy-gated-fatigue-events
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  energy-gate-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[test]"
+      - name: Compile additive point release
+        run: |
+          python -m py_compile \
+            arrhenius_fracture/hazard_energy_event_gate_v10230.py \
+            arrhenius_fracture/hazard_energy_event_gate_mesh_consistent_v10230.py \
+            arrhenius_fracture/hazard_energy_event_gate_numerical_fix_v10230.py \
+            arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py \
+            arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py \
+            arrhenius_fracture/sharp_front_v10_2_30_energy_gated_fatigue.py \
+            arrhenius_fracture/fixed_deltaK_v10230.py
+      - name: Run focused contracts
+        run: |
+          python -m pytest -q --tb=short \
+            tests/test_v10_2_30_energy_gate_contract.py \
+            tests/test_v10_2_30_transactional_engine.py \
+            tests/test_v10_2_30_fixed_deltaK_entry.py \
+            tests/test_v10_2_29_fixed_deltaK_entry.py \
+            tests/test_v10_2_29_event_cycle_accounting.py \
+            tests/test_v10_2_29_state_coupled_hazard.py \
+            tests/test_v10_2_29_fatigue_entry_contract.py
