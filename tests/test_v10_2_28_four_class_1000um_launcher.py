@@ -11,6 +11,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 LAUNCHER = ROOT / "scripts" / "run_v10_2_28_paper_four_class_1000um_orientation.sh"
 IMPLEMENTATION = ROOT / "scripts" / "run_v10_2_28_paper_four_class_theta30_1000um.sh"
+SOURCE_SCHEDULER = ROOT / "scripts" / "run_v10_2_27_paper_four_class_30deg_long_rcurves.sh"
+SOURCE_PLOTTER = ROOT / "scripts" / "plot_v10_2_27_paper_four_class_rcurves.py"
 INSTALLER = ROOT / "scripts" / "install_v10_2_27_four_class_registry.py"
 ENSURE = ROOT / "scripts" / "ensure_v10_2_28_signed_kernel.py"
 
@@ -21,6 +23,15 @@ def _canonical_options() -> tuple[str, ...]:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return tuple(item[0] for item in module.CANONICAL_OPTIONS)
+
+
+def _scheduler_adapter_source() -> str:
+    source = IMPLEMENTATION.read_text()
+    marker = 'OUTROOT="$OUTROOT" "$PYTHON_BIN" - <<\'PY\'\n'
+    start = source.index(marker, source.index('SOURCE_SCHEDULER="$source_scheduler"'))
+    start += len(marker)
+    end = source.index('\nPY\n\nchmod +x "$generated_scheduler"', start)
+    return source[start:end]
 
 
 def test_launchers_have_valid_bash_syntax():
@@ -157,3 +168,52 @@ def test_generated_scheduler_supports_ordered_subsets_and_fails_closed():
     )
     for token in required_tokens:
         assert token in source
+
+
+def test_scheduler_adapter_executes_against_current_v10227_source(tmp_path: Path):
+    generated_scheduler = tmp_path / "generated_scheduler.sh"
+    generated_plotter = tmp_path / "generated_plotter.py"
+    outroot = tmp_path / "out"
+    outroot.mkdir()
+
+    environment = dict(os.environ)
+    environment.update(
+        {
+            "SOURCE_SCHEDULER": str(SOURCE_SCHEDULER),
+            "SOURCE_PLOTTER": str(SOURCE_PLOTTER),
+            "GENERATED_SCHEDULER": str(generated_scheduler),
+            "GENERATED_PLOTTER": str(generated_plotter),
+            "OUTROOT": str(outroot),
+        }
+    )
+    completed = subprocess.run(
+        [sys.executable, "-c", _scheduler_adapter_source()],
+        cwd=ROOT,
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr + completed.stdout
+
+    generated = generated_scheduler.read_text()
+    assert "set -euo pipefail" in generated
+    assert "OPTIONS must contain at least one canonical option" in generated
+    assert "OPTIONS subset must retain canonical order" in generated
+    assert "for option in options:\n    option_index = expected_options.index(option)" in generated
+    assert "v913_paper_weakT01_0129902_persistent_sites" in generated
+    assert "v913_paper_ceramic01_0077080_persistent_sites" in generated
+    assert "v913_paper_weakT01_0257068_persistent_sites" not in generated
+    assert "v913_paper_ceramic01_0189364_persistent_sites" not in generated
+    assert "arrhenius_fracture.sharp_front_v10_2_28_audited" in generated
+    assert generated_plotter.is_file()
+    assert (outroot / "v10_2_28_generated_scheduler.sh").is_file()
+
+    syntax = subprocess.run(
+        ["bash", "-n", str(generated_scheduler)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert syntax.returncode == 0, syntax.stderr
