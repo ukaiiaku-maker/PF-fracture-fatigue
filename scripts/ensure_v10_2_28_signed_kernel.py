@@ -3,7 +3,13 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+root_text = str(ROOT)
+if not sys.path or sys.path[0] != root_text:
+    sys.path.insert(0, root_text)
 
 from arrhenius_fracture.kernel_resolver_v10228 import main
 
