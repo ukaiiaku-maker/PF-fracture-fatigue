@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$ROOT"
 
+PYTHON_BIN=${PYTHON_BIN:-python}
 CONDA_ENV=${CONDA_ENV:-arrhenius-sharp-front-v10}
 if [[ "${CONDA_DEFAULT_ENV:-}" != "$CONDA_ENV" ]]; then
   echo "ERROR: activate conda environment '$CONDA_ENV'" >&2
@@ -37,6 +38,7 @@ run_family() {
   local temperature
   for temperature in $TEMPERATURES; do
     local case_root="$OUTROOT/$label/$(printf '%04d' "$temperature")K"
+    mkdir -p "$case_root"
     MODE=transient \
     OUTROOT="$case_root" \
     REFERENCE_ROOT="$reference" \
@@ -76,7 +78,7 @@ analysis_args=(
 if [[ "$REQUIRE_CANDIDATE" == 1 ]]; then
   analysis_args+=(--require-candidate)
 fi
-python scripts/analyze_v10_2_29_coupled_transient_screen.py "${analysis_args[@]}" \
+"$PYTHON_BIN" scripts/analyze_v10_2_29_coupled_transient_screen.py "${analysis_args[@]}" \
   | tee "$OUTROOT/coupled_transient_screen.log"
 
 echo "DBTT_PEAK_COUPLED_TRANSIENT_COMPLETE: $OUTROOT"
