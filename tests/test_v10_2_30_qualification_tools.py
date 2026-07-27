@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 import subprocess
 
+import pytest
+
 from scripts.analyze_v10_2_30_energy_gated_qualification import summarize_case
 
 
@@ -93,10 +95,10 @@ def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
     assert row["committed_events"] == 1
     assert row["truncated_events"] == 1
     assert row["cycles_consumed"] == 1000.0
-    assert row["projected_extension_um"] == 3.0
-    assert row["path_extension_um"] == 4.0
-    assert row["path_tortuosity"] == 4.0 / 3.0
-    assert row["projected_da_dN_m_per_cycle"] == 3.0e-9
-    assert row["path_ds_dN_m_per_cycle"] == 4.0e-9
+    assert row["projected_extension_um"] == pytest.approx(3.0)
+    assert row["path_extension_um"] == pytest.approx(4.0)
+    assert row["path_tortuosity"] == pytest.approx(4.0 / 3.0)
+    assert row["projected_da_dN_m_per_cycle"] == pytest.approx(3.0e-9)
+    assert row["path_ds_dN_m_per_cycle"] == pytest.approx(4.0e-9)
     assert row["first_passage_rate_preserved"] is True
     assert row["continuum_energy_diagnostic_only"] is True
