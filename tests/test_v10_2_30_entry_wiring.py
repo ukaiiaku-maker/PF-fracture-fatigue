@@ -1,9 +1,13 @@
 from arrhenius_fracture import crystal, fem
+from arrhenius_fracture import hazard_energy_event_gate_v10230 as energy_gate
 from arrhenius_fracture import sharp_front_v10_1_7_3 as avalanche
 from arrhenius_fracture import sharp_front_v10_2_29_fatigue_audited as v10229
 from arrhenius_fracture import sharp_front_v10_2_30_energy_gated_fatigue as entry
-from arrhenius_fracture.persistent_site_cyclic_energy_gated_v10230 import (
-    HazardEnergyGatedPersistentSiteCyclicTipEngine,
+from arrhenius_fracture.hazard_energy_event_gate_mesh_consistent_v10230 import (
+    energy_gate_event_length_mesh_consistent,
+)
+from arrhenius_fracture.persistent_site_cyclic_energy_gated_eventload_v10230 import (
+    EventLoadConsistentHazardEnergyGatedPersistentSiteCyclicTipEngine,
 )
 
 
@@ -14,6 +18,7 @@ def test_v10230_entry_installs_and_restores_all_runtime_layers(monkeypatch, tmp_
     original_assemble = fem.assemble_mechanics
     original_compete = crystal.cleave_direction_competition
     original_discrete = crystal.cleavage_branch_candidates
+    original_energy_search = energy_gate.energy_gate_event_length
 
     def fake_main(args):
         observed["engine"] = v10229.AuditedCoupledPersistentSiteCyclicTipEngine
@@ -27,6 +32,7 @@ def test_v10230_entry_installs_and_restores_all_runtime_layers(monkeypatch, tmp_
         observed["discrete_changed"] = (
             crystal.cleavage_branch_candidates is not original_discrete
         )
+        observed["energy_search"] = energy_gate.energy_gate_event_length
         return "ok"
 
     monkeypatch.setattr(v10229, "main", fake_main)
@@ -35,14 +41,19 @@ def test_v10230_entry_installs_and_restores_all_runtime_layers(monkeypatch, tmp_
 
     result = entry.main(["--fatigue-cycles", "--out", str(tmp_path)])
     assert result == "ok"
-    assert observed["engine"] is HazardEnergyGatedPersistentSiteCyclicTipEngine
+    assert (
+        observed["engine"]
+        is EventLoadConsistentHazardEnergyGatedPersistentSiteCyclicTipEngine
+    )
     assert observed["builder_changed"] is True
     assert observed["assemble_changed"] is True
     assert observed["compete_changed"] is True
     assert observed["discrete_changed"] is True
+    assert observed["energy_search"] is energy_gate_event_length_mesh_consistent
 
     assert v10229.AuditedCoupledPersistentSiteCyclicTipEngine is original_engine
     assert avalanche.build_avalanche_backend is original_builder
+    assert energy_gate.energy_gate_event_length is original_energy_search
     assert fem.assemble_mechanics is original_assemble
     assert crystal.cleave_direction_competition is original_compete
     assert crystal.cleavage_branch_candidates is original_discrete
