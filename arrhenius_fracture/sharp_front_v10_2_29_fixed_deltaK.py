@@ -39,7 +39,7 @@ def _write_audit(args: list[str], target_deltaK: float) -> dict:
     payload.update({
         "schema": MODEL_ID,
         "base_fixed_deltaK_control": "v10.2.1",
-        "fatigue_engine": "v10.2.29_persistent_site_cyclic",
+        "fatigue_engine": "v10.2.29_persistent_site_state_coupled_cyclic",
         "parameter_option": _legacy_fixed._option_value(args, "--parameter-option"),
         "cleavage_hazard_seed": int(os.environ.get("CLEAVAGE_HAZARD_SEED", "0")),
         "target_deltaK_MPa_sqrt_m": float(target_deltaK),
@@ -63,6 +63,8 @@ def _write_audit(args: list[str], target_deltaK: float) -> dict:
         "source_refresh": False,
         "explicit_recovery": False,
         "engine_native_cycle_predictor": True,
+        "state_coupled_cleavage_hazard": True,
+        "cleavage_hazard_frozen_within_cycle_block": False,
         "consumed_cycle_accounting": True,
         "stochastic_geometry_events": len(events),
         "censor_status": "propagated" if events else "right_censored_no_event",
