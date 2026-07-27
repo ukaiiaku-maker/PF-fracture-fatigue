@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
 LAUNCHER = ROOT / "scripts" / "run_v10_2_28_paper_four_class_1000um_orientation.sh"
 IMPLEMENTATION = ROOT / "scripts" / "run_v10_2_28_paper_four_class_theta30_1000um.sh"
 INSTALLER = ROOT / "scripts" / "install_v10_2_27_four_class_registry.py"
+ENSURE = ROOT / "scripts" / "ensure_v10_2_28_signed_kernel.py"
 
 
 def _canonical_options() -> tuple[str, ...]:
@@ -36,6 +39,35 @@ def test_generic_alias_delegates_to_backward_compatible_implementation():
     source = LAUNCHER.read_text()
     assert IMPLEMENTATION.name in source
     assert 'exec bash "$ROOT/scripts/' in source
+
+
+def test_resolver_entry_point_pins_worktree_before_package_import(tmp_path: Path):
+    source = ENSURE.read_text()
+    root_index = source.index("ROOT = Path(__file__).resolve().parents[1]")
+    path_index = source.index("sys.path.insert(0, root_text)")
+    import_index = source.index(
+        "from arrhenius_fracture.kernel_resolver_v10228 import main"
+    )
+    assert root_index < path_index < import_index
+
+    fake = tmp_path / "arrhenius_fracture"
+    fake.mkdir()
+    (fake / "__init__.py").write_text("")
+    (fake / "kernel_resolver_v10228.py").write_text(
+        "raise RuntimeError('foreign package imported')\n"
+    )
+    environment = dict(os.environ)
+    environment["PYTHONPATH"] = str(tmp_path)
+    completed = subprocess.run(
+        [sys.executable, str(ENSURE), "--help"],
+        cwd=tmp_path,
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "foreign package imported" not in completed.stderr
 
 
 def test_launcher_uses_current_canonical_four_class_rows():
