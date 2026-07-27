@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from .fatigue_v1 import FatigueCycleHazardController
-from .persistent_site_vhcf_selector_v10229 import (
+from .persistent_site_vhcf_coupled_selector_v10229 import (
     attach_prediction_context,
     select_nonlinear_block,
 )
