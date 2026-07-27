@@ -41,6 +41,22 @@ if not math.isfinite(theta):
     raise SystemExit("ERROR: THETA must be finite")
 PY
 
+SIGNED_KERNEL_NOMINAL_FORWARD_COS=$(THETA="$THETA" "$PYTHON_BIN" - <<'PY'
+import math
+import os
+
+theta = math.radians(float(os.environ["THETA"]))
+# The direct provider chooses the globally most-forward member of the two
+# in-plane {100} traces at theta and theta+90 degrees.
+value = max(abs(math.cos(theta)), abs(math.sin(theta)))
+if not math.isfinite(value) or value <= 1.0e-12:
+    raise SystemExit("ERROR: no globally forward direct-provider cleavage trace")
+print(f"{value:.17g}")
+PY
+)
+export SIGNED_KERNEL_EXTENSION_COORDINATE=projected_ligament_equivalent
+export SIGNED_KERNEL_NOMINAL_FORWARD_COS
+
 mkdir -p "$OUTROOT"
 
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py
@@ -98,6 +114,8 @@ PY
 
 KERNEL_RESOLUTION="$kernel_resolution" FAMILY_JSON="$FAMILY_JSON" OUTROOT="$OUTROOT" \
 OPTIONS="$OPTIONS" TEMPS="$TEMPS" TARGET_EXT_UM="$TARGET_EXT_UM" THETA="$THETA" \
+SIGNED_KERNEL_EXTENSION_COORDINATE="$SIGNED_KERNEL_EXTENSION_COORDINATE" \
+SIGNED_KERNEL_NOMINAL_FORWARD_COS="$SIGNED_KERNEL_NOMINAL_FORWARD_COS" \
 "$PYTHON_BIN" - <<'PY'
 import hashlib
 import json
@@ -118,10 +136,16 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 payload = {
-    "schema": "v10.2.28_paper_four_class_orientation_1000um_campaign_lock_v1",
+    "schema": "v10.2.28_paper_four_class_orientation_1000um_campaign_lock_v2",
     "model_entry": "arrhenius_fracture.sharp_front_v10_2_28_audited",
-    "target_quantity": "cumulative_crack_path_extension",
+    "target_quantity": "projected_ligament_extension",
     "target_crack_extension_um": float(os.environ["TARGET_EXT_UM"]),
+    "kernel_extension_coordinate": os.environ["SIGNED_KERNEL_EXTENSION_COORDINATE"],
+    "kernel_nominal_forward_cosine": float(os.environ["SIGNED_KERNEL_NOMINAL_FORWARD_COS"]),
+    "kernel_coordinate_definition": (
+        "accumulated_actual_projected_ligament_advance_divided_by_"
+        "direct_provider_nominal_forward_cosine"
+    ),
     "crystal_theta_deg": float(os.environ["THETA"]),
     "options": os.environ["OPTIONS"].split(),
     "temperatures_K": [float(value) for value in os.environ["TEMPS"].split()],
@@ -229,4 +253,6 @@ env \
   PERSISTENT_SOURCE_MIN_WIDTH_UM="$PERSISTENT_SOURCE_MIN_WIDTH_UM" \
   SKIP_FINISHED="$SKIP_FINISHED" \
   RESTART_INCOMPLETE="$RESTART_INCOMPLETE" \
+  SIGNED_KERNEL_EXTENSION_COORDINATE="$SIGNED_KERNEL_EXTENSION_COORDINATE" \
+  SIGNED_KERNEL_NOMINAL_FORWARD_COS="$SIGNED_KERNEL_NOMINAL_FORWARD_COS" \
   bash "$generated_scheduler"
