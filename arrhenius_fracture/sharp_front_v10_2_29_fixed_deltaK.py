@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -40,6 +41,7 @@ def _write_audit(args: list[str], target_deltaK: float) -> dict:
         "base_fixed_deltaK_control": "v10.2.1",
         "fatigue_engine": "v10.2.29_persistent_site_cyclic",
         "parameter_option": _legacy_fixed._option_value(args, "--parameter-option"),
+        "cleavage_hazard_seed": int(os.environ.get("CLEAVAGE_HAZARD_SEED", "0")),
         "target_deltaK_MPa_sqrt_m": float(target_deltaK),
         "target_Kmax_MPa_sqrt_m": float(target_Kmax),
         "target_Kmin_MPa_sqrt_m": float(target_Kmin),
