@@ -37,10 +37,24 @@ def cyclic_records(root: Path) -> list[dict]:
     ]
 
 
-def first_last(records: list[dict], key: str) -> tuple[float, float]:
+def pre_post(
+    records: list[dict],
+    pre_key: str,
+    post_key: str,
+    *,
+    increment_key: str | None = None,
+) -> tuple[float, float, bool]:
+    """Return true pre/post values and whether an explicit pre-state was available."""
     if not records:
-        return 0.0, 0.0
-    return finite(records[0].get(key, 0.0)), finite(records[-1].get(key, 0.0))
+        return 0.0, 0.0, False
+    first = records[0]
+    final = finite(records[-1].get(post_key, 0.0))
+    if pre_key in first:
+        return finite(first.get(pre_key, 0.0)), final, True
+    if increment_key is not None and increment_key in first:
+        inferred = final - finite(first.get(increment_key, 0.0))
+        return inferred, final, False
+    return finite(first.get(post_key, 0.0)), final, False
 
 
 def summarize_case(control_path: Path) -> dict | None:
@@ -103,16 +117,46 @@ def summarize_case(control_path: Path) -> dict | None:
     else:
         global_log_span = 0.0
 
-    sigma_back_initial, sigma_back_final = first_last(
-        records, "persistent_sigma_back_Pa"
+    sigma_back_initial, sigma_back_final, sigma_pre_explicit = pre_post(
+        records, "state_sigma_back_Pa_pre", "persistent_sigma_back_Pa"
     )
-    mobile_initial, mobile_final = first_last(records, "state_mobile_count")
-    retained_initial, retained_final = first_last(records, "state_retained_count")
-    emitted_initial, emitted_final = first_last(records, "state_emitted_total")
-    shield_initial, shield_final = first_last(
-        records, "state_active_K_shield_signed_Pa_sqrt_m"
+    mobile_initial, mobile_final, mobile_pre_explicit = pre_post(
+        records,
+        "state_mobile_count_pre",
+        "state_mobile_count",
+        increment_key="dN_mobile_block",
     )
-    B_initial, B_final = first_last(records, "B")
+    retained_initial, retained_final, retained_pre_explicit = pre_post(
+        records,
+        "state_retained_count_pre",
+        "state_retained_count",
+        increment_key="dN_store_block",
+    )
+    emitted_initial, emitted_final, emitted_pre_explicit = pre_post(
+        records,
+        "state_emitted_total_pre",
+        "state_emitted_total",
+        increment_key="dN_emit_block",
+    )
+    shield_initial, shield_final, shield_pre_explicit = pre_post(
+        records,
+        "state_active_K_shield_signed_Pa_sqrt_m_pre",
+        "state_active_K_shield_signed_Pa_sqrt_m",
+    )
+    B_initial, B_final, B_pre_explicit = pre_post(
+        records, "B_pre", "B", increment_key="dB_block"
+    )
+
+    explicit_pre_state = all(
+        (
+            sigma_pre_explicit,
+            mobile_pre_explicit,
+            retained_pre_explicit,
+            emitted_pre_explicit,
+            shield_pre_explicit,
+            B_pre_explicit,
+        )
+    )
 
     return {
         "run_root": str(root),
@@ -129,6 +173,7 @@ def summarize_case(control_path: Path) -> dict | None:
         "event_count": event_count,
         "first_event_cycle": event_cycle,
         "right_censored": event_count == 0,
+        "explicit_pre_block_state_available": explicit_pre_state,
         "maximum_record_log_lambda_span_decades": max_log_span,
         "global_log_lambda_span_decades": global_log_span,
         "lambda_started_from_zero": bool(lambda_max > 0.0 and lambda_min <= 0.0),
@@ -141,16 +186,22 @@ def summarize_case(control_path: Path) -> dict | None:
         "coupled_rejected_splits": rejected_splits,
         "sigma_back_initial_Pa": sigma_back_initial,
         "sigma_back_final_Pa": sigma_back_final,
+        "sigma_back_change_Pa": sigma_back_final - sigma_back_initial,
         "mobile_initial": mobile_initial,
         "mobile_final": mobile_final,
+        "mobile_change": mobile_final - mobile_initial,
         "retained_initial": retained_initial,
         "retained_final": retained_final,
+        "retained_change": retained_final - retained_initial,
         "emitted_initial": emitted_initial,
         "emitted_final": emitted_final,
+        "emitted_change": emitted_final - emitted_initial,
         "active_K_shield_initial_Pa_sqrt_m": shield_initial,
         "active_K_shield_final_Pa_sqrt_m": shield_final,
+        "active_K_shield_change_Pa_sqrt_m": shield_final - shield_initial,
         "B_initial": B_initial,
         "B_final": B_final,
+        "B_change": B_final - B_initial,
     }
 
 
