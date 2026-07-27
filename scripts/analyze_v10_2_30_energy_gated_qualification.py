@@ -16,6 +16,12 @@ GEOMETRY = "stochastic_avalanche_geometry_events.json"
 CASE_META = "qualification_case.json"
 KINETIC = "kinetic_tip_cell_audit_v101.json"
 SUMMARY = "summary.json"
+CANONICAL_OPTIONS = {
+    "v913_paper_peak01_0242980_persistent_sites",
+    "v913_paper_dbtt01_0202500_persistent_sites",
+    "v913_paper_weakT01_0129902_persistent_sites",
+    "v913_paper_ceramic01_0077080_persistent_sites",
+}
 
 
 def _load(path: Path, default: Any):
@@ -98,6 +104,8 @@ def summarize_case(control_path: Path) -> dict[str, Any]:
     ]
     errors: list[str] = []
 
+    if control.get("parameter_option") not in CANONICAL_OPTIONS:
+        errors.append("case does not use one of the four canonical parameter options")
     if control.get("Gc0_athermal_active") is not False:
         errors.append("Gc0_athermal_active is not explicitly false")
     if control.get("independent_fracture_energy_active") is not False:
@@ -175,6 +183,9 @@ def summarize_case(control_path: Path) -> dict[str, Any]:
         else:
             truncated += 1
 
+    if committed and not direction_sources:
+        errors.append("propagated case lacks anisotropic direction audit")
+
     for index, event in enumerate(zero_length):
         if event.get("inserted") is True:
             errors.append(f"zero-length attempt {index} is marked inserted")
@@ -200,6 +211,7 @@ def summarize_case(control_path: Path) -> dict[str, Any]:
         "case": str(case),
         "parameter_option": control.get("parameter_option"),
         "temperature_K": _finite(meta.get("temperature_K", 300.0)),
+        "crystal_theta_deg": _finite(meta.get("crystal_theta_deg", 30.0)),
         "deltaK_fraction": _finite(meta.get("deltaK_fraction")),
         "target_deltaK_MPa_sqrt_m": _finite(
             control.get("target_deltaK_MPa_sqrt_m")
