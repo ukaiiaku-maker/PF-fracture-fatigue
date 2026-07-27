@@ -57,6 +57,9 @@ def main() -> None:
                     "records_per_consumed_cycle"
                 ),
                 "limiter_summary": payload.get("limiter_summary", {}),
+                "applied_limiter_summary": payload.get(
+                    "applied_limiter_summary", {}
+                ),
                 "final_state": payload.get("final_state", {}),
             }
         )
@@ -77,7 +80,7 @@ def main() -> None:
         case["difference_from_tightest"] = differences
 
     payload = {
-        "schema": "v10.2.29_block_target_convergence_v1",
+        "schema": "v10.2.29_block_target_convergence_v2",
         "baseline_target": baseline["target"],
         "minimum_cycles_required": args.minimum_cycles,
         "cases": cases,
