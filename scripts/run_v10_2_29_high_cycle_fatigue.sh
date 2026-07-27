@@ -218,7 +218,14 @@ PY
           --out "$CASE_OUT" \
           2>&1 | tee "$CASE_OUT/run.log"
 
-      if [[ "$MODE" == growth ]]; then
+      if [[ "$MODE" == horizon ]]; then
+        "$PYTHON_BIN" scripts/analyze_v10_2_29_horizon_scaling.py \
+          "$CASE_OUT" \
+          --temperature-K "$TEMPERATURE_K" \
+          --max-records-per-case "$MAX_RECORDS_PER_HORIZON" \
+          --require-censored-horizon \
+          > "$CASE_OUT/horizon_gate.log"
+      else
         "$PYTHON_BIN" scripts/extract_v10_2_29_developed_fatigue_growth.py \
           "$CASE_OUT" \
           --temperature-K "$TEMPERATURE_K" \
