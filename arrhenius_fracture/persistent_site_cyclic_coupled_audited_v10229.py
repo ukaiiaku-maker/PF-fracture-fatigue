@@ -32,9 +32,22 @@ _COUPLED_KEYS = (
     "coupled_hazard_segments",
 )
 
+_PRE_STATE_KEYS = (
+    "state_N_em_pre",
+    "state_mobile_count_pre",
+    "state_retained_count_pre",
+    "state_emitted_total_pre",
+    "state_escaped_total_pre",
+    "state_micro_advance_total_m_pre",
+    "state_active_K_shield_signed_Pa_sqrt_m_pre",
+    "state_wake_K_shield_signed_Pa_sqrt_m_pre",
+    "state_sigma_back_Pa_pre",
+)
+
 
 def _coupled_fields(result: dict) -> dict:
-    return {key: result[key] for key in _COUPLED_KEYS if key in result}
+    keys = _COUPLED_KEYS + _PRE_STATE_KEYS
+    return {key: result[key] for key in keys if key in result}
 
 
 class AuditedCoupledPersistentSiteCyclicTipEngine(
@@ -69,6 +82,7 @@ class AuditedCoupledPersistentSiteCyclicTipEngine(
                 "cycles_unused": float(result.get("cycles_unused", 0.0)),
                 "event_localized": bool(result.get("cycle_event_localized", False)),
                 "fired": bool(result.get("fired", False)),
+                "B_pre": float(result.get("B_pre", self.B)),
                 "B": float(result.get("B", self.B)),
                 "physical_hazard_action_block": float(
                     result.get("physical_hazard_action_block", 0.0)
@@ -99,4 +113,4 @@ class AuditedCoupledPersistentSiteCyclicTipEngine(
         return result
 
 
-__all__ = ["AuditedCoupledPersistentSiteCyclicTipEngine"]
+__all__ = ["AuditedCoupledPersistentSiteCyclicTipEngine", "_coupled_fields"]
