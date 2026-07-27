@@ -194,6 +194,7 @@ GENERATED_SCHEDULER="$generated_scheduler" GENERATED_PLOTTER="$generated_plotter
 OUTROOT="$OUTROOT" "$PYTHON_BIN" - <<'PY'
 import os
 from pathlib import Path
+import re
 
 source_scheduler = Path(os.environ["SOURCE_SCHEDULER"])
 source_plotter = Path(os.environ["SOURCE_PLOTTER"])
@@ -213,25 +214,12 @@ replacements = {
 }
 
 scheduler = source_scheduler.read_text()
-for old, new in replacements.items():
-    if old not in scheduler:
-        raise SystemExit(f"ERROR: scheduler source no longer contains expected token: {old}")
-    scheduler = scheduler.replace(old, new)
 
 strict_header = "set -u\nset -o pipefail"
 if strict_header not in scheduler:
     raise SystemExit("ERROR: scheduler strict-mode header changed")
 scheduler = scheduler.replace(strict_header, "set -euo pipefail", 1)
 
-canonical_validation = '''options = os.environ["OPTIONS"].split()
-expected_options = [
-    "v913_paper_peak01_0242980_persistent_sites",
-    "v913_paper_dbtt01_0202500_persistent_sites",
-    "v913_paper_weakT01_0129902_persistent_sites",
-    "v913_paper_ceramic01_0077080_persistent_sites",
-]
-if options != expected_options:
-    raise SystemExit(f"ERROR: OPTIONS must retain canonical order: {expected_options}")'''
 subset_validation = '''options = os.environ["OPTIONS"].split()
 expected_options = [
     "v913_paper_peak01_0242980_persistent_sites",
@@ -249,9 +237,22 @@ if unknown_options:
 option_indices = [expected_options.index(value) for value in options]
 if option_indices != sorted(option_indices):
     raise SystemExit(f"ERROR: OPTIONS subset must retain canonical order: {expected_options}")'''
-if canonical_validation not in scheduler:
+canonical_pattern = re.compile(
+    r'options = os\.environ\["OPTIONS"\]\.split\(\)\n'
+    r'expected_options = \[\n'
+    r'(?:    "[^"]+",\n){4}'
+    r'\]\n'
+    r'if options != expected_options:\n'
+    r'    raise SystemExit\(f"ERROR: OPTIONS must retain canonical order: '
+    r'\{expected_options\}"\)'
+)
+scheduler, replacement_count = canonical_pattern.subn(
+    subset_validation,
+    scheduler,
+    count=1,
+)
+if replacement_count != 1:
     raise SystemExit("ERROR: scheduler canonical option validation changed")
-scheduler = scheduler.replace(canonical_validation, subset_validation, 1)
 
 seed_loop = "for option_index, option in enumerate(options):"
 if seed_loop not in scheduler:
@@ -281,6 +282,11 @@ increment = "  option_index=$((option_index + 1))\n"
 if increment not in scheduler:
     raise SystemExit("ERROR: scheduler shell option-index increment changed")
 scheduler = scheduler.replace(increment, "", 1)
+
+for old, new in replacements.items():
+    if old not in scheduler:
+        raise SystemExit(f"ERROR: scheduler source no longer contains expected token: {old}")
+    scheduler = scheduler.replace(old, new)
 
 plotter = source_plotter.read_text()
 for old, new in replacements.items():
