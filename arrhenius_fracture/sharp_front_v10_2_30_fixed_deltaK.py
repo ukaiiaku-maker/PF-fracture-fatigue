@@ -51,7 +51,17 @@ def _write_audit(args: list[str], target_deltaK: float) -> dict:
         if bool(row.get("inserted", False))
         and float(row.get("event_advance_m", 0.0)) > 0.0
     ]
-    energy_arrests = [row for row in energy_attempts if row not in energy_commits]
+    zero_length_attempts = [
+        row
+        for row in energy_attempts
+        if not bool(row.get("inserted", False))
+        and float(row.get("committed_event_length_m", 0.0)) <= 0.0
+    ]
+    other_geometry_vetoes = [
+        row
+        for row in energy_attempts
+        if row not in energy_commits and row not in zero_length_attempts
+    ]
 
     payload = fixed_deltaK_audit_payload()
     payload.update(
@@ -59,7 +69,7 @@ def _write_audit(args: list[str], target_deltaK: float) -> dict:
             "schema": MODEL_ID,
             "base_fixed_deltaK_control": "v10.2.1",
             "fatigue_engine": (
-                "v10.2.30_transactional_persistent_site_hazard_energy_gate"
+                "v10.2.30_corrected_transactional_persistent_site_hazard_energy_gate"
             ),
             "parameter_option": _legacy_fixed._option_value(
                 args, "--parameter-option"
@@ -84,6 +94,7 @@ def _write_audit(args: list[str], target_deltaK: float) -> dict:
             "fatigue_control_mode": "prescribed_fixed_local_deltaK",
             "fem_loading_mode": "held_nonzero_geometry_tensor_probe",
             "probe_KJ_is_fatigue_driving_K": False,
+            "probe_K_captured_before_fixed_deltaK_replacement": True,
             "probe_energy_rescaled_to_event_K": True,
             "probe_energy_scale_expression": "(K_event/K_probe)**2",
             "persistent_site_source": True,
@@ -92,19 +103,25 @@ def _write_audit(args: list[str], target_deltaK: float) -> dict:
             "source_refresh": False,
             "explicit_recovery": False,
             "state_coupled_cleavage_hazard": True,
+            "cleavage_first_passage_rate_changed": False,
             "cleavage_first_passage_is_only_stochastic_trigger": True,
-            "hazard_derived_continuum_admissibility_active": True,
+            "continuum_energy_comparison_diagnostic_only": True,
+            "continuum_energy_comparison_affects_hazard": False,
+            "event_reward_energy_gated_after_first_passage": True,
             "transactional_tip_translation": True,
+            "zero_length_hazard_attempts_consumed": True,
             "stochastic_geometry_events": len(events),
             "hazard_energy_gate_attempts": len(energy_attempts),
             "hazard_energy_gated_events": len(energy_commits),
-            "hazard_energy_arrested_attempts": len(energy_arrests),
+            "hazard_energy_zero_length_attempts": len(zero_length_attempts),
+            "hazard_energy_other_geometry_vetoes": len(other_geometry_vetoes),
+            "hazard_energy_arrested_attempts": len(zero_length_attempts),
             "censor_status": (
                 "propagated"
                 if energy_commits
                 else (
                     "right_censored_energy_arrested"
-                    if energy_arrests
+                    if zero_length_attempts
                     else "right_censored_no_event"
                 )
             ),
@@ -178,7 +195,7 @@ def main(argv=None):
     print(
         "  fixed-DeltaK v10.2.30 audit: "
         f"committed={audit.get('hazard_energy_gated_events', 0)} "
-        f"arrested={audit.get('hazard_energy_arrested_attempts', 0)} "
+        f"zero_attempts={audit.get('hazard_energy_zero_length_attempts', 0)} "
         f"status={audit.get('censor_status', 'unknown')}"
     )
     return result
