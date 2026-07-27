@@ -21,9 +21,7 @@ def test_qualification_runner_has_valid_shell_syntax():
     assert completed.returncode == 0, completed.stderr
 
 
-def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
-    case = tmp_path / "case"
-    case.mkdir()
+def _write_valid_case(case):
     control = {
         "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites",
         "target_deltaK_MPa_sqrt_m": 10.0,
@@ -90,6 +88,13 @@ def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
     (case / "summary.json").write_text(
         json.dumps([{"geometry_projected_extension_m": 3.0e-6}])
     )
+    return control
+
+
+def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
+    case = tmp_path / "case"
+    case.mkdir()
+    _write_valid_case(case)
 
     row = summarize_case(case / "v10_2_30_fixed_deltaK_control.json")
     assert row["pass"] is True
@@ -104,3 +109,16 @@ def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
     assert row["path_ds_dN_m_per_cycle"] == pytest.approx(4.0e-9)
     assert row["first_passage_rate_preserved"] is True
     assert row["continuum_energy_diagnostic_only"] is True
+
+
+def test_qualification_analyzer_rejects_noncanonical_parameter_option(tmp_path):
+    case = tmp_path / "case"
+    case.mkdir()
+    control = _write_valid_case(case)
+    control["parameter_option"] = "legacy_six_case_option"
+    (case / "v10_2_30_fixed_deltaK_control.json").write_text(
+        json.dumps(control)
+    )
+    row = summarize_case(case / "v10_2_30_fixed_deltaK_control.json")
+    assert row["pass"] is False
+    assert any("four canonical" in error for error in row["errors"])
