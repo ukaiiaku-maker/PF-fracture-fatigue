@@ -103,11 +103,12 @@ def extract(
             interval_cycles = max(cycles_post - previous_event_cycles, 0.0)
             rate = da / interval_cycles if interval_cycles > 0.0 else float("nan")
             extension_since_initiation_pre_m = max(a_pre - initiation_post_m, 0.0)
-            in_lower = extension_since_initiation_pre_m >= developed_start_m
+            window_tol = max(1.0e-15, 1.0e-12 * max(developed_start_m, 1.0e-30))
+            in_lower = extension_since_initiation_pre_m + window_tol >= developed_start_m
             in_upper = (
                 True
                 if developed_end_m is None
-                else extension_since_initiation_pre_m < developed_end_m
+                else extension_since_initiation_pre_m < developed_end_m - window_tol
             )
             eligible = bool(in_lower and in_upper and interval_cycles > 0.0)
             stage = "developed" if eligible else "microstructure_development"
