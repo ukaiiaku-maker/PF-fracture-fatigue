@@ -28,7 +28,11 @@ def install_engine_native_cycle_preview() -> None:
         preview = getattr(front, "preview_cycle_waveform", None)
         if preview is not None:
             prediction = preview(self, waveform, T_K)
-            return attach_prediction_context(prediction, front, waveform, T_K)
+            if bool(getattr(front, "persistent_site_cyclic_v10229", False)):
+                return attach_prediction_context(
+                    prediction, front, waveform, T_K
+                )
+            return prediction
         return original_integrate(self, front, waveform, T_K)
 
     def delegated_choose(self, pred, user_block_cycles=None):
@@ -54,11 +58,6 @@ def install_engine_native_cycle_preview() -> None:
             and force_cycles is not None
             and callable(getattr(front, "cycle_step_waveform", None))
         ):
-            # The inherited multi-front driver has already selected one global
-            # cycle cap. Re-enter the engine-native selector with that cap rather
-            # than bypassing it through force_cycles. For one front this returns
-            # the same selected block; for multiple fronts it can only reduce the
-            # globally approved block, never increase it.
             old_max = float(self.cfg.max_block_cycles)
             old_context = _ACTIVE_STEP_CONTEXT
             cap = max(float(force_cycles), 0.0)
