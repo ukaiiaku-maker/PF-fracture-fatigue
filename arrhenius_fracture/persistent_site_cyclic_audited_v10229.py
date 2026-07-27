@@ -49,15 +49,46 @@ def _add_persistent_fields(engine, result: dict) -> dict:
     return result
 
 
+def _adaptive_diagnostics(controller, engine, result, targets, predictor):
+    """Recover the physical adaptive limiter hidden by driver force_cycles plumbing."""
+    cfg = controller.cfg
+    mode = str(getattr(cfg, "cycle_block_mode", "unknown") or "unknown").lower()
+    max_block = _finite_nonnegative(getattr(cfg, "max_block_cycles", 0.0))
+    nominal = _finite_nonnegative(getattr(cfg, "block_cycles", 0.0))
+    if mode in ("hazard", "hazard_limited", "rate", "auto"):
+        base_name = "max_block_cycles"
+        base = max_block
+    else:
+        base_name = "block_cycles"
+        base = min(max_block, nominal)
+
+    effective_targets = dict(targets)
+    B_pre = _finite_nonnegative(result.get("B_pre", getattr(engine, "B", 0.0)))
+    remaining = max(1.0 - B_pre, 0.0)
+    if effective_targets["cleavage_clock"] > 0.0:
+        effective_targets["cleavage_clock"] = min(
+            effective_targets["cleavage_clock"], remaining
+        )
+
+    limits = {base_name: base}
+    for name, target in effective_targets.items():
+        rate = predictor.get(name, 0.0)
+        if target > 0.0 and math.isfinite(target) and rate > 0.0 and math.isfinite(rate):
+            limits[name] = target / rate
+
+    limiter = min(limits, key=limits.get) if limits else base_name
+    unlimited = _finite_nonnegative(limits.get(limiter, base))
+    min_block = _finite_nonnegative(getattr(cfg, "min_block_cycles", 0.0))
+    if unlimited < min_block:
+        limiter = "min_block_cycles"
+    elif max_block > 0.0 and unlimited > max_block:
+        limiter = "max_block_cycles"
+    return limiter, unlimited, limits, effective_targets
+
+
 def _cycle_block_audit_fields(controller, engine, result: dict) -> dict:
     """Return JSON-safe diagnostics for adaptive cycle-block selection."""
     cfg = controller.cfg
-    candidate_limits = {}
-    for key, value in dict(result.get("cycle_candidate_limits", {})).items():
-        number = _finite_nonnegative(value, default=-1.0)
-        if number >= 0.0:
-            candidate_limits[str(key)] = number
-
     targets = {
         "cleavage_clock": _finite_nonnegative(getattr(cfg, "target_dB", 0.0)),
         "stored_pz": _finite_nonnegative(getattr(cfg, "target_dN_store", 0.0)),
@@ -88,17 +119,35 @@ def _cycle_block_audit_fields(controller, engine, result: dict) -> dict:
     consumed = _finite_nonnegative(result.get("cycles_consumed", 0.0))
     fraction = consumed / requested if requested > 0.0 else 0.0
 
+    applied_limiter = str(result.get("cycle_limiter", "unknown"))
+    reported_candidates = {}
+    for key, value in dict(result.get("cycle_candidate_limits", {})).items():
+        number = _finite_nonnegative(value, default=-1.0)
+        if number >= 0.0:
+            reported_candidates[str(key)] = number
+
+    limiter, unlimited, reconstructed, effective_targets = _adaptive_diagnostics(
+        controller, engine, result, targets, predictor
+    )
+    if applied_limiter not in ("global_forced", "unknown", ""):
+        limiter = applied_limiter
+        unlimited = _finite_nonnegative(result.get("cycle_unlimited", unlimited))
+        reconstructed.update(reported_candidates)
+
+    forced_below = requested + 1.0e-12 * max(unlimited, 1.0) < unlimited
     return {
         "cycle_block_mode": str(
             getattr(cfg, "cycle_block_mode", "unknown") or "unknown"
         ),
-        "cycle_limiter": str(result.get("cycle_limiter", "unknown")),
-        "cycle_unlimited": _finite_nonnegative(
-            result.get("cycle_unlimited", requested)
-        ),
-        "cycle_candidate_limits": candidate_limits,
+        "cycle_limiter": limiter,
+        "cycle_applied_limiter": applied_limiter,
+        "cycle_unlimited": unlimited,
+        "cycle_candidate_limits": reconstructed,
+        "cycle_reported_candidate_limits": reported_candidates,
         "cycle_target_increments": targets,
+        "cycle_effective_target_increments": effective_targets,
         "cycle_predicted_increments_per_cycle": predictor,
+        "cycle_forced_below_adaptive_limit": forced_below,
         "cycles_consumed_fraction": fraction,
         "cycle_min_block_cycles": _finite_nonnegative(
             getattr(cfg, "min_block_cycles", 0.0)
