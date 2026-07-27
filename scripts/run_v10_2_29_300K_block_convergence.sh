@@ -25,6 +25,7 @@ WEAKT_OPTION=v913_paper_weakT01_0129902_persistent_sites
 
 mkdir -p "$OUTROOT"
 
+"$PYTHON_BIN" -m pytest -q tests/test_v10_2_29_cycle_block_diagnostics.py
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py
 "$PYTHON_BIN" scripts/install_v10_2_27_four_class_registry.py --check-only
 
@@ -123,7 +124,7 @@ for target in "${target_array[@]}"; do
   run="$OUTROOT/target_$tag"
   rm -rf "$run"
   mkdir -p "$run"
-  echo "TARGET=$target cycles, physical exposure=$CYCLES_MAX cycles, dU=$FATIGUE_DU m"
+  echo "TARGET_INCREMENT=$target, physical exposure=$CYCLES_MAX cycles, dU=$FATIGUE_DU m"
   env CLEAVAGE_HAZARD_SEED="$HAZARD_SEED" \
     "$PYTHON_BIN" -u -m arrhenius_fracture.sharp_front_v10_2_29_fatigue_audited \
       "${common_args[@]}" \
