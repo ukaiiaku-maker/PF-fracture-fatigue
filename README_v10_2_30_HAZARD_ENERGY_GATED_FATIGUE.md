@@ -18,11 +18,11 @@ Cleavage first passage remains the only stochastic trigger. The continuum K-squa
 
 After first passage, the existing stochastic event-length draw is treated as an upper proposal. The committed distance is the largest mesh-resolved sharp-wake extension satisfying the fixed-opening elastic-energy balance at the event Kmax. The probe-field release is scaled by `(K_event/K_probe)^2` under the existing fixed-local-DeltaK architecture.
 
-The event resistance is derived only from active production hazard quantities:
+The trial event resistance is derived only from active production hazard quantities:
 
 `Gamma_hazard = gamma_relative * m_hits * DeltaG_cleave_effective / b^2`
 
-No `Gc0_athermal`, generic fracture-resistance configuration, toughness floor, Paris law, or fitted fracture-energy coefficient is used.
+This is an explicit, parameter-free mapping from the active hazard free-energy surface to event work per new crack area. It is part of the v10.2.30 physical qualification and is not treated as previously validated surface-energy data. No `Gc0_athermal`, generic fracture-resistance configuration, toughness floor, Paris law, or fitted fracture-energy coefficient is used.
 
 During waiting cycles the geometric tip is stationary while the persistent-site mobile/retained state evolves. Once an event is admitted, the sharp-wake geometry and moving-frame MPZ translate atomically by the same committed distance. A first-passage attempt with no mesh-resolved admissible increment is consumed as a nonpropagating attempt; its stochastic threshold is not restored.
 
