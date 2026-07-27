@@ -34,6 +34,10 @@ def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
         "persistent_site_source": True,
         "finite_source_inventory": False,
         "source_refresh": False,
+        "cleavage_first_passage_rate_changed": False,
+        "continuum_energy_comparison_diagnostic_only": True,
+        "continuum_energy_comparison_affects_hazard": False,
+        "zero_length_hazard_attempts_consumed": True,
     }
     (case / "v10_2_30_fixed_deltaK_control.json").write_text(
         json.dumps(control)
@@ -69,7 +73,7 @@ def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
         json.dumps([event])
     )
     (case / "stochastic_avalanche_geometry_events.json").write_text(
-        json.dumps([{"x0": 0.5e-3, "x1": 0.504e-3}])
+        json.dumps([{"x0": 0.5e-3, "x1": 0.503e-3}])
     )
     (case / "kinetic_tip_cell_audit_v101.json").write_text(
         json.dumps(
@@ -81,7 +85,7 @@ def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
         )
     )
     (case / "summary.json").write_text(
-        json.dumps([{"geometry_projected_extension_m": 4.0e-6}])
+        json.dumps([{"geometry_projected_extension_m": 3.0e-6}])
     )
 
     row = summarize_case(case / "v10_2_30_fixed_deltaK_control.json")
@@ -89,4 +93,10 @@ def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
     assert row["committed_events"] == 1
     assert row["truncated_events"] == 1
     assert row["cycles_consumed"] == 1000.0
-    assert row["projected_extension_um"] == 4.0
+    assert row["projected_extension_um"] == 3.0
+    assert row["path_extension_um"] == 4.0
+    assert row["path_tortuosity"] == 4.0 / 3.0
+    assert row["projected_da_dN_m_per_cycle"] == 3.0e-9
+    assert row["path_ds_dN_m_per_cycle"] == 4.0e-9
+    assert row["first_passage_rate_preserved"] is True
+    assert row["continuum_energy_diagnostic_only"] is True
