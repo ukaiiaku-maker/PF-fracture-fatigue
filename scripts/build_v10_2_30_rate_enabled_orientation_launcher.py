@@ -3,7 +3,7 @@
 
 The validated v10.2.28 launcher supplies the direct prescribed-geometry kernel,
 projected-extension coordinate, four audited material options, deterministic seed
-mapping, and loading-rate machinery.  This builder changes only the model entry,
+mapping, and loading-rate machinery. This builder changes only the model entry,
 gate provenance/verification, and the hard-coded 1000 um restriction so the same
 contract can support a short validation screen and the final 1000 um sweep.
 """
@@ -18,6 +18,7 @@ MODEL_ENTRY = (
     "arrhenius_fracture."
     "sharp_front_v10_2_30_hazard_energy_gated_audited"
 )
+_MODEL_TOKEN = "@@V10230_MODEL_ENTRY@@"
 
 
 def _load_rate_builder():
@@ -48,61 +49,8 @@ def _replace_exact(
     return text.replace(old, new, count if count == 1 else -1)
 
 
-def transform(source: str) -> str:
-    text = _load_rate_builder().transform(source)
-
-    text = _replace_exact(
-        text,
-        '''if not math.isclose(target, 1000.0, rel_tol=0.0, abs_tol=1.0e-12):
-    raise SystemExit("ERROR: this production launcher is fixed to 1000 um crack extension")''',
-        '''if not math.isfinite(target) or target <= 0.0:
-    raise SystemExit("ERROR: TARGET_EXT_UM must be finite and positive")''',
-        label="generic projected-target validation",
-    )
-    text = _replace_exact(
-        text,
-        '"schema": "v10.2.28_paper_four_class_orientation_1000um_campaign_lock_v3",',
-        '"schema": "v10.2.30_hazard_energy_gated_orientation_rate_lock_v1",',
-        label="gate campaign-lock schema",
-    )
-    text = _replace_exact(
-        text,
-        "arrhenius_fracture.sharp_front_v10_2_28_audited",
-        MODEL_ENTRY,
-        count=2,
-        label="v10.2.30 model entry",
-    )
-    text = _replace_exact(
-        text,
-        '    "model_entry": "' + MODEL_ENTRY + '",\n',
-        '    "model_entry": "' + MODEL_ENTRY + '",\n'
-        '    "hazard_energy_gate": True,\n'
-        '    "absolute_athermal_Gc": False,\n'
-        '    "hazard_dissipation_density": (\n'
-        '        "gamma_rel*m*DeltaG_cleave_eff(T,sigma)/b^2"\n'
-        '    ),\n'
-        '    "anisotropic_hazard_scaling": (\n'
-        '        "sigma_hazard=sigma_physical/sqrt(gamma_rel)"\n'
-        '    ),\n'
-        '    "fixed_DeltaK_energy_scaling": "(K_event/K_probe)^2",\n'
-        '    "gate_resolution": "every_internal_Strang_microstep",\n',
-        label="gate campaign-lock fields",
-    )
-    text = _replace_exact(
-        text,
-        'v10_2_28_campaign_kernel_lock.json',
-        'v10_2_30_hazard_energy_gate_campaign_lock.json',
-        label="gate campaign-lock filename",
-    )
-    text = _replace_exact(
-        text,
-        'v10_2_28_generated_scheduler.sh',
-        'v10_2_30_hazard_energy_gate_generated_scheduler.sh',
-        label="gate generated-scheduler filename",
-    )
-
-    adapter_marker = '''for old, new in replacements.items():'''
-    gate_adapter = '''replace_scheduler_exact(
+def _gate_scheduler_adapter() -> str:
+    template = r"""replace_scheduler_exact(
     '"v10.2.28_paper_four_class_orientation_loading_rate_campaign_v1"',
     '"v10.2.30_hazard_energy_gated_orientation_rate_campaign_v1"',
     label="gate campaign manifest schema",
@@ -113,8 +61,8 @@ replace_scheduler_exact(
     label="gate case contract schema",
 )
 replace_scheduler_exact(
-    '    "model_entry": "''' + MODEL_ENTRY + '''",',
-    '''    "model_entry": "''' + MODEL_ENTRY + '''",
+    '    "model_entry": "@@V10230_MODEL_ENTRY@@",',
+    '''    "model_entry": "@@V10230_MODEL_ENTRY@@",
     "hazard_energy_gate": True,
     "absolute_athermal_Gc": False,
     "hazard_dissipation_density": (
@@ -132,7 +80,7 @@ replace_scheduler_exact(
     "schema": "v10.2.30_hazard_energy_gated_orientation_rate_case_contract_v1",''',
     '''payload = {
     "schema": "v10.2.30_hazard_energy_gated_orientation_rate_case_contract_v1",
-    "model_entry": "''' + MODEL_ENTRY + '''",
+    "model_entry": "@@V10230_MODEL_ENTRY@@",
     "hazard_energy_gate": True,
     "absolute_athermal_Gc": False,
     "gate_resolution": "every_internal_Strang_microstep",''',
@@ -142,7 +90,7 @@ replace_scheduler_exact(
     '''expected = {
     "option": os.environ["OPTION"],''',
     '''expected = {
-    "model_entry": "''' + MODEL_ENTRY + '''",
+    "model_entry": "@@V10230_MODEL_ENTRY@@",
     "hazard_energy_gate": True,
     "absolute_athermal_Gc": False,
     "gate_resolution": "every_internal_Strang_microstep",
@@ -202,16 +150,73 @@ replace_scheduler_exact(
     '''tokens = [
     f"--parameter-option {expected['option']}",''',
     '''tokens = [
-    "-m ''' + MODEL_ENTRY + '''",
+    "-m @@V10230_MODEL_ENTRY@@",
     f"--parameter-option {expected['option']}",''',
     label="completed-case model command verification",
 )
 
-for old, new in replacements.items():'''
+for old, new in replacements.items():"""
+    return template.replace(_MODEL_TOKEN, MODEL_ENTRY)
+
+
+def transform(source: str) -> str:
+    text = _load_rate_builder().transform(source)
+
+    text = _replace_exact(
+        text,
+        '''if not math.isclose(target, 1000.0, rel_tol=0.0, abs_tol=1.0e-12):
+    raise SystemExit("ERROR: this production launcher is fixed to 1000 um crack extension")''',
+        '''if not math.isfinite(target) or target <= 0.0:
+    raise SystemExit("ERROR: TARGET_EXT_UM must be finite and positive")''',
+        label="generic projected-target validation",
+    )
+    text = _replace_exact(
+        text,
+        '"schema": "v10.2.28_paper_four_class_orientation_1000um_campaign_lock_v3",',
+        '"schema": "v10.2.30_hazard_energy_gated_orientation_rate_lock_v1",',
+        label="gate campaign-lock schema",
+    )
+    text = _replace_exact(
+        text,
+        "arrhenius_fracture.sharp_front_v10_2_28_audited",
+        MODEL_ENTRY,
+        count=2,
+        label="v10.2.30 model entry",
+    )
+    text = _replace_exact(
+        text,
+        '    "model_entry": "' + MODEL_ENTRY + '",\n',
+        '    "model_entry": "' + MODEL_ENTRY + '",\n'
+        '    "hazard_energy_gate": True,\n'
+        '    "absolute_athermal_Gc": False,\n'
+        '    "hazard_dissipation_density": (\n'
+        '        "gamma_rel*m*DeltaG_cleave_eff(T,sigma)/b^2"\n'
+        '    ),\n'
+        '    "anisotropic_hazard_scaling": (\n'
+        '        "sigma_hazard=sigma_physical/sqrt(gamma_rel)"\n'
+        '    ),\n'
+        '    "fixed_DeltaK_energy_scaling": "(K_event/K_probe)^2",\n'
+        '    "gate_resolution": "every_internal_Strang_microstep",\n',
+        label="gate campaign-lock fields",
+    )
+    text = _replace_exact(
+        text,
+        "v10_2_28_campaign_kernel_lock.json",
+        "v10_2_30_hazard_energy_gate_campaign_lock.json",
+        label="gate campaign-lock filename",
+    )
+    text = _replace_exact(
+        text,
+        "v10_2_28_generated_scheduler.sh",
+        "v10_2_30_hazard_energy_gate_generated_scheduler.sh",
+        label="gate generated-scheduler filename",
+    )
+
+    adapter_marker = "for old, new in replacements.items():"
     text = _replace_exact(
         text,
         adapter_marker,
-        gate_adapter,
+        _gate_scheduler_adapter(),
         label="embedded scheduler gate adapter",
     )
     return text
