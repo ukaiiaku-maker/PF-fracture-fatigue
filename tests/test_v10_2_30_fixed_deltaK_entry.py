@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from arrhenius_fracture import fixed_deltaK_v10230 as entry
+from arrhenius_fracture import sharp_front_v10_2_30_fixed_deltaK as entry
 
 
 @contextmanager
@@ -26,13 +26,13 @@ def test_fixed_deltaK_entry_dispatches_to_v10230(monkeypatch, tmp_path):
         "_fixed_deltaK_console_semantics",
         _null_context,
     )
-    monkeypatch.setattr(entry._fatigue, "main", fake_main)
+    monkeypatch.setattr(entry._energy, "main", fake_main)
     monkeypatch.setattr(
         entry,
         "_write_audit",
         lambda args, target: {
-            "energy_gated_propagating_events": 0,
-            "energy_gated_zero_length_attempts": 0,
+            "hazard_energy_gated_events": 0,
+            "hazard_energy_zero_length_attempts": 0,
             "censor_status": "right_censored_no_event",
         },
     )
