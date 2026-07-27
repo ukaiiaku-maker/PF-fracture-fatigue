@@ -28,7 +28,9 @@ export LOADING_RATE_FACTOR DU_M BASE_DT_S DT_S
 export NOMINAL_OPENING_RATE_M_PER_S RATE_TAG
 
 BASE="$ROOT/scripts/run_v10_2_28_paper_four_class_theta30_1000um.sh"
-GENERATED="$ROOT/scripts/.v10_2_28_rate_enabled_orientation_${$}.sh"
+GENERATED_BASE=$(mktemp "$ROOT/scripts/.v10_2_28_rate_enabled_orientation.XXXXXX")
+GENERATED="${GENERATED_BASE}.sh"
+mv "$GENERATED_BASE" "$GENERATED"
 trap 'rm -f "$GENERATED"' EXIT
 
 "$PYTHON_BIN" scripts/build_v10_2_28_rate_enabled_orientation_launcher.py \
