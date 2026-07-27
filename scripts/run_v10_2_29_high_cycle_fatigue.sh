@@ -26,6 +26,8 @@ TARGET_DB=${TARGET_DB:-0.1}
 MAX_RECORDS_PER_HORIZON=${MAX_RECORDS_PER_HORIZON:-1000}
 DEVELOPED_START_UM=${DEVELOPED_START_UM:-25}
 DEVELOPED_END_UM=${DEVELOPED_END_UM:-75}
+TRANSIENT_MIN_LOG_SPAN=${TRANSIENT_MIN_LOG_SPAN:-0.30}
+TRANSIENT_MIN_STATE_RATIO=${TRANSIENT_MIN_STATE_RATIO:-0.05}
 FORCE=${FORCE:-0}
 
 case "$MODE" in
@@ -35,6 +37,12 @@ case "$MODE" in
     TARGET_EXT_UM=${TARGET_EXT_UM:-5}
     STEPS=${STEPS:-2000}
     ;;
+  transient)
+    DELTA_K_FRACTIONS=${DELTA_K_FRACTIONS:-"0.20 0.35 0.50 0.65"}
+    HORIZONS=${HORIZONS:-1e10}
+    TARGET_EXT_UM=${TARGET_EXT_UM:-20}
+    STEPS=${STEPS:-10000}
+    ;;
   growth)
     DELTA_K_FRACTIONS=${DELTA_K_FRACTIONS:-"0.70 0.85 0.95"}
     HORIZONS=${HORIZONS:-1e12}
@@ -42,7 +50,7 @@ case "$MODE" in
     STEPS=${STEPS:-50000}
     ;;
   *)
-    echo "ERROR: MODE must be horizon or growth" >&2
+    echo "ERROR: MODE must be horizon, transient, or growth" >&2
     exit 2
     ;;
 esac
@@ -91,7 +99,7 @@ fi
 REFERENCE_STEPS="$REFERENCE_ROOT/steps_$(printf '%04d' "$TEMPERATURE_K")K.csv"
 [[ -f "$REFERENCE_STEPS" ]] || {
   echo "ERROR: missing monotonic reference $REFERENCE_STEPS" >&2
-  echo "Set REFERENCE_ROOT to the matching 300 K monotonic parameter-option case." >&2
+  echo "Set REFERENCE_ROOT to the matching parameter-option and temperature case." >&2
   exit 2
 }
 
@@ -225,13 +233,19 @@ PY
           --max-records-per-case "$MAX_RECORDS_PER_HORIZON" \
           --require-censored-horizon \
           > "$CASE_OUT/horizon_gate.log"
-      else
+      elif [[ "$MODE" == growth ]]; then
         "$PYTHON_BIN" scripts/extract_v10_2_29_developed_fatigue_growth.py \
           "$CASE_OUT" \
           --temperature-K "$TEMPERATURE_K" \
           --developed-start-um "$DEVELOPED_START_UM" \
           --developed-end-um "$DEVELOPED_END_UM" \
           > "$CASE_OUT/developed_growth.log"
+      else
+        "$PYTHON_BIN" scripts/analyze_v10_2_29_coupled_transient_screen.py \
+          "$CASE_OUT" \
+          --minimum-log-lambda-span-decades "$TRANSIENT_MIN_LOG_SPAN" \
+          --minimum-state-target-ratio "$TRANSIENT_MIN_STATE_RATIO" \
+          > "$CASE_OUT/coupled_transient.log"
       fi
     done
   done
@@ -243,9 +257,14 @@ if [[ "$MODE" == horizon ]]; then
     --temperature-K "$TEMPERATURE_K" \
     --max-records-per-case "$MAX_RECORDS_PER_HORIZON" \
     --require-censored-horizon
-else
+elif [[ "$MODE" == growth ]]; then
   "$PYTHON_BIN" scripts/analyze_v10_2_29_developed_fatigue_campaign.py \
     "$OUTROOT"
+else
+  "$PYTHON_BIN" scripts/analyze_v10_2_29_coupled_transient_screen.py \
+    "$OUTROOT" \
+    --minimum-log-lambda-span-decades "$TRANSIENT_MIN_LOG_SPAN" \
+    --minimum-state-target-ratio "$TRANSIENT_MIN_STATE_RATIO"
 fi
 
 echo "HIGH_CYCLE_COMPLETE: $OUTROOT"
