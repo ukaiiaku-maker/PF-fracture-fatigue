@@ -67,16 +67,27 @@ def _forward_argument(args: tuple[Any, ...], kwargs: dict[str, Any]) -> Any:
     return args[2] if len(args) >= 3 else np.array([1.0, 0.0], dtype=float)
 
 
-def _tracked_selector(original: Callable[..., list[dict[str, Any]]]):
+def _selected_rows(result: Any) -> list[dict[str, Any]]:
+    """Normalize the two selector return contracts without altering either result."""
+    selected = result[0] if isinstance(result, tuple) else result
+    if selected is None:
+        return []
+    if isinstance(selected, list):
+        return selected
+    return list(selected)
+
+
+def _tracked_selector(original: Callable[..., Any]):
     @functools.wraps(original)
     def wrapped(*args, **kwargs):
-        winners = original(*args, **kwargs)
+        result = original(*args, **kwargs)
+        winners = _selected_rows(result)
         forward = _forward_argument(args, kwargs)
         if winners:
             record_selected_direction(winners[0].get("t"), fallback=forward)
         else:
             record_selected_direction(forward, fallback=[1.0, 0.0])
-        return winners
+        return result
 
     wrapped._v10228_direction_tracker = True
     return wrapped
