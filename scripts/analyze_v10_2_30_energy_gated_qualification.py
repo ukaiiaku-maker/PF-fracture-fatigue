@@ -61,7 +61,10 @@ def _projected_extension(case: Path, geometry: list[dict[str, Any]]) -> float:
             return max(_finite(value), 0.0)
     if not geometry:
         return 0.0
-    return max(_finite(geometry[-1].get("x1")) - _finite(geometry[0].get("x0")), 0.0)
+    return max(
+        _finite(geometry[-1].get("x1")) - _finite(geometry[0].get("x0")),
+        0.0,
+    )
 
 
 def summarize_case(control_path: Path) -> dict[str, Any]:
@@ -81,7 +84,18 @@ def summarize_case(control_path: Path) -> dict[str, Any]:
         and bool(row.get("inserted", False))
         and _finite(row.get("event_advance_m")) > 0.0
     ]
-    arrested = [row for row in attempts if row not in committed]
+    zero_length = [
+        row
+        for row in attempts
+        if isinstance(row, dict)
+        and not bool(row.get("inserted", False))
+        and _finite(row.get("committed_event_length_m")) <= 0.0
+    ]
+    other_vetoes = [
+        row
+        for row in attempts
+        if row not in committed and row not in zero_length
+    ]
     errors: list[str] = []
 
     if control.get("Gc0_athermal_active") is not False:
@@ -96,6 +110,16 @@ def summarize_case(control_path: Path) -> dict[str, Any]:
         errors.append("finite source inventory is active")
     if control.get("source_refresh") is not False:
         errors.append("source refresh is active")
+    if control.get("cleavage_first_passage_rate_changed") is not False:
+        errors.append("cleavage first-passage rate changed or is unaudited")
+    if control.get("continuum_energy_comparison_diagnostic_only") is not True:
+        errors.append("continuum energy comparison is not diagnostic-only")
+    if control.get("continuum_energy_comparison_affects_hazard") is not False:
+        errors.append("continuum energy comparison alters the cleavage hazard")
+    if control.get("zero_length_hazard_attempts_consumed") is not True:
+        errors.append("zero-length hazard-attempt consumption is unaudited")
+    if other_vetoes:
+        errors.append(f"case contains {len(other_vetoes)} non-energy geometry vetoes")
     if len(geometry) != len(committed):
         errors.append(
             f"geometry/committed-event count mismatch: {len(geometry)} != {len(committed)}"
@@ -151,18 +175,26 @@ def summarize_case(control_path: Path) -> dict[str, Any]:
         else:
             truncated += 1
 
-    for index, event in enumerate(arrested):
+    for index, event in enumerate(zero_length):
         if event.get("inserted") is True:
-            errors.append(f"arrested attempt {index} is marked inserted")
+            errors.append(f"zero-length attempt {index} is marked inserted")
         if event.get("athermal_Gc_used") is not False:
-            errors.append(f"arrested attempt {index} used an athermal Gc")
+            errors.append(f"zero-length attempt {index} used an athermal Gc")
+        if _finite(event.get("committed_event_length_m")) > 0.0:
+            errors.append(f"zero-length attempt {index} has positive committed length")
 
     cycles = _cycles(case)
     projected = _projected_extension(case, geometry)
+    path_length = sum(max(value, 0.0) for value in actual)
+    tortuosity = path_length / projected if projected > 0.0 else 0.0
     status = (
         "propagated"
         if committed
-        else ("energy_arrested" if arrested else "right_censored_no_event")
+        else (
+            "energy_arrested"
+            if zero_length
+            else "right_censored_no_event"
+        )
     )
     return {
         "case": str(case),
@@ -179,7 +211,9 @@ def summarize_case(control_path: Path) -> dict[str, Any]:
         "status": status,
         "attempted_events": len(attempts),
         "committed_events": len(committed),
-        "arrested_attempts": len(arrested),
+        "zero_length_attempts": len(zero_length),
+        "other_geometry_vetoes": len(other_vetoes),
+        "arrested_attempts": len(zero_length),
         "full_proposal_events": full_proposal,
         "truncated_events": truncated,
         "mean_proposed_event_um": (
@@ -198,11 +232,23 @@ def summarize_case(control_path: Path) -> dict[str, Any]:
         "direction_sources": sorted(direction_sources),
         "cycles_consumed": cycles,
         "projected_extension_um": projected * 1.0e6,
+        "path_extension_um": path_length * 1.0e6,
+        "path_tortuosity": tortuosity,
         "projected_da_dN_m_per_cycle": (
             projected / cycles if cycles > 0.0 else 0.0
         ),
+        "path_ds_dN_m_per_cycle": (
+            path_length / cycles if cycles > 0.0 else 0.0
+        ),
         "fixed_deltaK_exact": control.get(
             "fixed_deltaK_exact_within_relative_1e-12"
+        ),
+        "first_passage_rate_preserved": (
+            control.get("cleavage_first_passage_rate_changed") is False
+        ),
+        "continuum_energy_diagnostic_only": (
+            control.get("continuum_energy_comparison_diagnostic_only") is True
+            and control.get("continuum_energy_comparison_affects_hazard") is False
         ),
         "errors": errors,
         "pass": not errors,
