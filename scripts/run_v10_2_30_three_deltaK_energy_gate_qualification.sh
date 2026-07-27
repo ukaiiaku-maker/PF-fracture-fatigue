@@ -43,8 +43,14 @@ mkdir -p "$OUTROOT"
 
 "$PYTHON_BIN" -m pytest -q --tb=short \
   tests/test_v10_2_30_hazard_energy_gate.py \
+  tests/test_v10_2_30_energy_gate_contract.py \
+  tests/test_v10_2_30_transactional_engine.py \
   tests/test_v10_2_30_entry_wiring.py \
+  tests/test_v10_2_30_fixed_deltaK_entry.py \
+  tests/test_v10_2_30_qualification_tools.py \
+  tests/test_v10_2_29_fixed_deltaK_entry.py \
   tests/test_v10_2_29_event_cycle_accounting.py \
+  tests/test_v10_2_29_state_coupled_hazard.py \
   tests/test_v10_2_29_coupled_transient_prepost.py
 
 if [[ -z "$FAMILY_JSON" ]]; then
@@ -207,6 +213,7 @@ payload = {
     "schema": "v10.2.30_energy_gate_qualification_case",
     "parameter_option": os.environ["OPTION"],
     "temperature_K": float(os.environ["TEMPERATURE"]),
+    "crystal_theta_deg": 30.0,
     "deltaK_fraction": float(os.environ["FRACTION"]),
     "target_deltaK_MPa_sqrt_m": float(os.environ["DELTAK"]),
     "energy_gate_trial_fraction": float(os.environ["TRIAL"]),
