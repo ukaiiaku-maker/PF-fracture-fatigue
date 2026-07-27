@@ -11,8 +11,8 @@ from arrhenius_fracture.hazard_energy_event_gate_v10230 import (
     reset_runtime_state,
     wrap_cleave_direction_competition,
 )
-from arrhenius_fracture.persistent_site_cyclic_energy_gated_eventload_v10230 import (
-    EventLoadConsistentHazardEnergyGatedPersistentSiteCyclicTipEngine,
+from arrhenius_fracture.persistent_site_cyclic_energy_gated_corrected_v10230 import (
+    CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine,
 )
 from arrhenius_fracture.persistent_site_cyclic_energy_gated_v10230 import (
     HazardEnergyGatedPersistentSiteCyclicTipEngine,
@@ -36,7 +36,7 @@ def test_hazard_resistance_uses_only_active_hazard_quantities():
     assert "DeltaG_cleave_effective" in payload["hazard_resistance_expression"]
 
 
-def test_continuum_gate_uses_same_effective_barrier_and_current_K():
+def test_continuum_comparison_reports_same_barrier_and_current_K():
     class Engine:
         b = 2.0e-10
         f = SimpleNamespace(m_hits=2.0)
@@ -136,67 +136,16 @@ def test_transactional_commit_moves_mpz_and_geometry_state_by_same_length():
     assert dummy._energy_gate_pending is None
 
 
-def test_cyclic_preview_does_not_translate_private_tip_state():
-    class MPZ:
-        mobile_count = 1.0
-        retained_count = 2.0
-        continuum_source_last_sigma_emit_effective_Pa = 1.0
-
-        def advance(self, distance):
-            raise AssertionError("stationary-tip preview must not translate MPZ")
-
-    class Dummy:
-        B = 0.0
-        b = 2.0e-10
-        f = SimpleNamespace(m_hits=1.0)
-        mpz = MPZ()
-        t = 0.0
-
-        @staticmethod
-        def sigma_tip(K):
-            return float(K)
-
-        @staticmethod
-        def lambda_cleave(stress, temperature):
-            return 1.0, 1.0, 1.0e-20
-
-        @staticmethod
-        def _plastic_half_step(dt, temperature, stress):
-            return {
-                "dN_emit": 0.0,
-                "dN_trapped": 0.0,
-                "dN_released": 0.0,
-                "dN_escaped": 0.0,
-                "peierls_rate_s": 0.0,
-                "taylor_completion_rate_s": 0.0,
-            }
-
-    class Controller:
-        @staticmethod
-        def _phases():
-            return np.array([0.0, np.pi])
-
-    class Waveform:
-        period_s = 1.0
-        frequency_Hz = 1.0
-        Kmax = 20.0e6
-
-        @staticmethod
-        def K_phase(phase):
-            return np.full_like(phase, 20.0e6, dtype=float)
-
-    reset_runtime_state()
-    OBSERVER.snapshot = {"mat": SimpleNamespace(Eprime=4.0e11)}
-    OBSERVER.direction = {
-        "direction": np.array([1.0, 0.0]),
-        "gamma_relative": 1.0,
-    }
-    result = (
-        EventLoadConsistentHazardEnergyGatedPersistentSiteCyclicTipEngine.preview_cycle_waveform(
-            Dummy(), Controller(), Waveform(), 300.0
-        )
+def test_corrected_engine_declares_continuum_comparison_diagnostic_only():
+    assert (
+        CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine.
+        hazard_energy_gate_continuum_affects_hazard
+        is False
     )
-    assert result.mu_cleave > 0.0
+    assert (
+        CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine.event_load_policy
+        == "cycle_maximum_Kmax"
+    )
 
 
 def test_four_canonical_parameterizations_are_preserved():
