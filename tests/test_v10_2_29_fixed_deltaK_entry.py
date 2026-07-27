@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import json
 
 from arrhenius_fracture import sharp_front_v10_2_29_fixed_deltaK as entry
 
@@ -55,3 +56,22 @@ def test_fixed_deltaK_entry_rejects_invalid_R(monkeypatch):
         assert "0 <= R < 1" in str(exc)
     else:
         raise AssertionError("invalid R was not rejected")
+
+
+def test_fixed_deltaK_audit_records_coupled_hazard(monkeypatch, tmp_path):
+    monkeypatch.setattr(entry._legacy_fixed, "_normalize_output_semantics", lambda *a: {})
+    payload = entry._write_audit(
+        [
+            "--out", str(tmp_path),
+            "--R", "0.1",
+            "--frequency-Hz", "1000",
+            "--cycles-max", "1e9",
+            "--parameter-option", "v913_paper_dbtt01_0202500_persistent_sites",
+        ],
+        4.0,
+    )
+    assert payload["state_coupled_cleavage_hazard"] is True
+    assert payload["cleavage_hazard_frozen_within_cycle_block"] is False
+    assert payload["fatigue_engine"] == "v10.2.29_persistent_site_state_coupled_cyclic"
+    stored = json.loads((tmp_path / "v10_2_29_fixed_deltaK_control.json").read_text())
+    assert stored["state_coupled_cleavage_hazard"] is True
