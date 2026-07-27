@@ -10,6 +10,7 @@ from .persistent_site_vhcf_selector_v10229 import (
 _ORIGINAL_INTEGRATE_ONE_CYCLE = None
 _ORIGINAL_CHOOSE_BLOCK_DIAGNOSTIC = None
 _ORIGINAL_CYCLE_STEP_FRONT = None
+_ACTIVE_STEP_CONTEXT = None
 
 
 def install_engine_native_cycle_preview() -> None:
@@ -32,6 +33,11 @@ def install_engine_native_cycle_preview() -> None:
 
     def delegated_choose(self, pred, user_block_cycles=None):
         linear = original_choose(self, pred, user_block_cycles)
+        if getattr(pred, "_v10229_vhcf_engine", None) is None:
+            context = _ACTIVE_STEP_CONTEXT
+            if context is not None:
+                front, waveform, temperature = context
+                attach_prediction_context(pred, front, waveform, temperature)
         return select_nonlinear_block(self, pred, user_block_cycles, linear)
 
     def delegated_step(
@@ -42,6 +48,7 @@ def install_engine_native_cycle_preview() -> None:
         requested_cycles=None,
         force_cycles=None,
     ):
+        global _ACTIVE_STEP_CONTEXT
         if (
             bool(getattr(front, "persistent_site_cyclic_v10229", False))
             and force_cycles is not None
@@ -53,9 +60,11 @@ def install_engine_native_cycle_preview() -> None:
             # the same selected block; for multiple fronts it can only reduce the
             # globally approved block, never increase it.
             old_max = float(self.cfg.max_block_cycles)
+            old_context = _ACTIVE_STEP_CONTEXT
             cap = max(float(force_cycles), 0.0)
             try:
                 self.cfg.max_block_cycles = min(old_max, cap)
+                _ACTIVE_STEP_CONTEXT = (front, waveform, float(T_K))
                 return front.cycle_step_waveform(
                     self,
                     waveform,
@@ -64,6 +73,7 @@ def install_engine_native_cycle_preview() -> None:
                     force_cycles=None,
                 )
             finally:
+                _ACTIVE_STEP_CONTEXT = old_context
                 self.cfg.max_block_cycles = old_max
         return original_step(
             self,
@@ -86,6 +96,7 @@ def restore_engine_native_cycle_preview() -> None:
     global _ORIGINAL_INTEGRATE_ONE_CYCLE
     global _ORIGINAL_CHOOSE_BLOCK_DIAGNOSTIC
     global _ORIGINAL_CYCLE_STEP_FRONT
+    global _ACTIVE_STEP_CONTEXT
     if _ORIGINAL_INTEGRATE_ONE_CYCLE is not None:
         FatigueCycleHazardController.integrate_one_cycle = (
             _ORIGINAL_INTEGRATE_ONE_CYCLE
@@ -99,6 +110,7 @@ def restore_engine_native_cycle_preview() -> None:
     if _ORIGINAL_CYCLE_STEP_FRONT is not None:
         FatigueCycleHazardController.cycle_step_front = _ORIGINAL_CYCLE_STEP_FRONT
         _ORIGINAL_CYCLE_STEP_FRONT = None
+    _ACTIVE_STEP_CONTEXT = None
 
 
 __all__ = ["install_engine_native_cycle_preview", "restore_engine_native_cycle_preview"]
