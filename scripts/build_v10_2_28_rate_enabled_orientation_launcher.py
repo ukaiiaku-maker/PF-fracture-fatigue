@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build a temporary rate-aware v10.2.28 orientation launcher.
 
-The validated base orientation launcher remains unchanged.  This builder adds
+The validated base orientation launcher remains unchanged. This builder adds
 loading-rate provenance to its campaign lock and to the inherited per-case
 scheduler, while replacing only the nominal monotonic ``dU``/``dt`` inputs.
 """
@@ -60,7 +60,7 @@ def transform(source: str) -> str:
     adapter_marker = '''scheduler = scheduler.replace(increment, "", 1)
 
 for old, new in replacements.items():'''
-    adapter_replacement = '''scheduler = scheduler.replace(increment, "", 1)
+    adapter_replacement = """scheduler = scheduler.replace(increment, "", 1)
 
 
 def replace_scheduler_exact(old, new, expected_count=1, label="scheduler token"):
@@ -124,7 +124,7 @@ replace_scheduler_exact(
     label="case contract schema",
 )
 
-for old, new in replacements.items():'''
+for old, new in replacements.items():"""
     text = _replace_exact(
         text,
         adapter_marker,
