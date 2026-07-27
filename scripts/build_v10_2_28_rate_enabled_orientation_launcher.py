@@ -102,7 +102,7 @@ replace_scheduler_exact(
     label="case contract rate insertion",
 )
 replace_scheduler_exact(
-    '    f"--crystal-theta-deg {os.environ[\'THETA\']}",',
+    '    f"--crystal-theta-deg {os.environ[\\'THETA\\']}",',
     '''    f"--crystal-theta-deg {os.environ['THETA']}",
     f"--dU {os.environ['DU_M']}",
     f"--dt {os.environ['DT_S']}",''',
