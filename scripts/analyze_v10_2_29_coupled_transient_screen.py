@@ -51,7 +51,7 @@ def summarize_case(control_path: Path) -> dict | None:
     control = load_json(control_path)
 
     cumulative = 0.0
-    event_cycle = math.nan
+    event_cycle: float | None = None
     event_count = 0
     max_log_span = 0.0
     max_state_ratio = 0.0
@@ -67,7 +67,7 @@ def summarize_case(control_path: Path) -> dict | None:
         cumulative += consumed
         if bool(record.get("fired", False)):
             event_count += 1
-            if not math.isfinite(event_cycle):
+            if event_cycle is None:
                 event_cycle = cumulative
         max_log_span = max(
             max_log_span,
@@ -95,9 +95,11 @@ def summarize_case(control_path: Path) -> dict | None:
     if not math.isfinite(lambda_min):
         lambda_min = 0.0
     if lambda_max > 0.0 and lambda_min > 0.0:
-        global_log_span = math.log10(lambda_max / lambda_min)
+        global_log_span: float | None = math.log10(lambda_max / lambda_min)
     elif lambda_max > 0.0:
-        global_log_span = math.inf
+        # A zero-to-positive transition is physically an unbounded logarithmic span.
+        # Store a null JSON value and use infinity only for candidate classification.
+        global_log_span = None
     else:
         global_log_span = 0.0
 
@@ -129,6 +131,7 @@ def summarize_case(control_path: Path) -> dict | None:
         "right_censored": event_count == 0,
         "maximum_record_log_lambda_span_decades": max_log_span,
         "global_log_lambda_span_decades": global_log_span,
+        "lambda_started_from_zero": bool(lambda_max > 0.0 and lambda_min <= 0.0),
         "maximum_segment_state_target_ratio": max_state_ratio,
         "lambda_min_s": lambda_min,
         "lambda_max_s": lambda_max,
@@ -179,16 +182,21 @@ def main() -> None:
         raise SystemExit(f"no coupled transient cases found below {root}")
 
     for row in rows:
+        stored_span = row["global_log_lambda_span_decades"]
+        classification_span = (
+            math.inf if row["lambda_started_from_zero"] else float(stored_span or 0.0)
+        )
         row["coupled_transient_candidate"] = bool(
-            float(row["global_log_lambda_span_decades"])
-            >= float(args.minimum_log_lambda_span_decades)
+            classification_span >= float(args.minimum_log_lambda_span_decades)
             and float(row["maximum_segment_state_target_ratio"])
             >= float(args.minimum_state_target_ratio)
         )
+        first_event = row["first_event_cycle"]
         row["delayed_event_candidate"] = bool(
             row["coupled_transient_candidate"]
             and int(row["event_count"]) > 0
-            and float(row["first_event_cycle"]) > 0.0
+            and first_event is not None
+            and float(first_event) > 0.0
         )
         row["censored_transient_candidate"] = bool(
             row["coupled_transient_candidate"] and bool(row["right_censored"])
@@ -213,10 +221,9 @@ def main() -> None:
         "cases": rows,
     }
     write_csv(root / "coupled_transient_screen.csv", rows)
-    (root / "coupled_transient_screen.json").write_text(
-        json.dumps(payload, indent=2, sort_keys=True, allow_nan=True) + "\n"
-    )
-    print(json.dumps(payload, indent=2, sort_keys=True, allow_nan=True))
+    text = json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    (root / "coupled_transient_screen.json").write_text(text)
+    print(text, end="")
     if args.require_candidate and not candidates:
         raise SystemExit("ERROR: coupled transient screen found no qualifying case")
 
