@@ -146,7 +146,13 @@ def aggregate(cases: list[dict], measurements: list[dict]) -> list[dict]:
     return rows
 
 
-def plot_summary(path: Path, rows: list[dict]) -> None:
+def plot_summary(
+    path: Path,
+    rows: list[dict],
+    *,
+    x_key: str,
+    x_label: str,
+) -> None:
     valid = [
         row for row in rows
         if math.isfinite(float(row["median_da_dN_m_per_cycle"]))
@@ -154,7 +160,7 @@ def plot_summary(path: Path, rows: list[dict]) -> None:
     ]
     fig, ax = plt.subplots(figsize=(7.0, 5.2))
     if valid:
-        x = np.asarray([float(row["target_deltaK_MPa_sqrt_m"]) for row in valid])
+        x = np.asarray([float(row[x_key]) for row in valid])
         y = np.asarray([float(row["median_da_dN_m_per_cycle"]) for row in valid])
         lo = y - np.asarray([float(row["p16_da_dN_m_per_cycle"]) for row in valid])
         hi = np.asarray([float(row["p84_da_dN_m_per_cycle"]) for row in valid]) - y
@@ -167,7 +173,7 @@ def plot_summary(path: Path, rows: list[dict]) -> None:
             capsize=3,
         )
         ax.set_yscale("log")
-    ax.set_xlabel(r"$\Delta K$ (MPa$\sqrt{\mathrm{m}}$)")
+    ax.set_xlabel(x_label)
     ax.set_ylabel(r"Developed-state $da/dN$ (m/cycle)")
     ax.set_title("Rates after the configured crack-extension development window")
     fig.tight_layout()
@@ -188,7 +194,18 @@ def main() -> None:
     write_csv(root / "developed_fatigue_case_summary.csv", cases)
     write_csv(root / "developed_fatigue_event_rates.csv", measurements)
     write_csv(root / "developed_fatigue_deltaK_summary.csv", summary)
-    plot_summary(root / "developed_fatigue_da_dN_vs_deltaK.png", summary)
+    plot_summary(
+        root / "developed_fatigue_da_dN_vs_deltaK.png",
+        summary,
+        x_key="target_deltaK_MPa_sqrt_m",
+        x_label=r"$\Delta K$ (MPa$\sqrt{\mathrm{m}}$)",
+    )
+    plot_summary(
+        root / "developed_fatigue_da_dN_vs_Kmax.png",
+        summary,
+        x_key="target_Kmax_MPa_sqrt_m",
+        x_label=r"$K_{\max}$ (MPa$\sqrt{\mathrm{m}}$)",
+    )
 
     payload = {
         "schema": SCHEMA,
