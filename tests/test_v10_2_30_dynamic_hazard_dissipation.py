@@ -38,7 +38,9 @@ def test_Gamma_haz_is_recomputed_from_temperature_stress_and_state():
     G_stressed, _ = hazard_dissipation_density_J_per_m2(
         engine, 300.0, 5.0e9, 1.0
     )
-    engine.state_shift_eV = -0.4
+    # Use a state perturbation different from the 0.4 eV stress perturbation
+    # above so the test independently resolves all three dependencies.
+    engine.state_shift_eV = -0.2
     G_evolved, _ = hazard_dissipation_density_J_per_m2(
         engine, 300.0, 1.0e9, 1.0
     )
