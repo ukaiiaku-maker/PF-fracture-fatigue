@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BUILD_SCHEMA = "v10.2.28_direct_prescribed_geometry_kernel_build_v1"
 VALIDATION_SCHEMA = "v10.2.28_direct_kernel_validation_v1"
 PROVIDER_ID = "v10.2.28_direct_prescribed_geometry_fem_v1"
+DIRECT_COVERAGE_GUARD_CHECKPOINTS = 2.0
 
 _LEGACY_CONFIGURATION = _legacy._configuration
 _LEGACY_VALIDATE_PROMOTION = _legacy._validate_promotion_evidence
@@ -34,17 +35,20 @@ _LEGACY_REQUIRED_MAX_EXTENSION = _legacy.required_max_extension_um
 
 
 def required_max_extension_um(**kwargs) -> float:
-    """Return strict coverage with one extra physical checkpoint of guard space.
+    """Return strict coverage with two physical checkpoints of guard space.
 
     The v10.2.27 bound covers the target projection plus one maximum stochastic
-    event.  The moving process-zone state can begin resolving the next partial
-    checkpoint before the outer driver observes the completed target event.  Add
-    one full ``da_phys`` checkpoint so strict interpolation never depends on
-    floating-point endpoint coincidence or clips a legitimate final-state query.
+    event.  The continuously translated process-zone state is resolved before
+    the outer geometry transaction and target-completion check are committed.
+    One checkpoint covers that geometry/microstate phase lag.  A second covers
+    the post-advance constitutive re-resolution that occurs inside the final
+    moving-tip substep.  Reserving complete physical checkpoints keeps the
+    coverage contract mesh-independent and avoids endpoint clipping or a
+    floating-point tolerance in the strict signed-kernel resolver.
     """
     base = _LEGACY_REQUIRED_MAX_EXTENSION(**kwargs)
     checkpoint = max(float(kwargs.get("da_phys_um", 0.0)), 0.0)
-    return base + checkpoint
+    return base + DIRECT_COVERAGE_GUARD_CHECKPOINTS * checkpoint
 
 
 def _configuration(args: argparse.Namespace) -> MechanicalKernelConfiguration:
@@ -246,6 +250,7 @@ __all__ = [
     "BUILD_SCHEMA",
     "VALIDATION_SCHEMA",
     "PROVIDER_ID",
+    "DIRECT_COVERAGE_GUARD_CHECKPOINTS",
     "build_parser",
     "main",
     "required_max_extension_um",
