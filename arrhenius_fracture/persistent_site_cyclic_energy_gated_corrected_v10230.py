@@ -9,7 +9,6 @@ attempt and the next stochastic threshold remains active.
 """
 from __future__ import annotations
 
-import copy
 from typing import Any
 
 from . import hazard_energy_event_gate_v10230 as _gate
@@ -18,6 +17,11 @@ from . import stochastic_avalanche_tip as _avalanche_tip
 
 
 MODEL_ID = "v10.2.30_corrected_transactional_energy_gated_cyclic"
+_ZERO_LENGTH_ARREST_REASONS = {
+    "no_energy_admissible_increment",
+    "no_mesh_resolved_admissible_increment",
+    "no_mesh_resolved_topology_change",
+}
 
 
 class CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine(
@@ -135,7 +139,7 @@ class CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine(
         row = log[-1]
         if bool(row.get("inserted", True)):
             return None
-        if str(row.get("arrest_reason", "")) != "no_energy_admissible_increment":
+        if str(row.get("arrest_reason", "")) not in _ZERO_LENGTH_ARREST_REASONS:
             return None
         if float(row.get("committed_event_length_m", 0.0)) > 0.0:
             return None
