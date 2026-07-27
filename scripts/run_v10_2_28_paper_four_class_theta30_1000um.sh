@@ -217,6 +217,71 @@ for old, new in replacements.items():
     if old not in scheduler:
         raise SystemExit(f"ERROR: scheduler source no longer contains expected token: {old}")
     scheduler = scheduler.replace(old, new)
+
+strict_header = "set -u\nset -o pipefail"
+if strict_header not in scheduler:
+    raise SystemExit("ERROR: scheduler strict-mode header changed")
+scheduler = scheduler.replace(strict_header, "set -euo pipefail", 1)
+
+canonical_validation = '''options = os.environ["OPTIONS"].split()
+expected_options = [
+    "v913_paper_peak01_0242980_persistent_sites",
+    "v913_paper_dbtt01_0202500_persistent_sites",
+    "v913_paper_weakT01_0129902_persistent_sites",
+    "v913_paper_ceramic01_0077080_persistent_sites",
+]
+if options != expected_options:
+    raise SystemExit(f"ERROR: OPTIONS must retain canonical order: {expected_options}")'''
+subset_validation = '''options = os.environ["OPTIONS"].split()
+expected_options = [
+    "v913_paper_peak01_0242980_persistent_sites",
+    "v913_paper_dbtt01_0202500_persistent_sites",
+    "v913_paper_weakT01_0129902_persistent_sites",
+    "v913_paper_ceramic01_0077080_persistent_sites",
+]
+if not options:
+    raise SystemExit("ERROR: OPTIONS must contain at least one canonical option")
+if len(options) != len(set(options)):
+    raise SystemExit("ERROR: OPTIONS contains duplicate entries")
+unknown_options = [value for value in options if value not in expected_options]
+if unknown_options:
+    raise SystemExit(f"ERROR: OPTIONS contains unknown entries: {unknown_options}")
+option_indices = [expected_options.index(value) for value in options]
+if option_indices != sorted(option_indices):
+    raise SystemExit(f"ERROR: OPTIONS subset must retain canonical order: {expected_options}")'''
+if canonical_validation not in scheduler:
+    raise SystemExit("ERROR: scheduler canonical option validation changed")
+scheduler = scheduler.replace(canonical_validation, subset_validation, 1)
+
+seed_loop = "for option_index, option in enumerate(options):"
+if seed_loop not in scheduler:
+    raise SystemExit("ERROR: scheduler Python seed loop changed")
+scheduler = scheduler.replace(
+    seed_loop,
+    "for option in options:\n    option_index = expected_options.index(option)",
+    1,
+)
+
+shell_loop = '''option_index=0
+for option in $OPTIONS; do
+  temperature_index=0'''
+shell_subset_loop = '''for option in $OPTIONS; do
+  case "$option" in
+    v913_paper_peak01_0242980_persistent_sites) option_index=0 ;;
+    v913_paper_dbtt01_0202500_persistent_sites) option_index=1 ;;
+    v913_paper_weakT01_0129902_persistent_sites) option_index=2 ;;
+    v913_paper_ceramic01_0077080_persistent_sites) option_index=3 ;;
+    *) echo "ERROR: unknown option in seed map: $option" >&2; exit 2 ;;
+  esac
+  temperature_index=0'''
+if shell_loop not in scheduler:
+    raise SystemExit("ERROR: scheduler shell option loop changed")
+scheduler = scheduler.replace(shell_loop, shell_subset_loop, 1)
+increment = "  option_index=$((option_index + 1))\n"
+if increment not in scheduler:
+    raise SystemExit("ERROR: scheduler shell option-index increment changed")
+scheduler = scheduler.replace(increment, "", 1)
+
 plotter = source_plotter.read_text()
 for old, new in replacements.items():
     plotter = plotter.replace(old, new)
