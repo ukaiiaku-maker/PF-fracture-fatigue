@@ -40,6 +40,17 @@ class CoupledPersistentSiteCyclicTipEngine(PersistentSiteCyclicTipEngine):
         escaped_pre = float(self.mpz.escaped_total)
         emitted_pre = float(self.mpz.emitted_total)
         N_pre = float(self.N_em)
+        micro_advance_pre = float(self.micro_advance_total_m)
+        self.sigma_tip(float(waveform.Kmax))
+        diagnostics_pre = self.mpz.diagnostics(self.G, self.nu, self.b, self.f.r0)
+        active_signed_pre = float(self._active_shielding_signed())
+        wake_signed_pre = float(self._wake_shielding_signed())
+        sigma_back_pre = float(
+            diagnostics_pre.get(
+                "persistent_sigma_back_mean_Pa",
+                getattr(self.mpz, "continuum_source_last_sigma_back_Pa", 0.0),
+            )
+        )
 
         coupled = integrate_state_coupled_waveform(
             self,
@@ -107,6 +118,15 @@ class CoupledPersistentSiteCyclicTipEngine(PersistentSiteCyclicTipEngine):
             "N_em_shed_to_wake": float(
                 advance.get("wake_mobile", 0.0) + advance.get("wake_retained", 0.0)
             ),
+            "state_N_em_pre": N_pre,
+            "state_mobile_count_pre": mobile_pre,
+            "state_retained_count_pre": retained_pre,
+            "state_emitted_total_pre": emitted_pre,
+            "state_escaped_total_pre": escaped_pre,
+            "state_micro_advance_total_m_pre": micro_advance_pre,
+            "state_active_K_shield_signed_Pa_sqrt_m_pre": active_signed_pre,
+            "state_wake_K_shield_signed_Pa_sqrt_m_pre": wake_signed_pre,
+            "state_sigma_back_Pa_pre": sigma_back_pre,
             "dN_emit_block": dN_emit,
             "dN_store_block": dN_retained,
             "dN_mobile_block": dN_mobile,
