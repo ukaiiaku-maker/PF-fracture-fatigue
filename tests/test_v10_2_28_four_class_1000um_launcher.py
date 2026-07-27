@@ -141,3 +141,19 @@ def test_stale_scheduler_rows_are_replaced_only_as_compatibility_inputs():
     assert source.count("v913_paper_ceramic01_0189364_persistent_sites") == 1
     assert '"v913_paper_weakT01_0129902_persistent_sites"' in source
     assert '"v913_paper_ceramic01_0077080_persistent_sites"' in source
+
+
+def test_generated_scheduler_supports_ordered_subsets_and_fails_closed():
+    source = IMPLEMENTATION.read_text()
+    required_tokens = (
+        'scheduler.replace(strict_header, "set -euo pipefail", 1)',
+        "OPTIONS must contain at least one canonical option",
+        "OPTIONS subset must retain canonical order",
+        "option_index = expected_options.index(option)",
+        "v913_paper_peak01_0242980_persistent_sites) option_index=0",
+        "v913_paper_dbtt01_0202500_persistent_sites) option_index=1",
+        "v913_paper_weakT01_0129902_persistent_sites) option_index=2",
+        "v913_paper_ceramic01_0077080_persistent_sites) option_index=3",
+    )
+    for token in required_tokens:
+        assert token in source
