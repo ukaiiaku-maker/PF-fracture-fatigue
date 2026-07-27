@@ -18,6 +18,7 @@ from arrhenius_fracture.kernel_resolver_v10227 import (
 )
 from arrhenius_fracture.kernel_resolver_v10228 import (
     BUILD_SCHEMA,
+    DIRECT_COVERAGE_GUARD_CHECKPOINTS,
     VALIDATION_SCHEMA,
     _validate_direct_evidence,
     required_max_extension_um,
@@ -59,7 +60,7 @@ def test_normalization_contract_preserves_current_production_defaults():
     )
 
 
-def test_direct_coverage_adds_one_physical_checkpoint_guard():
+def test_direct_coverage_adds_two_physical_checkpoint_guards():
     kwargs = {
         "target_extension_um": 1000.0,
         "theta_deg": 15.0,
@@ -70,9 +71,9 @@ def test_direct_coverage_adds_one_physical_checkpoint_guard():
     }
     legacy = legacy_required_max_extension_um(**kwargs)
     guarded = required_max_extension_um(**kwargs)
-    assert guarded == pytest.approx(legacy + 5.0, rel=0.0, abs=1.0e-12)
-    assert legacy < 1055.0955538978697
-    assert guarded > 1055.0955538978697
+    assert DIRECT_COVERAGE_GUARD_CHECKPOINTS == 2.0
+    assert guarded == pytest.approx(legacy + 10.0, rel=0.0, abs=1.0e-12)
+    assert guarded > 1060.0963066392914
 
 
 def test_anchor_plan_is_geometric_and_seed_free():
