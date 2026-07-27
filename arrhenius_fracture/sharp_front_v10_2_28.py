@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 from . import sharp_front_v10_2_27 as _base
+from .kernel_extension_coordinate_v10228 import install_direction_tracker
 
 MODEL_ID = "v10.2.28_paper_four_class_direct_prescribed_geometry_kernel"
 
@@ -138,6 +139,7 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
 
 
 def main(argv=None):
+    install_direction_tracker()
     original_resolver = _base._resolve_signed_kernel
     original_model_id = _base.MODEL_ID
     _base._resolve_signed_kernel = _resolve_signed_kernel
