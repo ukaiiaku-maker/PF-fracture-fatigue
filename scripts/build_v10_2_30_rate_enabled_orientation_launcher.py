@@ -154,8 +154,7 @@ replace_scheduler_exact(
     f"--parameter-option {expected['option']}",''',
     label="completed-case model command verification",
 )
-
-for old, new in replacements.items():"""
+"""
     return template.replace(_MODEL_TOKEN, MODEL_ENTRY)
 
 
@@ -212,11 +211,23 @@ def transform(source: str) -> str:
         label="gate generated-scheduler filename",
     )
 
-    adapter_marker = "for old, new in replacements.items():"
+    adapter_marker = '''for old, new in replacements.items():
+    if old not in scheduler:
+        raise SystemExit(f"ERROR: scheduler source no longer contains expected token: {old}")
+    scheduler = scheduler.replace(old, new)
+
+plotter = source_plotter.read_text()'''
+    adapter_replacement = '''for old, new in replacements.items():
+    if old not in scheduler:
+        raise SystemExit(f"ERROR: scheduler source no longer contains expected token: {old}")
+    scheduler = scheduler.replace(old, new)
+
+''' + _gate_scheduler_adapter() + '''
+plotter = source_plotter.read_text()'''
     text = _replace_exact(
         text,
         adapter_marker,
-        _gate_scheduler_adapter(),
+        adapter_replacement,
         label="embedded scheduler gate adapter",
     )
     return text
