@@ -48,6 +48,7 @@ def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
         json.dumps(
             {
                 "temperature_K": 300.0,
+                "crystal_theta_deg": 30.0,
                 "deltaK_fraction": 0.8,
                 "energy_gate_trial_fraction": 0.1,
             }
@@ -95,6 +96,7 @@ def test_qualification_analyzer_validates_hazard_energy_event(tmp_path):
     assert row["committed_events"] == 1
     assert row["truncated_events"] == 1
     assert row["cycles_consumed"] == 1000.0
+    assert row["crystal_theta_deg"] == pytest.approx(30.0)
     assert row["projected_extension_um"] == pytest.approx(3.0)
     assert row["path_extension_um"] == pytest.approx(4.0)
     assert row["path_tortuosity"] == pytest.approx(4.0 / 3.0)
