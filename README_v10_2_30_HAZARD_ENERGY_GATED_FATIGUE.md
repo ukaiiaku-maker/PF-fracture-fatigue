@@ -41,4 +41,6 @@ Run `scripts/run_v10_2_30_three_deltaK_energy_gate_qualification.sh` against a m
 - projected `da_x/dN` and path-length `ds/dN` outputs;
 - anisotropic direction and relative-orientation audits.
 
-The four-class production `da/dN` sweep remains blocked until this physical qualification passes.
+The dedicated v10.2.30 workflow compiles the additive point release and runs the corrected energy-gate, transactional-engine, fixed-DeltaK, qualification-tool, and inherited v10.2.29 cyclic-accounting contracts. The repository-wide legacy preflight is tracked separately.
+
+The four-class production `da/dN` sweep remains blocked until the local physical qualification passes.
