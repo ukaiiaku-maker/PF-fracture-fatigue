@@ -91,11 +91,22 @@ def test_launcher_locks_requested_geometry_and_direct_provider():
         "--da-phys-um 5",
         "scripts/ensure_v10_2_28_signed_kernel.py",
         "v10.2.28_direct_prescribed_geometry_fem_v1",
-        "v10.2.28_paper_four_class_orientation_1000um_campaign_lock_v1",
+        "v10.2.28_paper_four_class_orientation_1000um_campaign_lock_v2",
         "arrhenius_fracture.sharp_front_v10_2_28_audited",
+        "projected_ligament_extension",
+        "projected_ligament_equivalent",
+        "SIGNED_KERNEL_NOMINAL_FORWARD_COS",
     )
     for token in required_tokens:
         assert token in source
+
+
+def test_launcher_computes_direct_provider_nominal_forward_cosine():
+    source = IMPLEMENTATION.read_text()
+    assert "max(abs(math.cos(theta)), abs(math.sin(theta)))" in source
+    assert "accumulated_actual_projected_ligament_advance_divided_by_" in source
+    assert 'SIGNED_KERNEL_EXTENSION_COORDINATE="$SIGNED_KERNEL_EXTENSION_COORDINATE"' in source
+    assert 'SIGNED_KERNEL_NOMINAL_FORWARD_COS="$SIGNED_KERNEL_NOMINAL_FORWARD_COS"' in source
 
 
 def test_launcher_accepts_any_finite_orientation():
