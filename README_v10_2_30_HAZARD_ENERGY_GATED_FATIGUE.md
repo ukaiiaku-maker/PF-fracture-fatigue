@@ -28,19 +28,33 @@ During waiting cycles the geometric tip is stationary while the persistent-site 
 
 ## Qualification gate
 
-Run `scripts/run_v10_2_30_three_deltaK_energy_gate_qualification.sh` against a matching monotonic first-passage case. The gate requires:
+The low-level one-class primitive is:
+
+`scripts/run_v10_2_30_three_deltaK_energy_gate_qualification.sh`
+
+It requires one matching monotonic first-passage reference and supports class-specific DeltaK fractions for bracketing and numerical refinement.
+
+The release gate for the canonical material set is:
+
+`scripts/run_v10_2_30_four_class_three_deltaK_energy_gate_qualification.sh`
+
+It requires `PEAK_REFERENCE_ROOT`, `DBTT_REFERENCE_ROOT`, `WEAKT_REFERENCE_ROOT`, and `CERAMIC_REFERENCE_ROOT`. The wrapper runs the exact peak, DBTT, weak-T, and ceramic-like rows with separate class seed namespaces while retaining common random numbers between each class's primary and refined event-length trials.
+
+The four-class gate requires:
 
 - exact fixed-DeltaK control;
-- at least one propagated and one censored case;
+- at least one propagated and one censored case for every material class;
 - no independent fracture energy;
 - no change to first-passage kinetics;
 - no non-energy geometry veto;
 - mesh-resolved topology for every committed event;
 - event energy closure;
-- common-seed event-length convergence under trial-fraction refinement;
+- common-seed event-length convergence under 0.10 to 0.05 trial-fraction refinement for every class;
+- at least one positive committed event truncated by the energy balance across the four-class matrix;
+- unique class seed namespaces;
 - projected `da_x/dN` and path-length `ds/dN` outputs;
 - anisotropic direction and relative-orientation audits.
 
-The dedicated v10.2.30 workflow compiles the additive point release and runs the corrected energy-gate, transactional-engine, fixed-DeltaK, qualification-tool, and inherited v10.2.29 cyclic-accounting contracts. The repository-wide legacy preflight is tracked separately.
+The final machine-readable release gate is `v10_2_30_four_class_qualification_gate.json`. The four-class production `da/dN` sweep remains blocked unless its `pass` field is true.
 
-The four-class production `da/dN` sweep remains blocked until the local physical qualification passes.
+The dedicated v10.2.30 workflow compiles the additive point release and runs the corrected energy-gate, transactional-engine, fixed-DeltaK, one-class and four-class qualification-tool, and inherited v10.2.29 cyclic-accounting contracts. The repository-wide legacy preflight is tracked separately.
