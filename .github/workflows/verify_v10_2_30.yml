@@ -31,6 +31,7 @@ jobs:
             arrhenius_fracture/sharp_front_v10_2_30_fixed_deltaK.py \
             scripts/analyze_v10_2_30_energy_gated_qualification.py
           bash -n scripts/run_v10_2_30_three_deltaK_energy_gate_qualification.sh
+          bash -n scripts/run_v10_2_30_four_class_three_deltaK_energy_gate_qualification.sh
       - name: Run v10.2.30 regressions
         run: |
           python -m pytest -q --tb=short \
@@ -40,6 +41,7 @@ jobs:
             tests/test_v10_2_30_entry_wiring.py \
             tests/test_v10_2_30_fixed_deltaK_entry.py \
             tests/test_v10_2_30_qualification_tools.py \
+            tests/test_v10_2_30_four_class_qualification_runner.py \
             tests/test_v10_2_29_fixed_deltaK_entry.py \
             tests/test_v10_2_29_event_cycle_accounting.py \
             tests/test_v10_2_29_state_coupled_hazard.py \
