@@ -6,9 +6,11 @@ from pathlib import Path
 import sys
 
 from . import crystal as _crystal
+from . import fatigue_controller_delegate_v10229 as _delegate
 from . import fatigue_v1 as _fatigue_v1
 from . import fem as _fem
 from . import hazard_energy_event_gate_v10230 as _energy_gate
+from . import persistent_site_vhcf_coupled_selector_v10230 as _vhcf_selector
 from . import sharp_front_v10_1_7_3 as _avalanche
 from . import sharp_front_v10_2_29_fatigue_audited as _v10229
 from .hazard_energy_event_gate_v10230 import (
@@ -30,6 +32,11 @@ from .hazard_energy_event_gate_mesh_consistent_v10230 import (
 from .persistent_site_cyclic_energy_gated_corrected_v10230 import (
     CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine,
     MODEL_ID as CORRECTED_ENGINE_MODEL_ID,
+)
+from .persistent_site_trial_clone_v10230 import (
+    MODEL_ID as TRIAL_CLONE_MODEL_ID,
+    install_fast_trial_clone,
+    restore_fast_trial_clone,
 )
 
 
@@ -84,6 +91,14 @@ def _write_audit(args: list[str]) -> None:
             ),
             "transactional_engine_model_id": CORRECTED_ENGINE_MODEL_ID,
             "event_length_search_model_id": MESH_SEARCH_MODEL_ID,
+            "vhcf_block_selector_model_id": _vhcf_selector.MODEL_ID,
+            "vhcf_block_search_strategy": (
+                "linear_seed_geometric_bracket_log_bisection"
+            ),
+            "vhcf_full_horizon_first_trial": False,
+            "vhcf_physical_increment_targets_changed": False,
+            "trial_clone_model_id": TRIAL_CLONE_MODEL_ID,
+            "trial_rng_seedsequence_reduce_path_avoided": True,
             "persistent_site_source": True,
             "anisotropic_direction_competition": True,
             "four_class_registry_preserved": True,
@@ -128,6 +143,8 @@ def main(argv=None):
     original_discrete = _crystal.cleavage_branch_candidates
     original_energy_search = _energy_gate.energy_gate_event_length
     original_waveform = _fatigue_v1.FatigueWaveform
+    original_attach_prediction_context = _delegate.attach_prediction_context
+    original_select_nonlinear_block = _delegate.select_nonlinear_block
 
     OBSERVER.original_assemble = original_assemble
     _fem.assemble_mechanics = wrap_assemble_mechanics(original_assemble)
@@ -137,13 +154,14 @@ def main(argv=None):
     _crystal.cleavage_branch_candidates = wrap_cleavage_branch_candidates(
         original_discrete
     )
-    _energy_gate.energy_gate_event_length = (
-        energy_gate_event_length_mesh_consistent
-    )
+    _energy_gate.energy_gate_event_length = energy_gate_event_length_mesh_consistent
     _v10229.AuditedCoupledPersistentSiteCyclicTipEngine = (
         CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine
     )
     _fatigue_v1.FatigueWaveform = _observed_waveform_factory(original_waveform)
+    _delegate.attach_prediction_context = _vhcf_selector.attach_prediction_context
+    _delegate.select_nonlinear_block = _vhcf_selector.select_nonlinear_block
+    install_fast_trial_clone()
 
     def gated_builder(
         local_args,
@@ -167,7 +185,8 @@ def main(argv=None):
             "resistance=gamma_rel*m_hits*DeltaG_eff/b^2 "
             "event=min(stochastic_proposal,energy_arrest) "
             "event_load=Kmax continuum_gate=diagnostic_only "
-            "mesh_commit=required Gc0_athermal=off"
+            "block_search=linear_seed_geometric_bracket "
+            "trial_rng_clone=state_exact Gc0_athermal=off"
         )
         result = _v10229.main(args)
         out = _option_value(args, "--out")
@@ -177,6 +196,9 @@ def main(argv=None):
         return result
     finally:
         _avalanche.build_avalanche_backend = original_avalanche_builder
+        restore_fast_trial_clone()
+        _delegate.select_nonlinear_block = original_select_nonlinear_block
+        _delegate.attach_prediction_context = original_attach_prediction_context
         _fatigue_v1.FatigueWaveform = original_waveform
         _v10229.AuditedCoupledPersistentSiteCyclicTipEngine = original_engine
         _energy_gate.energy_gate_event_length = original_energy_search
