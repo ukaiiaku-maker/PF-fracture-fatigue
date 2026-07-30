@@ -17,6 +17,7 @@ from arrhenius_fracture import sharp_front_v10_4_bulk_peierls_taylor as entry
 ROW = {
     "option_key": "test_option",
     "candidate_id": "test_candidate",
+    "Tref_K": "481.33",
     "rho_forest_floor_m2": "5e12",
     "emit_G00_eV": "2.0",
     "emit_gT_eV_per_K": "0.002",
@@ -54,6 +55,7 @@ def test_exact_row_maps_to_bulk_configuration():
     assert cfg.rho_transport_c == 0.0
     assert cfg.exhaustion_enabled is False
     assert cfg.mobile_rho_floor == 5e12
+    assert cfg.pt_emit_Tref_K == pytest.approx(481.33)
     assert cfg.pt_peierls_energy_ratio == pytest.approx(0.25)
     assert cfg.pt_taylor_energy_ratio == pytest.approx(0.4)
     assert cfg.pt_peierls_entropy_ratio == pytest.approx(
@@ -63,12 +65,23 @@ def test_exact_row_maps_to_bulk_configuration():
     assert mapped["pt_emit_sigc0_Pa"] == pytest.approx(3e9)
 
 
-def test_coupled_wrapper_calls_original_and_records_nonnegative_work():
+def test_coupled_wrapper_uses_real_update_signature_and_records_work():
     parameters = BulkManifestParameters.from_row(ROW)
     coupling = BulkPlasticityCoupling(parameters)
     cfg = SimpleNamespace()
 
-    def original(ep, rho, sigma, mat, T, dt, disl_cfg, return_info=False):
+    def original(
+        ep,
+        rho,
+        sigma,
+        mat,
+        T,
+        dt,
+        plast_model,
+        disl_cfg,
+        return_info=False,
+    ):
+        assert disl_cfg is cfg
         assert disl_cfg.bulk_kinetics_model == "emission_derived_peierls_taylor_multihit"
         rho_out = rho + 1.0
         rate = np.full_like(rho, 2.0)
@@ -88,7 +101,17 @@ def test_coupled_wrapper_calls_original_and_records_nonnegative_work():
     ep = np.zeros((3, 2))
     rho = np.full(2, 5e12)
     sigma = np.zeros((3, 2))
-    result = wrapped(ep, rho, sigma, object(), 900.0, 1.0, cfg, True)
+    result = wrapped(
+        ep,
+        rho,
+        sigma,
+        object(),
+        900.0,
+        1.0,
+        object(),
+        cfg,
+        True,
+    )
 
     assert len(result) == 4
     payload = coupling.diagnostics.payload()
@@ -165,7 +188,6 @@ def test_emission_derived_series_rate_is_finite_and_stress_activated():
     cfg = SimpleNamespace(
         pt_emit_floor_min_eV=1e-4,
         pt_emit_floor_max_frac=0.95,
-        pt_emit_Tref_K=481.33,
         pt_taylor_renewal_time_s=1e-9,
         pt_mobile_fraction=0.01,
         pt_mobile_saturation_density_m2=1e14,
