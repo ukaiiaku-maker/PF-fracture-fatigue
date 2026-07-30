@@ -23,6 +23,7 @@ jobs:
       - name: Compile v10.2.30 modules and tools
         run: |
           python -m py_compile \
+            arrhenius_fracture/stochastic_avalanche_backend.py \
             arrhenius_fracture/hazard_energy_event_gate_v10230.py \
             arrhenius_fracture/hazard_energy_event_gate_mesh_consistent_v10230.py \
             arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py \
@@ -39,6 +40,7 @@ jobs:
       - name: Run v10.2.30 regressions
         run: |
           python -m pytest -q --tb=short \
+            tests/test_v10_2_30_diagnostic_serialization.py \
             tests/test_v10_2_30_hazard_energy_gate.py \
             tests/test_v10_2_30_energy_gate_contract.py \
             tests/test_v10_2_30_transactional_engine.py \
