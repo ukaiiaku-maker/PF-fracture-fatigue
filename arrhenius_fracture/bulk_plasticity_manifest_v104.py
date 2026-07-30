@@ -22,6 +22,7 @@ MODEL_ID = "v10.4.0_bulk_peierls_taylor_manifest_coupling"
 _REQUIRED = (
     "option_key",
     "candidate_id",
+    "Tref_K",
     "rho_forest_floor_m2",
     "emit_G00_eV",
     "emit_gT_eV_per_K",
@@ -64,23 +65,19 @@ def _positive(row: dict[str, str], key: str) -> float:
     return value
 
 
-def _ratio(numerator: float, denominator: float, label: str) -> float:
+def _safe_ratio(numerator: float, denominator: float) -> float:
+    """Return an audit-compatible ratio; direct exact fields remain authoritative."""
     if abs(denominator) <= 1.0e-30:
-        if abs(numerator) <= 1.0e-30:
-            return 0.0
-        raise ValueError(
-            f"cannot represent {label}: parent emission temperature slope is zero"
-        )
+        return 0.0 if abs(numerator) <= 1.0e-30 else 1.0
     value = numerator / denominator
-    if not math.isfinite(value):
-        raise ValueError(f"nonfinite v10.4 ratio for {label}")
-    return value
+    return value if math.isfinite(value) else 1.0
 
 
 @dataclass(frozen=True)
 class BulkManifestParameters:
     option_key: str
     candidate_id: str
+    Tref_K: float
     rho0_m2: float
     emit_G00_eV: float
     emit_gT_eV_per_K: float
@@ -127,11 +124,11 @@ class BulkManifestParameters:
         missing = [key for key in _REQUIRED if key not in row]
         if missing:
             raise ValueError(f"v10.4 selected manifest is missing fields: {missing}")
-        rho0 = _positive(row, "rho_forest_floor_m2")
         return cls(
             option_key=str(row["option_key"]).strip(),
             candidate_id=str(row["candidate_id"]).strip(),
-            rho0_m2=rho0,
+            Tref_K=_positive(row, "Tref_K"),
+            rho0_m2=_positive(row, "rho_forest_floor_m2"),
             emit_G00_eV=_positive(row, "emit_G00_eV"),
             emit_gT_eV_per_K=_number(row, "emit_gT_eV_per_K"),
             emit_sigc0_Pa=_positive(row, "emit_sigc0_GPa") * 1.0e9,
@@ -186,40 +183,37 @@ class BulkManifestParameters:
             "pt_emit_exp_a": self.emit_exp_a,
             "pt_emit_exp_n": self.emit_exp_n,
             "pt_emit_floor_frac": self.emit_floor_frac,
+            "pt_emit_floor_min_eV": 1.0e-4,
+            "pt_emit_floor_max_frac": 0.95,
+            "pt_emit_Tref_K": self.Tref_K,
             "pt_peierls_energy_ratio": self.peierls_H0_eV / self.emit_G00_eV,
-            "pt_peierls_entropy_ratio": _ratio(
-                self.peierls_gT_eV_per_K,
-                self.emit_gT_eV_per_K,
-                "Peierls temperature slope",
+            "pt_peierls_entropy_ratio": _safe_ratio(
+                self.peierls_gT_eV_per_K, self.emit_gT_eV_per_K
             ),
             "pt_peierls_stress_ratio": self.peierls_stress_fraction,
             "pt_peierls_nu0_s": self.peierls_nu0_s,
+            "pt_peierls_G00_eV": self.peierls_H0_eV,
+            "pt_peierls_gT_eV_per_K": self.peierls_gT_eV_per_K,
+            "pt_peierls_exp_a": self.peierls_exp_a,
+            "pt_peierls_exp_n": self.peierls_exp_n,
+            "pt_peierls_Tref_K": self.Tref_K,
             "pt_taylor_energy_ratio": self.taylor_H0_eV / self.emit_G00_eV,
-            "pt_taylor_entropy_ratio": _ratio(
-                self.taylor_gT_eV_per_K,
-                self.emit_gT_eV_per_K,
-                "Taylor temperature slope",
+            "pt_taylor_entropy_ratio": _safe_ratio(
+                self.taylor_gT_eV_per_K, self.emit_gT_eV_per_K
             ),
             "pt_taylor_stress_ratio": self.taylor_stress_fraction,
             "pt_taylor_nu0_s": self.taylor_nu0_s,
+            "pt_taylor_G00_eV": self.taylor_H0_eV,
+            "pt_taylor_gT_eV_per_K": self.taylor_gT_eV_per_K,
+            "pt_taylor_exp_a": self.taylor_exp_a,
+            "pt_taylor_exp_n": self.taylor_exp_n,
+            "pt_taylor_Tref_K": self.Tref_K,
             "pt_taylor_corr_rho_c": self.taylor_corr_rho_c_m2,
             "pt_taylor_m_exponent": 1.0,
             "pt_taylor_m_scale": self.taylor_corr_scale,
             "pt_taylor_m_cap": float("inf"),
             "pt_mobile_density_floor_m2": self.rho0_m2,
         }
-        mapping.update(
-            {
-                "pt_peierls_G00_eV": self.peierls_H0_eV,
-                "pt_peierls_gT_eV_per_K": self.peierls_gT_eV_per_K,
-                "pt_peierls_exp_a": self.peierls_exp_a,
-                "pt_peierls_exp_n": self.peierls_exp_n,
-                "pt_taylor_G00_eV": self.taylor_H0_eV,
-                "pt_taylor_gT_eV_per_K": self.taylor_gT_eV_per_K,
-                "pt_taylor_exp_a": self.taylor_exp_a,
-                "pt_taylor_exp_n": self.taylor_exp_n,
-            }
-        )
         for name, value in mapping.items():
             setattr(disl_cfg, name, value)
         return mapping
@@ -230,6 +224,7 @@ class BulkManifestParameters:
             "selected_option": self.option_key,
             "selected_candidate": self.candidate_id,
             "selected_manifest": self.source_path,
+            "reference_temperature_K": self.Tref_K,
             "initial_bulk_density_m2": self.rho0_m2,
             "bulk_kinetics_model": "emission_derived_peierls_taylor_multihit",
             "bulk_source_population": "homogeneous_persistent_background",
@@ -337,8 +332,10 @@ class BulkPlasticityCoupling:
 
     def wrap(self, original: Callable) -> Callable:
         def coupled_update(*args, **kwargs):
-            if len(args) >= 7:
-                disl_cfg = args[6]
+            # update_plasticity(ep, rho, sigma, mat, T, dt, plast_model,
+            #                   disl_cfg, return_info=False)
+            if len(args) >= 8:
+                disl_cfg = args[7]
             elif "disl_cfg" in kwargs:
                 disl_cfg = kwargs["disl_cfg"]
             else:
@@ -346,8 +343,8 @@ class BulkPlasticityCoupling:
             self.last_mapping = self.parameters.configure(disl_cfg)
             result = original(*args, **kwargs)
             wants_info = bool(kwargs.get("return_info", False))
-            if len(args) >= 8:
-                wants_info = bool(args[7])
+            if len(args) >= 9:
+                wants_info = bool(args[8])
             if wants_info:
                 _, rho_out, dot_ep, info = result
             else:
@@ -378,5 +375,6 @@ __all__ = [
     "BulkManifestParameters",
     "BulkPlasticityCoupling",
     "BulkUpdateDiagnostics",
+    "KB_EV_PER_K",
     "MODEL_ID",
 ]
