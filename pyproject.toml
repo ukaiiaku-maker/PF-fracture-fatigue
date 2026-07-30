@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.2.27"
-description = "Audited four-class 30 degree stochastic long-crack PF/sharp-front campaign"
+version = "10.4.0"
+description = "Experimental full-field Arrhenius Peierls-Taylor bulk coupling on the validated v10.2.30 sharp-front stack"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
