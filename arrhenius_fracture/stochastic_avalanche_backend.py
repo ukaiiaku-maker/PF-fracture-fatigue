@@ -29,6 +29,17 @@ from .stochastic_avalanche_tip import pop_pending_geometry_event
 _LAST_AVALANCHE_BACKEND = None
 
 
+def _json_default(value: Any):
+    """Convert NumPy diagnostic values to lossless JSON-native objects."""
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, np.generic):
+        return value.item()
+    if isinstance(value, Path):
+        return str(value)
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
 def _deterministic_fixed_mode() -> bool:
     """Return whether geometry must be an exact pass-through regression control."""
     hazard_mode = os.environ.get("CLEAVAGE_HAZARD_MODE", "deterministic").strip().lower()
@@ -288,7 +299,7 @@ class AvalancheSubsegmentBackend:
         path = Path(out_dir)
         path.mkdir(parents=True, exist_ok=True)
         (path / "stochastic_avalanche_geometry_events.json").write_text(
-            json.dumps(self.advance_log, indent=2)
+            json.dumps(self.advance_log, indent=2, default=_json_default)
         )
 
 
