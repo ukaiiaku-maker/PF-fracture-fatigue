@@ -53,7 +53,7 @@ replace_scheduler_exact(
 replace_scheduler_exact(
     '"v10.2.30_hazard_energy_gated_orientation_rate_case_contract_v1"',
     '"v10.4_bulk_peierls_taylor_orientation_rate_case_contract_v1"',
-    expected_count=2,
+    expected_count=1,
     label="v10.4 case contract schema",
 )
 
