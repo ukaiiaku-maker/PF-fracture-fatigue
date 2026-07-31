@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a v10.4 full-field bulk Peierls--Taylor orientation/rate launcher."""
+"""Build a v10.4.1 full-field bulk Peierls--Taylor orientation/rate launcher."""
 from __future__ import annotations
 
 import argparse
@@ -43,25 +43,25 @@ replace_scheduler_exact(
     --bulk-mult-frac 1
     --tip-source-rho-per-emit 0
     --rho-transport-c 0''',
-    label="v10.4 full-field bulk command",
+    label="v10.4.1 full-field bulk command",
 )
 replace_scheduler_exact(
     '"v10.2.30_hazard_energy_gated_orientation_rate_campaign_v1"',
     '"v10.4_bulk_peierls_taylor_orientation_rate_campaign_v1"',
-    label="v10.4 campaign manifest schema",
+    label="v10.4.1 campaign manifest schema",
 )
 replace_scheduler_exact(
     '"v10.2.30_hazard_energy_gated_orientation_rate_case_contract_v1"',
     '"v10.4_bulk_peierls_taylor_orientation_rate_case_contract_v1"',
     expected_count=1,
-    label="v10.4 case contract schema",
+    label="v10.4.1 case contract schema",
 )
 
 bulk_contract_marker = '    "hazard_energy_gate": True,'
 bulk_contract_count = scheduler.count(bulk_contract_marker)
 if bulk_contract_count < 3:
     raise SystemExit(
-        "ERROR: v10.4 bulk contract insertion expected at least 3 gate fields; "
+        "ERROR: v10.4.1 bulk contract insertion expected at least 3 gate fields; "
         f"found {bulk_contract_count}"
     )
 scheduler = scheduler.replace(
@@ -71,15 +71,19 @@ scheduler = scheduler.replace(
     "bulk_kinetics_model": "emission_derived_peierls_taylor_multihit",
     "bulk_initial_density_from_selected_row": True,
     "tip_and_bulk_source_populations_distinct": True,
-    "direct_tip_to_bulk_density_transfer": False,''',
+    "direct_tip_to_bulk_density_transfer": False,
+    "bulk_net_slip_model": "detailed_balance_forward_minus_reverse",
+    "zero_stress_net_plastic_rate_exactly_zero": True,
+    "v10_4_0_outputs_physics_compatible": False,''',
 )
 
 replace_scheduler_exact(
     '    root / "v10_2_30_hazard_energy_gate_audit.json",',
     '''    root / "v10_2_30_hazard_energy_gate_audit.json",
     root / "v10_4_bulk_peierls_taylor_coupling_audit.json",
-    root / "v10_4_bulk_coupled_model_audit.json",''',
-    label="v10.4 completed-case audit files",
+    root / "v10_4_bulk_coupled_model_audit.json",
+    root / "v10_4_1_bulk_detailed_balance_audit.json",''',
+    label="v10.4.1 completed-case audit files",
 )
 replace_scheduler_exact(
     'command = (root / "command.sh").read_text()',
@@ -105,9 +109,23 @@ if bulk_model_audit.get("bulk_plasticity_mode") != "full_field":
     raise SystemExit(1)
 if bulk_model_audit.get("v10_2_30_code_path_modified") is not False:
     raise SystemExit(1)
+if bulk_model_audit.get("zero_stress_net_plastic_rate_exactly_zero") is not True:
+    raise SystemExit(1)
+if bulk_model_audit.get("v10_4_0_outputs_physics_compatible") is not False:
+    raise SystemExit(1)
+
+detailed_balance_audit = json.loads(
+    (root / "v10_4_1_bulk_detailed_balance_audit.json").read_text()
+)
+if detailed_balance_audit.get("one_way_arrhenius_rate_used_as_net_slip") is not False:
+    raise SystemExit(1)
+if detailed_balance_audit.get("zero_stress_net_plastic_rate_exactly_zero") is not True:
+    raise SystemExit(1)
+if detailed_balance_audit.get("new_fitted_parameters") != 0:
+    raise SystemExit(1)
 
 command = (root / "command.sh").read_text()''',
-    label="v10.4 completed-case audit verification",
+    label="v10.4.1 completed-case audit verification",
 )
 replace_scheduler_exact(
     '    f"--parameter-option {expected[\'option\']}",',
@@ -116,7 +134,7 @@ replace_scheduler_exact(
     "--tip-source-rho-per-emit 0",
     "--rho-transport-c 0",
     f"--parameter-option {expected['option']}",''',
-    label="v10.4 completed-case command verification",
+    label="v10.4.1 completed-case command verification",
 )
 """
 
@@ -151,7 +169,7 @@ def transform(source: str) -> str:
         '"full_field_bulk_peierls_taylor_coupling",\n'
         '    "kernel_family_production_physics_modified": False,\n'
         '    "persistent_sites": True,\n',
-        "v10.4 campaign physics provenance",
+        "v10.4.1 campaign physics provenance",
     )
 
     outer = (
@@ -164,9 +182,12 @@ def transform(source: str) -> str:
         '    "bulk_initial_density_from_selected_row": True,\n'
         '    "tip_and_bulk_source_populations_distinct": True,\n'
         '    "direct_tip_to_bulk_density_transfer": False,\n'
+        '    "bulk_net_slip_model": "detailed_balance_forward_minus_reverse",\n'
+        '    "zero_stress_net_plastic_rate_exactly_zero": True,\n'
+        '    "v10_4_0_outputs_physics_compatible": False,\n'
     )
     if outer not in text:
-        raise RuntimeError("outer v10.4 model/gate lock block is missing")
+        raise RuntimeError("outer v10.4.1 model/gate lock block is missing")
     text = text.replace(outer, outer_bulk, 1)
 
     marker = "plotter = source_plotter.read_text()"
@@ -174,7 +195,7 @@ def transform(source: str) -> str:
         text,
         marker,
         _scheduler_adapter() + "\n" + marker,
-        "embedded v10.4 scheduler adapter",
+        "embedded v10.4.1 scheduler adapter",
     )
     return text
 
