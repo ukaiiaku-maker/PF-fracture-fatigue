@@ -140,6 +140,15 @@ def transform(source: str) -> str:
             raise RuntimeError(f"generated v10.2.30 token is missing: {old}")
         text = text.replace(old, new)
 
+    text = _replace_once(
+        text,
+        '    "production_physics_modified": False,\n',
+        '    "production_physics_modified": True,\n'
+        '    "production_physics_change": '
+        '"full_field_bulk_peierls_taylor_coupling",\n',
+        "v10.4 production physics provenance",
+    )
+
     outer = (
         f'    "model_entry": "{MODEL_ENTRY}",\n'
         '    "hazard_energy_gate": True,\n'
