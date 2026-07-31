@@ -11,4 +11,6 @@ CONDA_ENV=${CONDA_ENV:-arrhenius-sharp-front-v10}
 }
 
 bash scripts/validate_v10_2_30_hazard_energy_gate.sh
-python -m pytest -q tests/test_v10_4_bulk_peierls_taylor.py
+python -m pytest -q \
+  tests/test_v10_4_bulk_peierls_taylor.py \
+  tests/test_v10_4_provenance.py
