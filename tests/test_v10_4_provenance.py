@@ -4,7 +4,7 @@ import importlib.util
 from pathlib import Path
 
 
-def test_v104_launcher_marks_production_physics_modified():
+def test_v104_launcher_separates_kernel_and_campaign_provenance():
     root = Path(__file__).resolve().parents[1]
     path = root / "scripts" / "build_v10_4_bulk_rate_orientation_launcher.py"
     spec = importlib.util.spec_from_file_location("v104_builder_provenance", path)
@@ -17,9 +17,12 @@ def test_v104_launcher_marks_production_physics_modified():
     ).read_text()
     generated = module.transform(source)
 
-    assert '"production_physics_modified": True' in generated
+    assert generated.count('"production_physics_modified": True') == 1
     assert (
         '"production_physics_change": '
         '"full_field_bulk_peierls_taylor_coupling"'
     ) in generated
-    assert '"production_physics_modified": False' not in generated
+    assert '"kernel_family_production_physics_modified": False' in generated
+    # The direct-family provenance contract remains unchanged and continues to
+    # require the cached v10.2.28 kernel family itself to report False.
+    assert generated.count('"production_physics_modified": False') == 1
