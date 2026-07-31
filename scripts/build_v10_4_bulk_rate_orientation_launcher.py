@@ -35,6 +35,22 @@ def _replace_once(text: str, old: str, new: str, label: str) -> str:
     return text.replace(old, new, 1)
 
 
+def _replace_exact_count(
+    text: str,
+    old: str,
+    new: str,
+    *,
+    count: int,
+    label: str,
+) -> str:
+    actual = text.count(old)
+    if actual != count:
+        raise RuntimeError(
+            f"{label} changed: expected {count} occurrences, found {actual}"
+        )
+    return text.replace(old, new)
+
+
 def _scheduler_adapter() -> str:
     return r"""
 replace_scheduler_exact(
@@ -140,13 +156,14 @@ def transform(source: str) -> str:
             raise RuntimeError(f"generated v10.2.30 token is missing: {old}")
         text = text.replace(old, new)
 
-    text = _replace_once(
+    text = _replace_exact_count(
         text,
         '    "production_physics_modified": False,\n',
         '    "production_physics_modified": True,\n'
         '    "production_physics_change": '
         '"full_field_bulk_peierls_taylor_coupling",\n',
-        "v10.4 production physics provenance",
+        count=2,
+        label="v10.4 production physics provenance",
     )
 
     outer = (
