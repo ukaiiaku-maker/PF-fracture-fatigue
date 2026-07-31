@@ -175,7 +175,12 @@ def test_launcher_builder_generates_full_field_v104_contract(tmp_path: Path):
     assert "v10_4_bulk_peierls_taylor_coupling_audit.json" in generated
     assert "v10_4_bulk_coupled_model_audit.json" in generated
     assert "v10.4_bulk_peierls_taylor_orientation_rate_campaign_v1" in generated
-    assert "--bulk-plasticity-mode tip_only" not in generated
+    # The transformed outer launcher intentionally retains one quoted
+    # ``tip_only`` token as the exact search key used to rewrite the embedded
+    # scheduler. The actual replacement command must be full_field, and there
+    # must be no second tip_only occurrence outside that search pattern.
+    assert generated.count("--bulk-plasticity-mode tip_only") == 1
+    assert generated.count("--bulk-plasticity-mode full_field") >= 2
 
 
 def test_emission_derived_series_rate_is_finite_and_stress_activated():
