@@ -52,7 +52,9 @@ def _rewrite_model_audit(root: Path) -> None:
             "bulk_plastic_work_enters_fracture_measure": False,
             "bulk_plastic_work_enters_cleavage_hazard": False,
             "bulk_plastic_work_enters_energy_gate": False,
-            "bulk_plastic_work_primary_ledger": "constitutive_dWp_accepted_gp",
+            "bulk_plastic_work_primary_ledger": (
+                "constitutive_dWp_accepted_gp_summed_over_all_staggers"
+            ),
             "post_update_sigma_dot_ep_role": "compatibility_fallback_only",
             "J_pl_diss_definition": "W_bulk_plastic/(unit_thickness*initial_ligament)",
             "J_pl_diss_role": "temperature_dependent_plastic_dissipation_diagnostic",
