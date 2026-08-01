@@ -58,7 +58,11 @@ def _rewrite_model_audit(root: Path) -> None:
             "post_update_sigma_dot_ep_role": "compatibility_fallback_only",
             "J_pl_diss_definition": "W_bulk_plastic/(unit_thickness*initial_ligament)",
             "J_pl_diss_role": "temperature_dependent_plastic_dissipation_diagnostic",
-            "contour_shielding_definition": "max(J_outer_positive-J_tip_positive,0)",
+            "contour_shielding_definition": (
+                "max_over_peak_load_and_terminal_states_of_"
+                "max(J_outer_positive-J_tip_positive,0)"
+            ),
+            "contour_states": ["historical_peak_reaction_force", "terminal"],
             "contour_shielding_role": "diagnostic_only",
             "contour_shielding_enters_fracture_hazard": False,
             "v10_4_1_native_complete_cases_physics_compatible": True,
