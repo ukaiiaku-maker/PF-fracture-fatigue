@@ -2,8 +2,8 @@
 
 v10.4.2 changes only terminal classification and diagnostic output for cases
 that never reach sharp-tip first passage. A v10.4.1 case that already reached
-the requested crack extension under the identical detailed-balance constitutive
-law is therefore physics-compatible and must not be recomputed.
+the requested crack extension under the identical admitted constitutive law is
+therefore physics-compatible and must not be recomputed.
 """
 from __future__ import annotations
 
@@ -59,22 +59,28 @@ def verify_source_case(case_root: str | Path) -> dict[str, Any]:
     model = _json(root / "v10_4_bulk_coupled_model_audit.json")
     if model.get("bulk_plasticity_mode") != "full_field":
         raise ValueError("source case is not full-field bulk plasticity")
-    if model.get("zero_stress_net_plastic_rate_exactly_zero") is not True:
-        raise ValueError("source case does not use detailed-balance net slip")
     if model.get("v10_4_0_outputs_physics_compatible") is not False:
-        raise ValueError("source case detailed-balance provenance is incomplete")
+        raise ValueError("source case compatibility provenance is incomplete")
 
     detailed = root / "v10_4_1_bulk_detailed_balance_audit.json"
     reuse = root / "v10_4_1_reuse_audit.json"
     if detailed.is_file():
         payload = _json(detailed)
+        if model.get("zero_stress_net_plastic_rate_exactly_zero") is not True:
+            raise ValueError("native v10.4.1 model audit lacks zero-stress gate")
         if payload.get("zero_stress_net_plastic_rate_exactly_zero") is not True:
             raise ValueError("detailed-balance audit failed zero-stress gate")
+        if payload.get("one_way_arrhenius_rate_used_as_net_slip") is not False:
+            raise ValueError("native v10.4.1 case used one-way rate as net slip")
         execution = "native_v10.4.1"
     elif reuse.is_file():
         from .reuse_v1040_v1041 import verify_materialized_reuse
 
-        verify_materialized_reuse(root)
+        admitted = verify_materialized_reuse(root)
+        if admitted.get("target_model") != (
+            "v10.4.1_detailed_balance_forward_minus_reverse"
+        ):
+            raise ValueError("v10.4.1 reuse target model mismatch")
         execution = "audited_v10.4.0_reuse_admitted_by_v10.4.1"
     else:
         raise ValueError("source case has neither native nor reused v10.4.1 audit")
@@ -130,7 +136,8 @@ def materialize_completed_cases(
             "physics_compatibility_basis": (
                 "v10.4.2 changes only no-first-passage terminal classification and "
                 "diagnostics; this source case already completed the requested "
-                "sharp-fracture crack extension under v10.4.1 detailed-balance physics"
+                "sharp-fracture crack extension under the constitutive physics "
+                "admitted by v10.4.1"
             ),
             "source_commit": source_commit,
             "target_commit": target_commit,
@@ -141,7 +148,7 @@ def materialize_completed_cases(
                 "source_required_file_sha256"
             ],
             "fracture_measure_unchanged": True,
-            "detailed_balance_constitutive_law_unchanged": True,
+            "constitutive_acceptance_unchanged_from_v10_4_1": True,
             "terminal_logic_was_not_reached": True,
             "target_extension_complete": True,
         }
@@ -172,7 +179,7 @@ def verify_materialized_case(case_root: str | Path) -> dict[str, Any]:
         raise ValueError("v10.4.2 reuse audit is not approved")
     if audit.get("fracture_measure_unchanged") is not True:
         raise ValueError("fracture compatibility gate failed")
-    if audit.get("detailed_balance_constitutive_law_unchanged") is not True:
+    if audit.get("constitutive_acceptance_unchanged_from_v10_4_1") is not True:
         raise ValueError("constitutive compatibility gate failed")
     if audit.get("target_extension_complete") is not True:
         raise ValueError("only completed fracture cases may be reused")
