@@ -7,8 +7,9 @@ import sys
 
 from . import sharp_front_v10_4_bulk_peierls_taylor_audited as _v1041
 from .plastic_flow_terminal_v1042 import MODEL_ID as TERMINAL_MODEL_ID
-from .plastic_flow_accepted_work_v1042 import (
-    MODEL_ID as PLASTIC_WORK_MODEL_ID,
+from .plastic_flow_accepted_work_v1042 import MODEL_ID as PLASTIC_WORK_MODEL_ID
+from .directional_j_positive_v1042 import (
+    MODEL_ID as DIRECTIONAL_J_MODEL_ID,
     load_transformed_sharp_front,
 )
 
@@ -44,6 +45,14 @@ def _rewrite_model_audit(root: Path) -> None:
             "schema": MODEL_ID,
             "plastic_flow_terminal_model": TERMINAL_MODEL_ID,
             "plastic_work_ledger_model": PLASTIC_WORK_MODEL_ID,
+            "directional_J_model": DIRECTIONAL_J_MODEL_ID,
+            "directional_J_sign_convention": (
+                "positive_raw_signed_J_is_forward_configurational_work"
+            ),
+            "directional_J_effective_definition": "max(J_signed,0)",
+            "directional_J_first_nonzero_sign_latch_used": False,
+            "directional_J_absolute_value_used": False,
+            "negative_directional_J_is_non_driving": True,
             "plastic_flow_terminal_enabled": True,
             "plastic_flow_status": "plastic_flow_no_sharp_fracture",
             "plastic_flow_is_successful_campaign_terminal": True,
@@ -65,7 +74,9 @@ def _rewrite_model_audit(root: Path) -> None:
             "contour_states": ["historical_peak_reaction_force", "terminal"],
             "contour_shielding_role": "diagnostic_only",
             "contour_shielding_enters_fracture_hazard": False,
-            "v10_4_1_native_complete_cases_physics_compatible": True,
+            "v10_4_1_native_complete_cases_physics_compatible": (
+                "only_after_positive_directional_J_history_audit"
+            ),
         }
     )
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
@@ -82,8 +93,8 @@ def main(argv=None):
     try:
         print(
             "  v10.4.2 terminal model: plastic_flow_no_sharp_fracture; "
-            "fracture J unchanged; accepted Wp, J_pl and contour shielding "
-            "are diagnostic only"
+            "directional J=max(J_signed,0); accepted Wp, J_pl and contour "
+            "shielding are diagnostic only"
         )
         result = _v1041.main(args)
         out = _option_value(args, "--out")
