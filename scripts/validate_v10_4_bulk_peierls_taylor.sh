@@ -16,4 +16,5 @@ python -m pytest -q \
   tests/test_v10_4_provenance.py \
   tests/test_v10_4_1_detailed_balance.py \
   tests/test_v10_4_1_campaign_contract.py \
-  tests/test_v10_4_1_selective_reuse.py
+  tests/test_v10_4_1_selective_reuse.py \
+  tests/test_v10_4_2_plastic_flow_terminal.py
