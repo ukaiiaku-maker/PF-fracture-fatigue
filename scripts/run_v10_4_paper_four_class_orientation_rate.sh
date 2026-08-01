@@ -33,7 +33,7 @@ GENERATED="${GENERATED_BASE}.sh"
 mv "$GENERATED_BASE" "$GENERATED"
 trap 'rm -f "$GENERATED"' EXIT
 
-"$PYTHON_BIN" scripts/build_v10_4_bulk_rate_orientation_launcher.py \
+"$PYTHON_BIN" scripts/build_v10_4_2_plastic_terminal_launcher.py \
   --source "$BASE" \
   --output "$GENERATED"
 chmod +x "$GENERATED"
