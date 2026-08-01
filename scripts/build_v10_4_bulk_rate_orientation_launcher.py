@@ -74,16 +74,16 @@ scheduler = scheduler.replace(
     "direct_tip_to_bulk_density_transfer": False,
     "bulk_net_slip_model": "detailed_balance_forward_minus_reverse",
     "zero_stress_net_plastic_rate_exactly_zero": True,
-    "v10_4_0_outputs_physics_compatible": False,''',
+    "v10_4_0_outputs_physics_compatible": False,
+    "selective_reuse_permitted_with_case_audit": True,''',
 )
 
 replace_scheduler_exact(
     '    root / "v10_2_30_hazard_energy_gate_audit.json",',
     '''    root / "v10_2_30_hazard_energy_gate_audit.json",
     root / "v10_4_bulk_peierls_taylor_coupling_audit.json",
-    root / "v10_4_bulk_coupled_model_audit.json",
-    root / "v10_4_1_bulk_detailed_balance_audit.json",''',
-    label="v10.4.1 completed-case audit files",
+    root / "v10_4_bulk_coupled_model_audit.json",''',
+    label="v10.4.1 completed-case common audit files",
 )
 replace_scheduler_exact(
     'command = (root / "command.sh").read_text()',
@@ -109,23 +109,38 @@ if bulk_model_audit.get("bulk_plasticity_mode") != "full_field":
     raise SystemExit(1)
 if bulk_model_audit.get("v10_2_30_code_path_modified") is not False:
     raise SystemExit(1)
-if bulk_model_audit.get("zero_stress_net_plastic_rate_exactly_zero") is not True:
-    raise SystemExit(1)
-if bulk_model_audit.get("v10_4_0_outputs_physics_compatible") is not False:
-    raise SystemExit(1)
 
-detailed_balance_audit = json.loads(
-    (root / "v10_4_1_bulk_detailed_balance_audit.json").read_text()
-)
-if detailed_balance_audit.get("one_way_arrhenius_rate_used_as_net_slip") is not False:
-    raise SystemExit(1)
-if detailed_balance_audit.get("zero_stress_net_plastic_rate_exactly_zero") is not True:
-    raise SystemExit(1)
-if detailed_balance_audit.get("new_fitted_parameters") != 0:
-    raise SystemExit(1)
+reuse_path = root / "v10_4_1_reuse_audit.json"
+detailed_balance_path = root / "v10_4_1_bulk_detailed_balance_audit.json"
+if reuse_path.is_file():
+    from arrhenius_fracture.reuse_v1040_v1041 import verify_materialized_reuse
+
+    reuse = verify_materialized_reuse(root)
+    if bulk_model_audit.get("execution_mode") != "audited_v10_4_0_reuse":
+        raise SystemExit(1)
+    if bulk_model_audit.get("source_one_way_arrhenius_rate_used_as_net_slip") is not True:
+        raise SystemExit(1)
+    if reuse.get("target_model") != "v10.4.1_detailed_balance_forward_minus_reverse":
+        raise SystemExit(1)
+    if detailed_balance_path.exists():
+        raise SystemExit(1)
+else:
+    if not detailed_balance_path.is_file():
+        raise SystemExit(1)
+    if bulk_model_audit.get("zero_stress_net_plastic_rate_exactly_zero") is not True:
+        raise SystemExit(1)
+    if bulk_model_audit.get("v10_4_0_outputs_physics_compatible") is not False:
+        raise SystemExit(1)
+    detailed_balance_audit = json.loads(detailed_balance_path.read_text())
+    if detailed_balance_audit.get("one_way_arrhenius_rate_used_as_net_slip") is not False:
+        raise SystemExit(1)
+    if detailed_balance_audit.get("zero_stress_net_plastic_rate_exactly_zero") is not True:
+        raise SystemExit(1)
+    if detailed_balance_audit.get("new_fitted_parameters") != 0:
+        raise SystemExit(1)
 
 command = (root / "command.sh").read_text()''',
-    label="v10.4.1 completed-case audit verification",
+    label="v10.4.1 completed-case native/reuse audit verification",
 )
 replace_scheduler_exact(
     '    f"--parameter-option {expected[\'option\']}",',
@@ -185,6 +200,7 @@ def transform(source: str) -> str:
         '    "bulk_net_slip_model": "detailed_balance_forward_minus_reverse",\n'
         '    "zero_stress_net_plastic_rate_exactly_zero": True,\n'
         '    "v10_4_0_outputs_physics_compatible": False,\n'
+        '    "selective_reuse_permitted_with_case_audit": True,\n'
     )
     if outer not in text:
         raise RuntimeError("outer v10.4.1 model/gate lock block is missing")
