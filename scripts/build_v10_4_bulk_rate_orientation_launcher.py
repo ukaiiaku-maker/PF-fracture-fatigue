@@ -74,8 +74,7 @@ scheduler = scheduler.replace(
     "direct_tip_to_bulk_density_transfer": False,
     "bulk_net_slip_model": "detailed_balance_forward_minus_reverse",
     "zero_stress_net_plastic_rate_exactly_zero": True,
-    "v10_4_0_outputs_physics_compatible": False,
-    "selective_reuse_permitted_with_case_audit": True,''',
+    "v10_4_0_outputs_physics_compatible": False,''',
 )
 
 replace_scheduler_exact(
