@@ -33,7 +33,7 @@ GENERATED="${GENERATED_BASE}.sh"
 mv "$GENERATED_BASE" "$GENERATED"
 trap 'rm -f "$GENERATED"' EXIT
 
-"$PYTHON_BIN" scripts/build_v10_4_2_plastic_terminal_launcher.py \
+"$PYTHON_BIN" scripts/build_v10_4_2_positive_J_launcher.py \
   --source "$BASE" \
   --output "$GENERATED"
 chmod +x "$GENERATED"
@@ -42,6 +42,8 @@ bash -n "$GENERATED"
 printf 'Model entry: %s\n' \
   'arrhenius_fracture.sharp_front_v10_4_2_plastic_flow_audited'
 printf 'Hazard-energy gate: active; no absolute athermal Gc\n'
+printf 'Directional J: positive raw signed J is forward work; J_eff=max(J_signed,0)\n'
+printf 'First-nonzero directional-J sign latch: disabled\n'
 printf 'Bulk plasticity: full-field emission-derived Peierls/Taylor multihit\n'
 printf 'Bulk net slip: detailed balance; exact zero at zero stress\n'
 printf 'Plastic-flow terminal: enabled; 2000 accepted-step persistence window\n'
