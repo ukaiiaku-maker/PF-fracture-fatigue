@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add v10.4.2 inherited-case hash verification to the generated launcher."""
+"""Finalize v10.4.2 inherited-case and terminal campaign verification."""
 from __future__ import annotations
 
 import argparse
@@ -40,11 +40,36 @@ elif bulk_model_audit.get("schema") != "v10.4.2_bulk_detailed_balance_plastic_fl
 command = (root / "command.sh").read_text()
 if is_plastic_terminal and "--plastic-flow-terminal" not in command:
 '''
-    return _replace_once(
+    text = _replace_once(
         text,
         marker,
         replacement,
         "v10.4.2 inherited-case hash verification",
+    )
+
+    legacy_plot = '''"$PYTHON_BIN" scripts/plot_v10_2_27_paper_four_class_rcurves.py \\
+  --outroot "$OUTROOT" \\
+  --target-extension-um "$TARGET_EXT_UM" || {
+    echo "ERROR: four-class R-curve postprocessing failed" >&2
+    exit 1
+  }
+'''
+    terminal_aware_plot = '''if find "$OUTROOT" -type f -name COMPLETE -print -quit | grep -q .; then
+  "$PYTHON_BIN" scripts/plot_v10_2_27_paper_four_class_rcurves.py \\
+    --outroot "$OUTROOT" \\
+    --target-extension-um "$TARGET_EXT_UM" || {
+      echo "ERROR: four-class R-curve postprocessing failed" >&2
+      exit 1
+    }
+else
+  echo "No sharp-fracture COMPLETE cases; skipping fracture-only R-curve postprocessing"
+fi
+'''
+    return _replace_once(
+        text,
+        legacy_plot,
+        terminal_aware_plot,
+        "v10.4.2 terminal-aware fracture postprocessing",
     )
 
 
