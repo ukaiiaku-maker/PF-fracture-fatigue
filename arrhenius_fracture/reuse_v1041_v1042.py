@@ -1,9 +1,9 @@
-"""Materialize completed v10.4.1 fracture cases for a v10.4.2 campaign.
+"""Materialize only directionally compatible v10.4.1 fracture cases.
 
-v10.4.2 changes only terminal classification and diagnostic output for cases
-that never reach sharp-tip first passage. A v10.4.1 case that already reached
-the requested crack extension under the identical admitted constitutive law is
-therefore physics-compatible and must not be recomputed.
+v10.4.2 defines forward crack-driving work as ``max(J_signed, 0)`` under the
+fixed domain-integral convention. Older cases used a first-nonzero sign latch.
+A completed older fracture case is reusable only when its root-front history up
+to first passage already satisfies the corrected positive-signed-J relation.
 """
 from __future__ import annotations
 
@@ -12,8 +12,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-SCHEMA = "v10.4.2_reused_v10.4.1_complete_fracture_case_v1"
-MANIFEST_SCHEMA = "v10.4.2_materialized_v10.4.1_complete_cases_v1"
+import numpy as np
+
+SCHEMA = "v10.4.2_reused_v10.4.1_complete_fracture_case_v2"
+MANIFEST_SCHEMA = "v10.4.2_materialized_v10.4.1_complete_cases_v2"
 
 REQUIRED = (
     "COMPLETE",
@@ -40,6 +42,106 @@ def _json(path: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError(f"expected JSON object: {path}")
     return payload
+
+
+def _single_front_table(root: Path) -> Path:
+    paths = sorted(root.glob("fronts_*K.csv"))
+    if len(paths) != 1:
+        raise ValueError(
+            f"expected one root-front diagnostic table in {root}; found {len(paths)}"
+        )
+    return paths[0]
+
+
+def audit_positive_directional_J_history(case_root: str | Path) -> dict[str, Any]:
+    """Verify corrected directional J through the first accepted crack event."""
+    root = Path(case_root).expanduser().resolve()
+    path = _single_front_table(root)
+    table = np.genfromtxt(
+        path,
+        delimiter=",",
+        names=True,
+        dtype=float,
+        encoding=None,
+        autostrip=True,
+    )
+    names = table.dtype.names or ()
+    required = {
+        "step",
+        "front_id",
+        "n_fire",
+        "J_signed_trial",
+        "J_effective_trial",
+        "J_sign_ref",
+    }
+    missing = sorted(required.difference(names))
+    if missing:
+        raise ValueError(f"directional-J audit fields missing from {path}: {missing}")
+
+    rows = np.atleast_1d(table)
+    root_rows = rows[np.isclose(np.asarray(rows["front_id"], dtype=float), 0.0)]
+    if root_rows.size == 0:
+        raise ValueError(f"no root-front rows in {path}")
+    order = np.argsort(np.asarray(root_rows["step"], dtype=float))
+    root_rows = root_rows[order]
+
+    fired = np.flatnonzero(np.asarray(root_rows["n_fire"], dtype=float) > 0.0)
+    if fired.size == 0:
+        raise ValueError("completed fracture case has no root first-passage event")
+    first_index = int(fired[0])
+    prefix = root_rows[: first_index + 1]
+
+    raw = np.asarray(prefix["J_signed_trial"], dtype=float)
+    effective = np.asarray(prefix["J_effective_trial"], dtype=float)
+    sign_ref = np.asarray(prefix["J_sign_ref"], dtype=float)
+    expected = np.maximum(raw, 0.0)
+
+    finite = np.isfinite(raw) & np.isfinite(effective) & np.isfinite(sign_ref)
+    if not np.all(finite):
+        raise ValueError("non-finite root directional-J value before first passage")
+
+    scale = max(
+        float(np.max(np.abs(raw))) if raw.size else 0.0,
+        float(np.max(np.abs(effective))) if effective.size else 0.0,
+        1.0,
+    )
+    atol = 1.0e-10 * scale
+    compatible_rows = np.isclose(effective, expected, rtol=1.0e-8, atol=atol)
+    max_error = float(np.max(np.abs(effective - expected)))
+
+    first_raw = float(raw[-1])
+    first_effective = float(effective[-1])
+    first_sign_ref = float(sign_ref[-1])
+    compatible = bool(
+        np.all(compatible_rows)
+        and first_raw > 0.0
+        and first_effective > 0.0
+        and np.isclose(first_sign_ref, 1.0, rtol=0.0, atol=1.0e-12)
+    )
+
+    audit = {
+        "schema": "v10.4.2_positive_directional_J_reuse_audit_v1",
+        "front_table": str(path),
+        "front_table_sha256": sha256_file(path),
+        "root_rows_through_first_passage": int(prefix.size),
+        "first_passage_step": int(round(float(prefix["step"][-1]))),
+        "first_passage_J_signed_J_per_m2": first_raw,
+        "first_passage_J_effective_J_per_m2": first_effective,
+        "first_passage_J_sign_ref": first_sign_ref,
+        "maximum_pre_first_passage_relation_error_J_per_m2": max_error,
+        "relation_tolerance_J_per_m2": atol,
+        "required_relation": "J_effective=max(J_signed,0)",
+        "all_pre_first_passage_rows_compatible": bool(np.all(compatible_rows)),
+        "compatible": compatible,
+    }
+    if not compatible:
+        raise ValueError(
+            "source fracture case is incompatible with positive signed directional J: "
+            f"step={audit['first_passage_step']} raw={first_raw:.9g} "
+            f"effective={first_effective:.9g} sign_ref={first_sign_ref:.9g} "
+            f"max_relation_error={max_error:.9g}"
+        )
+    return audit
 
 
 def verify_source_case(case_root: str | Path) -> dict[str, Any]:
@@ -85,10 +187,12 @@ def verify_source_case(case_root: str | Path) -> dict[str, Any]:
     else:
         raise ValueError("source case has neither native nor reused v10.4.1 audit")
 
+    directional = audit_positive_directional_J_history(root)
     return {
         "source_case": str(root),
         "source_execution_mode": execution,
         "status": status,
+        "directional_J_audit": directional,
         "source_required_file_sha256": {
             name: sha256_file(root / name) for name in REQUIRED
         },
@@ -117,9 +221,19 @@ def materialize_completed_cases(
     destination.mkdir(parents=True, exist_ok=True)
 
     records: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
     for complete in sorted(source.glob("*/T*K_th*_seed*/COMPLETE")):
         case = complete.parent.resolve()
-        verified = verify_source_case(case)
+        try:
+            verified = verify_source_case(case)
+        except Exception as exc:
+            rejected.append({
+                "source_case": str(case),
+                "approved": False,
+                "reason": f"{type(exc).__name__}: {exc}",
+            })
+            continue
+
         relative = case.relative_to(source)
         target_case = destination / relative
         if target_case.exists():
@@ -134,10 +248,9 @@ def materialize_completed_cases(
             "schema": SCHEMA,
             "approved": True,
             "physics_compatibility_basis": (
-                "v10.4.2 changes only no-first-passage terminal classification and "
-                "diagnostics; this source case already completed the requested "
-                "sharp-fracture crack extension under the constitutive physics "
-                "admitted by v10.4.1"
+                "source case completed target extension and its complete root-front "
+                "history through first passage already satisfies "
+                "J_effective=max(J_signed,0) under the v10.4.2 convention"
             ),
             "source_commit": source_commit,
             "target_commit": target_commit,
@@ -147,7 +260,9 @@ def materialize_completed_cases(
             "source_required_file_sha256": verified[
                 "source_required_file_sha256"
             ],
-            "fracture_measure_unchanged": True,
+            "directional_J_audit": verified["directional_J_audit"],
+            "directional_J_positive_convention_compatible": True,
+            "fracture_measure_unchanged_for_this_case": True,
             "constitutive_acceptance_unchanged_from_v10_4_1": True,
             "terminal_logic_was_not_reached": True,
             "target_extension_complete": True,
@@ -164,7 +279,9 @@ def materialize_completed_cases(
         "source_commit": source_commit,
         "target_commit": target_commit,
         "materialized_case_count": len(records),
+        "rejected_case_count": len(rejected),
         "records": records,
+        "rejected_records": rejected,
     }
     (destination / "v10_4_2_materialized_reuse_manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n"
@@ -177,7 +294,9 @@ def verify_materialized_case(case_root: str | Path) -> dict[str, Any]:
     audit = _json(root / "v10_4_2_reuse_audit.json")
     if audit.get("schema") != SCHEMA or audit.get("approved") is not True:
         raise ValueError("v10.4.2 reuse audit is not approved")
-    if audit.get("fracture_measure_unchanged") is not True:
+    if audit.get("directional_J_positive_convention_compatible") is not True:
+        raise ValueError("positive directional-J compatibility gate failed")
+    if audit.get("fracture_measure_unchanged_for_this_case") is not True:
         raise ValueError("fracture compatibility gate failed")
     if audit.get("constitutive_acceptance_unchanged_from_v10_4_1") is not True:
         raise ValueError("constitutive compatibility gate failed")
@@ -195,12 +314,22 @@ def verify_materialized_case(case_root: str | Path) -> dict[str, Any]:
             raise ValueError(f"source file changed: {source_path}")
         if sha256_file(target_path) != expected:
             raise ValueError(f"materialized file changed: {target_path}")
+
+    directional = audit.get("directional_J_audit", {})
+    front_path = Path(directional.get("front_table", ""))
+    expected_front_hash = directional.get("front_table_sha256")
+    if not front_path.is_file() or sha256_file(front_path) != expected_front_hash:
+        raise ValueError("source directional-J front table changed")
+    target_front = root / front_path.name
+    if not target_front.is_file() or sha256_file(target_front) != expected_front_hash:
+        raise ValueError("materialized directional-J front table changed")
     return audit
 
 
 __all__ = [
     "MANIFEST_SCHEMA",
     "SCHEMA",
+    "audit_positive_directional_J_history",
     "materialize_completed_cases",
     "verify_materialized_case",
     "verify_source_case",
