@@ -6,8 +6,9 @@ from pathlib import Path
 import sys
 
 from . import sharp_front_v10_4_bulk_peierls_taylor_audited as _v1041
-from .plastic_flow_terminal_v1042 import (
-    MODEL_ID as TERMINAL_MODEL_ID,
+from .plastic_flow_terminal_v1042 import MODEL_ID as TERMINAL_MODEL_ID
+from .plastic_flow_accepted_work_v1042 import (
+    MODEL_ID as PLASTIC_WORK_MODEL_ID,
     load_transformed_sharp_front,
 )
 
@@ -42,6 +43,7 @@ def _rewrite_model_audit(root: Path) -> None:
         {
             "schema": MODEL_ID,
             "plastic_flow_terminal_model": TERMINAL_MODEL_ID,
+            "plastic_work_ledger_model": PLASTIC_WORK_MODEL_ID,
             "plastic_flow_terminal_enabled": True,
             "plastic_flow_status": "plastic_flow_no_sharp_fracture",
             "plastic_flow_is_successful_campaign_terminal": True,
@@ -50,6 +52,8 @@ def _rewrite_model_audit(root: Path) -> None:
             "bulk_plastic_work_enters_fracture_measure": False,
             "bulk_plastic_work_enters_cleavage_hazard": False,
             "bulk_plastic_work_enters_energy_gate": False,
+            "bulk_plastic_work_primary_ledger": "constitutive_dWp_accepted_gp",
+            "post_update_sigma_dot_ep_role": "compatibility_fallback_only",
             "J_pl_diss_definition": "W_bulk_plastic/(unit_thickness*initial_ligament)",
             "J_pl_diss_role": "temperature_dependent_plastic_dissipation_diagnostic",
             "contour_shielding_definition": "max(J_outer_positive-J_tip_positive,0)",
@@ -72,7 +76,8 @@ def main(argv=None):
     try:
         print(
             "  v10.4.2 terminal model: plastic_flow_no_sharp_fracture; "
-            "fracture J unchanged; J_pl and contour shielding diagnostic only"
+            "fracture J unchanged; accepted Wp, J_pl and contour shielding "
+            "are diagnostic only"
         )
         result = _v1041.main(args)
         out = _option_value(args, "--out")
