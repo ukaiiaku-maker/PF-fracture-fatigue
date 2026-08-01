@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
+import subprocess
 
 import numpy as np
 import pytest
@@ -71,3 +73,30 @@ def test_reuse_audit_rejects_first_nonzero_negative_sign_latch(tmp_path: Path):
     )
     with pytest.raises(ValueError, match="incompatible with positive signed directional J"):
         audit_positive_directional_J_history(case)
+
+
+def test_positive_J_launcher_provenance_and_shell_syntax(tmp_path: Path):
+    path = ROOT / "scripts" / "build_v10_4_2_positive_J_launcher.py"
+    spec = importlib.util.spec_from_file_location("v1042_positive_J_builder", path)
+    assert spec is not None and spec.loader is not None
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+
+    source = (
+        ROOT / "scripts" / "run_v10_2_28_paper_four_class_theta30_1000um.sh"
+    ).read_text()
+    generated = builder.transform(source)
+    output = tmp_path / "generated.sh"
+    output.write_text(generated)
+    subprocess.run(["bash", "-n", str(output)], check=True)
+
+    assert (
+        '"directional_J_sign_convention": '
+        '"positive_raw_signed_J_is_forward_configurational_work"'
+    ) in generated
+    assert '"directional_J_effective_definition": "max(J_signed,0)"' in generated
+    assert '"directional_J_first_nonzero_sign_latch_used": False' in generated
+    assert (
+        '"v10_4_1_completed_fracture_cases_physics_compatible": '
+        '"only_after_positive_directional_J_history_audit"'
+    ) in generated
