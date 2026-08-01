@@ -4,9 +4,10 @@ The underlying driver historically estimates an accepted-step plastic-work
 increment from the final stress and final plastic strain rate. That expression
 can vanish after a fully relaxed staggered solve even though the constitutive
 update accepted positive plastic work during the step. This overlay requests the
-existing ``dWp_accepted_gp`` diagnostic from ``update_plasticity`` and uses its
-area integral as the primary bulk-plastic work increment. The historical
-post-update expression remains only as a compatibility fallback.
+existing ``dWp_accepted_gp`` diagnostic from every staggered plasticity update,
+sums it over all accepted stagger iterations, and uses its area integral as the
+primary bulk-plastic work increment. The historical post-update expression
+remains only as a compatibility fallback.
 """
 from __future__ import annotations
 
@@ -36,9 +37,23 @@ def transform_source(source: str) -> str:
         "        plastic_flow_stiffness_reference = 0.0\n",
         "        plastic_flow_stiffness_reference = 0.0\n"
         "        plastic_work_info_v1042 = None\n"
+        "        plastic_work_accepted_gp_v1042 = None\n"
         "        plastic_work_ledger_source_v1042 = "
-        "'constitutive_dWp_accepted_gp'\n",
+        "'constitutive_dWp_accepted_gp_all_staggers'\n",
         "v10.4.2 accepted-work initialization",
+    )
+
+    text = _replace_once(
+        text,
+        """                sigma_gp = np.zeros((3, mesh.ne)); psi_gp = np.zeros(mesh.ne); Ftop = 0.0
+                for it in range(args.n_stagger):
+""",
+        """                sigma_gp = np.zeros((3, mesh.ne)); psi_gp = np.zeros(mesh.ne); Ftop = 0.0
+                plastic_work_info_v1042 = None
+                plastic_work_accepted_gp_v1042 = np.zeros(mesh.ne, dtype=float)
+                for it in range(args.n_stagger):
+""",
+        "v10.4.2 per-trial accepted-work reset",
     )
 
     text = _replace_once(
@@ -50,6 +65,18 @@ def transform_source(source: str) -> str:
         """                        ep_gp, rho_gp, dot_ep, plastic_work_info_v1042 = update_plasticity(
                             ep_gp, rho_gp, sigma_gp, mat, T, dt_cur,
                             plast_model, cfg.dislocations, return_info=True)
+                        _v1042_dWp_stagger_gp = np.asarray(
+                            plastic_work_info_v1042.get('dWp_accepted_gp', []),
+                            dtype=float,
+                        ).reshape(-1)
+                        if _v1042_dWp_stagger_gp.size != mesh.ne:
+                            raise RuntimeError(
+                                'v10.4.2 accepted plastic-work ledger size mismatch: '
+                                f'{_v1042_dWp_stagger_gp.size} != {mesh.ne}'
+                            )
+                        plastic_work_accepted_gp_v1042 += np.maximum(
+                            _v1042_dWp_stagger_gp, 0.0
+                        )
 """,
         "v10.4.2 constitutive accepted-work request",
     )
@@ -59,22 +86,27 @@ def transform_source(source: str) -> str:
         """            dWp = float(np.sum(np.sum(sigma_gp * dot_ep, axis=0) * mesh.area_e)) * dt_cur
             W_p_acc += max(dWp, 0.0)
 """,
-        """            if isinstance(plastic_work_info_v1042, dict) and 'dWp_accepted_gp' in plastic_work_info_v1042:
-                _v1042_dWp_gp = np.asarray(
-                    plastic_work_info_v1042.get('dWp_accepted_gp', []), dtype=float
-                ).reshape(-1)
-                if _v1042_dWp_gp.size != mesh.ne:
-                    raise RuntimeError(
-                        'v10.4.2 accepted plastic-work ledger size mismatch: '
-                        f'{_v1042_dWp_gp.size} != {mesh.ne}'
+        """            if (
+                plastic_work_accepted_gp_v1042 is not None
+                and np.asarray(plastic_work_accepted_gp_v1042).size == mesh.ne
+                and isinstance(plastic_work_info_v1042, dict)
+            ):
+                dWp = float(
+                    np.sum(
+                        np.maximum(plastic_work_accepted_gp_v1042, 0.0)
+                        * mesh.area_e
                     )
-                dWp = float(np.sum(np.maximum(_v1042_dWp_gp, 0.0) * mesh.area_e))
-                plastic_work_ledger_source_v1042 = 'constitutive_dWp_accepted_gp'
+                )
+                plastic_work_ledger_source_v1042 = (
+                    'constitutive_dWp_accepted_gp_all_staggers'
+                )
             else:
                 dWp = float(
                     np.sum(np.sum(sigma_gp * dot_ep, axis=0) * mesh.area_e)
                 ) * dt_cur
-                plastic_work_ledger_source_v1042 = 'post_update_sigma_dot_ep_fallback'
+                plastic_work_ledger_source_v1042 = (
+                    'post_update_sigma_dot_ep_fallback'
+                )
             W_p_acc += max(dWp, 0.0)
 """,
         "v10.4.2 accepted-work accumulation",
@@ -88,8 +120,10 @@ def transform_source(source: str) -> str:
         """                        'W_bulk_plastic_J_per_m': float(W_p_acc),
                         'W_bulk_plastic_ledger_source': plastic_work_ledger_source_v1042,
                         'W_bulk_plastic_primary_is_constitutive_accepted_work': (
-                            plastic_work_ledger_source_v1042 == 'constitutive_dWp_accepted_gp'
+                            plastic_work_ledger_source_v1042
+                            == 'constitutive_dWp_accepted_gp_all_staggers'
                         ),
+                        'W_bulk_plastic_stagger_iterations_accumulated': int(args.n_stagger),
                         'W_bulk_plastic_balance_estimate_J_per_m': _v1042_Wp_balance,
 """,
         "v10.4.2 accepted-work audit provenance",
