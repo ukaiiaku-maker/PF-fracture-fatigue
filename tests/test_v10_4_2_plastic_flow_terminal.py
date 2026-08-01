@@ -9,7 +9,7 @@ import sys
 
 import numpy as np
 
-from arrhenius_fracture.plastic_flow_terminal_v1042 import (
+from arrhenius_fracture.plastic_flow_accepted_work_v1042 import (
     load_transformed_sharp_front,
     transform_source,
 )
@@ -29,6 +29,9 @@ def test_transformed_sharp_front_compiles_and_preserves_fracture_measure():
     assert "eng.step(KJ, T, dt_cur)" in transformed
     assert "eng.step(J_pl" not in transformed
     assert "predict_clock_increment(J_pl" not in transformed
+    assert "return_info=True" in transformed
+    assert "dWp_accepted_gp" in transformed
+    assert "W_bulk_plastic_primary_is_constitutive_accepted_work" in transformed
 
 
 def test_synthetic_persistent_plastic_window_is_terminal():
@@ -85,6 +88,8 @@ def test_synthetic_persistent_plastic_window_is_terminal():
     assert result is not None
     assert result["criteria_pass"] is True
     assert all(result["criteria"].values())
+    assert result["predicted_remaining_cleavage_time_s"] is None
+    assert result["predicted_remaining_cleavage_time_infinite"] is True
 
 
 def test_nonzero_tip_drive_blocks_terminal():
