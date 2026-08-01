@@ -4,6 +4,7 @@ from collections import deque
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import sys
 
 import numpy as np
@@ -176,7 +177,7 @@ def test_contour_scan_keeps_shielding_diagnostic():
 
 
 def test_launcher_generation_compiles_and_contains_terminal_contract(tmp_path: Path):
-    builder_path = ROOT / "scripts" / "build_v10_4_bulk_rate_orientation_launcher.py"
+    builder_path = ROOT / "scripts" / "build_v10_4_2_plastic_terminal_launcher.py"
     spec = importlib.util.spec_from_file_location("v1042_builder", builder_path)
     assert spec is not None and spec.loader is not None
     builder = importlib.util.module_from_spec(spec)
@@ -187,12 +188,15 @@ def test_launcher_generation_compiles_and_contains_terminal_contract(tmp_path: P
     generated = builder.transform(source)
     output = tmp_path / "generated.sh"
     output.write_text(generated)
+    subprocess.run(["bash", "-n", str(output)], check=True)
     assert "sharp_front_v10_4_2_plastic_flow_audited" in generated
     assert "--plastic-flow-terminal" in generated
     assert "scripts/classify_v10_4_2_case.py" in generated
     assert "PLASTIC_FLOW" in generated
     assert "plastic_work_enters_fracture_measure" in generated
     assert "contour_shielding_is_diagnostic_only" in generated
+    assert "verify_materialized_case" in generated
+    assert "v10_4_2_reuse_audit.json" in generated
 
 
 def test_plastic_classifier_status_contract(tmp_path: Path):
