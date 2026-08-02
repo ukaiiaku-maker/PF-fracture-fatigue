@@ -11,7 +11,7 @@ from . import fatigue_v1 as _fatigue_v1
 from . import fem as _fem
 from . import hazard_energy_event_gate_v10230 as _energy_gate
 from . import persistent_site_cyclic_coupled_v10229 as _coupled_commit
-from . import persistent_site_forward_coupled_hazard_v10230 as _forward_hazard
+from . import persistent_site_forward_robust_v10230 as _forward_hazard
 from . import persistent_site_forward_selector_v10230 as _forward_selector
 from . import sharp_front_v10_1_7_3 as _avalanche
 from . import sharp_front_v10_2_29_fatigue_audited as _v10229
@@ -100,6 +100,11 @@ def _write_audit(args: list[str]) -> None:
             "vhcf_forward_marcher_model_id": _forward_hazard.MODEL_ID,
             "vhcf_full_horizon_first_trial": False,
             "vhcf_raw_population_increment_targets_active": False,
+            "vhcf_active_state_endpoint_error_control": True,
+            "vhcf_state_profile_endpoint_error_control": True,
+            "vhcf_backstress_endpoint_error_control": True,
+            "vhcf_segment_size_carried_across_outer_calls": True,
+            "vhcf_explicit_transient_segment_cap_active": True,
             "vhcf_recursive_depth_first_commit": False,
             "vhcf_partial_cycle_return_supported": True,
             "vhcf_two_half_step_state_committed": True,
@@ -196,7 +201,8 @@ def main(argv=None):
             "resistance=gamma_rel*m_hits*DeltaG_eff/b^2 "
             "event=min(stochastic_proposal,energy_arrest) "
             "event_load=Kmax continuum_gate=diagnostic_only "
-            "block_control=bounded_forward_two_half_step "
+            "block_control=partition_robust_forward_two_half_step "
+            "active_state_error=profile+backstress+source_rate "
             "partial_return=on work_budget=on "
             "trial_rng_clone=state_exact Gc0_athermal=off"
         )
