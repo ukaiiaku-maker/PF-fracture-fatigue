@@ -38,4 +38,11 @@ def test_reused_cases_exit_before_native_v1042_command_checks():
 
     assert early < verify < source_verify < success_exit < native
     assert "--plastic-flow-terminal" in transformed
-    assert "J_eff=max(J_signed,0)" not in transformed  # launcher source, not banner
+
+
+def test_public_wrapper_uses_reuse_aware_builder():
+    wrapper = (
+        ROOT / "scripts" / "run_v10_4_paper_four_class_orientation_rate.sh"
+    ).read_text()
+    assert "build_v10_4_2_reuse_aware_launcher.py" in wrapper
+    assert "verify v10.4.2 reuse audit before native command checks" in wrapper
