@@ -19,4 +19,5 @@ python -m pytest -q \
   tests/test_v10_4_1_selective_reuse.py \
   tests/test_v10_4_2_plastic_flow_terminal.py \
   tests/test_v10_4_2_launcher_adapter.py \
-  tests/test_v10_4_2_directional_j_positive.py
+  tests/test_v10_4_2_directional_j_positive.py \
+  tests/test_v10_4_2_reuse_aware_launcher.py
