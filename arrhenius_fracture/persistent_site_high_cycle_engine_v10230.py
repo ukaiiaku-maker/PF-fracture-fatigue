@@ -9,7 +9,7 @@ TRANSIENT -> PERIODIC_SEARCH -> STATIONARY_TAIL
                    |                  |
                    +--------> EVENT / RESTART
 
-The engine is designed for native horizons through 1e12 cycles.  It never uses a
+The engine is designed for native horizons through 1e12 cycles. It never uses a
 Paris law, never draws extra stochastic thresholds, and never carries an
 accelerated representation across a crack-geometry change.
 """
@@ -32,7 +32,6 @@ from .persistent_site_high_cycle_state_v10230 import (
     geometry_signature,
     ledger_delta,
     residual_metrics,
-    serialize_active_state,
 )
 from .persistent_site_periodic_solver_v10230 import solve_periodic_state
 from .persistent_site_poincare_v10230 import one_cycle_map
@@ -67,6 +66,9 @@ def high_cycle_config() -> dict[str, float | int]:
         "stationary_diagnostic_tolerance": _env_float(
             "V10230_HIGH_CYCLE_STATIONARY_DIAGNOSTIC_TOL", 1.0e-5, 1.0e-14
         ),
+        "stationary_admission_distance": _env_float(
+            "V10230_HIGH_CYCLE_STATIONARY_ADMISSION_DISTANCE", 1.0e-6, 1.0e-14
+        ),
         "transient_fallback_cycles": _env_float(
             "V10230_HIGH_CYCLE_TRANSIENT_FALLBACK_CYCLES", 64.0, 1.0e-6
         ),
@@ -95,12 +97,12 @@ def _cache(engine) -> dict[str, Any]:
     signature = geometry_signature(engine)
     cache = getattr(engine, "_v10230_high_cycle_cache", None)
     if not isinstance(cache, dict) or cache.get("geometry_signature") != signature:
+        pconfig = projective_config()
         cache = {
             "geometry_signature": signature,
             "projective_next_cycles": max(
-                float(projective_config()["minimum_project_cycles"]),
-                float(projective_config()["initial_factor"])
-                * float(projective_config()["burst_cycles"]),
+                float(pconfig["minimum_project_cycles"]),
+                float(pconfig["initial_factor"]) * float(pconfig["burst_cycles"]),
             ),
             "periodic_attempts": 0,
             "last_periodic_converged": False,
@@ -110,12 +112,12 @@ def _cache(engine) -> dict[str, Any]:
 
 
 def invalidate_high_cycle_cache(engine, reason: str) -> None:
+    pconfig = projective_config()
     engine._v10230_high_cycle_cache = {
         "geometry_signature": geometry_signature(engine),
         "projective_next_cycles": max(
-            float(projective_config()["minimum_project_cycles"]),
-            float(projective_config()["initial_factor"])
-            * float(projective_config()["burst_cycles"]),
+            float(pconfig["minimum_project_cycles"]),
+            float(pconfig["initial_factor"]) * float(pconfig["burst_cycles"]),
         ),
         "periodic_attempts": 0,
         "last_periodic_converged": False,
@@ -146,6 +148,32 @@ def _projective_with_requested_scale(
             os.environ["V10230_PROJECTIVE_INITIAL_FACTOR"] = previous
 
 
+def _accumulate_transient(
+    result: dict[str, Any],
+    plastic: dict[str, float],
+    advance: dict[str, float],
+) -> tuple[float, float, float, float, float, float, int, bool]:
+    cycles = max(float(result.get("coupled_hazard_cycles_consumed", 0.0)), 0.0)
+    dB = max(float(result.get("dB", 0.0)), 0.0)
+    dH = max(float(result.get("physical_hazard_action_step", 0.0)), 0.0)
+    da = max(float(result.get("da", 0.0)), 0.0)
+    packet_mean = max(float(result.get("packet_mean", 0.0)), 0.0)
+    packet_variance = max(float(result.get("packet_variance_m2", 0.0)), 0.0)
+    microsteps = int(result.get("microsteps", 0))
+    _sum_numeric(plastic, dict(result.get("plastic", {})))
+    _sum_numeric(advance, dict(result.get("advance", {})))
+    return (
+        cycles,
+        dB,
+        dH,
+        da,
+        packet_mean,
+        packet_variance,
+        microsteps,
+        bool(result.get("fired", False)),
+    )
+
+
 def integrate_state_coupled_waveform(
     engine,
     controller,
@@ -171,8 +199,8 @@ def integrate_state_coupled_waveform(
     dB_total = 0.0
     dH_total = 0.0
     da_total = 0.0
-    packet_mean = 0.0
-    packet_variance = 0.0
+    packet_mean_total = 0.0
+    packet_variance_total = 0.0
     microsteps = 0
     plastic: dict[str, float] = {}
     advance: dict[str, float] = {}
@@ -196,66 +224,6 @@ def integrate_state_coupled_waveform(
             relative_tolerance=float(config["stationary_relative_tolerance"]),
             diagnostic_tolerance=float(config["stationary_diagnostic_tolerance"]),
         )
-
-        if current_residual.converged:
-            stationary = propagate_stationary_cycles(
-                engine, waveform, cycle, remaining
-            )
-            consumed += stationary.cycles_consumed
-            dB_total += stationary.normalized_clock_added
-            dH_total += stationary.hazard_action_added
-            modes.append(
-                {
-                    "mode": "stationary_tail",
-                    "cycles": stationary.cycles_consumed,
-                    "event_within_guard": stationary.event_within_guard,
-                    "state_residual": current_residual.maximum_relative,
-                    "hazard_action_per_cycle": cycle.hazard_action_per_cycle,
-                }
-            )
-            if consumed >= requested:
-                break
-            remaining = requested - consumed
-            # At most a guard interval or sub-cycle remainder remains.  Delegate it
-            # to the transactional transient integrator so event localization,
-            # threshold renewal, and pending geometry state are unchanged.
-            local = _transient.integrate_state_coupled_waveform(
-                engine, controller, waveform, temperature_K, remaining
-            )
-            local_cycles = max(
-                float(local.get("coupled_hazard_cycles_consumed", 0.0)), 0.0
-            )
-            consumed += local_cycles
-            dB_total += max(float(local.get("dB", 0.0)), 0.0)
-            dH_total += max(
-                float(local.get("physical_hazard_action_step", 0.0)), 0.0
-            )
-            da_total += max(float(local.get("da", 0.0)), 0.0)
-            packet_mean += max(float(local.get("packet_mean", 0.0)), 0.0)
-            packet_variance += max(
-                float(local.get("packet_variance_m2", 0.0)), 0.0
-            )
-            microsteps += int(local.get("microsteps", 0))
-            _sum_numeric(plastic, dict(local.get("plastic", {})))
-            _sum_numeric(advance, dict(local.get("advance", {})))
-            fired = bool(local.get("fired", False))
-            last_result = dict(local)
-            modes.append(
-                {
-                    "mode": "event_guard_transient",
-                    "cycles": local_cycles,
-                    "fired": fired,
-                }
-            )
-            if fired:
-                invalidate_high_cycle_cache(engine, "first_passage_event")
-            if local_cycles <= 0.0 or bool(
-                local.get("coupled_hazard_work_budget_exhausted", False)
-            ):
-                work_budget_exhausted = True
-                break
-            continue
-
         periodic = solve_periodic_state(
             engine,
             controller,
@@ -272,11 +240,75 @@ def integrate_state_coupled_waveform(
                 "converged": periodic.converged,
                 "iterations": periodic.iterations,
                 "map_evaluations": periodic.map_evaluations,
-                "residual": periodic.residual.maximum_relative,
+                "current_map_residual": current_residual.maximum_relative,
+                "fixed_point_residual": periodic.residual.maximum_relative,
                 "distance_from_current": periodic.distance_from_initial,
                 "failure_reason": periodic.failure_reason,
             }
         )
+
+        stationary_admissible = bool(
+            current_residual.converged
+            and periodic.converged
+            and periodic.distance_from_initial
+            <= float(config["stationary_admission_distance"])
+        )
+        if stationary_admissible:
+            stationary = propagate_stationary_cycles(
+                engine, waveform, cycle, remaining
+            )
+            consumed += stationary.cycles_consumed
+            dB_total += stationary.normalized_clock_added
+            dH_total += stationary.hazard_action_added
+            modes.append(
+                {
+                    "mode": "stationary_tail",
+                    "cycles": stationary.cycles_consumed,
+                    "event_within_guard": stationary.event_within_guard,
+                    "state_residual": current_residual.maximum_relative,
+                    "fixed_point_distance": periodic.distance_from_initial,
+                    "hazard_action_per_cycle": cycle.hazard_action_per_cycle,
+                }
+            )
+            if consumed >= requested:
+                break
+            remaining = requested - consumed
+            local = _transient.integrate_state_coupled_waveform(
+                engine, controller, waveform, temperature_K, remaining
+            )
+            (
+                local_cycles,
+                local_dB,
+                local_dH,
+                local_da,
+                local_packet_mean,
+                local_packet_variance,
+                local_microsteps,
+                fired,
+            ) = _accumulate_transient(local, plastic, advance)
+            consumed += local_cycles
+            dB_total += local_dB
+            dH_total += local_dH
+            da_total += local_da
+            packet_mean_total += local_packet_mean
+            packet_variance_total += local_packet_variance
+            microsteps += local_microsteps
+            last_result = dict(local)
+            modes.append(
+                {
+                    "mode": "event_guard_transient",
+                    "cycles": local_cycles,
+                    "fired": fired,
+                }
+            )
+            if fired:
+                invalidate_high_cycle_cache(engine, "first_passage_event")
+            if local_cycles <= 0.0 or bool(
+                local.get("coupled_hazard_work_budget_exhausted", False)
+            ):
+                work_budget_exhausted = True
+                break
+            continue
 
         requested_project = min(
             float(cache.get("projective_next_cycles", 1.0)),
@@ -326,23 +358,23 @@ def integrate_state_coupled_waveform(
         local = _transient.integrate_state_coupled_waveform(
             engine, controller, waveform, temperature_K, fallback_cycles
         )
-        local_cycles = max(
-            float(local.get("coupled_hazard_cycles_consumed", 0.0)), 0.0
-        )
+        (
+            local_cycles,
+            local_dB,
+            local_dH,
+            local_da,
+            local_packet_mean,
+            local_packet_variance,
+            local_microsteps,
+            fired,
+        ) = _accumulate_transient(local, plastic, advance)
         consumed += local_cycles
-        dB_total += max(float(local.get("dB", 0.0)), 0.0)
-        dH_total += max(
-            float(local.get("physical_hazard_action_step", 0.0)), 0.0
-        )
-        da_total += max(float(local.get("da", 0.0)), 0.0)
-        packet_mean += max(float(local.get("packet_mean", 0.0)), 0.0)
-        packet_variance += max(
-            float(local.get("packet_variance_m2", 0.0)), 0.0
-        )
-        microsteps += int(local.get("microsteps", 0))
-        _sum_numeric(plastic, dict(local.get("plastic", {})))
-        _sum_numeric(advance, dict(local.get("advance", {})))
-        fired = bool(local.get("fired", False))
+        dB_total += local_dB
+        dH_total += local_dH
+        da_total += local_da
+        packet_mean_total += local_packet_mean
+        packet_variance_total += local_packet_variance
+        microsteps += local_microsteps
         last_result = dict(local)
         modes.append(
             {
@@ -381,11 +413,13 @@ def integrate_state_coupled_waveform(
             "da": float(da_total),
             "dt_consumed": float(consumed * period),
             "dt_unused": max((requested - consumed) * period, 0.0),
-            "packet_mean": float(packet_mean),
-            "packet_variance_m2": float(packet_variance),
+            "packet_mean": float(packet_mean_total),
+            "packet_variance_m2": float(packet_variance_total),
             "lambda_c": float(final_cycle.hazard_action_per_cycle / period),
             "lambda_c_raw": float(final_cycle.hazard_action_per_cycle / period),
-            "sigma_tip": float(final_cycle.state_start.diagnostics.get("sigma_tip_Pa", 0.0)),
+            "sigma_tip": float(
+                final_cycle.state_start.diagnostics.get("sigma_tip_Pa", 0.0)
+            ),
             "plastic": plastic,
             "advance": advance,
             "microsteps": int(microsteps),
