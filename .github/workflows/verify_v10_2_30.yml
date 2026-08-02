@@ -55,10 +55,12 @@ jobs:
           bash -n scripts/run_v10_2_30_weakt_feedback_block_smoke.sh
           bash -n scripts/run_v10_2_30_weakt_0p55_transient_diagnostic.sh
           bash -n scripts/run_v10_2_30_weakt_partition_robust_gate.sh
+          bash -n scripts/run_v10_2_30_weakt_0p55_high_cycle_1e12.sh
       - name: Run v10.2.30 regressions
         run: |
           python -m pytest -q --tb=short \
             tests/test_v10_2_30_high_cycle_engine.py \
+            tests/test_v10_2_30_high_cycle_launcher.py \
             tests/test_v10_2_30_audit_p0_invariants.py \
             tests/test_v10_2_30_forward_coupled_marcher.py \
             tests/test_v10_2_30_partition_robust_forward.py \
