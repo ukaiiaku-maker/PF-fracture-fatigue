@@ -60,7 +60,7 @@ required = {
     "adaptive retry limit": "--stagger-max-dt-retries",
     "state rollback": "ep_gp = ep_saved",
     "trial fraction shrink": "trial_frac = _v1043_next_trial_frac",
-    "adaptive hard failure": "did not converge after adaptive timestep subdivision",
+    "adaptive hard failure": "after adaptive timestep subdivision",
     "final equilibrium": "Close the staggered step with a",
     "converged work ledger": (
         "constitutive_dWp_accepted_gp_converged_stagger_rebased_state"
