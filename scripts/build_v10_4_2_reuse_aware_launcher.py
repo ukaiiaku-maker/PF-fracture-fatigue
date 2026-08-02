@@ -68,7 +68,7 @@ def transform(source: str) -> str:
         ')\n\n'
         'replace_scheduler_exact(\n'
         '    \'if find "$OUTROOT" -type f -name COMPLETE -print -quit | grep -q .; then\',\n'
-        '    \'if find "$OUTROOT" \\( -type f -o -type l \\) -name COMPLETE -print -quit | grep -q .; then\',\n'
+        '    \'if find "$OUTROOT" -name COMPLETE -print -quit | grep -q .; then\',\n'
         '    label="symlink-aware COMPLETE postprocessing gate",\n'
         ')\n\n'
         'replace_scheduler_exact(\n'
