@@ -52,7 +52,7 @@ required = {
     "step-state snapshot": "ep_gp_step0_v1043 = ep_gp.copy()",
     "density snapshot": "rho_gp_step0_v1043 = rho_gp.copy()",
     "re-based update": "ep_gp_step0_v1043, rho_gp_step0_v1043",
-    "relaxed fixed point": "ep_gp_iter_v1043 + _v1043_stagger_alpha",
+    "relaxed fixed point": "_v1043_stagger_alpha * _v1043_ep_delta",
     "strict convergence gate": "mechanics/plasticity fixed point did not converge",
     "final equilibrium": "Close the staggered step with a",
     "converged work ledger": (
