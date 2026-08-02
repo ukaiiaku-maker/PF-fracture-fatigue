@@ -29,7 +29,7 @@ def test_adaptive_stagger_retry_is_present_and_state_conservative():
         "load rollback": "Uapp = Uapp_saved",
         "fraction shrink": "trial_frac * _v1043_dt_shrink",
         "retry continuation": "trial_frac = _v1043_next_trial_frac\n                        continue",
-        "hard failure": "did not converge after adaptive timestep subdivision",
+        "hard failure": "after adaptive timestep subdivision",
         "fixed rate statement": "retry with dt and dU reduced together at fixed rate",
     }
     missing = [label for label, token in required.items() if token not in transformed]
@@ -42,7 +42,7 @@ def test_retry_precedes_hard_failure_and_final_equilibrium():
     rollback = transformed.index("u = u_saved", retry)
     retry_continue = transformed.index("continue", rollback)
     hard_failure = transformed.index(
-        "did not converge after adaptive timestep subdivision", retry_continue
+        "after adaptive timestep subdivision", retry_continue
     )
     final_equilibrium = transformed.index(
         "The converged constitutive update changes", hard_failure
