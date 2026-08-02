@@ -11,10 +11,21 @@ if [[ "${CONDA_DEFAULT_ENV:-}" != "$CONDA_ENV" ]]; then
   exit 2
 fi
 
-EXPECTED_HEAD=${EXPECTED_HEAD:-786869e8dc36aeefc4de3331ad64a2f5f37f7164}
+EXPECTED_BRANCH=${EXPECTED_BRANCH:-v10.2.30-hazard-energy-gated-fatigue-events}
+CURRENT_BRANCH=$(git branch --show-current)
+if [[ "$CURRENT_BRANCH" != "$EXPECTED_BRANCH" ]]; then
+  echo "ERROR: expected branch=$EXPECTED_BRANCH; observed $CURRENT_BRANCH" >&2
+  exit 2
+fi
+EXPECTED_HEAD=${EXPECTED_HEAD:-}
 ACTUAL_HEAD=$(git rev-parse HEAD)
-if [[ "$ACTUAL_HEAD" != "$EXPECTED_HEAD" ]]; then
+if [[ -n "$EXPECTED_HEAD" && "$ACTUAL_HEAD" != "$EXPECTED_HEAD" ]]; then
   echo "ERROR: expected HEAD=$EXPECTED_HEAD; observed $ACTUAL_HEAD" >&2
+  exit 2
+fi
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "ERROR: working tree is not clean" >&2
+  git status --short >&2
   exit 2
 fi
 
