@@ -13,13 +13,16 @@ from .plastic_flow_stagger_consistent_v1043 import MODEL_ID as STAGGER_MODEL_ID
 from .plastic_flow_fixed_point_converged_v1043 import MODEL_ID as FIXED_POINT_MODEL_ID
 from .plastic_flow_adaptive_timestep_v1043 import (
     MODEL_ID as ADAPTIVE_TIMESTEP_MODEL_ID,
+)
+from .plastic_flow_path_work_v1043 import (
+    MODEL_ID as PATH_WORK_MODEL_ID,
     load_transformed_sharp_front,
 )
 
 # The public entry path is retained so existing launcher contracts remain valid.
-# The model audit records the constitutive-time, strict convergence, and
-# rejected-trial adaptive-timestep corrections explicitly.
-MODEL_ID = "v10.4.3_bulk_detailed_balance_adaptive_converged_stagger_plastic_terminal"
+# The model audit records the constitutive-time, strict convergence,
+# rejected-trial adaptive-timestep, and endpoint-path work corrections.
+MODEL_ID = "v10.4.3_bulk_detailed_balance_adaptive_converged_stagger_path_work_terminal"
 
 
 def _has_option(args: list[str], name: str) -> bool:
@@ -51,6 +54,7 @@ def _rewrite_model_audit(root: Path) -> None:
             "schema": MODEL_ID,
             "plastic_flow_terminal_model": TERMINAL_MODEL_ID,
             "plastic_work_ledger_base_model": PLASTIC_WORK_MODEL_ID,
+            "plastic_work_path_model": PATH_WORK_MODEL_ID,
             "directional_J_model": DIRECTIONAL_J_MODEL_ID,
             "stagger_consistency_model": STAGGER_MODEL_ID,
             "stagger_fixed_point_model": FIXED_POINT_MODEL_ID,
@@ -89,7 +93,19 @@ def _rewrite_model_audit(root: Path) -> None:
             ),
             "accepted_plastic_work_stagger_policy": "converged_iterate_only",
             "bulk_plastic_work_primary_ledger": (
+                "equilibrated_endpoint_trapezoid_sigma_colon_delta_ep"
+            ),
+            "bulk_plastic_work_constitutive_comparison_ledger": (
                 "constitutive_dWp_accepted_gp_converged_stagger_rebased_state"
+            ),
+            "bulk_plastic_work_endpoint_states": (
+                "beginning_and_end_equilibrated_accepted_step_stresses"
+            ),
+            "bulk_plastic_work_endpoint_increment": (
+                "actual_accepted_ep_end_minus_ep_begin"
+            ),
+            "bulk_plastic_work_event_step_policy": (
+                "constitutive_fallback_to_avoid_mixing_pre_and_post_crack_geometries"
             ),
             "negative_accepted_plastic_work_policy": (
                 "raise_if_materially_negative_clamp_roundoff_only"
@@ -135,7 +151,9 @@ def main(argv=None):
             "and must converge before a step is accepted; unconverged trials "
             "are rolled back and retried with smaller dt and dU at fixed loading "
             "rate; mechanics is then re-equilibrated against the accepted plastic "
-            "state; accepted Wp, J_pl and contour shielding are diagnostic only"
+            "state; accepted bulk Wp uses equilibrated endpoint-average stress "
+            "contracted with the actual accepted plastic-strain increment; Wp, "
+            "J_pl and contour shielding are diagnostic only"
         )
         result = _v1041.main(args)
         out = _option_value(args, "--out")
