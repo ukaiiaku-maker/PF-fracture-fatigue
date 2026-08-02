@@ -2,9 +2,10 @@
 
 Cleavage first passage is unchanged. During the waiting cycles the persistent-site
 source/mobile/retained state evolves at a stationary geometric tip. A completed
-renewal creates a pending stochastic event proposal. The moving-frame state and
-sharp-wake geometry are translated together only after the hazard-derived energy
-gate approves the committed event distance.
+renewal creates a pending stochastic event proposal. The continuum K^2/E' energy
+comparison is diagnostic only and cannot suppress or rescale cleavage hazard. The
+moving-frame state and sharp-wake geometry are translated together only after the
+post-passage hazard-derived energy gate approves the committed event distance.
 """
 from __future__ import annotations
 
@@ -29,9 +30,10 @@ MODEL_ID = "v10.2.30_transactional_persistent_site_energy_gated_cyclic"
 class HazardEnergyGatedPersistentSiteCyclicTipEngine(
     AuditedCoupledPersistentSiteCyclicTipEngine
 ):
-    """State-coupled fatigue with atomic energy-gated event translation."""
+    """State-coupled fatigue with atomic post-passage energy-gated translation."""
 
     hazard_energy_gated_v10230 = True
+    hazard_energy_gate_continuum_affects_hazard = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -73,9 +75,10 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
         )
         self.energy_gate_last_continuum = dict(continuum)
 
+        # Non-negotiable invariant: the continuum K^2/E' comparison is diagnostic
+        # only. Cleavage first-passage kinetics are never suppressed or rescaled by
+        # the post-passage event-energy calculation.
         effective_lambda = lambda_override
-        if not bool(continuum["energy_gate_continuum_open"]):
-            effective_lambda = 0.0
 
         base_da = float(self.f.da)
         rng_state_before = copy.deepcopy(self._hazard_rng.bit_generator.state)
@@ -124,6 +127,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                 "hazard_cooperative_hits": float(self.f.m_hits),
                 "hazard_burgers_vector_m": float(self.b),
                 "energy_gate_continuum": dict(continuum),
+                "hazard_energy_gate_continuum_affects_hazard": False,
             }
             self._energy_gate_pending = {
                 "descriptor": descriptor,
@@ -147,6 +151,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                     continuum["energy_gate_continuum_open"]
                 ),
                 "hazard_energy_gate_continuum": dict(continuum),
+                "hazard_energy_gate_continuum_affects_hazard": False,
                 "stochastic_event_proposed_advance_m": proposal if fired else 0.0,
                 "stochastic_event_proposed_factor": proposal_factor if fired else 0.0,
                 "avalanche_event_advance_m": 0.0,
@@ -191,6 +196,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                 "energy_gate_continuum_open", False
             )
         )
+        result["hazard_energy_gate_continuum_affects_hazard"] = False
         result["transactional_event_translation_pending"] = bool(
             result.get("fired", False) and not self._energy_gate_provisional
         )
