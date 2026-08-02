@@ -400,7 +400,15 @@ def integrate_state_coupled_waveform(
                 flush=True,
             )
 
-    final_cycle = one_cycle_map(engine, controller, waveform, temperature_K)
+    if fired:
+        final_lambda = max(float(last_result.get("lambda_c", 0.0)), 0.0)
+        final_sigma = max(float(last_result.get("sigma_tip", 0.0)), 0.0)
+    else:
+        final_cycle = one_cycle_map(engine, controller, waveform, temperature_K)
+        final_lambda = float(final_cycle.hazard_action_per_cycle / period)
+        final_sigma = float(
+            final_cycle.state_start.diagnostics.get("sigma_tip_Pa", 0.0)
+        )
     final_ledgers = capture_ledgers(engine)
     result = dict(last_result)
     result.update(
@@ -415,11 +423,9 @@ def integrate_state_coupled_waveform(
             "dt_unused": max((requested - consumed) * period, 0.0),
             "packet_mean": float(packet_mean_total),
             "packet_variance_m2": float(packet_variance_total),
-            "lambda_c": float(final_cycle.hazard_action_per_cycle / period),
-            "lambda_c_raw": float(final_cycle.hazard_action_per_cycle / period),
-            "sigma_tip": float(
-                final_cycle.state_start.diagnostics.get("sigma_tip_Pa", 0.0)
-            ),
+            "lambda_c": final_lambda,
+            "lambda_c_raw": final_lambda,
+            "sigma_tip": final_sigma,
             "plastic": plastic,
             "advance": advance,
             "microsteps": int(microsteps),
