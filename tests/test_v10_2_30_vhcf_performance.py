@@ -135,20 +135,24 @@ def test_fast_trial_clone_install_and_restore():
     assert CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine.__deepcopy__ is original
 
 
-def test_entry_installs_geometric_selector_and_fast_clone(monkeypatch, tmp_path):
+def test_entry_installs_forward_selector_marcher_and_fast_clone(monkeypatch, tmp_path):
     from arrhenius_fracture import fatigue_controller_delegate_v10229 as delegate
+    from arrhenius_fracture import persistent_site_cyclic_coupled_v10229 as coupled_commit
+    from arrhenius_fracture import persistent_site_forward_coupled_hazard_v10230 as forward_hazard
+    from arrhenius_fracture import persistent_site_forward_selector_v10230 as forward_selector
     from arrhenius_fracture import sharp_front_v10_2_29_fatigue_audited as v10229
     from arrhenius_fracture import sharp_front_v10_2_30_energy_gated_fatigue as entry
-    from arrhenius_fracture import persistent_site_vhcf_coupled_selector_v10230 as coupled
 
     observed = {}
     original_attach = delegate.attach_prediction_context
     original_select = delegate.select_nonlinear_block
+    original_commit = coupled_commit.integrate_state_coupled_waveform
     original_deepcopy = CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine.__deepcopy__
 
     def fake_main(args):
         observed["attach"] = delegate.attach_prediction_context
         observed["select"] = delegate.select_nonlinear_block
+        observed["commit"] = coupled_commit.integrate_state_coupled_waveform
         observed["deepcopy"] = (
             CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine.__deepcopy__
         )
@@ -160,11 +164,13 @@ def test_entry_installs_geometric_selector_and_fast_clone(monkeypatch, tmp_path)
 
     result = entry.main(["--fatigue-cycles", "--out", str(tmp_path)])
     assert result == "ok"
-    assert observed["attach"] is coupled.attach_prediction_context
-    assert observed["select"] is coupled.select_nonlinear_block
+    assert observed["attach"] is forward_selector.attach_prediction_context
+    assert observed["select"] is forward_selector.select_nonlinear_block
+    assert observed["commit"] is forward_hazard.integrate_state_coupled_waveform
     assert observed["deepcopy"] is trial_clone.fast_trial_deepcopy
     assert delegate.attach_prediction_context is original_attach
     assert delegate.select_nonlinear_block is original_select
+    assert coupled_commit.integrate_state_coupled_waveform is original_commit
     assert CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine.__deepcopy__ is original_deepcopy
 
 
