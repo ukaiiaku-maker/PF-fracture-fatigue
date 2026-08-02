@@ -32,6 +32,7 @@ jobs:
             arrhenius_fracture/persistent_site_vhcf_selector_v10230.py \
             arrhenius_fracture/persistent_site_vhcf_coupled_selector_v10230.py \
             arrhenius_fracture/persistent_site_forward_coupled_hazard_v10230.py \
+            arrhenius_fracture/persistent_site_forward_robust_v10230.py \
             arrhenius_fracture/persistent_site_forward_selector_v10230.py \
             arrhenius_fracture/active_state_block_control_v10230.py \
             arrhenius_fracture/feedback_state_block_control_v10230.py \
@@ -53,6 +54,7 @@ jobs:
           python -m pytest -q --tb=short \
             tests/test_v10_2_30_audit_p0_invariants.py \
             tests/test_v10_2_30_forward_coupled_marcher.py \
+            tests/test_v10_2_30_partition_robust_forward.py \
             tests/test_v10_2_30_transient_diagnostic.py \
             tests/test_v10_2_30_partition_equivalence.py \
             tests/test_v10_2_30_diagnostic_serialization.py \
