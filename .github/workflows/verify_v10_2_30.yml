@@ -39,7 +39,8 @@ jobs:
             arrhenius_fracture/sharp_front_v10_2_30_fixed_deltaK.py \
             scripts/v10230_active_state_runtime/sitecustomize.py \
             scripts/analyze_v10_2_30_energy_gated_qualification.py \
-            scripts/analyze_v10_2_30_weakt_transient_diagnostic.py
+            scripts/analyze_v10_2_30_weakt_transient_diagnostic.py \
+            scripts/compare_v10_2_30_weakt_partition_equivalence.py
           bash -n scripts/run_v10_2_30_three_deltaK_energy_gate_qualification.sh
           bash -n scripts/run_v10_2_30_four_class_three_deltaK_energy_gate_qualification.sh
           bash -n scripts/run_v10_2_30_300K_four_class_fatigue.sh
@@ -53,6 +54,7 @@ jobs:
             tests/test_v10_2_30_audit_p0_invariants.py \
             tests/test_v10_2_30_forward_coupled_marcher.py \
             tests/test_v10_2_30_transient_diagnostic.py \
+            tests/test_v10_2_30_partition_equivalence.py \
             tests/test_v10_2_30_diagnostic_serialization.py \
             tests/test_v10_2_30_active_state_block_control.py \
             tests/test_v10_2_30_feedback_state_block_control.py \
