@@ -77,8 +77,9 @@ def _make_required_fixture(function_text: str, case_root: Path) -> None:
         'v1042_reuse_path = root / "v10_4_2_reuse_audit.json"', 1
     )[0]
     names = set(re.findall(r'root / "([^"]+)"', before_guard))
-    # The terminal-marker contract requires exactly one of COMPLETE/PLASTIC_FLOW.
-    names.discard("PLASTIC_FLOW")
+    # The terminal-marker contract requires exactly one terminal marker, and
+    # failure/incomplete markers must be absent.
+    names.difference_update({"PLASTIC_FLOW", "RUN_FAILED", "INCOMPLETE"})
     names.add("COMPLETE")
     names.add("v10_4_2_reuse_audit.json")
     for name in names:
@@ -170,12 +171,12 @@ def test_final_generated_scheduler_orders_and_hardens_reuse(tmp_path: Path):
     function = _extract_verified_complete(final)
     guard = 'v1042_reuse_path = root / "v10_4_2_reuse_audit.json"'
     assert final.count("verified_complete()") == 1
-    assert function.index(guard) < function.index("expected = {")
+    assert function.index(guard) < function.index("for key, value in expected.items():")
     assert "SKIP_REUSED_VERIFIED" in function
     assert "FAILED_REUSE_VERIFICATION" in function
     assert "RERUN_REQUIRED_STAGGER_TIME_CORRECTION" in function
     assert 'verify_source_case(Path(reuse_audit["source_case"]))' in function
-    assert 'find "$OUTROOT" \\( -type f -o -type l \\) -name COMPLETE' in final
+    assert 'find "$OUTROOT" -name COMPLETE -print -quit' in final
     assert "acceptance_failures=$(" in final
     assert "failed_or_incomplete_cases" in final
 
