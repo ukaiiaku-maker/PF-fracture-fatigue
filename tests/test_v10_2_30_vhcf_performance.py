@@ -135,10 +135,10 @@ def test_fast_trial_clone_install_and_restore():
     assert CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine.__deepcopy__ is original
 
 
-def test_entry_installs_forward_selector_marcher_and_fast_clone(monkeypatch, tmp_path):
+def test_entry_installs_high_cycle_engine_and_fast_clone(monkeypatch, tmp_path):
     from arrhenius_fracture import fatigue_controller_delegate_v10229 as delegate
     from arrhenius_fracture import persistent_site_cyclic_coupled_v10229 as coupled_commit
-    from arrhenius_fracture import persistent_site_forward_robust_v10230 as forward_hazard
+    from arrhenius_fracture import persistent_site_high_cycle_engine_v10230 as high_cycle
     from arrhenius_fracture import persistent_site_forward_selector_v10230 as forward_selector
     from arrhenius_fracture import sharp_front_v10_2_29_fatigue_audited as v10229
     from arrhenius_fracture import sharp_front_v10_2_30_energy_gated_fatigue as entry
@@ -166,7 +166,7 @@ def test_entry_installs_forward_selector_marcher_and_fast_clone(monkeypatch, tmp
     assert result == "ok"
     assert observed["attach"] is forward_selector.attach_prediction_context
     assert observed["select"] is forward_selector.select_nonlinear_block
-    assert observed["commit"] is forward_hazard.integrate_state_coupled_waveform
+    assert observed["commit"] is high_cycle.integrate_state_coupled_waveform
     assert observed["deepcopy"] is trial_clone.fast_trial_deepcopy
     assert delegate.attach_prediction_context is original_attach
     assert delegate.select_nonlinear_block is original_select
