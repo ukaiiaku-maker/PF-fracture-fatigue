@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""Run a controlled n_stagger comparison from a previously audited command.sh.
+"""Run a controlled stagger fixed-point comparison from an audited command.sh.
 
 The template command preserves the exact material, kernel, geometry, seed, and
 loading options of an existing case.  This harness changes only:
 
-* ``--n-stagger``;
+* ``--n-stagger`` (now the maximum fixed-point iteration count);
 * ``--out``;
-* optionally ``--steps``, ``--print-every``, and snapshot count.
+* optionally ``--steps``, ``--print-every``, and snapshot count;
+* the explicit fixed-point relaxation and convergence tolerances.
 
-It is intended for the v10.4.3 constitutive-time qualification before any
-production campaign is restarted.
+It is intended for the v10.4.3 constitutive-time/fixed-point qualification
+before any production campaign is restarted.
 """
 from __future__ import annotations
 
@@ -20,7 +21,6 @@ from pathlib import Path
 import re
 import shlex
 import subprocess
-import sys
 from typing import Any
 
 
@@ -69,30 +69,31 @@ def _ratio(value: float | None, reference: float | None) -> float | None:
     return value / reference
 
 
-def _summarize(cases: dict[int, Path]) -> dict[str, Any]:
+def _summarize(cases: dict[int, Path], controls: dict[str, float]) -> dict[str, Any]:
     rows = {n: _numeric_row(_steps_csv(root)) for n, root in cases.items()}
     reference_n = min(rows)
     reference = rows[reference_n]
     fields = [
         "Uapp_m",
-        "Uapp",
         "Ftop_N",
-        "Ftop",
-        "KJ_MPa_sqrt_m",
-        "KJ",
-        "J_effective_J_per_m2",
-        "J_positive_J_per_m2",
-        "W_p_J_per_m",
-        "W_p",
-        "U_el_J_per_m",
-        "U_el",
-        "rho_mean_m2",
-        "rho_mean",
-        "rho_max_m2",
-        "rho_max",
+        "J_effective_direct_J_per_m2",
+        "J_signed_direct_J_per_m2",
+        "KJ_Pa_sqrtm",
+        "sigma_tip_Pa",
+        "sigma_back_Pa",
+        "sigma_cleave_eff_Pa",
+        "W_bulk_plastic_cumulative_J_per_m",
+        "U_elastic_J_per_m",
+        "W_ext_cumulative_J_per_m",
+        "W_fracture_residual_cumulative_J_per_m",
+        "W_emit_J_per_m",
+        "W_tip_emit_cumulative_J_per_m",
+        "N_em",
+        "lambda_e",
+        "lambda_c",
         "B",
         "a_tip_m",
-        "a_tip",
+        "crack_extension_m",
         "n_fire",
     ]
     comparisons: dict[str, Any] = {}
@@ -106,16 +107,17 @@ def _summarize(cases: dict[int, Path]) -> dict[str, Any]:
         }
         comparisons[f"n_stagger_{n}_over_{reference_n}"] = ratios
     return {
-        "schema": "v10.4.3_n_stagger_pair_summary_v1",
+        "schema": "v10.4.3_converged_stagger_pair_summary_v2",
         "reference_n_stagger": reference_n,
+        "fixed_point_controls": controls,
         "cases": {str(n): str(path.resolve()) for n, path in cases.items()},
         "final_rows": {str(n): row for n, row in rows.items()},
         "ratios": comparisons,
         "interpretation": (
-            "Corrected runs need not be identical at n_stagger=1 and 4 because "
-            "they are different fixed-point convergence depths, but cumulative "
-            "plastic state/work must not scale approximately as n_stagger. "
-            "Use n_stagger=2 versus 4 as the tighter convergence comparison."
+            "Each successful case passed the strict relaxed fixed-point gate on "
+            "every accepted physical step. Runs with different maximum iteration "
+            "counts should therefore agree to the requested convergence tolerance. "
+            "A failure is diagnostic and must not be treated as a completed case."
         ),
     }
 
@@ -124,15 +126,23 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--template-command", type=Path, required=True)
     parser.add_argument("--outroot", type=Path, required=True)
-    parser.add_argument("--staggers", type=int, nargs="+", default=[1, 4])
+    parser.add_argument("--staggers", type=int, nargs="+", default=[20, 40])
     parser.add_argument("--steps", type=int, default=160)
     parser.add_argument("--print-every", type=int, default=20)
     parser.add_argument("--save-snapshots", type=int, default=0)
+    parser.add_argument("--stagger-relaxation", type=float, default=0.25)
+    parser.add_argument("--stagger-rtol", type=float, default=1.0e-6)
+    parser.add_argument("--stagger-ep-atol", type=float, default=1.0e-12)
+    parser.add_argument("--stagger-rho-atol-m2", type=float, default=1.0e3)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
 
     if len(set(args.staggers)) != len(args.staggers) or any(n < 1 for n in args.staggers):
         raise SystemExit("--staggers must contain unique positive integers")
+    if not (0.0 < args.stagger_relaxation <= 1.0):
+        raise SystemExit("--stagger-relaxation must satisfy 0 < alpha <= 1")
+    if min(args.stagger_rtol, args.stagger_ep_atol, args.stagger_rho_atol_m2) < 0.0:
+        raise SystemExit("fixed-point tolerances must be non-negative")
     if args.outroot.exists():
         raise SystemExit(f"refusing to overwrite existing output root: {args.outroot}")
 
@@ -159,6 +169,30 @@ def main(argv: list[str] | None = None) -> int:
         command = _replace_flag(
             command, "--save-snapshots", str(args.save_snapshots), required=False
         )
+        command = _replace_flag(
+            command,
+            "--stagger-relaxation",
+            f"{args.stagger_relaxation:.17g}",
+            required=False,
+        )
+        command = _replace_flag(
+            command,
+            "--stagger-rtol",
+            f"{args.stagger_rtol:.17g}",
+            required=False,
+        )
+        command = _replace_flag(
+            command,
+            "--stagger-ep-atol",
+            f"{args.stagger_ep_atol:.17g}",
+            required=False,
+        )
+        command = _replace_flag(
+            command,
+            "--stagger-rho-atol-m2",
+            f"{args.stagger_rho_atol_m2:.17g}",
+            required=False,
+        )
 
         command_path = args.outroot / f"command_n_stagger_{n_stagger}.sh"
         command_path.write_text("set -euo pipefail\n" + command.lstrip())
@@ -178,7 +212,7 @@ def main(argv: list[str] | None = None) -> int:
                 check=False,
             )
         if completed.returncode != 0:
-            tail = "\n".join(log_path.read_text().splitlines()[-80:])
+            tail = "\n".join(log_path.read_text().splitlines()[-100:])
             raise SystemExit(
                 f"n_stagger={n_stagger} failed with exit {completed.returncode}\n{tail}"
             )
@@ -186,7 +220,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Completed n_stagger={n_stagger}: {case_root}")
 
     if not args.dry_run:
-        summary = _summarize(cases)
+        controls = {
+            "stagger_relaxation": args.stagger_relaxation,
+            "stagger_rtol": args.stagger_rtol,
+            "stagger_ep_atol": args.stagger_ep_atol,
+            "stagger_rho_atol_m2": args.stagger_rho_atol_m2,
+        }
+        summary = _summarize(cases, controls)
         summary_path = args.outroot / "n_stagger_comparison.json"
         summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
         print(summary_path)
