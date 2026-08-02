@@ -50,7 +50,7 @@ bash -n "$GENERATED"
 
 printf 'Model entry: %s\n' \
   'arrhenius_fracture.sharp_front_v10_4_2_plastic_flow_audited'
-printf 'Model revision: v10.4.3 adaptive converged stagger bulk plasticity\n'
+printf 'Model revision: v10.4.3 stagger-consistent bulk plasticity with adaptive converged closure\n'
 printf 'Hazard-energy gate: active; no absolute athermal Gc\n'
 printf 'Directional J: positive raw signed J is forward work; J_eff=max(J_signed,0)\n'
 printf 'First-nonzero directional-J sign latch: disabled\n'
