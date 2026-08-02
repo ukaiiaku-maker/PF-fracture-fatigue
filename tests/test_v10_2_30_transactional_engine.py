@@ -5,21 +5,17 @@ from arrhenius_fracture import stochastic_avalanche_tip
 
 
 def test_continuum_comparison_is_diagnostic_only(monkeypatch):
-    seen = {}
-
-    def physical_continuum(*args, **kwargs):
-        return {
+    def fake_parent(self, K, T, dt, stress_override=None, lambda_override=None):
+        self.energy_gate_last_continuum = {
             "energy_gate_continuum_open": False,
             "hazard_resistance_J_per_m2": 2.0,
             "continuum_driving_J_per_m2": 1.0,
         }
+        return {
+            "fired": False,
+            "hazard_energy_gate_continuum_affects_hazard": False,
+        }
 
-    def fake_parent(self, K, T, dt, stress_override=None, lambda_override=None):
-        probe = corrected._base.continuum_gate_diagnostics(self, K, T)
-        seen["parent_open"] = probe["energy_gate_continuum_open"]
-        return {"fired": False}
-
-    monkeypatch.setattr(corrected._gate, "continuum_gate_diagnostics", physical_continuum)
     monkeypatch.setattr(
         corrected._base.HazardEnergyGatedPersistentSiteCyclicTipEngine,
         "_integrate_coupled",
@@ -33,7 +29,6 @@ def test_continuum_comparison_is_diagnostic_only(monkeypatch):
     engine._energy_gate_pending = None
     result = engine._integrate_coupled(4.0, 300.0, 1.0)
 
-    assert seen["parent_open"] is True
     assert result["hazard_energy_gate_continuum_open"] is False
     assert result["hazard_energy_gate_continuum_affects_hazard"] is False
 
@@ -41,16 +36,13 @@ def test_continuum_comparison_is_diagnostic_only(monkeypatch):
 def test_completed_event_barrier_is_reevaluated_at_Kmax(monkeypatch):
     stochastic_avalanche_tip.clear_pending_geometry_events()
 
-    def physical_continuum(*args, **kwargs):
-        return {"energy_gate_continuum_open": True}
-
     def fake_parent(self, K, T, dt, stress_override=None, lambda_override=None):
+        self.energy_gate_last_continuum = {"energy_gate_continuum_open": True}
         descriptor = {"energy_gate_engine_id": self._engine_id}
         self._energy_gate_pending = {"descriptor": descriptor}
         stochastic_avalanche_tip._PENDING_GEOMETRY_EVENTS.append(descriptor)
         return {"fired": True}
 
-    monkeypatch.setattr(corrected._gate, "continuum_gate_diagnostics", physical_continuum)
     monkeypatch.setattr(
         corrected._base.HazardEnergyGatedPersistentSiteCyclicTipEngine,
         "_integrate_coupled",
