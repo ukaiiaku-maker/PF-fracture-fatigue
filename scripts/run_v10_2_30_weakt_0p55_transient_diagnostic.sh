@@ -34,7 +34,7 @@ HAZARD_SEED=${HAZARD_SEED:-2001726}
 PARAMETER_OPTION=${PARAMETER_OPTION:-v913_paper_weakT01_0129902_persistent_sites}
 FAMILY_JSON=${FAMILY_JSON:-$ROOT/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json}
 RUN_CYCLES_MAX=${RUN_CYCLES_MAX:-1e6}
-REFERENCE_HORIZON_CYCLES=${REFERENCE_HORIZON_CYCLES:-1e10}
+REFERENCE_HORIZON_CYCLES=${REFERENCE_HORIZON_CYCLES:-1e12}
 OUTER_PROPOSAL_CYCLES=${OUTER_PROPOSAL_CYCLES:-1e6}
 STEPS=${STEPS:-16}
 MAX_WALL_SECONDS=${MAX_WALL_SECONDS:-900}
@@ -87,21 +87,28 @@ export V10230_FORWARD_SHIELD_REL_TOL=${V10230_FORWARD_SHIELD_REL_TOL:-1e-3}
 export V10230_FORWARD_SIGMA_REL_TOL=${V10230_FORWARD_SIGMA_REL_TOL:-1e-3}
 export V10230_FORWARD_RADIUS_REL_TOL=${V10230_FORWARD_RADIUS_REL_TOL:-1e-3}
 export V10230_FORWARD_LOG_LAMBDA_TOL_DECADES=${V10230_FORWARD_LOG_LAMBDA_TOL_DECADES:-0.01}
+export V10230_FORWARD_STATE_PROFILE_REL_TOL=${V10230_FORWARD_STATE_PROFILE_REL_TOL:-1e-4}
+export V10230_FORWARD_MOBILE_REL_TOL=${V10230_FORWARD_MOBILE_REL_TOL:-1e-4}
+export V10230_FORWARD_RETAINED_REL_TOL=${V10230_FORWARD_RETAINED_REL_TOL:-1e-4}
+export V10230_FORWARD_BACKSTRESS_REL_TOL=${V10230_FORWARD_BACKSTRESS_REL_TOL:-1e-4}
+export V10230_FORWARD_EMISSION_LOG_RATE_TOL_DECADES=${V10230_FORWARD_EMISSION_LOG_RATE_TOL_DECADES:-0.01}
+export V10230_FORWARD_MAX_SEGMENT_CYCLES=${V10230_FORWARD_MAX_SEGMENT_CYCLES:-1e6}
 export V10230_FORWARD_EVENT_LOCALIZATION_CYCLES=${V10230_FORWARD_EVENT_LOCALIZATION_CYCLES:-1e-6}
-export V10230_FORWARD_MAX_ACCEPTED_SEGMENTS=${V10230_FORWARD_MAX_ACCEPTED_SEGMENTS:-32}
-export V10230_FORWARD_MAX_TRIAL_INTEGRATIONS=${V10230_FORWARD_MAX_TRIAL_INTEGRATIONS:-128}
+export V10230_FORWARD_MAX_ACCEPTED_SEGMENTS=${V10230_FORWARD_MAX_ACCEPTED_SEGMENTS:-64}
+export V10230_FORWARD_MAX_TRIAL_INTEGRATIONS=${V10230_FORWARD_MAX_TRIAL_INTEGRATIONS:-256}
 export V10230_FORWARD_HEARTBEAT_SEGMENTS=${V10230_FORWARD_HEARTBEAT_SEGMENTS:-4}
 
 "$PYTHON_BIN" - <<'PY'
 from pathlib import Path
 import arrhenius_fracture
-from arrhenius_fracture import persistent_site_forward_coupled_hazard_v10230 as forward
+from arrhenius_fracture import persistent_site_forward_robust_v10230 as forward
 from arrhenius_fracture import persistent_site_forward_selector_v10230 as selector
 
-print("v10.2.30 weak-T transient diagnostic")
+print("v10.2.30 weak-T partition-robust transient diagnostic")
 print(f"  package={Path(arrhenius_fracture.__file__).resolve()}")
 print(f"  marcher={forward.MODEL_ID}")
 print(f"  selector={selector.MODEL_ID}")
+print("  state_error=profile+mobile+retained+backstress+source_rate")
 print("  stationary_tail_propagation=off")
 print("  full_four_class_campaign=off")
 PY
@@ -110,12 +117,13 @@ PY
   "$REFERENCE_HORIZON_CYCLES" "$OUTER_PROPOSAL_CYCLES" "$STEPS" \
   "$MAX_WALL_SECONDS" <<'PY'
 import json
+import os
 import sys
 from pathlib import Path
 
 root = Path(sys.argv[1])
 payload = {
-    "schema": "v10.2.30_weakt_transient_run_manifest_v1",
+    "schema": "v10.2.30_weakt_partition_robust_transient_manifest_v2",
     "git_head": sys.argv[2],
     "run_cycles_max": float(sys.argv[3]),
     "reference_horizon_cycles": float(sys.argv[4]),
@@ -124,6 +132,11 @@ payload = {
     "maximum_wall_seconds": int(sys.argv[7]),
     "stationary_tail_propagation_enabled": False,
     "production_campaign": False,
+    "forward_controls": {
+        name: os.environ[name]
+        for name in sorted(os.environ)
+        if name.startswith("V10230_FORWARD_")
+    },
 }
 (root / "transient_diagnostic_manifest.json").write_text(
     json.dumps(payload, indent=2, sort_keys=True) + "\n"
