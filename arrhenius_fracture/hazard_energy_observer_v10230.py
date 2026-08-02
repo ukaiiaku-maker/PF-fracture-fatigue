@@ -3,7 +3,9 @@
 The low-level sharp-front driver imports its cleavage selectors and J-integral
 routine inside ``run_2d``.  This module wraps those defining functions before the
 run begins, records the selected relative plane factor, and mirrors the driver's
-root-signed positive-J convention.  It does not alter the returned selector or
+positive raw signed-J convention.  Under the implemented q=1 inner/q=0 outer
+domain-integral convention, positive raw J is forward configurational work and
+negative raw J is non-driving.  It does not alter the returned selector or
 mechanics values.
 
 The production v10.2.28/v10.2.29 campaigns are single-front.  v10.2.30 therefore
@@ -21,6 +23,7 @@ from . import crystal
 from . import j_integral
 
 MODEL_ID = "v10.2.30_single_front_hazard_energy_observer"
+J_SIGN_CONVENTION = "positive_raw_signed_J_is_forward_configurational_work"
 
 
 @dataclass
@@ -29,7 +32,9 @@ class MechanicsObservation:
     J_probe_J_per_m2: float = 0.0
     J_signed_J_per_m2: float = 0.0
     K_probe_Pa_sqrt_m: float = 0.0
-    J_sign_reference: float = 0.0
+    J_sign_reference: float = 1.0
+    J_sign_convention: str = J_SIGN_CONVENTION
+    first_nonzero_sign_latch_used: bool = False
     direction_angle_deg: float = 0.0
     selector_serial: int = 0
     mechanics_serial: int = 0
@@ -106,9 +111,12 @@ def _j_wrapper(original: Callable[..., Any]):
         J_signed = float(info.get("J_signed", info.get("J", 0.0)) or 0.0)
         if not math.isfinite(J_signed):
             raise RuntimeError("directional J probe returned a nonfinite signed value")
-        if _STATE.J_sign_reference == 0.0 and abs(J_signed) > 1.0e-30:
-            _STATE.J_sign_reference = 1.0 if J_signed > 0.0 else -1.0
-        J_effective = max(_STATE.J_sign_reference * J_signed, 0.0)
+
+        # The outer sharp-front solver uses the same fixed convention.  Do not
+        # infer a global sign from the first nonzero probe: a small negative
+        # startup value can precede a large positive loaded root field.  The
+        # observer and event predictor must therefore both use max(J_signed, 0).
+        J_effective = max(J_signed, 0.0)
         K_value = max(float(K_raw), 0.0) if J_effective > 0.0 else 0.0
         if not math.isfinite(K_value):
             raise RuntimeError("directional J probe returned a nonfinite K")
@@ -116,11 +124,16 @@ def _j_wrapper(original: Callable[..., Any]):
         _STATE.J_signed_J_per_m2 = J_signed
         _STATE.J_probe_J_per_m2 = J_effective
         _STATE.K_probe_Pa_sqrt_m = K_value
+        _STATE.J_sign_reference = 1.0
+        _STATE.J_sign_convention = J_SIGN_CONVENTION
+        _STATE.first_nonzero_sign_latch_used = False
         _STATE.mechanics_serial += 1
         info["v10230_gamma_rel"] = float(_STATE.gamma_rel)
         info["v10230_J_effective_J_per_m2"] = float(J_effective)
         info["v10230_K_probe_Pa_sqrt_m"] = float(K_value)
-        info["v10230_J_sign_reference"] = float(_STATE.J_sign_reference)
+        info["v10230_J_sign_reference"] = 1.0
+        info["v10230_J_sign_convention"] = J_SIGN_CONVENTION
+        info["v10230_first_nonzero_sign_latch_used"] = False
         return result
 
     wrapped._v10230_hazard_energy_observer = True
@@ -170,12 +183,16 @@ def audit_payload() -> dict[str, Any]:
         "installed": bool(_INSTALLED),
         "single_front_only": True,
         "root_signed_positive_J": True,
+        "directional_J_effective_definition": "max(J_signed,0)",
+        "directional_J_sign_convention": J_SIGN_CONVENTION,
+        "first_nonzero_sign_latch_used": False,
         "continuous_and_discrete_gamma_contracts_normalized": True,
         "state": asdict(_STATE),
     }
 
 
 __all__ = [
+    "J_SIGN_CONVENTION",
     "MODEL_ID",
     "MechanicsObservation",
     "audit_payload",
