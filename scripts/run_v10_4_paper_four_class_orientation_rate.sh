@@ -33,7 +33,7 @@ GENERATED="${GENERATED_BASE}.sh"
 mv "$GENERATED_BASE" "$GENERATED"
 trap 'rm -f "$GENERATED"' EXIT
 
-"$PYTHON_BIN" scripts/build_v10_4_2_positive_J_launcher.py \
+"$PYTHON_BIN" scripts/build_v10_4_2_reuse_aware_launcher.py \
   --source "$BASE" \
   --output "$GENERATED"
 chmod +x "$GENERATED"
@@ -49,6 +49,7 @@ printf 'Bulk net slip: detailed balance; exact zero at zero stress\n'
 printf 'Plastic-flow terminal: enabled; 2000 accepted-step persistence window\n'
 printf 'Plastic dissipation measure: diagnostic only; excluded from fracture J and hazard\n'
 printf 'Contour shielding: multi-contour elastic configurational-J diagnostic only\n'
+printf 'Audited inherited cases: verify v10.4.2 reuse audit before native command checks\n'
 printf 'Bulk source population: homogeneous persistent background\n'
 printf 'Direct tip-to-bulk density transfer: disabled\n'
 printf 'Loading-rate factor: %s\n' "$LOADING_RATE_FACTOR"
