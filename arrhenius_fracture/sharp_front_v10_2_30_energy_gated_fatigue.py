@@ -10,7 +10,9 @@ from . import fatigue_controller_delegate_v10229 as _delegate
 from . import fatigue_v1 as _fatigue_v1
 from . import fem as _fem
 from . import hazard_energy_event_gate_v10230 as _energy_gate
-from . import persistent_site_vhcf_coupled_selector_v10230 as _vhcf_selector
+from . import persistent_site_cyclic_coupled_v10229 as _coupled_commit
+from . import persistent_site_forward_coupled_hazard_v10230 as _forward_hazard
+from . import persistent_site_forward_selector_v10230 as _forward_selector
 from . import sharp_front_v10_1_7_3 as _avalanche
 from . import sharp_front_v10_2_29_fatigue_audited as _v10229
 from .hazard_energy_event_gate_v10230 import (
@@ -91,12 +93,17 @@ def _write_audit(args: list[str]) -> None:
             ),
             "transactional_engine_model_id": CORRECTED_ENGINE_MODEL_ID,
             "event_length_search_model_id": MESH_SEARCH_MODEL_ID,
-            "vhcf_block_selector_model_id": _vhcf_selector.MODEL_ID,
+            "vhcf_block_selector_model_id": _forward_selector.MODEL_ID,
             "vhcf_block_search_strategy": (
-                "linear_seed_geometric_bracket_log_bisection"
+                "predictor_only_forward_marcher_authoritative"
             ),
+            "vhcf_forward_marcher_model_id": _forward_hazard.MODEL_ID,
             "vhcf_full_horizon_first_trial": False,
-            "vhcf_physical_increment_targets_changed": False,
+            "vhcf_raw_population_increment_targets_active": False,
+            "vhcf_recursive_depth_first_commit": False,
+            "vhcf_partial_cycle_return_supported": True,
+            "vhcf_two_half_step_state_committed": True,
+            "vhcf_third_commit_integration": False,
             "trial_clone_model_id": TRIAL_CLONE_MODEL_ID,
             "trial_rng_seedsequence_reduce_path_avoided": True,
             "persistent_site_source": True,
@@ -145,6 +152,7 @@ def main(argv=None):
     original_waveform = _fatigue_v1.FatigueWaveform
     original_attach_prediction_context = _delegate.attach_prediction_context
     original_select_nonlinear_block = _delegate.select_nonlinear_block
+    original_coupled_commit = _coupled_commit.integrate_state_coupled_waveform
 
     OBSERVER.original_assemble = original_assemble
     _fem.assemble_mechanics = wrap_assemble_mechanics(original_assemble)
@@ -159,8 +167,11 @@ def main(argv=None):
         CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine
     )
     _fatigue_v1.FatigueWaveform = _observed_waveform_factory(original_waveform)
-    _delegate.attach_prediction_context = _vhcf_selector.attach_prediction_context
-    _delegate.select_nonlinear_block = _vhcf_selector.select_nonlinear_block
+    _delegate.attach_prediction_context = _forward_selector.attach_prediction_context
+    _delegate.select_nonlinear_block = _forward_selector.select_nonlinear_block
+    _coupled_commit.integrate_state_coupled_waveform = (
+        _forward_hazard.integrate_state_coupled_waveform
+    )
     install_fast_trial_clone()
 
     def gated_builder(
@@ -185,7 +196,8 @@ def main(argv=None):
             "resistance=gamma_rel*m_hits*DeltaG_eff/b^2 "
             "event=min(stochastic_proposal,energy_arrest) "
             "event_load=Kmax continuum_gate=diagnostic_only "
-            "block_search=linear_seed_geometric_bracket "
+            "block_control=bounded_forward_two_half_step "
+            "partial_return=on work_budget=on "
             "trial_rng_clone=state_exact Gc0_athermal=off"
         )
         result = _v10229.main(args)
@@ -197,6 +209,7 @@ def main(argv=None):
     finally:
         _avalanche.build_avalanche_backend = original_avalanche_builder
         restore_fast_trial_clone()
+        _coupled_commit.integrate_state_coupled_waveform = original_coupled_commit
         _delegate.select_nonlinear_block = original_select_nonlinear_block
         _delegate.attach_prediction_context = original_attach_prediction_context
         _fatigue_v1.FatigueWaveform = original_waveform
