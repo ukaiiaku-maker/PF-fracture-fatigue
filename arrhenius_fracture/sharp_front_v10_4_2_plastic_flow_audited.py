@@ -10,14 +10,16 @@ from .plastic_flow_terminal_v1042 import MODEL_ID as TERMINAL_MODEL_ID
 from .plastic_flow_accepted_work_v1042 import MODEL_ID as PLASTIC_WORK_MODEL_ID
 from .directional_j_positive_v1042 import MODEL_ID as DIRECTIONAL_J_MODEL_ID
 from .plastic_flow_stagger_consistent_v1043 import MODEL_ID as STAGGER_MODEL_ID
-from .plastic_flow_fixed_point_converged_v1043 import (
-    MODEL_ID as FIXED_POINT_MODEL_ID,
+from .plastic_flow_fixed_point_converged_v1043 import MODEL_ID as FIXED_POINT_MODEL_ID
+from .plastic_flow_adaptive_timestep_v1043 import (
+    MODEL_ID as ADAPTIVE_TIMESTEP_MODEL_ID,
     load_transformed_sharp_front,
 )
 
 # The public entry path is retained so existing launcher contracts remain valid.
-# The model audit records both the constitutive-time and strict convergence fixes.
-MODEL_ID = "v10.4.3_bulk_detailed_balance_converged_stagger_plastic_terminal"
+# The model audit records the constitutive-time, strict convergence, and
+# rejected-trial adaptive-timestep corrections explicitly.
+MODEL_ID = "v10.4.3_bulk_detailed_balance_adaptive_converged_stagger_plastic_terminal"
 
 
 def _has_option(args: list[str], name: str) -> bool:
@@ -52,6 +54,7 @@ def _rewrite_model_audit(root: Path) -> None:
             "directional_J_model": DIRECTIONAL_J_MODEL_ID,
             "stagger_consistency_model": STAGGER_MODEL_ID,
             "stagger_fixed_point_model": FIXED_POINT_MODEL_ID,
+            "stagger_adaptive_timestep_model": ADAPTIVE_TIMESTEP_MODEL_ID,
             "directional_J_sign_convention": (
                 "positive_raw_signed_J_is_forward_configurational_work"
             ),
@@ -71,9 +74,15 @@ def _rewrite_model_audit(root: Path) -> None:
                 "under_relaxed_fixed_point_iteration_for_one_dt"
             ),
             "mechanics_plasticity_stagger_convergence_required": True,
-            "mechanics_plasticity_unconverged_step_policy": "raise_before_acceptance",
+            "mechanics_plasticity_unconverged_trial_policy": (
+                "rollback_reduce_dt_and_dU_at_fixed_loading_rate_then_retry"
+            ),
+            "mechanics_plasticity_unconverged_min_dt_policy": (
+                "raise_before_acceptance"
+            ),
             "plastic_state_rebased_each_stagger": True,
-            "plastic_state_physical_time_advance_per_step": "dt_cur",
+            "plastic_state_physical_time_advance_per_step": "accepted_dt_cur_only",
+            "rejected_stagger_trials_advance_physical_state": False,
             "accepted_mechanics_re_equilibrated_after_final_plastic_iterate": True,
             "accepted_mechanics_state_role": (
                 "J_force_stiffness_and_terminal_diagnostics_use_final_accepted_state"
@@ -123,9 +132,10 @@ def main(argv=None):
             "  v10.4.3 terminal model: plastic_flow_no_sharp_fracture; "
             "directional J=max(J_signed,0); each stagger is re-based to the "
             "beginning-of-step plastic state; the stagger map is under-relaxed "
-            "and must converge before a step is accepted; mechanics is then "
-            "re-equilibrated against the accepted plastic state; accepted Wp, "
-            "J_pl and contour shielding are diagnostic only"
+            "and must converge before a step is accepted; unconverged trials "
+            "are rolled back and retried with smaller dt and dU at fixed loading "
+            "rate; mechanics is then re-equilibrated against the accepted plastic "
+            "state; accepted Wp, J_pl and contour shielding are diagnostic only"
         )
         result = _v1041.main(args)
         out = _option_value(args, "--out")
