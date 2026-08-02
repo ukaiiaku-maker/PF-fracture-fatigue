@@ -155,6 +155,14 @@ def _run_verifier(
             "ALLOW_V1041_REUSE_AFTER_STAGGER_FIX": (
                 "1" if allow_legacy_reuse else "0"
             ),
+            # These are always exported by the public rate-enabled wrapper
+            # before the real scheduler calls verified_complete().
+            "LOADING_RATE_FACTOR": "1",
+            "DU_M": "2e-7",
+            "BASE_DT_S": "8.4",
+            "DT_S": "8.4",
+            "NOMINAL_OPENING_RATE_M_PER_S": str(2.0e-7 / 8.4),
+            "RATE_TAG": "rate1x",
         }
     )
     return subprocess.run(
