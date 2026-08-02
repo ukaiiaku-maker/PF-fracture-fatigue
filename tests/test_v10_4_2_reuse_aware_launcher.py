@@ -167,7 +167,9 @@ def _run_verifier(
     )
     return subprocess.run(
         ["bash", str(script)],
-        cwd=ROOT,
+        # Run outside the repository so the deliberately stubbed reuse module
+        # on PYTHONPATH is imported instead of the installed editable package.
+        cwd=tmp_path,
         env=env,
         text=True,
         capture_output=True,
