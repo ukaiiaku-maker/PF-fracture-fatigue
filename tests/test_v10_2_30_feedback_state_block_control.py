@@ -69,13 +69,13 @@ def test_zero_absolute_dB_cutoff_keeps_low_hazard_feedback_checks_active(monkeyp
     assert config["log_lambda_tol_decades"] > 0.0
 
 
-def test_feedback_launcher_installs_patch_and_disables_absolute_bypass():
+def test_feedback_launcher_is_disabled_pending_bounded_marcher():
     text = (
         ROOT
         / "scripts"
         / "run_v10_2_30_300K_four_class_fatigue_feedback_state.sh"
     ).read_text()
-    assert "V10230_FEEDBACK_STATE_BLOCK_CONTROL=1" in text
-    assert "V10229_COUPLED_HAZARD_ABS_DB_TOL=0" in text
-    assert "V10230_VHCF_RELATIVE_CYCLE_TOL" in text
-    assert "run_v10_2_30_300K_four_class_fatigue.sh" in text
+    assert "intentionally disabled" in text
+    assert "exit 2" in text
+    assert "bounded forward marcher" in text
+    assert "run_v10_2_30_300K_four_class_fatigue.sh" not in text
