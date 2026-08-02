@@ -9,7 +9,10 @@ import sys
 
 import numpy as np
 
-from arrhenius_fracture.plastic_flow_accepted_work_v1042 import (
+# Tests must exercise the same outermost transform used by production.  Importing
+# the accepted-work overlay directly bypasses both the positive-J repair and the
+# v10.4.3 stagger-consistency repair.
+from arrhenius_fracture.plastic_flow_stagger_consistent_v1043 import (
     load_transformed_sharp_front,
     transform_source,
 )
@@ -20,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_transformed_sharp_front_compiles_and_preserves_fracture_measure():
     source = (ROOT / "arrhenius_fracture" / "sharp_front.py").read_text()
     transformed = transform_source(source)
-    compile(transformed, "sharp_front.py[v10.4.2-test]", "exec")
+    compile(transformed, "sharp_front.py[v10.4.3-test]", "exec")
     assert "plastic_flow_no_sharp_fracture" in transformed
     assert "J_pl_diss_J_per_m2" in transformed
     assert "contour_shielding_enters_fracture_hazard': False" in transformed
@@ -32,6 +35,11 @@ def test_transformed_sharp_front_compiles_and_preserves_fracture_measure():
     assert "return_info=True" in transformed
     assert "dWp_accepted_gp" in transformed
     assert "W_bulk_plastic_primary_is_constitutive_accepted_work" in transformed
+    assert "ep_gp_step0_v1043 = ep_gp.copy()" in transformed
+    assert "rho_gp_step0_v1043 = rho_gp.copy()" in transformed
+    assert "plastic_work_accepted_gp_v1042 +=" not in transformed
+    assert "J_positive = max(sign_ref * J_signed, 0.0)" not in transformed
+    assert "J_positive = max(J_signed, 0.0)" in transformed
 
 
 def test_synthetic_persistent_plastic_window_is_terminal():
@@ -148,7 +156,7 @@ def test_nonzero_tip_drive_blocks_terminal():
     assert result["criteria"]["negligible_positive_tip_J"] is False
 
 
-def test_contour_scan_keeps_shielding_diagnostic():
+def test_contour_scan_keeps_shielding_diagnostic_and_raw_positive():
     module = load_transformed_sharp_front()
 
     def fake_compute(mesh, u, sigma, psi, damage, tip, direction, mat, ell,
@@ -179,6 +187,33 @@ def test_contour_scan_keeps_shielding_diagnostic():
     )
     assert [row["contour_multiplier"] for row in records] == [1.0, 2.0, 4.0]
     assert records[-1]["J_positive_root_convention_J_per_m2"] == 8.0
+
+
+def test_contour_scan_rejects_legacy_negative_sign_reference():
+    module = load_transformed_sharp_front()
+
+    def fake_compute(*args, **kwargs):
+        return 1.0, 1.0, {"J_signed": 1.0, "r_outer": 1.0}
+
+    import pytest
+
+    with pytest.raises(RuntimeError, match="non-production directional-J sign reference"):
+        module._v1042_contour_scan(
+            fake_compute,
+            mesh=None,
+            u=None,
+            sigma_gp=None,
+            psi_gp=None,
+            damage=None,
+            tip_xy=[0.0, 0.0],
+            direction=[1.0, 0.0],
+            mat=None,
+            base_ell_m=1.0,
+            multipliers="1",
+            crack_segments=None,
+            exclude_radius_m=0.0,
+            sign_reference=-1.0,
+        )
 
 
 def test_launcher_generation_compiles_and_contains_terminal_contract(tmp_path: Path):
