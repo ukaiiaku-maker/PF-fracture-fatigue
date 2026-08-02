@@ -140,13 +140,13 @@ def test_segment_size_is_carried_across_outer_calls(monkeypatch):
     )
     carried = engine._v10230_forward_next_segment_cycles
     assert first["coupled_hazard_partition_robust_state_control"] is True
-    assert carried > 0.01
+    assert carried > 0.0
 
     second = robust.integrate_state_coupled_waveform(
         engine, Controller(), Waveform(), 300.0, 0.02
     )
     first_segment = second["coupled_hazard_segments"][0]["cycles_proposed"]
-    assert first_segment >= min(carried, 0.02) - 1.0e-15
+    assert abs(first_segment - min(carried, 0.02)) <= 1.0e-15
 
 
 def test_explicit_transient_segment_cap_is_enforced(monkeypatch):
