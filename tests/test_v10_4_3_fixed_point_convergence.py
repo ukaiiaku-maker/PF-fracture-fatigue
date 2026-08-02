@@ -21,7 +21,7 @@ def test_fixed_point_overlay_compiles_and_requires_convergence():
         "plastic strain tolerance": "--stagger-ep-atol",
         "density tolerance": "--stagger-rho-atol-m2",
         "state rebase": "ep_gp_step0_v1043, rho_gp_step0_v1043",
-        "relaxed iterate": "ep_gp_iter_v1043 + _v1043_stagger_alpha",
+        "relaxed iterate": "_v1043_stagger_alpha * _v1043_ep_delta",
         "convergence flag": "stagger_converged_v1043 = True",
         "strict rejection": "mechanics/plasticity fixed point did not converge",
         "final mechanics closure": "Close the staggered step with a",
