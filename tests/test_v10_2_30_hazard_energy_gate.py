@@ -151,11 +151,17 @@ def test_zero_positive_J_suppresses_hazard_without_athermal_threshold(monkeypatc
     assert barrier == pytest.approx(3.0 * EV_TO_J)
 
 
-def test_observer_normalizes_continuous_gamma_and_root_signed_J(monkeypatch):
+def test_observer_normalizes_gamma_and_tracks_negative_to_positive_J(monkeypatch):
     observer.restore_observer()
+    results = iter(
+        [
+            (0.01, 5.0, {"J_signed": -0.01}),
+            (16.0, 7.0, {"J_signed": 16.0}),
+        ]
+    )
 
     def fake_J(*args, **kwargs):
-        return 10.0, 5.0, {"J_signed": -10.0}
+        return next(results)
 
     monkeypatch.setattr(observer.j_integral, "compute_J_integral", fake_J)
     observer.install_observer()
@@ -171,12 +177,24 @@ def test_observer_normalizes_continuous_gamma_and_root_signed_J(monkeypatch):
         )
         assert selected
         assert "gamma_rel" in selected[0]
+
         observer.j_integral.compute_J_integral()
-        state = observer.current_observation()
-        assert state.gamma_rel == pytest.approx(selected[0]["gamma_rel"])
-        assert state.J_sign_reference == -1.0
-        assert state.J_probe_J_per_m2 == pytest.approx(10.0)
-        assert state.K_probe_Pa_sqrt_m == pytest.approx(5.0)
+        startup = observer.current_observation()
+        assert startup.gamma_rel == pytest.approx(selected[0]["gamma_rel"])
+        assert startup.J_sign_reference == 1.0
+        assert startup.J_probe_J_per_m2 == 0.0
+        assert startup.K_probe_Pa_sqrt_m == 0.0
+        assert startup.first_nonzero_sign_latch_used is False
+
+        observer.j_integral.compute_J_integral()
+        loaded = observer.current_observation()
+        assert loaded.J_sign_reference == 1.0
+        assert loaded.J_probe_J_per_m2 == pytest.approx(16.0)
+        assert loaded.K_probe_Pa_sqrt_m == pytest.approx(7.0)
+        assert loaded.J_sign_convention == (
+            "positive_raw_signed_J_is_forward_configurational_work"
+        )
+        assert loaded.first_nonzero_sign_latch_used is False
     finally:
         observer.restore_observer()
 
