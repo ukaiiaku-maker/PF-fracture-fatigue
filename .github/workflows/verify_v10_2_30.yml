@@ -49,6 +49,7 @@ jobs:
           bash -n scripts/run_v10_2_30_300K_four_class_fatigue_feedback_state.sh
           bash -n scripts/run_v10_2_30_weakt_feedback_block_smoke.sh
           bash -n scripts/run_v10_2_30_weakt_0p55_transient_diagnostic.sh
+          bash -n scripts/run_v10_2_30_weakt_partition_robust_gate.sh
       - name: Run v10.2.30 regressions
         run: |
           python -m pytest -q --tb=short \
