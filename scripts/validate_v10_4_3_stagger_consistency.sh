@@ -24,6 +24,7 @@ PY
   tests/test_v10_4_2_directional_j_positive.py \
   tests/test_v10_4_2_plastic_flow_terminal.py \
   tests/test_v10_4_3_fixed_point_convergence.py \
+  tests/test_v10_4_3_adaptive_stagger_timestep.py \
   tests/test_v10_4_2_reuse_aware_launcher.py \
   tests/test_v10_4_2_launcher_adapter.py \
   tests/test_v10_4_bulk_peierls_taylor.py \
@@ -45,7 +46,7 @@ grep -q 'failed_or_incomplete_cases' "$GENERATED"
 from pathlib import Path
 
 source = Path("arrhenius_fracture/sharp_front.py").read_text()
-from arrhenius_fracture.plastic_flow_fixed_point_converged_v1043 import transform_source
+from arrhenius_fracture.plastic_flow_adaptive_timestep_v1043 import transform_source
 
 transformed = transform_source(source)
 required = {
@@ -54,6 +55,12 @@ required = {
     "re-based update": "ep_gp_step0_v1043, rho_gp_step0_v1043",
     "relaxed fixed point": "_v1043_stagger_alpha * _v1043_ep_delta",
     "strict convergence gate": "mechanics/plasticity fixed point did not converge",
+    "adaptive dt option": "--stagger-dt-shrink",
+    "adaptive minimum fraction": "--stagger-min-dt-fraction",
+    "adaptive retry limit": "--stagger-max-dt-retries",
+    "state rollback": "ep_gp = ep_saved",
+    "trial fraction shrink": "trial_frac = _v1043_next_trial_frac",
+    "adaptive hard failure": "did not converge after adaptive timestep subdivision",
     "final equilibrium": "Close the staggered step with a",
     "converged work ledger": (
         "constitutive_dWp_accepted_gp_converged_stagger_rebased_state"
