@@ -82,7 +82,7 @@ def _direct_j_from_front_rows(
                 step = int(round(float(row[0])))
                 root_by_step[step] = (float(row[17]), float(row[16]))
             for index, row in enumerate(steps):
-                item = root_by_step.get(int(round(float(row[0])))
+                item = root_by_step.get(int(round(float(row[0]))))
                 if item is not None:
                     effective[index], signed[index] = item
 
