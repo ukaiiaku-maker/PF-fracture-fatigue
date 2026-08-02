@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Add audited-reuse short-circuiting to the v10.4.2 production launcher.
 
-Materialized v10.4.1 cases already carry a v10.4.2 reuse audit that verifies
-source hashes, detailed-balance provenance, target completion, and the corrected
-positive directional-J history.  They must not then be rejected for lacking the
-native v10.4.2 command-line terminal options that were intentionally never used
-to generate those inherited results.
+Materialized v10.4.1 cases already carry a v10.4.2 reuse audit.  The generated
+scheduler must verify that audit before applying native v10.4.2 contract checks.
+This builder edits the nested scheduler generator, not merely the intermediate
+wrapper text, so the ordering is enforced in the executable final scheduler.
 """
 from __future__ import annotations
 
@@ -34,24 +33,42 @@ def _replace_once(text: str, old: str, new: str, label: str) -> str:
 def transform(source: str) -> str:
     text = _load_positive_j_builder().transform(source)
 
-    marker = "'''bulk_audit = json.loads(\n"
-    replacement = "'''v1042_reuse_path = root / \"v10_4_2_reuse_audit.json\"\n" \
-        "if v1042_reuse_path.is_file():\n" \
-        "    from arrhenius_fracture.reuse_v1041_v1042 import (\n" \
-        "        verify_materialized_case,\n" \
-        "        verify_source_case,\n" \
-        "    )\n\n" \
-        "    verify_materialized_case(root)\n" \
-        "    verify_source_case(root)\n" \
-        "    raise SystemExit(0)\n\n" \
-        "bulk_audit = json.loads(\n"
+    # The final scheduler's verifier reads the case contract before building the
+    # native expected dictionary.  Inject the audited-reuse branch at that exact
+    # point.  The previous anchor (bulk_audit = json.loads) was about 100 lines
+    # too late and could never be reached by a v10.4.1-era inherited contract.
+    guard = (
+        'replace_scheduler_exact(\n'
+        '    \'contract = json.loads((root / "v10_2_27_case_contract.json").read_text())\',\n'
+        '    \'\'\'v1042_reuse_path = root / "v10_4_2_reuse_audit.json"\n'
+        'if v1042_reuse_path.is_file():\n'
+        '    from arrhenius_fracture.reuse_v1041_v1042 import (\n'
+        '        verify_materialized_case,\n'
+        '        verify_source_case,\n'
+        '    )\n'
+        '\n'
+        '    try:\n'
+        '        reuse_audit = verify_materialized_case(root)\n'
+        '        verify_source_case(Path(reuse_audit["source_case"]))\n'
+        '    except Exception as exc:\n'
+        '        print(f"FAILED_REUSE_VERIFICATION {root}: {exc}")\n'
+        '        raise\n'
+        '    print(f"SKIP_REUSED_VERIFIED {root}")\n'
+        '    raise SystemExit(0)\n'
+        '\n'
+        'contract = json.loads((root / "v10_2_27_case_contract.json").read_text())\'\'\',\n'
+        '    label="v10.4.2 audited-reuse short-circuit before native contract checks",\n'
+        ')\n\n'
+    )
 
-    return _replace_once(
+    tail_marker = "plotter = source_plotter.read_text()"
+    text = _replace_once(
         text,
-        marker,
-        replacement,
+        tail_marker,
+        guard + tail_marker,
         "v10.4.2 audited-reuse scheduler short-circuit",
     )
+    return text
 
 
 def main(argv: list[str] | None = None) -> int:
