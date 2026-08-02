@@ -1,11 +1,11 @@
 """Corrections to the transactional v10.2.30 persistent-site fatigue engine.
 
-The continuum K^2/E' comparison is retained only as a diagnostic.  It does not
-suppress or rescale the cleavage hazard.  A completed first-passage event uses
-the active cleavage barrier reevaluated at Kmax after the accepted waiting-cycle
-state evolution.  If the full anisotropic FEM energy trial admits no positive
-geometry increment, the first-passage attempt is consumed as a nonpropagating
-attempt and the next stochastic threshold remains active.
+The base v10.2.30 engine now enforces structurally that the continuum K^2/E'
+comparison is diagnostic only. A completed first-passage event uses the active
+cleavage barrier reevaluated at Kmax after accepted waiting-cycle state evolution.
+If the full anisotropic FEM energy trial admits no positive geometry increment,
+the first-passage attempt is consumed as a nonpropagating attempt and the next
+stochastic threshold remains active.
 """
 from __future__ import annotations
 
@@ -44,33 +44,18 @@ class CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine(
         stress_override: float | None = None,
         lambda_override: float | None = None,
     ) -> dict[str, Any]:
-        diagnostic: dict[str, Any] = {}
-        original_continuum = _base.continuum_gate_diagnostics
+        # The base class is now structurally diagnostic-only. Do not monkey-patch
+        # module globals in this hot path; direct/base calls and subclass calls must
+        # obey the same first-passage invariant.
+        result = super()._integrate_coupled(
+            K,
+            T,
+            dt,
+            stress_override=stress_override,
+            lambda_override=lambda_override,
+        )
 
-        def diagnostic_only(*args, **kwargs):
-            nonlocal diagnostic
-            diagnostic = dict(_gate.continuum_gate_diagnostics(*args, **kwargs))
-            admitted = dict(diagnostic)
-            admitted["energy_gate_continuum_open_diagnostic"] = bool(
-                diagnostic.get("energy_gate_continuum_open", False)
-            )
-            admitted["energy_gate_continuum_open"] = True
-            admitted["energy_gate_continuum_affects_hazard"] = False
-            return admitted
-
-        _base.continuum_gate_diagnostics = diagnostic_only
-        try:
-            result = super()._integrate_coupled(
-                K,
-                T,
-                dt,
-                stress_override=stress_override,
-                lambda_override=lambda_override,
-            )
-        finally:
-            _base.continuum_gate_diagnostics = original_continuum
-
-        self.energy_gate_last_continuum = dict(diagnostic)
+        diagnostic = dict(self.energy_gate_last_continuum)
         result["hazard_energy_gate_continuum"] = dict(diagnostic)
         result["hazard_energy_gate_continuum_open"] = bool(
             diagnostic.get("energy_gate_continuum_open", False)
