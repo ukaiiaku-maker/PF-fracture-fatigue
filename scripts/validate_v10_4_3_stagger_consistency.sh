@@ -25,6 +25,7 @@ PY
   tests/test_v10_4_2_plastic_flow_terminal.py \
   tests/test_v10_4_3_fixed_point_convergence.py \
   tests/test_v10_4_3_adaptive_stagger_timestep.py \
+  tests/test_v10_4_3_endpoint_path_work.py \
   tests/test_v10_4_2_reuse_aware_launcher.py \
   tests/test_v10_4_2_launcher_adapter.py \
   tests/test_v10_4_bulk_peierls_taylor.py \
@@ -46,7 +47,7 @@ grep -q 'failed_or_incomplete_cases' "$GENERATED"
 from pathlib import Path
 
 source = Path("arrhenius_fracture/sharp_front.py").read_text()
-from arrhenius_fracture.plastic_flow_adaptive_timestep_v1043 import transform_source
+from arrhenius_fracture.plastic_flow_path_work_v1043 import transform_source
 
 transformed = transform_source(source)
 required = {
@@ -62,9 +63,10 @@ required = {
     "trial fraction shrink": "trial_frac = _v1043_next_trial_frac",
     "adaptive hard failure": "after adaptive timestep subdivision",
     "final equilibrium": "Close the staggered step with a",
-    "converged work ledger": (
-        "constitutive_dWp_accepted_gp_converged_stagger_rebased_state"
-    ),
+    "endpoint stress snapshot": "sigma_gp_step0_path_v1043",
+    "endpoint plastic snapshot": "ep_gp_step0_path_v1043",
+    "endpoint path work": "equilibrated_endpoint_trapezoid_sigma_colon_delta_ep",
+    "constitutive comparison history": "hist['W_p_constitutive']",
     "positive directional J": "J_positive = max(J_signed, 0.0)",
 }
 missing = [label for label, token in required.items() if token not in transformed]
