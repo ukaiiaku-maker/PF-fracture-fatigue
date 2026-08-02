@@ -46,6 +46,7 @@ jobs:
       - name: Run v10.2.30 regressions
         run: |
           python -m pytest -q --tb=short \
+            tests/test_v10_2_30_audit_p0_invariants.py \
             tests/test_v10_2_30_diagnostic_serialization.py \
             tests/test_v10_2_30_active_state_block_control.py \
             tests/test_v10_2_30_feedback_state_block_control.py \
