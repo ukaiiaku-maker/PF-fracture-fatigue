@@ -68,6 +68,10 @@ def _rewrite_model_audit(root: Path) -> None:
             "mechanics_plasticity_stagger_role": "fixed_point_iteration_for_one_dt",
             "plastic_state_rebased_each_stagger": True,
             "plastic_state_physical_time_advance_per_step": "dt_cur",
+            "accepted_mechanics_re_equilibrated_after_final_plastic_iterate": True,
+            "accepted_mechanics_state_role": (
+                "J_force_stiffness_and_terminal_diagnostics_use_final_accepted_state"
+            ),
             "accepted_plastic_work_stagger_policy": "converged_last_iterate_only",
             "bulk_plastic_work_primary_ledger": (
                 "constitutive_dWp_accepted_gp_converged_stagger_rebased_state"
@@ -112,8 +116,9 @@ def main(argv=None):
         print(
             "  v10.4.3 terminal model: plastic_flow_no_sharp_fracture; "
             "directional J=max(J_signed,0); each stagger is re-based to the "
-            "beginning-of-step plastic state; converged accepted Wp, J_pl and "
-            "contour shielding are diagnostic only"
+            "beginning-of-step plastic state; mechanics is re-equilibrated "
+            "against the final accepted plastic state; converged accepted Wp, "
+            "J_pl and contour shielding are diagnostic only"
         )
         result = _v1041.main(args)
         out = _option_value(args, "--out")
