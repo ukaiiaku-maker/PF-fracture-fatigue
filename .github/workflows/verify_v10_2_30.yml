@@ -31,6 +31,8 @@ jobs:
             arrhenius_fracture/persistent_site_trial_clone_v10230.py \
             arrhenius_fracture/persistent_site_vhcf_selector_v10230.py \
             arrhenius_fracture/persistent_site_vhcf_coupled_selector_v10230.py \
+            arrhenius_fracture/persistent_site_forward_coupled_hazard_v10230.py \
+            arrhenius_fracture/persistent_site_forward_selector_v10230.py \
             arrhenius_fracture/active_state_block_control_v10230.py \
             arrhenius_fracture/feedback_state_block_control_v10230.py \
             arrhenius_fracture/sharp_front_v10_2_30_energy_gated_fatigue.py \
@@ -47,6 +49,7 @@ jobs:
         run: |
           python -m pytest -q --tb=short \
             tests/test_v10_2_30_audit_p0_invariants.py \
+            tests/test_v10_2_30_forward_coupled_marcher.py \
             tests/test_v10_2_30_diagnostic_serialization.py \
             tests/test_v10_2_30_active_state_block_control.py \
             tests/test_v10_2_30_feedback_state_block_control.py \
