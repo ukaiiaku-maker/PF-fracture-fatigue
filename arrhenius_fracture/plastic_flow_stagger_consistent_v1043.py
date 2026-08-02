@@ -1,10 +1,11 @@
 """v10.4.3 stagger-consistent bulk-plasticity overlay.
 
 The mechanics/plasticity stagger loop is a fixed-point iteration for one accepted
-physical time increment.  Every constitutive trial must therefore start from the
+physical time increment.  Every constitutive trial therefore starts from the
 same beginning-of-step plastic strain and dislocation-density state.  Only the
-converged (last) stagger iterate is committed, and only its accepted constitutive
-plastic-work increment is entered in the cumulative ledger.
+converged (last) constitutive iterate is committed, its accepted plastic-work
+increment is entered once, and mechanics is re-equilibrated against that final
+plastic state before J, force, stiffness, or terminal diagnostics are evaluated.
 
 This overlay is deliberately outside the shared ``sharp_front.py`` source so the
 v10.4.0/v10.4.1 historical paths remain reproducible.  It is applied after the
@@ -94,6 +95,33 @@ def transform_source(source: str) -> str:
 
     text = _replace_once(
         text,
+        """                        plastic_work_accepted_gp_v1042 = _v1043_dWp_converged_gp.copy()
+
+                h_local = mesh.hbar_tip if mesh.hbar_tip > 0 else mesh.hbar
+""",
+        """                        plastic_work_accepted_gp_v1042 = _v1043_dWp_converged_gp.copy()
+
+                # The last constitutive update changes ep_gp/rho_gp after the
+                # last mechanics solve.  Close the staggered step with a
+                # solve-only equilibrium pass so J, reaction force, elastic
+                # energy, and terminal diagnostics correspond to the accepted
+                # plastic state rather than the penultimate trial state.
+                Kmat, Rint, sigma_gp, seq_gp, s1_gp, psi_gp = assemble_mechanics(
+                    mesh, u, ep_gp, rho_gp, d, D, mat,
+                    cohesive_network=cohesive_network)
+                u, Ftop = solve_dirichlet(
+                    Kmat, Rint, u, bnd, Uy_top, Uy_bot)
+                Kmat, Rint, sigma_gp, seq_gp, s1_gp, psi_gp = assemble_mechanics(
+                    mesh, u, ep_gp, rho_gp, d, D, mat,
+                    cohesive_network=cohesive_network)
+
+                h_local = mesh.hbar_tip if mesh.hbar_tip > 0 else mesh.hbar
+""",
+        "v10.4.3 final accepted-state mechanical equilibrium",
+    )
+
+    text = _replace_once(
+        text,
         """            if (
                 plastic_work_accepted_gp_v1042 is not None
                 and np.asarray(plastic_work_accepted_gp_v1042).size == mesh.ne
@@ -170,6 +198,7 @@ def transform_source(source: str) -> str:
                         ),
                         'plastic_state_rebased_each_stagger': True,
                         'accepted_work_from_converged_stagger_only': True,
+                        'accepted_mechanics_re_equilibrated_after_final_plastic_iterate': True,
                         'mechanics_plasticity_stagger_iterations': int(args.n_stagger),
                         'physical_time_advance_per_accepted_step': 'dt_cur_not_n_stagger_times_dt_cur',
 """,
