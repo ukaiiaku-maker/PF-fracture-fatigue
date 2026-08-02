@@ -11,7 +11,7 @@ from . import fatigue_v1 as _fatigue_v1
 from . import fem as _fem
 from . import hazard_energy_event_gate_v10230 as _energy_gate
 from . import persistent_site_cyclic_coupled_v10229 as _coupled_commit
-from . import persistent_site_forward_robust_v10230 as _forward_hazard
+from . import persistent_site_high_cycle_engine_v10230 as _high_cycle
 from . import persistent_site_forward_selector_v10230 as _forward_selector
 from . import sharp_front_v10_1_7_3 as _avalanche
 from . import sharp_front_v10_2_29_fatigue_audited as _v10229
@@ -94,21 +94,23 @@ def _write_audit(args: list[str]) -> None:
             "transactional_engine_model_id": CORRECTED_ENGINE_MODEL_ID,
             "event_length_search_model_id": MESH_SEARCH_MODEL_ID,
             "vhcf_block_selector_model_id": _forward_selector.MODEL_ID,
-            "vhcf_block_search_strategy": (
-                "predictor_only_forward_marcher_authoritative"
-            ),
-            "vhcf_forward_marcher_model_id": _forward_hazard.MODEL_ID,
+            "vhcf_block_search_strategy": "predictor_only_high_cycle_state_machine",
+            "vhcf_high_cycle_engine_model_id": _high_cycle.MODEL_ID,
+            "vhcf_native_horizon_cycles": 1.0e12,
+            "vhcf_complete_active_state_serialization": True,
+            "vhcf_phase_resolved_poincare_map": True,
+            "vhcf_accelerated_periodic_solver": True,
+            "vhcf_stationary_first_passage_propagation": True,
+            "vhcf_slow_manifold_projective_propagation": True,
+            "vhcf_post_event_cache_invalidation": True,
+            "vhcf_solver_iterations_consume_physical_cycles": False,
+            "vhcf_solver_iterations_consume_rng": False,
+            "vhcf_stationary_tail_draws_rng": False,
+            "vhcf_empirical_fatigue_growth_law": False,
             "vhcf_full_horizon_first_trial": False,
             "vhcf_raw_population_increment_targets_active": False,
-            "vhcf_active_state_endpoint_error_control": True,
-            "vhcf_state_profile_endpoint_error_control": True,
-            "vhcf_backstress_endpoint_error_control": True,
-            "vhcf_segment_size_carried_across_outer_calls": True,
-            "vhcf_explicit_transient_segment_cap_active": True,
             "vhcf_recursive_depth_first_commit": False,
             "vhcf_partial_cycle_return_supported": True,
-            "vhcf_two_half_step_state_committed": True,
-            "vhcf_third_commit_integration": False,
             "trial_clone_model_id": TRIAL_CLONE_MODEL_ID,
             "trial_rng_seedsequence_reduce_path_avoided": True,
             "persistent_site_source": True,
@@ -175,7 +177,7 @@ def main(argv=None):
     _delegate.attach_prediction_context = _forward_selector.attach_prediction_context
     _delegate.select_nonlinear_block = _forward_selector.select_nonlinear_block
     _coupled_commit.integrate_state_coupled_waveform = (
-        _forward_hazard.integrate_state_coupled_waveform
+        _high_cycle.integrate_state_coupled_waveform
     )
     install_fast_trial_clone()
 
@@ -201,9 +203,10 @@ def main(argv=None):
             "resistance=gamma_rel*m_hits*DeltaG_eff/b^2 "
             "event=min(stochastic_proposal,energy_arrest) "
             "event_load=Kmax continuum_gate=diagnostic_only "
-            "block_control=partition_robust_forward_two_half_step "
-            "active_state_error=profile+backstress+source_rate "
-            "partial_return=on work_budget=on "
+            "block_control=production_high_cycle_state_machine "
+            "poincare=phase_resolved periodic=anderson "
+            "tail=exact_first_passage projective=validated_slow_manifold "
+            "post_event_restart=on target_horizon=1e12 "
             "trial_rng_clone=state_exact Gc0_athermal=off"
         )
         result = _v10229.main(args)
