@@ -1,4 +1,4 @@
-"""Audited v10.4.3 entry with stagger-consistent plastic-flow diagnostics."""
+"""Audited v10.4.3 entry with converged stagger-consistent diagnostics."""
 from __future__ import annotations
 
 import json
@@ -9,14 +9,15 @@ from . import sharp_front_v10_4_bulk_peierls_taylor_audited as _v1041
 from .plastic_flow_terminal_v1042 import MODEL_ID as TERMINAL_MODEL_ID
 from .plastic_flow_accepted_work_v1042 import MODEL_ID as PLASTIC_WORK_MODEL_ID
 from .directional_j_positive_v1042 import MODEL_ID as DIRECTIONAL_J_MODEL_ID
-from .plastic_flow_stagger_consistent_v1043 import (
-    MODEL_ID as STAGGER_MODEL_ID,
+from .plastic_flow_stagger_consistent_v1043 import MODEL_ID as STAGGER_MODEL_ID
+from .plastic_flow_fixed_point_converged_v1043 import (
+    MODEL_ID as FIXED_POINT_MODEL_ID,
     load_transformed_sharp_front,
 )
 
 # The public entry path is retained so existing launcher contracts remain valid.
-# The model audit records the v10.4.3 constitutive-time correction explicitly.
-MODEL_ID = "v10.4.3_bulk_detailed_balance_stagger_consistent_plastic_terminal"
+# The model audit records both the constitutive-time and strict convergence fixes.
+MODEL_ID = "v10.4.3_bulk_detailed_balance_converged_stagger_plastic_terminal"
 
 
 def _has_option(args: list[str], name: str) -> bool:
@@ -50,6 +51,7 @@ def _rewrite_model_audit(root: Path) -> None:
             "plastic_work_ledger_base_model": PLASTIC_WORK_MODEL_ID,
             "directional_J_model": DIRECTIONAL_J_MODEL_ID,
             "stagger_consistency_model": STAGGER_MODEL_ID,
+            "stagger_fixed_point_model": FIXED_POINT_MODEL_ID,
             "directional_J_sign_convention": (
                 "positive_raw_signed_J_is_forward_configurational_work"
             ),
@@ -65,14 +67,18 @@ def _rewrite_model_audit(root: Path) -> None:
             "bulk_plastic_work_enters_fracture_measure": False,
             "bulk_plastic_work_enters_cleavage_hazard": False,
             "bulk_plastic_work_enters_energy_gate": False,
-            "mechanics_plasticity_stagger_role": "fixed_point_iteration_for_one_dt",
+            "mechanics_plasticity_stagger_role": (
+                "under_relaxed_fixed_point_iteration_for_one_dt"
+            ),
+            "mechanics_plasticity_stagger_convergence_required": True,
+            "mechanics_plasticity_unconverged_step_policy": "raise_before_acceptance",
             "plastic_state_rebased_each_stagger": True,
             "plastic_state_physical_time_advance_per_step": "dt_cur",
             "accepted_mechanics_re_equilibrated_after_final_plastic_iterate": True,
             "accepted_mechanics_state_role": (
                 "J_force_stiffness_and_terminal_diagnostics_use_final_accepted_state"
             ),
-            "accepted_plastic_work_stagger_policy": "converged_last_iterate_only",
+            "accepted_plastic_work_stagger_policy": "converged_iterate_only",
             "bulk_plastic_work_primary_ledger": (
                 "constitutive_dWp_accepted_gp_converged_stagger_rebased_state"
             ),
@@ -116,8 +122,9 @@ def main(argv=None):
         print(
             "  v10.4.3 terminal model: plastic_flow_no_sharp_fracture; "
             "directional J=max(J_signed,0); each stagger is re-based to the "
-            "beginning-of-step plastic state; mechanics is re-equilibrated "
-            "against the final accepted plastic state; converged accepted Wp, "
+            "beginning-of-step plastic state; the stagger map is under-relaxed "
+            "and must converge before a step is accepted; mechanics is then "
+            "re-equilibrated against the accepted plastic state; accepted Wp, "
             "J_pl and contour shielding are diagnostic only"
         )
         result = _v1041.main(args)
