@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Build the v10.4.4 full-field bulk-plasticity orientation campaign.
+"""Build the v10.4.5 full-field bulk-plasticity orientation campaign.
 
 The v10.2.30 launcher remains the geometry, barrier, seed, loading-rate, and
 hazard-energy-gate source. This builder changes the public model entry and
 arranges for the generated scheduler to be patched by the dedicated v10.4.4
-scheduler transformer.
+scheduler transformer.  v10.4.5 changes only the severe-substep campaign
+terminal; the fracture and constitutive physics remain unchanged.
 """
 from __future__ import annotations
 
@@ -18,9 +19,9 @@ OLD_ENTRY = (
 )
 MODEL_ENTRY = (
     "arrhenius_fracture."
-    "sharp_front_v10_4_4_plasticity_dominated_audited"
+    "sharp_front_v10_4_5_plasticity_plateau_audited"
 )
-LOCK_SCHEMA = "v10.4.4_full_field_bulk_plasticity_orientation_rate_lock_v1"
+LOCK_SCHEMA = "v10.4.5_full_field_bulk_plasticity_orientation_rate_lock_v1"
 
 
 def _load_gate_builder():
@@ -57,7 +58,7 @@ def transform(source: str) -> str:
         text,
         '"schema": "v10.2.30_hazard_energy_gated_orientation_rate_lock_v1",',
         f'"schema": "{LOCK_SCHEMA}",',
-        label="v10.4.4 campaign-lock schema",
+        label="v10.4.5 campaign-lock schema",
     )
 
     lock_marker = (
@@ -70,12 +71,13 @@ def transform(source: str) -> str:
         '    "plasticity_dominated_campaign_terminal": True,\n'
         '    "plasticity_terminal_allows_partial_fracture": True,\n'
         '    "plasticity_terminal_projected_hazard_role": "diagnostic_only",\n'
+        '    "plasticity_terminal_severe_substep_energy_ratios_role": "diagnostic_only",\n'
     )
     text = _replace_exact(
         text,
         lock_marker,
         lock_replacement,
-        label="v10.4.4 outer campaign-lock fields",
+        label="v10.4.5 outer campaign-lock fields",
     )
 
     marker = "plotter = source_plotter.read_text()"
