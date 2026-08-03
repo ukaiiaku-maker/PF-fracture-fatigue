@@ -4,7 +4,7 @@
 The v10.2.30 launcher remains the geometry, barrier, seed, loading-rate, and
 hazard-energy-gate source. This builder changes the public model entry and
 arranges for the generated scheduler to be patched by the dedicated v10.4.4
-scheduler transformer.  v10.4.5 changes only the severe-substep campaign
+scheduler transformer. v10.4.5 changes only the severe-substep campaign
 terminal; the fracture and constitutive physics remain unchanged.
 """
 from __future__ import annotations
@@ -16,6 +16,10 @@ from pathlib import Path
 OLD_ENTRY = (
     "arrhenius_fracture."
     "sharp_front_v10_2_30_hazard_energy_gated_audited"
+)
+V1044_ENTRY = (
+    "arrhenius_fracture."
+    "sharp_front_v10_4_4_plasticity_dominated_audited"
 )
 MODEL_ENTRY = (
     "arrhenius_fracture."
@@ -81,20 +85,26 @@ def transform(source: str) -> str:
     )
 
     marker = "plotter = source_plotter.read_text()"
-    patch_scheduler = '''patcher_path = source_scheduler.parent / "patch_v10_4_4_generated_scheduler.py"
-patcher_namespace = {}
+    patch_scheduler = f'''patcher_path = source_scheduler.parent / "patch_v10_4_4_generated_scheduler.py"
+patcher_namespace = {{}}
 exec(
     compile(patcher_path.read_text(), str(patcher_path), "exec"),
     patcher_namespace,
 )
 scheduler = patcher_namespace["transform"](scheduler)
+scheduler = scheduler.replace(
+    "{V1044_ENTRY}",
+    "{MODEL_ENTRY}",
+)
+if scheduler.count("{MODEL_ENTRY}") < 4:
+    raise RuntimeError("v10.4.5 generated scheduler model-entry contract is incomplete")
 
 '''
     text = _replace_exact(
         text,
         marker,
         patch_scheduler + marker,
-        label="v10.4.4 generated-scheduler patch hook",
+        label="v10.4.5 generated-scheduler patch hook",
     )
     return text
 
