@@ -65,9 +65,10 @@ def test_production_alias_reaches_1e12_without_subcycle_fallback(monkeypatch):
     def forbidden_subcycle(*args, **kwargs):
         raise AssertionError("ordinary high-cycle evolution entered subcycle fallback")
 
-    globals_dict = high.integrate_state_coupled_waveform.__globals__
+    wrapper_globals = high.integrate_state_coupled_waveform.__globals__
+    bound = wrapper_globals["_bound_integrator"]
     monkeypatch.setattr(
-        globals_dict["_transient"],
+        bound.__globals__["_transient"],
         "integrate_state_coupled_waveform",
         forbidden_subcycle,
     )
@@ -81,6 +82,6 @@ def test_production_alias_reaches_1e12_without_subcycle_fallback(monkeypatch):
         if row["mode"] == "slow_projective"
     ]
     assert projective
-    assert projective[0]["cycles"] == 1.0e12
-    assert high.MODEL_ID.endswith("v4_chained_affine_dmd")
+    assert sum(row["cycles"] for row in projective) == 1.0e12
+    assert "event_to_event" in high.MODEL_ID
     assert abs(engine.mpz.mobile_count - 1.0e12) / 1.0e12 < 1.0e-8
