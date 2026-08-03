@@ -47,8 +47,41 @@ printf '  cycle_censor=%s\n' "$CYCLES_MAX"
 printf '  output=%s\n' "$OUTROOT"
 printf '  live_checkpoint_dir=%s\n' "$V10230_HIGH_CYCLE_CHECKPOINT_DIR"
 
+# The original low-level launcher remains the qualified command source, but its
+# historical 0.55 display strings and schemas must not leak into arbitrary
+# DeltaK runs. Build a temporary script with run-specific metadata only; physics,
+# command arguments, validation settings, and execution logic remain unchanged.
+BASE_LAUNCHER="$ROOT/scripts/run_v10_2_30_weakt_0p55_high_cycle_1e12.sh"
+GENERATED_LAUNCHER=$(mktemp "$ROOT/scripts/.v10_2_30_generic_weakt.XXXXXX.sh")
+trap 'rm -f "$GENERATED_LAUNCHER"' EXIT
+
+"$PYTHON_BIN" - "$BASE_LAUNCHER" "$GENERATED_LAUNCHER" "$RUN_LABEL" <<'PY'
+from pathlib import Path
+import sys
+
+source = Path(sys.argv[1])
+output = Path(sys.argv[2])
+run_label = sys.argv[3]
+text = source.read_text()
+text = text.replace(
+    '"schema": "v10.2.30_weakt_0p55_native_high_cycle_1e12_v1",',
+    '"schema": "v10.2.30_generic_weakt_event_to_event_growth_driver_v1",',
+)
+text = text.replace(
+    'print("v10.2.30 real weak-T 0.55 high-cycle production run")',
+    f'print("v10.2.30 real weak-T {run_label} event-to-event production run")',
+)
+text = text.replace(
+    '"schema": "v10.2.30_weakt_0p55_high_cycle_summary_v1",',
+    '"schema": "v10.2.30_generic_weakt_event_growth_summary_v2",',
+)
+output.write_text(text)
+PY
+chmod +x "$GENERATED_LAUNCHER"
+bash -n "$GENERATED_LAUNCHER"
+
 set +e
-bash scripts/run_v10_2_30_weakt_0p55_high_cycle_1e12.sh
+bash "$GENERATED_LAUNCHER"
 RC=$?
 set -e
 
