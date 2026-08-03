@@ -49,7 +49,7 @@ grep -q 'failed_or_incomplete_cases' "$GENERATED"
 from pathlib import Path
 
 source = Path("arrhenius_fracture/sharp_front.py").read_text()
-from arrhenius_fracture.plastic_flow_hazard_terminal_v1043 import transform_source
+from arrhenius_fracture.plastic_flow_physical_progress_v1043 import transform_source
 
 transformed = transform_source(source)
 required = {
@@ -80,11 +80,6 @@ required = {
     "progress CSV columns": "nominal_progress_start,nominal_progress",
     "terminal physical window": "classification_window_nominal_increment_span",
     "fractional remaining horizon": "float(remaining_steps), 0.0",
-    "prospective horizon option": "--plastic-flow-prospective-horizon-steps",
-    "projected hazard fraction option": "--plastic-flow-max-projected-hazard-fraction",
-    "conservative hazard growth": "conservative_log_lambda_growth",
-    "projected action gate": "'projected_cleavage_action_safe': projected_cleavage_action_safe",
-    "J and stress diagnostic only": "J_and_sigma_zero_gates_are_diagnostic_only",
     "positive directional J": "J_positive = max(J_signed, 0.0)",
 }
 missing = [label for label, token in required.items() if token not in transformed]
@@ -92,10 +87,26 @@ if missing:
     raise SystemExit(f"ERROR: transformed source missing invariants: {missing}")
 if "while step < args.steps:" in transformed:
     raise SystemExit("ERROR: accepted-row count still controls loading completion")
-if "'negligible_positive_tip_J':" in transformed:
-    raise SystemExit("ERROR: near-zero positive J remains a terminal hard gate")
-if "'negligible_tip_stress':" in transformed:
-    raise SystemExit("ERROR: near-zero tip stress remains a terminal hard gate")
+
+hazard_source = Path(
+    "arrhenius_fracture/plastic_flow_hazard_terminal_v1043.py"
+).read_text()
+hazard_required = {
+    "runtime wrapper": "_v1043_hazard_terminal_wrapped",
+    "prospective horizon": "plastic_flow_prospective_horizon_steps",
+    "projected hazard fraction": "plastic_flow_max_projected_hazard_fraction",
+    "conservative growth": "conservative_log_lambda_growth_per_nominal_increment",
+    "projected action gate": "projected_cleavage_action_safe",
+    "J and stress diagnostic only": "J_and_sigma_zero_gates_are_diagnostic_only",
+}
+hazard_missing = [
+    label for label, token in hazard_required.items()
+    if token not in hazard_source
+]
+if hazard_missing:
+    raise SystemExit(
+        f"ERROR: hazard-terminal wrapper missing invariants: {hazard_missing}"
+    )
 print("v10.4.3 transformed-source invariants verified")
 PY
 
