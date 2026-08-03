@@ -1,11 +1,12 @@
-"""Neutral-mode-stabilized affine-DMD propagation for v10.2.30.
+"""Neutral- and output-stabilized affine-DMD propagation for v10.2.30.
 
 Least-squares roundoff can place an exactly neutral cycle-map eigenvalue at
-``1 + epsilon``.  Raising that map to 1e12 cycles then creates a false secular
-amplification.  This module binds the validated v1 propagator to a fit routine
-that snaps only eigenvalues within a configurable neighborhood of unity to
-exactly one and verifies that the stabilized map still satisfies the original
-training tolerance.
+``1 + epsilon`` or give a constant ledger rate a tiny spurious state dependence.
+Either error becomes secular when propagated over 1e12 cycles.  This module
+snaps only eigenvalues statistically indistinguishable from unity to exactly one
+and makes output rows that are constant over the exact training burst exactly
+constant.  The stabilized state map is then checked against the unchanged
+training and independent endpoint-validation tolerances.
 """
 from __future__ import annotations
 
@@ -18,7 +19,7 @@ import numpy as np
 from . import persistent_site_high_cycle_dmd_v10230 as _base
 
 
-MODEL_ID = "v10.2.30_validated_affine_dmd_cycle_map_v2_neutral_stable"
+MODEL_ID = "v10.2.30_validated_affine_dmd_cycle_map_v2_neutral_output_stable"
 
 
 def _neutral_tolerance() -> float:
@@ -28,6 +29,18 @@ def _neutral_tolerance() -> float:
         value = 1.0e-6
     if not math.isfinite(value):
         value = 1.0e-6
+    return max(value, 0.0)
+
+
+def _constant_output_tolerance() -> float:
+    try:
+        value = float(
+            os.environ.get("V10230_DMD_CONSTANT_OUTPUT_REL_TOL", 1.0e-12)
+        )
+    except (TypeError, ValueError):
+        value = 1.0e-12
+    if not math.isfinite(value):
+        value = 1.0e-12
     return max(value, 0.0)
 
 
@@ -50,6 +63,27 @@ def _stabilize_neutral_modes(A: np.ndarray, tolerance: float) -> np.ndarray:
     return np.real(stabilized)
 
 
+def _stabilize_constant_outputs(
+    C: np.ndarray,
+    d: np.ndarray,
+    outputs: np.ndarray,
+    tolerance: float,
+) -> tuple[np.ndarray, np.ndarray, tuple[int, ...]]:
+    slopes = np.asarray(C, dtype=float).copy()
+    offsets = np.asarray(d, dtype=float).copy()
+    observed = np.asarray(outputs, dtype=float)
+    constant_rows: list[int] = []
+    for index in range(observed.shape[0]):
+        row = observed[index]
+        scale = max(float(np.max(np.abs(row))), 1.0e-300)
+        span = float(np.max(row) - np.min(row))
+        if span / scale <= float(tolerance):
+            slopes[index, :] = 0.0
+            offsets[index] = float(np.mean(row))
+            constant_rows.append(index)
+    return slopes, offsets, tuple(constant_rows)
+
+
 def _fit_affine_model_stabilized(states, outputs, config):
     model = _base._fit_affine_model(states, outputs, config)
     A_original = np.asarray(model["A"], dtype=float)
@@ -59,8 +93,28 @@ def _fit_affine_model_stabilized(states, outputs, config):
     following = coordinates[:, 1:]
     fitted = A @ previous + np.asarray(model["c"], dtype=float)[:, None]
     training_error = _base._relative_vector_error(fitted, following)
+
+    C, d, constant_rows = _stabilize_constant_outputs(
+        np.asarray(model["C"], dtype=float),
+        np.asarray(model["d"], dtype=float),
+        np.asarray(outputs, dtype=float),
+        _constant_output_tolerance(),
+    )
+    output_fitted = C @ previous + d[:, None]
+    output_error_by_row = []
+    for index in range(outputs.shape[0]):
+        output_error_by_row.append(
+            _base._relative_vector_error(output_fitted[index], outputs[index])
+        )
+
     model["A_unstabilized"] = A_original
     model["A"] = A
+    model["C_unstabilized"] = np.asarray(model["C"], dtype=float)
+    model["d_unstabilized"] = np.asarray(model["d"], dtype=float)
+    model["C"] = C
+    model["d"] = d
+    model["constant_output_rows"] = constant_rows
+    model["output_training_error_by_row"] = tuple(output_error_by_row)
     model["training_error"] = training_error
     eigenvalues = np.linalg.eigvals(A)
     model["spectral_radius"] = (
@@ -96,5 +150,6 @@ __all__ = [
     "MODEL_ID",
     "dmd_config",
     "propagate_dmd_cycles",
+    "_stabilize_constant_outputs",
     "_stabilize_neutral_modes",
 ]
