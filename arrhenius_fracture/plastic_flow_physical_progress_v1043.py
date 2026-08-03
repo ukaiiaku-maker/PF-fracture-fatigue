@@ -1,21 +1,11 @@
-"""Physical-progress closure for the v10.4.3 adaptive fixed-point path.
+"""Preserve nominal loading progress under adaptive v10.4.3 subdivision.
 
-Adaptive constitutive retries reduce ``dt`` and ``dU`` together.  The previous
-outer loop nevertheless consumed one requested ``--steps`` entry for every
-accepted reduced substep.  A run requesting N nominal increments could therefore
-terminate after substantially less than N*dt and N*dU.
+Accepted reduced substeps remain individual output rows, but ``--steps`` is a
+nominal physical loading target.  The loop therefore continues until the sum of
+accepted trial fractions reaches the requested target.  Terminal persistence and
+remaining-horizon diagnostics use the same nominal coordinate.
 
-This outer transform makes ``--steps`` a nominal loading-progress target.  The
-accepted-row counter remains the public ``step`` column, while a separate
-fractional nominal-progress accumulator advances by the accepted trial fraction.
-The driver continues until that accumulator reaches the requested target, unless
-a physical stopping condition such as crack extension or ligament severance
-fires first.
-
-The transform also makes the plastic-flow terminal window and remaining loading
-horizon use nominal physical progress rather than accepted-row count.  No
-constitutive law, fracture law, hazard, material parameter, or accepted substep
-state is changed.
+No constitutive law, fracture law, hazard, or accepted substep is changed.
 """
 from __future__ import annotations
 
@@ -57,7 +47,7 @@ def transform_source(source: str) -> str:
             nominal_progress_target_v1043, 1.0
         )
 """,
-        "v10.4.3 nominal loading-progress initialization",
+        "nominal loading-progress initialization",
     )
 
     text = _replace_once(
@@ -68,7 +58,7 @@ def transform_source(source: str) -> str:
             nominal_progress_target_v1043 - nominal_progress_tol_v1043
         ):
 """,
-        "v10.4.3 physical-progress loop condition",
+        "physical-progress loop condition",
     )
 
     text = _replace_once(
@@ -85,7 +75,7 @@ def transform_source(source: str) -> str:
                 remaining_nominal_fraction_v1043,
             )
 """,
-        "v10.4.3 cap accepted substep at remaining nominal horizon",
+        "remaining nominal-fraction cap",
     )
 
     text = _replace_once(
@@ -97,7 +87,7 @@ def transform_source(source: str) -> str:
                         max(remaining_nominal_fraction_v1043, np.finfo(float).tiny),
                     )
 """,
-        "v10.4.3 final nominal remainder retry floor",
+        "final nominal-remainder retry floor",
     )
 
     text = _replace_once(
@@ -128,7 +118,7 @@ def transform_source(source: str) -> str:
             carry_frac = trial_frac
             adaptive_frac_used = trial_frac
 """,
-        "v10.4.3 accepted nominal progress commit",
+        "accepted nominal-progress commit",
     )
 
     text = _replace_once(
@@ -137,7 +127,7 @@ def transform_source(source: str) -> str:
 """,
         """        plastic_flow_window = deque()
 """,
-        "v10.4.3 terminal physical-span history",
+        "terminal physical-span history",
     )
 
     text = _replace_once(
@@ -183,7 +173,7 @@ def transform_source(source: str) -> str:
     if nominal_span < required - progress_tol:
         return None
 """,
-        "v10.4.3 terminal nominal physical-span selection",
+        "terminal nominal physical-span selection",
     )
 
     text = _replace_once(
@@ -198,7 +188,7 @@ def transform_source(source: str) -> str:
                 'nominal_progress_end': float(nominal_progress_v1043),
                 'Uapp': float(Uapp),
 """,
-        "v10.4.3 terminal row physical coordinates",
+        "terminal row physical coordinates",
     )
 
     text = _replace_once(
@@ -216,7 +206,7 @@ def transform_source(source: str) -> str:
         ),
         'crack_extension_window_m': crack_span,
 """,
-        "v10.4.3 terminal nominal-span audit",
+        "terminal nominal-span audit",
     )
 
     text = _replace_once(
@@ -229,7 +219,7 @@ def transform_source(source: str) -> str:
                         0.0,
                     ),
 """,
-        "v10.4.3 terminal remaining nominal horizon",
+        "terminal remaining nominal horizon",
     )
 
     text = _replace_once(
@@ -240,7 +230,7 @@ def transform_source(source: str) -> str:
         float(remaining_steps), 0.0
     ) * max(float(nominal_dt_s), 0.0)
 """,
-        "v10.4.3 fractional remaining loading horizon",
+        "fractional remaining loading horizon",
     )
 
     text = _replace_once(
@@ -251,7 +241,7 @@ def transform_source(source: str) -> str:
                          float(nominal_progress_step_start_v1043),
                          float(nominal_progress_v1043)))
 """,
-        "v10.4.3 step-row nominal progress columns",
+        "step-row nominal-progress columns",
     )
 
     text = _replace_once(
@@ -261,7 +251,7 @@ def transform_source(source: str) -> str:
         """                          'mpz_escaped_total,mpz_recovered_total,mpz_wake_retained_total,'
                           'nominal_progress_start,nominal_progress',
 """,
-        "v10.4.3 step-header nominal progress columns",
+        "step-header nominal-progress columns",
     )
 
     text = _replace_once(
@@ -273,30 +263,7 @@ def transform_source(source: str) -> str:
                     - nominal_progress_tol_v1043
                 )):
 """,
-        "v10.4.3 final physical-horizon snapshot",
-    )
-
-    text = _replace_once(
-        text,
-        """            'branched': bool(branched),
-            'mode': ('no-fracture' if Kc_first is None
-                     else ('ductile' if W_emit_total > 0.1 * Kc_first ** 2 / mat.Eprime
-                           else 'brittle')),
-            'shelf': audit,
-""",
-        """            'branched': bool(branched),
-            'mode': ('no-fracture' if Kc_first is None
-                     else ('ductile' if W_emit_total > 0.1 * Kc_first ** 2 / mat.Eprime
-                           else 'brittle')),
-            'accepted_substeps': int(step),
-            'nominal_loading_progress': float(nominal_progress_v1043),
-            'nominal_loading_target': float(nominal_progress_target_v1043),
-            'accepted_physical_time_s': float(
-                nominal_progress_v1043 * cfg.loading.dt
-            ),
-            'shelf': audit,
-""",
-        "v10.4.3 2-D summary physical-progress audit",
+        "final physical-horizon snapshot",
     )
 
     return text
