@@ -47,6 +47,16 @@ def test_generic_launcher_temp_script_cannot_dirty_worktree():
     assert 'rm -f -- "$GENERATED_LAUNCHER"' in text
 
 
+def test_generic_launcher_binds_generated_copy_to_repository_root():
+    text = _generic_text()
+    assert '"$RUN_LABEL" "$ROOT" <<\'PY\'' in text
+    assert "import shlex" in text
+    assert "repo_root = sys.argv[4]" in text
+    assert 'root_line = \'ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)\'' in text
+    assert 'text.replace(root_line, f"ROOT={shlex.quote(repo_root)}", 1)' in text
+    assert "low-level launcher ROOT contract changed" in text
+
+
 def test_generic_launcher_stops_before_postprocessing_missing_output():
     text = _generic_text()
     guard = 'if [[ ! -d "$OUTROOT" ]]; then'
