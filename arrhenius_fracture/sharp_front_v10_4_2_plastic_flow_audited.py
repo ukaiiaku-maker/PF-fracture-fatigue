@@ -16,13 +16,20 @@ from .plastic_flow_adaptive_timestep_v1043 import (
 )
 from .plastic_flow_path_work_startup_v1043 import (
     MODEL_ID as PATH_WORK_MODEL_ID,
+)
+from .plastic_flow_physical_progress_v1043 import (
+    MODEL_ID as PHYSICAL_PROGRESS_MODEL_ID,
     load_transformed_sharp_front,
 )
 
 # The public entry path is retained so existing launcher contracts remain valid.
 # The model audit records the constitutive-time, strict convergence,
-# rejected-trial adaptive-timestep, and endpoint-path work corrections.
-MODEL_ID = "v10.4.3_bulk_detailed_balance_adaptive_converged_stagger_path_work_terminal"
+# rejected-trial adaptive-timestep, endpoint-path work, and physical-progress
+# corrections.
+MODEL_ID = (
+    "v10.4.3_bulk_detailed_balance_adaptive_converged_stagger_"
+    "path_work_physical_progress_terminal"
+)
 
 
 def _has_option(args: list[str], name: str) -> bool:
@@ -55,6 +62,7 @@ def _rewrite_model_audit(root: Path) -> None:
             "plastic_flow_terminal_model": TERMINAL_MODEL_ID,
             "plastic_work_ledger_base_model": PLASTIC_WORK_MODEL_ID,
             "plastic_work_path_model": PATH_WORK_MODEL_ID,
+            "physical_progress_model": PHYSICAL_PROGRESS_MODEL_ID,
             "directional_J_model": DIRECTIONAL_J_MODEL_ID,
             "stagger_consistency_model": STAGGER_MODEL_ID,
             "stagger_fixed_point_model": FIXED_POINT_MODEL_ID,
@@ -83,6 +91,17 @@ def _rewrite_model_audit(root: Path) -> None:
             ),
             "mechanics_plasticity_unconverged_min_dt_policy": (
                 "raise_before_acceptance"
+            ),
+            "adaptive_substep_outer_loop_target": (
+                "requested_nominal_loading_progress_not_accepted_row_count"
+            ),
+            "requested_steps_semantics": (
+                "nominal_dt_and_dU_increments_preserved_under_subdivision"
+            ),
+            "accepted_row_step_semantics": "accepted_substep_index",
+            "terminal_window_coordinate": "nominal_loading_increment_span",
+            "terminal_remaining_horizon_coordinate": (
+                "remaining_nominal_loading_progress_times_nominal_dt"
             ),
             "plastic_state_rebased_each_stagger": True,
             "plastic_state_physical_time_advance_per_step": "accepted_dt_cur_only",
@@ -153,10 +172,11 @@ def main(argv=None):
             "beginning-of-step plastic state; the stagger map is under-relaxed "
             "and must converge before a step is accepted; unconverged trials "
             "are rolled back and retried with smaller dt and dU at fixed loading "
-            "rate; mechanics is then re-equilibrated against the accepted plastic "
-            "state; accepted bulk Wp uses equilibrated endpoint-average stress "
-            "contracted with the actual accepted plastic-strain increment; Wp, "
-            "J_pl and contour shielding are diagnostic only"
+            "rate; adaptive accepted substeps continue until the requested nominal "
+            "loading time and opening are reached; mechanics is then re-equilibrated "
+            "against the accepted plastic state; accepted bulk Wp uses equilibrated "
+            "endpoint-average stress contracted with the actual accepted plastic-"
+            "strain increment; Wp, J_pl and contour shielding are diagnostic only"
         )
         result = _v1041.main(args)
         out = _option_value(args, "--out")
