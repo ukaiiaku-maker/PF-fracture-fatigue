@@ -59,12 +59,14 @@ def replace_v1044_scheduler_exact(old, new, expected_count=1, label="v10.4.4 tok
 
 old_entry = "arrhenius_fracture.sharp_front_v10_2_30_hazard_energy_gated_audited"
 new_entry = "arrhenius_fracture.sharp_front_v10_4_4_plasticity_dominated_audited"
-entry_count = scheduler.count(old_entry)
+old_entry_count = scheduler.count(old_entry)
+if old_entry_count:
+    scheduler = scheduler.replace(old_entry, new_entry)
+entry_count = scheduler.count(new_entry)
 if entry_count < 4:
     raise SystemExit(
-        f"ERROR: v10.2.30 model-entry contract changed: found {entry_count}"
+        f"ERROR: v10.4.4 model-entry contract changed: found {entry_count}"
     )
-scheduler = scheduler.replace(old_entry, new_entry)
 
 replace_v1044_scheduler_exact(
     '    --dU "$DU_M" --dt "$DT_S" --n-stagger 2',
