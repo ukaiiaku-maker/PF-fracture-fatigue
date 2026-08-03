@@ -159,7 +159,7 @@ def _configure(monkeypatch):
     monkeypatch.setenv("V10230_PERIODIC_RELATIVE_TOL", "1e-15")
     monkeypatch.setenv("V10230_HIGH_CYCLE_STATIONARY_REL_TOL", "1e-15")
     monkeypatch.setenv("V10230_HIGH_CYCLE_MAX_MODE_OPERATIONS", "128")
-    monkeypatch.setenv("V10230_HIGH_CYCLE_HEARTBEAT_OPERATIONS", "1000")
+    monkeypatch.setenv("V10230_HIGH_CYCLE_HEARTBEAT_OPERATIONS", "1")
     monkeypatch.setenv("V10230_PROJECTIVE_BURST_CYCLES", "4")
     monkeypatch.setenv("V10230_PROJECTIVE_MIN_CYCLES", "4")
     monkeypatch.setenv("V10230_PROJECTIVE_INITIAL_FACTOR", "4")
