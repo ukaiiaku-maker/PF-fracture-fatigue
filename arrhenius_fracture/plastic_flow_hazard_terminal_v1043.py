@@ -19,6 +19,7 @@ from .plastic_flow_physical_progress_v1043 import (
 )
 
 MODEL_ID = "v10.4.3_plastic_flow_terminal_projected_cleavage_hazard"
+AUDIT_SCHEMA = "v10.4.3_projected_hazard_plastic_flow_terminal_audit_v2"
 
 
 def _projection_values(window, metrics):
@@ -122,6 +123,10 @@ def _projected_hazard_metrics(window, args, metrics, *, remaining_steps, nominal
 
     metrics.update(
         {
+            # This key is expanded last into plastic_flow_terminal_audit.json,
+            # intentionally overriding the base v10.4.2 schema label.
+            "schema": AUDIT_SCHEMA,
+            "terminal_classifier_model_id": MODEL_ID,
             "criteria": criteria,
             "criteria_pass": all(criteria.values()),
             "legacy_negligible_positive_tip_J": legacy_j,
@@ -170,7 +175,8 @@ def load_transformed_sharp_front() -> ModuleType:
     module._v1042_terminal_metrics = wrapped
     module._v1043_hazard_terminal_wrapped = True
     module._v1043_hazard_terminal_model_id = MODEL_ID
+    module._v1043_hazard_terminal_audit_schema = AUDIT_SCHEMA
     return module
 
 
-__all__ = ["MODEL_ID", "load_transformed_sharp_front"]
+__all__ = ["AUDIT_SCHEMA", "MODEL_ID", "load_transformed_sharp_front"]
