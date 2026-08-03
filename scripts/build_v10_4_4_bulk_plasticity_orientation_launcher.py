@@ -2,7 +2,7 @@
 """Build the v10.4.4 full-field bulk-plasticity orientation campaign.
 
 The v10.2.30 launcher remains the geometry, barrier, seed, loading-rate, and
-hazard-energy-gate source.  This builder changes the model entry, enables the
+hazard-energy-gate source. This builder changes the model entry, enables the
 qualified full-field coupling and adaptive stagger controls, and accepts either
 fracture-target completion or a plasticity-dominated campaign terminal.
 """
@@ -44,7 +44,7 @@ def _replace_exact(text: str, old: str, new: str, *, label: str) -> str:
 
 
 def _scheduler_adapter() -> str:
-    return r'''
+    return r"""
 
 # v10.4.4 full-field bulk-plasticity campaign adapter.
 def replace_v1044_scheduler_exact(old, new, expected_count=1, label="v10.4.4 token"):
@@ -95,7 +95,7 @@ replace_v1044_scheduler_exact(
     --plastic-flow-min-cumulative-plastic-fraction "${PLASTIC_FLOW_MIN_CUMULATIVE_FRACTION:-0.90}"
     --plastic-flow-max-elastic-fraction "${PLASTIC_FLOW_MAX_ELASTIC_FRACTION:-0.05}"
     --plastic-flow-max-tangent-fraction "${PLASTIC_FLOW_MAX_TANGENT_FRACTION:-0.05}"
-    --plastic-flow-contour-multipliers 1\\ 2\\ 4\\ 8''',
+    --plastic-flow-contour-multipliers "1 2 4 8"''',
     label="full-field bulk-plasticity command",
 )
 
@@ -252,7 +252,7 @@ replace_v1044_scheduler_exact(
   --outroot "$OUTROOT"''',
     label="mixed-outcome campaign postprocessing",
 )
-'''
+"""
 
 
 def transform(source: str) -> str:
