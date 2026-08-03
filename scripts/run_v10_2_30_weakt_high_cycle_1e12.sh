@@ -52,7 +52,9 @@ printf '  live_checkpoint_dir=%s\n' "$V10230_HIGH_CYCLE_CHECKPOINT_DIR"
 # The qualified low-level launcher remains the command source. Generate its
 # run-specific metadata copy outside the repository so the low-level clean-tree
 # gate does not reject the wrapper's own temporary file. BSD/macOS mktemp
-# requires the XXXXXX template at the end of the path.
+# requires the XXXXXX template at the end of the path. Because the generated
+# copy is outside the worktree, replace its script-relative ROOT with this
+# wrapper's verified repository root before execution.
 BASE_LAUNCHER="$ROOT/scripts/run_v10_2_30_weakt_0p55_high_cycle_1e12.sh"
 GENERATED_LAUNCHER=$(mktemp "${TMPDIR:-/tmp}/v10_2_30_generic_weakt.XXXXXX")
 cleanup_generated_launcher() {
@@ -60,14 +62,21 @@ cleanup_generated_launcher() {
 }
 trap cleanup_generated_launcher EXIT
 
-"$PYTHON_BIN" - "$BASE_LAUNCHER" "$GENERATED_LAUNCHER" "$RUN_LABEL" <<'PY'
+"$PYTHON_BIN" - \
+  "$BASE_LAUNCHER" "$GENERATED_LAUNCHER" "$RUN_LABEL" "$ROOT" <<'PY'
 from pathlib import Path
+import shlex
 import sys
 
 source = Path(sys.argv[1])
 output = Path(sys.argv[2])
 run_label = sys.argv[3]
+repo_root = sys.argv[4]
 text = source.read_text()
+root_line = 'ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)'
+if root_line not in text:
+    raise SystemExit("ERROR: low-level launcher ROOT contract changed")
+text = text.replace(root_line, f"ROOT={shlex.quote(repo_root)}", 1)
 text = text.replace(
     '"schema": "v10.2.30_weakt_0p55_native_high_cycle_1e12_v1",',
     '"schema": "v10.2.30_generic_weakt_event_to_event_growth_driver_v1",',
