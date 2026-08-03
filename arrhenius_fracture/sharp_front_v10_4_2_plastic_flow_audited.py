@@ -14,7 +14,7 @@ from .plastic_flow_fixed_point_converged_v1043 import MODEL_ID as FIXED_POINT_MO
 from .plastic_flow_adaptive_timestep_v1043 import (
     MODEL_ID as ADAPTIVE_TIMESTEP_MODEL_ID,
 )
-from .plastic_flow_path_work_v1043 import (
+from .plastic_flow_path_work_startup_v1043 import (
     MODEL_ID as PATH_WORK_MODEL_ID,
     load_transformed_sharp_front,
 )
@@ -103,6 +103,9 @@ def _rewrite_model_audit(root: Path) -> None:
             ),
             "bulk_plastic_work_endpoint_increment": (
                 "actual_accepted_ep_end_minus_ep_begin"
+            ),
+            "bulk_plastic_work_startup_stress_policy": (
+                "zero_only_before_first_bound_compatible_sigma_gp_else_previous_accepted"
             ),
             "bulk_plastic_work_event_step_policy": (
                 "constitutive_fallback_to_avoid_mixing_pre_and_post_crack_geometries"
