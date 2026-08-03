@@ -1,16 +1,17 @@
 """Production v10.2.30 high-cycle state machine with affine-DMD propagation.
 
 The v2 state-machine control flow is reused with an isolated global namespace in
-which the slow-projective operator is replaced by the validated affine-DMD
-cycle-map propagator.  The v2 module itself is not monkey-patched, so reference
-and production strategies can be tested side by side.
+which the slow-projective operator is replaced by the neutral-stabilized,
+validated affine-DMD cycle-map propagator.  The v2 module itself is not
+monkey-patched, so reference and production strategies can be tested side by
+side.
 """
 from __future__ import annotations
 
 import types
 
 from . import persistent_site_high_cycle_engine_v10230_v2 as _base
-from .persistent_site_high_cycle_dmd_v10230 import (
+from .persistent_site_high_cycle_dmd_v10230_v2 import (
     MODEL_ID as DMD_MODEL_ID,
     dmd_config,
     propagate_dmd_cycles,
