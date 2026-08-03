@@ -1,4 +1,4 @@
-"""Audited v10.4.3 entry with converged stagger-consistent diagnostics."""
+"""Audited v10.4.3 entry with converged hazard-consistent diagnostics."""
 from __future__ import annotations
 
 import json
@@ -19,16 +19,19 @@ from .plastic_flow_path_work_startup_v1043 import (
 )
 from .plastic_flow_physical_progress_v1043 import (
     MODEL_ID as PHYSICAL_PROGRESS_MODEL_ID,
+)
+from .plastic_flow_hazard_terminal_v1043 import (
+    MODEL_ID as HAZARD_TERMINAL_MODEL_ID,
     load_transformed_sharp_front,
 )
 
 # The public entry path is retained so existing launcher contracts remain valid.
 # The model audit records the constitutive-time, strict convergence,
-# rejected-trial adaptive-timestep, endpoint-path work, and physical-progress
-# corrections.
+# rejected-trial adaptive-timestep, endpoint-path work, physical-progress, and
+# projected-hazard terminal corrections.
 MODEL_ID = (
     "v10.4.3_bulk_detailed_balance_adaptive_converged_stagger_"
-    "path_work_physical_progress_terminal"
+    "path_work_physical_progress_projected_hazard_terminal"
 )
 
 
@@ -59,7 +62,8 @@ def _rewrite_model_audit(root: Path) -> None:
     payload.update(
         {
             "schema": MODEL_ID,
-            "plastic_flow_terminal_model": TERMINAL_MODEL_ID,
+            "plastic_flow_terminal_base_model": TERMINAL_MODEL_ID,
+            "plastic_flow_terminal_model": HAZARD_TERMINAL_MODEL_ID,
             "plastic_work_ledger_base_model": PLASTIC_WORK_MODEL_ID,
             "plastic_work_path_model": PATH_WORK_MODEL_ID,
             "physical_progress_model": PHYSICAL_PROGRESS_MODEL_ID,
@@ -82,6 +86,20 @@ def _rewrite_model_audit(root: Path) -> None:
             "bulk_plastic_work_enters_fracture_measure": False,
             "bulk_plastic_work_enters_cleavage_hazard": False,
             "bulk_plastic_work_enters_energy_gate": False,
+            "plastic_flow_terminal_J_and_sigma_zero_gates": (
+                "diagnostic_only_not_acceptance_criteria"
+            ),
+            "plastic_flow_terminal_hazard_gate": (
+                "conservative_projected_cleavage_action_fraction_of_remaining_"
+                "first_passage_budget"
+            ),
+            "plastic_flow_terminal_default_prospective_horizon_nominal_steps": 2000.0,
+            "plastic_flow_terminal_default_max_projected_hazard_fraction": 0.01,
+            "plastic_flow_terminal_default_hazard_growth_percentile": 95.0,
+            "plastic_flow_terminal_projection_growth_definition": (
+                "max_of_fitted_secant_and_positive_local_percentile_"
+                "d_log_lambda_c_per_nominal_increment"
+            ),
             "mechanics_plasticity_stagger_role": (
                 "under_relaxed_fixed_point_iteration_for_one_dt"
             ),
@@ -176,7 +194,9 @@ def main(argv=None):
             "loading time and opening are reached; mechanics is then re-equilibrated "
             "against the accepted plastic state; accepted bulk Wp uses equilibrated "
             "endpoint-average stress contracted with the actual accepted plastic-"
-            "strain increment; Wp, J_pl and contour shielding are diagnostic only"
+            "strain increment; finite J and tip stress remain audited, while terminal "
+            "acceptance uses a conservative projected cleavage first-passage action; "
+            "Wp, J_pl and contour shielding are diagnostic only"
         )
         result = _v1041.main(args)
         out = _option_value(args, "--out")
