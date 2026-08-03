@@ -38,12 +38,16 @@ jobs:
             arrhenius_fracture/persistent_site_poincare_v10230.py \
             arrhenius_fracture/persistent_site_periodic_solver_v10230.py \
             arrhenius_fracture/persistent_site_high_cycle_propagation_v10230.py \
+            arrhenius_fracture/persistent_site_high_cycle_checkpoint_v10230.py \
             arrhenius_fracture/persistent_site_high_cycle_dmd_v10230.py \
             arrhenius_fracture/persistent_site_high_cycle_dmd_v10230_v2.py \
             arrhenius_fracture/persistent_site_high_cycle_dmd_v10230_v3.py \
+            arrhenius_fracture/persistent_site_high_cycle_dmd_v10230_v4.py \
+            arrhenius_fracture/persistent_site_high_cycle_dmd_v10230_v5.py \
             arrhenius_fracture/persistent_site_high_cycle_engine_v10230_v2.py \
             arrhenius_fracture/persistent_site_high_cycle_engine_v10230_v3.py \
             arrhenius_fracture/persistent_site_high_cycle_engine_v10230_v4.py \
+            arrhenius_fracture/persistent_site_high_cycle_engine_v10230_v5.py \
             arrhenius_fracture/persistent_site_high_cycle_engine_v10230.py \
             arrhenius_fracture/active_state_block_control_v10230.py \
             arrhenius_fracture/feedback_state_block_control_v10230.py \
@@ -53,6 +57,8 @@ jobs:
             scripts/analyze_v10_2_30_energy_gated_qualification.py \
             scripts/analyze_v10_2_30_weakt_transient_diagnostic.py \
             scripts/analyze_v10_2_30_high_cycle_visuals.py \
+            scripts/analyze_v10_2_30_high_cycle_live_checkpoint.py \
+            scripts/analyze_v10_2_30_developed_fatigue_growth.py \
             scripts/compare_v10_2_30_weakt_partition_equivalence.py
           bash -n scripts/run_v10_2_30_three_deltaK_energy_gate_qualification.sh
           bash -n scripts/run_v10_2_30_four_class_three_deltaK_energy_gate_qualification.sh
@@ -70,6 +76,7 @@ jobs:
             tests/test_v10_2_30_high_cycle_engine.py \
             tests/test_v10_2_30_high_cycle_exact_burst.py \
             tests/test_v10_2_30_high_cycle_affine_dmd.py \
+            tests/test_v10_2_30_event_growth_v5.py \
             tests/test_v10_2_30_high_cycle_launcher.py \
             tests/test_v10_2_30_high_cycle_visuals.py \
             tests/test_v10_2_30_audit_p0_invariants.py \
