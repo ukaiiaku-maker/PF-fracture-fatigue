@@ -8,6 +8,7 @@ chained propagator reports a genuine validation or event-guard stop.
 """
 from __future__ import annotations
 
+import os
 import types
 
 from . import persistent_site_high_cycle_engine_v10230_v2 as _base
@@ -29,14 +30,23 @@ def _chained_dmd_with_requested_scale(
     cycles_requested: float,
     requested_project_cycles: float,
 ):
-    return propagate_chained_dmd_cycles(
-        engine,
-        controller,
-        waveform,
-        temperature_K,
-        cycles_requested,
-        requested_project_cycles=requested_project_cycles,
-    )
+    previous = os.environ.get("V10230_DMD_CHAIN_MAX_SEGMENTS")
+    if previous is None:
+        os.environ["V10230_DMD_CHAIN_MAX_SEGMENTS"] = "256"
+    try:
+        return propagate_chained_dmd_cycles(
+            engine,
+            controller,
+            waveform,
+            temperature_K,
+            cycles_requested,
+            requested_project_cycles=requested_project_cycles,
+        )
+    finally:
+        if previous is None:
+            os.environ.pop("V10230_DMD_CHAIN_MAX_SEGMENTS", None)
+        else:
+            os.environ["V10230_DMD_CHAIN_MAX_SEGMENTS"] = previous
 
 
 def _bind_integrator():
