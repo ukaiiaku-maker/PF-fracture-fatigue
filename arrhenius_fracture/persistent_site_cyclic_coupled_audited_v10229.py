@@ -1,6 +1,8 @@
 """Audit adapter for state-coupled v10.2.29 persistent-site fatigue."""
 from __future__ import annotations
 
+import os
+
 from .persistent_site_cyclic_audited_v10229 import (
     _add_persistent_fields,
     _cycle_block_audit_fields,
@@ -8,6 +10,7 @@ from .persistent_site_cyclic_audited_v10229 import (
 from .persistent_site_cyclic_coupled_v10229 import (
     CoupledPersistentSiteCyclicTipEngine,
 )
+from .persistent_site_high_cycle_state_v10230 import serialize_active_state
 
 
 _COUPLED_KEYS = (
@@ -86,6 +89,32 @@ def _coupled_fields(result: dict) -> dict:
     return {key: result[key] for key in keys if key in result}
 
 
+def _active_state_snapshot(engine) -> dict:
+    enabled = os.environ.get("V10230_SAVE_ACTIVE_STATE_SNAPSHOT", "0").strip().lower()
+    if enabled not in {"1", "true", "yes", "on"}:
+        return {}
+    snapshot = serialize_active_state(engine)
+    return {
+        "coupled_hazard_active_state_snapshot": {
+            "model_id": "v10.2.30_complete_high_cycle_active_state_v1",
+            "vector": snapshot.vector.tolist(),
+            "fields": [
+                {
+                    "owner": field.owner,
+                    "name": field.name,
+                    "shape": list(field.shape),
+                    "start": int(field.start),
+                    "stop": int(field.stop),
+                    "floor": float(field.floor),
+                }
+                for field in snapshot.fields
+            ],
+            "diagnostics": dict(snapshot.diagnostics),
+            "geometry_signature": list(snapshot.geometry_signature),
+        }
+    }
+
+
 class AuditedCoupledPersistentSiteCyclicTipEngine(
     CoupledPersistentSiteCyclicTipEngine
 ):
@@ -145,9 +174,14 @@ class AuditedCoupledPersistentSiteCyclicTipEngine(
                 "state_coupled_cleavage_hazard": True,
                 **_cycle_block_audit_fields(controller, self, result),
                 **_coupled_fields(result),
+                **_active_state_snapshot(self),
             }
         )
         return result
 
 
-__all__ = ["AuditedCoupledPersistentSiteCyclicTipEngine", "_coupled_fields"]
+__all__ = [
+    "AuditedCoupledPersistentSiteCyclicTipEngine",
+    "_active_state_snapshot",
+    "_coupled_fields",
+]
