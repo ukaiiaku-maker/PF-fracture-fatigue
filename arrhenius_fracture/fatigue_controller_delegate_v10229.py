@@ -58,22 +58,22 @@ def install_engine_native_cycle_preview() -> None:
             and force_cycles is not None
             and callable(getattr(front, "cycle_step_waveform", None))
         ):
-            old_max = float(self.cfg.max_block_cycles)
             old_context = _ACTIVE_STEP_CONTEXT
             cap = max(float(force_cycles), 0.0)
             try:
-                self.cfg.max_block_cycles = min(old_max, cap)
                 _ACTIVE_STEP_CONTEXT = (front, waveform, float(T_K))
+                # A globally selected shared cycle block is already a decision.
+                # Commit it directly through the engine's explicit force path.
+                # Do not mutate cfg.max_block_cycles and do not re-enter selection.
                 return front.cycle_step_waveform(
                     self,
                     waveform,
                     T_K,
                     requested_cycles=cap,
-                    force_cycles=None,
+                    force_cycles=cap,
                 )
             finally:
                 _ACTIVE_STEP_CONTEXT = old_context
-                self.cfg.max_block_cycles = old_max
         return original_step(
             self,
             front,
