@@ -91,6 +91,14 @@ exec(
     compile(patcher_path.read_text(), str(patcher_path), "exec"),
     patcher_namespace,
 )
+# The outer v10.4.5 transform has already replaced the legacy model entry in
+# the scheduler-builder source. Normalize the generated scheduler back to the
+# v10.2.30 entry expected by the established scheduler patcher, apply that
+# patch, and then promote every case command to the v10.4.5 entry.
+scheduler = scheduler.replace(
+    "{MODEL_ENTRY}",
+    "{OLD_ENTRY}",
+)
 scheduler = patcher_namespace["transform"](scheduler)
 scheduler = scheduler.replace(
     "{V1044_ENTRY}",
