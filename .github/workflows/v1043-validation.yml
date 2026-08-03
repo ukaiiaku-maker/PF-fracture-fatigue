@@ -1,0 +1,82 @@
+name: v10.4.3 validation
+
+on:
+  push:
+    branches:
+      - v10.4.3-stagger-consistent-plastic-terminal
+  pull_request:
+    branches:
+      - v10.4.2-plastic-flow-terminal
+
+jobs:
+  targeted:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python -m pip install -e '.[test]'
+      - name: Run v10.4.3 validation entrypoint
+        run: bash scripts/validate_v10_4_3_stagger_consistency.sh
+
+  full-tests-against-base-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python -m pip install -e '.[test]'
+      - name: Run full suite and require no new failures
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q > full_pytest.log 2>&1
+          pytest_rc=$?
+          set -e
+          cat full_pytest.log
+          PYTEST_RC="$pytest_rc" python - <<'PY'
+          import os
+          from pathlib import Path
+
+          expected = {
+              "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader",
+              "tests/test_state_resolved_kernel_v1029.py::test_effective_opening_fixed_point_uses_signed_shielding_not_applied_K",
+              "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id",
+              "tests/test_v10214_response_model_id.py::test_v10214_response_model_id",
+              "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly",
+              "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+          }
+          text = Path("full_pytest.log").read_text()
+          observed = set()
+          for line in text.splitlines():
+              if line.startswith("FAILED "):
+                  observed.add(line.split(" - ", 1)[0][len("FAILED "):])
+
+          rc = int(os.environ["PYTEST_RC"])
+          if rc == 0:
+              if expected:
+                  raise SystemExit(
+                      "full suite unexpectedly became green; update the explicit base-baseline contract"
+                  )
+          elif observed != expected:
+              missing = sorted(expected - observed)
+              added = sorted(observed - expected)
+              raise SystemExit(
+                  f"full-suite failure set changed; missing={missing}, new={added}"
+              )
+          print(
+              "Full suite has exactly the six pre-existing base-branch failures; "
+              "v10.4.3 introduced no additional full-suite failures."
+          )
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v1043-full-pytest-${{ github.run_id }}
+          path: full_pytest.log

@@ -3,13 +3,14 @@
 The legacy sharp-front driver already maintains accepted-step histories for
 external work, stored elastic energy, bulk plastic work, and tip-emission work,
 but only a subset was written to the production step CSV.  This overlay wraps
-``numpy.savetxt`` only while the audited v10.2.27 entry point is running and
-augments each ``steps_*K.csv`` table with those histories.
+``numpy.savetxt`` only while the audited entry point is running and augments
+each ``steps_*K.csv`` table with those histories.
 
-The implementation deliberately reads the already accepted ``hist`` arrays at
-final output time.  It therefore excludes rejected adaptive trial steps and is
-compatible with both ``bulk_plasticity_mode=tip_only`` and any future validated
-``full_field`` mode.
+The implementation reads the already accepted ``hist`` arrays at final output
+time.  It therefore excludes rejected adaptive trial steps.  Newer fixed-point
+paths may additionally provide ``hist['W_p_constitutive']``; when present, the
+CSV retains that older constitutive estimate beside the primary endpoint-path
+work ledger rather than silently replacing it.
 """
 from __future__ import annotations
 
@@ -21,7 +22,7 @@ from typing import Any
 import numpy as np
 
 
-SCHEMA = "v10.2.27_accepted_step_energy_ledger_v1"
+SCHEMA = "v10.2.27_accepted_step_energy_ledger_v2"
 _EXTRA_COLUMNS = (
     "J_effective_direct_J_per_m2",
     "J_signed_direct_J_per_m2",
@@ -30,6 +31,11 @@ _EXTRA_COLUMNS = (
     "W_bulk_plastic_cumulative_J_per_m",
     "W_tip_emit_cumulative_J_per_m",
     "W_fracture_residual_cumulative_J_per_m",
+)
+_OPTIONAL_PATH_WORK_COLUMNS = (
+    "W_bulk_plastic_constitutive_cumulative_J_per_m",
+    "W_bulk_plastic_path_minus_constitutive_cumulative_J_per_m",
+    "W_fracture_residual_constitutive_cumulative_J_per_m",
 )
 
 _original_savetxt = None
@@ -84,12 +90,13 @@ def _direct_j_from_front_rows(
     if np.any(missing):
         if not np.isfinite(effective_modulus_pa) or effective_modulus_pa <= 0.0:
             raise RuntimeError("cannot recover direct J without a positive Eprime")
-        # In the non-deflecting path, KJ is created immediately from the direct
-        # domain J through KJ=sqrt(J*Eprime).  This is an exact inversion of that
-        # solver transformation, not an apparent-modulus estimate.
-        effective[missing] = np.maximum(steps[missing, 3], 0.0) ** 2 / effective_modulus_pa
+        effective[missing] = (
+            np.maximum(steps[missing, 3], 0.0) ** 2 / effective_modulus_pa
+        )
         signed[missing] = effective[missing]
-        provenance = "root_front_direct_J_with_exact_nondeflecting_KJ_inverse_fallback"
+        provenance = (
+            "root_front_direct_J_with_exact_nondeflecting_KJ_inverse_fallback"
+        )
     else:
         provenance = "root_front_direct_J"
     return effective, signed, provenance
@@ -119,11 +126,37 @@ def augment_steps_table(
     )
     residual = w_ext - u_el - w_bulk - w_emit
 
-    extra = np.column_stack(
-        [j_effective, j_signed, w_ext, u_el, w_bulk, w_emit, residual]
-    )
+    extra_arrays = [
+        j_effective,
+        j_signed,
+        w_ext,
+        u_el,
+        w_bulk,
+        w_emit,
+        residual,
+    ]
+    columns = list(_EXTRA_COLUMNS)
+    optional_path_work = False
+    if "W_p_constitutive" in hist:
+        w_bulk_constitutive = _history_array(
+            hist, "W_p_constitutive", nrows
+        )
+        residual_constitutive = (
+            w_ext - u_el - w_bulk_constitutive - w_emit
+        )
+        extra_arrays.extend(
+            [
+                w_bulk_constitutive,
+                w_bulk - w_bulk_constitutive,
+                residual_constitutive,
+            ]
+        )
+        columns.extend(_OPTIONAL_PATH_WORK_COLUMNS)
+        optional_path_work = True
+
+    extra = np.column_stack(extra_arrays)
     augmented = np.column_stack([steps, extra])
-    augmented_header = header.rstrip() + "," + ",".join(_EXTRA_COLUMNS)
+    augmented_header = header.rstrip() + "," + ",".join(columns)
     audit = {
         "schema": SCHEMA,
         "row_count": int(nrows),
@@ -135,7 +168,9 @@ def augment_steps_table(
             "W_fracture_residual=W_ext-U_elastic-W_bulk_plastic-W_tip_emit; "
             "residual contains fracture-surface work plus discretization error"
         ),
-        "columns_added": list(_EXTRA_COLUMNS),
+        "primary_bulk_plastic_history": "hist.W_p",
+        "constitutive_comparison_history_present": optional_path_work,
+        "columns_added": columns,
     }
     return augmented, augmented_header, audit
 
@@ -221,8 +256,12 @@ def write_energy_ledger_audit(outroot: str | Path) -> Path:
         "direct_configurational_J_is_not_total_absorbed_energy": True,
         "bulk_plasticity_accounting": (
             "W_bulk_plastic is the accepted cumulative FEM plastic-work ledger; "
-            "it is zero in tip_only mode and nonzero when a validated full_field "
-            "mode is used"
+            "newer fixed-point paths use endpoint-average stress contracted with "
+            "the actual accepted plastic-strain increment"
+        ),
+        "constitutive_comparison_accounting": (
+            "when present, W_bulk_plastic_constitutive retains the older local "
+            "constitutive estimate for diagnosis and is not the primary ledger"
         ),
         "tip_emission_accounting": (
             "W_tip_emit is the accepted cumulative process-zone emission-work ledger"
