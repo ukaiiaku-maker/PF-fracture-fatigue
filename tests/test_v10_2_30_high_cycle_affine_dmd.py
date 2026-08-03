@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from arrhenius_fracture import persistent_site_high_cycle_dmd_v10230 as dmd
+from arrhenius_fracture import persistent_site_high_cycle_dmd_v10230_v2 as dmd
 from arrhenius_fracture import persistent_site_high_cycle_engine_v10230 as high
 
 
@@ -151,6 +151,7 @@ def _configure(monkeypatch):
     monkeypatch.setenv("V10230_DMD_BURST_CYCLES", "12")
     monkeypatch.setenv("V10230_DMD_MAX_RANK", "6")
     monkeypatch.setenv("V10230_DMD_MIN_PROJECT_CYCLES", "8")
+    monkeypatch.setenv("V10230_DMD_NEUTRAL_EIGEN_TOL", "1e-6")
     monkeypatch.setenv("V10230_DMD_TRAINING_REL_TOL", "1e-10")
     monkeypatch.setenv("V10230_DMD_STATE_VALIDATION_REL_TOL", "1e-9")
     monkeypatch.setenv("V10230_DMD_HAZARD_VALIDATION_REL_TOL", "1e-9")
