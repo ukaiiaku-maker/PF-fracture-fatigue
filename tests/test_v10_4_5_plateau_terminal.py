@@ -94,3 +94,77 @@ def test_plateau_fallback_rejects_zero_cumulative_bulk_work(monkeypatch):
     assert metrics is not None
     assert metrics["criteria_pass"] is False
     assert metrics["criteria"]["bulk_plastic_dissipation_present"] is False
+
+
+def test_failed_standard_terminal_allows_passing_plateau_fallback(monkeypatch):
+    module = SimpleNamespace(
+        _v1042_terminal_metrics=lambda window, args, **kwargs: {
+            "criteria_pass": False,
+            "terminal_basis": "standard_nominal_window",
+        }
+    )
+    monkeypatch.setattr(
+        v1045._terminal,
+        "load_transformed_sharp_front",
+        lambda: module,
+    )
+    monkeypatch.setattr(
+        v1045,
+        "_plateau_substep_metrics",
+        lambda window, args, **kwargs: {
+            "criteria_pass": True,
+            "terminal_basis": v1045.TERMINAL_BASIS,
+        },
+    )
+    monkeypatch.setattr(
+        v1045,
+        "_plateau_campaign_metrics",
+        lambda window, metrics, Eprime: {
+            "criteria_pass": True,
+            "terminal_basis": metrics["terminal_basis"],
+            "selected": "plateau_fallback",
+        },
+    )
+
+    transformed = v1045._load_transformed_sharp_front_v1045()
+    result = transformed._v1042_terminal_metrics(
+        _window(),
+        SimpleNamespace(),
+        Eprime=25.0,
+    )
+
+    assert result["criteria_pass"] is True
+    assert result["selected"] == "plateau_fallback"
+
+
+def test_passing_standard_terminal_has_priority(monkeypatch):
+    primary = {
+        "criteria_pass": True,
+        "terminal_basis": "standard_nominal_window",
+    }
+    module = SimpleNamespace(
+        _v1042_terminal_metrics=lambda window, args, **kwargs: primary
+    )
+    monkeypatch.setattr(
+        v1045._terminal,
+        "load_transformed_sharp_front",
+        lambda: module,
+    )
+
+    fallback_called = {"value": False}
+
+    def fallback(*args, **kwargs):
+        fallback_called["value"] = True
+        return {"criteria_pass": True}
+
+    monkeypatch.setattr(v1045, "_plateau_substep_metrics", fallback)
+
+    transformed = v1045._load_transformed_sharp_front_v1045()
+    result = transformed._v1042_terminal_metrics(
+        _window(),
+        SimpleNamespace(),
+        Eprime=25.0,
+    )
+
+    assert result is primary
+    assert fallback_called["value"] is False
