@@ -38,7 +38,9 @@ jobs:
             arrhenius_fracture/persistent_site_poincare_v10230.py \
             arrhenius_fracture/persistent_site_periodic_solver_v10230.py \
             arrhenius_fracture/persistent_site_high_cycle_propagation_v10230.py \
+            arrhenius_fracture/persistent_site_high_cycle_dmd_v10230.py \
             arrhenius_fracture/persistent_site_high_cycle_engine_v10230_v2.py \
+            arrhenius_fracture/persistent_site_high_cycle_engine_v10230_v3.py \
             arrhenius_fracture/persistent_site_high_cycle_engine_v10230.py \
             arrhenius_fracture/active_state_block_control_v10230.py \
             arrhenius_fracture/feedback_state_block_control_v10230.py \
@@ -62,6 +64,7 @@ jobs:
           python -m pytest -q --tb=short \
             tests/test_v10_2_30_high_cycle_engine.py \
             tests/test_v10_2_30_high_cycle_exact_burst.py \
+            tests/test_v10_2_30_high_cycle_affine_dmd.py \
             tests/test_v10_2_30_high_cycle_launcher.py \
             tests/test_v10_2_30_audit_p0_invariants.py \
             tests/test_v10_2_30_forward_coupled_marcher.py \
