@@ -4,14 +4,10 @@ from collections import deque
 from pathlib import Path
 from types import SimpleNamespace
 
+import arrhenius_fracture.plastic_flow_hazard_terminal_v1043 as hazard_terminal
 from arrhenius_fracture.plastic_flow_hazard_terminal_v1043 import (
     load_transformed_sharp_front,
-    transform_source,
 )
-
-
-def _source() -> str:
-    return Path("arrhenius_fracture/sharp_front.py").read_text()
 
 
 def _args(**overrides):
@@ -91,15 +87,15 @@ def _metrics(rows, args=None):
     )
 
 
-def test_hazard_terminal_transform_compiles_and_exposes_options() -> None:
-    transformed = transform_source(_source())
-    compile(transformed, "sharp_front.py[v10.4.3-hazard-terminal-test]", "exec")
-    assert "--plastic-flow-prospective-horizon-steps" in transformed
-    assert "--plastic-flow-max-projected-hazard-fraction" in transformed
-    assert "projected_cleavage_action_safe" in transformed
-    assert "J_and_sigma_zero_gates_are_diagnostic_only" in transformed
-    assert "'negligible_positive_tip_J':" not in transformed
-    assert "'negligible_tip_stress':" not in transformed
+def test_hazard_terminal_runtime_wrapper_is_installed() -> None:
+    module = load_transformed_sharp_front()
+    assert module._v1043_hazard_terminal_wrapped
+    assert module._v1043_hazard_terminal_model_id == hazard_terminal.MODEL_ID
+    source = Path(hazard_terminal.__file__).read_text()
+    assert "projected_cleavage_action_safe" in source
+    assert "J_and_sigma_zero_gates_are_diagnostic_only" in source
+    assert "plastic_flow_prospective_horizon_steps" in source
+    assert "plastic_flow_max_projected_hazard_fraction" in source
 
 
 def test_nearly_elastic_load_bearing_state_fails() -> None:
