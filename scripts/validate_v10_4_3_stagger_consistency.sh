@@ -26,6 +26,7 @@ PY
   tests/test_v10_4_3_fixed_point_convergence.py \
   tests/test_v10_4_3_adaptive_stagger_timestep.py \
   tests/test_v10_4_3_endpoint_path_work.py \
+  tests/test_v10_4_3_physical_progress.py \
   tests/test_v10_4_2_reuse_aware_launcher.py \
   tests/test_v10_4_2_launcher_adapter.py \
   tests/test_v10_4_bulk_peierls_taylor.py \
@@ -47,7 +48,7 @@ grep -q 'failed_or_incomplete_cases' "$GENERATED"
 from pathlib import Path
 
 source = Path("arrhenius_fracture/sharp_front.py").read_text()
-from arrhenius_fracture.plastic_flow_path_work_startup_v1043 import transform_source
+from arrhenius_fracture.plastic_flow_physical_progress_v1043 import transform_source
 
 transformed = transform_source(source)
 required = {
@@ -70,11 +71,21 @@ required = {
     "endpoint plastic snapshot": "ep_gp_step0_path_v1043",
     "endpoint path work": "equilibrated_endpoint_trapezoid_sigma_colon_delta_ep",
     "constitutive comparison history": "hist['W_p_constitutive']",
+    "nominal progress target": "nominal_progress_target_v1043",
+    "physical-progress loop": "while nominal_progress_v1043 <",
+    "accepted progress commit": "nominal_progress_v1043 += float(trial_frac)",
+    "remaining-fraction cap": "remaining_nominal_fraction_v1043",
+    "progress overshoot guard": "adaptive substep exceeded nominal loading horizon",
+    "progress CSV columns": "nominal_progress_start,nominal_progress",
+    "terminal physical window": "classification_window_nominal_increment_span",
+    "fractional remaining horizon": "float(remaining_steps), 0.0",
     "positive directional J": "J_positive = max(J_signed, 0.0)",
 }
 missing = [label for label, token in required.items() if token not in transformed]
 if missing:
     raise SystemExit(f"ERROR: transformed source missing invariants: {missing}")
+if "while step < args.steps:" in transformed:
+    raise SystemExit("ERROR: accepted-row count still controls loading completion")
 print("v10.4.3 transformed-source invariants verified")
 PY
 
