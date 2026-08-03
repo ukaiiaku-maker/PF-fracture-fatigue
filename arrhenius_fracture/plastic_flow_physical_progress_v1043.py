@@ -131,8 +131,6 @@ def transform_source(source: str) -> str:
         "v10.4.3 accepted nominal progress commit",
     )
 
-    # Keep the terminal history in physical loading coordinates.  The deque is
-    # pruned inside the metric helper once the requested nominal span is known.
     text = _replace_once(
         text,
         """        plastic_flow_window = deque(maxlen=plastic_flow_window_size)
@@ -245,8 +243,6 @@ def transform_source(source: str) -> str:
         "v10.4.3 fractional remaining loading horizon",
     )
 
-    # Append progress fields at the end so all legacy step-table column offsets
-    # remain unchanged.
     text = _replace_once(
         text,
         """                         float(info.get('mpz_wake_retained_total', 0.0))))
@@ -282,9 +278,17 @@ def transform_source(source: str) -> str:
 
     text = _replace_once(
         text,
-        """            'shelf': audit,
+        """            'branched': bool(branched),
+            'mode': ('no-fracture' if Kc_first is None
+                     else ('ductile' if W_emit_total > 0.1 * Kc_first ** 2 / mat.Eprime
+                           else 'brittle')),
+            'shelf': audit,
 """,
-        """            'accepted_substeps': int(step),
+        """            'branched': bool(branched),
+            'mode': ('no-fracture' if Kc_first is None
+                     else ('ductile' if W_emit_total > 0.1 * Kc_first ** 2 / mat.Eprime
+                           else 'brittle')),
+            'accepted_substeps': int(step),
             'nominal_loading_progress': float(nominal_progress_v1043),
             'nominal_loading_target': float(nominal_progress_target_v1043),
             'accepted_physical_time_s': float(
@@ -292,7 +296,7 @@ def transform_source(source: str) -> str:
             ),
             'shelf': audit,
 """,
-        "v10.4.3 summary physical-progress audit",
+        "v10.4.3 2-D summary physical-progress audit",
     )
 
     return text
