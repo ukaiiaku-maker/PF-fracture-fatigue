@@ -91,6 +91,7 @@ def test_hazard_terminal_runtime_wrapper_is_installed() -> None:
     module = load_transformed_sharp_front()
     assert module._v1043_hazard_terminal_wrapped
     assert module._v1043_hazard_terminal_model_id == hazard_terminal.MODEL_ID
+    assert module._v1043_hazard_terminal_audit_schema == hazard_terminal.AUDIT_SCHEMA
     source = Path(hazard_terminal.__file__).read_text()
     assert "projected_cleavage_action_safe" in source
     assert "J_and_sigma_zero_gates_are_diagnostic_only" in source
@@ -132,6 +133,8 @@ def test_collapsed_stiffness_inaccessible_hazard_passes_with_finite_J_and_stress
     ]
     metrics = _metrics(rows)
     assert metrics is not None
+    assert metrics["schema"] == hazard_terminal.AUDIT_SCHEMA
+    assert metrics["terminal_classifier_model_id"] == hazard_terminal.MODEL_ID
     assert metrics["criteria_pass"]
     assert metrics["criteria"]["projected_cleavage_action_safe"]
     assert not metrics["legacy_negligible_positive_tip_J"]
@@ -148,6 +151,8 @@ def test_collapsed_stiffness_accessible_positive_hazard_fails() -> None:
     ]
     metrics = _metrics(rows)
     assert metrics is not None
+    assert metrics["schema"] == hazard_terminal.AUDIT_SCHEMA
+    assert metrics["terminal_classifier_model_id"] == hazard_terminal.MODEL_ID
     assert not metrics["criteria_pass"]
     assert not metrics["criteria"]["projected_cleavage_action_safe"]
     assert metrics["projected_hazard_fraction_of_remaining_budget"] > 0.01
