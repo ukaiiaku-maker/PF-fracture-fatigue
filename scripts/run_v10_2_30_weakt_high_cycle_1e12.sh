@@ -10,6 +10,7 @@ TARGET_FRACTION=${TARGET_FRACTION:-custom}
 RUN_LABEL=${RUN_LABEL:-weakt_${TARGET_FRACTION}}
 TARGET_EXT_UM=${TARGET_EXT_UM:-100}
 CYCLES_MAX=${CYCLES_MAX:-1e12}
+HAZARD_SEED=${HAZARD_SEED:-2001726}
 
 if [[ -z "$TARGET_DELTAK" ]]; then
   echo "ERROR: set TARGET_DELTAK in MPa*sqrt(m)" >&2
@@ -31,7 +32,7 @@ SAFE_LABEL=$(printf '%s' "$RUN_LABEL" | tr -cs 'A-Za-z0-9._-' '_')
 OUTROOT=${OUTROOT:-$ROOT/runs/v10_2_30_${SAFE_LABEL}_event_growth_v5_100um_$(date +%Y%m%d_%H%M%S)}
 
 export DELTA_K_MPA_SQRT_M="$TARGET_DELTAK"
-export OUTROOT TARGET_EXT_UM CYCLES_MAX
+export OUTROOT TARGET_EXT_UM CYCLES_MAX HAZARD_SEED
 export V10230_SAVE_ACTIVE_STATE_SNAPSHOT=${V10230_SAVE_ACTIVE_STATE_SNAPSHOT:-1}
 export V10230_HIGH_CYCLE_CHECKPOINT_DIR=${V10230_HIGH_CYCLE_CHECKPOINT_DIR:-$OUTROOT}
 export V10230_HIGH_CYCLE_CHECKPOINT_MIN_SECONDS=${V10230_HIGH_CYCLE_CHECKPOINT_MIN_SECONDS:-30}
@@ -44,16 +45,20 @@ printf '  target_fraction=%s\n' "$TARGET_FRACTION"
 printf '  target_DeltaK_MPa_sqrt_m=%s\n' "$TARGET_DELTAK"
 printf '  crack_extension_target_um=%s\n' "$TARGET_EXT_UM"
 printf '  cycle_censor=%s\n' "$CYCLES_MAX"
+printf '  stochastic_threshold=Exp(1) cumulative-hazard draw, seed=%s\n' "$HAZARD_SEED"
 printf '  output=%s\n' "$OUTROOT"
 printf '  live_checkpoint_dir=%s\n' "$V10230_HIGH_CYCLE_CHECKPOINT_DIR"
 
-# The original low-level launcher remains the qualified command source, but its
-# historical 0.55 display strings and schemas must not leak into arbitrary
-# DeltaK runs. Build a temporary script with run-specific metadata only; physics,
-# command arguments, validation settings, and execution logic remain unchanged.
+# The qualified low-level launcher remains the command source. Generate its
+# run-specific metadata copy outside the repository so the low-level clean-tree
+# gate does not reject the wrapper's own temporary file. BSD/macOS mktemp
+# requires the XXXXXX template at the end of the path.
 BASE_LAUNCHER="$ROOT/scripts/run_v10_2_30_weakt_0p55_high_cycle_1e12.sh"
-GENERATED_LAUNCHER=$(mktemp "$ROOT/scripts/.v10_2_30_generic_weakt.XXXXXX.sh")
-trap 'rm -f "$GENERATED_LAUNCHER"' EXIT
+GENERATED_LAUNCHER=$(mktemp "${TMPDIR:-/tmp}/v10_2_30_generic_weakt.XXXXXX")
+cleanup_generated_launcher() {
+  rm -f -- "$GENERATED_LAUNCHER"
+}
+trap cleanup_generated_launcher EXIT
 
 "$PYTHON_BIN" - "$BASE_LAUNCHER" "$GENERATED_LAUNCHER" "$RUN_LABEL" <<'PY'
 from pathlib import Path
@@ -85,8 +90,18 @@ bash "$GENERATED_LAUNCHER"
 RC=$?
 set -e
 
-"$PYTHON_BIN" - "$OUTROOT" "$RUN_LABEL" "$TARGET_FRACTION" "$TARGET_DELTAK" "$TARGET_EXT_UM" "$CYCLES_MAX" <<'PY'
+if [[ ! -d "$OUTROOT" ]]; then
+  echo "ERROR: low-level launcher exited with code $RC before creating $OUTROOT" >&2
+  echo "exit_code=$RC"
+  echo "output=$OUTROOT"
+  exit "$RC"
+fi
+
+"$PYTHON_BIN" - \
+  "$OUTROOT" "$RUN_LABEL" "$TARGET_FRACTION" "$TARGET_DELTAK" \
+  "$TARGET_EXT_UM" "$CYCLES_MAX" "$HAZARD_SEED" <<'PY'
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -96,6 +111,14 @@ target_fraction = sys.argv[3]
 target_delta_k = float(sys.argv[4])
 target_extension_um = float(sys.argv[5])
 cycle_censor = float(sys.argv[6])
+hazard_seed = int(sys.argv[7])
+
+stochastic_metadata = {
+    "threshold_is_stochastic": True,
+    "threshold_distribution": "unit_exponential_in_cumulative_hazard_action",
+    "threshold_sampling": "independent_draw_per_first_passage_interval",
+    "hazard_seed": hazard_seed,
+}
 
 manifest_path = root / "high_cycle_run_manifest.json"
 manifest = json.loads(manifest_path.read_text()) if manifest_path.is_file() else {}
@@ -112,6 +135,7 @@ manifest.update(
         "generic_launcher": "scripts/run_v10_2_30_weakt_high_cycle_1e12.sh",
         "active_state_snapshot_requested": True,
         "live_checkpointing_requested": True,
+        **stochastic_metadata,
     }
 )
 manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
@@ -126,8 +150,26 @@ summary.update(
         "target_deltaK_MPa_sqrt_m": target_delta_k,
         "target_crack_extension_um": target_extension_um,
         "cycles_max_censor": cycle_censor,
+        **stochastic_metadata,
     }
 )
+
+checkpoint_path = root / "high_cycle_live_checkpoint.json"
+if checkpoint_path.is_file():
+    checkpoint = json.loads(checkpoint_path.read_text())
+    stochastic = checkpoint.get("stochastic", {})
+    action = stochastic.get("hazard_action_current")
+    threshold = stochastic.get("hazard_threshold_action")
+    clock = stochastic.get("B")
+    if action is not None:
+        action = float(action)
+        summary["current_interval_physical_hazard_action"] = action
+        summary["current_interval_ensemble_event_probability"] = -math.expm1(-action)
+    if threshold is not None:
+        summary["current_interval_sampled_threshold"] = float(threshold)
+    if clock is not None:
+        summary["current_interval_normalized_clock_B"] = float(clock)
+
 summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
 PY
 
