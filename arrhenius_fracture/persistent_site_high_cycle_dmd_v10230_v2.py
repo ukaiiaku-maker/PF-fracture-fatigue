@@ -1,12 +1,17 @@
 """Neutral- and output-stabilized affine-DMD propagation for v10.2.30.
 
 Least-squares roundoff can place an exactly neutral cycle-map eigenvalue at
-``1 + epsilon`` or give a constant ledger rate a tiny spurious state dependence.
-Either error becomes secular when propagated over 1e12 cycles.  This module
-snaps only eigenvalues statistically indistinguishable from unity to exactly one
-and makes output rows that are constant over the exact training burst exactly
-constant.  The stabilized state map is then checked against the unchanged
-training and independent endpoint-validation tolerances.
+``1 + epsilon``, give a constant ledger rate a tiny spurious state dependence,
+or obscure the small local variation of a hazard rate with a large intercept.
+Any such error becomes secular when propagated over 1e12 cycles.
+
+This module therefore:
+* snaps only eigenvalues statistically indistinguishable from unity to one;
+* makes output rows constant over the exact training burst exactly constant;
+* fits every nonconstant output in centered, row-scaled coordinates.
+
+The stabilized map remains subject to the unchanged training and independent
+endpoint-validation tolerances.
 """
 from __future__ import annotations
 
@@ -19,7 +24,7 @@ import numpy as np
 from . import persistent_site_high_cycle_dmd_v10230 as _base
 
 
-MODEL_ID = "v10.2.30_validated_affine_dmd_cycle_map_v2_neutral_output_stable"
+MODEL_ID = "v10.2.30_validated_affine_dmd_cycle_map_v2_neutral_output_scaled"
 
 
 def _neutral_tolerance() -> float:
@@ -63,25 +68,44 @@ def _stabilize_neutral_modes(A: np.ndarray, tolerance: float) -> np.ndarray:
     return np.real(stabilized)
 
 
-def _stabilize_constant_outputs(
-    C: np.ndarray,
-    d: np.ndarray,
+def _fit_scaled_outputs(
+    previous: np.ndarray,
     outputs: np.ndarray,
     tolerance: float,
-) -> tuple[np.ndarray, np.ndarray, tuple[int, ...]]:
-    slopes = np.asarray(C, dtype=float).copy()
-    offsets = np.asarray(d, dtype=float).copy()
+) -> tuple[np.ndarray, np.ndarray, tuple[int, ...], tuple[float, ...]]:
     observed = np.asarray(outputs, dtype=float)
+    design = np.vstack(
+        [np.asarray(previous, dtype=float), np.ones(previous.shape[1], dtype=float)]
+    )
+    rank = previous.shape[0]
+    C = np.zeros((observed.shape[0], rank), dtype=float)
+    d = np.zeros(observed.shape[0], dtype=float)
     constant_rows: list[int] = []
+    row_scales: list[float] = []
+
     for index in range(observed.shape[0]):
         row = observed[index]
-        scale = max(float(np.max(np.abs(row))), 1.0e-300)
+        center = float(np.mean(row))
+        variation = row - center
+        absolute_scale = max(float(np.max(np.abs(row))), 1.0e-300)
         span = float(np.max(row) - np.min(row))
-        if span / scale <= float(tolerance):
-            slopes[index, :] = 0.0
-            offsets[index] = float(np.mean(row))
+        if span / absolute_scale <= float(tolerance):
+            C[index, :] = 0.0
+            d[index] = center
             constant_rows.append(index)
-    return slopes, offsets, tuple(constant_rows)
+            row_scales.append(0.0)
+            continue
+
+        local_scale = max(float(np.max(np.abs(variation))), 1.0e-300)
+        normalized = variation / local_scale
+        coefficient = np.linalg.lstsq(
+            design.T, normalized, rcond=None
+        )[0]
+        C[index, :] = local_scale * coefficient[:rank]
+        d[index] = center + local_scale * coefficient[rank]
+        row_scales.append(local_scale)
+
+    return C, d, tuple(constant_rows), tuple(row_scales)
 
 
 def _fit_affine_model_stabilized(states, outputs, config):
@@ -94,18 +118,16 @@ def _fit_affine_model_stabilized(states, outputs, config):
     fitted = A @ previous + np.asarray(model["c"], dtype=float)[:, None]
     training_error = _base._relative_vector_error(fitted, following)
 
-    C, d, constant_rows = _stabilize_constant_outputs(
-        np.asarray(model["C"], dtype=float),
-        np.asarray(model["d"], dtype=float),
+    C, d, constant_rows, row_scales = _fit_scaled_outputs(
+        previous,
         np.asarray(outputs, dtype=float),
         _constant_output_tolerance(),
     )
     output_fitted = C @ previous + d[:, None]
-    output_error_by_row = []
-    for index in range(outputs.shape[0]):
-        output_error_by_row.append(
-            _base._relative_vector_error(output_fitted[index], outputs[index])
-        )
+    output_error_by_row = tuple(
+        _base._relative_vector_error(output_fitted[index], outputs[index])
+        for index in range(outputs.shape[0])
+    )
 
     model["A_unstabilized"] = A_original
     model["A"] = A
@@ -114,7 +136,8 @@ def _fit_affine_model_stabilized(states, outputs, config):
     model["C"] = C
     model["d"] = d
     model["constant_output_rows"] = constant_rows
-    model["output_training_error_by_row"] = tuple(output_error_by_row)
+    model["output_row_scales"] = row_scales
+    model["output_training_error_by_row"] = output_error_by_row
     model["training_error"] = training_error
     eigenvalues = np.linalg.eigvals(A)
     model["spectral_radius"] = (
@@ -150,6 +173,6 @@ __all__ = [
     "MODEL_ID",
     "dmd_config",
     "propagate_dmd_cycles",
-    "_stabilize_constant_outputs",
+    "_fit_scaled_outputs",
     "_stabilize_neutral_modes",
 ]
