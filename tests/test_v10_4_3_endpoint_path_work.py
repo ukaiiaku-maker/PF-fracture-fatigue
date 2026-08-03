@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 
 from arrhenius_fracture.energy_ledger_output_v10227 import augment_steps_table
-from arrhenius_fracture.plastic_flow_path_work_v1043 import transform_source
+from arrhenius_fracture.plastic_flow_path_work_startup_v1043 import transform_source
 
 
 def _source() -> str:
@@ -14,7 +14,11 @@ def _source() -> str:
 
 def test_endpoint_path_transform_compiles() -> None:
     transformed = transform_source(_source())
-    compile(transformed, "sharp_front.py[v10.4.3-endpoint-path-work-test]", "exec")
+    compile(
+        transformed,
+        "sharp_front.py[v10.4.3-startup-safe-endpoint-path-work-test]",
+        "exec",
+    )
 
 
 def test_endpoint_path_transform_uses_accepted_endpoint_states() -> None:
@@ -38,6 +42,29 @@ def test_endpoint_path_transform_uses_accepted_endpoint_states() -> None:
     snapshot = transformed.index("sigma_gp_step0_path_v1043")
     retry_loop = transformed.index("            while True:\n", snapshot)
     assert snapshot < retry_loop
+
+
+def test_endpoint_path_startup_does_not_read_unbound_sigma() -> None:
+    transformed = transform_source(_source())
+
+    assert "_v1043_sigma_step0_candidate = locals().get('sigma_gp')" in transformed
+    assert "_v1043_sigma_step0_candidate is not None" in transformed
+    assert "== (3, mesh.ne)" in transformed
+    assert "sigma_gp_step0_path_v1043 = np.zeros(" in transformed
+    assert "'unloaded_zero_stress_initialization'" in transformed
+    assert "'previous_accepted_equilibrated_stress'" in transformed
+
+    # The transformed snapshot block must not directly dereference sigma_gp
+    # before the first mechanics solve binds it.
+    block_start = transformed.index(
+        "_v1043_sigma_step0_candidate = locals().get('sigma_gp')"
+    )
+    block_end = transformed.index(
+        "ep_gp_step0_path_v1043 = np.asarray(ep_gp, dtype=float).copy()",
+        block_start,
+    )
+    block = transformed[block_start:block_end]
+    assert "np.asarray(\n                sigma_gp, dtype=float" not in block
 
 
 def test_energy_output_retains_constitutive_comparison() -> None:
