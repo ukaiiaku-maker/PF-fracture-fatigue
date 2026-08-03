@@ -29,9 +29,9 @@ def test_builder_preserves_campaign_source_and_installs_scheduler_patch_hook():
     assert '"plasticity_dominated_campaign_terminal": True' in generated
     assert "patch_v10_4_4_generated_scheduler.py" in generated
     assert 'patcher_namespace["transform"](scheduler)' in generated
-    assert "--nx 36" in generated
-    assert "--mesh-nx 36" in generated
-    assert "--tip-h-fine-um 1" in generated
+    assert "MESH_NX=${MESH_NX:-36}" in generated
+    assert "MESH_NY=${MESH_NY:-72}" in generated
+    assert "TIP_H_FINE_UM=${TIP_H_FINE_UM:-1}" in generated
     assert "v913_paper_peak01_0242980_persistent_sites" in generated
     assert "v913_paper_dbtt01_0202500_persistent_sites" in generated
     assert "v913_paper_weakT01_0129902_persistent_sites" in generated
