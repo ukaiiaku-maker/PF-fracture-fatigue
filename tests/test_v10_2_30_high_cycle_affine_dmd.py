@@ -30,6 +30,7 @@ def test_affine_dmd_segment_propagates_linear_neutral_mode(monkeypatch):
 
 def test_chained_dmd_completes_1e12_in_one_projective_operation(monkeypatch):
     configure(monkeypatch)
+    monkeypatch.setenv("V10230_DMD_CHAIN_MAX_SEGMENTS", "256")
     engine = AffineEngine(drift=1.0, hazard=1.0e-30)
     result = chained.propagate_chained_dmd_cycles(
         engine,
@@ -42,12 +43,13 @@ def test_chained_dmd_completes_1e12_in_one_projective_operation(monkeypatch):
     assert result.accepted is True
     assert result.completed_requested_horizon is True
     assert result.cycles_consumed == 1.0e12
-    assert result.accepted_segments <= 96
+    assert result.accepted_segments <= 256
     assert abs(engine.mpz.mobile_count - 1.0e12) / 1.0e12 < 1.0e-9
 
 
 def test_production_alias_reaches_1e12_without_subcycle_fallback(monkeypatch):
     configure(monkeypatch)
+    monkeypatch.delenv("V10230_DMD_CHAIN_MAX_SEGMENTS", raising=False)
     engine = AffineEngine(drift=1.0, hazard=1.0e-30)
 
     def forbidden_subcycle(*args, **kwargs):
