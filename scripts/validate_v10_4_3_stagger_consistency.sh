@@ -47,7 +47,7 @@ grep -q 'failed_or_incomplete_cases' "$GENERATED"
 from pathlib import Path
 
 source = Path("arrhenius_fracture/sharp_front.py").read_text()
-from arrhenius_fracture.plastic_flow_path_work_v1043 import transform_source
+from arrhenius_fracture.plastic_flow_path_work_startup_v1043 import transform_source
 
 transformed = transform_source(source)
 required = {
@@ -64,6 +64,9 @@ required = {
     "adaptive hard failure": "after adaptive timestep subdivision",
     "final equilibrium": "Close the staggered step with a",
     "endpoint stress snapshot": "sigma_gp_step0_path_v1043",
+    "startup-safe stress lookup": "locals().get('sigma_gp')",
+    "startup zero-stress fallback": "unloaded_zero_stress_initialization",
+    "prior accepted stress reuse": "previous_accepted_equilibrated_stress",
     "endpoint plastic snapshot": "ep_gp_step0_path_v1043",
     "endpoint path work": "equilibrated_endpoint_trapezoid_sigma_colon_delta_ep",
     "constitutive comparison history": "hist['W_p_constitutive']",
