@@ -157,6 +157,8 @@ def test_directional_front_selection_round_trips_without_event2_path_change():
         restore_front_state, serialize_front_state,
     )
     engine = object()
+    class TransientCycleResult:
+        pass
     front = {
         "eng": engine, "xy": np.array([5.1e-4, 1.2e-6]),
         "fwd": np.array([0.98, 0.2]), "path": [np.array([5e-4, 0.0])],
@@ -164,8 +166,10 @@ def test_directional_front_selection_round_trips_without_event2_path_change():
         "win_plane": {"t": np.array([0.7, -0.714]), "n": np.array([0.714, 0.7])},
         "cands": [{"t": np.array([0.7, -0.714]), "n": np.array([0.714, 0.7])}],
         "J_source": "cluster", "J_source_code": 0,
+        "fatigue_pred_trial": TransientCycleResult(),
     }
     recorded = serialize_front_state(front)
+    assert "fatigue_pred_trial" not in recorded
     restored = {"eng": engine}
     restore_front_state(restored, recorded)
     assert restored["eng"] is engine

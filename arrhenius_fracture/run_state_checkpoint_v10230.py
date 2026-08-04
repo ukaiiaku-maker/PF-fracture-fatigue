@@ -30,11 +30,18 @@ _FRONT_VECTOR_KEYS = {
     "xy", "fwd", "t_win", "t_trial", "birth_xy", "direction",
 }
 _PLANE_VECTOR_KEYS = {"t", "n"}
+_TRANSIENT_FRONT_KEYS = {
+    "info", "fatigue_pred_trial", "fatigue_wave_trial", "cands_trial",
+    "win_trial", "t_trial",
+}
 
 
 def serialize_front_state(front: dict[str, Any]) -> dict[str, Any]:
     """Serialize every persistent front field except the engine object itself."""
-    return {key: _safe(value) for key, value in front.items() if key != "eng"}
+    return {
+        key: _safe(value) for key, value in front.items()
+        if key != "eng" and key not in _TRANSIENT_FRONT_KEYS
+    }
 
 
 def restore_front_state(target: dict[str, Any], recorded: dict[str, Any]) -> None:
