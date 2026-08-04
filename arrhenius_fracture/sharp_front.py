@@ -2435,7 +2435,7 @@ def run_2d(args):
         )
         from .run_state_checkpoint_v10230 import (
             load_combined_checkpoint, validate_compatibility,
-            validate_cross_layer,
+            restore_front_state, serialize_front_state, validate_cross_layer,
         )
 
         def _restart_case():
@@ -2449,19 +2449,6 @@ def run_2d(args):
                 'da_phys_m': float(da_phys),
                 'crack_backend': str(crack_backend.name),
             }
-
-        def _front_checkpoint_row(front):
-            keep = {}
-            for key, value in front.items():
-                if key in {'eng', 'info', 'cands', 'win_plane', 'last_plane'}:
-                    continue
-                if isinstance(value, np.ndarray):
-                    keep[key] = value.tolist()
-                elif isinstance(value, (str, bool, int, float)) or value is None:
-                    keep[key] = value
-                elif key == 'path':
-                    keep[key] = [np.asarray(point, float).tolist() for point in value]
-            return keep
 
         def _outer_checkpoint_provider(engine_for_checkpoint, kinetic_payload):
             if (not deflect) or len(fronts) != 1 or fronts[0]['eng'] is not engine_for_checkpoint:
@@ -2503,7 +2490,7 @@ def run_2d(args):
                 'geometry': {
                     'crack_tip_m': np.asarray(fronts[0]['xy'], float).tolist(),
                     'front_paths': front_paths,
-                    'front_inventory': [_front_checkpoint_row(fronts[0])],
+                    'front_inventory': [serialize_front_state(fronts[0])],
                     'committed_event_count': int(event_count),
                     'kinetic_event_index': int(stochastic.get('hazard_event_index', 0)),
                     'transaction_index': int(event_count),
@@ -2553,13 +2540,7 @@ def run_2d(args):
             kill_r = max(h_tip, 0.5e-6)
             adj = build_elem_adjacency(mesh) if rho_transport_c > 0.0 else None
             saved_front = outer_restart['geometry']['front_inventory'][0]
-            for key, value in saved_front.items():
-                if key == 'path':
-                    fronts[0][key] = [np.asarray(point, float) for point in value]
-                elif key in {'xy', 'fwd', 't_win', 'birth_xy'}:
-                    fronts[0][key] = np.asarray(value, float)
-                else:
-                    fronts[0][key] = value
+            restore_front_state(fronts[0], saved_front)
             geometry_restart = outer_restart['geometry']
             crack_backend.advance_log = copy.deepcopy(
                 geometry_restart.get('energy_gate_attempt_log',

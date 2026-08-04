@@ -285,6 +285,9 @@ def smoke_worker(case: Path) -> int:
                 "geometry": {
                     "crack_tip_m": [0.001, 0.0],
                     "front_paths": [[[0.001, 0.0]]],
+                    "front_inventory": [{"xy": [0.001, 0.0], "fwd": [1.0, 0.0],
+                        "last_plane": {"t": [1.0, 0.0], "n": [0.0, 1.0]},
+                        "win_plane": {"t": [1.0, 0.0], "n": [0.0, 1.0]}}],
                     "committed_event_count": 0,
                     "kinetic_event_index": 0,
                     "transaction_index": 0,

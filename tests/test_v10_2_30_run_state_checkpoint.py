@@ -36,6 +36,12 @@ def fixture(event_count=0, cycles=12.5):
         "geometry": {
             "crack_tip_m": path[-1],
             "front_paths": [path],
+            "front_inventory": [{
+                "xy": path[-1], "fwd": [1.0, 0.0], "path": path,
+                "last_plane": {"t": [0.8, 0.6], "n": [-0.6, 0.8], "name": "p"},
+                "win_plane": {"t": [0.8, 0.6], "n": [-0.6, 0.8], "name": "p"},
+                "cands": [{"t": [0.8, 0.6], "n": [-0.6, 0.8]}],
+            }],
             "committed_event_count": event_count,
             "kinetic_event_index": event_count,
             "transaction_index": event_count,
@@ -144,3 +150,25 @@ def test_exact_cycles_threshold_and_rng_are_preserved(tmp_path):
     assert restored_outer["cycles_total"] == 123456789.125
     assert restored_kinetic["stochastic"]["hazard_threshold_action"] == 2.0
     assert restored_kinetic["stochastic"]["rng_state"] == {"state": 123}
+
+
+def test_directional_front_selection_round_trips_without_event2_path_change():
+    from arrhenius_fracture.run_state_checkpoint_v10230 import (
+        restore_front_state, serialize_front_state,
+    )
+    engine = object()
+    front = {
+        "eng": engine, "xy": np.array([5.1e-4, 1.2e-6]),
+        "fwd": np.array([0.98, 0.2]), "path": [np.array([5e-4, 0.0])],
+        "last_plane": {"t": np.array([0.8, 0.6]), "n": np.array([-0.6, 0.8])},
+        "win_plane": {"t": np.array([0.7, -0.714]), "n": np.array([0.714, 0.7])},
+        "cands": [{"t": np.array([0.7, -0.714]), "n": np.array([0.714, 0.7])}],
+        "J_source": "cluster", "J_source_code": 0,
+    }
+    recorded = serialize_front_state(front)
+    restored = {"eng": engine}
+    restore_front_state(restored, recorded)
+    assert restored["eng"] is engine
+    assert np.array_equal(restored["last_plane"]["t"], front["last_plane"]["t"])
+    assert np.array_equal(restored["win_plane"]["n"], front["win_plane"]["n"])
+    assert np.array_equal(restored["cands"][0]["t"], front["cands"][0]["t"])
