@@ -2654,6 +2654,16 @@ def run_2d(args):
                                 sig2, _theta, gate_fwd, min_forward=0.2,
                                 gamma_aniso=gamma_aniso, branch_ratio=r_branch_O)
                             cands = sel if sel else [f['last_plane']]
+                            from .path_selection_forensics_v10230 import record_selection
+                            record_selection(
+                                outroot=args.out, phase='pre_cycle', step=step_trial,
+                                cycles=fatigue_cycles_total_accepted, front=f,
+                                sigma2=sig2, all_candidates=_all, selected=cands,
+                                mesh=mesh, damage=d, displacement=u, ep_gp=ep_gp,
+                                rho_gp=rho_gp,
+                                proposed_length_m=getattr(f['eng'], 'avalanche_event_advance_m', None),
+                                threshold=getattr(f['eng'], 'hazard_threshold_action', None),
+                                hazard_action=getattr(f['eng'], 'hazard_action_current', None))
                         else:
                             cands = cleavage_branch_candidates(
                                 sig2, cleave_planes, forward=gate_fwd, min_forward=0.2,
@@ -2761,6 +2771,16 @@ def run_2d(args):
                                 sig2, _theta, gate_fwd, min_forward=0.2,
                                 gamma_aniso=gamma_aniso, branch_ratio=r_branch_O)
                             cands = sel if sel else [f['last_plane']]
+                            from .path_selection_forensics_v10230 import record_selection
+                            record_selection(
+                                outroot=args.out, phase='post_cycle', step=step_trial,
+                                cycles=fatigue_cycles_total_accepted, front=f,
+                                sigma2=sig2, all_candidates=_all, selected=cands,
+                                mesh=mesh, damage=d, displacement=u, ep_gp=ep_gp,
+                                rho_gp=rho_gp,
+                                proposed_length_m=getattr(f['eng'], 'avalanche_event_advance_m', None),
+                                threshold=getattr(f['eng'], 'hazard_threshold_action', None),
+                                hazard_action=getattr(f['eng'], 'hazard_action_current', None))
                         else:
                             cands = cleavage_branch_candidates(
                                 sig2, cleave_planes, forward=gate_fwd, min_forward=0.2,
