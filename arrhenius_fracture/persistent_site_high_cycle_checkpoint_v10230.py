@@ -200,6 +200,12 @@ def restore_checkpoint(engine, root: str | Path) -> dict[str, Any]:
     directory = Path(root)
     payload = json.loads((directory / "high_cycle_live_checkpoint.json").read_text())
     arrays = np.load(directory / "high_cycle_live_state.npz")
+    restore_checkpoint_payload(engine, payload, arrays["active_vector"])
+    return payload
+
+
+def restore_checkpoint_payload(engine, payload: dict[str, Any], vector) -> None:
+    """Restore an already validated kinetic payload after outer geometry."""
     current = serialize_active_state(engine)
     recorded_geometry = tuple(payload.get("geometry_signature", []))
     if tuple(_json_safe(geometry_signature(engine))) != recorded_geometry:
@@ -207,7 +213,7 @@ def restore_checkpoint(engine, root: str | Path) -> dict[str, Any]:
             "checkpoint geometry differs from the initialized engine; "
             "restore the matching outer crack geometry first"
         )
-    vector = np.asarray(arrays["active_vector"], dtype=float)
+    vector = np.asarray(vector, dtype=float)
     restore_active_state(engine, current, vector)
 
     current_ledgers = capture_ledgers(engine)
@@ -240,7 +246,6 @@ def restore_checkpoint(engine, root: str | Path) -> dict[str, Any]:
     engine._v10230_high_cycle_cache = copy.deepcopy(
         payload.get("high_cycle_cache", {})
     )
-    return payload
 
 
 __all__ = [
@@ -249,5 +254,6 @@ __all__ = [
     "maybe_write_checkpoint",
     "register_outer_state_provider",
     "restore_checkpoint",
+    "restore_checkpoint_payload",
     "write_checkpoint",
 ]

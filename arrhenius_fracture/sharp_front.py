@@ -70,6 +70,7 @@ import argparse
 import json
 import os
 import copy
+from pathlib import Path
 import numpy as np
 
 from .config import (SimulationConfig, FractureBarrier, make_emergent_config,
@@ -2424,6 +2425,181 @@ def run_2d(args):
         max_da_per_block_m = float(getattr(args, 'max_da_per_block_um', float('inf')) or float('inf')) * 1e-6
         prev_a_tip_for_block = float(a_tip)
 
+        # A combined restart is committed only at this outer-driver boundary.
+        # Inner high-cycle checkpoints remain useful diagnostics, but cannot be
+        # advertised as restartable because their surrounding FEM transaction
+        # may not yet have been accepted.
+        from .persistent_site_high_cycle_checkpoint_v10230 import (
+            clear_outer_state_provider, register_outer_state_provider,
+            restore_checkpoint_payload, write_checkpoint,
+        )
+        from .run_state_checkpoint_v10230 import (
+            load_combined_checkpoint, validate_compatibility,
+            validate_cross_layer,
+        )
+
+        def _restart_case():
+            return {
+                'parameter_option': str(getattr(args, 'parameter_option', '') or ''),
+                'temperature_K': float(T),
+                'deltaK_MPa_sqrt_m': float(os.environ.get('DELTA_K_MPA_SQRT_M', '0')),
+                'R': float(getattr(args, 'R', 0.1) or 0.0),
+                'frequency_Hz': float(getattr(args, 'frequency_Hz', 1000.0) or 0.0),
+                'seed': int(os.environ.get('CLEAVAGE_HAZARD_SEED', '0')),
+                'da_phys_m': float(da_phys),
+                'crack_backend': str(crack_backend.name),
+            }
+
+        def _front_checkpoint_row(front):
+            keep = {}
+            for key, value in front.items():
+                if key in {'eng', 'info', 'cands', 'win_plane', 'last_plane'}:
+                    continue
+                if isinstance(value, np.ndarray):
+                    keep[key] = value.tolist()
+                elif isinstance(value, (str, bool, int, float)) or value is None:
+                    keep[key] = value
+                elif key == 'path':
+                    keep[key] = [np.asarray(point, float).tolist() for point in value]
+            return keep
+
+        def _outer_checkpoint_provider(engine_for_checkpoint, kinetic_payload):
+            if (not deflect) or len(fronts) != 1 or fronts[0]['eng'] is not engine_for_checkpoint:
+                raise RuntimeError('production combined restart currently requires exactly one authoritative front')
+            front_paths = [[np.asarray(point, float).tolist()
+                            for point in fronts[0].get('path', [])]]
+            if getattr(engine_for_checkpoint, '_energy_gate_pending', None) is not None:
+                raise RuntimeError('refusing to checkpoint an uncommitted energy-gate transaction')
+            event_count = max(len(front_paths[0]) - 1, 0)
+            backend_attempts = copy.deepcopy(getattr(crack_backend, 'advance_log', []))
+            base_backend_log = copy.deepcopy(
+                getattr(getattr(crack_backend, 'base_backend', None), 'advance_log', []))
+            stochastic = kinetic_payload.get('stochastic', {})
+            outer = {
+                'case': _restart_case(),
+                'provenance': {
+                    'git_head': os.environ.get('EXPECTED_HEAD', ''),
+                    'output_directory': str(Path(args.out).resolve()),
+                },
+                'cycles_total': float(fatigue_cycles_total_accepted),
+                'driver': {
+                    'step': int(step), 'Uapp_accepted': float(Uapp_accepted),
+                    'carry_frac': float(carry_frac), 'dt_cur': float(dt_cur),
+                    'a_tip': float(a_tip), 'a_killed': float(a_killed),
+                    'crack_extension_start_a': float(crack_extension_start_a),
+                    'prev_a_tip_for_block': float(prev_a_tip_for_block),
+                    'W_ext_acc': float(W_ext_acc), 'W_p_acc': float(W_p_acc),
+                    'Ftop_prev': float(Ftop_prev), 'Uapp_prev': float(Uapp_prev),
+                    'cyclic_mechanics_updates': int(cyclic_mechanics_updates),
+                    'cyclic_plastic_work_acc': float(cyclic_plastic_work_acc),
+                    'Kc_first': Kc_first, 'Kc_first_step': Kc_first_step,
+                    'next_snapshot_ext_m': float(next_snapshot_ext_m),
+                    'refine_centers': np.asarray(refine_centers, float).tolist(),
+                },
+                'geometry': {
+                    'crack_tip_m': np.asarray(fronts[0]['xy'], float).tolist(),
+                    'front_paths': front_paths,
+                    'front_inventory': [_front_checkpoint_row(fronts[0])],
+                    'committed_event_count': int(event_count),
+                    'kinetic_event_index': int(stochastic.get('hazard_event_index', 0)),
+                    'transaction_index': int(event_count),
+                    'transaction_state': 'committed',
+                    'energy_gate_attempt_log': backend_attempts,
+                    'sharp_wake_advance_log': base_backend_log or backend_attempts,
+                },
+                'history': {
+                    'rows': [list(row) for row in rows],
+                    'branch_rows': [list(row) for row in branch_rows],
+                    'fronts_rows': [list(row) for row in fronts_rows],
+                    'hist': {key: list(value) for key, value in hist.items()},
+                },
+            }
+            arrays = {
+                'mesh_nodes': mesh.nodes, 'mesh_elems': mesh.elems,
+                'damage': d, 'displacement': u, 'ep_gp': ep_gp,
+                'rho_gp': rho_gp, 'pz_store_gp': pz_store_gp,
+                'pz_mobile_gp': pz_mobile_gp, 'pz_escape_gp': pz_escape_gp,
+                'pz_emit_gp': pz_emit_gp,
+            }
+            return outer, arrays
+
+        restart_root_raw = os.environ.get('V10230_RESTART_CHECKPOINT_DIR', '').strip()
+        if restart_root_raw:
+            outer_restart, kinetic_restart, restart_arrays = load_combined_checkpoint(restart_root_raw)
+            validate_compatibility(outer_restart, _restart_case())
+            validate_cross_layer(outer_restart, kinetic_restart)
+            from .mesh import rebuild_tri_mesh
+            mesh = rebuild_tri_mesh(restart_arrays['mesh_nodes'], restart_arrays['mesh_elems'],
+                                    tip_centers=outer_restart['geometry']['crack_tip_m'])
+            bnd = make_boundary_data(mesh, cfg.geometry)
+            d = restart_arrays['damage']; u = restart_arrays['displacement']
+            ep_gp = restart_arrays['ep_gp']; rho_gp = restart_arrays['rho_gp']
+            pz_store_gp = restart_arrays['pz_store_gp']; pz_mobile_gp = restart_arrays['pz_mobile_gp']
+            pz_escape_gp = restart_arrays['pz_escape_gp']; pz_emit_gp = restart_arrays['pz_emit_gp']
+            x = mesh.nodes[:, 0]; y = mesh.nodes[:, 1]
+            cx_e = mesh.nodes[mesh.elems].mean(axis=1)[:, 0]
+            cy_e = mesh.nodes[mesh.elems].mean(axis=1)[:, 1]
+            elem_rad = np.sqrt(np.maximum(mesh.area_e, 1e-30))
+            h_tip = mesh.hbar_tip if mesh.hbar_tip > 0 else mesh.hbar
+            kill_r = max(h_tip, 0.5e-6)
+            adj = build_elem_adjacency(mesh) if rho_transport_c > 0.0 else None
+            saved_front = outer_restart['geometry']['front_inventory'][0]
+            for key, value in saved_front.items():
+                if key == 'path':
+                    fronts[0][key] = [np.asarray(point, float) for point in value]
+                elif key in {'xy', 'fwd', 't_win', 'birth_xy'}:
+                    fronts[0][key] = np.asarray(value, float)
+                else:
+                    fronts[0][key] = value
+            geometry_restart = outer_restart['geometry']
+            crack_backend.advance_log = copy.deepcopy(
+                geometry_restart.get('energy_gate_attempt_log',
+                                     geometry_restart['sharp_wake_advance_log']))
+            if getattr(crack_backend, 'base_backend', None) is not None:
+                crack_backend.base_backend.advance_log = copy.deepcopy(
+                    geometry_restart['sharp_wake_advance_log'])
+            signature = kinetic_restart['geometry_signature']
+            eng.n_adv = int(signature[0]); eng.a_adv = float(signature[1])
+            eng.micro_advance_total_m = float(signature[2])
+            eng.checkpoint_advance_total_m = float(signature[3])
+            if getattr(eng, 'mpz', None) is not None:
+                eng.mpz.advance_total_m = float(signature[4])
+            _finalize_driver_physical_checkpoint(eng, da_phys)
+            restore_checkpoint_payload(
+                eng, kinetic_restart, restart_arrays['kinetic_active_vector'])
+            state = outer_restart['driver']; history = outer_restart['history']
+            step = int(state['step']); Uapp_accepted = float(state['Uapp_accepted'])
+            carry_frac = float(state['carry_frac']); dt_cur = float(state['dt_cur'])
+            a_tip = float(state['a_tip']); a_killed = float(state['a_killed'])
+            crack_extension_start_a = float(state['crack_extension_start_a'])
+            prev_a_tip_for_block = float(state['prev_a_tip_for_block'])
+            W_ext_acc = float(state['W_ext_acc']); W_p_acc = float(state['W_p_acc'])
+            Ftop_prev = float(state['Ftop_prev']); Uapp_prev = float(state['Uapp_prev'])
+            cyclic_mechanics_updates = int(state['cyclic_mechanics_updates'])
+            cyclic_plastic_work_acc = float(state['cyclic_plastic_work_acc'])
+            Kc_first = state['Kc_first']; Kc_first_step = state['Kc_first_step']
+            next_snapshot_ext_m = float(state['next_snapshot_ext_m'])
+            refine_centers = np.asarray(state['refine_centers'], float)
+            refine_center = refine_centers[0].copy()
+            fatigue_cycles_total_accepted = float(outer_restart['cycles_total'])
+            rows = [tuple(row) for row in history['rows']]
+            branch_rows = [tuple(row) for row in history['branch_rows']]
+            fronts_rows = [tuple(row) for row in history['fronts_rows']]
+            hist = {key: list(value) for key, value in history['hist'].items()}
+            print(f"  RESTART restored combined generation at step={step}, cycles={fatigue_cycles_total_accepted:.17g}, events={len(crack_backend.advance_log)}")
+
+        def _commit_outer_checkpoint(reason):
+            register_outer_state_provider(_outer_checkpoint_provider)
+            try:
+                return write_checkpoint(eng, waveform=None, temperature_K=T,
+                                        reason=reason)
+            finally:
+                clear_outer_state_provider()
+
+        # Establish a restartable pre-event generation before any outer evolution.
+        if not restart_root_raw:
+            _commit_outer_checkpoint('outer_driver_initial_committed_state')
+
         while step < args.steps:
             if fatigue_mode and np.isfinite(fatigue_cycles_max) and fatigue_cycles_total_accepted >= fatigue_cycles_max - 1e-12 * max(fatigue_cycles_max, 1.0):
                 print(f"  [T={T:.0f}K] reached fatigue cycle horizon {fatigue_cycles_total_accepted:.6g} cycles")
@@ -3248,6 +3424,7 @@ def run_2d(args):
             # comparison harness.  The multifront production driver keeps running
             # unless this flag is explicitly set.
             if bool(getattr(args, 'stop_after_first_fire', False)) and any_fired:
+                _commit_outer_checkpoint('outer_driver_stop_after_first_fire')
                 print(f"  [T={T:.0f}K] stopping after first fire at step {step} "
                       f"for diagnostic comparison")
                 break
@@ -3256,16 +3433,19 @@ def run_2d(args):
             # comparison harness. The production multifront driver keeps running
             # unless this flag is explicitly set.
             if bool(getattr(args, 'stop_after_first_fire', False)) and any_fired:
+                _commit_outer_checkpoint('outer_driver_stop_after_first_fire')
                 print(f"  [T={T:.0f}K] stopping after first fire at step {step} "
                       f"for diagnostic comparison")
                 break
 
             if np.isfinite(target_crack_extension_m) and target_crack_extension_m > 0.0 and crack_extension_m >= target_crack_extension_m:
+                _commit_outer_checkpoint('outer_driver_target_reached')
                 print(f"  [T={T:.0f}K] reached target crack extension {crack_extension_m*1e6:.3f} um at step {step}")
                 break
 
             tip_extent_x = a_tip
             if tip_extent_x >= cfg.geometry.Lx - 3e-5:
+                _commit_outer_checkpoint('outer_driver_ligament_severed')
                 print(f"  [T={T:.0f}K] ligament severed at step {step}")
                 break
 
@@ -3299,6 +3479,10 @@ def run_2d(args):
                         adj = build_elem_adjacency(mesh)
                     refine_center = tip_xy.copy()
                     refine_centers = active_tips.copy()
+
+            _commit_outer_checkpoint(
+                'outer_driver_geometry_committed' if any_fired
+                else 'outer_driver_step_committed')
 
         tag = f"{int(T):04d}K"
         if crack_backend.name != 'sharp_wake':
