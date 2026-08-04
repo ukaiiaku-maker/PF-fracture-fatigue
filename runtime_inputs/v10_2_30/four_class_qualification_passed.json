@@ -1,0 +1,32 @@
+{
+  "schema": "v10.2.30_four_class_qualification_passed_v1",
+  "qualified_git_head": "1c82a2532a0dd863825c90cf1262fa4c6dee27b4",
+  "qualified_tag": "v10.2.30-four-class-qualification-passed",
+  "qualified_simulation_head": "24b63a5bfd86a8ea249d457750b14b8c19488973",
+  "restart_equivalence_baseline": "runs/v10_2_30_restart_equivalence_24b63a5",
+  "restart_checkpoint_schema": "v10.2.30_combined_outer_kinetic_run_state_v2",
+  "family_manifest": "runtime_inputs/v10_2_30/qualification_family_manifest.json",
+  "family_sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c",
+  "qualification_campaign_root": "runs/v10_2_30_four_class_qualification_7a5133f_20260804",
+  "qualification_analyzer_outputs": [
+    "analysis/four_class_fatigue_summary.json",
+    "analysis/four_class_event_intervals.csv",
+    "analysis/four_class_fatigue_cases.csv",
+    "analysis/four_class_fatigue_censor_failure_table.csv"
+  ],
+  "focused_test_count": 54,
+  "cases": [
+    {"class": "peak", "option": "v913_paper_peak01_0242980_persistent_sites", "seed": 1720, "fraction": 0.55, "deltaK_MPa_sqrt_m": 11.709250555777624, "status": "censored"},
+    {"class": "peak", "option": "v913_paper_peak01_0242980_persistent_sites", "seed": 1720, "fraction": 0.75, "deltaK_MPa_sqrt_m": 15.967159848787666, "status": "censored"},
+    {"class": "peak", "option": "v913_paper_peak01_0242980_persistent_sites", "seed": 1720, "fraction": 0.95, "deltaK_MPa_sqrt_m": 20.22506914179771, "status": "completed"},
+    {"class": "dbtt", "option": "v913_paper_dbtt01_0202500_persistent_sites", "seed": 1001723, "fraction": 0.55, "deltaK_MPa_sqrt_m": 11.56391920820564, "status": "censored"},
+    {"class": "dbtt", "option": "v913_paper_dbtt01_0202500_persistent_sites", "seed": 1001723, "fraction": 0.75, "deltaK_MPa_sqrt_m": 15.768980738462234, "status": "censored"},
+    {"class": "dbtt", "option": "v913_paper_dbtt01_0202500_persistent_sites", "seed": 1001723, "fraction": 0.95, "deltaK_MPa_sqrt_m": 19.97404226871883, "status": "completed"},
+    {"class": "weakT", "option": "v913_paper_weakT01_0129902_persistent_sites", "seed": 2001726, "fraction": 0.55, "deltaK_MPa_sqrt_m": 6.986614560063834, "status": "censored"},
+    {"class": "weakT", "option": "v913_paper_weakT01_0129902_persistent_sites", "seed": 2001726, "fraction": 0.75, "deltaK_MPa_sqrt_m": 9.527201672814318, "status": "censored"},
+    {"class": "weakT", "option": "v913_paper_weakT01_0129902_persistent_sites", "seed": 2001726, "fraction": 0.95, "deltaK_MPa_sqrt_m": 12.067788785564803, "status": "completed"},
+    {"class": "ceramic", "option": "v913_paper_ceramic01_0077080_persistent_sites", "seed": 3001729, "fraction": 0.55, "deltaK_MPa_sqrt_m": 6.74271278552545, "status": "censored"},
+    {"class": "ceramic", "option": "v913_paper_ceramic01_0077080_persistent_sites", "seed": 3001729, "fraction": 0.75, "deltaK_MPa_sqrt_m": 9.19460834389834, "status": "censored"},
+    {"class": "ceramic", "option": "v913_paper_ceramic01_0077080_persistent_sites", "seed": 3001729, "fraction": 0.95, "deltaK_MPa_sqrt_m": 11.646503902271231, "status": "completed"}
+  ]
+}
