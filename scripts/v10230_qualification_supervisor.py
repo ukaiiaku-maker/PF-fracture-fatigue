@@ -85,11 +85,16 @@ def checkpoint_valid(case: Path, row: dict | None = None) -> bool:
         if row is not None:
             recorded = outer.get("case", {})
             expected = {
-                "parameter_option": row["parameter_option"],
                 "temperature_K": 300.0, "deltaK_MPa_sqrt_m": row["deltaK_MPa_sqrt_m"],
                 "R": 0.1, "frequency_Hz": 1000.0, "seed": row["seed"],
             }
             if any(recorded.get(key) != value for key, value in expected.items()):
+                return False
+            recorded_option = recorded.get("parameter_option")
+            if not recorded_option:
+                selection = read_json(case / "v10_2_22_parameter_selection.json")
+                recorded_option = selection.get("exact_registry_row", {}).get("option_key")
+            if recorded_option != row["parameter_option"]:
                 return False
         return True
     except (Exception,):
@@ -328,12 +333,15 @@ def run(args) -> int:
                     try: process.wait(timeout=max(deadline - time.time(), 0.0))
                     except subprocess.TimeoutExpired:
                         os.killpg(process.pid, signal.SIGKILL); process.wait()
-                    log.close(); set_status(case, "restartable" if checkpoint_valid(case) else "failed", pid=process.pid)
+                    row = next(row for row in rows if row["case"] == case.name)
+                    log.close(); set_status(case, "restartable" if checkpoint_valid(case, row) else "failed", pid=process.pid)
                 break
             while pending and len(active) < min(args.max_jobs, 2):
                 row = pending.pop(0); case = root / row["case"]; case.mkdir(exist_ok=True)
                 state = classify(case, row)
                 if args.skip_finished and state in TERMINAL:
+                    set_status(case, state, skipped=True); continue
+                if state == "failed":
                     set_status(case, state, skipped=True); continue
                 restarting = state in {"restartable", "watchdog-stopped"}
                 if free_gib(root) < args.minimum_free_gib:

@@ -81,6 +81,36 @@ def test_finished_skip_and_incomplete_restart_selection(tmp_path):
     assert module.classify(incomplete) == "restartable"
 
 
+def test_qualified_checkpoint_uses_parameter_selection_provenance_for_restart(tmp_path):
+    module = load_module(); case = tmp_path / "case"; case.mkdir()
+    row = module.matrix()[0]
+    write_restartable(case)
+    from arrhenius_fracture.run_state_checkpoint_v10230 import load_combined_checkpoint, write_combined_checkpoint
+    outer, kinetic, arrays = load_combined_checkpoint(case)
+    outer["case"].update({
+        "parameter_option": "", "temperature_K": 300.0,
+        "deltaK_MPa_sqrt_m": row["deltaK_MPa_sqrt_m"], "R": 0.1,
+        "frequency_Hz": 1000.0, "seed": row["seed"],
+    })
+    kinetic_vector = arrays.pop("kinetic_active_vector")
+    write_combined_checkpoint(case, outer=outer, arrays=arrays, kinetic=kinetic,
+                              kinetic_vector=kinetic_vector)
+    module.atomic_json(case / "v10_2_22_parameter_selection.json", {
+        "exact_registry_row": {"option_key": row["parameter_option"]},
+    })
+    assert module.checkpoint_valid(case, row) is True
+    assert module.classify(case, row) == "restartable"
+    env = module.worker_environment(row, case, type("Args", (), {
+        "smoke_worker": False, "target_extension_um": 25.0,
+        "cycles_max": 1e12, "family_path": tmp_path / "family.json",
+    })(), restarting=True)
+    assert env["V10230_RESTART_CHECKPOINT_DIR"] == str(case / "output")
+    module.atomic_json(case / "v10_2_22_parameter_selection.json", {
+        "exact_registry_row": {"option_key": "wrong-option"},
+    })
+    assert module.checkpoint_valid(case, row) is False
+
+
 def test_kinetic_only_checkpoint_is_not_physically_restartable(tmp_path):
     module = load_module(); case = tmp_path / "case"; case.mkdir()
     module.atomic_json(case / "high_cycle_live_checkpoint.json",
