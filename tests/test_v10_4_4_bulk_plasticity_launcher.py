@@ -25,6 +25,8 @@ def test_builder_preserves_campaign_source_and_installs_scheduler_patch_hook():
 
     assert builder.MODEL_ENTRY in generated
     assert builder.LOCK_SCHEMA in generated
+    assert builder.LAUNCHER_REVISION in generated
+    assert '"launcher_revision": "v10.4.9_exec_namespace_contract"' in generated
     assert '"bulk_plasticity_mode": "full_field"' in generated
     assert '"plasticity_dominated_campaign_terminal": True' in generated
     assert '"plasticity_terminal_severe_substep_positive_Wp_sufficient": False' in generated
@@ -36,7 +38,10 @@ def test_builder_preserves_campaign_source_and_installs_scheduler_patch_hook():
     assert '"numerical_fixed_point_failure_is_successful_terminal": False' in generated
     assert '"numerical_fixed_point_failure_exit_code": 5' in generated
     assert '"nonzero_solver_exit_bookkeeping_fail_closed": True' in generated
+    assert '"generated_patcher_file_context_supplied": True' in generated
     assert "patch_v10_4_8_generated_scheduler.py" in generated
+    assert '"__file__": str(patcher_path)' in generated
+    assert '"__name__": "v10_4_8_generated_scheduler_patcher"' in generated
 
     normalization = f'''scheduler = scheduler.replace(
     "{builder.MODEL_ENTRY}",
@@ -53,12 +58,31 @@ def test_builder_preserves_campaign_source_and_installs_scheduler_patch_hook():
     assert promotion in generated
     assert generated.index(normalization) < generated.index(patch_call)
     assert generated.index(patch_call) < generated.index(promotion)
-    assert "v10.4.8 generated scheduler model-entry contract is incomplete" in generated
+    assert "v10.4.9 generated scheduler model-entry contract is incomplete" in generated
 
     assert "v913_paper_peak01_0242980_persistent_sites" in generated
     assert "v913_paper_dbtt01_0202500_persistent_sites" in generated
     assert "v913_paper_weakT01_0129902_persistent_sites" in generated
     assert "v913_paper_ceramic01_0077080_persistent_sites" in generated
+
+
+def test_v1048_patcher_exec_namespace_resolves_sibling_base_patcher():
+    patcher_path = (
+        Path(__file__).parents[1]
+        / "scripts"
+        / "patch_v10_4_8_generated_scheduler.py"
+    )
+    namespace = {
+        "__file__": str(patcher_path),
+        "__name__": "v10_4_8_generated_scheduler_patcher",
+    }
+    exec(
+        compile(patcher_path.read_text(), str(patcher_path), "exec"),
+        namespace,
+    )
+    assert callable(namespace["transform"])
+    base = namespace["_load_base_patcher"]()
+    assert callable(base.transform)
 
 
 def test_scheduler_patcher_inserts_full_field_dual_terminal_contract():
