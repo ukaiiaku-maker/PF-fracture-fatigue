@@ -75,9 +75,10 @@ def test_writer_is_fail_closed(tmp_path):
     assert audit["classification"] == "numerical_fixed_point_failure"
     assert audit["complete"] is False
     assert audit["plasticity_dominated"] is False
+    assert audit["minimum_adaptive_trial_fraction_exhausted"] is True
     assert audit["exit_code"] == 5
     assert audit["step"] == 135
-    assert audit["minimum_adaptive_trial_fraction_exhausted"] if False else True
+    assert audit["dt_cur_s"] == pytest.approx(8.4e-8)
 
 
 def test_main_writes_fixed_point_audit_and_exits_five(monkeypatch, tmp_path):
