@@ -205,7 +205,9 @@ def update_liveness(case: Path, process: subprocess.Popen, tracker: dict) -> Non
     signature = (checkpoint.get("cycles_from_engine_time"), len(read_json(output / "stochastic_avalanche_geometry_events.json", [])))
     log_stamp = log.stat().st_mtime if log.exists() else 0.0
     if signature != tracker.get("physical_signature"):
-        tracker["physical_signature"] = signature; tracker["physical_timestamp"] = now
+        tracker["physical_signature"] = signature
+        tracker["physical_timestamp"] = now
+        tracker["liveness_timestamp"] = now
     if log_stamp != tracker.get("log_stamp") or process.poll() is not None:
         tracker["log_stamp"] = log_stamp; tracker["liveness_timestamp"] = now
     tail = log.read_text(errors="replace")[-12000:] if log.exists() else ""
@@ -304,14 +306,20 @@ def run(args) -> int:
                         state = "restartable" if checkpoint_valid(case, row) else "failed"
                     set_status(case, state, pid=process.pid, exit_code=process.returncode)
                     del active[name]
+                    if state == "restartable" and int(read_json(status_path(case)).get("restart_count", 0)) < args.max_restarts:
+                        pending.append(row)
                 elif stale(case, time.time(), args.no_progress_seconds):
                     os.killpg(process.pid, signal.SIGTERM)
                     try: process.wait(timeout=args.term_grace_seconds)
                     except subprocess.TimeoutExpired:
                         os.killpg(process.pid, signal.SIGKILL); process.wait()
                     log.close()
-                    set_status(case, "watchdog-stopped", pid=process.pid, restartable=checkpoint_valid(case))
+                    row = next(row for row in rows if row["case"] == name)
+                    valid = checkpoint_valid(case, row)
+                    set_status(case, "watchdog-stopped", pid=process.pid, restartable=valid)
                     del active[name]
+                    if valid and int(read_json(status_path(case)).get("restart_count", 0)) < args.max_restarts:
+                        pending.append(row)
             if stop_requested:
                 for process, case, log, _tracker in active.values():
                     os.killpg(process.pid, signal.SIGTERM)
@@ -458,6 +466,7 @@ def parser() -> argparse.ArgumentParser:
     runp.add_argument("--term-grace-seconds", type=float, default=30); runp.add_argument("--minimum-free-gib", type=float, default=float(os.environ.get("V10230_QUAL_MIN_FREE_GIB", "10")))
     runp.add_argument("--poll-seconds", type=float, default=2); runp.add_argument("--target-extension-um", type=float, default=25); runp.add_argument("--cycles-max", type=float, default=1e12)
     runp.add_argument("--smoke-worker", action="store_true")
+    runp.add_argument("--max-restarts", type=int, default=3)
     runp.add_argument("--family-descriptor", type=Path, default=Path(__file__).parents[1] / "runtime_inputs/v10_2_30/qualification_family_manifest.json")
     runp.add_argument("--recover-stale-lock", action="store_true")
     mon = sub.add_parser("monitor"); mon.add_argument("root", type=Path)

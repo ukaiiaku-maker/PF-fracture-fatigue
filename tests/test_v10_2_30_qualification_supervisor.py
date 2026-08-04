@@ -190,3 +190,17 @@ def test_default_watchdog_exceeds_observed_long_diagnostic_phase(monkeypatch):
     module = load_module(); monkeypatch.delenv("V10230_QUAL_NO_PROGRESS_SECONDS", raising=False)
     args = module.parser().parse_args(["run", "/tmp/example", "--smoke-worker"])
     assert args.no_progress_seconds == 900.0
+
+
+def test_physical_progress_is_also_real_liveness(tmp_path):
+    module = load_module(); case = tmp_path / "case"; case.mkdir()
+    module.atomic_json(case / "high_cycle_live_checkpoint.json", {"cycles_from_engine_time": 10.0})
+    class Running:
+        pid = 123
+        def poll(self): return None
+    tracker = {"physical_timestamp": 1.0, "liveness_timestamp": 1.0}
+    module.update_liveness(case, Running(), tracker)
+    assert tracker["physical_timestamp"] > 1.0
+    assert tracker["liveness_timestamp"] == tracker["physical_timestamp"]
+    payload = json.loads((case / "qualification_liveness.json").read_text())
+    assert payload["physical_progress"]["cycles"] == 10.0
