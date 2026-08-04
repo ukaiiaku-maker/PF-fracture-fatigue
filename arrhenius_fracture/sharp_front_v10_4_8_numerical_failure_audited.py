@@ -7,7 +7,7 @@ unchanged.
 
 This entry adds a distinct unsuccessful outcome when the mechanics/plasticity
 fixed point exhausts the configured minimum adaptive trial fraction before a
-bounded accepted-substep terminal window can be formed.  That outcome is not
+bounded accepted-substep terminal window can be formed. That outcome is not
 plasticity dominated and is not numerical stagnation: it is an explicit
 nonlinear-solver failure after partial or zero crack growth.
 """
@@ -43,13 +43,17 @@ class FixedPointFailure(RuntimeError):
 
 def _coerce_value(value: str):
     text = value.strip()
-    if text.endswith(" K"):
-        text = text[:-2].strip()
+    for suffix in (" K", " s"):
+        if text.endswith(suffix):
+            text = text[: -len(suffix)].strip()
+            break
     try:
         numeric = float(text)
     except ValueError:
         return value.strip()
-    if numeric.is_integer() and all(token not in text.lower() for token in (".", "e")):
+    if numeric.is_integer() and all(
+        token not in text.lower() for token in (".", "e")
+    ):
         return int(numeric)
     return numeric
 
@@ -88,6 +92,7 @@ def _fixed_point_failure_payload(failure: FixedPointFailure) -> dict:
         "plasticity_dominated": False,
         "physical_plasticity_terminal_accepted": False,
         "numerical_stagnation_terminal_reached": False,
+        "minimum_adaptive_trial_fraction_exhausted": True,
         "retry_same_numerics_recommended": False,
         "exception_type": "RuntimeError",
         "exception_message": str(failure),
