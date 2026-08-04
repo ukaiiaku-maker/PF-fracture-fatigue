@@ -5,6 +5,7 @@ import numpy as np
 from arrhenius_fracture.path_selection_forensics_v10230 import (
     FILENAME, array_hash, candidate_record, record_selection,
 )
+from arrhenius_fracture.mesh import restore_tri_mesh
 
 
 def candidates():
@@ -65,3 +66,26 @@ def test_forensic_record_is_atomic_and_preserves_selector_inputs(tmp_path, monke
     assert row["candidate_order_before_sort"] == row["candidate_order_after_sort"]
     assert row["rng_consumed"] is False
     assert row["hashes"]["damage"] == array_hash(values)
+
+
+def test_mesh_restore_preserves_selector_radius_anchor():
+    points = []
+    elems = []
+    for index in range(8):
+        x = index * 10e-6
+        size = (index + 1) * 1e-6
+        start = len(points)
+        points.extend([[x, 0.0], [x + size, 0.0], [x, size]])
+        elems.append([start, start + 1, start + 2])
+    nodes = np.asarray(points)
+    elems = np.asarray(elems)
+    from arrhenius_fracture.mesh import rebuild_tri_mesh
+    original = rebuild_tri_mesh(nodes, elems, tip_centers=[[0.0, 0.0]])
+    moved_tip_rebuild = rebuild_tri_mesh(nodes, elems, tip_centers=[[70e-6, 0.0]])
+    assert original.hbar_tip != moved_tip_rebuild.hbar_tip
+    restored = restore_tri_mesh(nodes, elems, {
+        "hbar_m": original.hbar,
+        "hbar_tip_m": original.hbar_tip,
+        "tip_reference_centers_m": [[0.0, 0.0]],
+    })
+    assert restored.hbar_tip == original.hbar_tip

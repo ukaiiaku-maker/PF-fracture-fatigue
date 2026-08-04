@@ -2497,6 +2497,11 @@ def run_2d(args):
                     'transaction_state': 'committed',
                     'energy_gate_attempt_log': backend_attempts,
                     'sharp_wake_advance_log': base_backend_log or backend_attempts,
+                    'mesh_metadata': {
+                        'hbar_m': float(mesh.hbar),
+                        'hbar_tip_m': float(mesh.hbar_tip),
+                        'tip_reference_centers_m': np.asarray(refine_centers, float).tolist(),
+                    },
                 },
                 'history': {
                     'rows': [list(row) for row in rows],
@@ -2524,9 +2529,10 @@ def run_2d(args):
             outer_restart, kinetic_restart, restart_arrays = load_combined_checkpoint(restart_root_raw)
             validate_compatibility(outer_restart, _restart_case())
             validate_cross_layer(outer_restart, kinetic_restart)
-            from .mesh import rebuild_tri_mesh
-            mesh = rebuild_tri_mesh(restart_arrays['mesh_nodes'], restart_arrays['mesh_elems'],
-                                    tip_centers=outer_restart['geometry']['crack_tip_m'])
+            from .mesh import restore_tri_mesh
+            mesh = restore_tri_mesh(
+                restart_arrays['mesh_nodes'], restart_arrays['mesh_elems'],
+                outer_restart['geometry'].get('mesh_metadata', {}))
             bnd = make_boundary_data(mesh, cfg.geometry)
             d = restart_arrays['damage']; u = restart_arrays['displacement']
             ep_gp = restart_arrays['ep_gp']; rho_gp = restart_arrays['rho_gp']

@@ -194,6 +194,31 @@ def rebuild_tri_mesh(nodes: np.ndarray, elems: np.ndarray, tip_centers=None, val
         hbar_tip=float(hbar_tip),
     )
 
+
+def restore_tri_mesh(nodes: np.ndarray, elems: np.ndarray, metadata: dict) -> TriMesh:
+    """Restore checkpoint-authoritative mesh metrics without moving their anchor.
+
+    ``hbar_tip`` is part of the directional selector because it defines the
+    near-tip stress averaging radius.  Recomputing it around the current crack
+    tip changes the physical query after a topology-preserving crack event.
+    """
+    required = {"hbar_m", "hbar_tip_m", "tip_reference_centers_m"}
+    missing = sorted(required - set(metadata or {}))
+    if missing:
+        raise ValueError(f"checkpoint lacks authoritative mesh metadata: {missing}")
+    mesh = rebuild_tri_mesh(
+        nodes, elems, tip_centers=metadata["tip_reference_centers_m"]
+    )
+    expected_hbar = float(metadata["hbar_m"])
+    expected_tip = float(metadata["hbar_tip_m"])
+    if mesh.hbar != expected_hbar or mesh.hbar_tip != expected_tip:
+        raise ValueError(
+            "checkpoint mesh metrics cannot be reconstructed exactly: "
+            f"hbar={mesh.hbar!r}/{expected_hbar!r}, "
+            f"hbar_tip={mesh.hbar_tip!r}/{expected_tip!r}"
+        )
+    return mesh
+
 def make_boundary_data(mesh: TriMesh, geom: GeometryConfig) -> BoundaryData:
     """Identify boundary node sets and notch region."""
     tol = 0.3 * mesh.hbar

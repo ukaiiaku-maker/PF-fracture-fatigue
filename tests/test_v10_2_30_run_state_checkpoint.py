@@ -46,6 +46,11 @@ def fixture(event_count=0, cycles=12.5):
             "kinetic_event_index": event_count,
             "transaction_index": event_count,
             "transaction_state": "committed",
+            "mesh_metadata": {
+                "hbar_m": 1.0e-6,
+                "hbar_tip_m": 5.0e-7,
+                "tip_reference_centers_m": [[0.001, 0.0]],
+            },
         },
     }
     threshold = 2.0

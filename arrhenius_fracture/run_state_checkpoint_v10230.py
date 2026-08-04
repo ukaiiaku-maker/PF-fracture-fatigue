@@ -18,7 +18,7 @@ from typing import Any
 import numpy as np
 
 
-MODEL_ID = "v10.2.30_combined_outer_kinetic_run_state_v1"
+MODEL_ID = "v10.2.30_combined_outer_kinetic_run_state_v2"
 MANIFEST = "run_state_checkpoint.json"
 
 
