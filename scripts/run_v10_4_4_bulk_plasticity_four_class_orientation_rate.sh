@@ -41,7 +41,7 @@ export PLASTIC_FLOW_MAX_ELASTIC_FRACTION
 export PLASTIC_FLOW_MAX_TANGENT_FRACTION
 
 BASE="$ROOT/scripts/run_v10_2_28_paper_four_class_theta30_1000um.sh"
-GENERATED_BASE=$(mktemp "$ROOT/scripts/.v10_4_6_bulk_plasticity_orientation.XXXXXX")
+GENERATED_BASE=$(mktemp "$ROOT/scripts/.v10_4_7_bulk_plasticity_orientation.XXXXXX")
 GENERATED="${GENERATED_BASE}.sh"
 mv "$GENERATED_BASE" "$GENERATED"
 trap 'rm -f "$GENERATED"' EXIT
@@ -53,16 +53,17 @@ chmod +x "$GENERATED"
 bash -n "$GENERATED"
 
 printf 'Model entry: %s\n' \
-  'arrhenius_fracture.sharp_front_v10_4_6_plasticity_dominance_audited'
+  'arrhenius_fracture.sharp_front_v10_4_7_numerical_stagnation_audited'
 printf 'Bulk plasticity: full_field; tip plasticity retained\n'
 printf 'Fracture law: unchanged Arrhenius first passage plus event-energy gate\n'
 printf 'Valid case terminals: target fracture extension OR physically plasticity dominated\n'
 printf 'Plasticity terminal window: %s nominal increments\n' \
   "$PLASTIC_FLOW_WINDOW_STEPS"
-printf 'Severe-substep fallback: 128-step J/force plateau plus cumulative plastic fraction >= %s\n' \
+printf 'Severe-substep physical terminal: 128-step J/force plateau plus cumulative plastic fraction >= %s\n' \
   "$PLASTIC_FLOW_MIN_CUMULATIVE_FRACTION"
+printf 'Severe-substep nonplastic plateau: fail fast as NUMERICAL_STAGNATION (exit 4)\n'
 printf 'Positive cumulative Wp alone: insufficient\n'
-printf 'Tiny-window energy fractions: diagnostic only for severe-substep fallback\n'
+printf 'Tiny-window energy fractions: diagnostic only for severe-substep physical terminal\n'
 printf 'Projected future cleavage action: diagnostic only\n'
 printf 'Loading-rate factor: %s\n' "$LOADING_RATE_FACTOR"
 printf 'Nominal dU: %s m\n' "$DU_M"
