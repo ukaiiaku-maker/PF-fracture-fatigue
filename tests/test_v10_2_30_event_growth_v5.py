@@ -264,6 +264,19 @@ def _load_growth_analyzer():
     return module
 
 
+def _load_campaign_analyzer():
+    path = (
+        Path(__file__).parents[1]
+        / "scripts"
+        / "analyze_v10_2_30_four_class_fatigue_campaign.py"
+    )
+    spec = importlib.util.spec_from_file_location("campaign_analyzer", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_developed_growth_analyzer_reports_stable_100um(tmp_path):
     fields = [
         "step", "fatigue_cycles", "crack_extension_m", "da_block_m", "n_fire",
@@ -297,6 +310,69 @@ def test_developed_growth_analyzer_reports_stable_100um(tmp_path):
         for index in range(21):
             writer.writerow([index * 5.0e-6, 0.0])
 
+    control = {
+        "parameter_option": "v913_paper_weakT01_0129902_persistent_sites",
+        "target_deltaK_MPa_sqrt_m": 12.0,
+        "target_Kmax_MPa_sqrt_m": 13.333333333333334,
+        "R": 0.1,
+        "frequency_Hz": 1000.0,
+        "cleavage_hazard_seed": 2001726,
+        "cycles_max": 1.0e12,
+    }
+    (tmp_path / "v10_2_30_fixed_deltaK_control.json").write_text(
+        json.dumps(control)
+    )
+    geometry = []
+    gates = []
+    kinetic = []
+    for index in range(20):
+        threshold = 0.5 + index
+        geometry.append(
+            {
+                "threshold_action": threshold,
+                "event_length_factor": 1.0,
+                "stochastic_proposed_event_length_m": 5.0e-6,
+                "geometry_transaction_mode": "single_checked_outer_commit",
+            }
+        )
+        gates.append(
+            {
+                "inserted": True,
+                "arrest_reason": "stochastic_proposal_reached",
+                "energy_admissible_event_length_m": 5.0e-6,
+                "trial_rows": [
+                    {
+                        "trial_length_m": 5.0e-6,
+                        "elastic_release_event_J_per_m": 2.0,
+                        "hazard_dissipation_J_per_m": 1.0,
+                        "energy_residual_J_per_m": 1.0,
+                    }
+                ],
+            }
+        )
+        kinetic.append(
+            {
+                "physical_hazard_action_block": threshold,
+                "coupled_hazard_modes": [
+                    {"mode": "projective_rejected", "failure_reason": "dmd_event_guard"},
+                    {"mode": "exact_cycle_burst"},
+                    {"mode": "event_localization_transient"},
+                ],
+            }
+        )
+    (tmp_path / "stochastic_avalanche_geometry_events.json").write_text(
+        json.dumps(geometry)
+    )
+    (tmp_path / "hazard_energy_gated_events_v10_2_30.json").write_text(
+        json.dumps(gates)
+    )
+    (tmp_path / "kinetic_tip_cell_audit_v101.json").write_text(
+        json.dumps({"records": kinetic})
+    )
+    (tmp_path / "high_cycle_run_manifest.json").write_text(
+        json.dumps({"git_head": "abc123", "generic_launcher": "test", "environment": {}})
+    )
+
     analyzer = _load_growth_analyzer()
     rc = analyzer.main([str(tmp_path), "--target-extension-um", "100"])
     assert rc == 0
@@ -305,4 +381,64 @@ def test_developed_growth_analyzer_reports_stable_100um(tmp_path):
     assert payload["target_reached"] is True
     assert payload["stable_growth_provisional"] is True
     assert payload["developed_interval"]["da_dN"] > 0.0
+    event = payload["event_measurements"][0]
+    assert event["parameter_option"] == control["parameter_option"]
+    assert event["threshold_action"] == 0.5
+    assert event["physical_hazard_action"] == 0.5
+    assert event["energy_available_J_per_m"] == 2.0
+    assert event["energy_required_J_per_m"] == 1.0
+    assert event["geometry_commit_inserted"] is True
+    assert event["dmd_event_guard"] is True
+    assert event["exact_fallback_entered"] is True
+    assert event["transient_localization_entered"] is True
+    assert event["private_trials_counted_as_cycles"] is False
+    assert payload["provenance"]["git_head"] == "abc123"
     assert (tmp_path / "event_da_dN_vs_extension.png").is_file()
+
+
+def test_four_class_campaign_analyzer_keeps_censors_and_provenance(tmp_path):
+    roots = []
+    for index, (option, rate, status) in enumerate(
+        [
+            ("v913_paper_peak01_0242980_persistent_sites", 2.0e-10, "growth_target_reached"),
+            ("v913_paper_weakT01_0129902_persistent_sites", None, "no_committed_crack_event"),
+        ]
+    ):
+        root = tmp_path / f"case_{index}"
+        root.mkdir()
+        roots.append(root)
+        (root / "developed_fatigue_growth_summary.json").write_text(
+            json.dumps(
+                {
+                    "status": status,
+                    "event_count": 3 if rate else 0,
+                    "cycles_consumed": 1.0e6,
+                    "final_projected_extension_um": 25.0 if rate else 0.0,
+                    "target_reached": bool(rate),
+                    "developed_interval": {"event_count": 2 if rate else 0, "da_dN": rate},
+                    "provenance": {
+                        "parameter_option": option,
+                        "deltaK_MPa_sqrt_m": 10.0 + index,
+                        "hazard_seed": 1720,
+                        "git_head": "deadbeef",
+                    },
+                }
+            )
+        )
+        (root / "v10_2_30_fixed_deltaK_control.json").write_text(
+            json.dumps({"censor_status": "right_censored_no_event" if not rate else "propagated"})
+        )
+        (root / "exit_code.txt").write_text("0\n")
+
+    out = tmp_path / "analysis"
+    analyzer = _load_campaign_analyzer()
+    assert analyzer.main([*(str(root) for root in roots), "--out", str(out)]) == 0
+    payload = json.loads((out / "four_class_fatigue_summary.json").read_text())
+    assert payload["case_count"] == 2
+    assert payload["completed_count"] == 1
+    assert payload["censored_count"] == 1
+    assert payload["failed_count"] == 0
+    assert payload["cases"][0]["git_head"] == "deadbeef"
+    assert (out / "four_class_fatigue_cases.csv").is_file()
+    assert (out / "four_class_fatigue_censor_failure_table.csv").is_file()
+    assert (out / "four_class_da_dN_vs_deltaK.png").is_file()
