@@ -41,7 +41,7 @@ export PLASTIC_FLOW_MAX_ELASTIC_FRACTION
 export PLASTIC_FLOW_MAX_TANGENT_FRACTION
 
 BASE="$ROOT/scripts/run_v10_2_28_paper_four_class_theta30_1000um.sh"
-GENERATED_BASE=$(mktemp "$ROOT/scripts/.v10_4_8_bulk_plasticity_orientation.XXXXXX")
+GENERATED_BASE=$(mktemp "$ROOT/scripts/.v10_4_9_bulk_plasticity_orientation.XXXXXX")
 GENERATED="${GENERATED_BASE}.sh"
 mv "$GENERATED_BASE" "$GENERATED"
 trap 'rm -f "$GENERATED"' EXIT
@@ -52,8 +52,10 @@ trap 'rm -f "$GENERATED"' EXIT
 chmod +x "$GENERATED"
 bash -n "$GENERATED"
 
+printf 'Launcher revision: %s\n' 'v10.4.9_exec_namespace_contract'
 printf 'Model entry: %s\n' \
   'arrhenius_fracture.sharp_front_v10_4_8_numerical_failure_audited'
+printf 'Generated patcher file context: supplied explicitly\n'
 printf 'Bulk plasticity: full_field; tip plasticity retained\n'
 printf 'Fracture law: unchanged Arrhenius first passage plus event-energy gate\n'
 printf 'Valid case terminals: target fracture extension OR physically plasticity dominated\n'
