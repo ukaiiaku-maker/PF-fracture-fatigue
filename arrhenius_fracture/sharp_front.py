@@ -678,6 +678,14 @@ def build_engine(args, mat) -> FrontEngine:
         )
     return FrontEngine(f, cb, eb, mat.G, mat.nu, mat.b)
 
+
+def _finalize_driver_physical_checkpoint(eng, da_phys: float) -> None:
+    """Install the final 2-D checkpoint before any stochastic evolution."""
+    eng.f.da = float(da_phys)
+    synchronize = getattr(eng, "_synchronize_driver_checkpoint_length", None)
+    if synchronize is not None:
+        synchronize()
+
 # ----------------------------------------------------------------------------
 # 1D driver: prescribed K-ramp (the validation / calibration model)
 # ----------------------------------------------------------------------------
@@ -1282,7 +1290,9 @@ def run_2d(args):
         cy_e = mesh.nodes[mesh.elems].mean(axis=1)[:, 1]
         adj = build_elem_adjacency(mesh) if rho_transport_c > 0.0 else None
         eng = build_engine(args, mat)
-        eng.f.da = da_phys  # PHYSICAL advance per cleavage event (mesh-independent)
+        # PHYSICAL advance per cleavage event (mesh-independent). Finalize this
+        # before shelf audit, previews, high-cycle trials, or hazard evolution.
+        _finalize_driver_physical_checkpoint(eng, da_phys)
         audit = eng.shelf_audit(T, args.steps * cfg.loading.dt)
         if not audit['clock_completable']:
             print(f"  [T={T:.0f}K] WARNING rate shelf: clock cannot complete; "

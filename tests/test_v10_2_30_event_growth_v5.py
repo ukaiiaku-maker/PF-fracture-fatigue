@@ -1,15 +1,24 @@
 from __future__ import annotations
 
 import csv
+import copy
 import importlib.util
 import json
+from types import SimpleNamespace
 from pathlib import Path
+
+import pytest
 
 from arrhenius_fracture import persistent_site_high_cycle_dmd_v10230_v4 as segment
 from arrhenius_fracture import persistent_site_high_cycle_engine_v10230 as high
 from arrhenius_fracture.persistent_site_high_cycle_checkpoint_v10230 import (
     restore_checkpoint,
 )
+from arrhenius_fracture.stochastic_avalanche_tip import (
+    StochasticAvalancheDiagnosticTipEngine,
+    threshold_event_length_factor,
+)
+from arrhenius_fracture import sharp_front
 
 from v10230_affine_dmd_fixture import AffineEngine, Controller, Waveform, configure
 
@@ -107,6 +116,143 @@ def test_production_alias_is_event_to_event_v5(monkeypatch, tmp_path):
     assert result["coupled_hazard_positivity_preserving_coordinates"] is True
     assert result["coupled_hazard_live_checkpointing"] is True
     assert result["coupled_hazard_growth_objective"] == "event_to_event_100um"
+
+
+def test_checkpoint_sync_event_guard_exact_fallback(monkeypatch, tmp_path):
+    """The final 5 um driver checkpoint must precede all high-cycle evolution."""
+    _production(monkeypatch, tmp_path)
+
+    class DriverEngine(AffineEngine):
+        _synchronize_driver_checkpoint_length = (
+            StochasticAvalancheDiagnosticTipEngine.
+            _synchronize_driver_checkpoint_length
+        )
+        _set_current_event_length = (
+            StochasticAvalancheDiagnosticTipEngine._set_current_event_length
+        )
+
+        def __init__(self):
+            super().__init__(drift=1.0, hazard=0.4)
+            self.f = SimpleNamespace(da=20.0e-6)
+            self.hazard_cfg = SimpleNamespace(mode="exponential", seed=2001726)
+            self.avalanche_cfg = SimpleNamespace(
+                mode="threshold_scaled",
+                minimum_factor=0.5,
+                maximum_factor=4.0,
+            )
+            self.hazard_threshold_action = 1.25
+            self.avalanche_base_checkpoint_m = self.f.da
+            self.avalanche_event_length_factor = 1.0
+            self.avalanche_event_advance_m = self.f.da
+            self.avalanche_event_length_history = []
+            self.avalanche_checkpoint_synchronized = False
+            self._set_current_event_length()
+
+    engine = DriverEngine()
+    threshold_before = engine.hazard_threshold_action
+    rng_before = copy.deepcopy(engine._hazard_rng.bit_generator.state)
+    factor_before = engine.avalanche_event_length_factor
+
+    sharp_front._finalize_driver_physical_checkpoint(engine, 5.0e-6)
+
+    assert engine.avalanche_checkpoint_synchronized is True
+    assert engine.avalanche_base_checkpoint_m == 5.0e-6
+    assert engine.B == 0.0
+    assert engine.hazard_action_current == 0.0
+    assert engine.hazard_threshold_action == threshold_before
+    assert engine._hazard_rng.bit_generator.state == rng_before
+    assert engine.avalanche_event_length_factor == factor_before
+    assert engine.avalanche_event_advance_m == 5.0e-6 * factor_before
+    assert factor_before == threshold_event_length_factor(
+        threshold_before,
+        mode="threshold_scaled",
+        minimum_factor=0.5,
+        maximum_factor=4.0,
+        deterministic_threshold=False,
+    )
+
+    base = high.integrate_state_coupled_waveform.__globals__["_bound_integrator"]
+    globals_ = base.__globals__
+    real_projective = globals_["_projective_with_requested_scale"]
+    real_exact = globals_["_advance_exact_cycle_burst"]
+    real_transient = globals_["_transient"].integrate_state_coupled_waveform
+
+    def rejected_projective(*args, **kwargs):
+        return SimpleNamespace(
+            accepted=False,
+            cycles_consumed=0.0,
+            burst_cycles=8,
+            projected_cycles=0.0,
+            drift_relative_error=0.0,
+            hazard_relative_error=0.0,
+            attempts=1,
+            failure_reason="dmd_event_guard",
+        )
+
+    exact_entered = []
+
+    def exact_near_event(*args, **kwargs):
+        exact_entered.append(True)
+        return {
+            "cycles": 0.0,
+            "dB": 0.0,
+            "dH": 0.0,
+            "plastic": {},
+            "event_near": True,
+            "last_cycle": None,
+        }
+
+    def localized_transient(live, controller, waveform, temperature, cycles):
+        assert live.avalanche_base_checkpoint_m == 5.0e-6
+        assert live._hazard_rng.bit_generator.state == rng_before
+        live.hazard_action_current = 0.5 * live.hazard_threshold_action
+        live.B = live.hazard_action_current / live.hazard_threshold_action
+        return {
+            "fired": False,
+            "coupled_hazard_cycles_consumed": cycles,
+            "coupled_hazard_partial_return": False,
+            "dB": 0.5,
+            "physical_hazard_action_step": live.hazard_action_current,
+            "da": 0.0,
+            "packet_mean": 0.0,
+            "packet_variance_m2": 0.0,
+            "microsteps": 1,
+            "plastic": {},
+            "advance": {},
+            "lambda_c": 0.0,
+            "sigma_tip": 1.0e9,
+        }
+
+    monkeypatch.setitem(globals_, "_projective_with_requested_scale", rejected_projective)
+    monkeypatch.setitem(globals_, "_advance_exact_cycle_burst", exact_near_event)
+    monkeypatch.setattr(
+        globals_["_transient"],
+        "integrate_state_coupled_waveform",
+        localized_transient,
+    )
+    try:
+        result = high.integrate_state_coupled_waveform(
+            engine, Controller(), Waveform(), 300.0, 2.0
+        )
+    finally:
+        globals_["_projective_with_requested_scale"] = real_projective
+        globals_["_advance_exact_cycle_burst"] = real_exact
+        globals_["_transient"].integrate_state_coupled_waveform = real_transient
+
+    assert exact_entered
+    assert any(
+        row.get("failure_reason") == "dmd_event_guard"
+        for row in result["coupled_hazard_modes"]
+    )
+    assert any(
+        row.get("mode") == "event_localization_transient"
+        for row in result["coupled_hazard_modes"]
+    )
+    assert engine.B == engine.hazard_action_current / engine.hazard_threshold_action
+
+    engine.f.da = 6.0e-6
+    with pytest.raises(RuntimeError, match="after stochastic event evolution began"):
+        engine._synchronize_driver_checkpoint_length()
 
 
 def _load_growth_analyzer():
