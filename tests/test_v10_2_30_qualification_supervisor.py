@@ -124,6 +124,20 @@ def test_shell_entry_points_parse():
         assert result.returncode == 0, result.stderr.decode()
 
 
+def test_launch_wrapper_handles_unset_optional_stale_recovery(tmp_path):
+    fake = tmp_path / "conda"
+    fake.write_text("#!/usr/bin/env bash\nprintf '%s\\n' \"$@\"\n")
+    fake.chmod(0o755)
+    import os
+    result = subprocess.run(
+        ["bash", str(ROOT / "scripts/run_v10_2_30_four_class_qualification_supervisor.sh"), "campaign"],
+        cwd=ROOT, env={**os.environ, "PATH": f"{tmp_path}:{os.environ['PATH']}"},
+        text=True, capture_output=True,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "--recover-stale-lock" not in result.stdout
+
+
 def test_smoke_worker_resumes_from_checkpoint(tmp_path, monkeypatch):
     module = load_module(); case = tmp_path / "case"; case.mkdir()
     monkeypatch.setenv("SMOKE_INTERRUPT", "1")
