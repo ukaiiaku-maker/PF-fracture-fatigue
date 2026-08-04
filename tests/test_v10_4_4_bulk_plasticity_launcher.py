@@ -27,6 +27,8 @@ def test_builder_preserves_campaign_source_and_installs_scheduler_patch_hook():
     assert builder.LOCK_SCHEMA in generated
     assert '"bulk_plasticity_mode": "full_field"' in generated
     assert '"plasticity_dominated_campaign_terminal": True' in generated
+    assert '"plasticity_terminal_severe_substep_positive_Wp_sufficient": False' in generated
+    assert '"plasticity_terminal_severe_substep_cumulative_fraction_threshold": 0.90' in generated
     assert "patch_v10_4_4_generated_scheduler.py" in generated
 
     normalization = f'''scheduler = scheduler.replace(
@@ -44,7 +46,7 @@ def test_builder_preserves_campaign_source_and_installs_scheduler_patch_hook():
     assert promotion in generated
     assert generated.index(normalization) < generated.index(patch_call)
     assert generated.index(patch_call) < generated.index(promotion)
-    assert "v10.4.5 generated scheduler model-entry contract is incomplete" in generated
+    assert "v10.4.6 generated scheduler model-entry contract is incomplete" in generated
 
     assert "v913_paper_peak01_0242980_persistent_sites" in generated
     assert "v913_paper_dbtt01_0202500_persistent_sites" in generated
