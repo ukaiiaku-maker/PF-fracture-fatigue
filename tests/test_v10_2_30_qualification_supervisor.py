@@ -20,6 +20,27 @@ def load_module():
     return module
 
 
+def write_restartable(case: Path, step: int = 0):
+    from arrhenius_fracture.run_state_checkpoint_v10230 import write_combined_checkpoint
+    write_combined_checkpoint(
+        case,
+        outer={"case": {"da_phys_m": 5e-6}, "cycles_total": float(step),
+               "geometry": {"crack_tip_m": [0.001, 0.0],
+                            "front_paths": [[[0.001, 0.0]]],
+                            "committed_event_count": 0, "kinetic_event_index": 0,
+                            "transaction_index": 0, "transaction_state": "committed"}},
+        arrays={"state": [step]},
+        kinetic={"geometry_signature": [0, 0, 0, 0],
+                 "stochastic": {"B": 0.25, "hazard_threshold_action": 2.0,
+                                "hazard_action_current": 0.5,
+                                "hazard_event_index": 0,
+                                "hazard_threshold_history": [],
+                                "avalanche_base_checkpoint_m": 5e-6,
+                                "rng_state": {"state": step}}},
+        kinetic_vector=[step],
+    )
+
+
 def test_matrix_is_deterministic_and_uses_canonical_seed_namespaces():
     module = load_module(); rows = module.matrix()
     assert len(rows) == 12
@@ -50,9 +71,17 @@ def test_finished_skip_and_incomplete_restart_selection(tmp_path):
     module.set_status(complete, "completed")
     assert module.classify(complete) == "completed"
     incomplete = tmp_path / "incomplete"; incomplete.mkdir()
-    module.atomic_json(incomplete / "high_cycle_live_checkpoint.json", {"schema": "x", "timestamp_unix_s": 1})
-    (incomplete / "high_cycle_live_state.npz").touch()
+    write_restartable(incomplete)
     assert module.classify(incomplete) == "restartable"
+
+
+def test_kinetic_only_checkpoint_is_not_physically_restartable(tmp_path):
+    module = load_module(); case = tmp_path / "case"; case.mkdir()
+    module.atomic_json(case / "high_cycle_live_checkpoint.json",
+                       {"schema": "kinetic", "timestamp_unix_s": 1})
+    (case / "high_cycle_live_state.npz").touch()
+    assert module.checkpoint_valid(case) is False
+    assert module.classify(case) == "pending"
 
 
 def test_disk_space_block_and_maximum_two_job_cap(tmp_path, monkeypatch):

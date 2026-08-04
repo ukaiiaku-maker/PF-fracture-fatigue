@@ -59,12 +59,15 @@ def read_json(path: Path, default=None):
 
 def checkpoint_valid(case: Path) -> bool:
     case = artifacts(case)
-    payload = read_json(case / "high_cycle_live_checkpoint.json")
-    return bool(
-        payload.get("schema")
-        and (case / "high_cycle_live_state.npz").is_file()
-        and payload.get("timestamp_unix_s")
-    )
+    try:
+        from arrhenius_fracture.run_state_checkpoint_v10230 import (
+            load_combined_checkpoint, validate_cross_layer,
+        )
+        outer, kinetic, _arrays = load_combined_checkpoint(case)
+        validate_cross_layer(outer, kinetic)
+        return True
+    except (Exception,):
+        return False
 
 
 def progress(case: Path) -> dict:
@@ -157,7 +160,9 @@ def worker_environment(row: dict, case: Path, args, restarting: bool) -> dict:
         ),
     })
     if restarting:
-        env["V10230_RESTART_CHECKPOINT_DIR"] = str(case)
+        env["V10230_RESTART_CHECKPOINT_DIR"] = str(
+            case if args.smoke_worker else case / "output"
+        )
     return env
 
 
@@ -211,9 +216,6 @@ def run(args) -> int:
                 if args.skip_finished and state in TERMINAL:
                     set_status(case, state, skipped=True); continue
                 restarting = state in {"restartable", "watchdog-stopped"}
-                if restarting and not args.smoke_worker and not args.production_resume_supported:
-                    set_status(case, "restartable", blocked_reason="outer_geometry_resume_not_supported")
-                    continue
                 if free_gib(root) < args.minimum_free_gib:
                     set_status(case, "pending", blocked_reason="minimum_free_space")
                     pending.insert(0, row); break
@@ -272,6 +274,38 @@ def smoke_worker(case: Path) -> int:
         atomic_json(case / "smoke_checkpoint.json", {"step": step})
         atomic_json(case / "high_cycle_live_checkpoint.json", {"schema": "smoke", "timestamp_unix_s": now, "cycles_from_engine_time": step})
         (case / "high_cycle_live_state.npz").touch()
+        from arrhenius_fracture.run_state_checkpoint_v10230 import write_combined_checkpoint
+        threshold = 2.0
+        action = 0.5
+        write_combined_checkpoint(
+            case,
+            outer={
+                "case": {"da_phys_m": 5e-6},
+                "cycles_total": float(step),
+                "geometry": {
+                    "crack_tip_m": [0.001, 0.0],
+                    "front_paths": [[[0.001, 0.0]]],
+                    "committed_event_count": 0,
+                    "kinetic_event_index": 0,
+                    "transaction_index": 0,
+                    "transaction_state": "committed",
+                },
+            },
+            arrays={"smoke": [step]},
+            kinetic={
+                "geometry_signature": [0, 0.0, 0.0, 0.0],
+                "stochastic": {
+                    "B": action / threshold,
+                    "hazard_threshold_action": threshold,
+                    "hazard_action_current": action,
+                    "hazard_event_index": 0,
+                    "hazard_threshold_history": [],
+                    "avalanche_base_checkpoint_m": 5e-6,
+                    "rng_state": {"smoke": step},
+                },
+            },
+            kinetic_vector=[float(step)],
+        )
         if os.environ.get("SMOKE_INTERRUPT") == "1" and step == 2: return 75
         time.sleep(float(os.environ.get("SMOKE_STEP_SECONDS", "0.05")))
     (case / "exit_code.txt").write_text("0\n")
@@ -303,7 +337,7 @@ def parser() -> argparse.ArgumentParser:
     runp.add_argument("--no-progress-seconds", type=float, default=float(os.environ.get("V10230_QUAL_NO_PROGRESS_SECONDS", "300")))
     runp.add_argument("--term-grace-seconds", type=float, default=30); runp.add_argument("--minimum-free-gib", type=float, default=float(os.environ.get("V10230_QUAL_MIN_FREE_GIB", "10")))
     runp.add_argument("--poll-seconds", type=float, default=2); runp.add_argument("--target-extension-um", type=float, default=25); runp.add_argument("--cycles-max", type=float, default=1e12)
-    runp.add_argument("--smoke-worker", action="store_true"); runp.add_argument("--production-resume-supported", action="store_true")
+    runp.add_argument("--smoke-worker", action="store_true")
     mon = sub.add_parser("monitor"); mon.add_argument("root", type=Path)
     stp = sub.add_parser("stop"); stp.add_argument("root", type=Path)
     smoke = sub.add_parser("smoke-worker"); smoke.add_argument("case", type=Path)

@@ -283,6 +283,12 @@ def capture_stochastic_state(engine) -> dict[str, Any]:
         ),
         "hazard_action_current": _finite(getattr(engine, "hazard_action_current", 0.0)),
         "hazard_event_index": int(getattr(engine, "hazard_event_index", 0)),
+        "avalanche_base_checkpoint_m": _finite(
+            getattr(engine, "avalanche_base_checkpoint_m", 0.0)
+        ),
+        "current_event_length_m": _finite(
+            getattr(engine, "current_event_length_m", 0.0)
+        ),
         "hazard_threshold_history": tuple(
             float(value) for value in getattr(engine, "hazard_threshold_history", [])
         ),

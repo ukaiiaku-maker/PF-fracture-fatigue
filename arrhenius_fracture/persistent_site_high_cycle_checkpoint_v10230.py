@@ -29,6 +29,18 @@ from .persistent_site_high_cycle_state_v10230 import (
 
 
 MODEL_ID = "v10.2.30_atomic_live_high_cycle_checkpoint_v1"
+_OUTER_STATE_PROVIDER = None
+
+
+def register_outer_state_provider(provider) -> None:
+    """Register the active 2-D driver's committed-state snapshot callback."""
+    global _OUTER_STATE_PROVIDER
+    _OUTER_STATE_PROVIDER = provider
+
+
+def clear_outer_state_provider() -> None:
+    global _OUTER_STATE_PROVIDER
+    _OUTER_STATE_PROVIDER = None
 
 
 def _json_safe(value: Any):
@@ -132,6 +144,17 @@ def write_checkpoint(
         root / "high_cycle_live_checkpoint.json",
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
     )
+    if _OUTER_STATE_PROVIDER is not None:
+        from .run_state_checkpoint_v10230 import write_combined_checkpoint
+
+        outer, outer_arrays = _OUTER_STATE_PROVIDER(engine, payload)
+        write_combined_checkpoint(
+            root,
+            outer=outer,
+            arrays=outer_arrays,
+            kinetic=payload,
+            kinetic_vector=snapshot.vector,
+        )
     history_path = root / "high_cycle_live_history.jsonl"
     with history_path.open("a", encoding="utf-8") as stream:
         stream.write(json.dumps(payload, sort_keys=True) + "\n")
@@ -205,6 +228,8 @@ def restore_checkpoint(engine, root: str | Path) -> dict[str, Any]:
         "hazard_action_current",
         "hazard_event_index",
         "hazard_threshold_history",
+        "avalanche_base_checkpoint_m",
+        "current_event_length_m",
     ):
         if name in stochastic:
             setattr(engine, name, copy.deepcopy(stochastic[name]))
@@ -220,7 +245,9 @@ def restore_checkpoint(engine, root: str | Path) -> dict[str, Any]:
 
 __all__ = [
     "MODEL_ID",
+    "clear_outer_state_provider",
     "maybe_write_checkpoint",
+    "register_outer_state_provider",
     "restore_checkpoint",
     "write_checkpoint",
 ]
