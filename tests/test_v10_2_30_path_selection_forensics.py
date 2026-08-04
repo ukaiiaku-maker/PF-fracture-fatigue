@@ -1,4 +1,6 @@
 import json
+import importlib.util
+from pathlib import Path
 
 import numpy as np
 
@@ -78,7 +80,7 @@ def test_mesh_restore_preserves_selector_radius_anchor():
         points.extend([[x, 0.0], [x + size, 0.0], [x, size]])
         elems.append([start, start + 1, start + 2])
     nodes = np.asarray(points)
-    elems = np.asarray(elems)
+    elems = np.asarray(elems, dtype=np.int32)
     from arrhenius_fracture.mesh import rebuild_tri_mesh
     original = rebuild_tri_mesh(nodes, elems, tip_centers=[[0.0, 0.0]])
     moved_tip_rebuild = rebuild_tri_mesh(nodes, elems, tip_centers=[[70e-6, 0.0]])
@@ -88,4 +90,38 @@ def test_mesh_restore_preserves_selector_radius_anchor():
         "hbar_tip_m": original.hbar_tip,
         "tip_reference_centers_m": [[0.0, 0.0]],
     })
+    assert restored.elems.dtype == elems.dtype
     assert restored.hbar_tip == original.hbar_tip
+
+
+def _comparison_module():
+    path = Path(__file__).parents[1] / "scripts" / "compare_v10_2_30_path_selection_forensics.py"
+    spec = importlib.util.spec_from_file_location("path_comparison", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_forensic_comparison_detects_perturbed_selector_input(tmp_path):
+    module = _comparison_module()
+    control = tmp_path / "control"
+    restored = tmp_path / "restored"
+    control.mkdir(); restored.mkdir()
+    row = {
+        "event_index": 2, "execution": "continuous", "combined_checkpoint_generation": "a",
+        "selector_input": {"near_tip_stress_tensor_Pa": [[1.0, 0.0], [0.0, 1.0]]},
+        "candidates": [], "selected_direction": [1.0, 0.0], "hashes": {"mesh_nodes": "x"},
+    }
+    payload = {"schema": "v10.2.30_path_selection_forensics_v1", "records": [row]}
+    (control / FILENAME).write_text(json.dumps(payload))
+    changed = json.loads(json.dumps(payload))
+    changed["records"][0]["execution"] = "restored"
+    changed["records"][0]["combined_checkpoint_generation"] = "b"
+    (restored / FILENAME).write_text(json.dumps(changed))
+    assert module.compare(control, restored)["equivalent"] is True
+    changed["records"][0]["selector_input"]["near_tip_stress_tensor_Pa"][0][0] = 2.0
+    (restored / FILENAME).write_text(json.dumps(changed))
+    result = module.compare(control, restored)
+    assert result["equivalent"] is False
+    assert result["classification"] == "A"
+    assert "selector_input" in result["first_difference"]["path"]

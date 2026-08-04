@@ -206,9 +206,16 @@ def restore_tri_mesh(nodes: np.ndarray, elems: np.ndarray, metadata: dict) -> Tr
     missing = sorted(required - set(metadata or {}))
     if missing:
         raise ValueError(f"checkpoint lacks authoritative mesh metadata: {missing}")
+    checkpoint_elems = np.ascontiguousarray(np.asarray(elems))
+    if checkpoint_elems.dtype.kind not in "iu":
+        raise ValueError("checkpoint element connectivity must have integer dtype")
     mesh = rebuild_tri_mesh(
-        nodes, elems, tip_centers=metadata["tip_reference_centers_m"]
+        nodes, checkpoint_elems, tip_centers=metadata["tip_reference_centers_m"]
     )
+    # ``rebuild_tri_mesh`` normalizes connectivity to the platform integer type.
+    # Restoration must retain the checkpoint representation too: forensic hashes
+    # and byte-level equivalence checks include the array dtype.
+    mesh.elems = checkpoint_elems
     expected_hbar = float(metadata["hbar_m"])
     expected_tip = float(metadata["hbar_tip_m"])
     if mesh.hbar != expected_hbar or mesh.hbar_tip != expected_tip:
