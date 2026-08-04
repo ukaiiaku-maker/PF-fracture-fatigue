@@ -286,8 +286,23 @@ def capture_stochastic_state(engine) -> dict[str, Any]:
         "avalanche_base_checkpoint_m": _finite(
             getattr(engine, "avalanche_base_checkpoint_m", 0.0)
         ),
-        "current_event_length_m": _finite(
-            getattr(engine, "current_event_length_m", 0.0)
+        "avalanche_event_advance_m": _finite(
+            getattr(engine, "avalanche_event_advance_m", 0.0)
+        ),
+        "avalanche_event_length_factor": _finite(
+            getattr(engine, "avalanche_event_length_factor", 0.0)
+        ),
+        "avalanche_last_completed_advance_m": _finite(
+            getattr(engine, "avalanche_last_completed_advance_m", 0.0)
+        ),
+        "avalanche_last_completed_factor": _finite(
+            getattr(engine, "avalanche_last_completed_factor", 0.0)
+        ),
+        "avalanche_event_length_history": tuple(
+            float(value) for value in getattr(engine, "avalanche_event_length_history", [])
+        ),
+        "avalanche_checkpoint_synchronized": bool(
+            getattr(engine, "avalanche_checkpoint_synchronized", False)
         ),
         "hazard_threshold_history": tuple(
             float(value) for value in getattr(engine, "hazard_threshold_history", [])

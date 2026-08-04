@@ -55,6 +55,8 @@ def fixture(event_count=0, cycles=12.5):
             "hazard_event_index": event_count,
             "hazard_threshold_history": list(range(event_count)),
             "avalanche_base_checkpoint_m": 5e-6,
+            "avalanche_event_length_factor": 1.0,
+            "avalanche_event_advance_m": 5e-6,
             "rng_state": {"state": 123},
         },
     }

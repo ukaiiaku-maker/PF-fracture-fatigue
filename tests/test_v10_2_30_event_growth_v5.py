@@ -13,6 +13,7 @@ from arrhenius_fracture import persistent_site_high_cycle_dmd_v10230_v4 as segme
 from arrhenius_fracture import persistent_site_high_cycle_engine_v10230 as high
 from arrhenius_fracture.persistent_site_high_cycle_checkpoint_v10230 import (
     restore_checkpoint,
+    write_checkpoint,
 )
 from arrhenius_fracture.stochastic_avalanche_tip import (
     StochasticAvalancheDiagnosticTipEngine,
@@ -170,6 +171,20 @@ def test_checkpoint_sync_event_guard_exact_fallback(monkeypatch, tmp_path):
         maximum_factor=4.0,
         deterministic_threshold=False,
     )
+
+    engine.avalanche_last_completed_advance_m = 9.0e-6
+    engine.avalanche_last_completed_factor = 1.8
+    engine.avalanche_event_length_history = [9.0e-6]
+    write_checkpoint(engine, reason="post_event_restart")
+    restored = DriverEngine()
+    sharp_front._finalize_driver_physical_checkpoint(restored, 5.0e-6)
+    restore_checkpoint(restored, tmp_path)
+    assert restored.hazard_threshold_action == threshold_before
+    assert restored.avalanche_event_length_factor == factor_before
+    assert restored.avalanche_event_advance_m == 5.0e-6 * factor_before
+    assert restored.avalanche_last_completed_advance_m == 9.0e-6
+    assert restored.avalanche_last_completed_factor == 1.8
+    assert restored.avalanche_event_length_history == [9.0e-6]
 
     base = high.integrate_state_coupled_waveform.__globals__["_bound_integrator"]
     globals_ = base.__globals__

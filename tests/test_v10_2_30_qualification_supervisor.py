@@ -36,6 +36,8 @@ def write_restartable(case: Path, step: int = 0):
                                 "hazard_event_index": 0,
                                 "hazard_threshold_history": [],
                                 "avalanche_base_checkpoint_m": 5e-6,
+                                "avalanche_event_length_factor": 1.0,
+                                "avalanche_event_advance_m": 5e-6,
                                 "rng_state": {"state": step}}},
         kinetic_vector=[step],
     )

@@ -301,6 +301,8 @@ def smoke_worker(case: Path) -> int:
                     "hazard_event_index": 0,
                     "hazard_threshold_history": [],
                     "avalanche_base_checkpoint_m": 5e-6,
+                    "avalanche_event_length_factor": 1.0,
+                    "avalanche_event_advance_m": 5e-6,
                     "rng_state": {"smoke": step},
                 },
             },

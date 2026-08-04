@@ -175,6 +175,12 @@ def validate_cross_layer(outer: dict, kinetic: dict) -> None:
     base = float(stochastic.get("avalanche_base_checkpoint_m", da))
     if base != da:
         raise RestartCheckpointError("avalanche checkpoint base differs from da_phys")
+    factor = float(stochastic.get("avalanche_event_length_factor", 0.0))
+    proposal = float(stochastic.get("avalanche_event_advance_m", 0.0))
+    if factor <= 0.0 or proposal <= 0.0 or not np.isclose(
+        proposal, base * factor, rtol=1e-14, atol=1e-18
+    ):
+        raise RestartCheckpointError("current event proposal differs from checkpoint base")
     action = float(stochastic.get("hazard_action_current", 0.0))
     threshold = float(stochastic.get("hazard_threshold_action", 0.0))
     B = float(stochastic.get("B", 0.0))

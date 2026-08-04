@@ -235,7 +235,12 @@ def restore_checkpoint_payload(engine, payload: dict[str, Any], vector) -> None:
         "hazard_event_index",
         "hazard_threshold_history",
         "avalanche_base_checkpoint_m",
-        "current_event_length_m",
+        "avalanche_event_advance_m",
+        "avalanche_event_length_factor",
+        "avalanche_last_completed_advance_m",
+        "avalanche_last_completed_factor",
+        "avalanche_event_length_history",
+        "avalanche_checkpoint_synchronized",
     ):
         if name in stochastic:
             setattr(engine, name, copy.deepcopy(stochastic[name]))
@@ -246,6 +251,27 @@ def restore_checkpoint_payload(engine, payload: dict[str, Any], vector) -> None:
     engine._v10230_high_cycle_cache = copy.deepcopy(
         payload.get("high_cycle_cache", {})
     )
+    if hasattr(engine, "avalanche_cfg"):
+        from .stochastic_avalanche_tip import threshold_event_length_factor
+
+        expected_factor = threshold_event_length_factor(
+            engine.hazard_threshold_action,
+            mode=engine.avalanche_cfg.mode,
+            minimum_factor=engine.avalanche_cfg.minimum_factor,
+            maximum_factor=engine.avalanche_cfg.maximum_factor,
+            deterministic_threshold=getattr(engine.hazard_cfg, "mode", "") == "deterministic",
+        )
+        if not math.isclose(
+            float(engine.avalanche_event_length_factor), expected_factor,
+            rel_tol=1.0e-14, abs_tol=1.0e-15,
+        ):
+            raise RuntimeError("restored event-length factor differs from restored threshold")
+        expected_advance = float(engine.avalanche_base_checkpoint_m) * expected_factor
+        if not math.isclose(
+            float(engine.avalanche_event_advance_m), expected_advance,
+            rel_tol=1.0e-14, abs_tol=1.0e-18,
+        ):
+            raise RuntimeError("restored event proposal differs from threshold and da_phys")
 
 
 __all__ = [
