@@ -31,7 +31,9 @@ def write_restartable(case: Path, step: int = 0):
                                 "last_plane": {"t": [1.0, 0.0], "n": [0.0, 1.0]},
                                 "win_plane": {"t": [1.0, 0.0], "n": [0.0, 1.0]}}],
                             "committed_event_count": 0, "kinetic_event_index": 0,
-                            "transaction_index": 0, "transaction_state": "committed"}},
+                            "transaction_index": 0, "transaction_state": "committed",
+                            "mesh_metadata": {"hbar_m": 1.0, "hbar_tip_m": 1.0,
+                                              "tip_reference_centers_m": [[0.001, 0.0]]}}},
         arrays={"state": [step]},
         kinetic={"geometry_signature": [0, 0, 0, 0],
                  "stochastic": {"B": 0.25, "hazard_threshold_action": 2.0,
@@ -61,13 +63,12 @@ def test_matrix_is_deterministic_and_uses_canonical_seed_namespaces():
 
 def test_stale_heartbeat_and_healthy_progress_protection(tmp_path):
     module = load_module(); case = tmp_path / "case"; case.mkdir()
-    checkpoint = case / "high_cycle_live_checkpoint.json"
-    module.atomic_json(checkpoint, {"schema": "x", "timestamp_unix_s": time.time()})
-    (case / "high_cycle_live_state.npz").touch()
+    checkpoint = case / "qualification_liveness.json"
+    module.atomic_json(checkpoint, {"latest_liveness_timestamp": time.time()})
     now = time.time()
     assert module.stale(case, now, 300.0) is False
     old = now - 301.0
-    checkpoint.touch(); import os; os.utime(checkpoint, (old, old))
+    module.atomic_json(checkpoint, {"latest_liveness_timestamp": old})
     assert module.stale(case, now, 300.0) is True
 
 
@@ -140,3 +141,38 @@ def test_stop_sends_sigterm_to_launcher(tmp_path, monkeypatch):
     monkeypatch.setattr(module.os, "kill", lambda pid, sig: calls.append((pid, sig)))
     assert module.stop_launcher(tmp_path) == 0
     assert calls == [(123, module.signal.SIGTERM)]
+
+
+def test_campaign_lock_rejects_live_owner_and_requires_explicit_stale_recovery(tmp_path, monkeypatch):
+    module = load_module()
+    monkeypatch.setattr(module, "process_identity", lambda pid: "same-start" if pid in {10, 20} else None)
+    monkeypatch.setattr(module.os, "getpid", lambda: 10)
+    first = module.acquire_lock(tmp_path, "head")
+    monkeypatch.setattr(module.os, "getpid", lambda: 20)
+    import pytest
+    with pytest.raises(RuntimeError, match="live"):
+        module.acquire_lock(tmp_path, "head")
+    module.release_lock(tmp_path, first["token"])
+    stale = {**first, "pid": 99, "process_start_identity": "gone"}
+    module.atomic_json(tmp_path / module.LOCK_NAME, stale)
+    with pytest.raises(RuntimeError, match="recover-stale-lock"):
+        module.acquire_lock(tmp_path, "head")
+    recovered = module.acquire_lock(tmp_path, "head", recover=True)
+    assert recovered["token"] != first["token"]
+    module.release_lock(tmp_path, recovered["token"])
+
+
+def test_partial_zero_exit_is_restartable_not_completed(tmp_path):
+    module = load_module(); case = tmp_path / "case"; case.mkdir()
+    write_restartable(case)
+    (case / "exit_code.txt").write_text("0\n")
+    (case / "developed_fatigue_growth_summary.json").write_text(json.dumps({
+        "status": "partial_growth", "target_reached": False,
+    }))
+    assert module.classify(case) == "restartable"
+
+
+def test_default_watchdog_exceeds_observed_long_diagnostic_phase(monkeypatch):
+    module = load_module(); monkeypatch.delenv("V10230_QUAL_NO_PROGRESS_SECONDS", raising=False)
+    args = module.parser().parse_args(["run", "/tmp/example", "--smoke-worker"])
+    assert args.no_progress_seconds == 900.0
