@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Build the v10.4.5 full-field bulk-plasticity orientation campaign.
+"""Build the v10.4.6 full-field bulk-plasticity orientation campaign.
 
 The v10.2.30 launcher remains the geometry, barrier, seed, loading-rate, and
 hazard-energy-gate source. This builder changes the public model entry and
 arranges for the generated scheduler to be patched by the dedicated v10.4.4
-scheduler transformer. v10.4.5 changes only the severe-substep campaign
+scheduler transformer. v10.4.6 changes only the severe-substep campaign
 terminal; the fracture and constitutive physics remain unchanged.
 """
 from __future__ import annotations
@@ -23,9 +23,9 @@ V1044_ENTRY = (
 )
 MODEL_ENTRY = (
     "arrhenius_fracture."
-    "sharp_front_v10_4_5_plasticity_plateau_audited"
+    "sharp_front_v10_4_6_plasticity_dominance_audited"
 )
-LOCK_SCHEMA = "v10.4.5_full_field_bulk_plasticity_orientation_rate_lock_v1"
+LOCK_SCHEMA = "v10.4.6_full_field_bulk_plasticity_orientation_rate_lock_v1"
 
 
 def _load_gate_builder():
@@ -62,7 +62,7 @@ def transform(source: str) -> str:
         text,
         '"schema": "v10.2.30_hazard_energy_gated_orientation_rate_lock_v1",',
         f'"schema": "{LOCK_SCHEMA}",',
-        label="v10.4.5 campaign-lock schema",
+        label="v10.4.6 campaign-lock schema",
     )
 
     lock_marker = (
@@ -76,12 +76,14 @@ def transform(source: str) -> str:
         '    "plasticity_terminal_allows_partial_fracture": True,\n'
         '    "plasticity_terminal_projected_hazard_role": "diagnostic_only",\n'
         '    "plasticity_terminal_severe_substep_energy_ratios_role": "diagnostic_only",\n'
+        '    "plasticity_terminal_severe_substep_positive_Wp_sufficient": False,\n'
+        '    "plasticity_terminal_severe_substep_cumulative_fraction_threshold": 0.90,\n'
     )
     text = _replace_exact(
         text,
         lock_marker,
         lock_replacement,
-        label="v10.4.5 outer campaign-lock fields",
+        label="v10.4.6 outer campaign-lock fields",
     )
 
     marker = "plotter = source_plotter.read_text()"
@@ -91,10 +93,10 @@ exec(
     compile(patcher_path.read_text(), str(patcher_path), "exec"),
     patcher_namespace,
 )
-# The outer v10.4.5 transform has already replaced the legacy model entry in
+# The outer v10.4.6 transform has already replaced the legacy model entry in
 # the scheduler-builder source. Normalize the generated scheduler back to the
 # v10.2.30 entry expected by the established scheduler patcher, apply that
-# patch, and then promote every case command to the v10.4.5 entry.
+# patch, and then promote every case command to the v10.4.6 entry.
 scheduler = scheduler.replace(
     "{MODEL_ENTRY}",
     "{OLD_ENTRY}",
@@ -105,14 +107,14 @@ scheduler = scheduler.replace(
     "{MODEL_ENTRY}",
 )
 if scheduler.count("{MODEL_ENTRY}") < 4:
-    raise RuntimeError("v10.4.5 generated scheduler model-entry contract is incomplete")
+    raise RuntimeError("v10.4.6 generated scheduler model-entry contract is incomplete")
 
 '''
     text = _replace_exact(
         text,
         marker,
         patch_scheduler + marker,
-        label="v10.4.5 generated-scheduler patch hook",
+        label="v10.4.6 generated-scheduler patch hook",
     )
     return text
 
