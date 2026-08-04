@@ -2470,6 +2470,10 @@ def run_2d(args):
                             for point in fronts[0].get('path', [])]]
             if getattr(engine_for_checkpoint, '_energy_gate_pending', None) is not None:
                 raise RuntimeError('refusing to checkpoint an uncommitted energy-gate transaction')
+            from . import stochastic_avalanche_tip as _restart_avalanche_tip
+            if _restart_avalanche_tip._PENDING_GEOMETRY_EVENTS:
+                raise RuntimeError('refusing to checkpoint a pending geometry descriptor')
+            from .hazard_energy_event_gate_v10230 import OBSERVER as _energy_observer
             event_count = max(len(front_paths[0]) - 1, 0)
             backend_attempts = copy.deepcopy(getattr(crack_backend, 'advance_log', []))
             base_backend_log = copy.deepcopy(
@@ -2512,6 +2516,11 @@ def run_2d(args):
                     'branch_rows': [list(row) for row in branch_rows],
                     'fronts_rows': [list(row) for row in fronts_rows],
                     'hist': {key: list(value) for key, value in hist.items()},
+                    'kinetic_audit_records': copy.deepcopy(
+                        getattr(type(engine_for_checkpoint), '_audit_records', [])),
+                    'energy_gate_event_records': copy.deepcopy(_energy_observer.event_records),
+                    'energy_gate_mechanics_serial': int(_energy_observer.mechanics_serial),
+                    'energy_gate_direction_serial': int(_energy_observer.direction_serial),
                 },
             }
             arrays = {
@@ -2586,6 +2595,11 @@ def run_2d(args):
             branch_rows = [tuple(row) for row in history['branch_rows']]
             fronts_rows = [tuple(row) for row in history['fronts_rows']]
             hist = {key: list(value) for key, value in history['hist'].items()}
+            type(eng)._audit_records = copy.deepcopy(history['kinetic_audit_records'])
+            from .hazard_energy_event_gate_v10230 import OBSERVER as _energy_observer
+            _energy_observer.event_records = copy.deepcopy(history['energy_gate_event_records'])
+            _energy_observer.mechanics_serial = int(history['energy_gate_mechanics_serial'])
+            _energy_observer.direction_serial = int(history['energy_gate_direction_serial'])
             print(f"  RESTART restored combined generation at step={step}, cycles={fatigue_cycles_total_accepted:.17g}, events={len(crack_backend.advance_log)}")
 
         def _commit_outer_checkpoint(reason):
@@ -3483,6 +3497,13 @@ def run_2d(args):
             _commit_outer_checkpoint(
                 'outer_driver_geometry_committed' if any_fired
                 else 'outer_driver_step_committed')
+            stop_after_events = int(
+                os.environ.get('V10230_STOP_AFTER_COMMITTED_EVENTS', '0') or 0)
+            committed_events_now = max(len(fronts[0].get('path', [])) - 1, 0)
+            if stop_after_events > 0 and committed_events_now >= stop_after_events:
+                print(f"  [T={T:.0f}K] graceful interruption after "
+                      f"{committed_events_now} committed geometry events")
+                break
 
         tag = f"{int(T):04d}K"
         if crack_backend.name != 'sharp_wake':

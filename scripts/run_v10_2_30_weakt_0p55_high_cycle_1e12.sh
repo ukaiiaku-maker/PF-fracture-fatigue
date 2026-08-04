@@ -43,11 +43,22 @@ OUTROOT=${OUTROOT:-$ROOT/runs/v10_2_30_weakt_0p55_high_cycle_1e12_$(date +%Y%m%d
   echo "ERROR: missing FAMILY_JSON=$FAMILY_JSON" >&2
   exit 2
 }
-if [[ -e "$OUTROOT" ]]; then
-  echo "ERROR: output already exists: $OUTROOT" >&2
-  exit 2
+if [[ -n "${V10230_RESTART_CHECKPOINT_DIR:-}" ]]; then
+  [[ -d "$OUTROOT" ]] || {
+    echo "ERROR: restart output does not exist: $OUTROOT" >&2
+    exit 2
+  }
+  [[ "$V10230_RESTART_CHECKPOINT_DIR" == "$OUTROOT" ]] || {
+    echo "ERROR: restart checkpoint must equal OUTROOT" >&2
+    exit 2
+  }
+else
+  if [[ -e "$OUTROOT" ]]; then
+    echo "ERROR: output already exists: $OUTROOT" >&2
+    exit 2
+  fi
+  mkdir -p "$OUTROOT"
 fi
-mkdir -p "$OUTROOT"
 
 unset V10230_ACTIVE_STATE_BLOCK_CONTROL || true
 unset V10230_FEEDBACK_STATE_BLOCK_CONTROL || true
