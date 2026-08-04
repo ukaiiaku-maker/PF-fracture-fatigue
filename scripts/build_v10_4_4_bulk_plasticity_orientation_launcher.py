@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Build the v10.4.8 full-field bulk-plasticity orientation campaign.
+"""Build the v10.4.9 full-field bulk-plasticity orientation campaign.
 
 The v10.2.30 launcher remains the geometry, barrier, seed, loading-rate, and
-hazard-energy-gate source. This builder changes the public model entry and
-arranges for the generated scheduler to be patched by the dedicated v10.4.8
-scheduler transformer. v10.4.8 changes only campaign terminal/failure
-arbitration and fail-closed exit bookkeeping; the fracture and constitutive
-physics remain unchanged.
+hazard-energy-gate source. This builder keeps the qualified v10.4.8 numerical
+failure model entry and fixes the generated-scheduler patcher execution
+contract by supplying an explicit ``__file__`` and ``__name__`` namespace.
+The fracture and constitutive physics remain unchanged.
 """
 from __future__ import annotations
 
@@ -26,7 +25,8 @@ MODEL_ENTRY = (
     "arrhenius_fracture."
     "sharp_front_v10_4_8_numerical_failure_audited"
 )
-LOCK_SCHEMA = "v10.4.8_full_field_bulk_plasticity_orientation_rate_lock_v1"
+LOCK_SCHEMA = "v10.4.9_full_field_bulk_plasticity_orientation_rate_lock_v1"
+LAUNCHER_REVISION = "v10.4.9_exec_namespace_contract"
 
 
 def _load_gate_builder():
@@ -63,7 +63,7 @@ def transform(source: str) -> str:
         text,
         '"schema": "v10.2.30_hazard_energy_gated_orientation_rate_lock_v1",',
         f'"schema": "{LOCK_SCHEMA}",',
-        label="v10.4.8 campaign-lock schema",
+        label="v10.4.9 campaign-lock schema",
     )
 
     lock_marker = (
@@ -72,6 +72,7 @@ def transform(source: str) -> str:
         '    "hazard_energy_gate": True,\n'
     )
     lock_replacement = lock_marker + (
+        f'    "launcher_revision": "{LAUNCHER_REVISION}",\n'
         '    "bulk_plasticity_mode": "full_field",\n'
         '    "plasticity_dominated_campaign_terminal": True,\n'
         '    "plasticity_terminal_allows_partial_fracture": True,\n'
@@ -86,26 +87,30 @@ def transform(source: str) -> str:
         '    "numerical_fixed_point_failure_is_successful_terminal": False,\n'
         '    "numerical_fixed_point_failure_exit_code": 5,\n'
         '    "nonzero_solver_exit_bookkeeping_fail_closed": True,\n'
+        '    "generated_patcher_file_context_supplied": True,\n'
     )
     text = _replace_exact(
         text,
         lock_marker,
         lock_replacement,
-        label="v10.4.8 outer campaign-lock fields",
+        label="v10.4.9 outer campaign-lock fields",
     )
 
     marker = "plotter = source_plotter.read_text()"
     patch_scheduler = f'''patcher_path = source_scheduler.parent / "patch_v10_4_8_generated_scheduler.py"
-patcher_namespace = {{}}
+patcher_namespace = {{
+    "__file__": str(patcher_path),
+    "__name__": "v10_4_8_generated_scheduler_patcher",
+}}
 exec(
     compile(patcher_path.read_text(), str(patcher_path), "exec"),
     patcher_namespace,
 )
-# The outer v10.4.8 transform has already replaced the legacy model entry in
+# The outer v10.4.9 transform has already replaced the legacy model entry in
 # the scheduler-builder source. Normalize the generated scheduler back to the
 # v10.2.30 entry expected by the established scheduler patcher, apply the
 # v10.4.8 fail-closed scheduler patch, and then promote every case command to
-# the v10.4.8 entry.
+# the qualified v10.4.8 model entry.
 scheduler = scheduler.replace(
     "{MODEL_ENTRY}",
     "{OLD_ENTRY}",
@@ -116,14 +121,14 @@ scheduler = scheduler.replace(
     "{MODEL_ENTRY}",
 )
 if scheduler.count("{MODEL_ENTRY}") < 4:
-    raise RuntimeError("v10.4.8 generated scheduler model-entry contract is incomplete")
+    raise RuntimeError("v10.4.9 generated scheduler model-entry contract is incomplete")
 
 '''
     text = _replace_exact(
         text,
         marker,
         patch_scheduler + marker,
-        label="v10.4.8 generated-scheduler patch hook",
+        label="v10.4.9 generated-scheduler patch hook",
     )
     return text
 
