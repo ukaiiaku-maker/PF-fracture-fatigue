@@ -12,3 +12,13 @@
 - Qualification commands: run `FAMILY_JSON=/absolute/family.json bash scripts/run_v10_2_30_four_class_qualification_supervisor.sh`; monitor `bash scripts/monitor_v10_2_30_four_class_qualification.sh`; stop `bash scripts/stop_v10_2_30_four_class_qualification.sh`
 - Blocker: production post-event restart remains fail-closed because the 2-D driver does not yet restore matching outer crack geometry; smoke workers prove supervisor resume selection but full qualification must not claim checkpoint resume support yet
 - Next action: commit wrapper milestone; do not launch the full 12-case qualification until outer-geometry checkpoint restore is implemented and validated
+
+## 2026-08-04 restart-production equivalence
+
+- Branch / simulation HEAD: `codex/v10.2.30-fatigue-da-dN` / `24b63a5bfd86a8ea249d457750b14b8c19488973`.
+- First event-2 divergence: checkpoint restore recomputed `mesh.hbar_tip` around the moved crack tip (`3.0827858824767497e-6 m`) instead of retaining the initial refinement anchor (`1.384579911336366e-6 m`); classification A, selector input differed before scoring.
+- Repair: combined checkpoint schema v2 stores authoritative `hbar`, `hbar_tip`, and tip-reference centers; restore validates their exact reconstruction and preserves connectivity dtype. Direction selection consumes no RNG and its fixed alpha-grid ordering is deterministic.
+- Focused replay: `runs/v10_2_30_event2_replay_{control,restored}_24b63a5`; event-2 proposal `2.2973400956248734 um`; forensic comparator exit 0 with identical inputs, candidates, scores, winner, direction, endpoint, and commit.
+- Long qualification: `runs/v10_2_30_restart_equivalence_24b63a5`; uninterrupted control and supervisor-resumed trajectory both reached 5 events, `658699.784846286` cycles, and `26.37911007410791 um` projected extension.
+- Production verifier: exit 0; event-2, terminal outer state, terminal kinetic state, and every checkpoint array identical. NaN pairs and explicitly nonphysical wall-time/cache-residual telemetry are canonicalized; physical fields remain fail-closed.
+- Focused gate: 33 tests passed. The 12-case qualification was not launched.

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,15 @@ from arrhenius_fracture.run_state_checkpoint_v10230 import (
 
 
 SCHEMA = "v10.2.30_restart_production_complete_verification_v1"
+
+# These fields measure execution cost or cache-admission convergence, not the
+# accepted physical trajectory.  The accepted mode sequence and all committed
+# kinetic/outer state remain compared elsewhere without exclusions.
+DIAGNOSTIC_LEAF_FIELDS = {
+    "coupled_hazard_wall_seconds",
+    "current_map_residual",
+    "fixed_point_residual",
+}
 EXPECTED_EVENT2_UM = 2.2973400956248734
 
 
@@ -24,6 +34,11 @@ def load_json(path: Path) -> Any:
 
 
 def compare_json(left: Any, right: Any, path: str = "") -> list[dict[str, Any]]:
+    if path.rsplit(".", 1)[-1] in DIAGNOSTIC_LEAF_FIELDS:
+        return []
+    if (isinstance(left, float) and isinstance(right, float)
+            and math.isnan(left) and math.isnan(right)):
+        return []
     if type(left) is not type(right):
         return [{"path": path, "control": left, "restarted": right}]
     if isinstance(left, dict):
