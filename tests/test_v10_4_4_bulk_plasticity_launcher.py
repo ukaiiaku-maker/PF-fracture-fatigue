@@ -32,7 +32,11 @@ def test_builder_preserves_campaign_source_and_installs_scheduler_patch_hook():
     assert '"numerical_stagnation_fail_fast": True' in generated
     assert '"numerical_stagnation_is_successful_terminal": False' in generated
     assert '"numerical_stagnation_exit_code": 4' in generated
-    assert "patch_v10_4_4_generated_scheduler.py" in generated
+    assert '"numerical_fixed_point_failure_fail_fast": True' in generated
+    assert '"numerical_fixed_point_failure_is_successful_terminal": False' in generated
+    assert '"numerical_fixed_point_failure_exit_code": 5' in generated
+    assert '"nonzero_solver_exit_bookkeeping_fail_closed": True' in generated
+    assert "patch_v10_4_8_generated_scheduler.py" in generated
 
     normalization = f'''scheduler = scheduler.replace(
     "{builder.MODEL_ENTRY}",
@@ -49,7 +53,7 @@ def test_builder_preserves_campaign_source_and_installs_scheduler_patch_hook():
     assert promotion in generated
     assert generated.index(normalization) < generated.index(patch_call)
     assert generated.index(patch_call) < generated.index(promotion)
-    assert "v10.4.7 generated scheduler model-entry contract is incomplete" in generated
+    assert "v10.4.8 generated scheduler model-entry contract is incomplete" in generated
 
     assert "v913_paper_peak01_0242980_persistent_sites" in generated
     assert "v913_paper_dbtt01_0202500_persistent_sites" in generated
