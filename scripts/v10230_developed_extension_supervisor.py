@@ -24,10 +24,11 @@ from arrhenius_fracture.run_state_checkpoint_v10230 import (
 TARGET_EXTENSION_UM = 100.0
 CYCLES_MAX = 1.0e12
 SOURCE_MANIFEST = "extension_source_manifest.json"
+QUALIFICATION_MATRIX = qualification.matrix
 
 
 def matrix() -> list[dict]:
-    return [row for row in qualification.matrix() if row["fraction"] == 0.95]
+    return [row for row in QUALIFICATION_MATRIX() if row["fraction"] == 0.95]
 
 
 def inspect_source(source_root: Path, row: dict) -> dict:

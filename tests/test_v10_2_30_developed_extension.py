@@ -37,3 +37,17 @@ def test_developed_analyzer_retains_complete_interval_physics(tmp_path):
     assert all(case["full_trajectory_da_dN_m_per_cycle"] > 0 for case in payload["cases"])
     assert (tmp_path / "complete_event_intervals.csv").is_file()
     assert (tmp_path / "restart_checkpoint_provenance.json").is_file()
+
+
+def test_run_adapter_rebinds_supervisor_matrix_without_recursion(tmp_path, monkeypatch):
+    module = load("extension_run", ROOT / "scripts/v10230_developed_extension_supervisor.py")
+    monkeypatch.setattr(module, "validate_staged", lambda _root: {})
+    observed = {}
+    def fake_run(_args):
+        observed["rows"] = module.qualification.matrix()
+        return 0
+    monkeypatch.setattr(module.qualification, "run", fake_run)
+    args = type("Args", (), {"minimum_free_gib": 10.0, "no_progress_seconds": 900.0,
+                              "recover_stale_lock": False})()
+    assert module.run(tmp_path, args) == 0
+    assert len(observed["rows"]) == 4
