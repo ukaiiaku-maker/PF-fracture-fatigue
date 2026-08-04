@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arrhenius-sharp-front-mpz"
-version = "10.4.8"
-description = "Full-field bulk plasticity with physical terminals and fail-closed numerical-failure auditing"
+version = "10.4.9"
+description = "Full-field bulk plasticity with fail-closed numerical auditing and corrected generated-scheduler loading"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
