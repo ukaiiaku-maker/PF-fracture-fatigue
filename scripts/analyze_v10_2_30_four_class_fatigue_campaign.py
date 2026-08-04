@@ -60,6 +60,37 @@ def summarize_run(root: Path) -> dict:
     }
 
 
+def event_intervals(root: Path) -> list[dict]:
+    summary = _load(root / "developed_fatigue_growth_summary.json", {})
+    geometry = _load(root / "stochastic_avalanche_geometry_events.json", [])
+    by_index = {int(row.get("event_index", -1)) + 1: row for row in geometry}
+    provenance = summary.get("provenance", {})
+    rows = []
+    for event in summary.get("event_measurements", []):
+        index = int(event["event_index"]); geom = by_index.get(index, {})
+        audit = geom.get("direction_audit", {})
+        rows.append({
+            "run_path": str(root.resolve()), "parameter_option": event.get("parameter_option"),
+            "deltaK_MPa_sqrt_m": event.get("deltaK_MPa_sqrt_m"), "hazard_seed": event.get("hazard_seed"),
+            "event_index": index, "interval_start_cycles": event.get("cycles_pre"),
+            "interval_end_cycles": event.get("cycles_post"), "delta_N": event.get("cycles_between_events"),
+            "interval_start_extension_m": event.get("projected_extension_pre_m"),
+            "interval_end_extension_m": event.get("projected_extension_post_m"),
+            "committed_delta_a_m": event.get("projected_advance_m"), "da_dN_m_per_cycle": event.get("da_dN_m_per_cycle"),
+            "threshold_action": event.get("threshold_action"), "physical_hazard_action": event.get("physical_hazard_action"),
+            "event_proposal_m": event.get("stochastic_proposed_advance_m"),
+            "selected_direction_x": (audit.get("direction") or [None, None])[0],
+            "selected_direction_y": (audit.get("direction") or [None, None])[1],
+            "endpoint_x_m": geom.get("x1"), "endpoint_y_m": geom.get("y1"),
+            "energy_gate_result": event.get("energy_gate_outcome"),
+            "geometry_commit_result": event.get("geometry_commit_inserted"),
+            "restart_status": "restored_trajectory" if provenance.get("environment", {}).get("V10230_RESTART_CHECKPOINT_DIR") else "continuous",
+            "acceleration_mode": event.get("acceleration_modes"),
+            "private_trials_counted_as_cycles": event.get("private_trials_counted_as_cycles"),
+        })
+    return rows
+
+
 def _write_csv(path: Path, rows: list[dict]) -> None:
     fields = sorted({key for row in rows for key in row})
     with path.open("w", newline="") as stream:
@@ -123,6 +154,11 @@ def main(argv=None) -> int:
     rows = [summarize_run(root.resolve()) for root in args.run_roots]
     rows.sort(key=lambda row: (str(row.get("parameter_option")), float(row.get("deltaK_MPa_sqrt_m") or math.inf), int(row.get("hazard_seed") or 0)))
     _write_csv(out / "four_class_fatigue_cases.csv", rows)
+    intervals = [row for root in args.run_roots for row in event_intervals(root.resolve())]
+    _write_csv(out / "four_class_event_intervals.csv", intervals)
+    per_case = out / "per_case_event_intervals"; per_case.mkdir(exist_ok=True)
+    for root in args.run_roots:
+        _write_csv(per_case / f"{root.resolve().parent.name}_event_intervals.csv", event_intervals(root.resolve()))
     exceptions = [row for row in rows if row["status"] in {"failed", "censored", "incomplete"}]
     _write_csv(out / "four_class_fatigue_censor_failure_table.csv", exceptions)
     plots = _plot(rows, out)
@@ -133,6 +169,8 @@ def main(argv=None) -> int:
         "censored_count": sum(row["status"] == "censored" for row in rows),
         "failed_count": sum(row["status"] == "failed" for row in rows),
         "cases": rows,
+        "event_interval_count": len(intervals),
+        "event_interval_csv": "four_class_event_intervals.csv",
         "plots": plots,
         "empirical_Paris_law_fit": False,
     }

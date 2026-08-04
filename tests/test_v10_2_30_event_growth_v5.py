@@ -431,6 +431,18 @@ def test_four_class_campaign_analyzer_keeps_censors_and_provenance(tmp_path):
                     "final_projected_extension_um": 25.0 if rate else 0.0,
                     "target_reached": bool(rate),
                     "developed_interval": {"event_count": 2 if rate else 0, "da_dN": rate},
+                    "event_measurements": ([{
+                        "event_index": 1, "parameter_option": option,
+                        "deltaK_MPa_sqrt_m": 10.0 + index, "hazard_seed": 1720,
+                        "cycles_pre": 0.0, "cycles_post": 10.0, "cycles_between_events": 10.0,
+                        "projected_extension_pre_m": 0.0, "projected_extension_post_m": 5e-6,
+                        "projected_advance_m": 5e-6, "da_dN_m_per_cycle": rate,
+                        "threshold_action": 0.5, "physical_hazard_action": 0.5,
+                        "stochastic_proposed_advance_m": 5e-6,
+                        "energy_gate_outcome": "stochastic_proposal_reached",
+                        "geometry_commit_inserted": True, "acceleration_modes": "exact_cycle_burst",
+                        "private_trials_counted_as_cycles": False,
+                    }] if rate else []),
                     "provenance": {
                         "parameter_option": option,
                         "deltaK_MPa_sqrt_m": 10.0 + index,
@@ -444,6 +456,11 @@ def test_four_class_campaign_analyzer_keeps_censors_and_provenance(tmp_path):
             json.dumps({"censor_status": "right_censored_no_event" if not rate else "propagated"})
         )
         (root / "exit_code.txt").write_text("0\n")
+        if rate:
+            (root / "stochastic_avalanche_geometry_events.json").write_text(json.dumps([{
+                "event_index": 0, "x1": 0.001005, "y1": 0.0,
+                "direction_audit": {"direction": [1.0, 0.0]},
+            }]))
 
     out = tmp_path / "analysis"
     analyzer = _load_campaign_analyzer()
@@ -456,4 +473,6 @@ def test_four_class_campaign_analyzer_keeps_censors_and_provenance(tmp_path):
     assert payload["cases"][0]["git_head"] == "deadbeef"
     assert (out / "four_class_fatigue_cases.csv").is_file()
     assert (out / "four_class_fatigue_censor_failure_table.csv").is_file()
+    assert payload["event_interval_count"] == 1
+    assert (out / "four_class_event_intervals.csv").is_file()
     assert (out / "four_class_da_dN_vs_deltaK.png").is_file()
