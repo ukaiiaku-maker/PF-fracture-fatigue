@@ -1,0 +1,108 @@
+from __future__ import annotations
+
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "scripts" / "v10230_qualification_supervisor.py"
+
+
+def load_module():
+    spec = importlib.util.spec_from_file_location("supervisor", SCRIPT)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_matrix_is_deterministic_and_uses_canonical_seed_namespaces():
+    module = load_module(); rows = module.matrix()
+    assert len(rows) == 12
+    assert [row["fraction"] for row in rows[:3]] == [0.55, 0.75, 0.95]
+    assert {row["parameter_option"] for row in rows} == {
+        "v913_paper_peak01_0242980_persistent_sites",
+        "v913_paper_dbtt01_0202500_persistent_sites",
+        "v913_paper_weakT01_0129902_persistent_sites",
+        "v913_paper_ceramic01_0077080_persistent_sites",
+    }
+    assert {row["seed"] for row in rows if row["label"] == "weakT"} == {2001726}
+
+
+def test_stale_heartbeat_and_healthy_progress_protection(tmp_path):
+    module = load_module(); case = tmp_path / "case"; case.mkdir()
+    checkpoint = case / "high_cycle_live_checkpoint.json"
+    module.atomic_json(checkpoint, {"schema": "x", "timestamp_unix_s": time.time()})
+    (case / "high_cycle_live_state.npz").touch()
+    now = time.time()
+    assert module.stale(case, now, 300.0) is False
+    old = now - 301.0
+    checkpoint.touch(); import os; os.utime(checkpoint, (old, old))
+    assert module.stale(case, now, 300.0) is True
+
+
+def test_finished_skip_and_incomplete_restart_selection(tmp_path):
+    module = load_module(); complete = tmp_path / "complete"; complete.mkdir()
+    module.set_status(complete, "completed")
+    assert module.classify(complete) == "completed"
+    incomplete = tmp_path / "incomplete"; incomplete.mkdir()
+    module.atomic_json(incomplete / "high_cycle_live_checkpoint.json", {"schema": "x", "timestamp_unix_s": 1})
+    (incomplete / "high_cycle_live_state.npz").touch()
+    assert module.classify(incomplete) == "restartable"
+
+
+def test_disk_space_block_and_maximum_two_job_cap(tmp_path, monkeypatch):
+    module = load_module()
+    args = module.parser().parse_args([
+        "run", str(tmp_path), "--smoke-worker", "--max-jobs", "99",
+        "--poll-seconds", "0.01", "--minimum-free-gib", "1",
+    ])
+    assert module.run(args) == 0
+    summary = json.loads((tmp_path / "qualification_supervisor_summary.json").read_text())
+    assert summary["maximum_jobs_configured"] == 2
+    assert summary["maximum_active_observed"] == 2
+    monkeypatch.setattr(module, "free_gib", lambda _path: 4.0)
+    assert module.free_gib(tmp_path) < 10.0
+
+
+def test_status_transitions_preserve_completed_outputs(tmp_path):
+    module = load_module(); case = tmp_path / "case"; case.mkdir()
+    result = case / "result.txt"; result.write_text("keep")
+    module.set_status(case, "pending")
+    module.set_status(case, "running", pid=12)
+    module.set_status(case, "completed")
+    assert json.loads((case / "qualification_status.json").read_text())["status"] == "completed"
+    assert result.read_text() == "keep"
+
+
+def test_shell_entry_points_parse():
+    for name in (
+        "run_v10_2_30_four_class_qualification_supervisor.sh",
+        "monitor_v10_2_30_four_class_qualification.sh",
+        "stop_v10_2_30_four_class_qualification.sh",
+    ):
+        result = subprocess.run(["bash", "-n", str(ROOT / "scripts" / name)], capture_output=True)
+        assert result.returncode == 0, result.stderr.decode()
+
+
+def test_smoke_worker_resumes_from_checkpoint(tmp_path, monkeypatch):
+    module = load_module(); case = tmp_path / "case"; case.mkdir()
+    monkeypatch.setenv("SMOKE_INTERRUPT", "1")
+    assert module.smoke_worker(case) == 75
+    assert json.loads((case / "smoke_checkpoint.json").read_text())["step"] == 2
+    monkeypatch.delenv("SMOKE_INTERRUPT")
+    assert module.smoke_worker(case) == 0
+    assert json.loads((case / "smoke_checkpoint.json").read_text())["step"] == 4
+    assert (case / "exit_code.txt").read_text().strip() == "0"
+
+
+def test_stop_sends_sigterm_to_launcher(tmp_path, monkeypatch):
+    module = load_module(); module.atomic_json(tmp_path / "launcher.json", {"pid": 123})
+    calls = []
+    monkeypatch.setattr(module.os, "kill", lambda pid, sig: calls.append((pid, sig)))
+    assert module.stop_launcher(tmp_path) == 0
+    assert calls == [(123, module.signal.SIGTERM)]
