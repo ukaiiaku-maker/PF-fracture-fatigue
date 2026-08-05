@@ -23,3 +23,12 @@ def test_after_growth_horizon_is_terminal_censor_not_restart(tmp_path):
     import json
     (out/"developed_fatigue_growth_summary.json").write_text(json.dumps({"target_reached":False,"cycles_consumed":1e14,"event_count":3}))
     assert dense.classify(case)=="censored"
+
+def test_run_rebinds_generic_full_precision_matrix_guard(tmp_path,monkeypatch):
+    monkeypatch.setattr(dense,"validate_staged",lambda _root:{})
+    observed={}
+    def fake_run(_args):
+        rows=dense.q.matrix(); observed['guarded']=all(dense.q.EXPECTED_MATRIX[(r['label'],r['fraction'])]==r['deltaK_MPa_sqrt_m'] for r in rows); return 0
+    monkeypatch.setattr(dense.q,"run",fake_run)
+    args=type('Args',(),{'minimum_free_gib':10,'no_progress_seconds':900,'recover_stale_lock':False})()
+    assert dense.run(tmp_path,args)==0 and observed['guarded']

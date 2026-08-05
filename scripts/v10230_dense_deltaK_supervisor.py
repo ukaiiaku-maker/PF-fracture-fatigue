@@ -128,6 +128,7 @@ def classify(case: Path, row: dict | None = None) -> str:
 
 def run(root:Path,args)->int:
     validate_staged(root); q.matrix=matrix; q.classify=classify
+    q.EXPECTED_MATRIX={(row["label"],row["fraction"]):row["deltaK_MPa_sqrt_m"] for row in matrix()}
     qargs=q.parser().parse_args(["run",str(root),"--max-jobs","2","--target-extension-um","100","--cycles-max","1e14",
         "--minimum-free-gib",str(args.minimum_free_gib),"--no-progress-seconds",str(args.no_progress_seconds),
         *( ["--recover-stale-lock"] if args.recover_stale_lock else [] )])
