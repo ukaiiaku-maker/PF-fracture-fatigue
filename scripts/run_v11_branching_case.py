@@ -35,7 +35,7 @@ def main(argv=None) -> int:
     )
     command = [sys.executable, "-m", module]
     if args.mode == "mechanistic":
-        command += ["--mechanistic-branching", "--maximum-fronts", "2"]
+        command += ["--mechanistic-branching", "--maximum-fronts", "16"]
     else:
         command += ["--max-fronts", "1"]
     command += [

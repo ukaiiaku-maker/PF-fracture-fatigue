@@ -25,12 +25,13 @@ class AuditedBranchingPolicy:
     loading: str = "monotonic"
     plasticity: str = "tip_only"
     crack_backend: str = "sharp_wake"
-    maximum_fronts: int = 2
+    maximum_fronts: int = 16
+    maximum_branch_births: int = 8
     directional_J: str = "positive_signed_raw"
     branch_process_zone_mode: str = "shared_unresolved_cluster"
     prebranch_mechanics_provider: str = PREBRANCH_PROVIDER_ID
     branch_mechanics_provider: str = PROVIDER_ID
-    independent_tip_handoff: str = "checkpoint_and_stop"
+    independent_tip_handoff: str = "junction_reservoir_and_independent_tip_continuation"
     topology_interpolation: str = "disabled"
 
 
@@ -81,9 +82,9 @@ def validate_audited_arguments(argv: Sequence[str]) -> None:
         actual = _value(tokens, name, expected)
         if actual != expected:
             raise SystemExit(f"ERROR: audited v11 forces {name}={expected}, got {actual}")
-    maximum = int(_value(tokens, "--maximum-fronts", "2"))
-    if maximum != 2:
-        raise SystemExit("ERROR: audited v11 forces --maximum-fronts=2")
+    maximum = int(_value(tokens, "--maximum-fronts", "16"))
+    if maximum != 16:
+        raise SystemExit("ERROR: audited v11 forces --maximum-fronts=16")
 
 
 def audit_payload(

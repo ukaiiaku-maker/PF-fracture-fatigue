@@ -15,6 +15,8 @@ def write_topology_snapshot(
     root: str | Path, state, *, step: int, reason: str,
     physical_extension_m: float, branch_birth_count: int,
     latest_action: str | None, mechanics: Mapping[str, Any] | None = None,
+    growth_metrics: Mapping[str, float] | None = None,
+    coalescence_count: int = 0, maximum_branch_births: int = 8,
     final: bool = False,
 ) -> tuple[Path, Path]:
     out = Path(root); directory = out / "snapshots"; directory.mkdir(parents=True, exist_ok=True)
@@ -60,9 +62,13 @@ def write_topology_snapshot(
             plot_axis.scatter([p[0] * 1e6 for p in active_tips], [p[1] * 1e6 for p in active_tips],
                               marker="*", s=90, color="gold", edgecolor="black", label="active tip")
     info = dict(mechanics or {})
+    metrics = dict(growth_metrics or {})
     annotation = (
-        f"reason: {reason}\nextension: {physical_extension_m * 1e6:.3f} µm\n"
-        f"branch births: {branch_birth_count}\nactive tips: {len(active_tips)}\n"
+        f"reason: {reason}\nroot-to-tip: {physical_extension_m * 1e6:.3f} µm\n"
+        f"network length: {metrics.get('network_total_new_crack_length_um', physical_extension_m * 1e6):.3f} µm\n"
+        f"forward projection: {metrics.get('max_forward_projected_extension_um', 0.0):.3f} µm\n"
+        f"branch births: {branch_birth_count}/{maximum_branch_births}\nactive tips: {len(active_tips)}\n"
+        f"coalescences: {coalescence_count}\n"
         f"latest action: {latest_action or 'none'}\n"
         f"J/K: {info.get('J_K_summary', 'recorded in action diagnostics')}\n"
         f"release/cost/margin: {info.get('energy_summary', 'no topology action')}"
@@ -94,6 +100,8 @@ def write_topology_snapshot(
         "schema": "v11.production-topology-snapshot/1", "image": str(image.relative_to(out)),
         "step": int(step), "reason": reason, "physical_extension_m": float(physical_extension_m),
         "branch_birth_count": int(branch_birth_count), "active_tip_ids": list(state.crack_network.active_tip_ids),
+        "maximum_branch_births": int(maximum_branch_births), "coalescence_count": int(coalescence_count),
+        "growth_metrics": metrics,
         "branch_count": len(state.crack_network.branches), "latest_action": latest_action,
         "mechanics": info,
     }

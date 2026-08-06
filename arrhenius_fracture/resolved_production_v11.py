@@ -21,6 +21,7 @@ from .directional_competition_v11 import (
 from .hazard_energy_event_gate_v10230 import hazard_resistance_J_per_m2
 from .live_topology_kernel_v11 import PROVIDER_ID
 from .multi_tip_step_loop_v11 import advance_multi_tip_step
+from .network_metrics_v11 import crack_growth_metrics
 from .production_step_loop_v11 import AcceptedStepContext, DirectionalStepRefinementRequired
 from .resolved_tip_state_v11 import resolve_unresolved_cluster
 from .topology_transaction_v11 import (
@@ -90,12 +91,14 @@ def continue_resolved_production(
     coalescence_count = int(state.event_counters.get("coalescence_count", 0))
     termination = None
     checkpoint = None
-    last_snapshot_extension = state.crack_network.total_physical_crack_length_m - cfg.geometry.a0
+    growth = crack_growth_metrics(state.crack_network, initial_crack_length_m=cfg.geometry.a0)
+    last_snapshot_extension = growth.max_root_to_tip_path_extension_m
     if resume_bundle is None:
         write_topology_snapshot(
             out, state, step=start_step - 1, reason="cluster_resolved",
             physical_extension_m=last_snapshot_extension,
             branch_birth_count=branch_birth_count, latest_action=None,
+            growth_metrics=growth.to_dict_um(), coalescence_count=coalescence_count,
         )
 
     for step in range(start_step, int(args.steps) + 1):
@@ -401,25 +404,31 @@ def continue_resolved_production(
         for branch in state.crack_network.branches:
             writer.front({"step": step, "front_id": branch.branch_id, "parent_front_id": branch.parent_branch_id, "status": branch.status, "termination_reason": branch.local_state.get("termination_reason"), "tip_x_m": branch.tip[0], "tip_y_m": branch.tip[1], "arclength_m": branch.physical_path_length_m})
         bundle = {"schema": "v11.multi-tip-engine-bundle/1", "owner_by_tip": owner_by_tip, "engines": {key: _capture_shared_engine(value) for key, value in engines.items()}, "junction_reservoirs": reservoirs}
-        extension = state.crack_network.total_physical_crack_length_m - cfg.geometry.a0
+        growth = crack_growth_metrics(state.crack_network, initial_crack_length_m=cfg.geometry.a0)
+        extension = growth.max_root_to_tip_path_extension_m
         checkpoint = ProductionBranchCheckpoint(
             state=state, shared_process_state=bundle, physical_time_s=physical_time,
             accepted_load=accepted_load, mesh_identity=_mesh_identity(state.mesh),
             boundary_condition_state={"opening_m": accepted_load}, provider_runtime=runtime,
             provider_cache_identity=str(cache_root.resolve()), topology_fingerprint=runtime.routing.topology_fingerprint or _hash(state.crack_network),
             front_competitions=competitions, branch_clusters=tuple(clusters.values()),
-            projected_extension_m=max(branch.tip[0] for branch in state.crack_network.branches) - cfg.geometry.a0,
+            projected_extension_m=growth.max_forward_projected_extension_m,
             physical_extension_m=extension, handoff_guard_diagnostics={}, termination_reason=None,
         )
         write_branch_checkpoint(checkpoint, out / "checkpoint" / "latest.json")
-        crossed = next((value for value in (25e-6, 50e-6, 75e-6, 100e-6) if last_snapshot_extension < value <= extension), None)
+        crossed = next((value for value in (25e-6, 50e-6, 75e-6, 100e-6, 250e-6, 500e-6, 750e-6, 1000e-6) if last_snapshot_extension < value <= extension), None)
         if snapshot_reason is not None or crossed is not None:
             reason = snapshot_reason or f"extension_{int(round(crossed * 1e6))}um"
+            write_branch_checkpoint(
+                checkpoint,
+                out / "checkpoint" / "transitions" / f"step{step:07d}_{reason}.json",
+            )
             write_topology_snapshot(
                 out, state, step=step, reason=reason,
                 physical_extension_m=extension, branch_birth_count=branch_birth_count,
                 latest_action=state.event_counters.get("latest_successful_action"),
                 mechanics=latest_mechanics,
+                growth_metrics=growth.to_dict_um(), coalescence_count=coalescence_count,
             )
             last_snapshot_extension = extension
         target = float(getattr(args, "target_crack_extension_um", float("inf"))) * 1e-6
@@ -436,11 +445,13 @@ def continue_resolved_production(
         reason=termination, physical_extension_m=checkpoint.physical_extension_m,
         branch_birth_count=branch_birth_count,
         latest_action=state.event_counters.get("latest_successful_action"), final=True,
+        growth_metrics=growth.to_dict_um(), coalescence_count=coalescence_count,
     )
     writer.complete(status=termination, final_checkpoint="checkpoint/latest.json", validation={
         "checkpoint": True, "branch_birth_count": branch_birth_count,
         "coalescence_count": coalescence_count, "active_tip_count": len(state.crack_network.active_tip_ids),
         "provider_transition": True, "live_fem_solve_count": runtime.live_fem_solve_count,
+        **growth.to_dict_um(),
     })
     return 0
 
