@@ -57,4 +57,4 @@ EOF
 
 echo "INSTALLATION PASSED at $HEAD"
 echo "Install record: $INSTALL_RECORD"
-echo "Next: run the one-case inherited reuse smoke before any live matrix launch."
+echo "Next: launch a fresh v10.4.3 pilot or the complete fresh 48-case campaign."
