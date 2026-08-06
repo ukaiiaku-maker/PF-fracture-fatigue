@@ -46,13 +46,15 @@ trap 'rm -f "$TMP"' EXIT
   --source scripts/run_v10_2_28_paper_four_class_theta30_1000um.sh \
   --output "$TMP"
 bash -n "$TMP"
+bash -n scripts/launch_v10_4_3_plastic_dominance_campaign.sh
 
 "${PY[@]}" -m pytest -q \
   tests/test_v10_4_2_directional_j_positive.py \
   tests/test_v10_4_2_reuse_aware_launcher.py \
   tests/test_v10_4_2_plastic_flow_terminal.py \
   tests/test_v10_4_2_launcher_adapter.py \
-  tests/test_v10_4_3_plastic_dominance.py
+  tests/test_v10_4_3_plastic_dominance.py \
+  tests/test_v10_4_3_fresh_campaign_launcher.py
 
 "${PY[@]}" - <<'PY'
 from pathlib import Path
@@ -79,4 +81,4 @@ if missing:
 print("v10.4.3 transformed production source validated")
 PY
 
-echo "VALIDATION PASSED: v10.4.3 is ready for the one-case reuse smoke"
+echo "VALIDATION PASSED: v10.4.3 is ready for a fresh pilot or fresh 48-case campaign"
