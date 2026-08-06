@@ -51,7 +51,7 @@ def main(argv=None) -> int:
         "--signed-active-shielding", "--mobile-shield-fraction", "0", "--no-wake-shielding",
         "--crystal-aniso", "--crystal-compete", "--crystal-theta-deg", str(args.orientation),
         "--crystal-material", "w", "--j-decomposition", "cluster", "--crack-backend", "sharp_wake",
-        "--adaptive-events", "--adaptive-event-target", "0.15", "--hazard-seed", str(args.seed),
+        "--adaptive-events", "--adaptive-event-target", "0.15",
         "--out", str(out),
     ]
     environment = os.environ.copy()
