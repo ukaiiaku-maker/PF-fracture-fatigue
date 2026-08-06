@@ -56,6 +56,7 @@ def main(argv=None) -> int:
     ]
     environment = os.environ.copy()
     environment["CLEAVAGE_HAZARD_SEED"] = str(args.seed)
+    environment["PARAMETER_CAMPAIGN"] = "1"
     status = {
         "schema": "v11.branching-case-status/1", "status": "active", "pid": os.getpid(),
         "start_time": datetime.now(timezone.utc).isoformat(), "command": command,
