@@ -101,13 +101,26 @@ def _make_materialized_fixture(case_root: Path, scheduler: str) -> None:
 
 
 def _write_stub_package(stub_root: Path) -> None:
-    package = stub_root / "arrhenius_fracture"
-    package.mkdir(parents=True)
-    (package / "__init__.py").write_text("")
-    (package / "reuse_v1041_v1042.py").write_text(
+    """Install the verifier stub before embedded Python mutates ``sys.path``.
+
+    The generated verifier intentionally prepends the production repository to
+    ``sys.path``. A normal shadow package would therefore be bypassed. Python
+    imports ``sitecustomize`` during interpreter startup, so this fixture loads
+    the real package identity and replaces only the reuse-verification submodule
+    in ``sys.modules`` before the generated verifier executes.
+    """
+    stub_root.mkdir(parents=True)
+    (stub_root / "sitecustomize.py").write_text(
         """from __future__ import annotations
 import os
 from pathlib import Path
+import sys
+import types
+
+import arrhenius_fracture as package
+
+module_name = 'arrhenius_fracture.reuse_v1041_v1042'
+module = types.ModuleType(module_name)
 
 
 def verify_materialized_case(root):
@@ -120,6 +133,12 @@ def verify_materialized_case(root):
 def verify_source_case(root):
     print(f'VERIFY_SOURCE_STUB {root}')
     return {'verified': True}
+
+
+module.verify_materialized_case = verify_materialized_case
+module.verify_source_case = verify_source_case
+sys.modules[module_name] = module
+setattr(package, 'reuse_v1041_v1042', module)
 """
     )
 
@@ -218,10 +237,11 @@ exit "$rc"
 
 def test_final_generated_scheduler_orders_reuse_before_native_checks(tmp_path: Path):
     scheduler = _generate_final_scheduler(tmp_path)
+    verifier_start = scheduler.index("verified_complete() {")
     skip = 'print(f"SKIP_REUSED_VERIFIED {root}")'
     native = "expected = {"
     assert scheduler.count(skip) == 1
-    assert scheduler.index(skip) < scheduler.index(native)
+    assert scheduler.index(skip, verifier_start) < scheduler.index(native, verifier_start)
     assert "verify_source_case(Path(reuse_audit[\"source_case\"]))" in scheduler
     assert "find \"$OUTROOT\" \\( -type f -o -type l \\) -name COMPLETE" in scheduler
     assert "acceptance_rc=$?" in scheduler
@@ -232,6 +252,8 @@ def test_valid_reused_case_skips_without_solver_launch(tmp_path: Path):
     scheduler = _generate_final_scheduler(tmp_path)
     result, sentinel = _run_generated_reuse_case(tmp_path, scheduler, corrupt=False)
     assert result.returncode == 0, result.stdout + result.stderr
+    assert "VERIFY_MATERIALIZED_STUB" in result.stdout
+    assert "VERIFY_SOURCE_STUB" in result.stdout
     assert "SKIP_REUSED_VERIFIED" in result.stdout
     assert "SKIP verified complete" in result.stdout
     assert "RUN_CASE_RC=0" in result.stdout
