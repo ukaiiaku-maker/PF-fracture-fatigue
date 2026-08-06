@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import pickle
 import sys
+import time
 from typing import Any, Mapping
 
 import numpy as np
@@ -38,6 +39,8 @@ from .hazard_energy_event_gate_v10230 import hazard_resistance_J_per_m2
 from .live_topology_kernel_registry_v11 import PREBRANCH_PROVIDER_ID
 from .live_topology_kernel_v11 import LiveTopologyRequest, PROVIDER_ID
 from .live_topology_runtime_v11 import LiveTopologyRuntime
+from .adaptive_multitip_mesh_v11 import adapt_accepted_state_for_trials, mesh_fingerprint
+from .network_metrics_v11 import crack_growth_metrics
 from .production_step_loop_v11 import (
     AcceptedStepContext, DirectionalStepRefinementRequired, advance_accepted_step,
 )
@@ -330,10 +333,75 @@ def run_2d(args):
             )
     last_measurement = {}; latest_sigma = None; latest_interval_rates = (); latest_live_result = None
     prebranch_snapshot_written = False
+    adaptation_required = True
 
     for step in range(start_step, int(args.steps) + 1):
+        if adaptation_required:
+            adaptation_start = time.perf_counter()
+            inventory = {tip: tuple(candidates) for tip in state.crack_network.active_tip_ids}
+            previous_generation = int(state.event_counters.get("mesh_generation", 0))
+            previous_operation = int(state.event_counters.get("refinement_operation_index", 0))
+            state, adaptation = adapt_accepted_state_for_trials(
+                state, inventory, da_phys_m=da_phys,
+                tip_h_fine_m=float(getattr(args, "tip_h_fine", 0.0) or 1.0e-6),
+                contour_radius_m=float(getattr(args, "rJ", None) or args.L_pz),
+                crack_band_radius_m=0.5e-6, accepted_load_m=accepted_load,
+                starting_generation=previous_generation,
+                starting_operation_index=previous_operation,
+            )
+            if adaptation.lineages:
+                counters = dict(state.event_counters)
+                counters["mesh_generation"] = adaptation.lineages[-1].mesh_generation
+                counters["refinement_operation_index"] = adaptation.lineages[-1].refinement_operation_index
+                junction = dict(state.junction_process_state)
+                junction["mesh_refinement"] = {
+                    "latest": adaptation.lineages[-1].to_dict(),
+                    "physical_topology_fingerprint": _hash(state.crack_network),
+                    "mechanical_discretization_fingerprint": mesh_fingerprint(state.mesh),
+                }
+                state = replace(state, event_counters=counters, junction_process_state=junction)
+                mesh = state.mesh; boundary = state.boundary
+                record = {
+                    "step": step, "physical_time_s": physical_time,
+                    "node_count": state.mesh.nn, "element_count": state.mesh.ne,
+                    "active_tip_count": len(state.crack_network.active_tip_ids),
+                    "levels_added": len(adaptation.lineages),
+                    "elements_marked": sum(len(item.refined_parent_element_ids) for item in adaptation.lineages),
+                    "elements_added_by_conformity": sum(item.elements_added_by_conformity for item in adaptation.lineages),
+                    "minimum_active_tip_hbar_m": min(adaptation.active_tip_hbar_m.values()),
+                    "maximum_active_tip_hbar_m": max(adaptation.active_tip_hbar_m.values()),
+                    "parent_energy_J_per_m": adaptation.parent_energy_J_per_m,
+                    "prolonged_energy_J_per_m": adaptation.prolonged_energy_J_per_m,
+                    "refined_equilibrium_energy_J_per_m": adaptation.refined_equilibrium_energy_J_per_m,
+                    "parent_vs_prolonged_relative_error": adaptation.parent_vs_prolonged_relative_error,
+                    "refined_equilibrium_relative_correction": adaptation.refined_equilibrium_relative_correction,
+                    "reaction_prolongated_N_per_m": adaptation.reaction_prolongated_N_per_m,
+                    "reaction_refined_equilibrium_N_per_m": adaptation.reaction_refined_equilibrium_N_per_m,
+                    "adaptation_wall_time_s": time.perf_counter() - adaptation_start,
+                    "provider_solve_count": runtime.live_fem_solve_count,
+                }
+                with (out / "mesh_adaptations.jsonl").open("a", encoding="utf-8") as stream:
+                    stream.write(json.dumps(record, sort_keys=True, allow_nan=False) + "\n")
+                growth_now = crack_growth_metrics(state.crack_network, initial_crack_length_m=cfg.geometry.a0)
+                adaptation_checkpoint = ProductionBranchCheckpoint(
+                    state=state, shared_process_state=_capture_shared_engine(engine),
+                    physical_time_s=physical_time, accepted_load=accepted_load,
+                    mesh_identity=_mesh_identity(state.mesh),
+                    boundary_condition_state={"opening_m": accepted_load}, provider_runtime=runtime,
+                    provider_cache_identity=str(cache_root.resolve()),
+                    topology_fingerprint=_hash((state.crack_network, mesh_fingerprint(state.mesh))),
+                    front_competitions={tip: state.competition for tip in state.crack_network.active_tip_ids},
+                    branch_clusters=(() if cluster is None else (cluster,)),
+                    projected_extension_m=growth_now.max_forward_projected_extension_m,
+                    physical_extension_m=growth_now.max_root_to_tip_path_extension_m,
+                    handoff_guard_diagnostics={}, termination_reason=None,
+                )
+                path = out / "checkpoint" / "transitions" / f"step{step:07d}_mesh_adaptation_g{counters['mesh_generation']:04d}.json"
+                write_branch_checkpoint(adaptation_checkpoint, path)
+                write_branch_checkpoint(adaptation_checkpoint, out / "checkpoint" / "latest.json")
+            adaptation_required = False
         trial_fraction = 1.0
-        context = AcceptedStepContext(step, physical_time, float(args.dt), _hash((step, state.crack_network, state.competition)))
+        context = AcceptedStepContext(step, physical_time, float(args.dt), _hash((step, state.crack_network, state.competition, mesh_fingerprint(state.mesh))))
 
         def solve_accepted(current, _context):
             nonlocal last_measurement, latest_sigma
@@ -445,7 +513,7 @@ def run_2d(args):
                 )
                 return apply_sharp_wake_trial_geometry(
                     trial_state, trial_arms,
-                    kill_radius_m=max(float(getattr(mesh, "hbar_tip", 0.0) or mesh.hbar), 0.5e-6),
+                    kill_radius_m=max(float(getattr(current.mesh, "hbar_tip", 0.0) or current.mesh.hbar), 0.5e-6),
                 )
 
             def equilibrate(trial_state):
@@ -543,6 +611,8 @@ def run_2d(args):
         accepted_load += float(args.dU) * trial_fraction
         physical_time += context.duration_s
         selected = next((item for item in result.trials if item.selected), None)
+        if selected is not None:
+            adaptation_required = True
         for item in result.trials:
             rate_map = trial_drives.get(item.proposal.action_id, {r.candidate_id: r for r in result.rates})
             rec = {field: None for field in TRIAL_FIELDS}
