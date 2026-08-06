@@ -11,6 +11,7 @@ from arrhenius_fracture.live_topology_kernel_cache_v11 import ExactTopologyCache
 from arrhenius_fracture.live_topology_kernel_v11 import topology_fingerprint
 from arrhenius_fracture.live_topology_kernel_v11 import LiveTopologyRequest, evaluate_exact_topology
 from arrhenius_fracture.live_topology_kernel_registry_v11 import validate_single_front_transition
+from arrhenius_fracture.live_topology_runtime_v11 import LiveTopologyRuntime
 from arrhenius_fracture.directional_competition_v11 import tungsten_cleavage_candidates
 from arrhenius_fracture.fem import elastic_energy_densities, plane_strain_D
 from arrhenius_fracture.config import ElasticProperties
@@ -191,3 +192,52 @@ def test_live_provider_matches_direct_single_front_FEM_anchors(extension_um):
     }
     parity = validate_single_front_transition(legacy, live)
     assert parity["passed"] and parity["sign_agreement"]
+
+
+def legacy_from_live(live):
+    return {
+        "reaction_force": live["base_equilibrium"]["reaction_force"],
+        "recoverable_potential_energy_J_per_m": live["base_equilibrium"]["recoverable_potential_energy_J_per_m"],
+        "directional": [dict(item) for item in live["tips"][0]["directional"]],
+    }
+
+
+def test_transition_preserves_kinetics_and_locks_provider_once(tmp_path):
+    request = live_straight_request(5.0e-6)
+    reference = evaluate_exact_topology(request)
+    protected = {
+        "clock": 0.75, "pending_events": ("event-1",),
+        "reservations": ("reservation-1",), "rng": (3, 6, 2, 1),
+        "event_index": 9,
+    }
+    snapshot = dict(protected)
+    runtime, live = LiveTopologyRuntime(str(tmp_path)).transition(
+        step=17, state_hash="accepted-state-hash",
+        legacy_result=legacy_from_live(reference), request=request,
+        protected_state=protected,
+    )
+    assert protected == snapshot
+    assert runtime.routing.active_mechanics_provider == "v11_exact_crack_network_live_fem_v1"
+    assert runtime.routing.transition_step == 17
+    assert runtime.routing.topology_fingerprint == live["topology_fingerprint"]
+    with pytest.raises(RuntimeError, match="already locked"):
+        runtime.transition(
+            step=18, state_hash="other", legacy_result=legacy_from_live(reference),
+            request=request, protected_state=protected,
+        )
+
+
+def test_rejected_ephemeral_trial_never_mutates_accepted_cache_or_routing(tmp_path):
+    request = live_straight_request(5.0e-6)
+    reference = evaluate_exact_topology(request)
+    runtime, _ = LiveTopologyRuntime(str(tmp_path)).transition(
+        step=1, state_hash="state", legacy_result=legacy_from_live(reference),
+        request=request, protected_state={"clock": 0.2},
+    )
+    accepted_count = runtime.accepted_provider_state_count
+    fingerprint = runtime.routing.topology_fingerprint
+    trial_runtime, trial = runtime.evaluate_trial(request)
+    assert runtime.accepted_provider_state_count == accepted_count
+    assert runtime.routing.topology_fingerprint == fingerprint
+    assert trial_runtime.accepted_provider_state_count == accepted_count
+    assert trial["topology_fingerprint"] == fingerprint

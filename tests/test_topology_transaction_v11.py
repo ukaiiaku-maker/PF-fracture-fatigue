@@ -6,6 +6,7 @@ import pytest
 
 from arrhenius_fracture.branch_cluster_v11 import create_unresolved_branch_cluster
 from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
+from arrhenius_fracture.live_topology_runtime_v11 import LiveTopologyRuntime
 from arrhenius_fracture.crack_backend import SharpWakeBackend
 from arrhenius_fracture.crack_network_v11 import CrackNetworkState, ROOT_BRANCH_ID
 from arrhenius_fracture.directional_competition_v11 import (
@@ -246,6 +247,26 @@ def test_restart_before_and_after_branch_birth(tmp_path, after_branch):
     assert restored.rng_state == state.rng_state
     np.testing.assert_array_equal(restored.damage, state.damage)
     assert manifest["active_tip_ids"] == list(state.crack_network.active_tip_ids)
+
+
+def test_restart_preserves_locked_provider_identity_and_topology_fingerprint(tmp_path):
+    state = fem_state()
+    runtime = LiveTopologyRuntime(
+        str(tmp_path / "cache"),
+        routing=replace(
+            LiveTopologyRuntime(str(tmp_path / "cache")).routing,
+            active_mechanics_provider="v11_exact_crack_network_live_fem_v1",
+            transition_step=3, transition_state_hash="accepted",
+            topology_fingerprint="topology-sha",
+        ),
+    )
+    path = tmp_path / "provider-checkpoint.json"
+    write_checkpoint(state, path, provider_runtime=runtime)
+    restored, restored_runtime = restore_checkpoint(path, with_provider_runtime=True)
+    assert restored.crack_network == state.crack_network
+    np.testing.assert_array_equal(restored.damage, state.damage)
+    assert restored_runtime == runtime
+    assert restored_runtime.routing.topology_fingerprint == "topology-sha"
 
 
 def test_first_intersection_clips_and_deactivates_only_incoming_tip(tmp_path):

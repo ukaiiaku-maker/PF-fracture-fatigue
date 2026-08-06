@@ -19,11 +19,14 @@ def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def write_checkpoint(state: LiveFEMTopologyState, path: str | Path) -> dict[str, Any]:
+def write_checkpoint(
+    state: LiveFEMTopologyState, path: str | Path, *, provider_runtime: Any = None,
+) -> dict[str, Any]:
     """Write the complete accepted state atomically; never checkpoint a trial."""
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
-    payload = pickle.dumps(state, protocol=5)
+    payload_object = {"state": state, "provider_runtime": provider_runtime}
+    payload = pickle.dumps(payload_object, protocol=5)
     payload_sha = _sha256(payload)
     manifest = {
         "schema": SCHEMA,
@@ -36,6 +39,9 @@ def write_checkpoint(state: LiveFEMTopologyState, path: str | Path) -> dict[str,
         "event_counters": dict(state.event_counters),
         "energy_ledgers": dict(state.energy_ledgers),
         "has_rng_state": state.rng_state is not None,
+        "provider_runtime": (
+            provider_runtime.audit_payload() if provider_runtime is not None else None
+        ),
     }
     state_path = target.with_name(manifest["state_file"])
     state_tmp = state_path.with_name(state_path.name + ".tmp")
@@ -47,7 +53,7 @@ def write_checkpoint(state: LiveFEMTopologyState, path: str | Path) -> dict[str,
     return manifest
 
 
-def restore_checkpoint(path: str | Path) -> LiveFEMTopologyState:
+def restore_checkpoint(path: str | Path, *, with_provider_runtime: bool = False):
     target = Path(path)
     manifest = json.loads(target.read_text())
     if manifest.get("schema") != SCHEMA:
@@ -56,14 +62,19 @@ def restore_checkpoint(path: str | Path) -> LiveFEMTopologyState:
     payload = state_path.read_bytes()
     if _sha256(payload) != manifest.get("state_sha256"):
         raise ValueError("v11 checkpoint state hash mismatch")
-    state = pickle.loads(payload)
+    restored = pickle.loads(payload)
+    if isinstance(restored, LiveFEMTopologyState):
+        state, provider_runtime = restored, None
+    else:
+        state = restored.get("state")
+        provider_runtime = restored.get("provider_runtime")
     if not isinstance(state, LiveFEMTopologyState):
         raise ValueError("v11 checkpoint payload has the wrong state type")
     if state.crack_network.to_dict() != manifest.get("crack_network"):
         raise ValueError("v11 checkpoint crack network does not match manifest")
     if competition_state_to_dict(state.competition) != manifest.get("directional_competition"):
         raise ValueError("v11 checkpoint directional state does not match manifest")
-    return state
+    return (state, provider_runtime) if with_provider_runtime else state
 
 
 __all__ = ["SCHEMA", "restore_checkpoint", "write_checkpoint"]
