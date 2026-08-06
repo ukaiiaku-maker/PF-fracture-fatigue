@@ -57,7 +57,7 @@ bash -n "$TMP"
 "${PY[@]}" - <<'PY'
 from pathlib import Path
 import arrhenius_fracture
-from arrhenius_fracture.plastic_dominance_v1043 import transform_source
+from arrhenius_fracture.plastic_dominance_runtime_v1043 import transform_source
 
 root = Path.cwd()
 assert arrhenius_fracture.PROJECT_ID == "PF-fracture-fatigue"
