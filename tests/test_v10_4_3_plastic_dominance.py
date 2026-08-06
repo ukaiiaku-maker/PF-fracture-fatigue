@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from arrhenius_fracture.plastic_dominance_v1043 import (
+from arrhenius_fracture.plastic_dominance_runtime_v1043 import (
     contour_scan_v1043,
     terminal_metrics_v1043,
     transform_source,
@@ -67,7 +67,13 @@ def _window(
     return rows
 
 
-def _metrics(window, *, cumulative_Wp: float, cumulative_Uel: float):
+def _metrics(
+    window,
+    *,
+    cumulative_Wp: float,
+    cumulative_Uel: float,
+    stiffness_reference: float = 1.0,
+):
     return terminal_metrics_v1043(
         window,
         Args(),
@@ -76,7 +82,7 @@ def _metrics(window, *, cumulative_Wp: float, cumulative_Uel: float):
         sigma_reference=3.0e10,
         peak_J_positive=1.0e5,
         peak_force=1.0,
-        stiffness_reference=1.0,
+        stiffness_reference=stiffness_reference,
         remaining_steps=1000,
         nominal_dt_s=8.4,
         cumulative_Wp=cumulative_Wp,
@@ -114,7 +120,6 @@ def test_sustained_majority_plastic_accommodation_passes():
     assert result["failed_criteria"] == []
     assert result["plastic_terminal_is_model_limit_censor"] is True
     assert result["future_fracture_beyond_terminal_resolved"] is False
-    # Positive J is reported, not used as an arbitrary athermal terminal veto.
     assert result["J_tip_positive_max_window_J_per_m2"] == 2500.0
 
 
@@ -126,7 +131,12 @@ def test_nearly_elastic_load_bearing_state_fails():
         stagger=0.01,
         plastic_work_fraction=0.01,
     )
-    result = _metrics(window, cumulative_Wp=0.04, cumulative_Uel=3.96)
+    result = _metrics(
+        window,
+        cumulative_Wp=0.04,
+        cumulative_Uel=3.96,
+        stiffness_reference=0.10,
+    )
     assert result is not None
     assert result["criteria_pass"] is False
     assert result["criteria"]["plastic_accommodation_dominant"] is False
