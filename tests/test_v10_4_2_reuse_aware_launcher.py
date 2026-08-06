@@ -4,6 +4,7 @@ import importlib.util
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 
@@ -100,27 +101,32 @@ def _make_materialized_fixture(case_root: Path, scheduler: str) -> None:
             path.write_text("{}\n")
 
 
-def _write_stub_package(stub_root: Path) -> None:
-    """Install the verifier stub before embedded Python mutates ``sys.path``.
+def _prepare_runtime_root(tmp_path: Path, *, corrupt: bool) -> Path:
+    """Create the exact repository root used by embedded verifier Python.
 
-    The generated verifier intentionally prepends the production repository to
-    ``sys.path``. A normal shadow package would therefore be bypassed. Python
-    imports ``sitecustomize`` during interpreter startup, so this fixture loads
-    the real package identity and replaces only the reuse-verification submodule
-    in ``sys.modules`` before the generated verifier executes.
+    The generated verifier prepends the shell ``ROOT`` to ``sys.path``. The
+    regression fixture therefore runs from an isolated copy of the repository
+    and replaces only ``reuse_v1041_v1042.py`` in that copy. All package-identity,
+    script-presence, and generated-shell checks still exercise real production
+    files.
     """
-    stub_root.mkdir(parents=True)
-    (stub_root / "sitecustomize.py").write_text(
+    runtime_root = tmp_path / ("runtime_corrupt" if corrupt else "runtime_valid")
+    shutil.copytree(
+        ROOT,
+        runtime_root,
+        ignore=shutil.ignore_patterns(
+            ".git",
+            "__pycache__",
+            "*.pyc",
+            ".pytest_cache",
+            "*.egg-info",
+        ),
+    )
+    verifier = runtime_root / "arrhenius_fracture" / "reuse_v1041_v1042.py"
+    verifier.write_text(
         """from __future__ import annotations
 import os
 from pathlib import Path
-import sys
-import types
-
-import arrhenius_fracture as package
-
-module_name = 'arrhenius_fracture.reuse_v1041_v1042'
-module = types.ModuleType(module_name)
 
 
 def verify_materialized_case(root):
@@ -133,14 +139,9 @@ def verify_materialized_case(root):
 def verify_source_case(root):
     print(f'VERIFY_SOURCE_STUB {root}')
     return {'verified': True}
-
-
-module.verify_materialized_case = verify_materialized_case
-module.verify_source_case = verify_source_case
-sys.modules[module_name] = module
-setattr(package, 'reuse_v1041_v1042', module)
 """
     )
+    return runtime_root
 
 
 def _run_generated_reuse_case(
@@ -154,8 +155,7 @@ def _run_generated_reuse_case(
     case_root = outroot / option / "T300K_th0_seed3621"
     _make_materialized_fixture(case_root, scheduler)
 
-    stub_root = tmp_path / ("stub_corrupt" if corrupt else "stub_valid")
-    _write_stub_package(stub_root)
+    runtime_root = _prepare_runtime_root(tmp_path, corrupt=corrupt)
     sentinel = tmp_path / ("solver_corrupt_started" if corrupt else "solver_valid_started")
     python_wrapper = tmp_path / ("python_corrupt.sh" if corrupt else "python_valid.sh")
     python_wrapper.write_text(
@@ -176,7 +176,7 @@ exec "$REAL_PYTHON" "$@"
         f"""#!/usr/bin/env bash
 set -u
 set -o pipefail
-ROOT={str(ROOT)!r}
+ROOT={str(runtime_root)!r}
 OUTROOT={str(outroot)!r}
 PYTHON_BIN={str(python_wrapper)!r}
 SKIP_FINISHED=1
@@ -219,14 +219,14 @@ exit "$rc"
             "REAL_PYTHON": sys.executable,
             "SOLVER_SENTINEL": str(sentinel),
             "PYTHONPATH": os.pathsep.join(
-                [str(stub_root), str(ROOT), env.get("PYTHONPATH", "")]
+                [str(runtime_root), env.get("PYTHONPATH", "")]
             ),
             "REUSE_STUB_FAIL": "1" if corrupt else "0",
         }
     )
     result = subprocess.run(
         ["bash", str(runner)],
-        cwd=ROOT,
+        cwd=runtime_root,
         env=env,
         text=True,
         capture_output=True,
