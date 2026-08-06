@@ -17,6 +17,7 @@ from arrhenius_fracture.fem import elastic_energy_densities, plane_strain_D
 from arrhenius_fracture.config import ElasticProperties
 from arrhenius_fracture.j_integral import compute_J_integral
 from arrhenius_fracture.unit_slip_perturbation_v1026 import solve_fixed_crack_state
+from arrhenius_fracture.unit_slip_perturbation_v1026 import SlipRibbonPerturbation
 from arrhenius_fracture.topology_transaction_v11 import TopologyArm, extend_network_arm, mark_coalesced
 from arrhenius_fracture.mesh import make_boundary_data, make_tri_mesh
 
@@ -241,3 +242,75 @@ def test_rejected_ephemeral_trial_never_mutates_accepted_cache_or_routing(tmp_pa
     assert runtime.routing.topology_fingerprint == fingerprint
     assert trial_runtime.accepted_provider_state_count == accepted_count
     assert trial["topology_fingerprint"] == fingerprint
+
+
+def live_branched_request(*, reverse_insertion=False):
+    request = live_straight_request(25.0e-6)
+    parent_id = request.crack_network.active_tip_ids[0]
+    candidate_ids = tuple(item.candidate_id for item in request.candidates_by_tip[parent_id][:2])
+    network, cluster = create_unresolved_branch_cluster(
+        request.crack_network, parent_branch_id=parent_id,
+        candidate_ids=candidate_ids, event_index=1, shared_process_state={},
+        conserved_ledgers={name: 0.0 for name in (
+            "retained", "mobile", "escaped", "recovered", "stored_energy",
+            "emission_work", "unconsumed_action",
+        )},
+    )
+    junction = np.asarray(cluster.junction_xy_m)
+    entries = list(zip(cluster.arm_branch_ids, candidate_ids, (-1.0, 1.0)))
+    if reverse_insertion:
+        entries.reverse()
+    damage = request.damage.copy()
+    from arrhenius_fracture.crack_backend import SharpWakeBackend
+    for branch_id, candidate_id, sign in entries:
+        endpoint = junction + np.array([40.0e-6, sign * 30.0e-6])
+        reward = float(np.linalg.norm(endpoint - junction))
+        network = extend_network_arm(
+            network, TopologyArm(candidate_id, branch_id, tuple(junction), tuple(endpoint), reward, 0.0)
+        )
+        damage = SharpWakeBackend().advance(
+            mesh=request.mesh, boundary=request.boundary, damage=damage,
+            displacement=request.displacement, p0=junction, p1=endpoint,
+            kill_r=0.5 * request.mesh.hbar_tip,
+        ).damage
+    candidates = tungsten_cleavage_candidates(theta_deg=30.0, include_110=True)
+    perturbation = SlipRibbonPerturbation(
+        system=0, region="active", bin_index=0,
+        start_xy_m=junction, end_xy_m=junction + np.array([100.0e-6, 0.0]),
+        slip_direction=np.array([1.0, 0.0]), plane_normal=np.array([0.0, 1.0]),
+        width_m=2.0 * request.mesh.hbar_tip,
+        burgers_m=request.material.b, signed_line_content=1.0,
+    )
+    return replace(
+        request, crack_network=network, damage=damage,
+        candidates_by_tip={branch_id: candidates for branch_id in network.active_tip_ids},
+        cluster_frame={"junction_xy_m": list(junction)},
+        shared_perturbations=(perturbation,),
+    )
+
+
+def test_shared_cluster_unit_perturbation_is_solved_once_and_measured_at_both_tips():
+    result = evaluate_exact_topology(live_branched_request())
+    assert result["shared_perturbation_solve_count"] == 1
+    rows = result["signed_shared_cluster_response"][0]["rows"]
+    assert len(rows) == 2
+    assert all(math.isfinite(row["H_I_Pa_sqrt_m_per_signed_line"]) for row in rows)
+    assert any(abs(row["H_I_Pa_sqrt_m_per_signed_line"]) > 0.0 for row in rows)
+
+
+def test_A12_insertion_order_does_not_change_energy_J_or_cross_tip_response():
+    forward = evaluate_exact_topology(live_branched_request(reverse_insertion=False))
+    reverse = evaluate_exact_topology(live_branched_request(reverse_insertion=True))
+    assert forward["topology_fingerprint"] == reverse["topology_fingerprint"]
+    assert forward["base_equilibrium"]["reaction_force"] == pytest.approx(reverse["base_equilibrium"]["reaction_force"], rel=1e-12)
+    assert forward["base_equilibrium"]["recoverable_potential_energy_J_per_m"] == pytest.approx(reverse["base_equilibrium"]["recoverable_potential_energy_J_per_m"], rel=1e-12)
+    forward_drives = [
+        (tip["physical_tip_key"], [(row["candidate_id"], row["signed_J_J_per_m2"]) for row in tip["directional"]])
+        for tip in forward["tips"]
+    ]
+    reverse_drives = [
+        (tip["physical_tip_key"], [(row["candidate_id"], row["signed_J_J_per_m2"]) for row in tip["directional"]])
+        for tip in reverse["tips"]
+    ]
+    assert forward_drives == reverse_drives
+    assert forward["signed_shared_cluster_response"][0]["rows"] == reverse["signed_shared_cluster_response"][0]["rows"]
