@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 
 from . import sharp_front_v10_4_bulk_peierls_taylor_audited as _v1041
-from .plastic_dominance_v1043 import (
+from .plastic_dominance_runtime_v1043 import (
     MODEL_ID as PLASTIC_DOMINANCE_MODEL_ID,
     load_transformed_sharp_front,
 )
@@ -39,8 +39,6 @@ def _prepare_args(args: list[str]) -> None:
     if not _has_option(args, "--plastic-flow-terminal"):
         args.append("--plastic-flow-terminal")
 
-    # These thresholds identify the onset of sustained plastic dominance.  They
-    # deliberately do not require complete force or stiffness collapse.
     _append_default(args, "--plastic-flow-min-plastic-fraction", "0.50")
     _append_default(
         args,
