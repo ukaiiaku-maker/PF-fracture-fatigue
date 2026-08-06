@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Add audited-reuse short-circuiting to the v10.4.2 production launcher.
+"""Add fail-closed audited-reuse handling to the v10.4.2 production launcher.
 
-Materialized v10.4.1 cases already carry a v10.4.2 reuse audit that verifies
-source hashes, detailed-balance provenance, target completion, and the corrected
-positive directional-J history.  They must not then be rejected for lacking the
-native v10.4.2 command-line terminal options that were intentionally never used
-to generate those inherited results.
+Materialized v10.4.1 cases carry a v10.4.2 reuse audit that verifies source
+hashes, detailed-balance provenance, target completion, and the corrected
+positive directional-J history.  A valid inherited case must return a clean
+skip before native-v10.4.2 contract checks are evaluated.
 """
 from __future__ import annotations
 
@@ -34,23 +33,100 @@ def _replace_once(text: str, old: str, new: str, label: str) -> str:
 def transform(source: str) -> str:
     text = _load_positive_j_builder().transform(source)
 
-    marker = "'''bulk_audit = json.loads(\n"
-    replacement = "'''v1042_reuse_path = root / \"v10_4_2_reuse_audit.json\"\n" \
-        "if v1042_reuse_path.is_file():\n" \
-        "    from arrhenius_fracture.reuse_v1041_v1042 import (\n" \
-        "        verify_materialized_case,\n" \
-        "        verify_source_case,\n" \
-        "    )\n\n" \
-        "    verify_materialized_case(root)\n" \
-        "    verify_source_case(root)\n" \
-        "    raise SystemExit(0)\n\n" \
-        "bulk_audit = json.loads(\n"
+    # These are transformations of the final generated scheduler.  They are
+    # deliberately inserted into the outer builder immediately before it reads
+    # the plotter, after every earlier scheduler adapter has been registered.
+    scheduler_repairs = r'''
+replace_scheduler_exact(
+    'contract = json.loads((root / "v10_2_27_case_contract.json").read_text())',
+    '''v1042_reuse_path = root / "v10_4_2_reuse_audit.json"
+if v1042_reuse_path.is_file():
+    from arrhenius_fracture.reuse_v1041_v1042 import (
+        verify_materialized_case,
+        verify_source_case,
+    )
 
+    reuse_audit = verify_materialized_case(root)
+    verify_source_case(Path(reuse_audit["source_case"]))
+    print(f"SKIP_REUSED_VERIFIED {root}")
+    raise SystemExit(0)
+
+contract = json.loads((root / "v10_2_27_case_contract.json").read_text())''',
+    label="v10.4.2 audited-reuse short-circuit before native contract checks",
+)
+
+replace_scheduler_exact(
+    '''v1042_reuse_path = root / "v10_4_2_reuse_audit.json"
+if v1042_reuse_path.is_file():
+    from arrhenius_fracture.reuse_v1041_v1042 import verify_materialized_case
+
+    verify_materialized_case(root)
+elif bulk_model_audit.get("schema") != "v10.4.2_bulk_detailed_balance_plastic_flow_terminal":
+    raise SystemExit(1)''',
+    '''if bulk_model_audit.get("schema") != "v10.4.2_bulk_detailed_balance_plastic_flow_terminal":
+    raise SystemExit(1)''',
+    label="remove obsolete late v10.4.2 reuse path",
+)
+
+replace_scheduler_exact(
+    '''if find "$OUTROOT" -type f -name COMPLETE -print -quit | grep -q .; then''',
+    '''if find "$OUTROOT" \\( -type f -o -type l \\) -name COMPLETE -print -quit | grep -q .; then''',
+    label="v10.4.2 symlink-aware COMPLETE postprocessing gate",
+)
+
+replace_scheduler_exact(
+    '''echo "Campaign complete: failures=$failures output=$OUTROOT"
+[[ "$failures" -eq 0 ]] || exit 1''',
+    '''acceptance_rc=$?
+if [[ "$acceptance_rc" -ne 0 ]]; then
+  echo "ERROR: final filesystem campaign acceptance failed (exit=$acceptance_rc)" >&2
+  exit "$acceptance_rc"
+fi
+if [[ "$failures" -ne 0 ]]; then
+  echo "WARNING: child-status failures=$failures but final filesystem acceptance passed; reconciling to failures=0" >&2
+fi
+failures=0
+echo "Campaign complete: failures=$failures output=$OUTROOT"''',
+    label="v10.4.2 reconcile scheduler and filesystem completion status",
+)
+
+# Convert any verification rejection of an inherited case into an explicit
+# status before the terminal-looking directory guard reports the shell failure.
+replace_scheduler_exact(
+    '''    if [[ -f "$case_root/COMPLETE" || -f "$case_root/PLASTIC_FLOW" ]]; then
+      echo "ERROR: terminal-looking case failed contract verification: $case_root" >&2
+      return 3
+    fi''',
+    '''    if [[ -f "$case_root/v10_4_2_reuse_audit.json" ]]; then
+      echo "FAILED_REUSE_VERIFICATION $case_root" >&2
+      return 3
+    fi
+    if [[ -f "$case_root/COMPLETE" || -f "$case_root/PLASTIC_FLOW" ]]; then
+      echo "ERROR: terminal-looking case failed contract verification: $case_root" >&2
+      return 3
+    fi''',
+    label="v10.4.2 explicit reuse-verification failure status",
+)
+
+_reuse_skip = 'print(f"SKIP_REUSED_VERIFIED {root}")'
+_native_expected = 'expected = {'
+if scheduler.count(_reuse_skip) != 1:
+    raise SystemExit(
+        "ERROR: final scheduler must contain exactly one SKIP_REUSED_VERIFIED path; "
+        f"found {scheduler.count(_reuse_skip)}"
+    )
+if scheduler.index(_reuse_skip) > scheduler.index(_native_expected):
+    raise SystemExit(
+        "ERROR: audited-reuse guard is still after native v10.4.2 contract checks"
+    )
+'''
+
+    tail_marker = "plotter = source_plotter.read_text()"
     return _replace_once(
         text,
-        marker,
-        replacement,
-        "v10.4.2 audited-reuse scheduler short-circuit",
+        tail_marker,
+        scheduler_repairs + "\n" + tail_marker,
+        "v10.4.2 audited-reuse final-scheduler repairs",
     )
 
 
