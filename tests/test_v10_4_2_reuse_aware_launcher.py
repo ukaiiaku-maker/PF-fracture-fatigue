@@ -4,7 +4,6 @@ import importlib.util
 import os
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import sys
 
@@ -78,7 +77,9 @@ def _make_materialized_fixture(case_root: Path, scheduler: str) -> None:
         verifier_start,
     )
     prefix = scheduler[verifier_start:early_guard]
-    required_names = set(re.findall(r'root / "([^"]+)"', prefix))
+    required_names = set(
+        re.findall(r"root / ['\"]([^'\"]+)['\"]", prefix)
+    )
     required_names.update(
         {
             "stage3_case_status.json",
@@ -88,42 +89,30 @@ def _make_materialized_fixture(case_root: Path, scheduler: str) -> None:
             "v10_4_2_reuse_audit.json",
         }
     )
+    required_names.discard("RUN_FAILED")
+    required_names.discard("PLASTIC_FLOW")
+
     case_root.mkdir(parents=True)
     source_root = case_root.parent / "source_case"
     source_root.mkdir()
     source_complete = source_root / "COMPLETE"
     source_complete.write_text("complete\n")
     (case_root / "COMPLETE").symlink_to(source_complete)
-    for name in sorted(required_names - {"COMPLETE", "PLASTIC_FLOW"}):
+    for name in sorted(required_names - {"COMPLETE"}):
         path = case_root / name
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
             path.write_text("{}\n")
 
+    required_paths = [case_root / name for name in required_names]
+    assert all(path.is_file() for path in required_paths), [
+        str(path) for path in required_paths if not path.is_file()
+    ]
 
-def _prepare_runtime_root(tmp_path: Path, *, corrupt: bool) -> Path:
-    """Create the exact repository root used by embedded verifier Python.
 
-    The generated verifier prepends the shell ``ROOT`` to ``sys.path``. The
-    regression fixture therefore runs from an isolated copy of the repository
-    and replaces only ``reuse_v1041_v1042.py`` in that copy. All package-identity,
-    script-presence, and generated-shell checks still exercise real production
-    files.
-    """
-    runtime_root = tmp_path / ("runtime_corrupt" if corrupt else "runtime_valid")
-    shutil.copytree(
-        ROOT,
-        runtime_root,
-        ignore=shutil.ignore_patterns(
-            ".git",
-            "__pycache__",
-            "*.pyc",
-            ".pytest_cache",
-            "*.egg-info",
-        ),
-    )
-    verifier = runtime_root / "arrhenius_fracture" / "reuse_v1041_v1042.py"
-    verifier.write_text(
+def _write_fixture_module(stub_root: Path) -> None:
+    stub_root.mkdir(parents=True)
+    (stub_root / "v1042_reuse_fixture.py").write_text(
         """from __future__ import annotations
 import os
 from pathlib import Path
@@ -141,7 +130,6 @@ def verify_source_case(root):
     return {'verified': True}
 """
     )
-    return runtime_root
 
 
 def _run_generated_reuse_case(
@@ -155,7 +143,8 @@ def _run_generated_reuse_case(
     case_root = outroot / option / "T300K_th0_seed3621"
     _make_materialized_fixture(case_root, scheduler)
 
-    runtime_root = _prepare_runtime_root(tmp_path, corrupt=corrupt)
+    stub_root = tmp_path / ("stub_corrupt" if corrupt else "stub_valid")
+    _write_fixture_module(stub_root)
     sentinel = tmp_path / ("solver_corrupt_started" if corrupt else "solver_valid_started")
     python_wrapper = tmp_path / ("python_corrupt.sh" if corrupt else "python_valid.sh")
     python_wrapper.write_text(
@@ -169,14 +158,27 @@ exec "$REAL_PYTHON" "$@"
     )
     python_wrapper.chmod(0o755)
 
-    verified_complete = _extract_shell_function(scheduler, "verified_complete", "run_case() {")
+    verified_complete = _extract_shell_function(
+        scheduler,
+        "verified_complete",
+        "run_case() {",
+    )
+    production_import = (
+        "from arrhenius_fracture.reuse_v1041_v1042 import ("
+    )
+    assert verified_complete.count(production_import) == 1
+    verified_complete = verified_complete.replace(
+        production_import,
+        "from v1042_reuse_fixture import (",
+        1,
+    )
     run_case = _extract_shell_function(scheduler, "run_case", "pids=()")
     runner = tmp_path / ("run_corrupt.sh" if corrupt else "run_valid.sh")
     runner.write_text(
         f"""#!/usr/bin/env bash
 set -u
 set -o pipefail
-ROOT={str(runtime_root)!r}
+ROOT={str(ROOT)!r}
 OUTROOT={str(outroot)!r}
 PYTHON_BIN={str(python_wrapper)!r}
 SKIP_FINISHED=1
@@ -219,14 +221,14 @@ exit "$rc"
             "REAL_PYTHON": sys.executable,
             "SOLVER_SENTINEL": str(sentinel),
             "PYTHONPATH": os.pathsep.join(
-                [str(runtime_root), env.get("PYTHONPATH", "")]
+                [str(stub_root), str(ROOT), env.get("PYTHONPATH", "")]
             ),
             "REUSE_STUB_FAIL": "1" if corrupt else "0",
         }
     )
     result = subprocess.run(
         ["bash", str(runner)],
-        cwd=runtime_root,
+        cwd=ROOT,
         env=env,
         text=True,
         capture_output=True,
@@ -243,6 +245,7 @@ def test_final_generated_scheduler_orders_reuse_before_native_checks(tmp_path: P
     assert scheduler.count(skip) == 1
     assert scheduler.index(skip, verifier_start) < scheduler.index(native, verifier_start)
     assert "verify_source_case(Path(reuse_audit[\"source_case\"]))" in scheduler
+    assert "from arrhenius_fracture.reuse_v1041_v1042 import (" in scheduler
     assert "find \"$OUTROOT\" \\( -type f -o -type l \\) -name COMPLETE" in scheduler
     assert "acceptance_rc=$?" in scheduler
     assert "FAILED_REUSE_VERIFICATION" in scheduler
