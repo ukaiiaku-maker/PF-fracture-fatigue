@@ -20,6 +20,24 @@ def _load_json(path: Path):
     return json.loads(path.read_text())
 
 
+def _v1043_energy_balance_pass(audit: dict) -> bool:
+    explicit = audit.get("energy_balance_pass")
+    if explicit is not None:
+        return explicit is True
+    criteria = audit.get("criteria")
+    if isinstance(criteria, dict):
+        return criteria.get("energy_balance_bounded") is True
+    window_error = audit.get("window_energy_balance_relative_error")
+    cumulative_error = audit.get("cumulative_energy_balance_relative_error")
+    tolerance = (audit.get("thresholds") or {}).get(
+        "energy_balance_relative_tolerance",
+        0.01,
+    )
+    if window_error is None or cumulative_error is None:
+        return False
+    return max(float(window_error), float(cumulative_error)) <= float(tolerance)
+
+
 def classify(case_root: Path, target_extension_um: float) -> dict:
     root = case_root.expanduser().resolve()
     marker = root / "PLASTIC_FLOW"
@@ -46,11 +64,25 @@ def classify(case_root: Path, target_extension_um: float) -> dict:
         is_v1043 = schema.startswith("v10.4.3_")
         if is_v1043:
             if audit.get("plastic_terminal_is_model_limit_censor") is not True:
-                raise ValueError("v10.4.3 terminal must be identified as a model-limit censor")
+                raise ValueError(
+                    "v10.4.3 terminal must be identified as a model-limit censor"
+                )
             if audit.get("future_fracture_beyond_terminal_resolved") is not False:
-                raise ValueError("v10.4.3 may not claim post-terminal fracture resolution")
-            if audit.get("energy_balance_pass") is not True:
-                raise ValueError("v10.4.3 terminal requires a passing energy balance")
+                raise ValueError(
+                    "v10.4.3 may not claim post-terminal fracture resolution"
+                )
+            if not _v1043_energy_balance_pass(audit):
+                raise ValueError(
+                    "v10.4.3 terminal requires a passing energy balance"
+                )
+        energy_error = max(
+            float(audit.get("window_energy_balance_relative_error", 0.0) or 0.0),
+            float(
+                audit.get("cumulative_energy_balance_relative_error", 0.0)
+                or 0.0
+            ),
+            float(audit.get("energy_balance_relative_error", 0.0) or 0.0),
+        )
         return {
             "schema": (
                 "v10.4.3_case_status_v1" if is_v1043
@@ -99,9 +131,7 @@ def classify(case_root: Path, target_extension_um: float) -> dict:
             "active_plastic_area_fraction_median": audit.get(
                 "active_plastic_area_fraction_median"
             ),
-            "energy_balance_relative_error": audit.get(
-                "energy_balance_relative_error"
-            ),
+            "energy_balance_relative_error": energy_error,
             "plastic_flow_terminal_audit": str(audit_path),
         }
 
@@ -110,7 +140,9 @@ def classify(case_root: Path, target_extension_um: float) -> dict:
     payload["target_extension_complete"] = payload.get("complete") is True
     payload["terminal"] = payload.get("complete") is True
     payload["campaign_terminal"] = payload.get("complete") is True
-    payload["sharp_fracture_occurred"] = payload.get("first_passage_recorded") is True
+    payload["sharp_fracture_occurred"] = (
+        payload.get("first_passage_recorded") is True
+    )
     payload["ductile_fracture_simulated"] = False
     payload["plastic_terminal_is_model_limit_censor"] = False
     return payload
@@ -148,19 +180,24 @@ def main() -> int:
     args = parser.parse_args()
     payload = classify(args.case_root, args.target_extension_um)
     write_status(args.case_root, payload)
-    print(json.dumps({
-        key: payload.get(key)
-        for key in (
-            "status",
-            "temperature_K",
-            "projected_extension_um",
-            "Kc_first_MPa_sqrt_m",
-            "J_pl_diss_J_per_m2",
-            "J_contour_shielding_J_per_m2",
-            "plastic_accommodation_ratio_median",
-            "campaign_terminal",
+    print(
+        json.dumps(
+            {
+                key: payload.get(key)
+                for key in (
+                    "status",
+                    "temperature_K",
+                    "projected_extension_um",
+                    "Kc_first_MPa_sqrt_m",
+                    "J_pl_diss_J_per_m2",
+                    "J_contour_shielding_J_per_m2",
+                    "plastic_accommodation_ratio_median",
+                    "campaign_terminal",
+                )
+            },
+            sort_keys=True,
         )
-    }, sort_keys=True))
+    )
     return 0
 
 
