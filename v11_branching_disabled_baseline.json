@@ -1,0 +1,98 @@
+{
+  "schema": "v11.branching-disabled.direct-kernel-2d-reference/1",
+  "source_head": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+  "branching_enabled": false,
+  "production_entry": "arrhenius_fracture.sharp_front_v10_2_28_audited",
+  "output_directory": "runs/v11_branching_disabled_2d_baseline_v1",
+  "environment": "arrhenius-sharp-front-v10",
+  "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10/bin/python",
+  "direct_kernel": {
+    "provider": "v10.2.28_direct_prescribed_geometry_fem_v1",
+    "configuration_fingerprint": "4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873",
+    "physics_fingerprint": "77340db33df73106746728f72d306b3c2a2c0c6af080ff5307795ab56b9f0b5f",
+    "family_runtime_path": "runs/v11_direct_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+    "family_sha256": "06b887f47a9d19c467921c60564a2b5568142fad446f44f2c628fc67caf4b8b1",
+    "prior_kernel_family_required": false,
+    "material_parameter_option_required": false,
+    "hazard_seed_required": false,
+    "stochastic_trajectory_required": false,
+    "production_physics_modified": false
+  },
+  "case": {
+    "parameter_option": "v913_paper_weakT01_0129902_persistent_sites",
+    "material_class": "weakT",
+    "temperature_K": 700.0,
+    "orientation_deg": 30.0,
+    "hazard_seed": 3621,
+    "maximum_fronts": 1,
+    "loading": {
+      "kind": "two-dimensional displacement ramp with anisotropic FEM directional J",
+      "dU_m": 2e-07,
+      "dt_s": 8.4,
+      "maximum_steps": 20000,
+      "target_projected_extension_um": 10.0
+    },
+    "first_passage": {
+      "step": 59,
+      "KJ_MPa_sqrt_m": 14.946052566197473,
+      "event_threshold_action": 0.5296494184524981
+    },
+    "event_count": 3,
+    "summary_equivalent_checkpoint_count": 2,
+    "event_threshold_actions": [
+      0.5296494184524981,
+      1.270133354524103,
+      0.3747792998336802
+    ],
+    "event_lengths_m": [
+      2.433569691270648e-06,
+      5.835856564277491e-06,
+      2.2973400956248514e-06
+    ],
+    "physical_path_extension_m": 1.0566766351172991e-05,
+    "projected_extension_m": 1.033121608243052e-05,
+    "final_tip_m": [0.0005103312160824305, 2.1506731109665278e-06],
+    "final_front_count": 1,
+    "branched": false,
+    "final_state": {
+      "N_em": 1761.5480636068128,
+      "W_emit_J_per_m": 0.8782865037857095,
+      "mpz_mobile_count": 523.8646263866912,
+      "mpz_retained_count": 1237.6834372201215,
+      "signed_active_shielding_Pa_sqrt_m": -72994.84904485139,
+      "wake_shielding_enabled": false
+    }
+  },
+  "output_sha256": {
+    "summary.json": "3ac3a38a730e5b845ccfedb8ccd5a6a1cbd0fd67cb6eebea520b4f9c481485ca",
+    "stochastic_avalanche_geometry_events.json": "5fe4d5f7edaab5944e2032c90698783e0fe4c93ef797f75165db859ffc3b5dba",
+    "steps_0700K.csv": "3b17ce29907162f2d314183c045d96d1ace17307f9d2843af66f34b87a68ad21",
+    "crack_path_700K.csv": "7810961ed8f1dc036b64814870491148e09dcec9d4f3c72ba3f91dae269bb734",
+    "kinetic_tip_cell_audit_v101.json": "d6c7c78a3abb7c6e0a5f902a9b5f53129fc1e732661cd356515093e567d6cb46"
+  },
+  "coverage": {
+    "two_dimensional_anisotropic_FEM": true,
+    "fresh_direct_kernel": true,
+    "persistent_site_emission": true,
+    "stochastic_cleavage_first_passage": true,
+    "signed_shielding": true,
+    "moving_tip_state": true,
+    "threshold_scaled_event_length": true,
+    "geometry_transaction": true,
+    "committed_crack_extension": true,
+    "branching": false,
+    "fatigue": false,
+    "restart_checkpoint": false,
+    "v10_2_30_fatigue_energy_gate": false
+  },
+  "supplemental_unit_level_reference": {
+    "output_directory": "runs/v11_branching_disabled_baseline_v1",
+    "mode": "one-dimensional stochastic moving-tip engine",
+    "temperature_K": 700.0,
+    "hazard_seed": 1720,
+    "event_count": 2,
+    "physical_extension_m": 4.594680191249747e-06,
+    "authoritative_2d_reference": false
+  },
+  "restart_evidence": "Focused v10.2.30 checkpoint/restart tests pass; this bounded monotonic 2-D run does not emit the high-cycle restart schema."
+}
