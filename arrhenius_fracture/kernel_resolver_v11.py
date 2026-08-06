@@ -6,15 +6,18 @@ import pickle
 
 from .live_topology_kernel_cache_v11 import ExactTopologyCache
 from .live_topology_kernel_v11 import (
-    LiveTopologyRequest, evaluate_exact_topology, topology_fingerprint,
+    LiveTopologyRequest, MAXIMUM_FRONTS_SUPPORTED, evaluate_exact_topology,
+    request_contour_definitions, topology_fingerprint,
 )
 
 
 def resolve_live_topology_request(
     request: LiveTopologyRequest, *, cache_root: str | Path, accepted: bool,
 ) -> tuple[dict, bool]:
-    if len(request.crack_network.active_tip_ids) > 2:
-        raise ValueError("v11 exact-topology provider supports at most two active fronts")
+    if len(request.crack_network.active_tip_ids) > MAXIMUM_FRONTS_SUPPORTED:
+        raise ValueError(
+            f"v11 exact-topology provider supports at most {MAXIMUM_FRONTS_SUPPORTED} active fronts"
+        )
     kwargs = dict(
         network=request.crack_network, mesh=request.mesh, damage=request.damage,
         mechanical_configuration_fingerprint=request.mechanical_configuration_fingerprint,
@@ -23,7 +26,7 @@ def resolve_live_topology_request(
         elastic_constants=request.elastic_constants, cluster_frame=request.cluster_frame,
         mpz_station_coordinates_m=request.mpz_station_coordinates_m,
         wake_station_coordinates_m=request.wake_station_coordinates_m,
-        contour_definitions={"radius_m": request.contour_radius_m, "exclude_radius_m": request.exclude_radius_m},
+        contour_definitions=request_contour_definitions(request),
     )
     fingerprint = topology_fingerprint(**kwargs)
     if not accepted:

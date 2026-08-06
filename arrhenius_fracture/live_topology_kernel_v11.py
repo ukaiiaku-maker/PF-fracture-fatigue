@@ -162,6 +162,23 @@ def _tip_direction(branch) -> np.ndarray:
     return np.array([math.cos(branch.current_orientation_rad), math.sin(branch.current_orientation_rad)])
 
 
+def request_contour_definitions(request: LiveTopologyRequest) -> dict[str, Any]:
+    return {
+        "radius_m": request.contour_radius_m,
+        "exclude_radius_m": request.exclude_radius_m,
+        "directional_candidates_by_physical_tip": sorted(
+            ({
+                "tip": _point(request.crack_network.branch(branch_id).tip),
+                "directions": sorted(
+                    (_point(candidate.direction_xy), candidate.candidate_id)
+                    for candidate in request.candidates_by_tip[branch_id]
+                ),
+            } for branch_id in request.crack_network.active_tip_ids),
+            key=lambda item: json.dumps(item, sort_keys=True),
+        ),
+    }
+
+
 def _shared_unit_response(request: LiveTopologyRequest, base: Mapping[str, Any], perturbation):
     raw, _, support = overlap_weighted_slip_ribbon_increment(request.mesh, perturbation)
     increment, audit = _mask_killed_ribbon_elements(
@@ -252,7 +269,7 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
         elastic_constants=request.elastic_constants, cluster_frame=request.cluster_frame,
         mpz_station_coordinates_m=request.mpz_station_coordinates_m,
         wake_station_coordinates_m=request.wake_station_coordinates_m,
-        contour_definitions={"radius_m": request.contour_radius_m, "exclude_radius_m": request.exclude_radius_m},
+        contour_definitions=request_contour_definitions(request),
     )
     fingerprint = topology_fingerprint(**fingerprint_args)
     responses = [_shared_unit_response(request, base, item) for item in request.shared_perturbations]
@@ -277,5 +294,5 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
 
 __all__ = [
     "LiveTopologyRequest", "MAXIMUM_FRONTS_SUPPORTED", "PROVIDER_ID", "SCHEMA", "canonical_topology_payload",
-    "evaluate_exact_topology", "topology_fingerprint",
+    "evaluate_exact_topology", "request_contour_definitions", "topology_fingerprint",
 ]

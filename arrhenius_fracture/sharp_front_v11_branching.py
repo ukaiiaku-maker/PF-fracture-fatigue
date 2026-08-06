@@ -28,6 +28,7 @@ from .branch_output_v11 import (
     BRANCH_EVENT_FIELDS, ENERGY_FIELDS, FRONT_FIELDS, PROVIDER_FIELDS, TRIAL_FIELDS,
     BranchOutputWriter,
 )
+from .branch_snapshot_v11 import write_topology_snapshot
 from .crack_network_v11 import CrackNetworkState, ROOT_BRANCH_ID
 from .directional_competition_v11 import (
     DirectionalCompetitionState, DirectionalRate, preview_production_cleavage_rate,
@@ -285,17 +286,50 @@ def run_2d(args):
         stored_energy_J_per_m=0.0,
     )
     restart_path = os.environ.get("V11_BRANCH_RESTART_CHECKPOINT", "").strip()
+    if not restart_path:
+        write_topology_snapshot(
+            out, state, step=0, reason="initiation", physical_extension_m=0.0,
+            branch_birth_count=0, latest_action=None,
+        )
     if restart_path:
         restored = restore_branch_checkpoint(restart_path)
         state = restored.state
-        engine = _restore_shared_engine(engine, restored.shared_process_state)
         runtime = restored.provider_runtime
         physical_time = restored.physical_time_s
         accepted_load = restored.accepted_load
         cluster = restored.branch_clusters[0] if restored.branch_clusters else None
         mesh = state.mesh; boundary = state.boundary; D = state.elasticity_D; mat = state.material
         start_step = int(state.event_counters.get("accepted_steps", 0)) + 1
+        if restored.shared_process_state.get("schema") == "v11.multi-tip-engine-bundle/1":
+            from .resolved_production_v11 import continue_resolved_production
+            return continue_resolved_production(
+                args=args, cfg=cfg, state=state, shared_engine=engine,
+                runtime=runtime, cluster=None, candidates=candidates,
+                writer=writer, out=out, cache_root=cache_root,
+                physical_time=physical_time, accepted_load=accepted_load,
+                start_step=start_step, engine_factory=lambda: base.build_engine(args, mat),
+                resume_bundle=restored.shared_process_state,
+                resume_competitions=restored.front_competitions,
+                resume_clusters=restored.branch_clusters,
+            )
+        engine = _restore_shared_engine(engine, restored.shared_process_state)
+        if (
+            (
+                restored.termination_reason == "branch_cluster_independent_tip_handoff_required"
+                or bool(restored.handoff_guard_diagnostics.get("handoff_required"))
+            )
+            and cluster is not None
+        ):
+            from .resolved_production_v11 import continue_resolved_production
+            return continue_resolved_production(
+                args=args, cfg=cfg, state=state, shared_engine=engine,
+                runtime=runtime, cluster=cluster, candidates=candidates,
+                writer=writer, out=out, cache_root=cache_root,
+                physical_time=physical_time, accepted_load=accepted_load,
+                start_step=start_step, engine_factory=lambda: base.build_engine(args, mat),
+            )
     last_measurement = {}; latest_sigma = None; latest_interval_rates = (); latest_live_result = None
+    prebranch_snapshot_written = False
 
     for step in range(start_step, int(args.steps) + 1):
         trial_fraction = 1.0
@@ -366,7 +400,15 @@ def run_2d(args):
         trial_requests = {}; trial_live_results = {}; trial_clusters = {}; trial_drives = {}
 
         def trial_action(current, proposal):
-            nonlocal runtime
+            nonlocal runtime, prebranch_snapshot_written
+            if proposal.action_type == "two_arm" and not prebranch_snapshot_written:
+                write_topology_snapshot(
+                    out, current, step=step, reason="before_first_branch",
+                    physical_extension_m=current.crack_network.total_physical_crack_length_m - cfg.geometry.a0,
+                    branch_birth_count=int(current.event_counters.get("branch_birth_count", 0)),
+                    latest_action=current.event_counters.get("latest_successful_action"),
+                )
+                prebranch_snapshot_written = True
             if runtime.routing.active_mechanics_provider == PREBRANCH_PROVIDER_ID:
                 request0 = _request(current, candidates, args=args, cfg=cfg, runtime_step=step, cluster=None)
                 runtime, live0 = runtime.transition(
@@ -568,6 +610,23 @@ def run_2d(args):
                 "energy_margin_J_per_m": selected.result.energy_margin_J_per_m,
             })
             writer.branch_event(event)
+            counters = dict(state.event_counters)
+            counters["branch_birth_count"] = counters.get("branch_birth_count", 0) + 1
+            counters["latest_successful_action"] = selected.proposal.action_id
+            state = replace(state, event_counters=counters)
+            write_topology_snapshot(
+                out, state, step=step, reason="branch_birth",
+                physical_extension_m=state.crack_network.total_physical_crack_length_m - cfg.geometry.a0,
+                branch_birth_count=counters["branch_birth_count"],
+                latest_action=selected.proposal.action_id,
+                mechanics={
+                    "energy_summary": {
+                        "released_J_per_m": selected.result.energy_release_J_per_m,
+                        "cost_J_per_m": selected.result.hazard_dissipation_J_per_m,
+                        "margin_J_per_m": selected.result.energy_margin_J_per_m,
+                    }
+                },
+            )
         writer.energy({
             "step": step, "accepted_state_id": context.accepted_state_id,
             "stored_energy_J_per_m": state.stored_energy_J_per_m,
@@ -626,7 +685,14 @@ def run_2d(args):
         checkpoint_path = out / "checkpoint" / "latest.json"
         write_branch_checkpoint(checkpoint, checkpoint_path)
         if guard is not None and guard.handoff_required:
-            termination = guard.termination_status; break
+            from .resolved_production_v11 import continue_resolved_production
+            return continue_resolved_production(
+                args=args, cfg=cfg, state=state, shared_engine=engine,
+                runtime=runtime, cluster=cluster, candidates=candidates,
+                writer=writer, out=out, cache_root=cache_root,
+                physical_time=physical_time, accepted_load=accepted_load,
+                start_step=step + 1, engine_factory=lambda: base.build_engine(args, mat),
+            )
         extension = state.crack_network.total_physical_crack_length_m - cfg.geometry.a0
         target = float(getattr(args, "target_crack_extension_um", float("inf"))) * 1e-6
         if extension >= target:

@@ -82,8 +82,9 @@ def resolve_unresolved_cluster(
     """
     if not cluster.unresolved:
         raise ValueError("branch cluster is already resolved")
-    if tuple(sorted(cluster.arm_branch_ids)) != tuple(sorted(network.active_tip_ids)):
-        raise ValueError("resolution requires exactly the two active cluster arms")
+    active = set(network.active_tip_ids)
+    if not set(cluster.arm_branch_ids).issubset(active):
+        raise ValueError("resolution requires both cluster arms to remain active")
     reservoir = JunctionWakeReservoir(
         reservoir_id=f"reservoir:{cluster.cluster_id}", cluster_id=cluster.cluster_id,
         junction_xy_m=cluster.junction_xy_m,

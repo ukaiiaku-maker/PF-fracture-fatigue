@@ -147,6 +147,16 @@ def _write_failure(out: Path, error: BaseException) -> None:
                 "latest_checkpoint": str(checkpoint.resolve()),
                 "latest_successful_action": manifest.get("event_counters", {}).get("latest_successful_action"),
             }
+            from .branch_checkpoint_v11 import restore_branch_checkpoint
+            from .branch_snapshot_v11 import write_topology_snapshot
+            restored = restore_branch_checkpoint(checkpoint)
+            write_topology_snapshot(
+                out, restored.state,
+                step=int(context.get("step") or 0), reason="failure",
+                physical_extension_m=float(restored.physical_extension_m),
+                branch_birth_count=int(restored.state.event_counters.get("branch_birth_count", 0)),
+                latest_action=context.get("latest_successful_action"),
+            )
         except (OSError, ValueError, TypeError):
             context = {"latest_checkpoint": str(checkpoint.resolve())}
     summary = {
