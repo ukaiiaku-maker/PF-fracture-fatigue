@@ -150,13 +150,25 @@ def _write_failure(out: Path, error: BaseException) -> None:
             }
             from .branch_checkpoint_v11 import restore_branch_checkpoint
             from .branch_snapshot_v11 import write_topology_snapshot
+            from .network_metrics_v11 import crack_growth_metrics
             restored = restore_branch_checkpoint(checkpoint)
+            root_branch = restored.state.crack_network.branch(restored.state.crack_network.primary_branch_id)
+            initial_length = (
+                ((root_branch.path[1][0] - root_branch.path[0][0]) ** 2 +
+                 (root_branch.path[1][1] - root_branch.path[0][1]) ** 2) ** 0.5
+                if len(root_branch.path) > 1 else 0.0
+            )
+            growth = crack_growth_metrics(
+                restored.state.crack_network, initial_crack_length_m=initial_length,
+            )
             write_topology_snapshot(
                 out, restored.state,
                 step=int(context.get("step") or 0), reason="failure",
                 physical_extension_m=float(restored.physical_extension_m),
                 branch_birth_count=int(restored.state.event_counters.get("branch_birth_count", 0)),
                 latest_action=context.get("latest_successful_action"),
+                growth_metrics=growth.to_dict_um(),
+                coalescence_count=int(restored.state.event_counters.get("coalescence_count", 0)),
             )
         except (OSError, ValueError, TypeError):
             context = {"latest_checkpoint": str(checkpoint.resolve())}
