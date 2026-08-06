@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 from pathlib import Path
+import re
+import subprocess
+import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,28 +20,232 @@ def _load_builder():
     return module
 
 
-def test_reused_cases_exit_before_native_v1042_command_checks():
+def _generate_final_scheduler(tmp_path: Path) -> str:
     builder = _load_builder()
     source = (
         ROOT / "scripts" / "run_v10_2_28_paper_four_class_theta30_1000um.sh"
     ).read_text()
-    transformed = builder.transform(source)
+    outer = builder.transform(source)
 
-    reuse_marker = 'v1042_reuse_path = root / "v10_4_2_reuse_audit.json"'
-    verify_marker = "verify_materialized_case(root)"
-    source_verify_marker = "verify_source_case(root)"
-    exit_marker = "raise SystemExit(0)"
-    native_marker = "bulk_audit = json.loads("
+    candidates = []
+    pattern = re.compile(
+        r'^OUTROOT="\$OUTROOT" "\$PYTHON_BIN" - <<[\'\"]?PY[\'\"]?\n'
+        r'(?P<body>.*?)^PY$',
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    for match in pattern.finditer(outer):
+        body = match.group("body")
+        if "SOURCE_SCHEDULER" in body and "GENERATED_SCHEDULER" in body:
+            candidates.append(body)
+    assert len(candidates) == 1
 
-    assert transformed.count(reuse_marker) >= 2
-    early = transformed.index(reuse_marker)
-    verify = transformed.index(verify_marker, early)
-    source_verify = transformed.index(source_verify_marker, verify)
-    success_exit = transformed.index(exit_marker, source_verify)
-    native = transformed.index(native_marker, success_exit)
+    generator = tmp_path / "generate_final_scheduler.py"
+    generator.write_text(candidates[0])
+    outroot = tmp_path / "out"
+    outroot.mkdir()
+    generated = tmp_path / "final_scheduler.sh"
+    generated_plotter = outroot / "plotter.py"
+    env = os.environ.copy()
+    env.update(
+        {
+            "SOURCE_SCHEDULER": str(
+                ROOT / "scripts" / "run_v10_2_27_paper_four_class_30deg_long_rcurves.sh"
+            ),
+            "SOURCE_PLOTTER": str(
+                ROOT / "scripts" / "plot_v10_2_27_paper_four_class_rcurves.py"
+            ),
+            "GENERATED_SCHEDULER": str(generated),
+            "GENERATED_PLOTTER": str(generated_plotter),
+            "OUTROOT": str(outroot),
+        }
+    )
+    subprocess.run([sys.executable, str(generator)], cwd=ROOT, env=env, check=True)
+    subprocess.run(["bash", "-n", str(generated)], check=True)
+    return generated.read_text()
 
-    assert early < verify < source_verify < success_exit < native
-    assert "--plastic-flow-terminal" in transformed
+
+def _extract_shell_function(shell: str, name: str, following: str) -> str:
+    start = shell.index(f"{name}() {{")
+    end = shell.index(f"\n}}\n\n{following}", start) + 3
+    return shell[start:end]
+
+
+def _make_materialized_fixture(case_root: Path, scheduler: str) -> None:
+    verifier_start = scheduler.index("verified_complete() {")
+    early_guard = scheduler.index(
+        'v1042_reuse_path = root / "v10_4_2_reuse_audit.json"',
+        verifier_start,
+    )
+    prefix = scheduler[verifier_start:early_guard]
+    required_names = set(re.findall(r'root / "([^"]+)"', prefix))
+    required_names.update(
+        {
+            "stage3_case_status.json",
+            "v10_2_27_case_contract.json",
+            "v10_2_27_paper_four_class_parameter_transfer.json",
+            "command.sh",
+            "v10_4_2_reuse_audit.json",
+        }
+    )
+    case_root.mkdir(parents=True)
+    source_root = case_root.parent / "source_case"
+    source_root.mkdir()
+    source_complete = source_root / "COMPLETE"
+    source_complete.write_text("complete\n")
+    (case_root / "COMPLETE").symlink_to(source_complete)
+    for name in sorted(required_names - {"COMPLETE", "PLASTIC_FLOW"}):
+        path = case_root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if not path.exists():
+            path.write_text("{}\n")
+
+
+def _write_stub_package(stub_root: Path) -> None:
+    package = stub_root / "arrhenius_fracture"
+    package.mkdir(parents=True)
+    (package / "__init__.py").write_text("")
+    (package / "reuse_v1041_v1042.py").write_text(
+        """from __future__ import annotations
+import os
+from pathlib import Path
+
+
+def verify_materialized_case(root):
+    if os.environ.get('REUSE_STUB_FAIL') == '1':
+        raise RuntimeError('synthetic corrupt reuse audit')
+    print(f'VERIFY_MATERIALIZED_STUB {root}')
+    return {'source_case': str(Path(root).parent / 'source_case')}
+
+
+def verify_source_case(root):
+    print(f'VERIFY_SOURCE_STUB {root}')
+    return {'verified': True}
+"""
+    )
+
+
+def _run_generated_reuse_case(
+    tmp_path: Path,
+    scheduler: str,
+    *,
+    corrupt: bool,
+) -> tuple[subprocess.CompletedProcess[str], Path]:
+    option = "v913_paper_peak01_0242980_persistent_sites"
+    outroot = tmp_path / ("campaign_corrupt" if corrupt else "campaign_valid")
+    case_root = outroot / option / "T300K_th0_seed3621"
+    _make_materialized_fixture(case_root, scheduler)
+
+    stub_root = tmp_path / ("stub_corrupt" if corrupt else "stub_valid")
+    _write_stub_package(stub_root)
+    sentinel = tmp_path / ("solver_corrupt_started" if corrupt else "solver_valid_started")
+    python_wrapper = tmp_path / ("python_corrupt.sh" if corrupt else "python_valid.sh")
+    python_wrapper.write_text(
+        """#!/usr/bin/env bash
+if [[ "${1:-}" == "-u" && "${2:-}" == "-m" ]]; then
+  : > "$SOLVER_SENTINEL"
+  exit 99
+fi
+exec "$REAL_PYTHON" "$@"
+"""
+    )
+    python_wrapper.chmod(0o755)
+
+    verified_complete = _extract_shell_function(scheduler, "verified_complete", "run_case() {")
+    run_case = _extract_shell_function(scheduler, "run_case", "pids=()")
+    runner = tmp_path / ("run_corrupt.sh" if corrupt else "run_valid.sh")
+    runner.write_text(
+        f"""#!/usr/bin/env bash
+set -u
+set -o pipefail
+ROOT={str(ROOT)!r}
+OUTROOT={str(outroot)!r}
+PYTHON_BIN={str(python_wrapper)!r}
+SKIP_FINISHED=1
+RESTART_INCOMPLETE=1
+TARGET_EXT_UM=1000
+THETA=0
+SAVE_SNAPSHOTS=20
+SNAPSHOT_COLS=5
+FAMILY_JSON=dummy-family.json
+REGISTRY=dummy-registry.csv
+STEPS=10
+PERSISTENT_SOURCE_MIN_WIDTH_UM=0
+
+candidate_for_option() {{
+  printf '%s\n' v913_zeroD_sobol_0242980
+}}
+
+write_case_contract() {{
+  echo 'ERROR: write_case_contract must not be reached' >&2
+  return 97
+}}
+
+{verified_complete}
+
+{run_case}
+
+set +e
+run_case {option!r} 300 3621
+rc=$?
+set -e
+echo "RUN_CASE_RC=$rc"
+exit "$rc"
+"""
+    )
+    runner.chmod(0o755)
+
+    env = os.environ.copy()
+    env.update(
+        {
+            "REAL_PYTHON": sys.executable,
+            "SOLVER_SENTINEL": str(sentinel),
+            "PYTHONPATH": os.pathsep.join(
+                [str(stub_root), str(ROOT), env.get("PYTHONPATH", "")]
+            ),
+            "REUSE_STUB_FAIL": "1" if corrupt else "0",
+        }
+    )
+    result = subprocess.run(
+        ["bash", str(runner)],
+        cwd=ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    return result, sentinel
+
+
+def test_final_generated_scheduler_orders_reuse_before_native_checks(tmp_path: Path):
+    scheduler = _generate_final_scheduler(tmp_path)
+    skip = 'print(f"SKIP_REUSED_VERIFIED {root}")'
+    native = "expected = {"
+    assert scheduler.count(skip) == 1
+    assert scheduler.index(skip) < scheduler.index(native)
+    assert "verify_source_case(Path(reuse_audit[\"source_case\"]))" in scheduler
+    assert "find \"$OUTROOT\" \\( -type f -o -type l \\) -name COMPLETE" in scheduler
+    assert "acceptance_rc=$?" in scheduler
+    assert "FAILED_REUSE_VERIFICATION" in scheduler
+
+
+def test_valid_reused_case_skips_without_solver_launch(tmp_path: Path):
+    scheduler = _generate_final_scheduler(tmp_path)
+    result, sentinel = _run_generated_reuse_case(tmp_path, scheduler, corrupt=False)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "SKIP_REUSED_VERIFIED" in result.stdout
+    assert "SKIP verified complete" in result.stdout
+    assert "RUN_CASE_RC=0" in result.stdout
+    assert not sentinel.exists()
+    assert not any((tmp_path / "campaign_valid").rglob("RUN_FAILED"))
+
+
+def test_corrupt_reuse_fails_closed_without_solver_launch(tmp_path: Path):
+    scheduler = _generate_final_scheduler(tmp_path)
+    result, sentinel = _run_generated_reuse_case(tmp_path, scheduler, corrupt=True)
+    assert result.returncode == 3
+    assert "FAILED_REUSE_VERIFICATION" in result.stderr
+    assert "RUN_CASE_RC=3" in result.stdout
+    assert not sentinel.exists()
 
 
 def test_public_wrapper_uses_reuse_aware_builder():
