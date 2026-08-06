@@ -3,8 +3,8 @@
 
 Materialized v10.4.1 cases carry a v10.4.2 reuse audit that verifies source
 hashes, detailed-balance provenance, target completion, and the corrected
-positive directional-J history.  A valid inherited case must return a clean
-skip before native-v10.4.2 contract checks are evaluated.
+positive directional-J history. A valid inherited case returns a clean skip
+before any native-v10.4.2 contract is constructed or compared.
 """
 from __future__ import annotations
 
@@ -33,12 +33,9 @@ def _replace_once(text: str, old: str, new: str, label: str) -> str:
 def transform(source: str) -> str:
     text = _load_positive_j_builder().transform(source)
 
-    # These are transformations of the final generated scheduler. They are
-    # deliberately inserted into the outer builder immediately before it reads
-    # the plotter, after every earlier scheduler adapter has been registered.
     scheduler_repairs = r"""
 replace_scheduler_exact(
-    'contract = json.loads((root / "v10_2_27_case_contract.json").read_text())',
+    'expected = {',
     '''v1042_reuse_path = root / "v10_4_2_reuse_audit.json"
 if v1042_reuse_path.is_file():
     from arrhenius_fracture.reuse_v1041_v1042 import (
@@ -51,8 +48,8 @@ if v1042_reuse_path.is_file():
     print(f"SKIP_REUSED_VERIFIED {root}")
     raise SystemExit(0)
 
-contract = json.loads((root / "v10_2_27_case_contract.json").read_text())''',
-    label="v10.4.2 audited-reuse short-circuit before native contract checks",
+expected = {''',
+    label="v10.4.2 audited-reuse short-circuit before native contract construction",
 )
 
 replace_scheduler_exact(
@@ -90,8 +87,6 @@ echo "Campaign complete: failures=$failures output=$OUTROOT"''',
     label="v10.4.2 reconcile scheduler and filesystem completion status",
 )
 
-# Convert any verification rejection of an inherited case into an explicit
-# status before the terminal-looking directory guard reports the shell failure.
 replace_scheduler_exact(
     '''    if [[ -f "$case_root/COMPLETE" || -f "$case_root/PLASTIC_FLOW" ]]; then
       echo "ERROR: terminal-looking case failed contract verification: $case_root" >&2
@@ -108,6 +103,7 @@ replace_scheduler_exact(
     label="v10.4.2 explicit reuse-verification failure status",
 )
 
+_verified_start = scheduler.index("verified_complete() {")
 _reuse_skip = 'print(f"SKIP_REUSED_VERIFIED {root}")'
 _native_expected = 'expected = {'
 if scheduler.count(_reuse_skip) != 1:
@@ -115,9 +111,11 @@ if scheduler.count(_reuse_skip) != 1:
         "ERROR: final scheduler must contain exactly one SKIP_REUSED_VERIFIED path; "
         f"found {scheduler.count(_reuse_skip)}"
     )
-if scheduler.index(_reuse_skip) > scheduler.index(_native_expected):
+_guard_index = scheduler.index(_reuse_skip, _verified_start)
+_expected_index = scheduler.index(_native_expected, _verified_start)
+if _guard_index > _expected_index:
     raise SystemExit(
-        "ERROR: audited-reuse guard is still after native v10.4.2 contract checks"
+        "ERROR: audited-reuse guard is still after native v10.4.2 contract construction"
     )
 """
 
