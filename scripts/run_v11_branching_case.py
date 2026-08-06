@@ -70,11 +70,18 @@ def main(argv=None) -> int:
             "final_checkpoint": None,
             "validation": {"branching_disabled": True, "provider_transition": False},
         })
+    completion = {}
+    try:
+        completion = json.loads((out / "run_complete.json").read_text())
+    except (OSError, json.JSONDecodeError):
+        pass
+    validation = completion.get("validation", {})
     status.update({
         "status": "completed" if result.returncode == 0 else "failed",
         "returncode": result.returncode, "end_time": datetime.now(timezone.utc).isoformat(),
         "provider_transition": (out / "provider_transitions.csv").exists(),
         "latest_event": "branch" if (out / "branch_events.csv").exists() else None,
+        "live_fem_solve_count": int(validation.get("live_fem_solve_count", 0)),
     })
     atomic_json(out / "case_status.json", status)
     return result.returncode

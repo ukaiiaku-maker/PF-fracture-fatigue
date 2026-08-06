@@ -638,6 +638,9 @@ def run_2d(args):
     writer.complete(status=termination, final_checkpoint="checkpoint/latest.json", validation={
         "checkpoint": True, "shared_state_updates": state.event_counters.get("shared_state_updates", 0),
         "topology_actions": state.event_counters.get("topology_actions", 0),
+        "provider_transition": runtime.routing.transition_step is not None,
+        "live_fem_solve_count": runtime.live_fem_solve_count,
+        "accepted_provider_state_count": runtime.accepted_provider_state_count,
     })
     return 0
 
