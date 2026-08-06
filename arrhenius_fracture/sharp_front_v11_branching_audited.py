@@ -152,6 +152,9 @@ def _write_failure(out: Path, error: BaseException) -> None:
             from .branch_snapshot_v11 import write_topology_snapshot
             from .network_metrics_v11 import crack_growth_metrics
             restored = restore_branch_checkpoint(checkpoint)
+            from .production_counts_v11 import production_front_counts
+            context.update(production_front_counts(restored.state))
+            context.pop("branch_count", None)
             root_branch = restored.state.crack_network.branch(restored.state.crack_network.primary_branch_id)
             initial_length = (
                 ((root_branch.path[1][0] - root_branch.path[0][0]) ** 2 +

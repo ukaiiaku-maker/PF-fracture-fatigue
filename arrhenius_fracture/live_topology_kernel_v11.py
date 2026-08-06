@@ -109,8 +109,16 @@ def canonical_topology_payload(
             if item["generation"] > 0
         ),
         "sharp_wake_damage": {
-            "representation": "nodal_stiffness_kill",
+            "representation": (
+                "nested_parent_inherited_element_stiffness_kill"
+                if getattr(mesh, "element_damage_gp", None) is not None
+                else "nodal_stiffness_kill"
+            ),
             "sha256": _array_hash(np.asarray(damage, dtype=float)),
+            "element_sha256": (
+                _array_hash(np.asarray(mesh.element_damage_gp, dtype=float))
+                if getattr(mesh, "element_damage_gp", None) is not None else None
+            ),
         },
         "shared_cluster_frame": json.loads(json.dumps(dict(cluster_frame), sort_keys=True, allow_nan=False)),
         "mpz_station_coordinates_m": sorted(_point(value) for value in mpz_station_coordinates_m),
