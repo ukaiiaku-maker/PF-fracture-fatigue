@@ -1,0 +1,279 @@
+"""Exact-crack-network live FEM mechanics provider for v11 branching."""
+from __future__ import annotations
+
+from dataclasses import dataclass
+import hashlib
+import json
+import math
+from typing import Any, Mapping, Sequence
+
+import numpy as np
+
+from .crack_network_v11 import CrackNetworkState
+from .directional_competition_v11 import CleavageCandidate
+from .fem import elastic_energy_densities
+from .hazard_energy_event_gate_v10230 import _infer_boundary_opening
+from .interaction_integral_v1026 import compute_signed_interaction_integral
+from .j_integral import compute_J_integral
+from .slip_ribbon_overlap_v10214 import overlap_weighted_slip_ribbon_increment
+from .unit_slip_perturbation_v10212 import (
+    _mask_killed_ribbon_elements,
+    equilibrated_base_state,
+)
+from .unit_slip_perturbation_v1026 import SlipRibbonPerturbation, solve_fixed_crack_state
+
+
+SCHEMA = "v11_exact_topology_live_fem_provider_v1"
+PROVIDER_ID = "v11_exact_crack_network_live_fem_v1"
+
+
+def _canonical_float(value: float) -> str:
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("topology fingerprint values must be finite")
+    if number == 0.0:
+        number = 0.0
+    return number.hex()
+
+
+def _point(point) -> tuple[str, str]:
+    return tuple(_canonical_float(value) for value in point)  # type: ignore[return-value]
+
+
+def _array_hash(value: np.ndarray) -> str:
+    array = np.ascontiguousarray(value)
+    digest = hashlib.sha256()
+    digest.update(str(array.dtype).encode())
+    digest.update(json.dumps(array.shape).encode())
+    digest.update(array.tobytes())
+    return digest.hexdigest()
+
+
+def canonical_topology_payload(
+    *,
+    network: CrackNetworkState,
+    mesh,
+    damage: np.ndarray,
+    mechanical_configuration_fingerprint: str,
+    specimen_geometry: Mapping[str, Any],
+    boundary_condition_identity: str,
+    elastic_constants: Mapping[str, float],
+    cluster_frame: Mapping[str, Any],
+    mpz_station_coordinates_m: Sequence[Sequence[float]],
+    wake_station_coordinates_m: Sequence[Sequence[float]],
+    contour_definitions: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Canonicalize the physical graph without retaining arbitrary branch IDs."""
+    records = []
+    for branch in network.branches:
+        path = tuple(_point(point) for point in branch.path)
+        parent_path = (
+            None if branch.parent_branch_id is None
+            else tuple(_point(point) for point in network.branch(branch.parent_branch_id).path)
+        )
+        records.append({
+            "path": path,
+            "parent_path": parent_path,
+            "status": branch.status,
+            "generation": branch.generation,
+            "initiation_event": branch.initiation_event,
+            "active_tip": _point(branch.tip) if branch.status == "active" else None,
+            "active_direction": (
+                (_canonical_float(math.cos(branch.current_orientation_rad)),
+                 _canonical_float(math.sin(branch.current_orientation_rad)))
+                if branch.status == "active" else None
+            ),
+        })
+    records.sort(key=lambda item: json.dumps(item, sort_keys=True, separators=(",", ":")))
+    edges = sorted(
+        (path[index], path[index + 1])
+        for item in records
+        for path in (item["path"],)
+        for index in range(len(path) - 1)
+    )
+    return {
+        "mechanical_configuration_fingerprint": str(mechanical_configuration_fingerprint),
+        "specimen_geometry": json.loads(json.dumps(dict(specimen_geometry), sort_keys=True, allow_nan=False)),
+        "boundary_condition_identity": str(boundary_condition_identity),
+        "elastic_constants": {key: _canonical_float(value) for key, value in sorted(elastic_constants.items())},
+        "mesh": {
+            "nodes_sha256": _array_hash(np.asarray(mesh.nodes, dtype=float)),
+            "elements_sha256": _array_hash(np.asarray(mesh.elems, dtype=np.int64)),
+            "node_count": int(mesh.nn), "element_count": int(mesh.ne),
+        },
+        "crack_graph": records,
+        "crack_edges": edges,
+        "branch_junction_coordinates": sorted(
+            path[0] for item in records for path in (item["path"],)
+            if item["generation"] > 0
+        ),
+        "sharp_wake_damage": {
+            "representation": "nodal_stiffness_kill",
+            "sha256": _array_hash(np.asarray(damage, dtype=float)),
+        },
+        "shared_cluster_frame": json.loads(json.dumps(dict(cluster_frame), sort_keys=True, allow_nan=False)),
+        "mpz_station_coordinates_m": sorted(_point(value) for value in mpz_station_coordinates_m),
+        "wake_station_coordinates_m": sorted(_point(value) for value in wake_station_coordinates_m),
+        "interaction_integral_contours": json.loads(json.dumps(dict(contour_definitions), sort_keys=True, allow_nan=False)),
+    }
+
+
+def topology_fingerprint(**kwargs) -> str:
+    payload = canonical_topology_payload(**kwargs)
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+@dataclass(frozen=True)
+class LiveTopologyRequest:
+    mesh: Any
+    boundary: Any
+    displacement: np.ndarray
+    ep_gp: np.ndarray
+    rho_gp: np.ndarray
+    damage: np.ndarray
+    elasticity_D: np.ndarray
+    material: Any
+    cohesive_network: Any
+    crack_network: CrackNetworkState
+    candidates_by_tip: Mapping[str, tuple[CleavageCandidate, ...]]
+    mechanical_configuration_fingerprint: str
+    specimen_geometry: Mapping[str, Any]
+    boundary_condition_identity: str
+    elastic_constants: Mapping[str, float]
+    cluster_frame: Mapping[str, Any]
+    mpz_station_coordinates_m: tuple[tuple[float, float], ...]
+    wake_station_coordinates_m: tuple[tuple[float, float], ...]
+    contour_radius_m: float
+    exclude_radius_m: float
+    shared_perturbations: tuple[SlipRibbonPerturbation, ...] = ()
+
+
+def _segments(network: CrackNetworkState):
+    return [
+        (np.asarray(a, dtype=float), np.asarray(b, dtype=float))
+        for branch in network.branches
+        for a, b in zip(branch.path, branch.path[1:])
+    ]
+
+
+def _tip_direction(branch) -> np.ndarray:
+    return np.array([math.cos(branch.current_orientation_rad), math.sin(branch.current_orientation_rad)])
+
+
+def _shared_unit_response(request: LiveTopologyRequest, base: Mapping[str, Any], perturbation):
+    raw, _, support = overlap_weighted_slip_ribbon_increment(request.mesh, perturbation)
+    increment, audit = _mask_killed_ribbon_elements(
+        request.mesh, request.damage, raw, support,
+        minimum_residual_stiffness_fraction=1.0e-3, stiffness_kappa=1.0e-6,
+    )
+    Uy_top, Uy_bot = _infer_boundary_opening(request.boundary, np.asarray(base["u"]))
+    perturbed = solve_fixed_crack_state(
+        mesh=request.mesh, boundary=request.boundary, u=np.asarray(base["u"]),
+        ep_gp=np.asarray(request.ep_gp) + increment, rho_gp=request.rho_gp,
+        d=request.damage, D=request.elasticity_D, mat=request.material,
+        Uy_top=Uy_top, Uy_bot=Uy_bot, cohesive_network=request.cohesive_network,
+    )
+    rows = []
+    segments = _segments(request.crack_network)
+    content = float(perturbation.signed_line_content)
+    for branch_id in request.crack_network.active_tip_ids:
+        branch = request.crack_network.branch(branch_id)
+        common = dict(
+            mesh=request.mesh, d=request.damage, crack_tip=np.asarray(branch.tip),
+            crack_direction=_tip_direction(branch), mat=request.material,
+            ell=request.contour_radius_m, crack_segments=segments,
+            exclude_radius=request.exclude_radius_m, D=request.elasticity_D,
+        )
+        before = compute_signed_interaction_integral(
+            u=np.asarray(base["u"]), sigma_gp=np.asarray(base["sigma_gp"]), **common
+        )
+        after = compute_signed_interaction_integral(
+            u=np.asarray(perturbed["u"]), sigma_gp=np.asarray(perturbed["sigma_gp"]), **common
+        )
+        rows.append({
+            "tip_physical_key": [_point(branch.tip), _point(_tip_direction(branch))],
+            "H_I_Pa_sqrt_m_per_signed_line": float((before.K_I_Pa_sqrt_m - after.K_I_Pa_sqrt_m) / content),
+            "H_II_Pa_sqrt_m_per_signed_line": float((before.K_II_Pa_sqrt_m - after.K_II_Pa_sqrt_m) / content),
+        })
+    rows.sort(key=lambda row: json.dumps(row["tip_physical_key"]))
+    return {"perturbation": perturbation.audit_payload(), "rows": rows, "support": audit}
+
+
+def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
+    """Equilibrate and measure one exact accepted or ephemeral trial topology."""
+    Uy_top, Uy_bot = _infer_boundary_opening(request.boundary, request.displacement)
+    base = equilibrated_base_state(
+        mesh=request.mesh, boundary=request.boundary, baseline_u=request.displacement,
+        baseline_ep_gp=request.ep_gp, rho_gp=request.rho_gp, d=request.damage,
+        D=request.elasticity_D, mat=request.material, Uy_top=Uy_top, Uy_bot=Uy_bot,
+        cohesive_network=request.cohesive_network,
+    )
+    stored, _ = elastic_energy_densities(
+        request.mesh, base["u"], request.ep_gp, base["sigma_gp"], request.elasticity_D
+    )
+    energy = float(np.sum(stored * request.mesh.area_e))
+    segments = _segments(request.crack_network)
+    tips = []
+    for branch_id in request.crack_network.active_tip_ids:
+        branch = request.crack_network.branch(branch_id)
+        directional = []
+        for candidate in sorted(request.candidates_by_tip[branch_id], key=lambda item: item.candidate_id):
+            _, _, info = compute_J_integral(
+                request.mesh, base["u"], base["sigma_gp"], base["psi_e_gp"],
+                request.damage, np.asarray(branch.tip), np.asarray(candidate.direction_xy),
+                request.material, ell=request.contour_radius_m,
+                crack_segments=segments, exclude_radius=request.exclude_radius_m,
+            )
+            signed = float(info.get("J_signed", info.get("J", 0.0)))
+            positive = max(signed, 0.0)
+            Eprime = float(request.material.Eprime)
+            directional.append({
+                "candidate_id": candidate.candidate_id,
+                "signed_J_J_per_m2": signed,
+                "positive_J_J_per_m2": positive,
+                "K_directional_Pa_sqrt_m": math.sqrt(Eprime * positive),
+                "local_contour_valid": bool(info.get("n_active_elements", 0) > 0 and math.isfinite(signed)),
+                "local_contour_active_elements": int(info.get("n_active_elements", 0)),
+                "contour_diagnostics": info,
+            })
+        tips.append({
+            "physical_tip_key": [_point(branch.tip), _point(_tip_direction(branch))],
+            "tip_xy_m": list(branch.tip), "tip_direction": _tip_direction(branch).tolist(),
+            "status": branch.status, "directional": directional,
+        })
+    tips.sort(key=lambda item: json.dumps(item["physical_tip_key"]))
+    fingerprint_args = dict(
+        network=request.crack_network, mesh=request.mesh, damage=request.damage,
+        mechanical_configuration_fingerprint=request.mechanical_configuration_fingerprint,
+        specimen_geometry=request.specimen_geometry,
+        boundary_condition_identity=request.boundary_condition_identity,
+        elastic_constants=request.elastic_constants, cluster_frame=request.cluster_frame,
+        mpz_station_coordinates_m=request.mpz_station_coordinates_m,
+        wake_station_coordinates_m=request.wake_station_coordinates_m,
+        contour_definitions={"radius_m": request.contour_radius_m, "exclude_radius_m": request.exclude_radius_m},
+    )
+    fingerprint = topology_fingerprint(**fingerprint_args)
+    responses = [_shared_unit_response(request, base, item) for item in request.shared_perturbations]
+    return {
+        "schema": SCHEMA, "kernel_provider_id": PROVIDER_ID,
+        "branching_mode": "direct_fem", "maximum_fronts_supported": 2,
+        "coverage_kind": "exact_topology", "topology_fingerprint": fingerprint,
+        "interpolation_permitted": False, "prior_kernel_family_required": False,
+        "stochastic_trajectory_required": False,
+        "material_parameter_option_required": False, "hazard_seed_required": False,
+        "production_physics_modified": False,
+        "base_equilibrium": {
+            "displacement": np.asarray(base["u"]),
+            "reaction_force": float(base["reaction_top"]),
+            "recoverable_potential_energy_J_per_m": energy,
+        },
+        "tips": tips, "signed_shared_cluster_response": responses,
+        "shared_perturbation_solve_count": len(request.shared_perturbations),
+    }
+
+
+__all__ = [
+    "LiveTopologyRequest", "PROVIDER_ID", "SCHEMA", "canonical_topology_payload",
+    "evaluate_exact_topology", "topology_fingerprint",
+]
