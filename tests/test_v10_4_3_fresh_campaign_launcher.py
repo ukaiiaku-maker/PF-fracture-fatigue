@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LAUNCHER = ROOT / "scripts" / "launch_v10_4_3_plastic_dominance_campaign.sh"
-MONITOR = ROOT / "scripts" / "monitor_v10_4_3_campaign.py"
+MONITOR = ROOT / "scripts" / "monitor_v10_4_3_fresh48.sh"
 
 
 def test_fresh_launcher_defaults_to_new_v1043_root() -> None:
@@ -41,7 +41,8 @@ def test_full_launch_no_longer_requires_reuse_smoke() -> None:
     assert "Campaign acceptance: planned=48 complete=48 failed_or_incomplete=0" in text
 
 
-def test_monitor_default_tracks_fresh48_root() -> None:
+def test_monitor_wrapper_tracks_fresh48_root() -> None:
     text = MONITOR.read_text()
     assert "plastic_dominance_fresh48_base3621_v1" in text
+    assert "monitor_v10_4_3_campaign.py" in text
     assert "reuse17_base3621_v1" not in text
