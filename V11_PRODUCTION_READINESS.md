@@ -31,6 +31,15 @@ partitioning these histories is not acceptable.  The 1000 µm qualification and
 mid-run restart comparison remain incomplete until that capability is
 implemented and requalified.
 
+A deterministic global multi-center Delaunay rebuild was evaluated as a repair
+and rejected.  It reduced all six active-tip local element sizes to
+1.11--1.40 µm and preserved the area integrals of plastic strain and
+dislocation density exactly, but fixed-load re-equilibration changed accepted
+stored energy from 247.7126626281 to 225.9155861982 J/m (−8.80%).  That violates
+the accepted-state parity requirement.  The remaining implementation need is
+topology-preserving local refinement, or an equivalently qualified variational
+state transfer, with energy/reaction parity at the remesh boundary.
+
 Evidence is under
 `runs/v11_canonical_45deg_700K_seed3621_1000um_long_growth_v1`, including the
 latest atomic checkpoint, action/energy ledgers, failure summary, full
