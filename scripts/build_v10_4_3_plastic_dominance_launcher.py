@@ -61,6 +61,87 @@ def transform(source: str) -> str:
 
     scheduler_adapter = r"""
 replace_scheduler_exact(
+    '''RESTART_INCOMPLETE=${RESTART_INCOMPLETE:-1}''',
+    '''RESTART_INCOMPLETE=${RESTART_INCOMPLETE:-1}
+CASE_FILTER_OPTION=${CASE_FILTER_OPTION:-}
+CASE_FILTER_TEMPERATURE=${CASE_FILTER_TEMPERATURE:-}''',
+    label="v10.4.3 manifest-preserving execution filters",
+)
+
+replace_scheduler_exact(
+    '''    while [[ ${#pids[@]} -ge $MAX_JOBS ]]; do
+      wait_one
+    done
+    run_case "$option" "$T" "$case_seed" &
+    pids+=("$!")
+    labels+=("${option}:T${T}K:seed${case_seed}")
+    temperature_index=$((temperature_index + 1))''',
+    '''    if [[ -n "$CASE_FILTER_OPTION" && "$option" != "$CASE_FILTER_OPTION" ]]; then
+      temperature_index=$((temperature_index + 1))
+      continue
+    fi
+    if [[ -n "$CASE_FILTER_TEMPERATURE" && "$T" != "$CASE_FILTER_TEMPERATURE" ]]; then
+      temperature_index=$((temperature_index + 1))
+      continue
+    fi
+
+    while [[ ${#pids[@]} -ge $MAX_JOBS ]]; do
+      wait_one
+    done
+    run_case "$option" "$T" "$case_seed" &
+    pids+=("$!")
+    labels+=("${option}:T${T}K:seed${case_seed}")
+    temperature_index=$((temperature_index + 1))''',
+    label="v10.4.3 filtered case scheduling with canonical seed indices",
+)
+
+replace_scheduler_exact(
+    '''if find "$OUTROOT" \\( -type f -o -type l \\) -name COMPLETE -print -quit | grep -q .; then''',
+    '''if [[ -z "$CASE_FILTER_OPTION" && -z "$CASE_FILTER_TEMPERATURE" ]] \\
+  && find "$OUTROOT" \\( -type f -o -type l \\) -name COMPLETE -print -quit | grep -q .; then''',
+    label="v10.4.3 skip campaign plotting during filtered smoke or pilot",
+)
+
+replace_scheduler_exact(
+    '''OUTROOT="$OUTROOT" "$PYTHON_BIN" - <<'PY'
+import csv
+import json
+import os
+from pathlib import Path
+
+root = Path(os.environ["OUTROOT"]).resolve()
+manifest = json.loads((root / "v10_2_27_campaign_manifest.json").read_text())
+with (root / "v10_2_27_case_seed_map.csv").open(newline="") as stream:
+    cases = list(csv.DictReader(stream))''',
+    '''OUTROOT="$OUTROOT" CASE_FILTER_OPTION="$CASE_FILTER_OPTION" \\
+CASE_FILTER_TEMPERATURE="$CASE_FILTER_TEMPERATURE" "$PYTHON_BIN" - <<'PY'
+import csv
+import json
+import os
+from pathlib import Path
+
+root = Path(os.environ["OUTROOT"]).resolve()
+manifest = json.loads((root / "v10_2_27_campaign_manifest.json").read_text())
+with (root / "v10_2_27_case_seed_map.csv").open(newline="") as stream:
+    cases = list(csv.DictReader(stream))
+filter_option = os.environ.get("CASE_FILTER_OPTION", "").strip()
+filter_temperature = os.environ.get("CASE_FILTER_TEMPERATURE", "").strip()
+if filter_option:
+    cases = [case for case in cases if case["option"] == filter_option]
+if filter_temperature:
+    requested_temperature = float(filter_temperature)
+    cases = [
+        case for case in cases
+        if float(case["temperature_K"]) == requested_temperature
+    ]
+if not cases:
+    raise SystemExit(
+        "ERROR: v10.4.3 execution filter selected zero canonical cases"
+    )''',
+    label="v10.4.3 filtered campaign acceptance",
+)
+
+replace_scheduler_exact(
     '''    --plastic-flow-contour-multipliers "1 2 4 8"''',
     '''    --plastic-flow-contour-multipliers "1 2 4 8"
     --plastic-flow-min-plastic-fraction 0.50
@@ -78,6 +159,8 @@ _v1043_required = [
     "--plastic-flow-max-elastic-fraction 0.50",
     "--plastic-flow-max-tangent-fraction 0.50",
     "--plastic-flow-energy-balance-tolerance 0.01",
+    "CASE_FILTER_OPTION",
+    "CASE_FILTER_TEMPERATURE",
     "SKIP_REUSED_VERIFIED",
 ]
 for _token in _v1043_required:
