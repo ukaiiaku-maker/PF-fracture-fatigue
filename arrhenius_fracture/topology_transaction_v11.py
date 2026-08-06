@@ -238,6 +238,7 @@ def execute_topology_trial(
     equilibrate_fixed_load: EquilibrateTrial,
     relative_energy_tolerance: float = 1.0e-8,
     absolute_energy_tolerance_J_per_m: float = 1.0e-12,
+    network_geometry_already_realized: bool = False,
 ) -> TopologyTrialResult:
     """Reserve, trial and atomically accept/release one one- or two-arm action."""
     trial_arms = tuple(sorted(arms, key=lambda item: item.candidate_id))
@@ -249,6 +250,13 @@ def execute_topology_trial(
     reserved = reserve_action(accepted.competition, proposal, event_rewards_m=rewards)
     reserved_state = replace(accepted, competition=reserved)
     trial = apply_trial_geometry(reserved_state.isolated_copy(), trial_arms)
+    if network_geometry_already_realized:
+        for arm in trial_arms:
+            branch = trial.crack_network.branch(arm.branch_id)
+            if branch.tip != tuple(arm.end_xy_m):
+                raise RuntimeError(
+                    "trial network does not contain the exact realized arm endpoint"
+                )
     trial = equilibrate_fixed_load(trial)
     released = float(accepted.stored_energy_J_per_m - trial.stored_energy_J_per_m)
     dissipation = math.fsum(item.hazard_dissipation_J_per_m for item in trial_arms)
@@ -269,8 +277,9 @@ def execute_topology_trial(
         )
     committed_competition = accept_reservation(trial.competition, proposal.action_id)
     committed_network = trial.crack_network
-    for arm in trial_arms:
-        committed_network = extend_network_arm(committed_network, arm)
+    if not network_geometry_already_realized:
+        for arm in trial_arms:
+            committed_network = extend_network_arm(committed_network, arm)
     committed = replace(
         trial,
         competition=committed_competition,

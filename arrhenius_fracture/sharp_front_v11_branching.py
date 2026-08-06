@@ -1,0 +1,637 @@
+"""Bounded monotonic 2-D FEM adapter for v11 mechanistic branching.
+
+This is a separate production loop.  It reuses the established mesh, FEM,
+plasticity, material, and v10.2.28 engine construction, but never enters the
+legacy probabilistic branching code in :mod:`sharp_front`.
+"""
+from __future__ import annotations
+
+from dataclasses import replace
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import pickle
+import sys
+from typing import Any, Mapping
+
+import numpy as np
+
+from .branch_checkpoint_v11 import (
+    ProductionBranchCheckpoint, restore_branch_checkpoint, write_branch_checkpoint,
+)
+from .branch_cluster_guard_v11 import evaluate_unresolved_cluster_guard
+from .branch_cluster_v11 import BranchClusterState, create_unresolved_branch_cluster
+from .branch_output_v11 import (
+    BRANCH_EVENT_FIELDS, ENERGY_FIELDS, FRONT_FIELDS, PROVIDER_FIELDS, TRIAL_FIELDS,
+    BranchOutputWriter,
+)
+from .crack_network_v11 import CrackNetworkState, ROOT_BRANCH_ID
+from .directional_competition_v11 import (
+    DirectionalCompetitionState, DirectionalRate, preview_production_cleavage_rate,
+    tungsten_cleavage_candidates,
+)
+from .hazard_energy_event_gate_v10230 import hazard_resistance_J_per_m2
+from .live_topology_kernel_registry_v11 import PREBRANCH_PROVIDER_ID
+from .live_topology_kernel_v11 import LiveTopologyRequest, PROVIDER_ID
+from .live_topology_runtime_v11 import LiveTopologyRuntime
+from .production_step_loop_v11 import (
+    AcceptedStepContext, DirectionalStepRefinementRequired, advance_accepted_step,
+)
+from .topology_transaction_v11 import (
+    LiveFEMTopologyState, TopologyArm, TopologyTrialResult,
+    apply_sharp_wake_trial_geometry, execute_topology_trial, extend_network_arm,
+)
+
+
+MODEL_ID = "v11.mechanistic_branching.production_fem_adapter/1"
+
+
+def _hash(value: Any) -> str:
+    return hashlib.sha256(pickle.dumps(value, protocol=5)).hexdigest()
+
+
+def _stored_energy(mesh, displacement, ep_gp, sigma_gp, D) -> float:
+    from .fem import elastic_energy_densities
+    density, _ = elastic_energy_densities(mesh, displacement, ep_gp, sigma_gp, D)
+    return float(np.sum(density * mesh.area_e))
+
+
+def _mesh_identity(mesh) -> str:
+    digest = hashlib.sha256()
+    digest.update(np.ascontiguousarray(mesh.nodes).tobytes())
+    digest.update(np.ascontiguousarray(mesh.elems).tobytes())
+    return digest.hexdigest()
+
+
+def _serializable_fields(owner) -> dict[str, Any]:
+    result = {}
+    for name, value in owner.__dict__.items():
+        if callable(value) or name == "mpz":
+            continue
+        try:
+            pickle.dumps(value, protocol=5)
+        except Exception:
+            continue
+        result[name] = value
+    return result
+
+
+def _capture_shared_engine(engine) -> dict[str, Any]:
+    return {
+        "schema": "v11.shared-production-engine-state/1",
+        "engine_type": type(engine).__name__,
+        "engine_fields": _serializable_fields(engine),
+        "mpz_type": type(engine.mpz).__name__,
+        "mpz_fields": _serializable_fields(engine.mpz),
+    }
+
+
+def _restore_shared_engine(engine, payload: Mapping[str, Any]):
+    if payload.get("schema") != "v11.shared-production-engine-state/1":
+        raise ValueError("unsupported shared production-engine state")
+    if payload.get("engine_type") != type(engine).__name__:
+        raise RuntimeError("restart engine type differs from initialized production engine")
+    for name, value in payload.get("engine_fields", {}).items():
+        setattr(engine, name, value)
+    for name, value in payload.get("mpz_fields", {}).items():
+        setattr(engine.mpz, name, value)
+    return engine
+
+
+def _request(
+    state: LiveFEMTopologyState, candidates, *, args, cfg, runtime_step: int,
+    cluster: BranchClusterState | None,
+) -> LiveTopologyRequest:
+    candidate_map = _candidate_map(candidates)
+    by_tip = {}
+    for tip in state.crack_network.active_tip_ids:
+        physical_id = state.crack_network.branch(tip).local_state.get("candidate_id")
+        by_tip[tip] = (
+            (candidate_map[physical_id],) if physical_id in candidate_map
+            else tuple(candidates)
+        )
+    geometry = {
+        name: float(getattr(cfg.geometry, name))
+        for name in ("Lx", "Ly", "a0", "notch_half_thickness")
+    }
+    frame = (
+        {"mode": "single_front"}
+        if cluster is None else {
+            "mode": "shared_unresolved_cluster", "cluster_id": cluster.cluster_id,
+            "junction_xy_m": list(cluster.junction_xy_m),
+        }
+    )
+    mat = state.material
+    return LiveTopologyRequest(
+        mesh=state.mesh, boundary=state.boundary,
+        displacement=state.displacement, ep_gp=state.ep_gp, rho_gp=state.rho_gp,
+        damage=state.damage, elasticity_D=state.elasticity_D, material=mat,
+        cohesive_network=state.cohesive_network, crack_network=state.crack_network,
+        candidates_by_tip=by_tip,
+        mechanical_configuration_fingerprint=str(os.environ.get("MECHANICAL_CONFIG_SHA256", "v10.2.28-installed")),
+        specimen_geometry=geometry,
+        boundary_condition_identity=f"symmetric_opening:step={runtime_step}",
+        elastic_constants={"E_Pa": float(mat.E), "nu": float(mat.nu), "Eprime_Pa": float(mat.Eprime)},
+        cluster_frame=frame, mpz_station_coordinates_m=(), wake_station_coordinates_m=(),
+        contour_radius_m=float(getattr(args, "rJ", None) or max(args.L_pz, 1.0e-6)),
+        exclude_radius_m=max(float(getattr(state.mesh, "hbar_tip", 0.0) or state.mesh.hbar), 1.0e-12),
+    )
+
+
+def _direct_measurement(state, candidates, args) -> dict[str, Any]:
+    from .fem import assemble_mechanics
+    from .j_integral import compute_J_integral
+    Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
+        state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
+    )
+    segments = [
+        (np.asarray(a), np.asarray(b)) for branch in state.crack_network.branches
+        for a, b in zip(branch.path, branch.path[1:])
+    ]
+    branch = state.crack_network.branch(state.crack_network.active_tip_ids[0])
+    directional = []
+    ell = float(getattr(args, "rJ", None) or max(args.L_pz, 1.0e-6))
+    exclude = max(float(getattr(state.mesh, "hbar_tip", 0.0) or state.mesh.hbar), 1.0e-12)
+    for candidate in candidates:
+        _, _, info = compute_J_integral(
+            state.mesh, state.displacement, sigma, psi, state.damage,
+            np.asarray(branch.tip), np.asarray(candidate.direction_xy), state.material,
+            ell=ell, crack_segments=segments, exclude_radius=exclude,
+        )
+        signed = float(info.get("J_signed", info.get("J", 0.0)))
+        positive = max(signed, 0.0)
+        directional.append({
+            "candidate_id": candidate.candidate_id,
+            "signed_J_J_per_m2": signed,
+            "positive_J_J_per_m2": positive,
+            "K_directional_Pa_sqrt_m": math.sqrt(float(state.material.Eprime) * positive),
+        })
+    return {
+        # The accepted solver supplies the authoritative Dirichlet reaction;
+        # this helper owns only directional configurational measurements.
+        "reaction_force": 0.0,
+        "recoverable_potential_energy_J_per_m": state.stored_energy_J_per_m,
+        "directional": directional,
+    }
+
+
+def _candidate_map(candidates):
+    return {candidate.candidate_id: candidate for candidate in candidates}
+
+
+def _realized_trial_network(state, proposal, candidates, da_phys, cluster):
+    cmap = _candidate_map(candidates)
+    network = state.crack_network
+    trial_cluster = cluster
+    if proposal.action_type == "two_arm" and cluster is None:
+        network, trial_cluster = create_unresolved_branch_cluster(
+            network, parent_branch_id=ROOT_BRANCH_ID,
+            candidate_ids=proposal.member_candidate_ids,
+            event_index=state.competition.competition_event_index + 1,
+            shared_process_state=dict(state.tip_process_state),
+            conserved_ledgers={name: float(state.energy_ledgers.get(name, 0.0)) for name in (
+                "retained", "mobile", "escaped", "recovered", "stored_energy",
+                "emission_work", "unconsumed_action",
+            )},
+        )
+    arms = []
+    for candidate_id in proposal.member_candidate_ids:
+        candidate = cmap[candidate_id]
+        if trial_cluster is None:
+            branch_id = ROOT_BRANCH_ID
+        else:
+            branch_id = next(
+                item for item in trial_cluster.arm_branch_ids
+                if network.branch(item).local_state.get("candidate_id") == candidate_id
+            )
+        start = network.branch(branch_id).tip
+        end = (
+            start[0] + da_phys * candidate.direction_xy[0],
+            start[1] + da_phys * candidate.direction_xy[1],
+        )
+        arms.append((candidate, TopologyArm(
+            candidate_id=candidate_id, branch_id=branch_id, start_xy_m=start,
+            end_xy_m=end, event_reward_m=da_phys, hazard_dissipation_J_per_m=0.0,
+        )))
+    return network, trial_cluster, tuple(arms)
+
+
+def run_2d(args):
+    from . import sharp_front as base
+    from .fem import assemble_mechanics, plane_strain_D, solve_dirichlet
+    from .mesh import make_boundary_data, make_tri_mesh
+    from .plasticity import update_plasticity
+
+    if bool(getattr(args, "fatigue_cycles", False)):
+        raise SystemExit("v11 mechanistic branching supports monotonic loading only")
+    if str(args.crack_backend) != "sharp_wake":
+        raise SystemExit("v11 mechanistic branching requires the sharp_wake backend")
+    cfg = base.make_emergent_config()
+    cfg.mesh.nx = args.nx; cfg.mesh.ny = args.ny
+    cfg.mesh.tip_h_fine = getattr(args, "tip_h_fine", 0.0) or 0.0
+    cfg.mesh.tip_ratio = getattr(args, "tip_ratio", 1.15)
+    cfg.loading.n_steps = args.steps; cfg.loading.dU_top = args.dU; cfg.loading.dt = args.dt
+    mat = cfg.material
+    mesh = make_tri_mesh(cfg.geometry, cfg.mesh, seed=42)
+    boundary = make_boundary_data(mesh, cfg.geometry)
+    if getattr(args, "crystal_aniso", False):
+        from .crystal import W_C11, W_C12, W_C44, cubic_plane_strain_D
+        D = cubic_plane_strain_D(
+            float(getattr(args, "crystal_C11", None) or W_C11),
+            float(getattr(args, "crystal_C12", None) or W_C12),
+            float(getattr(args, "crystal_C44", None) or W_C44),
+            float(getattr(args, "crystal_theta_deg", 0.0) or 0.0),
+        )
+    else:
+        D = plane_strain_D(mat)
+    engine = base.build_engine(args, mat)
+    da_phys = float(args.da_phys if args.da_phys is not None else max(5.0 * base.eng_r_pz_hint(args), 2.0e-6))
+    engine.f.da = da_phys
+    engine.f.max_advances_per_step = 1
+    theta = float(getattr(args, "crystal_theta_deg", 0.0) or 0.0)
+    candidates = tungsten_cleavage_candidates(
+        theta_deg=theta, include_110=bool(getattr(args, "crystal_include_110", False)),
+        gamma_110_rel=float(getattr(args, "gamma_110_rel", 1.3) or 1.3),
+    )
+    seed = int(os.environ.get("CLEAVAGE_HAZARD_SEED", getattr(args, "hazard_seed", 3621) or 3621))
+    competition = DirectionalCompetitionState.initialize(candidates, global_hazard_seed=seed)
+    network = replace(
+        CrackNetworkState.one_tip(((0.0, 0.0), (float(cfg.geometry.a0), 0.0))),
+        branching_enabled=True,
+    )
+    damage = np.zeros(mesh.nn)
+    damage[(mesh.nodes[:, 0] <= cfg.geometry.a0) & (np.abs(mesh.nodes[:, 1]) <= cfg.geometry.notch_half_thickness)] = 1.0
+    displacement = np.zeros(mesh.ndof); ep_gp = np.zeros((3, mesh.ne)); rho_gp = np.full(mesh.ne, engine.f.rho0)
+    out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
+    writer = BranchOutputWriter(out)
+    cache_root = Path(os.environ.get("KERNEL_CACHE_ROOT", out / "live_kernel_cache"))
+    runtime = LiveTopologyRuntime(str(cache_root)); cluster = None
+    physical_time = 0.0; accepted_load = 0.0; termination = None; start_step = 1
+    state = LiveFEMTopologyState(
+        mesh=mesh, boundary=boundary, damage=damage, displacement=displacement,
+        ep_gp=ep_gp, rho_gp=rho_gp, elasticity_D=D, material=mat,
+        cohesive_network=None, crack_network=network, competition=competition,
+        tip_process_state={"shared_engine_model": type(engine).__name__},
+        junction_process_state={}, energy_ledgers={name: 0.0 for name in (
+            "retained", "mobile", "escaped", "recovered", "stored_energy",
+            "emission_work", "unconsumed_action", "topology_release_J_per_m",
+            "hazard_dissipation_J_per_m",
+        )}, rng_state=np.random.default_rng(seed).bit_generator.state,
+        event_counters={"topology_actions": 0, "shared_state_updates": 0},
+        stored_energy_J_per_m=0.0,
+    )
+    restart_path = os.environ.get("V11_BRANCH_RESTART_CHECKPOINT", "").strip()
+    if restart_path:
+        restored = restore_branch_checkpoint(restart_path)
+        state = restored.state
+        engine = _restore_shared_engine(engine, restored.shared_process_state)
+        runtime = restored.provider_runtime
+        physical_time = restored.physical_time_s
+        accepted_load = restored.accepted_load
+        cluster = restored.branch_clusters[0] if restored.branch_clusters else None
+        mesh = state.mesh; boundary = state.boundary; D = state.elasticity_D; mat = state.material
+        start_step = int(state.event_counters.get("accepted_steps", 0)) + 1
+    last_measurement = {}; latest_sigma = None
+
+    for step in range(start_step, int(args.steps) + 1):
+        trial_fraction = 1.0
+        context = AcceptedStepContext(step, physical_time, float(args.dt), _hash((step, state.crack_network, state.competition)))
+
+        def solve_accepted(current, _context):
+            nonlocal last_measurement, latest_sigma
+            trial_load = accepted_load + float(args.dU) * trial_fraction
+            u = current.displacement.copy(); ep = current.ep_gp.copy(); rho = current.rho_gp.copy()
+            sigma = psi = None; reaction = 0.0
+            for _ in range(int(args.n_stagger)):
+                Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
+                    current.mesh, u, ep, rho, current.damage, D, mat,
+                    cohesive_network=current.cohesive_network,
+                )
+                u, reaction = solve_dirichlet(
+                    Kmat, Rint, u, current.boundary, 0.5 * trial_load, -0.5 * trial_load
+                )
+                Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
+                    current.mesh, u, ep, rho, current.damage, D, mat,
+                    cohesive_network=current.cohesive_network,
+                )
+                plast = base.PlasticityModel(cfg.plasticity_barrier, mat)
+                ep, rho, _ = update_plasticity(ep, rho, sigma, mat, float(args.temperatures[0]), _context.duration_s, plast, cfg.dislocations)
+            # Transition parity compares equilibrated accepted states.  Plastic
+            # evolution changes the internal force, so close the final accepted
+            # state once more without another constitutive update.
+            Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
+                current.mesh, u, ep, rho, current.damage, D, mat,
+                cohesive_network=current.cohesive_network,
+            )
+            u, reaction = solve_dirichlet(
+                Kmat, Rint, u, current.boundary, 0.5 * trial_load, -0.5 * trial_load
+            )
+            Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
+                current.mesh, u, ep, rho, current.damage, D, mat,
+                cohesive_network=current.cohesive_network,
+            )
+            energy = _stored_energy(current.mesh, u, ep, sigma, D)
+            latest_sigma = np.asarray(sigma).copy()
+            solved = replace(current, displacement=u, ep_gp=ep, rho_gp=rho, stored_energy_J_per_m=energy)
+            last_measurement = _direct_measurement(solved, candidates, args)
+            last_measurement["reaction_force"] = float(reaction)
+            return solved
+
+        def rates(current, _context):
+            source = last_measurement["directional"]
+            if runtime.routing.active_mechanics_provider == PROVIDER_ID:
+                request = _request(current, candidates, args=args, cfg=cfg, runtime_step=step, cluster=cluster)
+                live, _ = __import__("arrhenius_fracture.kernel_resolver_v11", fromlist=["resolve_live_topology_request"]).resolve_live_topology_request(
+                    request, cache_root=runtime.cache_root, accepted=True
+                )
+                source = live["tips"][0]["directional"] if len(live["tips"]) == 1 else [
+                    item for tip in live["tips"] for item in tip["directional"]
+                    if item["candidate_id"] in {c.candidate_id for c in candidates}
+                ]
+            by_id = {}
+            for item in source:
+                by_id.setdefault(item["candidate_id"], item)
+            return tuple(preview_production_cleavage_rate(
+                engine, candidate, signed_J_J_per_m2=float(by_id[candidate.candidate_id]["signed_J_J_per_m2"]),
+                Eprime_Pa=float(mat.Eprime), temperature_K=float(args.temperatures[0]),
+            ) for candidate in candidates)
+
+        trial_requests = {}; trial_live_results = {}; trial_clusters = {}; trial_drives = {}
+        interval_rates = {}
+
+        def trial_action(current, proposal):
+            nonlocal runtime
+            if runtime.routing.active_mechanics_provider == PREBRANCH_PROVIDER_ID:
+                request0 = _request(current, candidates, args=args, cfg=cfg, runtime_step=step, cluster=None)
+                runtime, live0 = runtime.transition(
+                    step=step, state_hash=context.accepted_state_id,
+                    legacy_result=last_measurement, request=request0,
+                    protected_state=(current.competition, pickle.dumps(engine, protocol=5)),
+                )
+                writer.provider_transition({
+                    "step": step, "from_provider": PREBRANCH_PROVIDER_ID, "to_provider": PROVIDER_ID,
+                    "state_hash": context.accepted_state_id, "topology_fingerprint": live0["topology_fingerprint"],
+                    "parity_passed": True, "residuals": runtime.routing.transition_parity_results,
+                })
+            network0, trial_cluster, pairs = _realized_trial_network(current, proposal, candidates, da_phys, cluster)
+            rate_by_id = {item.candidate_id: item for item in rates(current, context)}
+            if any(rate_by_id[cid].signed_J_J_per_m2 <= 0.0 for cid in proposal.member_candidate_ids):
+                return TopologyTrialResult(False, current, proposal.action_id, 0.0, 0.0, 0.0, "nonpositive_signed_directional_J")
+            arms = []
+            for candidate, arm in pairs:
+                drive = rate_by_id[candidate.candidate_id]
+                _, _, barrier = engine.lambda_cleave(engine.sigma_tip(drive.K_directional_Pa_sqrt_m / math.sqrt(candidate.gamma_rel)), float(args.temperatures[0]))
+                resistance = hazard_resistance_J_per_m2(
+                    barrier_J=barrier, cooperative_hits=float(engine.f.m_hits),
+                    burgers_vector_m=float(engine.b), gamma_relative=candidate.gamma_rel,
+                )
+                arms.append(replace(arm, hazard_dissipation_J_per_m=resistance * arm.event_reward_m))
+
+            def geometry(trial_state, trial_arms):
+                realized = network0
+                for item in trial_arms:
+                    realized = extend_network_arm(realized, item)
+                trial_state = replace(
+                    trial_state, crack_network=realized,
+                    junction_process_state=({"cluster": trial_cluster} if trial_cluster else {}),
+                )
+                return apply_sharp_wake_trial_geometry(
+                    trial_state, trial_arms,
+                    kill_radius_m=max(float(getattr(mesh, "hbar_tip", 0.0) or mesh.hbar), 0.5e-6),
+                )
+
+            def equilibrate(trial_state):
+                nonlocal runtime
+                request = _request(trial_state, candidates, args=args, cfg=cfg, runtime_step=step, cluster=trial_cluster)
+                runtime, live = runtime.evaluate_trial(request)
+                trial_requests[proposal.action_id] = request; trial_clusters[proposal.action_id] = trial_cluster
+                trial_live_results[proposal.action_id] = live
+                trial_drives[proposal.action_id] = rate_by_id
+                return replace(
+                    trial_state,
+                    displacement=np.asarray(live["base_equilibrium"]["displacement"]),
+                    stored_energy_J_per_m=float(live["base_equilibrium"]["recoverable_potential_energy_J_per_m"]),
+                )
+
+            return execute_topology_trial(
+                current, proposal, tuple(arms), apply_trial_geometry=geometry,
+                equilibrate_fixed_load=equilibrate, network_geometry_already_realized=True,
+            )
+
+        shared_info = {}
+        def update_shared(selected_state, _context, proposal):
+            nonlocal runtime, cluster, shared_info
+            from .crystal import near_tip_stress_tensor
+            rate_map = (
+                trial_drives[proposal.action_id] if proposal is not None
+                else {item.candidate_id: item for item in interval_rates["values"]}
+            )
+            K = max((item.K_directional_Pa_sqrt_m for item in rate_map.values()), default=0.0)
+            # Populate the installed v10.2.28 tensor-resolved emission observer
+            # from this accepted 2-D FEM state before evolving the one shared MPZ.
+            probe_tip = selected_state.crack_network.branch(
+                selected_state.crack_network.active_tip_ids[0]
+            ).tip
+            near_tip_stress_tensor(
+                latest_sigma, selected_state.mesh, np.asarray(probe_tip),
+                3.0 * max(float(getattr(selected_state.mesh, "hbar_tip", 0.0) or selected_state.mesh.hbar), 1.0e-12),
+            )
+            info = engine.step(K, float(args.temperatures[0]), _context.duration_s)
+            expected = proposal is not None
+            if bool(info.get("fired")) != expected or int(info.get("n_fire", 0)) > 1:
+                raise RuntimeError(
+                    "shared engine renewal disagrees with directional first passage; "
+                    f"selected={expected} n_fire={info.get('n_fire')}"
+                )
+            counters = dict(selected_state.event_counters)
+            counters["shared_state_updates"] = counters.get("shared_state_updates", 0) + 1
+            counters["accepted_steps"] = step
+            ledgers = dict(selected_state.energy_ledgers)
+            ledgers["retained"] = float(info.get("N_em", 0.0)); ledgers["emission_work"] = float(info.get("W_emit", engine.W_emit))
+            shared_info = info
+            if proposal is not None:
+                runtime = runtime.accept_trial(
+                    trial_requests[proposal.action_id],
+                    trial_live_results[proposal.action_id],
+                )
+                cluster = trial_clusters[proposal.action_id]
+            return replace(
+                selected_state, event_counters=counters, energy_ledgers=ledgers,
+                tip_process_state={
+                    "shared_engine_model": type(engine).__name__, "B": float(engine.B),
+                    "N_em": float(engine.N_em), "W_emit": float(engine.W_emit), "time_s": float(engine.t),
+                },
+            )
+
+        while True:
+            context = replace(context, duration_s=float(args.dt) * trial_fraction)
+            try:
+                result = advance_accepted_step(
+                    state, context, correlation_interval_s=float(engine.f.tau_c),
+                    solve_accepted=solve_accepted, evaluate_directional_rates=rates,
+                    trial_action=trial_action,
+                    update_shared_state_once=lambda selected, ctx, proposal: replace(selected),
+                    maximum_directional_action_increment=float(getattr(args, "adaptive_event_target", 0.15) or 0.15),
+                )
+                break
+            except DirectionalStepRefinementRequired as exc:
+                shrink = 0.7 * exc.target_increment / max(exc.predicted_increment, 1.0e-300)
+                next_fraction = max(float(getattr(args, "adaptive_min_frac", 1.0e-8)), trial_fraction * min(0.5, shrink))
+                if next_fraction >= trial_fraction or next_fraction <= float(getattr(args, "adaptive_min_frac", 1.0e-8)):
+                    raise RuntimeError("v11 directional adaptive stepping reached its minimum fraction") from exc
+                trial_fraction = next_fraction
+        interval_rates["values"] = result.rates
+        state = update_shared(result.state, context, next((item.proposal for item in result.trials if item.selected), None))
+        accepted_load += float(args.dU) * trial_fraction
+        physical_time += context.duration_s
+        selected = next((item for item in result.trials if item.selected), None)
+        for item in result.trials:
+            rate_map = trial_drives.get(item.proposal.action_id, {r.candidate_id: r for r in result.rates})
+            rec = {field: None for field in TRIAL_FIELDS}
+            rec.update({
+                "step": step, "physical_time_s": physical_time, "accepted_state_id": context.accepted_state_id,
+                "trial_id": item.proposal.action_id, "action_type": item.proposal.action_type,
+                "candidate_ids": list(item.proposal.member_candidate_ids), "pending_event_ids": list(item.proposal.member_event_ids),
+                "completion_times_s": list(item.proposal.completion_times_s),
+                "correlation_time_difference_s": max(item.proposal.completion_times_s) - min(item.proposal.completion_times_s),
+                "signed_directional_J_J_per_m2": [rate_map[c].signed_J_J_per_m2 for c in item.proposal.member_candidate_ids],
+                "positive_directional_J_J_per_m2": [rate_map[c].positive_J_J_per_m2 for c in item.proposal.member_candidate_ids],
+                "directional_K_Pa_sqrt_m": [rate_map[c].K_directional_Pa_sqrt_m for c in item.proposal.member_candidate_ids],
+                "released_energy_J_per_m": item.result.energy_release_J_per_m,
+                "total_dissipative_cost_J_per_m": item.result.hazard_dissipation_J_per_m,
+                "net_energy_margin_J_per_m": item.result.energy_margin_J_per_m,
+                "provider_identity": runtime.routing.active_mechanics_provider,
+                "accepted": item.selected, "veto_reason": None if item.selected else item.result.rejection_reason,
+                "reservation_result": "accepted" if item.selected else "released",
+                "consumption_result": "consumed" if item.selected else "preserved",
+            })
+            writer.append_trial(rec)
+        if selected is not None and selected.proposal.action_type == "two_arm" and cluster is not None:
+            arm_branches = tuple(state.crack_network.branch(item) for item in cluster.arm_branch_ids)
+            event = {field: None for field in BRANCH_EVENT_FIELDS}
+            event.update({
+                "event_record_id": selected.proposal.action_id, "step": step,
+                "branch_junction": list(cluster.junction_xy_m), "parent_front": cluster.parent_branch_id,
+                "arm_front_ids": list(cluster.arm_branch_ids),
+                "arm_directions": [branch.current_orientation_rad for branch in arm_branches],
+                "plane_identities": list(selected.proposal.member_candidate_ids),
+                "event_ids_consumed": list(selected.proposal.member_event_ids),
+                "completion_time_difference_s": max(selected.proposal.completion_times_s) - min(selected.proposal.completion_times_s),
+                "arm_lengths_m": [sum(math.dist(a, b) for a, b in zip(branch.path, branch.path[1:])) for branch in arm_branches],
+                "tip_positions_m": [list(branch.tip) for branch in arm_branches],
+                "tip_separation_m": math.dist(arm_branches[0].tip, arm_branches[1].tip),
+                "shared_cluster_id": cluster.cluster_id,
+                "shared_cluster_state_hash": _hash((engine.B, engine.N_em, engine.W_emit)),
+                "topology_fingerprint": runtime.routing.topology_fingerprint,
+                "released_energy_J_per_m": selected.result.energy_release_J_per_m,
+                "total_cost_J_per_m": selected.result.hazard_dissipation_J_per_m,
+                "energy_margin_J_per_m": selected.result.energy_margin_J_per_m,
+            })
+            writer.branch_event(event)
+        writer.energy({
+            "step": step, "accepted_state_id": context.accepted_state_id,
+            "stored_energy_J_per_m": state.stored_energy_J_per_m,
+            "released_energy_J_per_m": selected.result.energy_release_J_per_m if selected else 0.0,
+            "dissipative_cost_J_per_m": selected.result.hazard_dissipation_J_per_m if selected else 0.0,
+            "residual_J_per_m": selected.result.energy_margin_J_per_m if selected else 0.0,
+        })
+        for branch in state.crack_network.branches:
+            writer.front({
+                "step": step, "front_id": branch.branch_id, "parent_front_id": branch.parent_branch_id,
+                "status": branch.status, "termination_reason": branch.local_state.get("termination_reason"),
+                "tip_x_m": branch.tip[0], "tip_y_m": branch.tip[1],
+                "arclength_m": sum(math.dist(a, b) for a, b in zip(branch.path, branch.path[1:])),
+            })
+        checkpoint = ProductionBranchCheckpoint(
+            state=state, shared_process_state=_capture_shared_engine(engine),
+            physical_time_s=physical_time, accepted_load=accepted_load,
+            mesh_identity=_mesh_identity(state.mesh), boundary_condition_state={"opening_m": accepted_load},
+            provider_runtime=runtime, provider_cache_identity=str(cache_root.resolve()),
+            topology_fingerprint=runtime.routing.topology_fingerprint or _hash(state.crack_network),
+            front_competitions={tip: state.competition for tip in state.crack_network.active_tip_ids},
+            branch_clusters=(() if cluster is None else (cluster,)),
+            projected_extension_m=max(branch.tip[0] for branch in state.crack_network.branches) - cfg.geometry.a0,
+            physical_extension_m=state.crack_network.total_physical_crack_length_m - cfg.geometry.a0,
+            handoff_guard_diagnostics={}, termination_reason=None,
+        )
+        checkpoint_path = out / "checkpoint" / "latest.json"
+        write_branch_checkpoint(checkpoint, checkpoint_path)
+        if cluster is not None:
+            guard = evaluate_unresolved_cluster_guard(
+                state.crack_network, cluster, process_zone_length_m=float(args.L_pz),
+                local_J_contour_radius_m=float(getattr(args, "rJ", None) or args.L_pz),
+                independently_valid_local_J=(True, True),
+            )
+            if guard.handoff_required:
+                termination = guard.termination_status; break
+        extension = state.crack_network.total_physical_crack_length_m - cfg.geometry.a0
+        target = float(getattr(args, "target_crack_extension_um", float("inf"))) * 1e-6
+        if extension >= target:
+            termination = "target_reached"; break
+
+    termination = termination or "physical_veto_no_branch"
+    checkpoint = replace(checkpoint, termination_reason=termination)
+    write_branch_checkpoint(checkpoint, out / "checkpoint" / "latest.json")
+    writer.complete(status=termination, final_checkpoint="checkpoint/latest.json", validation={
+        "checkpoint": True, "shared_state_updates": state.event_counters.get("shared_state_updates", 0),
+        "topology_actions": state.event_counters.get("topology_actions", 0),
+    })
+    return 0
+
+
+def _remove_flag_with_value(args, name):
+    result = []; index = 0
+    while index < len(args):
+        token = args[index]
+        if token == name:
+            index += 2; continue
+        if token.startswith(name + "="):
+            index += 1; continue
+        result.append(token); index += 1
+    return result
+
+
+def main(argv=None, *, audit_already_written=False):
+    from . import sharp_front as base
+    from . import sharp_front_v10_2_28_audited as entry
+    from . import sharp_front_v10_1_7_3 as avalanche_entry
+    args = list(sys.argv[1:] if argv is None else argv)
+    restart = None
+    for index, token in enumerate(args):
+        if token.startswith("--v11-restart-checkpoint="):
+            restart = token.split("=", 1)[1]
+        elif token == "--v11-restart-checkpoint" and index + 1 < len(args):
+            restart = args[index + 1]
+    for flag in ("--mechanistic-branching", "--audit-only"):
+        args = [item for item in args if item != flag]
+    args = _remove_flag_with_value(args, "--maximum-fronts")
+    args = _remove_flag_with_value(args, "--hazard-seed")
+    args = _remove_flag_with_value(args, "--v11-restart-checkpoint")
+    args.extend(["--max-fronts", "1"])
+    original = base.run_2d
+    original_geometry_diagnostics = avalanche_entry._write_geometry_diagnostics
+    old_restart = os.environ.get("V11_BRANCH_RESTART_CHECKPOINT")
+    if restart:
+        os.environ["V11_BRANCH_RESTART_CHECKPOINT"] = restart
+    base.run_2d = run_2d
+    # The v10 wrapper's post-run report is specific to its stochastic-avalanche
+    # geometry backend, which this audited adapter intentionally never builds.
+    avalanche_entry._write_geometry_diagnostics = lambda _args: None
+    try:
+        return entry.main(args)
+    finally:
+        base.run_2d = original
+        avalanche_entry._write_geometry_diagnostics = original_geometry_diagnostics
+        if old_restart is None:
+            os.environ.pop("V11_BRANCH_RESTART_CHECKPOINT", None)
+        else:
+            os.environ["V11_BRANCH_RESTART_CHECKPOINT"] = old_restart
+
+
+if __name__ == "__main__": main()
+
+
+__all__ = ["MODEL_ID", "main", "run_2d"]

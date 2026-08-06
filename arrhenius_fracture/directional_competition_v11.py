@@ -253,12 +253,15 @@ def preview_production_cleavage_rate(
         candidate, signed_J_J_per_m2=signed_J_J_per_m2, Eprime_Pa=Eprime_Pa
     )
     before = pickle.dumps(engine.__dict__, protocol=5)
+    preview_engine = copy.deepcopy(engine)
     if drive.K_directional_Pa_sqrt_m <= 0.0:
         rate = 0.0
     else:
         effective_K = drive.K_directional_Pa_sqrt_m / math.sqrt(candidate.gamma_rel)
-        stress = engine.sigma_tip(effective_K)
-        rate, _, _ = engine.lambda_cleave(stress, _finite(temperature_K, "temperature_K"))
+        stress = preview_engine.sigma_tip(effective_K)
+        rate, _, _ = preview_engine.lambda_cleave(
+            stress, _finite(temperature_K, "temperature_K")
+        )
         rate = max(_finite(rate, "lambda_per_s"), 0.0)
     after = pickle.dumps(engine.__dict__, protocol=5)
     if before != after:

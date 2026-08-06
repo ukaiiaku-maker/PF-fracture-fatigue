@@ -7,7 +7,7 @@ from arrhenius_fracture.directional_competition_v11 import (
     tungsten_cleavage_candidates,
 )
 from arrhenius_fracture.production_step_loop_v11 import (
-    AcceptedStepContext, advance_accepted_step,
+    AcceptedStepContext, DirectionalStepRefinementRequired, advance_accepted_step,
 )
 from arrhenius_fracture.topology_transaction_v11 import TopologyTrialResult
 from tests.test_topology_transaction_v11 import fem_state
@@ -116,3 +116,21 @@ def test_rejected_trial_returning_modified_state_fails_closed():
             ),
             update_shared_state_once=lambda state, context, proposal: state,
         )
+
+
+def test_adaptive_gate_rejects_unresolved_multi_event_interval_before_mutation():
+    base = fem_state(DirectionalCompetitionState.initialize(
+        tungsten_cleavage_candidates(theta_deg=45), global_hazard_seed=3621
+    ))
+    with pytest.raises(DirectionalStepRefinementRequired) as caught:
+        advance_accepted_step(
+            base, AcceptedStepContext(1, 0.0, 1.0, "adaptive"),
+            correlation_interval_s=0.0,
+            solve_accepted=lambda state, context: state,
+            evaluate_directional_rates=lambda state, context: _rates(state, context, (2.0, 3.0)),
+            trial_action=lambda *_: pytest.fail("refinement must precede topology trials"),
+            update_shared_state_once=lambda *_: pytest.fail("refinement must precede state update"),
+            maximum_directional_action_increment=0.15,
+        )
+    assert caught.value.predicted_increment == pytest.approx(3.0)
+    assert base.competition.pending_events == ()

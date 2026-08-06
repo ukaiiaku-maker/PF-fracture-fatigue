@@ -8,6 +8,7 @@ semantics.
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+import math
 from typing import Callable, Mapping, Sequence
 
 from .directional_competition_v11 import (
@@ -27,6 +28,16 @@ from .topology_transaction_v11 import (
 
 
 MODEL_ID = "v11.monotonic_tip_only_mechanistic_branching_step_loop/1"
+
+
+class DirectionalStepRefinementRequired(RuntimeError):
+    def __init__(self, predicted_increment: float, target_increment: float):
+        self.predicted_increment = float(predicted_increment)
+        self.target_increment = float(target_increment)
+        super().__init__(
+            f"directional action increment {predicted_increment:.6g} exceeds "
+            f"adaptive target {target_increment:.6g}"
+        )
 
 
 @dataclass(frozen=True)
@@ -79,18 +90,38 @@ def _commit_interval(
     if set(by_id) != expected:
         raise ValueError("directional rates must map one-to-one to candidates")
     hazards = tuple(
-        commit_directional_interval(
-            hazard,
-            preview_directional_interval(
+        replace(
+            commit_directional_interval(
                 hazard,
-                lambda_per_s=by_id[hazard.candidate_id].lambda_per_s,
-                start_time_s=context.physical_time_s,
-                duration_s=context.duration_s,
+                preview_directional_interval(
+                    hazard,
+                    lambda_per_s=_logmean_rate(
+                        hazard.previous_rate_per_s,
+                        by_id[hazard.candidate_id].lambda_per_s,
+                    ),
+                    start_time_s=context.physical_time_s,
+                    duration_s=context.duration_s,
+                ),
             ),
+            previous_rate_per_s=by_id[hazard.candidate_id].lambda_per_s,
         )
         for hazard in state.hazard_states
     )
     return replace(state, hazard_states=hazards)
+
+
+def _logmean_rate(previous: float | None, current: float) -> float:
+    """Match the production engine's accepted linear-load hazard quadrature."""
+    now = max(float(current), 0.0)
+    if previous is None:
+        return now
+    old = max(float(previous), 0.0)
+    lo, hi = sorted((old, now))
+    if lo <= 0.0:
+        return 0.5 * hi
+    if abs(hi - lo) <= 1.0e-12 * hi:
+        return hi
+    return (hi - lo) / math.log(hi / lo)
 
 
 def _select(
@@ -118,6 +149,7 @@ def advance_accepted_step(
     evaluate_directional_rates: EvaluateRates,
     trial_action: TrialAction,
     update_shared_state_once: UpdateShared,
+    maximum_directional_action_increment: float | None = None,
 ) -> AcceptedStepResult:
     """Advance one interval while enforcing the production transaction order.
 
@@ -130,6 +162,17 @@ def advance_accepted_step(
     rates = tuple(sorted(
         evaluate_directional_rates(solved, context), key=lambda item: item.candidate_id
     ))
+    if maximum_directional_action_increment is not None:
+        target = float(maximum_directional_action_increment)
+        if target <= 0.0:
+            raise ValueError("maximum directional action increment must be positive")
+        previous = {item.candidate_id: item.previous_rate_per_s for item in solved.competition.hazard_states}
+        predicted = max(
+            (_logmean_rate(previous[item.candidate_id], item.lambda_per_s) * context.duration_s for item in rates),
+            default=0.0,
+        )
+        if predicted > target:
+            raise DirectionalStepRefinementRequired(predicted, target)
     competition = _commit_interval(solved.competition, rates, context)
     interval_state = replace(solved, competition=competition)
     proposals = construct_action_proposals(
@@ -169,6 +212,7 @@ def advance_accepted_step(
 
 
 __all__ = [
-    "AcceptedStepContext", "AcceptedStepResult", "ActionTrialDiagnostic", "MODEL_ID",
+    "AcceptedStepContext", "AcceptedStepResult", "ActionTrialDiagnostic",
+    "DirectionalStepRefinementRequired", "MODEL_ID",
     "advance_accepted_step",
 ]

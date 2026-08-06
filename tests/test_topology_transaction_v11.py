@@ -184,6 +184,35 @@ def test_two_arm_joint_energy_and_conservative_unresolved_cluster():
     assert independently_advanced.branch(second).tip == (1.4, 0.3)
 
 
+def test_exact_provider_equilibrates_with_already_realized_trial_network():
+    accepted = fem_state()
+    proposal = next(
+        p for p in construct_action_proposals(
+            accepted.competition.hazard_states, correlation_interval_s=0.0
+        ) if p.action_type == "one_arm"
+    )
+    trial_arm = arm(proposal.member_candidate_ids[0])
+    observed = []
+
+    def geometry(state, arms):
+        network = extend_network_arm(state.crack_network, arms[0])
+        return replace(state, crack_network=network)
+
+    def equilibrium(state):
+        observed.append(state.crack_network.branch(ROOT_BRANCH_ID).tip)
+        return replace(state, stored_energy_J_per_m=7.0)
+
+    result = execute_topology_trial(
+        accepted, proposal, (trial_arm,), apply_trial_geometry=geometry,
+        equilibrate_fixed_load=equilibrium, network_geometry_already_realized=True,
+    )
+    assert result.accepted
+    assert observed == [(1.5, 0.0)]
+    assert result.state.crack_network.branch(ROOT_BRANCH_ID).path == (
+        (0.0, 0.0), (1.0, 0.0), (1.5, 0.0),
+    )
+
+
 def test_independent_handoff_rejects_nonconservative_partition():
     network, cluster = create_unresolved_branch_cluster(
         fem_state().crack_network, parent_branch_id=ROOT_BRANCH_ID,

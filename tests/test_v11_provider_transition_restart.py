@@ -23,7 +23,8 @@ def checkpoint_at(label, tmp_path):
             topology_fingerprint="topology-sha",
         ))
     return ProductionBranchCheckpoint(
-        state=state, physical_time_s=3.5, accepted_load=0.75,
+        state=state, shared_process_state={"engine_type": "fixture", "B": 0.25, "N_em": 7.0},
+        physical_time_s=3.5, accepted_load=0.75,
         mesh_identity="mesh-sha", boundary_condition_state={"opening_m": 1e-7},
         provider_runtime=runtime, provider_cache_identity="cache-sha",
         topology_fingerprint="topology-sha",
@@ -53,6 +54,7 @@ def test_production_checkpoint_roundtrip_at_required_restart_locations(tmp_path,
     np.testing.assert_array_equal(restored.state.displacement, original.state.displacement)
     np.testing.assert_array_equal(restored.state.damage, original.state.damage)
     assert restored.state.rng_state == original.state.rng_state
+    assert restored.shared_process_state == original.shared_process_state
     assert restored.front_competitions == original.front_competitions
     assert manifest["handoff_guard_diagnostics"]["restart_location"] == location
 

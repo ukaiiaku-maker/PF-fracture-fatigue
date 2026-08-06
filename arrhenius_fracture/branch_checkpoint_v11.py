@@ -17,7 +17,7 @@ from .directional_competition_v11 import (
 from .topology_transaction_v11 import LiveFEMTopologyState
 
 
-SCHEMA = "v11.production-branch-network-checkpoint/1"
+SCHEMA = "v11.production-branch-network-checkpoint/2"
 
 
 def _sha(data: bytes) -> str:
@@ -27,6 +27,7 @@ def _sha(data: bytes) -> str:
 @dataclass(frozen=True)
 class ProductionBranchCheckpoint:
     state: LiveFEMTopologyState
+    shared_process_state: Mapping[str, Any]
     physical_time_s: float
     accepted_load: float
     mesh_identity: str
@@ -88,6 +89,7 @@ class ProductionBranchCheckpoint:
             "handoff_guard_diagnostics": dict(self.handoff_guard_diagnostics),
             "termination_reason": self.termination_reason,
             "has_rng_state": self.state.rng_state is not None,
+            "shared_process_engine_type": str(self.shared_process_state.get("engine_type", "unknown")),
             "fem_reconstruction": {
                 "displacement_shape": list(self.state.displacement.shape),
                 "damage_shape": list(self.state.damage.shape),
