@@ -1,0 +1,118 @@
+from dataclasses import replace
+
+import pytest
+
+from arrhenius_fracture.directional_competition_v11 import (
+    DirectionalCompetitionState, DirectionalRate, accept_reservation, reserve_action,
+    tungsten_cleavage_candidates,
+)
+from arrhenius_fracture.production_step_loop_v11 import (
+    AcceptedStepContext, advance_accepted_step,
+)
+from arrhenius_fracture.topology_transaction_v11 import TopologyTrialResult
+from tests.test_topology_transaction_v11 import fem_state
+
+
+def _rates(state, _context, values=(1.0, 1.0)):
+    return tuple(
+        DirectionalRate(c.candidate_id, rate, 2.0, 2.0, 3.0, c.gamma_rel)
+        for c, rate in zip(state.competition.candidates, values)
+    )
+
+
+def _result(base, proposal, *, accepted):
+    if accepted:
+        reserved = reserve_action(
+            base.competition, proposal,
+            event_rewards_m=(0.5,) * len(proposal.member_event_ids),
+        )
+        state = replace(
+            base,
+            competition=accept_reservation(reserved, proposal.action_id),
+            event_counters={**base.event_counters, "trial": len(proposal.member_event_ids)},
+        )
+    else:
+        state = base
+    return TopologyTrialResult(
+        accepted, state, proposal.action_id, 3.0 if accepted else 0.5,
+        2.0, 1.0 if accepted else -1.5,
+        None if accepted else "insufficient_whole_topology_energy_release",
+    )
+
+
+def test_no_event_interval_updates_shared_state_once_without_trials():
+    base = fem_state(DirectionalCompetitionState.initialize(
+        tungsten_cleavage_candidates(theta_deg=45), global_hazard_seed=3621
+    ))
+    calls = []
+    result = advance_accepted_step(
+        base, AcceptedStepContext(1, 0.0, 0.25, "s0"), correlation_interval_s=0.1,
+        solve_accepted=lambda state, context: state,
+        evaluate_directional_rates=lambda state, context: _rates(state, context, (1.0, 1.0)),
+        trial_action=lambda *_: pytest.fail("no trial is allowed"),
+        update_shared_state_once=lambda state, context, proposal: calls.append(proposal) or state,
+    )
+    assert result.proposals == ()
+    assert result.shared_state_update_count == 1
+    assert calls == [None]
+
+
+def test_a1_a2_a12_are_sibling_trials_and_admissible_a12_wins():
+    base = fem_state(DirectionalCompetitionState.initialize(
+        tungsten_cleavage_candidates(theta_deg=45), global_hazard_seed=3621
+    ))
+    trial_bases = []
+    updates = []
+
+    def trial(state, proposal):
+        trial_bases.append(state)
+        return _result(state, proposal, accepted=True)
+
+    result = advance_accepted_step(
+        base, AcceptedStepContext(2, 0.0, 1.0, "s1"), correlation_interval_s=0.0,
+        solve_accepted=lambda state, context: state,
+        evaluate_directional_rates=_rates, trial_action=trial,
+        update_shared_state_once=lambda state, context, proposal: updates.append(proposal) or state,
+    )
+    assert len(result.proposals) == 3
+    assert all(item is trial_bases[0] for item in trial_bases)
+    selected = next(item for item in result.trials if item.selected)
+    assert selected.proposal.action_type == "two_arm"
+    assert result.state.competition.consumed_event_ids == selected.proposal.member_event_ids
+    assert len(updates) == 1
+
+
+def test_rejected_a12_rolls_back_then_earliest_admissible_arm_commits():
+    base = fem_state(DirectionalCompetitionState.initialize(
+        tungsten_cleavage_candidates(theta_deg=45), global_hazard_seed=3621
+    ))
+
+    def trial(state, proposal):
+        return _result(state, proposal, accepted=proposal.action_type == "one_arm")
+
+    result = advance_accepted_step(
+        base, AcceptedStepContext(2, 0.0, 1.0, "s2"), correlation_interval_s=0.0,
+        solve_accepted=lambda state, context: state,
+        evaluate_directional_rates=_rates, trial_action=trial,
+        update_shared_state_once=lambda state, context, proposal: state,
+    )
+    selected = next(item for item in result.trials if item.selected)
+    assert selected.proposal.action_type == "one_arm"
+    assert len(result.state.competition.pending_events) == 1
+    assert len(result.state.competition.consumed_event_ids) == 1
+
+
+def test_rejected_trial_returning_modified_state_fails_closed():
+    base = fem_state(DirectionalCompetitionState.initialize(
+        tungsten_cleavage_candidates(theta_deg=45), global_hazard_seed=3621
+    ))
+    with pytest.raises(RuntimeError, match="rejected topology trial mutated"):
+        advance_accepted_step(
+            base, AcceptedStepContext(2, 0.0, 1.0, "s3"), correlation_interval_s=0.0,
+            solve_accepted=lambda state, context: state,
+            evaluate_directional_rates=_rates,
+            trial_action=lambda state, proposal: TopologyTrialResult(
+                False, state.isolated_copy(), proposal.action_id, 0.0, 1.0, -1.0, "veto"
+            ),
+            update_shared_state_once=lambda state, context, proposal: state,
+        )
