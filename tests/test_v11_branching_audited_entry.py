@@ -4,7 +4,7 @@ import pytest
 
 from arrhenius_fracture.live_topology_kernel_v11 import PROVIDER_ID
 from arrhenius_fracture.sharp_front_v11_branching_audited import (
-    AUDIT_NAME, main, validate_audited_arguments,
+    AUDIT_NAME, _write_failure, main, validate_audited_arguments,
 )
 
 
@@ -42,3 +42,17 @@ def test_audit_only_writes_complete_fail_closed_policy(tmp_path):
     assert payload["policy"]["branch_process_zone_mode"] == "shared_unresolved_cluster"
     assert payload["mechanics_provider_sequence"][-1] == PROVIDER_ID
     assert isinstance(payload["dirty_tree"], bool)
+
+
+def test_failure_capture_is_atomic_and_preserves_full_traceback(tmp_path):
+    try:
+        raise RuntimeError("mechanics stopped at exact topology")
+    except RuntimeError as error:
+        _write_failure(tmp_path, error)
+    summary = json.loads((tmp_path / "failure_summary.json").read_text())
+    assert summary["exception_class"] == "RuntimeError"
+    assert summary["exception_message"] == "mechanics stopped at exact topology"
+    traceback_text = (tmp_path / "failure_traceback.txt").read_text()
+    assert "Traceback (most recent call last)" in traceback_text
+    assert "RuntimeError: mechanics stopped at exact topology" in traceback_text
+    assert not list(tmp_path.glob("*.tmp"))

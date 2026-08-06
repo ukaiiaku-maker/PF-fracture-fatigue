@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import traceback
 from typing import Sequence
 
 from .live_topology_kernel_registry_v11 import PREBRANCH_PROVIDER_ID
@@ -127,6 +128,40 @@ def write_model_audit(path: str | Path, payload: dict) -> Path:
     return target
 
 
+def _write_failure(out: Path, error: BaseException) -> None:
+    """Persist the complete production exception and latest atomic context."""
+    context = {}
+    checkpoint = out / "checkpoint" / "latest.json"
+    if checkpoint.is_file():
+        try:
+            manifest = json.loads(checkpoint.read_text())
+            context = {
+                "step": manifest.get("event_counters", {}).get("accepted_steps"),
+                "event_index": manifest.get("event_counters", {}).get("topology_actions"),
+                "physical_time_s": manifest.get("physical_time_s"),
+                "accepted_load": manifest.get("accepted_load"),
+                "topology_fingerprint": manifest.get("topology_fingerprint"),
+                "mechanics_provider": manifest.get("mechanics_provider"),
+                "active_fronts": manifest.get("active_front_ids", []),
+                "branch_count": len(manifest.get("crack_network", {}).get("branches", [])),
+                "latest_checkpoint": str(checkpoint.resolve()),
+                "latest_successful_action": manifest.get("event_counters", {}).get("latest_successful_action"),
+            }
+        except (OSError, ValueError, TypeError):
+            context = {"latest_checkpoint": str(checkpoint.resolve())}
+    summary = {
+        "schema": "v11.production-failure-summary/1",
+        "exception_class": type(error).__name__,
+        "exception_message": str(error),
+        **context,
+    }
+    write_model_audit(out / "failure_summary.json", summary)
+    trace = out / "failure_traceback.txt"
+    temporary = trace.with_name(trace.name + ".tmp")
+    temporary.write_text(traceback.format_exc())
+    os.replace(temporary, trace)
+
+
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     validate_audited_arguments(args)
@@ -139,7 +174,11 @@ def main(argv=None):
     if known.audit_only:
         return 0
     from .sharp_front_v11_branching import main as production_main
-    return production_main(args, audit_already_written=True)
+    try:
+        return production_main(args, audit_already_written=True)
+    except BaseException as error:
+        _write_failure(Path(known.out), error)
+        raise
 
 
 if __name__ == "__main__":

@@ -25,6 +25,7 @@ from .unit_slip_perturbation_v1026 import SlipRibbonPerturbation, solve_fixed_cr
 
 SCHEMA = "v11_exact_topology_live_fem_provider_v1"
 PROVIDER_ID = "v11_exact_crack_network_live_fem_v1"
+MAXIMUM_FRONTS_SUPPORTED = 16
 
 
 def _canonical_float(value: float) -> str:
@@ -257,7 +258,8 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
     responses = [_shared_unit_response(request, base, item) for item in request.shared_perturbations]
     return {
         "schema": SCHEMA, "kernel_provider_id": PROVIDER_ID,
-        "branching_mode": "direct_fem", "maximum_fronts_supported": 2,
+        "branching_mode": "direct_fem",
+        "maximum_fronts_supported": MAXIMUM_FRONTS_SUPPORTED,
         "coverage_kind": "exact_topology", "topology_fingerprint": fingerprint,
         "interpolation_permitted": False, "prior_kernel_family_required": False,
         "stochastic_trajectory_required": False,
@@ -274,6 +276,6 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
 
 
 __all__ = [
-    "LiveTopologyRequest", "PROVIDER_ID", "SCHEMA", "canonical_topology_payload",
+    "LiveTopologyRequest", "MAXIMUM_FRONTS_SUPPORTED", "PROVIDER_ID", "SCHEMA", "canonical_topology_payload",
     "evaluate_exact_topology", "topology_fingerprint",
 ]
