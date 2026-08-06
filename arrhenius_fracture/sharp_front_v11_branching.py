@@ -295,7 +295,7 @@ def run_2d(args):
         cluster = restored.branch_clusters[0] if restored.branch_clusters else None
         mesh = state.mesh; boundary = state.boundary; D = state.elasticity_D; mat = state.material
         start_step = int(state.event_counters.get("accepted_steps", 0)) + 1
-    last_measurement = {}; latest_sigma = None; latest_interval_rates = ()
+    last_measurement = {}; latest_sigma = None; latest_interval_rates = (); latest_live_result = None
 
     for step in range(start_step, int(args.steps) + 1):
         trial_fraction = 1.0
@@ -342,13 +342,14 @@ def run_2d(args):
             return solved
 
         def rates(current, _context):
-            nonlocal latest_interval_rates
+            nonlocal latest_interval_rates, latest_live_result
             source = last_measurement["directional"]
             if runtime.routing.active_mechanics_provider == PROVIDER_ID:
                 request = _request(current, candidates, args=args, cfg=cfg, runtime_step=step, cluster=cluster)
                 live, _ = __import__("arrhenius_fracture.kernel_resolver_v11", fromlist=["resolve_live_topology_request"]).resolve_live_topology_request(
                     request, cache_root=runtime.cache_root, accepted=True
                 )
+                latest_live_result = live
                 source = live["tips"][0]["directional"] if len(live["tips"]) == 1 else [
                     item for tip in live["tips"] for item in tip["directional"]
                     if item["candidate_id"] in {c.candidate_id for c in candidates}
@@ -581,6 +582,34 @@ def run_2d(args):
                 "tip_x_m": branch.tip[0], "tip_y_m": branch.tip[1],
                 "arclength_m": sum(math.dist(a, b) for a, b in zip(branch.path, branch.path[1:])),
             })
+        guard = None
+        if cluster is not None:
+            accepted_live = (
+                trial_live_results.get(selected.proposal.action_id)
+                if selected is not None else latest_live_result
+            )
+            live_tips = tuple((accepted_live or {}).get("tips", ()))
+            independently_valid = tuple(
+                any(
+                    np.allclose(item.get("tip_xy_m", ()), state.crack_network.branch(branch_id).tip)
+                    and bool(item.get("directional"))
+                    and all(bool(direction.get("local_contour_valid", False)) for direction in item["directional"])
+                    for item in live_tips
+                )
+                for branch_id in cluster.arm_branch_ids
+            )
+            guard = evaluate_unresolved_cluster_guard(
+                state.crack_network, cluster, process_zone_length_m=float(args.L_pz),
+                local_J_contour_radius_m=float(getattr(args, "rJ", None) or args.L_pz),
+                independently_valid_local_J=independently_valid,
+            )
+            writer.cluster({
+                "step": step, "cluster_id": cluster.cluster_id,
+                "state_hash": _hash((cluster, state.tip_process_state)),
+                "unresolved": cluster.unresolved,
+                "tip_separation_m": guard.tip_separation_m,
+                "handoff_required": guard.handoff_required,
+            })
         checkpoint = ProductionBranchCheckpoint(
             state=state, shared_process_state=_capture_shared_engine(engine),
             physical_time_s=physical_time, accepted_load=accepted_load,
@@ -591,18 +620,13 @@ def run_2d(args):
             branch_clusters=(() if cluster is None else (cluster,)),
             projected_extension_m=max(branch.tip[0] for branch in state.crack_network.branches) - cfg.geometry.a0,
             physical_extension_m=state.crack_network.total_physical_crack_length_m - cfg.geometry.a0,
-            handoff_guard_diagnostics={}, termination_reason=None,
+            handoff_guard_diagnostics={} if guard is None else guard.to_dict(),
+            termination_reason=None,
         )
         checkpoint_path = out / "checkpoint" / "latest.json"
         write_branch_checkpoint(checkpoint, checkpoint_path)
-        if cluster is not None:
-            guard = evaluate_unresolved_cluster_guard(
-                state.crack_network, cluster, process_zone_length_m=float(args.L_pz),
-                local_J_contour_radius_m=float(getattr(args, "rJ", None) or args.L_pz),
-                independently_valid_local_J=(True, True),
-            )
-            if guard.handoff_required:
-                termination = guard.termination_status; break
+        if guard is not None and guard.handoff_required:
+            termination = guard.termination_status; break
         extension = state.crack_network.total_physical_crack_length_m - cfg.geometry.a0
         target = float(getattr(args, "target_crack_extension_um", float("inf"))) * 1e-6
         if extension >= target:

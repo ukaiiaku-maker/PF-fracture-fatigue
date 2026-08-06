@@ -98,10 +98,14 @@ def audit_payload(
         "python_executable": str(Path(sys.executable).resolve()),
         "package_import_path": str(Path(__file__).resolve().parent),
         "model_id": MODEL_ID,
-        "material_option": _value(argv, "--material-option"),
+        "material_option": _value(argv, "--parameter-option", _value(argv, "--material-option")),
         "temperature_K": [float(value) for value in (_value(argv, "--temperatures", "").split()) if value],
-        "orientation_deg": float(_value(argv, "--theta-deg", "30")),
-        "hazard_seed": int(_value(argv, "--hazard-seed", "3621")),
+        "orientation_deg": float(_value(
+            argv, "--crystal-theta-deg", _value(argv, "--theta-deg", "30")
+        )),
+        "hazard_seed": int(os.environ.get(
+            "CLEAVAGE_HAZARD_SEED", _value(argv, "--hazard-seed", "3621")
+        )),
         "mechanics_provider_sequence": [
             policy.prebranch_mechanics_provider, policy.branch_mechanics_provider,
         ],
