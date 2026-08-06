@@ -7,6 +7,7 @@ legacy probabilistic branching code in :mod:`sharp_front`.
 from __future__ import annotations
 
 from dataclasses import replace
+import copy
 import hashlib
 import json
 import math
@@ -294,7 +295,7 @@ def run_2d(args):
         cluster = restored.branch_clusters[0] if restored.branch_clusters else None
         mesh = state.mesh; boundary = state.boundary; D = state.elasticity_D; mat = state.material
         start_step = int(state.event_counters.get("accepted_steps", 0)) + 1
-    last_measurement = {}; latest_sigma = None
+    last_measurement = {}; latest_sigma = None; latest_interval_rates = ()
 
     for step in range(start_step, int(args.steps) + 1):
         trial_fraction = 1.0
@@ -341,6 +342,7 @@ def run_2d(args):
             return solved
 
         def rates(current, _context):
+            nonlocal latest_interval_rates
             source = last_measurement["directional"]
             if runtime.routing.active_mechanics_provider == PROVIDER_ID:
                 request = _request(current, candidates, args=args, cfg=cfg, runtime_step=step, cluster=cluster)
@@ -354,13 +356,13 @@ def run_2d(args):
             by_id = {}
             for item in source:
                 by_id.setdefault(item["candidate_id"], item)
-            return tuple(preview_production_cleavage_rate(
+            latest_interval_rates = tuple(preview_production_cleavage_rate(
                 engine, candidate, signed_J_J_per_m2=float(by_id[candidate.candidate_id]["signed_J_J_per_m2"]),
                 Eprime_Pa=float(mat.Eprime), temperature_K=float(args.temperatures[0]),
             ) for candidate in candidates)
+            return latest_interval_rates
 
         trial_requests = {}; trial_live_results = {}; trial_clusters = {}; trial_drives = {}
-        interval_rates = {}
 
         def trial_action(current, proposal):
             nonlocal runtime
@@ -423,11 +425,11 @@ def run_2d(args):
 
         shared_info = {}
         def update_shared(selected_state, _context, proposal):
-            nonlocal runtime, cluster, shared_info
+            nonlocal runtime, cluster, shared_info, engine
             from .crystal import near_tip_stress_tensor
             rate_map = (
                 trial_drives[proposal.action_id] if proposal is not None
-                else {item.candidate_id: item for item in interval_rates["values"]}
+                else {item.candidate_id: item for item in latest_interval_rates}
             )
             K = max((item.K_directional_Pa_sqrt_m for item in rate_map.values()), default=0.0)
             # Populate the installed v10.2.28 tensor-resolved emission observer
@@ -439,13 +441,24 @@ def run_2d(args):
                 latest_sigma, selected_state.mesh, np.asarray(probe_tip),
                 3.0 * max(float(getattr(selected_state.mesh, "hbar_tip", 0.0) or selected_state.mesh.hbar), 1.0e-12),
             )
-            info = engine.step(K, float(args.temperatures[0]), _context.duration_s)
+            engine_trial = copy.deepcopy(engine)
+            pre_progress = max(
+                (hazard.residual_action for hazard in state.competition.hazard_states),
+                default=0.0,
+            )
+            engine_trial.B = pre_progress
+            if hasattr(engine_trial, "hazard_action_current"):
+                engine_trial.hazard_action_current = pre_progress
+            if hasattr(engine_trial, "hazard_threshold_action"):
+                engine_trial.hazard_threshold_action = 1.0
+            info = engine_trial.step(K, float(args.temperatures[0]), _context.duration_s)
             expected = proposal is not None
             if bool(info.get("fired")) != expected or int(info.get("n_fire", 0)) > 1:
-                raise RuntimeError(
-                    "shared engine renewal disagrees with directional first passage; "
-                    f"selected={expected} n_fire={info.get('n_fire')}"
+                raise DirectionalStepRefinementRequired(
+                    max(float(info.get("physical_hazard_action_step", info.get("dB", 0.0))), 1.0e-300),
+                    max(float(getattr(args, "adaptive_event_target", 0.15) or 0.15) * 0.5, 1.0e-6),
                 )
+            engine = engine_trial
             counters = dict(selected_state.event_counters)
             counters["shared_state_updates"] = counters.get("shared_state_updates", 0) + 1
             counters["accepted_steps"] = step
@@ -473,7 +486,7 @@ def run_2d(args):
                     state, context, correlation_interval_s=float(engine.f.tau_c),
                     solve_accepted=solve_accepted, evaluate_directional_rates=rates,
                     trial_action=trial_action,
-                    update_shared_state_once=lambda selected, ctx, proposal: replace(selected),
+                    update_shared_state_once=update_shared,
                     maximum_directional_action_increment=float(getattr(args, "adaptive_event_target", 0.15) or 0.15),
                 )
                 break
@@ -483,30 +496,53 @@ def run_2d(args):
                 if next_fraction >= trial_fraction or next_fraction <= float(getattr(args, "adaptive_min_frac", 1.0e-8)):
                     raise RuntimeError("v11 directional adaptive stepping reached its minimum fraction") from exc
                 trial_fraction = next_fraction
-        interval_rates["values"] = result.rates
-        state = update_shared(result.state, context, next((item.proposal for item in result.trials if item.selected), None))
+        state = result.state
         accepted_load += float(args.dU) * trial_fraction
         physical_time += context.duration_s
         selected = next((item for item in result.trials if item.selected), None)
         for item in result.trials:
             rate_map = trial_drives.get(item.proposal.action_id, {r.candidate_id: r for r in result.rates})
             rec = {field: None for field in TRIAL_FIELDS}
+            post_energy = item.result.state.stored_energy_J_per_m
+            pre_energy = post_energy + item.result.energy_release_J_per_m
+            arm_count = len(item.proposal.member_candidate_ids)
+            participating = []
+            request_for_trial = trial_requests.get(item.proposal.action_id)
+            if request_for_trial is not None:
+                participating = list(request_for_trial.crack_network.active_tip_ids)
             rec.update({
                 "step": step, "physical_time_s": physical_time, "accepted_state_id": context.accepted_state_id,
                 "trial_id": item.proposal.action_id, "action_type": item.proposal.action_type,
+                "participating_front_ids": participating,
                 "candidate_ids": list(item.proposal.member_candidate_ids), "pending_event_ids": list(item.proposal.member_event_ids),
                 "completion_times_s": list(item.proposal.completion_times_s),
                 "correlation_time_difference_s": max(item.proposal.completion_times_s) - min(item.proposal.completion_times_s),
                 "signed_directional_J_J_per_m2": [rate_map[c].signed_J_J_per_m2 for c in item.proposal.member_candidate_ids],
                 "positive_directional_J_J_per_m2": [rate_map[c].positive_J_J_per_m2 for c in item.proposal.member_candidate_ids],
                 "directional_K_Pa_sqrt_m": [rate_map[c].K_directional_Pa_sqrt_m for c in item.proposal.member_candidate_ids],
+                "proposed_arm_lengths_m": [da_phys] * arm_count,
+                "realized_arm_lengths_m": [da_phys] * arm_count if item.result.accepted else [0.0] * arm_count,
+                "pretrial_potential_energy_J_per_m": pre_energy,
+                "posttrial_potential_energy_J_per_m": post_energy,
                 "released_energy_J_per_m": item.result.energy_release_J_per_m,
+                "hazard_derived_cost_per_arm_J_per_m": [
+                    item.result.hazard_dissipation_J_per_m / arm_count
+                ] * arm_count,
                 "total_dissipative_cost_J_per_m": item.result.hazard_dissipation_J_per_m,
                 "net_energy_margin_J_per_m": item.result.energy_margin_J_per_m,
+                "relative_energy_residual": item.result.energy_margin_J_per_m / max(
+                    abs(pre_energy), abs(post_energy), item.result.hazard_dissipation_J_per_m, 1.0e-300
+                ),
+                "geometry_status": "realized" if item.result.accepted else "rolled_back",
+                "equilibrium_status": "converged" if item.result.accepted else "trial_vetoed",
                 "provider_identity": runtime.routing.active_mechanics_provider,
                 "accepted": item.selected, "veto_reason": None if item.selected else item.result.rejection_reason,
                 "reservation_result": "accepted" if item.selected else "released",
                 "consumption_result": "consumed" if item.selected else "preserved",
+                "pretrial_state_hash": context.accepted_state_id,
+                "postrollback_state_hash": (
+                    None if item.result.accepted else context.accepted_state_id
+                ),
             })
             writer.append_trial(rec)
         if selected is not None and selected.proposal.action_type == "two_arm" and cluster is not None:
