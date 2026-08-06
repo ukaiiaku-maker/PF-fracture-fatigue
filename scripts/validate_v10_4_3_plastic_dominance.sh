@@ -6,7 +6,9 @@ cd "$ROOT"
 
 CONDA_ENV=${CONDA_ENV:-arrhenius-sharp-front-v10}
 
-if [[ "${CONDA_DEFAULT_ENV:-}" == "$CONDA_ENV" ]]; then
+if [[ "${USE_CURRENT_PYTHON:-0}" == 1 ]]; then
+  PY=(python)
+elif [[ "${CONDA_DEFAULT_ENV:-}" == "$CONDA_ENV" ]]; then
   PY=(python)
 else
   command -v conda >/dev/null 2>&1 || {
@@ -23,7 +25,8 @@ printf 'Python:     '
 "${PY[@]}" -c 'import sys; print(sys.executable)'
 
 EXPECTED_BRANCH=${EXPECTED_BRANCH:-v10.4.3-plastic-dominance-censor}
-if [[ "$(git branch --show-current)" != "$EXPECTED_BRANCH" ]]; then
+if [[ "${SKIP_BRANCH_CHECK:-0}" != 1 ]] \
+  && [[ "$(git branch --show-current)" != "$EXPECTED_BRANCH" ]]; then
   echo "ERROR: expected branch '$EXPECTED_BRANCH'" >&2
   exit 2
 fi
@@ -64,6 +67,7 @@ transformed = transform_source(source)
 compile(transformed, "sharp_front.py[v10.4.3-validation]", "exec")
 required = [
     "ep_gp_step0_v1043.copy()",
+    "rho_gp_step0_v1043.copy()",
     "constitutive_dWp_accepted_gp_final_stagger_iterate",
     "plastic_flow_candidate_latest.json",
     "v10.4.3_plastic_dominance_terminal_audit_v1",
@@ -75,4 +79,4 @@ if missing:
 print("v10.4.3 transformed production source validated")
 PY
 
-echo "VALIDATION PASSED: v10.4.3 plastic-dominance branch is ready for the one-case reuse smoke"
+echo "VALIDATION PASSED: v10.4.3 is ready for the one-case reuse smoke"
