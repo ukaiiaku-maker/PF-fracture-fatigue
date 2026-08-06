@@ -400,7 +400,7 @@ def events_are_correlated(
         raise ValueError("correlation interval must be nonnegative")
     if first.candidate_id == second.candidate_id:
         return False
-    return abs(first.completion_time_s - second.completion_time_s) <= interval
+    return abs(first.completion_time_s - second.completion_time_s) <= interval + TIME_TOLERANCE_S
 
 
 def construct_action_proposals(
