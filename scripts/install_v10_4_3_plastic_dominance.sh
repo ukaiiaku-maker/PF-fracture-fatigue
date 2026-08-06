@@ -44,7 +44,9 @@ conda run --no-capture-output -n "$CONDA_ENV" \
 CONDA_ENV="$CONDA_ENV" EXPECTED_BRANCH="$BRANCH" \
   bash scripts/validate_v10_4_3_plastic_dominance.sh
 
-cat > .v10_4_3_install.json <<EOF
+GIT_DIR=$(git rev-parse --git-dir)
+INSTALL_RECORD="$GIT_DIR/v10_4_3_install.json"
+cat > "$INSTALL_RECORD" <<EOF
 {
   "branch": "$BRANCH",
   "commit": "$HEAD",
@@ -54,4 +56,5 @@ cat > .v10_4_3_install.json <<EOF
 EOF
 
 echo "INSTALLATION PASSED at $HEAD"
+echo "Install record: $INSTALL_RECORD"
 echo "Next: run the one-case inherited reuse smoke before any live matrix launch."
