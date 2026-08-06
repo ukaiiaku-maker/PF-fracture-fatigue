@@ -62,6 +62,11 @@ class ProductionBranchCheckpoint:
 
     def manifest_fields(self) -> dict[str, Any]:
         runtime = self.provider_runtime
+        from .adaptive_multitip_mesh_v11 import mesh_fingerprint
+        from .production_counts_v11 import production_front_counts
+        physical_topology_fingerprint = hashlib.sha256(
+            self.state.crack_network.to_json().encode()
+        ).hexdigest()
         return {
             "physical_time_s": self.physical_time_s,
             "accepted_load": self.accepted_load,
@@ -75,6 +80,11 @@ class ProductionBranchCheckpoint:
             ),
             "provider_cache_identity": self.provider_cache_identity,
             "topology_fingerprint": self.topology_fingerprint,
+            "physical_topology_fingerprint": physical_topology_fingerprint,
+            "mechanical_discretization_fingerprint": mesh_fingerprint(self.state.mesh),
+            "mesh_generation": int(self.state.event_counters.get("mesh_generation", 0)),
+            "refinement_operation_index": int(self.state.event_counters.get("refinement_operation_index", 0)),
+            "mesh_refinement_lineage": dict(self.state.junction_process_state).get("mesh_refinement"),
             "crack_network": self.state.crack_network.to_dict(),
             "active_front_ids": list(self.state.crack_network.active_tip_ids),
             "front_competitions": {
@@ -85,6 +95,7 @@ class ProductionBranchCheckpoint:
             "projected_extension_m": self.projected_extension_m,
             "physical_extension_m": self.physical_extension_m,
             "event_counters": dict(self.state.event_counters),
+            **production_front_counts(self.state),
             "energy_ledgers": dict(self.state.energy_ledgers),
             "handoff_guard_diagnostics": dict(self.handoff_guard_diagnostics),
             "termination_reason": self.termination_reason,
@@ -131,10 +142,15 @@ def restore_branch_checkpoint(path: str | Path) -> ProductionBranchCheckpoint:
     checkpoint = pickle.loads(data)
     if not isinstance(checkpoint, ProductionBranchCheckpoint):
         raise ValueError("production branch checkpoint payload has the wrong type")
-    if checkpoint.manifest_fields() != {
+    expected = checkpoint.manifest_fields()
+    actual = {
         key: value for key, value in manifest.items()
         if key not in {"schema", "state_file", "state_sha256"}
-    }:
+    }
+    # Schema-2 checkpoints predate additive refinement/count diagnostics.  All
+    # fields actually recorded remain strict hash-checked; newly derived fields
+    # are reconstructed from the pickled accepted state on restore.
+    if any(expected.get(key) != value for key, value in actual.items()):
         raise ValueError("production branch checkpoint manifest does not match state")
     return checkpoint
 

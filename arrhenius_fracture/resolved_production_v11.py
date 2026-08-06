@@ -3,8 +3,10 @@ from __future__ import annotations
 
 from dataclasses import replace
 import copy
+import json
 import math
 from pathlib import Path
+import time
 from typing import Any
 
 import numpy as np
@@ -22,6 +24,7 @@ from .hazard_energy_event_gate_v10230 import hazard_resistance_J_per_m2
 from .live_topology_kernel_v11 import PROVIDER_ID
 from .multi_tip_step_loop_v11 import advance_multi_tip_step
 from .network_metrics_v11 import crack_growth_metrics
+from .adaptive_multitip_mesh_v11 import adapt_accepted_state_for_trials, mesh_fingerprint
 from .production_step_loop_v11 import AcceptedStepContext, DirectionalStepRefinementRequired
 from .resolved_tip_state_v11 import resolve_unresolved_cluster
 from .topology_transaction_v11 import (
@@ -91,6 +94,7 @@ def continue_resolved_production(
     coalescence_count = int(state.event_counters.get("coalescence_count", 0))
     termination = None
     checkpoint = None
+    adaptation_required = True
     growth = crack_growth_metrics(state.crack_network, initial_crack_length_m=cfg.geometry.a0)
     last_snapshot_extension = growth.max_root_to_tip_path_extension_m
     if resume_bundle is None:
@@ -102,6 +106,84 @@ def continue_resolved_production(
         )
 
     for step in range(start_step, int(args.steps) + 1):
+        if adaptation_required:
+            adaptation_start = time.perf_counter()
+            candidate_inventory = {tip: tuple(candidates) for tip in state.crack_network.active_tip_ids}
+            prior_generation = int(state.event_counters.get("mesh_generation", 0))
+            prior_operation = int(state.event_counters.get("refinement_operation_index", 0))
+            state, adaptation = adapt_accepted_state_for_trials(
+                state, candidate_inventory, da_phys_m=da_phys,
+                tip_h_fine_m=float(getattr(args, "tip_h_fine", 0.0) or 1.0e-6),
+                contour_radius_m=float(getattr(args, "rJ", None) or args.L_pz),
+                crack_band_radius_m=0.5e-6, accepted_load_m=accepted_load,
+                starting_generation=prior_generation,
+                starting_operation_index=prior_operation,
+            )
+            if adaptation.lineages:
+                counters = dict(state.event_counters)
+                counters["mesh_generation"] = adaptation.lineages[-1].mesh_generation
+                counters["refinement_operation_index"] = adaptation.lineages[-1].refinement_operation_index
+                junction = dict(state.junction_process_state)
+                junction["mesh_refinement"] = {
+                    "latest": adaptation.lineages[-1].to_dict(),
+                    "physical_topology_fingerprint": _hash(state.crack_network),
+                    "mechanical_discretization_fingerprint": mesh_fingerprint(state.mesh),
+                }
+                state = replace(state, event_counters=counters, junction_process_state=junction)
+                record = {
+                    "step": step, "physical_time_s": physical_time,
+                    "root_to_tip_extension_um": crack_growth_metrics(
+                        state.crack_network, initial_crack_length_m=cfg.geometry.a0,
+                    ).max_root_to_tip_path_extension_m * 1e6,
+                    "node_count": state.mesh.nn, "element_count": state.mesh.ne,
+                    "active_tip_count": len(state.crack_network.active_tip_ids),
+                    "levels_added": len(adaptation.lineages),
+                    "elements_marked": sum(len(item.refined_parent_element_ids) for item in adaptation.lineages),
+                    "elements_added_by_conformity": sum(item.elements_added_by_conformity for item in adaptation.lineages),
+                    "minimum_active_tip_hbar_m": min(adaptation.active_tip_hbar_m.values()),
+                    "maximum_active_tip_hbar_m": max(adaptation.active_tip_hbar_m.values()),
+                    "parent_energy_J_per_m": adaptation.parent_energy_J_per_m,
+                    "prolonged_energy_J_per_m": adaptation.prolonged_energy_J_per_m,
+                    "refined_equilibrium_energy_J_per_m": adaptation.refined_equilibrium_energy_J_per_m,
+                    "parent_vs_prolonged_relative_error": adaptation.parent_vs_prolonged_relative_error,
+                    "refined_equilibrium_relative_correction": adaptation.refined_equilibrium_relative_correction,
+                    "reaction_prolongated_N_per_m": adaptation.reaction_prolongated_N_per_m,
+                    "reaction_refined_equilibrium_N_per_m": adaptation.reaction_refined_equilibrium_N_per_m,
+                    "adaptation_wall_time_s": time.perf_counter() - adaptation_start,
+                    "provider_solve_count": runtime.live_fem_solve_count,
+                }
+                with (out / "mesh_adaptations.jsonl").open("a", encoding="utf-8") as stream:
+                    stream.write(json.dumps(record, sort_keys=True, allow_nan=False) + "\n")
+                bundle = {
+                    "schema": "v11.multi-tip-engine-bundle/1", "owner_by_tip": owner_by_tip,
+                    "engines": {key: _capture_shared_engine(value) for key, value in engines.items()},
+                    "junction_reservoirs": reservoirs,
+                }
+                growth_now = crack_growth_metrics(state.crack_network, initial_crack_length_m=cfg.geometry.a0)
+                checkpoint = ProductionBranchCheckpoint(
+                    state=state, shared_process_state=bundle, physical_time_s=physical_time,
+                    accepted_load=accepted_load, mesh_identity=_mesh_identity(state.mesh),
+                    boundary_condition_state={"opening_m": accepted_load}, provider_runtime=runtime,
+                    provider_cache_identity=str(cache_root.resolve()),
+                    topology_fingerprint=_hash((state.crack_network, mesh_fingerprint(state.mesh))),
+                    front_competitions=competitions, branch_clusters=tuple(clusters.values()),
+                    projected_extension_m=growth_now.max_forward_projected_extension_m,
+                    physical_extension_m=growth_now.max_root_to_tip_path_extension_m,
+                    handoff_guard_diagnostics={}, termination_reason=None,
+                )
+                write_branch_checkpoint(
+                    checkpoint, out / "checkpoint" / "transitions" /
+                    f"step{step:07d}_mesh_adaptation_g{counters['mesh_generation']:04d}.json",
+                )
+                write_branch_checkpoint(checkpoint, out / "checkpoint" / "latest.json")
+                write_topology_snapshot(
+                    out, state, step=step, reason=f"mesh_adaptation_g{counters['mesh_generation']:04d}",
+                    physical_extension_m=growth_now.max_root_to_tip_path_extension_m,
+                    branch_birth_count=branch_birth_count,
+                    latest_action=state.event_counters.get("latest_successful_action"),
+                    growth_metrics=growth_now.to_dict_um(), coalescence_count=coalescence_count,
+                )
+            adaptation_required = False
         fraction = 1.0
         context = AcceptedStepContext(step, physical_time, float(args.dt), _hash((step, state.crack_network, competitions)))
 
@@ -309,6 +391,7 @@ def continue_resolved_production(
         snapshot_reason = None
         latest_mechanics = {}
         if result.selected_proposal is not None:
+            adaptation_required = True
             tip = result.selected_tip_id
             key = (tip, result.selected_proposal.action_id)
             trial_cluster, arms, request, live, runtime = trial_data[key]

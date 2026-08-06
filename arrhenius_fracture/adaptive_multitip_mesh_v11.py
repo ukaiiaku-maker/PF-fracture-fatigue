@@ -53,6 +53,23 @@ class RefinementLineage:
         return json.loads(json.dumps(self, default=lambda value: value.__dict__, sort_keys=True))
 
 
+@dataclass(frozen=True)
+class AdaptationAudit:
+    lineages: tuple[RefinementLineage, ...]
+    parent_energy_J_per_m: float
+    prolonged_energy_J_per_m: float
+    refined_equilibrium_energy_J_per_m: float
+    parent_vs_prolonged_relative_error: float
+    refined_equilibrium_relative_correction: float
+    reaction_prolongated_N_per_m: float
+    reaction_refined_equilibrium_N_per_m: float
+    active_tip_hbar_m: Mapping[str, float]
+    trial_changed_element_count: Mapping[str, int]
+
+    def to_dict(self) -> dict:
+        return json.loads(json.dumps(self, default=lambda value: value.__dict__, sort_keys=True))
+
+
 def _subdivide(nodes: np.ndarray, elems: np.ndarray, marked: Iterable[int]):
     marked_ids = tuple(sorted(set(int(index) for index in marked)))
     if any(index < 0 or index >= len(elems) for index in marked_ids):
@@ -185,4 +202,144 @@ def mark_multitip_trial_support(mesh, network, candidates_by_tip, *, da_phys_m: 
     return tuple(int(value) for value in np.flatnonzero(marked))
 
 
-__all__ = ["RefinementLineage", "mark_multitip_trial_support", "mesh_fingerprint", "refine_accepted_state"]
+def _stored_energy_and_reaction(state) -> tuple[float, float]:
+    from .fem import assemble_mechanics, elastic_energy_densities
+    _, residual, sigma, *_ = assemble_mechanics(
+        state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
+    )
+    density, _ = elastic_energy_densities(
+        state.mesh, state.displacement, state.ep_gp, sigma, state.elasticity_D,
+    )
+    top = np.asarray(state.boundary.top_nodes, dtype=int)
+    reaction = float(np.sum(residual[2 * top + 1])) if top.size else 0.0
+    return float(np.sum(density * state.mesh.area_e)), reaction
+
+
+def active_tip_hbar(state) -> dict[str, float]:
+    return {
+        tip: _estimate_hbar_tip(
+            state.mesh.nodes, state.mesh.elems, *state.crack_network.branch(tip).tip,
+        )
+        for tip in state.crack_network.active_tip_ids
+    }
+
+
+def _mean_edge_length(mesh) -> np.ndarray:
+    triangles = mesh.nodes[mesh.elems]
+    return (
+        np.linalg.norm(triangles[:, 1] - triangles[:, 0], axis=1)
+        + np.linalg.norm(triangles[:, 2] - triangles[:, 1], axis=1)
+        + np.linalg.norm(triangles[:, 0] - triangles[:, 2], axis=1)
+    ) / 3.0
+
+
+def trial_stiffness_visibility(state, candidates_by_tip, *, da_phys_m: float, crack_band_radius_m: float) -> dict[str, int]:
+    from .crack_backend import SharpWakeBackend
+    inherited = getattr(state.mesh, "element_damage_gp", None)
+    if inherited is None:
+        inherited = np.mean(np.asarray(state.damage)[state.mesh.elems], axis=1)
+    result: dict[str, int] = {}
+    for tip_id in sorted(state.crack_network.active_tip_ids):
+        tip = np.asarray(state.crack_network.branch(tip_id).tip, dtype=float)
+        for candidate in sorted(candidates_by_tip[tip_id], key=lambda item: item.candidate_id):
+            end = tip + float(da_phys_m) * np.asarray(candidate.direction_xy, dtype=float)
+            trial = SharpWakeBackend().advance(
+                mesh=state.mesh, boundary=state.boundary, damage=state.damage,
+                displacement=state.displacement, p0=tip, p1=end,
+                kill_r=float(crack_band_radius_m),
+            )
+            after = getattr(trial.mesh, "element_damage_gp", None)
+            if after is None:
+                after = np.mean(np.asarray(trial.damage)[trial.mesh.elems], axis=1)
+            result[f"{tip_id}|{candidate.candidate_id}"] = int(np.count_nonzero(np.asarray(after) != inherited))
+    return result
+
+
+def adapt_accepted_state_for_trials(
+    state, candidates_by_tip, *, da_phys_m: float, tip_h_fine_m: float,
+    contour_radius_m: float, crack_band_radius_m: float, accepted_load_m: float,
+    starting_generation: int = 0, starting_operation_index: int = 0,
+    maximum_levels: int = 8,
+):
+    """Proactively refine one accepted discretization for all sibling trials."""
+    from .fem import assemble_mechanics, solve_dirichlet
+
+    target_hbar = max(float(tip_h_fine_m) * 1.5, float(da_phys_m) / 5.0)
+    parent_energy, _ = _stored_energy_and_reaction(state)
+    current = state
+    lineages = []
+    for level in range(1, int(maximum_levels) + 1):
+        hbars = active_tip_hbar(current)
+        support = mark_multitip_trial_support(
+            current.mesh, current.crack_network, candidates_by_tip,
+            da_phys_m=da_phys_m, contour_radius_m=contour_radius_m,
+            crack_band_radius_m=max(float(current.mesh.hbar_tip), float(crack_band_radius_m)),
+        )
+        mean_edge = _mean_edge_length(current.mesh)
+        marked = tuple(index for index in support if mean_edge[index] > target_hbar)
+        visible = trial_stiffness_visibility(
+            current, candidates_by_tip, da_phys_m=da_phys_m,
+            crack_band_radius_m=max(float(current.mesh.hbar_tip), float(crack_band_radius_m)),
+        )
+        if max(hbars.values(), default=0.0) <= target_hbar and min(visible.values(), default=1) > 0 and not marked:
+            break
+        if not marked:
+            marked = support
+        refined, lineage = refine_accepted_state(
+            current, marked_parent_elements=marked,
+            active_tip_ids=current.crack_network.active_tip_ids,
+            generation=starting_generation + level,
+            operation_index=starting_operation_index + level,
+        )
+        before, _ = _stored_energy_and_reaction(current)
+        prolonged, _ = _stored_energy_and_reaction(refined)
+        tolerance = 1e-12 * max(abs(before), abs(prolonged), 1.0)
+        if abs(prolonged - before) > tolerance:
+            raise RuntimeError(
+                "nested_refinement_stage_a_energy_parity_failure: "
+                f"parent={before:.17g} prolonged={prolonged:.17g}"
+            )
+        current = refined; lineages.append(lineage)
+    else:
+        raise RuntimeError("nested_refinement_maximum_levels_exceeded")
+
+    visibility = trial_stiffness_visibility(
+        current, candidates_by_tip, da_phys_m=da_phys_m,
+        crack_band_radius_m=max(float(current.mesh.hbar_tip), float(crack_band_radius_m)),
+    )
+    if min(visibility.values(), default=0) <= 0:
+        invisible = sorted(key for key, value in visibility.items() if value <= 0)
+        raise RuntimeError(f"unresolved_trial_stiffness_topology: {invisible}")
+    prolonged_energy, prolonged_reaction = _stored_energy_and_reaction(current)
+    K, residual, *_ = assemble_mechanics(
+        current.mesh, current.displacement, current.ep_gp, current.rho_gp,
+        current.damage, current.elasticity_D, current.material,
+        cohesive_network=current.cohesive_network,
+    )
+    displacement, equilibrium_reaction = solve_dirichlet(
+        K, residual, current.displacement, current.boundary,
+        0.5 * float(accepted_load_m), -0.5 * float(accepted_load_m),
+    )
+    current = replace(current, displacement=displacement)
+    equilibrium_energy, _ = _stored_energy_and_reaction(current)
+    current = replace(current, stored_energy_J_per_m=equilibrium_energy)
+    denominator = max(abs(parent_energy), 1e-300)
+    return current, AdaptationAudit(
+        lineages=tuple(lineages), parent_energy_J_per_m=parent_energy,
+        prolonged_energy_J_per_m=prolonged_energy,
+        refined_equilibrium_energy_J_per_m=equilibrium_energy,
+        parent_vs_prolonged_relative_error=(prolonged_energy - parent_energy) / denominator,
+        refined_equilibrium_relative_correction=(equilibrium_energy - prolonged_energy) / max(abs(prolonged_energy), 1e-300),
+        reaction_prolongated_N_per_m=prolonged_reaction,
+        reaction_refined_equilibrium_N_per_m=float(equilibrium_reaction),
+        active_tip_hbar_m=active_tip_hbar(current),
+        trial_changed_element_count=visibility,
+    )
+
+
+__all__ = [
+    "AdaptationAudit", "RefinementLineage", "active_tip_hbar",
+    "adapt_accepted_state_for_trials", "mark_multitip_trial_support",
+    "mesh_fingerprint", "refine_accepted_state", "trial_stiffness_visibility",
+]
