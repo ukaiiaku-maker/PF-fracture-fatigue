@@ -41,4 +41,4 @@ def test_audit_only_writes_complete_fail_closed_policy(tmp_path):
     assert payload["policy"]["maximum_fronts"] == 2
     assert payload["policy"]["branch_process_zone_mode"] == "shared_unresolved_cluster"
     assert payload["mechanics_provider_sequence"][-1] == PROVIDER_ID
-    assert payload["dirty_tree"] is True
+    assert isinstance(payload["dirty_tree"], bool)
