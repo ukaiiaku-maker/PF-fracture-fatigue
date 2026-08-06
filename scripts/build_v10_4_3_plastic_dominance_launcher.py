@@ -59,7 +59,7 @@ def transform(source: str) -> str:
             raise RuntimeError(f"v10.4.2 launcher token is missing: {old}")
         text = text.replace(old, new)
 
-    scheduler_adapter = r'''
+    scheduler_adapter = r"""
 replace_scheduler_exact(
     '''    --plastic-flow-contour-multipliers "1 2 4 8"''',
     '''    --plastic-flow-contour-multipliers "1 2 4 8"
@@ -89,7 +89,7 @@ if scheduler.index("SKIP_REUSED_VERIFIED") > scheduler.index("expected = {"):
     raise SystemExit(
         "ERROR: v10.4.3 inherited-case reuse remains after native checks"
     )
-'''
+"""
 
     marker = "plotter = source_plotter.read_text()"
     text = _replace_once(
