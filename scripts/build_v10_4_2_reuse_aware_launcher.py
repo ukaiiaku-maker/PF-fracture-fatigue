@@ -33,10 +33,10 @@ def _replace_once(text: str, old: str, new: str, label: str) -> str:
 def transform(source: str) -> str:
     text = _load_positive_j_builder().transform(source)
 
-    # These are transformations of the final generated scheduler.  They are
+    # These are transformations of the final generated scheduler. They are
     # deliberately inserted into the outer builder immediately before it reads
     # the plotter, after every earlier scheduler adapter has been registered.
-    scheduler_repairs = r'''
+    scheduler_repairs = r"""
 replace_scheduler_exact(
     'contract = json.loads((root / "v10_2_27_case_contract.json").read_text())',
     '''v1042_reuse_path = root / "v10_4_2_reuse_audit.json"
@@ -119,7 +119,7 @@ if scheduler.index(_reuse_skip) > scheduler.index(_native_expected):
     raise SystemExit(
         "ERROR: audited-reuse guard is still after native v10.4.2 contract checks"
     )
-'''
+"""
 
     tail_marker = "plotter = source_plotter.read_text()"
     return _replace_once(
