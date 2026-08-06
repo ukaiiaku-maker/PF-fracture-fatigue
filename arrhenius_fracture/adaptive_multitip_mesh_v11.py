@@ -199,6 +199,10 @@ def mark_multitip_trial_support(mesh, network, candidates_by_tip, *, da_phys_m: 
         for candidate in sorted(candidates_by_tip[tip_id], key=lambda item: item.candidate_id):
             end = tip + float(da_phys_m) * np.asarray(candidate.direction_xy, dtype=float)
             marked |= _distance_to_segment(centroids, tip, end) <= support + element_radius
+            # Every sibling trial must also land in an already qualified J
+            # support patch.  Refining this union before A1/A2/A12 avoids a
+            # post-commit discretization correction at the newly advanced tip.
+            marked |= np.linalg.norm(centroids - end, axis=1) <= float(contour_radius_m) + element_radius
     return tuple(int(value) for value in np.flatnonzero(marked))
 
 
