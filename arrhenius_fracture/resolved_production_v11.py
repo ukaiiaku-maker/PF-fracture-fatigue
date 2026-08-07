@@ -31,6 +31,7 @@ from .adaptive_multitip_mesh_v11 import adapt_accepted_state_for_trials, mesh_fi
 from .production_step_loop_v11 import AcceptedStepContext, DirectionalStepRefinementRequired
 from .resolved_tip_state_v11 import resolve_unresolved_cluster, tip_lineage_seed
 from .process_state_ownership_v11 import ProcessStateOwner, ProcessStateOwnerRegistry
+from .process_update_semantics_v11 import classify_process_update
 from .topology_transaction_v11 import (
     TopologyArm, TopologyTrialResult, apply_causal_sharp_wake_trial_geometry,
     clip_arm_at_first_intersection, execute_topology_trial, extend_network_arm,
@@ -414,8 +415,33 @@ def continue_resolved_production(
                     # scalar compatibility observer must not consume it.
                     engine.hazard_threshold_action = 1.0 if expected else 1.0e300
                 info = engine.step(K, float(args.temperatures[0]), local_context.duration_s)
-                if bool(info.get("fired")) != expected or int(info.get("n_fire", 0)) > 1:
-                    raise DirectionalStepRefinementRequired(max(float(info.get("physical_hazard_action_step", info.get("dB", 0.0))), 1e-300), max(float(getattr(args, "adaptive_event_target", 0.15)) * 0.5, 1e-6))
+                target = max(float(getattr(args, "adaptive_event_target", 0.15)) * 0.5, 1e-6)
+                decision = classify_process_update(
+                    info,
+                    directional_event_expected=expected,
+                    permitted_physical_hazard_action=target,
+                )
+                process_record = {
+                    "step": step,
+                    "owner_id": owner,
+                    "member_tip_ids": sorted(owner_tips),
+                    "selected_tip_id": selected_tip,
+                    "duration_s": local_context.duration_s,
+                    "current_fraction": fraction,
+                    "minimum_fraction": float(getattr(args, "adaptive_min_frac", 1e-8)),
+                    **decision.diagnostics,
+                    "info": info,
+                }
+                if decision.event_semantics == "process_checkpoint_synchronization" or decision.refinement_required:
+                    with (out / "process_update_diagnostics.jsonl").open("a", encoding="utf-8") as stream:
+                        stream.write(json.dumps(process_record, sort_keys=True, default=str) + "\n")
+                if decision.refinement_required:
+                    raise DirectionalStepRefinementRequired(
+                        decision.physical_hazard_action_step,
+                        target,
+                        refinement_reason=decision.refinement_reason or "process_update_refinement",
+                        diagnostics=process_record,
+                    )
                 evolved[owner] = engine
             engines = evolved
             counters = dict(current.event_counters)
@@ -435,7 +461,12 @@ def continue_resolved_production(
                 )
                 break
             except DirectionalStepRefinementRequired as error:
-                shrink = 0.7 * error.target_increment / max(error.predicted_increment, 1e-300)
+                if error.predicted_increment is None or error.predicted_increment <= 0.0:
+                    raise RuntimeError(
+                        "v11 resolved process update requested refinement without "
+                        "a positive physical hazard action"
+                    ) from error
+                shrink = 0.7 * error.target_increment / error.predicted_increment
                 next_fraction = max(float(getattr(args, "adaptive_min_frac", 1e-8)), fraction * min(0.5, shrink))
                 if next_fraction >= fraction or next_fraction <= float(getattr(args, "adaptive_min_frac", 1e-8)):
                     raise RuntimeError("v11 resolved multi-tip stepping reached its minimum fraction") from error

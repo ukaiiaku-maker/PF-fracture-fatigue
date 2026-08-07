@@ -31,12 +31,27 @@ MODEL_ID = "v11.monotonic_tip_only_mechanistic_branching_step_loop/1"
 
 
 class DirectionalStepRefinementRequired(RuntimeError):
-    def __init__(self, predicted_increment: float, target_increment: float):
-        self.predicted_increment = float(predicted_increment)
+    def __init__(
+        self,
+        predicted_increment: float | None,
+        target_increment: float,
+        *,
+        refinement_reason: str = "directional_action_increment",
+        diagnostics: Mapping[str, object] | None = None,
+    ):
+        self.predicted_increment = (
+            None if predicted_increment is None else float(predicted_increment)
+        )
         self.target_increment = float(target_increment)
+        self.refinement_reason = str(refinement_reason)
+        self.diagnostics = dict(diagnostics or {})
+        if self.predicted_increment is None:
+            detail = "no physical hazard action was reported"
+        else:
+            detail = f"physical hazard action {self.predicted_increment:.6g}"
         super().__init__(
-            f"directional action increment {predicted_increment:.6g} exceeds "
-            f"adaptive target {target_increment:.6g}"
+            f"step refinement required ({self.refinement_reason}): {detail}; "
+            f"requested target {target_increment:.6g}"
         )
 
 

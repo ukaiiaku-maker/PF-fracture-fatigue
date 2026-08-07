@@ -47,6 +47,7 @@ from .network_metrics_v11 import crack_growth_metrics
 from .production_step_loop_v11 import (
     AcceptedStepContext, DirectionalStepRefinementRequired, advance_accepted_step,
 )
+from .process_update_semantics_v11 import classify_process_update
 from .topology_transaction_v11 import (
     LiveFEMTopologyState, TopologyArm, TopologyTrialResult,
     apply_causal_sharp_wake_trial_geometry, clip_arm_at_first_intersection,
@@ -689,10 +690,18 @@ def run_2d(args):
             if hasattr(engine_trial, "hazard_threshold_action"):
                 engine_trial.hazard_threshold_action = 1.0 if expected else 1.0e300
             info = engine_trial.step(K, float(args.temperatures[0]), _context.duration_s)
-            if bool(info.get("fired")) != expected or int(info.get("n_fire", 0)) > 1:
+            target = max(float(getattr(args, "adaptive_event_target", 0.15) or 0.15) * 0.5, 1.0e-6)
+            decision = classify_process_update(
+                info,
+                directional_event_expected=expected,
+                permitted_physical_hazard_action=target,
+            )
+            if decision.refinement_required:
                 raise DirectionalStepRefinementRequired(
-                    max(float(info.get("physical_hazard_action_step", info.get("dB", 0.0))), 1.0e-300),
-                    max(float(getattr(args, "adaptive_event_target", 0.15) or 0.15) * 0.5, 1.0e-6),
+                    decision.physical_hazard_action_step,
+                    target,
+                    refinement_reason=decision.refinement_reason or "process_update_refinement",
+                    diagnostics={**decision.diagnostics, "info": info},
                 )
             engine = engine_trial
             counters = dict(selected_state.event_counters)
@@ -736,7 +745,12 @@ def run_2d(args):
                 )
                 break
             except DirectionalStepRefinementRequired as exc:
-                shrink = 0.7 * exc.target_increment / max(exc.predicted_increment, 1.0e-300)
+                if exc.predicted_increment is None or exc.predicted_increment <= 0.0:
+                    raise RuntimeError(
+                        "v11 process update requested refinement without a positive "
+                        "physical hazard action"
+                    ) from exc
+                shrink = 0.7 * exc.target_increment / exc.predicted_increment
                 next_fraction = max(float(getattr(args, "adaptive_min_frac", 1.0e-8)), trial_fraction * min(0.5, shrink))
                 if next_fraction >= trial_fraction or next_fraction <= float(getattr(args, "adaptive_min_frac", 1.0e-8)):
                     raise RuntimeError("v11 directional adaptive stepping reached its minimum fraction") from exc
