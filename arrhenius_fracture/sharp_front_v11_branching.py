@@ -812,6 +812,16 @@ def run_2d(args):
     termination = termination or "physical_veto_no_branch"
     checkpoint = replace(checkpoint, termination_reason=termination)
     write_branch_checkpoint(checkpoint, out / "checkpoint" / "latest.json")
+    final_growth = crack_growth_metrics(
+        state.crack_network, initial_crack_length_m=cfg.geometry.a0,
+    )
+    write_topology_snapshot(
+        out, state, step=int(state.event_counters.get("accepted_steps", 0)),
+        reason=termination, physical_extension_m=checkpoint.physical_extension_m,
+        branch_birth_count=int(state.event_counters.get("branch_birth_count", 0)),
+        latest_action=state.event_counters.get("latest_successful_action"),
+        growth_metrics=final_growth.to_dict_um(), final=True,
+    )
     writer.complete(status=termination, final_checkpoint="checkpoint/latest.json", validation={
         "checkpoint": True, "shared_state_updates": state.event_counters.get("shared_state_updates", 0),
         "topology_actions": state.event_counters.get("topology_actions", 0),
