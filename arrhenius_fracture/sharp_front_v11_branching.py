@@ -46,7 +46,8 @@ from .production_step_loop_v11 import (
 )
 from .topology_transaction_v11 import (
     LiveFEMTopologyState, TopologyArm, TopologyTrialResult,
-    apply_causal_sharp_wake_trial_geometry, execute_topology_trial, extend_network_arm,
+    apply_causal_sharp_wake_trial_geometry, clip_arm_at_first_intersection,
+    execute_topology_trial, extend_network_arm, mark_coalesced,
 )
 
 
