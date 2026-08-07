@@ -9,6 +9,8 @@ from typing import Any, Mapping
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.collections import PolyCollection
+import numpy as np
 
 
 def write_topology_snapshot(
@@ -25,6 +27,17 @@ def write_topology_snapshot(
     metadata = out / "v11_visual_snapshot.json" if final else directory / f"{stem}.json"
     figure, (overview, axis) = plt.subplots(1, 2, figsize=(14, 5.8))
     nodes = state.mesh.nodes
+    element_damage = getattr(state.mesh, "element_damage_gp", None)
+    causal_support_count = 0
+    if element_damage is not None:
+        killed = np.asarray(element_damage, dtype=float) >= 1.0
+        causal_support_count = int(np.count_nonzero(killed))
+        if causal_support_count:
+            support = nodes[state.mesh.elems[killed]] * 1.0e6
+            axis.add_collection(PolyCollection(
+                support, facecolor="tab:blue", edgecolor="none", alpha=0.18,
+                label="causal P0 FEM support",
+            ))
     specimen_x = [nodes[:, 0].min() * 1e6, nodes[:, 0].max() * 1e6, nodes[:, 0].max() * 1e6,
                   nodes[:, 0].min() * 1e6, nodes[:, 0].min() * 1e6]
     specimen_y = [nodes[:, 1].min() * 1e6, nodes[:, 1].min() * 1e6, nodes[:, 1].max() * 1e6,
@@ -104,6 +117,8 @@ def write_topology_snapshot(
         "growth_metrics": metrics,
         "branch_count": len(state.crack_network.branches), "latest_action": latest_action,
         "mechanics": info,
+        "crack_representation": dict(state.junction_process_state).get("crack_representation"),
+        "causal_support_element_count": causal_support_count,
     }
     temporary = metadata.with_name(metadata.name + ".tmp")
     temporary.write_text(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n")
