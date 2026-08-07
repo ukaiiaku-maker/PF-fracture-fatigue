@@ -13,6 +13,8 @@ TRIAL_FIELDS = (
     "participating_front_ids", "candidate_ids", "pending_event_ids", "completion_times_s",
     "correlation_time_difference_s", "signed_directional_J_J_per_m2",
     "positive_directional_J_J_per_m2", "directional_K_Pa_sqrt_m",
+    "J_local_signed_J_per_m2", "local_J_valid", "local_J_invalid_reason",
+    "G_marginal_J_per_m2", "J_kin_used_J_per_m2", "lambda_directional_per_s",
     "applied_displacement_m", "reaction_force_before_N_per_m",
     "reaction_force_after_N_per_m", "apparent_compliance_before_m2_per_N",
     "apparent_compliance_after_m2_per_N", "topology_fingerprint_before",

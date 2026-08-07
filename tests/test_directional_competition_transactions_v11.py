@@ -4,6 +4,7 @@ import pytest
 
 from arrhenius_fracture.directional_competition_v11 import (
     DirectionalCompetitionState,
+    DirectionalHazardState,
     accept_reservation,
     commit_directional_interval,
     construct_action_proposals,
@@ -18,6 +19,9 @@ from arrhenius_fracture.directional_competition_v11 import (
 def pending_state(*, second_time=1.05, multiple=False):
     candidates = tungsten_cleavage_candidates(theta_deg=30.0)
     state = DirectionalCompetitionState.initialize(candidates, global_hazard_seed=1720)
+    state = replace(state, hazard_states=tuple(
+        DirectionalHazardState(candidate.candidate_id) for candidate in state.candidates
+    ))
     hazards = []
     for index, hazard in enumerate(state.hazard_states):
         duration = (2.2 if multiple and index == 0 else 1.0)

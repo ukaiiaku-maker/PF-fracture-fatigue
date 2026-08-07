@@ -205,6 +205,11 @@ class DirectionalRate:
     positive_J_J_per_m2: float
     K_directional_Pa_sqrt_m: float
     gamma_rel: float
+    J_local_signed_J_per_m2: float | None = None
+    local_J_valid: bool = True
+    G_marginal_J_per_m2: float | None = None
+    J_kin_used_J_per_m2: float | None = None
+    local_J_invalid_reason: str | None = None
 
     def __post_init__(self) -> None:
         for name in (
@@ -216,6 +221,10 @@ class DirectionalRate:
             raise ValueError("directional rate and positive drive fields must be nonnegative")
         if self.gamma_rel <= 0.0:
             raise ValueError("gamma_rel must be positive")
+        for name in ("J_local_signed_J_per_m2", "G_marginal_J_per_m2", "J_kin_used_J_per_m2"):
+            value = getattr(self, name)
+            if value is not None:
+                _finite(value, name)
 
 
 def directional_drive(
@@ -300,6 +309,22 @@ class DirectionalHazardState:
     residual_action: float = 0.0
     last_completion_time_s: float | None = None
     pending_events: tuple[CompletedDirectionalEvent, ...] = ()
+    current_threshold_action: float = 1.0
+    threshold_process: str = "unit_deterministic"
+    threshold_seed: int = 0
+
+    @classmethod
+    def stochastic(
+        cls, candidate_id: str, *, threshold_seed: int,
+    ) -> "DirectionalHazardState":
+        return cls(
+            candidate_id=candidate_id,
+            current_threshold_action=_exponential_threshold_increment(
+                threshold_seed, candidate_id, 1,
+            ),
+            threshold_process="unit_exponential",
+            threshold_seed=int(threshold_seed),
+        )
 
     @classmethod
     def from_action(
@@ -315,6 +340,7 @@ class DirectionalHazardState:
             previous_rate_per_s=previous_rate_per_s,
             completed_event_count=completed,
             residual_action=value - completed,
+            current_threshold_action=float(completed + 1),
         )
 
     def __post_init__(self) -> None:
@@ -338,6 +364,19 @@ class DirectionalHazardState:
         event_ids = tuple(event.event_id for event in self.pending_events)
         if len(event_ids) != len(set(event_ids)):
             raise ValueError("duplicate pending directional event")
+        threshold = _finite(self.current_threshold_action, "current_threshold_action")
+        if threshold <= action and not math.isclose(threshold, action, abs_tol=1.0e-12):
+            raise ValueError("current threshold must remain ahead of accumulated action")
+        if self.threshold_process not in {"unit_deterministic", "unit_exponential"}:
+            raise ValueError("unsupported directional threshold process")
+
+
+def _exponential_threshold_increment(seed: int, candidate_id: str, ordinal: int) -> float:
+    """Stable Exp(1) draw from physical identity, never enumeration order."""
+    payload = f"v11-directional-threshold|{int(seed)}|{candidate_id}|{int(ordinal)}".encode()
+    integer = int.from_bytes(hashlib.sha256(payload).digest()[:8], "big")
+    uniform = (integer + 0.5) / float(1 << 64)
+    return -math.log(uniform)
 
 
 @dataclass(frozen=True)
@@ -543,7 +582,9 @@ class DirectionalCompetitionState:
         return cls(
             candidates=inventory,
             hazard_states=tuple(
-                DirectionalHazardState(candidate.candidate_id) for candidate in inventory
+                DirectionalHazardState.stochastic(
+                    candidate.candidate_id, threshold_seed=global_hazard_seed,
+                ) for candidate in inventory
             ),
             global_hazard_seed=global_hazard_seed,
         )
@@ -718,6 +759,9 @@ def competition_state_to_dict(state: DirectionalCompetitionState) -> dict[str, A
                 "residual_action": hazard.residual_action,
                 "last_completion_time_s": hazard.last_completion_time_s,
                 "pending_events": [_event_to_dict(event) for event in hazard.pending_events],
+                "current_threshold_action": hazard.current_threshold_action,
+                "threshold_process": hazard.threshold_process,
+                "threshold_seed": hazard.threshold_seed,
             }
             for hazard in state.hazard_states
         ],
@@ -779,6 +823,9 @@ def competition_state_from_dict(payload: Mapping[str, Any]) -> DirectionalCompet
             residual_action=item["residual_action"],
             last_completion_time_s=item.get("last_completion_time_s"),
             pending_events=tuple(load_event(event) for event in item.get("pending_events", [])),
+            current_threshold_action=item.get("current_threshold_action", 1.0),
+            threshold_process=item.get("threshold_process", "unit_deterministic"),
+            threshold_seed=item.get("threshold_seed", 0),
         )
         for item in payload.get("hazard_states", [])
     )
@@ -821,9 +868,8 @@ def preview_directional_interval(
     end = state.action + increment
     events = []
     ordinal = state.completed_event_count + 1
-    boundary = float(ordinal)
-    limit = math.floor(end + 1.0e-13)
-    while ordinal <= limit:
+    boundary = float(state.current_threshold_action)
+    while boundary <= end + 1.0e-13:
         crossing = start_time + (boundary - state.action) / rate if rate > 0.0 else math.inf
         if crossing >= start_time - TIME_TOLERANCE_S:
             events.append(
@@ -837,7 +883,12 @@ def preview_directional_interval(
                 )
             )
         ordinal += 1
-        boundary += 1.0
+        boundary += (
+            _exponential_threshold_increment(
+                state.threshold_seed, state.candidate_id, ordinal,
+            )
+            if state.threshold_process == "unit_exponential" else 1.0
+        )
     return DirectionalIntervalPreview(
         candidate_id=state.candidate_id,
         start_action=state.action,
@@ -864,6 +915,14 @@ def commit_directional_interval(
     residual = preview.end_action - math.floor(preview.end_action + 1.0e-14)
     if residual < 0.0 and abs(residual) < 1.0e-12:
         residual = 0.0
+    next_threshold = state.current_threshold_action
+    for event in preview.completed_events:
+        next_threshold = event.action_after + (
+            _exponential_threshold_increment(
+                state.threshold_seed, state.candidate_id, event.event_ordinal + 1,
+            )
+            if state.threshold_process == "unit_exponential" else 1.0
+        )
     return DirectionalHazardState(
         candidate_id=state.candidate_id,
         action=preview.end_action,
@@ -872,6 +931,9 @@ def commit_directional_interval(
         residual_action=residual,
         last_completion_time_s=last_time,
         pending_events=events,
+        current_threshold_action=next_threshold,
+        threshold_process=state.threshold_process,
+        threshold_seed=state.threshold_seed,
     )
 
 

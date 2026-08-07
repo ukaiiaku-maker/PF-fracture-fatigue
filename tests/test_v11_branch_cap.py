@@ -2,7 +2,7 @@ from dataclasses import replace
 
 from arrhenius_fracture.branch_policy_v11 import BRANCH_CAP_VETO, MAX_BRANCH_BIRTHS, branch_birth_policy
 from arrhenius_fracture.directional_competition_v11 import (
-    DirectionalCompetitionState, commit_directional_interval,
+    DirectionalCompetitionState, DirectionalHazardState, commit_directional_interval,
     construct_action_proposals, preview_directional_interval,
     tungsten_cleavage_candidates,
 )
@@ -10,6 +10,9 @@ from arrhenius_fracture.directional_competition_v11 import (
 
 def _proposals():
     state = DirectionalCompetitionState.initialize(tungsten_cleavage_candidates(theta_deg=45), global_hazard_seed=3621)
+    state = replace(state, hazard_states=tuple(
+        DirectionalHazardState(candidate.candidate_id) for candidate in state.candidates
+    ))
     state = replace(state, hazard_states=tuple(commit_directional_interval(
         hazard, preview_directional_interval(hazard, lambda_per_s=1.0, start_time_s=0.0, duration_s=1.0)
     ) for hazard in state.hazard_states))

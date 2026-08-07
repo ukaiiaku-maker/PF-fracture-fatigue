@@ -6,6 +6,7 @@ import numpy as np
 from arrhenius_fracture.branch_cluster_v11 import create_unresolved_branch_cluster
 from arrhenius_fracture.directional_competition_v11 import (
     DirectionalCompetitionState, DirectionalRate, commit_directional_interval,
+    DirectionalHazardState,
     preview_directional_interval,
 )
 from arrhenius_fracture.live_topology_kernel_v11 import (
@@ -26,6 +27,9 @@ def test_correlated_A12_uses_real_live_fem_and_updates_shared_state_once():
     base_live = evaluate_exact_topology(request)
     candidates = request.candidates_by_tip[request.crack_network.active_tip_ids[0]][:2]
     competition = DirectionalCompetitionState.initialize(candidates, global_hazard_seed=3621)
+    competition = replace(competition, hazard_states=tuple(
+        DirectionalHazardState(candidate.candidate_id) for candidate in competition.candidates
+    ))
     competition = replace(competition, hazard_states=tuple(
         commit_directional_interval(
             hazard,

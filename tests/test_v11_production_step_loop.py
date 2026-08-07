@@ -4,6 +4,7 @@ import pytest
 
 from arrhenius_fracture.directional_competition_v11 import (
     DirectionalCompetitionState, DirectionalRate, accept_reservation, reserve_action,
+    DirectionalHazardState,
     tungsten_cleavage_candidates,
 )
 from arrhenius_fracture.production_step_loop_v11 import (
@@ -62,6 +63,10 @@ def test_a1_a2_a12_are_sibling_trials_and_admissible_a12_wins():
     base = fem_state(DirectionalCompetitionState.initialize(
         tungsten_cleavage_candidates(theta_deg=45), global_hazard_seed=3621
     ))
+    base = replace(base, competition=replace(base.competition, hazard_states=tuple(
+        DirectionalHazardState(candidate.candidate_id)
+        for candidate in base.competition.candidates
+    )))
     trial_bases = []
     updates = []
 

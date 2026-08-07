@@ -26,7 +26,7 @@ from .multi_tip_step_loop_v11 import advance_multi_tip_step
 from .network_metrics_v11 import crack_growth_metrics
 from .adaptive_multitip_mesh_v11 import adapt_accepted_state_for_trials, mesh_fingerprint
 from .production_step_loop_v11 import AcceptedStepContext, DirectionalStepRefinementRequired
-from .resolved_tip_state_v11 import resolve_unresolved_cluster
+from .resolved_tip_state_v11 import resolve_unresolved_cluster, tip_lineage_seed
 from .topology_transaction_v11 import (
     TopologyArm, TopologyTrialResult, apply_causal_sharp_wake_trial_geometry,
     clip_arm_at_first_intersection, execute_topology_trial, extend_network_arm,
@@ -219,7 +219,7 @@ def continue_resolved_production(
             return replace(current, displacement=u, ep_gp=ep, rho_gp=rho, stored_energy_J_per_m=_stored_energy(current.mesh, u, ep, sigma, D))
 
         def evaluate_rates(current, _context):
-            nonlocal latest_live, latest_rates
+            nonlocal latest_live, latest_rates, runtime
             request = _request(current, candidates, args=args, cfg=cfg, runtime_step=step, cluster=None)
             request = replace(request, cluster_frame={
                 "mode": "multi_tip_with_junction_reservoirs",
@@ -235,11 +235,64 @@ def continue_resolved_production(
                 owner = owner_by_tip[tip_id]
                 engine = engines[owner]
                 by_id = {item["candidate_id"]: item for item in live_tip["directional"]}
-                result[tip_id] = tuple(preview_production_cleavage_rate(
-                    engine, candidate,
-                    signed_J_J_per_m2=float(by_id[candidate.candidate_id]["signed_J_J_per_m2"]),
-                    Eprime_Pa=float(mat.Eprime), temperature_K=float(args.temperatures[0]),
-                ) for candidate in candidates)
+                rows = []
+                for candidate in candidates:
+                    local = by_id[candidate.candidate_id]
+                    local_signed = float(local["J_local_signed_J_per_m2"])
+                    marginal = None
+                    if bool(local["local_J_valid"]):
+                        kinetic = max(local_signed, 0.0)
+                    else:
+                        start = current.crack_network.branch(tip_id).tip
+                        raw = TopologyArm(
+                            candidate.candidate_id, tip_id, start,
+                            (start[0] + da_phys * candidate.direction_xy[0],
+                             start[1] + da_phys * candidate.direction_xy[1]),
+                            da_phys, 0.0,
+                        )
+                        arm, target = clip_arm_at_first_intersection(current.crack_network, raw)
+                        if arm.event_reward_m <= 0.0:
+                            marginal = 0.0
+                        else:
+                            realized = extend_network_arm(current.crack_network, arm)
+                            if target is not None:
+                                realized = mark_coalesced(realized, arm.branch_id, target)
+                            ephemeral = replace(current.isolated_copy(), crack_network=realized)
+                            ephemeral = apply_causal_sharp_wake_trial_geometry(ephemeral, (arm,))
+                            marginal_request = _request(
+                                ephemeral, candidates, args=args, cfg=cfg,
+                                runtime_step=step, cluster=None,
+                            )
+                            marginal_request = replace(
+                                marginal_request,
+                                cluster_frame={"mode": "candidate_marginal_kinetic_drive"},
+                                candidates_by_tip={
+                                    active_tip: tuple(candidates)
+                                    for active_tip in ephemeral.crack_network.active_tip_ids
+                                },
+                            )
+                            runtime, marginal_live = runtime.evaluate_trial(marginal_request)
+                            trial_energy = float(
+                                marginal_live["base_equilibrium"]["recoverable_potential_energy_J_per_m"]
+                            )
+                            marginal = (
+                                float(latest_live["base_equilibrium"]["recoverable_potential_energy_J_per_m"])
+                                - trial_energy
+                            ) / float(arm.event_reward_m)
+                        kinetic = max(float(marginal), 0.0)
+                    rate = preview_production_cleavage_rate(
+                        engine, candidate, signed_J_J_per_m2=kinetic,
+                        Eprime_Pa=float(mat.Eprime), temperature_K=float(args.temperatures[0]),
+                    )
+                    rows.append(replace(
+                        rate,
+                        J_local_signed_J_per_m2=local_signed,
+                        local_J_valid=bool(local["local_J_valid"]),
+                        G_marginal_J_per_m2=marginal,
+                        J_kin_used_J_per_m2=kinetic,
+                        local_J_invalid_reason=local.get("local_J_invalid_reason"),
+                    ))
+                result[tip_id] = tuple(rows)
             latest_rates = result
             return result
 
@@ -365,6 +418,28 @@ def continue_resolved_production(
         competitions = dict(result.competitions)
         accepted_load += float(args.dU) * fraction
         physical_time += context.duration_s
+        with (out / "directional_rates.jsonl").open("a", encoding="utf-8") as stream:
+            for tip_id in sorted(result.rates_by_tip):
+                hazard_by_candidate = {
+                    item.candidate_id: item for item in competitions[tip_id].hazard_states
+                }
+                for rate in result.rates_by_tip[tip_id]:
+                    hazard = hazard_by_candidate[rate.candidate_id]
+                    stream.write(json.dumps({
+                        "step": step, "physical_time_s": physical_time,
+                        "accepted_state_id": context.accepted_state_id,
+                        "tip_id": tip_id, "candidate_id": rate.candidate_id,
+                        "J_local_signed_J_per_m2": rate.J_local_signed_J_per_m2,
+                        "local_J_valid": rate.local_J_valid,
+                        "local_J_invalid_reason": rate.local_J_invalid_reason,
+                        "G_marginal_J_per_m2": rate.G_marginal_J_per_m2,
+                        "J_kin_used_J_per_m2": rate.J_kin_used_J_per_m2,
+                        "lambda_directional_per_s": rate.lambda_per_s,
+                        "accumulated_integrated_hazard_H": hazard.action,
+                        "current_threshold_H_star": hazard.current_threshold_action,
+                        "directional_event_ordinal": hazard.completed_event_count + 1,
+                        "pending_event_ids": [item.event_id for item in hazard.pending_events],
+                    }, sort_keys=True, allow_nan=False) + "\n")
         for item in result.trials:
             proposal_item = item.diagnostic.proposal
             result_item = item.diagnostic.result
@@ -396,6 +471,12 @@ def continue_resolved_production(
                 "signed_directional_J_J_per_m2": [rate_map[candidate].signed_J_J_per_m2 for candidate in proposal_item.member_candidate_ids],
                 "positive_directional_J_J_per_m2": [rate_map[candidate].positive_J_J_per_m2 for candidate in proposal_item.member_candidate_ids],
                 "directional_K_Pa_sqrt_m": [rate_map[candidate].K_directional_Pa_sqrt_m for candidate in proposal_item.member_candidate_ids],
+                "J_local_signed_J_per_m2": [rate_map[candidate].J_local_signed_J_per_m2 for candidate in proposal_item.member_candidate_ids],
+                "local_J_valid": [rate_map[candidate].local_J_valid for candidate in proposal_item.member_candidate_ids],
+                "local_J_invalid_reason": [rate_map[candidate].local_J_invalid_reason for candidate in proposal_item.member_candidate_ids],
+                "G_marginal_J_per_m2": [rate_map[candidate].G_marginal_J_per_m2 for candidate in proposal_item.member_candidate_ids],
+                "J_kin_used_J_per_m2": [rate_map[candidate].J_kin_used_J_per_m2 for candidate in proposal_item.member_candidate_ids],
+                "lambda_directional_per_s": [rate_map[candidate].lambda_per_s for candidate in proposal_item.member_candidate_ids],
                 "applied_displacement_m": float(accepted_load),
                 "reaction_force_before_N_per_m": reaction_before,
                 "reaction_force_after_N_per_m": reaction_after,
@@ -443,7 +524,13 @@ def continue_resolved_production(
                 engines[trial_cluster.cluster_id] = owner_engine
                 competitions.pop(tip)
                 for child in trial_cluster.arm_branch_ids:
-                    competitions[child] = DirectionalCompetitionState.initialize(candidates, global_hazard_seed=state.competition.global_hazard_seed + branch_birth_count)
+                    competitions[child] = DirectionalCompetitionState.initialize(
+                        candidates,
+                        global_hazard_seed=tip_lineage_seed(
+                            state.competition.global_hazard_seed,
+                            trial_cluster.cluster_id, child,
+                        ),
+                    )
                     owner_by_tip[child] = trial_cluster.cluster_id
                 snapshot_reason = "branch_birth"
                 branches = [state.crack_network.branch(child) for child in trial_cluster.arm_branch_ids]

@@ -240,18 +240,95 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
     )
     energy = float(np.sum(stored * request.mesh.area_e))
     segments = _segments(request.crack_network)
+    branch_segments = {
+        item.branch_id: tuple(
+            (np.asarray(a, dtype=float), np.asarray(b, dtype=float))
+            for a, b in zip(item.path, item.path[1:])
+        ) for item in request.crack_network.branches
+    }
+    junctions = tuple(
+        np.asarray(item.root, dtype=float)
+        for item in request.crack_network.branches
+        if item.parent_branch_id is not None
+    )
+    domain_min = np.min(request.mesh.nodes, axis=0)
+    domain_max = np.max(request.mesh.nodes, axis=0)
+
+    def point_segment_distance(point, start, end):
+        delta = end - start
+        scale = float(delta @ delta)
+        if scale <= np.finfo(float).tiny:
+            return float(np.linalg.norm(point - start))
+        fraction = min(1.0, max(0.0, float((point - start) @ delta) / scale))
+        return float(np.linalg.norm(point - (start + fraction * delta)))
+
     tips = []
     for branch_id in request.crack_network.active_tip_ids:
         branch = request.crack_network.branch(branch_id)
+        tip_xy = np.asarray(branch.tip, dtype=float)
+        other_segments = tuple(
+            segment
+            for other_id, values in branch_segments.items()
+            if other_id != branch_id
+            for segment in values
+        )
+        nearest_other = min(
+            (point_segment_distance(tip_xy, *segment) for segment in other_segments),
+            default=math.inf,
+        )
+        nearest_junction = min(
+            (float(np.linalg.norm(tip_xy - point)) for point in junctions),
+            default=math.inf,
+        )
+        nearest_boundary = float(np.min(np.concatenate((tip_xy - domain_min, domain_max - tip_xy))))
+        local_h = max(float(getattr(request.mesh, "hbar_tip", 0.0) or request.mesh.hbar), 1.0e-15)
+        radii = tuple(sorted({
+            float(request.contour_radius_m),
+            max(3.0 * local_h, 0.75 * float(request.contour_radius_m)),
+            max(3.0 * local_h, 0.50 * float(request.contour_radius_m)),
+            max(3.0 * local_h, 0.25 * float(request.contour_radius_m)),
+        }))
         directional = []
         for candidate in sorted(request.candidates_by_tip[branch_id], key=lambda item: item.candidate_id):
-            _, _, info = compute_J_integral(
-                request.mesh, base["u"], base["sigma_gp"], base["psi_e_gp"],
-                request.damage, np.asarray(branch.tip), np.asarray(candidate.direction_xy),
-                request.material, ell=request.contour_radius_m,
-                crack_segments=segments, exclude_radius=request.exclude_radius_m,
-            )
-            signed = float(info.get("J_signed", info.get("J", 0.0)))
+            contour_rows = []
+            for radius in radii:
+                _, _, info = compute_J_integral(
+                    request.mesh, base["u"], base["sigma_gp"], base["psi_e_gp"],
+                    request.damage, tip_xy, np.asarray(candidate.direction_xy),
+                    request.material, ell=radius,
+                    crack_segments=segments, exclude_radius=request.exclude_radius_m,
+                )
+                signed_radius = float(info.get("J_signed", info.get("J", 0.0)))
+                another_crack = nearest_other <= radius
+                contains_junction = nearest_junction <= radius
+                boundary_intersection = nearest_boundary <= radius
+                adequate_support = bool(info.get("n_active_elements", 0) > 0 and math.isfinite(signed_radius))
+                reasons = []
+                if another_crack: reasons.append("another_committed_crack_in_contour")
+                if contains_junction: reasons.append("junction_in_contour")
+                if boundary_intersection: reasons.append("specimen_boundary_in_contour")
+                if not adequate_support: reasons.append("inadequate_finite_element_support")
+                contour_rows.append({
+                    "radius_m": radius, "signed_J_J_per_m2": signed_radius,
+                    "another_committed_crack_intersects": another_crack,
+                    "another_wake_intersects": another_crack,
+                    "junction_intersects": contains_junction,
+                    "specimen_boundary_intersects": boundary_intersection,
+                    "adequate_finite_element_support": adequate_support,
+                    "geometrically_valid": not reasons,
+                    "invalid_reasons": reasons,
+                    "integration": info,
+                })
+            valid_rows = [row for row in contour_rows if row["geometrically_valid"]]
+            plateau = None
+            for first, second in zip(valid_rows, valid_rows[1:]):
+                scale = max(abs(first["signed_J_J_per_m2"]), abs(second["signed_J_J_per_m2"]), 1.0e-12)
+                if abs(first["signed_J_J_per_m2"] - second["signed_J_J_per_m2"]) / scale <= 0.15:
+                    plateau = (first, second)
+                    break
+            local_valid = plateau is not None
+            selected_row = plateau[-1] if plateau else contour_rows[-1]
+            signed = float(selected_row["signed_J_J_per_m2"])
             positive = max(signed, 0.0)
             Eprime = float(request.material.Eprime)
             directional.append({
@@ -259,9 +336,22 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
                 "signed_J_J_per_m2": signed,
                 "positive_J_J_per_m2": positive,
                 "K_directional_Pa_sqrt_m": math.sqrt(Eprime * positive),
-                "local_contour_valid": bool(info.get("n_active_elements", 0) > 0 and math.isfinite(signed)),
-                "local_contour_active_elements": int(info.get("n_active_elements", 0)),
-                "contour_diagnostics": info,
+                "J_local_signed_J_per_m2": signed,
+                "local_contour_valid": local_valid,
+                "local_J_valid": local_valid,
+                "local_J_invalid_reason": None if local_valid else (
+                    "no_numerically_converged_independent_contour"
+                    if valid_rows else ";".join(sorted({reason for row in contour_rows for reason in row["invalid_reasons"]}))
+                ),
+                "J_contour_radius_m": selected_row["radius_m"],
+                "nearest_other_crack_distance_m": None if not math.isfinite(nearest_other) else nearest_other,
+                "nearest_junction_distance_m": None if not math.isfinite(nearest_junction) else nearest_junction,
+                "nearest_specimen_boundary_distance_m": nearest_boundary,
+                "another_committed_crack_intersects_J_domain": selected_row["another_committed_crack_intersects"],
+                "another_wake_intersects_J_domain": selected_row["another_wake_intersects"],
+                "local_contour_active_elements": int(selected_row["integration"].get("n_active_elements", 0)),
+                "contour_diagnostics": selected_row["integration"],
+                "nested_contour_diagnostics": contour_rows,
             })
         tips.append({
             "physical_tip_key": [_point(branch.tip), _point(_tip_direction(branch))],

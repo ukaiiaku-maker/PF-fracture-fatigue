@@ -60,7 +60,7 @@ class ClusterResolution:
 FreshTipFactory = Callable[[str], tuple[Mapping[str, Any], Mapping[str, Any]]]
 
 
-def _tip_seed(global_seed: int, cluster_id: str, branch_id: str) -> int:
+def tip_lineage_seed(global_seed: int, cluster_id: str, branch_id: str) -> int:
     digest = hashlib.sha256(f"{int(global_seed)}|{cluster_id}|{branch_id}".encode()).digest()
     return int.from_bytes(digest[:8], "big") & ((1 << 63) - 1)
 
@@ -109,7 +109,7 @@ def resolve_unresolved_cluster(
             raise ValueError("fresh child process state must explicitly reject historical import")
         if source_state.get("historical_state_imported") is not False:
             raise ValueError("fresh child source state must explicitly reject historical import")
-        seed = _tip_seed(global_hazard_seed, cluster.cluster_id, branch.branch_id)
+        seed = tip_lineage_seed(global_hazard_seed, cluster.cluster_id, branch.branch_id)
         tips[branch.branch_id] = IndependentTipState(
             branch_id=branch.branch_id,
             competition=DirectionalCompetitionState.initialize(candidates, global_hazard_seed=seed),
@@ -132,5 +132,5 @@ def resolve_unresolved_cluster(
 
 __all__ = [
     "ClusterResolution", "IndependentTipState", "JunctionWakeReservoir",
-    "resolve_unresolved_cluster",
+    "resolve_unresolved_cluster", "tip_lineage_seed",
 ]

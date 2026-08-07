@@ -4,6 +4,7 @@ from dataclasses import replace
 from arrhenius_fracture.directional_competition_v11 import (
     CleavageCandidate,
     DirectionalCompetitionState,
+    DirectionalHazardState,
     canonical_candidate_inventory,
     commit_directional_interval,
     competition_state_to_json,
@@ -65,6 +66,9 @@ def test_candidate_permutation_does_not_change_state_proposals_or_tie_result():
 def test_temporal_priority_is_seed_independent_but_degenerate_choice_is_repeatable():
     candidates = tungsten_cleavage_candidates(theta_deg=30.0)
     state = DirectionalCompetitionState.initialize(candidates, global_hazard_seed=1)
+    state = replace(state, hazard_states=tuple(
+        DirectionalHazardState(candidate.candidate_id) for candidate in state.candidates
+    ))
     hazards = []
     for hazard in state.hazard_states:
         preview = preview_directional_interval(

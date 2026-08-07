@@ -94,6 +94,13 @@ def summarize(live):
         best = max(tip["directional"], key=lambda row: row["signed_J_J_per_m2"])
         tips[f"tip_{index}"] = {
             "maximum_signed_J_J_per_m2": best["signed_J_J_per_m2"],
+            "J_local_signed_J_per_m2": best["J_local_signed_J_per_m2"],
+            "local_J_valid": best["local_J_valid"],
+            "local_J_invalid_reason": best["local_J_invalid_reason"],
+            "J_contour_radius_m": best["J_contour_radius_m"],
+            "nearest_other_crack_distance_m": best["nearest_other_crack_distance_m"],
+            "nearest_junction_distance_m": best["nearest_junction_distance_m"],
+            "nearest_specimen_boundary_distance_m": best["nearest_specimen_boundary_distance_m"],
             "candidate_id": best["candidate_id"],
             "local_contour_valid": best["local_contour_valid"],
         }
@@ -162,6 +169,13 @@ def main():
                 - trial["base_equilibrium"]["recoverable_potential_energy_J_per_m"]
             )
         row["topology_trial_energy_releases"] = releases
+        for index, tip in enumerate(row["tips"].values(), 1):
+            marginal = releases[f"advance_tip_{index}_5um_J_per_m"] / 5.0e-6
+            tip["G_marginal_J_per_m2"] = marginal
+            tip["J_kin_used_J_per_m2"] = (
+                max(tip["J_local_signed_J_per_m2"], 0.0)
+                if tip["local_J_valid"] else max(marginal, 0.0)
+            )
         states[name] = row
     payload = {
         "schema": "v11.close-crack-compliance-audit/1",

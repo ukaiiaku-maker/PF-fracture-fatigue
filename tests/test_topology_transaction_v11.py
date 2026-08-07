@@ -11,6 +11,7 @@ from arrhenius_fracture.crack_backend import SharpWakeBackend
 from arrhenius_fracture.crack_network_v11 import CrackNetworkState, ROOT_BRANCH_ID
 from arrhenius_fracture.directional_competition_v11 import (
     DirectionalCompetitionState,
+    DirectionalHazardState,
     commit_directional_interval,
     construct_action_proposals,
     preview_directional_interval,
@@ -30,6 +31,9 @@ from arrhenius_fracture.topology_transaction_v11 import (
 def competition():
     candidates = tungsten_cleavage_candidates(theta_deg=45.0)
     state = DirectionalCompetitionState.initialize(candidates, global_hazard_seed=3621)
+    state = replace(state, hazard_states=tuple(
+        DirectionalHazardState(candidate.candidate_id) for candidate in state.candidates
+    ))
     hazards = tuple(
         commit_directional_interval(
             hazard,
