@@ -2,6 +2,41 @@
 
 Status: **blocked; do not launch the four-class campaign**.
 
+## Adaptive nested-refinement follow-up
+
+Topology-preserving conforming edge subdivision is now implemented.  The
+refined P1 space contains the parent P1 space; old nodes are retained, midpoint
+values use exact parent shape functions, element plastic/dislocation histories
+and P0 stiffness degradation are inherited by every child, and boundary edge
+classes are inherited.  The preserved step-481 Stage-A energy comparison is
+bitwise exact (`247.71266262810803 J/m` before and after prolongation), replacing
+the rejected global-remesh discontinuity.
+
+A clean seed-3621 trajectory was rerun from initiation with proactive union
+refinement before sibling A1/A2/A12 trials.  Its 40 µm gate reached eight
+committed births, five active tips, four coalescences, mesh generation 43, 2,498
+nodes, and 4,882 elements.  Stage-A relative error stayed below 2.28e-16.  An
+actual duplicated restart from the refined checkpoint reproduced the exact
+mesh/topology fingerprints, directional state, process/junction state, energy
+ledger, RNG state, trial log, and next 45 µm checkpoint.
+
+The adaptive long continuation then reached an accepted 75 µm root-to-tip
+checkpoint (step 332, generation 80, 3,745 nodes, 7,368 elements) and failed
+closed before the next energy evaluation.  One active tip
+(`b5f2bd5610a01132`) has local hbar about 1.0 µm, but both candidate 5 µm
+segments change zero stiffness elements.  The preceding sharp-wake advances
+have already killed the complete prospective corridor through the inherited
+element-support halo.  Exact nested parent-to-child damage inheritance cannot
+un-kill it; further subdivision therefore cannot make either trial mechanically
+distinct.
+
+This is a new crack-representation blocker, not a mesh-spacing or physical
+energy veto.  Repair would require changing how sharp-wake support is committed
+so it cannot create ahead-of-tip killed material (or introducing a separately
+qualified discontinuous crack representation).  That is outside adaptive
+refinement and must not be hidden by repartitioning inherited damage, reducing
+event rewards, or changing energy tolerances.
+
 The canonical weakT, 700 K, 45 degree, seed-3621 continuation was resumed from
 the accepted 100 µm legacy checkpoint using the exact-topology live FEM
 provider.  Correct graph accounting showed that checkpoint contains 100 µm of
