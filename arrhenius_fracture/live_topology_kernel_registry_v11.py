@@ -51,7 +51,11 @@ def validate_single_front_transition(
             residual = _relative(old[name], new[name])
             comparisons[f"{candidate_id}:{name}"] = residual
             if residual > drive_rtol:
-                raise RuntimeError(f"live-provider transition parity failed for {candidate_id} {name}: {residual}")
+                raise RuntimeError(
+                    f"live-provider transition parity failed for {candidate_id} {name}: "
+                    f"relative_residual={residual}, legacy={float(old[name])}, "
+                    f"live={float(new[name])}"
+                )
     comparisons.update({
         "passed": True, "reaction_energy_rtol": reaction_energy_rtol,
         "drive_rtol": drive_rtol, "sign_agreement": True,
