@@ -71,7 +71,10 @@ def continue_resolved_production(
             state, crack_network=resolution.network,
             competition=competitions[sorted(competitions)[0]],
             tip_process_state={"mode": "independent_resolved_tips", "tips": resolution.tips},
-            junction_process_state={"reservoirs": reservoirs, "clusters": clusters},
+            junction_process_state={
+                "crack_representation": "sharp_wake_causal_v11",
+                "reservoirs": reservoirs, "clusters": clusters,
+            },
         )
     else:
         if resume_bundle.get("schema") != "v11.multi-tip-engine-bundle/1":
@@ -475,7 +478,10 @@ def continue_resolved_production(
 
         active = state.crack_network.active_tip_ids
         competitions = {tip: competitions[tip] for tip in active}
-        state = replace(state, competition=competitions[sorted(active)[0]], junction_process_state={"reservoirs": reservoirs, "clusters": clusters})
+        state = replace(state, competition=competitions[sorted(active)[0]], junction_process_state={
+            "crack_representation": "sharp_wake_causal_v11",
+            "reservoirs": reservoirs, "clusters": clusters,
+        })
         selected_result = next((item.diagnostic.result for item in result.trials if item.diagnostic.selected), None)
         writer.energy({
             "step": step, "accepted_state_id": context.accepted_state_id,

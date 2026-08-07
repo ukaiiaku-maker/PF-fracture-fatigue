@@ -297,6 +297,9 @@ def run_2d(args):
     if restart_path:
         restored = restore_branch_checkpoint(restart_path)
         state = restored.state
+        restored_junction = dict(state.junction_process_state)
+        restored_junction["crack_representation"] = "sharp_wake_causal_v11"
+        state = replace(state, junction_process_state=restored_junction)
         runtime = restored.provider_runtime
         physical_time = restored.physical_time_s
         accepted_load = restored.accepted_load
@@ -509,7 +512,10 @@ def run_2d(args):
                     realized = extend_network_arm(realized, item)
                 trial_state = replace(
                     trial_state, crack_network=realized,
-                    junction_process_state=({"cluster": trial_cluster} if trial_cluster else {}),
+                    junction_process_state={
+                        "crack_representation": "sharp_wake_causal_v11",
+                        **({"cluster": trial_cluster} if trial_cluster else {}),
+                    },
                 )
                 return apply_causal_sharp_wake_trial_geometry(trial_state, trial_arms)
 
