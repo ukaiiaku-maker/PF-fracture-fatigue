@@ -290,21 +290,6 @@ def run_2d(args):
     da_phys = float(args.da_phys if args.da_phys is not None else max(5.0 * base.eng_r_pz_hint(args), 2.0e-6))
     engine.f.da = da_phys
     scale_identity = resolve_branch_scale_identity(args, mesh)
-    audit_path = out / "v11_branching_model_audit.json"
-    if audit_path.is_file():
-        audit = json.loads(audit_path.read_text())
-        audit["runtime_scale_identity"] = scale_identity.to_dict()
-        persistent = getattr(engine, "_persistent_site_cfg", None)
-        audit["source_zone_length_m"] = (
-            None if persistent is None else float(persistent.source_zone_length_m)
-        )
-        audit["source_zone_length_source"] = (
-            None if persistent is None else
-            "selected_material_manifest.persistent_site_config.source_zone_length_m"
-        )
-        temporary = audit_path.with_name(audit_path.name + ".tmp")
-        temporary.write_text(json.dumps(audit, indent=2, sort_keys=True, allow_nan=False) + "\n")
-        os.replace(temporary, audit_path)
     engine.f.max_advances_per_step = 1
     theta = float(getattr(args, "crystal_theta_deg", 0.0) or 0.0)
     candidates = tungsten_cleavage_candidates(
@@ -321,6 +306,21 @@ def run_2d(args):
     damage[(mesh.nodes[:, 0] <= cfg.geometry.a0) & (np.abs(mesh.nodes[:, 1]) <= cfg.geometry.notch_half_thickness)] = 1.0
     displacement = np.zeros(mesh.ndof); ep_gp = np.zeros((3, mesh.ne)); rho_gp = np.full(mesh.ne, engine.f.rho0)
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
+    audit_path = out / "v11_branching_model_audit.json"
+    if audit_path.is_file():
+        audit = json.loads(audit_path.read_text())
+        audit["runtime_scale_identity"] = scale_identity.to_dict()
+        persistent = getattr(engine, "_persistent_site_cfg", None)
+        audit["source_zone_length_m"] = (
+            None if persistent is None else float(persistent.source_zone_length_m)
+        )
+        audit["source_zone_length_source"] = (
+            None if persistent is None else
+            "selected_material_manifest.persistent_site_config.source_zone_length_m"
+        )
+        temporary = audit_path.with_name(audit_path.name + ".tmp")
+        temporary.write_text(json.dumps(audit, indent=2, sort_keys=True, allow_nan=False) + "\n")
+        os.replace(temporary, audit_path)
     writer = BranchOutputWriter(out)
     cache_root = Path(os.environ.get("KERNEL_CACHE_ROOT", out / "live_kernel_cache"))
     runtime = LiveTopologyRuntime(str(cache_root)); cluster = None
