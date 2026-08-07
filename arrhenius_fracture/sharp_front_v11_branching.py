@@ -488,7 +488,7 @@ def run_2d(args):
         trial_requests = {}; trial_live_results = {}; trial_clusters = {}; trial_drives = {}
 
         def trial_action(current, proposal):
-            nonlocal runtime, prebranch_snapshot_written
+            nonlocal runtime, prebranch_snapshot_written, latest_live_result
             if proposal.action_type == "two_arm" and not prebranch_snapshot_written:
                 write_topology_snapshot(
                     out, current, step=step, reason="before_first_branch",
@@ -504,6 +504,7 @@ def run_2d(args):
                     legacy_result=last_measurement, request=request0,
                     protected_state=(current.competition, pickle.dumps(engine, protocol=5)),
                 )
+                latest_live_result = live0
                 writer.provider_transition({
                     "step": step, "from_provider": PREBRANCH_PROVIDER_ID, "to_provider": PROVIDER_ID,
                     "state_hash": context.accepted_state_id, "topology_fingerprint": live0["topology_fingerprint"],
@@ -643,6 +644,17 @@ def run_2d(args):
             request_for_trial = trial_requests.get(item.proposal.action_id)
             if request_for_trial is not None:
                 participating = list(request_for_trial.crack_network.active_tip_ids)
+            before_equilibrium = (latest_live_result or {}).get("base_equilibrium", {})
+            after_live = trial_live_results.get(item.proposal.action_id)
+            after_equilibrium = {} if after_live is None else after_live.get("base_equilibrium", {})
+            reaction_before = before_equilibrium.get("reaction_force")
+            reaction_after = after_equilibrium.get("reaction_force")
+
+            def apparent_compliance(reaction):
+                if reaction is None or not math.isfinite(float(reaction)) or abs(float(reaction)) <= 1.0e-300:
+                    return None
+                return float(accepted_load) / abs(float(reaction))
+
             rec.update({
                 "step": step, "physical_time_s": physical_time, "accepted_state_id": context.accepted_state_id,
                 "trial_id": item.proposal.action_id, "action_type": item.proposal.action_type,
@@ -653,6 +665,13 @@ def run_2d(args):
                 "signed_directional_J_J_per_m2": [rate_map[c].signed_J_J_per_m2 for c in item.proposal.member_candidate_ids],
                 "positive_directional_J_J_per_m2": [rate_map[c].positive_J_J_per_m2 for c in item.proposal.member_candidate_ids],
                 "directional_K_Pa_sqrt_m": [rate_map[c].K_directional_Pa_sqrt_m for c in item.proposal.member_candidate_ids],
+                "applied_displacement_m": float(accepted_load),
+                "reaction_force_before_N_per_m": reaction_before,
+                "reaction_force_after_N_per_m": reaction_after,
+                "apparent_compliance_before_m2_per_N": apparent_compliance(reaction_before),
+                "apparent_compliance_after_m2_per_N": apparent_compliance(reaction_after),
+                "topology_fingerprint_before": (latest_live_result or {}).get("topology_fingerprint"),
+                "topology_fingerprint_after": None if after_live is None else after_live.get("topology_fingerprint"),
                 "proposed_arm_lengths_m": [da_phys] * arm_count,
                 "realized_arm_lengths_m": [da_phys] * arm_count if item.result.accepted else [0.0] * arm_count,
                 "pretrial_potential_energy_J_per_m": pre_energy,
