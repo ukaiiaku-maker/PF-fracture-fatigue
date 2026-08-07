@@ -334,7 +334,7 @@ def continue_resolved_production(
                         "N_em": float(engines[owner_by_tip[tip_id]].N_em),
                         "W_emit": float(engines[owner_by_tip[tip_id]].W_emit),
                         "time_s": float(engines[owner_by_tip[tip_id]].t),
-                        "birth_step": int(context.step_index),
+                        "birth_step": int(context.step),
                         "birth_extension_m": crack_growth_metrics(
                             current.crack_network, initial_crack_length_m=cfg.geometry.a0,
                         ).max_root_to_tip_path_extension_m,
