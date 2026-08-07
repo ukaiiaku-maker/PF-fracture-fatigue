@@ -114,3 +114,16 @@ def test_collinear_existing_crack_spanning_candidate_is_a_physical_hit():
     )
     assert hit is not None
     assert 0.0 < hit[0] < 1.0e-6
+
+
+def test_valid_submicron_triangle_is_not_misclassified_as_degenerate():
+    mesh = FixtureMesh(
+        nodes=np.array([[0.0, 0.0], [2.0e-9, 0.0], [0.0, 1.0e-9]]),
+        elems=np.array([[0, 1, 2]]), area_e=np.array([1.0e-18]),
+        element_damage_gp=np.zeros(1),
+    )
+    selected, represented = causal_segment_support(
+        mesh, np.array([0.1e-9, 0.1e-9]), np.array([1.0e-9, 0.1e-9])
+    )
+    np.testing.assert_array_equal(selected, [0])
+    assert represented[0] > 0.0

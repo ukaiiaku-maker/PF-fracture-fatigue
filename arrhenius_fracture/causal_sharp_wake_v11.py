@@ -64,8 +64,8 @@ def _segment_triangle_parameter_interval(
     """
     matrix = np.column_stack((triangle[1] - triangle[0], triangle[2] - triangle[0]))
     determinant = float(np.linalg.det(matrix))
-    scale = max(float(np.linalg.norm(matrix, ord=np.inf)), 1.0)
-    if abs(determinant) <= np.finfo(float).eps * scale * scale:
+    scale = max(float(np.linalg.norm(matrix, ord=np.inf)), np.finfo(float).tiny)
+    if abs(determinant) <= 32.0 * np.finfo(float).eps * scale * scale:
         raise ValueError("degenerate triangle in causal sharp-wake support")
     inv = np.linalg.inv(matrix)
 
