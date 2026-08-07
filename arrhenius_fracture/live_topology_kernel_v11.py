@@ -328,15 +328,25 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
                     break
             local_valid = plateau is not None
             selected_row = plateau[-1] if plateau else contour_rows[-1]
-            signed = float(selected_row["signed_J_J_per_m2"])
-            positive = max(signed, 0.0)
+            # Keep the provider's established directional observable evaluated
+            # at the requested contour radius.  The irreversible v10 -> v11
+            # handoff parity contract is defined on this value.  The nested,
+            # independently-valid local value is a separate kinetic
+            # diagnostic and must not silently redefine transition parity.
+            nominal_row = next(
+                row for row in contour_rows
+                if row["radius_m"] == float(request.contour_radius_m)
+            )
+            nominal_signed = float(nominal_row["signed_J_J_per_m2"])
+            nominal_positive = max(nominal_signed, 0.0)
+            local_signed = float(selected_row["signed_J_J_per_m2"])
             Eprime = float(request.material.Eprime)
             directional.append({
                 "candidate_id": candidate.candidate_id,
-                "signed_J_J_per_m2": signed,
-                "positive_J_J_per_m2": positive,
-                "K_directional_Pa_sqrt_m": math.sqrt(Eprime * positive),
-                "J_local_signed_J_per_m2": signed,
+                "signed_J_J_per_m2": nominal_signed,
+                "positive_J_J_per_m2": nominal_positive,
+                "K_directional_Pa_sqrt_m": math.sqrt(Eprime * nominal_positive),
+                "J_local_signed_J_per_m2": local_signed,
                 "local_contour_valid": local_valid,
                 "local_J_valid": local_valid,
                 "local_J_invalid_reason": None if local_valid else (
