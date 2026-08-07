@@ -35,6 +35,7 @@ def test_handoff_rejects_value_different_from_physical_process_zone():
 
 def test_runtime_fallback_uses_promoted_mpz_not_legacy_L_pz(monkeypatch):
     monkeypatch.delenv("MECHANICAL_CONFIG", raising=False)
+    monkeypatch.delenv("SIGNED_KERNEL_FAMILY_JSON", raising=False)
     args = SimpleNamespace(
         mpz_length_um=50.0, L_pz=1e-6, rJ=None,
         tip_h_fine=1e-6, da_phys=5e-6,

@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, replace
 import math
 import os
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -52,13 +53,20 @@ class BranchScaleIdentity:
 def resolve_branch_scale_identity(args, mesh) -> BranchScaleIdentity:
     """Resolve physics from the promoted mechanical configuration, never mesh aliases."""
     configuration_path = os.environ.get("MECHANICAL_CONFIG", "").strip()
+    configuration_source = "MECHANICAL_CONFIG"
+    if not configuration_path:
+        family_path = os.environ.get("SIGNED_KERNEL_FAMILY_JSON", "").strip()
+        sibling = Path(family_path).resolve().parent / "mechanical_configuration.json" if family_path else None
+        if sibling is not None and sibling.is_file():
+            configuration_path = str(sibling)
+            configuration_source = "SIGNED_KERNEL_FAMILY_JSON sibling mechanical_configuration.json"
     if configuration_path:
         from .kernel_configuration_v10227 import load_configuration
         configuration = load_configuration(configuration_path)
         physical = float(configuration.process_zone_length_m)
         interaction = float(configuration.interaction_length_m)
-        physical_source = "MECHANICAL_CONFIG.process_zone_length_m"
-        interaction_source = "MECHANICAL_CONFIG.interaction_length_m"
+        physical_source = f"{configuration_source}:process_zone_length_m"
+        interaction_source = f"{configuration_source}:interaction_length_m"
     else:
         physical = float(args.mpz_length_um) * 1.0e-6
         interaction = float(getattr(args, "rJ", None) or max(float(args.L_pz), 1.0e-6))

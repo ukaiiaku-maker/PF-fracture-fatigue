@@ -152,6 +152,11 @@ def _request(
 
 def _provider_contract_interaction_length(args) -> float:
     path = os.environ.get("MECHANICAL_CONFIG", "").strip()
+    if not path:
+        family = os.environ.get("SIGNED_KERNEL_FAMILY_JSON", "").strip()
+        sibling = Path(family).resolve().parent / "mechanical_configuration.json" if family else None
+        if sibling is not None and sibling.is_file():
+            path = str(sibling)
     if path:
         from .kernel_configuration_v10227 import load_configuration
         return float(load_configuration(path).interaction_length_m)
@@ -311,13 +316,13 @@ def run_2d(args):
         audit = json.loads(audit_path.read_text())
         audit["runtime_scale_identity"] = scale_identity.to_dict()
         persistent = getattr(engine, "_persistent_site_cfg", None)
-        audit["source_zone_length_m"] = (
-            None if persistent is None else float(persistent.source_zone_length_m)
+        selection_path = out / "v10_2_22_parameter_selection.json"
+        selection = json.loads(selection_path.read_text()) if selection_path.is_file() else {}
+        selected_source_zone = selection.get("persistent_site_config", {}).get("source_zone_length_m")
+        audit["source_zone_length_m"] = float(
+            persistent.source_zone_length_m if persistent is not None else selected_source_zone
         )
-        audit["source_zone_length_source"] = (
-            None if persistent is None else
-            "selected_material_manifest.persistent_site_config.source_zone_length_m"
-        )
+        audit["source_zone_length_source"] = "selected_material_manifest.persistent_site_config.source_zone_length_m"
         temporary = audit_path.with_name(audit_path.name + ".tmp")
         temporary.write_text(json.dumps(audit, indent=2, sort_keys=True, allow_nan=False) + "\n")
         os.replace(temporary, audit_path)
