@@ -364,8 +364,14 @@ def run_2d(args):
                 }
                 state = replace(state, event_counters=counters, junction_process_state=junction)
                 mesh = state.mesh; boundary = state.boundary
+                growth_now = crack_growth_metrics(
+                    state.crack_network, initial_crack_length_m=cfg.geometry.a0,
+                )
                 record = {
                     "step": step, "physical_time_s": physical_time,
+                    "root_to_tip_extension_um": (
+                        growth_now.max_root_to_tip_path_extension_m * 1.0e6
+                    ),
                     "node_count": state.mesh.nn, "element_count": state.mesh.ne,
                     "active_tip_count": len(state.crack_network.active_tip_ids),
                     "levels_added": len(adaptation.lineages),
@@ -397,7 +403,6 @@ def run_2d(args):
                         "root_to_tip_extension_um": record["root_to_tip_extension_um"],
                         **adaptation.refinement_marking_diagnostics,
                     }, sort_keys=True, allow_nan=False) + "\n")
-                growth_now = crack_growth_metrics(state.crack_network, initial_crack_length_m=cfg.geometry.a0)
                 adaptation_checkpoint = ProductionBranchCheckpoint(
                     state=state, shared_process_state=_capture_shared_engine(engine),
                     physical_time_s=physical_time, accepted_load=accepted_load,
