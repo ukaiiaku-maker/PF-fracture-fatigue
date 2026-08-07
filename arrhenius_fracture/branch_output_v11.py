@@ -34,7 +34,14 @@ BRANCH_EVENT_FIELDS = (
     "shared_cluster_state_hash", "topology_fingerprint", "released_energy_J_per_m",
     "total_cost_J_per_m", "energy_margin_J_per_m",
 )
-CLUSTER_FIELDS = ("step", "cluster_id", "state_hash", "unresolved", "tip_separation_m", "handoff_required")
+CLUSTER_FIELDS = (
+    "step", "cluster_id", "parent_tip", "birth_step", "birth_extension_m",
+    "arm_ids", "arm_lengths_m", "tip_separation_m", "process_owner_id",
+    "unresolved", "sufficient_post_junction_length",
+    "separation_reaches_process_zone", "local_contours_overlap",
+    "independently_valid_local_J", "handoff_required", "handoff_step",
+    "junction_reservoir_id", "resolved_tip_engine_ids",
+)
 FRONT_FIELDS = ("step", "front_id", "parent_front_id", "status", "termination_reason", "tip_x_m", "tip_y_m", "arclength_m")
 PROVIDER_FIELDS = ("step", "from_provider", "to_provider", "state_hash", "topology_fingerprint", "parity_passed", "residuals")
 ENERGY_FIELDS = ("step", "accepted_state_id", "stored_energy_J_per_m", "released_energy_J_per_m", "dissipative_cost_J_per_m", "residual_J_per_m")

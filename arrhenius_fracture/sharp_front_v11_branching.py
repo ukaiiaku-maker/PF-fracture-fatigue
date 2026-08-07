@@ -337,7 +337,7 @@ def run_2d(args):
         cluster = restored.branch_clusters[0] if restored.branch_clusters else None
         mesh = state.mesh; boundary = state.boundary; D = state.elasticity_D; mat = state.material
         start_step = int(state.event_counters.get("accepted_steps", 0)) + 1
-        if restored.shared_process_state.get("schema") == "v11.multi-tip-engine-bundle/1":
+        if restored.shared_process_state.get("schema") == "v11.multi-tip-engine-bundle/2":
             from .resolved_production_v11 import continue_resolved_production
             return continue_resolved_production(
                 args=args, cfg=cfg, state=state, shared_engine=engine,
@@ -683,6 +683,15 @@ def run_2d(args):
                     trial_live_results[proposal.action_id],
                 )
                 cluster = trial_clusters[proposal.action_id]
+                if cluster is not None and "birth_step" not in cluster.shared_process_state:
+                    cluster = replace(cluster, shared_process_state={
+                        **cluster.shared_process_state,
+                        "birth_step": int(step),
+                        "birth_extension_m": crack_growth_metrics(
+                            selected_state.crack_network,
+                            initial_crack_length_m=cfg.geometry.a0,
+                        ).max_root_to_tip_path_extension_m,
+                    })
             return replace(
                 selected_state, event_counters=counters, energy_ledgers=ledgers,
                 tip_process_state={
@@ -884,10 +893,22 @@ def run_2d(args):
             )
             writer.cluster({
                 "step": step, "cluster_id": cluster.cluster_id,
-                "state_hash": _hash((cluster, state.tip_process_state)),
+                "parent_tip": cluster.parent_branch_id,
+                "birth_step": cluster.shared_process_state.get("birth_step"),
+                "birth_extension_m": cluster.shared_process_state.get("birth_extension_m"),
+                "arm_ids": list(cluster.arm_branch_ids),
+                "arm_lengths_m": list(guard.arm_arclengths_from_junction_m),
                 "unresolved": cluster.unresolved,
                 "tip_separation_m": guard.tip_separation_m,
+                "process_owner_id": cluster.cluster_id,
+                "sufficient_post_junction_length": list(guard.sufficient_post_junction_length),
+                "separation_reaches_process_zone": guard.separation_reaches_process_zone,
+                "local_contours_overlap": guard.local_contours_overlap,
+                "independently_valid_local_J": list(guard.independently_valid_local_J),
                 "handoff_required": guard.handoff_required,
+                "handoff_step": step if guard.handoff_required else None,
+                "junction_reservoir_id": f"reservoir:{cluster.cluster_id}" if guard.handoff_required else None,
+                "resolved_tip_engine_ids": list(cluster.arm_branch_ids) if guard.handoff_required else [],
             })
         checkpoint = ProductionBranchCheckpoint(
             state=state, shared_process_state=_capture_shared_engine(engine),

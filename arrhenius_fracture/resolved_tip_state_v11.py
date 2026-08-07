@@ -72,6 +72,7 @@ def resolve_unresolved_cluster(
     candidates: Sequence[CleavageCandidate],
     global_hazard_seed: int,
     fresh_tip_factory: FreshTipFactory,
+    existing_competitions: Mapping[str, DirectionalCompetitionState] | None = None,
 ) -> ClusterResolution:
     """Archive all history at the junction and establish zero-history child tips.
 
@@ -110,9 +111,14 @@ def resolve_unresolved_cluster(
         if source_state.get("historical_state_imported") is not False:
             raise ValueError("fresh child source state must explicitly reject historical import")
         seed = tip_lineage_seed(global_hazard_seed, cluster.cluster_id, branch.branch_id)
+        competition = (
+            existing_competitions[branch.branch_id]
+            if existing_competitions is not None else
+            DirectionalCompetitionState.initialize(candidates, global_hazard_seed=seed)
+        )
         tips[branch.branch_id] = IndependentTipState(
             branch_id=branch.branch_id,
-            competition=DirectionalCompetitionState.initialize(candidates, global_hazard_seed=seed),
+            competition=competition,
             process_state=process_state, source_state=source_state,
             rng_identity=f"sha256:{seed:016x}",
         )

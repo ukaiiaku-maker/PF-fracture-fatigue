@@ -27,6 +27,7 @@ from .network_metrics_v11 import crack_growth_metrics
 from .adaptive_multitip_mesh_v11 import adapt_accepted_state_for_trials, mesh_fingerprint
 from .production_step_loop_v11 import AcceptedStepContext, DirectionalStepRefinementRequired
 from .resolved_tip_state_v11 import resolve_unresolved_cluster, tip_lineage_seed
+from .process_state_ownership_v11 import ProcessStateOwner, ProcessStateOwnerRegistry
 from .topology_transaction_v11 import (
     TopologyArm, TopologyTrialResult, apply_causal_sharp_wake_trial_geometry,
     clip_arm_at_first_intersection, execute_topology_trial, extend_network_arm,
@@ -66,7 +67,17 @@ def continue_resolved_production(
         reservoirs = {resolution.reservoir.reservoir_id: resolution.reservoir}
         competitions = {tip: item.competition for tip, item in resolution.tips.items()}
         engines = {tip: engine_factory() for tip in competitions}
-        owner_by_tip = {tip: tip for tip in competitions}
+        ownership = ProcessStateOwnerRegistry(
+            {tip: tip for tip in competitions},
+            {
+                **{tip: ProcessStateOwner(tip, "resolved_tip_engine", process_engine_id=tip) for tip in competitions},
+                resolution.reservoir.reservoir_id: ProcessStateOwner(
+                    resolution.reservoir.reservoir_id, "junction_reservoir",
+                    cluster_id=cluster.cluster_id,
+                    junction_reservoir_id=resolution.reservoir.reservoir_id,
+                ),
+            },
+        )
         state = replace(
             state, crack_network=resolution.network,
             competition=competitions[sorted(competitions)[0]],
@@ -77,16 +88,17 @@ def continue_resolved_production(
             },
         )
     else:
-        if resume_bundle.get("schema") != "v11.multi-tip-engine-bundle/1":
+        if resume_bundle.get("schema") != "v11.multi-tip-engine-bundle/2":
             raise ValueError("unsupported resolved multi-tip restart bundle")
         competitions = dict(resume_competitions or {})
         clusters = {item.cluster_id: item for item in resume_clusters}
         reservoirs = dict(resume_bundle.get("junction_reservoirs", {}))
-        owner_by_tip = dict(resume_bundle["owner_by_tip"])
+        ownership = ProcessStateOwnerRegistry.from_dict(resume_bundle["ownership_registry"])
         engines = {
             owner: _restore_shared_engine(engine_factory(), payload)
             for owner, payload in resume_bundle["engines"].items()
         }
+    owner_by_tip = dict(ownership.owner_by_tip)
     mat = state.material
     D = state.elasticity_D
     da_phys = float(args.da_phys if args.da_phys is not None else max(5.0 * base.eng_r_pz_hint(args), 2.0e-6))
@@ -170,7 +182,8 @@ def continue_resolved_production(
                         **adaptation.refinement_marking_diagnostics,
                     }, sort_keys=True, allow_nan=False) + "\n")
                 bundle = {
-                    "schema": "v11.multi-tip-engine-bundle/1", "owner_by_tip": owner_by_tip,
+                    "schema": "v11.multi-tip-engine-bundle/2",
+                    "ownership_registry": ownership.to_dict(),
                     "engines": {key: _capture_shared_engine(value) for key, value in engines.items()},
                     "junction_reservoirs": reservoirs,
                 }
@@ -301,6 +314,11 @@ def continue_resolved_production(
             policy = branch_birth_policy(proposal, committed_branch_birth_count=branch_birth_count)
             if not policy.permitted:
                 return TopologyTrialResult(False, current, proposal.action_id, 0.0, 0.0, 0.0, policy.veto_reason)
+            if proposal.action_type == "two_arm" and not ownership.recursive_branch_eligible(tip_id):
+                return TopologyTrialResult(
+                    False, current, proposal.action_id, 0.0, 0.0, 0.0,
+                    "parent_process_zone_still_unresolved",
+                )
             network = current.crack_network
             trial_cluster = None
             if proposal.action_type == "two_arm":
@@ -316,6 +334,10 @@ def continue_resolved_production(
                         "N_em": float(engines[owner_by_tip[tip_id]].N_em),
                         "W_emit": float(engines[owner_by_tip[tip_id]].W_emit),
                         "time_s": float(engines[owner_by_tip[tip_id]].t),
+                        "birth_step": int(context.step_index),
+                        "birth_extension_m": crack_growth_metrics(
+                            current.crack_network, initial_crack_length_m=cfg.geometry.a0,
+                        ).max_root_to_tip_path_extension_m,
                     },
                     conserved_ledgers={name: float(current.energy_ledgers.get(name, 0.0)) for name in (
                         "retained", "mobile", "escaped", "recovered", "stored_energy", "emission_work", "unconsumed_action",
@@ -518,7 +540,7 @@ def continue_resolved_production(
             if trial_cluster is not None:
                 branch_birth_count += 1
                 counters["branch_birth_count"] = branch_birth_count
-                parent_owner = owner_by_tip.pop(tip)
+                parent_owner = owner_by_tip[tip]
                 owner_engine = engines.pop(parent_owner)
                 clusters[trial_cluster.cluster_id] = trial_cluster
                 engines[trial_cluster.cluster_id] = owner_engine
@@ -531,7 +553,8 @@ def continue_resolved_production(
                             trial_cluster.cluster_id, child,
                         ),
                     )
-                    owner_by_tip[child] = trial_cluster.cluster_id
+                ownership = ownership.branch(tip, trial_cluster.cluster_id, trial_cluster.arm_branch_ids)
+                owner_by_tip = dict(ownership.owner_by_tip)
                 snapshot_reason = "branch_birth"
                 branches = [state.crack_network.branch(child) for child in trial_cluster.arm_branch_ids]
                 branch_record = {field: None for field in BRANCH_EVENT_FIELDS}
@@ -558,7 +581,11 @@ def continue_resolved_production(
                 if target is not None:
                     coalescence_count += 1
                     counters["coalescence_count"] = coalescence_count
-                    competitions.pop(arm.branch_id, None); owner_by_tip.pop(arm.branch_id, None)
+                    competitions.pop(arm.branch_id, None)
+                    ownership, removable_engine = ownership.retire_tip(arm.branch_id)
+                    owner_by_tip = dict(ownership.owner_by_tip)
+                    if removable_engine is not None:
+                        engines.pop(removable_engine, None)
                     snapshot_reason = "coalescence"
             state = replace(state, event_counters=counters)
             selected_trial = next(item for item in result.trials if item.diagnostic.selected)
@@ -586,14 +613,70 @@ def continue_resolved_production(
                 match = next((item for item in (latest_live or {}).get("tips", ()) if np.allclose(item["tip_xy_m"], branch.tip)), None)
                 valid.append(bool(match and match["directional"] and all(row["local_contour_valid"] for row in match["directional"])))
             guard = evaluate_unresolved_cluster_guard(state.crack_network, pending, process_zone_length_m=float(args.L_pz), local_J_contour_radius_m=float(getattr(args, "rJ", None) or args.L_pz), independently_valid_local_J=tuple(valid))
+            writer.cluster({
+                "step": step, "cluster_id": cluster_id,
+                "parent_tip": pending.parent_branch_id,
+                "birth_step": pending.shared_process_state.get("birth_step"),
+                "birth_extension_m": pending.shared_process_state.get("birth_extension_m"),
+                "arm_ids": list(pending.arm_branch_ids),
+                "arm_lengths_m": list(guard.arm_arclengths_from_junction_m),
+                "tip_separation_m": guard.tip_separation_m,
+                "process_owner_id": (
+                    cluster_id if pending.unresolved else f"reservoir:{cluster_id}"
+                ),
+                "unresolved": pending.unresolved,
+                "sufficient_post_junction_length": list(guard.sufficient_post_junction_length),
+                "separation_reaches_process_zone": guard.separation_reaches_process_zone,
+                "local_contours_overlap": guard.local_contours_overlap,
+                "independently_valid_local_J": list(guard.independently_valid_local_J),
+                "handoff_required": guard.handoff_required,
+                "handoff_step": step if guard.handoff_required else None,
+                "junction_reservoir_id": f"reservoir:{cluster_id}" if guard.handoff_required else None,
+                "resolved_tip_engine_ids": list(pending.arm_branch_ids) if guard.handoff_required else [],
+            })
             if guard.handoff_required:
-                resolved = resolve_unresolved_cluster(state.crack_network, pending, candidates=candidates, global_hazard_seed=state.competition.global_hazard_seed, fresh_tip_factory=_fresh_tip_payload)
+                resolved = resolve_unresolved_cluster(
+                    state.crack_network, pending, candidates=candidates,
+                    global_hazard_seed=state.competition.global_hazard_seed,
+                    fresh_tip_factory=_fresh_tip_payload,
+                    existing_competitions={child: competitions[child] for child in pending.arm_branch_ids},
+                )
+                resolved = replace(resolved, reservoir=replace(
+                    resolved.reservoir,
+                    historical_process_state={
+                        **resolved.reservoir.historical_process_state,
+                        "process_engine_checkpoint": _capture_shared_engine(engines[cluster_id]),
+                    },
+                ))
                 state = replace(state, crack_network=resolved.network)
                 clusters[cluster_id] = resolved.cluster
                 reservoirs[resolved.reservoir.reservoir_id] = resolved.reservoir
                 engines.pop(cluster_id, None)
                 for child in resolved.cluster.arm_branch_ids:
                     owner_by_tip[child] = child; engines[child] = engine_factory()
+                    competitions[child] = resolved.tips[child].competition
+                ownership = ownership.resolve(
+                    cluster_id, resolved.cluster.arm_branch_ids, resolved.reservoir.reservoir_id,
+                )
+                owner_by_tip = dict(ownership.owner_by_tip)
+                writer.cluster({
+                    "step": step, "cluster_id": cluster_id,
+                    "parent_tip": pending.parent_branch_id,
+                    "birth_step": pending.shared_process_state.get("birth_step"),
+                    "birth_extension_m": pending.shared_process_state.get("birth_extension_m"),
+                    "arm_ids": list(pending.arm_branch_ids),
+                    "arm_lengths_m": list(guard.arm_arclengths_from_junction_m),
+                    "tip_separation_m": guard.tip_separation_m,
+                    "process_owner_id": resolved.reservoir.reservoir_id,
+                    "unresolved": False,
+                    "sufficient_post_junction_length": list(guard.sufficient_post_junction_length),
+                    "separation_reaches_process_zone": guard.separation_reaches_process_zone,
+                    "local_contours_overlap": guard.local_contours_overlap,
+                    "independently_valid_local_J": list(guard.independently_valid_local_J),
+                    "handoff_required": True, "handoff_step": step,
+                    "junction_reservoir_id": resolved.reservoir.reservoir_id,
+                    "resolved_tip_engine_ids": list(resolved.cluster.arm_branch_ids),
+                })
                 snapshot_reason = "cluster_resolved"
 
         active = state.crack_network.active_tip_ids
@@ -612,7 +695,15 @@ def continue_resolved_production(
         })
         for branch in state.crack_network.branches:
             writer.front({"step": step, "front_id": branch.branch_id, "parent_front_id": branch.parent_branch_id, "status": branch.status, "termination_reason": branch.local_state.get("termination_reason"), "tip_x_m": branch.tip[0], "tip_y_m": branch.tip[1], "arclength_m": branch.physical_path_length_m})
-        bundle = {"schema": "v11.multi-tip-engine-bundle/1", "owner_by_tip": owner_by_tip, "engines": {key: _capture_shared_engine(value) for key, value in engines.items()}, "junction_reservoirs": reservoirs}
+        ownership.validate(
+            active, engine_ids=engines, cluster_ids=clusters, reservoir_ids=reservoirs,
+        )
+        bundle = {
+            "schema": "v11.multi-tip-engine-bundle/2",
+            "ownership_registry": ownership.to_dict(),
+            "engines": {key: _capture_shared_engine(value) for key, value in engines.items()},
+            "junction_reservoirs": reservoirs,
+        }
         growth = crack_growth_metrics(state.crack_network, initial_crack_length_m=cfg.geometry.a0)
         extension = growth.max_root_to_tip_path_extension_m
         checkpoint = ProductionBranchCheckpoint(
