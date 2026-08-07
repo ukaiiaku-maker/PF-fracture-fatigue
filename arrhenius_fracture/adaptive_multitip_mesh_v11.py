@@ -442,7 +442,14 @@ def diagnose_underresolved_trial_geometry(
                             tip=tip, end=end, tangent_span=float(tangent_width[local]),
                             normal_span=float(normal_width[local]),
                             intersection_length=float(lengths[local]), metric=float(normal_width[local]))
-    records = tuple(PhysicalMarkRecord(**associations[key]) for key in sorted(associations))
+    # One element can belong both to current-tip support (candidate id None)
+    # and to candidate support.  Use an explicit total ordering rather than
+    # asking Python to compare None with str.
+    ordered_keys = sorted(
+        associations,
+        key=lambda item: (item[0], item[1], item[2] is not None, item[2] or ""),
+    )
+    records = tuple(PhysicalMarkRecord(**associations[key]) for key in ordered_keys)
     return MarkingAudit(
         tuple(sorted({record.element_id for record in records})), records,
     )

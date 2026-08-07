@@ -185,6 +185,21 @@ def test_reason_resolved_marks_are_local_and_below_threshold_children_are_not_re
     assert all(record.distance_to_current_tip_m <= 0.3 for record in audit.records)
 
 
+def test_reason_resolved_marks_totally_order_none_and_string_candidate_ids():
+    state, candidates = fixture_state()
+    audit = diagnose_underresolved_trial_geometry(
+        state.mesh, state.crack_network, {"b00000000": tuple(candidates)},
+        da_phys_m=0.1, contour_radius_m=0.3, target_resolution_m=0.2,
+    )
+    keys = [(row.element_id, row.tip_id, row.candidate_id) for row in audit.records]
+    assert any(candidate_id is None for _, _, candidate_id in keys)
+    assert any(candidate_id is not None for _, _, candidate_id in keys)
+    assert keys == sorted(
+        keys,
+        key=lambda item: (item[0], item[1], item[2] is not None, item[2] or ""),
+    )
+
+
 def test_final_mesh_is_validated_after_last_permitted_refinement_level():
     state, candidates = fixture_state()
     # The fixture already satisfies this deliberately loose local contract, so
