@@ -70,14 +70,43 @@ class AdaptationAudit:
         return json.loads(json.dumps(self, default=lambda value: value.__dict__, sort_keys=True))
 
 
-def _subdivide(nodes: np.ndarray, elems: np.ndarray, marked: Iterable[int]):
+def _subdivide(
+    nodes: np.ndarray, elems: np.ndarray, marked: Iterable[int], *,
+    longest_edge_closure: bool = False,
+):
     marked_ids = tuple(sorted(set(int(index) for index in marked)))
     if any(index < 0 or index >= len(elems) for index in marked_ids):
         raise ValueError("marked parent element index is out of range")
     split_edges: set[Edge] = set()
+    def longest(triangle) -> Edge:
+        a, b, c = (int(v) for v in triangle)
+        edges = (_edge(a, b), _edge(b, c), _edge(c, a))
+        return min(
+            edges,
+            key=lambda item: (-float(np.linalg.norm(nodes[item[1]] - nodes[item[0]])), item),
+        )
+
     for index in marked_ids:
         a, b, c = (int(v) for v in elems[index])
-        split_edges.update((_edge(a, b), _edge(b, c), _edge(c, a)))
+        if longest_edge_closure:
+            split_edges.add(longest((a, b, c)))
+        else:
+            split_edges.update((_edge(a, b), _edge(b, c), _edge(c, a)))
+    if longest_edge_closure:
+        # Conformity closure: a triangle touched by a split edge is never bisected
+        # across a shorter edge while retaining its longest edge.  This is the
+        # deterministic longest-edge propagation needed to prevent arbitrarily
+        # thin green-conformity children.
+        changed = True
+        while changed:
+            changed = False
+            for triangle in elems:
+                a, b, c = (int(v) for v in triangle)
+                edges = (_edge(a, b), _edge(b, c), _edge(c, a))
+                if any(item in split_edges for item in edges):
+                    edge = longest(triangle)
+                    if edge not in split_edges:
+                        split_edges.add(edge); changed = True
     new_nodes = [tuple(point) for point in np.asarray(nodes, dtype=float)]
     midpoint: dict[Edge, int] = {}
     interpolation: dict[int, tuple[int, int, float, float]] = {}
@@ -124,10 +153,15 @@ def _subdivide(nodes: np.ndarray, elems: np.ndarray, marked: Iterable[int]):
     return points, np.asarray(children, dtype=int), midpoint, interpolation, parent_map, conformity
 
 
-def refine_accepted_state(state, *, marked_parent_elements: Iterable[int], active_tip_ids: Iterable[str], generation: int, operation_index: int):
+def refine_accepted_state(
+    state, *, marked_parent_elements: Iterable[int], active_tip_ids: Iterable[str],
+    generation: int, operation_index: int, longest_edge_closure: bool = False,
+):
     old = state.mesh
     marked = tuple(sorted(set(int(value) for value in marked_parent_elements)))
-    nodes, elems, midpoint, interpolation, parent_map, conformity = _subdivide(old.nodes, old.elems, marked)
+    nodes, elems, midpoint, interpolation, parent_map, conformity = _subdivide(
+        old.nodes, old.elems, marked, longest_edge_closure=longest_edge_closure,
+    )
     tips = tuple(sorted(set(str(value) for value in active_tip_ids)))
     centers = np.asarray([state.crack_network.branch(tip).tip for tip in tips], dtype=float)
     mesh = rebuild_tri_mesh(nodes, elems, tip_centers=centers)
@@ -244,6 +278,43 @@ def _mean_edge_length(mesh) -> np.ndarray:
     ) / 3.0
 
 
+def mark_underresolved_trial_geometry(
+    mesh, network, candidates_by_tip, *, da_phys_m: float,
+    contour_radius_m: float, target_resolution_m: float,
+) -> tuple[int, ...]:
+    """Mark only geometry that controls a causal crack/J trial.
+
+    Candidate-crossed elements are measured by the represented tangent length
+    and their exact vertex-projection span in the crack-normal direction. Tip and
+    candidate-endpoint J patches are measured by element area-equivalent
+    diameter, the scale controlling their integrated FEM contribution.  A long
+    conformity edge with vanishing altitude therefore cannot veto an otherwise
+    resolved trial merely because its global edge maximum is large.
+    """
+    from .causal_sharp_wake_v11 import causal_segment_support
+    target = float(target_resolution_m)
+    centroids = mesh.nodes[mesh.elems].mean(axis=1)
+    equivalent_diameter = np.sqrt(4.0 * np.maximum(mesh.area_e, 0.0) / math.pi)
+    marked = np.zeros(mesh.ne, dtype=bool)
+    for tip_id in sorted(network.active_tip_ids):
+        tip = np.asarray(network.branch(tip_id).tip, dtype=float)
+        current_patch = np.linalg.norm(centroids - tip, axis=1) <= float(contour_radius_m)
+        marked |= current_patch & (equivalent_diameter > target)
+        for candidate in sorted(candidates_by_tip[tip_id], key=lambda item: item.candidate_id):
+            end = tip + float(da_phys_m) * np.asarray(candidate.direction_xy, dtype=float)
+            endpoint_patch = np.linalg.norm(centroids - end, axis=1) <= float(contour_radius_m)
+            marked |= endpoint_patch & (equivalent_diameter > target)
+            intersected, lengths = causal_segment_support(mesh, tip, end)
+            if intersected.size:
+                tangent = (end - tip) / max(float(np.linalg.norm(end - tip)), np.finfo(float).tiny)
+                normal = np.array((-tangent[1], tangent[0]))
+                normal_coordinates = mesh.nodes[mesh.elems[intersected]] @ normal
+                normal_width = np.ptp(normal_coordinates, axis=1)
+                unresolved = (lengths > target) | (normal_width > target)
+                marked[intersected[unresolved]] = True
+    return tuple(int(value) for value in np.flatnonzero(marked))
+
+
 def trial_stiffness_visibility(state, candidates_by_tip, *, da_phys_m: float, crack_band_radius_m: float) -> dict[str, int]:
     from .causal_sharp_wake_v11 import apply_causal_segment
     result: dict[str, int] = {}
@@ -276,8 +347,11 @@ def adapt_accepted_state_for_trials(
             da_phys_m=da_phys_m, contour_radius_m=contour_radius_m,
             crack_band_radius_m=max(float(current.mesh.hbar_tip), float(crack_band_radius_m)),
         )
-        mean_edge = _mean_edge_length(current.mesh)
-        marked = tuple(index for index in support if mean_edge[index] > target_hbar)
+        marked = mark_underresolved_trial_geometry(
+            current.mesh, current.crack_network, candidates_by_tip,
+            da_phys_m=da_phys_m, contour_radius_m=contour_radius_m,
+            target_resolution_m=target_hbar,
+        )
         visible = trial_stiffness_visibility(
             current, candidates_by_tip, da_phys_m=da_phys_m,
             crack_band_radius_m=max(float(current.mesh.hbar_tip), float(crack_band_radius_m)),
@@ -291,6 +365,7 @@ def adapt_accepted_state_for_trials(
             active_tip_ids=current.crack_network.active_tip_ids,
             generation=starting_generation + level,
             operation_index=starting_operation_index + level,
+            longest_edge_closure=True,
         )
         before, _ = _stored_energy_and_reaction(current)
         prolonged, _ = _stored_energy_and_reaction(refined)

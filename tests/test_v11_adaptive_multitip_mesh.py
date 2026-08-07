@@ -3,7 +3,8 @@ from dataclasses import replace
 import numpy as np
 
 from arrhenius_fracture.adaptive_multitip_mesh_v11 import (
-    mark_multitip_trial_support, mesh_fingerprint, refine_accepted_state,
+    _subdivide, mark_multitip_trial_support, mark_underresolved_trial_geometry,
+    mesh_fingerprint, refine_accepted_state,
 )
 from arrhenius_fracture.config import ElasticProperties
 from arrhenius_fracture.crack_network_v11 import CrackBranchState, CrackNetworkState
@@ -101,3 +102,52 @@ def test_refinement_and_marked_union_are_order_independent():
     two, lineage_two = refine_accepted_state(state, marked_parent_elements=reversed(marked_a), active_tip_ids=("b00000000",), generation=1, operation_index=1)
     assert mesh_fingerprint(one.mesh) == mesh_fingerprint(two.mesh)
     assert lineage_one.current_mesh_fingerprint == lineage_two.current_mesh_fingerprint
+
+
+def test_longest_edge_closure_is_deterministic_and_splits_the_controlling_edge():
+    nodes = np.array(((0.0, 0.0), (8.0, 0.0), (0.1, 0.01), (8.0, 1.0)))
+    elems = np.array(((0, 1, 2), (1, 3, 2)))
+    first = _subdivide(nodes, elems, (0,), longest_edge_closure=True)
+    second = _subdivide(nodes, elems, reversed((0,)), longest_edge_closure=True)
+    np.testing.assert_array_equal(first[0], second[0])
+    np.testing.assert_array_equal(first[1], second[1])
+    # The midpoint of the marked triangle's longest edge (0, 1) must exist.
+    midpoint = first[2]
+    assert (0, 1) in midpoint
+    np.testing.assert_array_equal(first[0][midpoint[(0, 1)]], (4.0, 0.0))
+
+
+def test_longest_edge_refinement_preserves_stage_a_energy_exactly():
+    state, _ = fixture_state()
+    refined, _ = refine_accepted_state(
+        state, marked_parent_elements=(0,), active_tip_ids=("b00000000",),
+        generation=1, operation_index=1, longest_edge_closure=True,
+    )
+    assert np.isclose(energy(refined), energy(state), rtol=2e-15, atol=1e-12)
+
+
+def test_local_resolution_contract_ignores_long_thin_nonintersecting_edge():
+    state, candidates = fixture_state()
+    # A vanishing-area conformity sliver has a huge global edge, but it is away
+    # from both the physical proposal and the 0.15-radius J patches.
+    nodes = np.vstack((state.mesh.nodes, ((4.0, 4.0), (14.0, 4.0), (4.0, 4.000001))))
+    elems = np.vstack((state.mesh.elems, ((4, 5, 6),)))
+    mesh = rebuild_tri_mesh(nodes, elems, tip_centers=((0.75, 0.5),))
+    marked = mark_underresolved_trial_geometry(
+        mesh, state.crack_network, {"b00000000": tuple(candidates)},
+        da_phys_m=0.1, contour_radius_m=0.15, target_resolution_m=0.2,
+    )
+    assert mesh.ne - 1 not in marked
+
+
+def test_local_resolution_contract_is_candidate_enumeration_invariant():
+    state, candidates = fixture_state()
+    first = mark_underresolved_trial_geometry(
+        state.mesh, state.crack_network, {"b00000000": tuple(candidates)},
+        da_phys_m=0.1, contour_radius_m=0.15, target_resolution_m=0.2,
+    )
+    second = mark_underresolved_trial_geometry(
+        state.mesh, state.crack_network, {"b00000000": tuple(reversed(candidates))},
+        da_phys_m=0.1, contour_radius_m=0.15, target_resolution_m=0.2,
+    )
+    assert first == second
