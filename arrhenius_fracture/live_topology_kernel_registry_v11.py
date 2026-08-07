@@ -45,16 +45,28 @@ def validate_single_front_transition(
     for candidate_id in sorted(legacy_directional):
         old = legacy_directional[candidate_id]
         new = live_directional[candidate_id]
-        for name in ("signed_J_J_per_m2", "positive_J_J_per_m2", "K_directional_Pa_sqrt_m"):
-            if math.copysign(1.0, float(old[name])) != math.copysign(1.0, float(new[name])):
+        pairs = (
+            ("J_provider_contract_signed_J_per_m2", "J_provider_contract_signed_J_per_m2"),
+            ("J_provider_contract_positive_J_per_m2", "J_provider_contract_positive_J_per_m2"),
+            ("K_provider_contract_Pa_sqrt_m", "K_provider_contract_Pa_sqrt_m"),
+        ) if "J_provider_contract_signed_J_per_m2" in old else (
+            ("signed_J_J_per_m2", "signed_J_J_per_m2"),
+            ("positive_J_J_per_m2", "positive_J_J_per_m2"),
+            ("K_directional_Pa_sqrt_m", "K_directional_Pa_sqrt_m"),
+        )
+        for old_name, new_name in pairs:
+            name = old_name
+            if new_name not in new:
+                raise RuntimeError(f"live-provider transition lacks matched observable {new_name}")
+            if math.copysign(1.0, float(old[old_name])) != math.copysign(1.0, float(new[new_name])):
                 raise RuntimeError(f"live-provider transition changed sign for {candidate_id} {name}")
-            residual = _relative(old[name], new[name])
+            residual = _relative(old[old_name], new[new_name])
             comparisons[f"{candidate_id}:{name}"] = residual
             if residual > drive_rtol:
                 raise RuntimeError(
                     f"live-provider transition parity failed for {candidate_id} {name}: "
-                    f"relative_residual={residual}, legacy={float(old[name])}, "
-                    f"live={float(new[name])}"
+                    f"relative_residual={residual}, legacy={float(old[old_name])}, "
+                    f"live={float(new[new_name])}"
                 )
     comparisons.update({
         "passed": True, "reaction_energy_rtol": reaction_energy_rtol,

@@ -23,8 +23,9 @@ from .unit_slip_perturbation_v10212 import (
 from .unit_slip_perturbation_v1026 import SlipRibbonPerturbation, solve_fixed_crack_state
 
 
-SCHEMA = "v11_exact_topology_live_fem_provider_v1"
+SCHEMA = "v11_exact_topology_live_fem_provider_v2"
 PROVIDER_ID = "v11_exact_crack_network_live_fem_v1"
+PROVIDER_SEMANTICS_ID = "provider_contract_j_separated_from_nested_local_j_v1"
 MAXIMUM_FRONTS_SUPPORTED = 16
 
 
@@ -155,6 +156,7 @@ class LiveTopologyRequest:
     wake_station_coordinates_m: tuple[tuple[float, float], ...]
     contour_radius_m: float
     exclude_radius_m: float
+    provider_contract_contour_radius_m: float | None = None
     shared_perturbations: tuple[SlipRibbonPerturbation, ...] = ()
 
 
@@ -174,6 +176,8 @@ def request_contour_definitions(request: LiveTopologyRequest) -> dict[str, Any]:
     return {
         "radius_m": request.contour_radius_m,
         "exclude_radius_m": request.exclude_radius_m,
+        "provider_contract_radius_m": request.provider_contract_contour_radius_m,
+        "provider_semantics_id": PROVIDER_SEMANTICS_ID,
         "directional_candidates_by_physical_tip": sorted(
             ({
                 "tip": _point(request.crack_network.branch(branch_id).tip),
@@ -340,12 +344,40 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
             nominal_signed = float(nominal_row["signed_J_J_per_m2"])
             nominal_positive = max(nominal_signed, 0.0)
             local_signed = float(selected_row["signed_J_J_per_m2"])
+            contract_radius = float(
+                request.provider_contract_contour_radius_m
+                if request.provider_contract_contour_radius_m is not None
+                else request.contour_radius_m
+            )
+            if contract_radius == float(request.contour_radius_m):
+                contract_row = nominal_row
+            else:
+                _, _, contract_info = compute_J_integral(
+                    request.mesh, base["u"], base["sigma_gp"], base["psi_e_gp"],
+                    request.damage, tip_xy, np.asarray(candidate.direction_xy),
+                    request.material, ell=contract_radius,
+                    crack_segments=segments, exclude_radius=request.exclude_radius_m,
+                )
+                contract_row = {
+                    "signed_J_J_per_m2": float(
+                        contract_info.get("J_signed", contract_info.get("J", 0.0))
+                    ),
+                    "integration": contract_info,
+                }
+            contract_signed = float(contract_row["signed_J_J_per_m2"])
+            contract_positive = max(contract_signed, 0.0)
             Eprime = float(request.material.Eprime)
             directional.append({
                 "candidate_id": candidate.candidate_id,
                 "signed_J_J_per_m2": nominal_signed,
                 "positive_J_J_per_m2": nominal_positive,
                 "K_directional_Pa_sqrt_m": math.sqrt(Eprime * nominal_positive),
+                "J_provider_contract_signed_J_per_m2": contract_signed,
+                "J_provider_contract_positive_J_per_m2": contract_positive,
+                "K_provider_contract_Pa_sqrt_m": math.sqrt(Eprime * contract_positive),
+                "provider_contract_contour_radius_m": contract_radius,
+                "provider_contract_auxiliary_direction_xy": list(candidate.direction_xy),
+                "provider_contract_integration": contract_row["integration"],
                 "J_local_signed_J_per_m2": local_signed,
                 "local_contour_valid": local_valid,
                 "local_J_valid": local_valid,
@@ -409,6 +441,6 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
 
 
 __all__ = [
-    "LiveTopologyRequest", "MAXIMUM_FRONTS_SUPPORTED", "PROVIDER_ID", "SCHEMA", "canonical_topology_payload",
+    "LiveTopologyRequest", "MAXIMUM_FRONTS_SUPPORTED", "PROVIDER_ID", "PROVIDER_SEMANTICS_ID", "SCHEMA", "canonical_topology_payload",
     "evaluate_exact_topology", "request_contour_definitions", "topology_fingerprint",
 ]

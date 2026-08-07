@@ -12,6 +12,7 @@ from arrhenius_fracture.live_topology_kernel_v11 import topology_fingerprint
 from arrhenius_fracture.live_topology_kernel_v11 import LiveTopologyRequest, evaluate_exact_topology
 from arrhenius_fracture.live_topology_kernel_registry_v11 import validate_single_front_transition
 from arrhenius_fracture.live_topology_runtime_v11 import LiveTopologyRuntime
+from arrhenius_fracture.kernel_resolver_v11 import resolve_live_topology_request
 from arrhenius_fracture.directional_competition_v11 import tungsten_cleavage_candidates
 from arrhenius_fracture.fem import elastic_energy_densities, plane_strain_D
 from arrhenius_fracture.config import ElasticProperties
@@ -110,7 +111,9 @@ def live_straight_request(extension_m):
     geometry = GeometryConfig(Lx=1.0e-3, Ly=1.0e-3, a0=0.25e-3, notch_half_thickness=20e-6)
     tip = np.array([geometry.a0 + extension_m, 0.0])
     mesh = make_tri_mesh(
-        geometry, MeshConfig(nx=24, ny=32, jitter=0.0), seed=1729,
+        geometry, MeshConfig(
+            nx=24, ny=32, jitter=0.0, tip_h_fine=0.5e-6, tip_ratio=1.2,
+        ), seed=1729,
         tip_center=tip,
     )
     boundary = make_boundary_data(mesh, geometry)
@@ -151,9 +154,16 @@ def live_straight_request(extension_m):
     return request
 
 
+@pytest.mark.parametrize("theta_deg", [30.0, 45.0])
 @pytest.mark.parametrize("extension_um", [0.0, 5.0, 10.0, 25.0])
-def test_live_provider_matches_direct_single_front_FEM_anchors(extension_um):
-    request = live_straight_request(extension_um * 1.0e-6)
+def test_live_provider_matches_direct_single_front_FEM_anchors(theta_deg, extension_um):
+    base_request = live_straight_request(extension_um * 1.0e-6)
+    candidates = tungsten_cleavage_candidates(theta_deg=theta_deg, include_110=True)
+    request = replace(
+        base_request,
+        candidates_by_tip={base_request.crack_network.active_tip_ids[0]: candidates},
+        provider_contract_contour_radius_m=2.0e-6,
+    )
     live = evaluate_exact_topology(request)
     Uy_top = 1.0e-7
     base = solve_fixed_crack_state(
@@ -178,10 +188,23 @@ def test_live_provider_matches_direct_single_front_FEM_anchors(extension_um):
         )
         signed = float(info["J_signed"])
         positive = max(signed, 0.0)
+        _, _, contract_info = compute_J_integral(
+            request.mesh, base["u"], base["sigma_gp"], base["psi_e_gp"],
+            request.damage, np.asarray(branch.tip), np.asarray(candidate.direction_xy),
+            request.material, ell=2.0e-6,
+            crack_segments=segments, exclude_radius=request.exclude_radius_m,
+        )
+        contract_signed = float(contract_info["J_signed"])
+        contract_positive = max(contract_signed, 0.0)
         directional.append({
             "candidate_id": candidate.candidate_id,
             "signed_J_J_per_m2": signed, "positive_J_J_per_m2": positive,
             "K_directional_Pa_sqrt_m": math.sqrt(request.material.Eprime * positive),
+            "J_provider_contract_signed_J_per_m2": contract_signed,
+            "J_provider_contract_positive_J_per_m2": contract_positive,
+            "K_provider_contract_Pa_sqrt_m": math.sqrt(
+                request.material.Eprime * contract_positive
+            ),
         })
     stored, _ = elastic_energy_densities(
         request.mesh, base["u"], request.ep_gp, base["sigma_gp"], request.elasticity_D
@@ -193,6 +216,28 @@ def test_live_provider_matches_direct_single_front_FEM_anchors(extension_um):
     }
     parity = validate_single_front_transition(legacy, live)
     assert parity["passed"] and parity["sign_agreement"]
+    assert all(
+        row["provider_contract_contour_radius_m"] == 2.0e-6
+        for row in live["tips"][0]["directional"]
+    )
+    assert all(
+        row["provider_contract_integration"]["n_active_elements"] > 0
+        for row in live["tips"][0]["directional"]
+    )
+
+
+def test_accepted_cache_identity_includes_mechanical_state_and_provider_semantics(tmp_path):
+    first = live_straight_request(0.0)
+    result0, cached0 = resolve_live_topology_request(first, cache_root=tmp_path, accepted=True)
+    assert not cached0
+    changed = replace(first, displacement=first.displacement * 1.5)
+    result1, cached1 = resolve_live_topology_request(changed, cache_root=tmp_path, accepted=True)
+    assert not cached1
+    assert result1["base_equilibrium"]["applied_displacement"] == pytest.approx(
+        1.5 * result0["base_equilibrium"]["applied_displacement"]
+    )
+    _, cached_again = resolve_live_topology_request(changed, cache_root=tmp_path, accepted=True)
+    assert cached_again
 
 
 def legacy_from_live(live):

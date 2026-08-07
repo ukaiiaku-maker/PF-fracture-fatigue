@@ -142,7 +142,16 @@ def _request(
         cluster_frame=frame, mpz_station_coordinates_m=(), wake_station_coordinates_m=(),
         contour_radius_m=float(getattr(args, "rJ", None) or max(args.L_pz, 1.0e-6)),
         exclude_radius_m=max(float(getattr(state.mesh, "hbar_tip", 0.0) or state.mesh.hbar), 1.0e-12),
+        provider_contract_contour_radius_m=_provider_contract_interaction_length(args),
     )
+
+
+def _provider_contract_interaction_length(args) -> float:
+    path = os.environ.get("MECHANICAL_CONFIG", "").strip()
+    if path:
+        from .kernel_configuration_v10227 import load_configuration
+        return float(load_configuration(path).interaction_length_m)
+    return float(getattr(args, "rJ", None) or max(args.L_pz, 1.0e-6))
 
 
 def _direct_measurement(state, candidates, args) -> dict[str, Any]:
@@ -159,6 +168,7 @@ def _direct_measurement(state, candidates, args) -> dict[str, Any]:
     branch = state.crack_network.branch(state.crack_network.active_tip_ids[0])
     directional = []
     ell = float(getattr(args, "rJ", None) or max(args.L_pz, 1.0e-6))
+    contract_ell = _provider_contract_interaction_length(args)
     exclude = max(float(getattr(state.mesh, "hbar_tip", 0.0) or state.mesh.hbar), 1.0e-12)
     for candidate in candidates:
         _, _, info = compute_J_integral(
@@ -168,11 +178,31 @@ def _direct_measurement(state, candidates, args) -> dict[str, Any]:
         )
         signed = float(info.get("J_signed", info.get("J", 0.0)))
         positive = max(signed, 0.0)
+        if contract_ell == ell:
+            contract_info = info
+        else:
+            _, _, contract_info = compute_J_integral(
+                state.mesh, state.displacement, sigma, psi, state.damage,
+                np.asarray(branch.tip), np.asarray(candidate.direction_xy), state.material,
+                ell=contract_ell, crack_segments=segments, exclude_radius=exclude,
+            )
+        contract_signed = float(
+            contract_info.get("J_signed", contract_info.get("J", 0.0))
+        )
+        contract_positive = max(contract_signed, 0.0)
         directional.append({
             "candidate_id": candidate.candidate_id,
             "signed_J_J_per_m2": signed,
             "positive_J_J_per_m2": positive,
             "K_directional_Pa_sqrt_m": math.sqrt(float(state.material.Eprime) * positive),
+            "J_provider_contract_signed_J_per_m2": contract_signed,
+            "J_provider_contract_positive_J_per_m2": contract_positive,
+            "K_provider_contract_Pa_sqrt_m": math.sqrt(
+                float(state.material.Eprime) * contract_positive
+            ),
+            "provider_contract_contour_radius_m": contract_ell,
+            "provider_contract_auxiliary_direction_xy": list(candidate.direction_xy),
+            "provider_contract_integration": contract_info,
         })
     return {
         # The accepted solver supplies the authoritative Dirichlet reaction;
