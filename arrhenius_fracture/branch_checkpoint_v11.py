@@ -87,7 +87,9 @@ class ProductionBranchCheckpoint:
             ),
             "mesh_generation": int(self.state.event_counters.get("mesh_generation", 0)),
             "refinement_operation_index": int(self.state.event_counters.get("refinement_operation_index", 0)),
-            "mesh_refinement_lineage": dict(self.state.junction_process_state).get("mesh_refinement"),
+            "mesh_refinement_lineage": json.loads(json.dumps(
+                dict(self.state.junction_process_state).get("mesh_refinement")
+            )),
             "crack_network": self.state.crack_network.to_dict(),
             "active_front_ids": list(self.state.crack_network.active_tip_ids),
             "front_competitions": {

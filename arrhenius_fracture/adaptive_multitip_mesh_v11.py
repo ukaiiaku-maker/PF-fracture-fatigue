@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from enum import IntFlag
 import hashlib
 import json
 import math
@@ -65,9 +66,58 @@ class AdaptationAudit:
     reaction_refined_equilibrium_N_per_m: float
     active_tip_hbar_m: Mapping[str, float]
     trial_changed_element_count: Mapping[str, int]
+    refinement_marking_diagnostics: Mapping[str, object] | None = None
 
     def to_dict(self) -> dict:
         return json.loads(json.dumps(self, default=lambda value: value.__dict__, sort_keys=True))
+
+
+class MarkingReason(IntFlag):
+    CANDIDATE_SEGMENT_INTERSECTION = 1
+    CANDIDATE_CRACK_NORMAL_SPAN = 2
+    CURRENT_TIP_J_SUPPORT_AREA = 4
+    CANDIDATE_ENDPOINT_J_SUPPORT_AREA = 8
+    ACTIVE_TIP_HBAR = 16
+    CONFORMITY_CLOSURE = 32
+
+
+@dataclass(frozen=True)
+class PhysicalMarkRecord:
+    element_id: int
+    tip_id: str
+    candidate_id: str | None
+    reason_bitmask: int
+    area_m2: float
+    equivalent_size_m: float
+    candidate_direction_projection_span_m: float | None
+    candidate_normal_projection_span_m: float | None
+    segment_intersection_length_m: float | None
+    distance_to_current_tip_m: float
+    distance_to_candidate_endpoint_m: float | None
+    inside_current_tip_J_support: bool
+    inside_candidate_endpoint_J_support: bool
+    controlling_metric_m: float
+    threshold_m: float
+
+    @property
+    def reasons(self) -> tuple[str, ...]:
+        bits = MarkingReason(self.reason_bitmask)
+        return tuple(reason.name.lower() for reason in MarkingReason if reason in bits)
+
+    def to_dict(self) -> dict[str, object]:
+        return {**self.__dict__, "reasons": self.reasons}
+
+
+@dataclass(frozen=True)
+class MarkingAudit:
+    marked_element_ids: tuple[int, ...]
+    records: tuple[PhysicalMarkRecord, ...]
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "marked_element_ids": list(self.marked_element_ids),
+            "records": [record.to_dict() for record in self.records],
+        }
 
 
 def _subdivide(
@@ -260,7 +310,23 @@ def _stored_energy_and_reaction(state) -> tuple[float, float]:
     return float(np.sum(density * state.mesh.area_e)), reaction
 
 
-def active_tip_hbar(state) -> dict[str, float]:
+def active_tip_hbar(state, *, contour_radius_m: float | None = None) -> dict[str, float]:
+    if contour_radius_m is not None:
+        centroids = state.mesh.nodes[state.mesh.elems].mean(axis=1)
+        equivalent = np.sqrt(4.0 * np.maximum(state.mesh.area_e, 0.0) / math.pi)
+        result = {}
+        for tip in state.crack_network.active_tip_ids:
+            point = np.asarray(state.crack_network.branch(tip).tip, dtype=float)
+            distance = np.linalg.norm(centroids - point, axis=1)
+            patch = np.flatnonzero(distance <= float(contour_radius_m))
+            if not patch.size:
+                patch = np.asarray((int(np.argmin(distance)),), dtype=int)
+            # This is the controlling J-support local scale: every element in
+            # the fixed physical patch must satisfy the same area-equivalent
+            # contract used by the marker.  Unlike the legacy nearest-2%
+            # statistic, its physical sampling region cannot grow with ne.
+            result[tip] = float(np.max(equivalent[patch]))
+        return result
     return {
         tip: _estimate_hbar_tip(
             state.mesh.nodes, state.mesh.elems, *state.crack_network.branch(tip).tip,
@@ -291,28 +357,95 @@ def mark_underresolved_trial_geometry(
     conformity edge with vanishing altitude therefore cannot veto an otherwise
     resolved trial merely because its global edge maximum is large.
     """
+    return diagnose_underresolved_trial_geometry(
+        mesh, network, candidates_by_tip, da_phys_m=da_phys_m,
+        contour_radius_m=contour_radius_m,
+        target_resolution_m=target_resolution_m,
+    ).marked_element_ids
+
+
+def diagnose_underresolved_trial_geometry(
+    mesh, network, candidates_by_tip, *, da_phys_m: float,
+    contour_radius_m: float, target_resolution_m: float,
+) -> MarkingAudit:
+    """Return deterministic, reason-resolved physical refinement marks."""
     from .causal_sharp_wake_v11 import causal_segment_support
     target = float(target_resolution_m)
     centroids = mesh.nodes[mesh.elems].mean(axis=1)
     equivalent_diameter = np.sqrt(4.0 * np.maximum(mesh.area_e, 0.0) / math.pi)
-    marked = np.zeros(mesh.ne, dtype=bool)
+    associations: dict[tuple[int, str, str | None], dict[str, object]] = {}
+
+    def add(
+        element_id: int, tip_id: str, candidate_id: str | None,
+        reason: MarkingReason, *, tip: np.ndarray, end: np.ndarray | None = None,
+        tangent_span: float | None = None, normal_span: float | None = None,
+        intersection_length: float | None = None, metric: float,
+    ) -> None:
+        element_id = int(element_id)
+        key = (element_id, tip_id, candidate_id)
+        endpoint_distance = None if end is None else float(np.linalg.norm(centroids[element_id] - end))
+        current_distance = float(np.linalg.norm(centroids[element_id] - tip))
+        row = associations.get(key)
+        if row is None:
+            row = {
+                "element_id": element_id, "tip_id": tip_id,
+                "candidate_id": candidate_id, "reason_bitmask": 0,
+                "area_m2": float(mesh.area_e[element_id]),
+                "equivalent_size_m": float(equivalent_diameter[element_id]),
+                "candidate_direction_projection_span_m": tangent_span,
+                "candidate_normal_projection_span_m": normal_span,
+                "segment_intersection_length_m": intersection_length,
+                "distance_to_current_tip_m": current_distance,
+                "distance_to_candidate_endpoint_m": endpoint_distance,
+                "inside_current_tip_J_support": current_distance <= float(contour_radius_m),
+                "inside_candidate_endpoint_J_support": (
+                    endpoint_distance is not None and endpoint_distance <= float(contour_radius_m)
+                ),
+                "controlling_metric_m": float(metric), "threshold_m": target,
+            }
+            associations[key] = row
+        row["reason_bitmask"] = int(row["reason_bitmask"]) | int(reason)
+        row["controlling_metric_m"] = max(float(row["controlling_metric_m"]), float(metric))
+
     for tip_id in sorted(network.active_tip_ids):
         tip = np.asarray(network.branch(tip_id).tip, dtype=float)
         current_patch = np.linalg.norm(centroids - tip, axis=1) <= float(contour_radius_m)
-        marked |= current_patch & (equivalent_diameter > target)
+        for element_id in np.flatnonzero(current_patch & (equivalent_diameter > target)):
+            add(element_id, tip_id, None, MarkingReason.CURRENT_TIP_J_SUPPORT_AREA,
+                tip=tip, metric=float(equivalent_diameter[element_id]))
         for candidate in sorted(candidates_by_tip[tip_id], key=lambda item: item.candidate_id):
             end = tip + float(da_phys_m) * np.asarray(candidate.direction_xy, dtype=float)
             endpoint_patch = np.linalg.norm(centroids - end, axis=1) <= float(contour_radius_m)
-            marked |= endpoint_patch & (equivalent_diameter > target)
+            for element_id in np.flatnonzero(endpoint_patch & (equivalent_diameter > target)):
+                add(element_id, tip_id, candidate.candidate_id,
+                    MarkingReason.CANDIDATE_ENDPOINT_J_SUPPORT_AREA,
+                    tip=tip, end=end, metric=float(equivalent_diameter[element_id]))
             intersected, lengths = causal_segment_support(mesh, tip, end)
             if intersected.size:
                 tangent = (end - tip) / max(float(np.linalg.norm(end - tip)), np.finfo(float).tiny)
                 normal = np.array((-tangent[1], tangent[0]))
-                normal_coordinates = mesh.nodes[mesh.elems[intersected]] @ normal
+                vertices = mesh.nodes[mesh.elems[intersected]]
+                normal_coordinates = vertices @ normal
+                tangent_coordinates = vertices @ tangent
                 normal_width = np.ptp(normal_coordinates, axis=1)
-                unresolved = (lengths > target) | (normal_width > target)
-                marked[intersected[unresolved]] = True
-    return tuple(int(value) for value in np.flatnonzero(marked))
+                tangent_width = np.ptp(tangent_coordinates, axis=1)
+                for local, element_id in enumerate(intersected):
+                    if lengths[local] > target:
+                        add(element_id, tip_id, candidate.candidate_id,
+                            MarkingReason.CANDIDATE_SEGMENT_INTERSECTION,
+                            tip=tip, end=end, tangent_span=float(tangent_width[local]),
+                            normal_span=float(normal_width[local]),
+                            intersection_length=float(lengths[local]), metric=float(lengths[local]))
+                    if normal_width[local] > target:
+                        add(element_id, tip_id, candidate.candidate_id,
+                            MarkingReason.CANDIDATE_CRACK_NORMAL_SPAN,
+                            tip=tip, end=end, tangent_span=float(tangent_width[local]),
+                            normal_span=float(normal_width[local]),
+                            intersection_length=float(lengths[local]), metric=float(normal_width[local]))
+    records = tuple(PhysicalMarkRecord(**associations[key]) for key in sorted(associations))
+    return MarkingAudit(
+        tuple(sorted({record.element_id for record in records})), records,
+    )
 
 
 def trial_stiffness_visibility(state, candidates_by_tip, *, da_phys_m: float, crack_band_radius_m: float) -> dict[str, int]:
@@ -340,18 +473,51 @@ def adapt_accepted_state_for_trials(
     parent_energy, _ = _stored_energy_and_reaction(state)
     current = state
     lineages = []
+    marking_levels: list[dict[str, object]] = []
+    root_lineage = {element_id: element_id for element_id in range(state.mesh.ne)}
+    unique_roots: set[int] = set()
     for level in range(1, int(maximum_levels) + 1):
-        hbars = active_tip_hbar(current)
-        support = mark_multitip_trial_support(
-            current.mesh, current.crack_network, candidates_by_tip,
-            da_phys_m=da_phys_m, contour_radius_m=contour_radius_m,
-            crack_band_radius_m=max(float(current.mesh.hbar_tip), float(crack_band_radius_m)),
-        )
-        marked = mark_underresolved_trial_geometry(
+        hbars = active_tip_hbar(current, contour_radius_m=contour_radius_m)
+        marking = diagnose_underresolved_trial_geometry(
             current.mesh, current.crack_network, candidates_by_tip,
             da_phys_m=da_phys_m, contour_radius_m=contour_radius_m,
             target_resolution_m=target_hbar,
         )
+        marked = marking.marked_element_ids
+        reason_counts: dict[str, int] = {}
+        association_counts: dict[tuple[str, str, str], int] = {}
+        for record in marking.records:
+            for reason in record.reasons:
+                reason_counts[reason] = reason_counts.get(reason, 0) + 1
+                key = (record.tip_id, record.candidate_id or "-", reason)
+                association_counts[key] = association_counts.get(key, 0) + 1
+        roots = {root_lineage[element_id] for element_id in marked}
+        unique_roots.update(roots)
+        if marked:
+            points = current.mesh.nodes[current.mesh.elems[list(marked)]].reshape(-1, 2)
+            bounding_box = {
+                "minimum_xy_m": points.min(axis=0).tolist(),
+                "maximum_xy_m": points.max(axis=0).tolist(),
+            }
+            marked_area = float(np.sum(current.mesh.area_e[list(marked)]))
+        else:
+            bounding_box = None; marked_area = 0.0
+        marking_levels.append({
+            "level": level - 1, "element_count_before": current.mesh.ne,
+            "physical_mark_count": len(marked),
+            "physical_marked_area_m2": marked_area,
+            "marked_region_bounding_box": bounding_box,
+            "unique_initial_parent_elements_affected": len(roots),
+            "counts_by_reason": dict(sorted(reason_counts.items())),
+            "counts_by_tip_candidate_reason": [
+                {"tip_id": key[0], "candidate_id": key[1], "reason": key[2], "count": value}
+                for key, value in sorted(association_counts.items())
+            ],
+            "records": [
+                {**record.to_dict(), "parent_lineage_root_element_id": root_lineage[record.element_id]}
+                for record in marking.records
+            ],
+        })
         visible = trial_stiffness_visibility(
             current, candidates_by_tip, da_phys_m=da_phys_m,
             crack_band_radius_m=max(float(current.mesh.hbar_tip), float(crack_band_radius_m)),
@@ -359,7 +525,10 @@ def adapt_accepted_state_for_trials(
         if max(hbars.values(), default=0.0) <= target_hbar and min(visible.values(), default=1) > 0 and not marked:
             break
         if not marked:
-            marked = support
+            raise RuntimeError(
+                "active_tip_resolution_marker_inconsistency: "
+                f"hbar={max(hbars.values(), default=0.0):.17g} target={target_hbar:.17g}"
+            )
         refined, lineage = refine_accepted_state(
             current, marked_parent_elements=marked,
             active_tip_ids=current.crack_network.active_tip_ids,
@@ -376,6 +545,11 @@ def adapt_accepted_state_for_trials(
                 f"parent={before:.17g} prolonged={prolonged:.17g}"
             )
         current = refined; lineages.append(lineage)
+        next_roots = {}
+        for parent, children in lineage.parent_to_child_element_map.items():
+            for child in children:
+                next_roots[int(child)] = root_lineage[parent]
+        root_lineage = next_roots
     else:
         raise RuntimeError("nested_refinement_maximum_levels_exceeded")
 
@@ -408,13 +582,22 @@ def adapt_accepted_state_for_trials(
         refined_equilibrium_relative_correction=(equilibrium_energy - prolonged_energy) / max(abs(prolonged_energy), 1e-300),
         reaction_prolongated_N_per_m=prolonged_reaction,
         reaction_refined_equilibrium_N_per_m=float(equilibrium_reaction),
-        active_tip_hbar_m=active_tip_hbar(current),
+        active_tip_hbar_m=active_tip_hbar(current, contour_radius_m=contour_radius_m),
         trial_changed_element_count=visibility,
+        refinement_marking_diagnostics={
+            "schema": "v11.reason-resolved-adaptation-marking/1",
+            "cumulative_mark_operations": sum(
+                int(item["physical_mark_count"]) for item in marking_levels
+            ),
+            "unique_initial_parent_elements_affected": len(unique_roots),
+            "levels": marking_levels,
+        },
     )
 
 
 __all__ = [
-    "AdaptationAudit", "RefinementLineage", "active_tip_hbar",
-    "adapt_accepted_state_for_trials", "mark_multitip_trial_support",
+    "AdaptationAudit", "MarkingAudit", "MarkingReason", "PhysicalMarkRecord",
+    "RefinementLineage", "active_tip_hbar", "adapt_accepted_state_for_trials",
+    "diagnose_underresolved_trial_geometry", "mark_multitip_trial_support",
     "mesh_fingerprint", "refine_accepted_state", "trial_stiffness_visibility",
 ]

@@ -8,8 +8,9 @@ the summed hazard-derived dissipation.  It introduces no fracture criterion.
 from __future__ import annotations
 
 import copy
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, is_dataclass, replace
 import math
+import time
 from typing import Any, Callable, Iterable, Mapping
 
 import numpy as np
@@ -30,10 +31,59 @@ from .directional_competition_v11 import (
 MODEL_ID = "v11.monotonic_tip_only_live_fem_topology_transaction/1"
 
 
-def _copy(value: Any) -> Any:
+class FrozenMapping(dict):
+    """Pickle-safe immutable mapping shared by topology siblings."""
+    def _immutable(self, *args, **kwargs):
+        raise TypeError("accepted topology mapping is immutable")
+
+    __setitem__ = __delitem__ = clear = pop = popitem = setdefault = update = _immutable
+
+    def __deepcopy__(self, memo):
+        return self
+
+    def __reduce__(self):
+        return (_make_frozen_mapping, (dict(self),))
+
+
+def _make_frozen_mapping(values: Mapping[str, Any]) -> FrozenMapping:
+    frozen = dict.__new__(FrozenMapping)
+    dict.update(frozen, values)
+    return frozen
+
+
+def _freeze(value: Any) -> Any:
+    if isinstance(value, FrozenMapping):
+        return value
     if isinstance(value, np.ndarray):
-        return value.copy()
-    return copy.deepcopy(value)
+        array = np.asarray(value)
+        if array.flags.writeable:
+            array = array.copy(); array.setflags(write=False)
+        return array
+    if isinstance(value, Mapping):
+        return _make_frozen_mapping({key: _freeze(item) for key, item in value.items()})
+    if isinstance(value, (list, tuple)):
+        return tuple(_freeze(item) for item in value)
+    return value
+
+
+def _freeze_array_container(value: Any, names: tuple[str, ...]) -> Any:
+    changes = {}
+    requires_clone = False
+    for name in names:
+        item = getattr(value, name, None)
+        if isinstance(item, np.ndarray):
+            changes[name] = _freeze(item)
+            requires_clone |= item.flags.writeable
+    if not changes:
+        return value
+    if not requires_clone:
+        return value
+    if is_dataclass(value):
+        return replace(value, **changes)
+    clone = copy.copy(value)
+    for name, item in changes.items():
+        setattr(clone, name, item)
+    return clone
 
 
 @dataclass(frozen=True)
@@ -64,23 +114,30 @@ class LiveFEMTopologyState:
             raise ValueError("stored FEM energy must be finite")
         object.__setattr__(self, "stored_energy_J_per_m", energy)
         for name in ("damage", "displacement", "ep_gp", "rho_gp", "elasticity_D"):
-            array = np.asarray(getattr(self, name), dtype=float).copy()
+            source = np.asarray(getattr(self, name), dtype=float)
+            array = source if not source.flags.writeable else source.copy()
             if not np.all(np.isfinite(array)):
                 raise ValueError(f"{name} must be finite")
             array.setflags(write=False)
             object.__setattr__(self, name, array)
-        object.__setattr__(self, "tip_process_state", _copy(dict(self.tip_process_state)))
-        object.__setattr__(self, "junction_process_state", _copy(dict(self.junction_process_state)))
-        object.__setattr__(self, "energy_ledgers", _copy(dict(self.energy_ledgers)))
-        object.__setattr__(self, "event_counters", _copy(dict(self.event_counters)))
-        object.__setattr__(self, "rng_state", _copy(self.rng_state))
+        object.__setattr__(self, "mesh", _freeze_array_container(
+            self.mesh, ("nodes", "elems", "area_e", "dNdx_e", "B_e", "element_damage_gp"),
+        ))
+        object.__setattr__(self, "boundary", _freeze_array_container(
+            self.boundary, ("top_nodes", "bot_nodes", "notch_nodes"),
+        ))
+        object.__setattr__(self, "tip_process_state", _freeze(self.tip_process_state))
+        object.__setattr__(self, "junction_process_state", _freeze(self.junction_process_state))
+        object.__setattr__(self, "energy_ledgers", _freeze(self.energy_ledgers))
+        object.__setattr__(self, "event_counters", _freeze(self.event_counters))
+        object.__setattr__(self, "rng_state", _freeze(self.rng_state))
 
     def isolated_copy(self) -> "LiveFEMTopologyState":
         return LiveFEMTopologyState(
-            mesh=_copy(self.mesh), boundary=_copy(self.boundary),
+            mesh=self.mesh, boundary=self.boundary,
             damage=self.damage, displacement=self.displacement,
             ep_gp=self.ep_gp, rho_gp=self.rho_gp, elasticity_D=self.elasticity_D,
-            material=_copy(self.material), cohesive_network=_copy(self.cohesive_network),
+            material=self.material, cohesive_network=self.cohesive_network,
             crack_network=self.crack_network, competition=self.competition,
             tip_process_state=self.tip_process_state,
             junction_process_state=self.junction_process_state,
@@ -119,6 +176,8 @@ class TopologyTrialResult:
     hazard_dissipation_J_per_m: float
     energy_margin_J_per_m: float
     rejection_reason: str | None
+    trial_copy_bytes: int = 0
+    trial_copy_wall_time_s: float = 0.0
 
 
 GeometryTrial = Callable[[LiveFEMTopologyState, tuple[TopologyArm, ...]], LiveFEMTopologyState]
@@ -288,7 +347,15 @@ def execute_topology_trial(
     rewards = tuple(item.event_reward_m for item in trial_arms)
     reserved = reserve_action(accepted.competition, proposal, event_rewards_m=rewards)
     reserved_state = replace(accepted, competition=reserved)
-    trial = apply_trial_geometry(reserved_state.isolated_copy(), trial_arms)
+    copy_start = time.perf_counter()
+    isolated = reserved_state.isolated_copy()
+    copy_wall = time.perf_counter() - copy_start
+    mechanics = ("damage", "displacement", "ep_gp", "rho_gp", "elasticity_D")
+    copy_bytes = sum(
+        int(getattr(isolated, name).nbytes)
+        for name in mechanics if getattr(isolated, name) is not getattr(reserved_state, name)
+    )
+    trial = apply_trial_geometry(isolated, trial_arms)
     if network_geometry_already_realized:
         for arm in trial_arms:
             branch = trial.crack_network.branch(arm.branch_id)
@@ -312,7 +379,7 @@ def execute_topology_trial(
         release_reservation(reserved, proposal.action_id)
         return TopologyTrialResult(
             False, accepted, proposal.action_id, released, dissipation, margin,
-            "insufficient_whole_topology_energy_release",
+            "insufficient_whole_topology_energy_release", copy_bytes, copy_wall,
         )
     committed_competition = accept_reservation(trial.competition, proposal.action_id)
     committed_network = trial.crack_network
@@ -333,7 +400,10 @@ def execute_topology_trial(
             "hazard_dissipation_J_per_m": float(trial.energy_ledgers.get("hazard_dissipation_J_per_m", 0.0)) + dissipation,
         },
     )
-    return TopologyTrialResult(True, committed, proposal.action_id, released, dissipation, margin, None)
+    return TopologyTrialResult(
+        True, committed, proposal.action_id, released, dissipation, margin, None,
+        copy_bytes, copy_wall,
+    )
 
 
 __all__ = [

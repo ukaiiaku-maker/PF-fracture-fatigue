@@ -154,9 +154,21 @@ def continue_resolved_production(
                     "reaction_refined_equilibrium_N_per_m": adaptation.reaction_refined_equilibrium_N_per_m,
                     "adaptation_wall_time_s": time.perf_counter() - adaptation_start,
                     "provider_solve_count": runtime.live_fem_solve_count,
+                    "cumulative_mark_operations": adaptation.refinement_marking_diagnostics["cumulative_mark_operations"],
+                    "unique_initial_parent_elements_affected": adaptation.refinement_marking_diagnostics["unique_initial_parent_elements_affected"],
+                    "physical_marked_area_m2_by_level": [
+                        item["physical_marked_area_m2"]
+                        for item in adaptation.refinement_marking_diagnostics["levels"]
+                    ],
                 }
                 with (out / "mesh_adaptations.jsonl").open("a", encoding="utf-8") as stream:
                     stream.write(json.dumps(record, sort_keys=True, allow_nan=False) + "\n")
+                with (out / "refinement_marking_diagnostics.jsonl").open("a", encoding="utf-8") as stream:
+                    stream.write(json.dumps({
+                        "step": step,
+                        "root_to_tip_extension_um": record["root_to_tip_extension_um"],
+                        **adaptation.refinement_marking_diagnostics,
+                    }, sort_keys=True, allow_nan=False) + "\n")
                 bundle = {
                     "schema": "v11.multi-tip-engine-bundle/1", "owner_by_tip": owner_by_tip,
                     "engines": {key: _capture_shared_engine(value) for key, value in engines.items()},
@@ -389,6 +401,8 @@ def continue_resolved_production(
                 "consumption_result": "consumed" if item.diagnostic.selected else "preserved",
                 "pretrial_state_hash": context.accepted_state_id,
                 "postrollback_state_hash": None if result_item.accepted else context.accepted_state_id,
+                "trial_copy_bytes": result_item.trial_copy_bytes,
+                "trial_copy_wall_time_s": result_item.trial_copy_wall_time_s,
             })
             writer.append_trial(record)
         snapshot_reason = None

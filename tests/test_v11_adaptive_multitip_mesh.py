@@ -3,7 +3,8 @@ from dataclasses import replace
 import numpy as np
 
 from arrhenius_fracture.adaptive_multitip_mesh_v11 import (
-    _subdivide, mark_multitip_trial_support, mark_underresolved_trial_geometry,
+    _subdivide, active_tip_hbar, diagnose_underresolved_trial_geometry,
+    mark_multitip_trial_support, mark_underresolved_trial_geometry,
     mesh_fingerprint, refine_accepted_state,
 )
 from arrhenius_fracture.config import ElasticProperties
@@ -151,3 +152,33 @@ def test_local_resolution_contract_is_candidate_enumeration_invariant():
         da_phys_m=0.1, contour_radius_m=0.15, target_resolution_m=0.2,
     )
     assert first == second
+
+
+def test_fixed_physical_tip_hbar_is_not_diluted_by_global_element_count():
+    state, _ = fixture_state()
+    expected = active_tip_hbar(state, contour_radius_m=0.3)
+    nodes = state.mesh.nodes.tolist()
+    elems = state.mesh.elems.tolist()
+    for index in range(30):
+        base = len(nodes); x = 10.0 + index
+        nodes.extend(((x, 10.0), (x + 0.1, 10.0), (x, 10.1)))
+        elems.append((base, base + 1, base + 2))
+    mesh = rebuild_tri_mesh(np.asarray(nodes), np.asarray(elems), tip_centers=((0.75, 0.5),))
+    expanded = replace(
+        state, mesh=mesh, damage=np.pad(state.damage, (0, mesh.nn - state.mesh.nn)),
+        displacement=np.pad(state.displacement, (0, 2 * (mesh.nn - state.mesh.nn))),
+        ep_gp=np.pad(state.ep_gp, ((0, 0), (0, mesh.ne - state.mesh.ne))),
+        rho_gp=np.pad(state.rho_gp, (0, mesh.ne - state.mesh.ne)),
+    )
+    assert active_tip_hbar(expanded, contour_radius_m=0.3) == expected
+
+
+def test_reason_resolved_marks_are_local_and_below_threshold_children_are_not_remarked():
+    state, candidates = fixture_state()
+    audit = diagnose_underresolved_trial_geometry(
+        state.mesh, state.crack_network, {"b00000000": tuple(candidates)},
+        da_phys_m=0.1, contour_radius_m=0.15, target_resolution_m=0.2,
+    )
+    assert audit.marked_element_ids
+    assert all(record.controlling_metric_m > record.threshold_m for record in audit.records)
+    assert all(record.distance_to_current_tip_m <= 0.3 for record in audit.records)

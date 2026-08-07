@@ -19,6 +19,7 @@ TRIAL_FIELDS = (
     "net_energy_margin_J_per_m", "relative_energy_residual", "geometry_status",
     "equilibrium_status", "provider_identity", "accepted", "veto_reason",
     "reservation_result", "consumption_result", "pretrial_state_hash", "postrollback_state_hash",
+    "trial_copy_bytes", "trial_copy_wall_time_s",
 )
 BRANCH_EVENT_FIELDS = (
     "event_record_id", "step", "branch_junction", "parent_front", "arm_front_ids",

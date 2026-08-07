@@ -95,6 +95,38 @@ def test_rejected_trial_is_exact_accepted_snapshot_and_consumes_nothing():
     assert accepted.event_counters == {"topology_actions": 4}
 
 
+def test_isolated_siblings_share_read_only_accepted_mechanics_and_not_mutable_trials():
+    accepted = fem_state()
+    first = accepted.isolated_copy(); second = accepted.isolated_copy()
+    assert first.mesh is accepted.mesh is second.mesh
+    assert first.boundary is accepted.boundary is second.boundary
+    for name in ("damage", "displacement", "ep_gp", "rho_gp", "elasticity_D"):
+        assert getattr(first, name) is getattr(accepted, name) is getattr(second, name)
+        with pytest.raises(ValueError):
+            getattr(first, name).flat[0] = 99.0
+    with pytest.raises(TypeError):
+        first.event_counters["topology_actions"] = 99
+    changed = replace(first, damage=np.ones_like(first.damage))
+    assert changed.damage is not accepted.damage
+    np.testing.assert_array_equal(second.damage, accepted.damage)
+
+
+def test_trial_copy_audit_reports_zero_immutable_mechanics_bytes():
+    accepted = fem_state()
+    proposal = next(p for p in construct_action_proposals(
+        accepted.competition.hazard_states, correlation_interval_s=0.0,
+    ) if p.action_type == "one_arm")
+    result = execute_topology_trial(
+        accepted, proposal, (arm(proposal.member_candidate_ids[0]),),
+        apply_trial_geometry=lambda state, arms: apply_sharp_wake_trial_geometry(
+            state, arms, kill_radius_m=0.2,
+        ),
+        equilibrate_fixed_load=equilibrate_to(7.0),
+    )
+    assert result.trial_copy_bytes == 0
+    assert result.trial_copy_wall_time_s >= 0.0
+
+
 def test_one_arm_transaction_commits_one_reward_and_one_event():
     accepted = fem_state()
     proposal = next(p for p in construct_action_proposals(accepted.competition.hazard_states, correlation_interval_s=0.0) if p.action_type == "one_arm")
