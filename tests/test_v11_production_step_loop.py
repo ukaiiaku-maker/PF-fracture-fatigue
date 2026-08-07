@@ -9,6 +9,7 @@ from arrhenius_fracture.directional_competition_v11 import (
 from arrhenius_fracture.production_step_loop_v11 import (
     AcceptedStepContext, DirectionalStepRefinementRequired, advance_accepted_step,
 )
+from arrhenius_fracture.multi_tip_step_loop_v11 import advance_multi_tip_step
 from arrhenius_fracture.topology_transaction_v11 import TopologyTrialResult
 from tests.test_topology_transaction_v11 import fem_state
 
@@ -134,3 +135,44 @@ def test_adaptive_gate_rejects_unresolved_multi_event_interval_before_mutation()
         )
     assert caught.value.predicted_increment == pytest.approx(3.0)
     assert base.competition.pending_events == ()
+
+
+def test_pending_multi_tip_event_is_revalidated_against_current_signed_J():
+    competition = DirectionalCompetitionState.initialize(
+        tungsten_cleavage_candidates(theta_deg=45), global_hazard_seed=3621
+    )
+    base = fem_state(competition)
+    tip = base.crack_network.active_tip_ids[0]
+    first = advance_multi_tip_step(
+        base, {tip: competition}, AcceptedStepContext(2, 0.0, 1.0, "current-network"),
+        correlation_interval_s=0.0,
+        solve_accepted=lambda state, context: state,
+        evaluate_rates=lambda state, context: {tip: _rates(state, context)},
+        trial_action=lambda state, tip_id, proposal: _result(state, proposal, accepted=False),
+        update_process_states=lambda state, context, selected_tip, proposal: state,
+    )
+    assert first.competitions[tip].pending_events
+    trial_calls = []
+    negative_current_rates = tuple(
+        DirectionalRate(candidate.candidate_id, 0.0, -1.0, 0.0, 0.0, candidate.gamma_rel)
+        for candidate in competition.candidates
+    )
+    result = advance_multi_tip_step(
+        first.state, first.competitions,
+        AcceptedStepContext(3, 1.0, 0.1, "changed-network"),
+        correlation_interval_s=0.0,
+        solve_accepted=lambda state, context: state,
+        evaluate_rates=lambda state, context: {tip: negative_current_rates},
+        trial_action=lambda *args: trial_calls.append(args) or pytest.fail(
+            "nonpositive current signed J must veto before a topology trial"
+        ),
+        update_process_states=lambda state, context, selected_tip, proposal: state,
+    )
+    assert trial_calls == []
+    assert result.selected_proposal is None
+    assert result.trials
+    assert all(
+        item.diagnostic.result.rejection_reason == "current_signed_directional_J_nonpositive"
+        for item in result.trials
+    )
+    assert result.competitions[tip].pending_events

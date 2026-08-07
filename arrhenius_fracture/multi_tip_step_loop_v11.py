@@ -88,10 +88,29 @@ def advance_multi_tip_step(
     trials = []
     for tip in sorted(active):
         interval_state = replace(solved, competition=committed[tip])
+        rates_by_candidate = {
+            item.candidate_id: item for item in rates_by_tip[tip]
+        }
         for proposal in construct_action_proposals(
             committed[tip].hazard_states, correlation_interval_s=correlation_interval_s
         ):
-            result = trial_action(interval_state, tip, proposal)
+            # Completion of a directional first-passage clock is kinetic
+            # history, not an irrevocable authorization to extend a crack.
+            # Revalidate every pending member against the current, fully
+            # equilibrated crack-network mechanics before constructing a
+            # topology trial.  The event remains pending when this veto fires.
+            current_drives = tuple(
+                rates_by_candidate[candidate_id].signed_J_J_per_m2
+                for candidate_id in proposal.member_candidate_ids
+            )
+            if any(value <= 0.0 for value in current_drives):
+                result = TopologyTrialResult(
+                    False, interval_state, proposal.action_id,
+                    0.0, 0.0, 0.0,
+                    "current_signed_directional_J_nonpositive",
+                )
+            else:
+                result = trial_action(interval_state, tip, proposal)
             if not result.accepted and result.state is not interval_state:
                 raise RuntimeError("a rejected multi-tip trial mutated accepted state")
             trials.append(TipActionTrial(tip, ActionTrialDiagnostic(proposal, result)))

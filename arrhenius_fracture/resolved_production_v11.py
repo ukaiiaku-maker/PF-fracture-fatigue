@@ -371,6 +371,18 @@ def continue_resolved_production(
             rate_map = {rate.candidate_id: rate for rate in result.rates_by_tip[item.tip_id]}
             record = {field: None for field in TRIAL_FIELDS}
             arm_count = len(proposal_item.member_candidate_ids)
+            before_equilibrium = (latest_live or {}).get("base_equilibrium", {})
+            trial_payload = trial_data.get((item.tip_id, proposal_item.action_id))
+            after_live = None if trial_payload is None else trial_payload[3]
+            after_equilibrium = {} if after_live is None else after_live.get("base_equilibrium", {})
+            reaction_before = before_equilibrium.get("reaction_force")
+            reaction_after = after_equilibrium.get("reaction_force")
+
+            def apparent_compliance(reaction):
+                if reaction is None or not math.isfinite(float(reaction)) or abs(float(reaction)) <= 1.0e-300:
+                    return None
+                return float(accepted_load) / abs(float(reaction))
+
             record.update({
                 "step": step, "physical_time_s": physical_time,
                 "accepted_state_id": context.accepted_state_id,
@@ -384,6 +396,13 @@ def continue_resolved_production(
                 "signed_directional_J_J_per_m2": [rate_map[candidate].signed_J_J_per_m2 for candidate in proposal_item.member_candidate_ids],
                 "positive_directional_J_J_per_m2": [rate_map[candidate].positive_J_J_per_m2 for candidate in proposal_item.member_candidate_ids],
                 "directional_K_Pa_sqrt_m": [rate_map[candidate].K_directional_Pa_sqrt_m for candidate in proposal_item.member_candidate_ids],
+                "applied_displacement_m": float(accepted_load),
+                "reaction_force_before_N_per_m": reaction_before,
+                "reaction_force_after_N_per_m": reaction_after,
+                "apparent_compliance_before_m2_per_N": apparent_compliance(reaction_before),
+                "apparent_compliance_after_m2_per_N": apparent_compliance(reaction_after),
+                "topology_fingerprint_before": (latest_live or {}).get("topology_fingerprint"),
+                "topology_fingerprint_after": None if after_live is None else after_live.get("topology_fingerprint"),
                 "proposed_arm_lengths_m": [da_phys] * arm_count,
                 "realized_arm_lengths_m": [da_phys] * arm_count if result_item.accepted else [0.0] * arm_count,
                 "pretrial_potential_energy_J_per_m": result_item.state.stored_energy_J_per_m + result_item.energy_release_J_per_m,

@@ -281,6 +281,12 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
     )
     fingerprint = topology_fingerprint(**fingerprint_args)
     responses = [_shared_unit_response(request, base, item) for item in request.shared_perturbations]
+    applied_opening = float(Uy_top - Uy_bot)
+    reaction_force = float(base["reaction_top"])
+    apparent_compliance = (
+        applied_opening / abs(reaction_force)
+        if abs(reaction_force) > 1.0e-300 else None
+    )
     return {
         "schema": SCHEMA, "kernel_provider_id": PROVIDER_ID,
         "branching_mode": "direct_fem",
@@ -292,7 +298,9 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
         "production_physics_modified": False,
         "base_equilibrium": {
             "displacement": np.asarray(base["u"]),
-            "reaction_force": float(base["reaction_top"]),
+            "applied_displacement": applied_opening,
+            "reaction_force": reaction_force,
+            "apparent_compliance": apparent_compliance,
             "recoverable_potential_energy_J_per_m": energy,
         },
         "tips": tips, "signed_shared_cluster_response": responses,

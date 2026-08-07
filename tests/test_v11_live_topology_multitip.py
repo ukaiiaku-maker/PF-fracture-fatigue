@@ -1,6 +1,8 @@
 from dataclasses import replace
 import math
 
+import pytest
+
 from arrhenius_fracture.crack_network_v11 import CrackBranchState
 from arrhenius_fracture.live_topology_kernel_v11 import MAXIMUM_FRONTS_SUPPORTED, evaluate_exact_topology
 from tests.test_live_topology_kernel_v11 import live_straight_request
@@ -24,5 +26,11 @@ def test_exact_provider_measures_three_active_tips_without_topology_interpolatio
     assert MAXIMUM_FRONTS_SUPPORTED >= 3
     assert result["maximum_fronts_supported"] == MAXIMUM_FRONTS_SUPPORTED
     assert len(result["tips"]) == 3
+    equilibrium = result["base_equilibrium"]
+    assert equilibrium["applied_displacement"] > 0.0
+    assert equilibrium["reaction_force"] != 0.0
+    assert equilibrium["apparent_compliance"] == pytest.approx(
+        equilibrium["applied_displacement"] / abs(equilibrium["reaction_force"])
+    )
     assert all(math.isfinite(row["signed_J_J_per_m2"]) for tip in result["tips"] for row in tip["directional"])
     assert result["interpolation_permitted"] is False
