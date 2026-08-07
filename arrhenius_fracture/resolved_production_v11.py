@@ -13,6 +13,9 @@ import numpy as np
 
 from .branch_checkpoint_v11 import ProductionBranchCheckpoint, write_branch_checkpoint
 from .branch_cluster_guard_v11 import evaluate_unresolved_cluster_guard
+from .branch_scale_identity_v11 import (
+    resolve_branch_scale_identity, selected_local_J_contour_radius,
+)
 from .branch_cluster_v11 import create_unresolved_branch_cluster
 from .branch_policy_v11 import branch_birth_policy
 from .branch_snapshot_v11 import write_topology_snapshot
@@ -102,6 +105,7 @@ def continue_resolved_production(
     mat = state.material
     D = state.elasticity_D
     da_phys = float(args.da_phys if args.da_phys is not None else max(5.0 * base.eng_r_pz_hint(args), 2.0e-6))
+    scale_identity = resolve_branch_scale_identity(args, state.mesh)
     latest_sigma = None
     latest_live = None
     latest_rates = {}
@@ -612,7 +616,23 @@ def continue_resolved_production(
                 branch = state.crack_network.branch(branch_id)
                 match = next((item for item in (latest_live or {}).get("tips", ()) if np.allclose(item["tip_xy_m"], branch.tip)), None)
                 valid.append(bool(match and match["directional"] and all(row["local_contour_valid"] for row in match["directional"])))
-            guard = evaluate_unresolved_cluster_guard(state.crack_network, pending, process_zone_length_m=float(args.L_pz), local_J_contour_radius_m=float(getattr(args, "rJ", None) or args.L_pz), independently_valid_local_J=tuple(valid))
+            guard = evaluate_unresolved_cluster_guard(
+                state.crack_network, pending,
+                branch_handoff_length_m=scale_identity.branch_handoff_length_m,
+                local_J_contour_radius_m=selected_local_J_contour_radius(
+                    latest_live, scale_identity.local_J_contour_radius_m,
+                ),
+                independently_valid_local_J=tuple(valid),
+            )
+            current_scales = scale_identity.with_local_measurements(
+                J_contour_radius_m=guard.local_J_contour_radius_m,
+                hbar_m=float(getattr(state.mesh, "hbar_tip", 0.0) or state.mesh.hbar),
+            )
+            scale_columns = {key: current_scales.to_dict()[key] for key in (
+                "physical_process_zone_length_m", "branch_handoff_length_m",
+                "local_J_contour_radius_m", "interaction_integral_length_m",
+                "tip_h_fine_m", "actual_local_hbar_m", "event_length_da_phys_m",
+            )}
             writer.cluster({
                 "step": step, "cluster_id": cluster_id,
                 "parent_tip": pending.parent_branch_id,
@@ -633,6 +653,7 @@ def continue_resolved_production(
                 "handoff_step": step if guard.handoff_required else None,
                 "junction_reservoir_id": f"reservoir:{cluster_id}" if guard.handoff_required else None,
                 "resolved_tip_engine_ids": list(pending.arm_branch_ids) if guard.handoff_required else [],
+                **scale_columns,
             })
             if guard.handoff_required:
                 resolved = resolve_unresolved_cluster(
@@ -676,6 +697,7 @@ def continue_resolved_production(
                     "handoff_required": True, "handoff_step": step,
                     "junction_reservoir_id": resolved.reservoir.reservoir_id,
                     "resolved_tip_engine_ids": list(resolved.cluster.arm_branch_ids),
+                    **scale_columns,
                 })
                 snapshot_reason = "cluster_resolved"
 
@@ -713,7 +735,13 @@ def continue_resolved_production(
             provider_cache_identity=str(cache_root.resolve()), topology_fingerprint=runtime.routing.topology_fingerprint or _hash(state.crack_network),
             front_competitions=competitions, branch_clusters=tuple(clusters.values()),
             projected_extension_m=growth.max_forward_projected_extension_m,
-            physical_extension_m=extension, handoff_guard_diagnostics={}, termination_reason=None,
+            physical_extension_m=extension,
+            handoff_guard_diagnostics={"scale_identity": scale_identity.with_local_measurements(
+                J_contour_radius_m=selected_local_J_contour_radius(
+                    latest_live, scale_identity.local_J_contour_radius_m,
+                ),
+                hbar_m=float(getattr(state.mesh, "hbar_tip", 0.0) or state.mesh.hbar),
+            ).to_dict()}, termination_reason=None,
         )
         write_branch_checkpoint(checkpoint, out / "checkpoint" / "latest.json")
         crossed = next((value for value in (25e-6, 50e-6, 75e-6, 100e-6, 250e-6, 500e-6, 750e-6, 1000e-6) if last_snapshot_extension < value <= extension), None)

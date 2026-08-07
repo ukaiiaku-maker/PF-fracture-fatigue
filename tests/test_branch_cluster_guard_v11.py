@@ -31,7 +31,7 @@ def cluster_network(length=0.0, angle=math.pi / 4):
 def test_below_guard_continues_shared_cluster():
     network, cluster = cluster_network(length=4.9)
     diagnostic = evaluate_unresolved_cluster_guard(
-        network, cluster, process_zone_length_m=5.0,
+        network, cluster, branch_handoff_length_m=5.0,
         local_J_contour_radius_m=2.0,
         independently_valid_local_J=(True, True),
     )
@@ -43,7 +43,7 @@ def test_below_guard_continues_shared_cluster():
 def test_all_existing_scale_conditions_trigger_exact_controlled_stop():
     network, cluster = cluster_network(length=8.0)
     diagnostic = evaluate_unresolved_cluster_guard(
-        network, cluster, process_zone_length_m=5.0,
+        network, cluster, branch_handoff_length_m=5.0,
         local_J_contour_radius_m=2.0,
         independently_valid_local_J=(True, True),
     )
@@ -57,7 +57,7 @@ def test_all_existing_scale_conditions_trigger_exact_controlled_stop():
 def test_invalid_contour_or_overlap_keeps_cluster_unresolved():
     network, cluster = cluster_network(length=8.0, angle=0.1)
     diagnostic = evaluate_unresolved_cluster_guard(
-        network, cluster, process_zone_length_m=1.0,
+        network, cluster, branch_handoff_length_m=1.0,
         local_J_contour_radius_m=2.0,
         independently_valid_local_J=(True, False),
     )
@@ -70,7 +70,7 @@ def test_coalesced_arm_can_never_request_two_tip_handoff():
     first, second = cluster.arm_branch_ids
     network = mark_coalesced(network, second, first)
     diagnostic = evaluate_unresolved_cluster_guard(
-        network, cluster, process_zone_length_m=1.0,
+        network, cluster, branch_handoff_length_m=1.0,
         local_J_contour_radius_m=0.1,
         independently_valid_local_J=(True, True),
     )

@@ -24,6 +24,9 @@ from .branch_checkpoint_v11 import (
     ProductionBranchCheckpoint, restore_branch_checkpoint, write_branch_checkpoint,
 )
 from .branch_cluster_guard_v11 import evaluate_unresolved_cluster_guard
+from .branch_scale_identity_v11 import (
+    resolve_branch_scale_identity, selected_local_J_contour_radius,
+)
 from .branch_cluster_v11 import BranchClusterState, create_unresolved_branch_cluster
 from .branch_output_v11 import (
     BRANCH_EVENT_FIELDS, ENERGY_FIELDS, FRONT_FIELDS, PROVIDER_FIELDS, TRIAL_FIELDS,
@@ -286,6 +289,22 @@ def run_2d(args):
     engine = base.build_engine(args, mat)
     da_phys = float(args.da_phys if args.da_phys is not None else max(5.0 * base.eng_r_pz_hint(args), 2.0e-6))
     engine.f.da = da_phys
+    scale_identity = resolve_branch_scale_identity(args, mesh)
+    audit_path = out / "v11_branching_model_audit.json"
+    if audit_path.is_file():
+        audit = json.loads(audit_path.read_text())
+        audit["runtime_scale_identity"] = scale_identity.to_dict()
+        persistent = getattr(engine, "_persistent_site_cfg", None)
+        audit["source_zone_length_m"] = (
+            None if persistent is None else float(persistent.source_zone_length_m)
+        )
+        audit["source_zone_length_source"] = (
+            None if persistent is None else
+            "selected_material_manifest.persistent_site_config.source_zone_length_m"
+        )
+        temporary = audit_path.with_name(audit_path.name + ".tmp")
+        temporary.write_text(json.dumps(audit, indent=2, sort_keys=True, allow_nan=False) + "\n")
+        os.replace(temporary, audit_path)
     engine.f.max_advances_per_step = 1
     theta = float(getattr(args, "crystal_theta_deg", 0.0) or 0.0)
     candidates = tungsten_cleavage_candidates(
@@ -887,9 +906,16 @@ def run_2d(args):
                 for branch_id in cluster.arm_branch_ids
             )
             guard = evaluate_unresolved_cluster_guard(
-                state.crack_network, cluster, process_zone_length_m=float(args.L_pz),
-                local_J_contour_radius_m=float(getattr(args, "rJ", None) or args.L_pz),
+                state.crack_network, cluster,
+                branch_handoff_length_m=scale_identity.branch_handoff_length_m,
+                local_J_contour_radius_m=selected_local_J_contour_radius(
+                    accepted_live, scale_identity.local_J_contour_radius_m,
+                ),
                 independently_valid_local_J=independently_valid,
+            )
+            current_scales = scale_identity.with_local_measurements(
+                J_contour_radius_m=guard.local_J_contour_radius_m,
+                hbar_m=float(getattr(state.mesh, "hbar_tip", 0.0) or state.mesh.hbar),
             )
             writer.cluster({
                 "step": step, "cluster_id": cluster.cluster_id,
@@ -909,6 +935,11 @@ def run_2d(args):
                 "handoff_step": step if guard.handoff_required else None,
                 "junction_reservoir_id": f"reservoir:{cluster.cluster_id}" if guard.handoff_required else None,
                 "resolved_tip_engine_ids": list(cluster.arm_branch_ids) if guard.handoff_required else [],
+                **{key: current_scales.to_dict()[key] for key in (
+                    "physical_process_zone_length_m", "branch_handoff_length_m",
+                    "local_J_contour_radius_m", "interaction_integral_length_m",
+                    "tip_h_fine_m", "actual_local_hbar_m", "event_length_da_phys_m",
+                )},
             })
         checkpoint = ProductionBranchCheckpoint(
             state=state, shared_process_state=_capture_shared_engine(engine),
@@ -920,7 +951,10 @@ def run_2d(args):
             branch_clusters=(() if cluster is None else (cluster,)),
             projected_extension_m=max(branch.tip[0] for branch in state.crack_network.branches) - cfg.geometry.a0,
             physical_extension_m=state.crack_network.total_physical_crack_length_m - cfg.geometry.a0,
-            handoff_guard_diagnostics={} if guard is None else guard.to_dict(),
+            handoff_guard_diagnostics=(
+                {"scale_identity": scale_identity.to_dict()} if guard is None else
+                {**guard.to_dict(), "scale_identity": current_scales.to_dict()}
+            ),
             termination_reason=None,
         )
         checkpoint_path = out / "checkpoint" / "latest.json"

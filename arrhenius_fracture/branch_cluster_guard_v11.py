@@ -16,7 +16,7 @@ class BranchClusterGuardDiagnostic:
     cluster_id: str
     tip_separation_m: float
     arm_arclengths_from_junction_m: tuple[float, float]
-    process_zone_length_m: float
+    branch_handoff_length_m: float
     local_J_contour_radius_m: float
     local_contours_overlap: bool
     independently_valid_local_J: tuple[bool, bool]
@@ -30,7 +30,7 @@ class BranchClusterGuardDiagnostic:
             "cluster_id": self.cluster_id,
             "tip_separation_m": self.tip_separation_m,
             "arm_arclengths_from_junction_m": list(self.arm_arclengths_from_junction_m),
-            "process_zone_length_m": self.process_zone_length_m,
+            "branch_handoff_length_m": self.branch_handoff_length_m,
             "local_J_contour_radius_m": self.local_J_contour_radius_m,
             "local_contours_overlap": self.local_contours_overlap,
             "independently_valid_local_J": list(self.independently_valid_local_J),
@@ -39,8 +39,8 @@ class BranchClusterGuardDiagnostic:
             "handoff_required": self.handoff_required,
             "termination_status": self.termination_status,
             "guard_scale_contract": {
-                "minimum_arm_length": "max(process_zone_length, local_J_contour_radius)",
-                "minimum_tip_separation": "process_zone_length",
+                "minimum_arm_length": "max(branch_handoff_length, local_J_contour_radius)",
+                "minimum_tip_separation": "branch_handoff_length",
                 "nonoverlap": "tip_separation >= 2*local_J_contour_radius",
                 "fitted_parameters": False,
             },
@@ -51,15 +51,15 @@ def evaluate_unresolved_cluster_guard(
     network: CrackNetworkState,
     cluster: BranchClusterState,
     *,
-    process_zone_length_m: float,
+    branch_handoff_length_m: float,
     local_J_contour_radius_m: float,
     independently_valid_local_J: tuple[bool, bool],
 ) -> BranchClusterGuardDiagnostic:
     """Stop only when every inherited scale/contour test identifies two tips."""
-    Lpz = float(process_zone_length_m)
+    handoff_length = float(branch_handoff_length_m)
     radius = float(local_J_contour_radius_m)
-    if not math.isfinite(Lpz) or Lpz <= 0.0:
-        raise ValueError("process-zone length must be finite and positive")
+    if not math.isfinite(handoff_length) or handoff_length <= 0.0:
+        raise ValueError("branch handoff length must be finite and positive")
     if not math.isfinite(radius) or radius <= 0.0:
         raise ValueError("local J-contour radius must be finite and positive")
     if not cluster.unresolved:
@@ -83,16 +83,16 @@ def evaluate_unresolved_cluster_guard(
     if any(branch.root != junction for branch in arms):
         raise ValueError("cluster arm does not begin at the branch junction")
     separation = math.dist(arms[0].tip, arms[1].tip)
-    minimum_length = max(Lpz, radius)
+    minimum_length = max(handoff_length, radius)
     sufficient = tuple(length >= minimum_length for length in lengths)
     overlaps = separation < 2.0 * radius
-    separation_ready = separation >= Lpz
+    separation_ready = separation >= handoff_length
     required = all(sufficient) and separation_ready and all(valid) and not overlaps
     return BranchClusterGuardDiagnostic(
         cluster_id=cluster.cluster_id,
         tip_separation_m=separation,
         arm_arclengths_from_junction_m=lengths,
-        process_zone_length_m= Lpz,
+        branch_handoff_length_m=handoff_length,
         local_J_contour_radius_m=radius,
         local_contours_overlap=overlaps,
         independently_valid_local_J=valid,

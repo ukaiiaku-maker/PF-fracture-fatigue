@@ -41,6 +41,9 @@ CLUSTER_FIELDS = (
     "separation_reaches_process_zone", "local_contours_overlap",
     "independently_valid_local_J", "handoff_required", "handoff_step",
     "junction_reservoir_id", "resolved_tip_engine_ids",
+    "physical_process_zone_length_m", "branch_handoff_length_m",
+    "local_J_contour_radius_m", "interaction_integral_length_m",
+    "tip_h_fine_m", "actual_local_hbar_m", "event_length_da_phys_m",
 )
 FRONT_FIELDS = ("step", "front_id", "parent_front_id", "status", "termination_reason", "tip_x_m", "tip_y_m", "arclength_m")
 PROVIDER_FIELDS = ("step", "from_provider", "to_provider", "state_hash", "topology_fingerprint", "parity_passed", "residuals")
