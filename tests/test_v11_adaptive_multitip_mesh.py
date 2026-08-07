@@ -3,7 +3,8 @@ from dataclasses import replace
 import numpy as np
 
 from arrhenius_fracture.adaptive_multitip_mesh_v11 import (
-    _subdivide, active_tip_hbar, diagnose_underresolved_trial_geometry,
+    _subdivide, active_tip_hbar, adapt_accepted_state_for_trials,
+    diagnose_underresolved_trial_geometry,
     mark_multitip_trial_support, mark_underresolved_trial_geometry,
     mesh_fingerprint, refine_accepted_state,
 )
@@ -182,3 +183,19 @@ def test_reason_resolved_marks_are_local_and_below_threshold_children_are_not_re
     assert audit.marked_element_ids
     assert all(record.controlling_metric_m > record.threshold_m for record in audit.records)
     assert all(record.distance_to_current_tip_m <= 0.3 for record in audit.records)
+
+
+def test_final_mesh_is_validated_after_last_permitted_refinement_level():
+    state, candidates = fixture_state()
+    # The fixture already satisfies this deliberately loose local contract, so
+    # maximum_levels=0 exercises the same post-loop validation path used after
+    # a real eighth and final refinement.
+    adapted, audit = adapt_accepted_state_for_trials(
+        state, {"b00000000": tuple(candidates)}, da_phys_m=0.1,
+        tip_h_fine_m=1.0, contour_radius_m=0.3,
+        crack_band_radius_m=0.0, accepted_load_m=0.0,
+        maximum_levels=0,
+    )
+    assert adapted.mesh is state.mesh
+    assert audit.lineages == ()
+    assert min(audit.trial_changed_element_count.values()) > 0

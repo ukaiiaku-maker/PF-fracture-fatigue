@@ -476,6 +476,7 @@ def adapt_accepted_state_for_trials(
     marking_levels: list[dict[str, object]] = []
     root_lineage = {element_id: element_id for element_id in range(state.mesh.ne)}
     unique_roots: set[int] = set()
+    resolution_gate_passed = False
     for level in range(1, int(maximum_levels) + 1):
         hbars = active_tip_hbar(current, contour_radius_m=contour_radius_m)
         marking = diagnose_underresolved_trial_geometry(
@@ -523,6 +524,7 @@ def adapt_accepted_state_for_trials(
             crack_band_radius_m=max(float(current.mesh.hbar_tip), float(crack_band_radius_m)),
         )
         if max(hbars.values(), default=0.0) <= target_hbar and min(visible.values(), default=1) > 0 and not marked:
+            resolution_gate_passed = True
             break
         if not marked:
             raise RuntimeError(
@@ -550,8 +552,35 @@ def adapt_accepted_state_for_trials(
             for child in children:
                 next_roots[int(child)] = root_lineage[parent]
         root_lineage = next_roots
-    else:
-        raise RuntimeError("nested_refinement_maximum_levels_exceeded")
+
+    if not resolution_gate_passed:
+        # A mesh refined on the final permitted level has not yet passed
+        # through the loop header again.  Validate that resulting mesh before
+        # declaring exhaustion; this is not an additional refinement level.
+        final_hbars = active_tip_hbar(current, contour_radius_m=contour_radius_m)
+        final_marking = diagnose_underresolved_trial_geometry(
+            current.mesh, current.crack_network, candidates_by_tip,
+            da_phys_m=da_phys_m, contour_radius_m=contour_radius_m,
+            target_resolution_m=target_hbar,
+        )
+        final_visible = trial_stiffness_visibility(
+            current, candidates_by_tip, da_phys_m=da_phys_m,
+            crack_band_radius_m=max(float(current.mesh.hbar_tip), float(crack_band_radius_m)),
+        )
+        if (
+            max(final_hbars.values(), default=0.0) > target_hbar
+            or min(final_visible.values(), default=1) <= 0
+            or final_marking.marked_element_ids
+        ):
+            raise RuntimeError("nested_refinement_maximum_levels_exceeded")
+        marking_levels.append({
+            "level": int(maximum_levels), "element_count_before": current.mesh.ne,
+            "physical_mark_count": 0, "physical_marked_area_m2": 0.0,
+            "marked_region_bounding_box": None,
+            "unique_initial_parent_elements_affected": 0,
+            "counts_by_reason": {}, "counts_by_tip_candidate_reason": [],
+            "records": [],
+        })
 
     visibility = trial_stiffness_visibility(
         current, candidates_by_tip, da_phys_m=da_phys_m,
