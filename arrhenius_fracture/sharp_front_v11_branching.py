@@ -46,7 +46,7 @@ from .production_step_loop_v11 import (
 )
 from .topology_transaction_v11 import (
     LiveFEMTopologyState, TopologyArm, TopologyTrialResult,
-    apply_sharp_wake_trial_geometry, execute_topology_trial, extend_network_arm,
+    apply_causal_sharp_wake_trial_geometry, execute_topology_trial, extend_network_arm,
 )
 
 
@@ -280,7 +280,7 @@ def run_2d(args):
         ep_gp=ep_gp, rho_gp=rho_gp, elasticity_D=D, material=mat,
         cohesive_network=None, crack_network=network, competition=competition,
         tip_process_state={"shared_engine_model": type(engine).__name__},
-        junction_process_state={}, energy_ledgers={name: 0.0 for name in (
+        junction_process_state={"crack_representation": "sharp_wake_causal_v11"}, energy_ledgers={name: 0.0 for name in (
             "retained", "mobile", "escaped", "recovered", "stored_energy",
             "emission_work", "unconsumed_action", "topology_release_J_per_m",
             "hazard_dissipation_J_per_m",
@@ -511,10 +511,7 @@ def run_2d(args):
                     trial_state, crack_network=realized,
                     junction_process_state=({"cluster": trial_cluster} if trial_cluster else {}),
                 )
-                return apply_sharp_wake_trial_geometry(
-                    trial_state, trial_arms,
-                    kill_radius_m=max(float(getattr(current.mesh, "hbar_tip", 0.0) or current.mesh.hbar), 0.5e-6),
-                )
+                return apply_causal_sharp_wake_trial_geometry(trial_state, trial_arms)
 
             def equilibrate(trial_state):
                 nonlocal runtime

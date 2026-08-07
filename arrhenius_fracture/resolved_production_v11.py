@@ -28,7 +28,7 @@ from .adaptive_multitip_mesh_v11 import adapt_accepted_state_for_trials, mesh_fi
 from .production_step_loop_v11 import AcceptedStepContext, DirectionalStepRefinementRequired
 from .resolved_tip_state_v11 import resolve_unresolved_cluster
 from .topology_transaction_v11 import (
-    TopologyArm, TopologyTrialResult, apply_sharp_wake_trial_geometry,
+    TopologyArm, TopologyTrialResult, apply_causal_sharp_wake_trial_geometry,
     clip_arm_at_first_intersection, execute_topology_trial, extend_network_arm,
     mark_coalesced,
 )
@@ -276,7 +276,7 @@ def continue_resolved_production(
                     if target is not None:
                         realized = mark_coalesced(realized, arm.branch_id, target)
                 trial = replace(trial, crack_network=realized)
-                return apply_sharp_wake_trial_geometry(trial, realized_arms, kill_radius_m=max(float(getattr(current.mesh, "hbar_tip", 0.0) or current.mesh.hbar), 0.5e-6))
+                return apply_causal_sharp_wake_trial_geometry(trial, realized_arms)
 
             def equilibrate(trial):
                 request = _request(trial, candidates, args=args, cfg=cfg, runtime_step=step, cluster=trial_cluster)

@@ -16,6 +16,7 @@ import numpy as np
 
 from .crack_network_v11 import CrackBranchState, CrackNetworkState
 from .crack_backend import SharpWakeBackend
+from .causal_sharp_wake_v11 import apply_causal_segment
 from .coalescence import segment_intersection_first
 from .directional_competition_v11 import (
     CompetingActionProposal,
@@ -167,6 +168,33 @@ def apply_sharp_wake_trial_geometry(
     return current
 
 
+def apply_causal_sharp_wake_trial_geometry(
+    state: LiveFEMTopologyState,
+    arms: tuple[TopologyArm, ...],
+) -> LiveFEMTopologyState:
+    """Insert v11 arms with causal P0 support and reject invisible trials."""
+    current = state
+    audits = []
+    for arm in arms:
+        current, audit = apply_causal_segment(
+            current, np.asarray(arm.start_xy_m), np.asarray(arm.end_xy_m),
+        )
+        if not audit.mechanically_resolved:
+            raise RuntimeError(
+                "sharp_wake_trial_not_mechanically_resolved: "
+                f"branch={arm.branch_id} candidate={arm.candidate_id}"
+            )
+        audits.append({
+            "branch_id": arm.branch_id,
+            "candidate_id": arm.candidate_id,
+            **audit.__dict__,
+        })
+    junction = dict(current.junction_process_state)
+    junction["latest_causal_support_trials"] = tuple(audits)
+    junction["crack_representation"] = "sharp_wake_causal_v11"
+    return replace(current, junction_process_state=junction)
+
+
 def _replace_branch(network: CrackNetworkState, updated: CrackBranchState) -> CrackNetworkState:
     branches = tuple(updated if item.branch_id == updated.branch_id else item for item in network.branches)
     return replace(network, branches=branches, geometry_generation=network.geometry_generation + 1)
@@ -181,6 +209,16 @@ def extend_network_arm(network: CrackNetworkState, arm: TopologyArm) -> CrackNet
         arm.end_xy_m[1] - arm.start_xy_m[1],
         arm.end_xy_m[0] - arm.start_xy_m[0],
     )
+    local = dict(branch.local_state)
+    edges = list(local.get("committed_edges", ()))
+    edges.append({
+        "start_point_m": list(arm.start_xy_m),
+        "end_point_m": list(arm.end_xy_m),
+        "branch_id": arm.branch_id,
+        "parent_or_junction_id": branch.parent_branch_id,
+        "commit_event_id": int(network.geometry_generation + 1),
+    })
+    local["committed_edges"] = edges
     updated = replace(
         branch,
         path=branch.path + (tuple(arm.end_xy_m),),
@@ -188,6 +226,7 @@ def extend_network_arm(network: CrackNetworkState, arm: TopologyArm) -> CrackNet
             (angle,) if len(branch.path) == 1
             else branch.orientation_history_rad + (angle,)
         ),
+        local_state=local,
     )
     return _replace_branch(network, updated)
 
@@ -299,7 +338,8 @@ def execute_topology_trial(
 
 __all__ = [
     "LiveFEMTopologyState", "MODEL_ID", "TopologyArm", "TopologyTrialResult",
-    "apply_sharp_wake_trial_geometry", "clip_arm_at_first_intersection",
+    "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry",
+    "clip_arm_at_first_intersection",
     "equilibrate_fixed_load_with_production_fem", "execute_topology_trial",
     "extend_network_arm", "mark_coalesced",
 ]

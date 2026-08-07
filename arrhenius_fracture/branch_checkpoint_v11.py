@@ -82,6 +82,9 @@ class ProductionBranchCheckpoint:
             "topology_fingerprint": self.topology_fingerprint,
             "physical_topology_fingerprint": physical_topology_fingerprint,
             "mechanical_discretization_fingerprint": mesh_fingerprint(self.state.mesh),
+            "crack_representation": dict(self.state.junction_process_state).get(
+                "crack_representation", "legacy_sharp_wake"
+            ),
             "mesh_generation": int(self.state.event_counters.get("mesh_generation", 0)),
             "refinement_operation_index": int(self.state.event_counters.get("refinement_operation_index", 0)),
             "mesh_refinement_lineage": dict(self.state.junction_process_state).get("mesh_refinement"),

@@ -189,6 +189,7 @@ def _distance_to_segment(points: np.ndarray, p0: np.ndarray, p1: np.ndarray) -> 
 
 
 def mark_multitip_trial_support(mesh, network, candidates_by_tip, *, da_phys_m: float, contour_radius_m: float, crack_band_radius_m: float) -> tuple[int, ...]:
+    from .causal_sharp_wake_v11 import causal_segment_support
     centroids = mesh.nodes[mesh.elems].mean(axis=1)
     element_radius = np.sqrt(np.maximum(mesh.area_e, 0.0))
     marked = np.zeros(mesh.ne, dtype=bool)
@@ -198,6 +199,11 @@ def mark_multitip_trial_support(mesh, network, candidates_by_tip, *, da_phys_m: 
         marked |= np.linalg.norm(centroids - tip, axis=1) <= float(contour_radius_m) + element_radius
         for candidate in sorted(candidates_by_tip[tip_id], key=lambda item: item.candidate_id):
             end = tip + float(da_phys_m) * np.asarray(candidate.direction_xy, dtype=float)
+            # Centroid/radius corridor tests can miss long, low-area conformity
+            # triangles.  Every element intersected by the physical proposal is
+            # therefore included explicitly before the causal P0 trial.
+            intersected, _ = causal_segment_support(mesh, tip, end)
+            marked[intersected] = True
             marked |= _distance_to_segment(centroids, tip, end) <= support + element_radius
             # Every sibling trial must also land in an already qualified J
             # support patch.  Refining this union before A1/A2/A12 avoids a
@@ -239,24 +245,14 @@ def _mean_edge_length(mesh) -> np.ndarray:
 
 
 def trial_stiffness_visibility(state, candidates_by_tip, *, da_phys_m: float, crack_band_radius_m: float) -> dict[str, int]:
-    from .crack_backend import SharpWakeBackend
-    inherited = getattr(state.mesh, "element_damage_gp", None)
-    if inherited is None:
-        inherited = np.mean(np.asarray(state.damage)[state.mesh.elems], axis=1)
+    from .causal_sharp_wake_v11 import apply_causal_segment
     result: dict[str, int] = {}
     for tip_id in sorted(state.crack_network.active_tip_ids):
         tip = np.asarray(state.crack_network.branch(tip_id).tip, dtype=float)
         for candidate in sorted(candidates_by_tip[tip_id], key=lambda item: item.candidate_id):
             end = tip + float(da_phys_m) * np.asarray(candidate.direction_xy, dtype=float)
-            trial = SharpWakeBackend().advance(
-                mesh=state.mesh, boundary=state.boundary, damage=state.damage,
-                displacement=state.displacement, p0=tip, p1=end,
-                kill_r=float(crack_band_radius_m),
-            )
-            after = getattr(trial.mesh, "element_damage_gp", None)
-            if after is None:
-                after = np.mean(np.asarray(trial.damage)[trial.mesh.elems], axis=1)
-            result[f"{tip_id}|{candidate.candidate_id}"] = int(np.count_nonzero(np.asarray(after) != inherited))
+            _, audit = apply_causal_segment(state, tip, end)
+            result[f"{tip_id}|{candidate.candidate_id}"] = audit.newly_degraded_element_count
     return result
 
 
@@ -314,7 +310,7 @@ def adapt_accepted_state_for_trials(
     )
     if min(visibility.values(), default=0) <= 0:
         invisible = sorted(key for key, value in visibility.items() if value <= 0)
-        raise RuntimeError(f"unresolved_trial_stiffness_topology: {invisible}")
+        raise RuntimeError(f"sharp_wake_trial_not_mechanically_resolved: {invisible}")
     prolonged_energy, prolonged_reaction = _stored_energy_and_reaction(current)
     K, residual, *_ = assemble_mechanics(
         current.mesh, current.displacement, current.ep_gp, current.rho_gp,

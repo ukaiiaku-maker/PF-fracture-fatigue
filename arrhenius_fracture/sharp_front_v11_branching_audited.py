@@ -15,7 +15,7 @@ from .live_topology_kernel_registry_v11 import PREBRANCH_PROVIDER_ID
 from .live_topology_kernel_v11 import PROVIDER_ID
 
 
-MODEL_ID = "v11.mechanistic_branching.monotonic_tip_only_sharp_wake/1"
+MODEL_ID = "v11.mechanistic_branching.monotonic_tip_only_sharp_wake_causal/2"
 AUDIT_NAME = "v11_branching_model_audit.json"
 
 
@@ -25,6 +25,7 @@ class AuditedBranchingPolicy:
     loading: str = "monotonic"
     plasticity: str = "tip_only"
     crack_backend: str = "sharp_wake"
+    crack_representation: str = "sharp_wake_causal_v11"
     maximum_fronts: int = 16
     maximum_branch_births: int = 8
     directional_J: str = "positive_signed_raw"
