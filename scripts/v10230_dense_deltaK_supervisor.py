@@ -107,7 +107,9 @@ def validate_staged(root:Path)->dict:
             source=q.read_json(case/SOURCE_NAME)
             if source.get("source_checkpoint_generation")!=q.read_json(case/"output/run_state_checkpoint.json").get("generation") or not q.checkpoint_valid(case,row):
                 raise RuntimeError(f'{row["case"]}: staged resume changed')
-        elif q.checkpoint_valid(case,row): raise RuntimeError(f'{row["case"]}: fresh case points to checkpoint')
+        elif (q.read_json(case/"qualification_status.json").get("status")=="pending" and
+              q.checkpoint_valid(case,row)):
+            raise RuntimeError(f'{row["case"]}: unlaunched fresh case points to checkpoint')
     return payload
 
 

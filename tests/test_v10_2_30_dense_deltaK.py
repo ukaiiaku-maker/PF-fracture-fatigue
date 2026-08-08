@@ -39,3 +39,13 @@ def test_excluded_case_is_fail_closed_before_worker_launch(tmp_path):
     case=tmp_path/'ceramic_f0p825_seed3001729';case.mkdir()
     dense.q.atomic_json(tmp_path/dense.EXCLUSIONS_NAME,{'cases':{case.name:{'queue_action':'skip'}}})
     assert dense.classify(case,next(r for r in dense.matrix() if r['case']==case.name))=='blocked-before-launch'
+
+def test_staged_validator_allows_checkpoint_only_after_fresh_case_was_launched(tmp_path,monkeypatch):
+    row=next(r for r in dense.matrix() if r['mode']=='fresh');case=tmp_path/row['case'];case.mkdir(parents=True)
+    rows=[row]*32;dense.q.atomic_json(tmp_path/'dense_deltaK_matrix.json',{'schema':'v10.2.30_dense_deltaK_preflight_v1','cases':rows})
+    monkeypatch.setattr(dense.q,'checkpoint_valid',lambda _case,_row:True)
+    dense.q.atomic_json(case/'qualification_status.json',{'status':'running'})
+    assert dense.validate_staged(tmp_path)['cases']==rows
+    dense.q.atomic_json(case/'qualification_status.json',{'status':'pending'})
+    import pytest
+    with pytest.raises(RuntimeError,match='unlaunched fresh case'):dense.validate_staged(tmp_path)
