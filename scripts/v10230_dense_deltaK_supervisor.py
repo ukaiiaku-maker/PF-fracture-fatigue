@@ -21,6 +21,7 @@ FRACTIONS = (0.925, 0.900, 0.875, 0.850, 0.825, 0.800, 0.775, 0.750)
 CYCLES_MAX = 1e14
 TARGET_UM = 100.0
 SOURCE_NAME = "dense_restart_source.json"
+EXCLUSIONS_NAME = "dense_scope_exclusions.json"
 BASE_MATRIX = q.matrix
 BASE_CLASSIFY = q.classify
 
@@ -38,7 +39,9 @@ def matrix() -> list[dict]:
 
 
 def inspect_resume(source_root: Path, row: dict) -> dict:
-    source_case=source_root/f'{row["label"]}_f0p75_seed{row["seed"]}'; output=source_case/"output"
+    source_case=source_root/f'{row["label"]}_f0p75_seed{row["seed"]}'
+    if not source_case.exists(): source_case=source_root/row["case"]
+    output=source_case/"output"
     if not q.checkpoint_valid(source_case,row): raise RuntimeError(f'{row["case"]}: invalid source checkpoint')
     outer,kinetic,_=load_combined_checkpoint(output); validate_cross_layer(outer,kinetic)
     control=q.read_json(output/"v10_2_30_fixed_deltaK_control.json")
@@ -111,6 +114,9 @@ def validate_staged(root:Path)->dict:
 def classify(case: Path, row: dict | None = None) -> str:
     """Recognize both no-growth and after-growth physical horizon censors."""
     old=q.read_json(case/"qualification_status.json")
+    exclusions=q.read_json(case.parent/EXCLUSIONS_NAME).get("cases",{})
+    if case.name in exclusions and exclusions[case.name].get("queue_action")=="skip":
+        return "blocked-before-launch"
     if old.get("status") in q.TERMINAL: return old["status"]
     output=q.artifacts(case)
     if (output/"exit_code.txt").is_file():
@@ -124,6 +130,41 @@ def classify(case: Path, row: dict | None = None) -> str:
                         (cycles is not None and float(cycles)>=CYCLES_MAX)):
             return "censored"
     return BASE_CLASSIFY(case,row)
+
+
+def exclude_lower_ceramic(root: Path) -> dict:
+    """Record the approved ceramic scope reduction without inventing censors."""
+    root=root.resolve()
+    if (root/q.LOCK_NAME).exists() or (root/"active_workers.json").exists():
+        raise RuntimeError("scope exclusions require a stopped supervisor")
+    dispositions={}
+    for fraction in (.875,.850):
+        row=next(r for r in matrix() if r["label"]=="ceramic" and r["fraction"]==fraction)
+        case=root/row["case"]
+        if not q.checkpoint_valid(case,row): raise RuntimeError(f'{row["case"]}: partial checkpoint is invalid')
+        outer,kinetic,_=load_combined_checkpoint(case/"output"); validate_cross_layer(outer,kinetic)
+        tip=outer["geometry"]["crack_tip_m"]
+        extension_um=(float(tip[0])-0.0005)*1e6
+        disposition={"terminal_classification":"incomplete_restartable","queue_action":"skip",
+            "reason":"exact_first_passage_localization_stall_at_B_near_one",
+            "cycles":outer["cycles_total"],"event_count":outer["geometry"]["committed_event_count"],
+            "projected_extension_um":extension_um,"checkpoint_generation":q.read_json(case/"output/run_state_checkpoint.json").get("generation"),
+            "checkpoint_valid":True,"B":kinetic["stochastic"]["B"],
+            "hazard_action_current":kinetic["stochastic"]["hazard_action_current"],
+            "hazard_threshold_action":kinetic["stochastic"]["hazard_threshold_action"]}
+        dispositions[row["case"]]=disposition
+        q.set_status(case,"incomplete_restartable",**disposition)
+    for fraction in (.825,.800,.775,.750):
+        row=next(r for r in matrix() if r["label"]=="ceramic" and r["fraction"]==fraction)
+        case=root/row["case"]
+        disposition={"terminal_classification":"blocked_before_launch","queue_action":"skip",
+            "reason":"approved_ceramic_lower_deltaK_scope_exclusion","cycles":None,"event_count":0,
+            "projected_extension_um":0.0,"checkpoint_valid":q.checkpoint_valid(case,row)}
+        dispositions[row["case"]]=disposition
+        q.set_status(case,"blocked-before-launch",**disposition)
+    payload={"schema":"v10.2.30_dense_scope_exclusions_v1","cases":dispositions}
+    q.atomic_json(root/EXCLUSIONS_NAME,payload)
+    return payload
 
 
 def run(root:Path,args)->int:
@@ -148,7 +189,7 @@ def parser():
     for command in ("preflight","prepare"):
         c=sub.add_parser(command); c.add_argument("source",type=Path); c.add_argument("destination",type=Path); c.add_argument("--minimum-free-gib",type=float,default=10)
     r=sub.add_parser("run"); r.add_argument("root",type=Path); r.add_argument("--minimum-free-gib",type=float,default=10); r.add_argument("--no-progress-seconds",type=float,default=900); r.add_argument("--recover-stale-lock",action="store_true")
-    for command in ("monitor","stop"): sub.add_parser(command).add_argument("root",type=Path)
+    for command in ("monitor","stop","exclude-lower-ceramic"): sub.add_parser(command).add_argument("root",type=Path)
     return p
 
 
@@ -158,6 +199,7 @@ def main(argv=None):
     if a.command=="prepare": print(json.dumps(prepare(a.source,a.destination,a.minimum_free_gib),indent=2,sort_keys=True)); return 0
     if a.command=="run": return run(a.root.resolve(),a)
     if a.command=="monitor": return monitor(a.root.resolve())
+    if a.command=="exclude-lower-ceramic": print(json.dumps(exclude_lower_ceramic(a.root),indent=2,sort_keys=True)); return 0
     return q.stop_launcher(a.root.resolve())
 
 if __name__=="__main__": raise SystemExit(main())

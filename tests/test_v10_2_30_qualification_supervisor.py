@@ -216,6 +216,16 @@ def test_partial_zero_exit_is_restartable_not_completed(tmp_path):
     assert module.classify(case) == "restartable"
 
 
+def test_blocked_before_launch_is_never_started(tmp_path, monkeypatch):
+    module=load_module(); monkeypatch.setattr(module,'matrix',lambda:[{"case":"blocked","label":"peak","fraction":.9,"deltaK_MPa_sqrt_m":1.0,"parameter_option":"x","seed":1}]); monkeypatch.setattr(module,'EXPECTED_MATRIX',{('peak',.9):1.0})
+    case=tmp_path/'blocked';case.mkdir();module.set_status(case,'blocked-before-launch')
+    original=module.classify;monkeypatch.setattr(module,'classify',lambda _case,_row=None:'blocked-before-launch')
+    args=module.parser().parse_args(['run',str(tmp_path),'--smoke-worker','--poll-seconds','.01','--minimum-free-gib','0'])
+    assert module.run(args)==0
+    status=json.loads((case/'qualification_status.json').read_text());assert status['status']=='blocked-before-launch' and status['skipped'] is True
+    assert not (case/'smoke_checkpoint.json').exists()
+
+
 def test_default_watchdog_exceeds_observed_long_diagnostic_phase(monkeypatch):
     module = load_module(); monkeypatch.delenv("V10230_QUAL_NO_PROGRESS_SECONDS", raising=False)
     args = module.parser().parse_args(["run", "/tmp/example", "--smoke-worker"])

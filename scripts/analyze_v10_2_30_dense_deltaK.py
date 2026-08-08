@@ -89,11 +89,14 @@ def plots(cases,events,out):
 def main(argv=None):
     p=argparse.ArgumentParser();p.add_argument('dense',type=Path);p.add_argument('--qualification',type=Path,required=True);p.add_argument('--developed',type=Path,required=True);p.add_argument('--out',type=Path);a=p.parse_args(argv)
     root=a.dense.resolve();out=(a.out or root/'final_analysis').resolve();out.mkdir(parents=True,exist_ok=True)
-    manifest=load(root/'dense_deltaK_matrix.json');family_hash=manifest.get('family_hash');cases=[];events=[]
+    manifest=load(root/'dense_deltaK_matrix.json');exclusions=load(root/dense.EXCLUSIONS_NAME).get('cases',{});family_hash=manifest.get('family_hash');cases=[];events=[]
     for label,(option,seed,critical) in dense.q.OPTIONS.items():
         for fraction in GRID:
             case,source=source_case(label,seed,fraction,a.qualification.resolve(),root,a.developed.resolve())
-            row,case_events=analyze_case(label,option,seed,critical,fraction,case,source,family_hash);cases.append(row);events.extend(case_events)
+            row,case_events=analyze_case(label,option,seed,critical,fraction,case,source,family_hash)
+            if case.name in exclusions:
+                disposition=exclusions[case.name];row['terminal_classification']=disposition['terminal_classification'];row['final_cycles']=disposition.get('cycles');row['final_extension_um']=disposition.get('projected_extension_um');row['event_count']=disposition.get('event_count',0);row['censor_flag']=False;row['full_trajectory_da_dN_m_per_cycle']=None;row['late_50um_da_dN_m_per_cycle']=None
+            cases.append(row);events.extend(case_events)
     write_csv(out/'complete_event_intervals.csv',events);write_csv(out/'case_summary.csv',cases);write_csv(out/'combined_curve.csv',cases)
     write_csv(out/'censor_table.csv',[r for r in cases if r['censor_flag']]);write_csv(out/'failure_table.csv',[r for r in cases if r['terminal_classification'] in {'failed','blocked_before_launch'}])
     files=plots(cases,events,out); validation={'all_40_rows':len(cases)==40,'unique_rows':len({(r['class'],r['fraction']) for r in cases})==40,'no_zero_censor_rates':all(r['late_50um_da_dN_m_per_cycle'] is None for r in cases if r['censor_flag']),'all_launch_tasks_terminal':all(r['terminal_classification'] in {'completed_growth','right_censored_no_growth','right_censored_after_growth'} for r in cases if .75<=r['fraction']<.95)}

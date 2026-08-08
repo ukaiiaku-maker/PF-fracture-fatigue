@@ -341,7 +341,7 @@ def run(args) -> int:
                 state = classify(case, row)
                 if args.skip_finished and state in TERMINAL:
                     set_status(case, state, skipped=True); continue
-                if state == "failed":
+                if state in {"failed", "blocked-before-launch"}:
                     set_status(case, state, skipped=True); continue
                 restarting = state in {"restartable", "watchdog-stopped"}
                 if free_gib(root) < args.minimum_free_gib:
