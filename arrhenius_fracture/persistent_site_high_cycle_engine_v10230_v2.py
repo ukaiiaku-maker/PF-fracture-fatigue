@@ -35,6 +35,7 @@ from .persistent_site_high_cycle_state_v10230 import (
 )
 from .persistent_site_periodic_solver_v10230 import solve_periodic_state
 from .persistent_site_poincare_v10230 import PoincareResult, one_cycle_map
+from .persistent_site_first_passage_locator_v10230 import localize_first_passage
 
 
 MODEL_ID = "v10.2.30_production_high_cycle_state_machine_v2"
@@ -613,7 +614,7 @@ def integrate_state_coupled_waveform(
             continue
 
         local_request = min(remaining, float(config["event_guard_cycles"]))
-        local = _transient.integrate_state_coupled_waveform(
+        local = localize_first_passage(
             engine, controller, waveform, temperature_K, local_request
         )
         (
@@ -636,10 +637,13 @@ def integrate_state_coupled_waveform(
         last_result = dict(local)
         modes.append(
             {
-                "mode": "event_localization_transient",
+                "mode": "first_passage_cycle_locator",
                 "cycles": local_cycles,
                 "fired": fired,
                 "partial": bool(local.get("coupled_hazard_partial_return", False)),
+                "bracket_low": local.get("coupled_hazard_locator_bracket_low"),
+                "bracket_high": local.get("coupled_hazard_locator_bracket_high"),
+                "trial_evaluations": local.get("coupled_hazard_locator_trial_evaluations"),
             }
         )
         if fired:

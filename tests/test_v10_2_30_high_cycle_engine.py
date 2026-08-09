@@ -1,8 +1,13 @@
 from types import SimpleNamespace
 
 import numpy as np
+import copy
+import pytest
 
 from arrhenius_fracture import persistent_site_high_cycle_engine_v10230 as high
+from arrhenius_fracture.persistent_site_first_passage_locator_v10230 import (
+    localize_first_passage,
+)
 from arrhenius_fracture.persistent_site_high_cycle_state_v10230 import (
     capture_ledgers,
     capture_stochastic_state,
@@ -167,6 +172,73 @@ class Engine:
             "advance": {},
             "microsteps": 1,
         }
+
+
+@pytest.mark.parametrize("threshold", [0.35940039563036524, 0.4332087756327596])
+def test_near_threshold_cycle_locator_matches_exact_and_is_transactional(threshold):
+    """DBTT/Peak B=1-1e-10 states must not enter microscopic marching."""
+    remaining = threshold * 1.0e-10
+    engine = Engine(lambda_per_s=0.25, threshold=threshold)
+    engine.hazard_action_current = threshold - remaining
+    engine.B = engine.hazard_action_current / threshold
+    rng_before = copy.deepcopy(engine._hazard_rng.bit_generator.state)
+    geometry_before = (engine.n_adv, engine.a_adv)
+
+    reference = copy.deepcopy(engine)
+    exact = reference._integrate_coupled(1.0, 300.0, 1.0)
+    reference_cycles = exact["dt_consumed"] * Waveform().frequency_Hz
+
+    result = localize_first_passage(
+        engine, Controller(), Waveform(), 300.0, 2.0
+    )
+    assert result["fired"] is True
+    assert result["coupled_hazard_first_passage_locator"] is True
+    assert result["coupled_hazard_cycles_consumed"] == pytest.approx(
+        reference_cycles, rel=1.0e-12, abs=1.0e-15
+    )
+    assert result["coupled_hazard_locator_bracket_high"] - result[
+        "coupled_hazard_locator_bracket_low"
+    ] <= 1.0
+    assert result["coupled_hazard_locator_trial_evaluations"] < 100
+    assert engine.hazard_event_index == 1
+    assert engine.hazard_threshold_history == [threshold]
+    assert engine._hazard_rng.bit_generator.state == rng_before
+    assert (engine.n_adv, engine.a_adv) == geometry_before
+
+
+def test_locator_allows_only_provisional_event_counter_before_energy_gate():
+    class ProvisionalEngine(Engine):
+        def _integrate_coupled(self, *args, **kwargs):
+            result = super()._integrate_coupled(*args, **kwargs)
+            if result["fired"]:
+                self.n_adv += 1
+            return result
+
+    engine = ProvisionalEngine(lambda_per_s=0.25, threshold=0.5)
+    engine.hazard_action_current = 0.5 * (1.0 - 1.0e-10)
+    engine.B = engine.hazard_action_current / 0.5
+    result = localize_first_passage(
+        engine, Controller(), Waveform(), 300.0, 2.0
+    )
+    assert result["fired"] is True
+    assert engine.n_adv == 1
+    assert engine.a_adv == 0.0
+    assert engine.micro_advance_total_m == 0.0
+    assert engine.checkpoint_advance_total_m == 0.0
+    assert engine.mpz.advance_total_m == 0.0
+
+
+def test_locator_commits_bounded_exact_progress_when_horizon_has_no_bracket():
+    engine = Engine(lambda_per_s=0.25, threshold=1.0)
+    result = localize_first_passage(
+        engine, Controller(), Waveform(), 300.0, 0.5
+    )
+    assert result["fired"] is False
+    assert result["coupled_hazard_cycles_consumed"] == pytest.approx(0.5)
+    assert result["coupled_hazard_locator_failure_reason"] == "no_bracket_within_horizon"
+    assert engine.hazard_action_current == pytest.approx(0.125)
+
+
 
 
 class Controller:

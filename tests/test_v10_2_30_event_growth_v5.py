@@ -190,7 +190,7 @@ def test_checkpoint_sync_event_guard_exact_fallback(monkeypatch, tmp_path):
     globals_ = base.__globals__
     real_projective = globals_["_projective_with_requested_scale"]
     real_exact = globals_["_advance_exact_cycle_burst"]
-    real_transient = globals_["_transient"].integrate_state_coupled_waveform
+    real_locator = globals_["localize_first_passage"]
 
     def rejected_projective(*args, **kwargs):
         return SimpleNamespace(
@@ -217,7 +217,7 @@ def test_checkpoint_sync_event_guard_exact_fallback(monkeypatch, tmp_path):
             "last_cycle": None,
         }
 
-    def localized_transient(live, controller, waveform, temperature, cycles):
+    def localized_first_passage(live, controller, waveform, temperature, cycles):
         assert live.avalanche_base_checkpoint_m == 5.0e-6
         assert live._hazard_rng.bit_generator.state == rng_before
         live.hazard_action_current = 0.5 * live.hazard_threshold_action
@@ -240,11 +240,7 @@ def test_checkpoint_sync_event_guard_exact_fallback(monkeypatch, tmp_path):
 
     monkeypatch.setitem(globals_, "_projective_with_requested_scale", rejected_projective)
     monkeypatch.setitem(globals_, "_advance_exact_cycle_burst", exact_near_event)
-    monkeypatch.setattr(
-        globals_["_transient"],
-        "integrate_state_coupled_waveform",
-        localized_transient,
-    )
+    monkeypatch.setitem(globals_, "localize_first_passage", localized_first_passage)
     try:
         result = high.integrate_state_coupled_waveform(
             engine, Controller(), Waveform(), 300.0, 2.0
@@ -252,7 +248,7 @@ def test_checkpoint_sync_event_guard_exact_fallback(monkeypatch, tmp_path):
     finally:
         globals_["_projective_with_requested_scale"] = real_projective
         globals_["_advance_exact_cycle_burst"] = real_exact
-        globals_["_transient"].integrate_state_coupled_waveform = real_transient
+        globals_["localize_first_passage"] = real_locator
 
     assert exact_entered
     assert any(
@@ -260,7 +256,7 @@ def test_checkpoint_sync_event_guard_exact_fallback(monkeypatch, tmp_path):
         for row in result["coupled_hazard_modes"]
     )
     assert any(
-        row.get("mode") == "event_localization_transient"
+        row.get("mode") == "first_passage_cycle_locator"
         for row in result["coupled_hazard_modes"]
     )
     assert engine.B == engine.hazard_action_current / engine.hazard_threshold_action
