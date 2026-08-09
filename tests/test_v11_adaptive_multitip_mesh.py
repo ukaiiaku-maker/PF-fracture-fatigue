@@ -3,11 +3,13 @@ from dataclasses import replace
 import numpy as np
 
 from arrhenius_fracture.adaptive_multitip_mesh_v11 import (
+    _NestedRefinementProgressGuard,
     _subdivide, active_tip_hbar, adapt_accepted_state_for_trials,
     diagnose_underresolved_trial_geometry,
     mark_multitip_trial_support, mark_underresolved_trial_geometry,
     mesh_fingerprint, refine_accepted_state,
 )
+import pytest
 from arrhenius_fracture.config import ElasticProperties
 from arrhenius_fracture.crack_network_v11 import CrackBranchState, CrackNetworkState
 from arrhenius_fracture.directional_competition_v11 import DirectionalCompetitionState, tungsten_cleavage_candidates
@@ -214,3 +216,24 @@ def test_final_mesh_is_validated_after_last_permitted_refinement_level():
     assert adapted.mesh is state.mesh
     assert audit.lineages == ()
     assert min(audit.trial_changed_element_count.values()) > 0
+
+
+def test_nested_refinement_progress_can_continue_beyond_former_eight_level_ceiling():
+    guard = _NestedRefinementProgressGuard()
+    for level in range(12):
+        scale = 0.5 ** level
+        guard.observe(
+            marked_area_m2=scale,
+            maximum_metric_m=2.0 * scale,
+            maximum_tip_hbar_m=3.0 * scale,
+        )
+    assert guard.stalled_levels == 0
+
+
+def test_nested_refinement_genuine_nonprogress_still_fails_closed():
+    guard = _NestedRefinementProgressGuard(maximum_stalled_levels=3)
+    guard.observe(marked_area_m2=1.0, maximum_metric_m=2.0, maximum_tip_hbar_m=3.0)
+    guard.observe(marked_area_m2=1.0, maximum_metric_m=2.0, maximum_tip_hbar_m=3.0)
+    guard.observe(marked_area_m2=1.0, maximum_metric_m=2.0, maximum_tip_hbar_m=3.0)
+    with pytest.raises(RuntimeError, match="nested_refinement_no_measurable_progress"):
+        guard.observe(marked_area_m2=1.0, maximum_metric_m=2.0, maximum_tip_hbar_m=3.0)

@@ -120,6 +120,32 @@ class MarkingAudit:
         }
 
 
+@dataclass
+class _NestedRefinementProgressGuard:
+    """Fail closed only when local refinement ceases to improve its metrics."""
+    maximum_stalled_levels: int = 3
+    previous: tuple[float, float, float] | None = None
+    stalled_levels: int = 0
+
+    def observe(self, *, marked_area_m2: float, maximum_metric_m: float,
+                maximum_tip_hbar_m: float) -> None:
+        current = (float(marked_area_m2), float(maximum_metric_m), float(maximum_tip_hbar_m))
+        if self.previous is not None:
+            progress = any(
+                now < before * (1.0 - 1.0e-12)
+                for now, before in zip(current, self.previous)
+                if before > 0.0
+            )
+            self.stalled_levels = 0 if progress else self.stalled_levels + 1
+            if self.stalled_levels >= self.maximum_stalled_levels:
+                raise RuntimeError(
+                    "nested_refinement_no_measurable_progress: "
+                    f"previous={self.previous!r} current={current!r} "
+                    f"stalled_levels={self.stalled_levels}"
+                )
+        self.previous = current
+
+
 def _subdivide(
     nodes: np.ndarray, elems: np.ndarray, marked: Iterable[int], *,
     longest_edge_closure: bool = False,
@@ -471,7 +497,7 @@ def adapt_accepted_state_for_trials(
     state, candidates_by_tip, *, da_phys_m: float, tip_h_fine_m: float,
     contour_radius_m: float, crack_band_radius_m: float, accepted_load_m: float,
     starting_generation: int = 0, starting_operation_index: int = 0,
-    maximum_levels: int = 8,
+    maximum_levels: int = 32,
 ):
     """Proactively refine one accepted discretization for all sibling trials."""
     from .fem import assemble_mechanics, solve_dirichlet
@@ -484,6 +510,7 @@ def adapt_accepted_state_for_trials(
     root_lineage = {element_id: element_id for element_id in range(state.mesh.ne)}
     unique_roots: set[int] = set()
     resolution_gate_passed = False
+    progress_guard = _NestedRefinementProgressGuard()
     for level in range(1, int(maximum_levels) + 1):
         hbars = active_tip_hbar(current, contour_radius_m=contour_radius_m)
         marking = diagnose_underresolved_trial_geometry(
@@ -510,6 +537,10 @@ def adapt_accepted_state_for_trials(
             marked_area = float(np.sum(current.mesh.area_e[list(marked)]))
         else:
             bounding_box = None; marked_area = 0.0
+        maximum_metric = max(
+            (float(record.controlling_metric_m) for record in marking.records),
+            default=0.0,
+        )
         marking_levels.append({
             "level": level - 1, "element_count_before": current.mesh.ne,
             "physical_mark_count": len(marked),
@@ -538,6 +569,11 @@ def adapt_accepted_state_for_trials(
                 "active_tip_resolution_marker_inconsistency: "
                 f"hbar={max(hbars.values(), default=0.0):.17g} target={target_hbar:.17g}"
             )
+        progress_guard.observe(
+            marked_area_m2=marked_area,
+            maximum_metric_m=maximum_metric,
+            maximum_tip_hbar_m=max(hbars.values(), default=0.0),
+        )
         refined, lineage = refine_accepted_state(
             current, marked_parent_elements=marked,
             active_tip_ids=current.crack_network.active_tip_ids,
