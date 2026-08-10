@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import runpy
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,3 +56,14 @@ def test_run_concurrency_is_explicitly_bounded_to_one_or_two():
     module = load_module()
     assert module.parser().parse_args(["run", "/tmp/x"]).max_jobs == 2
     assert module.parser().parse_args(["run", "/tmp/x", "--max-jobs", "1"]).max_jobs == 1
+
+
+def test_above_one_specialization_changes_only_fraction_matrix_and_manifest():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_above_one_driving_force_ladder_supervisor.py"
+    ), run_name="above_one_ladder_test")
+    module = namespace["ladder"]
+    rows = module.matrix()
+    assert [row["fraction"] for row in rows] == [1.025, 1.025, 1.05, 1.05]
+    assert {row["label"] for row in rows} == {"peak", "dbtt"}
+    assert module.MANIFEST_NAME == "above_one_driving_force_ladder_matrix.json"
