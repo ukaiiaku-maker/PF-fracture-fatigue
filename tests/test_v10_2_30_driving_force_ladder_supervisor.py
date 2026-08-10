@@ -137,3 +137,13 @@ def test_peak_dbtt_target_extension_is_exactly_two_rows():
     assert [(row["label"], row["fraction"]) for row in rows] == [
         ("dbtt", 1.105), ("peak", 1.15),
     ]
+
+
+def test_peak_target_refinement_has_two_neighboring_actual_points():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_peak_target_refinement_supervisor.py"
+    ), run_name="peak_target_refinement_test")
+    rows = namespace["ladder"].matrix()
+    assert [(row["label"], row["fraction"]) for row in rows] == [
+        ("peak", 1.135), ("peak", 1.14),
+    ]
