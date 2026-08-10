@@ -78,3 +78,25 @@ def test_f1p100_transition_specialization_is_single_deliberate_level():
     assert [row["fraction"] for row in rows] == [1.1, 1.1]
     assert {row["label"] for row in rows} == {"peak", "dbtt"}
     assert module.MANIFEST_NAME == "f1p100_driving_force_ladder_matrix.json"
+
+
+def test_weakt_ceramic_high_rate_specialization_preserves_loading_contract():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_weakt_ceramic_high_rate_ladder_supervisor.py"
+    ), run_name="weakt_ceramic_high_rate_ladder_test")
+    module = namespace["ladder"]
+    rows = module.matrix()
+    assert len(rows) == 12
+    assert {row["label"] for row in rows} == {"weakT", "ceramic"}
+    assert [row["fraction"] for row in rows] == [
+        .95, .95, .975, .975, 1.0, 1.0, 1.025, 1.025, 1.05, 1.05, 1.1, 1.1,
+    ]
+    assert {row["seed"] for row in rows if row["label"] == "weakT"} == {2001726}
+    assert {row["seed"] for row in rows if row["label"] == "ceramic"} == {3001729}
+    for row in rows:
+        assert row["deltaK_MPa_sqrt_m"] == row["reference_deltaK_MPa_sqrt_m"] * row["fraction"]
+        assert row["Kmax_MPa_sqrt_m"] == row["deltaK_MPa_sqrt_m"] / .9
+        assert row["Kmin_MPa_sqrt_m"] == .1 * row["Kmax_MPa_sqrt_m"]
+        assert row["frequency_Hz"] == 1000.0
+        assert row["temperature_K"] == 300.0
+    assert module.MANIFEST_NAME == "weakt_ceramic_high_rate_ladder_matrix.json"
