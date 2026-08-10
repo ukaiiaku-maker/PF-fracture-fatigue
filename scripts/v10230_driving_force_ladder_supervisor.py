@@ -117,7 +117,7 @@ def run(root: Path, args) -> int:
         for row in matrix()
     }
     argv = [
-        "run", str(root), "--max-jobs", "2",
+        "run", str(root), "--max-jobs", str(args.max_jobs),
         "--target-extension-um", str(TARGET_EXTENSION_UM),
         "--cycles-max", str(CYCLES_MAX),
         "--minimum-free-gib", str(args.minimum_free_gib),
@@ -148,6 +148,7 @@ def parser() -> argparse.ArgumentParser:
     prep.add_argument("--minimum-free-gib", type=float, default=10.0)
     runp = sub.add_parser("run")
     runp.add_argument("root", type=Path)
+    runp.add_argument("--max-jobs", type=int, choices=(1, 2), default=2)
     runp.add_argument("--minimum-free-gib", type=float, default=10.0)
     runp.add_argument("--no-progress-seconds", type=float, default=900.0)
     runp.add_argument("--recover-stale-lock", action="store_true")

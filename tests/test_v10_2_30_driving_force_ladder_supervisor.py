@@ -49,3 +49,9 @@ def test_prepare_is_clean_atomic_and_non_overwriting(tmp_path, monkeypatch):
     import pytest
     with pytest.raises(RuntimeError, match="already exists"):
         module.prepare(root)
+
+
+def test_run_concurrency_is_explicitly_bounded_to_one_or_two():
+    module = load_module()
+    assert module.parser().parse_args(["run", "/tmp/x"]).max_jobs == 2
+    assert module.parser().parse_args(["run", "/tmp/x", "--max-jobs", "1"]).max_jobs == 1
