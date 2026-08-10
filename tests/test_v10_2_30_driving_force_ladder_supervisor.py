@@ -127,3 +127,13 @@ def test_target_refinement_is_exactly_two_measured_rows():
     assert [(row["label"], row["fraction"]) for row in rows] == [
         ("weakT", 1.145), ("ceramic", 1.205),
     ]
+
+
+def test_peak_dbtt_target_extension_is_exactly_two_rows():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_peak_dbtt_target_extension_supervisor.py"
+    ), run_name="peak_dbtt_target_extension_test")
+    rows = namespace["ladder"].matrix()
+    assert [(row["label"], row["fraction"]) for row in rows] == [
+        ("dbtt", 1.105), ("peak", 1.15),
+    ]
