@@ -269,6 +269,17 @@ def test_locator_requires_executable_private_firing_not_only_reported_action():
     assert result["coupled_hazard_locator_bracket_high"] == 2.0
 
 
+def test_locator_commits_low_prefix_with_phase_resolved_path():
+    class BiasedMapEngine(Engine):
+        def _plastic_half_step(self, *args, **kwargs):
+            return super()._plastic_half_step(*args, **kwargs)
+
+    engine = BiasedMapEngine(lambda_per_s=0.25, threshold=0.495)
+    result = localize_first_passage(engine, Controller(), Waveform(), 300.0, 2.0)
+    assert result["fired"] is True
+    assert result["coupled_hazard_cycles_consumed"] == pytest.approx(1.98)
+
+
 
 
 class Controller:

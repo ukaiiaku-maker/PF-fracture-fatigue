@@ -198,21 +198,25 @@ def localize_first_passage(
         else:
             low, f_low = candidate, value
 
-    # The low endpoint is committed as exact whole cycles without stochastic
-    # consumption, then the final waveform cycle consumes exactly one passage.
+    # Commit the low endpoint through the same phase-resolved integrator used
+    # by the private bracket.  A summarized one-cycle-map commit can diverge
+    # from that exact prefix in a strongly transient LCF state, invalidating
+    # the otherwise executable final-cycle bracket.
     committed_cycles = 0.0
     plastic: dict[str, float] = {}
     whole_low = int(math.floor(low))
-    for _ in range(whole_low):
-        mapped = one_cycle_map(engine, controller, waveform, temperature_K)
-        from .persistent_site_high_cycle_engine_v10230_v2 import _commit_exact_cycle, _cache
-        _commit_exact_cycle(engine, mapped, _cache(engine))
-        committed_cycles += 1.0
-        _sum(plastic, mapped.plastic_totals)
-    final_span = high - committed_cycles
-    final = _commit_phase_resolved(
-        engine, controller, waveform, temperature_K, final_span, threshold)
-    committed_cycles += max(float(final.get("dt_consumed", 0.0)), 0.0) * float(waveform.frequency_Hz)
+    prefix = _commit_phase_resolved(
+        engine, controller, waveform, temperature_K, float(whole_low), threshold,
+    ) if whole_low else {"fired": False, "dt_consumed": 0.0, "plastic": {}}
+    committed_cycles += max(float(prefix.get("dt_consumed", 0.0)), 0.0) * float(waveform.frequency_Hz)
+    _sum(plastic, dict(prefix.get("plastic", {})))
+    if prefix.get("fired", False):
+        final = prefix
+    else:
+        final_span = high - committed_cycles
+        final = _commit_phase_resolved(
+            engine, controller, waveform, temperature_K, final_span, threshold)
+        committed_cycles += max(float(final.get("dt_consumed", 0.0)), 0.0) * float(waveform.frequency_Hz)
     if not final.get("fired", False):
         raise RuntimeError("bracketed first passage did not fire in final waveform cycle")
     geometry_after = geometry_signature(engine)
