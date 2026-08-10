@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -63,3 +64,20 @@ def test_rate_endpoint_accepts_1e3_target():
     endpoint = module.rate_endpoints(rows, 1e-3)[0]
     assert endpoint["target_da_dN_m_per_cycle"] == 1e-3
     assert endpoint["nearest"]["f"] == 1.185
+
+
+def test_crack_growth_kinetics_writes_class_loglog_plot(tmp_path):
+    module = load_module()
+    output = tmp_path / "case"; output.mkdir()
+    (output / "developed_fatigue_growth_summary.json").write_text(json.dumps({
+        "event_measurements": [
+            {"cycles_post": 1.0, "projected_extension_post_m": 5e-6},
+            {"cycles_post": 10.0, "projected_extension_post_m": 12e-6},
+        ]
+    }))
+    names = module.crack_growth_kinetics([{
+        "class": "peak", "f": 1.0, "deltaK_MPa_sqrt_m": 21.3,
+        "output_root": str(output),
+    }], tmp_path)
+    assert names == ["peak_crack_growth_kinetics_loglog.png"]
+    assert (tmp_path / names[0]).stat().st_size > 0

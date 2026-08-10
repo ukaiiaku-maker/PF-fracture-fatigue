@@ -89,3 +89,5 @@ Production roots:
 - `runs/v10_2_30_ceramic_1e3_rate_final_90e2065_20260810`
 
 The consolidated 68-point machine-readable dataset and regenerated plots are under `runs/v10_2_30_four_class_1e3_rate_complete_20260810`.
+
+The regenerated `four_class_da_dN_vs_deltaK.png` spans the complete measured range through the new `~1e-3 m/cycle` points. The `ladder_analysis` directory also contains `peak`, `dbtt`, `weakt`, and `ceramic` `crack_growth_kinetics_loglog.png` figures. Each kinetics figure plots every committed positive `(N, a)` event for every measured fixed-`DeltaK` trajectory of that class on logarithmic cycle and projected-extension axes.

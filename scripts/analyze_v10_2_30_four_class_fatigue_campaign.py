@@ -126,7 +126,9 @@ def _plot(rows: list[dict], out: Path) -> list[str]:
             continue
         x = [float(row["deltaK_MPa_sqrt_m"]) for row in selected]
         y = [float(row["developed_da_dN_m_per_cycle"]) for row in selected]
-        ax.plot(x, y, marker="o", label=option)
+        short = next((name for name in ("peak", "dbtt", "weakT", "ceramic")
+                      if name.lower() in option.lower()), option)
+        ax.plot(x, y, marker="o", label=short)
 
         single, single_ax = plt.subplots(figsize=(7.5, 5.0))
         single_ax.plot(x, y, marker="o")
@@ -142,6 +144,8 @@ def _plot(rows: list[dict], out: Path) -> list[str]:
     ax.set_xlabel("DeltaK (MPa sqrt(m))")
     ax.set_ylabel("Developed da/dN (m/cycle)")
     ax.set_title("Four-parameterization fatigue crack-growth comparison")
+    ax.axhline(1.0e-3, color="black", linestyle="--", linewidth=1.0,
+               alpha=0.7, label=r"$10^{-3}$ target")
     ax.grid(True, which="both", alpha=0.25)
     if ax.lines:
         ax.legend(fontsize=7)

@@ -231,6 +231,48 @@ def regime_map(rows: list[dict], filename: Path) -> None:
     plt.close(fig)
 
 
+def crack_growth_kinetics(rows: list[dict], out: Path) -> list[str]:
+    """Plot committed projected extension against cycle count for every stress."""
+    outputs = []
+    for label in CLASS_ORDER:
+        selected = sorted((row for row in rows if row["class"] == label), key=lambda row: row["f"])
+        curves = []
+        for row in selected:
+            summary = Path(row["output_root"]) / "developed_fatigue_growth_summary.json"
+            if not summary.is_file():
+                continue
+            events = json.loads(summary.read_text()).get("event_measurements", [])
+            points = []
+            for event in events:
+                cycles = finite(event.get("cycles_post"))
+                extension_m = finite(event.get("projected_extension_post_m"))
+                if cycles is not None and extension_m is not None and cycles > 0.0 and extension_m > 0.0:
+                    points.append((cycles, 1e6 * extension_m))
+            if points:
+                curves.append((row, points))
+        if not curves:
+            continue
+        figure, axis = plt.subplots(figsize=(9.2, 6.2))
+        colors = plt.cm.viridis(np.linspace(0.03, 0.97, len(curves)))
+        for color, (row, points) in zip(colors, curves):
+            axis.plot([point[0] for point in points], [point[1] for point in points],
+                      marker="o", markersize=2.8, linewidth=1.2, color=color,
+                      label=f"f={row['f']:.4g}, ΔK={row['deltaK_MPa_sqrt_m']:.4g}")
+        axis.set_xscale("log")
+        axis.set_yscale("log")
+        axis.set_xlabel("Cumulative cycles, N")
+        axis.set_ylabel(r"Projected crack extension, $a$ ($\mu$m)")
+        axis.set_title(f"{label.upper()} crack-growth kinetics")
+        axis.grid(True, which="both", alpha=.22)
+        axis.legend(fontsize=6.5, ncol=2, loc="best")
+        figure.tight_layout()
+        name = f"{label}_crack_growth_kinetics_loglog.png"
+        figure.savefig(out / name, dpi=200)
+        plt.close(figure)
+        outputs.append(name)
+    return outputs
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("summary", type=Path)
@@ -263,6 +305,8 @@ def main() -> int:
          args.out / "developed_da_dN_vs_f.png")
     plot(rows, "deltaK_MPa_sqrt_m", "developed_da_dN_m_per_cycle", "Developed da/dN (m/cycle)",
          args.out / "developed_da_dN_vs_deltaK.png")
+    plot(rows, "deltaK_MPa_sqrt_m", "developed_da_dN_m_per_cycle", "Developed da/dN (m/cycle)",
+         args.out / "four_class_da_dN_vs_deltaK.png")
     plot(rows, "f", "cycles_to_first_event", "Cycles to first event",
          args.out / "cycles_to_first_event_vs_f.png")
     plot(rows, "f", "cycles_to_target", "Cycles to ~100 µm target",
@@ -276,6 +320,9 @@ def main() -> int:
     plot(rows, "deltaK_MPa_sqrt_m", "developed_da_dN_m_per_cycle", "Developed da/dN (m/cycle)",
          args.out / "high_rate_zoom.png", ylim=(1e-8, max(1e-2, 10.0 * args.target_rate)))
     regime_map(rows, args.out / "four_class_regime_map.png")
+    result["crack_growth_kinetics_plots"] = crack_growth_kinetics(rows, args.out)
+    (args.out / "four_class_driving_force_ladder.json").write_text(
+        json.dumps(result, indent=2, sort_keys=True) + "\n")
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 
