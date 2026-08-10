@@ -147,3 +147,19 @@ def test_peak_target_refinement_has_two_neighboring_actual_points():
     assert [(row["label"], row["fraction"]) for row in rows] == [
         ("peak", 1.135), ("peak", 1.14),
     ]
+
+
+def test_four_class_1e3_rate_batch_is_explicit_and_physics_preserving():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_four_class_1e3_rate_supervisor.py"
+    ), run_name="four_class_1e3_rate_test")
+    rows = namespace["matrix"]()
+    assert [(row["label"], row["fraction"]) for row in rows] == [
+        ("peak", 1.18), ("peak", 1.19),
+        ("dbtt", 1.13), ("dbtt", 1.14),
+        ("weakT", 1.19), ("weakT", 1.195),
+        ("ceramic", 1.25), ("ceramic", 1.3),
+    ]
+    assert all(row["R"] == .1 and row["frequency_Hz"] == 1000.0
+               and row["temperature_K"] == 300.0
+               and row["target_extension_um"] == 100.0 for row in rows)
