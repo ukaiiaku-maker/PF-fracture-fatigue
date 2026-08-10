@@ -444,7 +444,7 @@ def integrate_state_coupled_waveform(
                 break
             _print_heartbeat(consumed, requested, operations, modes, cache, config)
             remaining = requested - consumed
-            local = _transient.integrate_state_coupled_waveform(
+            local = localize_first_passage(
                 engine,
                 controller,
                 waveform,
@@ -471,10 +471,16 @@ def integrate_state_coupled_waveform(
             last_result = dict(local)
             modes.append(
                 {
-                    "mode": "event_guard_transient",
+                    "mode": "first_passage_cycle_locator",
                     "cycles": local_cycles,
                     "fired": fired,
                     "partial": bool(local.get("coupled_hazard_partial_return", False)),
+                    "bracket_low": local.get("coupled_hazard_locator_bracket_low"),
+                    "bracket_high": local.get("coupled_hazard_locator_bracket_high"),
+                    "trial_evaluations": local.get(
+                        "coupled_hazard_locator_trial_evaluations"
+                    ),
+                    "entry_reason": "stationary_tail_event_guard",
                 }
             )
             if fired:

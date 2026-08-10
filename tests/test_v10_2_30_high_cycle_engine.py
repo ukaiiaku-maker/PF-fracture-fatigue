@@ -337,6 +337,15 @@ def test_first_passage_and_post_event_restart_inside_1e12_request(monkeypatch):
     assert first["fired"] is True
     assert abs(first["coupled_hazard_cycles_consumed"] - 14.0) < 2.0e-5
     assert engine._energy_gate_pending is not None
+    assert any(
+        row["mode"] == "first_passage_cycle_locator"
+        and row.get("entry_reason") == "stationary_tail_event_guard"
+        for row in first["coupled_hazard_modes"]
+    )
+    assert not any(
+        row["mode"] == "event_guard_transient"
+        for row in first["coupled_hazard_modes"]
+    )
 
     engine._energy_gate_pending = None
     engine.n_adv += 1
