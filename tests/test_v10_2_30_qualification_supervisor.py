@@ -244,6 +244,12 @@ def test_blocked_before_launch_is_never_started(tmp_path, monkeypatch):
     assert not (case/'smoke_checkpoint.json').exists()
 
 
+def test_base_classification_preserves_blocked_before_launch(tmp_path):
+    module = load_module(); case = tmp_path / "blocked"; case.mkdir()
+    module.set_status(case, "blocked-before-launch", blocked_reason="qualification_pause")
+    assert module.classify(case) == "blocked-before-launch"
+
+
 def test_default_watchdog_exceeds_observed_long_diagnostic_phase(monkeypatch):
     module = load_module(); monkeypatch.delenv("V10230_QUAL_NO_PROGRESS_SECONDS", raising=False)
     args = module.parser().parse_args(["run", "/tmp/example", "--smoke-worker"])

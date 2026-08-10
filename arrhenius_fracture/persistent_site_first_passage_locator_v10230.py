@@ -42,6 +42,7 @@ def _private_action(engine, controller, waveform, temperature_K: float, cycles: 
     total_phases = max(float(cycles), 0.0) * len(phases)
     action = 0.0
     evaluations = 0
+    cycle_boundaries: dict[float, float] = {}
     try:
         phase_index = 0
         while phase_index < math.ceil(total_phases):
@@ -52,6 +53,9 @@ def _private_action(engine, controller, waveform, temperature_K: float, cycles: 
             )
             action += max(float(result.get("physical_hazard_action_step", 0.0)), 0.0)
             evaluations += 1
+            completed_phases = phase_index + 1
+            if completed_phases % len(phases) == 0:
+                cycle_boundaries[float(completed_phases // len(phases))] = action
             if bool(result.get("fired", False)):
                 break
             phase_index += 1
@@ -62,7 +66,7 @@ def _private_action(engine, controller, waveform, temperature_K: float, cycles: 
         raise RuntimeError("first-passage candidate changed live stochastic state")
     if geometry_signature(engine) != geometry:
         raise RuntimeError("first-passage candidate changed live geometry")
-    return action, evaluations
+    return action, evaluations, cycle_boundaries
 
 
 def _commit_phase_resolved(
@@ -135,15 +139,18 @@ def localize_first_passage(
     estimate = min(max(remaining_action / rate, 0.0), float(cycles_available))
     low, f_low = 0.0, -remaining_action
     high = min(max(1.0, math.ceil(estimate)), float(cycles_available))
-    action_high, evaluations = _private_action(
+    action_high, evaluations, boundaries = _private_action(
         engine, controller, waveform, temperature_K, high)
+    action_cache = {0.0: 0.0, **boundaries}
+    prefix_reuses = 0
     f_high = action_high - remaining_action
     while f_high < 0.0 and high < cycles_available:
         low, f_low = high, f_high
         high = min(max(2.0 * high, high + 1.0), float(cycles_available))
-        action_high, used = _private_action(
+        action_high, used, boundaries = _private_action(
             engine, controller, waveform, temperature_K, high)
         evaluations += used
+        action_cache.update(boundaries)
         f_high = action_high - remaining_action
     if f_high < 0.0:
         bounded = _commit_phase_resolved(
@@ -161,6 +168,7 @@ def localize_first_passage(
             "coupled_hazard_locator_model_id": MODEL_ID,
             "coupled_hazard_locator_failure_reason": "no_bracket_within_horizon",
             "coupled_hazard_locator_trial_evaluations": evaluations,
+            "coupled_hazard_locator_prefix_reuses": prefix_reuses,
         })
         return bounded
 
@@ -173,9 +181,14 @@ def localize_first_passage(
         candidate = float(math.floor(0.5 * (low + high)))
         if candidate <= low:
             candidate = low + 1.0
-        action, used = _private_action(
-            engine, controller, waveform, temperature_K, candidate)
-        evaluations += used
+        if candidate in action_cache:
+            action = action_cache[candidate]
+            prefix_reuses += 1
+        else:
+            action, used, boundaries = _private_action(
+                engine, controller, waveform, temperature_K, candidate)
+            evaluations += used
+            action_cache.update(boundaries)
         value = action - remaining_action
         if value >= 0.0:
             high, f_high = candidate, value
@@ -216,6 +229,7 @@ def localize_first_passage(
         "coupled_hazard_locator_bracket_high": high,
         "coupled_hazard_locator_iterations": iterations,
         "coupled_hazard_locator_trial_evaluations": evaluations,
+        "coupled_hazard_locator_prefix_reuses": prefix_reuses,
         "plastic": plastic,
     })
     return final

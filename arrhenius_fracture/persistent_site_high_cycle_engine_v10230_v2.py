@@ -480,6 +480,9 @@ def integrate_state_coupled_waveform(
                     "trial_evaluations": local.get(
                         "coupled_hazard_locator_trial_evaluations"
                     ),
+                    "prefix_reuses": local.get(
+                        "coupled_hazard_locator_prefix_reuses", 0
+                    ),
                     "entry_reason": "stationary_tail_event_guard",
                 }
             )
@@ -650,6 +653,9 @@ def integrate_state_coupled_waveform(
                 "bracket_low": local.get("coupled_hazard_locator_bracket_low"),
                 "bracket_high": local.get("coupled_hazard_locator_bracket_high"),
                 "trial_evaluations": local.get("coupled_hazard_locator_trial_evaluations"),
+                "prefix_reuses": local.get(
+                    "coupled_hazard_locator_prefix_reuses", 0
+                ),
             }
         )
         if fired:

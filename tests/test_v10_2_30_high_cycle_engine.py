@@ -206,6 +206,20 @@ def test_near_threshold_cycle_locator_matches_exact_and_is_transactional(thresho
     assert (engine.n_adv, engine.a_adv) == geometry_before
 
 
+def test_locator_reuses_integer_prefix_when_two_cycle_bracket_is_needed():
+    """A [1, 2] bracket must not reintegrate cycle 1 after evaluating cycle 2."""
+    engine = Engine(lambda_per_s=0.25, threshold=0.495)
+    result = localize_first_passage(
+        engine, Controller(), Waveform(), 300.0, 2.0
+    )
+    assert result["fired"] is True
+    assert result["coupled_hazard_locator_bracket_low"] == 1.0
+    assert result["coupled_hazard_locator_bracket_high"] == 2.0
+    assert result["coupled_hazard_locator_prefix_reuses"] == 1
+    assert result["coupled_hazard_locator_trial_evaluations"] == 16
+    assert result["coupled_hazard_cycles_consumed"] == pytest.approx(1.98)
+
+
 def test_locator_allows_only_provisional_event_counter_before_energy_gate():
     class ProvisionalEngine(Engine):
         def _integrate_coupled(self, *args, **kwargs):

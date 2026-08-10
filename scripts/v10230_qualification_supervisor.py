@@ -132,7 +132,7 @@ def set_status(case: Path, state: str, **extra) -> dict:
 
 def classify(case: Path, row: dict | None = None) -> str:
     old = read_json(status_path(case))
-    if old.get("status") in TERMINAL:
+    if old.get("status") in TERMINAL | {"blocked-before-launch"}:
         return old["status"]
     output = artifacts(case)
     if (output / "exit_code.txt").is_file():
