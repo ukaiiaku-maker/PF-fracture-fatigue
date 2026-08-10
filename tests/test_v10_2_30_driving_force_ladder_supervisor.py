@@ -67,3 +67,14 @@ def test_above_one_specialization_changes_only_fraction_matrix_and_manifest():
     assert [row["fraction"] for row in rows] == [1.025, 1.025, 1.05, 1.05]
     assert {row["label"] for row in rows} == {"peak", "dbtt"}
     assert module.MANIFEST_NAME == "above_one_driving_force_ladder_matrix.json"
+
+
+def test_f1p100_transition_specialization_is_single_deliberate_level():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_f1p100_driving_force_ladder_supervisor.py"
+    ), run_name="f1p100_ladder_test")
+    module = namespace["ladder"]
+    rows = module.matrix()
+    assert [row["fraction"] for row in rows] == [1.1, 1.1]
+    assert {row["label"] for row in rows} == {"peak", "dbtt"}
+    assert module.MANIFEST_NAME == "f1p100_driving_force_ladder_matrix.json"
