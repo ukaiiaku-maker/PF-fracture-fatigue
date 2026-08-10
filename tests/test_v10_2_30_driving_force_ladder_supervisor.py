@@ -100,3 +100,20 @@ def test_weakt_ceramic_high_rate_specialization_preserves_loading_contract():
         assert row["frequency_Hz"] == 1000.0
         assert row["temperature_K"] == 300.0
     assert module.MANIFEST_NAME == "weakt_ceramic_high_rate_ladder_matrix.json"
+
+
+def test_weakt_ceramic_adaptive_high_rate_specialization():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_weakt_ceramic_adaptive_high_rate_supervisor.py"
+    ), run_name="weakt_ceramic_adaptive_high_rate_test")
+    module = namespace["ladder"]
+    rows = module.matrix()
+    assert [row["fraction"] for row in rows] == [1.15, 1.15, 1.2, 1.2]
+    assert {row["label"] for row in rows} == {"weakT", "ceramic"}
+    assert {row["seed"] for row in rows if row["label"] == "weakT"} == {2001726}
+    assert {row["seed"] for row in rows if row["label"] == "ceramic"} == {3001729}
+    for row in rows:
+        assert row["deltaK_MPa_sqrt_m"] == row["reference_deltaK_MPa_sqrt_m"] * row["fraction"]
+        assert row["R"] == .1
+        assert row["frequency_Hz"] == 1000.0
+        assert row["temperature_K"] == 300.0
