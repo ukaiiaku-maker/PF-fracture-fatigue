@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the Peak/DBTT v10.2.30 driving-force ladder data products."""
+"""Build four-class v10.2.30 driving-force/rate endpoint data products."""
 from __future__ import annotations
 
 import argparse
@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-CASE_RE = re.compile(r"(?P<label>peak|dbtt)_f(?P<whole>\d+)p(?P<frac>\d+)_seed")
+CASE_RE = re.compile(r"(?P<label>peak|dbtt|weakT|ceramic)_f(?P<whole>\d+)p(?P<frac>\d+)_seed", re.I)
+CLASS_ORDER = ("peak", "dbtt", "weakt", "ceramic")
 
 
 def fraction(path: str) -> tuple[str, float] | None:
@@ -21,7 +22,7 @@ def fraction(path: str) -> tuple[str, float] | None:
     if not match:
         return None
     token = f"{match.group('whole')}.{match.group('frac')}"
-    return match.group("label"), float(token)
+    return match.group("label").lower(), float(token)
 
 
 def finite(value):
@@ -52,18 +53,21 @@ def locator_max(output: Path) -> int | None:
 
 
 def regime(row: dict) -> str:
-    cycles = finite(row.get("cycles_to_target"))
-    if row.get("status") == "censored" or cycles is None:
-        return "VHCF"
-    if cycles <= 1.0e3:
+    """Classify using event-spacing distribution plus rate, not life alone."""
+    if row.get("status") == "censored" or finite(row.get("developed_da_dN_m_per_cycle")) is None:
+        return "VHCF_OR_CENSORED"
+    subcycle = finite(row.get("fraction_subcycle_intervals")) or 0.0
+    median = finite(row.get("median_event_spacing_cycles"))
+    rate = finite(row.get("developed_da_dN_m_per_cycle")) or 0.0
+    if subcycle >= 0.5 and median is not None and median < 1.0:
         return "NEAR_MONOTONIC_CYCLIC_FAILURE"
-    if cycles <= 1.0e7:
-        return "LCF"
-    if cycles <= 1.0e10:
-        return "ACCELERATED_FATIGUE"
-    if cycles <= 1.0e12:
+    if rate < 1e-15:
+        return "VHCF"
+    if rate < 1e-12:
         return "HCF"
-    return "VHCF"
+    if rate < 1e-9:
+        return "ACCELERATED_FATIGUE"
+    return "LCF"
 
 
 def case_row(case: dict) -> dict | None:
@@ -103,12 +107,19 @@ def case_row(case: dict) -> dict | None:
         "cycles_to_first_event": events[0].get("cycles_post") if events else None,
         "cycles_to_target": case.get("cycles_reached") if case.get("status") == "completed" else None,
         "projected_extension_um": case.get("projected_extension_um"),
+        "path_extension_um": (events[-1].get("path_extension_post_m", 0.0) * 1e6 if events else None),
         "event_count": case.get("event_count"),
         "developed_da_dN_m_per_cycle": case.get("developed_da_dN_m_per_cycle"),
+        "stable_growth_provisional": case.get("stable_growth_provisional", False),
         "event_rate_cv": (float(np.std(event_rates, ddof=1) / np.mean(event_rates))
                           if event_rates.size > 1 and np.mean(event_rates) else None),
         "event_da_dN_min": float(np.min(event_rates)) if event_rates.size else None,
         "event_da_dN_max": float(np.max(event_rates)) if event_rates.size else None,
+        "mean_event_spacing_cycles": float(np.mean(intervals)) if intervals.size else None,
+        "median_event_spacing_cycles": float(np.median(intervals)) if intervals.size else None,
+        "min_event_spacing_cycles": float(np.min(intervals)) if intervals.size else None,
+        "max_event_spacing_cycles": float(np.max(intervals)) if intervals.size else None,
+        "fraction_subcycle_intervals": float(np.mean(intervals < 1.0)) if intervals.size else None,
         "mean_tortuosity": float(np.mean(tortuosity)) if tortuosity.size else None,
         "late_to_early_rate_ratio": developed.get("late_to_early_rate_ratio"),
         "window_0_25_da_dN": windows[0].get("da_dN") if len(windows) > 0 else None,
@@ -150,9 +161,10 @@ def fit_rows(rows: list[dict], label: str) -> dict | None:
     }
 
 
-def plot(rows: list[dict], xkey: str, ykey: str, ylabel: str, filename: Path) -> None:
+def plot(rows: list[dict], xkey: str, ykey: str, ylabel: str, filename: Path,
+         *, ylim: tuple[float, float] | None = None) -> None:
     fig, axis = plt.subplots(figsize=(7.2, 4.8))
-    for label, marker in (("peak", "o"), ("dbtt", "s")):
+    for label, marker in zip(CLASS_ORDER, ("o", "s", "^", "D")):
         selected = sorted((row for row in rows if row["class"] == label and
                            finite(row.get(xkey)) and finite(row.get(ykey))), key=lambda row: row[xkey])
         axis.plot([row[xkey] for row in selected], [row[ykey] for row in selected],
@@ -160,7 +172,51 @@ def plot(rows: list[dict], xkey: str, ykey: str, ylabel: str, filename: Path) ->
     axis.set_xlabel("f" if xkey == "f" else r"$\Delta K$ (MPa $\sqrt{m}$)")
     axis.set_ylabel(ylabel)
     axis.set_yscale("log")
+    if ylim:
+        axis.set_ylim(*ylim)
     axis.grid(True, which="both", alpha=.25)
+    axis.legend()
+    fig.tight_layout()
+    fig.savefig(filename, dpi=180)
+    plt.close(fig)
+
+
+def rate_endpoints(rows: list[dict], target: float = 1e-5) -> list[dict]:
+    endpoints = []
+    for label in CLASS_ORDER:
+        selected = sorted((row for row in rows if row["class"] == label and
+                           finite(row.get("developed_da_dN_m_per_cycle"))), key=lambda row: row["f"])
+        if not selected:
+            continue
+        nearest = min(selected, key=lambda row: abs(math.log10(row["developed_da_dN_m_per_cycle"] / target)))
+        low = max((row for row in selected if row["developed_da_dN_m_per_cycle"] <= target),
+                  key=lambda row: row["developed_da_dN_m_per_cycle"], default=None)
+        high = min((row for row in selected if row["developed_da_dN_m_per_cycle"] >= target),
+                   key=lambda row: row["developed_da_dN_m_per_cycle"], default=None)
+        endpoints.append({
+            "class": label,
+            "target_da_dN_m_per_cycle": target,
+            "nearest": {key: nearest.get(key) for key in
+                        ("f", "deltaK_MPa_sqrt_m", "cycles_to_target", "developed_da_dN_m_per_cycle", "regime")},
+            "lower_bracket_f": low.get("f") if low else None,
+            "lower_bracket_rate": low.get("developed_da_dN_m_per_cycle") if low else None,
+            "upper_bracket_f": high.get("f") if high else None,
+            "upper_bracket_rate": high.get("developed_da_dN_m_per_cycle") if high else None,
+        })
+    return endpoints
+
+
+def regime_map(rows: list[dict], filename: Path) -> None:
+    names = ["VHCF", "HCF", "ACCELERATED_FATIGUE", "LCF", "NEAR_MONOTONIC_CYCLIC_FAILURE"]
+    ordinate = {name: index for index, name in enumerate(names)}
+    fig, axis = plt.subplots(figsize=(7.2, 4.8))
+    for label, marker in zip(CLASS_ORDER, ("o", "s", "^", "D")):
+        selected = [row for row in rows if row["class"] == label and row["regime"] in ordinate]
+        axis.scatter([row["deltaK_MPa_sqrt_m"] for row in selected],
+                     [ordinate[row["regime"]] for row in selected], marker=marker, label=label.upper())
+    axis.set_yticks(range(len(names)), [name.replace("_", " ") for name in names])
+    axis.set_xlabel(r"$\Delta K$ (MPa $\sqrt{m}$)")
+    axis.grid(True, alpha=.25)
     axis.legend()
     fig.tight_layout()
     fig.savefig(filename, dpi=180)
@@ -173,18 +229,25 @@ def main() -> int:
     parser.add_argument("--out", required=True, type=Path)
     args = parser.parse_args()
     payload = json.loads(args.summary.read_text())
-    rows = [row for case in payload["cases"] if (row := case_row(case)) is not None]
+    # Later aggregate entries are deliberate refinements/repeats and supersede
+    # earlier copies of the same class/f point.
+    deduplicated = {}
+    for case in payload["cases"]:
+        row = case_row(case)
+        if row is not None:
+            deduplicated[(row["class"], row["f"])] = row
+    rows = list(deduplicated.values())
     rows.sort(key=lambda row: (row["class"], row["f"]))
     args.out.mkdir(parents=True, exist_ok=True)
     fields = list(rows[0])
-    with (args.out / "peak_dbtt_driving_force_ladder.csv").open("w", newline="") as stream:
+    with (args.out / "four_class_driving_force_ladder.csv").open("w", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
         writer.writerows(rows)
-    fits = [fit for label in ("peak", "dbtt") if (fit := fit_rows(rows, label))]
-    result = {"schema": "v10.2.30_peak_dbtt_driving_force_ladder_v1", "cases": rows,
-              "descriptive_power_law_fits": fits}
-    (args.out / "peak_dbtt_driving_force_ladder.json").write_text(
+    fits = [fit for label in CLASS_ORDER if (fit := fit_rows(rows, label))]
+    result = {"schema": "v10.2.30_four_class_driving_force_ladder_v2", "cases": rows,
+              "descriptive_power_law_fits": fits, "rate_endpoints": rate_endpoints(rows)}
+    (args.out / "four_class_driving_force_ladder.json").write_text(
         json.dumps(result, indent=2, sort_keys=True) + "\n")
     plot(rows, "f", "developed_da_dN_m_per_cycle", "Developed da/dN (m/cycle)",
          args.out / "developed_da_dN_vs_f.png")
@@ -194,6 +257,15 @@ def main() -> int:
          args.out / "cycles_to_first_event_vs_f.png")
     plot(rows, "f", "cycles_to_target", "Cycles to ~100 µm target",
          args.out / "cycles_to_target_vs_f.png")
+    plot(rows, "deltaK_MPa_sqrt_m", "cycles_to_first_event", "Cycles to first event",
+         args.out / "cycles_to_first_event_vs_deltaK.png")
+    plot(rows, "deltaK_MPa_sqrt_m", "cycles_to_target", "Cycles to ~100 µm target",
+         args.out / "cycles_to_target_vs_deltaK.png")
+    plot(rows, "deltaK_MPa_sqrt_m", "median_event_spacing_cycles", "Median event spacing (cycles)",
+         args.out / "event_spacing_vs_deltaK.png")
+    plot(rows, "deltaK_MPa_sqrt_m", "developed_da_dN_m_per_cycle", "Developed da/dN (m/cycle)",
+         args.out / "high_rate_zoom.png", ylim=(1e-8, 1e-4))
+    regime_map(rows, args.out / "four_class_regime_map.png")
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 
