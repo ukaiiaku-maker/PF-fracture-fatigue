@@ -163,3 +163,15 @@ def test_four_class_1e3_rate_batch_is_explicit_and_physics_preserving():
     assert all(row["R"] == .1 and row["frequency_Hz"] == 1000.0
                and row["temperature_K"] == 300.0
                and row["target_extension_um"] == 100.0 for row in rows)
+
+
+def test_four_class_1e3_rate_refinement_uses_measured_neighbor_points():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_four_class_1e3_rate_refinement_supervisor.py"
+    ), run_name="four_class_1e3_rate_refinement_test")
+    rows = namespace["base"].matrix()
+    assert [(row["label"], row["fraction"]) for row in rows] == [
+        ("peak", 1.175),
+        ("dbtt", 1.125), ("dbtt", 1.128),
+        ("weakT", 1.185), ("weakT", 1.1875),
+    ]
