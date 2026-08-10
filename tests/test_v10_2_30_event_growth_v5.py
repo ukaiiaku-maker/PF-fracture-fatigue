@@ -58,6 +58,35 @@ def test_rate_separated_segment_reuses_map_and_writes_checkpoint(monkeypatch, tm
     assert (tmp_path / "high_cycle_live_history.jsonl").is_file()
 
 
+def test_projected_constitutive_failure_rejects_private_dmd_candidate(
+    monkeypatch, tmp_path
+):
+    _production(monkeypatch, tmp_path)
+    engine = AffineEngine(drift=1.0, hazard=1.0e-30)
+    exact_map = segment.one_cycle_map
+
+    def reject_states_beyond_training(*args, **kwargs):
+        state = kwargs.get("state")
+        if state is not None and max(state.vector) > 13.0:
+            raise ValueError("synthetic non-finite projected constitutive state")
+        return exact_map(*args, **kwargs)
+
+    monkeypatch.setattr(segment, "one_cycle_map", reject_states_beyond_training)
+    result = segment.propagate_dmd_cycles(
+        engine,
+        Controller(),
+        Waveform(),
+        300.0,
+        1.0e6,
+        requested_project_cycles=16.0,
+    )
+
+    assert result.accepted is False
+    assert result.failure_reason == "dmd_projected_state_constitutive_rejected"
+    assert engine.mpz.mobile_count == 0.0
+    assert engine.hazard_action_current == 0.0
+
+
 def test_signed_ledger_is_not_a_dmd_admission_gate(monkeypatch, tmp_path):
     _production(monkeypatch, tmp_path)
 
