@@ -253,6 +253,22 @@ def test_locator_commits_bounded_exact_progress_when_horizon_has_no_bracket():
     assert engine.hazard_action_current == pytest.approx(0.125)
 
 
+def test_locator_requires_executable_private_firing_not_only_reported_action():
+    """A rounded-up action diagnostic must not form a non-firing high bracket."""
+    class RoundedDiagnosticEngine(Engine):
+        def _integrate_coupled(self, *args, **kwargs):
+            result = super()._integrate_coupled(*args, **kwargs)
+            if not result["fired"]:
+                result["physical_hazard_action_step"] += 1.0e-11
+            return result
+
+    engine = RoundedDiagnosticEngine(lambda_per_s=0.25, threshold=0.250000000005)
+    result = localize_first_passage(engine, Controller(), Waveform(), 300.0, 2.0)
+    assert result["fired"] is True
+    assert result["coupled_hazard_locator_bracket_low"] == 1.0
+    assert result["coupled_hazard_locator_bracket_high"] == 2.0
+
+
 
 
 class Controller:
