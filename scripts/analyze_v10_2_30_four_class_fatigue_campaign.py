@@ -27,7 +27,14 @@ def summarize_run(root: Path) -> dict:
     event_count = int(summary.get("event_count", 0))
     exit_code_path = root / "exit_code.txt"
     exit_code = int(exit_code_path.read_text().strip()) if exit_code_path.is_file() else None
-    if exit_code not in (None, 0):
+    # A wrapper watchdog can expire during terminal plotting/analysis after the
+    # solver has already committed the physical target and the developed-growth
+    # analyzer has written a complete record.  The physical terminal artifact
+    # is authoritative; retain the nonzero wrapper code as diagnostic context.
+    if summary.get("target_reached") and event_count > 0:
+        status = "completed"
+        reason = f"post_target_wrapper_exit_{exit_code}" if exit_code not in (None, 0) else None
+    elif exit_code not in (None, 0):
         status = "failed"
         reason = f"exit_code_{exit_code}"
     elif event_count > 0:

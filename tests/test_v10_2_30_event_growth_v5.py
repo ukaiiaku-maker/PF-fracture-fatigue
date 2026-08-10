@@ -480,7 +480,9 @@ def test_four_class_campaign_analyzer_keeps_censors_and_provenance(tmp_path):
         (root / "v10_2_30_fixed_deltaK_control.json").write_text(
             json.dumps({"censor_status": "right_censored_no_event" if not rate else "propagated"})
         )
-        (root / "exit_code.txt").write_text("0\n")
+        # A target-reached physical record remains complete even if the outer
+        # wrapper times out during terminal post-processing.
+        (root / "exit_code.txt").write_text("124\n" if rate else "0\n")
         if rate:
             (root / "stochastic_avalanche_geometry_events.json").write_text(json.dumps([{
                 "event_index": 0, "x1": 0.001005, "y1": 0.0,
@@ -495,6 +497,7 @@ def test_four_class_campaign_analyzer_keeps_censors_and_provenance(tmp_path):
     assert payload["completed_count"] == 1
     assert payload["censored_count"] == 1
     assert payload["failed_count"] == 0
+    assert payload["cases"][0]["censor_or_failure_reason"] == "post_target_wrapper_exit_124"
     assert payload["cases"][0]["git_head"] == "deadbeef"
     assert (out / "four_class_fatigue_cases.csv").is_file()
     assert (out / "four_class_fatigue_censor_failure_table.csv").is_file()
