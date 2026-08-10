@@ -15,6 +15,12 @@ import numpy as np
 
 CASE_RE = re.compile(r"(?P<label>peak|dbtt|weakT|ceramic)_f(?P<whole>\d+)p(?P<frac>\d+)_seed", re.I)
 CLASS_ORDER = ("peak", "dbtt", "weakt", "ceramic")
+REFERENCE_DELTAK = {
+    "peak": 21.289546465050222,
+    "dbtt": 21.02530765128298,
+    "weakt": 12.702935563752424,
+    "ceramic": 12.259477791864454,
+}
 
 
 def fraction(path: str) -> tuple[str, float] | None:
@@ -74,7 +80,9 @@ def case_row(case: dict) -> dict | None:
     parsed = fraction(case["run_path"])
     if parsed is None:
         return None
-    label, f = parsed
+    label, path_fraction = parsed
+    delta_k = finite(case.get("deltaK_MPa_sqrt_m"))
+    f = delta_k / REFERENCE_DELTAK[label] if delta_k is not None else path_fraction
     output = Path(case["run_path"])
     developed_path = output / "developed_fatigue_growth_summary.json"
     developed = json.loads(developed_path.read_text()) if developed_path.exists() else {}
@@ -227,6 +235,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("summary", type=Path)
     parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument("--target-rate", type=float, default=1e-5)
     args = parser.parse_args()
     payload = json.loads(args.summary.read_text())
     # Later aggregate entries are deliberate refinements/repeats and supersede
@@ -246,7 +255,8 @@ def main() -> int:
         writer.writerows(rows)
     fits = [fit for label in CLASS_ORDER if (fit := fit_rows(rows, label))]
     result = {"schema": "v10.2.30_four_class_driving_force_ladder_v2", "cases": rows,
-              "descriptive_power_law_fits": fits, "rate_endpoints": rate_endpoints(rows)}
+              "descriptive_power_law_fits": fits,
+              "rate_endpoints": rate_endpoints(rows, args.target_rate)}
     (args.out / "four_class_driving_force_ladder.json").write_text(
         json.dumps(result, indent=2, sort_keys=True) + "\n")
     plot(rows, "f", "developed_da_dN_m_per_cycle", "Developed da/dN (m/cycle)",
@@ -264,7 +274,7 @@ def main() -> int:
     plot(rows, "deltaK_MPa_sqrt_m", "median_event_spacing_cycles", "Median event spacing (cycles)",
          args.out / "event_spacing_vs_deltaK.png")
     plot(rows, "deltaK_MPa_sqrt_m", "developed_da_dN_m_per_cycle", "Developed da/dN (m/cycle)",
-         args.out / "high_rate_zoom.png", ylim=(1e-8, 1e-4))
+         args.out / "high_rate_zoom.png", ylim=(1e-8, max(1e-2, 10.0 * args.target_rate)))
     regime_map(rows, args.out / "four_class_regime_map.png")
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0

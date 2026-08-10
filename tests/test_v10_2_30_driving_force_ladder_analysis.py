@@ -48,3 +48,18 @@ def test_rate_endpoint_reports_measured_neighbor_bracket():
     endpoint = module.rate_endpoints(rows)[0]
     assert endpoint["lower_bracket_f"] == 1.135
     assert endpoint["upper_bracket_f"] == 1.14
+
+
+def test_rate_endpoint_accepts_1e3_target():
+    module = load_module()
+    rows = [
+        {"class": "weakt", "f": 1.185, "developed_da_dN_m_per_cycle": 9.83e-4,
+         "deltaK_MPa_sqrt_m": 15.05, "cycles_to_target": .103,
+         "regime": "NEAR_MONOTONIC_CYCLIC_FAILURE"},
+        {"class": "weakt", "f": 1.1875, "developed_da_dN_m_per_cycle": 1.09e-3,
+         "deltaK_MPa_sqrt_m": 15.08, "cycles_to_target": .093,
+         "regime": "NEAR_MONOTONIC_CYCLIC_FAILURE"},
+    ]
+    endpoint = module.rate_endpoints(rows, 1e-3)[0]
+    assert endpoint["target_da_dN_m_per_cycle"] == 1e-3
+    assert endpoint["nearest"]["f"] == 1.185

@@ -175,3 +175,13 @@ def test_four_class_1e3_rate_refinement_uses_measured_neighbor_points():
         ("dbtt", 1.125), ("dbtt", 1.128),
         ("weakT", 1.185), ("weakT", 1.1875),
     ]
+
+
+def test_ceramic_1e3_final_is_single_measured_point():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_ceramic_1e3_rate_final_supervisor.py"
+    ), run_name="ceramic_1e3_rate_final_test")
+    rows = namespace["base"].matrix()
+    assert [(row["label"], row["fraction"]) for row in rows] == [
+        ("ceramic", 1.264),
+    ]

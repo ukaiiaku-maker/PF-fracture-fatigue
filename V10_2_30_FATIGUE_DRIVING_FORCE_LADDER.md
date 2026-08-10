@@ -68,3 +68,21 @@ The final directory contains:
 - a `1e-8` to `1e-4 m/cycle` high-rate zoom
 
 All supervisors terminated normally, no worker remains live, disk stayed above the 10 GiB launch reserve, and no queued matrix was restarted.
+
+## Extension to `da/dN ~ 1e-3 m/cycle`
+
+The fixed-local-`DeltaK` ladder was subsequently extended without changing any physics or parameterization. The computational domain configured by this model is `2 mm x 4 mm`, rather than 1 cm, so the qualified ~100 um developed trajectories were retained; they remain comfortably inside the modeled specimen.
+
+| class | closest measured f | DeltaK | developed da/dN | cycles target | events | projected/path um | measured neighbor |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Peak | 1.175 | 25.0152 | 1.23793e-3 | 0.07893 | 18 | 102.668 / 107.778 | f1.180, 1.53938e-3 |
+| DBTT | 1.125 | 23.6535 | 1.01319e-3 | 0.09989 | 15 | 101.976 / 108.587 | f1.128, 1.27269e-3 |
+| Weak-T | 1.185 | 15.0530 | 9.83017e-4 | 0.10286 | 16 | 111.501 / 119.405 | f1.1875, 1.08987e-3 |
+| ceramic-like | 1.250 | 15.3243 | 7.00857e-4 | 0.14978 | 20 | 108.149 / 121.110 | f1.300, 2.53704e-3 |
+
+Peak and DBTT were refined below an initial above-target pair; Weak-T has a tight measured below/above bracket; ceramic-like has a wider measured bracket containing the target. Every listed trajectory reached the extension target, retained multiple stochastic renewals and energy-gated geometry commits, and passed the existing developed-growth stability criterion. At these rates all four are firmly in the near-monotonic cyclic regime: the values are useful as the upper measured boundary of this stochastic cyclic model, not as long-life fatigue points.
+
+Production roots:
+
+- `runs/v10_2_30_four_class_1e3_rate_4146c9e_20260810`
+- `runs/v10_2_30_four_class_1e3_rate_refinement_eb6d7ae_20260810`
