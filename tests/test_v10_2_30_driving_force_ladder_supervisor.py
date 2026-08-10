@@ -117,3 +117,13 @@ def test_weakt_ceramic_adaptive_high_rate_specialization():
         assert row["R"] == .1
         assert row["frequency_Hz"] == 1000.0
         assert row["temperature_K"] == 300.0
+
+
+def test_target_refinement_is_exactly_two_measured_rows():
+    namespace = runpy.run_path(str(
+        ROOT / "scripts" / "v10230_weakt_ceramic_target_refinement_supervisor.py"
+    ), run_name="target_refinement_test")
+    rows = namespace["ladder"].matrix()
+    assert [(row["label"], row["fraction"]) for row in rows] == [
+        ("weakT", 1.145), ("ceramic", 1.205),
+    ]
