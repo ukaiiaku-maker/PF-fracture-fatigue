@@ -78,11 +78,14 @@ The fixed-local-`DeltaK` ladder was subsequently extended without changing any p
 | Peak | 1.175 | 25.0152 | 1.23793e-3 | 0.07893 | 18 | 102.668 / 107.778 | f1.180, 1.53938e-3 |
 | DBTT | 1.125 | 23.6535 | 1.01319e-3 | 0.09989 | 15 | 101.976 / 108.587 | f1.128, 1.27269e-3 |
 | Weak-T | 1.185 | 15.0530 | 9.83017e-4 | 0.10286 | 16 | 111.501 / 119.405 | f1.1875, 1.08987e-3 |
-| ceramic-like | 1.250 | 15.3243 | 7.00857e-4 | 0.14978 | 20 | 108.149 / 121.110 | f1.300, 2.53704e-3 |
+| ceramic-like | 1.264 | 15.4960 | 1.09493e-3 | 0.09589 | 20 | 108.149 / 121.110 | f1.250, 7.00857e-4 |
 
-Peak and DBTT were refined below an initial above-target pair; Weak-T has a tight measured below/above bracket; ceramic-like has a wider measured bracket containing the target. Every listed trajectory reached the extension target, retained multiple stochastic renewals and energy-gated geometry commits, and passed the existing developed-growth stability criterion. At these rates all four are firmly in the near-monotonic cyclic regime: the values are useful as the upper measured boundary of this stochastic cyclic model, not as long-life fatigue points.
+Peak and DBTT were refined below an initial above-target pair; Weak-T and ceramic-like have measured below/above brackets. Every listed trajectory reached the extension target, retained multiple stochastic renewals and energy-gated geometry commits, and passed the existing developed-growth stability criterion. At these rates all four are firmly in the near-monotonic cyclic regime: the values are useful as the upper measured boundary of this stochastic cyclic model, not as long-life fatigue points.
 
 Production roots:
 
 - `runs/v10_2_30_four_class_1e3_rate_4146c9e_20260810`
 - `runs/v10_2_30_four_class_1e3_rate_refinement_eb6d7ae_20260810`
+- `runs/v10_2_30_ceramic_1e3_rate_final_90e2065_20260810`
+
+The consolidated 68-point machine-readable dataset and regenerated plots are under `runs/v10_2_30_four_class_1e3_rate_complete_20260810`.
