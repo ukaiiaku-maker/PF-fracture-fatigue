@@ -134,6 +134,24 @@ def test_disk_space_block_and_maximum_two_job_cap(tmp_path, monkeypatch):
     assert module.free_gib(tmp_path) < 10.0
 
 
+def test_terminal_supervisor_transition_removes_all_ownership_metadata(tmp_path):
+    """A normally terminal matrix must never require manual PID/lock repair."""
+    module = load_module()
+    args = module.parser().parse_args([
+        "run", str(tmp_path), "--smoke-worker", "--max-jobs", "2",
+        "--poll-seconds", "0.01", "--minimum-free-gib", "0",
+    ])
+    assert module.run(args) == 0
+    assert not (tmp_path / module.LOCK_NAME).exists()
+    assert not (tmp_path / "launcher.json").exists()
+    assert not (tmp_path / "active_workers.json").exists()
+    for row in module.matrix():
+        status = json.loads(
+            (tmp_path / row["case"] / "qualification_status.json").read_text()
+        )
+        assert status["status"] == "completed"
+
+
 def test_status_transitions_preserve_completed_outputs(tmp_path):
     module = load_module(); case = tmp_path / "case"; case.mkdir()
     result = case / "result.txt"; result.write_text("keep")
