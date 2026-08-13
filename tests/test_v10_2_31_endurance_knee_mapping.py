@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import json
+import csv
 
 from arrhenius_fracture.material_manifest import MaterialManifest
 from arrhenius_fracture.unified_mpz import MPZConfig, UnifiedMPZState
@@ -28,6 +29,14 @@ def test_selection_record_exactly_matches_mapped_option_order():
     payload=json.loads(mapped.SELECTION_RECORD.read_text())
     assert payload["canonical_option_order"] == list(mapped.VALID)
     assert payload["parameter_refit"] is False
+
+
+def test_transferred_registry_maps_active_encounter_efficiency():
+    path="arrhenius_fracture/data/materials/v10_2_31_endurance_knee_ABCD_registry.csv"
+    for row in csv.DictReader(open(path)):
+        assert float(row["encounter_efficiency"]) == float(row["physics__encounter_efficiency"])
+        assert float(row["source_sites_per_system"]) > 0.0
+        assert row["legacy_source_sites_active"] == "0"
 
 
 def test_blunting_slip_fraction_maps_multiplicatively():

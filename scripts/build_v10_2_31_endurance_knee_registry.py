@@ -21,6 +21,7 @@ SHARED = {
     "mobile_shield_fraction": "0", "source_recovery_rate_s": "0",
     "L_pz_um_recommended": "50", "n_bins_recommended": "80",
     "retained_recovery_rate_s": "0", "source_refresh_length_um": "0",
+    "source_sites_per_system": "141.0590567476921",
     "recovery_nu0_s": "0", "recovery_H0_eV": "0",
     "recovery_activation_entropy_kB": "0", "reference_source_area_um2": "25",
     "reference_front_width_um": "10", "source_zone_length_um": "2",
@@ -40,6 +41,7 @@ def main() -> int:
     rows=[]
     for label,candidate in IDS.items():
         original=by_id[candidate]; row=dict(original); row.update(SHARED)
+        row["encounter_efficiency"] = original["physics__encounter_efficiency"]
         row.update({"option_key":candidate,"candidate_id":candidate,"material_class":label[0],
                     "role":"v10.2.31 exact endurance-knee spatial transfer",
                     "mechanism_summary":{"A":"direct barrier","B":"plastic-state controlled","C":"timescale crossover","D":"mixed"}[label[0]],
