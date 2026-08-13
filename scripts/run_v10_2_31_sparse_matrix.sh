@@ -21,7 +21,9 @@ mkdir -p "$CAMPAIGN"
 for spec in "${cases[@]}"; do
   read -r cls regime option dk target <<<"$spec"; out="$CAMPAIGN/$cls/$regime"
   [[ -e "$out/exit_code.txt" ]] && continue
-  while (( $(jobs -rp | wc -l) >= MAX_PARALLEL )); do wait -n || true; done
+  while (( $(jobs -rp | wc -l) >= MAX_PARALLEL )); do
+    oldest=$(jobs -rp | head -n 1); wait "$oldest" || true
+  done
   mkdir -p "$CAMPAIGN/$cls"
   (set +e; env PYTHON_BIN="$PYTHON_BIN" PARAMETER_OPTION="$option" DELTA_K_MPA_SQRT_M="$dk" OUTROOT="$out" CYCLES_MAX=1e14 TARGET_EXT_UM="$target" STEPS=20000 bash scripts/run_v10_2_31_sparse_case.sh; rc=$?; printf '%s\n' "$rc" > "$out/exit_code.txt"; exit "$rc") &
 done
