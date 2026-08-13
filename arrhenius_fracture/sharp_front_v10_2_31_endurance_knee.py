@@ -43,7 +43,7 @@ def _mapped_prepare(args):
 def main(argv=None):
     global _ORIGINAL_PREPARE
     args=list(sys.argv[1:] if argv is None else argv)
-    registry=_registry_entry._option_value(args,"--parameter-registry")
+    registry=_registry_entry._base._option_value(args,"--parameter-registry")
     if not registry: raise SystemExit("v10.2.31 requires an explicit transferred --parameter-registry")
     _paper.DEFAULT_REGISTRY=Path(registry).resolve(); _paper.VALID_OPTIONS=dict(VALID)
     _ORIGINAL_PREPARE=_registry_entry._prepare_option
