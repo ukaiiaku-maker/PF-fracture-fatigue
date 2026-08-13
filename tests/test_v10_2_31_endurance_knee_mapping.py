@@ -38,6 +38,8 @@ def test_transferred_registry_maps_active_encounter_efficiency():
         assert float(row["source_sites_per_system"]) > 0.0
         assert row["legacy_source_sites_active"] == "0"
         assert row["exact_spatial_Tref_active"] == "1"
+        assert row["material_class"] == "DBTT"
+        assert row["endurance_mechanism_class"] in "ABCD"
 
 
 def test_manifest_reads_candidate_reference_temperature(tmp_path):

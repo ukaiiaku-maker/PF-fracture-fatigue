@@ -44,7 +44,8 @@ def main() -> int:
     for label,candidate in IDS.items():
         original=by_id[candidate]; row=dict(original); row.update(SHARED)
         row["encounter_efficiency"] = original["physics__encounter_efficiency"]
-        row.update({"option_key":candidate,"candidate_id":candidate,"material_class":label[0],
+        row.update({"option_key":candidate,"candidate_id":candidate,"material_class":"DBTT",
+                    "endurance_mechanism_class":label[0],
                     "role":"v10.2.31 exact endurance-knee spatial transfer",
                     "mechanism_summary":{"A":"direct barrier","B":"plastic-state controlled","C":"timescale crossover","D":"mixed"}[label[0]],
                     "validation_status":"pending sparse 2-D validation"})
