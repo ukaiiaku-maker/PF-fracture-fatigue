@@ -17,7 +17,7 @@ def test_new_spatial_controls_have_legacy_neutral_defaults():
 
 def test_explicit_registry_option_is_read_from_stage3_namespace(monkeypatch):
     seen={}
-    monkeypatch.setattr(mapped._production,"main",lambda args:seen.setdefault("args",args))
+    monkeypatch.setattr(mapped,"_PRODUCTION_MAIN",lambda args:seen.setdefault("args",args))
     monkeypatch.setattr(mapped._registry_entry,"_prepare_option",lambda args:None)
     mapped.main(["--parameter-registry","registry.csv"])
     assert seen["args"] == ["--parameter-registry","registry.csv"]

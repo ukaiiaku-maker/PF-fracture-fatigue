@@ -10,6 +10,7 @@ from . import sharp_front_v10_2_30_energy_gated_fatigue as _production
 from .persistent_site_source_v10221 import PersistentSiteConfig
 
 MODEL_ID="v10.2.31_endurance_knee_ABCD_sparse_2D_validation"
+_PRODUCTION_MAIN = _production.main
 VALID={f"v914_endurance_knee_{suffix}":f"v914_endurance_knee_{suffix}" for suffix in ("0462","0658","0554","0133")}
 
 def _number(row,key):
@@ -48,7 +49,7 @@ def main(argv=None):
     _paper.DEFAULT_REGISTRY=Path(registry).resolve(); _paper.VALID_OPTIONS=dict(VALID)
     _ORIGINAL_PREPARE=_registry_entry._prepare_option
     _registry_entry._prepare_option=_mapped_prepare
-    try: return _production.main(args)
+    try: return _PRODUCTION_MAIN(args)
     finally: _registry_entry._prepare_option=_ORIGINAL_PREPARE
 
 if __name__=="__main__": main()
