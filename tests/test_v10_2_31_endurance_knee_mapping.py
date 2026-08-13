@@ -37,6 +37,18 @@ def test_transferred_registry_maps_active_encounter_efficiency():
         assert float(row["encounter_efficiency"]) == float(row["physics__encounter_efficiency"])
         assert float(row["source_sites_per_system"]) > 0.0
         assert row["legacy_source_sites_active"] == "0"
+        assert row["exact_spatial_Tref_active"] == "1"
+
+
+def test_manifest_reads_candidate_reference_temperature(tmp_path):
+    source="arrhenius_fracture/data/materials/v10_2_31_endurance_knee_ABCD_registry.csv"
+    row=next(csv.DictReader(open(source)))
+    target=tmp_path/"one.csv"
+    with target.open("w",newline="") as f:
+        w=csv.DictWriter(f,fieldnames=list(row));w.writeheader();w.writerow(row)
+    manifest=MaterialManifest.from_csv(target)
+    assert manifest.cleavage.Tref_K == 300.0
+    assert manifest.emission.Tref_K == 300.0
 
 
 def test_blunting_slip_fraction_maps_multiplicatively():

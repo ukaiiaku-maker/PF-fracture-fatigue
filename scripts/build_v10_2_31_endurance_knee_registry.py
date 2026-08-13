@@ -27,6 +27,8 @@ SHARED = {
     "reference_front_width_um": "10", "source_zone_length_um": "2",
     "legacy_source_sites_active": "0", "legacy_source_refresh_active": "0",
     "explicit_recovery_active": "0",
+    "exact_spatial_Tref_active": "1",
+    "max_K_shield_MPa_sqrt_m": "0",
 }
 
 def sha(path: Path) -> str:

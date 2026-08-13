@@ -10,9 +10,11 @@
   "schema": "v10.2.31_endurance_knee_registry_transfer_v1",
   "shared_spatial_constants": {
     "L_pz_um_recommended": "50",
+    "exact_spatial_Tref_active": "1",
     "explicit_recovery_active": "0",
     "legacy_source_refresh_active": "0",
     "legacy_source_sites_active": "0",
+    "max_K_shield_MPa_sqrt_m": "0",
     "mobile_shield_fraction": "0",
     "n_bins_recommended": "80",
     "n_slip_channels": "2",

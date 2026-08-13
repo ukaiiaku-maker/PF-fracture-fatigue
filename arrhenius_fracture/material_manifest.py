@@ -28,6 +28,11 @@ def _f(row: dict[str, str], key: str) -> float:
     return value
 
 
+def _f_default(row: dict[str, str], key: str, default: float) -> float:
+    raw = row.get(key)
+    return float(default) if raw in (None, "") else _f(row, key)
+
+
 @dataclass(frozen=True)
 class ExpFloorBarrier:
     G00_eV: float
@@ -123,6 +128,7 @@ class MaterialManifest:
             alpha=_f(row, "emit_exp_a"),
             exponent=_f(row, "emit_exp_n"),
             floor_fraction=_f(row, "emit_floor_frac"),
+            Tref_K=_f_default(row, "Tref_K", TREF_K),
             attempt_frequency_s=1.0e11,
         )
         cleavage = ExpFloorBarrier(
@@ -133,6 +139,7 @@ class MaterialManifest:
             alpha=_f(row, "cleave_exp_a"),
             exponent=_f(row, "cleave_exp_n"),
             floor_fraction=_f(row, "cleave_floor_frac"),
+            Tref_K=_f_default(row, "Tref_K", TREF_K),
             attempt_frequency_s=1.0e12,
         )
         return cls(

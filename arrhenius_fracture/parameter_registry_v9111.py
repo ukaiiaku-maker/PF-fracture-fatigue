@@ -124,7 +124,6 @@ def read_registry(path: str | Path | None = None) -> list[dict[str, str]]:
 def _validate_current_spatial_contract(row: dict[str, str]) -> None:
     """Fail closed when a row requires controls not wired into v10.2.15."""
     exact_or_close = {
-        "Tref_K": 481.33,
         "n_slip_channels": 2.0,
         "rho_forest_floor_m2": 5.0e12,
         "peierls_stress_fraction": 1.0 / math.sqrt(3.0),
@@ -132,6 +131,16 @@ def _validate_current_spatial_contract(row: dict[str, str]) -> None:
         "mobile_shield_fraction": 0.0,
         "source_recovery_rate_s": 0.0,
     }
+    tref = _number(row, "Tref_K")
+    explicit_tref = str(row.get("exact_spatial_Tref_active", "0")).strip() == "1"
+    if explicit_tref:
+        if tref <= 0.0:
+            raise ValueError("explicit spatial Tref_K must be positive")
+    elif not math.isclose(tref, 481.33, rel_tol=1.0e-12, abs_tol=1.0e-15):
+        raise ValueError(
+            f"registry option {row.get('option_key')!r} requires Tref_K={tref!r}; "
+            "v10.2.15 legacy rows require 481.33 K unless exact_spatial_Tref_active=1"
+        )
     for key, expected in exact_or_close.items():
         value = _number(row, key)
         if not math.isclose(value, expected, rel_tol=1.0e-12, abs_tol=1.0e-15):
