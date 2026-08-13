@@ -28,8 +28,11 @@ class MPZConfig:
     mobile_shield_fraction: float = 0.0
     shielding_core_m: float = 2.5e-10
     blunting_length_m: float = 0.5e-6
+    blunting_slip_fraction: float = 1.0
     forest_density_floor_m2: float = 5.0e12
     jump_fraction: float = 1.0
+    taylor_phi_max: float = float("inf")
+    mobile_transport_velocity_scale: float = 1.0
     peierls_stress_fraction: float = 1.0 / math.sqrt(3.0)
     taylor_stress_fraction: float = 1.0 / math.sqrt(3.0)
     mobile_recovery_rate_s: float = 0.0
@@ -154,7 +157,8 @@ class UnifiedMPZState:
     def local_slip_count(self) -> float:
         L = max(float(self.cfg.blunting_length_m), self.dx)
         w = np.exp(-self.x / L)
-        return float(np.sum(self.accumulated_slip * w[None, :]))
+        return (max(float(self.cfg.blunting_slip_fraction), 0.0)
+                * float(np.sum(self.accumulated_slip * w[None, :])))
 
     def blunted_radius(self, r0: float, b: float) -> float:
         return max(float(r0) + max(self.manifest.c_blunt, 0.0) * abs(float(b)) * self.local_slip_count(), float(r0))
@@ -179,6 +183,8 @@ class UnifiedMPZState:
         tau_p = max(float(self.cfg.peierls_stress_fraction), 0.0) * np.maximum(stress_profile, 0.0)
         spacing = 1.0 / (2.0 * np.sqrt(np.maximum(rho, 1.0)))
         phi = spacing / max(abs(float(b)), 1.0e-30)
+        if math.isfinite(float(self.cfg.taylor_phi_max)):
+            phi = np.minimum(phi, float(self.cfg.taylor_phi_max))
         tau_t = max(float(self.cfg.taylor_stress_fraction), 0.0) * np.maximum(stress_profile, 0.0) * phi
         p = p_surface.rate(tau_p, T_K)
         t1 = t_surface.rate(tau_t, T_K)
@@ -186,8 +192,9 @@ class UnifiedMPZState:
         m = 1.0 + max(self.manifest.taylor_corr_scale, 0.0) * np.maximum(ratio - 1.0, 0.0)
         t = gammainc(np.maximum(m, 1.0), np.minimum(np.maximum(t1, 0.0), 1.0e12))
         jump = max(float(self.cfg.jump_fraction), 0.0) * spacing
-        velocity = jump * p
-        encounter = max(self.manifest.encounter_efficiency, 0.0) * velocity * np.sqrt(np.maximum(rho, 0.0))
+        peierls_velocity = jump * p
+        velocity = max(float(self.cfg.mobile_transport_velocity_scale), 0.0) * peierls_velocity
+        encounter = max(self.manifest.encounter_efficiency, 0.0) * peierls_velocity * np.sqrt(np.maximum(rho, 0.0))
         return {"peierls": p, "taylor": t, "taylor_single": t1, "m": m, "jump": jump, "velocity": velocity, "encounter": encounter}
 
     @staticmethod

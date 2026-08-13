@@ -1,0 +1,33 @@
+import numpy as np
+import pytest
+
+from arrhenius_fracture.material_manifest import MaterialManifest
+from arrhenius_fracture.unified_mpz import MPZConfig, UnifiedMPZState
+from arrhenius_fracture.persistent_site_source_v10221 import PersistentSiteConfig
+
+
+def test_new_spatial_controls_have_legacy_neutral_defaults():
+    cfg=MPZConfig()
+    assert cfg.blunting_slip_fraction == 1.0
+    assert np.isinf(cfg.taylor_phi_max)
+    assert cfg.mobile_transport_velocity_scale == 1.0
+    assert PersistentSiteConfig(rho_site0_m2=1e12).backstress_scale == 1.0
+
+
+def test_blunting_slip_fraction_maps_multiplicatively():
+    manifest=MaterialManifest.from_csv("arrhenius_fracture/data/materials/weakT/spatial_promotion_manifest.csv")
+    state=UnifiedMPZState(manifest,MPZConfig(n_bins=4,blunting_slip_fraction=0.25))
+    state.accumulated_slip[:]=2.0
+    reference=UnifiedMPZState(manifest,MPZConfig(n_bins=4,blunting_slip_fraction=1.0))
+    reference.accumulated_slip[:]=2.0
+    assert state.local_slip_count() == pytest.approx(0.25*reference.local_slip_count())
+
+
+def test_transport_scale_does_not_change_encounter_storage_rate():
+    manifest=MaterialManifest.from_csv("arrhenius_fracture/data/materials/weakT/spatial_promotion_manifest.csv")
+    a=UnifiedMPZState(manifest,MPZConfig(n_bins=4,mobile_transport_velocity_scale=1.0))
+    b=UnifiedMPZState(manifest,MPZConfig(n_bins=4,mobile_transport_velocity_scale=0.0))
+    stress=np.full(4,1e9); rho=np.full(4,5e12)
+    ra=a._transport_rates(stress,rho,300.0,2.74e-10); rb=b._transport_rates(stress,rho,300.0,2.74e-10)
+    assert np.allclose(ra["encounter"],rb["encounter"])
+    assert np.all(rb["velocity"]==0.0)

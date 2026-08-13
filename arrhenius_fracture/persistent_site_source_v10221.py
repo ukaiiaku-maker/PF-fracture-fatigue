@@ -52,6 +52,7 @@ class PersistentSiteConfig:
     maximum_front_width_m: float = 0.0
     implicit_tolerance: float = 1.0e-10
     implicit_max_iterations: int = 96
+    backstress_scale: float = 1.0
 
     def validate(self) -> "PersistentSiteConfig":
         if not math.isfinite(self.rho_site0_m2) or self.rho_site0_m2 <= 0.0:
@@ -72,6 +73,8 @@ class PersistentSiteConfig:
             raise ValueError("implicit_tolerance must be positive")
         if self.implicit_max_iterations < 8:
             raise ValueError("implicit_max_iterations must be at least 8")
+        if not math.isfinite(self.backstress_scale) or self.backstress_scale <= 0.0:
+            raise ValueError("backstress_scale must be positive and finite")
         return self
 
 
@@ -482,6 +485,7 @@ def install_persistent_site_source(
     state._persistent_r0_m = r0
     state._persistent_b = float(b_m)
     state._persistent_active_arc_factor = arc_factor
+    state._campaign_backstress_scale = float(cfg.backstress_scale)
     state._persistent_base_diagnostics = state.diagnostics
     state.available_sites = np.asarray(state.site_capacity, dtype=float).copy()
     state.tip_source_activity = np.ones(state.n_systems, dtype=float)

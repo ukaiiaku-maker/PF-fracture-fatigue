@@ -1,0 +1,34 @@
+{
+  "candidate_ids": {
+    "A_0462": "v914_endurance_knee_0462",
+    "B_0658": "v914_endurance_knee_0658",
+    "C_0554": "v914_endurance_knee_0554",
+    "D_0133": "v914_endurance_knee_0133"
+  },
+  "output": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_codex_v10_2_30/arrhenius_fracture/data/materials/v10_2_31_endurance_knee_ABCD_registry.csv",
+  "parameter_refit": false,
+  "schema": "v10.2.31_endurance_knee_registry_transfer_v1",
+  "shared_spatial_constants": {
+    "L_pz_um_recommended": "50",
+    "explicit_recovery_active": "0",
+    "legacy_source_refresh_active": "0",
+    "legacy_source_sites_active": "0",
+    "mobile_shield_fraction": "0",
+    "n_bins_recommended": "80",
+    "n_slip_channels": "2",
+    "peierls_stress_fraction": "0.5773502691896258",
+    "recovery_H0_eV": "0",
+    "recovery_activation_entropy_kB": "0",
+    "recovery_nu0_s": "0",
+    "reference_front_width_um": "10",
+    "reference_source_area_um2": "25",
+    "retained_recovery_rate_s": "0",
+    "rho_forest_floor_m2": "5000000000000",
+    "source_recovery_rate_s": "0",
+    "source_refresh_length_um": "0",
+    "source_zone_length_um": "2",
+    "taylor_stress_fraction": "0.5773502691896258"
+  },
+  "source": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search/runtime_inputs/v914/endurance_knee_global_300K_1024.csv",
+  "source_sha256": "d05958c568610fab1fbb8795c6815f05ea6f36ef6cb1336dfecafa3ffc297ad1"
+}

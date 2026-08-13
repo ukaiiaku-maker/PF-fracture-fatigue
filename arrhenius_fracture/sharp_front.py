@@ -668,6 +668,9 @@ def build_engine(args, mat) -> FrontEngine:
             n_bins=int(getattr(args, 'mpz_n_bins', 200)),
             source_bin_count=int(getattr(args, 'mpz_source_bins', 2)),
             blunting_length_m=float(getattr(args, 'mpz_blunting_length_um', 0.5)) * 1.0e-6,
+            blunting_slip_fraction=float(getattr(args, 'mpz_blunting_slip_fraction', 1.0)),
+            taylor_phi_max=float(getattr(args, 'pt_taylor_phi_max', float('inf'))),
+            mobile_transport_velocity_scale=float(getattr(args, 'mpz_mobile_transport_velocity_scale', 1.0)),
             wake_length_m=float(getattr(args, 'wake_length_um', 100.0)) * 1.0e-6,
             wake_n_bins=int(getattr(args, 'wake_n_bins', 0)),
             wake_shielding=bool(getattr(args, 'wake_shielding', True)),
@@ -3882,6 +3885,7 @@ def _build_parser():
     p.add_argument('--mpz-pair-annihilation-rate-per-count-s', type=float, default=0.0)
     p.add_argument('--mpz-blunting-length-m', type=float, default=5e-7)
     p.add_argument('--mpz-blunting-slip-fraction', type=float, default=1.0)
+    p.add_argument('--mpz-mobile-transport-velocity-scale', type=float, default=1.0)
     p.add_argument('--mpz-max-transport-cfl', type=float, default=0.35)
     p.add_argument('--mpz-max-transport-substeps', type=int, default=2000)
     p.add_argument('--r-pz', type=float, default=1e-6, dest='r_pz')
