@@ -12,6 +12,7 @@ from .persistent_site_source_v10221 import PersistentSiteConfig
 MODEL_ID="v10.2.31_endurance_knee_ABCD_sparse_2D_validation"
 _PRODUCTION_MAIN = _production.main
 VALID={f"v914_endurance_knee_{suffix}":f"v914_endurance_knee_{suffix}" for suffix in ("0462","0658","0554","0133")}
+SELECTION_RECORD=(Path(__file__).resolve().parent/"data"/"materials"/"v10_2_31_endurance_knee_ABCD_selection.json")
 
 def _number(row,key):
     try: return float(row[key])
@@ -47,6 +48,7 @@ def main(argv=None):
     registry=_registry_entry._base._option_value(args,"--parameter-registry")
     if not registry: raise SystemExit("v10.2.31 requires an explicit transferred --parameter-registry")
     _paper.DEFAULT_REGISTRY=Path(registry).resolve(); _paper.VALID_OPTIONS=dict(VALID)
+    _paper.SELECTION_RECORD=SELECTION_RECORD
     _ORIGINAL_PREPARE=_registry_entry._prepare_option
     _registry_entry._prepare_option=_mapped_prepare
     try: return _PRODUCTION_MAIN(args)

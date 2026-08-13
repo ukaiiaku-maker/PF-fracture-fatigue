@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import json
 
 from arrhenius_fracture.material_manifest import MaterialManifest
 from arrhenius_fracture.unified_mpz import MPZConfig, UnifiedMPZState
@@ -21,6 +22,12 @@ def test_explicit_registry_option_is_read_from_stage3_namespace(monkeypatch):
     monkeypatch.setattr(mapped._registry_entry,"_prepare_option",lambda args:None)
     mapped.main(["--parameter-registry","registry.csv"])
     assert seen["args"] == ["--parameter-registry","registry.csv"]
+
+
+def test_selection_record_exactly_matches_mapped_option_order():
+    payload=json.loads(mapped.SELECTION_RECORD.read_text())
+    assert payload["canonical_option_order"] == list(mapped.VALID)
+    assert payload["parameter_refit"] is False
 
 
 def test_blunting_slip_fraction_maps_multiplicatively():
