@@ -181,7 +181,7 @@ def main()->int:
     classifications=[]
     decisions={
         "A":("SPARSE_2D_VALIDATED","four finite 2-D points reproduce the 1-D direct-barrier trend; upper points are within 14% and low-rate stochastic scatter is within a factor 3.4"),
-        "B":("FULL_2D_MAPPING_REQUIRED","matched interiors reveal a sharp ratio increase from 1.18 near onset to 13.6-14.5 by f=1.05-1.10; narrow transition refinement required"),
+        "B":("FULL_2D_MAPPING_REQUIRED","narrow refinement localizes a nonstationary f=1.00 trajectory, ratio 2.43 at f=1.02, and ratio 14.48 at f=1.04; the 2-D transition shape differs from 1-D"),
         "C":("SPARSE_2D_VALIDATED","five finite points preserve the timescale-crossover curve with 2-D/1-D ratios 0.878-1.142, including 0.894 at matched f=1.05"),
         "D":("FULL_2D_MAPPING_REQUIRED","developed upper points agree, but 2-D remains cycle-censored through DeltaK=36 MPa sqrt(m), shifting developed onset above the 1-D knee"),
     }
@@ -192,6 +192,14 @@ def main()->int:
             "reason":reason,
             "terminal_2D_cases":len(ss),"stable_developed_2D_cases":sum(bool(r["rate_m_per_cycle"]) for r in ss)})
     write_csv(out/"abcd_2D_validation_classification.csv",classifications)
-    (out/"abcd_1D_2D_validation_summary.json").write_text(json.dumps({"schema":"v10.2.31_sparse_2D_validation_v1","classifications":classifications,"parameter_refit":False,"censor_semantics":"partial/cycle-censored points are plotted as downward markers, never artificial developed rates"},indent=2)+"\n")
+    (out/"abcd_1D_2D_validation_summary.json").write_text(json.dumps({"schema":"v10.2.31_sparse_2D_validation_v1","classifications":classifications,"parameter_refit":False,"marker_semantics":{"developed":"filled circles","cycle_or_hazard_censor":"downward triangles","partial_or_numerically_unresolved":"open squares"}},indent=2)+"\n")
+    report=["# A–D sparse 1-D/2-D endurance-knee validation","",
+        "The continuous curves are authoritative v9.14 1-D predictions. Filled circles are independent stable, target-reaching 2-D rates; downward triangles are genuine cycle/hazard censors; open squares are partial or nonstationary calculations. No 2-D point was used to refit the 1-D curves.","",
+        "| Class | Classification | Evidence |","|---|---|---|"]
+    for row in classifications:
+        report.append(f"| {row['class']} | {row['classification']} | {row['reason']} |")
+    report += ["","D at 33.297 MPa√m was originally stopped only because its launcher target was 10 µm. The isolated 100-µm continuation reproduced all five prefix events, committed a sixth event to 30.908 µm, then reached the 1e14-cycle horizon; only the continuation is retained as the physical censor.","",
+        "No fracture physics, stochastic distribution, event-length law, energy gate, DMD tolerance, or material parameter was changed."]
+    (out/"abcd_1D_2D_mechanism_validation_report.md").write_text("\n".join(report)+"\n")
     return 0
 if __name__=="__main__": raise SystemExit(main())
