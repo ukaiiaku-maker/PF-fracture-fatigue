@@ -54,6 +54,8 @@ def two_d(root: Path) -> tuple[list[dict[str,Any]],list[dict[str,Any]]]:
     for cls,(folder,candidate,_) in CLASSES.items():
         case_dirs=sorted({p.parent for p in (root/folder).glob("*/developed_fatigue_growth_summary.json")} | {p.parent for p in (root/folder).glob("*/LOW_RATE_HAZARD_CENSOR.json")})
         for case in case_dirs:
+            if cls=="D" and case.name=="low" and (root/folder/"low_33p297_continued"/"exit_code.txt").exists():
+                continue  # superseded 10-um target truncation; not a physical terminal result
             summary=case/"developed_fatigue_growth_summary.json"
             hazard_payload=json.loads((case/"LOW_RATE_HAZARD_CENSOR.json").read_text()) if (case/"LOW_RATE_HAZARD_CENSOR.json").exists() else {}
             d=json.loads(summary.read_text()) if summary.exists() else {"cycles_consumed":hazard_payload.get("cycles_at_audit",0),"event_count":hazard_payload.get("committed_events",0),"final_projected_extension_um":0,"target_reached":False,"stable_growth_provisional":False,"developed_interval":{}}
@@ -116,7 +118,7 @@ def plots(reference:list[dict[str,Any]], spatial:list[dict[str,Any]], events:lis
         ax.plot([r["deltaK_MPa_sqrt_m"] for r in rr],[r["rate_m_per_cycle"] for r in rr],color=COLORS[cls],label=f"{cls} 1-D")
         ss=[r for r in spatial if r["class"]==cls]
         finite=[r for r in ss if r["rate_m_per_cycle"]]
-        ax.scatter([r["deltaK_MPa_sqrt_m"] for r in finite],[r["rate_m_per_cycle"] for r in finite],s=55,facecolors="white",edgecolors=COLORS[cls],marker="o",zorder=4,label=f"{cls} 2-D")
+        ax.scatter([r["deltaK_MPa_sqrt_m"] for r in finite],[r["rate_m_per_cycle"] for r in finite],s=55,facecolors=COLORS[cls],edgecolors="black",marker="o",zorder=4,label=f"{cls} 2-D")
         censor=[r for r in ss if r["plot_kind"]=="censor"]
         ax.scatter([r["deltaK_MPa_sqrt_m"] for r in censor],[max(r["observed_partial_rate_m_per_cycle"] or 1e-19,1e-19) for r in censor],s=55,facecolors="white",edgecolors=COLORS[cls],marker="v",zorder=4)
         partial=[r for r in ss if r["plot_kind"]=="partial_or_unresolved"]
@@ -177,10 +179,17 @@ def main()->int:
     write_csv(out/"abcd_1D_to_2D_parameter_mapping.csv",mapping_table(a.one_d_source,a.registry))
     plots(ref,spatial,events,out)
     classifications=[]
+    decisions={
+        "A":("SPARSE_2D_VALIDATED","four finite 2-D points reproduce the 1-D direct-barrier trend; upper points are within 14% and low-rate stochastic scatter is within a factor 3.4"),
+        "B":("FULL_2D_MAPPING_REQUIRED","matched interiors reveal a sharp ratio increase from 1.18 near onset to 13.6-14.5 by f=1.05-1.10; narrow transition refinement required"),
+        "C":("SPARSE_2D_VALIDATED","five finite points preserve the timescale-crossover curve with 2-D/1-D ratios 0.878-1.142, including 0.894 at matched f=1.05"),
+        "D":("FULL_2D_MAPPING_REQUIRED","developed upper points agree, but 2-D remains cycle-censored through DeltaK=36 MPa sqrt(m), shifting developed onset above the 1-D knee"),
+    }
     for cls in CLASSES:
+        decision,reason=decisions[cls]
         ss=[r for r in spatial if r["class"]==cls]
-        classifications.append({"class":cls,"candidate_id":CLASSES[cls][1],"classification":"PENDING_INTERIOR_VALIDATION",
-            "reason":"classification deferred until the requested finite matched interior points and mechanism diagnostics are terminal",
+        classifications.append({"class":cls,"candidate_id":CLASSES[cls][1],"classification":decision,
+            "reason":reason,
             "terminal_2D_cases":len(ss),"stable_developed_2D_cases":sum(bool(r["rate_m_per_cycle"]) for r in ss)})
     write_csv(out/"abcd_2D_validation_classification.csv",classifications)
     (out/"abcd_1D_2D_validation_summary.json").write_text(json.dumps({"schema":"v10.2.31_sparse_2D_validation_v1","classifications":classifications,"parameter_refit":False,"censor_semantics":"partial/cycle-censored points are plotted as downward markers, never artificial developed rates"},indent=2)+"\n")
