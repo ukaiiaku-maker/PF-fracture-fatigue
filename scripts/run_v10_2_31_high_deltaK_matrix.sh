@@ -16,12 +16,12 @@ EXPECTED_HEAD=${EXPECTED_HEAD:?set EXPECTED_HEAD to the committed launch HEAD}
 cases=(
   "A_0462 H1_intermediate_high v914_endurance_knee_0462 29.712385417040565 3.0"
   "A_0462 H2_few_cycle v914_endurance_knee_0462 99.04128472346855 10.0"
-  "B_0658 H1_intermediate_high v914_endurance_knee_0658 30.093913368164165 1.3"
-  "B_0658 H2_few_cycle v914_endurance_knee_0658 46.29832825871410 2.0"
+  "B_0658 H1_intermediate_high v914_endurance_knee_0658 30.093913368164163 1.3"
+  "B_0658 H2_few_cycle v914_endurance_knee_0658 46.29832825871409 2.0"
   "C_0554 H1_intermediate_high v914_endurance_knee_0554 40.09328387642745 3.0"
-  "C_0554 H2_few_cycle v914_endurance_knee_0554 133.6422795880915 10.0"
-  "D_0133 H1_intermediate_high v914_endurance_knee_0133 98.65760008596142 4.0"
-  "D_0133 H2_few_cycle v914_endurance_knee_0133 246.64400021490355 10.0"
+  "C_0554 H2_few_cycle v914_endurance_knee_0554 133.64427958809148 10.0"
+  "D_0133 H1_intermediate_high v914_endurance_knee_0133 98.6576000859614 4.0"
+  "D_0133 H2_few_cycle v914_endurance_knee_0133 246.6440002149035 10.0"
 )
 
 mkdir -p "$CAMPAIGN"
