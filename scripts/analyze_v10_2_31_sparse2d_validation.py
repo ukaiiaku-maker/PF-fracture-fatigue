@@ -52,20 +52,30 @@ def one_d(reference: Path) -> list[dict[str,Any]]:
 def two_d(root: Path) -> tuple[list[dict[str,Any]],list[dict[str,Any]]]:
     cases=[]; events=[]
     for cls,(folder,candidate,_) in CLASSES.items():
-        for summary in sorted((root/folder).glob("*/developed_fatigue_growth_summary.json")):
-            case=summary.parent; d=json.loads(summary.read_text())
+        case_dirs=sorted({p.parent for p in (root/folder).glob("*/developed_fatigue_growth_summary.json")} | {p.parent for p in (root/folder).glob("*/LOW_RATE_HAZARD_CENSOR.json")})
+        for case in case_dirs:
+            summary=case/"developed_fatigue_growth_summary.json"
+            hazard_payload=json.loads((case/"LOW_RATE_HAZARD_CENSOR.json").read_text()) if (case/"LOW_RATE_HAZARD_CENSOR.json").exists() else {}
+            d=json.loads(summary.read_text()) if summary.exists() else {"cycles_consumed":hazard_payload.get("cycles_at_audit",0),"event_count":hazard_payload.get("committed_events",0),"final_projected_extension_um":0,"target_reached":False,"stable_growth_provisional":False,"developed_interval":{}}
             args=json.loads((case/"run_args.json").read_text())
             dk=num(args.get("target_deltaK_MPa_sqrt_m"))
             if dk is None: dk=num(args.get("target_deltaK_MPa_sqrt_m".replace("_","-")))
-            control=json.loads((case/"v10_2_30_fixed_deltaK_control.json").read_text())
+            control=json.loads((case/"v10_2_30_fixed_deltaK_control.json").read_text()) if (case/"v10_2_30_fixed_deltaK_control.json").exists() else {}
             dk=dk or num(control.get("target_deltaK_MPa_sqrt_m")) or num(control.get("DeltaK_MPa_sqrt_m"))
-            developed=num(d.get("developed_interval",{}).get("da_dN")) if d.get("stable_growth_provisional") else None
+            dk=dk or num(hazard_payload.get("deltaK_MPa_sqrt_m"))
+            diagnostic_rate=num(d.get("developed_interval",{}).get("da_dN"))
+            developed=diagnostic_rate if d.get("stable_growth_provisional") and d.get("target_reached") else None
             cyc=num(d.get("cycles_consumed")) or 0.; ext=num(d.get("final_projected_extension_um")) or 0.
-            terminal="target" if d.get("target_reached") else ("cycle_censor" if cyc>=0.999999e14 else "partial")
+            hazard_censor=case/"LOW_RATE_HAZARD_CENSOR.json"
+            terminal=("developed" if developed else "target_nonstationary" if d.get("target_reached")
+                else "hazard_censor" if hazard_censor.exists() else "cycle_censor" if cyc>=0.999999e14 else "partial")
             observed=ext*1e-6/cyc if cyc>0 else None
+            marker_class=("developed" if developed else "censor" if terminal in {"hazard_censor","cycle_censor"}
+                else "partial_or_unresolved")
             cases.append({"dimension":"2D","class":cls,"candidate_id":candidate,"case":case.name,
-                "deltaK_MPa_sqrt_m":dk,"status":terminal,"plot_kind":"resolved" if developed else "censored_or_partial",
+                "deltaK_MPa_sqrt_m":dk,"status":terminal,"plot_kind":marker_class,
                 "rate_m_per_cycle":developed,"observed_partial_rate_m_per_cycle":observed,
+                "diagnostic_interval_rate_m_per_cycle":diagnostic_rate,
                 "cycles":cyc,"extension_um":ext,"events":int(d.get("event_count",0)),
                 "stable_growth":bool(d.get("stable_growth_provisional")),"result_path":str(case.resolve())})
             ef=case/"fatigue_event_growth_0300K.csv"
@@ -107,8 +117,10 @@ def plots(reference:list[dict[str,Any]], spatial:list[dict[str,Any]], events:lis
         ss=[r for r in spatial if r["class"]==cls]
         finite=[r for r in ss if r["rate_m_per_cycle"]]
         ax.scatter([r["deltaK_MPa_sqrt_m"] for r in finite],[r["rate_m_per_cycle"] for r in finite],s=55,facecolors="white",edgecolors=COLORS[cls],marker="o",zorder=4,label=f"{cls} 2-D")
-        partial=[r for r in ss if not r["rate_m_per_cycle"] and r["observed_partial_rate_m_per_cycle"]]
-        ax.scatter([r["deltaK_MPa_sqrt_m"] for r in partial],[r["observed_partial_rate_m_per_cycle"] for r in partial],s=55,color=COLORS[cls],marker="v",zorder=4)
+        censor=[r for r in ss if r["plot_kind"]=="censor"]
+        ax.scatter([r["deltaK_MPa_sqrt_m"] for r in censor],[max(r["observed_partial_rate_m_per_cycle"] or 1e-19,1e-19) for r in censor],s=55,facecolors="white",edgecolors=COLORS[cls],marker="v",zorder=4)
+        partial=[r for r in ss if r["plot_kind"]=="partial_or_unresolved"]
+        ax.scatter([r["deltaK_MPa_sqrt_m"] for r in partial],[r["diagnostic_interval_rate_m_per_cycle"] or r["observed_partial_rate_m_per_cycle"] or 1e-19 for r in partial],s=55,facecolors="white",edgecolors=COLORS[cls],marker="s",zorder=4)
     ax.set(yscale="log",xlabel=r"Dimensional $\Delta K$ (MPa$\sqrt{m}$)",ylabel=r"$da/dN$ (m/cycle)")
     ax.grid(True,which="both",alpha=.25); ax.legend(ncol=2,fontsize=8)
     save(fig,out/"abcd_1D_2D_da_dN_vs_deltaK_overlay")
@@ -119,8 +131,10 @@ def plots(reference:list[dict[str,Any]], spatial:list[dict[str,Any]], events:lis
         ax.plot([r["deltaK_MPa_sqrt_m"] for r in rr],[r["rate_m_per_cycle"] for r in rr],color=COLORS[cls],label="1-D prediction")
         ss=[r for r in spatial if r["class"]==cls]
         for r in ss:
-            y=r["rate_m_per_cycle"] or r["observed_partial_rate_m_per_cycle"]
-            if y: ax.scatter(r["deltaK_MPa_sqrt_m"],y,facecolors="white" if r["rate_m_per_cycle"] else COLORS[cls],edgecolors=COLORS[cls],marker="o" if r["rate_m_per_cycle"] else "v",s=50)
+            y=r["rate_m_per_cycle"] or r["diagnostic_interval_rate_m_per_cycle"] or r["observed_partial_rate_m_per_cycle"] or 1e-19
+            marker={"developed":"o","censor":"v","partial_or_unresolved":"s"}[r["plot_kind"]]
+            face=COLORS[cls] if r["plot_kind"]=="developed" else "white"
+            ax.scatter(r["deltaK_MPa_sqrt_m"],max(y,1e-19),facecolors=face,edgecolors=COLORS[cls],marker=marker,s=50)
         ax.set_yscale("log"); ax.grid(True,which="both",alpha=.25); ax.set_title(f"{cls} — {CLASSES[cls][2]}"); ax.set_xlabel(r"$\Delta K$ (MPa$\sqrt{m}$)")
     axs[0,0].set_ylabel(r"$da/dN$ (m/cycle)"); axs[1,0].set_ylabel(r"$da/dN$ (m/cycle)")
     save(fig,out/"abcd_1D_2D_da_dN_vs_deltaK_four_panel")
@@ -165,8 +179,8 @@ def main()->int:
     classifications=[]
     for cls in CLASSES:
         ss=[r for r in spatial if r["class"]==cls]
-        classifications.append({"class":cls,"candidate_id":CLASSES[cls][1],"classification":"FULL_2D_MAPPING_REQUIRED",
-            "reason":"sparse 2-D curve shape/arrest behavior is not described by a constant factor-of-two rate offset",
+        classifications.append({"class":cls,"candidate_id":CLASSES[cls][1],"classification":"PENDING_INTERIOR_VALIDATION",
+            "reason":"classification deferred until the requested finite matched interior points and mechanism diagnostics are terminal",
             "terminal_2D_cases":len(ss),"stable_developed_2D_cases":sum(bool(r["rate_m_per_cycle"]) for r in ss)})
     write_csv(out/"abcd_2D_validation_classification.csv",classifications)
     (out/"abcd_1D_2D_validation_summary.json").write_text(json.dumps({"schema":"v10.2.31_sparse_2D_validation_v1","classifications":classifications,"parameter_refit":False,"censor_semantics":"partial/cycle-censored points are plotted as downward markers, never artificial developed rates"},indent=2)+"\n")
