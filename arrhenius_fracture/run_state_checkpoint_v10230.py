@@ -20,6 +20,7 @@ import numpy as np
 
 MODEL_ID = "v10.2.30_combined_outer_kinetic_run_state_v2"
 MANIFEST = "run_state_checkpoint.json"
+RETENTION_ENV = "V10230_COMBINED_CHECKPOINT_KEEP_GENERATIONS"
 
 
 class RestartCheckpointError(RuntimeError):
@@ -94,6 +95,35 @@ def _atomic_json(path: Path, payload: dict) -> None:
     os.replace(temporary, path)
 
 
+def _prune_committed_generations(root: Path, current: str) -> None:
+    """Bound retained complete generations after the manifest is durable.
+
+    Zero/unset retains the historical behavior.  Pending directories are never
+    touched, and the manifest-selected generation is always retained.
+    """
+    raw = os.environ.get(RETENTION_ENV, "").strip()
+    if not raw:
+        return
+    try:
+        keep = int(raw)
+    except ValueError as exc:
+        raise RestartCheckpointError(f"invalid {RETENTION_ENV}: {raw!r}") from exc
+    if keep <= 0:
+        return
+    generations = root / "run_state_generations"
+    complete = [path for path in generations.iterdir()
+                if path.is_dir() and not path.name.startswith(".")]
+    selected = generations / current
+    if selected not in complete:
+        raise RestartCheckpointError("manifest-selected generation vanished before retention")
+    others = sorted((path for path in complete if path != selected),
+                    key=lambda path: path.stat().st_mtime_ns, reverse=True)
+    retained = {selected, *others[:max(0, keep - 1)]}
+    for path in complete:
+        if path not in retained:
+            shutil.rmtree(path)
+
+
 def write_combined_checkpoint(
     root: str | Path,
     *,
@@ -140,6 +170,7 @@ def write_combined_checkpoint(
             "files": files,
         }
         _atomic_json(root / MANIFEST, manifest)
+        _prune_committed_generations(root, generation_id)
         return manifest
     finally:
         if temporary.exists():
@@ -241,7 +272,7 @@ def validate_cross_layer(outer: dict, kinetic: dict) -> None:
 
 
 __all__ = [
-    "MANIFEST", "MODEL_ID", "RestartCheckpointError",
+    "MANIFEST", "MODEL_ID", "RETENTION_ENV", "RestartCheckpointError",
     "load_combined_checkpoint", "validate_compatibility",
     "restore_front_state", "serialize_front_state", "validate_cross_layer",
     "write_combined_checkpoint",

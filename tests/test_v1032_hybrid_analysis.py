@@ -38,3 +38,11 @@ def test_sparse_matrix_is_compatible_with_macos_bash_3() -> None:
     script = Path("scripts/run_v10_2_32_hybrid_sparse_matrix.sh").read_text()
     assert "wait -n" not in script
     assert 'wait "${pids[0]}"' in script
+
+
+def test_explicit_2d_launcher_bounds_checkpoints_and_supports_same_root_restart() -> None:
+    script = Path("scripts/run_v10_2_32_explicit_sparse_case.sh").read_text()
+    assert "V10230_COMBINED_CHECKPOINT_KEEP_GENERATIONS" in script
+    assert '[[ "$RESTART_DIR" == "$OUTROOT" ]]' in script
+    assert "hybrid_restart_contract.json" in script
+    assert "analyze_v10_2_30_developed_fatigue_growth.py" in script

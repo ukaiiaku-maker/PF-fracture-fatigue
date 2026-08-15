@@ -13,6 +13,7 @@ REGISTRY=${REGISTRY:-arrhenius_fracture/data/materials/v10_2_31_endurance_knee_A
 EXPECTED_HEAD=${EXPECTED_HEAD:-}
 NORMALIZED_F=${NORMALIZED_F:-}
 CLASS_LABEL=${CLASS_LABEL:-}
+RESTART_DIR=${V10230_RESTART_CHECKPOINT_DIR:-}
 CURRENT_HEAD=$(git rev-parse HEAD)
 CURRENT_BRANCH=$(git branch --show-current)
 if [[ -n "$EXPECTED_HEAD" && "$CURRENT_HEAD" != "$EXPECTED_HEAD" ]]; then
@@ -23,11 +24,20 @@ if [[ -n "$EXPECTED_HEAD" && -n "$(git status --porcelain)" ]]; then
   echo "authoritative launch requires a clean worktree" >&2
   exit 2
 fi
-[[ ! -e "$OUTROOT" ]] || { echo "output exists: $OUTROOT" >&2; exit 2; }
-mkdir -p "$OUTROOT"
+if [[ -n "$RESTART_DIR" ]]; then
+  [[ "$RESTART_DIR" == "$OUTROOT" ]] || { echo "restart checkpoint must equal OUTROOT" >&2; exit 2; }
+  [[ -f "$OUTROOT/run_state_checkpoint.json" ]] || { echo "missing combined restart manifest" >&2; exit 2; }
+  CONTRACT_PATH="$OUTROOT/hybrid_restart_contract.json"
+  LOG_TEE=(-a "$OUTROOT/run.log")
+else
+  [[ ! -e "$OUTROOT" ]] || { echo "output exists: $OUTROOT" >&2; exit 2; }
+  mkdir -p "$OUTROOT"
+  CONTRACT_PATH="$OUTROOT/hybrid_launch_contract.json"
+  LOG_TEE=("$OUTROOT/run.log")
+fi
 export CURRENT_HEAD CURRENT_BRANCH NORMALIZED_F CLASS_LABEL PARAMETER_OPTION
-export DELTA_K_MPA_SQRT_M REGISTRY FAMILY_JSON HAZARD_SEED TARGET_EXT_UM CYCLES_MAX N_PHASE
-"$PYTHON_BIN" - "$OUTROOT/hybrid_launch_contract.json" <<'PY'
+export DELTA_K_MPA_SQRT_M REGISTRY FAMILY_JSON HAZARD_SEED TARGET_EXT_UM CYCLES_MAX N_PHASE RESTART_DIR
+"$PYTHON_BIN" - "$CONTRACT_PATH" <<'PY'
 import hashlib, json, os, pathlib, sys
 
 def digest(path):
@@ -51,6 +61,7 @@ payload = {
     "maximum_cycles": float(os.environ.get("CYCLES_MAX", "100")),
     "phase_steps": int(os.environ.get("N_PHASE", "48")),
     "cycle_integration_mode": "explicit",
+    "restart_checkpoint_dir": os.environ.get("RESTART_DIR") or None,
     "registry": str(pathlib.Path(os.environ["REGISTRY"]).resolve()),
     "registry_sha256": digest(os.environ["REGISTRY"]),
     "family_json": str(pathlib.Path(os.environ["FAMILY_JSON"]).resolve()),
@@ -71,6 +82,7 @@ export V10230_ENERGY_GATE_ENABLED=1
 export V10230_SAVE_ACTIVE_STATE_SNAPSHOT=1
 export V10230_HIGH_CYCLE_CHECKPOINT_DIR="$OUTROOT"
 export V10230_FORWARD_OUTER_PROPOSAL_CYCLES=1
+export V10230_COMBINED_CHECKPOINT_KEEP_GENERATIONS=${V10230_COMBINED_CHECKPOINT_KEEP_GENERATIONS:-2}
 "$PYTHON_BIN" -u -m arrhenius_fracture.sharp_front_v10_2_32_explicit_lcf \
   --cycle-integration-mode explicit \
   --signed-kernel-family "$FAMILY_JSON" \
@@ -91,4 +103,6 @@ export V10230_FORWARD_OUTER_PROPOSAL_CYCLES=1
   --max-da-per-block-um 5 --print-every 1 --save-snapshots 0 --no-plots \
   --target-deltaK-MPa-sqrt-m "$DELTA_K_MPA_SQRT_M" \
   --steps "$STEPS" --cycles-max "$CYCLES_MAX" --block-cycles 1 \
-  --max-block-cycles 1 --out "$OUTROOT" 2>&1 | tee "$OUTROOT/run.log"
+  --max-block-cycles 1 --out "$OUTROOT" 2>&1 | tee "${LOG_TEE[@]}"
+MPLCONFIGDIR=${MPLCONFIGDIR:-/tmp/v1032_mpl} MPLBACKEND=Agg \
+  "$PYTHON_BIN" scripts/analyze_v10_2_30_developed_fatigue_growth.py "$OUTROOT" >/dev/null

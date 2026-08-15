@@ -9,6 +9,7 @@ import pytest
 from arrhenius_fracture.run_state_checkpoint_v10230 import (
     MANIFEST,
     MODEL_ID,
+    RETENTION_ENV,
     RestartCheckpointError,
     load_combined_checkpoint,
     validate_compatibility,
@@ -155,6 +156,35 @@ def test_exact_cycles_threshold_and_rng_are_preserved(tmp_path):
     assert restored_outer["cycles_total"] == 123456789.125
     assert restored_kinetic["stochastic"]["hazard_threshold_action"] == 2.0
     assert restored_kinetic["stochastic"]["rng_state"] == {"state": 123}
+
+
+def test_bounded_generation_retention_keeps_current_restartable(tmp_path, monkeypatch):
+    monkeypatch.setenv(RETENTION_ENV, "2")
+    latest = None
+    for index in range(5):
+        outer, arrays, kinetic, vector = fixture(1, cycles=10.0 + index)
+        latest = write_combined_checkpoint(
+            tmp_path, outer=outer, arrays=arrays,
+            kinetic=kinetic, kinetic_vector=vector,
+        )
+    directories = [p for p in (tmp_path / "run_state_generations").iterdir()
+                   if p.is_dir() and not p.name.startswith(".")]
+    assert len(directories) == 2
+    assert (tmp_path / "run_state_generations" / latest["generation"]).is_dir()
+    restored, restored_kinetic, _ = load_combined_checkpoint(tmp_path)
+    assert restored["cycles_total"] == 14.0
+    validate_cross_layer(restored, restored_kinetic)
+
+
+def test_unset_retention_preserves_complete_generations(tmp_path, monkeypatch):
+    monkeypatch.delenv(RETENTION_ENV, raising=False)
+    for index in range(3):
+        outer, arrays, kinetic, vector = fixture(1, cycles=20.0 + index)
+        write_combined_checkpoint(tmp_path, outer=outer, arrays=arrays,
+                                  kinetic=kinetic, kinetic_vector=vector)
+    directories = [p for p in (tmp_path / "run_state_generations").iterdir()
+                   if p.is_dir() and not p.name.startswith(".")]
+    assert len(directories) == 3
 
 
 def test_directional_front_selection_round_trips_without_event2_path_change():
