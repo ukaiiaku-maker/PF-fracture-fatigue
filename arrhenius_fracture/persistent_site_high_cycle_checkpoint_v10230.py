@@ -241,6 +241,9 @@ def restore_checkpoint_payload(engine, payload: dict[str, Any], vector) -> None:
         "avalanche_last_completed_factor",
         "avalanche_event_length_history",
         "avalanche_checkpoint_synchronized",
+        "explicit_cycle_phase",
+        "explicit_cycle_index",
+        "explicit_cycle_event_count",
     ):
         if name in stochastic:
             setattr(engine, name, copy.deepcopy(stochastic[name]))

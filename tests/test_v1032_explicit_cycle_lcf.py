@@ -12,6 +12,14 @@ if not V914.exists():
 sys.path.insert(0, str(V914))
 sys.path.insert(0, str(Path(__file__).parents[1] / "scripts"))
 
+# Pytest may have imported the local v10 package while collecting an earlier
+# module.  Extend that package's search path so the immutable external v9.14
+# submodules remain importable independent of collection order.
+import arrhenius_fracture
+external_package = str(V914 / "arrhenius_fracture")
+if external_package not in arrhenius_fracture.__path__:
+    arrhenius_fracture.__path__.append(external_package)
+
 from arrhenius_fracture import fatigue_v914 as base
 from arrhenius_fracture.emergent_gnd_campaign_v913 import candidate_from_registry_row
 from arrhenius_fracture.endurance_knee_v914 import physics_for_row

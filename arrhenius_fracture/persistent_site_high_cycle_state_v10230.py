@@ -307,6 +307,15 @@ def capture_stochastic_state(engine) -> dict[str, Any]:
         "hazard_threshold_history": tuple(
             float(value) for value in getattr(engine, "hazard_threshold_history", [])
         ),
+        "explicit_cycle_phase": _finite(
+            getattr(engine, "explicit_cycle_phase", 0.0)
+        ),
+        "explicit_cycle_index": int(
+            getattr(engine, "explicit_cycle_index", 0)
+        ),
+        "explicit_cycle_event_count": int(
+            getattr(engine, "explicit_cycle_event_count", 0)
+        ),
         "rng_state": copy.deepcopy(
             getattr(getattr(engine, "_hazard_rng", None), "bit_generator", None).state
             if getattr(engine, "_hazard_rng", None) is not None

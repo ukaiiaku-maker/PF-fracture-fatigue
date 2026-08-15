@@ -64,7 +64,13 @@ class CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine(
         result["hazard_energy_gate_event_load_policy"] = self.event_load_policy
 
         if bool(result.get("fired", False)):
-            event_K = max(float(K), 0.0)
+            # Explicit-cycle LCF evaluates cleavage and plasticity at the current
+            # waveform phase while preserving the established geometry/energy
+            # transaction load at cycle Kmax.  Accelerated callers do not set the
+            # override and retain byte-for-byte legacy behavior.
+            event_K = max(
+                float(getattr(self, "_energy_gate_event_K_override", K)), 0.0
+            )
             event_sigma = max(float(self.sigma_tip(event_K)), 0.0)
             _, _, event_barrier_J = self.lambda_cleave(event_sigma, float(T))
             pending = self._energy_gate_pending

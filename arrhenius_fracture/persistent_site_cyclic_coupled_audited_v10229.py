@@ -73,6 +73,15 @@ _COUPLED_KEYS = (
     "coupled_hazard_wall_seconds",
     "coupled_hazard_config",
     "coupled_hazard_segments",
+    "cycle_integration_mode",
+    "explicit_cycle_phase_start",
+    "explicit_cycle_phase_end",
+    "explicit_cycle_index",
+    "explicit_cycle_event_count",
+    "explicit_same_cycle_post_event_continuation",
+    "explicit_multi_cycle_projection",
+    "explicit_phase_records",
+    "high_cycle_cache_invalidated",
 )
 
 _PRE_STATE_KEYS = (
