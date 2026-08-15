@@ -37,6 +37,8 @@ def main() -> int:
     ap.add_argument("--phase-steps", type=int, default=32); ap.add_argument("--target-um", type=float, default=100)
     ap.add_argument("--maximum-cycles", type=float, default=50); ap.add_argument("--seed", type=int, default=1720)
     ap.add_argument("--out", type=Path, required=True); ap.add_argument("--restart", action="store_true")
+    ap.add_argument("--checkpoint-every-cycle", action="store_true",
+                    help="checkpoint every completed cycle and committed event instead of every phase")
     ap.add_argument("--pause-after-phases", type=int, default=0)
     ap.add_argument("--normalized-f", type=float, default=None)
     ap.add_argument("--expected-head", default=None)
@@ -60,6 +62,8 @@ def main() -> int:
         result = run_explicit_cycle_fatigue(candidate, physics, loading, seed=args.seed, numerics=numerics,
             checkpoint_path=checkpoint, restart_from=checkpoint if args.restart else None,
             maximum_physical_cycles=int(args.maximum_cycles),
+            checkpoint_each_phase=not args.checkpoint_every_cycle,
+            checkpoint_cycle_interval=1 if args.checkpoint_every_cycle else None,
             pause_after_phase_advances=args.pause_after_phases or None)
         events, history = result["events"], result["state_history"]
     else:
@@ -75,6 +79,7 @@ def main() -> int:
     contract = {"schema": "v10.2.32_lcf_case_contract_v1", "mode": args.mode,
         "candidate": args.candidate, "deltaK_MPa_sqrt_m": args.deltaK, "phase_steps": args.phase_steps,
         "target_um": args.target_um, "maximum_cycles": args.maximum_cycles, "seed": args.seed,
+        "checkpoint_cadence": "cycle_and_event" if args.checkpoint_every_cycle else "phase_and_event",
         "normalized_f": args.normalized_f,
         "repository": str(repository), "repository_branch": branch,
         "repository_head": head, "repository_clean": not bool(worktree.strip()),

@@ -1,5 +1,6 @@
 import csv
 from dataclasses import fields
+import json
 from pathlib import Path
 import sys
 
@@ -75,3 +76,31 @@ def test_midcycle_checkpoint_restart_is_bitwise_event_reproducible(tmp_path):
     for key in ("final_cycles", "final_extension_m", "events", "rng_state",
                 "current_threshold_action", "current_hazard_action"):
         assert resumed[key] == uninterrupted[key]
+
+
+def test_cycle_boundary_checkpointing_is_bitwise_and_reduces_writes(tmp_path):
+    reference = run()
+    phase_checkpoint = tmp_path / "phase.json"
+    cycle_checkpoint = tmp_path / "cycle.json"
+    phase = run(checkpoint_path=phase_checkpoint)
+    cycle = run(checkpoint_path=cycle_checkpoint, checkpoint_each_phase=False,
+                checkpoint_cycle_interval=1)
+    for key in ("final_cycles", "final_extension_m", "events", "rng_state",
+                "current_threshold_action", "current_hazard_action", "state_history"):
+        assert cycle[key] == reference[key] == phase[key]
+    candidate, physics, _, _ = inputs(32)
+    loading = base.FatigueLoading(1.0, phase_steps=32)
+    numerics = base.FatigueNumerics(maximum_cycles=2, target_extension_m=100e-6)
+    run_explicit_cycle_fatigue(candidate, physics, loading, seed=1720,
+        numerics=numerics, maximum_physical_cycles=2, checkpoint_path=phase_checkpoint)
+    run_explicit_cycle_fatigue(candidate, physics, loading, seed=1720,
+        numerics=numerics, maximum_physical_cycles=2, checkpoint_path=cycle_checkpoint,
+        checkpoint_each_phase=False, checkpoint_cycle_interval=1)
+    phase_sequence = json.loads(phase_checkpoint.read_text())["sequence"]
+    cycle_sequence = json.loads(cycle_checkpoint.read_text())["sequence"]
+    assert cycle_sequence * 5 < phase_sequence
+
+
+def test_checkpoint_cycle_interval_must_be_positive():
+    with pytest.raises(ValueError, match="checkpoint_cycle_interval"):
+        run(checkpoint_each_phase=False, checkpoint_cycle_interval=0)

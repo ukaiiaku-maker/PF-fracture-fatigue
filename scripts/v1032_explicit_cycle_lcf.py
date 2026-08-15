@@ -101,9 +101,12 @@ def run_explicit_cycle_fatigue(candidate, physics, loading, *, seed: int,
                                restart_from: str | Path | None = None,
                                maximum_physical_cycles: int = 50,
                                checkpoint_each_phase: bool = True,
+                               checkpoint_cycle_interval: int | None = None,
                                pause_after_phase_advances: int | None = None) -> dict[str, Any]:
     """Resolve every phase and continue the waveform after every crack event."""
     loading.validate(); physics.validate(); numerics.validate()
+    if checkpoint_cycle_interval is not None and checkpoint_cycle_interval < 1:
+        raise ValueError("checkpoint_cycle_interval must be positive")
     contract = {
         "mode": MODE, "candidate_id": candidate.candidate_id,
         "candidate_sha256": base._canonical_digest(asdict(candidate)),
@@ -193,9 +196,14 @@ def run_explicit_cycle_fatigue(candidate, physics, loading, *, seed: int,
         state = trial; action += increment; phase = boundary
         phase_advances += 1
         history.append(_diagnostic(state, loading, cycle, phase, action, threshold, extension, "phase_boundary"))
-        if phase >= 1.0 - 1e-14:
+        completed_cycle = phase >= 1.0 - 1e-14
+        if completed_cycle:
             cycle += 1; phase = 0.0
-        if checkpoint_each_phase: save("phase_boundary")
+        if checkpoint_each_phase:
+            save("phase_boundary")
+        elif (completed_cycle and checkpoint_cycle_interval is not None
+              and cycle % checkpoint_cycle_interval == 0):
+            save("cycle_boundary")
         if pause_after_phase_advances is not None and phase_advances >= pause_after_phase_advances:
             save("diagnostic_pause"); break
 
