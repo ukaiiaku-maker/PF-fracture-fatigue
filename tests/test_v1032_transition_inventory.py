@@ -34,6 +34,7 @@ def test_round_one_is_bounded_and_material_only():
     script = (repo / "scripts/run_v1032_transition_refinement_1d.sh").read_text()
     assert "state-history-cycle-interval 10" in script
     assert "authoritative launch requires clean worktree" in script
+    assert 'mode=${7:-explicit}' in script
 
 
 def test_round_two_adaptively_concentrates_on_weakt_transition():

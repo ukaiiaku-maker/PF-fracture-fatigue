@@ -127,6 +127,7 @@ def explicit_1d(root: Path) -> list[dict]:
         candidate = contract["candidate"]; cls = {**ABCD_IDS, **CANON_IDS}.get(candidate)
         if cls is None:
             continue
+        mode = contract.get("mode", "explicit")
         events = data.get("events", []); stats = _interval_stats(e.get("interval_cycles") for e in events)
         cycles = _float(data.get("final_cycles")); ext = _float(data.get("final_extension_m"))
         rate = _float(data.get("trajectory_da_dN_m_per_cycle"), ext / cycles if cycles > 0 else math.nan)
@@ -137,7 +138,7 @@ def explicit_1d(root: Path) -> list[dict]:
             "class": cls, "candidate_id": candidate,
             "deltaK_MPa_sqrt_m": contract["deltaK_MPa_sqrt_m"],
             "normalized_f": contract.get("normalized_f"), "dimensionality": "1D",
-            "integration_mode": "explicit", "da_dN_m_per_cycle": rate,
+            "integration_mode": mode, "da_dN_m_per_cycle": rate,
             "cycles_to_target": cycles, "extension_um": ext * 1e6,
             "status": status, "source_campaign": root.name,
             "result_path": str(result_path.parent.resolve()), **stats,

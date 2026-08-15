@@ -19,10 +19,10 @@ PHYSICS=${PHYSICS:-$V914/mpz_v9_13_v10222_transfer_common_physics.json}
 
 free_gib() { df -g /Volumes/Data | awk 'NR==2 {print $4}'; }
 run_one() {
-  local family=$1 candidate=$2 fraction=$3 delta_k=$4 seed=$5 max_cycles=$6
+  local family=$1 candidate=$2 fraction=$3 delta_k=$4 seed=$5 max_cycles=$6 mode=${7:-explicit}
   local label=${fraction//./p}
   local short=${candidate##*_}
-  local out="$OUT_BASE/${family}_${short}/f${label}_explicit"
+  local out="$OUT_BASE/${family}_${short}/f${label}_${mode}"
   if [[ -f "$out/result.json" && -f "$out/run_contract.json" ]]; then
     echo "already terminal: $out"
     return 0
@@ -30,14 +30,14 @@ run_one() {
   [[ ! -e "$out" ]] || { echo "existing nonterminal output requires explicit audit: $out" >&2; return 2; }
   env PYTHONPATH="$V914:$ROOT/scripts" "$PYTHON_BIN" scripts/run_v1032_explicit_lcf.py \
     --registry "$REGISTRY" --physics "$PHYSICS" --candidate "$candidate" \
-    --deltaK "$delta_k" --mode explicit --phase-steps 32 --target-um 100 \
+    --deltaK "$delta_k" --mode "$mode" --phase-steps 32 --target-um 100 \
     --maximum-cycles "$max_cycles" --seed "$seed" --normalized-f "$fraction" \
     --expected-head "$EXPECTED_HEAD" --checkpoint-cycle-interval 10 \
     --state-history-cycle-interval 10 --out "$out"
 }
 
 pids=()
-while IFS=, read -r family candidate fraction delta_k seed max_cycles; do
+while IFS=, read -r family candidate fraction delta_k seed max_cycles mode; do
   [[ "$family" == family || -z "$family" ]] && continue
   while (( ${#pids[@]} >= MAX_PARALLEL )); do
     wait "${pids[0]}"
@@ -47,7 +47,7 @@ while IFS=, read -r family candidate fraction delta_k seed max_cycles; do
     echo "disk safety gate: less than ${MIN_FREE_GIB} GiB free" >&2
     exit 3
   fi
-  run_one "$family" "$candidate" "$fraction" "$delta_k" "$seed" "$max_cycles" &
+  run_one "$family" "$candidate" "$fraction" "$delta_k" "$seed" "$max_cycles" "${mode:-explicit}" &
   pids+=("$!")
 done < "$MATRIX_CSV"
 for pid in "${pids[@]}"; do wait "$pid"; done
