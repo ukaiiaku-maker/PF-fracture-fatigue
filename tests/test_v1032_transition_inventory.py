@@ -77,4 +77,16 @@ def test_transition_2d_launcher_is_clean_head_and_disk_guarded():
     assert "authoritative launch requires clean worktree" in script
     assert "MIN_FREE_GIB" in script
     assert "wait -n" not in script
-    assert 'REGISTRY=arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv' in script
+    assert 'REGISTRY=${REGISTRY:-arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv}' in script
+
+
+def test_abcd_gap_fill_is_targeted_and_matched():
+    repo = Path(__file__).resolve().parents[1]
+    one = pd.read_csv(repo / "runtime_inputs/v10_2_32/transition_refinement_abcd_1d_explicit.csv")
+    two = pd.read_csv(repo / "runtime_inputs/v10_2_32/transition_refinement_abcd_2d_explicit.csv")
+    assert len(one) == len(two) == 9
+    assert one.groupby("family").size().to_dict() == {"A": 2, "B": 2, "C": 2, "D": 3}
+    assert set(one["mode"]) == {"explicit"}
+    left = one[["family", "fraction", "deltaK_MPa_sqrt_m"]].sort_values(["family", "fraction"]).reset_index(drop=True)
+    right = two[["family", "fraction", "deltaK_MPa_sqrt_m"]].sort_values(["family", "fraction"]).reset_index(drop=True)
+    pd.testing.assert_frame_equal(left, right)

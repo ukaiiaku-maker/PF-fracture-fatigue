@@ -8,7 +8,7 @@ MATRIX_CSV=${MATRIX_CSV:-runtime_inputs/v10_2_32/transition_refinement_2d_explic
 OUT_BASE=${OUT_BASE:-runs/v10_2_32_HCF_LCF_transition_refinement_v2}
 MAX_PARALLEL=${MAX_PARALLEL:-2}
 MIN_FREE_GIB=${MIN_FREE_GIB:-5}
-REGISTRY=arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv
+REGISTRY=${REGISTRY:-arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv}
 
 [[ $(git rev-parse HEAD) == "$EXPECTED_HEAD" ]] || { echo "HEAD mismatch" >&2; exit 2; }
 [[ -z $(git status --porcelain) ]] || { echo "authoritative launch requires clean worktree" >&2; exit 2; }
