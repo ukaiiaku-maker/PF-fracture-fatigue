@@ -34,3 +34,12 @@ def test_round_one_is_bounded_and_material_only():
     script = (repo / "scripts/run_v1032_transition_refinement_1d.sh").read_text()
     assert "state-history-cycle-interval 10" in script
     assert "authoritative launch requires clean worktree" in script
+
+
+def test_round_two_adaptively_concentrates_on_weakt_transition():
+    repo = Path(__file__).resolve().parents[1]
+    matrix = pd.read_csv(repo / "runtime_inputs/v10_2_32/transition_refinement_1d_round2.csv")
+    assert len(matrix) == 11
+    assert (matrix.family == "weak-T").sum() == 5
+    assert set(matrix[matrix.family == "weak-T"].fraction) == {1.12, 1.14, 1.16, 1.18, 1.20}
+    assert matrix.maximum_cycles.max() == 5000
