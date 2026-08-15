@@ -39,10 +39,16 @@ def main() -> int:
     ap.add_argument("--out", type=Path, required=True); ap.add_argument("--restart", action="store_true")
     ap.add_argument("--checkpoint-every-cycle", action="store_true",
                     help="checkpoint every completed cycle and committed event instead of every phase")
+    ap.add_argument("--checkpoint-cycle-interval", type=int, default=None,
+                    help="checkpoint every N completed cycles and every committed event")
     ap.add_argument("--pause-after-phases", type=int, default=0)
     ap.add_argument("--normalized-f", type=float, default=None)
     ap.add_argument("--expected-head", default=None)
     args = ap.parse_args(); args.out.mkdir(parents=True, exist_ok=True)
+    if args.checkpoint_every_cycle and args.checkpoint_cycle_interval not in (None, 1):
+        ap.error("--checkpoint-every-cycle conflicts with --checkpoint-cycle-interval other than 1")
+    checkpoint_cycle_interval = (args.checkpoint_cycle_interval if args.checkpoint_cycle_interval is not None
+                                 else 1 if args.checkpoint_every_cycle else None)
     repository = Path(__file__).resolve().parents[1]
     branch = subprocess.check_output(["git", "branch", "--show-current"], cwd=repository, text=True).strip()
     head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repository, text=True).strip()
@@ -62,8 +68,8 @@ def main() -> int:
         result = run_explicit_cycle_fatigue(candidate, physics, loading, seed=args.seed, numerics=numerics,
             checkpoint_path=checkpoint, restart_from=checkpoint if args.restart else None,
             maximum_physical_cycles=int(args.maximum_cycles),
-            checkpoint_each_phase=not args.checkpoint_every_cycle,
-            checkpoint_cycle_interval=1 if args.checkpoint_every_cycle else None,
+            checkpoint_each_phase=checkpoint_cycle_interval is None,
+            checkpoint_cycle_interval=checkpoint_cycle_interval,
             pause_after_phase_advances=args.pause_after_phases or None)
         events, history = result["events"], result["state_history"]
     else:
@@ -79,7 +85,8 @@ def main() -> int:
     contract = {"schema": "v10.2.32_lcf_case_contract_v1", "mode": args.mode,
         "candidate": args.candidate, "deltaK_MPa_sqrt_m": args.deltaK, "phase_steps": args.phase_steps,
         "target_um": args.target_um, "maximum_cycles": args.maximum_cycles, "seed": args.seed,
-        "checkpoint_cadence": "cycle_and_event" if args.checkpoint_every_cycle else "phase_and_event",
+        "checkpoint_cadence": (f"every_{checkpoint_cycle_interval}_cycles_and_event"
+                               if checkpoint_cycle_interval is not None else "phase_and_event"),
         "normalized_f": args.normalized_f,
         "repository": str(repository), "repository_branch": branch,
         "repository_head": head, "repository_clean": not bool(worktree.strip()),
