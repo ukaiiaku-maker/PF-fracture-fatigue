@@ -102,17 +102,21 @@ def run_explicit_cycle_fatigue(candidate, physics, loading, *, seed: int,
                                maximum_physical_cycles: int = 50,
                                checkpoint_each_phase: bool = True,
                                checkpoint_cycle_interval: int | None = None,
+                               state_history_cycle_interval: int | None = None,
                                pause_after_phase_advances: int | None = None) -> dict[str, Any]:
     """Resolve every phase and continue the waveform after every crack event."""
     loading.validate(); physics.validate(); numerics.validate()
     if checkpoint_cycle_interval is not None and checkpoint_cycle_interval < 1:
         raise ValueError("checkpoint_cycle_interval must be positive")
+    if state_history_cycle_interval is not None and state_history_cycle_interval < 1:
+        raise ValueError("state_history_cycle_interval must be positive")
     contract = {
         "mode": MODE, "candidate_id": candidate.candidate_id,
         "candidate_sha256": base._canonical_digest(asdict(candidate)),
         "physics_sha256": base._canonical_digest(asdict(physics)),
         "loading": asdict(loading), "numerics": asdict(numerics), "seed": int(seed),
         "maximum_physical_cycles": int(maximum_physical_cycles),
+        "state_history_cycle_interval": state_history_cycle_interval,
     }
     checkpoint = Path(checkpoint_path) if checkpoint_path else None
     if restart_from:
@@ -195,10 +199,18 @@ def run_explicit_cycle_fatigue(candidate, physics, loading, *, seed: int,
             continue
         state = trial; action += increment; phase = boundary
         phase_advances += 1
-        history.append(_diagnostic(state, loading, cycle, phase, action, threshold, extension, "phase_boundary"))
         completed_cycle = phase >= 1.0 - 1e-14
         if completed_cycle:
             cycle += 1; phase = 0.0
+        retain_phase_diagnostic = (
+            state_history_cycle_interval is None
+            or (completed_cycle and cycle % state_history_cycle_interval == 0)
+        )
+        if retain_phase_diagnostic:
+            history.append(_diagnostic(
+                state, loading, cycle, phase, action, threshold, extension,
+                "cycle_boundary" if completed_cycle else "phase_boundary",
+            ))
         if checkpoint_each_phase:
             save("phase_boundary")
         elif (completed_cycle and checkpoint_cycle_interval is not None

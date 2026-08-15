@@ -104,3 +104,20 @@ def test_cycle_boundary_checkpointing_is_bitwise_and_reduces_writes(tmp_path):
 def test_checkpoint_cycle_interval_must_be_positive():
     with pytest.raises(ValueError, match="checkpoint_cycle_interval"):
         run(checkpoint_each_phase=False, checkpoint_cycle_interval=0)
+
+
+def test_sparse_state_history_preserves_physical_result():
+    reference = run()
+    sparse = run(state_history_cycle_interval=2)
+    for key in ("final_cycles", "final_extension_m", "events", "rng_state",
+                "current_threshold_action", "current_hazard_action"):
+        assert sparse[key] == reference[key]
+    assert len(sparse["state_history"]) < len(reference["state_history"])
+    assert [row for row in sparse["state_history"] if row["record_type"] == "post_event"] == [
+        row for row in reference["state_history"] if row["record_type"] == "post_event"
+    ]
+
+
+def test_state_history_cycle_interval_must_be_positive():
+    with pytest.raises(ValueError, match="state_history_cycle_interval"):
+        run(state_history_cycle_interval=0)

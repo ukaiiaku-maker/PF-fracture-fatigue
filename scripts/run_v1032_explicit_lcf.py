@@ -41,6 +41,8 @@ def main() -> int:
                     help="checkpoint every completed cycle and committed event instead of every phase")
     ap.add_argument("--checkpoint-cycle-interval", type=int, default=None,
                     help="checkpoint every N completed cycles and every committed event")
+    ap.add_argument("--state-history-cycle-interval", type=int, default=None,
+                    help="retain phase diagnostics every N cycles and at every event")
     ap.add_argument("--pause-after-phases", type=int, default=0)
     ap.add_argument("--normalized-f", type=float, default=None)
     ap.add_argument("--expected-head", default=None)
@@ -70,6 +72,7 @@ def main() -> int:
             maximum_physical_cycles=int(args.maximum_cycles),
             checkpoint_each_phase=checkpoint_cycle_interval is None,
             checkpoint_cycle_interval=checkpoint_cycle_interval,
+            state_history_cycle_interval=args.state_history_cycle_interval,
             pause_after_phase_advances=args.pause_after_phases or None)
         events, history = result["events"], result["state_history"]
     else:
@@ -87,6 +90,7 @@ def main() -> int:
         "target_um": args.target_um, "maximum_cycles": args.maximum_cycles, "seed": args.seed,
         "checkpoint_cadence": (f"every_{checkpoint_cycle_interval}_cycles_and_event"
                                if checkpoint_cycle_interval is not None else "phase_and_event"),
+        "state_history_cycle_interval": args.state_history_cycle_interval,
         "normalized_f": args.normalized_f,
         "repository": str(repository), "repository_branch": branch,
         "repository_head": head, "repository_clean": not bool(worktree.strip()),
