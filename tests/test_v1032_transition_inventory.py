@@ -44,3 +44,12 @@ def test_round_two_adaptively_concentrates_on_weakt_transition():
     assert (matrix.family == "weak-T").sum() == 5
     assert set(matrix[matrix.family == "weak-T"].fraction) == {1.12, 1.14, 1.16, 1.18, 1.20}
     assert matrix.maximum_cycles.max() == 5000
+
+
+def test_accelerated_matrix_matches_explicit_transition_loads():
+    repo = Path(__file__).resolve().parents[1]
+    matrix = pd.read_csv(repo / "runtime_inputs/v10_2_32/transition_refinement_1d_accelerated.csv")
+    assert len(matrix) == 20
+    assert set(matrix["mode"]) == {"accelerated"}
+    assert set(matrix.family) == set(inventory.MATERIALS)
+    assert matrix.maximum_cycles.min() == 10_000_000
