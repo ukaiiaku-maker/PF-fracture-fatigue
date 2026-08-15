@@ -52,6 +52,12 @@ COMMON_COLUMNS = [
 ]
 
 
+def _is_censor_status(status: object) -> bool:
+    """Return true only for physical/hazard/cycle terminal censors."""
+    text = str(status).strip().lower()
+    return "censor" in text or text == "explicit_cycle_limit"
+
+
 def _float(value, default=math.nan) -> float:
     try:
         if value is None or value == "":
@@ -79,7 +85,7 @@ def _interval_stats(intervals: Iterable[float]) -> dict:
 
 def classify(row: dict) -> str:
     status = str(row.get("status", ""))
-    if "censor" in status:
+    if _is_censor_status(status):
         return "BELOW_FATIGUE_RESOLUTION"
     if status not in {"growth_target_reached", "developed", "complete", "completed", "target_reached"}:
         return "PARTIAL_OR_NUMERICAL_UNRESOLVED"
@@ -100,7 +106,7 @@ def finish(row: dict) -> dict:
     out = {key: row.get(key, math.nan) for key in COMMON_COLUMNS}
     out["mechanism_diagnostics"] = row.get("mechanism_diagnostics") or MECHANISMS[out["class"]]
     out["regime_classification"] = classify(out)
-    if "censor" in str(out["status"]):
+    if _is_censor_status(out["status"]):
         out["plot_kind"] = "censor"
         out["da_dN_m_per_cycle"] = math.nan
     elif out["regime_classification"] == "PARTIAL_OR_NUMERICAL_UNRESOLVED":
@@ -124,13 +130,16 @@ def explicit_1d(root: Path) -> list[dict]:
         events = data.get("events", []); stats = _interval_stats(e.get("interval_cycles") for e in events)
         cycles = _float(data.get("final_cycles")); ext = _float(data.get("final_extension_m"))
         rate = _float(data.get("trajectory_da_dN_m_per_cycle"), ext / cycles if cycles > 0 else math.nan)
+        status = data.get("status", "")
+        if status == "explicit_cycle_limit":
+            status = "cycle_censor"
         rows.append(finish({
             "class": cls, "candidate_id": candidate,
             "deltaK_MPa_sqrt_m": contract["deltaK_MPa_sqrt_m"],
             "normalized_f": contract.get("normalized_f"), "dimensionality": "1D",
             "integration_mode": "explicit", "da_dN_m_per_cycle": rate,
             "cycles_to_target": cycles, "extension_um": ext * 1e6,
-            "status": data.get("status", ""), "source_campaign": root.name,
+            "status": status, "source_campaign": root.name,
             "result_path": str(result_path.parent.resolve()), **stats,
         }))
     return rows
@@ -234,13 +243,25 @@ def explicit_2d(root: Path) -> list[dict]:
         measurements = data.get("event_measurements", [])
         intervals = [e.get("cycles_between_events") for e in measurements]
         stats = _interval_stats(intervals)
-        rate = _float(data.get("developed_interval", {}).get("da_dN"))
+        target_reached = bool(data.get("target_reached"))
+        stable = bool(data.get("stable_growth_provisional"))
         cycles = _float(data.get("cycles_consumed"))
+        maximum_cycles = _float(contract.get("maximum_cycles"))
+        if target_reached and stable:
+            status = "developed"
+        elif (math.isfinite(maximum_cycles) and math.isfinite(cycles)
+              and cycles >= maximum_cycles * (1 - 1e-9)):
+            status = "cycle_censor"
+        elif _is_censor_status(data.get("status", "")):
+            status = str(data.get("status"))
+        else:
+            status = "partial_or_nondeveloped"
+        rate = _float(data.get("developed_interval", {}).get("da_dN"))
         rows.append(finish({"class": cls, "candidate_id": contract["parameter_option"],
             "deltaK_MPa_sqrt_m": contract["deltaK_MPa_sqrt_m"], "normalized_f": contract.get("normalized_f"),
             "dimensionality": "2D", "integration_mode": "explicit", "da_dN_m_per_cycle": rate,
             "cycles_to_target": cycles, "extension_um": data.get("final_projected_extension_um"),
-            "status": "developed", "source_campaign": root.name,
+            "status": status, "source_campaign": root.name,
             "result_path": str(path.parent.resolve()), **stats}))
     return rows
 
@@ -257,6 +278,17 @@ def deduplicate(rows: list[dict]) -> list[dict]:
 
 
 def matched_diagnostics(rows: list[dict]) -> list[dict]:
+    def matched(cls: str, dimensionality: str, mode: str, dk: float) -> dict | None:
+        candidates = [r for r in rows if r["class"] == cls
+                      and r["dimensionality"] == dimensionality
+                      and r["integration_mode"] == mode
+                      and r["plot_kind"] == "resolved"]
+        if not candidates:
+            return None
+        candidate = min(candidates, key=lambda r: abs(_float(r["deltaK_MPa_sqrt_m"]) - dk))
+        relative = abs(_float(candidate["deltaK_MPa_sqrt_m"]) - dk) / max(abs(dk), 1e-30)
+        return candidate if relative <= 2e-6 else None
+
     out = []
     for cls in ["A", "B", "C", "D", "DBTT", "Peak"]:
         q = [r for r in rows if r["class"] == cls and r["dimensionality"] == "1D" and r["plot_kind"] == "resolved"]
@@ -268,6 +300,12 @@ def matched_diagnostics(rows: list[dict]) -> list[dict]:
             relk = abs(_float(a["deltaK_MPa_sqrt_m"]) - _float(e["deltaK_MPa_sqrt_m"])) / _float(e["deltaK_MPa_sqrt_m"])
             if relk > 2e-6: continue
             ratio = _float(e["da_dN_m_per_cycle"]) / _float(a["da_dN_m_per_cycle"])
+            accelerated_2d = matched(cls, "2D", "accelerated", _float(e["deltaK_MPa_sqrt_m"]))
+            explicit_2d = matched(cls, "2D", "explicit", _float(e["deltaK_MPa_sqrt_m"]))
+            accelerated_spatial_ratio = (_float(accelerated_2d["da_dN_m_per_cycle"]) /
+                                         _float(a["da_dN_m_per_cycle"])) if accelerated_2d else math.nan
+            explicit_spatial_ratio = (_float(explicit_2d["da_dN_m_per_cycle"]) /
+                                      _float(e["da_dN_m_per_cycle"])) if explicit_2d else math.nan
             out.append({"class": cls, "candidate_id": e["candidate_id"],
                 "deltaK_MPa_sqrt_m": e["deltaK_MPa_sqrt_m"], "normalized_f": e["normalized_f"],
                 "accelerated_da_dN_m_per_cycle": a["da_dN_m_per_cycle"],
@@ -275,6 +313,10 @@ def matched_diagnostics(rows: list[dict]) -> list[dict]:
                 "relative_rate_difference": abs(ratio - 1), "accelerated_cycles": a["cycles_to_target"],
                 "explicit_cycles": e["cycles_to_target"], "explicit_subcycle_fraction": e["subcycle_fraction"],
                 "explicit_median_interval_cycles": e["median_interval_cycles"],
+                "accelerated_2D_da_dN_m_per_cycle": accelerated_2d["da_dN_m_per_cycle"] if accelerated_2d else math.nan,
+                "accelerated_2D_to_1D_ratio": accelerated_spatial_ratio,
+                "explicit_2D_da_dN_m_per_cycle": explicit_2d["da_dN_m_per_cycle"] if explicit_2d else math.nan,
+                "explicit_2D_to_1D_ratio": explicit_spatial_ratio,
                 "parity_within_25_percent": abs(ratio - 1) <= .25,
                 "switch_evidence": "DIVERGED" if abs(ratio - 1) > .25 else "PARITY"})
     return out
@@ -356,15 +398,33 @@ def other_plots(out: Path, rows: list[dict], hybrid: list[dict], intervals: list
             ax.scatter([r["deltaK_MPa_sqrt_m"] for r in q],[r["da_dN_m_per_cycle"] for r in q],marker=marker,s=70,color=COLORS[cls],edgecolor="black",label=f"2-D {mode}")
             pdata.extend({**r,"figure":"abcd_hybrid_1D_2D_da_dN_vs_deltaK"} for r in q)
         pdata.extend({**r,"figure":"abcd_hybrid_1D_2D_da_dN_vs_deltaK"} for r in h)
+        unresolved = [r for r in rows if r["class"] == cls and r["dimensionality"] == "2D"
+                      and r["plot_kind"] in {"censor", "partial"}]
+        unresolved += [r for r in hybrid if r["class"] == cls
+                       and r["plot_kind"] in {"censor", "partial"}]
+        for kind, marker, label in [("censor", "v", "physical/hazard censor"),
+                                    ("partial", "s", "partial/unresolved")]:
+            z = [r for r in unresolved if r["plot_kind"] == kind]
+            if z:
+                ax.scatter([r["deltaK_MPa_sqrt_m"] for r in z], [2e-20] * len(z),
+                           marker=marker, facecolors="none", edgecolors=COLORS[cls],
+                           label=label, zorder=6)
+                pdata.extend({**r, "figure": "abcd_hybrid_1D_2D_da_dN_vs_deltaK"} for r in z)
         ax.set(yscale="log",ylim=(1e-20,1e-2),title=cls,xlabel=r"$\Delta K$ (MPa$\sqrt{m}$)",ylabel=r"$da/dN$ (m/cycle)"); ax.grid(True,which="both",alpha=.25); ax.legend(fontsize=7)
     _save(fig,out/"abcd_hybrid_1D_2D_da_dN_vs_deltaK"); _write(out/"abcd_hybrid_1D_2D_da_dN_vs_deltaK_plot_data.csv",pdata)
 
-    q=[r for r in rows if r["class"] in "ABCD" and r["plot_kind"]=="resolved" and _float(r["cycles_to_target"])>0]
+    q=[r for r in rows if r["class"] in "ABCD" and _float(r["cycles_to_target"])>0]
     fig,ax=plt.subplots(figsize=(9,6))
     for cls in "ABCD":
         for dim,mode,marker in [("1D","accelerated","."),("1D","explicit","x"),("2D","accelerated","o"),("2D","explicit","*")]:
-            z=[r for r in q if r["class"]==cls and r["dimensionality"]==dim and r["integration_mode"]==mode]
+            z=[r for r in q if r["class"]==cls and r["dimensionality"]==dim and r["integration_mode"]==mode and r["plot_kind"]=="resolved"]
             ax.scatter([r["deltaK_MPa_sqrt_m"] for r in z],[r["cycles_to_target"] for r in z],marker=marker,color=COLORS[cls],s=28,label=f"{cls} {dim} {mode}")
+        for kind, marker in [("censor", "v"), ("partial", "s")]:
+            z = [r for r in q if r["class"] == cls and r["plot_kind"] == kind]
+            ax.scatter([r["deltaK_MPa_sqrt_m"] for r in z],
+                       [r["cycles_to_target"] for r in z], marker=marker,
+                       facecolors="none", edgecolors=COLORS[cls], s=38,
+                       label=f"{cls} {kind}")
     ax.axhline(10,color="grey",ls="--"); ax.axhline(1,color="black",ls=":"); ax.set(yscale="log",xlabel=r"$\Delta K$ (MPa$\sqrt{m}$)",ylabel=r"cycles to $100\,\mu$m"); ax.grid(True,which="both",alpha=.25); ax.legend(fontsize=6,ncol=2)
     _save(fig,out/"abcd_cycles_to_100um_vs_deltaK_hybrid"); _write(out/"abcd_cycles_to_100um_vs_deltaK_hybrid_plot_data.csv",q)
 
@@ -423,10 +483,10 @@ def write_report(out: Path, rows: list[dict], diagnostics: list[dict]) -> None:
     lines=["# HCF–LCF hybrid validation report","",
         "All paths use one constitutive model. `accelerated` and `explicit` identify numerical integration regimes, not different fracture physics.","",
         "## Measured overlap and switch behavior","",
-        "| Class | ΔK | explicit/accelerated rate | explicit median interval (cycles) | parity (±25%) |",
-        "|---|---:|---:|---:|---|"]
+        "| Class | ΔK | 1-D explicit/accelerated | accelerated 2-D/1-D | explicit 2-D/1-D | explicit median interval (cycles) | parity (±25%) |",
+        "|---|---:|---:|---:|---:|---:|---|"]
     for d in diagnostics:
-        lines.append(f"| {d['class']} | {fmt(d['deltaK_MPa_sqrt_m'])} | {fmt(d['explicit_to_accelerated_ratio'])} | {fmt(d['explicit_median_interval_cycles'])} | {'yes' if d['parity_within_25_percent'] else 'no'} |")
+        lines.append(f"| {d['class']} | {fmt(d['deltaK_MPa_sqrt_m'])} | {fmt(d['explicit_to_accelerated_ratio'])} | {fmt(d['accelerated_2D_to_1D_ratio'])} | {fmt(d['explicit_2D_to_1D_ratio'])} | {fmt(d['explicit_median_interval_cycles'])} | {'yes' if d['parity_within_25_percent'] else 'no'} |")
     explicit=[r for r in rows if r["integration_mode"]=="explicit" and r["plot_kind"]=="resolved"]
     matches=[]
     for cls in ["A","B","C","D","DBTT","Peak"]:

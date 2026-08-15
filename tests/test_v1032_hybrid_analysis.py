@@ -26,6 +26,17 @@ def test_censor_and_partial_are_never_converted_to_rates() -> None:
     assert partial["plot_kind"] == "partial" and math.isnan(partial["da_dN_m_per_cycle"])
 
 
+def test_explicit_cycle_limit_is_a_true_cycle_censor() -> None:
+    row = {"class": "D", "candidate_id": "x", "deltaK_MPa_sqrt_m": 100,
+           "normalized_f": 5, "dimensionality": "1D", "integration_mode": "explicit",
+           "da_dN_m_per_cycle": 1e-9, "cycles_to_target": 5000,
+           "extension_um": 16, "event_count": 5, "status": "explicit_cycle_limit"}
+    result = finish(row)
+    assert result["regime_classification"] == "BELOW_FATIGUE_RESOLUTION"
+    assert result["plot_kind"] == "censor"
+    assert math.isnan(result["da_dN_m_per_cycle"])
+
+
 def test_near_monotonic_requires_target_and_dense_subcycle_events() -> None:
     row = {"status": "growth_target_reached", "integration_mode": "explicit",
            "cycles_to_target": 0.4, "subcycle_fraction": 0.9,
