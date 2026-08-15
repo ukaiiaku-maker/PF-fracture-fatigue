@@ -53,3 +53,28 @@ def test_accelerated_matrix_matches_explicit_transition_loads():
     assert set(matrix["mode"]) == {"accelerated"}
     assert set(matrix.family) == set(inventory.MATERIALS)
     assert matrix.maximum_cycles.min() == 10_000_000
+
+
+def test_explicit_2d_matrix_is_sparse_adaptive_and_canonical():
+    repo = Path(__file__).resolve().parents[1]
+    matrix = pd.read_csv(repo / "runtime_inputs/v10_2_32/transition_refinement_2d_explicit.csv")
+    assert len(matrix) == 17
+    assert matrix.groupby("family").size().to_dict() == {
+        "DBTT": 3, "Peak-T": 4, "weak-T": 5, "ceramic-like": 5,
+    }
+    assert set(matrix.family) == set(inventory.MATERIALS)
+    for family, (candidate, option, _) in inventory.MATERIALS.items():
+        rows = matrix[matrix.family == family]
+        assert set(rows.candidate_id) == {candidate}
+        assert set(rows.parameter_option) == {option}
+    assert matrix.maximum_cycles.max() == 1200
+    assert matrix.maximum_cycles.min() == 100
+
+
+def test_transition_2d_launcher_is_clean_head_and_disk_guarded():
+    repo = Path(__file__).resolve().parents[1]
+    script = (repo / "scripts/run_v1032_transition_refinement_2d.sh").read_text()
+    assert "authoritative launch requires clean worktree" in script
+    assert "MIN_FREE_GIB" in script
+    assert "wait -n" not in script
+    assert 'REGISTRY=arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv' in script
