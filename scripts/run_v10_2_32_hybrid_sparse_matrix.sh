@@ -51,12 +51,17 @@ run_one() {
 export -f run_one free_gib
 export EXPECTED_HEAD OUT_BASE LOCAL_REGISTRY CANONICAL_REGISTRY MIN_FREE_GIB
 
+pids=()
 for spec in "${CASES[@]}"; do
-  while (( $(jobs -rp | wc -l) >= MAX_PARALLEL )); do wait -n; done
+  if (( ${#pids[@]} >= MAX_PARALLEL )); then
+    wait "${pids[0]}"
+    pids=("${pids[@]:1}")
+  fi
   if (( $(free_gib) < MIN_FREE_GIB )); then
     echo "disk safety gate: less than ${MIN_FREE_GIB} GiB free" >&2
     exit 3
   fi
   run_one "$spec" &
+  pids+=("$!")
 done
-wait
+for pid in "${pids[@]}"; do wait "$pid"; done

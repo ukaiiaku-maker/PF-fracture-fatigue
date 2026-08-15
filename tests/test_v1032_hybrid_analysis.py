@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 from scripts.analyze_v1032_hybrid_hcf_lcf import _interval_stats, classify, finish
 
@@ -32,3 +33,8 @@ def test_near_monotonic_requires_target_and_dense_subcycle_events() -> None:
     assert classify(row) == "NEAR_MONOTONIC_EXPLICIT"
     assert classify({**row, "status": "partial"}) == "PARTIAL_OR_NUMERICAL_UNRESOLVED"
 
+
+def test_sparse_matrix_is_compatible_with_macos_bash_3() -> None:
+    script = Path("scripts/run_v10_2_32_hybrid_sparse_matrix.sh").read_text()
+    assert "wait -n" not in script
+    assert 'wait "${pids[0]}"' in script
