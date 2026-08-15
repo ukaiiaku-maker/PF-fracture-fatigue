@@ -8,6 +8,7 @@ from dataclasses import fields
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 
 from arrhenius_fracture.emergent_gnd_campaign_v913 import candidate_from_registry_row
 from arrhenius_fracture.endurance_knee_v914 import physics_for_row
@@ -37,7 +38,17 @@ def main() -> int:
     ap.add_argument("--maximum-cycles", type=float, default=50); ap.add_argument("--seed", type=int, default=1720)
     ap.add_argument("--out", type=Path, required=True); ap.add_argument("--restart", action="store_true")
     ap.add_argument("--pause-after-phases", type=int, default=0)
+    ap.add_argument("--normalized-f", type=float, default=None)
+    ap.add_argument("--expected-head", default=None)
     args = ap.parse_args(); args.out.mkdir(parents=True, exist_ok=True)
+    repository = Path(__file__).resolve().parents[1]
+    branch = subprocess.check_output(["git", "branch", "--show-current"], cwd=repository, text=True).strip()
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repository, text=True).strip()
+    worktree = subprocess.check_output(["git", "status", "--porcelain"], cwd=repository, text=True)
+    if args.expected_head and head != args.expected_head:
+        raise SystemExit(f"HEAD mismatch: expected {args.expected_head}, found {head}")
+    if args.expected_head and worktree.strip():
+        raise SystemExit("authoritative launch requires a clean worktree")
     rows = list(csv.DictReader(args.registry.open())); row = next((r for r in rows if r["candidate_id"] == args.candidate), None)
     if row is None: raise ValueError("candidate missing from registry")
     candidate = candidate_from_registry_row(row); physics = physics_for_row(load_physics(args.physics), row)
@@ -64,6 +75,9 @@ def main() -> int:
     contract = {"schema": "v10.2.32_lcf_case_contract_v1", "mode": args.mode,
         "candidate": args.candidate, "deltaK_MPa_sqrt_m": args.deltaK, "phase_steps": args.phase_steps,
         "target_um": args.target_um, "maximum_cycles": args.maximum_cycles, "seed": args.seed,
+        "normalized_f": args.normalized_f,
+        "repository": str(repository), "repository_branch": branch,
+        "repository_head": head, "repository_clean": not bool(worktree.strip()),
         "registry": str(args.registry.resolve()), "registry_sha256": hashlib.sha256(args.registry.read_bytes()).hexdigest(),
         "physics": str(args.physics.resolve()), "physics_sha256": hashlib.sha256(args.physics.read_bytes()).hexdigest()}
     (args.out / "run_contract.json").write_text(json.dumps(contract, indent=2, sort_keys=True) + "\n")
