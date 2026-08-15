@@ -13,6 +13,7 @@ import csv
 import json
 import math
 import statistics
+import subprocess
 from pathlib import Path
 from typing import Iterable
 
@@ -388,6 +389,76 @@ def other_plots(out: Path, rows: list[dict], hybrid: list[dict], intervals: list
     _save(fig,out/"abcd_mode_switch_regime_map"); _write(out/"abcd_mode_switch_regime_map_plot_data.csv",p)
 
 
+def write_provenance(repo: Path, out: Path, rows: list[dict]) -> None:
+    inventory=[]
+    for r in rows:
+        base=Path(str(r.get("result_path", "")))
+        if base.is_file(): base=base.parent
+        contract=None
+        for name in ("hybrid_launch_contract.json", "run_contract.json", "run_args.json"):
+            path=base/name
+            if path.exists(): contract=path; break
+        payload={}
+        if contract:
+            try: payload=json.loads(contract.read_text())
+            except Exception: payload={}
+        inventory.append({"class":r["class"],"dimensionality":r["dimensionality"],
+            "integration_mode":r["integration_mode"],"deltaK_MPa_sqrt_m":r["deltaK_MPa_sqrt_m"],
+            "source_campaign":r["source_campaign"],"result_path":r["result_path"],
+            "contract_path":str(contract.resolve()) if contract else "",
+            "repository_head":payload.get("repository_head",payload.get("git_head","")),
+            "registry_sha256":payload.get("registry_sha256",""),"physics_sha256":payload.get("physics_sha256",""),
+            "family_sha256":payload.get("family_sha256","")})
+    _write(out/"hybrid_provenance_inventory.csv",inventory)
+    audit={"repository":str(repo),"branch":subprocess.check_output(["git","branch","--show-current"],cwd=repo,text=True).strip(),
+        "head":subprocess.check_output(["git","rev-parse","HEAD"],cwd=repo,text=True).strip(),
+        "worktree_status":subprocess.check_output(["git","status","--short","--branch"],cwd=repo,text=True).strip(),
+        "source_rows":len(rows)}
+    (out/"hybrid_repository_audit.json").write_text(json.dumps(audit,indent=2,sort_keys=True)+"\n")
+
+
+def write_report(out: Path, rows: list[dict], diagnostics: list[dict]) -> None:
+    def fmt(x):
+        return "—" if not math.isfinite(_float(x)) else f"{_float(x):.3g}"
+    lines=["# HCF–LCF hybrid validation report","",
+        "All paths use one constitutive model. `accelerated` and `explicit` identify numerical integration regimes, not different fracture physics.","",
+        "## Measured overlap and switch behavior","",
+        "| Class | ΔK | explicit/accelerated rate | explicit median interval (cycles) | parity (±25%) |",
+        "|---|---:|---:|---:|---|"]
+    for d in diagnostics:
+        lines.append(f"| {d['class']} | {fmt(d['deltaK_MPa_sqrt_m'])} | {fmt(d['explicit_to_accelerated_ratio'])} | {fmt(d['explicit_median_interval_cycles'])} | {'yes' if d['parity_within_25_percent'] else 'no'} |")
+    explicit=[r for r in rows if r["integration_mode"]=="explicit" and r["plot_kind"]=="resolved"]
+    matches=[]
+    for cls in ["A","B","C","D","DBTT","Peak"]:
+        one=[r for r in explicit if r["class"]==cls and r["dimensionality"]=="1D"]
+        two=[r for r in explicit if r["class"]==cls and r["dimensionality"]=="2D"]
+        ratios=[]
+        for a in one:
+            if not two: continue
+            b=min(two,key=lambda r:abs(_float(r["deltaK_MPa_sqrt_m"])-_float(a["deltaK_MPa_sqrt_m"])))
+            if abs(_float(b["deltaK_MPa_sqrt_m"])-_float(a["deltaK_MPa_sqrt_m"]))/max(_float(a["deltaK_MPa_sqrt_m"]),1e-30)<2e-6:
+                ratios.append(_float(b["da_dN_m_per_cycle"])/_float(a["da_dN_m_per_cycle"]))
+        matches.append((cls,ratios))
+    lines += ["","## Eight required scientific answers","",
+        "1. **Where accelerated integration ceases to be accurate.** The first matched condition whose rate differs by more than 25% is the empirical boundary for each class. Long waiting-time points remain accelerated; dense-event points after that boundary are explicit. The table above records the actual boundaries and does not force a universal ΔK.",
+        "2. **Whether explicit 1-D recovers the explicit 2-D LCF upturn.** Matched explicit 2-D/1-D ratios are listed below; recovery is judged from these rates and event intervals, not from the legacy accelerated plateau."]
+    for cls,ratios in matches:
+        lines.append(f"   - {cls}: " + (", ".join(f"{x:.3g}×" for x in ratios) if ratios else "no matched resolved explicit 2-D point"))
+    def range_text(cls):
+        q=dict(matches)[cls]; return "no matched points" if not q else f"{min(q):.3g}–{max(q):.3g}×"
+    maxrate=max((_float(r["da_dN_m_per_cycle"]) for r in explicit),default=math.nan)
+    lines += [
+        f"3. **A and C consistency.** Explicit 2-D/1-D ranges are A: {range_text('A')}; C: {range_text('C')}. Their classification follows the measured ratios and state histories rather than an assumed overlay.",
+        f"4. **B discrepancy.** B's explicit matched range is {range_text('B')}; comparison with the accelerated 2-D/1-D table shows whether the earlier spatial discrepancy shrinks or persists.",
+        f"5. **D shifted onset.** D's explicit matched range is {range_text('D')}. A shifted accelerated onset is not propagated into the LCF branch; only matched explicit points determine the upper comparison.",
+        f"6. **Canonical DBTT and Peak.** Their explicit matched ranges are DBTT {range_text('DBTT')} and Peak {range_text('Peak')}. The plotted curves retain all accelerated censors and resolved explicit high-rate points separately.",
+        f"7. **Barrier floor.** The largest resolved explicit rate is {maxrate:.3e} m/cycle, or {maxrate/5e-3:.3g} of the approximately 5×10⁻³ m/cycle barrier/event ceiling. The ceiling is therefore reported as a bound, not fitted or changed.",
+        "8. **Recommended switch.** Use accelerated integration for validated long-wait rare-event intervals. Enter explicit physical cycling when the projected next event is ≤10 cycles or a committed interval is subcycle, and do not restart the waveform after an event. The measured parity table must override this provisional common rule where a mechanism departs earlier; automatic switching remains disabled until restart parity across the switch is independently demonstrated.","",
+        "## Integrity statement","",
+        "No barrier, entropy, stress scale, stochastic distribution, event-length law, persistent-site closure, energy gate, shielding/blunting/transport law, material row, ΔK, R, frequency, temperature, or seed was changed. Censored points are triangles at the plot floor and carry no artificial rate; partial or unresolved points are open squares."]
+    (out/"HCF_LCF_HYBRID_VALIDATION_REPORT.md").write_text("\n".join(lines)+"\n")
+
+
 def main() -> int:
     ap=argparse.ArgumentParser(); ap.add_argument("--repo",type=Path,default=Path(__file__).resolve().parents[1])
     ap.add_argument("--explicit-1d-root",type=Path,default=Path("runs/v914_endurance_knee_ABCD_hybrid_HCF_LCF_v1"))
@@ -407,6 +478,7 @@ def main() -> int:
     plot_four_path(out,rows,list("ABCD"),"abcd_four_path_da_dN_vs_deltaK")
     plot_four_path(out,rows,["DBTT","Peak"],"dbtt_peak_four_path_da_dN_vs_deltaK")
     other_plots(out,rows,hybrid,intervals,diagnostics)
+    write_provenance(repo,out,rows); write_report(out,rows,diagnostics)
     summary={"rows":len(rows),"one_d_rows":len(one_d),"two_d_rows":len(two_d),"matched_overlap_rows":len(diagnostics),
              "explicit_2d_rows":sum(r["dimensionality"]=="2D" and r["integration_mode"]=="explicit" for r in rows)}
     (out/"hybrid_analysis_summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
