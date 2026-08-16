@@ -32,6 +32,7 @@ DEFAULT_V913_ROOT = Path(
     "/Volumes/Data/Data/Nanopillar_calculation/"
     "Arrhenius_FEM_CZM_MPZ_v9_13_dbtt_temperature_shelf"
 )
+DRIVER_ROOT = Path(__file__).resolve().parents[1]
 HISTORICAL_TEMPERATURES_K = (
     700.0,
     800.0,
@@ -452,6 +453,7 @@ def main() -> int:
         "loading_map_sha256": sha256_path(loading_map),
         "policy_json_sha256": sha256_path(policy_json),
         "v913_git_head": git_head(v913_root),
+        "driver_git_head": git_head(DRIVER_ROOT),
         "instrumentation_only": True,
         "physics_changed": False,
         "numerical_settings_changed": False,
