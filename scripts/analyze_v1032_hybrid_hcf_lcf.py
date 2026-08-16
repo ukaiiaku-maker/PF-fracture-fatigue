@@ -104,7 +104,10 @@ def classify(row: dict) -> str:
 
 def finish(row: dict) -> dict:
     out = {key: row.get(key, math.nan) for key in COMMON_COLUMNS}
-    out["mechanism_diagnostics"] = row.get("mechanism_diagnostics") or MECHANISMS[out["class"]]
+    out["mechanism_diagnostics"] = (
+        row.get("mechanism_diagnostics")
+        or MECHANISMS.get(out["class"], f"{out['class']} production parameterization")
+    )
     out["regime_classification"] = classify(out)
     if _is_censor_status(out["status"]):
         out["plot_kind"] = "censor"

@@ -16,6 +16,23 @@ def test_authoritative_material_identifiers_are_exact():
     }
 
 
+def test_inventory_accepts_contract_family_labels_without_alias_failure():
+    row = inventory.prior.finish({
+        "class": "Peak-T",
+        "candidate_id": "v913_zeroD_sobol_0242980",
+        "deltaK_MPa_sqrt_m": 24.0,
+        "normalized_f": 1.1,
+        "dimensionality": "2D",
+        "integration_mode": "explicit",
+        "da_dN_m_per_cycle": 1e-6,
+        "cycles_to_target": 100.0,
+        "extension_um": 100.0,
+        "status": "developed",
+    })
+    assert row["class"] == "Peak-T"
+    assert "Peak-T" in row["mechanism_diagnostics"]
+
+
 def test_material_accelerated_censors_and_partials_have_no_rate():
     repo = Path(__file__).resolve().parents[1]
     rows = pd.DataFrame(inventory.material_accelerated_2d(repo))
