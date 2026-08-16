@@ -7,7 +7,6 @@ import argparse
 import json
 import math
 from pathlib import Path
-import shutil
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,10 +29,10 @@ COLORS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--registry", type=Path, required=True)
-    parser.add_argument("--historical-grid-root", type=Path, required=True)
-    parser.add_argument("--k300-root", type=Path, required=True)
-    parser.add_argument("--design-audit", type=Path, required=True)
-    parser.add_argument("--anchor-audit", type=Path, required=True)
+    parser.add_argument("--historical-grid-root", type=Path, nargs="+", required=True)
+    parser.add_argument("--k300-root", type=Path, nargs="+", required=True)
+    parser.add_argument("--design-audit", type=Path, nargs="+", required=True)
+    parser.add_argument("--anchor-audit", type=Path, nargs="+", required=True)
     parser.add_argument("--out", type=Path, required=True)
     return parser.parse_args()
 
@@ -52,6 +51,12 @@ def linear_slope(x: np.ndarray, y: np.ndarray) -> float:
     if len(x) < 2 or np.ptp(x) <= 0.0:
         return float("nan")
     return float(np.polyfit(x, y, 1)[0])
+
+
+def read_root_tables(roots: list[Path], filename: str) -> pd.DataFrame:
+    """Read disjoint production batches without copying or rewriting them."""
+    tables = [pd.read_csv(root / filename) for root in roots]
+    return pd.concat(tables, ignore_index=True)
 
 
 def morphology(T: np.ndarray, K: np.ndarray) -> str:
@@ -283,13 +288,22 @@ def main() -> int:
     args = parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     registry = pd.read_csv(args.registry)
-    grid_cases = pd.read_csv(args.historical_grid_root / "prospective_fracture_case_results.csv")
-    k300_cases = pd.read_csv(args.k300_root / "prospective_fracture_case_results.csv")
+    grid_cases = read_root_tables(
+        args.historical_grid_root, "prospective_fracture_case_results.csv"
+    )
+    k300_cases = read_root_tables(
+        args.k300_root, "prospective_fracture_case_results.csv"
+    )
     cases = pd.concat([k300_cases, grid_cases], ignore_index=True)
     states = pd.concat(
         [
-            pd.read_csv(args.k300_root / "prospective_fracture_state_at_first_passage.csv"),
-            pd.read_csv(args.historical_grid_root / "prospective_fracture_state_at_first_passage.csv"),
+            read_root_tables(
+                args.k300_root, "prospective_fracture_state_at_first_passage.csv"
+            ),
+            read_root_tables(
+                args.historical_grid_root,
+                "prospective_fracture_state_at_first_passage.csv",
+            ),
         ],
         ignore_index=True,
     )
@@ -298,8 +312,12 @@ def main() -> int:
     tests = hypothesis_tests(responses, mechanisms)
 
     registry.to_csv(args.out / "prospective_fracture_candidate_registry.csv", index=False)
-    shutil.copy2(args.design_audit, args.out / "prospective_candidate_design_audit.csv")
-    shutil.copy2(args.anchor_audit, args.out / "prospective_K300_anchor_audit.csv")
+    pd.concat([pd.read_csv(path) for path in args.design_audit], ignore_index=True).to_csv(
+        args.out / "prospective_candidate_design_audit.csv", index=False
+    )
+    pd.concat([pd.read_csv(path) for path in args.anchor_audit], ignore_index=True).to_csv(
+        args.out / "prospective_K300_anchor_audit.csv", index=False
+    )
     responses.to_csv(args.out / "prospective_fracture_response_summary.csv", index=False)
     points.to_csv(args.out / "prospective_fracture_response_points.csv", index=False)
     states.to_csv(args.out / "prospective_fracture_state_at_first_passage.csv", index=False)

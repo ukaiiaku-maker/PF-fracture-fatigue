@@ -3,6 +3,7 @@ import pandas as pd
 
 from scripts.analyze_v913_prospective_fracture_causality import (
     morphology,
+    read_root_tables,
     response_summary,
 )
 from scripts.run_v913_prospective_fracture_causality import _finite_summary
@@ -58,3 +59,15 @@ def test_response_summary_requires_exact_historical_grid_plus_k300():
     assert len(points) == 10
     assert summary.iloc[0].historical_grid_complete
     assert summary.iloc[0].morphology_class == "DBTT_LIKE"
+
+
+def test_analysis_reads_disjoint_production_batches_without_copying(tmp_path):
+    roots = [tmp_path / "primary", tmp_path / "confirmation"]
+    for index, root in enumerate(roots):
+        root.mkdir()
+        pd.DataFrame({"candidate_id": [f"c{index}"], "value": [index]}).to_csv(
+            root / "table.csv", index=False
+        )
+    combined = read_root_tables(roots, "table.csv")
+    assert combined.candidate_id.tolist() == ["c0", "c1"]
+    assert combined.value.tolist() == [0, 1]
