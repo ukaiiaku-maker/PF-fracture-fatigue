@@ -19,7 +19,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--selection", type=Path, required=True)
     parser.add_argument("--loads", type=Path, required=True)
     parser.add_argument("--accelerated-root", type=Path, required=True)
-    parser.add_argument("--explicit-root", type=Path, required=True)
+    parser.add_argument("--explicit-root", type=Path, nargs="+", required=True)
     parser.add_argument("--fracture-summary", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     return parser.parse_args()
@@ -111,6 +111,8 @@ def load_accelerated(root: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 def load_explicit(root: Path, loads: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     rates, event_rows = [], []
     for path in sorted(root.rglob("result.json")):
+        if any("INVALID_DUPLICATE_WRITER" in part for part in path.parts):
+            continue
         payload = json.loads(path.read_text())
         if payload.get("schema") != "v10.2.32_explicit_cycle_lcf_result_v1":
             continue
@@ -186,10 +188,13 @@ def overlap_parity(rates: pd.DataFrame) -> pd.DataFrame:
     explicit = rates[rates.integration_mode.eq("explicit") & rates.target_reached]
     rows = []
     for candidate_id, group in explicit.groupby("candidate_id"):
-        candidates = accelerated[accelerated.candidate_id.eq(candidate_id)]
-        if candidates.empty:
-            continue
         for event in group.itertuples(index=False):
+            candidates = accelerated[
+                accelerated.candidate_id.eq(candidate_id)
+                & accelerated.seed.eq(int(event.seed))
+            ]
+            if candidates.empty:
+                continue
             distance = (candidates.normalized_f - event.normalized_f).abs()
             index = distance.idxmin()
             if float(distance.loc[index]) > 6e-5:
@@ -242,7 +247,13 @@ def morphology_table(rates: pd.DataFrame, loads: pd.DataFrame) -> pd.DataFrame:
     rows = []
     preferred = preferred_hybrid_rates(rates, loads)
     for candidate_id, group in preferred.groupby("candidate_id"):
-        finite = group[group.target_reached & group.developed_da_dN_m_per_cycle.notna()].sort_values("normalized_f")
+        finite_raw = group[
+            group.target_reached & group.developed_da_dN_m_per_cycle.notna()
+        ].sort_values("normalized_f")
+        finite = finite_raw.groupby("normalized_f", as_index=False).agg(
+            developed_da_dN_m_per_cycle=("developed_da_dN_m_per_cycle", "median"),
+            deltaK_MPa_sqrt_m=("deltaK_MPa_sqrt_m", "median"),
+        )
         x = finite.normalized_f.to_numpy(float)
         y = np.log10(finite.developed_da_dN_m_per_cycle.to_numpy(float))
         slope = np.gradient(y, x) if len(finite) >= 2 else np.asarray([np.nan])
@@ -257,6 +268,14 @@ def morphology_table(rates: pd.DataFrame, loads: pd.DataFrame) -> pd.DataFrame:
             float(transition.deltaK_MPa_sqrt_m.iloc[0]) if len(transition) else np.nan
         )
         censors = group[group.status_class.eq("cycle_or_hazard_censor")]
+        overlap_rates = finite_raw[
+            np.isclose(
+                finite_raw.normalized_f,
+                transition_f,
+                rtol=0.0,
+                atol=6e-5,
+            )
+        ].developed_da_dN_m_per_cycle.to_numpy(float)
         rows.append(
             {
                 "candidate_id": candidate_id,
@@ -272,6 +291,12 @@ def morphology_table(rates: pd.DataFrame, loads: pd.DataFrame) -> pd.DataFrame:
                 "HCF_LCF_transition_deltaK_MPa_sqrt_m": transition_deltaK,
                 "lowest_finite_normalized_f": float(np.min(x)) if len(x) else np.nan,
                 "highest_censor_normalized_f": float(censors.normalized_f.max()) if len(censors) else np.nan,
+                "multiseed_overlap_count": len(overlap_rates),
+                "multiseed_overlap_CV": (
+                    float(np.std(overlap_rates, ddof=1) / np.mean(overlap_rates))
+                    if len(overlap_rates) >= 2 and np.mean(overlap_rates) > 0.0
+                    else np.nan
+                ),
                 "low_branch_log_slope_per_f": float(np.mean(slope[: max(len(slope) // 2, 1)])) if len(slope) else np.nan,
                 "upper_branch_log_slope_per_f": float(np.mean(slope[len(slope) // 2 :])) if len(slope) else np.nan,
                 "maximum_developed_da_dN_m_per_cycle": float(finite.developed_da_dN_m_per_cycle.max()) if len(finite) else np.nan,
@@ -293,8 +318,15 @@ def savefig(fig: plt.Figure, out: Path, stem: str, data: pd.DataFrame) -> None:
 def plot_rates(ax, rates: pd.DataFrame, x: str) -> None:
     colors = plt.cm.tab10(np.linspace(0, 1, max(rates.candidate_id.nunique(), 1)))
     for color, (candidate_id, group) in zip(colors, rates.groupby("candidate_id")):
-        resolved = group[group.status_class.eq("developed_target_reached")].sort_values(x)
+        resolved_raw = group[group.status_class.eq("developed_target_reached")].sort_values(x)
+        resolved = resolved_raw.groupby(x, as_index=False).agg(
+            developed_da_dN_m_per_cycle=("developed_da_dN_m_per_cycle", "median")
+        )
         ax.plot(resolved[x], resolved.developed_da_dN_m_per_cycle, "o-", color=color, label=candidate_id, alpha=0.8)
+        ax.scatter(
+            resolved_raw[x], resolved_raw.developed_da_dN_m_per_cycle,
+            s=16, facecolors="none", edgecolors=color, alpha=0.55,
+        )
         censor = group[group.status_class.eq("cycle_or_hazard_censor")]
         if len(censor):
             floor = resolved.developed_da_dN_m_per_cycle.min() / 5 if len(resolved) else 1e-18
@@ -333,7 +365,9 @@ def main() -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     loads = pd.read_csv(args.loads)
     accelerated, accelerated_events = load_accelerated(args.accelerated_root)
-    explicit, explicit_events = load_explicit(args.explicit_root, loads)
+    explicit_batches = [load_explicit(root, loads) for root in args.explicit_root]
+    explicit = pd.concat([batch[0] for batch in explicit_batches], ignore_index=True)
+    explicit_events = pd.concat([batch[1] for batch in explicit_batches], ignore_index=True)
     rates = pd.concat([accelerated, explicit], ignore_index=True, sort=False)
     events = pd.concat([accelerated_events, explicit_events], ignore_index=True, sort=False)
     if rates.empty:

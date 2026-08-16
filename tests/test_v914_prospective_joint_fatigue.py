@@ -80,3 +80,32 @@ def test_smooth_sparse_curve_is_not_mislabeled_as_endpoint_knee():
     assert not row.localized_knee_detected
     assert np.isnan(row.knee_normalized_f)
     assert row.HCF_LCF_transition_normalized_f == 1.08
+
+
+def test_morphology_aggregates_multiseed_overlap_without_duplicate_x_gradient():
+    fractions = [0.9, 1.0, 1.1, 1.1, 1.1, 1.2, 1.3]
+    rates = pd.DataFrame(
+        {
+            "candidate_id": ["a"] * 7,
+            "seed": [1, 1, 1, 2, 3, 1, 1],
+            "normalized_f": fractions,
+            "deltaK_MPa_sqrt_m": np.asarray(fractions) * 20.0,
+            "integration_mode": ["accelerated", "accelerated"] + ["explicit"] * 5,
+            "target_reached": [False] + [True] * 6,
+            "status_class": ["cycle_or_hazard_censor"] + ["developed_target_reached"] * 6,
+            "developed_da_dN_m_per_cycle": [np.nan, 1e-10, 1e-8, 1.1e-8, 0.9e-8, 1e-6, 1e-4],
+        }
+    )
+    loads = pd.DataFrame(
+        {
+            "candidate_id": ["a"] * 5,
+            "normalized_f": [0.9, 1.0, 1.1, 1.2, 1.3],
+            "deltaK_MPa_sqrt_m": [18, 20, 22, 24, 26],
+            "primary_integration_mode": ["ACCELERATED", "ACCELERATED", "BOTH_ACCELERATED_AND_EXPLICIT", "EXPLICIT", "EXPLICIT"],
+            "selection_regime": ["SCREEN_LOWER_ENDPOINT", "HCF_1E4", "HCF_LCF_OVERLAP", "LCF_1_TO_3", "SCREEN_UPPER_ENDPOINT"],
+        }
+    )
+    row = morphology_table(rates, loads).iloc[0]
+    assert row.finite_developed_points == 4
+    assert row.multiseed_overlap_count == 3
+    assert np.isfinite(row.multiseed_overlap_CV)
