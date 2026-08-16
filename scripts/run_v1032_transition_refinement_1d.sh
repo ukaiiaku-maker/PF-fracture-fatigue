@@ -22,7 +22,7 @@ run_one() {
   local family=$1 candidate=$2 fraction=$3 delta_k=$4 seed=$5 max_cycles=$6 mode=${7:-explicit}
   local label=${fraction//./p}
   local short=${candidate##*_}
-  local out="$OUT_BASE/${family}_${short}/f${label}_${mode}"
+  local out="$OUT_BASE/${family}_${short}/f${label}_${mode}_seed${seed}"
   if [[ -f "$out/result.json" && -f "$out/run_contract.json" ]]; then
     echo "already terminal: $out"
     return 0

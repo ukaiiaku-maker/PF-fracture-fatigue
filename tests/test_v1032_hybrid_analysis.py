@@ -63,3 +63,8 @@ def test_explicit_1d_launcher_exposes_cycle_checkpoint_interval() -> None:
     script = Path("scripts/run_v1032_explicit_lcf.py").read_text()
     assert "--checkpoint-cycle-interval" in script
     assert "checkpoint_cycle_interval=checkpoint_cycle_interval" in script
+
+
+def test_explicit_1d_matrix_isolates_multiseed_outputs() -> None:
+    script = Path("scripts/run_v1032_transition_refinement_1d.sh").read_text()
+    assert 'f${label}_${mode}_seed${seed}' in script
