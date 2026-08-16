@@ -41,8 +41,12 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    design = pd.read_csv(args.registry)
-    fracture = pd.read_csv(args.fracture_results)
+    # The production v9.13/v9.14 registries use csv.DictReader followed by
+    # float().  Pandas' default fast parser may choose the adjacent binary64
+    # value for a 17-digit token, which would manufacture a fingerprint
+    # mismatch.  round_trip is bit-identical to the production parser here.
+    design = pd.read_csv(args.registry, float_precision="round_trip")
+    fracture = pd.read_csv(args.fracture_results, float_precision="round_trip")
     qualified = fracture[fracture.fracture_qualified_for_fatigue.astype(bool)].copy()
     source = design.set_index("prospective_candidate_id")
     rows, audits = [], []

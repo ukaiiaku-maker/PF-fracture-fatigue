@@ -47,3 +47,11 @@ def test_parent_normalization_preserves_reference_at_parent_center():
     candidate_k300 = parent_k300
     transferred = parent_reference * candidate_k300 / parent_k300
     assert transferred == parent_reference
+
+
+def test_real_design_registry_round_trip_fingerprints_match():
+    path = ROOT / "runs/v913_joint_fracture_fatigue_slope_physics_v1/design/prospective_slope_design_registry.csv"
+    if not path.exists():
+        return
+    frame = pd.read_csv(path, float_precision="round_trip")
+    assert all(transfer.fingerprint(row) == row.parameter_fingerprint for _, row in frame.iterrows())
