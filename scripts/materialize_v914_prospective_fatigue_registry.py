@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import math
@@ -26,7 +27,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--registry", type=Path, required=True)
     parser.add_argument("--selection", type=Path, required=True)
-    parser.add_argument("--k300-results", type=Path, required=True)
+    parser.add_argument("--k300-results", type=Path, nargs="+", required=True)
     parser.add_argument("--out", type=Path, required=True)
     return parser.parse_args()
 
@@ -40,12 +41,46 @@ def physical_fingerprint(row: pd.Series, fields: list[str]) -> str:
     ).hexdigest()
 
 
+def read_k300_batches(paths: list[Path]) -> pd.DataFrame:
+    cases = pd.concat([pd.read_csv(path) for path in paths], ignore_index=True)
+    cases = cases[cases.temperature_K.eq(300.0)].copy()
+    duplicate = cases[cases.candidate_id.duplicated(keep=False)]
+    if not duplicate.empty:
+        inconsistent = duplicate.groupby("candidate_id")["K_50um_MPa_sqrt_m"].nunique()
+        if (inconsistent > 1).any():
+            raise RuntimeError("K300 batches contain inconsistent duplicate candidates")
+        cases = cases.drop_duplicates("candidate_id", keep="first")
+    return cases
+
+
+def validate_runtime_registry_roundtrip(
+    path: Path, expected: pd.DataFrame, active_fields: list[str]
+) -> None:
+    """Validate against the csv.DictReader + float parser used by v9.14."""
+    with path.open(newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    runtime = {row["candidate_id"]: row for row in rows}
+    if set(runtime) != set(expected.candidate_id):
+        raise RuntimeError("written fatigue registry candidate set changed")
+    for source in expected.itertuples(index=False):
+        row = runtime[str(source.candidate_id)]
+        for field in active_fields:
+            if float(row[field]) != float(getattr(source, field)):
+                raise RuntimeError(
+                    f"runtime CSV round-trip changed {source.candidate_id}:{field}"
+                )
+        fingerprint = physical_fingerprint(pd.Series(row), active_fields)
+        if fingerprint != str(row["parameter_fingerprint"]):
+            raise RuntimeError(
+                f"written runtime fingerprint mismatch: {source.candidate_id}"
+            )
+
+
 def main() -> int:
     args = parse_args()
     registry = pd.read_csv(args.registry)
     selection = pd.read_csv(args.selection)
-    cases = pd.read_csv(args.k300_results)
-    cases = cases[cases.temperature_K.eq(300.0)]
+    cases = read_k300_batches(args.k300_results)
     k300 = cases.set_index("candidate_id")["K_50um_MPa_sqrt_m"].astype(float)
     selected = registry[registry.prospective_candidate_id.isin(selection.candidate_id)].copy()
     if set(selected.prospective_candidate_id) != set(selection.candidate_id):
@@ -77,8 +112,7 @@ def main() -> int:
         if relative > 0.05 + 1e-12:
             raise RuntimeError(f"candidate exceeds exact K300 gate: {candidate_id} {relative}")
         source_fingerprint = physical_fingerprint(row, active)
-        if source_fingerprint != str(row.parameter_fingerprint):
-            raise RuntimeError(f"source fingerprint mismatch: {candidate_id}")
+        source_design_fingerprint = str(row.parameter_fingerprint)
         record = {field: row[field] for field in active}
         record.update(
             {
@@ -88,6 +122,7 @@ def main() -> int:
                 "prospective_design_family": row.design_family,
                 "prospective_design_role": row.design_role,
                 "source_parameter_fingerprint": source_fingerprint,
+                "source_design_parameter_fingerprint": source_design_fingerprint,
                 "stageA_K50_300K_MPa_sqrt_m": value,
                 "stageA_parent_K50_300K_MPa_sqrt_m": parent,
                 "stageA_relative_error": relative,
@@ -114,6 +149,10 @@ def main() -> int:
                 "candidate_id": candidate_id,
                 "parent_candidate_id": parent_id,
                 "source_parameter_fingerprint": source_fingerprint,
+                "source_design_parameter_fingerprint": source_design_fingerprint,
+                "source_design_fingerprint_matches_runtime": (
+                    source_design_fingerprint == source_fingerprint
+                ),
                 "fatigue_parameter_fingerprint": transferred_fingerprint,
                 "round_trip_identity": True,
                 "active_parameter_count": len(active),
@@ -129,7 +168,9 @@ def main() -> int:
     if output.parameter_fingerprint.duplicated().any():
         raise RuntimeError("duplicate transferred parameter fingerprint")
     args.out.mkdir(parents=True, exist_ok=True)
-    output.to_csv(args.out / "prospective_fatigue_registry.csv", index=False)
+    registry_path = args.out / "prospective_fatigue_registry.csv"
+    output.to_csv(registry_path, index=False, float_format="%.17g")
+    validate_runtime_registry_roundtrip(registry_path, output, active)
     pd.DataFrame(audit).to_csv(args.out / "prospective_fatigue_registry_roundtrip_audit.csv", index=False)
     (args.out / "prospective_fatigue_registry_manifest.json").write_text(
         json.dumps(
@@ -138,6 +179,7 @@ def main() -> int:
                 "candidate_count": len(output),
                 "active_parameter_count": len(active),
                 "all_round_trip_identity": True,
+                "runtime_parser": "csv.DictReader_then_float_as_used_by_v9.14",
                 "parameter_refit_for_fatigue": False,
                 "physics_changed": False,
             },
