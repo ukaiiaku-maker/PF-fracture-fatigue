@@ -13,6 +13,8 @@ import pandas as pd
 
 
 TARGETS = (
+    (1.0e6, "VHCF_1E6"),
+    (1.0e4, "HCF_1E4"),
     (100.0, "RARE_HCF_LOWER"),
     (25.0, "RARE_HCF_20PLUS"),
     (8.0, "HCF_LCF_OVERLAP"),

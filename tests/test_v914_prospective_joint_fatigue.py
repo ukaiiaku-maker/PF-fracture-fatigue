@@ -1,8 +1,11 @@
 import numpy as np
+import pandas as pd
 
 from scripts.analyze_v914_prospective_joint_fatigue import (
     classify_status,
     developed_from_events,
+    morphology_table,
+    preferred_hybrid_rates,
 )
 
 
@@ -19,3 +22,61 @@ def test_developed_event_rate_uses_only_post_development_events():
         {"cycles": 8.0, "cumulative_extension_m": 50e-6},
     ]
     assert np.isclose(developed_from_events(events), 25e-6 / 5.0)
+
+
+def test_developed_event_rate_accepts_explicit_cycle_schema():
+    events = [
+        {"cumulative_cycles": 1.0, "cumulative_extension_m": 10e-6},
+        {"cumulative_cycles": 4.0, "cumulative_extension_m": 25e-6},
+        {"cumulative_cycles": 10.0, "cumulative_extension_m": 55e-6},
+    ]
+    assert np.isclose(developed_from_events(events), 30e-6 / 6.0)
+
+
+def test_hybrid_selection_uses_candidate_specific_screened_mode():
+    rates = pd.DataFrame(
+        [
+            {"candidate_id": "a", "seed": 1, "normalized_f": 1.05, "integration_mode": "accelerated"},
+            {"candidate_id": "a", "seed": 1, "normalized_f": 1.10, "integration_mode": "accelerated"},
+            {"candidate_id": "a", "seed": 1, "normalized_f": 1.10, "integration_mode": "explicit"},
+        ]
+    )
+    loads = pd.DataFrame(
+        [
+            {"candidate_id": "a", "normalized_f": 1.05, "primary_integration_mode": "ACCELERATED"},
+            {"candidate_id": "a", "normalized_f": 1.10, "primary_integration_mode": "BOTH_ACCELERATED_AND_EXPLICIT"},
+        ]
+    )
+    chosen = preferred_hybrid_rates(rates, loads)
+    assert chosen.integration_mode.tolist() == ["accelerated", "explicit"]
+
+
+def test_smooth_sparse_curve_is_not_mislabeled_as_endpoint_knee():
+    fractions = [0.5, 0.99, 1.02, 1.06, 1.08, 1.10, 1.12, 1.15, 2.0]
+    rates = pd.DataFrame(
+        {
+            "candidate_id": ["a"] * len(fractions),
+            "seed": [1] * len(fractions),
+            "normalized_f": fractions,
+            "deltaK_MPa_sqrt_m": np.asarray(fractions) * 20.0,
+            "integration_mode": ["accelerated"] * 4 + ["explicit"] * 5,
+            "target_reached": [False] + [True] * 8,
+            "status_class": ["cycle_or_hazard_censor"] + ["developed_target_reached"] * 8,
+            "developed_da_dN_m_per_cycle": [np.nan] + list(np.logspace(-12, -3, 8)),
+        }
+    )
+    modes = ["ACCELERATED"] * 4 + ["EXPLICIT"] * 5
+    regimes = ["SCREEN_LOWER_ENDPOINT", "VHCF_1E6", "HCF_1E4", "RARE_HCF_LOWER", "HCF_LCF_OVERLAP", "TRANSITION_3_TO_10", "LCF_1_TO_3", "SUBCYCLE_0P1_TO_1", "SCREEN_UPPER_ENDPOINT"]
+    loads = pd.DataFrame(
+        {
+            "candidate_id": ["a"] * len(fractions),
+            "normalized_f": fractions,
+            "deltaK_MPa_sqrt_m": np.asarray(fractions) * 20.0,
+            "primary_integration_mode": modes,
+            "selection_regime": regimes,
+        }
+    )
+    row = morphology_table(rates, loads).iloc[0]
+    assert not row.localized_knee_detected
+    assert np.isnan(row.knee_normalized_f)
+    assert row.HCF_LCF_transition_normalized_f == 1.08
