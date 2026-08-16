@@ -28,7 +28,7 @@ COLORS = {
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--registry", type=Path, required=True)
+    parser.add_argument("--registry", type=Path, nargs="+", required=True)
     parser.add_argument("--historical-grid-root", type=Path, nargs="+", required=True)
     parser.add_argument("--k300-root", type=Path, nargs="+", required=True)
     parser.add_argument("--design-audit", type=Path, nargs="+", required=True)
@@ -287,7 +287,11 @@ def figures(out: Path, responses: pd.DataFrame, points: pd.DataFrame, mechanisms
 def main() -> int:
     args = parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
-    registry = pd.read_csv(args.registry)
+    registry = pd.concat([pd.read_csv(path) for path in args.registry], ignore_index=True)
+    if registry.prospective_candidate_id.duplicated().any():
+        raise RuntimeError("prospective registry batches contain duplicate candidate IDs")
+    if registry.parameter_fingerprint.duplicated().any():
+        raise RuntimeError("prospective registry batches contain duplicate fingerprints")
     grid_cases = read_root_tables(
         args.historical_grid_root, "prospective_fracture_case_results.csv"
     )
