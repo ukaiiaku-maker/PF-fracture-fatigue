@@ -11,7 +11,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-import scripts.design_v913_prospective_fracture_causality as design
+try:
+    import scripts.design_v913_prospective_fracture_causality as design
+except ModuleNotFoundError:  # Support direct ``python scripts/...py`` execution.
+    import design_v913_prospective_fracture_causality as design
 
 
 def parse_args() -> argparse.Namespace:

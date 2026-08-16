@@ -24,6 +24,15 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--registry", type=Path, required=True)
     parser.add_argument("--k300-results", type=Path, required=True)
+    parser.add_argument(
+        "--parent-k300-results",
+        type=Path,
+        help=(
+            "Optional previously qualified K300 result table containing the "
+            "canonical parent controls. This permits confirmation-only batches "
+            "without rerunning the controls."
+        ),
+    )
     parser.add_argument("--anchor-plan", type=Path, required=True)
     parser.add_argument("--out-registry", type=Path, required=True)
     parser.add_argument("--out-audit", type=Path, required=True)
@@ -60,11 +69,18 @@ def main() -> int:
         raise ValueError("relative tolerance must lie in (0, 0.25)")
     registry = pd.read_csv(args.registry)
     results = pd.read_csv(args.k300_results)
+    if args.parent_k300_results is not None:
+        parent_results = pd.read_csv(args.parent_k300_results)
+        results = pd.concat([results, parent_results], ignore_index=True)
     plan = pd.read_csv(args.anchor_plan).set_index("prospective_candidate_id")
     if not results.temperature_K.eq(300.0).all():
         raise RuntimeError("K300 results contain a non-300 K case")
-    if results.candidate_id.duplicated().any():
-        raise RuntimeError("K300 results are not one row per candidate")
+    duplicate = results[results.candidate_id.duplicated(keep=False)]
+    if not duplicate.empty:
+        inconsistent = duplicate.groupby("candidate_id")["K_50um_MPa_sqrt_m"].nunique()
+        if (inconsistent > 1).any():
+            raise RuntimeError("K300 results contain inconsistent duplicate candidates")
+        results = results.drop_duplicates("candidate_id", keep="first")
     k300 = results.set_index("candidate_id")["K_50um_MPa_sqrt_m"].astype(float)
     active_fields = [
         field

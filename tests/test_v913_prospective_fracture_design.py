@@ -15,6 +15,13 @@ sys.modules[spec.name] = mod
 assert spec.loader is not None
 spec.loader.exec_module(mod)
 
+ANCHOR_PATH = ROOT / "scripts/anchor_v913_prospective_fracture_k300.py"
+anchor_spec = importlib.util.spec_from_file_location("_v913_anchor_test", ANCHOR_PATH)
+anchor_mod = importlib.util.module_from_spec(anchor_spec)
+sys.modules[anchor_spec.name] = anchor_mod
+assert anchor_spec.loader is not None
+anchor_spec.loader.exec_module(anchor_mod)
+
 
 def test_f2_collinearity_audit_prefers_overlap():
     frame = pd.read_csv(ROOT / "runs/v913_barrier_temperature_fracture_morphology_v3_focused/focused_model_master.csv")
@@ -118,3 +125,58 @@ def test_anchor_plan_makes_no_unqualified_k300_claim(full_design):
     assert plan.K300_post_anchor_real_MPa_sqrt_m.isna().all()
     assert (~plan.post_anchor_claim_permitted).all()
     assert (plan.historical_envelope_lambda_min < plan.historical_envelope_lambda_max).all()
+
+
+def test_confirmation_anchor_can_reuse_qualified_parent_k300(tmp_path, monkeypatch):
+    active_fields = [
+        "Tref_K", "cleave_G00_eV", "cleave_gT_eV_per_K", "cleave_sigc0_GPa",
+        "cleave_sT_GPa_per_K", "cleave_exp_a", "cleave_exp_n", "cleave_floor_frac",
+        "emit_G00_eV", "emit_gT_eV_per_K", "emit_sigc0_GPa", "emit_sT_GPa_per_K",
+        "emit_exp_a", "emit_exp_n", "emit_floor_frac", "peierls_H0_eV",
+        "peierls_activation_entropy_kB", "peierls_exp_a", "peierls_exp_n",
+        "peierls_nu0_s", "taylor_H0_eV", "taylor_activation_entropy_kB",
+        "taylor_exp_a", "taylor_exp_n", "taylor_nu0_s", "rho_source0_m2",
+        "taylor_corr_rho_c_m2", "taylor_corr_scale", "c_blunt",
+    ]
+    row = {field: float(index + 1) for index, field in enumerate(active_fields)}
+    row.update(
+        prospective_candidate_id="confirm_dbtt",
+        design_family="DBTT",
+        design_role="INFORMATION_GAIN_CONFIRMATION",
+        parent_candidate_id="v913_zeroD_sobol_0202500",
+        parameter_fingerprint="preanchor",
+    )
+    registry = tmp_path / "registry.csv"
+    pd.DataFrame([row]).to_csv(registry, index=False)
+    results = tmp_path / "results.csv"
+    pd.DataFrame([
+        {"candidate_id": "confirm_dbtt", "temperature_K": 300.0, "K_50um_MPa_sqrt_m": 20.0}
+    ]).to_csv(results, index=False)
+    parents = tmp_path / "parents.csv"
+    pd.DataFrame([
+        {"candidate_id": "v913_prospective_dbtt_CENTER", "temperature_K": 300.0, "K_50um_MPa_sqrt_m": 25.0}
+    ]).to_csv(parents, index=False)
+    plan = tmp_path / "plan.csv"
+    pd.DataFrame([
+        {
+            "prospective_candidate_id": "confirm_dbtt",
+            "historical_envelope_lambda_min": 0.5,
+            "historical_envelope_lambda_max": 1.5,
+        }
+    ]).to_csv(plan, index=False)
+    output = tmp_path / "anchored.csv"
+    audit = tmp_path / "audit.csv"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            str(ANCHOR_PATH), "--registry", str(registry), "--k300-results", str(results),
+            "--parent-k300-results", str(parents), "--anchor-plan", str(plan),
+            "--out-registry", str(output), "--out-audit", str(audit),
+        ],
+    )
+    assert anchor_mod.main() == 0
+    anchored = pd.read_csv(output).iloc[0]
+    assert anchored.K300_parent_MPa_sqrt_m == 25.0
+    assert anchored.anchor_lambda_step == 1.25
+    assert anchored.cleave_sigc0_GPa == 4.0 * 1.25
