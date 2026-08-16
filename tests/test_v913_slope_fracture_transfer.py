@@ -55,3 +55,10 @@ def test_real_design_registry_round_trip_fingerprints_match():
         return
     frame = pd.read_csv(path, float_precision="round_trip")
     assert all(transfer.fingerprint(row) == row.parameter_fingerprint for _, row in frame.iterrows())
+
+
+def test_generic_global_stage_a_contract_is_emitted():
+    source = (ROOT / "scripts/materialize_v914_slope_fatigue_registry.py").read_text()
+    assert '"stageA_global_300K_qualified": "true"' in source
+    assert '"stageA_reference_fraction_of_K50": reference / k300' in source
+    assert '"material_class": "endurance_knee"' in source

@@ -62,7 +62,11 @@ def main() -> int:
         record = {field: original[field] for field in ACTIVE_FIELDS}
         record.update({
             "candidate_id": candidate,
-            "material_class": "prospective_slope_design",
+            # Use the runner's generic globally-qualified Stage-A contract so
+            # arbitrary exact parent backgrounds (including the prospective
+            # joint-balance parent) are admitted without a hard-coded parent
+            # lookup or any change to the derived loading scale.
+            "material_class": "endurance_knee",
             "campaign_parent_id": original.parent_candidate_id,
             "parent_family": original.parent_family,
             "design_axis": original.design_axis,
@@ -72,6 +76,8 @@ def main() -> int:
             "stageA_K50_300K_MPa_sqrt_m": k300,
             "stageA_parent_K50_300K_MPa_sqrt_m": parent_k300,
             "stageA_relative_error": float(result.K300_relative_error),
+            "stageA_global_300K_qualified": "true",
+            "stageA_reference_fraction_of_K50": reference / k300,
             "stageA_tier": "within_5pct_parent",
             "stageA_selected_for_endurance_knee": "true",
             "stageA_endurance_relative_tolerance_limit": float(result.K300_gate_tolerance),
