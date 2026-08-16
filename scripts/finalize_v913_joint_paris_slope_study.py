@@ -281,6 +281,7 @@ def main() -> int:
     fracture_points=pd.read_csv(args.fracture_analysis/"prospective_slope_fracture_curve_points.csv")
     design=pd.read_csv(args.design_registry); registry=pd.read_csv(args.fatigue_registry)
     rates,curve,local=load_prospective_rates(args)
+    overlap=fatigue_io.overlap_parity(rates)
     summary=fatigue_summary(rates,curve,local,fracture,registry)
     descriptors=fracture_descriptors(design,args.fracture_cases)
     hazard=attach_measured_dkdt(pd.read_csv(args.monotonic_hazard),fracture_points)
@@ -297,13 +298,13 @@ def main() -> int:
     shutil.copy2(args.design_registry,args.out/"prospective_slope_design_registry.csv");shutil.copy2(args.design_audit,args.out/"prospective_slope_design_audit.csv")
     shutil.copy2(args.fracture_analysis/"prospective_slope_fracture_results.csv",args.out/"prospective_slope_fracture_results.csv")
     summary.to_csv(args.out/"prospective_slope_fatigue_results.csv",index=False);pareto.to_csv(args.out/"joint_slope_pareto_front.csv",index=False)
-    curve.to_csv(args.out/"prospective_slope_fatigue_curve_points.csv",index=False);local.to_csv(args.out/"prospective_slope_local_derivative_points.csv",index=False);rates.to_csv(args.out/"prospective_slope_all_run_status.csv",index=False)
+    curve.to_csv(args.out/"prospective_slope_fatigue_curve_points.csv",index=False);local.to_csv(args.out/"prospective_slope_local_derivative_points.csv",index=False);rates.to_csv(args.out/"prospective_slope_all_run_status.csv",index=False);overlap.to_csv(args.out/"prospective_slope_accelerated_explicit_overlap.csv",index=False)
     # Retain established figures 1--7, then create the prospective figures 8--12.
     for stem in ("paris_slopes_all_shared_candidates","local_m_vs_deltaK","m_HCF_vs_cleavage_barrier_derivative","delta_m_vs_cleavage_curvature","measured_vs_hazard_predicted_paris_slope","fracture_dKdT_measured_vs_hazard_predicted","fracture_fatigue_common_sensitivity_map"):
         for suffix in (".png",".pdf","_plot_data.csv"): shutil.copy2(args.baseline_root/f"{stem}{suffix}",args.out/f"{stem}{suffix}")
     figures(args.out,summary,curve,local,fracture_points,hazard,descriptors,pareto,registry)
     (args.out/"JOINT_FRACTURE_FATIGUE_PARIS_SLOPE_REPORT.md").write_text(report(summary,local,hazard,pareto))
-    manifest={"schema":"v913_joint_paris_slope_study_final_v1","prospective_candidates":len(summary),"prospective_rate_cases":len(rates),"prospective_finite_points":len(curve),"integrated_monotonic_hazard_cases":len(hazard),"required_core_outputs":11,"required_figures":12,"experimental_reference_status":"NO_DEFENSIBLE_QUANTITATIVE_LOCAL_ENVELOPE","realism_basis":"MODEL_INTERNAL_PHYSICAL_PLAUSIBILITY","physics_changed":False}
+    manifest={"schema":"v913_joint_paris_slope_study_final_v1","prospective_candidates":len(summary),"prospective_rate_cases":len(rates),"prospective_finite_points":len(curve),"accelerated_explicit_overlap_cases":len(overlap),"integrated_monotonic_hazard_cases":len(hazard),"required_core_outputs":11,"required_figures":12,"experimental_reference_status":"NO_DEFENSIBLE_QUANTITATIVE_LOCAL_ENVELOPE","realism_basis":"MODEL_INTERNAL_PHYSICAL_PLAUSIBILITY","physics_changed":False}
     (args.out/"joint_paris_slope_final_manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
     print(f"V913_JOINT_PARIS_SLOPE_FINALIZED candidates={len(summary)} rate_cases={len(rates)}")
     return 0
