@@ -48,10 +48,16 @@ def main() -> int:
     for path in sorted((args.screen_root / "cases").glob("*.json")):
         payloads.append(json.loads(path.read_text()))
     if not payloads:
-        # The production screen currently writes one JSON per candidate at root.
-        for path in sorted(args.screen_root.glob("*.json")):
+        # The production screen writes one candidate payload per subdirectory.
+        # Do not admit the root run contract merely because its schema shares
+        # the same prefix.
+        for path in sorted(args.screen_root.glob("*/state_screen.json")):
             payload = json.loads(path.read_text())
-            if payload.get("schema", "").startswith("v914_endurance_knee_state_screen"):
+            if (
+                payload.get("schema", "").startswith("v914_endurance_knee_state_screen")
+                and "candidate_id" in payload
+                and "points" in payload
+            ):
                 payloads.append(payload)
     if not payloads:
         raise RuntimeError("no state-screen candidate payloads found")
