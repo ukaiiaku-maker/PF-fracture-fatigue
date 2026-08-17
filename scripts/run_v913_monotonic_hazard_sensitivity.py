@@ -116,16 +116,54 @@ def replay_to_peak(
         )
         desired = max(min((accumulated + dH_predictor) / threshold, 1.0), 0.0) ** exponent
         da_step = min(event_path_advance - path_advance, max(event_path_advance * desired - path_advance, 0.0))
-        if final_segment and geometry_scale == 1.0 and abs(temperature_K - float(settings["reference_temperature_K"])) < 1e-12:
+        production_crossing = (
+            final_segment
+            and geometry_scale == 1.0
+            and abs(temperature_K - float(settings["reference_temperature_K"])) < 1e-12
+        )
+        if production_crossing:
             # This is the production crossing segment: the production operator
-            # restores the pre-trial state and commits the full remaining
-            # hazard-coupled translation over the localized fractional step.
+            # first advances the complete candidate transaction, evaluates its
+            # post-state hazard, restores the pre-trial state, and only then
+            # commits the localized fractional segment.  Reproduce that trial
+            # even though it is rolled back: resolution and localization must
+            # follow the identical production call sequence.
             da_step = event_path_advance - path_advance
         resolved = rcurve._state_advance_is_resolved(
             state, trial_Kmid if final_segment else Kmid, temperature_K,
             trial_dt if final_segment else dt,
             minimum_expected_activations=minimum_activations,
         )
+        if production_crossing:
+            state_before_trial = copy.deepcopy(state)
+            if resolved and da_step > 0.0:
+                state.advance_coupled_segment(
+                    duration_s=trial_dt, da_m=da_step,
+                    K_start_MPa_sqrt_m=K0, K_end_MPa_sqrt_m=trial_K1,
+                    T_K=temperature_K, geometry_extension_override_m=0.0,
+                )
+            elif resolved:
+                state.advance_time(trial_dt, trial_Kmid, temperature_K)
+            elif da_step > 0.0:
+                state.time_s += trial_dt
+                state.translate_tip(da_step)
+            trial_rate1 = state.cleavage_rate_s(trial_K1, temperature_K)
+            trial_dH = 0.5 * (rate0 + trial_rate1) * trial_dt
+            fraction = float(np.clip(
+                (threshold - accumulated) / max(trial_dH, 1.0e-300),
+                0.0, 1.0,
+            ))
+            state = state_before_trial
+            localized_dU = dU_trial * fraction
+            if not math.isclose(
+                displacement + localized_dU, endpoint_U_m,
+                rel_tol=2.0e-12, abs_tol=max(1.0e-18, abs(endpoint_U_m) * 2.0e-12),
+            ):
+                raise RuntimeError("production crossing replay disagrees with archived endpoint")
+            dU = localized_dU
+            dt = trial_dt * fraction
+            K1 = geometry * (displacement + dU)
+            Kmid = 0.5 * (K0 + K1)
         if resolved and da_step > 0.0:
             state.advance_coupled_segment(
                 duration_s=dt, da_m=da_step, K_start_MPa_sqrt_m=K0,

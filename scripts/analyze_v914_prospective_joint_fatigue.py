@@ -29,7 +29,12 @@ def classify_status(status: str, extension_um: float) -> tuple[str, str]:
     token = str(status).lower()
     if "target" in token and extension_um >= 99.0:
         return "developed_target_reached", "filled"
-    if "maximum_cycle" in token or "cycle_censor" in token or "hazard_censor" in token:
+    if (
+        "maximum_cycle" in token
+        or "explicit_cycle_limit" in token
+        or "cycle_censor" in token
+        or "hazard_censor" in token
+    ):
         return "cycle_or_hazard_censor", "downward_triangle"
     if "fail" in token or "reject" in token or "partial" in token:
         return "partial_or_numerical_unresolved", "open_square"
@@ -120,8 +125,11 @@ def load_explicit(root: Path, loads: pd.DataFrame) -> tuple[pd.DataFrame, pd.Dat
         candidate_id = str(payload["candidate_id"])
         deltaK = float(payload["loading"]["deltaK_MPa_sqrt_m"])
         seed = int(payload["seed"])
+        contract_fraction = contract.get("normalized_f")
         match = loads[loads.candidate_id.eq(candidate_id)].copy()
-        if len(match):
+        if contract_fraction is not None and math.isfinite(float(contract_fraction)):
+            fraction = float(contract_fraction)
+        elif len(match):
             index = (match.deltaK_MPa_sqrt_m - deltaK).abs().idxmin()
             fraction = float(match.loc[index, "normalized_f"])
         else:

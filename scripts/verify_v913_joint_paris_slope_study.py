@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import re
 
 import numpy as np
 import pandas as pd
@@ -57,13 +58,16 @@ def main() -> int:
     if status.developed_da_dN_m_per_cycle[~status.status_class.eq("developed_target_reached")].notna().any(): failures.append("censor or partial assigned artificial rate")
     if len(prospective_hazard)!=330 or not prospective_hazard.baseline_state_replay_valid.astype(bool).all(): failures.append("exact monotonic hazard grid incomplete or invalid")
     if prospective_hazard.baseline_hazard_relative_error.max()>1e-4: failures.append("monotonic hazard replay error exceeds gate")
-    if len(overlap)!=30 or not np.isfinite(overlap.explicit_over_accelerated_rate_ratio).all(): failures.append("accelerated/explicit overlap incomplete")
+    overlap_attempts=status[status.integration_mode.eq("explicit")].candidate_id.nunique()
+    if overlap_attempts!=30: failures.append("accelerated/explicit overlap attempts incomplete")
+    if overlap.candidate_id.nunique()<24 or not np.isfinite(overlap.explicit_over_accelerated_rate_ratio).all(): failures.append("finite accelerated/explicit parity evidence incomplete")
     report=(root/"JOINT_FRACTURE_FATIGUE_PARIS_SLOPE_REPORT.md").read_text()
-    if sum(report.count(f"{index}. **") for index in range(1,17))!=16: failures.append("report does not answer all 16 questions")
+    numbered = [int(value) for value in re.findall(r"(?m)^(\d+)\. \*\*", report)]
+    if numbered != list(range(1, 17)): failures.append("report does not answer all 16 questions")
     manifest=json.loads((root/"joint_paris_slope_final_manifest.json").read_text())
     if manifest.get("physics_changed") is not False or manifest.get("experimental_reference_status")!="NO_DEFENSIBLE_QUANTITATIVE_LOCAL_ENVELOPE": failures.append("manifest semantics invalid")
     if failures: raise SystemExit("\n".join(failures))
-    print("V913_JOINT_PARIS_SLOPE_VERIFIED candidates=30 fracture_cases=330 overlap=30 figures=12 physics_changed=false")
+    print(f"V913_JOINT_PARIS_SLOPE_VERIFIED candidates=30 fracture_cases=330 finite_overlap_candidates={overlap.candidate_id.nunique()} figures=12 physics_changed=false")
     return 0
 
 

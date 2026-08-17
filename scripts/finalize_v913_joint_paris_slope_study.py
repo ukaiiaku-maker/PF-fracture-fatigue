@@ -38,7 +38,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--state-screen", type=Path, required=True)
     parser.add_argument("--loads", type=Path, required=True)
     parser.add_argument("--accelerated-root", type=Path, required=True)
-    parser.add_argument("--explicit-root", type=Path, required=True)
+    parser.add_argument("--explicit-root", type=Path, nargs="+", required=True)
     parser.add_argument("--out", type=Path, required=True)
     return parser.parse_args()
 
@@ -70,7 +70,12 @@ def segment(group: pd.DataFrame) -> dict[str, object]:
 
 def load_prospective_rates(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     accelerated, acc_events = fatigue_io.load_accelerated(args.accelerated_root)
-    explicit, exp_events = fatigue_io.load_explicit(args.explicit_root, pd.read_csv(args.loads))
+    explicit_batches = [
+        fatigue_io.load_explicit(root, pd.read_csv(args.loads))
+        for root in args.explicit_root
+    ]
+    explicit = pd.concat([batch[0] for batch in explicit_batches], ignore_index=True, sort=False)
+    exp_events = pd.concat([batch[1] for batch in explicit_batches], ignore_index=True, sort=False)
     rates = pd.concat([accelerated, explicit], ignore_index=True, sort=False)
     events = pd.concat([acc_events, exp_events], ignore_index=True, sort=False)
     loads = pd.read_csv(args.loads)
@@ -107,7 +112,7 @@ def fatigue_summary(rates: pd.DataFrame, curve: pd.DataFrame, local: pd.DataFram
         high = segment(hcf.iloc[-3:])
         lcf = segment(q[q.integration_mode.eq("explicit")])
         loc = local[(local.candidate_id.eq(candidate)) & local.integration_mode.eq("accelerated")]
-        state_correction = (loc.local_m - loc.cycle_hazard_predictor_m).median() if len(loc) else np.nan
+        state_correction = (loc.local_m - loc.m_cycle_hazard_frozen).median() if len(loc) else np.nan
         row = {
             "candidate_id": candidate, **{f"m_HCF_{key}": value for key, value in overall.items()},
             "m_low_HCF": low["m"], "m_high_HCF": high["m"], "delta_m_HCF": high["m"] - low["m"],
@@ -204,7 +209,7 @@ def save(fig: plt.Figure, out: Path, stem: str, data: pd.DataFrame) -> None:
 def figures(out: Path, summary: pd.DataFrame, curve: pd.DataFrame, local: pd.DataFrame, fracture_points: pd.DataFrame, hazard: pd.DataFrame, descriptors: pd.DataFrame, pareto: pd.DataFrame, registry: pd.DataFrame) -> None:
     # 8: exact analytic barrier design prediction versus measured HCF slope.
     hcf_local = local[local.integration_mode.eq("accelerated")]
-    pred = hcf_local.groupby("candidate_id", as_index=False).agg(barrier_predicted_m=("instantaneous_barrier_predictor_m", "median"), cycle_hazard_predicted_m=("cycle_hazard_predictor_m", "median"), evolved_predicted_m=("evolved_state_predictor_m", "median"))
+    pred = hcf_local.groupby("candidate_id", as_index=False).agg(barrier_predicted_m=("m_bare_cleavage", "median"), cycle_hazard_predicted_m=("m_cycle_hazard_frozen", "median"), evolved_predicted_m=("m_evolved_state_predictor", "median"))
     chart = summary.merge(pred, on="candidate_id", how="left")
     fig, ax = plt.subplots(figsize=(8,6))
     for family,g in chart.groupby("parent_family"): ax.scatter(g.barrier_predicted_m,g.m_HCF_m,s=45,label=family)
@@ -246,17 +251,31 @@ def figures(out: Path, summary: pd.DataFrame, curve: pd.DataFrame, local: pd.Dat
 def report(summary: pd.DataFrame, local: pd.DataFrame, hazard: pd.DataFrame, pareto: pd.DataFrame) -> str:
     q=local[local.integration_mode.eq("accelerated")].dropna(subset=["local_m"])
     def mae(column): return float(np.median(np.abs(q.local_m-q[column])))
-    curv=stats.spearmanr(q.dm_dln_deltaK,q.analytic_barrier_dm_dln_deltaK,nan_policy="omit")
+    curv=stats.spearmanr(q.dm_dln_deltaK,q.predicted_dm_dlnDeltaK_bare,nan_policy="omit")
     hcorr=stats.spearmanr(hazard.hazard_predicted_dK_dT_MPa_sqrt_m_per_K,hazard.measured_dK50_dT_MPa_sqrt_m_per_K,nan_policy="omit")
     axis=summary.groupby("design_axis").agg(median_m=("m_HCF_m","median"),median_delta_m=("delta_m_HCF","median"),median_Kspan=("K_span_MPa_sqrt_m","median"))
+    axis_table = axis.reset_index()
+    columns = list(axis_table.columns)
+    markdown = [
+        "| " + " | ".join(columns) + " |",
+        "| " + " | ".join("---" for _ in columns) + " |",
+    ]
+    for values in axis_table.itertuples(index=False, name=None):
+        markdown.append(
+            "| " + " | ".join(
+                f"{value:.6g}" if isinstance(value, (float, np.floating)) else str(value)
+                for value in values
+            ) + " |"
+        )
+    axis_markdown = "\n".join(markdown)
     winners=pareto[pareto.pareto_member].candidate_id.tolist()
     return f"""# Joint fracture–fatigue Paris-slope report
 
 All conclusions below concern the unchanged v9.13/v9.14 Arrhenius-hazard physics at 300 K. No defensible repository-held experimental crack-growth slope envelope was found, so absolute realism is labelled `MODEL_INTERNAL_PHYSICAL_PLAUSIBILITY`; no model parameter was fitted to an experiment.
 
 1. **Developed HCF slope control.** The dominant control is the load derivative of the crack-opening barrier, modified by cycle integration and evolved MPZ state. Across the prospective set the median HCF slope is {summary.m_HCF_m.median():.3g}.
-2. **Bare-barrier share.** Its median absolute local-slope error is {mae('instantaneous_barrier_predictor_m'):.3g}; it captures ordering but not the whole magnitude.
-3. **Cycle-integrated hazard.** The exact cycle operator improves the median absolute error to {mae('cycle_hazard_predictor_m'):.3g}.
+2. **Bare-barrier share.** Its median absolute local-slope error is {mae('m_bare_cleavage'):.3g}; it captures ordering but not the whole magnitude.
+3. **Cycle-integrated hazard.** The exact cycle operator improves the median absolute error to {mae('m_cycle_hazard_frozen'):.3g}.
 4. **State correction.** The median measured-minus-cycle-hazard correction is {summary.median_state_correction_to_cycle_hazard_m.median():.3g} in m.
 5. **Curvature and slope evolution.** Predicted versus measured dm/dlnΔK has Spearman rho {curv.statistic:.3g} (p={curv.pvalue:.3g}); this tests the exact EXP-floor curvature identity without smoothing across modes.
 6. **Gradual HCF change.** Median high-minus-low HCF slope is {summary.delta_m_HCF.median():.3g}; this is reported as continuous evolution, not forced into a knee classification.
@@ -269,7 +288,7 @@ All conclusions below concern the unchanged v9.13/v9.14 Arrhenius-hazard physics
 13. **Plastic correction.** P4 leaves cleavage unchanged and isolates the existing Peierls/plastic bottleneck; its measured differences quantify state-mediated corrections without a new fatigue law.
 14. **Joint models.** The nondominated raw-objective set is {', '.join(winners)}. No scalar realism score or single fitted winner is used.
 15. **Tradeoff.** Parent-family and design-axis tables show whether reduced m coexists with preserved K300/morphology; no universal tradeoff is assumed.
-16. **Low-dimensional manifold.** The supported coordinates are opening-barrier first derivative (P1), curvature (P2), thermal derivative (P3), and plastic state coupling (P4). Their medians are:\n\n{axis.to_markdown()}\n+
+16. **Low-dimensional manifold.** The supported coordinates are opening-barrier first derivative (P1), curvature (P2), thermal derivative (P3), and plastic state coupling (P4). Their medians are:\n\n{axis_markdown}\n
 The event-size term is retained explicitly; it is not assumed zero. Censors and partial/numerical outcomes are excluded from rate fits and remain separate status classes.
 """
 
@@ -293,7 +312,7 @@ def main() -> int:
     pd.concat([pd.read_csv(args.baseline_root/"fracture_barrier_detailed_descriptors.csv"),descriptors],ignore_index=True,sort=False).to_csv(args.out/"fracture_barrier_detailed_descriptors.csv",index=False)
     pd.concat([pd.read_csv(args.baseline_root/"fracture_hazard_sensitivity.csv"),hazard],ignore_index=True,sort=False).to_csv(args.out/"fracture_hazard_sensitivity.csv",index=False)
     pd.concat([pd.read_csv(args.baseline_root/"fatigue_hazard_sensitivity.csv"),local],ignore_index=True,sort=False).to_csv(args.out/"fatigue_hazard_sensitivity.csv",index=False)
-    master=summary.merge(local.groupby("candidate_id",as_index=False).agg(measured_local_m=("local_m","median"),barrier_predicted_m=("instantaneous_barrier_predictor_m","median"),cycle_hazard_predicted_m=("cycle_hazard_predictor_m","median"),evolved_predicted_m=("evolved_state_predictor_m","median")),on="candidate_id").merge(hazard.groupby("candidate_id",as_index=False).agg(A_K_total=("A_K_total_per_MPa_sqrt_m","median"),A_T_total=("A_T_total_per_K","median"),hazard_dK_dT=("hazard_predicted_dK_dT_MPa_sqrt_m_per_K","median")),on="candidate_id")
+    master=summary.merge(local.groupby("candidate_id",as_index=False).agg(measured_local_m=("local_m","median"),barrier_predicted_m=("m_bare_cleavage","median"),cycle_hazard_predicted_m=("m_cycle_hazard_frozen","median"),evolved_predicted_m=("m_evolved_state_predictor","median")),on="candidate_id").merge(hazard.groupby("candidate_id",as_index=False).agg(A_K_total=("A_K_total_per_MPa_sqrt_m","median"),A_T_total=("A_T_total_per_K","median"),hazard_dK_dT=("hazard_predicted_dK_dT_MPa_sqrt_m_per_K","median")),on="candidate_id")
     pd.concat([pd.read_csv(args.baseline_root/"fracture_fatigue_hazard_sensitivity_master.csv"),master],ignore_index=True,sort=False).to_csv(args.out/"fracture_fatigue_hazard_sensitivity_master.csv",index=False)
     shutil.copy2(args.design_registry,args.out/"prospective_slope_design_registry.csv");shutil.copy2(args.design_audit,args.out/"prospective_slope_design_audit.csv")
     shutil.copy2(args.fracture_analysis/"prospective_slope_fracture_results.csv",args.out/"prospective_slope_fracture_results.csv")

@@ -16,6 +16,9 @@ def test_operator_labels_exact_coupled_replay_not_instantaneous_proxy():
     assert "EXACT_V913_FIXED_PEAK_COUPLED_TRAJECTORY_REPLAY_CENTERED_DIFFERENCE" in source
     assert "A_K_direct_frozen_path_per_MPa_sqrt_m" in source
     assert "A_K_state_correction_per_MPa_sqrt_m" in source
+    assert "state_before_trial = copy.deepcopy(state)" in source
+    assert "trial_rate1 = state.cleavage_rate_s" in source
+    assert "production crossing replay disagrees with archived endpoint" in source
 
 
 def test_sha256_is_content_sensitive(tmp_path):
