@@ -2,21 +2,23 @@
 
 Physics added in this branch is intentionally narrow:
 
-1. The existing signed Peierls/upwind transport operator remains authoritative.
-2. Mobile content that leaves the left MPZ boundary under reverse effective
-   drive is counted as return to the crack/free surface and annihilated there.
-3. Retained/tangled content is *not* recovered by this rule.
-4. Returned mobile line content cancels the corresponding near-tip source-slip
-   ledger used for permanent blunting, while the historical cumulative source
-   slip ledger is retained unchanged.
-5. Right-boundary mobile outflow is recorded separately as far-field escape.
+1. Cleavage and new emission retain the qualified opening-only v9.13/v9.14 law.
+2. Already-mobile dislocations use the signed cyclic transport intensity
+   ``K_transport = K_applied - K_shield`` plus the existing signed GND stress.
+3. Mobile content that leaves the left MPZ boundary is counted as return to the
+   crack/free surface and annihilated there.
+4. Retained/tangled content is *not* recovered by this rule.
+5. Returned mobile line content cancels the corresponding near-tip source-slip
+   ledger used for permanent blunting, while cumulative activity is preserved.
+6. Right-boundary mobile outflow is recorded separately as far-field escape.
 
-No cleavage barrier, emission barrier, stochastic threshold, event-length law,
+No cleavage-barrier change, emission-barrier change, stochastic-law change,
 non-Schmid term, or empirical recovery fraction is introduced here.
 """
 from __future__ import annotations
 
 import copy
+import math
 from typing import Any, Mapping
 
 import numpy as np
@@ -29,15 +31,16 @@ from arrhenius_fracture.emergent_gnd_state_v913 import (
 from v914_reversible_transport_utils import (
     boundary_outflow_per_m,
     proportional_cancellation_density,
+    signed_transport_stress_fields,
 )
 
 
-MODEL_ID = "v9.14_minimal_reversible_mobile_return_v1"
-STATE_EXTENSION_SCHEMA = "v914_minimal_reversible_state_extension_v1"
+MODEL_ID = "v9.14_minimal_reversible_mobile_return_v2_signed_transport"
+STATE_EXTENSION_SCHEMA = "v914_minimal_reversible_state_extension_v2"
 
 
 class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
-    """Persistent-site MPZ state with mobile return/surface annihilation."""
+    """Persistent-site MPZ state with signed mobile return/surface annihilation."""
 
     def __init__(self, candidate, physics):
         super().__init__(candidate, physics)
@@ -47,18 +50,38 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
         if not hasattr(self, "returned_slip_m2"):
             self.returned_slip_m2 = np.zeros_like(self.accumulated_slip_m2)
         shape = (self.c.n_systems, 2)
-        if not hasattr(self, "cumulative_returned_mobile_per_m"):
-            self.cumulative_returned_mobile_per_m = np.zeros(shape, dtype=float)
-        if not hasattr(self, "cumulative_escaped_mobile_per_m"):
-            self.cumulative_escaped_mobile_per_m = np.zeros(shape, dtype=float)
-        if not hasattr(self, "cumulative_cancelled_slip_line_content"):
-            self.cumulative_cancelled_slip_line_content = np.zeros(shape, dtype=float)
-        if not hasattr(self, "interval_returned_mobile_per_m"):
-            self.interval_returned_mobile_per_m = np.zeros(shape, dtype=float)
-        if not hasattr(self, "interval_escaped_mobile_per_m"):
-            self.interval_escaped_mobile_per_m = np.zeros(shape, dtype=float)
-        if not hasattr(self, "interval_cancelled_slip_line_content"):
-            self.interval_cancelled_slip_line_content = np.zeros(shape, dtype=float)
+        for name in (
+            "cumulative_returned_mobile_per_m",
+            "cumulative_escaped_mobile_per_m",
+            "cumulative_cancelled_slip_line_content",
+            "interval_returned_mobile_per_m",
+            "interval_escaped_mobile_per_m",
+            "interval_cancelled_slip_line_content",
+        ):
+            if not hasattr(self, name):
+                setattr(self, name, np.zeros(shape, dtype=float))
+
+        scalar_defaults = {
+            "cumulative_transport_channel_time_s": 0.0,
+            "cumulative_reverse_channel_time_s": 0.0,
+            "cumulative_mobile_exposure_m2_s": 0.0,
+            "cumulative_reverse_mobile_exposure_m2_s": 0.0,
+            "interval_transport_channel_time_s": 0.0,
+            "interval_reverse_channel_time_s": 0.0,
+            "interval_mobile_exposure_m2_s": 0.0,
+            "interval_reverse_mobile_exposure_m2_s": 0.0,
+            "cumulative_transport_K_min_MPa_sqrt_m": math.inf,
+            "cumulative_transport_K_max_MPa_sqrt_m": -math.inf,
+            "cumulative_transport_tau_min_Pa": math.inf,
+            "cumulative_transport_tau_max_Pa": -math.inf,
+            "interval_transport_K_min_MPa_sqrt_m": math.inf,
+            "interval_transport_K_max_MPa_sqrt_m": -math.inf,
+            "interval_transport_tau_min_Pa": math.inf,
+            "interval_transport_tau_max_Pa": -math.inf,
+        }
+        for name, value in scalar_defaults.items():
+            if not hasattr(self, name):
+                setattr(self, name, float(value))
 
     def begin_diagnostic_interval(self) -> None:
         super().begin_diagnostic_interval()
@@ -66,6 +89,14 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
         self.interval_returned_mobile_per_m = np.zeros(shape, dtype=float)
         self.interval_escaped_mobile_per_m = np.zeros(shape, dtype=float)
         self.interval_cancelled_slip_line_content = np.zeros(shape, dtype=float)
+        self.interval_transport_channel_time_s = 0.0
+        self.interval_reverse_channel_time_s = 0.0
+        self.interval_mobile_exposure_m2_s = 0.0
+        self.interval_reverse_mobile_exposure_m2_s = 0.0
+        self.interval_transport_K_min_MPa_sqrt_m = math.inf
+        self.interval_transport_K_max_MPa_sqrt_m = -math.inf
+        self.interval_transport_tau_min_Pa = math.inf
+        self.interval_transport_tau_max_Pa = -math.inf
 
     def integration_metadata(self) -> dict[str, object]:
         metadata = dict(super().integration_metadata())
@@ -73,7 +104,11 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
             {
                 "model_id": MODEL_ID,
                 "minimal_reversible_mobile_return": True,
-                "reverse_transport_law": "existing_signed_peierls_upwind_operator",
+                "mobile_transport_driving_K": "signed_K_applied_minus_K_shield",
+                "mobile_transport_external_K_clipping": False,
+                "mobile_transport_internal_stress": "existing_signed_tau_gnd",
+                "cleavage_opening_only_unchanged": True,
+                "emission_opening_only_unchanged": True,
                 "surface_return_boundary": "left_mpz_mobile_outflow",
                 "surface_return_applies_to": "mobile_only",
                 "retained_recovery_from_surface_return": False,
@@ -119,9 +154,6 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
         )
 
     def local_accumulated_slip_count(self) -> float:
-        # During the parent constructor this override can be reached before the
-        # reversible extension fields exist.  In that narrow initialization
-        # window the state is exactly the baseline state.
         if not hasattr(self, "returned_slip_m2"):
             return super().local_accumulated_slip_count()
         weights, _ = self._tip_weights()
@@ -130,6 +162,75 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
             np.sum(line_content * weights[None, None, :])
             * max(float(self.c.blunting_slip_fraction), 0.0)
         )
+
+    def local_rates(self, K_MPa_sqrt_m: float, T_K: float) -> dict[str, np.ndarray]:
+        """Use signed cyclic stress only for transport of existing mobile line.
+
+        ``super().local_rates`` remains authoritative for cleavage, new emission,
+        Taylor completion and every barrier parameter.  We replace only the
+        Peierls mobile-transport velocity and the encounter rate tied to its
+        travelled distance.  This lets unloading/compression reverse a mobile
+        dislocation without creating reverse nucleation or opening cleavage.
+        """
+        rates = dict(super().local_rates(K_MPa_sqrt_m, T_K))
+        radius = float(self.tip_radius_m())
+        drive_factors = np.asarray(self.emission_drive_factors(), dtype=float)
+        tau_gnd = np.asarray(rates["tau_gnd_Pa"], dtype=float)
+        fields = signed_transport_stress_fields(
+            K_MPa_sqrt_m,
+            self.K_shield_MPa_sqrt_m(),
+            radius,
+            drive_factors,
+            tau_gnd,
+        )
+        tau_transport_eff = np.asarray(fields["tau_effective_Pa"], dtype=float)
+
+        forest = self.forest_density_m2()
+        spacing = 1.0 / (2.0 * np.sqrt(forest))
+        jump = self.c.jump_fraction_of_forest_spacing * spacing
+        p_surface = self.p.peierls.surface(self.p.emission)
+        peierls = self._signed_rate(
+            p_surface,
+            self.p.peierls.stress_fraction * tau_transport_eff,
+            T_K,
+            self.p.peierls.nu0_s,
+        )
+        peierls_velocity = jump * peierls
+        velocity = (
+            max(float(self.c.mobile_transport_velocity_scale), 0.0)
+            * peierls_velocity
+        )
+        mfp = self.c.mean_free_path_coefficient / np.sqrt(forest)
+        encounter = (
+            max(float(self.c.encounter_efficiency), 0.0)
+            * np.abs(peierls_velocity)
+            / np.maximum(mfp, 1.0e-30)
+        )
+
+        # The power bookkeeping should see the same signed transport stress as
+        # the mobile constitutive channel.  Emission fields from the parent are
+        # left untouched and therefore remain opening-only.
+        rates["velocity_m_s"] = velocity
+        rates["peierls_velocity_m_s"] = peierls_velocity
+        rates["encounter_s"] = encounter
+        rates["tau_external_Pa"] = np.asarray(fields["tau_applied_Pa"], dtype=float)
+        rates["tau_nonlocal_shielding_Pa"] = (
+            np.asarray(fields["tau_transport_Pa"], dtype=float)
+            - np.asarray(fields["tau_applied_Pa"], dtype=float)
+        )
+        rates["tau_eff_Pa"] = tau_transport_eff
+        rates["reversible_transport_K_signed_MPa_sqrt_m"] = np.asarray(
+            float(fields["K_transport_MPa_sqrt_m"])
+        )
+        rates["reversible_tau_transport_external_Pa"] = np.asarray(
+            fields["tau_transport_Pa"], dtype=float
+        )
+        rates["reversible_tau_transport_eff_Pa"] = tau_transport_eff.copy()
+        emission_sign = np.asarray(self.c.emission_signs, dtype=float)[:, None]
+        rates["reversible_emitted_sign_spatial_velocity_m_s"] = (
+            emission_sign * velocity
+        )
+        return rates
 
     def _cancel_returned_source_slip(
         self,
@@ -157,22 +258,68 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
         self.interval_cancelled_slip_line_content[system, q] += cancelled
         return float(cancelled)
 
+    @staticmethod
+    def _finite_or_nan(value: float) -> float:
+        return float(value) if math.isfinite(float(value)) else math.nan
+
+    def _update_transport_diagnostics(
+        self,
+        rates: Mapping[str, np.ndarray],
+        dt: float,
+    ) -> None:
+        self._ensure_reversible_fields()
+        duration = max(float(dt), 0.0)
+        if duration <= 0.0:
+            return
+        K_transport = float(rates["reversible_transport_K_signed_MPa_sqrt_m"])
+        tau = np.asarray(rates["reversible_tau_transport_eff_Pa"], dtype=float)
+        emitted_velocity = np.asarray(
+            rates["reversible_emitted_sign_spatial_velocity_m_s"], dtype=float
+        )
+        self.cumulative_transport_K_min_MPa_sqrt_m = min(
+            self.cumulative_transport_K_min_MPa_sqrt_m, K_transport
+        )
+        self.cumulative_transport_K_max_MPa_sqrt_m = max(
+            self.cumulative_transport_K_max_MPa_sqrt_m, K_transport
+        )
+        self.interval_transport_K_min_MPa_sqrt_m = min(
+            self.interval_transport_K_min_MPa_sqrt_m, K_transport
+        )
+        self.interval_transport_K_max_MPa_sqrt_m = max(
+            self.interval_transport_K_max_MPa_sqrt_m, K_transport
+        )
+        if tau.size:
+            tau_min = float(np.min(tau))
+            tau_max = float(np.max(tau))
+            self.cumulative_transport_tau_min_Pa = min(
+                self.cumulative_transport_tau_min_Pa, tau_min
+            )
+            self.cumulative_transport_tau_max_Pa = max(
+                self.cumulative_transport_tau_max_Pa, tau_max
+            )
+            self.interval_transport_tau_min_Pa = min(
+                self.interval_transport_tau_min_Pa, tau_min
+            )
+            self.interval_transport_tau_max_Pa = max(
+                self.interval_transport_tau_max_Pa, tau_max
+            )
+        channel_time = duration * float(emitted_velocity.size)
+        reverse_time = duration * float(np.count_nonzero(emitted_velocity < 0.0))
+        self.cumulative_transport_channel_time_s += channel_time
+        self.cumulative_reverse_channel_time_s += reverse_time
+        self.interval_transport_channel_time_s += channel_time
+        self.interval_reverse_channel_time_s += reverse_time
+
     def _coupled_mobile_retained(
         self,
         rates: Mapping[str, np.ndarray],
         dt: float,
     ) -> None:
-        """Baseline coupled operator plus exact boundary fate bookkeeping.
-
-        The matrix and solve order are copied from the qualified stiff operator.
-        Only the post-solve boundary fluxes are classified.  Mobile material
-        leaving x=0 is a returned/surface-annihilated fate; material leaving the
-        far boundary is an escaped fate.  Retained content never participates
-        directly in either boundary fate.
-        """
+        """Baseline stiff operator plus signed mobile boundary fate bookkeeping."""
         if dt <= 0.0:
             return
         self._ensure_reversible_fields()
+        self._update_transport_diagnostics(rates, dt)
         n_substeps = max(int(self.coupled_operator_substeps), 1)
         h = float(dt) / float(n_substeps)
         recovery = float(rates["recovery_rate_s"])
@@ -181,6 +328,7 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
         taylor = np.asarray(rates["taylor_completion_s"], dtype=float)
 
         for system in range(self.c.n_systems):
+            emitted_q = 1 if self.c.emission_signs[system] > 0 else 0
             for q in range(2):
                 burgers_sign = -1.0 if q == 0 else 1.0
                 velocity = burgers_sign * velocity_base[system]
@@ -205,8 +353,19 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
                         check_finite=False,
                     )
                     state = np.maximum(state, 0.0)
+                    mobile_now = state[0::2]
+                    if q == emitted_q:
+                        total_exposure = float(np.sum(mobile_now)) * h
+                        reverse_exposure = float(
+                            np.sum(mobile_now[velocity < 0.0])
+                        ) * h
+                        self.cumulative_mobile_exposure_m2_s += total_exposure
+                        self.cumulative_reverse_mobile_exposure_m2_s += reverse_exposure
+                        self.interval_mobile_exposure_m2_s += total_exposure
+                        self.interval_reverse_mobile_exposure_m2_s += reverse_exposure
+
                     returned, escaped = boundary_outflow_per_m(
-                        state[0::2], velocity, h
+                        mobile_now, velocity, h
                     )
                     if returned > 0.0:
                         self.cumulative_returned_mobile_per_m[system, q] += returned
@@ -273,6 +432,14 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
         returned_line = returned_per_m * max(float(self.state_strip_width_m), 0.0)
         escaped_line = escaped_per_m * max(float(self.state_strip_width_m), 0.0)
         denominator = max(emitted, 1.0e-300)
+        channel_fraction = (
+            self.cumulative_reverse_channel_time_s
+            / max(self.cumulative_transport_channel_time_s, 1.0e-300)
+        )
+        exposure_fraction = (
+            self.cumulative_reverse_mobile_exposure_m2_s
+            / max(self.cumulative_mobile_exposure_m2_s, 1.0e-300)
+        )
         return {
             "reversible_returned_mobile_per_m": returned_per_m,
             "reversible_escaped_mobile_per_m": escaped_per_m,
@@ -286,10 +453,36 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
             "reversible_cumulative_source_slip_count": self.cumulative_source_slip_count(),
             "reversible_returned_source_slip_count": self.returned_source_slip_count(),
             "reversible_net_source_slip_count": self.local_accumulated_slip_count(),
+            "reversible_reverse_transport_channel_fraction": channel_fraction,
+            "reversible_mobile_exposure_m2_s": self.cumulative_mobile_exposure_m2_s,
+            "reversible_reverse_mobile_exposure_m2_s": self.cumulative_reverse_mobile_exposure_m2_s,
+            "reversible_reverse_mobile_exposure_fraction": exposure_fraction,
+            "reversible_transport_K_min_MPa_sqrt_m": self._finite_or_nan(
+                self.cumulative_transport_K_min_MPa_sqrt_m
+            ),
+            "reversible_transport_K_max_MPa_sqrt_m": self._finite_or_nan(
+                self.cumulative_transport_K_max_MPa_sqrt_m
+            ),
+            "reversible_transport_tau_min_Pa": self._finite_or_nan(
+                self.cumulative_transport_tau_min_Pa
+            ),
+            "reversible_transport_tau_max_Pa": self._finite_or_nan(
+                self.cumulative_transport_tau_max_Pa
+            ),
         }
 
     def diagnostics(self, residence_time_s: float, K_MPa_sqrt_m: float, T_K: float):
         data = dict(super().diagnostics(residence_time_s, K_MPa_sqrt_m, T_K))
+        rates = self.local_rates(K_MPa_sqrt_m, T_K)
+        emitted_velocity = np.asarray(
+            rates["reversible_emitted_sign_spatial_velocity_m_s"], dtype=float
+        )
+        tau_transport = np.asarray(rates["reversible_tau_transport_eff_Pa"], dtype=float)
+        reverse_mobile = 0.0
+        for system, sign in enumerate(self.c.emission_signs):
+            q = 1 if sign > 0 else 0
+            mask = emitted_velocity[system] < 0.0
+            reverse_mobile += float(np.sum(self.mobile_m2[system, q, mask]))
         data.update(self.reversibility_diagnostics())
         data.update(
             {
@@ -302,13 +495,28 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
                 "reversible_interval_cancelled_slip_line_content": float(
                     np.sum(self.interval_cancelled_slip_line_content)
                 ),
+                "reversible_current_transport_K_signed_MPa_sqrt_m": float(
+                    rates["reversible_transport_K_signed_MPa_sqrt_m"]
+                ),
+                "reversible_current_transport_tau_min_Pa": float(np.min(tau_transport)),
+                "reversible_current_transport_tau_max_Pa": float(np.max(tau_transport)),
+                "reversible_current_emitted_sign_velocity_min_m_s": float(
+                    np.min(emitted_velocity)
+                ),
+                "reversible_current_emitted_sign_velocity_max_m_s": float(
+                    np.max(emitted_velocity)
+                ),
+                "reversible_current_reverse_spatial_fraction": float(
+                    np.mean(emitted_velocity < 0.0)
+                ),
+                "reversible_current_reverse_mobile_m2": reverse_mobile,
             }
         )
         return data
 
     def reversible_checkpoint_payload(self) -> dict[str, Any]:
         self._ensure_reversible_fields()
-        return {
+        payload = {
             "schema": STATE_EXTENSION_SCHEMA,
             "returned_slip_m2": np.asarray(self.returned_slip_m2).tolist(),
             "cumulative_returned_mobile_per_m": np.asarray(
@@ -330,6 +538,26 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
                 self.interval_cancelled_slip_line_content
             ).tolist(),
         }
+        for name in (
+            "cumulative_transport_channel_time_s",
+            "cumulative_reverse_channel_time_s",
+            "cumulative_mobile_exposure_m2_s",
+            "cumulative_reverse_mobile_exposure_m2_s",
+            "interval_transport_channel_time_s",
+            "interval_reverse_channel_time_s",
+            "interval_mobile_exposure_m2_s",
+            "interval_reverse_mobile_exposure_m2_s",
+            "cumulative_transport_K_min_MPa_sqrt_m",
+            "cumulative_transport_K_max_MPa_sqrt_m",
+            "cumulative_transport_tau_min_Pa",
+            "cumulative_transport_tau_max_Pa",
+            "interval_transport_K_min_MPa_sqrt_m",
+            "interval_transport_K_max_MPa_sqrt_m",
+            "interval_transport_tau_min_Pa",
+            "interval_transport_tau_max_Pa",
+        ):
+            payload[name] = float(getattr(self, name))
+        return payload
 
     def restore_reversible_checkpoint_payload(self, payload: Mapping[str, Any] | None) -> None:
         self._ensure_reversible_fields()
@@ -348,6 +576,25 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
         )
         for name in arrays:
             setattr(self, name, np.asarray(payload[name], dtype=float))
+        for name in (
+            "cumulative_transport_channel_time_s",
+            "cumulative_reverse_channel_time_s",
+            "cumulative_mobile_exposure_m2_s",
+            "cumulative_reverse_mobile_exposure_m2_s",
+            "interval_transport_channel_time_s",
+            "interval_reverse_channel_time_s",
+            "interval_mobile_exposure_m2_s",
+            "interval_reverse_mobile_exposure_m2_s",
+            "cumulative_transport_K_min_MPa_sqrt_m",
+            "cumulative_transport_K_max_MPa_sqrt_m",
+            "cumulative_transport_tau_min_Pa",
+            "cumulative_transport_tau_max_Pa",
+            "interval_transport_K_min_MPa_sqrt_m",
+            "interval_transport_K_max_MPa_sqrt_m",
+            "interval_transport_tau_min_Pa",
+            "interval_transport_tau_max_Pa",
+        ):
+            setattr(self, name, float(payload[name]))
         if self.returned_slip_m2.shape != self.accumulated_slip_m2.shape:
             raise ValueError("returned-slip checkpoint shape mismatch")
 
