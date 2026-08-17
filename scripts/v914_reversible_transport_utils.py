@@ -1,14 +1,61 @@
-"""Pure bookkeeping helpers for the v9.14 minimal reversible-fatigue model.
+"""Helpers for the v9.14 minimal reversible-fatigue model.
 
-These functions contain no constitutive physics.  They convert the conservative
-upwind boundary fluxes already present in the v9.13/v9.14 mobile-dislocation
-operator into explicit surface-return and far-field-escape ledgers, and provide
-an exact bounded cancellation of the source-slip ledger when a mobile
-population returns to the crack/free surface.
+The boundary/cancellation functions are bookkeeping utilities.  The signed
+transport helper implements the one deliberate constitutive extension in the
+minimal reversible model: already-mobile dislocations see the signed cyclic
+stress intensity, while cleavage and new emission remain on the unchanged
+opening-only v9.13/v9.14 laws.
 """
 from __future__ import annotations
 
+import math
+
 import numpy as np
+
+
+def signed_transport_stress_fields(
+    K_applied_MPa_sqrt_m: float,
+    K_shield_MPa_sqrt_m: float,
+    tip_radius_m: float,
+    drive_factors: np.ndarray,
+    tau_gnd_Pa: np.ndarray,
+) -> dict[str, np.ndarray | float]:
+    """Build signed applied/effective stress fields for mobile transport.
+
+    Unlike the opening/cleavage channel, ``K_applied`` is not clipped at zero.
+    The effective transport intensity is ``K_applied - K_shield`` and can
+    therefore become negative either under an externally compressive cycle or
+    when shielding exceeds the instantaneous positive applied K during
+    unloading.  The existing signed GND stress is then added exactly as in the
+    parent transport law.
+    """
+    drive = np.asarray(drive_factors, dtype=float)
+    tau_gnd = np.asarray(tau_gnd_Pa, dtype=float)
+    if drive.ndim != 1:
+        raise ValueError("drive_factors must be one-dimensional")
+    if tau_gnd.ndim != 2 or tau_gnd.shape[0] != drive.size:
+        raise ValueError("tau_gnd_Pa must have shape (n_systems, n_bins)")
+
+    radius = max(float(tip_radius_m), 1.0e-30)
+    scale = 1.0e6 / math.sqrt(2.0 * math.pi * radius)
+    K_applied = float(K_applied_MPa_sqrt_m)
+    K_transport = K_applied - float(K_shield_MPa_sqrt_m)
+    sigma_applied = K_applied * scale
+    sigma_transport = K_transport * scale
+
+    tau_applied_column = drive[:, None] * sigma_applied
+    tau_transport_column = drive[:, None] * sigma_transport
+    tau_applied = np.broadcast_to(tau_applied_column, tau_gnd.shape).copy()
+    tau_transport = np.broadcast_to(tau_transport_column, tau_gnd.shape).copy()
+    tau_effective = tau_transport + tau_gnd
+    return {
+        "K_transport_MPa_sqrt_m": K_transport,
+        "sigma_applied_Pa": sigma_applied,
+        "sigma_transport_Pa": sigma_transport,
+        "tau_applied_Pa": tau_applied,
+        "tau_transport_Pa": tau_transport,
+        "tau_effective_Pa": tau_effective,
+    }
 
 
 def boundary_outflow_per_m(
@@ -64,4 +111,8 @@ def proportional_cancellation_density(
     return net * fraction, cancelled
 
 
-__all__ = ["boundary_outflow_per_m", "proportional_cancellation_density"]
+__all__ = [
+    "signed_transport_stress_fields",
+    "boundary_outflow_per_m",
+    "proportional_cancellation_density",
+]
