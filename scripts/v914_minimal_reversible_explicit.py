@@ -1,9 +1,9 @@
 """Explicit-cycle qualification integrator for minimal reversible fatigue.
 
 This is a physics-isolation path.  It uses the unchanged v9.14 fatigue loading,
-hazard, event-length, and crack-advance rules, but instantiates
-``MinimalReversibleEmergentGNDState`` so that mobile dislocations may return to
-and annihilate at the crack/free-surface boundary under reverse effective drive.
+hazard, event-length, cleavage and crack-advance rules, but instantiates
+``MinimalReversibleEmergentGNDState`` so already-mobile dislocations respond to
+the signed cyclic transport stress and may return to the crack/free surface.
 
 The complete waveform is always continued after a crack event.  No DMD or
 multi-cycle projection is used in this qualification integrator.
@@ -28,7 +28,7 @@ from v914_minimal_reversible_state import (
 )
 
 
-SCHEMA = "v914_minimal_reversible_explicit_checkpoint_v1"
+SCHEMA = "v914_minimal_reversible_explicit_checkpoint_v2"
 MODE = "explicit_physical_cycles_minimal_reversible"
 
 
@@ -75,6 +75,19 @@ def _diagnostic(
     barrier = float(state.p.cleavage.barrier_eV(sigma, loading.temperature_K))
     rates = state.local_rates(K, loading.temperature_K)
     backstress = state.backstress_state()[2]
+    transport_tau = np.asarray(
+        rates["reversible_tau_transport_eff_Pa"], dtype=float
+    )
+    emitted_velocity = np.asarray(
+        rates["reversible_emitted_sign_spatial_velocity_m_s"], dtype=float
+    )
+    reverse_mobile = 0.0
+    for system, sign in enumerate(state.c.emission_signs):
+        q = 1 if sign > 0 else 0
+        reverse_mobile += float(
+            np.sum(state.mobile_m2[system, q, emitted_velocity[system] < 0.0])
+        )
+
     record = {
         "record_type": record_type,
         "cycle_index": int(cycle),
@@ -83,6 +96,17 @@ def _diagnostic(
         "time_s": float(state.time_s),
         "K_MPa_sqrt_m": float(K),
         "K_eff_MPa_sqrt_m": float(K_eff),
+        "transport_K_signed_MPa_sqrt_m": float(
+            rates["reversible_transport_K_signed_MPa_sqrt_m"]
+        ),
+        "transport_tau_min_Pa": float(np.min(transport_tau)),
+        "transport_tau_max_Pa": float(np.max(transport_tau)),
+        "emitted_sign_velocity_min_m_s": float(np.min(emitted_velocity)),
+        "emitted_sign_velocity_max_m_s": float(np.max(emitted_velocity)),
+        "reverse_transport_spatial_fraction": float(
+            np.mean(emitted_velocity < 0.0)
+        ),
+        "reverse_mobile_present_m2": reverse_mobile,
         "tip_stress_Pa": float(sigma),
         "effective_barrier_eV": barrier,
         "cleavage_rate_s": float(
@@ -158,7 +182,7 @@ def run_minimal_reversible_explicit(
     state_history_cycle_interval: int | None = None,
     pause_after_phase_advances: int | None = None,
 ) -> dict[str, Any]:
-    """Resolve the complete waveform with mobile-return reversibility."""
+    """Resolve the complete waveform with signed mobile-return reversibility."""
     loading.validate()
     physics.validate()
     numerics.validate()
@@ -179,6 +203,8 @@ def run_minimal_reversible_explicit(
         "maximum_physical_cycles": int(maximum_physical_cycles),
         "state_history_cycle_interval": state_history_cycle_interval,
         "cleavage_physics_changed": False,
+        "emission_physics_changed": False,
+        "signed_mobile_transport_active": True,
         "non_schmid_changed": False,
         "empirical_recovery_fraction": False,
     }
@@ -340,7 +366,6 @@ def run_minimal_reversible_explicit(
             renewals += 1
             action = 0.0
             save("committed_event")
-            # Continue the remainder of this same physical waveform.
             continue
 
         state = trial
@@ -398,7 +423,7 @@ def run_minimal_reversible_explicit(
         else "explicit_cycle_limit"
     )
     result = {
-        "schema": "v914_minimal_reversible_explicit_result_v1",
+        "schema": "v914_minimal_reversible_explicit_result_v2",
         "mode": MODE,
         "state_model": REVERSIBLE_STATE_MODEL_ID,
         "candidate_id": candidate.candidate_id,
@@ -420,6 +445,9 @@ def run_minimal_reversible_explicit(
             "multi_cycle_projection": False,
             "phase_resolved": True,
             "same_cycle_post_event_continuation": True,
+            "signed_mobile_transport_active": True,
+            "cleavage_opening_only_unchanged": True,
+            "emission_opening_only_unchanged": True,
             "mobile_surface_return_active": True,
             "retained_surface_recovery_active": False,
         },
