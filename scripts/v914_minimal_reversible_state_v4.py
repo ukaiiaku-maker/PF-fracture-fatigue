@@ -50,7 +50,7 @@ import numpy as np
 from scipy.linalg import solve_banded
 
 from v914_minimal_reversible_state_v3 import (
-    MinimalReversibleEmerentGNDState as _V3State,
+    MinimalReversibleEmergentGNDState as _V3State,
 )
 from v914_reversible_transport_utils import boundary_outflow_per_m
 
