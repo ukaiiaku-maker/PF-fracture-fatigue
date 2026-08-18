@@ -23,9 +23,15 @@ import run_v914_minimal_reversible_case as _runner
 from v914_minimal_reversible_explicit_v4 import (
     run_minimal_reversible_explicit,
 )
+from v914_signed_fatigue_loading import SignedFatigueLoading
 
 
 _runner.run_minimal_reversible_explicit = run_minimal_reversible_explicit
+# v4-only loading extension: preserve the qualified waveform but allow
+# compression down to R=-1 for controlled reversibility tests.  Baseline and
+# reversible cases receive the same loading object; only their constitutive
+# transport treatment differs.
+_runner.base.FatigueLoading = SignedFatigueLoading
 
 
 if __name__ == "__main__":
