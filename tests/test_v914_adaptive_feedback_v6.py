@@ -1,10 +1,23 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
+import sys
 
 import numpy as np
 
-from scripts.v914_adaptive_feedback_v6 import (
+ROOT = Path(__file__).resolve().parents[1]
+V914 = Path(
+    "/Volumes/Data/Data/Nanopillar_calculation/"
+    "Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search"
+)
+for _path in (str(ROOT / "scripts"), str(V914)):
+    while _path in sys.path:
+        sys.path.remove(_path)
+sys.path.insert(0, str(V914))
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from v914_adaptive_feedback_v6 import (
     AdaptiveFeedbackControls,
     _relative_difference,
     adaptive_one_cycle,
