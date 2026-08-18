@@ -26,7 +26,12 @@ from v914_adaptive_feedback_v6 import (
 
 
 def test_relative_difference_uses_physical_floor():
-    assert _relative_difference(0.0, 0.01, 0.1) == 0.1
+    assert math.isclose(
+        _relative_difference(0.0, 0.01, 0.1),
+        0.1,
+        rel_tol=1.0e-15,
+        abs_tol=0.0,
+    )
     assert _relative_difference(1.0, 1.01, 0.1) < 0.01
 
 
