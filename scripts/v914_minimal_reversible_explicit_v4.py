@@ -7,6 +7,23 @@ cancel the emission-linked blunting ledger.
 """
 from __future__ import annotations
 
+import os
+from pathlib import Path
+import sys
+
+_SCRIPTS = Path(__file__).resolve().parent
+_DEFAULT_V914 = Path(
+    os.environ.get(
+        "V914_ROOT",
+        "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search",
+    )
+)
+for _path in (str(_SCRIPTS), str(_DEFAULT_V914)):
+    while _path in sys.path:
+        sys.path.remove(_path)
+sys.path.insert(0, str(_DEFAULT_V914))
+sys.path.insert(0, str(_SCRIPTS))
+
 import v914_minimal_reversible_explicit as _v2
 import v914_minimal_reversible_explicit_v3 as _v3
 from v914_minimal_reversible_state_v4 import (
