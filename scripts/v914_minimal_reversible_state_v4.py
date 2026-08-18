@@ -21,23 +21,36 @@ changed relative to v3.
 from __future__ import annotations
 
 # This module is used in two legitimate import modes:
-#   1. direct runner execution, where ROOT/scripts is already on sys.path; and
+#   1. direct runner execution, where ROOT/scripts and the external v9.14 package
+#      are already on sys.path; and
 #   2. pytest/package import as scripts.v914_minimal_reversible_state_v4.
-# Keep the existing top-level module names used by the qualified v2/v3 stack,
-# but make the scripts directory discoverable in package-import mode as well.
+# Reproduce the authoritative runner precedence here so both modes resolve the
+# same constitutive package rather than the local driver repo's package shadow.
+import os
 from pathlib import Path
 import sys
 from typing import Any, Mapping
 
 _SCRIPTS = Path(__file__).resolve().parent
-if str(_SCRIPTS) not in sys.path:
-    sys.path.insert(0, str(_SCRIPTS))
+_DEFAULT_V914 = Path(
+    os.environ.get(
+        "V914_ROOT",
+        "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search",
+    )
+)
+for _path in (str(_SCRIPTS), str(_DEFAULT_V914)):
+    while _path in sys.path:
+        sys.path.remove(_path)
+# External constitutive package must precede the local repository; scripts must
+# precede both for the v2/v3 top-level module names.
+sys.path.insert(0, str(_DEFAULT_V914))
+sys.path.insert(0, str(_SCRIPTS))
 
 import numpy as np
 from scipy.linalg import solve_banded
 
 from v914_minimal_reversible_state_v3 import (
-    MinimalReversibleEmergentGNDState as _V3State,
+    MinimalReversibleEmerentGNDState as _V3State,
 )
 from v914_reversible_transport_utils import boundary_outflow_per_m
 
