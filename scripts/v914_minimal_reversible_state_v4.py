@@ -20,7 +20,18 @@ changed relative to v3.
 """
 from __future__ import annotations
 
+# This module is used in two legitimate import modes:
+#   1. direct runner execution, where ROOT/scripts is already on sys.path; and
+#   2. pytest/package import as scripts.v914_minimal_reversible_state_v4.
+# Keep the existing top-level module names used by the qualified v2/v3 stack,
+# but make the scripts directory discoverable in package-import mode as well.
+from pathlib import Path
+import sys
 from typing import Any, Mapping
+
+_SCRIPTS = Path(__file__).resolve().parent
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
 
 import numpy as np
 from scipy.linalg import solve_banded
