@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run bounded v7 shear audits or shared-cycle-map multi-cycle probes."""
+"""Run bounded v7 shear, exact multi-cycle, or projective-accelerator probes."""
 from __future__ import annotations
 
 import argparse
@@ -37,10 +37,17 @@ from v914_v7_cycle_map import (
     minimum_shear_sample,
 )
 from v914_v7_multicycle_accelerator import (
-    ACCELERATOR_ID,
+    ACCELERATOR_ID as SCAFFOLD_ACCELERATOR_ID,
     run_accelerator_anchor_path,
     run_exact_multicycle,
 )
+from v914_v7_projective_accelerator import (
+    ACCELERATOR_ID as PROJECTIVE_ACCELERATOR_ID,
+    ProjectiveAcceleratorControls,
+    compare_projective_to_exact,
+    run_projective_multicycle,
+)
+from v914_v7_projective_state import PROJECTOR_ID
 
 
 def parse_args() -> argparse.Namespace:
@@ -59,9 +66,14 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--tip-radius-rtol", type=float, default=0.001)
     p.add_argument("--hazard-rtol", type=float, default=0.01)
     p.add_argument("--max-refinement-depth", type=int, default=18)
-    p.add_argument("--mode", choices=("shear", "multicycle"), required=True)
+    p.add_argument(
+        "--mode", choices=("shear", "multicycle", "projective"), required=True
+    )
     p.add_argument("--cycles", type=int, default=3)
     p.add_argument("--verify-anchor-parity", action="store_true")
+    p.add_argument("--warmup-cycles", type=int, default=4)
+    p.add_argument("--block-stride", type=int, default=2)
+    p.add_argument("--max-projection-correction", type=float, default=0.10)
     p.add_argument("--expected-head", default=None)
     p.add_argument("--out", type=Path, required=True)
     return p.parse_args()
@@ -153,6 +165,10 @@ def main() -> int:
     )
     controls.validate()
 
+    active_accelerator_id = SCAFFOLD_ACCELERATOR_ID
+    cycle_skipping_enabled = False
+    projective_controls = None
+
     if args.mode == "shear":
         final_state, hazard, telemetry = advance_v7_cycle(initial, loading, controls)
         samples = telemetry.pop("samples")
@@ -175,7 +191,8 @@ def main() -> int:
             f"tau_eff={shear['tau_eff_projected_GPa']:.6g}GPa",
             f"return={result['reversibility'].get('reversible_physical_return_fraction_of_emitted',0.0):.6g}",
         )
-    else:
+
+    elif args.mode == "multicycle":
         final_state, exact, telemetry = run_exact_multicycle(
             initial, loading, controls, args.cycles
         )
@@ -209,7 +226,7 @@ def main() -> int:
         result = {
             "schema": "v914_v7_multicycle_cycle_map_probe_v1",
             "cycle_map_id": CYCLE_MAP_ID,
-            "accelerator_id": ACCELERATOR_ID,
+            "accelerator_id": SCAFFOLD_ACCELERATOR_ID,
             "cycles": args.cycles,
             "exact_history": exact,
             "telemetry": telemetry,
@@ -227,8 +244,71 @@ def main() -> int:
             f"parity={None if parity is None else parity['pass']}",
         )
 
+    else:
+        active_accelerator_id = PROJECTIVE_ACCELERATOR_ID
+        cycle_skipping_enabled = True
+        projective_controls = ProjectiveAcceleratorControls(
+            warmup_cycles=int(args.warmup_cycles),
+            block_stride=int(args.block_stride),
+            max_projection_constraint_correction=float(
+                args.max_projection_correction
+            ),
+        )
+        projective_controls.validate()
+
+        # Independent exact reference and accelerated calculation.  They share
+        # the cycle law, not mutable state objects.
+        exact_final, exact, exact_telemetry = run_exact_multicycle(
+            initial, loading, controls, args.cycles
+        )
+        accel_final, accelerated, accel_telemetry, accel_metadata = (
+            run_projective_multicycle(
+                initial,
+                loading,
+                controls,
+                args.cycles,
+                accelerator_controls=projective_controls,
+            )
+        )
+        comparison = compare_projective_to_exact(
+            exact_final,
+            exact,
+            accel_final,
+            accelerated,
+            warmup_cycles=projective_controls.warmup_cycles,
+        )
+        write_csv(args.out / "exact_cycle_history.csv", exact)
+        write_csv(args.out / "accelerated_cycle_history.csv", accelerated)
+        write_csv(args.out / "exact_cycle_telemetry.csv", exact_telemetry)
+        write_csv(args.out / "accelerated_cycle_telemetry.csv", accel_telemetry)
+        result = {
+            "schema": "v914_v7_projective_accelerator_qualification_v1",
+            "cycle_map_id": CYCLE_MAP_ID,
+            "accelerator_id": PROJECTIVE_ACCELERATOR_ID,
+            "projector_id": PROJECTOR_ID,
+            "cycles": args.cycles,
+            "accelerator_metadata": accel_metadata,
+            "comparison": comparison,
+            "exact_history": exact,
+            "accelerated_history": accelerated,
+            "exact_final_reversibility": exact_final.reversibility_diagnostics(),
+            "accelerated_final_reversibility": accel_final.reversibility_diagnostics(),
+            "cycle_skipping_enabled": True,
+        }
+        print(
+            args.candidate,
+            f"R={args.R:g}",
+            f"cycles={args.cycles}",
+            f"resolved={accel_metadata['resolved_cycle_count']}",
+            f"skipped={accel_metadata['projected_cycle_count']}",
+            f"ideal_speedup={accel_metadata['ideal_cycle_map_speedup']:.4g}",
+            f"Hpost_err={comparison['post_warmup_cumulative_hazard_relative_error']:.6g}",
+            f"fullstate_max={max(comparison['final_full_state_relative_norm_error'].values(), default=0.0):.6g}",
+            f"qualification={comparison['pass']}",
+        )
+
     contract = {
-        "schema": "v914_v7_cycle_map_contract_v1",
+        "schema": "v914_v7_cycle_map_contract_v2",
         "mode": args.mode,
         "candidate": args.candidate,
         "R": args.R,
@@ -244,9 +324,20 @@ def main() -> int:
         "registry_sha256": digest(args.registry),
         "physics_sha256": digest(args.physics),
         "cycle_map_id": CYCLE_MAP_ID,
-        "accelerator_id": ACCELERATOR_ID,
+        "accelerator_id": active_accelerator_id,
         "accelerator_within_cycle_law": "same_advance_v7_cycle",
-        "cycle_skipping_enabled": False,
+        "cycle_skipping_enabled": cycle_skipping_enabled,
+        "projective_controls": (
+            None if projective_controls is None else vars(projective_controls)
+        ),
+        "projector_id": PROJECTOR_ID if projective_controls is not None else None,
+        "skipped_cycle_hazard_rule": (
+            "log_bridge_between_resolved_anchor_hazards"
+            if projective_controls is not None
+            else None
+        ),
+        "crack_extension_during_projection_allowed": False,
+        "physics_parameters_changed_for_acceleration": False,
     }
     (args.out / "result.json").write_text(
         json.dumps(result, indent=2, sort_keys=True, allow_nan=True) + "\n"
