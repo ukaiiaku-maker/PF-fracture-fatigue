@@ -36,11 +36,14 @@ ACTIVE_MONOTONIC_ARRAYS = (
 
 # Cumulative physical/accounting arrays.  They do not define a new constitutive
 # law, but carrying them prevents an accelerated state from silently losing
-# return/emission bookkeeping.
+# return/emission bookkeeping.  The reverse-driven return ledger is required so
+# the physical-return diagnostic remains consistent with the projected
+# returned-slip/blunting state.
 MONOTONIC_LEDGER_ARRAYS = (
     "cumulative_source_activations",
     "cumulative_line_content",
     "cumulative_returned_mobile_per_m",
+    "cumulative_reverse_driven_returned_mobile_per_m",
     "cumulative_escaped_mobile_per_m",
     "cumulative_cancelled_slip_line_content",
 )
