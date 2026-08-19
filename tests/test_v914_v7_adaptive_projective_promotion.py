@@ -44,6 +44,12 @@ class _State:
         self.cumulative_mobile_exposure_m2_s = 10.0 * level
         self.cumulative_reverse_mobile_exposure_m2_s = 3.0 * level
 
+    @property
+    def cell_area_m2(self):
+        # Toy-state normalization used only by endpoint-observable tests.  The
+        # production v7 state provides the physical MPZ cell area itself.
+        return 1.0
+
     def K_shield_MPa_sqrt_m(self):
         return float(np.sum(self.retained_m2[:, 1, :] - self.retained_m2[:, 0, :]))
 
