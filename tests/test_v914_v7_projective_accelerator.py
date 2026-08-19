@@ -140,7 +140,7 @@ def test_projector_uses_log_secant_for_decaying_active_density():
         skip_cycles=1,
         frequency_Hz=1.0,
     )
-    assert np.all(p.mobile_m2 == pytest.approx(0.25))
+    assert np.allclose(p.mobile_m2, 0.25)
     assert diagnostics["maximum_relative_constraint_correction"] == pytest.approx(0.0)
     assert diagnostics["active_predictor_departure_from_linear"]["mobile_m2"] > 0.0
     assert diagnostics["active_nonnegative_predictor"] == (
