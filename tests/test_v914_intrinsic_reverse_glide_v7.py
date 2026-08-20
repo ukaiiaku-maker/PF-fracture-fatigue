@@ -19,6 +19,8 @@ sys.path.insert(0, str(V914))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from v914_intrinsic_reverse_glide_v7 import (
+    IRREVERSIBLE_CONTROL_MODEL_ID,
+    IntrinsicReverseGlideNoReturnState,
     IntrinsicReverseGlideState,
     intrinsic_signed_glide_stress_fields,
     reduced_competing_return_probability,
@@ -133,6 +135,32 @@ def test_v7_state_adds_no_constructor_return_parameter():
 
     names = tuple(inspect.signature(IntrinsicReverseGlideState.__init__).parameters)
     assert names == ("self", "candidate", "physics")
+
+
+def test_irreversible_control_disables_only_return_cancellation():
+    state = IntrinsicReverseGlideNoReturnState.__new__(
+        IntrinsicReverseGlideNoReturnState
+    )
+    state.accumulated_slip_m2 = np.full((1, 2, 3), 7.0)
+    state.returned_slip_m2 = np.full((1, 2, 3), 2.0)
+    state.cumulative_cancelled_slip_line_content = np.full((1, 2), 3.0)
+    state.interval_cancelled_slip_line_content = np.full((1, 2), 4.0)
+    state._ensure_reversible_fields = lambda: None
+    before_returned = state.returned_slip_m2.copy()
+    before_cumulative = state.cumulative_cancelled_slip_line_content.copy()
+    before_interval = state.interval_cancelled_slip_line_content.copy()
+
+    cancelled = state._cancel_returned_source_slip(0, 1, 1.25e9)
+
+    assert cancelled == 0.0
+    np.testing.assert_array_equal(state.returned_slip_m2, before_returned)
+    np.testing.assert_array_equal(
+        state.cumulative_cancelled_slip_line_content, before_cumulative
+    )
+    np.testing.assert_array_equal(
+        state.interval_cancelled_slip_line_content, before_interval
+    )
+    assert state.MODEL_ID == IRREVERSIBLE_CONTROL_MODEL_ID
 
 
 def test_intrinsic_stress_rejects_shape_mismatch():

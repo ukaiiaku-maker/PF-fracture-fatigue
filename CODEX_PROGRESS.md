@@ -22,3 +22,32 @@
 - Long qualification: `runs/v10_2_30_restart_equivalence_24b63a5`; uninterrupted control and supervisor-resumed trajectory both reached 5 events, `658699.784846286` cycles, and `26.37911007410791 um` projected extension.
 - Production verifier: exit 0; event-2, terminal outer state, terminal kinetic state, and every checkpoint array identical. NaN pairs and explicitly nonphysical wall-time/cache-residual telemetry are canonicalized; physical fields remain fail-closed.
 - Focused gate: 33 tests passed. The 12-case qualification was not launched.
+
+## 2026-08-20 v7 irreversible-baseline control
+
+- Starting branch / HEAD: `codex/v9.14-v7-vhcf-tangent-guard` /
+  `c914b535682d501cf6cc578a1cc389412739a117` (clean).
+- Added `V7-IRREV`, which disables only returned-source-slip cancellation while
+  retaining physical mobile return and every other current v7 constitutive and
+  numerical channel. Exact-cycle and rate-separated VHCF launchers expose
+  `--return-control REV|IRREV`; the model ID is part of checkpoint identity.
+- Positive-R null: REV and IRREV result payloads are exactly equal for 12 exact
+  cycles at R=0.1, Kmax=30; the reduced R=0 check is also exact. R=-0.5 return
+  is negligible. R=-0.95 produces the expected small controlled difference.
+- Historical canonical slope `m=71.45` is a mixed accelerated result: three
+  completed points used periodic/frozen-state projection, one used DMD-only,
+  and only the highest-load point was explicit in that driver. Later explicit
+  controls establish finite life but not a monotone exact Paris region.
+- Regression diagnosis: old runs used calibrated transferred-2-D common physics
+  SHA `59ebf68...`; the current v7 audit used legacy-1-D common physics SHA
+  `b5d7e54...`. At old exact DeltaK=14.6084, current v7-IRREV with the old input
+  has H/cycle about 25.45 and a 1 um tip, while the current input produces no
+  event through 1186 exact/DMD cycles and H=3.876e-9 against threshold 0.3754.
+- Decision: stop the paired Paris/R/frequency campaign under the user's explicit
+  regression stop condition. Selecting the authoritative common physics is an
+  unresolved physics-contract choice because the historical file also disables
+  mobile transport, while the current file changes source and shielding maps.
+- Validation: all 93 `tests/test_v914_*.py` tests pass; Python syntax checks and
+  `git diff --check` pass.
+- Full provenance, comparison tables, and artifact paths:
+  `V914_V7_RETURN_CONTROL_AUDIT.md`.

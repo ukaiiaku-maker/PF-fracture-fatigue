@@ -34,6 +34,9 @@ from v914_reverse_drive_utils import forward_projected_transport_stress
 
 MODEL_ID = "v9.14_intrinsic_reverse_glide_v7_signed_applied_plus_gnd"
 STATE_EXTENSION_SCHEMA = "v914_intrinsic_reverse_glide_state_extension_v7"
+IRREVERSIBLE_CONTROL_MODEL_ID = (
+    "v9.14_intrinsic_reverse_glide_v7_no_return_cancellation_control"
+)
 
 
 def intrinsic_signed_glide_stress_fields(
@@ -215,10 +218,50 @@ class IntrinsicReverseGlideState(FiniteTipFloorReversibleState):
         super().restore_reversible_checkpoint_payload(parent)
 
 
+class IntrinsicReverseGlideNoReturnState(IntrinsicReverseGlideState):
+    """Current v7 with only returned-source-slip cancellation disabled.
+
+    Mobile transport and left-boundary return remain fully active and are still
+    recorded by the inherited physical-return diagnostics.  The control changes
+    only the operation that would subtract that returned line content from the
+    source-linked blunting ledger.
+    """
+
+    MODEL_ID = IRREVERSIBLE_CONTROL_MODEL_ID
+
+    def integration_metadata(self) -> dict[str, object]:
+        metadata = dict(super().integration_metadata())
+        metadata.update(
+            {
+                "model_id": IRREVERSIBLE_CONTROL_MODEL_ID,
+                "v7_return_control": "IRREV",
+                "physical_mobile_return_enabled": True,
+                "returned_source_slip_cancellation_enabled": False,
+                "other_v7_constitutive_channels_changed": False,
+            }
+        )
+        return metadata
+
+    def _cancel_returned_source_slip(
+        self,
+        system: int,
+        q: int,
+        returned_per_m: float,
+    ) -> float:
+        # Deliberately leave returned_slip_m2 and both cancellation ledgers
+        # untouched.  The caller has already recorded the physical left-boundary
+        # mobile return, so transport/return observables remain available.
+        del system, q, returned_per_m
+        self._ensure_reversible_fields()
+        return 0.0
+
+
 __all__ = [
     "MODEL_ID",
     "STATE_EXTENSION_SCHEMA",
+    "IRREVERSIBLE_CONTROL_MODEL_ID",
     "IntrinsicReverseGlideState",
+    "IntrinsicReverseGlideNoReturnState",
     "intrinsic_signed_glide_stress_fields",
     "reduced_competing_return_probability",
 ]

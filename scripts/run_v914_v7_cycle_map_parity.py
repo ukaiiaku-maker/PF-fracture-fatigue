@@ -29,7 +29,10 @@ from arrhenius_fracture.emergent_gnd_campaign_v913 import candidate_from_registr
 from arrhenius_fracture.endurance_knee_v914 import physics_for_row
 from arrhenius_fracture.emergent_gnd_types_v913 import CommonPhysics
 from v914_adaptive_feedback_v6 import AdaptiveFeedbackControls
-from v914_intrinsic_reverse_glide_v7 import IntrinsicReverseGlideState
+from v914_intrinsic_reverse_glide_v7 import (
+    IntrinsicReverseGlideNoReturnState,
+    IntrinsicReverseGlideState,
+)
 from v914_signed_fatigue_loading import SignedFatigueLoading
 from v914_v7_cycle_map import (
     CYCLE_MAP_ID,
@@ -57,6 +60,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--candidate", required=True)
     p.add_argument("--deltaK", type=float, required=True)
     p.add_argument("--R", type=float, required=True)
+    p.add_argument(
+        "--return-control", choices=("REV", "IRREV"), default="REV",
+        help="IRREV disables only returned-source-slip cancellation of blunting.",
+    )
     p.add_argument("--frequency-Hz", type=float, default=1000.0)
     p.add_argument("--temperature-K", type=float, default=300.0)
     p.add_argument("--n-bins", type=int, default=640)
@@ -154,8 +161,13 @@ def main() -> int:
         phase_steps=max(int(args.base_phase_intervals), 2),
     )
     loading.validate()
-    IntrinsicReverseGlideState.coupled_operator_substeps = int(args.coupled_substeps)
-    initial = IntrinsicReverseGlideState(candidate, physics)
+    state_class = (
+        IntrinsicReverseGlideState
+        if args.return_control == "REV"
+        else IntrinsicReverseGlideNoReturnState
+    )
+    state_class.coupled_operator_substeps = int(args.coupled_substeps)
+    initial = state_class(candidate, physics)
     controls = AdaptiveFeedbackControls(
         state_rtol=args.state_rtol,
         tip_radius_rtol=args.tip_radius_rtol,
@@ -311,6 +323,8 @@ def main() -> int:
         "schema": "v914_v7_cycle_map_contract_v2",
         "mode": args.mode,
         "candidate": args.candidate,
+        "return_control": args.return_control,
+        "state_model_id": state_class.MODEL_ID,
         "R": args.R,
         "deltaK_MPa_sqrt_m": args.deltaK,
         "frequency_Hz": args.frequency_Hz,

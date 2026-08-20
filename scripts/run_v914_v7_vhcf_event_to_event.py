@@ -30,7 +30,10 @@ from arrhenius_fracture.emergent_gnd_campaign_v913 import candidate_from_registr
 from arrhenius_fracture.endurance_knee_v914 import physics_for_row
 from arrhenius_fracture.emergent_gnd_types_v913 import CommonPhysics
 from v914_adaptive_feedback_v6 import AdaptiveFeedbackControls
-from v914_intrinsic_reverse_glide_v7 import IntrinsicReverseGlideState
+from v914_intrinsic_reverse_glide_v7 import (
+    IntrinsicReverseGlideNoReturnState,
+    IntrinsicReverseGlideState,
+)
 from v914_signed_fatigue_loading import SignedFatigueLoading
 from v914_v7_adaptive_block_accelerator import AdaptiveBlockControls
 from v914_v7_vhcf_event_engine import (
@@ -48,6 +51,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--candidate", required=True)
     p.add_argument("--deltaK", type=float, required=True)
     p.add_argument("--R", type=float, required=True)
+    p.add_argument(
+        "--return-control",
+        choices=("REV", "IRREV"),
+        default="REV",
+        help="IRREV disables only returned-source-slip cancellation of blunting.",
+    )
     p.add_argument("--frequency-Hz", type=float, default=1000.0)
     p.add_argument("--temperature-K", type=float, default=300.0)
     p.add_argument("--seed", type=int, default=1720)
@@ -170,7 +179,12 @@ def main() -> int:
         phase_steps=max(int(args.base_phase_intervals), 2),
     )
     loading.validate()
-    IntrinsicReverseGlideState.coupled_operator_substeps = int(args.coupled_substeps)
+    state_class = (
+        IntrinsicReverseGlideState
+        if args.return_control == "REV"
+        else IntrinsicReverseGlideNoReturnState
+    )
+    state_class.coupled_operator_substeps = int(args.coupled_substeps)
 
     cycle_controls = AdaptiveFeedbackControls(
         state_rtol=args.state_rtol,
@@ -228,7 +242,9 @@ def main() -> int:
             "repository_head": head,
             "registry_sha256": digest(args.registry),
             "physics_sha256": digest(args.physics),
+            "return_control": args.return_control,
         },
+        state_class=state_class,
     )
 
     (args.out / "result.json").write_text(
@@ -243,6 +259,8 @@ def main() -> int:
         "engine_id": ENGINE_ID,
         "candidate": args.candidate,
         "R": args.R,
+        "return_control": args.return_control,
+        "state_model_id": state_class.MODEL_ID,
         "deltaK_MPa_sqrt_m": args.deltaK,
         "frequency_Hz": args.frequency_Hz,
         "temperature_K": args.temperature_K,

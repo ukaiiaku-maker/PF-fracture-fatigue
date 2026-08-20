@@ -267,6 +267,7 @@ def run_v7_vhcf_event_to_event(
     checkpoint_path: str | Path | None = None,
     restart_from: str | Path | None = None,
     contract_metadata: dict[str, Any] | None = None,
+    state_class=IntrinsicReverseGlideState,
 ) -> dict[str, Any]:
     """Advance v7 to a VHCF horizon or crack-extension target.
 
@@ -283,6 +284,8 @@ def run_v7_vhcf_event_to_event(
 
     checkpoint = Path(checkpoint_path) if checkpoint_path else None
     metadata = dict(contract_metadata or {})
+    if not issubclass(state_class, IntrinsicReverseGlideState):
+        raise TypeError("state_class must be an IntrinsicReverseGlideState subclass")
     identity_contract = {
         "engine_id": ENGINE_ID,
         "candidate_id": candidate.candidate_id,
@@ -294,6 +297,7 @@ def run_v7_vhcf_event_to_event(
         "cycle_controls": asdict(cycle_controls),
         "block_controls": asdict(block_controls),
         "localizer_id": LOCALIZER_ID,
+        "state_model_id": str(state_class.MODEL_ID),
         **metadata,
     }
 
@@ -302,7 +306,7 @@ def run_v7_vhcf_event_to_event(
         if saved["identity_contract"] != identity_contract:
             raise ValueError("v7 VHCF checkpoint identity contract mismatch")
         baseline = base._state_from_checkpoint(candidate, physics, saved["state"])
-        state = IntrinsicReverseGlideState.from_existing_state(
+        state = state_class.from_existing_state(
             baseline, saved.get("state_extension")
         )
         rng = np.random.default_rng()
@@ -320,7 +324,7 @@ def run_v7_vhcf_event_to_event(
         sequence = int(saved.get("sequence", 0))
         restart_count = int(saved.get("restart_count", 0)) + 1
     else:
-        state = IntrinsicReverseGlideState(candidate, physics)
+        state = state_class(candidate, physics)
         rng = np.random.default_rng(int(seed))
         cycle = 0
         action = 0.0

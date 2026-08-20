@@ -36,6 +36,7 @@ from arrhenius_fracture.emergent_gnd_types_v913 import CommonPhysics, KB_EV_PER_
 from arrhenius_fracture.endurance_knee_v914 import physics_for_row
 from v914_adaptive_feedback_v6 import AdaptiveFeedbackControls
 from v914_intrinsic_reverse_glide_v7 import (
+    IntrinsicReverseGlideNoReturnState,
     IntrinsicReverseGlideState,
     intrinsic_signed_glide_stress_fields,
 )
@@ -83,6 +84,21 @@ class DiagnosticIntrinsicReverseGlideState(IntrinsicReverseGlideState):
         )
         self.cumulative_signed_tip_plastic_displacement_proxy_m += signed_increment
         self.cumulative_reverse_tip_plastic_displacement_proxy_m += reverse_increment
+
+
+class DiagnosticIntrinsicReverseGlideNoReturnState(
+    DiagnosticIntrinsicReverseGlideState
+):
+    """Diagnostic v7 state using the production IRREV cancellation control."""
+
+    MODEL_ID = IntrinsicReverseGlideNoReturnState.MODEL_ID
+
+    def _cancel_returned_source_slip(
+        self, system: int, q: int, returned_per_m: float
+    ) -> float:
+        return IntrinsicReverseGlideNoReturnState._cancel_returned_source_slip(
+            self, system, q, returned_per_m
+        )
 
 
 def _common(path: Path) -> CommonPhysics:
@@ -424,6 +440,7 @@ def main() -> int:
     parser.add_argument("--candidate", default="v913_zeroD_sobol_0129902")
     parser.add_argument("--Kmax", default="12,30,62.60,70.77")
     parser.add_argument("--R-values", default="0.1")
+    parser.add_argument("--return-control", choices=("REV", "IRREV"), default="REV")
     parser.add_argument("--matched-R-Kmax", type=float, default=30.0)
     parser.add_argument("--matched-R", type=float, default=-0.95)
     parser.add_argument("--sample-cycles", default="0,1,2,4,8,12")
@@ -443,7 +460,12 @@ def main() -> int:
     candidate = candidate_from_registry_row(registry_row)
     common = replace(_common(args.physics), n_bins=int(args.n_bins))
     physics = physics_for_row(common, registry_row)
-    IntrinsicReverseGlideState.coupled_operator_substeps = int(args.coupled_substeps)
+    state_class = (
+        DiagnosticIntrinsicReverseGlideState
+        if args.return_control == "REV"
+        else DiagnosticIntrinsicReverseGlideNoReturnState
+    )
+    state_class.coupled_operator_substeps = int(args.coupled_substeps)
     controls = AdaptiveFeedbackControls(
         state_rtol=0.0025, tip_radius_rtol=0.001, hazard_rtol=0.01,
         base_phase_intervals=int(args.base_phase_intervals),
@@ -470,7 +492,7 @@ def main() -> int:
             temperature_K=args.temperature_K,
             phase_steps=controls.base_phase_intervals,
         )
-        state = DiagnosticIntrinsicReverseGlideState(candidate, physics)
+        state = state_class(candidate, physics)
         previous = {}
         hazards: dict[int, float] = {}
         for cycle in range(0, sample_cycles[-1] + 1):
@@ -500,6 +522,8 @@ def main() -> int:
     payload = {
         "schema": SCHEMA,
         "candidate_id": args.candidate,
+        "return_control": args.return_control,
+        "state_model_id": state_class.MODEL_ID,
         "trajectory_authority": "unmodified_exact_v7_adaptive_cycle_map",
         "counterfactuals_feed_back_to_state": False,
         "resolution": {
