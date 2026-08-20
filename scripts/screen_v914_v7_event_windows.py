@@ -103,6 +103,8 @@ def _evaluate(candidate, physics, *, Kmax, R, frequency, temperature, controls, 
         "K_shield_MPa_sqrt_m": float(state.K_shield_MPa_sqrt_m()),
         "mobile_density_sum_m2": float(state.mobile_m2.sum()),
         "retained_density_sum_m2": float(state.retained_m2.sum()),
+        "mobile_line_content": float(state.mobile_m2.sum() * state.cell_area_m2),
+        "retained_line_content": float(state.retained_m2.sum() * state.cell_area_m2),
         "net_source_slip_count": float(state.local_accumulated_slip_count()),
         "physical_return_fraction": float(
             diagnostics.get("reversible_physical_return_fraction_of_emitted", 0.0)
