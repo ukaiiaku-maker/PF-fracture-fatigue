@@ -127,6 +127,7 @@ def main() -> int:
     parser.add_argument("--n-bins", type=int, default=128)
     parser.add_argument("--base-phase-intervals", type=int, default=32)
     parser.add_argument("--coupled-substeps", type=int, default=2)
+    parser.add_argument("--max-refinement-depth", type=int, default=18)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
 
@@ -138,7 +139,8 @@ def main() -> int:
     IntrinsicReverseGlideState.coupled_operator_substeps = int(args.coupled_substeps)
     controls = AdaptiveFeedbackControls(
         state_rtol=0.0025, tip_radius_rtol=0.001, hazard_rtol=0.01,
-        base_phase_intervals=int(args.base_phase_intervals), max_refinement_depth=18,
+        base_phase_intervals=int(args.base_phase_intervals),
+        max_refinement_depth=int(args.max_refinement_depth),
     )
     targets = sorted(float(item) for item in args.target_windows.split(","))
     evaluated: dict[float, dict] = {}
@@ -229,6 +231,7 @@ def main() -> int:
         "targets_expected_cycles": targets, "development_resolution": {
             "n_bins": args.n_bins, "base_phase_intervals": args.base_phase_intervals,
             "coupled_substeps": args.coupled_substeps,
+            "max_refinement_depth": args.max_refinement_depth,
         }, "rows": output,
     }
     (args.out / "event_window_screen.json").write_text(
