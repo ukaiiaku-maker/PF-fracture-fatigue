@@ -34,6 +34,7 @@ from v914_intrinsic_reverse_glide_v7 import IntrinsicReverseGlideState
 from v914_signed_fatigue_loading import SignedFatigueLoading
 from v914_v7_adaptive_block_accelerator import AdaptiveBlockControls
 from v914_v7_vhcf_event_engine import (
+    DMD_MODEL_ID,
     ENGINE_ID,
     VHCFRunControls,
     run_v7_vhcf_event_to_event,
@@ -255,6 +256,9 @@ def main() -> int:
         "registry_sha256": digest(args.registry),
         "physics_sha256": digest(args.physics),
         "within_cycle_law": "shared adaptive v7 advance_v7_cycle",
+        "long_time_propagator": DMD_MODEL_ID,
+        "active_state": "mobile_retained_and_net_source_blunting",
+        "cumulative_ledgers": "independently_integrated_from_exact_cycle_rates",
         "stochastic_law": "unchanged exponential first-passage threshold",
         "event_length_law": "unchanged v9.14 event_length_factor",
         "projective_blocks_may_cross_event": False,

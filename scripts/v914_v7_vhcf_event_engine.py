@@ -29,12 +29,13 @@ import numpy as np
 from arrhenius_fracture import fatigue_v914 as base
 from v914_adaptive_feedback_v6 import AdaptiveFeedbackControls
 from v914_intrinsic_reverse_glide_v7 import IntrinsicReverseGlideState
-from v914_v7_adaptive_block_accelerator import (
-    AdaptiveBlockControls,
-    evaluate_step_doubled_block,
-)
+from v914_v7_adaptive_block_accelerator import AdaptiveBlockControls
 from v914_v7_adaptive_projective_accelerator import readiness_prediction
 from v914_v7_cycle_map import advance_v7_cycle, cycle_endpoint_summary
+from v914_v7_rate_separated_dmd import (
+    MODEL_ID as DMD_MODEL_ID,
+    evaluate_rate_separated_dmd_block,
+)
 from v914_v7_event_localizer import (
     LOCALIZER_ID,
     advance_v7_phase_span,
@@ -42,7 +43,7 @@ from v914_v7_event_localizer import (
 )
 
 
-ENGINE_ID = "v9.14_v7_vhcf_event_to_event_adaptive_block_v1"
+ENGINE_ID = "v9.14_v7_vhcf_event_to_event_rate_separated_dmd_v2"
 CHECKPOINT_SCHEMA = "v914_v7_vhcf_event_to_event_checkpoint_v1"
 
 
@@ -515,27 +516,29 @@ def run_v7_vhcf_event_to_event(
             readiness_streak = 0
             continue
 
-        trial = evaluate_step_doubled_block(
-            previous_state,
+        trial = evaluate_rate_separated_dmd_block(
             current_state,
-            previous_anchor_cycle=previous_cycle,
-            current_anchor_cycle=current_cycle,
-            current_anchor_hazard=current_hazard,
             block_stride=candidate_stride,
             loading=loading,
             cycle_controls=cycle_controls,
+            state_rtol=float(block_controls.block_state_rtol),
+            hazard_rtol=float(block_controls.block_hazard_rtol),
         )
-        total_maps += 3
+        maps_used = int(trial.get("cycle_map_evaluations", 0))
+        total_maps += maps_used
         state_err = float(trial["endpoint_state_error"]["maximum_relative_error"])
         hazard_err = float(trial["block_hazard_relative_error"])
         correction = float(trial["maximum_projection_constraint_correction"])
-        numerical_pass = bool(
+        numerical_pass = bool(trial.get("numerical_pass", False) and
             state_err <= float(block_controls.block_state_rtol)
             and hazard_err <= float(block_controls.block_hazard_rtol)
             and correction <= float(block_controls.max_projection_constraint_correction)
         )
         block_action = max(float(trial["fine_block_hazard_action"]), 0.0)
-        threshold_crossed = action + block_action >= threshold
+        upper_block_action = max(
+            float(trial.get("upper_block_hazard_action", block_action)), block_action
+        )
+        threshold_crossed = action + upper_block_action >= threshold
 
         block_history.append(
             {
@@ -548,6 +551,7 @@ def run_v7_vhcf_event_to_event(
                 "hazard_error": hazard_err,
                 "projection_correction": correction,
                 "block_hazard_action": block_action,
+                "upper_block_hazard_action": upper_block_action,
                 "hazard_clock_action_before": float(action),
                 "hazard_threshold_action": float(threshold),
             }
@@ -586,12 +590,12 @@ def run_v7_vhcf_event_to_event(
 
         # Accepted fine path.  The private coarse path is discarded.
         accepted_blocks += 1
-        accepted_maps += 2
+        accepted_maps += maps_used
         maximum_accepted_stride = max(maximum_accepted_stride, candidate_stride)
         action += block_action
         state = copy.deepcopy(trial["fine_end_state"])
-        mid_cycle = int(trial["mid_cycle"])
-        end_cycle = int(trial["end_cycle"])
+        mid_cycle = int(cycle + candidate_stride // 2)
+        end_cycle = int(cycle + candidate_stride)
         mid_state = copy.deepcopy(trial["fine_mid_state"])
         mid_hazard = float(trial["fine_mid_hazard"])
         end_hazard = float(trial["fine_end_hazard"])
@@ -635,6 +639,7 @@ def run_v7_vhcf_event_to_event(
     return {
         "schema": "v914_v7_vhcf_event_to_event_result_v1",
         "engine_id": ENGINE_ID,
+        "dmd_model_id": DMD_MODEL_ID,
         "localizer_id": LOCALIZER_ID,
         "status": status,
         "maximum_physical_cycles": horizon,
@@ -666,6 +671,7 @@ def run_v7_vhcf_event_to_event(
 
 __all__ = [
     "CHECKPOINT_SCHEMA",
+    "DMD_MODEL_ID",
     "ENGINE_ID",
     "VHCFRunControls",
     "read_checkpoint",
