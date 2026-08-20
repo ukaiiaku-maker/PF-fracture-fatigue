@@ -82,7 +82,7 @@ def test_ledger_delta_is_independent_of_active_state_vector():
     after_state.returned_slip_m2 += 2.0
     after_state.cumulative_source_activations += 4.0
     delta = ledger_delta(capture_ledgers(before_state), capture_ledgers(after_state))
-    assert np.all(delta["accumulated_slip_m2"] == 7.0)
+    assert np.all(delta["cumulative_gross_source_slip_m2"] == 7.0)
     assert np.all(delta["returned_slip_m2"] == 2.0)
     assert delta["cumulative_source_activations"] == pytest.approx(np.array([4.0]))
 
@@ -104,3 +104,20 @@ def test_rate_separated_dmd_projects_net_state_and_integrates_gross_ledgers(monk
     )
     assert end.cumulative_source_activations == pytest.approx(np.array([5.0 + 64 * 3.0]))
     assert result["fine_block_hazard_action"] == pytest.approx(64 * 0.125)
+    assert np.all(end.cumulative_gross_source_slip_m2 == pytest.approx(10.0 + 64 * 2.0))
+    # Gross activity and constitutive reconstruction remain distinct fields.
+    assert np.all(end.cumulative_gross_source_slip_m2 != end.accumulated_slip_m2)
+    training_endpoint = State()
+    for _ in range(6):
+        training_endpoint, _hazard, _telemetry = linear_cycle_map(
+            training_endpoint, Loading(), None
+        )
+    reused = evaluate_rate_separated_dmd_block(
+        training_endpoint, block_stride=128, loading=Loading(), cycle_controls=None,
+        state_rtol=1.0e-9, hazard_rtol=1.0e-9,
+        local_map=result["local_map"], cycle_map_fn=linear_cycle_map,
+    )
+    assert reused["numerical_pass"] is True
+    assert reused["local_map_reused"] is True
+    assert reused["cycle_map_evaluations"] == 3
+    assert reused["log_hazard_output_relative_error"] < 1.0e-12

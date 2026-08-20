@@ -36,6 +36,7 @@ from v914_v7_rate_separated_dmd import (
     MODEL_ID as DMD_MODEL_ID,
     evaluate_rate_separated_dmd_block,
 )
+from v914_v7_rate_separated_state import gross_activity_diagnostics
 from v914_v7_event_localizer import (
     LOCALIZER_ID,
     advance_v7_phase_span,
@@ -160,6 +161,7 @@ def _event_record(
         "retained_total_m2": float(np.sum(state.retained_m2)),
     }
     record.update(state.reversibility_diagnostics())
+    record.update(gross_activity_diagnostics(state))
     return record
 
 
@@ -345,6 +347,10 @@ def run_v7_vhcf_event_to_event(
     fallback_exact_cycles = 0
     accepted_blocks = 0
     maximum_accepted_stride = 0
+    dmd_local_map = None
+    dmd_map_refresh_count = int(controller.get("dmd_map_refresh_count", 0)) if restart_from else 0
+    dmd_map_reuse_count = int(controller.get("dmd_map_reuse_count", 0)) if restart_from else 0
+    dmd_map_invalidation_count = int(controller.get("dmd_map_invalidation_count", 0)) if restart_from else 0
     status = "running"
 
     def save(reason: str) -> None:
@@ -370,6 +376,9 @@ def run_v7_vhcf_event_to_event(
                     "interval_start_cycles": float(interval_start_cycles),
                     "total_cycle_map_evaluations": int(total_maps),
                     "accepted_cycle_map_evaluations": int(accepted_maps),
+                    "dmd_map_refresh_count": int(dmd_map_refresh_count),
+                    "dmd_map_reuse_count": int(dmd_map_reuse_count),
+                    "dmd_map_invalidation_count": int(dmd_map_invalidation_count),
                 },
                 "events": events,
                 "anchor_history": anchor_history,
@@ -425,6 +434,9 @@ def run_v7_vhcf_event_to_event(
                 summary["hazard_threshold_action"] = float(threshold)
                 anchor_history.append(summary)
                 resolved_states = []
+                if dmd_local_map is not None:
+                    dmd_map_invalidation_count += 1
+                dmd_local_map = None
                 readiness_streak = 0
                 promoted = False
                 stride = int(block_controls.initial_block_stride)
@@ -523,7 +535,13 @@ def run_v7_vhcf_event_to_event(
             cycle_controls=cycle_controls,
             state_rtol=float(block_controls.block_state_rtol),
             hazard_rtol=float(block_controls.block_hazard_rtol),
+            local_map=dmd_local_map,
         )
+        proposed_map = trial.get("local_map")
+        if bool(trial.get("local_map_reused", False)):
+            dmd_map_reuse_count += 1
+        elif proposed_map is not None:
+            dmd_map_refresh_count += 1
         maps_used = int(trial.get("cycle_map_evaluations", 0))
         total_maps += maps_used
         state_err = float(trial["endpoint_state_error"]["maximum_relative_error"])
@@ -535,10 +553,19 @@ def run_v7_vhcf_event_to_event(
             and correction <= float(block_controls.max_projection_constraint_correction)
         )
         block_action = max(float(trial["fine_block_hazard_action"]), 0.0)
-        upper_block_action = max(
-            float(trial.get("upper_block_hazard_action", block_action)), block_action
+        sampled_envelope_action = max(
+            float(trial.get("sampled_envelope_block_hazard_action", block_action)),
+            block_action,
         )
-        threshold_crossed = action + upper_block_action >= threshold
+        remaining_threshold_action = max(threshold - action, 0.0)
+        # A three-point sampled envelope is not a mathematical upper bound.
+        # Far from first passage, controlled nested quadrature is sufficient.
+        # Within a factor four of the remaining stochastic action, recursively
+        # subdivide until the exact-cycle guard/localizer takes authority.
+        event_guard_refinement = bool(
+            4.0 * sampled_envelope_action >= remaining_threshold_action
+        )
+        threshold_crossed = action + block_action >= threshold
 
         block_history.append(
             {
@@ -547,17 +574,29 @@ def run_v7_vhcf_event_to_event(
                 "block_stride": int(candidate_stride),
                 "numerical_pass": numerical_pass,
                 "threshold_crossed": threshold_crossed,
+                "event_guard_refinement": event_guard_refinement,
                 "state_error": state_err,
                 "hazard_error": hazard_err,
                 "projection_correction": correction,
                 "block_hazard_action": block_action,
-                "upper_block_hazard_action": upper_block_action,
+                "sampled_envelope_block_hazard_action": sampled_envelope_action,
+                "log_hazard_output_error": float(
+                    trial.get("log_hazard_output_relative_error", math.nan)
+                ),
+                "local_map_reused": bool(trial.get("local_map_reused", False)),
+                "local_map_reuse_distance": float(
+                    trial.get("local_map_reuse_distance", math.inf)
+                ),
+                "local_map_refresh_index": trial.get("local_map_refresh_index"),
                 "hazard_clock_action_before": float(action),
                 "hazard_threshold_action": float(threshold),
             }
         )
 
         if not numerical_pass:
+            if proposed_map is None and dmd_local_map is not None:
+                dmd_map_invalidation_count += 1
+            dmd_local_map = proposed_map
             rejected_blocks += 1
             if candidate_stride > int(block_controls.initial_block_stride):
                 stride = max(
@@ -570,7 +609,8 @@ def run_v7_vhcf_event_to_event(
             stride = int(block_controls.initial_block_stride)
             continue
 
-        if threshold_crossed:
+        if threshold_crossed or event_guard_refinement:
+            dmd_local_map = proposed_map
             # Never commit a projective state across a stochastic event.  Reduce
             # only the event bracket.  This costs O(log N) block trials even when
             # the event lies billions or trillions of cycles away.
@@ -590,6 +630,7 @@ def run_v7_vhcf_event_to_event(
 
         # Accepted fine path.  The private coarse path is discarded.
         accepted_blocks += 1
+        dmd_local_map = proposed_map
         accepted_maps += maps_used
         maximum_accepted_stride = max(maximum_accepted_stride, candidate_stride)
         action += block_action
@@ -660,10 +701,14 @@ def run_v7_vhcf_event_to_event(
         "fallback_exact_cycles": int(fallback_exact_cycles),
         "promotion_count": int(promotion_count),
         "maximum_accepted_stride": int(maximum_accepted_stride),
+        "dmd_map_refresh_count": int(dmd_map_refresh_count),
+        "dmd_map_reuse_count": int(dmd_map_reuse_count),
+        "dmd_map_invalidation_count": int(dmd_map_invalidation_count),
         "physical_cycles_per_total_cycle_map_evaluation": (
             float(cycle) / max(float(total_maps), 1.0)
         ),
         "final_reversibility": state.reversibility_diagnostics(),
+        "final_gross_activity": gross_activity_diagnostics(state),
         "identity_contract": identity_contract,
         "restart_count": int(restart_count),
     }

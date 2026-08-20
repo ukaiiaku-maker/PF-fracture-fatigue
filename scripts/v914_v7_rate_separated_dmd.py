@@ -8,6 +8,7 @@ from exact local cycle rates.
 from __future__ import annotations
 
 import copy
+from dataclasses import dataclass
 import math
 import os
 from typing import Any
@@ -26,7 +27,19 @@ from v914_v7_rate_separated_state import (
 )
 
 
-MODEL_ID = "v9.14_v7_rate_separated_positive_affine_dmd_v1"
+MODEL_ID = "v9.14_v7_reusable_rate_separated_positive_affine_dmd_v2"
+HAZARD_FLOOR = 1.0e-300
+
+
+@dataclass
+class ValidatedLocalMap:
+    model: dict[str, Any]
+    geometry_signature: tuple[Any, ...]
+    fields: tuple[Any, ...]
+    training_endpoint_vector: np.ndarray
+    refresh_index: int
+    accepted_reuse_segments: int = 0
+    maximum_validated_state_residual: float = 0.0
 
 
 def _env_int(name: str, default: int, minimum: int) -> int:
@@ -73,7 +86,9 @@ def _fit(states: list[np.ndarray], outputs: list[float], maximum_rank: int = 12)
             pass
     fitted = A @ x + c[:, None]
     error = float(np.linalg.norm(fitted - y)) / max(float(np.linalg.norm(y)), 1.0)
-    observed = np.asarray(outputs, dtype=float)
+    # Cleavage action is Arrhenius/exponential.  Fit log action as an auxiliary
+    # diagnostic output; raw action is never an affine state coordinate.
+    observed = np.log(np.maximum(np.asarray(outputs, dtype=float), HAZARD_FLOOR))
     output_center = float(np.mean(observed))
     variation = observed - output_center
     if float(np.ptp(observed)) <= 1.0e-12 * max(float(np.max(np.abs(observed))), 1.0e-300):
@@ -120,12 +135,23 @@ def _predict_output(model, vector: np.ndarray) -> float:
     z = np.asarray(model["basis"]).T @ (
         (np.asarray(vector) - np.asarray(model["reference"])) / np.asarray(model["scale"])
     )
-    return max(float(np.asarray(model["C"]) @ z + float(model["d"])), 0.0)
+    log_value = float(np.asarray(model["C"]) @ z + float(model["d"]))
+    return float(math.exp(np.clip(log_value, math.log(HAZARD_FLOOR), 700.0)))
 
 
 def _relative_vector(a, b) -> float:
     return float(np.linalg.norm(np.asarray(a) - np.asarray(b))) / max(
         float(np.linalg.norm(a)), float(np.linalg.norm(b)), 1.0
+    )
+
+
+def _model_relative_vector(model, a, b) -> float:
+    scale = np.asarray(model["scale"], dtype=float)
+    reference = np.asarray(model["reference"], dtype=float)
+    left = (np.asarray(a, dtype=float) - reference) / scale
+    right = (np.asarray(b, dtype=float) - reference) / scale
+    return float(np.linalg.norm(left - right)) / max(
+        float(np.linalg.norm(left)), float(np.linalg.norm(right)), 1.0
     )
 
 
@@ -155,17 +181,50 @@ def evaluate_rate_separated_dmd_block(
     cycle_controls,
     state_rtol: float,
     hazard_rtol: float,
+    local_map: ValidatedLocalMap | None = None,
     cycle_map_fn=advance_v7_cycle,
 ) -> dict[str, Any]:
-    """Return a private DMD block in the shape consumed by the VHCF engine."""
+    """Evaluate a block, reusing a validated geometry-local map when possible.
+
+    Active-state admission uses independent one-step residuals. Hazard action
+    uses exact sparse probes and nested Simpson/trapezoid quadrature; the fitted
+    log-hazard output is diagnostic only. No private call touches stochastic
+    state because the v7 cycle map is deterministic and receives only a copied
+    constitutive state.
+    """
     stride = int(block_stride)
-    burst = min(_env_int("V914_V7_DMD_BURST_CYCLES", 12, 4), stride - 2)
-    if stride <= burst + 1:
-        return {"numerical_pass": False, "failure_reason": "insufficient_dmd_horizon", "cycle_map_evaluations": 0}
     geometry = geometry_signature(current_state)
+    initial_snapshot = serialize_active_state(current_state)
+    reuse_distance = (
+        _model_relative_vector(
+            local_map.model,
+            initial_snapshot.vector,
+            local_map.training_endpoint_vector,
+        )
+        if local_map is not None
+        and local_map.geometry_signature == geometry
+        and local_map.fields == initial_snapshot.fields
+        else math.inf
+    )
+    reusable = bool(
+        local_map is not None
+        and local_map.geometry_signature == geometry
+        and local_map.fields == initial_snapshot.fields
+        and reuse_distance <= float(state_rtol)
+    )
+    burst = 0 if reusable else min(
+        _env_int("V914_V7_DMD_BURST_CYCLES", 12, 4), stride - 2
+    )
+    if stride <= burst + 1:
+        return {
+            "numerical_pass": False,
+            "failure_reason": "insufficient_dmd_horizon",
+            "cycle_map_evaluations": 0,
+            "local_map": None,
+        }
     exact_state = copy.deepcopy(current_state)
-    snapshots = [serialize_active_state(exact_state)]
-    hazards = []
+    snapshots = [initial_snapshot]
+    hazards: list[float] = []
     exact_ledger_total = {}
     evaluations = 0
     for _ in range(burst):
@@ -178,7 +237,21 @@ def evaluate_rate_separated_dmd_block(
         hazards.append(max(hazard, 0.0))
         for key, value in delta.items():
             exact_ledger_total[key] = np.asarray(exact_ledger_total.get(key, 0.0)) + np.asarray(value)
-    model = _fit([row.vector for row in snapshots], hazards, maximum_rank=_env_int("V914_V7_DMD_MAX_RANK", 12, 1))
+    if reusable:
+        model = local_map.model
+        active_map = local_map
+    else:
+        model = _fit(
+            [row.vector for row in snapshots], hazards,
+            maximum_rank=_env_int("V914_V7_DMD_MAX_RANK", 12, 1),
+        )
+        active_map = ValidatedLocalMap(
+            model=model,
+            geometry_signature=geometry,
+            fields=snapshots[-1].fields,
+            training_endpoint_vector=snapshots[-1].vector.copy(),
+            refresh_index=0 if local_map is None else local_map.refresh_index + 1,
+        )
     remaining = stride - burst
     midpoint_remaining = max(remaining // 2, 1)
     start_vector = snapshots[-1].vector
@@ -197,26 +270,34 @@ def evaluate_rate_separated_dmd_block(
     mid_prediction = _project(model, midpoint_vector, 1)
     end_prediction = _project(model, endpoint_vector, 1)
     state_error = max(
-        _relative_vector(start_next.vector, start_prediction),
-        _relative_vector(mid_next.vector, mid_prediction),
-        _relative_vector(end_next.vector, end_prediction),
+        _model_relative_vector(model, start_next.vector, start_prediction),
+        _model_relative_vector(model, mid_next.vector, mid_prediction),
+        _model_relative_vector(model, end_next.vector, end_prediction),
     )
-    # Fit hazard as an independently sampled local output, never as frozen state.
+    # Log-hazard prediction is an audit only. Admission uses quadrature error
+    # from exact sparse hazards and therefore cannot be dominated by a poor
+    # raw-linear auxiliary fit.
     predicted_mid_hazard = _predict_output(model, midpoint_vector)
     predicted_end_hazard = _predict_output(model, endpoint_vector)
-    hazard_error = max(
+    hazard_output_error = max(
         _relative_scalar(mid_hazard, predicted_mid_hazard),
         _relative_scalar(end_hazard, predicted_end_hazard),
     )
-    projected_action = float(remaining) * (start_hazard + 4.0 * mid_hazard + end_hazard) / 6.0
-    upper_action = float(remaining) * max(start_hazard, mid_hazard, end_hazard)
+    simpson_rate = (start_hazard + 4.0 * mid_hazard + end_hazard) / 6.0
+    trapezoid_rate = (start_hazard + end_hazard) / 2.0
+    hazard_error = _relative_scalar(simpson_rate, trapezoid_rate)
+    projected_action = float(remaining) * simpson_rate
+    sampled_envelope_action = float(remaining) * max(
+        start_hazard, mid_hazard, end_hazard
+    )
     ledger_delta, ledger_span = _combine_rates(start_rate, mid_rate, end_rate, remaining)
     for key, value in exact_ledger_total.items():
         ledger_delta[key] = np.asarray(ledger_delta.get(key, 0.0)) + np.asarray(value)
 
     final_state = copy.deepcopy(current_state)
+    capture_ledgers(final_state)  # initialize independent gross-audit fields
     apply_ledger_delta(final_state, ledger_delta)
-    restore_active_state(final_state, serialize_active_state(final_state), endpoint_vector)
+    restore_active_state(final_state, initial_snapshot, endpoint_vector)
     final_state.time_s = float(current_state.time_s) + float(stride) / float(loading.frequency_Hz)
     if geometry_signature(final_state) != geometry:
         raise RuntimeError("v7 DMD block changed crack geometry")
@@ -225,6 +306,15 @@ def evaluate_rate_separated_dmd_block(
         and state_error <= float(state_rtol)
         and hazard_error <= float(hazard_rtol)
     )
+    if state_error > float(state_rtol):
+        # A failed one-step residual invalidates the local map. Hazard-only
+        # quadrature rejection retains it for the subdivided retry.
+        active_map = None
+    elif numerical_pass:
+        active_map.accepted_reuse_segments += int(reusable)
+        active_map.maximum_validated_state_residual = max(
+            active_map.maximum_validated_state_residual, state_error
+        )
     return {
         "numerical_pass": numerical_pass,
         "failure_reason": None if numerical_pass else "dmd_validation_failed",
@@ -234,15 +324,24 @@ def evaluate_rate_separated_dmd_block(
         "fine_mid_hazard": float(mid_hazard),
         "fine_end_hazard": float(end_hazard),
         "fine_block_hazard_action": float(sum(hazards) + projected_action),
-        "upper_block_hazard_action": float(sum(hazards) + upper_action),
+        "sampled_envelope_block_hazard_action": float(
+            sum(hazards) + sampled_envelope_action
+        ),
         "endpoint_state_error": {"maximum_relative_error": state_error},
         "block_hazard_relative_error": hazard_error,
+        "log_hazard_output_relative_error": hazard_output_error,
         "maximum_projection_constraint_correction": 0.0,
         "training_error": float(model["training_error"]),
         "maximum_ledger_rate_span": ledger_span,
         "cycle_map_evaluations": evaluations,
+        "local_map": active_map,
+        "local_map_reused": reusable,
+        "local_map_reuse_distance": float(reuse_distance),
+        "local_map_refresh_index": (
+            active_map.refresh_index if active_map is not None else None
+        ),
         "model_id": MODEL_ID,
     }
 
 
-__all__ = ["MODEL_ID", "evaluate_rate_separated_dmd_block"]
+__all__ = ["MODEL_ID", "ValidatedLocalMap", "evaluate_rate_separated_dmd_block"]

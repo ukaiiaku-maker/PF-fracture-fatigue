@@ -539,6 +539,14 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
             ).tolist(),
         }
         for name in (
+            "cumulative_gross_source_slip_m2",
+            "cumulative_gross_returned_slip_m2",
+            "_gross_source_operational_marker_m2",
+            "_gross_return_operational_marker_m2",
+        ):
+            if hasattr(self, name):
+                payload[name] = np.asarray(getattr(self, name), dtype=float).tolist()
+        for name in (
             "cumulative_transport_channel_time_s",
             "cumulative_reverse_channel_time_s",
             "cumulative_mobile_exposure_m2_s",
@@ -576,6 +584,14 @@ class MinimalReversibleEmergentGNDState(_BaseEmergentGNDState):
         )
         for name in arrays:
             setattr(self, name, np.asarray(payload[name], dtype=float))
+        for name in (
+            "cumulative_gross_source_slip_m2",
+            "cumulative_gross_returned_slip_m2",
+            "_gross_source_operational_marker_m2",
+            "_gross_return_operational_marker_m2",
+        ):
+            if name in payload:
+                setattr(self, name, np.asarray(payload[name], dtype=float))
         for name in (
             "cumulative_transport_channel_time_s",
             "cumulative_reverse_channel_time_s",

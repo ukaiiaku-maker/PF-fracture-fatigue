@@ -21,8 +21,9 @@ MODEL_ID = "v9.14_v7_net_blunting_rate_separated_state_v1"
 
 ACTIVE_ARRAYS = ("mobile_m2", "retained_m2")
 LEDGER_ARRAYS = (
-    "accumulated_slip_m2",
     "returned_slip_m2",
+    "cumulative_gross_source_slip_m2",
+    "cumulative_gross_returned_slip_m2",
     "cumulative_source_activations",
     "cumulative_line_content",
     "cumulative_returned_mobile_per_m",
@@ -47,6 +48,37 @@ MONOTONE_LEDGER_FIELDS = frozenset(LEDGER_ARRAYS + (
     "cumulative_mobile_exposure_m2_s",
     "cumulative_reverse_mobile_exposure_m2_s",
 ))
+
+
+def _synchronize_gross_audit(state) -> None:
+    """Carry exact operational increments into independent gross ledgers.
+
+    DMD restoration changes the operational accumulated field to
+    ``returned + net``.  The private marker is reset at restoration so that
+    this constitutive reconstruction is never mistaken for gross activity.
+    Exact-cycle increments after restoration are, however, accumulated here.
+    """
+    accumulated = np.asarray(state.accumulated_slip_m2, dtype=float)
+    returned = np.asarray(state.returned_slip_m2, dtype=float)
+    pairs = (
+        ("cumulative_gross_source_slip_m2", "_gross_source_operational_marker_m2", accumulated),
+        ("cumulative_gross_returned_slip_m2", "_gross_return_operational_marker_m2", returned),
+    )
+    for audit_name, marker_name, current in pairs:
+        if not hasattr(state, audit_name):
+            setattr(state, audit_name, np.maximum(current, 0.0).copy())
+            setattr(state, marker_name, current.copy())
+            continue
+        marker = np.asarray(getattr(state, marker_name, current), dtype=float)
+        if marker.shape != current.shape:
+            raise RuntimeError(f"gross-ledger marker shape changed: {marker_name}")
+        increment = current - marker
+        # Both operational fields are physically monotone between geometry
+        # translations. A negative increment indicates a reconstruction, not
+        # gross reverse activity, and is intentionally excluded from the audit.
+        audit = np.asarray(getattr(state, audit_name), dtype=float)
+        setattr(state, audit_name, audit + np.maximum(increment, 0.0))
+        setattr(state, marker_name, current.copy())
 
 
 @dataclass(frozen=True)
@@ -108,9 +140,13 @@ def restore_active_state(state, snapshot: ReducedState, vector=None) -> None:
     returned = np.maximum(np.asarray(state.returned_slip_m2, dtype=float), 0.0)
     state.returned_slip_m2 = returned
     state.accumulated_slip_m2 = returned + restored["net_slip_m2"]
+    # Constitutive reconstruction is not gross source activity.
+    state._gross_source_operational_marker_m2 = state.accumulated_slip_m2.copy()
+    state._gross_return_operational_marker_m2 = state.returned_slip_m2.copy()
 
 
 def capture_ledgers(state) -> dict[str, np.ndarray | float]:
+    _synchronize_gross_audit(state)
     result: dict[str, np.ndarray | float] = {}
     for name in LEDGER_ARRAYS:
         if hasattr(state, name):
@@ -141,6 +177,8 @@ def apply_ledger_delta(state, delta, factor: float = 1.0) -> None:
         if name in MONOTONE_LEDGER_FIELDS:
             value = np.maximum(value, np.asarray(current))
         setattr(state, name, value if isinstance(current, np.ndarray) else float(value))
+    # Applying projected gross ledger rates does not change the operational
+    # fields until restore_active_state reconstructs the constitutive state.
 
 
 def independent_cycle(state, loading, controls, cycle_map_fn):
@@ -151,9 +189,27 @@ def independent_cycle(state, loading, controls, cycle_map_fn):
     return end, float(hazard), telemetry, serialize_active_state(end), ledger_delta(before, capture_ledgers(end))
 
 
+def gross_activity_diagnostics(state) -> dict[str, float]:
+    _synchronize_gross_audit(state)
+    gross_source = np.asarray(state.cumulative_gross_source_slip_m2, dtype=float)
+    gross_return = np.asarray(state.cumulative_gross_returned_slip_m2, dtype=float)
+    operational_accumulated = np.asarray(state.accumulated_slip_m2, dtype=float)
+    net = operational_accumulated - np.asarray(state.returned_slip_m2, dtype=float)
+    area = max(float(getattr(state, "cell_area_m2", 1.0)), 0.0)
+    return {
+        "gross_source_slip_density_sum_m2": float(np.sum(gross_source)),
+        "gross_returned_slip_density_sum_m2": float(np.sum(gross_return)),
+        "gross_source_slip_line_content": float(np.sum(gross_source) * area),
+        "gross_returned_slip_line_content": float(np.sum(gross_return) * area),
+        "constitutive_net_slip_density_sum_m2": float(np.sum(net)),
+        "gross_activity_is_constitutive_reconstruction": False,
+    }
+
+
 __all__ = [
     "MODEL_ID", "ACTIVE_ARRAYS", "LEDGER_ARRAYS", "LEDGER_SCALARS",
     "MONOTONE_LEDGER_FIELDS", "ReducedState", "apply_ledger_delta",
     "capture_ledgers", "geometry_signature", "independent_cycle",
-    "ledger_delta", "restore_active_state", "serialize_active_state",
+    "gross_activity_diagnostics", "ledger_delta", "restore_active_state", "serialize_active_state",
+    "_synchronize_gross_audit",
 ]
