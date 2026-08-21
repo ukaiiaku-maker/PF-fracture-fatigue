@@ -570,7 +570,7 @@ def main() -> int:
     write_plots(rows, args.out / "paris_response.png")
     write_trend_plots(rows, args.out / "R_frequency_trends.png")
     write_required_figures(rows, local_slopes, knees, args.out)
-    (args.out / "campaign_analysis.json").write_text(json.dumps({
+    analysis_payload = json.dumps({
         "schema": SCHEMA,
         "developed_start_um": args.developed_start_um,
         "rows": rows,
@@ -581,8 +581,8 @@ def main() -> int:
         "kinetic_knees": knees,
         "R_trends": r_trends,
         "frequency_trends": frequency_trends,
-    }, indent=2, sort_keys=True, allow_nan=True) + "\n")
-    (args.out / "CAMPAIGN_REPORT.md").write_text(
+    }, indent=2, sort_keys=True, allow_nan=True) + "\n"
+    report = (
         "# Calibrated transport fatigue campaign\n\n"
         f"- Audited result files: {len(rows)}\n"
         f"- Fresh completed growth trajectories: {sum(row['campaign_disposition'] == 'completed_growth_target' for row in rows)}\n"
@@ -596,6 +596,10 @@ def main() -> int:
         f"- Matched R comparisons: {len(r_trends)}\n"
         f"- Matched frequency comparisons: {len(frequency_trends)}\n"
     )
+    for name in ("campaign_analysis.json", "final_summary.json"):
+        (args.out / name).write_text(analysis_payload)
+    for name in ("CAMPAIGN_REPORT.md", "final_report.md"):
+        (args.out / name).write_text(report)
     print(f"summarized {len(rows)} result files; {len(fits)} output fits; {len(events)} events")
     return 0
 

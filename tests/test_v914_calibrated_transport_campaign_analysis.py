@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 from pathlib import Path
+import subprocess
 import sys
 
 import pytest
@@ -26,7 +27,7 @@ from analyze_v914_calibrated_transport_campaign import (  # noqa: E402
 
 
 def _write_result(root: Path, status: str, delta_k: float) -> Path:
-    root.mkdir()
+    root.mkdir(parents=True)
     result = {
         "status": status,
         "completed_physical_cycles": 100,
@@ -174,3 +175,23 @@ def test_empty_csv_output_clears_stale_analysis(tmp_path):
     _write_csv(path, [])
     assert path.is_file()
     assert path.read_text() == ""
+
+
+def test_cli_writes_final_named_summary_and_report(tmp_path):
+    root = tmp_path / "runs"
+    _write_result(root / "case", "growth_target_reached", 14.0)
+    out = tmp_path / "analysis"
+    subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "analyze_v914_calibrated_transport_campaign.py"),
+            "--roots", str(root), "--out", str(out),
+        ],
+        check=True,
+    )
+    assert (out / "final_summary.json").read_text() == (
+        out / "campaign_analysis.json"
+    ).read_text()
+    assert (out / "final_report.md").read_text() == (
+        out / "CAMPAIGN_REPORT.md"
+    ).read_text()
