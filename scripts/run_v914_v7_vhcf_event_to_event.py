@@ -85,7 +85,10 @@ def parse_args() -> argparse.Namespace:
         "--initial-block-stride",
         type=int,
         default=MINIMUM_FULL_TRAINING_STRIDE,
-        help="Initial DMD block; 16 accommodates the full 12-cycle training burst.",
+        help=(
+            "Initial DMD block; the default accommodates the full qualified "
+            "24-cycle training burst."
+        ),
     )
     p.add_argument(
         "--maximum-block-stride",

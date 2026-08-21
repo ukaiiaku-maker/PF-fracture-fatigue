@@ -46,7 +46,7 @@ from v914_v7_event_localizer import (
 )
 
 
-ENGINE_ID = "v9.14_v7_vhcf_event_to_event_rate_separated_dmd_v3"
+ENGINE_ID = "v9.14_v7_vhcf_event_to_event_rate_separated_dmd_v4"
 CHECKPOINT_SCHEMA = "v914_v7_vhcf_event_to_event_checkpoint_v1"
 
 
@@ -648,15 +648,16 @@ def run_v7_vhcf_event_to_event(
         )
 
         if not numerical_pass:
-            if proposed_map is None and dmd_local_map is not None:
-                dmd_map_invalidation_count += 1
-            dmd_local_map = proposed_map
             rejected_blocks += 1
             if candidate_stride > int(block_controls.initial_block_stride):
+                dmd_local_map = proposed_map
                 stride = max(
                     int(block_controls.initial_block_stride), candidate_stride // 2
                 )
                 continue
+            if proposed_map is not None or dmd_local_map is not None:
+                dmd_map_invalidation_count += 1
+            dmd_local_map = None
             promoted = False
             readiness_streak = 0
             fallback_exact_cycles += 1

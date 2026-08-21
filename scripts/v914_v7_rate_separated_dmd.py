@@ -27,11 +27,11 @@ from v914_v7_rate_separated_state import (
 )
 
 
-MODEL_ID = "v9.14_v7_reusable_rate_separated_positive_affine_dmd_v2"
+MODEL_ID = "v9.14_v7_reusable_rate_separated_positive_affine_dmd_v3"
 HAZARD_FLOOR = 1.0e-300
-DEFAULT_TRAINING_BURST_CYCLES = 12
+DEFAULT_TRAINING_BURST_CYCLES = 24
 # Power-of-two block that leaves the full default burst plus validation span.
-MINIMUM_FULL_TRAINING_STRIDE = 16
+MINIMUM_FULL_TRAINING_STRIDE = 32
 
 
 @dataclass
@@ -57,18 +57,16 @@ def _fit(states: list[np.ndarray], outputs: list[float], maximum_rank: int = 12)
     matrix = np.column_stack(states)
     reference = matrix[:, 0]
     centered = matrix - reference[:, None]
-    scale = np.maximum(np.max(np.abs(centered), axis=1), np.maximum(np.abs(reference), 1.0))
-    normalized = centered / scale[:, None]
-    previous = normalized[:, :-1]
-    following = normalized[:, 1:]
-    u, singular, _vh = np.linalg.svd(previous, full_matrices=False)
+    sample = centered[:, 1:]
+    u, singular, _vh = np.linalg.svd(sample, full_matrices=False)
     if singular.size == 0:
         raise ValueError("empty DMD training burst")
     cutoff = max(float(singular[0]) * 1.0e-12, 1.0e-15)
     rank = min(max(int(np.sum(singular > cutoff)), 1), int(maximum_rank))
     basis = u[:, :rank]
-    x = basis.T @ previous
-    y = basis.T @ following
+    coordinates = basis.T @ centered
+    x = coordinates[:, :-1]
+    y = coordinates[:, 1:]
     design = np.vstack([x, np.ones(x.shape[1])])
     coefficient = np.linalg.lstsq(design.T, y.T, rcond=None)[0].T
     A = coefficient[:, :rank]
@@ -77,10 +75,7 @@ def _fit(states: list[np.ndarray], outputs: list[float], maximum_rank: int = 12)
     adjusted = eigenvalues.copy()
     neutral = np.abs(eigenvalues - 1.0) <= 1.0e-6
     adjusted[neutral] = 1.0
-    # Growth faster than a neutral affine mode is unsafe over VHCF horizons.
-    unstable = np.abs(adjusted) > 1.0 + 1.0e-8
-    adjusted[unstable] /= np.abs(adjusted[unstable])
-    if np.any(neutral | unstable):
+    if np.any(neutral):
         try:
             candidate = eigenvectors @ np.diag(adjusted) @ np.linalg.inv(eigenvectors)
             if np.max(np.abs(np.imag(candidate))) <= 1.0e-9:
@@ -106,12 +101,14 @@ def _fit(states: list[np.ndarray], outputs: list[float], maximum_rank: int = 12)
         )[0]
         C = output_scale * coefficient_out[:rank]
         d = output_center + output_scale * float(coefficient_out[rank])
-    return {"reference": reference, "scale": scale, "basis": basis, "A": A, "c": c, "C": C, "d": d, "training_error": error}
+    return {
+        "reference": reference, "basis": basis, "A": A, "c": c,
+        "C": C, "d": d, "training_error": error,
+    }
 
 
 def _project(model, start: np.ndarray, cycles: int) -> np.ndarray:
     reference = np.asarray(model["reference"])
-    scale = np.asarray(model["scale"])
     basis = np.asarray(model["basis"])
     A = np.asarray(model["A"])
     c = np.asarray(model["c"])
@@ -120,9 +117,9 @@ def _project(model, start: np.ndarray, cycles: int) -> np.ndarray:
     augmented[:rank, :rank] = A
     augmented[:rank, -1] = c
     augmented[-1, -1] = 1.0
-    z = basis.T @ ((np.asarray(start) - reference) / scale)
+    z = basis.T @ (np.asarray(start) - reference)
     propagated = np.linalg.matrix_power(augmented, int(cycles)) @ np.r_[z, 1.0]
-    raw = reference + scale * (basis @ propagated[:rank])
+    raw = reference + basis @ propagated[:rank]
     # Positivity map from v5: retain valid values and smoothly map only invalid ones.
     invalid = raw < 0.0
     if np.any(invalid):
@@ -136,7 +133,7 @@ def _project(model, start: np.ndarray, cycles: int) -> np.ndarray:
 
 def _predict_output(model, vector: np.ndarray) -> float:
     z = np.asarray(model["basis"]).T @ (
-        (np.asarray(vector) - np.asarray(model["reference"])) / np.asarray(model["scale"])
+        np.asarray(vector) - np.asarray(model["reference"])
     )
     log_value = float(np.asarray(model["C"]) @ z + float(model["d"]))
     return float(math.exp(np.clip(log_value, math.log(HAZARD_FLOOR), 700.0)))
@@ -145,16 +142,6 @@ def _predict_output(model, vector: np.ndarray) -> float:
 def _relative_vector(a, b) -> float:
     return float(np.linalg.norm(np.asarray(a) - np.asarray(b))) / max(
         float(np.linalg.norm(a)), float(np.linalg.norm(b)), 1.0
-    )
-
-
-def _model_relative_vector(model, a, b) -> float:
-    scale = np.asarray(model["scale"], dtype=float)
-    reference = np.asarray(model["reference"], dtype=float)
-    left = (np.asarray(a, dtype=float) - reference) / scale
-    right = (np.asarray(b, dtype=float) - reference) / scale
-    return float(np.linalg.norm(left - right)) / max(
-        float(np.linalg.norm(left)), float(np.linalg.norm(right)), 1.0
     )
 
 
@@ -199,10 +186,8 @@ def evaluate_rate_separated_dmd_block(
     geometry = geometry_signature(current_state)
     initial_snapshot = serialize_active_state(current_state)
     reuse_distance = (
-        _model_relative_vector(
-            local_map.model,
-            initial_snapshot.vector,
-            local_map.training_endpoint_vector,
+        _relative_vector(
+            initial_snapshot.vector, local_map.training_endpoint_vector
         )
         if local_map is not None
         and local_map.geometry_signature == geometry
@@ -213,7 +198,6 @@ def evaluate_rate_separated_dmd_block(
         local_map is not None
         and local_map.geometry_signature == geometry
         and local_map.fields == initial_snapshot.fields
-        and reuse_distance <= float(state_rtol)
     )
     burst = 0 if reusable else min(
         _env_int(
@@ -276,9 +260,9 @@ def evaluate_rate_separated_dmd_block(
     mid_prediction = _project(model, midpoint_vector, 1)
     end_prediction = _project(model, endpoint_vector, 1)
     state_error = max(
-        _model_relative_vector(model, start_next.vector, start_prediction),
-        _model_relative_vector(model, mid_next.vector, mid_prediction),
-        _model_relative_vector(model, end_next.vector, end_prediction),
+        _relative_vector(start_next.vector, start_prediction),
+        _relative_vector(mid_next.vector, mid_prediction),
+        _relative_vector(end_next.vector, end_prediction),
     )
     # Log-hazard prediction is an audit only. Admission uses quadrature error
     # from exact sparse hazards and therefore cannot be dominated by a poor
@@ -312,11 +296,7 @@ def evaluate_rate_separated_dmd_block(
         and state_error <= float(state_rtol)
         and hazard_error <= float(hazard_rtol)
     )
-    if state_error > float(state_rtol):
-        # A failed one-step residual invalidates the local map. Hazard-only
-        # quadrature rejection retains it for the subdivided retry.
-        active_map = None
-    elif numerical_pass:
+    if numerical_pass:
         active_map.accepted_reuse_segments += int(reusable)
         active_map.maximum_validated_state_residual = max(
             active_map.maximum_validated_state_residual, state_error

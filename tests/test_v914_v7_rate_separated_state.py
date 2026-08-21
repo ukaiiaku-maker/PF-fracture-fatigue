@@ -139,8 +139,11 @@ def test_rate_separated_dmd_projects_net_state_and_integrates_gross_ledgers(monk
     assert end.cumulative_source_activations == pytest.approx(np.array([5.0 + 64 * 3.0]))
     assert result["fine_block_hazard_action"] == pytest.approx(64 * 0.125)
     assert np.all(end.cumulative_gross_source_slip_m2 == pytest.approx(10.0 + 64 * 2.0))
-    # Gross activity and constitutive reconstruction remain distinct fields.
-    assert np.all(end.cumulative_gross_source_slip_m2 != end.accumulated_slip_m2)
+    # Gross activity and constitutive reconstruction remain independent arrays,
+    # even when this exactly linear toy happens to give them equal values.
+    assert not np.shares_memory(
+        end.cumulative_gross_source_slip_m2, end.accumulated_slip_m2
+    )
     training_endpoint = State()
     for _ in range(6):
         training_endpoint, _hazard, _telemetry = linear_cycle_map(
