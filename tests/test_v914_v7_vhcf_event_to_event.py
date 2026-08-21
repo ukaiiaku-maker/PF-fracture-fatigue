@@ -19,7 +19,10 @@ from v914_v7_event_localizer import (
     advance_v7_phase_span,
     localize_v7_action_in_phase_span,
 )
-from v914_v7_vhcf_event_engine import VHCFRunControls
+from v914_v7_vhcf_event_engine import (
+    VHCFRunControls,
+    _minimum_dmd_candidate_stride,
+)
 
 
 class _Loading:
@@ -113,3 +116,10 @@ def test_block_controls_accept_power_of_two_beyond_1e14_horizon():
     )
     controls.validate()
     assert controls.maximum_block_stride > 10**14
+
+
+def test_validated_dmd_map_may_subdivide_below_training_stride():
+    block = AdaptiveBlockControls(initial_block_stride=32)
+    run = VHCFRunControls(event_guard_stride=4)
+    assert _minimum_dmd_candidate_stride(None, block, run) == 32
+    assert _minimum_dmd_candidate_stride(object(), block, run) == 4

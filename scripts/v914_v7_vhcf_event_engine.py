@@ -46,7 +46,7 @@ from v914_v7_event_localizer import (
 )
 
 
-ENGINE_ID = "v9.14_v7_vhcf_event_to_event_rate_separated_dmd_v4"
+ENGINE_ID = "v9.14_v7_vhcf_event_to_event_rate_separated_dmd_v5"
 CHECKPOINT_SCHEMA = "v914_v7_vhcf_event_to_event_checkpoint_v1"
 
 
@@ -157,6 +157,17 @@ def _largest_power_of_two_at_most(value: int) -> int:
     if n < 1:
         return 0
     return 1 << (n.bit_length() - 1)
+
+
+def _minimum_dmd_candidate_stride(
+    local_map, block_controls: AdaptiveBlockControls, run_controls: VHCFRunControls
+) -> int:
+    """Allow a validated map to subdivide below its training-burst stride."""
+    return int(
+        run_controls.event_guard_stride
+        if local_map is not None
+        else block_controls.initial_block_stride
+    )
 
 
 def _heartbeat(
@@ -558,7 +569,10 @@ def run_v7_vhcf_event_to_event(
             continue
 
         remaining = horizon - cycle
-        if remaining < int(block_controls.initial_block_stride):
+        minimum_candidate_stride = _minimum_dmd_candidate_stride(
+            dmd_local_map, block_controls, run_controls
+        )
+        if remaining < minimum_candidate_stride:
             promoted = False
             readiness_streak = 0
             continue
@@ -577,7 +591,7 @@ def run_v7_vhcf_event_to_event(
             int(block_controls.maximum_block_stride),
             _largest_power_of_two_at_most(remaining),
         )
-        if candidate_stride < int(block_controls.initial_block_stride):
+        if candidate_stride < minimum_candidate_stride:
             promoted = False
             readiness_streak = 0
             continue
@@ -649,10 +663,10 @@ def run_v7_vhcf_event_to_event(
 
         if not numerical_pass:
             rejected_blocks += 1
-            if candidate_stride > int(block_controls.initial_block_stride):
+            if candidate_stride > minimum_candidate_stride:
                 dmd_local_map = proposed_map
                 stride = max(
-                    int(block_controls.initial_block_stride), candidate_stride // 2
+                    minimum_candidate_stride, candidate_stride // 2
                 )
                 continue
             if proposed_map is not None or dmd_local_map is not None:
