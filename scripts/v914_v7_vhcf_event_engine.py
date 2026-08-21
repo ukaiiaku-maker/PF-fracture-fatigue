@@ -641,6 +641,11 @@ def run_v7_vhcf_event_to_event(
                 "end_cycle": int(cycle + candidate_stride),
                 "block_stride": int(candidate_stride),
                 "numerical_pass": numerical_pass,
+                "failure_reason": trial.get("failure_reason"),
+                "projection_probe_location": trial.get(
+                    "projection_probe_location"
+                ),
+                "projection_probe_error": trial.get("projection_probe_error"),
                 "threshold_crossed": threshold_crossed,
                 "event_guard_refinement": event_guard_refinement,
                 "state_error": state_err,

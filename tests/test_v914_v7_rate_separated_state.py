@@ -26,6 +26,7 @@ from v914_v7_rate_separated_dmd import (
     MINIMUM_FULL_TRAINING_STRIDE,
     evaluate_rate_separated_dmd_block,
 )
+from v914_v7_cycle_map import AdaptiveCycleRefinementError
 
 
 class State:
@@ -158,3 +159,40 @@ def test_rate_separated_dmd_projects_net_state_and_integrates_gross_ledgers(monk
     assert reused["local_map_reused"] is True
     assert reused["cycle_map_evaluations"] == 3
     assert reused["log_hazard_output_relative_error"] < 1.0e-12
+
+
+def test_projected_cycle_refinement_failure_rejects_block(monkeypatch):
+    monkeypatch.setenv("V914_V7_DMD_BURST_CYCLES", "6")
+    calls = 0
+
+    def projected_probe_failure(state, loading, controls):
+        nonlocal calls
+        calls += 1
+        if calls == 8:
+            raise AdaptiveCycleRefinementError("projected sign-change transient")
+        return linear_cycle_map(state, loading, controls)
+
+    result = evaluate_rate_separated_dmd_block(
+        State(), block_stride=64, loading=Loading(), cycle_controls=None,
+        state_rtol=1.0e-9, hazard_rtol=1.0e-9,
+        cycle_map_fn=projected_probe_failure,
+    )
+    assert result["numerical_pass"] is False
+    assert result["failure_reason"] == "projected_cycle_refinement_failed"
+    assert result["projection_probe_location"] == "midpoint"
+    assert result["cycle_map_evaluations"] == 8
+    assert result["local_map"] is not None
+
+
+def test_exact_training_cycle_refinement_failure_remains_fatal(monkeypatch):
+    monkeypatch.setenv("V914_V7_DMD_BURST_CYCLES", "6")
+
+    def exact_failure(state, loading, controls):
+        raise AdaptiveCycleRefinementError("accepted exact state failed")
+
+    with pytest.raises(AdaptiveCycleRefinementError, match="accepted exact state"):
+        evaluate_rate_separated_dmd_block(
+            State(), block_stride=64, loading=Loading(), cycle_controls=None,
+            state_rtol=1.0e-9, hazard_rtol=1.0e-9,
+            cycle_map_fn=exact_failure,
+        )

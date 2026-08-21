@@ -15,7 +15,7 @@ from typing import Any
 
 import numpy as np
 
-from v914_v7_cycle_map import advance_v7_cycle
+from v914_v7_cycle_map import AdaptiveCycleRefinementError, advance_v7_cycle
 from v914_v7_rate_separated_state import (
     MONOTONE_LEDGER_FIELDS,
     apply_ledger_delta,
@@ -252,10 +252,50 @@ def evaluate_rate_separated_dmd_block(
     restore_active_state(midpoint_state, snapshots[-1], midpoint_vector)
     restore_active_state(endpoint_state, snapshots[-1], endpoint_vector)
 
-    start_end, start_hazard, _st, start_next, start_rate = independent_cycle(exact_state, loading, cycle_controls, cycle_map_fn)
-    mid_end, mid_hazard, _mt, mid_next, mid_rate = independent_cycle(midpoint_state, loading, cycle_controls, cycle_map_fn)
-    end_end, end_hazard, _et, end_next, end_rate = independent_cycle(endpoint_state, loading, cycle_controls, cycle_map_fn)
-    evaluations += 3
+    start_end, start_hazard, _st, start_next, start_rate = independent_cycle(
+        exact_state, loading, cycle_controls, cycle_map_fn
+    )
+    evaluations += 1
+
+    def rejected_probe(location: str, exc: Exception) -> dict[str, Any]:
+        # A projected midpoint/endpoint is speculative.  If its independent
+        # exact-cycle validation cannot meet the cycle-map tolerance, reject
+        # and contract this DMD block.  Failures on the accepted exact state or
+        # during the exact training burst deliberately remain fatal.
+        return {
+            "numerical_pass": False,
+            "failure_reason": "projected_cycle_refinement_failed",
+            "projection_probe_location": str(location),
+            "projection_probe_error": str(exc),
+            "block_stride": stride,
+            "fine_block_hazard_action": 0.0,
+            "sampled_envelope_block_hazard_action": 0.0,
+            "endpoint_state_error": {"maximum_relative_error": math.inf},
+            "block_hazard_relative_error": math.inf,
+            "log_hazard_output_relative_error": math.inf,
+            "maximum_projection_constraint_correction": 0.0,
+            "cycle_map_evaluations": evaluations,
+            "local_map": active_map,
+            "local_map_reused": reusable,
+            "local_map_reuse_distance": float(reuse_distance),
+            "local_map_refresh_index": active_map.refresh_index,
+            "model_id": MODEL_ID,
+        }
+
+    try:
+        evaluations += 1
+        mid_end, mid_hazard, _mt, mid_next, mid_rate = independent_cycle(
+            midpoint_state, loading, cycle_controls, cycle_map_fn
+        )
+    except AdaptiveCycleRefinementError as exc:
+        return rejected_probe("midpoint", exc)
+    try:
+        evaluations += 1
+        end_end, end_hazard, _et, end_next, end_rate = independent_cycle(
+            endpoint_state, loading, cycle_controls, cycle_map_fn
+        )
+    except AdaptiveCycleRefinementError as exc:
+        return rejected_probe("endpoint", exc)
     start_prediction = _project(model, start_vector, 1)
     mid_prediction = _project(model, midpoint_vector, 1)
     end_prediction = _project(model, endpoint_vector, 1)

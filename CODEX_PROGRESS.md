@@ -71,3 +71,24 @@
   `artifacts/v914_calibrated_v7_transport_extension/fresh_irrev_rev_restart_decision.json`.
 - Campaign continuation began with a fresh adaptive midpoint at
   `DeltaK=16.1962435 MPa sqrt(m)`.
+
+## 2026-08-21 negative-R production blocker
+
+- Three fresh `R=-0.5`, 1000 Hz REV bracket trajectories reached the 100 um
+  target: DeltaK 25.405871, 26.464500, and 27.258384 MPa sqrt(m) completed at
+  105455, 136944, and 60088 cycles, respectively, each with 15 events and
+  102.284 um terminal extension.
+- All three fresh `R=-0.95`, 1000 Hz REV bracket trajectories failed closed in
+  the same place: an independently resolved exact-cycle validation of a
+  speculative DMD midpoint projection encountered a sharp transport sign-change
+  transient at the maximum adaptive refinement depth. The last accepted live
+  checkpoints remain diagnostic-only; none will be resumed or credited.
+- Numerical repair: exact accepted-state/training failures remain fatal, while
+  the typed refinement failure from a speculative midpoint/endpoint projection
+  now rejects and contracts that DMD block. This changes numerical accelerator
+  control flow and diagnostics only; constitutive and fracture physics are
+  unchanged.
+- Regression and focused v9.14 gate: 110 tests passed. Python syntax and
+  `git diff --check` pass. Corrected R=-0.95 production must be rerun fresh.
+- The fresh R=+0.1 adaptive midpoint ended `work_budget_exhausted` at 41,203,461
+  cycles, 5 events, and 16.0365 um; it is not a completed campaign point.

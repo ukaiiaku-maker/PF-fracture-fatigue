@@ -30,6 +30,10 @@ from v914_reverse_drive_utils import tensile_reference_signs
 CYCLE_MAP_ID = "v9.14_v7_intrinsic_reverse_glide_adaptive_cycle_map_v1"
 
 
+class AdaptiveCycleRefinementError(RuntimeError):
+    """The exact cycle map could not satisfy its error contract."""
+
+
 def intrinsic_phase_sample(state, loading, phase: float, depth: int) -> dict[str, float]:
     """Generic adaptive sample plus local applied/GND/effective shear split."""
     sample = dict(phase_sample(state, loading, phase, depth))
@@ -148,7 +152,7 @@ def _adaptive_cycle_with_sampler(
             return fine, fine_hazard
 
         if depth >= controls.max_refinement_depth:
-            raise RuntimeError(
+            raise AdaptiveCycleRefinementError(
                 "v7 adaptive cycle refinement failed closed at "
                 f"phase=[{p0:.16g},{p1:.16g}], depth={depth}, error={error}"
             )
@@ -226,6 +230,7 @@ def minimum_shear_sample(samples: list[dict[str, float]]) -> dict[str, float]:
 
 
 __all__ = [
+    "AdaptiveCycleRefinementError",
     "CYCLE_MAP_ID",
     "advance_v7_cycle",
     "cycle_endpoint_summary",
