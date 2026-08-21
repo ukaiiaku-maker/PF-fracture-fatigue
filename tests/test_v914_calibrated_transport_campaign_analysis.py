@@ -21,6 +21,7 @@ from analyze_v914_calibrated_transport_campaign import (  # noqa: E402
     summarize_result,
     trend_rows,
     write_plots,
+    write_required_figures,
 )
 
 
@@ -109,6 +110,9 @@ def test_fit_and_plot_use_only_completed_developed_points(tmp_path):
     output = tmp_path / "plot.png"
     write_plots(rows, output)
     assert output.is_file() and output.stat().st_size > 0
+    write_required_figures(rows, local_slope_rows(rows), knee_rows(rows), tmp_path)
+    for index in range(1, 7):
+        assert list(tmp_path.glob(f"figure_{index}_*.png"))
 
 
 def test_restart_result_is_excluded_and_event_diagnostics_are_resolved(tmp_path):

@@ -451,6 +451,90 @@ def write_trend_plots(rows: list[dict[str, Any]], path: Path) -> None:
     plt.close(figure)
 
 
+def write_required_figures(
+    rows: list[dict[str, Any]], local_slopes: list[dict[str, Any]],
+    knees: list[dict[str, Any]], out: Path,
+) -> None:
+    """Write the six campaign figures named by the scientific contract."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    usable = [row for row in rows if row["campaign_disposition"] != "unsupported_restart_result"]
+    completed = [
+        row for row in usable
+        if row["campaign_disposition"] == "completed_growth_target"
+        and math.isfinite(float(row["developed_da_dN_m_per_cycle"]))
+        and float(row["developed_da_dN_m_per_cycle"]) > 0.0
+    ]
+    censored = [row for row in usable if row["campaign_disposition"] == "physical_cycle_censor"]
+
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), constrained_layout=True)
+    positive = sorted((row for row in completed if math.isclose(float(row["R"]), 0.1)), key=lambda row: float(row["deltaK_MPa_sqrt_m"]))
+    if positive:
+        axes[0].loglog([row["deltaK_MPa_sqrt_m"] for row in positive], [row["developed_da_dN_m_per_cycle"] for row in positive], "o-")
+    positive_censors = [row for row in censored if math.isclose(float(row["R"]), 0.1)]
+    if positive_censors:
+        axes[0].loglog([row["deltaK_MPa_sqrt_m"] for row in positive_censors], [row["total_da_dN_m_per_cycle"] for row in positive_censors], "v", markerfacecolor="none", label="1e12-cycle censor")
+    positive_slopes = sorted((row for row in local_slopes if math.isclose(float(row["R"]), 0.1)), key=lambda row: float(row["deltaK_geometric_midpoint"]))
+    if positive_slopes:
+        axes[1].plot([row["deltaK_geometric_midpoint"] for row in positive_slopes], [row["local_paris_m"] for row in positive_slopes], "o-")
+    axes[0].set(xlabel=r"$\Delta K$ (MPa $\sqrt{m}$)", ylabel=r"developed $da/dN$ (m/cycle)")
+    axes[1].set(xlabel=r"$\Delta K$ midpoint (MPa $\sqrt{m}$)", ylabel="adjacent local slope")
+    for axis in axes: axis.grid(True, which="both", alpha=0.25)
+    fig.savefig(out / "figure_1_R0p1_paris_and_local_slope.png", dpi=180); plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(6.5, 4.8), constrained_layout=True)
+    for R in sorted({float(row["R"]) for row in usable}):
+        values = sorted((row for row in completed if math.isclose(float(row["R"]), R)), key=lambda row: float(row["deltaK_MPa_sqrt_m"]))
+        if values: ax.loglog([row["deltaK_MPa_sqrt_m"] for row in values], [row["developed_da_dN_m_per_cycle"] for row in values], "o-", label=f"R={R:g}")
+        marks = [row for row in censored if math.isclose(float(row["R"]), R)]
+        if marks: ax.loglog([row["deltaK_MPa_sqrt_m"] for row in marks], [row["total_da_dN_m_per_cycle"] for row in marks], "v", markerfacecolor="none")
+    ax.set(xlabel=r"$\Delta K$ (MPa $\sqrt{m}$)", ylabel=r"developed $da/dN$ (m/cycle)"); ax.grid(True, which="both", alpha=0.25)
+    if ax.lines: ax.legend()
+    fig.savefig(out / "figure_2_R_dependence_paris_curves.png", dpi=180); plt.close(fig)
+
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.3), constrained_layout=True)
+    if knees:
+        ordered = sorted(knees, key=lambda row: float(row["R"]))
+        R_values = [float(row["R"]) for row in ordered]
+        delta_k = [float(row["deltaK_knee_geometric_midpoint"]) for row in ordered]
+        axes[0].plot(R_values, delta_k, "o-")
+        axes[1].plot(R_values, [value / (1.0 - R) for value, R in zip(delta_k, R_values)], "o-")
+    axes[0].set(xlabel="R", ylabel=r"$\Delta K_{knee}$ (MPa $\sqrt{m}$)")
+    axes[1].set(xlabel="R", ylabel=r"$K_{max,knee}$ (MPa $\sqrt{m}$)")
+    for axis in axes: axis.grid(True, alpha=0.25)
+    fig.savefig(out / "figure_3_knee_shift_with_R.png", dpi=180); plt.close(fig)
+
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.2), constrained_layout=True)
+    for R in sorted({float(row["R"]) for row in usable}):
+        values = sorted((row for row in usable if math.isclose(float(row["R"]), R)), key=lambda row: float(row["Kmax_MPa_sqrt_m"]))
+        if not values: continue
+        x = [row["Kmax_MPa_sqrt_m"] for row in values]
+        axes[0].plot(x, [row["physical_return_fraction"] for row in values], "o-", label=f"R={R:g}")
+        axes[1].plot(x, [row["tip_radius_m"] for row in values], "o-")
+        axes[2].plot(x, [row["Kshield_MPa_sqrt_m"] for row in values], "o-")
+    axes[0].set(ylabel="physical return fraction"); axes[1].set(ylabel="tip radius (m)"); axes[2].set(ylabel=r"$K_{shield}$ (MPa $\sqrt{m}$)")
+    for axis in axes: axis.set_xlabel(r"$K_{max}$ (MPa $\sqrt{m}$)"); axis.grid(True, alpha=0.25)
+    if axes[0].lines: axes[0].legend()
+    fig.savefig(out / "figure_4_return_blunting_shielding.png", dpi=180); plt.close(fig)
+
+    for field, name, ylabel in (
+        ("developed_da_dN_m_per_cycle", "figure_5_frequency_da_dN.png", r"developed $da/dN$ (m/cycle)"),
+        ("developed_da_dt_m_per_s", "figure_6_frequency_da_dt.png", r"developed $da/dt$ (m/s)"),
+    ):
+        fig, ax = plt.subplots(figsize=(6.5, 4.8), constrained_layout=True)
+        groups: dict[tuple[float, float], list[dict[str, Any]]] = {}
+        for row in completed: groups.setdefault((float(row["R"]), round(float(row["deltaK_MPa_sqrt_m"]), 6)), []).append(row)
+        for key, values in sorted(groups.items()):
+            values.sort(key=lambda row: float(row["frequency_Hz"]))
+            if len(values) > 1: ax.loglog([row["frequency_Hz"] for row in values], [row[field] for row in values], "o-", label=f"R={key[0]:g}, dK={key[1]:g}")
+        ax.set(xlabel="frequency (Hz)", ylabel=ylabel); ax.grid(True, which="both", alpha=0.25)
+        if ax.lines: ax.legend(fontsize=7)
+        fig.savefig(out / name, dpi=180); plt.close(fig)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--roots", type=Path, nargs="+", required=True)
@@ -485,6 +569,7 @@ def main() -> int:
     _write_csv(args.out / "frequency_dependence.csv", frequency_trends)
     write_plots(rows, args.out / "paris_response.png")
     write_trend_plots(rows, args.out / "R_frequency_trends.png")
+    write_required_figures(rows, local_slopes, knees, args.out)
     (args.out / "campaign_analysis.json").write_text(json.dumps({
         "schema": SCHEMA,
         "developed_start_um": args.developed_start_um,
