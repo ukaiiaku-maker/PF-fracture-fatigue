@@ -12,7 +12,7 @@ from typing import Any
 import numpy as np
 
 
-SCHEMA = "v914_calibrated_transport_campaign_analysis_v1"
+SCHEMA = "v914_calibrated_transport_campaign_analysis_v2"
 ACCEPTED_TERMINAL_STATUSES = {"growth_target_reached", "cycle_horizon_reached"}
 
 
@@ -65,7 +65,10 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
     delta_k = float(contract.get("deltaK_MPa_sqrt_m", result.get("identity_contract", {}).get("loading", {}).get("deltaK_MPa_sqrt_m", math.nan)))
     R = float(contract.get("R", result.get("identity_contract", {}).get("loading", {}).get("R", math.nan)))
     status = result.get("status")
-    if status not in ACCEPTED_TERMINAL_STATUSES:
+    restart_count = int(result.get("restart_count", 0))
+    if restart_count > 0:
+        disposition = "unsupported_restart_result"
+    elif status not in ACCEPTED_TERMINAL_STATUSES:
         disposition = "incomplete_or_rejected"
     elif status == "cycle_horizon_reached":
         disposition = "physical_cycle_censor"
@@ -87,6 +90,8 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
         "campaign_disposition": disposition,
         "censored": status == "cycle_horizon_reached",
         "accepted_terminal_result": status in ACCEPTED_TERMINAL_STATUSES,
+        "restart_count": restart_count,
+        "fresh_uninterrupted": restart_count == 0,
         "physical_cycles_integer_boundary": int(result.get("completed_physical_cycles", 0)),
         "final_event_cycle": final_event_cycle,
         "event_count": len(events),
@@ -117,6 +122,138 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
         "gross_source_slip_line_content": float(final_gross.get("gross_source_slip_line_content", math.nan)),
         "gross_returned_slip_line_content": float(final_gross.get("gross_returned_slip_line_content", math.nan)),
     }
+
+
+def event_rate_rows(result_path: Path, developed_start_m: float = 20.0e-6) -> list[dict[str, Any]]:
+    """Return event-resolved projected/path rates from one audited result."""
+    summary = summarize_result(result_path, developed_start_m)
+    result = json.loads(result_path.read_text())
+    events = sorted(result.get("events", []), key=lambda row: float(row["cumulative_cycles"]))
+    rows = []
+    previous_cycles = 0.0
+    previous_extension = 0.0
+    previous_path = 0.0
+    for event in events:
+        cycles = float(event["cumulative_cycles"])
+        extension = float(event["cumulative_extension_m"])
+        projected_increment = extension - previous_extension
+        path_increment = float(event.get(
+            "committed_path_advance_m", event.get("committed_advance_m", projected_increment)
+        ))
+        path = previous_path + path_increment
+        interval = cycles - previous_cycles
+        rows.append({
+            "result_path": summary["result_path"],
+            "configuration_label": summary["configuration_label"],
+            "return_control": summary["return_control"],
+            "deltaK_MPa_sqrt_m": summary["deltaK_MPa_sqrt_m"],
+            "Kmax_MPa_sqrt_m": summary["Kmax_MPa_sqrt_m"],
+            "R": summary["R"], "frequency_Hz": summary["frequency_Hz"],
+            "seed": summary["seed"], "event_index": int(event.get("event_index", len(rows))),
+            "cumulative_cycles": cycles, "interval_cycles": interval,
+            "cumulative_extension_m": extension, "cumulative_path_m": path,
+            "projected_increment_m": projected_increment, "path_increment_m": path_increment,
+            "event_da_dN_m_per_cycle": projected_increment / interval if interval > 0.0 else math.nan,
+            "event_ds_dN_m_per_cycle": path_increment / interval if interval > 0.0 else math.nan,
+            "tortuosity": path_increment / projected_increment if projected_increment > 0.0 else math.nan,
+            "developed_event": previous_extension >= developed_start_m,
+            "physical_hazard_action": float(event.get("physical_hazard_action", math.nan)),
+            "threshold_action": float(event.get("threshold_action", math.nan)),
+        })
+        previous_cycles, previous_extension, previous_path = cycles, extension, path
+    return rows
+
+
+def moving_window_rows(event_rows: list[dict[str, Any]], window_m: float = 20.0e-6) -> list[dict[str, Any]]:
+    """Compute trailing event-aligned windows spanning at least ``window_m``."""
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for row in event_rows:
+        groups.setdefault(str(row["result_path"]), []).append(row)
+    output = []
+    for values in groups.values():
+        values.sort(key=lambda row: float(row["cumulative_cycles"]))
+        for right_index, right in enumerate(values):
+            left_index = right_index - 1
+            while left_index >= 0 and (
+                float(right["cumulative_extension_m"])
+                - float(values[left_index]["cumulative_extension_m"]) < window_m
+            ):
+                left_index -= 1
+            if left_index < 0:
+                continue
+            left = values[left_index]
+            cycles = float(right["cumulative_cycles"]) - float(left["cumulative_cycles"])
+            da = float(right["cumulative_extension_m"]) - float(left["cumulative_extension_m"])
+            ds = float(right["cumulative_path_m"]) - float(left["cumulative_path_m"])
+            if cycles <= 0.0 or da <= 0.0:
+                continue
+            output.append({
+                **{key: right[key] for key in (
+                    "result_path", "configuration_label", "return_control",
+                    "deltaK_MPa_sqrt_m", "Kmax_MPa_sqrt_m", "R", "frequency_Hz", "seed",
+                )},
+                "left_event_index": left["event_index"], "right_event_index": right["event_index"],
+                "window_cycles": cycles, "window_extension_m": da, "window_path_m": ds,
+                "window_da_dN_m_per_cycle": da / cycles,
+                "window_ds_dN_m_per_cycle": ds / cycles,
+                "window_tortuosity": ds / da,
+            })
+    return output
+
+
+def local_slope_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for row in rows:
+        rate = float(row["developed_da_dN_m_per_cycle"])
+        if row["campaign_disposition"] == "completed_growth_target" and math.isfinite(rate) and rate > 0.0:
+            key = (row["configuration_label"], row["return_control"], row["R"], row["frequency_Hz"], row["seed"])
+            groups.setdefault(key, []).append(row)
+    output = []
+    for key, values in groups.items():
+        values.sort(key=lambda row: float(row["deltaK_MPa_sqrt_m"]))
+        for left, right in zip(values, values[1:]):
+            k0, k1 = float(left["deltaK_MPa_sqrt_m"]), float(right["deltaK_MPa_sqrt_m"])
+            r0, r1 = float(left["developed_da_dN_m_per_cycle"]), float(right["developed_da_dN_m_per_cycle"])
+            output.append({
+                "configuration_label": key[0], "return_control": key[1], "R": key[2],
+                "frequency_Hz": key[3], "seed": key[4], "deltaK_left": k0, "deltaK_right": k1,
+                "deltaK_geometric_midpoint": math.sqrt(k0 * k1),
+                "local_paris_m": math.log(r1 / r0) / math.log(k1 / k0),
+                "rate_left_m_per_cycle": r0, "rate_right_m_per_cycle": r1,
+            })
+    return output
+
+
+def trend_rows(rows: list[dict[str, Any]], variable: str) -> list[dict[str, Any]]:
+    """Return adjacent R ratios or frequency power exponents at matched loads."""
+    if variable not in {"R", "frequency_Hz"}:
+        raise ValueError(variable)
+    fixed = "frequency_Hz" if variable == "R" else "R"
+    groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for row in rows:
+        rate = float(row["developed_da_dN_m_per_cycle"])
+        if row["campaign_disposition"] != "completed_growth_target" or not math.isfinite(rate) or rate <= 0.0:
+            continue
+        load = float(row["Kmax_MPa_sqrt_m"] if variable == "R" else row["deltaK_MPa_sqrt_m"])
+        key = (row["return_control"], row["seed"], float(row[fixed]), round(load, 6))
+        groups.setdefault(key, []).append(row)
+    output = []
+    for key, values in groups.items():
+        values.sort(key=lambda row: float(row[variable]))
+        for left, right in zip(values, values[1:]):
+            x0, x1 = float(left[variable]), float(right[variable])
+            rate0 = float(left["developed_da_dN_m_per_cycle"])
+            rate1 = float(right["developed_da_dN_m_per_cycle"])
+            record = {
+                "return_control": key[0], "seed": key[1], fixed: key[2],
+                "matched_load_MPa_sqrt_m": key[3], f"{variable}_left": x0,
+                f"{variable}_right": x1, "rate_left_m_per_cycle": rate0,
+                "rate_right_m_per_cycle": rate1, "rate_ratio_right_over_left": rate1 / rate0,
+            }
+            if variable == "frequency_Hz" and x0 > 0.0 and x1 > 0.0:
+                record["frequency_exponent_per_cycle"] = math.log(rate1 / rate0) / math.log(x1 / x0)
+            output.append(record)
+    return output
 
 
 def fit_groups(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -225,6 +362,48 @@ def write_plots(rows: list[dict[str, Any]], path: Path) -> None:
     plt.close(figure)
 
 
+def write_trend_plots(rows: list[dict[str, Any]], path: Path) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    figure, axes = plt.subplots(1, 2, figsize=(11.0, 4.5), constrained_layout=True)
+    accepted = [
+        row for row in rows
+        if row["campaign_disposition"] == "completed_growth_target"
+        and math.isfinite(float(row["developed_da_dN_m_per_cycle"]))
+        and float(row["developed_da_dN_m_per_cycle"]) > 0.0
+    ]
+    r_groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    f_groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for row in accepted:
+        r_groups.setdefault((row["return_control"], row["frequency_Hz"], row["seed"]), []).append(row)
+        f_groups.setdefault((row["return_control"], row["R"], row["seed"]), []).append(row)
+    for key, values in sorted(r_groups.items(), key=lambda item: str(item[0])):
+        values.sort(key=lambda row: (float(row["R"]), float(row["Kmax_MPa_sqrt_m"])))
+        axes[0].semilogy(
+            [float(row["R"]) for row in values],
+            [float(row["developed_da_dN_m_per_cycle"]) for row in values],
+            "o-", label=f"{key[0]}, {key[1]:g} Hz",
+        )
+    for key, values in sorted(f_groups.items(), key=lambda item: str(item[0])):
+        values.sort(key=lambda row: (float(row["frequency_Hz"]), float(row["deltaK_MPa_sqrt_m"])))
+        axes[1].loglog(
+            [float(row["frequency_Hz"]) for row in values],
+            [float(row["developed_da_dN_m_per_cycle"]) for row in values],
+            "o-", label=f"{key[0]}, R={key[1]:g}",
+        )
+    axes[0].set(xlabel="load ratio R", ylabel=r"developed $da/dN$ (m/cycle)")
+    axes[1].set(xlabel="frequency (Hz)", ylabel=r"developed $da/dN$ (m/cycle)")
+    for axis in axes:
+        axis.grid(True, which="both", alpha=0.25)
+        if axis.lines:
+            axis.legend(fontsize=7)
+    figure.savefig(path, dpi=180)
+    plt.close(figure)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--roots", type=Path, nargs="+", required=True)
@@ -234,17 +413,49 @@ def main() -> int:
     paths = sorted({path for root in args.roots for path in root.rglob("result.json")})
     rows = [summarize_result(path, args.developed_start_um * 1.0e-6) for path in paths]
     fits = fit_groups(rows)
+    events = [
+        row for path in paths
+        for row in event_rate_rows(path, args.developed_start_um * 1.0e-6)
+    ]
+    windows = moving_window_rows(events)
+    local_slopes = local_slope_rows(rows)
+    r_trends = trend_rows(rows, "R")
+    frequency_trends = trend_rows(rows, "frequency_Hz")
     args.out.mkdir(parents=True, exist_ok=True)
     _write_csv(args.out / "campaign_summary.csv", rows)
     _write_csv(args.out / "paris_fits.csv", fits)
+    _write_csv(args.out / "event_rates.csv", events)
+    _write_csv(args.out / "moving_window_rates.csv", windows)
+    _write_csv(args.out / "local_paris_slopes.csv", local_slopes)
+    _write_csv(args.out / "R_trends.csv", r_trends)
+    _write_csv(args.out / "frequency_trends.csv", frequency_trends)
     write_plots(rows, args.out / "paris_response.png")
+    write_trend_plots(rows, args.out / "R_frequency_trends.png")
     (args.out / "campaign_analysis.json").write_text(json.dumps({
         "schema": SCHEMA,
         "developed_start_um": args.developed_start_um,
         "rows": rows,
         "fits": fits,
+        "event_rates": events,
+        "moving_window_rates": windows,
+        "local_slopes": local_slopes,
+        "R_trends": r_trends,
+        "frequency_trends": frequency_trends,
     }, indent=2, sort_keys=True, allow_nan=True) + "\n")
-    print(f"summarized {len(rows)} complete result files; {len(fits)} output fits")
+    (args.out / "CAMPAIGN_REPORT.md").write_text(
+        "# Calibrated transport fatigue campaign\n\n"
+        f"- Audited result files: {len(rows)}\n"
+        f"- Fresh completed growth trajectories: {sum(row['campaign_disposition'] == 'completed_growth_target' for row in rows)}\n"
+        f"- Physical cycle censors: {sum(row['campaign_disposition'] == 'physical_cycle_censor' for row in rows)}\n"
+        f"- Excluded unsupported restart results: {sum(row['campaign_disposition'] == 'unsupported_restart_result' for row in rows)}\n"
+        f"- Event-rate rows: {len(events)}\n"
+        f"- Moving-window rows: {len(windows)}\n"
+        f"- Global output-only Paris fits: {len(fits)}\n"
+        f"- Adjacent local Paris slopes: {len(local_slopes)}\n"
+        f"- Matched R comparisons: {len(r_trends)}\n"
+        f"- Matched frequency comparisons: {len(frequency_trends)}\n"
+    )
+    print(f"summarized {len(rows)} result files; {len(fits)} output fits; {len(events)} events")
     return 0
 
 

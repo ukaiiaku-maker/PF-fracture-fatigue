@@ -51,3 +51,23 @@
   `git diff --check` pass.
 - Full provenance, comparison tables, and artifact paths:
   `V914_V7_RETURN_CONTROL_AUDIT.md`.
+
+## 2026-08-21 fresh R=+0.1 restart decision
+
+- Decisive virgin-state control: `CAL-TRANS-IRREV`,
+  `DeltaK=15.24352267650291 MPa sqrt(m)`, `R=0.1`, `f=1000 Hz`, seed 1720,
+  n=128, qualified v5 rate-separated DMD settings.
+- Fresh IRREV and fresh REV are physically and numerically identical: both
+  reach the `1e12`-cycle censor with 5 events, `16.036529362652427 um`
+  extension, hazard action `0.31648762472927244` against threshold
+  `2.797055987813155`, maximum accepted stride `274877906944`, and 951 map
+  evaluations. Event records, anchor history, final gross activity, and final
+  reversibility records are exactly equal.
+- Decision A: the earlier `restart_count=1` IRREV growth result is invalid for
+  scientific use. Restart/resume is not production-qualified and is treated as
+  operationally unsupported. Restart debugging is deferred; the campaign uses
+  fresh uninterrupted trajectories.
+- Machine-readable decision:
+  `artifacts/v914_calibrated_v7_transport_extension/fresh_irrev_rev_restart_decision.json`.
+- Campaign continuation began with a fresh adaptive midpoint at
+  `DeltaK=16.1962435 MPa sqrt(m)`.

@@ -12,8 +12,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from analyze_v914_calibrated_transport_campaign import (  # noqa: E402
+    event_rate_rows,
     fit_groups,
+    local_slope_rows,
+    moving_window_rows,
     summarize_result,
+    trend_rows,
     write_plots,
 )
 
@@ -103,3 +107,41 @@ def test_fit_and_plot_use_only_completed_developed_points(tmp_path):
     output = tmp_path / "plot.png"
     write_plots(rows, output)
     assert output.is_file() and output.stat().st_size > 0
+
+
+def test_restart_result_is_excluded_and_event_diagnostics_are_resolved(tmp_path):
+    path = _write_result(tmp_path / "restarted", "growth_target_reached", 14.0)
+    payload = json.loads(path.read_text())
+    payload["restart_count"] = 1
+    path.write_text(json.dumps(payload))
+
+    summary = summarize_result(path)
+    assert summary["campaign_disposition"] == "unsupported_restart_result"
+    assert summary["fresh_uninterrupted"] is False
+    assert fit_groups([summary]) == []
+
+    events = event_rate_rows(path)
+    assert len(events) == 2
+    assert events[0]["event_da_dN_m_per_cycle"] == pytest.approx(2.0e-6)
+    assert events[1]["event_da_dN_m_per_cycle"] == pytest.approx(1.0e-6)
+    assert events[1]["tortuosity"] == pytest.approx(1.0)
+    windows = moving_window_rows(events, window_m=50.0e-6)
+    assert len(windows) == 1
+    assert windows[0]["window_da_dN_m_per_cycle"] == pytest.approx(1.0e-6)
+
+
+def test_local_slopes_and_frequency_trends_use_fresh_completed_rows(tmp_path):
+    rows = []
+    for index, (delta_k, frequency) in enumerate(((10.0, 100.0), (12.0, 100.0), (10.0, 1000.0))):
+        row = summarize_result(_write_result(tmp_path / f"case_{index}", "growth_target_reached", delta_k))
+        row["frequency_Hz"] = frequency
+        row["developed_da_dN_m_per_cycle"] = delta_k**2 / frequency
+        rows.append(row)
+
+    slopes = local_slope_rows(rows)
+    assert len(slopes) == 1
+    assert slopes[0]["local_paris_m"] == pytest.approx(2.0)
+    trends = trend_rows(rows, "frequency_Hz")
+    assert len(trends) == 1
+    assert trends[0]["rate_ratio_right_over_left"] == pytest.approx(0.1)
+    assert trends[0]["frequency_exponent_per_cycle"] == pytest.approx(-1.0)

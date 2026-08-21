@@ -1,0 +1,37 @@
+{
+  "schema": "v914_fresh_irrev_rev_restart_decision_v1",
+  "decision": "A",
+  "candidate": "v913_zeroD_sobol_0129902",
+  "deltaK_MPa_sqrt_m": 15.24352267650291,
+  "R": 0.1,
+  "frequency_Hz": 1000.0,
+  "temperature_K": 300.0,
+  "seed": 1720,
+  "n_bins": 128,
+  "physics_sha256": "054abf35061d999772bfdaa3578b9a869d367c7c7d7a137a24fd0f5b8e9da608",
+  "fresh_irrev_result": "runs/v914_decisive_fresh_irrev_R0p1_dK15p243523/result.json",
+  "fresh_rev_result": "runs/v914_calibrated_transport_paris_n128_v5_R0p1_C/dK15p243523/result.json",
+  "invalid_restarted_irrev_result": "runs/v914_calibrated_transport_paris_n128_v5_R0p1_B/dK15p243523/result.json",
+  "fresh_terminal_comparison": {
+    "status": "cycle_horizon_reached",
+    "completed_physical_cycles": 1000000000000,
+    "event_count": 5,
+    "cumulative_extension_m": 1.6036529362652427e-05,
+    "hazard_clock_action": 0.31648762472927244,
+    "hazard_threshold_action": 2.797055987813155,
+    "maximum_accepted_stride": 274877906944,
+    "total_cycle_map_evaluations": 951,
+    "restart_count": 0,
+    "events_exactly_equal": true,
+    "anchor_history_exactly_equal": true,
+    "final_gross_activity_exactly_equal": true,
+    "final_reversibility_exactly_equal": true
+  },
+  "disposition": {
+    "previous_restarted_irrev_point_valid_for_science": false,
+    "restart_resume_production_qualified": false,
+    "restart_resume_operational_status": "unsupported",
+    "restart_debugging_deferred": true,
+    "campaign_runs_must_prefer_fresh_uninterrupted_execution": true
+  }
+}
