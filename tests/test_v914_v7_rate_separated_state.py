@@ -14,6 +14,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from v914_v7_rate_separated_state import (
+    active_readiness_prediction,
     apply_ledger_delta,
     capture_ledgers,
     ledger_delta,
@@ -85,6 +86,30 @@ def test_ledger_delta_is_independent_of_active_state_vector():
     assert np.all(delta["cumulative_gross_source_slip_m2"] == 7.0)
     assert np.all(delta["returned_slip_m2"] == 2.0)
     assert delta["cumulative_source_activations"] == pytest.approx(np.array([4.0]))
+
+
+def test_readiness_ignores_gross_flux_ledgers_but_tracks_net_blunting():
+    states = [State() for _ in range(3)]
+    for index, state in enumerate(states):
+        state.mobile_m2 += index
+        state.retained_m2 += 2.0 * index
+        state.accumulated_slip_m2 += 3.0 * index
+        # Deliberately nonlinear gross return/source ledgers with unchanged net.
+        gross = (0.0, 100.0, 10_000.0)[index]
+        state.returned_slip_m2 += gross
+        state.accumulated_slip_m2 += gross
+        state.cumulative_source_activations += gross
+
+    readiness = active_readiness_prediction(*states)
+    assert readiness["maximum_relative_error"] == pytest.approx(0.0)
+    assert readiness["cumulative_ledgers_in_readiness"] is False
+    assert set(readiness["active_state_relative_norm_error"]) == {
+        "mobile_m2", "retained_m2", "net_slip_m2",
+    }
+
+    states[2].accumulated_slip_m2 += 5.0
+    curved = active_readiness_prediction(*states)
+    assert curved["active_state_relative_norm_error"]["net_slip_m2"] > 0.0
 
 
 def test_rate_separated_dmd_projects_net_state_and_integrates_gross_ledgers(monkeypatch):

@@ -123,6 +123,43 @@ def serialize_active_state(state) -> ReducedState:
     return ReducedState(np.concatenate(values), tuple(fields), geometry_signature(state))
 
 
+def active_readiness_prediction(state_nm2, state_nm1, state_n) -> dict[str, Any]:
+    """Retrospective affine residual on constitutive state only.
+
+    This gate never projects a state that will be used by the constitutive
+    model.  It asks whether the latest exact endpoint was predictable from the
+    preceding two exact endpoints using only mobile, retained, and net
+    blunting fields.  Gross emission/return ledgers are intentionally absent.
+    The validated positive affine-DMD block remains the only long-time state
+    propagator.
+    """
+    snapshots = tuple(
+        serialize_active_state(state) for state in (state_nm2, state_nm1, state_n)
+    )
+    if len({snapshot.geometry_signature for snapshot in snapshots}) != 1:
+        raise RuntimeError("cannot assess v7 readiness across geometry change")
+    if not (snapshots[0].fields == snapshots[1].fields == snapshots[2].fields):
+        raise RuntimeError("v7 reduced-state field layout changed")
+    field_errors: dict[str, float] = {}
+    for field in snapshots[2].fields:
+        values = [
+            snapshot.vector[field.start:field.stop] for snapshot in snapshots
+        ]
+        predicted = 2.0 * values[1] - values[0]
+        field_errors[field.name] = float(np.linalg.norm(values[2] - predicted)) / max(
+            float(np.linalg.norm(values[2])),
+            float(np.linalg.norm(predicted)),
+            1.0,
+        )
+    return {
+        "maximum_relative_error": max([0.0, *field_errors.values()]),
+        "active_state_relative_norm_error": field_errors,
+        "projection_constraint_correction": 0.0,
+        "readiness_state_model_id": MODEL_ID,
+        "cumulative_ledgers_in_readiness": False,
+    }
+
+
 def restore_active_state(state, snapshot: ReducedState, vector=None) -> None:
     if geometry_signature(state) != snapshot.geometry_signature:
         raise RuntimeError("cannot restore v7 reduced state across geometry change")
@@ -211,5 +248,5 @@ __all__ = [
     "MONOTONE_LEDGER_FIELDS", "ReducedState", "apply_ledger_delta",
     "capture_ledgers", "geometry_signature", "independent_cycle",
     "gross_activity_diagnostics", "ledger_delta", "restore_active_state", "serialize_active_state",
-    "_synchronize_gross_audit",
+    "active_readiness_prediction", "_synchronize_gross_audit",
 ]

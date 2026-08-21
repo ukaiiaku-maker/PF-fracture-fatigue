@@ -30,13 +30,15 @@ from arrhenius_fracture import fatigue_v914 as base
 from v914_adaptive_feedback_v6 import AdaptiveFeedbackControls
 from v914_intrinsic_reverse_glide_v7 import IntrinsicReverseGlideState
 from v914_v7_adaptive_block_accelerator import AdaptiveBlockControls
-from v914_v7_adaptive_projective_accelerator import readiness_prediction
 from v914_v7_cycle_map import advance_v7_cycle, cycle_endpoint_summary
 from v914_v7_rate_separated_dmd import (
     MODEL_ID as DMD_MODEL_ID,
     evaluate_rate_separated_dmd_block,
 )
-from v914_v7_rate_separated_state import gross_activity_diagnostics
+from v914_v7_rate_separated_state import (
+    active_readiness_prediction,
+    gross_activity_diagnostics,
+)
 from v914_v7_event_localizer import (
     LOCALIZER_ID,
     advance_v7_phase_span,
@@ -44,7 +46,7 @@ from v914_v7_event_localizer import (
 )
 
 
-ENGINE_ID = "v9.14_v7_vhcf_event_to_event_rate_separated_dmd_v2"
+ENGINE_ID = "v9.14_v7_vhcf_event_to_event_rate_separated_dmd_v3"
 CHECKPOINT_SCHEMA = "v914_v7_vhcf_event_to_event_checkpoint_v1"
 
 
@@ -521,13 +523,7 @@ def run_v7_vhcf_event_to_event(
                 c0, s0, _ = resolved_states[0]
                 c1, s1, _ = resolved_states[1]
                 c2, s2, _ = resolved_states[2]
-                readiness = readiness_prediction(
-                    s0,
-                    s1,
-                    s2,
-                    frequency_Hz=float(loading.frequency_Hz),
-                    cycle_index=c2,
-                )
+                readiness = active_readiness_prediction(s0, s1, s2)
                 passed = bool(
                     c1 == c0 + 1
                     and c2 == c1 + 1

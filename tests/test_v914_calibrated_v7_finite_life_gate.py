@@ -116,7 +116,13 @@ def test_calibrated_transport_first_passage_resolves_past_depth22_failure(tmp_pa
     assert event["reversible_physical_return_fraction_of_emitted"] == 0.0
 
 
-def test_calibrated_short_life_event_burst_resolves_past_depth26_failure(tmp_path):
+@pytest.mark.parametrize(
+    ("base_phase_intervals", "expected_final_cycle"),
+    ((16, 0.4446618461952312), (32, 0.4446618760730985)),
+)
+def test_calibrated_short_life_event_burst_resolves_past_depth26_failure(
+    tmp_path, base_phase_intervals, expected_final_cycle
+):
     rows = list(csv.DictReader(REGISTRY.open()))
     row = next(r for r in rows if r["candidate_id"] == "v913_zeroD_sobol_0129902")
     candidate = candidate_from_registry_row(row)
@@ -126,13 +132,13 @@ def test_calibrated_short_life_event_burst_resolves_past_depth26_failure(tmp_pat
         R=0.1,
         frequency_Hz=1000.0,
         temperature_K=300.0,
-        phase_steps=32,
+        phase_steps=base_phase_intervals,
     )
     controls = AdaptiveFeedbackControls(
         state_rtol=0.0025,
         tip_radius_rtol=0.001,
         hazard_rtol=0.01,
-        base_phase_intervals=32,
+        base_phase_intervals=base_phase_intervals,
         max_refinement_depth=30,
     )
     result = run_v7_vhcf_event_to_event(
@@ -158,5 +164,5 @@ def test_calibrated_short_life_event_burst_resolves_past_depth26_failure(tmp_pat
         16.036529362652427e-6
     )
     assert result["events"][-1]["cumulative_cycles"] == pytest.approx(
-        0.4446618760730985, abs=2e-12
+        expected_final_cycle, abs=2e-12
     )
