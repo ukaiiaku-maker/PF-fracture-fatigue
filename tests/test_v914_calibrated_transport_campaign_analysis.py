@@ -12,8 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from analyze_v914_calibrated_transport_campaign import (  # noqa: E402
+    _write_csv,
     event_rate_rows,
     fit_groups,
+    knee_rows,
     local_slope_rows,
     moving_window_rows,
     summarize_result,
@@ -145,3 +147,26 @@ def test_local_slopes_and_frequency_trends_use_fresh_completed_rows(tmp_path):
     assert len(trends) == 1
     assert trends[0]["rate_ratio_right_over_left"] == pytest.approx(0.1)
     assert trends[0]["frequency_exponent_per_cycle"] == pytest.approx(-1.0)
+
+
+def test_nonmonotone_knee_is_not_forced_into_paris_fit(tmp_path):
+    rows = []
+    for index, (delta_k, rate) in enumerate(((15.8, 1.0e-15), (16.0, 1.0e-9), (16.2, 1.0e-10))):
+        row = summarize_result(_write_result(tmp_path / f"knee_{index}", "growth_target_reached", delta_k))
+        row["developed_da_dN_m_per_cycle"] = rate
+        rows.append(row)
+
+    assert fit_groups(rows) == []
+    knees = knee_rows(rows)
+    assert len(knees) == 1
+    assert knees[0]["deltaK_left"] == 15.8
+    assert knees[0]["deltaK_right"] == 16.0
+    assert knees[0]["classification"] == "sharp_kinetic_knee"
+
+
+def test_empty_csv_output_clears_stale_analysis(tmp_path):
+    path = tmp_path / "stale.csv"
+    path.write_text("invalid,old\n1,2\n")
+    _write_csv(path, [])
+    assert path.is_file()
+    assert path.read_text() == ""

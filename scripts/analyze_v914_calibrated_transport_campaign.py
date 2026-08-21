@@ -82,6 +82,7 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
         "candidate": contract.get("candidate", result.get("identity_contract", {}).get("candidate_id")),
         "deltaK_MPa_sqrt_m": delta_k,
         "Kmax_MPa_sqrt_m": delta_k / max(1.0 - R, 1.0e-300),
+        "Kmin_MPa_sqrt_m": R * delta_k / max(1.0 - R, 1.0e-300),
         "R": R,
         "frequency_Hz": frequency,
         "temperature_K": float(contract.get("temperature_K", math.nan)),
@@ -89,7 +90,7 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
         "status": status,
         "campaign_disposition": disposition,
         "censored": status == "cycle_horizon_reached",
-        "accepted_terminal_result": status in ACCEPTED_TERMINAL_STATUSES,
+        "accepted_terminal_result": status in ACCEPTED_TERMINAL_STATUSES and restart_count == 0,
         "restart_count": restart_count,
         "fresh_uninterrupted": restart_count == 0,
         "physical_cycles_integer_boundary": int(result.get("completed_physical_cycles", 0)),
@@ -106,6 +107,11 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
         "net_source_blunting_count": float(final_reversibility.get("reversible_net_source_slip_count", math.nan)),
         "returned_source_slip_count": float(final_reversibility.get("reversible_returned_source_slip_count", math.nan)),
         "physical_return_fraction": float(final_reversibility.get("reversible_physical_return_fraction_of_emitted", math.nan)),
+        "physical_returned_mobile_per_m": float(final_reversibility.get("reversible_physical_returned_mobile_per_m", math.nan)),
+        "reverse_mobile_exposure_m2_s": float(final_reversibility.get("reversible_reverse_mobile_exposure_m2_s", math.nan)),
+        "reverse_plastic_displacement_m": math.nan,
+        "reverse_plastic_displacement_available": False,
+        "mobile_density_sum_m2": float(last_state.get("mobile_total_m2", math.nan)),
         "retained_density_sum_m2": float(
             last_state.get("retained_total_m2", math.nan)
         ),
@@ -276,26 +282,67 @@ def fit_groups(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         values.sort(key=lambda row: float(row["deltaK_MPa_sqrt_m"]))
         if len(values) < 3:
             continue
-        x = np.log10([float(row["deltaK_MPa_sqrt_m"]) for row in values])
-        y = np.log10([float(row["developed_da_dN_m_per_cycle"]) for row in values])
-        slope, intercept = np.polyfit(x, y, 1)
-        fitted = slope * x + intercept
-        ss_res = float(np.sum((y - fitted) ** 2))
-        ss_tot = float(np.sum((y - np.mean(y)) ** 2))
+        selected = None
+        for length in range(len(values), 2, -1):
+            for start in range(len(values) - length + 1):
+                candidate = values[start:start + length]
+                x = np.log10([float(row["deltaK_MPa_sqrt_m"]) for row in candidate])
+                y = np.log10([float(row["developed_da_dN_m_per_cycle"]) for row in candidate])
+                if not np.all(np.diff(y) > 0.0):
+                    continue
+                slope, intercept = np.polyfit(x, y, 1)
+                fitted = slope * x + intercept
+                ss_res = float(np.sum((y - fitted) ** 2))
+                ss_tot = float(np.sum((y - np.mean(y)) ** 2))
+                r_squared = 1.0 - ss_res / ss_tot if ss_tot > 0.0 else 1.0
+                if r_squared >= 0.98:
+                    selected = (candidate, x, slope, intercept, r_squared)
+                    break
+            if selected is not None:
+                break
+        if selected is None:
+            continue
+        candidate, x, slope, intercept, r_squared = selected
         fits.append({
             "configuration_label": key[0], "return_control": key[1],
             "R": key[2], "frequency_Hz": key[3], "seed": key[4],
-            "point_count": len(values), "deltaK_min": float(10 ** x[0]),
+            "point_count": len(candidate), "deltaK_min": float(10 ** x[0]),
             "deltaK_max": float(10 ** x[-1]), "paris_m": float(slope),
             "log10_intercept": float(intercept),
-            "R_squared": 1.0 - ss_res / ss_tot if ss_tot > 0.0 else 1.0,
+            "R_squared": r_squared,
+            "selection_rule": "longest_contiguous_monotone_segment_with_R_squared_at_least_0.98",
             "fit_is_output_only": True,
         })
     return fits
 
 
+def knee_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Identify the largest adjacent log-rate transition without fitting a law."""
+    slopes = local_slope_rows(rows)
+    groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for row in slopes:
+        key = (row["configuration_label"], row["return_control"], row["R"], row["frequency_Hz"], row["seed"])
+        groups.setdefault(key, []).append(row)
+    output = []
+    for key, values in groups.items():
+        transition = max(values, key=lambda row: abs(math.log10(row["rate_right_m_per_cycle"] / row["rate_left_m_per_cycle"])))
+        log_jump = math.log10(transition["rate_right_m_per_cycle"] / transition["rate_left_m_per_cycle"])
+        output.append({
+            "configuration_label": key[0], "return_control": key[1], "R": key[2],
+            "frequency_Hz": key[3], "seed": key[4],
+            "deltaK_left": transition["deltaK_left"], "deltaK_right": transition["deltaK_right"],
+            "deltaK_knee_geometric_midpoint": transition["deltaK_geometric_midpoint"],
+            "rate_left_m_per_cycle": transition["rate_left_m_per_cycle"],
+            "rate_right_m_per_cycle": transition["rate_right_m_per_cycle"],
+            "log10_rate_jump": log_jump, "local_slope": transition["local_paris_m"],
+            "classification": "sharp_kinetic_knee" if abs(transition["local_paris_m"]) >= 50.0 else "graded_transition",
+        })
+    return output
+
+
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     if not rows:
+        path.write_text("")
         return
     fields = list(rows[0])
     with path.open("w", newline="") as stream:
@@ -419,16 +466,23 @@ def main() -> int:
     ]
     windows = moving_window_rows(events)
     local_slopes = local_slope_rows(rows)
+    knees = knee_rows(rows)
     r_trends = trend_rows(rows, "R")
     frequency_trends = trend_rows(rows, "frequency_Hz")
     args.out.mkdir(parents=True, exist_ok=True)
     _write_csv(args.out / "campaign_summary.csv", rows)
+    _write_csv(args.out / "paris_points.csv", rows)
     _write_csv(args.out / "paris_fits.csv", fits)
     _write_csv(args.out / "event_rates.csv", events)
+    _write_csv(args.out / "paris_event_rates.csv", events)
     _write_csv(args.out / "moving_window_rates.csv", windows)
     _write_csv(args.out / "local_paris_slopes.csv", local_slopes)
+    _write_csv(args.out / "local_slopes.csv", local_slopes)
+    _write_csv(args.out / "kinetic_knees.csv", knees)
     _write_csv(args.out / "R_trends.csv", r_trends)
+    _write_csv(args.out / "R_dependence.csv", r_trends)
     _write_csv(args.out / "frequency_trends.csv", frequency_trends)
+    _write_csv(args.out / "frequency_dependence.csv", frequency_trends)
     write_plots(rows, args.out / "paris_response.png")
     write_trend_plots(rows, args.out / "R_frequency_trends.png")
     (args.out / "campaign_analysis.json").write_text(json.dumps({
@@ -439,6 +493,7 @@ def main() -> int:
         "event_rates": events,
         "moving_window_rates": windows,
         "local_slopes": local_slopes,
+        "kinetic_knees": knees,
         "R_trends": r_trends,
         "frequency_trends": frequency_trends,
     }, indent=2, sort_keys=True, allow_nan=True) + "\n")
@@ -452,6 +507,7 @@ def main() -> int:
         f"- Moving-window rows: {len(windows)}\n"
         f"- Global output-only Paris fits: {len(fits)}\n"
         f"- Adjacent local Paris slopes: {len(local_slopes)}\n"
+        f"- Kinetic-knee summaries: {len(knees)}\n"
         f"- Matched R comparisons: {len(r_trends)}\n"
         f"- Matched frequency comparisons: {len(frequency_trends)}\n"
     )
