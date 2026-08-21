@@ -476,6 +476,9 @@ def main() -> int:
         raise SystemExit(f"HEAD mismatch: expected {args.expected_head}, found {head}")
     if args.expected_head and dirty:
         raise SystemExit("authoritative launch requires a clean worktree")
+    # Fail before expensive exact-cycle work if the audited output location
+    # cannot be created (for example, a full production volume).
+    args.out.mkdir(parents=True, exist_ok=True)
 
     registry_rows = list(csv.DictReader(args.registry.open()))
     registry_row = next(row for row in registry_rows if row["candidate_id"] == args.candidate)
@@ -537,7 +540,6 @@ def main() -> int:
                     f"Hfull={row['frozen_full_action']:.6g}", flush=True
                 )
 
-    args.out.mkdir(parents=True, exist_ok=True)
     with (args.out / "causal_physics_rows.csv").open("w", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=list(all_rows[0]))
         writer.writeheader(); writer.writerows(all_rows)
