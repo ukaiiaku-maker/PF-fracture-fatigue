@@ -29,6 +29,9 @@ from v914_v7_rate_separated_state import (
 
 MODEL_ID = "v9.14_v7_reusable_rate_separated_positive_affine_dmd_v2"
 HAZARD_FLOOR = 1.0e-300
+DEFAULT_TRAINING_BURST_CYCLES = 12
+# Power-of-two block that leaves the full default burst plus validation span.
+MINIMUM_FULL_TRAINING_STRIDE = 16
 
 
 @dataclass
@@ -213,7 +216,10 @@ def evaluate_rate_separated_dmd_block(
         and reuse_distance <= float(state_rtol)
     )
     burst = 0 if reusable else min(
-        _env_int("V914_V7_DMD_BURST_CYCLES", 12, 4), stride - 2
+        _env_int(
+            "V914_V7_DMD_BURST_CYCLES", DEFAULT_TRAINING_BURST_CYCLES, 4
+        ),
+        stride - 2,
     )
     if stride <= burst + 1:
         return {
@@ -344,4 +350,7 @@ def evaluate_rate_separated_dmd_block(
     }
 
 
-__all__ = ["MODEL_ID", "ValidatedLocalMap", "evaluate_rate_separated_dmd_block"]
+__all__ = [
+    "DEFAULT_TRAINING_BURST_CYCLES", "MINIMUM_FULL_TRAINING_STRIDE",
+    "MODEL_ID", "ValidatedLocalMap", "evaluate_rate_separated_dmd_block",
+]

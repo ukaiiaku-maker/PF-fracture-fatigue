@@ -21,7 +21,11 @@ from v914_v7_rate_separated_state import (
     restore_active_state,
     serialize_active_state,
 )
-from v914_v7_rate_separated_dmd import evaluate_rate_separated_dmd_block
+from v914_v7_rate_separated_dmd import (
+    DEFAULT_TRAINING_BURST_CYCLES,
+    MINIMUM_FULL_TRAINING_STRIDE,
+    evaluate_rate_separated_dmd_block,
+)
 
 
 class State:
@@ -39,6 +43,11 @@ class State:
 
 class Loading:
     frequency_Hz = 10.0
+
+
+def test_default_dmd_stride_accommodates_full_training_burst():
+    assert MINIMUM_FULL_TRAINING_STRIDE >= DEFAULT_TRAINING_BURST_CYCLES + 2
+    assert MINIMUM_FULL_TRAINING_STRIDE & (MINIMUM_FULL_TRAINING_STRIDE - 1) == 0
 
 
 def linear_cycle_map(state, loading, controls):

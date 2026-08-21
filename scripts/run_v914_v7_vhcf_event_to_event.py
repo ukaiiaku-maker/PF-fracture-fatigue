@@ -42,6 +42,7 @@ from v914_v7_vhcf_event_engine import (
     VHCFRunControls,
     run_v7_vhcf_event_to_event,
 )
+from v914_v7_rate_separated_dmd import MINIMUM_FULL_TRAINING_STRIDE
 
 
 def parse_args() -> argparse.Namespace:
@@ -80,7 +81,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--minimum-exact-cycles", type=int, default=4)
     p.add_argument("--readiness-rtol", type=float, default=0.05)
     p.add_argument("--readiness-consecutive-passes", type=int, default=2)
-    p.add_argument("--initial-block-stride", type=int, default=4)
+    p.add_argument(
+        "--initial-block-stride",
+        type=int,
+        default=MINIMUM_FULL_TRAINING_STRIDE,
+        help="Initial DMD block; 16 accommodates the full 12-cycle training burst.",
+    )
     p.add_argument(
         "--maximum-block-stride",
         type=int,
