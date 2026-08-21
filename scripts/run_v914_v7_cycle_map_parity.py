@@ -64,6 +64,11 @@ def parse_args() -> argparse.Namespace:
         "--return-control", choices=("REV", "IRREV"), default="REV",
         help="IRREV disables only returned-source-slip cancellation of blunting.",
     )
+    p.add_argument(
+        "--configuration-label",
+        choices=("HISTORICAL", "CAL-TRANS-IRREV", "CAL-TRANS-REV", "LEGACY1D-V7"),
+        default=None,
+    )
     p.add_argument("--frequency-Hz", type=float, default=1000.0)
     p.add_argument("--temperature-K", type=float, default=300.0)
     p.add_argument("--n-bins", type=int, default=640)
@@ -324,6 +329,7 @@ def main() -> int:
         "mode": args.mode,
         "candidate": args.candidate,
         "return_control": args.return_control,
+        "configuration_label": args.configuration_label,
         "state_model_id": state_class.MODEL_ID,
         "R": args.R,
         "deltaK_MPa_sqrt_m": args.deltaK,

@@ -1,0 +1,186 @@
+{
+  "candidate_parameters_refit": false,
+  "candidate_registry_sha256": "a8befb167c06289fc0b19bc1452f6744501fa09647ac2c242efd9fbb846e137f",
+  "common_physics": {
+    "G_Pa": 160156250000.0,
+    "activation_to_line_content_per_system": [
+      0.9124087591240877,
+      0.9124087591240877
+    ],
+    "active_strip_width_m": 1e-05,
+    "annihilation_capture_radius_b": 5.0,
+    "b_m": 2.74e-10,
+    "blunting_length_m": 5e-07,
+    "blunting_slip_fraction": 1.0,
+    "cleavage_correlation_time_s": 1e-06,
+    "cleavage_hits": 3.0,
+    "cleavage_nu0_s": 1000000000000.0,
+    "core_regularization_b": 5.0,
+    "coupled_moving_tip_enabled": true,
+    "emission_geometry_extension_m": [
+      0.0,
+      2.433569691270587e-06,
+      8.269426255547918e-06,
+      1.0566766351172788e-05,
+      1.4803139908889841e-05,
+      1.8972954423622028e-05,
+      2.3432408984334797e-05,
+      2.5729749079959662e-05,
+      3.26817503511525e-05,
+      3.497909044677733e-05,
+      4.0121044516183204e-05,
+      4.241838461180804e-05,
+      4.471572470743283e-05,
+      4.701306480305769e-05,
+      5.039551527368882e-05,
+      5.339185890882292e-05
+    ],
+    "emission_geometry_factors": [
+      [
+        0.07665031895930559,
+        0.004991199340349577
+      ],
+      [
+        0.16945468459897245,
+        0.006556774727632557
+      ],
+      [
+        0.5586799710775829,
+        0.009419299808054093
+      ],
+      [
+        0.5363003498393252,
+        0.007692919501431182
+      ],
+      [
+        0.7883473664044734,
+        0.025282117919834465
+      ],
+      [
+        0.8343904194588475,
+        0.014120019126573536
+      ],
+      [
+        0.5283337858047438,
+        0.001198738961482486
+      ],
+      [
+        0.5582540213199871,
+        0.0032092048498331104
+      ],
+      [
+        0.5658204201286452,
+        0.047232715716007345
+      ],
+      [
+        0.5139791029071795,
+        0.054900469928781476
+      ],
+      [
+        0.4093006922583901,
+        0.10731278748076033
+      ],
+      [
+        0.44116380666132016,
+        0.07262865859915303
+      ],
+      [
+        0.35736072158728,
+        0.13176464758753542
+      ],
+      [
+        0.55308259535749,
+        0.00804021122192659
+      ],
+      [
+        0.577070898103571,
+        0.004044810274856119
+      ],
+      [
+        0.5497770421299663,
+        0.008004820984133729
+      ]
+    ],
+    "emission_nu0_s": 100000000000.0,
+    "emission_schmid_factors": [
+      0.07665031895930559,
+      0.004991199340349577
+    ],
+    "emission_signs": [
+      1,
+      -1
+    ],
+    "encounter_efficiency": 9.160246308716648,
+    "forest_interaction_matrix": [
+      [
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0
+      ]
+    ],
+    "gnd_stress_projection_matrix": [
+      [
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "implicit_max_iterations": 96,
+    "implicit_tolerance": 1e-10,
+    "jump_fraction_of_forest_spacing": 1.0,
+    "max_fractional_state_change": 0.05,
+    "maximum_front_width_m": 5e-05,
+    "mean_free_path_coefficient": 1.0,
+    "min_substep_s": 1e-12,
+    "minimum_front_width_m": 2.74e-10,
+    "mobile_transport_velocity_scale": 1.0,
+    "moving_tip_cfl": 0.15999999999999998,
+    "mpz_length_m": 5e-05,
+    "n_bins": 80,
+    "n_systems": 2,
+    "nu": 0.28,
+    "persistent_backstress_scale": 1.0,
+    "r0_m": 1e-06,
+    "reference_density_m2": 5000000000000.0,
+    "reference_front_width_m": 1e-05,
+    "reference_source_area_m2": 2.5e-11,
+    "rho_forest_floor_m2": 5000000000000.0,
+    "shielding_orientation_factors": [
+      0.0,
+      0.0
+    ],
+    "source_zone_length_m": 2e-06,
+    "taylor_phi_max": 20.0
+  },
+  "conversion_provenance": "v10.2.22_archive_signed_kernel_activation_to_line_content",
+  "derived_configuration": {
+    "candidate_parameters_refit": false,
+    "changed_common_physics_fields": [
+      {
+        "field": "mobile_transport_velocity_scale",
+        "new_value": 1.0,
+        "old_value": 0.0,
+        "reason": "strictly positive velocity scale is mathematically required for the existing v7 signed Peierls velocity to transport mobile line content; one is its unscaled dimensionless value"
+      }
+    ],
+    "configuration_id": "calibrated_v7_transport_extension",
+    "parent_sha256": "59ebf68b366045c91fb08bfe870703c52e1f4e6b51c3f1c480b28dfc8ef8e9c6"
+  },
+  "model": "v9.13_persistent_site_autonomous_R_curve",
+  "schema_version": 2,
+  "shared_R_curve_calibration": {
+    "K_geometry_scale": 1.0,
+    "activation_to_line_content_scale": 1.0,
+    "blunting_slip_fraction_scale": 1.0,
+    "emission_geometry_scale": 1.0,
+    "persistent_backstress_scale": 1.0,
+    "reference_source_area_scale": 1.0,
+    "translation_action_exponent": 0.95
+  }
+}

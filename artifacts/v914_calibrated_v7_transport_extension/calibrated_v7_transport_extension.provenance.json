@@ -1,0 +1,44 @@
+{
+  "configuration_id": "calibrated_v7_transport_extension",
+  "derived": {
+    "all_other_parent_fields_preserved": true,
+    "changed_fields": [
+      {
+        "field": "common_physics.mobile_transport_velocity_scale",
+        "new_value": 1.0,
+        "old_value": 0.0,
+        "reason": "strictly positive velocity scale is mathematically required for the existing v7 signed Peierls velocity to transport mobile line content; one is its unscaled dimensionless value"
+      }
+    ],
+    "sha256": "054abf35061d999772bfdaa3578b9a869d367c7c7d7a137a24fd0f5b8e9da608",
+    "source": "calibrated_v7_transport_extension.json"
+  },
+  "models": {
+    "A_HISTORICAL": {
+      "mobile_transport_enabled": false,
+      "physics_sha256": "59ebf68b366045c91fb08bfe870703c52e1f4e6b51c3f1c480b28dfc8ef8e9c6",
+      "return_cancellation": "historical_not_applicable"
+    },
+    "B_CAL_TRANS_IRREV": {
+      "mobile_transport_enabled": true,
+      "physics_sha256": "054abf35061d999772bfdaa3578b9a869d367c7c7d7a137a24fd0f5b8e9da608",
+      "return_cancellation": false
+    },
+    "C_CAL_TRANS_REV": {
+      "mobile_transport_enabled": true,
+      "physics_sha256": "054abf35061d999772bfdaa3578b9a869d367c7c7d7a137a24fd0f5b8e9da608",
+      "return_cancellation": true
+    },
+    "D_LEGACY1D_V7": {
+      "role": "regression_diagnostic_only",
+      "sha256": "b5d7e54631928c6e7fb5b5d7304e15ec60a9e3e38c7ef5c3d50fc69ea98ec813",
+      "source": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search/mpz_v9_13_persistent_sites_common_physics.json"
+    }
+  },
+  "parent": {
+    "immutable": true,
+    "sha256": "59ebf68b366045c91fb08bfe870703c52e1f4e6b51c3f1c480b28dfc8ef8e9c6",
+    "source": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search/runs/v9_13_v10222_rcurve_alpha0p95_all50_v1/v9_13_R_curve_calibrated_common_physics.json"
+  },
+  "schema": "v914_calibrated_v7_transport_extension_provenance_v1"
+}

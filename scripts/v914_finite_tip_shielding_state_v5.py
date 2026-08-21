@@ -161,7 +161,10 @@ class _FiniteTipShieldState(_V4State):
         self._ensure_reversible_fields()
         if not payload:
             return
-        if payload.get("schema") != self.STATE_EXTENSION_SCHEMA:
+        expected_schema = (
+            FLOOR_SCHEMA if self.SHIELD_MODE == "radius_floor" else SHIFT_SCHEMA
+        )
+        if payload.get("schema") != expected_schema:
             raise ValueError(
                 "finite-tip v5 checkpoint schema mismatch; v4/sharp and the two "
                 "v5 regularizations are not cross-promoted"

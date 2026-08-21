@@ -57,6 +57,12 @@ def parse_args() -> argparse.Namespace:
         default="REV",
         help="IRREV disables only returned-source-slip cancellation of blunting.",
     )
+    p.add_argument(
+        "--configuration-label",
+        choices=("HISTORICAL", "CAL-TRANS-IRREV", "CAL-TRANS-REV", "LEGACY1D-V7"),
+        default=None,
+        help="Optional audited common-physics/control configuration label.",
+    )
     p.add_argument("--frequency-Hz", type=float, default=1000.0)
     p.add_argument("--temperature-K", type=float, default=300.0)
     p.add_argument("--seed", type=int, default=1720)
@@ -66,7 +72,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--state-rtol", type=float, default=0.0025)
     p.add_argument("--tip-radius-rtol", type=float, default=0.001)
     p.add_argument("--hazard-rtol", type=float, default=0.01)
-    p.add_argument("--max-refinement-depth", type=int, default=18)
+    # Calibrated weak-T same-cycle event bursts require depth 30 at the
+    # unchanged v7 state/hazard tolerances.  Shallower depths fail closed at
+    # sharp post-translation mobile-state transients.
+    p.add_argument("--max-refinement-depth", type=int, default=30)
 
     p.add_argument("--minimum-exact-cycles", type=int, default=4)
     p.add_argument("--readiness-rtol", type=float, default=0.05)
@@ -243,6 +252,7 @@ def main() -> int:
             "registry_sha256": digest(args.registry),
             "physics_sha256": digest(args.physics),
             "return_control": args.return_control,
+            "configuration_label": args.configuration_label,
         },
         state_class=state_class,
     )
@@ -260,6 +270,7 @@ def main() -> int:
         "candidate": args.candidate,
         "R": args.R,
         "return_control": args.return_control,
+        "configuration_label": args.configuration_label,
         "state_model_id": state_class.MODEL_ID,
         "deltaK_MPa_sqrt_m": args.deltaK,
         "frequency_Hz": args.frequency_Hz,

@@ -101,6 +101,55 @@ def read_checkpoint(path: str | Path) -> dict[str, Any]:
     return payload
 
 
+def _v7_state_from_checkpoint(
+    state_class, candidate, physics, saved, state_extension=None
+):
+    """Restore the full selected v7 state, including transport ledgers.
+
+    The historical base loader deliberately accepts only base-state fields and
+    therefore cannot restore a checkpoint written from a v7 subclass.
+    """
+    state = state_class(candidate, physics)
+    expected = set(state.__dict__) - {"p", "c"}
+    actual = set(saved)
+    extension_fields = set(state_extension or {}) - {"schema"}
+    allowed = expected | extension_fields
+    if not expected.issubset(actual) or not actual.issubset(allowed):
+        missing = sorted(expected - actual)
+        extra = sorted(actual - allowed)
+        raise ValueError(
+            f"v7 checkpoint state fields differ: missing={missing}, extra={extra}"
+        )
+    for name, value in saved.items():
+        current = getattr(state, name, None)
+        if isinstance(current, np.ndarray) or (
+            not hasattr(state, name)
+            and isinstance(value, dict)
+            and value.get("kind") == "ndarray"
+        ):
+            if not isinstance(value, dict) or value.get("kind") != "ndarray":
+                raise ValueError(f"v7 checkpoint array field {name!r} is malformed")
+            restored = np.asarray(value["data"], dtype=np.dtype(value["dtype"]))
+            if (
+                tuple(restored.shape) != tuple(value["shape"])
+                or (
+                    isinstance(current, np.ndarray)
+                    and restored.shape != current.shape
+                )
+            ):
+                raise ValueError(
+                    f"v7 checkpoint array field {name!r} has wrong shape"
+                )
+            if np.any(~np.isfinite(restored)):
+                raise ValueError(
+                    f"v7 checkpoint array field {name!r} is non-finite"
+                )
+            setattr(state, name, restored)
+        else:
+            setattr(state, name, value)
+    return state
+
+
 def _largest_power_of_two_at_most(value: int) -> int:
     n = int(value)
     if n < 1:
@@ -305,10 +354,15 @@ def run_v7_vhcf_event_to_event(
         saved = read_checkpoint(restart_from)
         if saved["identity_contract"] != identity_contract:
             raise ValueError("v7 VHCF checkpoint identity contract mismatch")
-        baseline = base._state_from_checkpoint(candidate, physics, saved["state"])
-        state = state_class.from_existing_state(
-            baseline, saved.get("state_extension")
+        state = _v7_state_from_checkpoint(
+            state_class,
+            candidate,
+            physics,
+            saved["state"],
+            saved.get("state_extension"),
         )
+        # Validate the extension schema and restore its duplicate audit fields.
+        state.restore_reversible_checkpoint_payload(saved.get("state_extension"))
         rng = np.random.default_rng()
         rng.bit_generator.state = saved["rng_state"]
         controller = saved["controller"]

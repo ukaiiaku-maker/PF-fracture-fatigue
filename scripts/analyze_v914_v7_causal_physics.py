@@ -10,10 +10,12 @@ from __future__ import annotations
 import argparse
 import csv
 from dataclasses import fields, replace
+import hashlib
 import json
 import math
 import os
 from pathlib import Path
+import subprocess
 import sys
 from typing import Any
 
@@ -441,6 +443,11 @@ def main() -> int:
     parser.add_argument("--Kmax", default="12,30,62.60,70.77")
     parser.add_argument("--R-values", default="0.1")
     parser.add_argument("--return-control", choices=("REV", "IRREV"), default="REV")
+    parser.add_argument(
+        "--configuration-label",
+        choices=("HISTORICAL", "CAL-TRANS-IRREV", "CAL-TRANS-REV", "LEGACY1D-V7"),
+        required=True,
+    )
     parser.add_argument("--matched-R-Kmax", type=float, default=30.0)
     parser.add_argument("--matched-R", type=float, default=-0.95)
     parser.add_argument("--sample-cycles", default="0,1,2,4,8,12")
@@ -452,8 +459,23 @@ def main() -> int:
     parser.add_argument("--max-refinement-depth", type=int, default=22)
     parser.add_argument("--reuse-rows-json", type=Path, default=None,
                         help="Reuse completed exact rows and regenerate only analytical metadata.")
+    parser.add_argument("--expected-head", default=None)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
+
+    branch = subprocess.check_output(
+        ["git", "branch", "--show-current"], cwd=ROOT, text=True
+    ).strip()
+    head = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+    ).strip()
+    dirty = subprocess.check_output(
+        ["git", "status", "--porcelain"], cwd=ROOT, text=True
+    ).strip()
+    if args.expected_head and head != args.expected_head:
+        raise SystemExit(f"HEAD mismatch: expected {args.expected_head}, found {head}")
+    if args.expected_head and dirty:
+        raise SystemExit("authoritative launch requires a clean worktree")
 
     registry_rows = list(csv.DictReader(args.registry.open()))
     registry_row = next(row for row in registry_rows if row["candidate_id"] == args.candidate)
@@ -522,10 +544,15 @@ def main() -> int:
     payload = {
         "schema": SCHEMA,
         "candidate_id": args.candidate,
+        "configuration_label": args.configuration_label,
         "return_control": args.return_control,
         "state_model_id": state_class.MODEL_ID,
         "trajectory_authority": "unmodified_exact_v7_adaptive_cycle_map",
         "counterfactuals_feed_back_to_state": False,
+        "repository_branch": branch,
+        "repository_head": head,
+        "repository_clean": not bool(dirty),
+        "physics_sha256": hashlib.sha256(args.physics.read_bytes()).hexdigest(),
         "resolution": {
             "n_bins": args.n_bins,
             "base_phase_intervals": args.base_phase_intervals,
