@@ -49,6 +49,10 @@ def main() -> int:
         type=Path,
         help="Optional candidate-specific CSV containing candidate_id and DeltaK_MPa_sqrt_m.",
     )
+    parser.add_argument(
+        "--campaign-label",
+        help="Optional output subdirectory label; the physical fidelity metadata is unchanged.",
+    )
     parser.add_argument("--out-root", type=Path, default=ROOT / "runs/v914_paris_reparameterization_v1")
     parser.add_argument("--worker-index", type=int, default=0)
     parser.add_argument("--worker-count", type=int, default=1)
@@ -101,7 +105,7 @@ def main() -> int:
         }
         for index, (row, deltaK) in enumerate(pairs)
     ]
-    output = args.out_root / args.fidelity
+    output = args.out_root / (args.campaign_label or args.fidelity)
     output.mkdir(parents=True, exist_ok=True)
     manifest = {
         "schema": "v914_paris_search_launch_manifest_v1",

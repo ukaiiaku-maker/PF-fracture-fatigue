@@ -12,7 +12,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from analyze_v914_paris_search import best_fit, expected_level0_points, fit_segment, level0_decision
+from analyze_v914_paris_search import best_fit, expected_level0_points, fit_segment, level0_decision, slug
 from propose_v914_paris_surrogate_batch import gp_predict
 
 
@@ -90,3 +90,7 @@ def test_level0_never_rejects_from_partial_load_evidence():
 def test_high_k50_candidate_requires_supplemental_level0_probe():
     assert expected_level0_points({"historical_monotonic_K50_300K_MPa_sqrt_m": "30.0"}, CONFIG) == 4
     assert expected_level0_points({"historical_monotonic_K50_300K_MPa_sqrt_m": "12.0"}, CONFIG) == 3
+
+
+def test_analysis_and_launcher_share_precise_load_slug():
+    assert slug(30.3832779198) == "30p3833"

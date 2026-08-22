@@ -25,6 +25,10 @@ ABCD = {
 }
 
 
+def slug(value: float) -> str:
+    return f"{float(value):g}".replace("-", "m").replace(".", "p")
+
+
 def finite(value: Any, default: float = math.nan) -> float:
     try:
         result = float(value)
@@ -342,7 +346,7 @@ def main() -> int:
     for manifest_path in sorted(args.root.glob("level*/launch_manifest.json")):
         manifest = json.loads(manifest_path.read_text())
         for case in manifest["cases"]:
-            run_dir = manifest_path.parent / case["candidate_id"] / f"DeltaK{str(float(case['deltaK_MPa_sqrt_m'])).replace('-', 'm').replace('.', 'p').removesuffix('p0')}_seed{case['seed']}"
+            run_dir = manifest_path.parent / case["candidate_id"] / f"DeltaK{slug(case['deltaK_MPa_sqrt_m'])}_seed{case['seed']}"
             result_path = run_dir / "result.json"
             if result_path.is_file():
                 point = point_from_result(case, result_path, config)
