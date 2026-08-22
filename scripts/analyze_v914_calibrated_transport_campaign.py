@@ -35,6 +35,18 @@ def _cycle_at_extension(events: list[dict[str, Any]], extension_m: float) -> flo
     return None
 
 
+def _life_regime(disposition: str, final_event_cycle: float) -> str:
+    if disposition == "physical_cycle_censor":
+        return "physical_cycle_censor"
+    if disposition != "completed_growth_target" or not math.isfinite(final_event_cycle):
+        return "not_classified"
+    if final_event_cycle >= 1.0e7:
+        return "VHCF_finite_growth"
+    if final_event_cycle >= 1.0e5:
+        return "HCF_finite_growth"
+    return "rapid_developed_growth"
+
+
 def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> dict[str, Any]:
     result = json.loads(result_path.read_text())
     contract_path = result_path.with_name("run_contract.json")
@@ -79,6 +91,7 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
         disposition = "physical_cycle_censor"
     else:
         disposition = "completed_growth_target"
+    life_regime = _life_regime(disposition, final_event_cycle)
     return {
         "result_path": str(result_path.resolve()),
         "configuration_label": contract.get("configuration_label"),
@@ -94,6 +107,7 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
         "seed": int(contract.get("seed", result.get("identity_contract", {}).get("seed", -1))),
         "status": status,
         "campaign_disposition": disposition,
+        "life_regime": life_regime,
         "censored": status == "cycle_horizon_reached",
         "accepted_terminal_result": status in ACCEPTED_TERMINAL_STATUSES and restart_count == 0,
         "restart_count": restart_count,
@@ -567,6 +581,96 @@ def write_required_figures(
         fig.savefig(out / name, dpi=180); plt.close(fig)
 
 
+def build_report(
+    rows: list[dict[str, Any]], fits: list[dict[str, Any]],
+    local_slopes: list[dict[str, Any]], knees: list[dict[str, Any]],
+    r_trends: list[dict[str, Any]], frequency_trends: list[dict[str, Any]],
+    event_count: int, window_count: int,
+) -> str:
+    accepted = [row for row in rows if row["accepted_terminal_result"]]
+    lines = [
+        "# Calibrated transport fatigue campaign", "",
+        "## Scope and numerical provenance", "",
+        "The results use the calibrated-transport REV production physics and "
+        "the qualified rate-separated VHCF accelerator. Positive-R IRREV rows "
+        "retained here are only the previously established zero-return null-"
+        "equivalent trajectories; their original control provenance remains "
+        "explicit in every table.", "",
+        f"- Audited result files: {len(rows)}",
+        f"- Fresh accepted terminal trajectories: {len(accepted)}",
+        f"- Completed 100-um growth trajectories: {sum(row['campaign_disposition'] == 'completed_growth_target' for row in rows)}",
+        f"- Physical cycle censors: {sum(row['campaign_disposition'] == 'physical_cycle_censor' for row in rows)}",
+        f"- Excluded unsupported restart results: {sum(row['campaign_disposition'] == 'unsupported_restart_result' for row in rows)}",
+        f"- Incomplete or rejected trajectories: {sum(row['campaign_disposition'] == 'incomplete_or_rejected' for row in rows)}",
+        f"- Event-rate rows: {event_count}",
+        f"- Moving-window rows: {window_count}", "",
+        "Censor-marker rates use the full observation horizon. Developed rates "
+        "start at 20 um extension. No empirical Paris or frequency correction "
+        "is used.", "", "## Terminal points", "",
+        "| R | f (Hz) | DeltaK | Kmax | Kmin | status | regime | cycles | events | developed da/dN | return fraction |",
+        "|---:|---:|---:|---:|---:|---|---|---:|---:|---:|---:|",
+    ]
+    for row in sorted(rows, key=lambda item: (
+        float(item["frequency_Hz"]), float(item["R"]),
+        float(item["deltaK_MPa_sqrt_m"]), int(item["restart_count"]),
+    )):
+        rate = float(row["developed_da_dN_m_per_cycle"])
+        rate_text = f"{rate:.6e}" if math.isfinite(rate) else "n/a"
+        return_fraction = float(row["physical_return_fraction"])
+        return_text = (
+            f"{return_fraction:.6e}" if math.isfinite(return_fraction) else "n/a"
+        )
+        lines.append(
+            f"| {float(row['R']):g} | {float(row['frequency_Hz']):g} | "
+            f"{float(row['deltaK_MPa_sqrt_m']):.6f} | "
+            f"{float(row['Kmax_MPa_sqrt_m']):.6f} | "
+            f"{float(row['Kmin_MPa_sqrt_m']):.6f} | {row['campaign_disposition']} | "
+            f"{row['life_regime']} | {float(row['observation_cycles_for_total_rate']):.6g} | "
+            f"{int(row['event_count'])} | {rate_text} | {return_text} |"
+        )
+    lines.extend(["", "## Paris and kinetic-knee analysis", ""])
+    if fits:
+        for fit in fits:
+            lines.append(
+                f"- R={float(fit['R']):g}, f={float(fit['frequency_Hz']):g} Hz: "
+                f"local contiguous fit m={float(fit['paris_m']):.6g}, "
+                f"R2={float(fit['R_squared']):.6f}, "
+                f"DeltaK={float(fit['deltaK_min']):.6g}--{float(fit['deltaK_max']):.6g}."
+            )
+    else:
+        lines.append(
+            "- No contiguous three-point monotone log-linear region met the "
+            "R2 >= 0.98 fit rule; no global Paris exponent is reported."
+        )
+    for knee in sorted(knees, key=lambda item: (float(item["frequency_Hz"]), float(item["R"]))):
+        R = float(knee["R"])
+        dk = float(knee["deltaK_knee_geometric_midpoint"])
+        lines.append(
+            f"- R={R:g}, f={float(knee['frequency_Hz']):g} Hz: "
+            f"{knee['classification']} at DeltaK~{dk:.6g}, "
+            f"Kmax~{dk / (1.0 - R):.6g}; adjacent local slope "
+            f"{float(knee['local_slope']):.6g} and log10 rate jump "
+            f"{float(knee['log10_rate_jump']):.6g}."
+        )
+    lines.extend([
+        "", "Neighboring nonmonotone lifetimes are retained as computed. "
+        "Interpretation should use event waiting times, developed rates, moving "
+        "windows, and the common stochastic threshold sequence rather than "
+        "reordering or smoothing individual realizations.", "",
+        "## R and frequency comparisons", "",
+        f"- Matched R comparisons: {len(r_trends)}",
+        f"- Matched frequency comparisons: {len(frequency_trends)}",
+        f"- Adjacent local slopes: {len(local_slopes)}", "",
+        "## Diagnostic limitation", "",
+        "The production state records physical returned slip, reverse-mobile "
+        "exposure, return fraction, and net blunting, but it does not carry the "
+        "non-feedback Orowan reverse-displacement proxy used by the separate "
+        "mechanism audit. Reverse plastic displacement is therefore reported "
+        "as unavailable rather than reconstructed after the fact.", "",
+    ])
+    return "\n".join(lines)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--roots", type=Path, nargs="+", required=True)
@@ -614,19 +718,9 @@ def main() -> int:
         "R_trends": r_trends,
         "frequency_trends": frequency_trends,
     }, indent=2, sort_keys=True, allow_nan=True) + "\n"
-    report = (
-        "# Calibrated transport fatigue campaign\n\n"
-        f"- Audited result files: {len(rows)}\n"
-        f"- Fresh completed growth trajectories: {sum(row['campaign_disposition'] == 'completed_growth_target' for row in rows)}\n"
-        f"- Physical cycle censors: {sum(row['campaign_disposition'] == 'physical_cycle_censor' for row in rows)}\n"
-        f"- Excluded unsupported restart results: {sum(row['campaign_disposition'] == 'unsupported_restart_result' for row in rows)}\n"
-        f"- Event-rate rows: {len(events)}\n"
-        f"- Moving-window rows: {len(windows)}\n"
-        f"- Global output-only Paris fits: {len(fits)}\n"
-        f"- Adjacent local Paris slopes: {len(local_slopes)}\n"
-        f"- Kinetic-knee summaries: {len(knees)}\n"
-        f"- Matched R comparisons: {len(r_trends)}\n"
-        f"- Matched frequency comparisons: {len(frequency_trends)}\n"
+    report = build_report(
+        rows, fits, local_slopes, knees, r_trends, frequency_trends,
+        len(events), len(windows),
     )
     for name in ("campaign_analysis.json", "final_summary.json"):
         (args.out / name).write_text(analysis_payload)

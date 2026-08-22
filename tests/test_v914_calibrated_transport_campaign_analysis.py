@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from analyze_v914_calibrated_transport_campaign import (  # noqa: E402
     _write_csv,
+    build_report,
     event_rate_rows,
     fit_groups,
     knee_rows,
@@ -81,6 +82,7 @@ def test_summary_uses_developed_span_and_distinguishes_work_budget(tmp_path):
     assert complete["developed_da_dN_m_per_cycle"] == pytest.approx(1.0e-6)
     assert complete["developed_da_dt_m_per_s"] == pytest.approx(1.0e-3)
     assert complete["retained_density_sum_m2"] == 14.0
+    assert complete["life_regime"] == "rapid_developed_growth"
     assert math.isnan(complete["retained_line_content"])
     assert incomplete["campaign_disposition"] == "incomplete_or_rejected"
     assert incomplete["censored"] is False
@@ -95,6 +97,7 @@ def test_censor_total_rate_uses_full_observation_horizon(tmp_path):
     summary = summarize_result(path)
     assert summary["observation_cycles_for_total_rate"] == 10**12
     assert summary["total_da_dN_m_per_cycle"] == pytest.approx(1.0e-16)
+    assert summary["life_regime"] == "physical_cycle_censor"
 
 
 def test_incomplete_total_rate_uses_completed_observation_cycles(tmp_path):
@@ -241,3 +244,6 @@ def test_cli_writes_final_named_summary_and_report(tmp_path):
     assert (out / "final_report.md").read_text() == (
         out / "CAMPAIGN_REPORT.md"
     ).read_text()
+    report = (out / "final_report.md").read_text()
+    assert "## Terminal points" in report
+    assert "Reverse plastic displacement is therefore reported" in report
