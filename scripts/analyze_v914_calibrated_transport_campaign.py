@@ -253,15 +253,26 @@ def local_slope_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def trend_rows(rows: list[dict[str, Any]], variable: str) -> list[dict[str, Any]]:
-    """Return adjacent R ratios or frequency power exponents at matched loads."""
+    """Return adjacent matched-load trends, retaining explicit censor basis."""
     if variable not in {"R", "frequency_Hz"}:
         raise ValueError(variable)
     fixed = "frequency_Hz" if variable == "R" else "R"
     groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
     for row in rows:
-        rate = float(row["developed_da_dN_m_per_cycle"])
-        if row["campaign_disposition"] != "completed_growth_target" or not math.isfinite(rate) or rate <= 0.0:
+        disposition = row["campaign_disposition"]
+        if disposition == "completed_growth_target":
+            rate = float(row["developed_da_dN_m_per_cycle"])
+            basis = "developed_growth_rate"
+        elif disposition == "physical_cycle_censor":
+            rate = float(row["total_da_dN_m_per_cycle"])
+            basis = "full_horizon_censor_marker_rate"
+        else:
             continue
+        if not math.isfinite(rate) or rate <= 0.0:
+            continue
+        selected = dict(row)
+        selected["_trend_rate"] = rate
+        selected["_trend_rate_basis"] = basis
         load = float(row["Kmax_MPa_sqrt_m"] if variable == "R" else row["deltaK_MPa_sqrt_m"])
         # R curves were launched from rounded DeltaK values chosen on a common
         # Kmax grid.  Milliscale Kmax grouping preserves that intended match
@@ -273,14 +284,14 @@ def trend_rows(rows: list[dict[str, Any]], variable: str) -> list[dict[str, Any]
             control_key, row["seed"], float(row[fixed]),
             round(load, load_digits),
         )
-        groups.setdefault(key, []).append(row)
+        groups.setdefault(key, []).append(selected)
     output = []
     for key, values in groups.items():
         values.sort(key=lambda row: float(row[variable]))
         for left, right in zip(values, values[1:]):
             x0, x1 = float(left[variable]), float(right[variable])
-            rate0 = float(left["developed_da_dN_m_per_cycle"])
-            rate1 = float(right["developed_da_dN_m_per_cycle"])
+            rate0 = float(left["_trend_rate"])
+            rate1 = float(right["_trend_rate"])
             record = {
                 "return_control": key[0], "seed": key[1], fixed: key[2],
                 "matched_load_MPa_sqrt_m": key[3], f"{variable}_left": x0,
@@ -290,6 +301,14 @@ def trend_rows(rows: list[dict[str, Any]], variable: str) -> list[dict[str, Any]
                 "return_control_right": right["return_control"],
                 "configuration_label_left": left["configuration_label"],
                 "configuration_label_right": right["configuration_label"],
+                "disposition_left": left["campaign_disposition"],
+                "disposition_right": right["campaign_disposition"],
+                "rate_basis_left": left["_trend_rate_basis"],
+                "rate_basis_right": right["_trend_rate_basis"],
+                "comparison_contains_censor": (
+                    left["campaign_disposition"] == "physical_cycle_censor"
+                    or right["campaign_disposition"] == "physical_cycle_censor"
+                ),
             }
             if variable == "R":
                 record["mixed_control_R_comparison"] = (

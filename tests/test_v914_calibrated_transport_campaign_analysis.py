@@ -203,6 +203,26 @@ def test_R_trends_match_rounded_deltaK_launches_on_common_Kmax(tmp_path):
     assert trends[0]["mixed_control_R_comparison"] is True
 
 
+def test_trends_retain_censor_marker_with_explicit_rate_basis(tmp_path):
+    censor_path = _write_result(
+        tmp_path / "trend_censor", "cycle_horizon_reached", 10.0
+    )
+    censor_payload = json.loads(censor_path.read_text())
+    censor_payload["completed_physical_cycles"] = 10**12
+    censor_path.write_text(json.dumps(censor_payload))
+    censor = summarize_result(censor_path)
+    growth = summarize_result(
+        _write_result(tmp_path / "trend_growth", "growth_target_reached", 10.0)
+    )
+    censor["frequency_Hz"] = 100.0
+    growth["frequency_Hz"] = 1000.0
+    trends = trend_rows([censor, growth], "frequency_Hz")
+    assert len(trends) == 1
+    assert trends[0]["comparison_contains_censor"] is True
+    assert trends[0]["rate_basis_left"] == "full_horizon_censor_marker_rate"
+    assert trends[0]["rate_basis_right"] == "developed_growth_rate"
+
+
 def test_nonmonotone_knee_is_not_forced_into_paris_fit(tmp_path):
     rows = []
     for index, (delta_k, rate) in enumerate(((15.8, 1.0e-15), (16.0, 1.0e-9), (16.2, 1.0e-10))):
