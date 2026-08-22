@@ -242,7 +242,7 @@ def level0_decision(points: list[dict[str, Any]], expected_points: int, minimum_
     any_growth = any(point["status"] == "growth_target_reached" for point in points)
     all_inert = all(point["event_count"] == 0 for point in points)
     all_catastrophic = all(
-        point["status"] == "growth_target_reached" and point["completed_physical_cycles"] < minimum_cycles
+        point["status"] == "growth_target_reached" and point["completed_physical_cycles"] <= minimum_cycles
         for point in points
     )
     promote = any_growth and not all_inert and not all_catastrophic
@@ -251,6 +251,20 @@ def level0_decision(points: list[dict[str, Any]], expected_points: int, minimum_
         "LEVEL0_FINITE_NONCATASTROPHIC_GROWTH" if promote else "LEVEL0_EARLY_REJECTION",
         "level1" if promote else "none",
     )
+
+
+def expected_level0_points(registry_row: dict[str, str], config: dict[str, Any]) -> int:
+    level0 = config["level0"]
+    expected = len(level0["DeltaK_MPa_sqrt_m"])
+    k50 = finite(registry_row.get("historical_monotonic_K50_300K_MPa_sqrt_m"))
+    if math.isfinite(k50):
+        supplemental = min(
+            float(level0["inert_supplement_max_DeltaK_MPa_sqrt_m"]),
+            float(level0["inert_supplement_historical_K50_factor"]) * k50,
+        )
+        if supplemental - max(level0["DeltaK_MPa_sqrt_m"]) >= float(level0["inert_supplement_minimum_separation_MPa_sqrt_m"]):
+            expected += 1
+    return expected
 
 
 def plot_outputs(out: Path, points: list[dict[str, Any]], fits: list[dict[str, Any]], registry: list[dict[str, str]], config: dict[str, Any]) -> None:
@@ -365,7 +379,7 @@ def main() -> int:
         elif level0:
             promote, reason, next_fidelity = level0_decision(
                 level0,
-                len(config["level0"]["DeltaK_MPa_sqrt_m"]),
+                expected_level0_points(row, config),
                 float(config["minimum_post_initiation_cycles"]),
             )
             objective = math.nan
