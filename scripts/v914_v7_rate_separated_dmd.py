@@ -243,29 +243,14 @@ def evaluate_rate_separated_dmd_block(
             training_endpoint_vector=snapshots[-1].vector.copy(),
             refresh_index=0 if local_map is None else local_map.refresh_index + 1,
         )
-    remaining = stride - burst
-    midpoint_remaining = max(remaining // 2, 1)
-    start_vector = snapshots[-1].vector
-    midpoint_vector = _project(model, start_vector, midpoint_remaining)
-    endpoint_vector = _project(model, start_vector, remaining)
-    midpoint_state = copy.deepcopy(exact_state)
-    endpoint_state = copy.deepcopy(exact_state)
-    restore_active_state(midpoint_state, snapshots[-1], midpoint_vector)
-    restore_active_state(endpoint_state, snapshots[-1], endpoint_vector)
 
-    start_end, start_hazard, _st, start_next, start_rate = independent_cycle(
-        exact_state, loading, cycle_controls, cycle_map_fn
-    )
-    evaluations += 1
-
-    def rejected_probe(location: str, exc: Exception) -> dict[str, Any]:
-        # A projected midpoint/endpoint is speculative.  If its independent
-        # exact-cycle validation cannot meet the cycle-map tolerance, reject
-        # and contract this DMD block.  Failures on the accepted exact state or
-        # during the exact training burst deliberately remain fatal.
+    def rejected_speculation(
+        reason: str, location: str, exc: Exception
+    ) -> dict[str, Any]:
+        """Reject an uncommitted projection/probe without changing physics."""
         return {
             "numerical_pass": False,
-            "failure_reason": "projected_cycle_refinement_failed",
+            "failure_reason": reason,
             "projection_probe_location": str(location),
             "projection_probe_error": str(exc),
             "block_stride": stride,
@@ -283,6 +268,33 @@ def evaluate_rate_separated_dmd_block(
             "model_id": MODEL_ID,
         }
 
+    remaining = stride - burst
+    midpoint_remaining = max(remaining // 2, 1)
+    start_vector = snapshots[-1].vector
+    try:
+        midpoint_vector = _project(model, start_vector, midpoint_remaining)
+        endpoint_vector = _project(model, start_vector, remaining)
+    except FloatingPointError as exc:
+        return rejected_speculation("dmd_projection_nonfinite", "block_state", exc)
+    midpoint_state = copy.deepcopy(exact_state)
+    endpoint_state = copy.deepcopy(exact_state)
+    restore_active_state(midpoint_state, snapshots[-1], midpoint_vector)
+    restore_active_state(endpoint_state, snapshots[-1], endpoint_vector)
+
+    start_end, start_hazard, _st, start_next, start_rate = independent_cycle(
+        exact_state, loading, cycle_controls, cycle_map_fn
+    )
+    evaluations += 1
+
+    def rejected_probe(location: str, exc: Exception) -> dict[str, Any]:
+        # A projected midpoint/endpoint is speculative.  If its independent
+        # exact-cycle validation cannot meet the cycle-map tolerance, reject
+        # and contract this DMD block.  Failures on the accepted exact state or
+        # during the exact training burst deliberately remain fatal.
+        return rejected_speculation(
+            "projected_cycle_refinement_failed", location, exc
+        )
+
     try:
         evaluations += 1
         mid_end, mid_hazard, _mt, mid_next, mid_rate = independent_cycle(
@@ -297,9 +309,12 @@ def evaluate_rate_separated_dmd_block(
         )
     except AdaptiveCycleRefinementError as exc:
         return rejected_probe("endpoint", exc)
-    start_prediction = _project(model, start_vector, 1)
-    mid_prediction = _project(model, midpoint_vector, 1)
-    end_prediction = _project(model, endpoint_vector, 1)
+    try:
+        start_prediction = _project(model, start_vector, 1)
+        mid_prediction = _project(model, midpoint_vector, 1)
+        end_prediction = _project(model, endpoint_vector, 1)
+    except FloatingPointError as exc:
+        return rejected_speculation("dmd_projection_nonfinite", "residual_state", exc)
     state_error = max(
         _relative_vector(start_next.vector, start_prediction),
         _relative_vector(mid_next.vector, mid_prediction),

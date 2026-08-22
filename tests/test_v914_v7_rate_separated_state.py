@@ -27,6 +27,7 @@ from v914_v7_rate_separated_dmd import (
     evaluate_rate_separated_dmd_block,
 )
 from v914_v7_cycle_map import AdaptiveCycleRefinementError
+import v914_v7_rate_separated_dmd as dmd
 
 
 class State:
@@ -216,3 +217,28 @@ def test_exact_training_cycle_refinement_failure_remains_fatal(monkeypatch):
             state_rtol=1.0e-9, hazard_rtol=1.0e-9,
             cycle_map_fn=exact_failure,
         )
+
+
+def test_nonfinite_speculative_projection_rejects_block(monkeypatch):
+    monkeypatch.setenv("V914_V7_DMD_BURST_CYCLES", "6")
+    original = dmd._project
+    calls = 0
+
+    def nonfinite_projection(model, start, cycles):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise FloatingPointError("non-finite v7 DMD projection")
+        return original(model, start, cycles)
+
+    monkeypatch.setattr(dmd, "_project", nonfinite_projection)
+    result = evaluate_rate_separated_dmd_block(
+        State(), block_stride=64, loading=Loading(), cycle_controls=None,
+        state_rtol=1.0e-9, hazard_rtol=1.0e-9,
+        cycle_map_fn=linear_cycle_map,
+    )
+    assert result["numerical_pass"] is False
+    assert result["failure_reason"] == "dmd_projection_nonfinite"
+    assert result["projection_probe_location"] == "block_state"
+    assert result["cycle_map_evaluations"] == 6
+    assert result["local_map"] is not None
