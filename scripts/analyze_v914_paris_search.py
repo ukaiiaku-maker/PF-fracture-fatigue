@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -80,11 +81,35 @@ def post_initiation_rate(events: list[dict[str, Any]], minimum_events: int) -> d
     }
 
 
-def point_from_result(case: dict[str, Any], result_path: Path, config: dict[str, Any]) -> dict[str, Any]:
+def point_from_result(
+    case: dict[str, Any], result_path: Path, config: dict[str, Any], manifest: dict[str, Any]
+) -> dict[str, Any]:
     payload = json.loads(result_path.read_text())
+    contract_path = result_path.with_name("run_contract.json")
+    if not contract_path.is_file():
+        raise ValueError(f"terminal result lacks run contract: {result_path}")
+    contract = json.loads(contract_path.read_text())
     identity = payload.get("identity_contract", {})
     loading = identity.get("loading", {})
     status = str(payload.get("status", "invalid"))
+    if status not in TERMINAL:
+        raise ValueError(f"unrecognized terminal status {status!r}: {result_path}")
+    if int(payload.get("restart_count", -1)) != 0:
+        raise ValueError(f"restart result is not admissible: {result_path}")
+    if contract.get("repository_clean") is not True:
+        raise ValueError(f"run contract is not clean: {contract_path}")
+    if contract.get("candidate") != case["candidate_id"]:
+        raise ValueError(f"candidate mismatch: {contract_path}")
+    if not math.isclose(finite(contract.get("deltaK_MPa_sqrt_m")), finite(case["deltaK_MPa_sqrt_m"]), rel_tol=1.0e-12):
+        raise ValueError(f"DeltaK mismatch: {contract_path}")
+    if contract.get("registry_sha256") != manifest["candidate_registry_sha256"]:
+        raise ValueError(f"candidate registry hash mismatch: {contract_path}")
+    if contract.get("physics_sha256") != manifest["fixed_current_physics_sha256"]:
+        raise ValueError(f"fixed physics hash mismatch: {contract_path}")
+    if contract.get("repository_head") != identity.get("repository_head"):
+        raise ValueError(f"result/contract HEAD mismatch: {result_path}")
+    if contract.get("return_control") != "REV" or contract.get("configuration_label") != "CAL-TRANS-REV":
+        raise ValueError(f"wrong v7 control configuration: {contract_path}")
     events = list(payload.get("events", []))
     minimum_events = int(config["minimum_post_initiation_events"])
     developed = post_initiation_rate(events, minimum_events)
@@ -133,6 +158,8 @@ def point_from_result(case: dict[str, Any], result_path: Path, config: dict[str,
         "repository_head": identity.get("repository_head", ""),
         "engine_id": payload.get("engine_id", ""),
         "result_path": str(result_path.resolve()),
+        "run_contract_path": str(contract_path.resolve()),
+        "run_contract_sha256": hashlib.sha256(contract_path.read_bytes()).hexdigest(),
     }
 
 
@@ -349,7 +376,7 @@ def main() -> int:
             run_dir = manifest_path.parent / case["candidate_id"] / f"DeltaK{slug(case['deltaK_MPa_sqrt_m'])}_seed{case['seed']}"
             result_path = run_dir / "result.json"
             if result_path.is_file():
-                point = point_from_result(case, result_path, config)
+                point = point_from_result(case, result_path, config, manifest)
                 points.append(point)
                 history.append({**case, "state": "terminal", "status": point["status"], "result_path": str(result_path.resolve())})
             elif (run_dir / "checkpoint.json").is_file():
@@ -409,7 +436,7 @@ def main() -> int:
         "shielding_MPa_sqrt_m", "mobile_total_m2", "retained_total_m2", "physical_return_fraction",
         "total_cycle_map_evaluations", "accepted_cycle_map_evaluations", "accepted_block_count", "rejected_block_count",
         "maximum_accepted_stride", "dmd_map_refresh_count", "dmd_map_reuse_count", "dmd_map_invalidation_count",
-        "repository_head", "engine_id", "result_path",
+        "repository_head", "engine_id", "result_path", "run_contract_path", "run_contract_sha256",
     ]
     fit_fields = [
         "candidate_id", "fidelity", "seed", "R", "frequency_Hz", "temperature_K", "n_points", "DeltaK_min", "DeltaK_max",
