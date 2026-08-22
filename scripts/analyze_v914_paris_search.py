@@ -236,6 +236,23 @@ def group_key(point: dict[str, Any]) -> tuple[Any, ...]:
     )
 
 
+def level0_decision(points: list[dict[str, Any]], expected_points: int, minimum_cycles: float) -> tuple[bool, str, str]:
+    if len(points) < expected_points:
+        return False, "LEVEL0_INCOMPLETE", "level0"
+    any_growth = any(point["status"] == "growth_target_reached" for point in points)
+    all_inert = all(point["event_count"] == 0 for point in points)
+    all_catastrophic = all(
+        point["status"] == "growth_target_reached" and point["completed_physical_cycles"] < minimum_cycles
+        for point in points
+    )
+    promote = any_growth and not all_inert and not all_catastrophic
+    return (
+        promote,
+        "LEVEL0_FINITE_NONCATASTROPHIC_GROWTH" if promote else "LEVEL0_EARLY_REJECTION",
+        "level1" if promote else "none",
+    )
+
+
 def plot_outputs(out: Path, points: list[dict[str, Any]], fits: list[dict[str, Any]], registry: list[dict[str, str]], config: dict[str, Any]) -> None:
     colors = {"A": "#0072B2", "B": "#D55E00", "C": "#009E73", "D": "#CC79A7"}
     fig, ax = plt.subplots(figsize=(8.5, 6.0))
@@ -346,15 +363,11 @@ def main() -> int:
             next_fidelity = "level2" if promote else "none"
             objective = level1_fit["objective"]
         elif level0:
-            any_growth = any(point["status"] == "growth_target_reached" for point in level0)
-            all_inert = all(point["event_count"] == 0 for point in level0)
-            all_catastrophic = all(
-                point["status"] == "growth_target_reached" and point["completed_physical_cycles"] < config["minimum_post_initiation_cycles"]
-                for point in level0
+            promote, reason, next_fidelity = level0_decision(
+                level0,
+                len(config["level0"]["DeltaK_MPa_sqrt_m"]),
+                float(config["minimum_post_initiation_cycles"]),
             )
-            promote = any_growth and not all_inert and not all_catastrophic
-            reason = "LEVEL0_FINITE_NONCATASTROPHIC_GROWTH" if promote else "LEVEL0_EARLY_REJECTION"
-            next_fidelity = "level1" if promote else "none"
             objective = math.nan
         else:
             promote, reason, next_fidelity, objective = False, "UNEVALUATED", "level0", math.nan

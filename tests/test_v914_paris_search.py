@@ -12,7 +12,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from analyze_v914_paris_search import best_fit, fit_segment
+from analyze_v914_paris_search import best_fit, fit_segment, level0_decision
 from propose_v914_paris_surrogate_batch import gp_predict
 
 
@@ -79,3 +79,9 @@ def test_surrogate_predictor_returns_finite_uncertainty():
     assert np.all(np.isfinite(mean))
     assert np.all(std > 0.0)
     assert length > 0.0
+
+
+def test_level0_never_rejects_from_partial_load_evidence():
+    inert = {"status": "cycle_horizon_reached", "event_count": 0, "completed_physical_cycles": 1.0e8}
+    assert level0_decision([inert, inert], 3, 1.0) == (False, "LEVEL0_INCOMPLETE", "level0")
+    assert level0_decision([inert, inert, inert], 3, 1.0) == (False, "LEVEL0_EARLY_REJECTION", "none")
