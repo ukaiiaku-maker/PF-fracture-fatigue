@@ -500,7 +500,7 @@ def write_required_figures(
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    usable = [row for row in rows if row["campaign_disposition"] != "unsupported_restart_result"]
+    usable = [row for row in rows if row["accepted_terminal_result"]]
     completed = [
         row for row in usable
         if row["campaign_disposition"] == "completed_growth_target"
@@ -522,6 +522,13 @@ def write_required_figures(
     axes[0].set(xlabel=r"$\Delta K$ (MPa $\sqrt{m}$)", ylabel=r"developed $da/dN$ (m/cycle)")
     axes[1].set(xlabel=r"$\Delta K$ midpoint (MPa $\sqrt{m}$)", ylabel="adjacent local slope")
     for axis in axes: axis.grid(True, which="both", alpha=0.25)
+    if positive or positive_censors:
+        x_values = [float(row["deltaK_MPa_sqrt_m"]) for row in positive]
+        x_values += [float(row["deltaK_MPa_sqrt_m"]) for row in positive_censors]
+        if x_values:
+            ticks = np.geomspace(min(x_values), max(x_values), 4)
+            axes[0].set_xticks(ticks)
+            axes[0].set_xticklabels([f"{tick:.3f}" for tick in ticks])
     fig.savefig(out / "figure_1_R0p1_paris_and_local_slope.png", dpi=180); plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.8), constrained_layout=True)
@@ -572,10 +579,38 @@ def write_required_figures(
     ):
         fig, ax = plt.subplots(figsize=(6.5, 4.8), constrained_layout=True)
         groups: dict[tuple[float, float], list[dict[str, Any]]] = {}
-        for row in completed: groups.setdefault((float(row["R"]), round(float(row["deltaK_MPa_sqrt_m"]), 6)), []).append(row)
+        for row in usable:
+            groups.setdefault(
+                (float(row["R"]), round(float(row["deltaK_MPa_sqrt_m"]), 6)),
+                [],
+            ).append(row)
         for key, values in sorted(groups.items()):
             values.sort(key=lambda row: float(row["frequency_Hz"]))
-            if len(values) > 1: ax.loglog([row["frequency_Hz"] for row in values], [row[field] for row in values], "o-", label=f"R={key[0]:g}, dK={key[1]:g}")
+            completed_values = [
+                row for row in values
+                if row["campaign_disposition"] == "completed_growth_target"
+            ]
+            if len(completed_values) > 1:
+                ax.loglog(
+                    [row["frequency_Hz"] for row in completed_values],
+                    [row[field] for row in completed_values], "o-",
+                    label=f"R={key[0]:g}, dK={key[1]:g}",
+                )
+            censored_values = [
+                row for row in values
+                if row["campaign_disposition"] == "physical_cycle_censor"
+            ]
+            if censored_values:
+                rates = [float(row["total_da_dN_m_per_cycle"]) for row in censored_values]
+                if field == "developed_da_dt_m_per_s":
+                    rates = [
+                        rate * float(row["frequency_Hz"])
+                        for rate, row in zip(rates, censored_values)
+                    ]
+                ax.loglog(
+                    [row["frequency_Hz"] for row in censored_values], rates,
+                    "v", markerfacecolor="none",
+                )
         ax.set(xlabel="frequency (Hz)", ylabel=ylabel); ax.grid(True, which="both", alpha=0.25)
         if ax.lines: ax.legend(fontsize=7)
         fig.savefig(out / name, dpi=180); plt.close(fig)
