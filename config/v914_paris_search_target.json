@@ -1,0 +1,60 @@
+{
+  "schema": "v914_paris_search_target_v1",
+  "target_source_status": "PROVISIONAL_EXTERNAL_BROAD_PHYSICAL_BAND_NO_DEFENSIBLE_LOCAL_EXPERIMENTAL_ENVELOPE",
+  "target_m_min": 2.0,
+  "target_m_max": 10.0,
+  "target_m_center": 4.0,
+  "target_log10_da_dN_min_m_per_cycle": -12.0,
+  "target_log10_da_dN_max_m_per_cycle": -6.0,
+  "target_log10_da_dN_center_m_per_cycle": -9.0,
+  "minimum_Paris_points": 4,
+  "minimum_relative_DeltaK_span": 0.2,
+  "preferred_da_dN_span_decades": 1.0,
+  "minimum_fit_R2": 0.9,
+  "minimum_post_initiation_events": 3,
+  "minimum_post_initiation_cycles": 1.0,
+  "objective_weights": {
+    "fit_rmse_log10": 1.0,
+    "rate_mismatch": 1.0,
+    "slope_mismatch": 2.0,
+    "span_shortfall": 1.0
+  },
+  "level0": {
+    "R": 0.1,
+    "base_phase_intervals": 16,
+    "DeltaK_MPa_sqrt_m": [10.8, 16.2, 21.6],
+    "frequency_Hz": 1000.0,
+    "maximum_cycle_map_evaluations": 1024,
+    "maximum_physical_cycles": 100000000,
+    "n_bins": 32,
+    "seed": 1720,
+    "target_extension_um": 5.0,
+    "temperature_K": 300.0
+  },
+  "level1": {
+    "R": 0.1,
+    "base_phase_intervals": 16,
+    "DeltaK_MPa_sqrt_m": [10.8, 13.5, 16.2, 18.9, 21.6],
+    "frequency_Hz": 1000.0,
+    "maximum_physical_cycles": 10000000000,
+    "n_bins": 64,
+    "seed": 1720,
+    "target_extension_um": 20.0,
+    "temperature_K": 300.0
+  },
+  "level2": {
+    "R": 0.1,
+    "base_phase_intervals": 256,
+    "frequency_Hz": 1000.0,
+    "maximum_physical_cycles": 1000000000000,
+    "n_bins": 128,
+    "seed": 1720,
+    "target_extension_um": 40.0,
+    "temperature_K": 300.0
+  },
+  "notes": [
+    "All target values are external and replaceable without rerunning preserved candidate responses.",
+    "The broad provisional slope/rate bands are not inferred from an old numerical slope.",
+    "Replace these targets when a defensible experimental Paris dataset and uncertainty envelope are supplied."
+  ]
+}

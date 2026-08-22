@@ -1,0 +1,222 @@
+{
+  "fixed_current_common_physics_fields": [
+    "physics__cleavage_hits",
+    "physics__cleavage_correlation_time_s",
+    "physics__persistent_backstress_scale",
+    "physics__blunting_length_m",
+    "physics__blunting_slip_fraction",
+    "physics__encounter_efficiency",
+    "physics__taylor_phi_max",
+    "physics__mobile_transport_velocity_scale"
+  ],
+  "fixed_physics_reason": "The corrected mission fixes calibrated transferred-2D common physics, calibrated transport, and three-hit cleavage; historical row-level CommonPhysics overrides remain provenance only.",
+  "historical_bounds_in_generator_order": [
+    {
+      "field": "cleave_G00_eV",
+      "lower": 1.0,
+      "transform": "linear",
+      "upper": 5.5
+    },
+    {
+      "field": "cleave_sigc0_GPa",
+      "lower": 1.0,
+      "transform": "linear",
+      "upper": 8.0
+    },
+    {
+      "field": "cleave_exp_a",
+      "lower": 0.05,
+      "transform": "log10",
+      "upper": 1.5
+    },
+    {
+      "field": "cleave_exp_n",
+      "lower": 0.5,
+      "transform": "linear",
+      "upper": 3.0
+    },
+    {
+      "field": "cleave_floor_frac",
+      "lower": 0.005,
+      "transform": "log10",
+      "upper": 0.5
+    },
+    {
+      "field": "emit_G00_eV",
+      "lower": 0.4,
+      "transform": "linear",
+      "upper": 5.0
+    },
+    {
+      "field": "emit_sigc0_GPa",
+      "lower": 1.0,
+      "transform": "linear",
+      "upper": 9.0
+    },
+    {
+      "field": "emit_exp_a",
+      "lower": 0.03,
+      "transform": "log10",
+      "upper": 1.5
+    },
+    {
+      "field": "emit_exp_n",
+      "lower": 0.45,
+      "transform": "linear",
+      "upper": 2.5
+    },
+    {
+      "field": "emit_floor_frac",
+      "lower": 0.005,
+      "transform": "log10",
+      "upper": 0.2
+    },
+    {
+      "field": "peierls_H0_eV",
+      "lower": 0.5,
+      "transform": "linear",
+      "upper": 7.0
+    },
+    {
+      "field": "peierls_activation_entropy_kB",
+      "lower": -40.0,
+      "transform": "linear",
+      "upper": 20.0
+    },
+    {
+      "field": "peierls_exp_a",
+      "lower": 0.1,
+      "transform": "log10",
+      "upper": 2.0
+    },
+    {
+      "field": "peierls_exp_n",
+      "lower": 0.5,
+      "transform": "linear",
+      "upper": 2.75
+    },
+    {
+      "field": "taylor_H0_eV",
+      "lower": 0.08,
+      "transform": "linear",
+      "upper": 2.0
+    },
+    {
+      "field": "taylor_activation_entropy_kB",
+      "lower": 0.0,
+      "transform": "linear",
+      "upper": 40.0
+    },
+    {
+      "field": "taylor_exp_a",
+      "lower": 0.03,
+      "transform": "log10",
+      "upper": 1.0
+    },
+    {
+      "field": "taylor_exp_n",
+      "lower": 0.5,
+      "transform": "linear",
+      "upper": 2.5
+    },
+    {
+      "field": "rho_source0_m2",
+      "lower": 100000000000000.0,
+      "transform": "log10",
+      "upper": 1e+17
+    },
+    {
+      "field": "taylor_corr_rho_c_m2",
+      "lower": 100000000000.0,
+      "transform": "log10",
+      "upper": 1e+18
+    },
+    {
+      "field": "taylor_corr_scale",
+      "lower": 0.1,
+      "transform": "log10",
+      "upper": 10.0
+    },
+    {
+      "field": "c_blunt",
+      "lower": 0.0,
+      "transform": "linear",
+      "upper": 3.0
+    },
+    {
+      "field": "physics__cleavage_hits",
+      "lower": 1.0,
+      "transform": "linear",
+      "upper": 6.0
+    },
+    {
+      "field": "physics__cleavage_correlation_time_s",
+      "lower": 1e-09,
+      "transform": "log10",
+      "upper": 0.001
+    },
+    {
+      "field": "physics__persistent_backstress_scale",
+      "lower": 0.25,
+      "transform": "log10",
+      "upper": 4.0
+    },
+    {
+      "field": "physics__blunting_length_m",
+      "lower": 1e-07,
+      "transform": "log10",
+      "upper": 2e-06
+    },
+    {
+      "field": "physics__blunting_slip_fraction",
+      "lower": 0.1,
+      "transform": "log10",
+      "upper": 4.0
+    },
+    {
+      "field": "physics__encounter_efficiency",
+      "lower": 0.1,
+      "transform": "log10",
+      "upper": 10.0
+    },
+    {
+      "field": "physics__taylor_phi_max",
+      "lower": 5.0,
+      "transform": "log10",
+      "upper": 50.0
+    },
+    {
+      "field": "physics__mobile_transport_velocity_scale",
+      "lower": 0.0,
+      "transform": "linear",
+      "upper": 1.0
+    }
+  ],
+  "historical_full_dimension": 30,
+  "new_paris_search_candidate_dimension": 22,
+  "new_paris_search_varied_fields": [
+    "cleave_G00_eV",
+    "cleave_sigc0_GPa",
+    "cleave_exp_a",
+    "cleave_exp_n",
+    "cleave_floor_frac",
+    "emit_G00_eV",
+    "emit_sigc0_GPa",
+    "emit_exp_a",
+    "emit_exp_n",
+    "emit_floor_frac",
+    "peierls_H0_eV",
+    "peierls_activation_entropy_kB",
+    "peierls_exp_a",
+    "peierls_exp_n",
+    "taylor_H0_eV",
+    "taylor_activation_entropy_kB",
+    "taylor_exp_a",
+    "taylor_exp_n",
+    "rho_source0_m2",
+    "taylor_corr_rho_c_m2",
+    "taylor_corr_scale",
+    "c_blunt"
+  ],
+  "schema": "v914_historical_search_bounds_v1"
+}

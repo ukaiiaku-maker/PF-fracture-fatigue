@@ -1,0 +1,68 @@
+{
+  "experimental_reference_recovery": {
+    "action": "use external replaceable target configuration; never use historical weak-T m as target",
+    "evidence": "scripts/finalize_v913_joint_paris_slope_study.py and its verified final manifest",
+    "status": "NO_DEFENSIBLE_QUANTITATIVE_LOCAL_ENVELOPE_IN_PRIOR_JOINT_PARIS_STUDY"
+  },
+  "fixed_forward_physics": {
+    "path": "/private/tmp/v914_model_screen_analysis_2e7c975/artifacts/v914_calibrated_v7_transport_extension/calibrated_v7_transport_extension.json",
+    "sha256": "054abf35061d999772bfdaa3578b9a869d367c7c7d7a137a24fd0f5b8e9da608"
+  },
+  "historical_ABCD_selection": {
+    "purpose": "four hand-designated mechanistic probes for sparse independent 2-D validation",
+    "registry_sha256": "74eefeea3389bde2349d513ca5847891b0887200f6f441e1b120af3705b1bf5a",
+    "roles": {
+      "v914_endurance_knee_0133": {
+        "option": "D",
+        "role": "mixed"
+      },
+      "v914_endurance_knee_0462": {
+        "option": "A",
+        "role": "direct barrier"
+      },
+      "v914_endurance_knee_0554": {
+        "option": "C",
+        "role": "timescale crossover"
+      },
+      "v914_endurance_knee_0658": {
+        "option": "B",
+        "role": "plastic-state controlled"
+      }
+    },
+    "selection_record": "/private/tmp/v914_model_screen_analysis_2e7c975/arrhenius_fracture/data/materials/v10_2_31_endurance_knee_ABCD_selection.json",
+    "selection_record_sha256": "6d8ee03072c6edc71fe6d4b5517eaa71742b3565c9420ec107c1660511f5f87c",
+    "selection_was_not_top_four_search_rank": true
+  },
+  "historical_candidate_registry": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search/runtime_inputs/v914/endurance_knee_global_300K_1024.csv",
+    "sha256": "d05958c568610fab1fbb8795c6815f05ea6f36ef6cb1336dfecafa3ffc297ad1"
+  },
+  "historical_generator": {
+    "candidate_id_format": "v914_endurance_knee_{sobol_index:04d}",
+    "method": "scipy.stats.qmc.Sobol scrambled power-of-two population",
+    "seed": 1914,
+    "sha256": "84b64d59083feed52131d0bfa630347c401ab4bf78ed1d72ee9a53d9a78f798f",
+    "source": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search/scripts/generate_v914_endurance_knee_manifold.py"
+  },
+  "historical_population": 1024,
+  "historical_ranking": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search/runs/v914_endurance_knee_global_300K_stageA_1024/ranked_candidates.csv",
+    "sha256": "3eb297519fca94203ac970704fcc30061cc1a8f2cb56d976193c0dd06f31c29c"
+  },
+  "historical_run_contract": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search/runs/v914_endurance_knee_global_300K_stageA_1024/run_contract.json",
+    "sha256": "b1e65b5b6166fdb57a15766b8cd8fb53f3ca2ea37f1bf5aa7fb37b32ee283d81"
+  },
+  "historical_search_manifest": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v9_14_cyclic_fatigue_knee_search/runs/v914_endurance_knee_global_300K_stageA_1024/search_manifest.json",
+    "sha256": "9170990ba8e1799af82b5fac2304b11069c2ccd150e9c42c0810f820f25981ab"
+  },
+  "new_initial_design": {
+    "common_random_seed": 1720,
+    "count": 32,
+    "fidelity_pair_count": 16,
+    "selection": "greedy maximin in exact inverse-transformed 22-D historical Sobol coordinates, seeded by A-D"
+  },
+  "physics_changed": false,
+  "schema": "v914_historical_fatigue_search_provenance_v1"
+}
