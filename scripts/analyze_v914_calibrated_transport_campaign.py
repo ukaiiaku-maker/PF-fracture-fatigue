@@ -42,9 +42,16 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
     events = sorted(result.get("events", []), key=lambda row: float(row["cumulative_cycles"]))
     final_event_cycle = float(events[-1]["cumulative_cycles"]) if events else math.nan
     extension = float(result.get("cumulative_extension_m", 0.0))
+    status = result.get("status")
+    completed_cycles = float(result.get("completed_physical_cycles", 0))
+    observation_cycles = (
+        completed_cycles
+        if status == "cycle_horizon_reached" and completed_cycles > 0.0
+        else final_event_cycle
+    )
     total_rate = (
-        extension / final_event_cycle
-        if events and final_event_cycle > 0.0
+        extension / observation_cycles
+        if events and observation_cycles > 0.0
         else math.nan
     )
     start_cycle = _cycle_at_extension(events, developed_start_m)
@@ -64,7 +71,6 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
     frequency = float(contract.get("frequency_Hz", result.get("identity_contract", {}).get("loading", {}).get("frequency_Hz", math.nan)))
     delta_k = float(contract.get("deltaK_MPa_sqrt_m", result.get("identity_contract", {}).get("loading", {}).get("deltaK_MPa_sqrt_m", math.nan)))
     R = float(contract.get("R", result.get("identity_contract", {}).get("loading", {}).get("R", math.nan)))
-    status = result.get("status")
     restart_count = int(result.get("restart_count", 0))
     if restart_count > 0:
         disposition = "unsupported_restart_result"
@@ -94,6 +100,7 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
         "restart_count": restart_count,
         "fresh_uninterrupted": restart_count == 0,
         "physical_cycles_integer_boundary": int(result.get("completed_physical_cycles", 0)),
+        "observation_cycles_for_total_rate": observation_cycles,
         "final_event_cycle": final_event_cycle,
         "event_count": len(events),
         "extension_m": extension,
@@ -133,6 +140,8 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
 def event_rate_rows(result_path: Path, developed_start_m: float = 20.0e-6) -> list[dict[str, Any]]:
     """Return event-resolved projected/path rates from one audited result."""
     summary = summarize_result(result_path, developed_start_m)
+    if summary["campaign_disposition"] == "unsupported_restart_result":
+        return []
     result = json.loads(result_path.read_text())
     events = sorted(result.get("events", []), key=lambda row: float(row["cumulative_cycles"]))
     rows = []
@@ -241,7 +250,15 @@ def trend_rows(rows: list[dict[str, Any]], variable: str) -> list[dict[str, Any]
         if row["campaign_disposition"] != "completed_growth_target" or not math.isfinite(rate) or rate <= 0.0:
             continue
         load = float(row["Kmax_MPa_sqrt_m"] if variable == "R" else row["deltaK_MPa_sqrt_m"])
-        key = (row["return_control"], row["seed"], float(row[fixed]), round(load, 6))
+        # R curves were launched from rounded DeltaK values chosen on a common
+        # Kmax grid.  Milliscale Kmax grouping preserves that intended match
+        # without merging distinct adaptive points. Frequency cases use the
+        # exact same DeltaK and retain the tighter rounding.
+        load_digits = 3 if variable == "R" else 6
+        key = (
+            row["return_control"], row["seed"], float(row[fixed]),
+            round(load, load_digits),
+        )
         groups.setdefault(key, []).append(row)
     output = []
     for key, values in groups.items():
@@ -485,14 +502,20 @@ def write_required_figures(
     for axis in axes: axis.grid(True, which="both", alpha=0.25)
     fig.savefig(out / "figure_1_R0p1_paris_and_local_slope.png", dpi=180); plt.close(fig)
 
-    fig, ax = plt.subplots(figsize=(6.5, 4.8), constrained_layout=True)
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.8), constrained_layout=True)
     for R in sorted({float(row["R"]) for row in usable}):
         values = sorted((row for row in completed if math.isclose(float(row["R"]), R)), key=lambda row: float(row["deltaK_MPa_sqrt_m"]))
-        if values: ax.loglog([row["deltaK_MPa_sqrt_m"] for row in values], [row["developed_da_dN_m_per_cycle"] for row in values], "o-", label=f"R={R:g}")
+        if values:
+            axes[0].loglog([row["deltaK_MPa_sqrt_m"] for row in values], [row["developed_da_dN_m_per_cycle"] for row in values], "o-", label=f"R={R:g}")
+            axes[1].semilogy([row["Kmax_MPa_sqrt_m"] for row in values], [row["developed_da_dN_m_per_cycle"] for row in values], "o-", label=f"R={R:g}")
         marks = [row for row in censored if math.isclose(float(row["R"]), R)]
-        if marks: ax.loglog([row["deltaK_MPa_sqrt_m"] for row in marks], [row["total_da_dN_m_per_cycle"] for row in marks], "v", markerfacecolor="none")
-    ax.set(xlabel=r"$\Delta K$ (MPa $\sqrt{m}$)", ylabel=r"developed $da/dN$ (m/cycle)"); ax.grid(True, which="both", alpha=0.25)
-    if ax.lines: ax.legend()
+        if marks:
+            axes[0].loglog([row["deltaK_MPa_sqrt_m"] for row in marks], [row["total_da_dN_m_per_cycle"] for row in marks], "v", markerfacecolor="none")
+            axes[1].semilogy([row["Kmax_MPa_sqrt_m"] for row in marks], [row["total_da_dN_m_per_cycle"] for row in marks], "v", markerfacecolor="none")
+    axes[0].set(xlabel=r"$\Delta K$ (MPa $\sqrt{m}$)", ylabel=r"developed $da/dN$ (m/cycle)")
+    axes[1].set(xlabel=r"$K_{max}$ (MPa $\sqrt{m}$)", ylabel=r"developed $da/dN$ (m/cycle)")
+    for axis in axes: axis.grid(True, which="both", alpha=0.25)
+    if axes[0].lines: axes[0].legend()
     fig.savefig(out / "figure_2_R_dependence_paris_curves.png", dpi=180); plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.3), constrained_layout=True)
@@ -507,7 +530,7 @@ def write_required_figures(
     for axis in axes: axis.grid(True, alpha=0.25)
     fig.savefig(out / "figure_3_knee_shift_with_R.png", dpi=180); plt.close(fig)
 
-    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.2), constrained_layout=True)
+    fig, axes = plt.subplots(1, 4, figsize=(16.5, 4.2), constrained_layout=True)
     for R in sorted({float(row["R"]) for row in usable}):
         values = sorted((row for row in usable if math.isclose(float(row["R"]), R)), key=lambda row: float(row["Kmax_MPa_sqrt_m"]))
         if not values: continue
@@ -515,7 +538,8 @@ def write_required_figures(
         axes[0].plot(x, [row["physical_return_fraction"] for row in values], "o-", label=f"R={R:g}")
         axes[1].plot(x, [row["tip_radius_m"] for row in values], "o-")
         axes[2].plot(x, [row["Kshield_MPa_sqrt_m"] for row in values], "o-")
-    axes[0].set(ylabel="physical return fraction"); axes[1].set(ylabel="tip radius (m)"); axes[2].set(ylabel=r"$K_{shield}$ (MPa $\sqrt{m}$)")
+        axes[3].plot(x, [row["net_source_blunting_count"] for row in values], "o-")
+    axes[0].set(ylabel="physical return fraction"); axes[1].set(ylabel="tip radius (m)"); axes[2].set(ylabel=r"$K_{shield}$ (MPa $\sqrt{m}$)"); axes[3].set(ylabel="net source blunting count")
     for axis in axes: axis.set_xlabel(r"$K_{max}$ (MPa $\sqrt{m}$)"); axis.grid(True, alpha=0.25)
     if axes[0].lines: axes[0].legend()
     fig.savefig(out / "figure_4_return_blunting_shielding.png", dpi=180); plt.close(fig)

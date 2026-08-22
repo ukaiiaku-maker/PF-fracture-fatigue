@@ -87,6 +87,16 @@ def test_summary_uses_developed_span_and_distinguishes_work_budget(tmp_path):
     assert incomplete["accepted_terminal_result"] is False
 
 
+def test_censor_total_rate_uses_full_observation_horizon(tmp_path):
+    path = _write_result(tmp_path / "censor", "cycle_horizon_reached", 13.0)
+    payload = json.loads(path.read_text())
+    payload["completed_physical_cycles"] = 10**12
+    path.write_text(json.dumps(payload))
+    summary = summarize_result(path)
+    assert summary["observation_cycles_for_total_rate"] == 10**12
+    assert summary["total_da_dN_m_per_cycle"] == pytest.approx(1.0e-16)
+
+
 def test_fit_and_plot_use_only_completed_developed_points(tmp_path):
     rows = []
     for index, delta_k in enumerate((10.0, 12.0, 14.0)):
@@ -127,7 +137,12 @@ def test_restart_result_is_excluded_and_event_diagnostics_are_resolved(tmp_path)
     assert summary["fresh_uninterrupted"] is False
     assert fit_groups([summary]) == []
 
-    events = event_rate_rows(path)
+    assert event_rate_rows(path) == []
+
+    fresh_path = _write_result(
+        tmp_path / "fresh_events", "growth_target_reached", 14.0
+    )
+    events = event_rate_rows(fresh_path)
     assert len(events) == 2
     assert events[0]["event_da_dN_m_per_cycle"] == pytest.approx(2.0e-6)
     assert events[1]["event_da_dN_m_per_cycle"] == pytest.approx(1.0e-6)
@@ -152,6 +167,25 @@ def test_local_slopes_and_frequency_trends_use_fresh_completed_rows(tmp_path):
     assert len(trends) == 1
     assert trends[0]["rate_ratio_right_over_left"] == pytest.approx(0.1)
     assert trends[0]["frequency_exponent_per_cycle"] == pytest.approx(-1.0)
+
+
+def test_R_trends_match_rounded_deltaK_launches_on_common_Kmax(tmp_path):
+    left = summarize_result(
+        _write_result(tmp_path / "r_left", "growth_target_reached", 15.87867)
+    )
+    right = summarize_result(
+        _write_result(tmp_path / "r_right", "growth_target_reached", 26.4645)
+    )
+    left["R"] = 0.1
+    left["Kmax_MPa_sqrt_m"] = left["deltaK_MPa_sqrt_m"] / 0.9
+    right["R"] = -0.5
+    right["Kmax_MPa_sqrt_m"] = right["deltaK_MPa_sqrt_m"] / 1.5
+    left["return_control"] = right["return_control"] = "REV"
+    left["developed_da_dN_m_per_cycle"] = 1.0e-12
+    right["developed_da_dN_m_per_cycle"] = 2.0e-12
+    trends = trend_rows([left, right], "R")
+    assert len(trends) == 1
+    assert trends[0]["matched_load_MPa_sqrt_m"] == pytest.approx(17.643)
 
 
 def test_nonmonotone_knee_is_not_forced_into_paris_fit(tmp_path):
