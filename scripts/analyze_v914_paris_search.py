@@ -335,6 +335,30 @@ def expected_level0_points(registry_row: dict[str, str], config: dict[str, Any])
     return expected
 
 
+def campaign_group_complete(
+    candidate: str,
+    fidelity: str,
+    points: list[dict[str, Any]],
+    history: list[dict[str, Any]],
+) -> bool:
+    def identity(row: dict[str, Any]) -> tuple[Any, ...]:
+        return (
+            row["candidate_id"], row["fidelity"], int(row["seed"]),
+            finite(row["R"]), finite(row["frequency_Hz"]), finite(row["temperature_K"]),
+            finite(row.get("deltaK_MPa_sqrt_m", row.get("DeltaK_MPa_sqrt_m"))),
+        )
+
+    expected = {
+        identity(row) for row in history
+        if row["candidate_id"] == candidate and row["fidelity"] == fidelity
+    }
+    terminal = {
+        identity(row) for row in points
+        if row["candidate_id"] == candidate and row["fidelity"] == fidelity
+    }
+    return bool(expected) and terminal == expected
+
+
 def plot_outputs(out: Path, points: list[dict[str, Any]], fits: list[dict[str, Any]], registry: list[dict[str, str]], config: dict[str, Any]) -> None:
     colors = {"A": "#0072B2", "B": "#D55E00", "C": "#009E73", "D": "#CC79A7"}
     fig, ax = plt.subplots(figsize=(8.5, 6.0))
@@ -439,7 +463,9 @@ def main() -> int:
         candidate_points = [point for point in points if point["candidate_id"] == candidate]
         level0 = [point for point in candidate_points if point["fidelity"] == "level0"]
         level1_fit = next((fit for fit in fits if fit["candidate_id"] == candidate and fit["fidelity"] == "level1"), None)
-        if level1_fit is not None:
+        if level1_fit is not None and not campaign_group_complete(candidate, "level1", points, history):
+            promote, reason, next_fidelity, objective = False, "LEVEL1_INCOMPLETE", "level1", math.nan
+        elif level1_fit is not None:
             promote = bool(level1_fit["valid_Paris_region"])
             reason = "VALID_LEVEL1_PARIS_REGION" if promote else "NO_VALID_LEVEL1_PARIS_REGION"
             next_fidelity = "level2" if promote else "none"

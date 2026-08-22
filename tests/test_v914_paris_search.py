@@ -13,7 +13,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from analyze_v914_paris_search import aggregate_seed_fits, best_fit, expected_level0_points, fit_segment, level0_decision, slug
+from analyze_v914_paris_search import aggregate_seed_fits, best_fit, campaign_group_complete, expected_level0_points, fit_segment, level0_decision, slug
 from propose_v914_paris_surrogate_batch import gp_predict
 
 
@@ -142,3 +142,21 @@ def test_finalist_seed_statistics_exclude_invalid_fits():
     assert rows[0]["m_mean"] == pytest.approx(5.0)
     assert rows[0]["m_std"] == pytest.approx(2.0**0.5)
     assert rows[0]["log10_C_mean"] == pytest.approx(-11.0)
+
+
+def test_level1_campaign_cannot_reject_from_partial_load_evidence():
+    base = {
+        "candidate_id": "candidate", "fidelity": "level1", "seed": 1720,
+        "R": 0.1, "frequency_Hz": 1000.0, "temperature_K": 300.0,
+    }
+    history = [
+        {**base, "deltaK_MPa_sqrt_m": load}
+        for load in (10.0, 12.0, 14.0, 16.0)
+    ]
+    partial = [
+        {**base, "DeltaK_MPa_sqrt_m": load}
+        for load in (10.0, 12.0, 14.0)
+    ]
+    assert campaign_group_complete("candidate", "level1", partial, history) is False
+    complete = partial + [{**base, "DeltaK_MPa_sqrt_m": 16.0}]
+    assert campaign_group_complete("candidate", "level1", complete, history) is True
