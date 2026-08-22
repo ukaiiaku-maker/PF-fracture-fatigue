@@ -161,6 +161,26 @@ def test_rate_separated_dmd_projects_net_state_and_integrates_gross_ledgers(monk
     assert reused["log_hazard_output_relative_error"] < 1.0e-12
 
 
+def test_distant_active_state_refreshes_geometry_local_map(monkeypatch):
+    monkeypatch.setenv("V914_V7_DMD_BURST_CYCLES", "6")
+    initial = evaluate_rate_separated_dmd_block(
+        State(), block_stride=64, loading=Loading(), cycle_controls=None,
+        state_rtol=0.03, hazard_rtol=1.0e-9,
+        cycle_map_fn=linear_cycle_map,
+    )
+    distant = State()
+    distant.mobile_m2 += 10.0
+    refreshed = evaluate_rate_separated_dmd_block(
+        distant, block_stride=64, loading=Loading(), cycle_controls=None,
+        state_rtol=0.03, hazard_rtol=1.0e-9,
+        local_map=initial["local_map"], cycle_map_fn=linear_cycle_map,
+    )
+    assert refreshed["local_map_reuse_distance"] > 0.03
+    assert refreshed["local_map_reused"] is False
+    assert refreshed["cycle_map_evaluations"] == 9
+    assert refreshed["local_map"].refresh_index == 1
+
+
 def test_projected_cycle_refinement_failure_rejects_block(monkeypatch):
     monkeypatch.setenv("V914_V7_DMD_BURST_CYCLES", "6")
     calls = 0

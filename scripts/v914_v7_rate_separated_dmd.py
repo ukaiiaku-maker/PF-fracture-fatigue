@@ -198,6 +198,7 @@ def evaluate_rate_separated_dmd_block(
         local_map is not None
         and local_map.geometry_signature == geometry
         and local_map.fields == initial_snapshot.fields
+        and reuse_distance <= float(state_rtol)
     )
     burst = 0 if reusable else min(
         _env_int(
