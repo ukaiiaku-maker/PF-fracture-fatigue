@@ -97,6 +97,16 @@ def test_censor_total_rate_uses_full_observation_horizon(tmp_path):
     assert summary["total_da_dN_m_per_cycle"] == pytest.approx(1.0e-16)
 
 
+def test_incomplete_total_rate_uses_completed_observation_cycles(tmp_path):
+    path = _write_result(tmp_path / "incomplete_rate", "work_budget_exhausted", 13.0)
+    payload = json.loads(path.read_text())
+    payload["completed_physical_cycles"] = 10_000_000
+    path.write_text(json.dumps(payload))
+    summary = summarize_result(path)
+    assert summary["observation_cycles_for_total_rate"] == 10_000_000
+    assert summary["total_da_dN_m_per_cycle"] == pytest.approx(1.0e-11)
+
+
 def test_fit_and_plot_use_only_completed_developed_points(tmp_path):
     rows = []
     for index, delta_k in enumerate((10.0, 12.0, 14.0)):
@@ -180,12 +190,14 @@ def test_R_trends_match_rounded_deltaK_launches_on_common_Kmax(tmp_path):
     left["Kmax_MPa_sqrt_m"] = left["deltaK_MPa_sqrt_m"] / 0.9
     right["R"] = -0.5
     right["Kmax_MPa_sqrt_m"] = right["deltaK_MPa_sqrt_m"] / 1.5
-    left["return_control"] = right["return_control"] = "REV"
+    left["return_control"] = "IRREV"
+    right["return_control"] = "REV"
     left["developed_da_dN_m_per_cycle"] = 1.0e-12
     right["developed_da_dN_m_per_cycle"] = 2.0e-12
     trends = trend_rows([left, right], "R")
     assert len(trends) == 1
     assert trends[0]["matched_load_MPa_sqrt_m"] == pytest.approx(17.643)
+    assert trends[0]["mixed_control_R_comparison"] is True
 
 
 def test_nonmonotone_knee_is_not_forced_into_paris_fit(tmp_path):

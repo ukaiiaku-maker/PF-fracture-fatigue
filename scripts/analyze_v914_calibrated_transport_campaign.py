@@ -44,10 +44,9 @@ def summarize_result(result_path: Path, developed_start_m: float = 20.0e-6) -> d
     extension = float(result.get("cumulative_extension_m", 0.0))
     status = result.get("status")
     completed_cycles = float(result.get("completed_physical_cycles", 0))
-    observation_cycles = (
-        completed_cycles
-        if status == "cycle_horizon_reached" and completed_cycles > 0.0
-        else final_event_cycle
+    observation_cycles = max(
+        completed_cycles,
+        final_event_cycle if math.isfinite(final_event_cycle) else 0.0,
     )
     total_rate = (
         extension / observation_cycles
@@ -255,8 +254,9 @@ def trend_rows(rows: list[dict[str, Any]], variable: str) -> list[dict[str, Any]
         # without merging distinct adaptive points. Frequency cases use the
         # exact same DeltaK and retain the tighter rounding.
         load_digits = 3 if variable == "R" else 6
+        control_key = None if variable == "R" else row["return_control"]
         key = (
-            row["return_control"], row["seed"], float(row[fixed]),
+            control_key, row["seed"], float(row[fixed]),
             round(load, load_digits),
         )
         groups.setdefault(key, []).append(row)
@@ -272,7 +272,15 @@ def trend_rows(rows: list[dict[str, Any]], variable: str) -> list[dict[str, Any]
                 "matched_load_MPa_sqrt_m": key[3], f"{variable}_left": x0,
                 f"{variable}_right": x1, "rate_left_m_per_cycle": rate0,
                 "rate_right_m_per_cycle": rate1, "rate_ratio_right_over_left": rate1 / rate0,
+                "return_control_left": left["return_control"],
+                "return_control_right": right["return_control"],
+                "configuration_label_left": left["configuration_label"],
+                "configuration_label_right": right["configuration_label"],
             }
+            if variable == "R":
+                record["mixed_control_R_comparison"] = (
+                    left["return_control"] != right["return_control"]
+                )
             if variable == "frequency_Hz" and x0 > 0.0 and x1 > 0.0:
                 record["frequency_exponent_per_cycle"] = math.log(rate1 / rate0) / math.log(x1 / x0)
             output.append(record)
