@@ -55,6 +55,16 @@
     "target_extension_um": 40.0,
     "temperature_K": 300.0
   },
+  "level3": {
+    "R": 0.1,
+    "base_phase_intervals": 256,
+    "frequency_Hz": 1000.0,
+    "maximum_physical_cycles": 1000000000000,
+    "n_bins": 128,
+    "seed": 1720,
+    "target_extension_um": 100.0,
+    "temperature_K": 300.0
+  },
   "notes": [
     "All target values are external and replaceable without rerunning preserved candidate responses.",
     "The broad provisional slope/rate bands are not inferred from an old numerical slope.",

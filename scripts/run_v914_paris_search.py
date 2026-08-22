@@ -39,7 +39,7 @@ def load_ids(path: Path | None) -> set[str] | None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--fidelity", choices=("level0", "level1", "level2"), required=True)
+    parser.add_argument("--fidelity", choices=("level0", "level1", "level2", "level3"), required=True)
     parser.add_argument("--registry", type=Path, default=DEFAULT_ARTIFACT / "candidate_registry.csv")
     parser.add_argument("--physics", type=Path, default=DEFAULT_PHYSICS)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
@@ -63,8 +63,8 @@ def main() -> int:
 
     config = json.loads(args.config.read_text())
     fidelity = dict(config[args.fidelity])
-    if args.fidelity == "level2" and args.case_table is None and "DeltaK_MPa_sqrt_m" not in fidelity:
-        raise SystemExit("level2 requires an adaptive candidate/load table via --case-table")
+    if args.fidelity in {"level2", "level3"} and args.case_table is None and "DeltaK_MPa_sqrt_m" not in fidelity:
+        raise SystemExit(f"{args.fidelity} requires an adaptive candidate/load table via --case-table")
     requested = load_ids(args.candidate_ids)
     with args.registry.open(newline="") as stream:
         registry = list(csv.DictReader(stream))
@@ -87,9 +87,9 @@ def main() -> int:
         unknown = {row["candidate_id"] for row in requested_cases} - set(registry_by_id)
         if unknown:
             raise SystemExit(f"case-table candidates absent from registry: {sorted(unknown)}")
-        pairs = [(registry_by_id[row["candidate_id"]], float(row["DeltaK_MPa_sqrt_m"])) for row in requested_cases]
+        pairs = [(registry_by_id[row["candidate_id"]], row) for row in requested_cases]
     else:
-        pairs = [(row, float(value)) for row in registry for value in fidelity["DeltaK_MPa_sqrt_m"]]
+        pairs = [(row, {"DeltaK_MPa_sqrt_m": value}) for row in registry for value in fidelity["DeltaK_MPa_sqrt_m"]]
     cases = [
         {
             "case_index": index,
@@ -97,13 +97,13 @@ def main() -> int:
             "source_historical_sobol_index": row["source_historical_sobol_index"],
             "paris_design_role": row["paris_design_role"],
             "fidelity": args.fidelity,
-            "deltaK_MPa_sqrt_m": float(deltaK),
-            "R": float(fidelity["R"]),
-            "frequency_Hz": float(fidelity["frequency_Hz"]),
-            "temperature_K": float(fidelity["temperature_K"]),
-            "seed": int(fidelity["seed"]),
+            "deltaK_MPa_sqrt_m": float(case["DeltaK_MPa_sqrt_m"]),
+            "R": float(case.get("R") or fidelity["R"]),
+            "frequency_Hz": float(case.get("frequency_Hz") or fidelity["frequency_Hz"]),
+            "temperature_K": float(case.get("temperature_K") or fidelity["temperature_K"]),
+            "seed": int(case.get("seed") or fidelity["seed"]),
         }
-        for index, (row, deltaK) in enumerate(pairs)
+        for index, (row, case) in enumerate(pairs)
     ]
     output = args.out_root / (args.campaign_label or args.fidelity)
     output.mkdir(parents=True, exist_ok=True)

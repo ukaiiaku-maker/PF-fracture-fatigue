@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
 import sys
 
 import pytest
@@ -94,3 +95,32 @@ def test_high_k50_candidate_requires_supplemental_level0_probe():
 
 def test_analysis_and_launcher_share_precise_load_slug():
     assert slug(30.3832779198) == "30p3833"
+
+
+def test_level3_launcher_preserves_case_specific_common_random_seeds(tmp_path):
+    case_table = tmp_path / "cases.csv"
+    case_table.write_text(
+        "candidate_id,DeltaK_MPa_sqrt_m,seed,case_role\n"
+        "v914_endurance_knee_0462,15.0,1720,LEVEL3_FINALIST_PRODUCTION_PARIS_INTERVAL\n"
+        "v914_endurance_knee_0462,15.0,2718,LEVEL3_FINALIST_PRODUCTION_PARIS_INTERVAL\n"
+    )
+    out = tmp_path / "runs"
+    subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPTS / "run_v914_paris_search.py"),
+            "--fidelity", "level3",
+            "--case-table", str(case_table),
+            "--campaign-label", "level3_test",
+            "--out-root", str(out),
+            "--dry-run",
+        ],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    manifest = json.loads((out / "level3_test" / "launch_manifest.json").read_text())
+    assert manifest["numerical_fidelity"]["n_bins"] == 128
+    assert manifest["numerical_fidelity"]["target_extension_um"] == 100.0
+    assert [case["seed"] for case in manifest["cases"]] == [1720, 2718]

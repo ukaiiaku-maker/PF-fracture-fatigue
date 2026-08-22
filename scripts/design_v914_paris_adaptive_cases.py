@@ -31,13 +31,15 @@ def write_csv(path: Path, rows: list[dict]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=("level0-supplement", "level1-promotions", "level2-fidelity-pairs", "level2-promotions"), required=True)
+    parser.add_argument("--mode", choices=("level0-supplement", "level1-promotions", "level2-fidelity-pairs", "level2-promotions", "level3-finalists"), required=True)
     parser.add_argument("--registry", type=Path, default=Path("artifacts/v914_paris_reparameterization/candidate_registry.csv"))
     parser.add_argument("--config", type=Path, default=Path("config/v914_paris_search_target.json"))
     parser.add_argument("--promotions", type=Path, default=Path("runs/v914_paris_reparameterization_v1/analysis/candidate_promotions.csv"))
     parser.add_argument("--points", type=Path, default=Path("runs/v914_paris_reparameterization_v1/analysis/paris_search_points.csv"))
     parser.add_argument("--fits", type=Path, default=Path("runs/v914_paris_reparameterization_v1/analysis/paris_candidate_fits.csv"))
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--finalist-count", type=int, default=5)
+    parser.add_argument("--finalist-seeds", default="1720,2718,3141")
     args = parser.parse_args()
     registry = read_csv(args.registry); config = json.loads(args.config.read_text())
     rows = []
@@ -72,13 +74,31 @@ def main() -> int:
         for candidate_id in sorted(pair_ids):
             for load in config["level1"]["DeltaK_MPa_sqrt_m"]:
                 rows.append({"candidate_id": candidate_id, "DeltaK_MPa_sqrt_m": load, "case_role": "N64_N128_RANKING_PAIR"})
-    else:
+    elif args.mode == "level2-promotions":
         fits = [row for row in read_csv(args.fits) if row["fidelity"] == "level1" and row["valid_Paris_region"].lower() == "true"]
         for fit in fits:
             low, high = finite(fit["DeltaK_min"]), finite(fit["DeltaK_max"])
             if low > 0.0 and high > low:
                 for load in [low * (high / low) ** (index / 4.0) for index in range(5)]:
                     rows.append({"candidate_id": fit["candidate_id"], "DeltaK_MPa_sqrt_m": f"{load:.12g}", "case_role": "ADAPTIVE_LEVEL2_PARIS_INTERVAL"})
+    else:
+        fits = [row for row in read_csv(args.fits) if row["fidelity"] == "level2" and row["valid_Paris_region"].lower() == "true"]
+        fits.sort(key=lambda row: finite(row["objective"]))
+        seeds = [int(value) for value in args.finalist_seeds.split(",") if value.strip()]
+        if not seeds:
+            raise SystemExit("level3-finalists requires at least one seed")
+        for fit in fits[:args.finalist_count]:
+            low, high = finite(fit["DeltaK_min"]), finite(fit["DeltaK_max"])
+            if not (low > 0.0 and high > low):
+                continue
+            for seed in seeds:
+                for load in [low * (high / low) ** (index / 5.0) for index in range(6)]:
+                    rows.append({
+                        "candidate_id": fit["candidate_id"],
+                        "DeltaK_MPa_sqrt_m": f"{load:.12g}",
+                        "seed": seed,
+                        "case_role": "LEVEL3_FINALIST_PRODUCTION_PARIS_INTERVAL",
+                    })
     args.out.parent.mkdir(parents=True, exist_ok=True)
     write_csv(args.out, rows)
     print(f"V914_PARIS_ADAPTIVE_CASES mode={args.mode} cases={len(rows)} out={args.out}")
