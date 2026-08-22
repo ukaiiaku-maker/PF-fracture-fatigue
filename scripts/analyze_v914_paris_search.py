@@ -267,6 +267,43 @@ def group_key(point: dict[str, Any]) -> tuple[Any, ...]:
     )
 
 
+def aggregate_seed_fits(fits: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Summarize only independently valid per-seed Paris fits."""
+    grouped: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for fit in fits:
+        if fit["valid_Paris_region"]:
+            key = (
+                fit["candidate_id"], fit["fidelity"], fit["R"],
+                fit["frequency_Hz"], fit["temperature_K"],
+            )
+            grouped.setdefault(key, []).append(fit)
+    rows = []
+    for key, values in sorted(grouped.items()):
+        candidate, fidelity, R, frequency, temperature = key
+        slopes = np.asarray([finite(value["m"]) for value in values])
+        log_coefficients = np.asarray([finite(value["log10_C"]) for value in values])
+        objectives = np.asarray([finite(value["objective"]) for value in values])
+        rows.append({
+            "candidate_id": candidate,
+            "fidelity": fidelity,
+            "R": R,
+            "frequency_Hz": frequency,
+            "temperature_K": temperature,
+            "n_valid_seeds": len(values),
+            "seeds": ";".join(str(value["seed"]) for value in sorted(values, key=lambda value: value["seed"])),
+            "m_mean": float(np.mean(slopes)),
+            "m_median": float(np.median(slopes)),
+            "m_std": float(np.std(slopes, ddof=1)) if len(slopes) > 1 else 0.0,
+            "m_min": float(np.min(slopes)),
+            "m_max": float(np.max(slopes)),
+            "log10_C_mean": float(np.mean(log_coefficients)),
+            "log10_C_median": float(np.median(log_coefficients)),
+            "log10_C_std": float(np.std(log_coefficients, ddof=1)) if len(log_coefficients) > 1 else 0.0,
+            "objective_median": float(np.median(objectives)),
+        })
+    return rows
+
+
 def level0_decision(points: list[dict[str, Any]], expected_points: int, minimum_cycles: float) -> tuple[bool, str, str]:
     if len(points) < expected_points:
         return False, "LEVEL0_INCOMPLETE", "level0"
@@ -427,6 +464,7 @@ def main() -> int:
         "fit_rmse_log10": fit["residual_rmse_log10"], "span_shortfall": fit["span_shortfall"],
         "valid_Paris_region": fit["valid_Paris_region"],
     } for fit in fits]
+    seed_statistics = aggregate_seed_fits(fits)
 
     point_fields = [
         "candidate_id", "fidelity", "seed", "R", "frequency_Hz", "temperature_K", "DeltaK_MPa_sqrt_m",
@@ -448,6 +486,12 @@ def main() -> int:
     write_csv(out / "paris_candidate_fits.csv", fits, fit_fields)
     write_csv(out / "candidate_objectives.csv", objectives, list(objectives[0]) if objectives else ["candidate_id", "fidelity", "objective", "slope_mismatch", "rate_mismatch", "fit_rmse_log10", "span_shortfall", "valid_Paris_region"])
     write_csv(out / "candidate_promotions.csv", promotions, list(promotions[0]))
+    seed_fields = [
+        "candidate_id", "fidelity", "R", "frequency_Hz", "temperature_K", "n_valid_seeds", "seeds",
+        "m_mean", "m_median", "m_std", "m_min", "m_max", "log10_C_mean", "log10_C_median",
+        "log10_C_std", "objective_median",
+    ]
+    write_csv(out / "finalist_seed_statistics.csv", seed_statistics, seed_fields)
     write_csv(out / "search_history.csv", history, list(history[0]) if history else ["candidate_id", "state", "status"])
     # Required copy is kept beside response tables for self-contained re-ranking.
     write_csv(out / "candidate_registry.csv", registry, list(registry[0]))

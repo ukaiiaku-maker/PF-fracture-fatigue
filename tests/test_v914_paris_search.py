@@ -13,7 +13,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from analyze_v914_paris_search import best_fit, expected_level0_points, fit_segment, level0_decision, slug
+from analyze_v914_paris_search import aggregate_seed_fits, best_fit, expected_level0_points, fit_segment, level0_decision, slug
 from propose_v914_paris_surrogate_batch import gp_predict
 
 
@@ -124,3 +124,21 @@ def test_level3_launcher_preserves_case_specific_common_random_seeds(tmp_path):
     assert manifest["numerical_fidelity"]["n_bins"] == 128
     assert manifest["numerical_fidelity"]["target_extension_um"] == 100.0
     assert [case["seed"] for case in manifest["cases"]] == [1720, 2718]
+
+
+def test_finalist_seed_statistics_exclude_invalid_fits():
+    base = {
+        "candidate_id": "candidate", "fidelity": "level3", "R": 0.1,
+        "frequency_Hz": 1000.0, "temperature_K": 300.0, "log10_C": -12.0,
+        "objective": 0.25,
+    }
+    rows = aggregate_seed_fits([
+        {**base, "seed": 1720, "m": 4.0, "valid_Paris_region": True},
+        {**base, "seed": 2718, "m": 6.0, "log10_C": -10.0, "valid_Paris_region": True},
+        {**base, "seed": 3141, "m": 100.0, "valid_Paris_region": False},
+    ])
+    assert len(rows) == 1
+    assert rows[0]["n_valid_seeds"] == 2
+    assert rows[0]["m_mean"] == pytest.approx(5.0)
+    assert rows[0]["m_std"] == pytest.approx(2.0**0.5)
+    assert rows[0]["log10_C_mean"] == pytest.approx(-11.0)
