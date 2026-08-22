@@ -35,6 +35,7 @@ def main() -> int:
     parser.add_argument("--registry", type=Path, default=Path("artifacts/v914_paris_reparameterization/candidate_registry.csv"))
     parser.add_argument("--config", type=Path, default=Path("config/v914_paris_search_target.json"))
     parser.add_argument("--promotions", type=Path, default=Path("runs/v914_paris_reparameterization_v1/analysis/candidate_promotions.csv"))
+    parser.add_argument("--points", type=Path, default=Path("runs/v914_paris_reparameterization_v1/analysis/paris_search_points.csv"))
     parser.add_argument("--fits", type=Path, default=Path("runs/v914_paris_reparameterization_v1/analysis/paris_candidate_fits.csv"))
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
@@ -51,9 +52,21 @@ def main() -> int:
                 rows.append({"candidate_id": candidate["candidate_id"], "DeltaK_MPa_sqrt_m": f"{load:.12g}", "case_role": "HIGH_K50_LEVEL0_SUPPLEMENT"})
     elif args.mode == "level1-promotions":
         promote = {row["candidate_id"] for row in read_csv(args.promotions) if row["next_fidelity"] == "level1" and row["promote"].lower() == "true"}
+        points = read_csv(args.points)
         for candidate_id in sorted(promote):
-            for load in config["level1"]["DeltaK_MPa_sqrt_m"]:
-                rows.append({"candidate_id": candidate_id, "DeltaK_MPa_sqrt_m": load, "case_role": "LEVEL1_PROMOTED_COMMON_RANGE"})
+            q = [row for row in points if row["candidate_id"] == candidate_id and row["fidelity"] == "level0"]
+            growth = sorted(finite(row["DeltaK_MPa_sqrt_m"]) for row in q if row["status"] == "growth_target_reached")
+            if not growth:
+                continue
+            first_growth = growth[0]
+            lower_censors = [finite(row["DeltaK_MPa_sqrt_m"]) for row in q if row["status"] != "growth_target_reached" and finite(row["DeltaK_MPa_sqrt_m"]) < first_growth]
+            low = 1.05 * max(lower_censors) if lower_censors else 0.75 * first_growth
+            high = min(1.20 * first_growth, config["level0"]["inert_supplement_max_DeltaK_MPa_sqrt_m"])
+            if high <= low:
+                low = 0.8 * first_growth
+            loads = [low * (high / low) ** (index / 5.0) for index in range(6)]
+            for load in loads:
+                rows.append({"candidate_id": candidate_id, "DeltaK_MPa_sqrt_m": f"{load:.12g}", "case_role": "LEVEL1_ADAPTIVE_BRACKETED_PARIS_RANGE"})
     elif args.mode == "level2-fidelity-pairs":
         pair_ids = {row["candidate_id"] for row in registry if row["paris_design_role"].startswith("ABCD_") or row["paris_design_role"] == "DIVERSE_FIDELITY_PAIR"}
         for candidate_id in sorted(pair_ids):
