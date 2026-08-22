@@ -73,10 +73,11 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--state-rtol", type=float, default=0.0025)
     p.add_argument("--tip-radius-rtol", type=float, default=0.001)
     p.add_argument("--hazard-rtol", type=float, default=0.01)
-    # Calibrated weak-T same-cycle event bursts require depth 30 at the
-    # unchanged v7 state/hazard tolerances.  Shallower depths fail closed at
-    # sharp post-translation mobile-state transients.
-    p.add_argument("--max-refinement-depth", type=int, default=30)
+    # Same-cycle post-translation mobile-state transients can require six more
+    # bisections than the earlier calibrated depth-30 cases.  This changes only
+    # the fail-closed refinement ceiling; all state/hazard tolerances and the
+    # accepted fine-path constitutive evolution remain unchanged.
+    p.add_argument("--max-refinement-depth", type=int, default=36)
 
     p.add_argument("--minimum-exact-cycles", type=int, default=4)
     p.add_argument("--readiness-rtol", type=float, default=0.05)

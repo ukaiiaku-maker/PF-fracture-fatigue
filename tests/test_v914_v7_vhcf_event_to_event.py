@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
+import math
 from pathlib import Path
 from types import SimpleNamespace
 import sys
@@ -16,6 +18,7 @@ if str(SCRIPTS) not in sys.path:
 from v914_adaptive_feedback_v6 import AdaptiveFeedbackControls
 from v914_v7_adaptive_block_accelerator import AdaptiveBlockControls
 from v914_v7_event_localizer import (
+    _adaptive_interval,
     advance_v7_phase_span,
     localize_v7_action_in_phase_span,
 )
@@ -101,6 +104,45 @@ def test_phase_first_passage_localizes_without_cycle_iteration():
     assert phase == pytest.approx(0.625, abs=2.0e-12)
     assert action >= 1.25
     assert state.value == pytest.approx(phase, abs=2.0e-12)
+
+
+def test_post_event_sharp_transient_can_refine_six_levels_beyond_depth_30():
+    boundary = 0.3671875 + 0.00390625 * math.sqrt(2.0) / 2.0
+
+    def sharp_transition(state, loading, p0, p1):
+        del loading
+        width = float(p1) - float(p0)
+        if float(p0) < boundary < float(p1):
+            state.mobile_m2 += 6.4e10 * width
+        return width
+
+    controls = AdaptiveFeedbackControls(
+        state_rtol=0.0025,
+        tip_radius_rtol=0.001,
+        hazard_rtol=0.01,
+        base_phase_intervals=256,
+        max_refinement_depth=35,
+    )
+    with pytest.raises(RuntimeError, match="adaptive refinement failed closed"):
+        _adaptive_interval(
+            _ToyState(),
+            _Loading(),
+            controls,
+            0.3671875,
+            0.37109375,
+            advance_phase_fn=sharp_transition,
+        )
+
+    state, hazard = _adaptive_interval(
+        _ToyState(),
+        _Loading(),
+        replace(controls, max_refinement_depth=36),
+        0.3671875,
+        0.37109375,
+        advance_phase_fn=sharp_transition,
+    )
+    assert hazard == pytest.approx(0.00390625)
+    assert np.all(np.isfinite(state.mobile_m2))
 
 
 def test_vhcf_controls_accept_1e14_cycle_horizon():
