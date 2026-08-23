@@ -145,7 +145,7 @@ def main() -> int:
         lines.append(f"| {row['candidate_id']} | {fmt(row['full_history_m'])} | {fmt(row['first_3_intervals_m'])} | {fmt(row['relative_m_error'])} | {row['full_history_rank']}/{row['first_3_intervals_rank']} |")
 
     lines.extend([
-        "", "The shortened histories preserve all three candidate ranks and do not misclassify A as realistic. They support a descriptor-only 9 µm Level-1 target with at least three developed intervals; formal Paris claims and n=128 qualification retain their original targets.",
+        "", "The shortened histories preserve all three candidate ranks and do not misclassify A as realistic. With the production 2.297 µm event increment, a descriptor-only 10 µm Level-1 target forces five events and therefore supplies at least three developed intervals; formal Paris claims and n=128 qualification retain their original targets.",
         "", "## Parameter sensitivity", "",
         f"All {len(sensitivity)} coordinates are reported in `parameter_slope_sensitivity.csv` and `.md`. Only one formal developed m and two provisional slopes currently exist, so direction signs are exploratory. The causal decomposition, rather than rank correlation alone, is why the next batch emphasizes the five cleavage EXP-surface coordinates.",
         "", "## Shape-first surrogate", "",

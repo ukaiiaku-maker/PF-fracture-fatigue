@@ -216,7 +216,15 @@ def test_level1_search_descriptor_uses_validated_short_target_only(tmp_path):
     assert manifest["descriptor_only_not_formal_Paris_claim"] is True
     assert manifest["numerical_fidelity"]["n_bins"] == 64
     assert manifest["numerical_fidelity"]["maximum_physical_cycles"] == 10_000_000_000
-    assert manifest["numerical_fidelity"]["target_extension_um"] == 9.0
+    assert manifest["numerical_fidelity"]["target_extension_um"] == 10.0
+
+
+def test_search_descriptor_target_forces_fifth_event_for_three_developed_intervals():
+    # Four production increments terminate at about 9.18936 um and leave only
+    # two intervals after the unchanged 40% developed-window truncation.
+    production_event_increment_um = 2.29734
+    target = CONFIG["level1"]["search_descriptor_target_um"]
+    assert 4.0 * production_event_increment_um < target <= 10.0
 
 
 def test_level1_search_case_designer_emits_three_bracketed_loads(tmp_path):
