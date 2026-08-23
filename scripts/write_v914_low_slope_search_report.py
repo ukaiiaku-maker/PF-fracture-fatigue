@@ -91,13 +91,21 @@ def main() -> int:
         if row.get("fidelity") == "level2" and 2.0 <= number(row.get("m")) <= 10.0
     ]
     batch_complete = all(row["level0_terminal_points"] >= 3 for row in candidate_results)
-    any_batch_bracket = any(row["level0_growth_points"] > 0 for row in candidate_results)
+    unresolved_batch_bracket = any(
+        row["level0_growth_points"] > 0 and not math.isfinite(number(row["developed_m"]))
+        for row in candidate_results
+    )
     if successful:
         decision = "SUCCESS"
         rationale = "At least one n=128 candidate retains a developed slope in the provisional 2–10 band."
-    elif batch_complete and not any_batch_bracket and best_measured >= 15.0 and float(audit["domain_best_credible_target_probability_times_feasibility"]) < 0.05:
+    elif batch_complete and not unresolved_batch_bracket and best_measured >= 15.0 and float(audit["domain_best_credible_target_probability_times_feasibility"]) < 0.05:
         decision = "DOMAIN FAILURE"
-        rationale = "The causally directed batch produced no finite-growth bracket, the best measured slope remains high, and the within-domain surrogate assigns less than 5% feasibility-weighted probability to the provisional target."
+        rationale = (
+            "Every viable finite-growth bracket in the causally directed batch has been "
+            "resolved, the best measured slope remains high, and the within-domain "
+            "surrogate assigns less than 5% feasibility-weighted probability to the "
+            "provisional target."
+        )
     else:
         decision = "OPEN — bounded batch or promoted descriptors still pending"
         rationale = "The stopping evidence is not yet complete."

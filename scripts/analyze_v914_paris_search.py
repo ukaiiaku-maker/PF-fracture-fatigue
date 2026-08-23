@@ -218,7 +218,25 @@ def segment_objective(fit: dict[str, float], config: dict[str, Any]) -> dict[str
 
 
 def best_fit(group: list[dict[str, Any]], config: dict[str, Any]) -> dict[str, Any]:
-    ordered = sorted(group, key=lambda point: point["DeltaK_MPa_sqrt_m"])
+    # Repeated fresh campaigns can contain the same load (for example, a
+    # superseded short descriptor followed by its qualified replacement).
+    # A rejected duplicate must not split an otherwise contiguous developed
+    # series. Retain one deterministic, strongest-evidence record per load.
+    by_load: dict[float, list[dict[str, Any]]] = {}
+    for point in group:
+        by_load.setdefault(float(point["DeltaK_MPa_sqrt_m"]), []).append(point)
+    ordered = [
+        max(
+            by_load[load],
+            key=lambda point: (
+                bool(point["developed_point_usable"]),
+                int(point.get("event_count", 0)),
+                finite(point.get("cumulative_extension_m"), 0.0),
+                str(point.get("result_path", "")),
+            ),
+        )
+        for load in sorted(by_load)
+    ]
     usable = [point for point in ordered if point["developed_point_usable"]]
     contiguous_runs: list[list[dict[str, Any]]] = []
     current: list[dict[str, Any]] = []

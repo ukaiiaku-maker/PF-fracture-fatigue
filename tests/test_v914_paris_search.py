@@ -167,6 +167,48 @@ def test_analyzer_discovers_campaigns_independent_of_label():
     assert 'args.root.glob("level*/launch_manifest.json")' not in source
 
 
+def test_best_fit_prefers_qualified_duplicate_load_over_rejected_short_run():
+    config = {
+        "minimum_Paris_points": 4,
+        "minimum_relative_DeltaK_span": 0.2,
+        "minimum_fit_R2": 0.9,
+        "target_m_min": 2.0,
+        "target_m_max": 10.0,
+        "target_m_center": 4.0,
+        "target_log10_da_dN_min_m_per_cycle": -12.0,
+        "target_log10_da_dN_max_m_per_cycle": -6.0,
+        "target_log10_da_dN_center_m_per_cycle": -9.0,
+        "preferred_da_dN_span_decades": 1.0,
+        "objective_weights": {
+            "slope_mismatch": 2.0,
+            "rate_mismatch": 1.0,
+            "fit_rmse_log10": 1.0,
+            "span_shortfall": 1.0,
+        },
+    }
+    points = []
+    for load, rate in ((10.0, 1.0e-10), (12.0, 2.0e-10), (15.0, 4.0e-10)):
+        common = {
+            "DeltaK_MPa_sqrt_m": load,
+            "developed_da_dN_m_per_cycle": rate,
+            "censor_type": "none",
+        }
+        points.append({
+            **common, "developed_point_usable": False, "event_count": 4,
+            "cumulative_extension_m": 9.0e-6, "result_path": f"old/{load}",
+        })
+        points.append({
+            **common, "developed_point_usable": True, "event_count": 5,
+            "cumulative_extension_m": 12.0e-6, "result_path": f"corrected/{load}",
+        })
+
+    fit = best_fit(points, config)
+
+    assert fit["descriptor_status"] == "PROVISIONAL_THREE_POINT_LOCAL_SLOPE"
+    assert fit["usable_developed_points"] == 3
+    assert fit["n_points"] == 3
+
+
 def test_level3_launcher_preserves_case_specific_common_random_seeds(tmp_path):
     case_table = tmp_path / "cases.csv"
     case_table.write_text(
