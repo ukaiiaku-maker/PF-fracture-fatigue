@@ -164,14 +164,19 @@ def main() -> int:
         direction[active] = best_x[active] - np.mean(other[:, active], axis=0)
         norm2 = max(float(direction @ direction), 1.0e-12)
         extrapolation = (query - best_x) @ direction / norm2
-        lower_confidence_m = predicted_m - 1.5 * predicted_m_std
         target_probability = np.maximum(
             norm.cdf((args.target_m_max - predicted_m) / predicted_m_std)
             - norm.cdf((args.target_m_min - predicted_m) / predicted_m_std),
             0.0,
         ) * feasibility_probability
-        shape_gain = np.maximum(response[best_id] - lower_confidence_m, 0.0)
-        acquisition = (shape_gain + y_scale * np.maximum(extrapolation, 0.0)) * feasibility_probability
+        # Expected improvement is referenced to the desired upper slope, not
+        # merely to the current (still pathological) incumbent.  The causal
+        # extrapolation factor prioritizes movement beyond A without allowing
+        # distance alone to outweigh credible low-m probability.
+        desired_improvement = args.target_m_max - predicted_m
+        desired_z = desired_improvement / predicted_m_std
+        desired_ei = desired_improvement * norm.cdf(desired_z) + predicted_m_std * norm.pdf(desired_z)
+        acquisition = desired_ei * feasibility_probability * (1.0 + np.maximum(extrapolation, 0.0))
         if int(np.sum(extrapolation > 0.0)) >= args.batch_size:
             acquisition[extrapolation <= 0.0] = -np.inf
     selected: list[int] = []
@@ -243,7 +248,10 @@ def main() -> int:
         "measured_descriptor_candidates": descriptor_ids,
         "censored_or_invalid_candidates": sorted(invalid_ids),
         "invalid_objective_penalty": None, "kernel": "isotropic_squared_exponential",
-        "kernel_length": length, "acquisition": "expected_improvement_with_batch_diversity_penalty",
+        "kernel_length": length, "acquisition": (
+            "desired_m_expected_improvement_with_causal_extrapolation_and_batch_diversity"
+            if args.response_mode == "developed-m" else "expected_improvement_with_batch_diversity_penalty"
+        ),
         "feasibility_kernel_length": feasibility_length,
         "acquisition_feasibility_weighted": True,
         "candidate_ids": [row["candidate_id"] for row in batch],
