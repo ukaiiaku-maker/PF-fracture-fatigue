@@ -56,6 +56,11 @@ def main() -> int:
     parser.add_argument("--out-root", type=Path, default=ROOT / "runs/v914_paris_reparameterization_v1")
     parser.add_argument("--worker-index", type=int, default=0)
     parser.add_argument("--worker-count", type=int, default=1)
+    parser.add_argument(
+        "--search-descriptor",
+        action="store_true",
+        help="Use the validated shorter Level-1 descriptor target; not permitted for finalist fidelities.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     if args.worker_count < 1 or not 0 <= args.worker_index < args.worker_count:
@@ -63,6 +68,12 @@ def main() -> int:
 
     config = json.loads(args.config.read_text())
     fidelity = dict(config[args.fidelity])
+    if args.search_descriptor:
+        if args.fidelity != "level1":
+            raise SystemExit("--search-descriptor is permitted only for level1")
+        if args.case_table is None:
+            raise SystemExit("--search-descriptor requires candidate-specific loads via --case-table")
+        fidelity["target_extension_um"] = float(fidelity["search_descriptor_target_um"])
     if args.fidelity in {"level2", "level3"} and args.case_table is None and "DeltaK_MPa_sqrt_m" not in fidelity:
         raise SystemExit(f"{args.fidelity} requires an adaptive candidate/load table via --case-table")
     requested = load_ids(args.candidate_ids)
@@ -122,6 +133,8 @@ def main() -> int:
         "candidate_specific_case_table": str(args.case_table.resolve()) if args.case_table else None,
         "candidate_specific_case_table_sha256": digest(args.case_table) if args.case_table else None,
         "numerical_fidelity": fidelity,
+        "search_descriptor": bool(args.search_descriptor),
+        "descriptor_only_not_formal_Paris_claim": bool(args.search_descriptor),
         "cases": cases,
     }
     (output / "launch_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")

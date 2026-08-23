@@ -83,6 +83,16 @@ def test_surrogate_separates_invalid_cases_from_measured_descriptors():
     assert invalid == {"b"}
 
 
+def test_shape_first_surrogate_uses_measured_m_without_fabricating_invalid_slopes():
+    fits = [
+        {"candidate_id": "a", "fidelity": "level1", "m": "20.5", "objective": "8", "descriptor_status": "PROVISIONAL_THREE_POINT_LOCAL_SLOPE"},
+        {"candidate_id": "b", "fidelity": "level1", "m": "nan", "objective": "inf", "descriptor_status": "NO_LOCAL_SLOPE_DESCRIPTOR"},
+    ]
+    _, response, invalid = descriptor_response({"a", "b"}, fits, "level1", "m")
+    assert response == {"a": 20.5}
+    assert invalid == {"b"}
+
+
 def test_surrogate_cli_rejects_less_than_two_descriptors(tmp_path):
     result = subprocess.run(
         [
@@ -173,6 +183,29 @@ def test_level3_launcher_preserves_case_specific_common_random_seeds(tmp_path):
     assert manifest["numerical_fidelity"]["n_bins"] == 128
     assert manifest["numerical_fidelity"]["target_extension_um"] == 100.0
     assert [case["seed"] for case in manifest["cases"]] == [1720, 2718]
+
+
+def test_level1_search_descriptor_uses_validated_short_target_only(tmp_path):
+    case_table = tmp_path / "cases.csv"
+    case_table.write_text(
+        "candidate_id,DeltaK_MPa_sqrt_m,seed,case_role\n"
+        "v914_endurance_knee_0462,12.0,1720,SEARCH_DESCRIPTOR\n"
+    )
+    out = tmp_path / "runs"
+    subprocess.run(
+        [
+            sys.executable, str(SCRIPTS / "run_v914_paris_search.py"),
+            "--fidelity", "level1", "--search-descriptor",
+            "--case-table", str(case_table), "--campaign-label", "descriptor_test",
+            "--out-root", str(out), "--dry-run",
+        ], cwd=ROOT, check=True, capture_output=True, text=True,
+    )
+    manifest = json.loads((out / "descriptor_test" / "launch_manifest.json").read_text())
+    assert manifest["search_descriptor"] is True
+    assert manifest["descriptor_only_not_formal_Paris_claim"] is True
+    assert manifest["numerical_fidelity"]["n_bins"] == 64
+    assert manifest["numerical_fidelity"]["maximum_physical_cycles"] == 10_000_000_000
+    assert manifest["numerical_fidelity"]["target_extension_um"] == 9.0
 
 
 def test_finalist_seed_statistics_exclude_invalid_fits():

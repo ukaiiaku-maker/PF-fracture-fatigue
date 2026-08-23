@@ -52,15 +52,16 @@ def gp_predict(x: np.ndarray, y: np.ndarray, query: np.ndarray) -> tuple[np.ndar
 
 
 def descriptor_response(
-    registry_ids: set[str], fits: list[dict[str, str]], fidelity: str
+    registry_ids: set[str], fits: list[dict[str, str]], fidelity: str,
+    response_field: str = "objective",
 ) -> tuple[list[str], dict[str, float], set[str]]:
     """Separate measured local-slope descriptors from censored/invalid cases."""
     selected = [row for row in fits if row["fidelity"] == fidelity and row["candidate_id"] in registry_ids]
     evaluated = {row["candidate_id"] for row in selected}
     response = {
-        row["candidate_id"]: finite(row["objective"])
+        row["candidate_id"]: finite(row[response_field])
         for row in selected
-        if math.isfinite(finite(row["objective"]))
+        if math.isfinite(finite(row.get(response_field)))
         and row.get("descriptor_status", "") in {
             "PROVISIONAL_THREE_POINT_LOCAL_SLOPE",
             "FOUR_POINT_INVALID_REGION",
@@ -76,6 +77,10 @@ def main() -> int:
     parser.add_argument("--registry", type=Path, default=Path("artifacts/v914_paris_reparameterization/candidate_registry.csv"))
     parser.add_argument("--fits", type=Path, default=Path("runs/v914_paris_reparameterization_v1/analysis/paris_candidate_fits.csv"))
     parser.add_argument("--fidelity", default="level1")
+    parser.add_argument(
+        "--response-mode", choices=("objective", "developed-m"), default="objective",
+        help="Use developed-m for the shape-first, low-slope search.",
+    )
     parser.add_argument("--batch-size", type=int, default=6)
     parser.add_argument(
         "--minimum-descriptors",
@@ -94,7 +99,10 @@ def main() -> int:
     coordinates = [field for field in pool[0] if field.startswith("u__")]
     pool_by_id = {row["candidate_id"]: row for row in pool}
     evaluated_ids = {row["candidate_id"] for row in registry}
-    observed_ids, response, invalid_ids = descriptor_response(evaluated_ids, fits, args.fidelity)
+    response_field = "m" if args.response_mode == "developed-m" else "objective"
+    observed_ids, response, invalid_ids = descriptor_response(
+        evaluated_ids, fits, args.fidelity, response_field
+    )
     descriptor_ids = sorted(response)
     finite_values = [response[candidate] for candidate in descriptor_ids]
     if len(observed_ids) < 8 or len(finite_values) < args.minimum_descriptors:
@@ -122,6 +130,42 @@ def main() -> int:
     z = improvement / std
     conditional_improvement = improvement * norm.cdf(z) + std * norm.pdf(z)
     acquisition = conditional_improvement * feasibility_probability
+    extrapolation = np.zeros(len(query), dtype=float)
+    low_slope_direction_fields: list[str] = []
+    if args.response_mode == "developed-m":
+        # With only a few real slope descriptors, explicitly seek coordinates
+        # beyond the current best in the direction away from the steep-slope
+        # centroid.  Feasibility remains a separate model; censors/bursts never
+        # receive fabricated slopes.
+        best_id = min(descriptor_ids, key=lambda candidate: response[candidate])
+        best_x = np.asarray([finite(pool_by_id[best_id][field]) for field in coordinates])
+        other = np.asarray([
+            [finite(pool_by_id[candidate][field]) for field in coordinates]
+            for candidate in descriptor_ids if candidate != best_id
+        ])
+        # A's completed causal audit has zero blunting/shielding feedback and
+        # attributes the majority of its slope to the cleavage EXP surface and
+        # three-hit transform.  Define extrapolation in that responsible
+        # five-coordinate subspace; other coordinates retain feasibility/level
+        # roles but cannot compensate for pathological shape.
+        low_slope_direction_fields = [
+            field for field in coordinates if field in {
+                "u__cleave_G00_eV", "u__cleave_sigc0_GPa", "u__cleave_exp_a",
+                "u__cleave_exp_n", "u__cleave_floor_frac",
+            }
+        ]
+        active = np.asarray([coordinates.index(field) for field in low_slope_direction_fields])
+        direction = np.zeros_like(best_x)
+        direction[active] = best_x[active] - np.mean(other[:, active], axis=0)
+        norm2 = max(float(direction @ direction), 1.0e-12)
+        extrapolation = (query - best_x) @ direction / norm2
+        predicted_m = mean * y_scale + y_mean
+        predicted_m_std = std * y_scale
+        lower_confidence_m = predicted_m - 1.5 * predicted_m_std
+        shape_gain = np.maximum(response[best_id] - lower_confidence_m, 0.0)
+        acquisition = (shape_gain + y_scale * np.maximum(extrapolation, 0.0)) * feasibility_probability
+        if int(np.sum(extrapolation > 0.0)) >= args.batch_size:
+            acquisition[extrapolation <= 0.0] = -np.inf
     selected: list[int] = []
     remaining = acquisition.copy()
     for _ in range(min(args.batch_size, len(available))):
@@ -146,15 +190,37 @@ def main() -> int:
             "surrogate_feasibility_probability": float(feasibility_probability[index]),
             "surrogate_feasibility_std": float(feasibility_std[index]),
             "surrogate_kernel_length": length,
+            "surrogate_response_mode": args.response_mode,
+            "surrogate_predicted_m": float(mean[index] * y_scale + y_mean) if args.response_mode == "developed-m" else "",
+            "surrogate_predicted_m_std": float(std[index] * y_scale) if args.response_mode == "developed-m" else "",
+            "surrogate_low_slope_extrapolation_score": float(extrapolation[index]),
         })
         batch.append(source)
     args.out.mkdir(parents=True, exist_ok=True)
     write_csv(args.out / "surrogate_batch.csv", batch, list(batch[0]))
+    if args.response_mode == "developed-m":
+        low_m_rows = [
+            {
+                "rank": row["surrogate_batch_rank"],
+                "candidate_id": row["candidate_id"],
+                "predicted_m": row["surrogate_predicted_m"],
+                "predicted_m_std": row["surrogate_predicted_m_std"],
+                "predicted_m_lower_1p5sigma": float(row["surrogate_predicted_m"]) - 1.5 * float(row["surrogate_predicted_m_std"]),
+                "feasibility_probability": row["surrogate_feasibility_probability"],
+                "low_slope_extrapolation_score": row["surrogate_low_slope_extrapolation_score"],
+            }
+            for row in batch
+        ]
+        write_csv(
+            args.out / "surrogate_predicted_low_m_region.csv",
+            low_m_rows,
+            list(low_m_rows[0]),
+        )
     combined = registry + batch
     fields = list(dict.fromkeys(key for row in combined for key in row))
     write_csv(args.out / "candidate_registry.csv", combined, fields)
     audit = {
-        "schema": "v914_paris_surrogate_batch_v1", "iteration": args.iteration,
+        "schema": "v914_paris_surrogate_batch_v2", "iteration": args.iteration,
         "batch_size": len(batch), "fidelity_response": args.fidelity,
         "observations": len(observed_ids), "finite_objectives": len(finite_values),
         "minimum_descriptors_required": args.minimum_descriptors,
@@ -166,6 +232,12 @@ def main() -> int:
         "feasibility_kernel_length": feasibility_length,
         "acquisition_feasibility_weighted": True,
         "candidate_ids": [row["candidate_id"] for row in batch],
+        "response_mode": args.response_mode,
+        "response_field": response_field,
+        "shape_objective_is_primary": args.response_mode == "developed-m",
+        "level_objective_compensation_allowed": False,
+        "low_slope_extrapolation_active": args.response_mode == "developed-m",
+        "low_slope_direction_fields": low_slope_direction_fields,
     }
     (args.out / "surrogate_audit.json").write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n")
     print(f"V914_PARIS_SURROGATE_BATCH iteration={args.iteration} size={len(batch)} observations={len(observed_ids)}")
