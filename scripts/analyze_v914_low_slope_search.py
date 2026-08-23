@@ -152,7 +152,11 @@ def main() -> int:
         growth = [row for row in level0 if row.get("status") == "growth_target_reached"]
         bursts = [row for row in growth if finite(row.get("post_initiation_cycles"), 0.0) <= 1.0]
         responses[candidate] = {
-            "m": finite(descriptor.get(candidate, {}).get("m")),
+            "developed_m": finite(descriptor.get(candidate, {}).get("m"))
+            if descriptor.get(candidate, {}).get("descriptor_status") == "VALID_PARIS_REGION" else math.nan,
+            "provisional_developed_local_slope": finite(descriptor.get(candidate, {}).get("m"))
+            if descriptor.get(candidate, {}).get("descriptor_status") == "PROVISIONAL_THREE_POINT_LOCAL_SLOPE" else math.nan,
+            "combined_slope_descriptor": finite(descriptor.get(candidate, {}).get("m")),
             "log_developed_da_dN": float(np.median(np.log10(developed))) if developed else math.nan,
             "censor_probability": sum(row.get("status") != "growth_target_reached" for row in level0) / len(level0) if level0 else math.nan,
             "burst_arrest_probability": len(bursts) / len(growth) if growth else 0.0 if level0 else math.nan,
@@ -162,13 +166,16 @@ def main() -> int:
     for field in coordinates:
         physical = field.removeprefix("u__")
         metrics = {}
-        for response in ("m", "log_developed_da_dN", "censor_probability", "burst_arrest_probability"):
+        for response in (
+            "developed_m", "provisional_developed_local_slope", "combined_slope_descriptor",
+            "log_developed_da_dN", "censor_probability", "burst_arrest_probability",
+        ):
             rho, count = association([(finite(by_registry[c][field]), values[response]) for c, values in responses.items() if c in by_registry])
             metrics[f"spearman_{response}"] = rho; metrics[f"n_{response}"] = count
         a = finite(by_registry.get("v914_endurance_knee_0462", {}).get(field))
         steep = [finite(by_registry.get(candidate, {}).get(field)) for candidate in ("v914_endurance_knee_0849", "v914_endurance_knee_0917")]
         contrast = float(np.mean([value for value in steep if math.isfinite(value)]) - a) if math.isfinite(a) and any(math.isfinite(value) for value in steep) else math.nan
-        slope_rho, rate_rho = metrics["spearman_m"], metrics["spearman_log_developed_da_dN"]
+        slope_rho, rate_rho = metrics["spearman_combined_slope_descriptor"], metrics["spearman_log_developed_da_dN"]
         feasibility = max(abs(metrics["spearman_censor_probability"]), abs(metrics["spearman_burst_arrest_probability"]))
         if math.isfinite(slope_rho) and abs(slope_rho) >= 0.5:
             interpretation = "decreasing it flattens m" if slope_rho > 0.0 else "increasing it flattens m"
@@ -186,9 +193,9 @@ def main() -> int:
             "exploratory_interpretation": interpretation,
         })
     write_csv(args.out / "parameter_slope_sensitivity.csv", sensitivity)
-    lines = ["# Exploratory parameter-to-slope sensitivity", "", "Only real developed/provisional slopes are used; censors and bursts have no artificial m. With three measured slope descriptors, signs are exploratory, not inferential.", "", "| parameter | physical role | slope rho (n) | log-rate rho | censor rho | burst rho | interpretation |", "|---|---|---:|---:|---:|---:|---|"]
+    lines = ["# Exploratory parameter-to-slope sensitivity", "", "Only real developed/provisional slopes are used; censors and bursts have no artificial m. The one formal developed m and two provisional slopes are reported separately; their three-point combined descriptor is used only for exploratory direction signs, not inference.", "", "| parameter | physical role | developed m rho (n) | provisional rho (n) | combined rho (n) | log-rate rho | censor rho | burst rho | interpretation |", "|---|---|---:|---:|---:|---:|---:|---:|---|"]
     for row in sensitivity:
-        lines.append(f"| `{row['coordinate']}` | {row['physics_role']} | {row['spearman_m']:.3g} ({row['n_m']}) | {row['spearman_log_developed_da_dN']:.3g} | {row['spearman_censor_probability']:.3g} | {row['spearman_burst_arrest_probability']:.3g} | {row['exploratory_interpretation']} |")
+        lines.append(f"| `{row['coordinate']}` | {row['physics_role']} | {row['spearman_developed_m']:.3g} ({row['n_developed_m']}) | {row['spearman_provisional_developed_local_slope']:.3g} ({row['n_provisional_developed_local_slope']}) | {row['spearman_combined_slope_descriptor']:.3g} ({row['n_combined_slope_descriptor']}) | {row['spearman_log_developed_da_dN']:.3g} | {row['spearman_censor_probability']:.3g} | {row['spearman_burst_arrest_probability']:.3g} | {row['exploratory_interpretation']} |")
     (args.out / "parameter_slope_sensitivity.md").write_text("\n".join(lines) + "\n")
 
     # Matched A fidelity comparison, including the terminal n=128 work-budget
