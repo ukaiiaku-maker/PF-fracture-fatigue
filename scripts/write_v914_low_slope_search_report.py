@@ -73,6 +73,12 @@ def main() -> int:
             and math.isfinite(number(row.get("m")))
         ]
         fit = descriptor_fits[-1] if descriptor_fits else {}
+        descriptor_status = fit.get("descriptor_status", "")
+        if not descriptor_status:
+            descriptor_status = (
+                "NOT_PROMOTED_NO_FINITE_BRACKET" if not growth
+                else "UNRESOLVED_FINITE_BRACKET"
+            )
         candidate_results.append({
             "candidate_id": candidate,
             "level0_terminal_points": len(candidate_points),
@@ -81,7 +87,7 @@ def main() -> int:
                 f"{fmt(row.get('DeltaK_MPa_sqrt_m'))}:{row.get('status')}" for row in sorted(candidate_points, key=lambda item: number(item.get("DeltaK_MPa_sqrt_m")))
             ) or "pending",
             "developed_m": fit.get("m", ""),
-            "descriptor_status": fit.get("descriptor_status", "pending"),
+            "descriptor_status": descriptor_status,
         })
 
     measured = [number(row.get("m")) for row in fits if row.get("fidelity") == "level1" and math.isfinite(number(row.get("m")))]
