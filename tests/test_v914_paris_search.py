@@ -140,6 +140,12 @@ def test_analysis_and_launcher_share_precise_load_slug():
     assert slug(30.3832779198) == "30p3833"
 
 
+def test_analyzer_discovers_campaigns_independent_of_label():
+    source = (SCRIPTS / "analyze_v914_paris_search.py").read_text()
+    assert 'args.root.glob("*/launch_manifest.json")' in source
+    assert 'args.root.glob("level*/launch_manifest.json")' not in source
+
+
 def test_level3_launcher_preserves_case_specific_common_random_seeds(tmp_path):
     case_table = tmp_path / "cases.csv"
     case_table.write_text(

@@ -457,7 +457,10 @@ def main() -> int:
 
     points: list[dict[str, Any]] = []
     history: list[dict[str, Any]] = []
-    for manifest_path in sorted(args.root.glob("level*/launch_manifest.json")):
+    # Campaign labels are operational names, not fidelity contracts.  Adaptive
+    # surrogate campaigns therefore must not disappear merely because their
+    # directory does not begin with ``level``.
+    for manifest_path in sorted(args.root.glob("*/launch_manifest.json")):
         manifest = json.loads(manifest_path.read_text())
         for case in manifest["cases"]:
             run_dir = manifest_path.parent / case["candidate_id"] / f"DeltaK{slug(case['deltaK_MPa_sqrt_m'])}_seed{case['seed']}"
