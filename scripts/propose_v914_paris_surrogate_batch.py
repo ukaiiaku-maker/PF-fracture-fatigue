@@ -89,6 +89,8 @@ def main() -> int:
         help="Minimum measured valid/provisional local-slope descriptors; use two only for an audited initial exploratory iteration.",
     )
     parser.add_argument("--iteration", type=int, required=True)
+    parser.add_argument("--target-m-min", type=float, default=2.0)
+    parser.add_argument("--target-m-max", type=float, default=10.0)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     if not 4 <= args.batch_size <= 8:
@@ -132,6 +134,9 @@ def main() -> int:
     acquisition = conditional_improvement * feasibility_probability
     extrapolation = np.zeros(len(query), dtype=float)
     low_slope_direction_fields: list[str] = []
+    predicted_m = mean * y_scale + y_mean
+    predicted_m_std = std * y_scale
+    target_probability = np.zeros(len(query), dtype=float)
     if args.response_mode == "developed-m":
         # With only a few real slope descriptors, explicitly seek coordinates
         # beyond the current best in the direction away from the steep-slope
@@ -159,9 +164,12 @@ def main() -> int:
         direction[active] = best_x[active] - np.mean(other[:, active], axis=0)
         norm2 = max(float(direction @ direction), 1.0e-12)
         extrapolation = (query - best_x) @ direction / norm2
-        predicted_m = mean * y_scale + y_mean
-        predicted_m_std = std * y_scale
         lower_confidence_m = predicted_m - 1.5 * predicted_m_std
+        target_probability = np.maximum(
+            norm.cdf((args.target_m_max - predicted_m) / predicted_m_std)
+            - norm.cdf((args.target_m_min - predicted_m) / predicted_m_std),
+            0.0,
+        ) * feasibility_probability
         shape_gain = np.maximum(response[best_id] - lower_confidence_m, 0.0)
         acquisition = (shape_gain + y_scale * np.maximum(extrapolation, 0.0)) * feasibility_probability
         if int(np.sum(extrapolation > 0.0)) >= args.batch_size:
@@ -199,17 +207,24 @@ def main() -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     write_csv(args.out / "surrogate_batch.csv", batch, list(batch[0]))
     if args.response_mode == "developed-m":
+        selected_ids = {row["candidate_id"] for row in batch}
+        ranked_indices = sorted(
+            range(len(available)),
+            key=lambda index: (-target_probability[index], predicted_m[index]),
+        )[:25]
         low_m_rows = [
             {
-                "rank": row["surrogate_batch_rank"],
-                "candidate_id": row["candidate_id"],
-                "predicted_m": row["surrogate_predicted_m"],
-                "predicted_m_std": row["surrogate_predicted_m_std"],
-                "predicted_m_lower_1p5sigma": float(row["surrogate_predicted_m"]) - 1.5 * float(row["surrogate_predicted_m_std"]),
-                "feasibility_probability": row["surrogate_feasibility_probability"],
-                "low_slope_extrapolation_score": row["surrogate_low_slope_extrapolation_score"],
+                "domain_rank": rank,
+                "candidate_id": available[index]["candidate_id"],
+                "selected_for_batch": available[index]["candidate_id"] in selected_ids,
+                "predicted_m": predicted_m[index],
+                "predicted_m_std": predicted_m_std[index],
+                "predicted_m_lower_1p5sigma": predicted_m[index] - 1.5 * predicted_m_std[index],
+                "credible_target_probability_times_feasibility": target_probability[index],
+                "feasibility_probability": feasibility_probability[index],
+                "low_slope_extrapolation_score": extrapolation[index],
             }
-            for row in batch
+            for rank, index in enumerate(ranked_indices, 1)
         ]
         write_csv(
             args.out / "surrogate_predicted_low_m_region.csv",
@@ -239,6 +254,14 @@ def main() -> int:
         "low_slope_extrapolation_active": args.response_mode == "developed-m",
         "low_slope_direction_fields": low_slope_direction_fields,
     }
+    if args.response_mode == "developed-m":
+        minimum_index = int(np.argmin(predicted_m))
+        credible_index = int(np.argmax(target_probability))
+        audit["domain_predicted_minimum_m"] = float(predicted_m[minimum_index])
+        audit["domain_predicted_minimum_m_candidate_id"] = available[minimum_index]["candidate_id"]
+        audit["domain_best_credible_target_probability_times_feasibility"] = float(target_probability[credible_index])
+        audit["domain_best_credible_target_candidate_id"] = available[credible_index]["candidate_id"]
+        audit["provisional_target_m"] = [args.target_m_min, args.target_m_max]
     (args.out / "surrogate_audit.json").write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n")
     print(f"V914_PARIS_SURROGATE_BATCH iteration={args.iteration} size={len(batch)} observations={len(observed_ids)}")
     return 0
