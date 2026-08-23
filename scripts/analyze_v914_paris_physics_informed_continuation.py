@@ -195,6 +195,18 @@ def main() -> int:
     write_csv(args.out / "historical_vs_extended_cleavage_bounds.csv", bound_rows)
     write_csv(args.out / "cleavage_extension_candidates.csv", candidates)
     write_csv(args.out / "cleavage_extension_OAT.csv", oat)
+    oat_cases = [
+        {
+            "candidate_id": candidate["candidate_id"],
+            "DeltaK_MPa_sqrt_m": load,
+            "seed": 1720,
+            "case_role": "CLEAVAGE_EXTENSION_OAT_SEARCH_DESCRIPTOR",
+        }
+        for candidate in candidates
+        if candidate["candidate_id"] != A_ID and candidate["barrier_surface_valid"] is True
+        for load in (10.24, 11.7972560356, 12.96)
+    ]
+    write_csv(args.out / "cleavage_extension_OAT_cases.csv", oat_cases)
 
     decomposition = []
     for load in A_LOADS:
