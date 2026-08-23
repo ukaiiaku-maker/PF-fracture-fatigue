@@ -5,6 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 
+import numpy as np
 import pytest
 
 
@@ -14,7 +15,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from analyze_v914_paris_search import aggregate_seed_fits, best_fit, campaign_group_complete, expected_level0_points, fit_segment, level0_decision, numerical_exclusion_for_case, slug
-from propose_v914_paris_surrogate_batch import descriptor_response, gp_predict
+from propose_v914_paris_surrogate_batch import descriptor_response, gp_predict, select_exploitation_and_exploration
 
 
 CONFIG = json.loads((ROOT / "config/v914_paris_search_target.json").read_text())
@@ -133,6 +134,18 @@ def test_surrogate_predictor_returns_finite_uncertainty():
     assert np.all(np.isfinite(mean))
     assert np.all(std > 0.0)
     assert length > 0.0
+
+
+def test_physics_informed_batch_reserves_distinct_maximin_exploration_points():
+    query = np.asarray([[0.0], [0.1], [0.2], [0.8], [0.9], [1.0]])
+    acquisition = np.asarray([6.0, 5.0, 4.0, 3.0, 2.0, 1.0])
+    selected, roles = select_exploitation_and_exploration(
+        query, acquisition, np.asarray([[0.0]]), exploitation_count=4,
+        exploration_count=2, diversity_length=1.0,
+    )
+    assert len(selected) == len(set(selected)) == 6
+    assert roles.count("LOW_M_EXPLOITATION") == 4
+    assert roles.count("HISTORICAL_DOMAIN_MAXIMIN_EXPLORATION") == 2
 
 
 def test_level0_never_rejects_from_partial_load_evidence():

@@ -71,6 +71,35 @@ def descriptor_response(
     return sorted(evaluated), response, evaluated - set(response)
 
 
+def select_exploitation_and_exploration(
+    query: np.ndarray,
+    acquisition: np.ndarray,
+    observed: np.ndarray,
+    *,
+    exploitation_count: int,
+    exploration_count: int,
+    diversity_length: float,
+) -> tuple[list[int], list[str]]:
+    """Select slope-directed points plus a protected maximin exploration reserve."""
+    selected: list[int] = []
+    roles: list[str] = []
+    remaining = acquisition.copy()
+    for _ in range(min(exploitation_count, len(query))):
+        chosen = int(np.argmax(remaining))
+        selected.append(chosen); roles.append("LOW_M_EXPLOITATION")
+        distance = np.sqrt(np.sum((query - query[chosen]) ** 2, axis=1))
+        remaining *= 1.0 - np.exp(-0.5 * (distance / max(0.25 * diversity_length, 1.0e-6)) ** 2)
+        remaining[selected] = -np.inf
+    for _ in range(min(exploration_count, len(query) - len(selected))):
+        anchors = observed if not selected else np.vstack((observed, query[selected]))
+        distance = np.sqrt(pairwise_sq(query, anchors))
+        score = np.min(distance, axis=1)
+        score[selected] = -np.inf
+        chosen = int(np.argmax(score))
+        selected.append(chosen); roles.append("HISTORICAL_DOMAIN_MAXIMIN_EXPLORATION")
+    return selected, roles
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pool", type=Path, default=Path("artifacts/v914_paris_reparameterization/candidate_pool.csv"))
@@ -82,6 +111,7 @@ def main() -> int:
         help="Use developed-m for the shape-first, low-slope search.",
     )
     parser.add_argument("--batch-size", type=int, default=6)
+    parser.add_argument("--exploration-count", type=int, default=2)
     parser.add_argument(
         "--minimum-descriptors",
         type=int,
@@ -95,6 +125,10 @@ def main() -> int:
     args = parser.parse_args()
     if not 4 <= args.batch_size <= 8:
         raise SystemExit("batch-size must lie in the requested 4-8 range")
+    if not 2 <= args.exploration_count <= 3:
+        raise SystemExit("exploration-count must lie in the requested 2-3 range")
+    if not 4 <= args.batch_size - args.exploration_count <= 6:
+        raise SystemExit("batch must retain 4-6 low-m exploitation candidates")
     if args.minimum_descriptors < 2:
         raise SystemExit("minimum-descriptors must be at least two")
     pool = read_csv(args.pool); registry = read_csv(args.registry); fits = read_csv(args.fits)
@@ -179,17 +213,16 @@ def main() -> int:
         acquisition = desired_ei * feasibility_probability * (1.0 + np.maximum(extrapolation, 0.0))
         if int(np.sum(extrapolation > 0.0)) >= args.batch_size:
             acquisition[extrapolation <= 0.0] = -np.inf
-    selected: list[int] = []
-    remaining = acquisition.copy()
-    for _ in range(min(args.batch_size, len(available))):
-        chosen = int(np.argmax(remaining))
-        selected.append(chosen)
-        # Deterministic local diversity penalty for sequential batch selection.
-        distance = np.sqrt(np.sum((query - query[chosen]) ** 2, axis=1))
-        remaining *= 1.0 - np.exp(-0.5 * (distance / max(0.25 * length, 1.0e-6)) ** 2)
-        remaining[selected] = -np.inf
+    selected, acquisition_roles = select_exploitation_and_exploration(
+        query,
+        acquisition,
+        feasibility_x,
+        exploitation_count=args.batch_size - args.exploration_count,
+        exploration_count=args.exploration_count,
+        diversity_length=length,
+    )
     batch = []
-    for rank, index in enumerate(selected, 1):
+    for rank, (index, acquisition_role) in enumerate(zip(selected, acquisition_roles), 1):
         source = dict(available[index])
         source.update({
             "paris_initial_design_order": "",
@@ -207,6 +240,7 @@ def main() -> int:
             "surrogate_predicted_m": float(mean[index] * y_scale + y_mean) if args.response_mode == "developed-m" else "",
             "surrogate_predicted_m_std": float(std[index] * y_scale) if args.response_mode == "developed-m" else "",
             "surrogate_low_slope_extrapolation_score": float(extrapolation[index]),
+            "surrogate_acquisition_role": acquisition_role,
         })
         batch.append(source)
     args.out.mkdir(parents=True, exist_ok=True)
@@ -255,6 +289,8 @@ def main() -> int:
         "feasibility_kernel_length": feasibility_length,
         "acquisition_feasibility_weighted": True,
         "candidate_ids": [row["candidate_id"] for row in batch],
+        "exploitation_candidate_ids": [row["candidate_id"] for row in batch if row["surrogate_acquisition_role"] == "LOW_M_EXPLOITATION"],
+        "exploration_candidate_ids": [row["candidate_id"] for row in batch if row["surrogate_acquisition_role"] == "HISTORICAL_DOMAIN_MAXIMIN_EXPLORATION"],
         "response_mode": args.response_mode,
         "response_field": response_field,
         "shape_objective_is_primary": args.response_mode == "developed-m",
