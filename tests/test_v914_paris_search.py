@@ -14,7 +14,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from analyze_v914_paris_search import aggregate_seed_fits, best_fit, campaign_group_complete, expected_level0_points, fit_segment, level0_decision, slug
-from propose_v914_paris_surrogate_batch import gp_predict
+from propose_v914_paris_surrogate_batch import descriptor_response, gp_predict
 
 
 CONFIG = json.loads((ROOT / "config/v914_paris_search_target.json").read_text())
@@ -55,6 +55,32 @@ def test_two_points_never_define_a_paris_candidate():
     fit = best_fit([point(10.0), point(15.0)], CONFIG)
     assert fit["valid_Paris_region"] is False
     assert fit["n_points"] == 2
+
+
+def test_three_contiguous_points_define_only_a_provisional_local_slope():
+    fit = best_fit([point(10.0), point(12.0), point(14.0)], CONFIG)
+    assert fit["descriptor_status"] == "PROVISIONAL_THREE_POINT_LOCAL_SLOPE"
+    assert fit["m"] == pytest.approx(4.0)
+    assert fit["valid_Paris_region"] is False
+
+
+def test_provisional_descriptor_does_not_bridge_a_censor():
+    values = [point(10.0), point(12.0), point(14.0, usable=False), point(16.0), point(18.0)]
+    fit = best_fit(values, CONFIG)
+    assert fit["descriptor_status"] == "NO_LOCAL_SLOPE_DESCRIPTOR"
+    assert fit["m"] != fit["m"]
+
+
+def test_surrogate_separates_invalid_cases_from_measured_descriptors():
+    fits = [
+        {"candidate_id": "a", "fidelity": "level1", "objective": "0.5", "descriptor_status": "PROVISIONAL_THREE_POINT_LOCAL_SLOPE"},
+        {"candidate_id": "b", "fidelity": "level1", "objective": "inf", "descriptor_status": "NO_LOCAL_SLOPE_DESCRIPTOR"},
+        {"candidate_id": "c", "fidelity": "level0", "objective": "0.1", "descriptor_status": "VALID_PARIS_REGION"},
+    ]
+    observed, response, invalid = descriptor_response({"a", "b", "c"}, fits, "level1")
+    assert observed == ["a", "b"]
+    assert response == {"a": 0.5}
+    assert invalid == {"b"}
 
 
 def test_recovered_population_and_initial_design_are_audited():

@@ -51,6 +51,25 @@ def gp_predict(x: np.ndarray, y: np.ndarray, query: np.ndarray) -> tuple[np.ndar
     return mean, np.sqrt(variance), length
 
 
+def descriptor_response(
+    registry_ids: set[str], fits: list[dict[str, str]], fidelity: str
+) -> tuple[list[str], dict[str, float], set[str]]:
+    """Separate measured local-slope descriptors from censored/invalid cases."""
+    selected = [row for row in fits if row["fidelity"] == fidelity and row["candidate_id"] in registry_ids]
+    evaluated = {row["candidate_id"] for row in selected}
+    response = {
+        row["candidate_id"]: finite(row["objective"])
+        for row in selected
+        if math.isfinite(finite(row["objective"]))
+        and row.get("descriptor_status", "") in {
+            "PROVISIONAL_THREE_POINT_LOCAL_SLOPE",
+            "FOUR_POINT_INVALID_REGION",
+            "VALID_PARIS_REGION",
+        }
+    }
+    return sorted(evaluated), response, evaluated - set(response)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pool", type=Path, default=Path("artifacts/v914_paris_reparameterization/candidate_pool.csv"))
@@ -67,23 +86,31 @@ def main() -> int:
     coordinates = [field for field in pool[0] if field.startswith("u__")]
     pool_by_id = {row["candidate_id"]: row for row in pool}
     evaluated_ids = {row["candidate_id"] for row in registry}
-    response = {row["candidate_id"]: finite(row["objective"]) for row in fits if row["fidelity"] == args.fidelity}
-    observed_ids = [candidate for candidate in evaluated_ids if candidate in response]
-    finite_values = [response[candidate] for candidate in observed_ids if math.isfinite(response[candidate])]
+    observed_ids, response, invalid_ids = descriptor_response(evaluated_ids, fits, args.fidelity)
+    descriptor_ids = sorted(response)
+    finite_values = [response[candidate] for candidate in descriptor_ids]
     if len(observed_ids) < 8 or len(finite_values) < 3:
-        raise SystemExit("adaptive surrogate requires >=8 evaluated candidates and >=3 finite objectives")
-    penalty = max(finite_values) + max(np.std(finite_values), 1.0)
-    y_raw = np.asarray([response[candidate] if math.isfinite(response[candidate]) else penalty for candidate in observed_ids])
+        raise SystemExit("adaptive surrogate requires >=8 evaluated candidates and >=3 measured local-slope descriptors")
+    y_raw = np.asarray([response[candidate] for candidate in descriptor_ids])
     y_mean, y_scale = float(np.mean(y_raw)), max(float(np.std(y_raw)), 1.0e-12)
     y = (y_raw - y_mean) / y_scale
-    x = np.asarray([[finite(pool_by_id[candidate][field]) for field in coordinates] for candidate in observed_ids])
+    x = np.asarray([[finite(pool_by_id[candidate][field]) for field in coordinates] for candidate in descriptor_ids])
     available = [row for row in pool if row["candidate_id"] not in evaluated_ids]
     query = np.asarray([[finite(row[field]) for field in coordinates] for row in available])
     mean, std, length = gp_predict(x, y, query)
+    # Feasibility is learned separately from all evaluated candidates.  This
+    # prevents censored/invalid families from acquiring fabricated slopes or
+    # objective penalties while still steering the acquisition away from
+    # regions that only produced censors, bursts, or arrest.
+    feasibility_x = np.asarray([[finite(pool_by_id[candidate][field]) for field in coordinates] for candidate in observed_ids])
+    feasibility_y = np.asarray([1.0 if candidate in response else 0.0 for candidate in observed_ids])
+    feasibility_mean, feasibility_std, feasibility_length = gp_predict(feasibility_x, feasibility_y, query)
+    feasibility_probability = np.clip(feasibility_mean, 0.0, 1.0)
     incumbent = float(np.min(y))
     improvement = incumbent - mean
     z = improvement / std
-    acquisition = improvement * norm.cdf(z) + std * norm.pdf(z)
+    conditional_improvement = improvement * norm.cdf(z) + std * norm.pdf(z)
+    acquisition = conditional_improvement * feasibility_probability
     selected: list[int] = []
     remaining = acquisition.copy()
     for _ in range(min(args.batch_size, len(available))):
@@ -104,6 +131,9 @@ def main() -> int:
             "surrogate_predicted_objective": float(mean[index] * y_scale + y_mean),
             "surrogate_predicted_std": float(std[index] * y_scale),
             "surrogate_expected_improvement": float(acquisition[index] * y_scale),
+            "surrogate_descriptor_expected_improvement": float(conditional_improvement[index] * y_scale),
+            "surrogate_feasibility_probability": float(feasibility_probability[index]),
+            "surrogate_feasibility_std": float(feasibility_std[index]),
             "surrogate_kernel_length": length,
         })
         batch.append(source)
@@ -116,8 +146,12 @@ def main() -> int:
         "schema": "v914_paris_surrogate_batch_v1", "iteration": args.iteration,
         "batch_size": len(batch), "fidelity_response": args.fidelity,
         "observations": len(observed_ids), "finite_objectives": len(finite_values),
-        "invalid_objective_penalty": penalty, "kernel": "isotropic_squared_exponential",
+        "measured_descriptor_candidates": descriptor_ids,
+        "censored_or_invalid_candidates": sorted(invalid_ids),
+        "invalid_objective_penalty": None, "kernel": "isotropic_squared_exponential",
         "kernel_length": length, "acquisition": "expected_improvement_with_batch_diversity_penalty",
+        "feasibility_kernel_length": feasibility_length,
+        "acquisition_feasibility_weighted": True,
         "candidate_ids": [row["candidate_id"] for row in batch],
     }
     (args.out / "surrogate_audit.json").write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n")

@@ -243,21 +243,47 @@ def best_fit(group: list[dict[str, Any]], config: dict[str, Any]) -> dict[str, A
                     and fit["R2"] >= config["minimum_fit_R2"]
                 )
                 candidates.append({**fit, **metrics, "valid_Paris_region": valid})
+    descriptor_status = "NO_LOCAL_SLOPE_DESCRIPTOR"
     if candidates:
         valid = [fit for fit in candidates if fit["valid_Paris_region"]]
         chosen = min(valid or candidates, key=lambda fit: (fit["objective"], -fit["n_points"]))
+        descriptor_status = "VALID_PARIS_REGION" if chosen["valid_Paris_region"] else "FOUR_POINT_INVALID_REGION"
     else:
-        chosen = {
-            "n_points": len(usable), "DeltaK_min": math.nan, "DeltaK_max": math.nan,
-            "relative_DeltaK_span": math.nan, "da_dN_min": math.nan, "da_dN_max": math.nan,
-            "da_dN_span_decades": math.nan, "m": math.nan, "log10_C": math.nan, "C": math.nan,
-            "R2": math.nan, "residual_rmse_log10": math.nan, "fit_point_DeltaK": "",
-            "slope_mismatch": math.inf, "rate_mismatch": math.inf, "span_shortfall": math.inf,
-            "objective": math.inf, "valid_Paris_region": False,
-        }
+        # Three contiguous developed points are not a Paris qualification, but
+        # they do contain the provisional local-slope information requested for
+        # adaptive search.  Censors split the runs above, so no censored or
+        # invalid point can be assigned an artificial slope here.
+        provisional = []
+        for run in contiguous_runs:
+            for start in range(len(run)):
+                for stop in range(start + 3, len(run) + 1):
+                    fit = fit_segment(run[start:stop])
+                    provisional.append({
+                        **fit,
+                        **segment_objective(fit, config),
+                        "valid_Paris_region": False,
+                    })
+        if provisional:
+            chosen = min(provisional, key=lambda fit: (fit["objective"], -fit["n_points"]))
+            descriptor_status = "PROVISIONAL_THREE_POINT_LOCAL_SLOPE"
+        else:
+            chosen = {
+                "n_points": len(usable), "DeltaK_min": math.nan, "DeltaK_max": math.nan,
+                "relative_DeltaK_span": math.nan, "da_dN_min": math.nan, "da_dN_max": math.nan,
+                "da_dN_span_decades": math.nan, "m": math.nan, "log10_C": math.nan, "C": math.nan,
+                "R2": math.nan, "residual_rmse_log10": math.nan, "fit_point_DeltaK": "",
+                "slope_mismatch": math.inf, "rate_mismatch": math.inf, "span_shortfall": math.inf,
+                "objective": math.inf, "valid_Paris_region": False,
+            }
     censors = [point for point in group if point["censor_type"] != "none"]
     threshold = bool(censors and any(point["event_count"] == 0 for point in censors))
-    return {**chosen, "usable_developed_points": len(usable), "censor_points": len(censors), "threshold_observed": threshold}
+    return {
+        **chosen,
+        "descriptor_status": descriptor_status,
+        "usable_developed_points": len(usable),
+        "censor_points": len(censors),
+        "threshold_observed": threshold,
+    }
 
 
 def group_key(point: dict[str, Any]) -> tuple[Any, ...]:
@@ -505,7 +531,7 @@ def main() -> int:
     fit_fields = [
         "candidate_id", "fidelity", "seed", "R", "frequency_Hz", "temperature_K", "n_points", "DeltaK_min", "DeltaK_max",
         "relative_DeltaK_span", "da_dN_min", "da_dN_max", "da_dN_span_decades", "m", "C", "log10_C", "R2",
-        "residual_rmse_log10", "usable_developed_points", "censor_points", "valid_Paris_region", "threshold_observed",
+        "residual_rmse_log10", "descriptor_status", "usable_developed_points", "censor_points", "valid_Paris_region", "threshold_observed",
         "slope_mismatch", "rate_mismatch", "span_shortfall", "objective", "fit_point_DeltaK",
     ]
     write_csv(out / "paris_search_points.csv", points, point_fields)
