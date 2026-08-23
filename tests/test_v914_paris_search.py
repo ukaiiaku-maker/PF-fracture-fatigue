@@ -146,6 +146,17 @@ def test_high_k50_candidate_requires_supplemental_level0_probe():
     assert expected_level0_points({"historical_monotonic_K50_300K_MPa_sqrt_m": "12.0"}, CONFIG) == 3
 
 
+def test_high_k50_candidate_with_finite_base_bracket_promotes_without_supplement():
+    points = [
+        {"status": "work_budget_exhausted", "event_count": 0, "completed_physical_cycles": 1.0e8},
+        {"status": "work_budget_exhausted", "event_count": 0, "completed_physical_cycles": 1.0e7},
+        {"status": "growth_target_reached", "event_count": 3, "completed_physical_cycles": 19},
+    ]
+    assert level0_decision(points, 4, 1.0) == (
+        True, "LEVEL0_FINITE_NONCATASTROPHIC_GROWTH", "level1"
+    )
+
+
 def test_analysis_and_launcher_share_precise_load_slug():
     assert slug(30.3832779198) == "30p3833"
 

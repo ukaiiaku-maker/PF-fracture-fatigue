@@ -331,14 +331,19 @@ def aggregate_seed_fits(fits: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def level0_decision(points: list[dict[str, Any]], expected_points: int, minimum_cycles: float) -> tuple[bool, str, str]:
-    if len(points) < expected_points:
-        return False, "LEVEL0_INCOMPLETE", "level0"
     any_growth = any(point["status"] == "growth_target_reached" for point in points)
     all_inert = all(point["event_count"] == 0 for point in points)
     all_catastrophic = all(
         point["status"] == "growth_target_reached" and point["completed_physical_cycles"] <= minimum_cycles
         for point in points
     )
+    # A high-K50 supplement protects rejection of an otherwise inert three-load
+    # screen.  It is not required once the base screen already contains finite,
+    # non-catastrophic growth and therefore a candidate-specific bracket.
+    if len(points) >= 3 and any_growth and not all_inert and not all_catastrophic:
+        return True, "LEVEL0_FINITE_NONCATASTROPHIC_GROWTH", "level1"
+    if len(points) < expected_points:
+        return False, "LEVEL0_INCOMPLETE", "level0"
     promote = any_growth and not all_inert and not all_catastrophic
     return (
         promote,
