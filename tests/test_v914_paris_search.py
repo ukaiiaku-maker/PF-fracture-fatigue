@@ -83,6 +83,23 @@ def test_surrogate_separates_invalid_cases_from_measured_descriptors():
     assert invalid == {"b"}
 
 
+def test_surrogate_cli_rejects_less_than_two_descriptors(tmp_path):
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPTS / "propose_v914_paris_surrogate_batch.py"),
+            "--iteration", "1",
+            "--minimum-descriptors", "1",
+            "--out", str(tmp_path / "out"),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode != 0
+    assert "minimum-descriptors must be at least two" in result.stderr
+
+
 def test_recovered_population_and_initial_design_are_audited():
     import csv
 

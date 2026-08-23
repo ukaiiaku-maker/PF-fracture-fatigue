@@ -77,11 +77,19 @@ def main() -> int:
     parser.add_argument("--fits", type=Path, default=Path("runs/v914_paris_reparameterization_v1/analysis/paris_candidate_fits.csv"))
     parser.add_argument("--fidelity", default="level1")
     parser.add_argument("--batch-size", type=int, default=6)
+    parser.add_argument(
+        "--minimum-descriptors",
+        type=int,
+        default=3,
+        help="Minimum measured valid/provisional local-slope descriptors; use two only for an audited initial exploratory iteration.",
+    )
     parser.add_argument("--iteration", type=int, required=True)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     if not 4 <= args.batch_size <= 8:
         raise SystemExit("batch-size must lie in the requested 4-8 range")
+    if args.minimum_descriptors < 2:
+        raise SystemExit("minimum-descriptors must be at least two")
     pool = read_csv(args.pool); registry = read_csv(args.registry); fits = read_csv(args.fits)
     coordinates = [field for field in pool[0] if field.startswith("u__")]
     pool_by_id = {row["candidate_id"]: row for row in pool}
@@ -89,8 +97,11 @@ def main() -> int:
     observed_ids, response, invalid_ids = descriptor_response(evaluated_ids, fits, args.fidelity)
     descriptor_ids = sorted(response)
     finite_values = [response[candidate] for candidate in descriptor_ids]
-    if len(observed_ids) < 8 or len(finite_values) < 3:
-        raise SystemExit("adaptive surrogate requires >=8 evaluated candidates and >=3 measured local-slope descriptors")
+    if len(observed_ids) < 8 or len(finite_values) < args.minimum_descriptors:
+        raise SystemExit(
+            f"adaptive surrogate requires >=8 evaluated candidates and >={args.minimum_descriptors} "
+            "measured local-slope descriptors"
+        )
     y_raw = np.asarray([response[candidate] for candidate in descriptor_ids])
     y_mean, y_scale = float(np.mean(y_raw)), max(float(np.std(y_raw)), 1.0e-12)
     y = (y_raw - y_mean) / y_scale
@@ -146,6 +157,8 @@ def main() -> int:
         "schema": "v914_paris_surrogate_batch_v1", "iteration": args.iteration,
         "batch_size": len(batch), "fidelity_response": args.fidelity,
         "observations": len(observed_ids), "finite_objectives": len(finite_values),
+        "minimum_descriptors_required": args.minimum_descriptors,
+        "initial_two_descriptor_exploration": args.minimum_descriptors == 2,
         "measured_descriptor_candidates": descriptor_ids,
         "censored_or_invalid_candidates": sorted(invalid_ids),
         "invalid_objective_penalty": None, "kernel": "isotropic_squared_exponential",
