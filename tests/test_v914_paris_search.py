@@ -13,7 +13,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from analyze_v914_paris_search import aggregate_seed_fits, best_fit, campaign_group_complete, expected_level0_points, fit_segment, level0_decision, slug
+from analyze_v914_paris_search import aggregate_seed_fits, best_fit, campaign_group_complete, expected_level0_points, fit_segment, level0_decision, numerical_exclusion_for_case, slug
 from propose_v914_paris_surrogate_batch import descriptor_response, gp_predict
 
 
@@ -207,6 +207,21 @@ def test_best_fit_prefers_qualified_duplicate_load_over_rejected_short_run():
     assert fit["descriptor_status"] == "PROVISIONAL_THREE_POINT_LOCAL_SLOPE"
     assert fit["usable_developed_points"] == 3
     assert fit["n_points"] == 3
+
+
+def test_numerical_nontermination_is_explicitly_excluded_from_physical_analysis():
+    case = {"candidate_id": "candidate", "deltaK_MPa_sqrt_m": 10.8}
+    exclusion = {
+        "candidate_id": "candidate",
+        "deltaK_MPa_sqrt_m": 10.8,
+        "classification": "numerical_nontermination",
+        "physical_analysis_admissible": False,
+        "feasibility_objective_admissible": False,
+    }
+    assert numerical_exclusion_for_case({"numerical_exclusions": [exclusion]}, case) == exclusion
+    assert numerical_exclusion_for_case(
+        {"numerical_exclusions": [exclusion]}, {**case, "deltaK_MPa_sqrt_m": 16.2}
+    ) is None
 
 
 def test_level3_launcher_preserves_case_specific_common_random_seeds(tmp_path):

@@ -43,6 +43,27 @@ def read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(stream))
 
 
+def numerical_exclusion_for_case(manifest: dict[str, Any], case: dict[str, Any]) -> dict[str, Any] | None:
+    """Return an explicit nonphysical numerical exclusion matching a launch case."""
+    for exclusion in manifest.get("numerical_exclusions", []):
+        if exclusion.get("candidate_id") != case.get("candidate_id"):
+            continue
+        if not math.isclose(
+            finite(exclusion.get("deltaK_MPa_sqrt_m")),
+            finite(case.get("deltaK_MPa_sqrt_m")),
+            rel_tol=1.0e-12,
+        ):
+            continue
+        if exclusion.get("classification") not in {"numerical_nontermination", "invalid_numerical_trajectory"}:
+            raise ValueError(f"unsupported numerical exclusion classification: {exclusion!r}")
+        if exclusion.get("physical_analysis_admissible") is not False:
+            raise ValueError(f"numerical exclusion must fail closed for physical analysis: {exclusion!r}")
+        if exclusion.get("feasibility_objective_admissible") is not False:
+            raise ValueError(f"numerical exclusion must fail closed for feasibility objectives: {exclusion!r}")
+        return exclusion
+    return None
+
+
 def write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> None:
     with path.open("w", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
@@ -488,7 +509,15 @@ def main() -> int:
         for case in manifest["cases"]:
             run_dir = manifest_path.parent / case["candidate_id"] / f"DeltaK{slug(case['deltaK_MPa_sqrt_m'])}_seed{case['seed']}"
             result_path = run_dir / "result.json"
-            if result_path.is_file():
+            exclusion = numerical_exclusion_for_case(manifest, case)
+            if exclusion is not None:
+                history.append({
+                    **case,
+                    "state": "numerically_excluded",
+                    "status": exclusion["classification"],
+                    "result_path": "",
+                })
+            elif result_path.is_file():
                 point = point_from_result(case, result_path, config, manifest)
                 points.append(point)
                 history.append({**case, "state": "terminal", "status": point["status"], "result_path": str(result_path.resolve())})
