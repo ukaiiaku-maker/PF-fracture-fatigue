@@ -208,6 +208,32 @@ def test_level1_search_descriptor_uses_validated_short_target_only(tmp_path):
     assert manifest["numerical_fidelity"]["target_extension_um"] == 9.0
 
 
+def test_level1_search_case_designer_emits_three_bracketed_loads(tmp_path):
+    registry = tmp_path / "registry.csv"
+    registry.write_text("candidate_id,historical_monotonic_K50_300K_MPa_sqrt_m\ncandidate,15\n")
+    promotions = tmp_path / "promotions.csv"
+    promotions.write_text("candidate_id,next_fidelity,promote\ncandidate,level1,true\n")
+    points = tmp_path / "points.csv"
+    points.write_text(
+        "candidate_id,fidelity,DeltaK_MPa_sqrt_m,status\n"
+        "candidate,level0,10.8,work_budget_exhausted\n"
+        "candidate,level0,16.2,growth_target_reached\n"
+    )
+    output = tmp_path / "cases.csv"
+    subprocess.run(
+        [
+            sys.executable, str(SCRIPTS / "design_v914_paris_adaptive_cases.py"),
+            "--mode", "level1-search-descriptors", "--registry", str(registry),
+            "--promotions", str(promotions), "--points", str(points), "--out", str(output),
+        ], cwd=ROOT, check=True, capture_output=True, text=True,
+    )
+    import csv
+    rows = list(csv.DictReader(output.open()))
+    assert len(rows) == 3
+    assert all(row["case_role"] == "LEVEL1_SEARCH_DESCRIPTOR" for row in rows)
+    assert [float(row["DeltaK_MPa_sqrt_m"]) for row in rows] == pytest.approx([11.34, (11.34 * 19.44) ** 0.5, 19.44])
+
+
 def test_finalist_seed_statistics_exclude_invalid_fits():
     base = {
         "candidate_id": "candidate", "fidelity": "level3", "R": 0.1,

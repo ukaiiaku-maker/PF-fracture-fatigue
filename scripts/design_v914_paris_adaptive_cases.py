@@ -31,7 +31,7 @@ def write_csv(path: Path, rows: list[dict]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=("level0-supplement", "level1-promotions", "level2-fidelity-pairs", "level2-promotions", "level3-finalists"), required=True)
+    parser.add_argument("--mode", choices=("level0-supplement", "level1-search-descriptors", "level1-promotions", "level2-fidelity-pairs", "level2-promotions", "level3-finalists"), required=True)
     parser.add_argument("--registry", type=Path, default=Path("artifacts/v914_paris_reparameterization/candidate_registry.csv"))
     parser.add_argument("--config", type=Path, default=Path("config/v914_paris_search_target.json"))
     parser.add_argument("--promotions", type=Path, default=Path("runs/v914_paris_reparameterization_v1/analysis/candidate_promotions.csv"))
@@ -52,7 +52,7 @@ def main() -> int:
             load = min(level0["inert_supplement_max_DeltaK_MPa_sqrt_m"], level0["inert_supplement_historical_K50_factor"] * k50)
             if load - maximum >= level0["inert_supplement_minimum_separation_MPa_sqrt_m"]:
                 rows.append({"candidate_id": candidate["candidate_id"], "DeltaK_MPa_sqrt_m": f"{load:.12g}", "case_role": "HIGH_K50_LEVEL0_SUPPLEMENT"})
-    elif args.mode == "level1-promotions":
+    elif args.mode in {"level1-search-descriptors", "level1-promotions"}:
         promote = {row["candidate_id"] for row in read_csv(args.promotions) if row["next_fidelity"] == "level1" and row["promote"].lower() == "true"}
         points = read_csv(args.points)
         for candidate_id in sorted(promote):
@@ -66,9 +66,15 @@ def main() -> int:
             high = min(1.20 * first_growth, config["level0"]["inert_supplement_max_DeltaK_MPa_sqrt_m"])
             if high <= low:
                 low = 0.8 * first_growth
-            loads = [low * (high / low) ** (index / 5.0) for index in range(6)]
+            descriptor_only = args.mode == "level1-search-descriptors"
+            count = 3 if descriptor_only else 6
+            loads = [low * (high / low) ** (index / (count - 1.0)) for index in range(count)]
             for load in loads:
-                rows.append({"candidate_id": candidate_id, "DeltaK_MPa_sqrt_m": f"{load:.12g}", "case_role": "LEVEL1_ADAPTIVE_BRACKETED_PARIS_RANGE"})
+                rows.append({
+                    "candidate_id": candidate_id,
+                    "DeltaK_MPa_sqrt_m": f"{load:.12g}",
+                    "case_role": "LEVEL1_SEARCH_DESCRIPTOR" if descriptor_only else "LEVEL1_ADAPTIVE_BRACKETED_PARIS_RANGE",
+                })
     elif args.mode == "level2-fidelity-pairs":
         pair_ids = {row["candidate_id"] for row in registry if row["paris_design_role"].startswith("ABCD_") or row["paris_design_role"] == "DIVERSE_FIDELITY_PAIR"}
         for candidate_id in sorted(pair_ids):
