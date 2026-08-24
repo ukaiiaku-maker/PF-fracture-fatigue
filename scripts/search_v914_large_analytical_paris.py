@@ -103,7 +103,8 @@ def evaluate(frame: pd.DataFrame, loads: np.ndarray, physics: dict, cfg: dict, o
     lo = float(cfg["target_log10_da_dN_min_m_per_cycle"]); hi = float(cfg["target_log10_da_dN_max_m_per_cycle"])
     # Interpretable regime proxy: finite rate, unsaturated three-hit response, and no gross cleavage/emission imbalance.
     feasible = (predicted >= lo - 2*uncertainty) & (predicted <= hi + 2*uncertainty) & (rt > 1e-10) & (rt < 30.) & (competition > -14.) & (competition < 14.)
-    arrays = dict(raw=raw, rate3=rate3, predicted=predicted, mlocal=mlocal, feasible=feasible,
+    arrays = dict(Gstar=G, raw=raw, raw_tau=rt, rate3=rate3, three_hit_amplification=amp,
+                  predicted=predicted, mraw=mraw, mlocal=mlocal, feasible=feasible,
                   competition=competition, plastic=plastic, transport=np.broadcast_to(transport, (n, nk)))
     return arrays
 
