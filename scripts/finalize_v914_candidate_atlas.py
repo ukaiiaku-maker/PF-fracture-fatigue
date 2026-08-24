@@ -170,6 +170,14 @@ def main() -> int:
              "taylor_nu0_s": 1.0e11, "n64_launch_status": "QUEUED_NOT_LAUNCHED"}
     for key, value in fixed.items(): queue[key] = value
     queue.to_csv(out/"n64_candidate_queue.csv", index=False, quoting=csv.QUOTE_MINIMAL)
+    round1=queue.nsmallest(25,"queue_priority")
+    round1[["candidate_id"]].to_csv(out/"n64_round01_candidate_ids.csv",index=False)
+    cases=pd.DataFrame([
+        {"candidate_id":cid,"DeltaK_MPa_sqrt_m":load,"R":0.1,
+         "frequency_Hz":1000.0,"temperature_K":300.0,"seed":1720}
+        for cid in round1.candidate_id for load in (10.8,16.2,21.6)
+    ])
+    cases.to_csv(out/"n64_round01_cases.csv",index=False)
     observation_path=out/"candidate_property_observations.parquet"
     n64_results_path=out/"n64_candidate_results.parquet"
     n128_results_path=out/"n128_candidate_results.parquet"

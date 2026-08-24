@@ -15,7 +15,7 @@ def require(ok,msg):
 def main():
     ap=argparse.ArgumentParser();ap.add_argument("--atlas",type=Path,required=True);ap.add_argument("--prior-root",type=Path,required=True);a=ap.parse_args();d=a.atlas
     expected={"master_candidate_registry.parquet":1572864,"fatigue_analytical_points.parquet":25165824,"fatigue_candidate_properties.parquet":1572864}
-    required=[*expected,"fatigue_window_catalog.parquet","candidate_property_observations.parquet","n64_candidate_queue.csv","n64_candidate_results.parquet","n128_candidate_results.parquet","parameter_space_clusters.parquet","property_space_clusters.parquet","candidate_atlas_coverage.csv","candidate_atlas_coverage_report.md","candidate_atlas_schema.json","candidate_generation_provenance.json","joint_candidate_property_atlas_schema.json","candidate_atlas_finalization.json","m_vs_C.png","m_vs_window_width.png","m_vs_three_hit_amplification.png"]
+    required=[*expected,"fatigue_window_catalog.parquet","candidate_property_observations.parquet","n64_candidate_queue.csv","n64_round01_candidate_ids.csv","n64_round01_cases.csv","n64_candidate_results.parquet","n128_candidate_results.parquet","parameter_space_clusters.parquet","property_space_clusters.parquet","candidate_atlas_coverage.csv","candidate_atlas_coverage_report.md","candidate_atlas_schema.json","candidate_generation_provenance.json","joint_candidate_property_atlas_schema.json","candidate_atlas_finalization.json","m_vs_C.png","m_vs_window_width.png","m_vs_three_hit_amplification.png"]
     require(all((d/x).is_file() and (d/x).stat().st_size>0 for x in required),"required atlas outputs are missing or empty")
     for name,n in expected.items():require(pq.ParquetFile(d/name).metadata.num_rows==n,f"wrong row count: {name}")
     require(pq.ParquetFile(d/"fatigue_window_catalog.parquet").metadata.num_rows>0,"no analytical windows")
@@ -31,6 +31,8 @@ def main():
     require(len(queue)==250 and queue.candidate_id.is_unique,"n64 queue must contain 250 unique candidates")
     require(set(queue.candidate_id)<=set(identity.candidate_id),"queue contains candidates outside registry")
     require(set(queue.n64_launch_status)=={"QUEUED_NOT_LAUNCHED"},"analytical finalizer must not mark queue launched")
+    cases=pd.read_csv(d/"n64_round01_cases.csv");require(len(cases)==75 and cases.candidate_id.nunique()==25,"round 1 must be 25 candidates x 3 loads")
+    require(set(cases.DeltaK_MPa_sqrt_m)=={10.8,16.2,21.6},"round 1 descriptor loads changed")
     roles=queue.atlas_sampling_role.value_counts().to_dict();require(roles=={"realistic_paris_exploitation":100,"distinct_low_m_basin":50,"property_space_coverage":50,"analytical_uncertainty":25,"maximin_global_exploration":25},f"queue role mismatch: {roles}")
     require(pq.ParquetFile(d/"parameter_space_clusters.parquet").metadata.num_rows==1572864,"parameter clustering incomplete")
     require(pq.ParquetFile(d/"property_space_clusters.parquet").metadata.num_rows==1572864,"property clustering incomplete")
