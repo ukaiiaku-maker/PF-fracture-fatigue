@@ -138,9 +138,14 @@ def point_from_result(
     extension = finite(payload.get("cumulative_extension_m"), 0.0)
     total_rate = extension / cycles if cycles > 0.0 else math.nan
     last = events[-1] if events else {}
+    # Descriptor usability is independent of *why* the trajectory stopped.
+    # A work-budget-exhausted or cycle-horizon-reached run can still contain a
+    # sufficient developed (post-truncation) interval count; only restart
+    # contamination, an insufficient interval count, or a non-positive rate
+    # make a point inadmissible. `status`/`censor_type` remain the separate,
+    # unmodified terminal-status axis recorded below.
     developed_usable = bool(
-        status == "growth_target_reached"
-        and int(payload.get("restart_count", -1)) == 0
+        int(payload.get("restart_count", -1)) == 0
         and developed["post_initiation_event_count"] >= minimum_events
         and developed["post_initiation_cycles"] >= float(config["minimum_post_initiation_cycles"])
         and finite(developed["developed_da_dN_m_per_cycle"]) > 0.0

@@ -14,7 +14,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from analyze_v914_paris_search import aggregate_seed_fits, best_fit, campaign_group_complete, expected_level0_points, fit_segment, level0_decision, numerical_exclusion_for_case, slug
+from analyze_v914_paris_search import aggregate_seed_fits, best_fit, campaign_group_complete, expected_level0_points, fit_segment, level0_decision, numerical_exclusion_for_case, point_from_result, post_initiation_rate, slug
 from propose_v914_paris_surrogate_batch import descriptor_response, gp_predict, select_exploitation_and_exploration
 
 
@@ -339,6 +339,66 @@ def test_finalist_seed_statistics_exclude_invalid_fits():
     assert rows[0]["m_mean"] == pytest.approx(5.0)
     assert rows[0]["m_std"] == pytest.approx(2.0**0.5)
     assert rows[0]["log10_C_mean"] == pytest.approx(-11.0)
+
+
+def _synthetic_events(n: int) -> list[dict]:
+    events = []
+    for i in range(n):
+        events.append({
+            "cumulative_cycles": float(100 * (i + 1)),
+            "cumulative_extension_m": float(2.0e-6 * (i + 1)),
+            "interval_cycles": 100.0,
+            "committed_advance_m": 2.0e-6,
+        })
+    return events
+
+
+def _minimal_terminal_fixture(tmp_path: Path, status: str, n_events: int):
+    case = {
+        "candidate_id": "candidate", "fidelity": "level1", "seed": 1720,
+        "R": 0.1, "frequency_Hz": 1000.0, "temperature_K": 300.0,
+        "deltaK_MPa_sqrt_m": 15.0,
+    }
+    payload = {
+        "status": status, "restart_count": 0,
+        "events": _synthetic_events(n_events),
+        "completed_physical_cycles": 100.0 * n_events,
+        "cumulative_extension_m": 2.0e-6 * n_events,
+        "identity_contract": {"loading": {}, "repository_head": "deadbeef"},
+        "repository_head": "deadbeef",
+    }
+    result_path = tmp_path / "result.json"
+    result_path.write_text(json.dumps(payload))
+    manifest = {"candidate_registry_sha256": "reg", "fixed_current_physics_sha256": "phys"}
+    contract = {
+        "repository_clean": True, "candidate": "candidate", "deltaK_MPa_sqrt_m": 15.0,
+        "registry_sha256": "reg", "physics_sha256": "phys", "repository_head": "deadbeef",
+        "return_control": "REV", "configuration_label": "CAL-TRANS-REV",
+    }
+    (tmp_path / "run_contract.json").write_text(json.dumps(contract))
+    return case, result_path, manifest
+
+
+def test_post_initiation_rate_needs_a_fifth_event_for_three_developed_intervals():
+    # Matches the search-descriptor target design: four committed events only
+    # supply two post-truncation intervals, one short of the minimum.
+    assert post_initiation_rate(_synthetic_events(4), 3)["post_initiation_event_count"] == 2
+    assert post_initiation_rate(_synthetic_events(5), 3)["post_initiation_event_count"] == 3
+
+
+def test_work_budget_exhausted_point_is_usable_with_enough_developed_events(tmp_path):
+    case, result_path, manifest = _minimal_terminal_fixture(tmp_path, "work_budget_exhausted", 5)
+    point = point_from_result(case, result_path, CONFIG, manifest)
+    assert point["status"] == "work_budget_exhausted"
+    assert point["developed_point_usable"] is True
+
+
+def test_growth_target_reached_point_stays_unusable_with_too_few_events(tmp_path):
+    case, result_path, manifest = _minimal_terminal_fixture(tmp_path, "growth_target_reached", 4)
+    point = point_from_result(case, result_path, CONFIG, manifest)
+    assert point["status"] == "growth_target_reached"
+    assert point["developed_point_usable"] is False
+    assert point["post_initiation_event_count"] == 2
 
 
 def test_level1_campaign_cannot_reject_from_partial_load_evidence():

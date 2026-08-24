@@ -7,3 +7,10 @@ def test_hierarchical_dimensions_are_disjoint():
 def test_room_temperature_reanchoring_identity():
  base,g,Tref=4.2,.003,481.33;at_ref=base+g*(Tref-300)
  assert abs(at_ref+g*(300-Tref)-base)<1e-14
+def test_support_label_requires_exact_historical_co_occurrence():
+ import json
+ sources=json.dumps(["v913_zeroD_sobol_0000001","v913_zeroD_sobol_0000002"])
+ assert M.support_label("v913_zeroD_sobol_0000001",sources)=="HISTORICAL_THERMAL_SUPPORT"
+ assert M.support_label("v914_large_analytical_0055172",sources)=="COMPOSITIONAL_EXTRAPOLATION"
+ assert M.support_label("",sources)=="COMPOSITIONAL_EXTRAPOLATION"
+ assert M.support_label(None,sources)=="COMPOSITIONAL_EXTRAPOLATION"

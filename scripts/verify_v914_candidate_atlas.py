@@ -13,7 +13,11 @@ def require(ok,msg):
     if not ok: raise RuntimeError(msg)
 
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument("--atlas",type=Path,required=True);ap.add_argument("--prior-root",type=Path,required=True);a=ap.parse_args();d=a.atlas
+    ap=argparse.ArgumentParser()
+    ap.add_argument("--atlas",type=Path,required=True)
+    ap.add_argument("--historical-prior",type=Path,required=True,help="path to the HISTORICAL_DOMAIN prior population's large_search_candidates.parquet")
+    ap.add_argument("--cleavage-extension-prior",type=Path,required=True,help="path to the CLEAVAGE_EXTENSION prior population's large_search_candidates.parquet")
+    a=ap.parse_args();d=a.atlas
     expected={"master_candidate_registry.parquet":1572864,"fatigue_analytical_points.parquet":25165824,"fatigue_candidate_properties.parquet":1572864}
     joint_expected={"thermal_profile_registry.parquet":4112,"joint_candidate_registry.parquet":1048576,"joint_fracture_analytical_points.parquet":10485760,"joint_candidate_property_atlas.parquet":1048576}
     required=[*expected,*joint_expected,"fatigue_window_catalog.parquet","candidate_property_observations.parquet","n64_candidate_queue.csv","n64_round01_candidate_ids.csv","n64_round01_cases.csv","n64_candidate_results.parquet","n128_candidate_results.parquet","parameter_space_clusters.parquet","property_space_clusters.parquet","candidate_atlas_coverage.csv","candidate_atlas_coverage_report.md","candidate_atlas_schema.json","candidate_generation_provenance.json","joint_candidate_property_atlas_schema.json","candidate_atlas_finalization.json","thermal_profile_schema.json","thermal_profile_provenance.json","historical_thermal_bounds.json","historical_thermal_parameter_audit.md","historical_thermal_shared_spearman.csv","fracture_property_transfer_model.json","fracture_property_transfer_cv.csv","joint_fracture_batch01_50.csv","joint_fracture_batch01_manifest.json","m_vs_C.png","m_vs_window_width.png","m_vs_three_hit_amplification.png"]
@@ -24,9 +28,10 @@ def main():
     identity=pq.read_table(d/"master_candidate_registry.parquet",columns=["candidate_id","candidate_sha256","domain_label",*PARAMS]).to_pandas()
     require(identity.candidate_id.is_unique,"candidate IDs are not unique");require(identity.candidate_sha256.is_unique,"candidate hashes are not unique")
     require(identity.candidate_id.iloc[0]=="V914_ATLAS_000000001" and identity.candidate_id.iloc[-1]=="V914_ATLAS_001572864","stable ID bounds wrong")
-    specs=[("historical_domain",0,524288),("cleavage_extension",1048576,131072)]
-    for name,start,n in specs:
-        old=pq.read_table(a.prior_root/name/"large_search_candidates.parquet",columns=PARAMS).slice(0,n).to_pandas().to_numpy()
+    specs=[("historical_domain",a.historical_prior,0,524288),("cleavage_extension",a.cleavage_extension_prior,1048576,131072)]
+    for name,prior_path,start,n in specs:
+        require(prior_path.is_file(),f"prior population source missing for {name}: {prior_path} (pass --historical-prior/--cleavage-extension-prior pointing at the preserved large_search_candidates.parquet; the Sobol-prefix reproducibility check cannot run without it)")
+        old=pq.read_table(prior_path,columns=PARAMS).slice(0,n).to_pandas().to_numpy()
         new=identity.iloc[start:start+n][PARAMS].to_numpy()
         require(np.array_equal(old,new,equal_nan=True),f"Sobol prefix mismatch: {name}")
     queue=pd.read_csv(d/"n64_candidate_queue.csv")

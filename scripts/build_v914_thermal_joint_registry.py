@@ -13,6 +13,8 @@ CANON={"v913_zeroD_sobol_0242980":"Peak-T","v913_zeroD_sobol_0202500":"DBTT","v9
 
 def sha(vals):return hashlib.sha256("|".join(float(v).hex() for v in vals).encode()).hexdigest()
 def git(repo,*args):return subprocess.check_output(["git","-C",str(repo),*args],text=True).strip()
+def support_label(legacy_id,historical_source_ids_json):
+    return "HISTORICAL_THERMAL_SUPPORT" if legacy_id and legacy_id in json.loads(historical_source_ids_json) else "COMPOSITIONAL_EXTRAPOLATION"
 def main():
  ap=argparse.ArgumentParser();ap.add_argument("--atlas",type=Path,required=True);ap.add_argument("--fracture-repo",type=Path,required=True);ap.add_argument("--joint-power",type=int,default=20);ap.add_argument("--creation-commit",required=True);a=ap.parse_args();out=a.atlas
  run=a.fracture_repo/"runs/v9_13_zero_d_large_persistent_search_v1";source=run/"zero_d_ranked_candidates_corrected.csv";contract=json.loads((run/"run_contract.json").read_text())["contract"]
@@ -68,7 +70,14 @@ Without this transformation, attaching a profile would silently change the base 
  provenance={"schema":"v914_thermal_profile_provenance_v1","source_registry":str(source.resolve()),"source_run_contract":str((run/"run_contract.json").resolve()),"source_repository_head":git(a.fracture_repo,"rev-parse","HEAD"),"historical_4096_candidates":len(src),"supplemental_qualified_legacy_profiles":supplemental_count,"distinct_profiles":len(profiles),"creation_commit":a.creation_commit,"physics_calculations_rerun":False};(out/"thermal_profile_provenance.json").write_text(json.dumps(provenance,indent=2)+"\n")
  # Deterministic, non-Cartesian 2-D Sobol pairing over base and profile indices.
  n=2**a.joint_power;j=qmc.Sobol(d=2,scramble=True,seed=271914).random_base2(a.joint_power);base_n=pq.ParquetFile(out/"master_candidate_registry.parquet").metadata.num_rows;base_idx=np.minimum((j[:,0]*base_n).astype(np.int64),base_n-1);thermal_idx=np.minimum((j[:,1]*len(profiles)).astype(np.int64),len(profiles)-1)
- base=pq.read_table(out/"master_candidate_registry.parquet",columns=["candidate_id","candidate_sha256",*BASE]).take(pa.array(base_idx)).to_pandas();therm=profiles.iloc[thermal_idx].reset_index(drop=True);joint=pd.DataFrame({"joint_candidate_id":[f"V914_JOINT_{i+1:09d}" for i in range(n)],"base_candidate_id":base.candidate_id,"thermal_profile_id":therm.thermal_profile_id,"common_physics_id":"v913_zeroD_transfer_common_physics_bd356ce6","joint_sequence_index":np.arange(n,dtype=np.int64),"pairing_u_base":j[:,0],"pairing_u_thermal":j[:,1],"pairing_strategy":"SOBOL_PRODUCT_NONCARTESIAN","support_label":"HISTORICAL_THERMAL_SUPPORT"})
+ base=pq.read_table(out/"master_candidate_registry.parquet",columns=["candidate_id","candidate_sha256","legacy_candidate_id",*BASE]).take(pa.array(base_idx)).to_pandas();therm=profiles.iloc[thermal_idx].reset_index(drop=True)
+ # A row is HISTORICAL_THERMAL_SUPPORT only if this exact base candidate (by
+ # its legacy generation identity, if any) was one of the original historical
+ # sources this thermal profile was extracted from; every other pairing is a
+ # compositional extrapolation beyond observed co-occurrence (see
+ # historical_thermal_parameter_audit.md).
+ support=[support_label(legacy,src) for legacy,src in zip(base.legacy_candidate_id,therm.historical_source_candidate_ids_json)]
+ joint=pd.DataFrame({"joint_candidate_id":[f"V914_JOINT_{i+1:09d}" for i in range(n)],"base_candidate_id":base.candidate_id,"thermal_profile_id":therm.thermal_profile_id,"common_physics_id":"v913_zeroD_transfer_common_physics_bd356ce6","joint_sequence_index":np.arange(n,dtype=np.int64),"pairing_u_base":j[:,0],"pairing_u_thermal":j[:,1],"pairing_strategy":"SOBOL_PRODUCT_NONCARTESIAN","support_label":support})
  for c in BASE:joint[c]=base[c].to_numpy()
  for c in THERMAL:joint[c]=therm[c].to_numpy()
  joint["base_candidate_sha256"]=base.candidate_sha256.to_numpy();joint["thermal_profile_sha256"]=therm.historical_thermal_sha256.to_numpy();joint["joint_sha256"]=[hashlib.sha256(f"{b}|{t}|v913_zeroD_transfer_common_physics_bd356ce6".encode()).hexdigest() for b,t in zip(joint.base_candidate_sha256,joint.thermal_profile_sha256)]
