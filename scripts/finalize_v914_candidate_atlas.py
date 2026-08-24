@@ -146,7 +146,7 @@ def main() -> int:
     ap.add_argument("--queue-size", type=int, default=250)
     ap.add_argument("--creation-commit", required=True)
     args = ap.parse_args(); out = args.atlas
-    registry_cols = ["candidate_id", "candidate_sha256", "domain_label", "legacy_candidate_id", *PARAMETER_COLUMNS]
+    registry_cols = ["candidate_id", "candidate_sha256", "domain_label", "legacy_candidate_id", "sobol_sequence_index", *PARAMETER_COLUMNS]
     registry = pq.read_table(out/"master_candidate_registry.parquet", columns=registry_cols).to_pandas()
     props = pq.read_table(out/"fatigue_candidate_properties.parquet").to_pandas()
     props["log10_best_window_C"] = np.log10(props.best_window_C.where(props.best_window_C > 0))
@@ -162,9 +162,12 @@ def main() -> int:
 
     queue = select_queue(frame, args.queue_size)
     # Fixed v7 launch constants supplement, but never alter, the 22 candidate coordinates.
-    fixed = {"Tref_K": 300.0, "cleave_activation_entropy_kB": 0.0,
-             "emit_activation_entropy_kB": 0.0, "nu0_cleave_s": 1e13,
-             "nu0_emit_s": 1e13, "n64_launch_status": "QUEUED_NOT_LAUNCHED"}
+    queue["source_historical_sobol_index"] = queue["sobol_sequence_index"]
+    queue["paris_design_role"] = queue["atlas_sampling_role"]
+    fixed = {"Tref_K": 300.0, "cleave_gT_eV_per_K": 0.0,
+             "cleave_sT_GPa_per_K": 0.0, "emit_gT_eV_per_K": 0.0,
+             "emit_sT_GPa_per_K": 0.0, "peierls_nu0_s": 1.0e12,
+             "taylor_nu0_s": 1.0e11, "n64_launch_status": "QUEUED_NOT_LAUNCHED"}
     for key, value in fixed.items(): queue[key] = value
     queue.to_csv(out/"n64_candidate_queue.csv", index=False, quoting=csv.QUOTE_MINIMAL)
     observation_path=out/"candidate_property_observations.parquet"

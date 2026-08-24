@@ -32,3 +32,10 @@ def test_queue_roles_are_unique_and_complete():
     assert len(q)==250
     assert q.candidate_id.is_unique
     assert set(q.atlas_sampling_role) >= {"realistic_paris_exploitation","distinct_low_m_basin","property_space_coverage","analytical_uncertainty","maximin_global_exploration"}
+
+
+def test_v7_fixed_launch_constants_match_qualified_registry_contract():
+    source=PATH.read_text()
+    assert '"peierls_nu0_s": 1.0e12' in source
+    assert '"taylor_nu0_s": 1.0e11' in source
+    assert 'queue["paris_design_role"] = queue["atlas_sampling_role"]' in source
