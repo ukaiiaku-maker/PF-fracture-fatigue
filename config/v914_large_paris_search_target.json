@@ -1,0 +1,20 @@
+{
+  "schema": "v914_large_paris_search_target_v1",
+  "target_source_status": "PROVISIONAL_EXTERNAL_BROAD_PHYSICAL_BAND_NO_DEFENSIBLE_LOCAL_EXPERIMENTAL_ENVELOPE",
+  "target_m_min": 2.0,
+  "target_m_max": 8.0,
+  "target_m_center": 4.0,
+  "preferred_m_min": 2.0,
+  "preferred_m_max": 6.0,
+  "target_log10_da_dN_min_m_per_cycle": -12.0,
+  "target_log10_da_dN_max_m_per_cycle": -6.0,
+  "target_log10_da_dN_center_m_per_cycle": -9.0,
+  "minimum_Paris_points": 4,
+  "minimum_relative_DeltaK_span": 0.2,
+  "preferred_da_dN_span_decades": 1.0,
+  "minimum_fit_R2": 0.9,
+  "notes": [
+    "External search/acquisition configuration only; no physics is changed.",
+    "Replace when a defensible material-specific experimental target is supplied."
+  ]
+}
