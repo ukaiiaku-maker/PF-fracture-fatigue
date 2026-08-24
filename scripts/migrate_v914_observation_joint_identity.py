@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+"""Add explicit base/thermal/joint lineage columns to the observation table."""
+from __future__ import annotations
+import argparse,json
+from pathlib import Path
+import pandas as pd,pyarrow as pa,pyarrow.parquet as pq
+def main():
+ ap=argparse.ArgumentParser();ap.add_argument("--atlas",type=Path,required=True);a=ap.parse_args();path=a.atlas/"candidate_property_observations.parquet";obs=pq.read_table(path).to_pandas();legacy=pq.read_table(a.atlas/"fracture_legacy_candidate_registry.parquet",columns=["fracture_atlas_id","source_candidate_id"]).to_pandas();profiles=pq.read_table(a.atlas/"thermal_profile_registry.parquet",columns=["thermal_profile_id","historical_source_candidate_ids_json"]).to_pandas();source_to_thermal={cid:r.thermal_profile_id for _,r in profiles.iterrows() for cid in json.loads(r.historical_source_candidate_ids_json)};fracture_to_thermal=legacy.set_index("fracture_atlas_id").source_candidate_id.map(source_to_thermal).to_dict();obs["base_candidate_id"]=obs.candidate_id.where(obs.candidate_id.str.startswith("V914_ATLAS_"),pd.NA);obs["thermal_profile_id"]=obs.candidate_id.map(fracture_to_thermal).astype("string");obs["joint_candidate_id"]=pd.Series(pd.NA,index=obs.index,dtype="string");cols=["candidate_id","base_candidate_id","thermal_profile_id","joint_candidate_id",*[c for c in obs if c not in {"candidate_id","base_candidate_id","thermal_profile_id","joint_candidate_id"}]];tmp=path.with_suffix(".parquet.tmp");pq.write_table(pa.Table.from_pandas(obs[cols],preserve_index=False),tmp,compression="zstd");tmp.replace(path);print(json.dumps({"observations":len(obs),"base_linked":int(obs.base_candidate_id.notna().sum()),"thermal_linked_legacy":int(obs.thermal_profile_id.notna().sum()),"joint_linked":0},indent=2));return 0
+if __name__=="__main__":raise SystemExit(main())
