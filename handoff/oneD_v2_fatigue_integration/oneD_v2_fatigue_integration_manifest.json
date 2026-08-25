@@ -1,0 +1,26 @@
+{
+  "schema": "oneD_v2_to_fatigue_handoff_v1",
+  "source_local_branch": "codex/oneD-v2-terminal-predictive-program",
+  "source_reported_head": "5045fee",
+  "source_producer_code_commit": "cddc51605aee93d8ecbaa0dda76c12085e08f9de",
+  "source_results_pr": "ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ#65",
+  "source_diagnostic_baseline": "e2ed84c",
+  "fatigue_reversible_base_branch": "codex/v9.14-minimal-reversible-fatigue",
+  "fatigue_reversible_base_head": "acefa81ccf2ed398d4d207b52439cef9d313c63b",
+  "required_reversible_documents": [
+    "V9_14_MINIMAL_REVERSIBLE_FATIGUE.md",
+    "V9_14_REVERSIBLE_V4_PHYSICAL_RETURN.md"
+  ],
+  "shared_rows": {
+    "Peak": "v913_zeroD_sobol_0242980",
+    "DBTT": "v913_zeroD_sobol_0202500",
+    "weak-T": "oneD_v2_focused_weak_T_0016",
+    "ceramic-like": "oneD_v2_focused_ceramic_like_0018"
+  },
+  "canonical_registry_overwrite_allowed": false,
+  "monotonic_lifecycle_import_allowed": false,
+  "preserve_signed_transport": true,
+  "preserve_physical_return_v4": true,
+  "preserve_retained_state_irreversibility": true,
+  "preserve_fatigue_threshold_event_energy_geometry_contract": true
+}
