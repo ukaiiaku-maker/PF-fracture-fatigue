@@ -10,6 +10,8 @@ PARAMETER_OPTION=${PARAMETER_OPTION:?PARAMETER_OPTION is required}
 HAZARD_SEED=${HAZARD_SEED:?HAZARD_SEED is required}
 CASE_OUT=${CASE_OUT:?CASE_OUT is required}
 TRANSFER_ROOT=${TRANSFER_ROOT:-/private/tmp/oneD-v2-terminal-predictive-program/analysis_outputs/oneD_v2_terminal_predictive_program}
+TRANSFER_REGISTRY=${TRANSFER_REGISTRY:-$TRANSFER_ROOT/oneD_v2_pf_transfer_registry.csv}
+TRANSFER_SELECTION=${TRANSFER_SELECTION:-$TRANSFER_ROOT/oneD_v2_pf_transfer_selection.json}
 FAMILY_JSON=${FAMILY_JSON:-/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/family.json}
 
 export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
@@ -28,8 +30,8 @@ export KERNEL_STRICT_FAMILY_OVERRIDE=1
 export SIGNED_KERNEL_FAMILY_JSON="$FAMILY_JSON"
 export PERSISTENT_SOURCE_MIN_WIDTH_UM=0
 export CLEAVAGE_HAZARD_SEED="$HAZARD_SEED"
-export ONED_V2_TRANSFER_REGISTRY="$TRANSFER_ROOT/oneD_v2_pf_transfer_registry.csv"
-export ONED_V2_TRANSFER_SELECTION="$TRANSFER_ROOT/oneD_v2_pf_transfer_selection.json"
+export ONED_V2_TRANSFER_REGISTRY="$TRANSFER_REGISTRY"
+export ONED_V2_TRANSFER_SELECTION="$TRANSFER_SELECTION"
 
 "$PYTHON_BIN" -u scripts/run_oneD_v2_terminal_pf_transfer.py \
   --signed-kernel-family "$FAMILY_JSON" \
