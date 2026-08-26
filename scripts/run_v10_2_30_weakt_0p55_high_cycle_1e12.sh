@@ -33,6 +33,7 @@ FAMILY_JSON=${FAMILY_JSON:-$ROOT/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77
 PARAMETER_OPTION=${PARAMETER_OPTION:-v913_paper_weakT01_0129902_persistent_sites}
 DELTA_K_MPA_SQRT_M=${DELTA_K_MPA_SQRT_M:-6.9866145600638339}
 HAZARD_SEED=${HAZARD_SEED:-2001726}
+R_RATIO=${R_RATIO:-0.1}
 CYCLES_MAX=${CYCLES_MAX:-1e12}
 TARGET_EXT_UM=${TARGET_EXT_UM:-25}
 STEPS=${STEPS:-20000}
@@ -205,7 +206,7 @@ set +e
   --crystal-aniso --crystal-compete --crystal-theta-deg 30 \
   --crystal-material w --j-decomposition cluster \
   --max-fronts 1 --crack-backend sharp_wake --dU 2e-7 \
-  --fatigue-cycles --fatigue-hold-load --R 0.1 --frequency-Hz 1000 \
+  --fatigue-cycles --fatigue-hold-load --R "$R_RATIO" --frequency-Hz 1000 \
   --cycle-block-mode hazard_limited --min-block-cycles 1e-6 \
   --target-dB 0.10 \
   --target-dN-store 0.10 --target-dN-emit 0.10 \

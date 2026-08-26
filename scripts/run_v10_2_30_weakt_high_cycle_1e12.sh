@@ -11,6 +11,7 @@ RUN_LABEL=${RUN_LABEL:-weakt_${TARGET_FRACTION}}
 TARGET_EXT_UM=${TARGET_EXT_UM:-100}
 CYCLES_MAX=${CYCLES_MAX:-1e12}
 HAZARD_SEED=${HAZARD_SEED:-2001726}
+R_RATIO=${R_RATIO:-0.1}
 
 if [[ -z "$TARGET_DELTAK" ]]; then
   echo "ERROR: set TARGET_DELTAK in MPa*sqrt(m)" >&2
@@ -32,7 +33,7 @@ SAFE_LABEL=$(printf '%s' "$RUN_LABEL" | tr -cs 'A-Za-z0-9._-' '_')
 OUTROOT=${OUTROOT:-$ROOT/runs/v10_2_30_${SAFE_LABEL}_event_growth_v5_100um_$(date +%Y%m%d_%H%M%S)}
 
 export DELTA_K_MPA_SQRT_M="$TARGET_DELTAK"
-export OUTROOT TARGET_EXT_UM CYCLES_MAX HAZARD_SEED
+export OUTROOT TARGET_EXT_UM CYCLES_MAX HAZARD_SEED R_RATIO
 export V10230_SAVE_ACTIVE_STATE_SNAPSHOT=${V10230_SAVE_ACTIVE_STATE_SNAPSHOT:-1}
 export V10230_HIGH_CYCLE_CHECKPOINT_DIR=${V10230_HIGH_CYCLE_CHECKPOINT_DIR:-$OUTROOT}
 export V10230_HIGH_CYCLE_CHECKPOINT_MIN_SECONDS=${V10230_HIGH_CYCLE_CHECKPOINT_MIN_SECONDS:-30}
@@ -45,6 +46,7 @@ printf '  target_fraction=%s\n' "$TARGET_FRACTION"
 printf '  target_DeltaK_MPa_sqrt_m=%s\n' "$TARGET_DELTAK"
 printf '  crack_extension_target_um=%s\n' "$TARGET_EXT_UM"
 printf '  cycle_censor=%s\n' "$CYCLES_MAX"
+printf '  R_ratio=%s\n' "$R_RATIO"
 printf '  stochastic_threshold=Exp(1) cumulative-hazard draw, seed=%s\n' "$HAZARD_SEED"
 printf '  output=%s\n' "$OUTROOT"
 printf '  live_checkpoint_dir=%s\n' "$V10230_HIGH_CYCLE_CHECKPOINT_DIR"
