@@ -17,8 +17,8 @@ def main() -> int:
     with registry.open(newline="") as stream:
         rows = list(csv.DictReader(stream))
     options = {row["option_key"]: row["candidate_id"] for row in rows}
-    if len(options) != 4:
-        raise SystemExit("terminal PF transfer registry must contain four unique options")
+    if not rows or len(options) != len(rows):
+        raise SystemExit("terminal PF transfer registry must contain unique nonempty options")
     paper.DEFAULT_REGISTRY = registry
     paper.SELECTION_RECORD = selection
     paper.VALID_OPTIONS = options
