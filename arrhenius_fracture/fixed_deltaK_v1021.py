@@ -80,6 +80,8 @@ def _update_minmax(key_min: str, key_max: str, value: float) -> None:
 def make_fixed_deltaK_waveform_factory(
     original: Callable[..., Any],
     config: FixedDeltaKConfig,
+    *,
+    allow_negative_R: bool = False,
 ) -> Callable[..., Any]:
     """Return a constructor that replaces incoming Kmax by the target DeltaK."""
     cfg = FixedDeltaKConfig(config.target_deltaK_MPa_sqrt_m).validate()
@@ -90,7 +92,12 @@ def make_fixed_deltaK_waveform_factory(
         values = dict(bound.arguments)
         R = float(values.get("R", kwargs.get("R", 0.1)))
         incoming_Kmax = float(values.get("Kmax", kwargs.get("Kmax", 0.0)))
-        target_Kmax = cfg.target_Kmax_Pa_sqrt_m(R)
+        if allow_negative_R:
+            if not -1.0 <= R < 1.0:
+                raise ValueError("reversible fixed-DeltaK control requires -1 <= R < 1")
+            target_Kmax = cfg.target_deltaK_Pa_sqrt_m / max(1.0 - R, 1.0e-300)
+        else:
+            target_Kmax = cfg.target_Kmax_Pa_sqrt_m(R)
         values["Kmax"] = target_Kmax
         waveform = original(**values)
 
@@ -128,6 +135,8 @@ def make_fixed_deltaK_waveform_factory(
 @contextmanager
 def install_fixed_deltaK_waveform(
     target_deltaK_MPa_sqrt_m: float,
+    *,
+    allow_negative_R: bool = False,
 ) -> Iterator[FixedDeltaKConfig]:
     """Temporarily prescribe DeltaK for every fatigue waveform in the 2-D driver.
 
@@ -142,7 +151,9 @@ def install_fixed_deltaK_waveform(
     reset_fixed_deltaK_audit(cfg)
 
     original_module = fatigue_v1.FatigueWaveform
-    factory = make_fixed_deltaK_waveform_factory(original_module, cfg)
+    factory = make_fixed_deltaK_waveform_factory(
+        original_module, cfg, allow_negative_R=allow_negative_R
+    )
     fatigue_v1.FatigueWaveform = factory
     try:
         yield cfg

@@ -66,6 +66,22 @@ def test_fixed_deltaK_entry_rejects_invalid_R(monkeypatch):
             ]
         )
     except SystemExit as exc:
-        assert "0 <= R < 1" in str(exc)
+        assert "-1 <= R < 1" in str(exc)
     else:
         raise AssertionError("invalid R was not rejected")
+
+
+def test_fixed_deltaK_entry_accepts_negative_R_for_reversible_solver(monkeypatch):
+    seen = {}
+
+    @contextmanager
+    def context(target, **kwargs):
+        seen.update(kwargs)
+        yield None
+
+    monkeypatch.setattr(entry, "install_fixed_deltaK_waveform", context)
+    monkeypatch.setattr(entry._energy, "main", lambda args: "ok")
+    monkeypatch.setattr(entry, "_write_audit", lambda *args: {})
+    result = entry.main(["--target-deltaK-MPa-sqrt-m", "6", "--R", "-0.95"])
+    assert result == "ok"
+    assert seen == {"allow_negative_R": True}
