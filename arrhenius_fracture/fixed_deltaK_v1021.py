@@ -129,6 +129,7 @@ def make_fixed_deltaK_waveform_factory(
         return waveform
 
     factory.__name__ = "FixedDeltaKFatigueWaveform"
+    factory._prescribed_fixed_deltaK_control = True
     factory.__doc__ = (
         "Construct the inherited waveform with Kmax adjusted so DeltaK equals "
         f"{cfg.target_deltaK_MPa_sqrt_m:g} MPa*sqrt(m)."

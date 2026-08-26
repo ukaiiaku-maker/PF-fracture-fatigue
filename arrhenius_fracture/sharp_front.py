@@ -2741,7 +2741,17 @@ def run_2d(args):
                         predicted_clock = eng.predict_clock_increment(KJ, T, dt_cur)
                     pred_primary = predicted_clock
 
-                if adaptive_events and predicted_clock > adaptive_target and trial_frac > adaptive_min_frac:
+                # Under prescribed fixed-local-DeltaK control, the FEM load is a
+                # held geometry/tensor probe. The event-to-event integrator
+                # localizes cleavage first passage itself, so using the proposed
+                # cycle block to shrink this probe would make the constitutive
+                # trajectory depend on the outer censor/proposal horizon.
+                fixed_deltaK_probe = bool(
+                    getattr(FatigueWaveform, '_prescribed_fixed_deltaK_control', False)
+                )
+                if (adaptive_events and not fixed_deltaK_probe
+                        and predicted_clock > adaptive_target
+                        and trial_frac > adaptive_min_frac):
                     u = u_saved; ep_gp = ep_saved; rho_gp = rho_saved; Uapp = Uapp_saved
                     shrink = adaptive_safety * adaptive_target / max(predicted_clock, 1e-300)
                     trial_frac = max(adaptive_min_frac, min(0.5 * trial_frac, trial_frac * shrink))

@@ -23,6 +23,7 @@ def test_factory_replaces_incoming_kmax_exactly():
     cfg = FixedDeltaKConfig(18.0).validate()
     reset_fixed_deltaK_audit(cfg)
     factory = make_fixed_deltaK_waveform_factory(fatigue_v1.FatigueWaveform, cfg)
+    assert factory._prescribed_fixed_deltaK_control is True
     wave = factory(Kmax=99.0e6, R=0.1, frequency_Hz=1000.0, closure_clip=True)
     assert np.isclose(wave.Kmax, 20.0e6)
     assert np.isclose(wave.DeltaK, 18.0e6)
