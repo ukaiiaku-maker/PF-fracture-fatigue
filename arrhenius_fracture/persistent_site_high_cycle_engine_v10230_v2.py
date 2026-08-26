@@ -490,6 +490,11 @@ def integrate_state_coupled_waveform(
                     "prefix_reuses": local.get(
                         "coupled_hazard_locator_prefix_reuses", 0
                     ),
+                    "initial_rate": local.get("coupled_hazard_locator_initial_rate"),
+                    "initial_estimate_cycles": local.get("coupled_hazard_locator_initial_estimate_cycles"),
+                    "initial_high_cycles": local.get("coupled_hazard_locator_initial_high_cycles"),
+                    "initial_high_action": local.get("coupled_hazard_locator_initial_high_action"),
+                    "initial_high_fired": local.get("coupled_hazard_locator_initial_high_fired"),
                     "entry_reason": "stationary_tail_event_guard",
                 }
             )
@@ -666,6 +671,11 @@ def integrate_state_coupled_waveform(
                 "prefix_reuses": local.get(
                     "coupled_hazard_locator_prefix_reuses", 0
                 ),
+                "initial_rate": local.get("coupled_hazard_locator_initial_rate"),
+                "initial_estimate_cycles": local.get("coupled_hazard_locator_initial_estimate_cycles"),
+                "initial_high_cycles": local.get("coupled_hazard_locator_initial_high_cycles"),
+                "initial_high_action": local.get("coupled_hazard_locator_initial_high_action"),
+                "initial_high_fired": local.get("coupled_hazard_locator_initial_high_fired"),
             }
         )
         if fired:

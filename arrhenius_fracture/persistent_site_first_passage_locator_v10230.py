@@ -155,6 +155,9 @@ def localize_first_passage(
     high = min(max(1.0, math.ceil(estimate)), float(cycles_available))
     action_high, evaluations, boundaries, fired_high = _private_action(
         engine, controller, waveform, temperature_K, high)
+    initial_high = float(high)
+    initial_action_high = float(action_high)
+    initial_fired_high = bool(fired_high)
     action_cache = {0.0: 0.0, **boundaries}
     prefix_reuses = 0
     f_high = action_high - remaining_action
@@ -183,6 +186,11 @@ def localize_first_passage(
             "coupled_hazard_locator_failure_reason": "no_bracket_within_horizon",
             "coupled_hazard_locator_trial_evaluations": evaluations,
             "coupled_hazard_locator_prefix_reuses": prefix_reuses,
+            "coupled_hazard_locator_initial_rate": rate,
+            "coupled_hazard_locator_initial_estimate_cycles": estimate,
+            "coupled_hazard_locator_initial_high_cycles": initial_high,
+            "coupled_hazard_locator_initial_high_action": initial_action_high,
+            "coupled_hazard_locator_initial_high_fired": initial_fired_high,
         })
         return bounded
 
@@ -249,6 +257,11 @@ def localize_first_passage(
         "coupled_hazard_locator_iterations": iterations,
         "coupled_hazard_locator_trial_evaluations": evaluations,
         "coupled_hazard_locator_prefix_reuses": prefix_reuses,
+        "coupled_hazard_locator_initial_rate": rate,
+        "coupled_hazard_locator_initial_estimate_cycles": estimate,
+        "coupled_hazard_locator_initial_high_cycles": initial_high,
+        "coupled_hazard_locator_initial_high_action": initial_action_high,
+        "coupled_hazard_locator_initial_high_fired": initial_fired_high,
         "plastic": plastic,
     })
     return final
