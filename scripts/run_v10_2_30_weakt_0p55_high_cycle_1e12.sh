@@ -38,6 +38,7 @@ CYCLES_MAX=${CYCLES_MAX:-1e12}
 TARGET_EXT_UM=${TARGET_EXT_UM:-25}
 STEPS=${STEPS:-20000}
 MAX_WALL_SECONDS=${MAX_WALL_SECONDS:-7200}
+V10230_ENTRY_MODULE=${V10230_ENTRY_MODULE:-arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK}
 OUTROOT=${OUTROOT:-$ROOT/runs/v10_2_30_weakt_0p55_high_cycle_1e12_$(date +%Y%m%d_%H%M%S)}
 
 [[ -s "$FAMILY_JSON" ]] || {
@@ -190,7 +191,7 @@ TIMEOUT_MARKER="$OUTROOT/watchdog_timeout.txt"
 START=$(date +%s)
 
 set +e
-"$PYTHON_BIN" -u -m arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK \
+"$PYTHON_BIN" -u -m "$V10230_ENTRY_MODULE" \
   --signed-kernel-family "$FAMILY_JSON" \
   --mode 2d --temperatures 300 \
   --nx 36 --ny 72 --dt 8.4 --n-stagger 2 \
