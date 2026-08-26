@@ -57,6 +57,7 @@ MPZ_LEDGER_ARRAYS = (
     "cumulative_physical_returned_mobile",
     "cumulative_escaped_mobile",
     "cumulative_cancelled_source_slip",
+    "cumulative_source_slip_wake_transfer",
 )
 
 ENGINE_LEDGER_SCALARS = (
