@@ -109,7 +109,8 @@ def select_rows(rows: list[dict[str, str]], stage: str) -> list[dict[str, str]]:
     raise ValueError(stage)
 
 
-def canonical_env(registry: Path, selection: Path, family: Path, seed: int) -> dict[str, str]:
+def canonical_env(registry: Path, selection: Path, family: Path, seed: int,
+                  observer_mode: str = "events") -> dict[str, str]:
     env = dict(os.environ)
     env.update({
         "PYTHONPATH": str(ROOT),
@@ -131,7 +132,7 @@ def canonical_env(registry: Path, selection: Path, family: Path, seed: int) -> d
         "PERSISTENT_SOURCE_MIN_WIDTH_UM": "0",
         "ONED_V2_TRANSFER_REGISTRY": str(registry),
         "ONED_V2_TRANSFER_SELECTION": str(selection),
-        "ONED_V2_TP_STATE_DIAGNOSTICS": "events",
+        "ONED_V2_TP_STATE_DIAGNOSTICS": observer_mode,
         "MPLCONFIGDIR": "/private/tmp/pf-canonical-mpl",
     })
     for forbidden in ("V10229_FATIGUE_ENABLED", "V10230_ENERGY_GATE_ENABLED"):
@@ -207,7 +208,7 @@ def compress_observer_artifacts(case_root: Path) -> list[dict[str, Any]]:
 
 def launch_one(row: dict[str, str], *, outroot: Path, registry: Path, selection: Path,
                cache: Path, target_um: float, save_snapshots: int, source_commit: str,
-               force: bool) -> dict[str, Any]:
+               force: bool, observer_mode: str) -> dict[str, Any]:
     identifier = case_id(row)
     case_root = outroot / identifier
     case_root.mkdir(parents=True, exist_ok=True)
@@ -239,14 +240,14 @@ def launch_one(row: dict[str, str], *, outroot: Path, registry: Path, selection:
         "kernel_family": str(family),
         "kernel_family_sha256": sha256(family),
         "kernel_configuration_fingerprint": family_payload.get("mechanical_configuration_fingerprint"),
-        "analysis_only_observer": "ONED_V2_TP_STATE_DIAGNOSTICS=events",
+        "analysis_only_observer": f"ONED_V2_TP_STATE_DIAGNOSTICS={observer_mode}",
         "observer_feedback": False,
         "fatigue_enabled": False,
         "command": command,
         "launched_at_utc": datetime.now(timezone.utc).isoformat(),
     }
     (case_root / "canonical_case_launch.json").write_text(json.dumps(contract, indent=2, sort_keys=True) + "\n")
-    environment = canonical_env(registry, selection, family, int(row["seed"]))
+    environment = canonical_env(registry, selection, family, int(row["seed"]), observer_mode)
     with (case_root / "run.stdout.log").open("w") as stdout, (case_root / "run.stderr.log").open("w") as stderr:
         proc = subprocess.run(command, cwd=ROOT, env=environment, stdout=stdout, stderr=stderr)
     status = "COMPLETE" if proc.returncode == 0 and completed(case_root, float(row["temperature_K"]), target_um) else "FAILED_OR_CENSORED"
@@ -269,6 +270,7 @@ def main() -> int:
     parser.add_argument("--workers", type=int, default=2)
     parser.add_argument("--target-extension-um", type=float, default=1000.0)
     parser.add_argument("--save-snapshots", type=int, default=20)
+    parser.add_argument("--observer-mode", choices=("events", "off"), default="events")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     if not 1 <= args.workers <= 2:
@@ -299,7 +301,7 @@ def main() -> int:
                 launch_one, row, outroot=args.outroot, registry=args.registry.resolve(),
                 selection=args.selection.resolve(), cache=args.kernel_cache.resolve(),
                 target_um=args.target_extension_um, save_snapshots=args.save_snapshots,
-                source_commit=source_commit, force=args.force,
+                source_commit=source_commit, force=args.force, observer_mode=args.observer_mode,
             )
             running[future] = row
             return True

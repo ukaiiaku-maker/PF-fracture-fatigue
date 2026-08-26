@@ -167,6 +167,8 @@ def test_launcher_has_no_fatigue_or_energy_gate_feedback(tmp_path):
     assert "V10229_FATIGUE_ENABLED" not in environment
     assert "V10230_ENERGY_GATE_ENABLED" not in environment
     assert environment["ONED_V2_TP_STATE_DIAGNOSTICS"] == "events"
+    assert runner.canonical_env(registry, selection, family, 7, "off")[
+        "ONED_V2_TP_STATE_DIAGNOSTICS"] == "off"
 
 
 def test_observer_artifact_compression_is_lossless_and_verified(tmp_path):
