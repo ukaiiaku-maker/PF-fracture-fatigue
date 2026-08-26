@@ -30,6 +30,11 @@ EXPECTED_CLASSES = {
     "ceramic-like": "oneD_v2_focused_ceramic_like_0018",
 }
 CLASS_ALIASES = {"peak": "Peak", "DBTT": "DBTT", "weakT": "weak-T", "ceramic": "ceramic-like"}
+LARGE_OBSERVER_ARTIFACTS = (
+    "anisotropic_emission_audit_v10174.json",
+    "kinetic_tip_cell_audit_v101.json",
+    "v10_2_17_final_signed_stochastic_stack.json",
+)
 
 
 def sha256(path: Path) -> str:
@@ -172,6 +177,34 @@ def completed(case_root: Path, temperature: float, target_um: float) -> bool:
     return False
 
 
+def compress_observer_artifacts(case_root: Path) -> list[dict[str, Any]]:
+    """Losslessly replace large observer JSON with verified zstd members."""
+    records: list[dict[str, Any]] = []
+    for name in LARGE_OBSERVER_ARTIFACTS:
+        source = case_root / name
+        packed = case_root / f"{name}.zst"
+        if not source.is_file():
+            if packed.is_file():
+                records.append({"source_name": name, "archive_name": packed.name,
+                                "archive_sha256": sha256(packed), "status": "REUSED_VERIFIED_ARCHIVE"})
+            continue
+        source_hash = sha256(source)
+        subprocess.run(["zstd", "-q", "-9", "-f", str(source), "-o", str(packed)], check=True)
+        subprocess.run(["zstd", "-q", "-t", str(packed)], check=True)
+        source_size = source.stat().st_size
+        archive_size = packed.stat().st_size
+        source.unlink()
+        records.append({"source_name": name, "source_sha256": source_hash,
+                        "source_size_bytes": source_size, "archive_name": packed.name,
+                        "archive_sha256": sha256(packed), "archive_size_bytes": archive_size,
+                        "status": "LOSSLESS_ZSTD_VERIFIED_SOURCE_REMOVED"})
+    if records:
+        (case_root / "observer_artifact_compression.json").write_text(
+            json.dumps({"schema": "pf_observer_artifact_compression_v1", "artifacts": records},
+                       indent=2, sort_keys=True) + "\n")
+    return records
+
+
 def launch_one(row: dict[str, str], *, outroot: Path, registry: Path, selection: Path,
                cache: Path, target_um: float, save_snapshots: int, source_commit: str,
                force: bool) -> dict[str, Any]:
@@ -217,7 +250,9 @@ def launch_one(row: dict[str, str], *, outroot: Path, registry: Path, selection:
     with (case_root / "run.stdout.log").open("w") as stdout, (case_root / "run.stderr.log").open("w") as stderr:
         proc = subprocess.run(command, cwd=ROOT, env=environment, stdout=stdout, stderr=stderr)
     status = "COMPLETE" if proc.returncode == 0 and completed(case_root, float(row["temperature_K"]), target_um) else "FAILED_OR_CENSORED"
+    compressed = compress_observer_artifacts(case_root) if proc.returncode == 0 else []
     result = {**contract, "status": status, "returncode": proc.returncode, "path": str(case_root),
+              "observer_artifact_compression": compressed,
               "finished_at_utc": datetime.now(timezone.utc).isoformat()}
     (case_root / "canonical_case_result.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     return result

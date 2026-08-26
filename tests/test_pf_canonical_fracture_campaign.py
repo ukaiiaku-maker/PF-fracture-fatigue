@@ -167,3 +167,13 @@ def test_launcher_has_no_fatigue_or_energy_gate_feedback(tmp_path):
     assert "V10229_FATIGUE_ENABLED" not in environment
     assert "V10230_ENERGY_GATE_ENABLED" not in environment
     assert environment["ONED_V2_TP_STATE_DIAGNOSTICS"] == "1"
+
+
+def test_observer_artifact_compression_is_lossless_and_verified(tmp_path):
+    source = tmp_path / runner.LARGE_OBSERVER_ARTIFACTS[0]
+    source.write_text(json.dumps({"profile": list(range(1000))}))
+    expected_hash = runner.sha256(source)
+    records = runner.compress_observer_artifacts(tmp_path)
+    assert not source.exists()
+    assert records[0]["source_sha256"] == expected_hash
+    assert (tmp_path / f"{source.name}.zst").is_file()
