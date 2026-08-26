@@ -5,6 +5,7 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 OUTROOT=${OUTROOT:-/private/tmp/oneD-v2-taylor-peierls-pf-runs}
 TRANSFER_ROOT=${TRANSFER_ROOT:-/private/tmp/oneD-v2-taylor-peierls-rcurve-search/analysis_outputs/oneD_v2_taylor_peierls_rcurve_search}
 TARGET_EXTENSION_UM=${TARGET_EXTENSION_UM:-100}
+PF_MATRIX_SCOPE=${PF_MATRIX_SCOPE:-FULL}
 mkdir -p "$OUTROOT"
 
 run_pair() {
@@ -48,11 +49,21 @@ run_pair() {
   echo "PF_PAIR_COMPLETE material=$material temperature=$temperature target_um=$TARGET_EXTENSION_UM"
 }
 
-for temperature in 600 1000 1200; do
-  run_pair Peak "$temperature" 8666
-done
-for temperature in 600 1100 1200; do
-  run_pair DBTT "$temperature" 1008666
-done
+if [[ "$PF_MATRIX_SCOPE" == "FULL" ]]; then
+  for temperature in 600 1000 1200; do
+    run_pair Peak "$temperature" 8666
+  done
+  for temperature in 600 1100 1200; do
+    run_pair DBTT "$temperature" 1008666
+  done
+  expected_cases=12
+elif [[ "$PF_MATRIX_SCOPE" == "TRANSITION" ]]; then
+  run_pair Peak 1000 8666
+  run_pair DBTT 1100 1008666
+  expected_cases=4
+else
+  echo "PF_MATRIX_SCOPE must be FULL or TRANSITION" >&2
+  exit 2
+fi
 
-echo "PF_MATRIX_COMPLETE cases=12 maximum_concurrent_workers=2 target_um=$TARGET_EXTENSION_UM"
+echo "PF_MATRIX_COMPLETE cases=$expected_cases maximum_concurrent_workers=2 target_um=$TARGET_EXTENSION_UM scope=$PF_MATRIX_SCOPE"
