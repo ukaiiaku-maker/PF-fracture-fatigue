@@ -371,13 +371,20 @@ def integrate_state_coupled_waveform(
             relative_tolerance=float(config["stationary_relative_tolerance"]),
             diagnostic_tolerance=float(config["stationary_diagnostic_tolerance"]),
         )
+        near_event_now = bool(
+            _cycles_to_event(engine, cycle.hazard_action_per_cycle)
+            <= float(config["event_guard_cycles"])
+        )
 
         periodic = None
         periodic_due = bool(
-            int(cache.get("periodic_attempts", 0)) == 0
-            or current_residual.converged
-            or float(cache.get("exact_cycles_since_periodic", 0.0))
-            >= float(cache.get("periodic_retry_cycles", 0.0))
+            not near_event_now
+            and (
+                int(cache.get("periodic_attempts", 0)) == 0
+                or current_residual.converged
+                or float(cache.get("exact_cycles_since_periodic", 0.0))
+                >= float(cache.get("periodic_retry_cycles", 0.0))
+            )
         )
         if periodic_due:
             periodic = solve_periodic_state(
@@ -495,9 +502,12 @@ def integrate_state_coupled_waveform(
             continue
 
         projective_due = bool(
-            int(cache.get("projective_attempts", 0)) == 0
-            or float(cache.get("exact_cycles_since_projective", 0.0))
-            >= float(cache.get("projective_retry_cycles", 0.0))
+            not near_event_now
+            and (
+                int(cache.get("projective_attempts", 0)) == 0
+                or float(cache.get("exact_cycles_since_projective", 0.0))
+                >= float(cache.get("projective_retry_cycles", 0.0))
+            )
         )
         projected = None
         if projective_due:
@@ -569,7 +579,7 @@ def integrate_state_coupled_waveform(
                 }
             )
 
-        exact_target = min(
+        exact_target = 0 if near_event_now else min(
             int(cache.get("exact_burst_next_cycles", 1)),
             int(config["exact_burst_maximum_cycles"]),
             max(int(math.floor(remaining)), 0),

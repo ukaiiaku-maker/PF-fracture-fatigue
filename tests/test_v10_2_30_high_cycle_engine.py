@@ -434,6 +434,25 @@ def test_first_passage_and_post_event_restart_inside_1e12_request(monkeypatch):
     assert engine._v10230_high_cycle_cache["geometry_signature"][0] == 1
 
 
+def test_near_event_localization_is_independent_of_requested_horizon(monkeypatch):
+    _fast_high_cycle_env(monkeypatch)
+    results = []
+    for horizon in (3.0, 20.0):
+        engine = Engine(lambda_per_s=0.25, threshold=0.075, drift_per_cycle=0.0)
+        result = high.integrate_state_coupled_waveform(
+            engine, Controller(), Waveform(), 300.0, horizon
+        )
+        results.append(result)
+        assert result["fired"] is True
+        assert not any(
+            row["mode"] in {"periodic_search", "projective_rejected", "slow_projective"}
+            for row in result["coupled_hazard_modes"]
+        )
+    assert results[0]["coupled_hazard_cycles_consumed"] == pytest.approx(
+        results[1]["coupled_hazard_cycles_consumed"], rel=0.0, abs=1.0e-14
+    )
+
+
 def test_linear_slow_manifold_reaches_1e12_without_false_stationarity(monkeypatch):
     _fast_high_cycle_env(monkeypatch)
     monkeypatch.setenv("V10230_PERIODIC_RELATIVE_TOL", "1e-15")
