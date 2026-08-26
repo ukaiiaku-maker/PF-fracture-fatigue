@@ -205,3 +205,11 @@ def test_sparse_observer_serializes_profiles_only_at_event_boundaries():
     source = Path("arrhenius_fracture/anisotropic_emission_v10174.py").read_text()
     assert 'mode == "events" and bool(result.get("fired", False))' in source
     assert '"taylor_peierls_state_profile_feedback": False' in source
+
+
+def test_observer_neutrality_gate_requires_byte_exact_trajectory_files():
+    source = Path("scripts/verify_pf_canonical_observer_neutrality.py").read_text()
+    for name in ("steps_1100K.csv", "fronts_1100K.csv", "crack_path_1100K.csv",
+                 "stochastic_avalanche_geometry_events.json", "sharp_wake_advance_log.csv"):
+        assert name in source
+    assert '"PASS" if all_equal and profile_gate else "FAIL"' in source
