@@ -22,9 +22,43 @@ from .hazard_energy_event_gate_v10230 import (
     continuum_gate_diagnostics,
     register_engine,
 )
+from .persistent_site_high_cycle_state_v10230 import serialize_active_state
 
 
 MODEL_ID = "v10.2.30_transactional_persistent_site_energy_gated_cyclic"
+
+
+def transaction_state_snapshot(engine) -> dict[str, Any]:
+    """Serialize the actual constitutive state at an event transaction boundary."""
+    try:
+        snapshot = serialize_active_state(engine)
+    except (AttributeError, TypeError, ValueError):
+        # Lightweight transaction-unit fixtures do not implement the production
+        # state contract. Production engines must always take the complete path.
+        return {
+            "schema": "v10.2.30_event_transaction_state_snapshot_v1",
+            "complete_active_state": False,
+            "engine_type": type(engine).__name__,
+        }
+    return {
+        "schema": "v10.2.30_event_transaction_state_snapshot_v1",
+        "complete_active_state": True,
+        "active_state_model_id": "v10.2.30_complete_high_cycle_active_state_v1",
+        "vector": snapshot.vector.tolist(),
+        "fields": [
+            {
+                "owner": field.owner,
+                "name": field.name,
+                "shape": list(field.shape),
+                "start": int(field.start),
+                "stop": int(field.stop),
+                "floor": float(field.floor),
+            }
+            for field in snapshot.fields
+        ],
+        "diagnostics": dict(snapshot.diagnostics),
+        "geometry_signature": list(snapshot.geometry_signature),
+    }
 
 
 class HazardEnergyGatedPersistentSiteCyclicTipEngine(
@@ -103,6 +137,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
 
         fired = bool(result.get("fired", False))
         if fired:
+            pre_event_state = transaction_state_snapshot(self)
             completed_threshold = float(
                 result.get("hazard_threshold_completed_action", threshold_before)
             )
@@ -114,6 +149,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                 "event_advance_m": proposal,
                 "event_length_factor": proposal_factor,
                 "threshold_action": completed_threshold,
+                "hazard_action_completed": completed_action,
                 "hazard_seed": int(self.hazard_cfg.seed),
                 "hazard_event_index": int(self.hazard_event_index - 1),
                 "geometry_subsegment_fraction": float(
@@ -128,6 +164,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                 "hazard_burgers_vector_m": float(self.b),
                 "energy_gate_continuum": dict(continuum),
                 "hazard_energy_gate_continuum_affects_hazard": False,
+                "pre_event_state": pre_event_state,
             }
             self._energy_gate_pending = {
                 "descriptor": descriptor,
@@ -219,6 +256,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
         if pending is None:
             raise RuntimeError("no pending transactional event exists")
 
+        pre_commit_state = transaction_state_snapshot(self)
         advance = self.mpz.advance(length)
         self.micro_advance_total_m += length
         self.a_adv += length
@@ -229,6 +267,32 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
         self.avalanche_event_length_history.append(length)
         self.energy_gate_committed_event_count += 1
         self.energy_gate_committed_path_m += length
+        post_commit_state = transaction_state_snapshot(self)
+        descriptor = pending.get("descriptor", {})
+        threshold_action = float(
+            descriptor.get("threshold_action", getattr(self, "hazard_threshold_action", 0.0))
+        )
+        transaction_audit = {
+            "schema": "v10.2.30_first_passage_energy_geometry_transaction_v1",
+            "threshold_action": threshold_action,
+            "hazard_action_completed": float(
+                descriptor.get("hazard_action_completed", threshold_action)
+            ),
+            "raw_proposed_advance_m": float(pending["proposal_m"]),
+            "event_length_random_factor": float(pending["proposal_factor"]),
+            "energy_gate_decision": str(gate.get("arrest_reason", "unknown")),
+            "energy_admissible_advance_m": float(
+                gate.get("energy_admissible_event_length_m", length)
+            ),
+            "geometry_committed_advance_m": length,
+            "mpz_translated_advance_m": length,
+            "pre_event_state": descriptor.get(
+                "pre_event_state", pre_commit_state
+            ),
+            "pre_geometry_commit_state": pre_commit_state,
+            "post_event_state": post_commit_state,
+        }
+        gate["event_transaction_audit"] = transaction_audit
 
         info = result_ref if isinstance(result_ref, dict) else {}
         dt_used = max(
@@ -269,6 +333,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                     advance.get("wake_mobile", 0.0)
                     + advance.get("wake_retained", 0.0)
                 ),
+                "event_transaction_audit": transaction_audit,
                 **{
                     key: value
                     for key, value in advance.items()
