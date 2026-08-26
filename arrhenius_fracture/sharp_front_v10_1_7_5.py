@@ -77,8 +77,8 @@ def make_transport_installer(
 def make_diagnostics_wrapper(original: Callable, mode: str) -> Callable:
     selected = normalize_transport_mode(mode)
 
-    def diagnostics(self):
-        payload = original(self)
+    def diagnostics(self, *args, **kwargs):
+        payload = original(self, *args, **kwargs)
         payload.update(
             {
                 "anisotropic_transport_mode": selected,

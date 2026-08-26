@@ -7,6 +7,7 @@ import pytest
 from arrhenius_fracture.sharp_front_v10_1_7_5 import (
     CHANNEL_RESOLVED_TRANSPORT,
     VALIDATED_SCALAR_TRANSPORT,
+    make_diagnostics_wrapper,
     make_transport_installer,
     normalize_transport_mode,
 )
@@ -62,3 +63,13 @@ def test_channel_mode_keeps_channel_resolved_evolve() -> None:
     assert hasattr(state, "_emit")
     assert state._anisotropic_transport_mode == CHANNEL_RESOLVED_TRANSPORT
     assert state._anisotropic_transport_channel_resolved is True
+
+
+def test_diagnostics_wrapper_forwards_sparse_observer_arguments() -> None:
+    def original(self, include_tensor_state=None):
+        return {"include_tensor_state": include_tensor_state}
+
+    wrapped = make_diagnostics_wrapper(original, VALIDATED_SCALAR_TRANSPORT)
+    payload = wrapped(object(), True)
+    assert payload["include_tensor_state"] is True
+    assert payload["anisotropic_transport_mode"] == VALIDATED_SCALAR_TRANSPORT
