@@ -131,7 +131,7 @@ def canonical_env(registry: Path, selection: Path, family: Path, seed: int) -> d
         "PERSISTENT_SOURCE_MIN_WIDTH_UM": "0",
         "ONED_V2_TRANSFER_REGISTRY": str(registry),
         "ONED_V2_TRANSFER_SELECTION": str(selection),
-        "ONED_V2_TP_STATE_DIAGNOSTICS": "1",
+        "ONED_V2_TP_STATE_DIAGNOSTICS": "events",
         "MPLCONFIGDIR": "/private/tmp/pf-canonical-mpl",
     })
     for forbidden in ("V10229_FATIGUE_ENABLED", "V10230_ENERGY_GATE_ENABLED"):
@@ -239,7 +239,7 @@ def launch_one(row: dict[str, str], *, outroot: Path, registry: Path, selection:
         "kernel_family": str(family),
         "kernel_family_sha256": sha256(family),
         "kernel_configuration_fingerprint": family_payload.get("mechanical_configuration_fingerprint"),
-        "analysis_only_observer": "ONED_V2_TP_STATE_DIAGNOSTICS=1",
+        "analysis_only_observer": "ONED_V2_TP_STATE_DIAGNOSTICS=events",
         "observer_feedback": False,
         "fatigue_enabled": False,
         "command": command,

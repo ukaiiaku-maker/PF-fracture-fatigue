@@ -166,7 +166,7 @@ def test_launcher_has_no_fatigue_or_energy_gate_feedback(tmp_path):
     environment = runner.canonical_env(registry, selection, family, 7)
     assert "V10229_FATIGUE_ENABLED" not in environment
     assert "V10230_ENERGY_GATE_ENABLED" not in environment
-    assert environment["ONED_V2_TP_STATE_DIAGNOSTICS"] == "1"
+    assert environment["ONED_V2_TP_STATE_DIAGNOSTICS"] == "events"
 
 
 def test_observer_artifact_compression_is_lossless_and_verified(tmp_path):
@@ -183,3 +183,23 @@ def test_launcher_submits_incrementally_and_stops_after_failure():
     source = Path("scripts/run_pf_canonical_fracture_campaign.py").read_text()
     assert "return_when=FIRST_COMPLETED" in source
     assert "if not stopped_after_failure" in source
+
+
+def test_angle_provider_uses_projected_physical_event_increment():
+    source = Path("scripts/generate_pf_canonical_angle_provider_maps.py").read_text()
+    assert "projected_step_m = PHYSICAL_EVENT_LENGTH_M * tangent[0]" in source
+    assert "PF_MODEL_NATIVE_PRODUCTION_DISCRETE_SHARP_WAKE_NOT_CONTINUUM_G" in source
+
+
+def test_matched_oneD_uses_theta_rate_seed_and_fails_closed():
+    source = Path("scripts/run_pf_canonical_oneD_comparisons.py").read_text()
+    assert "nominal_dt_s=float(plan[\"nominal_dt_s\"])" in source
+    assert "seed=int(plan[\"seed\"])" in source
+    assert "nominal_advance_m=float(projected_advance)" in source
+    assert 'return 0 if manifest["all_target_right_censored"] else 1' in source
+
+
+def test_sparse_observer_serializes_profiles_only_at_event_boundaries():
+    source = Path("arrhenius_fracture/anisotropic_emission_v10174.py").read_text()
+    assert 'mode == "events" and bool(result.get("fired", False))' in source
+    assert '"taylor_peierls_state_profile_feedback": False' in source

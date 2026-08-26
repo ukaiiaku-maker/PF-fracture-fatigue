@@ -28,10 +28,17 @@ MODEL_ID = "v10.1.7.4_reduced_2d_slip_trace_anisotropic_emission"
 TP_STATE_DIAGNOSTIC_ENV = "ONED_V2_TP_STATE_DIAGNOSTICS"
 
 
+def _tp_state_diagnostics_mode() -> str:
+    value = os.environ.get(TP_STATE_DIAGNOSTIC_ENV, "0").strip().lower()
+    if value in {"1", "true", "yes", "on", "all"}:
+        return "all"
+    if value in {"event", "events", "event_boundaries", "sparse"}:
+        return "events"
+    return "off"
+
+
 def _tp_state_diagnostics_enabled() -> bool:
-    return os.environ.get(TP_STATE_DIAGNOSTIC_ENV, "0").strip().lower() in {
-        "1", "true", "yes", "on",
-    }
+    return _tp_state_diagnostics_mode() != "off"
 
 
 def _unit(vector) -> np.ndarray:
@@ -858,7 +865,7 @@ class AnisotropicStochasticAvalancheTipEngine(
         self._install_current_drive_on_state()
         return super()._plastic_half_step(dt, T, cleavage_stress)
 
-    def _anisotropic_diagnostics(self) -> dict[str, Any]:
+    def _anisotropic_diagnostics(self, include_tensor_state: bool | None = None) -> dict[str, Any]:
         drive = self._anisotropic_drive or {}
         result = {
             "anisotropic_emission_model_id": MODEL_ID,
@@ -940,7 +947,9 @@ class AnisotropicStochasticAvalancheTipEngine(
                 self._anisotropic_fallback_count
             ),
         }
-        if _tp_state_diagnostics_enabled():
+        if include_tensor_state is None:
+            include_tensor_state = _tp_state_diagnostics_mode() == "all"
+        if include_tensor_state:
             result.update({
                 "opening_tensor_Pa": copy.deepcopy(drive.get("opening_tensor_Pa")),
                 "channel_tensors_Pa": copy.deepcopy(drive.get("channel_tensors_Pa")),
@@ -1009,8 +1018,12 @@ class AnisotropicStochasticAvalancheTipEngine(
     def step(self, K, T, dt):
         self._adopt_latest_drive()
         result = super().step(K, T, dt)
-        diagnostics = self._anisotropic_diagnostics()
-        if _tp_state_diagnostics_enabled():
+        mode = _tp_state_diagnostics_mode()
+        include_profile = mode == "all" or (
+            mode == "events" and bool(result.get("fired", False))
+        )
+        diagnostics = self._anisotropic_diagnostics(include_profile)
+        if include_profile:
             diagnostics.update(self._taylor_peierls_state_diagnostics(T, result))
         result.update(diagnostics)
         if type(self)._audit_records:

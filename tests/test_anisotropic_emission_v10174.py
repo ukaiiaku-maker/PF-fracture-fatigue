@@ -9,6 +9,7 @@ from arrhenius_fracture.anisotropic_emission_v10174 import (
     AnisotropicEmissionConfig,
     _anisotropic_campaign_emit,
     _tp_state_diagnostics_enabled,
+    _tp_state_diagnostics_mode,
     finite_source_emission_update,
     probe_tensor_ahead,
     resolve_channel_drives,
@@ -22,6 +23,9 @@ def test_taylor_peierls_state_observer_is_default_off(monkeypatch):
     assert _tp_state_diagnostics_enabled() is True
     monkeypatch.setenv("ONED_V2_TP_STATE_DIAGNOSTICS", "false")
     assert _tp_state_diagnostics_enabled() is False
+    monkeypatch.setenv("ONED_V2_TP_STATE_DIAGNOSTICS", "events")
+    assert _tp_state_diagnostics_enabled() is True
+    assert _tp_state_diagnostics_mode() == "events"
 
 
 def _rotate_tensor(tensor, angle_deg):
