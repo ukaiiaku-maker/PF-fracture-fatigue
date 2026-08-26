@@ -504,3 +504,33 @@ def test_four_class_campaign_analyzer_keeps_censors_and_provenance(tmp_path):
     assert payload["event_interval_count"] == 1
     assert (out / "four_class_event_intervals.csv").is_file()
     assert (out / "four_class_da_dN_vs_deltaK.png").is_file()
+
+
+def test_four_class_campaign_paris_fit_and_local_slopes():
+    analyzer = _load_campaign_analyzer()
+    option = "v913_paper_peak01_0242980_persistent_sites"
+    rows = [
+        {
+            "parameter_option": option,
+            "status": "completed",
+            "deltaK_MPa_sqrt_m": delta_k,
+            "developed_da_dN_m_per_cycle": 2.5e-12 * delta_k ** 4,
+        }
+        for delta_k in (10.0, 12.0, 15.0)
+    ]
+    # A failed trajectory must never enter the physical fit.
+    rows.append({
+        "parameter_option": option,
+        "status": "failed",
+        "deltaK_MPa_sqrt_m": 20.0,
+        "developed_da_dN_m_per_cycle": 1.0,
+    })
+    fit, local = analyzer._paris_fit(option, rows)
+    assert fit is not None
+    assert fit["point_count"] == 3
+    assert fit["m"] == pytest.approx(4.0)
+    assert fit["C_m_per_cycle"] == pytest.approx(2.5e-12)
+    assert fit["R2"] == pytest.approx(1.0)
+    assert fit["response_class"] == "credible_low_slope"
+    assert len(local) == 2
+    assert all(row["local_m"] == pytest.approx(4.0) for row in local)
