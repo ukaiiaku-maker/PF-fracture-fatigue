@@ -129,7 +129,8 @@ def _short_name(option: str) -> str:
 def _paris_fit(option: str, rows: list[dict]) -> tuple[dict | None, list[dict]]:
     selected = sorted(
         [row for row in rows if row.get("parameter_option") == option
-         and row.get("status") == "completed" and _valid(row)],
+         and row.get("status") == "completed"
+         and row.get("stable_growth_provisional") is True and _valid(row)],
         key=lambda row: float(row["deltaK_MPa_sqrt_m"]),
     )
     local = []

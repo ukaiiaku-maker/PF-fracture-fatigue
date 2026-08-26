@@ -513,6 +513,7 @@ def test_four_class_campaign_paris_fit_and_local_slopes():
         {
             "parameter_option": option,
             "status": "completed",
+            "stable_growth_provisional": True,
             "deltaK_MPa_sqrt_m": delta_k,
             "developed_da_dN_m_per_cycle": 2.5e-12 * delta_k ** 4,
         }
@@ -522,6 +523,7 @@ def test_four_class_campaign_paris_fit_and_local_slopes():
     rows.append({
         "parameter_option": option,
         "status": "failed",
+        "stable_growth_provisional": True,
         "deltaK_MPa_sqrt_m": 20.0,
         "developed_da_dN_m_per_cycle": 1.0,
     })
