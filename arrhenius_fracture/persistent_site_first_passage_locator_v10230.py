@@ -22,6 +22,15 @@ from .persistent_site_poincare_v10230 import one_cycle_map
 MODEL_ID = "v10.2.30_transactional_cycle_number_first_passage_locator_v1"
 
 
+def _set_signed_transport_phase(engine, K_signed: float) -> None:
+    """Expose the true waveform phase to mobile transport only."""
+    mpz = getattr(engine, "mpz", None)
+    if mpz is None or not getattr(mpz, "_reversible_transport_installed", False):
+        return
+    mpz._reversible_transport_K_signed_Pa_sqrt_m = float(K_signed)
+    mpz._reversible_tip_radius_m = float(engine.r_eff())
+
+
 def _sum(target: dict[str, float], source: dict[str, Any]) -> None:
     for key, value in source.items():
         if isinstance(value, (int, float, np.integer, np.floating)):
@@ -48,8 +57,10 @@ def _private_action(engine, controller, waveform, temperature_K: float, cycles: 
         phase_index = 0
         while phase_index < math.ceil(total_phases):
             phase_fraction = min(total_phases - phase_index, 1.0)
+            K_phase = float(K_values[phase_index % len(phases)])
+            _set_signed_transport_phase(work, K_phase)
             result = work._integrate_coupled(
-                max(float(K_values[phase_index % len(phases)]), 0.0),
+                max(K_phase, 0.0),
                 float(temperature_K), period * phase_fraction / len(phases),
             )
             action += max(float(result.get("physical_hazard_action_step", 0.0)), 0.0)
@@ -87,6 +98,7 @@ def _commit_phase_resolved(
     phase_index = 0
     while phase_index < math.ceil(remaining):
         K_value = K_values[phase_index % len(phases)]
+        _set_signed_transport_phase(engine, float(K_value))
         phase_fraction = min(max(remaining - phase_index, 0.0), 1.0)
         if phase_fraction <= 0.0:
             break

@@ -280,6 +280,34 @@ def test_locator_commits_low_prefix_with_phase_resolved_path():
     assert result["coupled_hazard_cycles_consumed"] == pytest.approx(1.98)
 
 
+def test_locator_exposes_signed_waveform_to_reversible_mobile_transport():
+    class SignedWaveform(Waveform):
+        R = -1.0
+
+        def K_phase(self, phases):
+            return np.where(np.arange(len(phases)) % 2 == 0, 2.0, -2.0)
+
+    class SignedEngine(Engine):
+        def __init__(self):
+            super().__init__(lambda_per_s=0.01, threshold=1.0)
+            self.mpz._reversible_transport_installed = True
+            self.signed_phases_seen = []
+
+        def _integrate_coupled(self, K, T, dt, **kwargs):
+            self.signed_phases_seen.append(
+                self.mpz._reversible_transport_K_signed_Pa_sqrt_m
+            )
+            return super()._integrate_coupled(K, T, dt, **kwargs)
+
+    engine = SignedEngine()
+    result = localize_first_passage(
+        engine, Controller(), SignedWaveform(), 300.0, 1.0
+    )
+    assert result["fired"] is False
+    assert engine.signed_phases_seen == [2.0, -2.0, 2.0, -2.0, 2.0, -2.0, 2.0, -2.0]
+    assert engine.mpz._reversible_tip_radius_m == pytest.approx(engine.r_eff())
+
+
 
 
 class Controller:

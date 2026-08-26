@@ -23,6 +23,7 @@ from .hazard_energy_event_gate_v10230 import (
     register_engine,
 )
 from .persistent_site_high_cycle_state_v10230 import serialize_active_state
+from .persistent_site_reversible_transport_v10230 import install_reversible_transport
 
 
 MODEL_ID = "v10.2.30_transactional_persistent_site_energy_gated_cyclic"
@@ -76,6 +77,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
         self.energy_gate_last_continuum: dict[str, Any] = {}
         self.energy_gate_committed_event_count = 0
         self.energy_gate_committed_path_m = 0.0
+        install_reversible_transport(self.mpz)
         register_engine(self)
 
     def __deepcopy__(self, memo):

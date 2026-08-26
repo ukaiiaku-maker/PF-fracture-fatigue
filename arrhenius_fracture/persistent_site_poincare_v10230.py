@@ -117,10 +117,16 @@ def one_cycle_map(
     phase_action: list[float] = []
     plastic_totals: dict[str, float] = {}
     for K_value in K_values:
-        K = max(float(K_value), 0.0)
+        K_signed = float(K_value)
+        K = max(K_signed, 0.0)
         half = 0.5 * dt_phase
+        if bool(getattr(work.mpz, "_reversible_transport_installed", False)):
+            work.mpz._reversible_transport_K_signed_Pa_sqrt_m = K_signed
+            work.mpz._reversible_tip_radius_m = float(work.r_eff())
         sigma_start = max(float(work.sigma_tip(K)), 0.0)
         first = work._plastic_half_step(half, float(temperature_K), sigma_start)
+        if bool(getattr(work.mpz, "_reversible_transport_installed", False)):
+            work.mpz._reversible_tip_radius_m = float(work.r_eff())
         sigma_mid = max(float(work.sigma_tip(K)), 0.0)
         lam_mid, _raw_mid, _barrier_mid = work.lambda_cleave(
             sigma_mid, float(temperature_K)
