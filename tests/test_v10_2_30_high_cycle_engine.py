@@ -475,3 +475,17 @@ def test_linear_slow_manifold_reaches_1e12_without_false_stationarity(monkeypatc
     assert any(row["mode"] == "slow_projective" for row in result["coupled_hazard_modes"])
     assert not any(row["mode"] == "stationary_tail" for row in result["coupled_hazard_modes"])
     assert abs(engine.mpz.mobile_count - 1.0e12) / 1.0e12 < 1.0e-10
+
+
+def test_explicit_only_qualification_mode_disables_acceleration(monkeypatch):
+    _fast_high_cycle_env(monkeypatch)
+    monkeypatch.setenv("V10230_HIGH_CYCLE_EXPLICIT_ONLY", "1")
+    engine = Engine(lambda_per_s=1.0e-30, threshold=1.0, drift_per_cycle=1.0)
+    result = high.integrate_state_coupled_waveform(
+        engine, Controller(), Waveform(), 300.0, 20.0
+    )
+    assert result["fired"] is False
+    assert result["coupled_hazard_cycles_consumed"] == 20.0
+    assert {row["mode"] for row in result["coupled_hazard_modes"]} == {
+        "exact_cycle_burst"
+    }

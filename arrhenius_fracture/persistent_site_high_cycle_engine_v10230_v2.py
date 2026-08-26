@@ -59,8 +59,16 @@ def _env_int(name: str, default: int, minimum: int = 1) -> int:
     return max(value, minimum)
 
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return bool(default)
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def high_cycle_config() -> dict[str, float | int]:
     return {
+        "explicit_only": _env_bool("V10230_HIGH_CYCLE_EXPLICIT_ONLY", False),
         "stationary_relative_tolerance": _env_float(
             "V10230_HIGH_CYCLE_STATIONARY_REL_TOL", 1.0e-7, 1.0e-14
         ),
@@ -378,7 +386,8 @@ def integrate_state_coupled_waveform(
 
         periodic = None
         periodic_due = bool(
-            not near_event_now
+            not bool(config["explicit_only"])
+            and not near_event_now
             and (
                 int(cache.get("periodic_attempts", 0)) == 0
                 or current_residual.converged
@@ -507,7 +516,8 @@ def integrate_state_coupled_waveform(
             continue
 
         projective_due = bool(
-            not near_event_now
+            not bool(config["explicit_only"])
+            and not near_event_now
             and (
                 int(cache.get("projective_attempts", 0)) == 0
                 or float(cache.get("exact_cycles_since_projective", 0.0))
