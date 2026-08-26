@@ -32,3 +32,25 @@ def test_candidate_registry_preserves_coordinates_and_fixes_common_physics(tmp_p
     assert payload["common_physics_changed"] is False
     assert payload["legacy_m64_label_applicable"] is False
     assert payload["candidates"][0]["Tref_normalization_rate_invariant"] is True
+
+
+def test_native_atlas_parquet_preserves_22d_vector_and_template_common_physics(tmp_path):
+    import pandas as pd
+
+    template = Path("arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv")
+    with template.open(newline="") as stream:
+        template_row = next(csv.DictReader(stream))
+    source_row = {"candidate_id": "V914_ATLAS_test"}
+    source_row.update({key: index + 0.125 for index, key in enumerate(builder.ATLAS_COORDINATES)})
+    source = tmp_path / "source.parquet"
+    pd.DataFrame([source_row]).to_parquet(source, index=False)
+    registry, selection = tmp_path / "registry.csv", tmp_path / "selection.json"
+    assert builder.main(["--source", str(source), "--candidate-id", "V914_ATLAS_test",
+                         "--template", str(template), "--out-registry", str(registry),
+                         "--out-selection", str(selection)]) == 0
+    with registry.open(newline="") as stream:
+        row = next(csv.DictReader(stream))
+    assert all(float(row[key]) == source_row[key] for key in builder.ATLAS_COORDINATES)
+    assert row["peierls_nu0_s"] == template_row["peierls_nu0_s"]
+    assert row["taylor_nu0_s"] == template_row["taylor_nu0_s"]
+    assert row["cleave_gT_eV_per_K"] == template_row["cleave_gT_eV_per_K"]

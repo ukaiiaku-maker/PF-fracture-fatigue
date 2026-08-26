@@ -9,17 +9,26 @@ import json
 from pathlib import Path
 
 
-DIRECT_COORDINATES = (
-    "cleave_G00_eV", "cleave_gT_eV_per_K",
-    "cleave_sigc0_GPa", "cleave_sT_GPa_per_K", "cleave_exp_a",
+ATLAS_COORDINATES = (
+    "cleave_G00_eV", "cleave_sigc0_GPa", "cleave_exp_a",
     "cleave_exp_n", "cleave_floor_frac", "emit_G00_eV",
-    "emit_gT_eV_per_K", "emit_sigc0_GPa", "emit_sT_GPa_per_K",
+    "emit_sigc0_GPa",
     "emit_exp_a", "emit_exp_n", "emit_floor_frac", "peierls_H0_eV",
     "peierls_activation_entropy_kB", "peierls_exp_a", "peierls_exp_n",
-    "peierls_nu0_s", "taylor_H0_eV", "taylor_activation_entropy_kB",
-    "taylor_exp_a", "taylor_exp_n", "taylor_nu0_s", "rho_source0_m2",
+    "taylor_H0_eV", "taylor_activation_entropy_kB",
+    "taylor_exp_a", "taylor_exp_n", "rho_source0_m2",
     "taylor_corr_rho_c_m2", "taylor_corr_scale", "c_blunt",
 )
+
+# These coordinates occur in older expanded CSV exports but are common-physics
+# constants, not dimensions of the immutable 22-D atlas.  Preserve them when
+# present; otherwise retain the qualified-v10 template value.
+OPTIONAL_COMMON_COORDINATES = (
+    "cleave_gT_eV_per_K", "cleave_sT_GPa_per_K",
+    "emit_gT_eV_per_K", "emit_sT_GPa_per_K",
+    "peierls_nu0_s", "taylor_nu0_s",
+)
+DIRECT_COORDINATES = ATLAS_COORDINATES + OPTIONAL_COMMON_COORDINATES
 
 
 def _sha(payload: dict) -> str:
@@ -36,8 +45,20 @@ def main(argv=None) -> int:
     parser.add_argument("--out-registry", required=True, type=Path)
     parser.add_argument("--out-selection", required=True, type=Path)
     args = parser.parse_args(argv)
-    with args.source.open(newline="") as stream:
-        source = {row["candidate_id"]: row for row in csv.DictReader(stream)}
+    wanted = set(args.candidate_id)
+    if args.source.suffix == ".parquet":
+        import pandas as pd
+        table = pd.read_parquet(args.source, filters=[("candidate_id", "in", sorted(wanted))])
+        source = {
+            str(row["candidate_id"]): {key: str(value) for key, value in row.items()}
+            for row in table.to_dict(orient="records")
+        }
+    else:
+        with args.source.open(newline="") as stream:
+            source = {
+                row["candidate_id"]: row for row in csv.DictReader(stream)
+                if row["candidate_id"] in wanted
+            }
     with args.template.open(newline="") as stream:
         reader = csv.DictReader(stream); fields = list(reader.fieldnames or []); template = next(reader)
     rows, candidates = [], []
@@ -45,11 +66,15 @@ def main(argv=None) -> int:
         original = source.get(candidate_id)
         if original is None:
             raise SystemExit(f"candidate absent from source: {candidate_id}")
-        missing = [key for key in DIRECT_COORDINATES if original.get(key, "") == ""]
+        missing = [key for key in ATLAS_COORDINATES if original.get(key, "") == ""]
         if missing:
             raise SystemExit(f"candidate {candidate_id} lacks coordinates: {missing}")
         row = dict(template)
-        row.update({key: original[key] for key in DIRECT_COORDINATES})
+        row.update({key: original[key] for key in ATLAS_COORDINATES})
+        row.update({
+            key: original[key] for key in OPTIONAL_COMMON_COORDINATES
+            if original.get(key, "") != ""
+        })
         source_tref = float(original.get("Tref_K", row["Tref_K"]))
         if source_tref != float(row["Tref_K"]):
             if float(original["cleave_gT_eV_per_K"]) != 0.0 or float(original["emit_gT_eV_per_K"]) != 0.0 or float(original["cleave_sT_GPa_per_K"]) != 0.0 or float(original["emit_sT_GPa_per_K"]) != 0.0:
@@ -65,7 +90,7 @@ def main(argv=None) -> int:
             "validation_status": "unmeasured refined-v10 search candidate",
             "n_bins_recommended": "80",
         })
-        coordinate_payload = {key: original[key] for key in DIRECT_COORDINATES}
+        coordinate_payload = {key: original[key] for key in ATLAS_COORDINATES}
         candidates.append({
             "candidate_id": candidate_id, "option_key": option,
             "source_coordinate_sha256": _sha(coordinate_payload),
