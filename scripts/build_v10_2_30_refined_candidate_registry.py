@@ -44,7 +44,10 @@ def main(argv=None) -> int:
         "arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv"))
     parser.add_argument("--out-registry", required=True, type=Path)
     parser.add_argument("--out-selection", required=True, type=Path)
+    parser.add_argument("--n-bins", type=int, default=80)
     args = parser.parse_args(argv)
+    if args.n_bins < 4:
+        raise SystemExit("--n-bins must be at least 4")
     wanted = set(args.candidate_id)
     if args.source.suffix == ".parquet":
         import pandas as pd
@@ -100,7 +103,7 @@ def main(argv=None) -> int:
             "material_class": "DBTT", "role": "refined v10 candidate search",
             "mechanism_summary": "immutable legacy coordinates on qualified v10 common physics",
             "validation_status": "unmeasured refined-v10 search candidate",
-            "n_bins_recommended": "80",
+            "n_bins_recommended": str(args.n_bins),
         })
         coordinate_payload = {key: original[key] for key in ATLAS_COORDINATES}
         candidates.append({
@@ -129,7 +132,7 @@ def main(argv=None) -> int:
         "installed_registry_sha256": registry_sha,
         "source": str(args.source.resolve()), "candidates": candidates,
         "common_physics_source": str(args.template.resolve()),
-        "common_physics_changed": False, "numerical_bins": 80,
+        "common_physics_changed": False, "numerical_bins": args.n_bins,
         "legacy_m64_label_applicable": False,
     }
     args.out_selection.write_text(json.dumps(selection, indent=2, sort_keys=True) + "\n")
