@@ -177,3 +177,9 @@ def test_observer_artifact_compression_is_lossless_and_verified(tmp_path):
     assert not source.exists()
     assert records[0]["source_sha256"] == expected_hash
     assert (tmp_path / f"{source.name}.zst").is_file()
+
+
+def test_launcher_submits_incrementally_and_stops_after_failure():
+    source = Path("scripts/run_pf_canonical_fracture_campaign.py").read_text()
+    assert "return_when=FIRST_COMPLETED" in source
+    assert "if not stopped_after_failure" in source

@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import datetime, timezone
 from typing import Any
 
@@ -285,17 +285,39 @@ def main() -> int:
     source_commit = git_commit(ROOT)
     args.outroot.mkdir(parents=True, exist_ok=True)
     results: list[dict[str, Any]] = []
+    stopped_after_failure = False
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        futures = [pool.submit(
-            launch_one, row, outroot=args.outroot, registry=args.registry.resolve(),
-            selection=args.selection.resolve(), cache=args.kernel_cache.resolve(),
-            target_um=args.target_extension_um, save_snapshots=args.save_snapshots,
-            source_commit=source_commit, force=args.force,
-        ) for row in rows]
-        for future in as_completed(futures):
-            result = future.result()
-            results.append(result)
-            print(json.dumps({k: result.get(k) for k in ("case_id", "status", "returncode", "path")}), flush=True)
+        row_iter = iter(rows)
+        running = {}
+
+        def submit_next() -> bool:
+            try:
+                row = next(row_iter)
+            except StopIteration:
+                return False
+            future = pool.submit(
+                launch_one, row, outroot=args.outroot, registry=args.registry.resolve(),
+                selection=args.selection.resolve(), cache=args.kernel_cache.resolve(),
+                target_um=args.target_extension_um, save_snapshots=args.save_snapshots,
+                source_commit=source_commit, force=args.force,
+            )
+            running[future] = row
+            return True
+
+        for _ in range(args.workers):
+            submit_next()
+        while running:
+            done, _ = wait(running, return_when=FIRST_COMPLETED)
+            for future in done:
+                running.pop(future)
+                result = future.result()
+                results.append(result)
+                print(json.dumps({k: result.get(k) for k in ("case_id", "status", "returncode", "path")}), flush=True)
+                if result["status"] not in {"COMPLETE", "REUSED_COMPLETE"}:
+                    stopped_after_failure = True
+            if not stopped_after_failure:
+                for _ in range(len(done)):
+                    submit_next()
     results.sort(key=lambda row: row["case_id"])
     manifest = args.outroot / f"canonical_{args.stage}_launch_manifest.json"
     manifest.write_text(json.dumps({
@@ -304,6 +326,9 @@ def main() -> int:
         "runner_commit": source_commit,
         "workers": args.workers,
         "target_extension_um": args.target_extension_um,
+        "stopped_after_failure": stopped_after_failure,
+        "planned_case_count": len(rows),
+        "executed_case_count": len(results),
         "cases": results,
     }, indent=2, sort_keys=True) + "\n")
     failures = [row for row in results if row["status"] not in {"COMPLETE", "REUSED_COMPLETE"}]
