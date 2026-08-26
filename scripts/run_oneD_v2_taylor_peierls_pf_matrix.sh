@@ -30,6 +30,8 @@ run_pair() {
       HAZARD_SEED="$seed" \
       CASE_OUT="$case_out" \
       TRANSFER_ROOT="$TRANSFER_ROOT" \
+      TRANSFER_REGISTRY="$TRANSFER_ROOT/oneD_v2_taylor_peierls_pf_transfer_registry.csv" \
+      TRANSFER_SELECTION="$TRANSFER_ROOT/oneD_v2_taylor_peierls_pf_transfer_selection.json" \
       TARGET_EXTENSION_UM="$TARGET_EXTENSION_UM" \
       bash "$ROOT/scripts/run_oneD_v2_terminal_pf_case.sh" \
       >"$case_out/run.log" 2>&1 &
