@@ -99,6 +99,10 @@ def make_fixed_deltaK_waveform_factory(
         else:
             target_Kmax = cfg.target_Kmax_Pa_sqrt_m(R)
         values["Kmax"] = target_Kmax
+        if allow_negative_R and R < 0.0 and "closure_clip" in signature.parameters:
+            # Keep the signed phase for already-mobile transport. Cleavage and
+            # new emission remain independently opening-clipped by v10.2.30.
+            values["closure_clip"] = False
         waveform = original(**values)
 
         actual_deltaK = float(getattr(waveform, "DeltaK"))
