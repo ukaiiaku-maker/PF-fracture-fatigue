@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 DIRECT_COORDINATES = (
-    "Tref_K", "cleave_G00_eV", "cleave_gT_eV_per_K",
+    "cleave_G00_eV", "cleave_gT_eV_per_K",
     "cleave_sigc0_GPa", "cleave_sT_GPa_per_K", "cleave_exp_a",
     "cleave_exp_n", "cleave_floor_frac", "emit_G00_eV",
     "emit_gT_eV_per_K", "emit_sigc0_GPa", "emit_sT_GPa_per_K",
@@ -50,6 +50,13 @@ def main(argv=None) -> int:
             raise SystemExit(f"candidate {candidate_id} lacks coordinates: {missing}")
         row = dict(template)
         row.update({key: original[key] for key in DIRECT_COORDINATES})
+        source_tref = float(original.get("Tref_K", row["Tref_K"]))
+        if source_tref != float(row["Tref_K"]):
+            if float(original["cleave_gT_eV_per_K"]) != 0.0 or float(original["emit_gT_eV_per_K"]) != 0.0 or float(original["cleave_sT_GPa_per_K"]) != 0.0 or float(original["emit_sT_GPa_per_K"]) != 0.0:
+                raise SystemExit(
+                    f"candidate {candidate_id} has nonzero temperature slopes; "
+                    "Tref normalization would change physics"
+                )
         option = "v10230_refined_" + candidate_id.lower()
         row.update({
             "option_key": option, "candidate_id": candidate_id,
@@ -63,6 +70,14 @@ def main(argv=None) -> int:
             "candidate_id": candidate_id, "option_key": option,
             "source_coordinate_sha256": _sha(coordinate_payload),
             "source_row_sha256": _sha(original),
+            "source_Tref_K": source_tref,
+            "qualified_Tref_K": float(row["Tref_K"]),
+            "Tref_normalization_rate_invariant": source_tref == float(row["Tref_K"]) or all(
+                float(original[key]) == 0.0 for key in (
+                    "cleave_gT_eV_per_K", "emit_gT_eV_per_K",
+                    "cleave_sT_GPa_per_K", "emit_sT_GPa_per_K"
+                )
+            ),
         })
         rows.append(row)
     args.out_registry.parent.mkdir(parents=True, exist_ok=True)
