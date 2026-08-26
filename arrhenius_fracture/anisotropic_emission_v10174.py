@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import copy
 import math
+import os
 from dataclasses import asdict, dataclass
 from types import MethodType
 from typing import Any, Callable
@@ -24,6 +25,13 @@ from .stochastic_avalanche_tip import StochasticAvalancheDiagnosticTipEngine
 
 
 MODEL_ID = "v10.1.7.4_reduced_2d_slip_trace_anisotropic_emission"
+TP_STATE_DIAGNOSTIC_ENV = "ONED_V2_TP_STATE_DIAGNOSTICS"
+
+
+def _tp_state_diagnostics_enabled() -> bool:
+    return os.environ.get(TP_STATE_DIAGNOSTIC_ENV, "0").strip().lower() in {
+        "1", "true", "yes", "on",
+    }
 
 
 def _unit(vector) -> np.ndarray:
@@ -339,6 +347,9 @@ def build_front_drive(
         ],
         "mechanics_serial": int(OBSERVER.mechanics_serial),
     })
+    if _tp_state_diagnostics_enabled():
+        drive["opening_tensor_Pa"] = opening_tensor.tolist()
+        drive["channel_tensors_Pa"] = [tensor.tolist() for tensor in channel_tensors]
     return drive
 
 
@@ -849,7 +860,7 @@ class AnisotropicStochasticAvalancheTipEngine(
 
     def _anisotropic_diagnostics(self) -> dict[str, Any]:
         drive = self._anisotropic_drive or {}
-        return {
+        result = {
             "anisotropic_emission_model_id": MODEL_ID,
             "anisotropic_emission_enabled": bool(
                 self.anisotropic_cfg.enabled
@@ -929,11 +940,78 @@ class AnisotropicStochasticAvalancheTipEngine(
                 self._anisotropic_fallback_count
             ),
         }
+        if _tp_state_diagnostics_enabled():
+            result.update({
+                "opening_tensor_Pa": copy.deepcopy(drive.get("opening_tensor_Pa")),
+                "channel_tensors_Pa": copy.deepcopy(drive.get("channel_tensors_Pa")),
+            })
+        return result
+
+    def _taylor_peierls_state_diagnostics(
+        self, temperature_K: float, step_result: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Serialize existing MPZ fields and rates without feedback."""
+        state = self.mpz
+        opening = float(getattr(state, "anisotropic_last_sigma_opening_Pa", 0.0))
+        stress = state.local_stress_profile_Pa(opening)
+        forest = state.local_forest_density_m2(False)
+        rates = state._transport_rates(stress, forest, float(temperature_K), self.b)
+        velocity = np.asarray(rates["velocity"], dtype=float)
+        encounter = np.asarray(rates["encounter"], dtype=float)
+        taylor = np.asarray(rates["taylor"], dtype=float)
+        distance = np.maximum(float(state.length_m) - np.asarray(state.x), state.dx)
+        transport_time = distance / np.maximum(np.abs(velocity), 1.0e-300)
+        retention_time = 1.0 / np.maximum(encounter, 1.0e-300)
+        taylor_time = 1.0 / np.maximum(taylor, 1.0e-300)
+        profile = {
+            "taylor_peierls_state_profile_schema": "oneD_v2_pf_existing_mpz_observer_v1",
+            "taylor_peierls_state_profile_feedback": False,
+            "taylor_peierls_state_profile_spatial_state": True,
+            "temperature_K": float(temperature_K),
+            "active_x_ahead_of_tip_m": np.asarray(state.x, dtype=float).tolist(),
+            "wake_x_behind_tip_m": (-np.asarray(state.wake_x, dtype=float)).tolist(),
+            "mobile_active_by_system_bin": np.asarray(state.mobile, dtype=float).tolist(),
+            "retained_active_by_system_bin": np.asarray(state.retained, dtype=float).tolist(),
+            "mobile_wake_by_system_bin": np.asarray(state.wake_mobile, dtype=float).tolist(),
+            "retained_wake_by_system_bin": np.asarray(state.wake_retained, dtype=float).tolist(),
+            "forest_density_active_m2_by_bin": forest.tolist(),
+            "source_opening_stress_Pa": opening,
+            "local_transport_stress_Pa_by_bin": np.asarray(stress, dtype=float).tolist(),
+            "peierls_rate_s_by_bin": np.asarray(rates["peierls"], dtype=float).tolist(),
+            "peierls_velocity_m_s_by_bin": velocity.tolist(),
+            "encounter_rate_s_by_bin": encounter.tolist(),
+            "taylor_completion_rate_s_by_bin": taylor.tolist(),
+            "taylor_single_hit_rate_s_by_bin": np.asarray(rates["taylor_single"], dtype=float).tolist(),
+            "taylor_correlation_order_by_bin": np.asarray(rates["m"], dtype=float).tolist(),
+            "transport_distance_to_active_zone_exit_m_by_bin": distance.tolist(),
+            "transport_time_s_by_bin": transport_time.tolist(),
+            "retention_encounter_time_s_by_bin": retention_time.tolist(),
+            "taylor_completion_time_s_by_bin": taylor_time.tolist(),
+            "chi_ret_by_bin": (transport_time / retention_time).tolist(),
+            "chi_taylor_completion_by_bin": (transport_time / taylor_time).tolist(),
+            "source_rate_max_peierls_s": float(step_result.get("peierls_rate_s", 0.0)),
+            "source_rate_max_encounter_s": float(step_result.get("encounter_rate_s", 0.0)),
+            "source_rate_max_taylor_completion_s": float(
+                step_result.get("taylor_completion_rate_s", 0.0)
+            ),
+        }
+        for name in (
+            "mobile_positive", "mobile_negative", "retained_positive", "retained_negative",
+            "wake_mobile_positive", "wake_mobile_negative",
+            "wake_retained_positive", "wake_retained_negative",
+        ):
+            if hasattr(state, name):
+                profile[f"{name}_by_system_bin"] = np.asarray(
+                    getattr(state, name), dtype=float
+                ).tolist()
+        return profile
 
     def step(self, K, T, dt):
         self._adopt_latest_drive()
         result = super().step(K, T, dt)
         diagnostics = self._anisotropic_diagnostics()
+        if _tp_state_diagnostics_enabled():
+            diagnostics.update(self._taylor_peierls_state_diagnostics(T, result))
         result.update(diagnostics)
         if type(self)._audit_records:
             type(self)._audit_records[-1].update(diagnostics)

@@ -9,6 +9,7 @@ TEMPERATURE_K=${TEMPERATURE_K:?TEMPERATURE_K is required}
 PARAMETER_OPTION=${PARAMETER_OPTION:?PARAMETER_OPTION is required}
 HAZARD_SEED=${HAZARD_SEED:?HAZARD_SEED is required}
 CASE_OUT=${CASE_OUT:?CASE_OUT is required}
+TARGET_EXTENSION_UM=${TARGET_EXTENSION_UM:-100}
 TRANSFER_ROOT=${TRANSFER_ROOT:-/private/tmp/oneD-v2-terminal-predictive-program/analysis_outputs/oneD_v2_terminal_predictive_program}
 TRANSFER_REGISTRY=${TRANSFER_REGISTRY:-$TRANSFER_ROOT/oneD_v2_pf_transfer_registry.csv}
 TRANSFER_SELECTION=${TRANSFER_SELECTION:-$TRANSFER_ROOT/oneD_v2_pf_transfer_selection.json}
@@ -32,13 +33,14 @@ export PERSISTENT_SOURCE_MIN_WIDTH_UM=0
 export CLEAVAGE_HAZARD_SEED="$HAZARD_SEED"
 export ONED_V2_TRANSFER_REGISTRY="$TRANSFER_REGISTRY"
 export ONED_V2_TRANSFER_SELECTION="$TRANSFER_SELECTION"
+export ONED_V2_TP_STATE_DIAGNOSTICS=1
 
 "$PYTHON_BIN" -u scripts/run_oneD_v2_terminal_pf_transfer.py \
   --signed-kernel-family "$FAMILY_JSON" \
   --mode 2d --temperatures "$TEMPERATURE_K" \
   --nx 36 --ny 72 --dt 8.4 --n-stagger 2 \
   --tip-h-fine 1e-6 --tip-ratio 1.20 --da-phys 5e-6 \
-  --target-crack-extension-um 100 \
+  --target-crack-extension-um "$TARGET_EXTENSION_UM" \
   --front-state-model moving_pz --tip-source-model continuum \
   --tip-kinetics-mode moving_velocity --bulk-plasticity-mode tip_only \
   --directional-j-mode root_signed --tip-plasticity \
