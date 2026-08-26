@@ -182,6 +182,8 @@ def main(argv=None):
             set_latest_probe_K(incoming)
             return fixed_factory(*factory_args, **factory_kwargs)
 
+        capture_probe._prescribed_fixed_deltaK_control = True
+
         fatigue_v1.FatigueWaveform = capture_probe
         try:
             with _legacy_fixed._allow_right_censored_stochastic_summary():

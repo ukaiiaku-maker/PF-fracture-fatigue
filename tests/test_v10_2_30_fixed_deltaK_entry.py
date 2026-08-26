@@ -22,6 +22,13 @@ def test_fixed_deltaK_entry_dispatches_to_v10230(monkeypatch, tmp_path):
 
     def fake_main(args):
         seen["args"] = list(args)
+        seen["fixed_deltaK_marker"] = bool(
+            getattr(
+                entry.fatigue_v1.FatigueWaveform,
+                "_prescribed_fixed_deltaK_control",
+                False,
+            )
+        )
         return "ok"
 
     monkeypatch.setattr(entry, "install_fixed_deltaK_waveform", _null_context)
@@ -61,6 +68,7 @@ def test_fixed_deltaK_entry_dispatches_to_v10230(monkeypatch, tmp_path):
     assert "--no-cyclic-mechanics" in seen["args"]
     assert "--fatigue-hold-load" in seen["args"]
     assert "--target-deltaK-MPa-sqrt-m" not in seen["args"]
+    assert seen["fixed_deltaK_marker"] is True
 
 
 def test_fixed_deltaK_entry_rejects_invalid_R(monkeypatch):
