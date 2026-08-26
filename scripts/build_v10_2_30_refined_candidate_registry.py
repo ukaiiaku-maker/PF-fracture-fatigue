@@ -75,6 +75,18 @@ def main(argv=None) -> int:
             key: original[key] for key in OPTIONAL_COMMON_COORDINATES
             if original.get(key, "") != ""
         })
+        implicit_temperature_neutral = not any(
+            original.get(key, "") != "" for key in (
+                "cleave_gT_eV_per_K", "cleave_sT_GPa_per_K",
+                "emit_gT_eV_per_K", "emit_sT_GPa_per_K",
+            )
+        )
+        if implicit_temperature_neutral:
+            for key in (
+                "cleave_gT_eV_per_K", "cleave_sT_GPa_per_K",
+                "emit_gT_eV_per_K", "emit_sT_GPa_per_K",
+            ):
+                row[key] = "0.0"
         source_tref = float(original.get("Tref_K", row["Tref_K"]))
         if source_tref != float(row["Tref_K"]):
             if float(original["cleave_gT_eV_per_K"]) != 0.0 or float(original["emit_gT_eV_per_K"]) != 0.0 or float(original["cleave_sT_GPa_per_K"]) != 0.0 or float(original["emit_sT_GPa_per_K"]) != 0.0:
@@ -97,6 +109,7 @@ def main(argv=None) -> int:
             "source_row_sha256": _sha(original),
             "source_Tref_K": source_tref,
             "qualified_Tref_K": float(row["Tref_K"]),
+            "implicit_temperature_neutral_coordinates": implicit_temperature_neutral,
             "Tref_normalization_rate_invariant": source_tref == float(row["Tref_K"]) or all(
                 float(original[key]) == 0.0 for key in (
                     "cleave_gT_eV_per_K", "emit_gT_eV_per_K",

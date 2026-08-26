@@ -53,4 +53,6 @@ def test_native_atlas_parquet_preserves_22d_vector_and_template_common_physics(t
     assert all(float(row[key]) == source_row[key] for key in builder.ATLAS_COORDINATES)
     assert row["peierls_nu0_s"] == template_row["peierls_nu0_s"]
     assert row["taylor_nu0_s"] == template_row["taylor_nu0_s"]
-    assert row["cleave_gT_eV_per_K"] == template_row["cleave_gT_eV_per_K"]
+    assert float(row["cleave_gT_eV_per_K"]) == 0.0
+    payload = json.loads(selection.read_text())
+    assert payload["candidates"][0]["implicit_temperature_neutral_coordinates"] is True
