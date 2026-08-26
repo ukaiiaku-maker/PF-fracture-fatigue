@@ -8,6 +8,15 @@ def _null_context(*args, **kwargs):
     yield None
 
 
+def test_energy_gate_waveform_observer_preserves_fixed_deltaK_marker():
+    def fixed_factory(*args, **kwargs):
+        return args, kwargs
+
+    fixed_factory._prescribed_fixed_deltaK_control = True
+    observed = entry._energy._observed_waveform_factory(fixed_factory)
+    assert observed._prescribed_fixed_deltaK_control is True
+
+
 def test_fixed_deltaK_entry_dispatches_to_v10230(monkeypatch, tmp_path):
     seen = {}
 
