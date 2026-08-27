@@ -302,7 +302,7 @@ def enrich_registry_provenance(root:Path,rows:list[dict],head:str)->None:
         if summary_path.is_file() and row["stage"]!="EXPLICIT_PREFLIGHT":
             summary=json.loads(summary_path.read_text())
             stationarity="STABLE" if summary.get("stable_growth_provisional") else "UNSTABLE"
-        row.update({"branch":BRANCH,"trajectory_head":trajectory_head,"analysis_head":head,
+        row.update({"branch":BRANCH,"head":trajectory_head,"trajectory_head":trajectory_head,"analysis_head":head,
           "production_solver_hash":provenance["production_solver_hash"],"common_physics_hash":provenance["common_physics_hash"],
           "composite_hash":variants[row["option"]]["complete_composite_material_hash"],"Kmax_MPa_sqrt_m":row["kmax"],
           "Kmin_MPa_sqrt_m":row["R"]*row["kmax"],"W_m":0.01,"B_m":0.0025,
