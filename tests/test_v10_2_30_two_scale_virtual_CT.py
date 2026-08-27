@@ -144,6 +144,10 @@ def test_anchor_controller_is_fresh_exact_bounded_and_freezes_predictions_first(
         'prediction_frozen_unix_ns',
         'held_out_constant_load_rows_used_for_fit',
         'interrupted physical anchor cannot resume',
+        'reconcile_prephysics_launch_failures',
+        'kinetic_tip_cell_audit_v101.json',
+        'high_cycle_live_checkpoint.json',
+        'prephysics quarantine collision',
     ):
         assert phrase in controller
     assert "fresh anchor worker refuses an existing result path" in worker

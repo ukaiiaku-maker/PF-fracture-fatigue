@@ -328,6 +328,40 @@ def run_anchors(root: Path, jobs: list[dict], head: str, workers: int) -> None:
         time.sleep(5)
 
 
+def reconcile_prephysics_launch_failures(root: Path, jobs: list[dict]) -> None:
+    """Retry only an attempt that never entered physical solver execution.
+
+    A sandbox denial of the launcher's process-substitution file can create an
+    output directory but cannot create physics.  Preserve that evidence under
+    quarantine and allocate a new fresh attempt; never retry an interrupted
+    trajectory with a checkpoint or kinetic audit.
+    """
+    changed = False
+    for job in jobs:
+        status = str(job.get("status", ""))
+        if status not in {"RUNNING", "INVALID_OR_NONTERMINAL"}:
+            continue
+        if status == "RUNNING" and alive(job.get("pid")):
+            continue
+        output = Path(job["result_path"])
+        physical_evidence = any(
+            (output / name).is_file()
+            for name in ("kinetic_tip_cell_audit_v101.json", "high_cycle_live_checkpoint.json")
+        )
+        if physical_evidence:
+            raise RuntimeError(f"interrupted physical anchor cannot resume: {job['job_id']}")
+        if output.exists():
+            quarantine = root / "quarantine" / f"{job['job_id']}__attempt{int(job['attempt'])}__prephysics"
+            quarantine.parent.mkdir(exist_ok=True)
+            if quarantine.exists():
+                raise RuntimeError(f"prephysics quarantine collision: {quarantine}")
+            os.replace(output, quarantine)
+        job.update({"status": "PENDING", "pid": None, "exit_code": None, "wall_seconds": None})
+        changed = True
+    if changed:
+        atomic_csv(root / "two_scale_anchor_job_registry.csv", jobs)
+
+
 def controller_lock(root: Path) -> Path:
     path = root / "controller.lock"
     if path.exists():
@@ -359,11 +393,9 @@ def main() -> int:
         else initialize(root, head)
     )
     verify_frozen_source(root)
+    reconcile_prephysics_launch_failures(root, jobs)
     if args.initialize_only:
         return 0
-    interrupted = [row["job_id"] for row in jobs if row["status"] == "RUNNING" and not alive(row["pid"])]
-    if interrupted:
-        raise RuntimeError(f"interrupted physical anchor cannot resume or rerun in place: {interrupted}")
     lock = controller_lock(root)
     try:
         atomic_json(root / "two_scale_controller_state.json", {"phase": "MANDATORY_ANCHORS", "pid": os.getpid(), "head": head})
