@@ -377,6 +377,28 @@ def test_final_state_only_observer_uses_production_mpz_adapter_without_feedback(
     assert payload["final_state_observer_feedback"] is False
 
 
+def test_final_state_artifact_is_fail_closed_and_requires_no_intermediate_snapshots(
+    tmp_path,
+):
+    path = tmp_path / "mpz_state_snapshots_1100K.json"
+    assert runner.final_state_artifact(tmp_path, 1100.0) is None
+    payload = {
+        "snapshots": [],
+        "final_fronts": [{"state": {
+            "final_state_only_observer": True,
+            "final_state_observer_feedback": False,
+        }}],
+    }
+    path.write_text(json.dumps(payload))
+    artifact = runner.final_state_artifact(tmp_path, 1100.0)
+    assert artifact is not None
+    assert artifact["final_front_count"] == 1
+    assert artifact["intermediate_snapshot_count"] == 0
+    payload["snapshots"] = [{"step": 1}]
+    path.write_text(json.dumps(payload))
+    assert runner.final_state_artifact(tmp_path, 1100.0) is None
+
+
 def test_storage_accounting_closes():
     path = Path("pf_storage_reclaimed_v1.csv")
     row = next(csv.DictReader(path.open()))

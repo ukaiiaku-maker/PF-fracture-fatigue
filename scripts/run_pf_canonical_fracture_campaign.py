@@ -227,6 +227,35 @@ def completed(case_root: Path, temperature: float, target_um: float) -> bool:
     return False
 
 
+def final_state_artifact(case_root: Path, temperature: float) -> dict[str, Any] | None:
+    path = case_root / f"mpz_state_snapshots_{int(temperature):04d}K.json"
+    if not path.is_file():
+        return None
+    try:
+        payload = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return None
+    finals = payload.get("final_fronts")
+    snapshots = payload.get("snapshots")
+    if not isinstance(finals, list) or not finals or snapshots != []:
+        return None
+    for front in finals:
+        state = front.get("state") if isinstance(front, dict) else None
+        if not isinstance(state, dict):
+            return None
+        if state.get("final_state_only_observer") is not True:
+            return None
+        if state.get("final_state_observer_feedback") is not False:
+            return None
+    return {
+        "path": str(path),
+        "sha256": sha256(path),
+        "size_bytes": path.stat().st_size,
+        "final_front_count": len(finals),
+        "intermediate_snapshot_count": 0,
+    }
+
+
 def compress_observer_artifacts(case_root: Path) -> list[dict[str, Any]]:
     """Losslessly replace large observer JSON with verified zstd members."""
     records: list[dict[str, Any]] = []
@@ -262,7 +291,11 @@ def launch_one(row: dict[str, str], *, outroot: Path, registry: Path, selection:
     case_root = outroot / identifier
     case_root.mkdir(parents=True, exist_ok=True)
     if completed(case_root, float(row["temperature_K"]), target_um) and not force:
-        return {"case_id": identifier, "status": "REUSED_COMPLETE", "returncode": 0, "path": str(case_root)}
+        final_state = final_state_artifact(case_root, float(row["temperature_K"]))
+        final_only_required = observer_mode == "off" and save_snapshots == 0
+        if not final_only_required or final_state is not None:
+            return {"case_id": identifier, "status": "REUSED_COMPLETE", "returncode": 0,
+                    "path": str(case_root), "final_state_artifact": final_state}
     registry_rows = load_registry(registry)
     registry_row = registry_rows[row["material_class"]]
     family, family_payload = family_for_theta(cache, float(row["theta_deg"]))
@@ -303,9 +336,22 @@ def launch_one(row: dict[str, str], *, outroot: Path, registry: Path, selection:
     environment = canonical_env(registry, selection, family, int(row["seed"]), observer_mode)
     with (case_root / "run.stdout.log").open("w") as stdout, (case_root / "run.stderr.log").open("w") as stderr:
         proc = subprocess.run(command, cwd=ROOT, env=environment, stdout=stdout, stderr=stderr)
-    status = "COMPLETE" if proc.returncode == 0 and completed(case_root, float(row["temperature_K"]), target_um) else "FAILED_OR_CENSORED"
+    reached_target = completed(case_root, float(row["temperature_K"]), target_um)
+    final_state = final_state_artifact(case_root, float(row["temperature_K"]))
+    final_only_required = observer_mode == "off" and save_snapshots == 0
+    output_contract_passed = not final_only_required or final_state is not None
+    status = (
+        "COMPLETE"
+        if proc.returncode == 0 and reached_target and output_contract_passed
+        else "FAILED_OUTPUT_CONTRACT"
+        if proc.returncode == 0 and reached_target
+        else "FAILED_OR_CENSORED"
+    )
     compressed = compress_observer_artifacts(case_root) if proc.returncode == 0 else []
     result = {**contract, "status": status, "returncode": proc.returncode, "path": str(case_root),
+              "final_state_only_output_required": final_only_required,
+              "final_state_output_contract_passed": output_contract_passed,
+              "final_state_artifact": final_state,
               "observer_artifact_compression": compressed,
               "finished_at_utc": datetime.now(timezone.utc).isoformat()}
     (case_root / "canonical_case_result.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
