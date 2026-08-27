@@ -53,7 +53,7 @@ def collect(root:Path):
  points=[];second=[];events=[];states=[];transfers=[];ctwindows=[]
  for j in jobs.itertuples():
   if j.stage=="EXPLICIT_PREFLIGHT":continue
-  out=Path(j.result_path);summary=read(out/"developed_fatigue_growth_summary.json");dev=summary.get("developed_interval") or {}
+  out=Path(j.result_path);summary=read(out/"developed_fatigue_growth_summary.json");dev=summary.get("developed_interval") or {};run_args=read(out/"run_args.json");r0_m=float(run_args["r_pz"])
   row={"job_id":j.job_id,"stage":j.stage,"option":j.option,"R":float(j.R),"Kmax_MPa_sqrt_m":float(j.kmax),"Kmin_MPa_sqrt_m":float(j.R*j.kmax),
    "deltaK_driver_MPa_sqrt_m":float(j.deltaK_driver_MPa_sqrt_m),"deltaK_nominal_full_MPa_sqrt_m":float(j.deltaK_driver_MPa_sqrt_m),
    "deltaK_nominal_tensile_MPa_sqrt_m":float(j.kmax-max(j.R*j.kmax,0)),"Kmax_nominal_MPa_sqrt_m":float(j.kmax),
@@ -75,11 +75,15 @@ def collect(root:Path):
     "physical_return":sum(ledger_sum(x,"cumulative_physical_returned_mobile") for x in recs),"returned_source_slip":sum(ledger_sum(x,"cumulative_cancelled_source_slip") for x in recs),
     "gross_source_activity":sum(ledger_sum(x,"cumulative_gross_source_activity") for x in recs),"gross_return_activity":sum(ledger_sum(x,"cumulative_gross_return_activity") for x in recs),
     "far_field_escape":sum(ledger_sum(x,"cumulative_escaped_mobile") for x in recs),"wake_transfer":sum(ledger_sum(x,"cumulative_source_slip_wake_transfer") for x in recs),
-    "net_source_linked_blunting":float(last.get("state_micro_advance_total_m",0)),"cleavage_action":sum(float(x.get("physical_hazard_action_block",0) or 0) for x in recs),
+    "r0_m":r0_m,"micro_advance_total_m":float(last.get("state_micro_advance_total_m",0)),
+    "net_source_linked_blunting_m":max(float(last.get("persistent_tip_radius_m",r0_m))-r0_m,0.0),
+    "cleavage_action":sum(float(x.get("physical_hazard_action_block",0) or 0) for x in recs),
     "emission_action":sum(float(x.get("persistent_aggregate_emission_hazard_s",0) or 0) for x in recs)})
    for i,x in enumerate(recs):
     states.append({**{k:row[k] for k in ["job_id","stage","option","R","Kmax_MPa_sqrt_m","Kmin_MPa_sqrt_m","deltaK_driver_MPa_sqrt_m","seed","result_path","branch","head","analysis_head","production_solver_hash","common_physics_hash","composite_hash","acceleration_mode","stationarity_classification","terminal_classification","n_bins","temperature_K","frequency_Hz","W_m","B_m","nominal_Pmax_initial_N","nominal_Pmin_initial_N"]},
       "record_index":i,"cycles_consumed":x.get("cycles_consumed"),"mobile_count":x.get("state_mobile_count"),"retained_count":x.get("state_retained_count"),"tip_radius_m":x.get("persistent_tip_radius_m"),
+      "r0_m":r0_m,"micro_advance_total_m":x.get("state_micro_advance_total_m"),
+      "net_source_linked_blunting_m":max(float(x.get("persistent_tip_radius_m",r0_m))-r0_m,0.0),
       "internal_stress_Pa":x.get("persistent_sigma_back_Pa"),"shielding_Pa_sqrt_m":x.get("state_active_K_shield_signed_Pa_sqrt_m"),"hazard_action":x.get("physical_hazard_action_block"),
       "emission_activity":x.get("persistent_aggregate_emission_hazard_s"),"physical_return":ledger_sum(x,"cumulative_physical_returned_mobile"),"returned_source_slip":ledger_sum(x,"cumulative_cancelled_source_slip"),
       "gross_source_activity":ledger_sum(x,"cumulative_gross_source_activity"),"gross_return_activity":ledger_sum(x,"cumulative_gross_return_activity"),"far_field_escape":ledger_sum(x,"cumulative_escaped_mobile"),"wake_transfer":ledger_sum(x,"cumulative_source_slip_wake_transfer")})
@@ -139,7 +143,7 @@ def figures(root,p,ratios,slopes,states,transfer,windows):
  save("MOBILE_RETAINED_VS_R","Terminal mobile population vs R","R","mobile_count",group="option",data=final,log=False)
  save("PHYSICAL_RETURN_AND_SOURCE_CANCELLATION_VS_R","Physical return vs R","R","physical_return",group="option",data=final,log=False)
  save("RADIUS_INTERNAL_STRESS_SHIELDING_VS_R","Terminal internal stress vs R","R","internal_stress_Pa",group="option",data=final,log=False)
- save("NET_BLUNTING_HAZARD_EVENT_HISTORY_VS_R","Cleavage hazard action vs record","record_index","hazard_action",group=["option","R"],data=states,log=False)
+ save("NET_BLUNTING_HAZARD_EVENT_HISTORY_VS_R","Net source-linked blunting vs event interval","record_index","net_source_linked_blunting_m",group=["option","R"],data=states,log=False)
  fig,ax=plt.subplots(figsize=(9,5.5));q=ratios.groupby(["option","R"]).S_PT_log10.apply(lambda x:max(abs(x))).unstack();q.index=[LABEL.get(x,x) for x in q.index];q.plot.bar(ax=ax);ax.axhline(.05,color="k",ls="--");ax.set_ylabel("max |log10 PT/native|");ax.set_title("Final R-ratio mechanism summary");fig.tight_layout();fig.savefig(out/"FINAL_R_RATIO_MECHANISM_SUMMARY.png",dpi=180);plt.close(fig)
 
 def main():
@@ -188,6 +192,7 @@ def main():
  return18=p[p.Kmax_MPa_sqrt_m==18].copy();return18["return_fraction"]=return18.physical_return/return18.gross_source_activity
  pt08_reverse_return_fraction=float(return18[(return18.option==PT08)&(return18.R<0)].return_fraction.iloc[0])
  pt03_retention_ratio=float(return18[(return18.option==PT03)&(return18.R==-0.95)].retained_count.iloc[0]/return18[(return18.option==NATIVE)&(return18.R==-0.95)].retained_count.iloc[0])
+ blunting_relative_span=float(return18.groupby("R").net_source_linked_blunting_m.apply(lambda x:x.max()/max(x.min(),1e-300)-1).max())
  event18=e[(e.Kmax_MPa_sqrt_m==18)&e.stage.astype(str).str.contains("PRIMARY")]
  event_size_relative_span=float(event18.groupby(["R","option"]).projected_advance_m.mean().groupby(level=0).apply(lambda x:x.max()/x.min()-1).max())
  modeb_m_abs=float(geometry[geometry.geometry=="W10mm"].apparent_global_m.abs().max())
@@ -197,6 +202,7 @@ def main():
   "maximum_PT03_native_rate_ratio":pt03_max_ratio,"maximum_PT08_native_rate_ratio":pt08_max_ratio,
   "PT08_reverse_return_fraction_of_gross_source_activity_at_Kmax18":pt08_reverse_return_fraction,
   "PT03_negative_R_retained_population_ratio_to_native":pt03_retention_ratio,"maximum_mean_event_size_relative_span_across_variants":event_size_relative_span,
+  "maximum_net_source_linked_blunting_relative_span_at_Kmax18":blunting_relative_span,
   "deltaK_semantics":"LOCAL_TIP_EFFECTIVE_K","nominal_transfer":"unit_scale_from_J_equivalence","closure_corrected_deltaK_reported":False,
   "constant_load_K_increase_100um_W10_fraction":geometry_change_10,"constant_load_K_increase_100um_W25_fraction":geometry_change_25,
   "constant_load_window_global_m_max_abs_W10":modeb_m_abs,"constant_load_window_curvature_max_W10":modeb_curvature,

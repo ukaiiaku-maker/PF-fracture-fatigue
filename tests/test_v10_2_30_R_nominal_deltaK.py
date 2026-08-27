@@ -73,3 +73,9 @@ def test_analysis_reports_constant_load_geometry_slopes_and_row_provenance():
   assert phrase in analysis
  for phrase in ["reconstructable row provenance","geometry sensitivity slope/curvature matrix incomplete","physical-return hierarchy"]:
   assert phrase in verifier
+
+def test_net_blunting_is_radius_increment_not_geometry_advance():
+ analysis=(ROOT/"scripts/analyze_v10_2_30_R_nominal_deltaK_study.py").read_text()
+ assert 'net_source_linked_blunting_m":max(float(last.get("persistent_tip_radius_m",r0_m))-r0_m' in analysis
+ assert '"micro_advance_total_m":float(last.get("state_micro_advance_total_m",0))' in analysis
+ assert '"net_source_linked_blunting":float(last.get("state_micro_advance_total_m",0))' not in analysis

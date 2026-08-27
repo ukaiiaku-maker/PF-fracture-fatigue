@@ -46,6 +46,10 @@ def main()->int:
   check(provenance_columns.issubset(table.columns),f"{name} lacks reconstructable row provenance",errors)
  check(len(geometry)==18 and {"W10mm","W25mm"}==set(geometry.geometry),"geometry sensitivity slope/curvature matrix incomplete",errors)
  check({"local_m_to_next_W10","local_m_to_next_W25","curvature_W10","curvature_W25"}.issubset(windows.columns),"constant-load window slope/curvature analysis missing",errors)
+ check({"r0_m","micro_advance_total_m","net_source_linked_blunting_m"}.issubset(pts.columns) and {"r0_m","micro_advance_total_m","net_source_linked_blunting_m"}.issubset(states.columns),"net-blunting diagnostic fields missing",errors)
+ if {"r0_m","tip_radius_m","net_source_linked_blunting_m"}.issubset(pts.columns):
+  residual=(pts.net_source_linked_blunting_m-(pts.tip_radius_m-pts.r0_m).clip(lower=0)).abs().max()
+  check(residual<=1e-15,"net blunting was not derived from the reversible tip-radius state",errors)
  check(decision.get("schema")=="A_PT03_PT08_R_final_decision_v2" and "APPARENT_DELTAK_AXIS_MAPPING_ONLY" in decision.get("mechanism_qualifiers",[]),"final quantitative decision schema/qualifier missing",errors)
  check(f"`{decision['primary_classification']}`" in md,"Markdown/JSON decision mismatch",errors)
  diff=subprocess.run(["git","diff","--check"],capture_output=True,text=True);check(diff.returncode==0,"git diff --check failed",errors)
