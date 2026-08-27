@@ -13,6 +13,7 @@ def test_persistent_controller_keeps_fresh_physics_and_bounded_decisions():
     assert "adaptive_max_additions_per_variant" in text
     assert "MEANINGFUL_RATE_LOG10" in text
     assert "ThreadPoolExecutor(max_workers=workers)" in text
+    assert '"--finalize-existing"' in text
 
 
 def test_final_verifier_requires_actual_acceleration_and_clean_tree():
@@ -27,3 +28,16 @@ def test_launch_denial_without_physical_record_is_not_numerical_failure():
     text = (ROOT / "scripts/complete_v10_2_30_A_native_plus_8PT_study.py").read_text()
     assert "kinetic_tip_cell_audit_v101.json" in text
     assert 'return "LAUNCH_PREFLIGHT_FAILURE"' in text
+
+
+def test_parity_analyzer_indexes_mode_column_not_dataframe_method():
+    text = (ROOT / "scripts/analyze_v10_2_30_A_native_plus_8PT_final.py").read_text()
+    assert 'group[group["mode"] == "explicit"]' in text
+    assert 'group[group["mode"] == "normal"]' in text
+
+
+def test_parity_retains_pure_relative_failure_and_unavailable_classification():
+    text = (ROOT / "scripts/analyze_v10_2_30_A_native_plus_8PT_final.py").read_text()
+    assert 'max(abs(x), abs(y), 1e-20)' in text
+    assert '"ACCELERATOR_PARITY_UNAVAILABLE_VALIDATION_MISMATCH"' in text
+    assert '"absolute_differences": absolute_errors' in text

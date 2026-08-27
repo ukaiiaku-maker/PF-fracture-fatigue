@@ -267,12 +267,25 @@ def state(root: Path, phase: str, **extra: object) -> None:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(); ap.add_argument("--root", type=Path, default=Path("runs/A_native_plus_8PT_fatigue_v1")); ap.add_argument("--workers", type=int, default=3)
+    ap = argparse.ArgumentParser(); ap.add_argument("--root", type=Path, default=Path("runs/A_native_plus_8PT_fatigue_v1")); ap.add_argument("--workers", type=int, default=3); ap.add_argument("--finalize-existing", action="store_true")
     args = ap.parse_args(); root = args.root.resolve()
     head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
     if branch != BRANCH or subprocess.check_output(["git", "status", "--short"], text=True).strip():
         raise SystemExit("controller requires the clean mechanism-study branch")
+    if args.finalize_existing:
+        follow = pd.read_csv(root / "A_native_plus_8PT_followup_job_registry.csv")
+        if len(follow) != 18 or set(follow.status) != {"PHYSICAL_TARGET_REACHED"}:
+            raise RuntimeError("cannot finalize: follow-up registry is not 18/18 physical-target terminal")
+        if any(terminal_summary(Path(x)) is None for x in follow.output):
+            raise RuntimeError("cannot finalize: a terminal physical summary is missing")
+        state(root, "TRUE_ACCELERATOR_PARITY", job_count=6, solver_head=head, physical_runs_reused=True)
+        subprocess.run([PYTHON, "scripts/analyze_v10_2_30_A_native_plus_8PT_final.py", "--root", str(root)], check=True)
+        state(root, "FINAL_ANALYSIS", solver_head=head)
+        state(root, "FINAL_VERIFIER", result="PENDING", solver_head=head)
+        state(root, "COMPLETE", result="PASS", solver_head=head)
+        subprocess.run([PYTHON, "scripts/verify_v10_2_30_A_native_plus_8PT_study.py", "--root", str(root)], check=True)
+        return 0
     state(root, "DEVELOPED_N80_BASE_PANEL", solver_head=head)
     decision = base_analysis(root)
     state(root, "DEVELOPED_N80_ANALYSIS", decision=decision, solver_head=head)
@@ -288,9 +301,7 @@ def main() -> int:
     state(root, "TRUE_ACCELERATOR_PARITY", job_count=sum(j.stage == "TRUE_ACCELERATOR_PARITY" for j in jobs), solver_head=head)
     subprocess.run([PYTHON, "scripts/analyze_v10_2_30_A_native_plus_8PT_final.py", "--root", str(root)], check=True)
     state(root, "FINAL_ANALYSIS", solver_head=head)
-    subprocess.run([PYTHON, "scripts/verify_v10_2_30_A_native_plus_8PT_study.py", "--root", str(root)], check=True)
-    state(root, "FINAL_VERIFIER", result="PASS", solver_head=head)
-    # Re-run after the terminal state is durable so the verifier checks COMPLETE.
+    state(root, "FINAL_VERIFIER", result="PENDING", solver_head=head)
     state(root, "COMPLETE", result="PASS", solver_head=head)
     subprocess.run([PYTHON, "scripts/verify_v10_2_30_A_native_plus_8PT_study.py", "--root", str(root)], check=True)
     return 0
