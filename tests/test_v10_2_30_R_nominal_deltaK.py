@@ -36,3 +36,10 @@ def test_three_row_controller_contracts_are_fresh_bounded_and_exact():
 def test_final_verifier_is_fail_closed():
  text=(ROOT/"scripts/verify_v10_2_30_R_nominal_deltaK_study.py").read_text()
  for phrase in ["resumed trajectory admitted","unqualified acceleration admitted","tip radius","fewer than three points","Markdown/JSON decision mismatch"]:assert phrase in text
+
+def test_only_prephysics_launch_denials_are_retried():
+ text=(ROOT/"scripts/complete_v10_2_30_R_nominal_deltaK_study.py").read_text()
+ assert "reconcile_prephysics_launch_failures" in text
+ assert 'kinetic_tip_cell_audit_v101.json' in text
+ assert 'high_cycle_live_checkpoint.json' in text
+ assert "interrupted physical trajectory cannot be resumed" in text

@@ -194,12 +194,29 @@ def lock(root:Path):
         path.unlink()
     fd=os.open(path,os.O_CREAT|os.O_EXCL|os.O_WRONLY);os.write(fd,json.dumps({"pid":os.getpid()}).encode());os.close(fd);return path
 
+def reconcile_prephysics_launch_failures(rows:list[dict])->None:
+    """Retry only attempts that demonstrably never entered physical execution."""
+    for row in rows:
+        status=str(row.get("status","")); out=Path(str(row["result_path"]))
+        try: pid=int(float(row.get("pid")))
+        except (TypeError,ValueError): pid=0
+        running_dead=status=="RUNNING" and not (pid>0 and alive(pid))
+        failed=status=="INVALID_OR_NONTERMINAL"
+        if not (running_dead or failed):
+            continue
+        physical_started=(out/"kinetic_tip_cell_audit_v101.json").is_file() or (out/"high_cycle_live_checkpoint.json").is_file()
+        if physical_started:
+            raise RuntimeError(f"interrupted physical trajectory cannot be resumed: {row['job_id']}")
+        row["status"]="PENDING";row["pid"]=None;row["exit_code"]=None;row["wall_seconds"]=None
+
 def main()->int:
     ap=argparse.ArgumentParser();ap.add_argument("--root",type=Path,default=Path("runs/A_native_PT03_PT08_R_nominal_deltaK_v1"));ap.add_argument("--workers",type=int,default=3);a=ap.parse_args()
     if not 1<=a.workers<=3:raise SystemExit("workers must be 1..3")
     root=a.root.resolve();head=git("rev-parse","HEAD");branch=git("branch","--show-current")
     if branch!=BRANCH or git("status","--short"):raise SystemExit("controller requires requested clean study branch")
     rows=pd.read_csv(root/"A_PT03_PT08_R_job_registry.csv").to_dict("records") if (root/"A_PT03_PT08_R_job_registry.csv").is_file() else initialize(root,head)
+    reconcile_prephysics_launch_failures(rows)
+    atomic_csv(root/"A_PT03_PT08_R_job_registry.csv",rows)
     lk=lock(root)
     try:
       atomic_json(root/"A_PT03_PT08_R_controller_state.json",{"phase":"PREFLIGHT","pid":os.getpid(),"head":head,"workers":a.workers})
