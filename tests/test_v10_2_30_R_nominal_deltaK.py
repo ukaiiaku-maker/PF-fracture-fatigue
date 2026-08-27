@@ -32,6 +32,7 @@ def test_three_row_controller_contracts_are_fresh_bounded_and_exact():
  text=(ROOT/"scripts/complete_v10_2_30_R_nominal_deltaK_study.py").read_text()
  assert 'OPTIONS=("A_NATIVE"' in text;assert '"resume":False' in text;assert 'V10230_HIGH_CYCLE_EXPLICIT_ONLY' in text
  assert '1<=a.workers<=3' in text;assert 'len(jobs)==60' not in text
+ assert 'sys.path.insert(0, str(REPO_ROOT))' in text
 def test_final_verifier_is_fail_closed():
  text=(ROOT/"scripts/verify_v10_2_30_R_nominal_deltaK_study.py").read_text()
  for phrase in ["resumed trajectory admitted","unqualified acceleration admitted","tip radius","fewer than three points","Markdown/JSON decision mismatch"]:assert phrase in text

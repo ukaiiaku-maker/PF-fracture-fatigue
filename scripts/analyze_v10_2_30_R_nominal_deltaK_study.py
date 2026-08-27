@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Final scientific analysis for the A/PT03/PT08 R and nominal-C(T) study."""
 from __future__ import annotations
-import argparse, json, math, subprocess
+import argparse, json, math, subprocess, sys
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 from arrhenius_fracture.virtual_ct_v10230 import PRIMARY_CT,SENSITIVITY_CT,ct_geometry_factor,ct_load_from_k_pa_sqrt_m
 
 NATIVE="A_NATIVE"; PT03="A_PT_03_oneD_v2_dbtt_TP_4895f9e5b44deea5"; PT08="A_PT_08_oneD_v2_dbtt_TP_f2817e7998cb7be6"
