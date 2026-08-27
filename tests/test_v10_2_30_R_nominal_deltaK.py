@@ -1,6 +1,9 @@
 import math
 from pathlib import Path
 import pytest
+from types import SimpleNamespace
+from arrhenius_fracture import stochastic_avalanche_backend
+from arrhenius_fracture.sharp_front_v10_2_30_candidate_constant_load_CT import _projected_extension
 from arrhenius_fracture.virtual_ct_v10230 import (PRIMARY_CT,SENSITIVITY_CT,ct_geometry_factor,ct_k_from_load_pa_sqrt_m,
  ct_load_from_k_pa_sqrt_m,projected_macro_crack_m,nominal_ranges,energy_equivalent_driver_k_pa_sqrt_m)
 
@@ -43,3 +46,14 @@ def test_only_prephysics_launch_denials_are_retried():
  assert 'kinetic_tip_cell_audit_v101.json' in text
  assert 'high_cycle_live_checkpoint.json' in text
  assert "interrupted physical trajectory cannot be resumed" in text
+
+def test_constant_load_reads_live_checked_geometry_log(tmp_path,monkeypatch):
+ backend=SimpleNamespace(advance_log=[{"x0":5e-4,"x1":5.002e-4},{"x0":5.002e-4,"x1":5.011e-4}])
+ monkeypatch.setattr(stochastic_avalanche_backend,"_LAST_AVALANCHE_BACKEND",backend)
+ assert _projected_extension(tmp_path)==pytest.approx(1.1e-6)
+
+def test_static_constant_load_attempt_is_fail_closed_and_rerun_fresh():
+ text=(ROOT/"scripts/complete_v10_2_30_R_nominal_deltaK_study.py").read_text()
+ assert "INVALID_CONSTANT_LOAD_STATIC_CONTROL" in text
+ assert "reconcile_superseded_constant_load_controls" in text
+ assert 'maximum_Kmax_driver_Pa_sqrt_m' in text

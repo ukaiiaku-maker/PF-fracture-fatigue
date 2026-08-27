@@ -149,6 +149,13 @@ def valid_terminal(job:dict)->bool:
     if not summary.is_file():return False
     d=json.loads(summary.read_text())
     if job["stage"]=="EXPLICIT_PREFLIGHT":return bool(d.get("target_reached")) and int(d.get("event_count",0))>=1
+    if job["stage"]=="CONSTANT_LOAD_CT":
+        control=out/"v10_2_30_constant_load_CT_control.json"
+        if not control.is_file(): return False
+        c=json.loads(control.read_text())
+        # At 100 um in W=10 mm, a genuine fixed-load control must increase K.
+        # Equality identifies the superseded file-at-terminal implementation.
+        if float(c.get("maximum_Kmax_driver_Pa_sqrt_m",0)) <= float(job["kmax"])*1e6*(1+1e-6): return False
     return bool(d.get("target_reached")) and bool(d.get("stable_growth_provisional")) and int(d.get("event_count",0))>=10
 
 def run_stage(root:Path,rows:list[dict],stages:set[str],head:str,workers:int)->None:
@@ -209,12 +216,33 @@ def reconcile_prephysics_launch_failures(rows:list[dict])->None:
             raise RuntimeError(f"interrupted physical trajectory cannot be resumed: {row['job_id']}")
         row["status"]="PENDING";row["pid"]=None;row["exit_code"]=None;row["wall_seconds"]=None
 
+def reconcile_superseded_constant_load_controls(root:Path,rows:list[dict])->None:
+    invalid=[]
+    for row in rows:
+        if row.get("stage")!="CONSTANT_LOAD_CT" or row.get("status") not in {"RUNNING","INVALID_OR_NONTERMINAL","PHYSICAL_TARGET_REACHED"}:
+            continue
+        try: pid=int(float(row.get("pid")))
+        except (TypeError,ValueError): pid=0
+        if pid>0 and alive(pid): continue
+        out=Path(str(row["result_path"])); control=out/"v10_2_30_constant_load_CT_control.json"; summary=out/"developed_fatigue_growth_summary.json"
+        if not control.is_file() or not summary.is_file(): continue
+        c=json.loads(control.read_text()); d=json.loads(summary.read_text())
+        static=float(c.get("maximum_Kmax_driver_Pa_sqrt_m",0)) <= float(row["kmax"])*1e6*(1+1e-6)
+        if static and float(d.get("final_projected_extension_um",0))>0:
+            invalid.append({"job_id":row["job_id"],"attempt":row.get("attempt"),"result_path":row["result_path"],
+              "classification":"INVALID_CONSTANT_LOAD_STATIC_CONTROL","physical_result_admitted":False,"resume":False})
+            row["status"]="PENDING";row["pid"]=None;row["exit_code"]=None;row["wall_seconds"]=None
+    if invalid:
+        path=root/"invalid_constant_load_attempts.json"; prior=json.loads(path.read_text()) if path.is_file() else []
+        atomic_json(path,prior+invalid)
+
 def main()->int:
     ap=argparse.ArgumentParser();ap.add_argument("--root",type=Path,default=Path("runs/A_native_PT03_PT08_R_nominal_deltaK_v1"));ap.add_argument("--workers",type=int,default=3);a=ap.parse_args()
     if not 1<=a.workers<=3:raise SystemExit("workers must be 1..3")
     root=a.root.resolve();head=git("rev-parse","HEAD");branch=git("branch","--show-current")
     if branch!=BRANCH or git("status","--short"):raise SystemExit("controller requires requested clean study branch")
     rows=pd.read_csv(root/"A_PT03_PT08_R_job_registry.csv").to_dict("records") if (root/"A_PT03_PT08_R_job_registry.csv").is_file() else initialize(root,head)
+    reconcile_superseded_constant_load_controls(root,rows)
     reconcile_prephysics_launch_failures(rows)
     atomic_csv(root/"A_PT03_PT08_R_job_registry.csv",rows)
     lk=lock(root)

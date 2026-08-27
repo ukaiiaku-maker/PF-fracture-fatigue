@@ -22,6 +22,14 @@ MODEL_ID = "v10.2.30_candidate_constant_load_virtual_CT_v1"
 
 
 def _projected_extension(root: Path) -> float:
+    # The authoritative geometry diagnostics file is intentionally written only
+    # after the case closes.  During a live run, read the same checked backend's
+    # in-process transaction log so the next waveform sees every committed event.
+    from . import stochastic_avalanche_backend as _avalanche_backend
+    backend = _avalanche_backend._LAST_AVALANCHE_BACKEND
+    live = getattr(backend, "advance_log", None) if backend is not None else None
+    if isinstance(live, list) and live:
+        return max(float(live[-1]["x1"]) - float(live[0]["x0"]), 0.0)
     path = root / "stochastic_avalanche_geometry_events.json"
     if not path.is_file():
         return 0.0
