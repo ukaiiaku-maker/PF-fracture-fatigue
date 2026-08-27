@@ -66,3 +66,10 @@ will reuse the 42 completed rate cases and rerun the two interrupted cases.
 After 144/144 rate cases pass, consolidate new observers, regenerate the V2
 analysis, run the single branching capability demonstration, execute final
 tests, and only then issue the final report and retention decision.
+
+## Checkpoint verification
+
+- Canonical campaign semantic tests: 29 passed.
+- Full PF suite: 561 passed and the same seven known legacy failures remained;
+  no new failure was introduced.
+- `compileall` and `git diff --check`: passed.

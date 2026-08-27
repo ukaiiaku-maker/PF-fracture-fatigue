@@ -18,5 +18,13 @@
   "rate_matrix_complete": false,
   "reason": "SHARED_VOLUME_HEADROOM_UNSAFE_DUE_TO_PROTECTED_ACTIVE_FATIGUE_CHECKPOINT_GROWTH",
   "state_profile_count": 30062,
-  "theta_matrix_complete": true
+  "theta_matrix_complete": true,
+  "verification": {
+    "compileall_passed": true,
+    "full_suite_failed": 7,
+    "full_suite_legacy_failures_only": true,
+    "full_suite_passed": 561,
+    "git_diff_check_passed": true,
+    "semantic_tests_passed": 29
+  }
 }
