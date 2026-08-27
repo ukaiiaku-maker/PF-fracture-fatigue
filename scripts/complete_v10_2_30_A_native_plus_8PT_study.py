@@ -71,9 +71,15 @@ def classify(out: Path, returncode: int | None) -> str:
     data = terminal_summary(out)
     if returncode == 0 and data:
         return "PHYSICAL_TARGET_REACHED" if data.get("stable_growth_provisional") else "DEVELOPED_UNSTABLE"
-    if returncode == 2 and not (out / "high_cycle_live_checkpoint.json").exists():
+    checkpoint = out / "high_cycle_live_checkpoint.json"
+    physical_record = out / "kinetic_tip_cell_audit_v101.json"
+    # Some host launch denials (for example, a blocked /dev/fd process
+    # substitution) occur after the wrapper has materialized metadata and can
+    # return code 1 rather than the wrapper's conventional preflight code 2.
+    # With neither checkpoint nor kinetic audit, no physical trajectory began.
+    if returncode not in (None, 0) and not checkpoint.exists() and not physical_record.exists():
         return "LAUNCH_PREFLIGHT_FAILURE"
-    if (out / "high_cycle_live_checkpoint.json").exists():
+    if checkpoint.exists():
         return "WATCHDOG_OR_OPERATIONAL_TERMINATION"
     return "NUMERICAL_FAILURE"
 

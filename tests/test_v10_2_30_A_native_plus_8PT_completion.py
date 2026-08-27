@@ -21,3 +21,9 @@ def test_final_verifier_requires_actual_acceleration_and_clean_tree():
     assert '"ACCELERATOR_PARITY_PASS"' in text
     assert '["git","diff","--check"]' in text
     assert '["git","status","--short"]' in text
+
+
+def test_launch_denial_without_physical_record_is_not_numerical_failure():
+    text = (ROOT / "scripts/complete_v10_2_30_A_native_plus_8PT_study.py").read_text()
+    assert "kinetic_tip_cell_audit_v101.json" in text
+    assert 'return "LAUNCH_PREFLIGHT_FAILURE"' in text
