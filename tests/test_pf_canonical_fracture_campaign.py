@@ -14,6 +14,7 @@ from scripts import consolidate_pf_canonical_observer_artifacts as consolidation
 from scripts import execute_pf_scoped_delete_list as delete_tool
 from scripts import run_pf_canonical_fracture_campaign as runner
 from scripts import build_pf_canonical_campaign_v2 as campaign_v2
+from arrhenius_fracture import sharp_front
 
 
 EXPECTED_HASHES = {
@@ -354,6 +355,26 @@ def test_v2_launcher_derives_matrix_provenance_from_membership_flags():
     assert runner.analysis_matrix_label({
         **base, "matrix": "CANONICAL_SINGLE_CRACK_THETA",
     }) == "CANONICAL_SINGLE_CRACK_THETA"
+
+
+def test_final_state_only_observer_uses_production_mpz_adapter_without_feedback():
+    class Engine:
+        def _taylor_peierls_state_diagnostics(self, temperature_K, step_result):
+            assert temperature_K == 1100.0
+            assert step_result == {"fired": True}
+            return {"mobile_active_by_system_bin": [[1.0, 2.0]]}
+
+        def _anisotropic_diagnostics(self, include_tensor_state=None):
+            assert include_tensor_state is True
+            return {"persistent_tip_radius_m": 4.0e-6}
+
+    payload = sharp_front._final_process_zone_state(
+        Engine(), 1100.0, {"fired": True}
+    )
+    assert payload["mobile_active_by_system_bin"] == [[1.0, 2.0]]
+    assert payload["persistent_tip_radius_m"] == 4.0e-6
+    assert payload["final_state_only_observer"] is True
+    assert payload["final_state_observer_feedback"] is False
 
 
 def test_storage_accounting_closes():

@@ -787,6 +787,28 @@ def run_1d(args):
 # 2D driver: FEM supplies K_J; the SAME engine advances the front
 # ----------------------------------------------------------------------------
 
+def _final_process_zone_state(engine, temperature_K, step_result=None):
+    """Serialize the existing final MPZ state without advancing it.
+
+    The production signed engines own the spatial state on ``engine.mpz`` and
+    expose the already-qualified Taylor/Peierls observer, rather than the
+    legacy ``engine.state_model``/``export_process_zone_state`` interface.
+    """
+    direct = getattr(engine, 'export_process_zone_state', None)
+    if callable(direct):
+        return direct()
+    profile = getattr(engine, '_taylor_peierls_state_diagnostics', None)
+    if not callable(profile):
+        return None
+    payload = profile(float(temperature_K), dict(step_result or {}))
+    anisotropic = getattr(engine, '_anisotropic_diagnostics', None)
+    if callable(anisotropic):
+        payload.update(anisotropic(include_tensor_state=True))
+    payload['final_state_only_observer'] = True
+    payload['final_state_observer_feedback'] = False
+    return payload
+
+
 def _render_field_snapshots(out, T, mesh, snaps, max_cols=4):
     """Render the per-temperature field-snapshot panel for the 2D driver.
 
@@ -3196,14 +3218,15 @@ def run_2d(args):
                                                             'active': True, 'eng': eng}]
                     for sf_state in state_fronts:
                         sf_eng = sf_state.get('eng')
-                        if getattr(sf_eng, 'state_model', 'legacy_scalar') == 'moving_pz' and hasattr(sf_eng, 'export_process_zone_state'):
+                        sf_payload = _final_process_zone_state(sf_eng, T, info)
+                        if sf_payload is not None:
                             mpz_front_states.append({
                                 'front_id': int(sf_state.get('id', 0)),
                                 'parent_id': int(sf_state.get('parent', -1)),
                                 'xy_m': np.asarray(sf_state.get('xy', [a_tip, 0.0]), float).tolist(),
                                 'direction': np.asarray(sf_state.get('direction', [1.0, 0.0]), float).tolist(),
                                 'active': bool(sf_state.get('active', True)),
-                                'state': sf_eng.export_process_zone_state(),
+                                'state': sf_payload,
                             })
                 snaps.append({
                     'step': step, 'KJ': KJ, 'N_em': info['N_em'], 'a_tip': a_tip,
@@ -3363,7 +3386,8 @@ def run_2d(args):
             final_payload = []
             for ff_state in final_state_fronts:
                 ff_eng = ff_state.get('eng')
-                if getattr(ff_eng, 'state_model', 'legacy_scalar') == 'moving_pz' and hasattr(ff_eng, 'export_process_zone_state'):
+                ff_payload = _final_process_zone_state(ff_eng, T, info)
+                if ff_payload is not None:
                     final_payload.append({
                         'front_id': int(ff_state.get('id', 0)),
                         'parent_id': int(ff_state.get('parent', -1)),
@@ -3372,7 +3396,7 @@ def run_2d(args):
                         'active': bool(ff_state.get('active', True)),
                         'inactive_reason': str(ff_state.get('inactive_reason', 'active')),
                         'coalesced': bool(ff_state.get('coalesced', False)),
-                        'state': ff_eng.export_process_zone_state(),
+                        'state': ff_payload,
                     })
             if final_payload:
                 with open(os.path.join(args.out, f'mpz_state_snapshots_{tag}.json'), 'w') as fp:
