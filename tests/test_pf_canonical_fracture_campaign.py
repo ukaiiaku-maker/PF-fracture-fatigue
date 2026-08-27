@@ -305,6 +305,38 @@ def test_generated_plan_is_deterministic():
     assert audit.canonical_matrix() == audit.canonical_matrix()
 
 
+def test_v2_prelaunch_addendum_preserves_plan_and_separates_interpolation_metadata():
+    payload = json.loads(
+        Path("pf_canonical_v2_prelaunch_execution_addendum.json").read_text()
+    )
+    assert payload["campaign_plan_modified"] is False
+    assert payload["campaign_lock_fingerprint_sha256"] == (
+        "5928e6abb7dcd59e6387d5d479128fec83c3ba4d509bae3a0e757b9e9ece5dde"
+    )
+    metadata = payload["family_interpolation_metadata"]
+    assert metadata["semantic_separation_confirmed"] is True
+    assert metadata["envelope"]["relative_tolerance"] == 1.0e-10
+    assert metadata["empirical_spatial_cross_validation"]["available"] is False
+    assert metadata["empirical_spatial_cross_validation"]["maximum_relative_error"] is None
+    assert metadata["empirical_spatial_cross_validation"][
+        "represented_as_envelope_tolerance"
+    ] is False
+
+
+def test_v2_lean_output_policy_retains_final_state_and_trajectory_contract():
+    payload = json.loads(
+        Path("pf_canonical_v2_prelaunch_execution_addendum.json").read_text()
+    )
+    policy = payload["execution_output_policy"]
+    assert policy["save_snapshots"] == 0
+    assert policy["analysis_only_observer_mode"] == "off"
+    assert policy["intermediate_field_snapshots_saved"] is False
+    assert policy["trajectory_csv_retained"] is True
+    assert policy["stochastic_event_geometry_retained"] is True
+    source = Path("arrhenius_fracture/sharp_front.py").read_text()
+    assert "'final_fronts': final_payload" in source
+
+
 def test_storage_accounting_closes():
     path = Path("pf_storage_reclaimed_v1.csv")
     row = next(csv.DictReader(path.open()))
