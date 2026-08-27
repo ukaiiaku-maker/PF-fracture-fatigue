@@ -10,6 +10,7 @@ import pytest
 from scripts import analyze_pf_canonical_fracture_campaign as analysis
 from scripts import archive_verified_legacy_pf_run as archive_tool
 from scripts import audit_pf_canonical_fracture_campaign as audit
+from scripts import consolidate_pf_canonical_observer_artifacts as consolidation
 from scripts import execute_pf_scoped_delete_list as delete_tool
 from scripts import run_pf_canonical_fracture_campaign as runner
 
@@ -213,3 +214,74 @@ def test_observer_neutrality_gate_requires_byte_exact_trajectory_files():
                  "stochastic_avalanche_geometry_events.json", "sharp_wake_advance_log.csv"):
         assert name in source
     assert '"PASS" if all_equal and profile_gate else "FAIL"' in source
+
+
+def test_redundant_observers_consolidate_only_after_exact_record_equality(tmp_path):
+    case = tmp_path / "case"
+    case.mkdir()
+    (case / "canonical_case_result.json").write_text(json.dumps({"status": "COMPLETE"}))
+    common = {"records": [{"fired": True, "value": 3.0}], "shared": {"x": 1}}
+    documents = [
+        {"schema": "anisotropic", **common, "transport_comparison": {"mode": "validated"}},
+        {"schema": "kinetic", **common},
+        {"schema": "final", **common, "final_only": True},
+    ]
+    for name, document in zip(consolidation.SOURCE_NAMES, documents):
+        raw = case / name.removesuffix(".zst")
+        raw.write_text(json.dumps(document, allow_nan=True))
+        consolidation.compress(raw, case / name)
+        raw.unlink()
+    assert consolidation.consolidate_case(case) == "consolidated"
+    assert not any((case / name).exists() for name in consolidation.SOURCE_NAMES)
+    merged = json.loads(consolidation.decompress(case / consolidation.DEST_NAME))
+    assert merged["records"] == common["records"]
+    assert merged["transport_comparison"] == {"mode": "validated"}
+    assert merged["final_only"] is True
+    assert merged["canonical_observer_consolidation"]["records_exactly_equal_across_sources"]
+    assert consolidation.consolidate_case(case) == "already_consolidated"
+
+
+def test_observer_consolidation_fails_closed_when_records_differ(tmp_path):
+    case = tmp_path / "case"
+    case.mkdir()
+    (case / "canonical_case_result.json").write_text(json.dumps({"status": "COMPLETE"}))
+    for index, name in enumerate(consolidation.SOURCE_NAMES):
+        raw = case / name.removesuffix(".zst")
+        raw.write_text(json.dumps({"schema": str(index), "records": [{"event": index}]}))
+        consolidation.compress(raw, case / name)
+        raw.unlink()
+    with pytest.raises(RuntimeError, match="records differ"):
+        consolidation.consolidate_case(case)
+    assert all((case / name).exists() for name in consolidation.SOURCE_NAMES)
+    assert not (case / consolidation.DEST_NAME).exists()
+
+
+def test_profile_summary_uses_direct_observer_state_and_conserves_profiles():
+    record = {
+        "hazard_event_index": 4,
+        "time_s": 2.0,
+        "persistent_tip_radius_m": 3e-6,
+        "persistent_site_front_width_m": 4e-7,
+        "developed_state_mobile_count": 6.0,
+        "developed_state_retained_count": 4.0,
+        "developed_state_retained_fraction": 0.4,
+        "mobile_active_by_system_bin": [[1.0, 2.0], [3.0]],
+        "retained_active_by_system_bin": [[1.0], [3.0]],
+        "mobile_wake_by_system_bin": [[5.0]],
+        "retained_wake_by_system_bin": [[7.0]],
+        "anisotropic_lambda_emit_by_system_s": [1.0, 2.0],
+        "anisotropic_channel_names": ["a", "b"],
+        "anisotropic_drive_reliable": True,
+        "active_K_shield_signed_Pa_sqrt_m": -2e6,
+        "wake_K_shield_signed_Pa_sqrt_m": 0.0,
+    }
+    row = analysis.profile_summary("case", 0, 7, record, {
+        "observer_artifact_path": "x", "observer_artifact_sha256": "h",
+        "observer_record_count": 1, "observer_fired_record_count": 1,
+        "observer_schema": "s",
+    })
+    assert row["tip_radius_um"] == pytest.approx(3.0)
+    assert row["mobile_profile_conservation_error"] == pytest.approx(0.0)
+    assert row["retained_profile_conservation_error"] == pytest.approx(0.0)
+    assert row["maximum_emission_rate_system_name"] == "b"
+    assert row["tensor_probe_reliable"] is True

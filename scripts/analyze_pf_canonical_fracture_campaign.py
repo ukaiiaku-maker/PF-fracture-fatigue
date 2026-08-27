@@ -8,6 +8,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import subprocess
 from typing import Any
 
 
@@ -30,7 +31,108 @@ def write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> None
         writer.writerows(rows)
 
 
-def event_transactions(case_root: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def canonical_json_sha(value: Any) -> str:
+    payload = json.dumps(
+        value, sort_keys=True, separators=(",", ":"), allow_nan=True
+    ).encode()
+    return hashlib.sha256(payload).hexdigest()
+
+
+def nested_sum(value: Any) -> float:
+    if isinstance(value, list):
+        return sum(nested_sum(item) for item in value)
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    return result if math.isfinite(result) else 0.0
+
+
+def load_json_or_zstd(path: Path) -> dict[str, Any]:
+    if path.suffix == ".zst":
+        raw = subprocess.run(
+            ["zstd", "-q", "-dc", str(path)], check=True, capture_output=True
+        ).stdout
+    else:
+        raw = path.read_bytes()
+    document = json.loads(raw)
+    if not isinstance(document, dict):
+        raise ValueError(f"observer artifact is not an object: {path}")
+    return document
+
+
+def observer_profiles(case_root: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    candidates = (
+        case_root / "canonical_pf_state_observer_v2.json.zst",
+        case_root / "v10_2_17_final_signed_stochastic_stack.json.zst",
+        case_root / "v10_2_17_final_signed_stochastic_stack.json",
+    )
+    path = next((candidate for candidate in candidates if candidate.is_file()), None)
+    if path is None:
+        raise ValueError(f"required event-boundary observer artifact is absent: {case_root}")
+    document = load_json_or_zstd(path)
+    records = document.get("records")
+    if not isinstance(records, list):
+        raise ValueError(f"observer records are absent: {path}")
+    fired = [(index, row) for index, row in enumerate(records)
+             if isinstance(row, dict) and bool(row.get("fired"))]
+    return fired, {
+        "observer_artifact_path": str(path),
+        "observer_artifact_sha256": sha256(path),
+        "observer_record_count": len(records),
+        "observer_fired_record_count": len(fired),
+        "observer_schema": document.get("schema"),
+    }
+
+
+def profile_summary(case_id: str, event_index: int, record_index: int,
+                    record: dict[str, Any], artifact: dict[str, Any]) -> dict[str, Any]:
+    active_mobile = nested_sum(record.get("mobile_active_by_system_bin", []))
+    active_retained = nested_sum(record.get("retained_active_by_system_bin", []))
+    wake_mobile = nested_sum(record.get("mobile_wake_by_system_bin", []))
+    wake_retained = nested_sum(record.get("retained_wake_by_system_bin", []))
+    developed_mobile = float(record.get("developed_state_mobile_count", math.nan))
+    developed_retained = float(record.get("developed_state_retained_count", math.nan))
+    rates = record.get("anisotropic_lambda_emit_by_system_s", [])
+    selected_index = math.nan
+    selected_name: Any = ""
+    if isinstance(rates, list) and rates:
+        selected_index = max(range(len(rates)), key=lambda index: float(rates[index]))
+        names = record.get("anisotropic_channel_names", [])
+        if isinstance(names, list) and selected_index < len(names):
+            selected_name = names[selected_index]
+    return {
+        "case_id": case_id,
+        "event_transaction_index": event_index,
+        "observer_record_index": record_index,
+        **artifact,
+        "observer_event_index": record.get("hazard_event_index"),
+        "observer_time_s": record.get("time_s"),
+        "tip_radius_um": float(record.get("persistent_tip_radius_m", math.nan)) * 1e6,
+        "front_width_um": float(record.get("persistent_site_front_width_m", math.nan)) * 1e6,
+        "mobile_count": developed_mobile,
+        "retained_count": developed_retained,
+        "retained_fraction": record.get("developed_state_retained_fraction", math.nan),
+        "active_mobile_profile_sum": active_mobile,
+        "active_retained_profile_sum": active_retained,
+        "wake_mobile_profile_sum": wake_mobile,
+        "wake_retained_profile_sum": wake_retained,
+        "mobile_profile_conservation_error": active_mobile - developed_mobile,
+        "retained_profile_conservation_error": active_retained - developed_retained,
+        "multiplicity_per_system": record.get("persistent_site_multiplicity_per_system", math.nan),
+        "backstress_Pa": record.get("persistent_sigma_back_Pa", math.nan),
+        "signed_active_shielding_MPa_sqrt_m": float(record.get("active_K_shield_signed_Pa_sqrt_m", math.nan)) / 1e6,
+        "signed_wake_shielding_MPa_sqrt_m": float(record.get("wake_K_shield_signed_Pa_sqrt_m", math.nan)) / 1e6,
+        "tensor_probe_reliable": record.get("anisotropic_drive_reliable"),
+        "maximum_emission_rate_system_index": selected_index,
+        "maximum_emission_rate_system_name": selected_name,
+        "opening_tensor_Pa_sha256": canonical_json_sha(record.get("opening_tensor_Pa")),
+        "channel_tensors_Pa_sha256": canonical_json_sha(record.get("channel_tensors_Pa")),
+        "profile_fingerprint_sha256": canonical_json_sha(record),
+    }
+
+
+def event_transactions(case_root: Path) -> tuple[list[dict[str, Any]], dict[str, Any], list[dict[str, Any]]]:
     launch = json.loads((case_root / "canonical_case_launch.json").read_text())
     temperature = int(float(launch["temperature_K"]))
     steps_path = case_root / f"steps_{temperature:04d}K.csv"
@@ -44,6 +146,16 @@ def event_transactions(case_root: Path) -> tuple[list[dict[str, Any]], dict[str,
         elapsed += number(step, "dt_cur_s", 0.0)
         times.append(elapsed)
     positions = [i for i, step in enumerate(steps) if number(step, "n_fire", 0.0) > 0.0]
+    fired_records, observer_artifact = observer_profiles(case_root)
+    if len(fired_records) != len(positions):
+        raise ValueError(
+            f"event/observer closure failed in {case_root}: "
+            f"steps={len(positions)} observer={len(fired_records)}"
+        )
+    profiles = [
+        profile_summary(launch["case_id"], index, record_index, record, observer_artifact)
+        for index, (record_index, record) in enumerate(fired_records)
+    ]
     transactions: list[dict[str, Any]] = []
     avalanche_id = 0
     state_fields = [
@@ -54,6 +166,7 @@ def event_transactions(case_root: Path) -> tuple[list[dict[str, Any]], dict[str,
     ]
     for index, pos in enumerate(positions):
         event = steps[pos]
+        profile = profiles[index]
         before = steps[max(pos - 1, 0)]
         if index:
             prior = positions[index - 1]
@@ -79,13 +192,17 @@ def event_transactions(case_root: Path) -> tuple[list[dict[str, Any]], dict[str,
             "pre_event_projected_extension_um": number(before, "crack_extension_m") * 1e6,
             "post_event_projected_extension_um": number(event, "crack_extension_m") * 1e6,
             "event_extension_um": number(event, "da_block_m") * 1e6,
-            "tip_radius_um": number(event, "r_pz_m", number(event, "tip_radius_m")) * 1e6,
-            "front_width_um": number(event, "mpz_length_m", number(event, "front_width_m")) * 1e6,
-            "mobile_count": number(event, "mpz_mobile_count"),
-            "retained_count": number(event, "mpz_retained_count"),
-            "multiplicity": number(event, "N_em_pre_renewal", number(event, "N_em")),
-            "backstress_Pa": number(event, "sigma_back_Pa"),
-            "signed_shielding_MPa_sqrt_m": number(event, "mpz_K_shield_Pa_sqrt_m") / 1e6,
+            "tip_radius_um": profile["tip_radius_um"],
+            "front_width_um": profile["front_width_um"],
+            "mobile_count": profile["mobile_count"],
+            "retained_count": profile["retained_count"],
+            "multiplicity": profile["multiplicity_per_system"],
+            "backstress_Pa": profile["backstress_Pa"],
+            "signed_shielding_MPa_sqrt_m": profile["signed_active_shielding_MPa_sqrt_m"],
+            "tensor_probe_reliable": profile["tensor_probe_reliable"],
+            "maximum_emission_rate_system_index": profile["maximum_emission_rate_system_index"],
+            "maximum_emission_rate_system_name": profile["maximum_emission_rate_system_name"],
+            "observer_profile_fingerprint_sha256": profile["profile_fingerprint_sha256"],
             "process_zone_state_fingerprint": fingerprint,
             "reload_time_to_next_event_s": math.nan if next_pos is None else times[next_pos] - times[pos],
             "reload_opening_to_next_event_m": math.nan if next_pos is None else number(steps[next_pos], "Uapp_m") - number(event, "Uapp_m"),
@@ -95,7 +212,7 @@ def event_transactions(case_root: Path) -> tuple[list[dict[str, Any]], dict[str,
         })
     achieved = number(steps[-1], "crack_extension_m") * 1e6
     return transactions, {**launch, "achieved_extension_um": achieved, "steps_sha256": sha256(steps_path),
-                          "numerical_event_count": len(positions)}
+                          "numerical_event_count": len(positions), **observer_artifact}, profiles
 
 
 def physical_avalanches(transactions: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -124,14 +241,25 @@ def physical_avalanches(transactions: list[dict[str, Any]]) -> list[dict[str, An
     return output
 
 
-def analyze(campaign_root: Path, out: Path) -> dict[str, Any]:
+def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None = None) -> dict[str, Any]:
     out.mkdir(parents=True, exist_ok=True)
     transactions: list[dict[str, Any]] = []
     cases: list[dict[str, Any]] = []
+    profiles: list[dict[str, Any]] = []
+    skipped_incomplete: list[str] = []
     for launch_path in sorted(campaign_root.glob("*/canonical_case_launch.json")):
-        tx, case = event_transactions(launch_path.parent)
+        result_path = launch_path.parent / "canonical_case_result.json"
+        if not result_path.is_file():
+            skipped_incomplete.append(launch_path.parent.name)
+            continue
+        result = json.loads(result_path.read_text())
+        if result.get("status") not in {"COMPLETE", "REUSED_COMPLETE"}:
+            skipped_incomplete.append(launch_path.parent.name)
+            continue
+        tx, case, case_profiles = event_transactions(launch_path.parent)
         transactions.extend(tx)
         cases.append(case)
+        profiles.extend(case_profiles)
     if not cases:
         raise ValueError(f"no canonical cases found under {campaign_root}")
     avalanches = physical_avalanches(transactions)
@@ -172,13 +300,20 @@ def analyze(campaign_root: Path, out: Path) -> dict[str, Any]:
     write_csv(out / "pf_canonical_physical_avalanches_v2.csv", avalanches, ava_fields)
     write_csv(out / "pf_canonical_onset_candidates_v2.csv", onset, list(onset[0]) if onset else tx_fields + ["onset_role"])
     write_csv(out / "pf_canonical_in_avalanche_native_drive_v2.csv", interior, list(interior[0]) if interior else tx_fields + ["semantic_role"])
+    write_csv(out / "pf_canonical_state_profile_index_v2.csv", profiles, list(profiles[0]))
     write_csv(out / "pf_canonical_fracture_run_manifest.csv", summaries, list(summaries[0]))
     write_csv(out / "pf_canonical_theta_results.csv", [r for r in summaries if r["matrix"] == "CANONICAL_SINGLE_CRACK_THETA"], list(summaries[0]))
     write_csv(out / "pf_canonical_rate_results.csv", [r for r in summaries if r["matrix"] == "CANONICAL_STRAIN_RATE"], list(summaries[0]))
     hashes = {path.name: sha256(path) for path in sorted(out.glob("*.csv"))}
     decision = {
-        "schema": "pf_canonical_campaign_decision_v1", "case_count": len(cases),
+        "schema": "pf_canonical_campaign_decision_v2", "case_count": len(cases),
+        "expected_case_count": expected_case_count,
+        "campaign_case_count_complete": expected_case_count is None or len(cases) == expected_case_count,
+        "skipped_incomplete_case_ids": skipped_incomplete,
         "all_targets_reached": all(row["target_status"] == "TARGET_REACHED" for row in summaries),
+        "event_observer_closure": len(profiles) == len(transactions),
+        "observer_profiles_are_event_boundary_only": True,
+        "state_profile_count": len(profiles),
         "transactions_are_not_resistance_curve_points": True,
         "native_history_label": "PF MODEL-NATIVE DRIVING TRAJECTORY",
         "onset_label": "RELOAD-SEPARATED EFFECTIVE RESISTANCE CANDIDATES",
@@ -192,8 +327,10 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--campaign-root", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--expected-case-count", type=int)
     args = parser.parse_args()
-    print(json.dumps(analyze(args.campaign_root, args.out), indent=2, sort_keys=True))
+    print(json.dumps(analyze(args.campaign_root, args.out,
+                             expected_case_count=args.expected_case_count), indent=2, sort_keys=True))
     return 0
 
 
