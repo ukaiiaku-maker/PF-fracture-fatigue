@@ -184,14 +184,47 @@ def validate_preflights(root:Path,rows:list[dict])->None:
     for r in rows:
       if r["stage"]!="EXPLICIT_PREFLIGHT":continue
       p=Path(r["result_path"]); c=json.loads((p/"v10_2_30_fixed_deltaK_control.json").read_text()); k=json.loads((p/"kinetic_tip_cell_audit_v101.json").read_text())
-      rec=k.get("records",[]); returns=sum(float(x.get("physical_return_count_block",0) or 0) for x in rec)
+      rec=k.get("records",[])
+      def ledger_sum(fragment:str)->float:
+        return sum(float(value or 0.0) for record in rec
+          for key,value in record.get("coupled_hazard_ledger_delta",{}).items() if fragment in key)
+      physical_return=ledger_sum("mpz.cumulative_physical_returned_mobile[")
+      returned_mobile=ledger_sum("mpz.cumulative_returned_mobile[")
+      cancelled_slip=ledger_sum("mpz.cumulative_cancelled_source_slip[")
+      escaped=ledger_sum("mpz.cumulative_escaped_mobile[")
+      wake_transfer=ledger_sum("mpz.cumulative_source_slip_wake_transfer[")
+      emitted=ledger_sum("mpz.emitted_total")
+      gross_source=ledger_sum("mpz.cumulative_gross_source_activity")
+      final_mobile=float(rec[-1].get("state_mobile_count",0.0)) if rec else math.nan
+      final_retained=float(rec[-1].get("state_retained_count",0.0)) if rec else math.nan
+      population_residual=emitted-(final_mobile+final_retained+escaped+physical_return+wake_transfer)
+      scale=max(1.0,abs(emitted),abs(gross_source))
+      ledger_tol=1e-10*scale
+      return_source_match=(abs(physical_return-returned_mobile)<=ledger_tol and
+        abs(physical_return-cancelled_slip)<=ledger_tol)
+      conservation=(bool(rec) and abs(population_residual)<=ledger_tol and
+        physical_return>=-ledger_tol and physical_return<=emitted+ledger_tol and
+        escaped>=-ledger_tol and wake_transfer>=-ledger_tol and
+        final_mobile>=-ledger_tol and final_retained>=-ledger_tol and return_source_match)
+      atomic=bool(rec) and all(bool(x.get("coupled_hazard_geometry_preserved_before_event")) and
+        bool(x.get("coupled_hazard_stochastic_threshold_preserved_until_event")) for x in rec)
+      signed_engine=k.get("signed_burgers_shared_physics",{}).get("population_state")=="nonnegative_positive_and_negative_Burgers_species"
+      signed_access=bool(r["R"]<0 and r["R"]*r["kmax"]<0 and signed_engine)
       out.append({"job_id":r["job_id"],"option":r["option"],"R":r["R"],"Kmax":r["kmax"],"Kmin":r["R"]*r["kmax"],"deltaK":r["deltaK_driver_MPa_sqrt_m"],
         "waveform_exact":c.get("fixed_deltaK_exact_within_relative_1e-12"),"opening_only_cleavage":True,"opening_only_emission":True,
-        "physical_return_raw":returns,"positive_R_return_negligible":returns<=1e-12 if r["R"]>0 else None,
-        "negative_R_signed_transport_access":r["R"]<0,"conservation_pass":True,"atomic_transactions":True,"horizon_dependence_absent":True,
+        "physical_return_raw":physical_return,"returned_mobile_raw":returned_mobile,"cancelled_source_slip_raw":cancelled_slip,
+        "gross_source_activity_raw":gross_source,"escaped_mobile_raw":escaped,"wake_transfer_raw":wake_transfer,
+        "population_conservation_residual":population_residual,"return_source_ledger_match":return_source_match,
+        "return_not_above_emitted":physical_return<=emitted+ledger_tol,"retained_nonnegative":final_retained>=-ledger_tol,
+        "positive_R_return_negligible":physical_return<=1e-12 if r["R"]>0 else None,
+        "negative_R_signed_transport_access":signed_access,"conservation_pass":conservation,"atomic_transactions":atomic,
+        "horizon_dependence_absent":True,"horizon_independence_basis":"test_near_event_localization_is_independent_of_requested_horizon",
         "admitted_as_fatigue_result":False,"status":r["status"],"result_path":r["result_path"]})
     df=pd.DataFrame(out);df.to_parquet(root/"A_PT03_PT08_R_explicit_preflight_results.parquet",index=False)
-    if len(df)!=6 or not df.waveform_exact.all() or not df.conservation_pass.all() or not df.atomic_transactions.all():raise RuntimeError("explicit preflight gate failed")
+    negative=df[df.R<0]; positive=df[df.R>0]
+    if (len(df)!=6 or not df.waveform_exact.all() or not df.conservation_pass.all() or not df.atomic_transactions.all()
+      or not negative.negative_R_signed_transport_access.all() or not positive.positive_R_return_negligible.all()
+      or not df.return_source_ledger_match.all()):raise RuntimeError("explicit preflight gate failed")
 
 def lock(root:Path):
     path=root/"controller.lock"

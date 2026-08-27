@@ -57,3 +57,11 @@ def test_static_constant_load_attempt_is_fail_closed_and_rerun_fresh():
  assert "INVALID_CONSTANT_LOAD_STATIC_CONTROL" in text
  assert "reconcile_superseded_constant_load_controls" in text
  assert 'maximum_Kmax_driver_Pa_sqrt_m' in text
+
+def test_preflight_return_and_conservation_are_extracted_from_ledgers():
+ text=(ROOT/"scripts/complete_v10_2_30_R_nominal_deltaK_study.py").read_text()
+ assert 'mpz.cumulative_physical_returned_mobile[' in text
+ assert 'mpz.cumulative_cancelled_source_slip[' in text
+ assert 'population_conservation_residual' in text
+ assert 'return_source_ledger_match' in text
+ assert 'physical_return_count_block' not in text

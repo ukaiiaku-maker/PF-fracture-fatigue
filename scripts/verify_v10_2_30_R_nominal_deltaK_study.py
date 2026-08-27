@@ -27,6 +27,10 @@ def main()->int:
  check((~jobs.resumed.astype(bool)).all(),"resumed trajectory admitted",errors);check((jobs[jobs.reused==False].acceleration_mode=="explicit_only").all(),"unqualified acceleration admitted",errors)
  check(set(jobs.status).issubset({"PHYSICAL_TARGET_REACHED","REUSED_PHYSICAL_TARGET_REACHED"}),"nonphysical terminal admitted",errors)
  check(len(pre)==6 and (~pre.admitted_as_fatigue_result).all(),"preflight count/admission failure",errors)
+ check(pre.waveform_exact.all() and pre.conservation_pass.all() and pre.atomic_transactions.all(),"preflight waveform/conservation/atomicity failure",errors)
+ check(pre.return_source_ledger_match.all() and pre.return_not_above_emitted.all() and pre.retained_nonnegative.all(),"preflight return-ledger conservation failure",errors)
+ check(pre[pre.R<0].negative_R_signed_transport_access.all(),"negative-R signed transport was not demonstrated",errors)
+ check(pre[pre.R>0].positive_R_return_negligible.all(),"positive-R return is not negligible",errors)
  check(len(pts)==36 and pts.target_reached.all() and pts.stable_growth.all(),"primary developed matrix incomplete",errors)
  check(len(seed)==9 and seed.target_reached.all() and seed.stable_growth.all(),"paired-seed matrix incomplete",errors)
  check(len(jobs[jobs.stage=="CONSTANT_LOAD_CT"])==9 and len(windows)>0,"constant-load C(T) matrix incomplete",errors)
@@ -44,4 +48,3 @@ def main()->int:
  (root/"A_PT03_PT08_R_verification.json").write_text(json.dumps(payload,indent=2,sort_keys=True)+"\n");print(json.dumps(payload,indent=2))
  return 1 if errors else 0
 if __name__=="__main__":raise SystemExit(main())
-
