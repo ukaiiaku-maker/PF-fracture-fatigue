@@ -198,3 +198,9 @@ def test_failed_low_K_interval_has_a_fresh_midpoint_refinement_controller():
         "interrupted physical refinement cannot resume",
     ):
         assert phrase in controller
+
+
+def test_final_verifier_is_fail_closed_for_science_and_provenance_contracts():
+    verifier=(ROOT/"scripts/verify_v10_2_30_two_scale_virtual_CT.py").read_text()
+    for phrase in ("source row changes after source manifest frozen","anchor exceeds error gate without refinement","constant-load trajectory fitted rather than held out","virtual path leaves validated local domain","resumed physical trajectory admitted","global Paris law","tip radius","closure-corrected DeltaK_eff reported","Markdown/JSON decision mismatch","controller is not terminal","active two-scale worker remains"):
+        assert phrase in verifier

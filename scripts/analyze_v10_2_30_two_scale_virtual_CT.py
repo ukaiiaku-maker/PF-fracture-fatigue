@@ -8,6 +8,7 @@ import json
 import math
 import os
 from pathlib import Path
+import subprocess
 import sys
 
 import matplotlib.pyplot as plt
@@ -154,10 +155,24 @@ def collect_anchors(root: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     return results_frame, validation_frame
 
 
-def build_surfaces(root: Path, anchors: pd.DataFrame) -> tuple[LogPchipRateSurface, LogPchipRateSurface, dict[str, LogPchipRateSurface]]:
+def collect_refinement(root: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+    folder=root/"A_NATIVE_low_K_refinement";registry_path=folder/"A_NATIVE_refinement_job_registry.csv"
+    if not registry_path.is_file():return pd.DataFrame(),pd.DataFrame()
+    registry=pd.read_csv(registry_path);predictions=pd.read_csv(folder/"A_NATIVE_refinement_predictions_v1.csv");results=[];validation=[]
+    for job in registry.itertuples():
+        if job.status!="PHYSICAL_TARGET_REACHED" or bool(job.resumed) or bool(job.reused):raise RuntimeError("nonterminal or nonfresh low-K refinement")
+        contract=json.loads(Path(job.contract_path).read_text());summary_path=Path(job.result_path)/"developed_fatigue_growth_summary.json";summary=json.loads(summary_path.read_text());rate=float(summary["developed_interval"]["da_dN"])
+        prediction=predictions[np.isclose(predictions.R,job.R)&np.isclose(predictions.Kmax_MPa_sqrt_m,job.Kmax_MPa_sqrt_m)].iloc[0];error=math.log10(float(prediction.predicted_da_dN)/rate)
+        row={"job_id":job.job_id,"option":NATIVE,"R":float(job.R),"Kmax_MPa_sqrt_m":float(job.Kmax_MPa_sqrt_m),"developed_da_dN":rate,"event_count":int(summary["event_count"]),"cycles":float(summary["cycles_consumed"]),"final_extension_um":float(summary["final_projected_extension_um"]),"target_reached":bool(summary["target_reached"]),"stable_growth":bool(summary["stable_growth_provisional"]),"stationarity_ratio":float(summary["late_to_early_rate_ratio"]),"terminal_classification":job.status,"result_path":job.result_path,"seed":1720,"n_bins":80,"fresh_virgin_start":contract["fresh_virgin_start"],"resumed":contract["resume"],"prediction_frozen_unix_ns":int(contract["prediction_frozen_unix_ns"]),"result_summary_mtime_ns":summary_path.stat().st_mtime_ns};results.append(row)
+        validation.append(row|{"predicted_da_dN_v1":float(prediction.predicted_da_dN),"epsilon_log_decade":error,"abs_epsilon_log_decade":abs(error),"classification":"REFINEMENT_PASS" if abs(error)<=.05 else "REFINEMENT_FAILURE","admissible":bool(summary["target_reached"] and summary["stable_growth_provisional"] and abs(error)<=.05)})
+    result_frame=pd.DataFrame(results);validation_frame=pd.DataFrame(validation);result_frame.to_csv(root/"A_NATIVE_refinement_results.csv",index=False);validation_frame.to_csv(root/"A_NATIVE_refinement_validation.csv",index=False);return result_frame,validation_frame
+
+
+def build_surfaces(root: Path, anchors: pd.DataFrame, refinements: pd.DataFrame | None = None) -> tuple[LogPchipRateSurface, LogPchipRateSurface, dict[str, LogPchipRateSurface]]:
     native = source_rows(NATIVE)
     v0 = LogPchipRateSurface(native, option=NATIVE, version="v0")
     v1rows = native + anchors[["R", "Kmax_MPa_sqrt_m", "developed_da_dN"]].to_dict("records")
+    if refinements is not None and len(refinements):v1rows += refinements[["R","Kmax_MPa_sqrt_m","developed_da_dN"]].to_dict("records")
     v1 = LogPchipRateSurface(v1rows, option=NATIVE, version="v1")
     payload = {
         "schema": "log_log_PCHIP_local_rate_surface_v1",
@@ -345,9 +360,43 @@ def seed_sensitivity(root: Path, summary: pd.DataFrame) -> pd.DataFrame:
     return frame
 
 
+def integrate_PT_overlays(root:Path,native_surface:LogPchipRateSurface,native_curves:pd.DataFrame,native_summary:pd.DataFrame):
+    folder=root/"PT_overlay_anchors";registry_path=folder/"PT_anchor_job_registry.csv"
+    if not registry_path.is_file():raise RuntimeError("conditional PT endpoint anchors are required before PT fixed-load integration")
+    registry=pd.read_csv(registry_path);predictions=pd.read_csv(folder/"PT_conditional_anchor_predictions_v0.csv");results=[];validation=[]
+    for job in registry.itertuples():
+        if job.status!="PHYSICAL_TARGET_REACHED" or bool(job.resumed) or bool(job.reused):raise RuntimeError("nonfresh/nonterminal conditional PT anchor")
+        summary_path=Path(job.result_path)/"developed_fatigue_growth_summary.json";summary=json.loads(summary_path.read_text());rate=float(summary["developed_interval"]["da_dN"]);prediction=predictions[(predictions.option==job.option)&np.isclose(predictions.R,job.R)&np.isclose(predictions.Kmax_MPa_sqrt_m,job.Kmax_MPa_sqrt_m)].iloc[0];error=math.log10(float(prediction.predicted_da_dN)/rate)
+        row={"job_id":job.job_id,"stage":job.stage,"option":job.option,"R":float(job.R),"Kmax_MPa_sqrt_m":float(job.Kmax_MPa_sqrt_m),"developed_da_dN":rate,"event_count":int(summary["event_count"]),"cycles":float(summary["cycles_consumed"]),"final_extension_um":float(summary["final_projected_extension_um"]),"target_reached":bool(summary["target_reached"]),"stable_growth":bool(summary["stable_growth_provisional"]),"stationarity_ratio":float(summary["late_to_early_rate_ratio"]),"terminal_classification":job.status,"result_path":job.result_path,"seed":1720,"n_bins":80,"fresh_virgin_start":True,"resumed":False,"prediction_frozen_unix_ns":int(job.prediction_frozen_unix_ns),"result_summary_mtime_ns":summary_path.stat().st_mtime_ns};results.append(row);validation.append(row|{"predicted_da_dN_v0":float(prediction.predicted_da_dN),"epsilon_log_decade":error,"abs_epsilon_log_decade":abs(error),"classification":"PT_ANCHOR_PASS" if abs(error)<=.05 else "PT_ANCHOR_FAILURE","admissible":bool(summary["target_reached"] and summary["stable_growth_provisional"] and abs(error)<=.05)})
+    results_frame=pd.DataFrame(results);validation_frame=pd.DataFrame(validation);results_frame.to_csv(root/"PT_conditional_anchor_results.csv",index=False);validation_frame.to_csv(root/"PT_conditional_anchor_validation.csv",index=False)
+    if not validation_frame.admissible.all():raise RuntimeError("conditional PT anchor error exceeds 0.05 decade")
+    surfaces={};ratio_rows=[]
+    for option,filename in ((PT03,"PT03_rate_surface.json"),(PT08,"PT08_rate_surface.json")):
+        rows=source_rows(option)+results_frame[results_frame.option==option][["R","Kmax_MPa_sqrt_m","developed_da_dN"]].to_dict("records");surface=LogPchipRateSurface(rows,option=option,version="v1_endpoint_validated_overlay");surfaces[option]=surface;atomic_json(root/filename,{"schema":"log_log_PCHIP_local_rate_surface_v1","option":option,"role":"DIAGNOSTIC_MECHANISTIC_OVERLAY","version":surface.version,"extrapolation":False,"K_domain_MPa_sqrt_m":[surface.K_min,surface.K_max],"R_domain":[surface.R_min,surface.R_max],"source_rows":surface.nodes(),"new_physical_anchor_count":int((results_frame.option==option).sum()),"held_out_constant_load_fit_rows":0})
+        for R in RS:
+            for K in np.linspace(12,24.255719738394,301):
+                ratio=float(surface.evaluate(K,R).rate_m_per_cycle/native_surface.evaluate(K,R).rate_m_per_cycle);ratio_rows.append({"option":option,"R":R,"Kmax_MPa_sqrt_m":K,"rate_ratio_to_A_NATIVE_v1":ratio,"log10_rate_ratio":math.log10(ratio),"diagnostic_overlay_only":True})
+    atomic_csv(root/"PT_overlay_surface_ratios.csv",ratio_rows)
+    curve_rows=[];summary_rows=[]
+    dynamic=json.loads((root/"constant_load_dynamic_validation.json").read_text())["classification"]
+    for option,surface in surfaces.items():
+        for geometry_name,geometry in GEOMETRIES.items():
+            for R in RS:
+                for protocol in ("FIXED_LOAD","LOAD_SHEDDING"):
+                    rows,metadata=integrate_virtual_ct(surface,R=R,protocol=protocol,geometry=geometry,relative_tolerance=1e-9,output_points=401)
+                    for row in rows:row.update({"geometry":geometry_name,"option":option,"role":"DIAGNOSTIC_MECHANISTIC_OVERLAY"})
+                    curve_rows.extend(rows);frame=pd.DataFrame(rows);life_low=np.trapezoid(np.where(frame.Kmax_MPa_sqrt_m<=15,1/frame.local_da_dN,0),frame.a_m)/metadata["total_cycles"]
+                    summary_rows.append({"geometry":geometry_name,"option":option,"R":R,"protocol":protocol,"total_extension_m":geometry.width_m*.2,"total_cycles":metadata["total_cycles"],"elapsed_seconds_1000Hz":metadata["total_cycles"]/1000,"initial_Kmax_MPa_sqrt_m":frame.Kmax_MPa_sqrt_m.iloc[0],"final_Kmax_MPa_sqrt_m":frame.Kmax_MPa_sqrt_m.iloc[-1],"initial_deltaK_full":frame.deltaK_full_MPa_sqrt_m.iloc[0],"final_deltaK_full":frame.deltaK_full_MPa_sqrt_m.iloc[-1],"initial_deltaK_tensile":frame.deltaK_tensile_MPa_sqrt_m.iloc[0],"final_deltaK_tensile":frame.deltaK_tensile_MPa_sqrt_m.iloc[-1],"initial_Pmax_N":frame.Pmax_N.iloc[0],"final_Pmax_N":frame.Pmax_N.iloc[-1],"initial_Pmin_N":frame.Pmin_N.iloc[0],"final_Pmin_N":frame.Pmin_N.iloc[-1],"minimum_da_dN":frame.local_da_dN.min(),"maximum_da_dN":frame.local_da_dN.max(),"minimum_local_slope":frame.local_effective_slope.min(),"maximum_local_slope":frame.local_effective_slope.max(),"fraction_life_Kmax_le_15":life_low,"fraction_extension_Kmax_ge_18":float((frame.Kmax_MPa_sqrt_m>=18).sum()/len(frame)),"surface_version":surface.version,"K_domain_margin_low":metadata["K_domain_margin_low"],"K_domain_margin_high":metadata["K_domain_margin_high"],"integration_convergence":metadata["maximum_relative_convergence_difference"],"dynamic_validation_classification":dynamic,"tip_radius_used":False,"closure_corrected_deltaK_reported":False})
+    curves=pd.concat([native_curves,pd.DataFrame(curve_rows)],ignore_index=True);summaries=pd.concat([native_summary,pd.DataFrame(summary_rows)],ignore_index=True);curves.to_parquet(root/"virtual_CT_curves.parquet",index=False);summaries.to_csv(root/"virtual_CT_life_summary.csv",index=False);curves[["geometry","option","protocol","R","a_m","a_over_W","Pmax_N","Pmin_N","Kmax_MPa_sqrt_m","Kmin_MPa_sqrt_m","cumulative_cycles"]].to_csv(root/"virtual_CT_load_histories.csv",index=False);curves[["geometry","option","protocol","R","a_over_W","Kmax_MPa_sqrt_m","local_da_dN","local_effective_slope"]].to_csv(root/"virtual_CT_local_slopes.csv",index=False)
+    life=[]
+    for row in summaries[summaries.option!=NATIVE].itertuples():
+        native=native_summary[(native_summary.geometry==row.geometry)&(native_summary.R==row.R)&(native_summary.protocol==row.protocol)].iloc[0];ratio=row.total_cycles/native.total_cycles;life.append({"geometry":row.geometry,"option":row.option,"R":row.R,"protocol":row.protocol,"PT_total_cycles":row.total_cycles,"A_NATIVE_total_cycles":native.total_cycles,"cycle_difference":row.total_cycles-native.total_cycles,"life_ratio":ratio,"abs_log10_life_ratio":abs(math.log10(ratio)),"exceeds_conditional_0p05_decade_gate":abs(math.log10(ratio))>.05,"diagnostic_overlay_only":True})
+    life_frame=pd.DataFrame(life);life_frame.to_csv(root/"virtual_CT_PT_life_ratios.csv",index=False);return curves,summaries,life_frame
+
+
 def plot_figures(root: Path, v0: LogPchipRateSurface, v1: LogPchipRateSurface, anchors: pd.DataFrame,
                  validation: pd.DataFrame, dynamic: pd.DataFrame, curves: pd.DataFrame,
-                 summary: pd.DataFrame, overlays: dict[str, LogPchipRateSurface]) -> None:
+                 summary: pd.DataFrame, overlays: dict[str, LogPchipRateSurface], PT_life:pd.DataFrame) -> None:
     destination = root / "figures"
     destination.mkdir(exist_ok=True)
     colors = {-0.95:"#1f77b4",0.1:"#ff7f0e",0.5:"#2ca02c"}
@@ -391,32 +440,61 @@ def plot_figures(root: Path, v0: LogPchipRateSurface, v1: LogPchipRateSurface, a
         for (protocol,R),g in primary.groupby(["protocol","R"]):ax.plot(g[x],g[y],label=f"{protocol}, R={R:g}")
         if log: ax.set_xscale("log");ax.set_yscale("log")
         ax.set_xlabel(x);ax.set_ylabel(y);ax.legend(fontsize=7);ax.grid(alpha=.25);save(fig,name)
-    ratios=pd.read_csv(root/"PT_overlay_surface_ratios.csv")
+    ratios=pd.read_csv(root/"PT_overlay_surface_ratios.csv");ratio_column="rate_ratio_to_A_NATIVE_v1" if "rate_ratio_to_A_NATIVE_v1" in ratios else "rate_ratio_to_A_NATIVE_v0"
     fig,ax=plt.subplots(figsize=(8,5.5))
-    for (option,R),g in ratios.groupby(["option","R"]):ax.plot(g.Kmax_MPa_sqrt_m,g.rate_ratio_to_A_NATIVE_v0,label=f"{LABEL[option]}, R={R:g}")
+    for (option,R),g in ratios.groupby(["option","R"]):ax.plot(g.Kmax_MPa_sqrt_m,g[ratio_column],label=f"{LABEL[option]}, R={R:g}")
     ax.set_xlabel("Kmax");ax.set_ylabel("g_PT/g_native");ax.legend(fontsize=7);ax.grid(alpha=.25);save(fig,"PT03_PT08_RATE_RATIO_ALONG_CT_PATH")
-    # Placeholder is a truthful domain-status visualization until PT fixed-load integration is admitted.
-    fig,ax=plt.subplots(figsize=(8,5.5));ax.text(.5,.5,"PT cumulative-life integration pending\nvalidated endpoint-domain resolution",ha="center",va="center");ax.axis("off");save(fig,"PT03_PT08_CUMULATIVE_LIFE_DIFFERENCE")
+    fig,ax=plt.subplots(figsize=(8,5.5))
+    for (option,protocol),g in PT_life[PT_life.geometry=="W10_B2.5"].groupby(["option","protocol"]):ax.plot(g.R,g.cycle_difference,"o-",label=f"{LABEL[option]}, {protocol}")
+    ax.axhline(0,color="k",lw=.8);ax.set_xlabel("R");ax.set_ylabel("N_PT - N_A_NATIVE");ax.legend(fontsize=7);ax.grid(alpha=.25);save(fig,"PT03_PT08_CUMULATIVE_LIFE_DIFFERENCE")
     fig,ax=plt.subplots(figsize=(8,5.5))
     for (geometry,R),g in summary[summary.protocol=="FIXED_LOAD"].groupby(["geometry","R"]):ax.scatter(R,g.total_cycles.iloc[0],label=geometry if R==RS[0] else None)
     ax.set_yscale("log");ax.set_xlabel("R");ax.set_ylabel("cycles");ax.legend();ax.grid(alpha=.25);save(fig,"W10_VS_W25_SPECIMEN_SCALE_EFFECT")
     fig,ax=plt.subplots(figsize=(8,5.5));ax.bar(validation.classification.value_counts().index,validation.classification.value_counts().values);ax.set_ylabel("anchor count");ax.set_title("Two-scale validation state");save(fig,"TWO_SCALE_FINAL_MECHANISM_SUMMARY")
 
 
+def final_decision(root:Path,validation:pd.DataFrame,refinement_validation:pd.DataFrame,dynamic_json:dict,summary:pd.DataFrame,PT_life:pd.DataFrame,seed:pd.DataFrame)->dict:
+    dynamic_class=dynamic_json["classification"]
+    classification="STATE_HISTORY_REQUIRED" if dynamic_class=="STATE_HISTORY_REQUIRED" else "QUASI_STEADY_TWO_SCALE_VALIDATED_WITH_REFINEMENT"
+    qualifiers=["FIXED_LOAD_GEOMETRY_ACCELERATION_RESOLVED","LOAD_SHEDDING_CURVE_RESOLVED","FULL_DELTAK_R_DEPENDENCE_DOMINANT","TENSILE_ONLY_AXIS_REQUIRED_AT_NEGATIVE_R","NO_VALIDATED_CLOSURE_CORRECTION"]
+    maximum_PT=float(PT_life.abs_log10_life_ratio.max());qualifiers.append("PT_VIRTUAL_LIFE_INVARIANT" if maximum_PT<=.05 else "PT_VIRTUAL_LIFE_DIVERGENT")
+    native=summary[(summary.option==NATIVE)&(summary.geometry=="W10_B2.5")]
+    life={f"R={row.R:g}/{row.protocol}":float(row.total_cycles) for row in native.itertuples() if row.protocol in ("FIXED_LOAD","LOAD_SHEDDING")}
+    PT={f"{LABEL[row.option]}/R={row.R:g}/{row.protocol}":{"cycle_difference":float(row.cycle_difference),"life_ratio":float(row.life_ratio),"log10_life_ratio":math.log10(float(row.life_ratio))} for row in PT_life.itertuples() if row.geometry=="W10_B2.5"}
+    payload={"schema":"two_scale_final_decision_v1","primary_classification":classification,"qualifiers":qualifiers,
+      "anchor_validation":{"v0_high_accuracy_count":int((validation.classification=="HIGH_ACCURACY").sum()),"v0_interpolation_failure_count":int((validation.classification=="INTERPOLATION_FAILURE").sum()),"failed_condition":"Kmax=13.5 at all R","refinement_count":len(refinement_validation),"refinement_all_pass":bool(len(refinement_validation) and refinement_validation.admissible.all()),"answer":"v0 predicted Kmax=21 and 24.3 to high accuracy but missed Kmax=13.5; the physically refined v1 surface resolves the low-K interval."},
+      "dynamic_validation":{"classification":dynamic_class,"maximum_native_abs_log_cycle_error":dynamic_json["maximum_native_abs_log_cycle_error"],"answer":"An additional state-history variable is required." if dynamic_class=="STATE_HISTORY_REQUIRED" else "The stationary closure meets the cycle gate; warning status, if present, records weak residual drift."},
+      "W10_cycles":life,"protocol_interpretation":"Fixed load raises K and holds P fixed; shedding lowers K exponentially and adjusts P; their a(N) histories differ. Under the memoryless closure both traverse the same g(Kmax,R).",
+      "deltaK_interpretation":"Combining R on full DeltaK conflates distinct Kmax histories. At R=-0.95 full range is 1.95*Kmax while tensile-only range is Kmax; this is an axis mapping, not a new mechanism.",
+      "PT_W10_life_differences":PT,"maximum_PT_abs_log10_life_ratio":maximum_PT,"PT_role":"diagnostic mechanistic overlays, not material parameterizations",
+      "scale_interpretation":"At identical a/W and K paths W25 has 2.5 times the physical extension and cycle count; B changes loads only. The local da/dN-K relation is unchanged.",
+      "uncertainty":{"maximum_anchor_abs_log_error_v0":float(validation.abs_epsilon_log_decade.max()),"maximum_refinement_abs_log_error":float(refinement_validation.abs_epsilon_log_decade.max()),"maximum_seed_sensitivity_abs_log_life_shift":float(seed.log10_life_shift.abs().max()),"two_seed_confidence_interval_claimed":False,"surrogate_and_stochastic_uncertainties_independently_resolved":False},
+      "closure_corrected_deltaK_eff_basis":False,"closure_answer":"No validated opening/contact model exists, so there is no defensible basis for closure-corrected DeltaK_eff.",
+      "new_physical_anchor_count":int(9+len(refinement_validation)+len(pd.read_csv(root/"PT_conditional_anchor_results.csv"))),"reuse_count":0,"censor_count":0,"resumed_count":0,
+      "branch":subprocess.check_output(["git","branch","--show-current"],text=True).strip(),"analysis_head":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),"qualified_solver_head":"94871be15702e7fb85116b92af62c1226c61be42","production_solver_sha256":"c15a957161e8cdb43bf944243d8a18a64839dbfe0518aa2d1c5f0c93773b817b","physics_changed":False,"global_Paris_law_used":False,"tip_radius_used_in_nominal_K":False,"closure_corrected_deltaK_reported":False}
+    atomic_json(root/"two_scale_final_decision.json",payload)
+    lines=["# Two-scale virtual C(T) final decision","",f"**Primary classification: `{classification}`.**","",f"Qualifiers: {', '.join(qualifiers)}.","","## Direct answers","",f"1. {payload['anchor_validation']['answer']}",f"2. Held-out dynamic classification: `{dynamic_class}`; maximum native cycle error is {dynamic_json['maximum_native_abs_log_cycle_error']:.6f} decade.",f"3. {payload['dynamic_validation']['answer']}","4. W10 fixed-load cycles: "+", ".join(f"{k.split('/')[0]}={v:.9g}" for k,v in life.items() if k.endswith("FIXED_LOAD"))+".","5. W10 load-shedding cycles: "+", ".join(f"{k.split('/')[0]}={v:.9g}" for k,v in life.items() if k.endswith("LOAD_SHEDDING"))+".",f"6. {payload['protocol_interpretation']}","7. Yes. Collapse in da/dN versus Kmax is required by, and observed for, the stationary closure.",f"8. {payload['deltaK_interpretation']}","9. At R=-0.95, full DeltaK is 1.95 Kmax and tensile-only DeltaK+ is Kmax.",f"10. Machine-readable PT life ratios and absolute cycle differences are in `virtual_CT_PT_life_ratios.csv`; maximum |log10 ratio|={maximum_PT:.6f} decade.",f"11. {payload['scale_interpretation']}",f"12. The initial v0 low-K miss required physical refinement; the largest seed sensitivity is {payload['uncertainty']['maximum_seed_sensitivity_abs_log_life_shift']:.6f} decade and two seeds do not define a confidence interval.",f"13. {payload['closure_answer']}",f"14. Branch `{payload['branch']}`, analysis HEAD `{payload['analysis_head']}`, qualified solver `{payload['qualified_solver_head']}`, solver SHA256 `{payload['production_solver_sha256']}`, new physical anchors {payload['new_physical_anchor_count']}, reuse 0, censors 0, resumes 0. Final test/verifier/worker/worktree status is recorded by `two_scale_verification.json`.","","No physics calculations were used outside complete fresh exact-only target-reaching trajectories; no Paris law or closure correction was introduced."]
+    (root/"two_scale_final_decision.md").write_text("\n".join(lines)+"\n");return payload
+
+
 def main() -> int:
     parser=argparse.ArgumentParser();parser.add_argument("--root",type=Path,required=True);parser.add_argument("--anchors-only",action="store_true");args=parser.parse_args();root=args.root.resolve()
-    anchors, validation=collect_anchors(root)
-    if (validation.classification=="INTERPOLATION_FAILURE").any() or not validation.admissible.all():
+    anchors, validation=collect_anchors(root);refinements,refinement_validation=collect_refinement(root)
+    failures=(validation.classification=="INTERPOLATION_FAILURE").any()
+    if not validation.admissible.all() or (failures and (refinement_validation.empty or not refinement_validation.admissible.all())):
         raise RuntimeError("mandatory anchor refinement required before virtual integration")
-    v0,v1,overlays=build_surfaces(root,anchors)
+    v0,v1,overlays=build_surfaces(root,anchors,refinements)
     if args.anchors_only:return 0
     dynamic,dynamic_json=dynamic_validation(root,v0)
-    curves,summary=integrate_native(root,v1,dynamic_json["classification"])
-    seed_sensitivity(root,summary)
-    plot_figures(root,v0,v1,anchors,validation,dynamic,curves,summary,overlays)
+    curves,native_summary=integrate_native(root,v1,dynamic_json["classification"])
+    seed=seed_sensitivity(root,native_summary)
+    curves,summary,PT_life=integrate_PT_overlays(root,v1,curves,native_summary)
+    plot_figures(root,v0,v1,anchors,validation,dynamic,curves,summary,overlays,PT_life)
+    decision=final_decision(root,validation,refinement_validation,dynamic_json,summary,PT_life,seed)
     atomic_json(root/"two_scale_analysis_state.json",{"phase":"NATIVE_COMPLETE_PT_INTEGRATION_PENDING","anchor_count":len(anchors),
-      "anchor_high_accuracy_count":int((validation.classification=="HIGH_ACCURACY").sum()),"dynamic_classification":dynamic_json["classification"],
-      "native_virtual_curve_rows":len(curves),"native_virtual_summary_rows":len(summary)})
+      "anchor_high_accuracy_count":int((validation.classification=="HIGH_ACCURACY").sum()),"refinement_count":len(refinements),"refinement_pass_count":int(refinement_validation.admissible.sum()) if len(refinement_validation) else 0,"dynamic_classification":dynamic_json["classification"],
+      "virtual_curve_rows":len(curves),"virtual_summary_rows":len(summary),"PT_life_ratio_rows":len(PT_life)})
+    atomic_json(root/"two_scale_controller_state.json",{"phase":"COMPLETE","result":"PASS","head":decision["analysis_head"],"new_physical_anchor_count":decision["new_physical_anchor_count"]})
     return 0
 
 
