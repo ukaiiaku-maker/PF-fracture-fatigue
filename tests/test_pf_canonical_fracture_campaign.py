@@ -337,6 +337,25 @@ def test_v2_lean_output_policy_retains_final_state_and_trajectory_contract():
     assert "'final_fronts': final_payload" in source
 
 
+def test_v2_launcher_derives_matrix_provenance_from_membership_flags():
+    base = {"case_id": "case"}
+    assert runner.analysis_matrix_label({
+        **base, "is_orientation_matrix_case": "True",
+        "is_rate_matrix_case": "False",
+    }) == "CANONICAL_SINGLE_CRACK_THETA"
+    assert runner.analysis_matrix_label({
+        **base, "is_orientation_matrix_case": "False",
+        "is_rate_matrix_case": "True",
+    }) == "CANONICAL_STRAIN_RATE"
+    assert runner.analysis_matrix_label({
+        **base, "is_orientation_matrix_case": "True",
+        "is_rate_matrix_case": "True",
+    }) == "CANONICAL_ORIENTATION_AND_RATE_SHARED"
+    assert runner.analysis_matrix_label({
+        **base, "matrix": "CANONICAL_SINGLE_CRACK_THETA",
+    }) == "CANONICAL_SINGLE_CRACK_THETA"
+
+
 def test_storage_accounting_closes():
     path = Path("pf_storage_reclaimed_v1.csv")
     row = next(csv.DictReader(path.open()))

@@ -104,6 +104,25 @@ def case_id(row: dict[str, str]) -> str:
     )
 
 
+def _flag(value: Any) -> bool:
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def analysis_matrix_label(row: dict[str, str]) -> str:
+    """Return a provenance label for V1 rows or unique-condition V2 rows."""
+    if row.get("matrix"):
+        return row["matrix"]
+    orientation = _flag(row.get("is_orientation_matrix_case", False))
+    rate = _flag(row.get("is_rate_matrix_case", False))
+    if orientation and rate:
+        return "CANONICAL_ORIENTATION_AND_RATE_SHARED"
+    if orientation:
+        return "CANONICAL_SINGLE_CRACK_THETA"
+    if rate:
+        return "CANONICAL_STRAIN_RATE"
+    raise ValueError(f"case has no canonical analysis membership: {case_id(row)}")
+
+
 def select_rows(rows: list[dict[str, str]], stage: str) -> list[dict[str, str]]:
     if stage == "all":
         return rows
@@ -255,7 +274,7 @@ def launch_one(row: dict[str, str], *, outroot: Path, registry: Path, selection:
         "physical_condition_id": row.get("physical_condition_id", identifier),
         "is_orientation_matrix_case": row.get("is_orientation_matrix_case", ""),
         "is_rate_matrix_case": row.get("is_rate_matrix_case", ""),
-        "matrix": row["matrix"],
+        "matrix": analysis_matrix_label(row),
         "material_class": row["material_class"],
         "candidate_id": registry_row["candidate_id"],
         "parameter_option": registry_row["option_key"],
