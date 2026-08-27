@@ -168,3 +168,19 @@ def test_analysis_holds_dynamic_controls_out_and_reports_only_defined_K_ranges()
         'STATE_HISTORY_REQUIRED',
     ):
         assert phrase in analysis
+
+
+def test_conditional_PT_controller_resolves_endpoint_without_resume_or_extrapolated_admission():
+    controller = (ROOT / "scripts/complete_v10_2_30_two_scale_PT_anchors.py").read_text()
+    for phrase in (
+        "FIRST_CONDITIONAL",
+        "ENDPOINT_DOMAIN_RESOLUTION",
+        "FIXED_LOAD_ENDPOINT_DOMAIN_AMBIGUITY",
+        '"fresh_virgin_start":True',
+        '"resume":False',
+        'V10230_HIGH_CYCLE_EXPLICIT_ONLY',
+        "conditional PT anchors cannot precede nine terminal native anchors",
+        "PT first conditional interpolation requires midpoint refinement",
+        "interrupted conditional PT physics cannot resume",
+    ):
+        assert phrase in controller
