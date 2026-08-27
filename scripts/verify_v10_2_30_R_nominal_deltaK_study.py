@@ -21,7 +21,7 @@ def main()->int:
  for n in REQUIRED:check((root/n).is_file() and (root/n).stat().st_size>0,f"missing artifact {n}",errors)
  for n in FIGURES:check((root/"figures"/f"{n}.png").is_file(),f"missing figure {n}",errors)
  if errors: print(json.dumps({"verifier":"FAIL","errors":errors},indent=2));return 1
- jobs=pd.read_csv(root/"A_PT03_PT08_R_job_registry.csv");pre=pd.read_parquet(root/"A_PT03_PT08_R_explicit_preflight_results.parquet");pts=pd.read_csv(root/"A_PT03_PT08_R_developed_points.csv");seed=pd.read_csv(root/"A_PT03_PT08_R_second_seed_points.csv");fits=pd.read_csv(root/"A_PT03_PT08_R_paris_analysis.csv");tr=pd.read_csv(root/"A_PT03_PT08_local_to_nominal_K_transfer.csv");windows=pd.read_csv(root/"A_PT03_PT08_constant_load_CT_windows.csv")
+ jobs=pd.read_csv(root/"A_PT03_PT08_R_job_registry.csv");pre=pd.read_parquet(root/"A_PT03_PT08_R_explicit_preflight_results.parquet");pts=pd.read_csv(root/"A_PT03_PT08_R_developed_points.csv");seed=pd.read_csv(root/"A_PT03_PT08_R_second_seed_points.csv");fits=pd.read_csv(root/"A_PT03_PT08_R_paris_analysis.csv");slopes=pd.read_csv(root/"A_PT03_PT08_R_local_slopes.csv");ratios=pd.read_csv(root/"A_PT03_PT08_R_PT_native_rate_ratios.csv");states=pd.read_parquet(root/"A_PT03_PT08_R_state_histories.parquet");events=pd.read_csv(root/"A_PT03_PT08_R_event_results.csv");tr=pd.read_csv(root/"A_PT03_PT08_local_to_nominal_K_transfer.csv");windows=pd.read_csv(root/"A_PT03_PT08_constant_load_CT_windows.csv");geometry=pd.read_csv(root/"A_PT03_PT08_geometry_sensitivity.csv")
  prov=json.loads((root/"A_PT03_PT08_R_provenance_manifest.json").read_text());sem=json.loads((root/"deltaK_semantics_audit.json").read_text());decision=json.loads((root/"A_PT03_PT08_R_final_decision.json").read_text());md=(root/"A_PT03_PT08_R_final_decision.md").read_text()
  check(len(jobs)==60,"job registry must contain 60 rows (45 new, 15 reuse)",errors);check(jobs.job_id.nunique()==len(jobs),"duplicate job identity",errors)
  check((~jobs.resumed.astype(bool)).all(),"resumed trajectory admitted",errors);check((jobs[jobs.reused==False].acceleration_mode=="explicit_only").all(),"unqualified acceleration admitted",errors)
@@ -31,6 +31,8 @@ def main()->int:
  check(pre.return_source_ledger_match.all() and pre.return_not_above_emitted.all() and pre.retained_nonnegative.all(),"preflight return-ledger conservation failure",errors)
  check(pre[pre.R<0].negative_R_signed_transport_access.all(),"negative-R signed transport was not demonstrated",errors)
  check(pre[pre.R>0].positive_R_return_negligible.all(),"positive-R return is not negligible",errors)
+ pt08=pre[(pre.R<0)&pre.option.astype(str).str.contains("PT_08")].physical_return_raw.iloc[0];pt03=pre[(pre.R<0)&pre.option.astype(str).str.contains("PT_03")].physical_return_raw.iloc[0]
+ check(pt08>pt03>0 and pre[pre.R>0].physical_return_raw.abs().max()<=1e-12,"preflight physical-return hierarchy is not ledger supported",errors)
  check(len(pts)==36 and pts.target_reached.all() and pts.stable_growth.all(),"primary developed matrix incomplete",errors)
  check(len(seed)==9 and seed.target_reached.all() and seed.stable_growth.all(),"paired-seed matrix incomplete",errors)
  check(len(jobs[jobs.stage=="CONSTANT_LOAD_CT"])==9 and len(windows)>0,"constant-load C(T) matrix incomplete",errors)
@@ -39,6 +41,12 @@ def main()->int:
  check((~tr.tip_radius_used.astype(bool)).all() and (~tr.fit_from_growth.astype(bool)).all(),"nominal K improperly uses tip radius or growth fit",errors)
  check(not decision["closure_corrected_deltaK_reported"],"unvalidated closure-corrected DeltaK reported",errors)
  check(all((r.admissible_points>=3) or pd.isna(r.m) for r in fits.itertuples()),"global exponent reported with fewer than three points",errors)
+ provenance_columns={"branch","head","analysis_head","production_solver_hash","common_physics_hash","composite_hash","n_bins","seed","temperature_K","frequency_Hz","result_path","terminal_classification","acceleration_mode","stationarity_classification"}
+ for name,table in {"job_registry":jobs,"preflight":pre,"developed":pts,"second_seed":seed,"states":states,"events":events,"fits":fits,"slopes":slopes,"ratios":ratios,"transfer":tr,"constant_windows":windows,"geometry":geometry}.items():
+  check(provenance_columns.issubset(table.columns),f"{name} lacks reconstructable row provenance",errors)
+ check(len(geometry)==18 and {"W10mm","W25mm"}==set(geometry.geometry),"geometry sensitivity slope/curvature matrix incomplete",errors)
+ check({"local_m_to_next_W10","local_m_to_next_W25","curvature_W10","curvature_W25"}.issubset(windows.columns),"constant-load window slope/curvature analysis missing",errors)
+ check(decision.get("schema")=="A_PT03_PT08_R_final_decision_v2" and "APPARENT_DELTAK_AXIS_MAPPING_ONLY" in decision.get("mechanism_qualifiers",[]),"final quantitative decision schema/qualifier missing",errors)
  check(f"`{decision['primary_classification']}`" in md,"Markdown/JSON decision mismatch",errors)
  diff=subprocess.run(["git","diff","--check"],capture_output=True,text=True);check(diff.returncode==0,"git diff --check failed",errors)
  status=subprocess.check_output(["git","status","--short"],text=True).strip();check(a.allow_dirty_controller or not status,"worktree not clean",errors)

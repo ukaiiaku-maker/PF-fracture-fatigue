@@ -180,6 +180,8 @@ def run_stage(root:Path,rows:list[dict],stages:set[str],head:str,workers:int)->N
         time.sleep(10)
 
 def validate_preflights(root:Path,rows:list[dict])->None:
+    provenance=json.loads((root/"A_PT03_PT08_R_provenance_manifest.json").read_text())
+    variants={x["composite_candidate_id"]:x for x in provenance["variants"]}
     out=[]
     for r in rows:
       if r["stage"]!="EXPLICIT_PREFLIGHT":continue
@@ -219,7 +221,12 @@ def validate_preflights(root:Path,rows:list[dict])->None:
         "positive_R_return_negligible":physical_return<=1e-12 if r["R"]>0 else None,
         "negative_R_signed_transport_access":signed_access,"conservation_pass":conservation,"atomic_transactions":atomic,
         "horizon_dependence_absent":True,"horizon_independence_basis":"test_near_event_localization_is_independent_of_requested_horizon",
-        "admitted_as_fatigue_result":False,"status":r["status"],"result_path":r["result_path"]})
+        "admitted_as_fatigue_result":False,"status":r["status"],"result_path":r["result_path"],
+        "branch":r["branch"],"head":r["trajectory_head"],"analysis_head":r["analysis_head"],
+        "production_solver_hash":r["production_solver_hash"],"common_physics_hash":r["common_physics_hash"],
+        "composite_hash":variants[r["option"]]["complete_composite_material_hash"],"n_bins":r["n_bins"],"seed":r["seed"],
+        "temperature_K":r["temperature_K"],"frequency_Hz":r["frequency_Hz"],"W_m":0.01,"B_m":0.0025,
+        "terminal_classification":r["status"],"acceleration_mode":r["acceleration_mode"],"stationarity_classification":"PREFLIGHT_NOT_FATIGUE"})
     df=pd.DataFrame(out);df.to_parquet(root/"A_PT03_PT08_R_explicit_preflight_results.parquet",index=False)
     negative=df[df.R<0]; positive=df[df.R>0]
     if (len(df)!=6 or not df.waveform_exact.all() or not df.conservation_pass.all() or not df.atomic_transactions.all()
@@ -269,6 +276,38 @@ def reconcile_superseded_constant_load_controls(root:Path,rows:list[dict])->None
         path=root/"invalid_constant_load_attempts.json"; prior=json.loads(path.read_text()) if path.is_file() else []
         atomic_json(path,prior+invalid)
 
+def enrich_registry_provenance(root:Path,rows:list[dict],head:str)->None:
+    provenance=json.loads((root/"A_PT03_PT08_R_provenance_manifest.json").read_text())
+    variants={x["composite_candidate_id"]:x for x in provenance["variants"]}
+    prior_state=json.loads((OLD/"A_native_plus_8PT_study_controller_state.json").read_text())
+    prior_head=prior_state.get("solver_head")
+    if not prior_head:
+        raise RuntimeError("prior controller state does not identify the reused trajectory HEAD")
+    provenance["analysis_head"]=head
+    provenance["reused_trajectory_head"]=prior_head
+    atomic_json(root/"A_PT03_PT08_R_provenance_manifest.json",provenance)
+    for row in rows:
+        attempt=int(float(row.get("attempt",0) or 0))
+        contract_path=root/"job_contracts"/f'{row["job_id"]}__attempt{attempt}.json'
+        if bool(row.get("reused")):
+            trajectory_head=prior_head
+        elif contract_path.is_file():
+            trajectory_head=json.loads(contract_path.read_text()).get("solver_head")
+        else:
+            trajectory_head=None
+        if row.get("status") in {"PHYSICAL_TARGET_REACHED","REUSED_PHYSICAL_TARGET_REACHED"} and not trajectory_head:
+            raise RuntimeError(f'no authoritative trajectory HEAD for terminal job {row["job_id"]}')
+        summary_path=Path(str(row["result_path"]))/"developed_fatigue_growth_summary.json"
+        stationarity="PREFLIGHT_NOT_FATIGUE" if row["stage"]=="EXPLICIT_PREFLIGHT" else "NOT_TERMINAL"
+        if summary_path.is_file() and row["stage"]!="EXPLICIT_PREFLIGHT":
+            summary=json.loads(summary_path.read_text())
+            stationarity="STABLE" if summary.get("stable_growth_provisional") else "UNSTABLE"
+        row.update({"branch":BRANCH,"trajectory_head":trajectory_head,"analysis_head":head,
+          "production_solver_hash":provenance["production_solver_hash"],"common_physics_hash":provenance["common_physics_hash"],
+          "composite_hash":variants[row["option"]]["complete_composite_material_hash"],"Kmax_MPa_sqrt_m":row["kmax"],
+          "Kmin_MPa_sqrt_m":row["R"]*row["kmax"],"W_m":0.01,"B_m":0.0025,
+          "terminal_classification":row["status"],"stationarity_classification":stationarity})
+
 def main()->int:
     ap=argparse.ArgumentParser();ap.add_argument("--root",type=Path,default=Path("runs/A_native_PT03_PT08_R_nominal_deltaK_v1"));ap.add_argument("--workers",type=int,default=3);a=ap.parse_args()
     if not 1<=a.workers<=3:raise SystemExit("workers must be 1..3")
@@ -277,6 +316,7 @@ def main()->int:
     rows=pd.read_csv(root/"A_PT03_PT08_R_job_registry.csv").to_dict("records") if (root/"A_PT03_PT08_R_job_registry.csv").is_file() else initialize(root,head)
     reconcile_superseded_constant_load_controls(root,rows)
     reconcile_prephysics_launch_failures(rows)
+    enrich_registry_provenance(root,rows,head)
     atomic_csv(root/"A_PT03_PT08_R_job_registry.csv",rows)
     lk=lock(root)
     try:

@@ -65,3 +65,11 @@ def test_preflight_return_and_conservation_are_extracted_from_ledgers():
  assert 'population_conservation_residual' in text
  assert 'return_source_ledger_match' in text
  assert 'physical_return_count_block' not in text
+
+def test_analysis_reports_constant_load_geometry_slopes_and_row_provenance():
+ analysis=(ROOT/"scripts/analyze_v10_2_30_R_nominal_deltaK_study.py").read_text()
+ verifier=(ROOT/"scripts/verify_v10_2_30_R_nominal_deltaK_study.py").read_text()
+ for phrase in ["local_m_to_next_{geometry}","deltaK_nominal_full_mid_W25_MPa_sqrt_m","apparent_curvature","APPARENT_DELTAK_AXIS_MAPPING_ONLY"]:
+  assert phrase in analysis
+ for phrase in ["reconstructable row provenance","geometry sensitivity slope/curvature matrix incomplete","physical-return hierarchy"]:
+  assert phrase in verifier
