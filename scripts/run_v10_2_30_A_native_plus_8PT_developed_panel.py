@@ -28,7 +28,7 @@ def make_registry(root):
     atomic_csv(rows,root/'A_native_plus_8PT_developed_job_registry.csv'); return rows
 
 def run_one(row,root,registry_path):
-    out=Path(row['result_path']); out.mkdir(parents=True,exist_ok=True)
+    out=Path(row["result_path"]); out.parent.mkdir(parents=True,exist_ok=True)
     env=os.environ.copy(); env.update({'PYTHON_BIN':PY,'CONDA_ENV':'arrhenius-sharp-front-v10-codex','CONDA_DEFAULT_ENV':'arrhenius-sharp-front-v10-codex',
       'EXPECTED_BRANCH':BRANCH,'EXPECTED_HEAD':HEAD,'FAMILY_JSON':FAMILY,
       'V10230_ENTRY_MODULE':'arrhenius_fracture.sharp_front_v10_2_30_candidate_fixed_deltaK',
@@ -44,7 +44,8 @@ def run_one(row,root,registry_path):
       d=json.load(open(result)); row['status']='COMPLETE' if d.get('target_reached') else ('PHYSICAL_CENSOR' if d.get('status')=='cycle_censor' else 'COMPLETE_PARTIAL_GROWTH')
       row['physical_censor']=row['status']=='PHYSICAL_CENSOR'
     elif checkpoint.exists(): row['status']='WALL_LIMIT_NONTERMINAL'; row['watchdog_nonterminal']=True
-    else: row['status']='NUMERICAL_FAILURE'
+    elif p.returncode == 2 and not checkpoint.exists(): row["status"]="LAUNCH_PREFLIGHT_FAILURE"
+    else: row["status"]="NUMERICAL_FAILURE"
     return row
 
 def run_panel(root,workers):
