@@ -122,7 +122,9 @@ def figures(root,p,ratios,slopes,states,transfer,windows):
  out=root/"figures";out.mkdir(exist_ok=True)
  def save(name,title,x,y,group="option",data=None,log=True):
   d=p if data is None else data;fig,ax=plt.subplots(figsize=(9,5.5))
-  for key,g in d.groupby(group):ax.plot(g[x],g[y],"o-",label=LABEL.get(key,str(key)))
+  for key,g in d.groupby(group):
+   label=(f"{LABEL.get(key[0],key[0])}, R={key[1]:g}" if isinstance(key,tuple) and len(key)==2 else LABEL.get(key,str(key)))
+   ax.plot(g[x],g[y],"o-",label=label)
   if log:ax.set_xscale("log");ax.set_yscale("log")
   ax.set_xlabel(x);ax.set_ylabel(y);ax.set_title(title);ax.grid(alpha=.25);ax.legend(fontsize=7);fig.tight_layout();fig.savefig(out/f"{name}.png",dpi=180);plt.close(fig)
  save("DADN_VS_DRIVER_DELTAK_BY_R","Developed growth vs local driver range","deltaK_driver_MPa_sqrt_m","developed_da_dN",group=["option","R"])
@@ -138,7 +140,7 @@ def figures(root,p,ratios,slopes,states,transfer,windows):
  save("PHYSICAL_RETURN_AND_SOURCE_CANCELLATION_VS_R","Physical return vs R","R","physical_return",group="option",data=final,log=False)
  save("RADIUS_INTERNAL_STRESS_SHIELDING_VS_R","Terminal internal stress vs R","R","internal_stress_Pa",group="option",data=final,log=False)
  save("NET_BLUNTING_HAZARD_EVENT_HISTORY_VS_R","Cleavage hazard action vs record","record_index","hazard_action",group=["option","R"],data=states,log=False)
- fig,ax=plt.subplots(figsize=(9,5.5));q=ratios.groupby(["option","R"]).S_PT_log10.apply(lambda x:max(abs(x))).unstack();q.plot.bar(ax=ax);ax.axhline(.05,color="k",ls="--");ax.set_ylabel("max |log10 PT/native|");ax.set_title("Final R-ratio mechanism summary");fig.tight_layout();fig.savefig(out/"FINAL_R_RATIO_MECHANISM_SUMMARY.png",dpi=180);plt.close(fig)
+ fig,ax=plt.subplots(figsize=(9,5.5));q=ratios.groupby(["option","R"]).S_PT_log10.apply(lambda x:max(abs(x))).unstack();q.index=[LABEL.get(x,x) for x in q.index];q.plot.bar(ax=ax);ax.axhline(.05,color="k",ls="--");ax.set_ylabel("max |log10 PT/native|");ax.set_title("Final R-ratio mechanism summary");fig.tight_layout();fig.savefig(out/"FINAL_R_RATIO_MECHANISM_SUMMARY.png",dpi=180);plt.close(fig)
 
 def main():
  ap=argparse.ArgumentParser();ap.add_argument("--root",type=Path,required=True);a=ap.parse_args();root=a.root.resolve()
