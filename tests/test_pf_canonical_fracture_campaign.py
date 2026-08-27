@@ -96,6 +96,8 @@ def test_incomplete_theta45_extreme_rate_cases_are_cancelled():
     assert len(cancelled["rows"]) == 54
     assert cancelled["interrupted_directory_count"] == 2
     assert cancelled["unstarted_count"] == 52
+    assert cancelled["directories_deleted"] is True
+    assert cancelled["deleted_directory_count"] == 2
     assert all(row["canonical_status"].startswith("CANCEL_SUPERSEDED") for row in cancelled["rows"])
 
 

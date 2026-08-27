@@ -1,6 +1,13 @@
 {
   "delete_only_after_lock_push": true,
-  "directories_deleted": false,
+  "deleted_case_ids": [
+    "canonical_strain_rate__ceramiclike__T1050K__theta45__rate0p01x__seed3009675",
+    "canonical_strain_rate__ceramiclike__T1100K__theta45__rate0p01x__seed3010684"
+  ],
+  "deleted_directory_count": 2,
+  "deletion_after_lock_push_commit": "fa4b98b2aa864eb3a2a044de6f946c889a12469d",
+  "deletion_completed_date": "2026-08-27",
+  "directories_deleted": true,
   "interrupted_directory_count": 2,
   "rows": [
     {
