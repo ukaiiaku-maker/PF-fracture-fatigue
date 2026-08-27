@@ -1,0 +1,70 @@
+{
+  "configuration_fingerprint": "4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873",
+  "direct_prescribed_geometry": true,
+  "family": "/private/tmp/pf-canonical-kernel-cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+  "family_physics_fingerprint": "5c78d4ff5e4af46c36f5de466b56ffba9f5cb18137d72eb2e7db5352f9fb2312",
+  "family_sha256": "33fae4e8088d0a914dff8139ba4b133dcb32f8e95f298857652047f239f2b51d",
+  "fracture_hazard_imported_or_invoked": false,
+  "hazard_seed_independent_by_construction": true,
+  "load_invariance_passed": true,
+  "load_invariance_reports": [
+    {
+      "maximum_relative_load_variation": 5.835806794068027e-13,
+      "maximum_within_load_relative_spread": 5.925989284582314e-11,
+      "path": "/private/tmp/pf-canonical-kernel-cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/load_invariance/E0000000/frozen_geometry_load_invariance.json",
+      "sha256": "e28871a25e21a4b3498b33267aef73cb698dab6041382727038031e6d30ba9fa"
+    },
+    {
+      "maximum_relative_load_variation": 2.270877801782742e-12,
+      "maximum_within_load_relative_spread": 4.584300197781002e-11,
+      "path": "/private/tmp/pf-canonical-kernel-cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/load_invariance/E0000200/frozen_geometry_load_invariance.json",
+      "sha256": "520815f0a6d6211e6ef7c13cb0c6430a22470ecbef5b124fb74d196f6071933a"
+    },
+    {
+      "maximum_relative_load_variation": 2.1057885366854242e-12,
+      "maximum_within_load_relative_spread": 9.69278159812921e-11,
+      "path": "/private/tmp/pf-canonical-kernel-cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/load_invariance/E0000400/frozen_geometry_load_invariance.json",
+      "sha256": "729799fa2b5ecddd4b07d249ef7571fe652703c8be9a903f31b4d60663d9b639"
+    },
+    {
+      "maximum_relative_load_variation": 2.5848347372865025e-12,
+      "maximum_within_load_relative_spread": 9.44853322461933e-11,
+      "path": "/private/tmp/pf-canonical-kernel-cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/load_invariance/E0000600/frozen_geometry_load_invariance.json",
+      "sha256": "78b985da09c00f0d366cdcde015d662b956680f4ed6bec7c501e62bdd7e9dadc"
+    },
+    {
+      "maximum_relative_load_variation": 4.0556527584257445e-12,
+      "maximum_within_load_relative_spread": 2.3536771008425565e-10,
+      "path": "/private/tmp/pf-canonical-kernel-cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/load_invariance/E0000800/frozen_geometry_load_invariance.json",
+      "sha256": "b1dde0aa02573f1077cfc5324b8d7452491945d19b6589eca20aa476c896b1f1"
+    },
+    {
+      "maximum_relative_load_variation": 5.641461877334437e-12,
+      "maximum_within_load_relative_spread": 1.518541159841336e-10,
+      "path": "/private/tmp/pf-canonical-kernel-cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/load_invariance/E0001000/frozen_geometry_load_invariance.json",
+      "sha256": "8722703228dbbc647e3216f0c1ba35c8b9022a4a9b9f332df650babbfe102404"
+    },
+    {
+      "maximum_relative_load_variation": 7.535093937467025e-12,
+      "maximum_within_load_relative_spread": 3.521976092109159e-10,
+      "path": "/private/tmp/pf-canonical-kernel-cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/load_invariance/E0001200/frozen_geometry_load_invariance.json",
+      "sha256": "cea20a88d008ac227fcd1be0cc3e3a11c023f437431a09f06f964889298068ee"
+    },
+    {
+      "maximum_relative_load_variation": 8.060951939076073e-12,
+      "maximum_within_load_relative_spread": 2.3027356954714896e-10,
+      "path": "/private/tmp/pf-canonical-kernel-cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/load_invariance/E0001290/frozen_geometry_load_invariance.json",
+      "sha256": "3d9a67055e5da5cdd0d192bb8d27e1f283ccd55af8f2c37ab3cf81958c5c9331"
+    }
+  ],
+  "material_option_independent_by_construction": true,
+  "moving_process_zone_imported_or_invoked": false,
+  "passed": true,
+  "positive_negative_multi_amplitude_linearity_passed": true,
+  "prior_family_independent_by_construction": true,
+  "schema": "v10.2.28_direct_kernel_validation_v1",
+  "source_emission_imported_or_invoked": false,
+  "state_count": 8,
+  "stochastic_event_independent_by_construction": true,
+  "temperature_independent_when_elasticity_fixed": true
+}

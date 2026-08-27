@@ -65,7 +65,9 @@ def load_registry(path: Path) -> dict[str, dict[str, str]]:
     return result
 
 
-def family_for_theta(cache: Path, theta: float) -> tuple[Path, dict[str, Any]]:
+def family_for_theta(
+    cache: Path, theta: float, required_extension_um: float = 1020.0
+) -> tuple[Path, dict[str, Any]]:
     matches: list[tuple[Path, dict[str, Any]]] = []
     for path in cache.glob("*/family.json"):
         try:
@@ -75,7 +77,14 @@ def family_for_theta(cache: Path, theta: float) -> tuple[Path, dict[str, Any]]:
             coverage = 1.0e6 * float(payload["cumulative_crack_path_extension_levels_m"][-1])
         except (KeyError, TypeError, ValueError, json.JSONDecodeError):
             continue
-        if math.isclose(actual, theta, abs_tol=1e-12) and coverage >= 1000.0 / max(math.cos(math.radians(theta)), 1e-12):
+        path_policy = config.get("extra", {}).get("prescribed_crack_path_policy")
+        nominal_angle = float(config.get("nominal_crack_angle_deg", math.nan))
+        if (
+            math.isclose(actual, theta, abs_tol=1e-12)
+            and math.isclose(nominal_angle, 0.0, abs_tol=1e-12)
+            and path_policy == "forward_100_cleavage_trace"
+            and coverage >= required_extension_um
+        ):
             matches.append((path.resolve(), payload))
     if len(matches) != 1:
         raise ValueError(f"expected one qualified kernel family for theta={theta}, found {len(matches)}")
@@ -86,6 +95,8 @@ def family_for_theta(cache: Path, theta: float) -> tuple[Path, dict[str, Any]]:
 
 
 def case_id(row: dict[str, str]) -> str:
+    if row.get("case_id"):
+        return row["case_id"]
     cls = row["material_class"].replace("-", "").lower()
     return (
         f"{row['matrix'].lower()}__{cls}__T{int(float(row['temperature_K'])):04d}K"
@@ -106,6 +117,25 @@ def select_rows(rows: list[dict[str, str]], stage: str) -> list[dict[str, str]]:
             candidates = [r for r in rows if r["material_class"] == cls and r["matrix"] == "CANONICAL_SINGLE_CRACK_THETA"]
             chosen.append(next(r for r in candidates if float(r["temperature_K"]) == 1100.0 and float(r["theta_deg"]) == 30.0))
         return chosen
+    if stage == "v2_theta45_1x":
+        return [
+            row for row in rows
+            if float(row["theta_deg"]) == 45.0
+            and row["rate_tag"] == "rate1x"
+            and row.get("canonical_execution_status") != "CANONICAL_REUSE_COMPLETE"
+        ]
+    if stage == "v2_theta0_rates":
+        return [
+            row for row in rows
+            if float(row["theta_deg"]) == 0.0
+            and row.get("canonical_execution_status") != "CANONICAL_REUSE_COMPLETE"
+        ]
+    if stage == "v2_pending":
+        return [
+            row for row in rows
+            if row.get("canonical_execution_status")
+            in {"CANONICAL_PENDING", "CANONICAL_RESTART_CLEAN"}
+        ]
     raise ValueError(stage)
 
 
@@ -221,6 +251,10 @@ def launch_one(row: dict[str, str], *, outroot: Path, registry: Path, selection:
     contract = {
         "schema": "pf_canonical_fracture_case_launch_v1",
         "case_id": identifier,
+        "campaign_plan_version": row.get("campaign_plan_version", "V1"),
+        "physical_condition_id": row.get("physical_condition_id", identifier),
+        "is_orientation_matrix_case": row.get("is_orientation_matrix_case", ""),
+        "is_rate_matrix_case": row.get("is_rate_matrix_case", ""),
         "matrix": row["matrix"],
         "material_class": row["material_class"],
         "candidate_id": registry_row["candidate_id"],
@@ -266,7 +300,12 @@ def main() -> int:
     parser.add_argument("--selection", type=Path, required=True)
     parser.add_argument("--kernel-cache", type=Path, required=True)
     parser.add_argument("--outroot", type=Path, required=True)
-    parser.add_argument("--stage", choices=("smoke", "theta", "rate", "all"), required=True)
+    parser.add_argument(
+        "--stage",
+        choices=("smoke", "theta", "rate", "all", "v2_theta45_1x",
+                 "v2_theta0_rates", "v2_pending"),
+        required=True,
+    )
     parser.add_argument("--workers", type=int, default=2)
     parser.add_argument("--target-extension-um", type=float, default=1000.0)
     parser.add_argument("--save-snapshots", type=int, default=20)

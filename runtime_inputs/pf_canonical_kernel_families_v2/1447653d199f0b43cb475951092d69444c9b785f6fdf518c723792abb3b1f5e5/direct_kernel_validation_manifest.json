@@ -1,0 +1,64 @@
+{
+  "configuration_fingerprint": "1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5",
+  "direct_prescribed_geometry": true,
+  "family": "/private/tmp/pf-canonical-kernel-cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/family.json",
+  "family_physics_fingerprint": "e215b7895b06ef21c6e6cbf135b85c46a941a9d3b163623c40bc919426eb172f",
+  "family_sha256": "a15eada6a3d86a8f52e3ba6a921c5cf6c98d7f9bae082f2e09f1ad8c14307c24",
+  "fracture_hazard_imported_or_invoked": false,
+  "hazard_seed_independent_by_construction": true,
+  "load_invariance_passed": true,
+  "load_invariance_reports": [
+    {
+      "maximum_relative_load_variation": 4.791366704503518e-13,
+      "maximum_within_load_relative_spread": 1.6551498967854103e-09,
+      "path": "/private/tmp/pf-canonical-kernel-cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/load_invariance/E0000000/frozen_geometry_load_invariance.json",
+      "sha256": "7900691a3ef5ad3f123732b05712d549b219a79da7fbfebcfa6d8e6285c70470"
+    },
+    {
+      "maximum_relative_load_variation": 3.1816116709025475e-12,
+      "maximum_within_load_relative_spread": 4.36207210445968e-11,
+      "path": "/private/tmp/pf-canonical-kernel-cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/load_invariance/E0000200/frozen_geometry_load_invariance.json",
+      "sha256": "7051a77f2b7ba5d50f359cd0ae5715f3f6c76b1e912dc394bd5be9733bd1cbd2"
+    },
+    {
+      "maximum_relative_load_variation": 7.06883874907027e-12,
+      "maximum_within_load_relative_spread": 3.733497361819803e-11,
+      "path": "/private/tmp/pf-canonical-kernel-cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/load_invariance/E0000400/frozen_geometry_load_invariance.json",
+      "sha256": "061b401f7f9026f9978fb02b98164785d3ac68965a472e115d44b5c5ad41a4e3"
+    },
+    {
+      "maximum_relative_load_variation": 8.594666243868335e-12,
+      "maximum_within_load_relative_spread": 9.546881065213497e-11,
+      "path": "/private/tmp/pf-canonical-kernel-cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/load_invariance/E0000600/frozen_geometry_load_invariance.json",
+      "sha256": "058841e261e664276c61a4d97db8a13222fd49436c8016247b4f8480198369a4"
+    },
+    {
+      "maximum_relative_load_variation": 5.60644317108551e-12,
+      "maximum_within_load_relative_spread": 2.0880886121525854e-10,
+      "path": "/private/tmp/pf-canonical-kernel-cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/load_invariance/E0000800/frozen_geometry_load_invariance.json",
+      "sha256": "d37c063dfd5848d870904bfa963e169ac724f3e7c8bfbc067cebf985289dbc44"
+    },
+    {
+      "maximum_relative_load_variation": 3.70445035541441e-12,
+      "maximum_within_load_relative_spread": 1.849925958166041e-10,
+      "path": "/private/tmp/pf-canonical-kernel-cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/load_invariance/E0001000/frozen_geometry_load_invariance.json",
+      "sha256": "775bac2c395a29a9db37221db17adcc889920454f83e9621bac091ede0ec9d52"
+    },
+    {
+      "maximum_relative_load_variation": 8.705048439589083e-12,
+      "maximum_within_load_relative_spread": 7.735057327681823e-11,
+      "path": "/private/tmp/pf-canonical-kernel-cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/load_invariance/E0001100/frozen_geometry_load_invariance.json",
+      "sha256": "f2679028f52dd628da7d70cd70418ac62fef5536da535610c233d73d36fc7f54"
+    }
+  ],
+  "material_option_independent_by_construction": true,
+  "moving_process_zone_imported_or_invoked": false,
+  "passed": true,
+  "positive_negative_multi_amplitude_linearity_passed": true,
+  "prior_family_independent_by_construction": true,
+  "schema": "v10.2.28_direct_kernel_validation_v1",
+  "source_emission_imported_or_invoked": false,
+  "state_count": 7,
+  "stochastic_event_independent_by_construction": true,
+  "temperature_independent_when_elasticity_fixed": true
+}

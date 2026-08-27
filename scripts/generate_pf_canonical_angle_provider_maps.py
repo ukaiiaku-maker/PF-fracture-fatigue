@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Generate candidate-independent PF mechanics/source maps for 15/30/45 degrees.
+"""Generate candidate-independent PF mechanics/source maps by crystal angle.
 
 These are production-discrete sharp-wake maps, not continuum G.  The wake is
-advanced in the physical crack direction by the production 5 micrometre event
-length; the reduced coordinate is projected x extension.
+advanced along the production horizontal ``forward_100_cleavage_trace`` by the
+5 micrometre event length.  Crystal theta rotates cubic elasticity and slip
+systems; it does not rotate the prescribed crack path.  The reduced coordinate
+is therefore projected x extension with forward cosine exactly one.
 """
 from __future__ import annotations
 
@@ -83,7 +85,7 @@ def state(mesh, boundary, damage, D, material, tip, tangent, segments, kill_radi
 
 
 def generate(theta_deg: float, target_projected_um: float, out: Path) -> dict[str, Any]:
-    theta = math.radians(theta_deg); tangent = np.array([math.cos(theta), math.sin(theta)])
+    tangent = np.array([1.0, 0.0])
     geometry = GeometryConfig(); config = MeshConfig(nx=36, ny=72, jitter=0.0, tip_h_fine=1e-6, tip_ratio=1.2)
     mesh = make_tri_mesh(geometry, config, seed=42, tip_center=np.array([geometry.a0, 0.0]))
     boundary = make_boundary_data(mesh, geometry); material = ElasticProperties()
@@ -92,7 +94,8 @@ def generate(theta_deg: float, target_projected_um: float, out: Path) -> dict[st
     backend = SharpWakeBackend(); kill = max(float(mesh.hbar_tip), .5e-6)
     tip0 = np.array([geometry.a0, 0.0]); tip = tip0.copy()
     segments = [(np.array([0.0, 0.0]), tip0.copy())]
-    projected_step_m = PHYSICAL_EVENT_LENGTH_M * tangent[0]
+    forward_cosine = float(tangent[0])
+    projected_step_m = PHYSICAL_EVENT_LENGTH_M * forward_cosine
     event_count = int(math.ceil(target_projected_um * 1e-6 / projected_step_m - 1e-14))
     mechanics: list[dict[str, Any]] = []; drives: list[dict[str, Any]] = []
     linearity_checks: list[dict[str, Any]] = []
@@ -198,6 +201,9 @@ def generate(theta_deg: float, target_projected_um: float, out: Path) -> dict[st
         raise RuntimeError(f"theta={theta_deg:g} load linearity failed: {max_linearity_error}")
     return {
         "theta_deg": theta_deg, "projected_event_increment_um": projected_step_m * 1e6,
+        "coordinate_definition": "laboratory_x_projected_extension_along_horizontal_forward_100_cleavage_trace",
+        "forward_cosine": forward_cosine,
+        "prescribed_crack_path_policy": "forward_100_cleavage_trace",
         "event_count": event_count, "maximum_projected_extension_um": mechanics[-1]["actual_extension_um"],
         "mechanics_map": str(mechanics_path), "mechanics_map_sha256": hashlib.sha256(mechanics_path.read_bytes()).hexdigest(),
         "source_drive_map": str(drive_path), "source_drive_map_sha256": hashlib.sha256(drive_path.read_bytes()).hexdigest(),
@@ -216,7 +222,7 @@ def generate(theta_deg: float, target_projected_um: float, out: Path) -> dict[st
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--thetas", type=float, nargs="+", default=(15.0, 30.0, 45.0))
+    parser.add_argument("--thetas", type=float, nargs="+", default=(0.0, 15.0, 30.0, 45.0))
     parser.add_argument("--target-projected-um", type=float, default=1000.0)
     args = parser.parse_args(); args.out.mkdir(parents=True, exist_ok=True)
     records = [generate(theta, args.target_projected_um, args.out) for theta in args.thetas]

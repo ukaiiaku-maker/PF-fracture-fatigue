@@ -1,0 +1,32 @@
+{
+  "active_kernel_mechanically_measured": true,
+  "crack_path_extensions_um": [
+    0.0,
+    200.0,
+    400.0,
+    600.0,
+    800.0,
+    1000.0,
+    1100.0
+  ],
+  "exact_endpoint_unavailable_cross_validation_preserved": true,
+  "expected_family_schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+  "family_schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+  "maximum_crack_path_extension_um": 1100.0,
+  "nonfinite_review_diagnostics_replaced_with_null": 43,
+  "out": "/private/tmp/pf-canonical-kernel-cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/family.json",
+  "out_sha256": "141e5df5ae747b5b19171059742a6356c9453118c88447c77e87fbfac126fc49",
+  "production_parameterization_allowed": true,
+  "schema": "v10.2.27_extended_active_only_signed_atlas_assembler",
+  "state_count": 7,
+  "state_ids": [
+    "E0000000",
+    "E0000200",
+    "E0000400",
+    "E0000600",
+    "E0000800",
+    "E0001000",
+    "E0001100"
+  ],
+  "wake_shielding_supported": false
+}

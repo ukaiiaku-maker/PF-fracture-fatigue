@@ -13,6 +13,7 @@ from scripts import audit_pf_canonical_fracture_campaign as audit
 from scripts import consolidate_pf_canonical_observer_artifacts as consolidation
 from scripts import execute_pf_scoped_delete_list as delete_tool
 from scripts import run_pf_canonical_fracture_campaign as runner
+from scripts import build_pf_canonical_campaign_v2 as campaign_v2
 
 
 EXPECTED_HASHES = {
@@ -23,8 +24,155 @@ EXPECTED_HASHES = {
 }
 
 
+def _v2_document() -> dict:
+    return json.loads(Path("pf_canonical_fracture_run_plan_v2.json").read_text())
+
+
+def _v2_rows() -> list[dict]:
+    return _v2_document()["rows"]
+
+
+def _theta45_audit() -> list[dict]:
+    return json.loads(Path("pf_theta45_paused_stage_audit_v2.json").read_text())["rows"]
+
+
+def test_v2_unique_case_count_is_288():
+    assert len(_v2_rows()) == 288
+
+
+def test_v2_orientation_membership_count_is_192():
+    assert sum(row["is_orientation_matrix_case"] for row in _v2_rows()) == 192
+
+
+def test_v2_rate_membership_count_is_144():
+    assert sum(row["is_rate_matrix_case"] for row in _v2_rows()) == 144
+
+
+def test_v2_theta0_rate1_shared_membership_is_exactly_48():
+    shared = [
+        row for row in _v2_rows()
+        if row["is_orientation_matrix_case"] and row["is_rate_matrix_case"]
+    ]
+    assert len(shared) == 48
+    assert {(row["theta_deg"], row["rate_tag"]) for row in shared} == {(0, "rate1x")}
+
+
+def test_v2_has_no_duplicate_physical_condition():
+    rows = _v2_rows()
+    assert len({row["physical_condition_id"] for row in rows}) == len(rows)
+
+
+def test_v2_completed_theta15_theta30_are_never_resubmitted():
+    rows = _v2_rows()
+    preserved = [row for row in rows if row["theta_deg"] in {15, 30}]
+    assert len(preserved) == 96
+    assert {row["canonical_execution_status"] for row in preserved} == {
+        "CANONICAL_REUSE_COMPLETE"
+    }
+    assert not any(row["theta_deg"] in {15, 30} for row in runner.select_rows(rows, "v2_pending"))
+
+
+def test_only_theta45_rate1_remains_canonical_from_paused_rate_stage():
+    canonical = [
+        row for row in _theta45_audit()
+        if row["canonical_status"].startswith("CANONICAL_")
+    ]
+    assert len(canonical) == 48
+    assert {row["rate_tag"] for row in canonical} == {"rate1x"}
+
+
+def test_completed_theta45_extreme_rate_cases_are_supplemental():
+    supplemental = json.loads(Path("pf_theta45_supplemental_manifest_v2.json").read_text())
+    assert supplemental["complete_case_count"] == 42
+    assert supplemental["principal_rate_analysis_membership"] is False
+    assert {row["rate_tag"] for row in supplemental["rows"]} <= {"rate0p01x", "rate100x"}
+    assert {row["canonical_status"] for row in supplemental["rows"]} == {
+        "SUPPLEMENTAL_CURRENT_SOURCE_NONCANONICAL"
+    }
+
+
+def test_incomplete_theta45_extreme_rate_cases_are_cancelled():
+    cancelled = json.loads(Path("pf_theta45_cancellation_manifest_v2.json").read_text())
+    assert len(cancelled["rows"]) == 54
+    assert cancelled["interrupted_directory_count"] == 2
+    assert cancelled["unstarted_count"] == 52
+    assert all(row["canonical_status"].startswith("CANCEL_SUPERSEDED") for row in cancelled["rows"])
+
+
+def test_theta0_uses_exactly_three_locked_physical_rates():
+    rows = [row for row in _v2_rows() if row["theta_deg"] == 0]
+    assert {
+        (row["rate_tag"], row["loading_rate_factor"], row["nominal_dt_s"],
+         row["nominal_opening_rate_m_per_s"])
+        for row in rows
+    } == {(tag, factor, dt_s, opening_rate) for tag, factor, dt_s, opening_rate in campaign_v2.RATES}
+    assert {row["nominal_dU_m"] for row in rows} == {2.0e-7}
+
+
+def test_theta0_common_random_numbers_are_preserved_across_rates():
+    groups: dict[tuple[str, int], set[int]] = {}
+    for row in _v2_rows():
+        if row["theta_deg"] == 0:
+            groups.setdefault((row["material_class"], row["temperature_K"]), set()).add(row["seed"])
+    assert len(groups) == 48
+    assert all(len(seeds) == 1 for seeds in groups.values())
+
+
+def test_all_four_angle_families_are_source_qualified_and_fail_closed():
+    lock = json.loads(Path("pf_canonical_angle_family_lock_v2.json").read_text())
+    assert {row["theta_deg"] for row in lock["families"]} == {0, 15, 30, 45}
+    assert lock["all_source_qualified"]
+    assert lock["all_cover_target_plus_margin"]
+    assert lock["no_extrapolation"]
+    assert all(row["forward_cosine"] == 1.0 for row in lock["families"])
+    assert len({row["family_sha256"] for row in lock["families"]}) == 4
+    pinned = Path("runtime_inputs/pf_canonical_kernel_families_v2")
+    assert {
+        int(json.loads(runner.family_for_theta(pinned, theta)[0].read_text())[
+            "mechanical_configuration"
+        ]["theta_deg"])
+        for theta in (0, 15, 30, 45)
+    } == {0, 15, 30, 45}
+
+
+def test_v2_plan_has_no_runtime_zip_dependency():
+    record = json.loads(Path("pf_canonical_zip_independence_v2.json").read_text())
+    assert record["all_288_rows_validated"]
+    assert record["runtime_zip_reference_count"] == 0
+    assert record["runtime_independence_passed"]
+    assert not record["legacy_zip_accessed"]
+    assert record["legacy_zip_temporarily_unavailable_test_passed"]
+
+
+def test_v1_plan_remains_preserved():
+    path = Path("pf_canonical_fracture_run_plan_v1.csv")
+    assert path.is_file()
+    assert len(list(csv.DictReader(path.open()))) == 240
+    lock = json.loads(Path("pf_canonical_campaign_lock_v2.json").read_text())
+    assert lock["scientific_fingerprint_changed_from_v1"]
+    assert lock["scientific_fingerprint_sha256"] != lock[
+        "superseded_v1_scientific_fingerprint_sha256"
+    ]
+
+
+def test_v2_final_material_hashes_are_unchanged():
+    rows = _v2_rows()
+    assert {
+        material: {row["full_material_sha256"] for row in rows if row["material_class"] == material}
+        for material in EXPECTED_HASHES
+    } == {material: {value} for material, value in EXPECTED_HASHES.items()}
+
+
+def test_v2_storage_accounting_and_observer_consolidation_close():
+    lock = json.loads(Path("pf_canonical_campaign_lock_v2.json").read_text())
+    assert lock["current_case_directory_count"] == 140
+    assert lock["verified_complete_current_case_count"] == 138
+    assert lock["verified_consolidated_observer_case_count"] == 138
+    assert lock["current_storage_status_partition_closes"]
+
+
 def test_current_four_material_hashes_are_exact():
-    registry = Path("analysis_outputs/pf_canonical_fracture_v2_campaign/pf_v2_four_class_registry.csv")
+    registry = Path("pf_v2_four_class_registry.csv")
     _, hashes = audit.load_registry(registry)
     assert hashes == EXPECTED_HASHES
 
@@ -156,7 +304,7 @@ def test_generated_plan_is_deterministic():
 
 
 def test_storage_accounting_closes():
-    path = Path("analysis_outputs/pf_canonical_fracture_v2_campaign/pf_storage_reclaimed.csv")
+    path = Path("pf_storage_reclaimed_v1.csv")
     row = next(csv.DictReader(path.open()))
     assert int(row["net_reclaimable_bytes"]) == int(row["original_size_bytes"]) - int(row["archive_size_bytes"])
 
@@ -190,7 +338,9 @@ def test_launcher_submits_incrementally_and_stops_after_failure():
 
 def test_angle_provider_uses_projected_physical_event_increment():
     source = Path("scripts/generate_pf_canonical_angle_provider_maps.py").read_text()
-    assert "projected_step_m = PHYSICAL_EVENT_LENGTH_M * tangent[0]" in source
+    assert "tangent = np.array([1.0, 0.0])" in source
+    assert "projected_step_m = PHYSICAL_EVENT_LENGTH_M * forward_cosine" in source
+    assert '"forward_cosine": forward_cosine' in source
     assert "PF_MODEL_NATIVE_PRODUCTION_DISCRETE_SHARP_WAKE_NOT_CONTINUUM_G" in source
     assert "maximum_load_scaling_relative_error" in source
     assert "maximum_interpolation_relative_error_by_quantity" in source
