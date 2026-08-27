@@ -152,3 +152,19 @@ def test_anchor_controller_is_fresh_exact_bounded_and_freezes_predictions_first(
         assert phrase in controller
     assert "fresh anchor worker refuses an existing result path" in worker
     assert '"RESUME" in key.upper() or "RESTART" in key.upper()' in worker
+
+
+def test_analysis_holds_dynamic_controls_out_and_reports_only_defined_K_ranges():
+    analysis = (ROOT / "scripts/analyze_v10_2_30_two_scale_virtual_CT.py").read_text()
+    for phrase in (
+        'used_for_surface_fit": False',
+        'constant_load_rows_used_for_fit": 0',
+        'closure_corrected_deltaK_reported": False',
+        'tip_radius_used": False',
+        'FULL_DELTAK',
+        'TENSILE_DELTAK',
+        'KMAX18_SEED_SENSITIVITY',
+        'probabilistic_confidence_interval": False',
+        'STATE_HISTORY_REQUIRED',
+    ):
+        assert phrase in analysis
