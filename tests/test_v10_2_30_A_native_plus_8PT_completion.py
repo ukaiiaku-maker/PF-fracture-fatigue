@@ -41,3 +41,10 @@ def test_parity_retains_pure_relative_failure_and_unavailable_classification():
     assert 'max(abs(x), abs(y), 1e-20)' in text
     assert '"ACCELERATOR_PARITY_UNAVAILABLE_VALIDATION_MISMATCH"' in text
     assert '"absolute_differences": absolute_errors' in text
+
+
+def test_final_metadata_separates_execution_from_physics_modification():
+    text = (ROOT / "scripts/analyze_v10_2_30_A_native_plus_8PT_final.py").read_text()
+    assert '"production_physics_modified":False' in text
+    assert '"physical_calculations_executed":True' in text
+    assert '"total_admitted_physical_trajectory_count":81' in text

@@ -222,7 +222,8 @@ def reports(root: Path, decision: dict, div: pd.DataFrame, fits: pd.DataFrame, p
       "negative_R_sensitivity":"NEW_PHYSICAL_RETURN_SIGNAL_WITHOUT_GROWTH_AMPLIFICATION","largest_return_option":PT08,
       "n128_status":"NOT_TRIGGERED_NO_MEANINGFUL_N80_FATIGUE_DIVERGENCE","multiseed_status":"COMPLETE",
       "true_accelerator_parity":parity_result["classification"],"screen_32_row_decision":"32_ROW_SCREEN_JUSTIFIED_ONLY_FOR_MECHANISM_MAPPING",
-      "material_promotion_status":"NOT_PROMOTED_DIAGNOSTIC_ONLY","physics_rerun_or_modified":False,
+      "material_promotion_status":"NOT_PROMOTED_DIAGNOSTIC_ONLY","production_physics_modified":False,
+      "physical_calculations_executed":True,"total_admitted_physical_trajectory_count":81,
       "base_run_count":36,"explicit_run_count":18,"multiseed_run_count":12,"fresh_parity_run_count":6})
     (root/"A_native_plus_8PT_final_decision.json").write_text(json.dumps(decision,indent=2,sort_keys=True)+"\n")
 
