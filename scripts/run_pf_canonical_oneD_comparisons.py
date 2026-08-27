@@ -33,6 +33,7 @@ def summarize(result: dict[str, Any], plan: dict[str, str]) -> dict[str, Any]:
     onsets = [event for event in events if event["event_index"] == 0 or event["reload_separated"]]
     sizes = [float(event["event_length_m"]) * 1e6 for event in events]
     onset_k = [float(event["native_KJ_MPa_sqrt_m"]) for event in onsets]
+    terminal = events[-1] if events else {}
     return {
         "case_id": plan["case_id"], "matrix": plan["matrix"],
         "material_class": plan["material_class"], "candidate_id": result["candidate_id"],
@@ -55,6 +56,11 @@ def summarize(result: dict[str, Any], plan: dict[str, str]) -> dict[str, Any]:
         "max_backstress_GPa": result["max_backstress_Pa"] * 1e-9,
         "minimum_front_width_um": result["min_front_width_m"] * 1e6,
         "max_source_multiplicity": result["max_source_multiplicity"],
+        "terminal_tip_radius_um": float(terminal.get("tip_radius_m", np.nan)) * 1e6,
+        "terminal_front_width_um": float(terminal.get("front_width_m", np.nan)) * 1e6,
+        "terminal_mobile_density_m2": terminal.get("mobile_density_m2", np.nan),
+        "terminal_retained_density_m2": terminal.get("retained_density_m2", np.nan),
+        "terminal_backstress_GPa": float(terminal.get("backstress_Pa", np.nan)) * 1e-9,
         "model_contract": result["model_contract"],
         "mechanics_coordinate": "PROJECTED_X_EXTENSION",
         "mechanics_semantics": "PF_MODEL_NATIVE_PRODUCTION_DISCRETE_SHARP_WAKE_NOT_CONTINUUM_G",
@@ -127,6 +133,11 @@ def main() -> int:
         "theta_conditioned": True, "rate_conditioned": True, "seed_matched": True,
         "provider": "PF", "comparison_warning": "ONSET_AND_AVALANCHE_SUMMARIES_NOT_EVENTWISE_R_CURVE",
     }
+    statuses = {status: sum(result["status"] == status for result in outputs)
+                for status in sorted({result["status"] for result in outputs})}
+    manifest["status_counts"] = statuses
+    manifest["drive_map_bound_case_count"] = statuses.get("RIGHT_CENSORED_DRIVE_MAP_BOUND", 0)
+    manifest["all_planned_conditions_evaluated"] = len(outputs) == len(plans)
     (args.out / "pf_canonical_1D_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
     return 0 if manifest["all_target_right_censored"] else 1
 

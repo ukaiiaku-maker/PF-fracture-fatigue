@@ -192,6 +192,9 @@ def test_angle_provider_uses_projected_physical_event_increment():
     source = Path("scripts/generate_pf_canonical_angle_provider_maps.py").read_text()
     assert "projected_step_m = PHYSICAL_EVENT_LENGTH_M * tangent[0]" in source
     assert "PF_MODEL_NATIVE_PRODUCTION_DISCRETE_SHARP_WAKE_NOT_CONTINUUM_G" in source
+    assert "maximum_load_scaling_relative_error" in source
+    assert "maximum_interpolation_relative_error_by_quantity" in source
+    assert "FAIL_CLOSED_NO_EXTRAPOLATION_BEYOND_RECORDED_EXTENSION" in source
 
 
 def test_matched_oneD_uses_theta_rate_seed_and_fails_closed():
@@ -200,6 +203,7 @@ def test_matched_oneD_uses_theta_rate_seed_and_fails_closed():
     assert "seed=int(plan[\"seed\"])" in source
     assert "nominal_advance_m=float(projected_advance)" in source
     assert 'return 0 if manifest["all_target_right_censored"] else 1' in source
+    assert '"drive_map_bound_case_count"' in source
 
 
 def test_sparse_observer_serializes_profiles_only_at_event_boundaries():

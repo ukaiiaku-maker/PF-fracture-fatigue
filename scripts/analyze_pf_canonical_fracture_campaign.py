@@ -241,7 +241,8 @@ def physical_avalanches(transactions: list[dict[str, Any]]) -> list[dict[str, An
     return output
 
 
-def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None = None) -> dict[str, Any]:
+def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None = None,
+            one_d_results: Path | None = None) -> dict[str, Any]:
     out.mkdir(parents=True, exist_ok=True)
     transactions: list[dict[str, Any]] = []
     cases: list[dict[str, Any]] = []
@@ -278,9 +279,13 @@ def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None =
     ava_by_case: dict[str, list[dict[str, Any]]] = {}
     for row in avalanches:
         ava_by_case.setdefault(row["case_id"], []).append(row)
+    profiles_by_case: dict[str, list[dict[str, Any]]] = {}
+    for row in profiles:
+        profiles_by_case.setdefault(row["case_id"], []).append(row)
     summaries: list[dict[str, Any]] = []
     for case in cases:
         group = ava_by_case.get(case["case_id"], [])
+        state_group = profiles_by_case.get(case["case_id"], [])
         sizes = [float(row["avalanche_extension_um"]) for row in group]
         summaries.append({
             **{key: case[key] for key in ("case_id", "matrix", "material_class", "candidate_id", "temperature_K", "theta_deg", "rate_tag", "loading_rate_factor", "seed")},
@@ -292,6 +297,12 @@ def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None =
             "initial_onset_native_KJ_MPa_sqrt_m": group[0]["onset_native_KJ_MPa_sqrt_m"] if group else math.nan,
             "final_reinitiation_native_KJ_MPa_sqrt_m": group[-1]["onset_native_KJ_MPa_sqrt_m"] if len(group) > 1 else math.nan,
             "delta_K_reinit_MPa_sqrt_m": (group[-1]["onset_native_KJ_MPa_sqrt_m"] - group[0]["onset_native_KJ_MPa_sqrt_m"]) if len(group) > 1 else math.nan,
+            "maximum_tip_radius_um": max((float(row["tip_radius_um"]) for row in state_group), default=math.nan),
+            "minimum_front_width_um": min((float(row["front_width_um"]) for row in state_group), default=math.nan),
+            "maximum_mobile_count": max((float(row["mobile_count"]) for row in state_group), default=math.nan),
+            "maximum_retained_count": max((float(row["retained_count"]) for row in state_group), default=math.nan),
+            "maximum_backstress_GPa": max((float(row["backstress_Pa"]) for row in state_group), default=math.nan) * 1e-9,
+            "maximum_absolute_shielding_MPa_sqrt_m": max((abs(float(row["signed_active_shielding_MPa_sqrt_m"])) for row in state_group), default=math.nan),
             "steps_sha256": case["steps_sha256"],
         })
     tx_fields = list(transactions[0]) if transactions else []
@@ -304,6 +315,46 @@ def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None =
     write_csv(out / "pf_canonical_fracture_run_manifest.csv", summaries, list(summaries[0]))
     write_csv(out / "pf_canonical_theta_results.csv", [r for r in summaries if r["matrix"] == "CANONICAL_SINGLE_CRACK_THETA"], list(summaries[0]))
     write_csv(out / "pf_canonical_rate_results.csv", [r for r in summaries if r["matrix"] == "CANONICAL_STRAIN_RATE"], list(summaries[0]))
+    comparison_count = 0
+    one_d_bound_count = 0
+    if one_d_results is not None:
+        with one_d_results.open(newline="") as stream:
+            one_d_rows = {row["case_id"]: row for row in csv.DictReader(stream)}
+        comparisons: list[dict[str, Any]] = []
+        for pf in summaries:
+            reduced = one_d_rows.get(pf["case_id"])
+            if reduced is None:
+                continue
+            comparison_count += 1
+            bound = reduced["status"] == "RIGHT_CENSORED_DRIVE_MAP_BOUND"
+            one_d_bound_count += int(bound)
+            comparisons.append({
+                **{key: pf[key] for key in (
+                    "case_id", "matrix", "material_class", "candidate_id",
+                    "temperature_K", "theta_deg", "rate_tag",
+                    "loading_rate_factor", "seed")},
+                "pf_target_status": pf["target_status"],
+                "oneD_status": reduced["status"],
+                "comparison_status": "MATCHED_WITH_ONED_DRIVE_MAP_BOUND" if bound else "MATCHED_TARGET_TO_TARGET",
+                "pf_initial_onset_native_KJ_MPa_sqrt_m": pf["initial_onset_native_KJ_MPa_sqrt_m"],
+                "oneD_initial_onset_native_KJ_MPa_sqrt_m": reduced["first_event_native_KJ_MPa_sqrt_m"],
+                "onset_delta_oneD_minus_PF_MPa_sqrt_m": float(reduced["first_event_native_KJ_MPa_sqrt_m"]) - float(pf["initial_onset_native_KJ_MPa_sqrt_m"]),
+                "pf_physical_avalanche_count": pf["physical_avalanche_count"],
+                "oneD_physical_avalanche_count": reduced["physical_avalanche_count"],
+                "pf_largest_avalanche_fraction": pf["largest_avalanche_fraction"],
+                "oneD_largest_avalanche_fraction": reduced["largest_avalanche_fraction"],
+                "pf_maximum_tip_radius_um": pf["maximum_tip_radius_um"],
+                "oneD_maximum_tip_radius_um": reduced["max_tip_radius_um"],
+                "pf_minimum_front_width_um": pf["minimum_front_width_um"],
+                "oneD_minimum_front_width_um": reduced["minimum_front_width_um"],
+                "pf_maximum_backstress_GPa": pf["maximum_backstress_GPa"],
+                "oneD_maximum_backstress_GPa": reduced["max_backstress_GPa"],
+                "pf_mobile_state_units": "signed_burgers_line_count",
+                "oneD_mobile_state_units": "density_m^-2_not_directly_subtracted",
+                "eventwise_K_not_compared_as_R_curve": True,
+            })
+        write_csv(out / "pf_canonical_1D_comparison_results.csv", comparisons,
+                  list(comparisons[0]) if comparisons else ["case_id"])
     hashes = {path.name: sha256(path) for path in sorted(out.glob("*.csv"))}
     decision = {
         "schema": "pf_canonical_campaign_decision_v2", "case_count": len(cases),
@@ -314,6 +365,8 @@ def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None =
         "event_observer_closure": len(profiles) == len(transactions),
         "observer_profiles_are_event_boundary_only": True,
         "state_profile_count": len(profiles),
+        "matched_oneD_comparison_count": comparison_count,
+        "matched_oneD_drive_map_bound_count": one_d_bound_count,
         "transactions_are_not_resistance_curve_points": True,
         "native_history_label": "PF MODEL-NATIVE DRIVING TRAJECTORY",
         "onset_label": "RELOAD-SEPARATED EFFECTIVE RESISTANCE CANDIDATES",
@@ -328,9 +381,11 @@ def main() -> int:
     parser.add_argument("--campaign-root", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--expected-case-count", type=int)
+    parser.add_argument("--oneD-results", type=Path)
     args = parser.parse_args()
     print(json.dumps(analyze(args.campaign_root, args.out,
-                             expected_case_count=args.expected_case_count), indent=2, sort_keys=True))
+                             expected_case_count=args.expected_case_count,
+                             one_d_results=args.oneD_results), indent=2, sort_keys=True))
     return 0
 
 
