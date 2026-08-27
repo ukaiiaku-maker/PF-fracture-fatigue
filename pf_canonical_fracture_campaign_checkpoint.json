@@ -1,0 +1,22 @@
+{
+  "campaign_complete": false,
+  "canonical_pf_launcher_commit": "998665899d15f818203d1742528462f21b99f7ed",
+  "checkpoint_schema": "pf_canonical_fracture_storage_blocked_checkpoint_v1",
+  "completed_pf_case_count": 138,
+  "completed_rate_case_count": 42,
+  "completed_theta_case_count": 96,
+  "event_observer_closure": true,
+  "interrupted_rate_case_count": 2,
+  "matched_oneD_case_count_available_pf": 138,
+  "oneD_drive_map_bound_case_count_all": 171,
+  "oneD_drive_map_bound_case_count_available_pf": 88,
+  "oneD_evaluated_case_count": 240,
+  "oneD_target_case_count": 69,
+  "physical_pf_source_commit": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+  "planned_pf_case_count": 240,
+  "protected_fatigue_modified": false,
+  "rate_matrix_complete": false,
+  "reason": "SHARED_VOLUME_HEADROOM_UNSAFE_DUE_TO_PROTECTED_ACTIVE_FATIGUE_CHECKPOINT_GROWTH",
+  "state_profile_count": 30062,
+  "theta_matrix_complete": true
+}
