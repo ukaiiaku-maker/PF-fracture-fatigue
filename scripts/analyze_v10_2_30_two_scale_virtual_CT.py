@@ -419,6 +419,9 @@ def plot_figures(root: Path, v0: LogPchipRateSurface, v1: LogPchipRateSurface, a
         K=np.linspace(12,24.3,300); ax.plot(K,v1.evaluate(K,R).rate_m_per_cycle,color=colors[R],label=f"R={R:g} v1")
         q=source[np.isclose(source.R,R)]; ax.scatter(q.Kmax_MPa_sqrt_m,q.developed_da_dN,color=colors[R],marker="o")
         q=anchors[np.isclose(anchors.R,R)]; ax.scatter(q.Kmax_MPa_sqrt_m,q.developed_da_dN,color=colors[R],marker="x",s=55)
+        refinement_path=root/"A_NATIVE_refinement_results.csv"
+        if refinement_path.is_file():
+            q=pd.read_csv(refinement_path);q=q[np.isclose(q.R,R)];ax.scatter(q.Kmax_MPa_sqrt_m,q.developed_da_dN,color=colors[R],marker="^",s=45)
     ax.set_yscale("log");ax.set_xlabel("Kmax (MPa sqrt(m))");ax.set_ylabel("da/dN (m/cycle)");ax.legend();ax.grid(alpha=.25)
     save(fig,"LOCAL_RATE_DATA_AND_PCHIP_SURFACES")
     fig,ax=plt.subplots(figsize=(8,5.5))
@@ -436,8 +439,14 @@ def plot_figures(root: Path, v0: LogPchipRateSurface, v1: LogPchipRateSurface, a
     limits=[min(dynamic.physical_cycles.min(),dynamic.predicted_cycles.min()),max(dynamic.physical_cycles.max(),dynamic.predicted_cycles.max())];ax.plot(limits,limits,"k--");ax.set_xscale("log");ax.set_yscale("log");ax.set_xlabel("physical cycles");ax.set_ylabel("predicted cycles");ax.legend();ax.grid(alpha=.25)
     save(fig,"DYNAMIC_CONSTANT_LOAD_PREDICTED_VS_PHYSICAL")
     primary=curves[curves.geometry=="W10_B2.5"]
+    fig,(ax_K,ax_P)=plt.subplots(2,1,figsize=(8,8),sharex=True)
+    for (protocol,R),g in primary.groupby(["protocol","R"]):
+        ax_K.plot(g.a_over_W,g.Kmax_MPa_sqrt_m,label=f"{protocol}, R={R:g}")
+        ax_P.plot(g.a_over_W,g.Pmax_N,label=f"{protocol}, R={R:g}")
+    ax_K.set_ylabel("Kmax (MPa sqrt(m))");ax_P.set_ylabel("Pmax (N)");ax_P.set_xlabel("a/W")
+    for axis in (ax_K,ax_P):axis.grid(alpha=.25);axis.legend(fontsize=7,ncol=2)
+    save(fig,"VIRTUAL_CT_K_AND_LOAD_VS_A_OVER_W")
     mappings = [
-      ("VIRTUAL_CT_K_AND_LOAD_VS_A_OVER_W","a_over_W","Kmax_MPa_sqrt_m",False),
       ("VIRTUAL_CT_A_OVER_W_VS_CYCLES","cumulative_cycles","a_over_W",True),
       ("VIRTUAL_CT_DADN_VS_KMAX_BY_R","Kmax_MPa_sqrt_m","local_da_dN",True),
       ("VIRTUAL_CT_DADN_VS_FULL_DELTAK_BY_R","deltaK_full_MPa_sqrt_m","local_da_dN",True),
