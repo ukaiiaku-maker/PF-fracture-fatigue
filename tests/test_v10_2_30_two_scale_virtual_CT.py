@@ -184,3 +184,17 @@ def test_conditional_PT_controller_resolves_endpoint_without_resume_or_extrapola
         "interrupted conditional PT physics cannot resume",
     ):
         assert phrase in controller
+
+
+def test_failed_low_K_interval_has_a_fresh_midpoint_refinement_controller():
+    controller = (ROOT / "scripts/complete_v10_2_30_two_scale_native_refinement.py").read_text()
+    for phrase in (
+        "additional_midpoint_Kmax_MPa_sqrt_m",
+        "12.75",
+        "V0_K13p5_INTERPOLATION_FAILURE",
+        '"fresh_virgin_start":True',
+        '"resume":False',
+        "V10230_HIGH_CYCLE_EXPLICIT_ONLY",
+        "interrupted physical refinement cannot resume",
+    ):
+        assert phrase in controller
