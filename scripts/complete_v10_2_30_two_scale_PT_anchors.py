@@ -150,6 +150,34 @@ def validate_first(folder:Path,jobs:list[dict])->None:
     atomic_csv(folder/"PT_first_conditional_validation.csv",rows)
     if not all(x["passes_0p05_decade"] for x in rows):raise RuntimeError("PT first conditional interpolation requires midpoint refinement")
 
+def completed_rows(jobs:list[dict],option:str)->list[dict]:
+    rows=[]
+    for job in jobs:
+        if job["option"]==option and job["status"]=="PHYSICAL_TARGET_REACHED":
+            summary=json.loads((Path(job["result_path"])/"developed_fatigue_growth_summary.json").read_text())
+            rows.append({"R":float(job["R"]),"Kmax_MPa_sqrt_m":float(job["Kmax_MPa_sqrt_m"]),"developed_da_dN":float(summary["developed_interval"]["da_dN"])})
+    return rows
+
+def add_low_K_stage(folder:Path,jobs:list[dict],stage:str,K:float,prediction_name:str)->None:
+    if any(job["stage"]==stage for job in jobs):return
+    predictions=[];frozen=time.time_ns()
+    for option in (PT03,PT08):
+        surface=LogPchipRateSurface(option_rows(option)+completed_rows(jobs,option),option=option,version=f"predict_{stage}")
+        for R in RS:
+            p=surface.prospective_anchor_prediction(K,R);p.update({"stage":stage,"option":option,"prediction_frozen_unix_ns":frozen,"trigger":"PT_INTEGRATED_LIFE_EXCEEDS_0p05_DECADE_DUE_TO_LOW_K_INTERPOLATION_AMBIGUITY","result_read_before_prediction":False,"result_path_existed_when_predicted":False});predictions.append(p)
+    prediction_path=folder/prediction_name;atomic_csv(prediction_path,predictions);prediction_sha=sha256(prediction_path)
+    for option in (PT03,PT08):
+        label="PT03" if option==PT03 else "PT08"
+        for R in RS:
+            jid=f"{stage.lower()}__{label}__R{R:g}__Kmax{K:g}__seed1720";jobs.append({"job_id":jid,"stage":stage,"option":option,"R":R,"Kmax_MPa_sqrt_m":K,"deltaK_driver_MPa_sqrt_m":K*(1-R),"seed":1720,"n_bins":80,"target_extension_um":100,"cycles_max":1_000_000,"result_path":str((folder/"results"/jid).resolve()),"status":"PENDING","attempt":0,"pid":None,"resumed":False,"reused":False,"acceleration_mode":"explicit_only","prediction_file_sha256":prediction_sha,"prediction_frozen_unix_ns":frozen,"contract_path":"","terminal_path":"","log_path":""})
+    atomic_csv(folder/"PT_anchor_job_registry.csv",jobs)
+
+def validate_low_K_stage(folder:Path,jobs:list[dict],stage:str,prediction_name:str,filename:str)->pd.DataFrame:
+    predictions=pd.read_csv(folder/prediction_name);rows=[]
+    for job in [x for x in jobs if x["stage"]==stage]:
+        summary=json.loads((Path(job["result_path"])/"developed_fatigue_growth_summary.json").read_text());rate=float(summary["developed_interval"]["da_dN"]);p=predictions[(predictions.option==job["option"])&np.isclose(predictions.R,job["R"])].iloc[0];error=math.log10(float(p.predicted_da_dN)/rate);rows.append({"job_id":job["job_id"],"stage":stage,"option":job["option"],"R":job["R"],"Kmax_MPa_sqrt_m":job["Kmax_MPa_sqrt_m"],"predicted_da_dN":p.predicted_da_dN,"physical_da_dN":rate,"epsilon_log_decade":error,"abs_epsilon_log_decade":abs(error),"passes_0p05_decade":abs(error)<=.05})
+    frame=pd.DataFrame(rows);frame.to_csv(folder/filename,index=False);return frame
+
 
 def main()->int:
     parser=argparse.ArgumentParser();parser.add_argument("--root",type=Path,default=ROOT);parser.add_argument("--workers",type=int,default=3);args=parser.parse_args()
@@ -158,7 +186,13 @@ def main()->int:
     root=args.root.resolve();folder=root/"PT_overlay_anchors";jobs=pd.read_csv(folder/"PT_anchor_job_registry.csv").to_dict("records") if (folder/"PT_anchor_job_registry.csv").is_file() else initialize(root);reconcile(folder,jobs);head=git("rev-parse","HEAD")
     atomic_json(folder/"PT_controller_state.json",{"phase":"FIRST_CONDITIONAL","pid":os.getpid(),"head":head});run_stage(folder,jobs,"FIRST_CONDITIONAL",head,args.workers);validate_first(folder,jobs)
     atomic_json(folder/"PT_controller_state.json",{"phase":"ENDPOINT_DOMAIN_RESOLUTION","pid":os.getpid(),"head":head});run_stage(folder,jobs,"ENDPOINT_DOMAIN_RESOLUTION",head,args.workers)
-    atomic_json(folder/"PT_controller_state.json",{"phase":"COMPLETE","result":"PASS","pid":os.getpid(),"head":head});return 0
+    life_path=root/"virtual_CT_PT_life_ratios.csv"
+    if life_path.is_file() and float(pd.read_csv(life_path).abs_log10_life_ratio.max())>.05:
+        add_low_K_stage(folder,jobs,"PT_LOW_K_13P5",13.5,"PT_low_K_13p5_predictions.csv");atomic_json(folder/"PT_controller_state.json",{"phase":"PT_LOW_K_13P5","pid":os.getpid(),"head":head});run_stage(folder,jobs,"PT_LOW_K_13P5",head,args.workers);low=validate_low_K_stage(folder,jobs,"PT_LOW_K_13P5","PT_low_K_13p5_predictions.csv","PT_low_K_13p5_validation.csv")
+        if not low.passes_0p05_decade.all():
+            add_low_K_stage(folder,jobs,"PT_LOW_K_REFINEMENT",12.75,"PT_low_K_12p75_predictions.csv");atomic_json(folder/"PT_controller_state.json",{"phase":"PT_LOW_K_REFINEMENT","pid":os.getpid(),"head":head});run_stage(folder,jobs,"PT_LOW_K_REFINEMENT",head,args.workers);refined=validate_low_K_stage(folder,jobs,"PT_LOW_K_REFINEMENT","PT_low_K_12p75_predictions.csv","PT_low_K_12p75_validation.csv")
+            if not refined.passes_0p05_decade.all():raise RuntimeError("conditional PT low-K refinement remains outside 0.05 decade")
+    atomic_json(folder/"PT_controller_state.json",{"phase":"COMPLETE","result":"PASS","pid":os.getpid(),"head":head,"job_count":len(jobs)});return 0
 
 
 if __name__=="__main__":raise SystemExit(main())
