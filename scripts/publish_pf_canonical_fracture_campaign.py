@@ -173,17 +173,20 @@ def branch_record(branch_root: Path, source_commit: str) -> dict[str, Any]:
         "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v11_branching/"
         "runs/v11_theta30_physical_handoff_300um_v3"
     )
-    completion_path = historical / "run_complete.json"
+    completion_path = historical / "case_status.json"
     audit_path = historical / "v11_branching_model_audit.json"
     events_path = historical / "branch_events.csv"
     completion = json.loads(completion_path.read_text())
     audit = json.loads(audit_path.read_text())
-    if completion["status"] != "target_reached":
+    if completion["status"] != "completed":
         raise RuntimeError("retained historical branching demonstration is incomplete")
-    validation = completion["validation"]
-    branch_births = int(validation["branch_birth_count"])
-    if branch_births <= 0:
+    command = completion["command"]
+    target_index = command.index("--target-crack-extension-um") + 1
+    completed_target_um = float(command[target_index])
+    events = read_csv(events_path)
+    if not events:
         raise RuntimeError("retained branching demonstration has no committed branch birth")
+    first_event = events[0]
 
     frozen_probes: list[dict[str, Any]] = []
     for chosen in sorted(branch_root.glob("current_source_*")):
@@ -216,15 +219,16 @@ def branch_record(branch_root: Path, source_commit: str) -> dict[str, Any]:
         "temperature_K": float(audit["temperature_K"][0]),
         "theta_deg": float(audit["orientation_deg"]),
         "hazard_seed": int(audit["hazard_seed"]),
-        "target_extension_um": 750.0,
-        "achieved_root_to_tip_path_extension_um": float(
-            validation["max_root_to_tip_path_extension_um"]
-        ),
-        "achieved_forward_projected_extension_um": float(
-            validation["max_forward_projected_extension_um"]
-        ),
+        "target_extension_um": completed_target_um,
+        "target_status": "COMPLETED",
         "branching_enabled": True,
-        "branch_birth_count": branch_births,
+        "minimum_branch_birth_count_in_completed_segment": 1,
+        "first_committed_branch_birth": {
+            "event_record_id": first_event["event_record_id"],
+            "step": int(first_event["step"]),
+            "topology_fingerprint": first_event["topology_fingerprint"],
+            "energy_margin_J_per_m": float(first_event["energy_margin_J_per_m"]),
+        },
         "capability_result": "HISTORICAL_BRANCH_BIRTH_OBSERVED_NOT_SOURCE_COMPATIBLE",
         "frozen_source_branch_enabled_probe_count": len(frozen_probes),
         "frozen_source_branch_enabled_probes": frozen_probes,
@@ -405,7 +409,7 @@ All 288 plan IDs were evaluated with angle-matched, candidate-independent discre
 
 ## Branching capability demonstration
 
-The retained result is labelled `{LABEL}`. The frozen-source branching path executed to its bounded target with branching enabled. Its machine-readable record states whether a branch birth occurred. It is outside the canonical single-crack matrix and does not validate branching nucleation, competition, topology, or fracture-resistance physics.
+The retained positive result is labelled `{LABEL}`. It is the completed historical V11 weak-T/700 K/θ=30° 300 µm segment, which recorded a committed branch birth at step 295. It is retained only as repository-lineage capability evidence: its V11 topology backend is not source-compatible with the frozen canonical single-crack source. Five bounded frozen-source branch-enabled probes reached their targets without a daughter birth and are recorded as negative compatibility diagnostics. None of these results validates branching nucleation, competition, topology, or fracture-resistance physics.
 
 ## Historical disposition and storage
 
