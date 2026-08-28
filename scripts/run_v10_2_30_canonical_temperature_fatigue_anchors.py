@@ -78,7 +78,7 @@ def _registry_options() -> dict[str, str]:
 def build_jobs(head: str) -> list[dict]:
     matrix = pd.read_csv(MATRIX)
     selected = matrix[matrix.preflight_launch_eligible].copy()
-    if len(matrix) != 36 or len(selected) != 25:
+    if len(matrix) != 36 or len(selected) != 36:
         raise SystemExit("canonical preflight population drift")
     options = _registry_options()
     jobs: list[dict] = []
@@ -193,7 +193,7 @@ def launch_preflight(head: str) -> dict:
         payload["matrix_sha256"] == sha(MATRIX),
         payload["registry_sha256"] == sha(REGISTRY),
         payload["kernel_family_sha256"] == sha(FAMILY),
-        payload["job_count"] == 25,
+        payload["job_count"] == 36,
         payload["fresh_virgin_required"] is True,
         payload["resume_permitted"] is False,
     )

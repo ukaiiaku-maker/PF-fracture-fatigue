@@ -600,7 +600,9 @@ def temperature_anchor_preflight(
                     math.isfinite(ceiling_fraction)
                     and ceiling_fraction < 0.95 and near_ceiling < 0.5
                     and near_floor < 0.5 and stress_cap < 0.5
-                    and number(fatigue["A0_da_dN"]) >= 1.0e-16
+                )
+                accessibility_gate_passed = bool(
+                    number(fatigue["A0_da_dN"]) >= 1.0e-16
                 )
                 persistent_density = number(raw.get("rho_source0_m2"))
                 bins = number(raw.get("n_bins_recommended"))
@@ -639,6 +641,11 @@ def temperature_anchor_preflight(
                         else "UNAVAILABLE_NONCONVERGED_NOT_A_PHYSICAL_REJECTION"
                     ),
                     "accessibility_floor_m_per_cycle": 1.0e-16,
+                    "accessibility_gate_passed": accessibility_gate_passed,
+                    "prospective_accessibility_class": (
+                        "EXPECTED_ACTIVE_OR_INTERMEDIATE" if accessibility_gate_passed
+                        else "EXPECTED_PHYSICAL_CYCLE_CENSOR"
+                    ),
                     "cooperative_ceiling_fraction": ceiling_fraction,
                     "phase_fraction_near_cooperative_ceiling": near_ceiling,
                     "phase_fraction_near_barrier_floor": near_floor,

@@ -72,7 +72,8 @@ def main() -> None:
     require(set(preflight.n_bins) == {80}, "temperature anchors must use the qualified n80 kernel")
     require(preflight.registry_role.nunique() == 6, "named/optional control row missing")
     require(preflight.groupby(["registry_role", "temperature_K"]).size().eq(3).all(), "Kmax triplets incomplete")
-    require(int(preflight.asymptotic_gate_passed.sum()) == 40, "asymptotic gate population drift")
+    require(int(preflight.asymptotic_gate_passed.sum()) == 54, "asymptotic gate population drift")
+    require(int(preflight.accessibility_gate_passed.sum()) == 40, "named accessibility population drift")
     require(not preflight.current_production_row_complete.any(), "legacy named row was silently completed")
     require(preflight.current_persistent_site_density_m2.isna().all(), "persistent density was fabricated")
     require(int(preflight.preflight_launch_eligible.sum()) == 0, "incomplete row admitted to production")
@@ -82,7 +83,11 @@ def main() -> None:
     require((asymptotic.cooperative_ceiling_fraction < .95).all(), "ceiling-dominated point admitted")
     require((asymptotic.phase_fraction_near_barrier_floor < .5).all(), "floor-dominated point admitted")
     require((asymptotic.phase_fraction_at_stress_cap < .5).all(), "stress-cap-dominated point admitted")
-    require((asymptotic.A0_da_dN_m_per_cycle >= asymptotic.accessibility_floor_m_per_cycle).all(), "inaccessible point admitted")
+    require(
+        set(preflight[~preflight.accessibility_gate_passed].prospective_accessibility_class)
+        == {"EXPECTED_PHYSICAL_CYCLE_CENSOR"},
+        "sub-onset point was not retained as a prospective censor",
+    )
     legacy = Path(decision["named_row_source_registry"])
     require(legacy.is_file(), "named-row source registry missing")
     require(sha256(legacy) == decision["named_row_source_registry_sha256"], "named-row source hash drift")
@@ -95,8 +100,9 @@ def main() -> None:
     require(canonical_preflight.groupby(["registry_role", "temperature_K"]).size().eq(3).all(), "canonical Kmax triplets incomplete")
     require(set(canonical_preflight.n_bins) == {80}, "canonical anchors must use n80")
     require(canonical_preflight.current_production_row_complete.all(), "canonical production row incomplete")
-    require(int(canonical_preflight.asymptotic_gate_passed.sum()) == 25, "canonical asymptotic population drift")
-    require(int(canonical_preflight.preflight_launch_eligible.sum()) == 25, "canonical launch population drift")
+    require(int(canonical_preflight.asymptotic_gate_passed.sum()) == 36, "canonical asymptotic population drift")
+    require(int(canonical_preflight.accessibility_gate_passed.sum()) == 25, "canonical accessibility population drift")
+    require(int(canonical_preflight.preflight_launch_eligible.sum()) == 36, "canonical launch population drift")
 
     require(decision["Kinit_transfer_fit_performed"] is False, "Kinit transfer fit present")
     require(decision["new_PF_or_FEM_calculations"] is False, "new spatial calculation present")
@@ -110,7 +116,7 @@ def main() -> None:
     print(json.dumps({
         "status": "PASS", "spatial_rows": len(reconstruction),
         "qualified_histories": len(qualified), "asymptotically_admissible_anchors": len(asymptotic),
-        "eligible_temperature_anchors": 25,
+        "eligible_temperature_anchors": 36,
         "physical_launches": 0,
     }, indent=2, sort_keys=True))
 

@@ -72,9 +72,8 @@ def test_temperature_preflight_is_physics_gated_not_stationary_closure_promoted(
     assert set(data.stationary_state_reduction_status) == {
         "UNAVAILABLE_NONCONVERGED_NOT_A_PHYSICAL_REJECTION"
     }
-    asymptotic = data[data.asymptotic_gate_passed]
-    assert len(asymptotic) == 40
-    assert (asymptotic.A0_da_dN_m_per_cycle >= asymptotic.accessibility_floor_m_per_cycle).all()
+    assert data.asymptotic_gate_passed.sum() == 54
+    assert data.accessibility_gate_passed.sum() == 40
     assert not data.current_production_row_complete.any()
     assert data.current_persistent_site_density_m2.isna().all()
     assert not data.preflight_launch_eligible.any()
@@ -86,15 +85,16 @@ def test_exact_canonical_rows_supply_the_production_eligible_temperature_matrix(
     assert data.registry_role.nunique() == 4
     assert set(data.n_bins) == {80}
     assert data.current_production_row_complete.all()
-    assert data.asymptotic_gate_passed.sum() == 25
-    assert data.preflight_launch_eligible.sum() == 25
+    assert data.asymptotic_gate_passed.sum() == 36
+    assert data.accessibility_gate_passed.sum() == 25
+    assert data.preflight_launch_eligible.sum() == 36
     assert set(data[data.preflight_launch_eligible].production_row_gap) == {"NONE"}
 
 
 def test_canonical_temperature_jobs_are_fresh_n80_and_use_Kmax_to_deltaK_mapping():
     jobs = build_jobs("test-head")
-    assert len(jobs) == 25
-    assert len({job["job_id"] for job in jobs}) == 25
+    assert len(jobs) == 36
+    assert len({job["job_id"] for job in jobs}) == 36
     assert {job["seed"] for job in jobs} == {1720}
     assert {job["n_bins"] for job in jobs} == {80}
     assert {job["R"] for job in jobs} == {0.1}
