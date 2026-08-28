@@ -16,6 +16,7 @@ import pandas as pd
 
 
 CLASS_ALIASES = {"peak": "Peak", "DBTT": "DBTT", "weakT": "weak-T", "ceramic": "ceramic-like"}
+PHYSICAL_EVENT_LENGTH_M = 5.0e-6
 
 
 def sha256(path: Path) -> str:
@@ -28,6 +29,45 @@ def jsonable(value: Any):
     raise TypeError(type(value).__name__)
 
 
+def flag(value: Any) -> bool:
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def analysis_matrix_label(plan: dict[str, str]) -> str:
+    """Preserve V1 labels and derive the non-exclusive V2 provenance label."""
+    if plan.get("matrix"):
+        return plan["matrix"]
+    orientation = flag(plan.get("is_orientation_matrix_case", False))
+    rate = flag(plan.get("is_rate_matrix_case", False))
+    if orientation and rate:
+        return "CANONICAL_ORIENTATION_AND_RATE_SHARED"
+    if orientation:
+        return "CANONICAL_SINGLE_CRACK_THETA"
+    if rate:
+        return "CANONICAL_STRAIN_RATE"
+    raise ValueError(f"case has no canonical analysis membership: {plan.get('case_id', '<unknown>')}")
+
+
+def target_extension_um(plan: dict[str, str]) -> float:
+    value = plan.get("target_projected_extension_um", plan.get("target_extension_um"))
+    if value in (None, ""):
+        raise ValueError(f"case has no target extension: {plan.get('case_id', '<unknown>')}")
+    return float(value)
+
+
+def canonical_case_id(plan: dict[str, str]) -> str:
+    """Use the authoritative V2 identity; synthesize only legacy V1 identities."""
+    if plan.get("case_id"):
+        return plan["case_id"]
+    theta = float(plan["theta_deg"])
+    return (
+        f"{analysis_matrix_label(plan).lower()}__"
+        f"{plan['material_class'].replace('-', '').lower()}__"
+        f"T{int(float(plan['temperature_K'])):04d}K__theta{theta:g}__"
+        f"{plan['rate_tag']}__seed{plan['seed']}"
+    )
+
+
 def summarize(result: dict[str, Any], plan: dict[str, str]) -> dict[str, Any]:
     events = result["events"]
     onsets = [event for event in events if event["event_index"] == 0 or event["reload_separated"]]
@@ -36,6 +76,8 @@ def summarize(result: dict[str, Any], plan: dict[str, str]) -> dict[str, Any]:
     terminal = events[-1] if events else {}
     return {
         "case_id": plan["case_id"], "matrix": plan["matrix"],
+        "is_orientation_matrix_case": flag(plan.get("is_orientation_matrix_case", False)),
+        "is_rate_matrix_case": flag(plan.get("is_rate_matrix_case", False)),
         "material_class": plan["material_class"], "candidate_id": result["candidate_id"],
         "temperature_K": float(plan["temperature_K"]), "theta_deg": float(plan["theta_deg"]),
         "rate_tag": plan["rate_tag"], "loading_rate_factor": float(plan["loading_rate_factor"]),
@@ -92,27 +134,33 @@ def main() -> int:
         plans = list(csv.DictReader(stream))
     outputs = []; summaries = []
     for index, plan in enumerate(plans):
+        plan = dict(plan)
         theta = float(plan["theta_deg"])
+        target_um = target_extension_um(plan)
         mechanics_path = args.maps / f"pf_v2_theta{theta:g}_mechanics_map.csv"
         drive_path = args.maps / f"pf_v2_theta{theta:g}_source_drive_map.csv"
         mechanics = ProviderMechanicsMap.from_csv("PF", mechanics_path)
         drive = SourceDriveMap.from_csv(drive_path)
-        projected_advance = 5e-6 * np.cos(np.deg2rad(theta))
-        lifecycle = replace(PF_PREDICTIVE_LIFECYCLE_V2, nominal_advance_m=float(projected_advance))
+        # Canonical V2 uses a horizontal forward-[100] crack trace at every
+        # crystal orientation.  Theta rotates elasticity/slip systems, not the
+        # crack path, so laboratory-x projected advance is the full 5 um.
+        lifecycle = replace(
+            PF_PREDICTIVE_LIFECYCLE_V2,
+            nominal_advance_m=PHYSICAL_EVENT_LENGTH_M,
+        )
         loading = provider_loading_map(
-            mechanics, seed=int(plan["seed"]), target_extension_m=float(plan["target_extension_um"]) * 1e-6,
+            mechanics, seed=int(plan["seed"]), target_extension_m=target_um * 1e-6,
             lifecycle=lifecycle, nominal_dU_m=float(plan["nominal_dU_m"]), nominal_dt_s=float(plan["nominal_dt_s"]),
         )
         candidate = candidate_from_registry_row(rows_by_class[plan["material_class"]])
         result = run_zero_d_predictive(
             candidate, physics, mechanics, drive, loading, float(plan["temperature_K"]),
-            target_extension_m=float(plan["target_extension_um"]) * 1e-6,
+            target_extension_m=target_um * 1e-6,
             lifecycle=lifecycle, maximum_intervals=500_000, maximum_opening_m=500e-6,
         )
-        plan = dict(plan); plan["case_id"] = (
-            f"{plan['matrix'].lower()}__{plan['material_class'].replace('-', '').lower()}__"
-            f"T{int(float(plan['temperature_K'])):04d}K__theta{theta:g}__{plan['rate_tag']}__seed{plan['seed']}"
-        )
+        plan["case_id"] = canonical_case_id(plan)
+        plan["matrix"] = analysis_matrix_label(plan)
+        plan["target_extension_um"] = f"{target_um:.17g}"
         result["canonical_case_identity"] = plan
         result["angle_conditioned_mechanics_map_sha256"] = sha256(mechanics_path)
         result["angle_conditioned_source_drive_map_sha256"] = sha256(drive_path)

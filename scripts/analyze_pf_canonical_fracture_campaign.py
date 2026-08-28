@@ -48,6 +48,24 @@ def nested_sum(value: Any) -> float:
     return result if math.isfinite(result) else 0.0
 
 
+def flag(value: Any) -> bool:
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def analysis_memberships(case: dict[str, Any]) -> tuple[bool, bool]:
+    """Return non-exclusive orientation/rate memberships for V1 or V2 cases."""
+    matrix = str(case.get("matrix", ""))
+    orientation = flag(case.get(
+        "is_orientation_matrix_case",
+        matrix == "CANONICAL_SINGLE_CRACK_THETA",
+    ))
+    rate = flag(case.get(
+        "is_rate_matrix_case",
+        matrix == "CANONICAL_STRAIN_RATE",
+    ))
+    return orientation, rate
+
+
 def load_json_or_zstd(path: Path) -> dict[str, Any]:
     if path.suffix == ".zst":
         raw = subprocess.run(
@@ -242,13 +260,30 @@ def physical_avalanches(transactions: list[dict[str, Any]]) -> list[dict[str, An
 
 
 def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None = None,
-            one_d_results: Path | None = None) -> dict[str, Any]:
+            one_d_results: Path | None = None,
+            plan: Path | None = None) -> dict[str, Any]:
     out.mkdir(parents=True, exist_ok=True)
     transactions: list[dict[str, Any]] = []
     cases: list[dict[str, Any]] = []
     profiles: list[dict[str, Any]] = []
     skipped_incomplete: list[str] = []
-    for launch_path in sorted(campaign_root.glob("*/canonical_case_launch.json")):
+    planned_case_ids: list[str] | None = None
+    plan_sha256: str | None = None
+    if plan is not None:
+        with plan.open(newline="") as stream:
+            plan_rows = list(csv.DictReader(stream))
+        planned_case_ids = [row["case_id"] for row in plan_rows]
+        if len(set(planned_case_ids)) != len(planned_case_ids):
+            raise ValueError(f"duplicate case identity in canonical plan: {plan}")
+        plan_sha256 = sha256(plan)
+        launch_paths = [campaign_root / case_id / "canonical_case_launch.json"
+                        for case_id in planned_case_ids]
+    else:
+        launch_paths = sorted(campaign_root.glob("*/canonical_case_launch.json"))
+    for launch_path in launch_paths:
+        if not launch_path.is_file():
+            skipped_incomplete.append(launch_path.parent.name)
+            continue
         result_path = launch_path.parent / "canonical_case_result.json"
         if not result_path.is_file():
             skipped_incomplete.append(launch_path.parent.name)
@@ -287,8 +322,11 @@ def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None =
         group = ava_by_case.get(case["case_id"], [])
         state_group = profiles_by_case.get(case["case_id"], [])
         sizes = [float(row["avalanche_extension_um"]) for row in group]
+        orientation_member, rate_member = analysis_memberships(case)
         summaries.append({
             **{key: case[key] for key in ("case_id", "matrix", "material_class", "candidate_id", "temperature_K", "theta_deg", "rate_tag", "loading_rate_factor", "seed")},
+            "is_orientation_matrix_case": orientation_member,
+            "is_rate_matrix_case": rate_member,
             "target_extension_um": case["target_extension_um"], "achieved_extension_um": case["achieved_extension_um"],
             "target_status": "TARGET_REACHED" if case["achieved_extension_um"] >= float(case["target_extension_um"]) - 1e-6 else "RIGHT_CENSORED",
             "numerical_event_count": case["numerical_event_count"], "physical_avalanche_count": len(group),
@@ -313,8 +351,10 @@ def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None =
     write_csv(out / "pf_canonical_in_avalanche_native_drive_v2.csv", interior, list(interior[0]) if interior else tx_fields + ["semantic_role"])
     write_csv(out / "pf_canonical_state_profile_index_v2.csv", profiles, list(profiles[0]))
     write_csv(out / "pf_canonical_fracture_run_manifest.csv", summaries, list(summaries[0]))
-    write_csv(out / "pf_canonical_theta_results.csv", [r for r in summaries if r["matrix"] == "CANONICAL_SINGLE_CRACK_THETA"], list(summaries[0]))
-    write_csv(out / "pf_canonical_rate_results.csv", [r for r in summaries if r["matrix"] == "CANONICAL_STRAIN_RATE"], list(summaries[0]))
+    theta_rows = [r for r in summaries if r["is_orientation_matrix_case"]]
+    rate_rows = [r for r in summaries if r["is_rate_matrix_case"]]
+    write_csv(out / "pf_canonical_theta_results.csv", theta_rows, list(summaries[0]))
+    write_csv(out / "pf_canonical_rate_results.csv", rate_rows, list(summaries[0]))
     comparison_count = 0
     one_d_bound_count = 0
     if one_d_results is not None:
@@ -367,6 +407,15 @@ def analyze(campaign_root: Path, out: Path, *, expected_case_count: int | None =
         "state_profile_count": len(profiles),
         "matched_oneD_comparison_count": comparison_count,
         "matched_oneD_drive_map_bound_count": one_d_bound_count,
+        "orientation_analysis_case_count": len(theta_rows),
+        "rate_analysis_case_count": len(rate_rows),
+        "shared_orientation_rate_case_count": sum(
+            row["is_orientation_matrix_case"] and row["is_rate_matrix_case"]
+            for row in summaries
+        ),
+        "canonical_plan_path": None if plan is None else str(plan),
+        "canonical_plan_sha256": plan_sha256,
+        "supplemental_cases_excluded_by_plan": plan is not None,
         "transactions_are_not_resistance_curve_points": True,
         "native_history_label": "PF MODEL-NATIVE DRIVING TRAJECTORY",
         "onset_label": "RELOAD-SEPARATED EFFECTIVE RESISTANCE CANDIDATES",
@@ -382,10 +431,12 @@ def main() -> int:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--expected-case-count", type=int)
     parser.add_argument("--oneD-results", type=Path)
+    parser.add_argument("--plan", type=Path)
     args = parser.parse_args()
     print(json.dumps(analyze(args.campaign_root, args.out,
                              expected_case_count=args.expected_case_count,
-                             one_d_results=args.oneD_results), indent=2, sort_keys=True))
+                             one_d_results=args.oneD_results,
+                             plan=args.plan), indent=2, sort_keys=True))
     return 0
 
 

@@ -13,7 +13,9 @@ from scripts import audit_pf_canonical_fracture_campaign as audit
 from scripts import consolidate_pf_canonical_observer_artifacts as consolidation
 from scripts import execute_pf_scoped_delete_list as delete_tool
 from scripts import run_pf_canonical_fracture_campaign as runner
+from scripts import run_pf_canonical_oneD_comparisons as one_d_comparison
 from scripts import build_pf_canonical_campaign_v2 as campaign_v2
+from scripts import publish_pf_canonical_fracture_campaign as publisher
 from arrhenius_fracture import sharp_front
 
 
@@ -56,6 +58,29 @@ def test_v2_theta0_rate1_shared_membership_is_exactly_48():
     ]
     assert len(shared) == 48
     assert {(row["theta_deg"], row["rate_tag"]) for row in shared} == {(0, "rate1x")}
+
+
+def test_v2_oneD_replay_preserves_authoritative_identity_target_and_membership():
+    rows = _v2_rows()
+    rate_only = next(row for row in rows if row["case_id"].startswith("canonical_theta0_rate__"))
+    shared = next(row for row in rows if row["case_id"].startswith("canonical_theta0_shared__"))
+    assert one_d_comparison.canonical_case_id(rate_only) == rate_only["case_id"]
+    assert one_d_comparison.canonical_case_id(shared) == shared["case_id"]
+    assert one_d_comparison.target_extension_um(rate_only) == 1000.0
+    assert one_d_comparison.analysis_matrix_label(rate_only) == "CANONICAL_STRAIN_RATE"
+    assert one_d_comparison.analysis_matrix_label(shared) == "CANONICAL_ORIENTATION_AND_RATE_SHARED"
+    assert one_d_comparison.PHYSICAL_EVENT_LENGTH_M == 5.0e-6
+
+
+def test_v2_analysis_memberships_are_nonexclusive_for_shared_case():
+    assert analysis.analysis_memberships({
+        "matrix": "CANONICAL_ORIENTATION_AND_RATE_SHARED",
+        "is_orientation_matrix_case": "True",
+        "is_rate_matrix_case": "True",
+    }) == (True, True)
+    assert analysis.analysis_memberships({
+        "matrix": "CANONICAL_SINGLE_CRACK_THETA",
+    }) == (True, False)
 
 
 def test_v2_has_no_duplicate_physical_condition():
@@ -300,6 +325,24 @@ def test_branching_must_be_labelled_demonstration_only():
     required = "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS"
     mission = Path("/Users/shen/.codex/attachments/3d905682-3e9b-4e85-9f4a-65a21828e824/pasted-text.txt").read_text()
     assert required in mission
+    assert publisher.LABEL == required
+
+
+def test_final_publisher_keeps_shared_membership_in_both_analyses():
+    rows = [{
+        "material_class": "Peak",
+        "theta_deg": "0.0",
+        "rate_tag": "rate1x",
+        "initial_onset_native_KJ_MPa_sqrt_m": "20",
+        "delta_K_reinit_MPa_sqrt_m": "",
+        "largest_avalanche_fraction": "1",
+        "physical_avalanche_count": "1",
+    }]
+    theta = publisher.grouped_summary(rows, "theta_deg", ["0.0"])
+    rate = publisher.grouped_summary(rows, "rate_tag", ["rate1x"])
+    assert theta[0]["case_count"] == 1
+    assert rate[0]["case_count"] == 1
+    assert theta[0]["delta_K_reinit_mean_MPa_sqrt_m"] is None
 
 
 def test_generated_plan_is_deterministic():
@@ -447,7 +490,8 @@ def test_matched_oneD_uses_theta_rate_seed_and_fails_closed():
     source = Path("scripts/run_pf_canonical_oneD_comparisons.py").read_text()
     assert "nominal_dt_s=float(plan[\"nominal_dt_s\"])" in source
     assert "seed=int(plan[\"seed\"])" in source
-    assert "nominal_advance_m=float(projected_advance)" in source
+    assert "nominal_advance_m=PHYSICAL_EVENT_LENGTH_M" in source
+    assert "5e-6 * np.cos" not in source
     assert 'return 0 if manifest["all_target_right_censored"] else 1' in source
     assert '"drive_map_bound_case_count"' in source
 
