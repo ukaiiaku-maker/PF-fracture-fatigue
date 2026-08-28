@@ -17,7 +17,10 @@ from scripts.analyze_v10_2_30_joint_fracture_fatigue_atlas import (
     load_candidate_rows,
     material_from_row,
 )
-from scripts.run_v10_2_30_canonical_temperature_fatigue_anchors import build_jobs
+from scripts.run_v10_2_30_canonical_temperature_fatigue_anchors import (
+    build_jobs,
+    prephysics_infrastructure_failure,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "runs/mechanical_transfer_temperature_anchors_v1"
@@ -107,3 +110,13 @@ def test_canonical_temperature_jobs_are_fresh_n80_and_use_Kmax_to_deltaK_mapping
         for job in jobs
     )
     assert not any("dbtt_intrinsic_control" in job["job_id"] for job in jobs)
+
+
+def test_empty_prephysics_dev_fd_failure_is_not_a_numerical_trajectory(tmp_path):
+    (tmp_path / "run.log").write_text("")
+    (tmp_path / "high_cycle_run_manifest.json").write_text("{}")
+    (tmp_path / "high_cycle_summary.json").write_text("{}")
+    (tmp_path / "exit_code.txt").write_text("1\n")
+    assert prephysics_infrastructure_failure(tmp_path)
+    (tmp_path / "kinetic_tip_cell_audit_v101.json").write_text("{}")
+    assert not prephysics_infrastructure_failure(tmp_path)

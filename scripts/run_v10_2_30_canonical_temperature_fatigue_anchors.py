@@ -217,11 +217,81 @@ def classify(path: Path, returncode: int) -> str:
         if int(summary.get("event_count", 0)) > 0:
             return "COMPLETE_PARTIAL_PHYSICAL_GROWTH"
         return "INVALID_NONTERMINAL_ZERO_EVENT"
+    if prephysics_infrastructure_failure(path):
+        return "LAUNCH_INFRASTRUCTURE_FAILURE"
     if checkpoint.is_file():
         return "NUMERICAL_NONTERMINATION_WITH_DIAGNOSTIC_CHECKPOINT"
     if returncode == 2:
         return "LAUNCH_CONTRACT_FAILURE"
     return "NUMERICAL_FAILURE"
+
+
+def prephysics_infrastructure_failure(path: Path) -> bool:
+    """Identify the macOS /dev/fd denial before solver initialization."""
+    if (path / "kinetic_tip_cell_audit_v101.json").is_file():
+        return False
+    log = path / "run.log"
+    if not log.is_file():
+        return False
+    text = log.read_text()
+    return (
+        "Operation not permitted" in text
+        or (
+            not text
+            and (path / "high_cycle_run_manifest.json").is_file()
+            and (path / "high_cycle_summary.json").is_file()
+            and (path / "exit_code.txt").read_text().strip() == "1"
+        )
+    )
+
+
+def requeue_infrastructure(head: str) -> None:
+    repository_preflight(head)
+    if not FREEZE.is_file() or not JOBS.is_file():
+        raise SystemExit("missing failed launch freeze or job registry")
+    payload = json.loads(FREEZE.read_text())
+    if payload["matrix_sha256"] != sha(MATRIX) or payload["registry_sha256"] != sha(REGISTRY):
+        raise SystemExit("prospective matrix or registry changed after failed launch")
+    rows = pd.read_csv(JOBS, keep_default_na=False).to_dict("records")
+    requeued = 0
+    for row in rows:
+        old = Path(str(row["result_path"]))
+        if row["status"] == "NUMERICAL_FAILURE" and prephysics_infrastructure_failure(old):
+            row["prior_infrastructure_failure_path"] = str(old)
+            row["result_path"] = str(Path(str(old) + "_fresh_retry1"))
+            row["status"] = "PENDING"
+            row["exit_code"] = ""
+            row["wall_seconds"] = ""
+            row["solver_head"] = head
+            requeued += 1
+    if requeued != 36:
+        raise SystemExit(f"expected 36 prephysics infrastructure failures; found {requeued}")
+    atomic_csv(JOBS, rows)
+    history = list(payload.get("infrastructure_failure_history", []))
+    history.append({
+        "attempt_head": payload["head"],
+        "attempt_utc": payload["physical_launch_utc"],
+        "classification": "PREPHYSICS_DEV_FD_OPERATION_NOT_PERMITTED",
+        "affected_jobs": requeued,
+        "kinetic_audits_written": 0,
+        "checkpoints_written": 0,
+        "fresh_requeue_head": head,
+    })
+    payload.update({
+        "head": head,
+        "physical_launch_utc": None,
+        "infrastructure_failure_history": history,
+    })
+    atomic_json(FREEZE, payload)
+    atomic_json(STATE, {
+        "schema": "v10.2.30_canonical_temperature_fatigue_controller_v1",
+        "phase": "INFRASTRUCTURE_REQUEUED_FRESH",
+        "expected_head": head,
+        "active_worker_count": 0,
+        "status_counts": {"PENDING": requeued},
+        "last_update_utc": now(),
+    })
+    print(json.dumps({"status": "PASS", "fresh_requeued": requeued, "head": head}))
 
 
 def run_one(job: dict, head: str, maximum_wall_seconds: int) -> dict:
@@ -315,7 +385,9 @@ def status() -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("freeze", "run", "status"))
+    parser.add_argument(
+        "command", choices=("freeze", "requeue-infrastructure", "run", "status")
+    )
     parser.add_argument("--expected-head")
     parser.add_argument("--workers", type=int, default=3)
     parser.add_argument("--maximum-wall-seconds", type=int, default=43200)
@@ -331,6 +403,8 @@ def main() -> int:
         raise SystemExit("--maximum-wall-seconds must be at least 60")
     if args.command == "freeze":
         freeze(args.expected_head)
+    elif args.command == "requeue-infrastructure":
+        requeue_infrastructure(args.expected_head)
     else:
         run(args.expected_head, args.workers, args.maximum_wall_seconds)
     return 0
