@@ -269,6 +269,7 @@ def main() -> int:
     parser.add_argument("--branch-root", type=Path, required=True)
     parser.add_argument("--historical-audit", type=Path, required=True)
     parser.add_argument("--campaign-root", type=Path, required=True)
+    parser.add_argument("--verification", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
@@ -282,6 +283,10 @@ def main() -> int:
         raise RuntimeError("canonical publication counts do not close")
     if any(row["target_status"] != "TARGET_REACHED" for row in manifest):
         raise RuntimeError("canonical campaign contains a non-complete PF case")
+    verification = json.loads(args.verification.read_text())
+    if verification.get("overall_status") != "PASS_WITH_SAME_SEVEN_LEGACY_FAILURES":
+        raise RuntimeError("final verification record is not qualified")
+    shutil.copyfile(args.verification, args.out / "pf_canonical_final_verification.json")
 
     # Promote the compact canonical tables verbatim.  The much larger event,
     # in-avalanche, and state-profile ledgers remain in the local analysis tree
@@ -371,6 +376,9 @@ def main() -> int:
         "branching_demo_result": branch["capability_result"],
         "historical_inventory_regenerated": False,
         "production_physics_modified_by_postprocessing": False,
+        "verification_status": verification["overall_status"],
+        "full_suite_passed": verification["full_suite"]["passed"],
+        "full_suite_legacy_failures": verification["full_suite"]["legacy_failures"],
     }
     decision_path = args.out / "pf_canonical_campaign_decision.json"
     decision_path.write_text(json.dumps(final_decision, indent=2, sort_keys=True) + "\n")
@@ -428,6 +436,9 @@ The retained positive result is labelled `{LABEL}`. It is the completed historic
 - Event-boundary state-profile rows: {decision['state_profile_count']}
 - Event/observer closure: `{str(decision['event_observer_closure']).lower()}`
 - Historical inventory regenerated: false
+- Full suite: {verification['full_suite']['passed']} passed; {verification['full_suite']['legacy_failures']} unchanged legacy failures; no new failures
+- Focused canonical tests: {verification['focused_canonical_tests']['passed']} passed
+- Compileall / git diff check / deterministic regeneration: pass / pass / pass
 
 The final decision JSON and artifact-hash manifest are the machine-readable authority for this report.
 
@@ -461,6 +472,7 @@ No additional deletion is authorized by this publication. The carried delete lis
         "scientific_plan_fingerprint_sha256": final_decision["scientific_plan_fingerprint_sha256"],
         "historical_inventory_regenerated": False,
         "canonical_result_root": str(args.campaign_root),
+        "verification_status": verification["overall_status"],
         "artifact_hashes": artifact_hashes,
     }
     (args.out / "pf_canonical_final_provenance.json").write_text(
