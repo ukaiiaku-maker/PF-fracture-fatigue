@@ -236,6 +236,7 @@ def solve_hierarchy(
     bracket_high = 1.0e-12
     fhigh = f0
     iteration = 0
+    last = math.nan
     while iteration < controls.max_iterations:
         iteration += 1
         fhigh, _, _ = balance(bracket_high)

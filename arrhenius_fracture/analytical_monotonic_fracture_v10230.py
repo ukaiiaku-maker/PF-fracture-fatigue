@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, replace
 import math
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 import numpy as np
 from scipy.special import gammainc, gammaln
@@ -283,6 +283,99 @@ def _linear_positive_advance(level: str, state: np.ndarray, dt: float,
     return np.maximum(np.r_[q, populations], 0.0)
 
 
+def _fast_affine_compartment_advance(
+    matrix: np.ndarray, source: np.ndarray, initial: np.ndarray, dt: float
+) -> np.ndarray:
+    """Small dense affine update without norm-dependent Pade scaling.
+
+    Archived PF steps can span more than 10^12 fastest compartment time
+    constants.  Diagonalizing the stable two/four-compartment generator avoids
+    thousands of matrix squarings while retaining the exact frozen-rate
+    exponential.  Ill-conditioned cases fail back to the established augmented
+    matrix exponential.  The compartment generator is Metzler, so only
+    round-off-scale negative content is clipped.
+    """
+    if dt <= 0.0:
+        return np.maximum(np.asarray(initial, dtype=float), 0.0)
+    matrix = np.asarray(matrix, dtype=float)
+    source = np.asarray(source, dtype=float)
+    initial = np.asarray(initial, dtype=float)
+    try:
+        augmented = np.zeros((matrix.shape[0] + 1, matrix.shape[1] + 1))
+        augmented[:-1, :-1] = matrix
+        augmented[:-1, -1] = source
+        eigenvalues, eigenvectors = np.linalg.eig(augmented)
+        transition = eigenvectors @ np.diag(
+            np.exp(np.clip(eigenvalues * dt, -745.0, 0.0))
+        ) @ np.linalg.inv(eigenvectors)
+        transition = np.real_if_close(transition, tol=1000).real
+        lifted = np.r_[initial, 1.0]
+        propagated = transition @ lifted
+        scale = float(propagated[-1])
+        if not math.isfinite(scale) or abs(scale - 1.0) > 1.0e-7:
+            raise np.linalg.LinAlgError("affine coordinate did not close")
+        result = propagated[:-1] / scale
+        if not np.all(np.isfinite(result)):
+            raise np.linalg.LinAlgError("non-finite eigen exponential")
+    except np.linalg.LinAlgError:
+        # A nearly conservative exchange matrix can contain a Jordan block at
+        # zero, for which eigenvector propagation is ill-conditioned.  Scale
+        # only the affine coordinate before the established augmented expm;
+        # this is an exact similarity transformation and prevents a very large
+        # emission source from driving unnecessary Pade scaling/squaring.
+        source_scale = max(float(np.max(np.abs(source))), 1.0)
+        augmented = np.zeros((matrix.shape[0] + 1, matrix.shape[1] + 1))
+        augmented[:-1, :-1] = matrix
+        augmented[:-1, -1] = source / source_scale
+        transition = expm(augmented * dt)
+        result = (
+            transition[:-1, :-1] @ initial
+            + transition[:-1, -1] * source_scale
+        )
+    return np.maximum(result, 0.0)
+
+
+def _linear_positive_advance_history(
+    level: str, state: np.ndarray, dt: float,
+    diagnostics: Mapping[str, float], manifest: MaterialManifest,
+    controls: MonotonicControls,
+) -> np.ndarray:
+    """Fast equivalent of ``_linear_positive_advance`` for archived histories."""
+    if level in {"F0", "F1"}:
+        return _linear_positive_advance(level, state, dt, diagnostics, manifest, controls)
+    emit = float(diagnostics["emission_rate_s"])
+    kq = float(diagnostics["blunting_transport_rate_s"])
+    if kq > 1.0e-30:
+        q = state[0] * math.exp(-min(kq * dt, 700.0)) + emit * (-math.expm1(-min(kq * dt, 700.0))) / kq
+    else:
+        q = state[0] + emit * dt
+    recovery = (
+        manifest.retained_recovery_rate_s
+        if controls.retained_recovery_rate_s is None
+        else controls.retained_recovery_rate_s
+    )
+    kenc = float(diagnostics["encounter_rate_s"])
+    kesc = float(diagnostics["escape_rate_s"])
+    kt = float(diagnostics["taylor_rate_s"])
+    if level == "F2":
+        matrix = np.array([[-kenc-kesc, kt], [kenc, -kt-max(recovery, 0.0)]])
+        populations = _fast_affine_compartment_advance(
+            matrix, np.array([emit, 0.0]), state[1:3], dt
+        )
+        return np.maximum(np.r_[q, populations], 0.0)
+    exchange = max(controls.f2b_exchange_rate_s, 0.0)
+    matrix = np.array([
+        [-kenc-exchange, kt, 0.0, 0.0],
+        [kenc, -kt-max(recovery, 0.0)-exchange, 0.0, 0.0],
+        [exchange, 0.0, -kesc-kenc, kt],
+        [0.0, exchange, kenc, -kt-max(recovery, 0.0)],
+    ])
+    populations = _fast_affine_compartment_advance(
+        matrix, np.array([emit, 0.0, 0.0, 0.0]), state[1:5], dt
+    )
+    return np.maximum(np.r_[q, populations], 0.0)
+
+
 def solve_first_passage(manifest: MaterialManifest, row: Mapping[str, Any],
                         temperature_K: float, level: str = "F2",
                         controls: MonotonicControls = MonotonicControls(),
@@ -374,6 +467,110 @@ def solve_first_passage(manifest: MaterialManifest, row: Mapping[str, Any],
         ),
         "pre_event_state": terminal,
         "history": history if return_history else None,
+        "no_crack_advance_translation_before_first_event": True,
+    }
+
+
+def solve_first_passage_history(
+    manifest: MaterialManifest,
+    row: Mapping[str, Any],
+    temperature_K: float,
+    history: Iterable[Mapping[str, Any]],
+    level: str = "F2",
+    controls: MonotonicControls = MonotonicControls(),
+    *,
+    threshold_action: float = 1.0,
+    return_history: bool = False,
+) -> dict[str, Any]:
+    """Drive the no-fit hierarchy with an archived piecewise-constant local-K history.
+
+    Each history record must provide ``dt_s`` and ``K_local_MPa_sqrt_m``.  The
+    update uses the same positivity-preserving frozen-rate midpoint operator as
+    :func:`solve_first_passage`; only the external loading protocol changes.
+    No applied-to-local transfer coefficient is inferred here.
+    """
+    level = str(level).upper()
+    nstate = {"F0": 1, "F1": 1, "F2": 3, "F2B": 5}[level]
+    threshold = float(threshold_action)
+    if not math.isfinite(threshold) or threshold <= 0.0:
+        raise ValueError("threshold_action must be finite and positive")
+    state = np.zeros(nstate, dtype=float)
+    action = 0.0
+    emission_action = 0.0
+    elapsed = 0.0
+    used = 0
+    passage_index: int | None = None
+    passage_fraction = math.nan
+    passage_K = math.nan
+    terminal: dict[str, float] = {}
+    trace: list[dict[str, float]] = []
+    for index, item in enumerate(history):
+        dt = float(item["dt_s"])
+        K_MPa = float(item["K_local_MPa_sqrt_m"])
+        if not math.isfinite(dt) or dt < 0.0:
+            raise ValueError(f"history interval {index} has invalid dt_s")
+        if not math.isfinite(K_MPa) or K_MPa < 0.0:
+            raise ValueError(f"history interval {index} has invalid local K")
+        K = K_MPa * 1.0e6
+        _, diag0 = _rhs(level, K, state, manifest, row, temperature_K, controls)
+        midpoint = _linear_positive_advance_history(
+            level, state, 0.5 * dt, diag0, manifest, controls
+        )
+        _, diagm = _rhs(level, K, midpoint, manifest, row, temperature_K, controls)
+        advanced = _linear_positive_advance_history(
+            level, state, dt, diagm, manifest, controls
+        )
+        increment = dt * diagm["cleavage_rate_s"]
+        emission_increment = dt * diagm["emission_rate_s"]
+        if return_history:
+            trace.append({
+                "interval_index": float(index),
+                "time_start_s": elapsed,
+                "time_end_s": elapsed + dt,
+                "K_local_MPa_sqrt_m": K_MPa,
+                "action_start": action,
+                "action_end_unlocalized": action + increment,
+                **diagm,
+            })
+        used += 1
+        terminal = diagm
+        if action + increment >= threshold:
+            fraction = min(
+                max((threshold - action) / max(increment, 1.0e-300), 0.0),
+                1.0,
+            )
+            state = np.maximum(state + fraction * (advanced - state), 0.0)
+            elapsed += fraction * dt
+            emission_action += fraction * emission_increment
+            action = threshold
+            passage_index = index
+            passage_fraction = fraction
+            passage_K = K_MPa
+            _, terminal = _rhs(level, K, state, manifest, row, temperature_K, controls)
+            break
+        state = advanced
+        elapsed += dt
+        action += increment
+        emission_action += emission_increment
+    reached = passage_index is not None
+    return {
+        "model_id": MODEL_ID,
+        "loading_protocol": "ARCHIVED_PIECEWISE_CONSTANT_LOCAL_K",
+        "level": level,
+        "temperature_K": float(temperature_K),
+        "threshold_action": threshold,
+        "first_passage_reached": reached,
+        "right_censored": not reached,
+        "first_passage_time_s": elapsed if reached else math.nan,
+        "first_passage_interval_index": passage_index,
+        "first_passage_interval_fraction": passage_fraction,
+        "K_local_at_first_passage_MPa_sqrt_m": passage_K,
+        "cleavage_action": action,
+        "emission_action": emission_action,
+        "intervals_consumed": used,
+        "pre_event_state": terminal,
+        "history": trace if return_history else None,
+        "no_transfer_coefficient_fitted": True,
         "no_crack_advance_translation_before_first_event": True,
     }
 
@@ -495,4 +692,5 @@ __all__ = [
     "MODEL_ID", "MonotonicControls", "controls_dict", "cooperative_rate",
     "cooperative_log_sensitivity", "finite_difference_sensitivity",
     "f0_implicit_sensitivities", "solve_first_passage", "stress_channels",
+    "solve_first_passage_history",
 ]

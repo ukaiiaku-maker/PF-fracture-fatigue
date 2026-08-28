@@ -83,3 +83,19 @@ def test_generic_launcher_supports_declared_negative_R_validation():
     assert "export OUTROOT TARGET_EXT_UM CYCLES_MAX HAZARD_SEED R_RATIO" in generic
     assert "R_RATIO=${R_RATIO:-0.1}" in low_level
     assert '--R "$R_RATIO"' in low_level
+
+
+def test_launcher_supports_explicit_temperature_and_frequency_without_changing_defaults():
+    generic = _generic_text()
+    low_level = _text()
+    for text in (generic, low_level):
+        assert "TEMPERATURE_K=${TEMPERATURE_K:-300}" in text
+        assert "FREQUENCY_HZ=${FREQUENCY_HZ:-1000}" in text
+    assert '--temperatures "$TEMPERATURE_K"' in low_level
+    assert '--frequency-Hz "$FREQUENCY_HZ"' in low_level
+    assert "TEMPERATURE_K must be a positive integer" in low_level
+    assert 'export OUTROOT TARGET_EXT_UM CYCLES_MAX HAZARD_SEED R_RATIO TEMPERATURE_K FREQUENCY_HZ' in generic
+    assert '"temperature_K": temperature_K' in generic
+    assert '"frequency_Hz": frequency_Hz' in generic
+    assert 'steps_${TEMPERATURE_TAG}K.csv' in generic
+    assert '--temperature-K "$TEMPERATURE_K"' in generic
