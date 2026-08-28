@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Build the v10.2.30 joint fracture-fatigue mechanism-guided atlas.
+"""Build the corrected v10.2.30 fracture-fatigue response atlas.
 
 This program is analysis-only.  It hashes and classifies archived evidence,
 freezes equations before aggregate comparison, evaluates the transparent
-monotonic hierarchy, creates a deterministic Sobol atlas, and reuses only
-fingerprint-identical physical trajectories.  It never launches or resumes a
-production trajectory and never modifies the qualified solver.
+monotonic hierarchy, creates a deterministic scrambled-Sobol *sample*, audits
+cooperative-renewal saturation before any clustering or selection, and reuses
+only fingerprint-identical physical trajectories.  It never launches or
+resumes a production trajectory and never modifies the qualified solver.
 """
 from __future__ import annotations
 
@@ -53,7 +54,7 @@ from arrhenius_fracture.material_manifest import (
 )
 
 
-OUT = ROOT / "runs/joint_fracture_fatigue_archetype_atlas_v1"
+OUT = ROOT / "runs/joint_fracture_fatigue_archetype_atlas_v2"
 FIG = OUT / "figures"
 HIST = Path("/private/tmp/taylor-peierls-spatial-coupling-paper-audit")
 QUALIFIED_HEAD = "94871be15702e7fb85116b92af62c1226c61be42"
@@ -66,6 +67,13 @@ ADAPTIVE_ROWS = 16_384
 TEMPERATURES = np.array([300.0, 600.0, 700.0, 900.0, 1100.0, 1200.0])
 RATES = np.array([0.002, 0.02, 0.2])
 K_LADDER = np.array([12.0, 15.0, 18.0, 24.3])
+FATIGUE_R = 0.1
+FATIGUE_FREQUENCY_HZ = 1000.0
+FATIGUE_PHASE_COUNT = 128
+COOPERATIVE_CEILING_FRACTION = 0.95
+BARRIER_FLOOR_RELATIVE_BAND = 0.01
+ZERO_ACTIVITY_FRACTION = 1.0e-12
+DOMINANT_PHASE_FRACTION = 0.50
 DOC_NAMES = [
     "Fatigue_and_fracture_V2(3).docx",
     "SI_MPZ_Parameterizations_0D_1D_Equations_v9_11_1(3).docx",
@@ -235,7 +243,7 @@ def source_audit(rows: pd.DataFrame) -> None:
             "omission_explanation": "Exact filename absent after recursive project, home, CloudStorage, attachment, and Spotlight searches; equations were not reconstructed from selected rows.",
         })
     manifest = {
-        "schema": "fracture_source_manifest_v1", "created_utc": now(),
+        "schema": "fracture_source_manifest_v2", "created_utc": now(),
         "current_repository": str(ROOT), "current_branch": git(ROOT, "branch", "--show-current"),
         "current_HEAD": git(ROOT, "rev-parse", "HEAD"),
         "qualified_solver_HEAD": QUALIFIED_HEAD, "qualified_solver_sha256": SOLVER_SHA,
@@ -243,6 +251,7 @@ def source_audit(rows: pd.DataFrame) -> None:
         "historical_branch": "codex/taylor-peierls-spatial-coupling-paper-audit",
         "historical_HEAD": HIST_HEAD, "sources": sources,
         "missing_document_policy": "FAIL_CLOSED_DOCUMENT_UNAVAILABLE_USE_CODE_AND_HASHED_ARCHIVE_ONLY",
+        "document_ingestion_complete": False,
     }
     write_json("fracture_source_manifest.json", manifest)
     write_json("source_hashes.json", {x["path"]: x["sha256"] for x in sources})
@@ -308,13 +317,102 @@ def prospective_freeze(rows: pd.DataFrame) -> None:
         "F2B_activation_gate": "activate only if F2 median state error >25% and F2 K_init error exceeds F1 by >2 percentage points",
     })
     (OUT / "fracture_analytical_equation_lineage.md").write_text(
-        "# Analytical monotonic-fracture equation lineage\n\n"
-        "The current v10.2.30 bounded EXP-floor and exact gamma-renewal equations are used. "
-        "F0 integrates virgin opening action; F1 adds transient persistent-site emission and "
-        "blunting without crack-advance translation; F2 adds signed mobile/retained moments, "
-        "Peierls transport, encounter, Taylor release, escape, recovery, and the source shielding "
-        "kernel. F2B is retained only as a predeclared closure test. Legacy finite inventories, "
-        "source refresh, stored-energy cleavage lowering, empirical toughness, and Paris laws are inactive.\n"
+        r"""# Analytical fracture and fatigue equation lineage
+
+## Scope and source limitation
+
+This is an analysis-only reduction of the current v10.2.30 implementation. The four
+named DOCX sources were not available in the mounted worktree or attachment area and
+are therefore not claimed as ingested. Document-only equations or interpretations are
+not reconstructed from selected response rows. The executable code and hashed archive
+listed in `fracture_source_manifest.json` are the auditable sources for this pass.
+
+## Barrier and activated rate
+
+For channel \(j\), the bounded EXP-floor barrier is
+
+\[G_{0j}(T)=\max(G_{00,j}+g_{T,j}(T-T_{ref}),10^{-12})\;\mathrm{eV},\]
+\[\sigma_{cj}(T)=\max(\sigma_{c0,j}+s_{T,j}(T-T_{ref}),1)\;\mathrm{Pa},\]
+\[G_{fj}=\min(0.95G_{0j},\max(10^{-4}\;\mathrm{eV},f_jG_{0j})),\]
+\[G_j(\sigma,T)=G_{fj}+(G_{0j}-G_{fj})
+\exp[-a_j(\max(\sigma,0)/\sigma_{cj})^{n_j}],\]
+\[\lambda_{j,raw}=\nu_j\exp[-G_j/(k_BT)]\;\mathrm{s^{-1}}.\]
+
+Source: `arrhenius_fracture/material_manifest.py`, `ExpFloorBarrier.values_eV`
+and `ExpFloorBarrier.rate`. Inputs use eV, K, Pa, and s\(^{-1}\).
+
+## Cooperative cleavage renewal and saturation
+
+With \(m_c=3\), \(\tau_c=10^{-6}\) s, and
+\(x_c=\lambda_{c,raw}\tau_c\),
+
+\[\Lambda_c=P(m_c,x_c)/\tau_c,\qquad 0\leq\Lambda_c\leq1/\tau_c.\]
+
+Source: `arrhenius_fracture/analytical_monotonic_fracture_v10230.py`,
+`cooperative_rate`. The stationary fatigue reduction integrates this rate over
+the declared sinusoidal cycle. Its event-rate prediction is
+
+\[da/dN=\bar\ell\langle\Lambda_c\rangle/f,\]
+
+so \((da/dN)_{max}=\bar\ell/(f\tau_c)=5\times10^{-3}\) m/cycle for
+\(\bar\ell=5\times10^{-6}\) m and \(f=1000\) Hz. This V2 atlas records
+\(x_c\), \(\Lambda_c\tau_c\), the normalized \(da/dN\), and phase fractions
+near the renewal ceiling, barrier floor, stress cap, and zero activity.
+
+## Separate local stress channels
+
+\[\sigma_{open}=K_{loc}/\sqrt{2\pi r_{eff}},\]
+\[\sigma_{cleave}=\max(K_{loc}-K_{shield},0)/\sqrt{2\pi r_{eff}},\]
+\[\sigma_{emit}=\max(w_e\sigma_{open}-\sigma_{back},0).\]
+
+Source: `analytical_monotonic_fracture_v10230.py`, `stress_channels`. The
+channels are never collapsed. Bulk PF/FEM redistribution is not added again as
+explicit shielding.
+
+## F0, F1, F2, and F2B
+
+F0 integrates virgin cleavage action during the prescribed monotonic ramp until
+\(\int\Lambda_c\,dt=1\), or right-censors at the declared maximum K. F1 adds a
+pre-event persistent emission/blunting moment \(q\):
+
+\[\dot q=R_e-k_bq,\qquad r_{eff}=r_0+c_{blunt}bq.\]
+
+F2 adds nonnegative mobile and retained moments:
+
+\[\dot M=R_e-(k_{enc}+k_{esc})M+k_TM_R,\]
+\[\dot M_R=k_{enc}M-(k_T+k_{rec})M_R,\]
+
+with Peierls transport, encounter, Taylor release, escape, recovery, back stress,
+and signed retained shielding. F2B splits the same moments into near-tip and
+outer-MPZ compartments with one tested exchange rate. Source:
+`analytical_monotonic_fracture_v10230.py`, `_rhs`,
+`_linear_positive_advance`, and `solve_first_passage`.
+
+Initial conditions are virgin zero reduced populations and zero cleavage action.
+Integration uses fixed K increments, positivity-preserving matrix exponentials
+for linear compartment evolution, trapezoidal hazard action, and within-step
+first-passage localization. Every reported state is pre-event/pre-translation;
+no crack-advance translation occurs before first passage.
+
+## Mechanical-transfer assumption and validation domains
+
+F0/F1/F2 consume front-local K. Matched evolving-1D comparisons test the local
+constitutive kernel. PF front-local J/K comparisons additionally test the PF
+mechanical mapping. FEM/CZM applied-load comparisons require an independently
+qualified mapping \(\mathcal M_{FEM}:K_{applied}\mapsto K_{local}\); V2 does not
+fit or assume that map. Constitutive and mechanical-transfer errors are reported
+separately in `monotonic_common_population_error.csv` and
+`mechanical_transfer_decomposition.csv`.
+
+## Inactive lineages and censor logic
+
+Legacy finite source inventories, crack-advance refresh, stored-energy cleavage
+lowering, empirical toughness laws, and Paris laws are inactive. F1/F2/F2B
+nonconvergence or failure to reach unit action within the frozen K domain is a
+right-censored analytical result, not a ductile law, toughness value, or physical
+failure datum. The tested F2B closure did not improve the result; this does not
+reject the broader class of two-compartment closures.
+"""
     )
 
 
@@ -550,7 +648,64 @@ def cross_fidelity_validation(inventory: pd.DataFrame, predictions: pd.DataFrame
         )
     merged["event_role"] = "FIRST_PASSAGE_INITIATION"
     merged["mechanical_transfer_residual_F2"] = merged.K_init_MPa_sqrt_m - merged.F2
+    merged["comparison_domain"] = merged.solver_fidelity.map({
+        "ONE_D_EVOLVING_MPZ": "MATCHED_LOCAL_1D",
+        "PF": "PF_FRONT_LOCAL_J_DERIVED",
+        "PF_SHARP_FRONT": "PF_SHARP_FRONT_MIXED_MECHANICAL_TRANSFER",
+        "FEMCZM": "FEM_APPLIED_LOAD_REQUIRES_TRANSFER",
+    }).fillna("UNCLASSIFIED_MECHANICAL_DOMAIN")
+    merged["local_driving_force_equivalence_verified"] = (
+        merged.comparison_domain == "MATCHED_LOCAL_1D"
+    )
+    merged["FEM_transfer_map_fitted"] = False
     merged.to_csv(OUT / "monotonic_cross_fidelity_validation.csv", index=False)
+
+    common = merged.dropna(subset=["F0", "F1", "F2"]).copy()
+    common_rows = []
+    for domain, group in [("ALL_COMMON_FINITE", common), *common.groupby("comparison_domain")]:
+        for level in ("F0", "F1", "F2"):
+            error = group[f"relative_error_{level}"].abs()
+            common_rows.append({
+                "comparison_domain": domain,
+                "level": level,
+                "common_finite_count": int(len(group)),
+                "median_absolute_relative_error": float(error.median()) if len(error) else math.nan,
+                "mean_absolute_relative_error": float(error.mean()) if len(error) else math.nan,
+                "population_policy": "SAME_ROWS_FINITE_FOR_F0_F1_F2",
+            })
+    write_csv("monotonic_common_population_error.csv", common_rows)
+
+    transfer_rows = []
+    for domain, group in merged.groupby("comparison_domain"):
+        for level in ("F0", "F1", "F2"):
+            finite = group.dropna(subset=[level, "K_init_MPa_sqrt_m"])
+            ratio = finite.K_init_MPa_sqrt_m / finite[level]
+            transfer_rows.append({
+                "comparison_domain": domain,
+                "solver_fidelity": ";".join(sorted(group.solver_fidelity.astype(str).unique())),
+                "analytical_level": level,
+                "finite_count": int(len(finite)),
+                "archived_to_local_K_ratio_median": float(ratio.median()) if len(ratio) else math.nan,
+                "median_absolute_relative_error": float(finite[f"relative_error_{level}"].abs().median()) if len(finite) else math.nan,
+                "constitutive_kernel_test": domain == "MATCHED_LOCAL_1D",
+                "mechanical_transfer_test": domain != "MATCHED_LOCAL_1D",
+                "local_driving_force_equivalence_verified": domain == "MATCHED_LOCAL_1D",
+                "transfer_map_status": (
+                    "IDENTITY_BY_MATCHED_1D_PROTOCOL" if domain == "MATCHED_LOCAL_1D"
+                    else "UNRESOLVED_NO_TRANSFER_MAP_FIT"
+                ),
+            })
+    write_csv("mechanical_transfer_decomposition.csv", transfer_rows)
+    write_json("mechanical_transfer_assumptions.json", {
+        "schema": "mechanical_transfer_assumptions_v1",
+        "analytical_input": "FRONT_LOCAL_K",
+        "matched_1D_identity_assumption": True,
+        "PF_front_local_J_or_K_requires_provider_specific_audit": True,
+        "FEM_applied_to_local_mapping_qualified": False,
+        "FEM_transfer_map_fitted": False,
+        "no_nominal_K_equivalence_assumed_for_FEM": True,
+        "conclusion": "LOCAL_KERNEL_VALIDATED_FOR_MATCHED_1D__CROSS_FIDELITY_MECHANICAL_TRANSFER_UNRESOLVED",
+    })
     return merged
 
 
@@ -589,14 +744,37 @@ def _transform_sobol(u: np.ndarray, specs: Mapping[str, Mapping[str, Any]]) -> p
     return pd.DataFrame(data)
 
 
+def _surface_components(
+    frame: pd.DataFrame, prefix: str, stress_Pa: np.ndarray, T: float,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    stress = np.asarray(stress_Pa, dtype=float)
+    expand = (slice(None),) + (None,) * max(stress.ndim - 1, 0)
+    G0 = np.maximum(
+        frame[f"{prefix}_G00_eV"].to_numpy()[expand]
+        + frame[f"{prefix}_gT_eV_per_K"].to_numpy()[expand] * (T - 481.33),
+        1e-12,
+    )
+    floor = np.minimum(
+        0.95 * G0,
+        np.maximum(1e-4, frame[f"{prefix}_floor_frac"].to_numpy()[expand] * G0),
+    )
+    sigc = np.maximum(
+        (
+            frame[f"{prefix}_sigc0_GPa"].to_numpy()[expand]
+            + frame[f"{prefix}_sT_GPa_per_K"].to_numpy()[expand] * (T - 481.33)
+        ) * 1e9,
+        1.0,
+    )
+    alpha = np.maximum(frame[f"{prefix}_exp_a"].to_numpy()[expand], 0.0)
+    exponent = np.maximum(frame[f"{prefix}_exp_n"].to_numpy()[expand], 1e-9)
+    G = floor + (G0 - floor) * np.exp(
+        -alpha * np.power(np.maximum(stress, 0.0) / sigc, exponent)
+    )
+    return G, G0, floor, sigc
+
+
 def _surface(frame: pd.DataFrame, prefix: str, stress_Pa: np.ndarray, T: float) -> np.ndarray:
-    G0 = np.maximum(frame[f"{prefix}_G00_eV"].to_numpy() +
-                    frame[f"{prefix}_gT_eV_per_K"].to_numpy() * (T-481.33), 1e-12)
-    floor = np.minimum(.95*G0, np.maximum(1e-4, frame[f"{prefix}_floor_frac"].to_numpy()*G0))
-    sigc = np.maximum((frame[f"{prefix}_sigc0_GPa"].to_numpy() +
-                       frame[f"{prefix}_sT_GPa_per_K"].to_numpy()*(T-481.33))*1e9, 1.0)
-    return floor + (G0-floor)*np.exp(-np.maximum(frame[f"{prefix}_exp_a"].to_numpy(), 0.0)*
-        np.power(np.maximum(stress_Pa, 0.0)/sigc, np.maximum(frame[f"{prefix}_exp_n"].to_numpy(), 1e-9)))
+    return _surface_components(frame, prefix, stress_Pa, T)[0]
 
 
 def _atlas_descriptors(frame: pd.DataFrame) -> pd.DataFrame:
@@ -677,21 +855,101 @@ def _atlas_descriptors(frame: pd.DataFrame) -> pd.DataFrame:
     out["min_dKinit_dT"] = np.nanmin(diff, axis=1)
     out["peak_temperature_K"] = TEMPERATURES[peak_index]
     out["peak_amplitude_MPa_sqrt_m"] = np.nanmax(F2, axis=1)-.5*(F2[:,0]+F2[:,-1])
-    out["barrier_or_state_asymptotic_artifact"] = artifact | ~np.isfinite(F2).all(axis=1)
-    out.loc[out.barrier_or_state_asymptotic_artifact, "response_class"] = "MIXED_OR_UNRESOLVED"
-    # Current event-conditioned fatigue screening at the only physically validated temperature.
+    out["monotonic_response_class"] = klass
+    monotonic_artifact = artifact | ~np.isfinite(F2).all(axis=1)
+
+    # Current event-conditioned fatigue screening at the only physically validated
+    # temperature.  Every load is integrated over the declared waveform and carries
+    # explicit renewal-ceiling, barrier-floor, stress-cap, and inactivity diagnostics.
     fatigue = np.empty((n, len(K_LADDER)))
+    ceiling_ratio = np.empty_like(fatigue)
+    near_ceiling_phase = np.empty_like(fatigue)
+    near_floor_phase = np.empty_like(fatigue)
+    stress_cap_phase = np.empty_like(fatigue)
+    zero_activity_phase = np.empty_like(fatigue)
+    xc_peak = np.empty_like(fatigue)
+    xc_mean = np.empty_like(fatigue)
+    lambda_tau_peak = np.empty_like(fatigue)
+    phase = 2.0 * math.pi * (np.arange(FATIGUE_PHASE_COUNT) + 0.5) / FATIGUE_PHASE_COUNT
+    waveform_ratio = 0.5 * (1.0 + FATIGUE_R) + 0.5 * (1.0 - FATIGUE_R) * np.cos(phase)
+    max_da_dN = 5e-6 / (FATIGUE_FREQUENCY_HZ * 1e-6)
+    for start in range(0, n, 4096):
+        stop = min(start + 4096, n)
+        sub = frame.iloc[start:stop]
+        radius = r0 * (1.0 + np.minimum(blunt[start:stop, 0], 100.0))
+        for ki, K in enumerate(K_LADDER):
+            K_phase = K * 1e6 * waveform_ratio[None, :]
+            sigma_uncapped = K_phase / np.sqrt(2.0 * math.pi * radius[:, None])
+            sigma = np.minimum(sigma_uncapped, 30.0e9)
+            G, G0, floor, _ = _surface_components(sub, "cleave", sigma, 300.0)
+            raw = 1e12 * np.exp(np.clip(-G / (KB_EV_PER_K * 300.0), -700.0, 0.0))
+            xc = np.minimum(raw * 1e-6, 1e12)
+            renewal_fraction = gammainc(3.0, xc)  # Lambda_c / (1/tau_c)
+            cycle_fraction = np.mean(renewal_fraction, axis=1)
+            fatigue[start:stop, ki] = max_da_dN * cycle_fraction
+            ceiling_ratio[start:stop, ki] = cycle_fraction
+            near_ceiling_phase[start:stop, ki] = np.mean(
+                renewal_fraction >= COOPERATIVE_CEILING_FRACTION, axis=1
+            )
+            span = np.maximum(G0 - floor, 1e-300)
+            near_floor_phase[start:stop, ki] = np.mean(
+                (G - floor) / span <= BARRIER_FLOOR_RELATIVE_BAND, axis=1
+            )
+            stress_cap_phase[start:stop, ki] = np.mean(sigma_uncapped >= 30.0e9, axis=1)
+            zero_activity_phase[start:stop, ki] = np.mean(
+                renewal_fraction <= ZERO_ACTIVITY_FRACTION, axis=1
+            )
+            xc_peak[start:stop, ki] = np.max(xc, axis=1)
+            xc_mean[start:stop, ki] = np.mean(xc, axis=1)
+            lambda_tau_peak[start:stop, ki] = np.max(renewal_fraction, axis=1)
     for ki, K in enumerate(K_LADDER):
-        stress = K*1e6/np.sqrt(2*math.pi*r0*(1+np.minimum(blunt[:,0], 100.0)))
-        G = _surface(frame, "cleave", stress, 300.0)
-        raw = 1e12*np.exp(np.clip(-G/(KB_EV_PER_K*300.0), -700, 0))
-        fatigue[:, ki] = 5e-6*gammainc(3.0, np.minimum(raw*1e-6, 1e12))/1e-6/1000.0
-        out[f"fatigue_da_dN_K{K:g}_R0p1_T300_f1000"] = fatigue[:,ki]
+        tag = f"K{K:g}_R0p1_T300_f1000"
+        out[f"fatigue_da_dN_{tag}"] = fatigue[:, ki]
+        out[f"fatigue_xc_peak_{tag}"] = xc_peak[:, ki]
+        out[f"fatigue_xc_cycle_mean_{tag}"] = xc_mean[:, ki]
+        out[f"fatigue_Lambda_c_tau_peak_{tag}"] = lambda_tau_peak[:, ki]
+        out[f"fatigue_Lambda_c_tau_cycle_mean_{tag}"] = ceiling_ratio[:, ki]
+        out[f"fatigue_da_dN_ceiling_fraction_{tag}"] = ceiling_ratio[:, ki]
+        out[f"fatigue_phase_fraction_near_cooperative_ceiling_{tag}"] = near_ceiling_phase[:, ki]
+        out[f"fatigue_phase_fraction_near_barrier_floor_{tag}"] = near_floor_phase[:, ki]
+        out[f"fatigue_phase_fraction_at_stress_cap_{tag}"] = stress_cap_phase[:, ki]
+        out[f"fatigue_phase_fraction_effectively_zero_{tag}"] = zero_activity_phase[:, ki]
     slopes = np.diff(np.log(np.maximum(fatigue, 1e-300)), axis=1)/np.diff(np.log(K_LADDER))
     out["fatigue_local_slope_low"] = slopes[:,0]
     out["fatigue_local_slope_mid"] = slopes[:,1]
     out["fatigue_local_slope_high"] = slopes[:,2]
     out["fatigue_high_K_flattening"] = slopes[:,0]-slopes[:,-1]
+    out["fatigue_max_da_dN_m_per_cycle"] = max_da_dN
+    out["fatigue_ceiling_dominated"] = (
+        np.mean(ceiling_ratio >= COOPERATIVE_CEILING_FRACTION, axis=1) >= DOMINANT_PHASE_FRACTION
+    )
+    out["fatigue_barrier_floor_dominated"] = np.max(near_floor_phase, axis=1) >= DOMINANT_PHASE_FRACTION
+    out["fatigue_stress_cap_dominated"] = np.max(stress_cap_phase, axis=1) >= DOMINANT_PHASE_FRACTION
+    out["fatigue_zero_activity_dominated"] = np.mean(
+        zero_activity_phase >= COOPERATIVE_CEILING_FRACTION, axis=1
+    ) >= DOMINANT_PHASE_FRACTION
+    out["fatigue_saturation_state"] = np.select(
+        [out.fatigue_ceiling_dominated, out.fatigue_zero_activity_dominated,
+         np.max(ceiling_ratio, axis=1) >= 0.50],
+        ["CEILING_DOMINATED", "EFFECTIVELY_ZERO", "TRANSITIONAL"],
+        default="UNSATURATED_ACTIVE",
+    )
+    out["source_activity_regime"] = np.where(
+        np.nanmax(emit_action, axis=1) > 1e-6, "SOURCE_ACTIVE", "SOURCE_INACTIVE"
+    )
+    out["barrier_floor_regime"] = np.where(
+        out.fatigue_barrier_floor_dominated, "FLOOR_DOMINATED", "NOT_FLOOR_DOMINATED"
+    )
+    out["barrier_or_state_asymptotic_artifact"] = (
+        monotonic_artifact | out.fatigue_ceiling_dominated
+        | out.fatigue_barrier_floor_dominated | out.fatigue_stress_cap_dominated
+    )
+    out["candidate_selection_eligible"] = (
+        ~out.barrier_or_state_asymptotic_artifact
+        & ~out.fatigue_zero_activity_dominated
+        & np.isfinite(fatigue).all(axis=1)
+    )
+    out.loc[out.barrier_or_state_asymptotic_artifact, "response_class"] = "MIXED_OR_UNRESOLVED"
     out["fatigue_temperature_status"] = "ANALYTICAL_EXTRAPOLATION_UNVALIDATED"
     out["physical_validated_fatigue_slice"] = "T300_R0.1_f1000_K12_to_24.3"
     return out
@@ -723,6 +981,8 @@ def atlas(bounds: dict[str, Any]) -> pd.DataFrame:
     ]
     if boundary.empty:
         boundary = described_initial[~described_initial.barrier_or_state_asymptotic_artifact]
+    if boundary.empty:
+        raise RuntimeError("no asymptotic-audit-eligible rows for adaptive analysis")
     rng = np.random.default_rng(ATLAS_SEED+1)
     chosen = boundary.iloc[rng.integers(0, len(boundary), ADAPTIVE_ROWS)].copy()
     for name, spec in specs.items():
@@ -745,59 +1005,120 @@ def atlas(bounds: dict[str, Any]) -> pd.DataFrame:
     described_adaptive = _atlas_descriptors(adaptive)
     result = pd.concat([described_initial, described_adaptive], ignore_index=True)
     result.to_parquet(OUT / "response_atlas.parquet", index=False)
-    descriptor_cols = [c for c in result if c.startswith(("Kinit_", "Pi_", "fatigue_"))]
-    result[["atlas_id", "sampling_stage", "response_class", "mechanism_class",
-            "barrier_or_state_asymptotic_artifact", *descriptor_cols]].to_parquet(
+    descriptor_prefixes = ("Kinit_", "Pi_", "fatigue_")
+    leading = ["atlas_id", "sampling_stage", "response_class", "monotonic_response_class",
+               "mechanism_class", "fatigue_saturation_state", "source_activity_regime",
+               "barrier_floor_regime", "candidate_selection_eligible",
+               "barrier_or_state_asymptotic_artifact"]
+    descriptor_cols = [
+        c for c in result if c.startswith(descriptor_prefixes) and c not in leading
+    ]
+    result[[*leading, *descriptor_cols]].to_parquet(
         OUT / "response_atlas_descriptors.parquet", index=False
     )
     rejected = result[result.barrier_or_state_asymptotic_artifact][
-        ["atlas_id", "sampling_stage", "response_class", "mechanism_class"]
+        ["atlas_id", "sampling_stage", "response_class", "mechanism_class",
+         "fatigue_ceiling_dominated", "fatigue_barrier_floor_dominated",
+         "fatigue_stress_cap_dominated", "fatigue_zero_activity_dominated"]
     ].copy()
-    rejected["rejection_reason"] = "BARRIER_FLOOR_STATE_ASYMPTOTE_OR_NO_FIRST_PASSAGE"
+    rejected["rejection_reason"] = np.select(
+        [rejected.fatigue_ceiling_dominated,
+         rejected.fatigue_barrier_floor_dominated,
+         rejected.fatigue_stress_cap_dominated],
+        ["COOPERATIVE_RENEWAL_CEILING_DOMINATED",
+         "BARRIER_FLOOR_DOMINATED", "STRESS_CAP_DOMINATED"],
+        default="MONOTONIC_STATE_ASYMPTOTE_OR_NO_FIRST_PASSAGE",
+    )
     rejected.to_csv(OUT / "atlas_rejection_audit.csv", index=False)
+    audit_rows = []
+    for K in K_LADDER:
+        tag = f"K{K:g}_R0p1_T300_f1000"
+        audit_rows.append(pd.DataFrame({
+            "atlas_id": result.atlas_id,
+            "sampling_stage": result.sampling_stage,
+            "Kmax_MPa_sqrt_m": K,
+            "R": FATIGUE_R,
+            "temperature_K": 300.0,
+            "frequency_Hz": FATIGUE_FREQUENCY_HZ,
+            "x_c_peak": result[f"fatigue_xc_peak_{tag}"],
+            "x_c_cycle_mean": result[f"fatigue_xc_cycle_mean_{tag}"],
+            "Lambda_c_over_inverse_tau_peak": result[f"fatigue_Lambda_c_tau_peak_{tag}"],
+            "Lambda_c_over_inverse_tau_cycle_mean": result[f"fatigue_Lambda_c_tau_cycle_mean_{tag}"],
+            "da_dN_m_per_cycle": result[f"fatigue_da_dN_{tag}"],
+            "da_dN_ceiling_m_per_cycle": result.fatigue_max_da_dN_m_per_cycle,
+            "da_dN_ceiling_fraction": result[f"fatigue_da_dN_ceiling_fraction_{tag}"],
+            "phase_fraction_near_cooperative_ceiling": result[f"fatigue_phase_fraction_near_cooperative_ceiling_{tag}"],
+            "phase_fraction_near_barrier_floor": result[f"fatigue_phase_fraction_near_barrier_floor_{tag}"],
+            "phase_fraction_at_stress_cap": result[f"fatigue_phase_fraction_at_stress_cap_{tag}"],
+            "phase_fraction_effectively_zero": result[f"fatigue_phase_fraction_effectively_zero_{tag}"],
+            "candidate_selection_eligible": result.candidate_selection_eligible,
+        }))
+    pd.concat(audit_rows, ignore_index=True).to_parquet(
+        OUT / "fatigue_asymptotic_audit.parquet", index=False
+    )
+    write_json("fatigue_asymptotic_thresholds.json", {
+        "schema": "fatigue_asymptotic_thresholds_v1",
+        "cooperative_ceiling_fraction": COOPERATIVE_CEILING_FRACTION,
+        "barrier_floor_relative_band": BARRIER_FLOOR_RELATIVE_BAND,
+        "zero_activity_fraction": ZERO_ACTIVITY_FRACTION,
+        "dominant_phase_or_load_fraction": DOMINANT_PHASE_FRACTION,
+        "phase_count": FATIGUE_PHASE_COUNT,
+        "cleavage_tau_s": 1e-6,
+        "mean_event_length_m": 5e-6,
+        "frequency_Hz": FATIGUE_FREQUENCY_HZ,
+        "da_dN_ceiling_m_per_cycle": 5e-6 / (FATIGUE_FREQUENCY_HZ * 1e-6),
+        "selection_policy": "REJECT_ASYMPTOTIC_CONTROL_BEFORE_CLUSTERING_AND_PARETO",
+    })
     return result
 
 
 def sensitivity_and_trends(atlas_frame: pd.DataFrame, specs: Mapping[str, Any]) -> tuple[pd.DataFrame, pd.DataFrame]:
     valid = atlas_frame[
         (atlas_frame.sampling_stage == "INITIAL_SOBOL")
-        & ~atlas_frame.barrier_or_state_asymptotic_artifact
+        & atlas_frame.candidate_selection_eligible
     ].copy()
     outputs = ["temperature_range_MPa_sqrt_m", "max_dKinit_dT",
                "fatigue_local_slope_mid", "fatigue_high_K_flattening"]
-    sobol_rows, morris_rows = [], []
+    variance_rows, derivative_rows = [], []
     for output in outputs:
         y = valid[output].to_numpy(float)
         finite = np.isfinite(y)
         y = y[finite]
         total_var = max(float(np.var(y)), 1e-30)
+        y_iqr = max(float(np.quantile(y, .75) - np.quantile(y, .25)), 1e-30)
         for name in specs:
             x = valid.loc[finite, name].to_numpy(float)
             bins = pd.qcut(pd.Series(x), 16, labels=False, duplicates="drop").to_numpy()
-            means = np.array([np.mean(y[bins == b]) for b in np.unique(bins)])
-            weights = np.array([np.mean(bins == b) for b in np.unique(bins)])
+            unique = np.unique(bins)
+            means = np.array([np.mean(y[bins == b]) for b in unique])
+            medians = np.array([np.median(y[bins == b]) for b in unique])
+            xmed = np.array([np.median(x[bins == b]) for b in unique])
+            weights = np.array([np.mean(bins == b) for b in unique])
             first = float(np.sum(weights*(means-np.mean(y))**2)/total_var)
-            # A conservative screening total index: first order plus unexplained
-            # monotonic rank contribution.  It is labeled as an estimator.
             rho = float(spearmanr(x, y).statistic)
-            total = min(1.0, max(first, first + .25*(1-rho*rho)))
-            sobol_rows.append({"response": output, "parameter": name,
-                               "S1_screening_estimate": first,
-                               "ST_screening_estimate": total,
-                               "estimator": "DETERMINISTIC_BINNED_VARIANCE_SCREEN"})
-            order = np.argsort(x)
-            dx = np.diff(x[order]); dy = np.diff(y[order])
-            effect = dy/np.where(np.abs(dx) > 1e-30, dx, np.nan)
-            scale = float(specs[name]["high"])-float(specs[name]["low"])
-            morris_rows.append({"response": output, "parameter": name,
-                                "mu_star_scaled": float(np.nanmedian(np.abs(effect))*scale),
-                                "sigma_scaled": float(np.nanstd(effect)*scale),
-                                "local_expected_sign_fraction": float(np.nanmean(effect >= 0)),
-                                "estimator": "ORDERED_LOCAL_ELEMENTARY_EFFECT"})
-    sobol = pd.DataFrame(sobol_rows)
-    morris = pd.DataFrame(morris_rows)
-    sobol.to_csv(OUT / "sobol_indices.csv", index=False)
-    morris.to_csv(OUT / "morris_indices.csv", index=False)
+            variance_rows.append({
+                "response": output, "parameter": name,
+                "explained_variance_fraction_binned": first,
+                "spearman_rank": rho, "bin_count": int(len(unique)),
+                "sample_count": int(len(y)),
+                "estimator": "DETERMINISTIC_BINNED_PARTIAL_DEPENDENCE_SCREEN_NOT_SOBOL",
+            })
+            xscale = max(float(np.max(xmed) - np.min(xmed)), 1e-30)
+            dx = np.diff(xmed) / xscale
+            dy = np.diff(medians) / y_iqr
+            effect = dy / np.where(np.abs(dx) > 1e-30, dx, np.nan)
+            derivative_rows.append({
+                "response": output, "parameter": name,
+                "standardized_mu_star": float(np.nanmedian(np.abs(effect))),
+                "standardized_sigma": float(np.nanstd(effect)),
+                "positive_effect_fraction": float(np.nanmean(effect >= 0)),
+                "bin_count": int(len(unique)), "sample_count": int(len(y)),
+                "estimator": "STANDARDIZED_PARTIAL_DEPENDENCE_BIN_DIFFERENCE_NOT_MORRIS",
+            })
+    screening = pd.DataFrame(variance_rows)
+    standardized = pd.DataFrame(derivative_rows)
+    screening.to_csv(OUT / "binned_variance_screen.csv", index=False)
+    standardized.to_csv(OUT / "standardized_local_effect_screen.csv", index=False)
     hypotheses = [
         (1, "opening barrier raises monotonic and fatigue resistance", "cleave_G00_eV", "temperature_range_MPa_sqrt_m"),
         (2, "opening stress sensitivity sharpens transitions", "cleave_exp_n", "max_dKinit_dT"),
@@ -813,6 +1134,25 @@ def sensitivity_and_trends(atlas_frame: pd.DataFrame, specs: Mapping[str, Any]) 
         (12, "monotonic and fatigue resistance retain common ordering", "cleave_G00_eV", "fatigue_da_dN_K18_R0p1_T300_f1000"),
     ]
     trend_rows = []
+    stratified_rows = []
+    stratifiers = [
+        "fatigue_saturation_state", "source_activity_regime", "mechanism_class",
+        "barrier_floor_regime", "monotonic_response_class",
+    ]
+
+    def support_for(frame: pd.DataFrame, parameter: str, response: str,
+                    expected_positive: bool) -> tuple[float, int]:
+        finite = frame[[parameter, response]].replace([np.inf, -np.inf], np.nan).dropna()
+        if len(finite) < 64 or finite[parameter].nunique() < 8:
+            return math.nan, int(len(finite))
+        bins = pd.qcut(finite[parameter], 12, labels=False, duplicates="drop")
+        medians = finite.groupby(bins, observed=True)[response].median().to_numpy()
+        effect = np.diff(medians)
+        if not len(effect):
+            return math.nan, int(len(finite))
+        support = np.mean(effect >= 0) if expected_positive else np.mean(effect <= 0)
+        return float(support), int(len(finite))
+
     for number, text, param, response in hypotheses:
         if param not in valid or response not in valid:
             trend_rows.append({"hypothesis_id": number, "hypothesis": text, "parameter": param,
@@ -821,23 +1161,52 @@ def sensitivity_and_trends(atlas_frame: pd.DataFrame, specs: Mapping[str, Any]) 
                                "counterexample_fraction": math.nan,
                                "status": "NOT_TESTABLE_WITH_CURRENT_DATA"})
             continue
-        x, y = valid[param].to_numpy(float), valid[response].to_numpy(float)
-        order = np.argsort(x); effect = np.diff(y[order])
         expected_positive = number not in {4, 6, 8, 12}
         if number == 12:  # resistance means smaller da/dN
             expected_positive = False
-        support = float(np.mean(effect >= 0) if expected_positive else np.mean(effect <= 0))
-        status = "CONFIRMED_BROADLY" if support >= .65 else (
-            "CONFIRMED_CONDITIONALLY" if support >= .55 else "COUNTEREXAMPLE_FOUND"
-        )
+        support, count = support_for(valid, param, response, expected_positive)
+        local_strata = []
+        for dimension in stratifiers:
+            for label, group in valid.groupby(dimension):
+                stratum_support, stratum_count = support_for(
+                    group, param, response, expected_positive
+                )
+                stratified_rows.append({
+                    "hypothesis_id": number, "parameter": param, "response": response,
+                    "stratification_dimension": dimension, "stratum": label,
+                    "row_count": stratum_count, "support_fraction": stratum_support,
+                    "counterexample_fraction": 1.0 - stratum_support if math.isfinite(stratum_support) else math.nan,
+                    "eligible_population_only": True,
+                })
+                if math.isfinite(stratum_support):
+                    local_strata.append((dimension, str(label), stratum_support))
+        stratum_values = np.array([value for _, _, value in local_strata], dtype=float)
+        stratum_q25 = float(np.quantile(stratum_values, .25)) if len(stratum_values) else math.nan
+        stratum_median = float(np.median(stratum_values)) if len(stratum_values) else math.nan
+        if not math.isfinite(support):
+            status = "NOT_TESTABLE_WITH_CURRENT_DATA"
+        elif support >= .65 and stratum_q25 >= .60:
+            status = "CONFIRMED_BROADLY"
+        elif support >= .55 and stratum_median >= .55:
+            status = "CONFIRMED_CONDITIONALLY"
+        else:
+            status = "COUNTEREXAMPLE_FOUND"
+        counterexample_labels = [
+            f"{d}={label}" for d, label, value in local_strata if value < .50
+        ]
         trend_rows.append({"hypothesis_id": number, "hypothesis": text, "parameter": param,
                            "response": response, "support_fraction": support,
-                           "important_interactions": "see ST_minus_S1 and mechanism strata",
+                           "eligible_row_count": count,
+                           "stratified_support_q25": stratum_q25,
+                           "stratified_support_median": stratum_median,
+                           "important_interactions": ";".join(counterexample_labels[:12]) or "NONE_RESOLVED",
                            "counterexample_fraction": 1-support, "status": status,
+                           "estimator": "STRATIFIED_BINNED_PARTIAL_DEPENDENCE_SIGN_SCREEN",
                            "physical_validation_result": "ARCHIVED_WHERE_EXACT_ROW_MATCHES"})
     trends = pd.DataFrame(trend_rows)
     trends.to_csv(OUT / "trend_confirmation_audit.csv", index=False)
-    return sobol, trends
+    pd.DataFrame(stratified_rows).to_csv(OUT / "trend_stratified_audit.csv", index=False)
+    return screening, trends
 
 
 def _standardize(matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -886,25 +1255,33 @@ def clustering(atlas_frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
                "peak_amplitude_MPa_sqrt_m", "fatigue_local_slope_low",
                "fatigue_local_slope_mid", "fatigue_local_slope_high",
                "fatigue_high_K_flattening", "Pi_b_T900", "Pi_sh_T900"]
-    matrix, _, _ = _standardize(atlas_frame[columns].to_numpy(float))
+    eligible_index = atlas_frame.index[atlas_frame.candidate_selection_eligible]
+    if len(eligible_index) < 60:
+        raise RuntimeError("fewer than 60 asymptotic-audit-eligible rows remain for clustering")
+    matrix, _, _ = _standardize(atlas_frame.loc[eligible_index, columns].to_numpy(float))
     training = matrix[::5]
     _, centroids = _kmeans(training, 6, ATLAS_SEED, 40)
     labels = np.argmin(((matrix[:,None,:]-centroids[None,:,:])**2).sum(axis=2), axis=1)
     u, s, vh = np.linalg.svd(matrix[::max(1,len(matrix)//20000)], full_matrices=False)
     pcs = matrix @ vh[:2].T
-    atlas_frame["cluster_id"] = labels
-    atlas_frame["PC1"] = pcs[:,0]; atlas_frame["PC2"] = pcs[:,1]
+    atlas_frame["cluster_id"] = -1
+    atlas_frame.loc[eligible_index, "cluster_id"] = labels
+    atlas_frame["PC1"] = math.nan; atlas_frame["PC2"] = math.nan
+    atlas_frame.loc[eligible_index, "PC1"] = pcs[:,0]
+    atlas_frame.loc[eligible_index, "PC2"] = pcs[:,1]
     # Density method proxy and hierarchical centroid linkage are independent summaries.
     d = np.sqrt(((matrix-centroids[labels])**2).sum(axis=1))
     cutoff = np.quantile(d, .95)
-    atlas_frame["density_cluster_id"] = np.where(d <= cutoff, labels, -1)
+    atlas_frame["density_cluster_id"] = -1
+    atlas_frame.loc[eligible_index, "density_cluster_id"] = np.where(d <= cutoff, labels, -1)
     hierarchy = linkage(centroids, method="ward")
     mapping = {}
     for cid in range(6):
-        sub = atlas_frame[atlas_frame.cluster_id == cid]
-        majority = sub.response_class.mode().iloc[0] if len(sub) else "MIXED_OR_UNRESOLVED"
-        mapping[cid] = majority
-    atlas_frame["archetype_label"] = atlas_frame.cluster_id.map(mapping)
+        # No cluster receives a material archetype label without exact-row
+        # joint fracture/fatigue validation.  Cluster topology is retained as a
+        # response diagnostic, not promoted by majority monotonic class.
+        mapping[cid] = "MIXED_OR_UNRESOLVED"
+    atlas_frame["archetype_label"] = "MIXED_OR_UNRESOLVED"
     membership = atlas_frame[["atlas_id", "cluster_id", "density_cluster_id", "archetype_label",
                               "response_class", "mechanism_class", "PC1", "PC2"]].copy()
     membership.to_csv(OUT / "archetype_cluster_membership.csv", index=False)
@@ -937,13 +1314,15 @@ def clustering(atlas_frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         "MIXED_OR_UNRESOLVED": {"criteria": "boundary, artifact, extrapolated, or mechanistically nonunique"},
         "cluster_centroids": {str(i): dict(zip(columns, centroids[i].tolist())) for i in range(6)},
         "cluster_label_mapping": {str(k): v for k,v in mapping.items()},
+        "cluster_mapping_policy": "NO_MATERIAL_ARCHETYPE_PROMOTION_WITHOUT_NONASYMPTOTIC_EXACT_ROW_JOINT_VALIDATION",
+        "rejected_rows_excluded_before_clustering": True,
     }
     write_json("archetype_definitions.json", definitions)
     return membership, stability
 
 
 def nonuniqueness_and_joint(atlas_frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    valid = atlas_frame[~atlas_frame.barrier_or_state_asymptotic_artifact].copy()
+    valid = atlas_frame[atlas_frame.candidate_selection_eligible].copy()
     manifold_rows = []
     for response_class, group in valid.groupby("response_class"):
         for mechanism, sub in group.groupby("mechanism_class"):
@@ -965,7 +1344,8 @@ def nonuniqueness_and_joint(atlas_frame: pd.DataFrame) -> tuple[pd.DataFrame, pd
         "Kinit_F2_T300", "Kinit_F2_T900", "Kinit_F2_T1200",
         "fatigue_da_dN_K12_R0p1_T300_f1000", "fatigue_da_dN_K18_R0p1_T300_f1000",
         "fatigue_da_dN_K24.3_R0p1_T300_f1000", "fatigue_local_slope_mid",
-        "fatigue_high_K_flattening", "archetype_label"]].copy()
+        "fatigue_high_K_flattening", "fatigue_saturation_state",
+        "candidate_selection_eligible", "archetype_label"]].copy()
     metrics.to_parquet(OUT / "joint_fracture_fatigue_metrics.parquet", index=False)
     correlations = []
     for cls, group in [("ALL", metrics), *metrics.groupby("mechanism_class")]:
@@ -983,65 +1363,90 @@ def nonuniqueness_and_joint(atlas_frame: pd.DataFrame) -> tuple[pd.DataFrame, pd
 
 
 def candidates(atlas_frame: pd.DataFrame, source_rows: pd.DataFrame) -> pd.DataFrame:
-    valid = atlas_frame[~atlas_frame.barrier_or_state_asymptotic_artifact].copy()
-    selected = []
-    for label in ["CERAMIC_LIKE", "WEAK_T", "DBTT_LIKE", "PEAK_LIKE"]:
-        group = valid[valid.response_class == label]
+    valid = atlas_frame[atlas_frame.candidate_selection_eligible].copy()
+    descriptors = ["temperature_range_MPa_sqrt_m", "peak_amplitude_MPa_sqrt_m",
+                   "fatigue_local_slope_mid", "Pi_b_T900", "Pi_sh_T900"]
+    requested = [
+        ("CERAMIC", "CERAMIC_LIKE", "INTRINSIC_OPENING"),
+        ("WEAK_T", "WEAK_T", None),
+        ("DBTT_INTRINSIC", "DBTT_LIKE", "INTRINSIC_OPENING"),
+        ("DBTT_BLUNTING", "DBTT_LIKE", "BLUNTING_MEDIATED"),
+        ("PEAK", "PEAK_LIKE", None),
+    ]
+    exemplars = []
+    for role, response_class, mechanism in requested:
+        group = valid[valid.monotonic_response_class == response_class]
+        if mechanism is not None:
+            group = group[group.mechanism_class == mechanism]
         if group.empty:
             continue
-        med = group[["temperature_range_MPa_sqrt_m", "peak_amplitude_MPa_sqrt_m",
-                     "fatigue_local_slope_mid", "Pi_b_T900", "Pi_sh_T900"]].median()
-        scale = group[med.index].std().replace(0,1)
-        idx = (((group[med.index]-med)/scale)**2).sum(axis=1).idxmin()
-        selected.append(group.loc[idx])
-        if label == "DBTT_LIKE":
-            for mechanism in group.mechanism_class.unique()[:2]:
-                sub = group[group.mechanism_class == mechanism]
-                if len(sub): selected.append(sub.iloc[len(sub)//2])
-    selected_frame = pd.DataFrame(selected).drop_duplicates("atlas_id").head(8).copy()
-    selected_frame["candidate_id"] = [f"JFFA_{r.response_class}_{i+1:02d}"
-                                      for i, r in selected_frame.reset_index(drop=True).iterrows()]
-    selected_frame["candidate_role"] = "ANALYTICAL_PARETO_PROSPECTIVE"
-    selected_frame["row_sha256"] = [canonical_sha({k:v for k,v in r.items()
-        if isinstance(v,(str,int,float,bool,np.number)) and (not isinstance(v,float) or math.isfinite(v))})
-        for r in selected_frame.to_dict("records")]
+        med = group[descriptors].median()
+        scale = group[descriptors].std().replace(0, 1)
+        idx = (((group[descriptors] - med) / scale) ** 2).sum(axis=1).idxmin()
+        row = group.loc[idx].copy()
+        row["response_exemplar_id"] = f"UNVALIDATED_RESPONSE_{role}_{len(exemplars)+1:02d}"
+        row["response_exemplar_role"] = "MECHANISM_RESPONSE_EXEMPLAR_NOT_ARCHETYPE"
+        row["archetype_label"] = "MIXED_OR_UNRESOLVED"
+        row["selection_status"] = "NOT_PHYSICALLY_VALIDATED_NO_ARCHETYPE_PROMOTION"
+        exemplars.append(row)
+    exemplar_frame = pd.DataFrame(exemplars)
+    if len(exemplar_frame):
+        exemplar_frame["row_sha256"] = [canonical_sha({k: v for k, v in r.items()
+            if isinstance(v, (str, int, float, bool, np.number))
+            and (not isinstance(v, float) or math.isfinite(v))})
+            for r in exemplar_frame.to_dict("records")]
+    exemplar_frame.to_csv(OUT / "response_exemplar_registry.csv", index=False)
+    write_json("response_exemplar_hashes.json", dict(zip(
+        exemplar_frame.get("response_exemplar_id", pd.Series(dtype=str)),
+        exemplar_frame.get("row_sha256", pd.Series(dtype=str)),
+    )))
+
+    candidate_columns = [
+        "candidate_id", "atlas_id", "archetype_label", "candidate_role",
+        "candidate_selection_eligible", "barrier_or_state_asymptotic_artifact",
+        "fatigue_ceiling_dominated", "fatigue_temperature_status", "row_sha256",
+    ]
+    selected_frame = pd.DataFrame(columns=candidate_columns)
     selected_frame.to_csv(OUT / "archetype_candidate_registry.csv", index=False)
-    write_json("archetype_candidate_hashes.json", dict(zip(selected_frame.candidate_id, selected_frame.row_sha256)))
-    fields = list(json.loads((HIST / "mpz_v9_13_zero_d_large_search_policy.json").read_text())["search_dimensions"])
-    audits = [{"candidate_id": r.candidate_id, "parent_row": "HISTORICAL_DOMAIN_SOBOL_ROW",
-               "declared_candidate_fields": json.dumps(fields), "changed_fields": json.dumps(fields),
-               "changed_fields_equal_declared": True, "same_complete_row_for_fracture_and_fatigue": True}
-              for r in selected_frame.itertuples()]
-    write_csv("archetype_candidate_diff_audit.csv", audits)
-    pareto = selected_frame[["candidate_id", "atlas_id", "response_class", "mechanism_class",
-                             "temperature_range_MPa_sqrt_m", "fatigue_local_slope_mid",
-                             "barrier_or_state_asymptotic_artifact", "row_sha256"]].copy()
-    pareto["pareto_distinct"] = True
-    pareto.to_csv(OUT / "joint_pareto_candidates.csv", index=False)
-    mono = []
-    fatigue = []
-    for _, r in selected_frame.iterrows():
-        for T in TEMPERATURES:
-            mono.append({"candidate_id": r["candidate_id"], "temperature_K": T,
-                         "K_init_F0_MPa_sqrt_m": r[f"Kinit_F0_T{int(T)}"],
-                         "K_init_F1_MPa_sqrt_m": r[f"Kinit_F1_T{int(T)}"],
-                         "K_init_F2_MPa_sqrt_m": r[f"Kinit_F2_T{int(T)}"],
-                         "prediction_status": "PROSPECTIVE_FROZEN_ANALYTICAL"})
-        for K in K_LADDER:
-            fatigue.append({"candidate_id": r["candidate_id"], "temperature_K": 300.0,
-                            "Kmax_MPa_sqrt_m": K, "R": .1, "frequency_Hz": 1000.0,
-                            "da_dN": r[f"fatigue_da_dN_K{K:g}_R0p1_T300_f1000"],
-                            "prediction_status": "PROSPECTIVE_FROZEN_ANALYTICAL"})
-    pd.DataFrame(mono).to_csv(OUT / "prospective_monotonic_predictions.csv", index=False)
-    pd.DataFrame(fatigue).to_csv(OUT / "prospective_fatigue_predictions.csv", index=False)
-    selected_frame[["candidate_id","Pi_b_T300","Pi_b_T900","Pi_sh_T300","Pi_sh_T900"]].to_parquet(
-        OUT / "prospective_state_predictions.parquet", index=False)
+    write_json("archetype_candidate_hashes.json", {})
+    write_csv("archetype_candidate_diff_audit.csv", [], fields=[
+        "candidate_id", "parent_row", "declared_candidate_fields", "changed_fields",
+        "changed_fields_equal_declared", "same_complete_row_for_fracture_and_fatigue",
+    ])
+    write_csv("joint_pareto_candidates.csv", [], fields=[
+        "candidate_id", "atlas_id", "archetype_label", "pareto_distinct",
+        "selection_status", "row_sha256",
+    ])
+    superseded = [
+        "JFFA_CERAMIC_LIKE_01", "JFFA_WEAK_T_02", "JFFA_DBTT_LIKE_03",
+        "JFFA_DBTT_LIKE_04", "JFFA_DBTT_LIKE_05", "JFFA_PEAK_LIKE_06",
+    ]
+    write_csv("superseded_candidate_audit.csv", [{
+        "candidate_id": candidate_id,
+        "previous_role": "ANALYTICAL_PARETO_PROSPECTIVE",
+        "current_status": "INVALIDATED_NOT_A_JOINT_ARCHETYPE",
+        "admitted_to_current_candidate_registry": False,
+        "reason": "PREVIOUS_FATIGUE_SELECTION_CONTAMINATED_BY_COOPERATIVE_RENEWAL_CEILING",
+    } for candidate_id in superseded])
+
+    write_csv("prospective_monotonic_predictions.csv", [], fields=[
+        "candidate_id", "temperature_K", "K_init_F0_MPa_sqrt_m",
+        "K_init_F1_MPa_sqrt_m", "K_init_F2_MPa_sqrt_m", "prediction_status",
+    ])
+    write_csv("prospective_fatigue_predictions.csv", [], fields=[
+        "candidate_id", "temperature_K", "Kmax_MPa_sqrt_m", "R",
+        "frequency_Hz", "da_dN", "prediction_status",
+    ])
+    pd.DataFrame(columns=[
+        "candidate_id", "Pi_b_T300", "Pi_b_T900", "Pi_sh_T300", "Pi_sh_T900",
+    ]).to_parquet(OUT / "prospective_state_predictions.parquet", index=False)
     write_json("prospective_validation_plan.json", {
-        "schema": "prospective_validation_plan_v1", "candidate_count": len(selected_frame),
+        "schema": "prospective_validation_plan_v2", "candidate_count": 0,
+        "response_exemplar_count": int(len(exemplar_frame)),
         "fresh_uninterrupted_only": True, "resume_allowed": False, "maximum_concurrency": 3,
         "monotonic_grid_K": [300,700,900,1200], "fatigue_grid": {"n":80,"seed":1720,"R":.1,
             "Kmax_MPa_sqrt_m": K_LADDER.tolist()},
-        "launch_decision": "NO_NEW_TRAJECTORIES__ANALYTICAL_F2_NOT_QUANTITATIVELY_QUALIFIED_AND_TEMPERATURE_FATIGUE_UNVALIDATED",
+        "launch_decision": "NO_NEW_TRAJECTORIES__NO_JOINT_ARCHETYPE_CANDIDATE_PASSES_ASYMPTOTIC_AND_CROSS_FIDELITY_GATES",
         "existing_exact_row_reuse_only": True,
     })
     return selected_frame
@@ -1099,7 +1504,7 @@ def physical_validation(inventory: pd.DataFrame, selected: pd.DataFrame) -> tupl
         "schema": "joint_atlas_physical_controller_v1", "state": "TERMINAL",
         "new_jobs_planned": 0, "new_jobs_launched": 0, "new_jobs_terminal": 0,
         "active_workers": 0, "maximum_concurrency": 3, "resume_allowed": False,
-        "gate_decision": "NO_NEW_LAUNCH_F2_CLOSURE_INSUFFICIENT_FOR_PROSPECTIVE_PHYSICS",
+        "gate_decision": "NO_NEW_LAUNCH_NO_JOINT_ARCHETYPE_PASSES_ASYMPTOTIC_AND_CROSS_FIDELITY_GATES",
         "existing_monotonic_rows_reused": len(mono), "existing_fatigue_rows_reused": len(fatigue),
     })
     return mono, fatigue
@@ -1161,7 +1566,8 @@ def figures(inventory: pd.DataFrame, pred: pd.DataFrame, validation: pd.DataFram
     ax.set(xlabel="T (K)",ylabel=r"$dK_{init}/d\ln\dot K$"); ax.legend(fontsize=5,ncol=2)
     _save(fig,"LOADING_RATE_SHIFT_DECOMPOSITION")
 
-    sampled=atlas_frame.sample(min(15000,len(atlas_frame)),random_state=ATLAS_SEED)
+    eligible_plot = atlas_frame[atlas_frame.candidate_selection_eligible]
+    sampled=eligible_plot.sample(min(15000,len(eligible_plot)),random_state=ATLAS_SEED)
     plot_specs = {
         "INTRINSIC_VS_STATE_MEDIATED_DBTT": ("Pi_b_T900","Pi_sh_T900","max_dKinit_dT"),
         "PEAK_MECHANISM_DECOMPOSITION": ("cleave_gT_eV_per_K","emit_gT_eV_per_K","peak_amplitude_MPa_sqrt_m"),
@@ -1171,9 +1577,9 @@ def figures(inventory: pd.DataFrame, pred: pd.DataFrame, validation: pd.DataFram
         "JOINT_FRACTURE_FATIGUE_RESPONSE_MAP": ("Kinit_F2_T300","fatigue_da_dN_K18_R0p1_T300_f1000","cluster_id"),
         "MONOTONIC_RESISTANCE_VS_FATIGUE_THRESHOLD": ("Kinit_F2_T300","fatigue_da_dN_K12_R0p1_T300_f1000","cluster_id"),
         "LOCAL_PARIS_SLOPE_VS_FRACTURE_CLASS": ("temperature_range_MPa_sqrt_m","fatigue_local_slope_mid","cluster_id"),
-        "ARCHETYPE_CLUSTER_MAP": ("PC1","PC2","cluster_id"),
-        "BCC_FCC_CERAMIC_ARCHETYPE_SUMMARY": ("max_dKinit_dT","fatigue_high_K_flattening","cluster_id"),
-        "CROSS_FIDELITY_ARCHETYPE_TRANSFER": ("Kinit_F1_T900","Kinit_F2_T900","cluster_id"),
+        "RESPONSE_CLUSTER_MAP": ("PC1","PC2","cluster_id"),
+        "PROVISIONAL_RESPONSE_CLASS_SUMMARY": ("max_dKinit_dT","fatigue_high_K_flattening","cluster_id"),
+        "CROSS_FIDELITY_RESPONSE_TRANSFER": ("Kinit_F1_T900","Kinit_F2_T900","cluster_id"),
     }
     for stem,(x,y,c) in plot_specs.items():
         fig,ax=plt.subplots(figsize=(6.5,4.8))
@@ -1183,20 +1589,29 @@ def figures(inventory: pd.DataFrame, pred: pd.DataFrame, validation: pd.DataFram
         ax.set(xlabel=x,ylabel=("log10 "+y if "da_dN" in y else y)); fig.colorbar(sc,ax=ax,label=c)
         _save(fig,stem)
 
-    top=sobol[sobol.response=="temperature_range_MPa_sqrt_m"].nlargest(12,"ST_screening_estimate")
-    fig,ax=plt.subplots(figsize=(8,5)); ax.barh(top.parameter,top.ST_screening_estimate)
-    ax.set_xlabel("Total-effect screening index"); _save(fig,"SOBOL_PARAMETER_IMPORTANCE")
+    top=sobol[sobol.response=="temperature_range_MPa_sqrt_m"].nlargest(
+        12,"explained_variance_fraction_binned"
+    )
+    fig,ax=plt.subplots(figsize=(8,5)); ax.barh(top.parameter,top.explained_variance_fraction_binned)
+    ax.set_xlabel("Binned explained-variance screen (not Sobol)")
+    _save(fig,"BINNED_SCREEN_PARAMETER_IMPORTANCE")
 
     fig,ax=plt.subplots(figsize=(8,4.8)); ax.bar(trends.hypothesis_id,trends.support_fraction.fillna(0),
                                                color=np.where(trends.status.str.contains("COUNTER"),"#c44e52","#4c72b0"))
     ax.axhline(.5,color="k",ls="--"); ax.set(xlabel="Hypothesis",ylabel="Supporting local-neighborhood fraction",ylim=(0,1))
     _save(fig,"TREND_CONFIRMATION_AND_COUNTEREXAMPLES")
 
+    exemplars = pd.read_csv(OUT / "response_exemplar_registry.csv")
     fig,ax=plt.subplots(figsize=(7,4.8))
-    ax.scatter(selected.temperature_range_MPa_sqrt_m,selected.fatigue_local_slope_mid,
-               c=pd.Categorical(selected.response_class).codes,s=90)
-    for r in selected.itertuples(): ax.annotate(r.candidate_id,(r.temperature_range_MPa_sqrt_m,r.fatigue_local_slope_mid),fontsize=6)
-    ax.set(xlabel="Monotonic T range",ylabel="Fatigue local slope"); _save(fig,"PARETO_CANDIDATE_SUMMARY")
+    if len(exemplars):
+        ax.scatter(exemplars.temperature_range_MPa_sqrt_m,exemplars.fatigue_local_slope_mid,
+                   c=pd.Categorical(exemplars.monotonic_response_class).codes,s=90)
+        for r in exemplars.itertuples():
+            ax.annotate(r.response_exemplar_id,
+                        (r.temperature_range_MPa_sqrt_m,r.fatigue_local_slope_mid),fontsize=6)
+    ax.set(xlabel="Monotonic T range",ylabel="Fatigue local slope",
+           title="Unvalidated response exemplars; no archetype promotion")
+    _save(fig,"UNVALIDATED_RESPONSE_EXEMPLAR_SUMMARY")
 
     fig,ax=plt.subplots(figsize=(7,4.8))
     ax.scatter(mono.Kinit_MPa_sqrt_m,mono.first_event_K_MPa_sqrt_m,c="#4c72b0")
@@ -1238,8 +1653,9 @@ def f2b_gate(rows: pd.DataFrame) -> pd.DataFrame:
                 "registry_role": row.registry_role, "candidate_id": row.candidate_id,
                 "temperature_K": T, "Kinit_F2": a, "Kinit_F2B": b,
                 "relative_difference": (b-a)/a if math.isfinite(a) and math.isfinite(b) and a else math.nan,
-                "F2B_required": False,
-                "decision": "NOT_PROMOTED__TWO_COMPARTMENT_DOES_NOT_RESOLVE_DOMINANT_CONSTITUTIVE_OR_MECHANICAL_TRANSFER_ERROR",
+                "tested_F2B_promoted": False,
+                "two_compartment_model_class_rejected": False,
+                "decision": "TESTED_F2B_CLOSURE_DID_NOT_IMPROVE_RESULT__MODEL_CLASS_NOT_REJECTED",
             })
     result = pd.DataFrame(records)
     result.to_csv(OUT / "F2B_activation_gate.csv", index=False)
@@ -1256,63 +1672,81 @@ def final_decision(inventory: pd.DataFrame, pred: pd.DataFrame, validation: pd.D
         median_errors[level] = float(values.median()) if len(values) else None
     class_counts = atlas_frame.response_class.value_counts().to_dict()
     mechanism_counts = atlas_frame.mechanism_class.value_counts().to_dict()
-    primary = "CURRENT_MONOTONIC_STATE_CLOSURE_INSUFFICIENT"
+    trend_counts = trends.status.value_counts().to_dict()
+    classifications = [
+        "LOCAL_MONOTONIC_KERNEL_VALIDATED_FOR_MATCHED_1D",
+        "CURRENT_TRANSIENT_STATE_CLOSURE_PARTIAL",
+        "CROSS_FIDELITY_MECHANICAL_TRANSFER_UNRESOLVED",
+    ]
+    primary = classifications[0]
     qualifiers = [
-        "MECHANISM_GUIDED_RESPONSE_ATLAS", "ARCHETYPE_LABELS_UNDERIDENTIFIED",
+        "CORRECTED_MECHANISM_GUIDED_RESPONSE_ATLAS", "ARCHETYPE_LABELS_UNDERIDENTIFIED",
         "JOINT_CO_DEFINITION_REQUIRES_MORE_TEMPERATURE_FATIGUE_DATA",
         "FATIGUE_TEMPERATURE_EXTENSION_UNVALIDATED", "PT_REMAINS_LATENT",
         "PEAK_CAPABLE_BUT_MECHANICALLY_SENSITIVE",
+        "PRIOR_CANDIDATE_SELECTION_INVALIDATED_BY_RENEWAL_CEILING",
+        "NO_JOINT_ARCHETYPE_CANDIDATE_PROMOTED",
     ]
     answers = {
-        "1": "No. F0 is parameter-free and useful for ordering, but absolute cross-fidelity K_init is not reproduced within the predeclared useful band without a qualified transient/mechanical state closure.",
+        "1": "The local F0/F2 kernel is validated for matched evolving-1D conditions; absolute cross-fidelity K_init is not qualified because transient coverage is partial and mechanical transfer remains unresolved.",
         "2": f"F0 captures intrinsic direction and ranking; its archived median absolute relative error is {median_errors['F0']!s}.",
         "3": "F1 adds one-pass persistent emission, channel back stress, transport loss, and effective-radius growth; it produces state-mediated shifts and censoring absent from F0.",
-        "4": "F2 is required to represent state semantics and mechanism nonuniqueness, but it does not yet improve absolute K_init robustly enough to qualify the closure.",
-        "5": "No for the present gate. The explicit F2B control did not resolve the dominant error and was not promoted.",
+        "4": "F2 is accurate on its finite matched-1D and PF subsets, but is finite on a smaller, easier population; common-population and coverage tables must accompany every error median.",
+        "5": "The tested F2B closure did not improve the result and was not promoted; one exchange-rate test does not reject the broader two-compartment model class.",
         "6": "The named v9.11 response options are LEGACY_V9_11_FINITE_SOURCE; stored-energy cases remain separately tagged LEGACY_STORED_ENERGY_ABLATION.",
         "7": "Broad ceramic/weak-T/DBTT topology survives more often than the narrow peak. Peak location and amplitude are mechanically sensitive across reduced, 1-D, PF and FEM-derived mappings.",
         "8": "The peak is a narrow derivative sign crossover among intrinsic opening, transient state, and local mechanical transfer, so small state/K-map changes can turn it into a shoulder.",
         "9": "dbtt_intrinsic_control is intrinsic; broad/primary/moderate shielding rows are state mediated to differing degrees. Macroscopic DBTT shape alone is non-identifying.",
         "10": "Higher loading rate raises first-passage K by reducing accumulated action; state-mediated rows add rate shifts through emission residence and transport.",
         "11": "Accessibility remains unresolved where F1/F2 is right-censored or required K leaves the archived solver domain; these branches are counterfactual, not ductile-law predictions.",
-        "12": "Opening-barrier and explicit-temperature trends are the most broadly supported; detailed statuses are in trend_confirmation_audit.csv.",
+        "12": ("Trend claims now require both aggregate and stratified support gates; "
+               f"the corrected counts are {trend_counts}. No single-R atlas statistic is "
+               "relabelled as a direct R-dependence test."),
         "13": "Blunting, Peierls/Taylor, and retention trends are conditional on source activity and feedback strength.",
         "14": "Counterexamples occur near barrier-floor saturation, weak source activity, and intrinsic/state cancellation boundaries; none were suppressed.",
-        "15": "Cleavage G00, gT, characteristic stress, and EXP shape dominate fracture-class screening.",
-        "16": "Cleavage stress shape plus event-conditioned blunting dominate the analytical fatigue slice; PT coordinates remain mostly latent at 300 K.",
+        "15": "Parameter importance is exploratory only. V2 reports binned variance and dimensionless standardized partial-dependence screens, not formal Sobol or Morris indices.",
+        "16": "The previous fatigue candidate ranking was dominated by the exact cooperative-renewal ceiling. V2 audits and excludes that regime before clustering and selection; PT coordinates remain mostly latent at 300 K.",
         "17": "Cleavage barrier height/shape and c_blunt are the strongest shared controls in the screened domain.",
         "18": "Only conditionally. The aggregate analytical rank is reported, but state-mediated outliers break a universal near-perfect ordering.",
-        "19": "Response clusters are reproducible as broad groups, but BCC/FCC material labels are not yet physically unique; ceramic-like is the most operationally stable.",
+        "19": "Response clusters remain exploratory and map to MIXED_OR_UNRESOLVED. No BCC-like, FCC-like, ceramic-like, or peak-like joint material archetype is promoted.",
         "20": "Definitions use derivative topology, state contributions, rate/R sensitivity, fatigue slope/flattening, and accessibility, as frozen in archetype_definitions.json.",
         "21": "No. Multiple intrinsic, blunting, and retained-shielding manifolds produce similar macroscopic response classes.",
         "22": "Opening gT versus stress-temperature coefficient, emission accessibility versus c_blunt, and Peierls/Taylor/retention combinations remain underidentified.",
         "23": "Measure pre-event radius and signed shielding versus temperature/rate, then add temperature-dependent fatigue at common Kmax and R; these jointly lift the leading null directions.",
-        "24": "A_NATIVE, PT03, and PT08 exact-row archived controls transferred at 300 K; new atlas rows were not launched because the F2 quantitative gate failed.",
+        "24": "A_NATIVE, PT03, and PT08 remain exact-row archived controls. The six V1 JFFA selections are explicitly invalidated, and no new atlas row was launched.",
         "25": "Existing PF spatial counterparts validate state diversity but not unique resistance transfer; no new FEM/CZM or PF trajectory was justified or launched.",
         "26": "Not yet demonstrated. One complete row can be evaluated jointly without retuning, but credible temperature-dependent fatigue plus fracture remains unvalidated.",
-        "27": "No new canonical material labels are promoted. Existing canonical rows remain controls; selected atlas rows are prospective mechanism candidates only.",
+        "27": "No new canonical material label or joint archetype candidate is promoted. Eligible rows are retained only as UNVALIDATED_RESPONSE exemplars.",
         "28": "BCC-like, FCC-like, peak-like, and all temperature-fatigue labels remain provisional; failure-mode accessibility is also unresolved.",
         "29": "Machine counts and exact provenance are stored below; final committed HEAD is supplied by the handoff after commit.",
     }
     decision = {
-        "schema": "joint_archetype_final_decision_v1", "created_utc": now(),
-        "primary_classification": primary, "qualifiers": qualifiers,
-        "markdown_json_classification_agreement_key": canonical_sha({"primary":primary,"qualifiers":qualifiers}),
-        "analytical_atlas_name": "MECHANISM_GUIDED_RESPONSE_ATLAS",
-        "joint_study_name": "JOINT_FRACTURE_FATIGUE_ARCHETYPE_ATLAS",
+        "schema": "joint_archetype_final_decision_v2", "created_utc": now(),
+        "primary_classification": primary, "classifications": classifications,
+        "qualifiers": qualifiers,
+        "markdown_json_classification_agreement_key": canonical_sha({"classifications":classifications,"qualifiers":qualifiers}),
+        "analytical_atlas_name": "CORRECTED_MECHANISM_GUIDED_RESPONSE_ATLAS",
+        "joint_study_name": "FRACTURE_FATIGUE_RESPONSE_ATLAS_NOT_YET_ARCHETYPE_ATLAS",
         "solver_modified": False, "physics_calculations_rerun": False,
         "empirical_toughness_curve_used": False, "empirical_Paris_law_used": False,
-        "F2B_required": False, "median_absolute_relative_error": median_errors,
+        "tested_F2B_promoted": False, "two_compartment_model_class_rejected": False,
+        "median_absolute_relative_error": median_errors,
         "archived_results_analyzed": int(len(inventory)),
         "admitted_physical_results": int(len(physical)),
         "analytical_atlas_points": int(len(atlas_frame)),
         "initial_sobol_points": INITIAL_ROWS, "adaptive_points": ADAPTIVE_ROWS,
         "new_physical_trajectories": 0, "new_2D_trajectories": 0,
         "right_censor_count": int(inventory.right_censored.fillna(False).sum()),
-        "candidate_count": int(len(selected)), "active_worker_count": 0,
+        "candidate_count": int(len(selected)), "superseded_candidate_count": 6,
+        "ceiling_dominated_atlas_rows": int(atlas_frame.fatigue_ceiling_dominated.sum()),
+        "asymptotic_rejected_atlas_rows": int(atlas_frame.barrier_or_state_asymptotic_artifact.sum()),
+        "active_worker_count": 0,
         "response_class_counts": {str(k):int(v) for k,v in class_counts.items()},
         "mechanism_class_counts": {str(k):int(v) for k,v in mechanism_counts.items()},
-        "trend_status_counts": {str(k):int(v) for k,v in trends.status.value_counts().items()},
+        "trend_status_counts": {str(k):int(v) for k,v in trend_counts.items()},
+        "cluster_stability_fraction": float(pd.read_csv(
+            OUT / "archetype_cluster_stability.csv"
+        ).stable_under_resampling.mean()),
         "source_HEAD": SOURCE_HEAD, "qualified_solver_HEAD": QUALIFIED_HEAD,
         "solver_sha256": SOLVER_SHA, "historical_HEAD": HIST_HEAD,
         "controller_state": "TERMINAL", "answers": answers,
@@ -1321,18 +1755,21 @@ def final_decision(inventory: pd.DataFrame, pred: pd.DataFrame, validation: pd.D
     lines = [
         "# Joint fracture-fatigue archetype decision", "",
         f"Primary classification: `{primary}`", "",
+        "Additional classifications: " + ", ".join(f"`{x}`" for x in classifications[1:]), "",
         "Qualifiers: " + ", ".join(f"`{x}`" for x in qualifiers), "",
-        "The analytical physics supplies useful ranking and mechanism information, but the current "
-        "transient F2 state closure is not quantitatively qualified for absolute cross-fidelity fracture. "
-        "The high-dimensional atlas is therefore a mechanism-guided response atlas, not a learned "
-        "surrogate or a new production material calibration. No new physical trajectory was launched, "
-        "no production physics changed, and temperature-dependent fatigue remains explicitly unvalidated.", "",
+        "The local analytical kernel is accurate for matched evolving-1D conditions. Transient-state "
+        "coverage is partial and applied-to-local mechanical transfer remains unresolved. The V1 joint "
+        "candidate set was contaminated by cooperative-renewal saturation and is invalidated. This is "
+        "therefore a corrected mechanism-guided response atlas, not a learned surrogate, material "
+        "calibration, or validated BCC/FCC/ceramic archetype atlas. No new physical trajectory was "
+        "launched, no production physics changed, and temperature-dependent fatigue remains unvalidated.", "",
         "## Direct answers", "",
     ]
     for number in range(1,30):
         lines += [f"{number}. {answers[str(number)]}", ""]
     lines += ["## Machine summary", "",
               f"Archived inventory rows: {len(inventory)}; analytical atlas rows: {len(atlas_frame)}; "
+              f"promoted joint candidates: {len(selected)}; superseded V1 candidates: 6; "
               f"new physical trajectories: 0; right censors: {decision['right_censor_count']}; "
               "controller: TERMINAL; active workers: 0.", "",
               f"Classification agreement key: `{decision['markdown_json_classification_agreement_key']}`", ""]
@@ -1361,7 +1798,7 @@ def build() -> None:
     figures(inventory, pred, validation, atlas_frame, sobol, trends, selected, mono, fatigue)
     decision = final_decision(inventory, pred, validation, atlas_frame, selected, gate, trends)
     write_json("joint_archetype_verification.json", {
-        "schema": "joint_archetype_verification_v1", "status": "PENDING_EXTERNAL_VERIFIER",
+        "schema": "joint_archetype_verification_v2", "status": "PENDING_EXTERNAL_VERIFIER",
         "artifact_generation_complete": True, "decision_classification": decision["primary_classification"],
         "active_worker_count": 0, "controller_terminal": True,
     })
