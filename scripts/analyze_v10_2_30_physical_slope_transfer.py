@@ -503,7 +503,13 @@ def finalize() -> None:
             raise SystemExit(f"corrected freeze artifact changed: {name}")
     physical = _physical_points()
     prediction = pd.read_csv(OUT / "corrected_candidate_prospective_predictions.csv")
-    comparison = prediction.merge(physical, on="Kmax_MPa_sqrt_m", validate="one_to_one")
+    prediction["load_key"] = prediction.Kmax_MPa_sqrt_m.round(8)
+    physical["load_key"] = physical.Kmax_MPa_sqrt_m.round(8)
+    comparison = prediction.drop(columns="Kmax_MPa_sqrt_m").merge(
+        physical, on="load_key", validate="one_to_one"
+    ).drop(columns="load_key")
+    if len(comparison) != len(CORRECTED_LOADS):
+        raise RuntimeError(f"corrected comparison lost a load point: {len(comparison)}")
     comparison["slope_error_vs_frozen_prediction"] = (
         comparison.measured_local_slope - comparison.predicted_physical_slope_reduced_operator
     )

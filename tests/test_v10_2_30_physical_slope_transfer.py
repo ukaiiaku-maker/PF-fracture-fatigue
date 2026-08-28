@@ -172,10 +172,13 @@ def test_seven_corrected_physical_trajectories_are_terminal_fresh_and_uncensored
 def test_final_decision_matches_frozen_acceptance_and_has_all_answers():
     decision=json.loads((OUT/"physical_slope_transfer_final_decision.json").read_text())
     report=(OUT/"physical_slope_transfer_final_decision.md").read_text()
+    comparison=pd.read_csv(OUT/"corrected_candidate_prediction_comparison.csv")
     assert decision["result"]=="PASS"
     assert decision["primary_classification"] in report
     assert decision["all_terminal_uncensored"] is True
     assert decision["all_fresh_without_resume"] is True
     assert decision["operator_refit_after_second_seed"] is False
+    assert len(comparison)==7 and np.allclose(comparison.Kmax_MPa_sqrt_m,
+        [12.,12.75,13.5,15.,18.,21.,24.3])
     assert all(f"{number}. **" in report for number in range(1,11))
     assert (OUT/"figures"/"PHYSICAL_SLOPE_TRANSFER_ALL_DATA.png").stat().st_size>10000
