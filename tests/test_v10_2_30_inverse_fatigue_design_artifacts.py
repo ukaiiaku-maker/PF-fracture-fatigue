@@ -66,3 +66,9 @@ def test_markdown_and_json_decisions_agree_when_finalized():
     markdown=(OUT/"inverse_design_final_decision.md").read_text()
     assert decision["primary_classification"] in markdown
     assert "g_A2 = g_A1" in markdown
+
+
+def test_prephysics_launch_failure_is_not_a_numerical_trajectory():
+    source=(ROOT/"scripts/run_v10_2_30_inverse_fatigue_barrier_validation.py").read_text()
+    assert '"LAUNCH_INFRASTRUCTURE_FAILURE"' in source
+    assert 'not (path/"kinetic_tip_cell_audit_v101.json").is_file()' in source

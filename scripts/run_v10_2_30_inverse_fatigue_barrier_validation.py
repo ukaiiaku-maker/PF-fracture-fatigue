@@ -163,10 +163,38 @@ def run_one(job: dict, head: str) -> dict:
             job["status"]="COMPLETE"
         elif data.get("status")=="cycle_censor": job["status"]="PHYSICAL_CENSOR"
         else: job["status"]="COMPLETE_PARTIAL_GROWTH"
+    elif (path/"run.log").is_file() and "Operation not permitted" in (path/"run.log").read_text() and not (path/"kinetic_tip_cell_audit_v101.json").is_file():
+        job["status"]="LAUNCH_INFRASTRUCTURE_FAILURE"
     elif checkpoint.is_file(): job["status"]="NUMERICAL_NONTERMINAL"
     elif result.returncode==2: job["status"]="LAUNCH_PREFLIGHT_FAILURE"
     else: job["status"]="NUMERICAL_FAILURE"
     return job
+
+
+def requeue_infrastructure_failures(head: str) -> None:
+    if git("branch","--show-current")!=BRANCH or git("rev-parse","HEAD")!=head:
+        raise SystemExit("branch/HEAD preflight mismatch")
+    path=OUT/"inverse_design_physical_job_registry.csv"
+    rows=pd.read_csv(path,keep_default_na=False).to_dict("records");count=0
+    for row in rows:
+        old=Path(row["result_path"]);log=old/"run.log"
+        infrastructure=(row["status"] in {"NUMERICAL_FAILURE","LAUNCH_INFRASTRUCTURE_FAILURE"}
+                        and log.is_file() and "Operation not permitted" in log.read_text()
+                        and not (old/"kinetic_tip_cell_audit_v101.json").is_file())
+        if infrastructure:
+            row["prior_infrastructure_failure_path"]=str(old)
+            row["result_path"]=str(Path(str(old)+"_fresh_retry1"))
+            row["status"]="PENDING";row["exit_code"]="";row["wall_seconds"]=""
+            count+=1
+        if row["status"] == "PENDING":
+            row["solver_head"] = head
+    atomic_csv(rows,path)
+    state=json.loads((OUT/"inverse_design_controller_state.json").read_text())
+    state.update({"phase":"INFRASTRUCTURE_FAILURE_REQUEUED","active_worker_count":0,
+                  "expected_head":head,"infrastructure_failure_count":count,
+                  "last_update_utc":now()})
+    atomic_json(OUT/"inverse_design_controller_state.json",state)
+    print(json.dumps({"result":"PASS","fresh_requeued":count}))
 
 
 def run_stage(head: str, stage: str, workers: int) -> None:
@@ -202,9 +230,10 @@ def run_stage(head: str, stage: str, workers: int) -> None:
 
 
 def main() -> int:
-    parser=argparse.ArgumentParser();parser.add_argument("command",choices=["init","preflight","developed","r-reference","all"])
+    parser=argparse.ArgumentParser();parser.add_argument("command",choices=["init","requeue-infrastructure","preflight","developed","r-reference","all"])
     parser.add_argument("--expected-head",required=True);parser.add_argument("--workers",type=int,default=3);args=parser.parse_args()
     if args.command=="init":initialize(args.expected_head)
+    elif args.command=="requeue-infrastructure":requeue_infrastructure_failures(args.expected_head)
     elif args.command=="preflight":run_stage(args.expected_head,"CYCLIC_PREFLIGHT",args.workers)
     elif args.command=="developed":run_stage(args.expected_head,"DEVELOPED",args.workers)
     elif args.command=="r-reference":run_stage(args.expected_head,"R_REFERENCE",args.workers)
