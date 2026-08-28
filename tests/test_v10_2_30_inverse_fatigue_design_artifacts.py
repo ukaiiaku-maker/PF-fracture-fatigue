@@ -79,3 +79,35 @@ def test_prephysics_launch_failure_is_not_a_numerical_trajectory(tmp_path):
     assert prephysics_infrastructure_failure(tmp_path)
     (tmp_path/"kinetic_tip_cell_audit_v101.json").write_text("{}")
     assert not prephysics_infrastructure_failure(tmp_path)
+
+
+def test_R_reference_launch_is_gated_by_addendum_freeze():
+    source=(ROOT/"scripts/run_v10_2_30_inverse_fatigue_barrier_validation.py").read_text()
+    assert 'if stage == "R_REFERENCE":' in source
+    assert "addendum_preflight(head)" in source
+    assert 'freeze["material_barrier_R_invariant"]' in source
+
+
+def test_multi_R_targets_keep_R_out_of_material_barriers():
+    data=json.loads((OUT/"multi_R_target_design_configurations.json").read_text())
+    assert data["common"]["R_design_values"]==[.1]
+    assert data["common"]["R_prediction_values"]==[-.95,.5]
+    assert data["common"]["comparison_mode"]=="BOTH"
+    assert data["common"]["negative_emission_branch_enabled"] is False
+    assert data["common"]["negative_fracture_branch_enabled"] is False
+
+
+def test_multi_R_derivative_identity_and_barrier_hashes():
+    identity=pd.read_csv(OUT/"R_fixed_Kmax_vs_fixed_deltaK.csv")
+    identity=identity[identity.comparison_mode=="DERIVATIVE_IDENTITY"]
+    assert identity.closure_residual.abs().max()<2e-6
+    cross=pd.read_csv(OUT/"cross_R_inverse_barrier_consistency.csv")
+    assert (cross.barrier_parameter_hash_i==cross.barrier_parameter_hash_j).all()
+    assert cross.E_RR_max_barrier_eV.max()==0
+
+
+def test_reverse_transport_is_not_reverse_emission():
+    audit=pd.read_csv(OUT/"reverse_transport_vs_reverse_emission_audit.csv")
+    assert not audit.double_count_detected.any()
+    assert not audit.negative_emission_branch_enabled.any()
+    assert audit.loc[audit.R<0,"reverse_transport_fraction"].min()>0

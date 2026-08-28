@@ -66,6 +66,24 @@ def prephysics_infrastructure_failure(path: Path) -> bool:
     return explicit_denial or process_substitution_denial
 
 
+def addendum_preflight(head: str) -> None:
+    freeze_path = OUT / "multi_R_prediction_freeze.json"
+    manifest_path = OUT / "multi_R_target_design_manifest.json"
+    predictions = OUT / "multi_R_prospective_predictions.csv"
+    if not all(path.is_file() for path in (freeze_path, manifest_path, predictions)):
+        raise SystemExit("multi-R addendum definitions and predictions are not frozen")
+    freeze = json.loads(freeze_path.read_text())
+    checks = (
+        freeze["git_head"] == head,
+        freeze["target_manifest_sha256"] == sha(manifest_path),
+        freeze["prospective_predictions_sha256"] == sha(predictions),
+        freeze["candidate_registry_sha256"] == sha(OUT/"inverse_design_candidate_registry.csv"),
+        bool(freeze["material_barrier_R_invariant"]),
+    )
+    if not all(checks):
+        raise SystemExit("multi-R addendum freeze mismatch")
+
+
 def preflight(head: str) -> None:
     if git("branch", "--show-current") != BRANCH or git("rev-parse", "HEAD") != head:
         raise SystemExit("branch/HEAD preflight mismatch")
@@ -211,8 +229,31 @@ def requeue_infrastructure_failures(head: str) -> None:
     print(json.dumps({"result":"PASS","fresh_requeued":count}))
 
 
+def bind_addendum(head: str) -> None:
+    preflight(head)
+    addendum_preflight(head)
+    path=OUT/"inverse_design_physical_job_registry.csv"
+    rows=pd.read_csv(path,keep_default_na=False).to_dict("records")
+    pending=0
+    for row in rows:
+        if row["status"] == "PENDING":
+            if row["stage"] != "R_REFERENCE":
+                raise SystemExit("only R-reference jobs may remain pending at addendum bind")
+            row["solver_head"] = head; pending+=1
+    if pending != 6:
+        raise SystemExit(f"expected six pending R-reference jobs; found {pending}")
+    atomic_csv(rows,path)
+    state=json.loads((OUT/"inverse_design_controller_state.json").read_text())
+    state.update({"phase":"MULTI_R_ADDENDUM_FROZEN","expected_head":head,
+                  "pending_R_reference_count":pending,"last_update_utc":now()})
+    atomic_json(OUT/"inverse_design_controller_state.json",state)
+    print(json.dumps({"result":"PASS","bound_R_reference_jobs":pending,"head":head}))
+
+
 def run_stage(head: str, stage: str, workers: int) -> None:
     preflight(head)
+    if stage == "R_REFERENCE":
+        addendum_preflight(head)
     path=OUT/"inverse_design_physical_job_registry.csv"
     rows=pd.read_csv(path,keep_default_na=False).to_dict("records")
     selected=[r for r in rows if r["stage"]==stage and r["status"]=="PENDING"]
@@ -225,6 +266,12 @@ def run_stage(head: str, stage: str, workers: int) -> None:
         freeze["physical_launch_utc"]=now()
     freeze["physical_run_count"]=sum(r["status"]!="PENDING" for r in rows)+len(selected)
     atomic_json(freeze_path,freeze)
+    if stage == "R_REFERENCE":
+        addendum_freeze_path=OUT/"multi_R_prediction_freeze.json"
+        addendum_freeze=json.loads(addendum_freeze_path.read_text())
+        if addendum_freeze["R_reference_physical_launch_utc"] is None:
+            addendum_freeze["R_reference_physical_launch_utc"]=now()
+        atomic_json(addendum_freeze_path,addendum_freeze)
     state.update({"phase":f"{stage}_RUNNING","active_worker_count":min(workers,len(selected)),
                   "last_update_utc":now()});atomic_json(OUT/"inverse_design_controller_state.json",state)
     byid={r["job_id"]:r for r in rows}
@@ -244,10 +291,11 @@ def run_stage(head: str, stage: str, workers: int) -> None:
 
 
 def main() -> int:
-    parser=argparse.ArgumentParser();parser.add_argument("command",choices=["init","requeue-infrastructure","preflight","developed","r-reference","all"])
+    parser=argparse.ArgumentParser();parser.add_argument("command",choices=["init","requeue-infrastructure","bind-addendum","preflight","developed","r-reference","all"])
     parser.add_argument("--expected-head",required=True);parser.add_argument("--workers",type=int,default=3);args=parser.parse_args()
     if args.command=="init":initialize(args.expected_head)
     elif args.command=="requeue-infrastructure":requeue_infrastructure_failures(args.expected_head)
+    elif args.command=="bind-addendum":bind_addendum(args.expected_head)
     elif args.command=="preflight":run_stage(args.expected_head,"CYCLIC_PREFLIGHT",args.workers)
     elif args.command=="developed":run_stage(args.expected_head,"DEVELOPED",args.workers)
     elif args.command=="r-reference":run_stage(args.expected_head,"R_REFERENCE",args.workers)
