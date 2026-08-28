@@ -316,7 +316,7 @@ def main() -> int:
 
     keep_rows = [
         {"path": str(args.campaign_root), "classification": "KEEP_CANONICAL_RAW_RUNS", "reason": "288 plan-filtered qualified conditions"},
-        {"path": str(args.out), "classification": "KEEP_FINAL_RESULT_BUNDLE", "reason": "regenerable final tables, figures, decisions, and provenance"},
+        {"path": "analysis_outputs/pf_canonical_fracture_v2_final/publication", "classification": "KEEP_FINAL_RESULT_BUNDLE", "reason": "regenerable final tables, figures, decisions, and provenance"},
         {"path": str(args.branch_root), "classification": "KEEP_BOUNDED_CAPABILITY_DEMO", "reason": LABEL},
     ]
     archive_rows = [
