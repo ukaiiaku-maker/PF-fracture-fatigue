@@ -1,0 +1,1858 @@
+{
+  "canonical_case_count": 288,
+  "canonical_orientation_composite_count": 4,
+  "canonical_orientation_individual_plot_count": 16,
+  "canonical_rate_composite_count": 4,
+  "canonical_rate_individual_plot_count": 12,
+  "chronological_lines_preserve_duplicate_extension": true,
+  "figure_records": [
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "9b647a92d1fa2461c28244b8084fc88b704f6b67a5940ab71ce822a2c0d5365f"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "2b872902c626a4fbbf57ddc7fa436a8062aee9a3c53f400cdb6bd0981566c3ef"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "9c81a8a4cab6c18ca32c02be854fcfc862c5fc448435ba1dcbe0a4623c1833ee"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "333da2a8a43f744606974786efe7ab238f2b29eb82b88c194bf0ec665a302b8f",
+      "stem": "PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "27f2f94ad314576f759cdb059f1ae51d15fbb9166b8c4e9bac63cb5492df05f5"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "1895814184c96f387ee8c83d0a26cdfbc22cf5ec4224247c1b05951d323821bc"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "43b5be5ca361678744fc0569366fcfa9b9d36ecde95fb70af0131e991e5cb686"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "f0966cdb619a30fcfa316df521803bff9e8b41e78d7904c10b7b8afd8d8e0d2a",
+      "stem": "PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "6d8689d272a8ac98441c4e2adf5cf46be77be36e1f753f4a1b6a4668a8ba6093"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "f2d012a4b969f48867f46a34843dc625051e8f6829500b79d98b815fbbf3ac86"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "d17be00078079724862504f060ed9b55effbe05f9f555900d5d97f5e6d38f0ac"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "48da97eb4709ecf253b13628218b2d499e2373c947f0f1b59db2cdc53624a543",
+      "stem": "PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "56197531df88105c4651714987815aa2e05b47f4b62d129bf26226ab9ac372aa"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "2c57765ac9f61f491d4378a8061ad9e9a6766ac0ac2d005b0365bbabe98b2fb5"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "e6d600d10645267416d670094a63806e853dc35b3366c35c86eed06ec4bfefa2"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "e5b7e75b3232fa68bd9f7f343416788e2bfcecf198333adaabe994955a2eec2f",
+      "stem": "PEAK_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "7e8d5e437688d2aa66dc34e7371871b4bc45cc2b2ab9fb354c047619e8261d70"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "854997f2ed6d7610c656f453ee432677f9f08783800a5e21daa4ae0e5f81e5a5"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "ed28dcfb1c31a6027c4f1521e75cb26ba4470960ad69f40d0b8be7efa2765b7f"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "72f1a323ce266989d800ed90831fe27fd8e3a887ee5255eefef230ee83306e24",
+      "stem": "PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "62d4a7b43c936e08b3aff8dd57044d44ee83cd0314e6304312096bccd5180c63"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "fdef2c024e5160b25659c497a91efb889e6f46f69f2604feb056692a49c04a30"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "74263f60030f3b88d7f12ebdd45ddcdab63a09a0c1d99fa1342dff84bdeeb246"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "b7df03f4272484fd294defd11e462b4ea2a8411baaf53bb4c292093f43e96161",
+      "stem": "PEAK_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "a7608416de4387fd0812e325182a4ab9fc1cc028cc2f601df2457803729b355a"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "bea207dfde956fdbe263198e85bd31a094cd0e747853e539017e51e4a9564791"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "cf4457c55cf73fc066a5ded2e5c7ca1752a618b747291ee3d7b7b16295096181"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "87655909939ce2bbb3f322de2e589bd1e6d7908488dd467bff72a82d064d4a62",
+      "stem": "PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "e1ed19e4d1839442ac7decd9fa723bcd6dbf4044761baa2bce998e9f8e542a9b"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "a7a9a56238980d52fb349283938d555dd5fd2c0fcdb82a5be31d406b49ffb680"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "0f524642f5f57ab6c46daa79719f7e1bd582248c1bc8c1d5cd5c6fb2bedb2949"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "f5a4a3e83cf1d448752fc66555727c338bad5453e04ef3f4a5e6833accc604ac",
+      "stem": "PEAK_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 48,
+      "category": "canonical_orientation_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_ORIENTATION_COMPOSITE_FULL.pdf",
+          "sha256": "9b507fef89ef8059b0a66910669edd223a4545e6215db4b8029263d1832fc67b"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_ORIENTATION_COMPOSITE_FULL.png",
+          "sha256": "862a2599e1d2c99f0c93c105469ae995f72f3566f45381728c284a223f339db2"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_ORIENTATION_COMPOSITE_FULL.svg",
+          "sha256": "6c1f51db953d9d47628e47a52ca84f1bc0418df98333a45a0a0d5b1bf69e7257"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/PEAK_ORIENTATION_COMPOSITE_FULL.parquet",
+      "source_data_sha256": "9a717ff733852e6b2d9d2f8979ba9f0920edaa7a85b3cd837db213a673abc7f8",
+      "stem": "PEAK_ORIENTATION_COMPOSITE_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 48,
+      "category": "canonical_orientation_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_ORIENTATION_COMPOSITE_EARLY.pdf",
+          "sha256": "fe3a9af43124f4e9acddb639d712720fa7c6caecd27b73073da2bb80be58d3fe"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_ORIENTATION_COMPOSITE_EARLY.png",
+          "sha256": "d02e2f2fe0655a5dfe608fb7082a87de0f22207d33992ad17d1613a6c2f5c6d4"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_ORIENTATION_COMPOSITE_EARLY.svg",
+          "sha256": "e3f755fdcc904dc1e3758f64c63e4540e2f3790661e91d5dbb1447b7ee5f7710"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/PEAK_ORIENTATION_COMPOSITE_EARLY.parquet",
+      "source_data_sha256": "b5c1eb8c7a9f832924ea920ec5d0d6d0a204083025a1288d1b164d180b0c2049",
+      "stem": "PEAK_ORIENTATION_COMPOSITE_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "929b7320bebaf4cfe6010fbb64fe85d1988e799a5a79851cdea1ccb3dd05f35d"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "0fd9ac9072bf7b1cfd55a2c5febb8f36c4be227ca1bd0049831fea12a7ecf727"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "ab6e52c3a4a9b22736aba47c1be60b3a7f05ec950a1c0081a14026abb78de542"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "71ce49399a3638b07bdc199644d6b8d59f0e70955eae80dd6ed6189dfc2999df",
+      "stem": "PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "01634f6692f1fd78568076072d22845af82f034b643cfaabd076dc21a778e1e5"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "161d90e581b4eeb9de753c2d33a46bf77af8d35587af20d75b1ee164d761978a"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "6ba7bd4847006ad5a8a26777a986cff09b43277044a78a16f920b3f982f03359"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "52cf73fef033d6c774f0d28f4b3168a1f7314a1f1942ac9040ed033d2ba1ce4f",
+      "stem": "PEAK_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "44c9a4ac11da1a9c377351f363b9332a330db8d69996b6a795d4fcceff4123e6"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "b435ec252b29214eef4f0bb2fcfdcfd4e3c3cfc14f5585921c491ea535a7692b"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "b69d73d884858bb185454faffc6cf87a9773a8659623f020c682e855b8063ca5"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "333da2a8a43f744606974786efe7ab238f2b29eb82b88c194bf0ec665a302b8f",
+      "stem": "PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "045fb3fd4c87f057af2d637c345756cee7d5d7a3fbc1d801db85299ef5a82bbb"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "c1fca2cdadb87dedd02e0ed53b9e7004618028176a973b65f2fe7d11c0509b39"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "1c5b797bbb2b88e9ec9246d8271b13af6b2a044657e729498585ff2f958eebcb"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "f0966cdb619a30fcfa316df521803bff9e8b41e78d7904c10b7b8afd8d8e0d2a",
+      "stem": "PEAK_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "2afde5bf80c5f915d2d271ef50d98e17ff8204a200499a475c7e7d5cef1b2004"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "43dced7f3ce50aeb05e7932be35aa053ef57396f8b5ef0017f0ce8280e78a15c"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "e3765ac85ea18c9c0ac6ecdd0acd87f4a15d1a9947ff0bcd053553c7638a66bf"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "d85bd6b27d9b7d65f0ee8f146c83ae74428c1fbc17746ed835580a3a44865c0f",
+      "stem": "PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "2544de1f699cddc7b109f4f31591bc67b63aabd8859e8bd200a535c8a66a5df8"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "56f45726b0fa5f2529145aaf46c4f0b7612fc3d3e67a17ef5e4cdb0fb330dbdc"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "7a45f819636da2ce5fc94fefda6753f802612590738f766c72e83dede3e0d3a2"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "662b32bb3b8f8b048c403cc3bd104a0f65b1f35aed38665335d46d43bb129987",
+      "stem": "PEAK_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 36,
+      "category": "canonical_rate_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_RATE_COMPOSITE_FULL.pdf",
+          "sha256": "7b267149c85839265ed84f50443a91df44c73684f727ecbb79d0c3b3de156483"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_RATE_COMPOSITE_FULL.png",
+          "sha256": "4525d233d5b5a211d19febba6aa698099660c304d8c746b2e4128afd49244608"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_RATE_COMPOSITE_FULL.svg",
+          "sha256": "56dd906cbe2e56754733788880174756c01488c64f0ab929a91afcc2102cff82"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/PEAK_RATE_COMPOSITE_FULL.parquet",
+      "source_data_sha256": "7c84e959ecb3800f1eea65f48c90b1c637cd8560e80c453afc2646e4d0307e80",
+      "stem": "PEAK_RATE_COMPOSITE_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 36,
+      "category": "canonical_rate_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_RATE_COMPOSITE_EARLY.pdf",
+          "sha256": "a22424a6a73b0dfa54b2908b6713900a41ae47cb3d4cfe8e96f7ffbf90cf7f86"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_RATE_COMPOSITE_EARLY.png",
+          "sha256": "45dde0e49dcad3b6f87edd34ca00116464cc443231657fda841088416fdd1668"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/PEAK_RATE_COMPOSITE_EARLY.svg",
+          "sha256": "cba0f496b440510634ab198bd89a18e954c1d5647ea5d173f650d4bce6d33e6d"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/PEAK_RATE_COMPOSITE_EARLY.parquet",
+      "source_data_sha256": "67fcba590fb9f68feebef7d1b6b99617b9dbbe54d0586f179931bbbbfc09e8c5",
+      "stem": "PEAK_RATE_COMPOSITE_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "b5557f71f58def920328f87d50da7b7e87720365980fa8efecc9b44af71762e7"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "fe2ffbd5d527ce8418d8f300a6502aa4c0dc866cd819551e64ebca17c6529bf2"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "d72872d107a9cbda17dfdb9d6bb79bfbc44214ff0414af1c52470a19e54a089d"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "ef7b3fc7510727dc9384a29658c15206a1f04542faff981326603504d13365c1",
+      "stem": "DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "6a4360eb1591c91a7899768bcb95fa5270b5a9bc53b016bb679e025c5e996061"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "e3c338e80b21812667744d3e401d0cfa3525ae23d613f0b9bea376f9962e6051"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "d971443fe8b631bde547020b76c910fa170f30e60d55ca4b6d58afd8025bfe69"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "32c8bf1ed1c46b1bad2faf58ad3167b1c5ac3126eae78caced343efec3326c27",
+      "stem": "DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "02be5891005b030618dcbab7b9f506d1967a3fc31a313cec852bb39fd0b0b760"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "b93c91c1f201c9dfe02d5f6a402fa0e4dcbd4f9fdf1f9fe405c631c44a337eca"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "3062e84b202b2d0ea6fcdbd8c36dbdcecde0a5e9067ef98bf4e8bb1167c0b72e"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "8166d37d44d74b60d9c5357f1a8949e88085838a2cb0cfe290cfd7525c2f21c4",
+      "stem": "DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "740bc16bb417009b3fbc4a30abc93b4f8d31710d9b4788ad69e4d7869381272c"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "ec69ff27e6aa73cde5bc6975df0bf05d7d3f9206aadec7e77296e6c0f0a7f09b"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "f6378da6b2f09389d4a9b726a0ca5d73a94a9db86ce8bb1fddf72dc1007f6ed5"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "455bd2fcc09b16325fe0a8bf751b70c75bb913753368c618f47f2ef262333210",
+      "stem": "DBTT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "72d8c80a265589c06d572e8fa7d551aa82902039401b692e4c6965b8b585a289"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "2ac0a3ed82f7f8967a192ff1bb7839ccb446a446c88f6214590d6ba2ed905a5e"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "374c5c683771ec35ee4abeff5c7631a7790326745799bf713010b0795ddc8a74"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "cc789392288f78175763a67623a274894894ccff6aae21be7ac4d349c2724d69",
+      "stem": "DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "ae813afc364537bc49508a0fc8de1e0cdec8e9b5deb685cb6f0ed6b629faa631"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "d8957be96385dcd27b7e98923423afd656db19a6ff94048d0ae72989c4380bad"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "f46042495bd827ddd4e79790069b3400cfb07da6fe3d26a89451644751f7ef99"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "d35549373f37631eebea6c2880e67d6f459821a93ffe02e7bb93f45d237bc3e8",
+      "stem": "DBTT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "97e62e0900fd3cabdc0cd5bbb36e5c2b3f5cb2f3c2e3c72f4565cd325f02fa5b"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "42b947fbf5279a04e6e9360d9011247e4999c9ec76b5bf96aceb4fd22dd9147a"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "0f34646206697e2f14d923144a7e3d2af90786edf204f210eb69e17d4fcbfd76"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "c319767eb86aa9088f7ec3b15f0453f95fd8ed2a98fdf9df3625c7825a5f21bf",
+      "stem": "DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "7a195d771c14081950c6fdbe6714c28c1522e63902224ca33a309c6d66f62e9b"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "483538c6f141742e2bf035509c95f0414a06737a1816fbd98ca8e9235788ad79"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "a1b6636e5fba788adf2bec37d0eff6c158ae29d5b7a5c73cfef5d8ebd2e3d7e4"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "9cb2a9dd1049a6456ab163b3ebc4bdf5cc721a506aa399f5ccfc8fc79fa60040",
+      "stem": "DBTT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 48,
+      "category": "canonical_orientation_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_ORIENTATION_COMPOSITE_FULL.pdf",
+          "sha256": "d4564595e079d12cbc6de1cefbbcc1e6188b454bc563a8b326d34bd8b3585816"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_ORIENTATION_COMPOSITE_FULL.png",
+          "sha256": "38584ab2ee6477767a322a9345851c1374530b767ea6504c9a2e940d13b5e1e6"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_ORIENTATION_COMPOSITE_FULL.svg",
+          "sha256": "022fcc7260eac7f6ce35b942151da8595840e4264fc9609d3769c8e6229fb2d3"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/DBTT_ORIENTATION_COMPOSITE_FULL.parquet",
+      "source_data_sha256": "452d262b80046e096e0b83b7647a7e7986ff4c50f63cf2557d94ca728510d0ec",
+      "stem": "DBTT_ORIENTATION_COMPOSITE_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 48,
+      "category": "canonical_orientation_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_ORIENTATION_COMPOSITE_EARLY.pdf",
+          "sha256": "1900d8da8231f24333bb2c8f8f8d9709a7610f2f06bf2f65c95f2c3a9eef7fda"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_ORIENTATION_COMPOSITE_EARLY.png",
+          "sha256": "15252226753e111f019ec3c852d6aa51f002630b7cfaa08b40af384770cab4e8"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_ORIENTATION_COMPOSITE_EARLY.svg",
+          "sha256": "da1f5390ec6749531e6b65c6be0e3f7724be483bb02330cd5711fc3adf681ce9"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/DBTT_ORIENTATION_COMPOSITE_EARLY.parquet",
+      "source_data_sha256": "4966b36057ffed5fe900b5ecf8263e18256f29fdd2e4f0845cfe651c6aff72e9",
+      "stem": "DBTT_ORIENTATION_COMPOSITE_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "564c0b1fd29d43c6b9f36ea3839f38110b7bb25feedeb625297a833b1a879ab8"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "4d9554ae1e1bb8d26f435ac94666544b3ad565c804433a5153d68fe32d1b36f7"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "765de772a08b2748fae41521b9d9cc3259644c1dbd9796f1753e3fb95e6e59b9"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "17a3ee488bd8a708d39f6dac540bbd93d50de05f4579332a70ef6be326801289",
+      "stem": "DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "2367ef7006c03df1facb0d27ad350bfc3d591b3f63a0cd392a09f5a6ae99dd88"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "f73d0cfc589801cd9e9bd3f5715b613df3ca7beec0cf6c374a3ff377e7b4cbd4"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "42d93475ad86dc0aa8a636f195987d506cf289a9094985aab1bbe46a093be59b"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "1f8c309d6e420a7de5df44513f084108bbe7e7bb48595938e538732bda05ca99",
+      "stem": "DBTT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "f16dca19cdb1891bdc1cf9561346b146df79107142e2ebb17fafa58ec2159a69"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "62da5ef5603b1be3319149852a514e11b0d66eb40e2f3d8e7e597da498a2431f"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "7b20cf89e616099092ed7e4cb7197ce075fc21630f710f68b91cc080109de046"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "ef7b3fc7510727dc9384a29658c15206a1f04542faff981326603504d13365c1",
+      "stem": "DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "2b437238afe1474b1b5aa73c1ce9ef7e6dbeeb3c359ea787492e6e555c506f0f"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "efa16b2fda7b2c0b1c961ac1ca95a1b8c89037acb7a82f9ef2061f8e8441fa52"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "1f82c0e8239f383ace53b12aee6095cd77001d25cb8e7f6d3b9839a8a17c5661"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "32c8bf1ed1c46b1bad2faf58ad3167b1c5ac3126eae78caced343efec3326c27",
+      "stem": "DBTT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "fd09dd505388c72a2d534b029865430415186696a839c26cb89b679fd1b732f6"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "be2302f176e98b6ef0f1b9d3c44abfee019d4dd9795344b107e72489d18d02e1"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "82fb1efca3b4925d80033ac4b1f18d088d99bad0074c2f586947449e3087b86c"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "033e177b235056c80ed0bf0cfec026471bd62011deba4537a45a1bd3a5089b36",
+      "stem": "DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "27e6ddfe6a4fde706480d70253e27315f5a2823db2a73c62aa449669f63cc170"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "ff91ce672ced0e7ec5181e298b17d6d6b22f0b6a6651daf7650e54b467304b92"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "c8d5108b991ba30695d38cce52a16716cd1edfcf40667844d71cfc619f5c7f11"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "f180848e243303c3b2fd87af15aa57f35c0d60082f5adb8154a1318e459d0976",
+      "stem": "DBTT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 36,
+      "category": "canonical_rate_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_RATE_COMPOSITE_FULL.pdf",
+          "sha256": "9e2e4ca8ce444dbf59017a6afb6d83210c49cb72f673ac31fcc71b6ec49132f5"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_RATE_COMPOSITE_FULL.png",
+          "sha256": "bfb2904c9f778181a5f61ac4fb823291c8a380437348c9a44e378a5a2709aae7"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_RATE_COMPOSITE_FULL.svg",
+          "sha256": "ca71c4a7611719f17a92bde2ff4ca53b24820192768c91bfa4632980ca6a40aa"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/DBTT_RATE_COMPOSITE_FULL.parquet",
+      "source_data_sha256": "62ffbd958eb45d887f97548235bd3a350eb7f0da39d0b983e4393d811f68e956",
+      "stem": "DBTT_RATE_COMPOSITE_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 36,
+      "category": "canonical_rate_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_RATE_COMPOSITE_EARLY.pdf",
+          "sha256": "90e7f401b339d1f8b072b1cbb11236707695f94857b78571420d509c7fb35748"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_RATE_COMPOSITE_EARLY.png",
+          "sha256": "cca6c82ada8f55cccc60819a97398f6f745c2701b4a2de79b97667e8f2f85eba"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/DBTT_RATE_COMPOSITE_EARLY.svg",
+          "sha256": "37fc1b5cd94648bf2181fba315ffd0209d5157e995117ea5ef4fdbcce68ddbf6"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/DBTT_RATE_COMPOSITE_EARLY.parquet",
+      "source_data_sha256": "e9f7233c21e2e39912b52fec9832bdec3800e7716dd1537a996e4e5ff9d53940",
+      "stem": "DBTT_RATE_COMPOSITE_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "7e11686878fb132422b9d65fc836e4698ad1e824c227f2dd256ec7ca0d6c3227"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "dfffae01944f86b0db0e260d7d0e59076bd22c15157f60bbb309dc5380937df4"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "ac626df6efb14e831e9ac62fef19cb8ab304079f98a78435a2d709a9ad919edb"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "726b92b8c35948afb448efbabef05f6565a9be32e1cf189332dc2082172633b4",
+      "stem": "WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "6dcba2e659d697f0c5782ab3378073fb8a2a65bfb4a5771348a4e88c892ab9de"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "7031be7c7c7ffb01d1dcb27ff7b5a0ed56462e5927c2df779e61fc56dfa45e21"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "34213383d218e6a9927949f2f9e29a3c3d1ee3c824c722e3becbebf0e243e421"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "0bba4a0302a6b87a2ff9be8dcbb665672ec23592c2d2e8b6f601eeb59c058a15",
+      "stem": "WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "f0bb16836ceef6113aa547e39a71eea11f853f5525de9ffa6585edd5dd947300"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "8c7cbf889e1059a9e7e530948389d1ad6f39403676af33c50ff485a029289cb7"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "55362458b8aa2854e418d57c3411ad1f94728ee65fc9e03d0310fde59944a5c9"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "32db584c0183cdd13ea4f65de19ae8aad36523954de8c19dc62dfd520da8edfa",
+      "stem": "WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "79434ac856edfd93f3dde1a74826c91e2d2a49b50a1e3a053d046c0c4f870674"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "92cf3b9462d09b25c595f6301a520260871351e0136f6850d750fb45eb03f2ad"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "f5d71ff8c947b848388bd2f5ba7d8b475fc5ff6219b59a83b8d63da18e05f081"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "947a15b1d69145c2faefb5773c4f5f999a26475757019424391fe047c7225a48",
+      "stem": "WEAKT_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "40954e40a64fe2d379eb91466ebd47b97ffda376438c69ba21f0cb8789038838"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "1c2a68ad4f3d34ad73ca93a15b1deb8ae4bb71e5d08186cb61d3222b0b3b6717"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "2d0fdb32692f47c7bc02fecda8db7abe2611a1341a3f7c63cb267ae1c06b8482"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "4733ab4f9e44217446ba6db75b465f7c5133c3fb80fefa547fdbe6402eedd7d6",
+      "stem": "WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "1254f161a03b9ad32c4019bd16aa9b814ff033fafde4c49b14890a32c8b124d6"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "2667f699a50727a71cb7bf2ce12b4cf2e0380c47a9a19377c58d4dc31fc6c380"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "96b315dba5564b3af4e8899b50d8f502382fe8491d7c06056670d27c6b808a3b"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "33da181b2da73d051fe4135d5822e784bb396595d47680fa78e6f6fa2916d176",
+      "stem": "WEAKT_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "dfd87cfbf8ac1367e1e7135e99e646dca4ff361ddb59134da33538da3839bfda"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "f9c87a7ff86d8760a416f51db4d4595442107db4cec8b8fd1aab31bf16194598"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "2fdb5534eacca4dc7fdcc53545a7af317e4936bbfbd278b4d26b4d6b3e5ad276"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "4f2b2731bbac150a49fcf6410e7cc0c6ab7b592c51a05535b6339525c7b211e7",
+      "stem": "WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "88bd02bbc053c55cca8d3ebc808263da45baa2b16aa5dca47147fa20bec8f87d"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "29088cac7d90a62394e76b7e9dc60313172cca17e3140ad2b4b84211243160bd"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "af7cda03f800689e69d6fd5f9333bab43d413fd0835ddd61ff30133beb904e22"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "174856d640826be5e0f154c2064843fa82c9fedc51678024fb61607807701b9e",
+      "stem": "WEAKT_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 48,
+      "category": "canonical_orientation_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_ORIENTATION_COMPOSITE_FULL.pdf",
+          "sha256": "ade06598ccee97effca10f2e19e86fe21e65fdd19d4e7ca6648bb11de581b25c"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_ORIENTATION_COMPOSITE_FULL.png",
+          "sha256": "9947b841ae8e9885aecd44f4f0b145e1542f3269dde13c7ebee98b19d0849997"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_ORIENTATION_COMPOSITE_FULL.svg",
+          "sha256": "78ce2f90780aac5e2bee8b9ad4554d4022a2bb03df2ab070f12f5598e6c7010b"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/WEAKT_ORIENTATION_COMPOSITE_FULL.parquet",
+      "source_data_sha256": "cb57bc276d665e2bfb529162e254936574359bf6e1d6114bb254ef7665af223e",
+      "stem": "WEAKT_ORIENTATION_COMPOSITE_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 48,
+      "category": "canonical_orientation_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_ORIENTATION_COMPOSITE_EARLY.pdf",
+          "sha256": "855cd75cac71139e7064c73afe93059dfd714af643c051c6f84c9e2d63e918e2"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_ORIENTATION_COMPOSITE_EARLY.png",
+          "sha256": "343cbb3c42da7c5cae0520fca8b671c04c965a617f9ad448a23a2a8f670d319a"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_ORIENTATION_COMPOSITE_EARLY.svg",
+          "sha256": "5a85f177c204917305be2dc5eb1b9fdd4c062779b61adf4350a2054d3e456b31"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/WEAKT_ORIENTATION_COMPOSITE_EARLY.parquet",
+      "source_data_sha256": "5eebe21a5133f75f79ad717d790c95b8242a956eea00ba319f272450fe2b7b05",
+      "stem": "WEAKT_ORIENTATION_COMPOSITE_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "13bd6e483ae4e4837eb29a9584949077e7c8ca864a932d01de93c8ef2051735c"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "b1337569c1daf521777eb29825bb6cb39a4f1163ec75dd8e4c7633c3f0e870d0"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "c1b6c019de80c344946662a06fa55c55aa3965056948750091b07a23186f675b"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "7752ad86be70be4d04718212b155780243eb4703431469a1d3fcbf0af9e507c2",
+      "stem": "WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "5909139f7255845f029803c38f07dda9ce3fc9dd8825e470a8ffc2ff24674232"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "d5d04d4a158e0000f63af9a85816119526479508b7cc189d0173257902c55dff"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "9e8a8d30c70e35bf04da160dd77b302b6b9c34710e01befdb7cc7daca66a61db"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "bc58d3c841cd4866b96beebf48492e5c754ecfcc15e6c6d508c2fb803f399cd9",
+      "stem": "WEAKT_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "84d21b5595b69752fe3144532831a70edd14524ec1bbd1a1cf8350f5978445e8"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "526cc780942403d0ba5e2657eae9564f196f299b15e3383cda33e807bbb45096"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "36f87365916f1a25fb48cdd93e0181c5c97ef5d5aae8ba4b9df7f62ce0dcfda7"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "726b92b8c35948afb448efbabef05f6565a9be32e1cf189332dc2082172633b4",
+      "stem": "WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "ee547a0cfcaa9abd95a5fd970490135232f48a52437fe596a41823042266ab7e"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "e3fae797e13a0ade5719588a160468eb5d3f5d145bb7913bddd77fecb5960a6c"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "16e7ae0ee7c750a43313baccb3ba61e5536f64ccb6248ac11ad99e794732e543"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "0bba4a0302a6b87a2ff9be8dcbb665672ec23592c2d2e8b6f601eeb59c058a15",
+      "stem": "WEAKT_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "f2b2333550e1bc569dd817f678acaeded3fe299600c585097dbc730c9e7e18ca"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "b4c070db86cafa823f7e86da5cc041431dbd60feef255bbfb997e92c545f2e1b"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "14f4f34988730ff7cc933cabdd64a89d31fba6e0a013c35e0ed9d1e077d7c55f"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "b3f22d0fbb02c5d661e49481fbee874b6d0fc8ab7592f53d797974bf80fa1967",
+      "stem": "WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "86abedef18fb9511ff7e349fabef6f5d94bdf4cab327fc6fa9cfdceb5f30ac8a"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "af346dbf57551e705b2a0fb603cd8f4e42d787917e30c6235fa109d14bd94275"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "290a31202d715f222e94204e5e37472fc6cf0388aca86dacdcffc2a592607396"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "7d27361d4f58d06100ac713d113c9794cf4f61af9e4fc1eb8e3dbbb7d4de15f6",
+      "stem": "WEAKT_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 36,
+      "category": "canonical_rate_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_RATE_COMPOSITE_FULL.pdf",
+          "sha256": "43000a638dfc4a67ea192a0e83db26f8f601754eae31d9e6eafb5c0f9de86b89"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_RATE_COMPOSITE_FULL.png",
+          "sha256": "0f5be9464d82fa381a8194d10ff6bd925d7bc1f58e067d6df266990aa297884f"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_RATE_COMPOSITE_FULL.svg",
+          "sha256": "b8d621a239b12c8c6d98d5fdd7e673388bfeacd21feefbac6a074c46f777b372"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/WEAKT_RATE_COMPOSITE_FULL.parquet",
+      "source_data_sha256": "360640593cc6583f6815b1299b3dd05f74e8026336d1dea16b8cfb9aeea9486e",
+      "stem": "WEAKT_RATE_COMPOSITE_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 36,
+      "category": "canonical_rate_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_RATE_COMPOSITE_EARLY.pdf",
+          "sha256": "33f89d1655815a2cd967d45c186d5b3e991b281e055dcf0b69e86c7c5c8a716d"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_RATE_COMPOSITE_EARLY.png",
+          "sha256": "4da1f2f5b0ab19c0c05e8fc7d30d7c050483a762e912aff664ad2f31f72409af"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/WEAKT_RATE_COMPOSITE_EARLY.svg",
+          "sha256": "7b697ee13602db97e88cb4a4544339ec4edd374c76dee05c2b734e34f13c1ef8"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/WEAKT_RATE_COMPOSITE_EARLY.parquet",
+      "source_data_sha256": "9e5db8fc33183e946cbd1667d7768768f795d035bb8de8d05e74662585adc128",
+      "stem": "WEAKT_RATE_COMPOSITE_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "ea1a3ed8d2f1ff3af587d8df5a8544c4bc7f07c24e520f0481b85e5d8e40d65d"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "ba91bb602924feaad0d1050d0b19cf4698a5bf5e0857419202e1e88588ff4c76"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "66bb25511b57f3e6830b1ebae40d2e28d3c7b84ba51a22a163cba12212f938fd"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "e7f610c2c29356ce3572f3e20aabbd32129446bc393951888794972d60b5fa81",
+      "stem": "CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "d3ba57ae09fd0c90ef95d6197fead9abf59aa0b9bb760ed62e1005420a7baf91"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "7eede992d028f08db1493738f70b84bd97707cac932b440210807e4861a2535c"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "45583eee15839e17df25179ba0685e16a83af41589585e74e600cbb164890794"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "970acf1586d037c0db6b9163b0a63cb04d4838515434534164e6a0faedea45f6",
+      "stem": "CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "09c0aadcaefa90d936805a4c9c931b8c6f2e9c1f1e961109db830ad3fa8c1f0d"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "c4237d2cf22e747d5ed96d041583db14bc1985d14479bfa4f0b32486b24a6933"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "b884fe9a007af8f3f121afd1f15cd2cb73299b565048256165731cf76ef6cdab"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "93b63779caca86f716e8828856ba924f704e8f5ca961fe48028124804193aaaf",
+      "stem": "CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "d0fc7c578f7471983e6b2f30d7af901ef8b0663f2322ffabc55a89b24b1a2875"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "d0f3e5784076875288ad7774b2808b73c8ef3df66c45d3be93819b50780e1557"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "6e6745810755f8430e0c0433a2ff8c38f8f3f44accb55c695f0f954cb21d1d18"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "58956dd2a3273a657d7fb28722838cb0b31ff3dcc5a73488b695be8a746c15be",
+      "stem": "CERAMICLIKE_THETA15_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "61e06099bba3f2e6dee15a952d284289b363403516a07daf7cddca79c5341a23"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "e0662d6adf6c5ff9be35c7dc15ccbc4c8d49671a2114130b7b9d7ea3c0a7d85b"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "c2ae64ac4a41ddca38cb6df7f40fe198ea07700bfd1702fb9b55c2803eff8ad7"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "28a7bb56d4ad16e481783eafd266f32781f2bfb944f804d55ff3ce82a14b4dd1",
+      "stem": "CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "be55635cba4bf45993cbf962ca1b16af7220e897bd03797f3cfe6104143bbd56"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "5a5a3c87f9d23c17cfca783bbfe1bdf787211c449bec8af73e946d3a20c55b8e"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "a70267a37f1c84108cf4851c40922f2ca628afeea6e0b92082ea2774f2857e5d"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "e7d1411665b7fe79eb3759b35e26de591eeb7eb5f5dd187ba88056690c583f15",
+      "stem": "CERAMICLIKE_THETA30_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "91f1c823a293749ea956b5bbf9548f37ba799c09fb8170e89352e0fe549ea992"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "8253664ebd7b42576628ab2fdd1c368972bf191e2a7189fb54cbf988af12c779"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "201eb4c1d71301ff79b189670dbb337a8588874f95be4e50054c8ba8edd28a93"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "ab831b25cfa8b8af14949a8d03161e4bb97cc6877a80e52c75f84f1b08abc146",
+      "stem": "CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_orientation_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "254751931187b26c565c5b5a6837398444dd9c35e8d207b9dfc482667dd021d3"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "f89c72284b45d7617b6705637e08c9d7436e1fc9a93f8adb43d27b2094a9a8ee"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/orientation/CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "516546722cbab93476f1864e3aec35fe01436da7b949460f41cd008c62761ebc"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/orientation/CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "a8b6da3f67d177fcf53d31d9ebecb9bdf69a9a03e7ba1433857ee540383fed58",
+      "stem": "CERAMICLIKE_THETA45_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 48,
+      "category": "canonical_orientation_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_ORIENTATION_COMPOSITE_FULL.pdf",
+          "sha256": "3f75f442dd93c8730537187ade752b694c1c27e1f8056675a3a1642c61449a26"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_ORIENTATION_COMPOSITE_FULL.png",
+          "sha256": "a81c911daeb8e11927f6ac35fb0ddfd325cff02f31fb3601d7eea3c8657a7853"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_ORIENTATION_COMPOSITE_FULL.svg",
+          "sha256": "1b6009fb1daf48788e1179557566ba85813a57fc83212eef2b35a9259935a225"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/CERAMICLIKE_ORIENTATION_COMPOSITE_FULL.parquet",
+      "source_data_sha256": "94ffa4b7ab74b4fa0f09b9d15fb39e6940d331a552ae6a09b13fff3666bd196f",
+      "stem": "CERAMICLIKE_ORIENTATION_COMPOSITE_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 48,
+      "category": "canonical_orientation_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_ORIENTATION_COMPOSITE_EARLY.pdf",
+          "sha256": "61b1eae682db0b4dc42495db358f5d3f17c3fff88a57f8fdad4ef39450b2d858"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_ORIENTATION_COMPOSITE_EARLY.png",
+          "sha256": "ac2177fe3598de51772a80b659b16707d5a5621bb23e7e2118d8d6b069b395ba"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_ORIENTATION_COMPOSITE_EARLY.svg",
+          "sha256": "5cef22b2db2e0f255149df598904ce6d74c82eba5de1ed431ecbcba32a91e5d6"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/CERAMICLIKE_ORIENTATION_COMPOSITE_EARLY.parquet",
+      "source_data_sha256": "33baaca44a9e23b4b82dd54f9e6833c967bc43271afb80887848ed298b5ea347",
+      "stem": "CERAMICLIKE_ORIENTATION_COMPOSITE_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "39ad9eb43533222214c768e30a200189f025928d27961fd74ad462e9bf65b03b"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "0083907c2fcc2632f2e5cedceb2521b45620db213cf9e2040d1e3769e4ef2747"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "9f4163168802211c834800dbc12ca19e10b97cff825e2e1b664cacaae7dfa7a4"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "45b32f48f5965b320e3ff4def3102e44039c67e6d905357d335cc83a629cd59a",
+      "stem": "CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "3bb69eea4834d6fc226f4fda6b9975e29132a04c7b34e2899dabcd9e38109e7a"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "304f56f78da822b8ee8e03224b0aa1de355985345727d8574a1c18393afb3786"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "cba6eaaa73c3ed59183b3726d86d4229724924c2fc0c55ee854f70175babf0de"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "28ad40398dc3f72abca3ae79f06e781663dd27c0bc47d91ce2d1c09f3dd4a4ba",
+      "stem": "CERAMICLIKE_THETA0_RATE0P01X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "93c6acf34b87a038ec225c69320e1d3e0d69e70ba90eafb5aa450defbc473159"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "e9f0c7fd0fe4d3ca3999fad1a14bbefc32816569c4a5da6fc292f4d395e67200"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "d4ee9ee1a3ba06b3a39b36a56908774e53cd368e2a87f87a5d491e9685c12aff"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "e7f610c2c29356ce3572f3e20aabbd32129446bc393951888794972d60b5fa81",
+      "stem": "CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "d64d9e20f35d9b6e68b06e5dcbdba38cf9d2e16084a60d8a6ab71728400fdc4b"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "d3b732e53c851d98b702d0a0b255f6818cbdbf267aec7dcb48ea8541bb9ac739"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "c50fc879cc675a086375b1205d7e7d35e07b77b1b7c6eeb3793dea63554aea81"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "970acf1586d037c0db6b9163b0a63cb04d4838515434534164e6a0faedea45f6",
+      "stem": "CERAMICLIKE_THETA0_RATE1X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "58a73ab84fa6a98440e1964866838b2806dc164a14f01bb92aa0c13d9384a654"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "672e92dd90f88ccf04e1933a9b3cd90aaebcbba610c7bf3117f4eb971afdff28"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "47fae81fdb04041ae11dc2e6836ba1cce5be0f101c63a6e9c2e989f39ee084ac"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "8b75ce34aca2b91157c9ed362c5ae58d1260eec1a691845ad431bf19d8c2d21d",
+      "stem": "CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "canonical_rate_individual",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "9e0ff941a2ef2153af4fa896fdf1f055a651ddbc473091396895258f0b68efec"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "fe4fd61e4c108b075c4fb39633b5483dddb7347522370bfde0cb61ddb407d2c7"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "de7e02a5faafbcea6e1cb69aa95a481e57b1ea1df42b875653bd7d451454677d"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/rate/CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "3797280798dfd8e0ca5d9ed776108645d3ad4e2a35648caf11bbac3e2742b325",
+      "stem": "CERAMICLIKE_THETA0_RATE100X_ALL_T_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 36,
+      "category": "canonical_rate_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_RATE_COMPOSITE_FULL.pdf",
+          "sha256": "4dc96297a410d266bdcb7e06c96e5f1281adbdcac11498a56b17987961fa26aa"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_RATE_COMPOSITE_FULL.png",
+          "sha256": "5bc9b9d215b91ca317b146883dc59808ee339407417e1f1701635056d8686c93"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_RATE_COMPOSITE_FULL.svg",
+          "sha256": "f220864f2c6c1c1491e5b8bbf6f333c403b168aaaa3a73c574138e74e0ef7451"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/CERAMICLIKE_RATE_COMPOSITE_FULL.parquet",
+      "source_data_sha256": "e0057cf0e3e965a4ce558fd83bd3d6e03bf1a5e587284487bf23defda68919a8",
+      "stem": "CERAMICLIKE_RATE_COMPOSITE_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 36,
+      "category": "canonical_rate_composite",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_RATE_COMPOSITE_EARLY.pdf",
+          "sha256": "e89c4a477351ee3848eeefc8a576270a2ddda90837e0769890e6b9ec04afa788"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_RATE_COMPOSITE_EARLY.png",
+          "sha256": "0d63ee4455da91f7742de40ae986ec7bb03e81c6873e57943724109da6370593"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/composites/CERAMICLIKE_RATE_COMPOSITE_EARLY.svg",
+          "sha256": "9d544a05bfc0990a60adba67ba43fb8b8a4301ce57f6c8a4ef57ecc97444ad7a"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/composites/CERAMICLIKE_RATE_COMPOSITE_EARLY.parquet",
+      "source_data_sha256": "be31130743f974f4d2942e6e2dc93c557e462f8ad2582583da4c459c9f8ee43a",
+      "stem": "CERAMICLIKE_RATE_COMPOSITE_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "supplemental_theta45_rate0p01x",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "ea38786718267d7b3b97748d95c18599562832038abe72167f892247e9dff96d"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "5bee88f19a99e421ac0037b938583788c19b037b5a9e02a7fce9f3888ae91d8d"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "c4cc02e8017a9ab4a09936fbc159daa00dfcd58f20fbd8e9c42e328f3242bc4d"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/supplemental/PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "a7d3e88606e4a0aae5766432539c35c99b75858c9728832efabb69537f4d46fd",
+      "stem": "PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "supplemental_theta45_rate0p01x",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "be663063fafb9ad766fdb819d397eeb3279752494daa3258b1487172ac921c31"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "0617fbe406ee0b3c84ae53bd1822ade89b125dec2b242997550b2db3629e6bf6"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "181c0372b307d2902db98b0e8031dcd67fd0dd359f3838c6a29296df359f1cc0"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/supplemental/PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "41ef4ae74ef0461129b7e78656ee4c3a840e426508a9a24def939f68befd261e",
+      "stem": "PEAK_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "supplemental_theta45_rate0p01x",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "bc21c23c204e8cda6d4533bf9f2ec4cd7fefdbda27d0774005cf13c7d43364cb"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "31850e97f06d8affac3aaa68261b776d1035aafad7c550bebf44686df492d304"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "9de18a290e756c32f2b8fb11af22cd540ac79f24c5a29af80ec5ce15f7d76348"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/supplemental/DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "42d2ae0a3508bf3b7341e7ac80fee3a2de9956533f9ddbf16627f877c79920e0",
+      "stem": "DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "supplemental_theta45_rate0p01x",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "27f7784da5c3697316f7d94304c40257acec6cde4b6c2c5a9679f0ee58ae0adf"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "d49fa8bc13addd7be116658f3661836a6f33a08af70b20f07b937521a4bb9e1b"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "2ec4a37a7f7a48570287b15844b68d5c60919c56b3bea5214a7064ea31a1067c"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/supplemental/DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "e4fbb4bfd157f212030f3d035e73643ffce94f50466961de20f62cfb816c115d",
+      "stem": "DBTT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 12,
+      "category": "supplemental_theta45_rate0p01x",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "561cf9766c428e6f8f669c53cb449cca93bd672ba276cc8d6eb335817bc1e433"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "f1da7dfe4c6238aa7c097ae683ebcca575ed0bfd4a9fe269c381131516749330"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "3085ea7ef72bd51ca45ce6ff2e83171a0f7e456b26b1bc056cfb0d45be6d5dcc"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/supplemental/WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "ae67d70e056d7a3f7028e0cbd20d37df5ca76dd45350d0a84eb586f3669940eb",
+      "stem": "WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 12,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 12,
+      "category": "supplemental_theta45_rate0p01x",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "34ebf1eeec8ef85639f68e7332ad3a6eeeac105e42ec68eb52fcecac173a72a7"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "30c0c792b3be37543162ac987f3341e9ac62cd14c83999137ca68b4e5cd65b81"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "7c7eb4f99e2f6d5eec2c5e11e9c70ddeae70188e8ff3166842256d2b3ebfe9d3"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/supplemental/WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "e2ba937a563954e1794e4b828d72881060c3c159eef72aeb782a2ca6c61f915d",
+      "stem": "WEAKT_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 12,
+      "variant": "EARLY"
+    },
+    {
+      "case_count": 6,
+      "category": "supplemental_theta45_rate0p01x",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.pdf",
+          "sha256": "3803ca246a88c5f2d262905ee670ee31a4f4d1bd61d8a308416888039d1ab843"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.png",
+          "sha256": "5143fefe39cb4dfba37b2b01616ae9552947d6a8f33fcbcf77162c6e3bcc0d86"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.svg",
+          "sha256": "2ae2a667acaed9d256ea91503a103a2f9a9fe767fc77f7c75ad55ac7ff3dc7bf"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/supplemental/CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL.parquet",
+      "source_data_sha256": "962ae3dac49a0a620b60a4361a9d2d525bb7934cbf9cabda27981a992158a145",
+      "stem": "CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_FULL",
+      "temperature_count": 6,
+      "variant": "FULL"
+    },
+    {
+      "case_count": 6,
+      "category": "supplemental_theta45_rate0p01x",
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.pdf",
+          "sha256": "6a8194948a70f140afcace39d78d65ca55d06e430991d6295853187d6198b4cf"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.png",
+          "sha256": "d8103f0a6282bec4cc350e68d243859db8b4c75aa5297c3e3c4d4fb21ecd078d"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/full_KJ_trajectories/supplemental/CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.svg",
+          "sha256": "ee65d1036bc3fc4d3a0f251a8afa34891ce8962a70175034fe93ed77bddd606c"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/full_KJ_trajectories/supplemental/CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY.parquet",
+      "source_data_sha256": "279a7984962d54d668eacc2e408ebd16a43123b9d95a61542ef3760d932b537c",
+      "stem": "CERAMICLIKE_THETA45_RATE0P01X_SUPPLEMENTAL_KJ_VS_CRACK_LENGTH_EARLY",
+      "temperature_count": 6,
+      "variant": "EARLY"
+    }
+  ],
+  "fixed_temperature_colormap": "viridis_discrete_12_level_300_to_1300K",
+  "full_and_early_versions": true,
+  "quantity": "PF_MODEL_NATIVE_KJ_MPa_sqrt_m",
+  "quantity_is_applied_K": false,
+  "quantity_is_conventional_R_curve": false,
+  "schema": "pf_canonical_full_KJ_atlas_manifest_v1",
+  "supplemental_case_count": 42,
+  "supplemental_plot_count": 4
+}

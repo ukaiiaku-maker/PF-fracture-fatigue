@@ -1,0 +1,217 @@
+{
+  "all_pdf_svg_png_600dpi": true,
+  "every_figure_has_source_data": true,
+  "figure_count": 11,
+  "records": [
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_RATE_FULL_KJ_TRAJECTORIES.pdf",
+          "sha256": "32986847c1a569e61bef422b40366ae8077779f18d93a13a2c8eb943019afe46"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_RATE_FULL_KJ_TRAJECTORIES.png",
+          "sha256": "526c9d9dbec5dc4586e158ae3a020ec04c5bd1d6a9397c796f8cd28cb8ee1145"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_RATE_FULL_KJ_TRAJECTORIES.svg",
+          "sha256": "e3509e45462aeee25cb26ffa86d2b83de8c3e68f3332e9833e4a3f46a5ae1308"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/PEAK_THETA0_RATE_FULL_KJ_TRAJECTORIES.parquet",
+      "source_data_sha256": "4b856435548de69a477acc5c3322c213394d0d381ad0d177d0d63164f774b9b0",
+      "stem": "PEAK_THETA0_RATE_FULL_KJ_TRAJECTORIES"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_RATE_EARLY_GROWTH.pdf",
+          "sha256": "e8223d81dee9e7bd62417de054c4e8f0aa5c9405374dd825fb559c89e1d935a4"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_RATE_EARLY_GROWTH.png",
+          "sha256": "811068347f56eb98d5ee30c32f42a6de4422aa23667ed413ff8d8dbaf64ba682"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_RATE_EARLY_GROWTH.svg",
+          "sha256": "fa0fb91f903c37da7a7aa676fcf4483a5a5f2e42898ffb91743ba865d044dbdc"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/PEAK_THETA0_RATE_EARLY_GROWTH.parquet",
+      "source_data_sha256": "c8fe81a592cae83f028a30a2c4429095be69f0471509a3ab3670763dc0626275",
+      "stem": "PEAK_THETA0_RATE_EARLY_GROWTH"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_PREINITIATION_STATE_VS_OPENING.pdf",
+          "sha256": "7a404890bccaba5d4c3656d601ddc4e8b7be7d69880cb04dd37ed25200677dff"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_PREINITIATION_STATE_VS_OPENING.png",
+          "sha256": "7d645ce721b132ae417dada34b314ab3fc48e791bd2608a982346b97e5a2decc"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_PREINITIATION_STATE_VS_OPENING.svg",
+          "sha256": "50f02b70f67a4ab2aec5325a07dd3f1caa84599d0018e1bf43b1fb3b0d3fb343"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/PEAK_THETA0_PREINITIATION_STATE_VS_OPENING.parquet",
+      "source_data_sha256": "4c485b199355c86e5fd30f14051cbc38bcea7f2765f438604028f4ba84428324",
+      "stem": "PEAK_THETA0_PREINITIATION_STATE_VS_OPENING"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_CLEAVAGE_EMISSION_COMPETITION.pdf",
+          "sha256": "42304c39593923de948c3f0d3de8442f3b35c0c99526ad80f621f6facfd056e2"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_CLEAVAGE_EMISSION_COMPETITION.png",
+          "sha256": "500d2b51ae70dbe7286e01fdb904b68f26c4f9cde130c3747568d6930c452078"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_CLEAVAGE_EMISSION_COMPETITION.svg",
+          "sha256": "e54e298cf9d043acd65842f6a362f9d779a4b0c4736a8c5ff8c7abb07def1b3d"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/PEAK_THETA0_CLEAVAGE_EMISSION_COMPETITION.parquet",
+      "source_data_sha256": "4c485b199355c86e5fd30f14051cbc38bcea7f2765f438604028f4ba84428324",
+      "stem": "PEAK_THETA0_CLEAVAGE_EMISSION_COMPETITION"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_RATE_ONSET_DECOMPOSITION.pdf",
+          "sha256": "7bbec5b72567da42de8963a2810ebfb934928360085c96bca0c5f4060af21c36"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_RATE_ONSET_DECOMPOSITION.png",
+          "sha256": "bbb704a3d43c97f8cbcb22662b0767ced6ce2d0c00d951a24a093081d6dcc3f3"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_THETA0_RATE_ONSET_DECOMPOSITION.svg",
+          "sha256": "68342aea8d14487e7ab90f3f1fc18d1046f2f19e04061c5ef6873cd31ac330a7"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/PEAK_THETA0_RATE_ONSET_DECOMPOSITION.parquet",
+      "source_data_sha256": "6d8c5a9adfe513027fc652bf12c2c519ed2e6d16a51b18e42fce3be56be8255d",
+      "stem": "PEAK_THETA0_RATE_ONSET_DECOMPOSITION"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_ORIENTATION_INITIAL_AND_REINITIATION.pdf",
+          "sha256": "0fd3375424d61236f585449090a072fb8fcb141232851cc5eb86a6771eba6e13"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_ORIENTATION_INITIAL_AND_REINITIATION.png",
+          "sha256": "9c8ba60cf6e9b8c855b12630170b568c7f0ec6a0c7a182946abb862168dfda24"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/PEAK_ORIENTATION_INITIAL_AND_REINITIATION.svg",
+          "sha256": "104d3c8cc4458b566a5ff3fb403990d82074d28d4f026df3ffe3b5fcf699fcaf"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/PEAK_ORIENTATION_INITIAL_AND_REINITIATION.parquet",
+      "source_data_sha256": "3ae8739c18e33dcb84c2ffcc93ccffd4a7b9a12cb2e69da2f088d9b2a55ee589",
+      "stem": "PEAK_ORIENTATION_INITIAL_AND_REINITIATION"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/DBTT_ORIENTATION_INITIAL_AND_REINITIATION.pdf",
+          "sha256": "1a33fc1cca9d4df7e7ef77548665e525c2d10be12c90051fbdbefe2166e30ece"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/DBTT_ORIENTATION_INITIAL_AND_REINITIATION.png",
+          "sha256": "34d5193be496f56cf80e3e4b5fc6f53fec44f03385a32c650b1dbacff1d06c66"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/DBTT_ORIENTATION_INITIAL_AND_REINITIATION.svg",
+          "sha256": "373e88554c6dc05535d0515f1cd7e2df69e4cf29eea6df5997baaa71b9db8a32"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/DBTT_ORIENTATION_INITIAL_AND_REINITIATION.parquet",
+      "source_data_sha256": "94511d56bc85d5b790aa4cb5144b7bfe51966c34f81d259bb9e060e05a671c55",
+      "stem": "DBTT_ORIENTATION_INITIAL_AND_REINITIATION"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/ORIENTATION_STRUCTURAL_TRANSFER_COEFFICIENT.pdf",
+          "sha256": "3e733ea32e56e3c59f40c7d7d8e359bcd6487f15a8fcfd4b5c4c8166a3a5b1c9"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/ORIENTATION_STRUCTURAL_TRANSFER_COEFFICIENT.png",
+          "sha256": "e51fd307e47879fe5857afd04ff1b880cb5e17a58c7ac28437250b2083ed3e44"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/ORIENTATION_STRUCTURAL_TRANSFER_COEFFICIENT.svg",
+          "sha256": "7356813b82ffff5d7554d33cd0afe1160a16ab3b8b79e4f6c3c91d7fb0dfca63"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/ORIENTATION_STRUCTURAL_TRANSFER_COEFFICIENT.parquet",
+      "source_data_sha256": "8a608313ac75d49ebd4a43549d9ab0cadea7258147319462cd132c69a7867378",
+      "stem": "ORIENTATION_STRUCTURAL_TRANSFER_COEFFICIENT"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/ORIENTATION_LOCAL_TENSOR_AND_SOURCE_SELECTION.pdf",
+          "sha256": "fc6caf48fc9daefa555758b70ef2160e9b2b432cd10dde7f2c148584ed1af587"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/ORIENTATION_LOCAL_TENSOR_AND_SOURCE_SELECTION.png",
+          "sha256": "2044c02c7801a004dcef317d96a0401162bad12862baa7739c2296c1ee8ee5a7"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/ORIENTATION_LOCAL_TENSOR_AND_SOURCE_SELECTION.svg",
+          "sha256": "2032827e00095362e2ff8c281bca2205e8ab08bf5654d3cafa255e51ee1b7dbc"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/ORIENTATION_LOCAL_TENSOR_AND_SOURCE_SELECTION.parquet",
+      "source_data_sha256": "8a608313ac75d49ebd4a43549d9ab0cadea7258147319462cd132c69a7867378",
+      "stem": "ORIENTATION_LOCAL_TENSOR_AND_SOURCE_SELECTION"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/ORIENTATION_DELTAK_REINIT_DECOMPOSITION.pdf",
+          "sha256": "2a4860965901aab71c772952dd5873723398c425fa2d29aff9421690d9200437"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/ORIENTATION_DELTAK_REINIT_DECOMPOSITION.png",
+          "sha256": "d701919716d5f896d0eeff7ed7b990ce40fbd980c72f0a38d99aa364caef6d4a"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/ORIENTATION_DELTAK_REINIT_DECOMPOSITION.svg",
+          "sha256": "73787a6d0e9314c617535b6183dbeccf82bfb8c1e60ccd4836c57d42b37c83af"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/ORIENTATION_DELTAK_REINIT_DECOMPOSITION.parquet",
+      "source_data_sha256": "1759eb7f3c0639ba5b1a1c88ec9cfb8d22040675a2990b58e6a5d6a94c199974",
+      "stem": "ORIENTATION_DELTAK_REINIT_DECOMPOSITION"
+    },
+    {
+      "outputs": {
+        "pdf": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/CANONICAL_RATE_ORIENTATION_MECHANISM_SUMMARY.pdf",
+          "sha256": "25beb29de5dbdd55220aadddc28678f299abcd67737f7470374d5ede9f2f4ae5"
+        },
+        "png": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/CANONICAL_RATE_ORIENTATION_MECHANISM_SUMMARY.png",
+          "sha256": "2be2e1be1279c0cfe34f8471a3f655b7c08bcf1c9bff3f6c97c7f370e9e7e5ab"
+        },
+        "svg": {
+          "path": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figures/mechanisms/CANONICAL_RATE_ORIENTATION_MECHANISM_SUMMARY.svg",
+          "sha256": "b368529b573b0a6964c31eb7dbf59f2a5ca426a0b5b4b85fc54fe8b2dcf1f4f3"
+        }
+      },
+      "source_data": "analysis_outputs/pf_canonical_full_trajectory_and_mechanism_audit/figure_source_data/mechanisms/CANONICAL_RATE_ORIENTATION_MECHANISM_SUMMARY.parquet",
+      "source_data_sha256": "fd2116f37634b23b36789ea1c9b97eaba9fa1befb577ad4687d4c7464f15ee74",
+      "stem": "CANONICAL_RATE_ORIENTATION_MECHANISM_SUMMARY"
+    }
+  ],
+  "schema": "pf_canonical_mechanism_figure_manifest_v1"
+}

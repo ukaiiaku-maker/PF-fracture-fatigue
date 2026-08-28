@@ -1,0 +1,113 @@
+{
+  "analysis_branch": "codex/canonical-pf-full-trajectory-and-mechanism-audit",
+  "analysis_producer_code_commit": "5421a5fce6b6b5d12c6169370999b1c302b31940",
+  "artifacts": {
+    "PAPER_CANONICAL_PF_RATE_AND_ORIENTATION_MECHANISMS.md": {
+      "bytes": 6569,
+      "sha256": "6fb9ddf197fd68ca77d6fb5ce04cea3f5ce9204488ef8f8b0be7191418fefdb2"
+    },
+    "PF_CANONICAL_FULL_TRAJECTORY_AND_MECHANISM_VALIDATION.md": {
+      "bytes": 1476,
+      "sha256": "a7de50cf0faabeef3f29458b4ce6dbbfbd089221cd749ce3cc0713d75fbf0663"
+    },
+    "PF_CANONICAL_FULL_TRAJECTORY_DATA_AUDIT.md": {
+      "bytes": 2081,
+      "sha256": "4feba3046c82b7309b45e0f7ca3751a08accaa7fc3214eb4568e8585ccc5902a"
+    },
+    "PF_PEAK_DBTT_ORIENTATION_REINITIATION_AUDIT.md": {
+      "bytes": 2079,
+      "sha256": "5a52e066e7b986a978bf9f1e8897ccbd9d32dfa06d78e860af3860e88bfc37cb"
+    },
+    "PF_PEAK_THETA0_SLOW_RATE_MECHANISM_AUDIT.md": {
+      "bytes": 1920,
+      "sha256": "2725116ae452312b04bc20fca53f257ecef248c3e4261a6db6d7fc22f5a3fa84"
+    },
+    "pf_canonical_deterministic_regeneration_validation.json": {
+      "bytes": 615,
+      "sha256": "b00fb9c3bf6c646fe5707a2b1aa7f91e2659e3c672a7fe2b8b5e4d02964d3115"
+    },
+    "pf_canonical_full_KJ_atlas_manifest.json": {
+      "bytes": 113614,
+      "sha256": "9bd012d9faec0479486c4e6d4f66eba7cf2ca9df5244dbd00b2640e21bc5bbe4"
+    },
+    "pf_canonical_full_step_trajectories.parquet": {
+      "bytes": 19193598,
+      "sha256": "1e8b502c5e783a20cd777afb05e83ac858f77eb99e934643333691cb294edbdb"
+    },
+    "pf_canonical_full_step_trajectories_index.csv": {
+      "bytes": 103823,
+      "sha256": "ac84ed2bdd31852a9f213dac7d5b4c2a56b51e4e102718a043684da988666b61"
+    },
+    "pf_canonical_full_trajectory_manifest.json": {
+      "bytes": 1989,
+      "sha256": "35882cd3cf14123444c8ec8e10be37edb50c943314886f793fdded2d8bcb8469"
+    },
+    "pf_canonical_mechanism_figure_manifest.json": {
+      "bytes": 12925,
+      "sha256": "58d4e42471cc09688e8f2cbfed71dec03612d270c36b1214c840a9155364d8d3"
+    },
+    "pf_orientation_conditional_reinitiation_statistics.csv": {
+      "bytes": 2384,
+      "sha256": "cf02402a1c3fe10f8e404401b228012045f70960c368e2ec0a1e6fcb94797a04"
+    },
+    "pf_orientation_frozen_swap_matrix.csv": {
+      "bytes": 3852644,
+      "sha256": "1368b453abb3a42d8347e9d2e527b99a3ce2bb967d37d743583ec542f37f70b7"
+    },
+    "pf_orientation_initial_onset_decomposition.csv": {
+      "bytes": 85718,
+      "sha256": "4743f1f03dc1ef467d8ee562fad9e7d18e1d4ce1f632040047fd368cedb5e919"
+    },
+    "pf_orientation_mechanism_classification.csv": {
+      "bytes": 56408,
+      "sha256": "35dbce9e29d4f8a77daae7cb26f323ab406e853c815c61349e5ba04d7a7e3cde"
+    },
+    "pf_orientation_reinitiation_decomposition.csv": {
+      "bytes": 83425,
+      "sha256": "b6c231b3e99069c69767c5a3d20c0961a5459b1d0fafe6ed2dc1848f3b7b7117"
+    },
+    "pf_peak_rate_initial_structural_transfer.csv": {
+      "bytes": 7388,
+      "sha256": "b3c1d5dd298f5dc9b7a6930c76a85eb1f7a80351d6d45a84e3ae5bea8c90ee89"
+    },
+    "pf_peak_theta0_rate_counterfactuals.csv": {
+      "bytes": 37527,
+      "sha256": "44f725eccab69b98e321de024395563201cc0f8e9a383c02f97464bfa859e059"
+    },
+    "pf_peak_theta0_rate_full_state_source.parquet": {
+      "bytes": 14005697,
+      "sha256": "4dbc7b62695a891f847443e813bf3671a401227be1df5395366b25fef67bc8b8"
+    },
+    "pf_peak_theta0_rate_onset_decomposition.csv": {
+      "bytes": 15146,
+      "sha256": "485da1ea2928a7a7be1fd39c4ae627d0950106283d7ca9c1ca19c903e56b6048"
+    },
+    "pf_peak_theta0_rate_state_history.parquet": {
+      "bytes": 1324841,
+      "sha256": "5868b262746b0cdf3ca542ecf93f0a8ab79eaec42f4c8df32847857ca45a197f"
+    },
+    "pf_rate_orientation_claims_and_evidence.csv": {
+      "bytes": 4911,
+      "sha256": "654877ac6a6cc88ad06f7bdb06ad96eb12a7f4f954ef8d5a748198d3340f869a"
+    },
+    "pf_rate_orientation_mechanism_summary.json": {
+      "bytes": 560,
+      "sha256": "76a182b42645b4b98acdebe306cf3962d55b66ee9a130fc0fb546b73725039da"
+    },
+    "pf_theta45_rate0p01x_supplemental_full_trajectories.parquet": {
+      "bytes": 882259,
+      "sha256": "bf1e64b879deee6afa5bf5c80de25046417a47e74c61965577bf1411643505e0"
+    }
+  },
+  "campaign_execution_commit": "c3f33fa7477ea44e612fa21b6b1b1fed0df73295",
+  "campaign_lock_fingerprint": "5928e6abb7dcd59e6387d5d479128fec83c3ba4d509bae3a0e757b9e9ece5dde",
+  "canonical_raw_artifacts_modified": false,
+  "fem_czm_runs": 0,
+  "final_publisher_source_commit": "b06e7cbcfc535081c8836f988e601eeea620892b",
+  "material_rows_changed": 0,
+  "new_stochastic_pf_trajectories": 0,
+  "physical_equations_changed": 0,
+  "qualified_physical_pf_source": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+  "schema": "pf_canonical_full_trajectory_and_mechanism_provenance_v1",
+  "scientific_plan_fingerprint": "f3928476f2564a3eb10ca4737780a38578d9517a860bd77a9321dcd94fd4df99"
+}

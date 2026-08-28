@@ -1,0 +1,44 @@
+{
+  "accepted_row_count": 432710,
+  "all_observer_rows_aligned": true,
+  "all_steps_sha256_verified": true,
+  "analysis_only": true,
+  "artifacts": {
+    "pf_canonical_full_step_trajectories.parquet": {
+      "rows": 432710,
+      "sha256": "1e8b502c5e783a20cd777afb05e83ac858f77eb99e934643333691cb294edbdb"
+    },
+    "pf_canonical_full_step_trajectories_index.csv": {
+      "rows": 288,
+      "sha256": "ac84ed2bdd31852a9f213dac7d5b4c2a56b51e4e102718a043684da988666b61"
+    },
+    "pf_peak_theta0_rate_full_state_source.parquet": {
+      "rows": 49120,
+      "sha256": "4dbc7b62695a891f847443e813bf3671a401227be1df5395366b25fef67bc8b8"
+    }
+  },
+  "canonical_case_count": 288,
+  "duplicate_extension_rows_preserved": 419669,
+  "fem_czm_run_launched": false,
+  "provenance": {
+    "campaign_execution_commit": "c3f33fa7477ea44e612fa21b6b1b1fed0df73295",
+    "campaign_lock_fingerprint": "5928e6abb7dcd59e6387d5d479128fec83c3ba4d509bae3a0e757b9e9ece5dde",
+    "canonical_case_count": 288,
+    "final_publisher_producer_commit": "b06e7cbcfc535081c8836f988e601eeea620892b",
+    "qualified_physical_pf_source": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+    "scientific_plan_fingerprint": "f3928476f2564a3eb10ca4737780a38578d9517a860bd77a9321dcd94fd4df99"
+  },
+  "raw_canonical_artifacts_modified": false,
+  "raw_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/canonical_pf_fracture_v2_20260826",
+  "schema": "pf_canonical_full_trajectory_manifest_v1",
+  "scientific_fingerprint_sha256": "82cd38fcf15698692cc8f6fba33fdc4fe8ccd0783ce4a12787a04c919a4aaf0c",
+  "shared_theta0_rate1_physical_case_count": 48,
+  "stochastic_production_run_launched": false,
+  "tensor_state_availability": {
+    "complete_channel_tensors": "not_archived",
+    "complete_opening_tensor": "not_archived",
+    "policy": "fail_closed_no_later_state_inference",
+    "resolved_signed_shears": "archived_at_every_accepted_step"
+  },
+  "unique_case_count": 288
+}

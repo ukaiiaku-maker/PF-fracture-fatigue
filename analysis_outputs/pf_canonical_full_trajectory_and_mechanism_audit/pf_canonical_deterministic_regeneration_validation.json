@@ -1,0 +1,11 @@
+{
+  "schema": "pf_canonical_deterministic_regeneration_validation_v1",
+  "regeneration_count": 2,
+  "byte_identical": true,
+  "artifacts": {
+    "pf_canonical_full_KJ_atlas_manifest.json": "9bd012d9faec0479486c4e6d4f66eba7cf2ca9df5244dbd00b2640e21bc5bbe4",
+    "pf_canonical_mechanism_figure_manifest.json": "58d4e42471cc09688e8f2cbfed71dec03612d270c36b1214c840a9155364d8d3",
+    "pf_canonical_full_step_trajectories.parquet": "1e8b502c5e783a20cd777afb05e83ac858f77eb99e934643333691cb294edbdb"
+  },
+  "interpretation": "Complete clean regeneration preserved trajectory data and all recorded figure fingerprints."
+}
