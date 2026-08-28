@@ -12,9 +12,17 @@ from typing import Iterable
 
 import numpy as np
 import pandas as pd
+from scipy.integrate import cumulative_trapezoid
+from scipy.optimize import least_squares
 from scipy.special import gammainc
 
-from .material_manifest import KB_EV_PER_K
+from .inverse_fatigue_barrier_design_v10230 import (
+    ExpFloorBounds,
+    RenewalControls,
+    barrier_from_vector,
+    cycle_growth_and_slope,
+)
+from .material_manifest import ExpFloorBarrier, KB_EV_PER_K
 
 
 MODEL_ID = "v10.2.30_physical_slope_transfer_analysis_v1"
@@ -25,6 +33,8 @@ HITS = 3.0
 TAU_S = 1.0e-6
 NU0_S = 1.0e12
 DEVELOPMENT_M = 20.0e-6
+TRANSFER_K_GRID = np.asarray((12.0, 12.75, 13.5, 15.0, 18.0, 21.0, 24.3))
+CORRECTED_OPTION = "INV_PHYS_M4_TRANSFER_V1"
 
 
 def read_json(path: Path):
@@ -275,5 +285,207 @@ def seed_check_predictions(points: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-__all__ = ["MODEL_ID", "aggregate_stage_points", "cross_target_fit", "extract_event_history",
-           "interval_log_slope", "local_log_slopes", "seed_check_predictions"]
+def second_seed_results(physical_root: Path, frozen: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Read the three fresh prospective controls without changing the transfer fit."""
+    rows = []
+    for K in (12.0, 18.0, 24.3):
+        run = physical_root / "INV_OPENING_M4_V1" / f"K_{K:g}_R_0.1_seed_1001723"
+        summary_path = run / "developed_fatigue_growth_summary.json"
+        manifest_path = run / "high_cycle_run_manifest.json"
+        if not summary_path.is_file() or not manifest_path.is_file():
+            raise RuntimeError(f"missing terminal second-seed record: {run}")
+        summary, manifest = read_json(summary_path), read_json(manifest_path)
+        developed = summary.get("developed_interval") or {}
+        environment = manifest.get("environment") or {}
+        if not summary.get("target_reached") or int(developed.get("event_count", 0)) < 1:
+            raise RuntimeError(f"nonterminal second-seed trajectory: {run}")
+        rows.append({
+            "option_key": "INV_OPENING_M4_V1", "Kmax_MPa_sqrt_m": K,
+            "R": 0.1, "seed": int(manifest["hazard_seed"]),
+            "n_bins": 80, "fresh": True,
+            "resume_environment_present": "V10230_RESTART_CHECKPOINT_DIR" in environment,
+            "solver_head": str(manifest["git_head"]),
+            "target_reached": bool(summary["target_reached"]),
+            "cycles_consumed": float(summary["cycles_consumed"]),
+            "event_count": int(summary["event_count"]),
+            "developed_event_count": int(developed["event_count"]),
+            "developed_da_dN": float(developed["da_dN"]),
+            "result_path": str(run.resolve()),
+        })
+    results = pd.DataFrame(rows).sort_values("Kmax_MPa_sqrt_m")
+    if not results.seed.eq(1001723).all() or results.resume_environment_present.any():
+        raise RuntimeError("second-seed provenance is not fresh")
+    values = results.set_index("Kmax_MPa_sqrt_m")
+    checks = []
+    for prediction in frozen.itertuples(index=False):
+        measured_slope = interval_log_slope(
+            prediction.K_low_MPa_sqrt_m, prediction.K_high_MPa_sqrt_m,
+            values.loc[prediction.K_low_MPa_sqrt_m].developed_da_dN,
+            values.loc[prediction.K_high_MPa_sqrt_m].developed_da_dN,
+        )
+        measured_A = measured_slope / float(prediction.reference_A0_interval_slope)
+        difference = measured_A - float(prediction.reference_A_interval)
+        checks.append({
+            **prediction._asdict(),
+            "measured_physical_interval_slope": measured_slope,
+            "measured_A_interval": measured_A,
+            "A_interval_difference_from_frozen_reference": difference,
+            "absolute_A_interval_difference": abs(difference),
+            "acceptance_pass": abs(difference) <= float(prediction.maximum_allowed_absolute_A_difference),
+            "operator_refit_performed": False,
+        })
+    validation = pd.DataFrame(checks)
+    return results, validation
+
+
+def _integrated_growth(K: np.ndarray, slope: np.ndarray, anchor_K: float,
+                       anchor_growth: float) -> np.ndarray:
+    logK = np.log(np.asarray(K, dtype=float))
+    integral = cumulative_trapezoid(np.asarray(slope, dtype=float), logK, initial=0.0)
+    anchor = int(np.flatnonzero(np.isclose(K, anchor_K))[0])
+    return np.exp(math.log(float(anchor_growth)) + integral - integral[anchor])
+
+
+def _candidate_evaluations(vector: np.ndarray, template: ExpFloorBarrier,
+                           K: np.ndarray, R: float = 0.1) -> tuple[ExpFloorBarrier, list[dict[str, float]]]:
+    barrier = barrier_from_vector(vector, template)
+    controls = RenewalControls()
+    return barrier, [cycle_growth_and_slope(barrier, float(load), R, controls) for load in K]
+
+
+def corrected_inverse_design(points: pd.DataFrame, fit: pd.DataFrame,
+                             source_registry: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series, dict, pd.DataFrame]:
+    """Invert the frozen physical transfer and project it into EXP-floor.
+
+    The empirical M2/M6 fit is retained as a diagnostic.  Candidate construction
+    uses only the independently identified K-to-stress map, m_phys=m_A0*m_Ksigma.
+    """
+    m4 = points[points.M_target == 4].sort_values("Kmax_MPa_sqrt_m").reset_index(drop=True)
+    fit = fit.sort_values("Kmax_MPa_sqrt_m").reset_index(drop=True)
+    K = m4.Kmax_MPa_sqrt_m.to_numpy(dtype=float)
+    if not np.allclose(K, TRANSFER_K_GRID):
+        raise RuntimeError("corrected inverse grid differs from frozen transfer grid")
+    empirical_required = (4.0 - fit.B_K_from_M2_M6.to_numpy(dtype=float)) / fit.A_K_from_M2_M6.to_numpy(dtype=float)
+    reduced_required = 4.0 / m4.m_K_to_sigma.to_numpy(dtype=float)
+    anchor_index = int(np.flatnonzero(np.isclose(K, 18.0))[0])
+    target_A0_growth = _integrated_growth(
+        K, reduced_required, 18.0, float(m4.T0_exact_A0_da_dN.iloc[anchor_index])
+    )
+    target_physical_growth = float(m4.T4_archived_identity_da_dN.iloc[anchor_index]) * (K / 18.0) ** 4.0
+    original = source_registry[source_registry.option_key == "INV_OPENING_M4_V1"].iloc[0]
+    template = ExpFloorBarrier(
+        G00_eV=float(original.cleave_G00_eV), gT_eV_per_K=float(original.cleave_gT_eV_per_K),
+        sigc0_Pa=float(original.cleave_sigc0_GPa) * 1.0e9,
+        sT_Pa_per_K=float(original.cleave_sT_GPa_per_K) * 1.0e9,
+        alpha=float(original.cleave_exp_a), exponent=float(original.cleave_exp_n),
+        floor_fraction=float(original.cleave_floor_frac), attempt_frequency_s=NU0_S,
+    )
+    bounds = ExpFloorBounds()
+    starts = [
+        [template.G00_eV, template.sigc0_Pa / 1e9, template.alpha, template.exponent, template.floor_fraction],
+        [0.46, 7.4, 0.122, 1.33, 0.001], [0.48, 8.0, 0.13, 1.29, 0.001],
+        [0.50, 8.0, 0.10, 1.00, 0.001], [0.80, 8.0, 0.05, 2.00, 0.001],
+        [1.20, 6.0, 0.05, 2.50, 0.02], [0.60, 3.0, 0.30, 1.25, 0.01],
+    ]
+
+    def residual(vector: np.ndarray) -> np.ndarray:
+        _barrier, evaluated = _candidate_evaluations(vector, template, K)
+        growth = np.asarray([item["da_dN"] for item in evaluated])
+        slope = np.asarray([item["local_slope"] for item in evaluated])
+        return np.r_[np.log(growth) - np.log(target_A0_growth), slope - reduced_required]
+
+    trials = [least_squares(
+        residual, np.clip(np.asarray(start), bounds.lower(), bounds.upper()),
+        bounds=(bounds.lower(), bounds.upper()), xtol=1e-12, ftol=1e-12,
+        gtol=1e-12, max_nfev=3000,
+    ) for start in starts]
+    solution = min(trials, key=lambda trial: float(np.dot(residual(trial.x), residual(trial.x))))
+    barrier, evaluated = _candidate_evaluations(solution.x, template, K)
+    A0_growth = np.asarray([item["da_dN"] for item in evaluated])
+    A0_slope = np.asarray([item["local_slope"] for item in evaluated])
+    old_rate_scale = (
+        m4.T4_archived_identity_da_dN.to_numpy(dtype=float) /
+        m4.T0_exact_A0_da_dN.to_numpy(dtype=float)
+    )
+    predicted_physical_growth = old_rate_scale * A0_growth
+    predicted_empirical_slope = (
+        fit.A_K_from_M2_M6.to_numpy(dtype=float) * A0_slope +
+        fit.B_K_from_M2_M6.to_numpy(dtype=float)
+    )
+    predicted_reduced_slope = m4.m_K_to_sigma.to_numpy(dtype=float) * A0_slope
+    design = pd.DataFrame({
+        "Kmax_MPa_sqrt_m": K,
+        "desired_physical_slope": 4.0,
+        "empirical_fit_required_A0_slope": empirical_required,
+        "reduced_operator_required_A0_slope": reduced_required,
+        "required_slope_difference_empirical_minus_reduced": empirical_required - reduced_required,
+        "target_A0_da_dN": target_A0_growth,
+        "projected_EXP_floor_A0_da_dN": A0_growth,
+        "projected_EXP_floor_A0_local_slope": A0_slope,
+        "target_physical_da_dN": target_physical_growth,
+        "predicted_physical_da_dN": predicted_physical_growth,
+        "predicted_physical_slope_empirical_fit": predicted_empirical_slope,
+        "predicted_physical_slope_reduced_operator": predicted_reduced_slope,
+        "frozen_original_physical_to_A0_rate_ratio": old_rate_scale,
+        "frozen_m_K_to_sigma": m4.m_K_to_sigma.to_numpy(dtype=float),
+        "frozen_A_fit": fit.A_K_from_M2_M6.to_numpy(dtype=float),
+        "frozen_B_fit": fit.B_K_from_M2_M6.to_numpy(dtype=float),
+    })
+    row = original.copy()
+    row["option_key"] = CORRECTED_OPTION
+    row["candidate_id"] = CORRECTED_OPTION
+    row["role"] = "prospective physical-transfer-corrected opening barrier"
+    row["mechanism_summary"] = "M=4 physical slope target; frozen reduced K-to-stress transfer; A_NATIVE common physics"
+    row["validation_status"] = "PROSPECTIVE_FROZEN"
+    row["cleave_G00_eV"] = barrier.G00_eV
+    row["cleave_sigc0_GPa"] = barrier.sigc0_Pa / 1.0e9
+    row["cleave_exp_a"] = barrier.alpha
+    row["cleave_exp_n"] = barrier.exponent
+    row["cleave_floor_frac"] = barrier.floor_fraction
+    slope_rms = float(np.sqrt(np.mean((A0_slope - reduced_required) ** 2)))
+    physical_rms = float(np.sqrt(np.mean((predicted_reduced_slope - 4.0) ** 2)))
+    physical_max = float(np.max(np.abs(predicted_reduced_slope - 4.0)))
+    sigma_knee = barrier.sigc0_Pa * (1.0 / barrier.alpha) ** (1.0 / barrier.exponent)
+    K_knee = sigma_knee * math.sqrt(2.0 * math.pi * R0_M) / 1.0e6
+    classification = (
+        "EXP_FLOOR_CAN_COMPENSATE_PHYSICAL_TRANSFER"
+        if slope_rms <= 0.75 and physical_rms <= 0.50 and physical_max <= 0.75
+        else "EXP_FLOOR_TOO_RESTRICTIVE_AFTER_TRANSFER"
+    )
+    summary = {
+        "schema": "v10.2.30_corrected_physical_transfer_candidate_v1",
+        "option_key": CORRECTED_OPTION,
+        "classification": classification,
+        "construction_operator": "m_physical=m_A0*m_K_to_sigma (reduced physical operator)",
+        "empirical_fit_role": "diagnostic comparison only; not used in candidate optimization",
+        "target_physical_slope": 4.0,
+        "projection_A0_slope_RMSE": slope_rms,
+        "predicted_reduced_physical_slope_RMSE": physical_rms,
+        "predicted_reduced_physical_slope_maximum_absolute_error": physical_max,
+        "projection_log_A0_growth_RMSE": float(np.sqrt(np.mean((np.log(A0_growth)-np.log(target_A0_growth))**2))),
+        "optimizer_success": bool(solution.success), "optimizer_nfev": int(solution.nfev),
+        "EXP_floor_lower_bound_active": bool(math.isclose(barrier.floor_fraction, bounds.floor_fraction[0], rel_tol=0, abs_tol=1e-8)),
+        "analytical_knee_Kmax_MPa_sqrt_m": K_knee,
+        "high_K_behavior": "bounded barrier reaches its floor; cooperative hazard saturates and local slope tends to zero",
+        "minimum_additional_flexibility_if_exact_profile_required": "second bounded EXP component or integrated-logistic slope window",
+        "changed_constitutive_fields": ["cleave_G00_eV", "cleave_sigc0_GPa", "cleave_exp_a", "cleave_exp_n", "cleave_floor_frac"],
+        "noncleavage_common_physics_unchanged": True,
+    }
+    R_rows = []
+    q18 = float(old_rate_scale[anchor_index])
+    for R in (-0.95, 0.1, 0.5):
+        item = cycle_growth_and_slope(barrier, 18.0, R, RenewalControls())
+        R_rows.append({
+            "Kmax_MPa_sqrt_m": 18.0, "R": R,
+            "analytical_A0_da_dN": item["da_dN"], "analytical_A0_local_slope": item["local_slope"],
+            "conditional_physical_da_dN_if_R01_rate_scale_held": q18 * item["da_dN"],
+            "physical_transfer_at_this_R_validated": R == 0.1,
+            "material_barrier_retuned_by_R": False,
+        })
+    return design, row, summary, pd.DataFrame(R_rows)
+
+
+__all__ = ["CORRECTED_OPTION", "MODEL_ID", "TRANSFER_K_GRID", "aggregate_stage_points",
+           "corrected_inverse_design", "cross_target_fit", "extract_event_history",
+           "interval_log_slope", "local_log_slopes", "second_seed_results",
+           "seed_check_predictions"]

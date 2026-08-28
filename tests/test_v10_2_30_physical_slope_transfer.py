@@ -97,7 +97,7 @@ def test_seed_predictions_are_frozen_before_launch():
     freeze=json.loads((OUT/"transfer_freeze.json").read_text())
     predictions=pd.read_csv(OUT/"second_seed_prospective_predictions.csv")
     assert freeze["new_physics_runs_before_freeze"]==0
-    assert freeze["physics_launch_utc"] is None
+    assert freeze["physics_launch_utc"] is not None
     assert len(predictions)==2
     assert predictions.seed.eq(1001723).all()
 
@@ -105,7 +105,77 @@ def test_seed_predictions_are_frozen_before_launch():
 def test_second_seed_launcher_is_fresh_exact_and_freeze_gated():
     source=(ROOT/"scripts/run_v10_2_30_physical_slope_transfer.py").read_text()
     assert 'V10230_HIGH_CYCLE_EXPLICIT_ONLY":"1"' in source
-    assert '"HAZARD_SEED":"1001723"' in source
+    assert '"seed":1001723' in source
+    assert '"HAZARD_SEED":str(job["seed"])' in source
     assert 'env.pop("V10230_RESTART_CHECKPOINT_DIR",None)' in source
     assert 'freeze["analysis_artifact_hashes"]' in source
     assert 'if git("status","--porcelain")' in source
+
+
+def test_second_seed_prospectively_validates_frozen_transfer_without_refit():
+    result=json.loads((OUT/"second_seed_transfer_decision.json").read_text())
+    validation=pd.read_csv(OUT/"second_seed_transfer_validation.csv")
+    physical=pd.read_csv(OUT/"second_seed_physical_results.csv")
+    assert result["result"]=="PASS"
+    assert result["operator_refit_performed"] is False
+    assert result["maximum_absolute_A_interval_difference"]<.034
+    assert validation.acceptance_pass.all()
+    assert not validation.operator_refit_performed.any()
+    assert len(physical)==3 and physical.target_reached.all()
+    assert physical.fresh.all() and not physical.resume_environment_present.any()
+    assert physical.seed.eq(1001723).all()
+
+
+def test_corrected_candidate_changes_only_the_five_cleavage_surface_fields():
+    projection=json.loads((OUT/"corrected_candidate_projection.json").read_text())
+    audit=pd.read_csv(OUT/"corrected_candidate_diff_audit.csv")
+    expected={"cleave_G00_eV","cleave_sigc0_GPa","cleave_exp_a","cleave_exp_n","cleave_floor_frac"}
+    assert set(projection["changed_constitutive_fields"])==expected
+    assert not audit.unexpected_change.any()
+    assert audit[audit.field.isin(expected)].changed.all()
+    assert projection["noncleavage_common_physics_unchanged"] is True
+
+
+def test_corrected_inverse_uses_reduced_operator_and_keeps_fit_diagnostic():
+    design=pd.read_csv(OUT/"corrected_candidate_prospective_predictions.csv")
+    projection=json.loads((OUT/"corrected_candidate_projection.json").read_text())
+    assert len(design)==7
+    assert np.allclose(design.reduced_operator_required_A0_slope,
+                       4/design.frozen_m_K_to_sigma,rtol=0,atol=1e-12)
+    assert "reduced physical operator" in projection["construction_operator"]
+    assert "not used" in projection["empirical_fit_role"]
+    assert design.reduced_operator_required_A0_slope.is_monotonic_increasing
+    assert projection["predicted_reduced_physical_slope_RMSE"]<=.5
+
+
+def test_corrected_predictions_are_frozen_before_physical_launch():
+    freeze=json.loads((OUT/"corrected_candidate_freeze.json").read_text())
+    assert freeze["new_corrected_physics_runs_before_freeze"]==0
+    assert freeze["physics_launch_utc"] is not None
+    assert freeze["operator_refit_after_second_seed"] is False
+    assert freeze["loads_MPa_sqrt_m"]==[12.,12.75,13.5,15.,18.,21.,24.3]
+    assert freeze["seed"]==1720 and freeze["n_bins"]==80
+
+
+def test_seven_corrected_physical_trajectories_are_terminal_fresh_and_uncensored():
+    points=pd.read_csv(OUT/"corrected_candidate_physical_points.csv",keep_default_na=False)
+    state=json.loads((OUT/"corrected_candidate_controller_state.json").read_text())
+    assert len(points)==7
+    assert points.target_reached.all()
+    assert points.fresh.all() and not points.resume.any()
+    assert not points.restart_environment_present.any()
+    assert points.censor_or_failure_reason.eq("").all()
+    assert points.seed.eq(1720).all() and points.n_bins.eq(80).all()
+    assert state["phase"]=="CORRECTED_TERMINAL" and state["active_worker_count"]==0
+
+
+def test_final_decision_matches_frozen_acceptance_and_has_all_answers():
+    decision=json.loads((OUT/"physical_slope_transfer_final_decision.json").read_text())
+    report=(OUT/"physical_slope_transfer_final_decision.md").read_text()
+    assert decision["result"]=="PASS"
+    assert decision["primary_classification"] in report
+    assert decision["all_terminal_uncensored"] is True
+    assert decision["all_fresh_without_resume"] is True
+    assert decision["operator_refit_after_second_seed"] is False
+    assert all(f"{number}. **" in report for number in range(1,11))
+    assert (OUT/"figures"/"PHYSICAL_SLOPE_TRANSFER_ALL_DATA.png").stat().st_size>10000
