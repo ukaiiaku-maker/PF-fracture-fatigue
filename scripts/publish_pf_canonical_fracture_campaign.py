@@ -15,6 +15,7 @@ import json
 import math
 from collections import defaultdict
 from pathlib import Path
+import shutil
 import subprocess
 from typing import Any, Iterable
 
@@ -277,6 +278,19 @@ def main() -> int:
         raise RuntimeError("canonical publication counts do not close")
     if any(row["target_status"] != "TARGET_REACHED" for row in manifest):
         raise RuntimeError("canonical campaign contains a non-complete PF case")
+
+    # Promote the compact canonical tables verbatim.  The much larger event,
+    # in-avalanche, and state-profile ledgers remain in the local analysis tree
+    # and are bound into the decision by SHA-256 rather than duplicated in Git.
+    for name in (
+        "pf_canonical_fracture_run_manifest.csv",
+        "pf_canonical_theta_results.csv",
+        "pf_canonical_rate_results.csv",
+        "pf_canonical_1D_comparison_results.csv",
+        "pf_canonical_physical_avalanches_v2.csv",
+        "pf_canonical_onset_candidates_v2.csv",
+    ):
+        shutil.copyfile(args.analysis / name, args.out / name)
 
     source_commit = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parents[1], text=True
