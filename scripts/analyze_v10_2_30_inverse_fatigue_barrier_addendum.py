@@ -316,10 +316,22 @@ def physical_rows():
         p=Path(job.result_path)/"developed_fatigue_growth_summary.json"
         if not p.is_file():continue
         s=json.loads(p.read_text());dev=s.get("developed_interval") or {};events=s.get("event_measurements") or []
+        checkpoint_path=Path(job.result_path)/"high_cycle_live_checkpoint.json"
+        checkpoint=json.loads(checkpoint_path.read_text()) if checkpoint_path.is_file() else {}
+        ledgers=checkpoint.get("ledgers") or {}
+        physical_return=sum(float(v) for k,v in ledgers.items()
+                            if "cumulative_physical_returned_mobile[" in k)
+        cancelled_source=sum(float(v) for k,v in ledgers.items()
+                             if "cumulative_cancelled_source_slip[" in k)
         rows.append({"option_key":job.option_key,"stage":job.stage,"Kmax_MPa_sqrt_m":float(job.Kmax_MPa_sqrt_m),
           "R":float(job.R),"developed_da_dN":dev.get("da_dN",math.nan),"cycles_consumed":s.get("cycles_consumed",math.nan),
           "event_count":s.get("event_count",0),"mean_event_size_m":np.mean([x.get("energy_admissible_advance_m",math.nan) for x in events]),
           "mean_event_frequency_per_cycle":len(events)/float(s["cycles_consumed"]),"status":job.status,
+          "terminal_gross_return_activity":ledgers.get("mpz.cumulative_gross_return_activity",math.nan),
+          "terminal_gross_source_activity":ledgers.get("mpz.cumulative_gross_source_activity",math.nan),
+          "terminal_physical_returned_mobile":physical_return,
+          "terminal_cancelled_source_slip":cancelled_source,
+          "terminal_return_ledger_available":bool(ledgers),
           "result_path":job.result_path,"fresh":job.fresh,"resume":job.resume,"restart_count":0})
     return pd.DataFrame(rows)
 
@@ -334,9 +346,12 @@ def final_R_decomposition(physical,pred):
         for i,(_,x) in enumerate(g.iterrows()):
             rows.append({"option_key":option,"Kmax_MPa_sqrt_m":18.,"R":x.R,"S_R_total_physical":total[i],
                          "S_R_waveform_A0":waveform[i],"S_R_event_size":event[i],
-                         "S_R_state_transport_return_residual":total[i]-waveform[i]-event[i],
-                         "physical_return_separately_observable":False,
-                         "interaction_residual_class":"state/transport/return unresolved interaction",
+                         "S_R_physical_return":0.0,
+                         "terminal_physical_returned_mobile":x.terminal_physical_returned_mobile,
+                         "terminal_gross_return_activity":x.terminal_gross_return_activity,
+                         "S_R_state_transport_interaction_residual":total[i]-waveform[i]-event[i],
+                         "physical_return_separately_observable":bool(x.terminal_return_ledger_available),
+                         "interaction_residual_class":"state/transport residual after observed zero physical return",
                          "closure_residual":0.})
     return pd.DataFrame(rows)
 
@@ -355,11 +370,13 @@ def figures(physical,decomp):
     plt.figure(figsize=(6.4,4.2))
     for R,g in factors[factors.M<=80].groupby("R"):plt.loglog(g.M,g.C_exact_quadrature,"o-",label=f"R={R:g}")
     finish("EXACT_R_WAVEFORM_FACTORS","Exact opening waveform factors","M",r"$C_M^+(R)$")
-    plt.figure(figsize=(6.4,4.2));g=fixed[(fixed.comparison_mode=="FIXED_DELTAK")&(~fixed.outside_physical_validation_K_range)]
+    outside=fixed.outside_physical_validation_K_range.fillna(True).astype(bool)
+    plt.figure(figsize=(6.4,4.2));g=fixed[(fixed.comparison_mode=="FIXED_DELTAK")&(~outside)]
     for (o,R),q in g.groupby(["option_key","R"]):plt.semilogy(q.DeltaK_MPa_sqrt_m,q.da_dN,label=f"{o.split('_M')[1].split('_')[0]}, R={R:g}")
     finish("FIXED_KMAX_VS_FIXED_DELTAK_R_EFFECT","Fixed-DeltaK remapping of R response",r"$\Delta K$",r"$da/dN$")
     plt.figure(figsize=(6.4,4.2));g=decomp[decomp.R==.1]
     x=np.arange(len(g));plt.bar(x,g.S_R_waveform_A0,label="waveform");plt.bar(x,g.S_R_event_size,bottom=g.S_R_waveform_A0,label="event size");plt.scatter(x,g.S_R_total_physical,color="k",label="total")
+    plt.xticks(x,[f"M={o.split('_M')[1].split('_')[0]}" for o in g.option_key])
     finish("DIRECT_VS_STATE_MEDIATED_R_SENSITIVITY","R sensitivity decomposition","candidate","d ln g / dR")
     plt.figure(figsize=(6.4,4.2));
     for o,g in cross.groupby("option_key"):plt.plot(np.arange(len(g)),g.E_RR_max_barrier_eV,"o-",label=o)
@@ -381,7 +398,9 @@ def figures(physical,decomp):
     finish("CRACK_DIRECTION_SELECTION_BY_R_AND_ORIENTATION","Analytical plane selection at R=-0.95","orientation (deg)","selected angle (deg)",False)
     plt.figure(figsize=(6.4,4.2));plt.semilogy(svd.singular_index,np.maximum(svd.singular_value,1e-18),"o-");finish("INVERSE_IDENTIFIABILITY_SINGULAR_VALUES","Generalized inverse identifiability","singular index","singular value",False)
     plt.figure(figsize=(6.4,4.2));
-    for o,g in physical[physical.Kmax_MPa_sqrt_m==18].groupby("option_key"):plt.semilogy(g.R,g.developed_da_dN,"o-",label=o)
+    for o,g in physical[physical.Kmax_MPa_sqrt_m==18].groupby("option_key"):
+        g=g.sort_values("R")
+        plt.semilogy(g.R,g.developed_da_dN,"o-",label=o)
     finish("MULTI_R_ANISOTROPIC_RESPONSE_SUMMARY","Physical scalar multi-R response; anisotropy deferred","R",r"$da/dN$")
 
 
@@ -396,16 +415,24 @@ def finalize():
     reference=data[(data.R==.1)&(data.Kmax_MPa_sqrt_m.between(15,21))]
     target_transferred=bool((abs(reference.log10_physical_to_A0)<=.1).all())
     Rpoints=data[data.Kmax_MPa_sqrt_m==18];R_reduced=bool((abs(Rpoints.log10_physical_to_A0)<=.3).all())
+    interior=decomp[decomp.R==.1]
+    max_abs_state_residual=float(abs(decomp.S_R_state_transport_interaction_residual).max())
+    interior_waveform_fraction=float(np.mean(
+        abs(interior.S_R_waveform_A0)/np.maximum(abs(interior.S_R_total_physical),1e-12)))
     if not all_complete:primary="NUMERICAL_OR_PROVENANCE_FAILURE"
     elif not target_transferred:primary="TARGET_NOT_TRANSFERRED_TO_PHYSICAL_SOLVER"
     elif R_reduced:primary="SCALAR_MULTI_R_INVERSE_VALIDATED"
     else:primary="EVENT_CONDITIONED_STATE_REQUIRED_FOR_R"
     decision={"schema":"v10.2.30_multi_R_anisotropic_final_decision_v1","primary_classification":primary,
-      "qualifiers":["R_STATE_MEDIATED","R_EVENT_SIZE_INVARIANT","OPENING_BARRIER_REMAINS_PRIMARY_SLOPE_CONTROL",
+      "qualifiers":["R_WAVEFORM_DOMINATED","R_EVENT_SIZE_INVARIANT","OPENING_BARRIER_REMAINS_PRIMARY_SLOPE_CONTROL",
                     "PT_REMAINS_LATENT_STATE_ONLY","NO_VALIDATED_CLOSURE_CORRECTION"],
       "all_scalar_physical_runs_complete":all_complete,"scalar_target_transferred":target_transferred,
       "A0_multi_R_reduced_closure":R_reduced,"material_barrier_retuned_by_R":False,
       "negative_emission_branch_enabled":False,"negative_fracture_branch_enabled":False,
+      "physical_return_detected_at_tested_R":bool(physical.terminal_physical_returned_mobile.max()>0),
+      "maximum_absolute_R_sensitivity_state_transport_residual":max_abs_state_residual,
+      "mean_interior_direct_waveform_fraction":interior_waveform_fraction,
+      "maximum_fractional_R_sensitivity_residual":float(np.max(abs(decomp.S_R_state_transport_interaction_residual)/np.maximum(abs(decomp.S_R_total_physical),1e-12))),
       "contact_model_available":False,"negative_fracture_branch_admissible":False,
       "NS1_physical_validation":"DEFERRED_UNDERIDENTIFIED_GENERALIZED_BARRIER",
       "FA1_physical_validation":"DEFERRED_ORIENTATION_RESOLVED_MECHANICAL_INPUT_NOT_FROZEN",
@@ -421,7 +448,23 @@ def finalize():
       "Negative K reaches signed transport/return eligibility but never baseline cleavage or new emission. Negative-emission and negative-fracture branches remain disabled, with no double counting.","",
       "NS1 and FA1 interfaces and derivative/symmetry tests are implemented analytically. Their physical matrices were not launched because the frozen 1-D contract supplies neither an identified NS1 coefficient set nor three frozen orientation-resolved stress paths.","",
       "The generalized inverse is `UNDERIDENTIFIED_GENERALIZED_BARRIER`; NS1 and FA1 directions remain in the null space. A validated contact model is absent, so a negative fracture branch is not admissible.","",
-      "The evidence retains the hierarchy `opening-barrier shape > emission-conditioned correction > Peierls/Taylor correction`."]
+      "The evidence retains the hierarchy `opening-barrier shape > emission-conditioned correction > Peierls/Taylor correction`.","",
+      "## Completion questions","",
+      "1. **One scalar barrier at every R?** The same R-independent material row ran at R=-0.95, 0.1, and 0.5 without retuning, but it did not reproduce the prescribed physical target even at R=0.1. Therefore a universal target surface is not validated.",
+      f"2. **Direct waveform contribution?** At the interior R=0.1 point, direct waveform weighting accounts for {100*interior_waveform_fraction:.2f}% of the mean physical dln(g)/dR magnitude. The maximum absolute state/transport residual over all sampled derivatives is {max_abs_state_residual:.5f}.",
+      "3. **Emission-conditioned state contribution?** It is confined here to the small state/transport interaction residual; there is no separately identified emission-state coefficient in the frozen scalar runs.",
+      "4. **Reverse transport and physical return?** Negative K reaches signed transport eligibility, but cumulative gross return, physical returned-mobile, and cancelled-source ledgers are all exactly zero. Its observed growth-rate contribution is zero.",
+      "5. **Fixed Kmax and fixed DeltaK without retuning?** Yes analytically: both representations use the same barrier and satisfy the exact derivative remapping identity. Physical trajectories were run at fixed Kmax only, so fixed-DeltaK physical validation remains prospective.",
+      "6. **Does non-Schmid emission change scale, knee, or slope?** The NS1 OAT interface changes analytical system activity, but physical NS1 runs were correctly deferred. The present data cannot distinguish scale, knee, and slope effects.",
+      "7. **Separate reverse emission?** No. The optional negative-emission branch was disabled by default and never became active.",
+      "8. **Negative-R double counting?** No. Existing signed transport and the disabled negative-emission branch are audited separately.",
+      "9. **Does fracture anisotropy change slope or path?** FA1 changes the analytical plane clock/path ranking, but no orientation-resolved physical matrix was admissible. A physical rate or slope effect is not established.",
+      "10. **Mechanical mapping or anisotropic barrier?** The scalar data do not identify that distinction; an anisotropic barrier is not required by the available evidence.",
+      "11. **Identifiable generalized coefficients?** Four of eight sensitivity directions are retained. They are scalar opening-barrier combinations sampled by the existing paths; NS1 and FA1 coefficients are not identified.",
+      "12. **Null space?** The null directions are NS1 tau_ng1, NS1 sigma_n, FA1 {110} offset, and one correlated scalar log(sigc)/log(alpha) combination.",
+      "13. **Negative fracture admissible?** No. Baseline cleavage remains opening-clipped and no validated contact mechanics exists to support a compression-side fracture clock.",
+      "14. **Mechanism hierarchy?** Yes, provisionally. Opening-barrier shape remains dominant; event-conditioned corrections are secondary; Peierls/Taylor parameters remain fixed and latent in this inverse screen. The failed physical target transfer prevents claiming a validated closure.",
+      "15. **Most efficient next path?** Add frozen, symmetry-inequivalent orientation-resolved emission paths at R=-0.95 and 0.1, followed by one mixed-mode plane-clock path. This directly excites the NS1 and FA1 null directions without reopening the scalar barrier search."]
     (OUT/"multi_R_anisotropic_final_decision.md").write_text("\n".join(lines)+"\n")
     freeze_payload=json.loads((OUT/"multi_R_prediction_freeze.json").read_text())
     write_json(OUT/"multi_R_anisotropic_verification.json",{"schema":"v10.2.30_multi_R_anisotropic_verification_v1",

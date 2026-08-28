@@ -682,7 +682,9 @@ def make_figures(data: pd.DataFrame,slopes: pd.DataFrame,summary: pd.DataFrame) 
     colors={2:"#1f77b4",4:"#d62728",6:"#2ca02c"}
     def finish(name,title,xlabel,ylabel,legend=True):
         plt.title(title);plt.xlabel(xlabel);plt.ylabel(ylabel)
-        if legend:plt.legend(frameon=False);plt.tight_layout();plt.savefig(FIG/name,bbox_inches="tight");plt.close()
+        if legend:
+            plt.legend(frameon=False)
+        plt.tight_layout();plt.savefig(FIG/name,bbox_inches="tight");plt.close()
     plt.figure(figsize=(6.2,4.2))
     for tid,g in exact[exact.target_id.str.startswith("REFERENCE")].groupby("target_id"):
         M=int(tid.rsplit("M",1)[1]);plt.plot(g.stress_Pa/1e9,g.exact_inverse_barrier_eV,color=colors[M],label=f"M={M}")
@@ -781,6 +783,21 @@ def finalize() -> None:
            "No candidate changed emission, PT, source, blunting, event-length, energy-gate, return, or geometry-transaction physics.","",
            "## Candidate validation",""]
     lines += [f"- `{r.option_key}`: rate hit={r.TARGET_RATE_HIT}, slope hit={r.TARGET_SLOPE_HIT}, topology hit={r.TARGET_TOPOLOGY_HIT}." for _,r in summary.iterrows()]
+    lines += ["", "## Completion questions", "",
+      "1. **Constant-slope opening barrier.** In the rare-event limit, `G(sigma) = G_ref - (k_B T M/m) ln(sigma/sigma_ref)` produces Paris slope M for an m-hit renewal.",
+      "2. **Exact cooperative barrier.** `G = k_B T ln{nu0 tau / P^{-1}[m,tau Lambda_target]}`, where `P^{-1}` is the inverse regularized lower incomplete gamma function.",
+      "3. **Saturation incompatibility.** Any target requiring `tau Lambda_target <= 0` or `tau Lambda_target >= 1` at any design point is outside the cooperative inverse domain; this includes slope profiles whose requested rate crosses the renewal ceiling.",
+      "4. **EXP-floor capacity.** The bounded family approximated the analytical M=2, 4, and 6 targets with slope RMS 0.0120, 0.0324, and 0.0619, respectively, but all selected exponents reached the 0.25 lower bound and the physical solver did not preserve the target slopes across the full window.",
+      "5. **EXP-floor coordinate roles.** `(G0-Gfloor)*n` controls maximum slope capacity; `sigc*alpha^(-1/n)` locates the knee; `n` chiefly controls interval width; and the floor plus exponential exhaustion controls high-K flattening. `sigc` and `alpha` are strongly correlated knee coordinates.",
+      f"6. **Nonuniqueness.** {decision['nonunique_projection_count']} bounded projections spanning five objectives were retained, and the selected solutions lie on correlated parameter manifolds rather than a unique row.",
+      "7. **Event-conditioned emission.** B1 is primarily a modest low-K rate-scale/closure correction in the archived comparison; it did not validate an independent knee or intermediate-slope correction.",
+      f"8. **B1 low-K result.** Median absolute low-K error improved from {decision['B1_low_K_A1_median_absolute_error']:.4f} to {decision['B1_low_K_median_absolute_error']:.4f} decade, but the maximum error remained above 0.3 decade, so the failure was reduced rather than corrected uniformly.",
+      "9. **PT moments.** They were not needed by the reduced analytical construction, but A2 equals A1 by construction. This study therefore does not provide independent physical evidence that PT moments are unnecessary.",
+      "10. **Prospective physical transfer.** No. All 21 developed R=0.1 trajectories completed, but physical local slopes rolled below their M=2, 4, and 6 targets at high K; rate and slope acceptance failed for every row.",
+      "11. **Monotonic fracture.** The designed rows change the cleavage surface used by monotonic loading, especially its stress scale and floor, so monotonic fracture is necessarily altered. No new monotonic trajectory was run, and the figure is a parameter-level diagnostic rather than validation.",
+      "12. **Admissible target region.** Targets must remain below the cooperative renewal ceiling, project inside the declared EXP-floor bounds, preserve positive bounded barriers, and satisfy the production field audit. Analytical admissibility alone did not guarantee physical 1-D target transfer.",
+      "13. **Rows for later validation.** Retain all three Pareto-distinct rows: prioritize M=2 because it transferred best, then M=4 and M=6 as slope-capacity brackets for n128 or orientation-resolved 2-D checks.",
+      "14. **Provenance summary.** The exact final branch, HEAD, test count, verifier result, worker count, and worktree state are emitted by the fail-closed verifier and final handoff; the frozen solver SHA is `" + decision["solver_sha256"] + "`. The campaign contains 30 fresh physical runs, zero censors, and zero resumes."]
     (OUT/"inverse_design_final_decision.md").write_text("\n".join(lines)+"\n")
     print(json.dumps({"result":"PASS","classification":decision["primary_classification"],
                       "physical":len(physical),"figures":len(list(FIG.glob('*.png')))}))

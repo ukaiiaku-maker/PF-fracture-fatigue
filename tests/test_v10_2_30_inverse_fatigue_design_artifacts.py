@@ -111,3 +111,50 @@ def test_reverse_transport_is_not_reverse_emission():
     assert not audit.double_count_detected.any()
     assert not audit.negative_emission_branch_enabled.any()
     assert audit.loc[audit.R<0,"reverse_transport_fraction"].min()>0
+
+
+def test_finalizer_saves_figures_that_do_not_have_legends():
+    source=(ROOT/"scripts/analyze_v10_2_30_inverse_fatigue_barrier_design.py").read_text()
+    block=source.split("def finish(name,title,xlabel,ylabel,legend=True):",1)[1].split("plt.figure",1)[0]
+    assert block.index("if legend:") < block.index("plt.savefig")
+    lines=block.splitlines()
+    legend_indent=len(lines[3])-len(lines[3].lstrip())
+    save_indent=len(lines[4])-len(lines[4].lstrip())
+    assert legend_indent > save_indent
+
+
+def test_addendum_fixed_deltaK_figure_mask_handles_identity_rows():
+    data=pd.read_csv(OUT/"R_fixed_Kmax_vs_fixed_deltaK.csv")
+    outside=data.outside_physical_validation_K_range.fillna(True).astype(bool)
+    selected=data[(data.comparison_mode=="FIXED_DELTAK")&(~outside)]
+    assert len(selected)>0
+    assert selected.outside_physical_validation_K_range.eq(False).all()
+
+
+def test_negative_R_physical_return_is_read_from_terminal_ledgers():
+    path=OUT/"multi_R_physical_comparison.csv"
+    if not path.exists():return
+    data=pd.read_csv(path)
+    negative=data[(data.R<0)&(data.Kmax_MPa_sqrt_m==18)]
+    assert negative.terminal_return_ledger_available.all()
+    assert negative.terminal_physical_returned_mobile.eq(0).all()
+
+
+def test_final_reports_answer_both_completion_question_sets():
+    original=(OUT/"inverse_design_final_decision.md").read_text()
+    addendum=(OUT/"multi_R_anisotropic_final_decision.md").read_text()
+    assert "## Completion questions" in original
+    assert "14. **Provenance summary.**" in original
+    assert "## Completion questions" in addendum
+    assert "15. **Most efficient next path?**" in addendum
+
+
+def test_R_sensitivity_figure_uses_physical_candidate_labels():
+    source=(ROOT/"scripts/analyze_v10_2_30_inverse_fatigue_barrier_addendum.py").read_text()
+    assert 'plt.xticks(x,[f"M={o.split' in source
+
+
+def test_multi_R_summary_orders_the_loading_path_before_connecting_points():
+    source=(ROOT/"scripts/analyze_v10_2_30_inverse_fatigue_barrier_addendum.py").read_text()
+    block=source.split('for o,g in physical[physical.Kmax_MPa_sqrt_m==18].groupby("option_key"):',1)[1]
+    assert block.index('g=g.sort_values("R")') < block.index('plt.semilogy(g.R')
