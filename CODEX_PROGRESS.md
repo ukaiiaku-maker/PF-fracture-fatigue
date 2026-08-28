@@ -42,3 +42,15 @@
 
 - Fresh uninterrupted trajectories are authoritative. No restored trajectory was admitted to this refined campaign.
 - Serialization support does not constitute production restart qualification; restart remains operationally unsupported for these scientific results.
+
+## 2026-08-27 joint fracture-fatigue mechanism-guided atlas
+
+- Branch: `codex/v10.2.30-joint-fracture-fatigue-archetype-atlas`; starting HEAD: `43b5ec9a259b636c5a950eec1f6fffbf3ef4b65c`.
+- Added an analysis-only F0/F1/F2/F2B monotonic first-passage hierarchy using the current bounded EXP-floor, exact cooperative gamma renewal, separated opening/cleavage/emission stresses, pre-event transient blunting, and signed mobile/retained moment balances. Production physics is unchanged.
+- Inventoried 187 archived monotonic and fatigue records across reduced, 1-D, PF, FEM-derived, and current fatigue evidence. Current persistent-site and legacy v9.11 finite-source/stored-energy lineages remain explicitly separated.
+- The four named DOCX sources were not found after recursive project/home/CloudStorage/attachment and Spotlight searches. This is fail-closed in `fracture_source_manifest.json`; no equation or historical bound was reconstructed from selected rows.
+- Recovered the original 26-coordinate v9.13 Sobol policy and produced 131,072 initial plus 16,384 adaptive analytical rows (147,456 total). Asymptotic/no-first-passage rows are rejected from archetype promotion and retained in the rejection audit.
+- The analytical result supplies useful response ranking and mechanism decomposition, but the current transient state closure lacks complete cross-fidelity coverage and remains insufficient for prospective physical promotion. F2B does not resolve the dominant residual. Temperature-dependent fatigue is labeled `ANALYTICAL_EXTRAPOLATION_UNVALIDATED`.
+- Six Pareto-distinct analytical candidates are frozen. The physical controller is terminal with zero new runs: the F2 quantitative gate did not justify new 1-D, PF, FEM/CZM, or stochastic trajectories. Exact-row A_NATIVE/PT03/PT08 archival controls are reused without resume or retuning.
+- Authoritative bundle: `runs/joint_fracture_fatigue_archetype_atlas_v1/`; 48 required machine artifacts and all 23 required figures are present.
+- Focused new tests: 22 passed. Combined relevant analytical/fatigue tests: 96 passed. The broad `test_v10_2_30*.py` run passed 341 tests and has four unresolved fixture-dependent failures because historical qualification run roots are absent from this isolated worktree; no tolerance, safety check, or test was changed to suppress them.
