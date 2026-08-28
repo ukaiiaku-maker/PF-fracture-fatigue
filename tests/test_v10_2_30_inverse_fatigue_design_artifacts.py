@@ -3,6 +3,10 @@ from pathlib import Path
 
 import pandas as pd
 
+from scripts.run_v10_2_30_inverse_fatigue_barrier_validation import (
+    prephysics_infrastructure_failure,
+)
+
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/"runs/inverse_fatigue_barrier_design_v1"
@@ -68,7 +72,10 @@ def test_markdown_and_json_decisions_agree_when_finalized():
     assert "g_A2 = g_A1" in markdown
 
 
-def test_prephysics_launch_failure_is_not_a_numerical_trajectory():
-    source=(ROOT/"scripts/run_v10_2_30_inverse_fatigue_barrier_validation.py").read_text()
-    assert '"LAUNCH_INFRASTRUCTURE_FAILURE"' in source
-    assert 'not (path/"kinetic_tip_cell_audit_v101.json").is_file()' in source
+def test_prephysics_launch_failure_is_not_a_numerical_trajectory(tmp_path):
+    (tmp_path/"run.log").write_text("")
+    (tmp_path/"high_cycle_run_manifest.json").write_text("{}")
+    (tmp_path/"high_cycle_summary.json").write_text("{}")
+    assert prephysics_infrastructure_failure(tmp_path)
+    (tmp_path/"kinetic_tip_cell_audit_v101.json").write_text("{}")
+    assert not prephysics_infrastructure_failure(tmp_path)

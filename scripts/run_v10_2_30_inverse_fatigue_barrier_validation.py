@@ -51,6 +51,21 @@ def git(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
 
 
+def prephysics_infrastructure_failure(path: Path) -> bool:
+    """Recognize a launcher failure that occurred before solver initialization."""
+    log = path / "run.log"
+    if (path / "kinetic_tip_cell_audit_v101.json").is_file() or not log.is_file():
+        return False
+    text = log.read_text()
+    explicit_denial = "Operation not permitted" in text
+    process_substitution_denial = (
+        not text
+        and (path / "high_cycle_run_manifest.json").is_file()
+        and (path / "high_cycle_summary.json").is_file()
+    )
+    return explicit_denial or process_substitution_denial
+
+
 def preflight(head: str) -> None:
     if git("branch", "--show-current") != BRANCH or git("rev-parse", "HEAD") != head:
         raise SystemExit("branch/HEAD preflight mismatch")
@@ -163,7 +178,7 @@ def run_one(job: dict, head: str) -> dict:
             job["status"]="COMPLETE"
         elif data.get("status")=="cycle_censor": job["status"]="PHYSICAL_CENSOR"
         else: job["status"]="COMPLETE_PARTIAL_GROWTH"
-    elif (path/"run.log").is_file() and "Operation not permitted" in (path/"run.log").read_text() and not (path/"kinetic_tip_cell_audit_v101.json").is_file():
+    elif prephysics_infrastructure_failure(path):
         job["status"]="LAUNCH_INFRASTRUCTURE_FAILURE"
     elif checkpoint.is_file(): job["status"]="NUMERICAL_NONTERMINAL"
     elif result.returncode==2: job["status"]="LAUNCH_PREFLIGHT_FAILURE"
@@ -179,8 +194,7 @@ def requeue_infrastructure_failures(head: str) -> None:
     for row in rows:
         old=Path(row["result_path"]);log=old/"run.log"
         infrastructure=(row["status"] in {"NUMERICAL_FAILURE","LAUNCH_INFRASTRUCTURE_FAILURE"}
-                        and log.is_file() and "Operation not permitted" in log.read_text()
-                        and not (old/"kinetic_tip_cell_audit_v101.json").is_file())
+                        and prephysics_infrastructure_failure(old))
         if infrastructure:
             row["prior_infrastructure_failure_path"]=str(old)
             row["result_path"]=str(Path(str(old)+"_fresh_retry1"))
