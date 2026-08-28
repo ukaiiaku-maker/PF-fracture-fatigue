@@ -1,0 +1,30 @@
+{
+  "compileall_passed": true,
+  "deterministic_artifact_count_excluding_provenance": 21,
+  "deterministic_regeneration_passed": true,
+  "final_bundle_hash_check_passed": true,
+  "focused_canonical_tests": {
+    "passed": 53
+  },
+  "full_suite": {
+    "legacy_failure_ids": [
+      "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader",
+      "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id",
+      "tests/test_v10214_response_model_id.py::test_v10214_response_model_id",
+      "tests/test_v10215_stage3_schema_and_status.py::test_stage3_status_script_parses_and_reports_missing_run",
+      "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly",
+      "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+      "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap"
+    ],
+    "legacy_failures": 7,
+    "new_failures": 0,
+    "passed": 585
+  },
+  "git_diff_check_passed": true,
+  "overall_status": "PASS_WITH_SAME_SEVEN_LEGACY_FAILURES",
+  "schema": "pf_canonical_final_verification_v2",
+  "visual_qa": {
+    "figures_inspected": 3,
+    "passed": true
+  }
+}

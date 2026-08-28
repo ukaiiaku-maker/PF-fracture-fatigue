@@ -1,0 +1,75 @@
+{
+  "artifact_sha256": {
+    "branch_events.csv": "1cb8237bc63ed04f29c57938c039fc50af1277bf2a3cae7686e4ac57c28a0728",
+    "case_status.json": "ccdef6e84f495937df8b1a88165b21266f005c40d1c5143c6e486b4afc0ebf24",
+    "v11_branching_model_audit.json": "c1815312bad163ff5f924c2a7299ebfefd10e743121ff2bdb61cd278cf69f6a8"
+  },
+  "branching_enabled": true,
+  "canonical_campaign_member": false,
+  "canonical_source_commit": "b06e7cbcfc535081c8836f988e601eeea620892b",
+  "canonical_source_compatible": false,
+  "capability_result": "HISTORICAL_BRANCH_BIRTH_OBSERVED_NOT_SOURCE_COMPATIBLE",
+  "claim_label": "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS",
+  "demonstration_source_commit": "9cc5795d8461ea28d24227b19e17cd233485ab72",
+  "first_committed_branch_birth": {
+    "energy_margin_J_per_m": 0.08032002374411258,
+    "event_record_id": "action:2:9a7f06412de474c5e9f8c8a1",
+    "step": 295,
+    "topology_fingerprint": "689654a4b8628d1acc6406a37899224b9b911f1b2b07bb514b1ffef31ac97ae8"
+  },
+  "frozen_source_branch_enabled_probe_count": 5,
+  "frozen_source_branch_enabled_probes": [
+    {
+      "branch_birth_count": 0,
+      "branch_diagnostics_sha256": "373a2da92e1df78ffeb8021e549ab6bad38191edb0ceb0a962f7ee3b3e928848",
+      "maximum_front_count": 1,
+      "run_path": "analysis_outputs/pf_canonical_fracture_v2_final/branching_demo/current_source_ceramic_0300K_theta0_globalgate_seed3003621",
+      "summary_sha256": "19ccd69760b10a2eb0092efa82738ae9a5e58fd14e0ca0e671b741f78a60d18c",
+      "target_reached": true
+    },
+    {
+      "branch_birth_count": 0,
+      "branch_diagnostics_sha256": "de3c0b9db44f04dc116caf530b01044e9934ff779318959cacb6e63b9233e782",
+      "maximum_front_count": 1,
+      "run_path": "analysis_outputs/pf_canonical_fracture_v2_final/branching_demo/current_source_ceramic_0300K_theta30_globalgate_seed3003621",
+      "summary_sha256": "e6b2253fb113a14ce98d55c5192eb82419ee5c19a03b3c9f4ae119e85350a906",
+      "target_reached": true
+    },
+    {
+      "branch_birth_count": 0,
+      "branch_diagnostics_sha256": "51108e194e053e5335fbb52b7d515ef351bf28aac699b3e479dbdd093cf513bf",
+      "maximum_front_count": 1,
+      "run_path": "analysis_outputs/pf_canonical_fracture_v2_final/branching_demo/current_source_ceramic_0300K_theta45_discrete_seed3003621",
+      "summary_sha256": "50c268c54803d80e0b8a1b77f879050e5fd23ee4234620f72517559242ada880",
+      "target_reached": true
+    },
+    {
+      "branch_birth_count": 0,
+      "branch_diagnostics_sha256": "38fcc492cf6a8fcf4b752414c085b8a9b73dbf90a4ce53551a1791a7202486a0",
+      "maximum_front_count": 1,
+      "run_path": "analysis_outputs/pf_canonical_fracture_v2_final/branching_demo/current_source_ceramic_0300K_theta45_globalgate_seed3003621",
+      "summary_sha256": "fc99b2e25cfba6cd6aec0e791458160d42d73e43085ff74ff946880c92c1362a",
+      "target_reached": true
+    },
+    {
+      "branch_birth_count": 0,
+      "branch_diagnostics_sha256": "c4c42d3b0a28bd8b6b4642f01ae68d2653b49adb82315ec38eb61827b48fc01e",
+      "maximum_front_count": 1,
+      "run_path": "analysis_outputs/pf_canonical_fracture_v2_final/branching_demo/current_source_ceramic_0300K_theta45_seed3003621",
+      "summary_sha256": "37a78d0860e27eaa502f9e9fc9b0d059e8925dec83ad77341cf0b841a4e26e82",
+      "target_reached": true
+    }
+  ],
+  "hazard_seed": 3621,
+  "interpretation": "This positive V11 result is retained as repository-lineage capability evidence only. The frozen canonical source does not contain the same mechanistic topology backend, so the result is not reusable canonical physics. It cannot validate branch nucleation, competition, topology, or fracture resistance.",
+  "material_option": "v913_paper_weakT01_0129902_persistent_sites",
+  "minimum_branch_birth_count_in_completed_segment": 1,
+  "retention_basis": "HISTORICAL_POSITIVE_CAPABILITY_RECORD_ONLY",
+  "run_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v11_branching/runs/v11_theta30_physical_handoff_300um_v3",
+  "schema": "pf_canonical_branching_capability_demonstration_v1",
+  "target_extension_um": 300.0,
+  "target_status": "COMPLETED",
+  "temperature_K": 700.0,
+  "theta_deg": 30.0,
+  "validated_branching_physics": false
+}
