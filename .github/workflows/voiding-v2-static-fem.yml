@@ -10,12 +10,23 @@ on:
 jobs:
   focused:
     runs-on: ubuntu-latest
+    env:
+      MPLCONFIGDIR: /tmp/matplotlib-voiding-v2
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m pip install -e '.[test]'
-      - run: python -m pytest -q tests/test_voiding_v2.py
+      - run: python -m pip install numpy==2.5.1 scipy==1.18.0 matplotlib==3.11.0 pytest==9.1.1
+      - run: python -m pip install -e . --no-deps
+      - run: >-
+          python -m pytest -q
+          tests/test_voiding_v2.py
+          tests/test_v11_process_state_ownership.py
+          tests/test_v11_live_topology_multitip.py
+          tests/test_v11_causal_sharp_wake.py
+          tests/test_live_topology_kernel_v11.py
+          tests/test_crack_network_v11.py
+          tests/test_topology_transaction_v11.py
       - run: python scripts/qualify_voiding_v2_static_fem.py --out /tmp/voiding-v2-static-fem
       - run: git diff --exit-code

@@ -251,7 +251,7 @@ def build_solid_plate_mesh(width_m: float, height_m: float, h_m: float) -> HoleM
 
 def build_explicit_hole_mesh(
     width_m: float, height_m: float, center_m: tuple[float,float], radius_m: float,
-    far_h_m: float, boundary_segments: int,
+    far_h_m: float, boundary_segments: int, *, radial_layers_override: Optional[int]=None,
 ) -> HoleMesh:
     """Build, prune, and derive the actual cavity boundary from retained connectivity."""
     cx,cy=center_m
@@ -274,7 +274,8 @@ def build_explicit_hole_mesh(
         distances.append(min(v for v in candidates if v > 0))
     distances=np.asarray(distances)
     polygon_radius=radius_m/math.cos(math.pi/boundary_segments)
-    radial_layers=max(4,int(math.ceil((float(distances.max())-polygon_radius)/far_h_m)))
+    radial_layers=(max(4,int(radial_layers_override)) if radial_layers_override is not None else
+                   max(4,int(math.ceil((float(distances.max())-polygon_radius)/far_h_m))))
     nodes=[]
     for j in range(radial_layers+1):
         s=j/radial_layers
@@ -333,12 +334,42 @@ def build_explicit_hole_mesh(
                 "minimum_angle_deg":float(np.degrees(np.arccos(np.clip(
                     (side[:,0]**2+side[:,2]**2-side[:,1]**2)/(2*side[:,0]*side[:,2]),-1,1))).min()),
                 "local_edge_min_m":float(lengths.min()),"local_edge_max_m":float(lengths.max())}
+    validation["radial_layers"]=radial_layers
     x,y=nodes[:,0],nodes[:,1]
     top=np.where(np.isclose(y,height_m/2,atol=tol))[0]; bot=np.where(np.isclose(y,-height_m/2,atol=tol))[0]
     lb=int(np.argmin(x*x+(y+height_m/2)**2)); rb=int(np.argmin((x-width_m)**2+(y+height_m/2)**2))
     boundary=BoundaryData(top,bot,lb,rb,np.array([],int))
     return HoleMesh(mesh,boundary,center_m,radius_m,cavity_edges,exterior_edges,
                     np.arange(boundary_segments,dtype=int),validation)
+
+
+def fill_explicit_hole_mesh(hole: HoleMesh) -> HoleMesh:
+    """Fill only the cavity patch to make a discretization-matched control."""
+    if len(hole.cavity_edges) < 3:
+        raise ValueError("an explicit cavity cycle is required")
+    nodes=np.vstack((hole.mesh.nodes,np.asarray(hole.center_m,float)))
+    center=len(nodes)-1
+    adjacency: dict[int,list[int]]={}
+    for a,b in hole.cavity_edges:
+        adjacency.setdefault(int(a),[]).append(int(b)); adjacency.setdefault(int(b),[]).append(int(a))
+    if any(len(v)!=2 for v in adjacency.values()):
+        raise ValueError("cavity boundary is not a simple cycle")
+    start=min(adjacency); ordered=[start]; previous=None; current=start
+    while True:
+        candidates=[n for n in adjacency[current] if n!=previous]
+        nxt=candidates[0]
+        if nxt==start: break
+        ordered.append(nxt); previous,current=current,nxt
+        if len(ordered)>len(adjacency): raise ValueError("invalid cavity cycle")
+    xy=nodes[np.asarray(ordered)]
+    signed=.5*np.sum(xy[:,0]*np.roll(xy[:,1],-1)-xy[:,1]*np.roll(xy[:,0],-1))
+    if signed < 0: ordered=ordered[:1]+ordered[:0:-1]
+    fan=np.asarray([(center,ordered[i],ordered[(i+1)%len(ordered)]) for i in range(len(ordered))],int)
+    mesh=rebuild_tri_mesh(nodes,np.vstack((hole.mesh.elems,fan)))
+    return HoleMesh(mesh,hole.boundary,(math.nan,math.nan),0.0,np.empty((0,2),int),
+                    hole.exterior_edges,np.empty(0,int),
+                    {"actual_internal_components":0,"orphan_nodes":0,
+                     "matched_parent_nodes":hole.mesh.nn,"matched_parent_elements":hole.mesh.ne})
 
 
 @dataclass(frozen=True)
@@ -418,5 +449,6 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
 
 __all__ = ["Clock","HoleMesh","LifecycleRates","Registry","Site","SiteState",
            "StaticFEMResult","SubgridVoid","TransactionAdapter","VoidingV2Config",
-           "advance_lifecycle_localized","build_explicit_hole_mesh","build_solid_plate_mesh","series_limited_growth_rate",
+           "advance_lifecycle_localized","build_explicit_hole_mesh","build_solid_plate_mesh",
+           "fill_explicit_hole_mesh","series_limited_growth_rate",
            "solve_static_hole","triangle_intersects_open_disk"]

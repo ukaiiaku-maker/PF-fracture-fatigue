@@ -6,7 +6,7 @@ import pytest
 
 from arrhenius_fracture.voiding_v2 import (
     Clock, LifecycleRates, Registry, Site, SiteState, VoidingV2Config,
-    advance_lifecycle_localized, build_explicit_hole_mesh,
+    advance_lifecycle_localized, build_explicit_hole_mesh, fill_explicit_hole_mesh,
     series_limited_growth_rate, solve_static_hole, triangle_intersects_open_disk,
 )
 
@@ -101,3 +101,12 @@ def test_production_fem_hole_solution_is_equilibrated_and_symmetric():
     assert result.symmetry_error < 1e-12
     assert np.isfinite(result.stored_energy_J_per_m) and result.stored_energy_J_per_m > 0
     assert 2.5 < result.hoop_stress_concentration < 3.5
+
+
+def test_filled_control_preserves_every_element_outside_cavity_patch():
+    hole=build_explicit_hole_mesh(.008,.008,(.006,0),.00025,2e-4,48)
+    control=fill_explicit_hole_mesh(hole)
+    assert np.array_equal(control.mesh.nodes[:hole.mesh.nn],hole.mesh.nodes)
+    assert np.array_equal(control.mesh.elems[:hole.mesh.ne],hole.mesh.elems)
+    assert control.mesh.nn == hole.mesh.nn+1
+    assert control.mesh.ne == hole.mesh.ne+len(hole.cavity_edges)
