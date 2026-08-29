@@ -1,5 +1,5 @@
 {
-  "schema": "voiding-v2-artifacts/2",
+  "schema": "voiding-v2-artifacts/3",
   "environment": {
     "python": "3.12.13",
     "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
@@ -16,18 +16,23 @@
   "files": [
     {
       "path": "acceptance_checks.csv",
-      "sha256": "6f96d7a906b7b8e8b7ea7d9e9b1f45f06d149cca2618daa49efc4b849de63c46",
-      "bytes": 2835
+      "sha256": "89f19e826e1f0298cece67b3d17adc442a71de7414177831ad26d7bc12e1b809",
+      "bytes": 4454
     },
     {
       "path": "circular_hole_fem_convergence.csv",
-      "sha256": "a9ab7edb1f7f97f14065428f4b843e2d88a31481e81600608621137b810830da",
-      "bytes": 2871
+      "sha256": "23d96ffc929b74e0acd91a760e8db29ffde01ac93450a2ececdeb5a2183b3451",
+      "bytes": 4250
+    },
+    {
+      "path": "circular_hole_plate_size_convergence.csv",
+      "sha256": "420ef98ce079079d53e3b6b33b195c7b6863c0a99aee31de1ad02d7899069f16",
+      "bytes": 818
     },
     {
       "path": "decision.json",
-      "sha256": "9b10c26aa2a632af7207ab39202a5275050e59942c284780ef6ddd564e4e3e33",
-      "bytes": 5662
+      "sha256": "4259b2a78b8a3a06ac0311d4c14b4c2bdad6aa6de21284efbcd5780ba801ba8d",
+      "bytes": 8565
     },
     {
       "path": "environment.json",
@@ -35,24 +40,34 @@
       "bytes": 565
     },
     {
+      "path": "far_void_asymptotic_uncertainty_checks.csv",
+      "sha256": "9fc026e2d52902993f489c9375b16ce571e51e9599eb98c16ddebd5b764ec688",
+      "bytes": 3735
+    },
+    {
       "path": "far_void_matched_mesh_matrix.csv",
-      "sha256": "36be8669a640976e11703a882c9db0be02c89b85b838c319010cc2eeb5373fe2",
-      "bytes": 17136
+      "sha256": "65253437ae8e6eb7051f71239fa5195ef0a0e8ac85214cae39928f9f14c1bb31",
+      "bytes": 28762
+    },
+    {
+      "path": "interaction_integral_contours.csv",
+      "sha256": "261eb45e88ec6afc58f8d8933d28b6dea7b2c3621bbf31275f2b39cc6e8f12d0",
+      "bytes": 58888
     },
     {
       "path": "qualification_test_inventory.txt",
-      "sha256": "7707f3bc2dc427f47ec34266ace6c89447fc9b8f65c7ba853a6508c7758642cb",
-      "bytes": 6710
+      "sha256": "2b5bf21b2dcebe3ad77c95ff206f6c2f00e876a0a27821dc794cb5e4d9f6cd7f",
+      "bytes": 8283
     },
     {
       "path": "virtual_energy_derivative_delta2.svg",
-      "sha256": "e363e255ec8cf9753df1800ad45821e1fa4e1180a0bb6b7ee020a5cead4ce9d2",
-      "bytes": 51560
+      "sha256": "46e79a4ab9f04a5f5382781fbb658daaba61c8751829d93184bca76d3c9cbecd",
+      "bytes": 56140
     },
     {
       "path": "virtual_energy_derivatives.csv",
-      "sha256": "e91d9f53dc4d3e2448f6cbb359efb3d6e2c8c4a12d0bf4322c8bd841327b5bf3",
-      "bytes": 9425
+      "sha256": "901990237d5960aba6955187d3201789f8611e7dc6c084bdf60896e7956eaa0f",
+      "bytes": 14304
     }
   ]
 }
