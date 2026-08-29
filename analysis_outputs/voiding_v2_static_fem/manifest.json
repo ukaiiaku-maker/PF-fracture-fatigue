@@ -1,30 +1,58 @@
 {
-  "schema": "voiding-v2-artifacts/1",
+  "schema": "voiding-v2-artifacts/2",
+  "environment": {
+    "python": "3.12.13",
+    "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "implementation": "CPython",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "matplotlib": "3.11.0",
+    "sparse_solver": "SciPy spsolve using SuperLU",
+    "plotting_dependency": "Matplotlib Agg/SVG with fixed hashsalt and no date metadata",
+    "table_dependency": "Python csv standard library",
+    "required_python": "3.12",
+    "local_default_python_3_13_2": "SIGNAL_139_OBSERVED_DURING_PYTEST; environment issue, not physics result"
+  },
   "files": [
     {
       "path": "acceptance_checks.csv",
-      "sha256": "d01202b467fdf899eadc40008cdb9d532ace4dbaa2851ae9386951e59ac5c63e",
-      "bytes": 1682
+      "sha256": "6f96d7a906b7b8e8b7ea7d9e9b1f45f06d149cca2618daa49efc4b849de63c46",
+      "bytes": 2835
     },
     {
       "path": "circular_hole_fem_convergence.csv",
-      "sha256": "1247ab77a61635a3cccce1956c32a81a1296b8e7f4ef3ed5ae95392893186227",
-      "bytes": 1780
+      "sha256": "a9ab7edb1f7f97f14065428f4b843e2d88a31481e81600608621137b810830da",
+      "bytes": 2871
     },
     {
       "path": "decision.json",
-      "sha256": "c89faf046028b4fcc5a7706acc9b4e5318e3735b6042dfba5867cd03ff1d8ba2",
-      "bytes": 3804
+      "sha256": "9b10c26aa2a632af7207ab39202a5275050e59942c284780ef6ddd564e4e3e33",
+      "bytes": 5662
     },
     {
-      "path": "prescribed_crack_void_interaction.csv",
-      "sha256": "cf1200b999baff16239137bffc2ff0428b527162b52462953340c45a9836004e",
-      "bytes": 3597
+      "path": "environment.json",
+      "sha256": "454a966253fba11c98ccf2138c4a511011d88433e6b06a41a116223961cd780c",
+      "bytes": 565
+    },
+    {
+      "path": "far_void_matched_mesh_matrix.csv",
+      "sha256": "36be8669a640976e11703a882c9db0be02c89b85b838c319010cc2eeb5373fe2",
+      "bytes": 17136
+    },
+    {
+      "path": "qualification_test_inventory.txt",
+      "sha256": "7707f3bc2dc427f47ec34266ace6c89447fc9b8f65c7ba853a6508c7758642cb",
+      "bytes": 6710
+    },
+    {
+      "path": "virtual_energy_derivative_delta2.svg",
+      "sha256": "e363e255ec8cf9753df1800ad45821e1fa4e1180a0bb6b7ee020a5cead4ce9d2",
+      "bytes": 51560
     },
     {
       "path": "virtual_energy_derivatives.csv",
-      "sha256": "42a884d9a1d79f0458aa1cde04c7037fe05b9f449296363846051a834079e75d",
-      "bytes": 447
+      "sha256": "e91d9f53dc4d3e2448f6cbb359efb3d6e2c8c4a12d0bf4322c8bd841327b5bf3",
+      "bytes": 9425
     }
   ]
 }

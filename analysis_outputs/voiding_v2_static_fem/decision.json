@@ -1,5 +1,5 @@
 {
-  "schema": "voiding-v2-static-fem-decision/1",
+  "schema": "voiding-v2-static-fem-decision/2",
   "EXPLICIT_VOID_MECHANICS_QUALIFIED": "OPEN",
   "reason": "one or more computed checks failed or remain OPEN",
   "checks": [
@@ -10,8 +10,8 @@
       "relation": "equal",
       "status": "PASS",
       "calculation_source": "executed V2 static FEM runner",
-      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
-      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
     },
     {
       "metric": "triangle_disk_intersections",
@@ -20,8 +20,8 @@
       "relation": "equal",
       "status": "PASS",
       "calculation_source": "executed V2 static FEM runner",
-      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
-      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
     },
     {
       "metric": "free_residual_relative",
@@ -30,28 +30,38 @@
       "relation": "max",
       "status": "PASS",
       "calculation_source": "executed V2 static FEM runner",
-      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
-      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
     },
     {
-      "metric": "traction_l2_normalized",
-      "value": 0.08867786333661015,
-      "tolerance": 0.1,
+      "metric": "energy_reaction_identity_relative",
+      "value": 5.752299972410172e-15,
+      "tolerance": 1e-10,
       "relation": "max",
       "status": "PASS",
       "calculation_source": "executed V2 static FEM runner",
-      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
-      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
     },
     {
-      "metric": "Kirsch_SC_error",
+      "metric": "traction_l2_normalized_two_finest",
+      "value": 0.11706781015092131,
+      "tolerance": 0.1,
+      "relation": "max",
+      "status": "FAIL",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
+    },
+    {
+      "metric": "Kirsch_SC_error_two_finest",
       "value": 0.018921468671681502,
       "tolerance": 0.1,
       "relation": "max",
       "status": "PASS",
       "calculation_source": "executed V2 static FEM runner",
-      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
-      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
     },
     {
       "metric": "minimum_angle_deg",
@@ -60,43 +70,68 @@
       "relation": "min",
       "status": "PASS",
       "calculation_source": "executed V2 static FEM runner",
-      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
-      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
     },
     {
-      "metric": "offset_mirror_tip_probe_relative",
-      "value": 0.0015202987623137393,
-      "tolerance": 0.02,
+      "metric": "far_void_same_reaction_KI_error_two_finest",
+      "value": 0.0015704968759797655,
+      "tolerance": 0.1,
       "relation": "max",
       "status": "PASS",
       "calculation_source": "executed V2 static FEM runner",
-      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
-      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
     },
     {
-      "metric": "far_void_tip_probe_relative_error",
-      "value": 0.8166960262849974,
-      "tolerance": 0.1,
-      "relation": "max",
+      "metric": "far_void_monotonic_with_separation",
+      "value": false,
+      "tolerance": true,
+      "relation": "equal",
       "status": "FAIL",
       "calculation_source": "executed V2 static FEM runner",
-      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
-      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
     },
     {
-      "metric": "virtual_derivative_mesh_and_step_convergence",
+      "metric": "crack_virtual_derivative_convergence",
+      "value": "NOT_CONVERGED",
+      "perturbation_spread": 0.28677510545256046,
+      "mesh_spread": 0.5459260391940413,
+      "tolerance": "both <= 0.1",
+      "relation": "max",
+      "status": "OPEN",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
+    },
+    {
+      "metric": "void_virtual_derivative_convergence",
+      "value": "PASS",
+      "perturbation_spread": 0.07604098543942801,
+      "mesh_spread": 0.07173659149376549,
+      "tolerance": "both <= 0.1",
+      "relation": "max",
+      "status": "PASS",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
+    },
+    {
+      "metric": "interaction_integral_K_I_K_II",
       "value": "NOT_RUN",
       "tolerance": "required",
       "relation": "",
       "status": "OPEN",
       "calculation_source": "executed V2 static FEM runner",
-      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
-      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
+      "git_sha": "d88c074881044e209521666de748701cb44baee6"
     }
   ],
-  "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a",
-  "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+  "git_sha": "d88c074881044e209521666de748701cb44baee6",
+  "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain/scipy.sparse.linalg.spsolve(SuperLU)",
   "not_run": {
+    "production_local_remeshing": "OUT_OF_SCOPE",
     "production_crack_void_topology": "OUT_OF_SCOPE",
     "stochastic_lifecycle_integration": "OUT_OF_SCOPE",
     "promotion_and_resolved_growth": "OUT_OF_SCOPE",

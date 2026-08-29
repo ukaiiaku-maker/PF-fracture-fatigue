@@ -1,0 +1,13 @@
+{
+  "python": "3.12.13",
+  "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "implementation": "CPython",
+  "numpy": "2.5.1",
+  "scipy": "1.18.0",
+  "matplotlib": "3.11.0",
+  "sparse_solver": "SciPy spsolve using SuperLU",
+  "plotting_dependency": "Matplotlib Agg/SVG with fixed hashsalt and no date metadata",
+  "table_dependency": "Python csv standard library",
+  "required_python": "3.12",
+  "local_default_python_3_13_2": "SIGNAL_139_OBSERVED_DURING_PYTEST; environment issue, not physics result"
+}
