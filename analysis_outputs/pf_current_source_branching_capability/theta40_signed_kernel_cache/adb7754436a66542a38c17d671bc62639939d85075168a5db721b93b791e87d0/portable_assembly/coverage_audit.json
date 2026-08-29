@@ -1,0 +1,21 @@
+{
+  "atlas_max_crack_path_extension_um": 415.00000000000006,
+  "atlas_min_crack_path_extension_um": 0.0,
+  "base_checkpoint_um": 5.0,
+  "coverage_margin_um": 4.999092435317436,
+  "event_maximum_factor": 4.0,
+  "event_minimum_factor": 0.5,
+  "family": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/family.json",
+  "family_schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+  "fixed_crack_tilt_deg": 40.0,
+  "margin_events": 1.0,
+  "maximum_event_advance_um": 18.378720764998985,
+  "minimum_path_extension_to_target_um": 391.6221867996836,
+  "normalized_maximum_event_factor": 3.675744152999797,
+  "pass": true,
+  "policy": "strict measured-envelope coverage; no clipping, endpoint hold, or extrapolation of the signed FEM kernel family",
+  "required_atlas_max_crack_path_extension_um": 410.0009075646826,
+  "schema": "v10.2.27_signed_kernel_coverage_audit_v1",
+  "state_count": 4,
+  "target_projected_crack_extension_um": 300.0
+}

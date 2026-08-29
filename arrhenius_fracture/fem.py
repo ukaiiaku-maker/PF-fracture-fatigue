@@ -76,7 +76,11 @@ def assemble_mechanics(
     eps_e = eps_tot - ep_gp.T  # (ne, 3), ep_gp is (3, ne)
 
     # Broken-material stiffness degradation per element
-    dgp = np.mean(d[conn], axis=1)  # (ne,)
+    inherited_damage = getattr(mesh, "element_damage_gp", None)
+    dgp = (
+        np.asarray(inherited_damage, dtype=float)
+        if inherited_damage is not None else np.mean(d[conn], axis=1)
+    )
     g_d = (1 - dgp)**2 + kappa      # (ne,)
 
     # Stress: sig = g_d * D @ eps_e
@@ -157,7 +161,11 @@ def stress_state(mesh: TriMesh, u: np.ndarray, ep_gp: np.ndarray,
     ue = u[edofs]
     eps_tot = np.einsum('eij,ej->ei', mesh.B_e, ue)
     eps_e = eps_tot - ep_gp.T
-    dgp = np.mean(d[conn], axis=1)
+    inherited_damage = getattr(mesh, "element_damage_gp", None)
+    dgp = (
+        np.asarray(inherited_damage, dtype=float)
+        if inherited_damage is not None else np.mean(d[conn], axis=1)
+    )
     g_d = (1 - dgp)**2 + kappa
     sig = g_d[:, None] * (eps_e @ D.T)
     sx, sy, txy = sig[:, 0], sig[:, 1], sig[:, 2]

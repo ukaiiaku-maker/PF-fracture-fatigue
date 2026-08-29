@@ -1,0 +1,33 @@
+{
+  "analysis_only": true,
+  "canonical_PF_registry_modified": false,
+  "canonical_option_order": [
+    "v913_paper_peak01_0242980_persistent_sites",
+    "v913_paper_dbtt01_0202500_persistent_sites",
+    "v913_paper_weakT01_0129902_persistent_sites",
+    "v913_paper_ceramic01_0077080_persistent_sites"
+  ],
+  "primary_candidates": [
+    {
+      "candidate_id": "v913_zeroD_sobol_0242980",
+      "material_class": "Peak",
+      "option_key": "v913_paper_peak01_0242980_persistent_sites"
+    },
+    {
+      "candidate_id": "v913_zeroD_sobol_0202500",
+      "material_class": "DBTT",
+      "option_key": "v913_paper_dbtt01_0202500_persistent_sites"
+    },
+    {
+      "candidate_id": "oneD_v2_focused_weak_T_0016",
+      "material_class": "weak-T",
+      "option_key": "v913_paper_weakT01_0129902_persistent_sites"
+    },
+    {
+      "candidate_id": "oneD_v2_focused_ceramic_like_0018",
+      "material_class": "ceramic-like",
+      "option_key": "v913_paper_ceramic01_0077080_persistent_sites"
+    }
+  ],
+  "schema": "oneD_v2_terminal_pf_transfer_selection_v1"
+}

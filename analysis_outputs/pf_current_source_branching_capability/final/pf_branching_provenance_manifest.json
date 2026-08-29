@@ -1,0 +1,656 @@
+{
+  "claim_label": "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS",
+  "current_material": "oneD_v2_focused_weak_T_0016",
+  "current_material_row_canonical_sha256": "275fc39b3df6a9c70c16076807893a080b1d0b61c882d6ec142e0bd6329bdcd9",
+  "current_python_source_tree": {
+    "file_count": 199,
+    "root": "/private/tmp/current-source-weakT-branching-capability/arrhenius_fracture",
+    "sha256": "9773755dbb27ea495387f83673cdcc8ebca7279803e397d713caeca7804591e9",
+    "suffix_filter": ".py",
+    "total_bytes": 2280667
+  },
+  "deterministic_analysis_command": [
+    "scripts/analyze_pf_current_source_branching_capability.py",
+    "--pair-root",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair",
+    "--fallback-root",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback",
+    "--out",
+    "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/final"
+  ],
+  "historical_positive_material": "v913_paper_weakT01_0129902_persistent_sites",
+  "historical_positive_material_executed": false,
+  "historical_positive_source_branch": "codex/v11-branching",
+  "historical_positive_source_commit": "9cc5795d8461ea28d24227b19e17cd233485ab72",
+  "historical_positive_source_executed": false,
+  "historical_positive_source_tag": "v11.0.0-hazard-branching-production",
+  "historical_seed": 3621,
+  "launch_base_commit": "7e71b8f27b0682060fd161e7e5e8fe0d3587e8ac",
+  "ported_atomic_topology_overlay_source_commit": "2b5e535",
+  "published_outputs": [
+    {
+      "bytes": 25351,
+      "path": "BRANCHING_CONTROL_VS_ENABLED_MORPHOLOGY.pdf",
+      "sha256": "191f410c0f25445ebb29a9b24401419d3460b47eb847c58f1295d422916af22c"
+    },
+    {
+      "bytes": 441566,
+      "path": "BRANCHING_CONTROL_VS_ENABLED_MORPHOLOGY.png",
+      "sha256": "89ee1f8f097c2585f7b184476ffc8a827cda7fdce5a095eb63e5262a68260326"
+    },
+    {
+      "bytes": 91843,
+      "path": "BRANCHING_CONTROL_VS_ENABLED_MORPHOLOGY.svg",
+      "sha256": "8d5f827873f77ed0b91810bbf32dd45f3661fa190bef03a3a96c751fc7529fc3"
+    },
+    {
+      "bytes": 27146,
+      "path": "BRANCHING_MODEL_NATIVE_KJ_TRAJECTORIES.pdf",
+      "sha256": "968c10ce307126fa725adc8f830d9b2456a2a7480f581569d699d74958c95dd5"
+    },
+    {
+      "bytes": 429593,
+      "path": "BRANCHING_MODEL_NATIVE_KJ_TRAJECTORIES.png",
+      "sha256": "c415e8496335bf8087304eb380d83729fb4de02162eade3e34c6d17791912dc8"
+    },
+    {
+      "bytes": 80272,
+      "path": "BRANCHING_MODEL_NATIVE_KJ_TRAJECTORIES.svg",
+      "sha256": "5b7192a4fbcfff49ca2950ee3431cdfb9d65e61f4bf207be6cfb6ffb35ef2076"
+    },
+    {
+      "bytes": 26598,
+      "path": "BRANCHING_TOPOLOGY_AND_WAKE_AUDIT.pdf",
+      "sha256": "857d636114fe9eec194f7ccbd3238c5b6ee66b4d8be08e591b762abbbcac2651"
+    },
+    {
+      "bytes": 602202,
+      "path": "BRANCHING_TOPOLOGY_AND_WAKE_AUDIT.png",
+      "sha256": "4e5350d6d02211b2b07d5924f7add69e2511e0ded01f87e9162ad672317f0e85"
+    },
+    {
+      "bytes": 90997,
+      "path": "BRANCHING_TOPOLOGY_AND_WAKE_AUDIT.svg",
+      "sha256": "6ebdfb3dcea83cec7e662ce57fd3c3eb94b07f81a9560794a4246876bf6f7c89"
+    },
+    {
+      "bytes": 26837,
+      "path": "BRANCH_BIRTH_AND_HANDOFF_DETAIL.pdf",
+      "sha256": "42c18a0f03d5fa6a42abc687c8df37e9567058009696432d40d0a21d14b97d57"
+    },
+    {
+      "bytes": 468928,
+      "path": "BRANCH_BIRTH_AND_HANDOFF_DETAIL.png",
+      "sha256": "43eb15c10c49bf4c6d16e7998fff70ae1141da0b96b437f14446e77dc9bd403c"
+    },
+    {
+      "bytes": 88922,
+      "path": "BRANCH_BIRTH_AND_HANDOFF_DETAIL.svg",
+      "sha256": "b2b3f516487be6a2a174290dabd4115652dc68bdddea898cc3a5055774819e01"
+    },
+    {
+      "bytes": 29420,
+      "path": "PARENT_DAUGHTER_DIRECTIONAL_DRIVING.pdf",
+      "sha256": "e8567ab1e9404caa3cb3674f42ef623af3e13d4cd49c6730675690ee72ec7be3"
+    },
+    {
+      "bytes": 534327,
+      "path": "PARENT_DAUGHTER_DIRECTIONAL_DRIVING.png",
+      "sha256": "64ff539b6a5130b6e0ae0c05c26657817acc1a7a5ece4896966d3b210e5d8037"
+    },
+    {
+      "bytes": 96726,
+      "path": "PARENT_DAUGHTER_DIRECTIONAL_DRIVING.svg",
+      "sha256": "8ecadba42774367a2e867b36660aab15683e71f1fe4a87d1352dca9b9654f62b"
+    },
+    {
+      "bytes": 27577,
+      "path": "PARENT_DAUGHTER_HAZARD_CLOCKS.pdf",
+      "sha256": "89c363f3926e3b6fb3d880c5e5df08aed726ac5609668350edbf4d260e275c3f"
+    },
+    {
+      "bytes": 581697,
+      "path": "PARENT_DAUGHTER_HAZARD_CLOCKS.png",
+      "sha256": "16b00a094439cec93eaf6adaf7d380b63151273825dd28c93d37f9064cdc3a9c"
+    },
+    {
+      "bytes": 89388,
+      "path": "PARENT_DAUGHTER_HAZARD_CLOCKS.svg",
+      "sha256": "9beae268cc360b61ede965095becae46751cde99a61cd6ae2518bfa25195253b"
+    },
+    {
+      "bytes": 24789,
+      "path": "PARENT_DAUGHTER_LENGTH_AND_REACH.pdf",
+      "sha256": "1bcafb2e3a3a5630977aca3147451516974d451d7dda0bb9cc177ead73538033"
+    },
+    {
+      "bytes": 457136,
+      "path": "PARENT_DAUGHTER_LENGTH_AND_REACH.png",
+      "sha256": "83e854bc18cb5ee511303fd87c12998bca41dac561a491db9b0d46b5a2241a11"
+    },
+    {
+      "bytes": 88050,
+      "path": "PARENT_DAUGHTER_LENGTH_AND_REACH.svg",
+      "sha256": "bd541982941ba15cb1b1874284a1194d522c243b4087b5d15b847396fd8ca740"
+    },
+    {
+      "bytes": 30533,
+      "path": "PARENT_DAUGHTER_PROCESS_ZONE_STATE.pdf",
+      "sha256": "c753908027e1d6241b1c4b52e46a62e59dd337a1453d29fa2f5498bbee9e4cd7"
+    },
+    {
+      "bytes": 698758,
+      "path": "PARENT_DAUGHTER_PROCESS_ZONE_STATE.png",
+      "sha256": "f664e37fd67257abbc84f556dd57612a31d27bd4e66935fd10c259b13b316e65"
+    },
+    {
+      "bytes": 151313,
+      "path": "PARENT_DAUGHTER_PROCESS_ZONE_STATE.svg",
+      "sha256": "c1c2860040262633ca29e5bb47330ddbf62bd289e089805a64b621bf2349ef80"
+    },
+    {
+      "bytes": 5877,
+      "path": "PF_CURRENT_SOURCE_BRANCHING_CAPABILITY_REPORT.md",
+      "sha256": "39a65ba1ed41f996f9f88502624fccbae5442c15cd7a139014c1a6619c345c1b"
+    },
+    {
+      "bytes": 2526,
+      "path": "pf_branching_birth_and_handoff.csv",
+      "sha256": "24bba5aba753e90bf116c216f90b858e8128d2d3e7fe8fb47461aca22372c450"
+    },
+    {
+      "bytes": 2251,
+      "path": "pf_branching_capability_run_manifest.csv",
+      "sha256": "36af3da86a3361793785647cf2b7776da75fcb5299b05541ea4aade7188e2424"
+    },
+    {
+      "bytes": 242994,
+      "path": "pf_branching_event_transactions.csv",
+      "sha256": "97cb34684e4141e570be02471217fca407bb9603e176a18d78f1b7c856a2883a"
+    },
+    {
+      "bytes": 8182,
+      "path": "pf_branching_figure_manifest_and_visual_qa.json",
+      "sha256": "72b89752040637e5d5187e7744da112e2663d4a2216445dab951e71af7e8d8d0"
+    },
+    {
+      "bytes": 16292,
+      "path": "pf_branching_final_decision.json",
+      "sha256": "d98865ea32710f73e70186a884ea4aeb29a5779ac533668c3724bccb3c162941"
+    },
+    {
+      "bytes": 1804967,
+      "path": "pf_branching_front_histories.csv",
+      "sha256": "55264f884e9bf75004b86e9ff7844c4e47fbefa11c13ca44b2e53c70977dd2e8"
+    },
+    {
+      "bytes": 837177,
+      "path": "pf_branching_state_histories.parquet",
+      "sha256": "420a881e8dfbd22e28e164b2cbf8b20a5229b53a010828f993789289a204f056"
+    },
+    {
+      "bytes": 15933,
+      "path": "pf_branching_topology_audit.json",
+      "sha256": "2ca54b366a6ec55ba8d1892c30fac0feec9c2e49ef12dcd3502f42cc28539777"
+    }
+  ],
+  "qualified_physical_source_commit": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+  "raw_case_outputs": [
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/anisotropic_emission_audit_v10174.json",
+      "sha256": "06f3110d846ba162588f37b20835a2d82220e6f23d6d435bfaf21a1c8b4a6d5a"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/branch_action_trials.jsonl",
+      "sha256": "ee5aa4f1519daf57735e2ea8bdd61545d127717718951b42bfd1f9ac5397c119"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/directional_rates.jsonl",
+      "sha256": "4b4de44badd9f684e34468b42eec19bc00b2176f9c9f1ac42aeb743fd769ebad"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/energy_ledger.csv",
+      "sha256": "80bcea06c94254fc1eec7b95e635d941310c51f83a982e4e87a0ce963b299d21"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/fronts.csv",
+      "sha256": "1da91bc05a55db5d1cb1ef689ac4043cd9e70353a085ff7a6d50f851910295f8"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/kinetic_tip_cell_audit_v101.json",
+      "sha256": "7cb2d41bf4d7989a48692ec23d7ffb6dfbbad64602488ebf1e81bdf7743308d2"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/mesh_adaptations.jsonl",
+      "sha256": "151714cc195fd13ca5df1692e86929b02039fd1a707a3510adaa16c97f901ff4"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/pair_case_result.json",
+      "sha256": "226f450202e43ca299ec3bd33c6c1b7408c291ccb0932c2cc1ff30d82fa109ea"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/pf_current_source_branching_model_audit.json",
+      "sha256": "8866afd215123aa33848e80b7fd328bfef1c2faff1d1eae985ab8fdee3313ed8"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/provider_transitions.csv",
+      "sha256": "59761ec99a54a5890e8811a8e5bcc44beedebe03977c6561934bd14f38553464"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/refinement_marking_diagnostics.jsonl",
+      "sha256": "39d06e0e9c5a9e0e093194ce5f4db11523b3a99364ccb1b61953b6fc40053255"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/run.stderr.log",
+      "sha256": "cace1071573ef725e762e8856427937617c8c67e5d0784c45c0e854e56a803a8"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/run.stdout.log",
+      "sha256": "3d63d154a78744549c7e2183d152363b1fe2c4343f9156b8b0e8d8c789c351b0"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/run_complete.json",
+      "sha256": "7f76d23398abf992821e07dae3bb80d397c302abb88b1c2d51d0c2aa40d9c7d6"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/selected_material_manifest_v10_2_22.csv",
+      "sha256": "9e564818d2eb8fad668e69f3546712a6398aa16e3b330383225e84c99447abc1"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v10_0_1_driver_modes.json",
+      "sha256": "17ac885675039709ca98a1af9593cc97043775e9f94a361a50a71c612c335393"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v10_1_1_source_model.json",
+      "sha256": "d82cb2c2888163a1124a29255243213cb4a2e5c54b17f97b37d52e01bdca90a3"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v10_1_7_5_transport_mode.json",
+      "sha256": "c3230c36b85901dd3320e41ffc02cb1a3ff790d3e1e994256ae11147ddeb127a"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v10_1_driver_modes.json",
+      "sha256": "d2e7dd634915b65263cdf20ed4cb2d0292f94cd39baa82b185fdc46ad5a12a54"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v10_2_17_final_signed_stochastic_stack.json",
+      "sha256": "fd2893382b0abc27ecd6dea01499d3286789c7dc1786f4657a1587a203067714"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v10_2_22_parameter_selection.json",
+      "sha256": "043db7b21e1d8758bb0a1b4f1e0e2a1e3c2efc7aea2a8b9aed01d254d1ed5cdc"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v10_2_22_persistent_site_model.json",
+      "sha256": "f75554069fd472a98532b649141125c04bedbe3171e8584fe28bd520fa54c90a"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v10_2_27_energy_ledger_output_audit.json",
+      "sha256": "0ac85f96b8c0e6b7b402654b6b7e82737d954c8eaea1344a260f02f517ed4f0f"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v10_2_27_paper_four_class_parameter_transfer.json",
+      "sha256": "96dda9ae8dd0cb11111fb386a51f9b3fefaee2a363f1a0c18da618a5be39270b"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v11_final_topology_and_energy.png",
+      "sha256": "f2adc08d6a81ae1d7b0687355846f905b6bb2c6a6fe0672430557e7115de1a11"
+    },
+    {
+      "case": "branching_disabled_control",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621/v11_visual_snapshot.json",
+      "sha256": "e9b607c20d8a699068005df9b44b33da3145cbb71a03c107fb037f884461b598"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/anisotropic_emission_audit_v10174.json",
+      "sha256": "f7b48d8decafa1f52605dad7d4dba0b4d0fd4128b4bfbbfeef5c7be6bf525b6d"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/branch_action_trials.jsonl",
+      "sha256": "d9d6814750d1326e176381b11241effaa62d464d35aaa707f55039d2f5481c80"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/branch_clusters.csv",
+      "sha256": "0015e8e3471d5bc334771f2fb632d6caf3ce55d08a0a661150a93547e6540cd0"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/branch_events.csv",
+      "sha256": "f10877e023593908335b1c52340d7f7b3da170005be587888883329a19126107"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/directional_rates.jsonl",
+      "sha256": "dc562ee6cbde6e57ddfca3b990bd783b4919f676319c377e51586f71cf26b93a"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/energy_ledger.csv",
+      "sha256": "cabdfc11adbfb469c3897ddc6e85d944fdb1fdafc4f03fe0c547b8e1c64d4d62"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/fronts.csv",
+      "sha256": "bc5566f0f8bc346081a0ae22757ed91dbb71ab884f7366b6e392a0f64d4924bc"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/kinetic_tip_cell_audit_v101.json",
+      "sha256": "86df0af1142c8c6701e59b77b35abab86948bfa65eb65b1a476ce3cd32c35f57"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/mesh_adaptations.jsonl",
+      "sha256": "16a3c46481f3484f4d368cf5f6f02c5937a8cbf4a0f189ef70f438b196a819d1"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/pair_case_result.json",
+      "sha256": "bf1bb2c2c17fc3422c82a1e4b6037dc4994ae9c11a4a3f01d4ff8c40e116f1bb"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/pf_current_source_branching_model_audit.json",
+      "sha256": "e56f4eb7819f615ca8514e80a8fb24f341be6a560fa2c1e9257536419b3c8c62"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/provider_transitions.csv",
+      "sha256": "9c5769b84b867398459e787dd4ef35ea12fbb88096dac25d77c42695d2216ce8"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/refinement_marking_diagnostics.jsonl",
+      "sha256": "c92c8d7ffea2d6286ccd5221dd5e7c30302deae14216fe0cfc20d7c6c8f779e7"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/run.stderr.log",
+      "sha256": "cace1071573ef725e762e8856427937617c8c67e5d0784c45c0e854e56a803a8"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/run.stdout.log",
+      "sha256": "3d63d154a78744549c7e2183d152363b1fe2c4343f9156b8b0e8d8c789c351b0"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/run_complete.json",
+      "sha256": "770242a02067772ddb0b27d860e82075b74e4bf85ed74bd942bdf17685e1acdf"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/selected_material_manifest_v10_2_22.csv",
+      "sha256": "9e564818d2eb8fad668e69f3546712a6398aa16e3b330383225e84c99447abc1"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v10_0_1_driver_modes.json",
+      "sha256": "17ac885675039709ca98a1af9593cc97043775e9f94a361a50a71c612c335393"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v10_1_1_source_model.json",
+      "sha256": "d82cb2c2888163a1124a29255243213cb4a2e5c54b17f97b37d52e01bdca90a3"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v10_1_7_5_transport_mode.json",
+      "sha256": "c3230c36b85901dd3320e41ffc02cb1a3ff790d3e1e994256ae11147ddeb127a"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v10_1_driver_modes.json",
+      "sha256": "d2e7dd634915b65263cdf20ed4cb2d0292f94cd39baa82b185fdc46ad5a12a54"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v10_2_17_final_signed_stochastic_stack.json",
+      "sha256": "c444766f5f50c5b69660f551b41bb242641c1d69185c93a01598aad60a01ed43"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v10_2_22_parameter_selection.json",
+      "sha256": "fd5549d32f945bb1f0adda7946470bb68f9deec4ca2ae3a7cc30bb130743c6fa"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v10_2_22_persistent_site_model.json",
+      "sha256": "f75554069fd472a98532b649141125c04bedbe3171e8584fe28bd520fa54c90a"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v10_2_27_energy_ledger_output_audit.json",
+      "sha256": "0ac85f96b8c0e6b7b402654b6b7e82737d954c8eaea1344a260f02f517ed4f0f"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v10_2_27_paper_four_class_parameter_transfer.json",
+      "sha256": "96dda9ae8dd0cb11111fb386a51f9b3fefaee2a363f1a0c18da618a5be39270b"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v11_final_topology_and_energy.png",
+      "sha256": "acd047b58beb687758221698beac9a5e9317a16c168c029c814ad969abea8f7c"
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/v11_visual_snapshot.json",
+      "sha256": "1840caeaa6168c5e602a515fa010939c0bbf731175c79abe1b6ce110ba0c0262"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/branch_action_trials.jsonl",
+      "sha256": "61025c8a6f3d75393ef7453114fa257e7758fb5d59bf60756f2a4bc194d86f57"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/branch_clusters.csv",
+      "sha256": "3628c4371d54f1eb7e1f8a3de0dbe85bb69b2cb6babadb4705b03ab25b6f7c8d"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/branch_events.csv",
+      "sha256": "5ece76b872379840d7039b6e59c5bba2874d41a66a7680c2e212f0ef8d26710f"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/directional_rates.jsonl",
+      "sha256": "6f58c362a2a0d3702f4d696be2a4a48378cbc80f7184fc123a11fe045c41d73c"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/energy_ledger.csv",
+      "sha256": "9275a83971df2da589ec88967fbc35a57401c48733ce55df49713cdc86833ba7"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/failure_summary.json",
+      "sha256": "db2b78c4b52652930780e28d4e2e1980fcada8101d0d23f26bea37ce18b51ba2"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/failure_traceback.txt",
+      "sha256": "10e0caa315ae97c0a6e8ae37e738340f53d5ae98f6785251e4684ed7658ed13f"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/fronts.csv",
+      "sha256": "6dd0ce5a6524e72466a87f5a6a7f7d114d511d07f46f4556a5d9cdd93b25ed18"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/mesh_adaptations.jsonl",
+      "sha256": "5a41b4c2c0b505a406d1457c159cf78fc85ff404ac86bde7e74a2d49c6d0afde"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/pair_case_result.json",
+      "sha256": "b52d9f0fdb7a652666c28ea1c3f213c7b332e1d66fd1bb29ea3f82efb340401f"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/pf_current_source_branching_model_audit.json",
+      "sha256": "7e3c64681ae09063eb27049d272c00ecd2116787d10cc5a7c4b2643b4216ce1f"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/provider_transitions.csv",
+      "sha256": "44cfb563a7ce247a81492d06d84a0a6ed0191422f3ca3f48d36af99000ef9e59"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/refinement_marking_diagnostics.jsonl",
+      "sha256": "2582997de3e883267a5f94e6645432fbf5a7e7a810dc56edd1c88641172a856e"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/run.stderr.log",
+      "sha256": "1a7aeb332108518c6755e0e1c998092ed9ca446c4d2381290bdd0b4bba43acd0"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/run.stdout.log",
+      "sha256": "0d4105f9dd040fcd9201142acc81944362b185143469f428b97f3f9b8c068537"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/selected_material_manifest_v10_2_22.csv",
+      "sha256": "9e564818d2eb8fad668e69f3546712a6398aa16e3b330383225e84c99447abc1"
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621/v10_2_22_parameter_selection.json",
+      "sha256": "5c18482aab732b2163a9ffadfe6054603fb22d34ebcb8592951e2e881c44d918"
+    }
+  ],
+  "raw_case_trees": [
+    {
+      "case": "branching_disabled_control",
+      "file_count": 1872,
+      "root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_control_max1_seed3621",
+      "sha256": "84788c6b055aacfd4a7e3e486d23a912c0cd6eeb667eb265c47f124d17f53e15",
+      "suffix_filter": null,
+      "total_bytes": 313125586
+    },
+    {
+      "case": "branching_enabled_theta40",
+      "file_count": 5218,
+      "root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621",
+      "sha256": "a28d5c312f1747658efa1ab5ec87aa85170da1180832714cadc3bce5bb9890b5",
+      "suffix_filter": null,
+      "total_bytes": 459944204
+    },
+    {
+      "case": "branching_enabled_theta45_fallback",
+      "file_count": 723,
+      "root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta45_fallback/theta45_enabled_max2_seed3621",
+      "sha256": "d08a706d12cf16d43390a59a0aeaa1113cda828c0f88de084f6e472048827384",
+      "suffix_filter": null,
+      "total_bytes": 71941298
+    }
+  ],
+  "schema": "pf_current_source_branching_provenance_manifest_v1",
+  "source_files": [
+    {
+      "path": "arrhenius_fracture/sharp_front_current_source_branching.py",
+      "sha256": "3dff3bf35ed0eb1c042664eb6e706776db1717901d409759a20f47e3113949a3"
+    },
+    {
+      "path": "arrhenius_fracture/sharp_front_current_source_branching_audited.py",
+      "sha256": "4a30a233b2ea4c55eca9040fa8d99a81d83b27b1c39586ccd2fb0ac8617ef926"
+    },
+    {
+      "path": "arrhenius_fracture/sharp_front_v11_branching.py",
+      "sha256": "5af58df7e8af2a0f5dbf79fbaac84b34f34288712135c10ddc0df9689d43a5b1"
+    },
+    {
+      "path": "arrhenius_fracture/resolved_production_v11.py",
+      "sha256": "a647f1a2a72914bff7d3f2f36ca124f79f72e460d48d06302b464314b630a28f"
+    },
+    {
+      "path": "arrhenius_fracture/directional_competition_v11.py",
+      "sha256": "c8fa1aa4aae186207cb44c9fbb6682cba54af1c1017f195c4a2df1acb97e6e4e"
+    },
+    {
+      "path": "arrhenius_fracture/topology_transaction_v11.py",
+      "sha256": "ad3ca94ba05fb83450ead8c210b61e56c09f1a1cacb317ccad0b7adc897a7d17"
+    },
+    {
+      "path": "arrhenius_fracture/causal_sharp_wake_v11.py",
+      "sha256": "1f0640761bdceb81f152758ef0a1360dfa1e311e178ac4cd82e73f2aa226d6bf"
+    },
+    {
+      "path": "arrhenius_fracture/process_state_ownership_v11.py",
+      "sha256": "1f07e90726b9848ab6003ad200f0488f5de8de556bea7a6d3373c40f0090b934"
+    },
+    {
+      "path": "arrhenius_fracture/branch_cluster_v11.py",
+      "sha256": "00d4c055aee36c2cca4ef78d0ba7ecbd9273e0d86c8d4e6e961c3befae6278c9"
+    },
+    {
+      "path": "arrhenius_fracture/branch_cluster_guard_v11.py",
+      "sha256": "99aaadef9f500f057aa5e8c4a0a4f549d3ded8f725c308bdacb7e9f79303cb3e"
+    },
+    {
+      "path": "arrhenius_fracture/crack_network_v11.py",
+      "sha256": "b43120c439592eb3decb50ed05a45508e2776d2ade545c53c4d1e5f4f3a00f47"
+    },
+    {
+      "path": "arrhenius_fracture/network_metrics_v11.py",
+      "sha256": "4af090e17afa923e410ad6c60f779bb6f13f4634eff8a626d167f2d6fc63db28"
+    },
+    {
+      "path": "scripts/run_pf_current_source_branching_capability_pair.py",
+      "sha256": "0947127d93245a6879e583f146aad2b8275731c84d48311914666a9e35dbee69"
+    },
+    {
+      "path": "scripts/analyze_pf_current_source_branching_capability.py",
+      "sha256": "98b0f9fe6670c211bde45848107a001faec86b1011781e194a38d7ef82adcba1"
+    },
+    {
+      "path": "scripts/status_v11_branching_campaign.py",
+      "sha256": "a6a8f354e17f8b7bab7362cd96c008d0c30754d40a3a59eb9c2b7186eb6ea05b"
+    },
+    {
+      "path": "runtime_inputs/pf_current_source_branching/pf_v2_four_class_pf_transfer_registry.csv",
+      "sha256": "43d4973b97156430d177f29eee8bbd631872db2a3ef0c3293c27604b00c63ef4"
+    },
+    {
+      "path": "runtime_inputs/pf_current_source_branching/pf_v2_four_class_pf_transfer_selection.json",
+      "sha256": "ab902b986f55dcd7993dc0d2d3f262885bc9ecdca14197d664df18e4fb9e0acd"
+    }
+  ],
+  "theta40_family_path": "analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/family.json",
+  "theta40_family_sha256": "b109a2fd6fc393fc986b1f15d6edd7c37366d84c111710ea70bcaba75f426847",
+  "theta45_family_path": "/private/tmp/canonical-pf-fracture-v2-analysis/runtime_inputs/pf_canonical_kernel_families_v2/03fa55d25e18e685b71f26a5ed724d84b94193acefaddb91d552e0f43e3802f4/family.json",
+  "theta45_family_sha256": "d3ac342a1268a748c580d394bcdf9756ef91b3fbc1795de903b4b371aec030e4"
+}

@@ -1,0 +1,6 @@
+# Frozen byte-exact campaign inputs and qualified mechanics artifacts retain
+# their authoritative CRLF serialization. Treat them as binary for diff
+# whitespace validation without normalizing their provenance hashes.
+runtime_inputs/pf_current_source_branching/*.csv -diff
+analysis_outputs/pf_current_source_branching_capability/mechanics_theta40/*.csv -diff
+analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/**/*.csv -diff

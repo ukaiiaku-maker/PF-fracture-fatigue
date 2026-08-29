@@ -1,0 +1,404 @@
+{
+  "case_metrics": {
+    "branching_disabled_control": {
+      "active_front_count": 1,
+      "final_step": 662,
+      "leading_front_id": "b00000000",
+      "ligament_severed_by_leading_front": false,
+      "max_forward_projected_extension_um": 300.9175216390797,
+      "max_root_to_tip_path_extension_um": 425.00000000000165,
+      "mesh_identity": "ebb9fb407e05c358e0046e520aa82216dc0649230bf9d33076d532d13bcf31b8",
+      "network_total_new_crack_length_um": 425.00000000000165,
+      "retired_or_terminated_front_count": 0,
+      "stagnant_active_front_count_last_50_steps": 0,
+      "termination_reason": "target_reached",
+      "topology_fingerprint": "a2c1c9b355cd63f90f11d4f163917057d3ea89dc8532d35576d6d02a74f76786"
+    },
+    "branching_enabled_theta40": {
+      "active_front_count": 2,
+      "final_step": 2182,
+      "leading_front_id": "b7d5efe0822562b9",
+      "ligament_severed_by_leading_front": false,
+      "max_forward_projected_extension_um": 302.23630529007903,
+      "max_root_to_tip_path_extension_um": 405.0000000000013,
+      "mesh_identity": "33c80336790c2e66c0328076265bf1c0f8ecc1f304a8eef1c2f01216472f4067",
+      "network_total_new_crack_length_um": 435.0000000000015,
+      "retired_or_terminated_front_count": 1,
+      "stagnant_active_front_count_last_50_steps": 0,
+      "termination_reason": "target_reached",
+      "topology_fingerprint": "e9d971044def5098d416be803f476766c3f0b8bc3d5a547c4989ae3a32b137f3"
+    },
+    "branching_enabled_theta45_fallback": {
+      "active_front_count": 2,
+      "final_step": 460,
+      "leading_front_id": "b7ad021ada7289d0",
+      "ligament_severed_by_leading_front": false,
+      "max_forward_projected_extension_um": 49.49747468305839,
+      "max_root_to_tip_path_extension_um": 70.00000000000018,
+      "mesh_identity": "42f08c0ccedda0a7b818ef622317b7e9b0758ad3acc7dcada500366d0464a7cd",
+      "network_total_new_crack_length_um": 105.00000000000027,
+      "retired_or_terminated_front_count": 1,
+      "stagnant_active_front_count_last_50_steps": 1,
+      "termination_reason": null,
+      "topology_fingerprint": "7b53ccb6b395c30eec0057d0b0e5e0dcd209e50001a8e58eacc89927a489c1c6"
+    }
+  },
+  "claim_label": "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS",
+  "matched_pair_gates": {
+    "control_reached_300um": true,
+    "prebirth_action_neutrality": true,
+    "prebirth_directional_neutrality": true,
+    "prebirth_front_neutrality": true
+  },
+  "orientation_attempts": {
+    "branching_enabled_theta40": {
+      "accepted_realized_length_m": 0.00043500000000000006,
+      "birth_action": {
+        "G_marginal_J_per_m2": [
+          null,
+          null
+        ],
+        "J_kin_used_J_per_m2": [
+          23327.3760714061,
+          25791.839235003165
+        ],
+        "J_local_signed_J_per_m2": [
+          23327.3760714061,
+          25791.839235003165
+        ],
+        "accepted": true,
+        "accepted_state_id": "193e42aeca842a0e90ada109c3744c2125392e0fc222585149883f26d904a706",
+        "action_type": "two_arm",
+        "apparent_compliance_after_m2_per_N": 4.612354640156146e-12,
+        "apparent_compliance_before_m2_per_N": 4.610451794798425e-12,
+        "applied_displacement_m": 5.7400000267885404e-05,
+        "candidate_ids": [
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          "cleave:cleavage:(100):77278fedde405b16bcd0"
+        ],
+        "completion_times_s": [
+          2410.8000111351284,
+          2410.8000112267864
+        ],
+        "consumption_result": "consumed",
+        "correlation_time_difference_s": 9.165796654997393e-08,
+        "directional_K_Pa_sqrt_m": [
+          101871720.45077264,
+          107117851.14848681
+        ],
+        "equilibrium_status": "converged",
+        "geometry_status": "realized",
+        "hazard_derived_cost_per_arm_J_per_m": [
+          4.5617165365531554e-06,
+          4.5617165365531554e-06
+        ],
+        "lambda_directional_per_s": [
+          1000000.0,
+          1000000.0
+        ],
+        "local_J_invalid_reason": [
+          null,
+          null
+        ],
+        "local_J_valid": [
+          true,
+          true
+        ],
+        "net_energy_margin_J_per_m": 0.14740228994918506,
+        "participating_front_ids": [
+          "b0fa22bb892937f8",
+          "b7d5efe0822562b9"
+        ],
+        "pending_event_ids": [
+          "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000014",
+          "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000010"
+        ],
+        "physical_time_s": 2410.8000112511872,
+        "positive_directional_J_J_per_m2": [
+          23327.3760714061,
+          25791.839235003165
+        ],
+        "postrollback_state_hash": null,
+        "posttrial_potential_energy_J_per_m": 357.1668147618528,
+        "pretrial_potential_energy_J_per_m": 357.31422617523504,
+        "pretrial_state_hash": "193e42aeca842a0e90ada109c3744c2125392e0fc222585149883f26d904a706",
+        "proposed_arm_lengths_m": [
+          5e-06,
+          5e-06
+        ],
+        "provider_identity": "v11_exact_crack_network_live_fem_v1",
+        "reaction_force_after_N_per_m": 12444836.693204103,
+        "reaction_force_before_N_per_m": 12449972.979360694,
+        "realized_arm_lengths_m": [
+          5e-06,
+          5e-06
+        ],
+        "relative_energy_residual": 0.0004125284669659238,
+        "released_energy_J_per_m": 0.14741141338225816,
+        "reservation_result": "accepted",
+        "signed_directional_J_J_per_m2": [
+          23327.3760714061,
+          25791.839235003165
+        ],
+        "step": 369,
+        "topology_fingerprint_after": "92b3f347ab221d5940e2a2fef166ef0e8a49b5aa37b2d0ce6c5b1b0ddc8c8d78",
+        "topology_fingerprint_before": "4e4dae25c286f2158ca62a92a1ac96721ab9d261d8ee844767ebf9731146446b",
+        "total_dissipative_cost_J_per_m": 9.123433073106311e-06,
+        "trial_copy_bytes": 0,
+        "trial_copy_wall_time_s": 1.9166851416230202e-05,
+        "trial_id": "action:2:b7c323766ce6cdf2722049dc",
+        "veto_reason": null
+      },
+      "birth_location_m": [
+        0.0005762531945699796,
+        -2.0867446366839387e-05
+      ],
+      "birth_step": 369,
+      "daughter_lengths_m": {
+        "b0fa22bb892937f8": 3.000000000000015e-05,
+        "b7d5efe0822562b9": 0.0002950000000000008
+      },
+      "failure": null,
+      "final_handoff_guard": {
+        "arm_arclengths_from_junction_m": [
+          3.000000000000015e-05,
+          0.0002950000000000008
+        ],
+        "branch_handoff_length_m": 5e-05,
+        "cluster_id": "jc9ec4d7327bde23",
+        "guard_scale_contract": {
+          "fitted_parameters": false,
+          "minimum_arm_length": "max(branch_handoff_length, local_J_contour_radius)",
+          "minimum_tip_separation": "branch_handoff_length",
+          "nonoverlap": "tip_separation >= 2*local_J_contour_radius"
+        },
+        "handoff_required": false,
+        "independently_valid_local_J": [
+          false,
+          false
+        ],
+        "local_J_contour_radius_m": 4.981869110140704e-06,
+        "local_contours_overlap": false,
+        "scale_identity": {
+          "actual_local_hbar_m": 1.6606230367135678e-06,
+          "branch_handoff_length_m": 5e-05,
+          "branch_handoff_source": "MECHANICAL_CONFIG:process_zone_length_m",
+          "event_length_da_phys_m": 5e-06,
+          "event_length_source": "runtime_args.da_phys",
+          "interaction_integral_length_m": 2e-06,
+          "interaction_integral_source": "MECHANICAL_CONFIG:interaction_length_m",
+          "local_J_contour_radius_m": 4.981869110140704e-06,
+          "local_J_contour_source": "live_FEM_selected_nested_contour;initial=request.contour_radius_m",
+          "physical_process_zone_length_m": 5e-05,
+          "physical_process_zone_source": "MECHANICAL_CONFIG:process_zone_length_m",
+          "schema": "v11.branch-scale-identity/1",
+          "tip_h_fine_m": 1e-06,
+          "tip_h_fine_source": "runtime_args.tip_h_fine"
+        },
+        "separation_reaches_process_zone": true,
+        "sufficient_post_junction_length": [
+          false,
+          true
+        ],
+        "termination_status": null,
+        "tip_separation_m": 0.00029652150006365536
+      },
+      "gates": {
+        "birth_local_probes_reliable": true,
+        "committed_daughter_birth": true,
+        "daughter_non_stub_growth": true,
+        "exact_length_topology_closure": true,
+        "final_local_probes_reliable": false,
+        "hazard_rng_state_geometry_provenance": true,
+        "independent_handoff_when_required": true,
+        "no_backward_growth": true,
+        "no_branch_cap_clipping": true,
+        "no_cross_wake_bridge_or_reconnection": true,
+        "run_completed_without_fail_closed_exception": true,
+        "run_reached_300um": true,
+        "valid_cluster_bookkeeping": true
+      },
+      "length_closure_error_m": 1.4094628242311558e-18,
+      "network_new_length_m": 0.00043500000000000147,
+      "qualified_daughter": false,
+      "theta_deg": 40.0
+    },
+    "branching_enabled_theta45_fallback": {
+      "accepted_realized_length_m": 0.000105,
+      "birth_action": {
+        "G_marginal_J_per_m2": [
+          3007.594825521664,
+          3041.7375363754213
+        ],
+        "J_kin_used_J_per_m2": [
+          3007.594825521664,
+          3041.7375363754213
+        ],
+        "J_local_signed_J_per_m2": [
+          5979.405744045611,
+          6143.628462209051
+        ],
+        "accepted": true,
+        "accepted_state_id": "58f280a38def3f2165c50c2fce1b7598ea677e3ed605e8c78c4075d271ea1167",
+        "action_type": "two_arm",
+        "apparent_compliance_after_m2_per_N": 4.590929692923353e-12,
+        "apparent_compliance_before_m2_per_N": 4.590703716652977e-12,
+        "applied_displacement_m": 6.07928197496247e-05,
+        "candidate_ids": [
+          "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "cleave:cleavage:(100):5b8d6e5e817cefaf59a4"
+        ],
+        "completion_times_s": [
+          2553.2984294478797,
+          2553.298429396265
+        ],
+        "consumption_result": "consumed",
+        "correlation_time_difference_s": 5.161473382031545e-08,
+        "directional_K_Pa_sqrt_m": [
+          36578876.29550064,
+          36785915.07742717
+        ],
+        "equilibrium_status": "converged",
+        "geometry_status": "realized",
+        "hazard_derived_cost_per_arm_J_per_m": [
+          8.648370251775368e-06,
+          8.648370251775368e-06
+        ],
+        "lambda_directional_per_s": [
+          1000000.0,
+          1000000.0
+        ],
+        "local_J_invalid_reason": [
+          "no_numerically_converged_independent_contour",
+          "no_numerically_converged_independent_contour"
+        ],
+        "local_J_valid": [
+          false,
+          false
+        ],
+        "net_energy_margin_J_per_m": 0.019796034951133353,
+        "participating_front_ids": [
+          "b002cebdef606974",
+          "b7ad021ada7289d0"
+        ],
+        "pending_event_ids": [
+          "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000003",
+          "cleave:cleavage:(100):5b8d6e5e817cefaf59a4#event:0000000000000002"
+        ],
+        "physical_time_s": 2553.2984294842577,
+        "positive_directional_J_J_per_m2": [
+          3007.594825521664,
+          3041.7375363754213
+        ],
+        "postrollback_state_hash": null,
+        "posttrial_potential_energy_J_per_m": 402.50746366331487,
+        "pretrial_potential_energy_J_per_m": 402.5272769950065,
+        "pretrial_state_hash": "58f280a38def3f2165c50c2fce1b7598ea677e3ed605e8c78c4075d271ea1167",
+        "proposed_arm_lengths_m": [
+          5e-06,
+          5e-06
+        ],
+        "provider_identity": "v11_exact_crack_network_live_fem_v1",
+        "reaction_force_after_N_per_m": 13241940.917399202,
+        "reaction_force_before_N_per_m": 13242592.748709986,
+        "realized_arm_lengths_m": [
+          5e-06,
+          5e-06
+        ],
+        "relative_energy_residual": 4.9179362697894706e-05,
+        "released_energy_J_per_m": 0.019813331691636904,
+        "reservation_result": "accepted",
+        "signed_directional_J_J_per_m2": [
+          3007.594825521664,
+          3041.7375363754213
+        ],
+        "step": 315,
+        "topology_fingerprint_after": "78cd339aa13c6765d0605eb4b99149958e3f6e9031e4c614aa902dc95e8f89d9",
+        "topology_fingerprint_before": "acdee85735558c06f9d257e2a18a70489cd85faa6fb5dbe827fd7532745a8412",
+        "total_dissipative_cost_J_per_m": 1.7296740503550736e-05,
+        "trial_copy_bytes": 0,
+        "trial_copy_wall_time_s": 1.7416896298527718e-05,
+        "trial_id": "action:2:47d4f0adc338000d47331cf8",
+        "veto_reason": null
+      },
+      "birth_location_m": [
+        0.0005106066017177982,
+        -3.5355339059327505e-06
+      ],
+      "birth_step": 315,
+      "daughter_lengths_m": {
+        "b002cebdef606974": 3.5000000000000085e-05,
+        "b7ad021ada7289d0": 5.500000000000013e-05
+      },
+      "failure": {
+        "claim_label": "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS",
+        "exception_class": "RuntimeError",
+        "exception_message": "active_tip_resolution_marker_inconsistency: hbar=9.0609942791897276e-07 target=1.5e-06"
+      },
+      "final_handoff_guard": {
+        "arm_arclengths_from_junction_m": [
+          3.5000000000000085e-05,
+          5.500000000000013e-05
+        ],
+        "branch_handoff_length_m": 5e-05,
+        "cluster_id": "jad81c9c9ac5be36",
+        "guard_scale_contract": {
+          "fitted_parameters": false,
+          "minimum_arm_length": "max(branch_handoff_length, local_J_contour_radius)",
+          "minimum_tip_separation": "branch_handoff_length",
+          "nonoverlap": "tip_separation >= 2*local_J_contour_radius"
+        },
+        "handoff_required": false,
+        "independently_valid_local_J": [
+          false,
+          false
+        ],
+        "local_J_contour_radius_m": 4.482506413410175e-06,
+        "local_contours_overlap": false,
+        "scale_identity": {
+          "actual_local_hbar_m": 1.4941688044700583e-06,
+          "branch_handoff_length_m": 5e-05,
+          "branch_handoff_source": "MECHANICAL_CONFIG:process_zone_length_m",
+          "event_length_da_phys_m": 5e-06,
+          "event_length_source": "runtime_args.da_phys",
+          "interaction_integral_length_m": 2e-06,
+          "interaction_integral_source": "MECHANICAL_CONFIG:interaction_length_m",
+          "local_J_contour_radius_m": 4.482506413410175e-06,
+          "local_J_contour_source": "live_FEM_selected_nested_contour;initial=request.contour_radius_m",
+          "physical_process_zone_length_m": 5e-05,
+          "physical_process_zone_source": "MECHANICAL_CONFIG:process_zone_length_m",
+          "schema": "v11.branch-scale-identity/1",
+          "tip_h_fine_m": 1e-06,
+          "tip_h_fine_source": "runtime_args.tip_h_fine"
+        },
+        "separation_reaches_process_zone": true,
+        "sufficient_post_junction_length": [
+          false,
+          true
+        ],
+        "termination_status": null,
+        "tip_separation_m": 6.519202405202671e-05
+      },
+      "gates": {
+        "birth_local_probes_reliable": false,
+        "committed_daughter_birth": true,
+        "daughter_non_stub_growth": true,
+        "exact_length_topology_closure": true,
+        "final_local_probes_reliable": false,
+        "hazard_rng_state_geometry_provenance": true,
+        "independent_handoff_when_required": true,
+        "no_backward_growth": true,
+        "no_branch_cap_clipping": true,
+        "no_cross_wake_bridge_or_reconnection": true,
+        "run_completed_without_fail_closed_exception": false,
+        "run_reached_300um": false,
+        "valid_cluster_bookkeeping": true
+      },
+      "length_closure_error_m": 2.574980159653073e-19,
+      "network_new_length_m": 0.00010500000000000026,
+      "qualified_daughter": false,
+      "theta_deg": 45.0
+    }
+  },
+  "schema": "pf_current_source_branching_topology_audit_v1"
+}

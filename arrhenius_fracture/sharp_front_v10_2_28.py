@@ -64,6 +64,9 @@ def _resolve_signed_kernel(args: list[str]) -> tuple[str, bool]:
         "--mode",
         os.environ.get("KERNEL_RESOLUTION_MODE", "auto"),
     ]
+    cache_root = os.environ.get("KERNEL_CACHE_ROOT", "").strip()
+    if cache_root:
+        command.extend(["--cache-root", str(Path(cache_root).expanduser().resolve())])
     if not mechanical_config:
         _base._append_cli_mechanics(command, args)
     mechanical_profile = os.environ.get("MECHANICAL_PROFILE", "").strip()

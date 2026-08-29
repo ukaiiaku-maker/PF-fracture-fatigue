@@ -1,0 +1,102 @@
+{
+  "anchors": [
+    {
+      "crack_direction": [
+        0.7660444431189781,
+        0.6427876096865394
+      ],
+      "crack_extension_m": 0.0,
+      "crack_tip_xy_m": [
+        0.0005,
+        0.0
+      ],
+      "damage_construction": {
+        "ahead_of_tip_damaged_nodes": 0,
+        "crack_band_half_width_m": 0.0,
+        "extended_crack_elements": 0,
+        "extended_crack_nodes": 0
+      },
+      "measurement_mesh_hbar_tip_m": 1.27279959168987e-08,
+      "mesh_elements": 3708,
+      "mesh_nodes": 1915,
+      "snapshot": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/prescribed_geometry_snapshots/E0000000/snapshot.json",
+      "state_id": "E0000000"
+    },
+    {
+      "crack_direction": [
+        0.7660444431189781,
+        0.6427876096865394
+      ],
+      "crack_extension_m": 0.0002,
+      "crack_tip_xy_m": [
+        0.0006532088886237956,
+        0.0001285575219373079
+      ],
+      "damage_construction": {
+        "ahead_of_tip_candidates_removed": 0,
+        "ahead_of_tip_damaged_nodes": 0,
+        "crack_band_half_width_m": 7.000397754293799e-09,
+        "crack_representation": "element_intersection_supported_nodal_stiffness_kill",
+        "extended_crack_elements": 138,
+        "extended_crack_nodes": 24
+      },
+      "measurement_mesh_hbar_tip_m": 1.2727995916897815e-08,
+      "mesh_elements": 3710,
+      "mesh_nodes": 1916,
+      "snapshot": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/prescribed_geometry_snapshots/E0000200/snapshot.json",
+      "state_id": "E0000200"
+    },
+    {
+      "crack_direction": [
+        0.7660444431189781,
+        0.6427876096865394
+      ],
+      "crack_extension_m": 0.0004,
+      "crack_tip_xy_m": [
+        0.0008064177772475913,
+        0.0002571150438746158
+      ],
+      "damage_construction": {
+        "ahead_of_tip_candidates_removed": 0,
+        "ahead_of_tip_damaged_nodes": 0,
+        "crack_band_half_width_m": 7.000397754294863e-09,
+        "crack_representation": "element_intersection_supported_nodal_stiffness_kill",
+        "extended_crack_elements": 144,
+        "extended_crack_nodes": 24
+      },
+      "measurement_mesh_hbar_tip_m": 1.272799591689975e-08,
+      "mesh_elements": 3708,
+      "mesh_nodes": 1915,
+      "snapshot": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/prescribed_geometry_snapshots/E0000400/snapshot.json",
+      "state_id": "E0000400"
+    },
+    {
+      "crack_direction": [
+        0.7660444431189781,
+        0.6427876096865394
+      ],
+      "crack_extension_m": 0.00041500000000000006,
+      "crack_tip_xy_m": [
+        0.0008179084438943759,
+        0.0002667568580199139
+      ],
+      "damage_construction": {
+        "ahead_of_tip_candidates_removed": 0,
+        "ahead_of_tip_damaged_nodes": 0,
+        "crack_band_half_width_m": 7.000397754294865e-09,
+        "crack_representation": "element_intersection_supported_nodal_stiffness_kill",
+        "extended_crack_elements": 142,
+        "extended_crack_nodes": 24
+      },
+      "measurement_mesh_hbar_tip_m": 1.2727995916899753e-08,
+      "mesh_elements": 3708,
+      "mesh_nodes": 1915,
+      "snapshot": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/prescribed_geometry_snapshots/E0000415/snapshot.json",
+      "state_id": "E0000415"
+    }
+  ],
+  "atlas_anchor_spacing_m": 0.0002,
+  "da_phys_m": 5e-06,
+  "required_max_extension_um": 410.0009075646826,
+  "schema": "v10.2.28_prescribed_geometry_anchor_plan_v1"
+}

@@ -1,0 +1,26 @@
+{
+  "active_kernel_mechanically_measured": true,
+  "crack_path_extensions_um": [
+    0.0,
+    200.0,
+    400.0,
+    415.00000000000006
+  ],
+  "exact_endpoint_unavailable_cross_validation_preserved": true,
+  "expected_family_schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+  "family_schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+  "maximum_crack_path_extension_um": 415.00000000000006,
+  "nonfinite_review_diagnostics_replaced_with_null": 25,
+  "out": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/family.json",
+  "out_sha256": "dac641b4d88d8284cd3bd69773a9f4ffc1b8c93d6bfc71fe16037aa7e711860d",
+  "production_parameterization_allowed": true,
+  "schema": "v10.2.27_extended_active_only_signed_atlas_assembler",
+  "state_count": 4,
+  "state_ids": [
+    "E0000000",
+    "E0000200",
+    "E0000400",
+    "E0000415"
+  ],
+  "wake_shielding_supported": false
+}

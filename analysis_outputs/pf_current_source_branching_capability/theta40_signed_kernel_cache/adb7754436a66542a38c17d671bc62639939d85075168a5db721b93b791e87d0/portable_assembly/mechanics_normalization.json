@@ -1,0 +1,37 @@
+{
+  "activation_to_line_content_by_system": [
+    0.9124087591240877,
+    0.9124087591240877
+  ],
+  "burgers_m": 2.74e-10,
+  "capacity_counts_in_plane_source_positions_only": true,
+  "constitutive_K_shield_cap_present": false,
+  "emitted_population_units": "signed_dislocation_line_content",
+  "fitted_to_toughness_or_fatigue": false,
+  "historical_source_sites_outside_mechanical_bounds": null,
+  "historical_source_sites_per_system": null,
+  "kinetic_packet_length_m": 2.5e-10,
+  "maximum_source_spacing_b": 100.0,
+  "maximum_source_spacing_m": 2.7399999999999997e-08,
+  "mechanical_line_content_source": "kinetic_packet_displacement_divided_by_burgers_magnitude",
+  "minimum_source_spacing_b": 10.0,
+  "minimum_source_spacing_m": 2.74e-09,
+  "n_systems": 2,
+  "normalization_source": "process_zone_geometry_and_line_spacing",
+  "out_of_plane_thickness_multiplier_applied": false,
+  "plane_strain_line_convention": "one_through_thickness_line_per_in_plane_source_position",
+  "schema": "v10.2.12_mechanics_derived_activation_line_source_normalization",
+  "shielding_attenuation_factor_fitted": false,
+  "source_capacity_bounds_per_system": [
+    [
+      1824.0,
+      18249.0
+    ],
+    [
+      1824.0,
+      18249.0
+    ]
+  ],
+  "source_region_length_m": 5e-05,
+  "source_sites_are_nucleation_opportunities": true
+}

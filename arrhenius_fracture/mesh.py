@@ -26,6 +26,10 @@ class TriMesh:
     dNdx_e: np.ndarray         # (ne, 2, 3) shape function gradients per element
     B_e: np.ndarray            # (ne, 3, 6) strain-displacement matrices
     hbar_tip: float = 0.0      # tip-local mean edge length (process-zone resolution)
+    # Optional P0 sharp-wake material state used by nested refinement.  When
+    # present, children inherit their parent's exact degradation instead of
+    # re-averaging a nodal visualization field.
+    element_damage_gp: np.ndarray | None = None
 
 
 @dataclass

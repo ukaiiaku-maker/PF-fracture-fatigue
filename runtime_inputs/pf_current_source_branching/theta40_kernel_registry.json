@@ -1,0 +1,16 @@
+{
+  "schema": "v10.2.27_kernel_registry_v1",
+  "entries": [],
+  "recipes": [],
+  "policy": {
+    "default_resolution": "recalculate_from_current_mechanical_configuration",
+    "historical_reference_condition_required": false,
+    "portable_archives_are_optional_cache_accelerators": true,
+    "portable_archives_are_required_inputs": false,
+    "legacy_archives_without_configuration_fingerprint_are_rejected": true,
+    "target_extension_is_coverage_not_configuration_identity": true,
+    "single_front_missing_kernel_action": "direct_prescribed_geometry_recalculation",
+    "branching_missing_kernel_action": "live_exact_topology_fem_after_branch_birth"
+  },
+  "notes": "Capability-only theta40 registry; it does not modify the canonical family registry."
+}

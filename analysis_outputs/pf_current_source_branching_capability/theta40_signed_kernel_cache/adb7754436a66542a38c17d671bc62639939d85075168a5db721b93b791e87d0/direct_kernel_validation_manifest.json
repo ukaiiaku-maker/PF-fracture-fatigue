@@ -1,0 +1,46 @@
+{
+  "configuration_fingerprint": "adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0",
+  "direct_prescribed_geometry": true,
+  "family": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/family.json",
+  "family_physics_fingerprint": "0e1fc4dc3d808f5e0e2c94e9813f12047e2a4497519e05c1a018a33e92ab797b",
+  "family_sha256": "b109a2fd6fc393fc986b1f15d6edd7c37366d84c111710ea70bcaba75f426847",
+  "fracture_hazard_imported_or_invoked": false,
+  "hazard_seed_independent_by_construction": true,
+  "load_invariance_passed": true,
+  "load_invariance_reports": [
+    {
+      "maximum_relative_load_variation": 2.0048386183955184e-12,
+      "maximum_within_load_relative_spread": 3.004392110974358e-10,
+      "path": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/load_invariance/E0000000/frozen_geometry_load_invariance.json",
+      "sha256": "694a314e7122a9aeb4b76f623ccd1be2f43d82ca00db2ea913fe4b0b77453314"
+    },
+    {
+      "maximum_relative_load_variation": 2.6671066721270026e-12,
+      "maximum_within_load_relative_spread": 1.0042323417619664e-10,
+      "path": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/load_invariance/E0000200/frozen_geometry_load_invariance.json",
+      "sha256": "6945b6f1e0b368ab65bec682bf9f314aa33c4da6641ee288ca377592c1ae9068"
+    },
+    {
+      "maximum_relative_load_variation": 3.629388634122761e-12,
+      "maximum_within_load_relative_spread": 1.652333356195757e-10,
+      "path": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/load_invariance/E0000400/frozen_geometry_load_invariance.json",
+      "sha256": "94d457cbe99263c8eebf1ab079522d48eb960d4ecd0a07a6a16e1b651139ef55"
+    },
+    {
+      "maximum_relative_load_variation": 3.622238326448639e-12,
+      "maximum_within_load_relative_spread": 6.737125439640613e-11,
+      "path": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/load_invariance/E0000415/frozen_geometry_load_invariance.json",
+      "sha256": "7810f77c0fa8c610219b2eeb9a0b86335779c9ece8cc7964f003df88156b4b35"
+    }
+  ],
+  "material_option_independent_by_construction": true,
+  "moving_process_zone_imported_or_invoked": false,
+  "passed": true,
+  "positive_negative_multi_amplitude_linearity_passed": true,
+  "prior_family_independent_by_construction": true,
+  "schema": "v10.2.28_direct_kernel_validation_v1",
+  "source_emission_imported_or_invoked": false,
+  "state_count": 4,
+  "stochastic_event_independent_by_construction": true,
+  "temperature_independent_when_elasticity_fixed": true
+}

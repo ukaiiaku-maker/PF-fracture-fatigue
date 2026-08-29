@@ -1,0 +1,169 @@
+{
+  "direct_prescribed_geometry": true,
+  "elasticity": {
+    "C11_Pa": 523000000000.0,
+    "C12_Pa": 203000000000.0,
+    "C44_Pa": 160000000000.0,
+    "equivalent_E_Pa": 409476584022.0386,
+    "equivalent_nu": 0.2796143250688705,
+    "zener_ratio": 1.0
+  },
+  "fracture_hazard_advanced": false,
+  "hazard_seed_required": false,
+  "material_parameter_option_required": false,
+  "mechanical_configuration": {
+    "active_station_policy_id": "v10.2.14_exact_first_last_active_stations",
+    "atlas_anchor_spacing_m": 0.0002,
+    "boundary_condition_id": "v10.2.27_mode_I_displacement",
+    "branching_mode": "single_front",
+    "crystal_C11_Pa": 523000000000.0,
+    "crystal_C12_Pa": 203000000000.0,
+    "crystal_C44_Pa": 160000000000.0,
+    "da_phys_m": 5e-06,
+    "elasticity_policy": "cubic_plane_strain_explicit_constants",
+    "extra": {
+      "burgers_m": 2.74e-10,
+      "geometry_anchor_source": "direct_prescription_not_stochastic_capture",
+      "hazard_seed_required": false,
+      "kinetic_packet_length_m": 2.5e-10,
+      "material_parameter_option_required": false,
+      "prescribed_crack_path_policy": "forward_100_cleavage_trace",
+      "prior_kernel_family_required": false
+    },
+    "front_direction_convention": "v10.2.27_front_direction_fix",
+    "initial_crack_length_m": 0.0005,
+    "interaction_length_m": 2e-06,
+    "kernel_provider_id": "v10.2.28_direct_prescribed_geometry_fem_v1",
+    "maximum_fronts": 1,
+    "measurement_mesh_policy_id": "v10.2.28_direct_prescribed_geometry_endpoint_mesh",
+    "measurement_tip_h_fine_m": 7.812500000000001e-09,
+    "measurement_tip_ratio": 1.2,
+    "mechanics_backend": "v10.2.28_sharp_front_fem_direct_kernel",
+    "mesh_nx": 36,
+    "mesh_ny": 72,
+    "mesh_policy_id": "v10.2.28_production_evolution_plus_direct_measurement_mesh",
+    "minimum_elements_per_process_zone": 3.0,
+    "nominal_crack_angle_deg": 0.0,
+    "normalization_policy": "v10.2.28_unchanged_code_defined_activation_line_conversion",
+    "notch_half_thickness_m": 8e-05,
+    "process_zone_bins": 80,
+    "process_zone_length_m": 5e-05,
+    "process_zone_policy_id": "dynamic_tip_radius_physical_front_width",
+    "profile_id": "v10_2_28_direct_prescribed_geometry_single_front",
+    "schema": "v10.2.27_mechanical_kernel_configuration_v6",
+    "signed_channel_convention": "v10.2.27_signed_mobile_retained_channels",
+    "specimen_geometry_id": "v10.2.27_rectangular_single_edge_notch",
+    "specimen_length_x_m": 0.002,
+    "specimen_length_y_m": 0.004,
+    "temperature_K": null,
+    "temperature_dependent_mechanics": false,
+    "theta_deg": 40.0,
+    "tip_h_fine_m": 1e-06,
+    "tip_ratio": 1.2
+  },
+  "mechanical_configuration_fingerprint": "adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0",
+  "model_id": "v10.2.28_direct_prescribed_geometry_fem_states_v1",
+  "moving_process_zone_advanced": false,
+  "prior_kernel_family_required": false,
+  "production_physics_modified": false,
+  "schema": "v10.2.28_prescribed_geometry_snapshot_manifest_v1",
+  "source_emission_advanced": false,
+  "state_count": 4,
+  "states": [
+    {
+      "crack_direction": [
+        0.7660444431189781,
+        0.6427876096865394
+      ],
+      "crack_extension_m": 0.0,
+      "crack_tip_xy_m": [
+        0.0005,
+        0.0
+      ],
+      "damage_construction": {
+        "ahead_of_tip_damaged_nodes": 0,
+        "crack_band_half_width_m": 0.0,
+        "extended_crack_elements": 0,
+        "extended_crack_nodes": 0
+      },
+      "measurement_mesh_hbar_tip_m": 1.27279959168987e-08,
+      "mesh_elements": 3708,
+      "mesh_nodes": 1915,
+      "snapshot": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/prescribed_geometry_snapshots/E0000000/snapshot.json",
+      "state_id": "E0000000"
+    },
+    {
+      "crack_direction": [
+        0.7660444431189781,
+        0.6427876096865394
+      ],
+      "crack_extension_m": 0.0002,
+      "crack_tip_xy_m": [
+        0.0006532088886237956,
+        0.0001285575219373079
+      ],
+      "damage_construction": {
+        "ahead_of_tip_candidates_removed": 0,
+        "ahead_of_tip_damaged_nodes": 0,
+        "crack_band_half_width_m": 7.000397754293799e-09,
+        "crack_representation": "element_intersection_supported_nodal_stiffness_kill",
+        "extended_crack_elements": 138,
+        "extended_crack_nodes": 24
+      },
+      "measurement_mesh_hbar_tip_m": 1.2727995916897815e-08,
+      "mesh_elements": 3710,
+      "mesh_nodes": 1916,
+      "snapshot": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/prescribed_geometry_snapshots/E0000200/snapshot.json",
+      "state_id": "E0000200"
+    },
+    {
+      "crack_direction": [
+        0.7660444431189781,
+        0.6427876096865394
+      ],
+      "crack_extension_m": 0.0004,
+      "crack_tip_xy_m": [
+        0.0008064177772475913,
+        0.0002571150438746158
+      ],
+      "damage_construction": {
+        "ahead_of_tip_candidates_removed": 0,
+        "ahead_of_tip_damaged_nodes": 0,
+        "crack_band_half_width_m": 7.000397754294863e-09,
+        "crack_representation": "element_intersection_supported_nodal_stiffness_kill",
+        "extended_crack_elements": 144,
+        "extended_crack_nodes": 24
+      },
+      "measurement_mesh_hbar_tip_m": 1.272799591689975e-08,
+      "mesh_elements": 3708,
+      "mesh_nodes": 1915,
+      "snapshot": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/prescribed_geometry_snapshots/E0000400/snapshot.json",
+      "state_id": "E0000400"
+    },
+    {
+      "crack_direction": [
+        0.7660444431189781,
+        0.6427876096865394
+      ],
+      "crack_extension_m": 0.00041500000000000006,
+      "crack_tip_xy_m": [
+        0.0008179084438943759,
+        0.0002667568580199139
+      ],
+      "damage_construction": {
+        "ahead_of_tip_candidates_removed": 0,
+        "ahead_of_tip_damaged_nodes": 0,
+        "crack_band_half_width_m": 7.000397754294865e-09,
+        "crack_representation": "element_intersection_supported_nodal_stiffness_kill",
+        "extended_crack_elements": 142,
+        "extended_crack_nodes": 24
+      },
+      "measurement_mesh_hbar_tip_m": 1.2727995916899753e-08,
+      "mesh_elements": 3708,
+      "mesh_nodes": 1915,
+      "snapshot": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/prescribed_geometry_snapshots/E0000415/snapshot.json",
+      "state_id": "E0000415"
+    }
+  ],
+  "stochastic_trajectory_required": false
+}

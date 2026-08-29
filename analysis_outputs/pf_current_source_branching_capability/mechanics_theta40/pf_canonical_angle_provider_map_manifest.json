@@ -1,0 +1,38 @@
+{
+  "maps": [
+    {
+      "bounds_policy": "FAIL_CLOSED_NO_EXTRAPOLATION_BEYOND_RECORDED_EXTENSION",
+      "candidate_independent": true,
+      "coordinate_definition": "laboratory_x_projected_extension_along_horizontal_forward_100_cleavage_trace",
+      "event_count": 64,
+      "forward_cosine": 1.0,
+      "interpolation_uncertainty_method": "leave_one_geometry_event_out_linear_midpoint_relative_error",
+      "load_linearity_check_count": 30,
+      "load_scaling_passed": true,
+      "maximum_interpolation_relative_error_by_quantity": {
+        "elastic_energy_J_per_m": 0.009485867485564707,
+        "native_J_J_per_m2": 0.020543567347866012,
+        "native_KJ_MPa_sqrt_m": 0.010196734973121289,
+        "reaction_N_per_m": 0.009485867485566077
+      },
+      "maximum_load_scaling_relative_error": 7.980489955135959e-15,
+      "maximum_projected_extension_um": 320.0,
+      "mechanics_map": "analysis_outputs/pf_current_source_branching_capability/mechanics_theta40/pf_v2_theta40_mechanics_map.csv",
+      "mechanics_map_sha256": "7bb670f8707b98f0abd6b0e2b6f443bb36b06fee87a333fa771a278bff320d03",
+      "mechanics_semantics": "PF_MODEL_NATIVE_PRODUCTION_DISCRETE_SHARP_WAKE_NOT_CONTINUUM_G",
+      "no_extrapolation": true,
+      "prescribed_crack_path_policy": "forward_100_cleavage_trace",
+      "projected_event_increment_um": 5.0,
+      "source_drive_map": "analysis_outputs/pf_current_source_branching_capability/mechanics_theta40/pf_v2_theta40_source_drive_map.csv",
+      "source_drive_map_sha256": "fc54d27733bbf087285a8f7f48ab6a152c938f72a4290b205257d6659e1b91fc",
+      "theta_deg": 40.0,
+      "tip_radius_bounds_um": [
+        1.0,
+        50.0
+      ]
+    }
+  ],
+  "physical_source_commit": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+  "schema": "pf_canonical_angle_provider_maps_v1",
+  "target_projected_extension_um": 320.0
+}
