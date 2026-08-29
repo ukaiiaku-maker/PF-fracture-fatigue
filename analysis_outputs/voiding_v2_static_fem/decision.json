@@ -1,0 +1,105 @@
+{
+  "schema": "voiding-v2-static-fem-decision/1",
+  "EXPLICIT_VOID_MECHANICS_QUALIFIED": "OPEN",
+  "reason": "one or more computed checks failed or remain OPEN",
+  "checks": [
+    {
+      "metric": "actual_cavity_components",
+      "value": 1,
+      "tolerance": 1,
+      "relation": "equal",
+      "status": "PASS",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+    },
+    {
+      "metric": "triangle_disk_intersections",
+      "value": 0,
+      "tolerance": 0,
+      "relation": "equal",
+      "status": "PASS",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+    },
+    {
+      "metric": "free_residual_relative",
+      "value": 3.0355554887929297e-14,
+      "tolerance": 1e-10,
+      "relation": "max",
+      "status": "PASS",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+    },
+    {
+      "metric": "traction_l2_normalized",
+      "value": 0.08867786333661015,
+      "tolerance": 0.1,
+      "relation": "max",
+      "status": "PASS",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+    },
+    {
+      "metric": "Kirsch_SC_error",
+      "value": 0.018921468671681502,
+      "tolerance": 0.1,
+      "relation": "max",
+      "status": "PASS",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+    },
+    {
+      "metric": "minimum_angle_deg",
+      "value": 11.258303200892477,
+      "tolerance": 10,
+      "relation": "min",
+      "status": "PASS",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+    },
+    {
+      "metric": "offset_mirror_tip_probe_relative",
+      "value": 0.0015202987623137393,
+      "tolerance": 0.02,
+      "relation": "max",
+      "status": "PASS",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+    },
+    {
+      "metric": "far_void_tip_probe_relative_error",
+      "value": 0.8166960262849974,
+      "tolerance": 0.1,
+      "relation": "max",
+      "status": "FAIL",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+    },
+    {
+      "metric": "virtual_derivative_mesh_and_step_convergence",
+      "value": "NOT_RUN",
+      "tolerance": "required",
+      "relation": "",
+      "status": "OPEN",
+      "calculation_source": "executed V2 static FEM runner",
+      "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+      "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a"
+    }
+  ],
+  "git_sha": "a37613268a2eb98111f8fe0f49598ca6218dba5a",
+  "solver_identity": "arrhenius_fracture.fem.production_CST_plane_strain",
+  "not_run": {
+    "production_crack_void_topology": "OUT_OF_SCOPE",
+    "stochastic_lifecycle_integration": "OUT_OF_SCOPE",
+    "promotion_and_resolved_growth": "OUT_OF_SCOPE",
+    "fatigue": "OUT_OF_SCOPE"
+  }
+}

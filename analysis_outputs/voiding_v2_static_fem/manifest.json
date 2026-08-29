@@ -1,0 +1,30 @@
+{
+  "schema": "voiding-v2-artifacts/1",
+  "files": [
+    {
+      "path": "acceptance_checks.csv",
+      "sha256": "d01202b467fdf899eadc40008cdb9d532ace4dbaa2851ae9386951e59ac5c63e",
+      "bytes": 1682
+    },
+    {
+      "path": "circular_hole_fem_convergence.csv",
+      "sha256": "1247ab77a61635a3cccce1956c32a81a1296b8e7f4ef3ed5ae95392893186227",
+      "bytes": 1780
+    },
+    {
+      "path": "decision.json",
+      "sha256": "c89faf046028b4fcc5a7706acc9b4e5318e3735b6042dfba5867cd03ff1d8ba2",
+      "bytes": 3804
+    },
+    {
+      "path": "prescribed_crack_void_interaction.csv",
+      "sha256": "cf1200b999baff16239137bffc2ff0428b527162b52462953340c45a9836004e",
+      "bytes": 3597
+    },
+    {
+      "path": "virtual_energy_derivatives.csv",
+      "sha256": "42a884d9a1d79f0458aa1cde04c7037fe05b9f449296363846051a834079e75d",
+      "bytes": 447
+    }
+  ]
+}
