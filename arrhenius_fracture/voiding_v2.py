@@ -398,7 +398,8 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
                       *, crack_tip_m: Optional[tuple[float,float]]=None,
                       wake_half_width_m: float=0.0,
                       symmetric_rigid_constraint: bool=True,
-                      element_kill_mask: Optional[np.ndarray]=None) -> StaticFEMResult:
+                      element_kill_mask: Optional[np.ndarray]=None,
+                      rigid_pin_node: Optional[int]=None) -> StaticFEMResult:
     """Use the unmodified production CST assembly and displacement solver."""
     mat=mat or ElasticProperties(E=210e9,nu=0.3)
     mesh=hole.mesh
@@ -417,7 +418,9 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
     prescribed=np.zeros(mesh.ndof,bool)
     prescribed[2*hole.boundary.top_nodes+1]=True; prescribed[2*hole.boundary.bot_nodes+1]=True
     if symmetric_rigid_constraint:
-        mid=int(np.argmin((mesh.nodes[:,0]-np.mean(mesh.nodes[:,0]))**2+mesh.nodes[:,1]**2))
+        mid=(int(rigid_pin_node) if rigid_pin_node is not None else
+             int(np.argmin((mesh.nodes[:,0]-np.mean(mesh.nodes[:,0]))**2+mesh.nodes[:,1]**2)))
+        if not 0<=mid<mesh.nn: raise ValueError("rigid_pin_node is outside the mesh")
         prescribed[2*mid]=True
         u_pres=np.zeros(mesh.ndof); u_pres[2*hole.boundary.top_nodes+1]=opening_m/2
         u_pres[2*hole.boundary.bot_nodes+1]=-opening_m/2

@@ -144,6 +144,7 @@ def compute_signed_interaction_integral(
     exclude_radius: float = 0.0,
     D: np.ndarray | None = None,
     isotropy_relative_tolerance: float = 1.0e-8,
+    exclude_element_mask: np.ndarray | None = None,
 ) -> InteractionIntegralResult:
     """Evaluate signed KI/KII using elastic constants consistent with ``D``."""
     if D is None:
@@ -178,6 +179,7 @@ def compute_signed_interaction_integral(
         exclude_radius=exclude_radius,
         D=fit.reconstructed_D,
         isotropy_relative_tolerance=isotropy_relative_tolerance,
+        exclude_element_mask=exclude_element_mask,
     )
     diagnostics = {
         **underlying.diagnostics,

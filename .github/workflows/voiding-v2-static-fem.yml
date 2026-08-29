@@ -4,6 +4,9 @@ on:
     paths:
       - "arrhenius_fracture/voiding_v2.py"
       - "scripts/qualify_voiding_v2_static_fem.py"
+      - "scripts/qualify_voiding_v2_causal_static.py"
+      - "arrhenius_fracture/interaction_integral_v1029.py"
+      - "arrhenius_fracture/interaction_integral_v10214.py"
       - "tests/test_voiding_v2.py"
       - ".github/workflows/voiding-v2-static-fem.yml"
   workflow_dispatch:
@@ -30,5 +33,7 @@ jobs:
           tests/test_topology_transaction_v11.py
           tests/test_interaction_integral_v1029.py
           tests/test_v10214_intrinsic_isotropy_interaction.py
-      - run: python scripts/qualify_voiding_v2_static_fem.py --out /tmp/voiding-v2-static-fem
+      - run: python scripts/qualify_voiding_v2_causal_static.py --out /tmp/voiding-v2-causal-static-a
+      - run: python scripts/qualify_voiding_v2_causal_static.py --out /tmp/voiding-v2-causal-static-b
+      - run: diff -rq /tmp/voiding-v2-causal-static-a /tmp/voiding-v2-causal-static-b
       - run: git diff --exit-code

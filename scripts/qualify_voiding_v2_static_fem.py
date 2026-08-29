@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Fail-closed V2 static explicit-cavity mechanics qualification."""
+"""Superseded centroid-band diagnostic retained for evidence reproduction.
+
+This file is not an authoritative qualification path.  New gate decisions are
+produced by ``qualify_voiding_v2_causal_static.py`` using the V11 causal wake.
+"""
 from __future__ import annotations
 
 import argparse, csv, hashlib, json, math, platform, subprocess, sys

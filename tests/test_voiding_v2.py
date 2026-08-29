@@ -3,6 +3,9 @@ import math
 
 import numpy as np
 import pytest
+from pathlib import Path
+from arrhenius_fracture.causal_sharp_wake_v11 import causal_segment_support
+from scripts.qualify_voiding_v2_causal_static import causal_mask, contour
 
 from arrhenius_fracture.voiding_v2 import (
     Clock, LifecycleRates, Registry, Site, SiteState, VoidingV2Config,
@@ -122,3 +125,29 @@ def test_fixed_wake_mask_shape_is_fail_closed():
     with pytest.raises(ValueError,match="one entry per element"):
         solve_static_hole(hole,8e-6,crack_tip_m=(.002,0),wake_half_width_m=1e-4,
                           element_kill_mask=np.zeros(hole.mesh.ne-1,bool))
+
+
+def test_authoritative_runner_has_no_centroid_band_crack_path():
+    source=Path("scripts/qualify_voiding_v2_causal_static.py").read_text()
+    assert "causal_segment_support" in source
+    assert "WAKE_HALF_WIDTH" not in source
+    assert "effective_crack_tip" not in source
+
+
+def test_v2_causal_mask_exactly_equals_v11_selector_and_inadmissible_contour_fails():
+    hole=build_explicit_hole_mesh(.008,.008,(.004,0),.00025,1e-4,96)
+    control=fill_explicit_hole_mesh(hole); p0=np.array((.0005,0.)); p1=np.array((.002,0.))
+    expected,_=causal_segment_support(control.mesh,p0,p1); mask,audit=causal_mask(control.mesh,p1)
+    np.testing.assert_array_equal(np.flatnonzero(mask),expected)
+    assert audit["physical_crack_length_m"] == pytest.approx(np.linalg.norm(p1-p0))
+    result=solve_static_hole(control,8e-6,crack_tip_m=tuple(p1),element_kill_mask=mask)
+    assert contour(control.mesh,result,mask,p1,.003)["status"] == "NOT_ADMISSIBLE_AT_CURRENT_RESOLUTION"
+
+
+def test_symmetric_rigid_pin_location_changes_only_translation():
+    hole=build_explicit_hole_mesh(.008,.008,(.004,0),.0005,2e-4,48)
+    mid=np.where(np.isclose(hole.mesh.nodes[:,1],0,atol=1e-14))[0]
+    first=solve_static_hole(hole,8e-6,rigid_pin_node=int(mid[0]))
+    second=solve_static_hole(hole,8e-6,rigid_pin_node=int(mid[-1]))
+    np.testing.assert_allclose(first.sigma_gp,second.sigma_gp,rtol=2e-10,atol=1e-2)
+    assert first.stored_energy_J_per_m == pytest.approx(second.stored_energy_J_per_m,rel=2e-12)
