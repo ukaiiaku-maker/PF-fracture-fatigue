@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Voiding V1 state",
+  "type": "object",
+  "required": [
+    "config",
+    "sites",
+    "cavities",
+    "ledger",
+    "transaction_id",
+    "event_history"
+  ],
+  "properties": {
+    "config": {
+      "type": "object"
+    },
+    "sites": {
+      "type": "object"
+    },
+    "cavities": {
+      "type": "object"
+    },
+    "ledger": {
+      "type": "object"
+    },
+    "transaction_id": {
+      "type": "integer"
+    },
+    "event_history": {
+      "type": "array"
+    }
+  }
+}

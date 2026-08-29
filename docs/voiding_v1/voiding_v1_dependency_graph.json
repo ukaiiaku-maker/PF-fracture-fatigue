@@ -1,0 +1,6 @@
+{
+  "schema_version": "voiding-v1-dependencies-1.0",
+  "nodes": ["VoidingConfig", "VoidRegistry", "FirstPassageState", "VoidSite", "Cavity", "VoidTransaction", "mesh.Delaunay", "mesh.rebuild_tri_mesh", "fem.CST_plane_strain", "sharp_front_existing_cleavage_barrier"],
+  "edges": [["VoidingConfig", "VoidRegistry"], ["VoidRegistry", "VoidSite"], ["VoidRegistry", "Cavity"], ["VoidSite", "FirstPassageState"], ["VoidTransaction", "VoidRegistry"], ["mesh.Delaunay", "Cavity"], ["mesh.rebuild_tri_mesh", "Cavity"], ["Cavity", "fem.CST_plane_strain"], ["sharp_front_existing_cleavage_barrier", "Cavity"]],
+  "new_third_party_dependencies": []
+}

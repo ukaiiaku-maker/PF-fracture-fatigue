@@ -1,0 +1,47 @@
+{
+  "schema": "1.0",
+  "rows": [
+    {
+      "boundary_segments": 24,
+      "area_m2": 0.7764571353075621,
+      "area_relative_error": 0.011384070534630971,
+      "perimeter_m": 3.1326286132812378,
+      "perimeter_relative_error": 0.0028533426503631666,
+      "element_count": 1212,
+      "minimum_quality": 0.6552066617062916,
+      "maximum_aspect_ratio": 2.338263604215425,
+      "no_triangles_inside": true,
+      "closed_boundary_components": 1,
+      "traction_bc": "NATURAL_ZERO_TRACTION",
+      "topology_fingerprint": "de207bb6b3f59b4dab766b48ff71446d03eef8eae93798d1aaf50d7dbdfea853"
+    },
+    {
+      "boundary_segments": 48,
+      "area_m2": 0.7831571533203094,
+      "area_relative_error": 0.0028533426503631666,
+      "perimeter_m": 3.1393502030468676,
+      "perimeter_relative_error": 0.0007137941770913921,
+      "element_count": 1236,
+      "minimum_quality": 0.5437268038647403,
+      "maximum_aspect_ratio": 3.004969505449686,
+      "no_triangles_inside": true,
+      "closed_boundary_components": 1,
+      "traction_bc": "NATURAL_ZERO_TRACTION",
+      "topology_fingerprint": "72c427b6f00f0582486a15071bfb54bf3f8578387c3924e4e1fc09fa223a83c5"
+    },
+    {
+      "boundary_segments": 96,
+      "area_m2": 0.7848375507617169,
+      "area_relative_error": 0.0007137941770913921,
+      "perimeter_m": 3.1410319508905093,
+      "perimeter_relative_error": 0.00017847721239195978,
+      "element_count": 1284,
+      "minimum_quality": 0.2940085916684875,
+      "maximum_aspect_ratio": 5.784247457185284,
+      "no_triangles_inside": true,
+      "closed_boundary_components": 1,
+      "traction_bc": "NATURAL_ZERO_TRACTION",
+      "topology_fingerprint": "2764448b0b6cdd33e86ead86d5180f52b0f1ff366c671a4aaa6aa576ba2a2577"
+    }
+  ]
+}
