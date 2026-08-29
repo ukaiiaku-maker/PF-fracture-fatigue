@@ -28,5 +28,7 @@ jobs:
           tests/test_live_topology_kernel_v11.py
           tests/test_crack_network_v11.py
           tests/test_topology_transaction_v11.py
+          tests/test_interaction_integral_v1029.py
+          tests/test_v10214_intrinsic_isotropy_interaction.py
       - run: python scripts/qualify_voiding_v2_static_fem.py --out /tmp/voiding-v2-static-fem
       - run: git diff --exit-code

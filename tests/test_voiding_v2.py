@@ -90,7 +90,8 @@ def test_actual_connectivity_derived_hole_invariants(h,n):
     v=hole.validation
     assert v["actual_internal_components"] == 1 and v["cavity_cycle"]
     assert v["triangle_disk_intersections"] == 0 and v["orphan_nodes"] == 0
-    assert v["polygon_match_max_radius_error_m"] < 1e-14
+    assert v["polygon_bidirectional_Hausdorff_m"] < 1e-14
+    assert v["polygon_exact_node_set_match"]
     assert len(hole.cavity_edges) == n
 
 
@@ -99,6 +100,10 @@ def test_production_fem_hole_solution_is_equilibrated_and_symmetric():
     result=solve_static_hole(hole,8e-6)
     assert result.free_residual_norm_N_per_m/result.reaction_top_N_per_m < 1e-12
     assert result.symmetry_error < 1e-12
+    assert result.weak_cavity_residual_relative < 1e-12
+    assert np.isfinite(result.mirror_sigma_xx_relative)
+    assert np.isfinite(result.mirror_sigma_yy_relative)
+    assert np.isfinite(result.mirror_sigma_xy_antisym_relative)
     assert np.isfinite(result.stored_energy_J_per_m) and result.stored_energy_J_per_m > 0
     assert 2.5 < result.hoop_stress_concentration < 3.5
 
@@ -110,3 +115,10 @@ def test_filled_control_preserves_every_element_outside_cavity_patch():
     assert np.array_equal(control.mesh.elems[:hole.mesh.ne],hole.mesh.elems)
     assert control.mesh.nn == hole.mesh.nn+1
     assert control.mesh.ne == hole.mesh.ne+len(hole.cavity_edges)
+
+
+def test_fixed_wake_mask_shape_is_fail_closed():
+    hole=build_explicit_hole_mesh(.008,.008,(.004,0),.00025,2e-4,48)
+    with pytest.raises(ValueError,match="one entry per element"):
+        solve_static_hole(hole,8e-6,crack_tip_m=(.002,0),wake_half_width_m=1e-4,
+                          element_kill_mask=np.zeros(hole.mesh.ne-1,bool))

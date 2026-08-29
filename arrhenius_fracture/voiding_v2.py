@@ -13,6 +13,7 @@ from enum import Enum
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 import numpy as np
+from scipy.sparse.linalg import spsolve
 from .config import ElasticProperties, GeometryConfig
 from .fem import assemble_mechanics, plane_strain_D, solve_dirichlet, stress_state
 from .mesh import BoundaryData, TriMesh, rebuild_tri_mesh
@@ -316,8 +317,9 @@ def build_explicit_hole_mesh(
         [edge for edge in boundary_edges if int(edge[0]) in exterior_nodes and int(edge[1]) in exterior_nodes],int)
     actual_xy=nodes[np.array(sorted(cavity_nodes))]
     prescribed_xy=nodes[np.arange(boundary_segments)]
-    radius_error=float(np.max(np.linalg.norm(
-        np.sort(actual_xy,axis=0)-np.sort(prescribed_xy,axis=0),axis=1)))
+    pairwise=np.linalg.norm(actual_xy[:,None,:]-prescribed_xy[None,:,:],axis=2)
+    radius_error=float(max(np.max(np.min(pairwise,axis=1)),np.max(np.min(pairwise,axis=0))))
+    exact_node_set=(cavity_nodes==set(range(boundary_segments)))
     degrees={n:0 for n in cavity_nodes}
     for a,b in cavity_edges: degrees[int(a)]+=1; degrees[int(b)]+=1
     crossings=sum(triangle_intersects_open_disk(nodes[e],center_m,radius_m) for e in elems)
@@ -329,6 +331,7 @@ def build_explicit_hole_mesh(
     quality=4*np.sqrt(3)*area/np.maximum(np.sum(side**2,axis=1),1e-300)
     validation={"actual_internal_components":len(internal),"cavity_cycle":all(v==2 for v in degrees.values()),
                 "triangle_disk_intersections":int(crossings),"orphan_nodes":orphan,
+                "polygon_bidirectional_Hausdorff_m":radius_error,"polygon_exact_node_set_match":exact_node_set,
                 "polygon_match_max_radius_error_m":radius_error,"minimum_quality":float(quality.min()),
                 "maximum_aspect_ratio":float((side.max(axis=1)/side.min(axis=1)).max()),
                 "minimum_angle_deg":float(np.degrees(np.arccos(np.clip(
@@ -385,32 +388,49 @@ class StaticFEMResult:
     hoop_stress_concentration: float
     symmetry_error: float
     crack_tip_sigma_yy_Pa: float = math.nan
+    weak_cavity_residual_relative: float = math.nan
+    mirror_sigma_xx_relative: float = math.nan
+    mirror_sigma_yy_relative: float = math.nan
+    mirror_sigma_xy_antisym_relative: float = math.nan
 
 
 def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticProperties]=None,
                       *, crack_tip_m: Optional[tuple[float,float]]=None,
-                      wake_half_width_m: float=0.0) -> StaticFEMResult:
+                      wake_half_width_m: float=0.0,
+                      symmetric_rigid_constraint: bool=True,
+                      element_kill_mask: Optional[np.ndarray]=None) -> StaticFEMResult:
     """Use the unmodified production CST assembly and displacement solver."""
     mat=mat or ElasticProperties(E=210e9,nu=0.3)
     mesh=hole.mesh
     if crack_tip_m is not None:
         cent=mesh.nodes[mesh.elems].mean(axis=1)
-        killed=((cent[:,0] <= crack_tip_m[0]) &
-                (np.abs(cent[:,1]-crack_tip_m[1]) <= wake_half_width_m))
+        killed=(np.asarray(element_kill_mask,bool) if element_kill_mask is not None else
+                ((cent[:,0] <= crack_tip_m[0]) &
+                 (np.abs(cent[:,1]-crack_tip_m[1]) <= wake_half_width_m)))
+        if killed.shape!=(mesh.ne,): raise ValueError("element_kill_mask must have one entry per element")
         # The V11 production assembler's authoritative P0 sharp-wake channel.
         mesh=replace(mesh,element_damage_gp=killed.astype(float))
     D=plane_strain_D(mat)
     u=np.zeros(mesh.ndof); ep=np.zeros((3,mesh.ne)); rho=np.zeros(mesh.ne); damage=np.zeros(mesh.nn)
     kappa=1e-6 if crack_tip_m is not None else 0.0
     K,R,*_=assemble_mechanics(mesh,u,ep,rho,damage,D,mat,kappa=kappa)
-    u,reaction=solve_dirichlet(K,R,u,hole.boundary,opening_m/2,-opening_m/2)
+    prescribed=np.zeros(mesh.ndof,bool)
+    prescribed[2*hole.boundary.top_nodes+1]=True; prescribed[2*hole.boundary.bot_nodes+1]=True
+    if symmetric_rigid_constraint:
+        mid=int(np.argmin((mesh.nodes[:,0]-np.mean(mesh.nodes[:,0]))**2+mesh.nodes[:,1]**2))
+        prescribed[2*mid]=True
+        u_pres=np.zeros(mesh.ndof); u_pres[2*hole.boundary.top_nodes+1]=opening_m/2
+        u_pres[2*hole.boundary.bot_nodes+1]=-opening_m/2
+        free=~prescribed; u[free]=spsolve(K[np.ix_(free,free)],-R[free]-K[np.ix_(free,prescribed)]@u_pres[prescribed])
+        u[prescribed]=u_pres[prescribed]
+    else:
+        u,reaction=solve_dirichlet(K,R,u,hole.boundary,opening_m/2,-opening_m/2)
     K2,R2,*_=assemble_mechanics(mesh,u,ep,rho,damage,D,mat,kappa=kappa)
     sigma,*_=stress_state(mesh,u,ep,damage,D,mat,kappa=kappa)
     residual=R2.copy()
-    prescribed=np.zeros(mesh.ndof,bool)
-    prescribed[2*hole.boundary.top_nodes+1]=True; prescribed[2*hole.boundary.bot_nodes+1]=True
-    prescribed[2*hole.boundary.left_bot:2*hole.boundary.left_bot+2]=True
-    prescribed[2*hole.boundary.right_bot]=True
+    if not symmetric_rigid_constraint:
+        prescribed[2*hole.boundary.left_bot:2*hole.boundary.left_bot+2]=True
+        prescribed[2*hole.boundary.right_bot]=True
     free_norm=float(np.linalg.norm(residual[~prescribed]))
     top=float(np.sum(residual[2*hole.boundary.top_nodes+1])); bottom=float(np.sum(residual[2*hole.boundary.bot_nodes+1]))
     energy=float(0.5*u@(K2@u))
@@ -435,6 +455,23 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
     hoop_sc=(float(max(hoop)/max(remote,1e-300)) if hoop else math.nan)
     # Mirror-pair hoop samples after sorting by |x-cx|, y sign.
     symmetry=float(abs(top+bottom)/max(abs(top),1e-300))
+    cavity_nodes=np.unique(hole.cavity_edges) if len(hole.cavity_edges) else np.empty(0,int)
+    cavity_dofs=np.ravel(np.column_stack((2*cavity_nodes,2*cavity_nodes+1))) if len(cavity_nodes) else np.empty(0,int)
+    weak_cavity=(float(np.linalg.norm(residual[cavity_dofs]))/max(abs(top),1e-300)
+                 if len(cavity_dofs) else math.nan)
+    cent=mesh.nodes[mesh.elems].mean(axis=1)
+    try:
+        from scipy.spatial import cKDTree
+        mirrored=cent.copy(); mirrored[:,1]=2*float(np.mean(mesh.nodes[:,1]))-mirrored[:,1]
+        distance,pair=cKDTree(cent).query(mirrored)
+        scale=max(float(np.ptp(mesh.nodes[:,1])),1e-300)
+        valid=distance<=1e-6*scale
+        def mirror_error(component: int, sign: float) -> float:
+            lhs=sigma[component,valid]; rhs=sign*sigma[component,pair[valid]]
+            return float(np.linalg.norm(lhs-rhs)/max(np.linalg.norm(lhs),1e-300))
+        mirror_xx,mirror_yy,mirror_xy=mirror_error(0,1),mirror_error(1,1),mirror_error(2,-1)
+    except Exception:
+        mirror_xx=mirror_yy=mirror_xy=math.nan
     tip_sigma=math.nan
     if crack_tip_m is not None:
         cent=mesh.nodes[mesh.elems].mean(axis=1)
@@ -444,7 +481,7 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
             local=candidates[np.argmin(np.linalg.norm(cent[candidates]-np.asarray(crack_tip_m),axis=1))]
             tip_sigma=float(sigma[1,local])
     return StaticFEMResult(u,sigma,top,bottom,energy,compliance,free_norm,traction_norm,
-                           hoop_sc,symmetry,tip_sigma)
+                           hoop_sc,symmetry,tip_sigma,weak_cavity,mirror_xx,mirror_yy,mirror_xy)
 
 
 __all__ = ["Clock","HoleMesh","LifecycleRates","Registry","Site","SiteState",
