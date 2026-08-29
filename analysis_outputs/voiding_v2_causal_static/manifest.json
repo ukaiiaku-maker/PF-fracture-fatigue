@@ -1,0 +1,35 @@
+{
+  "schema": "voiding-v2-causal-static-artifacts/1",
+  "files": [
+    {
+      "path": "causal_crack_contours.csv",
+      "sha256": "b160b6dbf34eaba7cabf25c84aec0fd85e23dcedec7fa8f28f4ef39ed2f8ad20",
+      "bytes": 2468
+    },
+    {
+      "path": "causal_crack_derivatives.csv",
+      "sha256": "e16c34810ebd1263477e2c809db2b0567225c92f73ae52b1485810c658dd0c25",
+      "bytes": 2179
+    },
+    {
+      "path": "causal_support.csv",
+      "sha256": "1fe43ced9ea7f7db5c6717e33ced3a09ba8a6c7f5bd1a66a1281c5c1b8c565be",
+      "bytes": 2028
+    },
+    {
+      "path": "cavity_only.csv",
+      "sha256": "0e4ff9462aba48dd322279c365e9e37d42103c5cea4c0ab6c693a9efc4f45caa",
+      "bytes": 1168
+    },
+    {
+      "path": "decision.json",
+      "sha256": "07623a298ac204cf4028fbde053d923adab4f72da27254d9bc0589f17ac43084",
+      "bytes": 1109
+    },
+    {
+      "path": "environment.json",
+      "sha256": "cbaa2446c71bf7b5ab863a2f541f1e2892e69b26b9d8e7ef152b58a8668d659f",
+      "bytes": 96
+    }
+  ]
+}

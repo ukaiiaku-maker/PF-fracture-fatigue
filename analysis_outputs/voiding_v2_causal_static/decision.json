@@ -1,0 +1,24 @@
+{
+  "schema": "voiding-v2-causal-static-decision/1",
+  "EXPLICIT_CAVITY_ONLY_STATIC_FEM_QUALIFIED": "PASS",
+  "V11_CAUSAL_CRACK_ONLY_STATIC_FEM_QUALIFIED": "OPEN",
+  "PRESCRIBED_CAUSAL_CRACK_VOID_INTERACTION_QUALIFIED": "NOT_RUN_REQUIRES_CAUSAL_CRACK_ONLY_PASS",
+  "EXPLICIT_VOID_MECHANICS_QUALIFIED": "OPEN",
+  "causal_crack_checks": {
+    "contours_all_admissible": true,
+    "contour_KI_plateau_relative": 0.21292966238414085,
+    "centered_KII_over_KI": 7.354791699423807e-15,
+    "energy_compliance_error": 1.8799618137618213e-06,
+    "energy_interaction_error": 0.9225552756691324,
+    "perturbation_spread": 0.5642329829826944,
+    "mesh_spread": 0.0805314717446029,
+    "causal_support_distance_decreases": true
+  },
+  "superseded_diagnostic": {
+    "type": "CENTROID_BAND_EXTENSION_DERIVATIVE_NUMERICALLY_STABLE",
+    "status": "DIAGNOSTIC",
+    "evidence_commit": "f0e2959ecf1187685e9d7723b2b4314791f9c353"
+  },
+  "git_sha": "0066ea628bf806553e534b2f6dbd7be5dae9d073",
+  "solver_identity": "production CST assembly/constitutive law + benchmark symmetric rigid constraint + scipy.spsolve(SuperLU)"
+}
