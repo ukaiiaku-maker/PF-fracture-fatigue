@@ -16,6 +16,10 @@ from arrhenius_fracture.sharp_front_current_source_branching_audited import (
     validate,
 )
 from scripts.run_pf_current_source_branching_capability_pair import command
+from arrhenius_fracture.branching_qualification_v2 import (
+    branch_birth_mechanics, independent_tip_mechanics, morphology_capability,
+    two_axis_decision,
+)
 
 
 def _base_args(maximum_fronts: int) -> list[str]:
@@ -89,3 +93,37 @@ def test_current_transfer_inputs_are_frozen() -> None:
         "ab902b986f55dcd7993dc0d2d3f262885bc9ecdca14197d664df18e4fb9e0acd"
     )
     assert CLAIM_LABEL == "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS"
+
+
+def _qualified_morphology_gates() -> dict[str, bool]:
+    return {
+        "run_reached_300um": True, "committed_daughter_birth": True,
+        "daughter_non_stub_growth": True,
+        "no_cross_wake_bridge_or_reconnection": True,
+        "exact_length_topology_closure": True, "valid_cluster_bookkeeping": True,
+        "independent_handoff_when_required": True, "no_branch_cap_clipping": True,
+        "no_backward_growth": True, "birth_local_probes_reliable": True,
+        "hazard_rng_state_geometry_provenance": True,
+        "run_completed_without_fail_closed_exception": True,
+        "final_local_probes_reliable": False,
+    }
+
+
+def test_optional_final_handoff_probe_does_not_erase_morphology_success() -> None:
+    gates = _qualified_morphology_gates()
+    gates["cluster_unresolved"] = True
+    assert morphology_capability(gates)
+    assert not independent_tip_mechanics(gates)
+    decision = two_axis_decision(gates)
+    assert decision.morphology_capability_decision.endswith("DEMONSTRATED")
+    assert decision.independent_tip_mechanics_decision == "UNQUALIFIED_FINAL_LOCAL_CONTOURS"
+    assert decision.cluster_handoff_decision == "NOT_TRIGGERED_UNRESOLVED_CLUSTER"
+    assert decision.predictive_branching_physics_validated is False
+
+
+def test_birth_probe_reliability_remains_required() -> None:
+    gates = _qualified_morphology_gates()
+    assert branch_birth_mechanics(gates)
+    gates["birth_local_probes_reliable"] = False
+    assert not branch_birth_mechanics(gates)
+    assert not morphology_capability(gates)

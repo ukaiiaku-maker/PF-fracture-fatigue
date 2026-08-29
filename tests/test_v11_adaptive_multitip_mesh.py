@@ -7,7 +7,7 @@ from arrhenius_fracture.adaptive_multitip_mesh_v11 import (
     _subdivide, active_tip_hbar, adapt_accepted_state_for_trials,
     diagnose_underresolved_trial_geometry,
     mark_multitip_trial_support, mark_underresolved_trial_geometry,
-    mesh_fingerprint, refine_accepted_state,
+    mesh_fingerprint, refine_accepted_state, zero_visibility_reasons,
 )
 import pytest
 from arrhenius_fracture.config import ElasticProperties
@@ -237,3 +237,14 @@ def test_nested_refinement_genuine_nonprogress_still_fails_closed():
     guard.observe(marked_area_m2=1.0, maximum_metric_m=2.0, maximum_tip_hbar_m=3.0)
     with pytest.raises(RuntimeError, match="nested_refinement_no_measurable_progress"):
         guard.observe(marked_area_m2=1.0, maximum_metric_m=2.0, maximum_tip_hbar_m=3.0)
+
+
+def test_fully_damaged_causal_support_has_reason_specific_class_A_veto():
+    state, candidates = fixture_state(damage_value=1.0)
+    reasons = zero_visibility_reasons(
+        state, {"b00000000": tuple(candidates)}, da_phys_m=0.1,
+    )
+    assert reasons
+    assert set(reasons.values()) == {
+        "candidate_segment_already_in_committed_wake_material"
+    }

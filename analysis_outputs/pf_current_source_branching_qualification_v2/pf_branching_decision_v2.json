@@ -1,0 +1,113 @@
+{
+  "asymmetric_cluster_design": {
+    "decision": "FUTURE_MODEL_LIMITATION_NO_SEMANTIC_PATCH",
+    "long_arm_independent_resolution_supported_by_current_state_model": false,
+    "short_arm_retirement_rule_found_in_source": false,
+    "theta40_daughter_lengths_um": [
+      30.00000000000015,
+      295.0000000000008
+    ],
+    "why_unresolved": "the all-arm handoff guard requires every arm to satisfy length and independent-local-J gates"
+  },
+  "branch_birth_mechanics_decision": "QUALIFIED_POSITIVE_SIGNED_J_AT_BIRTH",
+  "claim_label": "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS",
+  "cluster_handoff_decision": "NOT_TRIGGERED_UNRESOLVED_CLUSTER",
+  "independent_tip_mechanics_decision": "UNQUALIFIED_FINAL_LOCAL_CONTOURS",
+  "local_contour_audit": {
+    "final_failure_classification": "absence_of_15_percent_numerical_plateau",
+    "last_all_tip_reliable_projected_extension_um": 275.4247497809147,
+    "last_all_tip_reliable_step": 2147,
+    "selected_states": [
+      {
+        "accepted_step": 369,
+        "all_tip_local_contours_valid": false,
+        "projected_extension_um": 80.08341678557447,
+        "roles": [
+          "branch_birth_accepted_state"
+        ]
+      },
+      {
+        "accepted_step": 774,
+        "all_tip_local_contours_valid": true,
+        "projected_extension_um": 271.59452756531977,
+        "roles": [
+          "waiting_interval_start_271p595um"
+        ]
+      },
+      {
+        "accepted_step": 2147,
+        "all_tip_local_contours_valid": true,
+        "projected_extension_um": 275.4247497809147,
+        "roles": [
+          "last_all_tip_reliable_before_late_burst",
+          "waiting_interval_last_archived_state"
+        ]
+      },
+      {
+        "accepted_step": 2151,
+        "all_tip_local_contours_valid": false,
+        "projected_extension_um": 275.4247497809147,
+        "roles": [
+          "first_late_burst_archive"
+        ]
+      },
+      {
+        "accepted_step": 2182,
+        "all_tip_local_contours_valid": false,
+        "projected_extension_um": 302.23630529007903,
+        "roles": [
+          "final_accepted_state"
+        ]
+      }
+    ]
+  },
+  "morphology_capability_decision": "CURRENT_SOURCE_BRANCHING_MORPHOLOGY_CAPABILITY_DEMONSTRATED",
+  "orientation_specific_diagnostic_decisions": {
+    "theta40": {
+      "final_independent_tip_mechanics": "UNQUALIFIED",
+      "final_local_contour_failure": "absence_of_15_percent_numerical_plateau",
+      "morphology": "DEMONSTRATED"
+    },
+    "theta45": {
+      "birth_local_mechanics": "UNQUALIFIED",
+      "morphology": "INCOMPLETE_FAIL_CLOSED",
+      "visibility_failure_class": "A_COMMITTED_WAKE_MATERIAL"
+    }
+  },
+  "predictive_branching_physics_validated": false,
+  "schema": "pf_current_source_branching_decision_v2",
+  "shared_state_update_audit": {
+    "all_archived_spans_pass": true,
+    "duplicated_shared_updates_detected": false,
+    "proof": "delta_shared_state_updates_equals_delta_accepted_steps_for_every_archived_span",
+    "waiting_interval_archive_limitation": "No process-state checkpoint exists strictly between the 271.595-um archive and the next archived state; internal formation timing is unresolved."
+  },
+  "theta45_visibility_audit": {
+    "accepted_state_hash_after": "1a12fb2c2d546ebc96b32b29090b0d22941bdf2af4b456ea23fd6ac2626a9376",
+    "accepted_state_hash_before": "1a12fb2c2d546ebc96b32b29090b0d22941bdf2af4b456ea23fd6ac2626a9376",
+    "accepted_state_unchanged": true,
+    "classification": "A_COMMITTED_WAKE_MATERIAL",
+    "frozen_failure_message": "candidate_segment_already_in_committed_wake_material: b7ad021ada7289d0|cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+    "physical_time_advanced": false,
+    "reason_specific_fail_closed_veto": "candidate_segment_already_in_committed_wake_material",
+    "refinement_level_count": 5,
+    "rng_consumed": false,
+    "rng_hash_after": "270babb5fccc8e4b16202c06447ab50a7bd23aff2331503409a7bf972bb435d0",
+    "rng_hash_before": "270babb5fccc8e4b16202c06447ab50a7bd23aff2331503409a7bf972bb435d0",
+    "rng_unchanged": true,
+    "visibility_refinement_permitted": false
+  },
+  "v1_decision_file": "/private/tmp/current-source-weakT-branching-capability/analysis_outputs/pf_current_source_branching_capability/final/pf_branching_final_decision.json",
+  "v1_decision_preserved_exactly": "NO_CURRENT_SOURCE_BRANCH_BIRTH_IN_BOUNDED_TEST",
+  "v1_decision_sha256": "d98865ea32710f73e70186a884ea4aeb29a5779ac533668c3724bccb3c162941",
+  "validation": {
+    "branching_focused_suite": "93 passed, 1 skipped",
+    "compileall": "PASS",
+    "deterministic_double_regeneration": "PASS",
+    "full_suite": "767 passed, 1 skipped, 7 legacy failures",
+    "git_diff_check": "PASS",
+    "immutable_theta40_raw_tree_matches_v1_sha256": true,
+    "immutable_theta45_raw_tree_matches_v1_sha256": true,
+    "new_failures_relative_to_v1_parent_baseline": 0
+  }
+}

@@ -1,0 +1,1235 @@
+{
+  "active_tip_hbar_m": {
+    "b002cebdef606974": 9.060994279189728e-07,
+    "b7ad021ada7289d0": 7.781409246095225e-07
+  },
+  "final_marking": {
+    "marked_element_ids": [],
+    "records": []
+  },
+  "physical_time_or_rng_advanced": false,
+  "refinement_levels": [
+    {
+      "counts_by_reason": {
+        "candidate_crack_normal_span": 12,
+        "candidate_endpoint_j_support_area": 1,
+        "candidate_segment_intersection": 1
+      },
+      "counts_by_tip_candidate_reason": [
+        {
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "count": 12,
+          "reason": "candidate_crack_normal_span",
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+          "count": 1,
+          "reason": "candidate_endpoint_j_support_area",
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+          "count": 1,
+          "reason": "candidate_segment_intersection",
+          "tip_id": "b7ad021ada7289d0"
+        }
+      ],
+      "element_count_before": 3416,
+      "level": 0,
+      "marked_region_bounding_box": {
+        "maximum_xy_m": [
+          0.0005577704469167284,
+          4.308022795514744e-05
+        ],
+        "minimum_xy_m": [
+          0.0005485655286519359,
+          2.959653343891556e-05
+        ]
+      },
+      "physical_mark_count": 12,
+      "physical_marked_area_m2": 5.700767786631083e-11,
+      "records": [
+        {
+          "area_m2": 2.1994558897537255e-11,
+          "candidate_direction_projection_span_m": 4.419417382415928e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 1.1955777672758563e-05,
+          "controlling_metric_m": 1.1955777672758563e-05,
+          "distance_to_candidate_endpoint_m": 4.3121758724954555e-06,
+          "distance_to_current_tip_m": 5.927121326090017e-06,
+          "element_id": 22,
+          "equivalent_size_m": 5.291912901527297e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 22,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.1077888951197087e-06,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.0997279448768628e-11,
+          "candidate_direction_projection_span_m": 3.4183291046464078e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 7.536360290342635e-06,
+          "controlling_metric_m": 7.536360290342635e-06,
+          "distance_to_candidate_endpoint_m": 1.2263194267414085e-06,
+          "distance_to_current_tip_m": 6.0090030783716975e-06,
+          "element_id": 23,
+          "equivalent_size_m": 3.7419474981185302e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 23,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.569683761795183e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 7.608978857823584e-12,
+          "candidate_direction_projection_span_m": 2.002176555539095e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 1.1955777672758563e-05,
+          "controlling_metric_m": 1.1955777672758563e-05,
+          "distance_to_candidate_endpoint_m": 2.7718042577925217e-06,
+          "distance_to_current_tip_m": 3.4278084823067387e-06,
+          "element_id": 162,
+          "equivalent_size_m": 3.1125636984381188e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 162,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.0580098229095731e-06,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 3.804489428911345e-12,
+          "candidate_direction_projection_span_m": 1.001088277769466e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 1.1653711250797006e-05,
+          "controlling_metric_m": 1.1653711250797006e-05,
+          "distance_to_candidate_endpoint_m": 6.72490179567321e-06,
+          "distance_to_current_tip_m": 4.414241277381381e-06,
+          "element_id": 164,
+          "equivalent_size_m": 2.2009148980405445e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 164,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.223210094112468e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 3.804489428911345e-12,
+          "candidate_direction_projection_span_m": null,
+          "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+          "candidate_normal_projection_span_m": null,
+          "controlling_metric_m": 4.999999999995011e-06,
+          "distance_to_candidate_endpoint_m": 5.910126045309702e-07,
+          "distance_to_current_tip_m": 4.414241277381381e-06,
+          "element_id": 164,
+          "equivalent_size_m": 2.2009148980405445e-06,
+          "inside_candidate_endpoint_J_support": true,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 164,
+          "reason_bitmask": 9,
+          "reasons": [
+            "candidate_segment_intersection",
+            "candidate_endpoint_j_support_area"
+          ],
+          "segment_intersection_length_m": null,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.511223572278838e-13,
+          "candidate_direction_projection_span_m": 1.0731673969811319e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.6868779962280296e-06,
+          "controlling_metric_m": 2.6868779962280296e-06,
+          "distance_to_candidate_endpoint_m": 4.323624956644208e-06,
+          "distance_to_current_tip_m": 6.805268124600754e-07,
+          "element_id": 166,
+          "equivalent_size_m": 1.1004574490202998e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": true,
+          "parent_lineage_root_element_id": 166,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 6.272132610397995e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.9022447144557677e-12,
+          "candidate_direction_projection_span_m": 8.228953275387111e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.67582241441767e-06,
+          "controlling_metric_m": 5.67582241441767e-06,
+          "distance_to_candidate_endpoint_m": 4.790103337016285e-06,
+          "distance_to_current_tip_m": 1.4871964435242315e-06,
+          "element_id": 167,
+          "equivalent_size_m": 1.5562818492190067e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 167,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 3.4000074569419996e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.511223572279293e-13,
+          "candidate_direction_projection_span_m": 8.314040054906483e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 3.0644610236799487e-06,
+          "controlling_metric_m": 3.0644610236799487e-06,
+          "distance_to_candidate_endpoint_m": 3.546580760762603e-06,
+          "distance_to_current_tip_m": 1.7035031127013646e-06,
+          "element_id": 239,
+          "equivalent_size_m": 1.100457449020326e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 239,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.6600343260920953e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 4.755611786140393e-13,
+          "candidate_direction_projection_span_m": 8.314040054906483e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 3.0644610236799487e-06,
+          "controlling_metric_m": 3.0644610236799487e-06,
+          "distance_to_candidate_endpoint_m": 3.41986596703144e-06,
+          "distance_to_current_tip_m": 1.598881789226902e-06,
+          "element_id": 240,
+          "equivalent_size_m": 7.78140924609583e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 240,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.8857207728023534e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 4.755611786140389e-13,
+          "candidate_direction_projection_span_m": 6.70228411163605e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.9023722308889194e-06,
+          "controlling_metric_m": 5.9023722308889194e-06,
+          "distance_to_candidate_endpoint_m": 3.5508061296805224e-06,
+          "distance_to_current_tip_m": 2.001603331114344e-06,
+          "element_id": 241,
+          "equivalent_size_m": 7.781409246095826e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 241,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 9.790500469563252e-08,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.377805893069528e-13,
+          "candidate_direction_projection_span_m": 2.502720694423665e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.9134278126991702e-06,
+          "controlling_metric_m": 2.9134278126991702e-06,
+          "distance_to_candidate_endpoint_m": 3.776699909595535e-06,
+          "distance_to_current_tip_m": 1.2438558172056564e-06,
+          "element_id": 249,
+          "equivalent_size_m": 5.502287245101288e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 249,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.4361921354765888e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 3.804489428911831e-12,
+          "candidate_direction_projection_span_m": 6.787370891155422e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 1.165371125079706e-05,
+          "controlling_metric_m": 1.165371125079706e-05,
+          "distance_to_candidate_endpoint_m": 3.3856690578403743e-06,
+          "distance_to_current_tip_m": 2.985386036169865e-06,
+          "element_id": 269,
+          "equivalent_size_m": 2.200914898040685e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 269,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 5.49842835490817e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 3.804489428911584e-12,
+          "candidate_direction_projection_span_m": 6.70228411163605e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 1.1502678039816282e-05,
+          "controlling_metric_m": 1.1502678039816282e-05,
+          "distance_to_candidate_endpoint_m": 5.110714605076101e-06,
+          "distance_to_current_tip_m": 4.373711403643295e-06,
+          "element_id": 276,
+          "equivalent_size_m": 2.2009148980406135e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 276,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.035231213365906e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        }
+      ],
+      "unique_initial_parent_elements_affected": 12
+    },
+    {
+      "counts_by_reason": {
+        "candidate_crack_normal_span": 13,
+        "candidate_endpoint_j_support_area": 2,
+        "candidate_segment_intersection": 2,
+        "current_tip_j_support_area": 1
+      },
+      "counts_by_tip_candidate_reason": [
+        {
+          "candidate_id": "-",
+          "count": 1,
+          "reason": "current_tip_j_support_area",
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "count": 13,
+          "reason": "candidate_crack_normal_span",
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "count": 1,
+          "reason": "candidate_endpoint_j_support_area",
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+          "count": 1,
+          "reason": "candidate_endpoint_j_support_area",
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+          "count": 2,
+          "reason": "candidate_segment_intersection",
+          "tip_id": "b7ad021ada7289d0"
+        }
+      ],
+      "element_count_before": 3436,
+      "level": 1,
+      "marked_region_bounding_box": {
+        "maximum_xy_m": [
+          0.000556326007305008,
+          4.308022795514744e-05
+        ],
+        "minimum_xy_m": [
+          0.0005482044187490058,
+          2.959653343891556e-05
+        ]
+      },
+      "physical_mark_count": 16,
+      "physical_marked_area_m2": 2.764192070025769e-11,
+      "records": [
+        {
+          "area_m2": 5.498639724384314e-12,
+          "candidate_direction_projection_span_m": 2.209708691207964e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.977888836379227e-06,
+          "controlling_metric_m": 5.977888836379227e-06,
+          "distance_to_candidate_endpoint_m": 1.3408652105218915e-06,
+          "distance_to_current_tip_m": 4.200244300761988e-06,
+          "element_id": 22,
+          "equivalent_size_m": 2.6459564507636484e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 22,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.1077888951149492e-06,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 5.49863972438432e-12,
+          "candidate_direction_projection_span_m": null,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": null,
+          "controlling_metric_m": 3.7681801451712633e-06,
+          "distance_to_candidate_endpoint_m": 7.446095507463987e-07,
+          "distance_to_current_tip_m": 5.5794235662009285e-06,
+          "element_id": 25,
+          "equivalent_size_m": 2.64595645076365e-06,
+          "inside_candidate_endpoint_J_support": true,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 23,
+          "reason_bitmask": 10,
+          "reasons": [
+            "candidate_crack_normal_span",
+            "candidate_endpoint_j_support_area"
+          ],
+          "segment_intersection_length_m": null,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 3.804489428911793e-12,
+          "candidate_direction_projection_span_m": 1.3234394664235526e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.977888836379227e-06,
+          "controlling_metric_m": 5.977888836379227e-06,
+          "distance_to_candidate_endpoint_m": 1.768363784000369e-06,
+          "distance_to_current_tip_m": 3.2451569370864683e-06,
+          "element_id": 166,
+          "equivalent_size_m": 2.200914898040674e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 162,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 8.317318221346344e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.9022447144558896e-12,
+          "candidate_direction_projection_span_m": 6.617197332117763e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.826855625398503e-06,
+          "controlling_metric_m": 5.826855625398503e-06,
+          "distance_to_candidate_endpoint_m": 2.9732939066233384e-06,
+          "distance_to_current_tip_m": 3.271347789364849e-06,
+          "element_id": 167,
+          "equivalent_size_m": 1.5562818492190566e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 162,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.2627800077629596e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.511223572279581e-13,
+          "candidate_direction_projection_span_m": 5.00544138884733e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.826855625398503e-06,
+          "controlling_metric_m": 5.826855625398503e-06,
+          "distance_to_candidate_endpoint_m": 5.2413506847257986e-06,
+          "distance_to_current_tip_m": 1.5254361325646195e-06,
+          "element_id": 169,
+          "equivalent_size_m": 1.1004574490203428e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 164,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.2232100941059293e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.511223572279581e-13,
+          "candidate_direction_projection_span_m": 5.826855625398503e-06,
+          "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+          "candidate_normal_projection_span_m": 5.005441388847873e-07,
+          "controlling_metric_m": 2.7056852438169914e-06,
+          "distance_to_candidate_endpoint_m": 3.474662767377863e-06,
+          "distance_to_current_tip_m": 1.5254361325646195e-06,
+          "element_id": 169,
+          "equivalent_size_m": 1.1004574490203428e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 164,
+          "reason_bitmask": 1,
+          "reasons": [
+            "candidate_segment_intersection"
+          ],
+          "segment_intersection_length_m": 2.7056852438169914e-06,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.51122357227824e-13,
+          "candidate_direction_projection_span_m": 2.9889444181895866e-06,
+          "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+          "candidate_normal_projection_span_m": 6.617197332117221e-07,
+          "controlling_metric_m": 1.6910756436324158e-06,
+          "distance_to_candidate_endpoint_m": 1.5854200605028562e-06,
+          "distance_to_current_tip_m": 3.4185726354482114e-06,
+          "element_id": 171,
+          "equivalent_size_m": 1.100457449020265e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 164,
+          "reason_bitmask": 1,
+          "reasons": [
+            "candidate_segment_intersection"
+          ],
+          "segment_intersection_length_m": 1.6910756436324158e-06,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 4.755611786139754e-13,
+          "candidate_direction_projection_span_m": 4.11447663769464e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.8379112072088623e-06,
+          "controlling_metric_m": 2.8379112072088623e-06,
+          "distance_to_candidate_endpoint_m": 4.764308265500933e-06,
+          "distance_to_current_tip_m": 2.3780735355005638e-07,
+          "element_id": 175,
+          "equivalent_size_m": 7.781409246095309e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": true,
+          "parent_lineage_root_element_id": 167,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 3.3078707858887965e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.377805893070148e-13,
+          "candidate_direction_projection_span_m": 4.1570200274535125e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 1.5322305118399202e-06,
+          "controlling_metric_m": 1.5322305118399202e-06,
+          "distance_to_candidate_endpoint_m": 3.643216080931369e-06,
+          "distance_to_current_tip_m": 1.3886074721746317e-06,
+          "element_id": 249,
+          "equivalent_size_m": 5.502287245102006e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 239,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.6600343260861587e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.3778058930694975e-13,
+          "candidate_direction_projection_span_m": 5.005441388847873e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.988944418189641e-06,
+          "controlling_metric_m": 2.988944418189641e-06,
+          "distance_to_candidate_endpoint_m": 3.289875529155384e-06,
+          "distance_to_current_tip_m": 1.7521113216006971e-06,
+          "element_id": 252,
+          "equivalent_size_m": 5.502287245101253e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 240,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.281138920362851e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.377805893070121e-13,
+          "candidate_direction_projection_span_m": 4.1570200274535125e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 1.5322305118399202e-06,
+          "controlling_metric_m": 1.5322305118399202e-06,
+          "distance_to_candidate_endpoint_m": 3.6232313110638215e-06,
+          "distance_to_current_tip_m": 1.6134037109323872e-06,
+          "element_id": 253,
+          "equivalent_size_m": 5.502287245101975e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 240,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 6.045818524440291e-08,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.3778058930694955e-13,
+          "candidate_direction_projection_span_m": 5.005441388847873e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.988944418189641e-06,
+          "controlling_metric_m": 2.988944418189641e-06,
+          "distance_to_candidate_endpoint_m": 3.2526160526783885e-06,
+          "distance_to_current_tip_m": 1.7591902292338614e-06,
+          "element_id": 254,
+          "equivalent_size_m": 5.502287245101251e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 241,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 9.7905004695446e-08,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.9022447144559e-12,
+          "candidate_direction_projection_span_m": 6.702284111636593e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.9023722308889194e-06,
+          "controlling_metric_m": 5.9023722308889194e-06,
+          "distance_to_candidate_endpoint_m": 2.7526547321249903e-06,
+          "distance_to_current_tip_m": 2.248387233078277e-06,
+          "element_id": 285,
+          "equivalent_size_m": 1.5562818492190609e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 269,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 4.4104643139695354e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.51122357228076e-13,
+          "candidate_direction_projection_span_m": 6.702284111636593e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.9023722308889194e-06,
+          "controlling_metric_m": 5.9023722308889194e-06,
+          "distance_to_candidate_endpoint_m": 3.281584229356182e-06,
+          "distance_to_current_tip_m": 3.0531026992418734e-06,
+          "element_id": 286,
+          "equivalent_size_m": 1.100457449020411e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 269,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.0879640409451577e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.5112235722795e-13,
+          "candidate_direction_projection_span_m": 3.3511420558185673e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.751339019908141e-06,
+          "controlling_metric_m": 5.751339019908141e-06,
+          "distance_to_candidate_endpoint_m": 3.2696831300080483e-06,
+          "distance_to_current_tip_m": 2.201405244442685e-06,
+          "element_id": 293,
+          "equivalent_size_m": 1.1004574490203381e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 276,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.035231213356308e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.9022447144558743e-12,
+          "candidate_direction_projection_span_m": null,
+          "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+          "candidate_normal_projection_span_m": null,
+          "controlling_metric_m": 1.5562818492190503e-06,
+          "distance_to_candidate_endpoint_m": 7.079145671380888e-07,
+          "distance_to_current_tip_m": 4.543595631633006e-06,
+          "element_id": 346,
+          "equivalent_size_m": 1.5562818492190503e-06,
+          "inside_candidate_endpoint_J_support": true,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 327,
+          "reason_bitmask": 8,
+          "reasons": [
+            "candidate_endpoint_j_support_area"
+          ],
+          "segment_intersection_length_m": null,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.9022447144558904e-12,
+          "candidate_direction_projection_span_m": null,
+          "candidate_id": null,
+          "candidate_normal_projection_span_m": null,
+          "controlling_metric_m": 1.5562818492190568e-06,
+          "distance_to_candidate_endpoint_m": null,
+          "distance_to_current_tip_m": 6.927967379000556e-07,
+          "element_id": 347,
+          "equivalent_size_m": 1.5562818492190568e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": true,
+          "parent_lineage_root_element_id": 327,
+          "reason_bitmask": 4,
+          "reasons": [
+            "current_tip_j_support_area"
+          ],
+          "segment_intersection_length_m": null,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        }
+      ],
+      "unique_initial_parent_elements_affected": 11
+    },
+    {
+      "counts_by_reason": {
+        "candidate_crack_normal_span": 12,
+        "candidate_endpoint_j_support_area": 1
+      },
+      "counts_by_tip_candidate_reason": [
+        {
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "count": 12,
+          "reason": "candidate_crack_normal_span",
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "count": 1,
+          "reason": "candidate_endpoint_j_support_area",
+          "tip_id": "b7ad021ada7289d0"
+        }
+      ],
+      "element_count_before": 3460,
+      "level": 2,
+      "marked_region_bounding_box": {
+        "maximum_xy_m": [
+          0.0005542513174931225,
+          3.653995956780872e-05
+        ],
+        "minimum_xy_m": [
+          0.0005485655286519359,
+          2.959653343891556e-05
+        ]
+      },
+      "physical_mark_count": 12,
+      "physical_marked_area_m2": 1.2750947698247494e-11,
+      "records": [
+        {
+          "area_m2": 1.3746599310960785e-12,
+          "candidate_direction_projection_span_m": 1.104854345603955e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.9889444181895866e-06,
+          "controlling_metric_m": 2.9889444181895866e-06,
+          "distance_to_candidate_endpoint_m": 1.1482710509961246e-06,
+          "distance_to_current_tip_m": 4.100825793309253e-06,
+          "element_id": 22,
+          "equivalent_size_m": 1.3229782253818242e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 22,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 5.993059673727416e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.3746599310960785e-12,
+          "candidate_direction_projection_span_m": 1.7091645523231768e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 1.8840900725856317e-06,
+          "controlling_metric_m": 1.8840900725856317e-06,
+          "distance_to_candidate_endpoint_m": 8.205171521810381e-07,
+          "distance_to_current_tip_m": 4.4944664743436345e-06,
+          "element_id": 24,
+          "equivalent_size_m": 1.3229782253818242e-06,
+          "inside_candidate_endpoint_J_support": true,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 22,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 5.084829277448044e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.74931986219216e-12,
+          "candidate_direction_projection_span_m": null,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": null,
+          "controlling_metric_m": 2.209708691207964e-06,
+          "distance_to_candidate_endpoint_m": 7.708131355939165e-07,
+          "distance_to_current_tip_m": 5.760559364658162e-06,
+          "element_id": 28,
+          "equivalent_size_m": 1.8709737490592662e-06,
+          "inside_candidate_endpoint_J_support": true,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 23,
+          "reason_bitmask": 10,
+          "reasons": [
+            "candidate_crack_normal_span",
+            "candidate_endpoint_j_support_area"
+          ],
+          "segment_intersection_length_m": null,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.9022447144558977e-12,
+          "candidate_direction_projection_span_m": 1.3234394664235526e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.9889444181895866e-06,
+          "controlling_metric_m": 2.9889444181895866e-06,
+          "distance_to_candidate_endpoint_m": 1.977539045654407e-06,
+          "distance_to_current_tip_m": 3.6032033267348033e-06,
+          "element_id": 169,
+          "equivalent_size_m": 1.55628184921906e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 162,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 3.410176015521207e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.9022447144558896e-12,
+          "candidate_direction_projection_span_m": 8.228953275388196e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.675822414417725e-06,
+          "controlling_metric_m": 5.675822414417725e-06,
+          "distance_to_candidate_endpoint_m": 2.09392530781479e-06,
+          "distance_to_current_tip_m": 3.181190941379351e-06,
+          "element_id": 170,
+          "equivalent_size_m": 1.5562818492190566e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 162,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 4.907142205846732e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.511223572280478e-13,
+          "candidate_direction_projection_span_m": 4.920354609329043e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 5.675822414417725e-06,
+          "controlling_metric_m": 5.675822414417725e-06,
+          "distance_to_candidate_endpoint_m": 2.42866156134074e-06,
+          "distance_to_current_tip_m": 2.8853510920304974e-06,
+          "element_id": 171,
+          "equivalent_size_m": 1.1004574490203947e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 162,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.26278000775989e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.377805893070261e-13,
+          "candidate_direction_projection_span_m": 2.5027206944242073e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.9134278126992787e-06,
+          "controlling_metric_m": 2.9134278126992787e-06,
+          "distance_to_candidate_endpoint_m": 4.985443293790718e-06,
+          "distance_to_current_tip_m": 8.265276913404473e-08,
+          "element_id": 174,
+          "equivalent_size_m": 5.502287245102136e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": true,
+          "parent_lineage_root_element_id": 164,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.223210094102949e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.1889029465347478e-13,
+          "candidate_direction_projection_span_m": 3.3511420558185673e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.9511861154444597e-06,
+          "controlling_metric_m": 2.9511861154444597e-06,
+          "distance_to_candidate_endpoint_m": 3.1826370461214816e-06,
+          "distance_to_current_tip_m": 1.8651160487515905e-06,
+          "element_id": 267,
+          "equivalent_size_m": 3.8907046230473414e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 241,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 6.278808780534149e-08,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.511223572279345e-13,
+          "candidate_direction_projection_span_m": 6.65974072187772e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 3.0267027209347677e-06,
+          "controlling_metric_m": 3.0267027209347677e-06,
+          "distance_to_candidate_endpoint_m": 2.896684720524429e-06,
+          "distance_to_current_tip_m": 2.4255103742549625e-06,
+          "element_id": 300,
+          "equivalent_size_m": 1.100457449020329e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 269,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.3159707423588275e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 4.75561178614038e-13,
+          "candidate_direction_projection_span_m": 6.65974072187772e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 3.0267027209347677e-06,
+          "controlling_metric_m": 3.0267027209347677e-06,
+          "distance_to_candidate_endpoint_m": 2.6420237822675273e-06,
+          "distance_to_current_tip_m": 2.358239377939765e-06,
+          "element_id": 301,
+          "equivalent_size_m": 7.78140924609582e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 269,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.0944935716171612e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.37780589306956e-13,
+          "candidate_direction_projection_span_m": 3.3511420558185673e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.9511861154444597e-06,
+          "controlling_metric_m": 2.9511861154444597e-06,
+          "distance_to_candidate_endpoint_m": 2.4764995405135852e-06,
+          "distance_to_current_tip_m": 2.5235595108480754e-06,
+          "element_id": 302,
+          "equivalent_size_m": 5.502287245101325e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 269,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.0879640409416439e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 4.75561178613912e-13,
+          "candidate_direction_projection_span_m": 3.3511420558185673e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.9511861154444597e-06,
+          "controlling_metric_m": 2.9511861154444597e-06,
+          "distance_to_candidate_endpoint_m": 3.0856319683883206e-06,
+          "distance_to_current_tip_m": 1.9211098495036625e-06,
+          "element_id": 311,
+          "equivalent_size_m": 7.781409246094789e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 276,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.0352312133528386e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        }
+      ],
+      "unique_initial_parent_elements_affected": 7
+    },
+    {
+      "counts_by_reason": {
+        "candidate_crack_normal_span": 7
+      },
+      "counts_by_tip_candidate_reason": [
+        {
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "count": 7,
+          "reason": "candidate_crack_normal_span",
+          "tip_id": "b7ad021ada7289d0"
+        }
+      ],
+      "element_count_before": 3480,
+      "level": 3,
+      "marked_region_bounding_box": {
+        "maximum_xy_m": [
+          0.0005524917527813195,
+          3.467217443343812e-05
+        ],
+        "minimum_xy_m": [
+          0.0005496488583607262,
+          3.2061057632290965e-05
+        ]
+      },
+      "physical_mark_count": 7,
+      "physical_marked_area_m2": 3.4478185449513376e-12,
+      "records": [
+        {
+          "area_m2": 9.511223572279448e-13,
+          "candidate_direction_projection_span_m": 1.073167396981186e-06,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.686877996228084e-06,
+          "controlling_metric_m": 2.686877996228084e-06,
+          "distance_to_candidate_endpoint_m": 1.8065893858297204e-06,
+          "distance_to_current_tip_m": 3.3914507978479136e-06,
+          "element_id": 179,
+          "equivalent_size_m": 1.1004574490203351e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 162,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 3.4101760155141236e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 9.511223572279448e-13,
+          "candidate_direction_projection_span_m": 8.228953275388196e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.8379112072088623e-06,
+          "controlling_metric_m": 2.8379112072088623e-06,
+          "distance_to_candidate_endpoint_m": 1.9841481611915403e-06,
+          "distance_to_current_tip_m": 3.022423622736569e-06,
+          "element_id": 180,
+          "equivalent_size_m": 1.1004574490203351e-06,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 162,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 4.907142205839654e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 4.755611786140239e-13,
+          "candidate_direction_projection_span_m": 3.3085986660591525e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.9134278126992244e-06,
+          "controlling_metric_m": 2.9134278126992244e-06,
+          "distance_to_candidate_endpoint_m": 2.3115786352140483e-06,
+          "distance_to_current_tip_m": 2.6894233118711243e-06,
+          "element_id": 182,
+          "equivalent_size_m": 7.781409246095705e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 162,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.262780007756626e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 4.755611786139674e-13,
+          "candidate_direction_projection_span_m": 3.32987036093886e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.875669509953989e-06,
+          "controlling_metric_m": 2.875669509953989e-06,
+          "distance_to_candidate_endpoint_m": 2.890045616605045e-06,
+          "distance_to_current_tip_m": 2.175942344037972e-06,
+          "element_id": 315,
+          "equivalent_size_m": 7.781409246095242e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 269,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 2.315970742355519e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.3778058930701897e-13,
+          "candidate_direction_projection_span_m": 3.32987036093886e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 1.5133513604673838e-06,
+          "controlling_metric_m": 1.5133513604673838e-06,
+          "distance_to_candidate_endpoint_m": 2.803461318120662e-06,
+          "distance_to_current_tip_m": 2.308774972321465e-06,
+          "element_id": 317,
+          "equivalent_size_m": 5.502287245102055e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 269,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 9.915107117556438e-08,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 1.1889029465353718e-13,
+          "candidate_direction_projection_span_m": 1.69684272278872e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.9134278126992244e-06,
+          "controlling_metric_m": 2.9134278126992244e-06,
+          "distance_to_candidate_endpoint_m": 2.4725328420322313e-06,
+          "distance_to_current_tip_m": 2.628163800360602e-06,
+          "element_id": 319,
+          "equivalent_size_m": 3.890704623048363e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 269,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 5.37206173755146e-08,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        },
+        {
+          "area_m2": 2.377805893069007e-13,
+          "candidate_direction_projection_span_m": 1.6755710279084705e-07,
+          "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+          "candidate_normal_projection_span_m": 2.875669509953989e-06,
+          "controlling_metric_m": 2.875669509953989e-06,
+          "distance_to_candidate_endpoint_m": 3.0491870179083304e-06,
+          "distance_to_current_tip_m": 2.006390678724066e-06,
+          "element_id": 329,
+          "equivalent_size_m": 5.502287245100686e-07,
+          "inside_candidate_endpoint_J_support": false,
+          "inside_current_tip_J_support": false,
+          "parent_lineage_root_element_id": 276,
+          "reason_bitmask": 2,
+          "reasons": [
+            "candidate_crack_normal_span"
+          ],
+          "segment_intersection_length_m": 1.2516736025943222e-07,
+          "threshold_m": 1.5e-06,
+          "tip_id": "b7ad021ada7289d0"
+        }
+      ],
+      "unique_initial_parent_elements_affected": 3
+    },
+    {
+      "counts_by_reason": {},
+      "counts_by_tip_candidate_reason": [],
+      "element_count_before": 3490,
+      "level": 4,
+      "marked_region_bounding_box": null,
+      "physical_mark_count": 0,
+      "physical_marked_area_m2": 0.0,
+      "records": [],
+      "unique_initial_parent_elements_affected": 0
+    }
+  ],
+  "schema": "v11.frozen-zero-visibility-diagnosis/1",
+  "target_resolution_m": 1.5e-06,
+  "trial_changed_element_count": {
+    "b002cebdef606974|cleave:cleavage:(010):ee49045e2199f60d44a1": 6,
+    "b002cebdef606974|cleave:cleavage:(100):5b8d6e5e817cefaf59a4": 12,
+    "b7ad021ada7289d0|cleave:cleavage:(010):ee49045e2199f60d44a1": 28,
+    "b7ad021ada7289d0|cleave:cleavage:(100):5b8d6e5e817cefaf59a4": 0
+  },
+  "zero_visibility_reasons": {
+    "b7ad021ada7289d0|cleave:cleavage:(100):5b8d6e5e817cefaf59a4": "candidate_segment_already_in_committed_wake_material"
+  }
+}

@@ -355,16 +355,59 @@ def run_2d(args):
         )
     if restart_path:
         restored = restore_branch_checkpoint(restart_path)
+        requested_target_m = float(
+            getattr(args, "target_crack_extension_um", float("inf"))
+        ) * 1.0e-6
+        if requested_target_m <= restored.projected_extension_m:
+            raise RuntimeError(
+                "restart target must exceed the accepted checkpoint extension: "
+                f"target={requested_target_m:.17g} "
+                f"checkpoint={restored.projected_extension_m:.17g}"
+            )
+        source_cache_root = Path(restored.provider_cache_identity).resolve()
+        destination_cache_root = cache_root.resolve()
+        if source_cache_root == destination_cache_root:
+            raise RuntimeError(
+                "restart must fork to a fresh cache root; source evidence is immutable"
+            )
         state = restored.state
         restored_junction = dict(state.junction_process_state)
         restored_junction["crack_representation"] = "sharp_wake_causal_v11"
         state = replace(state, junction_process_state=restored_junction)
-        runtime = restored.provider_runtime
+        # A continuation is a provenance-linked output fork.  The routing and
+        # solve counters resume exactly, but every newly generated provider
+        # state belongs to the destination.  Reusing the serialized source
+        # cache path would silently mutate immutable evidence.
+        runtime = replace(restored.provider_runtime, cache_root=str(destination_cache_root))
         physical_time = restored.physical_time_s
         accepted_load = restored.accepted_load
         cluster = restored.branch_clusters[0] if restored.branch_clusters else None
         mesh = state.mesh; boundary = state.boundary; D = state.elasticity_D; mat = state.material
         start_step = int(state.event_counters.get("accepted_steps", 0)) + 1
+        source_manifest = json.loads(Path(restart_path).read_text())
+        restart_provenance = {
+            "schema": "v11.branching-restart-output-fork/1",
+            "source_checkpoint": str(Path(restart_path).resolve()),
+            "source_checkpoint_state_sha256": source_manifest["state_sha256"],
+            "source_checkpoint_topology_fingerprint": restored.topology_fingerprint,
+            "source_checkpoint_mesh_identity": restored.mesh_identity,
+            "source_checkpoint_accepted_steps": start_step - 1,
+            "source_checkpoint_projected_extension_m": restored.projected_extension_m,
+            "source_checkpoint_physical_time_s": restored.physical_time_s,
+            "source_checkpoint_accepted_load_m": restored.accepted_load,
+            "source_checkpoint_termination_reason": restored.termination_reason,
+            "requested_target_extension_m": requested_target_m,
+            "source_provider_cache_root": str(source_cache_root),
+            "destination_provider_cache_root": str(destination_cache_root),
+            "source_cache_rebound_to_destination": True,
+            "accepted_state_and_rng_restored_without_advance": True,
+        }
+        provenance_path = out / "restart_fork_provenance.json"
+        temporary = provenance_path.with_name(provenance_path.name + ".tmp")
+        temporary.write_text(
+            json.dumps(restart_provenance, indent=2, sort_keys=True, allow_nan=False) + "\n"
+        )
+        os.replace(temporary, provenance_path)
         if restored.shared_process_state.get("schema") == "v11.multi-tip-engine-bundle/2":
             from .resolved_production_v11 import continue_resolved_production
             return continue_resolved_production(

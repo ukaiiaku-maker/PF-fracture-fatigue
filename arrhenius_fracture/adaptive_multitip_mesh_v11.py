@@ -81,6 +81,15 @@ class MarkingReason(IntFlag):
     CONFORMITY_CLOSURE = 32
 
 
+class TrialVisibilityFailure(RuntimeError):
+    """Fail-closed frozen-state diagnosis for an invisible topology trial."""
+
+    def __init__(self, message: str, *, state, diagnostics: Mapping[str, object]):
+        super().__init__(message)
+        self.state = state
+        self.diagnostics = dict(diagnostics)
+
+
 @dataclass(frozen=True)
 class PhysicalMarkRecord:
     element_id: int
@@ -493,6 +502,32 @@ def trial_stiffness_visibility(state, candidates_by_tip, *, da_phys_m: float, cr
     return result
 
 
+def zero_visibility_reasons(state, candidates_by_tip, *, da_phys_m: float) -> dict[str, str]:
+    """Classify zero-visibility proposals without changing the accepted state.
+
+    A P0 wake element can extend beyond the physical endpoint that first
+    degraded it.  Nested refinement deliberately inherits that committed
+    damage, so refinement cannot create new stiffness visibility inside such
+    material.  Reporting this as a resolution-marker inconsistency is both
+    misleading and non-actionable.
+    """
+    from .causal_sharp_wake_v11 import causal_segment_support, element_damage
+
+    damage = element_damage(state.mesh, state.damage)
+    result: dict[str, str] = {}
+    for tip_id in sorted(state.crack_network.active_tip_ids):
+        tip = np.asarray(state.crack_network.branch(tip_id).tip, dtype=float)
+        for candidate in sorted(candidates_by_tip[tip_id], key=lambda item: item.candidate_id):
+            end = tip + float(da_phys_m) * np.asarray(candidate.direction_xy, dtype=float)
+            selected, _ = causal_segment_support(state.mesh, tip, end)
+            key = f"{tip_id}|{candidate.candidate_id}"
+            if not selected.size:
+                result[key] = "admissible_segment_has_no_discrete_causal_stiffness_support"
+            elif np.all(damage[selected] >= 1.0):
+                result[key] = "candidate_segment_already_in_committed_wake_material"
+    return result
+
+
 def adapt_accepted_state_for_trials(
     state, candidates_by_tip, *, da_phys_m: float, tip_h_fine_m: float,
     contour_radius_m: float, crack_band_radius_m: float, accepted_load_m: float,
@@ -565,9 +600,43 @@ def adapt_accepted_state_for_trials(
             resolution_gate_passed = True
             break
         if not marked:
-            raise RuntimeError(
+            zero_reasons = zero_visibility_reasons(
+                current, candidates_by_tip, da_phys_m=da_phys_m,
+            )
+            failure_diagnostics = {
+                "schema": "v11.frozen-zero-visibility-diagnosis/1",
+                "active_tip_hbar_m": dict(hbars),
+                "target_resolution_m": target_hbar,
+                "trial_changed_element_count": dict(visible),
+                "zero_visibility_reasons": dict(zero_reasons),
+                "final_marking": marking.to_dict(),
+                "refinement_levels": marking_levels,
+                "physical_time_or_rng_advanced": False,
+            }
+            committed_wake = sorted(
+                key for key, reason in zero_reasons.items()
+                if reason == "candidate_segment_already_in_committed_wake_material"
+            )
+            if committed_wake:
+                raise TrialVisibilityFailure(
+                    "candidate_segment_already_in_committed_wake_material: "
+                    + ",".join(committed_wake), state=current,
+                    diagnostics=failure_diagnostics,
+                )
+            unsupported = sorted(
+                key for key, reason in zero_reasons.items()
+                if reason == "admissible_segment_has_no_discrete_causal_stiffness_support"
+            )
+            if unsupported:
+                raise TrialVisibilityFailure(
+                    "candidate_segment_has_no_discrete_causal_stiffness_support: "
+                    + ",".join(unsupported), state=current,
+                    diagnostics=failure_diagnostics,
+                )
+            raise TrialVisibilityFailure(
                 "active_tip_resolution_marker_inconsistency: "
-                f"hbar={max(hbars.values(), default=0.0):.17g} target={target_hbar:.17g}"
+                f"hbar={max(hbars.values(), default=0.0):.17g} target={target_hbar:.17g}",
+                state=current, diagnostics=failure_diagnostics,
             )
         progress_guard.observe(
             marked_area_m2=marked_area,
@@ -672,4 +741,5 @@ __all__ = [
     "RefinementLineage", "active_tip_hbar", "adapt_accepted_state_for_trials",
     "diagnose_underresolved_trial_geometry", "mark_multitip_trial_support",
     "mesh_fingerprint", "refine_accepted_state", "trial_stiffness_visibility",
+    "TrialVisibilityFailure", "zero_visibility_reasons",
 ]

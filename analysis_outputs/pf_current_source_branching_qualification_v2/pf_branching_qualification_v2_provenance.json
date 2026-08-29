@@ -1,0 +1,59 @@
+{
+  "claim_label": "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS",
+  "outputs": [
+    {
+      "path": "PF_CURRENT_SOURCE_BRANCHING_QUALIFICATION_V2.md",
+      "sha256": "ae3b590d86b862f27aa6b5e3f2057db4055254993dde42bc8f7c4591e27db119"
+    },
+    {
+      "path": "pf_branching_decision_v2.json",
+      "sha256": "c3134773efbdcc65ca685a4637bc5af303a7c93eb48e5f9063cf91ac6518be0e"
+    },
+    {
+      "path": "pf_branching_local_contour_convergence_audit.csv",
+      "sha256": "d568f4b00ff2659fccd4a4918c43f9f6808ca117aef3e53b9c99f061cb0439f5"
+    },
+    {
+      "path": "pf_branching_long_reload_state_audit.csv",
+      "sha256": "0fb6a92ac291e7006db574605e46e2ae837ebf7ef8ecbd4489a2c379913b3a4b"
+    },
+    {
+      "path": "pf_branching_restart_qualification_v2.json",
+      "sha256": "0de7cf8bfd29da36494be62e33dcbb4de639bb83627f7470a65a9069d2717349"
+    },
+    {
+      "path": "pf_branching_theta45_refinement_marking_records.json",
+      "sha256": "dabda87193751f202ec7c56c257d90e25d3254e5bc308f8a59ca292b7396d6ca"
+    },
+    {
+      "path": "pf_branching_theta45_visibility_marker_diagnosis.csv",
+      "sha256": "526adef9709e125e0fc0650d1558cad386e94144bd9062233a3c6e8719e7a2aa"
+    }
+  ],
+  "producer_files": [
+    {
+      "path": "scripts/analyze_pf_current_source_branching_qualification_v2.py",
+      "sha256": "da14d1fbf3afc636fc421deb578c4b8284545789e496f26f8480a9f8e48cce75"
+    },
+    {
+      "path": "scripts/run_pf_current_source_branching_restart.py",
+      "sha256": "c95c71fcb6ec5662575a0713410402d6ddc8beaaa01961c2f9d17a7d9e57a161"
+    },
+    {
+      "path": "arrhenius_fracture/branching_qualification_v2.py",
+      "sha256": "55a6d10cacc61dfffc8af3bf9c337d6065d696996dff93b6ee28fed7bd57ce45"
+    },
+    {
+      "path": "arrhenius_fracture/adaptive_multitip_mesh_v11.py",
+      "sha256": "168499ab25d730d58eacfdb2402cb5a224855bf99691c02a7d779b801cda52b0"
+    },
+    {
+      "path": "arrhenius_fracture/sharp_front_v11_branching.py",
+      "sha256": "4b53093004d99ef7c8b4540d8fb40287a445949e99056bd827dca92745e8ce26"
+    }
+  ],
+  "raw_theta40_latest_checkpoint_sha256": "c6ff2a9a88eff6cc298e6ef1611574e51a0b12518d7d3ee49b504e992b190c79",
+  "raw_theta45_latest_checkpoint_sha256": "f62e897d00eef2a01dbc9a5182615c46e6481916b66460e7336c636ed59fcaff",
+  "schema": "pf_current_source_branching_qualification_v2_provenance",
+  "v1_decision_sha256": "d98865ea32710f73e70186a884ea4aeb29a5779ac533668c3724bccb3c162941"
+}
