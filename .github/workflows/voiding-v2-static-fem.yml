@@ -1,0 +1,21 @@
+name: voiding-v2-static-fem
+on:
+  pull_request:
+    paths:
+      - "arrhenius_fracture/voiding_v2.py"
+      - "scripts/qualify_voiding_v2_static_fem.py"
+      - "tests/test_voiding_v2.py"
+      - ".github/workflows/voiding-v2-static-fem.yml"
+  workflow_dispatch:
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e '.[test]'
+      - run: python -m pytest -q tests/test_voiding_v2.py
+      - run: python scripts/qualify_voiding_v2_static_fem.py --out /tmp/voiding-v2-static-fem
+      - run: git diff --exit-code
