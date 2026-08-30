@@ -4,7 +4,10 @@
   "V11_CONFORMING_CRACK_REFERENCE_QUALIFIED": "PASS",
   "V11_CAUSAL_P0_WAKE_MESH_OBJECTIVE": "OPEN",
   "V11_CAUSAL_CRACK_ONLY_STATIC_FEM_QUALIFIED": "OPEN",
-  "P0_ABSOLUTE_INTERACTION_INTEGRAL_QUALIFIED": "NOT_QUALIFIED_FINITE_WIDTH_STRIP_REQUIRES_INTERFACE_CONFIG_FORCE_CORRECTION",
+  "P0_ABSOLUTE_INTERACTION_INTEGRAL_QUALIFIED": "NOT_QUALIFIED_PRIMAL_P0_WAKE_DOES_NOT_CONVERGE_TO_CONFORMING_SLIT",
+  "INTERFACE_CONFIG_FORCE_CORRECTION_REQUIRED": "NOT_ESTABLISHED",
+  "CRACK_REPRESENTATION_OR_SUPPORT_REDESIGN_REQUIRED": "YES",
+  "CRACK_REPRESENTATION_DECISION": "REVISE_CAUSAL_SUPPORT_TO_MECHANICALLY_SEPARATING_OH_CORRIDOR",
   "P0_INTERACTION_INTEGRAL_SIGNED_PERTURBATION_ROLE": "RETAIN_PREVIOUSLY_QUALIFIED_ROLE_ONLY",
   "PRESCRIBED_CAUSAL_CRACK_VOID_INTERACTION_QUALIFIED": "NOT_RUN_REQUIRES_CAUSAL_CRACK_ONLY_PASS",
   "EXPLICIT_VOID_MECHANICS_QUALIFIED": "OPEN",
@@ -17,14 +20,21 @@
   "causal_p0_matched_checks": {
     "reaction_reference_error": 0.05460450412037062,
     "compliance_reference_error": 0.054604504120370566,
-    "crack_opening_reference_error": 0.9886151339029521,
+    "crack_opening_reference_error": 0.9936919909848063,
     "phase_energy_G_reference_error": 0.9962451636809823,
     "residual_normal_traction_relative": 3.087236564000857e-08,
-    "interface_traction_relative": 2.0007609295839615,
+    "intact_cross_graph_path_exists": true,
     "killed_energy_fraction": 1.1681727264885772e-11,
     "kappa_low_pair_reaction_spread": 9.911566115030152e-07,
     "absolute_KI_contour_spread": 0.2245726319938312,
     "phase_averaged_G_mesh_spread": 0.7487862163808421
+  },
+  "complete_separating_corridor_checks": {
+    "reaction_reference_error": 0.000971683421303759,
+    "compliance_reference_error": 0.0009716834213037197,
+    "COD_reference_error": 0.008342243474931827,
+    "G_reference_error": 0.007700133492949316,
+    "intact_cross_graph_path_exists": false
   },
   "legacy_unmatched_conforming_diagnostic_checks": {
     "all_contours_admissible": true,
@@ -49,6 +59,6 @@
     "status": "DIAGNOSTIC",
     "evidence_commit": "f0e2959ecf1187685e9d7723b2b4314791f9c353"
   },
-  "git_sha": "c7154cf97e512377fd4404f9278aa9669dd261ac",
+  "git_sha": "9386e7d76fcb98bcae17851a3a9a3a19b03f4888",
   "solver_identity": "production CST assembly/constitutive law + benchmark symmetric rigid constraint + scipy.spsolve(SuperLU)"
 }

@@ -3,53 +3,58 @@
   "files": [
     {
       "path": "causal_crack_contours.csv",
-      "sha256": "beb3521b2406e49408076076d1849d0b7e5b88452c7f3e52325258bc195a2581",
+      "sha256": "a32d6530cf650c53bc8c3c5bd2b646de313d205d1a3b1a59d67b25b2c03f5e60",
       "bytes": 2599
     },
     {
       "path": "causal_crack_derivative_states.csv",
-      "sha256": "c38bf0813cd7af79d38266c017236fcc84b966e29b7806e0beead9b057ed6adf",
+      "sha256": "8832e0a335427bad8d1c89bcd5533429b847935a3e21006dc194204a2159ce05",
       "bytes": 20516
     },
     {
       "path": "causal_crack_derivatives.csv",
-      "sha256": "bcc3a804d017ccc6b11ed55175f80e4650743f617f434df2b9465a665efd0140",
+      "sha256": "6f0cf92ae398fac4a9c9f4ce7e0786df5d16e2ac48b438133a04ca074b56fa94",
       "bytes": 3086
     },
     {
       "path": "causal_support.csv",
-      "sha256": "3220a7f62a35df3e60bff4f0b6dbcedeaad3c21ebfb9e34711a735c510ffa5df",
+      "sha256": "b1c79506a470568e724f52c0df068e172ad0f780d561c4147e326ba9bdaffc4f",
       "bytes": 2028
     },
     {
       "path": "cavity_only.csv",
-      "sha256": "60b3aeea9c1f9da8fefdb78653e64fba05fc4a966e7c535ee0c9b2ca91493058",
+      "sha256": "438683d144376fb4bf1abc1efee9f545a2441fc67bb2d0a3add812bf076c4c4a",
       "bytes": 1168
     },
     {
       "path": "conforming_contours.csv",
-      "sha256": "dd6f9fe4a112a4598556b7564800c15f40eedc3ab412d9610a62314121c15abc",
+      "sha256": "810eb85504db9a5342452bc9df8d1fc1988cb829248037398566743dd43a445d",
       "bytes": 1167
     },
     {
       "path": "conforming_crack_oracle.csv",
-      "sha256": "115670f53690ff7f2b7b6c57c491e334f24ce8a9d09cd5af374ac1bb9a6e2dda",
+      "sha256": "c20d69cb5cb279b83e1e10206930fe871c9b98d979ed56f806593d28af4d3f04",
       "bytes": 842
     },
     {
       "path": "conforming_crack_oracle_contours.csv",
-      "sha256": "24bb0d7c620c9f37d9066a37918a1c0b41e347c507e6f95c8a002070c059d017",
+      "sha256": "9fce99a1893b498cec11011b12780855e589f5094bdd30724db783a9f8cbd545",
       "bytes": 2027
     },
     {
       "path": "conforming_hardened.csv",
-      "sha256": "6a0a68cdc51ea9f56653ab924754b38d8e0ece1466d39f6d413d8e20429fb32c",
-      "bytes": 1826
+      "sha256": "1f6882b04a5d58e703a1464c0f10813934fe27a4e8b71405d8668bf59ef91784",
+      "bytes": 2166
+    },
+    {
+      "path": "crack_through_thickness_profiles.csv",
+      "sha256": "d4d862d732d80622d5de81eb21131d37fedffe1f9090565223ea64652d4d4735",
+      "bytes": 16549
     },
     {
       "path": "decision.json",
-      "sha256": "878dcea62d02ce8aedd476697bf29d96ce0aa7e6a176f905810d730d877bff85",
-      "bytes": 2750
+      "sha256": "0ec939cf109a8847abac619c419c26f1c3f2bd06af7a6adb65a1d3b73cc8983a",
+      "bytes": 3256
     },
     {
       "path": "environment.json",
@@ -57,28 +62,63 @@
       "bytes": 96
     },
     {
+      "path": "four_representation_screen.csv",
+      "sha256": "0efc0f3bccb6fab19b6b2f5a4f4b69f6fa6e61fbc68ab39bf968bbd91435bf07",
+      "bytes": 2293
+    },
+    {
+      "path": "joint_h_kappa_matrix.csv",
+      "sha256": "28d737fd2187a9327575269c72c88ab8e247de79e562bf675b51e412c2435139",
+      "bytes": 8804
+    },
+    {
       "path": "matched_geometry.csv",
-      "sha256": "49ea99afb75f19a91d1bebcd121f2d1dd0e181375d6b82bf3cd7c8eedc51abd0",
+      "sha256": "374cfe27e83312dbba105f8a7633494829e7fd95a83f668303885aedcceba07c",
       "bytes": 1647
     },
     {
+      "path": "p0_bridge_audit.csv",
+      "sha256": "d7ed6a272fb84b12fb7d5610267f152d698b3221340c32be0b4d6f6cd91b391a",
+      "bytes": 6675
+    },
+    {
+      "path": "p0_bridge_audit_12.5um.png",
+      "sha256": "6c09b26d2add2483d44f72ae6941af82d6b98090dab51ff6e0f20c61f86ad921",
+      "bytes": 79204
+    },
+    {
+      "path": "p0_bridge_audit_25um.png",
+      "sha256": "7e9c8c095a88e7e67ab94645ae05e4a4459d63e192b10aff0898611df9279d94",
+      "bytes": 66068
+    },
+    {
+      "path": "p0_bridge_audit_6.25um.png",
+      "sha256": "d8dc97ce1a2e176b719ebf354df792f58ec496b5801ea28154a309da27827e17",
+      "bytes": 80101
+    },
+    {
       "path": "p0_contours.csv",
-      "sha256": "6a5f0e1a2b96f549631a825948d297afc40c2b2d4bc6162f1bc4fd8f1c0f60f1",
-      "bytes": 5132
+      "sha256": "801630e9242ca81152fd318d399881df567d2077721c01c332da9bac3fd4dbd7",
+      "bytes": 5150
+    },
+    {
+      "path": "p0_interface_edge_tractions.csv",
+      "sha256": "d0dffa2918cedb66aace52bf2486fdaa957c3d130f35c1e645fb7f5d82d8449f",
+      "bytes": 7952
     },
     {
       "path": "p0_phase_slopes.csv",
-      "sha256": "bcf19779b608143859280259f59702eda29ed00ed5fd56fa4de3644957c50b8a",
+      "sha256": "1bc1f7272bb217005ad42e7068146c8ed24e7d082a264345fbd157e24ad9b803",
       "bytes": 1299
     },
     {
       "path": "p0_residual_stiffness_matrix.csv",
-      "sha256": "407f97d5764e31a6b3cbc23cd456b4417a4f8098917c5d74c68c7918c96608ea",
-      "bytes": 20107
+      "sha256": "38c696f55fd02dd34b913551b9589ddb698135c574c610c9fa217a6d7aa965f1",
+      "bytes": 20127
     },
     {
       "path": "p0_staircase.csv",
-      "sha256": "3a0c6630a2fa0a7e912b12781570a2e46b7235aa045d99342fefbfc752059888",
+      "sha256": "35c4a6c2f50a98163d4b304deaf292ac11e66d1ed30de6ce69399df5874c58e5",
       "bytes": 59457
     }
   ]
