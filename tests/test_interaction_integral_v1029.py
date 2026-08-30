@@ -1,3 +1,4 @@
+from copy import copy
 from types import SimpleNamespace
 
 import numpy as np
@@ -128,3 +129,51 @@ def test_hardened_integral_recovers_williams_field_and_is_contour_stable(
         assert result.diagnostics["domain_weight"] == "cubic_Hermite_C1"
         values.append(recovered)
     assert (max(values) - min(values)) / K_expected < 0.025
+
+
+def test_exact_element_exclusion_is_optional_validated_and_zeroes_contribution():
+    mat = ElasticProperties()
+    mesh = _mesh(n=31)
+    u, sigma, _ = _exact_state(mesh, "I", 5.0e6, mat)
+    damage = np.zeros(len(mesh.nodes))
+    kwargs = dict(
+        crack_tip=np.array([0.0, 0.0]), crack_direction=np.array([1.0, 0.0]),
+        mat=mat, ell=1.0,
+        cfg=SimpleNamespace(r_inner_factor=0.15, r_outer_factor=0.75),
+        D=isotropic_plane_strain_D(mat.E, mat.nu),
+    )
+    baseline = compute_signed_interaction_integral(mesh, u, sigma, damage, **kwargs)
+    explicit_none = compute_signed_interaction_integral(
+        mesh, u, sigma, damage, exclude_element_mask=None, **kwargs
+    )
+    assert explicit_none.K_I_Pa_sqrt_m == baseline.K_I_Pa_sqrt_m
+    assert explicit_none.K_II_Pa_sqrt_m == baseline.K_II_Pa_sqrt_m
+
+    with pytest.raises(ValueError, match="one entry per element"):
+        compute_signed_interaction_integral(
+            mesh, u, sigma, damage,
+            exclude_element_mask=np.zeros(mesh.ne + 1, dtype=bool), **kwargs
+        )
+
+    radii = np.linalg.norm(mesh.nodes, axis=1)
+    q = _hermite_plateau_q(radii, 0.15, 0.75)
+    excluded_id = int(np.flatnonzero(np.ptp(q[mesh.elems], axis=1) > 1.0e-14)[0])
+    exact_mask = np.zeros(mesh.ne, dtype=bool)
+    exact_mask[excluded_id] = True
+    excluded = compute_signed_interaction_integral(
+        mesh, u, sigma, damage, exclude_element_mask=exact_mask, **kwargs
+    )
+
+    zero_area_mesh = copy(mesh)
+    zero_area_mesh.area_e = mesh.area_e.copy()
+    zero_area_mesh.area_e[excluded_id] = 0.0
+    zero_area = compute_signed_interaction_integral(
+        zero_area_mesh, u, sigma, damage, **kwargs
+    )
+    assert excluded.K_I_Pa_sqrt_m == pytest.approx(zero_area.K_I_Pa_sqrt_m)
+    assert excluded.K_II_Pa_sqrt_m == pytest.approx(zero_area.K_II_Pa_sqrt_m)
+    for mode in ("mode_I", "mode_II"):
+        diagnostics = excluded.diagnostics[mode]
+        assert diagnostics["exact_mask_total_elements"] == 1
+        assert diagnostics["skipped_exact_elements"] == 1
+        assert diagnostics["active_elements"] == baseline.diagnostics[mode]["active_elements"] - 1

@@ -1,0 +1,43 @@
+name: voiding-v2-static-fem
+on:
+  pull_request:
+    paths:
+      - "arrhenius_fracture/voiding_v2.py"
+      - "arrhenius_fracture/conforming_crack_oracle_v11.py"
+      - "arrhenius_fracture/causal_sharp_wake_v11.py"
+      - "arrhenius_fracture/matched_crack_qualification_v11.py"
+      - "scripts/qualify_voiding_v2_static_fem.py"
+      - "scripts/qualify_voiding_v2_causal_static.py"
+      - "arrhenius_fracture/interaction_integral_v1029.py"
+      - "arrhenius_fracture/interaction_integral_v10214.py"
+      - "tests/test_voiding_v2.py"
+      - "tests/test_interaction_integral_v1029.py"
+      - ".github/workflows/voiding-v2-static-fem.yml"
+  workflow_dispatch:
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    env:
+      MPLCONFIGDIR: /tmp/matplotlib-voiding-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install numpy==2.5.1 scipy==1.18.0 matplotlib==3.11.0 pytest==9.1.1
+      - run: python -m pip install -e . --no-deps
+      - run: >-
+          python -m pytest -q
+          tests/test_voiding_v2.py
+          tests/test_v11_process_state_ownership.py
+          tests/test_v11_live_topology_multitip.py
+          tests/test_v11_causal_sharp_wake.py
+          tests/test_live_topology_kernel_v11.py
+          tests/test_crack_network_v11.py
+          tests/test_topology_transaction_v11.py
+          tests/test_interaction_integral_v1029.py
+          tests/test_v10214_intrinsic_isotropy_interaction.py
+      - run: python scripts/qualify_voiding_v2_causal_static.py --out /tmp/voiding-v2-causal-static-a
+      - run: python scripts/qualify_voiding_v2_causal_static.py --out /tmp/voiding-v2-causal-static-b
+      - run: diff -rq /tmp/voiding-v2-causal-static-a /tmp/voiding-v2-causal-static-b
+      - run: git diff --exit-code

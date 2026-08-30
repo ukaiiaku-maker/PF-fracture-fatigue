@@ -7,6 +7,7 @@ from arrhenius_fracture.causal_sharp_wake_v11 import (
     CRACK_REPRESENTATION,
     apply_causal_segment,
     causal_segment_support,
+    mechanically_separating_segment_support,
 )
 from arrhenius_fracture.crack_backend import SharpWakeBackend
 from arrhenius_fracture.crack_network_v11 import CrackNetworkState
@@ -58,6 +59,17 @@ def test_causal_selector_has_no_endpoint_only_forward_kill():
     # Every selected triangle has vertices at or behind the advancing endpoint.
     assert np.all(np.min(mesh.nodes[mesh.elems[selected], 0], axis=1) < 1.0)
     assert not np.any(np.all(mesh.nodes[mesh.elems[selected], 0] >= 1.0, axis=1))
+
+
+def test_mechanically_separating_support_closes_interior_node_stars_but_not_forward_tip():
+    mesh=strip_mesh(); p0=np.array([0.,0.]); p1=np.array([2.,0.])
+    exact,_=causal_segment_support(mesh,p0,p1)
+    separating,_=mechanically_separating_segment_support(mesh,p0,p1)
+    assert set(exact).issubset(set(separating))
+    interior_node=4
+    incident=np.flatnonzero(np.any(mesh.elems==interior_node,axis=1))
+    assert set(incident).issubset(set(separating))
+    assert not np.any(np.all(mesh.nodes[mesh.elems[separating],0]>=2.,axis=1))
 
 
 def test_repeated_advances_always_change_additional_p0_stiffness():

@@ -1,0 +1,11 @@
+{
+  "schema": "voiding-v2-source-manifest/1",
+  "inputs": [
+    {"name": "notes(20260829-010935).docx", "sha256": "9c67a1d459b019dfa67d9fb0d06de933ba85665c21cb3e3dd19195fb350274ea"},
+    {"name": "Arrhenius-Based Multiphysics Model for Void Nucleation and Failure in Creep Plasticity(2).docx", "sha256": "063075414e852bc5ebee55764277e8290fc63bcc22dad5fe36d851bcf33eba29"},
+    {"name": "StatefulVoiding_ConstantLoadCreep_MZ_v5(3).m", "sha256": "41a89a601355ed0fba2350bd1df5a75fc68a8b86ed3618b0e02266b232fef8bb"},
+    {"name": "StatefulVoiding_ArrheniusHazard_MZ_v2(3).m", "sha256": "77a8d3d71cf3486096025aab175c630a39afdf15c003907822d428a3a48c0733"}
+  ],
+  "adopted": ["site-resolved Arrhenius birth", "multi-hit first passage", "reversible embryo", "series-limited positive growth"],
+  "rejected": ["global damage", "global area loss", "scalar topology merge", "generic memory modes", "prototype numerical parameters"]
+}

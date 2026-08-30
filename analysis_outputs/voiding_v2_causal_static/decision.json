@@ -1,0 +1,64 @@
+{
+  "schema": "voiding-v2-causal-static-decision/1",
+  "EXPLICIT_CAVITY_ONLY_STATIC_FEM_QUALIFIED": "PASS",
+  "V11_CONFORMING_CRACK_REFERENCE_QUALIFIED": "PASS",
+  "V11_CAUSAL_P0_WAKE_MESH_OBJECTIVE": "OPEN",
+  "V11_CAUSAL_CRACK_ONLY_STATIC_FEM_QUALIFIED": "OPEN",
+  "P0_ABSOLUTE_INTERACTION_INTEGRAL_QUALIFIED": "NOT_QUALIFIED_PRIMAL_P0_WAKE_DOES_NOT_CONVERGE_TO_CONFORMING_SLIT",
+  "INTERFACE_CONFIG_FORCE_CORRECTION_REQUIRED": "NOT_ESTABLISHED",
+  "CRACK_REPRESENTATION_OR_SUPPORT_REDESIGN_REQUIRED": "YES",
+  "CRACK_REPRESENTATION_DECISION": "REVISE_CAUSAL_SUPPORT_TO_MECHANICALLY_SEPARATING_OH_CORRIDOR",
+  "P0_INTERACTION_INTEGRAL_SIGNED_PERTURBATION_ROLE": "RETAIN_PREVIOUSLY_QUALIFIED_ROLE_ONLY",
+  "PRESCRIBED_CAUSAL_CRACK_VOID_INTERACTION_QUALIFIED": "NOT_RUN_REQUIRES_CAUSAL_CRACK_ONLY_PASS",
+  "EXPLICIT_VOID_MECHANICS_QUALIFIED": "OPEN",
+  "conforming_crack_reference_checks": {
+    "two_finest_pairwise_G_agreement_max_relative": 0.006360761731767487,
+    "common_delta_mesh_spread_max_relative": 0.0030264367200105668,
+    "weak_face_residual_max_relative": 1.9798253007930653e-15,
+    "fixed_trim_traction_decreases": true
+  },
+  "causal_p0_matched_checks": {
+    "reaction_reference_error": 0.05460450412037062,
+    "compliance_reference_error": 0.054604504120370566,
+    "crack_opening_reference_error": 0.9936919909848063,
+    "phase_energy_G_reference_error": 0.9962451636809823,
+    "residual_normal_traction_relative": 3.087236564000857e-08,
+    "intact_cross_graph_path_exists": true,
+    "killed_energy_fraction": 1.1681727264885772e-11,
+    "kappa_low_pair_reaction_spread": 9.911566115030152e-07,
+    "absolute_KI_contour_spread": 0.2245726319938312,
+    "phase_averaged_G_mesh_spread": 0.7487862163808421
+  },
+  "complete_separating_corridor_checks": {
+    "reaction_reference_error": 0.000971683421303759,
+    "compliance_reference_error": 0.0009716834213037197,
+    "COD_reference_error": 0.008342243474931827,
+    "G_reference_error": 0.007700133492949316,
+    "intact_cross_graph_path_exists": false
+  },
+  "legacy_unmatched_conforming_diagnostic_checks": {
+    "all_contours_admissible": true,
+    "maximum_contour_KI_plateau_relative": 0.022034843935879643,
+    "energy_G_mesh_spread_relative": 0.029933895313551766,
+    "weak_face_residual_max_relative": 5.87167386286469e-16,
+    "recovered_face_traction_decreases": true,
+    "rigid_pin_energy_relative_error": 4.0624603636693795e-14
+  },
+  "causal_crack_checks": {
+    "contours_all_admissible": true,
+    "contour_KI_plateau_relative": 0.21292966238414085,
+    "centered_KII_over_KI": 7.354791699423807e-15,
+    "energy_compliance_error": 1.8799618141188645e-06,
+    "energy_interaction_error": "NOT_EVALUATED_REQUIRES_CONVERGED_INTERACTION_G",
+    "perturbation_spread": 0.25428609786894346,
+    "mesh_spread": 0.08053147174460284,
+    "causal_support_distance_decreases": true
+  },
+  "superseded_diagnostic": {
+    "type": "CENTROID_BAND_EXTENSION_DERIVATIVE_NUMERICALLY_STABLE",
+    "status": "DIAGNOSTIC",
+    "evidence_commit": "f0e2959ecf1187685e9d7723b2b4314791f9c353"
+  },
+  "git_sha": "9386e7d76fcb98bcae17851a3a9a3a19b03f4888",
+  "solver_identity": "production CST assembly/constitutive law + benchmark symmetric rigid constraint + scipy.spsolve(SuperLU)"
+}

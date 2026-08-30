@@ -1,0 +1,191 @@
+import copy
+import math
+
+import numpy as np
+import pytest
+from pathlib import Path
+from arrhenius_fracture.causal_sharp_wake_v11 import causal_segment_support
+from arrhenius_fracture.conforming_crack_oracle_v11 import (
+    build_conforming_slit_mesh, build_matched_crack_parent, conforming_slit_from_parent,
+    recovered_face_traction_relative, solve_conforming_slit,
+)
+from scripts.qualify_voiding_v2_causal_static import causal_mask, contour
+
+from arrhenius_fracture.voiding_v2 import (
+    Clock, LifecycleRates, Registry, Site, SiteState, VoidingV2Config,
+    advance_lifecycle_localized, build_explicit_hole_mesh, fill_explicit_hole_mesh,
+    series_limited_growth_rate, solve_static_hole, triangle_intersects_open_disk,
+)
+
+
+@pytest.mark.parametrize("a,b,expected", [
+    (2.0,3.0,1.2),(0.0,3.0,0.0),(2.0,0.0,0.0),(-2.0,3.0,0.0),
+    (2.0,-3.0,0.0),(-2.0,-3.0,0.0),
+])
+def test_series_growth_requires_two_positive_rates(a,b,expected):
+    assert series_limited_growth_rate(a,b) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("value", [math.nan,math.inf,-math.inf])
+def test_series_growth_rejects_nonfinite(value):
+    with pytest.raises(ValueError): series_limited_growth_rate(value,1.0)
+
+
+def registry(birth=.5,stable=1.0,heal=10.0):
+    return Registry(VoidingV2Config(enabled=True), sites={"s":Site(
+        "s",(1.0,0.0),SiteState.AVAILABLE,Clock(0,birth),Clock(0,stable),Clock(0,heal),1.0)})
+
+
+def fixed_rates(_registry,_site): return LifecycleRates(1.0,1.0,1.0)
+
+
+def test_birth_does_not_reuse_full_step_for_stabilization():
+    r=registry(birth=.75,stable=.5)
+    advance_lifecycle_localized(r,"s",1.0,fixed_rates,.1)
+    assert r.sites["s"].state == SiteState.EMBRYO
+    assert r.sites["s"].stabilization.hazard == pytest.approx(.25)
+
+
+def test_birth_then_stabilization_uses_only_residual_time():
+    r=registry(birth=.25,stable=.5,heal=10)
+    advance_lifecycle_localized(r,"s",1.0,fixed_rates,.1)
+    assert r.sites["s"].state == SiteState.CONSUMED
+    assert r.events[1]["time_within_step_s"] == pytest.approx(.75)
+
+
+def test_birth_then_healing_and_tie_policy():
+    r=registry(birth=.25,stable=.7,heal=.3)
+    advance_lifecycle_localized(r,"s",1.0,fixed_rates,.1)
+    assert r.sites["s"].state == SiteState.HEALED and not r.voids
+    tie=registry(birth=.1,stable=.2,heal=.2)
+    advance_lifecycle_localized(tie,"s",1.0,fixed_rates,.1)
+    assert tie.sites["s"].state == SiteState.HEALED
+
+
+def test_timestep_partition_invariance():
+    one=registry(birth=.25,stable=.5,heal=10); split=copy.deepcopy(one)
+    advance_lifecycle_localized(one,"s",1.0,fixed_rates,.1)
+    advance_lifecycle_localized(split,"s",.4,fixed_rates,.1)
+    advance_lifecycle_localized(split,"s",.6,fixed_rates,.1)
+    assert one.sites["s"].state == split.sites["s"].state
+    assert one.sites["s"].birth.hazard == split.sites["s"].birth.hazard
+    assert one.sites["s"].stabilization.hazard == split.sites["s"].stabilization.hazard
+
+
+@pytest.mark.parametrize("dt",[0,-1,math.nan])
+def test_lifecycle_rejects_invalid_dt(dt):
+    with pytest.raises(ValueError): advance_lifecycle_localized(registry(),"s",dt,fixed_rates,.1)
+
+
+def test_post_transition_veto_rolls_back_exactly():
+    r=registry(); before=copy.deepcopy(r)
+    with pytest.raises(RuntimeError):
+        advance_lifecycle_localized(r,"s",1.0,fixed_rates,.1,
+            post_transition_veto=lambda *_: (_ for _ in ()).throw(RuntimeError("veto")))
+    assert r == before
+
+
+def test_triangle_disk_intersection_catches_edge_and_center_cases():
+    assert triangle_intersects_open_disk(np.array([[-2,.5],[2,.5],[0,2.]]),(0,0),1)
+    assert triangle_intersects_open_disk(np.array([[-2,-2],[2,-2],[0,2.]]),(0,0),1)
+    assert not triangle_intersects_open_disk(np.array([[2,2],[3,2],[2,3]]),(0,0),1)
+
+
+@pytest.mark.parametrize("h,n",[(2e-4,48),(1e-4,96)])
+def test_actual_connectivity_derived_hole_invariants(h,n):
+    hole=build_explicit_hole_mesh(.008,.008,(.004,0),.0005,h,n)
+    v=hole.validation
+    assert v["actual_internal_components"] == 1 and v["cavity_cycle"]
+    assert v["triangle_disk_intersections"] == 0 and v["orphan_nodes"] == 0
+    assert v["polygon_bidirectional_Hausdorff_m"] < 1e-14
+    assert v["polygon_exact_node_set_match"]
+    assert len(hole.cavity_edges) == n
+
+
+def test_production_fem_hole_solution_is_equilibrated_and_symmetric():
+    hole=build_explicit_hole_mesh(.008,.008,(.004,0),.0005,1e-4,96)
+    result=solve_static_hole(hole,8e-6)
+    assert result.free_residual_norm_N_per_m/result.reaction_top_N_per_m < 1e-12
+    assert result.symmetry_error < 1e-12
+    assert result.weak_cavity_residual_relative < 1e-12
+    assert np.isfinite(result.mirror_sigma_xx_relative)
+    assert np.isfinite(result.mirror_sigma_yy_relative)
+    assert np.isfinite(result.mirror_sigma_xy_antisym_relative)
+    assert np.isfinite(result.stored_energy_J_per_m) and result.stored_energy_J_per_m > 0
+    assert 2.5 < result.hoop_stress_concentration < 3.5
+
+
+def test_filled_control_preserves_every_element_outside_cavity_patch():
+    hole=build_explicit_hole_mesh(.008,.008,(.006,0),.00025,2e-4,48)
+    control=fill_explicit_hole_mesh(hole)
+    assert np.array_equal(control.mesh.nodes[:hole.mesh.nn],hole.mesh.nodes)
+    assert np.array_equal(control.mesh.elems[:hole.mesh.ne],hole.mesh.elems)
+    assert control.mesh.nn == hole.mesh.nn+1
+    assert control.mesh.ne == hole.mesh.ne+len(hole.cavity_edges)
+
+
+def test_fixed_wake_mask_shape_is_fail_closed():
+    hole=build_explicit_hole_mesh(.008,.008,(.004,0),.00025,2e-4,48)
+    with pytest.raises(ValueError,match="one entry per element"):
+        solve_static_hole(hole,8e-6,crack_tip_m=(.002,0),wake_half_width_m=1e-4,
+                          element_kill_mask=np.zeros(hole.mesh.ne-1,bool))
+
+
+def test_authoritative_runner_has_no_centroid_band_crack_path():
+    source=Path("scripts/qualify_voiding_v2_causal_static.py").read_text()
+    assert "causal_segment_support" in source
+    assert "WAKE_HALF_WIDTH" not in source
+    assert "effective_crack_tip" not in source
+
+
+def test_v2_causal_mask_exactly_equals_v11_selector_and_inadmissible_contour_fails():
+    hole=build_explicit_hole_mesh(.008,.008,(.004,0),.00025,1e-4,96)
+    control=fill_explicit_hole_mesh(hole); p0=np.array((.0005,0.)); p1=np.array((.002,0.))
+    expected,_=causal_segment_support(control.mesh,p0,p1); mask,audit=causal_mask(control.mesh,p1)
+    np.testing.assert_array_equal(np.flatnonzero(mask),expected)
+    assert audit["physical_crack_length_m"] == pytest.approx(np.linalg.norm(p1-p0))
+    result=solve_static_hole(control,8e-6,crack_tip_m=tuple(p1),element_kill_mask=mask)
+    assert contour(control.mesh,result,mask,p1,.003)["status"] == "NOT_ADMISSIBLE_AT_CURRENT_RESOLUTION"
+
+
+def test_symmetric_rigid_pin_location_changes_only_translation():
+    hole=build_explicit_hole_mesh(.008,.008,(.004,0),.0005,2e-4,48)
+    mid=np.where(np.isclose(hole.mesh.nodes[:,1],0,atol=1e-14))[0]
+    first=solve_static_hole(hole,8e-6,rigid_pin_node=int(mid[0]))
+    second=solve_static_hole(hole,8e-6,rigid_pin_node=int(mid[-1]))
+    np.testing.assert_allclose(first.sigma_gp,second.sigma_gp,rtol=2e-10,atol=1e-2)
+    assert first.stored_energy_J_per_m == pytest.approx(second.stored_energy_J_per_m,rel=2e-12)
+
+
+def test_conforming_slit_has_shared_tips_duplicated_faces_and_natural_zero_traction():
+    slit=build_conforming_slit_mesh(.004,.004,(.001,0.),(.002,0.),.00025)
+    nodes=slit.hole.mesh.nodes
+    for x in (.001,.002):
+        assert np.count_nonzero(np.all(np.isclose(nodes,(x,0.),atol=1e-15),axis=1)) == 1
+    assert np.count_nonzero(np.all(np.isclose(nodes,(.0015,0.),atol=1e-15),axis=1)) == 2
+    assert not set(map(tuple,slit.upper_face_edges)).intersection(map(tuple,slit.lower_face_edges))
+    result=solve_conforming_slit(slit,4e-6,pin_node=slit.hole.boundary.left_bot)
+    assert result.weak_cavity_residual_relative < 1e-12
+    assert recovered_face_traction_relative(slit,result) < .6
+
+
+def test_matched_parent_normalized_connectivity_differs_only_by_face_duplication():
+    parent=build_matched_crack_parent(.008,.008,(.0005,0.),(.002,0.),25e-6)
+    slit=conforming_slit_from_parent(parent)
+    np.testing.assert_array_equal(slit.parent_node_of_node[slit.hole.mesh.elems],parent.hole.mesh.elems)
+    assert slit.hole.validation["actual_internal_components"] == 1
+    assert slit.hole.validation["normalized_parent_connectivity_fingerprint"] == parent.connectivity_fingerprint
+
+
+def test_p0_residual_stiffness_is_parameterized_and_validated():
+    parent=build_matched_crack_parent(.008,.008,(.0005,0.),(.002,0.),25e-6)
+    mask,_=causal_segment_support(parent.hole.mesh,np.array((.0005,0.)),np.array((.002,0.)))
+    selected=np.zeros(parent.hole.mesh.ne,bool); selected[mask]=True
+    high=solve_static_hole(parent.hole,8e-6,crack_tip_m=(.002,0.),element_kill_mask=selected,
+                           residual_stiffness_kappa=1e-4,rigid_pin_node=parent.hole.boundary.left_bot)
+    low=solve_static_hole(parent.hole,8e-6,crack_tip_m=(.002,0.),element_kill_mask=selected,
+                          residual_stiffness_kappa=1e-8,rigid_pin_node=parent.hole.boundary.left_bot)
+    assert low.killed_element_energy_J_per_m < high.killed_element_energy_J_per_m
+    with pytest.raises(ValueError,match="finite and nonnegative"):
+        solve_static_hole(parent.hole,8e-6,crack_tip_m=(.002,0.),element_kill_mask=selected,
+                          residual_stiffness_kappa=-1.)
