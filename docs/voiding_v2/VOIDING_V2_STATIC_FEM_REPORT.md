@@ -35,7 +35,17 @@ Every centered derivative now records its minus, base, and plus endpoints, true 
 
 The crack prerequisite uses a separate intact-material oracle with duplicated upper/lower face nodes strictly inside the crack and shared endpoints. It has no deleted-element strip, damage law, or residual stiffness. Three refinements use the same physical segment and opening, natural traction-free faces, fixed physical contours, and centered energy derivatives. The conforming gate passes: contours are admissible and plateaued, energy G refines, the weak face residual is near machine precision, recovered face traction decreases, and moving the rigid-body pin changes energy only at roundoff.
 
-This pass establishes that the production interaction integral is applicable to a resolved traction-free discontinuity. It does not qualify the P0 wake. The requested crack-aligned nested P0 family and residual-stiffness sweep remain an explicit OPEN mesh-objective prerequisite; no crack-void work may begin before it closes.
+The hardened matched-parent reference computes `G_energy`, `G_compliance`, and `G_K` explicitly. Across the two finest parents and common physical 50 and 75 micrometre perturbations, the maximum pairwise G disagreement is 0.64% and the maximum common-perturbation mesh spread is 0.30%. Crack-face topology is derived from edge incidence. Full-face recovered traction remains a singular-endpoint diagnostic; the qualified checks use weak residual plus fixed-physical and four-element trimmed norms.
+
+## Matched causal P0 wake decision
+
+Each 25, 12.5, and 6.25 micrometre screen starts from one locally refined crack-aligned intact parent. The conforming model duplicates only interior face nodes; mapping those duplicates back reproduces the exact parent connectivity. The P0 model retains the intact parent connectivity and obtains its support only from `causal_segment_support`. Fingerprints for parent geometry/connectivity and normalized conforming/P0 connectivity are published.
+
+The untuned residual-stiffness matrix uses `kappa = 1e-4, 1e-6, 1e-8`. It reports COD, killed-strip normal/shear traction and energy, intact/P0 interface traction, reaction, compliance, energy release, contour KI/KII, free residual, and a diagonal conditioning proxy. Lowering kappa produces a kappa-insensitive reaction and removes stress/energy stored inside the killed strip, but it does not make the finite-width P0 representation approach the conforming slit.
+
+At the finest screen the reaction/compliance error is 5.46%, but COD error is 98.9%, phase-averaged energy-G error is 99.6%, intact/P0 interface traction remains about twice the remote stress, and absolute-KI contour spread is 22.5%. The phase-averaged P0 G also decreases toward zero with mesh refinement instead of approaching the roughly 524 J/m2 conforming value. Endpoint-state evidence publishes support-event increments, resolved centered differences, fixed-window regression slopes, and graph-to-mesh phase averages.
+
+Therefore `V11_CAUSAL_P0_WAKE_MESH_OBJECTIVE` and `V11_CAUSAL_CRACK_ONLY_STATIC_FEM_QUALIFIED` remain OPEN. Absolute P0 KI is not qualified: the conforming slit is path independent while the degraded strip remains path dependent, indicating that an inhomogeneity/interface configurational-force correction is required. The interaction integral is retained only for its previously qualified signed-perturbation role. No tolerance is relaxed and no crack-void work is run.
 
 ## Interaction contours
 

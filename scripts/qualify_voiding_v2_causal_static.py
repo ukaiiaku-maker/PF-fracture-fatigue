@@ -16,6 +16,7 @@ from arrhenius_fracture.conforming_crack_oracle_v11 import (
 from arrhenius_fracture.fem import plane_strain_D
 from arrhenius_fracture.interaction_integral_v10214 import compute_signed_interaction_integral
 from arrhenius_fracture.interaction_integral_v1029 import _hermite_plateau_q
+from arrhenius_fracture.matched_crack_qualification_v11 import run_matched_qualification
 from arrhenius_fracture.voiding_v2 import build_explicit_hole_mesh, fill_explicit_hole_mesh, solve_static_hole
 
 OPENING=8e-6; MAT=ElasticProperties(E=210e9,nu=.3); D=plane_strain_D(MAT)
@@ -170,6 +171,8 @@ def main():
     oracle,oracle_contours,oracle_checks,oracle_pass=qualify_conforming_oracle(source)
     write_csv(out/"conforming_crack_oracle.csv",oracle)
     write_csv(out/"conforming_crack_oracle_contours.csv",oracle_contours)
+    matched,matched_oracle_checks,matched_oracle_pass,matched_p0_checks,matched_p0_pass=run_matched_qualification(source)
+    for name,rows in matched.items(): write_csv(out/(name+".csv"),rows)
     cavity_pass=(max(r["recovered_traction"] for r in cavity[-2:])<=.1 and max(r["Kirsch_error"] for r in cavity[-2:])<=.1 and
       max(r["weak_residual"] for r in cavity)<=1e-10 and all(r["topology_components"]==1 and r["disk_intersections"]==0 and r["exact_boundary_nodes"] for r in cavity))
     all_admissible=all(r["status"].startswith("EXECUTED") for r in contours)
@@ -188,11 +191,14 @@ def main():
     crack_pass=bool(all_admissible and plateau<=.1 and symmetry<=.05 and ec<=.1 and perturb<=.1 and mesh_spread<=.1 and support_converges)
     combined="NOT_RUN_REQUIRES_CAUSAL_CRACK_ONLY_PASS" if not crack_pass else "OPEN_NOT_RUN"
     decision={"schema":"voiding-v2-causal-static-decision/1","EXPLICIT_CAVITY_ONLY_STATIC_FEM_QUALIFIED":"PASS" if cavity_pass else "OPEN",
-      "V11_CONFORMING_CRACK_REFERENCE_QUALIFIED":"PASS" if oracle_pass else "OPEN",
-      "V11_CAUSAL_P0_WAKE_MESH_OBJECTIVE":"OPEN" if oracle_pass else "NOT_RUN_REQUIRES_CONFORMING_CRACK_REFERENCE_PASS",
-      "V11_CAUSAL_CRACK_ONLY_STATIC_FEM_QUALIFIED":"PASS" if crack_pass else "OPEN",
+      "V11_CONFORMING_CRACK_REFERENCE_QUALIFIED":"PASS" if matched_oracle_pass else "OPEN",
+      "V11_CAUSAL_P0_WAKE_MESH_OBJECTIVE":"PASS" if matched_p0_pass else "OPEN",
+      "V11_CAUSAL_CRACK_ONLY_STATIC_FEM_QUALIFIED":"PASS" if matched_p0_pass and crack_pass else "OPEN",
+      "P0_ABSOLUTE_INTERACTION_INTEGRAL_QUALIFIED":"PASS" if matched_p0_pass else "NOT_QUALIFIED_FINITE_WIDTH_STRIP_REQUIRES_INTERFACE_CONFIG_FORCE_CORRECTION",
+      "P0_INTERACTION_INTEGRAL_SIGNED_PERTURBATION_ROLE":"RETAIN_PREVIOUSLY_QUALIFIED_ROLE_ONLY",
       "PRESCRIBED_CAUSAL_CRACK_VOID_INTERACTION_QUALIFIED":combined,"EXPLICIT_VOID_MECHANICS_QUALIFIED":"OPEN",
-      "conforming_crack_reference_checks":oracle_checks,"causal_crack_checks":checks,"superseded_diagnostic":{"type":"CENTROID_BAND_EXTENSION_DERIVATIVE_NUMERICALLY_STABLE",
+      "conforming_crack_reference_checks":matched_oracle_checks,"causal_p0_matched_checks":matched_p0_checks,
+      "legacy_unmatched_conforming_diagnostic_checks":oracle_checks,"causal_crack_checks":checks,"superseded_diagnostic":{"type":"CENTROID_BAND_EXTENSION_DERIVATIVE_NUMERICALLY_STABLE",
        "status":"DIAGNOSTIC","evidence_commit":"f0e2959ecf1187685e9d7723b2b4314791f9c353"},"git_sha":source,"solver_identity":SOLVER}
     (out/"decision.json").write_text(json.dumps(decision,indent=2)+"\n")
     env={"python":platform.python_version(),"numpy":np.__version__,"scipy":scipy.__version__,"required_python":"3.12"}

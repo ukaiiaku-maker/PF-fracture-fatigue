@@ -6,7 +6,8 @@ import pytest
 from pathlib import Path
 from arrhenius_fracture.causal_sharp_wake_v11 import causal_segment_support
 from arrhenius_fracture.conforming_crack_oracle_v11 import (
-    build_conforming_slit_mesh, recovered_face_traction_relative, solve_conforming_slit,
+    build_conforming_slit_mesh, build_matched_crack_parent, conforming_slit_from_parent,
+    recovered_face_traction_relative, solve_conforming_slit,
 )
 from scripts.qualify_voiding_v2_causal_static import causal_mask, contour
 
@@ -166,3 +167,25 @@ def test_conforming_slit_has_shared_tips_duplicated_faces_and_natural_zero_tract
     result=solve_conforming_slit(slit,4e-6,pin_node=slit.hole.boundary.left_bot)
     assert result.weak_cavity_residual_relative < 1e-12
     assert recovered_face_traction_relative(slit,result) < .6
+
+
+def test_matched_parent_normalized_connectivity_differs_only_by_face_duplication():
+    parent=build_matched_crack_parent(.008,.008,(.0005,0.),(.002,0.),25e-6)
+    slit=conforming_slit_from_parent(parent)
+    np.testing.assert_array_equal(slit.parent_node_of_node[slit.hole.mesh.elems],parent.hole.mesh.elems)
+    assert slit.hole.validation["actual_internal_components"] == 1
+    assert slit.hole.validation["normalized_parent_connectivity_fingerprint"] == parent.connectivity_fingerprint
+
+
+def test_p0_residual_stiffness_is_parameterized_and_validated():
+    parent=build_matched_crack_parent(.008,.008,(.0005,0.),(.002,0.),25e-6)
+    mask,_=causal_segment_support(parent.hole.mesh,np.array((.0005,0.)),np.array((.002,0.)))
+    selected=np.zeros(parent.hole.mesh.ne,bool); selected[mask]=True
+    high=solve_static_hole(parent.hole,8e-6,crack_tip_m=(.002,0.),element_kill_mask=selected,
+                           residual_stiffness_kappa=1e-4,rigid_pin_node=parent.hole.boundary.left_bot)
+    low=solve_static_hole(parent.hole,8e-6,crack_tip_m=(.002,0.),element_kill_mask=selected,
+                          residual_stiffness_kappa=1e-8,rigid_pin_node=parent.hole.boundary.left_bot)
+    assert low.killed_element_energy_J_per_m < high.killed_element_energy_J_per_m
+    with pytest.raises(ValueError,match="finite and nonnegative"):
+        solve_static_hole(parent.hole,8e-6,crack_tip_m=(.002,0.),element_kill_mask=selected,
+                          residual_stiffness_kappa=-1.)

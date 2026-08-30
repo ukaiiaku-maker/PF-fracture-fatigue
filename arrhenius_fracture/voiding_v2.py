@@ -392,6 +392,8 @@ class StaticFEMResult:
     mirror_sigma_xx_relative: float = math.nan
     mirror_sigma_yy_relative: float = math.nan
     mirror_sigma_xy_antisym_relative: float = math.nan
+    conditioning_diagonal_ratio: float = math.nan
+    killed_element_energy_J_per_m: float = math.nan
 
 
 def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticProperties]=None,
@@ -399,7 +401,8 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
                       wake_half_width_m: float=0.0,
                       symmetric_rigid_constraint: bool=True,
                       element_kill_mask: Optional[np.ndarray]=None,
-                      rigid_pin_node: Optional[int]=None) -> StaticFEMResult:
+                      rigid_pin_node: Optional[int]=None,
+                      residual_stiffness_kappa: float=1e-6) -> StaticFEMResult:
     """Use the unmodified production CST assembly and displacement solver."""
     mat=mat or ElasticProperties(E=210e9,nu=0.3)
     mesh=hole.mesh
@@ -413,7 +416,8 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
         mesh=replace(mesh,element_damage_gp=killed.astype(float))
     D=plane_strain_D(mat)
     u=np.zeros(mesh.ndof); ep=np.zeros((3,mesh.ne)); rho=np.zeros(mesh.ne); damage=np.zeros(mesh.nn)
-    kappa=1e-6 if crack_tip_m is not None else 0.0
+    kappa=float(residual_stiffness_kappa) if crack_tip_m is not None else 0.0
+    if not np.isfinite(kappa) or kappa<0.0: raise ValueError("residual_stiffness_kappa must be finite and nonnegative")
     K,R,*_=assemble_mechanics(mesh,u,ep,rho,damage,D,mat,kappa=kappa)
     prescribed=np.zeros(mesh.ndof,bool)
     prescribed[2*hole.boundary.top_nodes+1]=True; prescribed[2*hole.boundary.bot_nodes+1]=True
@@ -428,8 +432,9 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
         u[prescribed]=u_pres[prescribed]
     else:
         u,reaction=solve_dirichlet(K,R,u,hole.boundary,opening_m/2,-opening_m/2)
+        free=~prescribed
     K2,R2,*_=assemble_mechanics(mesh,u,ep,rho,damage,D,mat,kappa=kappa)
-    sigma,*_=stress_state(mesh,u,ep,damage,D,mat,kappa=kappa)
+    sigma,*_,psi=stress_state(mesh,u,ep,damage,D,mat,kappa=kappa)
     residual=R2.copy()
     if not symmetric_rigid_constraint:
         prescribed[2*hole.boundary.left_bot:2*hole.boundary.left_bot+2]=True
@@ -437,6 +442,9 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
     free_norm=float(np.linalg.norm(residual[~prescribed]))
     top=float(np.sum(residual[2*hole.boundary.top_nodes+1])); bottom=float(np.sum(residual[2*hole.boundary.bot_nodes+1]))
     energy=float(0.5*u@(K2@u))
+    diagonal=np.abs(K.diagonal()[free]); positive=diagonal[diagonal>0]
+    conditioning_proxy=float(np.max(positive)/np.min(positive)) if len(positive) else math.inf
+    killed_energy=(float(np.sum(psi[killed]*mesh.area_e[killed])) if crack_tip_m is not None else math.nan)
     compliance=float(opening_m/max(abs(top),1e-300))
     # Boundary traction from the unique adjacent CST, integrated edgewise.
     edge_to_elem={}
@@ -484,7 +492,8 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
             local=candidates[np.argmin(np.linalg.norm(cent[candidates]-np.asarray(crack_tip_m),axis=1))]
             tip_sigma=float(sigma[1,local])
     return StaticFEMResult(u,sigma,top,bottom,energy,compliance,free_norm,traction_norm,
-                           hoop_sc,symmetry,tip_sigma,weak_cavity,mirror_xx,mirror_yy,mirror_xy)
+                           hoop_sc,symmetry,tip_sigma,weak_cavity,mirror_xx,mirror_yy,mirror_xy,
+                           conditioning_proxy,killed_energy)
 
 
 __all__ = ["Clock","HoleMesh","LifecycleRates","Registry","Site","SiteState",
