@@ -3,28 +3,43 @@
   "files": [
     {
       "path": "causal_crack_contours.csv",
-      "sha256": "b160b6dbf34eaba7cabf25c84aec0fd85e23dcedec7fa8f28f4ef39ed2f8ad20",
-      "bytes": 2468
+      "sha256": "94a6d56b5cbd5f6d7d225ea39634a933dccf6cdf3778740cf6ba8cb09d37e4f1",
+      "bytes": 2599
+    },
+    {
+      "path": "causal_crack_derivative_states.csv",
+      "sha256": "53eac6c5bf84326ac2513822657be56e924bcd655ead1b5b854add38180e9138",
+      "bytes": 20516
     },
     {
       "path": "causal_crack_derivatives.csv",
-      "sha256": "e16c34810ebd1263477e2c809db2b0567225c92f73ae52b1485810c658dd0c25",
-      "bytes": 2179
+      "sha256": "500bf207b34b2b0bc004ef19cab361a373981c79c1cc893aa49925ef49b4cb2b",
+      "bytes": 3086
     },
     {
       "path": "causal_support.csv",
-      "sha256": "1fe43ced9ea7f7db5c6717e33ced3a09ba8a6c7f5bd1a66a1281c5c1b8c565be",
+      "sha256": "e65b2af72c70244e2dac597eb8248a2aa601ff1bdaefb7faa68a65b9315e1961",
       "bytes": 2028
     },
     {
       "path": "cavity_only.csv",
-      "sha256": "0e4ff9462aba48dd322279c365e9e37d42103c5cea4c0ab6c693a9efc4f45caa",
+      "sha256": "ca23cc6e79a7300b8d44a2b5e040945dc7f7e790d4d10c84fdccd78d2961e941",
       "bytes": 1168
     },
     {
+      "path": "conforming_crack_oracle.csv",
+      "sha256": "3896fca0fc6c5dcd6d91860fb05a4ad13393739e2e90c49933d296e7bbaa1368",
+      "bytes": 842
+    },
+    {
+      "path": "conforming_crack_oracle_contours.csv",
+      "sha256": "23e853522b20bb6e3fb08cd1394b06ba76c7c33aeb5eebe13701f8127fab1428",
+      "bytes": 2027
+    },
+    {
       "path": "decision.json",
-      "sha256": "07623a298ac204cf4028fbde053d923adab4f72da27254d9bc0589f17ac43084",
-      "bytes": 1109
+      "sha256": "8483e6f51ac46490a914e920c4f918f52869a9fa2405293a586d5d38fa06fb3b",
+      "bytes": 1619
     },
     {
       "path": "environment.json",

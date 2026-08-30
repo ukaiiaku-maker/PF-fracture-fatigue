@@ -1,17 +1,27 @@
 {
   "schema": "voiding-v2-causal-static-decision/1",
   "EXPLICIT_CAVITY_ONLY_STATIC_FEM_QUALIFIED": "PASS",
+  "V11_CONFORMING_CRACK_REFERENCE_QUALIFIED": "PASS",
+  "V11_CAUSAL_P0_WAKE_MESH_OBJECTIVE": "OPEN",
   "V11_CAUSAL_CRACK_ONLY_STATIC_FEM_QUALIFIED": "OPEN",
   "PRESCRIBED_CAUSAL_CRACK_VOID_INTERACTION_QUALIFIED": "NOT_RUN_REQUIRES_CAUSAL_CRACK_ONLY_PASS",
   "EXPLICIT_VOID_MECHANICS_QUALIFIED": "OPEN",
+  "conforming_crack_reference_checks": {
+    "all_contours_admissible": true,
+    "maximum_contour_KI_plateau_relative": 0.022034843935879643,
+    "energy_G_mesh_spread_relative": 0.029933895313551766,
+    "weak_face_residual_max_relative": 5.87167386286469e-16,
+    "recovered_face_traction_decreases": true,
+    "rigid_pin_energy_relative_error": 4.0624603636693795e-14
+  },
   "causal_crack_checks": {
     "contours_all_admissible": true,
     "contour_KI_plateau_relative": 0.21292966238414085,
     "centered_KII_over_KI": 7.354791699423807e-15,
-    "energy_compliance_error": 1.8799618137618213e-06,
-    "energy_interaction_error": 0.9225552756691324,
-    "perturbation_spread": 0.5642329829826944,
-    "mesh_spread": 0.0805314717446029,
+    "energy_compliance_error": 1.8799618141188645e-06,
+    "energy_interaction_error": "NOT_EVALUATED_REQUIRES_CONVERGED_INTERACTION_G",
+    "perturbation_spread": 0.25428609786894346,
+    "mesh_spread": 0.08053147174460284,
     "causal_support_distance_decreases": true
   },
   "superseded_diagnostic": {
@@ -19,6 +29,6 @@
     "status": "DIAGNOSTIC",
     "evidence_commit": "f0e2959ecf1187685e9d7723b2b4314791f9c353"
   },
-  "git_sha": "0066ea628bf806553e534b2f6dbd7be5dae9d073",
+  "git_sha": "8ad7f42c49c27d1066ff5ef7ee4a910232f2e7d4",
   "solver_identity": "production CST assembly/constitutive law + benchmark symmetric rigid constraint + scipy.spsolve(SuperLU)"
 }
