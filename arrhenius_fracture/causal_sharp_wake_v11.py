@@ -121,6 +121,30 @@ def causal_segment_support(
     return np.asarray(selected, dtype=int), np.asarray(represented, dtype=float)
 
 
+def mechanically_separating_segment_support(
+    mesh, p0: np.ndarray, p1: np.ndarray, *, tolerance: float = 1.0e-12,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return an O(h) node-star closure that removes cross-face bypasses.
+
+    The physical segment and half-open advancing endpoint remain authoritative.
+    Exact intersected elements are augmented only by elements incident to an
+    interior mesh node lying on ``[p0,p1)``.  On a crack-aligned triangulation
+    this degrades the complete upper/lower cell pair adjacent to the graph,
+    eliminating intact elements that otherwise share crack-line nodes.
+    """
+    exact, represented = causal_segment_support(mesh, p0, p1, tolerance=tolerance)
+    start=np.asarray(p0,float); end=np.asarray(p1,float); direction=end-start; length2=float(direction@direction)
+    relative=np.asarray(mesh.nodes,float)-start; parameter=(relative@direction)/length2
+    distance=np.linalg.norm(relative-parameter[:,None]*direction,axis=1)
+    scale=max(float(np.sqrt(np.max(mesh.area_e))),float(np.linalg.norm(direction)),1.0)
+    line_nodes=np.flatnonzero((distance<=tolerance*scale)&(parameter>tolerance)&(parameter<1.0-tolerance))
+    closure=np.flatnonzero(np.any(np.isin(mesh.elems,line_nodes),axis=1))
+    selected=np.union1d(exact,closure).astype(int)
+    represented_by_id={int(e):float(v) for e,v in zip(exact,represented)}
+    lengths=np.asarray([represented_by_id.get(int(e),0.0) for e in selected],float)
+    return selected,lengths
+
+
 def apply_causal_segment(
     state, p0: np.ndarray, p1: np.ndarray, *, tolerance: float = 1.0e-12,
 ):
@@ -154,5 +178,5 @@ def apply_causal_segment(
 
 __all__ = [
     "CRACK_REPRESENTATION", "CausalSupportAudit", "apply_causal_segment",
-    "causal_segment_support", "element_damage", "mechanical_fingerprint",
+    "causal_segment_support", "mechanically_separating_segment_support", "element_damage", "mechanical_fingerprint",
 ]

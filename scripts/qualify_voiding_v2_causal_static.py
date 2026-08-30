@@ -171,7 +171,7 @@ def main():
     oracle,oracle_contours,oracle_checks,oracle_pass=qualify_conforming_oracle(source)
     write_csv(out/"conforming_crack_oracle.csv",oracle)
     write_csv(out/"conforming_crack_oracle_contours.csv",oracle_contours)
-    matched,matched_oracle_checks,matched_oracle_pass,matched_p0_checks,matched_p0_pass=run_matched_qualification(source)
+    matched,matched_oracle_checks,matched_oracle_pass,matched_p0_checks,matched_p0_pass,corridor_checks,representation_decision=run_matched_qualification(source,out)
     for name,rows in matched.items(): write_csv(out/(name+".csv"),rows)
     cavity_pass=(max(r["recovered_traction"] for r in cavity[-2:])<=.1 and max(r["Kirsch_error"] for r in cavity[-2:])<=.1 and
       max(r["weak_residual"] for r in cavity)<=1e-10 and all(r["topology_components"]==1 and r["disk_intersections"]==0 and r["exact_boundary_nodes"] for r in cavity))
@@ -194,10 +194,14 @@ def main():
       "V11_CONFORMING_CRACK_REFERENCE_QUALIFIED":"PASS" if matched_oracle_pass else "OPEN",
       "V11_CAUSAL_P0_WAKE_MESH_OBJECTIVE":"PASS" if matched_p0_pass else "OPEN",
       "V11_CAUSAL_CRACK_ONLY_STATIC_FEM_QUALIFIED":"PASS" if matched_p0_pass and crack_pass else "OPEN",
-      "P0_ABSOLUTE_INTERACTION_INTEGRAL_QUALIFIED":"PASS" if matched_p0_pass else "NOT_QUALIFIED_FINITE_WIDTH_STRIP_REQUIRES_INTERFACE_CONFIG_FORCE_CORRECTION",
+      "P0_ABSOLUTE_INTERACTION_INTEGRAL_QUALIFIED":"PASS" if matched_p0_pass else "NOT_QUALIFIED_PRIMAL_P0_WAKE_DOES_NOT_CONVERGE_TO_CONFORMING_SLIT",
+      "INTERFACE_CONFIG_FORCE_CORRECTION_REQUIRED":"NOT_ESTABLISHED",
+      "CRACK_REPRESENTATION_OR_SUPPORT_REDESIGN_REQUIRED":"NO" if matched_p0_pass else "YES",
+      "CRACK_REPRESENTATION_DECISION":representation_decision,
       "P0_INTERACTION_INTEGRAL_SIGNED_PERTURBATION_ROLE":"RETAIN_PREVIOUSLY_QUALIFIED_ROLE_ONLY",
       "PRESCRIBED_CAUSAL_CRACK_VOID_INTERACTION_QUALIFIED":combined,"EXPLICIT_VOID_MECHANICS_QUALIFIED":"OPEN",
       "conforming_crack_reference_checks":matched_oracle_checks,"causal_p0_matched_checks":matched_p0_checks,
+      "complete_separating_corridor_checks":corridor_checks,
       "legacy_unmatched_conforming_diagnostic_checks":oracle_checks,"causal_crack_checks":checks,"superseded_diagnostic":{"type":"CENTROID_BAND_EXTENSION_DERIVATIVE_NUMERICALLY_STABLE",
        "status":"DIAGNOSTIC","evidence_commit":"f0e2959ecf1187685e9d7723b2b4314791f9c353"},"git_sha":source,"solver_identity":SOLVER}
     (out/"decision.json").write_text(json.dumps(decision,indent=2)+"\n")

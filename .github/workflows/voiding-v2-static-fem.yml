@@ -4,6 +4,7 @@ on:
     paths:
       - "arrhenius_fracture/voiding_v2.py"
       - "arrhenius_fracture/conforming_crack_oracle_v11.py"
+      - "arrhenius_fracture/causal_sharp_wake_v11.py"
       - "arrhenius_fracture/matched_crack_qualification_v11.py"
       - "scripts/qualify_voiding_v2_static_fem.py"
       - "scripts/qualify_voiding_v2_causal_static.py"
