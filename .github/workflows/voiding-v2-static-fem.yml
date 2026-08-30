@@ -3,11 +3,13 @@ on:
   pull_request:
     paths:
       - "arrhenius_fracture/voiding_v2.py"
+      - "arrhenius_fracture/conforming_crack_oracle_v11.py"
       - "scripts/qualify_voiding_v2_static_fem.py"
       - "scripts/qualify_voiding_v2_causal_static.py"
       - "arrhenius_fracture/interaction_integral_v1029.py"
       - "arrhenius_fracture/interaction_integral_v10214.py"
       - "tests/test_voiding_v2.py"
+      - "tests/test_interaction_integral_v1029.py"
       - ".github/workflows/voiding-v2-static-fem.yml"
   workflow_dispatch:
 jobs:

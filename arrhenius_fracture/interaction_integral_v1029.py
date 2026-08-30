@@ -147,12 +147,12 @@ def _interaction_for_mode(
 
     nodal_displacement = np.asarray(u, dtype=float).reshape(-1, 2)
     for element in range(mesh.ne):
-        if exclude_element_mask is not None and bool(exclude_element_mask[element]):
-            skipped_exact_elements += 1
-            continue
         conn = mesh.elems[element]
         qe = q_node[conn]
         if np.max(np.abs(qe)) < 1.0e-14 or np.ptp(qe) < 1.0e-14:
+            continue
+        if exclude_element_mask is not None and bool(exclude_element_mask[element]):
+            skipped_exact_elements += 1
             continue
         if float(np.mean(d[conn])) > 0.95:
             skipped_damage += 1
@@ -210,6 +210,7 @@ def _interaction_for_mode(
         "skipped_branch_cut_elements": skipped_branch_cut,
         "skipped_line_of_sight_elements": skipped_los,
         "skipped_exact_elements": skipped_exact_elements,
+        "exact_mask_total_elements": int(np.count_nonzero(exclude_element_mask)) if exclude_element_mask is not None else 0,
         "r_inner_m": float(r_inner),
         "r_outer_m": float(r_outer),
     }

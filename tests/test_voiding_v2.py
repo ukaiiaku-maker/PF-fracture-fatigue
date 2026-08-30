@@ -5,6 +5,9 @@ import numpy as np
 import pytest
 from pathlib import Path
 from arrhenius_fracture.causal_sharp_wake_v11 import causal_segment_support
+from arrhenius_fracture.conforming_crack_oracle_v11 import (
+    build_conforming_slit_mesh, recovered_face_traction_relative, solve_conforming_slit,
+)
 from scripts.qualify_voiding_v2_causal_static import causal_mask, contour
 
 from arrhenius_fracture.voiding_v2 import (
@@ -151,3 +154,15 @@ def test_symmetric_rigid_pin_location_changes_only_translation():
     second=solve_static_hole(hole,8e-6,rigid_pin_node=int(mid[-1]))
     np.testing.assert_allclose(first.sigma_gp,second.sigma_gp,rtol=2e-10,atol=1e-2)
     assert first.stored_energy_J_per_m == pytest.approx(second.stored_energy_J_per_m,rel=2e-12)
+
+
+def test_conforming_slit_has_shared_tips_duplicated_faces_and_natural_zero_traction():
+    slit=build_conforming_slit_mesh(.004,.004,(.001,0.),(.002,0.),.00025)
+    nodes=slit.hole.mesh.nodes
+    for x in (.001,.002):
+        assert np.count_nonzero(np.all(np.isclose(nodes,(x,0.),atol=1e-15),axis=1)) == 1
+    assert np.count_nonzero(np.all(np.isclose(nodes,(.0015,0.),atol=1e-15),axis=1)) == 2
+    assert not set(map(tuple,slit.upper_face_edges)).intersection(map(tuple,slit.lower_face_edges))
+    result=solve_conforming_slit(slit,4e-6,pin_node=slit.hole.boundary.left_bot)
+    assert result.weak_cavity_residual_relative < 1e-12
+    assert recovered_face_traction_relative(slit,result) < .6
