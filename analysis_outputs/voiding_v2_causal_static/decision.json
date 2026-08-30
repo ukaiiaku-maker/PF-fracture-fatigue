@@ -4,9 +4,29 @@
   "V11_CONFORMING_CRACK_REFERENCE_QUALIFIED": "PASS",
   "V11_CAUSAL_P0_WAKE_MESH_OBJECTIVE": "OPEN",
   "V11_CAUSAL_CRACK_ONLY_STATIC_FEM_QUALIFIED": "OPEN",
+  "P0_ABSOLUTE_INTERACTION_INTEGRAL_QUALIFIED": "NOT_QUALIFIED_FINITE_WIDTH_STRIP_REQUIRES_INTERFACE_CONFIG_FORCE_CORRECTION",
+  "P0_INTERACTION_INTEGRAL_SIGNED_PERTURBATION_ROLE": "RETAIN_PREVIOUSLY_QUALIFIED_ROLE_ONLY",
   "PRESCRIBED_CAUSAL_CRACK_VOID_INTERACTION_QUALIFIED": "NOT_RUN_REQUIRES_CAUSAL_CRACK_ONLY_PASS",
   "EXPLICIT_VOID_MECHANICS_QUALIFIED": "OPEN",
   "conforming_crack_reference_checks": {
+    "two_finest_pairwise_G_agreement_max_relative": 0.006360761731767487,
+    "common_delta_mesh_spread_max_relative": 0.0030264367200105668,
+    "weak_face_residual_max_relative": 1.9798253007930653e-15,
+    "fixed_trim_traction_decreases": true
+  },
+  "causal_p0_matched_checks": {
+    "reaction_reference_error": 0.05460450412037062,
+    "compliance_reference_error": 0.054604504120370566,
+    "crack_opening_reference_error": 0.9886151339029521,
+    "phase_energy_G_reference_error": 0.9962451636809823,
+    "residual_normal_traction_relative": 3.087236564000857e-08,
+    "interface_traction_relative": 2.0007609295839615,
+    "killed_energy_fraction": 1.1681727264885772e-11,
+    "kappa_low_pair_reaction_spread": 9.911566115030152e-07,
+    "absolute_KI_contour_spread": 0.2245726319938312,
+    "phase_averaged_G_mesh_spread": 0.7487862163808421
+  },
+  "legacy_unmatched_conforming_diagnostic_checks": {
     "all_contours_admissible": true,
     "maximum_contour_KI_plateau_relative": 0.022034843935879643,
     "energy_G_mesh_spread_relative": 0.029933895313551766,
@@ -29,6 +49,6 @@
     "status": "DIAGNOSTIC",
     "evidence_commit": "f0e2959ecf1187685e9d7723b2b4314791f9c353"
   },
-  "git_sha": "8ad7f42c49c27d1066ff5ef7ee4a910232f2e7d4",
+  "git_sha": "c7154cf97e512377fd4404f9278aa9669dd261ac",
   "solver_identity": "production CST assembly/constitutive law + benchmark symmetric rigid constraint + scipy.spsolve(SuperLU)"
 }

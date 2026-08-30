@@ -3,48 +3,83 @@
   "files": [
     {
       "path": "causal_crack_contours.csv",
-      "sha256": "94a6d56b5cbd5f6d7d225ea39634a933dccf6cdf3778740cf6ba8cb09d37e4f1",
+      "sha256": "beb3521b2406e49408076076d1849d0b7e5b88452c7f3e52325258bc195a2581",
       "bytes": 2599
     },
     {
       "path": "causal_crack_derivative_states.csv",
-      "sha256": "53eac6c5bf84326ac2513822657be56e924bcd655ead1b5b854add38180e9138",
+      "sha256": "c38bf0813cd7af79d38266c017236fcc84b966e29b7806e0beead9b057ed6adf",
       "bytes": 20516
     },
     {
       "path": "causal_crack_derivatives.csv",
-      "sha256": "500bf207b34b2b0bc004ef19cab361a373981c79c1cc893aa49925ef49b4cb2b",
+      "sha256": "bcc3a804d017ccc6b11ed55175f80e4650743f617f434df2b9465a665efd0140",
       "bytes": 3086
     },
     {
       "path": "causal_support.csv",
-      "sha256": "e65b2af72c70244e2dac597eb8248a2aa601ff1bdaefb7faa68a65b9315e1961",
+      "sha256": "3220a7f62a35df3e60bff4f0b6dbcedeaad3c21ebfb9e34711a735c510ffa5df",
       "bytes": 2028
     },
     {
       "path": "cavity_only.csv",
-      "sha256": "ca23cc6e79a7300b8d44a2b5e040945dc7f7e790d4d10c84fdccd78d2961e941",
+      "sha256": "60b3aeea9c1f9da8fefdb78653e64fba05fc4a966e7c535ee0c9b2ca91493058",
       "bytes": 1168
     },
     {
+      "path": "conforming_contours.csv",
+      "sha256": "dd6f9fe4a112a4598556b7564800c15f40eedc3ab412d9610a62314121c15abc",
+      "bytes": 1167
+    },
+    {
       "path": "conforming_crack_oracle.csv",
-      "sha256": "3896fca0fc6c5dcd6d91860fb05a4ad13393739e2e90c49933d296e7bbaa1368",
+      "sha256": "115670f53690ff7f2b7b6c57c491e334f24ce8a9d09cd5af374ac1bb9a6e2dda",
       "bytes": 842
     },
     {
       "path": "conforming_crack_oracle_contours.csv",
-      "sha256": "23e853522b20bb6e3fb08cd1394b06ba76c7c33aeb5eebe13701f8127fab1428",
+      "sha256": "24bb0d7c620c9f37d9066a37918a1c0b41e347c507e6f95c8a002070c059d017",
       "bytes": 2027
     },
     {
+      "path": "conforming_hardened.csv",
+      "sha256": "6a0a68cdc51ea9f56653ab924754b38d8e0ece1466d39f6d413d8e20429fb32c",
+      "bytes": 1826
+    },
+    {
       "path": "decision.json",
-      "sha256": "8483e6f51ac46490a914e920c4f918f52869a9fa2405293a586d5d38fa06fb3b",
-      "bytes": 1619
+      "sha256": "878dcea62d02ce8aedd476697bf29d96ce0aa7e6a176f905810d730d877bff85",
+      "bytes": 2750
     },
     {
       "path": "environment.json",
       "sha256": "cbaa2446c71bf7b5ab863a2f541f1e2892e69b26b9d8e7ef152b58a8668d659f",
       "bytes": 96
+    },
+    {
+      "path": "matched_geometry.csv",
+      "sha256": "49ea99afb75f19a91d1bebcd121f2d1dd0e181375d6b82bf3cd7c8eedc51abd0",
+      "bytes": 1647
+    },
+    {
+      "path": "p0_contours.csv",
+      "sha256": "6a5f0e1a2b96f549631a825948d297afc40c2b2d4bc6162f1bc4fd8f1c0f60f1",
+      "bytes": 5132
+    },
+    {
+      "path": "p0_phase_slopes.csv",
+      "sha256": "bcf19779b608143859280259f59702eda29ed00ed5fd56fa4de3644957c50b8a",
+      "bytes": 1299
+    },
+    {
+      "path": "p0_residual_stiffness_matrix.csv",
+      "sha256": "407f97d5764e31a6b3cbc23cd456b4417a4f8098917c5d74c68c7918c96608ea",
+      "bytes": 20107
+    },
+    {
+      "path": "p0_staircase.csv",
+      "sha256": "3a0c6630a2fa0a7e912b12781570a2e46b7235aa045d99342fefbfc752059888",
+      "bytes": 59457
     }
   ]
 }
