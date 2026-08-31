@@ -75,6 +75,7 @@
     "observation": "campaign processes had stopped running by end of session and the .git worktree pointer file is missing, though the directory contents remain intact and the main repository's worktree metadata still references it; this was observed, not caused, and no corrective action was taken",
     "repair_status": "NOT_YET_PERFORMED_PENDING_EXPLICIT_USER_AUTHORIZATION_TO_PROCEED"
   },
-  "worktree_clean": false,
-  "round3_changes_committed": false
+  "worktree_clean": true,
+  "round3_changes_committed": true,
+  "round3_commit": "668c6a2"
 }
