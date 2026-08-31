@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CrackRebondingControls",
+  "description": "Frozen configuration for optional crack-face rebonding (v10.2.30). Source of truth: arrhenius_fracture/crack_rebonding_kinetics_v10230.py. Default-off: enabled=false must reproduce baseline physics exactly.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "enabled": {"type": "boolean", "default": false, "description": "Default-off master switch. No state allocated, no RNG draw, no new floating-point operation inserted into cleavage/emission when false."},
+    "model_level": {
+      "type": "string",
+      "enum": ["REBOND_OFF", "CONTACT_PROXY_ONLY", "CLEAN_REVERSIBLE_REBOND", "PASSIVATION_GATED_REBOND"],
+      "default": "REBOND_OFF"
+    },
+    "contact_model": {
+      "type": "string",
+      "enum": ["SIGNED_K_COMPRESSION_PROXY", "RESOLVED_GAP_TRACTION"],
+      "default": "SIGNED_K_COMPRESSION_PROXY",
+      "description": "RESOLVED_GAP_TRACTION is a documented future interface; validate() always rejects it in this pass regardless of contact_oracle_* fields, since no oracle contract is implemented."
+    },
+    "feedback_mode": {
+      "type": "string",
+      "enum": ["HAZARD_ONLY_REBOND_SHIELD", "COMMON_POSITIVE_LOCAL_K_REDUCTION", "HAZARD_AND_ENERGY_GATE_COUPLED"],
+      "default": "HAZARD_ONLY_REBOND_SHIELD",
+      "description": "Only HAZARD_ONLY_REBOND_SHIELD is implemented in this pass; the other two raise NotImplementedError at validate() time."
+    },
+    "topological_healing_enabled": {"type": "boolean", "const": false, "description": "Hard-disabled: validate() rejects true."},
+    "negative_crack_advance_enabled": {"type": "boolean", "const": false, "description": "Hard-disabled: validate() rejects true."},
+    "crack_segment_deletion_enabled": {"type": "boolean", "const": false, "description": "Hard-disabled: validate() rejects true."},
+    "wake_length_m": {"type": "number", "exclusiveMinimum": 0, "default": 5.0e-6},
+    "wake_weight_length_m": {"type": "number", "exclusiveMinimum": 0, "default": 1.0e-6, "description": "Must be in (0, wake_length_m]."},
+    "contact_radius_min_m": {"type": "number", "exclusiveMinimum": 0, "default": 1.0e-9},
+    "contact_pressure_scale": {"type": "number", "minimum": 0, "default": 1.0, "description": "eta_p."},
+    "contact_pressure_cap_Pa": {"type": "number", "exclusiveMinimum": 0, "default": 5.0e9},
+    "opening_stress_cap_Pa": {"type": "number", "exclusiveMinimum": 0, "default": 5.0e9},
+    "fresh_surface_clean_fraction": {"type": "number", "minimum": 0, "maximum": 1, "default": 1.0, "description": "P/C/B split assigned to every newly created patch from an accepted event, unconditionally -- independent of initial_precrack_wake_mode."},
+    "initial_precrack_wake_mode": {
+      "type": "string",
+      "enum": ["NO_INITIAL_ACTIVE_WAKE", "INITIAL_WAKE_PASSIVATED", "INITIAL_WAKE_CLEAN"],
+      "default": "NO_INITIAL_ACTIVE_WAKE",
+      "description": "Governs only whether the pre-existing crack starts with an active wake; never affects newly created patches."
+    },
+    "chemistry_factor": {"type": "number", "minimum": 0, "maximum": 1, "default": 1.0, "description": "chemistry_factor=0 gives exactly zero formation hazard without evaluating log(0)."},
+    "bond_attempt_frequency_s": {"type": "number", "minimum": 0, "default": 1.0e13},
+    "bond_barrier_eV": {"type": "number", "minimum": 0, "default": 0.5},
+    "bond_barrier_floor_eV": {"type": "number", "minimum": 0, "default": 0.0},
+    "bond_activation_volume_m3": {"type": "number", "minimum": 0, "default": 0.0},
+    "healing_cooperative_order": {"type": "number", "minimum": 1, "default": 1.0, "description": "m_h. m_h=1 exactly recovers the elementary rate (mirrors lambda_cleave's own convention)."},
+    "healing_correlation_time_s": {"type": "number", "exclusiveMinimum": 0, "default": 1.0e-6, "description": "tau_h."},
+    "rupture_attempt_frequency_s": {"type": "number", "minimum": 0, "default": 1.0e13},
+    "rupture_barrier_eV": {"type": "number", "minimum": 0, "default": 0.5},
+    "rupture_barrier_floor_eV": {"type": "number", "minimum": 0, "default": 0.0},
+    "rupture_activation_volume_m3": {"type": "number", "minimum": 0, "default": 0.0},
+    "depassivation_attempt_frequency_s": {"type": "number", "minimum": 0, "default": 1.0e13},
+    "depassivation_barrier_eV": {"type": "number", "minimum": 0, "default": 0.5},
+    "depassivation_barrier_floor_eV": {"type": "number", "minimum": 0, "default": 0.0},
+    "depassivation_activation_volume_m3": {"type": "number", "minimum": 0, "default": 0.0},
+    "repassivation_attempt_frequency_s": {"type": "number", "minimum": 0, "default": 1.0e13},
+    "repassivation_barrier_eV": {"type": "number", "minimum": 0, "default": 0.5},
+    "repassivation_barrier_floor_eV": {"type": "number", "minimum": 0, "default": 0.0},
+    "restored_work_of_separation_J_m2": {"type": "number", "minimum": 0, "default": 0.0, "description": "G_rebond_max. Zero gives zero K_rebond regardless of bonded fraction."},
+    "rebond_K_geometry_factor": {"type": "number", "minimum": 0, "default": 1.0, "description": "eta_K. Zero gives zero K_rebond."},
+    "minimum_load_hold_s": {"type": "number", "const": 0.0, "description": "Hard-disabled in this pass: validate() rejects any nonzero value (hold integration is a documented future interface, not implemented)."},
+    "stochastic_healing_enabled": {"type": "boolean", "const": false, "description": "Hard-disabled in this pass: validate() rejects true."},
+    "contact_oracle_id": {"type": "string", "default": "", "description": "Stable identifier for a future resolved-contact oracle binding; never a callable (callables are not JSON-safe/hashable)."},
+    "contact_oracle_version": {"type": "string", "default": ""},
+    "contact_oracle_source_hash": {"type": "string", "default": ""},
+    "rebonding_block_max_dpB": {"type": "number", "exclusiveMinimum": 0, "default": 0.05, "description": "Stage 2 exact-verification tolerance on bonded-fraction change per block."},
+    "rebonding_block_max_dpC": {"type": "number", "exclusiveMinimum": 0, "default": 0.05},
+    "rebonding_block_max_dK_rebond_frac": {"type": "number", "exclusiveMinimum": 0, "default": 0.05},
+    "rebonding_block_action_consistency_tol": {"type": "number", "exclusiveMinimum": 0, "default": 0.05, "description": "Relative tolerance between the representative-rate action estimate and the exact phase-resolved action over a candidate block."}
+  },
+  "required": [],
+  "x-validation-notes": [
+    "topological_healing_enabled, negative_crack_advance_enabled, crack_segment_deletion_enabled must all be false.",
+    "contact_model=RESOLVED_GAP_TRACTION always raises ValueError, even with oracle identifiers supplied.",
+    "minimum_load_hold_s must equal exactly 0.0.",
+    "stochastic_healing_enabled must be false.",
+    "feedback_mode other than HAZARD_ONLY_REBOND_SHIELD raises NotImplementedError (not ValueError) at validate() time.",
+    "wake_weight_length_m must satisfy 0 < wake_weight_length_m <= wake_length_m.",
+    "All barrier/frequency/activation-volume/tolerance fields are validated non-negative or positive as annotated above; validate() raises ValueError with every violated constraint joined by '; '."
+  ]
+}
