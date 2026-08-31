@@ -19,17 +19,19 @@
   "geometry": {
     "construction_screen": true,
     "edge_certificate_matrix": "edge_certificate_matrix.csv",
-    "event_resolution_matrix": "event_resolution_matrix.csv",
+    "event_partition_equivalence": "event_partition_equivalence.csv",
     "graded_far_field_matrix": "graded_far_field_objectivity.csv",
     "independent_separation_screen": true,
+    "local_refinement_objectivity": "local_refinement_objectivity.csv",
     "matrix": "geometry_matrix.csv",
     "max_forward_leakage_over_h_local": 1.6273830494780206,
-    "max_width_over_h_local": 1.9480000000000004
+    "max_width_over_h_local": 1.9480000000000004,
+    "normalized_event_resolution_matrix": "normalized_event_resolution_matrix.csv"
   },
   "model_id": "sharp_wake_mechanically_separating_v12",
   "provenance": {
     "base_git_sha": "2b5e5351add0bf0db67f2cda35a1480c3e7efc91",
-    "implementation_git_sha": "a2d71436306359eaeabe4c3560804a4554979ef6",
+    "implementation_git_sha": "f0b3c1278aeaca7ca2655671e3931a0466391c2e",
     "mesh_generator_identity": "v12_structured_checkerboard_and_seeded_perturbation_v2",
     "numpy_version": "2.5.1",
     "platform": "macOS-14.3.1-arm64-arm-64bit",
