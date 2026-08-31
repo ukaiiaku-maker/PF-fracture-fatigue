@@ -28,9 +28,7 @@ from scipy.linalg import expm
 
 from .crack_rebonding_kinetics_v10230 import (
     CONTACT_SEMANTICS_LABEL,
-    ContactModel,
     CrackRebondingControls,
-    FeedbackMode,
     InitialPrecrackWakeMode,
     RebondModelLevel,
     bond_formation_rate,
@@ -689,21 +687,13 @@ def install_crack_rebonding(engine: Any, cfg: CrackRebondingControls) -> None:
             "configuration; refusing a silent double install"
         )
 
+    # cfg.validate() (above) already raises NotImplementedError for any
+    # feedback_mode other than HAZARD_ONLY_REBOND_SHIELD, before any engine
+    # attribute is touched -- nothing further to enforce here.
     engine._rebonding_state = RebondingWakeState(cfg)
     engine._rebonding_cfg = cfg
     engine.rebonding_acceleration_qualified = False
     engine.contact_semantics = CONTACT_SEMANTICS_LABEL
-
-    if cfg.feedback_mode is FeedbackMode.COMMON_POSITIVE_LOCAL_K_REDUCTION:
-        raise NotImplementedError(
-            "COMMON_POSITIVE_LOCAL_K_REDUCTION is a documented future interface, "
-            "not implemented in this pass"
-        )
-    if cfg.feedback_mode is FeedbackMode.HAZARD_AND_ENERGY_GATE_COUPLED:
-        raise NotImplementedError(
-            "HAZARD_AND_ENERGY_GATE_COUPLED is a documented future interface, "
-            "not implemented in this pass"
-        )
 
 
 def serialize_rebonding_checkpoint(engine: Any) -> dict[str, Any] | None:
