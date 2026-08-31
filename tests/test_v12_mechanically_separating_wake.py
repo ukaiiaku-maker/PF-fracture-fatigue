@@ -6,7 +6,7 @@ import pytest
 from arrhenius_fracture.causal_sharp_wake_v11 import CRACK_REPRESENTATION as V11_ID, causal_segment_support
 from arrhenius_fracture.crack_network_v11 import CrackBranchState, CrackNetworkState
 from arrhenius_fracture.mechanically_separating_sharp_wake_v12 import (
-    MODEL_ID, apply_mechanically_separating_graph, classify_graph_vertices,
+    MODEL_ID, apply_mechanically_separating_graph, certification_arcs, classify_graph_vertices,
     independent_intact_path_certificate, mechanically_separating_graph_support as _graph_support, support_record, unique_graph_length,
 )
 
@@ -73,6 +73,20 @@ def test_partition_and_segment_insertion_order_are_invariant():
     assert aa.segment_partition_invariant_length_m==pytest.approx(bb.segment_partition_invariant_length_m)
     assert aa.support_fingerprint==bb.support_fingerprint
 
+@pytest.mark.parametrize("fractions",[(1.,),(.5,.5),(.25,.25,.25,.25),(.1,.2,.3,.4),(.07,.13,.31,.49)])
+def test_canonical_certificate_is_invariant_to_collinear_history_partition(fractions):
+    m=mesh(n=33); start=.125; end=.875; points=[(start,0.)]; position=start
+    for fraction in fractions:
+        position+=(end-start)*fraction; points.append((position,0.))
+    net=network(tuple(points)); ids,a=mechanically_separating_graph_support(m,net)
+    reference_net=network(((start,0.),(end,0.))); reference_ids,reference=mechanically_separating_graph_support(m,reference_net)
+    np.testing.assert_array_equal(ids,reference_ids)
+    assert certification_arcs(net)==certification_arcs(reference_net)
+    assert a.support_fingerprint==reference.support_fingerprint
+    assert a.certificate_fingerprint==reference.certificate_fingerprint
+    assert a.segment_partition_invariant_length_m==pytest.approx(reference.segment_partition_invariant_length_m)
+    assert a.selected_area_m2==pytest.approx(reference.selected_area_m2)
+
 def test_growth_is_monotone_and_former_tip_is_closed_as_interior():
     m=mesh(); first=network(((.125,0.),(.5,0.))); second=network(((.125,0.),(.5,0.),(.875,0.)))
     a,_=mechanically_separating_graph_support(m,first); damage=np.zeros(m.ne); damage[a]=1.; owned=support_record(m,first,damage,a)
@@ -105,7 +119,7 @@ def test_independent_path_search_detects_deliberately_defective_exact_only_suppo
 def test_independent_certificate_rejects_vacuous_missing_side_seeds():
     m=mesh(n=17); centered=network(((.125,0.),(.875,0.)))
     broad=independent_intact_path_certificate(m,centered,np.arange(m.ne))
-    assert broad["insufficient_seed_segment_ids"]==("b00000000:0",)
+    assert broad["insufficient_seed_segment_ids"]==("b00000000:arc0",)
     clipped=network(((.125,.48),(.875,.48)))
     exact,_=causal_segment_support(m,np.array((.125,.48)),np.array((.875,.48)))
     boundary=independent_intact_path_certificate(m,clipped,exact)
@@ -113,7 +127,7 @@ def test_independent_certificate_rejects_vacuous_missing_side_seeds():
 
 def test_edge_too_short_for_two_sided_certificate_fails_closed():
     m=mesh(n=33); h=np.sqrt(2)/32; short=network(((.125,0.),(.125+.5*h,0.)))
-    with pytest.raises(RuntimeError,match="INSUFFICIENT_OPPOSITE_SIDE_SEEDS"):
+    with pytest.raises(RuntimeError,match="CERTIFICATE_ARC_TOO_SHORT"):
         mechanically_separating_graph_support(m,short)
 
 def test_far_field_grading_does_not_change_crack_local_support_or_metrics():
@@ -131,13 +145,13 @@ def test_unique_graph_length_unions_partially_overlapping_collinear_edges():
     b=CrackBranchState("b00000001","b00000000",1,1,((.4,0.),(.9,0.)),(0.,),status="arrested")
     assert unique_graph_length(CrackNetworkState((a,b),branching_enabled=True))==pytest.approx(.8)
 
-@pytest.mark.parametrize("ratio,accepted",[(.25,False),(.5,False),(1,False),(2,False),(4,True),(8,True)])
-def test_event_resolution_matrix_fails_closed_below_four_grid_spacings(ratio,accepted):
+@pytest.mark.parametrize("ratio,accepted",[(.25,False),(.5,False),(1,True),(2,True),(4,True),(8,True)])
+def test_event_resolution_matrix_is_history_partition_invariant(ratio,accepted):
     m=mesh(n=33); start=.125; old_tip=.5; first=network(((start,0.),(old_tip,0.)))
     ids,_=_graph_support(m,first); damage=np.zeros(m.ne); damage[ids]=1.; owned=support_record(m,first,damage,ids)
     second=network(((start,0.),(old_tip,0.),(old_tip+ratio/32,0.)))
     if not accepted:
-        with pytest.raises(RuntimeError,match="ACTIVE_TIP_NOT_MESH_VERTEX|INSUFFICIENT_OPPOSITE_SIDE_SEEDS"):
+        with pytest.raises(RuntimeError,match="REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH|CERTIFICATE_ARC_TOO_SHORT|INSUFFICIENT_OPPOSITE_SIDE_SEEDS"):
             _graph_support(m,second,previous_support=owned,accepted_network=first,accepted_damage=damage)
     else:
         _,audit=_graph_support(m,second,previous_support=owned,accepted_network=first,accepted_damage=damage)
@@ -155,7 +169,7 @@ def test_resolved_long_event_and_two_step_sequence_have_same_support_and_stiffne
 
 def test_offgrid_active_tip_fails_closed_when_production_alignment_is_required():
     m=mesh(n=17); net=network(((.125,0.),(.731,.013)))
-    with pytest.raises(RuntimeError,match="ACTIVE_TIP_NOT_MESH_VERTEX"):
+    with pytest.raises(RuntimeError,match="REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH"):
         _graph_support(m,net)
 
 def test_remote_or_whole_mesh_previous_support_fails_locality_gate():
@@ -178,7 +192,7 @@ def test_subcell_sequential_event_without_new_mechanical_state_fails_closed():
     m=mesh(n=33); h=np.sqrt(2)/32; first=network(((.125,0.),(.125+3*h,0.)))
     ids,_=mechanically_separating_graph_support(m,first); damage=np.zeros(m.ne); damage[ids]=1.; owned=support_record(m,first,damage,ids)
     second=network(((.125,0.),(.125+3*h,0.),(.125+3.25*h,0.)))
-    with pytest.raises(RuntimeError,match="EVENT_BELOW_CERTIFIED_MESH_RESOLUTION"):
+    with pytest.raises(RuntimeError,match="NO_MECHANICALLY_NEW_SUPPORT"):
         mechanically_separating_graph_support(m,second,previous_support=owned,accepted_network=first,accepted_damage=damage)
 
 @pytest.mark.parametrize("perturb",[False,True])

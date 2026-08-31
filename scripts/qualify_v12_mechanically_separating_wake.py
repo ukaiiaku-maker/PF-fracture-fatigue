@@ -82,7 +82,7 @@ def main():
     with graded_path.open("w",newline="") as f:
         writer=csv.DictWriter(f,fieldnames=graded_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(graded_rows)
     event_mesh=mesh(33,False); dx=1/32
-    directions={0:np.array((1.,0.)),45:np.array((1.,1.)),90:np.array((0.,1.))}
+    directions={angle:np.array((np.cos(np.deg2rad(angle)),np.sin(np.deg2rad(angle)))) for angle in (0,15,-15,30,-30,45,-45,90)}
     for angle,direction in directions.items():
         for phase in (0,1,2):
             old_tip=np.array((.5+phase*dx,0.)); root=old_tip-.375*direction
