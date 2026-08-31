@@ -53,6 +53,21 @@ def reduced_modulus_Pa(G_Pa: float, nu: float) -> float:
     return 2.0 * float(G_Pa) / max(1.0 - float(nu), 1.0e-12)
 
 
+def chronological_phase_offset_rad(elapsed_time_s: float, period_s: float) -> float:
+    """The wake's own continuous phase-clock offset, mod one period.
+
+    Adding this to the solver's fixed relative-phase sample points before
+    evaluating ``K_phase`` gives the wake's genuinely elapsed-time-continuous
+    view of the waveform, while the array used unshifted (``Kvals``/``sig``
+    driving cleavage/emission) remains exactly as the existing solver
+    already computes it. See ``RebondingWakeState``'s docstring for the
+    full rationale.
+    """
+    if period_s <= 0.0:
+        return 0.0
+    return 2.0 * math.pi * (elapsed_time_s % period_s) / period_s
+
+
 def wake_weight(s_m: float, L_h_m: float, L_w_m: float) -> float:
     if L_h_m <= 0.0 or L_w_m <= 0.0:
         return 0.0
@@ -133,7 +148,29 @@ class RebondingWakeState:
     """Segment ledger of crack-wake patches and the current cohesive-coupling
     ledger (H_b, K_rebond). Owns no engine reference; all engine-specific
     quantities (K signed waveform, r_eff, K_shield, E') are passed in by the
-    caller at each use site."""
+    caller at each use site.
+
+    Chronological phase semantics (round-3 review correction): the existing
+    (pre-rebonding) solver's cleavage/emission channels sample a fixed,
+    block-invariant phase array every block (``FatigueCycleHazardController
+    ._phases()`` is a pure function of ``n_phase`` alone, unrelated to
+    elapsed physical time -- confirmed in
+    docs/v10_2_30_crack_rebonding_equation_lineage.md), and that convention
+    must not change (existing mechanics unchanged). The wake's OWN notion of
+    "where in the loading cycle we are," however, is new physics this module
+    owns, and the compression-formation / opening-rupture asymmetry the
+    mission specifies is only physically meaningful if that clock is
+    continuous across blocks and events -- a patch created mid-cycle must
+    evolve through the *actual remaining fraction* of that cycle, not a
+    fresh archetypal cycle restarted at phase zero. ``elapsed_time_s`` is
+    that persistent chronological clock (mod the waveform period), advanced
+    by the caller after every committed block or event and included in
+    snapshot/restore and checkpoint round-trips. It shifts only the phase
+    ARRAY passed to the wake's own K(phase) sampling (see
+    ``kinetic_tip_cell.py::cycle_step_waveform``); ``Kvals``/``sig`` driving
+    cleavage/emission are computed from the unshifted array exactly as
+    before, so this is purely additive and never perturbs those channels.
+    """
 
     def __init__(self, cfg: CrackRebondingControls):
         self.cfg = cfg
@@ -148,6 +185,7 @@ class RebondingWakeState:
         self.H_b = 0.0
         self.K_rebond_max_Pa_sqrt_m = 0.0
         self.K_rebond_Pa_sqrt_m = 0.0
+        self.elapsed_time_s = 0.0
         self._seed_initial_precrack_patch()
 
     def _allocate_patch_id(self) -> int:
@@ -189,6 +227,7 @@ class RebondingWakeState:
             "H_b": self.H_b,
             "K_rebond_max_Pa_sqrt_m": self.K_rebond_max_Pa_sqrt_m,
             "K_rebond_Pa_sqrt_m": self.K_rebond_Pa_sqrt_m,
+            "elapsed_time_s": self.elapsed_time_s,
         }
 
     def restore(self, snap: dict[str, Any] | None) -> None:
@@ -205,6 +244,7 @@ class RebondingWakeState:
         self.H_b = snap["H_b"]
         self.K_rebond_max_Pa_sqrt_m = snap["K_rebond_max_Pa_sqrt_m"]
         self.K_rebond_Pa_sqrt_m = snap["K_rebond_Pa_sqrt_m"]
+        self.elapsed_time_s = snap.get("elapsed_time_s", 0.0)
 
     # -- coupling ------------------------------------------------------------
     def rebuild_coupling(self, Eprime_Pa: float) -> None:
@@ -727,6 +767,7 @@ def serialize_rebonding_checkpoint(engine: Any) -> dict[str, Any] | None:
         "H_b": state.H_b,
         "K_rebond_max_Pa_sqrt_m": state.K_rebond_max_Pa_sqrt_m,
         "K_rebond_Pa_sqrt_m": state.K_rebond_Pa_sqrt_m,
+        "elapsed_time_s": state.elapsed_time_s,
         "config_hash": state.cfg.config_hash(),
     }
 
@@ -760,6 +801,7 @@ def restore_rebonding_checkpoint(engine: Any, payload: dict[str, Any] | None) ->
     state.H_b = payload.get("H_b", 0.0)
     state.K_rebond_max_Pa_sqrt_m = payload.get("K_rebond_max_Pa_sqrt_m", 0.0)
     state.K_rebond_Pa_sqrt_m = payload.get("K_rebond_Pa_sqrt_m", 0.0)
+    state.elapsed_time_s = payload.get("elapsed_time_s", 0.0)
 
 
 __all__ = [

@@ -117,20 +117,46 @@ as `integrate_coupled_fn` when calling `solve_coupled_event_time` -- see
 | Accepted-length-only patch creation, fresh patch never inherits pre-event bonding, exactly-once commit (no-event branch commits full-block state in `cycle_step_waveform`; fired branch defers to `commit_energy_gated_event`) | `RebondingWakeState.commit_event` / `commit_no_event_block`; wired in `kinetic_tip_cell.py::cycle_step_waveform` and `persistent_site_cyclic_energy_gated_v10230.py::_commit_rebonding_event` |
 | Transactional rollback | `RebondingWakeState.snapshot`/`restore`; `_energy_gate_pending["rebonding_state_before"]`, restored in `restore_geometry_veto` |
 
-**Phase provenance simplification (resolved during implementation, differs
-from the initially reviewed plan)**: the reviewed plan called for storing a
-persistent `rebonding_block_start_phase_index` across blocks. On closer
-reading of `FatigueCycleHazardController._phases()` (`fatigue_v1.py:288-290`),
-the phase sample grid is a pure function of `n_phase` alone -- it does not
-track absolute elapsed time or carry state between blocks; every block's
-hazard evaluation re-samples the same representative phase grid from
-`phi=pi/n_phase`. Since this is the existing, already-established convention
-the rest of the solver uses (not something this module introduces), every
-rebonding phase-resolved computation correctly uses `k0=0` for every block
--- there is no cross-block phase state to track. This is a discovered
-simplification, not a shortcut: the wake **state** (P/C/B fractions) still
-carries forward block-to-block exactly as designed; only the phase
-**index** convention needed no persistent tracking.
+**Chronological phase continuity (round-3 review correction, supersedes an
+earlier "no cross-block phase state needed" analysis)**: `FatigueCycleHazardController
+._phases()` (`fatigue_v1.py:288-290`) is a pure function of `n_phase` alone
+-- it does not track absolute elapsed time, and the existing (pre-rebonding)
+cleavage/emission channels re-sample the same fixed relative-phase grid
+every block, unchanged. An earlier draft of this document concluded from
+that fact that the rebonding wake also needed no persistent cross-block
+phase tracking (`k0=0` every block). Review correctly identified this as
+insufficient: the mission's compression-formation/opening-rupture asymmetry
+is only physically meaningful if a patch created mid-cycle evolves through
+the *actual remaining fraction* of that cycle, not a freshly restarted
+archetypal cycle -- discarding chronological history at every block boundary
+would silently convert "same-cycle formation and survival" into a
+cycle-averaged closure without saying so.
+
+The implemented fix keeps the existing cleavage/emission phase treatment
+completely untouched (satisfying "existing mechanics unchanged") while
+giving the wake its own genuinely continuous chronological clock:
+`RebondingWakeState.elapsed_time_s`, a persistent scalar (mod the waveform
+period) advanced by the caller after every committed block or event.
+`crack_rebonding_v10230.chronological_phase_offset_rad(elapsed_time_s,
+period_s)` converts it to a phase offset added to the fixed relative-phase
+sample array *only* when building `K_signed_phase` for the wake's own
+`representative_cycle_K_rebond`/Stage 1/Stage 2/event-time-root-finder
+context (`kinetic_tip_cell.py::cycle_step_waveform`) -- `Kvals`/`sig`
+(driving cleavage/emission) are computed from the unshifted array exactly
+as before, at the same line, so this is purely additive.
+
+The clock is advanced in two places, matching the exactly-once-commit
+invariant: the no-event branch in `cycle_step_waveform` advances it by
+`dt_block`; `_commit_rebonding_event` advances it by the **converged**
+`dt_used` from the event-time root-finder (not the raw uncoupled estimate),
+so an event that fires early or late within a candidate block correctly
+shifts the clock by the true elapsed time, not the nominal one. Included in
+`RebondingWakeState.snapshot`/`restore` (hence transactional rollback) and
+`serialize_rebonding_checkpoint`/`restore_rebonding_checkpoint`. Tested in
+`tests/test_v10_2_30_crack_rebonding_live_engine_smoke.py` (clock advances
+monotonically across real blocks and never resets; the resulting phase
+offset genuinely differs block-to-block, confirming the shift is not a
+no-op) and `test_chronological_phase_state_survives_snapshot_restore`.
 
 ## Analytical reductions (Part VI)
 

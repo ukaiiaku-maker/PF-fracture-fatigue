@@ -445,7 +445,14 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
             from . import crack_rebonding_v10230 as _rebond
 
             signed_waveform = _dataclasses_replace(waveform, closure_clip=False)
-            K_signed_phase = signed_waveform.K_phase(phase)
+            # Chronological phase continuity for the wake's own K(phase)
+            # sampling only (round-3 review correction) -- cleavage/emission
+            # continue to use the unshifted `phase`/`Kvals`/`sig` above,
+            # completely unaffected. See RebondingWakeState's docstring.
+            phase_offset_rad = _rebond.chronological_phase_offset_rad(
+                rebonding_state.elapsed_time_s, waveform.period_s
+            )
+            K_signed_phase = signed_waveform.K_phase(phase + phase_offset_rad)
             Eprime_Pa = _rebond.reduced_modulus_Pa(self.G, self.nu)
             r_contact_m = max(self.r_eff(), rebonding_state.cfg.contact_radius_min_m)
             active_patches = [p for p in rebonding_state.active if not p.retired]
@@ -480,6 +487,7 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
                 "K_shield_Pa_sqrt_m": K_shield_now,
                 "r_eff_m": r_eff_now,
                 "B_start": float(self.B),
+                "period_s": float(waveform.period_s),
             }
         else:
             sig_cleave = sig
@@ -554,6 +562,9 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
                     p.state_vector(), Q_list_p, factors_p, k0=0, dt=dt_block, dt_phase=dt_phase
                 )
             rebonding_state.commit_no_event_block(end_states, Eprime_Pa)
+            rebonding_state.elapsed_time_s = (
+                rebonding_state.elapsed_time_s + dt_block
+            ) % waveform.period_s
             self._rebonding_block_context = None
         plastic = coupled["plastic"]
         diag = self.mpz.diagnostics(self.G, self.nu, self.b, self.f.r0)

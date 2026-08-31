@@ -355,6 +355,16 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
             pre_event_states=final_states,
             Eprime_Pa=Eprime_Pa_ctx,
         )
+        # Advance the wake's chronological phase clock by the converged
+        # (rebonding-coupled) elapsed time, not the raw uncoupled estimate --
+        # this is what makes the next block/event's phase sampling correctly
+        # continuous from the true event instant, not a nominal one.
+        dt_for_clock = float(root["dt_used"]) if root.get("fired") else dt_uncoupled
+        period_s_ctx = float(ctx.get("period_s", 0.0))
+        if period_s_ctx > 0.0:
+            rebonding_state.elapsed_time_s = (
+                rebonding_state.elapsed_time_s + dt_for_clock
+            ) % period_s_ctx
 
     def commit_energy_gated_event(
         self,
