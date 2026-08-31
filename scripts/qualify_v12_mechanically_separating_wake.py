@@ -13,7 +13,9 @@ ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
 
 from arrhenius_fracture.crack_network_v11 import CrackNetworkState
-from arrhenius_fracture.mechanically_separating_sharp_wake_v12 import MODEL_ID, mechanically_separating_graph_support, support_record
+from arrhenius_fracture.mechanically_separating_sharp_wake_v12 import (
+    MODEL_ID, certification_arcs, mechanically_separating_graph_support, support_record,
+)
 
 
 def mesh(n,perturbed):
@@ -45,7 +47,7 @@ def git(*args): return subprocess.check_output(("git",)+args,cwd=ROOT,text=True)
 
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument("--out",type=Path,default=Path("artifacts/v12_mechanically_separating_wake")); args=parser.parse_args()
-    args.out.mkdir(parents=True,exist_ok=True); rows=[]; edge_rows=[]; graded_rows=[]; event_rows=[]
+    args.out.mkdir(parents=True,exist_ok=True); rows=[]; edge_rows=[]; graded_rows=[]; event_rows=[]; partition_rows=[]; refinement_rows=[]
     implementation_sha=git("log","-1","--format=%H","--","arrhenius_fracture/mechanically_separating_sharp_wake_v12.py","tests/test_v12_mechanically_separating_wake.py","scripts/qualify_v12_mechanically_separating_wake.py")
     for n in (9,17,33,65):
         for perturbed in (False,True):
@@ -81,25 +83,58 @@ def main():
     graded_path=args.out/"graded_far_field_objectivity.csv"
     with graded_path.open("w",newline="") as f:
         writer=csv.DictWriter(f,fieldnames=graded_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(graded_rows)
-    event_mesh=mesh(33,False); dx=1/32
-    directions={angle:np.array((np.cos(np.deg2rad(angle)),np.sin(np.deg2rad(angle)))) for angle in (0,15,-15,30,-30,45,-45,90)}
-    for angle,direction in directions.items():
-        for phase in (0,1,2):
-            old_tip=np.array((.5+phase*dx,0.)); root=old_tip-.375*direction
-            accepted=CrackNetworkState.one_tip((root,old_tip)); prior,_=mechanically_separating_graph_support(event_mesh,accepted)
+    directions={angle:np.array((np.cos(np.deg2rad(angle)),np.sin(np.deg2rad(angle)))) for angle in (0,15,30,45,60,75,90)}
+    event_meshes=(("structured",mesh(33,False)),("perturbed",mesh(33,True)),("graded",graded_mesh(4)))
+    for mesh_label,event_mesh in event_meshes:
+     for angle,direction in directions.items():
+        normal=np.array((-direction[1],direction[0]))
+        for tangent_phase in (0.,.37):
+          for normal_phase in (0.,.37):
+            old_tip=np.array((.5,0.))+(tangent_phase*direction+normal_phase*normal)/32; root=old_tip-.375*direction
+            accepted=CrackNetworkState.one_tip((root,old_tip)); prior,prior_audit=mechanically_separating_graph_support(event_mesh,accepted,allow_offgrid_active_tips_for_screen=True)
             damage=np.zeros(event_mesh.ne); damage[prior]=1.; owner=support_record(event_mesh,accepted,damage,prior)
-            for ratio in (.25,.5,1,2,4,8):
-                new_tip=old_tip+ratio*dx*direction; trial=CrackNetworkState.one_tip((root,old_tip,new_tip)); outcome="ACCEPTED"
+            for ratio in (.25,.5,1,2,3,4,6,8):
+                delta_a=ratio*prior_audit.local_h_max_m; new_tip=old_tip+delta_a*direction
+                trial=CrackNetworkState.one_tip((root,old_tip,new_tip)); outcome="ACCEPTED"; audit=None
                 try:
                     _,audit=mechanically_separating_graph_support(event_mesh,trial,previous_support=owner,accepted_network=accepted,accepted_damage=damage)
                     mechanically_new=audit.mechanically_new_element_count; accepted_fp=audit.accepted_damage_fingerprint; trial_fp=audit.trial_damage_fingerprint
                 except RuntimeError as error:
                     outcome=str(error).split(": ",1)[-1]; mechanically_new=0; accepted_fp=""; trial_fp=""
-                event_rows.append({"angle_deg":angle,"phase_cells":phase,"delta_a_over_grid_spacing":ratio,"outcome":outcome,
+                aligned=bool(np.any(np.linalg.norm(event_mesh.nodes-new_tip,axis=1)<=1e-12))
+                event_rows.append({"mesh":mesh_label,"angle_deg":angle,"tangent_phase_cells":tangent_phase,"normal_phase_cells":normal_phase,
+                  "delta_a_m":delta_a,"h_local_max_m":prior_audit.local_h_max_m,"h_local_median_m":prior_audit.local_h_median_m,
+                  "delta_a_over_h_local_max":delta_a/prior_audit.local_h_max_m,"delta_a_over_h_local_median":delta_a/prior_audit.local_h_median_m,
+                  "active_tip_aligned":aligned,"required_local_remesh":not aligned,"outcome":outcome,"certificate_status":audit.certification_reason if audit else "NOT_CERTIFIED",
+                  "graph_fingerprint":audit.graph_fingerprint if audit else "","support_fingerprint":audit.support_fingerprint if audit else "",
+                  "prior_support_ids":" ".join(map(str,prior)),"new_support_ids":" ".join(map(str,audit.selected_element_ids if audit else ())),
+                  "mechanically_new_ids":" ".join(map(str,audit.mechanically_new_element_ids if audit else ())),
                   "mechanically_new_element_count":mechanically_new,"accepted_damage_fingerprint":accepted_fp,"trial_damage_fingerprint":trial_fp})
-    event_path=args.out/"event_resolution_matrix.csv"
+    event_path=args.out/"normalized_event_resolution_matrix.csv"
     with event_path.open("w",newline="") as f:
         writer=csv.DictWriter(f,fieldnames=event_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(event_rows)
+    start,end=.125,.875
+    for label,fractions in (("one",(1.,)),("two",(.5,.5)),("four",(.25,)*4),("eight",(.125,)*8),("unequal",(.07,.13,.31,.49))):
+        points=[(start,0.)]; position=start
+        for fraction in fractions: position+=(end-start)*fraction; points.append((position,0.))
+        net=CrackNetworkState.one_tip(tuple(points)); ids,a=mechanically_separating_graph_support(mesh(33,False),net)
+        partition_rows.append({"partition":label,"event_count":len(fractions),"selected_support_ids":" ".join(map(str,ids)),
+          "support_fingerprint":a.support_fingerprint,"certificate_fingerprint":a.certificate_fingerprint,
+          "certification_arc_count":len(certification_arcs(net)),"physical_graph_length_m":a.segment_partition_invariant_length_m,
+          "trial_damage_fingerprint":a.trial_damage_fingerprint})
+    partition_path=args.out/"event_partition_equivalence.csv"
+    with partition_path.open("w",newline="") as f:
+        writer=csv.DictWriter(f,fieldnames=partition_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(partition_rows)
+    for n in (17,33,65,129):
+        m=mesh(n,False); _,a=mechanically_separating_graph_support(m,CrackNetworkState.one_tip(((.125,0.),(.875,0.))))
+        refinement_rows.append({"n":n,"outer_domain":"[0,1]x[-0.5,0.5]","h_local_max_m":a.local_h_max_m,
+          "support_width_m":a.maximum_normal_support_width_m,"support_area_m2":a.selected_area_m2,
+          "active_tip_footprint_m":a.active_tip_forward_leakage_m,"width_over_h_local":a.width_over_h,
+          "area_over_unique_length_h_local":a.selected_area_over_unique_graph_length_h_local,
+          "tip_footprint_over_h_local":a.forward_leakage_over_h})
+    refinement_path=args.out/"local_refinement_objectivity.csv"
+    with refinement_path.open("w",newline="") as f:
+        writer=csv.DictWriter(f,fieldnames=refinement_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(refinement_rows)
     construction=all(r["construction_screen"] and r["unresolved_bridge_nodes"]==0 for r in rows)
     separation=all(not r["intact_cross_graph_path_exists"] for r in rows)
     report={"schema":"v12_mechanically_separating_wake_qualification_v2","model_id":MODEL_ID,"cases":len(rows),
@@ -112,7 +147,8 @@ def main():
         "max_width_over_h_local":max(r["width_over_h_local"] for r in rows),
         "max_forward_leakage_over_h_local":max(r["forward_leakage_over_h_local"] for r in rows),"matrix":"geometry_matrix.csv",
         "edge_certificate_matrix":"edge_certificate_matrix.csv","graded_far_field_matrix":"graded_far_field_objectivity.csv",
-        "event_resolution_matrix":"event_resolution_matrix.csv"},
+        "normalized_event_resolution_matrix":"normalized_event_resolution_matrix.csv","event_partition_equivalence":"event_partition_equivalence.csv",
+        "local_refinement_objectivity":"local_refinement_objectivity.csv"},
       "gates":{"GRAPH_AWARE_NODE_STAR_CONSTRUCTION_SCREEN":"PASS" if construction else "FAIL",
         "SYNTHETIC_ORIENTATION_AND_PHASE_SCREEN":"PASS" if construction else "FAIL",
         "SYNTHETIC_INDEPENDENT_INTACT_PATH_SCREEN":"PASS" if separation else "FAIL",
@@ -126,7 +162,8 @@ def main():
         "V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED":"OPEN"}}
     qualification=args.out/"qualification.json"; qualification.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
     manifest={"geometry_matrix.csv":sha(csv_path),"edge_certificate_matrix.csv":sha(edge_path),
-      "graded_far_field_objectivity.csv":sha(graded_path),"event_resolution_matrix.csv":sha(event_path),"qualification.json":sha(qualification)}
+      "graded_far_field_objectivity.csv":sha(graded_path),"normalized_event_resolution_matrix.csv":sha(event_path),
+      "event_partition_equivalence.csv":sha(partition_path),"local_refinement_objectivity.csv":sha(refinement_path),"qualification.json":sha(qualification)}
     (args.out/"sha256_manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
     print(json.dumps(report,indent=2,sort_keys=True))
 
