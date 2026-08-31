@@ -4,19 +4,22 @@
     "ACCEPTED_STATE_NONMUTATION_OR_TRIAL_ISOLATION": "PASS",
     "ACTIVE_TIP_AND_EVENT_RESOLUTION_QUALIFIED": "OPEN",
     "GRAPH_AWARE_NODE_STAR_CONSTRUCTION_SCREEN": "PASS",
-    "INDEPENDENT_INTACT_PATH_SEPARATION_CERTIFIED": "PASS",
+    "INDEPENDENT_INTACT_PATH_SEPARATION_CERTIFIED": "OPEN",
     "LOCAL_H_AND_FULL_SUPPORT_OH_OBJECTIVITY": "OPEN",
     "MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED": "NOT_RUN",
     "MECHANICALLY_SEPARATING_WAKE_GEOMETRY_QUALIFIED": "OPEN",
     "MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED": "OPEN",
     "NO_PREMATURE_MECHANICAL_COALESCENCE": "OPEN",
     "PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED": "NOT_RUN",
+    "SYNTHETIC_INDEPENDENT_INTACT_PATH_SCREEN": "PASS",
     "SYNTHETIC_ORIENTATION_AND_PHASE_SCREEN": "PASS",
     "V12_CLEAN_WORKER_SCOPED_CI": "NOT_RUN",
     "V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED": "OPEN"
   },
   "geometry": {
     "construction_screen": true,
+    "edge_certificate_matrix": "edge_certificate_matrix.csv",
+    "graded_far_field_matrix": "graded_far_field_objectivity.csv",
     "independent_separation_screen": true,
     "matrix": "geometry_matrix.csv",
     "max_forward_leakage_over_h_local": 1.6273830494780206,
@@ -25,11 +28,16 @@
   "model_id": "sharp_wake_mechanically_separating_v12",
   "provenance": {
     "base_git_sha": "2b5e5351add0bf0db67f2cda35a1480c3e7efc91",
-    "implementation_git_sha": "531790fbe06a70cb21d36d67f35eed3831deb932",
+    "implementation_git_sha": "2b8dbc7de16738b1076aee91ad0834541cfc590e",
     "mesh_generator_identity": "v12_structured_checkerboard_and_seeded_perturbation_v2",
     "numpy_version": "2.5.1",
+    "platform": "macOS-14.3.1-arm64-arm-64bit",
+    "pytest_version": "9.1.1",
     "python_version": "3.12.13",
-    "random_seed_rule": "120031+n"
+    "qualification_constraints": "constraints/v12-qualification-py312.txt",
+    "random_seed_rule": "120031+n",
+    "scipy_version": "1.18.0",
+    "solver_backend_identity": "geometry_only_no_linear_solver"
   },
   "schema": "v12_mechanically_separating_wake_qualification_v2",
   "thresholds": {
