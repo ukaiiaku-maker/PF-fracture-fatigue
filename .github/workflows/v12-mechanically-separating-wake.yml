@@ -1,0 +1,30 @@
+name: V12 mechanically separating wake
+
+on:
+  pull_request:
+    branches: [v11-production-pr-base]
+  workflow_dispatch:
+
+jobs:
+  scoped-v12:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python -m pip install -e . pytest scipy
+      - run: python -m compileall -q arrhenius_fracture scripts tests
+      - run: |
+          python -m pytest -q \
+            tests/test_v12_mechanically_separating_wake.py \
+            tests/test_v11_causal_sharp_wake.py \
+            tests/test_crack_network_v11.py \
+            tests/test_v11_live_topology_multitip.py \
+            tests/test_topology_transaction_v11.py
+      - run: |
+          python scripts/qualify_v12_mechanically_separating_wake.py --out /tmp/v12-evidence-a
+          python scripts/qualify_v12_mechanically_separating_wake.py --out /tmp/v12-evidence-b
+          diff -ru /tmp/v12-evidence-a /tmp/v12-evidence-b
+      - run: git diff --check
+      - run: test -z "$(git status --short)"

@@ -7,7 +7,7 @@ from arrhenius_fracture.causal_sharp_wake_v11 import CRACK_REPRESENTATION as V11
 from arrhenius_fracture.crack_network_v11 import CrackBranchState, CrackNetworkState
 from arrhenius_fracture.mechanically_separating_sharp_wake_v12 import (
     MODEL_ID, apply_mechanically_separating_graph, classify_graph_vertices,
-    mechanically_separating_graph_support,
+    independent_intact_path_certificate, mechanically_separating_graph_support, support_record,
 )
 
 def mesh(n=9,perturb=False):
@@ -62,7 +62,8 @@ def test_partition_and_segment_insertion_order_are_invariant():
 
 def test_growth_is_monotone_and_former_tip_is_closed_as_interior():
     m=mesh(); first=network(((.125,0.),(.5,0.))); second=network(((.125,0.),(.5,0.),(.875,0.)))
-    a,_=mechanically_separating_graph_support(m,first); b,audit=mechanically_separating_graph_support(m,second,previous_support=a)
+    a,_=mechanically_separating_graph_support(m,first); damage=np.zeros(m.ne); damage[a]=1.; owned=support_record(m,first,damage,a)
+    b,audit=mechanically_separating_graph_support(m,second,previous_support=owned,accepted_network=first,accepted_damage=damage)
     assert set(a).issubset(set(b)); assert len(audit.newly_selected_element_ids)>0
     assert dict(audit.vertex_classes)["0.5,0"]=="degree_two_interior"
 
@@ -72,23 +73,59 @@ def test_branch_junction_and_active_tips_are_classified_explicitly():
     down=CrackBranchState("b00000002","b00000000",1,1,((.5,0.),(.8,-.2)),(np.arctan2(-.2,.3),))
     net=CrackNetworkState((root,up,down),branching_enabled=True)
     classes=classify_graph_vertices(net)
-    assert classes[(.5,0.)]=="branch_junction"; assert classes[(.8,.2)]=="active_tip"; assert classes[(.8,-.2)]=="active_tip"
+    assert classes[(.5,0.)]==frozenset(("branch_junction",))
+    assert classes[(.8,.2)]==frozenset(("active_tip",)); assert classes[(.8,-.2)]==frozenset(("active_tip",))
 
 def test_empty_graph_fails_closed():
     m=mesh(); net=CrackNetworkState.one_tip(((.2,0.),),initial_orientation_rad=0.)
     with pytest.raises(RuntimeError,match="no edges"):
         mechanically_separating_graph_support(m,net)
 
+def test_independent_path_search_detects_deliberately_defective_exact_only_support():
+    m=mesh(n=17); net=network(((.125,0.),(.875,0.)))
+    exact,_=causal_segment_support(m,np.array((.125,0.)),np.array((.875,0.)))
+    certificate=independent_intact_path_certificate(m,net,exact)
+    assert certificate["intact_cross_graph_path_exists"]
+    assert certificate["minimum_crossing_path_length"]>0
+    assert certificate["bridge_node_ids"] and certificate["bridge_element_ids"]
+
+def test_offgrid_active_tip_fails_closed_when_production_alignment_is_required():
+    m=mesh(n=17); net=network(((.125,0.),(.731,.013)))
+    with pytest.raises(RuntimeError,match="ACTIVE_TIP_NOT_MESH_VERTEX"):
+        mechanically_separating_graph_support(m,net,require_aligned_active_tips=True)
+
+def test_remote_or_whole_mesh_previous_support_fails_locality_gate():
+    m=mesh(n=17); net=network(((.125,0.),(.875,0.)))
+    damage=np.ones(m.ne); owned=support_record(m,net,damage,np.arange(m.ne))
+    with pytest.raises(RuntimeError,match="RETAINED_SUPPORT_NOT_LOCAL"):
+        mechanically_separating_graph_support(m,net,previous_support=owned,accepted_network=net,accepted_damage=damage)
+
+def test_support_owner_rejects_stale_mesh_and_damage_provenance():
+    m=mesh(n=17); net=network(((.125,0.),(.5,0.))); ids,_=mechanically_separating_graph_support(m,net)
+    damage=np.zeros(m.ne); damage[ids]=1.; owned=support_record(m,net,damage,ids)
+    moved=mesh(n=17); moved.nodes=moved.nodes.copy(); moved.nodes[0,0]+=.001
+    with pytest.raises(RuntimeError,match="STALE_SUPPORT_MESH_GEOMETRY_FINGERPRINT"):
+        mechanically_separating_graph_support(moved,net,previous_support=owned,accepted_network=net,accepted_damage=damage)
+    corrupted=damage.copy(); corrupted[ids[0]]=0.
+    with pytest.raises(RuntimeError,match="STALE_SUPPORT_ACCEPTED_DAMAGE_FINGERPRINT"):
+        mechanically_separating_graph_support(m,net,previous_support=owned,accepted_network=net,accepted_damage=corrupted)
+
+def test_subcell_sequential_event_without_new_mechanical_state_fails_closed():
+    m=mesh(n=33); h=np.sqrt(2)/32; first=network(((.125,0.),(.125+.25*h,0.)))
+    ids,_=mechanically_separating_graph_support(m,first); damage=np.zeros(m.ne); damage[ids]=1.; owned=support_record(m,first,damage,ids)
+    second=network(((.125,0.),(.125+.25*h,0.),(.125+.5*h,0.)))
+    with pytest.raises(RuntimeError,match="EVENT_BELOW_CERTIFIED_MESH_RESOLUTION"):
+        mechanically_separating_graph_support(m,second,previous_support=owned,accepted_network=first,accepted_damage=damage)
+
 @pytest.mark.parametrize("perturb",[False,True])
-def test_kinked_and_near_coalescing_graphs_certify_without_bridges(perturb):
+def test_near_coalescing_distinct_branches_fail_closed(perturb):
     m=mesh(n=13,perturb=perturb)
     trunk=CrackBranchState("b00000000",None,0,0,((.1,-.1),(.42,-.03),(.62,.08)),(0.,0.),status="arrested")
     upper=CrackBranchState("b00000001","b00000000",1,1,((.62,.08),(.86,.22)),(.5,))
     close=CrackBranchState("b00000002","b00000000",1,1,((.62,.08),(.84,.205)),(.5,))
     net=CrackNetworkState((trunk,upper,close),branching_enabled=True)
-    _,audit=mechanically_separating_graph_support(m,net)
-    assert audit.certified and audit.unresolved_bridge_node_ids==()
-    assert audit.width_over_h<=4 and audit.forward_leakage_over_h<=3
+    with pytest.raises(RuntimeError,match="PREMATURE_MECHANICAL_COALESCENCE"):
+        mechanically_separating_graph_support(m,net)
 
 def test_branch_tuple_order_does_not_change_support_or_fingerprint():
     m=mesh(n=13)
