@@ -175,27 +175,36 @@ def _path(adjacency,starts,targets):
     while hit is not None: result.append(hit); hit=parent[hit]
     return tuple(reversed(result))
 
-def independent_intact_path_certificate(mesh,network,selected,*,tolerance=1e-12):
+def _external_boundary_edges(mesh):
+    owners={}
+    for eid,element in enumerate(mesh.elems):
+        for a,b in ((element[0],element[1]),(element[1],element[2]),(element[2],element[0])):
+            owners.setdefault(tuple(sorted((int(a),int(b)))),[]).append(eid)
+    return np.asarray([edge for edge,value in owners.items() if len(value)==1],int)
+
+def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=None,allow_boundary_clip_for_screen=False,tolerance=1e-12):
     """Search the remaining intact element graph for an opposite-side path.
 
     This verifier is intentionally independent of the node-star construction:
     it only consumes the final selected element IDs, geometry, and crack graph.
     """
     selected=set(map(int,np.asarray(selected,int))); cent=np.mean(mesh.nodes[mesh.elems],axis=1)
-    paths=[]; positive_components=set(); negative_components=set(); edge_certificates=[]; insufficient=[]
+    paths=[]; positive_components=set(); negative_components=set(); edge_certificates=[]; insufficient=[]; boundary_edges=_external_boundary_edges(mesh)
     for p0,p1,branch_id,index in _segments(network):
         p0=np.asarray(p0,float); p1=np.asarray(p1,float); vector=p1-p0; length=float(np.linalg.norm(vector)); tangent=vector/length; normal=np.array((-tangent[1],tangent[0]))
         exact,_=causal_segment_support(mesh,p0,p1,tolerance=tolerance); h=float(np.max(_element_diameters(mesh,exact)))
         h_median=float(np.median(_element_diameters(mesh,exact)))
         margin=min(2*h,.2*length); rel=cent-p0; axial=rel@tangent; signed=rel@normal
-        local=np.flatnonzero((axial>=margin)&(axial<=length-margin)&(np.abs(signed)<=4*h)&~np.isin(np.arange(mesh.ne),tuple(selected)))
+        triangles=mesh.nodes[mesh.elems]; projected_axial=(triangles-p0)@tangent; projected_normal=(triangles-p0)@normal
+        geometric_tube=(np.max(projected_axial,axis=1)>=margin)&(np.min(projected_axial,axis=1)<=length-margin)&(np.max(projected_normal,axis=1)>=-3*h)&(np.min(projected_normal,axis=1)<=3*h)
+        local=np.flatnonzero(geometric_tube&~np.isin(np.arange(mesh.ne),tuple(selected)))
         by_node={}
         for eid in local:
             for node in mesh.elems[eid]: by_node.setdefault(int(node),[]).append(int(eid))
         adjacency={int(e):set() for e in local}
         for incident in by_node.values():
             for eid in incident: adjacency[eid].update(other for other in incident if other!=eid)
-        positive=[int(e) for e in local if signed[e]>=1.5*h]; negative=[int(e) for e in local if signed[e]<=-1.5*h]
+        positive=[int(e) for e in local if np.min(projected_normal[e])>=h]; negative=[int(e) for e in local if np.max(projected_normal[e])<=-h]
         labels={}; label=0
         for eid in local:
             if int(eid) in labels: continue
@@ -204,7 +213,11 @@ def independent_intact_path_certificate(mesh,network,selected,*,tolerance=1e-12)
                 for nxt in adjacency[current]:
                     if nxt not in labels: labels[nxt]=label; queue.append(nxt)
         positive_labels=tuple(sorted({labels[e] for e in positive})); negative_labels=tuple(sorted({labels[e] for e in negative}))
-        sufficient=bool(positive and negative and length>2*h)
+        boundary_points=mesh.nodes[boundary_edges]; boundary_axial=(boundary_points-p0)@tangent; boundary_normal=(boundary_points-p0)@normal
+        overlaps=(np.max(boundary_axial,axis=1)>=margin)&(np.min(boundary_axial,axis=1)<=length-margin)
+        normal_clearance=np.min(np.min(np.abs(boundary_normal[overlaps]),axis=1),initial=math.inf)
+        exterior_clearance=float(normal_clearance-3*h)
+        sufficient=bool(positive and negative and length>2*h and (exterior_clearance>=-tolerance or allow_boundary_clip_for_screen))
         segment_id=f"{branch_id}:{index}"
         if not sufficient: insufficient.append(segment_id)
         found=_path(adjacency,positive,negative)
@@ -214,16 +227,17 @@ def independent_intact_path_certificate(mesh,network,selected,*,tolerance=1e-12)
                 shared=np.intersect1d(mesh.elems[a],mesh.elems[b]); node_path.append(int(shared[0]) if len(shared) else -1)
             paths.append((branch_id,index,found,tuple(node_path)))
         positive_components.update(positive); negative_components.update(negative)
-        selected_array=np.asarray(sorted(selected),int); selected_points=mesh.nodes[mesh.elems[selected_array]].reshape(-1,2); selected_rel=selected_points-p0
+        segment_id=f"{branch_id}:{index}"
+        selected_array=np.asarray(sorted(edge_supports[segment_id] if edge_supports is not None else selected),int)
+        selected_points=mesh.nodes[mesh.elems[selected_array]].reshape(-1,2); selected_rel=selected_points-p0
         selected_axial=selected_rel@tangent; selected_normal=selected_rel@normal
-        local_selected=selected_array[np.min(_point_segment_distance(mesh.nodes[mesh.elems[selected_array]].reshape(-1,2),p0,p1).reshape(len(selected_array),3),axis=1)<=2.5*h]
         support_width=float(np.max(np.abs(selected_normal))); forward_leakage=float(max(0.,np.max(selected_axial)-length))
-        selected_area=float(np.sum(mesh.area_e[local_selected]))
-        clearance=min(max((signed[e] for e in positive),default=-math.inf)-1.5*h,
-          abs(min((signed[e] for e in negative),default=math.inf))-1.5*h,
-          max(length-2*margin,0.))
+        selected_area=float(np.sum(mesh.area_e[selected_array]))
+        clearance=min(max((signed[e] for e in positive),default=-math.inf)-h,
+          abs(min((signed[e] for e in negative),default=math.inf))-h,
+          max(length-2*margin,0.),exterior_clearance)
         local_payload=(f"{_array_digest(mesh.nodes,np.float64)}|{_array_digest(mesh.elems,np.int64)}|{graph_fingerprint(network)}|{segment_id}|"
-          f"{h:.17g}|{margin:.17g}|1.5|4|{','.join(map(str,sorted(selected)))}|{positive_labels}|{negative_labels}").encode()
+          f"{h:.17g}|{margin:.17g}|1|3|{','.join(map(str,sorted(selected)))}|{positive_labels}|{negative_labels}").encode()
         edge_certificates.append(EdgeCutCertificate(segment_id,h,h_median,support_width,support_width/h,forward_leakage,forward_leakage/h,
           selected_area,selected_area/max(length*h,1e-300),forward_leakage,len(positive),len(negative),
           positive_labels,negative_labels,len(positive_labels),len(negative_labels),float(clearance),bool(found),len(found) if found else None,
@@ -307,11 +321,15 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
         leakage=max(leakage,float(max(0.,np.max(relative@tangent)-length)))
     local_h=_element_diameters(mesh,np.asarray(sorted(exact),int)); h=float(np.max(local_h)); h_median=float(np.median(local_h))
     selected_centroids=np.mean(mesh.nodes[mesh.elems[selected_ids]],axis=1)
-    graph_distance=np.min(np.stack([_point_segment_distance(selected_centroids,p0,p1) for p0,p1,_ in segment_records]),axis=0)
-    maximum_graph_distance=float(np.max(graph_distance))
+    edge_distances=np.stack([_point_segment_distance(selected_centroids,p0,p1) for p0,p1,_ in segment_records])
+    edge_h=np.asarray([np.max(_element_diameters(mesh,ids)) for _,_,ids in segment_records])
+    nearest=np.argmin(edge_distances,axis=0); graph_distance=edge_distances[nearest,np.arange(len(selected_ids))]
+    retained_locality_ratio=graph_distance/edge_h[nearest]
     unresolved=_unresolved_node_star_bridges(mesh,exact,candidate_nodes,selected)
     width=max(widths); width_ratio=width/max(h,1e-300); leakage_ratio=leakage/max(h,1e-300)
-    certificate=independent_intact_path_certificate(mesh,network,selected_ids,tolerance=tolerance)
+    edge_support_map={f"{segments[i][2]}:{segments[i][3]}":tuple(sorted(values)) for i,_,_,values in local_supports}
+    certificate=independent_intact_path_certificate(mesh,network,selected_ids,edge_supports=edge_support_map,
+      allow_boundary_clip_for_screen=allow_offgrid_active_tips_for_screen,tolerance=tolerance)
     premature=[]; centroids=np.mean(mesh.nodes[mesh.elems],axis=1)
     for i,p0,p1,left in local_supports:
         for j,q0,q1,right in local_supports[i+1:]:
@@ -329,7 +347,7 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
     # while remaining independent of segment angle and endpoint phase.
     if width_ratio>4.0+1e-10: reasons.append("SUPPORT_NOT_O_H")
     if leakage_ratio>3.0+1e-10: reasons.append("ACTIVE_TIP_LEAKAGE_NOT_O_H")
-    if maximum_graph_distance>4*h+1e-10: reasons.append("RETAINED_SUPPORT_NOT_LOCAL")
+    if np.max(retained_locality_ratio)>4.+1e-10: reasons.append("RETAINED_SUPPORT_NOT_LOCAL")
     if certificate["intact_cross_graph_path_exists"]: reasons.append("INTACT_CROSS_GRAPH_PATH")
     if certificate["insufficient_seed_segment_ids"]: reasons.append("INSUFFICIENT_OPPOSITE_SIDE_SEEDS")
     if premature: reasons.append("PREMATURE_MECHANICAL_COALESCENCE")

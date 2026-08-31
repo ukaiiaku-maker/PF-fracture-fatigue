@@ -131,6 +131,28 @@ def test_unique_graph_length_unions_partially_overlapping_collinear_edges():
     b=CrackBranchState("b00000001","b00000000",1,1,((.4,0.),(.9,0.)),(0.,),status="arrested")
     assert unique_graph_length(CrackNetworkState((a,b),branching_enabled=True))==pytest.approx(.8)
 
+@pytest.mark.parametrize("ratio,accepted",[(.25,False),(.5,False),(1,False),(2,False),(4,True),(8,True)])
+def test_event_resolution_matrix_fails_closed_below_four_grid_spacings(ratio,accepted):
+    m=mesh(n=33); start=.125; old_tip=.5; first=network(((start,0.),(old_tip,0.)))
+    ids,_=_graph_support(m,first); damage=np.zeros(m.ne); damage[ids]=1.; owned=support_record(m,first,damage,ids)
+    second=network(((start,0.),(old_tip,0.),(old_tip+ratio/32,0.)))
+    if not accepted:
+        with pytest.raises(RuntimeError,match="ACTIVE_TIP_NOT_MESH_VERTEX|INSUFFICIENT_OPPOSITE_SIDE_SEEDS"):
+            _graph_support(m,second,previous_support=owned,accepted_network=first,accepted_damage=damage)
+    else:
+        _,audit=_graph_support(m,second,previous_support=owned,accepted_network=first,accepted_damage=damage)
+        assert audit.mechanically_new_element_count>0 and audit.accepted_damage_fingerprint!=audit.trial_damage_fingerprint
+
+def test_resolved_long_event_and_two_step_sequence_have_same_support_and_stiffness():
+    m=mesh(n=33); initial=network(((.125,0.),(.5,0.))); base,_=_graph_support(m,initial); damage=np.zeros(m.ne); damage[base]=1.; owner=support_record(m,initial,damage,base)
+    long=network(((.125,0.),(.5,0.),(.75,0.))); long_ids,_=_graph_support(m,long,previous_support=owner,accepted_network=initial,accepted_damage=damage)
+    middle=network(((.125,0.),(.5,0.),(.625,0.))); middle_ids,_=_graph_support(m,middle,previous_support=owner,accepted_network=initial,accepted_damage=damage)
+    middle_damage=damage.copy(); middle_damage[middle_ids]=1.; middle_owner=support_record(m,middle,middle_damage,middle_ids)
+    final=network(((.125,0.),(.5,0.),(.625,0.),(.75,0.))); final_ids,_=_graph_support(m,final,previous_support=middle_owner,accepted_network=middle,accepted_damage=middle_damage)
+    np.testing.assert_array_equal(long_ids,final_ids)
+    long_damage=damage.copy(); long_damage[long_ids]=1.; final_damage=middle_damage.copy(); final_damage[final_ids]=1.
+    np.testing.assert_array_equal(long_damage,final_damage)
+
 def test_offgrid_active_tip_fails_closed_when_production_alignment_is_required():
     m=mesh(n=17); net=network(((.125,0.),(.731,.013)))
     with pytest.raises(RuntimeError,match="ACTIVE_TIP_NOT_MESH_VERTEX"):
@@ -180,7 +202,7 @@ def test_branch_tuple_order_does_not_change_support_or_fingerprint():
     assert aa.support_fingerprint==bb.support_fingerprint and aa.graph_fingerprint==bb.graph_fingerprint
 
 def test_trial_application_is_rollback_exact_and_records_v12_identity():
-    raw=mesh(); sm=StateMesh(raw.nodes,raw.elems,raw.area_e,raw.ne,np.zeros(raw.ne)); net=network(((.125,0.),(.75,.125)))
+    raw=mesh(n=17); sm=StateMesh(raw.nodes,raw.elems,raw.area_e,raw.ne,np.zeros(raw.ne)); net=network(((.125,0.),(.75,0.)))
     accepted=State(sm,np.zeros(len(sm.nodes)),net,{"owned":"accepted"})
     before_gp=accepted.mesh.element_damage_gp.copy(); before_damage=accepted.damage.copy(); before_junction=dict(accepted.junction_process_state)
     trial,audit=apply_mechanically_separating_graph(accepted,net)
