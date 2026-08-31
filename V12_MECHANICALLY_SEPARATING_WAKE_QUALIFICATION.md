@@ -9,9 +9,10 @@ The V12 candidate derives support from the complete accepted crack graph. It
 classifies physical roots, active tips, inactive terminals, degree-two interior
 vertices, branch junctions, and merged vertices. Every exact graph-interior
 support node must have its complete P1 element star disabled; an unresolved
-star, unresolved graph edge, non-O(h) width, or non-O(h) tip leakage fails
-closed. Only a node exactly coincident with a currently active tip is exempted,
-so a former tip closes when it becomes an interior vertex.
+star, unresolved graph edge, independent intact crossing path, nonlocal retained
+support, premature mechanical coalescence, non-O(h) width, or non-O(h) tip
+leakage fails closed. Only a graph vertex whose sole role is active degree-one
+tip can be exempted, so a former or mixed-role tip closes.
 
 ## Reproduction
 
@@ -32,17 +33,27 @@ explicit vertex classes, fail-closed empty graphs, and exact rollback isolation.
 
 | Gate | State | Evidence |
 |---|---|---|
-| `MECHANICALLY_SEPARATING_WAKE_GEOMETRY_QUALIFIED` | PASS | 112/112 matrix cases certified; no unresolved node-star bridges |
+| `GRAPH_AWARE_NODE_STAR_CONSTRUCTION_SCREEN` | PASS | 112/112 preserved construction cases |
+| `SYNTHETIC_ORIENTATION_AND_PHASE_SCREEN` | PASS | Four resolutions, two mesh families, seven angles, two phases |
+| `INDEPENDENT_INTACT_PATH_SEPARATION_CERTIFIED` | PASS (screen scope) | Independent intact-element adjacency search finds no crossing in the 112 synthetic cases; defective exact-only support is detected |
+| `LOCAL_H_AND_FULL_SUPPORT_OH_OBJECTIVITY` | OPEN | Local-h implementation added; graded/adaptive convergence matrix remains outstanding |
+| `NO_PREMATURE_MECHANICAL_COALESCENCE` | OPEN | Near-branch counterexample now fails closed; full separation-distance matrix remains outstanding |
+| `ACTIVE_TIP_AND_EVENT_RESOLUTION_QUALIFIED` | OPEN | Off-grid production tips and unresolved subcell events fail closed; complete event sweep remains outstanding |
+| `ACCEPTED_STATE_NONMUTATION_OR_TRIAL_ISOLATION` | PASS | Pure trial leaves accepted arrays and ownership unchanged |
+| `PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED` | NOT_RUN | Production wiring remains blocked |
+| `V12_CLEAN_WORKER_SCOPED_CI` | NOT_RUN | Dedicated workflow added; awaiting GitHub result |
+| `MECHANICALLY_SEPARATING_WAKE_GEOMETRY_QUALIFIED` | OPEN | Broad arbitrary-graph/adaptive claim is withdrawn |
 | `MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED` | OPEN | Matched conforming-crack displacement/compliance comparison not yet committed |
 | `MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED` | NOT_RUN | Interaction-integral work is forbidden until primal mechanics passes |
 | `V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED` | OPEN | Requires both primal mechanics and absolute-K gates |
 
-The result is therefore a geometry-qualified draft prerequisite, not production
-approval and not authorization to resume the void-nucleation mission.
+The result is therefore a hardened synthetic construction/separation screen,
+not a broad geometry qualification, production approval, or authorization to
+resume the void-nucleation mission.
 
 ## Test result
 
-The scoped V12 plus V11 topology regression command passes `52 passed`. The
+The scoped V12 plus V11 topology regression command passes `57 passed`. The
 full repository suite reports `704 passed, 1 skipped, 7 failed`; all seven
 failures are in pre-existing V10.2 compatibility/status tests outside this
 branch's additive two-file implementation diff (legacy model-ID assertions,
