@@ -47,9 +47,21 @@ _ACTIVE_MODEL_LEVELS = frozenset(
 
 
 def reduced_modulus_Pa(G_Pa: float, nu: float) -> float:
-    """Plane-strain reduced modulus E' = 2G/(1-nu), computed from the engine's
-    own shear modulus and Poisson ratio (avoids depending on the diagnostic-only
-    global material-observer singleton used elsewhere for E')."""
+    """Isotropic plane-strain reduced modulus E' = 2G/(1-nu), computed from
+    the engine's own shear modulus and Poisson ratio (avoids depending on the
+    diagnostic-only global material-observer singleton used elsewhere for
+    E').
+
+    This is the isotropic plane-strain relation only -- it is NOT a general
+    anisotropic effective modulus, and this reduced 1-D solver has no
+    resolved crystal-orientation-dependent elastic tensor to draw from. That
+    is an acceptable simplification for this mechanism-exploration pass (the
+    mission is explicit that Pi_K = K_rebond_max/Kmax is a dimensionless
+    mechanism control, not a material calibration), but a future PF/FEM
+    contact implementation with resolved anisotropic elasticity MUST obtain
+    E' from the same mechanical convention already used by that solver's own
+    energy-release-rate calculation, not reconstruct it independently here.
+    """
     return 2.0 * float(G_Pa) / max(1.0 - float(nu), 1.0e-12)
 
 

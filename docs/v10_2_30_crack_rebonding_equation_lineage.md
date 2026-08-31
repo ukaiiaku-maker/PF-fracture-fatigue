@@ -63,7 +63,7 @@ being called on such an interval.
 | `w(s) = exp(-s/L_w)/(L_w*(1-exp(-L_h/L_w)))` | `crack_rebonding_v10230.wake_weight` |
 | `H_b = min(1, sum_j p_B,j*w(s_j)*l_j)` | `RebondingWakeState.rebuild_coupling` / `representative_cycle_K_rebond` (per-phase-point variant) / `phase_resolved_action` (per-bin variant) |
 | `K_rebond_max = eta_K*sqrt(E'*G_rebond_max)` | same three call sites |
-| `E' = 2G/(1-nu)` (plane-strain reduced modulus, derived from the engine's own shear modulus/Poisson ratio rather than the diagnostic-only global material observer used elsewhere for `E'`) | `crack_rebonding_v10230.reduced_modulus_Pa` |
+| `E' = 2G/(1-nu)` (**isotropic plane-strain** reduced modulus, derived from the engine's own shear modulus/Poisson ratio rather than the diagnostic-only global material observer used elsewhere for `E'`; NOT a general anisotropic effective modulus -- acceptable for this mechanism-exploration pass per the mission's explicit `Pi_K` dimensionless-control framing, but a future resolved-anisotropic PF/FEM contact implementation must obtain `E'` from that solver's own energy-release-rate convention rather than reconstruct it independently here) | `crack_rebonding_v10230.reduced_modulus_Pa` |
 | `K_rebond = K_rebond_max*H_b` | same three call sites |
 | `sigma_c = [K+ - K_shield - K_rebond]_+/sqrt(2*pi*r_eff)` (HAZARD_ONLY_REBOND_SHIELD) | `cleavage_stress_with_rebond` -- a free function replicating `sigma_tip`'s exact arithmetic (`unified_front.py:84-89`) with one extra subtraction, called only from the single guarded injection point in `kinetic_tip_cell.py::cycle_step_waveform`; `unified_front.py`/`separated_source_tip.py` themselves carry **zero source diff** |
 
