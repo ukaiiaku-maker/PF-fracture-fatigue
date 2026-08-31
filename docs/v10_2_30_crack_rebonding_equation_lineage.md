@@ -46,15 +46,34 @@ Replaces a rejected block-midpoint-scalar `K_rebond` and an incorrect
 | Exact for the piecewise-constant-rate phase discretization; `O(log m)` for `m` whole cycles via `numpy.linalg.matrix_power` | `propagate`, tested against brute-force stepping and the named regression cases (1.2-cycle block, odd/even integer blocks, arbitrary starting phase + wraparound, billion-cycle conservation) in `tests/test_v10_2_30_crack_rebonding_periodic_propagation.py` |
 | Strang-split per-phase-bin representative cycle: `p_{k+1/2}=expm(Q_k dt/2)p_k`, `K_rebond(k+1/2)=f(p_{k+1/2})`, `p_{k+1}=expm(Q_k dt/2)p_{k+1/2}` | `strang_cycle_trajectory` (pure) / `crack_rebonding_v10230.representative_cycle_K_rebond` (engine-facing, produces the length-`N_phase` array used for `sig_cleave`, never a single scalar) |
 
-**Known performance limitation** (documented, not fixed in this pass):
-`crack_rebonding_v10230.phase_resolved_action` steps every phase bin
-explicitly, `O(n_phase * n_cycles)`, rather than reusing the `O(log n)`
-`propagate` primitive for the wake-state trajectory plus a representative-
-cycle bulk approximation for the accumulated action. Acceptable for the
-interval widths exercised by the event-time root-finder and Stage 2
-verifier (bounded by the candidate block), but a production block spanning
-billions of cycles with no event firing would need this optimization before
-being called on such an interval.
+**VHCF/low-K performance (round-3 review, fixed after being flagged as a
+known limitation in an earlier pass)**: `crack_rebonding_v10230.phase_resolved_action`
+now resolves a finite transient exactly (cycle by cycle, since each cycle's
+`K(phase)` sequence repeats identically, making the per-cycle map
+state->state and state->action time-invariant), detects convergence to a
+periodic orbit via a per-cycle action/state-change tolerance, and represents
+any remaining whole cycles as `remaining_cycles * A_c` with the wake state
+advanced exactly via `propagate`'s `O(log n)` `matrix_power`. Critically,
+runtime is bounded **unconditionally** once at least one transient cycle has
+resolved: an earlier version fell back to exact bin-by-bin stepping for the
+remainder whenever strict convergence wasn't detected within the transient
+budget, which could itself become an `O(n_cycles)` computation for a
+slowly-relaxing configuration -- caught by a test that genuinely hung on a
+near-billion-cycle interval before this was fixed. The corrected design
+always uses the last resolved transient cycle's action as the bulk
+representative once the budget is spent, whether or not the strict
+tolerance was met; `tests/test_v10_2_30_crack_rebonding_vhcf_performance.py`
+verifies both a billion-cycle interval completes in well under a second and
+that the bulk result agrees with exhaustive exact stepping to a tight
+tolerance once the transient budget genuinely spans the configuration's
+relaxation time (one test case's relaxation time is ~200 cycles at 1000 Hz,
+not 30 -- confirming a real transient budget matters for physically
+slow-relaxing configurations, not merely a test artifact). Also fixed along
+the way: an initial version compared the bin-count `n_full` directly against
+`bulk_cycle_threshold` (meant as a cycle count), incorrectly triggering bulk
+mode for intervals as short as ~2-3 cycles at typical `n_phase` -- corrected
+by explicitly separating `n_full` into whole cycles (`n_cycles_full`) and a
+leftover partial-cycle bin remainder before applying the threshold.
 
 ## Cohesive wake coupling (Part IV)
 

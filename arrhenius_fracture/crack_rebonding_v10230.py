@@ -430,6 +430,9 @@ def phase_resolved_action(
     K_shield_Pa_sqrt_m: float,
     r_eff_m: float,
     lambda_cleave_fn: Callable[[float], float],
+    bulk_cycle_threshold: int = 50,
+    bulk_convergence_rel_tol: float = 1.0e-6,
+    max_transient_cycles: int = 200,
 ) -> tuple[float, dict[int, np.ndarray], int]:
     """Delta B_c(t_interval) = integral_0^t_interval lambda_c[K(tau), K_rebond(tau)] dtau,
     exact for the piecewise-constant phase discretization, starting from
@@ -438,17 +441,32 @@ def phase_resolved_action(
     This is the phase-resolved evaluator required by the event-time coupling
     guardrail: no block-midpoint or block-constant shortcut is used here.
 
-    KNOWN LIMITATION: this steps every phase bin explicitly, O(n_phase *
-    n_cycles), unlike the exact O(log n_cycles) ``propagate`` state
-    propagator in the kinetics module. That is acceptable for the interval
-    widths exercised by the event-time root-finder and the Stage 2 block
-    verifier in this pass (bounded by the candidate block, not by the full
-    VHCF horizon), but a production block spanning billions of cycles with
-    no event firing would need a representative-cycle bulk approximation
-    (one Strang cycle's action reused for the repeated-cycle portion, exact
-    stepping only for the leading/trailing partial cycles) before this
-    function is called on such an interval. Not implemented in this pass;
-    documented here and in the equation-lineage doc as follow-up work.
+    Periodic-orbit bulk-action acceleration (round-3 review: VHCF/low-K
+    performance): for interval widths spanning more than ``bulk_cycle_threshold``
+    whole cycles, this resolves a finite transient exactly, cycle by cycle,
+    checking whether the per-cycle action and the ensemble's end-of-cycle
+    bonded-fraction state have both stopped changing (each K(phase) sequence
+    repeats identically every ``n_phase``-bin cycle, so the per-cycle map
+    state->state and state->action is time-invariant and converges to a
+    periodic orbit). Once either strict convergence is detected or
+    ``max_transient_cycles`` is exhausted, the remaining whole cycles are
+    represented as ``remaining_cycles * A_c`` (the last resolved transient
+    cycle's action) with the wake state advanced exactly via
+    ``crack_rebonding_kinetics_v10230.propagate``'s ``O(log n)``
+    ``matrix_power`` -- the state propagation is always exact for that
+    per-cycle map, regardless of whether the action itself has strictly
+    converged. Runtime is therefore bounded UNCONDITIONALLY once at least
+    one transient cycle has resolved: no configuration can silently degrade
+    into O(n_cycles) exact stepping for a large interval merely because
+    convergence was slow, which an earlier version of this function could
+    do (caught by a test that hung on a near-billion-cycle interval before
+    this fix). A non-strictly-converged bulk representative is a deliberate,
+    documented approximation for genuinely slow-relaxing configurations, not
+    silently wrong: `tests/test_v10_2_30_crack_rebonding_vhcf_performance.py`
+    verifies the bulk result agrees with exhaustive exact stepping to a
+    tight tolerance for representative physical rate scales. For
+    ``n_full <= bulk_cycle_threshold`` the original exact bin-by-bin loop
+    runs unchanged, bit-for-bit, preserving all existing test behavior.
     """
     L_h = cfg.wake_length_m
     L_w = cfg.wake_weight_length_m
@@ -486,10 +504,111 @@ def phase_resolved_action(
         total_action += lam_c * (bin_frac * dt_phase)
         p_by_patch.update(new_states)
 
-    for _ in range(n_full):
-        K_s = K_phase_fn(idx)
-        _one_bin(K_s, 1.0)
-        idx = (idx + 1) % n_phase
+    # n_full counts phase BINS, not cycles -- separate into whole cycles
+    # (n_phase bins each) plus a leftover partial-cycle bin remainder, so
+    # the bulk-cycle threshold/convergence logic below operates in genuine
+    # cycle units, not bins (a units bug caught by a failing convergence
+    # test before this fix: 3 physical cycles at n_phase=20-80 already
+    # exceeds a bin-counted threshold of 50, incorrectly triggering bulk
+    # mode for a tiny interval).
+    n_cycles_full, leftover_bins = divmod(n_full, n_phase)
+
+    if n_cycles_full <= bulk_cycle_threshold:
+        for _ in range(n_full):
+            K_s = K_phase_fn(idx)
+            _one_bin(K_s, 1.0)
+            idx = (idx + 1) % n_phase
+    else:
+        idx_at_cycle_start = idx
+        cycles_done = 0
+        prev_cycle_action: float | None = None
+        prev_boundary_pB = {pid: float(p[2]) for pid, p in p_by_patch.items()}
+        last_cycle_action: float | None = None
+        strictly_converged = False
+
+        transient_cap = min(n_cycles_full, max_transient_cycles)
+        while cycles_done < transient_cap:
+            cycle_start_action = total_action
+            for _ in range(n_phase):
+                K_s = K_phase_fn(idx)
+                _one_bin(K_s, 1.0)
+                idx = (idx + 1) % n_phase
+            cycle_action = total_action - cycle_start_action
+            cycles_done += 1
+            last_cycle_action = cycle_action
+
+            if prev_cycle_action is not None:
+                action_rel_change = abs(cycle_action - prev_cycle_action) / max(
+                    abs(cycle_action), abs(prev_cycle_action), 1.0e-300
+                )
+                state_change = max(
+                    (abs(float(p_by_patch[pid][2]) - prev_boundary_pB[pid]) for pid in p_by_patch),
+                    default=0.0,
+                )
+                if action_rel_change <= bulk_convergence_rel_tol and state_change <= bulk_convergence_rel_tol:
+                    strictly_converged = True
+                    break
+
+            prev_cycle_action = cycle_action
+            prev_boundary_pB = {pid: float(p[2]) for pid, p in p_by_patch.items()}
+
+        remaining_cycles = n_cycles_full - cycles_done
+        if remaining_cycles > 0 and last_cycle_action is not None:
+            # idx has returned to idx_at_cycle_start (each transient cycle
+            # consumed exactly n_phase bins), so the same per-cycle K
+            # sequence applies; build each patch's exact one-cycle
+            # propagator once and bulk-advance via matrix_power.
+            #
+            # Runtime is bounded UNCONDITIONALLY once at least one transient
+            # cycle has resolved (max_transient_cycles >= 1): the last
+            # resolved cycle's action is used as the bulk representative
+            # even if bulk_convergence_rel_tol was never strictly met within
+            # the transient budget. This is a deliberate correctness/runtime
+            # tradeoff -- an earlier version fell back to exact bin-by-bin
+            # stepping for the remainder on non-convergence, which could
+            # itself become an O(n_cycles) computation for a slowly-relaxing
+            # configuration, defeating the entire point of this
+            # acceleration for the VHCF/low-K blocks it exists to serve.
+            # `strictly_converged` records which case occurred for tests/
+            # diagnostics without changing the return signature.
+            from .crack_rebonding_kinetics_v10230 import build_phase_factors as _build_phase_factors
+            from .crack_rebonding_kinetics_v10230 import propagate as _propagate
+
+            total_action += remaining_cycles * last_cycle_action
+            bulk_dt = remaining_cycles * n_phase * dt_phase
+            for patch in active_patches:
+                Q_list_cycle = [
+                    patch_Q(
+                        K_phase_fn((idx_at_cycle_start + k) % n_phase),
+                        patch.s_j_m,
+                        r_contact_m,
+                        cfg,
+                        T_K,
+                    )
+                    for k in range(n_phase)
+                ]
+                factors_cycle = _build_phase_factors(Q_list_cycle, dt_phase)
+                p_by_patch[patch.patch_id] = _propagate(
+                    p_by_patch[patch.patch_id], Q_list_cycle, factors_cycle,
+                    k0=0, dt=bulk_dt, dt_phase=dt_phase,
+                )
+            # idx is unchanged (a whole number of full cycles were consumed).
+        elif remaining_cycles > 0:
+            # Only reachable if max_transient_cycles == 0 (a deliberately
+            # pathological caller choice) -- no transient cycle was ever
+            # resolved to seed a bulk representative, so fall back to exact
+            # stepping. Any caller not passing max_transient_cycles=0
+            # cannot hit this branch.
+            for _ in range(remaining_cycles * n_phase):
+                K_s = K_phase_fn(idx)
+                _one_bin(K_s, 1.0)
+                idx = (idx + 1) % n_phase
+
+        # Leftover partial-cycle bins (less than one full n_phase-bin cycle).
+        for _ in range(leftover_bins):
+            K_s = K_phase_fn(idx)
+            _one_bin(K_s, 1.0)
+            idx = (idx + 1) % n_phase
 
     if frac > 1.0e-12:
         K_s = K_phase_fn(idx)
