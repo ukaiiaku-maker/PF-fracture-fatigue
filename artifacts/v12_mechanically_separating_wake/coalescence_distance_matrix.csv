@@ -1,0 +1,9 @@
+case,d_over_h_local,distance_m,outcome,graph_component_count,support_component_count_edge,support_component_count_node,illegal_support_connection,minimum_support_component_separation_m
+parallel_nonintersecting,0.5,0.02209708691207961,PREMATURE_MECHANICAL_COALESCENCE;DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH,2,1,1,True,inf
+parallel_nonintersecting,1,0.04419417382415922,PREMATURE_MECHANICAL_COALESCENCE;DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH,2,1,1,True,inf
+parallel_nonintersecting,1.5,0.06629126073623884,DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH,2,1,1,True,inf
+parallel_nonintersecting,2,0.08838834764831845,INSUFFICIENT_OPPOSITE_SIDE_SEEDS;DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH,2,1,1,True,inf
+parallel_nonintersecting,3,0.13258252147247768,ACCEPTED,2,2,2,False,0.0625
+parallel_nonintersecting,4,0.1767766952966369,ACCEPTED,2,2,2,False,0.0625
+parallel_nonintersecting,6,0.26516504294495535,ACCEPTED,2,2,2,False,0.1875
+parallel_nonintersecting,8,0.3535533905932738,ACCEPTED,2,2,2,False,0.25
