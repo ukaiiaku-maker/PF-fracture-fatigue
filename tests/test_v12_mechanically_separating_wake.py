@@ -7,8 +7,12 @@ from arrhenius_fracture.causal_sharp_wake_v11 import CRACK_REPRESENTATION as V11
 from arrhenius_fracture.crack_network_v11 import CrackBranchState, CrackNetworkState
 from arrhenius_fracture.mechanically_separating_sharp_wake_v12 import (
     MODEL_ID, apply_mechanically_separating_graph, classify_graph_vertices,
-    independent_intact_path_certificate, mechanically_separating_graph_support, support_record,
+    independent_intact_path_certificate, mechanically_separating_graph_support as _graph_support, support_record, unique_graph_length,
 )
+
+def mechanically_separating_graph_support(*args,**kwargs):
+    kwargs.setdefault("allow_offgrid_active_tips_for_screen",True)
+    return _graph_support(*args,**kwargs)
 
 def mesh(n=9,perturb=False):
     x=np.linspace(0,1,n); y=np.linspace(-.5,.5,n); X,Y=np.meshgrid(x,y); nodes=np.c_[X.ravel(),Y.ravel()]; elems=[]
@@ -23,6 +27,15 @@ def mesh(n=9,perturb=False):
     ab=p[:,1]-p[:,0]; ac=p[:,2]-p[:,0]
     area=.5*np.abs(ab[:,0]*ac[:,1]-ab[:,1]*ac[:,0])
     return SimpleNamespace(nodes=nodes,elems=elems,area_e=area,ne=len(elems))
+
+def graded_mesh(far_field_factor):
+    n=17; x=np.linspace(0,1,n); inner=np.linspace(-.25,.25,n-2); y=np.r_[-.25-.25*far_field_factor,inner,.25+.25*far_field_factor]
+    X,Y=np.meshgrid(x,y); nodes=np.c_[X.ravel(),Y.ravel()]; elems=[]
+    for j in range(n-1):
+        for i in range(n-1):
+            a=j*n+i; b=a+1; c=a+n; d=c+1; elems.extend(((a,b,d),(a,d,c)) if (i+j)%2==0 else ((a,b,c),(b,d,c)))
+    elems=np.asarray(elems,int); p=nodes[elems]; ab=p[:,1]-p[:,0]; ac=p[:,2]-p[:,0]
+    return SimpleNamespace(nodes=nodes,elems=elems,area_e=.5*np.abs(ab[:,0]*ac[:,1]-ab[:,1]*ac[:,0]),ne=len(elems))
 
 @dataclass(frozen=True)
 class StateMesh:
@@ -89,10 +102,39 @@ def test_independent_path_search_detects_deliberately_defective_exact_only_suppo
     assert certificate["minimum_crossing_path_length"]>0
     assert certificate["bridge_node_ids"] and certificate["bridge_element_ids"]
 
+def test_independent_certificate_rejects_vacuous_missing_side_seeds():
+    m=mesh(n=17); centered=network(((.125,0.),(.875,0.)))
+    broad=independent_intact_path_certificate(m,centered,np.arange(m.ne))
+    assert broad["insufficient_seed_segment_ids"]==("b00000000:0",)
+    clipped=network(((.125,.48),(.875,.48)))
+    exact,_=causal_segment_support(m,np.array((.125,.48)),np.array((.875,.48)))
+    boundary=independent_intact_path_certificate(m,clipped,exact)
+    assert boundary["insufficient_seed_segment_ids"]
+
+def test_edge_too_short_for_two_sided_certificate_fails_closed():
+    m=mesh(n=33); h=np.sqrt(2)/32; short=network(((.125,0.),(.125+.5*h,0.)))
+    with pytest.raises(RuntimeError,match="INSUFFICIENT_OPPOSITE_SIDE_SEEDS"):
+        mechanically_separating_graph_support(m,short)
+
+def test_far_field_grading_does_not_change_crack_local_support_or_metrics():
+    net=network(((.125,0.),(.875,0.))); reference=None
+    for factor in (1,2,4,8,16):
+        ids,a=mechanically_separating_graph_support(graded_mesh(factor),net)
+        value=(tuple(ids),a.local_h_max_m,a.local_h_median_m,a.width_over_h,a.forward_leakage_over_h,a.independent_separation_certified)
+        if reference is None: reference=value
+        else:
+            assert value[0]==reference[0]; np.testing.assert_allclose(value[1:5],reference[1:5],rtol=0,atol=1e-14)
+            assert value[5] is reference[5]
+
+def test_unique_graph_length_unions_partially_overlapping_collinear_edges():
+    a=CrackBranchState("b00000000",None,0,0,((.1,0.),(.6,0.)),(0.,),status="arrested")
+    b=CrackBranchState("b00000001","b00000000",1,1,((.4,0.),(.9,0.)),(0.,),status="arrested")
+    assert unique_graph_length(CrackNetworkState((a,b),branching_enabled=True))==pytest.approx(.8)
+
 def test_offgrid_active_tip_fails_closed_when_production_alignment_is_required():
     m=mesh(n=17); net=network(((.125,0.),(.731,.013)))
     with pytest.raises(RuntimeError,match="ACTIVE_TIP_NOT_MESH_VERTEX"):
-        mechanically_separating_graph_support(m,net,require_aligned_active_tips=True)
+        _graph_support(m,net)
 
 def test_remote_or_whole_mesh_previous_support_fails_locality_gate():
     m=mesh(n=17); net=network(((.125,0.),(.875,0.)))
@@ -111,9 +153,9 @@ def test_support_owner_rejects_stale_mesh_and_damage_provenance():
         mechanically_separating_graph_support(m,net,previous_support=owned,accepted_network=net,accepted_damage=corrupted)
 
 def test_subcell_sequential_event_without_new_mechanical_state_fails_closed():
-    m=mesh(n=33); h=np.sqrt(2)/32; first=network(((.125,0.),(.125+.25*h,0.)))
+    m=mesh(n=33); h=np.sqrt(2)/32; first=network(((.125,0.),(.125+3*h,0.)))
     ids,_=mechanically_separating_graph_support(m,first); damage=np.zeros(m.ne); damage[ids]=1.; owned=support_record(m,first,damage,ids)
-    second=network(((.125,0.),(.125+.25*h,0.),(.125+.5*h,0.)))
+    second=network(((.125,0.),(.125+3*h,0.),(.125+3.25*h,0.)))
     with pytest.raises(RuntimeError,match="EVENT_BELOW_CERTIFIED_MESH_RESOLUTION"):
         mechanically_separating_graph_support(m,second,previous_support=owned,accepted_network=first,accepted_damage=damage)
 
@@ -138,7 +180,7 @@ def test_branch_tuple_order_does_not_change_support_or_fingerprint():
     assert aa.support_fingerprint==bb.support_fingerprint and aa.graph_fingerprint==bb.graph_fingerprint
 
 def test_trial_application_is_rollback_exact_and_records_v12_identity():
-    raw=mesh(); sm=StateMesh(raw.nodes,raw.elems,raw.area_e,raw.ne,np.zeros(raw.ne)); net=network(((.125,0.),(.75,.1)))
+    raw=mesh(); sm=StateMesh(raw.nodes,raw.elems,raw.area_e,raw.ne,np.zeros(raw.ne)); net=network(((.125,0.),(.75,.125)))
     accepted=State(sm,np.zeros(len(sm.nodes)),net,{"owned":"accepted"})
     before_gp=accepted.mesh.element_damage_gp.copy(); before_damage=accepted.damage.copy(); before_junction=dict(accepted.junction_process_state)
     trial,audit=apply_mechanically_separating_graph(accepted,net)

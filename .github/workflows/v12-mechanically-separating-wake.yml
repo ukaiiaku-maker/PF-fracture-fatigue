@@ -13,7 +13,7 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: python -m pip install -e . pytest scipy
+      - run: python -m pip install -c constraints/v12-qualification-py312.txt -e . pytest scipy
       - run: python -m compileall -q arrhenius_fracture scripts tests
       - run: |
           python -m pytest -q \
