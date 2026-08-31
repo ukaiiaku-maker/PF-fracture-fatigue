@@ -7,7 +7,8 @@ from arrhenius_fracture.causal_sharp_wake_v11 import CRACK_REPRESENTATION as V11
 from arrhenius_fracture.crack_network_v11 import CrackBranchState, CrackNetworkState
 from arrhenius_fracture.mechanically_separating_sharp_wake_v12 import (
     MODEL_ID, apply_mechanically_separating_graph, certification_arcs, classify_graph_vertices,
-    independent_intact_path_certificate, mechanically_separating_graph_support as _graph_support, support_record, unique_graph_length,
+    graph_component_count, independent_intact_path_certificate, mechanically_separating_graph_support as _graph_support,
+    junction_sector_certificates, selected_support_components, support_record, unique_graph_length,
 )
 
 def mechanically_separating_graph_support(*args,**kwargs):
@@ -86,6 +87,30 @@ def test_canonical_certificate_is_invariant_to_collinear_history_partition(fract
     assert a.certificate_fingerprint==reference.certificate_fingerprint
     assert a.segment_partition_invariant_length_m==pytest.approx(reference.segment_partition_invariant_length_m)
     assert a.selected_area_m2==pytest.approx(reference.selected_area_m2)
+
+@pytest.mark.parametrize("fractions",[(1.,),(.5,.5),(.25,)*4,(.125,)*8,(2/24,4/24,7/24,11/24)])
+def test_incrementally_accepted_collinear_histories_reach_same_mechanical_state(fractions):
+    m=mesh(n=65); root=.125; initial_tip=.5; final_tip=.875
+    accepted=network(((root,0.),(initial_tip,0.))); ids,a=mechanically_separating_graph_support(m,accepted)
+    damage=np.zeros(m.ne); damage[ids]=1.; owner=support_record(m,accepted,damage,ids); points=[(root,0.),(initial_tip,0.)]; position=initial_tip
+    for fraction in fractions:
+        position+=(final_tip-initial_tip)*fraction; points.append((position,0.)); trial=network(tuple(points))
+        ids,a=mechanically_separating_graph_support(m,trial,previous_support=owner,accepted_network=accepted,accepted_damage=damage)
+        assert a.mechanically_new_element_count>0
+        damage=damage.copy(); damage[ids]=1.; owner=support_record(m,trial,damage,ids); accepted=trial
+    reference_ids,reference=mechanically_separating_graph_support(m,network(((root,0.),(final_tip,0.))))
+    np.testing.assert_array_equal(ids,reference_ids); np.testing.assert_array_equal(damage,np.isin(np.arange(m.ne),reference_ids).astype(float))
+    assert a.support_fingerprint==reference.support_fingerprint
+    assert a.certificate_fingerprint==reference.certificate_fingerprint
+    assert a.segment_partition_invariant_length_m==pytest.approx(reference.segment_partition_invariant_length_m)
+
+def test_active_tip_metrics_are_signed_and_tip_local():
+    m=mesh(n=33); _,a=mechanically_separating_graph_support(m,network(((.125,0.),(.875,0.))))
+    assert a.h_tip_max_m>0 and a.h_tip_median_m>0 and a.h_tip_tangent_m>0 and a.h_tip_normal_m>0
+    assert a.active_tip_signed_footprint_m==pytest.approx(a.active_tip_support_axial_extent_m-.75)
+    assert a.active_tip_forward_leakage_m==pytest.approx(max(0.,a.active_tip_signed_footprint_m))
+    assert a.active_tip_backward_undershoot_m==pytest.approx(max(0.,-a.active_tip_signed_footprint_m))
+    assert a.endpoint_footprint_error_m==pytest.approx(abs(a.active_tip_signed_footprint_m))
 
 def test_growth_is_monotone_and_former_tip_is_closed_as_interior():
     m=mesh(); first=network(((.125,0.),(.5,0.))); second=network(((.125,0.),(.5,0.),(.875,0.)))
@@ -205,8 +230,71 @@ def test_near_coalescing_distinct_branches_fail_closed(perturb):
     with pytest.raises(RuntimeError,match="PREMATURE_MECHANICAL_COALESCENCE"):
         mechanically_separating_graph_support(m,net)
 
+def two_branch_network(left,right):
+    a=CrackBranchState("b00000000",None,0,0,tuple(left),(0.,),status="active")
+    # The V11 schema requires one ancestry root but does not require geometric
+    # contact between parent and child; physical components are geometry-based.
+    b=CrackBranchState("b00000001","b00000000",1,1,tuple(right),(0.,),status="active")
+    return CrackNetworkState((a,b),primary_branch_id="b00000000",branching_enabled=True)
+
+def test_support_component_labels_distinguish_edge_and_node_connectivity():
+    m=mesh(n=17); selected=np.array((0,1,3))
+    edge=selected_support_components(m,selected,shared_nodes=2); node=selected_support_components(m,selected,shared_nodes=1)
+    assert len(edge)==len(selected) and len(node)==len(selected)
+    assert len(set(node))<=len(set(edge))
+
+def test_separated_physical_cracks_retain_distinct_node_components():
+    m=mesh(n=33); net=two_branch_network(((.125,-.2),(.875,-.2)),((.125,.2),(.875,.2)))
+    _,audit=mechanically_separating_graph_support(m,net)
+    assert graph_component_count(net)==2 and audit.graph_component_count==2
+    assert len(set(audit.support_component_ids_node))==2 and not audit.illegal_support_connection
+    assert audit.minimum_support_component_separation_m>0
+
+def test_mesh_unresolved_distinct_parallel_cracks_fail_closed_explicitly():
+    m=mesh(n=33); net=two_branch_network(((.125,-.01),(.875,-.01)),((.125,.01),(.875,.01)))
+    with pytest.raises(RuntimeError,match="DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH"):
+        mechanically_separating_graph_support(m,net)
+
+def test_geometric_crossing_without_graph_junction_fails_closed_explicitly():
+    m=mesh(n=33); net=two_branch_network(((.2,-.2),(.8,.2)),((.2,.2),(.8,-.2)))
+    with pytest.raises(RuntimeError,match="DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH"):
+        mechanically_separating_graph_support(m,net)
+    _,audit=mechanically_separating_graph_support(m,net,return_uncertified_audit_for_screen=True)
+    assert not audit.certified and audit.illegal_support_connection
+
+def test_kink_and_y_junction_sector_certificates_are_nonvacuous():
+    m=mesh(n=65); kink=network(((.125,0.),(.5,0.),(.75,.25))); _,kink_a=mechanically_separating_graph_support(m,kink)
+    assert len(kink_a.junction_sector_certificates)==1
+    assert kink_a.junction_sector_certificates[0].junction_certificate_status=="ACCEPTED"
+    root=CrackBranchState("b00000000",None,0,0,((.125,0.),(.5,0.)),(0.,),status="arrested")
+    up=CrackBranchState("b00000001","b00000000",1,1,((.5,0.),(.75,.25)),(.5,))
+    down=CrackBranchState("b00000002","b00000000",1,1,((.5,0.),(.75,-.25)),(-.5,))
+    _,y_a=mechanically_separating_graph_support(m,CrackNetworkState((root,up,down),branching_enabled=True))
+    assert len(y_a.junction_sector_certificates)==1
+    certificate=y_a.junction_sector_certificates[0]
+    assert certificate.junction_certificate_status=="ACCEPTED" and all(certificate.sector_seed_counts)
+
+def test_junction_sector_verifier_rejects_deliberately_removed_arm_support():
+    m=mesh(n=65); kink=network(((.125,0.),(.5,0.),(.75,.25))); selected,_=mechanically_separating_graph_support(m,kink)
+    centroids=np.mean(m.nodes[m.elems],axis=1); p0=np.array((.5,0.)); tangent=np.array((1.,1.))/np.sqrt(2); h=np.sqrt(2)/64
+    rel=centroids-p0; axial=rel@tangent; normal=np.abs(rel@np.array((-tangent[1],tangent[0])))
+    removed=set(map(int,np.flatnonzero((axial>=0)&(axial<=6*h)&(normal<=3*h))))
+    damaged=set(map(int,selected))-removed
+    certificates=junction_sector_certificates(m,kink,sorted(damaged))
+    assert certificates and certificates[0].junction_certificate_status!="ACCEPTED"
+
+def test_duplicate_partial_overlap_and_cross_branch_collinear_continuation_are_explicitly_rejected():
+    m=mesh(n=33)
+    root=CrackBranchState("b00000000",None,0,0,((.125,0.),(.625,0.)),(0.,),status="arrested")
+    overlap=CrackBranchState("b00000001","b00000000",1,1,((.5,0.),(.875,0.)),(0.,))
+    with pytest.raises(RuntimeError,match="DUPLICATE_OR_OVERLAPPING_GRAPH_EDGE"):
+        mechanically_separating_graph_support(m,CrackNetworkState((root,overlap),branching_enabled=True))
+    continuation=CrackBranchState("b00000001","b00000000",1,1,((.625,0.),(.875,0.)),(0.,))
+    with pytest.raises(RuntimeError,match="COLLINEAR_PARENT_CHILD_CONTINUATION_REQUIRES_CANONICAL_BRANCH_SEMANTICS"):
+        mechanically_separating_graph_support(m,CrackNetworkState((root,continuation),branching_enabled=True))
+
 def test_branch_tuple_order_does_not_change_support_or_fingerprint():
-    m=mesh(n=13)
+    m=mesh(n=33)
     root=CrackBranchState("b00000000",None,0,0,((.1,0.),(.5,0.)),(0.,),status="arrested")
     up=CrackBranchState("b00000001","b00000000",1,1,((.5,0.),(.8,.2)),(.5,))
     down=CrackBranchState("b00000002","b00000000",1,1,((.5,0.),(.8,-.2)),(-.5,))
