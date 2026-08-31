@@ -86,18 +86,74 @@ leftover partial-cycle bin remainder before applying the threshold.
 | `K_rebond = K_rebond_max*H_b` | same three call sites |
 | `sigma_c = [K+ - K_shield - K_rebond]_+/sqrt(2*pi*r_eff)` (HAZARD_ONLY_REBOND_SHIELD) | `cleavage_stress_with_rebond` -- a free function replicating `sigma_tip`'s exact arithmetic (`unified_front.py:84-89`) with one extra subtraction, called only from the single guarded injection point in `kinetic_tip_cell.py::cycle_step_waveform`; `unified_front.py`/`separated_source_tip.py` themselves carry **zero source diff** |
 
+## Injection-point correction history (round-3 review discovery)
+
+The round-2-approved plan asserted that `kinetic_tip_cell.py::cycle_step_waveform`
+was "the sole choke point" for cleavage-hazard computation, confirmed at
+plan time by tracing the override chain of a simpler class hierarchy
+(`CampaignCalibratedTipEngine -> SeparatedSourceKineticTipEngine -> ...`).
+Round-3 review correctly refused to accept that this had been verified
+against the *actual* production engine used by the CLI, since the earlier
+"real-engine" smoke test (`test_v10_2_30_crack_rebonding_live_engine_smoke.py`)
+only exercises `build_shared_engine`'s bare `CampaignCalibratedTipEngine`,
+which has no stochastic-hazard/transactional-event mixins at all. Direct
+construction of the real production class
+(`CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine`, matching the
+actual CLI monkeypatch/inheritance chain) surfaced a three-layer
+correction, in order of discovery:
+
+1. **First injection attempt** (`kinetic_tip_cell.py::cycle_step_waveform`,
+   the base implementation) -- confirmed **dead code** for the real engine:
+   `PersistentSiteCyclicTipEngine.cycle_step_waveform`
+   (`persistent_site_cyclic_v10229.py`) is a fully independent
+   reimplementation that never calls `super()`. The edit here is harmless
+   (correct in isolation, for the simpler class hierarchy it was originally
+   verified against) but unreached by the real production engine.
+2. **Second injection attempt**
+   (`persistent_site_cyclic_v10229.py::preview_cycle_waveform`/
+   `cycle_step_waveform`) -- also confirmed **dead code** for the real
+   engine: `CoupledPersistentSiteCyclicTipEngine.cycle_step_waveform`
+   (also present in the real MRO) overrides it *again*, delegating to
+   `integrate_state_coupled_waveform`
+   (`persistent_site_coupled_hazard_v10229.py`) -- a third, independent,
+   adaptive-Simpson-quadrature commit pathway with its own deep-copied trial
+   engines for error estimation. This edit is likewise harmless/correct if
+   ever reached (e.g. by a solver configuration that does not compose the
+   coupled-hazard mixin), but is not the real engine's path either.
+3. **Confirmed-correct injection point**: `persistent_site_coupled_hazard_v10229.py`,
+   specifically `_phase_statistics(engine, controller, waveform, temperature_K)`
+   (the actual per-phase cleavage-rate computation used by real runs) and
+   `_commit_constant_segment(engine, controller, waveform, temperature_K,
+   cycles, sigma_average_Pa, lambda_average_s)` (the actual final commit onto
+   the real engine, called once per accepted quadrature segment -- there can
+   be several per `cycle_step_waveform` call). `_commit_constant_segment`'s
+   signature gained a `controller` positional parameter (needed for
+   `controller._phases()`, the phase grid, not otherwise available at that
+   call site); all three call sites inside `commit_interval`
+   (`provisional_result`, `midpoint_result`, the final accepted `result`)
+   were updated to pass it.
+
+Verified via direct `__init__`-based construction of the real engine
+(matching the actual CLI runtime MRO, not the `object.__new__` bypass
+pattern used elsewhere in this repo for isolated unit tests) and a live
+multi-event test: `rebonding_block_context` is populated (proving injection
+point 3 is reached) only after this third fix; injection points 1 and 2
+never populate it for this class hierarchy. Permanent regression coverage:
+`tests/test_v10_2_30_crack_rebonding_full_production_qualification.py`.
+
 ## HAZARD_ONLY classification, confirmed by source (not asserted)
 
-- The only injection point is inside `kinetic_tip_cell.py::cycle_step_waveform`
-  (base implementation, confirmed the sole place `sig`/`lam_e_site`/`mu_emit`
-  and `lam_c_phase`/`mu_c` are computed -- every override in the real MRO
-  chain, `campaign_calibrated_tip.py:305`, `continuum_source_tip.py:376`,
-  `separated_source_tip.py:112`, and the
-  `HazardEnergyGatedPersistentSiteCyclicTipEngine`/`Corrected...` mixins, is a
-  confirmed diagnostic-only pass-through via `super().cycle_step_waveform(...)`).
-- `sig` (drives emission via `lam_e_site`/`mu_emit`/`avg_sig`/`stress_override`)
-  is never touched; only a second, separate `sig_cleave` array feeds
-  `lam_c_phase`/`mu_c`.
+- The confirmed injection point for the real production engine is
+  `persistent_site_coupled_hazard_v10229.py::_phase_statistics`/
+  `_commit_constant_segment` (see the injection-point correction history
+  above). `kinetic_tip_cell.py::cycle_step_waveform` and
+  `persistent_site_cyclic_v10229.py::preview_cycle_waveform`/
+  `cycle_step_waveform` carry the same guarded edit and remain correct for
+  any simpler class hierarchy that actually reaches them, but are dead code
+  for the real engine.
+- `sig` (drives emission via `sigma.append(sig)` -> `sigma_avg_Pa` ->
+  `stress_override`) is never touched at any of the three injection points;
+  only a second, separate `sig_cleave` value/array feeds `lambda_cleave`.
 - The energy-admissible event length is derived exclusively by
   `continuum_gate_diagnostics` (`hazard_energy_event_gate_v10230.py:280-326`),
   which calls `engine.sigma_tip(K)` directly at line 294 -- a method never
@@ -132,8 +188,8 @@ as `integrate_coupled_fn` when calling `solve_coupled_event_time` -- see
 |---|---|
 | `Delta B_c(t) = integral_0^t lambda_c[K(tau), K_rebond(tau)] dtau`, phase-resolved, no block-constant shortcut | `crack_rebonding_v10230.phase_resolved_action` |
 | Root-find `dt_used` such that `B_start + DeltaB_c(dt_used) = B_threshold`, bisection on `dt` (stable, since cleavage rates are non-negative so the action is monotone in `dt` -- replaces an earlier fixed-point-on-lambda scheme shown by a failing synthetic test to diverge for super-linear time-dependence) | `crack_rebonding_v10230.solve_coupled_event_time` |
-| Two-stage block-size limiter: cheap linearized Stage 1 candidate (unit-corrected seconds->cycles), exact Stage 2 verification with fail-closed bisection | `stage1_block_cycle_limits` / `stage2_verify_block`; folded into `kinetic_tip_cell.py::cycle_step_waveform`'s existing adaptive `limits` list before `cycles` is finalized |
-| Accepted-length-only patch creation, fresh patch never inherits pre-event bonding, exactly-once commit (no-event branch commits full-block state in `cycle_step_waveform`; fired branch defers to `commit_energy_gated_event`) | `RebondingWakeState.commit_event` / `commit_no_event_block`; wired in `kinetic_tip_cell.py::cycle_step_waveform` and `persistent_site_cyclic_energy_gated_v10230.py::_commit_rebonding_event` |
+| Two-stage block-size limiter: cheap linearized Stage 1 candidate (unit-corrected seconds->cycles), exact Stage 2 verification with fail-closed bisection | `stage1_block_cycle_limits` / `stage2_verify_block`; available for any injection point that composes them (see injection-point correction history below for which one the real engine actually reaches) |
+| Accepted-length-only patch creation, fresh patch never inherits pre-event bonding, exactly-once commit (no-event branch commits full-block state via `commit_no_event_block`; fired branch defers to `commit_energy_gated_event`) | `RebondingWakeState.commit_event` / `commit_no_event_block`; for the real production engine, the no-event branch is wired in `persistent_site_coupled_hazard_v10229.py::_commit_constant_segment` and the fired branch in `persistent_site_cyclic_energy_gated_v10230.py::_commit_rebonding_event` |
 | Transactional rollback | `RebondingWakeState.snapshot`/`restore`; `_energy_gate_pending["rebonding_state_before"]`, restored in `restore_geometry_veto` |
 
 **Chronological phase continuity (round-3 review correction, supersedes an
@@ -221,3 +277,46 @@ Classification: `MISSION_SOLVER_HASH_UNREPRODUCED_BUT_BASE_COMMIT_VERIFIED`.
   `rebonding: CrackRebondingControls` to `SharedReducedConfig` (whose
   `asdict()` output now includes nested enum fields) broke it. Fixed with a
   `default=_json_default` handler converting `Enum` to `.value`.
+- Adding the `controller` positional parameter to
+  `persistent_site_coupled_hazard_v10229.py::_commit_constant_segment`
+  (needed for `controller._phases()`, the phase grid, at the confirmed real
+  injection point -- see the injection-point correction history above) broke
+  a **third**, independent caller not visible from that file alone:
+  `persistent_site_forward_coupled_hazard_v10230.py::_constant_segment`
+  imports the function as `_legacy._commit_constant_segment` and calls it
+  with the old 6-argument positional signature. Caught by a full,
+  non-`-x` regression sweep across the whole `tests/` tree (`git stash`
+  A/B comparison against the pre-edit baseline, isolating this module's
+  edits from the ~78 pre-existing, environment/artifact-dependent failures
+  documented below) -- `test_v10_2_30_forward_coupled_marcher.py` (3 tests)
+  and `test_v10_2_30_partition_robust_forward.py` (2 tests) newly failed
+  with `TypeError: _commit_constant_segment() missing 1 required positional
+  argument`. Fixed by threading `controller` through `_constant_segment` and
+  all three of its call sites in that file; `_evaluate_segment` already had
+  `controller` in scope, so no further signature changes were needed
+  upstream. This is a direct, concrete confirmation of why the round-3
+  review's "trace the installation architecture" and "run the full
+  regression suite" requirements matter for a module that edits shared
+  production files with more callers than any single file's `grep` reveals.
+
+## Regression-sweep baseline caveat (round-3 review, honestly reported)
+
+A full, unfiltered `python -m pytest tests/ -q` run on this worktree shows
+**78 pre-existing failures** (before any of this module's edits, confirmed
+by `git stash`-ing this module's changes and re-running) out of roughly 966
+collected tests, unrelated to crack rebonding. Inspection of the failure
+list shows these are overwhelmingly tests that depend on large
+physical-campaign artifacts (CSV/JSON/parquet outputs under `runs/<campaign>/...`)
+that were never generated in this isolated worktree -- e.g.
+`test_v10_2_30_physical_slope_transfer.py`,
+`test_v10_2_30_joint_fracture_fatigue_atlas.py`,
+`test_v10_2_30_analytical_overlay.py`,
+`test_v10_2_30_inverse_fatigue_design_artifacts.py` -- plus a handful of
+model-id/registry tests with a similar missing-artifact shape. None of
+these were introduced or altered by this module; they are reported here
+rather than silently omitted, per the round-3 review's explicit
+instruction. With this module's edits present, the same sweep shows exactly
+78 pre-existing failures plus the 4 new
+`test_v10_2_30_crack_rebonding_full_production_qualification.py` tests, all
+passing -- i.e. **zero net new failures** once the `_commit_constant_segment`
+caller-site regression above was found and fixed.

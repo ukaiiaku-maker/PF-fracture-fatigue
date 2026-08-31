@@ -208,9 +208,10 @@ def _error_metrics(
     return metrics
 
 
-def _constant_segment(engine, waveform, temperature_K, cycles, stats):
+def _constant_segment(engine, controller, waveform, temperature_K, cycles, stats):
     return _legacy._commit_constant_segment(
         engine,
+        controller,
         waveform,
         temperature_K,
         cycles,
@@ -225,13 +226,13 @@ def _evaluate_segment(engine, controller, waveform, temperature_K: float, cycles
     )
 
     full = copy.deepcopy(engine)
-    full_result = _constant_segment(full, waveform, temperature_K, cycles, start_stats)
+    full_result = _constant_segment(full, controller, waveform, temperature_K, cycles, start_stats)
     full_endpoint = _endpoint(full, controller, waveform, temperature_K)
 
     half = copy.deepcopy(engine)
     half_cycles = 0.5 * cycles
     first_result = _constant_segment(
-        half, waveform, temperature_K, half_cycles, start_stats
+        half, controller, waveform, temperature_K, half_cycles, start_stats
     )
     if bool(first_result.get("fired", False)):
         half_result = dict(first_result)
@@ -243,6 +244,7 @@ def _evaluate_segment(engine, controller, waveform, temperature_K: float, cycles
     )
     second_result = _constant_segment(
         half,
+        controller,
         waveform,
         temperature_K,
         cycles - half_cycles,

@@ -276,6 +276,31 @@ class RebondingWakeState:
         self.K_rebond_max_Pa_sqrt_m = K_rebond_max
         self.K_rebond_Pa_sqrt_m = K_rebond_max * H_b
 
+    def advance_one_phase_bin(
+        self, K_s_Pa_sqrt_m: float, r_contact_m: float, T_K: float, Eprime_Pa: float, dt_phase: float
+    ) -> float:
+        """Mutate every active patch's P/C/B state by one Strang phase-bin
+        step at the given signed K, rebuild H_b/K_rebond, and return the
+        resulting K_rebond. Used for engines whose own cyclic integrator
+        (e.g. ``persistent_site_cyclic_v10229.py::preview_cycle_waveform``)
+        is a literal per-phase-bin loop rather than a single-array
+        evaluation, so the wake can be advanced in lockstep, bin by bin, in
+        the same trial clone that engine already deep-copies for its own
+        preview -- consistent with the transactional design elsewhere in
+        this module: this mutates only whatever ``RebondingWakeState`` it is
+        called on (the trial clone's own copy, disposable after the
+        preview), never the real engine's committed wake state directly.
+        """
+        for patch in self.active:
+            if patch.retired:
+                continue
+            Q = patch_Q(K_s_Pa_sqrt_m, patch.s_j_m, r_contact_m, self.cfg, T_K)
+            half = expm(Q * (0.5 * dt_phase))
+            p_mid = half @ patch.state_vector()
+            patch.set_state(half @ p_mid)
+        self.rebuild_coupling(Eprime_Pa)
+        return self.K_rebond_Pa_sqrt_m
+
     def bonded_fraction_for_state(self, patch_states: dict[int, np.ndarray]) -> float:
         """H_b evaluated at an arbitrary trial P/C/B state per patch (used by
         the event-time root-finder for trial durations, without mutating the

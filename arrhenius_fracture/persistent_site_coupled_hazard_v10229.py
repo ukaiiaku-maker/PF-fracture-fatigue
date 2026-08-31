@@ -8,6 +8,7 @@ hazard along that evolving state. No independent fatigue law is introduced.
 from __future__ import annotations
 
 import copy
+import dataclasses
 import math
 import os
 from typing import Any
@@ -79,16 +80,69 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
         raise ValueError("state-coupled cyclic integration requires waveform phases")
     K_values = np.asarray(waveform.K_phase(phases), dtype=float).reshape(-1)
     if K_values.size != phases.size:
-        raise ValueError("waveform K_phase output does not match phase quadrature")
+        raise ValueError("waveform K_phase output does not match quadrature")
+
+    # Optional crack-rebonding (v10.2.30, default off): confirmed by direct
+    # construction of the real production engine class
+    # (CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine) that
+    # CoupledPersistentSiteCyclicTipEngine.cycle_step_waveform -- which
+    # bypasses BOTH kinetic_tip_cell.py::cycle_step_waveform AND
+    # persistent_site_cyclic_v10229.py::cycle_step_waveform entirely,
+    # calling integrate_state_coupled_waveform (this module) instead -- is
+    # the actual production commit pathway for the real persistent-site
+    # engine hierarchy. See docs/v10_2_30_crack_rebonding_equation_lineage.md
+    # for the full correction record (two prior injection-point attempts
+    # were dead code for this real engine class). K_values (feeding
+    # sigma_avg_Pa, hence stress_override -> _plastic_half_step, hence
+    # emission) is never touched; only a separate sig_cleave array, used
+    # solely for the lambda_cleave call below, is rebond-aware.
+    rebonding_state = getattr(engine, "_rebonding_state", None)
+    rebonding_active = rebonding_state is not None and rebonding_state.cfg.enabled
+    K_signed_phase = None
+    K_rebond_phase = None
+    K_shield_now = 0.0
+    r_eff_now = 1.0e-30
+    if rebonding_active:
+        from . import crack_rebonding_v10230 as _rebond
+
+        signed_waveform = dataclasses.replace(waveform, closure_clip=False)
+        phase_offset_rad = _rebond.chronological_phase_offset_rad(
+            rebonding_state.elapsed_time_s, waveform.period_s
+        )
+        K_signed_phase = np.asarray(
+            signed_waveform.K_phase(phases + phase_offset_rad), dtype=float
+        )
+        Eprime_Pa = _rebond.reduced_modulus_Pa(engine.G, engine.nu)
+        r_contact_m = max(engine.r_eff(), rebonding_state.cfg.contact_radius_min_m)
+        active_patches = [p for p in rebonding_state.active if not p.retired]
+        patch_states_now = {p.patch_id: p.state_vector() for p in active_patches}
+        K_rebond_phase = _rebond.representative_cycle_K_rebond(
+            active_patches=active_patches,
+            patch_states=patch_states_now,
+            K_phase=K_signed_phase,
+            dt_phase=float(waveform.period_s) / float(phases.size),
+            r_contact_m=r_contact_m,
+            cfg=rebonding_state.cfg,
+            T_K=temperature_K,
+            Eprime_Pa=Eprime_Pa,
+        )
+        K_shield_now = engine.K_shield()
+        r_eff_now = engine.r_eff()
 
     sigma: list[float] = []
     lambdas: list[float] = []
     raw: list[float] = []
     barriers: list[float] = []
-    for value in K_values:
+    for _idx, value in enumerate(K_values):
         K = max(float(value), 0.0)
         sig = _positive(engine.sigma_tip(K))
-        lam, lam_raw, Gc = engine.lambda_cleave(sig, float(temperature_K))
+        if rebonding_active:
+            sig_cleave = _rebond.cleavage_stress_with_rebond(
+                float(K_signed_phase[_idx]), K_shield_now, float(K_rebond_phase[_idx]), r_eff_now
+            )
+        else:
+            sig_cleave = sig
+        lam, lam_raw, Gc = engine.lambda_cleave(sig_cleave, float(temperature_K))
         sigma.append(sig)
         lambdas.append(_positive(lam))
         raw.append(_positive(lam_raw))
@@ -169,6 +223,7 @@ def _sum_numeric(target: dict[str, float], source: dict[str, Any]) -> None:
 
 def _commit_constant_segment(
     engine,
+    controller,
     waveform,
     temperature_K: float,
     cycles: float,
@@ -176,13 +231,77 @@ def _commit_constant_segment(
     lambda_average_s: float,
 ) -> dict[str, Any]:
     engine.sigma_tip(float(waveform.Kmax))
-    return engine._integrate_coupled(
+
+    rebonding_state = getattr(engine, "_rebonding_state", None)
+    rebonding_active = rebonding_state is not None and rebonding_state.cfg.enabled
+    dt_segment = max(float(cycles), 0.0) * float(waveform.period_s)
+    if rebonding_active:
+        from . import crack_rebonding_v10230 as _rebond
+
+        phases = np.asarray(controller._phases(), dtype=float)
+        dt_phase = float(waveform.period_s) / float(phases.size)
+        signed_waveform = dataclasses.replace(waveform, closure_clip=False)
+        phase_offset_rad = _rebond.chronological_phase_offset_rad(
+            rebonding_state.elapsed_time_s, waveform.period_s
+        )
+        K_signed_phase = np.asarray(
+            signed_waveform.K_phase(phases + phase_offset_rad), dtype=float
+        )
+        engine._rebonding_block_context = {
+            "K_signed_phase": K_signed_phase,
+            "dt_phase": dt_phase,
+            "n_phase": int(phases.size),
+            "r_contact_m": max(engine.r_eff(), rebonding_state.cfg.contact_radius_min_m),
+            "Eprime_Pa": _rebond.reduced_modulus_Pa(engine.G, engine.nu),
+            "T_K": float(temperature_K),
+            "K_shield_Pa_sqrt_m": engine.K_shield(),
+            "r_eff_m": engine.r_eff(),
+            "B_start": float(engine.B),
+            "period_s": float(waveform.period_s),
+        }
+
+    result = engine._integrate_coupled(
         float(waveform.Kmax),
         float(temperature_K),
-        max(float(cycles), 0.0) * float(waveform.period_s),
+        dt_segment,
         stress_override=max(float(sigma_average_Pa), 0.0),
         lambda_override=max(float(lambda_average_s), 0.0),
     )
+
+    if rebonding_active and not result.get("fired", False):
+        # This segment did not fire: its full nominal duration was genuinely
+        # consumed, so finalize by committing the exact segment-length wake
+        # advance now (mirrors the kinetic_tip_cell.py/persistent_site_
+        # cyclic_v10229.py injection points exactly). If it fired, the wake
+        # state is left untouched here -- the transactional commit
+        # (accepted) or rollback (rejected) happens later in
+        # commit_energy_gated_event/restore_geometry_veto, using the
+        # rebonding_block_context stashed above via _energy_gate_pending.
+        # Uses result["dt_consumed"] (the actual elapsed segment time) in
+        # preference to the nominal dt_segment, since the two can differ.
+        from .crack_rebonding_kinetics_v10230 import build_phase_factors, propagate
+
+        ctx = engine._rebonding_block_context
+        dt_actual = max(float(result.get("dt_consumed", dt_segment)), 0.0)
+        active_patches = [p for p in rebonding_state.active if not p.retired]
+        end_states = {}
+        for p in active_patches:
+            Q_list_p = [
+                _rebond.patch_Q(float(K), p.s_j_m, ctx["r_contact_m"], rebonding_state.cfg, temperature_K)
+                for K in ctx["K_signed_phase"]
+            ]
+            factors_p = build_phase_factors(Q_list_p, ctx["dt_phase"])
+            end_states[p.patch_id] = propagate(
+                p.state_vector(), Q_list_p, factors_p, k0=0,
+                dt=dt_actual, dt_phase=ctx["dt_phase"],
+            )
+        rebonding_state.commit_no_event_block(end_states, ctx["Eprime_Pa"])
+        rebonding_state.elapsed_time_s = (
+            rebonding_state.elapsed_time_s + dt_actual
+        ) % waveform.period_s
+        engine._rebonding_block_context = None
+
+    return result
 
 
 def integrate_state_coupled_waveform(
@@ -245,6 +364,7 @@ def integrate_state_coupled_waveform(
         provisional = copy.deepcopy(engine)
         provisional_result = _commit_constant_segment(
             provisional,
+            controller,
             waveform,
             temperature_K,
             cycles,
@@ -260,6 +380,7 @@ def integrate_state_coupled_waveform(
         midpoint = copy.deepcopy(engine)
         midpoint_result = _commit_constant_segment(
             midpoint,
+            controller,
             waveform,
             temperature_K,
             half_cycles,
@@ -316,6 +437,7 @@ def integrate_state_coupled_waveform(
 
         result = _commit_constant_segment(
             engine,
+            controller,
             waveform,
             temperature_K,
             cycles,
