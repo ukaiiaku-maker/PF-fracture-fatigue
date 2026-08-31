@@ -70,7 +70,7 @@ def two_branch_network(left,right):
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument("--out",type=Path,default=Path("artifacts/v12_mechanically_separating_wake")); args=parser.parse_args()
     args.out.mkdir(parents=True,exist_ok=True); rows=[]; edge_rows=[]; graded_rows=[]; event_rows=[]; partition_rows=[]; refinement_rows=[]
-    topology_rows=[]; coalescence_rows=[]; junction_rows=[]; arc_rows=[]; adaptive_rows=[]
+    topology_rows=[]; coalescence_rows=[]; junction_rows=[]; arc_rows=[]; adaptive_rows=[]; branched_partition_rows=[]
     implementation_sha=git("log","-1","--format=%H","--","arrhenius_fracture/mechanically_separating_sharp_wake_v12.py","tests/test_v12_mechanically_separating_wake.py","scripts/qualify_v12_mechanically_separating_wake.py")
     for n in (9,17,33,65):
         for perturbed in (False,True):
@@ -174,6 +174,44 @@ def main():
     arc_path=args.out/"certification_arc_matrix.csv"
     with arc_path.open("w",newline="") as f:
         writer=csv.DictWriter(f,fieldnames=arc_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(arc_rows)
+    direct_kink=CrackNetworkState.one_tip(((.125,0.),(.5,0.),(.75,.25))); kink_ids,kink_a=mechanically_separating_graph_support(partition_mesh,direct_kink)
+    split_kink=CrackNetworkState.one_tip(((.125,0.),(.3125,0.),(.5,0.),(.5625,.0625),(.625,.125),(.6875,.1875),(.75,.25)))
+    split_ids,split_a=mechanically_separating_graph_support(partition_mesh,split_kink)
+    branched_partition_rows.append({"case":"kink_final_subdivision","support_matches":tuple(split_ids)==tuple(kink_ids),
+      "certificate_matches":split_a.certificate_fingerprint==kink_a.certificate_fingerprint,"support_fingerprint":split_a.support_fingerprint,
+      "certificate_fingerprint":split_a.certificate_fingerprint,"physical_graph_length_m":split_a.segment_partition_invariant_length_m})
+    accepted=CrackNetworkState.one_tip(((.125,0.),(.5,0.))); ids,_=mechanically_separating_graph_support(partition_mesh,accepted)
+    damage=np.zeros(partition_mesh.ne); damage[ids]=1.; owner=support_record(partition_mesh,accepted,damage,ids); kink_points=[(.125,0.),(.5,0.)]
+    for point in ((.625,.125),(.75,.25)):
+        kink_points.append(point); trial=CrackNetworkState.one_tip(tuple(kink_points)); ids,a=mechanically_separating_graph_support(partition_mesh,trial,
+          previous_support=owner,accepted_network=accepted,accepted_damage=damage)
+        damage=damage.copy(); damage[ids]=1.; owner=support_record(partition_mesh,trial,damage,ids); accepted=trial
+    branched_partition_rows.append({"case":"kink_sequential_history","support_matches":tuple(ids)==tuple(kink_ids),
+      "certificate_matches":a.certificate_fingerprint==kink_a.certificate_fingerprint,"support_fingerprint":a.support_fingerprint,
+      "certificate_fingerprint":a.certificate_fingerprint,"physical_graph_length_m":a.segment_partition_invariant_length_m})
+    def evidence_y(up_path,down_path):
+        root=CrackBranchState("b00000000",None,0,0,((.125,0.),(.5,0.)),(0.,),status="arrested")
+        up=CrackBranchState("b00000001","b00000000",1,1,tuple(up_path),(.5,)*max(1,len(up_path)-1))
+        down=CrackBranchState("b00000002","b00000000",1,1,tuple(down_path),(-.5,)*max(1,len(down_path)-1))
+        return CrackNetworkState((root,up,down),branching_enabled=True)
+    direct_y=evidence_y(((.5,0.),(.75,.25)),((.5,0.),(.75,-.25))); y_ids,y_a=mechanically_separating_graph_support(partition_mesh,direct_y)
+    split_y=evidence_y(((.5,0.),(.5625,.0625),(.625,.125),(.75,.25)),((.5,0.),(.625,-.125),(.6875,-.1875),(.75,-.25)))
+    split_ids,split_a=mechanically_separating_graph_support(partition_mesh,split_y)
+    branched_partition_rows.append({"case":"y_arm_final_subdivision","support_matches":tuple(split_ids)==tuple(y_ids),
+      "certificate_matches":split_a.certificate_fingerprint==y_a.certificate_fingerprint,"support_fingerprint":split_a.support_fingerprint,
+      "certificate_fingerprint":split_a.certificate_fingerprint,"physical_graph_length_m":split_a.segment_partition_invariant_length_m})
+    accepted=CrackNetworkState.one_tip(((.125,0.),(.5,0.))); ids,_=mechanically_separating_graph_support(partition_mesh,accepted)
+    damage=np.zeros(partition_mesh.ne); damage[ids]=1.; owner=support_record(partition_mesh,accepted,damage,ids)
+    middle_y=evidence_y(((.5,0.),(.625,.125)),((.5,0.),(.625,-.125)))
+    ids,_=mechanically_separating_graph_support(partition_mesh,middle_y,previous_support=owner,accepted_network=accepted,accepted_damage=damage)
+    damage[ids]=1.; owner=support_record(partition_mesh,middle_y,damage,ids)
+    ids,a=mechanically_separating_graph_support(partition_mesh,direct_y,previous_support=owner,accepted_network=middle_y,accepted_damage=damage)
+    branched_partition_rows.append({"case":"y_arm_sequential_history","support_matches":tuple(ids)==tuple(y_ids),
+      "certificate_matches":a.certificate_fingerprint==y_a.certificate_fingerprint,"support_fingerprint":a.support_fingerprint,
+      "certificate_fingerprint":a.certificate_fingerprint,"physical_graph_length_m":a.segment_partition_invariant_length_m})
+    branched_path=args.out/"branched_partition_equivalence.csv"
+    with branched_path.open("w",newline="") as f:
+        writer=csv.DictWriter(f,fieldnames=branched_partition_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(branched_partition_rows)
     for n in (17,33,65,129):
         m=mesh(n,False); _,a=mechanically_separating_graph_support(m,CrackNetworkState.one_tip(((.125,0.),(.875,0.))))
         refinement_rows.append({"n":n,"outer_domain":"[0,1]x[-0.5,0.5]","h_local_max_m":a.local_h_max_m,
@@ -262,6 +300,16 @@ def main():
         writer=csv.DictWriter(f,fieldnames=junction_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(junction_rows)
     construction=all(r["construction_screen"] and r["unresolved_bridge_nodes"]==0 for r in rows)
     separation=all(not r["intact_cross_graph_path_exists"] for r in rows)
+    partition_pass=all(r["final_support_matches_reference"] and r["final_certificate_matches_reference"] for r in partition_rows if r["is_final"])
+    partition_pass=partition_pass and all(r["support_matches"] and r["certificate_matches"] for r in branched_partition_rows)
+    component_pass=all((not r["illegal_support_connection"]) or "DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH" in r["status"] for r in topology_rows)
+    coalescence_pass=all((not r["illegal_support_connection"]) or "DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH" in r["outcome"] for r in coalescence_rows)
+    junction_pass=all((r["defective_support"] and r["junction_certificate_status"]!="ACCEPTED") or
+      (not r["defective_support"] and r["junction_certificate_status"]=="ACCEPTED") for r in junction_rows)
+    adaptive_pass=len({r["physical_support_fingerprint"] for r in adaptive_rows})==1
+    event_pass=all((not r["accepted_state_production_valid"] and r["outcome"]=="INVALID_ACCEPTED_BASELINE_REQUIRES_ALIGNMENT_REMESH") or
+      (r["accepted_state_production_valid"] and r["outcome"] in ("ACCEPTED","REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH","NO_MECHANICALLY_NEW_SUPPORT")) for r in event_rows)
+    geometry_pass=partition_pass and component_pass and coalescence_pass and junction_pass and adaptive_pass and event_pass
     report={"schema":"v12_mechanically_separating_wake_qualification_v2","model_id":MODEL_ID,"cases":len(rows),
       "provenance":{"implementation_git_sha":implementation_sha,"base_git_sha":"2b5e5351add0bf0db67f2cda35a1480c3e7efc91",
         "python_version":platform.python_version(),"numpy_version":np.__version__,"scipy_version":scipy.__version__,"pytest_version":pytest.__version__,
@@ -273,7 +321,7 @@ def main():
         "max_forward_leakage_over_h_local":max(r["forward_leakage_over_h_local"] for r in rows),"matrix":"geometry_matrix.csv",
         "edge_certificate_matrix":"edge_certificate_matrix.csv","graded_far_field_matrix":"graded_far_field_objectivity.csv",
         "normalized_event_resolution_matrix":"normalized_event_resolution_matrix.csv","event_partition_equivalence":"event_partition_equivalence.csv",
-        "certification_arc_matrix":"certification_arc_matrix.csv","local_refinement_objectivity":"local_refinement_objectivity.csv",
+        "branched_partition_equivalence":"branched_partition_equivalence.csv","certification_arc_matrix":"certification_arc_matrix.csv","local_refinement_objectivity":"local_refinement_objectivity.csv",
         "adaptive_far_field_objectivity":"adaptive_far_field_objectivity.csv","support_component_topology":"support_component_topology.csv",
         "coalescence_distance_matrix":"coalescence_distance_matrix.csv","junction_sector_matrix":"junction_sector_matrix.csv"},
       "gates":{"GRAPH_AWARE_NODE_STAR_CONSTRUCTION_SCREEN":"PASS" if construction else "FAIL",
@@ -282,13 +330,15 @@ def main():
         "SINGLE_BRANCH_COLLINEAR_CERTIFICATION_ARC_EQUIVALENCE":"PASS",
         "STRAIGHT_ALIGNED_LOCAL_REFINEMENT_OH_SCREEN":"PASS",
         "NORMALIZED_FIXED_MESH_EVENT_CLASSIFICATION_SCREEN":"PASS",
-        "GRAPH_PARTITION_INVARIANT_CERTIFICATION":"OPEN",
-        "SUPPORT_COMPONENT_TOPOLOGY_QUALIFIED":"OPEN","JUNCTION_SECTOR_CONNECTIVITY_QUALIFIED":"OPEN",
+        "GRAPH_PARTITION_INVARIANT_CERTIFICATION":"PASS" if partition_pass else "FAIL",
+        "SUPPORT_COMPONENT_TOPOLOGY_QUALIFIED":"PASS" if component_pass else "FAIL",
+        "JUNCTION_SECTOR_CONNECTIVITY_QUALIFIED":"PASS" if junction_pass else "FAIL",
         "INDEPENDENT_INTACT_PATH_SEPARATION_CERTIFIED":"OPEN",
-        "LOCAL_H_AND_FULL_SUPPORT_OH_OBJECTIVITY":"OPEN","NO_PREMATURE_MECHANICAL_COALESCENCE":"OPEN",
-        "ACTIVE_TIP_AND_EVENT_RESOLUTION_QUALIFIED":"OPEN","ACCEPTED_STATE_NONMUTATION_OR_TRIAL_ISOLATION":"PASS",
+        "LOCAL_H_AND_FULL_SUPPORT_OH_OBJECTIVITY":"PASS" if adaptive_pass else "FAIL",
+        "NO_PREMATURE_MECHANICAL_COALESCENCE":"PASS" if coalescence_pass else "FAIL",
+        "ACTIVE_TIP_AND_EVENT_RESOLUTION_QUALIFIED":"PASS" if event_pass else "FAIL","ACCEPTED_STATE_NONMUTATION_OR_TRIAL_ISOLATION":"PASS",
         "PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED":"NOT_RUN","V12_CLEAN_WORKER_SCOPED_CI":"NOT_RUN",
-        "MECHANICALLY_SEPARATING_WAKE_GEOMETRY_QUALIFIED":"OPEN",
+        "MECHANICALLY_SEPARATING_WAKE_GEOMETRY_QUALIFIED":"PASS" if geometry_pass else "FAIL",
         "MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED":"OPEN",
         "MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED":"NOT_RUN",
         "V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED":"OPEN"}}
@@ -296,6 +346,7 @@ def main():
     manifest={"geometry_matrix.csv":sha(csv_path),"edge_certificate_matrix.csv":sha(edge_path),
       "graded_far_field_objectivity.csv":sha(graded_path),"normalized_event_resolution_matrix.csv":sha(event_path),
       "event_partition_equivalence.csv":sha(partition_path),"certification_arc_matrix.csv":sha(arc_path),
+      "branched_partition_equivalence.csv":sha(branched_path),
       "local_refinement_objectivity.csv":sha(refinement_path),"adaptive_far_field_objectivity.csv":sha(adaptive_path),
       "support_component_topology.csv":sha(topology_path),"coalescence_distance_matrix.csv":sha(coalescence_path),
       "junction_sector_matrix.csv":sha(junction_path),"qualification.json":sha(qualification)}

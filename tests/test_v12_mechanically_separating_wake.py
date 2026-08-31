@@ -112,6 +112,37 @@ def test_active_tip_metrics_are_signed_and_tip_local():
     assert a.active_tip_backward_undershoot_m==pytest.approx(max(0.,-a.active_tip_signed_footprint_m))
     assert a.endpoint_footprint_error_m==pytest.approx(abs(a.active_tip_signed_footprint_m))
 
+def test_kink_partition_and_sequential_history_are_mechanically_equivalent():
+    m=mesh(n=65); direct=network(((.125,0.),(.5,0.),(.75,.25))); direct_ids,direct_a=mechanically_separating_graph_support(m,direct)
+    subdivided=network(((.125,0.),(.3125,0.),(.5,0.),(.5625,.0625),(.625,.125),(.6875,.1875),(.75,.25)))
+    split_ids,split_a=mechanically_separating_graph_support(m,subdivided)
+    np.testing.assert_array_equal(split_ids,direct_ids); assert split_a.certificate_fingerprint==direct_a.certificate_fingerprint
+    accepted=network(((.125,0.),(.5,0.))); ids,_=mechanically_separating_graph_support(m,accepted)
+    damage=np.zeros(m.ne); damage[ids]=1.; owner=support_record(m,accepted,damage,ids); points=[(.125,0.),(.5,0.)]
+    for point in ((.625,.125),(.75,.25)):
+        points.append(point); trial=network(tuple(points)); ids,a=mechanically_separating_graph_support(m,trial,previous_support=owner,accepted_network=accepted,accepted_damage=damage)
+        damage=damage.copy(); damage[ids]=1.; owner=support_record(m,trial,damage,ids); accepted=trial
+    np.testing.assert_array_equal(ids,direct_ids); assert a.certificate_fingerprint==direct_a.certificate_fingerprint
+
+def test_y_arm_subdivision_and_sequential_history_are_mechanically_equivalent():
+    m=mesh(n=65)
+    def y_graph(up_path,down_path):
+        root=CrackBranchState("b00000000",None,0,0,((.125,0.),(.5,0.)),(0.,),status="arrested")
+        up=CrackBranchState("b00000001","b00000000",1,1,tuple(up_path),(.5,)*max(1,len(up_path)-1))
+        down=CrackBranchState("b00000002","b00000000",1,1,tuple(down_path),(-.5,)*max(1,len(down_path)-1))
+        return CrackNetworkState((root,up,down),branching_enabled=True)
+    direct=y_graph(((.5,0.),(.75,.25)),((.5,0.),(.75,-.25))); direct_ids,direct_a=mechanically_separating_graph_support(m,direct)
+    split=y_graph(((.5,0.),(.5625,.0625),(.625,.125),(.75,.25)),((.5,0.),(.625,-.125),(.6875,-.1875),(.75,-.25)))
+    split_ids,split_a=mechanically_separating_graph_support(m,split)
+    np.testing.assert_array_equal(split_ids,direct_ids); assert split_a.certificate_fingerprint==direct_a.certificate_fingerprint
+    accepted=network(((.125,0.),(.5,0.))); ids,_=mechanically_separating_graph_support(m,accepted)
+    damage=np.zeros(m.ne); damage[ids]=1.; owner=support_record(m,accepted,damage,ids)
+    middle=y_graph(((.5,0.),(.625,.125)),((.5,0.),(.625,-.125)))
+    ids,_=mechanically_separating_graph_support(m,middle,previous_support=owner,accepted_network=accepted,accepted_damage=damage)
+    damage[ids]=1.; owner=support_record(m,middle,damage,ids)
+    ids,a=mechanically_separating_graph_support(m,direct,previous_support=owner,accepted_network=middle,accepted_damage=damage)
+    np.testing.assert_array_equal(ids,direct_ids); assert a.certificate_fingerprint==direct_a.certificate_fingerprint
+
 def test_growth_is_monotone_and_former_tip_is_closed_as_interior():
     m=mesh(); first=network(((.125,0.),(.5,0.))); second=network(((.125,0.),(.5,0.),(.875,0.)))
     a,_=mechanically_separating_graph_support(m,first); damage=np.zeros(m.ne); damage[a]=1.; owned=support_record(m,first,damage,a)
