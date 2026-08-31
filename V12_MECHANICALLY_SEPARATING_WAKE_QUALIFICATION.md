@@ -39,7 +39,7 @@ explicit vertex classes, fail-closed empty graphs, and exact rollback isolation.
 | `INDEPENDENT_INTACT_PATH_SEPARATION_CERTIFIED` | OPEN | Broad adaptive/branched and junction-sector certificate remains outstanding |
 | `LOCAL_H_AND_FULL_SUPPORT_OH_OBJECTIVITY` | OPEN | Edge-local metrics and far-field grading factors 1–16 pass; local-refinement convergence remains outstanding |
 | `NO_PREMATURE_MECHANICAL_COALESCENCE` | OPEN | Near-branch counterexample now fails closed; full separation-distance matrix remains outstanding |
-| `ACTIVE_TIP_AND_EVENT_RESOLUTION_QUALIFIED` | OPEN | Off-grid production tips and unresolved subcell events fail closed; complete event sweep remains outstanding |
+| `ACTIVE_TIP_AND_EVENT_RESOLUTION_QUALIFIED` | OPEN | 54-case, three-orientation/three-phase sweep establishes four grid spacings as the current minimum accepted increment; broader adaptive equivalence remains outstanding |
 | `ACCEPTED_STATE_NONMUTATION_OR_TRIAL_ISOLATION` | PASS | Pure trial leaves accepted arrays and ownership unchanged |
 | `PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED` | NOT_RUN | Production wiring remains blocked |
 | `V12_CLEAN_WORKER_SCOPED_CI` | EXTERNAL_PASS | Run 33344440023 passed at tested head fdc47b614b54e8b03988a0909ca71da1b249c900; the new head must rerun |
@@ -54,7 +54,7 @@ resume the void-nucleation mission.
 
 ## Test result
 
-The scoped V12 plus V11 topology regression command passes `61 passed`. The
+The scoped V12 plus V11 topology regression command passes `68 passed`. The
 full repository suite reports `704 passed, 1 skipped, 7 failed`; all seven
 failures are in pre-existing V10.2 compatibility/status tests outside this
 branch's additive two-file implementation diff (legacy model-ID assertions,

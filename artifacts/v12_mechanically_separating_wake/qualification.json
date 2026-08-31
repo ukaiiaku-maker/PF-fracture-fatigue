@@ -19,6 +19,7 @@
   "geometry": {
     "construction_screen": true,
     "edge_certificate_matrix": "edge_certificate_matrix.csv",
+    "event_resolution_matrix": "event_resolution_matrix.csv",
     "graded_far_field_matrix": "graded_far_field_objectivity.csv",
     "independent_separation_screen": true,
     "matrix": "geometry_matrix.csv",
@@ -28,7 +29,7 @@
   "model_id": "sharp_wake_mechanically_separating_v12",
   "provenance": {
     "base_git_sha": "2b5e5351add0bf0db67f2cda35a1480c3e7efc91",
-    "implementation_git_sha": "2b8dbc7de16738b1076aee91ad0834541cfc590e",
+    "implementation_git_sha": "a2d71436306359eaeabe4c3560804a4554979ef6",
     "mesh_generator_identity": "v12_structured_checkerboard_and_seeded_perturbation_v2",
     "numpy_version": "2.5.1",
     "platform": "macOS-14.3.1-arm64-arm-64bit",
