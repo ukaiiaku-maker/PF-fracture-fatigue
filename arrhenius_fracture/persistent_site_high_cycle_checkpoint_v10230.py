@@ -139,6 +139,12 @@ def write_checkpoint(
         ),
         "metadata": _json_safe(metadata or {}),
     }
+    from .crack_rebonding_v10230 import serialize_rebonding_checkpoint
+
+    rebonding_payload = serialize_rebonding_checkpoint(engine)
+    if rebonding_payload is not None:
+        payload["crack_rebonding"] = rebonding_payload
+
     _atomic_npz(root / "high_cycle_live_state.npz", active_vector=snapshot.vector)
     _atomic_text(
         root / "high_cycle_live_checkpoint.json",
@@ -215,6 +221,10 @@ def restore_checkpoint_payload(engine, payload: dict[str, Any], vector) -> None:
         )
     vector = np.asarray(vector, dtype=float)
     restore_active_state(engine, current, vector)
+
+    from .crack_rebonding_v10230 import restore_rebonding_checkpoint
+
+    restore_rebonding_checkpoint(engine, payload.get("crack_rebonding"))
 
     current_ledgers = capture_ledgers(engine)
     target_ledgers = {

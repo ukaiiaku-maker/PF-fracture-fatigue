@@ -18,7 +18,7 @@ used in the kinetics or cleavage stress.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 import csv
 import json
 import math
@@ -27,6 +27,8 @@ from types import MethodType, SimpleNamespace
 from typing import Any, Iterable
 
 import numpy as np
+
+from .crack_rebonding_kinetics_v10230 import CrackRebondingControls
 
 from .anisotropic_emission_v10174 import (
     AnisotropicEmissionConfig,
@@ -87,8 +89,10 @@ class SharedReducedConfig:
     max_translation_substep_m: float = 5.0e-8
     max_internal_steps: int = 20000
     max_outer_steps: int = 2_000_000
+    rebonding: CrackRebondingControls = field(default_factory=CrackRebondingControls)
 
     def validate(self) -> "SharedReducedConfig":
+        self.rebonding = self.rebonding.validate()
         if self.Kdot_MPa_sqrt_m_s <= 0.0:
             raise ValueError("Kdot must be positive")
         if self.Kmax_MPa_sqrt_m <= 0.0:
@@ -286,6 +290,12 @@ def build_shared_engine(
         "prescribed_K_and_channel_drive_factors"
     )
     engine._shared_reduced_transport_mode = cfg.transport_mode
+
+    if cfg.rebonding.enabled:
+        from .crack_rebonding_v10230 import install_crack_rebonding
+
+        install_crack_rebonding(engine, cfg.rebonding)
+
     return engine
 
 
@@ -640,6 +650,14 @@ def replay_shared_state(
     }
 
 
+def _json_default(value: Any) -> Any:
+    from enum import Enum
+
+    if isinstance(value, Enum):
+        return value.value
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
 def write_shared_result(result: dict[str, Any], out: str | Path) -> None:
     root = Path(out)
     root.mkdir(parents=True, exist_ok=True)
@@ -649,7 +667,7 @@ def write_shared_result(result: dict[str, Any], out: str | Path) -> None:
     payload.pop("history", None)
     payload.pop("_final_arrays", None)
     (root / "shared_reduced_summary.json").write_text(
-        json.dumps(payload, indent=2)
+        json.dumps(payload, indent=2, default=_json_default)
     )
     (root / "shared_reduced_audit.json").write_text(
         json.dumps(

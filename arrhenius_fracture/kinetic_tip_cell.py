@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import copy
 import math
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace as _dataclasses_replace
 from typing import Any
 
 import numpy as np
@@ -432,8 +432,60 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
         lam_e_site = self.manifest.emission.rate(sig, T_K)
         available = float(np.sum(self.mpz.available_sites))
         mu_emit = float(np.sum(lam_e_site * available) * dt_phase)
+
+        # Optional crack-rebonding (v10.2.30, default off): a phase-resolved,
+        # cleavage-hazard-only cohesive shielding correction. ``sig`` above
+        # (driving emission via lam_e_site/mu_emit/avg_sig/stress_override) is
+        # never touched, so emission is unconditionally unaffected. See
+        # docs/v10_2_30_crack_rebonding_equation_lineage.md.
+        rebonding_state = getattr(self, "_rebonding_state", None)
+        rebonding_active = rebonding_state is not None and rebonding_state.cfg.enabled
+        rebonding_block_context = None
+        if rebonding_active:
+            from . import crack_rebonding_v10230 as _rebond
+
+            signed_waveform = _dataclasses_replace(waveform, closure_clip=False)
+            K_signed_phase = signed_waveform.K_phase(phase)
+            Eprime_Pa = _rebond.reduced_modulus_Pa(self.G, self.nu)
+            r_contact_m = max(self.r_eff(), rebonding_state.cfg.contact_radius_min_m)
+            active_patches = [p for p in rebonding_state.active if not p.retired]
+            patch_states_now = {p.patch_id: p.state_vector() for p in active_patches}
+            K_rebond_phase = _rebond.representative_cycle_K_rebond(
+                active_patches=active_patches,
+                patch_states=patch_states_now,
+                K_phase=K_signed_phase,
+                dt_phase=dt_phase,
+                r_contact_m=r_contact_m,
+                cfg=rebonding_state.cfg,
+                T_K=T_K,
+                Eprime_Pa=Eprime_Pa,
+            )
+            K_shield_now = self.K_shield()
+            r_eff_now = self.r_eff()
+            sig_cleave = np.array(
+                [
+                    _rebond.cleavage_stress_with_rebond(
+                        float(K_signed_phase[i]), K_shield_now, float(K_rebond_phase[i]), r_eff_now
+                    )
+                    for i in range(len(phase))
+                ]
+            )
+            rebonding_block_context = {
+                "K_signed_phase": K_signed_phase,
+                "dt_phase": dt_phase,
+                "n_phase": len(phase),
+                "r_contact_m": r_contact_m,
+                "Eprime_Pa": Eprime_Pa,
+                "T_K": T_K,
+                "K_shield_Pa_sqrt_m": K_shield_now,
+                "r_eff_m": r_eff_now,
+                "B_start": float(self.B),
+            }
+        else:
+            sig_cleave = sig
+
         lam_c_phase = np.array([
-            self.lambda_cleave(float(s), T_K)[0] for s in sig
+            self.lambda_cleave(float(s), T_K)[0] for s in sig_cleave
         ])
         mu_c = float(np.sum(lam_c_phase) * dt_phase)
         limits = [
@@ -445,6 +497,18 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
                 limits.append(controller.cfg.target_dB / mu_c)
             if mu_emit > 0.0 and math.isfinite(controller.cfg.target_dN_emit):
                 limits.append(controller.cfg.target_dN_emit / mu_emit)
+            if rebonding_active:
+                stage1_limits = _rebond.stage1_block_cycle_limits(
+                    active_patches=active_patches,
+                    patch_states=patch_states_now,
+                    K_s0=float(K_signed_phase[0]),
+                    r_contact_m=r_contact_m,
+                    cfg=rebonding_state.cfg,
+                    T_K=T_K,
+                    Eprime_Pa=Eprime_Pa,
+                    period_s=waveform.period_s,
+                )
+                limits.extend(stage1_limits)
         cycles = max(
             float(force_cycles) if force_cycles is not None else min(limits),
             float(controller.cfg.min_block_cycles),
@@ -458,6 +522,8 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
         )
         lambda_avg = mu_c * waveform.frequency_Hz
         N_pre = self.N_em
+        if rebonding_block_context is not None:
+            self._rebonding_block_context = rebonding_block_context
         coupled = self._integrate_coupled(
             waveform.Kmax,
             T_K,
@@ -466,6 +532,29 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
             lambda_override=lambda_avg,
         )
         advance = coupled["advance"]
+
+        if rebonding_active and not coupled.get("fired", False):
+            # No event fired: the block's full nominal duration was genuinely
+            # consumed, so finalize by committing the exact full-block wake
+            # advance now. If an event did fire, the wake state is left
+            # untouched here -- the transactional commit (accepted) or
+            # rollback (rejected) happens later in
+            # commit_energy_gated_event/restore_geometry_veto, using the
+            # rebonding_block_context stashed above via _energy_gate_pending.
+            from .crack_rebonding_kinetics_v10230 import build_phase_factors, propagate
+
+            end_states = {}
+            for p in active_patches:
+                Q_list_p = [
+                    _rebond.patch_Q(float(K), p.s_j_m, r_contact_m, rebonding_state.cfg, T_K)
+                    for K in K_signed_phase
+                ]
+                factors_p = build_phase_factors(Q_list_p, dt_phase)
+                end_states[p.patch_id] = propagate(
+                    p.state_vector(), Q_list_p, factors_p, k0=0, dt=dt_block, dt_phase=dt_phase
+                )
+            rebonding_state.commit_no_event_block(end_states, Eprime_Pa)
+            self._rebonding_block_context = None
         plastic = coupled["plastic"]
         diag = self.mpz.diagnostics(self.G, self.nu, self.b, self.f.r0)
         active_signed = self._active_shielding_signed()
