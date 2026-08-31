@@ -41,6 +41,15 @@ def graded_mesh(factor):
     elems=np.asarray(elems,int); p=nodes[elems]; ab=p[:,1]-p[:,0]; ac=p[:,2]-p[:,0]
     return SimpleNamespace(nodes=nodes,elems=elems,area_e=.5*np.abs(ab[:,0]*ac[:,1]-ab[:,1]*ac[:,0]),ne=len(elems))
 
+def fixed_domain_graded_mesh(n=33):
+    x=np.linspace(0.,1.,n); parameter=np.linspace(-1.,1.,n); y=.5*np.sinh(2*parameter)/np.sinh(2)
+    xx,yy=np.meshgrid(x,y); nodes=np.c_[xx.ravel(),yy.ravel()]; elems=[]
+    for j in range(n-1):
+        for i in range(n-1):
+            a=j*n+i; b=a+1; c=a+n; d=c+1; elems.extend(((a,b,d),(a,d,c)) if (i+j)%2==0 else ((a,b,c),(b,d,c)))
+    elems=np.asarray(elems,int); p=nodes[elems]; ab=p[:,1]-p[:,0]; ac=p[:,2]-p[:,0]
+    return SimpleNamespace(nodes=nodes,elems=elems,area_e=.5*np.abs(ab[:,0]*ac[:,1]-ab[:,1]*ac[:,0]),ne=len(elems))
+
 def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 def git(*args): return subprocess.check_output(("git",)+args,cwd=ROOT,text=True).strip()
 
@@ -84,7 +93,7 @@ def main():
     with graded_path.open("w",newline="") as f:
         writer=csv.DictWriter(f,fieldnames=graded_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(graded_rows)
     directions={angle:np.array((np.cos(np.deg2rad(angle)),np.sin(np.deg2rad(angle)))) for angle in (0,15,30,45,60,75,90)}
-    event_meshes=(("structured",mesh(33,False)),("perturbed",mesh(33,True)),("graded",graded_mesh(4)))
+    event_meshes=(("structured",mesh(33,False)),("perturbed",mesh(33,True)),("fixed_domain_graded",fixed_domain_graded_mesh()))
     for mesh_label,event_mesh in event_meshes:
      for angle,direction in directions.items():
         normal=np.array((-direction[1],direction[0]))
