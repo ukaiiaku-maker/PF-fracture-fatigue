@@ -67,6 +67,7 @@ def main():
         checks["angle_finest_global_reference_error_max"]=max(max(r[k] for k in ("reaction_reference_error","compliance_reference_error","energy_reference_error")) for r in angle_fine)
         checks["angle_equilibrium_identity_max"]=max(max(r["free_residual_relative"],r["energy_reaction_identity_relative"]) for r in angle_rows)
         gates["V12_PRIMAL_MECHANICS_ANGLES_30_45"]="PASS" if checks["angle_finest_global_reference_error_max"]<=THRESHOLDS["maximum_finest_global_reference_error"] and checks["angle_equilibrium_identity_max"]<=THRESHOLDS["maximum_free_residual_relative"] else "FAIL"
+    gates["MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED"]="PASS" if gates["V12_PRIMAL_MECHANICS_STRAIGHT"]=="PASS" and gates["V12_PRIMAL_MECHANICS_ANGLES_30_45"]=="PASS" else "FAIL"
     args.out.mkdir(parents=True,exist_ok=True); write_csv(args.out/"straight_primal_matrix.csv",rows); write_csv(args.out/"centered_G_matrix.csv",derivatives)
     if angle_rows: write_csv(args.out/"angle_primal_matrix.csv",angle_rows)
     sha=subprocess.check_output(("git","rev-parse","HEAD"),cwd=ROOT,text=True).strip()
