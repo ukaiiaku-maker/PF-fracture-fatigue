@@ -111,12 +111,12 @@ def main():
     if angle_rows: write_csv(args.out/"angle_primal_matrix.csv",angle_rows)
     implementation_sha=git("log","-1","--format=%H","--",*IMPLEMENTATION_PATHS)
     oracle_sha=git("rev-parse",f"{CONFORMING_ORACLE_SOURCE_COMMIT}^{{commit}}")
-    report={"schema":"v12_primal_mechanics_qualification_v2","base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":git("rev-parse","HEAD"),"conforming_oracle_source_commit":oracle_sha,"thresholds_predeclared":THRESHOLDS,"checks":checks,"gates":gates}
+    report={"schema":"v12_primal_mechanics_qualification_v2","base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"thresholds_predeclared":THRESHOLDS,"checks":checks,"gates":gates}
     (args.out/"qualification.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n"); print(json.dumps(report,indent=2,sort_keys=True))
     scientific=("straight_primal_matrix.csv","centered_G_matrix.csv","angle_primal_matrix.csv","qualification.json")
     manifest={name:sha256(args.out/name) for name in scientific}
     (args.out/"sha256_manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
-    environment={"base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":git("rev-parse","HEAD"),"conforming_oracle_source_commit":oracle_sha,"python_version":platform.python_version(),"numpy_version":np.__version__,"scipy_version":scipy.__version__,"platform":platform.platform(),"solver_identity":"scipy.sparse.linalg.spsolve_cst_plane_strain","thresholds":THRESHOLDS}
+    environment={"base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"python_version":platform.python_version(),"numpy_version":np.__version__,"scipy_version":scipy.__version__,"platform":platform.platform(),"solver_identity":"scipy.sparse.linalg.spsolve_cst_plane_strain","thresholds":THRESHOLDS}
     (args.out/"environment_attestation.json").write_text(json.dumps(environment,indent=2,sort_keys=True)+"\n")
 
 if __name__=="__main__": main()
