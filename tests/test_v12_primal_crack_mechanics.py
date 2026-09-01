@@ -10,7 +10,7 @@ from arrhenius_fracture.primal_crack_mechanics_v12 import _interface_tractions, 
 def test_conforming_oracle_records_pr57_source_and_normalizes_to_parent():
     parent=build_matched_crack_parent(8e-4,8e-4,(2e-4,0.),(5e-4,0.),25e-6)
     slit=conforming_slit_from_parent(parent)
-    assert CONFORMING_ORACLE_SOURCE_COMMIT=="8ad7f42"
+    assert CONFORMING_ORACLE_SOURCE_COMMIT=="8ad7f42c49c27d1066ff5ef7ee4a910232f2e7d4"
     np.testing.assert_array_equal(slit.parent_node_of_node[slit.mesh.elems],parent.mesh.elems)
     assert slit.mesh.ne==parent.mesh.ne and slit.mesh.nn>parent.mesh.nn
 
@@ -26,6 +26,7 @@ def test_coarse_straight_screen_has_all_four_representations_and_equilibrates():
     assert conforming["conforming_extrapolated_direct_cod_error"]<.05
     assert v12["crack_opening_reference_error"]>.05  # required failure cannot be hidden by global PASS
     assert max(v12[k] for k in ("pin_reaction_relative_error","pin_energy_relative_error","pin_cod_relative_error"))<1e-10
+    assert max(r[k] for r in rows for k in r if k.startswith("mirror_") and k.endswith("relative"))<.05
 
 
 def test_coarse_rotated_screen_preserves_matched_representations():

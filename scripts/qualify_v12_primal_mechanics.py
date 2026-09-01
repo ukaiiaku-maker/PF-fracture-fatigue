@@ -9,7 +9,7 @@ import scipy
 
 ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT))
 from arrhenius_fracture.conforming_crack_oracle_v12 import CONFORMING_ORACLE_SOURCE_COMMIT
-from arrhenius_fracture.primal_crack_mechanics_v12 import run_rotated_cases, run_straight_case
+from arrhenius_fracture.primal_crack_mechanics_v12 import run_low_kappa_prescreen, run_rotated_cases, run_straight_case
 
 THRESHOLDS={
  "maximum_finest_global_reference_error":.05,
@@ -44,9 +44,9 @@ def sha256(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument("--out",type=Path,default=Path("artifacts/v12_primal_mechanics")); args=parser.parse_args()
-    rows,derivatives=run_straight_case(); finest=6.25e-6
+    rows,derivatives=run_straight_case(); prescreen=run_low_kappa_prescreen(); finest=6.25e-6; prescreen_h=3.125e-6
     v12=sorted((r for r in rows if r["representation"]=="C_V12"),key=lambda r:(r["h_tip_m"],r["kappa"])); fine=[r for r in v12 if r["h_tip_m"]==finest]
-    low=next(r for r in fine if r["kappa"]==1e-8); mid=next(r for r in fine if r["kappa"]==1e-6)
+    low=next(r for r in fine if r["kappa"]==1e-8); mid=next(r for r in fine if r["kappa"]==1e-6); pre_low=next(r for r in prescreen if r["representation"]=="C_V12"); pre_conf=next(r for r in prescreen if r["representation"]=="D_CONFORMING")
     vg=[r for r in derivatives if r["representation"]=="V12" and r["kappa"]==1e-8 and r["delta_a_m"]==25e-6]; cg=[r for r in derivatives if r["representation"]=="CONF" and r["delta_a_m"]==25e-6]
     vf=next(r for r in vg if r["h_tip_m"]==finest); cf=next(r for r in cg if r["h_tip_m"]==finest)
     checks={
@@ -61,13 +61,14 @@ def main():
       "maximum_free_residual_relative":max(r["free_residual_relative"] for r in rows),
       "maximum_energy_reaction_identity_relative":max(r["energy_reaction_identity_relative"] for r in rows),
       "killed_energy_fraction_at_kappa_1e-6":mid["killed_energy_fraction"],
-      "finest_matched_cod_error":low["crack_opening_reference_error"],
+      "finest_matched_cod_error":pre_low["crack_opening_reference_error"],
+      "finest_fixed_distance_cod_error":pre_low["fixed_distance_cod_reference_error"],
       "conforming_extrapolated_direct_cod_error_max":max(r["conforming_extrapolated_direct_cod_error"] for r in rows if r["representation"]=="D_CONFORMING"),
-      "matched_cod_error_decreases_under_refinement":all(next(r for r in v12 if r["h_tip_m"]==a and r["kappa"]==1e-8)["crack_opening_reference_error"]>next(r for r in v12 if r["h_tip_m"]==b and r["kappa"]==1e-8)["crack_opening_reference_error"] for a,b in ((25e-6,12.5e-6),(12.5e-6,6.25e-6))),
-      "all_area_weighted_tensor_errors_decrease":all(next(r for r in v12 if r["h_tip_m"]==a and r["kappa"]==1e-8)[key]>next(r for r in v12 if r["h_tip_m"]==b and r["kappa"]==1e-8)[key] for key in ("area_weighted_stress_error_near_tip_annulus","area_weighted_stress_error_face_adjacent_strip","area_weighted_stress_error_whole_exterior") for a,b in ((25e-6,12.5e-6),(12.5e-6,6.25e-6))),
-      "finest_local_tensor_error_max":max(low[key] for key in ("area_weighted_stress_error_near_tip_annulus","area_weighted_stress_error_face_adjacent_strip","area_weighted_stress_error_whole_exterior")),
+      "matched_cod_error_decreases_under_refinement":all(a>b for a,b in zip([next(r for r in v12 if r["h_tip_m"]==h and r["kappa"]==1e-8)["crack_opening_reference_error"] for h in (25e-6,12.5e-6,6.25e-6)],[next(r for r in v12 if r["h_tip_m"]==h and r["kappa"]==1e-8)["crack_opening_reference_error"] for h in (12.5e-6,6.25e-6)]+[pre_low["crack_opening_reference_error"]])),
+      "all_area_weighted_tensor_errors_decrease":all(a>b for key in ("area_weighted_stress_error_near_tip_annulus","area_weighted_stress_error_face_adjacent_strip","area_weighted_stress_error_whole_exterior") for a,b in zip([next(r for r in v12 if r["h_tip_m"]==h and r["kappa"]==1e-8)[key] for h in (25e-6,12.5e-6,6.25e-6)],[next(r for r in v12 if r["h_tip_m"]==h and r["kappa"]==1e-8)[key] for h in (12.5e-6,6.25e-6)]+[pre_low[key]])),
+      "finest_local_tensor_error_max":max(pre_low[key] for key in ("area_weighted_stress_error_near_tip_annulus","area_weighted_stress_error_face_adjacent_strip","area_weighted_stress_error_whole_exterior")),
       "pin_invariance_error_max":max(low[k] for k in ("pin_reaction_relative_error","pin_energy_relative_error","pin_cod_relative_error")),
-      "mirror_residual_max":max(low[k] for k in ("mirror_sigma_xx_relative","mirror_sigma_yy_relative","mirror_sigma_xy_antisymmetry_relative")),
+      "mirror_residual_max":max(r[f"mirror_{region}_{component}"] for r in rows+prescreen for region in ("full","constraint_excluded","near_tip") for component in ("sigma_xx_relative","sigma_yy_relative","sigma_xy_antisymmetry_relative")),
     }
     primary=("reaction_N_per_m","compliance_m2_per_N","energy_J_per_m","crack_opening_displacement_m","area_weighted_stress_error_near_tip_annulus","area_weighted_stress_error_face_adjacent_strip","area_weighted_stress_error_whole_exterior")
     checks["low_kappa_primary_spread_max"]=max(rel(low[k],mid[k]) for k in primary)
@@ -85,9 +86,11 @@ def main():
       "V12_ROTATION_COVARIANCE_SCREEN": "OPEN",
       "V12_MATCHED_COD_QUALIFIED":"OPEN",
       "V12_INTERFACE_TRACTION_QUALIFIED":"OPEN",
+      "V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED":"OPEN",
       "V12_LOCAL_TENSOR_FIELDS_QUALIFIED":"OPEN",
       "V12_G_PERTURBATION_CONVERGENCE":"OPEN",
       "V12_PRIMAL_CLEAN_WORKER_REPRODUCIBLE":"NOT_RUN",
+      "V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED":"OPEN",
       "MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED":"OPEN",
       "MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED":"NOT_RUN",
       "PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED":"NOT_RUN",
@@ -95,10 +98,12 @@ def main():
     }
     equilibrium=checks["maximum_free_residual_relative"]<=THRESHOLDS["maximum_free_residual_relative"] and checks["maximum_energy_reaction_identity_relative"]<=THRESHOLDS["maximum_energy_reaction_identity_relative"] and checks["killed_energy_fraction_at_kappa_1e-6"]<=THRESHOLDS["maximum_killed_energy_fraction_at_kappa_1e-6"]
     gates["V12_PRIMAL_GLOBAL_RESPONSE_SCREEN"]="PASS" if equilibrium and gates["MATCHED_PARENT_REPRESENTATIONS"]=="PASS" and checks["finest_global_reference_error"]<=THRESHOLDS["maximum_finest_global_reference_error"] else "FAIL"
+    gates["V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED"]="PASS" if checks["mirror_residual_max"]<=THRESHOLDS["maximum_mirror_residual"] and checks["pin_invariance_error_max"]<=THRESHOLDS["maximum_pin_invariance_error"] else "FAIL"
     gates["V12_CENTERED_G_SINGLE_INCREMENT_SCREEN"]="PASS" if gates["CENTERED_G_CONVERGENCE"]=="PASS" else "FAIL"
-    gates["V12_MATCHED_COD_QUALIFIED"]="PASS" if checks["matched_cod_error_decreases_under_refinement"] and checks["finest_matched_cod_error"]<=THRESHOLDS["maximum_finest_matched_cod_error"] and checks["conforming_extrapolated_direct_cod_error_max"]<=THRESHOLDS["maximum_conforming_extrapolated_direct_cod_error"] else "FAIL"
+    gates["V12_MATCHED_COD_QUALIFIED"]="PASS" if checks["matched_cod_error_decreases_under_refinement"] and max(checks["finest_matched_cod_error"],checks["finest_fixed_distance_cod_error"])<=THRESHOLDS["maximum_finest_matched_cod_error"] and checks["conforming_extrapolated_direct_cod_error_max"]<=THRESHOLDS["maximum_conforming_extrapolated_direct_cod_error"] else "FAIL"
     gates["V12_LOCAL_TENSOR_FIELDS_QUALIFIED"]="PASS" if checks["all_area_weighted_tensor_errors_decrease"] and checks["finest_local_tensor_error_max"]<=THRESHOLDS["maximum_finest_local_tensor_error"] else "FAIL"
     gates["V12_INTERFACE_TRACTION_QUALIFIED"]="PASS" if checks["transmitted_traction_and_killed_energy_decrease_h_kappa"] else "FAIL"
+    gates["V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED"]="PASS" if checks["transmitted_traction_and_killed_energy_decrease_h_kappa"] else "FAIL"
     gates["V12_G_PERTURBATION_CONVERGENCE"]="PASS" if checks["G_delta_plateau_spread_max"]<=THRESHOLDS["maximum_G_delta_plateau_spread"] else "FAIL"
     gates["KAPPA_OBJECTIVITY"]="PASS" if max(checks["low_kappa_primary_spread_max"],checks["low_kappa_G_spread_max"])<=THRESHOLDS["maximum_low_kappa_primary_spread"] else "FAIL"
     angle_rows=[]
@@ -107,16 +112,17 @@ def main():
         checks["angle_finest_global_reference_error_max"]=max(max(r[k] for k in ("reaction_reference_error","compliance_reference_error","energy_reference_error")) for r in angle_fine)
         checks["angle_equilibrium_identity_max"]=max(max(r["free_residual_relative"],r["energy_reaction_identity_relative"]) for r in angle_rows)
         gates["V12_ROTATION_COVARIANCE_SCREEN"]="PASS" if checks["angle_finest_global_reference_error_max"]<=THRESHOLDS["maximum_finest_global_reference_error"] and checks["angle_equilibrium_identity_max"]<=THRESHOLDS["maximum_free_residual_relative"] else "FAIL"
-    args.out.mkdir(parents=True,exist_ok=True); write_csv(args.out/"straight_primal_matrix.csv",rows); write_csv(args.out/"centered_G_matrix.csv",derivatives)
+    args.out.mkdir(parents=True,exist_ok=True); write_csv(args.out/"straight_primal_matrix.csv",rows); write_csv(args.out/"straight_3p125um_prescreen.csv",prescreen); write_csv(args.out/"centered_G_matrix.csv",derivatives)
     if angle_rows: write_csv(args.out/"angle_primal_matrix.csv",angle_rows)
     implementation_sha=git("log","-1","--format=%H","--",*IMPLEMENTATION_PATHS)
-    oracle_sha=git("rev-parse",f"{CONFORMING_ORACLE_SOURCE_COMMIT}^{{commit}}")
-    report={"schema":"v12_primal_mechanics_qualification_v2","base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"thresholds_predeclared":THRESHOLDS,"checks":checks,"gates":gates}
+    oracle_sha=CONFORMING_ORACLE_SOURCE_COMMIT
+    oracle_source_sha256=sha256(ROOT/"arrhenius_fracture/conforming_crack_oracle_v12.py")
+    report={"schema":"v12_primal_mechanics_qualification_v2","base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"conforming_oracle_source_sha256":oracle_source_sha256,"thresholds_predeclared":THRESHOLDS,"checks":checks,"gates":gates}
     (args.out/"qualification.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n"); print(json.dumps(report,indent=2,sort_keys=True))
-    scientific=("straight_primal_matrix.csv","centered_G_matrix.csv","angle_primal_matrix.csv","qualification.json")
+    scientific=("straight_primal_matrix.csv","straight_3p125um_prescreen.csv","centered_G_matrix.csv","angle_primal_matrix.csv","qualification.json")
     manifest={name:sha256(args.out/name) for name in scientific}
     (args.out/"sha256_manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
-    environment={"base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"python_version":platform.python_version(),"numpy_version":np.__version__,"scipy_version":scipy.__version__,"platform":platform.platform(),"solver_identity":"scipy.sparse.linalg.spsolve_cst_plane_strain","thresholds":THRESHOLDS}
+    environment={"base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"conforming_oracle_source_sha256":oracle_source_sha256,"python_version":platform.python_version(),"numpy_version":np.__version__,"scipy_version":scipy.__version__,"platform":platform.platform(),"solver_identity":"scipy.sparse.linalg.spsolve_cst_plane_strain","thresholds":THRESHOLDS}
     (args.out/"environment_attestation.json").write_text(json.dumps(environment,indent=2,sort_keys=True)+"\n")
 
 if __name__=="__main__": main()

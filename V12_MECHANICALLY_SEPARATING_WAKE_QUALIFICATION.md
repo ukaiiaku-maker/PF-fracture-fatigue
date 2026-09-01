@@ -37,15 +37,20 @@ outside-support stress, and centered G; 1% for the energy/compliance G identity;
 `1e-10` for equilibrium and energy/reaction identities. The 30 and 45 degree
 matrices may run only after the straight gate passes.
 
-The hardened ledger generated from implementation commit `3cc9312` corrects
-the earlier overclassification. Global response, the single-increment centered
-G screen, rotation covariance, multi-increment G, and low-kappa objectivity
-pass. The aggregate primal gate remains OPEN because the finest matched COD
-error is 5.180% against a frozen 5% limit, the maximum fixed-region local
-tensor error is 7.503%, and interface-traction/killed-energy refinement is not
-monotone. These failed matrices are retained. The conforming extrapolated COD
-reproduces its direct face jump increasingly well (0.042% on the finest mesh),
-and the three-delta G plateau spread is 1.897%.
+The subsequent hardening pass found that post-solve stress recovery had used a
+non-interleaved element DOF order even though the CST B matrix requires
+`x0,y0,x1,y1,x2,y2`. Stiffness, displacement, reaction, energy, COD, and G were
+unaffected; the earlier tensor, traction, and mirror numbers were invalid and
+are superseded. Correct recovery plus symmetry-plane exterior pins qualifies
+Mode-I mirror symmetry. Support-aware COD sampling and the bounded 3.125 um
+pre-screen qualify matched COD without relaxing its 5% tolerance (2.786%
+h-scaled and 2.618% fixed-distance error). The three-delta G plateau remains
+qualified.
+
+The aggregate primal gate remains OPEN. Although all fixed-region tensor errors
+decrease, the 3.125 um face-adjacent strip error is 17.825%, above the frozen 5%
+limit, and no qualified joint h-kappa soft-corridor transmission limit has yet
+been demonstrated. Those failed matrices are retained.
 
 The angle result is classified only as rotation covariance. The rotated graph
 endpoints are asserted to be actual mesh vertices and the off-grid screen
@@ -98,10 +103,12 @@ active-tip/event-resolution, and overall geometry gates are PASS.
 | `V12_PRIMAL_GLOBAL_RESPONSE_SCREEN` | PASS |
 | `V12_CENTERED_G_SINGLE_INCREMENT_SCREEN` | PASS |
 | `V12_ROTATION_COVARIANCE_SCREEN` | PASS |
-| `V12_MATCHED_COD_QUALIFIED` | FAIL, matrix retained |
+| `V12_MATCHED_COD_QUALIFIED` | PASS at 3.125 um pre-screen |
 | `V12_INTERFACE_TRACTION_QUALIFIED` | FAIL, matrix retained |
 | `V12_LOCAL_TENSOR_FIELDS_QUALIFIED` | FAIL, matrix retained |
 | `V12_G_PERTURBATION_CONVERGENCE` | PASS |
+| `V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED` | PASS |
+| `V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED` | FAIL, matrix retained |
 | `V12_PRIMAL_CLEAN_WORKER_REPRODUCIBLE` | NOT_RUN |
 | `MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED` | OPEN |
 | `MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED` | NOT_RUN |

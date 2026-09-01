@@ -31,6 +31,6 @@ jobs:
           python scripts/qualify_v12_primal_mechanics.py --out /tmp/v12-primal-a
           python scripts/qualify_v12_primal_mechanics.py --out /tmp/v12-primal-b
           diff -ru /tmp/v12-primal-a /tmp/v12-primal-b
-          diff -u artifacts/v12_primal_mechanics/sha256_manifest.json /tmp/v12-primal-a/sha256_manifest.json
+          python scripts/compare_v12_primal_evidence.py artifacts/v12_primal_mechanics /tmp/v12-primal-a
       - run: git diff --check
       - run: test -z "$(git status --short)"

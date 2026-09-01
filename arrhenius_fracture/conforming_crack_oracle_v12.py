@@ -12,7 +12,7 @@ import numpy as np
 
 from .mesh import BoundaryData, TriMesh, rebuild_tri_mesh
 
-CONFORMING_ORACLE_SOURCE_COMMIT = "8ad7f42"
+CONFORMING_ORACLE_SOURCE_COMMIT = "8ad7f42c49c27d1066ff5ef7ee4a910232f2e7d4"
 
 
 def _fingerprint(value: np.ndarray) -> str:
@@ -42,7 +42,7 @@ class ConformingSlit:
 def build_matched_crack_parent(width_m, height_m, p0, p1, h_tip_m):
     """Return an exact crack-aligned structured parent mesh."""
     h=float(h_tip_m); nx=int(round(width_m/h)); ny=int(round(height_m/h))
-    if h not in (25e-6,12.5e-6,6.25e-6) or not np.isclose(nx*h,width_m) or not np.isclose(ny*h,height_m):
+    if h not in (25e-6,12.5e-6,6.25e-6,3.125e-6) or not np.isclose(nx*h,width_m) or not np.isclose(ny*h,height_m):
         raise ValueError("domain and declared h_tip must be exactly commensurate")
     xs=np.linspace(0.,width_m,nx+1); ys=np.linspace(-height_m/2,height_m/2,ny+1)
     gx,gy=np.meshgrid(xs,ys); nodes=np.c_[gx.ravel(),gy.ravel()]

@@ -1,0 +1,20 @@
+Run 33465428061 failed in the combined primal regeneration/repeat/manifest-validation step.
+Both Linux regenerations completed and `diff -ru /tmp/v12-primal-a /tmp/v12-primal-b`
+passed. The exact failing stderr was the following manifest diff, followed by
+`Process completed with exit code 1`:
+
+--- artifacts/v12_primal_mechanics/sha256_manifest.json
++++ /tmp/v12-primal-a/sha256_manifest.json
+@@ -1,6 +1,6 @@
+ {
+-  "angle_primal_matrix.csv": "e73fb8d2d05433ab38f0e800d84c30714b0f036bcae290f9e861e9215d71910b",
+-  "centered_G_matrix.csv": "b94268155cfceb725829e6f5ea9a85cca1c415b4cdab3ebaa65162cd0cdb0575",
+-  "qualification.json": "c71fa9dd8ab342fc54af35fc882911e6b363da39981366aa41b6deff548bfd3c",
+-  "straight_primal_matrix.csv": "196042f8368a2f3ff7b3bc0e9fa33863647f2af835f851fdd9e6ea68b80c127a"
++  "angle_primal_matrix.csv": "3c96db7037b7e6202c8ed541ce12149edda997fccaf91ee0a3384607e273ac0f",
++  "centered_G_matrix.csv": "2f6ca01b333e090076ac4fd7ab971658353eecf3077fbf5502b21e73f5bd7a62",
++  "qualification.json": "064e3034598b4304df257ff1c4da3bb958af1058db8963a7a3cc0a991756634b",
++  "straight_primal_matrix.csv": "2b31befa5df276d9261c6a0f9b373afb91b2fe465dc3b027c1d13367f4b43846"
+ }
+
+Process completed with exit code 1.
