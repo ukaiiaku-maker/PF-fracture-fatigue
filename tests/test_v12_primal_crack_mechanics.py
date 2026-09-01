@@ -4,7 +4,42 @@ from arrhenius_fracture.conforming_crack_oracle_v12 import (
     CONFORMING_ORACLE_SOURCE_COMMIT, build_matched_crack_parent, conforming_slit_from_parent,
 )
 from types import SimpleNamespace
-from arrhenius_fracture.primal_crack_mechanics_v12 import _interface_tractions, run_rotated_cases, run_straight_case
+from arrhenius_fracture.fem import plane_strain_D
+from arrhenius_fracture.config import ElasticProperties
+from arrhenius_fracture.mesh import rebuild_tri_mesh
+from arrhenius_fracture.primal_crack_mechanics_v12 import _interface_tractions, recover_element_fields, run_rotated_cases, run_straight_case
+
+
+def test_affine_patch_recovers_interleaved_strain_stress_and_energy_on_rigidly_moved_triangles():
+    coefficients=np.array((.17,-.23,.41,.31,-.19,-.37))
+    expected_strain=np.array((coefficients[0],coefficients[4],coefficients[1]+coefficients[3]))
+    constitutive=plane_strain_D(ElasticProperties(E=73e9,nu=.27))
+    base=np.array(((.1,-.2),(1.4,.3),(.35,1.2)))
+    for angle,shift in ((0.,(0.,0.)),(.63,(2.7,-1.1))):
+        rotation=np.array(((np.cos(angle),-np.sin(angle)),(np.sin(angle),np.cos(angle))))
+        nodes=base@rotation.T+shift
+        mesh=rebuild_tri_mesh(nodes,np.array(((0,1,2),)))
+        x,y=nodes.T
+        ux=coefficients[0]*x+coefficients[1]*y+coefficients[2]
+        uy=coefficients[3]*x+coefficients[4]*y+coefficients[5]
+        u=np.column_stack((ux,uy)).ravel()
+        strain,stress=recover_element_fields(mesh,u,constitutive)
+        np.testing.assert_allclose(strain[:,0],expected_strain,rtol=0,atol=2e-15)
+        np.testing.assert_allclose(stress[:,0],constitutive@expected_strain,rtol=2e-15,atol=1e-5)
+        analytical=.5*mesh.area_e[0]*expected_strain@(constitutive@expected_strain)
+        element=.5*mesh.area_e[0]*strain[:,0]@stress[:,0]
+        stiffness=mesh.area_e[0]*mesh.B_e[0].T@constitutive@mesh.B_e[0]
+        quadratic=.5*u@stiffness@u
+        np.testing.assert_allclose((element,quadratic),(analytical,analytical),rtol=5e-15)
+
+
+def test_affine_patch_detects_superseded_blocked_dof_recovery_order():
+    mesh=rebuild_tri_mesh(np.array(((.2,-.1),(1.1,.4),(.3,1.3))),np.array(((0,1,2),)))
+    x,y=mesh.nodes.T; u=np.column_stack((.17*x-.23*y+.41,.31*x-.19*y-.37)).ravel()
+    correct,_=recover_element_fields(mesh,u)
+    blocked=np.r_[u[0::2],u[1::2]]
+    wrong=np.einsum("eij,ej->ei",mesh.B_e,blocked[None,:]).T
+    assert np.linalg.norm(wrong-correct)>1e-2
 
 
 def test_conforming_oracle_records_pr57_source_and_normalizes_to_parent():

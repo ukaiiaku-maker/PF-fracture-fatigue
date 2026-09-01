@@ -26,7 +26,9 @@ The analysis-only straight-crack screen uses the conforming node-splitting
 construction sourced from PR #57 commit `8ad7f42`; it does not import or
 transplant the voiding solver. For each `h_tip = 25, 12.5, 6.25 um`, the intact,
 V11 P0, V12 separating, and conforming-slit representations derive from one
-parent geometry and connectivity. V12 is evaluated at `kappa = 1e-4, 1e-6,
+parent geometry and connectivity. The authoritative straight matrix now also
+contains the 3.125 um level with identical columns, so "finest" is no longer
+split between a main matrix and a prescreen. V12 is evaluated at `kappa = 1e-4, 1e-6,
 1e-8`. Centered energy and compliance release rates use the common physical
 increment `delta_a = 25 um` on the two finest meshes.
 
@@ -43,14 +45,32 @@ non-interleaved element DOF order even though the CST B matrix requires
 unaffected; the earlier tensor, traction, and mirror numbers were invalid and
 are superseded. Correct recovery plus symmetry-plane exterior pins qualifies
 Mode-I mirror symmetry. Support-aware COD sampling and the bounded 3.125 um
-pre-screen qualify matched COD without relaxing its 5% tolerance (2.786%
+level qualifies matched COD without relaxing its 5% tolerance (2.786%
 h-scaled and 2.618% fixed-distance error). The three-delta G plateau remains
 qualified.
 
-The aggregate primal gate remains OPEN. Although all fixed-region tensor errors
-decrease, the 3.125 um face-adjacent strip error is 17.825%, above the frozen 5%
-limit, and no qualified joint h-kappa soft-corridor transmission limit has yet
-been demonstrated. Those failed matrices are retained.
+Permanent affine patch tests now recover arbitrary constant strain and stress
+on translated and rotated triangles, reconcile analytical, element, and
+quadratic-form energy, and prove that the superseded blocked DOF ordering is
+detected.
+
+The aggregate primal gate remains OPEN. Every fixed-region tensor error
+decreases, but the 3.125 um face-adjacent strip error is 17.825%, above the
+frozen 5% limit. A bounded matched 1.5625 um crack/tip refinement reduces that
+metric to 11.096% and gives a 3.906% production tensor-probe error. The frozen
+stop rule is therefore applied:
+`V12_P0_LOCAL_TENSOR_FIDELITY = NOT_QUALIFIED_REQUIRES_CONFORMING_TIP_PATCH`.
+The bulk P0 wake remains suitable for the far wake, while high-fidelity source
+mechanics requires a bounded conforming crack-tip patch.
+
+The joint corridor matrix retains fixed `kappa = 1e-6, 1e-8` rows and coupled
+`kappa(h)=kappa0(h/h0)^p` policies for `p=1,2`, with `h0=25 um` and
+`kappa0=1e-6`. Under `p=2`, recovered traction, discrete normal transfer, and
+killed energy all fall by about an order of magnitude and are far below the
+declared mechanics budget at 3.125 um. The discrete shear series is already at
+numerical-cancellation scale but is not strictly monotone, so the predeclared
+all-metric monotonic gate remains FAIL rather than being changed after seeing
+the result.
 
 The angle result is classified only as rotation covariance. The rotated graph
 endpoints are asserted to be actual mesh vertices and the off-grid screen
@@ -103,9 +123,10 @@ active-tip/event-resolution, and overall geometry gates are PASS.
 | `V12_PRIMAL_GLOBAL_RESPONSE_SCREEN` | PASS |
 | `V12_CENTERED_G_SINGLE_INCREMENT_SCREEN` | PASS |
 | `V12_ROTATION_COVARIANCE_SCREEN` | PASS |
-| `V12_MATCHED_COD_QUALIFIED` | PASS at 3.125 um pre-screen |
+| `V12_MATCHED_COD_QUALIFIED` | PASS at unified 3.125 um level |
 | `V12_INTERFACE_TRACTION_QUALIFIED` | FAIL, matrix retained |
 | `V12_LOCAL_TENSOR_FIELDS_QUALIFIED` | FAIL, matrix retained |
+| `V12_P0_LOCAL_TENSOR_FIDELITY` | NOT_QUALIFIED_REQUIRES_CONFORMING_TIP_PATCH |
 | `V12_G_PERTURBATION_CONVERGENCE` | PASS |
 | `V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED` | PASS |
 | `V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED` | FAIL, matrix retained |

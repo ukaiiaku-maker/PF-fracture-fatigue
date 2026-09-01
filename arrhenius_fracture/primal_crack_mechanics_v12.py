@@ -6,17 +6,30 @@ import hashlib
 import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import eigsh, spsolve
-from scipy.spatial import cKDTree
+from scipy.spatial import Delaunay, cKDTree
 
 from .causal_sharp_wake_v11 import causal_segment_support, mechanical_fingerprint
 from .config import ElasticProperties
-from .conforming_crack_oracle_v12 import build_matched_crack_parent, conforming_slit_from_parent
+from .conforming_crack_oracle_v12 import MatchedCrackParent, build_matched_crack_parent, conforming_slit_from_parent
 from .crack_network_v11 import CrackNetworkState
 from .fem import assemble_mechanics, plane_strain_D
 from .mechanically_separating_sharp_wake_v12 import mechanically_separating_graph_support
-from .mesh import rebuild_tri_mesh
+from .mesh import BoundaryData, rebuild_tri_mesh
+from .anisotropic_emission_v10174 import AnisotropicEmissionConfig, probe_tensor_ahead
 
 MAT=ElasticProperties(E=210e9,nu=.3); D=plane_strain_D(MAT)
+
+
+def recover_element_fields(mesh, displacement, constitutive=D, degradation=None):
+    """Recover CST engineering strain and stress from interleaved nodal DOFs."""
+    displacement=np.asarray(displacement,float)
+    edofs=np.empty((mesh.ne,6),int)
+    edofs[:,0::2]=2*mesh.elems
+    edofs[:,1::2]=2*mesh.elems+1
+    strain=np.einsum("eij,ej->ei",mesh.B_e,displacement[edofs]).T
+    scale=np.ones(mesh.ne) if degradation is None else np.asarray(degradation,float)
+    sigma=(scale[:,None]*(strain.T@np.asarray(constitutive,float).T)).T
+    return strain,sigma
 
 
 @dataclass(frozen=True)
@@ -58,10 +71,8 @@ def _solve_normal_opening(mesh,boundary,opening_m,normal,damage=None,kappa=0.,pi
     pin=boundary.left_bot if pin_node is None else int(pin_node); prescribed[2*pin]=1
     free=~prescribed; q[prescribed]=values[prescribed]; Kff=Kq[np.ix_(free,free)]; q[free]=spsolve(Kff,-Kq[np.ix_(free,prescribed)]@q[prescribed]); u=np.asarray(transform@q)
     residual=K@u; reaction=float(np.sum(residual.reshape(-1,2)[boundary.top_nodes]@normal)); energy=float(.5*u@(K@u))
-    edofs=np.empty((mesh.ne,6),int); edofs[:,0::2]=2*mesh.elems; edofs[:,1::2]=2*mesh.elems+1
-    strain=np.einsum('eij,ej->ei',mesh.B_e,u[edofs]).T
     degradation=np.ones(mesh.ne) if damage is None else (1-np.asarray(damage))**2+kappa
-    sigma=(degradation[:,None]*(strain.T@D.T)).T
+    strain,sigma=recover_element_fields(mesh,u,D,degradation)
     residual_q=np.asarray(transform.T@residual); free_res=float(np.linalg.norm(residual_q[free])/max(abs(reaction),1e-300))
     identity=abs(energy-.5*reaction*opening_m)/max(abs(energy),1e-300)
     diag=Kff.diagonal(); cond=float(np.max(diag)/np.min(diag))
@@ -92,8 +103,28 @@ def _field_errors(mesh,result,reference,mask,p0,tip):
     root_r=np.linalg.norm(cent-p0,axis=1); tip_r=np.linalg.norm(cent-tip,axis=1); graph_length=np.linalg.norm(tip-p0); fixed_tube=(axial>=0)&(axial<=graph_length)&(transverse<50e-6); physical_exterior=(root_r>=50e-6)&(tip_r>=50e-6)&(~fixed_tube)
     support_distance=np.maximum(0.,transverse-.5*np.ptp(cent[mask]@normal) if np.any(mask) else transverse)
     regions={"whole_exterior":physical_exterior,"near_tip_annulus":physical_exterior&(tip_r<=150e-6),"face_adjacent_strip":physical_exterior&(transverse>=50e-6)&(transverse<=100e-6)&(axial>=50e-6)&(axial<=graph_length-50e-6),"h_scaled_regularization_layer":(~mask)&(support_distance>0)&(support_distance<=4*mesh.hbar_tip)&(root_r>=50e-6)&(tip_r>=50e-6)}
-    output={}
-    for name,region in regions.items(): output[f"area_weighted_stress_error_{name}"]=_area_weighted_error(mesh,result.sigma_gp,reference.sigma_gp,region); output[f"area_weighted_stress_region_{name}_element_count"]=int(np.count_nonzero(region)); output[f"area_weighted_stress_region_{name}_area_m2"]=float(np.sum(mesh.area_e[region]))
+    output={}; remote_stress=abs(result.reaction_N_per_m)/max(float(np.ptp(mesh.nodes[:,0])),1e-300)
+    local=np.array(((normal[0]**2,normal[1]**2,2*normal[0]*normal[1]),(tangent[0]**2,tangent[1]**2,2*tangent[0]*tangent[1]),(normal[0]*tangent[0],normal[1]*tangent[1],normal[0]*tangent[1]+normal[1]*tangent[0])))
+    for name,region in regions.items():
+        ids=np.flatnonzero(region); area=mesh.area_e[ids]; difference=result.sigma_gp[:,ids]-reference.sigma_gp[:,ids]; ref=reference.sigma_gp[:,ids]
+        diff2=float(np.sum(area*np.sum(difference*difference,axis=0))); ref2=float(np.sum(area*np.sum(ref*ref,axis=0))); val2=float(np.sum(area*np.sum(result.sigma_gp[:,ids]**2,axis=0))); region_area=float(np.sum(area))
+        output[f"area_weighted_stress_error_{name}"]=float(np.sqrt(diff2/max(ref2,1e-300))); output[f"area_weighted_stress_region_{name}_element_count"]=len(ids); output[f"area_weighted_stress_region_{name}_area_m2"]=region_area
+        output[f"stress_norm_v12_{name}_Pa_sqrt_m2"]=float(np.sqrt(val2)); output[f"stress_norm_conforming_{name}_Pa_sqrt_m2"]=float(np.sqrt(ref2)); output[f"stress_difference_norm_{name}_Pa_sqrt_m2"]=float(np.sqrt(diff2)); output[f"stress_difference_remote_normalized_{name}"]=float(np.sqrt(diff2)/max(remote_stress*np.sqrt(region_area),1e-300))
+        local_difference=local@difference; local_reference=local@ref
+        for component,index in (("nn",0),("tt",1),("nt",2)):
+            num=float(np.sum(area*local_difference[index]**2)); den=float(np.sum(area*local_reference[index]**2)); output[f"stress_component_{component}_error_{name}"]=float(np.sqrt(num/max(den,1e-300))); output[f"stress_component_{component}_reference_norm_{name}_Pa_sqrt_m2"]=float(np.sqrt(den))
+        strain_difference=result.strain_gp[:,ids]-reference.strain_gp[:,ids]; num_energy=float(np.sum(area*np.einsum("ie,ij,je->e",strain_difference,D,strain_difference))); ref_energy=float(np.sum(area*np.einsum("ie,ij,je->e",reference.strain_gp[:,ids],D,reference.strain_gp[:,ids]))); output[f"elastic_energy_norm_error_{name}"]=float(np.sqrt(num_energy/max(ref_energy,1e-300))); output[f"elastic_energy_reference_denominator_{name}_J_per_m"]=ref_energy
+    profiles=[]
+    for distance in (25e-6,50e-6,75e-6,100e-6,150e-6):
+        for station_fraction in (.2,.4,.6,.8):
+            target_axial=station_fraction*graph_length; band=(np.abs(transverse-distance)<=max(mesh.hbar_tip,.15*distance))&(np.abs(axial-target_axial)<=max(mesh.hbar_tip,25e-6))
+            if np.any(band): profiles.append({"normal_distance_m":distance,"axial_station_fraction":station_fraction,"element_count":int(np.count_nonzero(band)),"relative_stress_error":_area_weighted_error(mesh,result.sigma_gp,reference.sigma_gp,band)})
+    output["distance_resolved_profiles_json"]=str(profiles)
+    probe_config=AnisotropicEmissionConfig(probe_radius_m=50e-6,sector_half_angle_deg=25.,damage_cutoff=.85,min_elements=3)
+    vprobe=probe_tensor_ahead(mesh,result.sigma_gp,mask.astype(float),tip,tangent,probe_config); cprobe=probe_tensor_ahead(mesh,reference.sigma_gp,np.zeros(mesh.ne),tip,tangent,probe_config)
+    output["production_tensor_probe_v12_json"]=str(vprobe); output["production_tensor_probe_conforming_json"]=str(cprobe)
+    if vprobe.get("reliable") and cprobe.get("reliable"):
+        output["production_tensor_probe_relative_error"]=float(np.linalg.norm(np.asarray(vprobe["tensor"])-np.asarray(cprobe["tensor"]))/max(np.linalg.norm(cprobe["tensor"]),1e-300))
     return output
 
 
@@ -120,6 +151,26 @@ def _interface_tractions(mesh,result,mask,p0,tip):
             output[f"{group}_{label}_shear_force_N_per_m"]=float(np.sum(weights*local[:,1])) if total else float("nan")
         output[f"{group}_interface_length_m"]=total
     return output
+
+
+def _discrete_corridor_transfer(mesh,result,mask,p0,tip):
+    """Independent nodal-force balance on the trimmed soft-corridor boundary."""
+    mask=np.asarray(mask,bool); p0=np.asarray(p0); tip=np.asarray(tip); tangent=(tip-p0)/np.linalg.norm(tip-p0); normal=np.array((-tangent[1],tangent[0])); cent=mesh.nodes[mesh.elems].mean(axis=1); axial=(cent-p0)@tangent
+    selected=mask&(axial>=50e-6)&(axial<=np.linalg.norm(tip-p0)-50e-6); nodal=np.zeros((mesh.nn,2))
+    for ei in np.flatnonzero(selected):
+        force=mesh.area_e[ei]*(mesh.B_e[ei].T@result.sigma_gp[:,ei])
+        for local,node in enumerate(mesh.elems[ei]): nodal[node]+=force[2*local:2*local+2]
+    interface=set()
+    adjacency={}
+    for ei,elem in enumerate(mesh.elems):
+        for a,b in ((elem[0],elem[1]),(elem[1],elem[2]),(elem[2],elem[0])): adjacency.setdefault(tuple(sorted((int(a),int(b)))),[]).append(ei)
+    for edge,eids in adjacency.items():
+        if len(eids)==2 and mask[eids[0]]!=mask[eids[1]]:
+            midpoint=mesh.nodes[list(edge)].mean(axis=0); x=float((midpoint-p0)@tangent)
+            if 50e-6<=x<=np.linalg.norm(tip-p0)-50e-6: interface.update(edge)
+    upper=np.array([node for node in interface if (mesh.nodes[node]-p0)@normal>=0],int); lower=np.array([node for node in interface if (mesh.nodes[node]-p0)@normal<0],int)
+    fu=nodal[upper].sum(axis=0) if len(upper) else np.zeros(2); fl=nodal[lower].sum(axis=0) if len(lower) else np.zeros(2)
+    return {"discrete_transmitted_normal_force_N_per_m":float(abs(fu@normal)+abs(fl@normal)),"discrete_transmitted_shear_force_N_per_m":float(abs(fu@tangent)+abs(fl@tangent)),"discrete_interface_node_count":len(interface)}
 
 
 def _mirror_residuals(mesh,result,tip,pin):
@@ -162,7 +213,7 @@ def _extrapolated_cod(result,mesh,p0,tip,h,normal=np.array((0.,1.)),support_widt
     return float(intercepts[0]-intercepts[1]),residual,tuple(map(float,distances)),details
 
 
-def run_straight_case(h_values=(25e-6,12.5e-6,6.25e-6),kappas=(1e-4,1e-6,1e-8),opening_m=8e-7):
+def run_straight_case(h_values=(25e-6,12.5e-6,6.25e-6,3.125e-6),kappas=(1e-4,1e-6,1e-8),opening_m=8e-7):
     width=height=8e-4; p0=np.array((2e-4,0.)); tip=np.array((5e-4,0.)); delta=25e-6
     rows=[]; derivatives=[]
     cache={}
@@ -181,7 +232,11 @@ def run_straight_case(h_values=(25e-6,12.5e-6,6.25e-6),kappas=(1e-4,1e-6,1e-8),o
             alternate=_solve_normal_opening(mesh,parent.boundary,opening_m,np.array((0.,1.)),v12,kappa,_symmetry_pin(mesh,np.array((0.,1.)),"max")); alternate_cod,_,_,_=_extrapolated_cod(alternate,mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m)
             result=replace(result,crack_opening_displacement_m=cod,cod_fit_residual_m=residual,cod_fit_distances_m=distances,pin_reaction_relative_error=_relative(result.reaction_N_per_m,alternate.reaction_N_per_m),pin_energy_relative_error=_relative(result.energy_J_per_m,alternate.energy_J_per_m),pin_cod_relative_error=_relative(cod,alternate_cod),fixed_distance_cod_m=fixed,cod_samples_json=str({"h_scaled":details,"fixed_physical":fixed_details})); cache[(h,kappa,float(tip[0]))]=(result,v12)
             rows.append(_row(h,kappa,"C_V12",result,conforming,mesh,v12.astype(bool),audit,parent))
-    for h in h_values[-2:]:
+    # The frozen G campaign remains on its predeclared 12.5/6.25 um pair; the
+    # unified straight matrix nevertheless carries all non-G diagnostics at
+    # every level through 3.125 um.
+    derivative_h_values=tuple(value for value in h_values if value in (12.5e-6,6.25e-6)) if len(h_values)>1 else tuple(h_values)
+    for h in derivative_h_values:
         for kappa in kappas:
             for delta in (12.5e-6,25e-6,50e-6):
                 if not np.isclose(delta/h,round(delta/h)): continue
@@ -207,6 +262,23 @@ def run_straight_case(h_values=(25e-6,12.5e-6,6.25e-6),kappas=(1e-4,1e-6,1e-8),o
 def run_low_kappa_prescreen(h=3.125e-6,opening_m=8e-7,kappa=1e-8):
     width=height=8e-4; p0=np.array((2e-4,0.)); tip=np.array((5e-4,0.)); parent=build_matched_crack_parent(width,height,tuple(p0),tuple(tip),h); mesh=parent.mesh
     ids,audit=mechanically_separating_graph_support(mesh,CrackNetworkState.one_tip((tuple(p0),tuple(tip)))); damage=np.isin(np.arange(mesh.ne),ids).astype(float); slit=conforming_slit_from_parent(parent)
+    conforming=_solve(slit.mesh,slit.boundary,opening_m); direct=_slit_cod(conforming,slit,p0,tip); cod,residual,distances,details=_extrapolated_cod(conforming,slit.mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m); fixed,_,_,fixed_details=_extrapolated_cod(conforming,slit.mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m,distances=(50e-6,62.5e-6,75e-6,87.5e-6)); conforming=replace(conforming,crack_opening_displacement_m=cod,cod_fit_residual_m=residual,cod_fit_distances_m=distances,direct_face_cod_m=direct,fixed_distance_cod_m=fixed,cod_samples_json=str({"h_scaled":details,"fixed_physical":fixed_details}))
+    result=_solve(mesh,parent.boundary,opening_m,damage,kappa); cod,residual,distances,details=_extrapolated_cod(result,mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m); fixed,_,_,fixed_details=_extrapolated_cod(result,mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m,distances=(50e-6,62.5e-6,75e-6,87.5e-6)); alternate=_solve_normal_opening(mesh,parent.boundary,opening_m,np.array((0.,1.)),damage,kappa,_symmetry_pin(mesh,np.array((0.,1.)),"max")); alternate_cod,_,_,_=_extrapolated_cod(alternate,mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m); result=replace(result,crack_opening_displacement_m=cod,cod_fit_residual_m=residual,cod_fit_distances_m=distances,fixed_distance_cod_m=fixed,cod_samples_json=str({"h_scaled":details,"fixed_physical":fixed_details}),pin_reaction_relative_error=_relative(result.reaction_N_per_m,alternate.reaction_N_per_m),pin_energy_relative_error=_relative(result.energy_J_per_m,alternate.energy_J_per_m),pin_cod_relative_error=_relative(cod,alternate_cod))
+    return [_row(h,None,"D_CONFORMING",conforming,conforming,mesh,np.zeros(mesh.ne,bool),None,parent),_row(h,kappa,"C_V12",result,conforming,mesh,damage.astype(bool),audit,parent)]
+
+
+def _locally_refined_parent(h=1.5625e-6,far_h=12.5e-6):
+    """Shared Delaunay parent with a bounded fine crack/tip patch."""
+    width=height=8e-4; p0=np.array((2e-4,0.)); tip=np.array((5e-4,0.)); x0,x1=1.5e-4,5.5e-4; y0,y1=-1.5e-4,1.5e-4
+    coarse_x=np.arange(0.,width+.5*far_h,far_h); coarse_y=np.arange(-height/2,height/2+.5*far_h,far_h); gx,gy=np.meshgrid(coarse_x,coarse_y); coarse=np.c_[gx.ravel(),gy.ravel()]; coarse=coarse[~((coarse[:,0]>x0)&(coarse[:,0]<x1)&(coarse[:,1]>y0)&(coarse[:,1]<y1))]
+    fine_x=np.arange(x0,x1+.5*h,h); fine_y=np.arange(y0,y1+.5*h,h); fx,fy=np.meshgrid(fine_x,fine_y); nodes=np.vstack((coarse,np.c_[fx.ravel(),fy.ravel()],p0,tip)); nodes=np.unique(np.round(nodes,15),axis=0)
+    elems=Delaunay(nodes).simplices; cent=nodes[elems].mean(axis=1); elems=elems[(cent[:,0]>=0)&(cent[:,0]<=width)&(cent[:,1]>=-height/2)&(cent[:,1]<=height/2)]
+    mesh=rebuild_tri_mesh(nodes,elems,tip_centers=tip); top=np.flatnonzero(np.isclose(nodes[:,1],height/2)); bot=np.flatnonzero(np.isclose(nodes[:,1],-height/2)); left=int(np.argmin(np.sum((nodes-np.array((0.,-height/2)))**2,axis=1))); right=int(np.argmin(np.sum((nodes-np.array((width,-height/2)))**2,axis=1))); boundary=BoundaryData(top,bot,left,right,np.empty(0,int))
+    return MatchedCrackParent(mesh,boundary,tuple(p0),tuple(tip),h,_hash(nodes),_hash(elems))
+
+
+def run_targeted_local_refinement(h=1.5625e-6,opening_m=8e-7,kappa=1e-8):
+    parent=_locally_refined_parent(h); mesh=parent.mesh; p0=np.asarray(parent.p0); tip=np.asarray(parent.p1); ids,audit=mechanically_separating_graph_support(mesh,CrackNetworkState.one_tip((parent.p0,parent.p1))); damage=np.isin(np.arange(mesh.ne),ids).astype(float); slit=conforming_slit_from_parent(parent)
     conforming=_solve(slit.mesh,slit.boundary,opening_m); direct=_slit_cod(conforming,slit,p0,tip); cod,residual,distances,details=_extrapolated_cod(conforming,slit.mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m); fixed,_,_,fixed_details=_extrapolated_cod(conforming,slit.mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m,distances=(50e-6,62.5e-6,75e-6,87.5e-6)); conforming=replace(conforming,crack_opening_displacement_m=cod,cod_fit_residual_m=residual,cod_fit_distances_m=distances,direct_face_cod_m=direct,fixed_distance_cod_m=fixed,cod_samples_json=str({"h_scaled":details,"fixed_physical":fixed_details}))
     result=_solve(mesh,parent.boundary,opening_m,damage,kappa); cod,residual,distances,details=_extrapolated_cod(result,mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m); fixed,_,_,fixed_details=_extrapolated_cod(result,mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m,distances=(50e-6,62.5e-6,75e-6,87.5e-6)); alternate=_solve_normal_opening(mesh,parent.boundary,opening_m,np.array((0.,1.)),damage,kappa,_symmetry_pin(mesh,np.array((0.,1.)),"max")); alternate_cod,_,_,_=_extrapolated_cod(alternate,mesh,p0,tip,h,support_width=audit.maximum_normal_support_width_m); result=replace(result,crack_opening_displacement_m=cod,cod_fit_residual_m=residual,cod_fit_distances_m=distances,fixed_distance_cod_m=fixed,cod_samples_json=str({"h_scaled":details,"fixed_physical":fixed_details}),pin_reaction_relative_error=_relative(result.reaction_N_per_m,alternate.reaction_N_per_m),pin_energy_relative_error=_relative(result.energy_J_per_m,alternate.energy_J_per_m),pin_cod_relative_error=_relative(cod,alternate_cod))
     return [_row(h,None,"D_CONFORMING",conforming,conforming,mesh,np.zeros(mesh.ne,bool),None,parent),_row(h,kappa,"C_V12",result,conforming,mesh,damage.astype(bool),audit,parent)]
@@ -244,13 +316,15 @@ def _row(h,kappa,name,result,reference,mesh,mask,audit,parent):
     remote=abs(result.reaction_N_per_m)/float(np.ptp(mesh.nodes[:,0])); traction=float(np.sqrt(np.mean(result.sigma_gp[1,mask]**2+result.sigma_gp[2,mask]**2))/max(remote,1e-300)) if np.any(mask) else 0.
     extra={}
     extra.update(_mirror_residuals(mesh if name!="D_CONFORMING" else mesh,result,parent.p1,_symmetry_pin(mesh,np.array((0.,1.)),"min")))
-    if name=="C_V12": extra.update(_field_errors(mesh,result,reference,mask,parent.p0,parent.p1)); extra.update(_interface_tractions(mesh,result,mask,parent.p0,parent.p1)); extra.update({"pin_reaction_relative_error":result.pin_reaction_relative_error,"pin_energy_relative_error":result.pin_energy_relative_error,"pin_cod_relative_error":result.pin_cod_relative_error})
+    if name=="C_V12": extra.update(_field_errors(mesh,result,reference,mask,parent.p0,parent.p1)); extra.update(_interface_tractions(mesh,result,mask,parent.p0,parent.p1)); extra.update(_discrete_corridor_transfer(mesh,result,mask,parent.p0,parent.p1)); extra.update({"pin_reaction_relative_error":result.pin_reaction_relative_error,"pin_energy_relative_error":result.pin_energy_relative_error,"pin_cod_relative_error":result.pin_cod_relative_error})
     if name=="C_V12":
         remote_stress=abs(result.reaction_N_per_m)/max(float(np.ptp(mesh.nodes[:,0])),1e-300); remote_force=abs(result.reaction_N_per_m)
         for key,value in tuple(extra.items()):
             if "soft_traction_rms_Pa" in key: extra[key.replace("_Pa","_relative_remote_stress")]=value/max(remote_stress,1e-300)
             elif "soft_normal_force_N_per_m" in key or "soft_shear_force_N_per_m" in key: extra[key.replace("_N_per_m","_relative_remote_resultant")]=value/max(remote_force,1e-300)
+            elif key.startswith("discrete_transmitted_") and key.endswith("_N_per_m"): extra[key.replace("_N_per_m","_relative_remote_resultant")]=value/max(remote_force,1e-300)
+        extra["effective_interface_stiffness_N_per_m2"]=extra["discrete_transmitted_normal_force_N_per_m"]/max(abs(result.crack_opening_displacement_m),1e-300)
     return {"h_tip_m":h,"kappa":kappa,"representation":name,"parent_geometry_fingerprint":parent.geometry_fingerprint,"parent_connectivity_fingerprint":parent.connectivity_fingerprint,"selected_element_count":int(np.count_nonzero(mask)),"support_fingerprint":_hash(np.flatnonzero(mask)),"reaction_N_per_m":result.reaction_N_per_m,"compliance_m2_per_N":result.compliance_m2_per_N,"energy_J_per_m":result.energy_J_per_m,"crack_opening_displacement_m":result.crack_opening_displacement_m,"fixed_distance_cod_m":result.fixed_distance_cod_m,"fixed_distance_cod_reference_error":_relative(result.fixed_distance_cod_m,reference.fixed_distance_cod_m) if np.isfinite(result.fixed_distance_cod_m) else None,"cod_samples":result.cod_samples_json,"direct_face_cod_m":result.direct_face_cod_m,"cod_fit_residual_m":result.cod_fit_residual_m,"cod_fit_distances_m":" ".join(map(str,result.cod_fit_distances_m)),"cod_extrapolation_order":2,"crack_opening_reference_error":_relative(result.crack_opening_displacement_m,reference.crack_opening_displacement_m) if np.isfinite(result.crack_opening_displacement_m) else None,"conforming_extrapolated_direct_cod_error":_relative(result.crack_opening_displacement_m,result.direct_face_cod_m) if name=="D_CONFORMING" else None,"free_residual_relative":result.free_residual_relative,"energy_reaction_identity_relative":result.energy_reaction_identity_relative,"conditioning_diagonal_ratio":result.conditioning_diagonal_ratio,"reaction_reference_error":_relative(result.reaction_N_per_m,reference.reaction_N_per_m),"compliance_reference_error":_relative(result.compliance_m2_per_N,reference.compliance_m2_per_N),"energy_reference_error":_relative(result.energy_J_per_m,reference.energy_J_per_m),"outside_support_stress_l2_error":stress_error,"KILLED_REGION_STRESS_RMS_DIAGNOSTIC":traction,"killed_energy_fraction":killed,"support_width_m":float(audit.maximum_normal_support_width_m) if audit else 0.,"support_footprint_m":float(audit.active_tip_signed_footprint_m) if audit else 0.,**extra}
 
 
-__all__=["PrimalResult","run_low_kappa_prescreen","run_rotated_cases","run_straight_case"]
+__all__=["PrimalResult","recover_element_fields","run_low_kappa_prescreen","run_rotated_cases","run_straight_case","run_targeted_local_refinement"]

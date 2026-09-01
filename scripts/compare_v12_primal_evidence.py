@@ -5,7 +5,7 @@ import argparse, ast, csv, json, math
 from pathlib import Path
 
 RTOL=1e-10; ATOL=1e-12
-CSV_FILES=("straight_primal_matrix.csv","straight_3p125um_prescreen.csv","centered_G_matrix.csv","angle_primal_matrix.csv")
+CSV_FILES=("straight_primal_matrix.csv","targeted_1p5625um_local_refinement.csv","joint_h_kappa_transmission_matrix.csv","centered_G_matrix.csv","angle_primal_matrix.csv")
 EXACT_JSON_KEYS=("schema","base_git_sha","implementation_git_sha","evidence_generation_parent_sha","conforming_oracle_source_commit","conforming_oracle_source_sha256","thresholds_predeclared","gates")
 EXACT_COLUMNS={"representation","parent_geometry_fingerprint","parent_connectivity_fingerprint","support_fingerprint","minus_graph_fingerprint","plus_graph_fingerprint","minus_support_fingerprint","plus_support_fingerprint","minus_mechanical_fingerprint","plus_mechanical_fingerprint"}
 
@@ -31,7 +31,7 @@ def compare_csv(expected,actual,name):
     for index,(left,right) in enumerate(zip(a,b)):
         for key in left:
             x,y=left[key],right[key]
-            if key=="cod_samples" and x and y: compare_nested(ast.literal_eval(x),ast.literal_eval(y),f"{name}:{index}:{key}")
+            if key in {"cod_samples","distance_resolved_profiles_json","production_tensor_probe_v12_json","production_tensor_probe_conforming_json"} and x and y: compare_nested(ast.literal_eval(x),ast.literal_eval(y),f"{name}:{index}:{key}")
             elif key in EXACT_COLUMNS or number(x) is None or number(y) is None:
                 if x!=y: raise AssertionError(f"{name}:{index}:{key}: exact mismatch {x!r} != {y!r}")
             else:
