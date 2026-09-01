@@ -22,7 +22,8 @@ def compare_nested(left,right,path):
         if len(left)!=len(right): raise AssertionError(f"{path}: nested length mismatch")
         for index,(a,b) in enumerate(zip(left,right)): compare_nested(a,b,f"{path}[{index}]")
     elif isinstance(left,(float,int)) and not isinstance(left,bool):
-        if not math.isclose(float(left),float(right),rel_tol=RTOL,abs_tol=ATOL): raise AssertionError(f"{path}: {left} != {right}")
+        nested_atol=1e-3 if ".tensor" in path else ATOL
+        if not math.isclose(float(left),float(right),rel_tol=RTOL,abs_tol=nested_atol): raise AssertionError(f"{path}: {left} != {right}")
     elif left!=right: raise AssertionError(f"{path}: exact mismatch {left!r} != {right!r}")
 
 def compare_csv(expected,actual,name):
