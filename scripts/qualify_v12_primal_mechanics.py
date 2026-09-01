@@ -38,7 +38,7 @@ def write_csv(path,rows):
         for key in row:
             if key not in fields: fields.append(key)
     with path.open("w",newline="") as stream:
-        writer=csv.DictWriter(stream,fieldnames=fields); writer.writeheader(); writer.writerows(rows)
+        writer=csv.DictWriter(stream,fieldnames=fields,lineterminator="\n"); writer.writeheader(); writer.writerows(rows)
 def git(*args): return subprocess.check_output(("git",)+args,cwd=ROOT,text=True).strip()
 def sha256(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 
