@@ -281,7 +281,8 @@ def _locally_refined_parent(h=1.5625e-6,far_h=12.5e-6):
             a,b,c,d=node(i,j),node(i+1,j),node(i+1,j+1),node(i,j+1); elems.extend(((a,b,c),(a,c,d)) if (i+j)%2==0 else ((a,b,d),(b,c,d)))
     elems=np.asarray(elems,int)
     mesh=rebuild_tri_mesh(nodes,elems,tip_centers=tip); top=np.flatnonzero(np.isclose(nodes[:,1],height/2)); bot=np.flatnonzero(np.isclose(nodes[:,1],-height/2)); left=int(np.argmin(np.sum((nodes-np.array((0.,-height/2)))**2,axis=1))); right=int(np.argmin(np.sum((nodes-np.array((width,-height/2)))**2,axis=1))); boundary=BoundaryData(top,bot,left,right,np.empty(0,int))
-    return MatchedCrackParent(mesh,boundary,tuple(p0),tuple(tip),h,_hash(nodes),_hash(elems))
+    canonical_geometry=np.rint(nodes/1e-15).astype(np.int64)
+    return MatchedCrackParent(mesh,boundary,tuple(p0),tuple(tip),h,_hash(canonical_geometry),_hash(elems))
 
 
 def run_targeted_local_refinement(h=1.5625e-6,opening_m=8e-7,kappa=1e-8):
