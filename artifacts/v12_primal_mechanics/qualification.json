@@ -1,0 +1,41 @@
+{
+  "checks": {
+    "G_error_decreases_under_refinement": true,
+    "angle_equilibrium_identity_max": 1.0938171876384686e-13,
+    "angle_finest_global_reference_error_max": 0.032591180637012225,
+    "finest_G_reference_error": 0.03719985791942876,
+    "finest_global_reference_error": 0.031146652450912478,
+    "finest_outside_support_stress_l2_error": 0.0327859267124558,
+    "global_and_field_errors_decrease_under_refinement": true,
+    "killed_energy_fraction_at_kappa_1e-6": 2.185057509347755e-05,
+    "low_kappa_pair_reaction_spread": 7.139212473933796e-06,
+    "matched_parent_fingerprints_identical_per_h": true,
+    "maximum_energy_compliance_G_identity_error": 0.001565910757583348,
+    "maximum_energy_reaction_identity_relative": 2.370911691400751e-13,
+    "maximum_free_residual_relative": 4.964910728528382e-14
+  },
+  "conforming_oracle_source_commit": "8ad7f42",
+  "gates": {
+    "CENTERED_G_CONVERGENCE": "PASS",
+    "FIELDS_CONVERGENCE": "PASS",
+    "KAPPA_OBJECTIVITY": "PASS",
+    "MATCHED_PARENT_REPRESENTATIONS": "PASS",
+    "MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED": "NOT_RUN",
+    "MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED": "PASS",
+    "V12_PRIMAL_MECHANICS_ANGLES_30_45": "PASS",
+    "V12_PRIMAL_MECHANICS_STRAIGHT": "PASS",
+    "V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED": "OPEN"
+  },
+  "implementation_git_sha": "e931fab52a392785c40850336d02dfa3ce443975",
+  "schema": "v12_primal_mechanics_qualification_v1",
+  "thresholds_predeclared": {
+    "maximum_energy_compliance_G_identity_error": 0.01,
+    "maximum_energy_reaction_identity_relative": 1e-10,
+    "maximum_finest_G_reference_error": 0.05,
+    "maximum_finest_global_reference_error": 0.05,
+    "maximum_finest_outside_support_stress_l2_error": 0.05,
+    "maximum_free_residual_relative": 1e-10,
+    "maximum_killed_energy_fraction_at_kappa_1e-6": 0.001,
+    "maximum_low_kappa_pair_reaction_spread": 0.001
+  }
+}
