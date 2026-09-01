@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tolerance-aware cross-platform comparator for V12 scientific evidence."""
 from __future__ import annotations
-import argparse, csv, json, math
+import argparse, ast, csv, json, math
 from pathlib import Path
 
 RTOL=1e-10; ATOL=1e-12
@@ -14,13 +14,25 @@ def number(value):
     try: return float(value)
     except ValueError: return None
 
+def compare_nested(left,right,path):
+    if isinstance(left,dict):
+        if left.keys()!=right.keys(): raise AssertionError(f"{path}: nested keys mismatch")
+        for key in left: compare_nested(left[key],right[key],f"{path}.{key}")
+    elif isinstance(left,list):
+        if len(left)!=len(right): raise AssertionError(f"{path}: nested length mismatch")
+        for index,(a,b) in enumerate(zip(left,right)): compare_nested(a,b,f"{path}[{index}]")
+    elif isinstance(left,(float,int)) and not isinstance(left,bool):
+        if not math.isclose(float(left),float(right),rel_tol=RTOL,abs_tol=ATOL): raise AssertionError(f"{path}: {left} != {right}")
+    elif left!=right: raise AssertionError(f"{path}: exact mismatch {left!r} != {right!r}")
+
 def compare_csv(expected,actual,name):
     a=list(csv.DictReader((expected/name).open())); b=list(csv.DictReader((actual/name).open()))
     if len(a)!=len(b) or (a and a[0].keys()!=b[0].keys()): raise AssertionError(f"{name}: row/schema mismatch")
     for index,(left,right) in enumerate(zip(a,b)):
         for key in left:
             x,y=left[key],right[key]
-            if key in EXACT_COLUMNS or number(x) is None or number(y) is None:
+            if key=="cod_samples" and x and y: compare_nested(ast.literal_eval(x),ast.literal_eval(y),f"{name}:{index}:{key}")
+            elif key in EXACT_COLUMNS or number(x) is None or number(y) is None:
                 if x!=y: raise AssertionError(f"{name}:{index}:{key}: exact mismatch {x!r} != {y!r}")
             else:
                 xf,yf=number(x),number(y)
