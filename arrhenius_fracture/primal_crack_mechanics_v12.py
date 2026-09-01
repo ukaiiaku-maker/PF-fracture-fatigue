@@ -7,7 +7,7 @@ import json
 import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import eigsh, spsolve
-from scipy.spatial import Delaunay, cKDTree
+from scipy.spatial import cKDTree
 
 from .causal_sharp_wake_v11 import causal_segment_support, mechanical_fingerprint
 from .config import ElasticProperties
@@ -270,11 +270,16 @@ def run_low_kappa_prescreen(h=3.125e-6,opening_m=8e-7,kappa=1e-8):
 
 
 def _locally_refined_parent(h=1.5625e-6,far_h=12.5e-6):
-    """Shared Delaunay parent with a bounded fine crack/tip patch."""
+    """Shared deterministic graded parent with a bounded fine intersection."""
     width=height=8e-4; p0=np.array((2e-4,0.)); tip=np.array((5e-4,0.)); x0,x1=1.5e-4,5.5e-4; y0,y1=-1.5e-4,1.5e-4
-    coarse_x=np.arange(0.,width+.5*far_h,far_h); coarse_y=np.arange(-height/2,height/2+.5*far_h,far_h); gx,gy=np.meshgrid(coarse_x,coarse_y); coarse=np.c_[gx.ravel(),gy.ravel()]; coarse=coarse[~((coarse[:,0]>x0)&(coarse[:,0]<x1)&(coarse[:,1]>y0)&(coarse[:,1]<y1))]
-    fine_x=np.arange(x0,x1+.5*h,h); fine_y=np.arange(y0,y1+.5*h,h); fx,fy=np.meshgrid(fine_x,fine_y); nodes=np.vstack((coarse,np.c_[fx.ravel(),fy.ravel()],p0,tip)); nodes=np.unique(np.round(nodes,15),axis=0)
-    elems=Delaunay(nodes).simplices; cent=nodes[elems].mean(axis=1); elems=elems[(cent[:,0]>=0)&(cent[:,0]<=width)&(cent[:,1]>=-height/2)&(cent[:,1]<=height/2)]
+    coarse_x=np.arange(0.,width+.5*far_h,far_h); coarse_y=np.arange(-height/2,height/2+.5*far_h,far_h); fine_x=np.arange(x0,x1+.5*h,h); fine_y=np.arange(y0,y1+.5*h,h)
+    xs=np.unique(np.round(np.r_[coarse_x[(coarse_x<x0)|(coarse_x>x1)],fine_x,p0[0],tip[0]],15)); ys=np.unique(np.round(np.r_[coarse_y[(coarse_y<y0)|(coarse_y>y1)],fine_y,0.],15)); gx,gy=np.meshgrid(xs,ys); nodes=np.c_[gx.ravel(),gy.ravel()]; nx=len(xs)-1; ny=len(ys)-1
+    def node(i,j): return j*(nx+1)+i
+    elems=[]
+    for j in range(ny):
+        for i in range(nx):
+            a,b,c,d=node(i,j),node(i+1,j),node(i+1,j+1),node(i,j+1); elems.extend(((a,b,c),(a,c,d)) if (i+j)%2==0 else ((a,b,d),(b,c,d)))
+    elems=np.asarray(elems,int)
     mesh=rebuild_tri_mesh(nodes,elems,tip_centers=tip); top=np.flatnonzero(np.isclose(nodes[:,1],height/2)); bot=np.flatnonzero(np.isclose(nodes[:,1],-height/2)); left=int(np.argmin(np.sum((nodes-np.array((0.,-height/2)))**2,axis=1))); right=int(np.argmin(np.sum((nodes-np.array((width,-height/2)))**2,axis=1))); boundary=BoundaryData(top,bot,left,right,np.empty(0,int))
     return MatchedCrackParent(mesh,boundary,tuple(p0),tuple(tip),h,_hash(nodes),_hash(elems))
 

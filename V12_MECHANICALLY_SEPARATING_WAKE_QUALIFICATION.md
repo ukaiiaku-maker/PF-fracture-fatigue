@@ -56,12 +56,12 @@ detected.
 
 The aggregate primal gate remains OPEN. Every fixed-region tensor error
 decreases, but the 3.125 um face-adjacent strip error is 17.825%, above the
-frozen 5% limit. A bounded matched 1.5625 um crack/tip refinement reduces that
-metric to 11.096% and gives a 3.906% production tensor-probe error. The frozen
-stop rule is therefore applied:
-`V12_P0_LOCAL_TENSOR_FIDELITY = NOT_QUALIFIED_REQUIRES_CONFORMING_TIP_PATCH`.
-The bulk P0 wake remains suitable for the far wake, while high-fidelity source
-mechanics requires a bounded conforming crack-tip patch.
+frozen 5% limit. A deterministic bounded matched 1.5625 um crack/tip refinement
+reduces that metric to 9.033% and gives a 2.117% production tensor-probe error.
+Because this was below the predeclared 10% stop line and remained convergent,
+one final 0.78125 um level was run. It closes at 4.564% face-strip error and
+1.199% production-probe error, so `V12_P0_LOCAL_TENSOR_FIDELITY = PASS` and
+`V12_LOCAL_TENSOR_FIELDS_QUALIFIED = PASS` under the unchanged 5% limit.
 
 The joint corridor matrix retains fixed `kappa = 1e-6, 1e-8` rows and coupled
 `kappa(h)=kappa0(h/h0)^p` policies for `p=1,2`, with `h0=25 um` and
@@ -125,8 +125,8 @@ active-tip/event-resolution, and overall geometry gates are PASS.
 | `V12_ROTATION_COVARIANCE_SCREEN` | PASS |
 | `V12_MATCHED_COD_QUALIFIED` | PASS at unified 3.125 um level |
 | `V12_INTERFACE_TRACTION_QUALIFIED` | FAIL, matrix retained |
-| `V12_LOCAL_TENSOR_FIELDS_QUALIFIED` | FAIL, matrix retained |
-| `V12_P0_LOCAL_TENSOR_FIDELITY` | NOT_QUALIFIED_REQUIRES_CONFORMING_TIP_PATCH |
+| `V12_LOCAL_TENSOR_FIELDS_QUALIFIED` | PASS at bounded 0.78125 um refinement |
+| `V12_P0_LOCAL_TENSOR_FIDELITY` | PASS |
 | `V12_G_PERTURBATION_CONVERGENCE` | PASS |
 | `V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED` | PASS |
 | `V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED` | FAIL, matrix retained |

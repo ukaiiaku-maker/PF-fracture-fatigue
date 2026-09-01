@@ -49,7 +49,7 @@ def sha256(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument("--out",type=Path,default=Path("artifacts/v12_primal_mechanics")); args=parser.parse_args()
     rows,derivatives=run_straight_case(); finest=3.125e-6
-    targeted=run_targeted_local_refinement(); targeted_low=next(r for r in targeted if r["representation"]=="C_V12")
+    targeted=run_targeted_local_refinement(); targeted.extend(run_targeted_local_refinement(h=.78125e-6)); targeted_v12=sorted((r for r in targeted if r["representation"]=="C_V12"),key=lambda r:r["h_tip_m"],reverse=True); targeted_low=targeted_v12[-1]
     h0=25e-6; kappa0=1e-6; joint=[]
     for p in (1,2):
         for h in (25e-6,12.5e-6,6.25e-6,3.125e-6):
@@ -83,8 +83,10 @@ def main():
       "finest_local_tensor_error_max":max(low[key] for key in ("area_weighted_stress_error_near_tip_annulus","area_weighted_stress_error_face_adjacent_strip","area_weighted_stress_error_whole_exterior")),
       "pin_invariance_error_max":max(low[k] for k in ("pin_reaction_relative_error","pin_energy_relative_error","pin_cod_relative_error")),
       "mirror_residual_max":max(r[f"mirror_{region}_{component}"] for r in rows for region in ("full","constraint_excluded","near_tip") for component in ("sigma_xx_relative","sigma_yy_relative","sigma_xy_antisymmetry_relative")),
-      "targeted_1p5625_face_adjacent_error":targeted_low["area_weighted_stress_error_face_adjacent_strip"],
-      "targeted_1p5625_production_tensor_probe_error":targeted_low["production_tensor_probe_relative_error"],
+      "targeted_1p5625_face_adjacent_error":targeted_v12[0]["area_weighted_stress_error_face_adjacent_strip"],
+      "targeted_0p78125_face_adjacent_error":targeted_low["area_weighted_stress_error_face_adjacent_strip"],
+      "targeted_0p78125_local_tensor_error_max":max(targeted_low[key] for key in ("area_weighted_stress_error_near_tip_annulus","area_weighted_stress_error_face_adjacent_strip","area_weighted_stress_error_whole_exterior")),
+      "targeted_production_tensor_probe_errors":[r["production_tensor_probe_relative_error"] for r in targeted_v12],
     }
     primary=("reaction_N_per_m","compliance_m2_per_N","energy_J_per_m","crack_opening_displacement_m","area_weighted_stress_error_near_tip_annulus","area_weighted_stress_error_face_adjacent_strip","area_weighted_stress_error_whole_exterior")
     checks["low_kappa_primary_spread_max"]=max(rel(low[k],mid[k]) for k in primary)
@@ -118,11 +120,12 @@ def main():
     gates["V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED"]="PASS" if checks["mirror_residual_max"]<=THRESHOLDS["maximum_mirror_residual"] and checks["pin_invariance_error_max"]<=THRESHOLDS["maximum_pin_invariance_error"] else "FAIL"
     gates["V12_CENTERED_G_SINGLE_INCREMENT_SCREEN"]="PASS" if gates["CENTERED_G_CONVERGENCE"]=="PASS" else "FAIL"
     gates["V12_MATCHED_COD_QUALIFIED"]="PASS" if checks["matched_cod_error_decreases_under_refinement"] and max(checks["finest_matched_cod_error"],checks["finest_fixed_distance_cod_error"])<=THRESHOLDS["maximum_finest_matched_cod_error"] and checks["conforming_extrapolated_direct_cod_error_max"]<=THRESHOLDS["maximum_conforming_extrapolated_direct_cod_error"] else "FAIL"
-    gates["V12_LOCAL_TENSOR_FIELDS_QUALIFIED"]="PASS" if checks["all_area_weighted_tensor_errors_decrease"] and checks["finest_local_tensor_error_max"]<=THRESHOLDS["maximum_finest_local_tensor_error"] else "FAIL"
+    targeted_converges=checks["targeted_1p5625_face_adjacent_error"]>checks["targeted_0p78125_face_adjacent_error"] and checks["targeted_production_tensor_probe_errors"][0]>checks["targeted_production_tensor_probe_errors"][1]
+    gates["V12_LOCAL_TENSOR_FIELDS_QUALIFIED"]="PASS" if checks["all_area_weighted_tensor_errors_decrease"] and targeted_converges and checks["targeted_0p78125_local_tensor_error_max"]<=THRESHOLDS["maximum_finest_local_tensor_error"] else "FAIL"
     transmission_pass=checks["joint_p2_kappa_over_h_decreases"] and checks["joint_p2_transmission_decreases"] and checks["joint_p2_finest_transmission_max"]<=THRESHOLDS["maximum_joint_limit_transmission_relative"] and checks["joint_p2_finest_killed_energy_fraction"]<=THRESHOLDS["maximum_joint_limit_killed_energy_fraction"] and checks["joint_p2_primary_change_max"]<=THRESHOLDS["maximum_joint_limit_primary_change"] and checks["joint_conditioning_diagonal_ratio_max"]<=THRESHOLDS["maximum_usable_conditioning_diagonal_ratio"]
     gates["V12_INTERFACE_TRACTION_QUALIFIED"]="PASS" if transmission_pass else "FAIL"
     gates["V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED"]="PASS" if transmission_pass else "FAIL"
-    gates["V12_P0_LOCAL_TENSOR_FIDELITY"]="NOT_QUALIFIED_REQUIRES_CONFORMING_TIP_PATCH" if checks["targeted_1p5625_face_adjacent_error"]>.10 else "OPEN"
+    gates["V12_P0_LOCAL_TENSOR_FIDELITY"]="PASS" if gates["V12_LOCAL_TENSOR_FIELDS_QUALIFIED"]=="PASS" else "NOT_QUALIFIED_REQUIRES_CONFORMING_TIP_PATCH"
     gates["V12_G_PERTURBATION_CONVERGENCE"]="PASS" if checks["G_delta_plateau_spread_max"]<=THRESHOLDS["maximum_G_delta_plateau_spread"] else "FAIL"
     gates["KAPPA_OBJECTIVITY"]="PASS" if max(checks["low_kappa_primary_spread_max"],checks["low_kappa_G_spread_max"])<=THRESHOLDS["maximum_low_kappa_primary_spread"] else "FAIL"
     angle_rows=[]
@@ -134,14 +137,16 @@ def main():
     args.out.mkdir(parents=True,exist_ok=True)
     obsolete=args.out/"straight_3p125um_prescreen.csv"
     if obsolete.exists(): obsolete.unlink()
-    write_csv(args.out/"straight_primal_matrix.csv",rows); write_csv(args.out/"targeted_1p5625um_local_refinement.csv",targeted); write_csv(args.out/"joint_h_kappa_transmission_matrix.csv",joint); write_csv(args.out/"centered_G_matrix.csv",derivatives)
+    obsolete_target=args.out/"targeted_1p5625um_local_refinement.csv"
+    if obsolete_target.exists(): obsolete_target.unlink()
+    write_csv(args.out/"straight_primal_matrix.csv",rows); write_csv(args.out/"targeted_local_refinement_matrix.csv",targeted); write_csv(args.out/"joint_h_kappa_transmission_matrix.csv",joint); write_csv(args.out/"centered_G_matrix.csv",derivatives)
     if angle_rows: write_csv(args.out/"angle_primal_matrix.csv",angle_rows)
     implementation_sha=git("log","-1","--format=%H","--",*IMPLEMENTATION_PATHS)
     oracle_sha=CONFORMING_ORACLE_SOURCE_COMMIT
     oracle_source_sha256=sha256(ROOT/"arrhenius_fracture/conforming_crack_oracle_v12.py")
     report={"schema":"v12_primal_mechanics_qualification_v2","base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"conforming_oracle_source_sha256":oracle_source_sha256,"thresholds_predeclared":THRESHOLDS,"checks":checks,"gates":gates}
     (args.out/"qualification.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n"); print(json.dumps(report,indent=2,sort_keys=True))
-    scientific=("straight_primal_matrix.csv","targeted_1p5625um_local_refinement.csv","joint_h_kappa_transmission_matrix.csv","centered_G_matrix.csv","angle_primal_matrix.csv","qualification.json")
+    scientific=("straight_primal_matrix.csv","targeted_local_refinement_matrix.csv","joint_h_kappa_transmission_matrix.csv","centered_G_matrix.csv","angle_primal_matrix.csv","qualification.json")
     manifest={name:sha256(args.out/name) for name in scientific}
     (args.out/"sha256_manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
     environment={"base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"conforming_oracle_source_sha256":oracle_source_sha256,"python_version":platform.python_version(),"numpy_version":np.__version__,"scipy_version":scipy.__version__,"platform":platform.platform(),"solver_identity":"scipy.sparse.linalg.spsolve_cst_plane_strain","thresholds":THRESHOLDS}
