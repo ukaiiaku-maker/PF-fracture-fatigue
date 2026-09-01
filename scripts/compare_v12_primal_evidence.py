@@ -37,7 +37,8 @@ def compare_csv(expected,actual,name):
             else:
                 xf,yf=number(x),number(y)
                 if math.isnan(xf) and math.isnan(yf): continue
-                if not math.isclose(xf,yf,rel_tol=RTOL,abs_tol=ATOL): raise AssertionError(f"{name}:{index}:{key}: {xf} != {yf}")
+                column_atol=1e-8 if key.endswith("_force_N_per_m") else ATOL
+                if not math.isclose(xf,yf,rel_tol=RTOL,abs_tol=column_atol): raise AssertionError(f"{name}:{index}:{key}: {xf} != {yf}")
 
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument("expected",type=Path); parser.add_argument("actual",type=Path); args=parser.parse_args()
