@@ -319,22 +319,51 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
             }
 
         def phase_resolved_action_fn(dt: float):
-            return _rebond.phase_resolved_action(
-                active_patches=active_patches,
-                patch_states=pre_event_states,
-                k0=0,
-                t_interval=dt,
-                K_phase_fn=K_phase_fn,
-                dt_phase=dt_phase_ctx,
-                n_phase=n_phase_ctx,
-                r_contact_m=r_contact_m_ctx,
-                cfg=rebonding_state.cfg,
-                T_K=T_K_ctx,
-                Eprime_Pa=Eprime_Pa_ctx,
-                K_shield_Pa_sqrt_m=K_shield_ctx,
-                r_eff_m=r_eff_ctx,
-                lambda_cleave_fn=lambda_cleave_normalized,
-            )
+            """Wraps ``phase_resolved_action``, enforcing the S8C certified
+            bulk-action bound: on an uncertified bulk result, retry once
+            with an extended transient budget (bounded by
+            ``cfg.bulk_action_max_transient_extensions``); if still
+            uncertified, fail closed rather than let an unbounded-error
+            bulk answer feed the root-finder. Strips the diagnostics dict
+            before returning so ``solve_coupled_event_time`` (which expects
+            exactly ``(action, end_states, end_idx)``) needs no change."""
+            cfg = rebonding_state.cfg
+            transient_budget = 200  # phase_resolved_action's own default
+            extensions = 0
+            while True:
+                action, end_states, end_idx, action_diag = _rebond.phase_resolved_action(
+                    active_patches=active_patches,
+                    patch_states=pre_event_states,
+                    k0=0,
+                    t_interval=dt,
+                    K_phase_fn=K_phase_fn,
+                    dt_phase=dt_phase_ctx,
+                    n_phase=n_phase_ctx,
+                    r_contact_m=r_contact_m_ctx,
+                    cfg=cfg,
+                    T_K=T_K_ctx,
+                    Eprime_Pa=Eprime_Pa_ctx,
+                    K_shield_Pa_sqrt_m=K_shield_ctx,
+                    r_eff_m=r_eff_ctx,
+                    lambda_cleave_fn=lambda_cleave_normalized,
+                    max_transient_cycles=transient_budget,
+                )
+                if action_diag.get("bulk_action_qualified", True):
+                    return action, end_states, end_idx
+                if extensions >= cfg.bulk_action_max_transient_extensions:
+                    raise RuntimeError(
+                        "crack-rebonding bulk-action certificate not qualified "
+                        f"after {extensions} transient-budget extension(s) "
+                        f"(tail_bound={action_diag.get('total_tail_action_error_bound')!r}, "
+                        f"tol_rel={cfg.bulk_action_error_rel_tol!r}); refusing to "
+                        "commit an event on an uncertified bulk-action estimate. "
+                        "Increase bulk_action_max_transient_extensions or "
+                        "bulk_action_error_rel_tol, or use a smaller "
+                        "max_transient_cycles-compatible block, if this "
+                        "configuration is expected to relax this slowly."
+                    )
+                transient_budget *= 2
+                extensions += 1
 
         lambda_avg_uncoupled = (
             (1.0 - B_start) * threshold_action / dt_uncoupled if dt_uncoupled > 0.0 else 1.0

@@ -130,6 +130,9 @@ class CrackRebondingControls:
     rebonding_block_max_dK_rebond_frac: float = 0.05
     rebonding_block_action_consistency_tol: float = 0.05
 
+    bulk_action_error_rel_tol: float = 1.0e-3
+    bulk_action_max_transient_extensions: int = 1
+
     def validate(self) -> "CrackRebondingControls":
         errors: list[str] = []
 
@@ -218,8 +221,13 @@ class CrackRebondingControls:
             "rebonding_block_max_dpC",
             "rebonding_block_max_dK_rebond_frac",
             "rebonding_block_action_consistency_tol",
+            "bulk_action_error_rel_tol",
         ):
             require(getattr(self, name) > 0.0, f"{name} must be positive")
+        require(
+            self.bulk_action_max_transient_extensions >= 0,
+            "bulk_action_max_transient_extensions must be non-negative",
+        )
 
         if errors:
             raise ValueError("; ".join(errors))
@@ -310,6 +318,39 @@ def crack_rebonding_config_from_environment(
         kwargs[f.name] = pick(f.name, float, default_value)
 
     return CrackRebondingControls(**kwargs).validate()
+
+
+_FATIGUE_INTEGRATOR_MODES = ("accelerated", "explicit")
+
+
+def fatigue_integrator_mode_from_environment(env: dict[str, str] | None = None) -> str:
+    """Selects between the default accelerated (DMD/Poincare) fatigue-cycle
+    integrator and the explicit phase-resolved one, via
+    ``V10230_FATIGUE_INTEGRATOR_MODE`` (default ``"accelerated"``, byte-
+    identical to the CLI's behavior before this selector existed).
+
+    S8D (round-3 follow-up): the accelerated integrator is what makes the
+    Gate-S0 rebonding/acceleration fail-closed check unconditional -- for a
+    real ``--fatigue-cycles`` CLI run, it unconditionally replaces
+    ``persistent_site_cyclic_coupled_v10229.integrate_state_coupled_waveform``
+    (the confirmed real rebonding injection point,
+    ``persistent_site_coupled_hazard_v10229.py``) with the accelerated
+    engine, so rebonding's real injection point is never reached once that
+    swap is applied. ``"explicit"`` opts out of that one swap only, for a
+    genuine outer-driver CLI smoke test with rebonding enabled -- see
+    ``sharp_front_v10_2_30_energy_gated_fatigue.py::main``. Every other
+    monkeypatch/config path is unaffected by this selector.
+    """
+    import os
+
+    source = dict(os.environ if env is None else env)
+    raw = source.get("V10230_FATIGUE_INTEGRATOR_MODE", "accelerated").strip().lower()
+    if raw not in _FATIGUE_INTEGRATOR_MODES:
+        raise ValueError(
+            f"Unknown V10230_FATIGUE_INTEGRATOR_MODE={raw!r}; expected one of "
+            f"{_FATIGUE_INTEGRATOR_MODES}"
+        )
+    return raw
 
 
 def _log_domain_rate(

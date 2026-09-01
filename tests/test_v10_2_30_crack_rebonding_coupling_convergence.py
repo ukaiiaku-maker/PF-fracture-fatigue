@@ -304,7 +304,7 @@ def test_phase_resolution_convergence_of_representative_action():
         def K_phase_fn(idx, n_phase=n_phase):
             return _K_phase(idx, n_phase, Kmax, R)
 
-        action, _, _ = phase_resolved_action(
+        action, _, _, _ = phase_resolved_action(
             active_patches=[patch],
             patch_states={0: patch.state_vector()},
             k0=0,

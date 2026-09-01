@@ -135,7 +135,7 @@ def test_phase_resolved_action_event_earlier_than_candidate_block():
     def lambda_cleave_fn(sigma: float) -> float:
         return 1.0e-3 * sigma  # simple monotone stand-in hazard
 
-    action_short, states_short, _ = phase_resolved_action(
+    action_short, states_short, _, _ = phase_resolved_action(
         active_patches=[patch],
         patch_states={0: patch.state_vector()},
         k0=0,
@@ -154,3 +154,57 @@ def test_phase_resolved_action_event_earlier_than_candidate_block():
     assert action_short >= 0.0
     total = states_short[0].sum()
     assert total == pytest.approx(1.0, abs=1.0e-8)
+
+
+def test_commit_rebonding_event_fails_closed_on_uncertified_bulk_action(monkeypatch):
+    """S8C caller-side enforcement: persistent_site_cyclic_energy_gated_v10230
+    .py's phase_resolved_action_fn closure (inside _commit_rebonding_event)
+    must retry with an extended transient budget on an uncertified bulk
+    result, then raise rather than silently commit an event on an
+    uncertified action estimate -- the fail-closed contract phase_resolved_
+    action itself deliberately does not enforce (see its docstring)."""
+    import _crack_rebonding_engine_fixture as fx
+
+    from arrhenius_fracture import crack_rebonding_v10230 as _rebond
+
+    engine = fx.build_real_engine(fx.rebonding_cfg())
+    ctrl = fx.controller()
+    waveform = fx.default_waveform()
+    fx.run_to_next_fired_event(engine, ctrl, waveform)
+    assert engine._energy_gate_pending.get("rebonding_block_context") is not None
+
+    call_count = 0
+    real_action_fn = _rebond.phase_resolved_action
+
+    def _always_unqualified(*args, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        action, end_states, end_idx, diag = real_action_fn(*args, **kwargs)
+        diag = dict(diag)
+        diag["bulk_action_qualified"] = False
+        diag["total_tail_action_error_bound"] = 1.0e12
+        return action, end_states, end_idx, diag
+
+    monkeypatch.setattr(_rebond, "phase_resolved_action", _always_unqualified)
+
+    pending = engine._energy_gate_pending
+    committed_length = pending["proposal_m"]
+    gate = {
+        "energy_admissible_event_length_m": committed_length,
+        "arrest_reason": "test_commit",
+        "hazard_resistance_J_per_m2": 1.0,
+        "orientation_gamma_relative": 1.0,
+    }
+    result_ref = pending["descriptor"].get("energy_gate_result_ref")
+
+    max_extensions = engine._rebonding_state.cfg.bulk_action_max_transient_extensions
+    with pytest.raises(RuntimeError, match="bulk-action certificate not qualified"):
+        engine.commit_energy_gated_event(committed_length, gate, result_ref)
+
+    # Bisection calls phase_resolved_action_fn multiple times per solve; each
+    # of those calls independently retries up to max_extensions+1 times
+    # before giving up -- so the raise must come from the FIRST bisection
+    # call to exhaust its own retry budget, confirming the retry loop is
+    # bounded rather than silently accepting the uncertified result at any
+    # point.
+    assert call_count >= max_extensions + 1

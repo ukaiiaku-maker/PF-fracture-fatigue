@@ -263,7 +263,174 @@ unconditionally).
 | Frozen, hashed parameter set | `freeze_reference_action_preset` (`sha256` of canonical sorted JSON) |
 
 Not yet exercised against live solver preflights -- that belongs to the
-deferred Part X physical campaign.
+deferred Part X physical campaign. **Used directly** by the S8B causal
+calibration below, via `solve_reference_action_barriers` with the
+`"persistent"` preset.
+
+## S8: Full-state and accuracy qualification (round-3 follow-up)
+
+Round-3's post-`668c6a2` assessment accepted the corrected injection point
+and the production-chain qualification test as a strong prephysical
+milestone, but required one further gate before authorizing Part X or a
+merge: `S8_REBONDING_FULL_STATE_AND_ACCURACY_QUALIFICATION`, with four
+sub-requirements (S8A-D). All four are implemented; two (S8A, S8B) close the
+requirement fully, one (S8C) replaces an uncertified approximation with a
+certified bound, and one (S8D) is honestly scoped to what is feasible in
+this environment.
+
+### S8A -- full-state chronological reference comparison
+
+`tests/test_v10_2_30_crack_rebonding_full_state_reference.py` forks one real
+engine (`copy.deepcopy`, hence identical RNG/threshold stream) into
+`production` (driven through the normal adaptive-Simpson block integrator,
+`persistent_site_coupled_hazard_v10229.py::commit_interval`) and `reference`
+(driven by calling `_phase_statistics`/`_commit_constant_segment` directly
+and repeatedly at `1/(n_phase * 10000)` cycles per step -- bypassing the
+Simpson-adaptive recursion but reusing the exact same underlying physics
+primitive, not a parallel reimplementation). Both commit through the
+identical `commit_energy_gated_event`. After each of 2 accepted events, the
+full MPZ/ledger/RNG state is compared via the repo's existing
+`persistent_site_high_cycle_state_v10230.py` utilities
+(`serialize_active_state`/`residual_metrics`, `capture_ledgers`/
+`ledger_delta`, `capture_stochastic_state`/`stochastic_state_equal`) --
+these already power `commit_energy_gated_event`'s own pre/post-commit
+snapshots, so no new state-enumeration code was needed.
+
+Two real, non-rebonding-specific findings surfaced and were resolved
+honestly rather than papered over:
+- `engine.K_prev` initially diverged (production sets it unconditionally in
+  `CoupledPersistentSiteCyclicTipEngine.cycle_step_waveform`,
+  `persistent_site_cyclic_coupled_v10229.py:71`, a pure bookkeeping field
+  with zero feedback into physics, confirmed absent from
+  `_integrate_coupled`); the reference loop, which calls the lower-level
+  primitives directly and so never reaches that wrapper, now mirrors the
+  same harmless assignment.
+- The wake's `elapsed_time_s` clock and, at the second event, the wake
+  kinetics (`p_P`/`p_C`/`p_B`) showed a genuine, bounded, resolution-limited
+  residual (confirmed by a direct convergence study, not asymptotic
+  argument-only): `_commit_constant_segment` holds one "cycle-averaged"
+  rate constant for its whole segment; production's own pre-existing
+  (non-rebonding) adaptive block-size selector naturally shrinks toward
+  B=1, refreshing that average far more often than any practical fixed
+  reference step size, and cleavage rate's Arrhenius-exponential
+  sensitivity to stress amplifies even small staleness into a measurable
+  "elapsed wall-clock time to reach the same accumulated hazard action"
+  difference -- while the resulting MPZ/ledger *state* (which tracks
+  accumulated action directly, not wall-clock time) is empirically
+  insensitive to this and converges far tighter. Frozen, empirically-derived
+  tolerances (not tuned past the point of passing) are documented in the
+  test file itself.
+
+### S8B -- dynamically generated nonzero rebonding (causal test)
+
+`tests/test_v10_2_30_crack_rebonding_causal_bonding.py` uses
+`solve_reference_action_barriers` with `REFERENCE_ACTION_PRESETS["persistent"]`
+(`A_on=10, A_off=0.1`) plus a calibrated `restored_work_of_separation_J_m2=50,
+rebond_K_geometry_factor=2.0` (chosen by a direct calibration sweep,
+documented in the test file: weaker values give undetectable shielding,
+markedly stronger values suppress the second event entirely within a
+reasonable call budget -- the saturated regime this pass is explicitly
+scoped to avoid) to drive two real engines (RB1 contact-proxy-only vs. RB2
+calibrated reversible rebonding) from the same starting state through two
+accepted events, sampling the event-1-created patch's `p_B` and the wake's
+`K_rebond_Pa_sqrt_m` between events. Confirms, on the live kinetics (not a
+manually seeded patch): `max(p_B) > 0`, `max(K_rebond) > 0`
+(`K_rebond` reaches roughly 40% of `Kmax` at the calibrated point), and
+`t_event_2^RB2 > t_event_2^RB1` (roughly double the waiting time) under the
+identical threshold stream -- while `sigma_tip` (the emission-facing
+quantity) stays bit-identical between RB1 and RB2 both before and after the
+first event, and the accepted event length matches exactly at both events
+(confirming `HAZARD_ONLY_REBOND_SHIELD` on the real engine, not just by
+source-level argument), and the second event's newly created patch still
+starts with `p_B=0` regardless of how much the first patch bonded.
+
+### S8C -- certified periodic-orbit error bound (replaces the best-effort fallback)
+
+The VHCF bulk-action acceleration (see above) previously used "the last
+resolved transient cycle's action" as the bulk representative for all
+remaining cycles, with `strictly_converged` computed but never enforced --
+an unbounded-error approximation with no fail-closed signal. Replaced with a
+certified bound, in `phase_resolved_action`'s bulk branch:
+
+| Step | Implementation |
+|---|---|
+| Per active patch, the exact one-cycle propagator `M_cycle` (3x3, already implicit in the existing per-cycle factor list) | `crack_rebonding_kinetics_v10230._partial_product(factors_cycle, 0, n_phase)` |
+| The periodic state `p*` reached FROM the current transient-end state (not a generic global fixed point -- deliberately avoids picking "the" eigenvalue-1 eigenvector when `M_cycle` is reducible, e.g. a currently-unreached-and-unreachable passivated state gives `M_cycle` more than one eigenvalue exactly 1, a legitimate benign case that an earlier version's naive "exclude one eigenvalue-1 index" logic falsely treated as a vanishing spectral gap, confirmed by a failing test before this fix) | `_periodic_orbit_certificate`, via forward-simulated `matrix_power(M_cycle, N_big) @ p_current` (`O(log N_big)`, free even for huge `N_big`) |
+| Subdominant eigenvalue magnitude `rho` (every eigenvalue within `gap_tol` of 1 excluded from the subdominant set, however many there are) | same function |
+| The unbiased bulk representative `A_c(p*)` (one more exact Strang-cycle from `p*`, replacing "last resolved transient cycle's action" -- removes the dominant, non-decaying bias term the old design had) | `_run_exact_cycle` |
+| Secant-based local sensitivity `L_A = \|A_c(p_transient_end) - A_c(p*)\| / dist0` (an honestly-approximate, auditable stand-in for a local Lipschitz constant along the actually-observed deviation direction -- not a global constant, since `lambda_cleave_fn` is an arbitrary caller-supplied callable with no declared smoothness contract) | same bulk branch |
+| Geometric-series tail bound `S = sum_k \|\|M_cycle^k p_current - p*\|\| / dist0` (numerically summed via repeated `matrix_power`, converges independent of the remaining cycle count once `A_c(p*)` is the representative) | same bulk branch |
+| `total_tail_action_error_bound = L_A * dist0 * S`; `bulk_action_qualified = strictly_converged or (bound <= cfg.bulk_action_error_rel_tol * accumulated_action)` | same bulk branch, returned in a new 4th `diagnostics` dict element of `phase_resolved_action`'s return tuple |
+
+New config fields: `bulk_action_error_rel_tol` (default `1e-3`),
+`bulk_action_max_transient_extensions` (default `1`). Enforcement is
+caller-side, not inside `phase_resolved_action` (which never raises,
+consistent with the module's existing propose-verify-bisect convention):
+`persistent_site_cyclic_energy_gated_v10230.py::_commit_rebonding_event`'s
+`phase_resolved_action_fn` closure retries with a doubled transient budget
+on an unqualified result, then raises rather than let an uncertified bulk
+answer feed the event-time root-finder --
+`tests/test_v10_2_30_crack_rebonding_event_time_coupling.py::test_commit_rebonding_event_fails_closed_on_uncertified_bulk_action`
+confirms this via a monkeypatched always-unqualified diagnostic on a real
+engine, checking both the raise and the bounded retry count.
+`phase_resolved_action`'s return signature changed from a 3-tuple to a
+4-tuple (`action, end_states, end_idx, diagnostics`); all call sites across
+the module and its test suite were updated.
+
+### S8D -- outer-driver exercise, honestly scoped
+
+**Part 1 (implemented in full)**: `V10230_FATIGUE_INTEGRATOR_MODE`
+(`crack_rebonding_kinetics_v10230.fatigue_integrator_mode_from_environment`,
+default `"accelerated"`, byte-identical to pre-S8 behavior) lets
+`sharp_front_v10_2_30_energy_gated_fatigue.py::main` skip just the one
+accelerated-integrator monkeypatch
+(`_coupled_commit.integrate_state_coupled_waveform = _high_cycle.integrate_state_coupled_waveform`)
+when explicitly set to `"explicit"`, leaving every other monkeypatch
+installed normally. This exists because investigation confirmed *why* the
+Gate-S0 fail-closed check must be unconditional today: for a real
+`--fatigue-cycles` run, that one swap is what replaces the confirmed
+rebonding injection point
+(`persistent_site_coupled_hazard_v10229.integrate_state_coupled_waveform`,
+reached via `persistent_site_cyclic_coupled_v10229.py:4,55`) with the
+accelerated engine, unconditionally, regardless of run length -- rebonding's
+real injection point is never reached once that swap is applied. The
+default path (`integrator_mode` unset) is untouched --
+`tests/test_v10_2_30_crack_rebonding_integrator_mode.py` regression-pins the
+pre-existing `test_v10_2_30_crack_rebonding_acceleration_gate.py` behavior
+alongside the new opt-in path.
+
+**Part 2 (implemented at the feasible scope, honestly bounded)**: round-3's
+concern was that the permanent qualification test calls
+`engine.commit_energy_gated_event(...)` directly, bypassing the real
+`EnergyGatedAvalancheBackend.advance()` -> `finalize_engine_event()` outer
+chain. Investigation confirmed that exercising the full chain --
+`EnergyGatedAvalancheBackend.advance()` specifically -- requires a real FEM
+mesh, boundary condition set, damage field, and displacement field
+(`energy_gate_event_length`'s `kwargs["mesh"]`/`damage`/`displacement`/
+`boundary` plus a matching `OBSERVER.snapshot`), which in this repo requires
+either a real, previously-built production kernel-family JSON (validated by
+a slow FEM/mesh-resolving subprocess,
+`scripts/ensure_v10_2_28_signed_kernel.py`) or a from-scratch synthetic FEM
+fixture -- neither exists as a lightweight fixture here, and building either
+is out of scope for a prephysical qualification pass (hours of unplanned
+FEM/mesh engineering, not what this gate asks for). This is the one
+honestly-open gap in S8.
+
+What IS feasible and implemented, in
+`tests/test_v10_2_30_crack_rebonding_finalize_event_glue.py`:
+`finalize_engine_event()` itself -- the actual glue between the backend and
+`commit_energy_gated_event`, including the real `register_engine`/
+`_engine_from_id` weakref-registry lookup a genuine CLI run uses to find the
+correct live engine instance from a bare descriptor -- requires no mesh at
+all, and is exercised directly: a real engine fires and is found via the
+registry exactly as a backend-driven commit would find it; a stale/missing
+registry entry correctly raises rather than silently no-op-ing; and the
+real, file-based checkpoint mechanism
+(`persistent_site_high_cycle_checkpoint_v10230.py::write_checkpoint`/
+`restore_checkpoint`, driven by `V10230_HIGH_CYCLE_CHECKPOINT_DIR` exactly
+as a real run configures it) round-trips the rebonding state correctly
+after a commit reached through this real glue function, and correctly
+omits the `crack_rebonding` key entirely for a disabled engine.
 
 ## Solver-hash provenance
 
@@ -315,8 +482,20 @@ that were never generated in this isolated worktree -- e.g.
 model-id/registry tests with a similar missing-artifact shape. None of
 these were introduced or altered by this module; they are reported here
 rather than silently omitted, per the round-3 review's explicit
-instruction. With this module's edits present, the same sweep shows exactly
-78 pre-existing failures plus the 4 new
+instruction. With the round-3 (`668c6a2`) production-file edits present, the
+same sweep showed exactly the same 78 pre-existing failures plus the 4 new
 `test_v10_2_30_crack_rebonding_full_production_qualification.py` tests, all
 passing -- i.e. **zero net new failures** once the `_commit_constant_segment`
 caller-site regression above was found and fixed.
+
+**Repeated for the S8 pass**: with S8A-D's production-file edits present
+(`crack_rebonding_v10230.py`'s certified-bound rewrite,
+`crack_rebonding_kinetics_v10230.py`'s new config fields and
+`fatigue_integrator_mode_from_environment`, `persistent_site_cyclic_energy_gated_v10230.py`'s
+fail-closed retry wrapper, `sharp_front_v10_2_30_energy_gated_fatigue.py`'s
+`integrator_mode` branch), the same `git stash` A/B discipline (exact
+`FAILED`-test-name-set comparison, not just totals) again shows **exactly
+the same 78 pre-existing failures, zero new, zero fixed** -- confirmed
+separately from the 170/170-passing rebonding-specific suite (up from 156 at
+the round-3 commit: +14 across the five new S8 test files plus the extra
+assertions added to existing VHCF/event-time-coupling files).

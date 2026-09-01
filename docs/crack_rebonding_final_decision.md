@@ -72,6 +72,66 @@ the old positional signature and broke with the new `controller` parameter.
 Caught by a full, unfiltered regression sweep (not `-x`), fixed by threading
 `controller` through; see "Regression-sweep results" below.
 
+## S8: full-state and accuracy qualification pass
+
+The round-3 assessment of commit `668c6a2` accepted the injection-point
+correction and production-chain qualification as a strong milestone but
+required one further gate, `S8_REBONDING_FULL_STATE_AND_ACCURACY_QUALIFICATION`,
+before authorizing Part X or a merge — four sub-requirements, all addressed:
+
+- **S8A (full-state chronological reference)**: `test_v10_2_30_crack_rebonding_full_state_reference.py`
+  compares a real engine driven through the normal adaptive-Simpson block
+  integrator against an independent fine-step reference (same starting
+  state, same RNG/threshold stream, same underlying `_phase_statistics`/
+  `_commit_constant_segment` primitive at far finer granularity) through 2
+  accepted events, using the repo's own `serialize_active_state`/
+  `residual_metrics`/`capture_ledgers`/`capture_stochastic_state` utilities
+  — the full MPZ/ledger/RNG state agrees to a tight, frozen tolerance; the
+  wake's own chronological clock and kinetics agree to a looser, empirically
+  justified tolerance reflecting a genuine (pre-existing, non-rebonding)
+  numerical-resolution effect, documented in the test file and the
+  equation-lineage doc. This closes the one invariant round-3 explicitly
+  flagged as not yet attempted.
+- **S8B (causal bond formation)**: `test_v10_2_30_crack_rebonding_causal_bonding.py`
+  uses the existing reference-action parameter generator
+  (`solve_reference_action_barriers` with the `"persistent"` preset) to
+  calibrate a strong-but-nonsaturated configuration, confirmed by a direct
+  calibration sweep, and shows on the real engine's *live* kinetics (not a
+  manually seeded patch): nonzero bonded fraction and nonzero `K_rebond`
+  develop between two real events, the second event is measurably delayed
+  (roughly doubled) relative to a contact-proxy-only control under the
+  identical threshold stream, emission stays bit-identical, and the
+  accepted event length is unaffected — closing round-3's concern that the
+  earlier qualification test proved bookkeeping but not the live causal
+  mechanism.
+- **S8C (certified VHCF bound)**: the bulk-action acceleration's earlier
+  "last resolved transient cycle as best-effort representative" (no error
+  bound, no fail-closed signal) is replaced with a periodic-orbit
+  certificate — the true periodic state and subdominant eigenvalue of each
+  patch's exact one-cycle propagator, an unbiased bulk representative, and a
+  numerically-summed geometric-series tail-action-error bound, with
+  caller-side fail-closed enforcement (retry with an extended transient
+  budget, then raise) rather than ever committing an event on an uncertified
+  estimate. See the equation-lineage doc for the full derivation and the
+  two real bugs found and fixed while implementing it (a false-degeneracy
+  bug from naively excluding only one eigenvalue when a patch's generator is
+  legitimately reducible, and the resulting need to compute the periodic
+  state by forward simulation rather than eigenvector selection).
+- **S8D (outer-driver exercise), honestly scoped**: an additive,
+  default-preserving `V10230_FATIGUE_INTEGRATOR_MODE` selector
+  (`"accelerated"` default, byte-identical to before; `"explicit"` opt-in)
+  makes a genuine CLI run with rebonding enabled possible in principle,
+  resolving *why* the Gate-S0 acceleration gate must be unconditional today.
+  Investigation confirmed that exercising the full outer chain through
+  `EnergyGatedAvalancheBackend.advance()` requires a real FEM
+  mesh/boundary/damage/displacement fixture that does not exist in this
+  repo and would require hours of unplanned engineering to construct — an
+  honestly-scoped, documented gap, not attempted. What IS implemented and
+  tested: `finalize_engine_event()` itself — the real glue function,
+  including the actual `register_engine`/`_engine_from_id` weakref-registry
+  lookup a genuine run uses — plus a full round trip through the real,
+  file-based checkpoint mechanism after a commit reached through that glue.
+
 ## What was built
 
 - `arrhenius_fracture/crack_rebonding_kinetics_v10230.py`: pure kinetics —
@@ -118,6 +178,15 @@ during, and after implementation:
   resolving phase-semantics ambiguity, qualifying VHCF/low-K runtime, and
   tracing the installation architecture. All four addressed in this pass;
   see "Round-3 prephysical qualification pass" above.
+- **Round 3 follow-up assessment** (post-`668c6a2`, S8, 4 points): accepted
+  the injection-point correction as a strong milestone but withheld
+  authorization further pending
+  `S8_REBONDING_FULL_STATE_AND_ACCURACY_QUALIFICATION` — full-state
+  fine-step reference agreement, live (not seeded) causal bond formation,
+  a certified VHCF error bound, and an outer-driver exercise. All four
+  addressed, one (S8D's mesh-dependent backend layer) at an honestly
+  scoped, documented partial completion; see "S8: full-state and accuracy
+  qualification pass" above.
 
 All corrections are implemented, not merely acknowledged — see
 `docs/v10_2_30_crack_rebonding_equation_lineage.md` for the equation-by-
@@ -127,16 +196,19 @@ root-finder is built on.
 
 ## Verification results
 
-- 156/156 rebonding-specific tests pass (152 from the software-integration
-  pass plus 4 new full-production-qualification tests from the round-3
-  pass).
+- 170/170 rebonding-specific tests pass (156 at the round-3 commit plus 14
+  new/added across S8A–D's five new test files and the extended VHCF/
+  event-time-coupling assertions).
 - Regression-sweep results (round-3 pass): a full, unfiltered
   `python -m pytest tests/ -q` (no `-x`, so pre-existing failures don't mask
   new ones) shows **78 pre-existing failures / 887-892 passed** both
   **before and after** the round-3 production-file edits, confirmed by a
   `git stash` A/B comparison of the exact FAILED-test-name sets — **zero net
   new failures** after the `_commit_constant_segment` third-caller
-  regression (found by this same sweep) was fixed. The 78 pre-existing
+  regression (found by this same sweep) was fixed.
+- Regression-sweep results (S8 pass): the same `git stash` A/B discipline,
+  repeated for S8A–D's production-file edits, shows the **exact same 78
+  pre-existing failures, zero new, zero fixed**. The 78 pre-existing
   failures are overwhelmingly missing-`runs/`-physical-campaign-artifact
   issues in this isolated worktree, unrelated to rebonding; see the
   equation-lineage doc's "Regression-sweep baseline caveat" section for the
@@ -190,6 +262,30 @@ root-finder is built on.
    `persistent_site_forward_coupled_hazard_v10230.py` using the old
    positional signature, caught by a full (non-`-x`) regression sweep and
    fixed by threading `controller` through.
+7. **False-degeneracy in the periodic-orbit certificate** (S8 pass): an
+   initial implementation picked "the" eigenvalue closest to 1 and treated
+   every other eigenvalue as subdominant; when a patch's generator was
+   legitimately reducible (e.g. a currently-unreached passivated state,
+   `k_PC=k_CP=0` for a whole cycle — a benign, expected case, not a modeling
+   error), `M_cycle` genuinely has more than one eigenvalue exactly 1, and
+   excluding only one of them inflated the computed subdominant eigenvalue
+   to ≈1, falsely flagging every such patch as degenerate. Caught by two
+   failing VHCF-performance tests; fixed by excluding every eigenvalue
+   within tolerance of 1 (however many) from the subdominant set, and
+   computing the periodic state by forward-simulating `matrix_power`
+   (lands in whichever invariant subspace the current state actually
+   projects onto) rather than selecting an eigenvector.
+8. **S8A reference-resolution artifact, correctly diagnosed rather than
+   silently tolerance-widened**: the fine-step reference's wake
+   `elapsed_time_s`/kinetics initially disagreed with production by ~1-4%
+   depending on granularity. Traced to a genuine, pre-existing,
+   non-rebonding property of `_commit_constant_segment` (a piecewise-
+   constant-rate-per-segment approximation whose accuracy depends on how
+   often the "current" rate estimate is refreshed, amplified by cleavage's
+   Arrhenius-exponential sensitivity to stress) rather than a rebonding
+   coupling bug — confirmed by a direct convergence study (residual shrinks
+   as the reference step size shrinks) before finalizing frozen, documented
+   tolerances, not by loosening them until the test passed.
 
 ## Known limitations, honestly scoped
 
@@ -197,25 +293,19 @@ root-finder is built on.
   only the post-transient bulk portion achieves `O(log n)` via `matrix_power`.
   `tests/test_v10_2_30_crack_rebonding_vhcf_performance.py` confirms this is
   sufficient for billion-cycle VHCF blocks in practice (bounded runtime
-  unconditionally once ≥1 transient cycle resolves), but a pathologically
-  slow-relaxing configuration with `max_transient_cycles` set very high
-  would still pay the full transient cost — a tunable, not an unbounded
-  risk.
-- **Full-MPZ-state agreement against an independent fine-step reference
-  integrator, at the rebonding-corrected event time, has not been
-  attempted.** This was round-3's explicit requirement and is the one
-  numbered invariant from its 12-item recommended-gate list not covered by
-  `test_v10_2_30_crack_rebonding_full_production_qualification.py`. Building
-  a fine-step brute-force reference (stepping the full MPZ + rebonding state
-  phase-by-phase rather than via the adaptive-Simpson/exact-propagator
-  machinery, over the same threshold stream/RNG draws) is a substantial
-  independent effort — plausible but not attempted in this pass. This is
-  the reason `REBONDING_PREPHYSICS_INTEGRATION_QUALIFIED` (the classification
-  round-3 named as the outcome of a fully-completed recommended gate) is
-  **not** claimed below; what is qualified is the round-3-required
-  end-to-end production-chain exercise (stochastic first passage +
-  transactional event + event-generated wake for ≥2 events), not the
-  fine-step numerical cross-check.
+  unconditionally once ≥1 transient cycle resolves), and the bulk *action*
+  representative is now certified (S8C) rather than best-effort — an
+  uncertified bound now fails closed (extends the transient budget, then
+  raises) instead of silently committing.
+- **The full outer FEM/mesh backend (`EnergyGatedAvalancheBackend.advance()`)
+  has not been exercised**, and is not feasible to exercise in this
+  environment without first constructing a real production kernel-family
+  (a slow, out-of-scope FEM/mesh subprocess build) or a from-scratch
+  synthetic FEM fixture (substantial, error-prone, out-of-scope
+  engineering). This is the one residual gap from S8D; what IS exercised is
+  `finalize_engine_event()` itself (the real glue/registry-lookup layer,
+  requiring no mesh) plus a full round trip through the real file-based
+  checkpoint mechanism.
 - **Part X (the physical campaign) has not been run.** No claim is made
   about whether rebonding alters, steepens, flattens, or arrests the Paris
   response.
@@ -223,24 +313,24 @@ root-finder is built on.
 ## Terminal classification
 
 ```
-REBONDING_CORE_SOFTWARE_QUALIFIED
-LIVE_TRANSACTIONAL_PATH_QUALIFIED_PENDING_FINE_STEP_REFERENCE
-VHCF_REBONDING_PERFORMANCE_QUALIFIED
+REBONDING_PREPHYSICS_INTEGRATION_QUALIFIED
+  (mesh-dependent EnergyGatedAvalancheBackend.advance() layer not exercised;
+   finalize_engine_event() and the real checkpoint mechanism are)
 PHYSICAL_PARIS_EFFECT_NOT_YET_EVALUATED
 ```
 
-`LIVE_TRANSACTIONAL_PATH_QUALIFIED_PENDING_FINE_STEP_REFERENCE` reflects
-that the real production engine's stochastic-first-passage ->
-energy-gated-transaction -> event-generated-wake chain is now exercised
-and verified end-to-end for ≥2 accepted events (round-3's core concern,
-fully addressed), while the fine-step MPZ-state reference comparison
-remains open (round-3's numerical-agreement requirement, not yet
-attempted) — an intermediate label between the round-3-suggested
-`LIVE_TRANSACTIONAL_PATH_NOT_YET_QUALIFIED` (too pessimistic; the chain is
-now proven to work correctly on the real engine) and
-`REBONDING_PREPHYSICS_INTEGRATION_QUALIFIED` (too strong; that label was
-tied to completing all 12 recommended-gate invariants, and the fine-step
-comparison specifically was not completed).
+With S8A (full-state fine-step reference agreement), S8B (live, non-seeded
+causal bond formation with a measurable event-time delay), and S8C
+(certified, fail-closed VHCF bulk-action bound) all complete, and S8D
+complete at the maximum feasible scope in this environment (the
+`integrator_mode` selector plus the real `finalize_engine_event`/checkpoint
+glue, with the mesh-dependent backend layer honestly documented as an
+out-of-scope residual gap rather than silently claimed), this pass now
+meets the substance of round-3's recommended gate — the classification it
+named as the outcome of a fully-completed gate,
+`REBONDING_PREPHYSICS_INTEGRATION_QUALIFIED`, is adopted, with the one
+residual gap stated explicitly alongside it rather than folded into the
+label itself.
 
 ## Branch/commit state
 

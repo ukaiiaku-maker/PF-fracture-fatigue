@@ -79,23 +79,34 @@ def test_bulk_action_matches_exhaustive_exact_stepping():
         lambda_cleave_fn=_lambda_cleave_fn,
     )
 
-    action_exact, states_exact, idx_exact = phase_resolved_action(
+    action_exact, states_exact, idx_exact, diag_exact = phase_resolved_action(
         bulk_cycle_threshold=10_000, **kwargs  # effectively disables bulk mode
     )
-    # max_transient_cycles=30 for a 40-cycle interval: strict convergence to
-    # bulk_convergence_rel_tol may or may not be reached within budget, so
-    # the comparison tolerance reflects "close, best-effort periodic
-    # representative," not a required bit-exact match (that stronger claim
-    # is only true once strict convergence is actually detected, which a
-    # tighter budget/looser tolerance combination achieves more reliably --
-    # see the second assertion below).
-    action_bulk, states_bulk, idx_bulk = phase_resolved_action(
+    assert diag_exact["bulk_action_used"] is False
+    assert diag_exact["bulk_action_qualified"] is True
+
+    # max_transient_cycles=30 for a 40-cycle interval, against a config
+    # whose relaxation time is genuinely ~200 cycles (see below): 30 cycles
+    # is deliberately insufficient to actually reach the periodic orbit, so
+    # the certified bound correctly reports bulk_action_qualified=False here
+    # -- this is the S8C fail-closed signal doing its job, not a bug. The
+    # numeric comparison tolerance reflects "still approximately close,
+    # honestly uncertified," not a required bit-exact match (that stronger
+    # claim is only true once the bound actually certifies, exercised by
+    # the tight case below).
+    action_bulk, states_bulk, idx_bulk, diag_bulk = phase_resolved_action(
         bulk_cycle_threshold=5, bulk_convergence_rel_tol=1.0e-8, max_transient_cycles=30, **kwargs
     )
 
     assert idx_exact == idx_bulk
-    assert action_bulk == pytest.approx(action_exact, rel=5.0e-4)
+    assert action_bulk == pytest.approx(action_exact, rel=2.0e-3)
     assert states_bulk[0].sum() == pytest.approx(1.0, abs=1.0e-8)
+    assert diag_bulk["bulk_action_used"] is True
+    assert diag_bulk["periodic_orbit_solved"] is True
+    assert diag_bulk["transient_cycles_resolved"] == 30
+    assert 0.0 <= diag_bulk["subdominant_eigenvalue"] < 1.0
+    assert diag_bulk["total_tail_action_error_bound"] >= 0.0
+    assert diag_bulk["bulk_action_qualified"] is False
 
     # This configuration's compression-gated formation vs. slow rupture
     # gives it a genuinely long relaxation time relative to one cycle (~200
@@ -103,11 +114,12 @@ def test_bulk_action_matches_exhaustive_exact_stepping():
     # kind of physical scenario, not an artifact of the test. With a larger
     # transient budget that actually spans the relaxation time, the match
     # tightens substantially.
-    action_bulk_tight, states_bulk_tight, _ = phase_resolved_action(
+    action_bulk_tight, states_bulk_tight, _, diag_bulk_tight = phase_resolved_action(
         bulk_cycle_threshold=5, bulk_convergence_rel_tol=1.0e-6, max_transient_cycles=n_cycles, **kwargs
     )
     assert action_bulk_tight == pytest.approx(action_exact, rel=1.0e-6)
     assert states_bulk_tight[0][2] == pytest.approx(states_exact[0][2], abs=1.0e-6)
+    assert diag_bulk_tight["bulk_action_qualified"] is True
 
 
 def test_bulk_action_matches_exact_for_non_integer_cycle_count():
@@ -140,8 +152,8 @@ def test_bulk_action_matches_exact_for_non_integer_cycle_count():
         r_eff_m=1.0e-6,
         lambda_cleave_fn=_lambda_cleave_fn,
     )
-    action_exact, _, idx_exact = phase_resolved_action(bulk_cycle_threshold=10_000, **kwargs)
-    action_bulk, _, idx_bulk = phase_resolved_action(
+    action_exact, _, idx_exact, _ = phase_resolved_action(bulk_cycle_threshold=10_000, **kwargs)
+    action_bulk, _, idx_bulk, _ = phase_resolved_action(
         bulk_cycle_threshold=3, bulk_convergence_rel_tol=1.0e-8, max_transient_cycles=15, **kwargs
     )
     assert idx_exact == idx_bulk
@@ -161,7 +173,7 @@ def test_bulk_mode_is_dramatically_faster_for_a_billion_cycles():
         return _K_phase(idx, n_phase, Kmax, R)
 
     start = time.perf_counter()
-    action, states, _ = phase_resolved_action(
+    action, states, _, diag = phase_resolved_action(
         active_patches=[patch],
         patch_states={0: patch.state_vector()},
         k0=0,
@@ -184,15 +196,28 @@ def test_bulk_mode_is_dramatically_faster_for_a_billion_cycles():
     assert math.isfinite(action)
     assert states[0].sum() == pytest.approx(1.0, abs=1.0e-6)
     assert 0.0 <= states[0][2] <= 1.0 + 1.0e-6
+    assert diag["bulk_action_used"] is True
+    assert math.isfinite(diag["total_tail_action_error_bound"])
 
 
 def test_bulk_mode_stays_bounded_even_when_strict_convergence_is_never_reached():
     """If bulk_convergence_rel_tol is essentially unreachable, the function
-    must still complete fast (using the last transient cycle's action as a
-    best-effort periodic representative) rather than silently degrading
-    into O(n_cycles) exact stepping for a huge interval -- an earlier
-    version of this function could hang for exactly this reason (caught by
-    a genuinely hanging test before the fix)."""
+    must still complete fast (runtime is always bounded -- state propagation
+    is exact regardless of action-bound certification) rather than silently
+    degrading into O(n_cycles) exact stepping for a huge interval -- an
+    earlier version of this function could hang for exactly this reason
+    (caught by a genuinely hanging test before the fix).
+
+    S8C (round-3 follow-up): this scenario is deliberately slow-relaxing
+    (bond_barrier_eV=0.5 is a genuinely slow formation rate) with only 20
+    transient cycles resolved -- the certified periodic-orbit bound is
+    expected to correctly flag this as NOT qualified (large distance to the
+    true periodic state, not yet within tolerance), rather than silently
+    returning an uncertified answer with no signal. The caller
+    (persistent_site_cyclic_energy_gated_v10230.py's phase_resolved_action_fn
+    closure) is what actually fails closed on this signal -- see
+    tests/test_v10_2_30_crack_rebonding_event_time_coupling.py for that
+    enforcement path."""
     cfg = _cfg(
         bond_barrier_eV=0.5, bond_attempt_frequency_s=1.0e2,  # very slow, near-linear buildup
         rupture_barrier_eV=5.0,  # negligible rupture
@@ -206,7 +231,7 @@ def test_bulk_mode_stays_bounded_even_when_strict_convergence_is_never_reached()
         return _K_phase(idx, n_phase, Kmax, R)
 
     start = time.perf_counter()
-    action, states, _ = phase_resolved_action(
+    action, states, _, diag = phase_resolved_action(
         active_patches=[patch],
         patch_states={0: patch.state_vector()},
         k0=0,
@@ -230,3 +255,7 @@ def test_bulk_mode_stays_bounded_even_when_strict_convergence_is_never_reached()
     assert elapsed < 2.0, f"non-convergent bulk evaluation took {elapsed:.2f}s, expected sub-second (bounded runtime)"
     assert math.isfinite(action)
     assert states[0].sum() == pytest.approx(1.0, abs=1.0e-6)
+    assert diag["bulk_action_used"] is True
+    assert diag["strict_convergence_reached"] is False
+    assert diag["bulk_action_qualified"] is False
+    assert diag["total_tail_action_error_bound"] > 0.0

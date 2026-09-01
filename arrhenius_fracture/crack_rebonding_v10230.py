@@ -439,6 +439,129 @@ def representative_cycle_K_rebond(
     return K_rebond_phase
 
 
+def _run_exact_cycle(
+    *,
+    active_patches: list[WakePatch],
+    states: dict[int, np.ndarray],
+    Q_lists: dict[int, list[np.ndarray]],
+    K_phase_fn: Callable[[int], float],
+    idx0: int,
+    n_phase: int,
+    dt_phase: float,
+    K_shield_Pa_sqrt_m: float,
+    r_eff_m: float,
+    lambda_cleave_fn: Callable[[float], float],
+    L_h: float,
+    L_w: float,
+    K_rebond_max: float,
+) -> tuple[float, dict[int, np.ndarray]]:
+    """One exact Strang-split cycle (``n_phase`` bins) starting from an
+    arbitrary joint ``states`` dict, using each patch's precomputed per-cycle
+    generator list ``Q_lists``. Pure -- no closures over caller state -- so
+    it can be evaluated at any probe state (the true periodic state, the
+    actual transient-end state, an intermediate blend) without disturbing
+    the caller's own trajectory. Used only by the periodic-orbit certificate
+    below; the main transient/bulk loop keeps using its own ``_one_bin``.
+    """
+    idx = idx0 % n_phase
+    cur = {pid: np.asarray(p, dtype=float).copy() for pid, p in states.items()}
+    action = 0.0
+    for step in range(n_phase):
+        K_s = K_phase_fn(idx)
+        total_weighted = 0.0
+        new_states: dict[int, np.ndarray] = {}
+        for patch in active_patches:
+            Q = Q_lists[patch.patch_id][step]
+            half = expm(Q * (0.5 * dt_phase))
+            p_mid = half @ cur[patch.patch_id]
+            w = wake_weight(patch.s_j_m, L_h, L_w)
+            total_weighted += p_mid[2] * w * patch.length_m
+            new_states[patch.patch_id] = half @ p_mid
+        H_b = min(1.0, max(total_weighted, 0.0))
+        K_rebond = K_rebond_max * H_b
+        sigma_c = cleavage_stress_with_rebond(K_s, K_shield_Pa_sqrt_m, K_rebond, r_eff_m)
+        action += lambda_cleave_fn(sigma_c) * dt_phase
+        cur.update(new_states)
+        idx = (idx + 1) % n_phase
+    return action, cur
+
+
+def _periodic_orbit_certificate(
+    M_cycle: np.ndarray, p_current: np.ndarray, max_terms: int
+) -> dict[str, Any]:
+    """Solve for the periodic fixed point of one active patch's exact
+    one-cycle propagator ``M_cycle`` (``p_{n+1} = M_cycle @ p_n``, column-
+    stochastic since the underlying generator's columns sum to zero --
+    confirmed in ``build_Q``: ``ones`` is the left eigenvector for
+    eigenvalue 1), and bound the decay of the SPECIFIC trajectory starting
+    at ``p_current`` toward it.
+
+    Deliberately avoids picking "the" eigenvalue-1 eigenvector and treating
+    every other eigenvalue as subdominant: a patch with, e.g., a currently
+    unreachable-and-unreached passivated state (``k_PC=k_CP=0`` over an
+    entire cycle at this patch's geometry -- a legitimate, benign case, not
+    a modeling error) has a genuinely reducible ``M_cycle`` with *more than
+    one* eigenvalue exactly 1, and naively excluding only one of them from
+    the subdominant set falsely inflates ``rho`` toward 1 (confirmed by a
+    failing test before this fix). Instead: every eigenvalue within
+    ``gap_tol`` of 1 is excluded from the subdominant set when computing
+    ``rho`` (however many there are), and the periodic state ``p_star``
+    reached FROM THIS SPECIFIC ``p_current`` is obtained by forward-
+    simulating ``M_cycle`` many cycles (``matrix_power``, ``O(log N)``, free
+    even for a very large ``N``) -- this automatically lands in whichever
+    invariant subspace ``p_current`` actually projects onto, sidestepping
+    the eigenvector-selection ambiguity entirely for a reducible generator.
+
+    ``degenerate=True`` marks the only genuinely unresolvable case: no
+    eigenvalue is bounded away from 1 (``rho`` undefined/zero) yet the
+    forward-simulated state has not settled (``dist0`` still nonzero) -- a
+    state without any contracting mode that has not already converged
+    cannot be bounded by this method and the caller must fail closed.
+    """
+    eigvals = np.linalg.eigvals(M_cycle)
+    gap_tol = 1.0e-6
+    is_slow = np.abs(eigvals - 1.0) < gap_tol
+    non_slow = eigvals[~is_slow]
+    rho = float(np.max(np.abs(non_slow))) if non_slow.size else 0.0
+
+    p_current = np.asarray(p_current, dtype=float)
+    if rho <= 0.0:
+        n_big = 1
+    else:
+        rho_clamped = min(rho, 0.999999)
+        n_big = min(10**7, max(64, int(math.ceil(60.0 / max(-math.log10(rho_clamped), 1.0e-9)))))
+    p_star = np.linalg.matrix_power(M_cycle, n_big) @ p_current
+    p_star = np.clip(p_star, 0.0, None)
+    total = float(p_star.sum())
+    if total > 1.0e-12:
+        p_star = p_star / total
+
+    dist0 = float(np.linalg.norm(p_current - p_star))
+
+    if dist0 <= 1.0e-12:
+        return {"p_star": p_star, "rho": rho, "dist0": 0.0, "S": 0.0, "degenerate": False}
+
+    if non_slow.size == 0:
+        # No contracting mode at all, and the state has not already
+        # settled -- cannot be bounded; caller must fail closed.
+        return {"p_star": p_star, "rho": rho, "dist0": dist0, "S": float("inf"), "degenerate": True}
+
+    # Sum the actual normalized deviation trajectory ||M^k p0 - p*|| / dist0
+    # -- tied to this specific starting state (tighter than a generic
+    # operator-norm bound), via repeated squaring so this stays cheap even
+    # for a large max_terms.
+    S = 0.0
+    Mk = np.eye(3)
+    for _ in range(max(int(max_terms), 1) + 1):
+        state_k = Mk @ p_current
+        term = float(np.linalg.norm(state_k - p_star)) / dist0
+        S += term
+        if term < 1.0e-12:
+            break
+        Mk = M_cycle @ Mk
+    return {"p_star": p_star, "rho": rho, "dist0": dist0, "S": S, "degenerate": False}
+
+
 def phase_resolved_action(
     *,
     active_patches: list[WakePatch],
@@ -458,40 +581,56 @@ def phase_resolved_action(
     bulk_cycle_threshold: int = 50,
     bulk_convergence_rel_tol: float = 1.0e-6,
     max_transient_cycles: int = 200,
-) -> tuple[float, dict[int, np.ndarray], int]:
+) -> tuple[float, dict[int, np.ndarray], int, dict[str, Any]]:
     """Delta B_c(t_interval) = integral_0^t_interval lambda_c[K(tau), K_rebond(tau)] dtau,
     exact for the piecewise-constant phase discretization, starting from
-    ``patch_states`` at phase index ``k0``. Returns (action, end_states, end_phase_index).
+    ``patch_states`` at phase index ``k0``. Returns
+    ``(action, end_states, end_phase_index, diagnostics)``.
 
     This is the phase-resolved evaluator required by the event-time coupling
     guardrail: no block-midpoint or block-constant shortcut is used here.
 
     Periodic-orbit bulk-action acceleration (round-3 review: VHCF/low-K
-    performance): for interval widths spanning more than ``bulk_cycle_threshold``
-    whole cycles, this resolves a finite transient exactly, cycle by cycle,
-    checking whether the per-cycle action and the ensemble's end-of-cycle
-    bonded-fraction state have both stopped changing (each K(phase) sequence
-    repeats identically every ``n_phase``-bin cycle, so the per-cycle map
-    state->state and state->action is time-invariant and converges to a
-    periodic orbit). Once either strict convergence is detected or
-    ``max_transient_cycles`` is exhausted, the remaining whole cycles are
-    represented as ``remaining_cycles * A_c`` (the last resolved transient
-    cycle's action) with the wake state advanced exactly via
-    ``crack_rebonding_kinetics_v10230.propagate``'s ``O(log n)``
-    ``matrix_power`` -- the state propagation is always exact for that
-    per-cycle map, regardless of whether the action itself has strictly
-    converged. Runtime is therefore bounded UNCONDITIONALLY once at least
-    one transient cycle has resolved: no configuration can silently degrade
-    into O(n_cycles) exact stepping for a large interval merely because
-    convergence was slow, which an earlier version of this function could
-    do (caught by a test that hung on a near-billion-cycle interval before
-    this fix). A non-strictly-converged bulk representative is a deliberate,
-    documented approximation for genuinely slow-relaxing configurations, not
-    silently wrong: `tests/test_v10_2_30_crack_rebonding_vhcf_performance.py`
-    verifies the bulk result agrees with exhaustive exact stepping to a
-    tight tolerance for representative physical rate scales. For
-    ``n_full <= bulk_cycle_threshold`` the original exact bin-by-bin loop
-    runs unchanged, bit-for-bit, preserving all existing test behavior.
+    performance), with a certified error bound (S8C, round-3 follow-up --
+    replaces an earlier "last resolved transient cycle as best-effort
+    representative" approximation that had no bound at all): for interval
+    widths spanning more than ``bulk_cycle_threshold`` whole cycles, this
+    resolves a finite transient exactly, cycle by cycle (each K(phase)
+    sequence repeats identically every ``n_phase``-bin cycle, so the
+    per-cycle map state->state and state->action is time-invariant). Once
+    either the existing per-cycle relative-change check converges or
+    ``max_transient_cycles`` is exhausted, each active patch's exact
+    one-cycle propagator ``M_cycle`` (3x3, cheap) is eigendecomposed to find
+    its true periodic state ``p*`` (the eigenvalue-1 right eigenvector,
+    normalized to sum to 1 -- valid since ``M_cycle`` is column-stochastic,
+    ``build_Q``'s generator columns summing to zero) and the subdominant
+    eigenvalue magnitude ``rho``. The bulk representative becomes the
+    *exact* one-cycle action evaluated with every patch AT its own periodic
+    state (``A_c(p*)``, via ``_run_exact_cycle``) rather than the action
+    from a single historical transient cycle -- this removes the dominant,
+    non-decaying bias term the old design had (its error scaled linearly
+    with the remaining cycle count; this one does not, since ``A_c(p*)`` is
+    the unbiased limiting value). The residual tail-action error is bounded
+    via a secant-based local sensitivity (``|A_c(p_transient_end) -
+    A_c(p*)| / dist0``, evaluated along the actually-observed deviation
+    direction -- an auditable, honestly-approximate stand-in for a local
+    Lipschitz constant, not a global one, since ``lambda_cleave_fn`` is an
+    arbitrary caller-supplied callable with no declared smoothness contract)
+    times a numerically-summed geometric series
+    ``S = sum_k ||(M_cycle - P*)^k||_op`` (via ``matrix_power``, converges
+    independently of the remaining cycle count). ``bulk_action_qualified``
+    in the returned diagnostics is ``True`` only when this bound is below
+    ``cfg.bulk_action_error_rel_tol`` (relative to the accumulated action)
+    OR the existing per-cycle convergence check already passed -- the
+    caller (``persistent_site_cyclic_energy_gated_v10230.py``'s
+    ``_commit_rebonding_event``) is responsible for failing closed
+    (extending the transient budget, then raising) when it is not; this
+    function itself never raises and never silently degrades runtime --
+    wake-state propagation remains exact and unconditionally ``O(log n)``
+    via ``matrix_power`` regardless of whether the action bound certifies.
+    For ``n_full <= bulk_cycle_threshold`` the original exact bin-by-bin
+    loop runs unchanged, bit-for-bit, preserving all existing test
+    behavior, with ``diagnostics = {"bulk_action_used": False, ...}``.
     """
     L_h = cfg.wake_length_m
     L_w = cfg.wake_weight_length_m
@@ -537,6 +676,18 @@ def phase_resolved_action(
     # exceeds a bin-counted threshold of 50, incorrectly triggering bulk
     # mode for a tiny interval).
     n_cycles_full, leftover_bins = divmod(n_full, n_phase)
+
+    diagnostics: dict[str, Any] = {
+        "bulk_action_used": False,
+        "periodic_orbit_solved": False,
+        "strict_convergence_reached": False,
+        "transient_cycles_resolved": 0,
+        "subdominant_eigenvalue": None,
+        "state_error_bound": None,
+        "cycle_action_error_bound": None,
+        "total_tail_action_error_bound": None,
+        "bulk_action_qualified": True,
+    }
 
     if n_cycles_full <= bulk_cycle_threshold:
         for _ in range(n_full):
@@ -585,22 +736,17 @@ def phase_resolved_action(
             # propagator once and bulk-advance via matrix_power.
             #
             # Runtime is bounded UNCONDITIONALLY once at least one transient
-            # cycle has resolved (max_transient_cycles >= 1): the last
-            # resolved cycle's action is used as the bulk representative
-            # even if bulk_convergence_rel_tol was never strictly met within
-            # the transient budget. This is a deliberate correctness/runtime
-            # tradeoff -- an earlier version fell back to exact bin-by-bin
-            # stepping for the remainder on non-convergence, which could
-            # itself become an O(n_cycles) computation for a slowly-relaxing
-            # configuration, defeating the entire point of this
-            # acceleration for the VHCF/low-K blocks it exists to serve.
-            # `strictly_converged` records which case occurred for tests/
-            # diagnostics without changing the return signature.
+            # cycle has resolved (max_transient_cycles >= 1): wake-state
+            # propagation below is exact regardless of whether the action
+            # bound (computed next) certifies. The bulk *action*
+            # representative and its certified error bound are S8C
+            # (round-3 follow-up): see the function docstring.
+            from .crack_rebonding_kinetics_v10230 import _partial_product
             from .crack_rebonding_kinetics_v10230 import build_phase_factors as _build_phase_factors
             from .crack_rebonding_kinetics_v10230 import propagate as _propagate
 
-            total_action += remaining_cycles * last_cycle_action
-            bulk_dt = remaining_cycles * n_phase * dt_phase
+            Q_lists: dict[int, list[np.ndarray]] = {}
+            factors_by_patch: dict[int, list[np.ndarray]] = {}
             for patch in active_patches:
                 Q_list_cycle = [
                     patch_Q(
@@ -612,9 +758,89 @@ def phase_resolved_action(
                     )
                     for k in range(n_phase)
                 ]
-                factors_cycle = _build_phase_factors(Q_list_cycle, dt_phase)
+                Q_lists[patch.patch_id] = Q_list_cycle
+                factors_by_patch[patch.patch_id] = _build_phase_factors(Q_list_cycle, dt_phase)
+
+            certs: dict[int, dict[str, Any]] = {}
+            any_degenerate_unconverged = False
+            max_rho = 0.0
+            for patch in active_patches:
+                M_cycle, _ = _partial_product(factors_by_patch[patch.patch_id], 0, n_phase)
+                cert = _periodic_orbit_certificate(
+                    M_cycle, p_by_patch[patch.patch_id], max_transient_cycles
+                )
+                certs[patch.patch_id] = cert
+                if not cert["degenerate"]:
+                    max_rho = max(max_rho, cert["rho"])
+                elif cert["dist0"] > 1.0e-12:
+                    any_degenerate_unconverged = True
+
+            p_star_states = {pid: cert["p_star"] for pid, cert in certs.items()}
+            action_at_star, _ = _run_exact_cycle(
+                active_patches=active_patches,
+                states=p_star_states,
+                Q_lists=Q_lists,
+                K_phase_fn=K_phase_fn,
+                idx0=idx_at_cycle_start,
+                n_phase=n_phase,
+                dt_phase=dt_phase,
+                K_shield_Pa_sqrt_m=K_shield_Pa_sqrt_m,
+                r_eff_m=r_eff_m,
+                lambda_cleave_fn=lambda_cleave_fn,
+                L_h=L_h,
+                L_w=L_w,
+                K_rebond_max=K_rebond_max,
+            )
+            action_at_transient_end, _ = _run_exact_cycle(
+                active_patches=active_patches,
+                states=p_by_patch,
+                Q_lists=Q_lists,
+                K_phase_fn=K_phase_fn,
+                idx0=idx_at_cycle_start,
+                n_phase=n_phase,
+                dt_phase=dt_phase,
+                K_shield_Pa_sqrt_m=K_shield_Pa_sqrt_m,
+                r_eff_m=r_eff_m,
+                lambda_cleave_fn=lambda_cleave_fn,
+                L_h=L_h,
+                L_w=L_w,
+                K_rebond_max=K_rebond_max,
+            )
+
+            dist0_total = sum(cert["dist0"] for cert in certs.values())
+            l_a_effective = abs(action_at_transient_end - action_at_star) / max(dist0_total, 1.0e-300)
+            if any_degenerate_unconverged:
+                tail_bound = float("inf")
+            else:
+                tail_bound = l_a_effective * sum(
+                    cert["dist0"] * cert["S"] for cert in certs.values()
+                )
+
+            bulk_representative_action = action_at_star
+            total_action += remaining_cycles * bulk_representative_action
+
+            reference_scale = max(abs(total_action), 1.0e-300)
+            qualified = strictly_converged or (
+                tail_bound <= cfg.bulk_action_error_rel_tol * reference_scale
+            )
+            diagnostics.update(
+                {
+                    "bulk_action_used": True,
+                    "periodic_orbit_solved": not any_degenerate_unconverged,
+                    "strict_convergence_reached": strictly_converged,
+                    "transient_cycles_resolved": cycles_done,
+                    "subdominant_eigenvalue": max_rho,
+                    "state_error_bound": dist0_total,
+                    "cycle_action_error_bound": l_a_effective * dist0_total,
+                    "total_tail_action_error_bound": tail_bound,
+                    "bulk_action_qualified": bool(qualified),
+                }
+            )
+
+            bulk_dt = remaining_cycles * n_phase * dt_phase
+            for patch in active_patches:
                 p_by_patch[patch.patch_id] = _propagate(
-                    p_by_patch[patch.patch_id], Q_list_cycle, factors_cycle,
+                    p_by_patch[patch.patch_id], Q_lists[patch.patch_id], factors_by_patch[patch.patch_id],
                     k0=0, dt=bulk_dt, dt_phase=dt_phase,
                 )
             # idx is unchanged (a whole number of full cycles were consumed).
@@ -639,7 +865,7 @@ def phase_resolved_action(
         K_s = K_phase_fn(idx)
         _one_bin(K_s, frac)
 
-    return total_action, p_by_patch, idx
+    return total_action, p_by_patch, idx, diagnostics
 
 
 def solve_coupled_event_time(
@@ -795,7 +1021,7 @@ def stage2_verify_block(
 ) -> dict[str, Any]:
     """Exact trial propagation of the candidate block; returns actual deltas
     and a pass/fail verdict the caller should bisect on when failed."""
-    action_exact, end_states, end_idx = phase_resolved_action(
+    action_exact, end_states, end_idx, action_diagnostics = phase_resolved_action(
         active_patches=active_patches,
         patch_states=patch_states,
         k0=k0,
@@ -846,6 +1072,7 @@ def stage2_verify_block(
         and max_dpC <= cfg.rebonding_block_max_dpC
         and dK_rebond <= cfg.rebonding_block_max_dK_rebond_frac * K_scale
         and action_error <= cfg.rebonding_block_action_consistency_tol
+        and action_diagnostics.get("bulk_action_qualified", True)
     )
 
     return {
@@ -857,6 +1084,7 @@ def stage2_verify_block(
         "action_exact": action_exact,
         "end_states": end_states,
         "end_phase_index": end_idx,
+        "action_diagnostics": action_diagnostics,
     }
 
 
