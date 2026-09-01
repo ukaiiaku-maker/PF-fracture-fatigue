@@ -1,0 +1,86 @@
+{
+  "configuration_fingerprint": "adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0",
+  "direct_load_invariance_passed_at_every_new_state": true,
+  "family": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/family.json",
+  "family_physics_fingerprint": "e0bc48eb8c3f5526877a21f8551e500046a614df8081693f340084fb73400302",
+  "family_sha256": "423bc3232326b8ccc3ffcca0aa6b5363c67bad2c64debee49925bf1e6413e8cb",
+  "old_domain_family_evaluation_exact": true,
+  "passed": true,
+  "preserved_load_payloads_byte_identical": true,
+  "preserved_state_payloads_byte_identical": true,
+  "schema": "pf_branching_theta40_append_only_direct_validation_v1",
+  "states": [
+    {
+      "maximum_relative_load_variation": 2.0048386183955184e-12,
+      "maximum_within_load_relative_spread": 3.004392110974358e-10,
+      "new_measurement": false,
+      "passed": true,
+      "report": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/load_invariance/E0000000/frozen_geometry_load_invariance.json",
+      "report_sha256": "694a314e7122a9aeb4b76f623ccd1be2f43d82ca00db2ea913fe4b0b77453314",
+      "state_id": "E0000000"
+    },
+    {
+      "maximum_relative_load_variation": 2.6671066721270026e-12,
+      "maximum_within_load_relative_spread": 1.0042323417619664e-10,
+      "new_measurement": false,
+      "passed": true,
+      "report": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/load_invariance/E0000200/frozen_geometry_load_invariance.json",
+      "report_sha256": "6945b6f1e0b368ab65bec682bf9f314aa33c4da6641ee288ca377592c1ae9068",
+      "state_id": "E0000200"
+    },
+    {
+      "maximum_relative_load_variation": 3.629388634122761e-12,
+      "maximum_within_load_relative_spread": 1.652333356195757e-10,
+      "new_measurement": false,
+      "passed": true,
+      "report": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/load_invariance/E0000400/frozen_geometry_load_invariance.json",
+      "report_sha256": "94d457cbe99263c8eebf1ab079522d48eb960d4ecd0a07a6a16e1b651139ef55",
+      "state_id": "E0000400"
+    },
+    {
+      "maximum_relative_load_variation": 3.622238326448639e-12,
+      "maximum_within_load_relative_spread": 6.737125439640613e-11,
+      "new_measurement": false,
+      "passed": true,
+      "report": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/load_invariance/E0000415/frozen_geometry_load_invariance.json",
+      "report_sha256": "7810f77c0fa8c610219b2eeb9a0b86335779c9ece8cc7964f003df88156b4b35",
+      "state_id": "E0000415"
+    },
+    {
+      "maximum_relative_load_variation": 6.988787870179953e-12,
+      "maximum_within_load_relative_spread": 4.485906696967723e-11,
+      "new_measurement": true,
+      "passed": true,
+      "report": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/load_invariance/E0000420/frozen_geometry_load_invariance.json",
+      "report_sha256": "abe77268523f78ec16a33abde403d41eab2df411b9901c6046c10ebf0014e65e",
+      "state_id": "E0000420"
+    },
+    {
+      "maximum_relative_load_variation": 2.5468203213430188e-12,
+      "maximum_within_load_relative_spread": 8.480829138554809e-11,
+      "new_measurement": true,
+      "passed": true,
+      "report": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/load_invariance/E0000425/frozen_geometry_load_invariance.json",
+      "report_sha256": "7d726122395c328db2cbf38a2260e07557512d57589b5a72cff1bbcf9c6f929b",
+      "state_id": "E0000425"
+    },
+    {
+      "maximum_relative_load_variation": 6.7986233081933365e-12,
+      "maximum_within_load_relative_spread": 4.372326814551175e-10,
+      "new_measurement": true,
+      "passed": true,
+      "report": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/load_invariance/E0000600/frozen_geometry_load_invariance.json",
+      "report_sha256": "b50152df25a78c33480b05c73da3ba0a6c77dfcecd29d478f64fa3caf225bc45",
+      "state_id": "E0000600"
+    },
+    {
+      "maximum_relative_load_variation": 7.659674237685758e-12,
+      "maximum_within_load_relative_spread": 1.6376473106961328e-10,
+      "new_measurement": true,
+      "passed": true,
+      "report": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/load_invariance/E0000745/frozen_geometry_load_invariance.json",
+      "report_sha256": "75c90acf82b29d191ff2565803ae4751c4beb773295e413aaabca7ad385bf9c0",
+      "state_id": "E0000745"
+    }
+  ]
+}

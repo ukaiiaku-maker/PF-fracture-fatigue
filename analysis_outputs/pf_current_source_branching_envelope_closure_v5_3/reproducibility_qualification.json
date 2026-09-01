@@ -1,0 +1,80 @@
+{
+  "comparisons": [
+    {
+      "byte_identical": true,
+      "path": "family.json",
+      "sha256": "423bc3232326b8ccc3ffcca0aa6b5363c67bad2c64debee49925bf1e6413e8cb"
+    },
+    {
+      "byte_identical": true,
+      "path": "new_prescribed_geometry_snapshots/E0000420/snapshot.json",
+      "sha256": "8cc9a1dcc2ff587e1bda6e92b7cf1bec1dcd4d7afd4d7ace49854252d5e4503c"
+    },
+    {
+      "byte_identical": true,
+      "path": "new_prescribed_geometry_snapshots/E0000420/state_arrays.npz",
+      "sha256": "4acbdb6441a076abf6ea67f26c002d48dad2248c8bad801f44c62fed8615f1fd"
+    },
+    {
+      "byte_identical": true,
+      "path": "load_invariance/E0000420/active_station_responses_load_1.csv",
+      "sha256": "9160f51de6acefcb537ce6c2b6ed4367517ddeabfe4c52c1008c307b2918686d"
+    },
+    {
+      "byte_identical": true,
+      "path": "new_prescribed_geometry_snapshots/E0000425/snapshot.json",
+      "sha256": "bfa0b84a9711d4b8c541f6d5ddc436a5b66f4a5737a6341b676fcf71d426d848"
+    },
+    {
+      "byte_identical": true,
+      "path": "new_prescribed_geometry_snapshots/E0000425/state_arrays.npz",
+      "sha256": "2afe7685bd175bcbbfe42bb779e7adf86dbb474f6b72fe0425384d5b0217e5f3"
+    },
+    {
+      "byte_identical": true,
+      "path": "load_invariance/E0000425/active_station_responses_load_1.csv",
+      "sha256": "92cc614a8c2325411d0c93b4a41f75cbaf5925c7526ad1b266d7393c4356982c"
+    },
+    {
+      "byte_identical": true,
+      "path": "new_prescribed_geometry_snapshots/E0000600/snapshot.json",
+      "sha256": "a27fe00d5801fec6ddaeb8006f5e655c959aa517e51e421313ef30570e5d03b9"
+    },
+    {
+      "byte_identical": true,
+      "path": "new_prescribed_geometry_snapshots/E0000600/state_arrays.npz",
+      "sha256": "0fffbd379528432f54ca87ea321124e3c8982635c7ec0db5c8ddb03911af240e"
+    },
+    {
+      "byte_identical": true,
+      "path": "load_invariance/E0000600/active_station_responses_load_1.csv",
+      "sha256": "0978bc86a005ba55b46e320e4eb1bbad10d0912e72ebfd11001b0f0c68b94d16"
+    },
+    {
+      "byte_identical": true,
+      "path": "new_prescribed_geometry_snapshots/E0000745/snapshot.json",
+      "sha256": "882fa17cc1a3ac00484212e58c4c089022a44eecd472ec4424214dbf178f7ede"
+    },
+    {
+      "byte_identical": true,
+      "path": "new_prescribed_geometry_snapshots/E0000745/state_arrays.npz",
+      "sha256": "b6714dc9655c71018cf05b3e4e6fe1507726a9deeb25895e13adb6368a385022"
+    },
+    {
+      "byte_identical": true,
+      "path": "load_invariance/E0000745/active_station_responses_load_1.csv",
+      "sha256": "ca971c5e47aa53ccc873d86e7ad8af40ab6727a3707b5cc66930cea3ab348ebe"
+    }
+  ],
+  "family_hash_equal": true,
+  "family_physics_fingerprint": "e0bc48eb8c3f5526877a21f8551e500046a614df8081693f340084fb73400302",
+  "family_sha256": "423bc3232326b8ccc3ffcca0aa6b5363c67bad2c64debee49925bf1e6413e8cb",
+  "new_state_arrays_byte_identical": true,
+  "new_state_response_tables_byte_identical": true,
+  "passed": true,
+  "physics_fingerprint_equal": true,
+  "primary_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final",
+  "producer_code_commit": "33210af0ef01deb5b08905ea4f49ac5085c7e19d",
+  "reproduction_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_repro",
+  "schema": "pf_branching_theta40_append_only_kernel_reproducibility_v1"
+}

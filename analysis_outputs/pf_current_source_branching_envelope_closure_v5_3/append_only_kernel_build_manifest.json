@@ -1,0 +1,49 @@
+{
+  "configuration_fingerprint": "adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0",
+  "configuration_sha256": "3ccc690c103f96da8eca7ee4bc67272653bd888b402bb0878c1b1f6eb9dee6f9",
+  "coverage_qualification": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/terminal_topology_coverage_qualification.json",
+  "cumulative_shared_process_coordinate_model": true,
+  "direct_load_invariance_passed": true,
+  "direct_validation": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/direct_kernel_validation_manifest.json",
+  "extension_levels_um": [
+    0.0,
+    200.0,
+    400.0,
+    415.0,
+    420.0,
+    425.0,
+    600.0,
+    745.0
+  ],
+  "family": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/family.json",
+  "family_sha256": "423bc3232326b8ccc3ffcca0aa6b5363c67bad2c64debee49925bf1e6413e8cb",
+  "full_branched_shielding_geometry_newly_validated": false,
+  "new_deterministic_fem_state_count": 4,
+  "new_family_physics_fingerprint": "e0bc48eb8c3f5526877a21f8551e500046a614df8081693f340084fb73400302",
+  "new_family_sha256": "423bc3232326b8ccc3ffcca0aa6b5363c67bad2c64debee49925bf1e6413e8cb",
+  "newly_measured_extension_levels_um": [
+    420.0,
+    425.0,
+    600.0,
+    745.0
+  ],
+  "no_clipping_endpoint_hold_or_extrapolation": true,
+  "old_domain_family_evaluation_identity_passed": true,
+  "old_domain_identity": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/old_domain_family_evaluation_identity.json",
+  "old_family_sha256": "b109a2fd6fc393fc986b1f15d6edd7c37366d84c111710ea70bcaba75f426847",
+  "old_payload_byte_identity_passed": true,
+  "old_root": "/private/tmp/current-source-branching-replay-preflight-v5/analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0",
+  "outroot": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final",
+  "passed": true,
+  "payload_preservation": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_final/append_only_payload_preservation.json",
+  "pf_runs_launched": 0,
+  "preserved_extension_levels_um": [
+    0.0,
+    200.0,
+    400.0,
+    415.0
+  ],
+  "producer_code_commit": "33210af0ef01deb5b08905ea4f49ac5085c7e19d",
+  "schema": "pf_current_source_branching_theta40_append_only_kernel_v5_3",
+  "stochastic_evolution_invoked": false
+}

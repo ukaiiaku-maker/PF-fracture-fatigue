@@ -1,0 +1,21 @@
+{
+  "cumulative_shared_process_coordinate_model": true,
+  "full_branched_shielding_geometry_validated": false,
+  "measured_endpoint_um": 745.0,
+  "measured_levels_um": [
+    0.0,
+    200.0,
+    400.0,
+    415.0,
+    420.0,
+    425.0,
+    600.0,
+    745.0
+  ],
+  "passed": true,
+  "policy": "strict_measured_envelope_no_clipping_endpoint_hold_or_extrapolation",
+  "schema": "pf_branching_terminal_topology_signed_kernel_coverage_v5_3",
+  "scope": "exact_terminal_two_front_topology_only_not_universal",
+  "shared_process_query_upper_bound_um": 740.0,
+  "topology_quantum_guard_um": 5.0
+}

@@ -1,0 +1,13 @@
+{
+  "continuum_identity_basis": "all closed-domain queries delegate to a resolver constructed from the byte-identical legacy state prefix with unchanged interpolation metadata",
+  "domain_um": [
+    0.0,
+    415.0
+  ],
+  "exact_array_equality": true,
+  "maximum_absolute_difference": 0.0,
+  "passed": true,
+  "sample_count": 167,
+  "sample_policy": "all_5um_physical_quanta_and_all_2p5um_midpoints",
+  "schema": "pf_branching_append_only_old_domain_identity_v1"
+}

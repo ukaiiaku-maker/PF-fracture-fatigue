@@ -96,3 +96,79 @@ def test_active_only_loader_rejects_nonzero_wake(tmp_path: Path):
     path.write_text(json.dumps(payload))
     with pytest.raises(ValueError, match="zero wake kernels"):
         ActiveOnlySigned2DShieldingKernelFamily.from_json(path)
+
+
+def test_append_only_policy_preserves_exact_legacy_domain(tmp_path: Path):
+    old_payload = _payload()
+    old_path = tmp_path / "old.json"
+    old_path.write_text(json.dumps(old_payload))
+    old = ActiveOnlySigned2DShieldingKernelFamily.from_json(old_path)
+
+    new_payload = json.loads(json.dumps(old_payload))
+    for state_id, extension, scale in (
+        ("E210", 2.1e-4, 2.0),
+        ("E400", 4.0e-4, 3.0),
+    ):
+        row = json.loads(json.dumps(new_payload["states"][-1]))
+        row["state_id"] = state_id
+        row["crack_extension_m"] = extension
+        for key in (
+            "active_kernel_I_Pa_sqrt_m_per_signed_line",
+            "active_kernel_II_Pa_sqrt_m_per_signed_line",
+        ):
+            row[key] = (scale * np.asarray(row[key], dtype=float)).tolist()
+        new_payload["states"].append(row)
+    new_payload["append_only_legacy_domain_policy"] = {
+        "model_id": "v10.2.14_exact_legacy_domain_prefix_v1",
+        "legacy_domain_max_crack_extension_m": 2.0e-4,
+        "legacy_state_ids": ["E000", "E200"],
+    }
+    new_path = tmp_path / "new.json"
+    new_path.write_text(json.dumps(new_payload))
+    new = ActiveOnlySigned2DShieldingKernelFamily.from_json(new_path)
+
+    for extension in np.linspace(0.0, 2.0e-4, 41):
+        old_active, old_wake = old.resolve(
+            r_eff_over_r0=3.0,
+            opening_strength_fraction=0.75,
+            crack_extension_m=float(extension),
+        )
+        new_active, new_wake = new.resolve(
+            r_eff_over_r0=3.0,
+            opening_strength_fraction=0.75,
+            crack_extension_m=float(extension),
+        )
+        assert np.array_equal(new_active, old_active)
+        assert np.array_equal(new_wake, old_wake)
+        assert np.array_equal(new.active_kernel_II, old.active_kernel_II)
+        assert np.array_equal(new.wake_kernel_II, old.wake_kernel_II)
+    assert new.audit_payload()["append_only_legacy_domain_active"] is True
+    new.resolve(
+        r_eff_over_r0=1.0,
+        opening_strength_fraction=0.0,
+        crack_extension_m=3.0e-4,
+    )
+
+
+def test_append_only_policy_rejects_missing_or_overlapping_states(tmp_path: Path):
+    payload = _payload()
+    payload["append_only_legacy_domain_policy"] = {
+        "model_id": "v10.2.14_exact_legacy_domain_prefix_v1",
+        "legacy_domain_max_crack_extension_m": 2.0e-4,
+        "legacy_state_ids": ["E000", "missing"],
+    }
+    path = tmp_path / "missing.json"
+    path.write_text(json.dumps(payload))
+    with pytest.raises(ValueError, match="missing legacy state"):
+        ActiveOnlySigned2DShieldingKernelFamily.from_json(path)
+
+    payload = _payload()
+    payload["append_only_legacy_domain_policy"] = {
+        "model_id": "v10.2.14_exact_legacy_domain_prefix_v1",
+        "legacy_domain_max_crack_extension_m": 2.0e-4,
+        "legacy_state_ids": ["E000", "E200"],
+    }
+    path = tmp_path / "no-new-state.json"
+    path.write_text(json.dumps(payload))
+    with pytest.raises(ValueError, match="strictly beyond"):
+        ActiveOnlySigned2DShieldingKernelFamily.from_json(path)

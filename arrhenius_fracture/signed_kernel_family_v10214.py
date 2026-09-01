@@ -85,6 +85,86 @@ class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
     contribute a claimed physical 2-D shielding response.
     """
 
+    def _install_append_only_legacy_domain(self) -> None:
+        """Install an exact resolver for a preserved prefix of an atlas.
+
+        Appending measured extension states changes the global coordinate scale
+        used by inverse-distance interpolation.  Without this explicit policy,
+        even byte-identical prefix states would evaluate differently below the
+        old endpoint.  The policy is opt-in and fail-closed so existing atlases
+        retain their historical behavior.
+        """
+        policy = self.metadata.get("append_only_legacy_domain_policy")
+        self._append_only_legacy_family = None
+        self._append_only_legacy_max_extension_m = None
+        if policy is None:
+            return
+        if not isinstance(policy, dict):
+            raise ValueError("append-only legacy-domain policy must be an object")
+        if policy.get("model_id") != "v10.2.14_exact_legacy_domain_prefix_v1":
+            raise ValueError("unrecognized append-only legacy-domain policy")
+        state_ids = tuple(str(value) for value in policy.get("legacy_state_ids", ()))
+        if len(state_ids) < 2 or len(set(state_ids)) != len(state_ids):
+            raise ValueError("append-only policy requires unique legacy state ids")
+        state_by_id = {state.state_id: state for state in self.states}
+        if any(state_id not in state_by_id for state_id in state_ids):
+            raise ValueError("append-only policy references a missing legacy state")
+        legacy_states = [state_by_id[state_id] for state_id in state_ids]
+        legacy_extensions = [float(state.coordinates[2]) for state in legacy_states]
+        if legacy_extensions != sorted(legacy_extensions):
+            raise ValueError("append-only legacy states must be ordered by extension")
+        legacy_max = float(policy.get("legacy_domain_max_crack_extension_m", float("nan")))
+        if not np.isfinite(legacy_max) or not np.isclose(
+            legacy_max, legacy_extensions[-1], rtol=0.0, atol=1.0e-15
+        ):
+            raise ValueError("append-only legacy endpoint does not match its final state")
+        new_extensions = [
+            float(state.coordinates[2])
+            for state in self.states
+            if state.state_id not in state_ids
+        ]
+        if not new_extensions or min(new_extensions) <= legacy_max:
+            raise ValueError("append-only states must lie strictly beyond the legacy domain")
+
+        legacy = type(self)(
+            states=[
+                KernelState(
+                    state_id=state.state_id,
+                    coordinates=state.coordinates.copy(),
+                    active_I=state.active_I.copy(),
+                    wake_I=state.wake_I.copy(),
+                    active_II=state.active_II.copy(),
+                    wake_II=state.wake_II.copy(),
+                    metadata=copy.deepcopy(state.metadata),
+                )
+                for state in legacy_states
+            ],
+            active_x_m=self.active_x_m.copy(),
+            wake_x_m=self.wake_x_m.copy(),
+            activation_to_line_content=self.activation_to_line_content.copy(),
+            source_capacity_bounds=self.source_capacity_bounds.copy(),
+            fixed_kernel_assessment=copy.deepcopy(self.fixed_kernel_assessment),
+            interpolation=copy.deepcopy(self.interpolation),
+            metadata={
+                key: copy.deepcopy(value)
+                for key, value in self.metadata.items()
+                if key != "append_only_legacy_domain_policy"
+            },
+            source_path=self.source_path,
+        )
+        legacy._opening_boundary_policy = copy.deepcopy(
+            getattr(self, "_opening_boundary_policy", {"policy": "strict"})
+        )
+        legacy._last_boundary_action = "none"
+        legacy._last_observed_analytical_r_eff_over_r0 = 1.0
+        legacy._last_observed_opening_strength_fraction = 0.0
+        legacy._runtime_grid_binding = copy.deepcopy(
+            getattr(self, "_runtime_grid_binding", None)
+        )
+        legacy._validate_complete_grid()
+        self._append_only_legacy_family = legacy
+        self._append_only_legacy_max_extension_m = legacy_max
+
     @classmethod
     def from_json(cls, path: str | Path) -> "ActiveOnlySigned2DShieldingKernelFamily":
         source = Path(path).expanduser().resolve()
@@ -182,6 +262,7 @@ class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
         family._last_observed_opening_strength_fraction = 0.0
         family._runtime_grid_binding = None
         family._validate_complete_grid()
+        family._install_append_only_legacy_domain()
         return family
 
     def clone_for_engine(self) -> "ActiveOnlySigned2DShieldingKernelFamily":
@@ -256,7 +337,56 @@ class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
             bound.metadata["runtime_grid_binding"]
         )
         bound._validate_complete_grid()
+        bound._install_append_only_legacy_domain()
         return bound
+
+    def resolve(
+        self,
+        *,
+        r_eff_over_r0: float,
+        opening_strength_fraction: float,
+        crack_extension_m: float,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        legacy = getattr(self, "_append_only_legacy_family", None)
+        legacy_max = getattr(self, "_append_only_legacy_max_extension_m", None)
+        if legacy is not None and legacy_max is not None:
+            tolerance = float(
+                self.interpolation.get("envelope_relative_tolerance", 1.0e-10)
+            )
+            allowance = tolerance * max(abs(float(legacy_max)), 1.0)
+            if float(crack_extension_m) <= float(legacy_max) + allowance:
+                active, wake = legacy.resolve(
+                    r_eff_over_r0=float(r_eff_over_r0),
+                    opening_strength_fraction=float(opening_strength_fraction),
+                    crack_extension_m=float(crack_extension_m),
+                )
+                self.active_kernel = active.copy()
+                self.wake_kernel = wake.copy()
+                self.active_kernel_II = legacy.active_kernel_II.copy()
+                self.wake_kernel_II = legacy.wake_kernel_II.copy()
+                self._last_query = legacy._last_query.copy()
+                self._last_weights = np.zeros(len(self.states), dtype=float)
+                index_by_id = {
+                    state.state_id: index for index, state in enumerate(self.states)
+                }
+                for state, weight in zip(legacy.states, legacy._last_weights):
+                    self._last_weights[index_by_id[state.state_id]] = weight
+                self._last_state_ids = list(legacy._last_state_ids)
+                self._last_boundary_action = getattr(
+                    legacy, "_last_boundary_action", "none"
+                )
+                self._last_observed_analytical_r_eff_over_r0 = float(
+                    getattr(legacy, "_last_observed_analytical_r_eff_over_r0", 1.0)
+                )
+                self._last_observed_opening_strength_fraction = float(
+                    getattr(legacy, "_last_observed_opening_strength_fraction", 0.0)
+                )
+                return self.active_kernel, self.wake_kernel
+        return super().resolve(
+            r_eff_over_r0=float(r_eff_over_r0),
+            opening_strength_fraction=float(opening_strength_fraction),
+            crack_extension_m=float(crack_extension_m),
+        )
 
     def _prepare_query(
         self,
@@ -294,6 +424,9 @@ class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
                 "wake_kernel_mechanically_measured": False,
                 "wake_shielding_supported": False,
                 "wake_kernel_forced_zero": True,
+                "append_only_legacy_domain_active": bool(
+                    getattr(self, "_append_only_legacy_family", None) is not None
+                ),
                 "runtime_grid_binding": copy.deepcopy(
                     getattr(self, "_runtime_grid_binding", None)
                 ),
