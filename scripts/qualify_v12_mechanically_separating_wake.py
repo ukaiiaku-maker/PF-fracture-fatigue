@@ -70,7 +70,7 @@ def two_branch_network(left,right):
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument("--out",type=Path,default=Path("artifacts/v12_mechanically_separating_wake")); args=parser.parse_args()
     args.out.mkdir(parents=True,exist_ok=True); rows=[]; edge_rows=[]; graded_rows=[]; event_rows=[]; partition_rows=[]; refinement_rows=[]
-    topology_rows=[]; coalescence_rows=[]; junction_rows=[]; arc_rows=[]; adaptive_rows=[]; branched_partition_rows=[]
+    topology_rows=[]; coalescence_rows=[]; junction_rows=[]; arc_rows=[]; adaptive_rows=[]; branched_partition_rows=[]; accepted_nonmutation=True
     implementation_sha=git("log","-1","--format=%H","--","arrhenius_fracture/mechanically_separating_sharp_wake_v12.py","tests/test_v12_mechanically_separating_wake.py","scripts/qualify_v12_mechanically_separating_wake.py")
     for n in (9,17,33,65):
         for perturbed in (False,True):
@@ -144,6 +144,25 @@ def main():
                   "prior_support_ids":" ".join(map(str,prior)),"new_support_ids":" ".join(map(str,audit.selected_element_ids if audit else ())),
                   "mechanically_new_ids":" ".join(map(str,audit.mechanically_new_element_ids if audit else ())),
                   "mechanically_new_element_count":mechanically_new,"accepted_damage_fingerprint":accepted_fp,"trial_damage_fingerprint":trial_fp})
+    novelty_mesh=mesh(33,False); novelty_accepted=CrackNetworkState.one_tip(((.125,0.),(.875,0.)))
+    novelty_ids,novelty_prior=mechanically_separating_graph_support(novelty_mesh,novelty_accepted)
+    novelty_damage=np.zeros(novelty_mesh.ne); novelty_damage[novelty_ids]=1.; novelty_owner=support_record(novelty_mesh,novelty_accepted,novelty_damage,novelty_ids)
+    novelty_trial=CrackNetworkState.one_tip(((.125,0.),(.5,0.),(.875,0.)))
+    _,novelty_audit=mechanically_separating_graph_support(novelty_mesh,novelty_trial,previous_support=novelty_owner,
+      accepted_network=novelty_accepted,accepted_damage=novelty_damage,return_uncertified_audit_for_screen=True)
+    event_rows.append({"mesh":"classification_control","angle_deg":0,"tangent_phase_cells":0.,"normal_phase_cells":0.,
+      "delta_a_m":0.,"h_tip_max_m":novelty_prior.h_tip_max_m,"h_tip_median_m":novelty_prior.h_tip_median_m,
+      "h_tip_tangent_m":novelty_prior.h_tip_tangent_m,"h_tip_normal_m":novelty_prior.h_tip_normal_m,"delta_a_over_h_tip_max":0.,
+      "delta_a_over_h_tip_median":0.,"delta_a_over_h_tip_tangent":0.,"accepted_tip_aligned":True,"trial_tip_aligned":True,
+      "accepted_state_production_valid":True,"trial_requires_alignment_remesh":False,"outcome":novelty_audit.certification_reason,
+      "certificate_status":novelty_audit.certification_reason,"support_axial_extent_m":novelty_audit.active_tip_support_axial_extent_m,
+      "signed_tip_footprint_m":novelty_audit.active_tip_signed_footprint_m,"forward_overshoot_m":novelty_audit.active_tip_forward_leakage_m,
+      "backward_undershoot_m":novelty_audit.active_tip_backward_undershoot_m,"overshoot_over_h_tip":novelty_audit.overshoot_over_h_tip,
+      "undershoot_over_h_tip":novelty_audit.undershoot_over_h_tip,"graph_fingerprint":novelty_audit.graph_fingerprint,
+      "support_fingerprint":novelty_audit.support_fingerprint,"prior_support_ids":" ".join(map(str,novelty_ids)),
+      "new_support_ids":" ".join(map(str,novelty_audit.selected_element_ids)),"mechanically_new_ids":"",
+      "mechanically_new_element_count":0,"accepted_damage_fingerprint":novelty_audit.accepted_damage_fingerprint,
+      "trial_damage_fingerprint":novelty_audit.trial_damage_fingerprint})
     event_path=args.out/"normalized_event_resolution_matrix.csv"
     with event_path.open("w",newline="") as f:
         writer=csv.DictWriter(f,fieldnames=event_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(event_rows)
@@ -155,7 +174,9 @@ def main():
         points=[(start,0.),(initial_tip,0.)]; position=initial_tip
         for event_index,fraction in enumerate(fractions,1):
             position+=(end-initial_tip)*fraction; points.append((position,0.)); trial=CrackNetworkState.one_tip(tuple(points))
+            damage_before=damage.copy()
             ids,a=mechanically_separating_graph_support(partition_mesh,trial,previous_support=owner,accepted_network=accepted,accepted_damage=damage)
+            accepted_nonmutation=accepted_nonmutation and np.array_equal(damage,damage_before)
             damage=damage.copy(); damage[ids]=1.; owner=support_record(partition_mesh,trial,damage,ids); accepted=trial
             partition_rows.append({"partition":label,"event_index":event_index,"event_count":len(fractions),"is_final":event_index==len(fractions),
               "selected_support_ids":" ".join(map(str,ids)),"mechanically_new_ids":" ".join(map(str,a.mechanically_new_element_ids)),
@@ -244,18 +265,26 @@ def main():
         coalescence_rows.append({"case":"parallel_nonintersecting","d_over_h_local":ratio,"distance_m":distance,
           "outcome":"ACCEPTED" if a.certified else a.certification_reason,"graph_component_count":a.graph_component_count,
           "support_component_count_edge":len(set(a.support_component_ids_edge)),"support_component_count_node":len(set(a.support_component_ids_node)),
+          "component_incidence_one_to_one":a.component_incidence_one_to_one,
+          "nonadjacent_arc_support_short_circuit_pairs":" ".join(a.nonadjacent_arc_support_short_circuit_pairs),
           "illegal_support_connection":a.illegal_support_connection,"minimum_support_component_separation_m":a.minimum_support_component_separation_m})
     topology_cases={
       "separated_parallel":two_branch_network(((.125,-.2),(.875,-.2)),((.125,.2),(.875,.2))),
       "approaching_tips":two_branch_network(((.125,-.15),(.48,-.02)),((.875,.15),(.52,.02))),
       "approaching_old_wake":two_branch_network(((.125,0.),(.875,0.)),((.65,.25),(.65,.08))),
       "geometric_crossing_without_junction":two_branch_network(((.2,-.2),(.8,.2)),((.2,.2),(.8,-.2))),
+      "exact_physical_coalescence":two_branch_network(((.2,-.2),(.5,0.)),((.8,-.2),(.5,0.))),
     }
     for label,net in topology_cases.items():
         _,a=mechanically_separating_graph_support(topology_mesh,net,allow_offgrid_active_tips_for_screen=True,return_uncertified_audit_for_screen=True)
         topology_rows.append({"case":label,"support_component_ids_edge":" ".join(map(str,a.support_component_ids_edge)),
           "support_component_ids_node":" ".join(map(str,a.support_component_ids_node)),"graph_component_count":a.graph_component_count,
-          "legal_junction_overlap":False,"illegal_support_connection":a.illegal_support_connection,
+          "graph_to_node_support_component_incidence":json.dumps(a.graph_to_node_support_component_incidence,separators=(",",":")),
+          "node_support_to_graph_component_incidence":json.dumps(a.node_support_to_graph_component_incidence,separators=(",",":")),
+          "component_incidence_one_to_one":a.component_incidence_one_to_one,
+          "legal_junction_overlap":bool(a.junction_sector_certificates) and all(c.legal_support_overlap for c in a.junction_sector_certificates),
+          "nonadjacent_arc_support_short_circuit_pairs":" ".join(a.nonadjacent_arc_support_short_circuit_pairs),
+          "illegal_support_connection":a.illegal_support_connection,
           "minimum_support_component_separation_m":a.minimum_support_component_separation_m,"status":"ACCEPTED" if a.certified else a.certification_reason})
     junction_mesh=mesh(65,False)
     kink=CrackNetworkState.one_tip(((.125,0.),(.5,0.),(.75,.25)))
@@ -273,15 +302,21 @@ def main():
         selected,a=mechanically_separating_graph_support(junction_mesh,net,allow_offgrid_active_tips_for_screen=True,return_uncertified_audit_for_screen=True)
         topology_rows.append({"case":label,"support_component_ids_edge":" ".join(map(str,a.support_component_ids_edge)),
           "support_component_ids_node":" ".join(map(str,a.support_component_ids_node)),"graph_component_count":a.graph_component_count,
-          "legal_junction_overlap":True,"illegal_support_connection":a.illegal_support_connection,
+          "graph_to_node_support_component_incidence":json.dumps(a.graph_to_node_support_component_incidence,separators=(",",":")),
+          "node_support_to_graph_component_incidence":json.dumps(a.node_support_to_graph_component_incidence,separators=(",",":")),
+          "component_incidence_one_to_one":a.component_incidence_one_to_one,
+          "legal_junction_overlap":bool(a.junction_sector_certificates) and all(c.legal_support_overlap for c in a.junction_sector_certificates),
+          "nonadjacent_arc_support_short_circuit_pairs":" ".join(a.nonadjacent_arc_support_short_circuit_pairs),
+          "illegal_support_connection":a.illegal_support_connection,
           "minimum_support_component_separation_m":a.minimum_support_component_separation_m,"status":"ACCEPTED" if a.certified else a.certification_reason})
         for certificate in a.junction_sector_certificates:
             item=asdict(certificate)
             for key,value in tuple(item.items()):
                 if isinstance(value,tuple): item[key]=json.dumps(value,separators=(",",":"))
             junction_rows.append({"case":label,"defective_support":False,**item})
-        if label=="kink":
-            center=np.array((.5,0.)); tangent=np.array((1.,1.))/np.sqrt(2); local_h=np.sqrt(2)/64; centroids=np.mean(junction_mesh.nodes[junction_mesh.elems],axis=1)
+        if label in ("kink","y_branch","t_junction"):
+            center=np.array((.5,0.)); tangent=np.array((0.,1.)) if label=="t_junction" else np.array((1.,1.))/np.sqrt(2)
+            local_h=np.sqrt(2)/64; centroids=np.mean(junction_mesh.nodes[junction_mesh.elems],axis=1)
             rel=centroids-center; axial=rel@tangent; normal_distance=np.abs(rel@np.array((-tangent[1],tangent[0])))
             defective=set(map(int,selected))-set(map(int,np.flatnonzero((axial>=0)&(axial<=6*local_h)&(normal_distance<=3*local_h))))
             for certificate in junction_sector_certificates(junction_mesh,net,sorted(defective)):
@@ -299,23 +334,55 @@ def main():
     with junction_path.open("w",newline="") as f:
         writer=csv.DictWriter(f,fieldnames=junction_rows[0],lineterminator="\n"); writer.writeheader(); writer.writerows(junction_rows)
     construction=all(r["construction_screen"] and r["unresolved_bridge_nodes"]==0 for r in rows)
+    orientation_pass=construction and {(r["angle_deg"],r["phase"],r["mesh"]) for r in rows}=={
+      (angle,phase,mesh_label) for angle in (0,15,-15,30,-30,45,-45) for phase in (0.,.037) for mesh_label in ("structured","perturbed")}
     separation=all(not r["intact_cross_graph_path_exists"] for r in rows)
     partition_pass=all(r["final_support_matches_reference"] and r["final_certificate_matches_reference"] for r in partition_rows if r["is_final"])
     partition_pass=partition_pass and all(r["support_matches"] and r["certificate_matches"] for r in branched_partition_rows)
-    component_pass=all((not r["illegal_support_connection"]) or "DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH" in r["status"] for r in topology_rows)
-    coalescence_pass=all((not r["illegal_support_connection"]) or "DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH" in r["outcome"] for r in coalescence_rows)
-    junction_pass=all((r["defective_support"] and r["junction_certificate_status"]!="ACCEPTED") or
+    single_branch_pass=all(r["final_support_matches_reference"] and r["final_certificate_matches_reference"]
+      for r in partition_rows if r["is_final"])
+    component_pass=all((r["status"]=="ACCEPTED" and r["component_incidence_one_to_one"] and
+      not r["nonadjacent_arc_support_short_circuit_pairs"]) or
+      (r["status"]!="ACCEPTED" and ("DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH" in r["status"] or
+      "NONADJACENT_ARC_SUPPORT_SHORT_CIRCUIT" in r["status"])) for r in topology_rows)
+    component_pass=component_pass and any(r["case"]=="exact_physical_coalescence" and r["status"]=="ACCEPTED" for r in topology_rows)
+    coalescence_pass=all((r["outcome"]=="ACCEPTED" and r["component_incidence_one_to_one"] and
+      not r["nonadjacent_arc_support_short_circuit_pairs"]) or
+      (r["outcome"]!="ACCEPTED" and "DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH" in r["outcome"]) for r in coalescence_rows)
+    defective_cases={r["case"] for r in junction_rows if r["defective_support"] and r["junction_certificate_status"]!="ACCEPTED"}
+    junction_pass=defective_cases=={"kink","y_branch","t_junction"} and all((r["defective_support"] and r["junction_certificate_status"]!="ACCEPTED") or
       (not r["defective_support"] and r["junction_certificate_status"]=="ACCEPTED") for r in junction_rows)
-    adaptive_pass=len({r["physical_support_fingerprint"] for r in adaptive_rows})==1
-    event_pass=all((not r["accepted_state_production_valid"] and r["outcome"]=="INVALID_ACCEPTED_BASELINE_REQUIRES_ALIGNMENT_REMESH") or
-      (r["accepted_state_production_valid"] and r["outcome"] in ("ACCEPTED","REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH","NO_MECHANICALLY_NEW_SUPPORT")) for r in event_rows)
-    geometry_pass=partition_pass and component_pass and coalescence_pass and junction_pass and adaptive_pass and event_pass
+    h_values=[r["h_local_max_m"] for r in refinement_rows]; width_values=[r["support_width_m"] for r in refinement_rows]
+    area_values=[r["support_area_m2"] for r in refinement_rows]; footprint_values=[abs(r["signed_tip_footprint_m"]) for r in refinement_rows]
+    decreasing=lambda values: all(right<left for left,right in zip(values,values[1:]))
+    nonincreasing=lambda values: all(right<=left+1e-14 for left,right in zip(values,values[1:]))
+    uniform_refinement_pass=decreasing(h_values) and decreasing(width_values) and decreasing(area_values) and nonincreasing(footprint_values)
+    uniform_refinement_pass=uniform_refinement_pass and width_values[-1]<=.2*width_values[0] and area_values[-1]<=.2*area_values[0]
+    uniform_refinement_pass=uniform_refinement_pass and footprint_values[-1]<=h_values[-1]
+    uniform_refinement_pass=uniform_refinement_pass and max(r["width_over_h_local"] for r in refinement_rows)<=4.
+    uniform_refinement_pass=uniform_refinement_pass and max(r["area_over_unique_length_h_local"] for r in refinement_rows)<=4.
+    adaptive_pass=len({r["physical_support_fingerprint"] for r in adaptive_rows})==1 and len({r["support_width_m"] for r in adaptive_rows})==1
+    adaptive_pass=adaptive_pass and len({r["support_area_m2"] for r in adaptive_rows})==1 and len({r["tip_overshoot_m"] for r in adaptive_rows})==1
+    adaptive_pass=adaptive_pass and len({r["tip_undershoot_m"] for r in adaptive_rows})==1
+    local_objectivity_pass=uniform_refinement_pass and adaptive_pass
+    expected_event_classification=all((not r["accepted_state_production_valid"] and r["outcome"]=="INVALID_ACCEPTED_BASELINE_REQUIRES_ALIGNMENT_REMESH") or
+      (r["accepted_state_production_valid"] and not r["trial_tip_aligned"] and r["outcome"]=="REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH") or
+      (r["accepted_state_production_valid"] and r["trial_tip_aligned"] and r["outcome"] in ("ACCEPTED","NO_MECHANICALLY_NEW_SUPPORT")) for r in event_rows)
+    accepted_events=[r for r in event_rows if r["outcome"]=="ACCEPTED"]
+    event_pass=expected_event_classification and bool(accepted_events)
+    event_pass=event_pass and any(r["outcome"]=="REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH" for r in event_rows)
+    event_pass=event_pass and any(r["outcome"]=="NO_MECHANICALLY_NEW_SUPPORT" for r in event_rows)
+    event_pass=event_pass and all(r["accepted_damage_fingerprint"]!=r["trial_damage_fingerprint"] for r in accepted_events)
+    event_pass=event_pass and partition_pass
+    geometry_pass=partition_pass and component_pass and coalescence_pass and junction_pass and local_objectivity_pass and event_pass
     report={"schema":"v12_mechanically_separating_wake_qualification_v2","model_id":MODEL_ID,"cases":len(rows),
       "provenance":{"implementation_git_sha":implementation_sha,"base_git_sha":"2b5e5351add0bf0db67f2cda35a1480c3e7efc91",
         "python_version":platform.python_version(),"numpy_version":np.__version__,"scipy_version":scipy.__version__,"pytest_version":pytest.__version__,
         "platform":platform.platform(),"solver_backend_identity":"geometry_only_no_linear_solver",
         "qualification_constraints":"constraints/v12-qualification-py312.txt","mesh_generator_identity":"v12_structured_checkerboard_and_seeded_perturbation_v2","random_seed_rule":"120031+n"},
-      "thresholds":{"maximum_width_over_h_local":4.0,"maximum_forward_leakage_over_h_local":3.0},
+      "thresholds":{"maximum_width_over_h_local":4.0,"maximum_area_over_unique_length_h_local":4.0,
+        "maximum_forward_leakage_over_h_local":3.0,"finest_to_coarsest_width_ratio":0.2,
+        "finest_to_coarsest_area_ratio":0.2,"maximum_finest_absolute_tip_footprint_over_h":1.0},
       "geometry":{"construction_screen":construction,"independent_separation_screen":separation,
         "max_width_over_h_local":max(r["width_over_h_local"] for r in rows),
         "max_forward_leakage_over_h_local":max(r["forward_leakage_over_h_local"] for r in rows),"matrix":"geometry_matrix.csv",
@@ -325,18 +392,19 @@ def main():
         "adaptive_far_field_objectivity":"adaptive_far_field_objectivity.csv","support_component_topology":"support_component_topology.csv",
         "coalescence_distance_matrix":"coalescence_distance_matrix.csv","junction_sector_matrix":"junction_sector_matrix.csv"},
       "gates":{"GRAPH_AWARE_NODE_STAR_CONSTRUCTION_SCREEN":"PASS" if construction else "FAIL",
-        "SYNTHETIC_ORIENTATION_AND_PHASE_SCREEN":"PASS" if construction else "FAIL",
+        "SYNTHETIC_ORIENTATION_AND_PHASE_SCREEN":"PASS" if orientation_pass else "FAIL",
         "SYNTHETIC_INDEPENDENT_INTACT_PATH_SCREEN":"PASS" if separation else "FAIL",
-        "SINGLE_BRANCH_COLLINEAR_CERTIFICATION_ARC_EQUIVALENCE":"PASS",
-        "STRAIGHT_ALIGNED_LOCAL_REFINEMENT_OH_SCREEN":"PASS",
-        "NORMALIZED_FIXED_MESH_EVENT_CLASSIFICATION_SCREEN":"PASS",
+        "SINGLE_BRANCH_COLLINEAR_CERTIFICATION_ARC_EQUIVALENCE":"PASS" if single_branch_pass else "FAIL",
+        "STRAIGHT_ALIGNED_LOCAL_REFINEMENT_OH_SCREEN":"PASS" if uniform_refinement_pass else "FAIL",
+        "NORMALIZED_FIXED_MESH_EVENT_CLASSIFICATION_SCREEN":"PASS" if event_pass else "FAIL",
         "GRAPH_PARTITION_INVARIANT_CERTIFICATION":"PASS" if partition_pass else "FAIL",
         "SUPPORT_COMPONENT_TOPOLOGY_QUALIFIED":"PASS" if component_pass else "FAIL",
         "JUNCTION_SECTOR_CONNECTIVITY_QUALIFIED":"PASS" if junction_pass else "FAIL",
         "INDEPENDENT_INTACT_PATH_SEPARATION_CERTIFIED":"PASS" if separation else "FAIL",
-        "LOCAL_H_AND_FULL_SUPPORT_OH_OBJECTIVITY":"PASS" if adaptive_pass else "FAIL",
+        "LOCAL_H_AND_FULL_SUPPORT_OH_OBJECTIVITY":"PASS" if local_objectivity_pass else "FAIL",
         "NO_PREMATURE_MECHANICAL_COALESCENCE":"PASS" if coalescence_pass else "FAIL",
-        "ACTIVE_TIP_AND_EVENT_RESOLUTION_QUALIFIED":"PASS" if event_pass else "FAIL","ACCEPTED_STATE_NONMUTATION_OR_TRIAL_ISOLATION":"PASS",
+        "ACTIVE_TIP_AND_EVENT_RESOLUTION_QUALIFIED":"PASS" if event_pass else "FAIL",
+        "ACCEPTED_STATE_NONMUTATION_OR_TRIAL_ISOLATION":"PASS" if accepted_nonmutation else "FAIL",
         "PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED":"NOT_RUN","V12_CLEAN_WORKER_SCOPED_CI":"NOT_RUN",
         "MECHANICALLY_SEPARATING_WAKE_GEOMETRY_QUALIFIED":"PASS" if geometry_pass else "FAIL",
         "MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED":"OPEN",

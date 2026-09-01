@@ -111,8 +111,12 @@ class GraphSupportAudit:
     support_component_ids_edge: tuple[int,...]
     support_component_ids_node: tuple[int,...]
     graph_component_count: int
+    graph_to_node_support_component_incidence: tuple[tuple[int,tuple[int,...]],...]
+    node_support_to_graph_component_incidence: tuple[tuple[int,tuple[int,...]],...]
+    component_incidence_one_to_one: bool
     illegal_support_connection: bool
     minimum_support_component_separation_m: float
+    nonadjacent_arc_support_short_circuit_pairs: tuple[str,...]
     junction_sector_certificates: tuple[JunctionSectorCertificate,...]
     node_star_construction_passed: bool
     independent_separation_certified: bool
@@ -302,7 +306,7 @@ def selected_support_components(mesh,selected,*,shared_nodes):
                 if nxt not in labels: labels[nxt]=label; queue.append(nxt)
     return tuple(labels[eid] for eid in ids)
 
-def graph_component_count(network,tolerance=1e-12):
+def graph_component_membership(network,tolerance=1e-12):
     segments=_segments(network); parent=list(range(len(segments)))
     def find(value):
         while parent[value]!=value: parent[value]=parent[parent[value]]; value=parent[value]
@@ -313,7 +317,11 @@ def graph_component_count(network,tolerance=1e-12):
     for i,(a,b,_,_) in enumerate(segments):
         for j,(c,d,_,_) in enumerate(segments[:i]):
             if any(np.linalg.norm(np.asarray(p)-np.asarray(q))<=tolerance for p in (a,b) for q in (c,d)): union(i,j)
-    return len({find(i) for i in range(len(segments))})
+    roots=sorted({find(i) for i in range(len(segments))}); canonical={root:index+1 for index,root in enumerate(roots)}
+    return tuple(canonical[find(i)] for i in range(len(segments)))
+
+def graph_component_count(network,tolerance=1e-12):
+    return len(set(graph_component_membership(network,tolerance)))
 
 def _minimum_component_separation(mesh,selected,labels):
     ids=np.asarray(sorted(map(int,np.asarray(selected,int))),int); unique=sorted(set(labels))
@@ -338,10 +346,14 @@ def junction_sector_certificates(mesh,network,selected,tolerance=1e-12):
             if not any(np.linalg.norm(ray-other)<=tolerance for other in unique): unique.append(ray)
         vertex_roles=roles.get(point,frozenset())
         if len(unique)<2 or not ({"kink_vertex","branch_junction","merged_vertex"}&set(vertex_roles) or len(vertex_roles)>1): continue
-        center=np.asarray(point,float); exact=set()
+        center=np.asarray(point,float); exact=set(); incident_supports=[]
         for a,b,_,_ in _segments(network):
             if np.linalg.norm(np.asarray(a)-center)<=tolerance or np.linalg.norm(np.asarray(b)-center)<=tolerance:
-                ids,_=causal_segment_support(mesh,np.asarray(a,float),np.asarray(b,float),tolerance=tolerance); exact.update(map(int,ids))
+                ids,_=causal_segment_support(mesh,np.asarray(a,float),np.asarray(b,float),tolerance=tolerance)
+                support=set(map(int,ids)); exact.update(support)
+                support_nodes=np.unique(mesh.elems[np.asarray(sorted(support),int)])
+                closure=set(map(int,np.flatnonzero(np.any(np.isin(mesh.elems,support_nodes),axis=1))))
+                incident_supports.append((support|closure)&selected_set)
         h=float(np.max(_element_diameters(mesh,np.asarray(sorted(exact),int))))
         rel=centroids-center; radius=np.linalg.norm(rel,axis=1); local=[int(e) for e in np.flatnonzero((radius>=.75*h)&(radius<=5.5*h)) if int(e) not in selected_set]
         by_node={}
@@ -365,10 +377,13 @@ def junction_sector_certificates(mesh,network,selected,tolerance=1e-12):
             counts.append(len(seeds)); sector_labels.append(tuple(sorted({labels[eid] for eid in seeds})))
         within=all(count>0 and len(values)==1 for count,values in zip(counts,sector_labels))
         cross=any(set(left)&set(right) for i,left in enumerate(sector_labels) for right in sector_labels[i+1:])
-        status="ACCEPTED" if within and not cross else ("MISSING_MATERIAL_SECTOR" if not within else "CROSS_ARM_INTACT_PATH")
-        payload=f"{_tolerance_point_key(center,tolerance)}|{angles}|{counts}|{sector_labels}|{within}|{cross}".encode()
+        overlaps=set().union(*(left&right for i,left in enumerate(incident_supports) for right in incident_supports[i+1:]))
+        legal_overlap=bool(overlaps) and all(np.linalg.norm(centroids[eid]-center)<=2*h+tolerance for eid in overlaps)
+        status="ACCEPTED" if within and not cross and legal_overlap else (
+          "MISSING_MATERIAL_SECTOR" if not within else ("CROSS_ARM_INTACT_PATH" if cross else "LEGAL_JUNCTION_OVERLAP_NOT_LOCAL"))
+        payload=f"{_tolerance_point_key(center,tolerance)}|{angles}|{counts}|{sector_labels}|{within}|{cross}|{legal_overlap}".encode()
         results.append(JunctionSectorCertificate(_point_key(center),tuple(sorted(vertex_roles)),angles,tuple(range(len(angles))),
-          tuple(counts),tuple(sector_labels),within,bool(cross),True,status,_digest(payload)))
+          tuple(counts),tuple(sector_labels),within,bool(cross),legal_overlap,status,_digest(payload)))
     return tuple(results)
 
 def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=None,arcs=None,allow_boundary_clip_for_screen=False,tolerance=1e-12):
@@ -554,9 +569,29 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
     h_tip_tangent=float(np.max(tip_tangent)) if tip_tangent else math.nan; h_tip_normal=float(np.max(tip_normal)) if tip_normal else math.nan
     component_edge=selected_support_components(mesh,selected_ids,shared_nodes=2)
     component_node=selected_support_components(mesh,selected_ids,shared_nodes=1)
-    physical_component_count=graph_component_count(network,tolerance)
-    illegal_connection=len(set(component_node))<physical_component_count
+    segment_component_labels=graph_component_membership(network,tolerance); physical_component_count=len(set(segment_component_labels))
+    branch_component={branch_id:label for (_,_,branch_id,_),label in zip(segments,segment_component_labels)}
+    arc_component=[branch_component[arc_id.split(":arc",1)[0]] for *_,arc_id in arc_records]
+    element_node_label={int(eid):int(label) for eid,label in zip(selected_ids,component_node)}
+    graph_to_support={label:set() for label in set(segment_component_labels)}; support_to_graph={label:set() for label in set(component_node)}
+    for arc_index,(_,_,_,local_ids,_) in enumerate(local_supports):
+        graph_label=arc_component[arc_index]
+        for eid in local_ids:
+            support_label=element_node_label[eid]; graph_to_support[graph_label].add(support_label); support_to_graph[support_label].add(graph_label)
+    graph_incidence=tuple((label,tuple(sorted(values))) for label,values in sorted(graph_to_support.items()))
+    support_incidence=tuple((label,tuple(sorted(values))) for label,values in sorted(support_to_graph.items()))
+    incidence_one_to_one=all(len(values)==1 for _,values in graph_incidence) and all(len(values)==1 for _,values in support_incidence)
+    illegal_connection=not incidence_one_to_one
     component_separation=_minimum_component_separation(mesh,selected_ids,component_node)
+    short_circuits=[]
+    for left_index,(_,p0,p1,left,_) in enumerate(local_supports):
+        left_nodes=set(map(int,np.unique(mesh.elems[np.asarray(sorted(left),int)])))
+        for right_index,(_,q0,q1,right,_) in enumerate(local_supports[left_index+1:],left_index+1):
+            if arc_component[left_index]!=arc_component[right_index]: continue
+            adjacent=any(np.linalg.norm(p-q)<=tolerance for p in (p0,p1) for q in (q0,q1))
+            if adjacent: continue
+            right_nodes=set(map(int,np.unique(mesh.elems[np.asarray(sorted(right),int)])))
+            if left_nodes&right_nodes: short_circuits.append(f"{left_index}:{right_index}")
     junction_certificates=junction_sector_certificates(mesh,network,selected_ids,tolerance)
     reasons=[]
     if unresolved: reasons.append("INCOMPLETE_INTERIOR_NODE_STAR")
@@ -576,6 +611,7 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
             reasons.append("INSUFFICIENT_OPPOSITE_SIDE_SEEDS")
     if premature: reasons.append("PREMATURE_MECHANICAL_COALESCENCE")
     if illegal_connection: reasons.append("DISTINCT_CRACK_COMPONENTS_UNRESOLVED_AT_CURRENT_MESH")
+    if short_circuits: reasons.append("NONADJACENT_ARC_SUPPORT_SHORT_CIRCUIT")
     if any(item.junction_certificate_status!="ACCEPTED" for item in junction_certificates): reasons.append("JUNCTION_SECTOR_NOT_CERTIFIED")
     if previous and graph_fingerprint(network)!=graph_fingerprint(accepted_network) and not mechanically_new.size:
         reasons.append("NO_MECHANICALLY_NEW_SUPPORT")
@@ -592,7 +628,8 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
       h,h_median,float(np.sum(mesh.area_e[selected_ids])/max(graph_length*h,1e-300)),endpoint_error,
       axial_extent,signed_tip_footprint,undershoot,h_tip_max,h_tip_median,h_tip_tangent,h_tip_normal,
       leakage/max(h_tip_max,1e-300),undershoot/max(h_tip_max,1e-300),
-      component_edge,component_node,physical_component_count,illegal_connection,component_separation,
+      component_edge,component_node,physical_component_count,graph_incidence,support_incidence,incidence_one_to_one,illegal_connection,component_separation,
+      tuple(short_circuits),
       junction_certificates,
       not unresolved,not certificate["intact_cross_graph_path_exists"] and not certificate["insufficient_seed_segment_ids"],tuple(premature),certified,
       "CERTIFIED_INDEPENDENT_INTACT_CUT" if certified else ";".join(reasons))
@@ -615,5 +652,5 @@ def apply_mechanically_separating_graph(state,network,*,previous_support=None):
     return replace(state,mesh=mesh,damage=visual,crack_network=network,junction_process_state=junction),audit
 
 __all__=["MODEL_ID","EdgeCutCertificate","GraphSupportAudit","GraphSupportRecord","JunctionSectorCertificate","apply_mechanically_separating_graph","certification_arc_fingerprint",
-  "certification_arcs","classify_graph_vertices","graph_component_count","graph_fingerprint","independent_intact_path_certificate",
+  "certification_arcs","classify_graph_vertices","graph_component_count","graph_component_membership","graph_fingerprint","independent_intact_path_certificate",
   "junction_sector_certificates","mechanically_separating_graph_support","selected_support_components","support_record","unique_graph_length"]

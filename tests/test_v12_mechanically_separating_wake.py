@@ -279,6 +279,8 @@ def test_separated_physical_cracks_retain_distinct_node_components():
     _,audit=mechanically_separating_graph_support(m,net)
     assert graph_component_count(net)==2 and audit.graph_component_count==2
     assert len(set(audit.support_component_ids_node))==2 and not audit.illegal_support_connection
+    assert audit.component_incidence_one_to_one
+    assert audit.graph_to_node_support_component_incidence==((1,(1,)),(2,(2,)))
     assert audit.minimum_support_component_separation_m>0
 
 def test_mesh_unresolved_distinct_parallel_cracks_fail_closed_explicitly():
@@ -304,6 +306,13 @@ def test_kink_and_y_junction_sector_certificates_are_nonvacuous():
     assert len(y_a.junction_sector_certificates)==1
     certificate=y_a.junction_sector_certificates[0]
     assert certificate.junction_certificate_status=="ACCEPTED" and all(certificate.sector_seed_counts)
+    assert certificate.legal_support_overlap
+
+def test_nonadjacent_same_graph_arc_support_short_circuit_fails_closed():
+    m=mesh(n=65); net=network(((.125,-.03),(.75,-.03),(.75,.03),(.125,.03)))
+    _,audit=mechanically_separating_graph_support(m,net,return_uncertified_audit_for_screen=True)
+    assert audit.nonadjacent_arc_support_short_circuit_pairs
+    assert "NONADJACENT_ARC_SUPPORT_SHORT_CIRCUIT" in audit.certification_reason
 
 def test_junction_sector_verifier_rejects_deliberately_removed_arm_support():
     m=mesh(n=65); kink=network(((.125,0.),(.5,0.),(.75,.25))); selected,_=mechanically_separating_graph_support(m,kink)

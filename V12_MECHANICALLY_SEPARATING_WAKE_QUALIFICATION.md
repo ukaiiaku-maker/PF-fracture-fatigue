@@ -1,62 +1,70 @@
-# V12 mechanically separating sharp-wake prerequisite
+# V12 mechanically separating sharp-wake qualification
 
-This branch is based on V11 production release `2b5e535` and introduces the
-separate model identity `sharp_wake_mechanically_separating_v12`. It does not
-install the model in the V11 production transaction path and does not change
-`sharp_wake_causal_v11`.
+This draft branch is based on V11 production commit `2b5e5351add0bf0db67f2cda35a1480c3e7efc91`
+and defines the separate model identity `sharp_wake_mechanically_separating_v12`.
+V12 is not installed in the production transaction path and PR #57 is unchanged.
 
-The V12 candidate derives support from the complete accepted crack graph. It
-classifies physical roots, active tips, inactive terminals, degree-two interior
-vertices, branch junctions, and merged vertices. Every exact graph-interior
-support node must have its complete P1 element star disabled; an unresolved
-star, unresolved graph edge, independent intact crossing path, nonlocal retained
-support, premature mechanical coalescence, non-O(h) width, or non-O(h) tip
-leakage fails closed. Only a graph vertex whose sole role is active degree-one
-tip can be exempted, so a former or mixed-role tip closes.
+## Attested geometry baseline
+
+The final geometry evidence at branch head
+`1b426ef04b3f371d16059a370f71883625bb53e1` reports
+`MECHANICALLY_SEPARATING_WAKE_GEOMETRY_QUALIFIED = PASS`. Scoped Python 3.12
+workflow run `33446100847` tested that exact head and passed 88 scoped tests,
+two deterministic evidence regenerations, `git diff --check`, and the clean-worker check.
+
+The Phase 0 integrity patch replaces literal scientific PASS values with
+evidence-derived Booleans, adds bidirectional graph/support component incidence,
+detects nonadjacent-arc support short circuits, calculates legal junction
+overlap geometrically, adds Y/T defective controls and exact physical
+coalescence, and adds an explicit no-mechanical-novelty event control. Its local
+focused suite passes 60 tests; its exact implementation source is recorded in
+the regenerated qualification provenance.
+
+## Geometry evidence requirements
+
+The runner derives every scientific geometry gate from its rows:
+
+- uniform fixed-domain refinement requires decreasing physical width and area,
+  convergent signed tip footprint, bounded `width/h`, and bounded `area/(L h)`;
+- the fixed crack-local patch must remain invariant under independent far-field
+  remeshing by physical-coordinate support fingerprint;
+- event classification requires production-valid acceptance, alignment-remesh,
+  and no-mechanical-novelty controls, correct classifications, a stiffness
+  fingerprint change for every accepted event, and sequential equivalence;
+- every graph component and node-connected support component must have a
+  one-to-one incidence outside declared junction/coalescence neighborhoods;
+- nonadjacent certification arcs in one graph component may not become
+  node-connected through their support;
+- kink, Y, T, mixed-role, merged-terminal, and exact-coalescence neighborhoods
+  use geometric overlap and annular sector certificates; deliberately defective
+  kink, Y, and T supports must be rejected.
 
 ## Reproduction
 
 ```bash
 python scripts/qualify_v12_mechanically_separating_wake.py
-python -m pytest -q tests/test_v12_mechanically_separating_wake.py \
-  tests/test_v11_causal_sharp_wake.py tests/test_crack_network_v11.py \
-  tests/test_v11_live_topology_multitip.py tests/test_topology_transaction_v11.py
+python -m pytest -q \
+  tests/test_v12_mechanically_separating_wake.py \
+  tests/test_v11_causal_sharp_wake.py \
+  tests/test_crack_network_v11.py \
+  tests/test_v11_live_topology_multitip.py \
+  tests/test_topology_transaction_v11.py
 ```
-
-The committed geometry matrix covers four nested resolutions, structured and
-deterministically perturbed meshes, seven orientations, and two endpoint
-phases. Unit tests separately cover graph partition and insertion-order
-invariance, monotone sequential growth, kinks, branching, near-coalescence,
-explicit vertex classes, fail-closed empty graphs, and exact rollback isolation.
 
 ## Gate ledger
 
-| Gate | State | Evidence |
-|---|---|---|
-| `GRAPH_AWARE_NODE_STAR_CONSTRUCTION_SCREEN` | PASS | 112/112 preserved construction cases |
-| `SYNTHETIC_ORIENTATION_AND_PHASE_SCREEN` | PASS | Four resolutions, two mesh families, seven angles, two phases |
-| `SYNTHETIC_INDEPENDENT_INTACT_PATH_SCREEN` | PASS | Nonvacuous independent search passes the 112 synthetic cases; exact-only support is detected |
-| `INDEPENDENT_INTACT_PATH_SEPARATION_CERTIFIED` | OPEN | Broad adaptive/branched and junction-sector certificate remains outstanding |
-| `LOCAL_H_AND_FULL_SUPPORT_OH_OBJECTIVITY` | OPEN | Edge-local metrics and far-field grading factors 1–16 pass; local-refinement convergence remains outstanding |
-| `NO_PREMATURE_MECHANICAL_COALESCENCE` | OPEN | Near-branch counterexample now fails closed; full separation-distance matrix remains outstanding |
-| `ACTIVE_TIP_AND_EVENT_RESOLUTION_QUALIFIED` | OPEN | 54-case, three-orientation/three-phase sweep establishes four grid spacings as the current minimum accepted increment; broader adaptive equivalence remains outstanding |
-| `ACCEPTED_STATE_NONMUTATION_OR_TRIAL_ISOLATION` | PASS | Pure trial leaves accepted arrays and ownership unchanged |
-| `PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED` | NOT_RUN | Production wiring remains blocked |
-| `V12_CLEAN_WORKER_SCOPED_CI` | EXTERNAL_PASS | Run 33344440023 passed at tested head fdc47b614b54e8b03988a0909ca71da1b249c900; the new head must rerun |
-| `MECHANICALLY_SEPARATING_WAKE_GEOMETRY_QUALIFIED` | OPEN | Broad arbitrary-graph/adaptive claim is withdrawn |
-| `MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED` | OPEN | Matched conforming-crack displacement/compliance comparison not yet committed |
-| `MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED` | NOT_RUN | Interaction-integral work is forbidden until primal mechanics passes |
-| `V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED` | OPEN | Requires both primal mechanics and absolute-K gates |
+Authoritative geometry states are generated in
+`artifacts/v12_mechanically_separating_wake/qualification.json`; they are not
+manually asserted here. At the attested baseline all construction, partition,
+local-objectivity, component-topology, coalescence, junction-sector,
+active-tip/event-resolution, and overall geometry gates are PASS.
 
-The result is therefore a hardened synthetic construction/separation screen,
-not a broad geometry qualification, production approval, or authorization to
-resume the void-nucleation mission.
+| Later gate | State |
+|---|---|
+| `PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED` | NOT_RUN |
+| `MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED` | OPEN |
+| `MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED` | NOT_RUN |
+| `V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED` | OPEN |
 
-## Test result
-
-The scoped V12 plus V11 topology regression command passes `68 passed`. The
-full repository suite reports `704 passed, 1 skipped, 7 failed`; all seven
-failures are in pre-existing V10.2 compatibility/status tests outside this
-branch's additive two-file implementation diff (legacy model-ID assertions,
-a sandbox-denied `ps` call, zero-event summary compatibility, and a historical
-fatigue delegate contract). No full-suite PASS is claimed.
+Geometry PASS does not authorize production wiring, absolute-K evaluation, or
+voiding. The next bounded gate is matched conforming-versus-V12 primal mechanics.
