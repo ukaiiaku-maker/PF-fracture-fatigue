@@ -81,10 +81,18 @@ active-tip/event-resolution, and overall geometry gates are PASS.
 | Later gate | State |
 |---|---|
 | `PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED` | NOT_RUN |
-| `MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED` | PASS in the generated straight and 30/45-degree ledgers |
+| `V12_PRIMAL_GLOBAL_RESPONSE_SCREEN` | PASS |
+| `V12_CENTERED_G_SINGLE_INCREMENT_SCREEN` | PASS |
+| `V12_ROTATION_COVARIANCE_SCREEN` | PASS |
+| `V12_MATCHED_COD_QUALIFIED` | OPEN |
+| `V12_INTERFACE_TRACTION_QUALIFIED` | OPEN |
+| `V12_LOCAL_TENSOR_FIELDS_QUALIFIED` | OPEN |
+| `V12_G_PERTURBATION_CONVERGENCE` | OPEN |
+| `V12_PRIMAL_CLEAN_WORKER_REPRODUCIBLE` | NOT_RUN |
+| `MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED` | OPEN |
 | `MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED` | NOT_RUN |
 | `V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED` | OPEN |
 
-Geometry and primal-mechanics PASS do not authorize production wiring,
+Geometry and the three preliminary mechanics screens do not authorize production wiring,
 absolute-K evaluation, or voiding. Absolute KI remains NOT_RUN and the overall
 production prerequisite remains OPEN.
