@@ -31,12 +31,17 @@
     "maximum_free_residual_relative": 1.272004022318684e-13,
     "mirror_residual_max": 1.3219425606957488e-12,
     "pin_invariance_error_max": 9.722069774015793e-14,
-    "targeted_1p5625_face_adjacent_error": 0.11095616667834349,
-    "targeted_1p5625_production_tensor_probe_error": 0.03906119738353192
+    "targeted_0p78125_face_adjacent_error": 0.04563566277883552,
+    "targeted_0p78125_local_tensor_error_max": 0.04563566277883552,
+    "targeted_1p5625_face_adjacent_error": 0.09032679734586994,
+    "targeted_production_tensor_probe_errors": [
+      0.021174494549210554,
+      0.01199296731982102
+    ]
   },
   "conforming_oracle_source_commit": "8ad7f42c49c27d1066ff5ef7ee4a910232f2e7d4",
   "conforming_oracle_source_sha256": "3237c850c9046087a28a80421c79f52c5716d2181b40c9b5f74a5ff1bd01de70",
-  "evidence_generation_parent_sha": "186af56672971b9c5f864b176ab3e8693eb0e133",
+  "evidence_generation_parent_sha": "0120ed1cd7056efdc964a08a8827491c78ad6cee",
   "gates": {
     "CENTERED_G_CONVERGENCE": "PASS",
     "FIELDS_CONVERGENCE": "FAIL",
@@ -48,9 +53,9 @@
     "V12_CENTERED_G_SINGLE_INCREMENT_SCREEN": "PASS",
     "V12_G_PERTURBATION_CONVERGENCE": "PASS",
     "V12_INTERFACE_TRACTION_QUALIFIED": "FAIL",
-    "V12_LOCAL_TENSOR_FIELDS_QUALIFIED": "FAIL",
+    "V12_LOCAL_TENSOR_FIELDS_QUALIFIED": "PASS",
     "V12_MATCHED_COD_QUALIFIED": "PASS",
-    "V12_P0_LOCAL_TENSOR_FIDELITY": "NOT_QUALIFIED_REQUIRES_CONFORMING_TIP_PATCH",
+    "V12_P0_LOCAL_TENSOR_FIDELITY": "PASS",
     "V12_PRIMAL_CLEAN_WORKER_REPRODUCIBLE": "NOT_RUN",
     "V12_PRIMAL_GLOBAL_RESPONSE_SCREEN": "PASS",
     "V12_ROTATION_COVARIANCE_SCREEN": "PASS",
@@ -58,7 +63,7 @@
     "V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED": "FAIL",
     "V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED": "PASS"
   },
-  "implementation_git_sha": "186af56672971b9c5f864b176ab3e8693eb0e133",
+  "implementation_git_sha": "0120ed1cd7056efdc964a08a8827491c78ad6cee",
   "schema": "v12_primal_mechanics_qualification_v2",
   "thresholds_predeclared": {
     "maximum_G_delta_plateau_spread": 0.1,
