@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tolerance-aware cross-platform comparator for V12 scientific evidence."""
 from __future__ import annotations
-import argparse, ast, csv, json, math
+import argparse, csv, json, math
 from pathlib import Path
 
 RTOL=1e-10; ATOL=1e-12
@@ -31,7 +31,7 @@ def compare_csv(expected,actual,name):
     for index,(left,right) in enumerate(zip(a,b)):
         for key in left:
             x,y=left[key],right[key]
-            if key in {"cod_samples","distance_resolved_profiles_json","production_tensor_probe_v12_json","production_tensor_probe_conforming_json"} and x and y: compare_nested(ast.literal_eval(x),ast.literal_eval(y),f"{name}:{index}:{key}")
+            if key in {"cod_samples","distance_resolved_profiles_json","production_tensor_probe_v12_json","production_tensor_probe_conforming_json"} and x and y: compare_nested(json.loads(x),json.loads(y),f"{name}:{index}:{key}")
             elif key in EXACT_COLUMNS or number(x) is None or number(y) is None:
                 if x!=y: raise AssertionError(f"{name}:{index}:{key}: exact mismatch {x!r} != {y!r}")
             else:
