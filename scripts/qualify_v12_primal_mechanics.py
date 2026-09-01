@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT))
 from arrhenius_fracture.conforming_crack_oracle_v12 import CONFORMING_ORACLE_SOURCE_COMMIT
-from arrhenius_fracture.primal_crack_mechanics_v12 import run_straight_case
+from arrhenius_fracture.primal_crack_mechanics_v12 import run_rotated_cases, run_straight_case
 
 THRESHOLDS={
  "maximum_finest_global_reference_error":.05,
@@ -61,7 +61,14 @@ def main():
     }
     equilibrium=checks["maximum_free_residual_relative"]<=THRESHOLDS["maximum_free_residual_relative"] and checks["maximum_energy_reaction_identity_relative"]<=THRESHOLDS["maximum_energy_reaction_identity_relative"] and checks["killed_energy_fraction_at_kappa_1e-6"]<=THRESHOLDS["maximum_killed_energy_fraction_at_kappa_1e-6"]
     gates["V12_PRIMAL_MECHANICS_STRAIGHT"]="PASS" if equilibrium and all(gates[k]=="PASS" for k in ("MATCHED_PARENT_REPRESENTATIONS","KAPPA_OBJECTIVITY","FIELDS_CONVERGENCE","CENTERED_G_CONVERGENCE")) else "FAIL"
+    angle_rows=[]
+    if gates["V12_PRIMAL_MECHANICS_STRAIGHT"]=="PASS":
+        angle_rows=run_rotated_cases(); angle_fine=[r for r in angle_rows if r["representation"]=="C_V12" and r["h_tip_m"]==finest and r["kappa"]==1e-8]
+        checks["angle_finest_global_reference_error_max"]=max(max(r[k] for k in ("reaction_reference_error","compliance_reference_error","energy_reference_error")) for r in angle_fine)
+        checks["angle_equilibrium_identity_max"]=max(max(r["free_residual_relative"],r["energy_reaction_identity_relative"]) for r in angle_rows)
+        gates["V12_PRIMAL_MECHANICS_ANGLES_30_45"]="PASS" if checks["angle_finest_global_reference_error_max"]<=THRESHOLDS["maximum_finest_global_reference_error"] and checks["angle_equilibrium_identity_max"]<=THRESHOLDS["maximum_free_residual_relative"] else "FAIL"
     args.out.mkdir(parents=True,exist_ok=True); write_csv(args.out/"straight_primal_matrix.csv",rows); write_csv(args.out/"centered_G_matrix.csv",derivatives)
+    if angle_rows: write_csv(args.out/"angle_primal_matrix.csv",angle_rows)
     sha=subprocess.check_output(("git","rev-parse","HEAD"),cwd=ROOT,text=True).strip()
     report={"schema":"v12_primal_mechanics_qualification_v1","implementation_git_sha":sha,"conforming_oracle_source_commit":CONFORMING_ORACLE_SOURCE_COMMIT,"thresholds_predeclared":THRESHOLDS,"checks":checks,"gates":gates}
     (args.out/"qualification.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n"); print(json.dumps(report,indent=2,sort_keys=True))
