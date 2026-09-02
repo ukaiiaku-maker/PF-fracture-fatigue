@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from arrhenius_fracture.fem import plane_strain_D
 from arrhenius_fracture.config import ElasticProperties
 from arrhenius_fracture.mesh import rebuild_tri_mesh
-from arrhenius_fracture.primal_crack_mechanics_v12 import _interface_tractions, recover_element_fields, run_rotated_cases, run_straight_case
+from arrhenius_fracture.primal_crack_mechanics_v12 import _interface_tractions, _stress_tensor, _traction_local_components, recover_element_fields, run_rotated_cases, run_straight_case
 
 
 def test_affine_patch_recovers_interleaved_strain_stress_and_energy_on_rigidly_moved_triangles():
@@ -76,3 +76,28 @@ def test_interface_traction_jump_is_zero_for_known_uniform_field():
     result=SimpleNamespace(sigma_gp=np.tile(np.array([[2.],[3.],[.5]]),(1,parent.mesh.ne)))
     measured=_interface_tractions(parent.mesh,result,mask,parent.p0,parent.p1)
     assert measured["trimmed_interior_jump_traction_rms_Pa"]<1e-12
+
+
+def test_affine_stress_traction_on_arbitrary_cut_and_normal_reversal():
+    stress=np.array((7.0,3.0,1.5)); interface_normal=np.array((2.0,-1.0)); interface_normal/=np.linalg.norm(interface_normal); crack_normal=np.array((.6,.8)); tangent=np.array((.8,-.6))
+    expected=_stress_tensor(stress)@interface_normal
+    measured=_traction_local_components(stress,interface_normal,crack_normal,tangent)
+    np.testing.assert_allclose(measured,(expected@crack_normal,expected@tangent),rtol=0,atol=1e-14)
+    reversed_components=_traction_local_components(stress,-interface_normal,crack_normal,tangent)
+    np.testing.assert_allclose(reversed_components,-measured,rtol=0,atol=1e-14)
+    np.testing.assert_allclose(np.abs(reversed_components),np.abs(measured),rtol=0,atol=0)
+
+
+def test_conforming_slit_has_no_connectivity_transmitting_across_open_faces():
+    parent=build_matched_crack_parent(8e-4,8e-4,(2e-4,0.),(5e-4,0.),25e-6); slit=conforming_slit_from_parent(parent)
+    upper=set(slit.upper_face_edges[1:-1].ravel()); lower=set(slit.lower_face_edges[1:-1].ravel())
+    assert upper.isdisjoint(lower)
+    assert not any(any(node in upper for node in elem) and any(node in lower for node in elem) for elem in slit.mesh.elems)
+
+
+def test_mode_i_interface_regions_balance_and_shear_is_numerical_zero():
+    rows,_=run_straight_case(h_values=(25e-6,),kappas=(1e-6,)); row=next(r for r in rows if r["representation"]=="C_V12")
+    assert all(row[f"{region}_interface_length_m"]>0 for region in ("root","trimmed_interior","active_tip"))
+    assert row["discrete_upper_lower_normal_balance_relative"]<1e-10
+    assert abs(row["discrete_signed_transmitted_shear_force_N_per_m"])/abs(row["reaction_N_per_m"])<1e-10
+    assert abs(abs(row["discrete_upper_shear_force_N_per_m"])-abs(row["discrete_lower_shear_force_N_per_m"]))/abs(row["reaction_N_per_m"])<1e-10

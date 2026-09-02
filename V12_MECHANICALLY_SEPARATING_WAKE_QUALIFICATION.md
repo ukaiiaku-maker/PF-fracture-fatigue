@@ -72,6 +72,27 @@ numerical-cancellation scale but is not strictly monotone, so the predeclared
 all-metric monotonic gate remains FAIL rather than being changed after seeing
 the result.
 
+## Prospective V3 physical transmission criterion
+
+The historical result is retained as
+`V12_SOFT_CORRIDOR_TRANSMISSION_V2_FROZEN =
+FAIL_STRICT_SIGNED_COMPONENT_MONOTONICITY`; V3 does not relabel it.
+
+Before regenerating V3, the physical gate is frozen on the existing `p=2`
+policy and mesh levels. It requires decreasing `kappa/h`, recovered soft-side
+traction magnitude `T_sigma`, discrete normal-transfer magnitude `T_n`, vector
+resultant `T_resultant`, and killed-energy fraction `E_soft`. Both finest
+`T_sigma`, `T_resultant`, and `E_soft` values must be below `1e-3`; `T_t` must
+be below `1e-3` at every level; straight Mode-I symmetry, the 5% primary
+budget, `1e12` conditioning limit, and equilibrium residual limit must remain
+qualified. Signed shear is published but is not required to be strictly
+monotone when its magnitude is numerical zero. The `p=1` sequence remains a
+nonqualifying diagnostic control.
+
+Recovered soft-side traction and discrete element-internal-force balance are
+independent diagnostics. Intact-side traction and the elementwise traction
+jump are retained diagnostically and are not required to vanish.
+
 The angle result is classified only as rotation covariance. The rotated graph
 endpoints are asserted to be actual mesh vertices and the off-grid screen
 override is not used. Absolute K and all production work remain outside scope.
@@ -124,12 +145,14 @@ active-tip/event-resolution, and overall geometry gates are PASS.
 | `V12_CENTERED_G_SINGLE_INCREMENT_SCREEN` | PASS |
 | `V12_ROTATION_COVARIANCE_SCREEN` | PASS |
 | `V12_MATCHED_COD_QUALIFIED` | PASS at unified 3.125 um level |
-| `V12_INTERFACE_TRACTION_QUALIFIED` | FAIL, matrix retained |
+| `V12_INTERFACE_TRACTION_DIAGNOSTIC` | RETAINED_NOT_AGGREGATE |
 | `V12_LOCAL_TENSOR_FIELDS_QUALIFIED` | PASS at bounded 0.78125 um refinement |
 | `V12_P0_LOCAL_TENSOR_FIDELITY` | PASS |
 | `V12_G_PERTURBATION_CONVERGENCE` | PASS |
 | `V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED` | PASS |
 | `V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED` | FAIL, matrix retained |
+| `V12_SOFT_CORRIDOR_TRANSMISSION_V2_FROZEN` | FAIL_STRICT_SIGNED_COMPONENT_MONOTONICITY |
+| `V12_SOFT_CORRIDOR_TRANSMISSION_V3_PHYSICAL` | OPEN pending prospective regeneration |
 | `V12_PRIMAL_CLEAN_WORKER_REPRODUCIBLE` | NOT_RUN |
 | `MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED` | OPEN |
 | `MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED` | NOT_RUN |

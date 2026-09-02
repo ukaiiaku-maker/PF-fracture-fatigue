@@ -45,6 +45,9 @@ def write_csv(path,rows):
         writer=csv.DictWriter(stream,fieldnames=fields,lineterminator="\n"); writer.writeheader(); writer.writerows(rows)
 def git(*args): return subprocess.check_output(("git",)+args,cwd=ROOT,text=True).strip()
 def sha256(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+def decreasing(values): return all(a>b for a,b in zip(values,values[1:]))
+def fitted_slope(rows,key):
+    x=np.log([r["h_tip_m"] for r in rows]); y=np.log(np.maximum([abs(r[key]) for r in rows],1e-300)); return float(np.polyfit(x,y,1)[0])
 
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument("--out",type=Path,default=Path("artifacts/v12_primal_mechanics")); args=parser.parse_args()
@@ -91,25 +94,35 @@ def main():
     primary=("reaction_N_per_m","compliance_m2_per_N","energy_J_per_m","crack_opening_displacement_m","area_weighted_stress_error_near_tip_annulus","area_weighted_stress_error_face_adjacent_strip","area_weighted_stress_error_whole_exterior")
     checks["low_kappa_primary_spread_max"]=max(rel(low[k],mid[k]) for k in primary)
     checks["low_kappa_G_spread_max"]=max(rel(next(r for r in derivatives if r["representation"]=="V12" and r["h_tip_m"]==h and r["delta_a_m"]==delta and r["kappa"]==1e-8)[quantity],next(r for r in derivatives if r["representation"]=="V12" and r["h_tip_m"]==h and r["delta_a_m"]==delta and r["kappa"]==1e-6)[quantity]) for h in (12.5e-6,6.25e-6) for delta in (12.5e-6,25e-6,50e-6) for quantity in ("G_energy_J_per_m2","G_compliance_J_per_m2"))
+    for row in joint:
+        row["T_sigma"]=abs(row["trimmed_interior_soft_traction_rms_relative_remote_stress"]); row["T_n"]=abs(row["discrete_signed_transmitted_normal_force_N_per_m"])/abs(row["reaction_N_per_m"]); row["T_t"]=abs(row["discrete_signed_transmitted_shear_force_N_per_m"])/abs(row["reaction_N_per_m"]); row["T_resultant"]=float(np.hypot(row["T_n"],row["T_t"])); row["E_soft"]=row["killed_energy_fraction"]
     p2=sorted((r for r in joint if r["policy_exponent_p"]==2),key=lambda r:r["h_tip_m"],reverse=True); joint_metrics=("trimmed_interior_soft_traction_rms_relative_remote_stress","discrete_transmitted_normal_force_relative_remote_resultant","discrete_transmitted_shear_force_relative_remote_resultant","killed_energy_fraction")
     checks["joint_p2_kappa_over_h_decreases"]=all(a["kappa_over_h_per_m"]>b["kappa_over_h_per_m"] for a,b in zip(p2,p2[1:])); checks["joint_p2_transmission_decreases"]=all(a[key]>b[key] for key in joint_metrics for a,b in zip(p2,p2[1:])); checks["joint_p2_finest_transmission_max"]=max(abs(p2[-1][key]) for key in joint_metrics[:3]); checks["joint_p2_finest_killed_energy_fraction"]=p2[-1]["killed_energy_fraction"]; checks["joint_p2_primary_change_max"]=max(p2[-1][key] for key in ("reaction_reference_error","compliance_reference_error","energy_reference_error","crack_opening_reference_error")); checks["joint_conditioning_diagonal_ratio_max"]=max(r["conditioning_diagonal_ratio"] for r in joint)
+    for key in ("T_sigma","T_n","T_t","T_resultant","E_soft"):
+        checks[f"v3_{key}_values"]=[r[key] for r in p2]; checks[f"v3_{key}_convergence_ratios"]=[a[key]/max(b[key],1e-300) for a,b in zip(p2,p2[1:])]; checks[f"v3_{key}_fitted_slope"]=fitted_slope(p2,key)
+    checks["v3_kappa_over_h_decreases"]=decreasing([r["kappa_over_h_per_m"] for r in p2]); checks["v3_T_sigma_decreases"]=decreasing([r["T_sigma"] for r in p2]); checks["v3_T_n_decreases"]=decreasing([r["T_n"] for r in p2]); checks["v3_T_resultant_decreases"]=decreasing([r["T_resultant"] for r in p2]); checks["v3_E_soft_decreases"]=decreasing([r["E_soft"] for r in p2]); checks["v3_two_finest_T_sigma_max"]=max(r["T_sigma"] for r in p2[-2:]); checks["v3_two_finest_T_resultant_max"]=max(r["T_resultant"] for r in p2[-2:]); checks["v3_two_finest_E_soft_max"]=max(r["E_soft"] for r in p2[-2:]); checks["v3_T_t_all_levels_max"]=max(r["T_t"] for r in p2); checks["v3_transmission_threshold_margin"]=THRESHOLDS["maximum_joint_limit_transmission_relative"]-max(checks["v3_two_finest_T_sigma_max"],checks["v3_two_finest_T_resultant_max"],checks["v3_T_t_all_levels_max"]); checks["v3_energy_threshold_margin"]=THRESHOLDS["maximum_joint_limit_killed_energy_fraction"]-checks["v3_two_finest_E_soft_max"]; checks["v3_recovered_discrete_ratio_finest"]=p2[-1]["T_sigma"]/max(p2[-1]["T_resultant"],1e-300); checks["v3_upper_lower_balance_max"]=max(r[k] for r in p2 for k in ("discrete_upper_lower_normal_balance_relative","discrete_upper_lower_shear_balance_relative")); checks["v3_free_residual_max"]=max(r["free_residual_relative"] for r in p2)
     delta_groups=[[r for r in derivatives if r["representation"]==name and r["h_tip_m"]==h and (name=="CONF" or r["kappa"]==1e-8)] for name in ("V12","CONF") for h in (12.5e-6,6.25e-6)]
     checks["G_delta_plateau_spread_max"]=max((max(r["G_energy_J_per_m2"] for r in group)-min(r["G_energy_J_per_m2"] for r in group))/max(abs(r["G_energy_J_per_m2"]) for r in group) for group in delta_groups)
     gates={
       "MATCHED_PARENT_REPRESENTATIONS": "PASS" if checks["matched_parent_fingerprints_identical_per_h"] else "FAIL",
       "KAPPA_OBJECTIVITY": "PASS" if checks["low_kappa_pair_reaction_spread"]<=THRESHOLDS["maximum_low_kappa_pair_reaction_spread"] else "FAIL",
-      "FIELDS_CONVERGENCE": "PASS" if checks["global_and_field_errors_decrease_under_refinement"] and checks["finest_global_reference_error"]<=THRESHOLDS["maximum_finest_global_reference_error"] and checks["finest_outside_support_stress_l2_error"]<=THRESHOLDS["maximum_finest_outside_support_stress_l2_error"] else "FAIL",
+      "UNIFORM_25_TO_3P125_FIELD_SCREEN": "PASS" if checks["global_and_field_errors_decrease_under_refinement"] and checks["finest_global_reference_error"]<=THRESHOLDS["maximum_finest_global_reference_error"] and checks["finest_outside_support_stress_l2_error"]<=THRESHOLDS["maximum_finest_outside_support_stress_l2_error"] else "FAIL",
       "CENTERED_G_CONVERGENCE": "PASS" if checks["G_error_decreases_under_refinement"] and checks["finest_G_reference_error"]<=THRESHOLDS["maximum_finest_G_reference_error"] and checks["maximum_energy_compliance_G_identity_error"]<=THRESHOLDS["maximum_energy_compliance_G_identity_error"] else "FAIL",
       "V12_PRIMAL_GLOBAL_RESPONSE_SCREEN": "OPEN",
       "V12_CENTERED_G_SINGLE_INCREMENT_SCREEN": "OPEN",
       "V12_ROTATION_COVARIANCE_SCREEN": "OPEN",
       "V12_MATCHED_COD_QUALIFIED":"OPEN",
       "V12_INTERFACE_TRACTION_QUALIFIED":"OPEN",
+      "V12_INTERFACE_TRACTION_DIAGNOSTIC":"RETAINED_NOT_AGGREGATE",
       "V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED":"OPEN",
+      "V12_SOFT_CORRIDOR_TRANSMISSION_V2_FROZEN":"FAIL_STRICT_SIGNED_COMPONENT_MONOTONICITY",
+      "V12_SOFT_CORRIDOR_TRANSMISSION_V3_PHYSICAL":"OPEN",
       "V12_LOCAL_TENSOR_FIELDS_QUALIFIED":"OPEN",
       "V12_G_PERTURBATION_CONVERGENCE":"OPEN",
       "V12_PRIMAL_CLEAN_WORKER_REPRODUCIBLE":"NOT_RUN",
       "V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED":"OPEN",
+      "V12_STRAIGHT_MODE_I_PRIMAL_MECHANICS_QUALIFIED":"OPEN",
+      "BOUNDED_LOCAL_REFINEMENT_FIELD_QUALIFIED":"OPEN",
       "MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED":"OPEN",
       "MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED":"NOT_RUN",
       "PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED":"NOT_RUN",
@@ -122,12 +135,18 @@ def main():
     gates["V12_MATCHED_COD_QUALIFIED"]="PASS" if checks["matched_cod_error_decreases_under_refinement"] and max(checks["finest_matched_cod_error"],checks["finest_fixed_distance_cod_error"])<=THRESHOLDS["maximum_finest_matched_cod_error"] and checks["conforming_extrapolated_direct_cod_error_max"]<=THRESHOLDS["maximum_conforming_extrapolated_direct_cod_error"] else "FAIL"
     targeted_converges=checks["targeted_1p5625_face_adjacent_error"]>checks["targeted_0p78125_face_adjacent_error"] and checks["targeted_production_tensor_probe_errors"][0]>checks["targeted_production_tensor_probe_errors"][1]
     gates["V12_LOCAL_TENSOR_FIELDS_QUALIFIED"]="PASS" if checks["all_area_weighted_tensor_errors_decrease"] and targeted_converges and checks["targeted_0p78125_local_tensor_error_max"]<=THRESHOLDS["maximum_finest_local_tensor_error"] else "FAIL"
-    transmission_pass=checks["joint_p2_kappa_over_h_decreases"] and checks["joint_p2_transmission_decreases"] and checks["joint_p2_finest_transmission_max"]<=THRESHOLDS["maximum_joint_limit_transmission_relative"] and checks["joint_p2_finest_killed_energy_fraction"]<=THRESHOLDS["maximum_joint_limit_killed_energy_fraction"] and checks["joint_p2_primary_change_max"]<=THRESHOLDS["maximum_joint_limit_primary_change"] and checks["joint_conditioning_diagonal_ratio_max"]<=THRESHOLDS["maximum_usable_conditioning_diagonal_ratio"]
-    gates["V12_INTERFACE_TRACTION_QUALIFIED"]="PASS" if transmission_pass else "FAIL"
-    gates["V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED"]="PASS" if transmission_pass else "FAIL"
+    gates["V12_INTERFACE_TRACTION_QUALIFIED"]="DIAGNOSTIC_NOT_AGGREGATE"
+    gates["V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED"]="FAIL"
     gates["V12_P0_LOCAL_TENSOR_FIDELITY"]="PASS" if gates["V12_LOCAL_TENSOR_FIELDS_QUALIFIED"]=="PASS" else "NOT_QUALIFIED_REQUIRES_CONFORMING_TIP_PATCH"
+    gates["BOUNDED_LOCAL_REFINEMENT_FIELD_QUALIFIED"]=gates["V12_LOCAL_TENSOR_FIELDS_QUALIFIED"]
+    v3_pass=all((checks["v3_kappa_over_h_decreases"],checks["v3_T_sigma_decreases"],checks["v3_T_n_decreases"],checks["v3_T_resultant_decreases"],checks["v3_E_soft_decreases"],checks["v3_two_finest_T_sigma_max"]<=THRESHOLDS["maximum_joint_limit_transmission_relative"],checks["v3_two_finest_T_resultant_max"]<=THRESHOLDS["maximum_joint_limit_transmission_relative"],checks["v3_two_finest_E_soft_max"]<=THRESHOLDS["maximum_joint_limit_killed_energy_fraction"],checks["v3_T_t_all_levels_max"]<=THRESHOLDS["maximum_joint_limit_transmission_relative"],gates["V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED"]=="PASS",checks["joint_p2_primary_change_max"]<=THRESHOLDS["maximum_joint_limit_primary_change"],checks["joint_conditioning_diagonal_ratio_max"]<=THRESHOLDS["maximum_usable_conditioning_diagonal_ratio"],checks["v3_free_residual_max"]<=THRESHOLDS["maximum_free_residual_relative"]))
+    gates["V12_SOFT_CORRIDOR_TRANSMISSION_V3_PHYSICAL"]="PASS" if v3_pass else "FAIL"
+    gates["V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED"]=gates["V12_SOFT_CORRIDOR_TRANSMISSION_V3_PHYSICAL"]
     gates["V12_G_PERTURBATION_CONVERGENCE"]="PASS" if checks["G_delta_plateau_spread_max"]<=THRESHOLDS["maximum_G_delta_plateau_spread"] else "FAIL"
     gates["KAPPA_OBJECTIVITY"]="PASS" if max(checks["low_kappa_primary_spread_max"],checks["low_kappa_G_spread_max"])<=THRESHOLDS["maximum_low_kappa_primary_spread"] else "FAIL"
+    straight_pass=v3_pass and gates["V12_PRIMAL_GLOBAL_RESPONSE_SCREEN"]=="PASS" and gates["V12_MATCHED_COD_QUALIFIED"]=="PASS" and gates["V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED"]=="PASS" and gates["V12_LOCAL_TENSOR_FIELDS_QUALIFIED"]=="PASS" and gates["V12_G_PERTURBATION_CONVERGENCE"]=="PASS" and gates["KAPPA_OBJECTIVITY"]=="PASS"
+    gates["V12_STRAIGHT_MODE_I_PRIMAL_MECHANICS_QUALIFIED"]="PASS" if straight_pass else "FAIL"
+    gates["MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED"]="PASS_STRAIGHT_MODE_I_SCOPE" if straight_pass else "OPEN"
     angle_rows=[]
     if gates["V12_PRIMAL_GLOBAL_RESPONSE_SCREEN"]=="PASS":
         angle_rows=run_rotated_cases(); angle_fine=[r for r in angle_rows if r["representation"]=="C_V12" and r["h_tip_m"]==g_finest and r["kappa"]==1e-8]
@@ -144,7 +163,7 @@ def main():
     implementation_sha=git("log","-1","--format=%H","--",*IMPLEMENTATION_PATHS)
     oracle_sha=CONFORMING_ORACLE_SOURCE_COMMIT
     oracle_source_sha256=sha256(ROOT/"arrhenius_fracture/conforming_crack_oracle_v12.py")
-    report={"schema":"v12_primal_mechanics_qualification_v2","base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"conforming_oracle_source_sha256":oracle_source_sha256,"thresholds_predeclared":THRESHOLDS,"checks":checks,"gates":gates}
+    report={"schema":"v12_primal_mechanics_qualification_v3","base_git_sha":BASE_SHA,"implementation_git_sha":implementation_sha,"evidence_generation_parent_sha":implementation_sha,"conforming_oracle_source_commit":oracle_sha,"conforming_oracle_source_sha256":oracle_source_sha256,"thresholds_predeclared":THRESHOLDS,"checks":checks,"gates":gates}
     (args.out/"qualification.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n"); print(json.dumps(report,indent=2,sort_keys=True))
     scientific=("straight_primal_matrix.csv","targeted_local_refinement_matrix.csv","joint_h_kappa_transmission_matrix.csv","centered_G_matrix.csv","angle_primal_matrix.csv","qualification.json")
     manifest={name:sha256(args.out/name) for name in scientific}

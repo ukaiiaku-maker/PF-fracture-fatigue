@@ -92,6 +92,11 @@ def _json(value): return json.dumps(value,sort_keys=True,separators=(",",":"),de
 def _stress_tensor(voigt): return np.array(((voigt[0],voigt[2]),(voigt[2],voigt[1])))
 
 
+def _traction_local_components(stress_voigt,interface_normal,crack_normal,tangent):
+    traction=_stress_tensor(np.asarray(stress_voigt,float))@np.asarray(interface_normal,float)
+    return np.array((traction@np.asarray(crack_normal,float),traction@np.asarray(tangent,float)))
+
+
 def _area_weighted_error(mesh,value,reference,region):
     ids=np.flatnonzero(region)
     if not len(ids): return float("nan")
@@ -171,8 +176,9 @@ def _discrete_corridor_transfer(mesh,result,mask,p0,tip):
             midpoint=mesh.nodes[list(edge)].mean(axis=0); x=float((midpoint-p0)@tangent)
             if 50e-6<=x<=np.linalg.norm(tip-p0)-50e-6: interface.update(edge)
     upper=np.array([node for node in interface if (mesh.nodes[node]-p0)@normal>=0],int); lower=np.array([node for node in interface if (mesh.nodes[node]-p0)@normal<0],int)
-    fu=nodal[upper].sum(axis=0) if len(upper) else np.zeros(2); fl=nodal[lower].sum(axis=0) if len(lower) else np.zeros(2)
-    return {"discrete_transmitted_normal_force_N_per_m":float(abs(fu@normal)+abs(fl@normal)),"discrete_transmitted_shear_force_N_per_m":float(abs(fu@tangent)+abs(fl@tangent)),"discrete_interface_node_count":len(interface)}
+    fu=nodal[upper].sum(axis=0) if len(upper) else np.zeros(2); fl=nodal[lower].sum(axis=0) if len(lower) else np.zeros(2); un=float(fu@normal); ln=float(fl@normal); ut=float(fu@tangent); lt=float(fl@tangent)
+    normal_signed=.5*(un-ln); shear_signed=.5*(ut-lt); normal_scale=max(abs(un)+abs(ln),1e-300); shear_scale=max(abs(ut)+abs(lt),1e-300)
+    return {"discrete_upper_normal_force_N_per_m":un,"discrete_lower_normal_force_N_per_m":ln,"discrete_upper_shear_force_N_per_m":ut,"discrete_lower_shear_force_N_per_m":lt,"discrete_signed_transmitted_normal_force_N_per_m":normal_signed,"discrete_signed_transmitted_shear_force_N_per_m":shear_signed,"discrete_transmitted_normal_force_N_per_m":abs(normal_signed),"discrete_transmitted_shear_force_N_per_m":abs(shear_signed),"discrete_upper_lower_normal_balance_relative":abs(abs(un)-abs(ln))/normal_scale,"discrete_upper_lower_shear_balance_relative":abs(abs(ut)-abs(lt))/shear_scale,"discrete_interface_node_count":len(interface)}
 
 
 def _mirror_residuals(mesh,result,tip,pin):
