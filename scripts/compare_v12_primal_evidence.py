@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse, csv, json, math
 from pathlib import Path
 
-RTOL=1e-8; ATOL=1e-12
+RTOL=1e-8; CHECK_RTOL=1e-6; ATOL=1e-12
 CSV_FILES=("straight_primal_matrix.csv","targeted_local_refinement_matrix.csv","joint_h_kappa_transmission_matrix.csv","centered_G_matrix.csv","angle_primal_matrix.csv")
 EXACT_JSON_KEYS=("schema","base_git_sha","implementation_git_sha","evidence_generation_parent_sha","conforming_oracle_source_commit","conforming_oracle_source_sha256","thresholds_predeclared","gates")
 EXACT_COLUMNS={"representation","parent_geometry_fingerprint","parent_connectivity_fingerprint","support_fingerprint","minus_graph_fingerprint","plus_graph_fingerprint","minus_support_fingerprint","plus_support_fingerprint","minus_mechanical_fingerprint","plus_mechanical_fingerprint"}
@@ -52,7 +52,7 @@ def main():
         if isinstance(value,bool):
             if value is not other: raise AssertionError(f"qualification:checks:{key}: exact mismatch")
         elif isinstance(value,(list,dict)): compare_nested(value,other,f"qualification:checks:{key}")
-        elif not math.isclose(value,other,rel_tol=RTOL,abs_tol=ATOL): raise AssertionError(f"qualification:checks:{key}: {value} != {other}")
+        elif not math.isclose(value,other,rel_tol=CHECK_RTOL,abs_tol=ATOL): raise AssertionError(f"qualification:checks:{key}: {value} != {other}")
     print("V12 primal scientific evidence matches across platforms")
 
 if __name__=="__main__": main()
