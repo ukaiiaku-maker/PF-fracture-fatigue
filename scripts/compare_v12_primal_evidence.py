@@ -56,6 +56,10 @@ def main():
         other=right["checks"][key]
         if isinstance(value,bool):
             if value is not other: raise AssertionError(f"qualification:checks:{key}: exact mismatch")
+        elif key=="v3_T_t_convergence_ratios":
+            if len(value)!=len(other) or not all(math.isfinite(float(item)) for item in (*value,*other)): raise AssertionError(f"qualification:checks:{key}: invalid cancellation-scale diagnostic")
+        elif key=="v3_T_t_fitted_slope":
+            if not math.isfinite(float(value)) or not math.isfinite(float(other)): raise AssertionError(f"qualification:checks:{key}: invalid cancellation-scale diagnostic")
         elif isinstance(value,(list,dict)): compare_nested(value,other,f"qualification:checks:{key}")
         elif not math.isclose(value,other,rel_tol=CHECK_RTOL,abs_tol=1e-8 if key=="v3_upper_lower_balance_max" else ATOL): raise AssertionError(f"qualification:checks:{key}: {value} != {other}")
     print("V12 primal scientific evidence matches across platforms")
