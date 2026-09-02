@@ -37,22 +37,98 @@
     "targeted_production_tensor_probe_errors": [
       0.021174494549210554,
       0.01199296731982102
-    ]
+    ],
+    "v3_E_soft_convergence_ratios": [
+      2.6163027075902785,
+      2.3121187503531457,
+      2.161332607945393
+    ],
+    "v3_E_soft_decreases": true,
+    "v3_E_soft_fitted_slope": 1.2335213717068427,
+    "v3_E_soft_values": [
+      2.298700656118401e-06,
+      8.786065348820429e-07,
+      3.800006097212123e-07,
+      1.7581773778097424e-07
+    ],
+    "v3_T_n_convergence_ratios": [
+      2.223243327619897,
+      2.1250440921919194,
+      2.0702684707902823
+    ],
+    "v3_T_n_decreases": true,
+    "v3_T_n_fitted_slope": 1.0957422273016653,
+    "v3_T_n_values": [
+      2.317843802248574e-06,
+      1.04255066166327e-06,
+      4.90601896447198e-07,
+      2.369750123566925e-07
+    ],
+    "v3_T_resultant_convergence_ratios": [
+      2.223243327619897,
+      2.1250440921919194,
+      2.0702684707902823
+    ],
+    "v3_T_resultant_decreases": true,
+    "v3_T_resultant_fitted_slope": 1.0957422273016653,
+    "v3_T_resultant_values": [
+      2.317843802248574e-06,
+      1.04255066166327e-06,
+      4.90601896447198e-07,
+      2.369750123566925e-07
+    ],
+    "v3_T_sigma_convergence_ratios": [
+      2.2270714217894074,
+      2.125753778038442,
+      2.070549165841767
+    ],
+    "v3_T_sigma_decreases": true,
+    "v3_T_sigma_fitted_slope": 1.096738186646388,
+    "v3_T_sigma_values": [
+      9.31938632543105e-06,
+      4.184592480623324e-06,
+      1.968521718674631e-06,
+      9.507244508605243e-07
+    ],
+    "v3_T_t_all_levels_max": 8.047321868204208e-20,
+    "v3_T_t_convergence_ratios": [
+      2.1416712306068124,
+      0.21187905555327782,
+      1.553684206599451
+    ],
+    "v3_T_t_fitted_slope": -0.37514574660586286,
+    "v3_T_t_values": [
+      3.6516757150559016e-20,
+      1.705058957168347e-20,
+      8.047321868204208e-20,
+      5.1795093456072286e-20
+    ],
+    "v3_energy_threshold_margin": 0.0009996199993902789,
+    "v3_free_residual_max": 1.2423522252815848e-13,
+    "v3_kappa_over_h_decreases": true,
+    "v3_recovered_discrete_ratio_finest": 4.01191856223855,
+    "v3_transmission_threshold_margin": 0.0009980314782813255,
+    "v3_two_finest_E_soft_max": 3.800006097212123e-07,
+    "v3_two_finest_T_resultant_max": 4.90601896447198e-07,
+    "v3_two_finest_T_sigma_max": 1.968521718674631e-06,
+    "v3_upper_lower_balance_max": 1.8502062907154624e-09
   },
   "conforming_oracle_source_commit": "8ad7f42c49c27d1066ff5ef7ee4a910232f2e7d4",
   "conforming_oracle_source_sha256": "3237c850c9046087a28a80421c79f52c5716d2181b40c9b5f74a5ff1bd01de70",
-  "evidence_generation_parent_sha": "1eb8057da4c28b58d04c58f53d3fb207aec4a7d2",
+  "evidence_generation_parent_sha": "bcea1106a66282377d2a3e59c92786c8d88562ed",
   "gates": {
+    "BOUNDED_LOCAL_REFINEMENT_FIELD_QUALIFIED": "PASS",
     "CENTERED_G_CONVERGENCE": "PASS",
-    "FIELDS_CONVERGENCE": "FAIL",
     "KAPPA_OBJECTIVITY": "PASS",
     "MATCHED_PARENT_REPRESENTATIONS": "PASS",
     "MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED": "NOT_RUN",
-    "MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED": "OPEN",
+    "MECHANICALLY_SEPARATING_WAKE_PRIMAL_MECHANICS_QUALIFIED": "PASS_STRAIGHT_MODE_I_SCOPE",
     "PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED": "NOT_RUN",
+    "UNIFORM_25_TO_3P125_FIELD_SCREEN": "FAIL",
     "V12_CENTERED_G_SINGLE_INCREMENT_SCREEN": "PASS",
     "V12_G_PERTURBATION_CONVERGENCE": "PASS",
-    "V12_INTERFACE_TRACTION_QUALIFIED": "FAIL",
+    "V12_INTERFACE_TRACTION_DIAGNOSTIC": "RETAINED_NOT_AGGREGATE",
+    "V12_INTERFACE_TRACTION_QUALIFIED": "DIAGNOSTIC_NOT_AGGREGATE",
     "V12_LOCAL_TENSOR_FIELDS_QUALIFIED": "PASS",
     "V12_MATCHED_COD_QUALIFIED": "PASS",
     "V12_P0_LOCAL_TENSOR_FIDELITY": "PASS",
@@ -60,11 +136,14 @@
     "V12_PRIMAL_GLOBAL_RESPONSE_SCREEN": "PASS",
     "V12_ROTATION_COVARIANCE_SCREEN": "PASS",
     "V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED": "OPEN",
-    "V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED": "FAIL",
+    "V12_SOFT_CORRIDOR_TRANSMISSION_QUALIFIED": "PASS",
+    "V12_SOFT_CORRIDOR_TRANSMISSION_V2_FROZEN": "FAIL_STRICT_SIGNED_COMPONENT_MONOTONICITY",
+    "V12_SOFT_CORRIDOR_TRANSMISSION_V3_PHYSICAL": "PASS",
+    "V12_STRAIGHT_MODE_I_PRIMAL_MECHANICS_QUALIFIED": "PASS",
     "V12_STRAIGHT_MODE_I_SYMMETRY_QUALIFIED": "PASS"
   },
-  "implementation_git_sha": "1eb8057da4c28b58d04c58f53d3fb207aec4a7d2",
-  "schema": "v12_primal_mechanics_qualification_v2",
+  "implementation_git_sha": "bcea1106a66282377d2a3e59c92786c8d88562ed",
+  "schema": "v12_primal_mechanics_qualification_v3",
   "thresholds_predeclared": {
     "maximum_G_delta_plateau_spread": 0.1,
     "maximum_conforming_extrapolated_direct_cod_error": 0.05,
