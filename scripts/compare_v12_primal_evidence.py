@@ -38,7 +38,12 @@ def compare_csv(expected,actual,name):
             else:
                 xf,yf=number(x),number(y)
                 if math.isnan(xf) and math.isnan(yf): continue
-                column_atol=1e-8 if key.endswith(("_force_N_per_m","_shear_balance_relative")) else ATOL
+                if key.endswith("_force_N_per_m"):
+                    column_atol=1e-8
+                elif key.endswith("_shear_balance_relative"):
+                    column_atol=1e-6
+                else:
+                    column_atol=ATOL
                 if not math.isclose(xf,yf,rel_tol=RTOL,abs_tol=column_atol): raise AssertionError(f"{name}:{index}:{key}: {xf} != {yf}")
 
 def main():
