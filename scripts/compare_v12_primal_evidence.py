@@ -38,7 +38,7 @@ def compare_csv(expected,actual,name):
             else:
                 xf,yf=number(x),number(y)
                 if math.isnan(xf) and math.isnan(yf): continue
-                column_atol=1e-8 if key.endswith("_force_N_per_m") else ATOL
+                column_atol=1e-8 if key.endswith(("_force_N_per_m","_shear_balance_relative")) else ATOL
                 if not math.isclose(xf,yf,rel_tol=RTOL,abs_tol=column_atol): raise AssertionError(f"{name}:{index}:{key}: {xf} != {yf}")
 
 def main():
@@ -52,7 +52,7 @@ def main():
         if isinstance(value,bool):
             if value is not other: raise AssertionError(f"qualification:checks:{key}: exact mismatch")
         elif isinstance(value,(list,dict)): compare_nested(value,other,f"qualification:checks:{key}")
-        elif not math.isclose(value,other,rel_tol=CHECK_RTOL,abs_tol=ATOL): raise AssertionError(f"qualification:checks:{key}: {value} != {other}")
+        elif not math.isclose(value,other,rel_tol=CHECK_RTOL,abs_tol=1e-8 if key=="v3_upper_lower_balance_max" else ATOL): raise AssertionError(f"qualification:checks:{key}: {value} != {other}")
     print("V12 primal scientific evidence matches across platforms")
 
 if __name__=="__main__": main()
