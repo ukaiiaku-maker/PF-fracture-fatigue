@@ -270,6 +270,7 @@ def apply_causal_sharp_wake_trial_geometry(
 def apply_mechanically_separating_v12_trial_geometry(
     state: LiveFEMTopologyState, arms: tuple[TopologyArm, ...], *,
     source_commit: str, configuration: Mapping[str, Any], transaction_identity: str,
+    failure_injector: Callable[[str, LiveFEMTopologyState], None] | None = None,
 ) -> LiveFEMTopologyState:
     """Realize tentative graph first, then rebuild/certify complete V12 support."""
     from .causal_sharp_wake_v11 import element_damage
@@ -277,17 +278,41 @@ def apply_mechanically_separating_v12_trial_geometry(
     from .sharp_wake_backend_v12 import V12_MODEL_ID, support_state_from_production
     network=state.crack_network
     for arm in arms: network=extend_network_arm(network,arm)
+    if failure_injector is not None: failure_injector("graph_edit",replace(state,crack_network=network))
     previous=None
     if state.v12_support_state is not None:
         previous=state.junction_process_state.get("v12_support_record")
     trial,audit=apply_mechanically_separating_graph(state,network,previous_support=previous)
+    if failure_injector is not None: failure_injector("support_generation",trial)
     if not audit.certified or audit.mechanically_new_element_count<=0:
         raise RuntimeError("V12 tentative event did not create certified mechanical novelty")
+    if failure_injector is not None: failure_injector("support_certification",trial)
     prior=state.v12_support_state.transaction_identity if state.v12_support_state is not None else None
     ownership=support_state_from_production(
         mesh=trial.mesh,crack_network=network,selected_support_elements=audit.selected_element_ids,
         damage_gp=element_damage(trial.mesh,trial.damage),certification_fingerprint=audit.certificate_fingerprint,
         transaction_identity=transaction_identity,previous_accepted_transaction=prior,
+        source_commit=source_commit,configuration=configuration,
+        checkpoint_generation=state.checkpoint_generation)
+    return replace(trial,sharp_wake_model_id=V12_MODEL_ID,v12_support_state=ownership)
+
+
+def initialize_mechanically_separating_v12(
+    state: LiveFEMTopologyState, *, source_commit: str,
+    configuration: Mapping[str, Any], transaction_identity: str="v12-initial",
+) -> LiveFEMTopologyState:
+    """Select V12 only together with certified support for the accepted graph."""
+    from .causal_sharp_wake_v11 import element_damage
+    from .mechanically_separating_sharp_wake_v12 import apply_mechanically_separating_graph
+    from .sharp_wake_backend_v12 import V12_MODEL_ID, support_state_from_production
+    trial,audit=apply_mechanically_separating_graph(state,state.crack_network)
+    if not audit.certified: raise RuntimeError("initial V12 support is not certified")
+    ownership=support_state_from_production(
+        mesh=trial.mesh,crack_network=trial.crack_network,
+        selected_support_elements=audit.selected_element_ids,
+        damage_gp=element_damage(trial.mesh,trial.damage),
+        certification_fingerprint=audit.certificate_fingerprint,
+        transaction_identity=transaction_identity,previous_accepted_transaction=None,
         source_commit=source_commit,configuration=configuration,
         checkpoint_generation=state.checkpoint_generation)
     return replace(trial,sharp_wake_model_id=V12_MODEL_ID,v12_support_state=ownership)
@@ -376,6 +401,7 @@ def execute_topology_trial(
     relative_energy_tolerance: float = 1.0e-8,
     absolute_energy_tolerance_J_per_m: float = 1.0e-12,
     network_geometry_already_realized: bool = False,
+    failure_injector: Callable[[str, LiveFEMTopologyState], None] | None = None,
 ) -> TopologyTrialResult:
     """Reserve, trial and atomically accept/release one one- or two-arm action."""
     trial_arms = tuple(sorted(arms, key=lambda item: item.candidate_id))
@@ -388,6 +414,7 @@ def execute_topology_trial(
     reserved_state = replace(accepted, competition=reserved)
     copy_start = time.perf_counter()
     isolated = reserved_state.isolated_copy()
+    if failure_injector is not None: failure_injector("accepted_snapshot",isolated)
     copy_wall = time.perf_counter() - copy_start
     mechanics = ("damage", "displacement", "ep_gp", "rho_gp", "elasticity_D")
     copy_bytes = sum(
@@ -395,6 +422,7 @@ def execute_topology_trial(
         for name in mechanics if getattr(isolated, name) is not getattr(reserved_state, name)
     )
     trial = apply_trial_geometry(isolated, trial_arms)
+    if failure_injector is not None: failure_injector("field_transfer",trial)
     if network_geometry_already_realized:
         for arm in trial_arms:
             branch = trial.crack_network.branch(arm.branch_id)
@@ -403,6 +431,7 @@ def execute_topology_trial(
                     "trial network does not contain the exact realized arm endpoint"
                 )
     trial = equilibrate_fixed_load(trial)
+    if failure_injector is not None: failure_injector("equilibrium",trial)
     released = float(accepted.stored_energy_J_per_m - trial.stored_energy_J_per_m)
     dissipation = math.fsum(item.hazard_dissipation_J_per_m for item in trial_arms)
     tolerance = max(
@@ -420,6 +449,7 @@ def execute_topology_trial(
             False, accepted, proposal.action_id, released, dissipation, margin,
             "insufficient_whole_topology_energy_release", copy_bytes, copy_wall,
         )
+    if failure_injector is not None: failure_injector("energy_acceptance",trial)
     committed_competition = accept_reservation(trial.competition, proposal.action_id)
     committed_network = trial.crack_network
     if not network_geometry_already_realized:
@@ -439,6 +469,10 @@ def execute_topology_trial(
             "hazard_dissipation_J_per_m": float(trial.energy_ledgers.get("hazard_dissipation_J_per_m", 0.0)) + dissipation,
         },
     )
+    if failure_injector is not None:
+        failure_injector("process_state_update",committed)
+        failure_injector("topology_verification",committed)
+        failure_injector("late_event_veto",committed)
     return TopologyTrialResult(
         True, committed, proposal.action_id, released, dissipation, margin, None,
         copy_bytes, copy_wall,
@@ -447,7 +481,7 @@ def execute_topology_trial(
 
 __all__ = [
     "LiveFEMTopologyState", "MODEL_ID", "TopologyArm", "TopologyTrialResult",
-    "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry", "apply_mechanically_separating_v12_trial_geometry",
+    "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry", "apply_mechanically_separating_v12_trial_geometry", "initialize_mechanically_separating_v12",
     "clip_arm_at_first_intersection",
     "equilibrate_fixed_load_with_production_fem", "execute_topology_trial",
     "extend_network_arm", "mark_coalesced",

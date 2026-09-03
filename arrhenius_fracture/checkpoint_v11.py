@@ -80,6 +80,7 @@ def restore_checkpoint(path: str | Path, *, with_provider_runtime: bool = False)
     if state.sharp_wake_model_id != manifest.get("sharp_wake_model_id", "sharp_wake_causal_v11"):
         raise ValueError("checkpoint sharp-wake model identity mismatch")
     expected_support=state.v12_support_state.__dict__ if state.v12_support_state is not None else None
+    expected_support=json.loads(json.dumps(expected_support,sort_keys=True,allow_nan=False))
     if expected_support != manifest.get("v12_support_state"):
         raise ValueError("checkpoint V12 support ownership mismatch")
     return (state, provider_runtime) if with_provider_runtime else state

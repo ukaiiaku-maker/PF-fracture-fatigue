@@ -9,6 +9,7 @@ from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoi
 from arrhenius_fracture.live_topology_runtime_v11 import LiveTopologyRuntime
 from arrhenius_fracture.crack_backend import SharpWakeBackend
 from arrhenius_fracture.crack_network_v11 import CrackNetworkState, ROOT_BRANCH_ID
+from arrhenius_fracture.conforming_crack_oracle_v12 import build_matched_crack_parent
 from arrhenius_fracture.directional_competition_v11 import (
     DirectionalCompetitionState,
     DirectionalHazardState,
@@ -25,6 +26,7 @@ from arrhenius_fracture.topology_transaction_v11 import (
     execute_topology_trial,
     extend_network_arm,
     mark_coalesced,
+    initialize_mechanically_separating_v12,
 )
 
 
@@ -77,6 +79,52 @@ def equilibrate_to(energy):
         state, displacement=np.asarray(state.displacement) + 0.25,
         stored_energy_J_per_m=energy,
     )
+
+
+@pytest.mark.parametrize("failure_stage", (
+    "accepted_snapshot", "field_transfer", "equilibrium", "energy_acceptance",
+    "process_state_update", "topology_verification", "late_event_veto",
+))
+def test_injected_transaction_failure_leaves_exact_accepted_state(failure_stage):
+    accepted=fem_state()
+    proposal=next(p for p in construct_action_proposals(
+        accepted.competition.hazard_states,correlation_interval_s=0.0)
+        if p.action_type=="one_arm")
+    before={name: getattr(accepted,name) for name in (
+        "mesh","damage","displacement","ep_gp","rho_gp","crack_network",
+        "competition","tip_process_state","junction_process_state","rng_state",
+        "event_counters","energy_ledgers")}
+    def inject(stage,state):
+        if stage==failure_stage: raise RuntimeError("injected:"+stage)
+    with pytest.raises(RuntimeError,match="injected:"+failure_stage):
+        execute_topology_trial(
+            accepted,proposal,(arm(proposal.member_candidate_ids[0]),),
+            apply_trial_geometry=lambda state,arms: apply_sharp_wake_trial_geometry(state,arms,kill_radius_m=.2),
+            equilibrate_fixed_load=equilibrate_to(7.0),failure_injector=inject)
+    for name,value in before.items():
+        current=getattr(accepted,name)
+        if isinstance(value,np.ndarray): np.testing.assert_array_equal(current,value)
+        else: assert current is value or current==value
+
+
+def test_v12_initialization_and_checkpoint_own_certified_support(tmp_path):
+    parent=build_matched_crack_parent(8e-4,8e-4,(2e-4,0.),(5e-4,0.),25e-6)
+    mesh=parent.mesh
+    accepted=LiveFEMTopologyState(
+        mesh=mesh,boundary=parent.boundary,damage=np.zeros(mesh.nn),
+        displacement=np.zeros(mesh.ndof),ep_gp=np.zeros((3,mesh.ne)),rho_gp=np.zeros(mesh.ne),
+        elasticity_D=np.eye(3),material={"name":"test"},cohesive_network=None,
+        crack_network=CrackNetworkState.one_tip(((2e-4,0.),(5e-4,0.))),competition=competition(),
+        tip_process_state={"r_tip_m":1e-8},junction_process_state={},energy_ledgers={},
+        rng_state={"seed":3},event_counters={},stored_energy_J_per_m=1.)
+    v12=initialize_mechanically_separating_v12(
+        accepted,source_commit="test-sha",configuration={"kappa":1e-8})
+    assert v12.sharp_wake_model_id=="sharp_wake_mechanically_separating_v12"
+    assert v12.v12_support_state.selected_support_elements
+    path=tmp_path/"v12.json"; manifest=write_checkpoint(v12,path)
+    restored=restore_checkpoint(path)
+    assert restored.v12_support_state==v12.v12_support_state
+    assert manifest["v12_support_state"]["transaction_identity"]=="v12-initial"
 
 
 def test_rejected_trial_is_exact_accepted_snapshot_and_consumes_nothing():
