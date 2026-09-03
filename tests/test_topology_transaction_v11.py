@@ -28,6 +28,7 @@ from arrhenius_fracture.topology_transaction_v11 import (
     mark_coalesced,
     initialize_mechanically_separating_v12,
     apply_mechanically_separating_v12_trial_geometry,
+    remesh_mechanically_separating_v12,
 )
 
 
@@ -133,7 +134,7 @@ def v12_event_state():
     mesh=parent.mesh
     base=LiveFEMTopologyState(mesh,parent.boundary,np.zeros(mesh.nn),np.zeros(mesh.ndof),
         np.zeros((3,mesh.ne)),np.zeros(mesh.ne),np.eye(3),{"name":"test"},None,
-        CrackNetworkState.one_tip(((2e-4,0.),(5e-4,0.))),competition(),{"r_tip_m":1e-8},{},{},{"seed":3},{},10.)
+        CrackNetworkState.one_tip(((2e-4,0.),(5e-4,0.))),competition(),{"r_tip_m":1e-8},{},{},{"seed":3},{},10.,checkpoint_generation=1)
     return initialize_mechanically_separating_v12(base,source_commit="test",configuration={"kappa":1e-8})
 
 
@@ -149,6 +150,83 @@ def test_v12_geometry_failure_injection_preserves_accepted_state(stage):
             accepted,(event,),source_commit="test",configuration={"kappa":1e-8},
             transaction_identity="tx-1",failure_injector=inject)
     assert accepted.v12_support_state is before
+
+
+def test_v12_event_commits_exact_graph_length_and_certified_mechanical_state():
+    accepted=v12_event_state()
+    proposal=next(p for p in construct_action_proposals(
+        accepted.competition.hazard_states,correlation_interval_s=0.0)
+        if p.action_type=="one_arm")
+    event=TopologyArm(proposal.member_candidate_ids[0],ROOT_BRANCH_ID,
+                      (5e-4,0.),(525e-6,0.),25e-6,0.)
+    def geometry(state,arms):
+        return apply_mechanically_separating_v12_trial_geometry(
+            state,arms,source_commit="test",configuration={"kappa":1e-8},
+            transaction_identity="tx-1")
+    result=execute_topology_trial(
+        accepted,proposal,(event,),apply_trial_geometry=geometry,
+        equilibrate_fixed_load=lambda state: replace(
+            state,displacement=state.displacement+1e-12,stored_energy_J_per_m=9.),
+        network_geometry_already_realized=True)
+    assert result.accepted
+    assert result.state.v12_support_state.previous_accepted_transaction=="v12-initial"
+    assert result.state.v12_support_state.physical_graph_length_m==pytest.approx(
+        accepted.v12_support_state.physical_graph_length_m+25e-6)
+    assert result.state.junction_process_state["v12_graph_support_audit"]["certified"]
+
+
+def test_v12_interrupted_restart_continues_exactly(tmp_path):
+    accepted=v12_event_state()
+    def advance(state,end,tx):
+        proposal=next(p for p in construct_action_proposals(
+            state.competition.hazard_states,correlation_interval_s=0.0)
+            if p.action_type=="one_arm")
+        event=TopologyArm(proposal.member_candidate_ids[0],ROOT_BRANCH_ID,
+                          state.crack_network.branch(ROOT_BRANCH_ID).tip,end,
+                          float(np.linalg.norm(np.asarray(end)-state.crack_network.branch(ROOT_BRANCH_ID).tip)),0.)
+        return execute_topology_trial(state,proposal,(event,),
+            apply_trial_geometry=lambda trial,arms: apply_mechanically_separating_v12_trial_geometry(
+                trial,arms,source_commit="test",configuration={"kappa":1e-8},transaction_identity=tx),
+            equilibrate_fixed_load=lambda trial: replace(trial,displacement=trial.displacement+1e-12,stored_energy_J_per_m=trial.stored_energy_J_per_m-1.),
+            network_geometry_already_realized=True).state
+    first=advance(accepted,(525e-6,0.),"tx-1")
+    path=tmp_path/"restart.json"; write_checkpoint(first,path); restored=restore_checkpoint(path)
+    uninterrupted=advance(first,(575e-6,0.),"tx-2")
+    restarted=advance(restored,(575e-6,0.),"tx-2")
+    assert uninterrupted.crack_network.to_dict()==restarted.crack_network.to_dict()
+    assert uninterrupted.v12_support_state==restarted.v12_support_state
+    np.testing.assert_array_equal(uninterrupted.mesh.element_damage_gp,restarted.mesh.element_damage_gp)
+    np.testing.assert_array_equal(uninterrupted.displacement,restarted.displacement)
+    assert uninterrupted.competition==restarted.competition
+    assert uninterrupted.rng_state==restarted.rng_state
+    assert uninterrupted.checkpoint_generation==1
+
+
+def test_short_event_is_resolved_by_bounded_tip_refinement_not_length_change():
+    accepted=v12_event_state()
+    event=TopologyArm(accepted.competition.candidates[0].candidate_id,ROOT_BRANCH_ID,
+                      (5e-4,0.),(512.5e-6,0.),12.5e-6,0.)
+    network=extend_network_arm(accepted.crack_network,event)
+    fine=build_matched_crack_parent(8e-4,8e-4,(2e-4,0.),(512.5e-6,0.),12.5e-6)
+    fields={"damage":np.zeros(fine.mesh.nn),"displacement":np.zeros(fine.mesh.ndof),
+            "ep_gp":np.zeros((3,fine.mesh.ne)),"rho_gp":np.zeros(fine.mesh.ne)}
+    refined=remesh_mechanically_separating_v12(
+        accepted,mesh=fine.mesh,boundary=fine.boundary,tentative_network=network,
+        transferred_fields=fields,source_commit="test",configuration={"kappa":1e-8},
+        transaction_identity="tx-refined")
+    assert refined.crack_network.total_physical_crack_length_m==pytest.approx(
+        accepted.crack_network.total_physical_crack_length_m+12.5e-6)
+    assert refined.v12_support_state.selected_support_elements
+
+
+def test_active_tip_remesh_failure_preserves_accepted_state():
+    accepted=v12_event_state(); fine=build_matched_crack_parent(8e-4,8e-4,(2e-4,0.),(512.5e-6,0.),12.5e-6)
+    fields={"damage":np.zeros(fine.mesh.nn),"displacement":np.zeros(fine.mesh.ndof),"ep_gp":np.zeros((3,fine.mesh.ne)),"rho_gp":np.zeros(fine.mesh.ne)}
+    def inject(stage,state): raise RuntimeError("injected:"+stage)
+    with pytest.raises(RuntimeError,match="injected:active_tip_remesh"):
+        remesh_mechanically_separating_v12(accepted,mesh=fine.mesh,boundary=fine.boundary,
+            transferred_fields=fields,source_commit="test",configuration={},transaction_identity="tx",failure_injector=inject)
+    assert accepted.v12_support_state.transaction_identity=="v12-initial"
 
 
 def test_rejected_trial_is_exact_accepted_snapshot_and_consumes_nothing():

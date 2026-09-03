@@ -318,6 +318,31 @@ def initialize_mechanically_separating_v12(
     return replace(trial,sharp_wake_model_id=V12_MODEL_ID,v12_support_state=ownership)
 
 
+def remesh_mechanically_separating_v12(
+    state: LiveFEMTopologyState, *, mesh, boundary, tentative_network=None,
+    transferred_fields: Mapping[str, Any], source_commit: str,
+    configuration: Mapping[str, Any], transaction_identity: str,
+    failure_injector: Callable[[str, LiveFEMTopologyState], None] | None=None,
+) -> LiveFEMTopologyState:
+    """Rebuild V12 ownership on a new mesh; never transfer element IDs."""
+    required=("damage","displacement","ep_gp","rho_gp")
+    if any(name not in transferred_fields for name in required):
+        raise ValueError("V12 remesh requires every owned structural/history field")
+    junction={key:value for key,value in state.junction_process_state.items()
+              if key not in ("v12_support_record","v12_graph_support_audit",
+                             "v12_accepted_mechanical_fingerprint","v12_trial_mechanical_fingerprint")}
+    base=replace(state,mesh=mesh,boundary=boundary,
+        crack_network=state.crack_network if tentative_network is None else tentative_network,
+        damage=np.asarray(transferred_fields["damage"]),
+        displacement=np.asarray(transferred_fields["displacement"]),
+        ep_gp=np.asarray(transferred_fields["ep_gp"]),rho_gp=np.asarray(transferred_fields["rho_gp"]),
+        junction_process_state=junction,sharp_wake_model_id="sharp_wake_causal_v11",v12_support_state=None)
+    if failure_injector is not None: failure_injector("active_tip_remesh",base)
+    return initialize_mechanically_separating_v12(
+        base,source_commit=source_commit,configuration=configuration,
+        transaction_identity=transaction_identity)
+
+
 def _replace_branch(network: CrackNetworkState, updated: CrackBranchState) -> CrackNetworkState:
     branches = tuple(updated if item.branch_id == updated.branch_id else item for item in network.branches)
     return replace(network, branches=branches, geometry_generation=network.geometry_generation + 1)
@@ -481,7 +506,7 @@ def execute_topology_trial(
 
 __all__ = [
     "LiveFEMTopologyState", "MODEL_ID", "TopologyArm", "TopologyTrialResult",
-    "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry", "apply_mechanically_separating_v12_trial_geometry", "initialize_mechanically_separating_v12",
+    "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry", "apply_mechanically_separating_v12_trial_geometry", "initialize_mechanically_separating_v12", "remesh_mechanically_separating_v12",
     "clip_arm_at_first_intersection",
     "equilibrate_fixed_load_with_production_fem", "execute_topology_trial",
     "extend_network_arm", "mark_coalesced",
