@@ -1,0 +1,33 @@
+{
+  "base_git_sha": "2b5e5351add0bf0db67f2cda35a1480c3e7efc91",
+  "conforming_oracle_source_commit": "8ad7f42c49c27d1066ff5ef7ee4a910232f2e7d4",
+  "conforming_oracle_source_sha256": "3237c850c9046087a28a80421c79f52c5716d2181b40c9b5f74a5ff1bd01de70",
+  "evidence_generation_parent_sha": "bcea1106a66282377d2a3e59c92786c8d88562ed",
+  "implementation_git_sha": "bcea1106a66282377d2a3e59c92786c8d88562ed",
+  "numpy_version": "2.5.1",
+  "platform": "macOS-14.3.1-arm64-arm-64bit",
+  "python_version": "3.12.13",
+  "scipy_version": "1.18.0",
+  "solver_identity": "scipy.sparse.linalg.spsolve_cst_plane_strain",
+  "thresholds": {
+    "maximum_G_delta_plateau_spread": 0.1,
+    "maximum_conforming_extrapolated_direct_cod_error": 0.05,
+    "maximum_energy_compliance_G_identity_error": 0.01,
+    "maximum_energy_reaction_identity_relative": 1e-10,
+    "maximum_finest_G_reference_error": 0.05,
+    "maximum_finest_global_reference_error": 0.05,
+    "maximum_finest_local_tensor_error": 0.05,
+    "maximum_finest_matched_cod_error": 0.05,
+    "maximum_finest_outside_support_stress_l2_error": 0.05,
+    "maximum_free_residual_relative": 1e-10,
+    "maximum_joint_limit_killed_energy_fraction": 0.001,
+    "maximum_joint_limit_primary_change": 0.05,
+    "maximum_joint_limit_transmission_relative": 0.001,
+    "maximum_killed_energy_fraction_at_kappa_1e-6": 0.001,
+    "maximum_low_kappa_pair_reaction_spread": 0.001,
+    "maximum_low_kappa_primary_spread": 0.01,
+    "maximum_mirror_residual": 0.05,
+    "maximum_pin_invariance_error": 1e-10,
+    "maximum_usable_conditioning_diagonal_ratio": 1000000000000.0
+  }
+}
