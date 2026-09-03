@@ -27,6 +27,7 @@ from arrhenius_fracture.topology_transaction_v11 import (
     extend_network_arm,
     mark_coalesced,
     initialize_mechanically_separating_v12,
+    apply_mechanically_separating_v12_trial_geometry,
 )
 
 
@@ -125,6 +126,29 @@ def test_v12_initialization_and_checkpoint_own_certified_support(tmp_path):
     restored=restore_checkpoint(path)
     assert restored.v12_support_state==v12.v12_support_state
     assert manifest["v12_support_state"]["transaction_identity"]=="v12-initial"
+
+
+def v12_event_state():
+    parent=build_matched_crack_parent(8e-4,8e-4,(2e-4,0.),(525e-6,0.),25e-6)
+    mesh=parent.mesh
+    base=LiveFEMTopologyState(mesh,parent.boundary,np.zeros(mesh.nn),np.zeros(mesh.ndof),
+        np.zeros((3,mesh.ne)),np.zeros(mesh.ne),np.eye(3),{"name":"test"},None,
+        CrackNetworkState.one_tip(((2e-4,0.),(5e-4,0.))),competition(),{"r_tip_m":1e-8},{},{},{"seed":3},{},10.)
+    return initialize_mechanically_separating_v12(base,source_commit="test",configuration={"kappa":1e-8})
+
+
+@pytest.mark.parametrize("stage",("graph_edit","support_generation","support_certification"))
+def test_v12_geometry_failure_injection_preserves_accepted_state(stage):
+    accepted=v12_event_state(); before=accepted.v12_support_state
+    event=TopologyArm(accepted.competition.candidates[0].candidate_id,ROOT_BRANCH_ID,
+                      (5e-4,0.),(525e-6,0.),25e-6,0.)
+    def inject(name,state):
+        if name==stage: raise RuntimeError("injected:"+stage)
+    with pytest.raises(RuntimeError,match="injected:"+stage):
+        apply_mechanically_separating_v12_trial_geometry(
+            accepted,(event,),source_commit="test",configuration={"kappa":1e-8},
+            transaction_identity="tx-1",failure_injector=inject)
+    assert accepted.v12_support_state is before
 
 
 def test_rejected_trial_is_exact_accepted_snapshot_and_consumes_nothing():
