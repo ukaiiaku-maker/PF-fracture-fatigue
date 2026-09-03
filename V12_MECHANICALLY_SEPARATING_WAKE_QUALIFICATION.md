@@ -182,3 +182,25 @@ the conforming control, primal mechanics, V3 transmission, global energy, and
 Williams gates pass.  Production may then continue only if the event-law audit
 proves absolute K is not consumed (or a separately qualified conforming tip
 source exists).
+
+### Absolute-K result
+
+The SHA-bound v1 matrix classifies the conforming interaction-integral control,
+geometry admissibility, global energy/compliance identity, and K-I mesh
+convergence as PASS.  The fixed-`kappa=1e-8` and joint-`p=2` V12 contour spreads
+are far inside 5%, but the prospectively fixed Williams stress fit differs from
+`sqrt(Eprime*G_energy)` by more than 5%.  Consequently the complete standard
+absolute-K gate fails closed even though its interaction-integral subdiagnostic
+is stable:
+
+`V12_STANDARD_INTERACTION_INTEGRAL_ABSOLUTE_K = NOT_QUALIFIED`
+
+`MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED =
+CONFORMING_TIP_PATCH_REQUIRED`
+
+The matched conforming representation provides converged interaction-integral
+and energy extraction, and the production dependency audit finds no absolute-K
+consumer in event selection.  Thus `STAGE_II_PERMITTED = PASS`; unqualified V12
+K must remain unavailable to production.  The initially generated report that
+incorrectly aggregated contour stability alone into PASS is retained as
+`superseded_classifier_failure.json` and is not scientific evidence.

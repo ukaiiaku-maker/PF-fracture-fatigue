@@ -1,0 +1,91 @@
+{
+  "base_git_sha": "2b5e5351add0bf0db67f2cda35a1480c3e7efc91",
+  "checks": {
+    "CONFORMING_1.25e-05_contour_spread": 3.5368534026168336e-05,
+    "CONFORMING_1.25e-05_mode_ratio_max": 1.622137940501702e-14,
+    "CONFORMING_3.125e-06_contour_spread": 1.6036299308896513e-06,
+    "CONFORMING_3.125e-06_mode_ratio_max": 7.12953821439328e-13,
+    "CONFORMING_6.25e-06_contour_spread": 6.603628423013307e-06,
+    "CONFORMING_6.25e-06_mode_ratio_max": 1.3891271264746707e-13,
+    "V12_FIXED_1.25e-05_contour_spread": 0.00011097944587511424,
+    "V12_FIXED_1.25e-05_mode_ratio_max": 1.1245974492972485e-14,
+    "V12_FIXED_3.125e-06_contour_spread": 7.559853609212727e-06,
+    "V12_FIXED_3.125e-06_mode_ratio_max": 5.06495380299487e-13,
+    "V12_FIXED_6.25e-06_contour_spread": 2.928435481863043e-05,
+    "V12_FIXED_6.25e-06_mode_ratio_max": 6.224341417219713e-14,
+    "V12_JOINT_P2_1.25e-05_contour_spread": 0.00011083862104966116,
+    "V12_JOINT_P2_1.25e-05_mode_ratio_max": 3.4013327552639965e-14,
+    "V12_JOINT_P2_3.125e-06_contour_spread": 7.548879132479923e-06,
+    "V12_JOINT_P2_3.125e-06_mode_ratio_max": 4.394973573530042e-13,
+    "V12_JOINT_P2_6.25e-06_contour_spread": 2.922954215885068e-05,
+    "V12_JOINT_P2_6.25e-06_mode_ratio_max": 3.7069681089473486e-13
+  },
+  "criterion": {
+    "contours_m": [
+      [
+        0.00024,
+        0.00026
+      ],
+      [
+        0.00025,
+        0.00027
+      ],
+      [
+        0.00026,
+        0.00028
+      ]
+    ],
+    "limits": {
+      "maximum_GK_to_compliance_G_error": 0.05,
+      "maximum_GK_to_energy_G_error": 0.05,
+      "maximum_KI_to_energy_K_error": 0.05,
+      "maximum_Williams_KI_to_energy_K_error": 0.05,
+      "maximum_Williams_radius_sensitivity": 0.05,
+      "maximum_contour_spread": 0.05,
+      "maximum_fit_condition_number": 100000000.0,
+      "maximum_mode_II_to_mode_I": 0.05,
+      "maximum_q_support_width_over_r_inner": 0.1,
+      "minimum_active_angular_coverage_fraction": 0.7,
+      "minimum_fit_samples": 24,
+      "minimum_r_inner_over_h_tip": 8.0,
+      "minimum_root_exterior_patch_clearance_m": 1.5e-05
+    },
+    "mesh_levels_m": [
+      1.25e-05,
+      6.25e-06,
+      3.125e-06
+    ],
+    "production_absolute_K_dependency_audit": "NOT_CONSUMED",
+    "williams_annuli_m": [
+      [
+        7.5e-05,
+        0.000175
+      ],
+      [
+        8.75e-05,
+        0.000175
+      ],
+      [
+        7.5e-05,
+        0.0001625
+      ]
+    ],
+    "williams_terms": [
+      "K_I",
+      "K_II",
+      "T_STRESS_SIGMA_XX"
+    ]
+  },
+  "evidence_generation_parent_sha": "461c474231594712353a6eedbb24767aef8d47aa",
+  "gates": {
+    "CONFORMING_CONTROL_QUALIFIED": "PASS",
+    "GLOBAL_ENERGY_QUALIFIED": "PASS",
+    "MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED": "PASS",
+    "STAGE_II_PERMITTED": "PASS",
+    "V12_STANDARD_INTERACTION_INTEGRAL_ABSOLUTE_K": "PASS",
+    "V12_STANDARD_INTERACTION_INTEGRAL_QUALIFIED": "PASS",
+    "WILLIAMS_QUALIFIED": "FAIL"
+  },
+  "implementation_git_sha": "461c474231594712353a6eedbb24767aef8d47aa",
+  "schema": "v12_absolute_k_qualification_v1"
+}
