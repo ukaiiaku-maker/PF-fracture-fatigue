@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass,field,replace
 import copy,math
 import numpy as np
+import json
 from enum import Enum
 from typing import Any,Mapping
 
@@ -161,4 +162,25 @@ def attach_disabled_voiding_manifest(physical_manifest: Mapping[str,Any]):
  """Capability metadata is separate and leaves the physical manifest untouched."""
  return dict(physical_manifest),{"voiding_schema":SCHEMA,"voiding_enabled":False}
 
-__all__=["SCHEMA","CavityRecord","CrackVoidCandidate","FirstPassageClock","SiteRecord","VoidingState","VoidingV3Config","VoidingV3State","activate_downstream_front","advance_site_localized","attach_disabled_voiding_manifest","connect_crack_to_void","first_cavity_intersection","grow_cavity","initialize_voiding","promote_cavity","series_limited_growth_rate","signed_growth_rate","stabilize_cavity"]
+def serialize_voiding_state(state:VoidingV3State)->str:
+ def clock(c):return {"hazard":c.hazard,"threshold":c.threshold}
+ payload={"schema":SCHEMA,
+  "sites":[{"site_id":s.site_id,"center_m":s.center_m,"state":s.state.value,"hits":s.hits,
+   "required_hits":s.required_hits,"birth":clock(s.birth),"stabilization":clock(s.stabilization),
+   "healing":clock(s.healing),"inventory":s.inventory} for s in state.sites],
+  "cavities":[{"cavity_id":c.cavity_id,"parent_site_id":c.parent_site_id,"center_m":c.center_m,
+   "radius_m":c.radius_m,"inventory":c.inventory,"state":c.state.value,
+   "lineage":c.lineage,"population_identity":c.population_identity} for c in state.cavities],
+  "rng_state":state.rng_state,"thresholds":state.thresholds,"growth_state":state.growth_state,
+  "geometry_lineage":state.geometry_lineage,"length_ledgers":state.length_ledgers}
+ return json.dumps(payload,sort_keys=True,separators=(",",":"),allow_nan=False)
+
+def restore_voiding_state(payload:str)->VoidingV3State:
+ value=json.loads(payload)
+ if value.get("schema")!=SCHEMA:raise ValueError("unsupported voiding state schema")
+ def clock(c):return FirstPassageClock(float(c["hazard"]),float(c["threshold"]))
+ sites=tuple(SiteRecord(s["site_id"],tuple(s["center_m"]),VoidingState(s["state"]),int(s["hits"]),int(s["required_hits"]),clock(s["birth"]),clock(s["stabilization"]),clock(s["healing"]),float(s["inventory"])) for s in value["sites"])
+ cavities=tuple(CavityRecord(c["cavity_id"],c["parent_site_id"],tuple(c["center_m"]),float(c["radius_m"]),float(c["inventory"]),VoidingState(c["state"]),tuple(c["lineage"]),c["population_identity"]) for c in value["cavities"])
+ return VoidingV3State(sites,cavities,value["rng_state"],value["thresholds"],value["growth_state"],value["geometry_lineage"],value["length_ledgers"])
+
+__all__=["SCHEMA","CavityRecord","CrackVoidCandidate","FirstPassageClock","SiteRecord","VoidingState","VoidingV3Config","VoidingV3State","activate_downstream_front","advance_site_localized","attach_disabled_voiding_manifest","connect_crack_to_void","first_cavity_intersection","grow_cavity","initialize_voiding","promote_cavity","restore_voiding_state","serialize_voiding_state","series_limited_growth_rate","signed_growth_rate","stabilize_cavity"]

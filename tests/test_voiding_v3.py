@@ -78,3 +78,10 @@ def test_complete_deterministic_one_void_sequence():
  state=replace(state,geometry_lineage={**state.geometry_lineage,"continued_front_events":1})
  assert state.cavities[0].state==VoidingState.DOWNSTREAM_FRONT_ACTIVE
  assert state.geometry_lineage["continued_front_events"]==1
+
+def test_backend_neutral_state_contract_roundtrips_exactly():
+ s=site(); c=CavityRecord("v","s",(2.,0.),.5,1.,VoidingState.RESOLVED_VOID,("s",),"pop:s")
+ state=VoidingV3State((s,),(c,),{"counter":7},{"birth":.25},{"vacancies":4},
+  {"parent":"graph"},{"fractured":1.5})
+ assert restore_voiding_state(serialize_voiding_state(state))==state
+ with pytest.raises(ValueError):restore_voiding_state('{"schema":"wrong"}')
