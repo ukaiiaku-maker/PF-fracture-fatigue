@@ -170,6 +170,9 @@ class TopologyArm:
     end_xy_m: tuple[float, float]
     event_reward_m: float
     hazard_dissipation_J_per_m: float
+    event_classification: str = "software_forced_geometry"
+    candidate_direction_xy: tuple[float, float] | None = None
+    first_intersection_xy_m: tuple[float, float] | None = None
 
     def __post_init__(self) -> None:
         reward = float(self.event_reward_m)
@@ -180,6 +183,26 @@ class TopologyArm:
             raise ValueError("hazard-derived dissipation must be finite and nonnegative")
         if math.dist(self.start_xy_m, self.end_xy_m) <= 0.0:
             raise ValueError("topology arm must have positive geometric length")
+        classification = str(self.event_classification)
+        if classification not in {"software_forced_geometry", "physical_cleavage"}:
+            raise ValueError("unknown topology-event classification")
+        object.__setattr__(self, "event_classification", classification)
+        if classification == "physical_cleavage":
+            if dissipation <= 0.0:
+                raise ValueError("a physical cleavage event requires nonzero hazard dissipation")
+            if self.candidate_direction_xy is None or self.first_intersection_xy_m is None:
+                raise ValueError("a physical cleavage event requires direction and first-intersection evidence")
+            direction = np.asarray(self.candidate_direction_xy, dtype=float)
+            segment = np.asarray(self.end_xy_m, dtype=float) - np.asarray(self.start_xy_m, dtype=float)
+            if direction.shape != (2,) or not np.all(np.isfinite(direction)):
+                raise ValueError("physical candidate direction must be a finite 2-vector")
+            if np.linalg.norm(direction) <= 0.0:
+                raise ValueError("physical candidate direction must be nonzero")
+            cosine = float(np.dot(direction, segment) / (np.linalg.norm(direction) * np.linalg.norm(segment)))
+            if cosine < 1.0 - 1.0e-10:
+                raise ValueError("realized arm is not aligned with its selected physical candidate")
+            if not np.allclose(self.end_xy_m, self.first_intersection_xy_m, rtol=0.0, atol=1.0e-15):
+                raise ValueError("realized endpoint is not the recorded first intersection")
 
 
 @dataclass(frozen=True)

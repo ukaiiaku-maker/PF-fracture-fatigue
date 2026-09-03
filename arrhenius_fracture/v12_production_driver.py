@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import replace
+from dataclasses import asdict, replace
 import json
 from pathlib import Path
 import subprocess
@@ -13,6 +13,7 @@ import numpy as np
 from .checkpoint_v11 import restore_checkpoint, write_checkpoint
 from .conforming_crack_oracle_v12 import build_matched_crack_parent
 from .crack_network_v11 import CrackNetworkState, ROOT_BRANCH_ID
+from .branch_cluster_v11 import create_unresolved_branch_cluster
 from .directional_competition_v11 import (
     DirectionalCompetitionState,
     DirectionalHazardState,
@@ -22,7 +23,11 @@ from .directional_competition_v11 import (
     tungsten_cleavage_candidates,
 )
 from .fem import plane_strain_D
-from .sharp_front import make_emergent_config
+from .sharp_front import (
+    FrontConfig, FrontEngine, default_cleavage_barrier,
+    default_emission_barrier, make_emergent_config,
+)
+from .hazard_energy_event_gate_v10230 import hazard_resistance_J_per_m2
 from .sharp_wake_backend_v12 import V11_MODEL_ID, V12_MODEL_ID, select_sharp_wake_model
 from .topology_transaction_v11 import (
     LiveFEMTopologyState,
@@ -51,6 +56,20 @@ def _competition(seed: int) -> DirectionalCompetitionState:
                                          start_time_s=0.0, duration_s=duration),
         ))
     return replace(state, hazard_states=tuple(hazards))
+
+
+def _two_arm_competition(seed: int) -> DirectionalCompetitionState:
+    state = DirectionalCompetitionState.initialize(
+        tungsten_cleavage_candidates(theta_deg=45.0), global_hazard_seed=seed,
+    )
+    hazards = tuple(commit_directional_interval(
+        DirectionalHazardState(candidate.candidate_id),
+        preview_directional_interval(
+            DirectionalHazardState(candidate.candidate_id), lambda_per_s=1.0,
+            start_time_s=0.0, duration_s=1.0,
+        ),
+    ) for candidate in state.candidates)
+    return replace(state, hazard_states=hazards)
 
 
 def build_loaded_state(model: str, *, seed: int = 3621) -> LiveFEMTopologyState:
@@ -185,6 +204,102 @@ def execute_event(
         "energy_release_J_per_m": result.energy_release_J_per_m,
         "hazard_dissipation_J_per_m": result.hazard_dissipation_J_per_m,
         "energy_margin_J_per_m": result.energy_margin_J_per_m,
+    }
+
+
+def execute_physical_two_arm_event(
+    state: LiveFEMTopologyState, *, arm_length_m: float = 25.0e-6 * 2.0 ** 0.5,
+    event_stress_Pa: float = 40.0e9, event_temperature_K: float = 900.0,
+    failure_stage: str | None = None, operation_log: list[str] | None = None,
+) -> tuple[LiveFEMTopologyState, dict[str, Any]]:
+    """Execute a genuine correlated two-candidate branch transaction.
+
+    Dissipation is calculated from the active production cleavage barrier and
+    converted by the existing hazard-energy law; it is not an invented constant.
+    """
+    if state.sharp_wake_model_id != V12_MODEL_ID:
+        raise ValueError("physical two-arm production event requires V12 mechanics")
+    state = replace(state, competition=_two_arm_competition(state.competition.global_hazard_seed))
+    proposals = construct_action_proposals(
+        state.competition.hazard_states, correlation_interval_s=1.0e-12,
+    )
+    proposal = next(item for item in proposals if item.action_type == "two_arm")
+    candidates = {item.candidate_id: item for item in state.competition.candidates}
+    material = state.material
+    engine = FrontEngine(
+        FrontConfig(), default_cleavage_barrier(), default_emission_barrier(material.b),
+        material.G, material.nu, material.b,
+    )
+    _, _, barrier_J = engine.lambda_cleave(event_stress_Pa, event_temperature_K)
+    network, cluster = create_unresolved_branch_cluster(
+        state.crack_network, parent_branch_id=ROOT_BRANCH_ID,
+        candidate_ids=proposal.member_candidate_ids, event_index=1,
+        shared_process_state=dict(state.tip_process_state),
+        conserved_ledgers={
+            "retained": 7.0, "mobile": 2.0, "stored_energy": state.stored_energy_J_per_m,
+            "emission_work": 3.0, "unconsumed_action": 2.0,
+        },
+    )
+    state = replace(
+        state, crack_network=network,
+        junction_process_state={**state.junction_process_state, "branch_cluster": asdict(cluster)},
+    )
+    start = network.branch(cluster.arm_branch_ids[0]).tip
+    arms = []
+    candidate_to_branch = dict(zip(proposal.member_candidate_ids, cluster.arm_branch_ids))
+    for candidate_id in proposal.member_candidate_ids:
+        direction = np.asarray(candidates[candidate_id].direction_xy, dtype=float)
+        direction /= np.linalg.norm(direction)
+        endpoint = tuple((np.asarray(start) + arm_length_m * direction).tolist())
+        resistance = hazard_resistance_J_per_m2(
+            barrier_J=barrier_J, cooperative_hits=engine.f.m_hits,
+            burgers_vector_m=engine.b,
+            gamma_relative=candidates[candidate_id].gamma_rel,
+        )
+        hazard_dissipation_J_per_m = resistance * arm_length_m
+        arms.append(TopologyArm(
+            candidate_id, candidate_to_branch[candidate_id], start, endpoint,
+            arm_length_m, hazard_dissipation_J_per_m,
+            event_classification="physical_cleavage",
+            candidate_direction_xy=tuple(direction.tolist()),
+            first_intersection_xy_m=endpoint,
+        ))
+    operations: list[str] = []
+
+    def inject(stage: str, trial: LiveFEMTopologyState) -> None:
+        operations.append(stage)
+        if operation_log is not None:
+            operation_log.append(stage)
+        if stage == failure_stage:
+            raise RuntimeError("injected:" + stage)
+
+    result = execute_topology_trial(
+        state, proposal, tuple(arms),
+        apply_trial_geometry=lambda trial, values: apply_v12_production_trial_geometry(
+            trial, values, source_commit=_git_head(),
+            configuration={"entry_point": "v12_production_driver", "model": V12_MODEL_ID},
+            transaction_identity="physical-two-arm",
+            failure_injector=inject,
+        ),
+        equilibrate_fixed_load=equilibrate_fixed_load_with_production_fem,
+        network_geometry_already_realized=True,
+        failure_injector=inject,
+    )
+    return result.state, {
+        "accepted": result.accepted,
+        "action_type": proposal.action_type,
+        "candidate_ids": list(proposal.member_candidate_ids),
+        "branch_ids": list(cluster.arm_branch_ids),
+        "directions": [list(arm.candidate_direction_xy) for arm in arms],
+        "endpoints_m": [list(arm.end_xy_m) for arm in arms],
+        "energy_release_J_per_m": result.energy_release_J_per_m,
+        "hazard_dissipation_J_per_m": result.hazard_dissipation_J_per_m,
+        "energy_margin_J_per_m": result.energy_margin_J_per_m,
+        "event_stress_Pa": event_stress_Pa,
+        "event_temperature_K": event_temperature_K,
+        "hazard_barrier_J": barrier_J,
+        "rejection_reason": result.rejection_reason,
+        "operations": operations,
     }
 
 
