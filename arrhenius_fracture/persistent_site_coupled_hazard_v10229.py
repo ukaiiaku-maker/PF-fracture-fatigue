@@ -96,15 +96,17 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
     # sigma_avg_Pa, hence stress_override -> _plastic_half_step, hence
     # emission) is never touched; only a separate sig_cleave array, used
     # solely for the lambda_cleave call below, is rebond-aware.
+    from . import crack_rebonding_v10230 as _rebond
+
     rebonding_state = getattr(engine, "_rebonding_state", None)
-    rebonding_active = rebonding_state is not None and rebonding_state.cfg.enabled
+    rebonding_active = rebonding_state is not None and _rebond.rebonding_kinetics_active(
+        rebonding_state.cfg
+    )
     K_signed_phase = None
     K_rebond_phase = None
     K_shield_now = 0.0
     r_eff_now = 1.0e-30
     if rebonding_active:
-        from . import crack_rebonding_v10230 as _rebond
-
         signed_waveform = dataclasses.replace(waveform, closure_clip=False)
         phase_offset_rad = _rebond.chronological_phase_offset_rad(
             rebonding_state.elapsed_time_s, waveform.period_s
@@ -232,12 +234,14 @@ def _commit_constant_segment(
 ) -> dict[str, Any]:
     engine.sigma_tip(float(waveform.Kmax))
 
+    from . import crack_rebonding_v10230 as _rebond
+
     rebonding_state = getattr(engine, "_rebonding_state", None)
-    rebonding_active = rebonding_state is not None and rebonding_state.cfg.enabled
+    rebonding_active = rebonding_state is not None and _rebond.rebonding_kinetics_active(
+        rebonding_state.cfg
+    )
     dt_segment = max(float(cycles), 0.0) * float(waveform.period_s)
     if rebonding_active:
-        from . import crack_rebonding_v10230 as _rebond
-
         phases = np.asarray(controller._phases(), dtype=float)
         dt_phase = float(waveform.period_s) / float(phases.size)
         signed_waveform = dataclasses.replace(waveform, closure_clip=False)

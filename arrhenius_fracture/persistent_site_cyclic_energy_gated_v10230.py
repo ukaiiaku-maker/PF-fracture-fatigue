@@ -24,6 +24,7 @@ from .hazard_energy_event_gate_v10230 import (
 )
 from .persistent_site_high_cycle_state_v10230 import serialize_active_state
 from .persistent_site_reversible_transport_v10230 import install_reversible_transport
+from . import crack_rebonding_v10230 as _rebond
 
 
 MODEL_ID = "v10.2.30_transactional_persistent_site_energy_gated_cyclic"
@@ -415,7 +416,25 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
 
         rebonding_state = getattr(self, "_rebonding_state", None)
         if rebonding_state is not None and rebonding_state.cfg.enabled:
-            self._commit_rebonding_event(length, pending, result_ref)
+            if _rebond.rebonding_kinetics_active(rebonding_state.cfg):
+                self._commit_rebonding_event(length, pending, result_ref)
+            else:
+                # REBOND_OFF/CONTACT_PROXY_ONLY: patch_Q is the exact zero
+                # generator, so there is no kinetics to couple into event
+                # timing. Skip the coupled root-finder entirely (never
+                # construct phase_resolved_action_fn / call
+                # solve_coupled_event_time) so this trajectory is byte-
+                # identical to cfg=None/absent -- only the wake ledger
+                # (patch creation/translation) is maintained, for RB1's own
+                # contact diagnostics archival, exactly mirroring the
+                # existing "no block context stashed" fail-closed branch of
+                # _commit_rebonding_event.
+                rebonding_state.commit_event(
+                    accepted_length_m=length,
+                    event_index=int(self.hazard_event_index) - 1,
+                    pre_event_states=None,
+                    Eprime_Pa=_rebond.reduced_modulus_Pa(self.G, self.nu),
+                )
         self._rebonding_block_context = None
 
         self.micro_advance_total_m += length

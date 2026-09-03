@@ -34,9 +34,26 @@ from arrhenius_fracture.crack_rebonding_kinetics_v10230 import (
     RebondModelLevel,
     solve_reference_action_barriers,
 )
+from arrhenius_fracture.fatigue_v1 import FatigueWaveform
+
+# Unit-test-only driving frequency for the LIVE-KINETICS test below, NOT a
+# mission/pilot protocol choice: at the mission's f=1000 Hz, the real
+# production engine's native cleavage hazard at Kmax=18 MPa*sqrt(m) fires
+# the second event within a few microseconds of the first -- a small
+# fraction of one waveform period -- so an event-created patch never
+# experiences a compressive excursion at all (confirmed empirically; see
+# docs/v10_2_30_crack_rebonding_causal_pilot_v2.md's protocol-selection
+# notes). This is the same "reference protocol cannot sample compression"
+# finding the v2 causal pilot's own preflight formally investigates for the
+# real campaign. Here, at unit-test scope, a much higher frequency (shorter
+# period) is used SOLELY to give the same tiny absolute native-hazard dwell
+# enough phase coverage to reach compression, so this regression test can
+# exercise the live P->C->B->K_rebond mechanism end-to-end through the real
+# engine. It makes no claim about the physical 1 kHz campaign.
+_LIVE_KINETICS_TEST_FREQUENCY_HZ = 1.0e6
 
 
-def _calibrated_rb2_cfg(reference_contact_radius_m: float):
+def _calibrated_rb2_cfg(reference_contact_radius_m: float, *, f_Hz: float = 1000.0):
     template = fx.rebonding_cfg(model_level=RebondModelLevel.CLEAN_REVERSIBLE_REBOND)
     import dataclasses
 
@@ -49,6 +66,7 @@ def _calibrated_rb2_cfg(reference_contact_radius_m: float):
     return solve_reference_action_barriers(
         A_on_ref,
         A_off_ref,
+        f_Hz=f_Hz,
         reference_patch_distance_m=0.0,
         reference_contact_radius_m=reference_contact_radius_m,
         cfg_template=template,
@@ -83,11 +101,15 @@ def test_live_kinetics_generate_nonzero_bonding_that_delays_the_next_event():
     reference_contact_radius_m = max(seed_bare.r_eff(), fx.rebonding_cfg().contact_radius_min_m)
 
     rb1_cfg = fx.rebonding_cfg(model_level=RebondModelLevel.CONTACT_PROXY_ONLY)
-    rb2_cfg = _calibrated_rb2_cfg(reference_contact_radius_m)
+    rb2_cfg = _calibrated_rb2_cfg(
+        reference_contact_radius_m, f_Hz=_LIVE_KINETICS_TEST_FREQUENCY_HZ
+    )
 
     engine_rb1 = fx.build_real_engine(rb1_cfg)
     engine_rb2 = fx.build_real_engine(rb2_cfg)
-    waveform = fx.default_waveform()
+    waveform = FatigueWaveform(
+        Kmax=18.0e6, R=-0.95, frequency_Hz=_LIVE_KINETICS_TEST_FREQUENCY_HZ
+    )
 
     length1_rb1, result2_rb1, _, _ = _drive_to_second_event(engine_rb1, waveform)
     length2_rb1 = fx.commit_pending_event(engine_rb1)

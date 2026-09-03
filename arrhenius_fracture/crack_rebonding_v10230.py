@@ -46,6 +46,24 @@ _ACTIVE_MODEL_LEVELS = frozenset(
 )
 
 
+def rebonding_kinetics_active(cfg: CrackRebondingControls | None) -> bool:
+    """True only when ``cfg`` actually couples formation/rupture kinetics
+    into the Markov generator (``patch_Q`` is non-trivial for this
+    ``model_level``) -- i.e. excludes ``None``, ``REBOND_OFF``, and
+    ``CONTACT_PROXY_ONLY``.
+
+    Every call site that decides whether to route through the rebonding-
+    coupled event-time root-finder / phase-shifted cleavage sampling MUST use
+    this predicate, not a bare ``cfg.enabled`` check: ``CONTACT_PROXY_ONLY``
+    has ``enabled=True`` but an exactly-zero generator (``patch_Q`` below),
+    so routing it through the coupled machinery anyway produces a spurious,
+    non-physical numerical divergence from the ``cfg is None`` baseline
+    (round-3 causal-pilot finding; see
+    docs/v10_2_30_crack_rebonding_causal_pilot_v2.md).
+    """
+    return cfg is not None and cfg.enabled and cfg.model_level in _ACTIVE_MODEL_LEVELS
+
+
 def reduced_modulus_Pa(G_Pa: float, nu: float) -> float:
     """Isotropic plane-strain reduced modulus E' = 2G/(1-nu), computed from
     the engine's own shear modulus and Poisson ratio (avoids depending on the
@@ -117,7 +135,17 @@ def patch_Q(
 
     diag = contact_diagnostics(K_s_Pa_sqrt_m, s_j_m, r_contact_m, cfg)
     lam_bond_raw, _ = bond_formation_rate(diag["sigma_comp_Pa"], T_K, cfg.chemistry_factor, cfg)
-    k_CB = cooperative_hazard(lam_bond_raw, cfg.healing_cooperative_order, cfg.healing_correlation_time_s)
+    # Exact contact gate (mission SIGNED_K_COMPRESSION_PROXY contract): no
+    # contact exists when K_signed >= 0, so formation must be exactly zero
+    # there -- never an unassisted-thermal-rate residual suppressed only by
+    # barrier underflow. sigma_comp_Pa is already zero for K_signed >= 0
+    # (contact_pressure's max(-K,0)), but bond_formation_rate's nu*exp(-G0/kT)
+    # baseline is NOT zero at zero work, so the gate must be applied here,
+    # after the raw rate, not relied upon to fall out of the work term alone.
+    if diag["compressive_phase"]:
+        k_CB = cooperative_hazard(lam_bond_raw, cfg.healing_cooperative_order, cfg.healing_correlation_time_s)
+    else:
+        k_CB = 0.0
     k_BC, _ = bond_rupture_rate(diag["sigma_open_Pa"], T_K, cfg, compressive_phase=diag["compressive_phase"])
 
     if cfg.model_level is RebondModelLevel.PASSIVATION_GATED_REBOND:
@@ -1190,6 +1218,7 @@ def restore_rebonding_checkpoint(engine: Any, payload: dict[str, Any] | None) ->
 
 __all__ = [
     "reduced_modulus_Pa",
+    "rebonding_kinetics_active",
     "wake_weight",
     "contact_diagnostics",
     "patch_Q",

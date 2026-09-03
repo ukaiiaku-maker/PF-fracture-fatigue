@@ -336,3 +336,75 @@ For peak, DBTT, weak-T, and ceramic-like rows:
 6. Run the focused tests.
 7. Rerun the weak-T 0.95 qualification to the first event and verify threshold, event length, energy gate, geometry commit, and post-event restart.
 8. Do not begin the four-class sweep until the first real event-to-event restart is demonstrated.
+
+---
+
+## 14. v10.2.30 crack-rebonding causal pilot V2 status (this worktree)
+
+This section tracks the CONTACT-GATED CRACK-REBONDING CAUSAL PILOT V2
+campaign specifically (unrelated to sections 1-13 above, which are an
+earlier, separate da/dN mission). Full writeup:
+`docs/v10_2_30_crack_rebonding_causal_pilot_v2.md`.
+
+**Worktree:** `/private/tmp/v10230-crack-rebonding-causal-pilot-v2`
+**Branch:** `codex/v10.2.30-crack-rebonding-causal-pilot-v2`
+**Required interpreter:**
+`/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python`
+
+Do not touch these preserved/read-only worktrees:
+- `/private/tmp/v10230-crack-rebonding-causal-pilot` (v1 diagnostic pilot, dce8cc0)
+- `/private/tmp/v10230-crack-rebonding-ablation` (S8 milestone, 4d6c1c1)
+- `/private/tmp/v10230-reversible-energy-integration` (read-only provenance source; its `runs/A_native_plus_8PT_fatigue_v1/` tree is now empty — 1371 dirs, 0 files, swept by OS /tmp cleanup)
+- `/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_codex_v10_2_30` (mounted checkout, unrelated v9.14 branch — read from it for provenance lookups only, never edit/commit)
+
+### Completed
+
+- **V2-A (A_NATIVE provenance):** recovered and cross-verified from an
+  immutable, git-tracked v9.14 source registry (hash-verified) plus a
+  disclosed-constants downstream registry; classified
+  `A_NATIVE_REGISTRY_DETERMINISTICALLY_RECONSTRUCTED_FROM_QUALIFIED_INPUTS`.
+  Frozen at `artifacts/crack_rebonding_causal_pilot_v2/A_native_provenance.json`.
+  Real engine construction implemented in
+  `arrhenius_fracture/a_native_engine_v10230.py::build_a_native_engine()`
+  (verified: builds, runs, fires a first event at ~1 cycle under the
+  reference protocol).
+- **V2-B (contact gating + strict RB0/RB1 parity):** exact
+  `K_signed < 0` contact gate on bond formation
+  (`crack_rebonding_v10230.py::patch_Q`,
+  `crack_rebonding_kinetics_v10230.py::_integrate_A_on`); new
+  `rebonding_kinetics_active()` predicate used consistently at all three
+  routing sites that previously kept RB1 on the coupled/root-finder path
+  purely because `cfg.enabled` (not `model_level`) was true
+  (`persistent_site_coupled_hazard_v10229.py::_phase_statistics` and
+  `_commit_constant_segment`, `persistent_site_cyclic_energy_gated_v10230.py
+  ::commit_energy_gated_event`). Full test suite: 918 passed / 77
+  pre-existing unrelated failures (missing
+  `v10_2_27_paper_four_class_registry.csv`, confirmed untouched by this
+  work) / 1 skipped. All 181 `crack_rebonding`-selected tests pass.
+
+### Pending
+
+- **V2-C (protocol preflight):** confirm the reference protocol (T=300K,
+  R=-0.95, Kmax=18 MPa*sqrt(m), f=1000 Hz) samples a complete compressive
+  excursion for an event-created patch using RB1 contact diagnostics on the
+  REAL A_NATIVE engine (not the DBTT test fixture) before touching Kmax/f.
+  Early signal is promising: A_NATIVE's own native hazard fires roughly
+  once per cycle at this protocol (unlike the fixture's DBTT candidate,
+  which fired within microseconds) — this still needs the actual
+  multi-interval RB1 preflight evidence per mission Section 9 before
+  declaring the reference protocol usable.
+- **V2-D:** four zero/finite-cohesion RB2 config pairs, the corrected
+  8-case pilot (C0-C5), interval-resolved evidence CSV, causal-decision
+  gates, verifier, final classification.
+
+### Active processes
+
+None. No trajectories have been launched yet.
+
+### Immediate next step if resuming
+
+Run the Section 9 RB1 contact-only preflight against
+`arrhenius_fracture.a_native_engine_v10230.build_a_native_engine` at the
+reference protocol, logging per-interval compression-contact duration and
+whether a complete negative-K excursion occurs before the next event, for
+at least the first several accepted events.

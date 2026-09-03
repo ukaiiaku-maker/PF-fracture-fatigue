@@ -607,7 +607,15 @@ def _integrate_A_on(
             Ks, trial_cfg.contact_pressure_scale, r_contact_m, s_j_m, trial_cfg.contact_pressure_cap_Pa
         )
         lam_raw, _ = bond_formation_rate(sigma_comp, T_K, trial_cfg.chemistry_factor, trial_cfg)
-        k_cb = cooperative_hazard(lam_raw, trial_cfg.healing_cooperative_order, trial_cfg.healing_correlation_time_s)
+        # Same exact contact gate as crack_rebonding_v10230.patch_Q: no
+        # contact for K_signed >= 0, so k_cb must be exactly zero there (not
+        # just the (already-zero) work term inside bond_formation_rate's
+        # Arrhenius exponent, which leaves a nonzero unassisted-thermal
+        # baseline rate).
+        if Ks < 0.0:
+            k_cb = cooperative_hazard(lam_raw, trial_cfg.healing_cooperative_order, trial_cfg.healing_correlation_time_s)
+        else:
+            k_cb = 0.0
         total += k_cb * dt_phase
     return float(total)
 

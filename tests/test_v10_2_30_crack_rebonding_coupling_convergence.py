@@ -263,8 +263,17 @@ def test_p_to_c_to_b_activation_not_missed_by_linear_stage1_estimate():
 
     # Stage 2 over a long candidate block must still catch the P->C->B
     # activation and fail (forcing bisection), since it uses exact
-    # propagation rather than the t=0 linearization.
-    dt_candidate = 2.0e4 * n_phase * dt_phase
+    # propagation rather than the t=0 linearization. Landing on a whole
+    # number of full cycles would sample the true periodic orbit at its
+    # cycle-boundary phase, which -- now that bond formation is exactly
+    # gated to the compressive half of the cycle (v10.2.30 v2 contact-gate
+    # fix) -- is a fully rupture-drained (p_B=0) point for these barriers:
+    # the transient P->C->B activation this test targets is real and large
+    # mid-cycle (see the dt_candidate scan in the v2 causal-pilot provenance
+    # notes), it just isn't visible exactly at a full-cycle boundary. A
+    # half-cycle offset keeps the "long candidate block" intent while
+    # landing inside the compressive-formation window.
+    dt_candidate = (2.0e4 * n_phase + n_phase // 2) * dt_phase
     result = stage2_verify_block(
         active_patches=[patch],
         patch_states={0: patch.state_vector()},
