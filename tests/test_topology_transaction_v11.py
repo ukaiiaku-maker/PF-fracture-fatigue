@@ -22,6 +22,7 @@ from arrhenius_fracture.topology_transaction_v11 import (
     LiveFEMTopologyState,
     TopologyArm,
     apply_sharp_wake_trial_geometry,
+    apply_causal_sharp_wake_trial_geometry,
     clip_arm_at_first_intersection,
     execute_topology_trial,
     extend_network_arm,
@@ -247,6 +248,24 @@ def test_rejected_trial_is_exact_accepted_snapshot_and_consumes_nothing():
     assert accepted.competition.consumed_event_ids == ()
     assert accepted.competition.reservations == ()
     assert accepted.event_counters == {"topology_actions": 4}
+
+
+def test_explicit_v11_selection_is_physically_identical_to_default():
+    seeded=v12_event_state()
+    default=replace(seeded,sharp_wake_model_id="sharp_wake_causal_v11",v12_support_state=None)
+    explicit=replace(default,sharp_wake_model_id="sharp_wake_causal_v11")
+    def run(state):
+        proposal=next(p for p in construct_action_proposals(state.competition.hazard_states,correlation_interval_s=0.0) if p.action_type=="one_arm")
+        event=TopologyArm(proposal.member_candidate_ids[0],ROOT_BRANCH_ID,(5e-4,0.),(525e-6,0.),25e-6,0.)
+        return execute_topology_trial(state,proposal,(event,),
+            apply_trial_geometry=lambda trial,arms: apply_causal_sharp_wake_trial_geometry(trial,arms),
+            equilibrate_fixed_load=equilibrate_to(7.)).state
+    left,right=run(default),run(explicit)
+    assert left.crack_network.to_dict()==right.crack_network.to_dict()
+    np.testing.assert_array_equal(left.mesh.element_damage_gp,right.mesh.element_damage_gp)
+    np.testing.assert_array_equal(left.displacement,right.displacement)
+    assert left.competition==right.competition and left.rng_state==right.rng_state
+    assert left.v12_support_state is right.v12_support_state is None
 
 
 def test_isolated_siblings_share_read_only_accepted_mechanics_and_not_mutable_trials():
