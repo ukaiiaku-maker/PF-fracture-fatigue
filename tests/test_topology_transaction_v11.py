@@ -85,7 +85,7 @@ def equilibrate_to(energy):
 
 
 @pytest.mark.parametrize("failure_stage", (
-    "accepted_snapshot", "field_transfer", "equilibrium", "energy_acceptance",
+    "accepted_snapshot", "field_transfer", "equilibrium", "energy_gate",
     "process_state_update", "topology_verification", "late_event_veto",
 ))
 def test_injected_transaction_failure_leaves_exact_accepted_state(failure_stage):
@@ -210,7 +210,8 @@ def test_short_event_is_resolved_by_bounded_tip_refinement_not_length_change():
     network=extend_network_arm(accepted.crack_network,event)
     fine=build_matched_crack_parent(8e-4,8e-4,(2e-4,0.),(512.5e-6,0.),12.5e-6)
     fields={"damage":np.zeros(fine.mesh.nn),"displacement":np.zeros(fine.mesh.ndof),
-            "ep_gp":np.zeros((3,fine.mesh.ne)),"rho_gp":np.zeros(fine.mesh.ne)}
+            "ep_gp":np.zeros((3,fine.mesh.ne)),"rho_gp":np.zeros(fine.mesh.ne),
+            "tip_process_state":accepted.tip_process_state,"source_state":{}}
     refined=remesh_mechanically_separating_v12(
         accepted,mesh=fine.mesh,boundary=fine.boundary,tentative_network=network,
         transferred_fields=fields,source_commit="test",configuration={"kappa":1e-8},
@@ -222,9 +223,9 @@ def test_short_event_is_resolved_by_bounded_tip_refinement_not_length_change():
 
 def test_active_tip_remesh_failure_preserves_accepted_state():
     accepted=v12_event_state(); fine=build_matched_crack_parent(8e-4,8e-4,(2e-4,0.),(512.5e-6,0.),12.5e-6)
-    fields={"damage":np.zeros(fine.mesh.nn),"displacement":np.zeros(fine.mesh.ndof),"ep_gp":np.zeros((3,fine.mesh.ne)),"rho_gp":np.zeros(fine.mesh.ne)}
+    fields={"damage":np.zeros(fine.mesh.nn),"displacement":np.zeros(fine.mesh.ndof),"ep_gp":np.zeros((3,fine.mesh.ne)),"rho_gp":np.zeros(fine.mesh.ne),"tip_process_state":accepted.tip_process_state,"source_state":{}}
     def inject(stage,state): raise RuntimeError("injected:"+stage)
-    with pytest.raises(RuntimeError,match="injected:active_tip_remesh"):
+    with pytest.raises(RuntimeError,match="injected:remesh"):
         remesh_mechanically_separating_v12(accepted,mesh=fine.mesh,boundary=fine.boundary,
             transferred_fields=fields,source_commit="test",configuration={},transaction_identity="tx",failure_injector=inject)
     assert accepted.v12_support_state.transaction_identity=="v12-initial"

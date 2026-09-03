@@ -1,6 +1,6 @@
 """Prospective criteria for V12 production integration qualification."""
-CRITERION_ID="v12.production-integration/1"
-ROLLBACK_STAGES=("accepted_snapshot","graph_edit","active_tip_remesh","support_generation","support_certification","field_transfer","equilibrium","energy_acceptance","process_state_update","topology_verification","late_event_veto")
+CRITERION_ID="v12.production-integration/2"
+ROLLBACK_STAGES=("graph_edit","remesh","field_projection","support_rebuild","equilibrium","energy_gate","process_state_update","topology_verification","late_event_veto")
 RESTART_FIELDS=("event_sequence","crack_graph","support","p0_damage","mesh_generation","front_state","process_state","hazards","thresholds","rng","reaction","energy","terminal_fingerprint")
 V11_NEUTRALITY_FIELDS=("event_sequence","crack_graph","wake","active_fronts","process_state","source_state","hazards","thresholds","rng","reactions","energies","terminal_status","checkpoint_restart")
 BOUNDED_CASES=("straight_repeated","sequential_events","kink","branch_capable","oblique_aligned","active_tip_refinement","rollback","restart")
