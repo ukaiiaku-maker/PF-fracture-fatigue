@@ -52,6 +52,9 @@ from .crack_rebonding_kinetics_v10230 import (
     InitialPrecrackWakeMode,
     RebondModelLevel,
     _integrate_A_on,
+    bond_formation_rate,
+    contact_pressure,
+    cooperative_hazard,
     solve_reference_action_barriers,
     two_state_fixed_point,
 )
@@ -250,6 +253,49 @@ def analytical_single_patch_predictions(
     )
     fixed_point = two_state_fixed_point(a_on, a_off)
     return {"A_on": a_on, "A_off": a_off, **fixed_point}
+
+
+def barrier_floor_saturation_diagnostics(
+    resolved_cfg: CrackRebondingControls, *, reference_contact_radius_m: float
+) -> dict[str, Any]:
+    """Barrier-floor/cooperative-saturation diagnostics at the deepest
+    compression point of the reference protocol (K_signed = R_REF*Kmax,
+    s_j_m=0), computed directly from the frozen config -- no engine replay
+    needed, since this is a pure function of (cfg, K_min, r_contact_m).
+
+    Shared verbatim between a zero/finite-cohesion twin pair: formation
+    kinetics (bond_barrier_eV, bond_activation_volume_m3,
+    bond_attempt_frequency_s, healing_cooperative_order,
+    healing_correlation_time_s) are identical by construction
+    (zero_cohesion_twin only changes restored_work_of_separation_J_m2), so
+    this diagnostic is evaluated once per {reversible, persistent} preset
+    and applies to both its zero- and finite-cohesion variants.
+    """
+    K_min_signed = R_REF * KMAX_Pa_sqrt_m
+    sigma_comp_Pa = contact_pressure(
+        K_min_signed, resolved_cfg.contact_pressure_scale, reference_contact_radius_m,
+        0.0, resolved_cfg.contact_pressure_cap_Pa,
+    )
+    lam_bond_raw, rate_diag = bond_formation_rate(
+        sigma_comp_Pa, T_K, resolved_cfg.chemistry_factor, resolved_cfg
+    )
+    m_h = resolved_cfg.healing_cooperative_order
+    k_CB_at_min_K = cooperative_hazard(
+        lam_bond_raw, m_h, resolved_cfg.healing_correlation_time_s
+    )
+    return {
+        "K_min_signed_Pa_sqrt_m": K_min_signed,
+        "sigma_comp_Pa_at_K_min": sigma_comp_Pa,
+        "bond_barrier_floor_fraction_at_K_min": rate_diag["barrier_floor_fraction"],
+        "bond_barrier_floored_at_K_min": rate_diag["floored"],
+        "bond_rate_saturated_at_K_min": rate_diag["saturated"],
+        "healing_cooperative_order": m_h,
+        "cooperative_regime": (
+            "single_hit_elementary" if m_h <= 1.0 + 1.0e-12 else "gamma_incomplete_saturating"
+        ),
+        "lambda_bond_raw_at_K_min_s": lam_bond_raw,
+        "k_CB_at_K_min_s": k_CB_at_min_K,
+    }
 
 
 def freeze_pilot_configuration(
@@ -485,6 +531,17 @@ def run_trajectory(
                 if pre_commit_rebonding_state is not None
                 else 0.0
             )
+            pre_event_K_rebond = (
+                float(pre_commit_rebonding_state.K_rebond_Pa_sqrt_m)
+                if pre_commit_rebonding_state is not None else 0.0
+            )
+            # RNG/threshold provenance for this event, read before commit
+            # mutates any state -- the drawn hazard threshold and the
+            # engine/event identifiers that pin down which threshold-stream
+            # draw this event corresponds to.
+            hazard_threshold_action = getattr(engine, "hazard_threshold_action", None)
+            hazard_event_index = getattr(engine, "hazard_event_index", None)
+            engine_id = getattr(engine, "_engine_id", None)
 
             engine.commit_energy_gated_event(committed_length, gate, result_ref)
             cumulative_extension_m += committed_length
@@ -499,6 +556,31 @@ def run_trajectory(
             )
 
             new_bulk_records = bulk_action_records[bulk_action_records_before:]
+            # The LAST recorded phase_resolved_action call for this event is
+            # the one whose (action, end_states) the caller actually
+            # committed with (solve_coupled_event_time's bisection loop ends
+            # on its final residual() call; the zero-cohesion direct-
+            # evaluation path makes exactly one call) -- so it is the
+            # converged/final action and K_rebond summary for this event,
+            # not an arbitrary bisection trial.
+            final_record = new_bulk_records[-1] if new_bulk_records else {}
+            max_phase_resolved_K_rebond = max(
+                (r.get("max_K_rebond_Pa_sqrt_m", 0.0) for r in new_bulk_records), default=0.0
+            )
+
+            # MPZ-state snapshot at the committing block (mission Section
+            # 11's "relevant MPZ-state" requirement) -- read directly off
+            # the real production engine's own cycle_step_waveform result,
+            # never re-derived or approximated.
+            mpz_state = {
+                key: fired_result.get(key)
+                for key in (
+                    "mpz_mobile_count", "mpz_retained_count", "mpz_emitted_total",
+                    "mpz_escaped_total", "mpz_recovered_total", "r_eff", "sigma_tip",
+                    "mpz_total_K_shield_Pa_sqrt_m",
+                )
+            }
+
             events.append({
                 "event_index": len(events),
                 "blocks_to_fire": blocks_used,
@@ -507,8 +589,18 @@ def run_trajectory(
                 "accepted_length_m": float(committed_length),
                 "cumulative_extension_m": cumulative_extension_m,
                 "pre_event_max_pB": pre_event_max_pB,
+                "pre_event_K_rebond_Pa_sqrt_m": pre_event_K_rebond,
                 "max_pB_post_commit": max_pB_post_commit,
                 "max_K_rebond_post_commit_Pa_sqrt_m": max_K_rebond_post_commit,
+                "max_phase_resolved_K_rebond_Pa_sqrt_m": max_phase_resolved_K_rebond,
+                "action_weighted_K_rebond_Pa_sqrt_m": final_record.get(
+                    "action_weighted_K_rebond_Pa_sqrt_m", 0.0
+                ),
+                "cleavage_action": final_record.get("action", 0.0),
+                "hazard_threshold_action": hazard_threshold_action,
+                "hazard_event_index": hazard_event_index,
+                "engine_id": engine_id,
+                "mpz_state": mpz_state,
                 "bulk_action_records": new_bulk_records,
                 "any_bulk_action_used": any(r.get("bulk_action_used") for r in new_bulk_records),
                 "all_bulk_action_qualified": all(

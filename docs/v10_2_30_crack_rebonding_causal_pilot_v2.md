@@ -307,10 +307,10 @@ gitignored; tracked summary/decision artifacts under
 
 | Gate | Result |
 |---|---|
-| 1. C0/C1 exact physical parity | **PASS** -- 0 mismatches across all 7 matched events (`rel_tol=1e-9` on both `accepted_length_m` and `waiting_time_s_this_event`; no 2% tolerance used) |
+| 1. C0/C1 event-time-and-length parity | **PASS** -- 0 mismatches across all 7 matched events (`rel_tol=1e-9` on both `accepted_length_m` and `waiting_time_s_this_event`; no 2% tolerance used). This checks those two fields specifically, not an unqualified full-state claim -- MPZ populations, emission ledgers, etc. were not separately diffed between C0 and C1. |
 | 2. C5 exactly zero bond formation at R=0.1 | **PASS** -- `max_pB_post_commit`/`max_K_rebond` are exactly `0.0` at every one of C5's 7 events (C4 control likewise) |
 | 3. Dynamically formed bonds from an event-created patch | **PASS** -- C3R and C3P both show genuine, dynamically-generated nonzero bonding (C2R/C2P, the zero-cohesion twins, correctly show `K_rebond` staying exactly 0 despite `p_B` evolving) |
-| 4. Finite-cohesion delay in >=2 compression-containing intervals | **PASS** -- 4 of 6 post-first-event intervals contain a complete negative-K excursion (matching V2-C's preflight finding), and every one of them shows a finite-cohesion delay |
+| 4. Finite-cohesion delay in >=2 compression-containing intervals | **PASS** -- 2 unique post-first-event intervals (`event_0_to_1`, `event_2_to_3`) contain a complete negative-K excursion, each evaluated once under the reversible preset and once under the persistent preset (4 rows total, not 4 independent intervals), and every one of the 4 rows shows a finite-cohesion delay |
 | 5. Only certified periodic-orbit/explicit actions admitted | **PASS** -- every `bulk_action_qualified` flag true across all 8 trajectories x 7 events |
 | 6. Contact semantics label preserved | **PASS** -- `SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT` |
 | 7. No physical Paris-slope inference | **PASS** -- single-Kmax pilot only, explicitly noted |
@@ -321,13 +321,14 @@ All 7 hard gates pass (`overall_gate_pass: true`).
 
 `Delta t = t_finite_cohesion - t_zero_cohesion` at matched event indices
 between each zero/finite twin pair (`interval_causal_analysis.csv`, 12
-rows -- 6 intervals x {reversible, persistent}). The effect is small but
-**real, correctly signed, and remarkably consistent**: every interval
-(compression-containing or not) shows `t_finite > t_zero` by
-`log10(t_finite/t_zero)` in a narrow band of **0.028 to 0.044 decades**
-across all 12 rows. The **maximum** ratio among the 4 compression-containing
-intervals is **0.0420 decades** -- below the mission's frozen expansion
-threshold of **0.05 decades**.
+rows -- 6 unique post-first-event intervals x {reversible, persistent}
+preset). The effect is small but **real, correctly signed, and remarkably
+consistent**: every interval (compression-containing or not) shows
+`t_finite > t_zero` by `log10(t_finite/t_zero)` in a narrow band of
+**0.028 to 0.044 decades** across all 12 rows. The **maximum** ratio among
+the 4 rows drawn from the 2 unique compression-containing intervals is
+**0.0420 decades** -- below the mission's frozen expansion threshold of
+**0.05 decades**.
 
 ```
 classification: REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL
@@ -344,13 +345,91 @@ waiting-time effect at this Kmax/Pi_K combination does not clear the
 prospectively-frozen macroscopic-significance bar. **Stop here -- no
 multi-K matrix, no Part X.**
 
+### Evidence hardening (analysis-only, no new physics)
+
+The originally tracked artifacts (`trajectory_summary.json`,
+`interval_causal_analysis.csv`) were insufficient to independently
+reproduce the hard gates without the gitignored
+`runs/crack_rebonding_causal_pilot_v2/trajectories.json`, and did not carry
+several diagnostics the mission requested. Fixed, with no change to any
+physical result:
+
+1. **Portable event ledger.** `scripts/build_v2_event_ledger.py` extracts,
+   from the raw `trajectories.json`, a tracked
+   `artifacts/crack_rebonding_causal_pilot_v2/event_ledger.json` (+ a flat
+   `.csv` export) containing every per-event field the gates need
+   (`accepted_length_m`, `waiting_time_s_this_event`, `max_pB_post_commit`,
+   `max_K_rebond_post_commit_Pa_sqrt_m`, `all_bulk_action_qualified`,
+   `post_first_event_intervals`, etc.) for all 8 trajectories x 7 events =
+   56 rows. `analyze_v10_2_30_crack_rebonding_causal_pilot_v2.py` and
+   `verify_v10_2_30_crack_rebonding_causal_pilot_v2.py` were rewritten to
+   read ONLY this tracked ledger -- the verifier no longer opens
+   `runs/.../trajectories.json` at all, and keeps working even if that
+   /private/tmp directory is gone.
+2. **New per-event diagnostics**, added via non-invasive instrumentation
+   of `crack_rebonding_v10230.py::phase_resolved_action` (three new
+   diagnostics-only accumulators -- `max_K_rebond_Pa_sqrt_m`,
+   `action_weighted_K_rebond_Pa_sqrt_m`, `action` -- that are never fed
+   back into `total_action`/`p_by_patch`/`idx`, so they cannot change any
+   decision the function's callers make) plus a few additional live-state
+   reads already available in `run_trajectory` at commit time:
+   - `pre_event_p_B` / `pre_event_K_rebond_Pa_sqrt_m` (already-existing
+     live state, read immediately before commit).
+   - `max_phase_resolved_K_rebond_Pa_sqrt_m` and
+     `action_weighted_K_rebond_Pa_sqrt_m` (from the new
+     `phase_resolved_action` diagnostics).
+   - `cleavage_action` (the converged action from the same bisection call
+     `dt_used`/`patch_states` are taken from -- not an arbitrary trial).
+   - `finite_minus_zero_cleavage_action` (computed in
+     `analyze.py::_matched_delay_rows` from the two trajectories' own
+     `cleavage_action` at the matched event).
+   - `hazard_threshold_action`, `hazard_event_index`, `engine_id` (RNG/
+     threshold provenance).
+   - `mpz_state` (`mpz_mobile_count`, `mpz_retained_count`,
+     `mpz_emitted_total`, `mpz_escaped_total`, `mpz_recovered_total`,
+     `r_eff`, `sigma_tip`, `mpz_total_K_shield_Pa_sqrt_m`), read directly
+     off the real production engine's own `cycle_step_waveform` result.
+   - `barrier_floor_saturation_diagnostics` (bond-barrier floor fraction,
+     floored/saturated flags, cooperative-order regime), computed
+     analytically from the frozen config at the reference protocol's
+     deepest compression point -- a pure function of `(cfg, K_min,
+     r_contact_m)`, needing no replay. `healing_cooperative_order=1.0` for
+     both presets, so the cooperative-hazard regime is
+     `single_hit_elementary` throughout (no gamma-incomplete saturation
+     branch is exercised by this pilot).
+
+   These required re-running the same 8 trajectories once more under the
+   identical seed=1720/frozen configuration to populate the richer
+   instrumentation. **Verified as a pure re-observation, not new physics**:
+   every event's `accepted_length_m`, `waiting_time_s_this_event`,
+   `max_pB_post_commit`, and `max_K_rebond_post_commit_Pa_sqrt_m` compares
+   byte-identical against the original run's `trajectories.json` (0
+   mismatches across all 56 events).
+3. **Interesting finding surfaced by this pass**: `action_weighted_K_rebond`
+   and `max_phase_resolved_K_rebond` sit at essentially the full
+   `K_rebond_max` ceiling (900 kPa*sqrt(m)) in nearly every interval once
+   any meaningful bonding has occurred, rather than tracking `p_B`
+   continuously. This is a real, pre-existing property of the already-
+   frozen wake geometry (`wake_weight_length_m=5e-7 m` is far smaller than
+   a single event's accepted patch length, ~5e-6 m, so `H_b = p_B * w *
+   length_m` saturates its `min(1.0, ...)` cap at a fairly small `p_B`) --
+   not a defect introduced by this hardening pass, and not something this
+   analysis-only pass changes.
+4. **Wording corrections**: gate 1 is now explicitly labeled
+   "event-time-and-length parity", and gate 4's rows are explicitly
+   annotated with `interval_group_id` so it is clear the 4 compression-
+   containing rows are 2 unique physical intervals x 2 kinetics presets,
+   not 4 independent samples.
+
 ### Verification
 
-`scripts/verify_v10_2_30_crack_rebonding_causal_pilot_v2.py`: independently
-rebuilds the bare A_NATIVE engine and reproduces
-`frozen_configuration_sha256` from scratch, re-derives all 5
-gate-relevant boolean predicates directly from `trajectories.json`
-(bypassing the saved `causal_decision.json` entirely), confirms
+`scripts/verify_v10_2_30_crack_rebonding_causal_pilot_v2.py`: depends ONLY
+on tracked artifacts (no `--run-root`, no read of any gitignored
+`runs/...` file). Independently rebuilds the bare A_NATIVE engine and
+reproduces `frozen_configuration_sha256` from scratch, confirms the tracked
+`event_ledger.json` points at that same hash, re-derives all gate-relevant
+predicates directly from the ledger (bypassing the saved
+`causal_decision.json` entirely), confirms
 `mpz_n_bins=80`/`n_phase=80`/`seed=1720`/the reference protocol values, and
 confirms DMD/Poincare acceleration, passivation, and topological healing
 are all disabled. **`overall_pass: true`**, zero failed checks.

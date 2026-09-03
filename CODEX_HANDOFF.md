@@ -357,13 +357,19 @@ Do not touch these preserved/read-only worktrees:
 - `/private/tmp/v10230-reversible-energy-integration` (read-only provenance source; its `runs/A_native_plus_8PT_fatigue_v1/` tree is now empty — 1371 dirs, 0 files, swept by OS /tmp cleanup)
 - `/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_codex_v10_2_30` (mounted checkout, unrelated v9.14 branch — read from it for provenance lookups only, never edit/commit)
 
-### Status: COMPLETE — terminal classification reached
+### Status: terminal classification accepted; evidence-hardening + second-seed replication in progress
 
 **`REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL`**
-(mission completion-contract outcome C). All four milestones (V2-A through
-V2-D) are committed. See `docs/v10_2_30_crack_rebonding_causal_pilot_v2.md`
-for the full writeup and `artifacts/crack_rebonding_causal_pilot_v2/
-causal_decision.json` / `verification.json` for the machine-readable record.
+(mission completion-contract outcome C) is accepted as final -- no Part X,
+no production-line merge. All four original milestones (V2-A through V2-D)
+are committed. Per follow-up review, an analysis-only evidence-hardening
+pass (portable tracked event ledger; additional per-event diagnostics;
+precise gate-1/gate-4 wording) and a bounded second-seed replication
+(seed=1001723, the 4 RB2 zero/finite-cohesion trajectories only) were
+requested. See `docs/v10_2_30_crack_rebonding_causal_pilot_v2.md` for the
+full writeup and `artifacts/crack_rebonding_causal_pilot_v2/
+causal_decision.json` / `verification.json` / `event_ledger.json` for the
+machine-readable record.
 
 ### Completed
 
@@ -406,10 +412,31 @@ causal_decision.json` / `verification.json` for the machine-readable record.
   just under the frozen 0.05-decade expansion threshold. Independently
   reproduced by `scripts/verify_v10_2_30_crack_rebonding_causal_pilot_v2.py`
   (`overall_pass: true`).
+- **Evidence hardening (analysis-only, no new physics):** added
+  `scripts/build_v2_event_ledger.py` producing a tracked, portable
+  `artifacts/crack_rebonding_causal_pilot_v2/event_ledger.json`/`.csv`
+  (56 event rows); rewrote `analyze_...py`/`verify_...py` to depend ONLY on
+  tracked artifacts (verify no longer reads any gitignored `runs/...`
+  file); added non-invasive `phase_resolved_action` instrumentation
+  (max/action-weighted K_rebond, converged action) plus pre-event
+  K_rebond, RNG/threshold identifiers, MPZ-state snapshot, and analytic
+  barrier-floor/cooperative-saturation diagnostics. Re-ran the same 8
+  trajectories under the identical seed=1720/frozen config to populate
+  this and confirmed 0 mismatches on every physics field against the
+  original run (pure re-observation). Corrected gate-1 wording to
+  "event-time-and-length parity" (not an unqualified full-state claim) and
+  annotated gate 4's 4 rows as 2 unique intervals x 2 kinetics presets.
+  Classification unchanged: `REBONDING_KINETICALLY_ACTIVE_BUT_
+  MACROSCOPICALLY_SMALL`, max ratio still 0.0420 decades.
 
 ### Active processes
 
-None. All 8 trajectories completed; no workers running.
+Second-seed replication (seed=1001723, 4 RB2 zero/finite-cohesion
+trajectories only) may be running in the background -- check
+`ps aux | grep run_v2_second_seed_replication` and
+`runs/crack_rebonding_causal_pilot_v2_seed1001723/` before assuming it's
+done. Its result has not yet been reviewed against the frozen 0.05-decade
+threshold (the threshold must NOT be altered after seeing that result).
 
 ### Remaining authorized-but-not-attempted scope
 

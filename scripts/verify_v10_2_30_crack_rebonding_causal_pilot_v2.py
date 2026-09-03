@@ -1,13 +1,16 @@
 """Strict verifier for the corrected crack-rebonding causal pilot v2.
 
-Independently re-derives the frozen configuration (from a freshly-built
-bare A_NATIVE engine) and the causal-decision gates (from trajectories.json)
-and confirms they match the artifacts the run/analyze scripts wrote, then
-hashes every tracked artifact. Exits 0 only if every check passes.
+Depends ONLY on tracked artifacts under artifacts/
+crack_rebonding_causal_pilot_v2/ -- never on the gitignored
+runs/.../trajectories.json -- so this verifier keeps working even if the
+original /private/tmp run directory is gone. Independently re-derives the
+frozen configuration (from a freshly-built bare A_NATIVE engine) and the
+causal-decision gates (from the tracked event_ledger.json) and confirms
+they match the committed artifacts, then hashes every tracked artifact.
+Exits 0 only if every check passes.
 
 Usage:
-    <pinned interpreter> scripts/verify_v10_2_30_crack_rebonding_causal_pilot_v2.py \\
-        --run-root runs/crack_rebonding_causal_pilot_v2
+    <pinned interpreter> scripts/verify_v10_2_30_crack_rebonding_causal_pilot_v2.py
 """
 from __future__ import annotations
 
@@ -35,6 +38,8 @@ TRACKED_ARTIFACT_NAMES = [
     "A_native_provenance.json",
     "frozen_configuration.json",
     "preflight_protocol_selection.json",
+    "event_ledger.json",
+    "event_ledger.csv",
     "trajectory_summary.json",
     "interval_causal_analysis.csv",
     "causal_decision.json",
@@ -51,18 +56,29 @@ def sha256_file(path: Path) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--run-root", required=True)
+    parser.add_argument(
+        "--artifacts-dir", default=str(ARTIFACTS_DIR),
+        help="tracked artifacts directory (default: the repo's own artifacts/crack_rebonding_causal_pilot_v2)",
+    )
     args = parser.parse_args(argv)
+    artifacts_dir = Path(args.artifacts_dir)
 
-    run_root = Path(args.run_root)
     checks: dict[str, bool] = {}
     details: dict[str, object] = {}
 
     if sys.executable != pilot.REQUIRED_PYTHON:
         raise SystemExit(f"wrong interpreter: expected {pilot.REQUIRED_PYTHON!r}, got {sys.executable!r}")
 
-    # 1. Frozen-configuration reproducibility.
-    saved_frozen = json.loads((run_root / "frozen_configuration.json").read_text())
+    for name in TRACKED_ARTIFACT_NAMES:
+        checks[f"artifact_present_{name}"] = (artifacts_dir / name).is_file()
+    if not all(checks.values()):
+        missing = [k for k, v in checks.items() if not v]
+        raise SystemExit(f"missing tracked artifacts, cannot verify: {missing}")
+
+    # 1. Frozen-configuration reproducibility (rebuilds the bare A_NATIVE
+    # engine fresh -- the only non-tracked-artifact input, and itself
+    # reproducible from the tracked A_native_provenance.json).
+    saved_frozen = json.loads((artifacts_dir / "frozen_configuration.json").read_text())
     bare_engine, _ = build_a_native_engine(None)
     Eprime_Pa = reduced_modulus_Pa(bare_engine.G, bare_engine.nu)
     r_eff = max(bare_engine.r_eff(), 1.0e-9)
@@ -88,20 +104,31 @@ def main(argv: list[str] | None = None) -> int:
         and common["frequency_Hz"] == 1000.0
     )
 
-    # 3. Re-derive the causal-decision gates independently and compare.
+    # 3. event_ledger.json's own frozen_configuration_sha256 pointer matches
+    # the tracked frozen_configuration.json -- the ledger is traceable to
+    # the exact configuration it was extracted from.
+    ledger = json.loads((artifacts_dir / "event_ledger.json").read_text())
+    checks["ledger_matches_frozen_configuration"] = (
+        ledger["frozen_configuration_sha256"] == saved_frozen["frozen_configuration_sha256"]
+    )
+
+    # 4. Re-derive the causal-decision gates independently from the
+    # PORTABLE, TRACKED ledger (not the gitignored runs/.../trajectories.json)
+    # and compare against the tracked causal_decision.json.
     analyze = importlib.import_module("analyze_v10_2_30_crack_rebonding_causal_pilot_v2")
-    trajectories = json.loads((run_root / "trajectories.json").read_text())
+    trajectories = ledger["trajectories"]
     c0, c1 = trajectories["C0"], trajectories["C1"]
     c2r, c3r = trajectories["C2R"], trajectories["C3R"]
     c2p, c3p = trajectories["C2P"], trajectories["C3P"]
     c4, c5 = trajectories["C4"], trajectories["C5"]
 
-    saved_decision = json.loads((run_root / "causal_decision.json").read_text())
+    saved_decision = json.loads((artifacts_dir / "causal_decision.json").read_text())
 
-    recomputed_gate_1 = analyze._strict_physical_parity(c0, c1)
+    recomputed_gate_1 = analyze._strict_event_time_and_length_parity(c0, c1)
     recomputed_gate_1["pass"] = recomputed_gate_1["identical"]
     checks["gate_1_reproducible"] = (
-        recomputed_gate_1["pass"] == saved_decision["gates"]["gate_1_c0_c1_exact_parity"]["pass"]
+        recomputed_gate_1["pass"]
+        == saved_decision["gates"]["gate_1_c0_c1_event_time_and_length_parity"]["pass"]
     )
     checks["gate_1_pass"] = recomputed_gate_1["pass"]
 
@@ -112,9 +139,21 @@ def main(argv: list[str] | None = None) -> int:
         c2p, c3p, "persistent"
     )
     compression_rows = [r for r in rows if r["contains_complete_negative_excursion"]]
-    checks["gate_4_pass"] = len(compression_rows) >= 2
+    n_unique_compression_intervals = len({r["interval_group_id"] for r in compression_rows})
+    checks["gate_4_pass"] = n_unique_compression_intervals >= 2
     checks["gate_5_pass"] = all(
         analyze._all_bulk_action_qualified(t) for t in (c0, c1, c2r, c3r, c2p, c3p, c4, c5)
+    )
+
+    recomputed_max_ratio = max(
+        (r["log10_ratio_abs_decade"] for r in compression_rows), default=0.0
+    )
+    checks["max_ratio_reproducible"] = (
+        abs(
+            recomputed_max_ratio
+            - saved_decision["max_log10_ratio_abs_decade_in_compression_containing_intervals"]
+        )
+        < 1.0e-9
     )
 
     checks["causal_decision_classification_reproducible"] = saved_decision["classification"] in (
@@ -123,43 +162,30 @@ def main(argv: list[str] | None = None) -> int:
         "HARD_GATE_FAILURE_SEE_GATES",
     )
 
-    # 4. No unauthorized activity: no DMD/Poincare, no passivation, no
+    # 5. No unauthorized activity: no DMD/Poincare, no passivation, no
     # topological healing, no resume.
     checks["dmd_poincare_disabled"] = not common["dmd_poincare_acceleration_enabled"]
     checks["passivation_disabled"] = not common["passivation_enabled"]
     checks["topological_healing_disabled"] = not common["topological_healing_enabled"]
     checks["restart_resume_forbidden_declared"] = common["restart_resume_forbidden"] is True
 
-    # 5. Hash every tracked artifact.
-    file_hashes = {}
-    for name in TRACKED_ARTIFACT_NAMES:
-        path = ARTIFACTS_DIR / name
-        if path.is_file():
-            file_hashes[name] = sha256_file(path)
-        else:
-            file_hashes[name] = None
-            checks[f"artifact_present_{name}"] = False
-    for name, digest in file_hashes.items():
-        if digest is not None:
-            checks[f"artifact_present_{name}"] = True
-
-    file_hashes_path = ARTIFACTS_DIR / "file_hashes.json"
+    # 6. Hash every tracked artifact.
+    file_hashes = {name: sha256_file(artifacts_dir / name) for name in TRACKED_ARTIFACT_NAMES}
+    file_hashes_path = artifacts_dir / "file_hashes.json"
     file_hashes_path.write_text(json.dumps(file_hashes, indent=2, sort_keys=True) + "\n")
 
     overall_pass = all(checks.values())
     verification = {
         "schema": "v10.2.30_crack_rebonding_causal_pilot_v2_verification_v1",
+        "depends_on_gitignored_run_files": False,
         "checks": checks,
         "details": details,
         "saved_causal_decision_classification": saved_decision["classification"],
         "file_hashes": file_hashes,
         "overall_pass": overall_pass,
     }
-    verification_path = run_root / "verification.json"
+    verification_path = artifacts_dir / "verification.json"
     verification_path.write_text(json.dumps(verification, indent=2, sort_keys=True) + "\n")
-    (ARTIFACTS_DIR / "verification.json").write_text(
-        json.dumps(verification, indent=2, sort_keys=True) + "\n"
-    )
     print(f"wrote {verification_path}")
     print(f"overall_pass={overall_pass}")
     for key, value in checks.items():

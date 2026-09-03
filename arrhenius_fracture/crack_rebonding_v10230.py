@@ -700,9 +700,16 @@ def phase_resolved_action(
 
     total_action = 0.0
     idx = k0 % n_phase
+    # Diagnostic-only accumulators (S9 evidence-hardening pass): never fed
+    # back into total_action/p_by_patch/idx, so they cannot change any
+    # decision this function's callers make -- purely additive
+    # instrumentation for the portable event ledger's
+    # max_K_rebond/action_weighted_K_rebond fields.
+    max_K_rebond_seen = 0.0
+    action_weighted_K_rebond_accum = 0.0
 
     def _one_bin(K_s: float, bin_frac: float) -> None:
-        nonlocal total_action
+        nonlocal total_action, max_K_rebond_seen, action_weighted_K_rebond_accum
         total_weighted = 0.0
         new_states: dict[int, np.ndarray] = {}
         for patch in active_patches:
@@ -716,7 +723,10 @@ def phase_resolved_action(
         K_rebond_bin = K_rebond_max * H_b_bin
         sigma_c = cleavage_stress_with_rebond(K_s, K_shield_Pa_sqrt_m, K_rebond_bin, r_eff_m)
         lam_c = lambda_cleave_fn(sigma_c)
-        total_action += lam_c * (bin_frac * dt_phase)
+        action_increment = lam_c * (bin_frac * dt_phase)
+        total_action += action_increment
+        max_K_rebond_seen = max(max_K_rebond_seen, K_rebond_bin)
+        action_weighted_K_rebond_accum += K_rebond_bin * action_increment
         p_by_patch.update(new_states)
 
     # n_full counts phase BINS, not cycles -- separate into whole cycles
@@ -868,7 +878,22 @@ def phase_resolved_action(
                 )
 
             bulk_representative_action = action_at_star
-            total_action += remaining_cycles * bulk_representative_action
+            bulk_segment_action = remaining_cycles * bulk_representative_action
+            total_action += bulk_segment_action
+
+            # Diagnostic-only: represent the bulk-jumped segment by its own
+            # asymptotic K_rebond (at the periodic state p_star), weighted
+            # by the segment's own action contribution -- consistent with
+            # how the bulk approximation itself treats this segment as a
+            # single repeated representative cycle.
+            H_b_star = 0.0
+            for patch in active_patches:
+                w = wake_weight(patch.s_j_m, L_h, L_w)
+                H_b_star += float(p_star_states[patch.patch_id][2]) * w * patch.length_m
+            H_b_star = min(1.0, max(H_b_star, 0.0))
+            K_rebond_star = K_rebond_max * H_b_star
+            max_K_rebond_seen = max(max_K_rebond_seen, K_rebond_star)
+            action_weighted_K_rebond_accum += K_rebond_star * bulk_segment_action
 
             reference_scale = max(abs(total_action), 1.0e-300)
             qualified = strictly_converged or (
@@ -915,6 +940,12 @@ def phase_resolved_action(
     if frac > 1.0e-12:
         K_s = K_phase_fn(idx)
         _one_bin(K_s, frac)
+
+    diagnostics["max_K_rebond_Pa_sqrt_m"] = max_K_rebond_seen
+    diagnostics["action_weighted_K_rebond_Pa_sqrt_m"] = (
+        action_weighted_K_rebond_accum / total_action if total_action > 0.0 else 0.0
+    )
+    diagnostics["action"] = total_action
 
     return total_action, p_by_patch, idx, diagnostics
 
