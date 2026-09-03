@@ -366,30 +366,47 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                 transient_budget *= 2
                 extensions += 1
 
-        lambda_avg_uncoupled = (
-            (1.0 - B_start) * threshold_action / dt_uncoupled if dt_uncoupled > 0.0 else 1.0
-        )
-        root = _rebond.solve_coupled_event_time(
-            integrate_coupled_fn=integrate_coupled_fn,
-            phase_resolved_action_fn=phase_resolved_action_fn,
-            lambda_avg_uncoupled=lambda_avg_uncoupled,
-            B_start=B_start,
-            B_threshold=1.0,
-            eps_B=1.0e-6,
-            dt_block=dt_uncoupled if dt_uncoupled > 0.0 else None,
-        )
-        final_states = root["patch_states"] if root.get("fired") else pre_event_states
+        if not _rebond.cohesion_present(rebonding_state.cfg):
+            # Zero-cohesion RB2 (mission Section 7/8): K_rebond_max is
+            # exactly 0 regardless of p_B, so the cleavage hazard is
+            # provably unaffected by wake state and the coupled root is
+            # trivially dt_uncoupled -- evolve the P/C/B Markov state to
+            # that KNOWN duration directly (one exact evaluation), rather
+            # than re-deriving an approximate root via
+            # solve_coupled_event_time's bisection (whose eps_B=1e-6
+            # tolerance would otherwise reintroduce the same kind of
+            # baseline-timing drift RB1's strict-parity fix removes). This
+            # still gives honest, dynamically-evolved P/C/B state for the
+            # zero-cohesion vs finite-cohesion causal comparison.
+            _, final_states, _end_idx = phase_resolved_action_fn(dt_uncoupled)
+            dt_for_clock = dt_uncoupled
+        else:
+            lambda_avg_uncoupled = (
+                (1.0 - B_start) * threshold_action / dt_uncoupled if dt_uncoupled > 0.0 else 1.0
+            )
+            root = _rebond.solve_coupled_event_time(
+                integrate_coupled_fn=integrate_coupled_fn,
+                phase_resolved_action_fn=phase_resolved_action_fn,
+                lambda_avg_uncoupled=lambda_avg_uncoupled,
+                B_start=B_start,
+                B_threshold=1.0,
+                eps_B=1.0e-6,
+                dt_block=dt_uncoupled if dt_uncoupled > 0.0 else None,
+            )
+            final_states = root["patch_states"] if root.get("fired") else pre_event_states
+            # Advance the wake's chronological phase clock by the converged
+            # (rebonding-coupled) elapsed time, not the raw uncoupled
+            # estimate -- this is what makes the next block/event's phase
+            # sampling correctly continuous from the true event instant,
+            # not a nominal one.
+            dt_for_clock = float(root["dt_used"]) if root.get("fired") else dt_uncoupled
+
         rebonding_state.commit_event(
             accepted_length_m=accepted_length_m,
             event_index=event_index,
             pre_event_states=final_states,
             Eprime_Pa=Eprime_Pa_ctx,
         )
-        # Advance the wake's chronological phase clock by the converged
-        # (rebonding-coupled) elapsed time, not the raw uncoupled estimate --
-        # this is what makes the next block/event's phase sampling correctly
-        # continuous from the true event instant, not a nominal one.
-        dt_for_clock = float(root["dt_used"]) if root.get("fired") else dt_uncoupled
         period_s_ctx = float(ctx.get("period_s", 0.0))
         if period_s_ctx > 0.0:
             rebonding_state.elapsed_time_s = (

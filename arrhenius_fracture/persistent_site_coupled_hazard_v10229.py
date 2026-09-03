@@ -99,14 +99,23 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
     from . import crack_rebonding_v10230 as _rebond
 
     rebonding_state = getattr(engine, "_rebonding_state", None)
-    rebonding_active = rebonding_state is not None and _rebond.rebonding_kinetics_active(
+    kinetics_active = rebonding_state is not None and _rebond.rebonding_kinetics_active(
         rebonding_state.cfg
     )
+    # Zero-cohesion RB2 configs (mission Section 8) keep kinetics_active
+    # True (bonds still form/rupture, tracked for the causal comparison)
+    # but K_rebond_max is provably 0 regardless of state -- only feed the
+    # rebond-aware, phase-shifted sig_cleave into the hazard when cohesion
+    # can actually be nonzero, so a zero-cohesion trajectory's hazard
+    # statistics are bit-identical to RB0/RB1's rather than merely
+    # numerically close (the same phase-shifted-quadrature divergence RB1's
+    # strict-parity fix addresses).
+    hazard_coupled = kinetics_active and _rebond.cohesion_present(rebonding_state.cfg)
     K_signed_phase = None
     K_rebond_phase = None
     K_shield_now = 0.0
     r_eff_now = 1.0e-30
-    if rebonding_active:
+    if hazard_coupled:
         signed_waveform = dataclasses.replace(waveform, closure_clip=False)
         phase_offset_rad = _rebond.chronological_phase_offset_rad(
             rebonding_state.elapsed_time_s, waveform.period_s
@@ -138,7 +147,7 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
     for _idx, value in enumerate(K_values):
         K = max(float(value), 0.0)
         sig = _positive(engine.sigma_tip(K))
-        if rebonding_active:
+        if hazard_coupled:
             sig_cleave = _rebond.cleavage_stress_with_rebond(
                 float(K_signed_phase[_idx]), K_shield_now, float(K_rebond_phase[_idx]), r_eff_now
             )

@@ -64,6 +64,29 @@ def rebonding_kinetics_active(cfg: CrackRebondingControls | None) -> bool:
     return cfg is not None and cfg.enabled and cfg.model_level in _ACTIVE_MODEL_LEVELS
 
 
+def cohesion_present(cfg: CrackRebondingControls | None) -> bool:
+    """True iff K_rebond_max (``eta_K * sqrt(E' * G_max)``) can ever be
+    nonzero for this config, i.e. whether restored cohesion actually
+    couples into the cleavage hazard at all.
+
+    Used to distinguish the zero-cohesion RB2 matching controls (mission
+    Section 8: identical formation/rupture kinetics and wake bookkeeping to
+    their finite-cohesion twin, but K_rebond_max frozen at exactly 0) from
+    the finite-cohesion case: a zero-cohesion config must still evolve its
+    P/C/B Markov state (bonds can form/rupture; ``rebonding_kinetics_active``
+    is True), but since K_rebond is provably zero regardless of that state,
+    the cleavage hazard and event-time localization must NOT be routed
+    through the coupled root-finder (mission Section 7) -- doing so would
+    reintroduce the same bisection-tolerance-scale timing drift from
+    baseline that RB1's strict-parity fix removes.
+    """
+    return (
+        cfg is not None
+        and cfg.restored_work_of_separation_J_m2 > 0.0
+        and cfg.rebond_K_geometry_factor > 0.0
+    )
+
+
 def reduced_modulus_Pa(G_Pa: float, nu: float) -> float:
     """Isotropic plane-strain reduced modulus E' = 2G/(1-nu), computed from
     the engine's own shear modulus and Poisson ratio (avoids depending on the
@@ -1219,6 +1242,7 @@ def restore_rebonding_checkpoint(engine: Any, payload: dict[str, Any] | None) ->
 __all__ = [
     "reduced_modulus_Pa",
     "rebonding_kinetics_active",
+    "cohesion_present",
     "wake_weight",
     "contact_diagnostics",
     "patch_Q",
