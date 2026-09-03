@@ -81,7 +81,7 @@ def main():
     def passes(kind):
         return all(checks[f"{kind}_{h}_contour_spread"]<=LIMITS["maximum_contour_spread"] and checks[f"{kind}_{h}_mode_ratio_max"]<=LIMITS["maximum_mode_II_to_mode_I"] for h in finest)
     gates["CONFORMING_CONTROL_QUALIFIED"]="PASS" if passes("CONFORMING") else "FAIL"
-    gates["V12_STANDARD_INTERACTION_INTEGRAL_QUALIFIED"]="PASS" if passes("V12_FIXED") and passes("V12_JOINT_P2") else "FAIL"
+    geometry_ok=all(r["r_inner_over_h_tip"]>=LIMITS["minimum_r_inner_over_h_tip"] and r["support_width_over_r_inner"]<=LIMITS["maximum_q_support_width_over_r_inner"] and min(r["root_clearance_m"],r["exterior_clearance_m"],r["patch_clearance_m"])>=LIMITS["minimum_root_exterior_patch_clearance_m"] and r["active_angular_coverage_fraction"]>=LIMITS["minimum_active_angular_coverage_fraction"] for r in rows)
     # Global-G and Williams comparisons use only predeclared primary fit and contours after plateau qualification.
     energy_ok=True; fit_ok=True
     for kind in ("CONFORMING","V12_FIXED","V12_JOINT_P2"):
@@ -89,8 +89,17 @@ def main():
             g=next(x for x in globals_ if x["representation"]==kind and x["h_tip_m"]==h); ks=[x["K_I_int"] for x in rows if x["representation"]==kind and x["h_tip_m"]==h]; km=float(np.mean(ks)); kg=g["K_G"]
             energy_ok &= g["energy_compliance_error"]<=LIMITS["maximum_GK_to_compliance_G_error"] and rel(km,kg)<=LIMITS["maximum_KI_to_energy_K_error"]
             fs=[x for x in fits if x["representation"]==kind and x["h_tip_m"]==h]; primary=fs[0]; fit_ok &= rel(primary["K_I_fit"],kg)<=LIMITS["maximum_Williams_KI_to_energy_K_error"] and max(rel(x["K_I_fit"],primary["K_I_fit"]) for x in fs[1:])<=LIMITS["maximum_Williams_radius_sensitivity"] and primary["fit_condition_number_scaled"]<=LIMITS["maximum_fit_condition_number"] and primary["fit_sample_elements"]>=LIMITS["minimum_fit_samples"]
+    mesh_ok=True
+    for kind in ("CONFORMING","V12_FIXED","V12_JOINT_P2"):
+        means=[np.mean([r["K_I_int"] for r in rows if r["representation"]==kind and r["h_tip_m"]==h]) for h in MESH_LEVELS_M]
+        checks[f"{kind}_two_finest_mesh_change"]=rel(means[-1],means[-2]); mesh_ok &= checks[f"{kind}_two_finest_mesh_change"]<=LIMITS["maximum_contour_spread"]
+    standard_components=passes("V12_FIXED") and passes("V12_JOINT_P2") and geometry_ok and mesh_ok and energy_ok and fit_ok
+    gates["CONTOUR_GEOMETRY_ADMISSIBLE"]="PASS" if geometry_ok else "FAIL"; gates["K_I_MESH_CONVERGENCE"]="PASS" if mesh_ok else "FAIL"
     gates["GLOBAL_ENERGY_QUALIFIED"]="PASS" if energy_ok else "FAIL"; gates["WILLIAMS_QUALIFIED"]="PASS" if fit_ok else "FAIL"
-    classification=classify_absolute_k(conforming_pass=gates["CONFORMING_CONTROL_QUALIFIED"]=="PASS",primal_pass=True,corridor_v3_pass=True,standard_pass=gates["V12_STANDARD_INTERACTION_INTEGRAL_QUALIFIED"]=="PASS",energy_pass=energy_ok,williams_pass=fit_ok,production_consumes_absolute_k=False)
+    gates["V12_STANDARD_INTERACTION_INTEGRAL_QUALIFIED"]="PASS" if standard_components else "FAIL"
+    conforming_source_pass=passes("CONFORMING") and geometry_ok and mesh_ok and energy_ok
+    gates["V12_LOCAL_INTENSITY_REPRESENTATION"]="CONFORMING_TIP_PATCH_REQUIRED" if conforming_source_pass and not fit_ok else "NOT_REQUIRED" if standard_components else "NOT_QUALIFIED"
+    classification=classify_absolute_k(conforming_pass=gates["CONFORMING_CONTROL_QUALIFIED"]=="PASS",primal_pass=True,corridor_v3_pass=True,standard_pass=standard_components,energy_pass=energy_ok,williams_pass=fit_ok,production_consumes_absolute_k=False,conforming_tip_patch_pass=conforming_source_pass)
     gates["V12_STANDARD_INTERACTION_INTEGRAL_ABSOLUTE_K"]=classification.standard_integral; gates["MECHANICALLY_SEPARATING_WAKE_ABSOLUTE_K_QUALIFIED"]=classification.aggregate; gates["STAGE_II_PERMITTED"]="PASS" if classification.production_may_continue else "FAIL"
     args.out.mkdir(parents=True,exist_ok=True); write_csv(args.out/"interaction_matrix.csv",rows); write_csv(args.out/"williams_matrix.csv",fits); write_csv(args.out/"global_G_matrix.csv",globals_)
     impl=git("log","-1","--format=%H","--",*IMPLEMENTATION_PATHS); report={"schema":CRITERION_ID,"base_git_sha":BASE_SHA,"implementation_git_sha":impl,"evidence_generation_parent_sha":git("rev-parse","HEAD"),"criterion":{ "limits":LIMITS,"contours_m":CONTOURS_M,"mesh_levels_m":MESH_LEVELS_M,"williams_annuli_m":WILLIAMS_ANNULI_M,"williams_terms":WILLIAMS_TERMS,"production_absolute_K_dependency_audit":"NOT_CONSUMED"},"checks":checks,"gates":gates}
