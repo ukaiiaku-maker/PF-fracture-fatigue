@@ -11,7 +11,7 @@ from typing import Any, Mapping
 import numpy as np
 
 KB = 1.380649e-23
-SCHEMA = "v12.production-voiding/4"
+SCHEMA = "v12.production-voiding/5"
 
 
 class VoidPhase(str, Enum):
@@ -35,6 +35,9 @@ class VoidingConfig:
     healing_barrier_J: float = 1.0e-19
     activation_area_m2: float = 2.0e-20
     promotion_radius_m: float = 8.0e-6
+    surface_reaction_barrier_J: float = 0.7e-19
+    vacancy_transport_barrier_J: float = 0.9e-19
+    radial_growth_scale_m: float = 1.0e-8
     schema: str = SCHEMA
 
 
@@ -91,18 +94,30 @@ def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
                     stress_tensor_Pa: np.ndarray) -> dict[str, float]:
     """Compute rates from the local production tensor; no candidate weight here."""
     stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
-    tensile = max(float(np.linalg.eigvalsh(stress)[-1]), 0.0)
+    eigenvalues = np.linalg.eigvalsh(stress)
+    tensile = max(float(eigenvalues[-1]), 0.0)
+    hydrostatic = float(np.trace(stress) / 2.0)
+    deviator = stress - np.eye(2) * hydrostatic
+    von_mises_2d = math.sqrt(max(1.5 * float(np.sum(deviator * deviator)), 0.0))
     thermal = KB * float(temperature_K)
     if thermal <= 0.0:
         raise ValueError("temperature must be positive")
     def rate(barrier):
         effective = max(float(barrier) - tensile * config.activation_area_m2, 0.0)
         return config.attempt_frequency_s * math.exp(-effective / thermal)
+    surface = rate(config.surface_reaction_barrier_J)
+    transport = rate(config.vacancy_transport_barrier_J)
+    series = 0.0 if surface <= 0.0 or transport <= 0.0 else 1.0 / (1.0 / surface + 1.0 / transport)
     return {
         "birth_s": rate(config.birth_barrier_J),
         "stabilization_s": rate(config.stabilization_barrier_J),
         "healing_s": rate(config.healing_barrier_J),
         "local_max_principal_stress_Pa": tensile,
+        "local_hydrostatic_stress_Pa": hydrostatic,
+        "local_von_mises_stress_Pa": von_mises_2d,
+        "surface_reaction_s": surface,
+        "vacancy_transport_s": transport,
+        "series_limited_growth_s": series,
     }
 
 
@@ -127,7 +142,11 @@ def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
                 break
             hits = current.hits + 1
             if hits < current.required_hits:
-                current = replace(current, hits=hits, birth=HazardClock(0.0, current.birth.threshold))
+                rng = np.random.default_rng()
+                rng.bit_generator.state = dict(state.rng_state)
+                renewed = float(rng.exponential())
+                state = replace(state, rng_state=rng.bit_generator.state)
+                current = replace(current, hits=hits, birth=HazardClock(0.0, renewed))
                 events.append("BIRTH_HIT")
                 continue
             current = replace(current, hits=hits, phase=VoidPhase.EMBRYO)
@@ -167,6 +186,8 @@ def create_subgrid_cavity(state: ProductionVoidState, site_id: str,
     site = next(item for item in state.sites if item.site_id == site_id)
     if site.phase != VoidPhase.STABLE_SUBGRID_VOID:
         raise ValueError("site has not stabilized")
+    if any(item.parent_site_id == site_id for item in state.cavities):
+        raise ValueError("a stabilized site may own only one cavity")
     area = math.pi * float(radius_m) ** 2
     cavity = Cavity2D("void:" + site_id, site_id, site.center_m, radius_m, area, area,
                       VoidPhase.STABLE_SUBGRID_VOID, lineage=(site_id,))
@@ -184,6 +205,14 @@ def grow_cavity_2d(cavity: Cavity2D, delta_radius_m: float) -> Cavity2D:
         inventory_area_m2=cavity.inventory_area_m2 + inventory_increment,
         geometry_generation=cavity.geometry_generation + 1,
     )
+
+
+def grow_cavity_from_rate(cavity: Cavity2D, *, rates: Mapping[str, float],
+                          dt_s: float, radial_growth_scale_m: float) -> Cavity2D:
+    """Advance radius only through the measured series-limited kinetic rate."""
+    rate = max(float(rates["series_limited_growth_s"]), 0.0)
+    dt = max(float(dt_s), 0.0)
+    return grow_cavity_2d(cavity, float(radial_growth_scale_m) * rate * dt)
 
 
 def replace_cavity(state: ProductionVoidState, cavity: Cavity2D) -> ProductionVoidState:
@@ -227,5 +256,6 @@ def serialize(state: ProductionVoidState | None) -> str:
 __all__ = [
     "Cavity2D", "HazardClock", "ProductionVoidState", "SCHEMA", "VoidPhase",
     "VoidSite", "VoidingConfig", "advance_site", "arrhenius_rates",
-    "create_subgrid_cavity", "fingerprint", "grow_cavity_2d", "promote_cavity", "replace_cavity", "serialize",
+    "create_subgrid_cavity", "fingerprint", "grow_cavity_2d", "grow_cavity_from_rate",
+    "promote_cavity", "replace_cavity", "serialize",
 ]

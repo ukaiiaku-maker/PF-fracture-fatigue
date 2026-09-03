@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Direct qualification of production-owned V4 lifecycle and topology rows."""
+"""Direct qualification of production-owned V5 lifecycle and topology rows."""
 from __future__ import annotations
 
+from dataclasses import replace
 import hashlib
 import json
 import math
@@ -14,9 +15,10 @@ sys.path.insert(0, str(ROOT))
 
 from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
-from arrhenius_fracture.voiding_production_v4 import (
-    build_production_void_state, deterministic_trajectory, ligament_transaction,
-    natural_trajectory, observables,
+from arrhenius_fracture.voiding_production_v5 import (
+    _complete_next_clock, build_production_void_state, cavity_boundary_tensor,
+    deterministic_trajectory, equilibrate_fixed_load_with_production_fem,
+    ligament_transaction, natural_trajectory, observables,
 )
 
 ROLLBACK_STAGES = ("graph_edit", "remesh", "field_projection", "support_rebuild", "equilibrium",
@@ -24,7 +26,7 @@ ROLLBACK_STAGES = ("graph_edit", "remesh", "field_projection", "support_rebuild"
 
 
 def main(argv=None):
-    out = Path(argv[0] if argv else "artifacts/voiding_v4/production")
+    out = Path(argv[0] if argv else "artifacts/voiding_v5/production")
     out.mkdir(parents=True, exist_ok=True)
     rows = []
 
@@ -44,7 +46,7 @@ def main(argv=None):
     required = (
         "available_site", "multi_hit_1", "multi_hit_2", "stabilization", "subgrid_void",
         "subgrid_growth", "geometric_promotion", "resolved_growth", "ligament_rupture",
-        "connected_topology", "downstream_first_passage", "new_graph_front", "continued_accepted_event",
+        "connected_topology", "downstream_surface_probe", "new_graph_front", "continued_accepted_event",
     )
     sequence = tuple(row["operation"] for row in deterministic)
     area_balances = [
@@ -83,6 +85,10 @@ def main(argv=None):
                   and max(area_balances, default=0.0) <= 1.0e-20
                   and deterministic[6]["field_transfer_audit"]["projected_fields_nonzero"]
                   and deterministic[7]["field_transfer_audit"]["projected_fields_nonzero"]
+                  and deterministic[6]["field_transfer_audit"]["plastic_integral_error"] <= 1.0e-18
+                  and deterministic[6]["field_transfer_audit"]["density_integral_error"] <= 1.0e-6
+                  and deterministic[7]["field_transfer_audit"]["plastic_integral_error"] <= 1.0e-18
+                  and deterministic[7]["field_transfer_audit"]["density_integral_error"] <= 1.0e-6
                   and deterministic[6]["mesh_minimum_quality"] > 0.0
                   and deterministic[7]["compliance_m2_per_N"] > 0.0,
     })
@@ -111,9 +117,35 @@ def main(argv=None):
         "executed_operations": [row["operation"] for row in deterministic[8:]],
         "measured_graph_gain_m": deterministic[-1]["graph_length_m"] - deterministic[7]["graph_length_m"],
         "passed": deterministic[8]["void_phase"] == "CONNECTED_VOID"
+                  and deterministic[8]["hazard_dissipation_J_per_m"] > 0.0
+                  and deterministic[8]["energy_margin_J_per_m"] > 0.0
                   and deterministic[-1]["void_phase"] == "DOWNSTREAM_FRONT_ACTIVE"
                   and deterministic[-1]["graph_length_m"] > deterministic[7]["graph_length_m"]
-                  and len(deterministic[10]["cavity_boundary_element_ids"]) > 0,
+                  and len(deterministic[10]["cavity_boundary_element_ids"]) > 0
+                  and deterministic[11]["causal_first_passage"]["cleavage"][0]["rate_s"] > 0.0
+                  and deterministic[11]["causal_first_passage"]["cleavage"][0]["duration_s"] > 0.0,
+    })
+
+    perturbation_rates = []
+    for scale in (0.0, 0.5, 1.0, 1.5):
+        perturbed = equilibrate_fixed_load_with_production_fem(
+            replace(final, displacement=final.displacement * scale)
+        )
+        tensor, elements = cavity_boundary_tensor(perturbed)
+        _, audit = _complete_next_clock(perturbed, tensor, start_time=3.0)
+        perturbation_rates.append({
+            "opening_scale": scale, "rate_s": audit[0]["rate_s"],
+            "duration_s": audit[0]["duration_s"],
+            "boundary_element_ids": elements, "tensor_Pa": tensor.tolist(),
+        })
+    rows.append({
+        "gate": "V12_CAVITY_SURFACE_CAUSAL_PERTURBATIONS",
+        "case": "opening_scale_controls_existing_cleavage_law",
+        "measurements": perturbation_rates,
+        "passed": all(
+            right["rate_s"] > left["rate_s"]
+            for left, right in zip(perturbation_rates, perturbation_rates[1:])
+        ),
     })
 
     # Checkpoint the nontrivial final state and verify complete restart ownership.
@@ -142,7 +174,7 @@ def main(argv=None):
     for gate in sorted({row["gate"] for row in rows}):
         gates[gate] = "PASS" if all(row["passed"] for row in rows if row["gate"] == gate) else "FAIL"
     payload = {
-        "schema": "v12.production-voiding-qualification/4",
+        "schema": "v12.production-voiding-qualification/5",
         "implementation_git_sha": subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip(),
         "gates": gates, "rows": rows, "multiple_voids_enabled": False, "fatigue_campaign_run": False,
     }

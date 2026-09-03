@@ -1,4 +1,4 @@
-"""V4 body-fitted explicit-cavity FEM adapter transplanted from PR #57.
+"""V5 body-fitted explicit-cavity FEM adapter derived from PR #57.
 
 This module is default-off and intentionally stops at prescribed static cavity
 mechanics.  It contains no stochastic production-driver coupling and no claims

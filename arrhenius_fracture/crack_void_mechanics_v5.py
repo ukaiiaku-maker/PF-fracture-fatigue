@@ -9,10 +9,10 @@ import numpy as np
 
 from .config import ElasticProperties
 from .crack_network_v11 import CrackNetworkState
-from .explicit_cavity_v4 import build_explicit_hole_mesh, fill_explicit_hole_mesh, solve_static_hole
+from .explicit_cavity_v5 import build_explicit_hole_mesh, fill_explicit_hole_mesh, solve_static_hole
 from .mechanically_separating_sharp_wake_v12 import mechanically_separating_graph_support
 
-SCHEMA = "v12.crack-void-static/4"
+SCHEMA = "v12.crack-void-static/5"
 
 
 def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e-5,

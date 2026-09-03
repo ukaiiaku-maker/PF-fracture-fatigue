@@ -48,7 +48,7 @@ def write_checkpoint(
         ),
     }
     if state.void_state is not None:
-        from .voiding_v4 import fingerprint as void_fingerprint, serialize as serialize_void_state
+        from .voiding_v5 import fingerprint as void_fingerprint, serialize as serialize_void_state
         manifest["production_void_state"] = json.loads(serialize_void_state(state.void_state))
         manifest["production_void_state_sha256"] = void_fingerprint(state.void_state)
     state_path = target.with_name(manifest["state_file"])
@@ -89,7 +89,7 @@ def restore_checkpoint(path: str | Path, *, with_provider_runtime: bool = False)
     if expected_support != manifest.get("v12_support_state"):
         raise ValueError("checkpoint V12 support ownership mismatch")
     if state.void_state is not None:
-        from .voiding_v4 import fingerprint as void_fingerprint
+        from .voiding_v5 import fingerprint as void_fingerprint
         if void_fingerprint(state.void_state) != manifest.get("production_void_state_sha256"):
             raise ValueError("checkpoint production void state mismatch")
     return (state, provider_runtime) if with_provider_runtime else state

@@ -8,14 +8,23 @@ import subprocess
 from typing import Any
 
 import numpy as np
+from scipy.interpolate import LinearNDInterpolator
 from scipy.spatial import cKDTree
 
 from .crack_network_v11 import CrackBranchState, CrackNetworkState, ROOT_BRANCH_ID
-from .directional_competition_v11 import commit_directional_interval, preview_directional_interval
-from .explicit_cavity_v4 import build_explicit_hole_mesh, fill_explicit_hole_mesh
+from .directional_competition_v11 import (
+    DirectionalCompetitionState, commit_directional_interval,
+    construct_action_proposals, preview_directional_interval,
+    preview_production_cleavage_rate, tungsten_cleavage_candidates,
+)
+from .explicit_cavity_v5 import build_explicit_hole_mesh, fill_explicit_hole_mesh
 from .mesh import rebuild_tri_mesh
 from .fem import assemble_mechanics, plane_strain_D
-from .sharp_front import make_emergent_config
+from .sharp_front import (
+    FrontConfig, FrontEngine, default_cleavage_barrier,
+    default_emission_barrier, make_emergent_config,
+)
+from .hazard_energy_event_gate_v10230 import hazard_resistance_J_per_m2
 from .sharp_wake_backend_v12 import V12_MODEL_ID
 from .topology_transaction_v11 import (
     LiveFEMTopologyState, TopologyArm, apply_v12_production_trial_geometry,
@@ -23,14 +32,14 @@ from .topology_transaction_v11 import (
     execute_topology_trial, initialize_mechanically_separating_v12,
     remesh_mechanically_separating_v12,
 )
-from .v12_production_driver import _competition
-from .voiding_v4 import (
+from .voiding_v5 import (
     Cavity2D, HazardClock, ProductionVoidState, VoidPhase, VoidSite, VoidingConfig,
     advance_site, arrhenius_rates, create_subgrid_cavity, grow_cavity_2d,
+    grow_cavity_from_rate,
     promote_cavity, replace_cavity,
 )
 
-SCHEMA = "v12.production-one-void-trajectory/4"
+SCHEMA = "v12.production-one-void-trajectory/5"
 
 
 def _head():
@@ -65,7 +74,9 @@ def build_production_void_state(*, enabled=True, stochastic=False, seed=3621):
         mesh, filled.boundary, np.zeros(mesh.nn), u,
         np.vstack((np.full(mesh.ne, 1.0e-5), np.full(mesh.ne, -0.5e-5), np.full(mesh.ne, 0.25e-5))),
         np.linspace(1.0e12, 1.2e12, mesh.ne), plane_strain_D(cfg.material), cfg.material, None,
-        CrackNetworkState.one_tip((start, tip)), _competition(seed),
+        CrackNetworkState.one_tip((start, tip)), DirectionalCompetitionState.initialize(
+            tungsten_cleavage_candidates(theta_deg=0.0), global_hazard_seed=seed,
+        ),
         {"retained": 4.0, "mobile": 1.0}, {"source_state": {"density": 3.0, "clock": 0.125}},
         {"emission_work": 1.0}, np.random.default_rng(seed).bit_generator.state,
         {"accepted_steps": 0, "topology_actions": 0, "mesh_generation": 0}, 0.0,
@@ -119,7 +130,11 @@ def local_site_tensor(state):
 
 
 def cavity_boundary_tensor(state):
-    """Average production stresses in elements incident to the explicit cavity boundary."""
+    """Return the most tensile resolved tensor on the explicit cavity boundary.
+
+    First passage is local, so circumferential averaging (which can cancel the
+    tensile hot spot) is not a valid kinetic input.
+    """
     _, _, sigma, *_ = assemble_mechanics(
         state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
         state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
@@ -129,8 +144,13 @@ def cavity_boundary_tensor(state):
     radii = np.linalg.norm(np.asarray(state.mesh.nodes) - center, axis=1)
     boundary_nodes = np.flatnonzero(radii <= np.min(radii) * (1.0 + 1.0e-7))
     elements = np.flatnonzero(np.any(np.isin(state.mesh.elems, boundary_nodes), axis=1))
-    mean = np.mean(sigma[:, elements], axis=1)
-    return np.array([[mean[0], mean[2]], [mean[2], mean[1]]]), tuple(map(int, elements))
+    tensors = np.asarray([
+        [[sigma[0, element], sigma[2, element]],
+         [sigma[2, element], sigma[1, element]]]
+        for element in elements
+    ])
+    selected = int(np.argmax(np.linalg.eigvalsh(tensors)[:, -1]))
+    return tensors[selected], tuple(map(int, elements))
 
 
 def _project_fields(state, mesh):
@@ -139,11 +159,31 @@ def _project_fields(state, mesh):
     old_centers = old_nodes[state.mesh.elems].mean(axis=1)
     new_centers = new_nodes[mesh.elems].mean(axis=1)
     _, element_parent = cKDTree(old_centers).query(new_centers)
+    def p1(values):
+        source = np.asarray(values, dtype=float)
+        projected = np.asarray(LinearNDInterpolator(old_nodes, source)(new_nodes))
+        missing = ~np.all(np.isfinite(projected), axis=1) if projected.ndim == 2 else ~np.isfinite(projected)
+        projected[missing] = source[node_parent[missing]]
+        return projected
+
+    ep = np.asarray(state.ep_gp, dtype=float)[:, element_parent]
+    rho = np.asarray(state.rho_gp, dtype=float)[element_parent]
+    new_area = np.asarray(mesh.area_e, dtype=float)
+    old_area = np.asarray(state.mesh.area_e, dtype=float)
+    for component in range(ep.shape[0]):
+        source_integral = float(np.sum(np.asarray(state.ep_gp)[component] * old_area))
+        projected_integral = float(np.sum(ep[component] * new_area))
+        if abs(projected_integral) > 1.0e-300:
+            ep[component] *= source_integral / projected_integral
+    source_rho = float(np.sum(np.asarray(state.rho_gp) * old_area))
+    projected_rho = float(np.sum(rho * new_area))
+    if abs(projected_rho) > 1.0e-300:
+        rho *= source_rho / projected_rho
     return {
-        "damage": np.asarray(state.damage)[node_parent],
-        "displacement": np.asarray(state.displacement).reshape(-1, 2)[node_parent].reshape(-1),
-        "ep_gp": np.asarray(state.ep_gp)[:, element_parent],
-        "rho_gp": np.asarray(state.rho_gp)[element_parent],
+        "damage": np.clip(p1(np.asarray(state.damage)), 0.0, 1.0),
+        "displacement": p1(np.asarray(state.displacement).reshape(-1, 2)).reshape(-1),
+        "ep_gp": ep,
+        "rho_gp": rho,
         "tip_process_state": state.tip_process_state,
         "source_state": state.junction_process_state.get("source_state", {}),
     }
@@ -171,6 +211,14 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
         "projected_plastic_history_l2": float(np.linalg.norm(fields["ep_gp"])),
         "source_density_l2_m2": float(np.linalg.norm(state.rho_gp)),
         "projected_density_l2_m2": float(np.linalg.norm(fields["rho_gp"])),
+        "plastic_integral_error": float(np.max(np.abs(
+            np.sum(fields["ep_gp"] * hole.mesh.area_e[None, :], axis=1)
+            - np.sum(state.ep_gp * state.mesh.area_e[None, :], axis=1)
+        ))),
+        "density_integral_error": float(abs(
+            np.sum(fields["rho_gp"] * hole.mesh.area_e)
+            - np.sum(state.rho_gp * state.mesh.area_e)
+        )),
         "projected_fields_nonzero": bool(
             np.linalg.norm(fields["displacement"]) > 0.0 and np.linalg.norm(fields["ep_gp"]) > 0.0
             and np.linalg.norm(fields["rho_gp"]) > 0.0
@@ -193,16 +241,36 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
     return solved
 
 
-def _complete_next_clock(state, start_time=1.0):
+def _complete_next_clock(state, stress_tensor_Pa, *, start_time=0.0, temperature_K=900.0):
+    """Reach a cleavage first passage using the existing production hazard law."""
+    material = state.material
+    engine = FrontEngine(
+        FrontConfig(), default_cleavage_barrier(), default_emission_barrier(material.b),
+        material.G, material.nu, material.b,
+    )
+    stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
+    principal = max(float(np.linalg.eigvalsh(stress)[-1]), 0.0)
+    signed_J = principal * principal / max(float(material.Eprime), 1.0e-300)
+    rates = []
     hazards = list(state.competition.hazard_states)
-    for index, hazard in enumerate(hazards):
-        if not hazard.pending_events:
-            hazards[index] = commit_directional_interval(
-                hazard, preview_directional_interval(hazard, lambda_per_s=1.0,
-                                                     start_time_s=start_time, duration_s=1.0),
-            )
-            break
-    return replace(state, competition=replace(state.competition, hazard_states=tuple(hazards)))
+    for index, (candidate, hazard) in enumerate(zip(state.competition.candidates, hazards)):
+        preview = preview_production_cleavage_rate(
+            engine, candidate, signed_J_J_per_m2=signed_J,
+            Eprime_Pa=material.Eprime, temperature_K=temperature_K,
+        )
+        rate = preview.lambda_per_s
+        if rate <= 0.0:
+            raise RuntimeError("production cleavage clock cannot reach first passage")
+        duration = max(hazard.current_threshold_action - hazard.action, 0.0) / rate
+        hazards[index] = commit_directional_interval(
+            hazard, preview_directional_interval(
+                hazard, lambda_per_s=rate, start_time_s=start_time, duration_s=duration,
+            ),
+        )
+        rates.append({"candidate_id": candidate.candidate_id, "rate_s": rate,
+                      "duration_s": duration, "signed_J_J_per_m2": signed_J,
+                      "K_Pa_sqrt_m": preview.K_directional_Pa_sqrt_m})
+    return replace(state, competition=replace(state.competition, hazard_states=tuple(hazards))), rates
 
 
 def ligament_transaction(state, *, failure_stage=None, operation_log=None):
@@ -211,10 +279,23 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     target = np.asarray((cavity.center_m[0] - cavity.radius_m, cavity.center_m[1]))
     node = int(np.argmin(np.linalg.norm(np.asarray(state.mesh.nodes) - target, axis=1)))
     end = tuple(map(float, state.mesh.nodes[node]))
-    proposal = next(item for item in __import__(
-        "arrhenius_fracture.directional_competition_v11", fromlist=["construct_action_proposals"]
-    ).construct_action_proposals(state.competition.hazard_states, correlation_interval_s=0.0) if item.action_type == "one_arm")
-    arm = TopologyArm(proposal.member_candidate_ids[0], ROOT_BRANCH_ID, start, end, math.dist(start, end), 0.0)
+    state, cleavage_audit = _complete_next_clock(state, cavity_boundary_tensor(state)[0])
+    proposal = next(item for item in construct_action_proposals(
+        state.competition.hazard_states, correlation_interval_s=0.0,
+    ) if item.action_type == "one_arm")
+    candidate = next(item for item in state.competition.candidates if item.candidate_id == proposal.member_candidate_ids[0])
+    engine = FrontEngine(FrontConfig(), default_cleavage_barrier(), default_emission_barrier(state.material.b),
+                         state.material.G, state.material.nu, state.material.b)
+    _, _, barrier = engine.lambda_cleave(engine.sigma_tip(cleavage_audit[0]["K_Pa_sqrt_m"]), 900.0)
+    resistance = hazard_resistance_J_per_m2(
+        barrier_J=barrier, cooperative_hits=engine.f.m_hits,
+        burgers_vector_m=engine.b, gamma_relative=candidate.gamma_rel,
+    )
+    arm = TopologyArm(
+        proposal.member_candidate_ids[0], ROOT_BRANCH_ID, start, end, math.dist(start, end),
+        resistance * math.dist(start, end), event_classification="physical_cleavage",
+        candidate_direction_xy=candidate.direction_xy, first_intersection_xy_m=end,
+    )
     operations = operation_log if operation_log is not None else []
     def inject(stage, current):
         operations.append(stage)
@@ -239,10 +320,13 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
 
 
 def downstream_front_transaction(state, *, continuation=False):
-    state = _complete_next_clock(state, start_time=2.0 if continuation else 1.0)
-    proposal = next(item for item in __import__(
-        "arrhenius_fracture.directional_competition_v11", fromlist=["construct_action_proposals"]
-    ).construct_action_proposals(state.competition.hazard_states, correlation_interval_s=0.0) if item.action_type == "one_arm")
+    tensor, boundary_elements = cavity_boundary_tensor(state)
+    state, cleavage_audit = _complete_next_clock(
+        state, tensor, start_time=2.0 if continuation else 1.0,
+    )
+    proposal = next(item for item in construct_action_proposals(
+        state.competition.hazard_states, correlation_interval_s=0.0,
+    ) if item.action_type == "one_arm")
     child_id = "void-front-1"
     center = np.asarray(state.void_state.cavities[0].center_m)
     nodes = np.asarray(state.mesh.nodes)
@@ -263,7 +347,19 @@ def downstream_front_transaction(state, *, continuation=False):
         candidates = np.flatnonzero(nodes[:, 0] > start[0] + 1.0e-8)
         end_node = int(candidates[np.argmin(np.linalg.norm(nodes[candidates] - (np.asarray(start) + [1.5e-4, 0.0]), axis=1))])
     end = tuple(map(float, nodes[end_node]))
-    arm = TopologyArm(proposal.member_candidate_ids[0], child_id, start, end, math.dist(start, end), 0.0)
+    candidate = next(item for item in state.competition.candidates if item.candidate_id == proposal.member_candidate_ids[0])
+    engine = FrontEngine(FrontConfig(), default_cleavage_barrier(), default_emission_barrier(state.material.b),
+                         state.material.G, state.material.nu, state.material.b)
+    _, _, barrier = engine.lambda_cleave(engine.sigma_tip(cleavage_audit[0]["K_Pa_sqrt_m"]), 900.0)
+    resistance = hazard_resistance_J_per_m2(
+        barrier_J=barrier, cooperative_hits=engine.f.m_hits,
+        burgers_vector_m=engine.b, gamma_relative=candidate.gamma_rel,
+    )
+    arm = TopologyArm(
+        proposal.member_candidate_ids[0], child_id, start, end, math.dist(start, end),
+        resistance * math.dist(start, end), event_classification="physical_cleavage",
+        candidate_direction_xy=candidate.direction_xy, first_intersection_xy_m=end,
+    )
     operations = []
     def inject(stage, current): operations.append(stage)
     def geometry(trial, arms):
@@ -286,7 +382,10 @@ def downstream_front_transaction(state, *, continuation=False):
         replace_cavity(result.state.void_state, updated),
         event_history=result.state.void_state.event_history + ({"event": "CONTINUED_ACCEPTED_EVENT" if continuation else "DOWNSTREAM_FIRST_PASSAGE"},),
     )
-    return replace(result.state, void_state=void_state), result, operations
+    return replace(result.state, void_state=void_state), result, operations, {
+        "tensor_Pa": tensor.tolist(), "boundary_element_ids": boundary_elements,
+        "cleavage": cleavage_audit,
+    }
 
 
 def deterministic_trajectory(*, stop_before_ligament=False):
@@ -309,34 +408,55 @@ def deterministic_trajectory(*, stop_before_ligament=False):
     rows.append({**observables(state, "stabilization"), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
     state = replace(state, void_state=create_subgrid_cavity(state.void_state, "site-1", 2.5e-5))
     state = equilibrate_fixed_load_with_production_fem(state); rows.append(observables(state, "subgrid_void"))
-    grown = grow_cavity_2d(state.void_state.cavities[0], 2.5e-5)
+    tensor = local_site_tensor(state)
+    rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+    growth_dt = 2.5e-5 / (cfg.radial_growth_scale_m * rates["series_limited_growth_s"])
+    grown = grow_cavity_from_rate(
+        state.void_state.cavities[0], rates=rates, dt_s=growth_dt,
+        radial_growth_scale_m=cfg.radial_growth_scale_m,
+    )
     state = replace(state, void_state=replace_cavity(state.void_state, grown))
-    state = equilibrate_fixed_load_with_production_fem(state); rows.append(observables(state, "subgrid_growth"))
+    state = equilibrate_fixed_load_with_production_fem(state)
+    rows.append({**observables(state, "subgrid_growth"), "rates": rates, "growth_dt_s": growth_dt})
     promoted = promote_cavity(state.void_state, grown.cavity_id, cfg.promotion_radius_m)
     operations = []
     state = remesh_cavity(state, hole, promoted, "promotion", operations)
     rows.append({**observables(state, "geometric_promotion"), "executed_operations": operations})
     grown_hole = _grow_hole_boundary(hole, 5.5e-5)
-    cavity = grow_cavity_2d(state.void_state.cavities[0], 0.5e-5)
+    tensor = cavity_boundary_tensor(state)[0]
+    rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+    growth_dt = 0.5e-5 / (cfg.radial_growth_scale_m * rates["series_limited_growth_s"])
+    cavity = grow_cavity_from_rate(
+        state.void_state.cavities[0], rates=rates, dt_s=growth_dt,
+        radial_growth_scale_m=cfg.radial_growth_scale_m,
+    )
     state = remesh_cavity(state, grown_hole, replace_cavity(state.void_state, cavity), "resolved-growth")
-    rows.append(observables(state, "resolved_growth"))
+    rows.append({**observables(state, "resolved_growth"), "rates": rates, "growth_dt_s": growth_dt})
     if stop_before_ligament:
         return state, rows
     state, result = ligament_transaction(state)
-    rows.append({**observables(state, "ligament_rupture"), "energy_release_J_per_m": result.energy_release_J_per_m})
+    rows.append({
+        **observables(state, "ligament_rupture"),
+        "energy_release_J_per_m": result.energy_release_J_per_m,
+        "hazard_dissipation_J_per_m": result.hazard_dissipation_J_per_m,
+        "energy_margin_J_per_m": result.energy_margin_J_per_m,
+        "event_classification": "physical_cleavage",
+    })
     rows.append(observables(state, "connected_topology"))
     tensor, boundary_elements = cavity_boundary_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
-    downstream_hazard = rates["birth_s"] * 1.0e-12
-    rows.append({**observables(state, "downstream_first_passage"), "direct_cavity_boundary_tensor_Pa": tensor.tolist(),
+    rows.append({**observables(state, "downstream_surface_probe"), "direct_cavity_boundary_tensor_Pa": tensor.tolist(),
                  "cavity_boundary_element_ids": boundary_elements,
-                 "cleavage_rate_s": rates["birth_s"], "integrated_hazard": downstream_hazard})
-    state, result, operations = downstream_front_transaction(state)
+                 "void_birth_rate_s": rates["birth_s"],
+                 "classification": "PRE_CLEAVAGE_SURFACE_PROBE"})
+    state, result, operations, causal = downstream_front_transaction(state)
     rows.append({**observables(state, "new_graph_front"), "executed_operations": operations,
-                 "energy_release_J_per_m": result.energy_release_J_per_m})
-    state, result, operations = downstream_front_transaction(state, continuation=True)
+                 "energy_release_J_per_m": result.energy_release_J_per_m,
+                 "causal_first_passage": causal})
+    state, result, operations, causal = downstream_front_transaction(state, continuation=True)
     rows.append({**observables(state, "continued_accepted_event"), "executed_operations": operations,
-                 "energy_release_J_per_m": result.energy_release_J_per_m})
+                 "energy_release_J_per_m": result.energy_release_J_per_m,
+                 "causal_first_passage": causal})
     return state, rows
 
 
