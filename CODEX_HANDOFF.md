@@ -357,19 +357,22 @@ Do not touch these preserved/read-only worktrees:
 - `/private/tmp/v10230-reversible-energy-integration` (read-only provenance source; its `runs/A_native_plus_8PT_fatigue_v1/` tree is now empty — 1371 dirs, 0 files, swept by OS /tmp cleanup)
 - `/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_codex_v10_2_30` (mounted checkout, unrelated v9.14 branch — read from it for provenance lookups only, never edit/commit)
 
-### Status: terminal classification accepted; evidence-hardening + second-seed replication in progress
+### Status: terminal classification accepted and now replicated under a second seed
 
 **`REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL`**
 (mission completion-contract outcome C) is accepted as final -- no Part X,
 no production-line merge. All four original milestones (V2-A through V2-D)
-are committed. Per follow-up review, an analysis-only evidence-hardening
-pass (portable tracked event ledger; additional per-event diagnostics;
-precise gate-1/gate-4 wording) and a bounded second-seed replication
-(seed=1001723, the 4 RB2 zero/finite-cohesion trajectories only) were
-requested. See `docs/v10_2_30_crack_rebonding_causal_pilot_v2.md` for the
-full writeup and `artifacts/crack_rebonding_causal_pilot_v2/
-causal_decision.json` / `verification.json` / `event_ledger.json` for the
-machine-readable record.
+are committed, plus a follow-up analysis-only evidence-hardening pass and a
+bounded second-seed replication (seed=1001723, the 4 RB2 zero/finite-
+cohesion trajectories only). The replication corroborates the original
+finding closely: max ratio 0.0436 decades (original seed 1720: 0.0420),
+cumulative-waiting-time ratios 0.0421-0.0422 decades, still below the
+frozen 0.05-decade threshold, which was not touched. See
+`docs/v10_2_30_crack_rebonding_causal_pilot_v2.md` Section 6 for the full
+replication writeup and `artifacts/crack_rebonding_causal_pilot_v2/
+second_seed_replication.json` for the machine-readable record. **Returned
+for review after this replication per the requester's instruction -- no
+further seeds or multi-K matrix launched.**
 
 ### Completed
 
@@ -429,14 +432,21 @@ machine-readable record.
   Classification unchanged: `REBONDING_KINETICALLY_ACTIVE_BUT_
   MACROSCOPICALLY_SMALL`, max ratio still 0.0420 decades.
 
+- **Second-seed replication (seed=1001723):** 4 RB2 zero/finite-cohesion
+  trajectories, configs reloaded verbatim from the committed
+  `frozen_configuration.json` (hash-checked before running). All 4
+  completed uncensored, 7 events each. 2 unique compression-containing
+  intervals found under this seed's own stochastic timing (different
+  event indices than seed 1720's, as expected). Max ratio **0.0436
+  decades** (vs. seed 1720's 0.0420); cumulative-waiting-time ratios
+  0.0421 (reversible) / 0.0422 (persistent) decades -- all still below
+  the untouched 0.05-decade threshold. A second, independent,
+  correctly-signed confirmation of the same small real effect.
+
 ### Active processes
 
-Second-seed replication (seed=1001723, 4 RB2 zero/finite-cohesion
-trajectories only) may be running in the background -- check
-`ps aux | grep run_v2_second_seed_replication` and
-`runs/crack_rebonding_causal_pilot_v2_seed1001723/` before assuming it's
-done. Its result has not yet been reviewed against the frozen 0.05-decade
-threshold (the threshold must NOT be altered after seeing that result).
+None. Both the primary pilot and the second-seed replication have
+completed; no workers running.
 
 ### Remaining authorized-but-not-attempted scope
 

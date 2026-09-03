@@ -434,7 +434,54 @@ predicates directly from the ledger (bypassing the saved
 confirms DMD/Poincare acceleration, passivation, and topological healing
 are all disabled. **`overall_pass: true`**, zero failed checks.
 
-## 6. Terminal classification
+## 6. Second-seed replication (seed=1001723)
+
+Bounded replication of ONLY the zero/finite-cohesion comparison
+(`scripts/run_v2_second_seed_replication.py`): RB2 reversible zero/finite
+and RB2 persistent zero/finite, reloaded verbatim from the committed
+`frozen_configuration.json` (config hashes checked against that file
+before running -- refuses to proceed on any mismatch), same A_NATIVE row,
+Kmax=18 MPa*sqrt(m), T=300K, R=-0.95, f=1000 Hz, mpz_n_bins=80, n_phase=80,
+cohesive scale, kinetics, event target, and numerical controls as the
+original pilot. Only the hazard RNG seed changed: 1720 -> **1001723**. C0,
+C1, C4, C5 were not re-run (out of scope for this replication). The frozen
+0.05-decade threshold was not touched.
+
+All 4 trajectories completed uncensored, 7 accepted events each. Two
+different post-first-event intervals contain a complete compressive
+excursion under this seed's own stochastic event timing --
+`event_0_to_1` and `event_4_to_5` (not the same pair as seed 1720's
+`event_0_to_1`/`event_2_to_3`, as expected for an independent threshold
+draw) -- so gate 4's ">= 2 unique compression-containing intervals" bar is
+independently met again.
+
+**The result replicates the first seed's finding closely**: every one of
+the 12 interval rows (6 unique intervals x 2 presets) shows `t_finite >
+t_zero`, in an even tighter band of **0.0415 to 0.0437 decades** (seed
+1720: 0.028-0.044). The maximum ratio among the 4 compression-containing
+rows is **0.0436 decades** -- still below the 0.05-decade threshold.
+Cumulative-waiting-time ratios (summed over all 7 events) agree closely:
+**0.0421 decades** (reversible), **0.0422 decades** (persistent).
+
+```
+seed=1001723
+n_unique_compression_containing_intervals: 2
+max_log10_ratio_abs_decade_in_compression_containing_intervals: 0.0436
+expansion_threshold_exceeded: false
+cumulative: reversible=0.0421 decades, persistent=0.0422 decades
+```
+
+This is a second, independent, correctly-signed confirmation of a small,
+real, consistently sub-threshold cohesive effect -- not a fluke of the
+first seed's particular threshold draws. The terminal classification is
+unchanged. Result recorded at `artifacts/crack_rebonding_causal_pilot_v2/
+second_seed_replication.json`; raw run at
+`runs/crack_rebonding_causal_pilot_v2_seed1001723/` (gitignored).
+
+No further seeds, no multi-K Paris-slope matrix, and no threshold
+adjustment were made or are proposed as a result of this replication.
+
+## 7. Terminal classification
 
 **`REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL`**
 (mission completion-contract outcome C).
