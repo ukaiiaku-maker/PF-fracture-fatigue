@@ -561,8 +561,12 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
     unresolved=_unresolved_node_star_bridges(mesh,exact,candidate_nodes,selected)
     width=max(widths); width_ratio=width/max(h,1e-300); leakage_ratio=leakage/max(h,1e-300)
     edge_support_map={arc_id:tuple(sorted(values)) for _,_,_,values,arc_id in local_supports}
+    explicit_free_surface_root = any(
+        branch.local_state.get("source") == "direct_cavity_boundary_tensor"
+        for branch in network.branches
+    )
     certificate=independent_intact_path_certificate(mesh,network,selected_ids,edge_supports=edge_support_map,
-      arcs=arcs,allow_boundary_clip_for_screen=allow_offgrid_active_tips_for_screen,tolerance=tolerance)
+      arcs=arcs,allow_boundary_clip_for_screen=(allow_offgrid_active_tips_for_screen or explicit_free_surface_root),tolerance=tolerance)
     premature=[]; centroids=np.mean(mesh.nodes[mesh.elems],axis=1)
     for i,p0,p1,left,_ in local_supports:
         for j,q0,q1,right,_ in local_supports[i+1:]:
