@@ -80,11 +80,18 @@ def build_production_void_state(*, enabled=True, stochastic=False, seed=3621):
 def observables(state, operation):
     cavity = None if state.void_state is None or not state.void_state.cavities else state.void_state.cavities[0]
     site = None if state.void_state is None else state.void_state.sites[0]
+    tri = np.asarray(state.mesh.nodes)[np.asarray(state.mesh.elems)]
+    side = np.linalg.norm(tri[:, [1, 2, 0]] - tri[:, [0, 1, 2]], axis=2)
+    avec, bvec = tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]
+    area = np.abs(avec[:, 0] * bvec[:, 1] - avec[:, 1] * bvec[:, 0]) / 2.0
+    quality = 4.0 * np.sqrt(3.0) * area / np.maximum(np.sum(side**2, axis=1), 1.0e-300)
+    reaction = float(state.energy_ledgers.get("latest_reaction_N_per_m", 0.0))
     return {
         "operation": operation, "fingerprint": complete_accepted_state_fingerprint(state),
         "mesh_nodes": int(state.mesh.nn), "mesh_elements": int(state.mesh.ne),
         "graph_length_m": float(state.crack_network.total_physical_crack_length_m),
-        "reaction_N_per_m": float(state.energy_ledgers.get("latest_reaction_N_per_m", 0.0)),
+        "reaction_N_per_m": reaction,
+        "compliance_m2_per_N": 4.0e-7 / max(abs(reaction), 1.0e-300),
         "energy_J_per_m": float(state.stored_energy_J_per_m),
         "residual_N_per_m": float(state.energy_ledgers.get("latest_residual_l2_N_per_m", 0.0)),
         "void_phase": None if cavity is None else cavity.phase.value,
@@ -94,6 +101,9 @@ def observables(state, operation):
         "inventory_area_m2": None if cavity is None else cavity.inventory_area_m2,
         "void_event_history": [] if state.void_state is None else list(state.void_state.event_history),
         "event_counters": dict(state.event_counters),
+        "mesh_minimum_quality": float(np.min(quality)),
+        "mesh_maximum_aspect_ratio": float(np.max(side, axis=1).max() / max(np.min(side), 1.0e-300)),
+        "field_transfer_audit": state.junction_process_state.get("latest_void_remesh_audit"),
     }
 
 
@@ -106,6 +116,21 @@ def local_site_tensor(state):
     centroids = state.mesh.nodes[state.mesh.elems].mean(axis=1)
     element = int(np.argmin(np.linalg.norm(centroids - center, axis=1)))
     return np.array([[sigma[0, element], sigma[2, element]], [sigma[2, element], sigma[1, element]]])
+
+
+def cavity_boundary_tensor(state):
+    """Average production stresses in elements incident to the explicit cavity boundary."""
+    _, _, sigma, *_ = assemble_mechanics(
+        state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
+    )
+    cavity = state.void_state.cavities[0]
+    center = np.asarray(cavity.center_m)
+    radii = np.linalg.norm(np.asarray(state.mesh.nodes) - center, axis=1)
+    boundary_nodes = np.flatnonzero(radii <= np.min(radii) * (1.0 + 1.0e-7))
+    elements = np.flatnonzero(np.any(np.isin(state.mesh.elems, boundary_nodes), axis=1))
+    mean = np.mean(sigma[:, elements], axis=1)
+    return np.array([[mean[0], mean[2]], [mean[2], mean[1]]]), tuple(map(int, elements))
 
 
 def _project_fields(state, mesh):
@@ -139,6 +164,18 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
     operations = operation_log if operation_log is not None else []
     trial = replace(state, void_state=void_state)
     fields = _project_fields(trial, hole.mesh)
+    transfer_audit = {
+        "source_displacement_l2_m": float(np.linalg.norm(state.displacement)),
+        "projected_displacement_l2_m": float(np.linalg.norm(fields["displacement"])),
+        "source_plastic_history_l2": float(np.linalg.norm(state.ep_gp)),
+        "projected_plastic_history_l2": float(np.linalg.norm(fields["ep_gp"])),
+        "source_density_l2_m2": float(np.linalg.norm(state.rho_gp)),
+        "projected_density_l2_m2": float(np.linalg.norm(fields["rho_gp"])),
+        "projected_fields_nonzero": bool(
+            np.linalg.norm(fields["displacement"]) > 0.0 and np.linalg.norm(fields["ep_gp"]) > 0.0
+            and np.linalg.norm(fields["rho_gp"]) > 0.0
+        ),
+    }
     def inject(stage, current):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
@@ -147,6 +184,9 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
         source_commit=_head(), configuration={"voiding_enabled": True},
         transaction_identity=identity, failure_injector=inject,
     )
+    junction = dict(rebuilt.junction_process_state)
+    junction["latest_void_remesh_audit"] = transfer_audit
+    rebuilt = replace(rebuilt, junction_process_state=junction)
     solved = equilibrate_fixed_load_with_production_fem(rebuilt)
     operations.append("equilibrium")
     if failure_stage == "equilibrium": raise RuntimeError("injected:equilibrium")
@@ -260,7 +300,8 @@ def deterministic_trajectory(*, stop_before_ligament=False):
         void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
         state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))
         rows.append({**observables(state, label), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
-    tensor = local_site_tensor(state); rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+    tensor = local_site_tensor(state)
+    rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
     site = state.void_state.sites[0]
     dt = site.stabilization.threshold / rates["stabilization_s"]
     void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
@@ -284,9 +325,11 @@ def deterministic_trajectory(*, stop_before_ligament=False):
     state, result = ligament_transaction(state)
     rows.append({**observables(state, "ligament_rupture"), "energy_release_J_per_m": result.energy_release_J_per_m})
     rows.append(observables(state, "connected_topology"))
-    tensor = local_site_tensor(state); rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+    tensor, boundary_elements = cavity_boundary_tensor(state)
+    rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
     downstream_hazard = rates["birth_s"] * 1.0e-12
     rows.append({**observables(state, "downstream_first_passage"), "direct_cavity_boundary_tensor_Pa": tensor.tolist(),
+                 "cavity_boundary_element_ids": boundary_elements,
                  "cleavage_rate_s": rates["birth_s"], "integrated_hazard": downstream_hazard})
     state, result, operations = downstream_front_transaction(state)
     rows.append({**observables(state, "new_graph_front"), "executed_operations": operations,
