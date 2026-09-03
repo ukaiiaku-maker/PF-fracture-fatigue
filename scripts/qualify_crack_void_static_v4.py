@@ -12,6 +12,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from arrhenius_fracture.crack_void_mechanics_v4 import solve_crack_void_case
+from arrhenius_fracture.voiding_production_v4 import deterministic_trajectory
 
 
 def main(argv=None):
@@ -57,6 +58,25 @@ def main(argv=None):
         rows.append({"case": case, "executed_operation": "production_static_fem_solve",
                      "configuration": result["configuration"], "observables": obs,
                      "support_audit": result["support_audit"], "passed": finite and support_ok})
+
+    _, transferred = deterministic_trajectory(stop_before_ligament=True)
+    promotion = next(row for row in transferred if row["operation"] == "geometric_promotion")
+    growth = next(row for row in transferred if row["operation"] == "resolved_growth")
+    rows.append({
+        "case": "mesh_and_nonzero_field_transfer_convergence",
+        "executed_operation": "body_fitted_remesh_project_equilibrate",
+        "configuration": {"source": "production_voiding_v4"},
+        "observables": {
+            "promotion": promotion, "resolved_growth": growth,
+            "reaction_relative_change": abs(growth["reaction_N_per_m"] - promotion["reaction_N_per_m"]) /
+                max(abs(growth["reaction_N_per_m"]), 1e-300),
+            "energy_relative_change": abs(growth["energy_J_per_m"] - promotion["energy_J_per_m"]) /
+                max(abs(growth["energy_J_per_m"]), 1e-300),
+        },
+        "support_audit": None,
+        "passed": promotion["field_transfer_audit"]["projected_fields_nonzero"]
+                  and growth["field_transfer_audit"]["projected_fields_nonzero"],
+    })
 
     by_case = {row["case"]: row for row in rows}
     # Measured centered differences at fixed companion geometry.

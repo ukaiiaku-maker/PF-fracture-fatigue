@@ -80,7 +80,11 @@ def main(argv=None):
         "energy_after_J_per_m": deterministic[7]["energy_J_per_m"],
         "passed": deterministic[6]["void_phase"] == "RESOLVED_VOID"
                   and deterministic[7]["cavity_radius_m"] > deterministic[6]["cavity_radius_m"]
-                  and max(area_balances, default=0.0) <= 1.0e-20,
+                  and max(area_balances, default=0.0) <= 1.0e-20
+                  and deterministic[6]["field_transfer_audit"]["projected_fields_nonzero"]
+                  and deterministic[7]["field_transfer_audit"]["projected_fields_nonzero"]
+                  and deterministic[6]["mesh_minimum_quality"] > 0.0
+                  and deterministic[7]["compliance_m2_per_N"] > 0.0,
     })
 
     # Ligament failures occur after the named real production operations.
@@ -108,7 +112,8 @@ def main(argv=None):
         "measured_graph_gain_m": deterministic[-1]["graph_length_m"] - deterministic[7]["graph_length_m"],
         "passed": deterministic[8]["void_phase"] == "CONNECTED_VOID"
                   and deterministic[-1]["void_phase"] == "DOWNSTREAM_FRONT_ACTIVE"
-                  and deterministic[-1]["graph_length_m"] > deterministic[7]["graph_length_m"],
+                  and deterministic[-1]["graph_length_m"] > deterministic[7]["graph_length_m"]
+                  and len(deterministic[10]["cavity_boundary_element_ids"]) > 0,
     })
 
     # Checkpoint the nontrivial final state and verify complete restart ownership.
@@ -150,4 +155,3 @@ def main(argv=None):
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv[1:]))
-
