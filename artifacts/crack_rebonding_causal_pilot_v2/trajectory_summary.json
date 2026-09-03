@@ -1,0 +1,90 @@
+{
+  "C0": {
+    "R": -0.95,
+    "censor_reason": null,
+    "censored": false,
+    "cumulative_extension_m": 3.5e-05,
+    "cumulative_time_s": 0.14207092255102757,
+    "n_accepted_events": 7,
+    "n_intervals_with_complete_negative_excursion": 2,
+    "rebonding_model_level": "REBOND_OFF",
+    "uncensored": true
+  },
+  "C1": {
+    "R": -0.95,
+    "censor_reason": null,
+    "censored": false,
+    "cumulative_extension_m": 3.5e-05,
+    "cumulative_time_s": 0.14207092255102757,
+    "n_accepted_events": 7,
+    "n_intervals_with_complete_negative_excursion": 2,
+    "rebonding_model_level": "CONTACT_PROXY_ONLY",
+    "uncensored": true
+  },
+  "C2P": {
+    "R": -0.95,
+    "censor_reason": null,
+    "censored": false,
+    "cumulative_extension_m": 3.5e-05,
+    "cumulative_time_s": 0.14207092255102746,
+    "n_accepted_events": 7,
+    "n_intervals_with_complete_negative_excursion": 2,
+    "rebonding_model_level": "CLEAN_REVERSIBLE_REBOND",
+    "uncensored": true
+  },
+  "C2R": {
+    "R": -0.95,
+    "censor_reason": null,
+    "censored": false,
+    "cumulative_extension_m": 3.5e-05,
+    "cumulative_time_s": 0.14207092255102746,
+    "n_accepted_events": 7,
+    "n_intervals_with_complete_negative_excursion": 2,
+    "rebonding_model_level": "CLEAN_REVERSIBLE_REBOND",
+    "uncensored": true
+  },
+  "C3P": {
+    "R": -0.95,
+    "censor_reason": null,
+    "censored": false,
+    "cumulative_extension_m": 3.5e-05,
+    "cumulative_time_s": 0.1568388668135567,
+    "n_accepted_events": 7,
+    "n_intervals_with_complete_negative_excursion": 2,
+    "rebonding_model_level": "CLEAN_REVERSIBLE_REBOND",
+    "uncensored": true
+  },
+  "C3R": {
+    "R": -0.95,
+    "censor_reason": null,
+    "censored": false,
+    "cumulative_extension_m": 3.5e-05,
+    "cumulative_time_s": 0.15680198031607803,
+    "n_accepted_events": 7,
+    "n_intervals_with_complete_negative_excursion": 2,
+    "rebonding_model_level": "CLEAN_REVERSIBLE_REBOND",
+    "uncensored": true
+  },
+  "C4": {
+    "R": 0.1,
+    "censor_reason": null,
+    "censored": false,
+    "cumulative_extension_m": 3.5e-05,
+    "cumulative_time_s": 0.09303227049776959,
+    "n_accepted_events": 7,
+    "n_intervals_with_complete_negative_excursion": 0,
+    "rebonding_model_level": "REBOND_OFF",
+    "uncensored": true
+  },
+  "C5": {
+    "R": 0.1,
+    "censor_reason": null,
+    "censored": false,
+    "cumulative_extension_m": 3.5e-05,
+    "cumulative_time_s": 0.09303227083732153,
+    "n_accepted_events": 7,
+    "n_intervals_with_complete_negative_excursion": 0,
+    "rebonding_model_level": "CLEAN_REVERSIBLE_REBOND",
+    "uncensored": true
+  }
+}

@@ -357,6 +357,14 @@ Do not touch these preserved/read-only worktrees:
 - `/private/tmp/v10230-reversible-energy-integration` (read-only provenance source; its `runs/A_native_plus_8PT_fatigue_v1/` tree is now empty — 1371 dirs, 0 files, swept by OS /tmp cleanup)
 - `/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_codex_v10_2_30` (mounted checkout, unrelated v9.14 branch — read from it for provenance lookups only, never edit/commit)
 
+### Status: COMPLETE — terminal classification reached
+
+**`REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL`**
+(mission completion-contract outcome C). All four milestones (V2-A through
+V2-D) are committed. See `docs/v10_2_30_crack_rebonding_causal_pilot_v2.md`
+for the full writeup and `artifacts/crack_rebonding_causal_pilot_v2/
+causal_decision.json` / `verification.json` for the machine-readable record.
+
 ### Completed
 
 - **V2-A (A_NATIVE provenance):** recovered and cross-verified from an
@@ -364,47 +372,49 @@ Do not touch these preserved/read-only worktrees:
   disclosed-constants downstream registry; classified
   `A_NATIVE_REGISTRY_DETERMINISTICALLY_RECONSTRUCTED_FROM_QUALIFIED_INPUTS`.
   Frozen at `artifacts/crack_rebonding_causal_pilot_v2/A_native_provenance.json`.
-  Real engine construction implemented in
-  `arrhenius_fracture/a_native_engine_v10230.py::build_a_native_engine()`
-  (verified: builds, runs, fires a first event at ~1 cycle under the
-  reference protocol).
-- **V2-B (contact gating + strict RB0/RB1 parity):** exact
+  Real engine construction in `arrhenius_fracture/a_native_engine_v10230.py
+  ::build_a_native_engine()`.
+- **V2-B (contact gating + strict event-timing parity):** exact
   `K_signed < 0` contact gate on bond formation
   (`crack_rebonding_v10230.py::patch_Q`,
   `crack_rebonding_kinetics_v10230.py::_integrate_A_on`); new
-  `rebonding_kinetics_active()` predicate used consistently at all three
-  routing sites that previously kept RB1 on the coupled/root-finder path
-  purely because `cfg.enabled` (not `model_level`) was true
+  `rebonding_kinetics_active()`/`cohesion_present()` predicates used
+  consistently at all routing sites that previously kept RB1 (and,
+  discovered while implementing Section 8, zero-cohesion RB2) on the
+  coupled/root-finder path purely because `cfg.enabled` was true, not
+  whether kinetics/cohesion were actually active
   (`persistent_site_coupled_hazard_v10229.py::_phase_statistics` and
   `_commit_constant_segment`, `persistent_site_cyclic_energy_gated_v10230.py
-  ::commit_energy_gated_event`). Full test suite: 918 passed / 77
-  pre-existing unrelated failures (missing
+  ::commit_energy_gated_event`/`_commit_rebonding_event`). Full test suite:
+  918 passed / 77 pre-existing unrelated failures (missing
   `v10_2_27_paper_four_class_registry.csv`, confirmed untouched by this
-  work) / 1 skipped. All 181 `crack_rebonding`-selected tests pass.
-
-### Pending
-
-- **V2-C (protocol preflight):** confirm the reference protocol (T=300K,
-  R=-0.95, Kmax=18 MPa*sqrt(m), f=1000 Hz) samples a complete compressive
-  excursion for an event-created patch using RB1 contact diagnostics on the
-  REAL A_NATIVE engine (not the DBTT test fixture) before touching Kmax/f.
-  Early signal is promising: A_NATIVE's own native hazard fires roughly
-  once per cycle at this protocol (unlike the fixture's DBTT candidate,
-  which fired within microseconds) — this still needs the actual
-  multi-interval RB1 preflight evidence per mission Section 9 before
-  declaring the reference protocol usable.
-- **V2-D:** four zero/finite-cohesion RB2 config pairs, the corrected
-  8-case pilot (C0-C5), interval-resolved evidence CSV, causal-decision
-  gates, verifier, final classification.
+  work) / 1 skipped. All 183 `crack_rebonding`-selected tests pass.
+- **V2-C (protocol preflight):** RB1 contact-only preflight against the
+  real A_NATIVE engine at the reference protocol found 2 of 7
+  post-first-event intervals contain a complete negative-K excursion —
+  meets the mission's bar. `REFERENCE_PROTOCOL_SAMPLES_COMPRESSION`; no
+  frequency escalation needed or attempted. (This also refuted v1's
+  documented "native hazard too fast for one period" finding as an
+  artifact of v1 having actually used the wrong — DBTT test-fixture —
+  material.)
+- **V2-D (corrected 8-case pilot):** C0/C1/C2R/C3R/C2P/C3P/C4/C5, each 7
+  accepted events, uncensored. All 7 hard gates pass, including exact
+  (not 2%-tolerance) C0/C1 parity and a provably-exact-zero C5 residual at
+  R=0.1. The cohesive causal effect is real, correctly signed, and
+  isolated via matching zero-cohesion RB2 controls (not inferred from RB2
+  minus RB1): max 0.042 decades across 4 compression-containing intervals,
+  just under the frozen 0.05-decade expansion threshold. Independently
+  reproduced by `scripts/verify_v10_2_30_crack_rebonding_causal_pilot_v2.py`
+  (`overall_pass: true`).
 
 ### Active processes
 
-None. No trajectories have been launched yet.
+None. All 8 trajectories completed; no workers running.
 
-### Immediate next step if resuming
+### Remaining authorized-but-not-attempted scope
 
-Run the Section 9 RB1 contact-only preflight against
-`arrhenius_fracture.a_native_engine_v10230.build_a_native_engine` at the
-reference protocol, logging per-interval compression-contact duration and
-whether a complete negative-K excursion occurs before the next event, for
-at least the first several accepted events.
+Per the mission, still unauthorized: full multi-K Paris-slope campaign,
+passivation/repassivation sweep, frequency sweep beyond the frozen
+reference protocol, DMD/Poincare acceleration with rebonding, energy-gate
+coupling, topological crack retreat, mesh-resolved contact claims, branch
+merge into the authoritative production line. None of these were attempted.

@@ -1,0 +1,41 @@
+{
+  "checks": {
+    "artifact_present_A_native_provenance.json": true,
+    "artifact_present_causal_decision.json": true,
+    "artifact_present_frozen_configuration.json": true,
+    "artifact_present_interval_causal_analysis.csv": true,
+    "artifact_present_preflight_protocol_selection.json": true,
+    "artifact_present_trajectory_summary.json": true,
+    "causal_decision_classification_reproducible": true,
+    "dmd_poincare_disabled": true,
+    "frozen_configuration_reproducible": true,
+    "gate_1_pass": true,
+    "gate_1_reproducible": true,
+    "gate_2_pass": true,
+    "gate_3_pass": true,
+    "gate_4_pass": true,
+    "gate_5_pass": true,
+    "mpz_n_bins_is_80": true,
+    "n_phase_is_80": true,
+    "passivation_disabled": true,
+    "reference_protocol_matches_mission": true,
+    "restart_resume_forbidden_declared": true,
+    "seed_is_1720": true,
+    "topological_healing_disabled": true
+  },
+  "details": {
+    "recomputed_frozen_configuration_sha256": "afaaaa4ce2c9b69cfe65bfdc0887f1df19134d3a435bc7bb79affebcfe3113b0",
+    "saved_frozen_configuration_sha256": "afaaaa4ce2c9b69cfe65bfdc0887f1df19134d3a435bc7bb79affebcfe3113b0"
+  },
+  "file_hashes": {
+    "A_native_provenance.json": "6f4a81f46336c9c0a812ef886ac5ed81d8f245afbf76331c2ff1b67ae344268c",
+    "causal_decision.json": "dbfdc5a48460c929c36c8d431c2c47197b365f00ab7696ae81c23a95c4aa6c9f",
+    "frozen_configuration.json": "a78500e1803d1853a013dcbcabcc729eb051c9ae539aaa7fec19865d2ec4099f",
+    "interval_causal_analysis.csv": "3552959b0cf84a4528be698031bdfd056d53b6d896edbf538e2f4ff9dc3e27e9",
+    "preflight_protocol_selection.json": "36797bafa920a5ef10e9054652b3065024fb41ae5583ec8508e1eb3a10debc10",
+    "trajectory_summary.json": "8d342dd50d989edfd8775e88f25e058d90d82f78bbd5e0b5eb77767b5b35505d"
+  },
+  "overall_pass": true,
+  "saved_causal_decision_classification": "REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL",
+  "schema": "v10.2.30_crack_rebonding_causal_pilot_v2_verification_v1"
+}

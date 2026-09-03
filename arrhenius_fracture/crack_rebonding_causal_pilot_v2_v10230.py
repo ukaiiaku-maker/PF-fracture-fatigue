@@ -1,0 +1,568 @@
+"""Corrected crack-rebonding causal pilot (v10.2.30, V2).
+
+Supersedes ``crack_rebonding_causal_pilot_v10230.py`` (v1, preserved as a
+diagnostic artifact -- see docs/v10_2_30_crack_rebonding_causal_pilot_v2.md
+for the four defects it had that this module fixes):
+
+1. Uses the real, provenance-recovered A_NATIVE production engine
+   (``a_native_engine_v10230.build_a_native_engine``), not a DBTT
+   test-fixture candidate.
+2. Relies on the shared kinetics/engine-layer contact gate (exact
+   ``K_signed < 0``) and strict RB0/RB1/RB2-zero-cohesion event-timing
+   parity fixes (V2-B), not a 2%-tolerance workaround.
+3. Adds matching zero-cohesion RB2 controls (``restored_work_of_separation_
+   J_m2=0.0``, otherwise identical to their finite-cohesion twin) so the
+   cohesive causal effect is isolated as
+   ``Delta t = t_finite_cohesion - t_zero_cohesion`` at matched event
+   indices, rather than inferred from RB2 minus RB1.
+4. Records interval-resolved compression evidence (creation/next-event
+   phase, elapsed time/cycles, negative-K contact duration, whether a
+   complete negative excursion occurred) using the same external,
+   engine-independent K(t) evaluation as the V2-C protocol preflight.
+
+Trajectory set (mission Section 10):
+
+    C0   R=-0.95   RB0
+    C1   R=-0.95   RB1 (CONTACT_PROXY_ONLY)
+    C2R  R=-0.95   RB2 reversible, zero cohesion
+    C3R  R=-0.95   RB2 reversible, finite cohesion
+    C2P  R=-0.95   RB2 persistent, zero cohesion
+    C3P  R=-0.95   RB2 persistent, finite cohesion
+    C4   R=0.1     RB0
+    C5   R=0.1     RB2 persistent, finite cohesion
+"""
+from __future__ import annotations
+
+import copy
+import dataclasses
+import hashlib
+import json
+import time
+from dataclasses import asdict, replace
+from typing import Any, Callable
+
+import numpy as np
+
+from . import crack_rebonding_v10230 as _rebond
+from .crack_rebonding_kinetics_v10230 import (
+    REFERENCE_ACTION_PRESETS,
+    ContactModel,
+    CrackRebondingControls,
+    FeedbackMode,
+    InitialPrecrackWakeMode,
+    RebondModelLevel,
+    _integrate_A_on,
+    solve_reference_action_barriers,
+    two_state_fixed_point,
+)
+
+SCHEMA = "v10.2.30_crack_rebonding_causal_pilot_v2"
+
+REQUIRED_PYTHON = (
+    "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python"
+)
+
+SEED = 1720
+T_K = 300.0
+KMAX_Pa_sqrt_m = 18.0e6
+F_HZ = 1000.0
+R_REF = -0.95
+R_POSITIVE = 0.1
+N_PHASE = 80
+MPZ_N_BINS = 80
+
+PI_K_TARGET = 0.05
+K_REBOND_MAX_TARGET_Pa_sqrt_m = PI_K_TARGET * KMAX_Pa_sqrt_m
+ETA_K = 1.0
+_BOND_ACTIVATION_VOLUME_SEED_m3 = 1.0e-30
+
+MAX_ACCEPTED_EVENTS = 8
+MAX_PROJECTED_EXTENSION_m = 30.0e-6
+MIN_ACCEPTED_EVENTS_FOR_UNCENSORED = 3
+MAX_BLOCKS_PER_EVENT = 20000
+MAX_WALL_SECONDS_PER_TRAJECTORY = 1800.0
+BLOCK_CYCLES = 1000.0
+MAX_BLOCK_CYCLES = 1.0e6
+
+EXPANSION_THRESHOLD_LOG10_DECADE = 0.05
+
+TRAJECTORY_NAMES = ("C0", "C1", "C2R", "C3R", "C2P", "C3P", "C4", "C5")
+
+
+def _jsonable(value: Any) -> Any:
+    if hasattr(value, "value") and hasattr(value, "name") and not isinstance(value, (int, str)):
+        return value.value
+    if isinstance(value, dict):
+        return {k: _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonable(v) for v in value]
+    return value
+
+
+def canonical_hash(payload: Any) -> str:
+    canonical = json.dumps(_jsonable(payload), sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
+
+def resolve_restored_work_of_separation(Eprime_Pa: float) -> float:
+    target = K_REBOND_MAX_TARGET_Pa_sqrt_m / max(ETA_K, 1.0e-300)
+    return float(target * target / max(Eprime_Pa, 1.0e-300))
+
+
+def _rb2_template(
+    *, reference_contact_radius_m: float, G_max: float, bond_activation_volume_m3: float
+) -> CrackRebondingControls:
+    return CrackRebondingControls(
+        enabled=True,
+        model_level=RebondModelLevel.CLEAN_REVERSIBLE_REBOND,
+        contact_model=ContactModel.SIGNED_K_COMPRESSION_PROXY,
+        feedback_mode=FeedbackMode.HAZARD_ONLY_REBOND_SHIELD,
+        initial_precrack_wake_mode=InitialPrecrackWakeMode.NO_INITIAL_ACTIVE_WAKE,
+        wake_length_m=5.0e-4,
+        wake_weight_length_m=5.0e-7,
+        contact_radius_min_m=max(reference_contact_radius_m, 1.0e-9),
+        fresh_surface_clean_fraction=1.0,
+        chemistry_factor=1.0,
+        restored_work_of_separation_J_m2=G_max,
+        rebond_K_geometry_factor=ETA_K,
+        bond_activation_volume_m3=bond_activation_volume_m3,
+        rupture_activation_volume_m3=0.0,
+        bond_attempt_frequency_s=1.0e10,
+        rupture_attempt_frequency_s=1.0e10,
+        bond_barrier_eV=0.2,
+        rupture_barrier_eV=1.0,
+    )
+
+
+def _r_positive_action_ratio(
+    resolved_cfg: CrackRebondingControls, *, reference_contact_radius_m: float
+) -> float:
+    """Predicted single-patch A_on at R_POSITIVE relative to the
+    reference-condition A_on_ref. Now provably EXACTLY 0.0 (not merely
+    negligible): under the exact K_signed<0 contact gate, R_POSITIVE keeps
+    K_signed >= 0 at every phase (Kmin = R_POSITIVE*Kmax > 0), so k_cb is
+    forced to exactly 0.0 at every phase point -- hard gate 2's "exactly
+    zero bond formation at R=0.1" is a closed-form guarantee of the shared
+    kinetics fix, not a calibration target."""
+    a_on_ref = _integrate_A_on(
+        resolved_cfg.bond_barrier_eV, T_K=T_K, f_Hz=F_HZ, R=R_REF,
+        Kmax_Pa_sqrt_m=KMAX_Pa_sqrt_m, s_j_m=0.0,
+        r_contact_m=reference_contact_radius_m, cfg=resolved_cfg, n_phase=360,
+    )
+    a_on_pos = _integrate_A_on(
+        resolved_cfg.bond_barrier_eV, T_K=T_K, f_Hz=F_HZ, R=R_POSITIVE,
+        Kmax_Pa_sqrt_m=KMAX_Pa_sqrt_m, s_j_m=0.0,
+        r_contact_m=reference_contact_radius_m, cfg=resolved_cfg, n_phase=360,
+    )
+    return float(a_on_pos / max(a_on_ref, 1.0e-300))
+
+
+def solve_calibrated_rb2_configs(
+    *, Eprime_Pa: float, reference_contact_radius_m: float
+) -> dict[str, Any]:
+    """Solve RB2-reversible and RB2-persistent FINITE-cohesion configs
+    hitting their target reference actions at (R_REF, KMAX), then verify the
+    R_POSITIVE residual action is exactly 0.0 (closed-form under the exact
+    contact gate -- see _r_positive_action_ratio)."""
+    G_max = resolve_restored_work_of_separation(Eprime_Pa)
+    activation_volume = _BOND_ACTIVATION_VOLUME_SEED_m3
+
+    resolved: dict[str, CrackRebondingControls] = {}
+    ratios: dict[str, float] = {}
+    for name, (a_on_ref, a_off_ref) in (
+        ("reversible", REFERENCE_ACTION_PRESETS["reversible"]),
+        ("persistent", REFERENCE_ACTION_PRESETS["persistent"]),
+    ):
+        template = _rb2_template(
+            reference_contact_radius_m=reference_contact_radius_m,
+            G_max=G_max, bond_activation_volume_m3=activation_volume,
+        ).validate()
+        cfg = solve_reference_action_barriers(
+            a_on_ref, a_off_ref, T_K=T_K, f_Hz=F_HZ, R=R_REF, Kmax_Pa_sqrt_m=KMAX_Pa_sqrt_m,
+            reference_patch_distance_m=0.0, reference_contact_radius_m=reference_contact_radius_m,
+            cfg_template=template,
+        ).validate()
+        ratio = _r_positive_action_ratio(cfg, reference_contact_radius_m=reference_contact_radius_m)
+        if ratio != 0.0:
+            raise RuntimeError(
+                f"R_POSITIVE residual action ratio for {name!r} is {ratio!r}, not exactly "
+                "0.0 -- the exact contact gate should make this a closed-form guarantee; "
+                "something upstream is not gating on K_signed<0 correctly"
+            )
+        resolved[name] = cfg
+        ratios[name] = ratio
+
+    return {
+        "configs_finite_cohesion": resolved,
+        "r_positive_action_ratios": ratios,
+        "bond_activation_volume_m3": activation_volume,
+        "restored_work_of_separation_J_m2": G_max,
+        "rebond_K_geometry_factor": ETA_K,
+    }
+
+
+def rb1_config(rb2_reversible_finite: CrackRebondingControls) -> CrackRebondingControls:
+    """CONTACT_PROXY_ONLY: patch_Q returns the exact zero generator, and
+    the shared engine-layer fix routes it through the identical wake-ledger
+    -only commit path as cfg=None -- kept field-identical to the RB2
+    reversible finite-cohesion config only so config_hash() differences are
+    exactly and only the model_level field."""
+    return replace(rb2_reversible_finite, model_level=RebondModelLevel.CONTACT_PROXY_ONLY)
+
+
+def zero_cohesion_twin(finite_cfg: CrackRebondingControls) -> CrackRebondingControls:
+    """Identical to finite_cfg in every field except restored_work_of_
+    separation_J_m2=0.0 (hence K_rebond_max=0 regardless of state) -- the
+    matching zero-cohesion control mission Section 8 requires."""
+    return replace(finite_cfg, restored_work_of_separation_J_m2=0.0)
+
+
+def trajectory_specs() -> list[dict[str, Any]]:
+    return [
+        {"name": "C0", "R": R_REF, "rebonding": "RB0"},
+        {"name": "C1", "R": R_REF, "rebonding": "RB1"},
+        {"name": "C2R", "R": R_REF, "rebonding": "RB2_reversible_zero"},
+        {"name": "C3R", "R": R_REF, "rebonding": "RB2_reversible_finite"},
+        {"name": "C2P", "R": R_REF, "rebonding": "RB2_persistent_zero"},
+        {"name": "C3P", "R": R_REF, "rebonding": "RB2_persistent_finite"},
+        {"name": "C4", "R": R_POSITIVE, "rebonding": "RB0"},
+        {"name": "C5", "R": R_POSITIVE, "rebonding": "RB2_persistent_finite"},
+    ]
+
+
+def analytical_single_patch_predictions(
+    resolved_cfg: CrackRebondingControls, *, reference_contact_radius_m: float
+) -> dict[str, Any]:
+    from .crack_rebonding_kinetics_v10230 import _integrate_A_off
+
+    a_on = _integrate_A_on(
+        resolved_cfg.bond_barrier_eV, T_K=T_K, f_Hz=F_HZ, R=R_REF, Kmax_Pa_sqrt_m=KMAX_Pa_sqrt_m,
+        s_j_m=0.0, r_contact_m=reference_contact_radius_m, cfg=resolved_cfg, n_phase=360,
+    )
+    a_off = _integrate_A_off(
+        resolved_cfg.rupture_barrier_eV, T_K=T_K, f_Hz=F_HZ, R=R_REF, Kmax_Pa_sqrt_m=KMAX_Pa_sqrt_m,
+        s_j_m=0.0, r_contact_m=reference_contact_radius_m, cfg=resolved_cfg, n_phase=360,
+    )
+    fixed_point = two_state_fixed_point(a_on, a_off)
+    return {"A_on": a_on, "A_off": a_off, **fixed_point}
+
+
+def freeze_pilot_configuration(
+    *, Eprime_Pa: float, reference_contact_radius_m: float, engine_G_Pa: float, engine_nu: float,
+    a_native_provenance_sha256: str,
+) -> dict[str, Any]:
+    calibration = solve_calibrated_rb2_configs(
+        Eprime_Pa=Eprime_Pa, reference_contact_radius_m=reference_contact_radius_m
+    )
+    rb2_rev_finite = calibration["configs_finite_cohesion"]["reversible"]
+    rb2_pers_finite = calibration["configs_finite_cohesion"]["persistent"]
+    rb2_rev_zero = zero_cohesion_twin(rb2_rev_finite)
+    rb2_pers_zero = zero_cohesion_twin(rb2_pers_finite)
+    rb1 = rb1_config(rb2_rev_finite)
+
+    configs = {
+        "RB0": None,
+        "RB1": rb1,
+        "RB2_reversible_zero": rb2_rev_zero,
+        "RB2_reversible_finite": rb2_rev_finite,
+        "RB2_persistent_zero": rb2_pers_zero,
+        "RB2_persistent_finite": rb2_pers_finite,
+    }
+    config_hashes = {
+        name: (cfg.config_hash() if cfg is not None else None) for name, cfg in configs.items()
+    }
+
+    analytical_predictions = {
+        "reversible_finite": analytical_single_patch_predictions(
+            rb2_rev_finite, reference_contact_radius_m=reference_contact_radius_m
+        ),
+        "persistent_finite": analytical_single_patch_predictions(
+            rb2_pers_finite, reference_contact_radius_m=reference_contact_radius_m
+        ),
+    }
+
+    frozen = {
+        "schema": SCHEMA,
+        "required_python": REQUIRED_PYTHON,
+        "seed": SEED,
+        "a_native_provenance_sha256": a_native_provenance_sha256,
+        "common_settings": {
+            "parameter_option": "A_NATIVE",
+            "T_K": T_K,
+            "Kmax_Pa_sqrt_m": KMAX_Pa_sqrt_m,
+            "frequency_Hz": F_HZ,
+            "n_phase": N_PHASE,
+            "mpz_n_bins": MPZ_N_BINS,
+            "integrator_mode": "EXPLICIT_PHASE_RESOLVED",
+            "feedback_mode": FeedbackMode.HAZARD_ONLY_REBOND_SHIELD.value,
+            "initial_precrack_wake_mode": InitialPrecrackWakeMode.NO_INITIAL_ACTIVE_WAKE.value,
+            "fresh_surface_clean_fraction": 1.0,
+            "chemistry_factor": 1.0,
+            "passivation_enabled": False,
+            "topological_healing_enabled": False,
+            "dmd_poincare_acceleration_enabled": False,
+            "restart_resume_forbidden": True,
+            "contact_model": ContactModel.SIGNED_K_COMPRESSION_PROXY.value,
+            "contact_semantics_label": _rebond.CONTACT_SEMANTICS_LABEL,
+        },
+        "material": {
+            "engine_G_Pa": engine_G_Pa,
+            "engine_nu": engine_nu,
+            "Eprime_Pa": Eprime_Pa,
+            "reference_contact_radius_m": reference_contact_radius_m,
+        },
+        "rebonding_mechanism_control": {
+            "Pi_K_target": PI_K_TARGET,
+            "K_rebond_max_target_Pa_sqrt_m": K_REBOND_MAX_TARGET_Pa_sqrt_m,
+            "eta_K": ETA_K,
+            "restored_work_of_separation_J_m2_finite": calibration["restored_work_of_separation_J_m2"],
+            "bond_activation_volume_m3": calibration["bond_activation_volume_m3"],
+            "r_positive_check": {
+                "R": R_POSITIVE,
+                "predicted_action_ratios": calibration["r_positive_action_ratios"],
+                "note": "exactly 0.0 by construction of the exact K_signed<0 contact gate",
+            },
+        },
+        "reference_action_presets": {
+            "reversible": REFERENCE_ACTION_PRESETS["reversible"],
+            "persistent": REFERENCE_ACTION_PRESETS["persistent"],
+        },
+        "configs": {name: (asdict(cfg) if cfg is not None else None) for name, cfg in configs.items()},
+        "config_hashes": config_hashes,
+        "analytical_single_patch_predictions": analytical_predictions,
+        "limits": {
+            "max_accepted_events": MAX_ACCEPTED_EVENTS,
+            "max_projected_extension_m": MAX_PROJECTED_EXTENSION_m,
+            "min_accepted_events_for_uncensored": MIN_ACCEPTED_EVENTS_FOR_UNCENSORED,
+            "max_blocks_per_event": MAX_BLOCKS_PER_EVENT,
+            "max_wall_seconds_per_trajectory": MAX_WALL_SECONDS_PER_TRAJECTORY,
+            "block_cycles": BLOCK_CYCLES,
+            "max_block_cycles": MAX_BLOCK_CYCLES,
+        },
+        "trajectories": trajectory_specs(),
+        "expansion_threshold_log10_decade": EXPANSION_THRESHOLD_LOG10_DECADE,
+    }
+    frozen["frozen_configuration_sha256"] = canonical_hash(frozen)
+    return frozen
+
+
+# ---------------------------------------------------------------------------
+# Trajectory execution
+# ---------------------------------------------------------------------------
+
+
+def signed_K(t_s: np.ndarray, *, R: float) -> np.ndarray:
+    Kmin = R * KMAX_Pa_sqrt_m
+    Kmean = 0.5 * (KMAX_Pa_sqrt_m + Kmin)
+    Kamp = 0.5 * (KMAX_Pa_sqrt_m - Kmin)
+    phase = 2.0 * np.pi * F_HZ * t_s
+    return Kmean + Kamp * np.cos(phase)
+
+
+def interval_compression_analysis(
+    t_creation_s: float, t_next_event_s: float, *, R: float, n_samples: int = 4000
+) -> dict[str, Any]:
+    if t_next_event_s <= t_creation_s:
+        return {
+            "elapsed_time_s": 0.0, "elapsed_cycles": 0.0,
+            "negative_contact_duration_s": 0.0, "complete_negative_excursion": False,
+        }
+    t = np.linspace(t_creation_s, t_next_event_s, n_samples)
+    K = signed_K(t, R=R)
+    neg = K < 0.0
+    dt = t[1] - t[0]
+    negative_duration_s = float(np.count_nonzero(neg)) * dt
+    complete = False
+    if neg.any() and not neg[0] and not neg[-1]:
+        edges = np.diff(neg.astype(int))
+        complete = bool((edges == 1).any() and (edges == -1).any())
+    return {
+        "elapsed_time_s": float(t_next_event_s - t_creation_s),
+        "elapsed_cycles": float((t_next_event_s - t_creation_s) * F_HZ),
+        "negative_contact_duration_s": negative_duration_s,
+        "complete_negative_excursion": bool(complete),
+    }
+
+
+def run_trajectory(
+    *,
+    name: str,
+    build_engine: Callable[[CrackRebondingControls | None], tuple[Any, dict[str, Any]]],
+    make_controller: Callable[[int], Any],
+    waveform_cls: Callable[..., Any],
+    rebonding_cfg: CrackRebondingControls | None,
+    R: float,
+    reset_engine_registry: Callable[[], None] | None = None,
+    Kmax_Pa_sqrt_m: float = KMAX_Pa_sqrt_m,
+    frequency_Hz: float = F_HZ,
+    n_phase: int = N_PHASE,
+    T_K_: float = T_K,
+    max_accepted_events: int = MAX_ACCEPTED_EVENTS,
+    max_projected_extension_m: float = MAX_PROJECTED_EXTENSION_m,
+    min_accepted_events_for_uncensored: int = MIN_ACCEPTED_EVENTS_FOR_UNCENSORED,
+    max_blocks_per_event: int = MAX_BLOCKS_PER_EVENT,
+    max_wall_seconds: float = MAX_WALL_SECONDS_PER_TRAJECTORY,
+) -> dict[str, Any]:
+    """Drive one fresh, unresumed trajectory in-process via the real
+    A_NATIVE production engine's own cycle_step_waveform/
+    commit_energy_gated_event (never through the mesh-dependent CLI
+    backend)."""
+    if reset_engine_registry is not None:
+        reset_engine_registry()
+    engine, manifest_audit = build_engine(rebonding_cfg)
+    ctrl = make_controller(n_phase)
+    waveform = waveform_cls(Kmax=Kmax_Pa_sqrt_m, R=R, frequency_Hz=frequency_Hz)
+
+    bulk_action_records: list[dict[str, Any]] = []
+    original_phase_resolved_action = _rebond.phase_resolved_action
+
+    def _recording_phase_resolved_action(*args, **kwargs):
+        action, end_states, end_idx, diag = original_phase_resolved_action(*args, **kwargs)
+        bulk_action_records.append(dict(diag))
+        return action, end_states, end_idx, diag
+
+    events: list[dict[str, Any]] = []
+    cumulative_extension_m = 0.0
+    cumulative_time_s = 0.0
+    time_at_previous_event_s = 0.0
+    censored = False
+    censor_reason = None
+    start_wall = time.monotonic()
+
+    _rebond.phase_resolved_action = _recording_phase_resolved_action
+    try:
+        while True:
+            if len(events) >= max_accepted_events:
+                break
+            if cumulative_extension_m >= max_projected_extension_m:
+                break
+            if time.monotonic() - start_wall > max_wall_seconds:
+                censored = True
+                censor_reason = "wall_time_budget_exhausted_between_events"
+                break
+
+            bulk_action_records_before = len(bulk_action_records)
+            fired_result = None
+            blocks_used = 0
+            for blocks_used in range(1, max_blocks_per_event + 1):
+                if time.monotonic() - start_wall > max_wall_seconds:
+                    break
+                result = engine.cycle_step_waveform(ctrl, waveform, T_K_)
+                cumulative_time_s += float(result.get("kinetic_dt_consumed_s", 0.0))
+                if result.get("fired"):
+                    fired_result = result
+                    break
+
+            if fired_result is None:
+                censored = True
+                censor_reason = (
+                    "wall_time_budget_exhausted_mid_event"
+                    if time.monotonic() - start_wall > max_wall_seconds
+                    else f"event_did_not_fire_within_{max_blocks_per_event}_blocks"
+                )
+                break
+
+            pending = engine._energy_gate_pending
+            committed_length = pending["proposal_m"]
+            gate = {
+                "energy_admissible_event_length_m": committed_length,
+                "arrest_reason": "causal_pilot_v2_commit",
+                "hazard_resistance_J_per_m2": 1.0,
+                "orientation_gamma_relative": 1.0,
+            }
+            result_ref = pending["descriptor"].get("energy_gate_result_ref")
+            waiting_time_s = cumulative_time_s - time_at_previous_event_s
+            time_at_previous_event_s = cumulative_time_s
+
+            pre_commit_rebonding_state = getattr(engine, "_rebonding_state", None)
+            pre_event_max_pB = (
+                max((float(p.p_B) for p in pre_commit_rebonding_state.active), default=0.0)
+                if pre_commit_rebonding_state is not None
+                else 0.0
+            )
+
+            engine.commit_energy_gated_event(committed_length, gate, result_ref)
+            cumulative_extension_m += committed_length
+
+            rebonding_state = getattr(engine, "_rebonding_state", None)
+            max_pB_post_commit = (
+                max((float(p.p_B) for p in rebonding_state.active), default=0.0)
+                if rebonding_state is not None else 0.0
+            )
+            max_K_rebond_post_commit = (
+                float(rebonding_state.K_rebond_Pa_sqrt_m) if rebonding_state is not None else 0.0
+            )
+
+            new_bulk_records = bulk_action_records[bulk_action_records_before:]
+            events.append({
+                "event_index": len(events),
+                "blocks_to_fire": blocks_used,
+                "waiting_time_s_this_event": waiting_time_s,
+                "cumulative_time_s": cumulative_time_s,
+                "accepted_length_m": float(committed_length),
+                "cumulative_extension_m": cumulative_extension_m,
+                "pre_event_max_pB": pre_event_max_pB,
+                "max_pB_post_commit": max_pB_post_commit,
+                "max_K_rebond_post_commit_Pa_sqrt_m": max_K_rebond_post_commit,
+                "bulk_action_records": new_bulk_records,
+                "any_bulk_action_used": any(r.get("bulk_action_used") for r in new_bulk_records),
+                "all_bulk_action_qualified": all(
+                    r.get("bulk_action_qualified", True) for r in new_bulk_records
+                ),
+            })
+    finally:
+        _rebond.phase_resolved_action = original_phase_resolved_action
+
+    uncensored = (not censored) and (len(events) >= min_accepted_events_for_uncensored)
+
+    intervals = []
+    for i in range(1, len(events)):
+        t_creation = events[i - 1]["cumulative_time_s"]
+        t_next = events[i]["cumulative_time_s"]
+        analysis = interval_compression_analysis(t_creation, t_next, R=R)
+        analysis.update({
+            "creation_event_index": i - 1, "next_event_index": i,
+            "waiting_time_s_this_event": events[i]["waiting_time_s_this_event"],
+        })
+        intervals.append(analysis)
+
+    return {
+        "name": name, "R": R,
+        "rebonding_cfg_hash": rebonding_cfg.config_hash() if rebonding_cfg is not None else None,
+        "rebonding_model_level": (
+            rebonding_cfg.model_level.value if rebonding_cfg is not None else "REBOND_OFF"
+        ),
+        "restored_work_of_separation_J_m2": (
+            rebonding_cfg.restored_work_of_separation_J_m2 if rebonding_cfg is not None else 0.0
+        ),
+        "manifest_audit": manifest_audit,
+        "seed": SEED,
+        "events": events,
+        "post_first_event_intervals": intervals,
+        "n_accepted_events": len(events),
+        "cumulative_extension_m": cumulative_extension_m,
+        "cumulative_time_s": cumulative_time_s,
+        "censored": censored,
+        "censor_reason": censor_reason,
+        "uncensored": uncensored,
+        "wall_seconds": time.monotonic() - start_wall,
+    }
+
+
+__all__ = [
+    "SCHEMA", "REQUIRED_PYTHON", "SEED", "T_K", "KMAX_Pa_sqrt_m", "F_HZ",
+    "R_REF", "R_POSITIVE", "N_PHASE", "MPZ_N_BINS",
+    "MAX_ACCEPTED_EVENTS", "MAX_PROJECTED_EXTENSION_m",
+    "MIN_ACCEPTED_EVENTS_FOR_UNCENSORED", "EXPANSION_THRESHOLD_LOG10_DECADE",
+    "TRAJECTORY_NAMES",
+    "resolve_restored_work_of_separation", "solve_calibrated_rb2_configs",
+    "rb1_config", "zero_cohesion_twin", "trajectory_specs",
+    "analytical_single_patch_predictions", "freeze_pilot_configuration",
+    "signed_K", "interval_compression_analysis", "run_trajectory",
+    "canonical_hash",
+]

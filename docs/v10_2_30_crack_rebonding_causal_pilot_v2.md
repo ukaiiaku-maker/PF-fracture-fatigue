@@ -273,4 +273,96 @@ f=1000 Hz, mpz_n_bins=80, seed=1720.
 
 ## 5. V2-D: corrected 8-case pilot, zero-cohesion controls, decision
 
-Pending.
+### Configurations
+
+`arrhenius_fracture/crack_rebonding_causal_pilot_v2_v10230.py` builds six
+distinct `CrackRebondingControls` (RB1, RB2-reversible-zero,
+RB2-reversible-finite, RB2-persistent-zero, RB2-persistent-finite; RB0 is
+`cfg=None`). The finite-cohesion reversible/persistent configs are
+calibrated via `solve_reference_action_barriers` exactly as v1 did
+(target dimensionless actions `A_on=1.0/A_off=1.0` and `A_on=10/A_off=0.1`
+at the reference condition), with `K_rebond_max` target `Pi_K * Kmax =
+0.05 * 18 MPa*sqrt(m) = 900 kPa*sqrt(m)`. Each zero-cohesion twin is
+`dataclasses.replace(finite_cfg, restored_work_of_separation_J_m2=0.0)` --
+identical in every other field by construction, not independently tuned.
+
+The R=0.1 residual-bonding check (hard gate 2) is now a **closed-form
+guarantee** rather than a calibration search: since `_integrate_A_on` gates
+formation exactly on `K_signed < 0` and `R_POSITIVE=0.1` keeps
+`Kmin = 0.1*Kmax > 0` at every phase, the predicted single-patch action at
+R=0.1 is *exactly* 0.0 for any barrier choice -- confirmed programmatically
+(`r_positive_action_ratios = {"reversible": 0.0, "persistent": 0.0}`) before
+any trajectory runs, and empirically in gate 2 below.
+
+### Run
+
+`scripts/run_v10_2_30_crack_rebonding_causal_pilot_v2.py`, real A_NATIVE
+engine, seed=1720, T=300K, f=1000Hz, mpz_n_bins=80, n_phase=80. All eight
+trajectories (C0, C1, C2R, C3R, C2P, C3P, C4, C5) completed **uncensored**
+with **7 accepted events each** (`runs/crack_rebonding_causal_pilot_v2/`,
+gitignored; tracked summary/decision artifacts under
+`artifacts/crack_rebonding_causal_pilot_v2/`).
+
+### Hard gates (`scripts/analyze_v10_2_30_crack_rebonding_causal_pilot_v2.py`)
+
+| Gate | Result |
+|---|---|
+| 1. C0/C1 exact physical parity | **PASS** -- 0 mismatches across all 7 matched events (`rel_tol=1e-9` on both `accepted_length_m` and `waiting_time_s_this_event`; no 2% tolerance used) |
+| 2. C5 exactly zero bond formation at R=0.1 | **PASS** -- `max_pB_post_commit`/`max_K_rebond` are exactly `0.0` at every one of C5's 7 events (C4 control likewise) |
+| 3. Dynamically formed bonds from an event-created patch | **PASS** -- C3R and C3P both show genuine, dynamically-generated nonzero bonding (C2R/C2P, the zero-cohesion twins, correctly show `K_rebond` staying exactly 0 despite `p_B` evolving) |
+| 4. Finite-cohesion delay in >=2 compression-containing intervals | **PASS** -- 4 of 6 post-first-event intervals contain a complete negative-K excursion (matching V2-C's preflight finding), and every one of them shows a finite-cohesion delay |
+| 5. Only certified periodic-orbit/explicit actions admitted | **PASS** -- every `bulk_action_qualified` flag true across all 8 trajectories x 7 events |
+| 6. Contact semantics label preserved | **PASS** -- `SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT` |
+| 7. No physical Paris-slope inference | **PASS** -- single-Kmax pilot only, explicitly noted |
+
+All 7 hard gates pass (`overall_gate_pass: true`).
+
+### Causal quantities and the expansion threshold
+
+`Delta t = t_finite_cohesion - t_zero_cohesion` at matched event indices
+between each zero/finite twin pair (`interval_causal_analysis.csv`, 12
+rows -- 6 intervals x {reversible, persistent}). The effect is small but
+**real, correctly signed, and remarkably consistent**: every interval
+(compression-containing or not) shows `t_finite > t_zero` by
+`log10(t_finite/t_zero)` in a narrow band of **0.028 to 0.044 decades**
+across all 12 rows. The **maximum** ratio among the 4 compression-containing
+intervals is **0.0420 decades** -- below the mission's frozen expansion
+threshold of **0.05 decades**.
+
+```
+classification: REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL
+overall_gate_pass: true
+expansion_threshold_exceeded: false
+max_log10_ratio_abs_decade_in_compression_containing_intervals: 0.0420
+multi_K_paris_slope_campaign_authorized: false
+```
+
+Per mission Section 12: bonds form, the causal mechanism is real and
+correctly isolated from Markov-propagation/event-time-localization
+artifacts (unlike v1's RB2-minus-RB1 comparison), but the cohesive
+waiting-time effect at this Kmax/Pi_K combination does not clear the
+prospectively-frozen macroscopic-significance bar. **Stop here -- no
+multi-K matrix, no Part X.**
+
+### Verification
+
+`scripts/verify_v10_2_30_crack_rebonding_causal_pilot_v2.py`: independently
+rebuilds the bare A_NATIVE engine and reproduces
+`frozen_configuration_sha256` from scratch, re-derives all 5
+gate-relevant boolean predicates directly from `trajectories.json`
+(bypassing the saved `causal_decision.json` entirely), confirms
+`mpz_n_bins=80`/`n_phase=80`/`seed=1720`/the reference protocol values, and
+confirms DMD/Poincare acceleration, passivation, and topological healing
+are all disabled. **`overall_pass: true`**, zero failed checks.
+
+## 6. Terminal classification
+
+**`REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL`**
+(mission completion-contract outcome C).
+
+Remain unauthorized (per mission Section 14), and not attempted: full
+multi-K Paris-slope campaign, passivation/repassivation sweep, frequency
+sweep beyond the already-frozen reference protocol, DMD/Poincare
+acceleration with rebonding, energy-gate coupling, topological crack
+retreat, mesh-resolved contact claims, branch merge into the authoritative
+production line.
