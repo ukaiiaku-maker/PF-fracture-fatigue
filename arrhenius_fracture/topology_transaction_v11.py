@@ -107,6 +107,9 @@ class LiveFEMTopologyState:
     rng_state: Any
     event_counters: Mapping[str, int]
     stored_energy_J_per_m: float
+    sharp_wake_model_id: str = "sharp_wake_causal_v11"
+    v12_support_state: Any = None
+    checkpoint_generation: int = 0
 
     def __post_init__(self) -> None:
         energy = float(self.stored_energy_J_per_m)
@@ -131,6 +134,13 @@ class LiveFEMTopologyState:
         object.__setattr__(self, "energy_ledgers", _freeze(self.energy_ledgers))
         object.__setattr__(self, "event_counters", _freeze(self.event_counters))
         object.__setattr__(self, "rng_state", _freeze(self.rng_state))
+        from .sharp_wake_backend_v12 import V11_MODEL_ID, V12_MODEL_ID, select_sharp_wake_model
+        selected=select_sharp_wake_model(self.sharp_wake_model_id)
+        if selected==V11_MODEL_ID and self.v12_support_state is not None:
+            raise ValueError("V11 state may not own V12 support")
+        if selected==V12_MODEL_ID and self.v12_support_state is None:
+            raise ValueError("V12 state requires authoritative support ownership")
+        object.__setattr__(self,"sharp_wake_model_id",selected)
 
     def isolated_copy(self) -> "LiveFEMTopologyState":
         return LiveFEMTopologyState(
@@ -144,6 +154,9 @@ class LiveFEMTopologyState:
             energy_ledgers=self.energy_ledgers, rng_state=self.rng_state,
             event_counters=self.event_counters,
             stored_energy_J_per_m=self.stored_energy_J_per_m,
+            sharp_wake_model_id=self.sharp_wake_model_id,
+            v12_support_state=self.v12_support_state,
+            checkpoint_generation=self.checkpoint_generation,
         )
 
 
@@ -252,6 +265,32 @@ def apply_causal_sharp_wake_trial_geometry(
     junction["latest_causal_support_trials"] = tuple(audits)
     junction["crack_representation"] = "sharp_wake_causal_v11"
     return replace(current, junction_process_state=junction)
+
+
+def apply_mechanically_separating_v12_trial_geometry(
+    state: LiveFEMTopologyState, arms: tuple[TopologyArm, ...], *,
+    source_commit: str, configuration: Mapping[str, Any], transaction_identity: str,
+) -> LiveFEMTopologyState:
+    """Realize tentative graph first, then rebuild/certify complete V12 support."""
+    from .causal_sharp_wake_v11 import element_damage
+    from .mechanically_separating_sharp_wake_v12 import apply_mechanically_separating_graph
+    from .sharp_wake_backend_v12 import V12_MODEL_ID, support_state_from_production
+    network=state.crack_network
+    for arm in arms: network=extend_network_arm(network,arm)
+    previous=None
+    if state.v12_support_state is not None:
+        previous=state.junction_process_state.get("v12_support_record")
+    trial,audit=apply_mechanically_separating_graph(state,network,previous_support=previous)
+    if not audit.certified or audit.mechanically_new_element_count<=0:
+        raise RuntimeError("V12 tentative event did not create certified mechanical novelty")
+    prior=state.v12_support_state.transaction_identity if state.v12_support_state is not None else None
+    ownership=support_state_from_production(
+        mesh=trial.mesh,crack_network=network,selected_support_elements=audit.selected_element_ids,
+        damage_gp=element_damage(trial.mesh,trial.damage),certification_fingerprint=audit.certificate_fingerprint,
+        transaction_identity=transaction_identity,previous_accepted_transaction=prior,
+        source_commit=source_commit,configuration=configuration,
+        checkpoint_generation=state.checkpoint_generation)
+    return replace(trial,sharp_wake_model_id=V12_MODEL_ID,v12_support_state=ownership)
 
 
 def _replace_branch(network: CrackNetworkState, updated: CrackBranchState) -> CrackNetworkState:
@@ -408,7 +447,7 @@ def execute_topology_trial(
 
 __all__ = [
     "LiveFEMTopologyState", "MODEL_ID", "TopologyArm", "TopologyTrialResult",
-    "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry",
+    "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry", "apply_mechanically_separating_v12_trial_geometry",
     "clip_arm_at_first_intersection",
     "equilibrate_fixed_load_with_production_fem", "execute_topology_trial",
     "extend_network_arm", "mark_coalesced",

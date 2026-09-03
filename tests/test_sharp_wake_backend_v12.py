@@ -2,7 +2,7 @@ import pytest
 from arrhenius_fracture.sharp_wake_backend_v12 import *
 
 def sample():
-    return V12SharpWakeSupportState("g","c",2,"graph",1.25,"arcs",(2,5),"damage",("tip-1",),"tx-2","tx-1","abc")
+    return V12SharpWakeSupportState("g","c",2,"graph",1.25,"arcs",(2,5),"damage",("tip-1",),"tx-2","tx-1","abc","cfg",3,"lineage")
 
 def test_default_remains_v11_and_selection_is_explicit():
     assert select_sharp_wake_model()==V11_MODEL_ID
