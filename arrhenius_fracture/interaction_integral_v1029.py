@@ -122,12 +122,14 @@ def _interaction_for_mode(
     r_inner: float,
     r_outer: float,
     exclude_radius: float,
+    exclude_element_mask: np.ndarray | None,
 ) -> tuple[float, dict[str, Any]]:
     value = 0.0
     active = 0
     skipped_branch_cut = 0
     skipped_damage = 0
     skipped_los = 0
+    skipped_exact_elements = 0
     near_segments = None
     if crack_segments:
         rmax2 = (3.0 * r_outer) ** 2
@@ -148,6 +150,9 @@ def _interaction_for_mode(
         conn = mesh.elems[element]
         qe = q_node[conn]
         if np.max(np.abs(qe)) < 1.0e-14 or np.ptp(qe) < 1.0e-14:
+            continue
+        if exclude_element_mask is not None and exclude_element_mask[element]:
+            skipped_exact_elements += 1
             continue
         if float(np.mean(d[conn])) > 0.95:
             skipped_damage += 1
@@ -204,6 +209,8 @@ def _interaction_for_mode(
         "skipped_damage_elements": skipped_damage,
         "skipped_branch_cut_elements": skipped_branch_cut,
         "skipped_line_of_sight_elements": skipped_los,
+        "skipped_exact_elements": skipped_exact_elements,
+        "exact_mask_total_elements": int(np.count_nonzero(exclude_element_mask)) if exclude_element_mask is not None else 0,
         "r_inner_m": float(r_inner),
         "r_outer_m": float(r_outer),
     }
@@ -224,6 +231,7 @@ def compute_signed_interaction_integral(
     exclude_radius: float = 0.0,
     D: np.ndarray | None = None,
     isotropy_relative_tolerance: float = 1.0e-8,
+    exclude_element_mask: np.ndarray | None = None,
 ) -> InteractionIntegralResult:
     """Return signed KI and KII using analytic auxiliary gradients."""
     require_isotropic_stiffness(
@@ -243,6 +251,10 @@ def compute_signed_interaction_integral(
     r_outer = float(cfg.r_outer_factor) * float(ell)
     radii = np.linalg.norm(np.asarray(mesh.nodes) - tip[None, :], axis=1)
     q_node = _hermite_plateau_q(radii, r_inner, r_outer)
+    if exclude_element_mask is not None:
+        exclude_element_mask = np.asarray(exclude_element_mask)
+        if exclude_element_mask.shape != (mesh.ne,) or exclude_element_mask.dtype.kind != "b":
+            raise ValueError("exclude_element_mask must be a Boolean array with one entry per element")
 
     common = dict(
         mesh=mesh,
@@ -257,6 +269,7 @@ def compute_signed_interaction_integral(
         r_inner=r_inner,
         r_outer=r_outer,
         exclude_radius=exclude_radius,
+        exclude_element_mask=exclude_element_mask,
     )
     M_I, diag_I = _interaction_for_mode(mode="I", **common)
     M_II, diag_II = _interaction_for_mode(mode="II", **common)

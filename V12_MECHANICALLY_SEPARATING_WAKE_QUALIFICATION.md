@@ -162,3 +162,23 @@ active-tip/event-resolution, and overall geometry gates are PASS.
 Geometry and the three preliminary mechanics screens do not authorize production wiring,
 absolute-K evaluation, or voiding. Absolute KI remains NOT_RUN and the overall
 production prerequisite remains OPEN.
+
+## Prospective absolute-K criterion
+
+Before any V12 absolute-K result is generated, Stage I freezes criterion
+`v12_absolute_k_qualification_v1` in
+`arrhenius_fracture.absolute_k_criterion_v12`.  It uses the existing 5% mechanics
+budget, a 5% Mode-I symmetry bound, three geometry-only physical contours
+`(240,260)`, `(250,270)`, and `(260,280)` micrometres, and matched mesh levels
+12.5, 6.25, and 3.125 micrometres.  Those contours satisfy `r_inner/h_tip >= 8`,
+`(r_outer-r_inner)/r_inner <= 0.1`, and at least 15 micrometres of root,
+exterior, and patch clearance without reference to extracted K values.
+
+The fixed Williams stress basis contains K-I, K-II, and constant sigma-xx
+T-stress.  Its primary annulus is 75--175 micrometres; two predeclared radius
+variants measure sensitivity.  Missing checks fail closed.  A standard-integral
+failure may only receive the exact qualified-unavailable classification when
+the conforming control, primal mechanics, V3 transmission, global energy, and
+Williams gates pass.  Production may then continue only if the event-law audit
+proves absolute K is not consumed (or a separately qualified conforming tip
+source exists).
