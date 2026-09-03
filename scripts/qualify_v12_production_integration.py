@@ -20,7 +20,7 @@ def main():
  for gate,tests in GROUPS.items():
   p=subprocess.run([sys.executable,"-m","pytest","-q",*tests],cwd=ROOT,env=env,text=True,capture_output=True)
   checks[gate]=p.returncode==0
-  rows.append({"gate":gate,"passed":checks[gate],"returncode":p.returncode,"tests":" ".join(tests),"stdout_sha256":hashlib.sha256(p.stdout.encode()).hexdigest(),"stderr_sha256":hashlib.sha256(p.stderr.encode()).hexdigest()})
+  rows.append({"gate":gate,"passed":checks[gate],"returncode":p.returncode,"tests":" ".join(tests)})
  gates=qualify(checks); gates["V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED"]=prerequisite(gates)
  with (out/"qualification_matrix.csv").open("w",newline="") as f:
   w=csv.DictWriter(f,fieldnames=rows[0]);w.writeheader();w.writerows(rows)
