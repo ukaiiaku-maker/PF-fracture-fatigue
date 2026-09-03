@@ -7,6 +7,9 @@
     "artifact_present_frozen_configuration.json": true,
     "artifact_present_interval_causal_analysis.csv": true,
     "artifact_present_preflight_protocol_selection.json": true,
+    "artifact_present_second_seed_event_ledger.csv": true,
+    "artifact_present_second_seed_event_ledger.json": true,
+    "artifact_present_second_seed_replication.json": true,
     "artifact_present_trajectory_summary.json": true,
     "causal_decision_classification_reproducible": true,
     "dmd_poincare_disabled": true,
@@ -24,13 +27,21 @@
     "passivation_disabled": true,
     "reference_protocol_matches_mission": true,
     "restart_resume_forbidden_declared": true,
+    "second_seed_gate_4_pass": true,
+    "second_seed_ledger_matches_frozen_configuration": true,
+    "second_seed_ledger_matches_replicated_seed": true,
+    "second_seed_max_ratio_reproducible": true,
+    "second_seed_n_unique_intervals_reproducible": true,
+    "second_seed_threshold_untouched": true,
     "seed_is_1720": true,
     "topological_healing_disabled": true
   },
   "depends_on_gitignored_run_files": false,
   "details": {
     "recomputed_frozen_configuration_sha256": "afaaaa4ce2c9b69cfe65bfdc0887f1df19134d3a435bc7bb79affebcfe3113b0",
-    "saved_frozen_configuration_sha256": "afaaaa4ce2c9b69cfe65bfdc0887f1df19134d3a435bc7bb79affebcfe3113b0"
+    "saved_frozen_configuration_sha256": "afaaaa4ce2c9b69cfe65bfdc0887f1df19134d3a435bc7bb79affebcfe3113b0",
+    "second_seed_max_ratio_recomputed": 0.0435682773383182,
+    "second_seed_max_ratio_saved": 0.0435682773383182
   },
   "file_hashes": {
     "A_native_provenance.json": "6f4a81f46336c9c0a812ef886ac5ed81d8f245afbf76331c2ff1b67ae344268c",
@@ -40,6 +51,9 @@
     "frozen_configuration.json": "a78500e1803d1853a013dcbcabcc729eb051c9ae539aaa7fec19865d2ec4099f",
     "interval_causal_analysis.csv": "6c27b1d04ade6fcc48ad2576ad28f9d429a0168281da2a6422ab15eedd34c8d5",
     "preflight_protocol_selection.json": "36797bafa920a5ef10e9054652b3065024fb41ae5583ec8508e1eb3a10debc10",
+    "second_seed_event_ledger.csv": "c771b66373d3a71687c3938e86f6fec3ad76e9e82737e32aa469b71fe8be01fa",
+    "second_seed_event_ledger.json": "e47ed0b4203e2a9a0766703649f9c8f5aac5ea62116f9d3811b1004bd7e45f6c",
+    "second_seed_replication.json": "be0ecc32a8968e669ee5906117e4a07ce824b4862ff0f7da96dcd6cd5bc3f3b3",
     "trajectory_summary.json": "8d342dd50d989edfd8775e88f25e058d90d82f78bbd5e0b5eb77767b5b35505d"
   },
   "overall_pass": true,

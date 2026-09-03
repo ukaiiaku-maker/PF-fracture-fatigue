@@ -43,6 +43,9 @@ TRACKED_ARTIFACT_NAMES = [
     "trajectory_summary.json",
     "interval_causal_analysis.csv",
     "causal_decision.json",
+    "second_seed_event_ledger.json",
+    "second_seed_event_ledger.csv",
+    "second_seed_replication.json",
 ]
 
 
@@ -161,6 +164,46 @@ def main(argv: list[str] | None = None) -> int:
         "REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL",
         "HARD_GATE_FAILURE_SEE_GATES",
     )
+
+    # 4b. Re-derive the second-seed (1001723) replication's own ratios from
+    # ITS tracked, portable ledger (symmetric provenance to the primary
+    # seed -- also never touches any gitignored runs/... file) and compare
+    # against the committed second_seed_replication.json.
+    second_seed_ledger = json.loads((artifacts_dir / "second_seed_event_ledger.json").read_text())
+    saved_replication = json.loads((artifacts_dir / "second_seed_replication.json").read_text())
+    checks["second_seed_ledger_matches_frozen_configuration"] = (
+        second_seed_ledger["frozen_configuration_sha256"] == saved_frozen["frozen_configuration_sha256"]
+    )
+    checks["second_seed_ledger_matches_replicated_seed"] = (
+        second_seed_ledger["seed"] == saved_replication["seed"] == 1001723
+    )
+    s2 = second_seed_ledger["trajectories"]
+    s2_rows = analyze._matched_delay_rows(
+        s2["S2_C2R"], s2["S2_C3R"], "reversible"
+    ) + analyze._matched_delay_rows(s2["S2_C2P"], s2["S2_C3P"], "persistent")
+    s2_compression_rows = [r for r in s2_rows if r["contains_complete_negative_excursion"]]
+    s2_n_unique = len({r["interval_group_id"] for r in s2_compression_rows})
+    checks["second_seed_gate_4_pass"] = s2_n_unique >= 2
+    checks["second_seed_n_unique_intervals_reproducible"] = (
+        s2_n_unique == saved_replication["n_unique_compression_containing_intervals"]
+    )
+    s2_max_ratio = max((r["log10_ratio_abs_decade"] for r in s2_compression_rows), default=0.0)
+    checks["second_seed_max_ratio_reproducible"] = (
+        abs(
+            s2_max_ratio
+            - saved_replication["max_log10_ratio_abs_decade_in_compression_containing_intervals"]
+        )
+        < 1.0e-9
+    )
+    checks["second_seed_threshold_untouched"] = (
+        saved_replication["expansion_threshold_log10_decade"]
+        == pilot.EXPANSION_THRESHOLD_LOG10_DECADE
+        == 0.05
+    )
+    details["second_seed_max_ratio_recomputed"] = s2_max_ratio
+    details["second_seed_max_ratio_saved"] = saved_replication[
+        "max_log10_ratio_abs_decade_in_compression_containing_intervals"
+    ]
 
     # 5. No unauthorized activity: no DMD/Poincare, no passivation, no
     # topological healing, no resume.

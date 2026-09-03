@@ -478,6 +478,22 @@ unchanged. Result recorded at `artifacts/crack_rebonding_causal_pilot_v2/
 second_seed_replication.json`; raw run at
 `runs/crack_rebonding_causal_pilot_v2_seed1001723/` (gitignored).
 
+**Provenance symmetry (follow-up to review):** the second seed's evidence
+is now portable to the same standard as the primary seed.
+`scripts/build_v2_second_seed_event_ledger.py` extracts a tracked
+`second_seed_event_ledger.json`/`.csv` (28 event rows) from the raw
+`runs/crack_rebonding_causal_pilot_v2_seed1001723/trajectories.json`,
+pointing at the same `frozen_configuration_sha256` as the primary ledger
+(checked, not assumed) -- the barrier-floor/cooperative-saturation
+diagnostics are identical to the primary seed's own (same frozen config)
+and are not duplicated. `verify_v10_2_30_crack_rebonding_causal_pilot_v2.py`
+now also re-derives the second seed's `n_unique_compression_containing_
+intervals` and `max_log10_ratio_abs_decade_in_compression_containing_
+intervals` directly from this tracked ledger and confirms them against the
+committed `second_seed_replication.json` -- both reproduce exactly
+(`0.043568...` decades, bit-identical). The verifier depends on no
+gitignored run file for either seed.
+
 No further seeds, no multi-K Paris-slope matrix, and no threshold
 adjustment were made or are proposed as a result of this replication.
 
