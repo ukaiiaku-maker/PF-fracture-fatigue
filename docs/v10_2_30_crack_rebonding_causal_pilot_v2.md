@@ -237,10 +237,39 @@ the second) and preserve each test's original intent.
 
 ## 4. V2-C: protocol/compression-sampling preflight
 
-Pending. To be run against the real A_NATIVE engine via RB1
-(CONTACT_PROXY_ONLY, contact diagnostics only) at the mission's reference
-protocol before any frequency-escalation question is raised, per mission
-Section 9.
+`scripts/run_v2_rb1_compression_preflight.py` drives the real A_NATIVE
+engine through 8 accepted events via RB1 (CONTACT_PROXY_ONLY -- contact
+diagnostics only, `patch_Q` exactly zero, so this cannot perturb event
+timing) at the mission's reference protocol (T=300K, R=-0.95, Kmax=18
+MPa*sqrt(m), f=1000 Hz, mpz_n_bins=80, seed=1720), then independently (no
+engine-internal clock changes needed -- `FatigueWaveform.K_phase` is a pure
+function of continuous phase `2*pi*f*t` with no resets, confirmed in
+`fatigue_v1.py`) evaluates the signed K(t) waveform each event-created
+patch actually sees between its creation and the next event, using only the
+physically-summed `kinetic_dt_consumed_s` cumulative time each block
+already reports.
+
+**Result** (`artifacts/crack_rebonding_causal_pilot_v2/
+preflight_protocol_selection.json`): of 7 post-first-event intervals,
+**2 contain a complete negative-K (compressive) excursion** (event
+0->1: 5.76 cycles elapsed, 2.95 ms of negative dwell; event 2->3: 6.31
+cycles elapsed, 2.95 ms of negative dwell) -- exactly meeting the mission's
+"at least two" bar. Inter-event spacing under RB1 ranges from 0.06 to 62
+cycles (highly variable, stochastic), unlike v1's DBTT test-fixture
+candidate, whose native hazard fired every event within a small fraction of
+one cycle. **This refutes v1's documented defect #2 as a property of the
+real A_NATIVE material/protocol combination** -- it was an artifact of the
+v1 pilot's actual use of the (undocumented, out-of-scope) DBTT test-fixture
+candidate rather than the true A_NATIVE row (see Section 2: the v1 pilot's
+`build_engine` was `tests/_crack_rebonding_engine_fixture.py::
+build_real_engine`, which unconditionally loads
+`load_manifest(candidate_id="DBTT_A0003837")`, never A_NATIVE, and uses
+`mpz_n_bins=8`, not 80).
+
+**Status: `REFERENCE_PROTOCOL_SAMPLES_COMPRESSION`.** No frequency
+escalation (mission Section 9's option A/B choice) is needed -- the
+reference protocol is frozen as-is: T=300K, R=-0.95, Kmax=18 MPa*sqrt(m),
+f=1000 Hz, mpz_n_bins=80, seed=1720.
 
 ## 5. V2-D: corrected 8-case pilot, zero-cohesion controls, decision
 
