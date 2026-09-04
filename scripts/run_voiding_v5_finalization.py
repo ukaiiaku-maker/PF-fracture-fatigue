@@ -271,7 +271,7 @@ def topology_matrices():
                          "restored_exactly": before == complete_accepted_state_fingerprint(accepted), "status": "PASS" if error == "injected:" + stage else "FAIL"})
     restart = []
     for index, stage in enumerate(("incomplete_first_hit", "between_birth_hits", "embryo", "stable_subgrid", "before_promotion", "after_promotion", "before_ligament", "connected_before_downstream", "downstream_before_continued")):
-        path = OUT / f"restart-{index}.json"
+        path = Path("/private/tmp") / f"voiding-v5-restart-{SOURCE_SHA[:12]}-{index}.json"
         write_checkpoint(final, path); restored = restore_checkpoint(path)
         restart.append({"case_id": f"RESTART-{index:02d}", "stage": stage,
                         "fingerprints_equal": complete_accepted_state_fingerprint(final) == complete_accepted_state_fingerprint(restored), "status": "PASS"})
