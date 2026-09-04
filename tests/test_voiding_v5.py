@@ -6,7 +6,7 @@ import pytest
 
 from arrhenius_fracture.voiding_production_v5 import (
     _complete_next_clock, build_production_void_state,
-    deterministic_trajectory, natural_trajectory,
+    deterministic_trajectory, ligament_transaction, natural_trajectory,
 )
 from arrhenius_fracture.directional_competition_v11 import (
     DirectionalCompetitionState, DirectionalHazardState, tungsten_cleavage_candidates,
@@ -151,3 +151,42 @@ def test_zero_rate_candidate_keeps_residual_while_peer_wins():
     loser = next(index for index, item in enumerate(audit) if not item["winner"])
     assert audit[loser]["rate_s"] == 0.0
     assert advanced.competition.hazard_states[loser].action == 0.0
+
+
+@pytest.mark.parametrize("stage", [
+    "cavity_phase_update",
+    "length_ledger_update:fractured_ligament_length_m",
+    "length_ledger_update:active_front_coordinate_advance_m",
+    "connected_surface_certification",
+])
+def test_connection_phase_surface_and_ledgers_rollback_atomically(stage):
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+    before = complete_accepted_state_fingerprint(accepted)
+    with pytest.raises(RuntimeError, match="injected:" + stage):
+        ligament_transaction(accepted, failure_stage=stage)
+    assert complete_accepted_state_fingerprint(accepted) == before
+
+
+def test_growth_uses_drive_magnitude_inventory_and_configured_shrinkage():
+    cfg = VoidingConfig(enabled=True)
+    cavity = Cavity2D("v", "s", (0.0, 0.0), 1.0e-6, math.pi * 1.0e-12,
+                      math.pi * 1.0e-12, VoidPhase.STABLE_SUBGRID_VOID)
+    rates = {"series_limited_growth_s": 1.0}
+    low = grow_cavity_from_rate(cavity, rates=rates, dt_s=1.0,
+                                radial_growth_scale_m=1.0e-8,
+                                chemical_potential_drive_J=1.0e-21)
+    high = grow_cavity_from_rate(cavity, rates=rates, dt_s=1.0,
+                                 radial_growth_scale_m=1.0e-8,
+                                 chemical_potential_drive_J=2.0e-21)
+    exhausted = grow_cavity_from_rate(cavity, rates=rates, dt_s=1.0,
+                                      radial_growth_scale_m=1.0e-8,
+                                      chemical_potential_drive_J=2.0e-21,
+                                      available_inventory_area_m2=0.0)
+    shrink = grow_cavity_from_rate(cavity, rates=rates, dt_s=1.0,
+                                   radial_growth_scale_m=1.0e-8,
+                                   chemical_potential_drive_J=-1.0e-20,
+                                   shrinkage_mobility_m_per_J_s=2.0e8)
+    assert high.radius_m - cavity.radius_m == pytest.approx(2.0 * (low.radius_m - cavity.radius_m))
+    assert exhausted.radius_m == cavity.radius_m
+    assert shrink.radius_m < cavity.radius_m
