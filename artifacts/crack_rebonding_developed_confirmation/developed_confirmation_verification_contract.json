@@ -1,0 +1,54 @@
+{
+  "schema": "v10.2.30_crack_rebonding_developed_confirmation_verification_contract_v1",
+  "written_before_any_result_path_exists": true,
+  "purpose": "binding checklist a strict, independently-re-deriving verifier script must satisfy before this campaign's terminal classification (Section F) can be accepted as hardened",
+
+  "provenance_checks": [
+    "rebuild the bare A_NATIVE engine via arrhenius_fracture.a_native_engine_v10230.build_a_native_engine and independently reproduce complete_row_sha256 == 04518e244b7a446a120ea6e2d15a68758cb54a225d099609deeb23da32679971",
+    "reload artifacts/crack_rebonding_causal_pilot_v2/frozen_configuration.json and reproduce CrackRebondingControls(**configs['RB2_reversible_zero']).config_hash() == f08635f9f5d6b18be8288180ee7ced0dbd03a45ee0ca2b6d1868a2239c715caa",
+    "reload the same file and reproduce CrackRebondingControls(**configs['RB2_reversible_finite']).config_hash() == 271f45981545cf80d9d96c14138d9d9c6235b3f1bba20635d8e993e568d76fd2",
+    "confirm every trajectory record's reloaded config matches these two hashes exactly (no silent drift)",
+    "confirm dmd_poincare_acceleration_enabled == false in every reloaded config used"
+  ],
+
+  "trajectory_integrity_checks": [
+    "every trajectory record shows a virgin start (no resume/restart token, restart_resume_forbidden == true)",
+    "for each of the 3 (seed, Kmax) pairs: hazard_threshold_action sequences are IDENTICAL element-by-element between the zero and finite trajectory of that pair (hard failure if not)",
+    "for each accepted event: all_bulk_action_qualified is true, OR its absence is explicitly reported and justified (never silently dropped)",
+    "censored trajectories are flagged censored=true and EXCLUDED from developed/stationarity pass-fail and from Stage-2 gating (never coerced to da/dN=0)",
+    "action path used is exclusively the certified phase-resolved path (no dmd/projective/Poincare shortcut instrumentation present)"
+  ],
+
+  "developed_stationarity_gate_checks": [
+    "re-derive developed_interval, stability_early_interval, stability_late_interval, late_to_early_rate_ratio, and stable_growth_provisional from the tracked event ledger ONLY (never from a gitignored runs/ directory), using EXACTLY the field mapping and constants recorded in developed_confirmation_frozen_protocol.json's developed_growth_and_stationarity_gate block (development_extension_um=20.0, target_extension_um=100.0, stability_window_um=50.0)",
+    "confirm the re-derived stable_growth_provisional boolean matches the committed analysis output's value for all 6 (Stage 1) or 12 (Stage 1+2) trajectories",
+    "confirm the stability_definition string stored in every analysis output matches 'at_least_10_events_and_50um_developed_growth_and_late_to_early_cumulative_rate_ratio_between_0p5_and_2' verbatim (proof the gate was not silently altered)"
+  ],
+
+  "analysis_recomputation_checks": [
+    "re-derive production developed_da_dN (m/cycle) for every uncensored trajectory strictly from tracked ledger fields",
+    "re-derive all-event, post-first-event, final-half (indices 9-17), and final-six (indices 12-17) window rates for the actual per-trajectory event count",
+    "re-derive S_h(K) for every window at every Kmax as the length/time rate ratio (not assumed via the waiting-time simplification unless the accepted-length identity check is present and passes in the committed output)",
+    "re-derive 3-point least-squares delta_m, the 15->18 and 18->21 secants, and endpoint curvature for the production developed window and for the final-half window",
+    "re-derive unconditional AND conditional (nonzero-event) action-weighted K_rebond means plus the nonzero-event fraction, per trajectory and pooled",
+    "re-derive S_abs(K) and S_occupancy(K) = S_h(K) - S_abs(K) using the pooled developed K_b and the frozen developed_confirmation_predictions.json interpolation/local-power-law rule actually used, and confirm S_occupancy is reported as a residual, never fit as its own law"
+  ],
+
+  "classification_exact_match_checks": [
+    "re-run the Section F classification function against the re-derived delta_m/S_h/censorship values",
+    "round-trip both the freshly re-derived classification dict and the committed classification dict through json.loads(json.dumps(..., sort_keys=True)) before comparing, to eliminate int/string key false positives",
+    "require EXACT dict equality between the two round-tripped dicts (not membership-in-allowed-set)",
+    "if Stage 2 was not authorized (gate failed), confirm the committed record shows the STOP path was taken and no seed-1001723 trajectory files exist anywhere under the tracked ledger or artifacts tree"
+  ],
+
+  "portability_checks": [
+    "every value the verifier checks is re-derived from files committed to this branch (artifacts/crack_rebonding_developed_confirmation/event_ledger.json or equivalent, plus the frozen protocol/predictions/registry files) -- the verifier must run correctly even if /private/tmp/v10230-crack-rebonding-developed-confirmation and all gitignored runs/ output are deleted"
+  ],
+
+  "test_and_hygiene_checks": [
+    "py_compile every new/modified .py file",
+    "pytest tests/ -k crack_rebonding -q passes with no regressions against the pre-campaign baseline (183 passed at the time this contract was written)",
+    "git diff --check reports no whitespace errors",
+    "git status --short is clean after the final commit"
+  ]
+}

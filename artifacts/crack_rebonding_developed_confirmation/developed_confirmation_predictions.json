@@ -1,0 +1,58 @@
+{
+  "schema": "v10.2.30_crack_rebonding_developed_confirmation_frozen_predictions_v1",
+  "written_before_any_result_path_exists": true,
+  "note": "these are FROZEN ANALYTICAL (single-patch) predictions carried forward VERBATIM from artifacts/crack_rebonding_minimal_slope_screen_v1/frozen_predictions.json. They are stored here so Section C/D can compare against them WITHOUT ever substituting them for measured trajectory-integrated A_on/A_off -- the frozen values and the measured values are archived as two separate fields in every downstream analysis output.",
+  "source_file": "artifacts/crack_rebonding_minimal_slope_screen_v1/frozen_predictions.json",
+  "source_parent_frozen_configuration_sha256": "afaaaa4ce2c9b69cfe65bfdc0887f1df19134d3a435bc7bb79affebcfe3113b0",
+  "config_hashes_reused_verbatim": {
+    "RB2_reversible_finite": "271f45981545cf80d9d96c14138d9d9c6235b3f1bba20635d8e993e568d76fd2"
+  },
+  "material": {
+    "Eprime_Pa": 444444444444.44446,
+    "reference_contact_radius_m": 1e-06
+  },
+  "kmax_grid_Pa_sqrt_m": [15000000.0, 18000000.0, 21000000.0],
+  "no_rescaling_note": "no barrier re-inversion, no activation-volume search, no Pi_K rescaling at the new loads -- every kinetics/cohesion parameter is held fixed at its Kmax=18 calibrated value; Pi_K = K_rebond_max/Kmax varies naturally with Kmax",
+  "reversible_frozen_predictions": [
+    {
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "A_on": 0.9352429002561812,
+      "A_off": 0.9999999999992888,
+      "P_survive": 0.22349024877974571,
+      "p_B_star": 0.26120549996854103,
+      "K_rebond_max_Pa_sqrt_m": 900000.0,
+      "K_rebond_predicted_Pa_sqrt_m": 235084.94997168693,
+      "Pi_K_at_this_load": 0.06
+    },
+    {
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "A_on": 0.9999999995795651,
+      "A_off": 0.9999999999992888,
+      "P_survive": 0.23254415787809532,
+      "p_B_star": 0.2689414213221087,
+      "K_rebond_max_Pa_sqrt_m": 900000.0,
+      "K_rebond_predicted_Pa_sqrt_m": 242047.27918989782,
+      "Pi_K_at_this_load": 0.05
+    },
+    {
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "A_on": 1.0416549124465753,
+      "A_off": 0.9999999999992888,
+      "P_survive": 0.2380657384663088,
+      "p_B_star": 0.2735801967997558,
+      "K_rebond_max_Pa_sqrt_m": 900000.0,
+      "K_rebond_predicted_Pa_sqrt_m": 246222.17711978024,
+      "Pi_K_at_this_load": 0.04285714285714286
+    }
+  ],
+  "S_h_pred_note": "S_h_pred is not defined from single-patch A_on/A_off alone (S_h is a population/rate-ratio quantity from the real engine's cleavage hazard, not the single-patch bonded-fraction model); p_B_star and K_rebond_predicted are the frozen prospective diagnostics available for comparison against measured action-weighted K_rebond and measured pre-event p_B in Section C/D.",
+  "measured_vs_frozen_comparison_fields_required": [
+    "actual_trajectory_integrated_A_on (measured, per trajectory)",
+    "actual_trajectory_integrated_A_off (measured, per trajectory)",
+    "frozen_A_on (this file, for reference only)",
+    "frozen_A_off (this file, for reference only)",
+    "measured_action_weighted_K_rebond_unconditional_mean",
+    "measured_action_weighted_K_rebond_conditional_mean",
+    "frozen_K_rebond_predicted_Pa_sqrt_m (this file, for reference only)"
+  ]
+}
