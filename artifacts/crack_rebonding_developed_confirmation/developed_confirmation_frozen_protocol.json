@@ -149,10 +149,10 @@
   },
 
   "windows_final_half_and_final_six": {
-    "definition_basis": "event INDEX windows over the reused ~18-event developed target (distinct from the extension-based developed/stationarity gate above, which is authoritative for pass/fail)",
-    "final_half_event_indices_1_based": [9, 10, 11, 12, 13, 14, 15, 16, 17],
-    "final_six_event_indices_1_based": [12, 13, 14, 15, 16, 17],
-    "note": "indices assume an 18-event trajectory (events 1..18); if a trajectory's actual accepted-event count differs, the same relative windows (last 9 of 18 → final-half; last 6 of 18 → final-six) are computed against the ACTUAL final event count, recorded explicitly in the analysis output alongside the nominal target, per Section C's requirement to report numerical uncertainty"
+    "definition_basis": "event INDEX windows over the reused ~18-event developed target, using the SAME 0-based event_index convention run_trajectory already assigns (events[0]['event_index']==0, i.e. len(events) at append time before the append) -- distinct from the extension-based developed/stationarity gate above, which is authoritative for pass/fail",
+    "final_half_event_indices_0_based": [9, 10, 11, 12, 13, 14, 15, 16, 17],
+    "final_six_event_indices_0_based": [12, 13, 14, 15, 16, 17],
+    "note": "these are the literal event_index values for an 18-event trajectory (event_index runs 0..17); if a trajectory's actual accepted-event count N differs from 18, the same RELATIVE windows (last 9 of N -> final-half; last 6 of N -> final-six) are recomputed against the ACTUAL final event_index range and recorded explicitly in the analysis output alongside the nominal target, per Section C's requirement to report numerical uncertainty"
   },
 
   "rate_shift_statistic": {
