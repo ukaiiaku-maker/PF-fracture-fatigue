@@ -111,6 +111,7 @@ def observables(state, operation):
         "cavity_area_m2": None if cavity is None else cavity.area_m2,
         "inventory_area_m2": None if cavity is None else cavity.inventory_area_m2,
         "void_event_history": [] if state.void_state is None else list(state.void_state.event_history),
+        "length_ledgers": {} if state.void_state is None else dict(state.void_state.length_ledgers),
         "event_counters": dict(state.event_counters),
         "mesh_minimum_quality": float(np.min(quality)),
         "mesh_maximum_aspect_ratio": float(np.max(side, axis=1).max() / max(np.min(side), 1.0e-300)),
@@ -312,9 +313,17 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     )
     if not result.accepted: raise RuntimeError("ligament event rejected")
     connected = replace(cavity, phase=VoidPhase.CONNECTED_VOID, lineage=cavity.lineage + ("CRACK_TO_VOID_LIGAMENT",))
+    ledgers = dict(result.state.void_state.length_ledgers)
+    ligament_length = math.dist(start, end)
+    ledgers["fractured_ligament_length_m"] += ligament_length
+    ledgers["projected_fractured_length_m"] += end[0] - start[0]
+    ledgers["preexisting_void_free_span_m"] += 2.0 * cavity.radius_m
+    ledgers["projected_free_span_m"] += 2.0 * cavity.radius_m
+    ledgers["connected_free_surface_extent_m"] += math.pi * cavity.radius_m
     void_state = replace(
         replace_cavity(result.state.void_state, connected),
         event_history=result.state.void_state.event_history + ({"event": "CRACK_TO_VOID_LIGAMENT"},),
+        length_ledgers=ledgers,
     )
     return replace(result.state, void_state=void_state), result
 
@@ -378,9 +387,16 @@ def downstream_front_transaction(state, *, continuation=False):
     cavity = result.state.void_state.cavities[0]
     phase = VoidPhase.DOWNSTREAM_FRONT_ACTIVE
     updated = replace(cavity, phase=phase, lineage=cavity.lineage + (("CONTINUED_EVENT" if continuation else "DOWNSTREAM_FIRST_PASSAGE"),))
+    ledgers = dict(result.state.void_state.length_ledgers)
+    advance = math.dist(start, end)
+    ledgers["ordinary_crack_fractured_length_m"] += advance
+    ledgers["active_front_coordinate_advance_m"] += advance
+    ledgers["projected_fractured_length_m"] += end[0] - start[0]
+    ledgers["projected_front_advance_m"] += end[0] - start[0]
     void_state = replace(
         replace_cavity(result.state.void_state, updated),
         event_history=result.state.void_state.event_history + ({"event": "CONTINUED_ACCEPTED_EVENT" if continuation else "DOWNSTREAM_FIRST_PASSAGE"},),
+        length_ledgers=ledgers,
     )
     return replace(result.state, void_state=void_state), result, operations, {
         "tensor_Pa": tensor.tolist(), "boundary_element_ids": boundary_elements,

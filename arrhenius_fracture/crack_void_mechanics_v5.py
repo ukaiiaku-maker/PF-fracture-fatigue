@@ -17,7 +17,9 @@ SCHEMA = "v12.crack-void-static/5"
 
 def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e-5,
                           boundary_segments=32, radial_layers=12, tip_layer=3,
-                          opening_m=4.0e-7, crack_enabled=True, cavity_enabled=True) -> dict[str, Any]:
+                          opening_m=4.0e-7, crack_enabled=True, cavity_enabled=True,
+                          ligament_ratio: float | None = None,
+                          crack_orientation_deg: float = 0.0) -> dict[str, Any]:
     hole = build_explicit_hole_mesh(
         1.0e-3, 1.0e-3, cavity_center_m, cavity_radius_m,
         5.0e-5, boundary_segments, radial_layers_override=radial_layers,
@@ -30,9 +32,18 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
     network = None
     if crack_enabled:
         ntheta = boundary_segments
-        ray_index = ntheta // 2
-        outer = radial_layers * ntheta + ray_index
-        tip = max(1, min(int(tip_layer), radial_layers - 1)) * ntheta + ray_index
+        angle = math.radians(180.0 + float(crack_orientation_deg))
+        direction = np.array((math.cos(angle), math.sin(angle)))
+        if ligament_ratio is None:
+            ray_index = ntheta // 2
+            outer = radial_layers * ntheta + ray_index
+            tip = max(1, min(int(tip_layer), radial_layers - 1)) * ntheta + ray_index
+        else:
+            center = np.asarray(cavity_center_m, dtype=float)
+            desired_tip = center + direction * cavity_radius_m * (1.0 + float(ligament_ratio))
+            desired_outer = center + direction * max(4.0 * cavity_radius_m, cavity_radius_m * (2.0 + float(ligament_ratio)))
+            tip = int(np.argmin(np.linalg.norm(hole.mesh.nodes - desired_tip, axis=1)))
+            outer = int(np.argmin(np.linalg.norm(hole.mesh.nodes - desired_outer, axis=1)))
         start_xy = tuple(map(float, hole.mesh.nodes[outer]))
         tip_xy = tuple(map(float, hole.mesh.nodes[tip]))
         network = CrackNetworkState.one_tip((start_xy, tip_xy))
@@ -66,6 +77,8 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
             "cavity_center_m": list(cavity_center_m), "cavity_radius_m": cavity_radius_m,
             "boundary_segments": boundary_segments, "radial_layers": radial_layers,
             "tip_layer": tip_layer, "opening_m": opening_m,
+            "ligament_ratio_requested": ligament_ratio,
+            "crack_orientation_deg": crack_orientation_deg,
             "crack_enabled": crack_enabled, "cavity_enabled": cavity_enabled,
             "support_selection": "exact_v12_only", "centroid_band_fallback": False,
         },
@@ -91,4 +104,3 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
         },
         "support_audit": None if support_audit is None else asdict(support_audit),
     }
-
