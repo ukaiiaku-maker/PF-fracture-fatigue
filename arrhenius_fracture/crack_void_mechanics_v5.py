@@ -41,9 +41,10 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
         else:
             center = np.asarray(cavity_center_m, dtype=float)
             desired_tip = center + direction * cavity_radius_m * (1.0 + float(ligament_ratio))
-            desired_outer = center + direction * max(4.0 * cavity_radius_m, cavity_radius_m * (2.0 + float(ligament_ratio)))
-            tip = int(np.argmin(np.linalg.norm(hole.mesh.nodes - desired_tip, axis=1)))
-            outer = int(np.argmin(np.linalg.norm(hole.mesh.nodes - desired_outer, axis=1)))
+            ray_index = int(round(((180.0 + float(crack_orientation_deg)) % 360.0) / 360.0 * ntheta)) % ntheta
+            ray_nodes = np.arange(radial_layers + 1) * ntheta + ray_index
+            tip = int(ray_nodes[np.argmin(np.linalg.norm(hole.mesh.nodes[ray_nodes] - desired_tip, axis=1))])
+            outer = int(radial_layers * ntheta + ray_index)
         start_xy = tuple(map(float, hole.mesh.nodes[outer]))
         tip_xy = tuple(map(float, hole.mesh.nodes[tip]))
         network = CrackNetworkState.one_tip((start_xy, tip_xy))
