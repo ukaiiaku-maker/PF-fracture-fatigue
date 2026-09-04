@@ -453,11 +453,25 @@ def run_trajectory(
     min_accepted_events_for_uncensored: int = MIN_ACCEPTED_EVENTS_FOR_UNCENSORED,
     max_blocks_per_event: int = MAX_BLOCKS_PER_EVENT,
     max_wall_seconds: float = MAX_WALL_SECONDS_PER_TRAJECTORY,
+    hazard_rng_seed: int = SEED,
 ) -> dict[str, Any]:
     """Drive one fresh, unresumed trajectory in-process via the real
     A_NATIVE production engine's own cycle_step_waveform/
     commit_energy_gated_event (never through the mesh-dependent CLI
-    backend)."""
+    backend).
+
+    ``hazard_rng_seed`` is reporting-only (the actual hazard RNG seed is
+    set by the caller via ``Engine.configure_hazard(seed=...)`` before
+    ``build_engine``/``reset_engine_registry`` run -- this function never
+    touches RNG state itself); it is recorded verbatim in the returned
+    dict's ``"seed"`` field so a caller driving multiple seeds through
+    this same function gets an honest per-trajectory label instead of the
+    module constant ``SEED`` regardless of which seed was actually used
+    (a mislabeling caught, and fixed here, while completing the minimal
+    slope screen's exposure-unconditioned trajectory -- harmless in every
+    prior use since no gate or comparison ever read this field, but
+    corrected for provenance honesty going forward).
+    """
     if reset_engine_registry is not None:
         reset_engine_registry()
     engine, manifest_audit = build_engine(rebonding_cfg)
@@ -633,7 +647,7 @@ def run_trajectory(
             rebonding_cfg.restored_work_of_separation_J_m2 if rebonding_cfg is not None else 0.0
         ),
         "manifest_audit": manifest_audit,
-        "seed": SEED,
+        "seed": hazard_rng_seed,
         "events": events,
         "post_first_event_intervals": intervals,
         "n_accepted_events": len(events),

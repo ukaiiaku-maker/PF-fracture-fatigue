@@ -1,0 +1,39 @@
+{
+  "checks": {
+    "S_h_K15MPa_seed1001723_reproducible": true,
+    "S_h_K15MPa_seed1720_reproducible": true,
+    "S_h_K18MPa_seed1001723_reproducible": true,
+    "S_h_K18MPa_seed1720_reproducible": true,
+    "S_h_K21MPa_seed1001723_reproducible": true,
+    "S_h_K21MPa_seed1720_reproducible": true,
+    "artifact_present_completion_record.json": true,
+    "artifact_present_event_ledger.csv": true,
+    "artifact_present_event_ledger.json": true,
+    "artifact_present_partial_analysis.json": true,
+    "artifact_present_slope_exposure_continuation_decision.json": true,
+    "completion_Kmax_is_21": true,
+    "completion_config_hash_matches": true,
+    "completion_is_exposure_unconditioned_labeled": true,
+    "completion_matches_parent_frozen_config": true,
+    "completion_seed_is_1001723": true,
+    "delta_m_seed_1001723_reproducible": true,
+    "delta_m_seed_1720_reproducible": true,
+    "multi_K_paris_slope_campaign_not_authorized": true,
+    "overall_classification_reproducible": true,
+    "parent_frozen_configuration_reproducible": true,
+    "part_x_not_authorized": true,
+    "production_merge_not_authorized": true
+  },
+  "depends_on_gitignored_run_files": false,
+  "details": {},
+  "file_hashes": {
+    "completion_record.json": "4538b515711cfe90a9a60a6b6d51f95b07f0d3755bba4b05f1fad567462d829d",
+    "event_ledger.csv": "e9fdefc8b83634ae1e79cb9cb489f158f98b6b23976330e61f2654c9d3e64148",
+    "event_ledger.json": "09cabe6612dea652dc27defd0178b659a34a13b5e5c4e11c3f43acaefb12bb9a",
+    "partial_analysis.json": "1eb39c52592cd7a29ed4cdbc0eb9109799ccd46779fb63ece8bbf89c9283c447",
+    "slope_exposure_continuation_decision.json": "437cea7c824a2b43739c42878ba9acacf06a43e9e9a12d65cfe38efb30dd1449"
+  },
+  "overall_pass": true,
+  "saved_overall_classification": "REBONDING_STEEPENS_LOCAL_RESPONSE",
+  "schema": "v10.2.30_crack_rebonding_slope_exposure_continuation_verification_v1"
+}

@@ -1,0 +1,170 @@
+{
+  "classification_analysis": {
+    "classification": "REBONDING_STEEPENS_LOCAL_RESPONSE",
+    "complete_excursion_count_by_seed_at_Kmax_hi": {
+      "1720": 2,
+      "1001723": 0
+    },
+    "delta_m_abs_difference": 0.013598527192710819,
+    "delta_m_by_seed": {
+      "1720": 0.6849483706845445,
+      "1001723": 0.6713498434918337
+    },
+    "endpoint_span_S_h_by_seed_decade": {
+      "1720": 0.0984866936175641,
+      "1001723": 0.09652743368544493
+    },
+    "high_K_difference_traced_to_exposure_disparity": false,
+    "seeds": [
+      1720,
+      1001723
+    ],
+    "seeds_differ_a_lot": false,
+    "seeds_disagree_in_sign": false
+  },
+  "exposure_records": {
+    "K15MPa_seed1001723": {
+      "finite_cohesion": {
+        "n_intervals_complete_excursion": 1,
+        "n_intervals_partial_excursion": 5,
+        "total_negative_K_contact_time_s": 0.16177008312370666
+      },
+      "zero_cohesion": {
+        "n_intervals_complete_excursion": 2,
+        "n_intervals_partial_excursion": 4,
+        "total_negative_K_contact_time_s": 0.12114568027405634
+      }
+    },
+    "K15MPa_seed1720": {
+      "finite_cohesion": {
+        "n_intervals_complete_excursion": 2,
+        "n_intervals_partial_excursion": 4,
+        "total_negative_K_contact_time_s": 0.13395988039757298
+      },
+      "zero_cohesion": {
+        "n_intervals_complete_excursion": 2,
+        "n_intervals_partial_excursion": 3,
+        "total_negative_K_contact_time_s": 0.1001480368267092
+      }
+    },
+    "K18MPa_seed1001723": {
+      "finite_cohesion": {
+        "n_intervals_complete_excursion": 2,
+        "n_intervals_partial_excursion": 4,
+        "total_negative_K_contact_time_s": 0.09244234737082678
+      },
+      "zero_cohesion": {
+        "n_intervals_complete_excursion": 2,
+        "n_intervals_partial_excursion": 4,
+        "total_negative_K_contact_time_s": 0.08377445999708066
+      }
+    },
+    "K18MPa_seed1720": {
+      "finite_cohesion": {
+        "n_intervals_complete_excursion": 2,
+        "n_intervals_partial_excursion": 4,
+        "total_negative_K_contact_time_s": 0.07675674292838244
+      },
+      "zero_cohesion": {
+        "n_intervals_complete_excursion": 2,
+        "n_intervals_partial_excursion": 3,
+        "total_negative_K_contact_time_s": 0.0693757371865106
+      }
+    },
+    "K21MPa_seed1001723": {
+      "finite_cohesion": {
+        "n_intervals_complete_excursion": 0,
+        "n_intervals_partial_excursion": 6,
+        "total_negative_K_contact_time_s": 0.07603691273411867
+      },
+      "zero_cohesion": {
+        "n_intervals_complete_excursion": 1,
+        "n_intervals_partial_excursion": 5,
+        "total_negative_K_contact_time_s": 0.07143415037355356
+      }
+    },
+    "K21MPa_seed1720": {
+      "finite_cohesion": {
+        "n_intervals_complete_excursion": 2,
+        "n_intervals_partial_excursion": 3,
+        "total_negative_K_contact_time_s": 0.06281279911366049
+      },
+      "zero_cohesion": {
+        "n_intervals_complete_excursion": 5,
+        "n_intervals_partial_excursion": 0,
+        "total_negative_K_contact_time_s": 0.05901617937510853
+      }
+    }
+  },
+  "kmax_grid_Pa_sqrt_m": [
+    15000000.0,
+    18000000.0,
+    21000000.0
+  ],
+  "multi_K_paris_slope_campaign_authorized": false,
+  "overall_classification": "REBONDING_STEEPENS_LOCAL_RESPONSE",
+  "part_x_authorized": false,
+  "per_seed_slope_fit": {
+    "1001723": {
+      "S_h_by_Kmax": {
+        "15000000": -0.12265014507484188,
+        "18000000": -0.04205123512964494,
+        "21000000": -0.026122711389396956
+      },
+      "delta_m_least_squares": 0.6713498434918337,
+      "secant_15_to_18": 1.0179040362249308,
+      "secant_18_to_21": 0.23792811915456324
+    },
+    "1720": {
+      "S_h_by_Kmax": {
+        "15000000": -0.1250073164711856,
+        "18000000": -0.04284634266222075,
+        "21000000": -0.026520622853621504
+      },
+      "delta_m_least_squares": 0.6849483706845445,
+      "secant_15_to_18": 1.0376317361758556,
+      "secant_18_to_21": 0.2438611305886117
+    }
+  },
+  "production_line_merge_authorized": false,
+  "rate_shifts": {
+    "K15MPa_seed1001723": {
+      "S_h_decade": -0.12265014507484188,
+      "accepted_lengths_identical": true,
+      "g_finite_m_per_s": 0.00010420612113419812,
+      "g_zero_m_per_s": 0.00013821124386395348
+    },
+    "K15MPa_seed1720": {
+      "S_h_decade": -0.1250073164711856,
+      "accepted_lengths_identical": true,
+      "g_finite_m_per_s": 0.00012792006900416554,
+      "g_zero_m_per_s": 0.00017058702744176358
+    },
+    "K18MPa_seed1001723": {
+      "S_h_decade": -0.04205123512964494,
+      "accepted_lengths_identical": true,
+      "g_finite_m_per_s": 0.0001811794690684352,
+      "g_zero_m_per_s": 0.00019959985331434308
+    },
+    "K18MPa_seed1720": {
+      "S_h_decade": -0.04284634266222075,
+      "accepted_lengths_identical": true,
+      "g_finite_m_per_s": 0.00022321146665015172,
+      "g_zero_m_per_s": 0.00024635582969082984
+    },
+    "K21MPa_seed1001723": {
+      "S_h_decade": -0.026122711389396956,
+      "accepted_lengths_identical": true,
+      "g_finite_m_per_s": 0.00022071110098502038,
+      "g_zero_m_per_s": 0.00023439421487061175
+    },
+    "K21MPa_seed1720": {
+      "S_h_decade": -0.026520622853621504,
+      "accepted_lengths_identical": true,
+      "g_finite_m_per_s": 0.0002721628798265916,
+      "g_zero_m_per_s": 0.000289300720017266
+    }
+  },
+  "schema": "v10.2.30_crack_rebonding_slope_exposure_continuation_decision_v1",
+  "status": "COMPLETE"
+}

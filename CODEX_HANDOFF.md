@@ -501,10 +501,66 @@ slope_screen_decision.json`.
 None. The screen ran to its own defined stopping point; no workers
 running.
 
-### Remaining scope (unauthorized, not attempted, by this worktree)
+### Remaining scope (unauthorized, not attempted, by that worktree)
 
 Any next step at this Kmax grid or beyond (additional seeds at Kmax=21,
 a different Kmax upper bound, or a frequency ablation per V2-C's original
 Option A/B framing) is new physics requiring its own separate
 authorization. The full multi-K/R/frequency/dwell/passivation Part X
 campaign and any production-line merge remain unauthorized regardless.
+
+---
+
+## 16. v10.2.30 crack-rebonding slope-exposure continuation (THIS worktree)
+
+Branch `codex/v10.2.30-crack-rebonding-slope-exposure-continuation`,
+created from the minimal slope screen's own `c742722` (preserved
+unchanged, untouched by this worktree). Full writeup:
+`docs/v10_2_30_crack_rebonding_slope_exposure_continuation.md`.
+
+### Status: COMPLETE
+
+Per review: the screen's exposure gate correctly stopped it, but reduced
+compression exposure at high Kmax may itself be part of the physical
+effect under study, so the missing finite-cohesion twin
+(Kmax=21, seed=1001723) was run WITHOUT that gate
+(`EXPOSURE_UNCONDITIONED_COMPLETION`), reusing the exact frozen
+configuration verbatim (hash-checked). Completed uncensored, 7 events;
+0 complete + 6 partial compression intervals (less complete exposure than
+its own zero-cohesion twin -- a real coupled-feedback effect, not an
+error).
+
+**Result: all three Kmax points now available for both seeds, and
+`|S_h|` falls monotonically with Kmax for both** (seed 1720:
+-0.1250/-0.0428/-0.0265; seed 1001723: -0.1227/-0.0421/-0.0261 decade at
+Kmax=15/18/21). Three-point least-squares `delta_m`: **0.6849** (seed
+1720), **0.6713** (seed 1001723) -- both clear the 0.25 steepening gate by
+~3x, agreeing to within 0.0136 despite a starkly different Kmax=21
+exposure profile (2 vs 0 complete excursions) between the two seeds,
+evidence the result is not an exposure-counting artifact.
+
+**Terminal classification: `REBONDING_STEEPENS_LOCAL_RESPONSE`**
+(`artifacts/crack_rebonding_slope_exposure_continuation/
+slope_exposure_continuation_decision.json`). Physical reading: cohesive
+shielding suppresses the local rate ~29% at Kmax=15 but only ~6% at
+Kmax=21 -- consistent with faster opening renewals at high Kmax leaving
+less cleavage-hazard-weighted history available for bond formation.
+
+Incidental fix: `run_trajectory`'s returned `"seed"` field was hardcoded
+to the module constant regardless of the actually-configured engine seed
+(harmless pre-existing mislabeling -- no gate/comparison ever read it;
+fixed via a new `hazard_rng_seed` parameter).
+
+`scripts/verify_v2_slope_exposure_continuation.py`: `overall_pass: true`,
+depends on no gitignored run file. All 183 `crack_rebonding` tests pass.
+
+### Active processes
+
+None. The one authorized trajectory completed; no workers running.
+
+### Remaining scope (unauthorized, not attempted)
+
+This does not constitute Part X, a developed Paris-law campaign, or a
+production-line merge -- it is a 3-point/2-seed/1-regime minimal local
+slope screen only. No further seeds, additional Kmax points, frequency
+ablation, or other scope expansion were run or are proposed.
