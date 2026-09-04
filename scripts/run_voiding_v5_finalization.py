@@ -84,6 +84,12 @@ def static_specs():
         specs.append({"family": "far_limit", "ligament_ratio": separation, "offset_ratio": 0.0, "resolution": 16, "opening_scale": 1.0, "theta_deg": 0.0})
     for segments in (32, 64, 128, 256):
         specs.append({"family": "kirsch", "ligament_ratio": 2.0, "offset_ratio": 0.0, "resolution": 16, "opening_scale": 1.0, "theta_deg": 0.0, "segments": segments})
+    for ligament in (0.5, 1.0, 2.0, 4.0, 8.0):
+        for increment in (-0.025, 0.025):
+            specs.append({"family": "energy_derivative", "ligament_ratio": ligament + increment,
+                          "offset_ratio": 0.0, "resolution": 20,
+                          "opening_scale": 1.0, "theta_deg": 0.0,
+                          "perturbation_ratio": increment})
     return specs
 
 
@@ -138,12 +144,28 @@ def run_static(specs, registry):
                    "wall_seconds": time.perf_counter() - started, "status": "PASS", "failure_classification": ""}
             registry[index]["status"] = "PASS"; registry[index]["attempt_count"] = 1
         except Exception as error:
-            row = {"case_id": case_id, **spec, "status": "OUTSIDE_ENVELOPE",
-                   "error": f"{type(error).__name__}: {error}", "wall_seconds": time.perf_counter() - started,
-                   "failure_classification": "OUTSIDE_DEMONSTRATED_GEOMETRY_ENVELOPE"}
-            registry[index]["status"] = "OUTSIDE_ENVELOPE"; registry[index]["attempt_count"] = 1
-            registry[index]["failure_classification"] = row["failure_classification"]
-            failures.append(row)
+            initial_error = f"{type(error).__name__}: {error}"
+            recovery = dict(kwargs)
+            recovery["radial_layers"] = int(kwargs["radial_layers"]) + 4
+            try:
+                result = solve_crack_void_case(**recovery)
+                obs = result["observables"]
+                row = {"case_id": case_id, **spec, **obs, "status": "RECOVERED_PASS",
+                       "initial_error": initial_error, "recovery": "one_local_mesh_refinement",
+                       "attempt_count": 2, "wall_seconds": time.perf_counter() - started,
+                       "failure_classification": "MESH_CONVERGENCE_FAILURE_RECOVERED"}
+                registry[index]["status"] = "RECOVERED_PASS"; registry[index]["attempt_count"] = 2
+                failures.append({"case_id": case_id, "failure_classification": "MESH_CONVERGENCE_FAILURE",
+                                 "initial_error": initial_error, "recovery": "one_local_mesh_refinement", "status": "RECOVERED_PASS"})
+            except Exception as retry_error:
+                row = {"case_id": case_id, **spec, "status": "OUTSIDE_ENVELOPE",
+                       "error": f"{type(retry_error).__name__}: {retry_error}",
+                       "initial_error": initial_error, "recovery": "one_local_mesh_refinement_failed",
+                       "attempt_count": 2, "wall_seconds": time.perf_counter() - started,
+                       "failure_classification": "OUTSIDE_DEMONSTRATED_GEOMETRY_ENVELOPE"}
+                registry[index]["status"] = "OUTSIDE_ENVELOPE"; registry[index]["attempt_count"] = 2
+                registry[index]["failure_classification"] = row["failure_classification"]
+                failures.append(row)
         rows.append(row)
     return rows, failures
 
@@ -291,7 +313,7 @@ def main() -> int:
     classifications = {}
     for row in seeds: classifications[row["terminal_classification"]] = classifications.get(row["terminal_classification"], 0) + 1
     validity = {"schema": "v12.voiding-v5-validity-envelope/1", "static_total": len(static),
-                "static_pass": sum(row["status"] == "PASS" for row in static),
+                "static_pass": sum(row["status"] in {"PASS", "RECOVERED_PASS"} for row in static),
                 "static_outside_envelope": len(static_failures), "seed_outcomes": classifications,
                 "single_void_only": True, "plane_strain_2d_only": True,
                 "material_calibrated": False, "physical_validation": False}
