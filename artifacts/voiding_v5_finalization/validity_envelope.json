@@ -1,0 +1,14 @@
+{
+  "material_calibrated": false,
+  "physical_validation": false,
+  "plane_strain_2d_only": true,
+  "schema": "v12.voiding-v5-validity-envelope/1",
+  "seed_outcomes": {
+    "STABLE_SUBGRID_VOID": 32
+  },
+  "single_void_only": true,
+  "static_outside_envelope": 36,
+  "static_pass": 120,
+  "static_recovered_after_refinement": 28,
+  "static_total": 156
+}

@@ -1,0 +1,52 @@
+{
+  "edges": [
+    [
+      "FEM_tensor",
+      "void_birth_clock"
+    ],
+    [
+      "site_orientation",
+      "void_birth_clock"
+    ],
+    [
+      "void_birth_clock",
+      "embryo_competition"
+    ],
+    [
+      "embryo_competition",
+      "series_growth"
+    ],
+    [
+      "series_growth",
+      "explicit_cavity"
+    ],
+    [
+      "explicit_cavity",
+      "ligament_cleavage"
+    ],
+    [
+      "ligament_cleavage",
+      "cavity_surface_tensor"
+    ],
+    [
+      "cavity_surface_tensor",
+      "downstream_cleavage"
+    ],
+    [
+      "downstream_cleavage",
+      "new_front"
+    ]
+  ],
+  "nodes": [
+    "FEM_tensor",
+    "site_orientation",
+    "void_birth_clock",
+    "embryo_competition",
+    "series_growth",
+    "explicit_cavity",
+    "ligament_cleavage",
+    "cavity_surface_tensor",
+    "downstream_cleavage",
+    "new_front"
+  ]
+}
