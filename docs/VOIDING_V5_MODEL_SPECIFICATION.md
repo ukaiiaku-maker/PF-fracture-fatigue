@@ -121,7 +121,8 @@ SI-square-metre ledgers.
 
 ## Explicit exclusions
 
-V5 contains no AT1, AT2, GTN, diffuse void order parameter, scalar resolved-
+V5 contains no legacy variational phase-field variant one or two, GTN,
+diffuse void order parameter, scalar resolved-
 void damage law, global area-loss law, generic MZ memory, or Prony memory. It
 does not modify the four-class canonical material registry. Multiple voids,
 three-dimensional geometry, fatigue calibration, material calibration, and
