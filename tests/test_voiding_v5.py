@@ -307,6 +307,47 @@ def test_offset_cavity_ligament_transaction_preserves_combined_topology():
     assert connected.junction_process_state["latest_intersection_alignment"]["accepted_mesh_has_aligned_node"]
 
 
+def test_true_fixed_crack_positive_negative_offset_pair_is_mirrored_and_atomic():
+    from arrhenius_fracture.voiding_production_v5 import crack_tip_tensor
+    from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+    fixed_path = ((0.0, 0.0), (0.0005725993004046688, 0.0))
+    results = []
+    for offset in (1.0e-5, -1.0e-5):
+        accepted, rows = deterministic_trajectory(
+            stop_before_ligament=True, cavity_center_m=(7.0e-4, offset),
+            crack_path_m=fixed_path,
+        )
+        before = complete_accepted_state_fingerprint(accepted)
+        with pytest.raises(RuntimeError, match="injected:intersection_alignment"):
+            ligament_transaction(accepted, failure_stage="intersection_alignment")
+        assert complete_accepted_state_fingerprint(accepted) == before
+        tensor, _ = crack_tip_tensor(accepted)
+        connected, result = ligament_transaction(accepted)
+        results.append((rows[-1], tensor, connected, result))
+    positive, negative = results
+    assert positive[3].accepted and negative[3].accepted
+    assert positive[2].junction_process_state["latest_crack_void_connection_certificate"]["passed"]
+    assert negative[2].junction_process_state["latest_crack_void_connection_certificate"]["passed"]
+    positive_tip = positive[2].crack_network.branch("b00000000").tip
+    negative_tip = negative[2].crack_network.branch("b00000000").tip
+    assert positive_tip[0] == pytest.approx(negative_tip[0], abs=1.0e-12)
+    assert positive_tip[1] == pytest.approx(-negative_tip[1], abs=1.0e-12)
+    assert positive[0]["reaction_N_per_m"] == pytest.approx(negative[0]["reaction_N_per_m"], rel=5.0e-3)
+    assert positive[0]["compliance_m2_per_N"] == pytest.approx(negative[0]["compliance_m2_per_N"], rel=5.0e-3)
+    centered, _ = deterministic_trajectory(
+        stop_before_ligament=True, cavity_center_m=(7.0e-4, 0.0), crack_path_m=fixed_path,
+    )
+    centered_tensor, _ = crack_tip_tensor(centered)
+    assert positive[1][0, 0] == pytest.approx(negative[1][0, 0], rel=1.0e-2)
+    assert positive[1][1, 1] == pytest.approx(negative[1][1, 1], rel=1.0e-2)
+    # The bottom-corner rigid-body pins create a small baseline shear.  The
+    # offset-induced shear increment, rather than the biased raw component, is
+    # the reflection-odd observable.
+    positive_shear_increment = positive[1][0, 1] - centered_tensor[0, 1]
+    negative_shear_increment = negative[1][0, 1] - centered_tensor[0, 1]
+    assert positive_shear_increment == pytest.approx(-negative_shear_increment, rel=2.0e-2)
+
+
 def test_oblique_interior_edge_intersection_is_inserted_and_rollback_safe():
     accepted, _ = deterministic_trajectory(stop_before_ligament=True)
     angle = math.radians(10.0)
@@ -331,3 +372,165 @@ def test_oblique_interior_edge_intersection_is_inserted_and_rollback_safe():
     assert result.accepted and alignment["interior_edge_split_performed"]
     assert alignment["accepted_mesh_has_aligned_node"]
     assert connected.junction_process_state["latest_crack_void_connection_certificate"]["passed"]
+    cavity = connected.void_state.cavities[0]
+    ledger = connected.void_state.length_ledgers
+    physical_chord = math.dist(cavity.connection_entry_m, cavity.connection_exit_m)
+    projected_chord = cavity.connection_exit_m[0] - cavity.connection_entry_m[0]
+    ligament = math.dist(accepted.crack_network.branch("b00000000").tip,
+                         cavity.connection_entry_m)
+    assert ledger["connected_void_free_span_m"] == pytest.approx(physical_chord)
+    assert ledger["projected_connected_void_free_span_m"] == pytest.approx(projected_chord)
+    assert ledger["fractured_ligament_length_m"] == pytest.approx(ligament)
+    assert ledger["physical_active_front_travel_m"] == pytest.approx(ligament)
+    assert ledger["projected_fractured_length_m"] == pytest.approx(
+        cavity.connection_entry_m[0] - accepted.crack_network.branch("b00000000").tip[0]
+    )
+    assert physical_chord > projected_chord
+    assert physical_chord != pytest.approx(2.0 * cavity.radius_m)
+
+
+@pytest.mark.parametrize("stage", ["root_status_change", "dormant_support_rebuild"])
+def test_connected_dormant_ownership_rolls_back(stage):
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+    before = complete_accepted_state_fingerprint(accepted)
+    with pytest.raises(RuntimeError, match="injected:" + stage):
+        ligament_transaction(accepted, failure_stage=stage)
+    assert complete_accepted_state_fingerprint(accepted) == before
+
+
+def test_connected_and_downstream_states_own_zero_then_one_active_front(tmp_path):
+    from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
+    from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    connected, _ = ligament_transaction(accepted)
+    assert connected.crack_network.active_tip_ids == ()
+    assert connected.v12_support_state.active_tip_identities == ()
+    connected_path = tmp_path / "connected.json"
+    write_checkpoint(connected, connected_path)
+    assert complete_accepted_state_fingerprint(restore_checkpoint(connected_path)) == complete_accepted_state_fingerprint(connected)
+
+    downstream, _, _, _ = downstream_front_transaction(connected)
+    assert downstream.crack_network.branch("b00000000").status == "arrested"
+    assert downstream.crack_network.active_tip_ids == ("void-front-1",)
+    assert downstream.v12_support_state.active_tip_identities == ("void-front-1",)
+    downstream_path = tmp_path / "downstream.json"
+    write_checkpoint(downstream, downstream_path)
+    assert complete_accepted_state_fingerprint(restore_checkpoint(downstream_path)) == complete_accepted_state_fingerprint(downstream)
+
+
+def test_downstream_child_activation_rolls_back():
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    accepted, _ = ligament_transaction(accepted)
+    from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+    before = complete_accepted_state_fingerprint(accepted)
+    with pytest.raises(RuntimeError, match="injected:downstream_child_activation"):
+        downstream_front_transaction(accepted, failure_stage="downstream_child_activation")
+    assert complete_accepted_state_fingerprint(accepted) == before
+
+
+def test_distinct_direction_tie_selects_intersecting_ligament_and_retains_miss():
+    from arrhenius_fracture.voiding_production_v5 import crack_tip_tensor
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    candidates = (
+        CleavageCandidate.create(plane_family="cleavage", plane_variant="hits-cavity",
+                                 direction_xy=(1.0, 0.0), normal_xy=(0.0, 1.0), gamma_rel=1.0,
+                                 orientation_convention="V5 distinct-direction tie"),
+        CleavageCandidate.create(plane_family="cleavage", plane_variant="misses-cavity",
+                                 direction_xy=(0.0, 1.0), normal_xy=(1.0, 0.0), gamma_rel=1.0,
+                                 orientation_convention="V5 distinct-direction tie"),
+    )
+    initial = DirectionalCompetitionState(
+        candidates=candidates,
+        hazard_states=tuple(DirectionalHazardState(candidate.candidate_id) for candidate in candidates),
+        global_hazard_seed=3621,
+    )
+    probe = replace(accepted, competition=initial)
+    _, audit = _complete_next_clock(probe, crack_tip_tensor(probe)[0])
+    rates = {row["candidate_id"]: row["rate_s"] for row in audit}
+    assert all(rate > 0.0 for rate in rates.values())
+    tied = replace(initial, hazard_states=tuple(
+        replace(hazard, current_threshold_action=rates[hazard.candidate_id])
+        for hazard in initial.hazard_states
+    ))
+    connected, _ = ligament_transaction(replace(accepted, competition=tied))
+    consumed_candidates = {event_id.split("#event:")[0] for event_id in connected.competition.consumed_event_ids}
+    pending_candidates = {event.candidate_id for event in connected.competition.pending_events}
+    assert consumed_candidates == {candidates[0].candidate_id}
+    assert pending_candidates == {candidates[1].candidate_id}
+
+
+def test_combined_certificate_rejects_wrong_identity_and_stale_support():
+    from arrhenius_fracture.voiding_production_v5 import crack_void_connection_certificate
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    connected, _ = ligament_transaction(accepted)
+    endpoint = connected.crack_network.branch("b00000000").tip
+    with pytest.raises(ValueError, match="exact cavity identity"):
+        crack_void_connection_certificate(connected, branch_id="b00000000",
+                                          cavity_id="wrong-cavity", intended_intersection=endpoint)
+    stale = replace(connected, v12_support_state=replace(
+        connected.v12_support_state, selected_support_elements=()
+    ))
+    certificate = crack_void_connection_certificate(
+        stale, branch_id="b00000000", cavity_id=connected.void_state.cavities[0].cavity_id,
+        intended_intersection=endpoint,
+    )
+    assert certificate["no_surviving_solid_ligament_bridge"] is False
+    assert certificate["passed"] is False
+
+
+def test_combined_certificate_rejects_segment_through_cavity_and_broken_cycle():
+    from arrhenius_fracture.voiding_production_v5 import crack_void_connection_certificate, cavity_free_surface_certificate
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    connected, _ = ligament_transaction(accepted)
+    root = connected.crack_network.branch("b00000000")
+    center = connected.void_state.cavities[0].center_m
+    crossing = replace(root, path=root.path + (center,),
+                       orientation_history_rad=root.orientation_history_rad + (0.0,))
+    crossing_state = replace(connected, crack_network=replace(
+        connected.crack_network,
+        branches=tuple(crossing if branch.branch_id == root.branch_id else branch
+                       for branch in connected.crack_network.branches),
+    ))
+    certificate = crack_void_connection_certificate(
+        crossing_state, branch_id=root.branch_id,
+        cavity_id=connected.void_state.cavities[0].cavity_id,
+        intended_intersection=center,
+    )
+    assert any(row["intersects_cavity_open_disk"] for row in certificate["crack_segment_cavity_intersections"])
+    assert certificate["passed"] is False
+    # Removing one cavity-adjacent boundary triangle breaks the degree-two cycle.
+    boundary_element = cavity_free_surface_certificate(connected)["boundary_edge_ids"][0]
+    owner = next(index for index, triangle in enumerate(connected.mesh.elems)
+                 if set(boundary_element).issubset(set(map(int, triangle))))
+    broken_mesh = replace(connected.mesh, elems=np.delete(connected.mesh.elems, owner, axis=0))
+    assert cavity_free_surface_certificate(replace(connected, mesh=broken_mesh))["passed"] is False
+
+
+def test_combined_certificate_detects_support_triangle_overlap_with_centroid_outside():
+    from arrhenius_fracture.mesh import rebuild_tri_mesh
+    from arrhenius_fracture.voiding_production_v5 import crack_void_connection_certificate
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    connected, _ = ligament_transaction(accepted)
+    cavity = connected.void_state.cavities[0]
+    center = np.asarray(cavity.center_m)
+    radius = cavity.radius_m
+    adversarial = center + radius * np.asarray(((0.5, 0.0), (2.0, 0.1), (2.0, -0.1)))
+    first = connected.mesh.nn
+    mesh = rebuild_tri_mesh(
+        np.vstack((connected.mesh.nodes, adversarial)),
+        np.vstack((connected.mesh.elems, (first, first + 1, first + 2))),
+        tip_centers=np.asarray(cavity.center_m),
+    )
+    support = replace(connected.v12_support_state,
+                      selected_support_elements=(mesh.ne - 1,))
+    altered = replace(connected, mesh=mesh, v12_support_state=support)
+    certificate = crack_void_connection_certificate(
+        altered, branch_id="b00000000", cavity_id=cavity.cavity_id,
+        intended_intersection=connected.crack_network.branch("b00000000").tip,
+    )
+    centroid = adversarial.mean(axis=0)
+    assert np.linalg.norm(centroid - center) > radius
+    assert certificate["support_triangle_cavity_overlap_element_ids"] == [mesh.ne - 1]
+    assert certificate["wake_support_outside_cavity"] is False
+    assert certificate["passed"] is False

@@ -143,6 +143,21 @@ def main(argv=None):
                   and deterministic[11]["causal_first_passage"]["barrier_candidate_id"]
                       == deterministic[11]["causal_first_passage"]["candidate_id"],
     })
+    rows.append({
+        "gate": "V12_SINGLE_ACTIVE_FRONT_OWNERSHIP",
+        "case": "connected_dormancy_then_downstream_sole_activation",
+        "initial": deterministic[8], "final": deterministic[11],
+        "connected_graph_active_ids": deterministic[8]["active_crack_branch_ids"],
+        "connected_support_active_ids": deterministic[8]["support_active_tip_ids"],
+        "downstream_graph_active_ids": deterministic[11]["active_crack_branch_ids"],
+        "downstream_support_active_ids": deterministic[11]["support_active_tip_ids"],
+        "executed_operations": ["root_status_change", "dormant_support_rebuild",
+                                "downstream_child_activation", "support_rebuild"],
+        "passed": deterministic[8]["active_crack_branch_ids"] == []
+                  and deterministic[8]["support_active_tip_ids"] == []
+                  and deterministic[11]["active_crack_branch_ids"] == ["void-front-1"]
+                  and deterministic[11]["support_active_tip_ids"] == ["void-front-1"],
+    })
 
     # Prospectively frozen constitutive test: one state, candidate, orientation,
     # threshold and hazard action; only the supplied local tensor changes.
@@ -290,6 +305,18 @@ def main(argv=None):
                 "wake_support_outside_cavity": {"source_row_id": f"raw:{index}", "path": base + ["wake_support_outside_cavity"]},
                 "closed_cycle_passed": {"source_row_id": f"raw:{index}", "path": base + ["closed_cavity_boundary_cycle", "passed"]},
                 "combined_incidence_component_count": {"source_row_id": f"raw:{index}", "path": base + ["combined_incidence_component_count"]},
+                "bridge_search_uncovered_sample_indices": {"source_row_id": f"raw:{index}", "path": base + ["bridge_search_uncovered_sample_indices"]},
+                "support_triangle_cavity_overlap_element_ids": {"source_row_id": f"raw:{index}", "path": base + ["support_triangle_cavity_overlap_element_ids"]},
+                "crack_segment_cavity_intersections": {"source_row_id": f"raw:{index}", "path": base + ["crack_segment_cavity_intersections"]},
+                "combined_components": {"source_row_id": f"raw:{index}", "path": base + ["combined_components"]},
+                "combined_incidence_edges": {"source_row_id": f"raw:{index}", "path": base + ["combined_incidence_edges"]},
+            }}
+        elif row["case"] == "connected_dormancy_then_downstream_sole_activation":
+            evidence["predicate_name"] = "single_active_front_ownership"
+            evidence["predicate_inputs"] = {"source_bindings": {
+                name: {"source_row_id": f"raw:{index}", "path": [name]}
+                for name in ("connected_graph_active_ids", "connected_support_active_ids",
+                             "downstream_graph_active_ids", "downstream_support_active_ids")
             }}
     for family, measurements in (("direct", perturbation_rates), ("solver", solver_rows)):
         for index, measurement in enumerate(measurements):

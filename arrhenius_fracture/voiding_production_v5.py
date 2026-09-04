@@ -17,8 +17,8 @@ from .directional_competition_v11 import (
     construct_action_proposals, preview_directional_interval,
     select_temporal_or_degenerate_proposal, tungsten_cleavage_candidates,
 )
-from .explicit_cavity_v5 import build_explicit_hole_mesh, fill_explicit_hole_mesh
-from .mesh import rebuild_tri_mesh
+from .explicit_cavity_v5 import build_explicit_hole_mesh, fill_explicit_hole_mesh, triangle_intersects_open_disk
+from .mesh import BoundaryData, rebuild_tri_mesh
 from .fem import assemble_mechanics, plane_strain_D
 from .sharp_front import (
     FrontConfig, FrontEngine, default_cleavage_barrier,
@@ -47,18 +47,100 @@ def _head():
 
 
 def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0)):
+    if center_m[1] < 0.0:
+        positive_hole, positive_filled = _geometry(radius_m, (center_m[0], -center_m[1]))
+        def mirrored(value):
+            nodes = np.asarray(value.mesh.nodes).copy(); nodes[:, 1] *= -1.0
+            elems = np.asarray(value.mesh.elems)[:, [0, 2, 1]]
+            mesh = rebuild_tri_mesh(nodes, elems, tip_centers=np.asarray(center_m))
+            bottom = np.asarray(value.boundary.top_nodes)
+            boundary = BoundaryData(
+                np.asarray(value.boundary.bot_nodes), bottom,
+                int(bottom[np.argmin(nodes[bottom, 0])]), int(bottom[np.argmax(nodes[bottom, 0])]),
+                np.asarray(value.boundary.notch_nodes),
+            )
+            return replace(value, mesh=mesh, boundary=boundary,
+                           center_m=(float(center_m[0]), float(center_m[1])))
+        return mirrored(positive_hole), mirrored(positive_filled)
     hole = build_explicit_hole_mesh(1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5, 32, radial_layers_override=12)
     return hole, fill_explicit_hole_mesh(hole)
 
 
+def _insert_point_in_mesh(mesh, point):
+    point = np.asarray(point, dtype=float)
+    nodes = np.asarray(mesh.nodes)
+    if float(np.min(np.linalg.norm(nodes - point, axis=1))) <= 1.0e-12:
+        return mesh
+    owners = []
+    for index, triangle_ids in enumerate(np.asarray(mesh.elems, dtype=int)):
+        triangle = nodes[triangle_ids]
+        matrix = np.column_stack((triangle[1] - triangle[0], triangle[2] - triangle[0]))
+        if abs(np.linalg.det(matrix)) <= 1.0e-24: continue
+        uv = np.linalg.solve(matrix, point - triangle[0])
+        if uv[0] >= -1.0e-12 and uv[1] >= -1.0e-12 and uv.sum() <= 1.0 + 1.0e-12:
+            owners.append((index, uv))
+    if not owners:
+        raise ValueError("fixed crack tip is outside the specimen mesh")
+    new = len(nodes)
+    source = np.asarray(mesh.elems, dtype=int)
+    strict = [(index, uv) for index, uv in owners
+              if uv[0] > 1.0e-10 and uv[1] > 1.0e-10 and uv.sum() < 1.0 - 1.0e-10]
+    replacements = []
+    removed = set()
+    if strict:
+        owner = strict[0][0]
+        a, b, c = map(int, source[owner])
+        removed.add(owner)
+        replacements.extend(((a, b, new), (b, c, new), (c, a, new)))
+    else:
+        # A point on an existing edge must split both incident triangles.  A
+        # one-sided split creates a hanging node and makes mirrored fixed-crack
+        # meshes depend on which owner happens to be encountered first.
+        candidate_edges = []
+        for owner, _ in owners:
+            triangle_ids = source[owner]
+            for u, v in ((triangle_ids[0], triangle_ids[1]),
+                         (triangle_ids[1], triangle_ids[2]),
+                         (triangle_ids[2], triangle_ids[0])):
+                edge = nodes[v] - nodes[u]
+                scale = max(float(np.dot(edge, edge)), 1.0e-300)
+                fraction = float(np.dot(point - nodes[u], edge) / scale)
+                distance = abs(float(np.cross(edge, point - nodes[u]))) / math.sqrt(scale)
+                if -1.0e-12 <= fraction <= 1.0 + 1.0e-12 and distance <= 1.0e-12:
+                    candidate_edges.append(tuple(sorted((int(u), int(v)))))
+        edge = min(candidate_edges)
+        for owner, triangle_ids in enumerate(source):
+            if not set(edge).issubset(map(int, triangle_ids)):
+                continue
+            removed.add(owner)
+            u, v = edge
+            w = next(int(value) for value in triangle_ids if int(value) not in edge)
+            original = nodes[triangle_ids]
+            original_sign = np.cross(original[1] - original[0], original[2] - original[0])
+            for tri in ((u, new, w), (new, v, w)):
+                coordinates = np.vstack((nodes[tri[0]], point, nodes[tri[2]])) if tri[0] == u else np.vstack((point, nodes[tri[1]], nodes[tri[2]]))
+                sign = np.cross(coordinates[1] - coordinates[0], coordinates[2] - coordinates[0])
+                replacements.append(tri if sign * original_sign > 0.0 else (tri[0], tri[2], tri[1]))
+    elems = np.delete(source, sorted(removed), axis=0)
+    elems = np.vstack((elems, replacements))
+    return rebuild_tri_mesh(np.vstack((nodes, point)), elems, tip_centers=point)
+
+
 def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
-                                cavity_center_m=(7.0e-4, 0.0)):
+                                cavity_center_m=(7.0e-4, 0.0), crack_path_m=None):
     hole, filled = _geometry(center_m=cavity_center_m)
     mesh = filled.mesh
     ray = 16
-    start = tuple(map(float, mesh.nodes[12 * 32 + ray]))
-    tip = tuple(map(float, mesh.nodes[3 * 32 + ray]))
+    if crack_path_m is None:
+        start = tuple(map(float, mesh.nodes[12 * 32 + ray]))
+        tip = tuple(map(float, mesh.nodes[3 * 32 + ray]))
+    else:
+        start, tip = (tuple(map(float, point)) for point in crack_path_m)
+        mesh = _insert_point_in_mesh(mesh, tip)
+        hole = replace(hole, mesh=_insert_point_in_mesh(hole.mesh, tip))
+        filled = replace(filled, mesh=mesh)
     cfg = make_emergent_config()
+    element_x = np.asarray(mesh.nodes)[np.asarray(mesh.elems)].mean(axis=1)[:, 0]
     u = np.zeros(mesh.ndof)
     u[2 * np.asarray(filled.boundary.top_nodes) + 1] = 2.0e-7
     u[2 * np.asarray(filled.boundary.bot_nodes) + 1] = -2.0e-7
@@ -73,8 +155,10 @@ def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
         void_state = ProductionVoidState((site,), rng_state=rng.bit_generator.state)
     state = LiveFEMTopologyState(
         mesh, filled.boundary, np.zeros(mesh.nn), u,
-        np.vstack((np.full(mesh.ne, 1.0e-5), np.full(mesh.ne, -0.5e-5), np.full(mesh.ne, 0.25e-5))),
-        np.linspace(1.0e12, 1.2e12, mesh.ne), plane_strain_D(cfg.material), cfg.material, None,
+        np.vstack((np.full(mesh.ne, 1.0e-5), np.full(mesh.ne, -0.5e-5),
+                   np.full(mesh.ne, 0.25e-5 * (1.0 if cavity_center_m[1] >= 0.0 else -1.0)))),
+        1.0e12 + 2.0e11 * element_x / 1.0e-3,
+        plane_strain_D(cfg.material), cfg.material, None,
         CrackNetworkState.one_tip((start, tip)), DirectionalCompetitionState.initialize(
             tungsten_cleavage_candidates(theta_deg=0.0), global_hazard_seed=seed,
         ),
@@ -98,6 +182,9 @@ def observables(state, operation):
     area = np.abs(avec[:, 0] * bvec[:, 1] - avec[:, 1] * bvec[:, 0]) / 2.0
     quality = 4.0 * np.sqrt(3.0) * area / np.maximum(np.sum(side**2, axis=1), 1.0e-300)
     reaction = float(state.energy_ledgers.get("latest_reaction_N_per_m", 0.0))
+    active_branches = [branch.branch_id for branch in state.crack_network.branches
+                       if branch.status == "active"]
+    support_active = [] if state.v12_support_state is None else list(state.v12_support_state.active_tip_identities)
     return {
         "operation": operation, "fingerprint": complete_accepted_state_fingerprint(state),
         "mesh_nodes": int(state.mesh.nn), "mesh_elements": int(state.mesh.ne),
@@ -116,6 +203,8 @@ def observables(state, operation):
         "void_event_history": [] if state.void_state is None else list(state.void_state.event_history),
         "length_ledgers": {} if state.void_state is None else dict(state.void_state.length_ledgers),
         "event_counters": dict(state.event_counters),
+        "active_crack_branch_ids": active_branches,
+        "support_active_tip_ids": support_active,
         "mesh_minimum_quality": float(np.min(quality)),
         "mesh_maximum_aspect_ratio": float(np.max(side, axis=1).max() / max(np.min(side), 1.0e-300)),
         "field_transfer_audit": state.junction_process_state.get("latest_void_remesh_audit"),
@@ -136,15 +225,24 @@ def local_site_tensor(state):
 
 
 def crack_tip_tensor(state, branch_id=ROOT_BRANCH_ID):
-    """Return the tensor from the element whose centroid is nearest the tip."""
+    """Return a geometry-weighted tensor recovery at an aligned crack-tip node."""
     _, _, sigma, *_ = assemble_mechanics(
         state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
         state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
     )
     tip = np.asarray(state.crack_network.branch(branch_id).tip)
-    centroids = state.mesh.nodes[state.mesh.elems].mean(axis=1)
-    element = int(np.argmin(np.linalg.norm(centroids - tip, axis=1)))
-    return np.array([[sigma[0, element], sigma[2, element]], [sigma[2, element], sigma[1, element]]]), element
+    nodes = np.asarray(state.mesh.nodes)
+    node = int(np.argmin(np.linalg.norm(nodes - tip, axis=1)))
+    if np.linalg.norm(nodes[node] - tip) > 1.0e-12:
+        raise RuntimeError("crack-tip tensor recovery requires an aligned mesh node")
+    elements = np.flatnonzero(np.any(np.asarray(state.mesh.elems) == node, axis=1))
+    weights = np.asarray(state.mesh.area_e)[elements]
+    weights = weights / np.sum(weights)
+    recovered = np.array([
+        [np.sum(weights * sigma[0, elements]), np.sum(weights * sigma[2, elements])],
+        [np.sum(weights * sigma[2, elements]), np.sum(weights * sigma[1, elements])],
+    ])
+    return recovered, tuple(map(int, elements))
 
 
 def _first_ray_cavity_intersection(state, start, direction):
@@ -288,6 +386,7 @@ def cavity_free_surface_certificate(state) -> dict[str, Any]:
             stack.extend(adjacency[node] - visited)
     passed = len(edges) >= 16 and visited == set(adjacency) and all(len(peers) == 2 for peers in adjacency.values())
     return {"passed": passed, "boundary_edge_count": len(edges),
+            "boundary_node_ids": sorted(adjacency), "boundary_edge_ids": [list(edge) for edge in edges],
             "boundary_node_count": len(adjacency),
             "connected_component_count": 1 if passed else None,
             "topology": "single_closed_cavity_boundary_cycle"}
@@ -296,7 +395,10 @@ def cavity_free_surface_certificate(state) -> dict[str, Any]:
 def crack_void_connection_certificate(state, *, branch_id: str, cavity_id: str,
                                       intended_intersection) -> dict[str, Any]:
     """Certify combined graph/cavity incidence, clearance, and free boundary."""
-    cavity = next(item for item in state.void_state.cavities if item.cavity_id == cavity_id)
+    cavities = [item for item in state.void_state.cavities if item.cavity_id == cavity_id]
+    if len(cavities) != 1:
+        raise ValueError("combined topology certificate requires one exact cavity identity")
+    cavity = cavities[0]
     branch = state.crack_network.branch(branch_id)
     endpoint = np.asarray(branch.tip)
     intended = np.asarray(intended_intersection, dtype=float)
@@ -304,23 +406,80 @@ def crack_void_connection_certificate(state, *, branch_id: str, cavity_id: str,
     cycle = cavity_free_surface_certificate(state)
     endpoint_matches = bool(np.linalg.norm(endpoint - intended) <= 1.0e-12)
     endpoint_on_boundary = bool(abs(np.linalg.norm(endpoint - center) - cavity.radius_m) <= cavity.radius_m * 0.02)
-    graph_outside = all(np.linalg.norm(np.asarray(point) - center) >= cavity.radius_m * (1.0 - 1.0e-10)
-                        for item in state.crack_network.branches for point in item.path)
+    def segment_open_disk_distance(first, second):
+        a = np.asarray(first); b = np.asarray(second); delta = b - a
+        fraction = float(np.clip((center - a) @ delta / max(delta @ delta, 1.0e-300), 0.0, 1.0))
+        return float(np.linalg.norm(a + fraction * delta - center))
+    segment_rows = [{"branch_id": item.branch_id, "segment_index": index,
+                     "minimum_center_distance_m": segment_open_disk_distance(first, second),
+                     "intersects_cavity_open_disk": segment_open_disk_distance(first, second) < cavity.radius_m * (1.0 - 1.0e-10)}
+                    for item in state.crack_network.branches
+                    for index, (first, second) in enumerate(zip(item.path, item.path[1:]))]
+    graph_outside = not any(row["intersects_cavity_open_disk"] for row in segment_rows)
     support = state.v12_support_state
     support_ids = () if support is None else support.selected_support_elements
     centroids = np.asarray(state.mesh.nodes)[np.asarray(state.mesh.elems)].mean(axis=1)
-    support_outside = all(np.linalg.norm(centroids[int(element)] - center) >= cavity.radius_m * (1.0 - 1.0e-10)
-                          for element in support_ids)
-    no_solid_bridge = endpoint_matches and endpoint_on_boundary
+    overlap_ids = [int(element) for element in support_ids if triangle_intersects_open_disk(
+        np.asarray(state.mesh.nodes)[np.asarray(state.mesh.elems)[int(element)]], center, cavity.radius_m,
+    )]
+    support_outside = not overlap_ids
+    # Search the former ligament centerline for an uncovered intact gap. The
+    # support triangles are derived independently from the endpoint test.
+    ligament_start = np.asarray(branch.path[-2])
+    samples = np.linspace(ligament_start, endpoint, 65)[1:-1]
+    support_triangles = np.asarray(state.mesh.nodes)[np.asarray(state.mesh.elems)[list(support_ids)]] if support_ids else np.empty((0, 3, 2))
+    def point_in_triangle(point, triangle):
+        matrix = np.column_stack((triangle[1] - triangle[0], triangle[2] - triangle[0]))
+        if abs(np.linalg.det(matrix)) <= 1.0e-24: return False
+        uv = np.linalg.solve(matrix, point - triangle[0])
+        return uv[0] >= -1.0e-10 and uv[1] >= -1.0e-10 and uv.sum() <= 1.0 + 1.0e-10
+    covered = [any(point_in_triangle(sample, triangle) for triangle in support_triangles) for sample in samples]
+    uncovered_indices = [index for index, value in enumerate(covered) if not value]
+    no_solid_bridge = not uncovered_indices
+    # Build and traverse the actual branch/cavity incidence graph.
+    component_graph = {"cavity:" + cavity_id: set()}
+    incidence_edges = []
+    boundary_nodes = np.asarray(cycle["boundary_node_ids"], dtype=int)
+    boundary_points = np.asarray(state.mesh.nodes)[boundary_nodes]
+    intersected_edge_id = None
+    for item in state.crack_network.branches:
+        key = "branch:" + item.branch_id; component_graph.setdefault(key, set())
+        if item.parent_branch_id is not None:
+            parent = "branch:" + item.parent_branch_id
+            component_graph.setdefault(parent, set()).add(key); component_graph[key].add(parent)
+        distances = np.linalg.norm(boundary_points - np.asarray(item.tip), axis=1)
+        if len(distances) and float(np.min(distances)) <= 1.0e-12:
+            cavity_key = "cavity:" + cavity_id
+            component_graph[key].add(cavity_key); component_graph[cavity_key].add(key)
+            incidence_edges.append([key, cavity_key])
+    unseen = set(component_graph); components = []
+    while unseen:
+        todo = [min(unseen)]; component = []
+        while todo:
+            key = todo.pop()
+            if key not in unseen: continue
+            unseen.remove(key); component.append(key)
+            todo.extend(sorted(component_graph[key], reverse=True))
+        components.append(sorted(component))
+    combined_count = len(components)
+    for edge in cycle["boundary_edge_ids"]:
+        a, b = np.asarray(state.mesh.nodes)[edge]
+        if np.linalg.norm(endpoint - a) <= 1.0e-12 or np.linalg.norm(endpoint - b) <= 1.0e-12:
+            intersected_edge_id = edge; break
     passed = bool(cycle["passed"] and endpoint_matches and endpoint_on_boundary
-                  and graph_outside and support_outside and no_solid_bridge)
+                  and graph_outside and support_outside and no_solid_bridge and combined_count == 1)
     return {
         "passed": passed, "cavity_id": cavity_id, "branch_id": branch_id,
         "branch_endpoint_m": endpoint.tolist(), "intended_intersection_m": intended.tolist(),
         "endpoint_matches_intersection": endpoint_matches, "endpoint_on_cavity_boundary": endpoint_on_boundary,
         "no_surviving_solid_ligament_bridge": no_solid_bridge,
+        "bridge_search_sample_count": len(samples), "bridge_search_uncovered_sample_indices": uncovered_indices,
+        "intersected_cavity_edge_id": intersected_edge_id,
         "crack_graph_outside_cavity": graph_outside, "wake_support_outside_cavity": support_outside,
-        "combined_incidence_component_count": 1 if passed else None,
+        "crack_segment_cavity_intersections": segment_rows,
+        "support_triangle_cavity_overlap_element_ids": overlap_ids,
+        "combined_incidence_edges": incidence_edges, "combined_components": components,
+        "combined_incidence_component_count": combined_count,
         "closed_cavity_boundary_cycle": cycle,
         "topology": "connected_crack_graph_and_traction_free_cavity_cycle",
     }
@@ -365,9 +524,9 @@ def _project_fields(state, mesh):
 def _grow_hole_boundary(hole, radius_m):
     nodes = np.asarray(hole.mesh.nodes).copy()
     count = len(hole.prescribed_polygon_nodes)
-    theta = 2.0 * np.pi * np.arange(count) / count
-    polygon_radius = float(radius_m) / math.cos(math.pi / count)
     center = np.asarray(hole.center_m)
+    theta = np.arctan2(nodes[:count, 1] - center[1], nodes[:count, 0] - center[0])
+    polygon_radius = float(radius_m) / math.cos(math.pi / count)
     nodes[:count] = center + polygon_radius * np.c_[np.cos(theta), np.sin(theta)]
     mesh = rebuild_tri_mesh(nodes, np.asarray(hole.mesh.elems), tip_centers=np.asarray(hole.center_m))
     return replace(hole, mesh=mesh, radius_m=float(radius_m))
@@ -462,14 +621,16 @@ def _complete_next_clock(state, stress_tensor_Pa, *, start_time=0.0, temperature
     return replace(state, competition=replace(state.competition, hazard_states=tuple(hazards))), rates
 
 
-def _select_emitted_proposal(state, audit):
+def _select_emitted_proposal(state, audit, *, eligible_candidate_ids=None):
     emitted_ids = {event_id for row in audit for event_id in row["emitted_event_ids"]}
+    eligible = None if eligible_candidate_ids is None else set(eligible_candidate_ids)
     proposals = tuple(
         proposal for proposal in construct_action_proposals(
             state.competition.hazard_states, correlation_interval_s=0.0,
         )
         if set(proposal.member_event_ids).issubset(emitted_ids)
         and proposal.action_type == "one_arm"
+        and (eligible is None or set(proposal.member_candidate_ids).issubset(eligible))
     )
     proposal = select_temporal_or_degenerate_proposal(
         proposals, global_hazard_seed=state.competition.global_hazard_seed,
@@ -486,9 +647,12 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     start = state.crack_network.branch(ROOT_BRANCH_ID).tip
     tensor, source_element = crack_tip_tensor(state)
     state, cleavage_audit = _complete_next_clock(state, tensor)
-    proposal = _select_emitted_proposal(state, cleavage_audit)
+    intersections = {candidate.candidate_id: _first_ray_cavity_intersection(state, start, candidate.direction_xy)
+                     for candidate in state.competition.candidates}
+    eligible_ids = {candidate_id for candidate_id, intersection in intersections.items() if intersection is not None}
+    proposal = _select_emitted_proposal(state, cleavage_audit, eligible_candidate_ids=eligible_ids)
     candidate = next(item for item in state.competition.candidates if item.candidate_id == proposal.member_candidate_ids[0])
-    end = _first_ray_cavity_intersection(state, start, candidate.direction_xy)
+    end = intersections[candidate.candidate_id]
     if end is None:
         raise RuntimeError("selected candidate ray does not intersect the cavity polygon")
     engine = FrontEngine(FrontConfig(), default_cleavage_barrier(), default_emission_barrier(state.material.b),
@@ -517,21 +681,30 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
             trial, arms, source_commit=_head(), configuration={"event": "CRACK_TO_VOID_LIGAMENT"},
             transaction_identity="ligament", failure_injector=inject,
         )
+        exit_point = _first_ray_cavity_intersection(realized, end, candidate.direction_xy)
+        if exit_point is None:
+            raise RuntimeError("connected cavity has no far-side chord intersection")
         connected = replace(
             realized.void_state.cavities[0], phase=VoidPhase.CONNECTED_VOID,
             lineage=realized.void_state.cavities[0].lineage + ("CRACK_TO_VOID_LIGAMENT",),
+            connection_entry_m=end, connection_exit_m=exit_point,
+            connection_direction_xy=candidate.direction_xy,
         )
         void_state = replace_cavity(realized.void_state, connected)
         inject("cavity_phase_update", replace(realized, void_state=void_state))
         ledgers = dict(void_state.length_ledgers)
         ligament_length = math.dist(start, end)
+        physical_span = math.dist(end, exit_point)
+        projected_span = float(np.asarray(exit_point)[0] - np.asarray(end)[0])
         increments = {
             "fractured_ligament_length_m": ligament_length,
             "active_front_coordinate_advance_m": ligament_length,
+            "physical_active_front_travel_m": ligament_length,
             "projected_fractured_length_m": end[0] - start[0],
             "projected_front_advance_m": end[0] - start[0],
-            "preexisting_void_free_span_m": 2.0 * cavity.radius_m,
-            "connected_void_free_span_m": 2.0 * cavity.radius_m,
+            "preexisting_void_free_span_m": physical_span,
+            "connected_void_free_span_m": physical_span,
+            "projected_connected_void_free_span_m": projected_span,
             # Precisely the propagation-side semicircular arc (not 2*pi*R).
             "connected_free_surface_extent_m": math.pi * cavity.radius_m,
         }
@@ -546,13 +719,27 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
                                                         "source_element": source_element},),
         )
         realized = replace(realized, void_state=void_state)
+        root = realized.crack_network.branch(ROOT_BRANCH_ID)
+        dormant_network = replace(
+            realized.crack_network,
+            branches=tuple(replace(branch, status="arrested") if branch.branch_id == ROOT_BRANCH_ID else branch
+                           for branch in realized.crack_network.branches),
+        )
+        realized = replace(realized, crack_network=dormant_network)
+        inject("root_status_change", realized)
+        realized = initialize_mechanically_separating_v12(
+            realized, source_commit=_head(),
+            configuration={"event": "CRACK_TO_VOID_LIGAMENT", "root_status": "arrested"},
+            transaction_identity="ligament-connected-dormant",
+        )
+        inject("dormant_support_rebuild", realized)
         cycle = cavity_free_surface_certificate(realized)
         certificate = crack_void_connection_certificate(
             realized, branch_id=ROOT_BRANCH_ID, cavity_id=cavity.cavity_id,
             intended_intersection=end,
         )
         if not certificate["passed"]:
-            raise RuntimeError("connected free surface is not certified")
+            raise RuntimeError("connected free surface is not certified: " + repr(certificate))
         junction = dict(realized.junction_process_state)
         junction["latest_intersection_alignment"] = {
             "intersection_m": list(end), "aligned_node_id_before_refinement": aligned_node,
@@ -627,6 +814,8 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         if stage == failure_stage:
             raise RuntimeError("injected:" + stage)
     def geometry(trial, arms):
+        if not continuation:
+            inject("downstream_child_activation", replace(trial, crack_network=base_network))
         realized = apply_v12_production_trial_geometry(
             replace(trial, crack_network=base_network), arms,
             source_commit=_head(), configuration={"event": "DOWNSTREAM_FRONT" if not continuation else "CONTINUED_FRONT"},
@@ -640,13 +829,17 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         inject("downstream_phase_update", replace(realized, void_state=void_state))
         ledgers = dict(void_state.length_ledgers)
         projected = end[0] - start[0]
+        physical_span = cavity.connection_entry_m is not None and cavity.connection_exit_m is not None
+        chord_length = math.dist(cavity.connection_entry_m, cavity.connection_exit_m) if physical_span else 0.0
+        chord_projected = (cavity.connection_exit_m[0] - cavity.connection_entry_m[0]) if physical_span else 0.0
         increments = {
             "ordinary_crack_fractured_length_m": math.dist(start, end),
-            "active_front_coordinate_advance_m": projected + (2.0 * cavity.radius_m if not continuation else 0.0),
+            "active_front_coordinate_advance_m": math.dist(start, end) + (chord_length if not continuation else 0.0),
+            "physical_active_front_travel_m": math.dist(start, end) + (chord_length if not continuation else 0.0),
             "projected_fractured_length_m": projected,
-            "projected_front_advance_m": projected + (2.0 * cavity.radius_m if not continuation else 0.0),
-            "projected_free_span_m": 2.0 * cavity.radius_m if not continuation else 0.0,
-            "traversed_void_free_span_m": 2.0 * cavity.radius_m if not continuation else 0.0,
+            "projected_front_advance_m": projected + (chord_projected if not continuation else 0.0),
+            "projected_free_span_m": chord_projected if not continuation else 0.0,
+            "traversed_void_free_span_m": chord_length if not continuation else 0.0,
         }
         for name, increment in increments.items():
             ledgers[name] += increment
@@ -677,8 +870,9 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     }
 
 
-def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0)):
-    state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m)
+def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0), crack_path_m=None):
+    state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m,
+                                              crack_path_m=crack_path_m)
     cfg = VoidingConfig(enabled=True, promotion_radius_m=5.0e-5)
     rows = [observables(state, "available_site")]
     for label in ("multi_hit_1", "multi_hit_2"):

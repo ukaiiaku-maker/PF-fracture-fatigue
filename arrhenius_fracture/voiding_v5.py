@@ -87,6 +87,9 @@ class Cavity2D:
     phase: VoidPhase
     geometry_generation: int = 0
     lineage: tuple[str, ...] = ()
+    connection_entry_m: tuple[float, float] | None = None
+    connection_exit_m: tuple[float, float] | None = None
+    connection_direction_xy: tuple[float, float] | None = None
 
     def __post_init__(self):
         expected = math.pi * float(self.radius_m) ** 2
@@ -106,6 +109,8 @@ class ProductionVoidState:
         "preexisting_void_free_span_m": 0.0,
         "connected_void_free_span_m": 0.0,
         "traversed_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
         "active_front_coordinate_advance_m": 0.0,
         "projected_fractured_length_m": 0.0,
         "projected_free_span_m": 0.0,

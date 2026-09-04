@@ -105,6 +105,17 @@ direction, first cavity-boundary intersection, stochastic threshold, barrier,
 positive hazard-derived dissipation, graph edit, support rebuild, equilibrium,
 and `CONNECTED_VOID` transition belong to one transaction.
 
+`CONNECTED_VOID` has no active sharp front: the incoming root is arrested and
+V12 support is rebuilt with the same empty active-tip set. The first accepted
+downstream event creates and activates exactly one child, `void-front-1`, while
+the root remains arrested. Graph ownership and support ownership must agree.
+
+The combined topology certificate is derived from mesh and graph primitives.
+It records the exact cavity cycle, endpoint/boundary incidence, per-segment
+open-disk clearance, exact triangle/open-disk support overlap, sampled coverage
+across the former ligament, the intersected edge, and the connected components
+of the actual branch/cavity incidence graph.
+
 Downstream nucleation evaluates the production cleavage law from a tensor on
 the explicit cavity boundary. No child branch exists in accepted state before
 threshold crossing. Child creation and the first sharp segment commit together.
@@ -118,12 +129,14 @@ combined effective radius.
 
 ## Length accounting
 
-V5 records separate cumulative SI-metre ledgers for fractured ligament,
-ordinary newly fractured crack, pre-existing void free span, active-front
-coordinate advance, their projected counterparts, and connected free-surface
-extent. Front-coordinate traversal of pre-existing void space is never counted
-as newly fractured material. Cavity area and defect inventory remain separate
-SI-square-metre ledgers.
+V5 records separate cumulative SI-metre ledgers for physical fractured
+ligament, physical ordinary crack, physical connected and traversed cavity
+chords, physical active-front travel, projected fractured extension, projected
+cavity span, projected front advance, and connected free-surface extent. These
+quantities are derived from the actual entry/exit coordinates and trajectory;
+`2*R` is valid only for a certified diametral chord. Front traversal of
+pre-existing void space is never counted as newly fractured material. Cavity
+area and defect inventory remain separate SI-square-metre ledgers.
 
 ## Parameter registry
 

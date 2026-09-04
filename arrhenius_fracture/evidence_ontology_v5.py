@@ -45,7 +45,19 @@ PREDICATES: dict[str, Callable[[Mapping[str, Any]], bool]] = {
         values["no_surviving_solid_ligament_bridge"], values["crack_graph_outside_cavity"],
         values["wake_support_outside_cavity"], values["closed_cycle_passed"],
         values["combined_incidence_component_count"] == 1,
+        not values["bridge_search_uncovered_sample_indices"],
+        not values["support_triangle_cavity_overlap_element_ids"],
+        not any(row["intersects_cavity_open_disk"]
+                for row in values["crack_segment_cavity_intersections"]),
+        len(values["combined_components"]) == 1,
+        len(values["combined_incidence_edges"]) >= 1,
     )),
+    "single_active_front_ownership": lambda values: (
+        values["connected_graph_active_ids"] == []
+        and values["connected_support_active_ids"] == []
+        and values["downstream_graph_active_ids"] == ["void-front-1"]
+        and values["downstream_support_active_ids"] == ["void-front-1"]
+    ),
 }
 
 
