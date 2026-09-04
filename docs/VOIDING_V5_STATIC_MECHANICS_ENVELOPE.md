@@ -1,5 +1,8 @@
 # V5 static-mechanics envelope
 
+> **STATUS: SUPERSEDED_INITIAL_FINALIZATION_ATTEMPT.** Results below are
+> retained for provenance only. No PASS claim in this document is authoritative.
+
 The structured campaign contains 156 attempted production-FEM cases covering
 five ligament ratios, five signed offsets, three nominal resolutions, a
 15-case three-level convergence subset, opening sensitivity, fixed-mesh

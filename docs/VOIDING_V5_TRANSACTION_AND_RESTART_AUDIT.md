@@ -1,5 +1,8 @@
 # V5 transaction and restart audit
 
+> **STATUS: SUPERSEDED_INITIAL_FINALIZATION_ATTEMPT.** Results below are
+> retained for provenance only. No PASS claim in this document is authoritative.
+
 The production runner injects failures at graph edit, remesh, field projection,
 support rebuild, equilibrium, energy gate, process-state update, topology
 verification, and late veto. Accepted-state fingerprints remain exact for these

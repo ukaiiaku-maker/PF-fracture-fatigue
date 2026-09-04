@@ -2,6 +2,10 @@
 """Deterministic broad V5 finalization campaign and evidence aggregator."""
 from __future__ import annotations
 
+raise SystemExit(
+    "SUPERSEDED_INITIAL_FINALIZATION_ATTEMPT: use run_voiding_v5_finalization_v2.py"
+)
+
 from dataclasses import asdict, replace
 import csv
 import hashlib
@@ -190,7 +194,7 @@ def causal_matrix():
     add("BIRTH-SHEAR-COEFF-ZERO", config=replace(cfg, signed_shear_work_coefficient=0.0))
     add("BIRTH-BARRIER-UP", config=replace(cfg, birth_barrier_J=cfg.birth_barrier_J * 1.1))
     add("BIRTH-WEIGHT-DOWN", weight=0.4)
-    for label, tensor in (("STABILIZE-FAVOR", np.eye(2) * 2.0e9), ("HEAL-FAVOR", -np.eye(2) * 2.0e9)):
+    for label, tensor in (("STABILIZE-FAVOR", np.eye(2) * 2.0e9), ("COMPRESSION-CONTROL", -np.eye(2) * 2.0e9)):
         add(label, tensor=tensor)
     add("ORIENTATION-NORMAL-Y", normal=(0.0, 1.0))
     return experiments

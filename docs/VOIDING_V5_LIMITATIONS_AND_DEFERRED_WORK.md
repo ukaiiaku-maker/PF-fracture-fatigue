@@ -1,5 +1,8 @@
 # V5 limitations and deferred work
 
+> **STATUS: SUPERSEDED_INITIAL_FINALIZATION_ATTEMPT.** Results below are
+> retained for provenance only. No PASS claim in this document is authoritative.
+
 - Single void only; duplicate site-to-cavity creation fails closed.
 - Two-dimensional plane strain only.
 - Diagnostic parameters are not in the canonical four-class registry.
@@ -12,8 +15,8 @@
   continuation are incomplete.
 - Controlled variant rows share the reference production path; separate
   geometry-specific complete trajectories remain required.
-- Disabled neutrality covers production monotonic sentinels; an exact bounded
-  unload/reload base-to-V5 comparison remains open.
+- The current self-comparison is construction determinism only. Base-to-V5
+  disabled neutrality is `NOT_RUN`.
 
 These open items are systematic finalization blockers. They are not hidden by
 relaxing tolerances, and V5 is not designated a release candidate.

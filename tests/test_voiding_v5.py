@@ -6,14 +6,14 @@ import pytest
 
 from arrhenius_fracture.voiding_production_v5 import (
     _complete_next_clock, build_production_void_state,
-    deterministic_trajectory, ligament_transaction, natural_trajectory,
+    deterministic_trajectory, downstream_front_transaction, ligament_transaction, natural_trajectory,
 )
 from arrhenius_fracture.directional_competition_v11 import (
     DirectionalCompetitionState, DirectionalHazardState, tungsten_cleavage_candidates,
 )
 from arrhenius_fracture.voiding_v5 import (
     Cavity2D, VoidPhase, VoidingConfig, advance_site, arrhenius_rates,
-    create_subgrid_cavity, grow_cavity_2d, grow_cavity_from_rate,
+    create_subgrid_cavity, grow_cavity_2d, grow_cavity_from_rate, update_cavity_growth,
 )
 
 
@@ -190,3 +190,54 @@ def test_growth_uses_drive_magnitude_inventory_and_configured_shrinkage():
     assert high.radius_m - cavity.radius_m == pytest.approx(2.0 * (low.radius_m - cavity.radius_m))
     assert exhausted.radius_m == cavity.radius_m
     assert shrink.radius_m < cavity.radius_m
+
+
+def test_state_owned_growth_and_shrinkage_conserve_inventory_area():
+    # Use a minimal standalone state because site lifecycle is irrelevant here.
+    cavity = Cavity2D("v", "s", (0.0, 0.0), 1.0e-6, math.pi * 1.0e-12,
+                      math.pi * 1.0e-12, VoidPhase.STABLE_SUBGRID_VOID)
+    from arrhenius_fracture.voiding_v5 import ProductionVoidState
+    inventory = ProductionVoidState((), (cavity,), available_defect_inventory_area_m2=1.0e-9)
+    total = inventory.available_defect_inventory_area_m2 + inventory.consumed_defect_inventory_area_m2
+    grown = update_cavity_growth(inventory, "v", rates={"series_limited_growth_s": 1.0},
+                                 dt_s=1.0, radial_growth_scale_m=1.0e-8)
+    delta = grown.cavities[0].area_m2 - cavity.area_m2
+    assert inventory.available_defect_inventory_area_m2 - grown.available_defect_inventory_area_m2 == pytest.approx(delta)
+    assert grown.consumed_defect_inventory_area_m2 == pytest.approx(delta)
+    assert grown.available_defect_inventory_area_m2 + grown.consumed_defect_inventory_area_m2 == pytest.approx(total)
+    shrunk = update_cavity_growth(grown, "v", rates={"series_limited_growth_s": 1.0},
+                                  dt_s=1.0, radial_growth_scale_m=1.0e-8,
+                                  chemical_potential_drive_J=-1.0e-20)
+    assert shrunk.available_defect_inventory_area_m2 + shrunk.consumed_defect_inventory_area_m2 == pytest.approx(total)
+    assert shrunk.consumed_defect_inventory_area_m2 < grown.consumed_defect_inventory_area_m2
+
+
+@pytest.mark.parametrize("stage", [
+    "downstream_phase_update",
+    "downstream_length_ledger_update:ordinary_crack_fractured_length_m",
+    "downstream_length_ledger_update:projected_front_advance_m",
+    "downstream_event_history_update",
+])
+def test_downstream_state_updates_rollback_atomically(stage):
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    accepted, _ = ligament_transaction(accepted)
+    from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+    before = complete_accepted_state_fingerprint(accepted)
+    with pytest.raises(RuntimeError, match="injected:" + stage):
+        downstream_front_transaction(accepted, failure_stage=stage)
+    assert complete_accepted_state_fingerprint(accepted) == before
+
+
+@pytest.mark.parametrize("threshold_offset,expected_winners", [(5.0e-14, 2), (2.0e-13, 1)])
+def test_first_passage_near_tie_uses_frozen_action_tolerance(threshold_offset, expected_winners):
+    state, _ = build_production_void_state()
+    candidates = tungsten_cleavage_candidates(theta_deg=45.0)
+    hazards = [DirectionalHazardState(item.candidate_id) for item in candidates]
+    hazards[1] = replace(hazards[1], current_threshold_action=1.0 + threshold_offset)
+    state = replace(state, competition=DirectionalCompetitionState(
+        candidates=candidates, hazard_states=tuple(hazards), global_hazard_seed=3621,
+    ))
+    advanced, audit = _complete_next_clock(state, np.eye(2) * 1.0e9)
+    assert sum(row["winner"] for row in audit) == expected_winners
+    emitted = {row["candidate_id"] for row in audit if row["emitted_event_ids"]}
+    assert {event.candidate_id for event in advanced.competition.pending_events} == emitted

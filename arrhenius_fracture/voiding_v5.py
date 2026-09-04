@@ -287,6 +287,48 @@ def grow_cavity_from_rate(cavity: Cavity2D, *, rates: Mapping[str, float],
     return grow_cavity_2d(cavity, delta) if delta != 0.0 else cavity
 
 
+def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
+                         rates: Mapping[str, float], dt_s: float,
+                         radial_growth_scale_m: float,
+                         chemical_potential_drive_J: float = 1.0e-20,
+                         chemical_potential_reference_J: float = 1.0e-20,
+                         shrinkage_mobility_m_per_J_s: float = 1.0e8) -> ProductionVoidState:
+    """Atomically advance a cavity and its finite 2-D defect inventory.
+
+    Growth transfers area from available to consumed inventory.  Shrinkage
+    returns the released area to available inventory; consumed inventory may
+    never become negative.
+    """
+    cavity = next(item for item in state.cavities if item.cavity_id == cavity_id)
+    grown = grow_cavity_from_rate(
+        cavity, rates=rates, dt_s=dt_s,
+        radial_growth_scale_m=radial_growth_scale_m,
+        chemical_potential_drive_J=chemical_potential_drive_J,
+        chemical_potential_reference_J=chemical_potential_reference_J,
+        shrinkage_mobility_m_per_J_s=shrinkage_mobility_m_per_J_s,
+        available_inventory_area_m2=state.available_defect_inventory_area_m2,
+    )
+    delta_area = grown.area_m2 - cavity.area_m2
+    if delta_area >= 0.0:
+        available = state.available_defect_inventory_area_m2 - delta_area
+        consumed = state.consumed_defect_inventory_area_m2 + delta_area
+    else:
+        returned = min(-delta_area, state.consumed_defect_inventory_area_m2)
+        # A cavity cannot return inventory that was not previously consumed.
+        if returned < -delta_area:
+            target_area = cavity.area_m2 - returned
+            grown = replace(grown, radius_m=math.sqrt(target_area / math.pi),
+                            area_m2=target_area,
+                            inventory_area_m2=cavity.inventory_area_m2 - returned)
+        available = state.available_defect_inventory_area_m2 + returned
+        consumed = state.consumed_defect_inventory_area_m2 - returned
+    return replace(
+        replace_cavity(state, grown),
+        available_defect_inventory_area_m2=max(float(available), 0.0),
+        consumed_defect_inventory_area_m2=max(float(consumed), 0.0),
+    )
+
+
 def replace_cavity(state: ProductionVoidState, cavity: Cavity2D) -> ProductionVoidState:
     return replace(state, cavities=tuple(
         cavity if item.cavity_id == cavity.cavity_id else item for item in state.cavities
@@ -329,5 +371,5 @@ __all__ = [
     "Cavity2D", "HazardClock", "ProductionVoidState", "SCHEMA", "VoidPhase",
     "VoidSite", "VoidingConfig", "advance_site", "arrhenius_rates",
     "create_subgrid_cavity", "fingerprint", "grow_cavity_2d", "grow_cavity_from_rate",
-    "promote_cavity", "replace_cavity", "serialize",
+    "promote_cavity", "replace_cavity", "serialize", "update_cavity_growth",
 ]

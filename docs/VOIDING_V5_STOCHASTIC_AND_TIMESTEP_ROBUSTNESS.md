@@ -1,5 +1,8 @@
 # V5 stochastic and timestep robustness
 
+> **STATUS: SUPERSEDED_INITIAL_FINALIZATION_ATTEMPT.** Results below are
+> retained for provenance only. No PASS claim in this document is authoritative.
+
 The campaign records 35 partition rows (seven transition labels at partitions
 1, 2, 4, 8, and 16) and 32 fixed natural seeds. Thresholds, integrated birth
 hazard, hit count, RNG hash, state hash, outcome, and solver status are retained.

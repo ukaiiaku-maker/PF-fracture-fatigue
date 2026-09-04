@@ -7,6 +7,18 @@ This specification describes the implemented two-dimensional plane-strain,
 single-void capability. It is a software and diagnostic mechanics model, not a
 calibrated tungsten material model and not experimental validation.
 
+When multiple directional first passages are emitted at the same common event
+time, temporal/degenerate proposal selection owns the selected event IDs. Any
+simultaneous emitted event not selected remains pending at that same completion
+time. After an accepted topology change it must be proposed against the rebuilt
+geometry; its completed hazard threshold is not erased or advanced a second
+time.
+
+For crack-to-void connection, projected front advance is defined as projected
+newly fractured ligament length plus the pre-existing projected cavity span.
+`connected_free_surface_extent_m` counts the propagation-side semicircular arc,
+`pi*R`; it does not claim the full `2*pi*R` cavity perimeter.
+
 ## State and eligibility
 
 A `VoidSite` is eligible only in `AVAILABLE_SITE`. Its unit normal `n` is stored

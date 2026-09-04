@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
+from arrhenius_fracture.evidence_ontology_v5 import canonical_hash, validate_evidence_rows
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
 from arrhenius_fracture.voiding_production_v5 import (
     _complete_next_clock, build_production_void_state, cavity_boundary_tensor,
@@ -34,7 +35,7 @@ def main(argv=None):
     disabled, _ = build_production_void_state(enabled=False)
     disabled_again, _ = build_production_void_state(enabled=False)
     rows.append({
-        "gate": "V12_VOIDING_DISABLED_NEUTRALITY", "case": "default_off_exact_state",
+        "gate": "V5_DISABLED_CONSTRUCTION_DETERMINISM", "case": "default_off_exact_state",
         "initial": observables(disabled, "disabled-a"), "final": observables(disabled_again, "disabled-b"),
         "fingerprints_equal": complete_accepted_state_fingerprint(disabled) == complete_accepted_state_fingerprint(disabled_again),
         "void_state_absent": disabled.void_state is None and disabled_again.void_state is None,
@@ -121,38 +122,86 @@ def main(argv=None):
                   and deterministic[8]["energy_margin_J_per_m"] > 0.0
                   and deterministic[-1]["void_phase"] == "DOWNSTREAM_FRONT_ACTIVE"
                   and deterministic[-1]["graph_length_m"] > deterministic[7]["graph_length_m"]
+                  and deterministic[8]["connected_free_surface_certificate"]["passed"]
+                  and abs(deterministic[8]["length_ledgers"]["projected_front_advance_m"]
+                          - deterministic[8]["length_ledgers"]["projected_fractured_length_m"]
+                          - deterministic[8]["length_ledgers"]["projected_free_span_m"]) <= 1.0e-15
                   and len(deterministic[10]["cavity_boundary_element_ids"]) > 0
                   and deterministic[11]["causal_first_passage"]["cleavage"][0]["rate_s"] > 0.0
-                  and deterministic[11]["causal_first_passage"]["cleavage"][0]["common_advance_duration_s"] > 0.0,
+                  and deterministic[11]["causal_first_passage"]["cleavage"][0]["common_advance_duration_s"] > 0.0
+                  and set(deterministic[11]["causal_first_passage"]["selected_proposal_candidate_ids"])
+                      <= set(deterministic[11]["causal_first_passage"]["emitted_winner_candidate_ids"])
+                  and deterministic[11]["causal_first_passage"]["barrier_candidate_id"]
+                      == deterministic[11]["causal_first_passage"]["candidate_id"],
     })
 
+    # Prospectively frozen constitutive test: one state, candidate, orientation,
+    # threshold and hazard action; only the supplied local tensor changes.
+    direct_state, _ = build_production_void_state(enabled=True)
+    fixed_candidate_id = direct_state.competition.candidates[0].candidate_id
     perturbation_rates = []
-    for scale in (0.0, 0.5, 1.0, 1.5):
-        perturbed = equilibrate_fixed_load_with_production_fem(
-            replace(final, displacement=final.displacement * scale)
-        )
-        tensor, elements = cavity_boundary_tensor(perturbed)
-        try:
-            _, audit = _complete_next_clock(perturbed, tensor, start_time=3.0)
-            rate, duration = audit[0]["rate_s"], audit[0]["common_advance_duration_s"]
-            classification = "FIRST_PASSAGE_REACHABLE"
-        except RuntimeError:
-            rate, duration = 0.0, None
-            classification = "ZERO_DRIVE_NO_EVENT"
+    for opening_Pa in (2.0e8, 4.0e8, 6.0e8, 8.0e8):
+        tensor = [[opening_Pa, 0.0], [0.0, opening_Pa]]
+        _, audit = _complete_next_clock(direct_state, tensor, start_time=3.0)
+        measured = next(row for row in audit if row["candidate_id"] == fixed_candidate_id)
         perturbation_rates.append({
-            "opening_scale": scale, "rate_s": rate, "duration_s": duration,
-            "classification": classification,
-            "boundary_element_ids": elements, "tensor_Pa": tensor.tolist(),
+            "candidate_id": fixed_candidate_id, "position_m": [7.0e-4, 0.0],
+            "normal_xy": list(direct_state.competition.candidates[0].normal_xy),
+            "direction_xy": list(direct_state.competition.candidates[0].direction_xy),
+            "tensor_Pa": tensor, "resolved_opening_stress_Pa": measured["resolved_opening_stress_Pa"],
+            "barrier_J": measured["hazard_barrier_J"], "raw_rate_s": measured["raw_rate_s"],
+            "effective_rate_s": measured["effective_rate_s"], "crossing_time_s": measured["crossing_time_s"],
         })
     rows.append({
-        "gate": "V12_CAVITY_SURFACE_CAUSAL_PERTURBATIONS",
-        "case": "opening_scale_controls_existing_cleavage_law",
+        "gate": "DIRECT_TENSOR_CLEAVAGE_CAUSALITY",
+        "case": "fixed_candidate_unsaturated_tensor_perturbation",
         "measurements": perturbation_rates,
         "passed": all(
-            right["rate_s"] > left["rate_s"]
+            right["resolved_opening_stress_Pa"] > left["resolved_opening_stress_Pa"]
+            and right["barrier_J"] < left["barrier_J"]
+            and right["effective_rate_s"] > left["effective_rate_s"]
+            and right["crossing_time_s"] < left["crossing_time_s"]
             for left, right in zip(perturbation_rates, perturbation_rates[1:])
         ),
     })
+    print(json.dumps({"DIRECT_TENSOR_CLEAVAGE_CAUSALITY": perturbation_rates}, sort_keys=True))
+
+    # The solver-backed experiment freezes the connected topology, boundary
+    # node and candidate.  Retained history is unchanged and its residual is
+    # reported rather than treating a scale factor as stress-free.
+    connected, _ = deterministic_trajectory(stop_before_ligament=True)
+    connected, _ = ligament_transaction(connected)
+    center = connected.void_state.cavities[0].center_m
+    import numpy as np
+    distances = np.linalg.norm(np.asarray(connected.mesh.nodes) - np.asarray(center), axis=1)
+    boundary_nodes = np.flatnonzero(distances <= connected.void_state.cavities[0].radius_m * 1.02)
+    fixed_node = int(boundary_nodes[np.argmax(np.asarray(connected.mesh.nodes)[boundary_nodes, 0])])
+    solver_rows = []
+    for load_scale in (0.75, 1.0, 1.25):
+        trial = equilibrate_fixed_load_with_production_fem(replace(connected, displacement=connected.displacement * load_scale))
+        tensor, elements = cavity_boundary_tensor(trial, boundary_node=fixed_node)
+        _, audit = _complete_next_clock(connected, tensor, start_time=4.0)
+        measured = next(row for row in audit if row["candidate_id"] == fixed_candidate_id)
+        solver_rows.append({
+            "load_scale": load_scale, "candidate_id": fixed_candidate_id,
+            "boundary_node": fixed_node, "boundary_position_m": list(map(float, trial.mesh.nodes[fixed_node])),
+            "topology_fingerprint": complete_accepted_state_fingerprint(replace(connected, displacement=np.zeros_like(connected.displacement))),
+            "retained_history_policy": "FIX_EP_RHO_DAMAGE_AND_CRACK_STATE",
+            "residual_N_per_m": trial.energy_ledgers.get("latest_residual_l2_N_per_m", 0.0),
+            "tensor_Pa": tensor.tolist(), "boundary_element_ids": elements,
+            "resolved_opening_stress_Pa": measured["resolved_opening_stress_Pa"],
+            "barrier_J": measured["hazard_barrier_J"], "raw_rate_s": measured["raw_rate_s"],
+            "effective_rate_s": measured["effective_rate_s"], "crossing_time_s": measured["crossing_time_s"],
+        })
+    rows.append({
+        "gate": "SOLVER_BACKED_CAVITY_SURFACE_LOADING_CAUSALITY",
+        "case": "fixed_connected_topology_node_candidate_reload",
+        "measurements": solver_rows,
+        "passed": all(right["resolved_opening_stress_Pa"] > left["resolved_opening_stress_Pa"]
+                      and right["effective_rate_s"] > left["effective_rate_s"]
+                      for left, right in zip(solver_rows, solver_rows[1:])),
+    })
+    print(json.dumps({"SOLVER_BACKED_CAVITY_SURFACE_LOADING_CAUSALITY": solver_rows}, sort_keys=True))
 
     # Checkpoint the nontrivial final state and verify complete restart ownership.
     checkpoint = out / "one_void_checkpoint.json"
@@ -179,10 +228,35 @@ def main(argv=None):
     gates = {}
     for gate in sorted({row["gate"] for row in rows}):
         gates[gate] = "PASS" if all(row["passed"] for row in rows if row["gate"] == gate) else "FAIL"
+    implementation_sha = subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip()
+    source_rows = {f"raw:{index}": row for index, row in enumerate(rows)}
+    evidence_rows = []
+    for index, row in enumerate(rows):
+        configuration = {"gate": row["gate"], "case": row["case"]}
+        geometry = {
+            "initial_mesh_nodes": row.get("initial", {}).get("mesh_nodes"),
+            "terminal_mesh_nodes": row.get("final", {}).get("mesh_nodes"),
+            "terminal_graph_length_m": row.get("final", {}).get("graph_length_m"),
+        }
+        evidence_rows.append({
+            "case_id": f"production:{index}:{row['case']}", "execution_id": f"production-execution:{index}",
+            "input_configuration": configuration, "input_hash": canonical_hash(configuration),
+            "actual_realized_geometry": geometry, "actual_geometry_fingerprint": canonical_hash(geometry),
+            "actual_operation_trace": row.get("executed_operations", row.get("executed_sequence", [row["case"]])),
+            "initial_fingerprint": row.get("initial", {}).get("fingerprint", "not-applicable"),
+            "terminal_fingerprint": row.get("final", {}).get("fingerprint", "not-applicable"),
+            "measurement_source": "scripts/qualify_voiding_production_v5.py",
+            "predicate_name": "boolean_measurement", "predicate_inputs": {"measurement": row["passed"]},
+            "predicate_result": row["passed"], "source_row_ids": [f"raw:{index}"],
+            "implementation_sha": implementation_sha,
+        })
+    validate_evidence_rows(evidence_rows, source_rows=source_rows, implementation_sha=implementation_sha)
     payload = {
         "schema": "v12.production-voiding-qualification/5",
-        "implementation_git_sha": subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip(),
-        "gates": gates, "rows": rows, "multiple_voids_enabled": False, "fatigue_campaign_run": False,
+        "implementation_git_sha": implementation_sha,
+        "gates": gates, "rows": rows, "evidence_rows": evidence_rows,
+        "evidence_ontology_validation": "PASS",
+        "multiple_voids_enabled": False, "fatigue_campaign_run": False,
     }
     path = out / "case_rows.json"
     path.write_text(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n")

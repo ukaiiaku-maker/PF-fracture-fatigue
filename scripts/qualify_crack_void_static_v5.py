@@ -12,12 +12,18 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from arrhenius_fracture.crack_void_mechanics_v5 import solve_crack_void_case
+from arrhenius_fracture.evidence_ontology_v5 import canonical_hash, validate_evidence_rows
 from arrhenius_fracture.voiding_production_v5 import deterministic_trajectory
 
 
 def main(argv=None):
     out = Path(argv[0] if argv else "artifacts/voiding_v5/static")
     out.mkdir(parents=True, exist_ok=True)
+    def clean(value):
+        if isinstance(value, float) and not math.isfinite(value): return None
+        if isinstance(value, dict): return {key: clean(item) for key, item in value.items()}
+        if isinstance(value, (list, tuple)): return [clean(item) for item in value]
+        return value
     specifications = []
     for segments in (32, 64, 128):
         specifications.append((f"kirsch_{segments}", dict(boundary_segments=segments, crack_enabled=False)))
@@ -98,7 +104,7 @@ def main(argv=None):
         derivatives = {
             "fixed_opening_crack_release_rate_J_per_m2": -(crack[2]["stored_energy_J_per_m"] - crack[0]["stored_energy_J_per_m"]) /
                 (crack[2]["crack_graph_length_m"] - crack[0]["crack_graph_length_m"]),
-            "fixed_opening_cavity_release_rate_J_per_m2": -(cavity[2]["stored_energy_J_per_m"] - cavity[0]["stored_energy_J_per_m"]) /
+            "cavity_area_conjugate_J_per_m3": -(cavity[2]["stored_energy_J_per_m"] - cavity[0]["stored_energy_J_per_m"]) /
                 (cavity[2]["cavity_area_m2"] - cavity[0]["cavity_area_m2"]),
         }
     refinement = [by_case[f"mesh_refinement_{i}"]["observables"] for i in (10, 12, 16)]
@@ -132,22 +138,46 @@ def main(argv=None):
         and kirsch_analytic_error <= declared_tolerances["kirsch_128_relative_to_analytic_max"]
         and kirsch_fine_change <= declared_tolerances["kirsch_64_to_128_relative_max"]
     )
+    implementation_sha = subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip()
+    source_rows = {f"raw:{index}": row for index, row in enumerate(rows)}
+    evidence_rows = []
+    for index, row in enumerate(rows):
+        configuration = row["configuration"]
+        observables = clean(row.get("observables", {}))
+        geometry = {"case": row["case"], "configuration": configuration,
+                    "mesh_nodes": observables.get("mesh_nodes"), "mesh_elements": observables.get("mesh_elements")}
+        evidence_rows.append({
+            "case_id": f"static:{index}:{row['case']}", "execution_id": f"static-execution:{index}",
+            "input_configuration": configuration, "input_hash": canonical_hash(configuration),
+            "actual_realized_geometry": geometry, "actual_geometry_fingerprint": canonical_hash(geometry),
+            "actual_operation_trace": [row["executed_operation"]],
+            "initial_fingerprint": canonical_hash(configuration), "terminal_fingerprint": canonical_hash(observables),
+            "measurement_source": "scripts/qualify_crack_void_static_v5.py",
+            "predicate_name": "boolean_measurement", "predicate_inputs": {"measurement": row["passed"]},
+            "predicate_result": row["passed"], "source_row_ids": [f"raw:{index}"],
+            "implementation_sha": implementation_sha,
+        })
+    signatures = {}
+    for evidence in evidence_rows:
+        signature = (evidence["input_hash"], evidence["initial_fingerprint"], evidence["terminal_fingerprint"])
+        signatures[signature] = signatures.get(signature, 0) + 1
+    for evidence in evidence_rows:
+        signature = (evidence["input_hash"], evidence["initial_fingerprint"], evidence["terminal_fingerprint"])
+        if signatures[signature] > 1:
+            evidence["equality_classification"] = "EXPECTED_EQUIVALENCE"
+    validate_evidence_rows(evidence_rows, source_rows=source_rows, implementation_sha=implementation_sha)
     payload = {
         "schema": "v12.crack-void-static-qualification/5",
-        "implementation_git_sha": subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip(),
+        "implementation_git_sha": implementation_sha,
         "gate": "PASS" if passed else "FAIL",
-        "rows": rows, "fixed_opening_release_rates": derivatives,
+        "rows": rows, "evidence_rows": evidence_rows, "evidence_ontology_validation": "PASS",
+        "fixed_opening_release_rates": derivatives,
         "mesh_convergence": convergence, "mirror_reaction_relative_error": mirror_error,
         "kirsch_hoop_concentration": kirsch,
         "kirsch_128_relative_to_analytic": kirsch_analytic_error,
         "kirsch_64_to_128_relative_change": kirsch_fine_change,
         "declared_tolerances": declared_tolerances,
     }
-    def clean(value):
-        if isinstance(value, float) and not math.isfinite(value): return None
-        if isinstance(value, dict): return {key: clean(item) for key, item in value.items()}
-        if isinstance(value, (list, tuple)): return [clean(item) for item in value]
-        return value
     payload = clean(payload)
     path = out / "case_rows.json"
     path.write_text(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n")
