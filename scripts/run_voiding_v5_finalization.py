@@ -31,7 +31,7 @@ from arrhenius_fracture.voiding_v5 import (
     arrhenius_rates, grow_cavity_from_rate,
 )
 
-OUT = ROOT / "artifacts/voiding_v5_finalization"
+OUT = Path(os.environ.get("VOIDING_V5_FINALIZATION_OUT", ROOT / "artifacts/voiding_v5_finalization"))
 SOURCE_SHA = subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip()
 
 
@@ -141,7 +141,7 @@ def run_static(specs, registry):
                    "crack_free_surface_components": 1, "support_cavity_overlap": 0,
                    "bridge_element_audit": "PASS", "energy_reaction_identity": "FINITE",
                    "conditioning": "SOLVED", "topology_classification": "ONE_CRACK_ONE_VOID",
-                   "wall_seconds": time.perf_counter() - started, "status": "PASS", "failure_classification": ""}
+                   "wall_seconds": "NOT_INCLUDED_IN_DETERMINISTIC_AGGREGATE", "status": "PASS", "failure_classification": ""}
             registry[index]["status"] = "PASS"; registry[index]["attempt_count"] = 1
         except Exception as error:
             initial_error = f"{type(error).__name__}: {error}"
@@ -152,7 +152,7 @@ def run_static(specs, registry):
                 obs = result["observables"]
                 row = {"case_id": case_id, **spec, **obs, "status": "RECOVERED_PASS",
                        "initial_error": initial_error, "recovery": "one_local_mesh_refinement",
-                       "attempt_count": 2, "wall_seconds": time.perf_counter() - started,
+                       "attempt_count": 2, "wall_seconds": "NOT_INCLUDED_IN_DETERMINISTIC_AGGREGATE",
                        "failure_classification": "MESH_CONVERGENCE_FAILURE_RECOVERED"}
                 registry[index]["status"] = "RECOVERED_PASS"; registry[index]["attempt_count"] = 2
                 failures.append({"case_id": case_id, "failure_classification": "MESH_CONVERGENCE_FAILURE",
@@ -161,7 +161,7 @@ def run_static(specs, registry):
                 row = {"case_id": case_id, **spec, "status": "OUTSIDE_ENVELOPE",
                        "error": f"{type(retry_error).__name__}: {retry_error}",
                        "initial_error": initial_error, "recovery": "one_local_mesh_refinement_failed",
-                       "attempt_count": 2, "wall_seconds": time.perf_counter() - started,
+                       "attempt_count": 2, "wall_seconds": "NOT_INCLUDED_IN_DETERMINISTIC_AGGREGATE",
                        "failure_classification": "OUTSIDE_DEMONSTRATED_GEOMETRY_ENVELOPE"}
                 registry[index]["status"] = "OUTSIDE_ENVELOPE"; registry[index]["attempt_count"] = 2
                 registry[index]["failure_classification"] = row["failure_classification"]
@@ -238,12 +238,12 @@ def seed_ensemble(registry):
                    "embryo_outcome": site.phase.value, "maximum_subgrid_radius_m": 0.0,
                    "promotion_status": False, "ligament_status": False, "downstream_status": False,
                    "accepted_crack_events": 0, "terminal_classification": classification,
-                   "wall_seconds": time.perf_counter() - started, "solver_failure": "", "status": "PASS"}
+                   "wall_seconds": "NOT_INCLUDED_IN_DETERMINISTIC_AGGREGATE", "solver_failure": "", "status": "PASS"}
             registry[offset + index]["status"] = "PASS"; registry[offset + index]["attempt_count"] = 1
         except Exception as error:
             row = {"case_id": f"SEED-{index:03d}", "seed": seed, "terminal_classification": "NUMERICAL_FAILURE",
                    "solver_failure": f"{type(error).__name__}: {error}", "status": "FAIL",
-                   "wall_seconds": time.perf_counter() - started}
+                   "wall_seconds": "NOT_INCLUDED_IN_DETERMINISTIC_AGGREGATE"}
             registry[offset + index]["status"] = "FAIL"; registry[offset + index]["attempt_count"] = 1
             registry[offset + index]["failure_classification"] = "SOLVER_CONDITIONING_LIMIT"
         rows.append(row)
