@@ -312,9 +312,12 @@ def main() -> int:
     write_csv(OUT / "failure_recovery_log.csv", failures or [{"case_id": "NONE", "failure_classification": "NONE", "status": "NO_SYSTEMATIC_FAILURE"}])
     classifications = {}
     for row in seeds: classifications[row["terminal_classification"]] = classifications.get(row["terminal_classification"], 0) + 1
+    outside = sum(row["status"] == "OUTSIDE_ENVELOPE" for row in static)
+    recovered = sum(row["status"] == "RECOVERED_PASS" for row in static)
     validity = {"schema": "v12.voiding-v5-validity-envelope/1", "static_total": len(static),
                 "static_pass": sum(row["status"] in {"PASS", "RECOVERED_PASS"} for row in static),
-                "static_outside_envelope": len(static_failures), "seed_outcomes": classifications,
+                "static_recovered_after_refinement": recovered,
+                "static_outside_envelope": outside, "seed_outcomes": classifications,
                 "single_void_only": True, "plane_strain_2d_only": True,
                 "material_calibrated": False, "physical_validation": False}
     write_json(OUT / "validity_envelope.json", validity)
