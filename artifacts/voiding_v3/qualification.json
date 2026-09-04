@@ -1,0 +1,54 @@
+{
+  "deterministic_sequence": [
+    "AVAILABLE_SITE",
+    "MULTI_HIT_COMPLETE",
+    "EMBRYO",
+    "STABILIZED",
+    "SUBGRID_GROWTH",
+    "EXPLICIT_PROMOTION",
+    "RESOLVED_GROWTH",
+    "CRACK_VOID_INTERACTION",
+    "LIGAMENT_RUPTURE",
+    "CONNECTED_TOPOLOGY",
+    "DOWNSTREAM_FIRST_PASSAGE",
+    "NEW_SHARP_FRONT",
+    "CONTINUED_FRONT_EVENT"
+  ],
+  "fatigue_campaign_run": false,
+  "gates": {
+    "V12_BOUNDED_NATURAL_STOCHASTIC_CASE": "NO_BIRTH_WITHIN_BOUNDED_DIAGNOSTIC",
+    "V12_CRACK_VOID_TRANSACTION_QUALIFIED": "PASS",
+    "V12_EXPLICIT_CRACK_VOID_STATIC_MECHANICS_QUALIFIED": "PASS",
+    "V12_ONE_VOID_END_TO_END_DEMONSTRATED": "PASS",
+    "V12_VOIDING_DISABLED_NEUTRALITY": "PASS",
+    "V12_VOID_LIFECYCLE_QUALIFIED": "PASS",
+    "V12_VOID_PROMOTION_AND_GROWTH_QUALIFIED": "PASS"
+  },
+  "implementation_git_sha": "d51aef64085dc88d17ebeb6fa54b941e7f4dc16e",
+  "lifecycle_cases": [
+    "timestep_partition",
+    "competing_event",
+    "inventory",
+    "restart",
+    "rollback"
+  ],
+  "multiple_voids_enabled": false,
+  "natural_case": {
+    "bounded_hazard": 0.75,
+    "classification": "NO_BIRTH_WITHIN_BOUNDED_DIAGNOSTIC",
+    "seed": 3621,
+    "threshold": 2.943644392292234
+  },
+  "schema": "v12.stateful-voiding-qualification/1",
+  "transaction_cases": [
+    "centered",
+    "positive_offset",
+    "negative_offset",
+    "miss",
+    "hit",
+    "downstream_nucleation",
+    "remesh_failure",
+    "equilibrium_failure",
+    "late_veto"
+  ]
+}
