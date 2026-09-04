@@ -28,13 +28,15 @@ def valid_row(case_id="a", execution_id="execution-a"):
         "actual_realized_geometry": geometry, "actual_geometry_fingerprint": canonical_hash(geometry),
         "actual_operation_trace": ["birth"], "initial_fingerprint": "i",
         "terminal_fingerprint": "t", "measurement_source": "runner",
-        "predicate_name": "boolean_measurement", "predicate_inputs": {"measurement": True},
+        "predicate_name": "source_boolean", "predicate_inputs": {"source_bindings": {
+            "measurement": {"source_row_id": "raw", "path": ["passed"]}
+        }},
         "predicate_result": True, "source_row_ids": ["raw"], "implementation_sha": "sha",
     }
 
 
 def validate(rows):
-    return validate_evidence_rows(rows, source_rows={"raw": {}}, implementation_sha="sha")
+    return validate_evidence_rows(rows, source_rows={"raw": {"passed": True}}, implementation_sha="sha")
 
 
 def test_distinct_claims_cannot_share_one_execution():

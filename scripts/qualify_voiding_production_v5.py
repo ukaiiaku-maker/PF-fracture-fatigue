@@ -18,6 +18,7 @@ from arrhenius_fracture.evidence_ontology_v5 import canonical_hash, validate_evi
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
 from arrhenius_fracture.voiding_production_v5 import (
     _complete_next_clock, build_production_void_state, cavity_boundary_tensor,
+    cavity_boundary_recovery_operator,
     deterministic_trajectory, equilibrate_fixed_load_with_production_fem,
     ligament_transaction, natural_trajectory, observables,
 )
@@ -122,10 +123,18 @@ def main(argv=None):
                   and deterministic[8]["energy_margin_J_per_m"] > 0.0
                   and deterministic[-1]["void_phase"] == "DOWNSTREAM_FRONT_ACTIVE"
                   and deterministic[-1]["graph_length_m"] > deterministic[7]["graph_length_m"]
-                  and deterministic[8]["connected_free_surface_certificate"]["passed"]
+                  and deterministic[8]["closed_cavity_boundary_cycle_certificate"]["passed"]
+                  and deterministic[8]["crack_void_connection_certificate"]["passed"]
                   and abs(deterministic[8]["length_ledgers"]["projected_front_advance_m"]
                           - deterministic[8]["length_ledgers"]["projected_fractured_length_m"]
                           - deterministic[8]["length_ledgers"]["projected_free_span_m"]) <= 1.0e-15
+                  and deterministic[8]["length_ledgers"]["connected_void_free_span_m"] > 0.0
+                  and deterministic[8]["length_ledgers"]["traversed_void_free_span_m"] == 0.0
+                  and deterministic[11]["length_ledgers"]["traversed_void_free_span_m"]
+                      == deterministic[8]["length_ledgers"]["connected_void_free_span_m"]
+                  and abs(deterministic[11]["length_ledgers"]["projected_front_advance_m"]
+                          - deterministic[11]["length_ledgers"]["projected_fractured_length_m"]
+                          - deterministic[11]["length_ledgers"]["projected_free_span_m"]) <= 1.0e-15
                   and len(deterministic[10]["cavity_boundary_element_ids"]) > 0
                   and deterministic[11]["causal_first_passage"]["cleavage"][0]["rate_s"] > 0.0
                   and deterministic[11]["causal_first_passage"]["cleavage"][0]["common_advance_duration_s"] > 0.0
@@ -176,15 +185,19 @@ def main(argv=None):
     distances = np.linalg.norm(np.asarray(connected.mesh.nodes) - np.asarray(center), axis=1)
     boundary_nodes = np.flatnonzero(distances <= connected.void_state.cavities[0].radius_m * 1.02)
     fixed_node = int(boundary_nodes[np.argmax(np.asarray(connected.mesh.nodes)[boundary_nodes, 0])])
+    recovery = cavity_boundary_recovery_operator(connected, fixed_node)
     solver_rows = []
     for load_scale in (0.75, 1.0, 1.25):
         trial = equilibrate_fixed_load_with_production_fem(replace(connected, displacement=connected.displacement * load_scale))
-        tensor, elements = cavity_boundary_tensor(trial, boundary_node=fixed_node)
+        tensor, elements = cavity_boundary_tensor(
+            trial, boundary_node=fixed_node, boundary_element=recovery["selected_element_id"]
+        )
         _, audit = _complete_next_clock(connected, tensor, start_time=4.0)
         measured = next(row for row in audit if row["candidate_id"] == fixed_candidate_id)
         solver_rows.append({
             "load_scale": load_scale, "candidate_id": fixed_candidate_id,
             "boundary_node": fixed_node, "boundary_position_m": list(map(float, trial.mesh.nodes[fixed_node])),
+            **recovery,
             "topology_fingerprint": complete_accepted_state_fingerprint(replace(connected, displacement=np.zeros_like(connected.displacement))),
             "retained_history_policy": "FIX_EP_RHO_DAMAGE_AND_CRACK_STATE",
             "residual_N_per_m": trial.energy_ledgers.get("latest_residual_l2_N_per_m", 0.0),
@@ -230,6 +243,9 @@ def main(argv=None):
         gates[gate] = "PASS" if all(row["passed"] for row in rows if row["gate"] == gate) else "FAIL"
     implementation_sha = subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip()
     source_rows = {f"raw:{index}": row for index, row in enumerate(rows)}
+    for family, measurements in (("direct", perturbation_rates), ("solver", solver_rows)):
+        for index, measurement in enumerate(measurements):
+            source_rows[f"measurement:{family}:{index}"] = measurement
     evidence_rows = []
     for index, row in enumerate(rows):
         configuration = {"gate": row["gate"], "case": row["case"]}
@@ -246,10 +262,79 @@ def main(argv=None):
             "initial_fingerprint": row.get("initial", {}).get("fingerprint", "not-applicable"),
             "terminal_fingerprint": row.get("final", {}).get("fingerprint", "not-applicable"),
             "measurement_source": "scripts/qualify_voiding_production_v5.py",
-            "predicate_name": "boolean_measurement", "predicate_inputs": {"measurement": row["passed"]},
+            "predicate_name": "source_boolean", "predicate_inputs": {"source_bindings": {
+                "measurement": {"source_row_id": f"raw:{index}", "path": ["passed"]}
+            }},
             "predicate_result": row["passed"], "source_row_ids": [f"raw:{index}"],
             "implementation_sha": implementation_sha,
         })
+        evidence = evidence_rows[-1]
+        if row["case"] == "body_fitted_2d_promotion_and_growth":
+            evidence["predicate_name"] = "inventory_balance_within_tolerance"
+            evidence["predicate_inputs"] = {"tolerance_m2": 1.0e-20, "source_bindings": {
+                "cavity_before_m2": {"source_row_id": f"raw:{index}", "path": ["initial", "cavity_area_m2"]},
+                "cavity_after_m2": {"source_row_id": f"raw:{index}", "path": ["final", "cavity_area_m2"]},
+                "available_before_m2": {"source_row_id": f"raw:{index}", "path": ["initial", "available_defect_inventory_area_m2"]},
+                "available_after_m2": {"source_row_id": f"raw:{index}", "path": ["final", "available_defect_inventory_area_m2"]},
+                "consumed_before_m2": {"source_row_id": f"raw:{index}", "path": ["initial", "consumed_defect_inventory_area_m2"]},
+                "consumed_after_m2": {"source_row_id": f"raw:{index}", "path": ["final", "consumed_defect_inventory_area_m2"]},
+            }}
+        elif row["case"] == "accepted_ligament_and_downstream":
+            base = ["final", "crack_void_connection_certificate"]
+            evidence["predicate_name"] = "combined_crack_void_topology_certified"
+            evidence["predicate_inputs"] = {"source_bindings": {
+                "endpoint_matches_intersection": {"source_row_id": f"raw:{index}", "path": base + ["endpoint_matches_intersection"]},
+                "endpoint_on_cavity_boundary": {"source_row_id": f"raw:{index}", "path": base + ["endpoint_on_cavity_boundary"]},
+                "no_surviving_solid_ligament_bridge": {"source_row_id": f"raw:{index}", "path": base + ["no_surviving_solid_ligament_bridge"]},
+                "crack_graph_outside_cavity": {"source_row_id": f"raw:{index}", "path": base + ["crack_graph_outside_cavity"]},
+                "wake_support_outside_cavity": {"source_row_id": f"raw:{index}", "path": base + ["wake_support_outside_cavity"]},
+                "closed_cycle_passed": {"source_row_id": f"raw:{index}", "path": base + ["closed_cavity_boundary_cycle", "passed"]},
+                "combined_incidence_component_count": {"source_row_id": f"raw:{index}", "path": base + ["combined_incidence_component_count"]},
+            }}
+    for family, measurements in (("direct", perturbation_rates), ("solver", solver_rows)):
+        for index, measurement in enumerate(measurements):
+            source_id = f"measurement:{family}:{index}"
+            configuration = {"family": family, "sequence_index": index,
+                             "candidate_id": measurement["candidate_id"]}
+            geometry = {"position_m": measurement.get("position_m", measurement.get("boundary_position_m")),
+                        "operator_id": measurement.get("recovery_operator_id", "direct-tensor")}
+            if index == 0:
+                predicate_name = "finite_positive_rate"
+                predicate_inputs = {"source_bindings": {
+                    "rate_s": {"source_row_id": source_id, "path": ["effective_rate_s"]},
+                    "crossing_time_s": {"source_row_id": source_id, "path": ["crossing_time_s"]},
+                }}
+                source_ids = [source_id]
+            else:
+                prior_id = f"measurement:{family}:{index-1}"
+                operator_path = ["recovery_operator_id"] if family == "solver" else ["candidate_id"]
+                predicate_name = "fixed_candidate_causal_step"
+                predicate_inputs = {"source_bindings": {
+                    "candidate_before": {"source_row_id": prior_id, "path": ["candidate_id"]},
+                    "candidate_after": {"source_row_id": source_id, "path": ["candidate_id"]},
+                    "operator_before": {"source_row_id": prior_id, "path": operator_path},
+                    "operator_after": {"source_row_id": source_id, "path": operator_path},
+                    "opening_before_Pa": {"source_row_id": prior_id, "path": ["resolved_opening_stress_Pa"]},
+                    "opening_after_Pa": {"source_row_id": source_id, "path": ["resolved_opening_stress_Pa"]},
+                    "barrier_before_J": {"source_row_id": prior_id, "path": ["barrier_J"]},
+                    "barrier_after_J": {"source_row_id": source_id, "path": ["barrier_J"]},
+                    "rate_before_s": {"source_row_id": prior_id, "path": ["effective_rate_s"]},
+                    "rate_after_s": {"source_row_id": source_id, "path": ["effective_rate_s"]},
+                    "crossing_before_s": {"source_row_id": prior_id, "path": ["crossing_time_s"]},
+                    "crossing_after_s": {"source_row_id": source_id, "path": ["crossing_time_s"]},
+                }}
+                source_ids = [prior_id, source_id]
+            evidence_rows.append({
+                "case_id": f"causality:{family}:{index}", "execution_id": f"causality-execution:{family}:{index}",
+                "input_configuration": configuration, "input_hash": canonical_hash(configuration),
+                "actual_realized_geometry": geometry, "actual_geometry_fingerprint": canonical_hash(geometry),
+                "actual_operation_trace": ["direct_tensor_perturbation" if family == "direct" else "fixed_operator_reload"],
+                "initial_fingerprint": "fixed-hazard-and-topology", "terminal_fingerprint": canonical_hash(measurement),
+                "measurement_source": "scripts/qualify_voiding_production_v5.py",
+                "predicate_name": predicate_name, "predicate_inputs": predicate_inputs,
+                "predicate_result": True, "source_row_ids": source_ids,
+                "implementation_sha": implementation_sha,
+            })
     validate_evidence_rows(evidence_rows, source_rows=source_rows, implementation_sha=implementation_sha)
     payload = {
         "schema": "v12.production-voiding-qualification/5",

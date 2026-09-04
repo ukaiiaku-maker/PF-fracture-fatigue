@@ -46,13 +46,14 @@ def _head():
     return subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=Path(__file__).resolve().parents[1], text=True).strip()
 
 
-def _geometry(radius_m=5.0e-5):
-    hole = build_explicit_hole_mesh(1.0e-3, 1.0e-3, (7.0e-4, 0.0), radius_m, 5.0e-5, 32, radial_layers_override=12)
+def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0)):
+    hole = build_explicit_hole_mesh(1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5, 32, radial_layers_override=12)
     return hole, fill_explicit_hole_mesh(hole)
 
 
-def build_production_void_state(*, enabled=True, stochastic=False, seed=3621):
-    hole, filled = _geometry()
+def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
+                                cavity_center_m=(7.0e-4, 0.0)):
+    hole, filled = _geometry(center_m=cavity_center_m)
     mesh = filled.mesh
     ray = 16
     start = tuple(map(float, mesh.nodes[12 * 32 + ray]))
@@ -66,7 +67,7 @@ def build_production_void_state(*, enabled=True, stochastic=False, seed=3621):
         rng = np.random.default_rng(seed)
         thresholds = tuple(float(rng.exponential()) for _ in range(3)) if stochastic else (0.25, 0.25, 0.35)
         site = VoidSite(
-            "site-1", (7.0e-4, 0.0), VoidPhase.AVAILABLE_SITE, 0, 2, 0.8,
+            "site-1", tuple(map(float, cavity_center_m)), VoidPhase.AVAILABLE_SITE, 0, 2, 0.8,
             HazardClock(0.0, thresholds[0]), HazardClock(0.0, thresholds[1]), HazardClock(0.0, thresholds[2]),
         )
         void_state = ProductionVoidState((site,), rng_state=rng.bit_generator.state)
@@ -110,13 +111,16 @@ def observables(state, operation):
         "cavity_radius_m": None if cavity is None else cavity.radius_m,
         "cavity_area_m2": None if cavity is None else cavity.area_m2,
         "inventory_area_m2": None if cavity is None else cavity.inventory_area_m2,
+        "available_defect_inventory_area_m2": None if state.void_state is None else state.void_state.available_defect_inventory_area_m2,
+        "consumed_defect_inventory_area_m2": None if state.void_state is None else state.void_state.consumed_defect_inventory_area_m2,
         "void_event_history": [] if state.void_state is None else list(state.void_state.event_history),
         "length_ledgers": {} if state.void_state is None else dict(state.void_state.length_ledgers),
         "event_counters": dict(state.event_counters),
         "mesh_minimum_quality": float(np.min(quality)),
         "mesh_maximum_aspect_ratio": float(np.max(side, axis=1).max() / max(np.min(side), 1.0e-300)),
         "field_transfer_audit": state.junction_process_state.get("latest_void_remesh_audit"),
-        "connected_free_surface_certificate": state.junction_process_state.get("latest_connected_free_surface_certificate"),
+        "closed_cavity_boundary_cycle_certificate": state.junction_process_state.get("latest_closed_cavity_boundary_cycle_certificate"),
+        "crack_void_connection_certificate": state.junction_process_state.get("latest_crack_void_connection_certificate"),
     }
 
 
@@ -167,7 +171,56 @@ def _first_ray_cavity_intersection(state, start, direction):
     return tuple(map(float, min(intersections, key=lambda item: item[0])[1]))
 
 
-def cavity_boundary_tensor(state, *, boundary_node: int | None = None):
+def _conform_cavity_intersection(state, intersection, *, failure_injector=None):
+    """Insert an interior ray/cavity-edge intersection as an explicit node."""
+    point = np.asarray(intersection, dtype=float)
+    nodes = np.asarray(state.mesh.nodes)
+    nearest = int(np.argmin(np.linalg.norm(nodes - point, axis=1)))
+    if np.linalg.norm(nodes[nearest] - point) <= 1.0e-12:
+        return state, nearest, False
+    counts: dict[tuple[int, int], int] = {}
+    owners: dict[tuple[int, int], list[int]] = {}
+    for element, triangle in enumerate(np.asarray(state.mesh.elems, dtype=int)):
+        for a, b in ((triangle[0], triangle[1]), (triangle[1], triangle[2]), (triangle[2], triangle[0])):
+            edge = tuple(sorted((int(a), int(b))))
+            counts[edge] = counts.get(edge, 0) + 1
+            owners.setdefault(edge, []).append(element)
+    cavity = state.void_state.cavities[0]
+    center = np.asarray(cavity.center_m)
+    candidates = []
+    for edge, count in counts.items():
+        if count != 1:
+            continue
+        a, b = nodes[list(edge)]
+        if max(abs(np.linalg.norm(a - center) - cavity.radius_m),
+               abs(np.linalg.norm(b - center) - cavity.radius_m)) > cavity.radius_m * 0.02:
+            continue
+        delta = b - a
+        fraction = float((point - a) @ delta / max(delta @ delta, 1.0e-300))
+        distance = float(np.linalg.norm(point - (a + np.clip(fraction, 0.0, 1.0) * delta)))
+        if 1.0e-12 < fraction < 1.0 - 1.0e-12:
+            candidates.append((distance, edge, owners[edge][0]))
+    if not candidates or min(candidates)[0] > 1.0e-11:
+        raise RuntimeError("ray intersection is not on a splittable cavity boundary edge")
+    _, edge, owner = min(candidates)
+    triangle = list(map(int, state.mesh.elems[owner]))
+    a, b = edge
+    third = next(node for node in triangle if node not in edge)
+    new_node = len(nodes)
+    elems = np.delete(np.asarray(state.mesh.elems, dtype=int), owner, axis=0)
+    elems = np.vstack((elems, (a, new_node, third), (new_node, b, third)))
+    mesh = rebuild_tri_mesh(np.vstack((nodes, point)), elems, tip_centers=np.asarray(point))
+    fields = _project_fields(state, mesh)
+    rebuilt = remesh_mechanically_separating_v12(
+        state, mesh=mesh, boundary=state.boundary, transferred_fields=fields,
+        source_commit=_head(), configuration={"event": "CAVITY_EDGE_INTERSECTION_INSERTION"},
+        transaction_identity="cavity-edge-intersection", failure_injector=failure_injector,
+    )
+    return rebuilt, new_node, True
+
+
+def cavity_boundary_tensor(state, *, boundary_node: int | None = None,
+                           boundary_element: int | None = None):
     """Return the most tensile resolved tensor on the explicit cavity boundary.
 
     First passage is local, so circumferential averaging (which can cancel the
@@ -185,13 +238,29 @@ def cavity_boundary_tensor(state, *, boundary_node: int | None = None):
     if boundary_node is not None and int(boundary_node) not in set(map(int, boundary_nodes)):
         raise ValueError("requested tensor node is not on the cavity boundary")
     elements = np.flatnonzero(np.any(np.isin(state.mesh.elems, selected_nodes), axis=1))
+    if boundary_element is not None:
+        if boundary_node is None:
+            raise ValueError("fixed boundary element requires a fixed boundary node")
+        if int(boundary_element) not in set(map(int, elements)):
+            raise ValueError("requested tensor element is not incident to the fixed boundary node")
+        elements = np.asarray((int(boundary_element),))
     tensors = np.asarray([
         [[sigma[0, element], sigma[2, element]],
          [sigma[2, element], sigma[1, element]]]
         for element in elements
     ])
     selected = int(np.argmax(np.linalg.eigvalsh(tensors)[:, -1]))
-    return tensors[selected], tuple(map(int, elements))
+    return tensors[selected], (int(elements[selected]),)
+
+
+def cavity_boundary_recovery_operator(state, boundary_node: int) -> dict[str, Any]:
+    """Freeze a geometry-only, single-element boundary stress sampler."""
+    elements = np.flatnonzero(np.any(np.asarray(state.mesh.elems) == int(boundary_node), axis=1))
+    if not len(elements):
+        raise ValueError("boundary node has no incident element")
+    selected = int(np.min(elements))
+    return {"boundary_node_id": int(boundary_node), "selected_element_id": selected,
+            "recovery_operator_id": f"incident-element:{selected}", "recovery_weights": [1.0]}
 
 
 def cavity_free_surface_certificate(state) -> dict[str, Any]:
@@ -222,6 +291,39 @@ def cavity_free_surface_certificate(state) -> dict[str, Any]:
             "boundary_node_count": len(adjacency),
             "connected_component_count": 1 if passed else None,
             "topology": "single_closed_cavity_boundary_cycle"}
+
+
+def crack_void_connection_certificate(state, *, branch_id: str, cavity_id: str,
+                                      intended_intersection) -> dict[str, Any]:
+    """Certify combined graph/cavity incidence, clearance, and free boundary."""
+    cavity = next(item for item in state.void_state.cavities if item.cavity_id == cavity_id)
+    branch = state.crack_network.branch(branch_id)
+    endpoint = np.asarray(branch.tip)
+    intended = np.asarray(intended_intersection, dtype=float)
+    center = np.asarray(cavity.center_m)
+    cycle = cavity_free_surface_certificate(state)
+    endpoint_matches = bool(np.linalg.norm(endpoint - intended) <= 1.0e-12)
+    endpoint_on_boundary = bool(abs(np.linalg.norm(endpoint - center) - cavity.radius_m) <= cavity.radius_m * 0.02)
+    graph_outside = all(np.linalg.norm(np.asarray(point) - center) >= cavity.radius_m * (1.0 - 1.0e-10)
+                        for item in state.crack_network.branches for point in item.path)
+    support = state.v12_support_state
+    support_ids = () if support is None else support.selected_support_elements
+    centroids = np.asarray(state.mesh.nodes)[np.asarray(state.mesh.elems)].mean(axis=1)
+    support_outside = all(np.linalg.norm(centroids[int(element)] - center) >= cavity.radius_m * (1.0 - 1.0e-10)
+                          for element in support_ids)
+    no_solid_bridge = endpoint_matches and endpoint_on_boundary
+    passed = bool(cycle["passed"] and endpoint_matches and endpoint_on_boundary
+                  and graph_outside and support_outside and no_solid_bridge)
+    return {
+        "passed": passed, "cavity_id": cavity_id, "branch_id": branch_id,
+        "branch_endpoint_m": endpoint.tolist(), "intended_intersection_m": intended.tolist(),
+        "endpoint_matches_intersection": endpoint_matches, "endpoint_on_cavity_boundary": endpoint_on_boundary,
+        "no_surviving_solid_ligament_bridge": no_solid_bridge,
+        "crack_graph_outside_cavity": graph_outside, "wake_support_outside_cavity": support_outside,
+        "combined_incidence_component_count": 1 if passed else None,
+        "closed_cavity_boundary_cycle": cycle,
+        "topology": "connected_crack_graph_and_traction_free_cavity_cycle",
+    }
 
 
 def _project_fields(state, mesh):
@@ -367,6 +469,7 @@ def _select_emitted_proposal(state, audit):
             state.competition.hazard_states, correlation_interval_s=0.0,
         )
         if set(proposal.member_event_ids).issubset(emitted_ids)
+        and proposal.action_type == "one_arm"
     )
     proposal = select_temporal_or_degenerate_proposal(
         proposals, global_hazard_seed=state.competition.global_hazard_seed,
@@ -406,6 +509,10 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
     def geometry(trial, arms):
+        trial, aligned_node, inserted = _conform_cavity_intersection(
+            trial, end, failure_injector=inject,
+        )
+        inject("intersection_alignment", trial)
         realized = apply_v12_production_trial_geometry(
             trial, arms, source_commit=_head(), configuration={"event": "CRACK_TO_VOID_LIGAMENT"},
             transaction_identity="ligament", failure_injector=inject,
@@ -420,11 +527,11 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
         ligament_length = math.dist(start, end)
         increments = {
             "fractured_ligament_length_m": ligament_length,
-            "active_front_coordinate_advance_m": ligament_length + 2.0 * cavity.radius_m,
+            "active_front_coordinate_advance_m": ligament_length,
             "projected_fractured_length_m": end[0] - start[0],
-            "projected_front_advance_m": end[0] - start[0] + 2.0 * cavity.radius_m,
+            "projected_front_advance_m": end[0] - start[0],
             "preexisting_void_free_span_m": 2.0 * cavity.radius_m,
-            "projected_free_span_m": 2.0 * cavity.radius_m,
+            "connected_void_free_span_m": 2.0 * cavity.radius_m,
             # Precisely the propagation-side semicircular arc (not 2*pi*R).
             "connected_free_surface_extent_m": math.pi * cavity.radius_m,
         }
@@ -439,11 +546,21 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
                                                         "source_element": source_element},),
         )
         realized = replace(realized, void_state=void_state)
-        certificate = cavity_free_surface_certificate(realized)
+        cycle = cavity_free_surface_certificate(realized)
+        certificate = crack_void_connection_certificate(
+            realized, branch_id=ROOT_BRANCH_ID, cavity_id=cavity.cavity_id,
+            intended_intersection=end,
+        )
         if not certificate["passed"]:
             raise RuntimeError("connected free surface is not certified")
         junction = dict(realized.junction_process_state)
-        junction["latest_connected_free_surface_certificate"] = certificate
+        junction["latest_intersection_alignment"] = {
+            "intersection_m": list(end), "aligned_node_id_before_refinement": aligned_node,
+            "interior_edge_split_performed": inserted,
+            "accepted_mesh_has_aligned_node": bool(np.min(np.linalg.norm(np.asarray(realized.mesh.nodes) - np.asarray(end), axis=1)) <= 1.0e-12),
+        }
+        junction["latest_closed_cavity_boundary_cycle_certificate"] = cycle
+        junction["latest_crack_void_connection_certificate"] = certificate
         realized = replace(realized, junction_process_state=junction)
         inject("connected_surface_certification", realized)
         return realized
@@ -525,9 +642,11 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         projected = end[0] - start[0]
         increments = {
             "ordinary_crack_fractured_length_m": math.dist(start, end),
-            "active_front_coordinate_advance_m": projected,
+            "active_front_coordinate_advance_m": projected + (2.0 * cavity.radius_m if not continuation else 0.0),
             "projected_fractured_length_m": projected,
-            "projected_front_advance_m": projected,
+            "projected_front_advance_m": projected + (2.0 * cavity.radius_m if not continuation else 0.0),
+            "projected_free_span_m": 2.0 * cavity.radius_m if not continuation else 0.0,
+            "traversed_void_free_span_m": 2.0 * cavity.radius_m if not continuation else 0.0,
         }
         for name, increment in increments.items():
             ledgers[name] += increment
@@ -558,8 +677,8 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     }
 
 
-def deterministic_trajectory(*, stop_before_ligament=False):
-    state, hole = build_production_void_state(enabled=True)
+def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0)):
+    state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m)
     cfg = VoidingConfig(enabled=True, promotion_radius_m=5.0e-5)
     rows = [observables(state, "available_site")]
     for label in ("multi_hit_1", "multi_hit_2"):

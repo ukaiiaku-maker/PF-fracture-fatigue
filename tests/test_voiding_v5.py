@@ -9,7 +9,7 @@ from arrhenius_fracture.voiding_production_v5 import (
     deterministic_trajectory, downstream_front_transaction, ligament_transaction, natural_trajectory,
 )
 from arrhenius_fracture.directional_competition_v11 import (
-    DirectionalCompetitionState, DirectionalHazardState, tungsten_cleavage_candidates,
+    CleavageCandidate, DirectionalCompetitionState, DirectionalHazardState, tungsten_cleavage_candidates,
 )
 from arrhenius_fracture.voiding_v5 import (
     Cavity2D, VoidPhase, VoidingConfig, advance_site, arrhenius_rates,
@@ -212,6 +212,27 @@ def test_state_owned_growth_and_shrinkage_conserve_inventory_area():
     assert shrunk.consumed_defect_inventory_area_m2 < grown.consumed_defect_inventory_area_m2
 
 
+def test_initial_cavity_seed_debits_finite_inventory_atomically():
+    from arrhenius_fracture.voiding_v5 import HazardClock, ProductionVoidState, VoidSite
+    site = VoidSite("s", (0.0, 0.0), VoidPhase.STABLE_SUBGRID_VOID, 2, 2, 1.0,
+                    HazardClock(1.0, 1.0), HazardClock(1.0, 1.0), HazardClock(0.0, 1.0))
+    state = ProductionVoidState((site,), available_defect_inventory_area_m2=1.0e-8)
+    seeded = create_subgrid_cavity(state, "s", 2.0e-6)
+    area = math.pi * (2.0e-6) ** 2
+    assert seeded.available_defect_inventory_area_m2 == pytest.approx(1.0e-8 - area)
+    assert seeded.consumed_defect_inventory_area_m2 == pytest.approx(area)
+    assert seeded.event_history[-1]["event"] == "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+    with pytest.raises(ValueError, match="exceeds available"):
+        create_subgrid_cavity(replace(state, available_defect_inventory_area_m2=area / 2), "s", 2.0e-6)
+
+
+def test_full_deterministic_trajectory_preserves_total_defect_inventory():
+    _, rows = deterministic_trajectory()
+    totals = [row["available_defect_inventory_area_m2"] + row["consumed_defect_inventory_area_m2"]
+              for row in rows if row["available_defect_inventory_area_m2"] is not None]
+    assert all(total == pytest.approx(totals[0], abs=1.0e-20) for total in totals)
+
+
 @pytest.mark.parametrize("stage", [
     "downstream_phase_update",
     "downstream_length_ledger_update:ordinary_crack_fractured_length_m",
@@ -241,3 +262,72 @@ def test_first_passage_near_tie_uses_frozen_action_tolerance(threshold_offset, e
     assert sum(row["winner"] for row in audit) == expected_winners
     emitted = {row["candidate_id"] for row in audit if row["emitted_event_ids"]}
     assert {event.candidate_id for event in advanced.competition.pending_events} == emitted
+
+
+def _two_horizontal_candidate_competition():
+    candidates = tuple(CleavageCandidate.create(
+        plane_family="cleavage", plane_variant=variant,
+        direction_xy=(1.0, 0.0), normal_xy=(0.0, 1.0), gamma_rel=1.0,
+        orientation_convention="V5 exact-tie single-arm test",
+    ) for variant in ("tie-a", "tie-b"))
+    return DirectionalCompetitionState(
+        candidates=candidates,
+        hazard_states=tuple(DirectionalHazardState(candidate.candidate_id) for candidate in candidates),
+        global_hazard_seed=3621,
+    )
+
+
+def test_exact_tie_ligament_transaction_selects_one_arm_and_preserves_peer():
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    accepted = replace(accepted, competition=_two_horizontal_candidate_competition())
+    connected, _ = ligament_transaction(accepted)
+    assert len(connected.competition.pending_events) == 1
+    assert len(connected.competition.consumed_event_ids) == 1
+    assert connected.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID
+
+
+def test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer():
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    accepted, _ = ligament_transaction(accepted)
+    accepted = replace(accepted, competition=_two_horizontal_candidate_competition())
+    downstream, _, _, causal = downstream_front_transaction(accepted)
+    assert len(causal["emitted_winner_candidate_ids"]) == 2
+    assert len(causal["selected_proposal_candidate_ids"]) == 1
+    assert len(downstream.competition.pending_events) == 1
+    assert len(downstream.competition.consumed_event_ids) == 1
+
+
+def test_offset_cavity_ligament_transaction_preserves_combined_topology():
+    accepted, _ = deterministic_trajectory(
+        stop_before_ligament=True, cavity_center_m=(7.0e-4, 2.5e-5)
+    )
+    connected, result = ligament_transaction(accepted)
+    assert result.accepted
+    assert connected.junction_process_state["latest_crack_void_connection_certificate"]["passed"]
+    assert connected.junction_process_state["latest_intersection_alignment"]["accepted_mesh_has_aligned_node"]
+
+
+def test_oblique_interior_edge_intersection_is_inserted_and_rollback_safe():
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    angle = math.radians(10.0)
+    candidate = CleavageCandidate.create(
+        plane_family="cleavage", plane_variant="oblique-interior-edge",
+        direction_xy=(math.cos(angle), math.sin(angle)),
+        normal_xy=(-math.sin(angle), math.cos(angle)), gamma_rel=1.0,
+        orientation_convention="V5 semantic-hardening qualification",
+    )
+    competition = DirectionalCompetitionState(
+        candidates=(candidate,), hazard_states=(DirectionalHazardState(candidate.candidate_id),),
+        global_hazard_seed=3621,
+    )
+    accepted = replace(accepted, competition=competition)
+    from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+    before = complete_accepted_state_fingerprint(accepted)
+    with pytest.raises(RuntimeError, match="injected:intersection_alignment"):
+        ligament_transaction(accepted, failure_stage="intersection_alignment")
+    assert complete_accepted_state_fingerprint(accepted) == before
+    connected, result = ligament_transaction(accepted)
+    alignment = connected.junction_process_state["latest_intersection_alignment"]
+    assert result.accepted and alignment["interior_edge_split_performed"]
+    assert alignment["accepted_mesh_has_aligned_node"]
+    assert connected.junction_process_state["latest_crack_void_connection_certificate"]["passed"]

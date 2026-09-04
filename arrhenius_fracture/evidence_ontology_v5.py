@@ -22,10 +22,38 @@ def canonical_hash(value: Any) -> str:
 
 
 PREDICATES: dict[str, Callable[[Mapping[str, Any]], bool]] = {
-    "boolean_measurement": lambda values: bool(values["measurement"]),
+    "source_boolean": lambda values: bool(values["measurement"]),
     "strictly_increasing": lambda values: all(right > left for left, right in zip(values["values"], values["values"][1:])),
     "expected_sign": lambda values: values["delta"] > 0 if values["sign"] == "positive" else values["delta"] < 0,
+    "finite_positive_rate": lambda values: values["rate_s"] > 0.0 and values["crossing_time_s"] > 0.0,
+    "fixed_candidate_causal_step": lambda values: (
+        values["candidate_before"] == values["candidate_after"]
+        and values["operator_before"] == values["operator_after"]
+        and values["opening_after_Pa"] > values["opening_before_Pa"]
+        and values["barrier_after_J"] < values["barrier_before_J"]
+        and values["rate_after_s"] > values["rate_before_s"]
+        and values["crossing_after_s"] < values["crossing_before_s"]
+    ),
+    "inventory_balance_within_tolerance": lambda values: (
+        abs((values["cavity_after_m2"] - values["cavity_before_m2"])
+            + (values["available_after_m2"] - values["available_before_m2"])) <= values["tolerance_m2"]
+        and abs((values["cavity_after_m2"] - values["cavity_before_m2"])
+                - (values["consumed_after_m2"] - values["consumed_before_m2"])) <= values["tolerance_m2"]
+    ),
+    "combined_crack_void_topology_certified": lambda values: all((
+        values["endpoint_matches_intersection"], values["endpoint_on_cavity_boundary"],
+        values["no_surviving_solid_ligament_bridge"], values["crack_graph_outside_cavity"],
+        values["wake_support_outside_cavity"], values["closed_cycle_passed"],
+        values["combined_incidence_component_count"] == 1,
+    )),
 }
+
+
+def _source_value(sources, binding):
+    value = sources[binding["source_row_id"]]
+    for component in binding["path"]:
+        value = value[int(component)] if isinstance(value, (list, tuple)) else value[component]
+    return value
 
 
 def running_head(root: Path | None = None) -> str:
@@ -66,9 +94,13 @@ def validate_evidence_rows(rows: Iterable[Mapping[str, Any]], *,
             errors.append({"case_id": row["case_id"], "code": "LITERAL_OR_UNNAMED_PREDICATE"})
         else:
             try:
-                recomputed = bool(predicate(row["predicate_inputs"]))
+                inputs = dict(row["predicate_inputs"])
+                for alias, binding in inputs.pop("source_bindings", {}).items():
+                    inputs[alias] = _source_value(sources, binding)
+                recomputed = bool(predicate(inputs))
             except Exception as error:
-                errors.append({"case_id": case_id, "code": "PREDICATE_RECOMPUTE_ERROR", "error": type(error).__name__})
+                errors.append({"case_id": case_id, "code": "PREDICATE_RECOMPUTE_ERROR",
+                               "error": type(error).__name__, "message": str(error)})
             else:
                 if recomputed != bool(row["predicate_result"]):
                     errors.append({"case_id": case_id, "code": "PREDICATE_RESULT_MISMATCH"})

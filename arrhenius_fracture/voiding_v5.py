@@ -104,6 +104,8 @@ class ProductionVoidState:
         "fractured_ligament_length_m": 0.0,
         "ordinary_crack_fractured_length_m": 0.0,
         "preexisting_void_free_span_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "traversed_void_free_span_m": 0.0,
         "active_front_coordinate_advance_m": 0.0,
         "projected_fractured_length_m": 0.0,
         "projected_free_span_m": 0.0,
@@ -245,9 +247,17 @@ def create_subgrid_cavity(state: ProductionVoidState, site_id: str,
     if any(item.parent_site_id == site_id for item in state.cavities):
         raise ValueError("a stabilized site may own only one cavity")
     area = math.pi * float(radius_m) ** 2
+    if area > state.available_defect_inventory_area_m2:
+        raise ValueError("initial cavity seed exceeds available defect inventory")
     cavity = Cavity2D("void:" + site_id, site_id, site.center_m, radius_m, area, area,
                       VoidPhase.STABLE_SUBGRID_VOID, lineage=(site_id,))
-    return replace(state, cavities=state.cavities + (cavity,))
+    return replace(
+        state, cavities=state.cavities + (cavity,),
+        available_defect_inventory_area_m2=state.available_defect_inventory_area_m2 - area,
+        consumed_defect_inventory_area_m2=state.consumed_defect_inventory_area_m2 + area,
+        event_history=state.event_history + ({"event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT",
+                                              "cavity_id": cavity.cavity_id, "area_m2": area},),
+    )
 
 
 def grow_cavity_2d(cavity: Cavity2D, delta_radius_m: float) -> Cavity2D:

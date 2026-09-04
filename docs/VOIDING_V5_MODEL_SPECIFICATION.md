@@ -15,9 +15,22 @@ geometry; its completed hazard threshold is not erased or advanced a second
 time.
 
 For crack-to-void connection, projected front advance is defined as projected
-newly fractured ligament length plus the pre-existing projected cavity span.
+newly fractured length plus only the cavity span actually traversed by an active
+downstream front. Ligament rupture records the span as
+`connected_void_free_span_m` but does not advance through it. Downstream first
+passage transfers that diameter into `traversed_void_free_span_m` and
+`projected_free_span_m`; only then does it contribute to front advance.
 `connected_free_surface_extent_m` counts the propagation-side semicircular arc,
 `pi*R`; it does not claim the full `2*pi*R` cavity perimeter.
+
+The initial stable seed area `pi*R0^2` consumes the same finite defect inventory
+as later growth. Seed creation atomically debits available area, credits consumed
+area, and records `INITIAL_CAVITY_SEED_INVENTORY_DEBIT`.
+
+The solver-backed cavity causality gate freezes `boundary_node_id`,
+`selected_element_id`, `recovery_operator_id`, and weights before changing load.
+The element is chosen from geometry alone (lowest incident element ID), never by
+a stress-dependent argmax.
 
 ## State and eligibility
 

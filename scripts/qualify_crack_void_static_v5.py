@@ -153,7 +153,9 @@ def main(argv=None):
             "actual_operation_trace": [row["executed_operation"]],
             "initial_fingerprint": canonical_hash(configuration), "terminal_fingerprint": canonical_hash(observables),
             "measurement_source": "scripts/qualify_crack_void_static_v5.py",
-            "predicate_name": "boolean_measurement", "predicate_inputs": {"measurement": row["passed"]},
+            "predicate_name": "source_boolean", "predicate_inputs": {"source_bindings": {
+                "measurement": {"source_row_id": f"raw:{index}", "path": ["passed"]}
+            }},
             "predicate_result": row["passed"], "source_row_ids": [f"raw:{index}"],
             "implementation_sha": implementation_sha,
         })
