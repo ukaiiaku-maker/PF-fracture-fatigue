@@ -57,7 +57,7 @@ def plot_developed_da_dN_vs_Kmax(seed_analyses: dict[int, dict], out_dir: Path) 
 
 
 def plot_S_h_vs_Kmax_all_windows(seed_analyses: dict[int, dict], out_dir: Path) -> str:
-    windows = ["developed", "all_event", "final_half", "final_six"]
+    windows = ["developed", "all_event", "true_final_half", "true_final_six"]
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True)
     x = [math.log10(K) for K in KMAX_GRID_Pa_sqrt_m]
     for ax, window in zip(axes.flat, windows):
@@ -84,7 +84,7 @@ def plot_S_h_vs_Kmax_all_windows(seed_analyses: dict[int, dict], out_dir: Path) 
 
 
 def plot_delta_m_and_secants(seed_analyses: dict[int, dict], out_dir: Path) -> str:
-    windows = ["developed", "all_event", "final_half", "final_six"]
+    windows = ["developed", "all_event", "true_final_half", "true_final_six"]
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
     width = 0.35
     xpos = range(len(windows))
@@ -148,27 +148,68 @@ def plot_pB_contact_action_vs_Kmax(seed_analyses: dict[int, dict], out_dir: Path
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     x = [K / 1.0e6 for K in KMAX_GRID_Pa_sqrt_m]
     for seed, a in seed_analyses.items():
-        pB, contact_t, aw_uncond, aw_cond = [], [], [], []
+        pB, contact_t, aw_simple, aw_true_weighted = [], [], [], []
         for K in KMAX_GRID_Pa_sqrt_m:
             pair = a["per_pair"][f"K{int(round(K/1e6))}MPa_seed{seed}"]
             fa = pair["finite_exposure_and_action"]
             pB.append(fa["pre_event_max_pB_mean"])
             contact_t.append(fa["total_negative_K_contact_time_s"])
-            aw_uncond.append(fa["action_weighted_K_rebond_unconditional_mean_Pa_sqrt_m"])
-            aw_cond.append(fa["action_weighted_K_rebond_conditional_mean_nonzero_Pa_sqrt_m"])
+            aw_simple.append(fa["action_weighted_K_rebond_simple_mean_Pa_sqrt_m"])
+            aw_true_weighted.append(
+                fa["action_weighted_K_rebond_true_inter_event_weighted"][
+                    "unconditional_action_weighted_mean_Pa_sqrt_m"
+                ]
+            )
         axes[0].plot(x, pB, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed], label=f"seed {seed}")
         axes[1].plot(x, contact_t, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed], label=f"seed {seed}")
-        axes[2].plot(x, aw_uncond, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed],
-                      linestyle="--", label=f"seed {seed} unconditional")
-        axes[2].plot(x, aw_cond, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed],
-                      linestyle="-", label=f"seed {seed} conditional (nonzero)")
+        axes[2].plot(x, aw_simple, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed],
+                      linestyle="--", label=f"seed {seed} simple per-event mean")
+        axes[2].plot(x, aw_true_weighted, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed],
+                      linestyle="-", label=f"seed {seed} true inter-event action-weighted")
     axes[0].set_title("pre-event max p_B (mean)"); axes[0].set_xlabel(r"$K_{max}$ (MPa $\sqrt{m}$)")
     axes[1].set_title("integrated negative-K contact time (s)"); axes[1].set_xlabel(r"$K_{max}$ (MPa $\sqrt{m}$)")
-    axes[2].set_title("action-weighted K_rebond (Pa sqrt(m))"); axes[2].set_xlabel(r"$K_{max}$ (MPa $\sqrt{m}$)")
+    axes[2].set_title("action-weighted K_rebond (Pa sqrt(m))\nsimple mean vs true inter-event weighted mean")
+    axes[2].set_xlabel(r"$K_{max}$ (MPa $\sqrt{m}$)")
     for ax in axes:
         ax.grid(alpha=0.3); ax.legend(fontsize=6)
     fig.tight_layout()
     path = out_dir / "pB_contact_time_action_weighted_Krebond_vs_Kmax.png"
+    fig.savefig(path, dpi=180)
+    plt.close(fig)
+    return path.name
+
+
+def plot_true_terminal_persistence(seed_analyses: dict[int, dict], out_dir: Path) -> str:
+    """New figure (evidence-hardening pass): explicitly compares delta_m
+    across developed / matched_18_event_half (the old, mislabeled window)
+    / true_final_half / true_final_six, showing the primary developed-
+    window result is corroborated by the ACTUAL terminal events of each
+    30-event trajectory, not just the first 18."""
+    windows = ["developed", "matched_18_event_half", "true_final_half", "true_final_six"]
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    width = 0.35
+    xpos = range(len(windows))
+    for i, seed in enumerate(seed_analyses):
+        a = seed_analyses[seed]
+        dm = [
+            a["fits_by_window"][w]["delta_m_least_squares"] if a["fits_by_window"].get(w) else float("nan")
+            for w in windows
+        ]
+        offset = (i - 0.5) * width
+        ax.bar([p + offset for p in xpos], dm, width=width, color=SEED_COLORS[seed], label=f"seed {seed}")
+    ax.axhline(0.25, color="red", linestyle=":", label="slope_gate=0.25")
+    ax.set_xticks(list(xpos))
+    ax.set_xticklabels(
+        ["developed\n(primary)", "matched_18_event_half\n(old, mislabeled window)",
+         "true_final_half\n(actual last 15 of 30)", "true_final_six\n(actual last 6 of 30)"],
+        fontsize=8,
+    )
+    ax.set_ylabel("delta_m (3-point least squares)")
+    ax.set_title("Persistence of the developed-window result into the ACTUAL terminal events")
+    ax.legend(fontsize=8)
+    ax.grid(axis="y", alpha=0.3)
+    fig.tight_layout()
+    path = out_dir / "true_terminal_window_persistence.png"
     fig.savefig(path, dpi=180)
     plt.close(fig)
     return path.name
@@ -186,6 +227,7 @@ def main() -> int:
         plot_delta_m_and_secants(seed_analyses, DEV_ARTIFACTS),
         plot_eventwise_and_rolling_ratios(seed_analyses, DEV_ARTIFACTS),
         plot_pB_contact_action_vs_Kmax(seed_analyses, DEV_ARTIFACTS),
+        plot_true_terminal_persistence(seed_analyses, DEV_ARTIFACTS),
     ]
     for name in outputs:
         print(f"wrote {DEV_ARTIFACTS / name}")

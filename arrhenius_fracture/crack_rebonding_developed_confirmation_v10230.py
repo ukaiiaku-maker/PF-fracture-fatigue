@@ -118,6 +118,33 @@ def stable_growth_gate(
     }
 
 
+def true_final_half_indices(n_events: int) -> list[int]:
+    """The actual last ceil(n/2) event_index values of a trajectory with
+    n_events accepted events -- NOT the fixed [9..17] window that was only
+    correct for a nominal 18-event trajectory. For n_events=30 this is
+    indices 15-29."""
+    half = math.ceil(n_events / 2)
+    return list(range(max(n_events - half, 0), n_events))
+
+
+def true_final_six_indices(n_events: int) -> list[int]:
+    """The actual last six event_index values -- NOT the fixed [12..17]
+    window. For n_events=30 this is indices 24-29."""
+    return list(range(max(n_events - 6, 0), n_events))
+
+
+def extension_window_rate(events: list[dict], width_um: float, frequency_Hz: float) -> dict[str, Any]:
+    """da/dN over the last ``width_um`` of PROJECTED EXTENSION (not event
+    count) -- robust even if event lengths later cease to be fixed."""
+    mapped = _events_pre_post(events)
+    if not mapped:
+        return {"event_count": 0, "da_m": 0.0, "dN": 0.0, "da_dN": None}
+    final_extension = float(mapped[-1]["projected_extension_post_m"])
+    width_m = width_um * 1.0e-6
+    start_m = max(final_extension - width_m, 0.0)
+    return interval_rate(mapped, start_m, final_extension, frequency_Hz)
+
+
 def effective_horizon_censored(
     traj: dict, *, max_accepted_events: int, max_projected_extension_m: float,
 ) -> dict[str, Any]:
@@ -235,6 +262,66 @@ def classify_developed_confirmation(
     return diagnostics
 
 
+def apply_tail_sensitivity_gate(
+    primary_classification: dict[str, Any],
+    *,
+    true_terminal_delta_m_by_seed: dict[int, float] | None,
+    slope_gate: float = 0.25,
+) -> dict[str, Any]:
+    """Evidence-hardening pass (post-review): the original Section F
+    classification used fixed event-index windows (matched_18_event_half/
+    tail = [9..17]/[12..17]) that were only valid for a nominal 18-event
+    trajectory. The actual campaign trajectories ran to 30 events, so
+    those windows terminate at event 17 and never see the final 12 events
+    (60um) of growth. This function re-tests DEVELOPED_REBONDING_
+    STEEPENING_CONFIRMED against the TRUE terminal window (the trajectory's
+    actual last-half events, true_final_half_indices) and downgrades to
+    DEVELOPED_REBONDING_TAIL_SENSITIVE if the true terminal response does
+    not independently corroborate the developed-window result.
+
+    Only ever downgrades STEEPENING_CONFIRMED; every other primary
+    classification is passed through unchanged (a result that was not
+    already confirmed cannot become tail-sensitive -- it is already one of
+    the other fail-closed categories)."""
+    result = dict(primary_classification)
+    result["tail_sensitivity_check"] = {
+        "true_terminal_delta_m_by_seed": true_terminal_delta_m_by_seed,
+        "applies_only_to": "DEVELOPED_REBONDING_STEEPENING_CONFIRMED",
+    }
+    if primary_classification["classification"] != "DEVELOPED_REBONDING_STEEPENING_CONFIRMED":
+        result["tail_sensitivity_check"]["evaluated"] = False
+        return result
+
+    if not true_terminal_delta_m_by_seed or len(true_terminal_delta_m_by_seed) != 2:
+        result["classification"] = "DEVELOPED_REBONDING_TAIL_SENSITIVE"
+        result["tail_sensitivity_check"]["evaluated"] = True
+        result["tail_sensitivity_check"]["reason"] = "true terminal window delta_m unavailable for both seeds"
+        return result
+
+    seeds = sorted(true_terminal_delta_m_by_seed)
+    s0, s1 = seeds
+    dm0, dm1 = true_terminal_delta_m_by_seed[s0], true_terminal_delta_m_by_seed[s1]
+    both_positive = dm0 > 0.0 and dm1 > 0.0
+    both_ge_gate = dm0 >= slope_gate and dm1 >= slope_gate
+    disagree_in_sign = (dm0 > 0) != (dm1 > 0)
+    diff = abs(dm0 - dm1)
+    within_agreement = diff <= slope_gate
+
+    passes = both_positive and both_ge_gate and not disagree_in_sign and within_agreement
+    result["tail_sensitivity_check"].update({
+        "evaluated": True,
+        "both_positive": both_positive,
+        "both_ge_slope_gate": both_ge_gate,
+        "seeds_disagree_in_sign": disagree_in_sign,
+        "delta_m_abs_difference": diff,
+        "within_agreement_le_slope_gate": within_agreement,
+        "passes": passes,
+    })
+    if not passes:
+        result["classification"] = "DEVELOPED_REBONDING_TAIL_SENSITIVE"
+    return result
+
+
 def action_weighted_K_rebond_means(events: list[dict]) -> dict[str, Any]:
     """Section D fix: report BOTH the unconditional mean (over ALL events)
     and the conditional mean (over nonzero-K_rebond events only), plus the
@@ -249,6 +336,50 @@ def action_weighted_K_rebond_means(events: list[dict]) -> dict[str, Any]:
         "nonzero_event_fraction": (len(nonzero) / n) if n else float("nan"),
         "unconditional_mean_Pa_sqrt_m": (sum(vals) / n) if n else 0.0,
         "conditional_mean_nonzero_only_Pa_sqrt_m": (sum(nonzero) / len(nonzero)) if nonzero else 0.0,
+    }
+
+
+def action_weighted_K_rebond_true_inter_event_weighted(events: list[dict]) -> dict[str, Any]:
+    """Evidence-hardening pass (post-review): ``action_weighted_K_rebond_
+    means`` above reports a SIMPLE per-event arithmetic mean of each
+    event's own (already intra-event action-weighted)
+    action_weighted_K_rebond_Pa_sqrt_m value -- every event counts
+    equally regardless of how much cleavage action it actually carried.
+    This function instead computes the genuinely INTER-EVENT
+    action-weighted mean:
+
+        <K_b> = sum_j( A_c,j * Kbar_b,j ) / sum_j( A_c,j )
+
+    where A_c,j is event j's own total ``cleavage_action`` and Kbar_b,j is
+    its action_weighted_K_rebond_Pa_sqrt_m. The two means can differ
+    substantially (observed ~3x in this campaign's data) whenever
+    cleavage action is unevenly distributed across events -- they are
+    reported as separate, clearly labeled fields, never conflated."""
+    weighted_num = 0.0
+    weight_den = 0.0
+    nonzero_weighted_num = 0.0
+    nonzero_weight_den = 0.0
+    n_nonzero = 0
+    for e in events:
+        A_c = float(e.get("cleavage_action") or 0.0)
+        K_b = float(e.get("action_weighted_K_rebond_Pa_sqrt_m") or 0.0)
+        weighted_num += A_c * K_b
+        weight_den += A_c
+        if K_b > 0.0:
+            nonzero_weighted_num += A_c * K_b
+            nonzero_weight_den += A_c
+            n_nonzero += 1
+    return {
+        "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
+        "unconditional_action_weighted_mean_Pa_sqrt_m": (
+            weighted_num / weight_den if weight_den > 0.0 else 0.0
+        ),
+        "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": (
+            nonzero_weighted_num / nonzero_weight_den if nonzero_weight_den > 0.0 else 0.0
+        ),
+        "sum_cleavage_action_all_events": weight_den,
+        "sum_cleavage_action_nonzero_events": nonzero_weight_den,
+        "n_nonzero_events": n_nonzero,
     }
 
 
@@ -306,8 +437,13 @@ __all__ = [
     "effective_horizon_censored",
     "interval_rate",
     "event_index_window_rate",
+    "true_final_half_indices",
+    "true_final_six_indices",
+    "extension_window_rate",
     "classify_developed_confirmation",
+    "apply_tail_sensitivity_gate",
     "action_weighted_K_rebond_means",
+    "action_weighted_K_rebond_true_inter_event_weighted",
     "S_abs_shape_preserving",
     "S_abs_local_power_law",
 ]

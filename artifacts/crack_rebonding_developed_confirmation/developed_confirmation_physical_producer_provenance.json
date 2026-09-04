@@ -1,0 +1,57 @@
+{
+  "schema": "v10.2.30_crack_rebonding_developed_confirmation_physical_producer_provenance_v1",
+  "purpose": "Determine and record which commit's CODE actually generated the twelve physical trajectories, distinct from which commit HAPPENED TO BE HEAD at each stage's launch moment -- per evidence-hardening review Section 4. Determined retrospectively from git history and file-content hashes, since the stage_manifest.json files written at run time do not record a git_head field (a gap noted below, to fix prospectively in any future campaign).",
+
+  "commit_timeline": {
+    "protocol_freeze_commit": {
+      "sha": "e596cf23f20b25b4ea457f7d9120771a70df9240",
+      "committed_at": "2026-09-04T22:05:01+02:00",
+      "note": "Section A freeze files only; no trajectory code exists yet at this commit"
+    },
+    "producer_code_commit": {
+      "sha": "aa6982a785b43040ad0a385063c8a35fca2acdda",
+      "committed_at": "2026-09-04T22:14:03+02:00",
+      "note": "introduces scripts/run_developed_confirmation_stage.py and arrhenius_fracture/crack_rebonding_developed_confirmation_v10230.py -- the code that actually runs a trajectory and evaluates the developed/stationarity gate. Confirmed via git diff that NEITHER file was modified again between this commit and abe82a6 (the v1 final-evidence commit) -- see producer_file_sha256_at_producer_commit below, independently re-verified by the verifier at every run."
+    },
+    "stage_1_repo_head_at_launch": {
+      "sha": "aa6982a785b43040ad0a385063c8a35fca2acdda",
+      "note": "Stage 1 (seed=1720) was launched with repo HEAD literally at this commit -- identical to producer_code_commit, so HEAD-at-launch and producer-code-commit coincide for Stage 1."
+    },
+    "stage_1_result_commit": {
+      "sha": "ac0337f6124ce637d4f7e6ebae2a35d9e5292f15",
+      "committed_at": "2026-09-04T22:57:57+02:00",
+      "note": "commits Stage 1's tracked ledger/decision/verification artifacts and job-registry update AFTER the six Stage-1 trajectories finished running; does not touch producer code"
+    },
+    "stage_2_repo_head_at_launch": {
+      "sha": "ac0337f6124ce637d4f7e6ebae2a35d9e5292f15",
+      "note": "Stage 2 (seed=1001723) was launched with repo HEAD at ac0337f, NOT at producer_code_commit (aa6982a) -- but ac0337f only added data/artifact files (ledger, decision, verification, job registry) and never touched scripts/run_developed_confirmation_stage.py or arrhenius_fracture/crack_rebonding_developed_confirmation_v10230.py, so the ACTUAL PHYSICAL PRODUCER CODE Stage 2 executed is byte-identical to Stage 1's (both trace to producer_code_commit aa6982a). This is the case the review specifically asked to distinguish: HEAD-at-launch differs, physical-producer-code does not."
+    },
+    "plot_producer_commit": {
+      "sha": "35971275721b29240e6fadc9c928a7af0daec8f5",
+      "committed_at": "2026-09-04T22:59:14+02:00",
+      "note": "scripts/plot_developed_confirmation.py; committed while Stage 2 was still running as a background physics process -- irrelevant to Stage 2's already-launched subprocess, which had already imported its own code from disk at launch time"
+    },
+    "v1_final_evidence_commit": {
+      "sha": "abe82a6701ad5d85e601b9d06270f23d88a5278e",
+      "committed_at": "2026-09-04T23:43:15+02:00",
+      "note": "Stage 2 results, final figures, and the v1 terminal classification (DEVELOPED_REBONDING_STEEPENING_CONFIRMED) -- accepted by reviewer with required evidence-hardening follow-up"
+    },
+    "evidence_hardening_branch_base": {
+      "sha": "abe82a6701ad5d85e601b9d06270f23d88a5278e",
+      "note": "codex/v10.2.30-crack-rebonding-developed-evidence-hardening branches from here; analysis-only, no new trajectories"
+    }
+  },
+
+  "producer_file_sha256_at_producer_commit": {
+    "scripts/run_developed_confirmation_stage.py": "47b2b3188d9da0da0cd4af058015c388d9f94542ea645a883908e5a98321d163",
+    "arrhenius_fracture/crack_rebonding_developed_confirmation_v10230.py": "590ab7f9f427facbf57ea332f0d9e7a26483d59c167a2569863b87744bcb1702",
+    "scripts/analyze_developed_confirmation.py": "4f1275aa859ec503514b69583365752b3bbb6a2823e66afd541e0c490d1ed082",
+    "scripts/build_developed_confirmation_event_ledger.py": "efde456ec2c622694220e4b300ad65bda7d5356d209957d2583586ff7f771b2a",
+    "note": "these are the file contents AS OF producer_code_commit (aa6982a). The verifier re-hashes scripts/run_developed_confirmation_stage.py and arrhenius_fracture/crack_rebonding_developed_confirmation_v10230.py against these values at every run (the two files that actually drive trajectory generation and gate evaluation); analyze_developed_confirmation.py and build_developed_confirmation_event_ledger.py hashes are recorded for completeness but were subsequently modified in THIS branch (evidence-hardening pass) -- their v1 hashes here are historical record of what produced the v1 decision, not what the verifier re-checks now (the verifier's independent_recompute path supersedes analyze_developed_confirmation.py's v1 logic entirely)."
+  },
+
+  "verification_method": {
+    "how_determined": "git log -- <path> to find each producer file's last-modifying commit before the commit in question; git diff <producer_code_commit> <later_commit> -- <producer files> to confirm zero diff (empty output) through every intervening commit up to and including v1_final_evidence_commit",
+    "gap_noted_for_future_campaigns": "stage_manifest.json (written by run_developed_confirmation_stage.py at run time) does not record git_head or a producer-file-hash snapshot. This provenance record had to be reconstructed retrospectively from git history instead of read directly from a run-time artifact. A future campaign's runner script should record sys.argv[0]'s enclosing repo's git rev-parse HEAD and sha256 of its own source file into stage_manifest.json at launch time, so this reconstruction step is unnecessary."
+  }
+}
