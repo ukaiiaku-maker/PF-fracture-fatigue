@@ -541,22 +541,49 @@ evidence the result is not an exposure-counting artifact.
 
 **Terminal classification: `REBONDING_STEEPENS_LOCAL_RESPONSE`**
 (`artifacts/crack_rebonding_slope_exposure_continuation/
-slope_exposure_continuation_decision.json`). Physical reading: cohesive
-shielding suppresses the local rate ~29% at Kmax=15 but only ~6% at
-Kmax=21 -- consistent with faster opening renewals at high Kmax leaving
-less cleavage-hazard-weighted history available for bond formation.
+slope_exposure_continuation_decision.json`). Corrected physical reading
+(a units error in the first draft is fixed -- `10^0.125=1.334` is the
+waiting-time multiplier, not a rate-reduction fraction): cohesive
+shielding reduces the local rate **~25%** at Kmax=15 vs **~6%** at Kmax=21
+(waiting-time increase ~33% vs ~6%) -- consistent with faster opening
+renewals at high Kmax leaving less cleavage-hazard-weighted history
+available for bond formation.
 
-Incidental fix: `run_trajectory`'s returned `"seed"` field was hardcoded
-to the module constant regardless of the actually-configured engine seed
-(harmless pre-existing mislabeling -- no gate/comparison ever read it;
-fixed via a new `hazard_rng_seed` parameter).
+**Evidence-hardening pass (per second review, analysis-only, no new
+physics):**
+- Fixed a real logic bug in `classify_slope_effect_v2`: its exposure
+  check was dead code (only evaluated inside a branch already forcing the
+  same outcome) and used the misleading binary complete-excursion count.
+  Now three genuinely independent triggers, using continuous
+  `total_negative_K_contact_time_s` -- which shows the two seeds' Kmax=21
+  exposure differs by only ~21% (1.21x), not the ~infinite ratio the 2-vs-0
+  complete-excursion count implied. `REBONDING_STEEPENS_LOCAL_RESPONSE`
+  confirmed non-tautologically.
+- Added a **late-window** (events 3-6) recomputation: `delta_m` changes
+  by <0.02 and the classification is identical to the all-event window --
+  the result is not a wake-establishment transient artifact.
+- Added a load-dependence decomposition diagnostic: action-weighted
+  `K_rebond` varies only 0-15% across the Kmax grid for both seeds,
+  consistent with the steepening being explained mainly by fixed absolute
+  shielding becoming a smaller fraction of a larger Kmax (`Pi_K` falling),
+  not a strongly load-dependent occupancy mechanism (diagnostic, not a
+  quantitative decomposition).
+- Verifier now **reruns the classifier and requires exact equality** with
+  the saved diagnostics (not membership in an allowed set), and
+  hard-checks accepted-length identity, hazard-threshold-sequence
+  identity, and bulk-action certification for **all six** zero/finite
+  pairs (60/60 checks, `overall_pass: true`).
+- Documented (not rewritten) the pre-existing, harmless `run_trajectory`
+  `"seed"` field mislabeling; fixed going forward via `hazard_rng_seed`.
+- Curvature is substantial (15->18 secant ~1.03 vs 18->21 secant ~0.24):
+  the finding is better described as strong low-K suppression that
+  weakens rapidly with Kmax than a uniform Paris-exponent shift.
 
-`scripts/verify_v2_slope_exposure_continuation.py`: `overall_pass: true`,
-depends on no gitignored run file. All 183 `crack_rebonding` tests pass.
+All 183 `crack_rebonding` tests pass.
 
 ### Active processes
 
-None. The one authorized trajectory completed; no workers running.
+None. All trajectories and analysis complete; no workers running.
 
 ### Remaining scope (unauthorized, not attempted)
 

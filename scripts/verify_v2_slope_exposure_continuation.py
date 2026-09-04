@@ -1,7 +1,19 @@
 """Strict verifier for the exposure-unconditioned slope-exposure
-continuation. Depends ONLY on tracked artifacts (this worktree's own,
-the minimal slope screen's, and the parent causal pilot's -- all
-git-tracked) -- never on any gitignored runs/... file.
+continuation (v2, hardened per review). Depends ONLY on tracked artifacts
+(this worktree's own, the minimal slope screen's, and the parent causal
+pilot's -- all git-tracked) -- never on any gitignored runs/... file.
+
+v2 adds, per review:
+  - reruns classify_slope_effect_v2 and requires EXACT equality with the
+    saved classification_analysis (not just membership in an allowed set);
+  - requires accepted_lengths_identical True for all six zero/finite pairs;
+  - requires the hazard_threshold_action sequence to match EXACTLY, event
+    index by event index, between each zero/finite pair (the common-
+    random-numbers design this whole campaign relies on);
+  - requires every admitted event's bulk_action to have been certified
+    (all_bulk_action_qualified) for all six pairs;
+  - re-confirms config/material hashes for the reused Kmax=18 point and
+    the one new completion trajectory.
 
 Usage:
     <pinned interpreter> scripts/verify_v2_slope_exposure_continuation.py
@@ -12,6 +24,7 @@ import argparse
 import hashlib
 import importlib
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -23,6 +36,13 @@ from arrhenius_fracture import crack_rebonding_causal_pilot_v2_v10230 as pilot  
 from arrhenius_fracture.a_native_engine_v10230 import (  # noqa: E402
     build_a_native_engine,
     load_a_native_provenance,
+)
+from arrhenius_fracture.crack_rebonding_minimal_slope_screen_v10230 import (  # noqa: E402
+    adjacent_secant,
+    three_point_slope_fit,
+)
+from arrhenius_fracture.crack_rebonding_slope_exposure_continuation_v10230 import (  # noqa: E402
+    classify_slope_effect_v2,
 )
 from arrhenius_fracture.crack_rebonding_v10230 import reduced_modulus_Pa  # noqa: E402
 
@@ -37,6 +57,8 @@ CONTINUATION_TRACKED_ARTIFACT_NAMES = [
     "event_ledger.csv",
     "slope_exposure_continuation_decision.json",
 ]
+SEEDS = (1720, 1001723)
+KMAX_GRID_Pa_sqrt_m = (15.0e6, 18.0e6, 21.0e6)
 
 
 def sha256_file(path: Path) -> str:
@@ -45,6 +67,28 @@ def sha256_file(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _pairs(analyze) -> dict[tuple[float, int], tuple[dict, dict]]:
+    parent_1720 = json.loads((PARENT_PILOT_ARTIFACTS / "event_ledger.json").read_text())
+    parent_1001723 = json.loads((PARENT_PILOT_ARTIFACTS / "second_seed_event_ledger.json").read_text())
+    screen_ledger = json.loads((SLOPE_SCREEN_ARTIFACTS / "event_ledger.json").read_text())
+    continuation_ledger = json.loads((CONTINUATION_ARTIFACTS / "event_ledger.json").read_text())
+    completion_finite = continuation_ledger["trajectories"][
+        "C3R_K21MPa_seed1001723_EXPOSURE_UNCONDITIONED"
+    ]
+    completion_zero = screen_ledger["trajectories"]["C2R_K21MPa_seed1001723"]
+    return {
+        (15.0e6, 1720): (screen_ledger["trajectories"]["C2R_K15MPa_seed1720"],
+                          screen_ledger["trajectories"]["C3R_K15MPa_seed1720"]),
+        (15.0e6, 1001723): (screen_ledger["trajectories"]["C2R_K15MPa_seed1001723"],
+                             screen_ledger["trajectories"]["C3R_K15MPa_seed1001723"]),
+        (18.0e6, 1720): (parent_1720["trajectories"]["C2R"], parent_1720["trajectories"]["C3R"]),
+        (18.0e6, 1001723): (parent_1001723["trajectories"]["S2_C2R"], parent_1001723["trajectories"]["S2_C3R"]),
+        (21.0e6, 1720): (screen_ledger["trajectories"]["C2R_K21MPa_seed1720"],
+                          screen_ledger["trajectories"]["C3R_K21MPa_seed1720"]),
+        (21.0e6, 1001723): (completion_zero, completion_finite),
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -77,8 +121,6 @@ def main(argv: list[str] | None = None) -> int:
     checks["completion_Kmax_is_21"] = completion_record["Kmax_Pa_sqrt_m"] == 21.0e6
     checks["completion_seed_is_1001723"] = completion_record["seed"] == 1001723
 
-    # Re-derive frozen config from scratch (transitively re-validates the
-    # whole provenance chain this completion trajectory's config rests on).
     bare_engine, _ = build_a_native_engine(None)
     Eprime_Pa = reduced_modulus_Pa(bare_engine.G, bare_engine.nu)
     r_eff = max(bare_engine.r_eff(), 1.0e-9)
@@ -92,63 +134,92 @@ def main(argv: list[str] | None = None) -> int:
         recomputed_frozen["frozen_configuration_sha256"] == parent_frozen["frozen_configuration_sha256"]
     )
 
-    # Re-derive the full decision from tracked artifacts alone and compare.
     analyze = importlib.import_module("analyze_v2_slope_exposure_continuation")
-    ledger = json.loads((CONTINUATION_ARTIFACTS / "event_ledger.json").read_text())
-    completion_finite = ledger["trajectories"]["C3R_K21MPa_seed1001723_EXPOSURE_UNCONDITIONED"]
-    screen_ledger = json.loads((SLOPE_SCREEN_ARTIFACTS / "event_ledger.json").read_text())
-    completion_zero = screen_ledger["trajectories"]["C2R_K21MPa_seed1001723"]
+    pairs = _pairs(analyze)
 
-    parent_1720 = json.loads((PARENT_PILOT_ARTIFACTS / "event_ledger.json").read_text())
-    parent_1001723 = json.loads((PARENT_PILOT_ARTIFACTS / "second_seed_event_ledger.json").read_text())
-
-    pairs = {
-        (15.0e6, 1720): (screen_ledger["trajectories"]["C2R_K15MPa_seed1720"],
-                          screen_ledger["trajectories"]["C3R_K15MPa_seed1720"]),
-        (15.0e6, 1001723): (screen_ledger["trajectories"]["C2R_K15MPa_seed1001723"],
-                             screen_ledger["trajectories"]["C3R_K15MPa_seed1001723"]),
-        (18.0e6, 1720): (parent_1720["trajectories"]["C2R"], parent_1720["trajectories"]["C3R"]),
-        (18.0e6, 1001723): (parent_1001723["trajectories"]["S2_C2R"], parent_1001723["trajectories"]["S2_C3R"]),
-        (21.0e6, 1720): (screen_ledger["trajectories"]["C2R_K21MPa_seed1720"],
-                          screen_ledger["trajectories"]["C3R_K21MPa_seed1720"]),
-        (21.0e6, 1001723): (completion_zero, completion_finite),
-    }
-
-    import math
-    S_h_by_Kmax: dict[float, dict[int, float]] = {K: {} for K in analyze.KMAX_GRID_Pa_sqrt_m}
+    # Hard checks, for EVERY one of the six zero/finite pairs: accepted
+    # event-length identity, hazard-threshold sequence identity (event
+    # ordinal by event ordinal -- the common-random-numbers design), and
+    # certified bulk-action status on every admitted event.
     for (Kmax, seed), (zero_res, finite_res) in pairs.items():
-        rs = analyze._rate_shift(zero_res, finite_res)
+        key = f"K{Kmax/1e6:.0f}MPa_seed{seed}"
+        zero_events = {e["event_index"]: e for e in zero_res["events"]}
+        finite_events = {e["event_index"]: e for e in finite_res["events"]}
+        common_idx = sorted(set(zero_events) & set(finite_events))
+
+        checks[f"{key}_accepted_lengths_identical"] = all(
+            abs(zero_events[i]["accepted_length_m"] - finite_events[i]["accepted_length_m"]) < 1.0e-15
+            for i in common_idx
+        )
+        checks[f"{key}_hazard_threshold_sequence_identical"] = all(
+            zero_events[i]["hazard_threshold_action"] == finite_events[i]["hazard_threshold_action"]
+            for i in common_idx
+        )
+        checks[f"{key}_event_ordinals_match"] = (
+            set(zero_events) == set(finite_events) == set(range(zero_res["n_accepted_events"]))
+        )
+        checks[f"{key}_zero_all_bulk_action_qualified"] = all(
+            e["all_bulk_action_qualified"] for e in zero_res["events"]
+        )
+        checks[f"{key}_finite_all_bulk_action_qualified"] = all(
+            e["all_bulk_action_qualified"] for e in finite_res["events"]
+        )
+
+    # Re-derive S_h (all-window) at all six points and the per-seed
+    # 3-point slope fit, and compare against the saved decision.
+    S_h_by_Kmax: dict[float, dict[int, float]] = {K: {} for K in KMAX_GRID_Pa_sqrt_m}
+    for (Kmax, seed), (zero_res, finite_res) in pairs.items():
+        rs = analyze._rate_shift_windowed(zero_res, finite_res, [0, 1, 2, 3, 4, 5, 6])
         S_h_by_Kmax[Kmax][seed] = rs["S_h_decade"]
+        key = f"K{Kmax/1e6:.0f}MPa_seed{seed}"
+        checks[f"{key}_accepted_lengths_identical_windowed"] = rs["accepted_lengths_identical"]
 
     saved_decision = json.loads(
         (CONTINUATION_ARTIFACTS / "slope_exposure_continuation_decision.json").read_text()
     )
-    for Kmax in analyze.KMAX_GRID_Pa_sqrt_m:
-        for seed in analyze.SEEDS:
+    for Kmax in KMAX_GRID_Pa_sqrt_m:
+        for seed in SEEDS:
             key = f"K{Kmax/1e6:.0f}MPa_seed{seed}"
-            checks[f"S_h_{key}_reproducible"] = (
-                abs(S_h_by_Kmax[Kmax][seed] - saved_decision["rate_shifts"][key]["S_h_decade"]) < 1.0e-9
-            )
+            saved_S_h = saved_decision["per_pair"][key]["windows"]["all"]["S_h_decade"]
+            checks[f"S_h_{key}_reproducible"] = abs(S_h_by_Kmax[Kmax][seed] - saved_S_h) < 1.0e-9
 
-    per_seed = {}
-    for seed in analyze.SEEDS:
-        from arrhenius_fracture.crack_rebonding_minimal_slope_screen_v10230 import (
-            adjacent_secant, three_point_slope_fit,
-        )
-        x = [math.log10(K) for K in analyze.KMAX_GRID_Pa_sqrt_m]
-        y = [S_h_by_Kmax[K][seed] for K in analyze.KMAX_GRID_Pa_sqrt_m]
+    delta_m_by_seed = {}
+    for seed in SEEDS:
+        x = [math.log10(K) for K in KMAX_GRID_Pa_sqrt_m]
+        y = [S_h_by_Kmax[K][seed] for K in KMAX_GRID_Pa_sqrt_m]
         fit = three_point_slope_fit(x, y)
-        per_seed[seed] = fit["slope"]
+        delta_m_by_seed[seed] = fit["slope"]
         checks[f"delta_m_seed_{seed}_reproducible"] = (
-            abs(fit["slope"] - saved_decision["per_seed_slope_fit"][str(seed)]["delta_m_least_squares"])
+            abs(fit["slope"] - saved_decision["per_seed_by_window"][str(seed)]["all"]["delta_m_least_squares"])
             < 1.0e-9
         )
 
-    checks["overall_classification_reproducible"] = saved_decision["overall_classification"] in (
-        "REBONDING_RATE_OFFSET_LIKE", "REBONDING_STEEPENS_LOCAL_RESPONSE",
-        "REBONDING_FLATTENS_LOCAL_RESPONSE", "REBONDING_PHASE_EXPOSURE_SENSITIVE",
-        "REBONDING_SLOPE_EFFECT_WEAK_OR_UNRESOLVED",
+    # STRICT classification re-derivation: exact equality with the saved
+    # classification_analysis dict, not membership in an allowed set.
+    exposure_at_Kmax_hi = {
+        seed: saved_decision["per_pair"][f"K21MPa_seed{seed}"]["finite_cohesion_diagnostics"]
+        for seed in SEEDS
+    }
+    recomputed_classification = classify_slope_effect_v2(
+        S_h_by_Kmax=S_h_by_Kmax, delta_m_by_seed=delta_m_by_seed,
+        exposure_by_seed_at_Kmax=exposure_at_Kmax_hi,
     )
+    saved_classification_analysis = saved_decision["classification_analysis_all_window"]
+    # Round-trip the freshly recomputed dict through JSON before comparing,
+    # so both sides go through the same string-key/float-repr normalization
+    # (dict keys here are ints in-process but strings once loaded back from
+    # the saved JSON -- this is a representation artifact, not a value
+    # difference, and comparing raw Python dicts without normalizing would
+    # produce a false mismatch on every seed-keyed sub-dict).
+    recomputed_normalized = json.loads(json.dumps(recomputed_classification, sort_keys=True))
+    saved_normalized = json.loads(json.dumps(saved_classification_analysis, sort_keys=True))
+    checks["classification_analysis_exact_match"] = recomputed_normalized == saved_normalized
+    checks["overall_classification_exact_match"] = (
+        recomputed_classification["classification"] == saved_decision["overall_classification"]
+    )
+    details["recomputed_classification"] = recomputed_classification["classification"]
+    details["saved_classification"] = saved_decision["overall_classification"]
+
     checks["multi_K_paris_slope_campaign_not_authorized"] = (
         saved_decision.get("multi_K_paris_slope_campaign_authorized", False) is False
     )
@@ -164,7 +235,7 @@ def main(argv: list[str] | None = None) -> int:
 
     overall_pass = all(checks.values())
     verification = {
-        "schema": "v10.2.30_crack_rebonding_slope_exposure_continuation_verification_v1",
+        "schema": "v10.2.30_crack_rebonding_slope_exposure_continuation_verification_v2",
         "depends_on_gitignored_run_files": False,
         "checks": checks,
         "details": details,

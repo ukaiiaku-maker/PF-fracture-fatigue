@@ -90,77 +90,225 @@ by this field).
 
 ## 4. Full three-point result (both seeds now complete)
 
-`scripts/analyze_v2_slope_exposure_continuation.py`:
+`scripts/analyze_v2_slope_exposure_continuation.py` (v2, hardened per
+review -- see Section 5 for what changed and why):
 
 | Kmax (MPa*sqrt(m)) | S_h, seed 1720 | S_h, seed 1001723 |
 |---|---|---|
 | 15 | -0.125007 | -0.122650 |
 | 18 | -0.042846 | -0.042051 |
-| 21 | -0.026521 | **-0.026123** |
+| 21 | -0.026521 | -0.026123 |
 
 `|S_h|` falls **monotonically** with Kmax for both seeds, and the two
 seeds agree closely at every point (largest relative difference ~2%,
-despite Kmax=21's wildly different complete-excursion counts: 2 vs 0).
+despite Kmax=21's wildly different *complete-excursion* counts: 2 vs 0 --
+see Section 5.3 on why that count is the wrong metric to judge this by).
+
+**Corrected physical units** (a reporting error in the prior draft is
+fixed here: `10^0.125 = 1.334` is the *waiting-time multiplier*, not a
+"29% rate reduction"):
+
+| Kmax | rate ratio `10^S_h` | rate reduction `1-10^S_h` | waiting-time increase `10^-S_h - 1` |
+|---|---|---|---|
+| 15, seed 1720 | 0.7499 | **25.01%** | **33.35%** |
+| 15, seed 1001723 | 0.7540 | **24.60%** | **32.63%** |
+| 18, seed 1720 | 0.9061 | **9.39%** | **10.37%** |
+| 18, seed 1001723 | 0.9077 | **9.23%** | **10.17%** |
+| 21, seed 1720 | 0.9408 | **5.92%** | **6.30%** |
+| 21, seed 1001723 | 0.9416 | **5.84%** | **6.20%** |
+
+`da/dN` in m/cycle (`= g_m_per_s / f`, `f=1000 Hz`) is recorded alongside
+the m/s rate in every `per_pair[...]["windows"][...]` record for both
+completeness and direct comparability with conventional Paris-law units;
+since every trajectory here uses the same frequency, the m/s ratio and the
+m/cycle ratio are identical to `S_h`, so no reported conclusion changes --
+this is a units/reporting addition, not a re-derivation.
 
 ```
-delta_m (least-squares, 3-point): seed 1720 = 0.6849   seed 1001723 = 0.6713
-secant(15->18):                   seed 1720 = 1.0376   seed 1001723 = 1.0179
-secant(18->21):                   seed 1720 = 0.2439   seed 1001723 = 0.2379
+delta_m (least-squares, 3-point, all-event window):
+    seed 1720 = 0.6849   seed 1001723 = 0.6713
+secant(15->18): seed 1720 = 1.0376   seed 1001723 = 1.0179
+secant(18->21): seed 1720 = 0.2439   seed 1001723 = 0.2379
 ```
 
-Both secants are positive and both seeds' `delta_m` clear the 0.25
-steepening gate by nearly 3x, and the two seeds' `delta_m` values differ
-by only 0.0136 (well under the "seeds differ a lot" bar) despite their
-starkly different Kmax=21 compression-exposure profile -- direct evidence
-that this result is **not** an artifact of exposure-counting variance
-between seeds; the underlying steepening signal is robust across two very
-different realizations of how much complete-vs-partial compression each
-one actually saw.
+**Curvature is substantial**: the 15->18 secant (~1.03) is roughly 4x the
+18->21 secant (~0.24) for both seeds. The single 3-point least-squares
+`delta_m` is a valid finite-window average, but the more precise physical
+statement is that rebonding produces **strong low-K suppression that
+weakens rapidly with Kmax**, not a uniform Paris-exponent shift -- an
+apparent steepening/onset-shift over the sampled window rather than a
+constant slope correction. The 18->21 secant (~0.24) already sits just
+under the 0.25 steepening gate on its own, so the LOW-K interval is what
+mainly drives the overall-window classification.
 
-## 5. Classification
+### 4.1 Persistence check: does this survive into a "late" window?
 
-**`REBONDING_STEEPENS_LOCAL_RESPONSE`**
-(`artifacts/crack_rebonding_slope_exposure_continuation/
-slope_exposure_continuation_decision.json`).
+Seven events from an initially empty bonded wake can include wake
+establishment and early-occupancy transients, not yet a developed
+moving-frame response. `analyze_v2_slope_exposure_continuation.py` now
+also computes `S_h` over a `post_first` window (events 1-6) and a `late`
+window (events 3-6, prospectively defined) for every (Kmax, seed) pair:
 
-Per the revised gate set: not `RATE_OFFSET_LIKE` (endpoint span ~0.098
-decade, far above the 0.01 threshold); seeds do not disagree in sign or
-differ by more than 0.25 in `delta_m`, and the high-K difference is not
-traced to exposure disparity (checked explicitly and found false) --
-`delta_m >= 0.25` for both seeds, cleanly clearing
-`REBONDING_STEEPENS_LOCAL_RESPONSE`.
+```
+late-window delta_m: seed 1720 = 0.6895   seed 1001723 = 0.6860
+  (all-window was:   seed 1720 = 0.6849   seed 1001723 = 0.6713)
+```
 
-Physical reading: contact-gated cohesive shielding suppresses the local
-crack-growth rate most strongly at low Kmax (~29% rate reduction at
-Kmax=15, `10^0.125 = 1.334`) and gets much weaker at high Kmax (~6% rate
-reduction at Kmax=21, `10^0.0265 = 1.063`) -- consistent with the
-mechanism this review proposed: faster opening renewals at high Kmax
-reduce the fraction of the cleavage-hazard-weighted history available for
-contact-conditioned bond formation, even though (per Section 3) some
-compressive contact is present in essentially every interval at every
-load studied.
+The late-window classification is **identical**
+(`REBONDING_STEEPENS_LOCAL_RESPONSE`) and `delta_m` changes by less than
+0.02 for either seed. The result is not an artifact of the wake's initial
+transient -- it persists, essentially unchanged, when the first event
+(closest to the empty-wake initial condition) is dropped and only events
+3-6 are used.
 
-## 6. Verification
+## 5. Classifier repair and classification
 
-`scripts/verify_v2_slope_exposure_continuation.py`: depends ONLY on
-tracked artifacts (this branch's own, the slope screen's, and the parent
-pilot's -- never any gitignored `runs/...` file). Independently rebuilds
-the bare A_NATIVE engine, reproduces `frozen_configuration_sha256` from
-scratch, confirms the completion trajectory's config hash and
-classification label, re-derives all 6 `S_h` values and both seeds'
-`delta_m` directly from the tracked ledgers, and confirms no
-unauthorized-activity flag was set. **`overall_pass: true`**. All 183
-`crack_rebonding` tests pass.
+### 5.1 The bug found on review
 
-## 7. What this does and does not authorize
+`classify_slope_effect_v2`'s original `exposure_driven` check was
+computed *only inside* the branch already guarded by
+`seeds_disagree_in_sign or seeds_differ_a_lot` -- so it could never
+independently change the classification (dead code), and it compared only
+the *binary complete-excursion count* (2 vs 0 at Kmax=21), not a
+continuous exposure/action quantity. Both are fixed in
+`crack_rebonding_slope_exposure_continuation_v10230.py`'s v2:
+
+- `seeds_disagree_in_sign`, `seeds_differ_a_lot`, and
+  `exposure_disparity_exceeds_threshold` are now three genuinely
+  independent conditions -- any one alone can trigger
+  `REBONDING_PHASE_EXPOSURE_SENSITIVE`, none nested inside another.
+- Exposure disparity is now measured via `total_negative_K_contact_time_s`
+  (integrated compressive-contact **duration**, continuous), not the
+  complete-lobe count.
+
+### 5.2 What the continuous metric actually shows
+
+```
+total_negative_K_contact_time_s at Kmax=21 (finite-cohesion trajectory):
+    seed 1720:    0.0628 s
+    seed 1001723: 0.0760 s
+    ratio: 1.21x  (threshold for "disparity": 2.0x -- NOT exceeded)
+```
+
+Despite the complete-excursion counts differing starkly (2 vs 0), the
+*continuous* contact-time exposure differs by only ~21% between seeds --
+nowhere near a 2x disparity. This is the metric review identified as more
+physically meaningful (partial excursions still contribute real contact
+duration and real formation opportunity), and by this corrected metric the
+two seeds' exposure histories are actually quite similar, not starkly
+different.
+
+### 5.3 Result: `REBONDING_STEEPENS_LOCAL_RESPONSE` (confirmed, non-tautologically)
+
+Per the fixed, independent gate set: not `RATE_OFFSET_LIKE` (endpoint span
+~0.098 decade, far above the 0.01 threshold); `seeds_disagree_in_sign` is
+`False`; `seeds_differ_a_lot` is `False` (diff 0.0136 vs 0.25 gate);
+`exposure_disparity_exceeds_threshold` is `False` (1.21x vs 2.0x
+threshold) -- none of the three `PHASE_EXPOSURE_SENSITIVE` triggers fire,
+so the result falls through to `delta_m >= 0.25` for both seeds ->
+`REBONDING_STEEPENS_LOCAL_RESPONSE`. Unlike the prior draft, this is no
+longer "not exposure-driven by construction of a tautological check" --
+it is "checked against a continuous exposure metric and found not
+exposure-driven."
+
+### 5.4 Load-dependence decomposition diagnostic (no new physics)
+
+Does the steepening come mainly from the *fixed absolute* cohesive scale
+becoming a smaller *fraction* of a larger `Kmax` (`Pi_K =
+K_rebond_max/Kmax` falling with load, acting on an unchanged absolute
+shielding), or from a genuinely load-dependent bonded-occupancy/contact-
+exposure mechanism? Comparing the already-tracked, already-measured
+action-weighted `K_rebond` the finite-cohesion trajectory actually reaches
+at each `Kmax` (no counterfactual re-simulation):
+
+```
+seed 1720:    varies 15.2% across the Kmax=15/18/21 grid
+seed 1001723: varies  0.0% across the Kmax=15/18/21 grid
+```
+
+Both are well inside a 30% "roughly constant" band. This is consistent
+with the steepening being explained **mainly by the fixed absolute
+shielding scale becoming a smaller fraction of a larger `Kmax`**, not by a
+strongly load-dependent bonded-occupancy mechanism -- though this
+comparison is a diagnostic on already-measured quantities, not a
+controlled counterfactual (which would require a new, fixed-`K_rebond`
+simulation and is out of scope here).
+
+### 5.5 Scientific qualifiers
+
+The single machine label is retained, decorated with explicit qualifiers
+recorded in `slope_exposure_continuation_decision.json["scientific_
+qualifiers"]`:
+
+```
+REBONDING_STEEPENS_LOCAL_RESPONSE
+  + CONTACT_GATED_REBONDING_FINITE_WINDOW_STEEPENING_DEMONSTRATED
+  + RELATIVE_SLOPE_CORRECTION_POSITIVE_OVER_KMAX_15_TO_21
+  + STRONG_CURVATURE_OR_ONSET_SHIFT_PRESENT
+  + DEVELOPED_PARIS_SLOPE_NOT_YET_QUALIFIED
+  + PHASE_EXPOSURE_AND_ABSOLUTE_SHIELDING_CONTRIBUTIONS_NOT_YET_DECOMPOSED
+  + PHYSICAL_CHEMISTRY_REALISM_NOT_CLAIMED
+```
+
+In prose: **contact-gated rebonding steepens the finite-window local
+crack-growth response primarily by suppressing the low-K rate; the
+correction weakens substantially above the intermediate load point.** The
+new trajectory and the fixed classifier corroborate this at both a
+different seed and, within each seed, a late/developed-leaning event
+window -- but Section 5.4's decomposition is a diagnostic, not a
+quantitative separation, and the result applies to the **reversible**
+preset specifically (shown equivalent to persistent *at Kmax=18 only*
+in the parent branch; not independently re-tested across 15-21 here).
+
+## 6. Seed-metadata fix (documented, not a data rewrite)
+
+`run_trajectory`'s returned `"seed"` field was hardcoded to the module
+constant `SEED` (1720) regardless of which seed was actually configured
+on the engine before the call -- confirmed harmless (no gate or
+comparison anywhere in this campaign ever read this nested field for a
+decision; e.g. the second seed's own `second_seed_event_ledger.json` has
+the correct seed 1001723 at its top level, with the mislabeled `1720`
+only in each trajectory's own nested `"seed"` field). Fixed via an
+explicit `hazard_rng_seed` parameter recorded verbatim going forward. No
+prior physical result was rewritten; this section documents the
+mislabeling for anyone reading the older nested fields directly.
+
+## 7. Verification
+
+`scripts/verify_v2_slope_exposure_continuation.py` (v2, hardened):
+depends ONLY on tracked artifacts (this branch's own, the slope screen's,
+and the parent pilot's -- never any gitignored `runs/...` file).
+Independently rebuilds the bare A_NATIVE engine, reproduces
+`frozen_configuration_sha256` from scratch, re-derives all 6 `S_h` values
+and both seeds' `delta_m` (all-window) directly from the tracked ledgers,
+and **reruns `classify_slope_effect_v2` and requires exact equality**
+(not membership in an allowed set) with the saved classification and its
+full diagnostics dict. Additionally hard-checks, for **all six**
+zero/finite pairs: accepted-event-length identity, event-index-by-index
+`hazard_threshold_action` sequence identity (the common-random-numbers
+design this whole campaign relies on -- confirmed to match exactly, 7 of
+7 events, at every one of the six pairs), and certified
+(`all_bulk_action_qualified`) status on every admitted event. **60/60
+checks pass, `overall_pass: true`.** All 183 `crack_rebonding` tests pass.
+
+## 8. What this does and does not authorize
 
 This one-trajectory completion and its analysis do **not** constitute
 Part X, a developed Paris-law campaign, or a production-line merge. The
-result is a *minimal local slope screen* at three points (15/18/21
-MPa*sqrt(m)), two seeds, one regime (reversible, shown equivalent to
-persistent for this purpose in the parent branch) -- sufficient to
-demonstrate a reproducible sign and approximate magnitude for a local
-slope correction, not to characterize a full Paris curve, a different `R`,
-a different frequency, or passivation/repassivation behavior. No further
-seeds, no additional Kmax points, no frequency ablation, and no scope
-expansion were run or are proposed here.
+result is a *minimal, finite-window local slope screen* at three points
+(15/18/21 MPa*sqrt(m)), two seeds, one regime (reversible, shown
+equivalent to persistent *at Kmax=18* in the parent branch) -- sufficient
+to demonstrate a reproducible sign, approximate magnitude, and
+late-window persistence for a local slope correction, not to characterize
+a full Paris curve, a different `R`, a different frequency, or
+passivation/repassivation behavior. No further seeds, no additional Kmax
+points, no frequency ablation, and no scope expansion were run or are
+proposed here.
+
+A **developed-response confirmation** (fresh reversible zero/finite pairs
+at Kmax=15/18/21, seed 1720 first, run to the ~100 micrometre / 18-event
+developed-growth and stationarity standard used by the qualified A_NATIVE
+campaigns, with seed 1001723 replicated only if the late-window slope
+correction remains positive and exceeds 0.25) is a scientifically
+reasonable next step suggested on review -- but it is new physics, is not
+authorized by this document, and was not run.
