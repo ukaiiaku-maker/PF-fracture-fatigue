@@ -33,16 +33,23 @@ class VoidingConfig:
     birth_barrier_J: float = 1.2e-19
     stabilization_barrier_J: float = 0.8e-19
     healing_barrier_J: float = 1.0e-19
-    activation_area_m2: float = 2.0e-20
+    birth_hydrostatic_volume_m3: float = 2.0e-29
+    birth_normal_area_m2: float = 2.0e-20
+    birth_normal_separation_m: float = 2.5e-10
+    birth_shear_volume_m3: float = 5.0e-30
+    stabilization_activation_volume_m3: float = 1.0e-29
+    healing_activation_volume_m3: float = 1.0e-29
+    plane_strain_poisson_ratio: float = 0.30
     promotion_radius_m: float = 8.0e-6
     surface_reaction_barrier_J: float = 0.7e-19
     vacancy_transport_barrier_J: float = 0.9e-19
     radial_growth_scale_m: float = 1.0e-8
     hydrostatic_work_coefficient: float = 1.0
     normal_opening_work_coefficient: float = 1.0
-    signed_shear_work_coefficient: float = 0.25
+    signed_shear_work_coefficient: float = 1.0
     plastic_accommodation_barrier_J: float = 1.0e-19
     shrinkage_mobility_m_per_J_s: float = 1.0e8
+    chemical_potential_reference_J: float = 1.0e-20
     schema: str = SCHEMA
 
 
@@ -103,6 +110,8 @@ class ProductionVoidState:
         "projected_front_advance_m": 0.0,
         "connected_free_surface_extent_m": 0.0,
     })
+    available_defect_inventory_area_m2: float = 1.0e-8
+    consumed_defect_inventory_area_m2: float = 0.0
     schema: str = SCHEMA
 
 
@@ -113,9 +122,14 @@ def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
     stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
     eigenvalues = np.linalg.eigvalsh(stress)
     tensile = max(float(eigenvalues[-1]), 0.0)
-    hydrostatic = float(np.trace(stress) / 2.0)
-    deviator = stress - np.eye(2) * hydrostatic
-    von_mises_2d = math.sqrt(max(1.5 * float(np.sum(deviator * deviator)), 0.0))
+    in_plane_mean = float(np.trace(stress) / 2.0)
+    sigma_zz = config.plane_strain_poisson_ratio * float(np.trace(stress))
+    stress3 = np.array([[stress[0, 0], stress[0, 1], 0.0],
+                        [stress[1, 0], stress[1, 1], 0.0],
+                        [0.0, 0.0, sigma_zz]])
+    hydrostatic = float(np.trace(stress3) / 3.0)
+    deviator3 = stress3 - np.eye(3) * hydrostatic
+    von_mises_3d = math.sqrt(max(1.5 * float(np.sum(deviator3 * deviator3)), 0.0))
     normal = np.asarray(normal_xy, dtype=float)
     normal /= max(float(np.linalg.norm(normal)), 1.0e-300)
     tangent = np.array((-normal[1], normal[0]))
@@ -127,27 +141,35 @@ def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
     def rate(barrier, work=0.0):
         effective = max(float(barrier) - float(work), 0.0)
         return config.attempt_frequency_s * math.exp(-effective / thermal)
-    birth_work = config.activation_area_m2 * (
-        config.hydrostatic_work_coefficient * hydrostatic
-        + config.normal_opening_work_coefficient * normal_opening
-        + config.signed_shear_work_coefficient * signed_shear
-    )
-    tensile_work = config.activation_area_m2 * tensile
-    surface = rate(config.surface_reaction_barrier_J, tensile_work)
-    transport = rate(config.vacancy_transport_barrier_J, tensile_work)
-    accommodation = rate(config.plastic_accommodation_barrier_J, config.activation_area_m2 * von_mises_2d)
+    hydro_work = config.hydrostatic_work_coefficient * hydrostatic * config.birth_hydrostatic_volume_m3
+    normal_work = (config.normal_opening_work_coefficient * max(normal_opening, 0.0)
+                   * config.birth_normal_area_m2 * config.birth_normal_separation_m)
+    shear_work = config.signed_shear_work_coefficient * signed_shear * config.birth_shear_volume_m3
+    birth_work = hydro_work + normal_work + shear_work
+    stabilization_work = max(tensile, 0.0) * config.stabilization_activation_volume_m3
+    healing_work = -max(tensile, 0.0) * config.healing_activation_volume_m3
+    surface = rate(config.surface_reaction_barrier_J, max(hydrostatic, 0.0) * config.stabilization_activation_volume_m3)
+    transport = rate(config.vacancy_transport_barrier_J, max(hydrostatic, 0.0) * config.stabilization_activation_volume_m3)
+    accommodation = rate(config.plastic_accommodation_barrier_J, von_mises_3d * config.stabilization_activation_volume_m3)
     series = 0.0 if surface <= 0.0 or transport <= 0.0 else 1.0 / (1.0 / surface + 1.0 / transport)
     series = 0.0 if series <= 0.0 or accommodation <= 0.0 else 1.0 / (1.0 / series + 1.0 / accommodation)
     return {
         "birth_s": rate(config.birth_barrier_J, birth_work),
-        "stabilization_s": rate(config.stabilization_barrier_J, tensile_work),
-        "healing_s": rate(config.healing_barrier_J, -tensile_work),
+        "stabilization_s": rate(config.stabilization_barrier_J, stabilization_work),
+        "healing_s": rate(config.healing_barrier_J, healing_work),
         "local_max_principal_stress_Pa": tensile,
+        "local_in_plane_mean_stress_Pa": in_plane_mean,
+        "local_sigma_zz_Pa": sigma_zz,
         "local_hydrostatic_stress_Pa": hydrostatic,
-        "local_von_mises_stress_Pa": von_mises_2d,
+        "local_von_mises_stress_Pa": von_mises_3d,
         "local_normal_opening_stress_Pa": normal_opening,
         "local_signed_shear_stress_Pa": signed_shear,
         "birth_activation_work_J": birth_work,
+        "birth_hydrostatic_work_J": hydro_work,
+        "birth_normal_opening_work_J": normal_work,
+        "birth_signed_shear_work_J": shear_work,
+        "stabilization_activation_work_J": stabilization_work,
+        "healing_activation_work_J": healing_work,
         "surface_reaction_s": surface,
         "vacancy_transport_s": transport,
         "plastic_accommodation_s": accommodation,
@@ -243,15 +265,23 @@ def grow_cavity_2d(cavity: Cavity2D, delta_radius_m: float) -> Cavity2D:
 
 def grow_cavity_from_rate(cavity: Cavity2D, *, rates: Mapping[str, float],
                           dt_s: float, radial_growth_scale_m: float,
-                          chemical_potential_drive_J: float = 1.0) -> Cavity2D:
+                          chemical_potential_drive_J: float = 1.0e-20,
+                          chemical_potential_reference_J: float = 1.0e-20,
+                          shrinkage_mobility_m_per_J_s: float = 1.0e8,
+                          available_inventory_area_m2: float = math.inf) -> Cavity2D:
     """Advance radius only through the measured series-limited kinetic rate."""
     drive = float(chemical_potential_drive_J)
     rate = max(float(rates["series_limited_growth_s"]), 0.0)
     dt = max(float(dt_s), 0.0)
     if drive > 0.0:
-        delta = float(radial_growth_scale_m) * rate * dt
+        scale = drive / max(abs(float(chemical_potential_reference_J)), 1.0e-300)
+        delta = float(radial_growth_scale_m) * rate * dt * scale
+        requested_area = math.pi * ((cavity.radius_m + delta) ** 2 - cavity.radius_m ** 2)
+        if requested_area > max(float(available_inventory_area_m2), 0.0):
+            target_area = cavity.area_m2 + max(float(available_inventory_area_m2), 0.0)
+            delta = math.sqrt(target_area / math.pi) - cavity.radius_m
     elif drive < 0.0:
-        delta = -min(cavity.radius_m * 0.5, abs(drive) * dt * 1.0e8)
+        delta = -min(cavity.radius_m * 0.5, abs(drive) * dt * float(shrinkage_mobility_m_per_J_s))
     else:
         delta = 0.0
     return grow_cavity_2d(cavity, delta) if delta != 0.0 else cavity

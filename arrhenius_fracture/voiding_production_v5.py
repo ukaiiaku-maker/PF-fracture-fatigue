@@ -15,7 +15,7 @@ from .crack_network_v11 import CrackBranchState, CrackNetworkState, ROOT_BRANCH_
 from .directional_competition_v11 import (
     DirectionalCompetitionState, commit_directional_interval,
     construct_action_proposals, preview_directional_interval,
-    preview_production_cleavage_rate, tungsten_cleavage_candidates,
+    tungsten_cleavage_candidates,
 )
 from .explicit_cavity_v5 import build_explicit_hole_mesh, fill_explicit_hole_mesh
 from .mesh import rebuild_tri_mesh
@@ -130,7 +130,7 @@ def local_site_tensor(state):
     return np.array([[sigma[0, element], sigma[2, element]], [sigma[2, element], sigma[1, element]]])
 
 
-def cavity_boundary_tensor(state):
+def cavity_boundary_tensor(state, *, boundary_node: int | None = None):
     """Return the most tensile resolved tensor on the explicit cavity boundary.
 
     First passage is local, so circumferential averaging (which can cancel the
@@ -143,8 +143,11 @@ def cavity_boundary_tensor(state):
     cavity = state.void_state.cavities[0]
     center = np.asarray(cavity.center_m)
     radii = np.linalg.norm(np.asarray(state.mesh.nodes) - center, axis=1)
-    boundary_nodes = np.flatnonzero(radii <= np.min(radii) * (1.0 + 1.0e-7))
-    elements = np.flatnonzero(np.any(np.isin(state.mesh.elems, boundary_nodes), axis=1))
+    boundary_nodes = np.flatnonzero(radii <= cavity.radius_m * 1.02)
+    selected_nodes = boundary_nodes if boundary_node is None else np.asarray((int(boundary_node),))
+    if boundary_node is not None and int(boundary_node) not in set(map(int, boundary_nodes)):
+        raise ValueError("requested tensor node is not on the cavity boundary")
+    elements = np.flatnonzero(np.any(np.isin(state.mesh.elems, selected_nodes), axis=1))
     tensors = np.asarray([
         [[sigma[0, element], sigma[2, element]],
          [sigma[2, element], sigma[1, element]]]
@@ -243,43 +246,56 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
 
 
 def _complete_next_clock(state, stress_tensor_Pa, *, start_time=0.0, temperature_K=900.0):
-    """Reach a cleavage first passage using the existing production hazard law."""
+    """Advance all directional clocks through one common earliest-event time."""
     material = state.material
     engine = FrontEngine(
         FrontConfig(), default_cleavage_barrier(), default_emission_barrier(material.b),
         material.G, material.nu, material.b,
     )
     stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
-    principal = max(float(np.linalg.eigvalsh(stress)[-1]), 0.0)
-    signed_J = principal * principal / max(float(material.Eprime), 1.0e-300)
     rates = []
     hazards = list(state.competition.hazard_states)
-    for index, (candidate, hazard) in enumerate(zip(state.competition.candidates, hazards)):
-        preview = preview_production_cleavage_rate(
-            engine, candidate, signed_J_J_per_m2=signed_J,
-            Eprime_Pa=material.Eprime, temperature_K=temperature_K,
-        )
-        rate = preview.lambda_per_s
-        if rate <= 0.0:
-            raise RuntimeError("production cleavage clock cannot reach first passage")
-        duration = max(hazard.current_threshold_action - hazard.action, 0.0) / rate
+    crossing_times = []
+    for candidate, hazard in zip(state.competition.candidates, hazards):
+        normal = np.asarray(candidate.normal_xy, dtype=float)
+        resolved_opening = max(float(normal @ stress @ normal), 0.0)
+        raw_rate, _, barrier = engine.lambda_cleave(resolved_opening, temperature_K)
+        rate = 0.0 if resolved_opening <= 0.0 else max(float(raw_rate), 0.0)
+        remaining = max(hazard.current_threshold_action - hazard.action, 0.0)
+        crossing = math.inf if rate <= 0.0 else remaining / rate
+        crossing_times.append(crossing)
+        rates.append({"candidate_id": candidate.candidate_id, "rate_s": rate,
+                      "resolved_opening_stress_Pa": resolved_opening,
+                      "hazard_barrier_J": barrier, "crossing_time_s": crossing})
+    duration = min(crossing_times)
+    if not math.isfinite(duration):
+        raise RuntimeError("production cleavage clock cannot reach first passage")
+    for index, (hazard, rate) in enumerate(zip(hazards, rates)):
         hazards[index] = commit_directional_interval(
             hazard, preview_directional_interval(
-                hazard, lambda_per_s=rate, start_time_s=start_time, duration_s=duration,
+                hazard, lambda_per_s=rate["rate_s"], start_time_s=start_time,
+                duration_s=duration,
             ),
         )
-        rates.append({"candidate_id": candidate.candidate_id, "rate_s": rate,
-                      "duration_s": duration, "signed_J_J_per_m2": signed_J,
-                      "K_Pa_sqrt_m": preview.K_directional_Pa_sqrt_m})
+        rate["common_advance_duration_s"] = duration
+        rate["winner"] = abs(rate["crossing_time_s"] - duration) <= 1.0e-12 * max(1.0, duration)
     return replace(state, competition=replace(state.competition, hazard_states=tuple(hazards))), rates
 
 
 def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     cavity = state.void_state.cavities[0]
     start = state.crack_network.branch(ROOT_BRANCH_ID).tip
-    target = np.asarray((cavity.center_m[0] - cavity.radius_m, cavity.center_m[1]))
-    node = int(np.argmin(np.linalg.norm(np.asarray(state.mesh.nodes) - target, axis=1)))
+    nodes = np.asarray(state.mesh.nodes)
+    center = np.asarray(cavity.center_m)
+    radii = np.linalg.norm(nodes - center, axis=1)
+    boundary_nodes = np.flatnonzero(radii <= cavity.radius_m * 1.02)
+    # The selected theta=0 cleavage ray is horizontal.  Its first intersection
+    # with the actual polygonal free boundary is the leftmost boundary vertex;
+    # no unrelated nearest-volume node is permitted.
+    node = int(boundary_nodes[np.argmin(nodes[boundary_nodes, 0])])
     end = tuple(map(float, state.mesh.nodes[node]))
+    if abs(end[1] - start[1]) > 1.0e-14 or end[0] <= start[0]:
+        raise RuntimeError("no exact selected-direction cavity-boundary intersection")
     state, cleavage_audit = _complete_next_clock(state, cavity_boundary_tensor(state)[0])
     proposal = next(item for item in construct_action_proposals(
         state.competition.hazard_states, correlation_interval_s=0.0,
@@ -287,7 +303,8 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     candidate = next(item for item in state.competition.candidates if item.candidate_id == proposal.member_candidate_ids[0])
     engine = FrontEngine(FrontConfig(), default_cleavage_barrier(), default_emission_barrier(state.material.b),
                          state.material.G, state.material.nu, state.material.b)
-    _, _, barrier = engine.lambda_cleave(engine.sigma_tip(cleavage_audit[0]["K_Pa_sqrt_m"]), 900.0)
+    winner = next(item for item in cleavage_audit if item["winner"])
+    barrier = winner["hazard_barrier_J"]
     resistance = hazard_resistance_J_per_m2(
         barrier_J=barrier, cooperative_hits=engine.f.m_hits,
         burgers_vector_m=engine.b, gamma_relative=candidate.gamma_rel,
@@ -302,47 +319,70 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
     def geometry(trial, arms):
-        return apply_v12_production_trial_geometry(
+        realized = apply_v12_production_trial_geometry(
             trial, arms, source_commit=_head(), configuration={"event": "CRACK_TO_VOID_LIGAMENT"},
             transaction_identity="ligament", failure_injector=inject,
         )
+        connected = replace(
+            realized.void_state.cavities[0], phase=VoidPhase.CONNECTED_VOID,
+            lineage=realized.void_state.cavities[0].lineage + ("CRACK_TO_VOID_LIGAMENT",),
+        )
+        void_state = replace_cavity(realized.void_state, connected)
+        inject("cavity_phase_update", replace(realized, void_state=void_state))
+        ledgers = dict(void_state.length_ledgers)
+        ligament_length = math.dist(start, end)
+        increments = {
+            "fractured_ligament_length_m": ligament_length,
+            "active_front_coordinate_advance_m": ligament_length,
+            "projected_fractured_length_m": end[0] - start[0],
+            "projected_front_advance_m": end[0] - start[0],
+            "preexisting_void_free_span_m": 2.0 * cavity.radius_m,
+            "projected_free_span_m": 2.0 * cavity.radius_m,
+            "connected_free_surface_extent_m": math.pi * cavity.radius_m,
+        }
+        for name, increment in increments.items():
+            ledgers[name] += increment
+            void_state = replace(void_state, length_ledgers=dict(ledgers))
+            inject("length_ledger_update:" + name, replace(realized, void_state=void_state))
+        void_state = replace(
+            void_state,
+            event_history=void_state.event_history + ({"event": "CRACK_TO_VOID_LIGAMENT"},),
+        )
+        realized = replace(realized, void_state=void_state)
+        _, boundary_elements = cavity_boundary_tensor(realized)
+        if not boundary_elements:
+            raise RuntimeError("connected free surface is not certified")
+        inject("connected_surface_certification", realized)
+        return realized
     result = execute_topology_trial(
         state, proposal, (arm,), apply_trial_geometry=geometry,
         equilibrate_fixed_load=equilibrate_fixed_load_with_production_fem,
         network_geometry_already_realized=True, failure_injector=inject,
     )
     if not result.accepted: raise RuntimeError("ligament event rejected")
-    connected = replace(cavity, phase=VoidPhase.CONNECTED_VOID, lineage=cavity.lineage + ("CRACK_TO_VOID_LIGAMENT",))
-    ledgers = dict(result.state.void_state.length_ledgers)
-    ligament_length = math.dist(start, end)
-    ledgers["fractured_ligament_length_m"] += ligament_length
-    ledgers["projected_fractured_length_m"] += end[0] - start[0]
-    ledgers["preexisting_void_free_span_m"] += 2.0 * cavity.radius_m
-    ledgers["projected_free_span_m"] += 2.0 * cavity.radius_m
-    ledgers["connected_free_surface_extent_m"] += math.pi * cavity.radius_m
-    void_state = replace(
-        replace_cavity(result.state.void_state, connected),
-        event_history=result.state.void_state.event_history + ({"event": "CRACK_TO_VOID_LIGAMENT"},),
-        length_ledgers=ledgers,
-    )
-    return replace(result.state, void_state=void_state), result
+    return result.state, result
 
 
 def downstream_front_transaction(state, *, continuation=False):
-    tensor, boundary_elements = cavity_boundary_tensor(state)
+    child_id = "void-front-1"
+    center = np.asarray(state.void_state.cavities[0].center_m)
+    nodes = np.asarray(state.mesh.nodes)
+    boundary_radii = np.linalg.norm(nodes - center, axis=1)
+    cavity_nodes = np.flatnonzero(boundary_radii <= state.void_state.cavities[0].radius_m * 1.02)
+    right_boundary = int(cavity_nodes[np.argmax(nodes[cavity_nodes, 0])])
+    tensor, boundary_elements = cavity_boundary_tensor(state, boundary_node=right_boundary)
     state, cleavage_audit = _complete_next_clock(
         state, tensor, start_time=2.0 if continuation else 1.0,
     )
     proposal = next(item for item in construct_action_proposals(
         state.competition.hazard_states, correlation_interval_s=0.0,
     ) if item.action_type == "one_arm")
-    child_id = "void-front-1"
-    center = np.asarray(state.void_state.cavities[0].center_m)
-    nodes = np.asarray(state.mesh.nodes)
-    right_boundary = int(np.argmin(np.linalg.norm(nodes - (center + [state.void_state.cavities[0].radius_m, 0.0]), axis=1)))
     if continuation:
         start = state.crack_network.branch(child_id).tip
-        candidates = np.flatnonzero(nodes[:, 0] > start[0] + 1.0e-8)
+        candidates = np.flatnonzero(
+            (nodes[:, 0] > start[0] + 1.0e-8)
+            & (np.abs(nodes[:, 1] - start[1]) <= 1.0e-10)
+        )
         end_node = int(candidates[np.argmin(np.linalg.norm(nodes[candidates] - (np.asarray(start) + [7.5e-5, 0.0]), axis=1))])
         base_network = state.crack_network
     else:
@@ -353,13 +393,17 @@ def downstream_front_transaction(state, *, continuation=False):
         base_network = replace(state.crack_network, branches=state.crack_network.branches + (child,),
                                geometry_generation=state.crack_network.geometry_generation + 1,
                                branching_enabled=True)
-        candidates = np.flatnonzero(nodes[:, 0] > start[0] + 1.0e-8)
+        candidates = np.flatnonzero(
+            (nodes[:, 0] > start[0] + 1.0e-8)
+            & (np.abs(nodes[:, 1] - start[1]) <= 1.0e-10)
+        )
         end_node = int(candidates[np.argmin(np.linalg.norm(nodes[candidates] - (np.asarray(start) + [1.5e-4, 0.0]), axis=1))])
     end = tuple(map(float, nodes[end_node]))
     candidate = next(item for item in state.competition.candidates if item.candidate_id == proposal.member_candidate_ids[0])
     engine = FrontEngine(FrontConfig(), default_cleavage_barrier(), default_emission_barrier(state.material.b),
                          state.material.G, state.material.nu, state.material.b)
-    _, _, barrier = engine.lambda_cleave(engine.sigma_tip(cleavage_audit[0]["K_Pa_sqrt_m"]), 900.0)
+    winner = next(item for item in cleavage_audit if item["winner"])
+    barrier = winner["hazard_barrier_J"]
     resistance = hazard_resistance_J_per_m2(
         barrier_J=barrier, cooperative_hits=engine.f.m_hits,
         burgers_vector_m=engine.b, gamma_relative=candidate.gamma_rel,
@@ -400,7 +444,10 @@ def downstream_front_transaction(state, *, continuation=False):
     )
     return replace(result.state, void_state=void_state), result, operations, {
         "tensor_Pa": tensor.tolist(), "boundary_element_ids": boundary_elements,
-        "cleavage": cleavage_audit,
+        "boundary_position_m": list(map(float, nodes[right_boundary])),
+        "surface_normal_xy": [1.0, 0.0], "surface_tangent_xy": [0.0, 1.0],
+        "candidate_id": proposal.member_candidate_ids[0],
+        "cavity_id": cavity.cavity_id, "cleavage": cleavage_audit,
     }
 
 

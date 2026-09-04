@@ -8,6 +8,9 @@ from arrhenius_fracture.voiding_production_v5 import (
     _complete_next_clock, build_production_void_state,
     deterministic_trajectory, natural_trajectory,
 )
+from arrhenius_fracture.directional_competition_v11 import (
+    DirectionalCompetitionState, DirectionalHazardState, tungsten_cleavage_candidates,
+)
 from arrhenius_fracture.voiding_v5 import (
     Cavity2D, VoidPhase, VoidingConfig, advance_site, arrhenius_rates,
     create_subgrid_cavity, grow_cavity_2d, grow_cavity_from_rate,
@@ -77,3 +80,42 @@ def test_no_zero_drive_or_unit_rate_bypass_for_cleavage_first_passage():
     state, _ = build_production_void_state()
     with pytest.raises(RuntimeError, match="cannot reach first passage"):
         _complete_next_clock(state, np.zeros((2, 2)))
+
+
+def test_activation_work_has_energy_units_and_reference_is_not_saturated():
+    cfg = VoidingConfig(enabled=True)
+    tensor = np.array([[1.0e9, 1.0e8], [1.0e8, 0.6e9]])
+    base = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+    hydro = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor + np.eye(2) * 2.0e8)
+    reversed_shear = arrhenius_rates(
+        cfg, temperature_K=900.0,
+        stress_tensor_Pa=np.array([[1.0e9, -1.0e8], [-1.0e8, 0.6e9]]),
+    )
+    barrier = arrhenius_rates(
+        replace(cfg, birth_barrier_J=1.1 * cfg.birth_barrier_J),
+        temperature_K=900.0, stress_tensor_Pa=tensor,
+    )
+    assert 0.0 < base["birth_activation_work_J"] < cfg.birth_barrier_J
+    assert base["birth_s"] < cfg.attempt_frequency_s
+    assert hydro["birth_s"] > base["birth_s"]
+    assert reversed_shear["birth_s"] < base["birth_s"]
+    assert barrier["birth_s"] < base["birth_s"]
+
+
+def test_directional_candidates_advance_over_one_common_earliest_interval():
+    state, _ = build_production_void_state()
+    candidates = tungsten_cleavage_candidates(theta_deg=45.0)
+    competition = DirectionalCompetitionState(
+        candidates=candidates,
+        hazard_states=tuple(DirectionalHazardState(item.candidate_id) for item in candidates),
+        global_hazard_seed=3621,
+    )
+    state = replace(state, competition=competition)
+    advanced, audit = _complete_next_clock(
+        state, np.array([[2.0e9, 4.0e8], [4.0e8, 0.5e9]])
+    )
+    durations = {item["common_advance_duration_s"] for item in audit}
+    assert len(durations) == 1
+    assert sum(item["winner"] for item in audit) == 1
+    assert len(advanced.competition.pending_events) == 1
+    assert all(item.action > 0.0 for item in advanced.competition.hazard_states)

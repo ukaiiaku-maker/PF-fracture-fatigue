@@ -28,7 +28,10 @@ There is no scalar resolved-void damage variable.
 
 The birth work is
 
-`W_b = A_act(c_h sigma_h + c_n sigma_n + c_s tau_nt)` (J).
+`W_b = c_h sigma_h V_h* + c_n max(sigma_n,0) A_n* delta_n* + c_s tau_nt V_s*` (J).
+
+Here `sigma_h=(sigma_xx+sigma_yy+sigma_zz)/3` and plane-strain
+`sigma_zz=nu(sigma_xx+sigma_yy)`. The in-plane mean is diagnostic only.
 
 The birth rate is
 
@@ -40,8 +43,8 @@ Birth completes after `required_birth_hits` threshold crossings. After every
 nonterminal hit, exactly one new unit-exponential threshold is drawn from the
 state-owned RNG; the RNG advances exactly once.
 
-Stabilization uses `lambda_s = nu exp[-max(Q_s-A_act sigma_1,0)/(k_B T)]`.
-Healing uses `lambda_h = nu exp[-max(Q_h+A_act sigma_1,0)/(k_B T)]`; tensile
+Stabilization uses `lambda_s = nu exp[-max(Q_s-sigma_1 V_s*,0)/(k_B T)]`.
+Healing uses `lambda_h = nu exp[-max(Q_h+sigma_1 V_h*,0)/(k_B T)]`; tensile
 opening therefore favors stabilization and suppresses healing. Equal crossing
 times resolve deterministically to healing. A healed embryo creates no geometry
 and no inventory.
@@ -106,7 +109,10 @@ SI-square-metre ledgers.
 | `Q_b` | `birth_barrier_J` | J | >=0 | birth rate | material-dependent | no |
 | `Q_s` | `stabilization_barrier_J` | J | >=0 | stabilization | material-dependent | no |
 | `Q_h` | `healing_barrier_J` | J | >=0 | healing | material-dependent | no |
-| `A_act` | `activation_area_m2` | m^2 | >=0 | stress work | material-dependent | no |
+| `V_h*` | `birth_hydrostatic_volume_m3` | m^3 | >=0 | hydrostatic birth work | diagnostic | no |
+| `A_n*` | `birth_normal_area_m2` | m^2 | >=0 | normal birth work | diagnostic | no |
+| `delta_n*` | `birth_normal_separation_m` | m | >=0 | normal birth work | diagnostic | no |
+| `V_s*` | `birth_shear_volume_m3` | m^3 | >=0 | signed-shear birth work | diagnostic | no |
 | `c_h` | `hydrostatic_work_coefficient` | 1 | signed | birth work | diagnostic | no |
 | `c_n` | `normal_opening_work_coefficient` | 1 | signed | birth work | diagnostic | no |
 | `c_s` | `signed_shear_work_coefficient` | 1 | signed | birth work | diagnostic | no |

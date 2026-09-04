@@ -1,6 +1,9 @@
 # V5 final decision
 
-Decision: **FINALIZATION_COMPLETE_WITH_OPEN_SYSTEMATIC_BLOCKERS**.
+Decision: **SUPERSEDED_INITIAL_FINALIZATION_ATTEMPT**.
+
+The original campaign tables contain aliased and literal evidence and must not
+be used as a release basis. Physics and evidence repair is in progress.
 
 - Software implementation qualification: partial pass; core tests and causal
   paths pass, while full partition/restart matrices remain incomplete.
