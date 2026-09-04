@@ -119,3 +119,35 @@ def test_directional_candidates_advance_over_one_common_earliest_interval():
     assert sum(item["winner"] for item in audit) == 1
     assert len(advanced.competition.pending_events) == 1
     assert all(item.action > 0.0 for item in advanced.competition.hazard_states)
+
+
+def test_directional_exact_tie_fires_only_prospectively_equal_candidates():
+    state, _ = build_production_void_state()
+    candidates = tungsten_cleavage_candidates(theta_deg=45.0)
+    competition = DirectionalCompetitionState(
+        candidates=candidates,
+        hazard_states=tuple(DirectionalHazardState(item.candidate_id) for item in candidates),
+        global_hazard_seed=3621,
+    )
+    state = replace(state, competition=competition)
+    advanced, audit = _complete_next_clock(state, np.eye(2) * 1.0e9)
+    assert sum(item["winner"] for item in audit) == 2
+    assert len(advanced.competition.pending_events) == 2
+
+
+def test_zero_rate_candidate_keeps_residual_while_peer_wins():
+    state, _ = build_production_void_state()
+    candidates = tungsten_cleavage_candidates(theta_deg=45.0)
+    competition = DirectionalCompetitionState(
+        candidates=candidates,
+        hazard_states=tuple(DirectionalHazardState(item.candidate_id) for item in candidates),
+        global_hazard_seed=3621,
+    )
+    state = replace(state, competition=competition)
+    # Rank-one tension opens one candidate plane and closes the other.
+    tensor = np.array([[1.0e9, 1.0e9], [1.0e9, 1.0e9]])
+    advanced, audit = _complete_next_clock(state, tensor)
+    assert sum(item["winner"] for item in audit) == 1
+    loser = next(index for index, item in enumerate(audit) if not item["winner"])
+    assert audit[loser]["rate_s"] == 0.0
+    assert advanced.competition.hazard_states[loser].action == 0.0

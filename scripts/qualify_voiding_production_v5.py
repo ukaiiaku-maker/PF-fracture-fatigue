@@ -123,7 +123,7 @@ def main(argv=None):
                   and deterministic[-1]["graph_length_m"] > deterministic[7]["graph_length_m"]
                   and len(deterministic[10]["cavity_boundary_element_ids"]) > 0
                   and deterministic[11]["causal_first_passage"]["cleavage"][0]["rate_s"] > 0.0
-                  and deterministic[11]["causal_first_passage"]["cleavage"][0]["duration_s"] > 0.0,
+                  and deterministic[11]["causal_first_passage"]["cleavage"][0]["common_advance_duration_s"] > 0.0,
     })
 
     perturbation_rates = []
@@ -132,10 +132,16 @@ def main(argv=None):
             replace(final, displacement=final.displacement * scale)
         )
         tensor, elements = cavity_boundary_tensor(perturbed)
-        _, audit = _complete_next_clock(perturbed, tensor, start_time=3.0)
+        try:
+            _, audit = _complete_next_clock(perturbed, tensor, start_time=3.0)
+            rate, duration = audit[0]["rate_s"], audit[0]["common_advance_duration_s"]
+            classification = "FIRST_PASSAGE_REACHABLE"
+        except RuntimeError:
+            rate, duration = 0.0, None
+            classification = "ZERO_DRIVE_NO_EVENT"
         perturbation_rates.append({
-            "opening_scale": scale, "rate_s": audit[0]["rate_s"],
-            "duration_s": audit[0]["duration_s"],
+            "opening_scale": scale, "rate_s": rate, "duration_s": duration,
+            "classification": classification,
             "boundary_element_ids": elements, "tensor_Pa": tensor.tolist(),
         })
     rows.append({

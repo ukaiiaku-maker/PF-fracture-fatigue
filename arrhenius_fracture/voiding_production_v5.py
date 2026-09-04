@@ -260,7 +260,8 @@ def _complete_next_clock(state, stress_tensor_Pa, *, start_time=0.0, temperature
         normal = np.asarray(candidate.normal_xy, dtype=float)
         resolved_opening = max(float(normal @ stress @ normal), 0.0)
         raw_rate, _, barrier = engine.lambda_cleave(resolved_opening, temperature_K)
-        rate = 0.0 if resolved_opening <= 0.0 else max(float(raw_rate), 0.0)
+        zero_tolerance = 1.0e-12 * max(float(np.linalg.norm(stress, ord=2)), 1.0)
+        rate = 0.0 if resolved_opening <= zero_tolerance else max(float(raw_rate), 0.0)
         remaining = max(hazard.current_threshold_action - hazard.action, 0.0)
         crossing = math.inf if rate <= 0.0 else remaining / rate
         crossing_times.append(crossing)
