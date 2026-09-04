@@ -1,0 +1,72 @@
+{
+  "bounded_cases": [
+    "straight_repeated",
+    "sequential_events",
+    "kink",
+    "branch_capable",
+    "oblique_aligned",
+    "active_tip_refinement",
+    "rollback",
+    "restart"
+  ],
+  "checks": {
+    "PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED": true,
+    "V11_SELECTABLE_NEUTRALITY": true,
+    "V12_BOUNDED_PRODUCTION_PROPAGATION_QUALIFIED": true,
+    "V12_PRODUCTION_CHECKPOINT_RESTART_QUALIFIED": true,
+    "V12_PRODUCTION_STATE_OWNERSHIP_QUALIFIED": true
+  },
+  "gates": {
+    "PRODUCTION_TRANSACTION_ROLLBACK_QUALIFIED": "PASS",
+    "V11_SELECTABLE_NEUTRALITY": "PASS",
+    "V12_BOUNDED_PRODUCTION_PROPAGATION_QUALIFIED": "PASS",
+    "V12_PRODUCTION_CHECKPOINT_RESTART_QUALIFIED": "PASS",
+    "V12_PRODUCTION_STATE_OWNERSHIP_QUALIFIED": "PASS",
+    "V12_SHARP_WAKE_PRODUCTION_PREREQUISITE_QUALIFIED": "PASS"
+  },
+  "implementation_git_sha": "f77f6a81f6ab98f35094593fad80f09d6b13cd65",
+  "restart_fields": [
+    "event_sequence",
+    "crack_graph",
+    "support",
+    "p0_damage",
+    "mesh_generation",
+    "front_state",
+    "process_state",
+    "hazards",
+    "thresholds",
+    "rng",
+    "reaction",
+    "energy",
+    "terminal_fingerprint"
+  ],
+  "rollback_stages": [
+    "accepted_snapshot",
+    "graph_edit",
+    "active_tip_remesh",
+    "support_generation",
+    "support_certification",
+    "field_transfer",
+    "equilibrium",
+    "energy_acceptance",
+    "process_state_update",
+    "topology_verification",
+    "late_event_veto"
+  ],
+  "schema": "v12.production-integration/1",
+  "v11_neutrality_fields": [
+    "event_sequence",
+    "crack_graph",
+    "wake",
+    "active_fronts",
+    "process_state",
+    "source_state",
+    "hazards",
+    "thresholds",
+    "rng",
+    "reactions",
+    "energies",
+    "terminal_status",
+    "checkpoint_restart"
+  ]
+}

@@ -1,0 +1,30 @@
+name: V12 production integration V2
+
+on:
+  push:
+    branches: [codex/v12-sharp-wake-production-integration]
+  workflow_dispatch:
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Unit and transaction regression
+        run: python -m pytest -q tests/test_topology_transaction_v11.py tests/test_sharp_wake_backend_v12.py
+      - name: First clean-worker evidence generation
+        run: python scripts/qualify_v12_production_integration_v2.py /tmp/evidence-a
+      - name: Second clean-worker evidence generation
+        run: python scripts/qualify_v12_production_integration_v2.py /tmp/evidence-b
+      - name: Verify deterministic scientific evidence
+        run: diff -ru /tmp/evidence-a /tmp/evidence-b
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v12-production-integration-v2-${{ github.sha }}
+          path: /tmp/evidence-a
+

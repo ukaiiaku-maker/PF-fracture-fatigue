@@ -999,6 +999,10 @@ class DiagnosticsConfig:
 @dataclass
 class SimulationConfig:
     """Top-level simulation configuration."""
+    # Runtime crack representation. V11 remains the compatibility default.
+    sharp_wake_model_id: Literal[
+        'sharp_wake_causal_v11', 'sharp_wake_mechanically_separating_v12'
+    ] = 'sharp_wake_causal_v11'
     # Temperature list
     T_list: list = field(default_factory=lambda: [500, 700, 900, 1100, 1300, 1500])
 

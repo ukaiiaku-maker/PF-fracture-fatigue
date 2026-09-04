@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass, is_dataclass, replace
+import hashlib
+import json
 import math
 import time
 from typing import Any, Callable, Iterable, Mapping
@@ -107,6 +109,9 @@ class LiveFEMTopologyState:
     rng_state: Any
     event_counters: Mapping[str, int]
     stored_energy_J_per_m: float
+    sharp_wake_model_id: str = "sharp_wake_causal_v11"
+    v12_support_state: Any = None
+    checkpoint_generation: int = 0
 
     def __post_init__(self) -> None:
         energy = float(self.stored_energy_J_per_m)
@@ -131,6 +136,13 @@ class LiveFEMTopologyState:
         object.__setattr__(self, "energy_ledgers", _freeze(self.energy_ledgers))
         object.__setattr__(self, "event_counters", _freeze(self.event_counters))
         object.__setattr__(self, "rng_state", _freeze(self.rng_state))
+        from .sharp_wake_backend_v12 import V11_MODEL_ID, V12_MODEL_ID, select_sharp_wake_model
+        selected=select_sharp_wake_model(self.sharp_wake_model_id)
+        if selected==V11_MODEL_ID and self.v12_support_state is not None:
+            raise ValueError("V11 state may not own V12 support")
+        if selected==V12_MODEL_ID and self.v12_support_state is None:
+            raise ValueError("V12 state requires authoritative support ownership")
+        object.__setattr__(self,"sharp_wake_model_id",selected)
 
     def isolated_copy(self) -> "LiveFEMTopologyState":
         return LiveFEMTopologyState(
@@ -144,6 +156,9 @@ class LiveFEMTopologyState:
             energy_ledgers=self.energy_ledgers, rng_state=self.rng_state,
             event_counters=self.event_counters,
             stored_energy_J_per_m=self.stored_energy_J_per_m,
+            sharp_wake_model_id=self.sharp_wake_model_id,
+            v12_support_state=self.v12_support_state,
+            checkpoint_generation=self.checkpoint_generation,
         )
 
 
@@ -155,6 +170,9 @@ class TopologyArm:
     end_xy_m: tuple[float, float]
     event_reward_m: float
     hazard_dissipation_J_per_m: float
+    event_classification: str = "software_forced_geometry"
+    candidate_direction_xy: tuple[float, float] | None = None
+    first_intersection_xy_m: tuple[float, float] | None = None
 
     def __post_init__(self) -> None:
         reward = float(self.event_reward_m)
@@ -165,6 +183,26 @@ class TopologyArm:
             raise ValueError("hazard-derived dissipation must be finite and nonnegative")
         if math.dist(self.start_xy_m, self.end_xy_m) <= 0.0:
             raise ValueError("topology arm must have positive geometric length")
+        classification = str(self.event_classification)
+        if classification not in {"software_forced_geometry", "physical_cleavage"}:
+            raise ValueError("unknown topology-event classification")
+        object.__setattr__(self, "event_classification", classification)
+        if classification == "physical_cleavage":
+            if dissipation <= 0.0:
+                raise ValueError("a physical cleavage event requires nonzero hazard dissipation")
+            if self.candidate_direction_xy is None or self.first_intersection_xy_m is None:
+                raise ValueError("a physical cleavage event requires direction and first-intersection evidence")
+            direction = np.asarray(self.candidate_direction_xy, dtype=float)
+            segment = np.asarray(self.end_xy_m, dtype=float) - np.asarray(self.start_xy_m, dtype=float)
+            if direction.shape != (2,) or not np.all(np.isfinite(direction)):
+                raise ValueError("physical candidate direction must be a finite 2-vector")
+            if np.linalg.norm(direction) <= 0.0:
+                raise ValueError("physical candidate direction must be nonzero")
+            cosine = float(np.dot(direction, segment) / (np.linalg.norm(direction) * np.linalg.norm(segment)))
+            if cosine < 1.0 - 1.0e-10:
+                raise ValueError("realized arm is not aligned with its selected physical candidate")
+            if not np.allclose(self.end_xy_m, self.first_intersection_xy_m, rtol=0.0, atol=1.0e-15):
+                raise ValueError("realized endpoint is not the recorded first intersection")
 
 
 @dataclass(frozen=True)
@@ -187,16 +225,95 @@ EquilibrateTrial = Callable[[LiveFEMTopologyState], LiveFEMTopologyState]
 def equilibrate_fixed_load_with_production_fem(
     state: LiveFEMTopologyState,
 ) -> LiveFEMTopologyState:
-    """Use the installed production assembler at the accepted boundary opening."""
-    from .hazard_energy_event_gate_v10230 import _equilibrate_fixed_opening
+    """Equilibrate with the production assembler at the accepted opening.
 
-    displacement, _, energy = _equilibrate_fixed_opening(
-        mesh=state.mesh, boundary=state.boundary,
-        u_initial=state.displacement, ep_gp=state.ep_gp, rho_gp=state.rho_gp,
-        damage=state.damage, D=state.elasticity_D, mat=state.material,
+    This deliberately calls the public FEM assembly and Dirichlet solver.  It
+    does not depend on a test observer or replace energy with a synthetic value.
+    """
+    from .fem import assemble_mechanics, elastic_energy_densities, solve_dirichlet
+
+    u0 = np.asarray(state.displacement, dtype=float).copy()
+    top = np.asarray(state.boundary.top_nodes, dtype=int)
+    bot = np.asarray(state.boundary.bot_nodes, dtype=int)
+    top_opening = float(np.mean(u0[2 * top + 1])) if top.size else 0.0
+    bottom_opening = float(np.mean(u0[2 * bot + 1])) if bot.size else 0.0
+    Kmat, Rint, *_ = assemble_mechanics(
+        state.mesh, u0, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material,
         cohesive_network=state.cohesive_network,
     )
-    return replace(state, displacement=displacement, stored_energy_J_per_m=energy)
+    displacement, reaction = solve_dirichlet(
+        Kmat, Rint, u0, state.boundary, top_opening, bottom_opening,
+    )
+    _, residual, sigma_gp, *_ = assemble_mechanics(
+        state.mesh, displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material,
+        cohesive_network=state.cohesive_network,
+    )
+    density, _ = elastic_energy_densities(
+        state.mesh, displacement, state.ep_gp, sigma_gp, state.elasticity_D,
+    )
+    energy = float(np.sum(density * state.mesh.area_e))
+    ledger = dict(state.energy_ledgers)
+    ledger.update({
+        "latest_reaction_N_per_m": float(reaction),
+        "latest_residual_l2_N_per_m": float(np.linalg.norm(residual)),
+        "latest_fem_energy_J_per_m": energy,
+    })
+    return replace(
+        state, displacement=displacement, stored_energy_J_per_m=energy,
+        energy_ledgers=ledger,
+    )
+
+
+def complete_accepted_state_fingerprint(state: LiveFEMTopologyState) -> str:
+    """Hash all accepted production ownership without object identities."""
+    from .sharp_wake_backend_v12 import array_fingerprint
+
+    def normalize(value):
+        if isinstance(value, np.ndarray):
+            return {"array_sha256": array_fingerprint(value)}
+        if hasattr(value, "to_dict"):
+            return normalize(value.to_dict())
+        if is_dataclass(value):
+            return normalize({name: getattr(value, name) for name in value.__dataclass_fields__})
+        if isinstance(value, Mapping):
+            return {str(key): normalize(item) for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))}
+        if isinstance(value, (tuple, list)):
+            return [normalize(item) for item in value]
+        if isinstance(value, np.generic):
+            return value.item()
+        if isinstance(value, float) and not math.isfinite(value):
+            return {"nonfinite": str(value)}
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            return value
+        return {"type": type(value).__qualname__, "state": normalize(getattr(value, "__dict__", str(value)))}
+
+    payload = {
+        "mesh_nodes": state.mesh.nodes,
+        "mesh_elems": state.mesh.elems,
+        "boundary": state.boundary,
+        "damage": state.damage,
+        "displacement": state.displacement,
+        "ep_gp": state.ep_gp,
+        "rho_gp": state.rho_gp,
+        "elasticity_D": state.elasticity_D,
+        "material": state.material,
+        "cohesive_network": state.cohesive_network,
+        "crack_network": state.crack_network,
+        "competition": state.competition,
+        "tip_process_state": state.tip_process_state,
+        "junction_process_state": state.junction_process_state,
+        "energy_ledgers": state.energy_ledgers,
+        "rng_state": state.rng_state,
+        "event_counters": state.event_counters,
+        "stored_energy_J_per_m": state.stored_energy_J_per_m,
+        "sharp_wake_model_id": state.sharp_wake_model_id,
+        "v12_support_state": state.v12_support_state,
+        "checkpoint_generation": state.checkpoint_generation,
+    }
+    encoded = json.dumps(normalize(payload), sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def apply_sharp_wake_trial_geometry(
@@ -252,6 +369,160 @@ def apply_causal_sharp_wake_trial_geometry(
     junction["latest_causal_support_trials"] = tuple(audits)
     junction["crack_representation"] = "sharp_wake_causal_v11"
     return replace(current, junction_process_state=junction)
+
+
+def apply_mechanically_separating_v12_trial_geometry(
+    state: LiveFEMTopologyState, arms: tuple[TopologyArm, ...], *,
+    source_commit: str, configuration: Mapping[str, Any], transaction_identity: str,
+    failure_injector: Callable[[str, LiveFEMTopologyState], None] | None = None,
+) -> LiveFEMTopologyState:
+    """Realize tentative graph first, then rebuild/certify complete V12 support."""
+    from .causal_sharp_wake_v11 import element_damage
+    from .mechanically_separating_sharp_wake_v12 import apply_mechanically_separating_graph
+    from .sharp_wake_backend_v12 import V12_MODEL_ID, support_state_from_production
+    network=state.crack_network
+    for arm in arms: network=extend_network_arm(network,arm)
+    if failure_injector is not None: failure_injector("graph_edit",replace(state,crack_network=network))
+    previous=None
+    if state.v12_support_state is not None:
+        previous=state.junction_process_state.get("v12_support_record")
+    trial,audit=apply_mechanically_separating_graph(state,network,previous_support=previous)
+    if failure_injector is not None: failure_injector("support_generation",trial)
+    if not audit.certified or audit.mechanically_new_element_count<=0:
+        raise RuntimeError("V12 tentative event did not create certified mechanical novelty")
+    if failure_injector is not None: failure_injector("support_certification",trial)
+    prior=state.v12_support_state.transaction_identity if state.v12_support_state is not None else None
+    ownership=support_state_from_production(
+        mesh=trial.mesh,crack_network=network,selected_support_elements=audit.selected_element_ids,
+        damage_gp=element_damage(trial.mesh,trial.damage),certification_fingerprint=audit.certificate_fingerprint,
+        transaction_identity=transaction_identity,previous_accepted_transaction=prior,
+        source_commit=source_commit,configuration=configuration,
+        checkpoint_generation=state.checkpoint_generation)
+    return replace(trial,sharp_wake_model_id=V12_MODEL_ID,v12_support_state=ownership)
+
+
+def initialize_mechanically_separating_v12(
+    state: LiveFEMTopologyState, *, source_commit: str,
+    configuration: Mapping[str, Any], transaction_identity: str="v12-initial",
+) -> LiveFEMTopologyState:
+    """Select V12 only together with certified support for the accepted graph."""
+    from .causal_sharp_wake_v11 import element_damage
+    from .mechanically_separating_sharp_wake_v12 import apply_mechanically_separating_graph
+    from .sharp_wake_backend_v12 import V12_MODEL_ID, support_state_from_production
+    trial,audit=apply_mechanically_separating_graph(state,state.crack_network)
+    if not audit.certified: raise RuntimeError("initial V12 support is not certified")
+    ownership=support_state_from_production(
+        mesh=trial.mesh,crack_network=trial.crack_network,
+        selected_support_elements=audit.selected_element_ids,
+        damage_gp=element_damage(trial.mesh,trial.damage),
+        certification_fingerprint=audit.certificate_fingerprint,
+        transaction_identity=transaction_identity,previous_accepted_transaction=None,
+        source_commit=source_commit,configuration=configuration,
+        checkpoint_generation=state.checkpoint_generation)
+    return replace(trial,sharp_wake_model_id=V12_MODEL_ID,v12_support_state=ownership)
+
+
+def remesh_mechanically_separating_v12(
+    state: LiveFEMTopologyState, *, mesh, boundary, tentative_network=None,
+    transferred_fields: Mapping[str, Any], source_commit: str,
+    configuration: Mapping[str, Any], transaction_identity: str,
+    failure_injector: Callable[[str, LiveFEMTopologyState], None] | None=None,
+) -> LiveFEMTopologyState:
+    """Rebuild V12 ownership on a new mesh; never transfer element IDs."""
+    required=("damage","displacement","ep_gp","rho_gp","tip_process_state","source_state")
+    if any(name not in transferred_fields for name in required):
+        raise ValueError("V12 remesh requires every owned structural/history field")
+    junction={key:value for key,value in state.junction_process_state.items()
+              if key not in ("v12_support_record","v12_graph_support_audit",
+                             "v12_accepted_mechanical_fingerprint","v12_trial_mechanical_fingerprint")}
+    counters = dict(state.event_counters)
+    counters["mesh_generation"] = int(counters.get("mesh_generation", 0)) + 1
+    counters["refinement_operation_index"] = int(counters.get("refinement_operation_index", 0)) + 1
+    base=replace(state,mesh=mesh,boundary=boundary,
+        crack_network=state.crack_network if tentative_network is None else tentative_network,
+        damage=np.asarray(transferred_fields["damage"]),
+        displacement=np.asarray(transferred_fields["displacement"]),
+        ep_gp=np.asarray(transferred_fields["ep_gp"]),rho_gp=np.asarray(transferred_fields["rho_gp"]),
+        tip_process_state=transferred_fields["tip_process_state"],
+        junction_process_state={**junction, "source_state": transferred_fields["source_state"]},
+        event_counters=counters, sharp_wake_model_id="sharp_wake_causal_v11",v12_support_state=None)
+    if failure_injector is not None: failure_injector("remesh",base)
+    if failure_injector is not None: failure_injector("field_projection",base)
+    rebuilt = initialize_mechanically_separating_v12(
+        base,source_commit=source_commit,configuration=configuration,
+        transaction_identity=transaction_identity)
+    if failure_injector is not None: failure_injector("support_rebuild",rebuilt)
+    return rebuilt
+
+
+def apply_v12_production_trial_geometry(
+    state: LiveFEMTopologyState,
+    arms: tuple[TopologyArm, ...],
+    *,
+    source_commit: str,
+    configuration: Mapping[str, Any],
+    transaction_identity: str,
+    failure_injector: Callable[[str, LiveFEMTopologyState], None] | None = None,
+) -> LiveFEMTopologyState:
+    """Perform graph edit, conforming remesh, physical field transfer and support rebuild."""
+    from .adaptive_multitip_mesh_v11 import refine_accepted_state
+
+    network = state.crack_network
+    for arm in arms:
+        network = extend_network_arm(network, arm)
+    graph_state = replace(state, crack_network=network)
+    if failure_injector is not None:
+        failure_injector("graph_edit", graph_state)
+
+    graph_segments = tuple(
+        (a, b) for branch in network.branches for a, b in zip(branch.path, branch.path[1:])
+    )
+    refined = graph_state
+    for level in range(3):
+        centroids = np.asarray(refined.mesh.nodes)[np.asarray(refined.mesh.elems)].mean(axis=1)
+        marked: set[int] = set()
+        for start, end in graph_segments:
+            a = np.asarray(start, dtype=float)
+            b = np.asarray(end, dtype=float)
+            delta = b - a
+            length2 = float(delta @ delta)
+            t = np.clip(((centroids - a) @ delta) / max(length2, 1.0e-300), 0.0, 1.0)
+            distance = np.linalg.norm(centroids - (a + t[:, None] * delta), axis=1)
+            local_h = np.sqrt(np.maximum(np.asarray(refined.mesh.area_e), 1.0e-300))
+            marked.update(np.flatnonzero(distance <= 2.0 * local_h).tolist())
+        if not marked:
+            raise RuntimeError("production V12 remesh found no physical event support")
+        refined, _ = refine_accepted_state(
+            refined,
+            marked_parent_elements=tuple(sorted(marked)),
+            active_tip_ids=network.active_tip_ids,
+            generation=int(state.event_counters.get("mesh_generation", 0)) + 1,
+            operation_index=int(state.event_counters.get("refinement_operation_index", 0)) + level + 1,
+        )
+    counters = dict(refined.event_counters)
+    counters.update({
+        "mesh_generation": int(state.event_counters.get("mesh_generation", 0)) + 1,
+        "refinement_operation_index": int(state.event_counters.get("refinement_operation_index", 0)) + 1,
+    })
+    refined = replace(refined, event_counters=counters)
+    return remesh_mechanically_separating_v12(
+        state,
+        mesh=refined.mesh,
+        boundary=refined.boundary,
+        tentative_network=network,
+        transferred_fields={
+            "damage": refined.damage,
+            "displacement": refined.displacement,
+            "ep_gp": refined.ep_gp,
+            "rho_gp": refined.rho_gp,
+            "tip_process_state": state.tip_process_state,
+            "source_state": state.junction_process_state.get("source_state", {}),
+        },
+        source_commit=source_commit,
+        configuration=configuration,
+        transaction_identity=transaction_identity,
+        failure_injector=failure_injector,
+    )
 
 
 def _replace_branch(network: CrackNetworkState, updated: CrackBranchState) -> CrackNetworkState:
@@ -337,6 +608,7 @@ def execute_topology_trial(
     relative_energy_tolerance: float = 1.0e-8,
     absolute_energy_tolerance_J_per_m: float = 1.0e-12,
     network_geometry_already_realized: bool = False,
+    failure_injector: Callable[[str, LiveFEMTopologyState], None] | None = None,
 ) -> TopologyTrialResult:
     """Reserve, trial and atomically accept/release one one- or two-arm action."""
     trial_arms = tuple(sorted(arms, key=lambda item: item.candidate_id))
@@ -349,6 +621,7 @@ def execute_topology_trial(
     reserved_state = replace(accepted, competition=reserved)
     copy_start = time.perf_counter()
     isolated = reserved_state.isolated_copy()
+    if failure_injector is not None: failure_injector("accepted_snapshot",isolated)
     copy_wall = time.perf_counter() - copy_start
     mechanics = ("damage", "displacement", "ep_gp", "rho_gp", "elasticity_D")
     copy_bytes = sum(
@@ -356,6 +629,7 @@ def execute_topology_trial(
         for name in mechanics if getattr(isolated, name) is not getattr(reserved_state, name)
     )
     trial = apply_trial_geometry(isolated, trial_arms)
+    if failure_injector is not None: failure_injector("field_transfer",trial)
     if network_geometry_already_realized:
         for arm in trial_arms:
             branch = trial.crack_network.branch(arm.branch_id)
@@ -364,6 +638,7 @@ def execute_topology_trial(
                     "trial network does not contain the exact realized arm endpoint"
                 )
     trial = equilibrate_fixed_load(trial)
+    if failure_injector is not None: failure_injector("equilibrium",trial)
     released = float(accepted.stored_energy_J_per_m - trial.stored_energy_J_per_m)
     dissipation = math.fsum(item.hazard_dissipation_J_per_m for item in trial_arms)
     tolerance = max(
@@ -381,6 +656,7 @@ def execute_topology_trial(
             False, accepted, proposal.action_id, released, dissipation, margin,
             "insufficient_whole_topology_energy_release", copy_bytes, copy_wall,
         )
+    if failure_injector is not None: failure_injector("energy_gate",trial)
     committed_competition = accept_reservation(trial.competition, proposal.action_id)
     committed_network = trial.crack_network
     if not network_geometry_already_realized:
@@ -400,6 +676,10 @@ def execute_topology_trial(
             "hazard_dissipation_J_per_m": float(trial.energy_ledgers.get("hazard_dissipation_J_per_m", 0.0)) + dissipation,
         },
     )
+    if failure_injector is not None:
+        failure_injector("process_state_update",committed)
+        failure_injector("topology_verification",committed)
+        failure_injector("late_event_veto",committed)
     return TopologyTrialResult(
         True, committed, proposal.action_id, released, dissipation, margin, None,
         copy_bytes, copy_wall,
@@ -408,8 +688,8 @@ def execute_topology_trial(
 
 __all__ = [
     "LiveFEMTopologyState", "MODEL_ID", "TopologyArm", "TopologyTrialResult",
-    "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry",
+    "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry", "apply_mechanically_separating_v12_trial_geometry", "apply_v12_production_trial_geometry", "initialize_mechanically_separating_v12", "remesh_mechanically_separating_v12",
     "clip_arm_at_first_intersection",
-    "equilibrate_fixed_load_with_production_fem", "execute_topology_trial",
+    "complete_accepted_state_fingerprint", "equilibrate_fixed_load_with_production_fem", "execute_topology_trial",
     "extend_network_arm", "mark_coalesced",
 ]

@@ -506,6 +506,14 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
         candidate_nodes=candidate_nodes[distance>tolerance*max(scale,1.)]
     closure=np.flatnonzero(np.any(np.isin(mesh.elems,candidate_nodes),axis=1))
     selected=set(map(int,closure))|exact
+    # A turning or branching vertex needs one additional node-star ring so the
+    # discrete P1 displacement graph cannot reconnect the two material sectors
+    # around the corner. Straight interiors retain the narrower one-ring wake.
+    vertex_classes = classify_graph_vertices(network)
+    if any({"kink_vertex", "branch_junction", "merged_vertex"} & set(value)
+           for value in vertex_classes.values()):
+        closure_nodes = np.unique(mesh.elems[np.asarray(sorted(selected), int)])
+        selected.update(map(int, np.flatnonzero(np.any(np.isin(mesh.elems, closure_nodes), axis=1))))
     if previous_support is not None and (accepted_network is None or accepted_damage is None):
         raise ValueError("accepted_network and accepted_damage are required with previous_support")
     previous=_validated_previous(mesh,previous_support,accepted_network,accepted_damage)
@@ -634,7 +642,17 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
       not unresolved,not certificate["intact_cross_graph_path_exists"] and not certificate["insufficient_seed_segment_ids"],tuple(premature),certified,
       "CERTIFIED_INDEPENDENT_INTACT_CUT" if certified else ";".join(reasons))
     if not certified and not return_uncertified_audit_for_screen:
-        raise RuntimeError(f"v12_support_not_certified: {audit.certification_reason}")
+        junction_detail = tuple(
+            (item.junction_id, item.junction_certificate_status,
+             item.sector_seed_counts, item.within_sector_connected,
+             item.cross_arm_path_exists, item.legal_support_overlap)
+            for item in audit.junction_sector_certificates
+            if item.junction_certificate_status != "ACCEPTED"
+        )
+        raise RuntimeError(
+            f"v12_support_not_certified: {audit.certification_reason}; "
+            f"junction_detail={junction_detail!r}"
+        )
     return selected_ids,audit
 
 def apply_mechanically_separating_graph(state,network,*,previous_support=None):

@@ -1,0 +1,13 @@
+{
+  "absolute_K_consumed": false,
+  "schema": "v12.production-integration/1",
+  "sources": {
+    "arrhenius_fracture/checkpoint_v11.py": "96a208bf501272f9c4fd5da63a547f218b8f052ab8d1499d8b31903eef883c9a",
+    "arrhenius_fracture/sharp_wake_backend_v12.py": "2c663ad93f8e56b1b1ef4be42b5823fc91d5c536c12d9749a5e2445001aecfb9",
+    "arrhenius_fracture/stage2_criterion_v12.py": "93eb1e105764d68e3a957e3c0d9984e9ffc211a4de663975885d2d1f3de1c9e1",
+    "arrhenius_fracture/topology_transaction_v11.py": "cc84d33b791e2076467caf5b2009073c5705a1a288f0bb5432cc91d88d83fe13",
+    "tests/test_sharp_wake_backend_v12.py": "af725cf8b68d82734d25e5081ef58d8ab6069487eb964cc53bb66aa114c4329f",
+    "tests/test_topology_transaction_v11.py": "c9f489b4556a39ebd4d14ffae8b1c35885b9e7175ce90bd3b070118940ab7cac"
+  },
+  "stale_element_ids_authoritative_after_remesh": false
+}
