@@ -1,0 +1,39 @@
+{
+  "min_compression_intervals_required": 2,
+  "results": {
+    "K15MPa_seed1001723": {
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "censored": false,
+      "exposure_gate_pass": true,
+      "n_accepted_events": 7,
+      "n_intervals_with_complete_negative_excursion": 2,
+      "seed": 1001723
+    },
+    "K15MPa_seed1720": {
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "censored": false,
+      "exposure_gate_pass": true,
+      "n_accepted_events": 7,
+      "n_intervals_with_complete_negative_excursion": 2,
+      "seed": 1720
+    },
+    "K21MPa_seed1001723": {
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "censored": false,
+      "exposure_gate_pass": false,
+      "n_accepted_events": 7,
+      "n_intervals_with_complete_negative_excursion": 1,
+      "seed": 1001723
+    },
+    "K21MPa_seed1720": {
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "censored": false,
+      "exposure_gate_pass": true,
+      "n_accepted_events": 7,
+      "n_intervals_with_complete_negative_excursion": 5,
+      "seed": 1720
+    }
+  },
+  "schema": "v10.2.30_crack_rebonding_minimal_slope_screen_exposure_gate_v1",
+  "stopped_early_at": "K21MPa_seed1001723"
+}

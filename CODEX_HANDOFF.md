@@ -448,10 +448,63 @@ further seeds or multi-K matrix launched.**
 None. Both the primary pilot and the second-seed replication have
 completed; no workers running.
 
-### Remaining authorized-but-not-attempted scope
+### Remaining authorized-but-not-attempted scope (parent branch)
 
-Per the mission, still unauthorized: full multi-K Paris-slope campaign,
-passivation/repassivation sweep, frequency sweep beyond the frozen
-reference protocol, DMD/Poincare acceleration with rebonding, energy-gate
-coupling, topological crack retreat, mesh-resolved contact claims, branch
-merge into the authoritative production line. None of these were attempted.
+Per the mission, still unauthorized on the parent branch: full multi-K
+Paris-slope campaign, passivation/repassivation sweep, frequency sweep
+beyond the frozen reference protocol, DMD/Poincare acceleration with
+rebonding, energy-gate coupling, topological crack retreat, mesh-resolved
+contact claims, branch merge into the authoritative production line. None
+of these were attempted.
+
+---
+
+## 15. v10.2.30 crack-rebonding minimal local slope screen (THIS worktree)
+
+This worktree/branch (`codex/v10.2.30-crack-rebonding-minimal-slope-screen`,
+created from the parent's `5bc56c9`) is a separately authorized, staged
+follow-up. Full writeup:
+`docs/v10_2_30_crack_rebonding_minimal_slope_screen.md`. The parent
+worktree/branch (`codex/v10.2.30-crack-rebonding-causal-pilot-v2`,
+`/private/tmp/v10230-crack-rebonding-causal-pilot-v2`) is untouched by this
+worktree and remains the authoritative, preserved two-seed causal pilot.
+
+### Status: STOPPED_EARLY_EXPOSURE_GATE_FAILED
+
+Authorization chain: parent branch's regime-equivalence analysis (commit
+`8737784`, analysis-only, no new physics) found reversible/persistent
+equivalent at both seeds, authorizing this single-regime 8-trajectory
+screen. Frozen predictions (Kmax=15/18/21, `Pi_K` varying naturally, no
+barrier re-inversion) written before any new run. Reused the parent's
+Kmax=18 reversible zero/finite results verbatim (hash-checked).
+
+Ran zero-cohesion first, gating each finite-cohesion twin on `>= 2`
+compression-containing intervals:
+
+- Kmax=15, both seeds: PASS (2/6 each) -- both zero+finite completed.
+- Kmax=21, seed 1720: PASS (5/6) -- both zero+finite completed.
+- Kmax=21, seed 1001723: **FAIL** (1/6) -- **stopped here per the frozen
+  protocol, without launching that finite-cohesion twin and without
+  substituting a different load.**
+
+7 of the planned 8 trajectories ran (all uncensored, 7 events each). No
+3-point slope fit, no secants, no `REBONDING_RATE_OFFSET_LIKE`/
+`STEEPENS`/`FLATTENS`/`WEAK_OR_UNRESOLVED` classification can be assigned
+-- the screen's own terminal status is `STOPPED_EARLY_EXPOSURE_GATE_FAILED`,
+recorded at `artifacts/crack_rebonding_minimal_slope_screen_v1/
+slope_screen_decision.json`.
+`scripts/verify_v2_minimal_slope_screen.py`: `overall_pass: true`. All 183
+`crack_rebonding` tests pass.
+
+### Active processes
+
+None. The screen ran to its own defined stopping point; no workers
+running.
+
+### Remaining scope (unauthorized, not attempted, by this worktree)
+
+Any next step at this Kmax grid or beyond (additional seeds at Kmax=21,
+a different Kmax upper bound, or a frequency ablation per V2-C's original
+Option A/B framing) is new physics requiring its own separate
+authorization. The full multi-K/R/frequency/dwell/passivation Part X
+campaign and any production-line merge remain unauthorized regardless.
