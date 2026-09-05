@@ -59,6 +59,14 @@ def equivalent_values(left,right):
         return len(left)==len(right) and all(equivalent_values(a,b) for a,b in zip(left,right))
     return left==right
 
+def partition_projection(value):
+    """Remove only subdivision-count and interval-local audit coordinates."""
+    if isinstance(value,dict):
+        return {key:partition_projection(item) for key,item in value.items()
+                if key not in {"geometry_generation","action_before","action_increment"}}
+    if isinstance(value,list): return [partition_projection(item) for item in value]
+    return value
+
 def write_json(path,value):
     path.parent.mkdir(parents=True,exist_ok=True)
     temporary=path.with_suffix(path.suffix+".tmp")
@@ -144,10 +152,13 @@ def transition_partition_rows():
         reference=group[0]
         for row in group:
             if "clock_measurement" in row:
-                equivalent=equivalent_values(row["clock_measurement"],reference["clock_measurement"]) and row["winner_count"]==reference["winner_count"]
+                equivalent=equivalent_values(partition_projection(row["clock_measurement"]),
+                  partition_projection(reference["clock_measurement"])) and row["winner_count"]==reference["winner_count"]
             else:
-                equivalent=equivalent_values(row.get("state_measurement"),reference.get("state_measurement")) and row.get("events")==reference.get("events")
+                equivalent=equivalent_values(partition_projection(row.get("state_measurement")),
+                  partition_projection(reference.get("state_measurement"))) and row.get("events")==reference.get("events")
             row["partition_equivalent"]=bool(row["passed"] and equivalent)
+            row["comparison_projection_excludes"]=["geometry_generation","pending_event.action_before","pending_event.action_increment"]
     return rows
 
 def controlled_rows():
