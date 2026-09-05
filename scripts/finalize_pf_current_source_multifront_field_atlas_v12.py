@@ -31,6 +31,9 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_NAME = "pf_current_source_multifront_field_atlas_300K_1000K"
 ROW_ORDER = ("Peak", "DBTT", "weakT", "ceramic")
 DISPLAY = {"Peak": "Peak", "DBTT": "DBTT", "weakT": "weak-T", "ceramic": "ceramic-like"}
+CORRECTED_SOURCE_COMMIT = "12811e0beff95d9390a27646f5044ff0847b2b9d"
+CORRECTED_SOURCE_TREE = "ab901f1f1c83a81f0fa1c6866efed608f609c93b"
+SOURCE_BUNDLE_SHA256 = "28f4340c8095a2a00a17752172e5b4f1bee2a1b5df2fa424bf74a179e4f2c374"
 
 
 def atomic_json(path: Path, payload: Any) -> None:
@@ -279,7 +282,9 @@ def main() -> int:
             "case": case, "canonical_parameterization_id": launch["canonical_parameterization_id"],
             "execution_alias": launch["execution_alias"], "temperature_K": launch["temperature_K"],
             "parameter_row_canonical_json_sha256": launch["parameter_row_canonical_json_sha256"],
-            "theta_deg": 40, "seed": 3621, "source_commit": BASE_COMMIT,
+            "theta_deg": 40, "seed": 3621,
+            "source_commit": launch["source"]["campaign_commit"],
+            "archived_executable_source_commit": launch["source"]["archived_executable_source_commit"],
             "mechanical_fingerprint": MECHANICAL_FINGERPRINT, "family_sha256": FAMILY_SHA256,
             "family_physics_fingerprint": FAMILY_PHYSICS, "raw_directory": str(case_root),
         })
@@ -321,14 +326,16 @@ def main() -> int:
         "case", "canonical_parameterization_id", "execution_alias", "temperature_K", "theta_deg", "seed",
         "source_commit", "mechanical_fingerprint", "family_sha256", "target_forward_reach_um",
         "achieved_forward_reach_um", "terminal_step", "terminal_time_s", "terminal_opening_m",
-        "terminal_reason", "target_reached", "cumulative_branch_births", "maximum_concurrent_active_fronts",
+        "terminal_reason", "exact_terminal_reason", "target_reached",
+        "cumulative_branch_births", "maximum_concurrent_active_fronts",
         "final_active_front_count", "junction_count", "retirement_count", "coalescence_count",
         "final_checkpoint_path", "final_field_package_path", "raw_tree_fingerprint",
     )
     normalized_terminal = []
     for terminal in terminal_rows:
         normalized_terminal.append({
-            **terminal, "source_commit": BASE_COMMIT, "mechanical_fingerprint": MECHANICAL_FINGERPRINT,
+            **terminal, "source_commit": CORRECTED_SOURCE_COMMIT,
+            "mechanical_fingerprint": MECHANICAL_FINGERPRINT,
             "family_sha256": FAMILY_SHA256, "target_forward_reach_um": 1000.0,
             "terminal_reason": terminal["terminal_label"],
         })
@@ -349,7 +356,11 @@ def main() -> int:
     branch_owner_figure(records, figures); process_zone_figure(records, figures)
     provenance = {
         "schema": "v12.multifront-field-atlas-provenance/1", "claim_label": CLAIM_LABEL,
-        "execution_source_commit": BASE_COMMIT, "campaign_commit": subprocess.check_output(
+        "execution_source_commit": CORRECTED_SOURCE_COMMIT,
+        "execution_source_tree": CORRECTED_SOURCE_TREE,
+        "archived_pre_correction_source_commit": BASE_COMMIT,
+        "source_bundle_sha256": SOURCE_BUNDLE_SHA256,
+        "postprocessing_commit": subprocess.check_output(
             ("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip(),
         "family_sha256": FAMILY_SHA256, "family_physics_fingerprint": FAMILY_PHYSICS,
         "mechanical_configuration_sha256": MECHANICAL_SHA256,
@@ -367,7 +378,9 @@ Permanent interpretation boundary: `{CLAIM_LABEL}`.
 
 ## Scope and decision
 
-Exactly eight pinned physical cases were run: Peak, DBTT, weak-T, and ceramic-like at 300 K and 1000 K. Each trajectory used theta=40 degrees, seed 3621, canonical 1x loading, the pinned V12 physical execution source `{BASE_COMMIT}`, at most six active fronts, and a 1000 µm maximum-forward-reach target. Early fail-closed stops are preserved as scientifically complete capability records; they are not classified as failed campaigns and were not patched, reseeded, or restarted from the beginning.
+Exactly eight pinned physical cases were run: Peak, DBTT, weak-T, and ceramic-like at 300 K and 1000 K. Each trajectory used theta=40 degrees, seed 3621, canonical 1x loading, corrected V12 source `{CORRECTED_SOURCE_COMMIT}`, at most six active fronts, and a 1000 µm maximum-forward-reach target. The source is preserved by a complete Git bundle with SHA-256 `{SOURCE_BUNDLE_SHA256}`. Early fail-closed stops are preserved as scientifically complete capability records; they are not patched, reseeded, or restarted from the beginning.
+
+All eight cases reached 41.516160204381784 µm maximum projected forward extension, one cumulative binary branch birth, and two simultaneous active fronts. None reached the 1000 µm target. Every case then stopped at the same existing fail-closed geometry gate: `candidate_segment_already_in_committed_wake_material`. This common terminal outcome is recorded as the result of each case; no automatic convergence, mesh, parameter, or reseeding study was launched.
 
 The shared family is mechanically valid for all eight cases because its mechanical configuration explicitly declares temperature-independent mechanics. Its SHA-256 is `{FAMILY_SHA256}`, its mechanical fingerprint is `{MECHANICAL_FINGERPRINT}`, and its qualified owner-local range is 0–1600 µm. Temperature remains active in the process kinetics.
 
