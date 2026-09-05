@@ -858,12 +858,15 @@ def preview_directional_interval(
     lambda_per_s: float,
     start_time_s: float,
     duration_s: float,
+    maximum_completed_events: int | None = None,
 ) -> DirectionalIntervalPreview:
     rate = _finite(lambda_per_s, "lambda_per_s")
     start_time = _finite(start_time_s, "start_time_s")
     duration = _finite(duration_s, "duration_s")
     if rate < 0.0 or duration < 0.0:
         raise ValueError("rate and duration must be nonnegative")
+    if maximum_completed_events is not None and maximum_completed_events <= 0:
+        raise ValueError("maximum_completed_events must be positive when specified")
     increment = rate * duration
     end = state.action + increment
     events = []
@@ -882,6 +885,11 @@ def preview_directional_interval(
                     action_after=boundary,
                 )
             )
+            if (
+                maximum_completed_events is not None
+                and len(events) >= maximum_completed_events
+            ):
+                break
         ordinal += 1
         boundary += (
             _exponential_threshold_increment(

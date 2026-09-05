@@ -187,14 +187,27 @@ EquilibrateTrial = Callable[[LiveFEMTopologyState], LiveFEMTopologyState]
 def equilibrate_fixed_load_with_production_fem(
     state: LiveFEMTopologyState,
 ) -> LiveFEMTopologyState:
-    """Use the installed production assembler at the accepted boundary opening."""
-    from .hazard_energy_event_gate_v10230 import _equilibrate_fixed_opening
+    """Equilibrate directly with the production assembler at fixed opening."""
+    from .fem import assemble_mechanics, solve_dirichlet
+    from .hazard_energy_event_gate_v10230 import _infer_boundary_opening, _stored_energy
 
-    displacement, _, energy = _equilibrate_fixed_opening(
-        mesh=state.mesh, boundary=state.boundary,
-        u_initial=state.displacement, ep_gp=state.ep_gp, rho_gp=state.rho_gp,
-        damage=state.damage, D=state.elasticity_D, mat=state.material,
+    displacement = np.asarray(state.displacement, dtype=float).copy()
+    top, bottom = _infer_boundary_opening(state.boundary, displacement)
+    matrix, residual, *_ = assemble_mechanics(
+        state.mesh, displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material,
         cohesive_network=state.cohesive_network,
+    )
+    displacement, _ = solve_dirichlet(
+        matrix, residual, displacement, state.boundary, top, bottom,
+    )
+    _, _, sigma_gp, *_ = assemble_mechanics(
+        state.mesh, displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material,
+        cohesive_network=state.cohesive_network,
+    )
+    energy = _stored_energy(
+        state.mesh, displacement, state.ep_gp, sigma_gp, state.elasticity_D,
     )
     return replace(state, displacement=displacement, stored_energy_J_per_m=energy)
 

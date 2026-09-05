@@ -53,3 +53,17 @@ def test_restart_rejects_existing_destination_and_nonincreasing_target(tmp_path)
     destination = tmp_path / "exists"; destination.mkdir()
     with pytest.raises(ValueError, match="fresh path"):
         build_restart_command(checkpoint, destination, 1000.0)
+
+
+def test_restart_refuses_checkpoint_marked_ineligible(tmp_path) -> None:
+    checkpoint = restart_fixture(tmp_path)
+    record = tmp_path / "pf_branching_restart_eligibility_v3.json"
+    record.write_text(json.dumps({
+        "theta40_final_checkpoint_restart_eligible": False,
+        "1000um_continuation_authorized": False,
+    }))
+    with pytest.raises(RuntimeError, match="restart_eligible=false"):
+        build_restart_command(
+            checkpoint, tmp_path / "continuation", 1000.0,
+            eligibility_record=record,
+        )

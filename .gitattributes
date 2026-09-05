@@ -4,3 +4,6 @@
 runtime_inputs/pf_current_source_branching/*.csv -diff
 analysis_outputs/pf_current_source_branching_capability/mechanics_theta40/*.csv -diff
 analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/**/*.csv -diff
+# Byte-exact historical binary patches may contain whitespace inherited from
+# their source commits. Preserve their hashes and omit payload whitespace checks.
+analysis_outputs/pf_current_source_general_multifront_v6_1_1/*.patch -diff

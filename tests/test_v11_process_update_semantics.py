@@ -1,6 +1,14 @@
+import random
+from types import SimpleNamespace
+
 import pytest
 
-from arrhenius_fracture.process_update_semantics_v11 import classify_process_update
+from arrhenius_fracture.kinetic_tip_cell import (
+    KineticMovingTipFrontEngine, KineticTipConfig,
+)
+from arrhenius_fracture.process_update_semantics_v11 import (
+    classify_process_update, require_full_accepted_interval_consumption,
+)
 
 
 def test_disabled_legacy_hazard_checkpoint_sync_is_not_time_refinement():
@@ -89,3 +97,49 @@ def test_shared_owner_checkpoint_sync_preserves_membership_contract():
     owner_by_tip = {tip: "shared-cluster" for tip in member_tips}
     assert not decision.refinement_required
     assert tuple(tip for tip, owner in owner_by_tip.items() if owner == "shared-cluster") == member_tips
+
+
+def test_process_observer_must_consume_exact_accepted_interval():
+    result = require_full_accepted_interval_consumption(
+        {"kinetic_dt_consumed_s": 8.4, "kinetic_dt_unused_s": 0.0}, 8.4,
+    )
+    assert result["process_dt_consumed_s"] == 8.4
+    assert result["process_dt_unused_s"] == 0.0
+    with pytest.raises(RuntimeError, match="complete accepted physical interval"):
+        require_full_accepted_interval_consumption(
+            {"kinetic_dt_consumed_s": 0.1, "kinetic_dt_unused_s": 8.3}, 8.4,
+        )
+
+
+class _NoPlasticProcessState:
+    def copy(self):
+        return _NoPlasticProcessState()
+
+
+def test_directional_topology_owner_suppresses_legacy_cleavage_for_full_interval():
+    engine = KineticMovingTipFrontEngine.__new__(KineticMovingTipFrontEngine)
+    engine.tip_cfg = KineticTipConfig(plasticity_enabled=False)
+    engine.mpz = _NoPlasticProcessState()
+    engine.f = SimpleNamespace(da=5.0e-6)
+    engine.B = 0.99
+    engine.W_emit = 0.0
+    engine.t = 0.0
+    engine.micro_advance_total_m = 0.0
+    engine.packet_count_mean_total = 0.0
+    engine.packet_variance_total_m2 = 0.0
+    engine.checkpoint_advance_total_m = 0.0
+    engine.n_adv = 0
+    engine._directional_topology_owns_cleavage = True
+    engine._hazard_rng = random.Random(3621)
+    engine.sigma_tip = lambda _K: 1.0
+    engine.lambda_cleave = lambda _stress, _temperature: (10.0, 10.0, 1.0)
+
+    rng_before = engine._hazard_rng.getstate()
+    result = engine._integrate_coupled(1.0, 700.0, 8.4)
+
+    assert result["dt_consumed"] == pytest.approx(8.4)
+    assert result["dt_unused"] == pytest.approx(0.0)
+    assert result["fired"] is False
+    assert result["da"] == pytest.approx(0.0)
+    assert engine.B == pytest.approx(0.99)
+    assert engine._hazard_rng.getstate() == rng_before
