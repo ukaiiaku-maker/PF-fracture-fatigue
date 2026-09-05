@@ -5,6 +5,7 @@ from dataclasses import asdict, replace
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import subprocess
 from typing import Any
@@ -48,6 +49,9 @@ SCHEMA = "v12.production-one-void-trajectory/5"
 
 
 def _head():
+    declared = os.environ.get("VOIDING_V5_SOURCE_COMMIT")
+    if declared:
+        return declared
     return subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=Path(__file__).resolve().parents[1], text=True).strip()
 
 
