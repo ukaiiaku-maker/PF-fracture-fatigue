@@ -281,8 +281,60 @@ def main(argv: list[str] | None = None) -> int:
             ),
         }
 
+    parity_audit_path = STATIC_ARTIFACTS / "static_shield_localization_parity_audit.json"
+    parity_audit = json.loads(parity_audit_path.read_text()) if parity_audit_path.is_file() else None
+    residual_terminology = (
+        "dynamic-history-plus-numerical-path residual"
+        if parity_audit is not None and parity_audit["classification"] != "PRESCRIBED_STATIC_EVENT_LOCALIZATION_PARITY_QUALIFIED"
+        else "dynamic-history residual"
+    )
+
+    scientific_wording = None
+    if seed1720 is not None:
+        max_d = seed1720["fits_by_window"]["developed"]["max_abs_D_history_decade"]
+        scientific_wording = {
+            "K_b_description": "fixed post-first-event cohesive shield (not an unqualified 'always-on' shield -- K_b=0 for the first accepted event, K_b=0.9 MPa sqrt(m) from the first accepted event onward)",
+            "delta_m_description": (
+                "delta_m is the three-point least-squares fitted slope INCREMENT that "
+                "dynamic (or prescribed-static) rebonding induces in S_h(K) over "
+                "Kmax=15-21 MPa sqrt(m) -- it is a rebonding-induced correction to the "
+                "local Paris-slope response over this narrow load range, NOT the complete "
+                "Paris exponent of the underlying da/dN(K) curve"
+            ),
+            "residual_terminology": residual_terminology,
+            "residual_terminology_note": (
+                "the localization-parity audit (scripts/audit_static_shield_localization_parity.py) "
+                "did not reach PRESCRIBED_STATIC_EVENT_LOCALIZATION_PARITY_QUALIFIED -- a naive "
+                "single-segment model of the static-shield engine's event-time localization showed "
+                "up to ~32% relative discrepancy against an exact phase-resolved integrator (the real "
+                "adaptive-quadrature implementation is expected to do much better, consistent with the "
+                "tiny empirical residual actually observed, but this was not independently proven at "
+                "the naive-model level) -- so the small residual below is reported as a combined "
+                "dynamic-history-plus-numerical-path quantity, not attributed solely to genuine P/C/B "
+                "kinetic history"
+                if residual_terminology == "dynamic-history-plus-numerical-path residual"
+                else "the localization-parity audit reached PRESCRIBED_STATIC_EVENT_LOCALIZATION_PARITY_QUALIFIED, "
+                "supporting attribution of the residual to genuine kinetic history"
+            ),
+            "p_c_b_kinetics_claim": (
+                "This study does NOT establish that P/C/B bond-formation/rupture kinetics are "
+                "physically unnecessary. It shows only that, once the near-ceiling cohesive "
+                "amplitude K_rebond_max is present, the incremental contribution of P/C/B temporal "
+                f"modulation beyond that near-saturated shield amplitude is at most "
+                f"{max_d:.5f} decade ({residual_terminology}) for the tested developed regime -- "
+                "P/C/B kinetics may still be the mechanism that drives the wake rapidly into, and "
+                "maintains it near, that saturated bonded state."
+            ),
+            "load_dependence_note": (
+                "K_b/Kmax = 6.0%, 5.0%, 4.29% at Kmax=15/18/21 MPa sqrt(m) respectively -- a fixed "
+                "absolute subtraction is proportionally larger at low Kmax, naturally producing "
+                "stronger low-load suppression and a positive delta_m without requiring a strongly "
+                "load-dependent bonded fraction"
+            ),
+        }
+
     decision = {
-        "schema": "v10.2.30_crack_rebonding_static_shield_attribution_decision_v1",
+        "schema": "v10.2.30_crack_rebonding_static_shield_attribution_decision_v2",
         "kmax_grid_Pa_sqrt_m": list(KMAX_GRID_Pa_sqrt_m),
         "frequency_Hz": FREQUENCY_HZ,
         "K_b_static_Pa_sqrt_m": 900000.0,
@@ -291,6 +343,9 @@ def main(argv: list[str] | None = None) -> int:
         "stage1_classification": stage1_classification,
         "stage2_conditional_gate_authorized": stage2_gate_authorized,
         "terminal_classification": terminal_classification,
+        "localization_parity_audit_reference": str(parity_audit_path),
+        "localization_parity_classification": parity_audit["classification"] if parity_audit else None,
+        "scientific_wording": scientific_wording,
         "multi_K_paris_slope_campaign_authorized": False,
         "part_x_authorized": False,
         "production_line_merge_authorized": False,

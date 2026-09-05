@@ -1,0 +1,230 @@
+{
+  "all_points_within_tolerance": false,
+  "classification": "STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED",
+  "does_not_retroactively_invalidate": "FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT remains valid: the AUTHORITATIVE number for the dominant-gate comparison is the empirically observed D_history from the real trajectories (max 0.00156 decade, an order of magnitude under the frozen 0.01-decade dominant threshold), not this audit's naive-model upper bound. Per protocol, D_history is relabeled everywhere as a 'dynamic-history-plus-numerical-path residual' rather than attributed solely to genuine P/C/B kinetic history, since this audit did not achieve PARITY_QUALIFIED status.",
+  "important_caveat_naive_vs_real_quadrature": "_constant_segment_firing_time models the CRUDEST possible approximation -- one segment spanning the ENTIRE remaining B, at a single one-cycle mean rate, never re-evaluated. The real integrate_state_coupled_waveform is an adaptive Simpson quadrature that re-evaluates _phase_statistics and subdivides segments as the engine state evolves, and is expected to achieve substantially better precision than this toy model -- this is confirmed indirectly by the empirical D_history observed between the REAL static and dynamic trajectories (0.0005-0.0016 decade), which already reflects whatever precision the real adaptive quadrature actually achieves and is far tighter than this audit's naive-model discrepancy (up to ~32% relative, ~0.12 decade equivalent). This audit therefore bounds a NAIVE single-segment approximation's error, not the real implementation's achieved precision -- it should not be read as evidence that the real static-vs-dynamic residual is actually as large as this toy model's discrepancy.",
+  "max_relative_discrepancy": 0.3232855360769044,
+  "n_phase_fine_reference": 16000,
+  "n_phase_production": 80,
+  "parity_tolerance_rel_frozen_prospectively": 0.01,
+  "purpose": "Bounds how much of the observed D_history residual (0.0005-0.0016 decade) could stem from the confirmed structural asymmetry that dynamic rebonding's commit goes through an exact phase-resolved bisection (_commit_rebonding_event/solve_coupled_event_time/phase_resolved_action) while the static-shield engine (rebonding_state always None) never calls that path, relying solely on integrate_state_coupled_waveform's constant-segment approximation of _phase_statistics' one-cycle lambda_avg_s.",
+  "rows": [
+    {
+      "B_start": 0.0,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "relative_discrepancy": 0.009367926987695431,
+      "t_constant_segment_s": 0.01921732540414884,
+      "t_exact_phase_resolved_s": 0.019038969725836262,
+      "within_tolerance": true
+    },
+    {
+      "B_start": 0.3,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "relative_discrepancy": 0.027868294167476503,
+      "t_constant_segment_s": 0.013452127782904187,
+      "t_exact_phase_resolved_s": 0.013087404154050455,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.6,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "relative_discrepancy": 0.032267343628891894,
+      "t_constant_segment_s": 0.007686930161659536,
+      "t_exact_phase_resolved_s": 0.007943237330116239,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.9,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "relative_discrepancy": 0.032381229608277995,
+      "t_constant_segment_s": 0.0019217325404148836,
+      "t_exact_phase_resolved_s": 0.0019860430566439992,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.0,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "relative_discrepancy": 0.009996436476997257,
+      "t_constant_segment_s": 0.025695653154800626,
+      "t_exact_phase_resolved_s": 0.02595511178097248,
+      "within_tolerance": true
+    },
+    {
+      "B_start": 0.3,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "relative_discrepancy": 0.0006212973614622125,
+      "t_constant_segment_s": 0.017986957208360438,
+      "t_exact_phase_resolved_s": 0.01799813940488392,
+      "within_tolerance": true
+    },
+    {
+      "B_start": 0.6,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "relative_discrepancy": 0.023654528140514976,
+      "t_constant_segment_s": 0.010278261261920251,
+      "t_exact_phase_resolved_s": 0.010040752010925873,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.9,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "relative_discrepancy": 0.12355367800140181,
+      "t_constant_segment_s": 0.002569565315480062,
+      "t_exact_phase_resolved_s": 0.0029317999870437836,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.0,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "relative_discrepancy": 0.017545711275186858,
+      "t_constant_segment_s": 0.013306875750368614,
+      "t_exact_phase_resolved_s": 0.013077423061114823,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.3,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "relative_discrepancy": 0.025922861636674104,
+      "t_constant_segment_s": 0.00931481302525803,
+      "t_exact_phase_resolved_s": 0.009079447757307926,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.6,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "relative_discrepancy": 0.047481524887795674,
+      "t_constant_segment_s": 0.005322750300147446,
+      "t_exact_phase_resolved_s": 0.005081474158427386,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.9,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "relative_discrepancy": 0.22813500196001069,
+      "t_constant_segment_s": 0.0013306875750368611,
+      "t_exact_phase_resolved_s": 0.0010835026873374542,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.0,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "relative_discrepancy": 0.014684712537157092,
+      "t_constant_segment_s": 0.014715683598284882,
+      "t_exact_phase_resolved_s": 0.014934999776748946,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.3,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "relative_discrepancy": 0.023063412295822375,
+      "t_constant_segment_s": 0.010300978518799417,
+      "t_exact_phase_resolved_s": 0.010068758588173275,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.6,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "relative_discrepancy": 0.014688758216878298,
+      "t_constant_segment_s": 0.005886273439313953,
+      "t_exact_phase_resolved_s": 0.005974024439893267,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.9,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "relative_discrepancy": 0.3232855360769044,
+      "t_constant_segment_s": 0.0014715683598284879,
+      "t_exact_phase_resolved_s": 0.0011120565590032761,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.0,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "relative_discrepancy": 0.021024267862751304,
+      "t_constant_segment_s": 0.011331552911030388,
+      "t_exact_phase_resolved_s": 0.011098220941163374,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.3,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "relative_discrepancy": 0.005986337371852985,
+      "t_constant_segment_s": 0.007932087037721271,
+      "t_exact_phase_resolved_s": 0.007979857154829274,
+      "within_tolerance": true
+    },
+    {
+      "B_start": 0.6,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "relative_discrepancy": 0.06742648031445947,
+      "t_constant_segment_s": 0.0045326211644121555,
+      "t_exact_phase_resolved_s": 0.004860336551203528,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.9,
+      "K_b_Pa_sqrt_m": 0.0,
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "relative_discrepancy": 0.0901445581813945,
+      "t_constant_segment_s": 0.0011331552911030386,
+      "t_exact_phase_resolved_s": 0.0010394541555052072,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.0,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "relative_discrepancy": 0.0035213292002196682,
+      "t_constant_segment_s": 0.012059041580267892,
+      "t_exact_phase_resolved_s": 0.012016726729544088,
+      "within_tolerance": true
+    },
+    {
+      "B_start": 0.3,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "relative_discrepancy": 0.03911838422082904,
+      "t_constant_segment_s": 0.008441329106187525,
+      "t_exact_phase_resolved_s": 0.008123548995350668,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.6,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "relative_discrepancy": 0.025730148155325178,
+      "t_constant_segment_s": 0.004823616632107158,
+      "t_exact_phase_resolved_s": 0.00495100676981245,
+      "within_tolerance": false
+    },
+    {
+      "B_start": 0.9,
+      "K_b_Pa_sqrt_m": 900000.0,
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "relative_discrepancy": 0.14048953543059367,
+      "t_constant_segment_s": 0.001205904158026789,
+      "t_exact_phase_resolved_s": 0.0010573566179820299,
+      "within_tolerance": false
+    }
+  ],
+  "schema": "v10.2.30_crack_rebonding_static_shield_localization_parity_v1"
+}

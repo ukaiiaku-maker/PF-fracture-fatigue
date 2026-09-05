@@ -30,6 +30,7 @@ import argparse
 import hashlib
 import json
 import math
+import subprocess
 import sys
 from pathlib import Path
 
@@ -73,7 +74,15 @@ TRACKED_ARTIFACT_NAMES = [
     "static_shield_attribution_decision.json",
 ]
 
-NOT_ARCHIVED_PER_TRAJECTORY_FIELDS = ["Kmax_Pa_sqrt_m", "T_K", "frequency_Hz"]
+EXPECTED_T_K = 300.0
+EXPECTED_FREQUENCY_HZ = 1000.0
+
+
+def _git_object_exists(sha: str) -> bool:
+    result = subprocess.run(
+        ["git", "cat-file", "-t", sha], cwd=REPO_ROOT, capture_output=True, text=True,
+    )
+    return result.returncode == 0 and result.stdout.strip() == "commit"
 
 
 def sha256_file(path: Path) -> str:
@@ -115,9 +124,7 @@ def _S(num_win: dict, den_win: dict) -> tuple[float | None, bool]:
 
 def independent_recompute(developed_ledger: dict, static_ledger: dict, protocol: dict) -> tuple[dict, dict, dict]:
     checks: dict[str, bool] = {}
-    details: dict[str, object] = {
-        "not_archived_per_trajectory_fields": NOT_ARCHIVED_PER_TRAJECTORY_FIELDS,
-    }
+    details: dict[str, object] = {}
     dev_trajs = developed_ledger["trajectories"]
     static_trajs = static_ledger["trajectories"]
     expected_hash_zero = "f08635f9f5d6b18be8288180ee7ced0dbd03a45ee0ca2b6d1868a2239c715caa"
@@ -163,6 +170,25 @@ def independent_recompute(developed_ledger: dict, static_ledger: dict, protocol:
         checks[f"{key}_static_rng_stream_identifier_present"] = bool(static_traj.get("rng_state_or_stream_identifier"))
         checks[f"{key}_static_frozen_config_hash_matches"] = (
             static_traj.get("frozen_configuration_sha256") == protocol.get("_parent_frozen_configuration_sha256")
+        )
+
+        # Provenance fields genuinely archived per trajectory (corrects a
+        # prior verifier bug that hardcoded these as NOT_ARCHIVED without
+        # ever checking the ledger -- they were, in fact, correctly
+        # propagated by build_static_shield_attribution_event_ledger.py).
+        checks[f"{key}_static_Kmax_matches"] = static_traj.get("Kmax_Pa_sqrt_m") == Kmax
+        checks[f"{key}_static_T_K_matches"] = static_traj.get("T_K") == EXPECTED_T_K
+        checks[f"{key}_static_frequency_Hz_matches"] = static_traj.get("frequency_Hz") == EXPECTED_FREQUENCY_HZ
+        git_head = static_traj.get("git_head_at_launch")
+        checks[f"{key}_static_git_head_at_launch_is_valid_commit"] = (
+            isinstance(git_head, str) and len(git_head) == 40
+            and _git_object_exists(git_head)
+        )
+        producer_hashes = static_traj.get("producer_file_sha256_at_launch")
+        checks[f"{key}_static_producer_file_hashes_present"] = (
+            isinstance(producer_hashes, dict)
+            and "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py" in producer_hashes
+            and "scripts/run_static_shield_attribution_stage.py" in producer_hashes
         )
 
         for window in WINDOWS:

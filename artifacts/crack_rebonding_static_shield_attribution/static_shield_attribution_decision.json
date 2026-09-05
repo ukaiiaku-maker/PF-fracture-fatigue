@@ -6,10 +6,20 @@
     18000000.0,
     21000000.0
   ],
+  "localization_parity_audit_reference": "/private/tmp/v10230-crack-rebonding-static-shield-evidence-hardening/artifacts/crack_rebonding_static_shield_attribution/static_shield_localization_parity_audit.json",
+  "localization_parity_classification": "STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED",
   "multi_K_paris_slope_campaign_authorized": false,
   "part_x_authorized": false,
   "production_line_merge_authorized": false,
-  "schema": "v10.2.30_crack_rebonding_static_shield_attribution_decision_v1",
+  "schema": "v10.2.30_crack_rebonding_static_shield_attribution_decision_v2",
+  "scientific_wording": {
+    "K_b_description": "fixed post-first-event cohesive shield (not an unqualified 'always-on' shield -- K_b=0 for the first accepted event, K_b=0.9 MPa sqrt(m) from the first accepted event onward)",
+    "delta_m_description": "delta_m is the three-point least-squares fitted slope INCREMENT that dynamic (or prescribed-static) rebonding induces in S_h(K) over Kmax=15-21 MPa sqrt(m) -- it is a rebonding-induced correction to the local Paris-slope response over this narrow load range, NOT the complete Paris exponent of the underlying da/dN(K) curve",
+    "load_dependence_note": "K_b/Kmax = 6.0%, 5.0%, 4.29% at Kmax=15/18/21 MPa sqrt(m) respectively -- a fixed absolute subtraction is proportionally larger at low Kmax, naturally producing stronger low-load suppression and a positive delta_m without requiring a strongly load-dependent bonded fraction",
+    "p_c_b_kinetics_claim": "This study does NOT establish that P/C/B bond-formation/rupture kinetics are physically unnecessary. It shows only that, once the near-ceiling cohesive amplitude K_rebond_max is present, the incremental contribution of P/C/B temporal modulation beyond that near-saturated shield amplitude is at most 0.00083 decade (dynamic-history-plus-numerical-path residual) for the tested developed regime -- P/C/B kinetics may still be the mechanism that drives the wake rapidly into, and maintains it near, that saturated bonded state.",
+    "residual_terminology": "dynamic-history-plus-numerical-path residual",
+    "residual_terminology_note": "the localization-parity audit (scripts/audit_static_shield_localization_parity.py) did not reach PRESCRIBED_STATIC_EVENT_LOCALIZATION_PARITY_QUALIFIED -- a naive single-segment model of the static-shield engine's event-time localization showed up to ~32% relative discrepancy against an exact phase-resolved integrator (the real adaptive-quadrature implementation is expected to do much better, consistent with the tiny empirical residual actually observed, but this was not independently proven at the naive-model level) -- so the small residual below is reported as a combined dynamic-history-plus-numerical-path quantity, not attributed solely to genuine P/C/B kinetic history"
+  },
   "seed_1001723_analysis": null,
   "seed_1720_analysis": {
     "all_k_b_step_functions_valid": true,
