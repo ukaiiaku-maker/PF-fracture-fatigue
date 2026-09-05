@@ -3,8 +3,8 @@
     {
       "events": [
         {
-          "energy_margin_J_per_m": 0.0003279856867207248,
-          "energy_release_J_per_m": 0.0003279856867207248,
+          "energy_margin_J_per_m": 0.0002728019758387046,
+          "energy_release_J_per_m": 0.0002728019758387046,
           "final": {
             "active_tips": [
               "b00000000"
@@ -12,9 +12,9 @@
             "competition_consumed": [
               "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
             ],
-            "damage_l1": 9.0,
+            "damage_l1": 8.0,
             "density_l2_m2": 47535518883836.28,
-            "displacement_l2_m": 4.175895081278566e-06,
+            "displacement_l2_m": 4.174423901594416e-06,
             "event_counters": {
               "accepted_steps": 1,
               "mesh_generation": 0,
@@ -28,9 +28,9 @@
             "mesh_elements": 2048,
             "mesh_generation": 0,
             "mesh_nodes": 1089,
-            "plastic_history_l2": 0.0007504665215717512,
-            "reaction_N_per_m": 176393.7070967199,
-            "residual_l2_N_per_m": 44455.37140240707,
+            "plastic_history_l2": 0.0007504665215717468,
+            "reaction_N_per_m": 176673.64674640808,
+            "residual_l2_N_per_m": 44528.993728743146,
             "rng_state": {
               "bit_generator": "PCG64",
               "has_uint32": 0,
@@ -40,7 +40,7 @@
               },
               "uinteger": 0
             },
-            "stored_energy_J_per_m": 0.03479884352761113,
+            "stored_energy_J_per_m": 0.034854027238493145,
             "support_elements": 0,
             "thresholds": [
               2.0,
@@ -74,9 +74,9 @@
             "mesh_elements": 2048,
             "mesh_generation": 0,
             "mesh_nodes": 1089,
-            "plastic_history_l2": 0.0007504665215717512,
-            "reaction_N_per_m": 178057.35978215295,
-            "residual_l2_N_per_m": 44888.53576432867,
+            "plastic_history_l2": 0.0007504665215717468,
+            "reaction_N_per_m": 178057.35978215316,
+            "residual_l2_N_per_m": 44888.53576432874,
             "rng_state": {
               "bit_generator": "PCG64",
               "has_uint32": 0,
@@ -86,7 +86,7 @@
               },
               "uinteger": 0
             },
-            "stored_energy_J_per_m": 0.035126829214331856,
+            "stored_energy_J_per_m": 0.03512682921433185,
             "support_elements": 0,
             "thresholds": [
               2.0,
@@ -130,9 +130,9 @@
         "mesh_elements": 2048,
         "mesh_generation": 0,
         "mesh_nodes": 1089,
-        "plastic_history_l2": 0.0007504665215717512,
-        "reaction_N_per_m": 178057.35978215295,
-        "residual_l2_N_per_m": 44888.53576432867,
+        "plastic_history_l2": 0.0007504665215717468,
+        "reaction_N_per_m": 178057.35978215316,
+        "residual_l2_N_per_m": 44888.53576432874,
         "rng_state": {
           "bit_generator": "PCG64",
           "has_uint32": 0,
@@ -142,7 +142,7 @@
           },
           "uinteger": 0
         },
-        "stored_energy_J_per_m": 0.035126829214331856,
+        "stored_energy_J_per_m": 0.03512682921433185,
         "support_elements": 0,
         "thresholds": [
           2.0,
@@ -161,9 +161,9 @@
         "competition_consumed": [
           "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
         ],
-        "damage_l1": 9.0,
+        "damage_l1": 8.0,
         "density_l2_m2": 47535518883836.28,
-        "displacement_l2_m": 4.175895081278566e-06,
+        "displacement_l2_m": 4.174423901594416e-06,
         "event_counters": {
           "accepted_steps": 1,
           "mesh_generation": 0,
@@ -177,9 +177,9 @@
         "mesh_elements": 2048,
         "mesh_generation": 0,
         "mesh_nodes": 1089,
-        "plastic_history_l2": 0.0007504665215717512,
-        "reaction_N_per_m": 176393.7070967199,
-        "residual_l2_N_per_m": 44455.37140240707,
+        "plastic_history_l2": 0.0007504665215717468,
+        "reaction_N_per_m": 176673.64674640808,
+        "residual_l2_N_per_m": 44528.993728743146,
         "rng_state": {
           "bit_generator": "PCG64",
           "has_uint32": 0,
@@ -189,7 +189,7 @@
           },
           "uinteger": 0
         },
-        "stored_energy_J_per_m": 0.03479884352761113,
+        "stored_energy_J_per_m": 0.034854027238493145,
         "support_elements": 0,
         "thresholds": [
           2.0,
@@ -206,8 +206,8 @@
     {
       "events": [
         {
-          "energy_margin_J_per_m": 0.0002601027662328184,
-          "energy_release_J_per_m": 0.0002601027662328184,
+          "energy_margin_J_per_m": 0.0001381836587012672,
+          "energy_release_J_per_m": 0.0001381836587012672,
           "final": {
             "active_tips": [
               "b00000000"
@@ -215,9 +215,9 @@
             "competition_consumed": [
               "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
             ],
-            "damage_l1": 9.0,
+            "damage_l1": 8.0,
             "density_l2_m2": 47535518883836.28,
-            "displacement_l2_m": 4.172278484978606e-06,
+            "displacement_l2_m": 4.16861667909014e-06,
             "event_counters": {
               "accepted_steps": 1,
               "mesh_generation": 0,
@@ -231,9 +231,9 @@
             "mesh_elements": 2048,
             "mesh_generation": 0,
             "mesh_nodes": 1089,
-            "plastic_history_l2": 0.0007504665215717512,
-            "reaction_N_per_m": 176737.9680694283,
-            "residual_l2_N_per_m": 44543.75239868104,
+            "plastic_history_l2": 0.0007504665215717468,
+            "reaction_N_per_m": 177356.49426148762,
+            "residual_l2_N_per_m": 44706.205405625224,
             "rng_state": {
               "bit_generator": "PCG64",
               "has_uint32": 0,
@@ -243,7 +243,7 @@
               },
               "uinteger": 0
             },
-            "stored_energy_J_per_m": 0.03486672644809904,
+            "stored_energy_J_per_m": 0.03498864555563058,
             "support_elements": 0,
             "thresholds": [
               2.0,
@@ -277,9 +277,9 @@
             "mesh_elements": 2048,
             "mesh_generation": 0,
             "mesh_nodes": 1089,
-            "plastic_history_l2": 0.0007504665215717512,
-            "reaction_N_per_m": 178057.35978215295,
-            "residual_l2_N_per_m": 44888.53576432867,
+            "plastic_history_l2": 0.0007504665215717468,
+            "reaction_N_per_m": 178057.35978215316,
+            "residual_l2_N_per_m": 44888.53576432874,
             "rng_state": {
               "bit_generator": "PCG64",
               "has_uint32": 0,
@@ -289,7 +289,7 @@
               },
               "uinteger": 0
             },
-            "stored_energy_J_per_m": 0.035126829214331856,
+            "stored_energy_J_per_m": 0.03512682921433185,
             "support_elements": 0,
             "thresholds": [
               2.0,
@@ -333,9 +333,9 @@
         "mesh_elements": 2048,
         "mesh_generation": 0,
         "mesh_nodes": 1089,
-        "plastic_history_l2": 0.0007504665215717512,
-        "reaction_N_per_m": 178057.35978215295,
-        "residual_l2_N_per_m": 44888.53576432867,
+        "plastic_history_l2": 0.0007504665215717468,
+        "reaction_N_per_m": 178057.35978215316,
+        "residual_l2_N_per_m": 44888.53576432874,
         "rng_state": {
           "bit_generator": "PCG64",
           "has_uint32": 0,
@@ -345,7 +345,7 @@
           },
           "uinteger": 0
         },
-        "stored_energy_J_per_m": 0.035126829214331856,
+        "stored_energy_J_per_m": 0.03512682921433185,
         "support_elements": 0,
         "thresholds": [
           2.0,
@@ -364,9 +364,9 @@
         "competition_consumed": [
           "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
         ],
-        "damage_l1": 9.0,
+        "damage_l1": 8.0,
         "density_l2_m2": 47535518883836.28,
-        "displacement_l2_m": 4.172278484978606e-06,
+        "displacement_l2_m": 4.16861667909014e-06,
         "event_counters": {
           "accepted_steps": 1,
           "mesh_generation": 0,
@@ -380,9 +380,9 @@
         "mesh_elements": 2048,
         "mesh_generation": 0,
         "mesh_nodes": 1089,
-        "plastic_history_l2": 0.0007504665215717512,
-        "reaction_N_per_m": 176737.9680694283,
-        "residual_l2_N_per_m": 44543.75239868104,
+        "plastic_history_l2": 0.0007504665215717468,
+        "reaction_N_per_m": 177356.49426148762,
+        "residual_l2_N_per_m": 44706.205405625224,
         "rng_state": {
           "bit_generator": "PCG64",
           "has_uint32": 0,
@@ -392,7 +392,7 @@
           },
           "uinteger": 0
         },
-        "stored_energy_J_per_m": 0.03486672644809904,
+        "stored_energy_J_per_m": 0.03498864555563058,
         "support_elements": 0,
         "thresholds": [
           2.0,
@@ -409,8 +409,8 @@
     {
       "events": [
         {
-          "energy_margin_J_per_m": 0.0003279856867207248,
-          "energy_release_J_per_m": 0.0003279856867207248,
+          "energy_margin_J_per_m": 0.0002728019758387046,
+          "energy_release_J_per_m": 0.0002728019758387046,
           "final": {
             "active_tips": [
               "b00000000"
@@ -418,9 +418,9 @@
             "competition_consumed": [
               "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
             ],
-            "damage_l1": 9.0,
+            "damage_l1": 8.0,
             "density_l2_m2": 47535518883836.28,
-            "displacement_l2_m": 4.175895081278566e-06,
+            "displacement_l2_m": 4.174423901594416e-06,
             "event_counters": {
               "accepted_steps": 1,
               "mesh_generation": 0,
@@ -434,9 +434,9 @@
             "mesh_elements": 2048,
             "mesh_generation": 0,
             "mesh_nodes": 1089,
-            "plastic_history_l2": 0.0007504665215717512,
-            "reaction_N_per_m": 176393.7070967199,
-            "residual_l2_N_per_m": 44455.37140240707,
+            "plastic_history_l2": 0.0007504665215717468,
+            "reaction_N_per_m": 176673.64674640808,
+            "residual_l2_N_per_m": 44528.993728743146,
             "rng_state": {
               "bit_generator": "PCG64",
               "has_uint32": 0,
@@ -446,7 +446,7 @@
               },
               "uinteger": 0
             },
-            "stored_energy_J_per_m": 0.03479884352761113,
+            "stored_energy_J_per_m": 0.034854027238493145,
             "support_elements": 0,
             "thresholds": [
               2.0,
@@ -480,9 +480,9 @@
             "mesh_elements": 2048,
             "mesh_generation": 0,
             "mesh_nodes": 1089,
-            "plastic_history_l2": 0.0007504665215717512,
-            "reaction_N_per_m": 178057.35978215295,
-            "residual_l2_N_per_m": 44888.53576432867,
+            "plastic_history_l2": 0.0007504665215717468,
+            "reaction_N_per_m": 178057.35978215316,
+            "residual_l2_N_per_m": 44888.53576432874,
             "rng_state": {
               "bit_generator": "PCG64",
               "has_uint32": 0,
@@ -492,7 +492,7 @@
               },
               "uinteger": 0
             },
-            "stored_energy_J_per_m": 0.035126829214331856,
+            "stored_energy_J_per_m": 0.03512682921433185,
             "support_elements": 0,
             "thresholds": [
               2.0,
@@ -515,8 +515,8 @@
           ]
         },
         {
-          "energy_margin_J_per_m": 0.0003279856867207248,
-          "energy_release_J_per_m": 0.0003279856867207248,
+          "energy_margin_J_per_m": 0.0002728019758387046,
+          "energy_release_J_per_m": 0.0002728019758387046,
           "final": {
             "active_tips": [
               "b00000000"
@@ -524,9 +524,9 @@
             "competition_consumed": [
               "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
             ],
-            "damage_l1": 9.0,
+            "damage_l1": 8.0,
             "density_l2_m2": 47535518883836.28,
-            "displacement_l2_m": 4.175895081278566e-06,
+            "displacement_l2_m": 4.174423901594416e-06,
             "event_counters": {
               "accepted_steps": 1,
               "mesh_generation": 0,
@@ -540,9 +540,9 @@
             "mesh_elements": 2048,
             "mesh_generation": 0,
             "mesh_nodes": 1089,
-            "plastic_history_l2": 0.0007504665215717512,
-            "reaction_N_per_m": 176393.7070967199,
-            "residual_l2_N_per_m": 44455.37140240707,
+            "plastic_history_l2": 0.0007504665215717468,
+            "reaction_N_per_m": 176673.64674640808,
+            "residual_l2_N_per_m": 44528.993728743146,
             "rng_state": {
               "bit_generator": "PCG64",
               "has_uint32": 0,
@@ -552,7 +552,7 @@
               },
               "uinteger": 0
             },
-            "stored_energy_J_per_m": 0.03479884352761113,
+            "stored_energy_J_per_m": 0.034854027238493145,
             "support_elements": 0,
             "thresholds": [
               2.0,
@@ -586,9 +586,9 @@
             "mesh_elements": 2048,
             "mesh_generation": 0,
             "mesh_nodes": 1089,
-            "plastic_history_l2": 0.0007504665215717512,
-            "reaction_N_per_m": 178057.35978215295,
-            "residual_l2_N_per_m": 44888.53576432867,
+            "plastic_history_l2": 0.0007504665215717468,
+            "reaction_N_per_m": 178057.35978215316,
+            "residual_l2_N_per_m": 44888.53576432874,
             "rng_state": {
               "bit_generator": "PCG64",
               "has_uint32": 0,
@@ -598,7 +598,7 @@
               },
               "uinteger": 0
             },
-            "stored_energy_J_per_m": 0.035126829214331856,
+            "stored_energy_J_per_m": 0.03512682921433185,
             "support_elements": 0,
             "thresholds": [
               2.0,
@@ -642,9 +642,9 @@
         "mesh_elements": 2048,
         "mesh_generation": 0,
         "mesh_nodes": 1089,
-        "plastic_history_l2": 0.0007504665215717512,
-        "reaction_N_per_m": 178057.35978215295,
-        "residual_l2_N_per_m": 44888.53576432867,
+        "plastic_history_l2": 0.0007504665215717468,
+        "reaction_N_per_m": 178057.35978215316,
+        "residual_l2_N_per_m": 44888.53576432874,
         "rng_state": {
           "bit_generator": "PCG64",
           "has_uint32": 0,
@@ -654,7 +654,7 @@
           },
           "uinteger": 0
         },
-        "stored_energy_J_per_m": 0.035126829214331856,
+        "stored_energy_J_per_m": 0.03512682921433185,
         "support_elements": 0,
         "thresholds": [
           2.0,
@@ -674,9 +674,9 @@
         "competition_consumed": [
           "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
         ],
-        "damage_l1": 9.0,
+        "damage_l1": 8.0,
         "density_l2_m2": 47535518883836.28,
-        "displacement_l2_m": 4.175895081278566e-06,
+        "displacement_l2_m": 4.174423901594416e-06,
         "event_counters": {
           "accepted_steps": 1,
           "mesh_generation": 0,
@@ -690,9 +690,9 @@
         "mesh_elements": 2048,
         "mesh_generation": 0,
         "mesh_nodes": 1089,
-        "plastic_history_l2": 0.0007504665215717512,
-        "reaction_N_per_m": 176393.7070967199,
-        "residual_l2_N_per_m": 44455.37140240707,
+        "plastic_history_l2": 0.0007504665215717468,
+        "reaction_N_per_m": 176673.64674640808,
+        "residual_l2_N_per_m": 44528.993728743146,
         "rng_state": {
           "bit_generator": "PCG64",
           "has_uint32": 0,
@@ -702,7 +702,7 @@
           },
           "uinteger": 0
         },
-        "stored_energy_J_per_m": 0.03479884352761113,
+        "stored_energy_J_per_m": 0.034854027238493145,
         "support_elements": 0,
         "thresholds": [
           2.0,
@@ -722,9 +722,9 @@
         "competition_consumed": [
           "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
         ],
-        "damage_l1": 9.0,
+        "damage_l1": 8.0,
         "density_l2_m2": 47535518883836.28,
-        "displacement_l2_m": 4.175895081278566e-06,
+        "displacement_l2_m": 4.174423901594416e-06,
         "event_counters": {
           "accepted_steps": 1,
           "mesh_generation": 0,
@@ -738,9 +738,9 @@
         "mesh_elements": 2048,
         "mesh_generation": 0,
         "mesh_nodes": 1089,
-        "plastic_history_l2": 0.0007504665215717512,
-        "reaction_N_per_m": 176393.7070967199,
-        "residual_l2_N_per_m": 44455.37140240707,
+        "plastic_history_l2": 0.0007504665215717468,
+        "reaction_N_per_m": 176673.64674640808,
+        "residual_l2_N_per_m": 44528.993728743146,
         "rng_state": {
           "bit_generator": "PCG64",
           "has_uint32": 0,
@@ -750,7 +750,7 @@
           },
           "uinteger": 0
         },
-        "stored_energy_J_per_m": 0.03479884352761113,
+        "stored_energy_J_per_m": 0.034854027238493145,
         "support_elements": 0,
         "thresholds": [
           2.0,
@@ -773,7 +773,7 @@
         "competition_consumed": [],
         "damage_l1": 0.0,
         "density_l2_m2": 47535518883836.28,
-        "displacement_l2_m": 4.162676666085487e-06,
+        "displacement_l2_m": 4.1626766660854875e-06,
         "event_counters": {
           "accepted_steps": 1,
           "mesh_generation": 0,
@@ -787,7 +787,7 @@
         "mesh_elements": 2048,
         "mesh_generation": 0,
         "mesh_nodes": 1089,
-        "plastic_history_l2": 0.0007504665215717512,
+        "plastic_history_l2": 0.0007504665215717468,
         "reaction_N_per_m": 178057.3597821542,
         "residual_l2_N_per_m": 44888.53576432891,
         "rng_state": {
@@ -799,7 +799,7 @@
           },
           "uinteger": 0
         },
-        "stored_energy_J_per_m": 0.03512682921433184,
+        "stored_energy_J_per_m": 0.03512682921433185,
         "support_elements": 0,
         "thresholds": [
           2.0,

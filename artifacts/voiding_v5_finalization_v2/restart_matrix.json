@@ -1,102 +1,102 @@
 [
   {
-    "checkpoint_fingerprint": "c61fd356a20944d8206aad268350639d68c9564ccb0f4092f0f1733da91fdfaf",
+    "checkpoint_fingerprint": "e47f2249599b7aab4bab1b0edfefdf4bbaa6fccdd500b68f1a6b2727ba4552ef",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-00",
     "passed": true,
-    "restored_checkpoint_fingerprint": "c61fd356a20944d8206aad268350639d68c9564ccb0f4092f0f1733da91fdfaf",
-    "restored_fingerprint": "3da44475f24211414a44dd22b42e6c29c9e47cb89a09be76f7c64ee3223bda9d",
+    "restored_checkpoint_fingerprint": "e47f2249599b7aab4bab1b0edfefdf4bbaa6fccdd500b68f1a6b2727ba4552ef",
+    "restored_fingerprint": "e7baafb9a48fcbf53ffb0863713c2b1e3e0cbaacbe653f5fc215f8e2faf0ae0f",
     "stage": "available_site",
-    "uninterrupted_fingerprint": "3da44475f24211414a44dd22b42e6c29c9e47cb89a09be76f7c64ee3223bda9d"
+    "uninterrupted_fingerprint": "e7baafb9a48fcbf53ffb0863713c2b1e3e0cbaacbe653f5fc215f8e2faf0ae0f"
   },
   {
-    "checkpoint_fingerprint": "45d4a18542f79137316b2e6b53acc6be3442e5840fbde7e641cf45e09af417e8",
+    "checkpoint_fingerprint": "2eb7d50e1bcf5d24c1a979284d9ab93aa8a77d03da177f25ade9edf673ee2aaa",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-01",
     "passed": true,
-    "restored_checkpoint_fingerprint": "45d4a18542f79137316b2e6b53acc6be3442e5840fbde7e641cf45e09af417e8",
-    "restored_fingerprint": "c3dfc1dd6c29c4becb474849d4aef561fa4c851b9d32b3ba87a07e7f08e785ee",
+    "restored_checkpoint_fingerprint": "2eb7d50e1bcf5d24c1a979284d9ab93aa8a77d03da177f25ade9edf673ee2aaa",
+    "restored_fingerprint": "c2371bb431977a1956ee1ce6ff570fc27ab5335681feab8326b7944949367d24",
     "stage": "incomplete_first_hit",
-    "uninterrupted_fingerprint": "c3dfc1dd6c29c4becb474849d4aef561fa4c851b9d32b3ba87a07e7f08e785ee"
+    "uninterrupted_fingerprint": "c2371bb431977a1956ee1ce6ff570fc27ab5335681feab8326b7944949367d24"
   },
   {
-    "checkpoint_fingerprint": "3da44475f24211414a44dd22b42e6c29c9e47cb89a09be76f7c64ee3223bda9d",
+    "checkpoint_fingerprint": "e7baafb9a48fcbf53ffb0863713c2b1e3e0cbaacbe653f5fc215f8e2faf0ae0f",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-02",
     "passed": true,
-    "restored_checkpoint_fingerprint": "3da44475f24211414a44dd22b42e6c29c9e47cb89a09be76f7c64ee3223bda9d",
-    "restored_fingerprint": "94551ce548018ab88f2e9836431e409abe7f93c8992b37ae6b913da8bb608423",
+    "restored_checkpoint_fingerprint": "e7baafb9a48fcbf53ffb0863713c2b1e3e0cbaacbe653f5fc215f8e2faf0ae0f",
+    "restored_fingerprint": "f32ea64de32f69126a775c772287eda6efe126a2387d9a0f4dd44f58d2eeabea",
     "stage": "between_birth_hits",
-    "uninterrupted_fingerprint": "94551ce548018ab88f2e9836431e409abe7f93c8992b37ae6b913da8bb608423"
+    "uninterrupted_fingerprint": "f32ea64de32f69126a775c772287eda6efe126a2387d9a0f4dd44f58d2eeabea"
   },
   {
-    "checkpoint_fingerprint": "94551ce548018ab88f2e9836431e409abe7f93c8992b37ae6b913da8bb608423",
+    "checkpoint_fingerprint": "f32ea64de32f69126a775c772287eda6efe126a2387d9a0f4dd44f58d2eeabea",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-03",
     "passed": true,
-    "restored_checkpoint_fingerprint": "94551ce548018ab88f2e9836431e409abe7f93c8992b37ae6b913da8bb608423",
-    "restored_fingerprint": "9cee5e9486bcdc2e3c46be1644971ae47090cfca15a7f455cc9e75781394d238",
+    "restored_checkpoint_fingerprint": "f32ea64de32f69126a775c772287eda6efe126a2387d9a0f4dd44f58d2eeabea",
+    "restored_fingerprint": "f034f075c5e06e523db83c647a6d22b609f27b37427bb8c77fb335a4377c2847",
     "stage": "embryo",
-    "uninterrupted_fingerprint": "9cee5e9486bcdc2e3c46be1644971ae47090cfca15a7f455cc9e75781394d238"
+    "uninterrupted_fingerprint": "f034f075c5e06e523db83c647a6d22b609f27b37427bb8c77fb335a4377c2847"
   },
   {
-    "checkpoint_fingerprint": "9cee5e9486bcdc2e3c46be1644971ae47090cfca15a7f455cc9e75781394d238",
+    "checkpoint_fingerprint": "f034f075c5e06e523db83c647a6d22b609f27b37427bb8c77fb335a4377c2847",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-04",
     "passed": true,
-    "restored_checkpoint_fingerprint": "9cee5e9486bcdc2e3c46be1644971ae47090cfca15a7f455cc9e75781394d238",
-    "restored_fingerprint": "8e9602de5da20d9080e0ab915b2e8ff0e050201536a141d90cc4906f855afc59",
+    "restored_checkpoint_fingerprint": "f034f075c5e06e523db83c647a6d22b609f27b37427bb8c77fb335a4377c2847",
+    "restored_fingerprint": "19aa81766d88f7084b44bb2a14eb7c6b9bf4b2ebdf5ccf467520d7696290c92f",
     "stage": "stable_subgrid_cavity",
-    "uninterrupted_fingerprint": "8e9602de5da20d9080e0ab915b2e8ff0e050201536a141d90cc4906f855afc59"
+    "uninterrupted_fingerprint": "19aa81766d88f7084b44bb2a14eb7c6b9bf4b2ebdf5ccf467520d7696290c92f"
   },
   {
-    "checkpoint_fingerprint": "da01c444ab2865decdd7c72520b91f4798956aaf7dff347f26ada451d571c84d",
+    "checkpoint_fingerprint": "5ad282a2be2a96ca8958fe8d5d35e689f29b7eef3f69ebe61557020513aca4e1",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-05",
     "passed": true,
-    "restored_checkpoint_fingerprint": "da01c444ab2865decdd7c72520b91f4798956aaf7dff347f26ada451d571c84d",
-    "restored_fingerprint": "2d77b4c8f052d55de65e8c875821439b01b8c0113c0ca8bd405c8441d2d30ea8",
+    "restored_checkpoint_fingerprint": "5ad282a2be2a96ca8958fe8d5d35e689f29b7eef3f69ebe61557020513aca4e1",
+    "restored_fingerprint": "c769e86b745ea0ddfdd094b9357abf17b916e2cdd42aa67f9a2af81d9a19cd43",
     "stage": "before_promotion",
-    "uninterrupted_fingerprint": "2d77b4c8f052d55de65e8c875821439b01b8c0113c0ca8bd405c8441d2d30ea8"
+    "uninterrupted_fingerprint": "c769e86b745ea0ddfdd094b9357abf17b916e2cdd42aa67f9a2af81d9a19cd43"
   },
   {
-    "checkpoint_fingerprint": "02d7a0d80d8f503220bce716e397875bbabca96b859643f0c018ab1a0a821953",
+    "checkpoint_fingerprint": "dd1f4a3213c2625fa6d4fbfeb287d02da4eab0784e68a5ccb68a8b53fc182756",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-06",
     "passed": true,
-    "restored_checkpoint_fingerprint": "02d7a0d80d8f503220bce716e397875bbabca96b859643f0c018ab1a0a821953",
-    "restored_fingerprint": "d0bce5a1f0ccc54044a84cae2671830ec14ac4282666f059698c724ad3b50534",
+    "restored_checkpoint_fingerprint": "dd1f4a3213c2625fa6d4fbfeb287d02da4eab0784e68a5ccb68a8b53fc182756",
+    "restored_fingerprint": "234eac69f8c5947307d98ad94107432cdd1e1b5cf867c54258f501de3d1f9ec7",
     "stage": "after_promotion",
-    "uninterrupted_fingerprint": "d0bce5a1f0ccc54044a84cae2671830ec14ac4282666f059698c724ad3b50534"
+    "uninterrupted_fingerprint": "234eac69f8c5947307d98ad94107432cdd1e1b5cf867c54258f501de3d1f9ec7"
   },
   {
-    "checkpoint_fingerprint": "418d0382c8c1705842025377086f93d644102ccc303648a6686dac77c76829c0",
+    "checkpoint_fingerprint": "ab960496a020c666e9a4d806c4b48b65a268cde07c06e922f6f083c4c0a66c1e",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-07",
     "passed": true,
-    "restored_checkpoint_fingerprint": "418d0382c8c1705842025377086f93d644102ccc303648a6686dac77c76829c0",
-    "restored_fingerprint": "c1a4a78b4b5ef98144328b13d5d5d523054b67191d99963722d8ff363f067284",
+    "restored_checkpoint_fingerprint": "ab960496a020c666e9a4d806c4b48b65a268cde07c06e922f6f083c4c0a66c1e",
+    "restored_fingerprint": "08237818ef9e463fc1b594d16f94abc96effff8654d53c17fe2ab8cf36832210",
     "stage": "before_ligament",
-    "uninterrupted_fingerprint": "c1a4a78b4b5ef98144328b13d5d5d523054b67191d99963722d8ff363f067284"
+    "uninterrupted_fingerprint": "08237818ef9e463fc1b594d16f94abc96effff8654d53c17fe2ab8cf36832210"
   },
   {
-    "checkpoint_fingerprint": "c1a4a78b4b5ef98144328b13d5d5d523054b67191d99963722d8ff363f067284",
+    "checkpoint_fingerprint": "08237818ef9e463fc1b594d16f94abc96effff8654d53c17fe2ab8cf36832210",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-08",
     "passed": true,
-    "restored_checkpoint_fingerprint": "c1a4a78b4b5ef98144328b13d5d5d523054b67191d99963722d8ff363f067284",
-    "restored_fingerprint": "99ffa4de4b3ccaf721ab4dbe6e031ffa717a6d40c83060be5b6271b9d5c1a67e",
+    "restored_checkpoint_fingerprint": "08237818ef9e463fc1b594d16f94abc96effff8654d53c17fe2ab8cf36832210",
+    "restored_fingerprint": "01aef92d8ae76e5e3e1b6d226996daa5f7c4082928c233e6891b77462d6cb667",
     "stage": "connected_before_downstream",
-    "uninterrupted_fingerprint": "99ffa4de4b3ccaf721ab4dbe6e031ffa717a6d40c83060be5b6271b9d5c1a67e"
+    "uninterrupted_fingerprint": "01aef92d8ae76e5e3e1b6d226996daa5f7c4082928c233e6891b77462d6cb667"
   },
   {
-    "checkpoint_fingerprint": "99ffa4de4b3ccaf721ab4dbe6e031ffa717a6d40c83060be5b6271b9d5c1a67e",
+    "checkpoint_fingerprint": "01aef92d8ae76e5e3e1b6d226996daa5f7c4082928c233e6891b77462d6cb667",
     "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
     "execution_id": "restart-09",
     "passed": true,
-    "restored_checkpoint_fingerprint": "99ffa4de4b3ccaf721ab4dbe6e031ffa717a6d40c83060be5b6271b9d5c1a67e",
-    "restored_fingerprint": "fe688ce12bf5402085a2ce78009f3ad990ed6877408ca1f7384d69847dfe6a6b",
+    "restored_checkpoint_fingerprint": "01aef92d8ae76e5e3e1b6d226996daa5f7c4082928c233e6891b77462d6cb667",
+    "restored_fingerprint": "4dc5407aca98c2b1f3b7263393a6ffaa6de293f2d465dee10790f4716bb03779",
     "stage": "downstream_front_before_continuation",
-    "uninterrupted_fingerprint": "fe688ce12bf5402085a2ce78009f3ad990ed6877408ca1f7384d69847dfe6a6b"
+    "uninterrupted_fingerprint": "4dc5407aca98c2b1f3b7263393a6ffaa6de293f2d465dee10790f4716bb03779"
   }
 ]

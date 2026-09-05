@@ -81,12 +81,12 @@
   "energy_ledgers": {
     "emission_work": 1.0,
     "latest_constrained_reaction_l2_N_per_m": 53883.91935541957,
-    "latest_energy_reaction_identity": 0.00439276613276816,
+    "latest_energy_reaction_identity": 0.004392766132768051,
     "latest_fem_energy_J_per_m": 0.016000029548810663,
-    "latest_free_dof_residual_l2_N_per_m": 2.1434474358138773e-10,
-    "latest_reaction_N_per_m": 79088.69756539648,
-    "latest_residual_l2_N_per_m": 53883.91935541957,
-    "latest_top_bottom_reaction_balance": 0.002669346994983332
+    "latest_free_dof_residual_l2_N_per_m": 2.721566615563922e-10,
+    "latest_reaction_N_per_m": 79088.6975653965,
+    "latest_residual_l2_N_per_m": 53883.91935541958,
+    "latest_top_bottom_reaction_balance": 0.0026693469949830564
   },
   "event_counters": {
     "accepted_steps": 0,
@@ -96,10 +96,10 @@
   "has_production_void_state": true,
   "has_rng_state": true,
   "production_void_state": {
-    "available_defect_inventory_area_m2": 2.146018366025514e-09,
+    "available_defect_inventory_area_m2": 2.1460183660255175e-09,
     "cavities": [
       {
-        "area_m2": 7.853981633974486e-09,
+        "area_m2": 7.853981633974483e-09,
         "cavity_id": "void:site-1",
         "center_m": [
           0.0007,
@@ -109,16 +109,16 @@
         "connection_entry_m": null,
         "connection_exit_m": null,
         "geometry_generation": 1,
-        "inventory_area_m2": 7.853981633974486e-09,
+        "inventory_area_m2": 7.853981633974483e-09,
         "lineage": [
           "site-1"
         ],
         "parent_site_id": "site-1",
         "phase": "STABLE_SUBGRID_VOID",
-        "radius_m": 5.000000000000001e-05
+        "radius_m": 5e-05
       }
     ],
-    "consumed_defect_inventory_area_m2": 7.853981633974486e-09,
+    "consumed_defect_inventory_area_m2": 7.853981633974483e-09,
     "event_history": [
       {
         "event": "BIRTH_HIT",
@@ -192,12 +192,12 @@
       }
     ]
   },
-  "production_void_state_sha256": "79d05d2a13946b708505e084bdade12bb43963b91430bed1bec1dfee08b11b0c",
+  "production_void_state_sha256": "f1f82d58a858633f7d7cd502681db7da737b0035da8e8a03cccd4d4709e69350",
   "provider_runtime": null,
   "schema": "v11.live-fem-branch-checkpoint/1",
   "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
   "state_file": "before_promotion.json.state.pkl",
-  "state_sha256": "a20a9459d2690d040f7f2f79d8366dd0334058b6f749c1452895c7f8834d9a4a",
+  "state_sha256": "f90fa52c4dfc28f463dd88e78877611dd6ef7c81c706791e478fcb68c5db4f94",
   "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
   "v12_support_state": {
     "accepted_p0_damage_fingerprint": "ba8e5ef7c098e3a0b09a57c88cb8fd71116e90b9559d8da3251d5ff0150cae61",
@@ -205,13 +205,13 @@
       "b00000000"
     ],
     "branch_vertex_lineage_fingerprint": "d526df5cdcf05a970afcb69b5d09331edc8dc7678e2bc499ea4ea71d4902ade9",
-    "certification_arc_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+    "certification_arc_fingerprint": "2ec8e06dea4a1cf8271f61fece2221c72c60333dc513212dc9a8abcb58372a5e",
     "checkpoint_generation": 0,
     "complete_crack_graph_fingerprint": "7b83f05d1e72b339864a4d8a39c8e7c7c60ff68077506e889e0f47179de6861b",
     "configuration_hash": "e7d8c0742ffb5447c32104fe4d369123e1ec359841748a4f21e06a206465e148",
     "mesh_connectivity_fingerprint": "f3838b076ebf070bd63b55d18716f1d4be45747ae19ad32eb62b6f50a49ef673",
     "mesh_generation": 0,
-    "mesh_geometry_fingerprint": "b3ba1de05dc2ab9c52178913e46730944ef081fc6f03e0d4e662f615ef55f843",
+    "mesh_geometry_fingerprint": "b130902b4cef7ca8dd5e21c049faa80bf70bc7ed58542c5568e67f8d78bfb900",
     "model_id": "sharp_wake_mechanically_separating_v12",
     "physical_graph_length_m": 0.0005725993004046688,
     "previous_accepted_transaction": null,
@@ -298,7 +298,7 @@
       738,
       739
     ],
-    "source_commit": "361774073e6a734dc24e4f22d600e721fbe62aa9",
+    "source_commit": "d050c238e72090e4a805acf88fce876a968b7117",
     "transaction_identity": "v12-initial"
   }
 }

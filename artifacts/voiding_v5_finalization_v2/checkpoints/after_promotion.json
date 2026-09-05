@@ -81,12 +81,12 @@
   "energy_ledgers": {
     "emission_work": 1.0,
     "latest_constrained_reaction_l2_N_per_m": 48813.55850866962,
-    "latest_energy_reaction_identity": 0.005737270571570671,
+    "latest_energy_reaction_identity": 0.0057372705715704134,
     "latest_fem_energy_J_per_m": 0.013642651008699607,
-    "latest_free_dof_residual_l2_N_per_m": 2.818505800851629e-10,
-    "latest_reaction_N_per_m": 67410.23492329707,
-    "latest_residual_l2_N_per_m": 48813.558508669616,
-    "latest_top_bottom_reaction_balance": 0.00036730707117117885
+    "latest_free_dof_residual_l2_N_per_m": 2.9540695603988566e-10,
+    "latest_reaction_N_per_m": 67410.23492329713,
+    "latest_residual_l2_N_per_m": 48813.55850866962,
+    "latest_top_bottom_reaction_balance": 0.00036730707117031556
   },
   "event_counters": {
     "accepted_steps": 0,
@@ -97,10 +97,10 @@
   "has_production_void_state": true,
   "has_rng_state": true,
   "production_void_state": {
-    "available_defect_inventory_area_m2": 2.146018366025514e-09,
+    "available_defect_inventory_area_m2": 2.1460183660255175e-09,
     "cavities": [
       {
-        "area_m2": 7.853981633974486e-09,
+        "area_m2": 7.853981633974483e-09,
         "cavity_id": "void:site-1",
         "center_m": [
           0.0007,
@@ -110,17 +110,17 @@
         "connection_entry_m": null,
         "connection_exit_m": null,
         "geometry_generation": 2,
-        "inventory_area_m2": 7.853981633974486e-09,
+        "inventory_area_m2": 7.853981633974483e-09,
         "lineage": [
           "site-1",
           "GEOMETRIC_PROMOTION"
         ],
         "parent_site_id": "site-1",
         "phase": "RESOLVED_VOID",
-        "radius_m": 5.000000000000001e-05
+        "radius_m": 5e-05
       }
     ],
-    "consumed_defect_inventory_area_m2": 7.853981633974486e-09,
+    "consumed_defect_inventory_area_m2": 7.853981633974483e-09,
     "event_history": [
       {
         "event": "BIRTH_HIT",
@@ -198,26 +198,26 @@
       }
     ]
   },
-  "production_void_state_sha256": "e8e07e30bf341faeef447ea9b817516df585385522771e44b8d1291b9f9f2e2b",
+  "production_void_state_sha256": "199368919f0c0e72108eb30214608dfba5c09f5ba870d140954e176b4a317340",
   "provider_runtime": null,
   "schema": "v11.live-fem-branch-checkpoint/1",
   "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
   "state_file": "after_promotion.json.state.pkl",
-  "state_sha256": "f9bdd08e3b8b543e2e8505b08fd1b220383b9dbbfbaddb95df0a8d2411521835",
+  "state_sha256": "7255c88680c8301f3101cce2cf45183cf40940d5255461b96760e5edd10cd701",
   "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
   "v12_support_state": {
-    "accepted_p0_damage_fingerprint": "1b5d6aff2a718088b52d0061ef93b44b07225693dbc88269a80328509fabb7a5",
+    "accepted_p0_damage_fingerprint": "4a2942b4e2b83cf9d3cc8b2bf37d7ed0ca5cffd3980980dae74e9c66cb415df6",
     "active_tip_identities": [
       "b00000000"
     ],
     "branch_vertex_lineage_fingerprint": "d526df5cdcf05a970afcb69b5d09331edc8dc7678e2bc499ea4ea71d4902ade9",
-    "certification_arc_fingerprint": "e512cb6d8fbcab7f1a596ff86fdd4fa555853f1a961115fdf2703ab92b8a3014",
+    "certification_arc_fingerprint": "775787c297d68267ed93107ceb8ce5f74305649e38040c46128e21ae37af1f41",
     "checkpoint_generation": 0,
     "complete_crack_graph_fingerprint": "7b83f05d1e72b339864a4d8a39c8e7c7c60ff68077506e889e0f47179de6861b",
     "configuration_hash": "4f237b0a12ef3bff28c763b08c97809770969158ad3115c433315c93177aea50",
     "mesh_connectivity_fingerprint": "df98b55fdceede0585acc7a9b15efcfe50dd543d7c860efa4fa67a9800f0768d",
     "mesh_generation": 0,
-    "mesh_geometry_fingerprint": "d0f1a61cc424ad700223c1c7bebc5971156d707212b7f75d7fc232184700e6f2",
+    "mesh_geometry_fingerprint": "f8003425c64d332cc1acdf92aa771eae51dcddbaf0641b461d8857698f907b25",
     "model_id": "sharp_wake_mechanically_separating_v12",
     "physical_graph_length_m": 0.0005725993004046688,
     "previous_accepted_transaction": null,
@@ -304,7 +304,7 @@
       738,
       739
     ],
-    "source_commit": "361774073e6a734dc24e4f22d600e721fbe62aa9",
+    "source_commit": "d050c238e72090e4a805acf88fce876a968b7117",
     "transaction_identity": "promotion"
   }
 }

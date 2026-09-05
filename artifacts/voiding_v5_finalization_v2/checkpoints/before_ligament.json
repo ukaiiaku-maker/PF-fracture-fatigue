@@ -80,13 +80,13 @@
   },
   "energy_ledgers": {
     "emission_work": 1.0,
-    "latest_constrained_reaction_l2_N_per_m": 47914.45225481699,
-    "latest_energy_reaction_identity": 0.005624416280028994,
-    "latest_fem_energy_J_per_m": 0.01323919398017923,
-    "latest_free_dof_residual_l2_N_per_m": 2.572358142370504e-10,
-    "latest_reaction_N_per_m": 65411.72474420346,
-    "latest_residual_l2_N_per_m": 47914.452254817,
-    "latest_top_bottom_reaction_balance": 0.0006688886471623517
+    "latest_constrained_reaction_l2_N_per_m": 47914.45225481698,
+    "latest_energy_reaction_identity": 0.005624416280029325,
+    "latest_fem_energy_J_per_m": 0.013239193980179228,
+    "latest_free_dof_residual_l2_N_per_m": 3.0015867328344257e-10,
+    "latest_reaction_N_per_m": 65411.724744203486,
+    "latest_residual_l2_N_per_m": 47914.45225481698,
+    "latest_top_bottom_reaction_balance": 0.0006688886471625746
   },
   "event_counters": {
     "accepted_steps": 0,
@@ -97,10 +97,10 @@
   "has_production_void_state": true,
   "has_rng_state": true,
   "production_void_state": {
-    "available_defect_inventory_area_m2": 4.966822228908725e-10,
+    "available_defect_inventory_area_m2": 4.966822228908758e-10,
     "cavities": [
       {
-        "area_m2": 9.503317777109128e-09,
+        "area_m2": 9.503317777109124e-09,
         "cavity_id": "void:site-1",
         "center_m": [
           0.0007,
@@ -110,17 +110,17 @@
         "connection_entry_m": null,
         "connection_exit_m": null,
         "geometry_generation": 3,
-        "inventory_area_m2": 9.503317777109128e-09,
+        "inventory_area_m2": 9.503317777109124e-09,
         "lineage": [
           "site-1",
           "GEOMETRIC_PROMOTION"
         ],
         "parent_site_id": "site-1",
         "phase": "RESOLVED_VOID",
-        "radius_m": 5.500000000000001e-05
+        "radius_m": 5.5e-05
       }
     ],
-    "consumed_defect_inventory_area_m2": 9.503317777109128e-09,
+    "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
     "event_history": [
       {
         "event": "BIRTH_HIT",
@@ -198,26 +198,26 @@
       }
     ]
   },
-  "production_void_state_sha256": "60e3b16e1e08847d90dda9597a8e43eec8b85f2126f4a351db88e2f193a0c376",
+  "production_void_state_sha256": "ad55386f03fac62b1a40e2d99b6b824d39f4c0f768a38d2ef8197810b52a510a",
   "provider_runtime": null,
   "schema": "v11.live-fem-branch-checkpoint/1",
   "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
   "state_file": "before_ligament.json.state.pkl",
-  "state_sha256": "2bb1b3ab59cb9617862e8e0ae5cab08198aae47da98979ca3e4235ac10a203f7",
+  "state_sha256": "52732393b165c2bc94fa0ed43345614388927ef7ef60e1c61e9201416fd0bb20",
   "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
   "v12_support_state": {
-    "accepted_p0_damage_fingerprint": "15c7231569132fb8e3bfcd823102aedc008758eedba11fb1a0b0589615ac83e7",
+    "accepted_p0_damage_fingerprint": "66162f5d1588b5a3810f0d5d53628445b282176378199826e05892d47290ef2f",
     "active_tip_identities": [
       "b00000000"
     ],
     "branch_vertex_lineage_fingerprint": "d526df5cdcf05a970afcb69b5d09331edc8dc7678e2bc499ea4ea71d4902ade9",
-    "certification_arc_fingerprint": "dd869b0fc8b64579eeb70573e02bb1027b8b23971989a3890b6c664f5c6a32c3",
+    "certification_arc_fingerprint": "e4cced59fd350a56ecfdf428f1d794054df3156263a75e5f54e2612204a51f07",
     "checkpoint_generation": 0,
     "complete_crack_graph_fingerprint": "7b83f05d1e72b339864a4d8a39c8e7c7c60ff68077506e889e0f47179de6861b",
     "configuration_hash": "4f237b0a12ef3bff28c763b08c97809770969158ad3115c433315c93177aea50",
     "mesh_connectivity_fingerprint": "df98b55fdceede0585acc7a9b15efcfe50dd543d7c860efa4fa67a9800f0768d",
     "mesh_generation": 0,
-    "mesh_geometry_fingerprint": "f603ceaee24c6968812d31f5275e19a8a6604ebfe441e929d511f86bde24e460",
+    "mesh_geometry_fingerprint": "fc9656b2d13add496e37196d1362cd00303bf81b2e48ecd674d56fa2fe2c60d7",
     "model_id": "sharp_wake_mechanically_separating_v12",
     "physical_graph_length_m": 0.0005725993004046688,
     "previous_accepted_transaction": null,
@@ -304,7 +304,7 @@
       738,
       739
     ],
-    "source_commit": "361774073e6a734dc24e4f22d600e721fbe62aa9",
+    "source_commit": "d050c238e72090e4a805acf88fce876a968b7117",
     "transaction_identity": "resolved-growth"
   }
 }

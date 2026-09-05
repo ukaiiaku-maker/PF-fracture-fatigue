@@ -80,13 +80,13 @@
   },
   "energy_ledgers": {
     "emission_work": 1.0,
-    "latest_constrained_reaction_l2_N_per_m": 53883.9193554197,
-    "latest_energy_reaction_identity": 0.004392766132767941,
+    "latest_constrained_reaction_l2_N_per_m": 53883.91935541985,
+    "latest_energy_reaction_identity": 0.0043927661327657535,
     "latest_fem_energy_J_per_m": 0.016000029548810663,
-    "latest_free_dof_residual_l2_N_per_m": 1.113809760588001e-09,
-    "latest_reaction_N_per_m": 79088.6975653969,
-    "latest_residual_l2_N_per_m": 53883.91935541969,
-    "latest_top_bottom_reaction_balance": 0.002669346994977367
+    "latest_free_dof_residual_l2_N_per_m": 1.0917107530475046e-09,
+    "latest_reaction_N_per_m": 79088.69756539701,
+    "latest_residual_l2_N_per_m": 53883.91935541985,
+    "latest_top_bottom_reaction_balance": 0.0026693469949789148
   },
   "event_counters": {
     "accepted_steps": 0,
@@ -159,7 +159,7 @@
   "schema": "v11.live-fem-branch-checkpoint/1",
   "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
   "state_file": "available_site.json.state.pkl",
-  "state_sha256": "661a8b9b539818bf6b523f704df7ac6e81fdc17aef829e065b9e851097379ecc",
+  "state_sha256": "8f52305e62f3f8e3393e808155fc5e529e910989594445d70e21b06762ec1070",
   "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
   "v12_support_state": {
     "accepted_p0_damage_fingerprint": "ba8e5ef7c098e3a0b09a57c88cb8fd71116e90b9559d8da3251d5ff0150cae61",
@@ -167,13 +167,13 @@
       "b00000000"
     ],
     "branch_vertex_lineage_fingerprint": "d526df5cdcf05a970afcb69b5d09331edc8dc7678e2bc499ea4ea71d4902ade9",
-    "certification_arc_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+    "certification_arc_fingerprint": "2ec8e06dea4a1cf8271f61fece2221c72c60333dc513212dc9a8abcb58372a5e",
     "checkpoint_generation": 0,
     "complete_crack_graph_fingerprint": "7b83f05d1e72b339864a4d8a39c8e7c7c60ff68077506e889e0f47179de6861b",
     "configuration_hash": "e7d8c0742ffb5447c32104fe4d369123e1ec359841748a4f21e06a206465e148",
     "mesh_connectivity_fingerprint": "f3838b076ebf070bd63b55d18716f1d4be45747ae19ad32eb62b6f50a49ef673",
     "mesh_generation": 0,
-    "mesh_geometry_fingerprint": "b3ba1de05dc2ab9c52178913e46730944ef081fc6f03e0d4e662f615ef55f843",
+    "mesh_geometry_fingerprint": "b130902b4cef7ca8dd5e21c049faa80bf70bc7ed58542c5568e67f8d78bfb900",
     "model_id": "sharp_wake_mechanically_separating_v12",
     "physical_graph_length_m": 0.0005725993004046688,
     "previous_accepted_transaction": null,
@@ -260,7 +260,7 @@
       738,
       739
     ],
-    "source_commit": "361774073e6a734dc24e4f22d600e721fbe62aa9",
+    "source_commit": "d050c238e72090e4a805acf88fce876a968b7117",
     "transaction_identity": "v12-initial"
   }
 }

@@ -415,7 +415,7 @@
     "winner_count": 1
   },
   {
-    "clock": "4dd06a185e8b06a31b79d7a52da2a130ac3e987d8ed82e633e5b42bd45992947",
+    "clock": "1fe11b057025665b6a907add997a1c5529bbac4f568f1020c69126e03d08f126",
     "clock_measurement": {
       "candidates": [
         {
@@ -437,28 +437,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 4287296095814937808,
+      "global_hazard_seed": 1024751184801721603,
       "hazard_states": [
         {
-          "action": 1.1247830130209153,
+          "action": 0.19472347955712133,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 2.6484605206141727,
-          "last_completion_time_s": 1.6418904228429738e+16,
+          "current_threshold_action": 1.3588355162821106,
+          "last_completion_time_s": 1.6409244709825202e+16,
           "pending_events": [
             {
-              "action_after": 1.1247830130209153,
+              "action_after": 0.19472347955712133,
               "action_before": 0.0,
-              "action_increment": 1.1247830130209153,
+              "action_increment": 0.19472347955712133,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 1.6418904228429738e+16,
+              "completion_time_s": 1.6409244709825202e+16,
               "event_ordinal": 1
             }
           ],
-          "previous_rate_per_s": 9.628425302964603e-14,
-          "residual_action": 0.12478301302091532,
+          "previous_rate_per_s": 9.628425302964739e-14,
+          "residual_action": 0.19472347955712133,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 4287296095814937808
+          "threshold_seed": 1024751184801721603
         }
       ],
       "reservations": []
@@ -468,7 +468,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 11681899974594.945,
+    "duration_s": 2022381370058.1235,
     "execution_id": "partition-downstream-1",
     "partition_equivalent": true,
     "partitions": 1,
@@ -477,7 +477,7 @@
     "winner_count": 1
   },
   {
-    "clock": "3aa7b88de46bd1c99afec83b10f95aa180d5e35afd621557443ee59efcc14dfd",
+    "clock": "12acc7cdcfd8822ab0b5c693600ba17da619a82f7124c52c13e388546ca23121",
     "clock_measurement": {
       "candidates": [
         {
@@ -499,28 +499,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 2282773741471000030,
+      "global_hazard_seed": 6038661496304451251,
       "hazard_states": [
         {
-          "action": 0.4408901005479311,
+          "action": 1.126176664425262,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 0.4744993876748045,
-          "last_completion_time_s": 2.1296357822341172e+16,
+          "current_threshold_action": 2.1952079853023907,
+          "last_completion_time_s": 2.8867847006528464e+16,
           "pending_events": [
             {
-              "action_after": 0.4408901005479311,
+              "action_after": 1.126176664425262,
               "action_before": 0.0,
-              "action_increment": 0.4408901005479311,
+              "action_increment": 1.126176664425262,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 2.1296357822341172e+16,
+              "completion_time_s": 2.8867847006528464e+16,
               "event_ordinal": 1
             }
           ],
           "previous_rate_per_s": 9.03934998168507e-17,
-          "residual_action": 0.4408901005479311,
+          "residual_action": 0.126176664425262,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 2282773741471000030
+          "threshold_seed": 6038661496304451251
         }
       ],
       "reservations": []
@@ -530,7 +530,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 4877453593911435.0,
+    "duration_s": 1.245860229670326e+16,
     "execution_id": "partition-child-1",
     "partition_equivalent": true,
     "partitions": 1,
@@ -954,7 +954,7 @@
     "winner_count": 1
   },
   {
-    "clock": "763351669ff8e66211b317baf1a4378cb0976199684d42ee3f902e4c1f92bb3a",
+    "clock": "119fe2ef92bad4721b00ff9059af78399e8317711bd0d3b515a62d144265bece",
     "clock_measurement": {
       "candidates": [
         {
@@ -976,28 +976,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 4287296095814937808,
+      "global_hazard_seed": 1024751184801721603,
       "hazard_states": [
         {
-          "action": 1.1247830130209153,
+          "action": 0.19472347955712133,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 2.6484605206141727,
-          "last_completion_time_s": 1.641890422842974e+16,
+          "current_threshold_action": 1.3588355162821106,
+          "last_completion_time_s": 1.6409244709825204e+16,
           "pending_events": [
             {
-              "action_after": 1.1247830130209153,
-              "action_before": 0.5623915065104577,
-              "action_increment": 0.5623915065104577,
+              "action_after": 0.19472347955712133,
+              "action_before": 0.09736173977856066,
+              "action_increment": 0.09736173977856066,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 1.641890422842974e+16,
+              "completion_time_s": 1.6409244709825204e+16,
               "event_ordinal": 1
             }
           ],
-          "previous_rate_per_s": 9.628425302964603e-14,
-          "residual_action": 0.12478301302091532,
+          "previous_rate_per_s": 9.628425302964739e-14,
+          "residual_action": 0.19472347955712133,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 4287296095814937808
+          "threshold_seed": 1024751184801721603
         }
       ],
       "reservations": []
@@ -1007,7 +1007,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 11681899974594.945,
+    "duration_s": 2022381370058.1235,
     "execution_id": "partition-downstream-2",
     "partition_equivalent": true,
     "partitions": 2,
@@ -1016,7 +1016,7 @@
     "winner_count": 1
   },
   {
-    "clock": "4910b416ec175304fc8649de44d48e30adde88a9d93a3bd01e72dd5f94290164",
+    "clock": "9daaa58f2d53575ae435d3a67bbf6faf7c68a2b4ed0610c5ffee525195e71e6d",
     "clock_measurement": {
       "candidates": [
         {
@@ -1038,28 +1038,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 2282773741471000030,
+      "global_hazard_seed": 6038661496304451251,
       "hazard_states": [
         {
-          "action": 0.4408901005479311,
+          "action": 1.126176664425262,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 0.4744993876748045,
-          "last_completion_time_s": 2.1296357822341172e+16,
+          "current_threshold_action": 2.1952079853023907,
+          "last_completion_time_s": 2.8867847006528464e+16,
           "pending_events": [
             {
-              "action_after": 0.4408901005479311,
-              "action_before": 0.22044505027396555,
-              "action_increment": 0.22044505027396555,
+              "action_after": 1.126176664425262,
+              "action_before": 0.563088332212631,
+              "action_increment": 0.563088332212631,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 2.1296357822341172e+16,
+              "completion_time_s": 2.8867847006528464e+16,
               "event_ordinal": 1
             }
           ],
           "previous_rate_per_s": 9.03934998168507e-17,
-          "residual_action": 0.4408901005479311,
+          "residual_action": 0.126176664425262,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 2282773741471000030
+          "threshold_seed": 6038661496304451251
         }
       ],
       "reservations": []
@@ -1069,7 +1069,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 4877453593911435.0,
+    "duration_s": 1.245860229670326e+16,
     "execution_id": "partition-child-2",
     "partition_equivalent": true,
     "partitions": 2,
@@ -1493,7 +1493,7 @@
     "winner_count": 1
   },
   {
-    "clock": "127cadfadf46caf37e41f1a8457778b7efdb2113ca1d5410bd838d4abf08053b",
+    "clock": "9dd0b1952b81bdd0cb01d9ae088814afe4cabddcb2fc40739ec75dea2c0ce30e",
     "clock_measurement": {
       "candidates": [
         {
@@ -1515,28 +1515,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 4287296095814937808,
+      "global_hazard_seed": 1024751184801721603,
       "hazard_states": [
         {
-          "action": 1.1247830130209153,
+          "action": 0.19472347955712133,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 2.6484605206141727,
-          "last_completion_time_s": 1.6418904228429736e+16,
+          "current_threshold_action": 1.3588355162821106,
+          "last_completion_time_s": 1.64092447098252e+16,
           "pending_events": [
             {
-              "action_after": 1.1247830130209153,
-              "action_before": 0.8435872597656865,
-              "action_increment": 0.28119575325522883,
+              "action_after": 0.19472347955712133,
+              "action_before": 0.146042609667841,
+              "action_increment": 0.04868086988928033,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 1.6418904228429736e+16,
+              "completion_time_s": 1.64092447098252e+16,
               "event_ordinal": 1
             }
           ],
-          "previous_rate_per_s": 9.628425302964603e-14,
-          "residual_action": 0.12478301302091532,
+          "previous_rate_per_s": 9.628425302964739e-14,
+          "residual_action": 0.19472347955712133,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 4287296095814937808
+          "threshold_seed": 1024751184801721603
         }
       ],
       "reservations": []
@@ -1546,7 +1546,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 11681899974594.945,
+    "duration_s": 2022381370058.1235,
     "execution_id": "partition-downstream-4",
     "partition_equivalent": true,
     "partitions": 4,
@@ -1555,7 +1555,7 @@
     "winner_count": 1
   },
   {
-    "clock": "1f150d29975d93d8555bb999eebc5972f5cec9df3eb51982708867206d6bf9a5",
+    "clock": "039ce9d69c9296a50fd796f7487d85b849d66e97a6bf98f904980a251990c445",
     "clock_measurement": {
       "candidates": [
         {
@@ -1577,28 +1577,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 2282773741471000030,
+      "global_hazard_seed": 6038661496304451251,
       "hazard_states": [
         {
-          "action": 0.4408901005479311,
+          "action": 1.126176664425262,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 0.4744993876748045,
-          "last_completion_time_s": 2.1296357822341176e+16,
+          "current_threshold_action": 2.1952079853023907,
+          "last_completion_time_s": 2.8867847006528464e+16,
           "pending_events": [
             {
-              "action_after": 0.4408901005479311,
-              "action_before": 0.3306675754109483,
-              "action_increment": 0.11022252513698277,
+              "action_after": 1.126176664425262,
+              "action_before": 0.8446324983189465,
+              "action_increment": 0.2815441661063155,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 2.1296357822341176e+16,
+              "completion_time_s": 2.8867847006528464e+16,
               "event_ordinal": 1
             }
           ],
           "previous_rate_per_s": 9.03934998168507e-17,
-          "residual_action": 0.4408901005479311,
+          "residual_action": 0.126176664425262,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 2282773741471000030
+          "threshold_seed": 6038661496304451251
         }
       ],
       "reservations": []
@@ -1608,7 +1608,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 4877453593911435.0,
+    "duration_s": 1.245860229670326e+16,
     "execution_id": "partition-child-4",
     "partition_equivalent": true,
     "partitions": 4,
@@ -2032,7 +2032,7 @@
     "winner_count": 1
   },
   {
-    "clock": "bccc4a71f2fac0c910265300ed08676c85bf7cb32569ebf7dc414d615c35032f",
+    "clock": "cb040089f3b93265c6716e42a2bde6ef6997c87809b9cf5910123866876a4f0b",
     "clock_measurement": {
       "candidates": [
         {
@@ -2054,28 +2054,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 4287296095814937808,
+      "global_hazard_seed": 1024751184801721603,
       "hazard_states": [
         {
-          "action": 1.124783013020915,
+          "action": 0.19472347955712133,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 2.6484605206141727,
-          "last_completion_time_s": 1.6418904228429736e+16,
+          "current_threshold_action": 1.3588355162821106,
+          "last_completion_time_s": 1.6409244709825208e+16,
           "pending_events": [
             {
-              "action_after": 1.1247830130209153,
-              "action_before": 0.9841851363933007,
-              "action_increment": 0.14059787662761458,
+              "action_after": 0.19472347955712133,
+              "action_before": 0.17038304461248116,
+              "action_increment": 0.024340434944640166,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 1.6418904228429736e+16,
+              "completion_time_s": 1.6409244709825208e+16,
               "event_ordinal": 1
             }
           ],
-          "previous_rate_per_s": 9.628425302964603e-14,
-          "residual_action": 0.1247830130209151,
+          "previous_rate_per_s": 9.628425302964739e-14,
+          "residual_action": 0.19472347955712133,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 4287296095814937808
+          "threshold_seed": 1024751184801721603
         }
       ],
       "reservations": []
@@ -2085,7 +2085,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 11681899974594.945,
+    "duration_s": 2022381370058.1235,
     "execution_id": "partition-downstream-8",
     "partition_equivalent": true,
     "partitions": 8,
@@ -2094,7 +2094,7 @@
     "winner_count": 1
   },
   {
-    "clock": "086c998506ddef8072e9eecf47ba3319f296365bc864906dca1a7d8bf082728f",
+    "clock": "503fb6d3a60cd37621ace356df29778a3232611272085886a8b6922a1e106750",
     "clock_measurement": {
       "candidates": [
         {
@@ -2116,28 +2116,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 2282773741471000030,
+      "global_hazard_seed": 6038661496304451251,
       "hazard_states": [
         {
-          "action": 0.4408901005479311,
+          "action": 1.126176664425262,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 0.4744993876748045,
-          "last_completion_time_s": 2.129635782234117e+16,
+          "current_threshold_action": 2.1952079853023907,
+          "last_completion_time_s": 2.886784700652846e+16,
           "pending_events": [
             {
-              "action_after": 0.4408901005479311,
-              "action_before": 0.3857788379794398,
-              "action_increment": 0.055111262568491304,
+              "action_after": 1.126176664425262,
+              "action_before": 0.9854045813721044,
+              "action_increment": 0.14077208305315758,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 2.129635782234117e+16,
+              "completion_time_s": 2.886784700652846e+16,
               "event_ordinal": 1
             }
           ],
           "previous_rate_per_s": 9.03934998168507e-17,
-          "residual_action": 0.4408901005479311,
+          "residual_action": 0.126176664425262,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 2282773741471000030
+          "threshold_seed": 6038661496304451251
         }
       ],
       "reservations": []
@@ -2147,7 +2147,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 4877453593911435.0,
+    "duration_s": 1.245860229670326e+16,
     "execution_id": "partition-child-8",
     "partition_equivalent": true,
     "partitions": 8,
@@ -2571,7 +2571,7 @@
     "winner_count": 1
   },
   {
-    "clock": "48b22263dd1215ddb2cb1e6420dcd2d6763ab3ac83a013da1b7031acff0bff0a",
+    "clock": "9aa874eae68391b107a325ea6ebc945907a7076a9fca4a05c778fcb85fc5f34e",
     "clock_measurement": {
       "candidates": [
         {
@@ -2593,28 +2593,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 4287296095814937808,
+      "global_hazard_seed": 1024751184801721603,
       "hazard_states": [
         {
-          "action": 1.124783013020915,
+          "action": 0.19472347955712133,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 2.6484605206141727,
-          "last_completion_time_s": 1.6418904228429736e+16,
+          "current_threshold_action": 1.3588355162821106,
+          "last_completion_time_s": 1.6409244709825192e+16,
           "pending_events": [
             {
-              "action_after": 1.1247830130209153,
-              "action_before": 1.0544840747071078,
-              "action_increment": 0.07029893831380751,
+              "action_after": 0.19472347955712133,
+              "action_before": 0.18255326208480124,
+              "action_increment": 0.012170217472320083,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 1.6418904228429736e+16,
+              "completion_time_s": 1.6409244709825192e+16,
               "event_ordinal": 1
             }
           ],
-          "previous_rate_per_s": 9.628425302964603e-14,
-          "residual_action": 0.1247830130209151,
+          "previous_rate_per_s": 9.628425302964739e-14,
+          "residual_action": 0.19472347955712133,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 4287296095814937808
+          "threshold_seed": 1024751184801721603
         }
       ],
       "reservations": []
@@ -2624,7 +2624,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 11681899974594.945,
+    "duration_s": 2022381370058.1235,
     "execution_id": "partition-downstream-16",
     "partition_equivalent": true,
     "partitions": 16,
@@ -2633,7 +2633,7 @@
     "winner_count": 1
   },
   {
-    "clock": "5a27365c9e290a0879f5d7d549f5b9ecb184e50c6e9f79f319dd08b27a68c617",
+    "clock": "32808d173d1f6b9d88e5fd84c794265ae8c0040b79b4dae655006f6959a08941",
     "clock_measurement": {
       "candidates": [
         {
@@ -2655,28 +2655,28 @@
       ],
       "competition_event_index": 0,
       "consumed_event_ids": [],
-      "global_hazard_seed": 2282773741471000030,
+      "global_hazard_seed": 6038661496304451251,
       "hazard_states": [
         {
-          "action": 0.4408901005479311,
+          "action": 1.126176664425262,
           "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
           "completed_event_count": 1,
-          "current_threshold_action": 0.4744993876748045,
-          "last_completion_time_s": 2.1296357822341164e+16,
+          "current_threshold_action": 2.1952079853023907,
+          "last_completion_time_s": 2.886784700652844e+16,
           "pending_events": [
             {
-              "action_after": 0.4408901005479311,
-              "action_before": 0.41333446926368556,
-              "action_increment": 0.02755563128424554,
+              "action_after": 1.126176664425262,
+              "action_before": 1.0557906228986833,
+              "action_increment": 0.07038604152657868,
               "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
-              "completion_time_s": 2.1296357822341164e+16,
+              "completion_time_s": 2.886784700652844e+16,
               "event_ordinal": 1
             }
           ],
           "previous_rate_per_s": 9.03934998168507e-17,
-          "residual_action": 0.4408901005479311,
+          "residual_action": 0.126176664425262,
           "threshold_process": "unit_exponential",
-          "threshold_seed": 2282773741471000030
+          "threshold_seed": 6038661496304451251
         }
       ],
       "reservations": []
@@ -2686,7 +2686,7 @@
       "pending_event.action_before",
       "pending_event.action_increment"
     ],
-    "duration_s": 4877453593911435.0,
+    "duration_s": 1.245860229670326e+16,
     "execution_id": "partition-child-16",
     "partition_equivalent": true,
     "partitions": 16,

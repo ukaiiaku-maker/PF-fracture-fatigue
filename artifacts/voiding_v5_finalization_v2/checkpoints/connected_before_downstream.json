@@ -78,19 +78,19 @@
     ],
     "competition_event_index": 0,
     "consumed_event_ids": [],
-    "global_hazard_seed": 4287296095814937808,
+    "global_hazard_seed": 1024751184801721603,
     "hazard_states": [
       {
         "action": 0.0,
         "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
         "completed_event_count": 0,
-        "current_threshold_action": 1.1247830130209153,
+        "current_threshold_action": 0.19472347955712133,
         "last_completion_time_s": null,
         "pending_events": [],
         "previous_rate_per_s": null,
         "residual_action": 0.0,
         "threshold_process": "unit_exponential",
-        "threshold_seed": 4287296095814937808
+        "threshold_seed": 1024751184801721603
       }
     ],
     "reservations": [],
@@ -100,13 +100,13 @@
     "emission_work": 1.0,
     "hazard_dissipation_J_per_m": 0.001086749814427115,
     "latest_constrained_reaction_l2_N_per_m": 43318.77662967258,
-    "latest_energy_reaction_identity": 0.0046749783767794945,
+    "latest_energy_reaction_identity": 0.004674978376779662,
     "latest_fem_energy_J_per_m": 0.010458243746255723,
-    "latest_free_dof_residual_l2_N_per_m": 5.825776433182848e-10,
-    "latest_reaction_N_per_m": 51645.30526032089,
+    "latest_free_dof_residual_l2_N_per_m": 6.234798395105541e-10,
+    "latest_reaction_N_per_m": 51645.30526032082,
     "latest_residual_l2_N_per_m": 43318.77662967258,
-    "latest_top_bottom_reaction_balance": 0.0030743983605156975,
-    "topology_release_J_per_m": 0.0027809502339235063
+    "latest_top_bottom_reaction_balance": 0.0030743983605151367,
+    "topology_release_J_per_m": 0.0027809502339235046
   },
   "event_counters": {
     "accepted_steps": 0,
@@ -117,10 +117,10 @@
   "has_production_void_state": true,
   "has_rng_state": true,
   "production_void_state": {
-    "available_defect_inventory_area_m2": 4.966822228908725e-10,
+    "available_defect_inventory_area_m2": 4.966822228908758e-10,
     "cavities": [
       {
-        "area_m2": 9.503317777109128e-09,
+        "area_m2": 9.503317777109124e-09,
         "cavity_id": "void:site-1",
         "center_m": [
           0.0007,
@@ -139,7 +139,7 @@
           0.0
         ],
         "geometry_generation": 3,
-        "inventory_area_m2": 9.503317777109128e-09,
+        "inventory_area_m2": 9.503317777109124e-09,
         "lineage": [
           "site-1",
           "GEOMETRIC_PROMOTION",
@@ -147,10 +147,10 @@
         ],
         "parent_site_id": "site-1",
         "phase": "CONNECTED_VOID",
-        "radius_m": 5.500000000000001e-05
+        "radius_m": 5.5e-05
       }
     ],
-    "consumed_defect_inventory_area_m2": 9.503317777109128e-09,
+    "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
     "event_history": [
       {
         "event": "BIRTH_HIT",
@@ -238,24 +238,24 @@
       }
     ]
   },
-  "production_void_state_sha256": "6ce7226caa2daae8dab6df3d4d2209d989ddd25d383c8488a6ea8de3c854455b",
+  "production_void_state_sha256": "2176ba3289a55e90549741c88264f28e8fdb4a0318c71295f78dbe7498454ac5",
   "provider_runtime": null,
   "schema": "v11.live-fem-branch-checkpoint/1",
   "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
   "state_file": "connected_before_downstream.json.state.pkl",
-  "state_sha256": "81ed6fece35f27056e787171ff69ef9d43f157c4bfef70d8bff7b153dab75fd3",
+  "state_sha256": "51b6586f3d4eac610f7809d2f87c1a73362fda1bd14de90c672ae7e16087f5cd",
   "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
   "v12_support_state": {
-    "accepted_p0_damage_fingerprint": "4c53b06a3c9e38317b0865959151a4842a1e554d74ea29de19dff96f32f31645",
+    "accepted_p0_damage_fingerprint": "715e21059874535b8c5f6c2de061b44e6e6c8738f557bae68d491fa429bd8161",
     "active_tip_identities": [],
     "branch_vertex_lineage_fingerprint": "0392667541e87cddaec409613fd1781448beeee84cdc0b479c49c61b8115fda7",
-    "certification_arc_fingerprint": "a588b44ef3df3acbe6f940cee5a1c5c3fad2b5ccd656e629c716c5b007e09cd2",
+    "certification_arc_fingerprint": "c2a5d2e7354a68301fb1dabff2b07dcef63b59fdbac7ce50b0658082c55f143c",
     "checkpoint_generation": 0,
     "complete_crack_graph_fingerprint": "f354b37d678748735938fe34cb1c9c3fcf141e1519c727bb542c77fb513f91b4",
     "configuration_hash": "5c6062ee6180784a1916ca9a6daca5bcbbcf464cbeb8e7661ab922be85ce483b",
     "mesh_connectivity_fingerprint": "cf793c6f5db34ed0d5ded41492a746db5298c7ae7621972b7ca63755f6968541",
     "mesh_generation": 0,
-    "mesh_geometry_fingerprint": "f80194acf34b7003b02edfb307c5c19ca413b27fa65259dc0791d37b0ff02aac",
+    "mesh_geometry_fingerprint": "20e648ac75ebfd81e0bdc0f70975d8dfe1927c6ce33c8f45744aa49a27aad818",
     "model_id": "sharp_wake_mechanically_separating_v12",
     "physical_graph_length_m": 0.0006447338785193029,
     "previous_accepted_transaction": null,
@@ -1006,7 +1006,7 @@
       2382,
       2384
     ],
-    "source_commit": "361774073e6a734dc24e4f22d600e721fbe62aa9",
+    "source_commit": "d050c238e72090e4a805acf88fce876a968b7117",
     "transaction_identity": "ligament-connected-dormant"
   }
 }
