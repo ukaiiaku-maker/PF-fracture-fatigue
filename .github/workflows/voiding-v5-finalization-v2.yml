@@ -37,7 +37,7 @@ jobs:
       - name: Exact broad and committed-evidence comparison
         run: |
           diff -ru /tmp/campaign-a /tmp/campaign-b
-          diff -ru artifacts/voiding_v5_finalization_v2 /tmp/campaign-a
+          python scripts/compare_voiding_v5_finalization_v2.py artifacts/voiding_v5_finalization_v2 /tmp/campaign-a
       - name: Evidence ontology and integrity manifests
         if: always()
         run: |

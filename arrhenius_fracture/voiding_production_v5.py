@@ -816,7 +816,17 @@ def _transition_competition_source(state, source, *, candidates=None):
                        "stale_at_geometry_generation": int(state.crack_network.geometry_generation)})
         provenance[event.event_id] = record
         stale.append(record)
-    seed_payload = json.dumps({"source": source, "seed": state.competition.global_hazard_seed},
+    seed_source = {
+        key: source.get(key) for key in (
+            "source_kind", "source_front_id", "source_cavity_id",
+            "source_boundary_site_id", "source_geometry_generation",
+        )
+    }
+    seed_source["candidate_ids"] = sorted(
+        candidate.candidate_id
+        for candidate in (state.competition.candidates if candidates is None else candidates)
+    )
+    seed_payload = json.dumps({"source": seed_source, "seed": state.competition.global_hazard_seed},
                               sort_keys=True, separators=(",", ":")).encode()
     seed = int.from_bytes(hashlib.sha256(seed_payload).digest()[:8], "big") & ((1 << 63) - 1)
     competition = DirectionalCompetitionState.initialize(
