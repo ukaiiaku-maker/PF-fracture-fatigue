@@ -119,20 +119,26 @@ def topology_overlay(ax, network: dict, *, owner_by_front: dict | None = None, o
         ax.plot(path[:, 0], path[:, 1], style, color=color, lw=1.2, zorder=5)
 
 
-def annotate_panel(ax, terminal: dict) -> None:
+def annotate_panel(ax, terminal: dict, *, scale_length_um: float = 250.0) -> None:
     text = (
         f"reach {terminal['achieved_forward_reach_um']:.1f} µm\n"
         f"births {terminal['cumulative_branch_births']}; max active {terminal['maximum_concurrent_active_fronts']}"
     )
     if not terminal["target_reached"]:
-        text += "\n" + terminal["terminal_label"].replace("V12_FIELD_ATLAS_", "")
+        reason = terminal.get("exact_terminal_reason", terminal["terminal_label"])
+        status = (
+            "fail-closed: wake-overlap gate"
+            if reason.startswith("candidate_segment_already_in_committed_wake_material")
+            else "fail-closed: " + reason.split(":", 1)[0]
+        )
+        text += "\n" + status
     ax.text(0.015, 0.985, text, transform=ax.transAxes, va="top", ha="left", fontsize=5.8,
             bbox={"facecolor": "white", "alpha": 0.72, "edgecolor": "none", "pad": 1.5})
     x0, x1 = ax.get_xlim(); y0, y1 = ax.get_ylim()
-    length = 250.0
+    length = float(scale_length_um)
     ax.plot([x0 + 0.04*(x1-x0), x0 + 0.04*(x1-x0) + length], [y0 + 0.055*(y1-y0)]*2,
             color="black", lw=2.0, zorder=10)
-    ax.text(x0 + 0.04*(x1-x0) + length/2, y0 + 0.07*(y1-y0), "250 µm",
+    ax.text(x0 + 0.04*(x1-x0) + length/2, y0 + 0.07*(y1-y0), f"{length:g} µm",
             ha="center", va="bottom", fontsize=6)
     ax.plot([500.0], [0.0], marker="|", color="red", ms=8, mew=1.1, zorder=8)
 
@@ -145,7 +151,8 @@ def save_figure(fig, base: Path) -> None:
 
 
 def matrix_figure(records: dict, figures: Path, *, field: str, filename: str,
-                  title: str, nodal: bool, cmap: str, autoscale: bool = False) -> None:
+                  title: str, nodal: bool, cmap: str, autoscale: bool = False,
+                  spatial_zoom: bool = False) -> None:
     values = [records[case]["arrays"][field] for case in CASES]
     common_min = min(float(np.nanmin(v)) for v in values)
     common_max = max(float(np.nanmax(v)) for v in values)
@@ -171,9 +178,13 @@ def matrix_figure(records: dict, figures: Path, *, field: str, filename: str,
                 for junction in rec["metadata"]["junctions"].values():
                     xy = np.asarray(junction["junction_xy_m"]) * 1e6
                     ax.plot(xy[0], xy[1], marker="o", ms=2.6, mec="black", mfc="yellow", zorder=7)
-                ax.set_aspect("equal"); ax.set_xlim(rec["limits"][0]); ax.set_ylim(rec["limits"][1])
+                limits = rec["zoom_limits"] if spatial_zoom else rec["limits"]
+                ax.set_aspect("equal"); ax.set_xlim(limits[0]); ax.set_ylim(limits[1])
                 ax.set_title(f"{DISPLAY[material]}, {temperature} K", fontsize=9)
-                annotate_panel(ax, rec["terminal"])
+                annotate_panel(
+                    ax, rec["terminal"],
+                    scale_length_um=10.0 if spatial_zoom else 250.0,
+                )
                 if row_index == 3: ax.set_xlabel("x (µm)")
                 if col_index == 0: ax.set_ylabel("y (µm)")
         fig.suptitle(title + (" — individual scales" if local_scale else " — common scale"), fontsize=12)
@@ -183,7 +194,7 @@ def matrix_figure(records: dict, figures: Path, *, field: str, filename: str,
         save_figure(fig, figures / f"{filename}{suffix}")
 
 
-def branch_owner_figure(records: dict, figures: Path) -> None:
+def branch_owner_figure(records: dict, figures: Path, *, spatial_zoom: bool = False) -> None:
     fig, axes = plt.subplots(4, 2, figsize=(12.2, 12.0), sharex=True, sharey=True)
     for ri, material in enumerate(ROW_ORDER):
         for ci, temperature in enumerate((300, 1000)):
@@ -194,13 +205,27 @@ def branch_owner_figure(records: dict, figures: Path) -> None:
                 ax.scatter(*xy, s=18, facecolor="yellow", edgecolor="black", zorder=7)
                 ax.text(xy[0], xy[1], junction_id[-4:], fontsize=4.5)
             ax.axvline(500.0, color="0.5", lw=0.5, ls=":")
-            ax.set_aspect("equal"); ax.set_xlim(rec["limits"][0]); ax.set_ylim(rec["limits"][1])
-            ax.set_title(f"{DISPLAY[material]}, {temperature} K", fontsize=9); annotate_panel(ax, rec["terminal"])
+            limits = rec["zoom_limits"] if spatial_zoom else rec["limits"]
+            ax.set_aspect("equal"); ax.set_xlim(limits[0]); ax.set_ylim(limits[1])
+            ax.set_title(f"{DISPLAY[material]}, {temperature} K", fontsize=9)
+            annotate_panel(
+                ax, rec["terminal"],
+                scale_length_um=10.0 if spatial_zoom else 250.0,
+            )
             if ri == 3: ax.set_xlabel("x (µm)")
             if ci == 0: ax.set_ylabel("y (µm)")
-    fig.suptitle("Final accepted branch, junction, and process-owner map", fontsize=12)
+    fig.suptitle(
+        "Final accepted branch, junction, and process-owner map"
+        + (" — crack-tip zoom" if spatial_zoom else " — specimen context"),
+        fontsize=12,
+    )
     fig.subplots_adjust(top=0.95, hspace=0.22, wspace=0.08)
-    save_figure(fig, figures / "final_branch_junction_owner_map")
+    save_figure(
+        fig, figures / (
+            "final_branch_junction_owner_map_tip_zoom"
+            if spatial_zoom else "final_branch_junction_owner_map"
+        )
+    )
 
 
 def process_zone_figure(records: dict, figures: Path) -> None:
@@ -321,7 +346,20 @@ def main() -> int:
                 "wake_ledgers_json": json.dumps(owner["wake_ledgers"], sort_keys=True),
                 "signed_system_ledgers_json": json.dumps(owner["signed_system_ledgers"], sort_keys=True),
             })
-    for rec in records.values(): rec["limits"] = (tuple(global_x), tuple(global_y))
+    network_points = np.vstack([
+        np.asarray(branch["path_m"], dtype=float) * 1e6
+        for rec in records.values()
+        for branch in rec["network"]["branches"]
+    ])
+    tip_points = network_points[network_points[:, 0] >= 500.0 - 1e-8]
+    zoom_x = (480.0, float(np.max(tip_points[:, 0])) + 12.0)
+    zoom_y = (
+        float(np.min(tip_points[:, 1])) - 12.0,
+        float(np.max(tip_points[:, 1])) + 12.0,
+    )
+    for rec in records.values():
+        rec["limits"] = (tuple(global_x), tuple(global_y))
+        rec["zoom_limits"] = (zoom_x, zoom_y)
     summary_fields = (
         "case", "canonical_parameterization_id", "execution_alias", "temperature_K", "theta_deg", "seed",
         "source_commit", "mechanical_fingerprint", "family_sha256", "target_forward_reach_um",
@@ -347,13 +385,23 @@ def main() -> int:
     atomic_json(output / "pf_multifront_field_atlas_field_inventory.json", inventory)
     matrix_figure(records, figures, field="damage_nodal", filename="final_damage_and_crack_topology",
                   title="Final accepted sharp-wake-compatible damage and crack topology", nodal=True, cmap="gray_r")
+    matrix_figure(records, figures, field="damage_nodal", filename="final_damage_and_crack_topology_tip_zoom",
+                  title="Final accepted damage and crack topology", nodal=True, cmap="gray_r", spatial_zoom=True)
     matrix_figure(records, figures, field="maximum_principal_stress_Pa", filename="final_maximum_principal_stress",
                   title="Final accepted maximum principal stress", nodal=False, cmap="magma", autoscale=True)
+    matrix_figure(records, figures, field="maximum_principal_stress_Pa", filename="final_maximum_principal_stress_tip_zoom",
+                  title="Final accepted maximum principal stress", nodal=False, cmap="magma", spatial_zoom=True)
     matrix_figure(records, figures, field="equivalent_plastic_strain", filename="final_equivalent_plastic_strain",
                   title="Final accepted equivalent plastic strain", nodal=False, cmap="viridis", autoscale=True)
+    matrix_figure(records, figures, field="equivalent_plastic_strain", filename="final_equivalent_plastic_strain_tip_zoom",
+                  title="Final accepted equivalent plastic strain", nodal=False, cmap="viridis", spatial_zoom=True)
     matrix_figure(records, figures, field="displacement_magnitude_m", filename="final_displacement_magnitude",
                   title="Final accepted displacement magnitude", nodal=True, cmap="cividis", autoscale=True)
-    branch_owner_figure(records, figures); process_zone_figure(records, figures)
+    matrix_figure(records, figures, field="displacement_magnitude_m", filename="final_displacement_magnitude_tip_zoom",
+                  title="Final accepted displacement magnitude", nodal=True, cmap="cividis", spatial_zoom=True)
+    branch_owner_figure(records, figures)
+    branch_owner_figure(records, figures, spatial_zoom=True)
+    process_zone_figure(records, figures)
     provenance = {
         "schema": "v12.multifront-field-atlas-provenance/1", "claim_label": CLAIM_LABEL,
         "execution_source_commit": CORRECTED_SOURCE_COMMIT,
