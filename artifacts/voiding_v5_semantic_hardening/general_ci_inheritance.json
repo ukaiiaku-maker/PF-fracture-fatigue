@@ -42,6 +42,20 @@
       "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap"
     ]
   },
+  "ownership_topology_head": {
+    "git_sha": "a82a265af4dcfae41aad50dcc98531edb58d9310",
+    "run_ids": [33922841723, 33922845369],
+    "conclusions": ["failure", "failure"],
+    "failure_ids": [
+      "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader",
+      "tests/test_stage2_criterion_v12.py::test_required_matrices_are_complete",
+      "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id",
+      "tests/test_v10214_response_model_id.py::test_v10214_response_model_id",
+      "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly",
+      "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+      "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap"
+    ]
+  },
   "failure_identity_sets_equal": true,
   "v5_introduced_new_general_ci_failures": false,
   "general_repository_ci": "FAIL_INHERITED_BASELINE",

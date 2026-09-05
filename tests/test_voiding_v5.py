@@ -76,10 +76,19 @@ def test_series_limiter_and_duplicate_cavity_guard():
         create_subgrid_cavity(voids, site.site_id, 1.0e-6)
 
 
-def test_no_zero_drive_or_unit_rate_bypass_for_cleavage_first_passage():
+def test_zero_drive_returns_dormant_without_first_passage_or_state_consumption():
     state, _ = build_production_void_state()
-    with pytest.raises(RuntimeError, match="cannot reach first passage"):
-        _complete_next_clock(state, np.zeros((2, 2)))
+    before = state.competition
+    advanced, audit = _complete_next_clock(
+        state, np.zeros((2, 2)), maximum_advance_duration_s=10.0,
+    )
+    assert advanced.competition == before
+    assert advanced.rng_state == state.rng_state
+    assert advanced.junction_process_state["latest_directional_clock_status"] == \
+        "NO_KINETICALLY_ACTIVE_CANDIDATE"
+    assert all(row["effective_rate_s"] == 0.0 for row in audit)
+    assert all(math.isinf(row["crossing_time_s"]) for row in audit)
+    assert all(not row["emitted_event_ids"] for row in audit)
 
 
 def test_activation_work_has_energy_units_and_reference_is_not_saturated():
@@ -281,20 +290,31 @@ def test_exact_tie_ligament_transaction_selects_one_arm_and_preserves_peer():
     accepted, _ = deterministic_trajectory(stop_before_ligament=True)
     accepted = replace(accepted, competition=_two_horizontal_candidate_competition())
     connected, _ = ligament_transaction(accepted)
-    assert len(connected.competition.pending_events) == 1
-    assert len(connected.competition.consumed_event_ids) == 1
+    provenance = connected.junction_process_state["directional_event_provenance"]
+    assert sorted(row["status"] for row in provenance.values()) == [
+        "COMPLETED_BUT_GEOMETRICALLY_STALE", "CONSUMED_AT_OWNED_SOURCE",
+    ]
+    assert not connected.competition.pending_events
     assert connected.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID
 
 
 def test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer():
     accepted, _ = deterministic_trajectory(stop_before_ligament=True)
-    accepted, _ = ligament_transaction(accepted)
     accepted = replace(accepted, competition=_two_horizontal_candidate_competition())
+    accepted, _ = ligament_transaction(accepted)
+    accepted = replace(accepted, competition=replace(
+        accepted.competition,
+        hazard_states=tuple(replace(hazard, current_threshold_action=1.0)
+                            for hazard in accepted.competition.hazard_states),
+    ))
     downstream, _, _, causal = downstream_front_transaction(accepted)
     assert len(causal["emitted_winner_candidate_ids"]) == 2
     assert len(causal["selected_proposal_candidate_ids"]) == 1
-    assert len(downstream.competition.pending_events) == 1
-    assert len(downstream.competition.consumed_event_ids) == 1
+    provenance = downstream.junction_process_state["directional_event_provenance"]
+    assert list(row["status"] for row in provenance.values()).count(
+        "COMPLETED_BUT_GEOMETRICALLY_STALE"
+    ) >= 1
+    assert not downstream.competition.pending_events
 
 
 def test_offset_cavity_ligament_transaction_preserves_combined_topology():
@@ -321,7 +341,7 @@ def test_true_fixed_crack_positive_negative_offset_pair_is_mirrored_and_atomic()
         with pytest.raises(RuntimeError, match="injected:intersection_alignment"):
             ligament_transaction(accepted, failure_stage="intersection_alignment")
         assert complete_accepted_state_fingerprint(accepted) == before
-        tensor, _ = crack_tip_tensor(accepted)
+        tensor, _ = crack_tip_tensor(accepted, branch_id="b00000000")
         connected, result = ligament_transaction(accepted)
         results.append((rows[-1], tensor, connected, result))
     positive, negative = results
@@ -337,7 +357,7 @@ def test_true_fixed_crack_positive_negative_offset_pair_is_mirrored_and_atomic()
     centered, _ = deterministic_trajectory(
         stop_before_ligament=True, cavity_center_m=(7.0e-4, 0.0), crack_path_m=fixed_path,
     )
-    centered_tensor, _ = crack_tip_tensor(centered)
+    centered_tensor, _ = crack_tip_tensor(centered, branch_id="b00000000")
     assert positive[1][0, 0] == pytest.approx(negative[1][0, 0], rel=1.0e-2)
     assert positive[1][1, 1] == pytest.approx(negative[1][1, 1], rel=1.0e-2)
     # The bottom-corner rigid-body pins create a small baseline shear.  The
@@ -346,6 +366,60 @@ def test_true_fixed_crack_positive_negative_offset_pair_is_mirrored_and_atomic()
     positive_shear_increment = positive[1][0, 1] - centered_tensor[0, 1]
     negative_shear_increment = negative[1][0, 1] - centered_tensor[0, 1]
     assert positive_shear_increment == pytest.approx(-negative_shear_increment, rel=2.0e-2)
+
+
+def test_zero_drive_connected_state_partitions_restart_and_tensile_reload(tmp_path):
+    from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
+    from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+
+    fixed_path = ((0.0, 0.0), (0.0005725993004046688, 0.0))
+    accepted, _ = deterministic_trajectory(
+        stop_before_ligament=True, cavity_center_m=(7.0e-4, -1.0e-5),
+        crack_path_m=fixed_path,
+    )
+    connected, result = ligament_transaction(accepted)
+    assert result.accepted
+    assert connected.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID
+    assert connected.crack_network.active_tip_ids == ()
+    assert connected.v12_support_state.active_tip_identities == ()
+    assert all(branch.branch_id != "void-front-1" for branch in connected.crack_network.branches)
+    source = connected.junction_process_state["active_event_source"]
+    assert source["candidate_source_states"][0]["geometry_status"] == \
+        "GEOMETRICALLY_VALID_KINETICALLY_DORMANT"
+    assert source["candidate_source_states"][0]["instantaneous_status"] == \
+        "ZERO_DOWNSTREAM_DRIVE"
+
+    def invariant(state):
+        return (state.competition, state.rng_state, state.crack_network,
+                state.v12_support_state, state.void_state.cavities)
+
+    for partitions in (1, 2, 4, 8, 16):
+        trial = connected
+        before = invariant(trial)
+        for _ in range(partitions):
+            trial, audit = _complete_next_clock(
+                trial, np.zeros((2, 2)), source_kind="cavity_surface",
+                source_cavity_id="void:site-1", source_boundary_site_id="connection_exit",
+                source_position_m=trial.void_state.cavities[0].connection_exit_m,
+                source_probe_identity={"kind": "direct_cavity_boundary_tensor"},
+                maximum_advance_duration_s=16.0 / partitions,
+            )
+            assert all(row["effective_rate_s"] == 0.0 for row in audit)
+        assert invariant(trial) == before
+
+    checkpoint = tmp_path / "zero-drive-connected.json"
+    write_checkpoint(connected, checkpoint)
+    restored = restore_checkpoint(checkpoint)
+    assert complete_accepted_state_fingerprint(restored) == \
+        complete_accepted_state_fingerprint(connected)
+
+    tensile = np.eye(2) * 8.0e8
+    direct, direct_audit = _complete_next_clock(connected, tensile)
+    restarted, restarted_audit = _complete_next_clock(restored, tensile)
+    assert direct.competition == restarted.competition
+    assert direct_audit == restarted_audit
+    assert any(row["winner"] for row in direct_audit)
+    assert direct.competition.pending_events
 
 
 def test_oblique_interior_edge_intersection_is_inserted_and_rollback_safe():
@@ -446,7 +520,7 @@ def test_distinct_direction_tie_selects_intersecting_ligament_and_retains_miss()
         global_hazard_seed=3621,
     )
     probe = replace(accepted, competition=initial)
-    _, audit = _complete_next_clock(probe, crack_tip_tensor(probe)[0])
+    _, audit = _complete_next_clock(probe, crack_tip_tensor(probe, branch_id="b00000000")[0])
     rates = {row["candidate_id"]: row["rate_s"] for row in audit}
     assert all(rate > 0.0 for rate in rates.values())
     tied = replace(initial, hazard_states=tuple(
@@ -454,8 +528,11 @@ def test_distinct_direction_tie_selects_intersecting_ligament_and_retains_miss()
         for hazard in initial.hazard_states
     ))
     connected, _ = ligament_transaction(replace(accepted, competition=tied))
-    consumed_candidates = {event_id.split("#event:")[0] for event_id in connected.competition.consumed_event_ids}
-    pending_candidates = {event.candidate_id for event in connected.competition.pending_events}
+    provenance = connected.junction_process_state["directional_event_provenance"]
+    consumed_candidates = {row["candidate_id"] for row in provenance.values()
+                           if row["status"] == "CONSUMED_AT_OWNED_SOURCE"}
+    pending_candidates = {row["candidate_id"] for row in provenance.values()
+                          if row["status"] == "COMPLETED_BUT_GEOMETRICALLY_STALE"}
     assert consumed_candidates == {candidates[0].candidate_id}
     assert pending_candidates == {candidates[1].candidate_id}
 
@@ -534,3 +611,62 @@ def test_combined_certificate_detects_support_triangle_overlap_with_centroid_out
     assert certificate["support_triangle_cavity_overlap_element_ids"] == [mesh.ne - 1]
     assert certificate["wake_support_outside_cavity"] is False
     assert certificate["passed"] is False
+
+
+def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(monkeypatch):
+    import arrhenius_fracture.voiding_production_v5 as production
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    connected, _ = ligament_transaction(accepted)
+    downstream, _, _, first = downstream_front_transaction(connected)
+    assert first["source_kind"] == "cavity_surface"
+    certificate = downstream.junction_process_state["latest_crack_void_connection_certificate"]
+    assert certificate["combined_components"] == ((
+        "branch:b00000000", "branch:void-front-1", "cavity:void:site-1",
+    ),)
+    assert ("branch:void-front-1", "cavity:void:site-1") in certificate["combined_incidence_edges"]
+    assert downstream.tip_process_state["active_branch_id"] == "void-front-1"
+    assert downstream.tip_process_state["by_branch"]["void-front-1"]["r_tip_m"] > 0.0
+
+    original_tip = production.crack_tip_tensor
+    calls = []
+    def child_tip_only(state, branch_id="b00000000"):
+        calls.append(branch_id)
+        return original_tip(state, branch_id=branch_id)
+    monkeypatch.setattr(production, "crack_tip_tensor", child_tip_only)
+    monkeypatch.setattr(production, "cavity_boundary_tensor",
+                        lambda *args, **kwargs: (_ for _ in ()).throw(
+                            AssertionError("continued front reused cavity probe")))
+    continued, _, _, causal = downstream_front_transaction(downstream, continuation=True)
+    assert calls == ["void-front-1"]
+    assert causal["source_kind"] == "sharp_front"
+    assert causal["source_front_id"] == "void-front-1"
+    assert continued.junction_process_state["latest_topology_certificate_stage"] == "POST_CONTINUATION"
+
+
+def test_event_provenance_is_source_bound_and_stale_root_event_cannot_rebind():
+    accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+    accepted = replace(accepted, competition=_two_horizontal_candidate_competition())
+    connected, _ = ligament_transaction(accepted)
+    records = connected.junction_process_state["directional_event_provenance"].values()
+    required = {"source_kind", "source_front_id", "source_cavity_id",
+                "source_boundary_site_id", "source_position_m",
+                "source_geometry_generation", "source_tensor_fingerprint",
+                "source_probe_identity", "completion_time_s", "candidate_id",
+                "threshold_identity"}
+    assert all(required <= set(record) for record in records)
+    stale = [record for record in records
+             if record["status"] == "COMPLETED_BUT_GEOMETRICALLY_STALE"]
+    assert len(stale) == 1 and stale[0]["source_front_id"] == "b00000000"
+    assert connected.junction_process_state["active_event_source"]["source_kind"] == "cavity_surface"
+
+
+def test_equilibrium_metrics_separate_free_residual_from_reactions():
+    final, rows = deterministic_trajectory()
+    row = rows[-1]
+    assert row["free_dof_residual_l2_N_per_m"] < 1.0e-8 * row["constrained_reaction_l2_N_per_m"]
+    assert row["top_bottom_reaction_balance"] < 3.0e-2
+    assert row["energy_reaction_identity"] < 1.0e-2
+    assert row["full_residual_including_reactions_N_per_m"] == pytest.approx(
+        row["constrained_reaction_l2_N_per_m"], rel=1.0e-12
+    )
+    assert final.crack_network.active_tip_ids == ("void-front-1",)

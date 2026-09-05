@@ -1,6 +1,7 @@
 # V5 semantic-hardening checkpoint
 
-Status: `AUDIT_REPAIR_IN_PROGRESS`; broad finalization remains prohibited.
+Status: `PHASE_A_REQUALIFIED`; broad finalization may begin only after the
+dedicated exact-head workflow reaches a successful terminal result.
 
 This checkpoint follows, and does not rewrite, exact green checkpoint
 `2b39339d7738cc3d251146b69f10ce1a9e0e17c4`.
@@ -47,3 +48,18 @@ same seven failure identities at the exact base, retained V5 checkpoint, and
 semantic-hardening head `b786f7c9c5d2175803d50b88d4215853468d4157`:
 `V5_INTRODUCED_NEW_GENERAL_CI_FAILURES=NO_OBSERVED` and
 `GENERAL_REPOSITORY_CI=FAIL_INHERITED_BASELINE`.
+
+The requalification additionally separates geometric eligibility, kinetic
+activity, and first-passage completion. A connected cavity with an all-zero
+downstream rate set is accepted as `CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE`,
+retains every admissible source-native candidate and its untouched clock/RNG
+provenance, and has neither child nor active tip. Partition, restart, reload,
+and rollback tests preserve this state exactly.
+
+Physical external roots and inactive cavity terminals now use a strict
+per-arc/per-endpoint boundary-relative V12 certificate. The audit records exact
+incidence, component and cavity identity, independently closed cavity-cycle
+status, incident tangent, all tube/boundary intersections, interior two-sided
+seed counts, intact-path and node-star results, and the precise classification.
+Only incident traction-free-boundary clearance is conditional; all other V12
+mechanical-separation predicates and tolerances remain frozen.

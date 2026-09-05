@@ -94,6 +94,7 @@ class GraphSupportAudit:
     negative_seed_element_ids: tuple[int,...]
     certificate_fingerprint: str
     edge_cut_certificates: tuple[EdgeCutCertificate,...]
+    boundary_terminal_certificates: tuple[dict,...]
     insufficient_seed_segment_ids: tuple[str,...]
     local_h_max_m: float
     local_h_median_m: float
@@ -386,7 +387,8 @@ def junction_sector_certificates(mesh,network,selected,tolerance=1e-12):
           tuple(counts),tuple(sector_labels),within,bool(cross),legal_overlap,status,_digest(payload)))
     return tuple(results)
 
-def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=None,arcs=None,allow_boundary_clip_for_screen=False,tolerance=1e-12):
+def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=None,arcs=None,
+    boundary_terminal_context=None,allow_boundary_clip_for_screen=False,tolerance=1e-12):
     """Search the remaining intact element graph for an opposite-side path.
 
     This verifier is intentionally independent of the node-star construction:
@@ -394,6 +396,7 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
     """
     selected=set(map(int,np.asarray(selected,int))); cent=np.mean(mesh.nodes[mesh.elems],axis=1)
     paths=[]; positive_components=set(); negative_components=set(); edge_certificates=[]; insufficient=[]; boundary_edges=_external_boundary_edges(mesh)
+    boundary_terminal_audits=[]; contexts=dict(boundary_terminal_context or {})
     arcs=certification_arcs(network,tolerance) if arcs is None else arcs
     for p0,p1,arc_id in arcs:
         p0=np.asarray(p0,float); p1=np.asarray(p1,float); vector=p1-p0; length=float(np.linalg.norm(vector)); tangent=vector/length; normal=np.array((-tangent[1],tangent[0]))
@@ -419,8 +422,100 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
                     if nxt not in labels: labels[nxt]=label; queue.append(nxt)
         positive_labels=tuple(sorted({labels[e] for e in positive})); negative_labels=tuple(sorted({labels[e] for e in negative}))
         exterior_clearance=_boundary_tube_clearance(mesh,boundary_edges,p0,tangent,normal,margin,length,3*h,tolerance)
-        sufficient=bool(positive and negative and length>2*h and (exterior_clearance>tolerance or allow_boundary_clip_for_screen))
         segment_id=arc_id
+        relative_contexts=[]
+        for context in contexts.get(segment_id, ()):
+            endpoint_name=context.get("endpoint")
+            endpoint=p0 if endpoint_name=="start" else p1 if endpoint_name=="end" else None
+            declared_endpoint=np.asarray(context.get("endpoint_coordinate_m",(math.nan,math.nan)),dtype=float)
+            declared_endpoint_ok=bool(endpoint is not None and declared_endpoint.shape==(2,)
+                                      and np.all(np.isfinite(declared_endpoint))
+                                      and np.linalg.norm(declared_endpoint-endpoint)<=tolerance)
+            expected_role="physical_root" if context.get("boundary_kind")=="external_free_surface" else "inactive_terminal"
+            roles=classify_graph_vertices(network).get(tuple(endpoint),frozenset()) if endpoint is not None else frozenset()
+            node_count=int(getattr(mesh,"nn",len(mesh.nodes)))
+            edge_ids=tuple(tuple(map(int,edge)) for edge in context.get("boundary_edge_ids",())
+                           if len(edge)==2 and min(edge)>=0 and max(edge)<node_count)
+            exact_edges=tuple(edge for edge in edge_ids if edge in boundary_edges or tuple(reversed(edge)) in boundary_edges)
+            edge_degree={}
+            for a,b in exact_edges:
+                edge_degree[a]=edge_degree.get(a,0)+1; edge_degree[b]=edge_degree.get(b,0)+1
+            cavity_cycle_independently_closed=bool(len(exact_edges)>=3 and edge_degree
+                                                   and all(value==2 for value in edge_degree.values()))
+            distances=tuple(float(_point_segment_distance(endpoint[None,:],mesh.nodes[a],mesh.nodes[b])[0])
+                            for a,b in exact_edges) if endpoint is not None else ()
+            endpoint_distance=min(distances,default=math.inf)
+            role_ok=(context.get("endpoint_role")==expected_role
+                     and (roles==frozenset((expected_role,)) or expected_role in roles))
+            active_prohibited="active_tip" in roles
+            kind_ok=context.get("boundary_kind") in ("external_free_surface","cavity_free_surface")
+            identity_ok=(context.get("boundary_component_id") is not None and len(exact_edges)>=2
+                         and (context.get("boundary_kind")!="cavity_free_surface"
+                              or (context.get("cavity_id")
+                                  and context.get("cavity_id")==context.get("certified_cavity_id")
+                                  and context.get("cavity_cycle_certified") is True
+                                  and cavity_cycle_independently_closed)))
+            context_edge_set={tuple(sorted(edge)) for edge in exact_edges}
+            # Only contact with the endpoint-owned free component is allowed.
+            corners=[p0+margin*tangent-3*h*normal,p0+(length-margin)*tangent-3*h*normal,
+                     p0+(length-margin)*tangent+3*h*normal,p0+margin*tangent+3*h*normal]
+            sides=tuple(zip(corners,corners[1:]+corners[:1])); touched=[]
+            for edge in boundary_edges:
+                a,b=mesh.nodes[list(edge)]; rel_a=a-p0; rel_b=b-p0
+                inside=lambda rel: margin-tolerance<=rel@tangent<=length-margin+tolerance and abs(rel@normal)<=3*h+tolerance
+                if inside(rel_a) or inside(rel_b) or any(_segments_intersect(a,b,c,d,tolerance) for c,d in sides):
+                    touched.append(tuple(map(int,edge)))
+            unrelated=tuple(edge for edge in touched if tuple(sorted(edge)) not in context_edge_set)
+            incident_tangent=tangent if endpoint_name=="start" else -tangent
+            solid_side=[]
+            for edge in exact_edges:
+                owners=np.flatnonzero(np.sum(np.isin(mesh.elems,edge),axis=1)==2)
+                midpoint=np.mean(mesh.nodes[list(edge)],axis=0)
+                for owner in owners:
+                    centroid=np.mean(mesh.nodes[mesh.elems[int(owner)]],axis=0)
+                    solid_side.append(float(incident_tangent@(centroid-midpoint)))
+            tangent_enters=bool(solid_side and max(solid_side)>tolerance)
+            valid=bool(endpoint is not None and declared_endpoint_ok and role_ok and not active_prohibited and kind_ok and identity_ok
+                       and endpoint_distance<=tolerance and exact_edges and not unrelated and tangent_enters)
+            if active_prohibited:
+                classification="ACTIVE_TIP_BOUNDARY_CLIP_PROHIBITED"
+            elif endpoint is None or not declared_endpoint_ok or endpoint_distance>tolerance or not exact_edges:
+                classification="BOUNDARY_ENDPOINT_NOT_EXACTLY_INCIDENT"
+            elif not kind_ok or not identity_ok:
+                classification="BOUNDARY_COMPONENT_IDENTITY_NOT_CERTIFIED"
+            elif not role_ok:
+                classification="BOUNDARY_ENDPOINT_ROLE_NOT_AUTHORIZED"
+            elif unrelated:
+                classification="CERTIFICATE_TUBE_INTERSECTS_UNRELATED_BOUNDARY"
+            elif not tangent_enters:
+                classification="INCIDENT_TANGENT_DOES_NOT_ENTER_OR_APPROACH_SOLID"
+            elif not positive or not negative:
+                classification="BOUNDARY_TERMINAL_CERTIFICATE_HAS_NO_INTERIOR_TWO_SIDED_REGION"
+            elif length<=2*h:
+                classification="CERTIFICATE_ARC_TOO_SHORT"
+            elif context.get("boundary_kind")=="external_free_surface":
+                classification="CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY"
+            else:
+                classification="CERTIFIED_RELATIVE_TO_CAVITY_FREE_BOUNDARY"
+            audit={"arc_id":segment_id,"endpoint":endpoint_name,
+              "endpoint_coordinate_m":None if endpoint is None else tuple(map(float,endpoint)),
+              "declared_endpoint_coordinate_m":tuple(map(float,declared_endpoint)),
+              "endpoint_graph_role":tuple(sorted(roles)),"boundary_kind":context.get("boundary_kind"),
+              "boundary_component_id":context.get("boundary_component_id"),"boundary_edge_ids":exact_edges,
+              "cavity_id":context.get("cavity_id"),"cavity_cycle_independently_closed":cavity_cycle_independently_closed,
+              "endpoint_to_boundary_distance_m":endpoint_distance,
+              "exact_incidence":endpoint_distance<=tolerance,"incident_crack_tangent":tuple(map(float,incident_tangent)),
+              "tangent_enters_or_approaches_solid":tangent_enters,
+              "tube_boundary_intersections":tuple(touched),"unrelated_boundary_intersections":unrelated,
+              "maximum_boundary_affected_axial_extent_m":margin,"first_two_sided_axial_station_m":margin,
+              "positive_interior_seed_count":len(positive),"negative_interior_seed_count":len(negative),
+              "intact_path_exists":False,"node_star_passed":None,"only_boundary_clearance_waived":valid,
+              "classification":classification}
+            boundary_terminal_audits.append(audit)
+            if valid and audit["tangent_enters_or_approaches_solid"]: relative_contexts.append(audit)
+        boundary_relative=bool(relative_contexts)
+        sufficient=bool(positive and negative and length>2*h and
+                        (exterior_clearance>tolerance or boundary_relative or allow_boundary_clip_for_screen))
         if not sufficient: insufficient.append(segment_id)
         found=_path(adjacency,positive,negative)
         if found:
@@ -451,7 +546,8 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
     return {"intact_cross_graph_path_exists":bool(paths),"minimum_crossing_path_length":min((len(p) for _,p,_ in paths),default=None),
       "bridge_node_ids":bridge_nodes,"bridge_element_ids":bridge_elements,"positive_seed_element_ids":tuple(sorted(positive_components)),
       "negative_seed_element_ids":tuple(sorted(negative_components)),"certificate_fingerprint":_digest(payload),
-      "edge_cut_certificates":tuple(edge_certificates),"insufficient_seed_segment_ids":tuple(insufficient)}
+      "edge_cut_certificates":tuple(edge_certificates),"boundary_terminal_certificates":tuple(boundary_terminal_audits),
+      "insufficient_seed_segment_ids":tuple(insufficient)}
 
 def _unresolved_node_star_bridges(mesh,exact,candidate_nodes,selected):
     """Return exact-support nodes that retain any intact nodal coupling.
@@ -471,7 +567,7 @@ def _unresolved_node_star_bridges(mesh,exact,candidate_nodes,selected):
     return tuple(unresolved)
 
 def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previous_support=None,*,accepted_network=None,accepted_damage=None,tolerance=1e-12,
-    allow_offgrid_active_tips_for_screen=False,return_uncertified_audit_for_screen=False):
+    boundary_terminal_context=None,allow_offgrid_active_tips_for_screen=False,return_uncertified_audit_for_screen=False):
     """Build deterministic monotone O(h) support from the complete crack graph."""
     active_ids=tuple(sorted(network.active_tip_ids if active_tip_ids is None else active_tip_ids))
     if active_ids!=tuple(sorted(network.active_tip_ids)): raise ValueError("active_tip_ids must match accepted crack network")
@@ -563,10 +659,17 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
     edge_support_map={arc_id:tuple(sorted(values)) for _,_,_,values,arc_id in local_supports}
     explicit_free_surface_root = any(
         branch.local_state.get("source") == "direct_cavity_boundary_tensor"
+        or branch.local_state.get("terminal_boundary_kind") == "traction_free_cavity"
         for branch in network.branches
     )
     certificate=independent_intact_path_certificate(mesh,network,selected_ids,edge_supports=edge_support_map,
-      arcs=arcs,allow_boundary_clip_for_screen=(allow_offgrid_active_tips_for_screen or explicit_free_surface_root),tolerance=tolerance)
+      arcs=arcs,boundary_terminal_context=boundary_terminal_context,
+      allow_boundary_clip_for_screen=allow_offgrid_active_tips_for_screen,tolerance=tolerance)
+    certificate["boundary_terminal_certificates"] = tuple({
+        **row,
+        "intact_path_exists": certificate["intact_cross_graph_path_exists"],
+        "node_star_passed": not unresolved,
+    } for row in certificate["boundary_terminal_certificates"])
     premature=[]; centroids=np.mean(mesh.nodes[mesh.elems],axis=1)
     for i,p0,p1,left,_ in local_supports:
         for j,q0,q1,right,_ in local_supports[i+1:]:
@@ -636,7 +739,7 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
       graph_length,h,width_ratio,leakage_ratio,unresolved,
       certificate["intact_cross_graph_path_exists"],certificate["bridge_node_ids"],certificate["bridge_element_ids"],certificate["minimum_crossing_path_length"],
       certificate["positive_seed_element_ids"],certificate["negative_seed_element_ids"],certificate["certificate_fingerprint"],
-      certificate["edge_cut_certificates"],certificate["insufficient_seed_segment_ids"],
+      certificate["edge_cut_certificates"],certificate["boundary_terminal_certificates"],certificate["insufficient_seed_segment_ids"],
       h,h_median,float(np.sum(mesh.area_e[selected_ids])/max(graph_length*h,1e-300)),endpoint_error,
       axial_extent,signed_tip_footprint,undershoot,h_tip_max,h_tip_median,h_tip_tangent,h_tip_normal,
       leakage/max(h_tip_max,1e-300),undershoot/max(h_tip_max,1e-300),
@@ -655,6 +758,8 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
         )
         raise RuntimeError(
             f"v12_support_not_certified: {audit.certification_reason}; "
+            f"insufficient_seed_segment_ids={audit.insufficient_seed_segment_ids!r}; "
+            f"boundary_terminal_certificates={audit.boundary_terminal_certificates!r}; "
             f"junction_detail={junction_detail!r}"
         )
     return selected_ids,audit
@@ -664,11 +769,13 @@ def apply_mechanically_separating_graph(state,network,*,previous_support=None):
     owned=previous_support
     if owned is None: owned=state.junction_process_state.get("v12_support_record")
     selected,audit=mechanically_separating_graph_support(state.mesh,network,previous_support=owned,
-      accepted_network=state.crack_network,accepted_damage=before)
+      accepted_network=state.crack_network,accepted_damage=before,
+      boundary_terminal_context=state.junction_process_state.get("boundary_terminal_context"))
     newly=selected[before[selected]<1.]; audit=replace(audit,newly_selected_element_ids=tuple(map(int,newly)))
     after=before.copy(); after[selected]=1.; visual=np.asarray(state.damage,float).copy(); visual[np.unique(state.mesh.elems[selected])]=1.
     mesh=replace(state.mesh,element_damage_gp=after)
     junction=dict(state.junction_process_state); junction.update({"crack_representation":MODEL_ID,"v12_graph_support_audit":audit.__dict__,
+      "v12_boundary_terminal_certificates":audit.boundary_terminal_certificates,
       "v12_support_record":support_record(mesh,network,after,selected).__dict__,
       "v12_accepted_mechanical_fingerprint":mechanical_fingerprint(state.mesh,before),"v12_trial_mechanical_fingerprint":mechanical_fingerprint(mesh,after)})
     return replace(state,mesh=mesh,damage=visual,crack_network=network,junction_process_state=junction),audit

@@ -110,11 +110,29 @@ V12 support is rebuilt with the same empty active-tip set. The first accepted
 downstream event creates and activates exactly one child, `void-front-1`, while
 the root remains arrested. Graph ownership and support ownership must agree.
 
+Connection and downstream nucleation are distinct first-passage transitions.
+After a ligament transaction passes cleavage, energy, remesh, and topology
+gates, connection may commit while every source-native cavity-surface candidate
+is `GEOMETRICALLY_VALID_KINETICALLY_DORMANT`. Such candidates retain geometry,
+direction, tensor-probe, threshold, RNG, source, and mesh-generation provenance;
+their rate is zero, crossing time is infinite, hazard and RNG do not advance,
+and no proposal, child, or active tip is created. A later tensile state resumes
+the same preserved clocks and creates a child only at an actual crossing.
+
 The combined topology certificate is derived from mesh and graph primitives.
 It records the exact cavity cycle, endpoint/boundary incidence, per-segment
 open-disk clearance, exact triangle/open-disk support overlap, sampled coverage
 across the former ligament, the intersected edge, and the connected components
 of the actual branch/cavity incidence graph.
+
+V12 cut certification is boundary-relative only per endpoint and per arc. A
+physical root must be exactly incident on a prospectively identified unloaded
+external component and point into the solid. An inactive cavity terminal must
+be exactly incident on the independently reconstructed closed cycle of the
+identified cavity. Only clearance against that same incident free component is
+waived; two-sided seeds, intact-path exclusion, node-star closure, locality,
+support-width, leakage, incidence, junction, and overlap predicates are
+unchanged. Active tips and unrelated arcs cannot use this rule.
 
 Downstream nucleation evaluates the production cleavage law from a tensor on
 the explicit cavity boundary. No child branch exists in accepted state before

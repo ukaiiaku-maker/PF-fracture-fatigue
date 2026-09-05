@@ -44,6 +44,8 @@ PREDICATES: dict[str, Callable[[Mapping[str, Any]], bool]] = {
         values["endpoint_matches_intersection"], values["endpoint_on_cavity_boundary"],
         values["no_surviving_solid_ligament_bridge"], values["crack_graph_outside_cavity"],
         values["wake_support_outside_cavity"], values["closed_cycle_passed"],
+        values["exact_no_intact_node_or_element_path"],
+        values["exact_triangle_polygon_interior_overlap_absent"],
         values["combined_incidence_component_count"] == 1,
         not values["bridge_search_uncovered_sample_indices"],
         not values["support_triangle_cavity_overlap_element_ids"],
@@ -57,6 +59,77 @@ PREDICATES: dict[str, Callable[[Mapping[str, Any]], bool]] = {
         and values["connected_support_active_ids"] == []
         and values["downstream_graph_active_ids"] == ["void-front-1"]
         and values["downstream_support_active_ids"] == ["void-front-1"]
+    ),
+    "offset_pair_symmetry": lambda values: (
+        values["positive_certified"] and values["negative_certified"]
+        and values["reaction_relative_error"] <= values["reaction_tolerance"]
+        and values["compliance_relative_error"] <= values["compliance_tolerance"]
+        and values["mirrored_intersection_error_m"] <= values["geometry_tolerance_m"]
+    ),
+    "generalized_length_identities": lambda values: (
+        abs(values["physical_front_travel_m"] - values["physical_fractured_m"]
+            - values["traversed_physical_void_m"]) <= values["tolerance_m"]
+        and abs(values["projected_front_advance_m"] - values["projected_fractured_m"]
+                - values["projected_void_m"]) <= values["tolerance_m"]
+    ),
+    "child_sharp_front_handoff": lambda values: (
+        values["first_source_kind"] == "cavity_surface"
+        and values["continued_source_kind"] == "sharp_front"
+        and values["continued_source_front_id"] == "void-front-1"
+        and values["active_branch_id"] == "void-front-1"
+        and values["r_tip_m"] > 0.0
+        and values["topology_stage"] == "POST_CONTINUATION"
+    ),
+    "free_equilibrium_metrics": lambda values: (
+        values["free_residual_l2"] <= values["free_residual_relative_tolerance"]
+            * max(values["constrained_reaction_l2"], 1.0e-300)
+        and values["reaction_balance"] <= values["reaction_balance_tolerance"]
+        and values["energy_reaction_identity"] <= values["energy_identity_tolerance"]
+    ),
+    "distinct_direction_source_eligibility": lambda values: (
+        values["consumed_candidate_ids"] == [values["intersecting_candidate_id"]]
+        and values["geometrically_stale_candidate_ids"]
+            == [values["nonintersecting_candidate_id"]]
+    ),
+    "zero_drive_connected_invariance": lambda values: (
+        values["classification"] == "CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE"
+        and values["active_graph_tip_ids"] == []
+        and values["active_support_tip_ids"] == []
+        and not values["child_branch_exists"]
+        and all(
+            row["all_rates_zero"] and row["competition_unchanged"]
+            and row["rng_unchanged"] and row["graph_unchanged"]
+            and row["support_unchanged"]
+            for row in values["partition_measurements"]
+        )
+    ),
+    "eventwise_exact_topology": lambda values: (
+        values["certificate_passed"]
+        and values["exact_no_intact_path"]
+        and values["exact_polygon_overlap_absent"]
+        and sorted(values["component_members"]) == sorted(values["expected_component_members"])
+    ),
+    "child_tip_causal_perturbation": lambda values: (
+        values["first_passage_source_kind"] == "cavity_surface"
+        and values["continuation_source_front_id"] == "void-front-1"
+        and values["raised_child_rate_s"] > values["base_child_rate_s"] > 0.0
+        and not values["obsolete_cavity_probe_is_active_route"]
+    ),
+    "oblique_connection_geometry": lambda values: (
+        values["topology_passed"]
+        and values["physical_chord_m"] > abs(values["projected_chord_m"])
+        and values["propagation_side_boundary_arc_m"] > 0.0
+        and values["classification"] in (
+            "CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE",
+            "CONNECTED_VOID_WITH_ACTIVE_DOWNSTREAM_CANDIDATE",
+        )
+    ),
+    "boundary_relative_cut_certificate": lambda values: (
+        values["classification"] == values["expected_classification"]
+        and values["exact_incidence"] and values["tangent_enters_solid"]
+        and values["positive_seed_count"] > 0 and values["negative_seed_count"] > 0
+        and not values["intact_path_exists"] and values["node_star_passed"]
+        and values["only_boundary_clearance_waived"]
     ),
 }
 
