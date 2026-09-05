@@ -1,0 +1,32 @@
+{
+  "branch_graph": {
+    "base_v3": "3e3c79536bc76ce19589567afc0d5eca667fc691",
+    "campaign_head": "ba0803a10ce540feb92bb1d8988712d315173d59",
+    "v5_start": "87fd1b14db86c8d6458f4e9250e4cc82991651c1"
+  },
+  "counts": {
+    "end_to_end": 12,
+    "kinetic": 35,
+    "restart": 9,
+    "rollback": 9,
+    "seeds": 32,
+    "static": 156
+  },
+  "failures": 64,
+  "schema": "v12.voiding-v5-finalization-campaign/1",
+  "source_sha": "ba0803a10ce540feb92bb1d8988712d315173d59",
+  "validity_envelope": {
+    "material_calibrated": false,
+    "physical_validation": false,
+    "plane_strain_2d_only": true,
+    "schema": "v12.voiding-v5-validity-envelope/1",
+    "seed_outcomes": {
+      "STABLE_SUBGRID_VOID": 32
+    },
+    "single_void_only": true,
+    "static_outside_envelope": 36,
+    "static_pass": 120,
+    "static_recovered_after_refinement": 28,
+    "static_total": 156
+  }
+}

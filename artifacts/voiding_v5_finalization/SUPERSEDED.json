@@ -1,0 +1,11 @@
+{
+  "classification": [
+    "SUPERSEDED_INITIAL_FINALIZATION_ATTEMPT",
+    "V5_INITIAL_FINALIZATION_ATTEMPT",
+    "SUPERSEDED_PENDING_EVIDENCE_AND_DIMENSIONAL_REPAIR",
+    "DO_NOT_USE_AS_RELEASE_BASE"
+  ],
+  "reason": "Aliased controlled, partition, restart and neutrality rows; literal derivatives and audit fields; dimensionally inconsistent activation work; non-competing directional clock advancement.",
+  "superseded_head": "927529887e4e1a96c5f636145f8035eb75fee579",
+  "replacement_status": "OPEN"
+}
