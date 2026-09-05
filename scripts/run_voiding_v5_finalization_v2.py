@@ -350,7 +350,7 @@ def main(argv=None):
       "length_inventory_conservation":conservation}
     for name,rows in datasets.items(): write_json(out/(name+".json"),rows)
     write_json(out/"static_mechanics_summary.json",static)
-    manifest={"schema":"v12.voiding-v5-finalization-v2/1","implementation_sha":args.implementation_sha or head,"execution_head_sha":head,
+    manifest={"schema":"v12.voiding-v5-finalization-v2/1","implementation_sha":args.implementation_sha or head,
       "counts":{name:len(rows) for name,rows in datasets.items()},"gates":gates,"decision":"PASS" if all(gates.values()) else "BLOCKED",
       "limitations":[key for key,value in gates.items() if not value]}
     write_json(out/"campaign_manifest.json",manifest)

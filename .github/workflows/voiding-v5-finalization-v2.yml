@@ -1,0 +1,53 @@
+name: V5 finalization-v2 clean-worker reproduction
+
+on:
+  push:
+    branches: [codex/sharp-front-stateful-voiding-v5-finalization-v2]
+  workflow_dispatch:
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Complete focused regression set
+        run: python -m pytest -q tests/test_explicit_cavity_v5.py tests/test_voiding_v5.py tests/test_evidence_ontology_v5.py tests/test_voiding_v5_ci_inheritance.py tests/test_v12_stage2_base_v3.py tests/test_topology_transaction_v11.py tests/test_sharp_wake_backend_v12.py tests/test_v12_mechanically_separating_wake.py
+      - name: Small evidence A and B
+        run: |
+          python scripts/qualify_crack_void_static_v5.py /tmp/small-a/static
+          python scripts/qualify_voiding_production_v5.py /tmp/small-a/production
+          python scripts/qualify_crack_void_static_v5.py /tmp/small-b/static
+          python scripts/qualify_voiding_production_v5.py /tmp/small-b/production
+          diff -ru /tmp/small-a /tmp/small-b
+      - name: Prepare clean neutrality worktrees
+        run: |
+          git worktree add --detach /tmp/v5-neutral-base 3e3c79536bc76ce19589567afc0d5eca667fc691
+          git worktree add --detach /tmp/v5-neutral-head d050c238e72090e4a805acf88fce876a968b7117
+      - name: Regenerate broad campaign A and B
+        run: |
+          python scripts/run_voiding_v5_finalization_v2.py /tmp/campaign-a --implementation-sha d050c238e72090e4a805acf88fce876a968b7117 --neutrality-base-worktree /tmp/v5-neutral-base --neutrality-head-worktree /tmp/v5-neutral-head
+          python scripts/run_voiding_v5_finalization_v2.py /tmp/campaign-b --implementation-sha d050c238e72090e4a805acf88fce876a968b7117 --neutrality-base-worktree /tmp/v5-neutral-base --neutrality-head-worktree /tmp/v5-neutral-head
+      - name: Exact broad and committed-evidence comparison
+        run: |
+          diff -ru /tmp/campaign-a /tmp/campaign-b
+          diff -ru artifacts/voiding_v5_finalization_v2 /tmp/campaign-a
+      - name: Evidence ontology and integrity manifests
+        run: |
+          python -m pytest -q tests/test_evidence_ontology_v5.py
+          python -m json.tool /tmp/campaign-a/campaign_manifest.json
+          python -m json.tool /tmp/campaign-a/sha256_manifest.json
+      - name: Clean worktree and diff checks
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: voiding-v5-finalization-v2-${{ github.sha }}
+          path: /tmp/campaign-a
