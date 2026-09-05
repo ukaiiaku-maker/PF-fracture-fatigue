@@ -454,6 +454,7 @@ def run_trajectory(
     max_blocks_per_event: int = MAX_BLOCKS_PER_EVENT,
     max_wall_seconds: float = MAX_WALL_SECONDS_PER_TRAJECTORY,
     hazard_rng_seed: int = SEED,
+    static_shield_control: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Drive one fresh, unresumed trajectory in-process via the real
     A_NATIVE production engine's own cycle_step_waveform/
@@ -471,10 +472,26 @@ def run_trajectory(
     slope screen's exposure-unconditioned trajectory -- harmless in every
     prior use since no gate or comparison ever read this field, but
     corrected for provenance honesty going forward).
+
+    ``static_shield_control`` (default ``None``, zero effect on every
+    existing caller): opt-in hook for the v10.2.30 static-shield-
+    attribution study's PRESCRIBED_POST_FIRST_EVENT_COHESIVE_SHIELD
+    mechanism-control ablation (arrhenius_fracture/persistent_site_
+    cyclic_v10229.py's ``preview_cycle_waveform``). When provided, it is
+    installed as ``engine._static_shield_control`` immediately after
+    ``build_engine`` runs, and its ``"first_event_fired"`` key is
+    refreshed to ``len(events) >= 1`` once per event-loop iteration
+    (i.e. before that event's own block-search begins) -- so K_b applies
+    as a pure step function of already-COMMITTED events, never derived
+    from any engine-internal counter. This function never reads any other
+    key of the dict; its content and interpretation belong entirely to
+    the static-shield engine code path.
     """
     if reset_engine_registry is not None:
         reset_engine_registry()
     engine, manifest_audit = build_engine(rebonding_cfg)
+    if static_shield_control is not None:
+        engine._static_shield_control = static_shield_control
     ctrl = make_controller(n_phase)
     waveform = waveform_cls(Kmax=Kmax_Pa_sqrt_m, R=R, frequency_Hz=frequency_Hz)
 
@@ -505,6 +522,9 @@ def run_trajectory(
                 censored = True
                 censor_reason = "wall_time_budget_exhausted_between_events"
                 break
+
+            if static_shield_control is not None:
+                static_shield_control["first_event_fired"] = len(events) >= 1
 
             bulk_action_records_before = len(bulk_action_records)
             fired_result = None
@@ -620,6 +640,12 @@ def run_trajectory(
                 "all_bulk_action_qualified": all(
                     r.get("bulk_action_qualified", True) for r in new_bulk_records
                 ),
+                "K_b_applied_Pa_sqrt_m": (
+                    (
+                        float(static_shield_control["K_b_static_Pa_sqrt_m"])
+                        if static_shield_control.get("first_event_fired") else 0.0
+                    ) if static_shield_control is not None else None
+                ),
             })
     finally:
         _rebond.phase_resolved_action = original_phase_resolved_action
@@ -648,6 +674,10 @@ def run_trajectory(
         ),
         "manifest_audit": manifest_audit,
         "seed": hazard_rng_seed,
+        "Kmax_Pa_sqrt_m": Kmax_Pa_sqrt_m,
+        "T_K": T_K_,
+        "frequency_Hz": frequency_Hz,
+        "static_shield_control": static_shield_control,
         "events": events,
         "post_first_event_intervals": intervals,
         "n_accepted_events": len(events),

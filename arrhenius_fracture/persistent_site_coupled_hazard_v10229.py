@@ -111,10 +111,48 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
     # numerically close (the same phase-shifted-quadrature divergence RB1's
     # strict-parity fix addresses).
     hazard_coupled = kinetics_active and _rebond.cohesion_present(rebonding_state.cfg)
+
+    # Static-shield mechanism-control ablation (default off,
+    # PRESCRIBED_POST_FIRST_EVENT_COHESIVE_SHIELD, v10.2.30 static-shield-
+    # attribution study). Confirmed correct injection point per the same
+    # source audit as dynamic rebonding above (docs/v10_2_30_crack_
+    # rebonding_equation_lineage.md's injection-point correction history --
+    # a first attempt at persistent_site_cyclic_v10229.py::preview_cycle_
+    # waveform was dead code for this real engine hierarchy, exactly as
+    # documented there for the original rebonding implementation; this
+    # ablation is fixed to the SAME confirmed-correct location). Not a
+    # physical rebonding model: no P/C/B Markov kinetics, no contact-gated
+    # formation, no rupture/repassivation, no wake-state allocation or
+    # translation (rebonding_state is always None for this engine
+    # configuration -- REBOND_OFF/rebonding_cfg=None -- so none of that
+    # machinery is even reachable). K_b is a pure step function of whether
+    # at least one crack event has already been accepted (set externally by
+    # the run script via engine._static_shield_control, never derived from
+    # an engine-internal counter), entering ONLY sig_cleave through the
+    # identical cleavage_stress_with_rebond positive-part subtraction
+    # dynamic rebonding uses above. sig (emission), the energy-
+    # admissibility gate, MPZ transport/shielding/blunting, event length,
+    # and RNG are all untouched -- this function only ever reads them, and
+    # this branch adds no new reads or writes to any of them.
+    static_shield = getattr(engine, "_static_shield_control", None)
+    static_shield_active = (
+        not kinetics_active and static_shield is not None
+        and bool(static_shield.get("enabled", False))
+    )
     K_signed_phase = None
     K_rebond_phase = None
     K_shield_now = 0.0
     r_eff_now = 1.0e-30
+    K_b_static = 0.0
+    if static_shield_active:
+        signed_waveform = dataclasses.replace(waveform, closure_clip=False)
+        K_signed_phase = np.asarray(signed_waveform.K_phase(phases), dtype=float)
+        K_shield_now = engine.K_shield()
+        r_eff_now = engine.r_eff()
+        K_b_static = (
+            float(static_shield["K_b_static_Pa_sqrt_m"])
+            if static_shield.get("first_event_fired", False) else 0.0
+        )
     if hazard_coupled:
         signed_waveform = dataclasses.replace(waveform, closure_clip=False)
         phase_offset_rad = _rebond.chronological_phase_offset_rad(
@@ -150,6 +188,10 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
         if hazard_coupled:
             sig_cleave = _rebond.cleavage_stress_with_rebond(
                 float(K_signed_phase[_idx]), K_shield_now, float(K_rebond_phase[_idx]), r_eff_now
+            )
+        elif static_shield_active:
+            sig_cleave = _rebond.cleavage_stress_with_rebond(
+                float(K_signed_phase[_idx]), K_shield_now, K_b_static, r_eff_now
             )
         else:
             sig_cleave = sig

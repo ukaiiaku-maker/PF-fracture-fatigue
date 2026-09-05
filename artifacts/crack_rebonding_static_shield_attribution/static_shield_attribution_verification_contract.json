@@ -1,0 +1,48 @@
+{
+  "schema": "v10.2.30_crack_rebonding_static_shield_attribution_verification_contract_v1",
+  "written_before_any_new_trajectory_exists": true,
+  "purpose": "binding checklist a strict verifier must satisfy before this study's D_history/terminal classification can be accepted",
+
+  "reuse_verification_checks": [
+    "the existing zero-cohesion trajectories (D1_K{15,18,21}MPa_seed1720_zero) reload with rebonding_cfg_hash == f08635f9f5d6b18be8288180ee7ced0dbd03a45ee0ca2b6d1868a2239c715caa",
+    "the existing dynamic-rebonding trajectories (D1_K{15,18,21}MPa_seed1720_finite) reload with rebonding_cfg_hash == 271f45981545cf80d9d96c14138d9d9c6235b3f1bba20635d8e993e568d76fd2",
+    "both R == -0.95, both n_accepted_events == 30, both cumulative_extension_m == 1.5e-4",
+    "these files are NOT modified, renamed, or rerun by this study -- only read"
+  ],
+
+  "static_shield_trajectory_checks": [
+    "each new static-shield trajectory's hazard_threshold_action sequence is IDENTICAL, event-index by event-index, to the corresponding existing zero-cohesion trajectory at the same Kmax/seed (common-random-numbers design)",
+    "each new static-shield trajectory's accepted_length_m sequence matches the existing zero-cohesion trajectory's sequence exactly (same fixed event-length physics, untouched by the ablation)",
+    "K_b applied is exactly 0.0 for all events before the first accepted event and exactly 900000.0 Pa sqrt(m) for all events from the first accepted event onward -- verified from a per-event archived K_b_applied_Pa_sqrt_m field",
+    "no rebonding_state / CrackRebondingControls object is installed on the static-shield engine (rebonding_active is False for every block)",
+    "the run used the pinned interpreter and refused to overwrite an existing result path (no restart/resume)"
+  ],
+
+  "comparison_recomputation_checks": [
+    "re-derive (da/dN)_zero, (da/dN)_dynamic, (da/dN)_static for the developed, true_final_half, and true_final_six windows from the tracked ledger only",
+    "re-derive S_dynamic(K), S_static(K), D_history(K) for all three Kmax and require the accepted-length identity check to pass before using the waiting-time simplification",
+    "re-derive delta_m_dynamic, delta_m_static, delta_m_history and both adjacent secants via the reused three_point_slope_fit/adjacent_secant primitives",
+    "re-run the terminal classification gate (FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT / MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY / DYNAMIC_REBONDING_HISTORY_REQUIRED) and require EXACT match against the saved decision"
+  ],
+
+  "provenance_checks": [
+    "git rev-parse HEAD recorded at launch time for the static-shield runner matches the commit that introduced the PRESCRIBED_POST_FIRST_EVENT_COHESIVE_SHIELD code path",
+    "sha256 of persistent_site_coupled_hazard_v10229.py (the confirmed correct injection point) and the static-shield runner script recorded at launch time",
+    "Kmax_Pa_sqrt_m, T_K, frequency_Hz stored per trajectory (new provenance requirement -- a gap explicitly noted and fixed relative to the developed-confirmation campaign's ledger)",
+    "an explicit no-resume/no-restart marker stored per trajectory",
+    "an RNG-state or stream identifier stored per trajectory",
+    "frozen-configuration hash stored per trajectory"
+  ],
+
+  "portability_checks": [
+    "every value the verifier checks is re-derived from files committed to this branch -- the verifier must run correctly even if the gitignored runs/ directory is deleted"
+  ],
+
+  "test_and_hygiene_checks": [
+    "py_compile every new/modified .py file",
+    "pytest tests/ -k crack_rebonding -q passes with no regressions against the pre-study baseline",
+    "full test suite run at least once after the persistent_site_coupled_hazard_v10229.py engine change, to check for collateral impact on other studies sharing that file",
+    "git diff --check reports no whitespace errors",
+    "git status --short is clean after the final commit"
+  ]
+}
