@@ -477,6 +477,27 @@ def test_endpoint_search_budget_resolves_production_absolute_time_tolerance():
     assert (2.0 ** -(limit - 32)) <= tolerance
 
 
+def test_event_endpoint_is_first_event_side_of_discontinuous_mechanics_rate(tmp_path):
+    context = fixture(tmp_path, rate=0.1, exact_trials=True)
+
+    def discontinuous_rate(_observation, _candidate, owner):
+        return (
+            0.3
+            if owner.provisional_solved_state.accepted_load_m >= 0.5e-9
+            else 0.1
+        )
+
+    context.adapter_configuration["directional_rate_adapter"] = discontinuous_rate
+    result = run_stateful_accepted_interval_v12(
+        context, 8.4, dry_run_discard=True,
+    )
+    assert result.disposition == "accepted_event"
+    assert result.accepted_duration_s == pytest.approx(4.2, abs=1.0e-9)
+    assert result.selected_completion_time_s == pytest.approx(
+        context.physical_time_s, abs=1.0e-12
+    )
+
+
 @pytest.mark.parametrize("action,count", (
     ("one_arm", 1), ("two_arm", 1), ("coalescence", 3), ("retirement", 2),
 ))

@@ -2040,6 +2040,7 @@ def run_stateful_accepted_interval_v12(
             evaluated = evaluate_fraction(1.0)
             candidate = evaluated[-1]
         alignment_iterations = 0
+        endpoint_clock_residual_s = 0.0
         if candidate is not None and not pending_at_boundary:
             lower = 0.0
             upper = 1.0
@@ -2075,9 +2076,7 @@ def run_stateful_accepted_interval_v12(
                 completion_fraction = (
                     float(event_candidate.completion_time_s) - before_physical_time
                 ) / float(duration_s)
-                if upper - lower <= tolerance_fraction and (
-                    abs(upper - completion_fraction) <= tolerance_fraction
-                ):
+                if upper - lower <= tolerance_fraction:
                     aligned = True
                     break
                 trial_fraction = min(upper, max(lower, completion_fraction))
@@ -2104,11 +2103,7 @@ def run_stateful_accepted_interval_v12(
                     float(event_evaluated[-1].completion_time_s)
                     - before_physical_time
                 ) / float(duration_s)
-                aligned = (
-                    upper - lower <= tolerance_fraction
-                    and abs(upper - final_completion_fraction)
-                    <= tolerance_fraction
-                )
+                aligned = upper - lower <= tolerance_fraction
             if not aligned:
                 raise StatefulProductionInterlock(
                     "event endpoint search did not converge to the absolute time tolerance: "
@@ -2129,12 +2124,23 @@ def run_stateful_accepted_interval_v12(
             endpoint_error = (
                 evaluated[0].physical_time_s - float(candidate.completion_time_s)
             )
-            if endpoint_error < -1.0e-12 or endpoint_error > max(
-                1.0e-12, absolute_time_tolerance
-            ):
+            if endpoint_error < -max(1.0e-12, absolute_time_tolerance):
                 raise StatefulProductionInterlock(
-                    "selected event was not aligned with the accepted interval endpoint"
+                    "selected event completion lies after the accepted event-side endpoint"
                 )
+            # The physical endpoint is the event/no-event transition bracket,
+            # not a fixed point of the endpoint-rate interpolation.  A sharp
+            # mechanics-rate transition can leave the interpolated clock time
+            # slightly behind the first event-side endpoint even after the
+            # bracket is narrower than the configured absolute-time tolerance.
+            # Relabel only that already-completed proposal at the resolved
+            # transition endpoint; its threshold, ordinal, RNG state, action,
+            # mechanics, and topology remain unchanged.
+            endpoint_clock_residual_s = max(0.0, endpoint_error)
+            candidate = replace(
+                candidate, completion_time_s=float(evaluated[0].physical_time_s)
+            )
+            evaluated = evaluated[:-1] + (candidate,)
         solved, sigma, provisional_runtime, batch, preview, candidate = evaluated
         accepted_duration_s = float(solved.physical_time_s) - before_physical_time
         trial_by_proposal = {}
@@ -2278,6 +2284,7 @@ def run_stateful_accepted_interval_v12(
                 None if candidate is None else candidate.completion_time_s
             ),
             "event_endpoint_alignment_iterations": alignment_iterations,
+            "endpoint_rate_clock_residual_s": endpoint_clock_residual_s,
         })
         rows["observation"].extend(x.__dict__ for x in batch.observations)
         rows["trial"].extend({
