@@ -55,9 +55,99 @@ class State:
 
 def network(path): return CrackNetworkState.one_tip(path)
 
+def left_free_context(m, network_value, *, declared_offset=(0.,0.), edge_subset=None,
+                      boundary_kind="external_free_surface", endpoint="start",
+                      endpoint_role="physical_root", cavity_id=None,
+                      certified_cavity_id=None, cavity_cycle_certified=None):
+    n=int(round(np.sqrt(len(m.nodes))))
+    edges=tuple((j*n,(j+1)*n) for j in range(n-1))
+    if edge_subset is not None: edges=tuple(edges[index] for index in edge_subset)
+    arc_id=certification_arcs(network_value)[0][2]
+    point=np.asarray(certification_arcs(network_value)[0][0 if endpoint=="start" else 1])+declared_offset
+    return {arc_id: ({"endpoint":endpoint,"endpoint_role":endpoint_role,
+      "endpoint_coordinate_m":tuple(point),"boundary_kind":boundary_kind,
+      "boundary_component_id":"left-free","boundary_edge_ids":edges,
+      "cavity_id":cavity_id,"certified_cavity_id":certified_cavity_id,
+      "cavity_cycle_certified":cavity_cycle_certified,
+      "tangent_enters_or_approaches_solid":True},)}
+
 def test_v12_has_new_identity_and_does_not_mutate_v11_identity():
     assert MODEL_ID=="sharp_wake_mechanically_separating_v12"
     assert V11_ID=="sharp_wake_causal_v11"
+
+@pytest.mark.parametrize("angle",[0.,30.,45.])
+def test_physical_external_free_surface_root_is_certified_per_arc(angle):
+    m=mesh(n=65); radians=np.deg2rad(angle); root=np.array((0.,-.25)); tip=root+.6*np.array((np.cos(radians),np.sin(radians)))
+    net=network((tuple(root),tuple(tip))); context=left_free_context(m,net)
+    _,audit=_graph_support(m,net,boundary_terminal_context=context,
+                          allow_offgrid_active_tips_for_screen=True)
+    certificate=audit.boundary_terminal_certificates[0]
+    assert certificate["classification"]=="CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY"
+    assert certificate["exact_incidence"] and certificate["tangent_enters_or_approaches_solid"]
+    assert certificate["positive_interior_seed_count"] and certificate["negative_interior_seed_count"]
+    assert not certificate["intact_path_exists"] and certificate["node_star_passed"]
+
+@pytest.mark.parametrize("mutation,expected",[
+    ({"declared_offset":(1e-6,0.)},"BOUNDARY_ENDPOINT_NOT_EXACTLY_INCIDENT"),
+    ({"boundary_kind":"displacement_controlled_platen"},"BOUNDARY_COMPONENT_IDENTITY_NOT_CERTIFIED"),
+    ({"boundary_kind":"externally_loaded_boundary"},"BOUNDARY_COMPONENT_IDENTITY_NOT_CERTIFIED"),
+    ({"endpoint_role":"inactive_terminal"},"BOUNDARY_ENDPOINT_ROLE_NOT_AUTHORIZED"),
+    ({"edge_subset":(31,)},"BOUNDARY_COMPONENT_IDENTITY_NOT_CERTIFIED"),
+])
+def test_boundary_terminal_context_fail_closed_classifications(mutation,expected):
+    m=mesh(n=65); net=network(((0.,0.),(.75,.2)))
+    context=left_free_context(m,net,**mutation)
+    _,audit=_graph_support(m,net,boundary_terminal_context=context,
+                          allow_offgrid_active_tips_for_screen=True,
+                          return_uncertified_audit_for_screen=True)
+    assert audit.boundary_terminal_certificates[0]["classification"]==expected
+
+def test_active_tip_may_not_use_boundary_terminal_clipping():
+    m=mesh(n=65); net=network(((.25,0.),(1.,0.)))
+    n=65; right=tuple((j*n+n-1,(j+1)*n+n-1) for j in range(n-1))
+    arc_id=certification_arcs(net)[0][2]
+    context={arc_id:({"endpoint":"end","endpoint_role":"physical_root",
+      "endpoint_coordinate_m":(1.,0.),"boundary_kind":"external_free_surface",
+      "boundary_component_id":"right-free","boundary_edge_ids":right,
+      "tangent_enters_or_approaches_solid":True},)}
+    _,audit=_graph_support(m,net,boundary_terminal_context=context,
+                          return_uncertified_audit_for_screen=True,
+                          allow_offgrid_active_tips_for_screen=True)
+    assert audit.boundary_terminal_certificates[0]["classification"]=="ACTIVE_TIP_BOUNDARY_CLIP_PROHIBITED"
+
+@pytest.mark.parametrize("angle",[30.,45.])
+def test_boundary_relative_certificate_is_partition_and_restart_invariant(angle):
+    m=mesh(n=65); radians=np.deg2rad(angle); root=np.array((0.,-.25))
+    tip=root+.6*np.array((np.cos(radians),np.sin(radians)))
+    direct=network((tuple(root),tuple(tip)))
+    midpoint=tuple((root+tip)/2)
+    partitioned=network((tuple(root),midpoint,tuple(tip)))
+    direct_ids,direct_audit=_graph_support(m,direct,boundary_terminal_context=left_free_context(m,direct),
+      allow_offgrid_active_tips_for_screen=True)
+    partitioned_ids,partitioned_audit=_graph_support(m,partitioned,boundary_terminal_context=left_free_context(m,partitioned),
+      allow_offgrid_active_tips_for_screen=True)
+    restarted_ids,restarted_audit=_graph_support(m,direct,boundary_terminal_context=left_free_context(m,direct),
+      allow_offgrid_active_tips_for_screen=True)
+    np.testing.assert_array_equal(direct_ids,partitioned_ids)
+    np.testing.assert_array_equal(direct_ids,restarted_ids)
+    assert direct_audit.support_fingerprint==partitioned_audit.support_fingerprint==restarted_audit.support_fingerprint
+    assert direct_audit.certificate_fingerprint==partitioned_audit.certificate_fingerprint==restarted_audit.certificate_fingerprint
+    assert direct_audit.boundary_terminal_certificates==restarted_audit.boundary_terminal_certificates
+
+@pytest.mark.parametrize("cavity_id,certified_id,cycle_ok",[
+    ("wrong","actual",True),("actual","actual",False),(None,None,True),
+])
+def test_cavity_terminal_requires_matching_identity_and_certified_cycle(cavity_id,certified_id,cycle_ok):
+    m=mesh(n=65)
+    branch=CrackBranchState("b00000000",None,0,0,((.75,0.),(0.,0.)),(0.,),status="arrested")
+    net=CrackNetworkState((branch,))
+    context=left_free_context(m,net,endpoint="end",endpoint_role="inactive_terminal",
+      boundary_kind="cavity_free_surface",cavity_id=cavity_id,
+      certified_cavity_id=certified_id,cavity_cycle_certified=cycle_ok)
+    _,audit=_graph_support(m,net,boundary_terminal_context=context,
+                          allow_offgrid_active_tips_for_screen=True,
+                          return_uncertified_audit_for_screen=True)
+    assert audit.boundary_terminal_certificates[0]["classification"]=="BOUNDARY_COMPONENT_IDENTITY_NOT_CERTIFIED"
 
 @pytest.mark.parametrize("angle",[0,15,-15,30,-30,45,-45])
 @pytest.mark.parametrize("phase",[0.,.037])

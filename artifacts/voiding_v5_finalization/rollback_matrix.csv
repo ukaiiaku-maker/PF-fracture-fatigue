@@ -1,0 +1,10 @@
+case_id,exception,operation,restored_exactly,status
+ROLLBACK-graph_edit,injected:graph_edit,graph_edit,True,PASS
+ROLLBACK-remesh,injected:remesh,remesh,True,PASS
+ROLLBACK-field_projection,injected:field_projection,field_projection,True,PASS
+ROLLBACK-support_rebuild,injected:support_rebuild,support_rebuild,True,PASS
+ROLLBACK-equilibrium,injected:equilibrium,equilibrium,True,PASS
+ROLLBACK-energy_gate,injected:energy_gate,energy_gate,True,PASS
+ROLLBACK-process_state_update,injected:process_state_update,process_state_update,True,PASS
+ROLLBACK-topology_verification,injected:topology_verification,topology_verification,True,PASS
+ROLLBACK-late_event_veto,injected:late_event_veto,late_event_veto,True,PASS

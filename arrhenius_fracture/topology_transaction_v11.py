@@ -111,6 +111,7 @@ class LiveFEMTopologyState:
     stored_energy_J_per_m: float
     sharp_wake_model_id: str = "sharp_wake_causal_v11"
     v12_support_state: Any = None
+    void_state: Any = None
     checkpoint_generation: int = 0
 
     def __post_init__(self) -> None:
@@ -158,6 +159,7 @@ class LiveFEMTopologyState:
             stored_energy_J_per_m=self.stored_energy_J_per_m,
             sharp_wake_model_id=self.sharp_wake_model_id,
             v12_support_state=self.v12_support_state,
+            void_state=self.void_state,
             checkpoint_generation=self.checkpoint_generation,
         )
 
@@ -254,10 +256,30 @@ def equilibrate_fixed_load_with_production_fem(
         state.mesh, displacement, state.ep_gp, sigma_gp, state.elasticity_D,
     )
     energy = float(np.sum(density * state.mesh.area_e))
+    prescribed = np.zeros(state.mesh.ndof, dtype=bool)
+    prescribed[2 * top + 1] = True
+    prescribed[2 * bot + 1] = True
+    prescribed[2 * int(state.boundary.left_bot)] = True
+    prescribed[2 * int(state.boundary.left_bot) + 1] = True
+    prescribed[2 * int(state.boundary.right_bot)] = True
+    free_residual = float(np.linalg.norm(residual[~prescribed]))
+    constrained_reaction = float(np.linalg.norm(residual[prescribed]))
+    top_reaction = float(np.sum(residual[2 * top + 1]))
+    bottom_reaction = float(np.sum(residual[2 * bot + 1]))
+    reaction_scale = max(abs(top_reaction) + abs(bottom_reaction), 1.0e-300)
+    reaction_balance = abs(top_reaction + bottom_reaction) / reaction_scale
+    boundary_work = top_reaction * top_opening + bottom_reaction * bottom_opening
+    energy_reaction_identity = abs(2.0 * energy - boundary_work) / max(
+        abs(2.0 * energy) + abs(boundary_work), 1.0e-300,
+    )
     ledger = dict(state.energy_ledgers)
     ledger.update({
         "latest_reaction_N_per_m": float(reaction),
         "latest_residual_l2_N_per_m": float(np.linalg.norm(residual)),
+        "latest_free_dof_residual_l2_N_per_m": free_residual,
+        "latest_constrained_reaction_l2_N_per_m": constrained_reaction,
+        "latest_top_bottom_reaction_balance": reaction_balance,
+        "latest_energy_reaction_identity": energy_reaction_identity,
         "latest_fem_energy_J_per_m": energy,
     })
     return replace(
@@ -310,6 +332,7 @@ def complete_accepted_state_fingerprint(state: LiveFEMTopologyState) -> str:
         "stored_energy_J_per_m": state.stored_energy_J_per_m,
         "sharp_wake_model_id": state.sharp_wake_model_id,
         "v12_support_state": state.v12_support_state,
+        "void_state": state.void_state,
         "checkpoint_generation": state.checkpoint_generation,
     }
     encoded = json.dumps(normalize(payload), sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
@@ -463,6 +486,7 @@ def apply_v12_production_trial_geometry(
     configuration: Mapping[str, Any],
     transaction_identity: str,
     failure_injector: Callable[[str, LiveFEMTopologyState], None] | None = None,
+    refinement_levels: int = 3,
 ) -> LiveFEMTopologyState:
     """Perform graph edit, conforming remesh, physical field transfer and support rebuild."""
     from .adaptive_multitip_mesh_v11 import refine_accepted_state
@@ -478,7 +502,9 @@ def apply_v12_production_trial_geometry(
         (a, b) for branch in network.branches for a, b in zip(branch.path, branch.path[1:])
     )
     refined = graph_state
-    for level in range(3):
+    if refinement_levels < 1:
+        raise ValueError("production V12 remesh requires at least one refinement level")
+    for level in range(int(refinement_levels)):
         centroids = np.asarray(refined.mesh.nodes)[np.asarray(refined.mesh.elems)].mean(axis=1)
         marked: set[int] = set()
         for start, end in graph_segments:

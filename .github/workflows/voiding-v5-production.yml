@@ -1,0 +1,39 @@
+name: V12 production-owned voiding V5
+
+on:
+  push:
+    branches: [codex/sharp-front-stateful-voiding-v5]
+  workflow_dispatch:
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Implementation regression
+        run: python -m pytest -q tests/test_explicit_cavity_v5.py tests/test_voiding_v5.py tests/test_evidence_ontology_v5.py tests/test_voiding_v5_ci_inheritance.py tests/test_v12_stage2_base_v3.py tests/test_topology_transaction_v11.py tests/test_sharp_wake_backend_v12.py tests/test_v12_mechanically_separating_wake.py
+      - name: Evidence generation A
+        run: |
+          python scripts/qualify_crack_void_static_v5.py /tmp/evidence-a/static
+          python scripts/qualify_voiding_production_v5.py /tmp/evidence-a/production
+      - name: Evidence generation B
+        run: |
+          python scripts/qualify_crack_void_static_v5.py /tmp/evidence-b/static
+          python scripts/qualify_voiding_production_v5.py /tmp/evidence-b/production
+      - name: Exact evidence comparison
+        run: diff -ru /tmp/evidence-a /tmp/evidence-b
+      - name: Evidence ontology validation
+        run: python -m pytest -q tests/test_evidence_ontology_v5.py
+      - name: Clean worktree and implementation diff check
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: voiding-v5-production-${{ github.sha }}
+          path: /tmp/evidence-a

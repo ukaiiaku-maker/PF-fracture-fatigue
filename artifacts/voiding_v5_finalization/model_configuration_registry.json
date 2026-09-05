@@ -1,0 +1,27 @@
+{
+  "classification": [
+    "DIAGNOSTIC_SINGLE_VOID_REFERENCE",
+    "NOT_MATERIAL_CALIBRATED",
+    "NOT_CANONICAL_MATERIAL_REGISTRY"
+  ],
+  "configuration": {
+    "activation_area_m2": 2e-20,
+    "attempt_frequency_s": 1000000000000.0,
+    "birth_barrier_J": 1.2e-19,
+    "enabled": true,
+    "healing_barrier_J": 1e-19,
+    "hydrostatic_work_coefficient": 1.0,
+    "normal_opening_work_coefficient": 1.0,
+    "plastic_accommodation_barrier_J": 1e-19,
+    "promotion_radius_m": 8e-06,
+    "radial_growth_scale_m": 1e-08,
+    "required_birth_hits": 2,
+    "schema": "v12.production-voiding/5",
+    "shrinkage_mobility_m_per_J_s": 100000000.0,
+    "signed_shear_work_coefficient": 0.25,
+    "stabilization_barrier_J": 8e-20,
+    "surface_reaction_barrier_J": 7e-20,
+    "vacancy_transport_barrier_J": 9e-20
+  },
+  "source_sha": "ba0803a10ce540feb92bb1d8988712d315173d59"
+}
