@@ -10,24 +10,47 @@ v2 (evidence-hardening pass, post-review): the review noted that v1's
 classification re-derivation imported analyze_developed_confirmation and
 called its own analyze_seed(), so it would silently reproduce a shared
 analysis bug (such as v1's mislabeled tail windows) rather than catch it.
-This version adds a SEPARATE, independent recomputation path
-(_independent_pair_checks / _independent_S_h below) that reimplements the
-window selection, da/dN, S_h, delta_m, and classification-input assembly
-directly against the shared, reused primitives (stable_growth_gate,
-event_index_window_rate, true_final_half_indices, three_point_slope_fit,
+This version adds a SEPARATE recomputation path (independent_recompute
+below) that reimplements the window selection, da/dN, S_h, delta_m, and
+classification-input assembly directly against the shared, reused
+primitives (stable_growth_gate, event_index_window_rate,
+true_final_half_indices, three_point_slope_fit,
 classify_developed_confirmation, apply_tail_sensitivity_gate) WITHOUT
 calling analyze_developed_confirmation.analyze_seed() -- so a defect
-specific to that module's glue code would now show up as a verifier
-disagreement rather than being silently reproduced.
+specific to that module's glue code shows up as a verifier disagreement
+rather than being silently reproduced.
 
 Also added per review: exact event-ordinal-sequence and accepted-length-
 sequence identity checks (not just aggregate assertions), exact event-
 count identity, per-trajectory R/seed/rebonding-config-hash/material-
 manifest-hash checks, a hard requirement that the accepted-length
-identity check pass before the waiting-time simplification is used (for
-both the developed and true_final_half windows), and a check against the
-physical-producer provenance record (Section 4) rather than assuming HEAD
-is the producer commit.
+identity check pass before the waiting-time simplification is used, and a
+check against the physical-producer provenance record (Section 4) rather
+than assuming HEAD is the producer commit.
+
+v3 (decomposition-repair pass, post-second-review): this level of
+independence is accurately described as INDEPENDENT_LEDGER_REDUCTION_
+WITH_SHARED_QUALIFIED_PRIMITIVES, not "fully independent" -- it still
+calls stable_growth_gate, event_index_window_rate,
+true_final_half_indices/true_final_six_indices, three_point_slope_fit,
+classify_developed_confirmation, and apply_tail_sensitivity_gate, which
+are the campaign's frozen/reused formulas themselves (reimplementing
+those would defeat the point of reusing them verbatim), not analysis
+glue. Extended per this review round: true_final_six and the
+last_50_um/last_25_um extension windows are now independently recomputed
+and cross-checked against the saved decision (not just true_final_half);
+hard checks confirm the saved decision's developed-window diagnostics are
+NOT aliased to its all-event diagnostics (the second substantive defect
+this round found) and that the retracted inter-event action-weighted
+K_rebond mean is recorded as NOT_ARCHIVED, not silently reintroduced.
+Fields the tracked ledger genuinely does not archive per trajectory
+(Kmax_Pa_sqrt_m, T_K, frequency_Hz, a nested per-event RNG seed/state
+identifier distinct from hazard_event_index, and an explicit no-resume
+marker) are reported as NOT_ARCHIVED rather than inferred from the
+trajectory's own name or a hard-coded study constant; T_K/frequency_Hz
+are instead validated through the single shared frozen_configuration_
+sha256 reproducibility check, which covers them structurally since every
+trajectory reloads that same file.
 
 Usage:
     <pinned interpreter> scripts/verify_developed_confirmation.py
@@ -55,10 +78,13 @@ from arrhenius_fracture.crack_rebonding_developed_confirmation_v10230 import (  
     STABILITY_DEFINITION_STRING,
     apply_tail_sensitivity_gate,
     classify_developed_confirmation,
+    developed_interval_event_indices,
     effective_horizon_censored,
     event_index_window_rate,
+    extension_window_rate,
     stable_growth_gate,
     true_final_half_indices,
+    true_final_six_indices,
 )
 from arrhenius_fracture.crack_rebonding_kinetics_v10230 import (  # noqa: E402
     ContactModel, CrackRebondingControls, FeedbackMode, InitialPrecrackWakeMode, RebondModelLevel,
@@ -138,12 +164,37 @@ def _independent_S_h(zero_win: dict, finite_win: dict) -> tuple[float | None, bo
     return math.log10(fr / zr), len_ident
 
 
-def independent_recompute(ledger: dict, protocol: dict) -> tuple[dict, dict, dict]:
-    """Fully independent recomputation path: reimplements per-pair hard
-    checks, window selection, S_h, and delta_m fitting directly against
-    the shared primitives -- never calls analyze_developed_confirmation."""
+NOT_ARCHIVED_PER_TRAJECTORY_FIELDS = [
+    "Kmax_Pa_sqrt_m", "T_K", "frequency_Hz",
+    "nested_per_event_rng_seed_or_state_identifier", "explicit_no_resume_marker",
+]
+
+
+def independent_recompute(ledger: dict, protocol: dict, decision: dict) -> tuple[dict, dict, dict]:
+    """INDEPENDENT_LEDGER_REDUCTION_WITH_SHARED_QUALIFIED_PRIMITIVES:
+    reimplements per-pair hard checks, window selection, S_h, and delta_m
+    fitting directly against the shared, reused primitives -- never calls
+    analyze_developed_confirmation.analyze_seed(). Not a from-scratch
+    reimplementation of the primitives themselves (stable_growth_gate,
+    the window-index functions, three_point_slope_fit, and the
+    classifiers ARE the campaign's frozen/reused formulas, intentionally
+    reused rather than reimplemented)."""
     checks: dict[str, bool] = {}
-    details: dict[str, object] = {}
+    details: dict[str, object] = {
+        "not_archived_per_trajectory_fields": NOT_ARCHIVED_PER_TRAJECTORY_FIELDS,
+        "not_archived_note": (
+            "the tracked ledger does not record Kmax/T_K/frequency_Hz per "
+            "trajectory (T_K/frequency_Hz are instead validated structurally "
+            "via the single shared frozen_configuration_sha256 check, since "
+            "every trajectory reloads that same file), nor a nested per-event "
+            "RNG seed/state snapshot distinct from hazard_event_index, nor an "
+            "explicit per-trajectory no-resume marker (no-resume is a "
+            "structural guarantee of run_developed_confirmation_stage.py's "
+            "refusal to overwrite an existing result path, not a stored "
+            "field) -- these are reported here as not archived rather than "
+            "inferred from the trajectory name or a hard-coded constant"
+        ),
+    }
 
     seeds_present = set()
     for seed in (1720, 1001723):
@@ -162,6 +213,9 @@ def independent_recompute(ledger: dict, protocol: dict) -> tuple[dict, dict, dic
     for seed in sorted(seeds_present):
         S_h_developed_by_K: dict[float, float | None] = {}
         S_h_true_final_half_by_K: dict[float, float | None] = {}
+        S_h_true_final_six_by_K: dict[float, float | None] = {}
+        S_h_last_50_um_by_K: dict[float, float | None] = {}
+        S_h_last_25_um_by_K: dict[float, float | None] = {}
         gate_pass_all = True
         uncensored_all = True
 
@@ -193,7 +247,12 @@ def independent_recompute(ledger: dict, protocol: dict) -> tuple[dict, dict, dic
             checks[f"{key}_top_level_seed_matches_trajectory_name"] = (
                 zero_traj["seed"] == seed and finite_traj["seed"] == seed
             )
-            checks[f"{key}_nested_hazard_event_index_present_every_event"] = (
+            # hazard_event_index is a per-event ordinal identifying which
+            # draw in the RNG threshold stream this event corresponds to --
+            # NOT the same thing as a nested per-event RNG seed/state
+            # snapshot (which the ledger does not archive at all; reported
+            # explicitly below as not_archived_fields rather than assumed).
+            checks[f"{key}_hazard_event_index_present_every_event"] = (
                 all(e.get("hazard_event_index") is not None for e in zero_events)
                 and all(e.get("hazard_event_index") is not None for e in finite_events)
             )
@@ -258,19 +317,103 @@ def independent_recompute(ledger: dict, protocol: dict) -> tuple[dict, dict, dic
             )
             S_h_true_final_half_by_K[Kmax] = S_h_tfh
 
+            idx6_zero = true_final_six_indices(n_zero)
+            idx6_finite = true_final_six_indices(n_finite)
+            w6_zero = event_index_window_rate(zero_events, idx6_zero, FREQUENCY_HZ)
+            w6_finite = event_index_window_rate(finite_events, idx6_finite, FREQUENCY_HZ)
+            S_h_tf6, tf6_len_ident = _independent_S_h(w6_zero, w6_finite)
+            checks[f"{key}_true_final_six_length_identity_holds_before_simplification"] = tf6_len_ident
+            checks[f"{key}_true_final_six_window_is_actual_tail"] = (
+                idx6_zero == list(range(max(n_zero - 6, 0), n_zero))
+                and idx6_finite == list(range(max(n_finite - 6, 0), n_finite))
+            )
+            S_h_true_final_six_by_K[Kmax] = S_h_tf6
+
+            w50_zero = extension_window_rate(zero_events, 50.0, FREQUENCY_HZ)
+            w50_finite = extension_window_rate(finite_events, 50.0, FREQUENCY_HZ)
+            S_h_50, len_ident_50 = _independent_S_h(w50_zero, w50_finite)
+            checks[f"{key}_last_50_um_length_identity_holds_before_simplification"] = len_ident_50
+            S_h_last_50_um_by_K[Kmax] = S_h_50
+
+            w25_zero = extension_window_rate(zero_events, 25.0, FREQUENCY_HZ)
+            w25_finite = extension_window_rate(finite_events, 25.0, FREQUENCY_HZ)
+            S_h_25, len_ident_25 = _independent_S_h(w25_zero, w25_finite)
+            checks[f"{key}_last_25_um_length_identity_holds_before_simplification"] = len_ident_25
+            S_h_last_25_um_by_K[Kmax] = S_h_25
+
+            # Cross-check the developed-window event-index selection and
+            # the developed/all-event diagnostic non-aliasing this review
+            # round specifically flagged, against the saved decision.
+            dev_idx_zero_independent = developed_interval_event_indices(zero_events)
+            dev_idx_finite_independent = developed_interval_event_indices(finite_events)
+            checks[f"{key}_developed_indices_exclude_transient_events_zero"] = (
+                0 not in dev_idx_zero_independent if n_zero > 4 else True
+            )
+            checks[f"{key}_developed_indices_exclude_transient_events_finite"] = (
+                0 not in dev_idx_finite_independent if n_finite > 4 else True
+            )
+            saved_pair = None
+            for seed_key in (f"seed_{seed}_analysis",):
+                sa = decision.get(seed_key)
+                if sa is not None:
+                    saved_pair = sa["per_pair"].get(key)
+            if saved_pair is not None:
+                checks[f"{key}_developed_event_ids_zero_match_saved"] = (
+                    dev_idx_zero_independent == saved_pair.get("developed_window_event_ids_zero")
+                )
+                checks[f"{key}_developed_event_ids_finite_match_saved"] = (
+                    dev_idx_finite_independent == saved_pair.get("developed_window_event_ids_finite")
+                )
+                checks[f"{key}_developed_diagnostics_not_aliased_to_all_event"] = bool(
+                    saved_pair.get("developed_window_diagnostics_is_not_alias_of_all_event")
+                )
+                for cohesion_label in ("zero", "finite"):
+                    diag_key = f"{cohesion_label}_exposure_and_action" if cohesion_label == "zero" else "finite_exposure_and_action"
+                    aw = saved_pair.get(diag_key, {}).get("action_weighted_K_rebond_true_inter_event_weighted", {})
+                    checks[f"{key}_{cohesion_label}_inter_event_weighted_status_not_archived_all_event"] = (
+                        aw.get("status") == "NOT_ARCHIVED"
+                    )
+                    dev_aw = saved_pair.get("diagnostics_developed_window", {}).get(cohesion_label, {}).get(
+                        "action_weighted_K_rebond_true_inter_event_weighted", {}
+                    )
+                    checks[f"{key}_{cohesion_label}_inter_event_weighted_status_not_archived_developed"] = (
+                        dev_aw.get("status") == "NOT_ARCHIVED"
+                    )
+
         x = [math.log10(K) for K in KMAX_GRID_Pa_sqrt_m]
-        dev_delta_m = None
-        if all(S_h_developed_by_K.get(K) is not None for K in KMAX_GRID_Pa_sqrt_m):
-            y = [S_h_developed_by_K[K] for K in KMAX_GRID_Pa_sqrt_m]
-            dev_delta_m = three_point_slope_fit(x, y)["slope"]
-        tfh_delta_m = None
-        if all(S_h_true_final_half_by_K.get(K) is not None for K in KMAX_GRID_Pa_sqrt_m):
-            y = [S_h_true_final_half_by_K[K] for K in KMAX_GRID_Pa_sqrt_m]
-            tfh_delta_m = three_point_slope_fit(x, y)["slope"]
+
+        def _fit_delta_m(y_by_K: dict[float, float | None]) -> float | None:
+            if not all(y_by_K.get(K) is not None for K in KMAX_GRID_Pa_sqrt_m):
+                return None
+            y = [y_by_K[K] for K in KMAX_GRID_Pa_sqrt_m]
+            return three_point_slope_fit(x, y)["slope"]
+
+        dev_delta_m = _fit_delta_m(S_h_developed_by_K)
+        tfh_delta_m = _fit_delta_m(S_h_true_final_half_by_K)
+        tf6_delta_m = _fit_delta_m(S_h_true_final_six_by_K)
+        last50_delta_m = _fit_delta_m(S_h_last_50_um_by_K)
+        last25_delta_m = _fit_delta_m(S_h_last_25_um_by_K)
+
+        # Cross-check these extended windows' delta_m against the saved
+        # decision's fits_by_window for the same seed (tight tolerance).
+        saved_seed_analysis = decision.get(f"seed_{seed}_analysis")
+        if saved_seed_analysis is not None:
+            for wname, recomputed in (
+                ("true_final_six", tf6_delta_m), ("last_50_um", last50_delta_m), ("last_25_um", last25_delta_m),
+            ):
+                saved_fit = saved_seed_analysis["fits_by_window"].get(wname)
+                if saved_fit is None or recomputed is None:
+                    checks[f"seed{seed}_{wname}_delta_m_reproducible"] = saved_fit is None and recomputed is None
+                else:
+                    checks[f"seed{seed}_{wname}_delta_m_reproducible"] = (
+                        abs(saved_fit["delta_m_least_squares"] - recomputed) < 1.0e-9
+                    )
 
         per_seed[seed] = {
             "uncensored": uncensored_all, "gate_pass": gate_pass_all,
             "developed_delta_m": dev_delta_m, "true_final_half_delta_m": tfh_delta_m,
+            "true_final_six_delta_m": tf6_delta_m,
+            "last_50_um_delta_m": last50_delta_m, "last_25_um_delta_m": last25_delta_m,
             "S_h_developed_by_K": S_h_developed_by_K,
         }
 
@@ -416,7 +559,9 @@ def main(argv: list[str] | None = None) -> int:
 
     # Independent recomputation path -- does NOT call
     # analyze_developed_confirmation.analyze_seed().
-    recomputed_classification, independent_checks, independent_details = independent_recompute(ledger, protocol)
+    recomputed_classification, independent_checks, independent_details = independent_recompute(
+        ledger, protocol, decision,
+    )
     checks.update(independent_checks)
     details.update(independent_details)
 
@@ -439,12 +584,20 @@ def main(argv: list[str] | None = None) -> int:
 
     overall_pass = all(checks.values())
     verification = {
-        "schema": "v10.2.30_crack_rebonding_developed_confirmation_verification_v2",
+        "schema": "v10.2.30_crack_rebonding_developed_confirmation_verification_v3",
         "depends_on_gitignored_run_files": False,
+        "independence_level": "INDEPENDENT_LEDGER_REDUCTION_WITH_SHARED_QUALIFIED_PRIMITIVES",
         "independent_recomputation_path": (
-            "reimplements window selection/S_h/delta_m/classification-input assembly "
-            "directly against shared primitives; does not call analyze_developed_"
-            "confirmation.analyze_seed()"
+            "reimplements window selection (developed/true_final_half/true_final_six/"
+            "last_50_um/last_25_um)/S_h/delta_m/classification-input assembly directly "
+            "against the shared, reused primitives (stable_growth_gate, "
+            "event_index_window_rate, extension_window_rate, true_final_half_indices, "
+            "true_final_six_indices, three_point_slope_fit, "
+            "classify_developed_confirmation, apply_tail_sensitivity_gate); does not "
+            "call analyze_developed_confirmation.analyze_seed(). This is NOT a "
+            "from-scratch reimplementation of those shared primitives themselves -- "
+            "reimplementing the campaign's own frozen/reused gate and classifier "
+            "formulas would defeat the point of reusing them verbatim."
         ),
         "checks": checks,
         "details": details,

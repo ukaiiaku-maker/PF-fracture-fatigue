@@ -1,6 +1,6 @@
 {
   "frequency_Hz": 1000.0,
-  "frozen_predictions_reference": "/private/tmp/v10230-crack-rebonding-developed-evidence-hardening/artifacts/crack_rebonding_developed_confirmation/developed_confirmation_predictions.json",
+  "frozen_predictions_reference": "/private/tmp/v10230-crack-rebonding-developed-decomposition-repair/artifacts/crack_rebonding_developed_confirmation/developed_confirmation_predictions.json",
   "kmax_grid_Pa_sqrt_m": [
     15000000.0,
     18000000.0,
@@ -39,27 +39,27 @@
         "all_event": {
           "S_abs_S_occupancy_by_Kmax": {
             "15000000": {
-              "S_abs_decade": -0.04005004456799712,
+              "S_abs_decade": -0.04105032465094839,
               "S_abs_method": "local_power_law_fallback",
               "S_h_decade": -0.12451420596844216,
-              "S_occupancy_residual_decade": -0.08446416140044505
+              "S_occupancy_residual_decade": -0.08346388131749377
             },
             "18000000": {
-              "S_abs_decade": -0.04515523994207542,
+              "S_abs_decade": -0.04624970573956239,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.04267399603155317,
-              "S_occupancy_residual_decade": 0.002481243910522249
+              "S_occupancy_residual_decade": 0.003575709708009224
             },
             "21000000": {
-              "S_abs_decade": -0.01974248969722423,
+              "S_abs_decade": -0.020221005142132546,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.02639969593318141,
-              "S_occupancy_residual_decade": -0.00665720623595718
+              "S_occupancy_residual_decade": -0.006178690791048866
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918667,
-          "pooled_K_b_Pa_sqrt_m": 848693.1448038365,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 869263.639407354,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "all_event",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 1.907607437336212e-07,
@@ -70,27 +70,27 @@
         "developed": {
           "S_abs_S_occupancy_by_Kmax": {
             "15000000": {
-              "S_abs_decade": -0.04005004456799712,
+              "S_abs_decade": -0.04250622161949126,
               "S_abs_method": "local_power_law_fallback",
               "S_h_decade": -0.12540573839964805,
-              "S_occupancy_residual_decade": -0.08535569383165093
+              "S_occupancy_residual_decade": -0.08289951678015679
             },
             "18000000": {
-              "S_abs_decade": -0.04515523994207499,
+              "S_abs_decade": -0.047839846697985765,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.04296056357219288,
-              "S_occupancy_residual_decade": 0.0021946763698821106
+              "S_occupancy_residual_decade": 0.004879283125792888
             },
             "21000000": {
-              "S_abs_decade": -0.019742489697223878,
+              "S_abs_decade": -0.020916236559995166,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.026572290815174388,
-              "S_occupancy_residual_decade": -0.00682980111795051
+              "S_occupancy_residual_decade": -0.005656054255179222
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918667,
-          "pooled_K_b_Pa_sqrt_m": 848693.1448038365,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 899150.3531623315,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "developed",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 2.1043477960013614e-07,
@@ -101,27 +101,27 @@
         "last_50_um": {
           "S_abs_S_occupancy_by_Kmax": {
             "15000000": {
-              "S_abs_decade": -0.042547656285704,
+              "S_abs_decade": -0.042439931346293536,
               "S_abs_method": "local_power_law_fallback",
               "S_h_decade": -0.12527373391645164,
-              "S_occupancy_residual_decade": -0.08272607763074763
+              "S_occupancy_residual_decade": -0.0828338025701581
             },
             "18000000": {
-              "S_abs_decade": -0.04788505267974208,
+              "S_abs_decade": -0.04776751712717498,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.042964512414627905,
-              "S_occupancy_residual_decade": 0.004920540265114175
+              "S_occupancy_residual_decade": 0.0048030047125470765
             },
             "21000000": {
-              "S_abs_decade": -0.020936001234708165,
+              "S_abs_decade": -0.020884613080451808,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.02652142319351995,
-              "S_occupancy_residual_decade": -0.005585421958811784
+              "S_occupancy_residual_decade": -0.005636810113068141
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918667,
-          "pooled_K_b_Pa_sqrt_m": 900000.0,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 897790.9182220618,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "last_50_um",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 2.3669922273263827e-07,
@@ -132,27 +132,27 @@
         "true_final_half": {
           "S_abs_S_occupancy_by_Kmax": {
             "15000000": {
-              "S_abs_decade": -0.04254765628570416,
+              "S_abs_decade": -0.04247583778432871,
               "S_abs_method": "local_power_law_fallback",
               "S_h_decade": -0.12528255427157425,
-              "S_occupancy_residual_decade": -0.0827348979858701
+              "S_occupancy_residual_decade": -0.08280671648724555
             },
             "18000000": {
-              "S_abs_decade": -0.04788505267974235,
+              "S_abs_decade": -0.047806695644697916,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.04293348301171313,
-              "S_occupancy_residual_decade": 0.004951569668029218
+              "S_occupancy_residual_decade": 0.004873212632984784
             },
             "21000000": {
-              "S_abs_decade": -0.020936001234708825,
+              "S_abs_decade": -0.02090174246520408,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.02653792181408298,
-              "S_occupancy_residual_decade": -0.005601920579374156
+              "S_occupancy_residual_decade": -0.0056361793488789
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918724,
-          "pooled_K_b_Pa_sqrt_m": 900000.0,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 898527.2788147079,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "true_final_half",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 2.378586701341105e-07,
@@ -163,27 +163,27 @@
         "true_final_six": {
           "S_abs_S_occupancy_by_Kmax": {
             "15000000": {
-              "S_abs_decade": -0.042547656285704,
+              "S_abs_decade": -0.04236812409454985,
               "S_abs_method": "local_power_law_fallback",
               "S_h_decade": -0.12502171223935885,
-              "S_occupancy_residual_decade": -0.08247405595365484
+              "S_occupancy_residual_decade": -0.082653588144809
             },
             "18000000": {
-              "S_abs_decade": -0.047885052679742884,
+              "S_abs_decade": -0.04768916009213047,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.04278786901371147,
-              "S_occupancy_residual_decade": 0.005097183666031416
+              "S_occupancy_residual_decade": 0.0049012910784190025
             },
             "21000000": {
-              "S_abs_decade": -0.020936001234709126,
+              "S_abs_decade": -0.0208503543109481,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.026344930535316214,
-              "S_occupancy_residual_decade": -0.005408929300607088
+              "S_occupancy_residual_decade": -0.005494576224368115
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918667,
-          "pooled_K_b_Pa_sqrt_m": 900000.0,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 896318.1970367697,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "true_final_six",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 3.05811690628005e-07,
@@ -199,27 +199,27 @@
         "all_event": {
           "S_abs_S_occupancy_by_Kmax": {
             "15000000": {
-              "S_abs_decade": -0.022751837857030048,
+              "S_abs_decade": -0.03957620293971396,
               "S_abs_method": "local_power_law_fallback",
               "S_h_decade": -0.12515384810536642,
-              "S_occupancy_residual_decade": -0.10240201024833637
+              "S_occupancy_residual_decade": -0.08557764516565247
             },
             "18000000": {
-              "S_abs_decade": -0.025974227565671606,
+              "S_abs_decade": -0.04463622571087164,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.04272473681447621,
-              "S_occupancy_residual_decade": -0.016750509248804602
+              "S_occupancy_residual_decade": 0.001911488896395433
             },
             "21000000": {
-              "S_abs_decade": -0.011356288235128383,
+              "S_abs_decade": -0.019515569562917934,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.026459530393899193,
-              "S_occupancy_residual_decade": -0.01510324215877081
+              "S_occupancy_residual_decade": -0.0069439608309812585
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918669,
-          "pooled_K_b_Pa_sqrt_m": 488185.84299048706,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 838938.2676147573,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "all_event",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 2.5490086602983976e-07,
@@ -230,27 +230,27 @@
         "developed": {
           "S_abs_S_occupancy_by_Kmax": {
             "15000000": {
-              "S_abs_decade": -0.022751837857029958,
+              "S_abs_decade": -0.04198517565025662,
               "S_abs_method": "local_power_law_fallback",
               "S_h_decade": -0.12545937189413456,
-              "S_occupancy_residual_decade": -0.1027075340371046
+              "S_occupancy_residual_decade": -0.08347419624387795
             },
             "18000000": {
-              "S_abs_decade": -0.02597422756567094,
+              "S_abs_decade": -0.04727114341309058,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.042871801689660975,
-              "S_occupancy_residual_decade": -0.016897574123990036
+              "S_occupancy_residual_decade": 0.004399341723429602
             },
             "21000000": {
-              "S_abs_decade": -0.01135628823512947,
+              "S_abs_decade": -0.020667591690490098,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.026548712588616314,
-              "S_occupancy_residual_decade": -0.015192424353486843
+              "S_occupancy_residual_decade": -0.005881120898126216
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918607,
-          "pooled_K_b_Pa_sqrt_m": 488185.84299048706,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 888461.5697578507,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "developed",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 2.2827475558511557e-07,
@@ -261,27 +261,27 @@
         "last_50_um": {
           "S_abs_S_occupancy_by_Kmax": {
             "15000000": {
-              "S_abs_decade": -0.03325769806825192,
+              "S_abs_decade": -0.04108616255868006,
               "S_abs_method": "local_power_law_fallback",
               "S_h_decade": -0.12489884810371779,
-              "S_occupancy_residual_decade": -0.09164115003546587
+              "S_occupancy_residual_decade": -0.08381268554503774
             },
             "18000000": {
-              "S_abs_decade": -0.0376810701965889,
+              "S_abs_decade": -0.04628888858644657,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.04235028320424868,
-              "S_occupancy_residual_decade": -0.004669213007659781
+              "S_occupancy_residual_decade": 0.003938605382197889
             },
             "21000000": {
-              "S_abs_decade": -0.016474680260603572,
+              "S_abs_decade": -0.02023813641974091,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.026343566210146715,
-              "S_occupancy_residual_decade": -0.009868885949543143
+              "S_occupancy_residual_decade": -0.006105429790405806
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918667,
-          "pooled_K_b_Pa_sqrt_m": 708216.0565582177,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 870000.0813704118,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "last_50_um",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 4.011599361685547e-07,
@@ -292,27 +292,27 @@
         "true_final_half": {
           "S_abs_S_occupancy_by_Kmax": {
             "15000000": {
-              "S_abs_decade": -0.03466950463116919,
+              "S_abs_decade": -0.04157298207708799,
               "S_abs_method": "local_power_law_fallback",
               "S_h_decade": -0.12517430154594175,
-              "S_occupancy_residual_decade": -0.09050479691477256
+              "S_occupancy_residual_decade": -0.08360131946885377
             },
             "18000000": {
-              "S_abs_decade": -0.0392406792429439,
+              "S_abs_decade": -0.04682094328421183,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.04269267636931835,
-              "S_occupancy_residual_decade": -0.003451997126374451
+              "S_occupancy_residual_decade": 0.004128266914893479
             },
             "21000000": {
-              "S_abs_decade": -0.01715656270810844,
+              "S_abs_decade": -0.020470758024730456,
               "S_abs_method": "shape_preserving_interpolation",
               "S_h_decade": -0.02651836234315986,
-              "S_occupancy_residual_decade": -0.009361799635051418
+              "S_occupancy_residual_decade": -0.0060476043184294025
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918669,
-          "pooled_K_b_Pa_sqrt_m": 737528.922748582,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 880000.0542469412,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "true_final_half",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 2.952693765294025e-07,
@@ -342,8 +342,8 @@
             }
           },
           "local_zero_cohesion_power_law_slope_m_zero": 1.5833367253918547,
-          "pooled_K_b_Pa_sqrt_m": 900000.0,
-          "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+          "pooled_K_b_Pa_sqrt_m": 900000.0000000001,
+          "pooled_K_b_formula": "mean over Kmax of the SIMPLE per-event arithmetic mean of action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- the inter-event action-weighted alternative is NOT_ARCHIVED, see action_weighted_K_rebond_true_inter_event_weighted's status",
           "window": "true_final_six",
           "zero_cohesion_rate_grid_m_per_cycle": {
             "15000000": 4.1873574319580873e-07,
@@ -553,18 +553,74 @@
           "waiting_time_simplification_admissible": true,
           "zero_rate_m_per_cycle": 1.860970151092536e-07
         },
+        "developed_window_diagnostics_is_not_alias_of_all_event": true,
+        "developed_window_event_ids_finite": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "developed_window_event_ids_zero": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
         "diagnostics_by_tail_window": {
           "last_25_um": {
             "finite": {
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 5,
-                "sum_cleavage_action_all_events": 1.1842337266877698e-19,
-                "sum_cleavage_action_nonzero_events": 1.1842337266877698e-19,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.1842337266877698e-19
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -584,12 +640,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 0.7109217188082849,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 0.7109217188082849
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -611,12 +666,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 10,
-                "sum_cleavage_action_all_events": 7.738838636240665e-07,
-                "sum_cleavage_action_nonzero_events": 7.738838636240665e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 7.738838636240665e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -636,12 +690,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.1338512612957548,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.1338512612957548
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -663,12 +716,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0000000002,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000002,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0000000001,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 9,
-                "sum_cleavage_action_all_events": 1.214647852180622e-06,
-                "sum_cleavage_action_nonzero_events": 1.214647852180622e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0000000001
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.214647852180622e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -688,12 +740,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.2645947692754538,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.2645947692754538
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -715,12 +766,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0000000001,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000001,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0000000001,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 5.801242711690383e-07,
-                "sum_cleavage_action_nonzero_events": 5.801242711690383e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0000000001
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.801242711690383e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -740,12 +790,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.0717739045104928,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0717739045104928
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -767,12 +816,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0000000001,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 15,
-                "sum_cleavage_action_all_events": 1.354138685186429e-06,
-                "sum_cleavage_action_nonzero_events": 1.354138685186429e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0000000001
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.354138685186429e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -792,12 +840,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.7620025760706755,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.762002576070676
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -819,12 +866,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899999.9999999999,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999999,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 1.1842337266877698e-19,
-                "sum_cleavage_action_nonzero_events": 1.1842337266877698e-19,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.1842337266877698e-19
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -844,12 +890,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.100198944865409,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.100198944865409
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -865,6 +910,56 @@
               "trajectory_integrated_A_on": "NOT_ARCHIVED",
               "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
             }
+          }
+        },
+        "diagnostics_developed_window": {
+          "finite": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0000000001,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000001,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.4512430906640837e-06
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 1.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 900000.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 26,
+            "n_intervals_complete_excursion": 3,
+            "n_intervals_partial_excursion": 23,
+            "pre_event_max_pB_mean": 0.4616835655034129,
+            "pre_event_max_pB_overall_max": 0.7061982856245267,
+            "total_negative_K_contact_time_s": 0.40534428688166063,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
+          },
+          "zero": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.2143440623454085
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 0.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 0.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 0,
+            "n_intervals_complete_excursion": 4,
+            "n_intervals_partial_excursion": 22,
+            "pre_event_max_pB_mean": 0.5010633346643518,
+            "pre_event_max_pB_overall_max": 0.7083349547717565,
+            "total_negative_K_contact_time_s": 0.3038024142461137,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
           }
         },
         "eventwise_and_rolling_waiting_time_ratios": {
@@ -1357,12 +1452,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 870000.0000000001,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000001,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 29,
-            "sum_cleavage_action_all_events": 2.451243090664244e-06,
-            "sum_cleavage_action_nonzero_events": 2.451243090664244e-06,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.4512430906642434e-06
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.9666666666666667,
@@ -1381,6 +1475,34 @@
         "finite_uncensored": true,
         "gate_finite": {
           "developed_da_dN_m_per_cycle": 1.576564637318427e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 824.577673016417,
             "da_dN": 1.576564637318427e-07,
@@ -1410,6 +1532,34 @@
         },
         "gate_zero": {
           "developed_da_dN_m_per_cycle": 2.1043477960013614e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 617.768603873482,
             "da_dN": 2.1043477960013614e-07,
@@ -1461,12 +1611,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 0,
-            "sum_cleavage_action_all_events": 4.703671071959634,
-            "sum_cleavage_action_nonzero_events": 0.0,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.703671071959634
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -1578,18 +1727,74 @@
           "waiting_time_simplification_admissible": true,
           "zero_rate_m_per_cycle": 2.687548124131438e-07
         },
+        "developed_window_diagnostics_is_not_alias_of_all_event": true,
+        "developed_window_event_ids_finite": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "developed_window_event_ids_zero": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
         "diagnostics_by_tail_window": {
           "last_25_um": {
             "finite": {
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 5,
-                "sum_cleavage_action_all_events": 5.232108520288988e-07,
-                "sum_cleavage_action_nonzero_events": 5.232108520288988e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.232108520288988e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -1609,12 +1814,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 0.4441407284557509,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 0.4441407284557509
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -1636,12 +1840,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 10,
-                "sum_cleavage_action_all_events": 6.433953412094344e-07,
-                "sum_cleavage_action_nonzero_events": 6.433953412094344e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 6.433953412094344e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -1661,12 +1864,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.3648690814557223,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.3648690814557223
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -1688,12 +1890,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 9,
-                "sum_cleavage_action_all_events": 2.3979576296028127e-06,
-                "sum_cleavage_action_nonzero_events": 2.3979576296028127e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.3979576296028127e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -1713,12 +1914,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.2175110655099863,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.2175110655099863
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -1740,12 +1940,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 1.709565758602495e-06,
-                "sum_cleavage_action_nonzero_events": 1.709565758602495e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.709565758602495e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -1765,12 +1964,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.0020582231132633,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0020582231132633
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -1792,12 +1990,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 15,
-                "sum_cleavage_action_all_events": 1.4582681272182344e-06,
-                "sum_cleavage_action_nonzero_events": 1.4582681272182344e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.4582681272182344e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -1817,12 +2014,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 3.27977223544743,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.27977223544743
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -1844,12 +2040,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899999.9999999999,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999999,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 5.232108520288988e-07,
-                "sum_cleavage_action_nonzero_events": 5.232108520288988e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.232108520288988e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -1869,12 +2064,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.3648689515797074,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.3648689515797074
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -1890,6 +2084,56 @@
               "trajectory_integrated_A_on": "NOT_ARCHIVED",
               "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
             }
+          }
+        },
+        "diagnostics_developed_window": {
+          "finite": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.23861827435379e-06
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 1.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 900000.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 26,
+            "n_intervals_complete_excursion": 6,
+            "n_intervals_partial_excursion": 20,
+            "pre_event_max_pB_mean": 0.44591287108381583,
+            "pre_event_max_pB_overall_max": 0.7253980815832827,
+            "total_negative_K_contact_time_s": 0.2323833235736913,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
+          },
+          "zero": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.591793423657277
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 0.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 0.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 0,
+            "n_intervals_complete_excursion": 13,
+            "n_intervals_partial_excursion": 13,
+            "pre_event_max_pB_mean": 0.49439048124874935,
+            "pre_event_max_pB_overall_max": 0.7226281359748871,
+            "total_negative_K_contact_time_s": 0.21026656903938662,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
           }
         },
         "eventwise_and_rolling_waiting_time_ratios": {
@@ -2382,12 +2626,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 870000.0,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 29,
-            "sum_cleavage_action_all_events": 5.11901416724501e-06,
-            "sum_cleavage_action_nonzero_events": 4.24354577182518e-06,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 746079.4344115095
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.11901416724501e-06
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.9666666666666667,
@@ -2406,6 +2649,34 @@
         "finite_uncensored": true,
         "gate_finite": {
           "developed_da_dN_m_per_cycle": 2.752794539329751e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 472.2473767753561,
             "da_dN": 2.752794539329751e-07,
@@ -2435,6 +2706,34 @@
         },
         "gate_zero": {
           "developed_da_dN_m_per_cycle": 3.039025622384829e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 427.7686869187515,
             "da_dN": 3.039025622384829e-07,
@@ -2486,12 +2785,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 0,
-            "sum_cleavage_action_all_events": 5.166412594752161,
-            "sum_cleavage_action_nonzero_events": 0.0,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.166412594752161
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -2603,18 +2901,74 @@
           "waiting_time_simplification_admissible": true,
           "zero_rate_m_per_cycle": 3.156043063271666e-07
         },
+        "developed_window_diagnostics_is_not_alias_of_all_event": true,
+        "developed_window_event_ids_finite": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "developed_window_event_ids_zero": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
         "diagnostics_by_tail_window": {
           "last_25_um": {
             "finite": {
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 5,
-                "sum_cleavage_action_all_events": 1.2138211737226073e-07,
-                "sum_cleavage_action_nonzero_events": 1.2138211737226073e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.2138211737226073e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -2634,12 +2988,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 0.7220571676713826,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 0.7220571676713826
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -2661,12 +3014,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 893372.7546661856,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 893372.7546661856,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 10,
-                "sum_cleavage_action_all_events": 2.3491616300873957e-07,
-                "sum_cleavage_action_nonzero_events": 2.3491616300873957e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.3491616300873957e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -2686,12 +3038,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.147473946016986,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.147473946016986
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -2713,12 +3064,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 9,
-                "sum_cleavage_action_all_events": 1.6331420323629376e-06,
-                "sum_cleavage_action_nonzero_events": 1.6331420323629376e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.6331420323629376e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -2738,12 +3088,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.1186990902175253,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.1186990902175256
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -2765,12 +3114,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 1.6263794736092867e-06,
-                "sum_cleavage_action_nonzero_events": 1.6263794736092867e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.6263794736092869e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -2790,12 +3138,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 0.900375389851412,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 0.900375389851412
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -2817,12 +3164,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 895581.8364441238,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 895581.8364441238,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 15,
-                "sum_cleavage_action_all_events": 1.0255063036814758e-06,
-                "sum_cleavage_action_nonzero_events": 1.0255063036814758e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0255063036814758e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -2842,12 +3188,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 3.0154514325175232,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.0154514325175237
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -2869,12 +3214,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 888954.5911103092,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 888954.5911103092,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 1.2138211737226073e-07,
-                "sum_cleavage_action_nonzero_events": 1.2138211737226073e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.2138211737226073e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -2894,12 +3238,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.147473946016986,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.147473946016986
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -2915,6 +3258,56 @@
               "trajectory_integrated_A_on": "NOT_ARCHIVED",
               "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
             }
+          }
+        },
+        "diagnostics_developed_window": {
+          "finite": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 897451.0594869945,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 897451.0594869945,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.8928788496851245e-06
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 1.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 900000.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 26,
+            "n_intervals_complete_excursion": 0,
+            "n_intervals_partial_excursion": 26,
+            "pre_event_max_pB_mean": 0.5071889892812944,
+            "pre_event_max_pB_overall_max": 0.7389719681456218,
+            "total_negative_K_contact_time_s": 0.19068865391269907,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
+          },
+          "zero": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.1552326861452435
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 0.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 0.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 0,
+            "n_intervals_complete_excursion": 6,
+            "n_intervals_partial_excursion": 19,
+            "pre_event_max_pB_mean": 0.5110669189177774,
+            "pre_event_max_pB_overall_max": 0.7351754279944546,
+            "total_negative_K_contact_time_s": 0.17934294102926718,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
           }
         },
         "eventwise_and_rolling_waiting_time_ratios": {
@@ -3407,12 +3800,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 867790.9182220619,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 897714.7429883399,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 29,
-            "sum_cleavage_action_all_events": 2.007883308700577e-06,
-            "sum_cleavage_action_nonzero_events": 2.007883308700577e-06,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.007883308700577e-06
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.9666666666666667,
@@ -3431,6 +3823,34 @@
         "finite_uncensored": true,
         "gate_finite": {
           "developed_da_dN_m_per_cycle": 3.356979905750086e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 387.25283930751647,
             "da_dN": 3.356979905750086e-07,
@@ -3460,6 +3880,34 @@
         },
         "gate_zero": {
           "developed_da_dN_m_per_cycle": 3.5687903217480853e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 364.26908918628385,
             "da_dN": 3.5687903217480853e-07,
@@ -3511,12 +3959,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 0,
-            "sum_cleavage_action_all_events": 4.638154406216888,
-            "sum_cleavage_action_nonzero_events": 0.0,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.638154406216887
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -3736,18 +4183,74 @@
           "waiting_time_simplification_admissible": true,
           "zero_rate_m_per_cycle": 2.470099125976486e-07
         },
+        "developed_window_diagnostics_is_not_alias_of_all_event": true,
+        "developed_window_event_ids_finite": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "developed_window_event_ids_zero": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
         "diagnostics_by_tail_window": {
           "last_25_um": {
             "finite": {
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0000000001,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 5,
-                "sum_cleavage_action_all_events": 1.3729881373342608e-23,
-                "sum_cleavage_action_nonzero_events": 1.3729881373342608e-23,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0000000001
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3729881373342608e-23
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -3767,12 +4270,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.4067049253053405,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.4067049253053407
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -3794,12 +4296,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 10,
-                "sum_cleavage_action_all_events": 1.3630550325430807e-06,
-                "sum_cleavage_action_nonzero_events": 1.3630550325430807e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3630550325430807e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -3819,12 +4320,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.7582871860366633,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.7582871860366633
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -3846,12 +4346,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999998,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 9,
-                "sum_cleavage_action_all_events": 1.3340570374754417e-06,
-                "sum_cleavage_action_nonzero_events": 1.3340570374754417e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999998
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3340570374754415e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -3871,12 +4370,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.322197200243767,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.322197200243767
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -3898,12 +4396,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 1.3340570374733546e-06,
-                "sum_cleavage_action_nonzero_events": 1.3340570374733546e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3340570374733544e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -3923,12 +4420,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.7392043003997,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.7392043003997002
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -3950,12 +4446,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 15,
-                "sum_cleavage_action_all_events": 1.4110981326737162e-06,
-                "sum_cleavage_action_nonzero_events": 1.4110981326737162e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.4110981326737162e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -3975,12 +4470,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.863853610453716,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.8638536104537162
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -4002,12 +4496,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 5.089476299046621e-07,
-                "sum_cleavage_action_nonzero_events": 5.089476299046621e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.089476299046621e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -4027,12 +4520,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.5223144594610134,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.5223144594610134
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -4048,6 +4540,56 @@
               "trajectory_integrated_A_on": "NOT_ARCHIVED",
               "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
             }
+          }
+        },
+        "diagnostics_developed_window": {
+          "finite": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.3749951865519614e-06
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 1.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 900000.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 26,
+            "n_intervals_complete_excursion": 9,
+            "n_intervals_partial_excursion": 17,
+            "pre_event_max_pB_mean": 0.4568658734366272,
+            "pre_event_max_pB_overall_max": 0.7042683329087513,
+            "total_negative_K_contact_time_s": 0.3738449289041393,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
+          },
+          "zero": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.1221346163993955
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 0.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 0.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 0,
+            "n_intervals_complete_excursion": 6,
+            "n_intervals_partial_excursion": 20,
+            "pre_event_max_pB_mean": 0.46891423135223315,
+            "pre_event_max_pB_overall_max": 0.705690352592044,
+            "total_negative_K_contact_time_s": 0.2801463716460469,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
           }
         },
         "eventwise_and_rolling_waiting_time_ratios": {
@@ -4540,12 +5082,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 840006.1047093394,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 868971.8324579373,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 293283.8157521674,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 29,
-            "sum_cleavage_action_all_events": 1.0509149858023057e-05,
-            "sum_cleavage_action_nonzero_events": 1.0509149858023057e-05,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 293283.8157521674
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0509149858023057e-05
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.9666666666666667,
@@ -4564,6 +5105,34 @@
         "finite_uncensored": true,
         "gate_finite": {
           "developed_da_dN_m_per_cycle": 1.7100094662367669e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 760.229709640685,
             "da_dN": 1.7100094662367669e-07,
@@ -4593,6 +5162,34 @@
         },
         "gate_zero": {
           "developed_da_dN_m_per_cycle": 2.2827475558511557e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 569.4891652245252,
             "da_dN": 2.2827475558511557e-07,
@@ -4644,12 +5241,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 0,
-            "sum_cleavage_action_all_events": 11.459424955109679,
-            "sum_cleavage_action_nonzero_events": 0.0,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 11.459424955109679
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -4761,18 +5357,74 @@
           "waiting_time_simplification_admissible": true,
           "zero_rate_m_per_cycle": 3.567230924439861e-07
         },
+        "developed_window_diagnostics_is_not_alias_of_all_event": true,
+        "developed_window_event_ids_finite": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "developed_window_event_ids_zero": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
         "diagnostics_by_tail_window": {
           "last_25_um": {
             "finite": {
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0000000001,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 5,
-                "sum_cleavage_action_all_events": 5.254153089501277e-07,
-                "sum_cleavage_action_nonzero_events": 5.254153089501277e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0000000001
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.254153089501277e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -4792,12 +5444,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.3753721856646317,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3753721856646317
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -4819,12 +5470,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 810015.0573881521,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 810015.0573881521,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 324690.4625379608,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 10,
-                "sum_cleavage_action_all_events": 2.95116784230059e-06,
-                "sum_cleavage_action_nonzero_events": 2.95116784230059e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 324690.4625379608
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.95116784230059e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -4844,12 +5494,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.489733508316414,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.489733508316414
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -4871,12 +5520,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 9,
-                "sum_cleavage_action_all_events": 2.924654852456969e-06,
-                "sum_cleavage_action_nonzero_events": 2.924654852456969e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.924654852456969e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -4896,12 +5544,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.0278022657945036,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.027802265794504
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -4923,12 +5570,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 1.7578001746486501e-06,
-                "sum_cleavage_action_nonzero_events": 1.7578001746486501e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.7578001746486501e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -4948,12 +5594,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.7295485797124228,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.7295485797124228
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -4975,12 +5620,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 840010.0382587682,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 840010.0382587682,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 412628.8017532057,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 15,
-                "sum_cleavage_action_all_events": 3.483658887587874e-06,
-                "sum_cleavage_action_nonzero_events": 3.483658887587874e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 412628.8017532057
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.483658887587874e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -5000,12 +5644,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.7988928691995936,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.7988928691995936
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -5027,12 +5670,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 1.0643688323257254e-06,
-                "sum_cleavage_action_nonzero_events": 1.0643688323257254e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0643688323257254e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -5052,12 +5694,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.45995801566466,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.45995801566466
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -5073,6 +5714,56 @@
               "trajectory_integrated_A_on": "NOT_ARCHIVED",
               "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
             }
+          }
+        },
+        "diagnostics_developed_window": {
+          "finite": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 865390.4066877508,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 865390.4066877508,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.87582269475756e-06
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 1.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 900000.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 26,
+            "n_intervals_complete_excursion": 6,
+            "n_intervals_partial_excursion": 20,
+            "pre_event_max_pB_mean": 0.487053279928173,
+            "pre_event_max_pB_overall_max": 0.727757956654687,
+            "total_negative_K_contact_time_s": 0.2142443624483073,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
+          },
+          "zero": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.889691522570887
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 0.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 0.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 0,
+            "n_intervals_complete_excursion": 7,
+            "n_intervals_partial_excursion": 18,
+            "pre_event_max_pB_mean": 0.47940107299758367,
+            "pre_event_max_pB_overall_max": 0.7284342675427249,
+            "total_negative_K_contact_time_s": 0.19409215841317767,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
           }
         },
         "eventwise_and_rolling_waiting_time_ratios": {
@@ -5565,12 +6256,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 836808.6329368212,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 865664.103038091,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 689797.316379797,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 29,
-            "sum_cleavage_action_all_events": 1.086854027010573e-05,
-            "sum_cleavage_action_nonzero_events": 9.92373506846687e-06,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 629833.0455213868
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.086854027010573e-05
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.9666666666666667,
@@ -5589,6 +6279,34 @@
         "finite_uncensored": true,
         "gate_finite": {
           "developed_da_dN_m_per_cycle": 2.986777885044864e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 435.25164911299476,
             "da_dN": 2.986777885044864e-07,
@@ -5618,6 +6336,34 @@
         },
         "gate_zero": {
           "developed_da_dN_m_per_cycle": 3.296664327470099e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 394.3379946716128,
             "da_dN": 3.296664327470099e-07,
@@ -5669,12 +6415,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 0,
-            "sum_cleavage_action_all_events": 6.219386431434945,
-            "sum_cleavage_action_nonzero_events": 0.0,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 6.219386431434945
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -5786,18 +6531,74 @@
           "waiting_time_simplification_admissible": true,
           "zero_rate_m_per_cycle": 4.1890726767190605e-07
         },
+        "developed_window_diagnostics_is_not_alias_of_all_event": true,
+        "developed_window_event_ids_finite": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "developed_window_event_ids_zero": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
         "diagnostics_by_tail_window": {
           "last_25_um": {
             "finite": {
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0000000003,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000003,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899999.9999999999,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 5,
-                "sum_cleavage_action_all_events": 2.275564854548214e-06,
-                "sum_cleavage_action_nonzero_events": 2.275564854548214e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899999.9999999999
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.275564854548214e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -5817,12 +6618,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.5155328764601252,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.5155328764601252
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -5844,12 +6644,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899985.186723083,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899985.186723083,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899957.7071366925,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 10,
-                "sum_cleavage_action_all_events": 6.435083919205097e-06,
-                "sum_cleavage_action_nonzero_events": 6.435083919205097e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899957.7071366925
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 6.4350839192050966e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -5869,12 +6668,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 4.848156241016847,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.848156241016847
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -5896,12 +6694,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 9,
-                "sum_cleavage_action_all_events": 7.742237871860327e-07,
-                "sum_cleavage_action_nonzero_events": 7.742237871860327e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 7.742237871860327e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -5921,12 +6718,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 2.5462395453988362,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.5462395453988362
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -5948,12 +6744,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899999.9999999999,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999999,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 7.742237871860327e-07,
-                "sum_cleavage_action_nonzero_events": 7.742237871860327e-07,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 7.742237871860327e-07
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -5973,12 +6768,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.9424458561173092,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.9424458561173092
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -6000,12 +6794,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899990.1244820554,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899990.1244820554,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 899957.9664925402,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 15,
-                "sum_cleavage_action_all_events": 6.474789781154077e-06,
-                "sum_cleavage_action_nonzero_events": 6.474789781154077e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 899957.9664925402
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 6.4747897811540765e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -6025,12 +6818,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 5.245442252731916,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.245442252731917
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -6052,12 +6844,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 900000.0000000003,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000003,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 900000.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 6,
-                "sum_cleavage_action_all_events": 3.061662057502706e-06,
-                "sum_cleavage_action_nonzero_events": 3.061662057502706e-06,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 900000.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.061662057502706e-06
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 1.0,
@@ -6077,12 +6868,11 @@
               "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
-                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-                "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-                "n_nonzero_events": 0,
-                "sum_cleavage_action_all_events": 1.6135646688488134,
-                "sum_cleavage_action_nonzero_events": 0.0,
-                "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+                "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "status": "NOT_ARCHIVED",
+                "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+                "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.6135646688488137
               },
               "all_bulk_action_qualified_every_event": true,
               "fraction_events_nonzero_bonded_shielding": 0.0,
@@ -6098,6 +6888,56 @@
               "trajectory_integrated_A_on": "NOT_ARCHIVED",
               "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
             }
+          }
+        },
+        "diagnostics_developed_window": {
+          "finite": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 899994.3025858011,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899994.3025858011,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 8.305577393777451e-06
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 1.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 900000.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 26,
+            "n_intervals_complete_excursion": 3,
+            "n_intervals_partial_excursion": 23,
+            "pre_event_max_pB_mean": 0.4982756082292218,
+            "pre_event_max_pB_overall_max": 0.7380841713836059,
+            "total_negative_K_contact_time_s": 0.17560558448761293,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
+          },
+          "zero": {
+            "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
+            "action_weighted_K_rebond_true_inter_event_weighted": {
+              "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "status": "NOT_ARCHIVED",
+              "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+              "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 7.634192069612811
+            },
+            "all_bulk_action_qualified_every_event": true,
+            "fraction_events_nonzero_bonded_shielding": 0.0,
+            "max_phase_resolved_K_rebond_Pa_sqrt_m": 0.0,
+            "n_events_in_window": 26,
+            "n_events_with_nonzero_action_weighted_K_rebond": 0,
+            "n_intervals_complete_excursion": 8,
+            "n_intervals_partial_excursion": 18,
+            "pre_event_max_pB_mean": 0.4743578942950719,
+            "pre_event_max_pB_overall_max": 0.7212799071588087,
+            "total_negative_K_contact_time_s": 0.16519205161809095,
+            "trajectory_integrated_A_off": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on": "NOT_ARCHIVED",
+            "trajectory_integrated_A_on_A_off_note": "checked the raw run_trajectory per-event bulk_action_records (the real engine's phase-resolved action diagnostic) -- it records action, action_weighted_K_rebond_Pa_sqrt_m, max_K_rebond_Pa_sqrt_m, bulk_action_qualified/used, and periodic-orbit/convergence diagnostics, but NEVER a single-patch A_on/A_off pair. A_on/A_off are single-patch ANALYTICAL model predictions (frozen in developed_confirmation_predictions.json) computed from a closed-form bonded-fraction model, not a measured trajectory-integrated quantity the real engine ever produces -- so there is nothing to archive here, and the frozen analytical values must not be substituted in as if they were measured"
           }
         },
         "eventwise_and_rolling_waiting_time_ratios": {
@@ -6590,12 +7430,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 840000.0651981112,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 868965.5846877013,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 587270.7488497458,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 29,
-            "sum_cleavage_action_all_events": 1.5463951117418047e-05,
-            "sum_cleavage_action_nonzero_events": 1.42571582777824e-05,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 541440.6676979071
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.5463951117418047e-05
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.9666666666666667,
@@ -6614,6 +7453,34 @@
         "finite_uncensored": true,
         "gate_finite": {
           "developed_da_dN_m_per_cycle": 3.641771450129369e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 356.96913378620155,
             "da_dN": 3.641771450129369e-07,
@@ -6643,6 +7510,34 @@
         },
         "gate_zero": {
           "developed_da_dN_m_per_cycle": 3.871340754506353e-07,
+          "developed_event_indices": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
           "developed_interval": {
             "dN": 335.8009750205435,
             "da_dN": 3.871340754506353e-07,
@@ -6694,12 +7589,11 @@
           "action_weighted_K_rebond_simple_mean_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
-            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": 0.0,
-            "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-            "n_nonzero_events": 0,
-            "sum_cleavage_action_all_events": 12.45178752096252,
-            "sum_cleavage_action_nonzero_events": 0.0,
-            "unconditional_action_weighted_mean_Pa_sqrt_m": 0.0
+            "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
+            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "status": "NOT_ARCHIVED",
+            "unconditional_action_weighted_mean_Pa_sqrt_m": null,
+            "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 12.451787520962519
           },
           "all_bulk_action_qualified_every_event": true,
           "fraction_events_nonzero_bonded_shielding": 0.0,

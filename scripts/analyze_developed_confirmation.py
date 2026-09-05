@@ -314,6 +314,27 @@ def analyze_seed(ledger: dict, seed: int) -> dict[str, Any] | None:
         S_h_developed = _S_h_from_windows(developed_z, developed_f)
         S_h_developed_by_Kmax[Kmax] = S_h_developed["S_h_decade"]
 
+        # Decomposition-repair pass (post-review): select the SAME event
+        # subset stable_growth_gate's developed_interval used (via its
+        # exposed developed_event_indices), so developed-window
+        # diagnostics are not aliased to the all-event diagnostics -- the
+        # bug the prior evidence-hardening pass's "if window in
+        # ('developed', 'all_event')" routing silently reintroduced.
+        developed_idx_zero = set(gate_zero["developed_event_indices"])
+        developed_idx_finite = set(gate_finite["developed_event_indices"])
+        developed_events_zero = _events_in_index_set(zero_traj["events"], developed_idx_zero)
+        developed_events_finite = _events_in_index_set(finite_traj["events"], developed_idx_finite)
+        diagnostics_developed_window = {
+            "zero": _exposure_and_action(
+                developed_events_zero,
+                _intervals_matching_events(zero_traj["post_first_event_intervals"], developed_events_zero),
+            ),
+            "finite": _exposure_and_action(
+                developed_events_finite,
+                _intervals_matching_events(finite_traj["post_first_event_intervals"], developed_events_finite),
+            ),
+        }
+
         all_z = event_index_window_rate(zero_traj["events"], [e["event_index"] for e in zero_traj["events"]], FREQUENCY_HZ)
         all_f = event_index_window_rate(finite_traj["events"], [e["event_index"] for e in finite_traj["events"]], FREQUENCY_HZ)
         S_h_all = _S_h_from_windows(all_z, all_f)
@@ -382,6 +403,13 @@ def analyze_seed(ledger: dict, seed: int) -> dict[str, Any] | None:
             "S_h_post_first_event": S_h_post_first,
             "S_h_by_tail_window": S_h_by_window,
             "diagnostics_by_tail_window": diagnostics_by_window,
+            "diagnostics_developed_window": diagnostics_developed_window,
+            "developed_window_event_ids_zero": sorted(developed_idx_zero),
+            "developed_window_event_ids_finite": sorted(developed_idx_finite),
+            "developed_window_diagnostics_is_not_alias_of_all_event": (
+                sorted(developed_idx_zero) != [e["event_index"] for e in zero_traj["events"]]
+                or sorted(developed_idx_finite) != [e["event_index"] for e in finite_traj["events"]]
+            ),
             "eventwise_and_rolling_waiting_time_ratios": ratios,
             "zero_exposure_and_action": _exposure_and_action(
                 zero_traj["events"], zero_traj["post_first_event_intervals"]
@@ -441,14 +469,22 @@ def decompose_section_d_window(seed_analysis: dict, window: str) -> dict[str, An
         return pair["S_h_by_tail_window"][window]["S_h_decade"]
 
     def _finite_diag_for(pair: dict) -> dict:
-        if window in ("developed", "all_event"):
+        if window == "developed":
+            return pair["diagnostics_developed_window"]["finite"]
+        if window == "all_event":
             return pair["finite_exposure_and_action"]
         return pair["diagnostics_by_tail_window"][window]["finite"]
 
+    # pooled_K_b uses the SIMPLE per-event arithmetic mean of
+    # action_weighted_K_rebond_Pa_sqrt_m (equal weight per event), not the
+    # inter-event action-weighted mean -- the latter is NOT_ARCHIVED (see
+    # action_weighted_K_rebond_true_inter_event_weighted's docstring for
+    # the traced reason cleavage_action cannot be used as a cross-event
+    # weight). The simple mean remains valid because each event's own
+    # action_weighted_K_rebond_Pa_sqrt_m is itself a ratio in which the
+    # per-event normalization cancels (intra-event-safe).
     pooled_K_b = sum(
-        _finite_diag_for(pair)["action_weighted_K_rebond_true_inter_event_weighted"][
-            "unconditional_action_weighted_mean_Pa_sqrt_m"
-        ]
+        _finite_diag_for(pair)["action_weighted_K_rebond_simple_mean_Pa_sqrt_m"]
         for pair in seed_analysis["per_pair"].values()
     ) / len(seed_analysis["per_pair"])
 
@@ -488,7 +524,12 @@ def decompose_section_d_window(seed_analysis: dict, window: str) -> dict[str, An
     return {
         "window": window,
         "pooled_K_b_Pa_sqrt_m": pooled_K_b,
-        "pooled_K_b_formula": "mean over Kmax of the true inter-event action-weighted unconditional K_rebond mean",
+        "pooled_K_b_formula": (
+            "mean over Kmax of the SIMPLE per-event arithmetic mean of "
+            "action_weighted_K_rebond_Pa_sqrt_m (equal weight per event) -- "
+            "the inter-event action-weighted alternative is NOT_ARCHIVED, "
+            "see action_weighted_K_rebond_true_inter_event_weighted's status"
+        ),
         "zero_cohesion_rate_grid_m_per_cycle": {str(int(k)): v for k, v in g_zero_window.items()},
         "local_zero_cohesion_power_law_slope_m_zero": m_zero_local,
         "S_abs_S_occupancy_by_Kmax": rows,

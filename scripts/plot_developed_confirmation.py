@@ -148,27 +148,23 @@ def plot_pB_contact_action_vs_Kmax(seed_analyses: dict[int, dict], out_dir: Path
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     x = [K / 1.0e6 for K in KMAX_GRID_Pa_sqrt_m]
     for seed, a in seed_analyses.items():
-        pB, contact_t, aw_simple, aw_true_weighted = [], [], [], []
+        pB, contact_t, aw_simple = [], [], []
         for K in KMAX_GRID_Pa_sqrt_m:
             pair = a["per_pair"][f"K{int(round(K/1e6))}MPa_seed{seed}"]
             fa = pair["finite_exposure_and_action"]
             pB.append(fa["pre_event_max_pB_mean"])
             contact_t.append(fa["total_negative_K_contact_time_s"])
             aw_simple.append(fa["action_weighted_K_rebond_simple_mean_Pa_sqrt_m"])
-            aw_true_weighted.append(
-                fa["action_weighted_K_rebond_true_inter_event_weighted"][
-                    "unconditional_action_weighted_mean_Pa_sqrt_m"
-                ]
-            )
         axes[0].plot(x, pB, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed], label=f"seed {seed}")
         axes[1].plot(x, contact_t, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed], label=f"seed {seed}")
         axes[2].plot(x, aw_simple, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed],
-                      linestyle="--", label=f"seed {seed} simple per-event mean")
-        axes[2].plot(x, aw_true_weighted, marker=SEED_MARKERS[seed], color=SEED_COLORS[seed],
-                      linestyle="-", label=f"seed {seed} true inter-event action-weighted")
+                      linestyle="-", label=f"seed {seed} simple per-event mean")
     axes[0].set_title("pre-event max p_B (mean)"); axes[0].set_xlabel(r"$K_{max}$ (MPa $\sqrt{m}$)")
     axes[1].set_title("integrated negative-K contact time (s)"); axes[1].set_xlabel(r"$K_{max}$ (MPa $\sqrt{m}$)")
-    axes[2].set_title("action-weighted K_rebond (Pa sqrt(m))\nsimple mean vs true inter-event weighted mean")
+    axes[2].set_title(
+        "action-weighted K_rebond (Pa sqrt(m)), simple per-event mean\n"
+        "(inter-event action-weighted alternative: NOT_ARCHIVED, see decision JSON)"
+    )
     axes[2].set_xlabel(r"$K_{max}$ (MPa $\sqrt{m}$)")
     for ax in axes:
         ax.grid(alpha=0.3); ax.legend(fontsize=6)

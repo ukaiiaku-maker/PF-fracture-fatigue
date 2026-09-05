@@ -115,7 +115,36 @@ def stable_growth_gate(
         "stable_growth_provisional": stable,
         "stability_definition": STABILITY_DEFINITION_STRING,
         "developed_da_dN_m_per_cycle": developed["da_dN"] if stable else None,
+        "developed_event_indices": developed_interval_event_indices(
+            events, development_extension_um=development_extension_um,
+        ),
     }
+
+
+def developed_interval_event_indices(
+    events: list[dict], *, development_extension_um: float = DEVELOPMENT_EXTENSION_UM_DEFAULT,
+) -> list[int]:
+    """Decomposition-repair pass (post-review): exposes the EXACT
+    event_index values ``stable_growth_gate``'s own ``developed_interval``
+    selects (the same predicate ``interval_rate`` applies internally:
+    ``projected_extension_post_m > development_m and
+    projected_extension_pre_m < final_extension``), so callers computing
+    developed-window DIAGNOSTICS (contact time, p_B, K_rebond, bulk-action
+    certification) can select the SAME event subset ``stable_growth_gate``
+    used for its rate, instead of aliasing to the all-event diagnostics
+    (the bug this function's introduction fixes -- see
+    scripts/analyze_developed_confirmation.py's ``_finite_diag_for``)."""
+    mapped = _events_pre_post(events)
+    if not mapped:
+        return []
+    development_m = development_extension_um * 1.0e-6
+    final_extension = float(mapped[-1]["projected_extension_post_m"])
+    stop_m = max(final_extension, development_m)
+    return [
+        row["event_index"] for row in mapped
+        if row["projected_extension_post_m"] > development_m
+        and row["projected_extension_pre_m"] < stop_m
+    ]
 
 
 def true_final_half_indices(n_events: int) -> list[int]:
@@ -340,46 +369,82 @@ def action_weighted_K_rebond_means(events: list[dict]) -> dict[str, Any]:
 
 
 def action_weighted_K_rebond_true_inter_event_weighted(events: list[dict]) -> dict[str, Any]:
-    """Evidence-hardening pass (post-review): ``action_weighted_K_rebond_
-    means`` above reports a SIMPLE per-event arithmetic mean of each
-    event's own (already intra-event action-weighted)
-    action_weighted_K_rebond_Pa_sqrt_m value -- every event counts
-    equally regardless of how much cleavage action it actually carried.
-    This function instead computes the genuinely INTER-EVENT
-    action-weighted mean:
+    """Decomposition-repair pass (post-review, second round): the previous
+    evidence-hardening pass reported an INTER-EVENT action-weighted mean
 
         <K_b> = sum_j( A_c,j * Kbar_b,j ) / sum_j( A_c,j )
 
-    where A_c,j is event j's own total ``cleavage_action`` and Kbar_b,j is
-    its action_weighted_K_rebond_Pa_sqrt_m. The two means can differ
-    substantially (observed ~3x in this campaign's data) whenever
-    cleavage action is unevenly distributed across events -- they are
-    reported as separate, clearly labeled fields, never conflated."""
-    weighted_num = 0.0
-    weight_den = 0.0
-    nonzero_weighted_num = 0.0
-    nonzero_weight_den = 0.0
-    n_nonzero = 0
-    for e in events:
-        A_c = float(e.get("cleavage_action") or 0.0)
-        K_b = float(e.get("action_weighted_K_rebond_Pa_sqrt_m") or 0.0)
-        weighted_num += A_c * K_b
-        weight_den += A_c
-        if K_b > 0.0:
-            nonzero_weighted_num += A_c * K_b
-            nonzero_weight_den += A_c
-            n_nonzero += 1
+    using each event's ``cleavage_action`` field as the weight A_c,j. This
+    was WRONG and the resulting numbers (293,284 Pa sqrt(m), and every
+    pooled K_b / S_abs / S_occupancy value derived from it) are retracted.
+
+    Root cause, traced to the physical producer code (crack_rebonding_
+    v10230.py, arrhenius_fracture/persistent_site_cyclic_energy_gated_
+    v10230.py, commit aa6982a -- unchanged since):
+
+    - ``_commit_rebonding_event``'s ``lambda_cleave_normalized(sigma) =
+      self.lambda_cleave(sigma, T_K_ctx)[0] / threshold_action``
+      (persistent_site_cyclic_energy_gated_v10230.py, the
+      ``phase_resolved_action_fn`` closure) divides the raw cleavage hazard
+      rate by ``threshold_action`` -- a value drawn FRESH, independently,
+      for every event -- BEFORE integrating it.
+    - ``phase_resolved_action``'s returned ``action`` (crack_rebonding_
+      v10230.py: ``diagnostics["action"] = total_action``, where
+      ``total_action`` accumulates ``lambda_cleave_fn(sigma_c) * dt`` bin by
+      bin) is therefore DIMENSIONLESS NORMALIZED PROGRESS toward
+      ``B_threshold=1.0`` (see ``solve_coupled_event_time``'s
+      ``residual(dt) = (B_start + action) - B_threshold``), scaled by a
+      DIFFERENT random denominator (that event's own ``threshold_action``)
+      for every event -- not a raw physical action comparable across
+      events on a common scale. This is exactly why the recorded
+      ``cleavage_action`` values span ~70 orders of magnitude (5.6e-54 to
+      7.1e-6 observed in one trajectory) with no consistent relationship to
+      the event's own ``hazard_threshold_action`` (ratios from 1e-5 down to
+      1e-74) -- summing or weighting by it treats incommensurable
+      quantities as if they were on one scale.
+    - By contrast, the PER-EVENT ``action_weighted_K_rebond_Pa_sqrt_m``
+      field (``diagnostics["action_weighted_K_rebond_Pa_sqrt_m"] =
+      action_weighted_K_rebond_accum / total_action``) is a RATIO of two
+      quantities built from the same per-bin ``action_increment`` terms
+      within one call -- the arbitrary 1/threshold_action normalization
+      factor cancels between numerator and denominator, so this per-event
+      value is intra-event-safe and remains valid for the SIMPLE
+      per-event arithmetic mean (action_weighted_K_rebond_means() above).
+      It is only CROSS-event weighting by the raw, differently-normalized
+      ``cleavage_action`` that is invalid.
+    - Separately and independently: the recording wrapper in run_
+      trajectory monkeypatches ``_rebond.phase_resolved_action`` at module
+      scope, so ``bulk_action_records`` captures EVERY call made during an
+      event's entire block-search loop, not provably only the converged
+      root-finding call -- ``new_bulk_records[-1]`` (this module's prior
+      assumption for "the" per-event value) has not been confirmed to
+      exclusively represent the full inter-event interval versus some
+      other single-block diagnostic evaluation. This is a second,
+      independent reason the raw ``action``/``cleavage_action`` value
+      cannot be trusted as an event-integrated quantity without further
+      producer-code instrumentation this pass did not undertake.
+
+    Per review: when a complete, non-double-counted event-integrated
+    action cannot be reconstructed from the currently recorded fields, the
+    correct result is NOT_ARCHIVED, not a surrogate weight. This function
+    now returns that status. The raw (uninterpreted, NOT validated for
+    physics) per-event cleavage_action values are still surfaced under
+    unvalidated_raw_cleavage_action_sum for audit-trail transparency only
+    -- explicitly marked not to be used in any downstream computation."""
+    raw_sum = sum(float(e.get("cleavage_action") or 0.0) for e in events)
     return {
-        "formula": "sum(cleavage_action_j * action_weighted_K_rebond_j) / sum(cleavage_action_j)",
-        "unconditional_action_weighted_mean_Pa_sqrt_m": (
-            weighted_num / weight_den if weight_den > 0.0 else 0.0
+        "status": "NOT_ARCHIVED",
+        "reason": (
+            "cleavage_action is normalized by a per-event-varying threshold_action "
+            "denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's "
+            "lambda_cleave_normalized), so it is not a raw, cross-event-comparable "
+            "physical action; using it as an inter-event weight conflates "
+            "incommensurable quantities. See this function's docstring for the full "
+            "code-traced derivation."
         ),
-        "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": (
-            nonzero_weighted_num / nonzero_weight_den if nonzero_weight_den > 0.0 else 0.0
-        ),
-        "sum_cleavage_action_all_events": weight_den,
-        "sum_cleavage_action_nonzero_events": nonzero_weight_den,
-        "n_nonzero_events": n_nonzero,
+        "unconditional_action_weighted_mean_Pa_sqrt_m": None,
+        "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": None,
+        "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": raw_sum,
     }
 
 
