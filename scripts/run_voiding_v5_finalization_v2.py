@@ -50,6 +50,15 @@ def canonical(value):
 def digest(value):
     return hashlib.sha256(json.dumps(canonical(value),sort_keys=True,separators=(",",":")).encode()).hexdigest()
 
+def equivalent_values(left,right):
+    if isinstance(left,(int,float)) and isinstance(right,(int,float)) and not isinstance(left,bool) and not isinstance(right,bool):
+        return math.isclose(float(left),float(right),rel_tol=1e-12,abs_tol=1e-15)
+    if isinstance(left,dict) and isinstance(right,dict):
+        return left.keys()==right.keys() and all(equivalent_values(left[key],right[key]) for key in left)
+    if isinstance(left,(list,tuple)) and isinstance(right,(list,tuple)):
+        return len(left)==len(right) and all(equivalent_values(a,b) for a,b in zip(left,right))
+    return left==right
+
 def write_json(path,value):
     path.parent.mkdir(parents=True,exist_ok=True)
     temporary=path.with_suffix(path.suffix+".tmp")
@@ -82,42 +91,42 @@ def transition_partition_rows():
     for n in PARTITIONS:
         embryo,rates,birth_events=lifecycle_to_embryo(7100)
         rows.append({"execution_id":f"partition-birth-{n}","transition":"birth_hits","partitions":n,
-          "events":birth_events,"state":digest(asdict(embryo.void_state)),"passed":len(birth_events)==2})
+          "events":birth_events,"state_measurement":canonical(asdict(embryo.void_state)),"state":digest(asdict(embryo.void_state)),"passed":len(birth_events)==2})
         site=embryo.void_state.sites[0]; total=site.stabilization.threshold/rates["stabilization_s"]
         void=embryo.void_state; events=[]
         for _ in range(n): void,new=advance_site(void,"site-1",total/n,rates=rates); events.extend(new)
         rows.append({"execution_id":f"partition-stabilization-{n}","transition":"stabilization","partitions":n,
-          "events":events,"state":digest(asdict(void)),"passed":void.sites[0].phase==VoidPhase.STABLE_SUBGRID_VOID})
+          "events":events,"state_measurement":canonical(asdict(void)),"state":digest(asdict(void)),"passed":void.sites[0].phase==VoidPhase.STABLE_SUBGRID_VOID})
         heal={**rates,"stabilization_s":0.}; site=embryo.void_state.sites[0]; total=site.healing.threshold/heal["healing_s"]
         void=embryo.void_state; events=[]
         for _ in range(n): void,new=advance_site(void,"site-1",total/n,rates=heal); events.extend(new)
         rows.append({"execution_id":f"partition-healing-{n}","transition":"healing","partitions":n,
-          "events":events,"state":digest(asdict(void)),"passed":void.sites[0].phase==VoidPhase.HEALED_SITE})
+          "events":events,"state_measurement":canonical(asdict(void)),"state":digest(asdict(void)),"passed":void.sites[0].phase==VoidPhase.HEALED_SITE})
         area=math.pi*(2.5e-5)**2
         cavity=Cavity2D("partition-void","site-1",(0.,0.),2.5e-5,area,area,VoidPhase.STABLE_SUBGRID_VOID)
         grown=cavity
         for _ in range(n): grown=grow_cavity_from_rate(grown,rates=rates,dt_s=1e-6/n,radial_growth_scale_m=1e-9)
         rows.append({"execution_id":f"partition-growth-{n}","transition":"subgrid_growth","partitions":n,
-          "radius_m":grown.radius_m,"state":digest(asdict(grown)),"passed":grown.radius_m>cavity.radius_m})
+          "radius_m":grown.radius_m,"state_measurement":canonical(asdict(grown)),"state":digest(asdict(grown)),"passed":grown.radius_m>cavity.radius_m})
         promoted_source=ProductionVoidState((),(replace(grown,radius_m=5e-5,area_m2=math.pi*(5e-5)**2,
           inventory_area_m2=math.pi*(5e-5)**2),))
         promoted=promote_cavity(promoted_source,"partition-void",5e-5)
         rows.append({"execution_id":f"partition-promotion-{n}","transition":"promotion","partitions":n,
-          "state":digest(asdict(promoted)),"passed":promoted.cavities[0].phase==VoidPhase.RESOLVED_VOID})
+          "state_measurement":canonical(asdict(promoted)),"state":digest(asdict(promoted)),"passed":promoted.cavities[0].phase==VoidPhase.RESOLVED_VOID})
         pre,_=deterministic_trajectory(stop_before_ligament=True)
         tensor,elements=crack_tip_tensor(pre,branch_id=ROOT_BRANCH_ID)
         advanced,audit,total=clock_partition(pre,tensor,n,{"source_kind":"sharp_front","source_front_id":ROOT_BRANCH_ID,
           "source_position_m":pre.crack_network.branch(ROOT_BRANCH_ID).tip,
           "source_probe_identity":{"kind":"crack_tip_tensor","element_ids":list(elements)}})
         rows.append({"execution_id":f"partition-ligament-{n}","transition":"ligament_first_passage","partitions":n,
-          "duration_s":total,"clock":digest(asdict(advanced.competition)),"winner_count":sum(bool(x["winner"]) for x in audit),"passed":True})
+          "duration_s":total,"clock_measurement":canonical(asdict(advanced.competition)),"clock":digest(asdict(advanced.competition)),"winner_count":sum(bool(x["winner"]) for x in audit),"passed":True})
         connected,_=ligament_transaction(pre); tensor,elements=cavity_boundary_tensor(connected)
         advanced,audit,total=clock_partition(connected,tensor,n,{"source_kind":"cavity_surface",
           "source_cavity_id":connected.void_state.cavities[0].cavity_id,"source_boundary_site_id":"connection_exit",
           "source_position_m":connected.void_state.cavities[0].connection_exit_m,
           "source_probe_identity":{"kind":"direct_cavity_boundary_tensor","element_ids":list(elements)}})
         rows.append({"execution_id":f"partition-downstream-{n}","transition":"downstream_first_passage","partitions":n,
-          "duration_s":total,"clock":digest(asdict(advanced.competition)),"winner_count":sum(bool(x["winner"]) for x in audit),"passed":True})
+          "duration_s":total,"clock_measurement":canonical(asdict(advanced.competition)),"clock":digest(asdict(advanced.competition)),"winner_count":sum(bool(x["winner"]) for x in audit),"passed":True})
         child,result,_,_=downstream_front_transaction(connected)
         if result is None:
             rows.append({"execution_id":f"partition-child-{n}","transition":"child_continuation","partitions":n,
@@ -128,18 +137,16 @@ def transition_partition_rows():
               "source_position_m":child.crack_network.branch("void-front-1").tip,
               "source_probe_identity":{"kind":"child_crack_tip_tensor","element_ids":list(elements)}})
             rows.append({"execution_id":f"partition-child-{n}","transition":"child_continuation","partitions":n,
-              "duration_s":total,"clock":digest(asdict(advanced.competition)),"winner_count":sum(bool(x["winner"]) for x in audit),"passed":True})
+              "duration_s":total,"clock_measurement":canonical(asdict(advanced.competition)),"clock":digest(asdict(advanced.competition)),"winner_count":sum(bool(x["winner"]) for x in audit),"passed":True})
     by={}
     for row in rows: by.setdefault(row["transition"],[]).append(row)
     for group in by.values():
         reference=group[0]
         for row in group:
-            if row["transition"]=="subgrid_growth":
-                equivalent=math.isclose(row["radius_m"],reference["radius_m"],rel_tol=1e-12,abs_tol=1e-18)
-            elif "clock" in row:
-                equivalent=row["clock"]==reference["clock"] and row["winner_count"]==reference["winner_count"]
+            if "clock_measurement" in row:
+                equivalent=equivalent_values(row["clock_measurement"],reference["clock_measurement"]) and row["winner_count"]==reference["winner_count"]
             else:
-                equivalent=row.get("state")==reference.get("state") and row.get("events")==reference.get("events")
+                equivalent=equivalent_values(row.get("state_measurement"),reference.get("state_measurement")) and row.get("events")==reference.get("events")
             row["partition_equivalent"]=bool(row["passed"] and equivalent)
     return rows
 
