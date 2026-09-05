@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -138,7 +139,9 @@ def main(argv=None):
         and kirsch_analytic_error <= declared_tolerances["kirsch_128_relative_to_analytic_max"]
         and kirsch_fine_change <= declared_tolerances["kirsch_64_to_128_relative_max"]
     )
-    implementation_sha = subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip()
+    implementation_sha = os.environ.get("VOIDING_V5_SOURCE_COMMIT") or subprocess.check_output(
+        ("git", "rev-parse", "HEAD"), cwd=ROOT, text=True
+    ).strip()
     source_rows = {f"raw:{index}": row for index, row in enumerate(rows)}
     evidence_rows = []
     for index, row in enumerate(rows):

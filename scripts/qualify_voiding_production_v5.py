@@ -6,6 +6,7 @@ from dataclasses import replace
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -598,7 +599,9 @@ def main(argv=None):
     gates = {}
     for gate in sorted({row["gate"] for row in rows}):
         gates[gate] = "PASS" if all(row["passed"] for row in rows if row["gate"] == gate) else "FAIL"
-    implementation_sha = subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=ROOT, text=True).strip()
+    implementation_sha = os.environ.get("VOIDING_V5_SOURCE_COMMIT") or subprocess.check_output(
+        ("git", "rev-parse", "HEAD"), cwd=ROOT, text=True
+    ).strip()
     source_rows = {f"raw:{index}": row for index, row in enumerate(rows)}
     for family, measurements in (("direct", perturbation_rates), ("solver", solver_rows)):
         for index, measurement in enumerate(measurements):
