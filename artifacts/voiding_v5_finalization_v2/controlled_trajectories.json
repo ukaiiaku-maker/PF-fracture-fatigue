@@ -229,8 +229,8 @@
         "passed": true,
         "topology": "single_closed_cavity_boundary_cycle"
       },
-      "compliance_m2_per_N": 1.5638877099490336e-11,
-      "constrained_reaction_l2_N_per_m": 27917.470258623835,
+      "compliance_m2_per_N": 1.5638877099490352e-11,
+      "constrained_reaction_l2_N_per_m": 27917.470258623813,
       "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
       "crack_void_connection_certificate": {
         "active_tip_ids": [
@@ -548,13 +548,13 @@
           "boundary_terminal_certificates": [],
           "bridge_element_ids": [],
           "bridge_node_ids": [],
-          "certificate_fingerprint": "6d900659b330f95694c1a91cf8973c9dce6a42d6efa5dd8f8442806b72ea7081",
+          "certificate_fingerprint": "e25fc50553db6f08876b61718023344137ae2bea0dade8f7e3158dc32ff9e02f",
           "edge_cut_certificates": [
             {
               "backward_undershoot_m": 0.0,
               "bridge_element_ids": [],
               "bridge_node_ids": [],
-              "certificate_fingerprint": "9ea1be9c0955ae6a6dd948c98ddce1c54146e8b764ef92a14b5b495b18e59d7c",
+              "certificate_fingerprint": "1cf441167df4ca0505c253ab2e6e58a72bc160f84d17023bbd0692389cee904c",
               "endpoint_footprint_error_m": 0.0,
               "forward_leakage_m": 0.0,
               "forward_leakage_over_h_local": 0.0,
@@ -586,7 +586,7 @@
               "backward_undershoot_m": 0.0,
               "bridge_element_ids": [],
               "bridge_node_ids": [],
-              "certificate_fingerprint": "a59f458e3a50701ecb0347b010d969d83f6a146f396fc0fdd0d81ae20bb6f0b7",
+              "certificate_fingerprint": "2e6a37e9b578fb2a0b2a33e2d97f850b1febd332e9c660d0d5867e36b26f88a9",
               "endpoint_footprint_error_m": 0.0,
               "forward_leakage_m": 0.0,
               "forward_leakage_over_h_local": 0.0,
@@ -2230,8 +2230,8 @@
         "topology": "connected_crack_graph_and_traction_free_cavity_cycle",
         "wake_support_outside_cavity": true
       },
-      "energy_J_per_m": 0.005187877515005446,
-      "energy_reaction_identity": 0.0007067037354529434,
+      "energy_J_per_m": 0.005187877515005448,
+      "energy_reaction_identity": 0.0007067037354535291,
       "event_counters": {
         "accepted_steps": 0,
         "mesh_generation": 7,
@@ -2241,17 +2241,17 @@
       "field_transfer_audit": {
         "density_integral_error": 0.0,
         "plastic_integral_error": 8.077935669463161e-27,
-        "projected_density_l2_m2": 31712413821690.996,
-        "projected_displacement_l2_m": 2.5783730475672477e-06,
+        "projected_density_l2_m2": 31712413821691.0,
+        "projected_displacement_l2_m": 2.578373047567248e-06,
         "projected_fields_nonzero": true,
-        "projected_plastic_history_l2": 0.00032058116942660286,
-        "source_density_l2_m2": 31656982231251.945,
-        "source_displacement_l2_m": 2.5793788845529104e-06,
-        "source_plastic_history_l2": 0.0003200404036820817
+        "projected_plastic_history_l2": 0.00032058116942660253,
+        "source_density_l2_m2": 31656982231251.94,
+        "source_displacement_l2_m": 2.5793788845529112e-06,
+        "source_plastic_history_l2": 0.00032004040368208115
       },
-      "fingerprint": "4dc5407aca98c2b1f3b7263393a6ffaa6de293f2d465dee10790f4716bb03779",
-      "free_dof_residual_l2_N_per_m": 5.156116025747687e-10,
-      "full_residual_including_reactions_N_per_m": 27917.470258623838,
+      "fingerprint": "6a9cacf2018cdbace84093ed0375829fb994f0c4420dac3339bd83e650faffb4",
+      "free_dof_residual_l2_N_per_m": 5.215930673167277e-10,
+      "full_residual_including_reactions_N_per_m": 27917.47025862382,
       "graph_length_m": 0.0007947338785193028,
       "inventory_area_m2": 9.503317777109124e-09,
       "length_ledgers": {
@@ -2273,12 +2273,12 @@
       "mesh_minimum_quality": 0.020701957770776897,
       "mesh_nodes": 4340,
       "operation": "centered",
-      "reaction_N_per_m": 25577.28393511295,
+      "reaction_N_per_m": 25577.283935112926,
       "site_phase": "STABLE_SUBGRID_VOID",
       "support_active_tip_ids": [
         "void-front-1"
       ],
-      "top_bottom_reaction_balance": 0.012564943893528835,
+      "top_bottom_reaction_balance": 0.012564943893528914,
       "void_event_history": [
         {
           "event": "BIRTH_HIT",
@@ -2328,7 +2328,7 @@
       ],
       "void_phase": "DOWNSTREAM_FRONT_ACTIVE"
     },
-    "terminal_fingerprint": "4dc5407aca98c2b1f3b7263393a6ffaa6de293f2d465dee10790f4716bb03779",
+    "terminal_fingerprint": "6a9cacf2018cdbace84093ed0375829fb994f0c4420dac3339bd83e650faffb4",
     "trace": [
       "available_site",
       "multi_hit_1",
@@ -2623,8 +2623,8 @@
         "passed": true,
         "topology": "single_closed_cavity_boundary_cycle"
       },
-      "compliance_m2_per_N": 7.700174879410968e-12,
-      "constrained_reaction_l2_N_per_m": 43400.56852606776,
+      "compliance_m2_per_N": 7.700174879410966e-12,
+      "constrained_reaction_l2_N_per_m": 43400.568526067764,
       "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
       "crack_void_connection_certificate": {
         "active_tip_ids": [],
@@ -2933,13 +2933,13 @@
           "boundary_terminal_certificates": [],
           "bridge_element_ids": [],
           "bridge_node_ids": [],
-          "certificate_fingerprint": "f2038dae566e6067c44dea7187629b2d2297fdb3d5abbf953ff791a64fc84db4",
+          "certificate_fingerprint": "f9a77a35413e2a295331beb510ff0771de11024e01d865c376931ee4d1313347",
           "edge_cut_certificates": [
             {
               "backward_undershoot_m": 0.0,
               "bridge_element_ids": [],
               "bridge_node_ids": [],
-              "certificate_fingerprint": "de122a76971ad7b43392a0c6102a90025e3dcf2634a893413cd8848f6010e82a",
+              "certificate_fingerprint": "ed1e9a7d2f208c3412866047c59d1fda8645e0f43b2fecd1154ac8506223ba49",
               "endpoint_footprint_error_m": 0.0,
               "forward_leakage_m": 0.0,
               "forward_leakage_over_h_local": 0.0,
@@ -3401,7 +3401,7 @@
         "wake_support_outside_cavity": true
       },
       "energy_J_per_m": 0.01051778632916013,
-      "energy_reaction_identity": 0.004830885861306361,
+      "energy_reaction_identity": 0.004830885861306195,
       "event_counters": {
         "accepted_steps": 0,
         "mesh_generation": 5,
@@ -3414,14 +3414,14 @@
         "projected_density_l2_m2": 31768472995585.24,
         "projected_displacement_l2_m": 2.5521571930482215e-06,
         "projected_fields_nonzero": true,
-        "projected_plastic_history_l2": 0.0003212062470600677,
+        "projected_plastic_history_l2": 0.00032120624706006765,
         "source_density_l2_m2": 31712951224440.51,
         "source_displacement_l2_m": 2.5530118189456863e-06,
-        "source_plastic_history_l2": 0.0003206645050198196
+        "source_plastic_history_l2": 0.00032066450501981857
       },
-      "fingerprint": "a298c24dd62e6aa22818d24f023a5b8186e6df19a4c4811d16db13bb5e449c91",
-      "free_dof_residual_l2_N_per_m": 2.520877224134885e-09,
-      "full_residual_including_reactions_N_per_m": 43400.568526067764,
+      "fingerprint": "40f5e041c4e954c9f48b89c498aa90bf28a985a38c59e0fa6c7a3bd5bba6e14c",
+      "free_dof_residual_l2_N_per_m": 2.592159047206015e-09,
+      "full_residual_including_reactions_N_per_m": 43400.56852606777,
       "graph_length_m": 0.0006457187925528744,
       "inventory_area_m2": 9.503317777109124e-09,
       "length_ledgers": {
@@ -3443,10 +3443,10 @@
       "mesh_minimum_quality": 0.011807705733953865,
       "mesh_nodes": 1349,
       "operation": "positive_offset",
-      "reaction_N_per_m": 51946.8721508567,
+      "reaction_N_per_m": 51946.87215085672,
       "site_phase": "STABLE_SUBGRID_VOID",
       "support_active_tip_ids": [],
-      "top_bottom_reaction_balance": 0.0026188835633511823,
+      "top_bottom_reaction_balance": 0.0026188835633512513,
       "void_event_history": [
         {
           "event": "BIRTH_HIT",
@@ -3481,7 +3481,7 @@
       ],
       "void_phase": "CONNECTED_VOID"
     },
-    "terminal_fingerprint": "a298c24dd62e6aa22818d24f023a5b8186e6df19a4c4811d16db13bb5e449c91",
+    "terminal_fingerprint": "40f5e041c4e954c9f48b89c498aa90bf28a985a38c59e0fa6c7a3bd5bba6e14c",
     "trace": [
       "available_site",
       "multi_hit_1",
@@ -3771,8 +3771,8 @@
         "passed": true,
         "topology": "single_closed_cavity_boundary_cycle"
       },
-      "compliance_m2_per_N": 7.70305052949158e-12,
-      "constrained_reaction_l2_N_per_m": 43340.77491584371,
+      "compliance_m2_per_N": 7.703050529491585e-12,
+      "constrained_reaction_l2_N_per_m": 43340.77491584369,
       "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
       "crack_void_connection_certificate": {
         "active_tip_ids": [],
@@ -4081,13 +4081,13 @@
           "boundary_terminal_certificates": [],
           "bridge_element_ids": [],
           "bridge_node_ids": [],
-          "certificate_fingerprint": "07038bea2b3a9a3438fc418b306a218e45cf6592eb46cc84e3977b9c36971e37",
+          "certificate_fingerprint": "d84a886b39032991540301c51439c23a2ef14b1c819a454201b93b4886dcf652",
           "edge_cut_certificates": [
             {
               "backward_undershoot_m": 0.0,
               "bridge_element_ids": [],
               "bridge_node_ids": [],
-              "certificate_fingerprint": "a2a1e250f56166f9e768407cf0cbe817cef4148f40000a4fcff0278203b42b2d",
+              "certificate_fingerprint": "4f27787b00bf90f3c9a8c56aa35509c07f0680d6f38c1efcd16b98f8be8e34ad",
               "endpoint_footprint_error_m": 0.0,
               "forward_leakage_m": 0.0,
               "forward_leakage_over_h_local": 0.0,
@@ -4548,8 +4548,8 @@
         "topology": "connected_crack_graph_and_traction_free_cavity_cycle",
         "wake_support_outside_cavity": true
       },
-      "energy_J_per_m": 0.010519810249249528,
-      "energy_reaction_identity": 0.006424890790289609,
+      "energy_J_per_m": 0.01051981024924953,
+      "energy_reaction_identity": 0.006424890790289525,
       "event_counters": {
         "accepted_steps": 0,
         "mesh_generation": 5,
@@ -4560,16 +4560,16 @@
         "density_integral_error": 0.0,
         "plastic_integral_error": 4.8467614016778965e-27,
         "projected_density_l2_m2": 31768472995585.24,
-        "projected_displacement_l2_m": 2.8426901730297386e-06,
+        "projected_displacement_l2_m": 2.8426901730297403e-06,
         "projected_fields_nonzero": true,
-        "projected_plastic_history_l2": 0.0003212062470600677,
+        "projected_plastic_history_l2": 0.00032120624706006765,
         "source_density_l2_m2": 31712951224440.51,
-        "source_displacement_l2_m": 2.8438917137691977e-06,
-        "source_plastic_history_l2": 0.0003206645050198196
+        "source_displacement_l2_m": 2.843891713769199e-06,
+        "source_plastic_history_l2": 0.00032066450501981857
       },
-      "fingerprint": "95730537a6a6d94b8f9cbb287f31dfabea65141faf68a3248fe2266067d47e2e",
-      "free_dof_residual_l2_N_per_m": 2.4557594526996272e-09,
-      "full_residual_including_reactions_N_per_m": 43340.77491584371,
+      "fingerprint": "2d623e0074f079571f941657ae53c56c5b76fcb812b7c85224944bca0cb3964c",
+      "free_dof_residual_l2_N_per_m": 2.5235759141038125e-09,
+      "full_residual_including_reactions_N_per_m": 43340.77491584369,
       "graph_length_m": 0.0006457187925528744,
       "inventory_area_m2": 9.503317777109124e-09,
       "length_ledgers": {
@@ -4591,10 +4591,10 @@
       "mesh_minimum_quality": 0.011807705733953863,
       "mesh_nodes": 1349,
       "operation": "negative_offset",
-      "reaction_N_per_m": 51927.4797002274,
+      "reaction_N_per_m": 51927.47970022737,
       "site_phase": "STABLE_SUBGRID_VOID",
       "support_active_tip_ids": [],
-      "top_bottom_reaction_balance": 2.55014164643841e-14,
+      "top_bottom_reaction_balance": 2.571159297370594e-14,
       "void_event_history": [
         {
           "event": "BIRTH_HIT",
@@ -4629,7 +4629,7 @@
       ],
       "void_phase": "CONNECTED_VOID"
     },
-    "terminal_fingerprint": "95730537a6a6d94b8f9cbb287f31dfabea65141faf68a3248fe2266067d47e2e",
+    "terminal_fingerprint": "2d623e0074f079571f941657ae53c56c5b76fcb812b7c85224944bca0cb3964c",
     "trace": [
       "available_site",
       "multi_hit_1",
@@ -4870,7 +4870,7 @@
         "topology": "single_closed_cavity_boundary_cycle"
       },
       "compliance_m2_per_N": 7.385553180328209e-12,
-      "constrained_reaction_l2_N_per_m": 46957.561156243246,
+      "constrained_reaction_l2_N_per_m": 46957.56115624327,
       "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
       "crack_void_connection_certificate": {
         "active_tip_ids": [],
@@ -5129,13 +5129,13 @@
           "boundary_terminal_certificates": [],
           "bridge_element_ids": [],
           "bridge_node_ids": [],
-          "certificate_fingerprint": "5be1b7f469a46531f420ba87491e2dcac8cd0775ab7b58e7f44778e7c22ac490",
+          "certificate_fingerprint": "3607cb98b2ca4671ab8820ad94822a445e51ce498ad814656535483c79b50a52",
           "edge_cut_certificates": [
             {
               "backward_undershoot_m": 0.0,
               "bridge_element_ids": [],
               "bridge_node_ids": [],
-              "certificate_fingerprint": "63a1d7ae925b1cc1c356719214ac07facd1544c021b8f9e210519a8b5084623a",
+              "certificate_fingerprint": "f7d9675d6062275b323a69f77addfc7b1926b397c5470591d61d8190b5ad01a5",
               "endpoint_footprint_error_m": 0.0,
               "forward_leakage_m": 0.0,
               "forward_leakage_over_h_local": 0.0,
@@ -5528,7 +5528,7 @@
         "wake_support_outside_cavity": true
       },
       "energy_J_per_m": 0.010973436217645273,
-      "energy_reaction_identity": 0.0032293916477265988,
+      "energy_reaction_identity": 0.003229391647725644,
       "event_counters": {
         "accepted_steps": 0,
         "mesh_generation": 3,
@@ -5539,21 +5539,21 @@
         "density_integral_error": 2.3283064365386963e-10,
         "plastic_integral_error": 1.1309109937248425e-26,
         "projected_density_l2_m2": 31600860610926.215,
-        "projected_displacement_l2_m": 2.663686827887753e-06,
+        "projected_displacement_l2_m": 2.663686827887754e-06,
         "projected_fields_nonzero": true,
-        "projected_plastic_history_l2": 0.00032057795595731223,
+        "projected_plastic_history_l2": 0.00032057795595731245,
         "source_density_l2_m2": 31545948160807.258,
-        "source_displacement_l2_m": 2.664805494356152e-06,
-        "source_plastic_history_l2": 0.0003200377568697667
+        "source_displacement_l2_m": 2.664805494356153e-06,
+        "source_plastic_history_l2": 0.0003200377568697668
       },
-      "fingerprint": "5fb572165c4806aa63c166ecf76a1bc5100ee26602c548252536512bc8833a20",
-      "free_dof_residual_l2_N_per_m": 5.307294132179918e-10,
-      "full_residual_including_reactions_N_per_m": 46957.561156243246,
+      "fingerprint": "4c97cf14114d0804796f598051918f7a114921433a2398d114973e0811fde35c",
+      "free_dof_residual_l2_N_per_m": 5.512522515142985e-10,
+      "full_residual_including_reactions_N_per_m": 46957.56115624327,
       "graph_length_m": 0.0006197338785193029,
       "inventory_area_m2": 9.503317777109124e-09,
       "length_ledgers": {
         "active_front_coordinate_advance_m": 6.91658281146341e-05,
-        "connected_free_surface_extent_m": 0.00017334486990860907,
+        "connected_free_surface_extent_m": 0.00017334486990860904,
         "connected_void_free_span_m": 0.00011053224296139427,
         "fractured_ligament_length_m": 6.91658281146341e-05,
         "ordinary_crack_fractured_length_m": 0.0,
@@ -5573,7 +5573,7 @@
       "reaction_N_per_m": 54159.78874343767,
       "site_phase": "STABLE_SUBGRID_VOID",
       "support_active_tip_ids": [],
-      "top_bottom_reaction_balance": 0.006496646579782667,
+      "top_bottom_reaction_balance": 0.006496646579783657,
       "void_event_history": [
         {
           "event": "BIRTH_HIT",
@@ -5609,7 +5609,7 @@
       ],
       "void_phase": "CONNECTED_VOID"
     },
-    "terminal_fingerprint": "5fb572165c4806aa63c166ecf76a1bc5100ee26602c548252536512bc8833a20",
+    "terminal_fingerprint": "4c97cf14114d0804796f598051918f7a114921433a2398d114973e0811fde35c",
     "trace": [
       "available_site",
       "multi_hit_1",
@@ -5849,7 +5849,7 @@
         "passed": true,
         "topology": "single_closed_cavity_boundary_cycle"
       },
-      "compliance_m2_per_N": 8.474467075565545e-12,
+      "compliance_m2_per_N": 8.47446707556554e-12,
       "constrained_reaction_l2_N_per_m": 37626.18494588117,
       "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
       "crack_void_connection_certificate": {
@@ -6109,13 +6109,13 @@
           "boundary_terminal_certificates": [],
           "bridge_element_ids": [],
           "bridge_node_ids": [],
-          "certificate_fingerprint": "d9a8dfd00c7b7d12c4a8dbe8f7127253759bfebc772f1691f37bc7448134572f",
+          "certificate_fingerprint": "29962a431fd58a5168807f4dce94ea6dccdebe19371247d8c291915fa76b577d",
           "edge_cut_certificates": [
             {
               "backward_undershoot_m": 0.0,
               "bridge_element_ids": [],
               "bridge_node_ids": [],
-              "certificate_fingerprint": "aa2623c250a379081031a93b1f3c5faa163e366b8db2874e9fedfcca1502ad47",
+              "certificate_fingerprint": "0308633ea5471af532aa6805cadc3419e29b88face2eb6f9d8b0d2069548ff8d",
               "endpoint_footprint_error_m": 0.0,
               "forward_leakage_m": 0.0,
               "forward_leakage_over_h_local": 0.0,
@@ -6504,7 +6504,7 @@
         "wake_support_outside_cavity": true
       },
       "energy_J_per_m": 0.00956166631821979,
-      "energy_reaction_identity": 0.003689972605780279,
+      "energy_reaction_identity": 0.0036899726057800053,
       "event_counters": {
         "accepted_steps": 0,
         "mesh_generation": 3,
@@ -6515,21 +6515,21 @@
         "density_integral_error": 2.3283064365386963e-10,
         "plastic_integral_error": 4.8467614016778965e-27,
         "projected_density_l2_m2": 31867161267255.434,
-        "projected_displacement_l2_m": 2.5997174377923823e-06,
+        "projected_displacement_l2_m": 2.599717437792383e-06,
         "projected_fields_nonzero": true,
-        "projected_plastic_history_l2": 0.0003205713549049076,
+        "projected_plastic_history_l2": 0.00032057135490490783,
         "source_density_l2_m2": 31811268735405.285,
-        "source_displacement_l2_m": 2.6007614602194265e-06,
-        "source_plastic_history_l2": 0.00032003231980508746
+        "source_displacement_l2_m": 2.6007614602194274e-06,
+        "source_plastic_history_l2": 0.0003200323198050869
       },
-      "fingerprint": "c2048b084fddf6337ef9cbe9f439cdcde03b96c1e909915906626df97a68f264",
-      "free_dof_residual_l2_N_per_m": 6.165995860498527e-10,
+      "fingerprint": "e6999af1e2ccd8fdffd7bd5ce34a7cfdeb9245587da937d5f1bfae14b394b679",
+      "free_dof_residual_l2_N_per_m": 6.097440630746635e-10,
       "full_residual_including_reactions_N_per_m": 37626.18494588117,
       "graph_length_m": 0.0006797338785193028,
       "inventory_area_m2": 9.503317777109124e-09,
       "length_ledgers": {
         "active_front_coordinate_advance_m": 7.629082811463407e-05,
-        "connected_free_surface_extent_m": 0.00017334486990860907,
+        "connected_free_surface_extent_m": 0.00017334486990860904,
         "connected_void_free_span_m": 0.00011053224296139427,
         "fractured_ligament_length_m": 7.629082811463407e-05,
         "ordinary_crack_fractured_length_m": 0.0,
@@ -6546,10 +6546,10 @@
       "mesh_minimum_quality": 0.21440125371089885,
       "mesh_nodes": 1254,
       "operation": "long_ligament",
-      "reaction_N_per_m": 47200.60818376664,
+      "reaction_N_per_m": 47200.608183766664,
       "site_phase": "STABLE_SUBGRID_VOID",
       "support_active_tip_ids": [],
-      "top_bottom_reaction_balance": 0.005398544115169504,
+      "top_bottom_reaction_balance": 0.005398544115169885,
       "void_event_history": [
         {
           "event": "BIRTH_HIT",
@@ -6585,7 +6585,7 @@
       ],
       "void_phase": "CONNECTED_VOID"
     },
-    "terminal_fingerprint": "c2048b084fddf6337ef9cbe9f439cdcde03b96c1e909915906626df97a68f264",
+    "terminal_fingerprint": "e6999af1e2ccd8fdffd7bd5ce34a7cfdeb9245587da937d5f1bfae14b394b679",
     "trace": [
       "available_site",
       "multi_hit_1",
@@ -6982,8 +6982,8 @@
         "passed": true,
         "topology": "single_closed_cavity_boundary_cycle"
       },
-      "compliance_m2_per_N": 7.70305052949158e-12,
-      "constrained_reaction_l2_N_per_m": 43340.77491584371,
+      "compliance_m2_per_N": 7.703050529491585e-12,
+      "constrained_reaction_l2_N_per_m": 43340.77491584369,
       "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
       "crack_void_connection_certificate": {
         "active_tip_ids": [],
@@ -7292,13 +7292,13 @@
           "boundary_terminal_certificates": [],
           "bridge_element_ids": [],
           "bridge_node_ids": [],
-          "certificate_fingerprint": "07038bea2b3a9a3438fc418b306a218e45cf6592eb46cc84e3977b9c36971e37",
+          "certificate_fingerprint": "d84a886b39032991540301c51439c23a2ef14b1c819a454201b93b4886dcf652",
           "edge_cut_certificates": [
             {
               "backward_undershoot_m": 0.0,
               "bridge_element_ids": [],
               "bridge_node_ids": [],
-              "certificate_fingerprint": "a2a1e250f56166f9e768407cf0cbe817cef4148f40000a4fcff0278203b42b2d",
+              "certificate_fingerprint": "4f27787b00bf90f3c9a8c56aa35509c07f0680d6f38c1efcd16b98f8be8e34ad",
               "endpoint_footprint_error_m": 0.0,
               "forward_leakage_m": 0.0,
               "forward_leakage_over_h_local": 0.0,
@@ -7759,8 +7759,8 @@
         "topology": "connected_crack_graph_and_traction_free_cavity_cycle",
         "wake_support_outside_cavity": true
       },
-      "energy_J_per_m": 0.010519810249249528,
-      "energy_reaction_identity": 0.006424890790289609,
+      "energy_J_per_m": 0.01051981024924953,
+      "energy_reaction_identity": 0.006424890790289525,
       "event_counters": {
         "accepted_steps": 0,
         "mesh_generation": 5,
@@ -7771,16 +7771,16 @@
         "density_integral_error": 0.0,
         "plastic_integral_error": 4.8467614016778965e-27,
         "projected_density_l2_m2": 31768472995585.24,
-        "projected_displacement_l2_m": 2.8426901730297386e-06,
+        "projected_displacement_l2_m": 2.8426901730297403e-06,
         "projected_fields_nonzero": true,
-        "projected_plastic_history_l2": 0.0003212062470600677,
+        "projected_plastic_history_l2": 0.00032120624706006765,
         "source_density_l2_m2": 31712951224440.51,
-        "source_displacement_l2_m": 2.8438917137691977e-06,
-        "source_plastic_history_l2": 0.0003206645050198196
+        "source_displacement_l2_m": 2.843891713769199e-06,
+        "source_plastic_history_l2": 0.00032066450501981857
       },
-      "fingerprint": "95730537a6a6d94b8f9cbb287f31dfabea65141faf68a3248fe2266067d47e2e",
-      "free_dof_residual_l2_N_per_m": 2.4557594526996272e-09,
-      "full_residual_including_reactions_N_per_m": 43340.77491584371,
+      "fingerprint": "2d623e0074f079571f941657ae53c56c5b76fcb812b7c85224944bca0cb3964c",
+      "free_dof_residual_l2_N_per_m": 2.5235759141038125e-09,
+      "full_residual_including_reactions_N_per_m": 43340.77491584369,
       "graph_length_m": 0.0006457187925528744,
       "inventory_area_m2": 9.503317777109124e-09,
       "length_ledgers": {
@@ -7802,10 +7802,10 @@
       "mesh_minimum_quality": 0.011807705733953863,
       "mesh_nodes": 1349,
       "operation": "downstream_zero_drive",
-      "reaction_N_per_m": 51927.4797002274,
+      "reaction_N_per_m": 51927.47970022737,
       "site_phase": "STABLE_SUBGRID_VOID",
       "support_active_tip_ids": [],
-      "top_bottom_reaction_balance": 2.55014164643841e-14,
+      "top_bottom_reaction_balance": 2.571159297370594e-14,
       "void_event_history": [
         {
           "event": "BIRTH_HIT",
@@ -7840,7 +7840,7 @@
       ],
       "void_phase": "CONNECTED_VOID"
     },
-    "terminal_fingerprint": "95730537a6a6d94b8f9cbb287f31dfabea65141faf68a3248fe2266067d47e2e",
+    "terminal_fingerprint": "2d623e0074f079571f941657ae53c56c5b76fcb812b7c85224944bca0cb3964c",
     "trace": [
       "available_site",
       "multi_hit_1",
@@ -8081,7 +8081,7 @@
         "passed": true,
         "topology": "single_closed_cavity_boundary_cycle"
       },
-      "compliance_m2_per_N": 7.745720833999664e-12,
+      "compliance_m2_per_N": 7.745720833999668e-12,
       "constrained_reaction_l2_N_per_m": 43273.87029625622,
       "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
       "crack_void_connection_certificate": {
@@ -8341,13 +8341,13 @@
           "boundary_terminal_certificates": [],
           "bridge_element_ids": [],
           "bridge_node_ids": [],
-          "certificate_fingerprint": "6dc2a60557b00e2163de5626516ad638c646ebde6620109f77da88e50e5cb714",
+          "certificate_fingerprint": "a3ca0678737cac04aeb0b087e2715a799c3ab6abd328d03b36297d991fd5d99c",
           "edge_cut_certificates": [
             {
               "backward_undershoot_m": 0.0,
               "bridge_element_ids": [],
               "bridge_node_ids": [],
-              "certificate_fingerprint": "27399d19c6e8fc6400ee781a79c0262a0efbd0bbd215da1b8fb9265dddd7c236",
+              "certificate_fingerprint": "6bcd93d174362a8b8e12824426f4c197e82a0784638927e887420b04febaab6b",
               "endpoint_footprint_error_m": 0.0,
               "forward_leakage_m": 0.0,
               "forward_leakage_over_h_local": 0.0,
@@ -8739,8 +8739,8 @@
         "topology": "connected_crack_graph_and_traction_free_cavity_cycle",
         "wake_support_outside_cavity": true
       },
-      "energy_J_per_m": 0.010462522255927809,
-      "energy_reaction_identity": 0.006456644661262743,
+      "energy_J_per_m": 0.010462522255927807,
+      "energy_reaction_identity": 0.0064566446612622395,
       "event_counters": {
         "accepted_steps": 0,
         "mesh_generation": 3,
@@ -8750,16 +8750,16 @@
       "field_transfer_audit": {
         "density_integral_error": 2.3283064365386963e-10,
         "plastic_integral_error": 4.8467614016778965e-27,
-        "projected_density_l2_m2": 31712370301255.914,
-        "projected_displacement_l2_m": 2.719915969202858e-06,
+        "projected_density_l2_m2": 31712370301255.91,
+        "projected_displacement_l2_m": 2.7199159692028604e-06,
         "projected_fields_nonzero": true,
-        "projected_plastic_history_l2": 0.0003205807231031123,
-        "source_density_l2_m2": 31656946580809.297,
-        "source_displacement_l2_m": 2.7210773257055847e-06,
-        "source_plastic_history_l2": 0.0003200400360629701
+        "projected_plastic_history_l2": 0.0003205807231031122,
+        "source_density_l2_m2": 31656946580809.293,
+        "source_displacement_l2_m": 2.7210773257055872e-06,
+        "source_plastic_history_l2": 0.00032004003606296913
       },
-      "fingerprint": "0cf1579554fe84c68c6b26cb324cfa51cae65dd2dde5721f80c5294345a94758",
-      "free_dof_residual_l2_N_per_m": 5.831209756093415e-10,
+      "fingerprint": "f8548725071836adae5ca4ccf88c838b8a6349f55530f15e3c312397c28b7894",
+      "free_dof_residual_l2_N_per_m": 6.054816901506721e-10,
       "full_residual_including_reactions_N_per_m": 43273.87029625622,
       "graph_length_m": 0.0006447338785193029,
       "inventory_area_m2": 9.503317777109124e-09,
@@ -8782,10 +8782,10 @@
       "mesh_minimum_quality": 0.2642936683195265,
       "mesh_nodes": 1250,
       "operation": "delayed_downstream",
-      "reaction_N_per_m": 51641.41705755895,
+      "reaction_N_per_m": 51641.417057558916,
       "site_phase": "STABLE_SUBGRID_VOID",
       "support_active_tip_ids": [],
-      "top_bottom_reaction_balance": 3.5223460299674425e-16,
+      "top_bottom_reaction_balance": 2.1134076179804638e-16,
       "void_event_history": [
         {
           "event": "BIRTH_HIT",
@@ -8821,7 +8821,7 @@
       ],
       "void_phase": "CONNECTED_VOID"
     },
-    "terminal_fingerprint": "0cf1579554fe84c68c6b26cb324cfa51cae65dd2dde5721f80c5294345a94758",
+    "terminal_fingerprint": "f8548725071836adae5ca4ccf88c838b8a6349f55530f15e3c312397c28b7894",
     "trace": [
       "available_site",
       "multi_hit_1",
@@ -9113,8 +9113,8 @@
         "passed": true,
         "topology": "single_closed_cavity_boundary_cycle"
       },
-      "compliance_m2_per_N": 7.66050742614447e-12,
-      "constrained_reaction_l2_N_per_m": 43649.307768058316,
+      "compliance_m2_per_N": 7.660507426144481e-12,
+      "constrained_reaction_l2_N_per_m": 43649.307768058294,
       "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
       "crack_void_connection_certificate": {
         "active_tip_ids": [],
@@ -9423,13 +9423,13 @@
           "boundary_terminal_certificates": [],
           "bridge_element_ids": [],
           "bridge_node_ids": [],
-          "certificate_fingerprint": "1cef5e943b3efffdeebe9007bddc85613e65b1f39f89e9e602e57235861fbf52",
+          "certificate_fingerprint": "636f53432d4a8bcfaf3b4f0a9ba1e2e9d9c8d522c198f287f17af793666482be",
           "edge_cut_certificates": [
             {
               "backward_undershoot_m": 0.0,
               "bridge_element_ids": [],
               "bridge_node_ids": [],
-              "certificate_fingerprint": "8cd38667fbb035d933ba9841c43b727fc77bad01bfb53b2ea8793f8bf46409db",
+              "certificate_fingerprint": "7148d428268d5aada003ccf492b4c5e063f9300106bcbd32fa69e50e1af5bc0a",
               "endpoint_footprint_error_m": 0.0,
               "forward_leakage_m": 0.0,
               "forward_leakage_over_h_local": 0.0,
@@ -10899,8 +10899,8 @@
         "topology": "connected_crack_graph_and_traction_free_cavity_cycle",
         "wake_support_outside_cavity": true
       },
-      "energy_J_per_m": 0.010573535455712709,
-      "energy_reaction_identity": 0.006289074323196262,
+      "energy_J_per_m": 0.010573535455712713,
+      "energy_reaction_identity": 0.0062890743231969245,
       "event_counters": {
         "accepted_steps": 0,
         "mesh_generation": 5,
@@ -10910,17 +10910,17 @@
       "field_transfer_audit": {
         "density_integral_error": 2.3283064365386963e-10,
         "plastic_integral_error": 2.4233807008389483e-26,
-        "projected_density_l2_m2": 41224913849619.75,
-        "projected_displacement_l2_m": 3.5386449706364734e-06,
+        "projected_density_l2_m2": 41224913849619.74,
+        "projected_displacement_l2_m": 3.538644970636473e-06,
         "projected_fields_nonzero": true,
-        "projected_plastic_history_l2": 0.00042613511459023786,
+        "projected_plastic_history_l2": 0.0004261351145902384,
         "source_density_l2_m2": 41152854921742.29,
-        "source_displacement_l2_m": 3.538797534005546e-06,
-        "source_plastic_history_l2": 0.00042541629734679136
+        "source_displacement_l2_m": 3.5387975340055456e-06,
+        "source_plastic_history_l2": 0.00042541629734679386
       },
-      "fingerprint": "994cf1f0d96800b36bb9d59399adab62c79c8eaa976595c99c6bb3d3d3fa85c5",
-      "free_dof_residual_l2_N_per_m": 2.007707959338799e-09,
-      "full_residual_including_reactions_N_per_m": 43649.307768058316,
+      "fingerprint": "ec554b3bffb5e3ee1a98ea0086b1a1ed10b73503e4882d46b995311e17a56a7e",
+      "free_dof_residual_l2_N_per_m": 1.984282087804121e-09,
+      "full_residual_including_reactions_N_per_m": 43649.307768058294,
       "graph_length_m": 0.0007532609134015685,
       "inventory_area_m2": 9.503317777109124e-09,
       "length_ledgers": {
@@ -10942,10 +10942,10 @@
       "mesh_minimum_quality": 0.010342345463247677,
       "mesh_nodes": 3868,
       "operation": "fixed_mesh_oblique",
-      "reaction_N_per_m": 52215.86218098868,
+      "reaction_N_per_m": 52215.86218098861,
       "site_phase": "STABLE_SUBGRID_VOID",
       "support_active_tip_ids": [],
-      "top_bottom_reaction_balance": 0.00017251469890740178,
+      "top_bottom_reaction_balance": 0.00017251469890691414,
       "void_event_history": [
         {
           "event": "BIRTH_HIT",
@@ -10980,7 +10980,7 @@
       ],
       "void_phase": "CONNECTED_VOID"
     },
-    "terminal_fingerprint": "994cf1f0d96800b36bb9d59399adab62c79c8eaa976595c99c6bb3d3d3fa85c5",
+    "terminal_fingerprint": "ec554b3bffb5e3ee1a98ea0086b1a1ed10b73503e4882d46b995311e17a56a7e",
     "trace": [
       "available_site",
       "multi_hit_1",
@@ -11013,12 +11013,12 @@
       "cavity_area_m2": 9.503317777109124e-09,
       "cavity_radius_m": 5.5e-05,
       "closed_cavity_boundary_cycle_certificate": null,
-      "compliance_m2_per_N": 5.018706399135097e-12,
+      "compliance_m2_per_N": 5.0187063991350975e-12,
       "constrained_reaction_l2_N_per_m": 52987.85153383908,
       "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
       "crack_void_connection_certificate": null,
-      "energy_J_per_m": 0.01612603395627847,
-      "energy_reaction_identity": 0.0012940909003623935,
+      "energy_J_per_m": 0.016126033956278474,
+      "energy_reaction_identity": 0.001294090900362501,
       "event_counters": {
         "accepted_steps": 0,
         "mesh_generation": 2,
@@ -11028,16 +11028,16 @@
       "field_transfer_audit": {
         "density_integral_error": 2.3283064365386963e-10,
         "plastic_integral_error": 2.908056841006738e-26,
-        "projected_density_l2_m2": 40457204966201.1,
-        "projected_displacement_l2_m": 3.3690788751098138e-06,
+        "projected_density_l2_m2": 40457204966201.086,
+        "projected_displacement_l2_m": 3.3690788751098134e-06,
         "projected_fields_nonzero": true,
-        "projected_plastic_history_l2": 0.00041741003992843513,
+        "projected_plastic_history_l2": 0.00041741003992843556,
         "source_density_l2_m2": 40386487952081.48,
         "source_displacement_l2_m": 3.3695467833137254e-06,
-        "source_plastic_history_l2": 0.0004167059403975227
+        "source_plastic_history_l2": 0.00041670594039752544
       },
-      "fingerprint": "941b03356157d0f64a456e3d3be406aac0f1a3e3d82c17395914d04b370971df",
-      "free_dof_residual_l2_N_per_m": 3.3102558151589543e-10,
+      "fingerprint": "05613f546d70fd9395c671a430d9aef06056e931798cb9b833be72b50dbbbac1",
+      "free_dof_residual_l2_N_per_m": 3.3724215929392884e-10,
       "full_residual_including_reactions_N_per_m": 52987.85153383908,
       "graph_length_m": 0.0005725993004046688,
       "inventory_area_m2": 9.503317777109124e-09,
@@ -11060,7 +11060,7 @@
       "mesh_minimum_quality": 0.2642936683195265,
       "mesh_nodes": 685,
       "operation": "local_remesh_refinement",
-      "reaction_N_per_m": 79701.81321404543,
+      "reaction_N_per_m": 79701.81321404541,
       "site_phase": "STABLE_SUBGRID_VOID",
       "support_active_tip_ids": [
         "b00000000"
@@ -11091,7 +11091,7 @@
       ],
       "void_phase": "RESOLVED_VOID"
     },
-    "terminal_fingerprint": "941b03356157d0f64a456e3d3be406aac0f1a3e3d82c17395914d04b370971df",
+    "terminal_fingerprint": "05613f546d70fd9395c671a430d9aef06056e931798cb9b833be72b50dbbbac1",
     "trace": [
       "available_site",
       "multi_hit_1",

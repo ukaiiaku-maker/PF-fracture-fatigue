@@ -80,13 +80,13 @@
   },
   "energy_ledgers": {
     "emission_work": 1.0,
-    "latest_constrained_reaction_l2_N_per_m": 53883.91935541958,
+    "latest_constrained_reaction_l2_N_per_m": 53883.91935541957,
     "latest_energy_reaction_identity": 0.004392766132768051,
     "latest_fem_energy_J_per_m": 0.016000029548810663,
-    "latest_free_dof_residual_l2_N_per_m": 2.782037886822208e-10,
+    "latest_free_dof_residual_l2_N_per_m": 2.699302279678733e-10,
     "latest_reaction_N_per_m": 79088.6975653965,
-    "latest_residual_l2_N_per_m": 53883.91935541958,
-    "latest_top_bottom_reaction_balance": 0.0026693469949831483
+    "latest_residual_l2_N_per_m": 53883.91935541957,
+    "latest_top_bottom_reaction_balance": 0.002669346994982965
   },
   "event_counters": {
     "accepted_steps": 0,
@@ -172,7 +172,7 @@
   "schema": "v11.live-fem-branch-checkpoint/1",
   "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
   "state_file": "stable_subgrid_cavity.json.state.pkl",
-  "state_sha256": "30cc5399480a680caedc2a5a649bcc49273bec12da1ee30a58b70a5ec4f92692",
+  "state_sha256": "f98382c33527f3929927e615f36457f7130ef7b8380f30bf8e18baed6e195bd2",
   "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
   "v12_support_state": {
     "accepted_p0_damage_fingerprint": "ba8e5ef7c098e3a0b09a57c88cb8fd71116e90b9559d8da3251d5ff0150cae61",
