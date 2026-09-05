@@ -530,8 +530,10 @@ def main() -> int:
     branch = subprocess.check_output(("git", "branch", "--show-current"), cwd=ROOT, text=True).strip()
     if branch != BRANCH:
         raise RuntimeError(f"campaign branch mismatch: {branch}")
-    if subprocess.check_output(("git", "status", "--porcelain"), cwd=ROOT, text=True).strip():
-        raise RuntimeError("campaign execution requires a clean committed tree")
+    tracked_dirty = subprocess.run(("git", "diff", "--quiet"), cwd=ROOT).returncode
+    index_dirty = subprocess.run(("git", "diff", "--cached", "--quiet"), cwd=ROOT).returncode
+    if tracked_dirty or index_dirty:
+        raise RuntimeError("campaign execution requires clean committed tracked source")
     validate_inputs(args.family); protected_source_audit()
     for canonical, alias in ROWS.values():
         row, _ = registry_row(canonical)
