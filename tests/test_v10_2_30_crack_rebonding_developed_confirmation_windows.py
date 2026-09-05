@@ -8,8 +8,10 @@ Covers, with synthetic events (no engine needed):
     developed_interval_event_indices() computed independently;
   - true_final_half_indices/true_final_six_indices give the ACTUAL tail of
     an n-event trajectory, not the old fixed [9..17]/[12..17] windows;
-  - action_weighted_K_rebond_true_inter_event_weighted() returns an
-    explicit NOT_ARCHIVED status rather than a surrogate weight;
+  - inter_event_raw_action_weighted_K_rebond() returns an explicit
+    NOT_ARCHIVED status rather than a surrogate weight (and its
+    compatibility alias, action_weighted_K_rebond_true_inter_event_
+    weighted, still resolves to the same function);
   - apply_tail_sensitivity_gate() only ever downgrades
     DEVELOPED_REBONDING_STEEPENING_CONFIRMED, never other classifications.
 """
@@ -25,6 +27,7 @@ from arrhenius_fracture.crack_rebonding_developed_confirmation_v10230 import (  
     action_weighted_K_rebond_true_inter_event_weighted,
     apply_tail_sensitivity_gate,
     developed_interval_event_indices,
+    inter_event_raw_action_weighted_K_rebond,
     stable_growth_gate,
     true_final_half_indices,
     true_final_six_indices,
@@ -85,12 +88,15 @@ def test_true_final_windows_are_actual_tail_not_fixed_18_event_window():
 
 def test_inter_event_action_weighted_mean_is_not_archived():
     events = _synthetic_events(30)
-    result = action_weighted_K_rebond_true_inter_event_weighted(events)
+    result = inter_event_raw_action_weighted_K_rebond(events)
     assert result["status"] == "NOT_ARCHIVED"
+    assert result["limitation_tag"] == "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED"
     assert result["unconditional_action_weighted_mean_Pa_sqrt_m"] is None
     assert result["conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m"] is None
     # The raw sum is still surfaced for audit, but explicitly marked unsafe.
     assert "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics" in result
+    # The compatibility alias must resolve to the exact same function.
+    assert action_weighted_K_rebond_true_inter_event_weighted is inter_event_raw_action_weighted_K_rebond
 
 
 def test_tail_sensitivity_gate_only_downgrades_steepening_confirmed():

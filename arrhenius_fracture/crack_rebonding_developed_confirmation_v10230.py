@@ -355,11 +355,23 @@ def action_weighted_K_rebond_means(events: list[dict]) -> dict[str, Any]:
     """Section D fix: report BOTH the unconditional mean (over ALL events)
     and the conditional mean (over nonzero-K_rebond events only), plus the
     nonzero-event fraction -- the prior campaign's 'conditional mean'
-    silently excluded zero-K_rebond events without reporting that fraction."""
+    silently excluded zero-K_rebond events without reporting that fraction.
+
+    field_semantics (per the decomposition-repair pass's source audit):
+    each event's own ``action_weighted_K_rebond_Pa_sqrt_m`` is an
+    EVENT_LOCALIZATION_INTERVAL_ACTION_WEIGHTED_K_REBOND -- the
+    action-weighted K_rebond over the final localization block that
+    triggered that event (B_start resets every block, so this is NOT an
+    average over the full inter-event history; see
+    inter_event_raw_action_weighted_K_rebond's docstring). The equal-
+    per-event means this function computes are therefore
+    EVENT_LOCALIZATION-INTERVAL, EQUAL-EVENT-WEIGHT statistics, not a
+    complete inter-event hazard-weighted mean."""
     vals = [float(e.get("action_weighted_K_rebond_Pa_sqrt_m") or 0.0) for e in events]
     nonzero = [v for v in vals if v > 0.0]
     n = len(vals)
     return {
+        "field_semantics": "EVENT_LOCALIZATION_INTERVAL_ACTION_WEIGHTED_K_REBOND",
         "n_events": n,
         "n_nonzero_events": len(nonzero),
         "nonzero_event_fraction": (len(nonzero) / n) if n else float("nan"),
@@ -368,84 +380,99 @@ def action_weighted_K_rebond_means(events: list[dict]) -> dict[str, Any]:
     }
 
 
-def action_weighted_K_rebond_true_inter_event_weighted(events: list[dict]) -> dict[str, Any]:
-    """Decomposition-repair pass (post-review, second round): the previous
-    evidence-hardening pass reported an INTER-EVENT action-weighted mean
+def inter_event_raw_action_weighted_K_rebond(events: list[dict]) -> dict[str, Any]:
+    """INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED (limitation tag, per
+    review). Decomposition-repair pass (post-review, second round)
+    retracted an INTER-EVENT action-weighted mean
 
         <K_b> = sum_j( A_c,j * Kbar_b,j ) / sum_j( A_c,j )
 
-    using each event's ``cleavage_action`` field as the weight A_c,j. This
-    was WRONG and the resulting numbers (293,284 Pa sqrt(m), and every
-    pooled K_b / S_abs / S_occupancy value derived from it) are retracted.
+    that used each event's ``cleavage_action`` field as the weight A_c,j
+    (the resulting number, 293,284 Pa sqrt(m), and every pooled K_b /
+    S_abs / S_occupancy value derived from it, was retracted). This third
+    pass corrects and completes the root-cause explanation after a full
+    source audit of the physical producer code (crack_rebonding_v10230.py
+    and arrhenius_fracture/persistent_site_cyclic_v10229.py /
+    persistent_site_cyclic_energy_gated_v10230.py, commit aa6982a --
+    unchanged since):
 
-    Root cause, traced to the physical producer code (crack_rebonding_
-    v10230.py, arrhenius_fracture/persistent_site_cyclic_energy_gated_
-    v10230.py, commit aa6982a -- unchanged since):
+    ``event["cleavage_action"]`` is threshold-normalized progress
+    (``lambda_cleave_normalized = raw_lambda / threshold_action``, so the
+    integral is dimensionless progress toward ``B_threshold = 1.0``,
+    ``persistent_site_cyclic_energy_gated_v10230.py``'s
+    ``phase_resolved_action_fn`` closure) evaluated over the EVENT-
+    LOCALIZATION interval measured from the CURRENT ``B_start`` -- NOT a
+    common-scale raw physical action over the complete inter-event
+    waiting interval. Confirmed by source audit:
+    ``persistent_site_cyclic_v10229.py``'s block-stepping code sets
+    ``self._rebonding_block_context = {..., "B_start": float(self.B), ...}``
+    FRESH on EVERY call to the per-block cyclic-stepping routine (one call
+    per block in run_trajectory's per-event block-search loop), so this
+    context -- and therefore ``B_start`` -- is OVERWRITTEN on every
+    non-firing block and only the LAST (firing) block's snapshot survives
+    to be read by ``_commit_rebonding_event``. The bisection ``dt`` search
+    in ``solve_coupled_event_time`` (``residual(dt) = (B_start + action) -
+    B_threshold``) therefore only resolves the RESIDUAL progress within
+    that one firing block, not the full inter-event interval since the
+    previous accepted event. Its large variation (5.6e-54 to 7.1e-6
+    observed in one trajectory, with no consistent relationship to the
+    event's own ``hazard_threshold_action``) reflects the independently
+    drawn threshold, the residual action remaining at the start of the
+    firing block, phase, and the final localization block's duration --
+    not simply "the stochastic threshold varying," as an earlier version
+    of this docstring stated.
 
-    - ``_commit_rebonding_event``'s ``lambda_cleave_normalized(sigma) =
-      self.lambda_cleave(sigma, T_K_ctx)[0] / threshold_action``
-      (persistent_site_cyclic_energy_gated_v10230.py, the
-      ``phase_resolved_action_fn`` closure) divides the raw cleavage hazard
-      rate by ``threshold_action`` -- a value drawn FRESH, independently,
-      for every event -- BEFORE integrating it.
-    - ``phase_resolved_action``'s returned ``action`` (crack_rebonding_
-      v10230.py: ``diagnostics["action"] = total_action``, where
-      ``total_action`` accumulates ``lambda_cleave_fn(sigma_c) * dt`` bin by
-      bin) is therefore DIMENSIONLESS NORMALIZED PROGRESS toward
-      ``B_threshold=1.0`` (see ``solve_coupled_event_time``'s
-      ``residual(dt) = (B_start + action) - B_threshold``), scaled by a
-      DIFFERENT random denominator (that event's own ``threshold_action``)
-      for every event -- not a raw physical action comparable across
-      events on a common scale. This is exactly why the recorded
-      ``cleavage_action`` values span ~70 orders of magnitude (5.6e-54 to
-      7.1e-6 observed in one trajectory) with no consistent relationship to
-      the event's own ``hazard_threshold_action`` (ratios from 1e-5 down to
-      1e-74) -- summing or weighting by it treats incommensurable
-      quantities as if they were on one scale.
-    - By contrast, the PER-EVENT ``action_weighted_K_rebond_Pa_sqrt_m``
-      field (``diagnostics["action_weighted_K_rebond_Pa_sqrt_m"] =
-      action_weighted_K_rebond_accum / total_action``) is a RATIO of two
-      quantities built from the same per-bin ``action_increment`` terms
-      within one call -- the arbitrary 1/threshold_action normalization
-      factor cancels between numerator and denominator, so this per-event
-      value is intra-event-safe and remains valid for the SIMPLE
-      per-event arithmetic mean (action_weighted_K_rebond_means() above).
-      It is only CROSS-event weighting by the raw, differently-normalized
-      ``cleavage_action`` that is invalid.
-    - Separately and independently: the recording wrapper in run_
-      trajectory monkeypatches ``_rebond.phase_resolved_action`` at module
-      scope, so ``bulk_action_records`` captures EVERY call made during an
-      event's entire block-search loop, not provably only the converged
-      root-finding call -- ``new_bulk_records[-1]`` (this module's prior
-      assumption for "the" per-event value) has not been confirmed to
-      exclusively represent the full inter-event interval versus some
-      other single-block diagnostic evaluation. This is a second,
-      independent reason the raw ``action``/``cleavage_action`` value
-      cannot be trusted as an event-integrated quantity without further
-      producer-code instrumentation this pass did not undertake.
+    By contrast, the PER-EVENT ``action_weighted_K_rebond_Pa_sqrt_m``
+    field (``action_weighted_K_rebond_accum / total_action``, both
+    accumulated over that SAME final-block localization interval) is a
+    ratio in which the arbitrary normalization cancels, so it remains a
+    valid, intra-call-consistent quantity -- but it should be understood
+    and labeled as EVENT_LOCALIZATION_INTERVAL_ACTION_WEIGHTED_K_REBOND
+    (the action-weighted K_rebond over the final localization block that
+    triggered this event), not as a full inter-event-history average.
+    This audit did not find any code path in which it accumulates over
+    "all preceding nonfiring blocks between accepted events"; on the
+    contrary, ``B_start`` is proven to reset every block, so no such
+    accumulation occurs.
 
-    Per review: when a complete, non-double-counted event-integrated
-    action cannot be reconstructed from the currently recorded fields, the
-    correct result is NOT_ARCHIVED, not a surrogate weight. This function
-    now returns that status. The raw (uninterpreted, NOT validated for
-    physics) per-event cleavage_action values are still surfaced under
-    unvalidated_raw_cleavage_action_sum for audit-trail transparency only
-    -- explicitly marked not to be used in any downstream computation."""
+    Per review: a complete, non-double-counted event-integrated action
+    cannot be reconstructed from the currently recorded fields (doing so
+    would require summing every block's localized action across the
+    entire inter-event interval, which is not separately recorded), so
+    this returns NOT_ARCHIVED rather than a surrogate weight. The raw
+    (uninterpreted, NOT validated for physics) per-event cleavage_action
+    values are still surfaced under
+    unvalidated_raw_cleavage_action_sum_do_not_use_for_physics for
+    audit-trail transparency only.
+
+    Renamed from ``action_weighted_K_rebond_true_inter_event_weighted``
+    (retained below as a compatibility alias) because that name implied a
+    quantity this function correctly refuses to calculate."""
     raw_sum = sum(float(e.get("cleavage_action") or 0.0) for e in events)
     return {
         "status": "NOT_ARCHIVED",
+        "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
         "reason": (
-            "cleavage_action is normalized by a per-event-varying threshold_action "
-            "denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's "
-            "lambda_cleave_normalized), so it is not a raw, cross-event-comparable "
-            "physical action; using it as an inter-event weight conflates "
-            "incommensurable quantities. See this function's docstring for the full "
-            "code-traced derivation."
+            "cleavage_action is threshold-normalized progress over the EVENT-"
+            "LOCALIZATION interval from the current B_start, not a common-scale "
+            "raw physical action over the complete inter-event waiting interval "
+            "-- B_start is reset every block (persistent_site_cyclic_v10229.py), "
+            "so the final commit-time call only resolves the residual progress "
+            "within the firing block. Its variation reflects the independently "
+            "drawn threshold, the residual action remaining at the start of the "
+            "firing block, phase, and final localization duration -- not simply "
+            "the drawn threshold varying. See this function's docstring for the "
+            "full source-audited derivation."
         ),
         "unconditional_action_weighted_mean_Pa_sqrt_m": None,
         "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": None,
         "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": raw_sum,
     }
+
+
+# Compatibility alias: existing committed artifacts (verification checks,
+# prior decision JSON schemas) reference the old name.
+action_weighted_K_rebond_true_inter_event_weighted = inter_event_raw_action_weighted_K_rebond
 
 
 def S_abs_shape_preserving(K: float, K_b: float, g_zero_points: dict[float, float]) -> float | None:
@@ -508,7 +535,8 @@ __all__ = [
     "classify_developed_confirmation",
     "apply_tail_sensitivity_gate",
     "action_weighted_K_rebond_means",
-    "action_weighted_K_rebond_true_inter_event_weighted",
+    "inter_event_raw_action_weighted_K_rebond",
+    "action_weighted_K_rebond_true_inter_event_weighted",  # compatibility alias
     "S_abs_shape_preserving",
     "S_abs_local_power_law",
 ]

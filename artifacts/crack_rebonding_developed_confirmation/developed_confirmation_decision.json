@@ -1,6 +1,6 @@
 {
   "frequency_Hz": 1000.0,
-  "frozen_predictions_reference": "/private/tmp/v10230-crack-rebonding-developed-decomposition-repair/artifacts/crack_rebonding_developed_confirmation/developed_confirmation_predictions.json",
+  "frozen_predictions_reference": "/private/tmp/v10230-crack-rebonding-static-shield-attribution/artifacts/crack_rebonding_developed_confirmation/developed_confirmation_predictions.json",
   "kmax_grid_Pa_sqrt_m": [
     15000000.0,
     18000000.0,
@@ -617,7 +617,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.1842337266877698e-19
@@ -641,7 +642,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 0.7109217188082849
@@ -667,7 +669,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 7.738838636240665e-07
@@ -691,7 +694,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.1338512612957548
@@ -717,7 +721,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000002,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.214647852180622e-06
@@ -741,7 +746,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.2645947692754538
@@ -767,7 +773,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000001,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.801242711690383e-07
@@ -791,7 +798,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0717739045104928
@@ -817,7 +825,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.354138685186429e-06
@@ -841,7 +850,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.762002576070676
@@ -867,7 +877,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999999,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.1842337266877698e-19
@@ -891,7 +902,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.100198944865409
@@ -918,7 +930,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000001,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.4512430906640837e-06
@@ -942,7 +955,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.2143440623454085
@@ -1453,7 +1467,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000001,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.4512430906642434e-06
@@ -1612,7 +1627,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.703671071959634
@@ -1791,7 +1807,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.232108520288988e-07
@@ -1815,7 +1832,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 0.4441407284557509
@@ -1841,7 +1859,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 6.433953412094344e-07
@@ -1865,7 +1884,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.3648690814557223
@@ -1891,7 +1911,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.3979576296028127e-06
@@ -1915,7 +1936,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.2175110655099863
@@ -1941,7 +1963,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.709565758602495e-06
@@ -1965,7 +1988,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0020582231132633
@@ -1991,7 +2015,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.4582681272182344e-06
@@ -2015,7 +2040,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.27977223544743
@@ -2041,7 +2067,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999999,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.232108520288988e-07
@@ -2065,7 +2092,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.3648689515797074
@@ -2092,7 +2120,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.23861827435379e-06
@@ -2116,7 +2145,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.591793423657277
@@ -2627,7 +2657,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.11901416724501e-06
@@ -2786,7 +2817,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.166412594752161
@@ -2965,7 +2997,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999998,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.2138211737226073e-07
@@ -2989,7 +3022,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 0.7220571676713826
@@ -3015,7 +3049,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 893372.7546661856,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.3491616300873957e-07
@@ -3039,7 +3074,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.147473946016986
@@ -3065,7 +3101,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.6331420323629376e-06
@@ -3089,7 +3126,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.1186990902175256
@@ -3115,7 +3153,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.6263794736092869e-06
@@ -3139,7 +3178,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 0.900375389851412
@@ -3165,7 +3205,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 895581.8364441238,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0255063036814758e-06
@@ -3189,7 +3230,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.0154514325175237
@@ -3215,7 +3257,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 888954.5911103092,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.2138211737226073e-07
@@ -3239,7 +3282,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.147473946016986
@@ -3266,7 +3310,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 897451.0594869945,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.8928788496851245e-06
@@ -3290,7 +3335,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.1552326861452435
@@ -3801,7 +3847,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 897714.7429883399,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.007883308700577e-06
@@ -3960,7 +4007,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.638154406216887
@@ -4247,7 +4295,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3729881373342608e-23
@@ -4271,7 +4320,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.4067049253053407
@@ -4297,7 +4347,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3630550325430807e-06
@@ -4321,7 +4372,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.7582871860366633
@@ -4347,7 +4399,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3340570374754415e-06
@@ -4371,7 +4424,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.322197200243767
@@ -4397,7 +4451,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3340570374733544e-06
@@ -4421,7 +4476,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.7392043003997002
@@ -4447,7 +4503,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.4110981326737162e-06
@@ -4471,7 +4528,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.8638536104537162
@@ -4497,7 +4555,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.089476299046621e-07
@@ -4521,7 +4580,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.5223144594610134
@@ -4548,7 +4608,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.3749951865519614e-06
@@ -4572,7 +4633,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.1221346163993955
@@ -5083,7 +5145,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 868971.8324579373,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0509149858023057e-05
@@ -5242,7 +5305,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 11.459424955109679
@@ -5421,7 +5485,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.254153089501277e-07
@@ -5445,7 +5510,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.3753721856646317
@@ -5471,7 +5537,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 810015.0573881521,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.95116784230059e-06
@@ -5495,7 +5562,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.489733508316414
@@ -5521,7 +5589,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.924654852456969e-06
@@ -5545,7 +5614,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.027802265794504
@@ -5571,7 +5641,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.7578001746486501e-06
@@ -5595,7 +5666,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.7295485797124228
@@ -5621,7 +5693,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 840010.0382587682,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.483658887587874e-06
@@ -5645,7 +5718,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.7988928691995936
@@ -5671,7 +5745,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.0643688323257254e-06
@@ -5695,7 +5770,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.45995801566466
@@ -5722,7 +5798,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 865390.4066877508,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.87582269475756e-06
@@ -5746,7 +5823,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.889691522570887
@@ -6257,7 +6335,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 865664.103038091,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.086854027010573e-05
@@ -6416,7 +6495,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 6.219386431434945
@@ -6595,7 +6675,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000003,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.275564854548214e-06
@@ -6619,7 +6700,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.5155328764601252
@@ -6645,7 +6727,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899985.186723083,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 6.4350839192050966e-06
@@ -6669,7 +6752,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 4.848156241016847
@@ -6695,7 +6779,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 7.742237871860327e-07
@@ -6719,7 +6804,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 2.5462395453988362
@@ -6745,7 +6831,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899999.9999999999,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 7.742237871860327e-07
@@ -6769,7 +6856,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.9424458561173092
@@ -6795,7 +6883,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899990.1244820554,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 6.4747897811540765e-06
@@ -6819,7 +6908,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 5.245442252731917
@@ -6845,7 +6935,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 900000.0000000003,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 3.061662057502706e-06
@@ -6869,7 +6960,8 @@
               "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
               "action_weighted_K_rebond_true_inter_event_weighted": {
                 "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-                "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+                "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+                "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
                 "status": "NOT_ARCHIVED",
                 "unconditional_action_weighted_mean_Pa_sqrt_m": null,
                 "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.6135646688488137
@@ -6896,7 +6988,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 899994.3025858011,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 8.305577393777451e-06
@@ -6920,7 +7013,8 @@
             "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
             "action_weighted_K_rebond_true_inter_event_weighted": {
               "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-              "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+              "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+              "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
               "status": "NOT_ARCHIVED",
               "unconditional_action_weighted_mean_Pa_sqrt_m": null,
               "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 7.634192069612811
@@ -7431,7 +7525,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 868965.5846877013,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 1.5463951117418047e-05
@@ -7590,7 +7685,8 @@
           "action_weighted_K_rebond_simple_mean_conditional_nonzero_Pa_sqrt_m": 0.0,
           "action_weighted_K_rebond_true_inter_event_weighted": {
             "conditional_action_weighted_mean_nonzero_only_Pa_sqrt_m": null,
-            "reason": "cleavage_action is normalized by a per-event-varying threshold_action denominator (traced to persistent_site_cyclic_energy_gated_v10230.py's lambda_cleave_normalized), so it is not a raw, cross-event-comparable physical action; using it as an inter-event weight conflates incommensurable quantities. See this function's docstring for the full code-traced derivation.",
+            "limitation_tag": "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+            "reason": "cleavage_action is threshold-normalized progress over the EVENT-LOCALIZATION interval from the current B_start, not a common-scale raw physical action over the complete inter-event waiting interval -- B_start is reset every block (persistent_site_cyclic_v10229.py), so the final commit-time call only resolves the residual progress within the firing block. Its variation reflects the independently drawn threshold, the residual action remaining at the start of the firing block, phase, and final localization duration -- not simply the drawn threshold varying. See this function's docstring for the full source-audited derivation.",
             "status": "NOT_ARCHIVED",
             "unconditional_action_weighted_mean_Pa_sqrt_m": null,
             "unvalidated_raw_cleavage_action_sum_do_not_use_for_physics": 12.451787520962519

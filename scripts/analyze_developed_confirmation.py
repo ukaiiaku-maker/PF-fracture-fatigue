@@ -60,7 +60,7 @@ from arrhenius_fracture.crack_rebonding_developed_confirmation_v10230 import (  
     S_abs_local_power_law,
     S_abs_shape_preserving,
     action_weighted_K_rebond_means,
-    action_weighted_K_rebond_true_inter_event_weighted,
+    inter_event_raw_action_weighted_K_rebond,
     apply_tail_sensitivity_gate,
     classify_developed_confirmation,
     effective_horizon_censored,
@@ -185,7 +185,7 @@ def _exposure_and_action(events: list[dict], intervals: list[dict]) -> dict[str,
     from the SAME window, not developed-window S_h against all-event
     diagnostics."""
     aw_means = action_weighted_K_rebond_means(events)
-    aw_true_weighted = action_weighted_K_rebond_true_inter_event_weighted(events)
+    aw_true_weighted = inter_event_raw_action_weighted_K_rebond(events)
     pre_event_pB = [e["pre_event_max_pB"] for e in events]
     return {
         "n_events_in_window": len(events),
