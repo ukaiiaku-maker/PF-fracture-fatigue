@@ -1452,12 +1452,16 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
 
 
 def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0),
-                             crack_path_m=None, cleavage_theta_deg=0.0):
+                             crack_path_m=None, cleavage_theta_deg=0.0,
+                             state_trace=None):
     state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m,
                                               crack_path_m=crack_path_m,
                                               cleavage_theta_deg=cleavage_theta_deg)
     cfg = VoidingConfig(enabled=True, promotion_radius_m=5.0e-5)
     rows = [observables(state, "available_site")]
+    def capture(label):
+        if state_trace is not None: state_trace.append((label,state))
+    capture("available_site")
     for label in ("multi_hit_1", "multi_hit_2"):
         tensor = local_site_tensor(state); rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
         site = state.void_state.sites[0]
@@ -1465,6 +1469,7 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
         void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
         state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))
         rows.append({**observables(state, label), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
+        capture(label)
     tensor = local_site_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
     site = state.void_state.sites[0]
@@ -1472,8 +1477,10 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
     state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))
     rows.append({**observables(state, "stabilization"), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
+    capture("stabilization")
     state = replace(state, void_state=create_subgrid_cavity(state.void_state, "site-1", 2.5e-5))
     state = equilibrate_fixed_load_with_production_fem(state); rows.append(observables(state, "subgrid_void"))
+    capture("subgrid_void")
     tensor = local_site_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
     growth_dt = 2.5e-5 / (cfg.radial_growth_scale_m * rates["series_limited_growth_s"])
@@ -1484,10 +1491,12 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     grown = state.void_state.cavities[0]
     state = equilibrate_fixed_load_with_production_fem(state)
     rows.append({**observables(state, "subgrid_growth"), "rates": rates, "growth_dt_s": growth_dt})
+    capture("subgrid_growth")
     promoted = promote_cavity(state.void_state, grown.cavity_id, cfg.promotion_radius_m)
     operations = []
     state = remesh_cavity(state, hole, promoted, "promotion", operations)
     rows.append({**observables(state, "geometric_promotion"), "executed_operations": operations})
+    capture("geometric_promotion")
     grown_hole = _grow_hole_boundary(hole, 5.5e-5)
     tensor = cavity_boundary_tensor(state)[0]
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
@@ -1498,6 +1507,7 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     )
     state = remesh_cavity(state, grown_hole, void_state, "resolved-growth")
     rows.append({**observables(state, "resolved_growth"), "rates": rates, "growth_dt_s": growth_dt})
+    capture("resolved_growth")
     if stop_before_ligament:
         return state, rows
     state, result = ligament_transaction(state)
@@ -1508,6 +1518,7 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
         "energy_margin_J_per_m": result.energy_margin_J_per_m,
         "event_classification": "physical_cleavage",
     })
+    capture("ligament_rupture")
     rows.append(observables(state, "connected_topology"))
     tensor, boundary_elements = cavity_boundary_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
@@ -1519,10 +1530,12 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     rows.append({**observables(state, "new_graph_front"), "executed_operations": operations,
                  "energy_release_J_per_m": result.energy_release_J_per_m,
                  "causal_first_passage": causal})
+    capture("new_graph_front")
     state, result, operations, causal = downstream_front_transaction(state, continuation=True)
     rows.append({**observables(state, "continued_accepted_event"), "executed_operations": operations,
                  "energy_release_J_per_m": result.energy_release_J_per_m,
                  "causal_first_passage": causal})
+    capture("continued_accepted_event")
     return state, rows
 
 
