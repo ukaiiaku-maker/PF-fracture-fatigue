@@ -179,11 +179,14 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
             if static_shield.get("first_event_fired", False) else 0.0
         )
     if hazard_coupled:
-        phase_offset_rad = _rebond.chronological_phase_offset_rad(
-            rebonding_state.elapsed_time_s, waveform.period_s
-        )
-        K_signed_phase, dt_signed_values = waveform.cycle_schedule(
-            n_phase_count, signed=True, phase_offset_rad=phase_offset_rad
+        # PX2.5 fix: chronological_phase_offset_rad's single-angle rotation
+        # assumes the whole period is one sinusoidal traverse -- true only
+        # at hold=0. cycle_schedule_from_elapsed correctly represents the
+        # wake's continuous elapsed-time clock whether it currently sits in
+        # the sinusoid or the dwell, and reduces to the exact original
+        # phase_offset_rad rotation when the hold is zero.
+        K_signed_phase, dt_signed_values = waveform.cycle_schedule_from_elapsed(
+            n_phase_count, rebonding_state.elapsed_time_s, signed=True
         )
         Eprime_Pa = _rebond.reduced_modulus_Pa(engine.G, engine.nu)
         r_contact_m = max(engine.r_eff(), rebonding_state.cfg.contact_radius_min_m)
@@ -322,11 +325,14 @@ def _commit_constant_segment(
     dt_segment = max(float(cycles), 0.0) * float(waveform.period_s)
     if rebonding_active:
         n_phase_count = len(controller._phases())
-        phase_offset_rad = _rebond.chronological_phase_offset_rad(
-            rebonding_state.elapsed_time_s, waveform.period_s
-        )
-        K_signed_phase, dt_signed_values = waveform.cycle_schedule(
-            n_phase_count, signed=True, phase_offset_rad=phase_offset_rad
+        # PX2.5 fix: chronological_phase_offset_rad's single-angle rotation
+        # assumes the whole period is one sinusoidal traverse -- true only
+        # at hold=0. cycle_schedule_from_elapsed correctly represents the
+        # wake's continuous elapsed-time clock whether it currently sits in
+        # the sinusoid or the dwell, and reduces to the exact original
+        # phase_offset_rad rotation when the hold is zero.
+        K_signed_phase, dt_signed_values = waveform.cycle_schedule_from_elapsed(
+            n_phase_count, rebonding_state.elapsed_time_s, signed=True
         )
         # dt_phase is a plain scalar at hold=0 (identical to the original
         # ``period_s/phases.size`` expression -- period_s==base_period_s

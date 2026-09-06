@@ -27,8 +27,10 @@ from arrhenius_fracture.crack_rebonding_kinetics_v10230 import (
 )
 from arrhenius_fracture.crack_rebonding_v10230 import (
     WakePatch,
+    install_crack_rebonding,
     patch_Q,
     patch_rate_constants,
+    patch_transition_actions_and_fluxes,
     restore_rebonding_checkpoint,
     serialize_rebonding_checkpoint,
 )
@@ -105,22 +107,60 @@ def test_formation_and_rupture_active_as_in_rb2():
 
 
 def test_all_four_transitions_live_through_real_engine_trajectory():
-    """End-to-end: a real A_NATIVE engine, real waveform, cycling through
-    both compression and tension, must exercise all four transitions
-    (P->C, C->P, C->B, B->C) with genuinely nonzero action over the
-    trajectory -- not merely nonzero instantaneous rate constants."""
+    """External review, correctly: the original version of this test only
+    asserted p_P<1 and (p_C>0 or p_B>0) -- consistent with as few as ONE
+    of the four transitions ever firing. Strengthened to require ALL
+    eight quantities (A_PC, A_CP, A_CB, A_BC, F_PC, F_CP, F_CB, F_BC)
+    strictly positive, measured directly via PX1.2's exact
+    patch_transition_actions_and_fluxes over the precise per-segment
+    dt_consumed each committed segment actually used (not the requested
+    block duration), summed across the whole trajectory, with the
+    cumulative state-balance identities closing against the real
+    observed state change."""
     ctrl = controller(n_phase=16)
     cfg = _rb3_cfg()
     engine = build_real_engine(cfg)
     wave = FatigueWaveform(Kmax=18.0e6, R=-0.5, frequency_Hz=1000.0)
-    for _ in range(30):
-        _commit_constant_segment(engine, ctrl, wave, 300.0, 1.0, sigma_average_Pa=1.0e8, lambda_average_s=1.0e-3)
+    r_contact_m = max(engine.r_eff(), cfg.contact_radius_min_m)
+    n_phase = 16
+    K_signed, dt_signed = wave.cycle_schedule(n_phase, signed=True)
+
     patch = engine._rebonding_state.active[0]
-    # Started fully passivated (INITIAL_WAKE_PASSIVATED: p_P=1); after
-    # cycling through many compression/tension half-cycles, the patch must
-    # have moved off its initial state through all four channels.
-    assert patch.p_P < 1.0
-    assert (patch.p_C > 0.0) or (patch.p_B > 0.0)
+    p_initial = patch.state_vector().copy()
+    totals = {"A_PC": 0.0, "A_CP": 0.0, "A_CB": 0.0, "A_BC": 0.0,
+              "F_PC": 0.0, "F_CP": 0.0, "F_CB": 0.0, "F_BC": 0.0}
+
+    for _ in range(30):
+        state_before = patch.state_vector().copy()
+        result = _commit_constant_segment(
+            engine, ctrl, wave, 300.0, 1.0, sigma_average_Pa=1.0e8, lambda_average_s=1.0e-3,
+        )
+        dt_consumed = float(result.get("dt_consumed", wave.period_s))
+        # Independently measure this segment's exact diagnostics from the
+        # pre-segment state over the exact consumed duration (not the
+        # requested block), then verify against the real observed
+        # post-segment state before folding into the running totals.
+        patch_probe = WakePatch(
+            patch_id=-1, length_m=patch.length_m, s_j_m=patch.s_j_m,
+            p_P=state_before[0], p_C=state_before[1], p_B=state_before[2],
+            creation_event_index=-1,
+        )
+        diag = patch_transition_actions_and_fluxes(
+            patch=patch_probe, K_signed_phase=K_signed, dt_phase=dt_signed,
+            r_contact_m=r_contact_m, cfg=cfg, T_K=300.0, dt_consumed=dt_consumed,
+        )
+        assert np.allclose(diag["p_final"], patch.state_vector(), atol=1e-8)
+        for key in totals:
+            totals[key] += diag[key]
+
+    for key, value in totals.items():
+        assert value > 0.0, f"{key} was not strictly positive over the trajectory ({value})"
+
+    p_final = patch.state_vector()
+    dpP, dpC, dpB = p_final - p_initial
+    assert dpP == pytest.approx(-totals["F_PC"] + totals["F_CP"], abs=1e-6)
+    assert dpC == pytest.approx(totals["F_PC"] - totals["F_CP"] - totals["F_CB"] + totals["F_BC"], abs=1e-6)
+    assert dpB == pytest.approx(totals["F_CB"] - totals["F_BC"], abs=1e-6)
 
 
 # ---------------------------------------------------------------------------
@@ -248,14 +288,26 @@ def test_snapshot_restore_round_trip_via_wake_state_directly():
 def test_rb3_does_not_change_ordinary_emission_relative_to_rb0():
     """RB3 enters only sig_cleave (via cleavage_stress_with_rebond); the
     ordinary emission/plasticity channel (fed by K_values / sigma_tip, not
-    sig_cleave) must be unaffected by which rebonding model level -- or
-    whether rebonding is installed at all -- is active."""
+    sig_cleave) must be unaffected by whether rebonding is installed.
+
+    Per external review: comparing two independently-constructed engines
+    is unreliable in this suite (pre-existing class-level state can leak
+    across test execution order -- see test_v10_2_30_crack_rebonding_
+    part_x_engine_reproducibility.py for the root cause and fix). Uses a
+    SINGLE engine's own before/after channel-level calculation instead:
+    mu_emit is a deterministic function of engine.mpz/sigma_tip/material
+    state via preview_cycle_waveform, with no hazard-RNG dependence at
+    all, so calling it before and after installing RB3 on the identical
+    engine is a strictly stronger and more direct test than comparing two
+    separate engines could ever be.
+    """
     ctrl = controller(n_phase=16)
     wave = FatigueWaveform(Kmax=18.0e6, R=-0.5, frequency_Hz=1000.0)
+    engine = build_real_engine(None)
 
-    engine_rb3 = build_real_engine(_rb3_cfg())
-    engine_none = build_real_engine(None)
+    pred_before = engine.preview_cycle_waveform(ctrl, wave, 300.0)
+    install_crack_rebonding(engine, _rb3_cfg())
+    pred_after = engine.preview_cycle_waveform(ctrl, wave, 300.0)
 
-    r_rb3 = engine_rb3.cycle_step_waveform(ctrl, wave, 300.0)
-    r_none = engine_none.cycle_step_waveform(ctrl, wave, 300.0)
-    assert r_rb3["mu_emit"] == pytest.approx(r_none["mu_emit"], rel=1e-9)
+    assert pred_after.mu_emit == pytest.approx(pred_before.mu_emit, rel=1e-12)
+    assert pred_after.avg_sigma_tip == pytest.approx(pred_before.avg_sigma_tip, rel=1e-12)

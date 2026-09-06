@@ -9,8 +9,8 @@
     "dwell_transition_s": 0.0005,
     "dwell_transition_delta_mean_p_B": 0.04857533489227156,
     "passivation_chemistry_factor": 1.0,
-    "competing_persistent_selected": true,
-    "competing_persistent_reason": "PX2.3 construction already confirmed distinguishable from COMPETING_REVERSIBLE (mean_p_B differs by >=0.10, A_BC >=5x smaller) -- section 7.8 item 5 satisfied by construction.",
+    "competing_persistent_status": "ANALYTICALLY_ELIGIBLE_FOR_PX3_SCREEN",
+    "competing_persistent_reason": "PX2.3's analytical construction found it distinguishable from COMPETING_REVERSIBLE (mean_p_B differs by >=0.10, A_BC >=5x smaller) at the reference condition -- this is SCREEN eligibility (section 7.8 item 5's analytical precondition), not a developed-campaign selection. Its D6 developed jobs remain BLOCKED_PENDING_PX3_PERSISTENT_DISTINCTION until PX3's live production screen independently confirms the same distinction under real trajectory noise/discretization, not merely the periodic-orbit ideal.",
     "cohesive_strength_endpoint_selected": null,
     "cohesive_strength_endpoint_reason": "deferred per section 7.8 item 6 -- selected only if the PX3 three-point cohesive-strength screen is visibly nonlinear or changes the qualitative slope classification; cannot be determined from the analytical atlas alone."
   }

@@ -305,6 +305,86 @@ class FatigueWaveform:
             dt_values = np.concatenate([dt_values, [hold_s]])
         return K_values, dt_values
 
+    def cycle_schedule_from_elapsed(
+        self, n_phase: int, elapsed_time_s: float, *, signed: bool = False
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """PX2.5 correctness fix: rotate the cycle schedule so bin 0 of the
+        returned arrays represents "right now" -- wherever the wake's
+        continuous elapsed-time clock (mod ``period_s``) currently sits,
+        whether that is partway through a sinusoidal bin OR partway
+        through the dwell.
+
+        The pre-fix code (``chronological_phase_offset_rad(elapsed_time_s,
+        period_s)`` feeding ``cycle_schedule(..., phase_offset_rad=...)``)
+        maps ``elapsed_time_s`` onto a single angle assuming the WHOLE
+        period is one sinusoidal rotation. That is exactly right when
+        ``minimum_load_hold_s == 0`` (``period_s == base_period_s``), but
+        once the hold is active it silently applies a spurious rotation to
+        the sinusoidal bins whenever the cursor is actually sitting inside
+        the dwell -- e.g. a cursor 30% into a 0.5 ms hold (elapsed_time_s
+        = base_period_s + 0.15 ms) produced a ~276-degree sinusoidal
+        rotation with no physical meaning, silently corrupting every
+        multi-block dwell trajectory's next-block K-schedule. Verified
+        directly: at Kmax=18 MPa sqrt(m), R=-0.5, hold=0.5 ms, this bug
+        substituted K(phase=0)=17.74 MPa sqrt(m) with a spurious
+        K=8.50 MPa sqrt(m) for the immediately-following segment.
+
+        This function instead finds which bin of the UNROTATED schedule
+        (``cycle_schedule`` with no offset) contains the cursor and how
+        much of that bin remains, then returns the schedule reordered to
+        start there: bin 0 is the remaining duration of the cursor's own
+        bin, followed by every subsequent bin in its ordinary order
+        (wrapping around), with the already-consumed portion of the
+        cursor's own bin appended as the final (generally partial) entry
+        -- so the returned schedule still sums to exactly one full period,
+        preserving cycle-mean-statistics correctness, while bin 0 always
+        represents the exact remaining time in whichever segment (sinusoid
+        or dwell) the cursor is actually in.
+
+        hold=0 identity: when ``minimum_load_hold_s == 0`` this dispatches
+        to the byte-for-byte original ``phase_offset_rad`` rotation
+        instead (mathematically DIFFERENT discretizations in general --
+        angle-rotation of a uniform grid versus bin-splitting -- so hold=0
+        must not run through the new bin-splitting logic at all).
+        """
+        n_phase = max(int(n_phase), 1)
+        if float(self.minimum_load_hold_s) <= 0.0:
+            from .crack_rebonding_v10230 import chronological_phase_offset_rad
+
+            offset = chronological_phase_offset_rad(elapsed_time_s, self.period_s)
+            return self.cycle_schedule(n_phase, signed=signed, phase_offset_rad=offset)
+
+        K_full, dt_full = self.cycle_schedule(n_phase, signed=signed)
+        n_total = len(dt_full)
+        total_period = float(dt_full.sum())
+        t = float(elapsed_time_s) % total_period if total_period > 0.0 else 0.0
+
+        cursor = 0.0
+        start_idx = n_total - 1
+        remaining_in_bin = float(dt_full[-1])
+        for i in range(n_total):
+            if t < cursor + dt_full[i] - 1.0e-12 or i == n_total - 1:
+                start_idx = i
+                remaining_in_bin = max((cursor + dt_full[i]) - t, 0.0)
+                break
+            cursor += dt_full[i]
+
+        order_idx = [start_idx]
+        order_dt = [remaining_in_bin]
+        idx = (start_idx + 1) % n_total
+        while idx != start_idx:
+            order_idx.append(idx)
+            order_dt.append(float(dt_full[idx]))
+            idx = (idx + 1) % n_total
+        consumed_in_start_bin = float(dt_full[start_idx]) - remaining_in_bin
+        if consumed_in_start_bin > 1.0e-15:
+            order_idx.append(start_idx)
+            order_dt.append(consumed_in_start_bin)
+
+        K_rot = np.asarray([K_full[i] for i in order_idx], dtype=float)
+        dt_rot = np.asarray(order_dt, dtype=float)
+        return K_rot, dt_rot
+
 
 @dataclass
 class FatigueControllerConfig:

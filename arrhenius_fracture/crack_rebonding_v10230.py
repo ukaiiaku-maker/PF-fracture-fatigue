@@ -571,6 +571,130 @@ def patch_transition_actions_and_fluxes(
     )
 
 
+def build_screen_event_ledger_row(
+    *,
+    patch: WakePatch,
+    K_signed_phase: np.ndarray,
+    dt_phase: float | np.ndarray,
+    r_contact_m: float,
+    cfg: CrackRebondingControls,
+    T_K: float,
+    dt_consumed: float,
+    n_phase_sinusoid: int,
+    elapsed_time_s_before: float,
+    elapsed_time_s_after: float,
+    k0: int = 0,
+) -> dict[str, Any]:
+    """PX2.5 item 3: the complete per-accepted-interval, per-patch record
+    mission section 5.2/PX3's portable screen ledger must preserve --
+    wiring PX1.2's diagnostics into an actual tracked-artifact schema
+    BEFORE any PX3 job runs, per external review, rather than after.
+
+    Computes A_CB/A_BC/A_PC/A_CP and F_CB/F_BC/F_PC/F_CP via the exact,
+    already-validated ``patch_transition_actions_and_fluxes`` (PX1.2),
+    then independently re-walks the SAME schedule bin by bin (using the
+    already-validated ``propagate`` one bin at a time) to obtain the
+    per-interval max/mean p_B and the sinusoid-vs-dwell split of
+    contact-gated (K_signed<0) duration actually consumed -- exactly
+    through ``dt_consumed``, never through the proposed candidate block
+    duration. The independent walk's final state is cross-checked against
+    ``patch_transition_actions_and_fluxes``'s own ``p_final`` (two
+    separately-written computations over the same inputs must agree, or
+    this function raises rather than silently archive a divergence).
+
+    ``n_phase_sinusoid`` is the number of purely-sinusoidal bins in the
+    schedule (``K_signed_phase``/``dt_phase`` may additionally carry one
+    appended dwell bin at index ``n_phase_sinusoid`` when the hold is
+    active) -- needed here, and only here, to split contact time by
+    segment type; the lower-level functions this wraps do not need to
+    know it.
+
+    Deliberately NOT included here: ``max_K_rebond``/``event_localization_
+    block_action_weighted_K_rebond``. Those are already computed, for the
+    one case they are meaningful in (an interval that actually FIRES),
+    by the existing PX1-era ``phase_resolved_action``'s own diagnostics
+    (``max_K_rebond_Pa_sqrt_m``/``action_weighted_K_rebond_Pa_sqrt_m``,
+    used during event localization via ``solve_coupled_event_time``) --
+    a non-firing committed segment (this function's use case, matching
+    ``_commit_constant_segment``'s no-fire finalize path) never runs that
+    localization at all, so there is no event-localization-block action
+    to weight. A study's ledger builder should take those two fields
+    directly from ``phase_resolved_action``'s diagnostics on firing
+    intervals, and leave them null on non-firing ones, rather than this
+    function fabricating a value for a concept that does not apply.
+    """
+    from .crack_rebonding_kinetics_v10230 import build_phase_factors, propagate
+
+    n = len(K_signed_phase)
+    dt_array = np.full(n, float(dt_phase)) if np.isscalar(dt_phase) else np.asarray(dt_phase, dtype=float)
+
+    diag = patch_transition_actions_and_fluxes(
+        patch=patch, K_signed_phase=K_signed_phase, dt_phase=dt_phase,
+        r_contact_m=r_contact_m, cfg=cfg, T_K=T_K, dt_consumed=dt_consumed, k0=k0,
+    )
+
+    # Independent re-walk for p_B extrema and contact-time-by-segment-type.
+    Q_list = [
+        patch_Q(float(K_signed_phase[i]), patch.s_j_m, r_contact_m, cfg, T_K) for i in range(n)
+    ]
+    factors = build_phase_factors(Q_list, dt_array)
+    p = patch.state_vector().copy()
+    p_B_values = [float(p[2])]
+    contact_time_sinusoid_s = 0.0
+    contact_time_dwell_s = 0.0
+    idx = k0 % n
+    t_left = float(dt_consumed)
+    while t_left > 1.0e-15:
+        bin_dt = float(dt_array[idx])
+        take = min(bin_dt, t_left)
+        is_dwell_bin = idx >= n_phase_sinusoid
+        if float(K_signed_phase[idx]) < 0.0:
+            if is_dwell_bin:
+                contact_time_dwell_s += take
+            else:
+                contact_time_sinusoid_s += take
+        if take >= bin_dt - 1.0e-12:
+            p = factors[idx] @ p
+            idx = (idx + 1) % n
+        else:
+            from scipy.linalg import expm
+
+            p = expm(Q_list[idx] * take) @ p
+        p_B_values.append(float(p[2]))
+        t_left -= take
+
+    if not np.allclose(p, diag["p_final"], atol=1.0e-8):
+        raise RuntimeError(
+            "build_screen_event_ledger_row: independent re-walk final state "
+            f"{p} disagrees with patch_transition_actions_and_fluxes's p_final "
+            f"{diag['p_final']} -- refusing to archive a ledger row with an "
+            "internally inconsistent final state."
+        )
+
+    p_start = patch.state_vector()
+    p_end = diag["p_final"]
+    balance_residual_P = float((p_end[0] - p_start[0]) - (-diag["F_PC"] + diag["F_CP"]))
+    balance_residual_C = float((p_end[1] - p_start[1]) - (diag["F_PC"] - diag["F_CP"] - diag["F_CB"] + diag["F_BC"]))
+    balance_residual_B = float((p_end[2] - p_start[2]) - (diag["F_CB"] - diag["F_BC"]))
+
+    return {
+        "A_CB": diag["A_CB"], "A_BC": diag["A_BC"], "A_PC": diag["A_PC"], "A_CP": diag["A_CP"],
+        "F_CB": diag["F_CB"], "F_BC": diag["F_BC"], "F_PC": diag["F_PC"], "F_CP": diag["F_CP"],
+        "interval_start_p_P": float(p_start[0]), "interval_start_p_C": float(p_start[1]), "interval_start_p_B": float(p_start[2]),
+        "interval_end_p_P": float(p_end[0]), "interval_end_p_C": float(p_end[1]), "interval_end_p_B": float(p_end[2]),
+        "dt_consumed_s": float(dt_consumed),
+        "protocol_cursor_start_s": float(elapsed_time_s_before),
+        "protocol_cursor_end_s": float(elapsed_time_s_after),
+        "contact_time_sinusoid_s": contact_time_sinusoid_s,
+        "contact_time_dwell_s": contact_time_dwell_s,
+        "max_p_B": float(max(p_B_values)),
+        "mean_p_B": float(np.mean(p_B_values)),
+        "balance_residual_P": balance_residual_P,
+        "balance_residual_C": balance_residual_C,
+        "balance_residual_B": balance_residual_B,
+    }
+
+
 def _run_exact_cycle(
     *,
     active_patches: list[WakePatch],
@@ -1800,6 +1924,7 @@ __all__ = [
     "patch_Q",
     "patch_rate_constants",
     "patch_transition_actions_and_fluxes",
+    "build_screen_event_ledger_row",
     "WakePatch",
     "RebondingWakeState",
     "cleavage_stress_with_rebond",

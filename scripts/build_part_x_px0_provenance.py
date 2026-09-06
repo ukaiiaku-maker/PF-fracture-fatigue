@@ -351,7 +351,7 @@ def main() -> None:
 
     rows, hashes_payload = build_inherited_inventory()
     with (OUT_DIR / "inherited_result_inventory.csv").open("w", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
+        writer = csv.DictWriter(fh, fieldnames=list(rows[0].keys()), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 

@@ -29,6 +29,7 @@ analytical_regime_selection.json for auditability.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import math
 from dataclasses import asdict, replace
@@ -266,7 +267,7 @@ def main() -> None:
             "all_gates_passed": meta["gates"]["all_gates_passed"],
         })
     with (OUT_DIR / "kinetic_regime_registry.csv").open("w", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=list(registry_rows[0].keys()))
+        writer = csv.DictWriter(fh, fieldnames=list(registry_rows[0].keys()), lineterminator="\n")
         writer.writeheader()
         writer.writerows(registry_rows)
     (OUT_DIR / "kinetic_regime_registry.json").write_text(
@@ -477,9 +478,14 @@ def select_screen_conditions(df) -> dict[str, Any]:
         "dwell_transition_s": selected_hold_s,
         "dwell_transition_delta_mean_p_B": hold_delta,
         "passivation_chemistry_factor": selected_chemistry_factor,
-        "competing_persistent_selected": True,
-        "competing_persistent_reason": "PX2.3 construction already confirmed distinguishable from COMPETING_REVERSIBLE "
-                                         "(mean_p_B differs by >=0.10, A_BC >=5x smaller) -- section 7.8 item 5 satisfied by construction.",
+        "competing_persistent_status": "ANALYTICALLY_ELIGIBLE_FOR_PX3_SCREEN",
+        "competing_persistent_reason": "PX2.3's analytical construction found it distinguishable from "
+                                         "COMPETING_REVERSIBLE (mean_p_B differs by >=0.10, A_BC >=5x smaller) at the "
+                                         "reference condition -- this is SCREEN eligibility (section 7.8 item 5's "
+                                         "analytical precondition), not a developed-campaign selection. Its D6 "
+                                         "developed jobs remain BLOCKED_PENDING_PX3_PERSISTENT_DISTINCTION until PX3's "
+                                         "live production screen independently confirms the same distinction under "
+                                         "real trajectory noise/discretization, not merely the periodic-orbit ideal.",
         "cohesive_strength_endpoint_selected": None,
         "cohesive_strength_endpoint_reason": "deferred per section 7.8 item 6 -- selected only if the PX3 three-point "
                                                "cohesive-strength screen is visibly nonlinear or changes the qualitative "
@@ -491,26 +497,92 @@ def select_screen_conditions(df) -> dict[str, Any]:
     return selections
 
 
+INTEGRATOR_MODE = "explicit"  # V10230_FATIGUE_INTEGRATOR_MODE=explicit -- DMD/Poincare/projective forbidden (mission section 7)
+
+
+def _material_row_hash() -> str:
+    payload = json.loads(
+        (REPO_ROOT / "artifacts" / "crack_rebonding_part_x_v1" / "source_provenance.json").read_text()
+    )
+    return payload["material_row"]["complete_active_material_row_sha256"]
+
+
+def _physical_producer_sha() -> str:
+    import subprocess
+
+    try:
+        return subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, check=True, capture_output=True, text=True,
+        ).stdout.strip()
+    except Exception:
+        return "UNKNOWN_AT_REGISTRATION_TIME"
+
+
+def canonical_job_key(
+    *, material_row_hash, rebonding_config_hash, Kmax, R, nominal_frequency_Hz, minimum_load_hold_s,
+    T_K, chemistry_factor, K_rebond_max_Pa_sqrt_m, seed, integrator_mode, physical_producer_sha,
+) -> str:
+    """The complete physical identity of one scientific job (mission
+    section 5's fail-closed dedup key). Two job requests with the same
+    canonical key are the SAME physical run and must be launched once,
+    referenced by multiple analysis aliases -- never independently
+    recomputed under different panel labels."""
+    canonical = json.dumps({
+        "material_row_hash": material_row_hash, "rebonding_config_hash": rebonding_config_hash,
+        "Kmax_Pa_sqrt_m": float(Kmax), "R": float(R), "nominal_frequency_Hz": float(nominal_frequency_Hz),
+        "minimum_load_hold_s": float(minimum_load_hold_s), "T_K": float(T_K),
+        "chemistry_factor": float(chemistry_factor), "K_rebond_max_Pa_sqrt_m": float(K_rebond_max_Pa_sqrt_m),
+        "seed": int(seed), "integrator_mode": str(integrator_mode), "physical_producer_sha": str(physical_producer_sha),
+    }, sort_keys=True)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 def build_screen_and_developed_registries(rows, selections, Eprime_Pa, r_eff_m) -> None:
     screen_jobs: list[dict[str, Any]] = []
     developed_jobs: list[dict[str, Any]] = []
+    seen_keys: dict[str, dict[str, Any]] = {}  # canonical_key -> first-registered job dict
+    material_hash = _material_row_hash()
+    producer_sha = _physical_producer_sha()
+
+    def _register(job: dict[str, Any], registry_status_if_new: str) -> dict[str, Any]:
+        """Fail-closed dedup: a repeat canonical key becomes an alias
+        pointing at the first registration (never a second AUTHORIZED_/
+        BLOCKED_ row for the same physical job), per section 5's explicit
+        requirement that the R/frequency/dwell/persistent/strength panels
+        reference one run, not recompute it."""
+        key = job["canonical_job_key"]
+        if key in seen_keys:
+            job["status"] = "ALIAS_OF_EXISTING_JOB"
+            job["alias_of_protocol"] = seen_keys[key]["protocol"]
+            job["alias_of_row_name"] = seen_keys[key]["row_name"]
+        else:
+            job["status"] = registry_status_if_new
+            seen_keys[key] = job
+        return job
 
     def _screen_job(protocol, row_name, R, f_Hz, hold_s, chem, K_b_target=None, note=""):
         cfg, _ = rows[row_name]
-        screen_jobs.append({
-            "protocol": protocol, "row_name": row_name, "config_hash": _config_hash(cfg),
-            "Kmax_Pa_sqrt_m": REF_KMAX_Pa_sqrt_m, "R": R, "frequency_Hz": f_Hz,
-            "minimum_load_hold_s": hold_s, "chemistry_factor": chem,
-            "K_rebond_max_target_Pa_sqrt_m": K_b_target, "seed": SCREEN_SEED,
-            "cohesion": "finite", "status": "QUEUED_NOT_LAUNCHED", "note": note,
-        })
-        screen_jobs.append({
-            "protocol": protocol, "row_name": row_name, "config_hash": _config_hash(cfg),
-            "Kmax_Pa_sqrt_m": REF_KMAX_Pa_sqrt_m, "R": R, "frequency_Hz": f_Hz,
-            "minimum_load_hold_s": hold_s, "chemistry_factor": chem,
-            "K_rebond_max_target_Pa_sqrt_m": 0.0, "seed": SCREEN_SEED,
-            "cohesion": "zero", "status": "QUEUED_NOT_LAUNCHED", "note": note + " (matched zero-cohesion control)",
-        })
+        rb_hash = _config_hash(cfg)
+        for cohesion, K_target in (("finite", K_b_target if K_b_target is not None else
+                                     ETA_K_BASELINE * math.sqrt(Eprime_Pa * G_MAX_BASELINE_J_m2)),
+                                    ("zero", 0.0)):
+            key = canonical_job_key(
+                material_row_hash=material_hash, rebonding_config_hash=rb_hash,
+                Kmax=REF_KMAX_Pa_sqrt_m, R=R, nominal_frequency_Hz=f_Hz, minimum_load_hold_s=hold_s,
+                T_K=REF_T_K, chemistry_factor=chem, K_rebond_max_Pa_sqrt_m=K_target, seed=SCREEN_SEED,
+                integrator_mode=INTEGRATOR_MODE, physical_producer_sha=producer_sha,
+            )
+            job = {
+                "protocol": protocol, "row_name": row_name, "config_hash": rb_hash,
+                "material_row_hash": material_hash, "Kmax_Pa_sqrt_m": REF_KMAX_Pa_sqrt_m, "R": R,
+                "frequency_Hz": f_Hz, "minimum_load_hold_s": hold_s, "chemistry_factor": chem,
+                "K_rebond_max_target_Pa_sqrt_m": K_target, "seed": SCREEN_SEED, "integrator_mode": INTEGRATOR_MODE,
+                "physical_producer_sha": producer_sha, "canonical_job_key": key,
+                "cohesion": cohesion,
+                "note": note + ("" if cohesion == "finite" else " (matched zero-cohesion control)"),
+                "alias_of_protocol": "", "alias_of_row_name": "",
+            }
+            screen_jobs.append(_register(job, "AUTHORIZED_PX3"))
 
     # 7.1 R panel -- COMPETING_REVERSIBLE
     for R in [-0.95, -0.50, -0.10, 0.10]:
@@ -545,64 +617,116 @@ def build_screen_and_developed_registries(rows, selections, Eprime_Pa, r_eff_m) 
     sat_note = "reusing existing SAT_EXISTING Kmax=18/R=-0.95/f=1000 result -- classified prospectively as the static-shield limit, not duplicated"
 
     with (OUT_DIR / "screen_job_registry.csv").open("w", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=list(screen_jobs[0].keys()))
+        writer = csv.DictWriter(fh, fieldnames=list(screen_jobs[0].keys()), lineterminator="\n")
         writer.writeheader()
         writer.writerows(screen_jobs)
-    print(f"\nWrote screen_job_registry.csv: {len(screen_jobs)} jobs (all QUEUED_NOT_LAUNCHED)")
+    n_aliases = sum(1 for j in screen_jobs if j["status"] == "ALIAS_OF_EXISTING_JOB")
+    print(f"\nWrote screen_job_registry.csv: {len(screen_jobs)} rows "
+          f"({len(screen_jobs) - n_aliases} AUTHORIZED_PX3 unique jobs, {n_aliases} aliases)")
 
-    # -- Developed job registry (section 8) --
-    # Stage-1 seed-1720 grid: Kmax=12,15,18,21,24.3
-    def _developed_job_stage1(protocol, row_name, R, f_Hz, hold_s, chem, K_b_target=None, note=""):
+    # -- Developed job registry (section 8): fail-closed BLOCKED_* statuses.
+    # The controller may launch ONLY rows whose status begins AUTHORIZED_ --
+    # every developed row here is BLOCKED pending its own named PX3 gate,
+    # since D1-D7/second-seed authorization is a PX3/PX4/PX5 decision, not
+    # a PX2 one. QUEUED_NOT_LAUNCHED is deliberately never used again.
+    def _developed_job_stage1(protocol, row_name, R, f_Hz, hold_s, chem, blocked_status, K_b_target=None, note=""):
         cfg, _ = rows[row_name]
+        rb_hash = _config_hash(cfg)
         for Kmax in [12.0e6, 15.0e6, 18.0e6, 21.0e6, 24.3e6]:
             for cohesion, K_target in (("finite", K_b_target), ("zero", 0.0)):
-                developed_jobs.append({
-                    "protocol": protocol, "row_name": row_name, "config_hash": _config_hash(cfg),
-                    "Kmax_Pa_sqrt_m": Kmax, "R": R, "frequency_Hz": f_Hz, "minimum_load_hold_s": hold_s,
-                    "chemistry_factor": chem, "K_rebond_max_target_Pa_sqrt_m": K_target,
-                    "seed": DEVELOPED_SEEDS["stage1"], "cohesion": cohesion, "status": "QUEUED_NOT_LAUNCHED", "note": note,
-                })
+                key = canonical_job_key(
+                    material_row_hash=material_hash, rebonding_config_hash=rb_hash, Kmax=Kmax, R=R,
+                    nominal_frequency_Hz=f_Hz, minimum_load_hold_s=hold_s, T_K=REF_T_K, chemistry_factor=chem,
+                    K_rebond_max_Pa_sqrt_m=K_target, seed=DEVELOPED_SEEDS["stage1"],
+                    integrator_mode=INTEGRATOR_MODE, physical_producer_sha=producer_sha,
+                )
+                job = {
+                    "protocol": protocol, "row_name": row_name, "config_hash": rb_hash,
+                    "material_row_hash": material_hash, "Kmax_Pa_sqrt_m": Kmax, "R": R, "frequency_Hz": f_Hz,
+                    "minimum_load_hold_s": hold_s, "chemistry_factor": chem, "K_rebond_max_target_Pa_sqrt_m": K_target,
+                    "seed": DEVELOPED_SEEDS["stage1"], "integrator_mode": INTEGRATOR_MODE,
+                    "physical_producer_sha": producer_sha, "canonical_job_key": key,
+                    "cohesion": cohesion, "note": note, "alias_of_protocol": "", "alias_of_row_name": "",
+                }
+                developed_jobs.append(_register(job, blocked_status))
 
-    def _developed_job_confirmation(protocol, row_name, R, f_Hz, hold_s, chem, K_b_target=None, note=""):
+    def _developed_job_confirmation(protocol, row_name, R, f_Hz, hold_s, chem, blocked_status, K_b_target=None, note=""):
         cfg, _ = rows[row_name]
+        rb_hash = _config_hash(cfg)
         for Kmax in [15.0e6, 18.0e6, 21.0e6]:
             for cohesion, K_target in (("finite", K_b_target), ("zero", 0.0)):
-                developed_jobs.append({
-                    "protocol": protocol, "row_name": row_name, "config_hash": _config_hash(cfg),
-                    "Kmax_Pa_sqrt_m": Kmax, "R": R, "frequency_Hz": f_Hz, "minimum_load_hold_s": hold_s,
-                    "chemistry_factor": chem, "K_rebond_max_target_Pa_sqrt_m": K_target,
-                    "seed": DEVELOPED_SEEDS["confirmation"], "cohesion": cohesion, "status": "QUEUED_NOT_LAUNCHED", "note": note,
-                })
+                key = canonical_job_key(
+                    material_row_hash=material_hash, rebonding_config_hash=rb_hash, Kmax=Kmax, R=R,
+                    nominal_frequency_Hz=f_Hz, minimum_load_hold_s=hold_s, T_K=REF_T_K, chemistry_factor=chem,
+                    K_rebond_max_Pa_sqrt_m=K_target, seed=DEVELOPED_SEEDS["confirmation"],
+                    integrator_mode=INTEGRATOR_MODE, physical_producer_sha=producer_sha,
+                )
+                job = {
+                    "protocol": protocol, "row_name": row_name, "config_hash": rb_hash,
+                    "material_row_hash": material_hash, "Kmax_Pa_sqrt_m": Kmax, "R": R, "frequency_Hz": f_Hz,
+                    "minimum_load_hold_s": hold_s, "chemistry_factor": chem, "K_rebond_max_target_Pa_sqrt_m": K_target,
+                    "seed": DEVELOPED_SEEDS["confirmation"], "integrator_mode": INTEGRATOR_MODE,
+                    "physical_producer_sha": producer_sha, "canonical_job_key": key,
+                    "cohesion": cohesion, "note": note, "alias_of_protocol": "", "alias_of_row_name": "",
+                }
+                developed_jobs.append(_register(job, blocked_status))
 
     K_b_baseline = ETA_K_BASELINE * math.sqrt(Eprime_Pa * G_MAX_BASELINE_J_m2)
-    _developed_job_stage1("D1", "COMPETING_REVERSIBLE", -0.95, REF_FREQUENCY_Hz, 0.0, 1.0, K_b_baseline)
-    _developed_job_stage1("D2", "COMPETING_REVERSIBLE", -0.50, REF_FREQUENCY_Hz, 0.0, 1.0, K_b_baseline)
+    _developed_job_stage1("D1", "COMPETING_REVERSIBLE", -0.95, REF_FREQUENCY_Hz, 0.0, 1.0,
+                           "BLOCKED_PENDING_PX3_COMPLETION", K_b_baseline)
+    _developed_job_stage1("D2", "COMPETING_REVERSIBLE", -0.50, REF_FREQUENCY_Hz, 0.0, 1.0,
+                           "BLOCKED_PENDING_PX3_COMPLETION", K_b_baseline)
     if selections["frequency_transition_Hz"] is not None:
-        _developed_job_stage1("D3", "COMPETING_REVERSIBLE", -0.50, selections["frequency_transition_Hz"], 0.0, 1.0, K_b_baseline)
+        _developed_job_stage1("D3", "COMPETING_REVERSIBLE", -0.50, selections["frequency_transition_Hz"], 0.0, 1.0,
+                               "BLOCKED_PENDING_PX3_FREQUENCY_GATE", K_b_baseline)
     if selections["dwell_transition_s"] is not None:
-        _developed_job_stage1("D4", "COMPETING_REVERSIBLE", -0.50, REF_FREQUENCY_Hz, selections["dwell_transition_s"], 1.0, K_b_baseline)
+        _developed_job_stage1("D4", "COMPETING_REVERSIBLE", -0.50, REF_FREQUENCY_Hz, selections["dwell_transition_s"], 1.0,
+                               "BLOCKED_PENDING_PX3_DWELL_GATE", K_b_baseline)
     if selections["passivation_chemistry_factor"] is not None:
-        _developed_job_stage1("D5", "PASSIVATION_LIMITED", -0.50, REF_FREQUENCY_Hz, 0.0, selections["passivation_chemistry_factor"], K_b_baseline)
-    _developed_job_stage1("D6_conditional_persistent", "COMPETING_PERSISTENT", -0.50, REF_FREQUENCY_Hz, 0.0, 1.0, K_b_baseline,
-                           note="PX3.8 item 5: COMPETING_PERSISTENT already confirmed distinguishable at the reference "
-                                "condition, so D6 is authorized as of this freeze -- PX4 must still confirm the screen-"
-                                "level effect before launching")
+        _developed_job_stage1("D5", "PASSIVATION_LIMITED", -0.50, REF_FREQUENCY_Hz, 0.0, selections["passivation_chemistry_factor"],
+                               "BLOCKED_PENDING_PX3_PASSIVATION_GATE", K_b_baseline)
+    # COMPETING_PERSISTENT is ANALYTICALLY_ELIGIBLE_FOR_PX3_SCREEN (per PX2.5's
+    # correction), not "selected for developed work" -- its D6 developed jobs
+    # stay blocked until PX3's live production screen confirms the
+    # predeclared persistent-vs-reversible distinction gate, exactly like
+    # every other conditional developed job.
+    _developed_job_stage1("D6_conditional_persistent", "COMPETING_PERSISTENT", -0.50, REF_FREQUENCY_Hz, 0.0, 1.0,
+                           "BLOCKED_PENDING_PX3_PERSISTENT_DISTINCTION", K_b_baseline,
+                           note="COMPETING_PERSISTENT is ANALYTICALLY_ELIGIBLE_FOR_PX3_SCREEN (its analytical mean_p_B/"
+                                "A_BC gates passed at the reference condition) -- that is a screen-eligibility finding, "
+                                "not a developed-campaign authorization. D6 remains blocked until PX3's live production "
+                                "screen independently confirms the predeclared persistent-vs-reversible distinction gate.")
+    # D7: cohesive-strength developed endpoint -- authorized only if PX3's
+    # own 3-point screen is visibly nonlinear or changes the qualitative
+    # slope classification (section 8's D7 / section 7.8 item 6). No
+    # specific K_rebond,max is chosen yet; PX3 selects it.
+    _developed_job_stage1("D7_conditional_cohesive_strength", "COMPETING_REVERSIBLE", -0.50, REF_FREQUENCY_Hz, 0.0, 1.0,
+                           "BLOCKED_PENDING_PX3_COHESIVE_NONLINEARITY_GATE", K_b_baseline,
+                           note="placeholder at the baseline K_rebond,max=0.9 MPa sqrt(m); PX3 selects the actual "
+                                "endpoint (0.45 or 1.8) only if its 3-point cohesive-strength screen is visibly "
+                                "nonlinear or changes the qualitative slope classification")
 
-    # Second-seed confirmation, conditional -- registered here as queued;
-    # PX4/PX5's own gate (effect sizes vs. frozen thresholds) decides
-    # whether these are actually launched.
+    # Second-seed confirmation -- explicitly blocked on the Stage-1 decision,
+    # never on a generic queued status.
     for protocol, row_name, R, f_Hz, hold_s, chem in [
         ("D1_confirm", "COMPETING_REVERSIBLE", -0.95, REF_FREQUENCY_Hz, 0.0, 1.0),
         ("D2_confirm", "COMPETING_REVERSIBLE", -0.50, REF_FREQUENCY_Hz, 0.0, 1.0),
     ]:
-        _developed_job_confirmation(protocol, row_name, R, f_Hz, hold_s, chem, K_b_baseline,
-                                     note="conditional on PX4 Stage-1 effect gates; launch decided in PX4/PX5, not PX2")
+        _developed_job_confirmation(protocol, row_name, R, f_Hz, hold_s, chem,
+                                     "BLOCKED_PENDING_STAGE1_DECISION", K_b_baseline,
+                                     note="second-seed confirmation; launch decided in PX4/PX5 against Stage-1's own "
+                                          "effect gates, never authorized by PX2/PX2.5")
 
     with (OUT_DIR / "developed_job_registry.csv").open("w", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=list(developed_jobs[0].keys()))
+        writer = csv.DictWriter(fh, fieldnames=list(developed_jobs[0].keys()), lineterminator="\n")
         writer.writeheader()
         writer.writerows(developed_jobs)
-    print(f"Wrote developed_job_registry.csv: {len(developed_jobs)} jobs (all QUEUED_NOT_LAUNCHED)")
+    n_dev_aliases = sum(1 for j in developed_jobs if j["status"] == "ALIAS_OF_EXISTING_JOB")
+    status_counts: dict[str, int] = {}
+    for j in developed_jobs:
+        status_counts[j["status"]] = status_counts.get(j["status"], 0) + 1
+    print(f"Wrote developed_job_registry.csv: {len(developed_jobs)} rows, zero AUTHORIZED_ "
+          f"(all fail-closed pending their named PX3/PX4 gate): {status_counts}")
 
     (OUT_DIR / "physical_screen_predictions.json").write_text(
         json.dumps({
