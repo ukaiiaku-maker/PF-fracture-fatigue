@@ -1,0 +1,98 @@
+{
+  "counts": {
+    "controlled_trajectories": 12,
+    "disabled_neutrality": 4,
+    "length_inventory_conservation": 9,
+    "natural_seed_ensemble": 32,
+    "restart_matrix": 10,
+    "rollback_matrix": 11,
+    "static_mechanics": 29,
+    "transition_partitions": 40
+  },
+  "decision": "BLOCKED",
+  "evidence_row_count": 157,
+  "failed_gates": [
+    "transition_partitions",
+    "controlled_trajectories",
+    "restart_matrix",
+    "disabled_neutrality",
+    "lifecycle_wide_rollback",
+    "natural_partition_restart_rng"
+  ],
+  "gates": {
+    "controlled_trajectories": false,
+    "disabled_neutrality": false,
+    "evidence_ontology": true,
+    "length_inventory_conservation": true,
+    "lifecycle_wide_rollback": false,
+    "natural_partition_restart_rng": false,
+    "natural_seed_ensemble": true,
+    "restart_matrix": false,
+    "rollback_matrix": true,
+    "static_mechanics": true,
+    "transition_partitions": false
+  },
+  "persistent_limitations": [
+    "single_void_only",
+    "two_dimensional_plane_strain",
+    "uncalibrated_parameters",
+    "not_experimentally_validated",
+    "no_general_multi_front_campaign",
+    "no_fatigue_calibration",
+    "no_fatigue_growth_campaign",
+    "standard_absolute_K_unavailable"
+  ],
+  "provenance": {
+    "campaign_runner_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "criteria_sha": "da742b231b4413b3118e0546256bfadaf9022a55",
+    "evidence_generation_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "executed_code_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "implementation_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "model_form_base_sha": "3e3c79536bc76ce19589567afc0d5eca667fc691",
+    "production_qualifier_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "static_qualifier_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "stochastic_seed_policy_sha": "d563304c1a3d0782c407c3307826c77eceb7a912"
+  },
+  "reproducibility_policy": {
+    "diagnostic_float_absolute": 1e-15,
+    "diagnostic_float_relative": 1e-12,
+    "exact_classes": [
+      "gate_identity",
+      "threshold",
+      "event_id",
+      "source_relationship",
+      "input_hash",
+      "topology_fingerprint",
+      "support_fingerprint",
+      "operation_trace",
+      "categorical_outcome"
+    ]
+  },
+  "runner_results": {
+    "broad_returncode": 2,
+    "static_returncode": 0
+  },
+  "schema": "v12.voiding-v5-finalization-v3/1",
+  "scientific_tolerances": {
+    "cavity_area_relative": 0.02,
+    "cavity_perimeter_relative": 0.02,
+    "cavity_traction_normalized": 0.05,
+    "derivative_energy_compliance_relative": 0.1,
+    "derivative_perturbation_relative": 0.1,
+    "energy_reaction_identity_relative": 0.01,
+    "far_void_relative": 0.02,
+    "free_residual_relative": 1e-08,
+    "inventory_identity_abs_m2": 1e-24,
+    "kirsch_relative": 0.03,
+    "length_identity_abs_m": 1e-15,
+    "mesh_minimum_quality": 0.05,
+    "offset_compliance_relative": 0.005,
+    "offset_reaction_relative": 0.005,
+    "reaction_balance_relative": 0.03,
+    "requested_realized_geometry_abs_m": 1e-12,
+    "static_mesh_energy_relative": 0.06,
+    "static_mesh_reaction_relative": 0.06,
+    "tensor_probe_relative": 0.05,
+    "transition_event_time_relative": 1e-12
+  }
+}

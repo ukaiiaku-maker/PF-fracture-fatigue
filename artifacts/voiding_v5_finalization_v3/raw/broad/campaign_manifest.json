@@ -1,0 +1,28 @@
+{
+  "counts": {
+    "controlled_trajectories": 12,
+    "disabled_neutrality": 4,
+    "length_inventory_conservation": 9,
+    "natural_seed_ensemble": 32,
+    "restart_matrix": 10,
+    "rollback_matrix": 11,
+    "transition_partitions": 40
+  },
+  "decision": "BLOCKED",
+  "gates": {
+    "ATOMIC_ROLLBACK": true,
+    "DISABLED_NEUTRALITY": false,
+    "EVIDENCE_ONTOLOGY": true,
+    "LENGTH_INVENTORY_CONSERVATION": true,
+    "NATURAL_32": true,
+    "STAGE_RESTART_CONTINUATION": true,
+    "STATIC_MECHANICS": true,
+    "TRANSITION_PARTITIONS": true,
+    "TWELVE_DISTINCT_CONTROLLED": true
+  },
+  "implementation_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+  "limitations": [
+    "DISABLED_NEUTRALITY"
+  ],
+  "schema": "v12.voiding-v5-finalization-v2/1"
+}
