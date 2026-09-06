@@ -128,10 +128,15 @@ def main(argv=None):
                 predicate = "controlled_history_execution"
             else:
                 obs = row.get("observables", {})
-                explicit = not row.get("configuration", {}).get("crack_enabled", True) or row.get("configuration", {}).get("geometry_mode") == "V3_FIXED_LABORATORY_GEOMETRY"
-                inputs = {"maximum_error_m": row.get("geometry_conformity_audit", {}).get("maximum_requested_realized_error_m", 0.0),
+                configuration = row.get("configuration", {})
+                crack_enabled = configuration.get("crack_enabled", False)
+                cavity_enabled = configuration.get("cavity_enabled", True)
+                audit = row.get("geometry_conformity_audit") or {}
+                explicit = not crack_enabled or configuration.get("geometry_mode") == "V3_FIXED_LABORATORY_GEOMETRY"
+                ray_required = crack_enabled and cavity_enabled
+                inputs = {"maximum_error_m": audit.get("maximum_requested_realized_error_m", 0.0),
                           "tolerance_m": SCIENTIFIC_ACCEPTANCE_TOLERANCES["requested_realized_geometry_abs_m"],
-                          "ray_intersects_polygon": bool(obs.get("ray_intersects_polygon", True)) and explicit}
+                          "ray_intersects_polygon": (not ray_required or bool(obs.get("ray_intersects_polygon"))) and explicit}
                 predicate = "fixed_geometry_exact"
             fn_result = bool(__import__("arrhenius_fracture.finalization_v3_schema", fromlist=["REGISTERED_SCIENTIFIC_PREDICATES"]).REGISTERED_SCIENTIFIC_PREDICATES[predicate](inputs))
             rows.append(evidence(f"{dataset}:{index}", f"v3:{dataset}:{index}:{head[:12]}", config, geometry,

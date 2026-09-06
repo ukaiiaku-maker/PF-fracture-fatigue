@@ -88,6 +88,7 @@ def main(argv=None):
         rows.append({"case": case, "executed_operation": "production_static_fem_solve",
                      "configuration": result["configuration"], "dimensionless": dimensionless,
                      "observables": obs,
+                     "geometry_conformity_audit": result.get("geometry_conformity_audit"),
                      "support_audit": result["support_audit"], "passed": finite and support_ok})
 
     _, transferred = deterministic_trajectory(stop_before_ligament=True)
