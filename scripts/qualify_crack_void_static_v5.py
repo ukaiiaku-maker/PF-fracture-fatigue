@@ -18,6 +18,9 @@ from arrhenius_fracture.voiding_production_v5 import deterministic_trajectory
 
 
 def main(argv=None):
+    argv = list(argv or [])
+    v3 = "--v3-fixed-geometry" in argv
+    if v3: argv.remove("--v3-fixed-geometry")
     out = Path(argv[0] if argv else "artifacts/voiding_v5/static")
     out.mkdir(parents=True, exist_ok=True)
     def clean(value):
@@ -44,6 +47,21 @@ def main(argv=None):
     for layers in (10, 12, 16):
         specifications.append((f"mesh_refinement_{layers}", dict(radial_layers=layers)))
 
+    if v3:
+        fixed = ((0.0, 0.0), (5.0e-4, 0.0))
+        corrected = []
+        for case, kwargs in specifications:
+            kwargs = dict(kwargs)
+            if kwargs.get("crack_enabled", True):
+                tip = 5.0e-4
+                if case.startswith("virtual_crack_extension_"):
+                    tip += (int(case.rsplit("_", 1)[1]) - 3) * 1.0e-5
+                kwargs.pop("tip_layer", None)
+                kwargs.update(crack_path_m=((0.0, 0.0), (tip, 0.0)),
+                              geometry_mode="V3_FIXED_LABORATORY_GEOMETRY")
+            corrected.append((case, kwargs))
+        specifications = corrected
+
     rows = []
     for case, kwargs in specifications:
         try:
@@ -65,12 +83,7 @@ def main(argv=None):
         )
         dimensionless = {
             "radius_over_width": float(result["configuration"]["cavity_radius_m"] / 1.0e-3),
-            "ligament_over_radius": float(
-                (result["configuration"]["cavity_center_m"][0]
-                 - result["observables"]["crack_graph_length_m"]
-                 - result["configuration"]["cavity_radius_m"])
-                / max(result["configuration"]["cavity_radius_m"], 1.0e-300)
-            ),
+            "ligament_over_radius": result["observables"].get("ligament_over_radius"),
         }
         rows.append({"case": case, "executed_operation": "production_static_fem_solve",
                      "configuration": result["configuration"], "dimensionless": dimensionless,
