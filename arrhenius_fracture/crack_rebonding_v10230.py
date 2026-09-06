@@ -694,6 +694,95 @@ def _periodic_orbit_certificate(
     return {"p_star": p_star, "rho": rho, "dist0": dist0, "S": S, "degenerate": False}
 
 
+def static_shield_phase_resolved_action(
+    *,
+    k0: int,
+    t_interval: float,
+    K_phase_fn: Callable[[int], float],
+    dt_phase: float | np.ndarray,
+    n_phase: int,
+    K_shield_Pa_sqrt_m: float,
+    K_b_static: float,
+    r_eff_m: float,
+    lambda_cleave_fn: Callable[[float], float],
+) -> tuple[float, dict[int, np.ndarray], int]:
+    """PX1.4 (mission section 5.4): exact phase-resolved cleavage action
+    for a PRESCRIBED CONSTANT K_b (the static-shield mechanism-control
+    ablation), giving it access to the identical event-time localization
+    semantics dynamic rebonding uses (exact bisection via
+    ``solve_coupled_event_time`` against a genuine phase-resolved action,
+    not the coarser cycle-mean adaptive quadrature ``_phase_statistics``
+    uses) -- the missing piece the static-shield localizer-parity audit
+    (a72d465) identified: the static path never ran through this exact
+    machinery at all.
+
+    Unlike dynamic rebonding's ``phase_resolved_action``, there is no
+    patch/P-C-B state to evolve here -- ``K_b_static`` is, by definition,
+    constant -- so this is exact BY CONSTRUCTION for any interval length,
+    with no periodic-orbit bulk-action approximation needed: the action
+    contributed by one full cycle is identical every cycle (a pure
+    function of phase alone, since nothing carries state from one cycle
+    to the next), so ``n_cycles_full`` whole cycles contribute exactly
+    ``n_cycles_full`` times that one cycle's action, computed once.
+
+    ``dt_phase`` may be a uniform scalar or Part X's heterogeneous
+    per-bin duration array (sinusoidal bins plus the appended dwell bin),
+    so an event may localize inside the hold exactly as it can for
+    dynamic rebonding.
+
+    Returns ``(action, {}, end_phase_index)`` -- the empty dict matches
+    ``solve_coupled_event_time``'s generic ``(action, end_states,
+    end_idx)`` contract; there is no patch state for the caller to
+    commit for this mechanism.
+
+    Per the mission's explicit requirement, callers must NOT route
+    ``K_b_static == 0`` through this function -- the exact original
+    (K_b-independent) baseline path must remain untouched in that case.
+    """
+    n = int(n_phase)
+    dt_array = np.full(n, float(dt_phase)) if np.isscalar(dt_phase) else np.asarray(dt_phase, dtype=float)
+    total_cycle = float(np.sum(dt_array))
+    if total_cycle <= 0.0 or t_interval <= 0.0:
+        return 0.0, {}, int(k0 % max(n, 1))
+
+    def _bin_action(idx: int, duration_s: float) -> float:
+        K_s = K_phase_fn(idx)
+        sigma_c = cleavage_stress_with_rebond(K_s, K_shield_Pa_sqrt_m, K_b_static, r_eff_m)
+        return lambda_cleave_fn(sigma_c) * duration_s
+
+    idx = k0 % n
+    one_cycle_action = 0.0
+    for _ in range(n):
+        one_cycle_action += _bin_action(idx, float(dt_array[idx]))
+        idx = (idx + 1) % n
+    # idx has returned to k0 % n after one full cycle.
+
+    n_cycles_full = int(math.floor(t_interval / total_cycle + 1.0e-12))
+    remaining_time = t_interval - n_cycles_full * total_cycle
+    if remaining_time > total_cycle * (1.0 - 1.0e-9):
+        n_cycles_full += 1
+        remaining_time = 0.0
+
+    total_action = n_cycles_full * one_cycle_action
+
+    idx = k0 % n
+    t_left = remaining_time
+    while t_left > 1.0e-15:
+        bin_dt = float(dt_array[idx])
+        if bin_dt <= 0.0:
+            idx = (idx + 1) % n
+            continue
+        if t_left >= bin_dt * (1.0 - 1.0e-9):
+            total_action += _bin_action(idx, bin_dt)
+            t_left -= bin_dt
+            idx = (idx + 1) % n
+        else:
+            total_action += _bin_action(idx, t_left)
+            t_left = 0.0
+
+    return total_action, {}, int(idx)
+
+
 def phase_resolved_action(
     *,
     active_patches: list[WakePatch],
@@ -1717,6 +1806,7 @@ __all__ = [
     "build_patch_phase_generators",
     "representative_cycle_K_rebond",
     "phase_resolved_action",
+    "static_shield_phase_resolved_action",
     "solve_coupled_event_time",
     "stage1_block_cycle_limits",
     "stage2_verify_block",
