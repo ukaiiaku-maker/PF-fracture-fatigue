@@ -402,24 +402,39 @@ def freeze_pilot_configuration(
 # ---------------------------------------------------------------------------
 
 
-def signed_K(t_s: np.ndarray, *, R: float) -> np.ndarray:
-    Kmin = R * KMAX_Pa_sqrt_m
-    Kmean = 0.5 * (KMAX_Pa_sqrt_m + Kmin)
-    Kamp = 0.5 * (KMAX_Pa_sqrt_m - Kmin)
-    phase = 2.0 * np.pi * F_HZ * t_s
+def signed_K(
+    t_s: np.ndarray, *, R: float, frequency_Hz: float = F_HZ, Kmax_Pa_sqrt_m: float = KMAX_Pa_sqrt_m,
+) -> np.ndarray:
+    Kmin = R * Kmax_Pa_sqrt_m
+    Kmean = 0.5 * (Kmax_Pa_sqrt_m + Kmin)
+    Kamp = 0.5 * (Kmax_Pa_sqrt_m - Kmin)
+    phase = 2.0 * np.pi * frequency_Hz * t_s
     return Kmean + Kamp * np.cos(phase)
 
 
 def interval_compression_analysis(
-    t_creation_s: float, t_next_event_s: float, *, R: float, n_samples: int = 4000
+    t_creation_s: float, t_next_event_s: float, *, R: float,
+    frequency_Hz: float = F_HZ, Kmax_Pa_sqrt_m: float = KMAX_Pa_sqrt_m, n_samples: int = 4000,
 ) -> dict[str, Any]:
+    """Reconstructs a PURE SINUSOIDAL K(t) trace at the given
+    ``frequency_Hz``/``Kmax_Pa_sqrt_m`` (both default to this module's own
+    R=-0.95/1000Hz/18MPa-sqrt(m) reference trajectory constants -- exact
+    prior behavior for every existing caller, which never ran at any other
+    condition). Callers with ``minimum_load_hold_s`` > 0 get this
+    trajectory's SINUSOIDAL-TRAVERSE-ONLY contact reconstruction: it does
+    not model the constant-Kmin dwell segment the real engine's own
+    ``cycle_schedule`` adds (PX1.1), so ``negative_contact_duration_s``/
+    ``complete_negative_excursion`` under-count true negative-K contact
+    time for dwell-enabled trajectories -- a documented approximation, not
+    a claim of dwell-aware contact accounting.
+    """
     if t_next_event_s <= t_creation_s:
         return {
             "elapsed_time_s": 0.0, "elapsed_cycles": 0.0,
             "negative_contact_duration_s": 0.0, "complete_negative_excursion": False,
         }
     t = np.linspace(t_creation_s, t_next_event_s, n_samples)
-    K = signed_K(t, R=R)
+    K = signed_K(t, R=R, frequency_Hz=frequency_Hz, Kmax_Pa_sqrt_m=Kmax_Pa_sqrt_m)
     neg = K < 0.0
     dt = t[1] - t[0]
     negative_duration_s = float(np.count_nonzero(neg)) * dt
@@ -429,7 +444,7 @@ def interval_compression_analysis(
         complete = bool((edges == 1).any() and (edges == -1).any())
     return {
         "elapsed_time_s": float(t_next_event_s - t_creation_s),
-        "elapsed_cycles": float((t_next_event_s - t_creation_s) * F_HZ),
+        "elapsed_cycles": float((t_next_event_s - t_creation_s) * frequency_Hz),
         "negative_contact_duration_s": negative_duration_s,
         "complete_negative_excursion": bool(complete),
     }
@@ -669,7 +684,9 @@ def run_trajectory(
     for i in range(1, len(events)):
         t_creation = events[i - 1]["cumulative_time_s"]
         t_next = events[i]["cumulative_time_s"]
-        analysis = interval_compression_analysis(t_creation, t_next, R=R)
+        analysis = interval_compression_analysis(
+            t_creation, t_next, R=R, frequency_Hz=frequency_Hz, Kmax_Pa_sqrt_m=Kmax_Pa_sqrt_m,
+        )
         analysis.update({
             "creation_event_index": i - 1, "next_event_index": i,
             "waiting_time_s_this_event": events[i]["waiting_time_s_this_event"],

@@ -278,37 +278,112 @@ before/after state instead.
   (386 + 24 new across the four new test files), zero regressions; both
   existing verifiers still `overall_pass=true`.
 
+- **PX3 (physical screen executed; commit pending final test confirmation):**
+  implemented the real screen-budget branch of `part_x_run_one_job.py`
+  (12 accepted events or 60 μm, driven by the qualified causal-pilot-v2
+  event loop, resolving each screen job's `chemistry_factor`/
+  `K_rebond_max_target_Pa_sqrt_m` panel overrides against the row's frozen
+  baseline config). Two minimal, default-preserving extensions to
+  `run_trajectory`: `minimum_load_hold_s` threading (for the dwell panel)
+  and `cumulative_cycles` bookkeeping (section 7.8's `g` denominator).
+  Found and fixed a real bug while reviewing the results: `signed_K`/
+  `interval_compression_analysis` hardcoded the module's own reference
+  1000 Hz/18 MPa√m instead of the trajectory's actual frequency/Kmax, so
+  every non-1000 Hz screen job's `post_first_event_intervals` diagnostic
+  (not the core g/S_h quantities, which always used the real engine's own
+  `cycle_step_waveform`) was computed against the wrong frequency; fixed
+  and the 6 affected already-completed `runs/.../result.json` files were
+  repaired in place (pure post-hoc recomputation from stored
+  `cumulative_time_s`, no re-simulation). Regenerated `screen_job_registry.
+  csv`/`developed_job_registry.csv` once more for the new HEAD (only
+  `physical_producer_sha`/`canonical_job_key` changed, verified
+  programmatically). Launched all 28 unique `AUTHORIZED_PX3` jobs via
+  `part_x_physical_controller.py --allow-head-drift` (justified: the only
+  intervening commit was that same producer-sha refresh) against the real
+  `runs/crack_rebonding_part_x_v1/` run root — all 28 completed, zero
+  quarantined; 27/28 hit the full 12-event/60 μm budget, one (dwell=0.5ms,
+  finite cohesion) was right-censored at 6/12 events by the 30-minute
+  per-trajectory wall-time ceiling (a genuine right-censor per the
+  mission's own rule, not a failure).
+
+  Built `build_part_x_px3_screen_analysis.py` (g/S_h over three windows —
+  overall, post-first-event, late-half — for all 18 matched pairs,
+  measurable-effect gates, contact-time diagnostics with an explicit
+  pure-sinusoid-approximation caveat for hold>0 pairs) and
+  `build_part_x_px3_adaptive_selection.py` (mechanically applies section
+  7.8's six frozen rules against the real numbers). R=+0.10's exact
+  zero/finite parity control passed exactly (S_h=0.0000000, confirming the
+  signed-K semantic control). Five of six rules resolved cleanly and
+  flipped the corresponding `developed_job_registry.csv` rows to
+  `AUTHORIZED_PX4`: rule 1 (D1/D2, unconditional), rule 4 (D5,
+  chemistry_factor=1.0 — the analytically-selected value also shows the
+  largest live effect, no contradiction), rule 5 (D6, COMPETING_PERSISTENT
+  selected — NOT distinguishable from reversible at baseline, S_h delta
+  only 0.0001, but decisively distinguished at the frequency-transition
+  condition per section 7.4's own fallback instruction, S_h delta 0.0413),
+  rule 6 (D7, no cohesive-strength endpoint selected — the 3-point screen
+  is monotonic with same-sign slope in both segments, not visibly
+  nonlinear by a documented >2x/<0.5x slope-ratio-or-sign-flip test).
+
+  **Two findings need a decision before D3/D4 can launch (left
+  deliberately BLOCKED, not guessed):**
+  - **Rule 2 (frequency-transition, D3) is UNRESOLVED.** The
+    analytically-preselected 100 Hz condition (largest predicted
+    mean_p_B change from the 1000 Hz baseline) does NOT clear the
+    |S_h|>=0.01 live measurable-effect gate (|S_h|=0.0011). The only
+    other screened candidate, 10000 Hz, clears the gate but shows the
+    *same* S_h magnitude as the 1000 Hz baseline (-0.0435 vs -0.0435) —
+    it isn't actually a distinct transition, just a scaled repeat.
+    Neither candidate cleanly satisfies rule 2's literal wording.
+  - **Rule 3 (dwell, D4) mechanically selects hold=0.002s, overriding the
+    provisional analytical pick of 0.0005s** — S_h grows monotonically
+    with hold duration (0 → 0.0005 (censored, partial) → 0.002 s:
+    -0.0435 → 0.3551 → 0.7969), and hold=0.002s's larger effect is also
+    the uncensored, more reliable measurement. But `developed_job_
+    registry.csv`'s existing D4 rows are baked at hold=0.0005s (from
+    `analytical_regime_selection.json`'s original pick), so they were
+    correctly left BLOCKED (0 rows matched the 0.002s selection) — D4
+    needs `analytical_regime_selection.json`'s `dwell_transition_s`
+    updated to 0.002 and `build_part_x_kinetic_regime_registry.py`
+    re-run before its rows can be authorized.
+
+  Full `crack_rebonding` test selection re-verified after the
+  `interval_compression_analysis` fix (not yet committed as of this
+  handoff entry — see the exact next action below).
+
 ## Terminal and pending counts
 
-- Physical trajectories launched: 0 (no physical result directory exists
-  yet — PX3 is the first stage authorized to create one).
-- PX1, PX2, and PX2.5 done. PX3–PX7: not started.
+- Physical trajectories launched: 28 (all COMPLETE, 0 quarantined; PX3
+  screen only — PX4 developed campaigns not yet launched).
+- PX1, PX2, PX2.5, and PX3's physical screen + analysis are done modulo
+  the two items above. PX4–PX7: not started.
 
 ## Exact next action
 
-PX3 (bounded single-K mechanism screen, mission section 7): **this is the
-first PX stage that launches real physical trajectories.** The controller
-and job registries are now qualified (PX2.5 items 5 and 7). Remaining
-work: implement the real PX3 screen budget in `part_x_run_one_job.py`
-(currently `--preflight` only; raises `NotImplementedError` otherwise) —
-A_NATIVE, 300K, Kmax=18 MPa√m, seed=1720, mpz_n_bins=80, n_phase=80, 12
-accepted events or 60 μm (whichever first), **explicit phase-resolved
-integration only** (`V10230_FATIGUE_INTEGRATOR_MODE=explicit` —
-DMD/Poincaré/projective acceleration forbidden), virgin paths, no resume.
-Then launch the 28 unique `AUTHORIZED_PX3` rows in `screen_job_registry.csv`
-via `part_x_physical_controller.py` against the real
-`runs/crack_rebonding_part_x_v1/` run root, respecting the 3-worker cap;
-for each finite/zero matched pair compute `g`/`S_h` per section 7.8 and
-apply the frozen selection rules already recorded in
-`analytical_regime_selection.json` (frequency=100Hz, dwell=0.5ms,
-chemistry=1.0 already selected; cohesive-strength endpoint selection is
-PX3's own job, decided from the actual 3-point screen once it exists).
-Commit the complete PX3 screen and its portable ledger before authorizing
-any PX4 developed job. Per the review's explicit instruction, continue
-automatically through PX4–PX7 without stopping merely because PX3 is a
-new physical phase; before PX5, wire the already-qualified
-`static_shield_phase_resolved_action` evaluator (PX1.4) into the live
-production static-control commit path. This stage will take real
-wall-clock time for physical simulation — launch via background workers
-and continue via the harness's notification system rather than blocking
-synchronously.
+1. Confirm the full `crack_rebonding` test selection still passes with
+   the `interval_compression_analysis` frequency/Kmax fix, then commit:
+   the source fix + its 2 new regression tests, `build_part_x_px3_screen_
+   analysis.py`, `build_part_x_px3_adaptive_selection.py`, the resulting
+   `artifacts/crack_rebonding_part_x_v1/px3_screen_pair_analysis.{csv,
+   json}` and `px3_adaptive_selection.json`, and the `developed_job_
+   registry.csv` update (32 rows flipped to `AUTHORIZED_PX4`).
+2. Get a decision on rule 2's frequency-transition ambiguity (100 Hz vs
+   10000 Hz vs re-examining the premise) — this is the one genuinely
+   irreducible physical judgment call from PX3, escalated rather than
+   guessed.
+3. Regenerate the registry with `dwell_transition_s=0.002` so D4's rows
+   reflect the actual PX3-selected dwell condition, then re-run the
+   adaptive-selection script to authorize D4.
+4. Launch PX4 (mission section 8): the developed multi-K campaign for
+   every row `build_part_x_px3_adaptive_selection.py` has already flipped
+   to `AUTHORIZED_PX4` (D1, D2, D5, D6 — 32 rows) via
+   `part_x_physical_controller.py` against `developed_job_registry.csv`,
+   respecting the 3-worker cap and the trajectory budget in section 8
+   (max 30 accepted events, 150 μm, 1e12 cycles). Per the review's
+   explicit instruction, continue automatically through PX5–PX7 without
+   stopping merely because each is a new phase; before PX5, wire the
+   already-qualified `static_shield_phase_resolved_action` evaluator
+   (PX1.4) into the live production static-control commit path. This
+   stage will take real wall-clock time — launch via background workers
+   and continue via the harness's notification system rather than
+   blocking synchronously.

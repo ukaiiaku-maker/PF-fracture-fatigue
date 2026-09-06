@@ -12,6 +12,20 @@ Also covers scripts/part_x_run_one_job.py's chemistry_factor /
 K_rebond_max_target_Pa_sqrt_m screen-panel override resolution (sections
 7.5/7.6), which must reproduce build_part_x_kinetic_regime_registry.py's
 own K_target -> restored_work_of_separation_J_m2 mapping exactly.
+
+Also covers a real bug found while reviewing the just-completed PX3
+screen's post_first_event_intervals diagnostic: interval_compression_
+analysis/signed_K hardcoded this module's own reference F_HZ=1000.0 (and
+KMAX_Pa_sqrt_m) instead of accepting the trajectory's actual frequency/
+Kmax, so every screen job run at a frequency other than 1000 Hz (the
+7.2 frequency panel's 100/10000 Hz jobs, and 7.4's 100 Hz transition job)
+silently got its negative-contact-duration/elapsed-cycles diagnostic
+computed against the wrong assumed frequency. This never affected the
+core g/S_h-relevant quantities (n_accepted_events, cumulative_extension_m,
+cumulative_time_s, cumulative_cycles all come straight from the real
+engine's own cycle_step_waveform, which always used the correct
+waveform.frequency_Hz) -- only this post-hoc, engine-independent
+cross-check diagnostic was wrong.
 """
 from __future__ import annotations
 
@@ -92,6 +106,30 @@ def test_run_trajectory_nonzero_hold_reaches_the_waveform():
         hazard_rng_seed=1720, minimum_load_hold_s=0.0005,
     )
     assert captured == [0.0005]
+
+
+def test_interval_compression_analysis_default_is_byte_identical_to_before():
+    r_default = pilot.interval_compression_analysis(0.0, 0.0137, R=-0.5)
+    r_explicit = pilot.interval_compression_analysis(
+        0.0, 0.0137, R=-0.5, frequency_Hz=pilot.F_HZ, Kmax_Pa_sqrt_m=pilot.KMAX_Pa_sqrt_m,
+    )
+    assert r_default == r_explicit
+
+
+def test_interval_compression_analysis_uses_the_actual_frequency():
+    elapsed_s = 0.01
+    for f_Hz in (100.0, 1000.0, 10000.0):
+        r = pilot.interval_compression_analysis(0.0, elapsed_s, R=-0.5, frequency_Hz=f_Hz, Kmax_Pa_sqrt_m=18.0e6)
+        assert r["elapsed_cycles"] == pytest.approx(elapsed_s * f_Hz, rel=1.0e-12)
+    # Sanity: a 100 Hz reconstruction over one cycle at R=-0.5 sees a
+    # nonzero negative-K contact fraction; a 100x-faster (10 kHz)
+    # reconstruction over the SAME wall-clock window sees ~100x more
+    # elapsed cycles but the same contact FRACTION of elapsed time.
+    r_100 = pilot.interval_compression_analysis(0.0, 0.05, R=-0.5, frequency_Hz=100.0, Kmax_Pa_sqrt_m=18.0e6)
+    r_10000 = pilot.interval_compression_analysis(0.0, 0.05, R=-0.5, frequency_Hz=10000.0, Kmax_Pa_sqrt_m=18.0e6)
+    frac_100 = r_100["negative_contact_duration_s"] / r_100["elapsed_time_s"]
+    frac_10000 = r_10000["negative_contact_duration_s"] / r_10000["elapsed_time_s"]
+    assert frac_100 == pytest.approx(frac_10000, rel=1.0e-3)
 
 
 def test_resolve_screen_rebonding_cfg_zero_cohesion_forces_zero_G():
