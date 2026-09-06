@@ -79,6 +79,166 @@ class HoleMesh:
     validation: Mapping[str, Any]
 
 
+def _replace_split_edge(edges: np.ndarray, edge: tuple[int, int], new: int) -> np.ndarray:
+    """Replace a boundary edge by its two conforming children, if present."""
+    edge = tuple(sorted(edge))
+    out = []
+    found = False
+    for raw in np.asarray(edges, dtype=int).reshape((-1, 2)):
+        if tuple(sorted(map(int, raw))) == edge:
+            out.extend(((edge[0], new), (new, edge[1])))
+            found = True
+        else:
+            out.append(tuple(map(int, raw)))
+    return np.asarray(out, dtype=int).reshape((-1, 2)) if found else np.asarray(edges, dtype=int)
+
+
+def _final_mesh_validation(hole: HoleMesh) -> dict[str, Any]:
+    """Recompute geometry/topology/quality facts from the realized mesh."""
+    mesh = hole.mesh
+    edges, counts = _edge_counts(mesh.elems)
+    boundary_edges = edges[counts == 1]
+    components = _components(boundary_edges)
+    cavity_nodes = set(map(int, np.asarray(hole.cavity_edges).ravel()))
+    degrees = {node: 0 for node in cavity_nodes}
+    for a, b in np.asarray(hole.cavity_edges, dtype=int).reshape((-1, 2)):
+        degrees[int(a)] += 1; degrees[int(b)] += 1
+    tri = mesh.nodes[mesh.elems]
+    side = np.linalg.norm(tri[:, [1, 2, 0]] - tri[:, [0, 1, 2]], axis=2)
+    area = np.asarray(mesh.area_e, dtype=float)
+    quality = 4.0 * np.sqrt(3.0) * area / np.maximum(np.sum(side ** 2, axis=1), 1e-300)
+    cavity_lengths = (np.linalg.norm(mesh.nodes[hole.cavity_edges[:, 1]] -
+                                     mesh.nodes[hole.cavity_edges[:, 0]], axis=1)
+                      if len(hole.cavity_edges) else np.empty(0))
+    validation = dict(hole.validation)
+    validation.update({
+        "actual_boundary_components": len(components),
+        "actual_internal_components": 1 if cavity_nodes else 0,
+        "cavity_cycle": bool(cavity_nodes) and all(value == 2 for value in degrees.values()),
+        "triangle_disk_intersections": int(sum(triangle_intersects_open_disk(t, hole.center_m, hole.radius_m)
+                                                   for t in tri)) if hole.radius_m else 0,
+        "orphan_nodes": int(mesh.nn - len(np.unique(mesh.elems))),
+        "minimum_quality": float(np.min(quality)),
+        "maximum_aspect_ratio": float(np.max(side.max(axis=1) / side.min(axis=1))),
+        "local_edge_min_m": float(np.min(cavity_lengths)) if len(cavity_lengths) else math.nan,
+        "local_edge_max_m": float(np.max(cavity_lengths)) if len(cavity_lengths) else math.nan,
+    })
+    return validation
+
+
+def conform_crack_path(hole: HoleMesh, crack_path_m: Sequence[Sequence[float]],
+                       *, tolerance_m: float = 1.0e-12) -> tuple[HoleMesh, Mapping[str, Any]]:
+    """Insert every fixed laboratory-frame crack vertex into a ``HoleMesh``.
+
+    Boundary edge registries and displacement boundary node sets are updated
+    when an inserted vertex splits an edge.  The first vertex must lie on the
+    actual exterior boundary; subsequent vertices must lie in the material or
+    on its boundary.  The returned audit records element ancestry and the
+    post-insertion geometry generation.
+    """
+    requested = np.asarray(crack_path_m, dtype=float)
+    if requested.ndim != 2 or requested.shape[0] < 2 or requested.shape[1] != 2:
+        raise ValueError("crack_path_m must contain at least root and tip")
+    if not np.all(np.isfinite(requested)):
+        raise ValueError("crack_path_m must be finite")
+    current = hole
+    records = []
+    generation = int(current.validation.get("geometry_generation", 0))
+    for path_index, point in enumerate(requested):
+        mesh = current.mesh
+        distances = np.linalg.norm(mesh.nodes - point, axis=1)
+        nearest = int(np.argmin(distances))
+        split_edge = None
+        parents: list[int] = []
+        if float(distances[nearest]) <= tolerance_m:
+            node = nearest
+        else:
+            owners = []
+            for index, ids in enumerate(np.asarray(mesh.elems, dtype=int)):
+                tri = mesh.nodes[ids]
+                matrix = np.column_stack((tri[1] - tri[0], tri[2] - tri[0]))
+                if abs(float(np.linalg.det(matrix))) <= 1e-24:
+                    continue
+                uv = np.linalg.solve(matrix, point - tri[0])
+                if uv[0] >= -tolerance_m and uv[1] >= -tolerance_m and uv.sum() <= 1.0 + tolerance_m:
+                    owners.append((index, uv))
+            if not owners:
+                raise ValueError(f"crack path point {path_index} is outside the specimen mesh")
+            strict = [(index, uv) for index, uv in owners
+                      if uv[0] > 1e-10 and uv[1] > 1e-10 and uv.sum() < 1.0 - 1e-10]
+            source = np.asarray(mesh.elems, dtype=int)
+            node = mesh.nn
+            replacements = []
+            removed = set()
+            if strict:
+                owner = strict[0][0]; parents = [owner]
+                a, b, c = map(int, source[owner]); removed.add(owner)
+                replacements.extend(((a, b, node), (b, c, node), (c, a, node)))
+            else:
+                candidates = []
+                for owner, _ in owners:
+                    ids = source[owner]
+                    for u, v in ((ids[0], ids[1]), (ids[1], ids[2]), (ids[2], ids[0])):
+                        delta = mesh.nodes[v] - mesh.nodes[u]
+                        fraction = float((point - mesh.nodes[u]) @ delta / max(delta @ delta, 1e-300))
+                        distance = abs(float(delta[0] * (point - mesh.nodes[u])[1] -
+                                             delta[1] * (point - mesh.nodes[u])[0])) / math.sqrt(max(delta @ delta, 1e-300))
+                        if -tolerance_m <= fraction <= 1 + tolerance_m and distance <= tolerance_m:
+                            candidates.append(tuple(sorted((int(u), int(v)))))
+                if not candidates:
+                    raise ValueError(f"cannot conform crack path point {path_index}")
+                split_edge = min(candidates)
+                for owner, ids in enumerate(source):
+                    if not set(split_edge).issubset(map(int, ids)): continue
+                    parents.append(owner); removed.add(owner)
+                    u, v = split_edge; w = next(int(value) for value in ids if int(value) not in split_edge)
+                    original = mesh.nodes[ids]
+                    oa, ob = original[1] - original[0], original[2] - original[0]
+                    original_sign = oa[0] * ob[1] - oa[1] * ob[0]
+                    for candidate in ((u, node, w), (node, v, w)):
+                        xyz = np.vstack(tuple(point if q == node else mesh.nodes[q] for q in candidate))
+                        ca, cb = xyz[1] - xyz[0], xyz[2] - xyz[0]
+                        sign = ca[0] * cb[1] - ca[1] * cb[0]
+                        replacements.append(candidate if sign * original_sign > 0 else (candidate[0], candidate[2], candidate[1]))
+            elems = np.vstack((np.delete(source, sorted(removed), axis=0), replacements))
+            rebuilt = rebuild_tri_mesh(np.vstack((mesh.nodes, point)), elems, tip_centers=requested[-1])
+            exterior = current.exterior_edges
+            cavity = current.cavity_edges
+            boundary = current.boundary
+            polygon = current.prescribed_polygon_nodes
+            if split_edge is not None:
+                exterior = _replace_split_edge(exterior, split_edge, node)
+                cavity = _replace_split_edge(cavity, split_edge, node)
+                if tuple(sorted(split_edge)) in {tuple(sorted(map(int, e))) for e in current.cavity_edges}:
+                    polygon = np.append(polygon, node)
+                top = np.asarray(boundary.top_nodes)
+                bot = np.asarray(boundary.bot_nodes)
+                if set(split_edge).issubset(map(int, top)): top = np.append(top, node)
+                if set(split_edge).issubset(map(int, bot)): bot = np.append(bot, node)
+                boundary = BoundaryData(np.unique(top), np.unique(bot), boundary.left_bot,
+                                        boundary.right_bot, boundary.notch_nodes)
+            current = replace(current, mesh=rebuilt, boundary=boundary, cavity_edges=cavity,
+                              exterior_edges=exterior, prescribed_polygon_nodes=polygon)
+            generation += 1
+        realized = current.mesh.nodes[node]
+        records.append({"path_index": path_index, "node_id": int(node),
+                        "requested_m": point.tolist(), "realized_m": realized.tolist(),
+                        "error_m": float(np.linalg.norm(realized - point)),
+                        "parent_element_ids": parents,
+                        "split_boundary_edge": None if split_edge is None else list(split_edge)})
+    exterior_nodes = set(map(int, np.asarray(current.exterior_edges).ravel()))
+    if records[0]["node_id"] not in exterior_nodes:
+        raise ValueError("crack root is not on the actual exterior boundary component")
+    validation = _final_mesh_validation(current)
+    validation["geometry_generation"] = generation
+    current = replace(current, validation=validation)
+    audit = {"mode": "V3_FIXED_LABORATORY_GEOMETRY", "geometry_generation": generation,
+             "path_records": records, "root_boundary_component": "exterior_traction_free",
+             "maximum_requested_realized_error_m": max(r["error_m"] for r in records),
+             "post_insertion_validation": validation}
+    return current, audit
+
+
 def build_solid_plate_mesh(width_m: float, height_m: float, h_m: float) -> HoleMesh:
     """Deterministic no-hole control using the same production CST mesh type."""
     nx=max(2,int(math.ceil(width_m/h_m))); ny=max(2,int(math.ceil(height_m/h_m)))
