@@ -427,13 +427,6 @@ def run_case(
     reason = failure or complete.get("termination") or restored.runtime.termination_reason or "unknown_fail_closed_stop"
     reached_um = growth.max_forward_projected_extension_m * 1e6
     final_reasons = ["final_last_accepted_state"]
-    existing_reasons = set()
-    for metadata_path in (output / "field_snapshots").glob("*/metadata.json"):
-        existing_reasons.update(json.loads(metadata_path.read_text()).get("selection_reasons", []))
-    for milestone in MILESTONES_UM:
-        label = f"milestone_at_or_below_{int(milestone)}um"
-        if label not in existing_reasons and reached_um <= milestone + 1e-10:
-            final_reasons.append(label)
     final_snapshot = export_snapshot(
         output / "field_snapshots", case=case, runtime=restored.runtime,
         accepted_fem_state=restored.accepted_fem_state,

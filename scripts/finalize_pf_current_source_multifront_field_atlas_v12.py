@@ -272,6 +272,21 @@ def copy_compact_snapshot(source: Path, destination: Path) -> None:
         shutil.copy2(source / name, destination / name)
 
 
+def interpreted_snapshot_metadata(metadata: dict, terminal: dict) -> dict:
+    """Remove terminal-only milestone labels for milestones never crossed."""
+    result = dict(metadata)
+    reasons = list(metadata["selection_reasons"])
+    if "final_last_accepted_state" in reasons:
+        reached = float(terminal["achieved_forward_reach_um"])
+        reasons = [
+            reason for reason in reasons
+            if not reason.startswith("milestone_at_or_below_")
+            or reached >= float(reason.removeprefix("milestone_at_or_below_").removesuffix("um"))
+        ]
+    result["selection_reasons"] = reasons
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--raw-root", type=Path, required=True)
@@ -315,7 +330,10 @@ def main() -> int:
         })
         entries = []
         for meta_path in sorted((case_root / "field_snapshots").glob("*/metadata.json")):
-            meta = json.loads(meta_path.read_text()); entries.append(meta)
+            meta = interpreted_snapshot_metadata(
+                json.loads(meta_path.read_text()), terminal,
+            )
+            entries.append(meta)
             snapshot_rows.append({
                 "case": case, "step": meta["step_count"], "physical_time_s": meta["physical_time_s"],
                 "accepted_opening_m": meta["accepted_opening_m"],
@@ -326,7 +344,9 @@ def main() -> int:
                 "field_package_path": meta["files"]["fields_npz"], "field_package_sha256": meta["files"]["fields_npz_sha256"],
             })
             if any(reason.startswith("milestone_at_or_below_") or reason == "final_last_accepted_state" for reason in meta["selection_reasons"]):
-                copy_compact_snapshot(meta_path.parent, review / "portable_fields" / case / meta_path.parent.name)
+                destination = review / "portable_fields" / case / meta_path.parent.name
+                copy_compact_snapshot(meta_path.parent, destination)
+                atomic_json(destination / "metadata.json", meta)
         inventory["cases"][case] = {"snapshots": entries, "final_validation": validation[-1]}
         for branch in network["branches"]:
             branch_rows.append({"case": case, **{key: branch.get(key) for key in (
@@ -434,7 +454,7 @@ The shared family is mechanically valid for all eight cases because its mechanic
 
 ## Accepted-state field contract
 
-Portable NPZ, VTU, and crack-network VTP/JSON packages were saved only at the fresh initial state, every accepted binary birth, every detected owner handoff or partition, the nearest accepted state at or below each requested reach, and the last accepted state. All final packages were reloaded and checked exactly against their atomic accepted V12 checkpoints for mesh, displacement, damage, plastic strain, dislocation density, the complete accepted stress tensor, state identities, and topology.
+Portable NPZ, VTU, and crack-network VTP/JSON packages were saved at accepted binary births, detected owner handoffs or partitions, reached milestones, and the last accepted state. No case reached the 250/500/750/1000 µm milestones, so no field is classified as a milestone field. All final packages were reloaded and checked exactly against their atomic accepted V12 checkpoints for mesh, displacement, damage, plastic strain, dislocation density, the complete accepted stress tensor, state identities, and topology.
 
 ## Interpretation limit
 
