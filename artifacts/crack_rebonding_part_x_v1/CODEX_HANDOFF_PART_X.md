@@ -325,65 +325,150 @@ before/after state instead.
   is monotonic with same-sign slope in both segments, not visibly
   nonlinear by a documented >2x/<0.5x slope-ratio-or-sign-flip test).
 
-  **Two findings need a decision before D3/D4 can launch (left
-  deliberately BLOCKED, not guessed):**
-  - **Rule 2 (frequency-transition, D3) is UNRESOLVED.** The
-    analytically-preselected 100 Hz condition (largest predicted
-    mean_p_B change from the 1000 Hz baseline) does NOT clear the
-    |S_h|>=0.01 live measurable-effect gate (|S_h|=0.0011). The only
-    other screened candidate, 10000 Hz, clears the gate but shows the
-    *same* S_h magnitude as the 1000 Hz baseline (-0.0435 vs -0.0435) —
-    it isn't actually a distinct transition, just a scaled repeat.
-    Neither candidate cleanly satisfies rule 2's literal wording.
-  - **Rule 3 (dwell, D4) mechanically selects hold=0.002s, overriding the
-    provisional analytical pick of 0.0005s** — S_h grows monotonically
-    with hold duration (0 → 0.0005 (censored, partial) → 0.002 s:
-    -0.0435 → 0.3551 → 0.7969), and hold=0.002s's larger effect is also
-    the uncensored, more reliable measurement. But `developed_job_
-    registry.csv`'s existing D4 rows are baked at hold=0.0005s (from
-    `analytical_regime_selection.json`'s original pick), so they were
-    correctly left BLOCKED (0 rows matched the 0.002s selection) — D4
-    needs `analytical_regime_selection.json`'s `dwell_transition_s`
-    updated to 0.002 and `build_part_x_kinetic_regime_registry.py`
-    re-run before its rows can be authorized.
+  **Two findings needed a decision before D3/D4 could launch (left
+  deliberately BLOCKED, not guessed) — both resolved in PX3.5 below.**
 
-  Full `crack_rebonding` test selection re-verified after the
-  `interval_compression_analysis` fix (not yet committed as of this
-  handoff entry — see the exact next action below).
+- **PX3.5 (portable screen qualification, dwell-causality audit, final
+  developed-protocol selection) — complete.** External review accepted
+  PX3's physical execution but required this bounded closure before PX4.
+
+  1. **Producer provenance closed.** `build_part_x_px3_producer_
+     provenance.py` proves, by re-hashing every physics-affecting source
+     file at both the registry's recorded `physical_producer_sha`
+     (6b9631d) and the actual launch HEAD (cc306a8), that the only
+     difference between them was the two registry CSVs themselves (a
+     protocol-registry concern, never physics) — `physical_source_bundle_
+     byte_identical: true`. Policy going forward: no general
+     `--allow-head-drift` for PX4+; require exact launch-HEAD match or a
+     fresh instance of this same proof.
+  2. **Portable ledger built.** `build_part_x_px3_portable_ledger.py`
+     produces `screen_event_ledger.{csv,json}` (330 events across the 28
+     trajectories), `screen_censor_registry.csv`, `screen_raw_result_
+     hashes.json`, and `screen_posthoc_correction_manifest.json` (the 6
+     files whose `post_first_event_intervals` were repaired, with the
+     exact-fields-changed proof — pre-repair hashes are `NOT_ARCHIVED`,
+     since the repair was applied in place before this manifest existed).
+     Missing per-event diagnostics (A/F transition-flux breakdown for
+     firing sub-intervals, live cycle-mean p_P/p_C, dwell-aware contact
+     time) are recorded as `NOT_ARCHIVED`, never inferred.
+  3. **Real bug found and fixed: the actual root cause of the dwell
+     "acceleration."** `persistent_site_coupled_hazard_v10229.py::
+     _phase_statistics`'s `hazard_coupled` branch duration-weighted
+     `sig_cleave` samples (drawn from a cursor-**rotated** K array,
+     `cycle_schedule_from_elapsed`) using the **unrotated** `dt_values`
+     array from the plain `cycle_schedule` — pairing each sample with the
+     wrong bin's duration whenever bin durations are non-uniform
+     (`hold>0`). Invisible at `hold=0` (uniform bins mask the
+     misalignment) — this is why 24 of PX3's 28 jobs were unaffected.
+     Proven via a zero-active-patches control (no crack-advance event has
+     fired yet, so `K_rebond` is provably 0 regardless of cohesion):
+     `_phase_statistics` matched between finite/zero configs only at
+     cursor=0 before the fix, diverged by up to ~8x at other cursor
+     positions once `hold>0`; after the fix they match to floating-point
+     roundoff (~1e-15 relative) at *every* cursor position. Also fixed a
+     related variable-length bug in the same function (`cycle_schedule_
+     from_elapsed` can return one entry longer than the plain schedule
+     when the cursor doesn't land on a bin boundary — the cleave-side
+     loop now walks its own array length, never `K_values`'s). 11 new
+     regression tests (`test_v10_2_30_crack_rebonding_part_x_px3_5_
+     dwell_hazard_fix.py`). Full `crack_rebonding` selection re-verified
+     clean after the fix (429 passed) — confirmed pre-existing, unrelated
+     to this fix: 8 failures in `test_v10_2_29_state_coupled_hazard.py`/
+     `test_v10_2_30_forward_coupled_marcher.py`/`test_v10_2_30_partition_
+     robust_forward.py` (stale mock `Waveform` test doubles missing
+     `cycle_schedule`, present identically on the unmodified pre-fix
+     commit — a latent PX1.1-era gap, out of PX3.5's scope, worth a future
+     follow-up).
+  4. **Dwell causal audit: `ORIGINAL_DWELL_SIGN_REVERSAL_NOT_REPRODUCED`.**
+     Reran both nonzero-hold dynamic-finite trajectories under the fix
+     (both now complete uncensored, 12/12 events) plus a prescribed
+     post-first-event static `K_b=0.9 MPa√m` control at each hold (first
+     live-production use of the `run_trajectory` `static_shield_control`
+     hook with `hold>0`). All four legs give `S_h≈-0.044`, matching the
+     `hold=0` baseline (`-0.0435`) — not the original `+0.36`/`+0.80`.
+     Static and dynamic agree to within 0.0002–0.0004 decade at both
+     holds, ruling out `DWELL_OR_LOCALIZER_IMPLEMENTATION_INCONSISTENT`.
+     Change from the zero-hold baseline is only 0.0005–0.0007 decade —
+     far below the 0.01 measurable-effect gate — so **D4 is not selected**
+     (`build_part_x_px3_5_dwell_audit_classification.py`; existing D4 rows
+     set to `BLOCKED_DWELL_GATE_NOT_SATISFIED`). The dwell-induced
+     "acceleration" was entirely a software defect.
+  5. **Frequency transition localized at 316.227766 Hz** (`run_part_x_
+     px3_5_frequency_bisection.py`), the geometric mean of 100/1000 Hz —
+     resolved on the *first* evaluated point (of 3 permitted): `S_h=
+     -0.0232`, clearing both the `|S_h|>=0.01` measurable-effect gate and
+     the `|S_h-S_h(1000Hz)|>=0.01` distinct-from-baseline gate. **D3
+     authorized** at this condition (10 new developed rows across the
+     Kmax grid).
+  6. **D6 corrected to the localized transition frequency**, per review's
+     explicit instruction ("D6 must use the ultimately selected
+     frequency-transition condition"). At 1000 Hz baseline, persistent
+     vs. reversible are indistinguishable (`ΔS_h=0.0001`) — the original
+     D6 rows (baked at 1000 Hz) are set to `BLOCKED_PROTOCOL_MISMATCH`.
+     Reran the persistent pair at 316.227766 Hz (`run_part_x_px3_5_
+     persistent_at_transition.py`): `S_h=-0.0429` vs. reversible's
+     `-0.0232` at the same condition, `ΔS_h=0.0197` — clears the gate.
+     **New D6 rows authorized** at 316.227766 Hz.
+  7. **D5 passivation chemistry re-qualified with a live-data proxy.**
+     True sub-event p_B/p_P traces aren't archived at this instrumentation
+     depth, so the mean of `pre_event_max_pB`/`max_pB_post_commit` across
+     each chemistry factor's 12 already-completed events is used as the
+     coarsest available *live* (not analytical) proxy for cycle-mean p_B:
+     chem=1.0→0.397 (|Δ from 0.30|=0.097), chem=0.3→0.184 (|Δ|=0.116),
+     chem=0.1→0.064 (|Δ|=0.236) — chem=1.0 remains closest, consistent
+     with the analytical pick and the largest-live-effect ranking
+     (3-way convergent evidence). The literal "mean p_P>=0.30" qualifier
+     is not independently verified (p_P not archived) — documented as
+     such rather than assumed. **D5 stays authorized at chemistry=1.0.**
+  8. **`post_screen_protocol_selection.{json,csv}`** records every D1–D7
+     decision (analytical preselection / observed screen result /
+     post-screen amendment / reason / omitted), explicitly *not*
+     overwriting `analytical_regime_selection.json` (still an accurate
+     record of what was analytically predicted, now superseded for D3/D4/
+     D6 by the post-screen amendments above).
+  9. **Strict verifier** (`verify_part_x_px3_5.py`) independently
+     reproduces all 18 pairwise S_h values from the tracked ledger alone
+     (`runs/` hidden), confirms R=+0.10's near-exact parity, the frequency/
+     dwell/selection records' self-consistency, that `developed_job_
+     registry.csv`'s `AUTHORIZED_PX4` rows exactly match `post_screen_
+     protocol_selection.json`, that zero PX4 jobs have been launched yet,
+     and the producer-provenance proof — `overall_pass=true` (8/8 checks).
+
+  Final `developed_job_registry.csv` state (102 rows): D1/D2/D5 unchanged
+  (`AUTHORIZED_PX4`, 8 rows each); D3 now `AUTHORIZED_PX4` at 316.227766 Hz
+  (10 new rows; the old 100 Hz rows remain as a labeled historical record,
+  never authorized); D4 `BLOCKED_DWELL_GATE_NOT_SATISFIED` (terminal, not
+  "pending" — the audit is conclusive); D6 old 1000 Hz rows `BLOCKED_
+  PROTOCOL_MISMATCH`, new 316.227766 Hz rows `AUTHORIZED_PX4` (10 rows);
+  D7 unchanged (all aliased, no endpoint selected); D1_confirm/D2_confirm
+  unchanged (`BLOCKED_PENDING_STAGE1_DECISION`, a PX4-Stage-1 concern).
 
 ## Terminal and pending counts
 
-- Physical trajectories launched: 28 (all COMPLETE, 0 quarantined; PX3
-  screen only — PX4 developed campaigns not yet launched).
-- PX1, PX2, PX2.5, and PX3's physical screen + analysis are done modulo
-  the two items above. PX4–PX7: not started.
+- Physical trajectories launched: 28 PX3 screen (all COMPLETE) + 8 PX3.5
+  targeted reruns (4 dwell-causal-audit legs: dynamic-finite + prescribed-
+  static at each of hold=0.0005s/0.002s; 2 frequency-bisection legs at
+  316.227766 Hz; 2 persistent-at-transition legs at the same frequency —
+  all COMPLETE, 0 quarantined). PX4 developed campaigns: 0 launched
+  (verified by `verify_part_x_px3_5.py`'s own check).
+- PX1, PX2, PX2.5, PX3, and PX3.5 are done. PX4–PX7: not started.
 
 ## Exact next action
 
-1. Confirm the full `crack_rebonding` test selection still passes with
-   the `interval_compression_analysis` frequency/Kmax fix, then commit:
-   the source fix + its 2 new regression tests, `build_part_x_px3_screen_
-   analysis.py`, `build_part_x_px3_adaptive_selection.py`, the resulting
-   `artifacts/crack_rebonding_part_x_v1/px3_screen_pair_analysis.{csv,
-   json}` and `px3_adaptive_selection.json`, and the `developed_job_
-   registry.csv` update (32 rows flipped to `AUTHORIZED_PX4`).
-2. Get a decision on rule 2's frequency-transition ambiguity (100 Hz vs
-   10000 Hz vs re-examining the premise) — this is the one genuinely
-   irreducible physical judgment call from PX3, escalated rather than
-   guessed.
-3. Regenerate the registry with `dwell_transition_s=0.002` so D4's rows
-   reflect the actual PX3-selected dwell condition, then re-run the
-   adaptive-selection script to authorize D4.
-4. Launch PX4 (mission section 8): the developed multi-K campaign for
-   every row `build_part_x_px3_adaptive_selection.py` has already flipped
-   to `AUTHORIZED_PX4` (D1, D2, D5, D6 — 32 rows) via
-   `part_x_physical_controller.py` against `developed_job_registry.csv`,
-   respecting the 3-worker cap and the trajectory budget in section 8
-   (max 30 accepted events, 150 μm, 1e12 cycles). Per the review's
-   explicit instruction, continue automatically through PX5–PX7 without
-   stopping merely because each is a new phase; before PX5, wire the
-   already-qualified `static_shield_phase_resolved_action` evaluator
-   (PX1.4) into the live production static-control commit path. This
-   stage will take real wall-clock time — launch via background workers
-   and continue via the harness's notification system rather than
-   blocking synchronously.
+Launch PX4 (mission section 8): the developed multi-K campaign for every
+row now `AUTHORIZED_PX4` in `developed_job_registry.csv` (D1, D2, D3, D5,
+D6 — 44 rows across their respective Kmax grids) via `part_x_physical_
+controller.py`, respecting the 3-worker cap and the trajectory budget in
+section 8 (max 30 accepted events, 150 μm, 1e12 cycles). Do **not** use a
+general `--allow-head-drift` — require exact launch-HEAD match to each
+row's `physical_producer_sha`, or a fresh producer-provenance proof
+identical in form to `px3_physical_producer_provenance.json` if the
+registry needs another producer-sha refresh first. Per the review's
+explicit instruction, continue automatically through PX5–PX7 without
+stopping merely because each is a new phase; before PX5, wire the
+already-qualified `static_shield_phase_resolved_action` evaluator (PX1.4)
+into the live production static-control commit path (PX3.5 already
+proved out the `run_trajectory` `static_shield_control` hook works
+correctly with `hold>0`, which PX5 will need). This stage will take real
+wall-clock time — launch via background workers and continue via the
+harness's notification system rather than blocking synchronously.

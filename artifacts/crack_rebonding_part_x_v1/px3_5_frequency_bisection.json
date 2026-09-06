@@ -1,0 +1,32 @@
+{
+  "schema": "v10230_part_x_px3_5_frequency_bisection_v1",
+  "gate_measurable": 0.01,
+  "S_h_1000Hz_baseline": -0.043507401620722155,
+  "evaluated_pairs": [
+    {
+      "frequency_Hz": 316.22776601683796,
+      "g_finite": 9.744498901710046e-07,
+      "g_zero": 1.0280302239839418e-06,
+      "S_h": -0.023246372066354767,
+      "n_events_finite": 12,
+      "n_events_zero": 12,
+      "censored_finite": false,
+      "censored_zero": false,
+      "measurable_effect_gate": true,
+      "distinct_from_1000Hz_gate": true
+    }
+  ],
+  "localized": {
+    "frequency_Hz": 316.22776601683796,
+    "g_finite": 9.744498901710046e-07,
+    "g_zero": 1.0280302239839418e-06,
+    "S_h": -0.023246372066354767,
+    "n_events_finite": 12,
+    "n_events_zero": 12,
+    "censored_finite": false,
+    "censored_zero": false,
+    "measurable_effect_gate": true,
+    "distinct_from_1000Hz_gate": true
+  },
+  "classification": "FREQUENCY_TRANSITION_LOCALIZED_AT_316.227766HZ"
+}

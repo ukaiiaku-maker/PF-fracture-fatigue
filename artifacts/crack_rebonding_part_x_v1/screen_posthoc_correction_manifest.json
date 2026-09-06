@@ -1,0 +1,137 @@
+{
+  "schema": "v10230_part_x_px3_posthoc_correction_manifest_v1",
+  "corrections": [
+    {
+      "canonical_job_key": "0119326470e5cbe683c05f6a42d1f242d3c64de459e6ccb90758d94cf69e24b4",
+      "protocol": "7.2_frequency_panel",
+      "frequency_Hz": "10000.0",
+      "cohesion": "finite",
+      "result_file_sha256_after_repair": "f296e5eaf5e41b34dc127ec67362d97e9ee5c21f79fd7fda82d421ab4326ee9f",
+      "result_file_sha256_before_repair": "NOT_ARCHIVED",
+      "reason": "NOT_ARCHIVED: the repair (interval_compression_analysis's frequency_Hz/Kmax_Pa_sqrt_m parameters, previously hardcoded to this module's own 1000Hz/18MPa reference trajectory constants) was applied via in-place byte rewrite before this provenance manifest was written; the pre-repair byte content was not separately preserved.",
+      "repair_script": "px3_repair_intervals.py (one-off, run from the session scratchpad, not committed -- superseded by this manifest's own record)",
+      "exact_fields_changed": [
+        "trajectory.post_first_event_intervals"
+      ],
+      "fields_proven_unchanged": [
+        "trajectory.events (all fields, including cumulative_extension_m/cumulative_cycles/cumulative_time_s/accepted_length_m/hazard_threshold_action)",
+        "trajectory.n_accepted_events",
+        "trajectory.censored",
+        "trajectory.censor_reason",
+        "trajectory.cumulative_extension_m",
+        "trajectory.cumulative_cycles"
+      ],
+      "proof": "The repair is a pure function of trajectory.events[i]['cumulative_time_s'] (already stored, unaffected by the bug) and job.R/frequency_Hz/Kmax_Pa_sqrt_m (job-level fields, also unaffected) -- it recomputes ONLY the post_first_event_intervals list via interval_compression_analysis and overwrites nothing else in the file. g and S_h (both computed from trajectory.events[...]['cumulative_extension_m']/['cumulative_cycles'], never from post_first_event_intervals) are therefore unaffected by construction, not merely by observation."
+    },
+    {
+      "canonical_job_key": "acf3a51ccf2954fb04352f35d9de8c1417678119cb8d1321ec41a24e1d6237ee",
+      "protocol": "7.2_frequency_panel",
+      "frequency_Hz": "100.0",
+      "cohesion": "finite",
+      "result_file_sha256_after_repair": "87af7611762f57327dd63279b55605b76b419786e9b25a57d29449a43807a5b3",
+      "result_file_sha256_before_repair": "NOT_ARCHIVED",
+      "reason": "NOT_ARCHIVED: the repair (interval_compression_analysis's frequency_Hz/Kmax_Pa_sqrt_m parameters, previously hardcoded to this module's own 1000Hz/18MPa reference trajectory constants) was applied via in-place byte rewrite before this provenance manifest was written; the pre-repair byte content was not separately preserved.",
+      "repair_script": "px3_repair_intervals.py (one-off, run from the session scratchpad, not committed -- superseded by this manifest's own record)",
+      "exact_fields_changed": [
+        "trajectory.post_first_event_intervals"
+      ],
+      "fields_proven_unchanged": [
+        "trajectory.events (all fields, including cumulative_extension_m/cumulative_cycles/cumulative_time_s/accepted_length_m/hazard_threshold_action)",
+        "trajectory.n_accepted_events",
+        "trajectory.censored",
+        "trajectory.censor_reason",
+        "trajectory.cumulative_extension_m",
+        "trajectory.cumulative_cycles"
+      ],
+      "proof": "The repair is a pure function of trajectory.events[i]['cumulative_time_s'] (already stored, unaffected by the bug) and job.R/frequency_Hz/Kmax_Pa_sqrt_m (job-level fields, also unaffected) -- it recomputes ONLY the post_first_event_intervals list via interval_compression_analysis and overwrites nothing else in the file. g and S_h (both computed from trajectory.events[...]['cumulative_extension_m']/['cumulative_cycles'], never from post_first_event_intervals) are therefore unaffected by construction, not merely by observation."
+    },
+    {
+      "canonical_job_key": "15eae7ce2b2c26727671304b329d0937c7f995c7c0292084d7b1418df6540d02",
+      "protocol": "7.2_frequency_panel",
+      "frequency_Hz": "100.0",
+      "cohesion": "zero",
+      "result_file_sha256_after_repair": "d2b5442a36b463009b4e3fdf903d3ba867f5810daef9b0905af1895d830933e2",
+      "result_file_sha256_before_repair": "NOT_ARCHIVED",
+      "reason": "NOT_ARCHIVED: the repair (interval_compression_analysis's frequency_Hz/Kmax_Pa_sqrt_m parameters, previously hardcoded to this module's own 1000Hz/18MPa reference trajectory constants) was applied via in-place byte rewrite before this provenance manifest was written; the pre-repair byte content was not separately preserved.",
+      "repair_script": "px3_repair_intervals.py (one-off, run from the session scratchpad, not committed -- superseded by this manifest's own record)",
+      "exact_fields_changed": [
+        "trajectory.post_first_event_intervals"
+      ],
+      "fields_proven_unchanged": [
+        "trajectory.events (all fields, including cumulative_extension_m/cumulative_cycles/cumulative_time_s/accepted_length_m/hazard_threshold_action)",
+        "trajectory.n_accepted_events",
+        "trajectory.censored",
+        "trajectory.censor_reason",
+        "trajectory.cumulative_extension_m",
+        "trajectory.cumulative_cycles"
+      ],
+      "proof": "The repair is a pure function of trajectory.events[i]['cumulative_time_s'] (already stored, unaffected by the bug) and job.R/frequency_Hz/Kmax_Pa_sqrt_m (job-level fields, also unaffected) -- it recomputes ONLY the post_first_event_intervals list via interval_compression_analysis and overwrites nothing else in the file. g and S_h (both computed from trajectory.events[...]['cumulative_extension_m']/['cumulative_cycles'], never from post_first_event_intervals) are therefore unaffected by construction, not merely by observation."
+    },
+    {
+      "canonical_job_key": "f9ae8c11742212a4dd0b1afff0b2504c285b12950d52967a6b27b0e4ef465ab2",
+      "protocol": "7.2_frequency_panel",
+      "frequency_Hz": "10000.0",
+      "cohesion": "zero",
+      "result_file_sha256_after_repair": "427c98251631c83bfa618130574a20a68268ddc834d63b742659a2be848ac88b",
+      "result_file_sha256_before_repair": "NOT_ARCHIVED",
+      "reason": "NOT_ARCHIVED: the repair (interval_compression_analysis's frequency_Hz/Kmax_Pa_sqrt_m parameters, previously hardcoded to this module's own 1000Hz/18MPa reference trajectory constants) was applied via in-place byte rewrite before this provenance manifest was written; the pre-repair byte content was not separately preserved.",
+      "repair_script": "px3_repair_intervals.py (one-off, run from the session scratchpad, not committed -- superseded by this manifest's own record)",
+      "exact_fields_changed": [
+        "trajectory.post_first_event_intervals"
+      ],
+      "fields_proven_unchanged": [
+        "trajectory.events (all fields, including cumulative_extension_m/cumulative_cycles/cumulative_time_s/accepted_length_m/hazard_threshold_action)",
+        "trajectory.n_accepted_events",
+        "trajectory.censored",
+        "trajectory.censor_reason",
+        "trajectory.cumulative_extension_m",
+        "trajectory.cumulative_cycles"
+      ],
+      "proof": "The repair is a pure function of trajectory.events[i]['cumulative_time_s'] (already stored, unaffected by the bug) and job.R/frequency_Hz/Kmax_Pa_sqrt_m (job-level fields, also unaffected) -- it recomputes ONLY the post_first_event_intervals list via interval_compression_analysis and overwrites nothing else in the file. g and S_h (both computed from trajectory.events[...]['cumulative_extension_m']/['cumulative_cycles'], never from post_first_event_intervals) are therefore unaffected by construction, not merely by observation."
+    },
+    {
+      "canonical_job_key": "405ea308df2e40942e799754ce1ef58fd76c3d8368fe82a6a41fe63a026cadf0",
+      "protocol": "7.4_reversible_vs_persistent_at_transition",
+      "frequency_Hz": "100.0",
+      "cohesion": "finite",
+      "result_file_sha256_after_repair": "5642d85e8bc73e3ca531b0f16339f288bab987797ff9ed8eb916622e99536d29",
+      "result_file_sha256_before_repair": "NOT_ARCHIVED",
+      "reason": "NOT_ARCHIVED: the repair (interval_compression_analysis's frequency_Hz/Kmax_Pa_sqrt_m parameters, previously hardcoded to this module's own 1000Hz/18MPa reference trajectory constants) was applied via in-place byte rewrite before this provenance manifest was written; the pre-repair byte content was not separately preserved.",
+      "repair_script": "px3_repair_intervals.py (one-off, run from the session scratchpad, not committed -- superseded by this manifest's own record)",
+      "exact_fields_changed": [
+        "trajectory.post_first_event_intervals"
+      ],
+      "fields_proven_unchanged": [
+        "trajectory.events (all fields, including cumulative_extension_m/cumulative_cycles/cumulative_time_s/accepted_length_m/hazard_threshold_action)",
+        "trajectory.n_accepted_events",
+        "trajectory.censored",
+        "trajectory.censor_reason",
+        "trajectory.cumulative_extension_m",
+        "trajectory.cumulative_cycles"
+      ],
+      "proof": "The repair is a pure function of trajectory.events[i]['cumulative_time_s'] (already stored, unaffected by the bug) and job.R/frequency_Hz/Kmax_Pa_sqrt_m (job-level fields, also unaffected) -- it recomputes ONLY the post_first_event_intervals list via interval_compression_analysis and overwrites nothing else in the file. g and S_h (both computed from trajectory.events[...]['cumulative_extension_m']/['cumulative_cycles'], never from post_first_event_intervals) are therefore unaffected by construction, not merely by observation."
+    },
+    {
+      "canonical_job_key": "5beb4b72022143074a2e92105dd15e2029c780621a656f2d8ea62e5aa099181d",
+      "protocol": "7.4_reversible_vs_persistent_at_transition",
+      "frequency_Hz": "100.0",
+      "cohesion": "zero",
+      "result_file_sha256_after_repair": "006e86c61ec031762abd0857e757ba7278c94edc5be3122df8819137840ab3a7",
+      "result_file_sha256_before_repair": "NOT_ARCHIVED",
+      "reason": "NOT_ARCHIVED: the repair (interval_compression_analysis's frequency_Hz/Kmax_Pa_sqrt_m parameters, previously hardcoded to this module's own 1000Hz/18MPa reference trajectory constants) was applied via in-place byte rewrite before this provenance manifest was written; the pre-repair byte content was not separately preserved.",
+      "repair_script": "px3_repair_intervals.py (one-off, run from the session scratchpad, not committed -- superseded by this manifest's own record)",
+      "exact_fields_changed": [
+        "trajectory.post_first_event_intervals"
+      ],
+      "fields_proven_unchanged": [
+        "trajectory.events (all fields, including cumulative_extension_m/cumulative_cycles/cumulative_time_s/accepted_length_m/hazard_threshold_action)",
+        "trajectory.n_accepted_events",
+        "trajectory.censored",
+        "trajectory.censor_reason",
+        "trajectory.cumulative_extension_m",
+        "trajectory.cumulative_cycles"
+      ],
+      "proof": "The repair is a pure function of trajectory.events[i]['cumulative_time_s'] (already stored, unaffected by the bug) and job.R/frequency_Hz/Kmax_Pa_sqrt_m (job-level fields, also unaffected) -- it recomputes ONLY the post_first_event_intervals list via interval_compression_analysis and overwrites nothing else in the file. g and S_h (both computed from trajectory.events[...]['cumulative_extension_m']/['cumulative_cycles'], never from post_first_event_intervals) are therefore unaffected by construction, not merely by observation."
+    }
+  ]
+}

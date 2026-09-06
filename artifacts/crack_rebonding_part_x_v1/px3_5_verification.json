@@ -1,0 +1,15 @@
+{
+  "schema": "v10230_part_x_px3_5_verifier_v1",
+  "checks": {
+    "reproduce_18_pairwise_S_h_from_ledger": true,
+    "R_positive_0p1_exact_zero_parity": true,
+    "frequency_bisection_present": true,
+    "dwell_audit_classification_present": true,
+    "post_screen_selection_complete": true,
+    "developed_registry_matches_selection": true,
+    "zero_px4_jobs_launched": true,
+    "physical_source_bundle_byte_identical": true
+  },
+  "errors": [],
+  "overall_pass": true
+}

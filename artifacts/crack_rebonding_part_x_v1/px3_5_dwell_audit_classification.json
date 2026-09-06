@@ -1,0 +1,61 @@
+{
+  "schema": "v10230_part_x_px3_5_dwell_audit_classification_v1",
+  "classification": "ORIGINAL_DWELL_SIGN_REVERSAL_NOT_REPRODUCED",
+  "root_cause_identified_and_fixed": "persistent_site_coupled_hazard_v10229.py::_phase_statistics's hazard_coupled branch duration-weighted sig_cleave samples (drawn from a cursor-ROTATED K array, cycle_schedule_from_elapsed) using the UNROTATED dt_values array from the plain cycle_schedule -- pairing each sample with the wrong bin's duration whenever bin durations are non-uniform (hold>0). Invisible at hold=0 (all bins equal duration). Proven via a zero-active-patches control (K_rebond provably 0 regardless of cohesion): finite/zero configs matched only at cursor=0 before the fix, diverged by up to ~8x at other cursor positions once hold>0; after the fix they match to floating-point roundoff (~1e-15 relative) at every cursor position. See tests/test_v10_2_30_crack_rebonding_part_x_px3_5_dwell_hazard_fix.py.",
+  "original_buggy_screen_S_h": {
+    "hold=0.0005_censored_partial_unequal_window": 0.3551054814755134,
+    "hold=0.002_uncensored": 0.7968632120351952
+  },
+  "corrected_audit_S_h_vs_matched_zero_cohesion": {
+    "dynamic_finite_hold0.0005": -0.04398496238856613,
+    "prescribed_static_hold0.0005": -0.04421390547099756,
+    "dynamic_finite_hold0.002": -0.044017161426242166,
+    "prescribed_static_hold0.002": -0.044213905470998516
+  },
+  "corrected_audit_legs": {
+    "dynamic_finite_hold0.0005": {
+      "g": 2.9377911667343524e-07,
+      "S_h_vs_zero_cohesion": -0.04398496238856613,
+      "n_events": 12,
+      "censored": false,
+      "cumulative_cycles": 204.23507524769357,
+      "cumulative_extension_m": 5.9999999999999995e-05
+    },
+    "prescribed_static_hold0.0005": {
+      "g": 2.9362428861467926e-07,
+      "S_h_vs_zero_cohesion": -0.04421390547099756,
+      "n_events": 12,
+      "censored": false,
+      "cumulative_cycles": 204.34276838295725,
+      "cumulative_extension_m": 5.9999999999999995e-05
+    },
+    "dynamic_finite_hold0.002": {
+      "g": 2.93757336396264e-07,
+      "S_h_vs_zero_cohesion": -0.044017161426242166,
+      "n_events": 12,
+      "censored": false,
+      "cumulative_cycles": 204.2502180066849,
+      "cumulative_extension_m": 5.9999999999999995e-05
+    },
+    "prescribed_static_hold0.002": {
+      "g": 2.9362428861467883e-07,
+      "S_h_vs_zero_cohesion": -0.044213905470998516,
+      "n_events": 12,
+      "censored": false,
+      "cumulative_cycles": 204.34276838295756,
+      "cumulative_extension_m": 5.9999999999999995e-05
+    }
+  },
+  "hold0_baseline_S_h_for_reference": -0.043507401620722155,
+  "static_vs_dynamic_agreement_abs_S_h_difference": {
+    "hold=0.0005": 0.00022894308243142508,
+    "hold=0.002": 0.0001967440447563501
+  },
+  "change_from_zero_hold_abs_S_h_difference": {
+    "hold=0.0005": 0.0004775607678439778,
+    "hold=0.002": 0.0005097598055200103
+  },
+  "measurable_gate": 0.01,
+  "conclusion": "Both nonzero-hold legs, rerun under the fixed code, reproduce essentially the SAME S_h as the hold=0 baseline (~-0.044 vs -0.0435), not the original ~+0.36/+0.80 acceleration. The prescribed post-first-event static K_b=0.9 MPa sqrt(m) control agrees with the dynamic rebonding result at both holds to within 0.0002-0.0004 decade (far inside the measurable-effect gate), confirming the dwell/localizer implementation is CONSISTENT between static and dynamic treatments -- neither shows the acceleration, ruling out DWELL_OR_LOCALIZER_IMPLEMENTATION_INCONSISTENT. The change from the zero-hold baseline is only 0.0005-0.0007 decade at either nonzero hold, far below the 0.01 measurable-effect gate -- dwell duration does not meaningfully change this mechanism's screen-level growth-rate effect once the bug is fixed. Per mission section 7.8 rule 3 ('select the nonzero hold with the largest change in transition flux or p_B from zero hold, PROVIDED it produces a screen-level rate effect'), NEITHER nonzero hold clears that provision -- D4 is therefore NOT selected for developed confirmation. The dwell-induced rate-sign-reversal reported by PX3's original screen was entirely a software defect, not a state-mediated physical effect.",
+  "d4_decision": "DO_NOT_SELECT_D4"
+}

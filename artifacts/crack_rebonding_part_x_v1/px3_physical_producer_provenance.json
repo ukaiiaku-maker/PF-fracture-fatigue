@@ -1,0 +1,86 @@
+{
+  "schema": "v10230_part_x_px3_physical_producer_provenance_v1",
+  "protocol_registry_commit": "6b9631dc4d0c27367fd444f93a0d4894cdf66fa5",
+  "launch_HEAD": "cc306a8a4174b64a608865e8cd02620a56d030f8",
+  "current_full_HEAD_at_provenance_time": "ba1731e0c9b20a0b685245bd12af49c6b437b25a",
+  "files_changed_between_registry_producer_and_launch_HEAD": [
+    "artifacts/crack_rebonding_part_x_v1/developed_job_registry.csv",
+    "artifacts/crack_rebonding_part_x_v1/screen_job_registry.csv"
+  ],
+  "physical_source_files_touched_by_that_diff": [],
+  "physical_source_file_hashes": {
+    "arrhenius_fracture/persistent_site_cyclic_v10229.py": {
+      "sha256_at_registry_producer_commit": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+      "sha256_at_launch_HEAD": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/persistent_site_cyclic_coupled_v10229.py": {
+      "sha256_at_registry_producer_commit": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+      "sha256_at_launch_HEAD": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py": {
+      "sha256_at_registry_producer_commit": "b413badae311db2d301e5ebfea095224f7a664a531b7b4efe03dd5f91b9313da",
+      "sha256_at_launch_HEAD": "b413badae311db2d301e5ebfea095224f7a664a531b7b4efe03dd5f91b9313da",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/persistent_site_cyclic_coupled_audited_v10229.py": {
+      "sha256_at_registry_producer_commit": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+      "sha256_at_launch_HEAD": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": {
+      "sha256_at_registry_producer_commit": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+      "sha256_at_launch_HEAD": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": {
+      "sha256_at_registry_producer_commit": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+      "sha256_at_launch_HEAD": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/crack_rebonding_v10230.py": {
+      "sha256_at_registry_producer_commit": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+      "sha256_at_launch_HEAD": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/crack_rebonding_kinetics_v10230.py": {
+      "sha256_at_registry_producer_commit": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+      "sha256_at_launch_HEAD": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/a_native_engine_v10230.py": {
+      "sha256_at_registry_producer_commit": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+      "sha256_at_launch_HEAD": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/material_manifest.py": {
+      "sha256_at_registry_producer_commit": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+      "sha256_at_launch_HEAD": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/reduced_shared_state_v1023.py": {
+      "sha256_at_registry_producer_commit": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+      "sha256_at_launch_HEAD": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/fatigue_v1.py": {
+      "sha256_at_registry_producer_commit": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+      "sha256_at_launch_HEAD": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+      "byte_identical": true
+    },
+    "arrhenius_fracture/crack_rebonding_causal_pilot_v2_v10230.py": {
+      "sha256_at_registry_producer_commit": "24a5b868413c1c79ec820280f382035084e968f7a54a71f8e18bc60a28e9fe07",
+      "sha256_at_launch_HEAD": "24a5b868413c1c79ec820280f382035084e968f7a54a71f8e18bc60a28e9fe07",
+      "byte_identical": true
+    },
+    "scripts/part_x_run_one_job.py": {
+      "sha256_at_registry_producer_commit": "cb33cc46446ad08c8c9536108b434dcf69b0940cba018f9205726687b9d8ccc0",
+      "sha256_at_launch_HEAD": "cb33cc46446ad08c8c9536108b434dcf69b0940cba018f9205726687b9d8ccc0",
+      "byte_identical": true
+    }
+  },
+  "physical_source_bundle_byte_identical": true,
+  "conclusion": "PROVEN_EQUAL_PHYSICAL_SOURCE_BUNDLE -- the only file changes between the registry's recorded physical_producer_sha and the actual launch HEAD were the two registry CSVs themselves (a protocol_registry_commit concern), never a physics-affecting module; the 28 already-completed PX3 trajectories are admitted as valid under this launch HEAD.",
+  "policy_for_future_physical_launches": "Do not use a general --allow-head-drift for PX4 or later. Require exact launch-HEAD equality to the registry's recorded physical_producer_sha, or an explicit re-proof of physical_source_bundle equality identical in form to this file, before any future physical launch."
+}

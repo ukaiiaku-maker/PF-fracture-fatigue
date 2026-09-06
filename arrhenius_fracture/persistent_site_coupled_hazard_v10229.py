@@ -178,6 +178,22 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
             float(static_shield["K_b_static_Pa_sqrt_m"])
             if static_shield.get("first_event_fired", False) else 0.0
         )
+    # dt_cleave_values is the duration array that actually pairs, bin for
+    # bin, with whichever K array feeds sig_cleave below. It defaults to
+    # dt_values (the plain, unrotated schedule) because at hold=0 -- and
+    # for the static-shield branch, whose own cycle_schedule(signed=True)
+    # call carries no phase offset -- that IS the same schedule K_signed_
+    # phase is drawn from. Only the hazard_coupled branch below overrides
+    # it, because that is the only branch whose K array comes from a
+    # CURSOR-ROTATED schedule (cycle_schedule_from_elapsed), which can also
+    # be a DIFFERENT LENGTH than K_values/dt_values: cycle_schedule_from_
+    # elapsed splits whichever bin the cursor currently sits inside into a
+    # "remaining" and "already-consumed" piece (append at the end) whenever
+    # the cursor does not land exactly on a bin boundary, so its output can
+    # be one entry longer than the plain schedule's. The cleave-side
+    # statistics below are therefore always computed over K_signed_phase's
+    # OWN length, never K_values's, and never share a loop index with it.
+    dt_cleave_values = dt_values
     if hazard_coupled:
         # PX2.5 fix: chronological_phase_offset_rad's single-angle rotation
         # assumes the whole period is one sinusoidal traverse -- true only
@@ -188,6 +204,27 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
         K_signed_phase, dt_signed_values = waveform.cycle_schedule_from_elapsed(
             n_phase_count, rebonding_state.elapsed_time_s, signed=True
         )
+        # PX3.5 fix: dt_signed_values is a DIFFERENT bin ORDER than dt_values
+        # (dt_values always starts at phase 0; dt_signed_values is rotated to
+        # start at the wake's actual elapsed-time cursor). The loop below
+        # indexes K_signed_phase[_idx] by the SAME _idx it uses for the
+        # unrotated K_values/dt_values -- so the weight used for sig_cleave's
+        # contribution to lambda_avg_s/sigma_avg_Pa must come from this
+        # rotated dt_signed_values, not the unrotated dt_values, or every
+        # sig_cleave sample is duration-weighted against the WRONG bin's
+        # duration. This is invisible whenever every bin has equal duration
+        # (hold=0, all bins are base_period_s/n_phase) -- reusing dt_values
+        # there happens to give the right answer by coincidence -- but at
+        # hold>0 the appended dwell bin's much larger duration would get
+        # paired with whatever sinusoid K value happens to share its index,
+        # corrupting the duration-weighted hazard rate. Caught via PX3.5's
+        # dwell-causal audit: with zero active rebonding patches (so
+        # K_rebond is provably 0 and finite/zero-cohesion trajectories MUST
+        # be physically identical), _phase_statistics returned IDENTICAL
+        # results at cursor=0 but diverged sharply at every other cursor
+        # position once hold>0 -- proving the divergence was this indexing
+        # defect, not a real cursor-dependent physical effect.
+        dt_cleave_values = dt_signed_values
         Eprime_Pa = _rebond.reduced_modulus_Pa(engine.G, engine.nu)
         r_contact_m = max(engine.r_eff(), rebonding_state.cfg.contact_radius_min_m)
         active_patches = [p for p in rebonding_state.active if not p.retired]
@@ -206,27 +243,37 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
         r_eff_now = engine.r_eff()
 
     sigma: list[float] = []
+    for value in K_values:
+        K = max(float(value), 0.0)
+        sigma.append(_positive(engine.sigma_tip(K)))
+
     lambdas: list[float] = []
     raw: list[float] = []
     barriers: list[float] = []
-    for _idx, value in enumerate(K_values):
-        K = max(float(value), 0.0)
-        sig = _positive(engine.sigma_tip(K))
-        if hazard_coupled:
-            sig_cleave = _rebond.cleavage_stress_with_rebond(
-                float(K_signed_phase[_idx]), K_shield_now, float(K_rebond_phase[_idx]), r_eff_now
-            )
-        elif static_shield_active:
-            sig_cleave = _rebond.cleavage_stress_with_rebond(
-                float(K_signed_phase[_idx]), K_shield_now, K_b_static, r_eff_now
-            )
-        else:
-            sig_cleave = sig
-        lam, lam_raw, Gc = engine.lambda_cleave(sig_cleave, float(temperature_K))
-        sigma.append(sig)
-        lambdas.append(_positive(lam))
-        raw.append(_positive(lam_raw))
-        barriers.append(_finite(Gc))
+    if hazard_coupled or static_shield_active:
+        # Independent walk over the cleave schedule's OWN arrays (never
+        # K_values's length/index -- see the dt_cleave_values note above).
+        for _cidx in range(len(K_signed_phase)):
+            if hazard_coupled:
+                sig_cleave = _rebond.cleavage_stress_with_rebond(
+                    float(K_signed_phase[_cidx]), K_shield_now, float(K_rebond_phase[_cidx]), r_eff_now
+                )
+            else:
+                sig_cleave = _rebond.cleavage_stress_with_rebond(
+                    float(K_signed_phase[_cidx]), K_shield_now, K_b_static, r_eff_now
+                )
+            lam, lam_raw, Gc = engine.lambda_cleave(sig_cleave, float(temperature_K))
+            lambdas.append(_positive(lam))
+            raw.append(_positive(lam_raw))
+            barriers.append(_finite(Gc))
+    else:
+        # sig_cleave == sig identically -- reuse the sigma walk above rather
+        # than a second, redundant lambda_cleave pass over the same values.
+        for sig in sigma:
+            lam, lam_raw, Gc = engine.lambda_cleave(sig, float(temperature_K))
+            lambdas.append(_positive(lam))
+            raw.append(_positive(lam_raw))
+            barriers.append(_finite(Gc))
 
     engine.sigma_tip(float(waveform.Kmax))
     shield = (
@@ -239,11 +286,16 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
     barriers_arr = np.asarray(barriers, dtype=float)
     sigma_arr = np.asarray(sigma, dtype=float)
     return {
-        "lambda_avg_s": _duration_weighted_mean(lambdas_arr, dt_values),
+        # lambdas/raw/barriers are derived from sig_cleave, which (when
+        # hazard_coupled) is drawn from the cursor-rotated K_signed_phase --
+        # so they must be weighted by the matching dt_cleave_values, not the
+        # plain dt_values (see the PX3.5 fix note above). sigma_arr comes
+        # from the always-unrotated K_values, so it stays on dt_values.
+        "lambda_avg_s": _duration_weighted_mean(lambdas_arr, dt_cleave_values),
         "lambda_min_s": float(np.min(lambdas)),
         "lambda_max_s": float(np.max(lambdas)),
-        "lambda_raw_avg_s": _duration_weighted_mean(raw_arr, dt_values),
-        "Gc_avg_J": _duration_weighted_mean(barriers_arr, dt_values),
+        "lambda_raw_avg_s": _duration_weighted_mean(raw_arr, dt_cleave_values),
+        "Gc_avg_J": _duration_weighted_mean(barriers_arr, dt_cleave_values),
         "sigma_avg_Pa": _duration_weighted_mean(sigma_arr, dt_values),
         "sigma_min_Pa": float(np.min(sigma)),
         "sigma_max_Pa": float(np.max(sigma)),
