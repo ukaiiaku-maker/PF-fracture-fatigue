@@ -634,6 +634,155 @@ def propagate(
     )
 
 
+def build_augmented_Q(Q: np.ndarray) -> np.ndarray:
+    """6x6 augmented generator for exact occupancy time-integral tracking
+    alongside the ordinary 3-state propagation: writing the augmented
+    state as ``[p; s]`` (``s`` a running integral of ``p``),
+    ``d/dt [p;s] = [[Q,0],[I,0]] @ [p;s]`` exactly reproduces
+    ``dp/dt = Q p`` in the top block while ``s(t) = integral_0^t p(tau)
+    dtau`` accumulates in the bottom block -- so
+    ``expm(augmented_Q * dt) @ [p0; 0]`` gives ``(p(dt), integral_0^dt
+    p(tau) dtau)`` exactly for a CONSTANT generator, with no averaging or
+    trapezoid approximation (PX1.2: mission section 5.2's transition-
+    action/flux instrumentation)."""
+    n = Q.shape[0]
+    Q_aug = np.zeros((2 * n, 2 * n))
+    Q_aug[:n, :n] = Q
+    Q_aug[n:, :n] = np.eye(n)
+    return Q_aug
+
+
+def transition_actions_and_fluxes(
+    p0: np.ndarray,
+    Q_phase_list: list[np.ndarray],
+    rate_constants: dict[str, np.ndarray],
+    k0: int,
+    dt: float,
+    dt_phase: float | Sequence[float],
+) -> dict[str, Any]:
+    """Exact transition actions ``A_ij = integral k_ij(tau) dtau`` and
+    realized fluxes ``F_ij = integral k_ij(tau) p_source(tau) dtau`` over
+    one committed interval, plus the ordinary final state and the P/C/B
+    state-balance closure (``dp_P = -F_PC+F_CP``, ``dp_C =
+    F_PC-F_CP-F_CB+F_BC``, ``dp_B = F_CB-F_BC``).
+
+    ``rate_constants`` maps ``"CB"``/``"BC"``/``"PC"``/``"CP"`` to a
+    per-bin array (same length as ``Q_phase_list``) of that transition's
+    instantaneous rate constant -- the same values ``build_Q`` assembled
+    into each bin's generator, supplied separately here since the
+    generator alone does not expose the individual rate constants needed
+    to weight each bin's occupancy integral by the RIGHT transition.
+
+    Deliberately a fully separate, parallel bin-walk from ``propagate``
+    (which this function's own returned ``p_final`` can be cross-checked
+    against for instrumentation-on-vs-off physical parity): this is
+    default-off diagnostic instrumentation and must not alter, or even
+    risk perturbing, the real state-evolution code path it audits.
+    Because every rate constant is exactly constant within a bin, each
+    bin's exact contribution uses ``build_augmented_Q`` once per bin
+    (cached across calls at the same schedule via ``phase_factors``-style
+    precomputation is left to the caller, matching the existing
+    ``build_phase_factors``/``propagate`` split).
+
+    KNOWN LIMITATION (acceptable for a first, correctness-first pass):
+    whole cycles are walked bin-by-bin rather than bulk-accelerated via
+    matrix power the way ``_propagate_heterogeneous``/
+    ``phase_resolved_action`` are for VHCF-scale spans, so this is O(bins
+    x cycles), not O(log cycles). Fine for per-event archival on a
+    bounded inter-event interval; revisit with a periodic-orbit-style
+    bulk shortcut (accumulate the per-cycle A/F once, then scale by the
+    whole-cycle count, using the SAME periodic-state argument
+    ``_periodic_orbit_certificate`` already makes) if profiling on a real
+    VHCF campaign shows this default-off instrumentation is a bottleneck.
+    """
+    p0 = np.asarray(p0, dtype=float)
+    n_state = p0.shape[0]
+    if dt <= 1.0e-300:
+        zero = np.zeros(())
+        return {
+            "p_final": p0.copy(), "idx_final": int(k0),
+            "A_CB": 0.0, "A_BC": 0.0, "A_PC": 0.0, "A_CP": 0.0,
+            "F_CB": 0.0, "F_BC": 0.0, "F_PC": 0.0, "F_CP": 0.0,
+        }
+
+    n = len(Q_phase_list)
+    if np.isscalar(dt_phase):
+        dt_array = np.full(n, float(dt_phase))
+    else:
+        dt_array = np.asarray(dt_phase, dtype=float)
+
+    k_CB = np.asarray(rate_constants["CB"], dtype=float)
+    k_BC = np.asarray(rate_constants["BC"], dtype=float)
+    k_PC = np.asarray(rate_constants["PC"], dtype=float)
+    k_CP = np.asarray(rate_constants["CP"], dtype=float)
+
+    augmented = [build_augmented_Q(Q) for Q in Q_phase_list]
+
+    p = p0.copy()
+    A_CB = A_BC = A_PC = A_CP = 0.0
+    F_CB = F_BC = F_PC = F_CP = 0.0
+
+    def _consume_bin(idx: int, duration_s: float) -> None:
+        nonlocal p, A_CB, A_BC, A_PC, A_CP, F_CB, F_BC, F_PC, F_CP
+        if duration_s <= 0.0:
+            return
+        y0 = np.concatenate([p, np.zeros(n_state)])
+        y1 = expm(augmented[idx] * duration_s) @ y0
+        p = y1[:n_state]
+        integral_p = y1[n_state:]  # [int p_P dt, int p_C dt, int p_B dt] over this bin
+        int_pP, int_pC, int_pB = integral_p[0], integral_p[1], integral_p[2]
+        A_CB += k_CB[idx] * duration_s
+        A_BC += k_BC[idx] * duration_s
+        A_PC += k_PC[idx] * duration_s
+        A_CP += k_CP[idx] * duration_s
+        F_CB += k_CB[idx] * int_pC
+        F_BC += k_BC[idx] * int_pB
+        F_PC += k_PC[idx] * int_pP
+        F_CP += k_CP[idx] * int_pC
+
+    total_cycle = float(np.sum(dt_array))
+    if total_cycle <= 0.0:
+        return {
+            "p_final": p.copy(), "idx_final": int(k0 % max(n, 1)),
+            "A_CB": 0.0, "A_BC": 0.0, "A_PC": 0.0, "A_CP": 0.0,
+            "F_CB": 0.0, "F_BC": 0.0, "F_PC": 0.0, "F_CP": 0.0,
+        }
+
+    m_cycles = int(math.floor(dt / total_cycle + 1.0e-12))
+    remaining = dt - m_cycles * total_cycle
+    if remaining > total_cycle * (1.0 - 1.0e-9):
+        m_cycles += 1
+        remaining = 0.0
+
+    idx = k0 % n
+    for _ in range(m_cycles):
+        cycle_start_idx = idx
+        for _ in range(n):
+            _consume_bin(idx, float(dt_array[idx]))
+            idx = (idx + 1) % n
+        assert idx == cycle_start_idx  # one full cycle returns to the same bin
+
+    t_left = remaining
+    while t_left > 1.0e-15:
+        bin_dt = float(dt_array[idx])
+        if bin_dt <= 0.0:
+            idx = (idx + 1) % n
+            continue
+        if t_left >= bin_dt * (1.0 - 1.0e-9):
+            _consume_bin(idx, bin_dt)
+            t_left -= bin_dt
+            idx = (idx + 1) % n
+        else:
+            _consume_bin(idx, t_left)
+            t_left = 0.0
+
+    return {
+        "p_final": p, "idx_final": int(idx),
+        "A_CB": float(A_CB), "A_BC": float(A_BC), "A_PC": float(A_PC), "A_CP": float(A_CP),
+        "F_CB": float(F_CB), "F_BC": float(F_BC), "F_PC": float(F_PC), "F_CP": float(F_CP),
+    }
+
+
 def strang_cycle_trajectory(
     p_start: np.ndarray, Q_phase_list: list[np.ndarray], dt_phase: float
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -877,6 +1026,8 @@ __all__ = [
     "advance_markov",
     "build_phase_factors",
     "propagate",
+    "build_augmented_Q",
+    "transition_actions_and_fluxes",
     "strang_cycle_trajectory",
     "two_state_fixed_point",
     "two_state_iterate",

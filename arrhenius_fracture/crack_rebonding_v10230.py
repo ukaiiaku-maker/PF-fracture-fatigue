@@ -39,6 +39,7 @@ from .crack_rebonding_kinetics_v10230 import (
     depassivation_rate,
     opening_stress,
     repassivation_rate,
+    transition_actions_and_fluxes,
 )
 
 _ACTIVE_MODEL_LEVELS = frozenset(
@@ -142,19 +143,23 @@ def contact_diagnostics(K_s_Pa_sqrt_m: float, s_j_m: float, r_contact_m: float, 
     }
 
 
-def patch_Q(
+def patch_rate_constants(
     K_s_Pa_sqrt_m: float,
     s_j_m: float,
     r_contact_m: float,
     cfg: CrackRebondingControls,
     T_K: float,
-) -> np.ndarray:
-    """Build the patch's 3x3 conservative generator at one instant. Exactly
-    zero (identity propagator) for REBOND_OFF/CONTACT_PROXY_ONLY, so RB0/RB1
-    never alter bonded state — RB1's diagnostics are computed separately via
-    ``contact_diagnostics`` and archived without feeding back here."""
+) -> tuple[float, float, float, float]:
+    """The patch's four instantaneous transition rate constants
+    ``(k_CB, k_BC, k_PC, k_CP)`` -- the same quantities ``patch_Q`` (below)
+    assembles into a generator, factored out so PX1.2's transition-
+    action/flux instrumentation (``crack_rebonding_kinetics_v10230.
+    propagate_with_transition_integrals``) uses the identical rate
+    constants the real physics does, rather than a parallel
+    recomputation that could silently drift from it. Exactly zero for
+    REBOND_OFF/CONTACT_PROXY_ONLY."""
     if cfg.model_level not in _ACTIVE_MODEL_LEVELS:
-        return build_Q(0.0, 0.0, 0.0, 0.0)
+        return 0.0, 0.0, 0.0, 0.0
 
     diag = contact_diagnostics(K_s_Pa_sqrt_m, s_j_m, r_contact_m, cfg)
     lam_bond_raw, _ = bond_formation_rate(diag["sigma_comp_Pa"], T_K, cfg.chemistry_factor, cfg)
@@ -178,6 +183,21 @@ def patch_Q(
         k_PC = 0.0
         k_CP = 0.0
 
+    return k_CB, k_BC, k_PC, k_CP
+
+
+def patch_Q(
+    K_s_Pa_sqrt_m: float,
+    s_j_m: float,
+    r_contact_m: float,
+    cfg: CrackRebondingControls,
+    T_K: float,
+) -> np.ndarray:
+    """Build the patch's 3x3 conservative generator at one instant. Exactly
+    zero (identity propagator) for REBOND_OFF/CONTACT_PROXY_ONLY, so RB0/RB1
+    never alter bonded state — RB1's diagnostics are computed separately via
+    ``contact_diagnostics`` and archived without feeding back here."""
+    k_CB, k_BC, k_PC, k_CP = patch_rate_constants(K_s_Pa_sqrt_m, s_j_m, r_contact_m, cfg, T_K)
     return build_Q(k_CB=k_CB, k_BC=k_BC, k_PC=k_PC, k_CP=k_CP)
 
 
@@ -502,6 +522,53 @@ def representative_cycle_K_rebond(
         H_b_k = min(1.0, max(total_bonded_weighted, 0.0))
         K_rebond_phase[k] = K_rebond_max * H_b_k
     return K_rebond_phase
+
+
+def patch_transition_actions_and_fluxes(
+    *,
+    patch: WakePatch,
+    K_signed_phase: np.ndarray,
+    dt_phase: float | np.ndarray,
+    r_contact_m: float,
+    cfg: CrackRebondingControls,
+    T_K: float,
+    dt_consumed: float,
+    k0: int = 0,
+) -> dict[str, Any]:
+    """PX1.2 (mission section 5.2): default-off transition-action/flux
+    instrumentation for one patch over one committed interval, ready for a
+    study's own event-ledger builder to archive per accepted event (this
+    module computes diagnostics; per-study scripts, not this shared engine
+    layer, decide what gets written to a tracked ledger -- matching the
+    existing architecture where e.g. build_static_shield_attribution_
+    event_ledger.py, not crack_rebonding_v10230.py itself, owns portable
+    artifact schemas).
+
+    Builds the patch's per-bin rate constants via ``patch_rate_constants``
+    (the exact same function ``patch_Q`` uses, so these diagnostics cannot
+    silently drift from the real generator) and delegates the exact
+    occupancy-time-integral bookkeeping to
+    ``crack_rebonding_kinetics_v10230.transition_actions_and_fluxes``.
+    Pure -- does not mutate ``patch``.
+    """
+    n = len(K_signed_phase)
+    k_CB = np.zeros(n)
+    k_BC = np.zeros(n)
+    k_PC = np.zeros(n)
+    k_CP = np.zeros(n)
+    for idx in range(n):
+        k_CB[idx], k_BC[idx], k_PC[idx], k_CP[idx] = patch_rate_constants(
+            float(K_signed_phase[idx]), patch.s_j_m, r_contact_m, cfg, T_K
+        )
+    Q_phase_list = [build_Q(k_CB[idx], k_BC[idx], k_PC[idx], k_CP[idx]) for idx in range(n)]
+    return transition_actions_and_fluxes(
+        patch.state_vector(),
+        Q_phase_list,
+        {"CB": k_CB, "BC": k_BC, "PC": k_PC, "CP": k_CP},
+        k0,
+        float(dt_consumed),
+        dt_phase,
+    )
 
 
 def _run_exact_cycle(
@@ -1642,6 +1709,8 @@ __all__ = [
     "wake_weight",
     "contact_diagnostics",
     "patch_Q",
+    "patch_rate_constants",
+    "patch_transition_actions_and_fluxes",
     "WakePatch",
     "RebondingWakeState",
     "cleavage_stress_with_rebond",
