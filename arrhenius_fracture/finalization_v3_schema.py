@@ -119,6 +119,7 @@ REGISTERED_SCIENTIFIC_PREDICATES = {
     "natural_partition_invariance": lambda v: v["partition_equal"],
     "natural_restart_invariance": lambda v: v["restart_equal"],
     "natural_rng_reproducibility": lambda v: v["rng_equal"],
+    "controlled_history_execution": lambda v: v["production_integrator_executed"] and v["declared_terminal_observed"] and v["stagewise_conservation_checked"],
 }
 
 
