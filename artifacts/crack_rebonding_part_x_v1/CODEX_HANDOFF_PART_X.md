@@ -110,32 +110,65 @@ mission section 14, updated after each major milestone.
   it in isolation) and was removed rather than chased further — documented
   in the test file itself.
 
+- **PX1.2 (committed `6f24dd9`):** transition-action/flux instrumentation,
+  default-off. `crack_rebonding_kinetics_v10230.build_augmented_Q`/
+  `transition_actions_and_fluxes`: augmented 6x6 generator
+  (`d/dt[p;s]=[[Q,0],[I,0]][p;s]`) gives the exact per-bin occupancy time
+  integral alongside the ordinary propagation, so `A_CB/A_BC/A_PC/A_CP`
+  and `F_CB/F_BC/F_PC/F_CP` are exact (no averaging/trapezoids) for any
+  constant-generator segment including the dwell bin. Deliberately a fully
+  separate bin-walk from `propagate`/`phase_resolved_action` — this
+  diagnostic must never risk perturbing the real state-evolution path it
+  audits. `crack_rebonding_v10230.py`: `patch_Q` refactored (no behavior
+  change) onto a new `patch_rate_constants` helper so the diagnostic can't
+  drift from the real physics; `patch_transition_actions_and_fluxes` wraps
+  this around one real `WakePatch`. Validated against an independent
+  brute-force fine-stepped reference (genuinely different numerical
+  method); state-balance identities close to ~1e-13 relative in every
+  case. 24 new tests, full `crack_rebonding` selection 245 passed
+  (196+25+24), zero regressions. Two of the three attempted "compare two
+  independently-constructed engines" tests across PX1.1/PX1.2 reproducibly
+  diverged well beyond floating-point roundoff — but ONLY when the file
+  ran as part of the full test selection, never in isolation, and neither
+  RNG reseeding nor bumping the global engine-id counter reproduced it —
+  confirming this is pre-existing global/class-level state in the shared
+  test fixture, unrelated to Part X. **Do not write a test that compares
+  two independently-constructed `build_real_engine()` instances against
+  each other in this suite** — use a single engine's own before/after
+  state instead, as the surviving tests do.
+  Deferred: wiring these diagnostics into `RebondingWakeState`'s
+  persistent checkpoint/ledger schema (appropriate once a specific
+  study's event-ledger builder needs to archive them, not in this shared
+  module) and the remaining section 5.2 diagnostics (contact-duration-in-
+  sinusoid vs. in-dwell separately, phase-resolved p_P/p_C/p_B extrema,
+  barrier-floor/cooperative-saturation fractions) — straightforward
+  additions once a concrete consumer exists.
+
 ## Terminal and pending counts
 
 - Physical trajectories launched: 0 (no physical result directory exists
   yet, per mission section 2's gate — PX2 analytical work must land first).
-- PX1.1 done. PX1.2–PX7: not started.
+- PX1.1, PX1.2 done. PX1.3–PX7: not started.
 
 ## Exact next action
 
-PX1.2 (transition-action/flux instrumentation, default-off): for every
-patch and accepted inter-event interval, archive `A_CB/A_BC/A_PC/A_CP`
-(integrated rate actions) and `F_CB/F_BC/F_PC/F_CP` (realized state-weighted
-fluxes), plus contact-duration-in-sinusoid vs. contact-duration-in-dwell
-separately, phase-resolved p_P/p_C/p_B extrema, and the other diagnostics
-mission section 5.2 lists. Since `Q` is constant over each piecewise
-segment (including the new dwell bin), these are obtainable exactly via an
-augmented matrix exponential (stack the state vector with the four
-transition-integral accumulators and exponentiate the augmented generator),
-not endpoint averaging/trapezoids. Must close the state-balance identities
-(`Δp_P=-F_PC+F_CP`, `Δp_C=F_PC-F_CP-F_CB+F_BC`, `Δp_B=F_CB-F_BC`) for every
-patch/interval as its own test. Require instrumentation-on vs.
-instrumentation-off physical parity (a pure diagnostic addition must not
-change `p_by_patch`/`total_action`/`idx`). Then PX1.3 (RB3 passivation
-audit — `patch_Q`'s P↔C↔B generator already exists and is wired for
-`PASSIVATION_GATED_REBOND`; this is audit/test-coverage on existing code,
-not new physics) and PX1.4 (generalize the exact phase-resolved
-event-time evaluator around a common `K_b` shielding provider — dynamic
-rebonding, prescribed-static, and a zero provider that must still bypass to
-the original baseline exactly — to attempt resolving
-`STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED`).
+PX1.3 (RB3 passivation audit): `patch_Q`'s P↔C↔B generator already exists
+and is wired for `PASSIVATION_GATED_REBOND` (depassivation/repassivation
+via `depassivation_rate`/`repassivation_rate`, ~lines 174–179) — this is
+audit/test-coverage on existing code, not new physics. Add tests through
+the real A_NATIVE production engine demonstrating live, nonzero,
+correctly-signed P→C depassivation, C→P repassivation, C→B formation, B→C
+rupture; exact probability conservation/nonnegativity; compression-gated
+depassivation; exact zero contact formation at K>=0; repassivation at its
+qualified phase/stress condition; fresh-surface P/C initialization;
+rollback/checkpoint restoration of all three states; no direct
+energy-gate/emission contamination. Then PX1.4: generalize the exact
+phase-resolved event-time evaluator (`solve_coupled_event_time`/
+`phase_resolved_action`) around a common `K_b` shielding provider —
+dynamic rebonding, prescribed-static, and a zero provider that must still
+bypass to the original baseline exactly — to attempt resolving
+`STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED` per mission section 5.4's
+frozen tolerance protocol. PX1 completion (section 5.5) then requires one
+more full run of: all new focused tests, full `crack_rebonding` selection,
+both existing verifiers, `py_compile`/`compileall`, `git diff --check` —
+before PX2 (kinetic-regime analytical design) may begin.
