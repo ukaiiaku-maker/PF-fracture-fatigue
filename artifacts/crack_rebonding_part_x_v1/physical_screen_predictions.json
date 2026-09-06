@@ -1,0 +1,17 @@
+{
+  "schema": "v10230_part_x_physical_screen_predictions_v1",
+  "note": "Analytical-atlas-level predictions for each screen condition's rebonding-vs-zero direction and rough magnitude, to be compared against actual PX3 screen results -- NOT a substitute for the physical screen itself (bulk-cycle occupancy is a periodic-orbit STEADY-STATE property; a real 12-event/60um screen trajectory need not have reached it).",
+  "sat_existing_reuse_note": "reusing existing SAT_EXISTING Kmax=18/R=-0.95/f=1000 result -- classified prospectively as the static-shield limit, not duplicated",
+  "selections": {
+    "schema": "v10230_part_x_screen_condition_selection_v1",
+    "frequency_transition_Hz": 100.0,
+    "frequency_transition_delta_mean_p_B": 0.049302139911005904,
+    "dwell_transition_s": 0.0005,
+    "dwell_transition_delta_mean_p_B": 0.04857533489227156,
+    "passivation_chemistry_factor": 1.0,
+    "competing_persistent_selected": true,
+    "competing_persistent_reason": "PX2.3 construction already confirmed distinguishable from COMPETING_REVERSIBLE (mean_p_B differs by >=0.10, A_BC >=5x smaller) -- section 7.8 item 5 satisfied by construction.",
+    "cohesive_strength_endpoint_selected": null,
+    "cohesive_strength_endpoint_reason": "deferred per section 7.8 item 6 -- selected only if the PX3 three-point cohesive-strength screen is visibly nonlinear or changes the qualitative slope classification; cannot be determined from the analytical atlas alone."
+  }
+}
