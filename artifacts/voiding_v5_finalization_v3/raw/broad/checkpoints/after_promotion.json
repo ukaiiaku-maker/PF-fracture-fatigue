@@ -203,7 +203,7 @@
   "schema": "v11.live-fem-branch-checkpoint/1",
   "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
   "state_file": "after_promotion.json.state.pkl",
-  "state_sha256": "438aaadec15aa3325ede5ffa88808ca66929e0ce2f8cd30e793b5ff2fecf5dc0",
+  "state_sha256": "c2ef7dd8c12cac7b5df72a9b124f1a605ea6c343ba1bacbc6ec1bbf3bd1496d2",
   "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
   "v12_support_state": {
     "accepted_p0_damage_fingerprint": "1b5d6aff2a718088b52d0061ef93b44b07225693dbc88269a80328509fabb7a5",
@@ -304,7 +304,7 @@
       738,
       739
     ],
-    "source_commit": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "source_commit": "f92f0b21941478d3081950aba443df194f986a1a",
     "transaction_identity": "promotion"
   }
 }

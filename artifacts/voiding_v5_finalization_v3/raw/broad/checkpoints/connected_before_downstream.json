@@ -243,7 +243,7 @@
   "schema": "v11.live-fem-branch-checkpoint/1",
   "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
   "state_file": "connected_before_downstream.json.state.pkl",
-  "state_sha256": "147de247825763f1e963a7e4534999f9f9f8573534d09f798d0964d89e66c39d",
+  "state_sha256": "0777df203ab16a4ed99619cf0430864dca70f0cae17289c850831197664380d3",
   "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
   "v12_support_state": {
     "accepted_p0_damage_fingerprint": "4c53b06a3c9e38317b0865959151a4842a1e554d74ea29de19dff96f32f31645",
@@ -1006,7 +1006,7 @@
       2382,
       2384
     ],
-    "source_commit": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "source_commit": "f92f0b21941478d3081950aba443df194f986a1a",
     "transaction_identity": "ligament-connected-dormant"
   }
 }

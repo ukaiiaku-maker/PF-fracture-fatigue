@@ -10,26 +10,28 @@
     "transition_partitions": 40
   },
   "decision": "BLOCKED",
-  "evidence_row_count": 157,
+  "evidence_row_count": 165,
   "failed_gates": [
     "transition_partitions",
     "controlled_trajectories",
     "restart_matrix",
     "disabled_neutrality",
+    "complete_static_scientific_predicates",
     "lifecycle_wide_rollback",
     "natural_partition_restart_rng"
   ],
   "gates": {
+    "complete_static_scientific_predicates": false,
     "controlled_trajectories": false,
     "disabled_neutrality": false,
     "evidence_ontology": true,
+    "fixed_geometry_static_matrix": true,
     "length_inventory_conservation": true,
     "lifecycle_wide_rollback": false,
     "natural_partition_restart_rng": false,
     "natural_seed_ensemble": true,
     "restart_matrix": false,
     "rollback_matrix": true,
-    "static_mechanics": true,
     "transition_partitions": false
   },
   "persistent_limitations": [
@@ -43,14 +45,14 @@
     "standard_absolute_K_unavailable"
   ],
   "provenance": {
-    "campaign_runner_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "campaign_runner_sha": "f92f0b21941478d3081950aba443df194f986a1a",
     "criteria_sha": "da742b231b4413b3118e0546256bfadaf9022a55",
-    "evidence_generation_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
-    "executed_code_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
-    "implementation_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "evidence_generation_sha": "f92f0b21941478d3081950aba443df194f986a1a",
+    "executed_code_sha": "f92f0b21941478d3081950aba443df194f986a1a",
+    "implementation_sha": "f92f0b21941478d3081950aba443df194f986a1a",
     "model_form_base_sha": "3e3c79536bc76ce19589567afc0d5eca667fc691",
-    "production_qualifier_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
-    "static_qualifier_sha": "32c92fd978e3bb005a63b5f8fe440b51c3262474",
+    "production_qualifier_sha": "f92f0b21941478d3081950aba443df194f986a1a",
+    "static_qualifier_sha": "f92f0b21941478d3081950aba443df194f986a1a",
     "stochastic_seed_policy_sha": "d563304c1a3d0782c407c3307826c77eceb7a912"
   },
   "reproducibility_policy": {
