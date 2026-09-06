@@ -25,10 +25,14 @@ from arrhenius_fracture.production_multifront_v12 import (
 from arrhenius_fracture.stateful_multifront_production_v12 import (
     AtomicIntervalTransactionWriterV12,
     CurrentSourceMultiFrontProductionContextV12, StatefulProductionInterlock,
+    _apply_realized_cleavage_intersections_v12,
     build_arbitrary_region_request_v12, build_stateful_production_hooks,
     event_endpoint_iteration_limit,
     run_stateful_accepted_interval_v12,
     stress_field_identity,
+)
+from arrhenius_fracture.topology_transaction_v11 import (
+    TopologyArm, extend_network_arm, mark_coalesced,
 )
 
 
@@ -607,6 +611,103 @@ def test_arbitrary_region_request_maps_four_tips_three_owners(monkeypatch, tmp_p
         value["frame_kind"] == "unresolved_shared_region"
         for value in frame["process_region_frame_by_owner"].values()
     ) == 1
+
+    omitted = runtime.active_front_ids[0]
+    subset = tuple(
+        front_id for front_id in runtime.active_front_ids if front_id != omitted
+    )
+    request = build_arbitrary_region_request_v12(
+        solved, runtime, context, active_front_ids=subset,
+    )
+    subset_frame = request.cluster_frame
+    assert set(subset_frame["frame_by_tip"]) == set(subset)
+    assert omitted not in {
+        front_id
+        for owner in subset_frame["process_region_frame_by_owner"].values()
+        for front_id in owner["member_front_ids"]
+    }
+
+
+def test_intersecting_cleavage_arm_is_one_atomic_coalescence_transaction():
+    before = _branched_runtime(2)
+    proposal = _proposal(before, "one_arm")
+    nominal = commit_selected_proposal(before, proposal)
+    incoming = proposal.front_id
+    target = next(
+        front_id for front_id in before.active_front_ids if front_id != incoming
+    )
+    start = before.crack_network.branch(incoming).tip
+    end = before.crack_network.branch(target).tip
+    arm = TopologyArm(
+        proposal.candidate_ids[0], incoming, start, end,
+        float(np.linalg.norm(np.asarray(end) - np.asarray(start))), 0.0,
+    )
+    realized = extend_network_arm(before.crack_network, arm)
+    realized = mark_coalesced(realized, incoming, target)
+    actual = _apply_realized_cleavage_intersections_v12(
+        before, nominal, realized, (arm,), {incoming: target},
+    )
+
+    assert actual.active_front_ids == (target,)
+    assert actual.cumulative_coalescences == before.cumulative_coalescences + 1
+    assert len(actual.transaction_records) == len(before.transaction_records) + 1
+    assert actual.scheduler.accepted_transaction_index == (
+        before.scheduler.accepted_transaction_index + 1
+    )
+    record = actual.transaction_records[-1]
+    assert record.action_type == "one_arm"
+    assert record.coalescence_target_front_id == target
+    assert incoming in record.retired_front_ids
+    assert record.realized_endpoints_m == (end,)
+    assert record.post_active_front_count == 1
+    assert actual.crack_network.branch(incoming).status == "merged"
+    actual.validate()
+
+
+def test_unclipped_binary_arm_realization_matches_nominal_atomic_topology():
+    before = _branched_runtime(1)
+    proposal = _proposal(before, "two_arm")
+    nominal = commit_selected_proposal(before, proposal)
+    parent = before.crack_network.branch(proposal.front_id)
+    child_by_candidate = {
+        nominal.crack_network.branch(front_id).local_state["candidate_id"]: front_id
+        for front_id in nominal.active_front_ids
+    }
+    child_ids = set(child_by_candidate.values())
+    branches = []
+    for branch in nominal.crack_network.branches:
+        if branch.branch_id not in child_ids:
+            branches.append(branch)
+            continue
+        local_state = dict(branch.local_state)
+        local_state.pop("committed_edges", None)
+        branches.append(replace(
+            branch,
+            path=(parent.tip,),
+            orientation_history_rad=(parent.current_orientation_rad,),
+            local_state=local_state,
+        ))
+    realized = replace(
+        nominal.crack_network,
+        branches=tuple(branches),
+        geometry_generation=before.crack_network.geometry_generation,
+    )
+    arms = []
+    for candidate_id, endpoint in zip(
+        proposal.candidate_ids, proposal.end_points_m
+    ):
+        arm = TopologyArm(
+            candidate_id, child_by_candidate[candidate_id], parent.tip, endpoint,
+            float(np.linalg.norm(np.asarray(endpoint) - np.asarray(parent.tip))),
+            0.0,
+        )
+        realized = extend_network_arm(realized, arm)
+        arms.append(arm)
+    actual = _apply_realized_cleavage_intersections_v12(
+        before, nominal, realized, tuple(arms), {},
+    )
+    assert actual is nominal
+    assert actual.topology_fingerprint == nominal.topology_fingerprint
 
 
 def test_pure_hook_detects_physical_engine_mutation(tmp_path):

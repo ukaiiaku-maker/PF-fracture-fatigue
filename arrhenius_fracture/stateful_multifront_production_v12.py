@@ -19,7 +19,7 @@ import numpy as np
 
 from .general_multifront_v12 import (
     FrontCandidateObservation, FrontRuntimeState, MultiFrontRuntimeState,
-    ProcessEngineState, TopologyProposal, canonical_hash,
+    ProcessEngineState, ProcessRegionReservoir, TopologyProposal, canonical_hash,
 )
 from .directional_competition_v11 import competition_state_from_dict
 from .production_multifront_v12 import (
@@ -825,6 +825,7 @@ class CurrentSourceMultiFrontProductionContextV12:
 def build_arbitrary_region_request_v12(
     solved: SolvedAcceptedState, runtime: MultiFrontRuntimeState,
     context: CurrentSourceMultiFrontProductionContextV12,
+    *, active_front_ids: Sequence[str] | None = None,
 ):
     """Construct the exact V11 request with a front-count-independent frame."""
     from .sharp_front_v11_branching import _request
@@ -835,6 +836,13 @@ def build_arbitrary_region_request_v12(
         solved.fem_state, context.candidates, args=context.args, cfg=cfg["cfg"],
         runtime_step=context.step_count, cluster=None,
     )
+    requested_fronts = tuple(sorted(
+        runtime.active_front_ids if active_front_ids is None else active_front_ids
+    ))
+    if not set(requested_fronts).issubset(runtime.active_front_ids):
+        raise StatefulProductionInterlock(
+            "arbitrary-region request contains a front outside the accepted runtime"
+        )
     candidate_by_id = {item.candidate_id: item for item in context.candidates}
     active_candidates_by_tip = None
     if candidate_by_id:
@@ -845,7 +853,7 @@ def build_arbitrary_region_request_v12(
                     front_id
                 ].mechanically_active_candidate_ids
             )
-            for front_id in runtime.active_front_ids
+            for front_id in requested_fronts
         }
         if any(not values for values in active_candidates_by_tip.values()):
             raise StatefulProductionInterlock(
@@ -854,9 +862,14 @@ def build_arbitrary_region_request_v12(
     frame_by_tip = {}
     process_region_frame_by_owner = {}
     for owner_id, region in runtime.process_regions.items():
+        requested_members = sorted(
+            set(region.member_front_ids).intersection(requested_fronts)
+        )
+        if not requested_members:
+            continue
         owner_frame = {
             "owner_id": owner_id,
-            "member_front_ids": sorted(region.member_front_ids),
+            "member_front_ids": requested_members,
             "unresolved_junction_ids": sorted(region.unresolved_junction_ids),
             "local_process_coordinate_m": region.cumulative_process_advance_m,
             "frame_kind": (
@@ -865,9 +878,9 @@ def build_arbitrary_region_request_v12(
             ),
         }
         process_region_frame_by_owner[owner_id] = owner_frame
-        for front_id in region.member_front_ids:
+        for front_id in requested_members:
             frame_by_tip[front_id] = owner_frame
-    if set(frame_by_tip) != set(runtime.active_front_ids):
+    if set(frame_by_tip) != set(requested_fronts):
         raise StatefulProductionInterlock("arbitrary-region request omitted an active front")
     return replace(
         request,
@@ -1488,7 +1501,6 @@ def evaluate_candidate_marginal_kinetic_v12(
         network = mark_coalesced(network, arm.branch_id, target)
     trial_fem = replace(solved.fem_state, crack_network=network)
     trial_fem = apply_causal_sharp_wake_trial_geometry(trial_fem, (arm,))
-    trial_runtime = replace(runtime, crack_network=network)
     trial_solved = replace(
         solved, fem_state=trial_fem,
         measurement={
@@ -1496,7 +1508,8 @@ def evaluate_candidate_marginal_kinetic_v12(
         },
     )
     request = build_arbitrary_region_request_v12(
-        trial_solved, trial_runtime, context
+        trial_solved, runtime, context,
+        active_front_ids=network.active_tip_ids,
     )
     result = DynamicExactTopologyProviderV12(
         runtime.resource_policy
@@ -1508,6 +1521,128 @@ def evaluate_candidate_marginal_kinetic_v12(
     return (
         float(solved.fem_state.stored_energy_J_per_m) - trial_energy
     ) / float(arm.event_reward_m)
+
+
+def _apply_realized_cleavage_intersections_v12(
+    before: MultiFrontRuntimeState,
+    nominal_post: MultiFrontRuntimeState,
+    realized_network: Any,
+    arms: Sequence[Any],
+    targets_by_front: Mapping[str, str],
+) -> MultiFrontRuntimeState:
+    """Atomically project V11 arm clipping/coalescence into V12 registries.
+
+    A cleavage transaction remains one transaction even when one of its
+    realized arms terminates at an existing crack.  The incoming tip is
+    removed from the owner/runtime registries and its process engine is
+    archived only when that removal empties the owner region.
+    """
+    if not targets_by_front:
+        realized_fingerprint = hashlib.sha256(
+            realized_network.to_json().encode()
+        ).hexdigest()
+        if realized_fingerprint != nominal_post.topology_fingerprint:
+            raise StatefulProductionInterlock(
+                "unclipped realized cleavage geometry differs from its atomic commit"
+            )
+        return nominal_post
+    if not nominal_post.transaction_records:
+        raise StatefulProductionInterlock(
+            "realized cleavage intersection lacks its atomic transaction record"
+        )
+    if (
+        nominal_post.transaction_records[-1].pre_topology_fingerprint
+        != before.topology_fingerprint
+    ):
+        raise StatefulProductionInterlock(
+            "realized cleavage intersection does not belong to the accepted precursor"
+        )
+    front_runtimes = dict(nominal_post.front_runtimes)
+    owner_by_front = dict(nominal_post.owner_by_front)
+    regions = dict(nominal_post.process_regions)
+    engines = dict(nominal_post.process_engines)
+    reservoirs = dict(nominal_post.reservoirs)
+    transition = dict(nominal_post.transaction_records[-1].owner_region_transition)
+    archived = {}
+    transaction_id = nominal_post.transaction_records[-1].transaction_id
+    for front_id, target_id in sorted(targets_by_front.items()):
+        if front_id not in front_runtimes or front_id not in owner_by_front:
+            raise StatefulProductionInterlock(
+                "realized coalescence refers to a non-active incoming front"
+            )
+        front_runtimes.pop(front_id)
+        owner_id = owner_by_front.pop(front_id)
+        region = regions[owner_id]
+        remaining = region.member_front_ids - {front_id}
+        if remaining:
+            regions[owner_id] = replace(region, member_front_ids=remaining)
+        else:
+            engine = engines.pop(region.process_engine_id)
+            regions.pop(owner_id)
+            reservoir_id = "reservoir:" + canonical_hash({
+                "owner": owner_id,
+                "tx": transaction_id,
+                "coalesced_front": front_id,
+            })[:20]
+            reservoirs[reservoir_id] = ProcessRegionReservoir(
+                reservoir_id=reservoir_id,
+                archived_owner_id=owner_id,
+                archived_engine=engine,
+                member_front_ids_at_archive=(front_id,),
+                junction_ids=tuple(region.unresolved_junction_ids),
+                archive_transaction_id=transaction_id,
+            )
+            archived[front_id] = reservoir_id
+    transition.update({
+        "coalescence_targets_by_front": dict(sorted(targets_by_front.items())),
+        "coalescence_archived_reservoir_by_front": dict(sorted(archived.items())),
+    })
+    provisional = replace(
+        nominal_post,
+        crack_network=realized_network,
+        front_runtimes=front_runtimes,
+        owner_by_front=owner_by_front,
+        process_regions=regions,
+        process_engines=engines,
+        reservoirs=reservoirs,
+        cumulative_coalescences=(
+            nominal_post.cumulative_coalescences + len(targets_by_front)
+        ),
+    )
+    arm_by_front = {arm.branch_id: arm for arm in arms}
+    if len(arm_by_front) != len(arms):
+        raise StatefulProductionInterlock(
+            "realized cleavage arm identities are not unique"
+        )
+    record = nominal_post.transaction_records[-1]
+    target_values = tuple(sorted(set(targets_by_front.values())))
+    record = replace(
+        record,
+        retired_front_ids=tuple(sorted(
+            set(record.retired_front_ids).union(targets_by_front)
+        )),
+        post_active_front_count=len(provisional.active_front_ids),
+        realized_lengths_m=tuple(float(arm.event_reward_m) for arm in arms),
+        realized_endpoints_m=tuple(tuple(arm.end_xy_m) for arm in arms),
+        renewal_distance_m=max(float(arm.event_reward_m) for arm in arms),
+        owner_region_transition=transition,
+        post_topology_fingerprint=provisional.topology_fingerprint,
+        post_registry_fingerprint=provisional.registry_fingerprint,
+        coalescence_target_front_id=(
+            target_values[0] if len(target_values) == 1 else None
+        ),
+        clipped_or_coalesced_disposition=(
+            "clipped_at_first_intersection_and_coalesced:"
+            + ";".join(
+                f"{front}->{target}"
+                for front, target in sorted(targets_by_front.items())
+            )
+        ),
+    )
+    return replace(
+        provisional,
+        transaction_records=nominal_post.transaction_records[:-1] + (record,),
+    )
 
 
 def execute_selected_topology_trial_v12(
@@ -1523,6 +1658,7 @@ def execute_selected_topology_trial_v12(
     from .production_multifront_v12 import ExactTrialDeltaV12
     from .topology_transaction_v11 import (
         TopologyArm, apply_causal_sharp_wake_trial_geometry,
+        clip_arm_at_first_intersection, extend_network_arm, mark_coalesced,
         equilibrate_fixed_load_with_production_fem,
     )
     runtime = context.provisional_runtime
@@ -1554,6 +1690,7 @@ def execute_selected_topology_trial_v12(
         )
     if proposal.action_type == "one_arm":
         branch_ids = (proposal.front_id,)
+        realized_network = runtime.crack_network
     else:
         branch_ids = tuple(
             next(
@@ -1566,6 +1703,26 @@ def execute_selected_topology_trial_v12(
             )
             for candidate_id in proposal.candidate_ids
         )
+        parent = runtime.crack_network.branch(proposal.front_id)
+        child_ids = set(branch_ids)
+        stripped = []
+        for branch in post.crack_network.branches:
+            if branch.branch_id not in child_ids:
+                stripped.append(branch)
+                continue
+            local_state = dict(branch.local_state)
+            local_state.pop("committed_edges", None)
+            stripped.append(replace(
+                branch,
+                path=(parent.tip,),
+                orientation_history_rad=(parent.current_orientation_rad,),
+                local_state=local_state,
+            ))
+        realized_network = replace(
+            post.crack_network,
+            branches=tuple(stripped),
+            geometry_generation=runtime.crack_network.geometry_generation,
+        )
     observations = {
         (item.front_id, item.candidate_id): item for item in batch.observations
     }
@@ -1575,12 +1732,17 @@ def execute_selected_topology_trial_v12(
     engine = context.actual_engines[owner_engine_id]
     candidate_objects = {item.candidate_id: item for item in context.candidates}
     arms = []
+    targets_by_front = {}
     for branch_id, candidate_id, endpoint in zip(
         branch_ids, proposal.candidate_ids, proposal.end_points_m
     ):
         candidate = candidate_objects[candidate_id]
         start = runtime.crack_network.branch(proposal.front_id).tip
-        length = math.dist(start, endpoint)
+        raw = TopologyArm(
+            candidate_id, branch_id, start, endpoint,
+            math.dist(start, endpoint), 0.0,
+        )
+        arm, target = clip_arm_at_first_intersection(realized_network, raw)
         observation = observations[(proposal.front_id, candidate_id)]
         sigma_tip = engine.sigma_tip(
             observation.directional_K_MPa_sqrt_m * 1.0e6
@@ -1594,10 +1756,20 @@ def execute_selected_topology_trial_v12(
             burgers_vector_m=float(engine.b),
             gamma_relative=float(candidate.gamma_rel),
         )
-        arms.append(TopologyArm(
-            candidate_id, branch_id, start, endpoint, length,
-            resistance * length,
-        ))
+        arm = replace(
+            arm,
+            hazard_dissipation_J_per_m=resistance * arm.event_reward_m,
+        )
+        realized_network = extend_network_arm(realized_network, arm)
+        if target is not None:
+            realized_network = mark_coalesced(
+                realized_network, arm.branch_id, target,
+            )
+            targets_by_front[arm.branch_id] = target
+        arms.append(arm)
+    post = _apply_realized_cleavage_intersections_v12(
+        runtime, post, realized_network, tuple(arms), targets_by_front,
+    )
     trial = replace(state.isolated_copy(), crack_network=post.crack_network)
     trial = apply_causal_sharp_wake_trial_geometry(trial, tuple(arms))
     trial = equilibrate_fixed_load_with_production_fem(trial)
@@ -1631,7 +1803,7 @@ def execute_selected_topology_trial_v12(
     exact_state = accepted_fem_state_fingerprint(trial)
     record = replace(
         post.transaction_records[-1],
-        realized_endpoints_m=tuple(proposal.end_points_m),
+        realized_endpoints_m=tuple(item.end_xy_m for item in arms),
         realized_lengths_m=tuple(item.event_reward_m for item in arms),
         wake_mutation=dict(trial.junction_process_state),
         stored_energy_release_J_per_m=released,
@@ -1654,7 +1826,9 @@ def execute_selected_topology_trial_v12(
         continued_front_ids=tuple(sorted(before_active & after_active)),
         created_front_ids=tuple(sorted(after_active - before_active)),
         retired_front_ids=tuple(sorted(before_active - after_active)),
-        coalescence_target_front_id=proposal.target_front_id,
+        coalescence_target_front_id=(
+            post.transaction_records[-1].coalescence_target_front_id
+        ),
         junctions_after=post.junctions,
         owner_by_front_after=post.owner_by_front,
         process_regions_after=post.process_regions,
@@ -1669,7 +1843,7 @@ def execute_selected_topology_trial_v12(
         output_counters_after=post.output_counters,
         termination_reason_after=post.termination_reason,
         policy_bound_after=post.policy_bound,
-        realized_endpoints_m=proposal.end_points_m,
+        realized_endpoints_m=tuple(item.end_xy_m for item in arms),
         realized_lengths_m=lengths,
         wake_mutation=dict(trial.junction_process_state),
         released_energy_J_per_m=released,
@@ -1678,7 +1852,7 @@ def execute_selected_topology_trial_v12(
     return ProposalTrialOutcome(
         proposal, True, trial, "accepted_exact_current_source_trial",
         exact_realized_crack_network=post.crack_network,
-        realized_endpoints_m=proposal.end_points_m,
+        realized_endpoints_m=tuple(item.end_xy_m for item in arms),
         realized_arm_lengths_m=lengths,
         stored_energy_release_J_per_m=released,
         stored_energy_cost_J_per_m=cost,
