@@ -181,33 +181,67 @@ never in isolation; root cause is pre-existing global/class-level state in
 the shared fixture, unrelated to Part X. Use a single engine's own
 before/after state instead.
 
+- **PX2 (committed `628ae33`):** kinetic-regime analytical design and
+  prospective freeze. New module `crack_rebonding_part_x_kinetic_regime_
+  v10230.py::analytical_periodic_orbit` finds the true periodic fixed
+  point of the phase-resolved P/C/B chain (thin composition over PX1.1's
+  heterogeneous `propagate` + PX1.2's `transition_actions_and_fluxes` --
+  convergence verified explicitly every call, not trusted from iteration
+  count). Four rows constructed and gate-checked (margins archived in
+  `kinetic_regime_registry.json`):
+  - **SAT_EXISTING**: `RB2_reversible_finite` reused byte-for-byte from
+    `artifacts/crack_rebonding_causal_pilot_v2/frozen_configuration.json`
+    — config-hash reproduction is asserted by the script (raises on
+    mismatch).
+  - **COMPETING_REVERSIBLE**: `solve_reference_action_barriers(A_on=2,
+    A_off=2)` at the reference state — mean p_B=0.320, swing=0.507,
+    A_CB=2.040, A_BC=1.952 (all 7 section-6.2 gates pass with margin).
+  - **COMPETING_PERSISTENT**: same bond barrier, rupture barrier +0.05 eV
+    — mean p_B=0.571 (Δ0.251 from reversible, gate ≥0.10), A_BC ratio
+    0.145 (gate ≤0.20) — **deliberately does not reuse causal_pilot_v2's
+    old presets** per PX0's own recorded constraint.
+  - **PASSIVATION_LIMITED**: same formation/rupture barriers + symmetric
+    0.40 eV depassivation/repassivation — mean p_P=0.324, mean p_B=0.343,
+    all four transition actions/fluxes nonzero.
+  Analytical atlas: 1399 points across the full grid (`analytical_phase_
+  atlas.{csv,parquet}`) — R=+0.1 confirmed exactly zero contact/A_CB/F_CB
+  everywhere (semantic control); cohesive-strength axis confirmed
+  p_B-independent as expected (K_rebond,max doesn't feed P/C/B kinetics).
+  PX3 condition selections frozen from the atlas
+  (`analytical_regime_selection.json`): **frequency-transition = 100 Hz**,
+  **dwell-transition = 0.5 ms**, **passivation chemistry_factor = 1.0**;
+  cohesive-strength endpoint explicitly deferred to PX3 (can't be decided
+  analytically). `screen_job_registry.csv` (36 jobs) / `developed_job_
+  registry.csv` (72 jobs) enumerate sections 7/8's matrices, every job
+  `QUEUED_NOT_LAUNCHED` — confirmed no `runs/crack_rebonding_part_x_v1`
+  directory exists yet. 9 new tests. Full selection: 386 passed, zero
+  regressions.
+
 ## Terminal and pending counts
 
 - Physical trajectories launched: 0 (no physical result directory exists
-  yet, per mission section 2's gate — PX2 analytical work must land first).
-- PX1 (all of PX1.1–PX1.4) done. PX2–PX7: not started.
+  yet — PX3 is the first stage authorized to create one).
+- PX1 and PX2 done. PX3–PX7: not started.
 
 ## Exact next action
 
-PX2 (kinetic-regime analytical design and prospective freeze, mission
-section 6): using ONLY the existing analytical phase-resolved P/C/B model
-(`crack_rebonding_kinetics_v10230.solve_reference_action_barriers`/
-`freeze_reference_action_preset`/`REFERENCE_ACTION_PRESETS`) — never
-fitting to da/dN or a desired Paris slope — construct and freeze four
-kinetic rows at the reference state (A_NATIVE, 300K, Kmax=18, R=-0.5,
-f=1000Hz, hold=0, K_rebond,max=0.9): SAT_EXISTING (unchanged), COMPETING_
-REVERSIBLE (genuine formation/rupture competition per section 6.2's exact
-quantitative gates), COMPETING_PERSISTENT (materially reduced rupture
-relative to COMPETING_REVERSIBLE — **do not reuse causal_pilot_v2's old
-presets**, see PX0's finding above), PASSIVATION_LIMITED (fresh-surface
-P/C partition and depassivation/repassivation chosen from existing config
-bounds, never from crack-growth results). Then evaluate the analytical
-atlas across the full Kmax×R×frequency×hold×chemistry×cohesive-strength
-grid section 6.5 specifies, and commit `kinetic_regime_registry.{csv,json}`/
-`analytical_phase_atlas.{csv,parquet}`/`analytical_regime_selection.json`/
-`physical_screen_predictions.json`/`screen_job_registry.csv`/
-`developed_job_registry.csv`/`prospective_classification_gates.json` as
-PX2 — all before any physical result directory may exist. If no
-COMPETING_REVERSIBLE or PASSIVATION_LIMITED row can be constructed within
-existing validated bounds, stop with `NONSATURATED_REBONDING_REGIME_NOT_
-CONSTRUCTED` and report the failed constraints rather than forcing a row.
+PX3 (bounded single-K mechanism screen, mission section 7): **this is the
+first PX stage that launches real physical trajectories.** Before
+launching anything, implement the persistent disk-backed controller
+mission section 14 requires (max 3 concurrent workers, atomic registry
+updates, unique result paths under `runs/crack_rebonding_part_x_v1/`,
+expected-HEAD and config-hash enforcement, no-resume enforcement,
+prephysics-failure and interrupted-physics quarantine). Common screen
+settings: A_NATIVE, 300K, Kmax=18 MPa√m, seed=1720, mpz_n_bins=80,
+n_phase=80, 12 accepted events or 60 μm (whichever first), **explicit
+phase-resolved integration only** (`V10230_FATIGUE_INTEGRATOR_MODE=
+explicit` — DMD/Poincaré/projective acceleration forbidden), virgin paths,
+no resume. Launch `screen_job_registry.csv`'s 36 queued jobs (18
+finite/zero matched pairs) respecting the worker cap; for each pair
+compute `g`/`S_h` per section 7.8 and apply the frozen selection rules
+already recorded in `analytical_regime_selection.json` (frequency=100Hz,
+dwell=0.5ms, chemistry=1.0 already selected; cohesive-strength endpoint
+selection is PX3's own job, decided from the actual 3-point screen once
+it exists). This stage will take real wall-clock time for physical
+simulation — launch via background workers and continue via the harness's
+notification system rather than blocking synchronously.
