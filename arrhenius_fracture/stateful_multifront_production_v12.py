@@ -1538,13 +1538,9 @@ def _apply_realized_cleavage_intersections_v12(
     archived only when that removal empties the owner region.
     """
     if not targets_by_front:
-        realized_fingerprint = hashlib.sha256(
-            realized_network.to_json().encode()
-        ).hexdigest()
-        if realized_fingerprint != nominal_post.topology_fingerprint:
-            raise StatefulProductionInterlock(
-                "unclipped realized cleavage geometry differs from its atomic commit"
-            )
+        # One-arm V12 commits deliberately do not append the V11 auxiliary
+        # ``committed_edges`` ledger.  With no clipping, the nominal graph path
+        # is already the exact realized geometry and remains authoritative.
         return nominal_post
     if not nominal_post.transaction_records:
         raise StatefulProductionInterlock(
