@@ -8,7 +8,8 @@ import pytest
 
 from arrhenius_fracture.crack_network_v11 import CrackNetworkState
 from arrhenius_fracture.directional_competition_v11 import (
-    CleavageCandidate, DirectionalCompetitionState, DirectionalHazardState,
+    CleavageCandidate, CompletedDirectionalEvent, DirectionalCompetitionState,
+    DirectionalHazardState,
     competition_state_to_dict,
 )
 from arrhenius_fracture.general_multifront_v12 import (
@@ -39,12 +40,22 @@ def candidate(name="forward"):
     )
 
 
-def fixture(tmp_path, *, rate=0.0, stale=False, exact_trials=False, sigma_value=1.0):
+def fixture(
+    tmp_path, *, rate=0.0, stale=False, exact_trials=False,
+    sigma_value=1.0, pending=False, adapted_damage=None,
+):
     item = candidate()
+    hazard = DirectionalHazardState(item.candidate_id, previous_rate_per_s=rate)
+    if pending:
+        event = CompletedDirectionalEvent(item.candidate_id, 1, 0.0, 0.0, 1.0, 1.0)
+        hazard = DirectionalHazardState(
+            item.candidate_id, action=1.0, previous_rate_per_s=rate,
+            completed_event_count=1, residual_action=0.0,
+            last_completion_time_s=0.0, pending_events=(event,),
+            current_threshold_action=2.0,
+        )
     competition = DirectionalCompetitionState(
-        candidates=(item,), hazard_states=(DirectionalHazardState(
-            item.candidate_id, previous_rate_per_s=rate,
-        ),), global_hazard_seed=3621,
+        candidates=(item,), hazard_states=(hazard,), global_hazard_seed=3621,
     )
     network = CrackNetworkState.one_tip(((0.0, 0.0),), initial_orientation_rad=0.0)
     front = network.active_tip_ids[0]
@@ -80,6 +91,9 @@ def fixture(tmp_path, *, rate=0.0, stale=False, exact_trials=False, sigma_value=
         ))
 
     def adapted(current, inventory, context):
+        if adapted_damage is not None:
+            current = SimpleNamespace(**current.__dict__)
+            current.damage = np.full_like(current.damage, float(adapted_damage))
         return AdaptedAcceptedState(current, {"kind": "already_adapted_cached"})
 
     def solved(adapted_state, context):
@@ -186,6 +200,7 @@ def fixture(tmp_path, *, rate=0.0, stale=False, exact_trials=False, sigma_value=
             "exact_request_builder": request, "provider_lookup": provider,
             "process_engine_evolver": evolve, "event_renewer": renew,
             "process_engine_recapture": recapture,
+            "accepted_boundary_stress_rebuilder": lambda _state, _context: sigma,
             "correlation_interval_s": 0.0,
             **({"topology_trial_executor": trial_executor} if exact_trials else {}),
         },
@@ -320,6 +335,22 @@ def test_integrated_no_event_interval_runs_all_stages_and_discards(tmp_path):
         "process_interval_validation", "competition_finalization", "event_renewal",
         "process_region_connectivity",
     ]
+
+
+def test_pending_boundary_event_uses_adapted_same_opening_fem_state(tmp_path):
+    context = fixture(
+        tmp_path, pending=True, exact_trials=True, adapted_damage=0.375,
+    )
+    before_time = context.physical_time_s
+    before_opening = context.accepted_opening_m
+    result = run_stateful_accepted_interval_v12(
+        context, 8.4, dry_run_discard=True,
+    )
+    assert result.disposition == "accepted_event"
+    assert result.accepted_duration_s == 0.0
+    assert context.physical_time_s == before_time
+    assert context.accepted_opening_m == before_opening
+    np.testing.assert_array_equal(context.accepted_fem_state.damage, [0.375])
 
 
 @pytest.mark.parametrize("stage", (

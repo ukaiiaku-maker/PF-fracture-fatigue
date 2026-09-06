@@ -1905,12 +1905,37 @@ def run_stateful_accepted_interval_v12(
                     raise StatefulProductionInterlock(
                         "accepted-boundary pending event requires accepted stress"
                     )
+                boundary_state = adapted.fem_state
+                boundary_hash = accepted_fem_state_fingerprint(boundary_state)
+                before_hash = accepted_fem_state_fingerprint(before_fem)
+                if boundary_hash == before_hash:
+                    boundary_sigma = before_sigma
+                else:
+                    # A pending clock freezes time/opening, not discretization.
+                    # Use the graph-authoritative adapted state at that same
+                    # boundary; reverting to before_fem here would silently
+                    # discard a required topology-damage remap.
+                    stress_rebuilder = context.adapter_configuration.get(
+                        "accepted_boundary_stress_rebuilder"
+                    )
+                    if callable(stress_rebuilder):
+                        boundary_sigma = stress_rebuilder(boundary_state, context)
+                    else:
+                        from .fem import assemble_mechanics
+                        boundary_sigma = assemble_mechanics(
+                            boundary_state.mesh, boundary_state.displacement,
+                            boundary_state.ep_gp, boundary_state.rho_gp,
+                            boundary_state.damage, boundary_state.elasticity_D,
+                            boundary_state.material,
+                            cohesive_network=boundary_state.cohesive_network,
+                        )[2]
                 solved_value = SolvedAcceptedState(
-                    before_fem, before_sigma,
+                    boundary_state, boundary_sigma,
                     {
                         "accepted_fem_state_sha256":
-                            accepted_fem_state_fingerprint(before_fem),
+                            boundary_hash,
                         "accepted_boundary_reuse": True,
+                        "adapted_same_boundary_state": boundary_hash != before_hash,
                     },
                     before_opening, before_physical_time,
                     before_mechanics_source,
