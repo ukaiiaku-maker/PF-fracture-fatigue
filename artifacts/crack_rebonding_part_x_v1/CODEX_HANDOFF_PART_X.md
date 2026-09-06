@@ -217,31 +217,98 @@ before/after state instead.
   directory exists yet. 9 new tests. Full selection: 386 passed, zero
   regressions.
 
+- **PX2.5 (committed `34ab3e3`):** bounded prephysics closure requested by
+  external review before allowing PX3 to launch real physical
+  trajectories. Addressed exactly 7 items:
+  1. Fresh-process engine reproducibility root-caused to two effects —
+     `_next_engine_id` shadowed per leaf subclass (base-class
+     `reset_audit()` doesn't touch it) and `_hazard_config_default` a
+     mutable class attribute leaked across tests via `configure_hazard()`
+     without reset. Verified fix: `Engine.configure_hazard()` +
+     `Engine.reset_audit()` on the actual leaf class immediately before
+     construction (5 new tests).
+  2. Intra-dwell cursor bug fixed via new
+     `FatigueWaveform.cycle_schedule_from_elapsed()` — the previous
+     phase-offset reconstruction silently discarded dwell-segment
+     progress across cycle boundaries whenever `minimum_load_hold_s > 0`
+     (11 new tests). This is a genuine correctness fix affecting every
+     dwell-enabled multi-cycle trajectory computed before this commit.
+  3. Screen event ledger wired: `build_screen_event_ledger_row()` in
+     `crack_rebonding_v10230.py` computes all 8 A/F quantities with
+     independent cross-checks and balance-residual closure (2 new tests).
+  4. RB3 passivation tests strengthened to measure all 8 A/F quantities
+     through a real trajectory and to compare one engine's own
+     before/after state rather than two independently-constructed
+     engines.
+  5. Job registries rewritten fail-closed with canonical dedup keys:
+     screen rows are `AUTHORIZED_PX3` only once uniquely keyed (28 of 36
+     rows; 8 are `ALIAS_OF_EXISTING_JOB`); developed rows carry specific
+     `BLOCKED_PENDING_*` statuses until their PX3 prerequisite lands (82
+     rows total: 16 `BLOCKED_PENDING_PX3_COMPLETION`, 12
+     `BLOCKED_PENDING_STAGE1_DECISION`, 8 each of `_FREQUENCY_GATE`,
+     `_DWELL_GATE`, `_PASSIVATION_GATE`, `_PERSISTENT_DISTINCTION`, 22
+     `ALIAS_OF_EXISTING_JOB`; includes a new D7 cohesive-strength job).
+     `competing_persistent_selected` renamed to
+     `competing_persistent_status = "ANALYTICALLY_ELIGIBLE_FOR_PX3_SCREEN"`
+     (6 new tests for the controller's authorization gating).
+  6. Candidate search history preserved:
+     `kinetic_regime_candidate_audit.csv` reproduces all 20 candidates
+     PX2's interactive search evaluated (7 COMPETING_REVERSIBLE, 6
+     COMPETING_PERSISTENT, 7 PASSIVATION_LIMITED) through the same
+     evaluator, with every gate value and the deterministic selection
+     rule.
+  7. Controller qualified: `part_x_run_one_job.py` (fresh-process
+     entry point, `--preflight` only so far) + `part_x_physical_
+     controller.py` (disk-backed, atomic-write, max-3-worker,
+     quarantines prephysics/interrupted failures). Qualifying it under
+     real concurrent preflight execution found and fixed a genuine
+     production race in `build_a_native_manifest()` (fixed non-unique
+     temp path → concurrent workers collided on atomic rename); fixed at
+     the caller level via a private `tempfile.tempdir` per worker
+     process, without touching the shared production function.
+
+  Also fixed a missing `lineterminator="\n"` on 5 `csv.DictWriter` call
+  sites. Self-caught and corrected a mistake made while doing so: an
+  initial re-run of `build_part_x_px0_provenance.py` silently overwrote
+  PX0's frozen a72d465-era source hashes with current post-edit hashes;
+  caught via `git diff` showing genuine hash *value* changes, reverted
+  with `git checkout --`, and re-fixed the one genuinely-affected
+  artifact (`inherited_result_inventory.csv`) via direct byte-level
+  `\r\n`→`\n` substitution instead of a script re-run. 410 tests pass
+  (386 + 24 new across the four new test files), zero regressions; both
+  existing verifiers still `overall_pass=true`.
+
 ## Terminal and pending counts
 
 - Physical trajectories launched: 0 (no physical result directory exists
   yet — PX3 is the first stage authorized to create one).
-- PX1 and PX2 done. PX3–PX7: not started.
+- PX1, PX2, and PX2.5 done. PX3–PX7: not started.
 
 ## Exact next action
 
 PX3 (bounded single-K mechanism screen, mission section 7): **this is the
-first PX stage that launches real physical trajectories.** Before
-launching anything, implement the persistent disk-backed controller
-mission section 14 requires (max 3 concurrent workers, atomic registry
-updates, unique result paths under `runs/crack_rebonding_part_x_v1/`,
-expected-HEAD and config-hash enforcement, no-resume enforcement,
-prephysics-failure and interrupted-physics quarantine). Common screen
-settings: A_NATIVE, 300K, Kmax=18 MPa√m, seed=1720, mpz_n_bins=80,
-n_phase=80, 12 accepted events or 60 μm (whichever first), **explicit
-phase-resolved integration only** (`V10230_FATIGUE_INTEGRATOR_MODE=
-explicit` — DMD/Poincaré/projective acceleration forbidden), virgin paths,
-no resume. Launch `screen_job_registry.csv`'s 36 queued jobs (18
-finite/zero matched pairs) respecting the worker cap; for each pair
-compute `g`/`S_h` per section 7.8 and apply the frozen selection rules
-already recorded in `analytical_regime_selection.json` (frequency=100Hz,
-dwell=0.5ms, chemistry=1.0 already selected; cohesive-strength endpoint
-selection is PX3's own job, decided from the actual 3-point screen once
-it exists). This stage will take real wall-clock time for physical
-simulation — launch via background workers and continue via the harness's
-notification system rather than blocking synchronously.
+first PX stage that launches real physical trajectories.** The controller
+and job registries are now qualified (PX2.5 items 5 and 7). Remaining
+work: implement the real PX3 screen budget in `part_x_run_one_job.py`
+(currently `--preflight` only; raises `NotImplementedError` otherwise) —
+A_NATIVE, 300K, Kmax=18 MPa√m, seed=1720, mpz_n_bins=80, n_phase=80, 12
+accepted events or 60 μm (whichever first), **explicit phase-resolved
+integration only** (`V10230_FATIGUE_INTEGRATOR_MODE=explicit` —
+DMD/Poincaré/projective acceleration forbidden), virgin paths, no resume.
+Then launch the 28 unique `AUTHORIZED_PX3` rows in `screen_job_registry.csv`
+via `part_x_physical_controller.py` against the real
+`runs/crack_rebonding_part_x_v1/` run root, respecting the 3-worker cap;
+for each finite/zero matched pair compute `g`/`S_h` per section 7.8 and
+apply the frozen selection rules already recorded in
+`analytical_regime_selection.json` (frequency=100Hz, dwell=0.5ms,
+chemistry=1.0 already selected; cohesive-strength endpoint selection is
+PX3's own job, decided from the actual 3-point screen once it exists).
+Commit the complete PX3 screen and its portable ledger before authorizing
+any PX4 developed job. Per the review's explicit instruction, continue
+automatically through PX4–PX7 without stopping merely because PX3 is a
+new physical phase; before PX5, wire the already-qualified
+`static_shield_phase_resolved_action` evaluator (PX1.4) into the live
+production static-control commit path. This stage will take real
+wall-clock time for physical simulation — launch via background workers
+and continue via the harness's notification system rather than blocking
+synchronously.
