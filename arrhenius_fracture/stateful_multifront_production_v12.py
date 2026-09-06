@@ -2357,6 +2357,22 @@ def run_stateful_accepted_interval_v12(
             candidate is not None and accepted_candidate is not None
             and accepted_candidate.accepted and not resource_stop
         )
+        if (
+            candidate is not None
+            and accepted_candidate is not None
+            and not accepted_candidate.accepted
+            and not resource_stop
+        ):
+            # V12 intentionally exposes only the correlated proposal when a
+            # complete pair is available.  Unlike V11's sibling-trial loop it
+            # therefore has no qualified fallback transaction after the exact
+            # selected proposal fails the global energy gate.  Stop at the
+            # prior atomic checkpoint instead of replaying the same pending
+            # event forever at zero duration.
+            raise StatefulProductionInterlock(
+                "selected_topology_trial_rejected:"
+                + str(accepted_candidate.reason)
+            )
 
         # Evolve each physical owner once, retaining isolated engines until the
         # complete transaction is publishable.

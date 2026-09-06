@@ -492,6 +492,32 @@ def test_integrated_one_arm_event_consumes_selected_and_physically_renews_once(t
     assert context.trial_cache.audit()["creation_count"] == context.trial_cache.audit()["destruction_count"]
 
 
+def test_rejected_selected_trial_stops_at_prior_atomic_checkpoint(tmp_path):
+    context = fixture(tmp_path, pending=True)
+    before = context.fingerprint
+
+    def reject(state, proposal):
+        return ProposalTrialOutcome(
+            proposal, False, state,
+            "insufficient_whole_topology_energy_release",
+            stored_energy_release_J_per_m=0.5,
+            stored_energy_cost_J_per_m=1.0,
+        )
+
+    context.adapter_configuration["topology_trial_executor"] = reject
+    with pytest.raises(
+        StatefulProductionInterlock,
+        match=(
+            "selected_topology_trial_rejected:"
+            "insufficient_whole_topology_energy_release"
+        ),
+    ):
+        run_stateful_accepted_interval_v12(context, 8.4)
+    assert context.fingerprint == before
+    assert context.step_count == 0
+    assert not (tmp_path / "production-output").exists()
+
+
 def test_submicrosecond_event_uses_local_bracket_and_absolute_endpoint_tolerance(tmp_path):
     context = fixture(tmp_path, rate=1.0e6, exact_trials=True)
     result = run_stateful_accepted_interval_v12(
