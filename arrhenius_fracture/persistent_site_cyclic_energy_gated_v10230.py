@@ -12,6 +12,8 @@ from __future__ import annotations
 import copy
 from typing import Any
 
+import numpy as np
+
 from .persistent_site_cyclic_coupled_audited_v10229 import (
     AuditedCoupledPersistentSiteCyclicTipEngine,
 )
@@ -295,7 +297,15 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
         threshold_action = max(float(pending["threshold_before"]), 1.0e-300)
         B_start = float(ctx["B_start"])
         K_signed_phase = ctx["K_signed_phase"]
-        dt_phase_ctx = float(ctx["dt_phase"])
+        # ``dt_phase`` is a plain scalar at hold=0 (routes every downstream
+        # phase_resolved_action/propagate call to its byte-identical
+        # original path) or a per-bin duration array (n_phase sinusoidal
+        # bins plus the appended dwell bin) when the minimum-load hold is
+        # active -- must NOT be force-cast to float here, which would raise
+        # on a multi-element array.
+        dt_phase_ctx = (
+            float(ctx["dt_phase"]) if np.isscalar(ctx["dt_phase"]) else np.asarray(ctx["dt_phase"], dtype=float)
+        )
         n_phase_ctx = int(ctx["n_phase"])
         r_contact_m_ctx = float(ctx["r_contact_m"])
         Eprime_Pa_ctx = float(ctx["Eprime_Pa"])

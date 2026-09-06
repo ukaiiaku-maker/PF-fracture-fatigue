@@ -456,7 +456,7 @@ def representative_cycle_K_rebond(
     active_patches: list[WakePatch],
     patch_states: dict[int, np.ndarray],
     K_phase: np.ndarray,
-    dt_phase: float,
+    dt_phase: float | np.ndarray,
     r_contact_m: float,
     cfg: CrackRebondingControls,
     T_K: float,
@@ -465,8 +465,21 @@ def representative_cycle_K_rebond(
     """One Strang-split representative cycle, starting from each patch's given
     state, producing a length-N_phase K_rebond(phase) array (never a single
     scalar). This is a trial/provisional evaluation: it does not mutate the
-    caller's committed wake state."""
+    caller's committed wake state.
+
+    ``dt_phase`` may be a uniform scalar or a per-bin duration array the
+    same length as ``K_phase`` (Part X: ``n_phase`` sinusoidal bins plus one
+    appended constant-Kmin dwell bin of its own duration). A scalar is
+    broadcast to every bin -- bit-identical to the original single-loop
+    computation, since a scalar and a ``np.full`` array holding that same
+    scalar value produce identical per-bin floating-point operations here
+    (a single multiply-then-``expm``, not the multi-branch bulk-cycle
+    acceleration ``propagate``/``phase_resolved_action`` use elsewhere,
+    where operation-order risk motivated a fully separate code path)."""
     n_phase = len(K_phase)
+    dt_array = np.full(n_phase, float(dt_phase)) if np.isscalar(dt_phase) else np.asarray(dt_phase, dtype=float)
+    if dt_array.shape[0] != n_phase:
+        raise ValueError("dt_phase length must match K_phase length")
     L_h = cfg.wake_length_m
     L_w = cfg.wake_weight_length_m
     G_max = cfg.restored_work_of_separation_J_m2
@@ -477,10 +490,11 @@ def representative_cycle_K_rebond(
     K_rebond_phase = np.zeros(n_phase)
     for k in range(n_phase):
         K_s = float(K_phase[k])
+        dt_k = float(dt_array[k])
         total_bonded_weighted = 0.0
         for patch in active_patches:
             Q = patch_Q(K_s, patch.s_j_m, r_contact_m, cfg, T_K)
-            half = expm(Q * (0.5 * dt_phase))
+            half = expm(Q * (0.5 * dt_k))
             p_mid = half @ p_by_patch[patch.patch_id]
             w = wake_weight(patch.s_j_m, L_h, L_w)
             total_bonded_weighted += p_mid[2] * w * patch.length_m
@@ -614,6 +628,55 @@ def _periodic_orbit_certificate(
 
 
 def phase_resolved_action(
+    *,
+    active_patches: list[WakePatch],
+    patch_states: dict[int, np.ndarray],
+    k0: int,
+    t_interval: float,
+    K_phase_fn: Callable[[int], float],
+    dt_phase: float | np.ndarray,
+    n_phase: int,
+    r_contact_m: float,
+    cfg: CrackRebondingControls,
+    T_K: float,
+    Eprime_Pa: float,
+    K_shield_Pa_sqrt_m: float,
+    r_eff_m: float,
+    lambda_cleave_fn: Callable[[float], float],
+    bulk_cycle_threshold: int = 50,
+    bulk_convergence_rel_tol: float = 1.0e-6,
+    max_transient_cycles: int = 200,
+) -> tuple[float, dict[int, np.ndarray], int, dict[str, Any]]:
+    """Dispatches to the original uniform-bin-duration implementation
+    (``dt_phase`` a scalar -- byte-for-byte unchanged, guaranteeing hold=0
+    identity) or to the Part X heterogeneous-schedule implementation
+    (``dt_phase`` a per-bin duration array of length ``n_phase``, ``n_phase``
+    then meaning the FULL schedule length including the appended dwell bin
+    when present). See ``_phase_resolved_action_uniform``/
+    ``_phase_resolved_action_heterogeneous`` for the shared docstring."""
+    if np.isscalar(dt_phase):
+        return _phase_resolved_action_uniform(
+            active_patches=active_patches, patch_states=patch_states, k0=k0,
+            t_interval=t_interval, K_phase_fn=K_phase_fn, dt_phase=float(dt_phase),
+            n_phase=n_phase, r_contact_m=r_contact_m, cfg=cfg, T_K=T_K,
+            Eprime_Pa=Eprime_Pa, K_shield_Pa_sqrt_m=K_shield_Pa_sqrt_m, r_eff_m=r_eff_m,
+            lambda_cleave_fn=lambda_cleave_fn, bulk_cycle_threshold=bulk_cycle_threshold,
+            bulk_convergence_rel_tol=bulk_convergence_rel_tol,
+            max_transient_cycles=max_transient_cycles,
+        )
+    return _phase_resolved_action_heterogeneous(
+        active_patches=active_patches, patch_states=patch_states, k0=k0,
+        t_interval=t_interval, K_phase_fn=K_phase_fn,
+        dt_array=np.asarray(dt_phase, dtype=float), r_contact_m=r_contact_m, cfg=cfg,
+        T_K=T_K, Eprime_Pa=Eprime_Pa, K_shield_Pa_sqrt_m=K_shield_Pa_sqrt_m,
+        r_eff_m=r_eff_m, lambda_cleave_fn=lambda_cleave_fn,
+        bulk_cycle_threshold=bulk_cycle_threshold,
+        bulk_convergence_rel_tol=bulk_convergence_rel_tol,
+        max_transient_cycles=max_transient_cycles,
+    )
+
+
+def _phase_resolved_action_uniform(
     *,
     active_patches: list[WakePatch],
     patch_states: dict[int, np.ndarray],
@@ -940,6 +1003,308 @@ def phase_resolved_action(
     if frac > 1.0e-12:
         K_s = K_phase_fn(idx)
         _one_bin(K_s, frac)
+
+    diagnostics["max_K_rebond_Pa_sqrt_m"] = max_K_rebond_seen
+    diagnostics["action_weighted_K_rebond_Pa_sqrt_m"] = (
+        action_weighted_K_rebond_accum / total_action if total_action > 0.0 else 0.0
+    )
+    diagnostics["action"] = total_action
+
+    return total_action, p_by_patch, idx, diagnostics
+
+
+def _run_exact_cycle_heterogeneous(
+    *,
+    active_patches: list[WakePatch],
+    states: dict[int, np.ndarray],
+    Q_lists: dict[int, list[np.ndarray]],
+    K_phase_fn: Callable[[int], float],
+    idx0: int,
+    dt_array: np.ndarray,
+    K_shield_Pa_sqrt_m: float,
+    r_eff_m: float,
+    lambda_cleave_fn: Callable[[float], float],
+    L_h: float,
+    L_w: float,
+    K_rebond_max: float,
+) -> tuple[float, dict[int, np.ndarray]]:
+    """Heterogeneous-schedule counterpart of ``_run_exact_cycle``: one exact
+    Strang-split cycle over ``len(dt_array)`` bins of individually declared
+    duration (the ``n_phase`` sinusoidal bins plus the appended dwell bin),
+    used only by the Part X periodic-orbit bulk-action path when the
+    minimum-load hold is active."""
+    n_total = len(dt_array)
+    idx = idx0 % n_total
+    cur = {pid: np.asarray(p, dtype=float).copy() for pid, p in states.items()}
+    action = 0.0
+    for step in range(n_total):
+        dt_bin = float(dt_array[step])
+        K_s = K_phase_fn(idx)
+        total_weighted = 0.0
+        new_states: dict[int, np.ndarray] = {}
+        for patch in active_patches:
+            Q = Q_lists[patch.patch_id][step]
+            half = expm(Q * (0.5 * dt_bin))
+            p_mid = half @ cur[patch.patch_id]
+            w = wake_weight(patch.s_j_m, L_h, L_w)
+            total_weighted += p_mid[2] * w * patch.length_m
+            new_states[patch.patch_id] = half @ p_mid
+        H_b = min(1.0, max(total_weighted, 0.0))
+        K_rebond = K_rebond_max * H_b
+        sigma_c = cleavage_stress_with_rebond(K_s, K_shield_Pa_sqrt_m, K_rebond, r_eff_m)
+        action += lambda_cleave_fn(sigma_c) * dt_bin
+        cur.update(new_states)
+        idx = (idx + 1) % n_total
+    return action, cur
+
+
+def _phase_resolved_action_heterogeneous(
+    *,
+    active_patches: list[WakePatch],
+    patch_states: dict[int, np.ndarray],
+    k0: int,
+    t_interval: float,
+    K_phase_fn: Callable[[int], float],
+    dt_array: np.ndarray,
+    r_contact_m: float,
+    cfg: CrackRebondingControls,
+    T_K: float,
+    Eprime_Pa: float,
+    K_shield_Pa_sqrt_m: float,
+    r_eff_m: float,
+    lambda_cleave_fn: Callable[[float], float],
+    bulk_cycle_threshold: int = 50,
+    bulk_convergence_rel_tol: float = 1.0e-6,
+    max_transient_cycles: int = 200,
+) -> tuple[float, dict[int, np.ndarray], int, dict[str, Any]]:
+    """Heterogeneous-schedule counterpart of ``_phase_resolved_action``
+    (Part X minimum-load dwell): identical certified periodic-orbit bulk-
+    action acceleration, generalized from a fixed bin count/uniform
+    duration to ``len(dt_array)`` bins of individually declared duration
+    (the ``n_phase`` sinusoidal bins plus one appended constant-Kmin dwell
+    bin). Interval accounting is TIME-based (whole cycles by dividing
+    ``t_interval`` by the schedule's total duration, then walking the
+    remainder bin by bin) rather than bin-count-based, since bins are no
+    longer of equal duration. Never invoked for ``minimum_load_hold_s=0``
+    (``phase_resolved_action`` dispatches that case to the untouched
+    original ``_phase_resolved_action_uniform``), so this code path
+    carries zero hold=0 regression risk.
+    """
+    n_total = len(dt_array)
+    L_h = cfg.wake_length_m
+    L_w = cfg.wake_weight_length_m
+    G_max = cfg.restored_work_of_separation_J_m2
+    eta_K = cfg.rebond_K_geometry_factor
+    K_rebond_max = eta_K * math.sqrt(max(Eprime_Pa, 0.0) * max(G_max, 0.0))
+
+    p_by_patch = {p.patch_id: patch_states.get(p.patch_id, p.state_vector()).copy() for p in active_patches}
+
+    total_cycle_s = float(np.sum(dt_array))
+    n_cycles_full = int(math.floor(t_interval / total_cycle_s + 1.0e-9)) if total_cycle_s > 0.0 else 0
+    leftover_time = t_interval - n_cycles_full * total_cycle_s
+    if leftover_time > total_cycle_s * (1.0 - 1.0e-9):
+        n_cycles_full += 1
+        leftover_time = 0.0
+
+    total_action = 0.0
+    idx = k0 % n_total
+    max_K_rebond_seen = 0.0
+    action_weighted_K_rebond_accum = 0.0
+
+    def _one_bin(K_s: float, duration_s: float) -> None:
+        nonlocal total_action, max_K_rebond_seen, action_weighted_K_rebond_accum
+        total_weighted = 0.0
+        new_states: dict[int, np.ndarray] = {}
+        for patch in active_patches:
+            Q = patch_Q(K_s, patch.s_j_m, r_contact_m, cfg, T_K)
+            half = expm(Q * (0.5 * duration_s))
+            p_mid = half @ p_by_patch[patch.patch_id]
+            w = wake_weight(patch.s_j_m, L_h, L_w)
+            total_weighted += p_mid[2] * w * patch.length_m
+            new_states[patch.patch_id] = half @ p_mid
+        H_b_bin = min(1.0, max(total_weighted, 0.0))
+        K_rebond_bin = K_rebond_max * H_b_bin
+        sigma_c = cleavage_stress_with_rebond(K_s, K_shield_Pa_sqrt_m, K_rebond_bin, r_eff_m)
+        lam_c = lambda_cleave_fn(sigma_c)
+        action_increment = lam_c * duration_s
+        total_action += action_increment
+        max_K_rebond_seen = max(max_K_rebond_seen, K_rebond_bin)
+        action_weighted_K_rebond_accum += K_rebond_bin * action_increment
+        p_by_patch.update(new_states)
+
+    diagnostics: dict[str, Any] = {
+        "bulk_action_used": False,
+        "periodic_orbit_solved": False,
+        "strict_convergence_reached": False,
+        "transient_cycles_resolved": 0,
+        "subdominant_eigenvalue": None,
+        "state_error_bound": None,
+        "cycle_action_error_bound": None,
+        "total_tail_action_error_bound": None,
+        "bulk_action_qualified": True,
+    }
+
+    if n_cycles_full <= bulk_cycle_threshold:
+        for _ in range(n_cycles_full):
+            for step in range(n_total):
+                K_s = K_phase_fn(idx)
+                _one_bin(K_s, float(dt_array[idx % n_total]))
+                idx = (idx + 1) % n_total
+    else:
+        idx_at_cycle_start = idx
+        cycles_done = 0
+        prev_cycle_action: float | None = None
+        prev_boundary_pB = {pid: float(p[2]) for pid, p in p_by_patch.items()}
+        last_cycle_action: float | None = None
+        strictly_converged = False
+
+        transient_cap = min(n_cycles_full, max_transient_cycles)
+        while cycles_done < transient_cap:
+            cycle_start_action = total_action
+            for _ in range(n_total):
+                K_s = K_phase_fn(idx)
+                _one_bin(K_s, float(dt_array[idx % n_total]))
+                idx = (idx + 1) % n_total
+            cycle_action = total_action - cycle_start_action
+            cycles_done += 1
+            last_cycle_action = cycle_action
+
+            if prev_cycle_action is not None:
+                action_rel_change = abs(cycle_action - prev_cycle_action) / max(
+                    abs(cycle_action), abs(prev_cycle_action), 1.0e-300
+                )
+                state_change = max(
+                    (abs(float(p_by_patch[pid][2]) - prev_boundary_pB[pid]) for pid in p_by_patch),
+                    default=0.0,
+                )
+                if action_rel_change <= bulk_convergence_rel_tol and state_change <= bulk_convergence_rel_tol:
+                    strictly_converged = True
+                    break
+
+            prev_cycle_action = cycle_action
+            prev_boundary_pB = {pid: float(p[2]) for pid, p in p_by_patch.items()}
+
+        remaining_cycles = n_cycles_full - cycles_done
+        if remaining_cycles > 0 and last_cycle_action is not None:
+            from .crack_rebonding_kinetics_v10230 import _partial_product
+            from .crack_rebonding_kinetics_v10230 import build_phase_factors as _build_phase_factors
+            from .crack_rebonding_kinetics_v10230 import propagate as _propagate
+
+            Q_lists: dict[int, list[np.ndarray]] = {}
+            factors_by_patch: dict[int, list[np.ndarray]] = {}
+            for patch in active_patches:
+                Q_list_cycle = [
+                    patch_Q(
+                        K_phase_fn((idx_at_cycle_start + k) % n_total),
+                        patch.s_j_m,
+                        r_contact_m,
+                        cfg,
+                        T_K,
+                    )
+                    for k in range(n_total)
+                ]
+                Q_lists[patch.patch_id] = Q_list_cycle
+                factors_by_patch[patch.patch_id] = _build_phase_factors(Q_list_cycle, dt_array)
+
+            certs: dict[int, dict[str, Any]] = {}
+            any_degenerate_unconverged = False
+            max_rho = 0.0
+            for patch in active_patches:
+                M_cycle, _ = _partial_product(factors_by_patch[patch.patch_id], 0, n_total)
+                cert = _periodic_orbit_certificate(
+                    M_cycle, p_by_patch[patch.patch_id], max_transient_cycles
+                )
+                certs[patch.patch_id] = cert
+                if not cert["degenerate"]:
+                    max_rho = max(max_rho, cert["rho"])
+                elif cert["dist0"] > 1.0e-12:
+                    any_degenerate_unconverged = True
+
+            p_star_states = {pid: cert["p_star"] for pid, cert in certs.items()}
+            action_at_star, _ = _run_exact_cycle_heterogeneous(
+                active_patches=active_patches, states=p_star_states, Q_lists=Q_lists,
+                K_phase_fn=K_phase_fn, idx0=idx_at_cycle_start, dt_array=dt_array,
+                K_shield_Pa_sqrt_m=K_shield_Pa_sqrt_m, r_eff_m=r_eff_m,
+                lambda_cleave_fn=lambda_cleave_fn, L_h=L_h, L_w=L_w, K_rebond_max=K_rebond_max,
+            )
+            action_at_transient_end, _ = _run_exact_cycle_heterogeneous(
+                active_patches=active_patches, states=p_by_patch, Q_lists=Q_lists,
+                K_phase_fn=K_phase_fn, idx0=idx_at_cycle_start, dt_array=dt_array,
+                K_shield_Pa_sqrt_m=K_shield_Pa_sqrt_m, r_eff_m=r_eff_m,
+                lambda_cleave_fn=lambda_cleave_fn, L_h=L_h, L_w=L_w, K_rebond_max=K_rebond_max,
+            )
+
+            dist0_total = sum(cert["dist0"] for cert in certs.values())
+            l_a_effective = abs(action_at_transient_end - action_at_star) / max(dist0_total, 1.0e-300)
+            if any_degenerate_unconverged:
+                tail_bound = float("inf")
+            else:
+                tail_bound = l_a_effective * sum(
+                    cert["dist0"] * cert["S"] for cert in certs.values()
+                )
+
+            bulk_representative_action = action_at_star
+            bulk_segment_action = remaining_cycles * bulk_representative_action
+            total_action += bulk_segment_action
+
+            H_b_star = 0.0
+            for patch in active_patches:
+                w = wake_weight(patch.s_j_m, L_h, L_w)
+                H_b_star += float(p_star_states[patch.patch_id][2]) * w * patch.length_m
+            H_b_star = min(1.0, max(H_b_star, 0.0))
+            K_rebond_star = K_rebond_max * H_b_star
+            max_K_rebond_seen = max(max_K_rebond_seen, K_rebond_star)
+            action_weighted_K_rebond_accum += K_rebond_star * bulk_segment_action
+
+            reference_scale = max(abs(total_action), 1.0e-300)
+            qualified = strictly_converged or (
+                tail_bound <= cfg.bulk_action_error_rel_tol * reference_scale
+            )
+            diagnostics.update(
+                {
+                    "bulk_action_used": True,
+                    "periodic_orbit_solved": not any_degenerate_unconverged,
+                    "strict_convergence_reached": strictly_converged,
+                    "transient_cycles_resolved": cycles_done,
+                    "subdominant_eigenvalue": max_rho,
+                    "state_error_bound": dist0_total,
+                    "cycle_action_error_bound": l_a_effective * dist0_total,
+                    "total_tail_action_error_bound": tail_bound,
+                    "bulk_action_qualified": bool(qualified),
+                }
+            )
+
+            bulk_dt = remaining_cycles * total_cycle_s
+            for patch in active_patches:
+                p_by_patch[patch.patch_id] = _propagate(
+                    p_by_patch[patch.patch_id], Q_lists[patch.patch_id], factors_by_patch[patch.patch_id],
+                    k0=0, dt=bulk_dt, dt_phase=dt_array,
+                )
+            # idx is unchanged (a whole number of full cycles were consumed).
+        elif remaining_cycles > 0:
+            for _ in range(remaining_cycles * n_total):
+                K_s = K_phase_fn(idx)
+                _one_bin(K_s, float(dt_array[idx % n_total]))
+                idx = (idx + 1) % n_total
+
+    # Leftover partial cycle: walk the remaining bins by TIME, exactly as
+    # ``_propagate_heterogeneous`` does, so an event may localize inside the
+    # dwell (a bin whose own duration can exceed a sinusoidal bin's by
+    # orders of magnitude) rather than only at the boundary between bins.
+    t_left = leftover_time
+    while t_left > 1.0e-15:
+        bin_dt = float(dt_array[idx % n_total])
+        if bin_dt <= 0.0:
+            idx = (idx + 1) % n_total
+            continue
+        K_s = K_phase_fn(idx)
+        if t_left >= bin_dt * (1.0 - 1.0e-9):
+            _one_bin(K_s, bin_dt)
+            t_left -= bin_dt
+            idx = (idx + 1) % n_total
+        else:
+            _one_bin(K_s, t_left)
+            t_left = 0.0
 
     diagnostics["max_K_rebond_Pa_sqrt_m"] = max_K_rebond_seen
     diagnostics["action_weighted_K_rebond_Pa_sqrt_m"] = (

@@ -28,7 +28,7 @@ import json
 import math
 from dataclasses import asdict, dataclass, field, replace
 from enum import Enum
-from typing import Any, Callable
+from typing import Any, Callable, Sequence
 
 import numpy as np
 from scipy.linalg import expm
@@ -159,8 +159,16 @@ class CrackRebondingControls:
         )
         require(
             self.minimum_load_hold_s == 0.0,
-            "minimum_load_hold_s must be exactly 0.0 in this pass (hold "
-            "integration is a documented future interface, not implemented)",
+            "CrackRebondingControls.minimum_load_hold_s must be exactly 0.0: "
+            "the minimum-load dwell is now implemented (v10.2.30 Part X) as "
+            "FatigueWaveform.minimum_load_hold_s, not as a field on this "
+            "rebonding-only config -- the dwell must drive ordinary "
+            "cleavage/emission hazard and block-cycle selection identically "
+            "whether or not rebonding is even enabled, which only the "
+            "waveform (threaded through every channel) can reach. Leaving a "
+            "second, disconnected minimum_load_hold_s on this config would "
+            "be a silent-no-op footgun, so it stays rejected here on "
+            "purpose; set the waveform's own field instead.",
         )
         require(
             not self.stochastic_healing_enabled,
@@ -470,8 +478,23 @@ def advance_markov(p: np.ndarray, Q: np.ndarray, dt: float) -> np.ndarray:
     return expm(Q * float(dt)) @ np.asarray(p, dtype=float)
 
 
-def build_phase_factors(Q_phase_list: list[np.ndarray], dt_phase: float) -> list[np.ndarray]:
-    return [expm(Q * float(dt_phase)) for Q in Q_phase_list]
+def build_phase_factors(
+    Q_phase_list: list[np.ndarray], dt_phase: float | Sequence[float]
+) -> list[np.ndarray]:
+    """Per-bin matrix exponential. ``dt_phase`` may be a uniform scalar (the
+    original, pre-Part-X convention -- every bin gets the same duration) or a
+    per-bin duration sequence the same length as ``Q_phase_list`` (Part X's
+    heterogeneous schedule: ``n_phase`` sinusoidal bins plus one appended
+    constant-Kmin dwell bin of its own, generally different, duration)."""
+    if np.isscalar(dt_phase):
+        return [expm(Q * float(dt_phase)) for Q in Q_phase_list]
+    dt_array = np.asarray(dt_phase, dtype=float)
+    if dt_array.shape[0] != len(Q_phase_list):
+        raise ValueError(
+            "per-bin dt_phase length must match Q_phase_list length "
+            f"({dt_array.shape[0]} != {len(Q_phase_list)})"
+        )
+    return [expm(Q * float(dt)) for Q, dt in zip(Q_phase_list, dt_array)]
 
 
 def _partial_product(phase_factors: list[np.ndarray], k0: int, r: int) -> tuple[np.ndarray, int]:
@@ -484,7 +507,7 @@ def _partial_product(phase_factors: list[np.ndarray], k0: int, r: int) -> tuple[
     return M, idx
 
 
-def propagate(
+def _propagate_uniform(
     p: np.ndarray,
     Q_phase_list: list[np.ndarray],
     phase_factors: list[np.ndarray],
@@ -492,13 +515,11 @@ def propagate(
     dt: float,
     dt_phase: float,
 ) -> np.ndarray:
-    """Exact p(t+dt) = M(k0, dt) @ p for the piecewise-constant-rate phase
-    discretization: any starting phase-grid index, any duration (fractional or
-    spanning many cycles), no rounding.
-    """
-    p = np.asarray(p, dtype=float)
-    if dt <= 1.0e-300:
-        return p.copy()
+    """Original (pre-Part-X) uniform-bin-duration propagator, byte-for-byte
+    unchanged. This is the exact hold=0 code path -- kept as its own
+    function, never touched by the heterogeneous generalization below, so
+    hold=0 trajectories cannot pick up so much as a floating-point
+    operation-order change from Part X's dwell support."""
     n = len(phase_factors)
     steps_f = float(dt) / float(dt_phase)
     whole_steps = int(math.floor(steps_f + 1.0e-9))
@@ -523,6 +544,94 @@ def propagate(
         p = expm(Q_frac * (frac * dt_phase)) @ p
 
     return p
+
+
+def _propagate_heterogeneous(
+    p: np.ndarray,
+    Q_phase_list: list[np.ndarray],
+    phase_factors: list[np.ndarray],
+    k0: int,
+    dt: float,
+    dt_array: np.ndarray,
+) -> np.ndarray:
+    """Exact p(t+dt) = M(k0, dt) @ p for a schedule of ``n`` bins with
+    arbitrary, generally unequal, per-bin durations (Part X's sinusoidal-
+    traverse-plus-dwell cycle). Any starting bin index, any duration
+    (fractional bin, spanning many bins, or many full cycles), no rounding
+    and no approximation of the dwell as extra equal-duration phase bins.
+
+    Whole-cycle handling is identical in spirit to the uniform case: the
+    full-cycle product starting at ``k0`` returns the state to phase index
+    ``k0`` exactly (mod n) regardless of bin-duration heterogeneity, so
+    repeated whole cycles are still a matrix power of that one product.
+    The remainder (less than one full cycle) is walked bin by bin -- each
+    bin either fully consumed (bulk matrix multiply, matching a whole
+    sinusoidal bin or, when the remainder reaches it, the entire dwell) or
+    partially consumed by one exact sub-bin ``expm`` (a fractional
+    sinusoidal bin, or an event firing partway through the dwell) -- so an
+    event may localize inside the hold, and a subsequent call starting at
+    the resulting (idx, remaining-duration-in-that-bin) position correctly
+    consumes only what remains of that same bin, not a fresh one.
+    """
+    n = len(phase_factors)
+    total_cycle = float(np.sum(dt_array))
+    if total_cycle <= 0.0:
+        return p.copy()
+
+    m_cycles = int(math.floor(dt / total_cycle + 1.0e-12))
+    remaining = dt - m_cycles * total_cycle
+    if remaining > total_cycle * (1.0 - 1.0e-9):
+        m_cycles += 1
+        remaining = 0.0
+
+    if m_cycles > 0:
+        M_cycle, _ = _partial_product(phase_factors, k0, n)
+        p = np.linalg.matrix_power(M_cycle, m_cycles) @ p
+
+    idx = k0 % n
+    t_left = remaining
+    while t_left > 1.0e-15:
+        bin_dt = float(dt_array[idx])
+        if bin_dt <= 0.0:
+            idx = (idx + 1) % n
+            continue
+        if t_left >= bin_dt * (1.0 - 1.0e-9):
+            p = phase_factors[idx] @ p
+            t_left -= bin_dt
+            idx = (idx + 1) % n
+        else:
+            p = expm(Q_phase_list[idx] * t_left) @ p
+            t_left = 0.0
+
+    return p
+
+
+def propagate(
+    p: np.ndarray,
+    Q_phase_list: list[np.ndarray],
+    phase_factors: list[np.ndarray],
+    k0: int,
+    dt: float,
+    dt_phase: float | Sequence[float],
+) -> np.ndarray:
+    """Exact p(t+dt) = M(k0, dt) @ p for the piecewise-constant-rate phase
+    discretization: any starting phase-grid index, any duration (fractional or
+    spanning many cycles), no rounding.
+
+    ``dt_phase`` is a uniform scalar for the original (pre-Part-X) equal-
+    duration phase grid, or a per-bin duration array for Part X's
+    heterogeneous sinusoidal-traverse-plus-dwell schedule -- dispatched to
+    ``_propagate_uniform``/``_propagate_heterogeneous`` respectively, so
+    every existing (scalar-``dt_phase``) call site is completely unaffected.
+    """
+    p = np.asarray(p, dtype=float)
+    if dt <= 1.0e-300:
+        return p.copy()
+    if np.isscalar(dt_phase):
+        return _propagate_uniform(p, Q_phase_list, phase_factors, k0, dt, float(dt_phase))
+    return _propagate_heterogeneous(
+        p, Q_phase_list, phase_factors, k0, dt, np.asarray(dt_phase, dtype=float)
+    )
 
 
 def strang_cycle_trajectory(

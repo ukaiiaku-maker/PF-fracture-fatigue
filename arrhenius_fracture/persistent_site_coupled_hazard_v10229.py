@@ -74,13 +74,39 @@ def coupled_hazard_config(controller) -> dict[str, float | int]:
     }
 
 
+def _duration_weighted_mean(values: np.ndarray, dt_values: np.ndarray) -> float:
+    """Cycle-mean of a per-bin quantity, weighted by each bin's own
+    duration (Part X: the appended dwell bin's duration can differ by
+    orders of magnitude from a sinusoidal bin's, so an unweighted
+    ``np.mean`` would silently give it the weight of one ordinary bin
+    regardless of its physical length).
+
+    hold=0 bit-identity: ``waveform.cycle_schedule`` builds a uniform-dt
+    array via ``np.full`` in that case, so every entry is the literal same
+    float -- detected here and routed to plain ``np.mean`` (the pre-Part-X
+    expression, verbatim) rather than the mathematically-equal but not
+    bit-identical ``sum(v*dt)/sum(dt)`` weighted form, so a hold=0
+    trajectory cannot pick up so much as a last-bit floating-point
+    difference from this change.
+    """
+    if values.size == 0:
+        return 0.0
+    if dt_values.size and np.all(dt_values == dt_values[0]):
+        return float(np.mean(values))
+    total_dt = float(np.sum(dt_values))
+    if total_dt <= 0.0:
+        return float(np.mean(values))
+    return float(np.sum(np.asarray(values, dtype=float) * dt_values) / total_dt)
+
+
 def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dict[str, float]:
-    phases = np.asarray(controller._phases(), dtype=float)
-    if phases.size < 1:
+    n_phase_count = len(controller._phases())
+    if n_phase_count < 1:
         raise ValueError("state-coupled cyclic integration requires waveform phases")
-    K_values = np.asarray(waveform.K_phase(phases), dtype=float).reshape(-1)
-    if K_values.size != phases.size:
-        raise ValueError("waveform K_phase output does not match quadrature")
+    K_values, dt_values = waveform.cycle_schedule(n_phase_count, signed=False)
+    K_values = np.asarray(K_values, dtype=float).reshape(-1)
+    if K_values.size != dt_values.size:
+        raise ValueError("waveform cycle_schedule K/dt length mismatch")
 
     # Optional crack-rebonding (v10.2.30, default off): confirmed by direct
     # construction of the real production engine class
@@ -145,8 +171,7 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
     r_eff_now = 1.0e-30
     K_b_static = 0.0
     if static_shield_active:
-        signed_waveform = dataclasses.replace(waveform, closure_clip=False)
-        K_signed_phase = np.asarray(signed_waveform.K_phase(phases), dtype=float)
+        K_signed_phase, _dt_signed_unused = waveform.cycle_schedule(n_phase_count, signed=True)
         K_shield_now = engine.K_shield()
         r_eff_now = engine.r_eff()
         K_b_static = (
@@ -154,12 +179,11 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
             if static_shield.get("first_event_fired", False) else 0.0
         )
     if hazard_coupled:
-        signed_waveform = dataclasses.replace(waveform, closure_clip=False)
         phase_offset_rad = _rebond.chronological_phase_offset_rad(
             rebonding_state.elapsed_time_s, waveform.period_s
         )
-        K_signed_phase = np.asarray(
-            signed_waveform.K_phase(phases + phase_offset_rad), dtype=float
+        K_signed_phase, dt_signed_values = waveform.cycle_schedule(
+            n_phase_count, signed=True, phase_offset_rad=phase_offset_rad
         )
         Eprime_Pa = _rebond.reduced_modulus_Pa(engine.G, engine.nu)
         r_contact_m = max(engine.r_eff(), rebonding_state.cfg.contact_radius_min_m)
@@ -169,7 +193,7 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
             active_patches=active_patches,
             patch_states=patch_states_now,
             K_phase=K_signed_phase,
-            dt_phase=float(waveform.period_s) / float(phases.size),
+            dt_phase=dt_signed_values,
             r_contact_m=r_contact_m,
             cfg=rebonding_state.cfg,
             T_K=temperature_K,
@@ -207,13 +231,17 @@ def _phase_statistics(engine, controller, waveform, temperature_K: float) -> dic
         if callable(getattr(engine, "K_shield", None))
         else 0.0
     )
+    lambdas_arr = np.asarray(lambdas, dtype=float)
+    raw_arr = np.asarray(raw, dtype=float)
+    barriers_arr = np.asarray(barriers, dtype=float)
+    sigma_arr = np.asarray(sigma, dtype=float)
     return {
-        "lambda_avg_s": float(np.mean(lambdas)),
+        "lambda_avg_s": _duration_weighted_mean(lambdas_arr, dt_values),
         "lambda_min_s": float(np.min(lambdas)),
         "lambda_max_s": float(np.max(lambdas)),
-        "lambda_raw_avg_s": float(np.mean(raw)),
-        "Gc_avg_J": float(np.mean(barriers)),
-        "sigma_avg_Pa": float(np.mean(sigma)),
+        "lambda_raw_avg_s": _duration_weighted_mean(raw_arr, dt_values),
+        "Gc_avg_J": _duration_weighted_mean(barriers_arr, dt_values),
+        "sigma_avg_Pa": _duration_weighted_mean(sigma_arr, dt_values),
         "sigma_min_Pa": float(np.min(sigma)),
         "sigma_max_Pa": float(np.max(sigma)),
         "r_eff_m": _positive(engine.r_eff(), 1.0e-30),
@@ -293,19 +321,33 @@ def _commit_constant_segment(
     )
     dt_segment = max(float(cycles), 0.0) * float(waveform.period_s)
     if rebonding_active:
-        phases = np.asarray(controller._phases(), dtype=float)
-        dt_phase = float(waveform.period_s) / float(phases.size)
-        signed_waveform = dataclasses.replace(waveform, closure_clip=False)
+        n_phase_count = len(controller._phases())
         phase_offset_rad = _rebond.chronological_phase_offset_rad(
             rebonding_state.elapsed_time_s, waveform.period_s
         )
-        K_signed_phase = np.asarray(
-            signed_waveform.K_phase(phases + phase_offset_rad), dtype=float
+        K_signed_phase, dt_signed_values = waveform.cycle_schedule(
+            n_phase_count, signed=True, phase_offset_rad=phase_offset_rad
+        )
+        # dt_phase is a plain scalar at hold=0 (identical to the original
+        # ``period_s/phases.size`` expression -- period_s==base_period_s
+        # exactly when hold=0) so every downstream consumer (propagate/
+        # build_phase_factors/phase_resolved_action/
+        # representative_cycle_K_rebond), which dispatches on
+        # ``np.isscalar(dt_phase)`` rather than on whether an array's
+        # values happen to be uniform, takes its byte-identical original
+        # code path. Only when the hold is active does this become the
+        # per-bin duration array (n_phase sinusoidal bins plus the
+        # appended dwell bin) that routes those same functions to their
+        # separately-validated Part X heterogeneous implementation.
+        dt_phase_ctx = (
+            float(waveform.base_period_s) / float(n_phase_count)
+            if float(waveform.minimum_load_hold_s) <= 0.0
+            else dt_signed_values
         )
         engine._rebonding_block_context = {
             "K_signed_phase": K_signed_phase,
-            "dt_phase": dt_phase,
-            "n_phase": int(phases.size),
+            "dt_phase": dt_phase_ctx,
+            "n_phase": int(K_signed_phase.size),
             "r_contact_m": max(engine.r_eff(), rebonding_state.cfg.contact_radius_min_m),
             "Eprime_Pa": _rebond.reduced_modulus_Pa(engine.G, engine.nu),
             "T_K": float(temperature_K),
@@ -369,7 +411,12 @@ def integrate_state_coupled_waveform(
     """Advance a block with cleavage hazard coupled to the evolving tip state."""
     requested = max(float(cycles_requested), 0.0)
     period = float(waveform.period_s)
-    frequency = max(float(waveform.frequency_Hz), 0.0)
+    # Protocol-cycle rate (1/period_s, i.e. including the dwell when
+    # present) -- this function's "cycles" bookkeeping (actual_cycles,
+    # accepted-segment counts) is defined in the same units as
+    # ``cycles_requested``/``period``, not the nominal sinusoidal-traverse
+    # rate. Bit-identical to ``waveform.frequency_Hz`` when hold=0.
+    frequency = max(float(waveform.effective_cycle_frequency_Hz), 0.0)
     config = coupled_hazard_config(controller)
     state_targets = _state_targets(controller)
     threshold = max(

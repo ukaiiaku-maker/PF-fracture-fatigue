@@ -271,7 +271,7 @@ class PersistentSiteCyclicTipEngine(PersistentSiteStateResolvedTipEngine):
             lambda_override=lambda_avg,
         )
         cycles_consumed = cycle_count_from_consumed_time(
-            coupled["dt_consumed"], waveform.frequency_Hz
+            coupled["dt_consumed"], waveform.effective_cycle_frequency_Hz
         )
         cycles_unused = max(cycles_requested - cycles_consumed, 0.0)
 
