@@ -158,11 +158,32 @@ def main(argv=None):
                              ["FAILURE_INJECTION_NOT_IMPLEMENTED"], source, "rollback_exact", inputs,
                              False, source_id, head))
 
+    # The corrected matrix establishes fixed geometry, but the inherited static
+    # qualifier does not expose every raw measurement required by the frozen V3
+    # equilibrium/topology/derivative predicates.  Preserve that distinction.
+    missing_static = ("free_dof_equilibrium", "reaction_energy_identity",
+                      "cavity_area_perimeter_convergence", "cavity_traction",
+                      "no_wake_overlap_and_no_bridge", "fixed_tensor_probe_convergence",
+                      "crack_energy_compliance_derivative", "cavity_energy_compliance_derivative")
+    for name in missing_static:
+        source_id = f"raw:static_missing:{name}"
+        source = {"gate": name, "classification": "REQUIRED_RAW_MEASUREMENT_NOT_EXPOSED"}
+        sources[source_id] = source
+        inputs = {"comparisons": [{"error": 1.0, "tolerance": 0.0}]}
+        rows.append(evidence(f"static_missing:{name}", f"v3:static-missing:{name}:{head[:12]}",
+                             {"gate": name}, {"dataset": "static_mechanics", "gate": name},
+                             ["REQUIRED_RAW_MEASUREMENT_NOT_EXPOSED"], source,
+                             "bounded_convergence", inputs, False, source_id, head))
+
     validate_evidence_rows(rows, sources, executed_code_sha=head)
     gates = {}
     for dataset in datasets:
         selected = [row for row in rows if row["case_id"].startswith(dataset + ":")]
         gates[dataset] = bool(selected) and all(row["predicate_result"] for row in selected)
+    gates["fixed_geometry_static_matrix"] = gates.pop("static_mechanics")
+    gates["complete_static_scientific_predicates"] = all(
+        row["predicate_result"] for row in rows if row["case_id"].startswith("static_missing:")
+    )
     gates["lifecycle_wide_rollback"] = all(row["predicate_result"] for row in rows if row["case_id"].startswith("rollback"))
     gates["natural_partition_restart_rng"] = False  # not measured by the inherited short-window ensemble
     gates["evidence_ontology"] = True
