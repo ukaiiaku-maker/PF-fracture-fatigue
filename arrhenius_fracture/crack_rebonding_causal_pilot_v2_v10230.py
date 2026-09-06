@@ -455,6 +455,7 @@ def run_trajectory(
     max_wall_seconds: float = MAX_WALL_SECONDS_PER_TRAJECTORY,
     hazard_rng_seed: int = SEED,
     static_shield_control: dict[str, Any] | None = None,
+    minimum_load_hold_s: float = 0.0,
 ) -> dict[str, Any]:
     """Drive one fresh, unresumed trajectory in-process via the real
     A_NATIVE production engine's own cycle_step_waveform/
@@ -486,6 +487,12 @@ def run_trajectory(
     from any engine-internal counter. This function never reads any other
     key of the dict; its content and interpretation belong entirely to
     the static-shield engine code path.
+
+    ``minimum_load_hold_s`` (Part X PX3, default 0.0 -- exact prior
+    behavior for every existing caller) is threaded straight through to
+    ``waveform_cls``, letting this same qualified event loop drive the
+    PX3 dwell panel (mission section 7.3) without a second
+    reimplementation.
     """
     if reset_engine_registry is not None:
         reset_engine_registry()
@@ -493,7 +500,10 @@ def run_trajectory(
     if static_shield_control is not None:
         engine._static_shield_control = static_shield_control
     ctrl = make_controller(n_phase)
-    waveform = waveform_cls(Kmax=Kmax_Pa_sqrt_m, R=R, frequency_Hz=frequency_Hz)
+    waveform = waveform_cls(
+        Kmax=Kmax_Pa_sqrt_m, R=R, frequency_Hz=frequency_Hz,
+        minimum_load_hold_s=minimum_load_hold_s,
+    )
 
     bulk_action_records: list[dict[str, Any]] = []
     original_phase_resolved_action = _rebond.phase_resolved_action
@@ -506,6 +516,7 @@ def run_trajectory(
     events: list[dict[str, Any]] = []
     cumulative_extension_m = 0.0
     cumulative_time_s = 0.0
+    cumulative_cycles = 0.0
     time_at_previous_event_s = 0.0
     censored = False
     censor_reason = None
@@ -534,6 +545,7 @@ def run_trajectory(
                     break
                 result = engine.cycle_step_waveform(ctrl, waveform, T_K_)
                 cumulative_time_s += float(result.get("kinetic_dt_consumed_s", 0.0))
+                cumulative_cycles += float(result.get("cycles_consumed", 0.0))
                 if result.get("fired"):
                     fired_result = result
                     break
@@ -620,6 +632,7 @@ def run_trajectory(
                 "blocks_to_fire": blocks_used,
                 "waiting_time_s_this_event": waiting_time_s,
                 "cumulative_time_s": cumulative_time_s,
+                "cumulative_cycles": cumulative_cycles,
                 "accepted_length_m": float(committed_length),
                 "cumulative_extension_m": cumulative_extension_m,
                 "pre_event_max_pB": pre_event_max_pB,
@@ -683,6 +696,8 @@ def run_trajectory(
         "n_accepted_events": len(events),
         "cumulative_extension_m": cumulative_extension_m,
         "cumulative_time_s": cumulative_time_s,
+        "cumulative_cycles": cumulative_cycles,
+        "minimum_load_hold_s": minimum_load_hold_s,
         "censored": censored,
         "censor_reason": censor_reason,
         "uncensored": uncensored,
