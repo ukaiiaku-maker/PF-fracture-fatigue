@@ -72,24 +72,70 @@ mission section 14, updated after each major milestone.
   `serialize_rebonding_checkpoint` — all call sites that PX1.1's dwell
   segment and PX1.4's localizer-parity generalization must also touch.
 
+- **PX1.1 (committed `f5df106`):** minimum-load dwell, implemented as
+  `FatigueWaveform.minimum_load_hold_s` (a whole-loading-protocol property,
+  not a `CrackRebondingControls` field — see that config's `validate()` for
+  the explicit reasoning; keeping both would have created a disconnected
+  second dwell control). One authoritative schedule
+  (`FatigueWaveform.cycle_schedule`): `n_phase` sinusoidal bins plus one
+  appended constant-`Kmin` dwell bin. `period_s` redefined once to mean the
+  complete protocol cycle, which makes essentially all existing
+  cycle/block-duration bookkeeping hold-aware automatically (no per-site
+  changes needed there); `effective_cycle_frequency_Hz` added, defined to
+  equal `frequency_Hz` exactly (not just numerically) at hold=0. Genuinely
+  phase-resolved machinery (`propagate`/`build_phase_factors` in
+  `crack_rebonding_kinetics_v10230.py`, `phase_resolved_action`/
+  `representative_cycle_K_rebond` in `crack_rebonding_v10230.py`,
+  `_phase_statistics`/`_commit_constant_segment` in
+  `persistent_site_coupled_hazard_v10229.py`) generalized to heterogeneous
+  per-bin durations, with the original uniform/scalar implementations
+  preserved as separate, untouched functions dispatched to whenever
+  `dt_phase` is a scalar — hold=0 takes the byte-identical original code
+  path by construction, not by coincidence. Fixed a real latent bug this
+  surfaced: two `dt_consumed→cycles_consumed` conversions
+  (`persistent_site_cyclic_coupled_v10229.py` — the real production
+  `cycle_step_waveform` override — and the dead `persistent_site_cyclic_
+  v10229.py` copy) used the nominal `frequency_Hz` instead of the effective
+  protocol-cycle frequency; harmless while hold was always 0, silently
+  wrong otherwise. 25 new tests (`test_v10_2_30_crack_rebonding_part_x_
+  minimum_load_hold.py`) cover the mission's exact required battery. Two
+  production files touched beyond PX0's original list
+  (`fatigue_v1.py`, `persistent_site_cyclic_coupled_v10229.py`); their
+  a72d465 preimages recorded in `px1_source_preimage_manifest.json`. Full
+  `crack_rebonding` selection: 221 passed (196 + 25), zero regressions.
+  Both existing verifiers still pass. One initially-written full-trajectory
+  RNG-comparison test was found sensitive to pre-existing global test-order
+  state unrelated to Part X (reproduced only after ~19 other test files ran
+  first; neither RNG reseeding nor bumping the engine-id counter reproduced
+  it in isolation) and was removed rather than chased further — documented
+  in the test file itself.
+
 ## Terminal and pending counts
 
 - Physical trajectories launched: 0 (no physical result directory exists
   yet, per mission section 2's gate — PX2 analytical work must land first).
-- PX1–PX7: not started.
+- PX1.1 done. PX1.2–PX7: not started.
 
 ## Exact next action
 
-Implement PX1.1 (minimum-load dwell): generalize `propagate`/
-`build_phase_factors`/`_partial_product` in `crack_rebonding_kinetics_v10230.py`
-to heterogeneous per-bin duration, construct the appended hold generator
-(`Kmin`, contact-active only when `Kmin<0`), wire into
-`preview_cycle_waveform`'s phase loop, `_commit_constant_segment`'s no-fire
-finalize path, `cycle_step_waveform`'s no-fire finalize path, and
-`solve_coupled_event_time`, then remove the `validate()` rejection and add
-the required test battery (hold=0 bit-identical to a72d465; R>=0 zero
-contact-gated formation during hold; R<0 analytically-expected constant-rate
-formation action; monodromy vs. fine stepping; event localization inside
-hold; block-subdivision invariance; cycle-count/physical-time distinctness;
-emission/energy-gate parity; checkpoint-shape parity) before moving to
-PX1.2–PX1.4.
+PX1.2 (transition-action/flux instrumentation, default-off): for every
+patch and accepted inter-event interval, archive `A_CB/A_BC/A_PC/A_CP`
+(integrated rate actions) and `F_CB/F_BC/F_PC/F_CP` (realized state-weighted
+fluxes), plus contact-duration-in-sinusoid vs. contact-duration-in-dwell
+separately, phase-resolved p_P/p_C/p_B extrema, and the other diagnostics
+mission section 5.2 lists. Since `Q` is constant over each piecewise
+segment (including the new dwell bin), these are obtainable exactly via an
+augmented matrix exponential (stack the state vector with the four
+transition-integral accumulators and exponentiate the augmented generator),
+not endpoint averaging/trapezoids. Must close the state-balance identities
+(`Δp_P=-F_PC+F_CP`, `Δp_C=F_PC-F_CP-F_CB+F_BC`, `Δp_B=F_CB-F_BC`) for every
+patch/interval as its own test. Require instrumentation-on vs.
+instrumentation-off physical parity (a pure diagnostic addition must not
+change `p_by_patch`/`total_action`/`idx`). Then PX1.3 (RB3 passivation
+audit — `patch_Q`'s P↔C↔B generator already exists and is wired for
+`PASSIVATION_GATED_REBOND`; this is audit/test-coverage on existing code,
+not new physics) and PX1.4 (generalize the exact phase-resolved
+event-time evaluator around a common `K_b` shielding provider — dynamic
+rebonding, prescribed-static, and a zero provider that must still bypass to
+the original baseline exactly — to attempt resolving
+`STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED`).
