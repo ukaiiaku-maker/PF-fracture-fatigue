@@ -144,31 +144,70 @@ mission section 14, updated after each major milestone.
   barrier-floor/cooperative-saturation fractions) — straightforward
   additions once a concrete consumer exists.
 
+- **PX1.3 (committed `9397f35`):** RB3 audit — 12 tests through the real
+  engine confirming `patch_Q`'s existing P↔C↔B generator behaves correctly
+  (depassivation live only compressive, repassivation live only tensile,
+  probability conservation, exact zero at K≥0, fresh-surface split,
+  checkpoint/snapshot round-trip, no emission contamination). No source
+  changes — audit only, as anticipated. First attempt clean.
+- **PX1.4 (committed `c0792c9`):** `static_shield_phase_resolved_action` —
+  generalizes exact event localization to a prescribed constant `K_b`.
+  `solve_coupled_event_time` needed zero changes (already fully generic in
+  its `phase_resolved_action_fn` argument). Unlike dynamic rebonding,
+  no state evolves for a constant `K_b`, so this is exact by construction
+  for any span (no periodic-orbit approximation needed at all — one
+  cycle's action is bit-identical every cycle). Validated against an
+  independent fine-stepped reference at a **frozen 1e-6 relative
+  tolerance** across Kmax=15/18/21, K_b=0.45/0.9/1.8, 4 starting phases,
+  partial/single/multi-cycle spans, and firing inside the hold — 120/120
+  passed. Classified `PRESCRIBED_STATIC_EVENT_LOCALIZATION_PARITY_QUALIFIED`
+  **for this new evaluator itself** (`px1_4_static_localizer_parity_
+  finding.json`) — this does NOT retroactively reclassify the already-
+  published static-shield-attribution study, which never used this
+  evaluator; `STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED` remains correct
+  for those published numbers. Production wiring into a live commit path
+  deferred to whichever future study (PX5) needs it.
+
+## PX1 COMPLETE
+
+Final gate: 377 passed (196 pre-existing + 181 new across the four PX1.x
+test files), zero regressions; both existing verifiers still
+`overall_pass=true`; `compileall`/`git diff --check` clean; zero workers;
+worktree clean. Recurring lesson worth restating: **never compare two
+independently-constructed `build_real_engine()` instances against each
+other** in this test suite — reproducibly diverges (sometimes by far more
+than floating-point roundoff) only when run as part of the full selection,
+never in isolation; root cause is pre-existing global/class-level state in
+the shared fixture, unrelated to Part X. Use a single engine's own
+before/after state instead.
+
 ## Terminal and pending counts
 
 - Physical trajectories launched: 0 (no physical result directory exists
   yet, per mission section 2's gate — PX2 analytical work must land first).
-- PX1.1, PX1.2 done. PX1.3–PX7: not started.
+- PX1 (all of PX1.1–PX1.4) done. PX2–PX7: not started.
 
 ## Exact next action
 
-PX1.3 (RB3 passivation audit): `patch_Q`'s P↔C↔B generator already exists
-and is wired for `PASSIVATION_GATED_REBOND` (depassivation/repassivation
-via `depassivation_rate`/`repassivation_rate`, ~lines 174–179) — this is
-audit/test-coverage on existing code, not new physics. Add tests through
-the real A_NATIVE production engine demonstrating live, nonzero,
-correctly-signed P→C depassivation, C→P repassivation, C→B formation, B→C
-rupture; exact probability conservation/nonnegativity; compression-gated
-depassivation; exact zero contact formation at K>=0; repassivation at its
-qualified phase/stress condition; fresh-surface P/C initialization;
-rollback/checkpoint restoration of all three states; no direct
-energy-gate/emission contamination. Then PX1.4: generalize the exact
-phase-resolved event-time evaluator (`solve_coupled_event_time`/
-`phase_resolved_action`) around a common `K_b` shielding provider —
-dynamic rebonding, prescribed-static, and a zero provider that must still
-bypass to the original baseline exactly — to attempt resolving
-`STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED` per mission section 5.4's
-frozen tolerance protocol. PX1 completion (section 5.5) then requires one
-more full run of: all new focused tests, full `crack_rebonding` selection,
-both existing verifiers, `py_compile`/`compileall`, `git diff --check` —
-before PX2 (kinetic-regime analytical design) may begin.
+PX2 (kinetic-regime analytical design and prospective freeze, mission
+section 6): using ONLY the existing analytical phase-resolved P/C/B model
+(`crack_rebonding_kinetics_v10230.solve_reference_action_barriers`/
+`freeze_reference_action_preset`/`REFERENCE_ACTION_PRESETS`) — never
+fitting to da/dN or a desired Paris slope — construct and freeze four
+kinetic rows at the reference state (A_NATIVE, 300K, Kmax=18, R=-0.5,
+f=1000Hz, hold=0, K_rebond,max=0.9): SAT_EXISTING (unchanged), COMPETING_
+REVERSIBLE (genuine formation/rupture competition per section 6.2's exact
+quantitative gates), COMPETING_PERSISTENT (materially reduced rupture
+relative to COMPETING_REVERSIBLE — **do not reuse causal_pilot_v2's old
+presets**, see PX0's finding above), PASSIVATION_LIMITED (fresh-surface
+P/C partition and depassivation/repassivation chosen from existing config
+bounds, never from crack-growth results). Then evaluate the analytical
+atlas across the full Kmax×R×frequency×hold×chemistry×cohesive-strength
+grid section 6.5 specifies, and commit `kinetic_regime_registry.{csv,json}`/
+`analytical_phase_atlas.{csv,parquet}`/`analytical_regime_selection.json`/
+`physical_screen_predictions.json`/`screen_job_registry.csv`/
+`developed_job_registry.csv`/`prospective_classification_gates.json` as
+PX2 — all before any physical result directory may exist. If no
+COMPETING_REVERSIBLE or PASSIVATION_LIMITED row can be constructed within
+existing validated bounds, stop with `NONSATURATED_REBONDING_REGIME_NOT_
+CONSTRUCTED` and report the failed constraints rather than forcing a row.
