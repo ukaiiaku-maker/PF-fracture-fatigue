@@ -81,6 +81,13 @@ def main():
         "## Clean parents and actual companion mechanics", "",
         "| Case | First accepted endpoint (s) | Opening (µm) | Companion check | Exact pair admissible |",
         "|---|---:|---:|---|---|"]
+    all_surface = [s for r in summary["cases"] for s in r.get("sensitivity_surface", [])]
+    if all_surface:
+        maximum = max(row["P_committed"] for row in all_surface)
+        intro = ["## Physical result", "",
+            f"All {len(summary['cases'])} clean-parent checks completed. The largest committed-branch probability across {len(all_surface)} analytic case/parameter evaluations is **{maximum:.8g}**. No physical short ensemble was launched.", "",
+            "The stop decision follows from the analytic surface, independently of the eight reference random marks. Exact two-arm mechanical acceptance does not imply appreciable companion-embryo probability.", ""]
+        lines[8:8] = intro
     for r in summary["cases"]:
         p = r.get("clean_parent_record", {})
         candidates = r.get("companions", [])
@@ -112,6 +119,11 @@ def main():
             fmt = lambda value: "unevaluated" if value is None else f"{value:.8g}"
             lines.append(f"| {result['case']} | {observation.get('reason', observation['status'])} | {fmt(raw)} | {fmt(None if barrier is None else barrier/1.602176634e-19)} | {fmt(margin)} | {ranges[0]} | {ranges[1]} |")
     lines += ["", "The full JSON records retain candidate identities, tensor probes, process-state fingerprints, costs, exact fallback identities, and every preregistered grid point. A range spans the entire sensitivity grid and is not a fitted or calibrated uncertainty interval.", ""]
+    lines += ["## Interpretation and limits", "",
+        "The opportunity range is beta_B = 10⁻⁶ to 1 with tau_c = 1 µs. All eight raw multihit orders are three. Even with zero added junction/overlap barriers and the longest tested opportunity, raw arrival × tau_c is only approximately 0.000517–0.006455. Three arrivals within that opportunity are therefore very unlikely. Nonnegative branch-only barriers can only reduce this probability. No exposure range or barrier was changed after seeing the result.", "",
+        "All eight accepted parent radii equal the 1 µm reference radius, and the frozen shielding/blunting attribution does not demonstrate the preregistered 5% raw-rate effect. This is a statement about these first-cleavage snapshots, not a proof that the continuous-emission process has no effect on the preceding parent history or on later growth. Material/temperature differences in small raw probabilities exist, but do not establish the required nondegenerate physical branching regime.", "",
+        "The deterministic pair adapter accepted real PF FEM states in all eight cases. All eight preregistered stochastic reference marks retained the exact single-arm result; a positive stochastic pair commitment and subsequent owner-transition trajectory have not been demonstrated here. No mark seed search or forced physical branch was performed.", "",
+        "Focused capture, companion-contract, topology, clock and checkpoint checks: 35 passed. Compileall and git diff --check passed. The accepted initial sampler qualification was not repeated; no new full-suite/Monte Carlo claim is made.", ""]
     (args.root/"V13_PHYSICAL_COMPANION_QUALIFICATION.md").write_text("\n".join(lines))
     print(gate["status"], gate["reasons"])
 
