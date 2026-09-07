@@ -195,6 +195,7 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
             "traction_diagnostic_cavity_perimeter_m": result.cavity_perimeter_m,
             "cavity_edge_traction_records": [dict(row) for row in result.cavity_edge_traction_records],
             "hoop_stress_concentration": result.hoop_stress_concentration,
+            "crack_tip_sigma_yy_Pa": result.crack_tip_sigma_yy_Pa,
             "symmetry_error": result.symmetry_error,
             "cavity_area_m2": area,
             "cavity_perimeter_m": perimeter,
