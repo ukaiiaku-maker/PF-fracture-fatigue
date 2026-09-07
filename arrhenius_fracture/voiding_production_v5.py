@@ -1041,6 +1041,13 @@ def _cavity_resolution_binding(state):
                   state.rho_gp, state.damage, state.elasticity_D):
         array = np.ascontiguousarray(value)
         digest.update(str((array.shape, array.dtype.str)).encode()); digest.update(array.tobytes())
+    p0 = getattr(state.mesh,"element_damage_gp",None)
+    if p0 is None:
+        digest.update(b"element_damage_gp:None")
+    else:
+        array = np.ascontiguousarray(p0)
+        digest.update(b"element_damage_gp:")
+        digest.update(str((array.shape,array.dtype.str)).encode());digest.update(array.tobytes())
     cavity = state.void_state.cavities[0]
     digest.update(repr((cavity.cavity_id,cavity.center_m,cavity.radius_m,cavity.connection_exit_m,
         state.crack_network.geometry_generation,tuple((c.candidate_id,c.direction_xy,c.normal_xy)
@@ -1061,8 +1068,10 @@ def _qualified_cavity_source(state, tensor):
         or not all(key in proof for key in ("current_metrics","previous_metrics","previous_binding"))): return False
     current = proof["current_metrics"]; reference = proof["previous_metrics"]
     capture = proof.get("previous_source_capture")
-    if not capture: return False
-    previous_state = replace(state, mesh=rebuild_tri_mesh(capture["nodes"], capture["elements"]),
+    if not capture or "element_damage_gp" not in capture: return False
+    previous_mesh = replace(rebuild_tri_mesh(capture["nodes"], capture["elements"]),
+        element_damage_gp=capture["element_damage_gp"])
+    previous_state = replace(state, mesh=previous_mesh,
         boundary=capture["boundary"],
         displacement=capture["displacement"], damage=capture["damage"],
         ep_gp=capture["ep_gp"], rho_gp=capture["rho_gp"],
@@ -1194,6 +1203,7 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
             "previous_binding":_cavity_resolution_binding(current),"current_binding":_cavity_resolution_binding(trial)}
         proof["previous_source_capture"] = {"nodes":current.mesh.nodes,"elements":current.mesh.elems,
             "boundary":current.boundary,
+            "element_damage_gp":getattr(current.mesh,"element_damage_gp",None),
             "displacement":current.displacement,"damage":current.damage,"ep_gp":current.ep_gp,
             "rho_gp":current.rho_gp,"energy_ledgers":dict(current.energy_ledgers)}
         trial = replace(trial,junction_process_state={**trial.junction_process_state,
@@ -1203,6 +1213,42 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
             if key != "previous_source_capture"},"qualified":passed})
         if passed:
             inject("source_qualification",trial)
+            rates = {row["candidate_id"]:row for row in directional_clock_rates(trial,metrics["tensor_Pa"])}
+            source_candidates = trial.junction_process_state.get("active_event_source",{}).get("candidate_source_states",())
+            candidates = {item.candidate_id:item for item in trial.competition.candidates}
+            hazards = {item.candidate_id:item for item in trial.competition.hazard_states}
+            if len(source_candidates) != len(candidates) or {row["candidate_id"] for row in source_candidates} != set(candidates):
+                raise RuntimeError("source refinement changed candidate inventory")
+            for row in source_candidates:
+                owned = candidates[row["candidate_id"]]; clock = hazards[row["candidate_id"]]
+                if (tuple(row["direction_xy"]) != tuple(owned.direction_xy)
+                    or tuple(row["normal_xy"]) != tuple(owned.normal_xy)
+                    or tuple(row["tangent_xy"]) != tuple(owned.direction_xy)
+                    or row["threshold_identity"]["threshold_action"] != clock.current_threshold_action
+                    or row["threshold_identity"]["threshold_seed"] != clock.threshold_seed
+                    or row["rng_provenance"]["global_hazard_seed"] != trial.competition.global_hazard_seed):
+                    raise RuntimeError("source refinement candidate geometry/threshold/RNG provenance mismatch")
+                if (row.get("source_cavity_id",cavity.cavity_id) != cavity.cavity_id
+                    or row.get("source_boundary_site_id","connection_exit") != "connection_exit"
+                    or math.dist(row.get("source_position_m",cavity.connection_exit_m),cavity.connection_exit_m)>1e-12):
+                    raise RuntimeError("source refinement candidate boundary-site identity mismatch")
+            candidate_probe = {"kind":"direct_cavity_boundary_tensor",
+                "boundary_node_id":metrics["boundary_node_id"],"element_ids":metrics["probe_element_ids"]}
+            candidate_rows = tuple({**row,
+                "source_kind":"cavity_surface","source_cavity_id":cavity.cavity_id,
+                "source_boundary_site_id":"connection_exit","source_position_m":list(cavity.connection_exit_m),
+                "source_geometry_generation":int(trial.crack_network.geometry_generation),
+                "source_mesh_generation":int(trial.event_counters.get("mesh_generation",0)),
+                "source_tensor_fingerprint":_tensor_fingerprint(metrics["tensor_Pa"]),
+                "source_probe_identity":candidate_probe,
+                "geometry_status":"GEOMETRICALLY_VALID_KINETICALLY_ACTIVE" if rates[row["candidate_id"]]["effective_rate_s"] > 0
+                    else "GEOMETRICALLY_VALID_KINETICALLY_DORMANT",
+                "instantaneous_status":"POSITIVE_DOWNSTREAM_DRIVE" if rates[row["candidate_id"]]["effective_rate_s"] > 0
+                    else "ZERO_DOWNSTREAM_DRIVE",
+                "effective_rate_s":rates[row["candidate_id"]]["effective_rate_s"],
+                "crossing_time_s":rates[row["candidate_id"]]["crossing_time_s"],
+                "resolved_opening_stress_Pa":rates[row["candidate_id"]]["resolved_opening_stress_Pa"]}
+                for row in source_candidates)
             source = {**trial.junction_process_state.get("active_event_source",{}),
                 **_source_identity(trial,metrics["tensor_Pa"],source_kind="cavity_surface",
                     source_cavity_id=cavity.cavity_id,source_boundary_site_id="connection_exit",
@@ -1210,7 +1256,8 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
                     source_probe_identity={"kind":"direct_cavity_boundary_tensor",
                         "boundary_node_id":metrics["boundary_node_id"],
                         "element_ids":metrics["probe_element_ids"]}),
-                "source_mesh_generation":trial.event_counters.get("mesh_generation",0)}
+                "source_mesh_generation":trial.event_counters.get("mesh_generation",0),
+                "candidate_source_states":candidate_rows}
             trial = replace(trial,junction_process_state={**trial.junction_process_state,
                 "active_event_source":source})
             return trial,{"status":"SOURCE_TENSOR_QUALIFIED","attempts":rows,"operations":operations}
@@ -1526,17 +1573,24 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
         endpoints[surface_candidate.candidate_id] = list(map(float, endpoint))
         candidate_rows.append({
             "candidate_id": surface_candidate.candidate_id,
+            "source_kind":"cavity_surface","source_cavity_id":cavity.cavity_id,
+            "source_boundary_site_id":"connection_exit","source_position_m":list(cavity.connection_exit_m),
+            "source_geometry_generation":int(result_state.crack_network.geometry_generation),
+            "source_mesh_generation":int(result_state.event_counters.get("mesh_generation",0)),
+            "source_tensor_fingerprint":_tensor_fingerprint(surface_tensor),
+            "source_probe_identity":{"kind":"direct_cavity_boundary_tensor",
+                "boundary_node_id":exit_node,"element_ids":list(boundary_elements)},
             "direction_xy": list(surface_candidate.direction_xy),
             "normal_xy": list(surface_candidate.normal_xy),
             "tangent_xy": list(surface_candidate.direction_xy),
             "planned_endpoint_m": endpoints[surface_candidate.candidate_id],
             "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_DORMANT"
-                               if opening <= 0.0 else "GEOMETRICALLY_VALID_KINETICALLY_ACTIVE",
+                               if opening <= 0.0 else "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
             "instantaneous_status": "ZERO_DOWNSTREAM_DRIVE"
-                                    if opening <= 0.0 else "POSITIVE_DOWNSTREAM_DRIVE",
+                                    if opening <= 0.0 else "SOURCE_TENSOR_UNQUALIFIED",
             "resolved_opening_stress_Pa": opening,
-            "effective_rate_s": 0.0 if opening <= 0.0 else None,
-            "crossing_time_s": "infinity" if opening <= 0.0 else None,
+            "effective_rate_s": 0.0,
+            "crossing_time_s": "infinity",
         })
     candidate_inventory = tuple(candidate for candidate in candidate_inventory
                                 if candidate.candidate_id in endpoints)
@@ -1551,6 +1605,7 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
                                "element_ids": list(boundary_elements)},
     )
     surface_source["candidate_source_states"] = tuple(candidate_rows)
+    surface_source["source_mesh_generation"] = int(result_state.event_counters.get("mesh_generation",0))
     surface_source["next_candidate_endpoints_m"] = endpoints
     transitioned = _transition_competition_source(
         result_state, surface_source, candidates=candidate_inventory,

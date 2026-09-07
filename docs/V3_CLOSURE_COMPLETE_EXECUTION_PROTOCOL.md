@@ -7,6 +7,20 @@ An implementation or evidence-ontology PASS is not scientific qualification.
 
 Before new attesting execution, this protocol freezes:
 
+The replacement controlled healing predecessor uses stochastic seed 12010,
+selected from the exploratory 32-seed run because its actual competing clocks
+reach healing first. Two real birth hits precede a -0.4 micrometre compressive
+reload at 900 K. This selection is a named controlled positive peer, not an
+unbiased ensemble result or a repaired result for the old deterministic input.
+The old failed deterministic healing cases remain historical. No rate or
+threshold is replaced; all 32 natural seeds remain in the ensemble unfiltered.
+
+The exploratory 16-microsecond run exposed nine seed/partition inventory
+failures from separately adding and subtracting the same floating-point area
+transfer. The replacement implementation computes the available account as the
+complement of consumed inventory in the accepted total. The transfer, growth
+law and frozen 1e-24 square-metre tolerance are unchanged.
+
 - 45 physical transition attempts (nine named stages, partitions 1/2/4/8/16).
 - All 11 registered restart stages, with actual subsequent-operation equality.
   The terminal requires accepted child-tip continuation, not merely child birth.

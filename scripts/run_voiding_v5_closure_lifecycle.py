@@ -13,7 +13,7 @@ ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT))
 from arrhenius_fracture.closure_lifecycle_evidence import (
     SCHEMA, PARTITIONS, PRECURSORS, CFG, advance_transition, resume_to_guard,
     conservation, transition_occurred, load_state, validate_lifecycle,
-    lifecycle_decision,stagewise_topology,
+    lifecycle_decision,stagewise_topology,natural_terminal_measurements,build_healing_predecessor,CONTROLLED_HEALING_SEED,
 )
 from arrhenius_fracture.closure_mechanics_evidence import canonical_data
 from arrhenius_fracture.finalization_v3_schema import FROZEN_CASE_REGISTRY, canonical_hash
@@ -49,6 +49,7 @@ def main():
     rows=[]; trace=[]
     terminal,trajectory_history=deterministic_trajectory(state_trace=trace)
     captured=dict(trace); available=captured["available_site"]
+    captured['healing_peer'],healing_preparation=build_healing_predecessor()
     def checkpoint(state):
         relative="checkpoints/"+fingerprint(state)+".json"
         if not (out/relative).exists(): write_checkpoint(state,out/relative)
@@ -77,7 +78,9 @@ def main():
             try: after,_=advance_transition(before,name,partitions,operations=operations)
             except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
             record("transitions",name,initial_capture,after,{"partition_count":partitions,"requested_predecessor":precursor,
-                "predecessor_available":precursor in captured,"fixed_opening_m":4e-7,"seed":3621},operations,
+                "predecessor_available":precursor in captured,"fixed_opening_m":-4e-7 if name=='healing' else 4e-7,
+                "seed":CONTROLLED_HEALING_SEED if name=='healing' else 3621},operations,
+                predecessor_preparation_operations=healing_preparation if name=='healing' else [],
                 transition_occurred=transition_occurred(name,initial_capture,after),failure=error)
     # Each restart continues, not just one step, to the attainable blocked
     # terminal. That reproduction is separate from the required continued-front gate.
@@ -128,10 +131,13 @@ def main():
             path=((0.,float(tip[1]-tip[0]*direction[1]/direction[0])),tuple(map(float,tip)))
         try:
             angle=30. if case=="fixed_mesh_oblique" else 0.
-            before,_=deterministic_trajectory(stop_before_ligament=True,cavity_center_m=center,
-                crack_path_m=path,cleavage_theta_deg=angle,state_trace=local_trace)
+            if case!='embryo_healing':
+                before,_=deterministic_trajectory(stop_before_ligament=True,cavity_center_m=center,
+                    crack_path_m=path,cleavage_theta_deg=angle,state_trace=local_trace)
             if case=="embryo_healing":
-                before=dict(local_trace)["multi_hit_2"]; before=load_state(before,opening)
+                before,preparation=build_healing_predecessor();ops.extend(preparation)
+                path=before.crack_network.branches[0].path
+                local_trace.append(('stochastic_healing_predecessor',before))
                 after,_=advance_transition(before,"healing",1,operations=ops)
             elif case in ("diffusion_limited","accommodation_limited"):
                 before=load_state(dict(local_trace)["subgrid_void"],opening); after=before
@@ -160,7 +166,14 @@ def main():
                 else: after=resume_to_guard(after,ops)
         except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
         record("controlled",case,before,after,{"center_m":center,"loading_opening_m":opening,
-            "fixed_crack_path_m":path,"history_kind":case},ops,
+            "fixed_crack_path_m":path,"history_kind":case,'cleavage_theta_deg':angle,
+            'seed':CONTROLLED_HEALING_SEED if case=='embryo_healing' else 3621,
+            'remesh_boundary_segments':64 if case=='local_remesh_refinement' else 32,
+            'remesh_radial_layers':24 if case=='local_remesh_refinement' else 12,
+            'accepted_opening_history_m':([4e-7,0.,opening] if case=='delayed_downstream'
+                else [4e-7,0.] if case=='downstream_zero_drive' else [4e-7,opening]),
+            'growth_interval_count':8 if case in ('diffusion_limited','accommodation_limited') else None,
+            'growth_interval_duration_s':1e-10 if case in ('diffusion_limited','accommodation_limited') else None},ops,
             actual_preparation_stages=[name for name,_ in local_trace],
             actual_preparation_checkpoints={name:checkpoint(state) for name,state in local_trace},failure=error)
     for case in FROZEN_CASE_REGISTRY["neutrality"]:
@@ -210,6 +223,7 @@ def main():
                 "duration_s":NATURAL_WINDOW_S,'opening_m':4e-7,'temperature_K':900.,
                 'driver':'advance_production_void_interval','restart_time_s':NATURAL_WINDOW_S/2},ops,
                 elapsed_physical_time_s=elapsed,failure=failure,replay_failure=replay_failure,
+                terminal_measurements=natural_terminal_measurements(after),
                 terminal_classification=phase.value,restarted_operations=replay_ops,
                 midpoint_restart_exact=fingerprint(after)==fingerprint(replay),
                 restarted_terminal_checkpoint=checkpoint(replay))

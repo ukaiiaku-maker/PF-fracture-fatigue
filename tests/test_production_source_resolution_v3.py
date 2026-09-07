@@ -33,6 +33,28 @@ def test_accepted_ligament_survives_unqualified_source_without_child(connected):
     assert audit["status"] == "UNQUALIFIED_CAVITY_SOURCE_TENSOR"
 
 
+def test_stored_unqualified_candidate_metadata_matches_zero_effective_kinetics(connected):
+    before=fingerprint(connected)
+    hazards={h.candidate_id:h for h in connected.competition.hazard_states}
+    rows=connected.junction_process_state["active_event_source"]["candidate_source_states"]
+    source=connected.junction_process_state["active_event_source"]
+    assert rows and any(row["resolved_opening_stress_Pa"]>0 for row in rows)
+    for row in rows:
+        positive=row["resolved_opening_stress_Pa"]>0
+        assert row["geometry_status"] == ("GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE" if positive
+            else "GEOMETRICALLY_VALID_KINETICALLY_DORMANT")
+        assert row["instantaneous_status"] == ("SOURCE_TENSOR_UNQUALIFIED" if positive else "ZERO_DOWNSTREAM_DRIVE")
+        assert row["effective_rate_s"]==0 and row["crossing_time_s"]=="infinity"
+        assert row["threshold_identity"]["threshold_action"] == hazards[row["candidate_id"]].current_threshold_action
+        for name in ("source_kind","source_cavity_id","source_boundary_site_id","source_position_m",
+                     "source_geometry_generation","source_tensor_fingerprint","source_probe_identity"):
+            assert row[name]==source[name]
+        assert row["source_mesh_generation"]==connected.event_counters["mesh_generation"]
+    advanced,_,_,_=downstream_front_transaction(connected)
+    assert fingerprint(advanced)==before
+    assert advanced.competition==connected.competition and advanced.rng_state==connected.rng_state
+
+
 def test_ligament_retires_arriving_front_before_first_support_rebuild():
     from arrhenius_fracture.voiding_production_v5 import ligament_transaction
     pre, _ = deterministic_trajectory(stop_before_ligament=True)
@@ -195,3 +217,40 @@ def test_bounded_quality_flip_preserves_nodes_boundary_and_protected_crack_edge(
     protected = SimpleNamespace(mesh=mesh,crack_network=CrackNetworkState.one_tip(((0.,0.),(1.,0.))))
     unchanged, flips = _bounded_quality_edge_flips(protected)
     assert not flips and np.array_equal(unchanged.elems,mesh.elems)
+
+
+def test_source_binding_includes_authoritative_p0_not_just_nodal_visualization(connected):
+    from arrhenius_fracture.voiding_production_v5 import _cavity_resolution_binding
+    before = _cavity_resolution_binding(connected)
+    p0 = np.asarray(connected.mesh.element_damage_gp).copy()
+    assert p0.shape == (connected.mesh.ne,)
+    p0[0] = 1.-p0[0]
+    tampered = replace(connected,mesh=replace(connected.mesh,element_damage_gp=p0))
+    assert np.array_equal(tampered.damage,connected.damage)
+    assert _cavity_resolution_binding(tampered) != before
+
+
+def test_source_proof_without_previous_p0_capture_fails_closed(connected):
+    from arrhenius_fracture.voiding_production_v5 import _cavity_resolution_binding,_qualified_cavity_source
+    proof = {"schema":"v12.cavity-source-local-refinement/1","refinement_count":1,
+        "current_binding":_cavity_resolution_binding(connected),
+        "previous_binding":"irrelevant","current_metrics":{},"previous_metrics":{},
+        "previous_source_capture":{"nodes":connected.mesh.nodes,"elements":connected.mesh.elems}}
+    forged = replace(connected,junction_process_state={**connected.junction_process_state,
+        "cavity_source_resolution_proof":proof})
+    assert not _qualified_cavity_source(forged,np.eye(2)*1e9)
+
+
+def test_tampered_reference_p0_capture_cannot_authorize_source(connected):
+    from arrhenius_fracture.voiding_production_v5 import _cavity_resolution_binding,_qualified_cavity_source
+    p0=np.asarray(connected.mesh.element_damage_gp).copy();p0[0]=1.-p0[0]
+    capture={"nodes":connected.mesh.nodes,"elements":connected.mesh.elems,"boundary":connected.boundary,
+        "element_damage_gp":p0,"displacement":connected.displacement,"damage":connected.damage,
+        "ep_gp":connected.ep_gp,"rho_gp":connected.rho_gp,"energy_ledgers":connected.energy_ledgers}
+    proof={"schema":"v12.cavity-source-local-refinement/1","refinement_count":1,
+        "current_binding":_cavity_resolution_binding(connected),
+        "previous_binding":_cavity_resolution_binding(connected),"current_metrics":{},"previous_metrics":{},
+        "previous_source_capture":capture}
+    forged=replace(connected,junction_process_state={**connected.junction_process_state,
+        "cavity_source_resolution_proof":proof})
+    assert not _qualified_cavity_source(forged,np.eye(2)*1e9)

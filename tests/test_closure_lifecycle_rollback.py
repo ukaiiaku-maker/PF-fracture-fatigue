@@ -87,3 +87,16 @@ def test_checkpoint_write_failure_preserves_prior_manifest_payload_and_accepted_
     assert target.read_bytes()==manifest_bytes and payload.read_bytes()==payload_bytes
     assert fingerprint(restore_checkpoint(target))==fingerprint(before)
     assert fingerprint(trial)==identity
+
+
+@pytest.mark.parametrize('partitions',[1,2,4,8,16])
+def test_frozen_stochastic_healing_peer_uses_actual_competing_rates(partitions):
+    from arrhenius_fracture.closure_lifecycle_evidence import build_healing_predecessor,advance_transition
+    before,_=build_healing_predecessor()
+    assert before.void_state.sites[0].phase==VoidPhase.EMBRYO
+    threshold=before.void_state.sites[0].healing.threshold
+    after,operations=advance_transition(before,'healing',partitions)
+    assert after.void_state.sites[0].phase==VoidPhase.HEALED_SITE
+    assert after.void_state.sites[0].healing.threshold==threshold
+    assert len(operations)==partitions
+    assert [event for op in operations for event in op['events']]==['HEALED']

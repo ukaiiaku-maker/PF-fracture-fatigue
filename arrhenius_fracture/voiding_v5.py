@@ -326,6 +326,8 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
     never become negative.
     """
     cavity = next(item for item in state.cavities if item.cavity_id == cavity_id)
+    owned_total=math.fsum((state.available_defect_inventory_area_m2,
+                          state.consumed_defect_inventory_area_m2))
     grown = grow_cavity_from_rate(
         cavity, rates=rates, dt_s=dt_s,
         radial_growth_scale_m=radial_growth_scale_m,
@@ -338,7 +340,6 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
     if failure_injector is not None:
         failure_injector("state_owned_growth",replace_cavity(state,grown))
     if delta_area >= 0.0:
-        available = state.available_defect_inventory_area_m2 - delta_area
         consumed = state.consumed_defect_inventory_area_m2 + delta_area
     else:
         returned = min(-delta_area, state.consumed_defect_inventory_area_m2)
@@ -348,8 +349,11 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
             grown = replace(grown, radius_m=math.sqrt(target_area / math.pi),
                             area_m2=target_area,
                             inventory_area_m2=cavity.inventory_area_m2 - returned)
-        available = state.available_defect_inventory_area_m2 + returned
         consumed = state.consumed_defect_inventory_area_m2 - returned
+    # Compute the complementary account once. Independently adding and
+    # subtracting the same transfer let repeated partitions drift by an ULP
+    # beyond the frozen inventory tolerance; no physical transfer is changed.
+    available=owned_total-consumed
     result = replace(
         replace_cavity(state, grown),
         available_defect_inventory_area_m2=max(float(available), 0.0),

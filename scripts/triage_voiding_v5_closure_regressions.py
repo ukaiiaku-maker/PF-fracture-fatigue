@@ -19,7 +19,7 @@ def tests(path):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('initial',type=Path)
-    parser.add_argument('--rerun',type=Path);args=parser.parse_args()
+    parser.add_argument('--rerun',type=Path);parser.add_argument('--output',type=Path);args=parser.parse_args()
     baseline=json.loads((ROOT/'artifacts/voiding_v5_semantic_hardening/general_ci_inheritance.json').read_text())
     inherited=set(baseline['base']['failure_ids']);initial=tests(args.initial)
     rerun={} if args.rerun is None else tests(args.rerun)
@@ -38,7 +38,12 @@ def main():
         'policy_c_expectation_count':sum(r['test_node_id'] not in inherited for r in rows),
         'rows':rows,'repository_wide_ci':'NOT_GREEN' if any(t['status']=='FAIL' for t in rerun.values()) or not rerun else 'GREEN',
         'rerun_additional_failures':[identity for identity,t in rerun.items() if t['status']=='FAIL' and identity not in {r['test_node_id'] for r in rows}]}
-    print(json.dumps(result,indent=2,sort_keys=True))
+    encoded=json.dumps(result,indent=2,sort_keys=True)
+    if args.output is not None:
+        args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(encoded+'\n')
+        print(json.dumps({key:result[key] for key in ('initial_failures','inherited_failure_count',
+            'policy_c_expectation_count','repository_wide_ci','rerun_additional_failures')}))
+    else: print(encoded)
 
 
 if __name__=='__main__':main()

@@ -2,6 +2,7 @@ from arrhenius_fracture.voiding_production_v5 import build_production_void_state
 from arrhenius_fracture.voiding_lifecycle_driver_v5 import advance_production_void_interval,NATURAL_WINDOW_S
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint as fingerprint
 from arrhenius_fracture.checkpoint_v11 import write_checkpoint,restore_checkpoint
+import pytest
 
 
 def test_physical_window_exercises_owned_birth_growth_and_real_promotion_without_mutating_input():
@@ -26,3 +27,14 @@ def test_real_window_midpoint_restart_reproduces_complete_state_and_operations(t
     replay,replay_operations,replay_result=advance_production_void_interval(restored,NATURAL_WINDOW_S/2)
     assert fingerprint(after)==fingerprint(replay)
     assert operations==replay_operations and result==replay_result
+
+
+@pytest.mark.parametrize('seed',[12004,12023,12029])
+def test_repeated_physical_growth_preserves_frozen_inventory_tolerance(seed):
+    from arrhenius_fracture.closure_lifecycle_evidence import conservation
+    before,_=build_production_void_state(stochastic=True,seed=seed)
+    state=before
+    for _ in range(32):
+        state,_,result=advance_production_void_interval(state,NATURAL_WINDOW_S/32)
+        assert result['failure'] is None
+        assert conservation(state,before)['passed']

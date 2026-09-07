@@ -27,11 +27,44 @@ SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/3"
 PARTITIONS = (1,2,4,8,16)
 CFG = VoidingConfig(enabled=True, promotion_radius_m=5e-5)
 PRECURSORS = {"birth_hit_1": "available_site", "birth_hit_2": "multi_hit_1",
-              "stabilization": "multi_hit_2", "healing": "multi_hit_2",
+              "stabilization": "multi_hit_2", "healing": "healing_peer",
               "subgrid_growth": "subgrid_void", "promotion": "subgrid_growth",
               "ligament": "resolved_growth", "downstream_child": "ligament_rupture",
               "child_continuation": "new_graph_front"}
 _TOPOLOGY_MEASUREMENTS = {}
+CONTROLLED_HEALING_SEED=12010
+
+
+def build_healing_predecessor():
+    from .voiding_production_v5 import build_production_void_state
+    state,_=build_production_void_state(stochastic=True,seed=CONTROLLED_HEALING_SEED)
+    ops=[]
+    for stage in ('birth_hit_1','birth_hit_2'):
+        state,_=advance_transition(state,stage,1,operations=ops)
+    state=load_state(state,-4e-7)
+    ops.append({'api':'accepted_compressive_reload','opening_m':-4e-7,'seed':CONTROLLED_HEALING_SEED})
+    return state,ops
+
+
+def natural_terminal_measurements(state):
+    """Decode the actual accepted seed state, never infer events from rates."""
+    from .closure_mechanics_evidence import canonical_data
+    voids=state.void_state;site=voids.sites[0]
+    clocks={name:{'integrated_hazard':getattr(site,name).accumulated,
+        'threshold':getattr(site,name).threshold,
+        'threshold_margin':getattr(site,name).threshold-getattr(site,name).accumulated}
+        for name in ('birth','stabilization','healing')}
+    return {'site_id':site.site_id,'site_phase':site.phase.value,'birth_hit_count':site.hits,
+        'clocks':clocks,'void_rng_identity':canonical_hash(dict(voids.rng_state)),
+        'global_rng_identity':canonical_hash(canonical_data(state.rng_state)),
+        'event_history':list(voids.event_history),'cavity_count':len(voids.cavities),
+        'cavities':[{'cavity_id':c.cavity_id,'radius_m':c.radius_m,'phase':c.phase.value,
+            'geometry_generation':c.geometry_generation,'entry_m':c.connection_entry_m,'exit_m':c.connection_exit_m}
+            for c in voids.cavities],
+        'active_tip_ids':list(state.crack_network.active_tip_ids),
+        'accepted_topology_actions':state.event_counters.get('topology_actions',0),
+        'directional_event_provenance':state.junction_process_state.get('directional_event_provenance',{}),
+        'length_ledgers':dict(voids.length_ledgers)}
 
 
 def load_state(state, opening_m):
@@ -311,6 +344,9 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
             if row['subsequent_history_exact'] != (row['actual_operations']==row['restarted_operations']):
                 raise ValueError('subsequent restart history mismatch')
         if row["dataset"] == "natural":
+            from .closure_mechanics_evidence import canonical_data
+            if row['terminal_measurements']!=canonical_data(natural_terminal_measurements(after)):
+                raise ValueError('natural seed terminal measurements do not match accepted state')
             restarted=sources[row["restarted_terminal_checkpoint"]]
             if row["midpoint_restart_exact"] != (fingerprint(after)==fingerprint(restarted)):
                 raise ValueError("natural restart mismatch")

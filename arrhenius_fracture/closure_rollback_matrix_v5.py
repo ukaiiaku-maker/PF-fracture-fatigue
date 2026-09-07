@@ -1,6 +1,6 @@
 """Frozen real-stage rollback attempts; unreached injections are failures."""
 from dataclasses import replace
-from .closure_lifecycle_evidence import CFG,load_state,advance_transition
+from .closure_lifecycle_evidence import CFG,load_state,advance_transition,build_healing_predecessor
 from .voiding_v5 import advance_site,arrhenius_rates,create_subgrid_cavity,update_cavity_growth,promote_cavity
 from .voiding_production_v5 import (
     local_site_tensor,_geometry,_grow_hole_boundary,remesh_cavity,ligament_transaction,
@@ -30,7 +30,7 @@ def rollback_attempts(captured,terminal,checkpoint_path):
                 label={'first_hit_threshold_renewal':'available_site','second_hit_embryo_transition':'multi_hit_1',
                     'stabilization':'multi_hit_2','healing':'multi_hit_2'}[stage]
                 before=captured[label]
-                if stage=='healing': before=load_state(before,-4e-7)
+                if stage=='healing': before,preparation=build_healing_predecessor();ops.extend(preparation)
                 rates=arrhenius_rates(CFG,temperature_K=900.,stress_tensor_Pa=local_site_tensor(before))
                 site=before.void_state.sites[0]
                 if stage in ROLLBACK_STAGES[:2]: duration=site.birth.crossing_time(rates['birth_s']*site.candidate_weight)
