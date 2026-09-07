@@ -67,6 +67,20 @@ def _components(edges: np.ndarray) -> list[np.ndarray]:
     return out
 
 
+def cavity_edge_traction_geometry(a, b, cavity_interior_point, stress_tensor):
+    """Return orientation-independent edge geometry and analytic traction."""
+    a=np.asarray(a,float); b=np.asarray(b,float); center=np.asarray(cavity_interior_point,float)
+    edge=b-a; length=float(np.linalg.norm(edge))
+    if not length>0.0: raise ValueError("cavity edge must have positive length")
+    tangent=edge/length; normal=np.array((tangent[1],-tangent[0])); midpoint=.5*(a+b); radial=midpoint-center
+    if float(normal@radial)<0.0: normal=-normal
+    radial_unit=radial/max(float(np.linalg.norm(radial)),1e-300)
+    traction=np.asarray(stress_tensor,float)@normal
+    return {"edge_tangent":tangent,"outward_normal":normal,"edge_length_m":length,
+            "center_radial_consistency":float(normal@radial_unit),"traction":traction,
+            "normal_traction":float(traction@normal),"tangential_traction":float(traction@tangent)}
+
+
 @dataclass(frozen=True)
 class HoleMesh:
     mesh: TriMesh
@@ -406,6 +420,12 @@ class StaticFEMResult:
     traction_tangential_l2_normalized: float = math.nan
     traction_resultant_normalized: tuple[float, float] = (math.nan, math.nan)
     traction_moment_normalized: float = math.nan
+    traction_l2_dimensional_Pa_sqrt_m: float = math.nan
+    traction_normal_l2_dimensional_Pa_sqrt_m: float = math.nan
+    traction_tangential_l2_dimensional_Pa_sqrt_m: float = math.nan
+    nominal_remote_stress_Pa: float = math.nan
+    cavity_perimeter_m: float = math.nan
+    cavity_edge_traction_records: tuple[Mapping[str, Any], ...] = ()
 
 
 def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticProperties]=None,
@@ -464,17 +484,24 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
         for edge in (tuple(sorted((elem[0],elem[1]))),tuple(sorted((elem[1],elem[2]))),tuple(sorted((elem[2],elem[0])))):
             edge_to_elem.setdefault(edge,[]).append(ei)
     t2=0.0; tn2=0.0; tt2=0.0; resultant=np.zeros(2); moment=0.0
-    hoop=[]; weighted=[]; perimeter=0.0
+    hoop=[]; weighted=[]; perimeter=0.0; edge_records=[]
     c=np.asarray(hole.center_m)
     for a,b in hole.cavity_edges:
-        xy=mesh.nodes[[a,b]]; midpoint=xy.mean(axis=0); normal=(midpoint-c); normal/=np.linalg.norm(normal)
-        tangent=np.array([-normal[1],normal[0]]); length=float(np.linalg.norm(xy[1]-xy[0])); perimeter+=length
+        xy=mesh.nodes[[a,b]]; midpoint=xy.mean(axis=0)
         ei=edge_to_elem[tuple(sorted((int(a),int(b))))][0]
         S=np.array([[sigma[0,ei],sigma[2,ei]],[sigma[2,ei],sigma[1,ei]]])
-        traction=S@normal; normal_component=float(traction@normal); tangential_component=float(traction@tangent)
+        geometry=cavity_edge_traction_geometry(xy[0],xy[1],c,S)
+        tangent=geometry["edge_tangent"]; normal=geometry["outward_normal"]
+        length=geometry["edge_length_m"]; perimeter+=length
+        traction=geometry["traction"]; normal_component=geometry["normal_traction"]; tangential_component=geometry["tangential_traction"]
         t2+=float(traction@traction)*length; tn2+=normal_component**2*length; tt2+=tangential_component**2*length
         force=traction*length; resultant+=force
         arm=midpoint-c; moment+=float(arm[0]*force[1]-arm[1]*force[0])
+        edge_records.append({"edge_node_ids":(int(a),int(b)),"edge_endpoints_m":tuple(map(tuple,xy)),
+          "edge_tangent":tuple(map(float,tangent)),"outward_normal":tuple(map(float,normal)),
+          "center_radial_consistency":geometry["center_radial_consistency"],"adjacent_element_id":int(ei),"edge_length_m":length,
+          "traction_Pa":tuple(map(float,traction)),"normal_traction_Pa":normal_component,
+          "tangential_traction_Pa":tangential_component})
         hoop.append(float(tangent@S@tangent)); weighted.append(length)
     remote=abs(top)/max(float(np.ptp(mesh.nodes[:,0])),1e-300)
     traction_norm=(math.sqrt(t2)/max(remote*math.sqrt(perimeter),1e-300)
@@ -514,9 +541,10 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
     return StaticFEMResult(u,sigma,top,bottom,energy,compliance,free_norm,traction_norm,
                            hoop_sc,symmetry,tip_sigma,weak_cavity,mirror_xx,mirror_yy,mirror_xy,
                            conditioning_proxy,killed_energy,traction_normal,traction_tangential,
-                           resultant_normalized,moment_normalized)
+                           resultant_normalized,moment_normalized,math.sqrt(t2),math.sqrt(tn2),math.sqrt(tt2),
+                           remote,perimeter,tuple(edge_records))
 
 
-__all__ = ["HoleMesh","StaticFEMResult","build_explicit_hole_mesh",
+__all__ = ["HoleMesh","StaticFEMResult","build_explicit_hole_mesh","cavity_edge_traction_geometry",
            "build_solid_plate_mesh","conform_crack_path","fill_explicit_hole_mesh",
            "solve_static_hole","triangle_intersects_open_disk"]

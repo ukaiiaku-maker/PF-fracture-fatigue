@@ -2,7 +2,9 @@ import numpy as np
 import pytest
 
 from arrhenius_fracture.crack_void_mechanics_v5 import solve_crack_void_case
-from arrhenius_fracture.explicit_cavity_v5 import build_explicit_hole_mesh, conform_crack_path
+from arrhenius_fracture.explicit_cavity_v5 import (
+    build_explicit_hole_mesh, cavity_edge_traction_geometry, conform_crack_path,
+)
 
 
 MODE = "V3_FIXED_LABORATORY_GEOMETRY"
@@ -86,3 +88,21 @@ def test_cavity_traction_diagnostic_separates_weak_and_recovered_quantities():
     assert fine["cavity_traction_tangential_l2_normalized"] > 0.0
     assert len(fine["cavity_traction_resultant_normalized"]) == 2
     assert abs(fine["cavity_traction_moment_normalized"]) < 1e-10
+
+
+@pytest.mark.parametrize("a,b", [((1.0, -0.25), (1.0, 0.25)), ((1.0, 0.25), (1.0, -0.25))])
+def test_edge_normal_comes_from_oriented_edge_and_is_order_independent(a, b):
+    stress = np.array(((2.0, 0.5), (0.5, 3.0)))
+    result = cavity_edge_traction_geometry(a, b, (0.0, 0.0), stress)
+    assert np.allclose(result["outward_normal"], (1.0, 0.0))
+    assert np.allclose(result["traction"], (2.0, 0.5))
+    assert result["normal_traction"] == pytest.approx(2.0)
+    assert abs(result["tangential_traction"]) == pytest.approx(0.5)
+
+
+def test_split_and_oblique_edge_geometry_uses_edge_normal():
+    result = cavity_edge_traction_geometry((1.0, 0.0), (0.5, 0.5), (0.0, 0.0), np.eye(2)*7.0)
+    assert result["edge_length_m"] == pytest.approx(np.sqrt(0.5))
+    assert result["center_radial_consistency"] > 0.0
+    assert result["normal_traction"] == pytest.approx(7.0)
+    assert result["tangential_traction"] == pytest.approx(0.0, abs=1e-14)
