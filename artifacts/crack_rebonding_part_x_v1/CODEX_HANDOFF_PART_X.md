@@ -490,33 +490,78 @@ before/after state instead.
   316.227766 Hz rows `AUTHORIZED_PX4` (10 rows); D7 unchanged (all
   aliased); D1_confirm/D2_confirm unchanged (Stage-1 concern, not PX3.6's).
 
+- **PX4 (developed multi-K campaign) — physical execution complete.**
+  Two producer-freeze cycles (`build_part_x_px4_producer_freeze.py`,
+  committed `679bcd5`) refreshed the 44 `AUTHORIZED_PX4` rows to a clean,
+  committed HEAD (each freeze proved zero physics-affecting files changed
+  in its own one-commit lag).
+
+  **A real bug was caught by the launch itself, before any real damage**:
+  `part_x_run_one_job.py`'s real-budget branch always used PX3's screen
+  budget (12 events/60 μm, no cycle cap) regardless of protocol — the
+  first 3 D1 jobs launched under this bug were killed within ~20 seconds
+  (still mid-first-block) and quarantined as `INTERRUPTED_NOT_SCIENCE`
+  with fresh virgin paths reserved. Fixed by adding `run_trajectory`'s
+  `max_cumulative_cycles` parameter (default `math.inf`, zero effect on
+  every existing caller) and branching `part_x_run_one_job.py` on
+  `job["protocol"]` (screen protocols are named `"7.<n>..."`, developed
+  protocols `"D<n>[...]"`) to select the correct budget/result schema. 8
+  new regression tests, including a real end-to-end run of a D1 job
+  confirming the developed schema/budget selection.
+
+  Relaunched cleanly: **all 44 jobs COMPLETE, 0 quarantined**, genuine
+  developed-scale trajectories (30/30 events, exactly 150 μm, uncensored,
+  6–17 minutes each).
+
+  `build_part_x_px4_developed_analysis.py` applies the mission's own
+  required, **already-qualified** stationarity gate
+  (`arrhenius_fracture.crack_rebonding_developed_confirmation_v10230.
+  stable_growth_gate` — reused verbatim, same constants/formula, from the
+  pre-Part-X developed-confirmation study; ≥10 developed events, ≥50 μm
+  final-window growth, late/early rate ratio in [0.5, 2.0]) to all 22
+  matched finite/zero pairs (paired by matching Kmax/R/frequency/hold/
+  chemistry across cohesion, not file adjacency, since D3/D6's rows were
+  appended out of construction order). **22/22 pairs achieve stable,
+  developed growth on both members** — a fully clean campaign. Spot-
+  checked the largest effect (D1 Kmax=12 MPa√m: `S_h_developed=-1.19`, a
+  ~15.5× rate reduction) for artifact-vs-physics: both cohesions' late/
+  early ratios are close and comfortably stable (1.22/1.22), both reached
+  the full budget without horizon-censoring while unstable — a genuine,
+  physically sensible near-threshold amplification of the cohesive-
+  shielding effect (well-established fatigue-threshold behavior), not a
+  numerical artifact. `S_h_developed` at the reference Kmax=18 MPa√m
+  condition (D3/D6) exactly reproduces PX3.5/PX3.6's own screen-level
+  values (`-0.0232`/`-0.0429`), a strong internal consistency check.
+
 ## Terminal and pending counts
 
 - Physical trajectories launched: 28 PX3 screen (2 now formally
   invalidated, bug-contaminated) + 8 PX3.5 pre-commit reruns (kept as
   `_PRECOMMIT_ba1731e` historical record) + 8 PX3.5 clean-producer reruns
-  (4 dwell-audit legs, 2 frequency-bisection legs, 2 persistent-at-
-  transition legs) + 3 PX3.6 passivation-requalification trajectories —
-  all COMPLETE, 0 quarantined. PX4 developed campaigns: 0 launched
-  (verified by both PX3.5 and PX3.6 verifiers' own checks).
-- PX1, PX2, PX2.5, PX3, PX3.5, and PX3.6 are done. PX4–PX7: not started.
+  + 3 PX3.6 passivation-requalification trajectories + 3 PX4 interrupted-
+  then-quarantined jobs + **44 PX4 developed trajectories, all COMPLETE**.
+  0 quarantined among the final accepted set.
+- PX1, PX2, PX2.5, PX3, PX3.5, PX3.6, and PX4's physical execution +
+  stationarity analysis are done. PX5–PX7: not started.
 
 ## Exact next action
 
-Launch PX4 (mission section 8): the developed multi-K campaign for every
-row now `AUTHORIZED_PX4` in `developed_job_registry.csv` (D1, D2, D3, D5,
-D6 — 44 rows across their respective Kmax grids) via `part_x_physical_
-controller.py`, respecting the 3-worker cap and the trajectory budget in
-section 8 (max 30 accepted events, 150 μm, 1e12 cycles). Per review's own
-"selection_source_commit / physical_source_commit / launch_HEAD /
-physical_source_bundle_sha256" distinction: confirm the worktree is clean
-and record the full HEAD immediately before launch; do **not** use a
-general `--allow-head-drift`. Per the review's explicit instruction,
-continue automatically through PX5–PX7 without stopping merely because
-each is a new phase; before PX5, wire the already-qualified
-`static_shield_phase_resolved_action` evaluator (PX1.4) into the live
-production static-control commit path (PX3.5/PX3.6 already proved out the
-`run_trajectory` `static_shield_control` hook works correctly with
-`hold>0`, which PX5 will need). This stage will take real wall-clock
-time — launch via background workers and continue via the harness's
-notification system rather than blocking synchronously.
+PX5 (mission section 9, static versus dynamic attribution in
+nonsaturated regimes): wire the already-qualified `static_shield_
+phase_resolved_action`/`run_trajectory(static_shield_control=...)`
+mechanism-control ablation (PX1.4, proved compatible with `hold>0` during
+PX3.5's dwell audit) into a live production commit path for the
+nonsaturated D1–D6 developed conditions, mirroring the existing
+`crack_rebonding_static_shield_attribution` study's own methodology but
+applied to Part X's own rows. Test the mission's own attribution gates
+(`FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT` / `MIXED_STATIC_SHIELDING_
+AND_KINETIC_HISTORY` / `DYNAMIC_REBONDING_HISTORY_REQUIRED`, already
+recorded in `prospective_classification_gates.json`'s
+`static_dynamic_attribution` block) against each of the 22 now-completed
+developed pairs. Per the review's explicit instruction, continue
+automatically through PX6 (scientific synthesis and figures) and PX7
+(portable verifier and terminal decision) without stopping merely because
+each is a new phase. This stage will take real wall-clock time (one
+additional static-control trajectory per nonsaturated developed
+condition) — launch via background workers and continue via the
+harness's notification system rather than blocking synchronously.
