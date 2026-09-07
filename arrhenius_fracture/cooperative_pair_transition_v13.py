@@ -54,12 +54,19 @@ def frozen_pair_probability(parameters, *, temperature_K, rate_balance):
 
 def apply_cooperative_pair_transition(*, parent, baseline_single_state, companion_id,
                                       parameters, temperature_K, rate_balance,
-                                      exact_pair_trial, opportunity_ordinal=0):
+                                      exact_pair_trial, opportunity_ordinal=0,
+                                      observation_accepted_state_id=None,
+                                      observation_process_sha256=None):
     if parent is None or not parameters.enabled:
         return MarkedCleavageResult(baseline_single_state,BranchMark(None,None,()),
             "BRANCH_DISABLED" if not parameters.enabled else "NO_CLEAVAGE_EVENT")
     if companion_id == parent.primary_candidate_id or opportunity_ordinal < 0:
         raise ValueError("invalid companion/opportunity identity")
+    if parent.primary_event_id not in baseline_single_state.competition.consumed_event_ids:
+        raise ValueError("cooperative pair requires an already accepted canonical primary")
+    if (observation_accepted_state_id != parent.accepted_state_id or
+            observation_process_sha256 != parent.process_state_sha256):
+        raise ValueError("stale or missing cooperative-pair observation identity")
     probability=frozen_pair_probability(parameters,temperature_K=temperature_K,rate_balance=rate_balance)
     key={"model_id":MODEL_ID,"seed":parameters.branch_seed,"lineage":parent.front_lineage,
         "event_id":parent.primary_event_id,"ordinal":parent.primary_event_ordinal,
