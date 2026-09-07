@@ -1,0 +1,271 @@
+{
+  "schema": "v10230_part_x_px5_scientific_decision_v1",
+  "status": "PROVISIONAL_PENDING_PX6_PX7",
+  "wording_convention": "fold_slowdown and pct_rate_reduction are DIFFERENT numbers computed from the same S_h; report both -- NEVER '{fold}x rate reduction'.",
+  "per_point": [
+    {
+      "protocol": "D2",
+      "Kmax_MPa_sqrt_m": 12.0,
+      "dynamic_rebonding": {
+        "S_h": -1.190247585901405,
+        "fold_slowdown": 15.496998318010371,
+        "pct_rate_reduction": 93.54713745540118,
+        "wording": "gives approximately a 15.5-fold slowdown, or a 93.5% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -1.1904886211322747,
+        "fold_slowdown": 15.505601603280107,
+        "pct_rate_reduction": 93.550717827108,
+        "wording": "gives approximately a 15.5-fold slowdown, or a 93.6% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.0002025084811974
+      },
+      "orbit_matched_static": {
+        "S_h": -0.27107419788684284,
+        "fold_slowdown": 1.8666985833491174,
+        "pct_rate_reduction": 46.42948738912842,
+        "wording": "gives approximately a 1.9-fold slowdown, or a 46.4% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.22774605980952392
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D2",
+      "Kmax_MPa_sqrt_m": 15.0,
+      "dynamic_rebonding": {
+        "S_h": -0.12593677594792968,
+        "fold_slowdown": 1.3364009507914323,
+        "pct_rate_reduction": 25.17215739724008,
+        "wording": "gives approximately a 1.3-fold slowdown, or a 25.2% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -0.12680770044480927,
+        "fold_slowdown": 1.3390836285335588,
+        "pct_rate_reduction": 25.322065127843587,
+        "wording": "gives approximately a 1.3-fold slowdown, or a 25.3% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.006915569263419
+      },
+      "orbit_matched_static": {
+        "S_h": -0.03276648421432156,
+        "fold_slowdown": 1.078366739341733,
+        "pct_rate_reduction": 7.267169552129404,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 7.3% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.2601820156795924
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D2",
+      "Kmax_MPa_sqrt_m": 18.0,
+      "dynamic_rebonding": {
+        "S_h": -0.0435803582695874,
+        "fold_slowdown": 1.1055550132415626,
+        "pct_rate_reduction": 9.547694323421151,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 9.5% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -0.04441265262068267,
+        "fold_slowdown": 1.1076757619326327,
+        "pct_rate_reduction": 9.720873709898992,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 9.7% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.0190979235633335
+      },
+      "orbit_matched_static": {
+        "S_h": -0.01335094176780787,
+        "fold_slowdown": 1.0312190844394347,
+        "pct_rate_reduction": 3.0273959152341656,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 3.0% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.306352271939096
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D2",
+      "Kmax_MPa_sqrt_m": 21.0,
+      "dynamic_rebonding": {
+        "S_h": -0.027322813315269555,
+        "fold_slowdown": 1.064934295229915,
+        "pct_rate_reduction": 6.097493105515572,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 6.1% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -0.027745199395542312,
+        "fold_slowdown": 1.0659705327418774,
+        "pct_rate_reduction": 6.188776398179474,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 6.2% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.0154590991564072
+      },
+      "orbit_matched_static": {
+        "S_h": -0.008868086519900441,
+        "fold_slowdown": 1.0206294285846758,
+        "pct_rate_reduction": 2.021245714351294,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 2.0% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.32456710872245526
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D2",
+      "Kmax_MPa_sqrt_m": 24.3,
+      "dynamic_rebonding": {
+        "S_h": -0.019688210372243064,
+        "fold_slowdown": 1.046377061060234,
+        "pct_rate_reduction": 4.432155748257971,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 4.4% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -0.0200405673176567,
+        "fold_slowdown": 1.0472263645838114,
+        "pct_rate_reduction": 4.509661538418197,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 4.5% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.017896849878768
+      },
+      "orbit_matched_static": {
+        "S_h": -0.006669085372771095,
+        "fold_slowdown": 1.0154746478765468,
+        "pct_rate_reduction": 1.5238832312461814,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 1.5% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.33873497116697515
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_MPa_sqrt_m": 12.0,
+      "dynamic_rebonding": {
+        "S_h": -1.1902023788617737,
+        "fold_slowdown": 15.49538527205844,
+        "pct_rate_reduction": 93.54646572226108,
+        "wording": "gives approximately a 15.5-fold slowdown, or a 93.5% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -1.1904886211322747,
+        "fold_slowdown": 15.505601603280107,
+        "pct_rate_reduction": 93.550717827108,
+        "wording": "gives approximately a 15.5-fold slowdown, or a 93.6% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.0002404988223723
+      },
+      "orbit_matched_static": {
+        "S_h": -0.2643387667757986,
+        "fold_slowdown": 1.837971474360065,
+        "pct_rate_reduction": 45.59219150296254,
+        "wording": "gives approximately a 1.8-fold slowdown, or a 45.6% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.2220956464803857
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_MPa_sqrt_m": 15.0,
+      "dynamic_rebonding": {
+        "S_h": -0.1260044756006598,
+        "fold_slowdown": 1.336609290837503,
+        "pct_rate_reduction": 25.18382096735148,
+        "wording": "gives approximately a 1.3-fold slowdown, or a 25.2% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -0.12680770044480927,
+        "fold_slowdown": 1.3390836285335588,
+        "pct_rate_reduction": 25.322065127843587,
+        "wording": "gives approximately a 1.3-fold slowdown, or a 25.3% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.0063745739214462
+      },
+      "orbit_matched_static": {
+        "S_h": -0.03366472197271349,
+        "fold_slowdown": 1.0805993997769319,
+        "pct_rate_reduction": 7.458767772179953,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 7.5% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.2671708430373977
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_MPa_sqrt_m": 18.0,
+      "dynamic_rebonding": {
+        "S_h": -0.04363093463566765,
+        "fold_slowdown": 1.1056837696806951,
+        "pct_rate_reduction": 9.558227458762014,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 9.6% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -0.04441265262068267,
+        "fold_slowdown": 1.1076757619326327,
+        "pct_rate_reduction": 9.720873709898992,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 9.7% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.0179165995764845
+      },
+      "orbit_matched_static": {
+        "S_h": -0.014348849138454555,
+        "fold_slowdown": 1.0335913096121023,
+        "pct_rate_reduction": 3.249960530793239,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 3.2% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.3288687088248754
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_MPa_sqrt_m": 21.0,
+      "dynamic_rebonding": {
+        "S_h": -0.027300440627894502,
+        "fold_slowdown": 1.064879436535224,
+        "pct_rate_reduction": 6.0926555917279135,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 6.1% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -0.027745199395542312,
+        "fold_slowdown": 1.0659705327418774,
+        "pct_rate_reduction": 6.188776398179474,
+        "wording": "gives approximately a 1.1-fold slowdown, or a 6.2% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.016291267005902
+      },
+      "orbit_matched_static": {
+        "S_h": -0.009934888765095741,
+        "fold_slowdown": 1.023139587439435,
+        "pct_rate_reduction": 2.2616256592461026,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 2.3% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.3639094658034445
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_MPa_sqrt_m": 24.3,
+      "dynamic_rebonding": {
+        "S_h": -0.01968113610902707,
+        "fold_slowdown": 1.0463600166657663,
+        "pct_rate_reduction": 4.430599022073956,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 4.4% rate reduction"
+      },
+      "ceiling_static": {
+        "S_h": -0.0200405673176567,
+        "fold_slowdown": 1.0472263645838114,
+        "pct_rate_reduction": 4.509661538418197,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 4.5% rate reduction",
+        "reproduction_fraction_of_dynamic": 1.0182627266352153
+      },
+      "orbit_matched_static": {
+        "S_h": -0.007798888639307391,
+        "fold_slowdown": 1.018119812003154,
+        "pct_rate_reduction": 1.7797327769806692,
+        "wording": "gives approximately a 1.0-fold slowdown, or a 1.8% rate reduction",
+        "reproduction_fraction_of_dynamic": 0.3962621159725787
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    }
+  ],
+  "summary_statistics": {
+    "ceiling_reproduction_fraction_min": 1.0002025084811974,
+    "ceiling_reproduction_fraction_max": 1.0190979235633335,
+    "orbit_matched_reproduction_fraction_min": 0.2220956464803857,
+    "orbit_matched_reproduction_fraction_max": 0.3962621159725787
+  },
+  "interpretation": "At all 10 tested (D2/D5, Kmax) points, the ceiling static control (K_b fixed at the full 900000 Pa*sqrt(m) cohesive-strength constant from the first accepted event onward) reproduces 100.0-101.9% of the dynamic-rebonding developed-regime slowdown -- essentially the ENTIRE effect, including at Kmax=12 MPa*sqrt(m) where the dynamic slowdown itself is largest (approximately 15.5-fold). The analytical periodic-orbit-matched control (K_b = K_rebond_max * cycle-mean bonded occupancy, computed with zero fitting to any physical trajectory) reproduces only 22.2-39.6% -- a naive duration-weighted-average shielding level substantially UNDERESTIMATES the true suppression. This is not evidence that dynamic P/C/B kinetics timing per se is required to explain the developed-regime rate (the ceiling control has NO kinetics, no timing, no formation/rupture dynamics at all, yet reproduces the effect almost exactly) -- rather, it shows that the developed-regime hazard is dominated by whichever portions of the loading cycle see the crack tip fully shielded, and a simple cycle-averaged proxy for that shielding fails specifically because the hazard integral is NOT linear in the instantaneous K_b.",
+  "classification_note": "Classified MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY at every point under the review's both-controls-must-agree gate (dominant requires BOTH controls >=80% reproduction) -- not because dynamic kinetic history is confirmed necessary, but because the review's classification scheme correctly refuses to credit 'static shielding in general' when one of the two prescribed static proxies fails this badly. The narrower, better-supported finding is in the interpretation text above: the CEILING level specifically (not a cycle-averaged level) is what matters.",
+  "scope_reminder": [
+    "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT",
+    "HAZARD_ONLY_COHESIVE_FEEDBACK",
+    "TOPOLOGICAL_HEALING_NOT_MODELED",
+    "PHYSICAL_CHEMISTRY_PARAMETERIZATION_NOT_CALIBRATED"
+  ]
+}
