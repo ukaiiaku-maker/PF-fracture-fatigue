@@ -27,6 +27,7 @@ jobs:
           tests/test_closure_mechanics_evidence.py tests/test_closure_lifecycle_evidence.py
           tests/test_closure_lifecycle_rollback.py tests/test_voiding_lifecycle_driver_v5.py
           tests/test_v5_clean_historical_neutrality.py
+          tests/test_closure_publication_package.py
       - name: Unique source-resolved traction A and B
         run: |
           python scripts/qualify_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-a
