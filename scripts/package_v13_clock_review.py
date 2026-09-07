@@ -22,7 +22,8 @@ def main():
     modules=['test_v13_clean_parent_capture','test_v13_physical_companion_contract',
         'test_topology_transaction_v11','test_directional_competition_transactions_v11',
         'test_multifront_checkpoint_output_v12','test_v13_clock_inverse_audit',
-        'test_v13_cooperative_pair_transition','test_v13_later_parent_contract','test_v13_revised_ensemble_gate']
+        'test_v13_cooperative_pair_transition','test_v13_later_parent_contract','test_v13_revised_ensemble_gate',
+        'test_v13_inherited_residual_clock']
     test=subprocess.run([sys.executable,'-m','pytest','-q',*(f'tests/{m}.py' for m in modules)],
         capture_output=True,text=True,check=True)
     compiled=subprocess.run([sys.executable,'-m','compileall','-q','arrhenius_fracture',

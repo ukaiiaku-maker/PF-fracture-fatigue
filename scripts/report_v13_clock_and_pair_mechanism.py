@@ -41,7 +41,7 @@ def main():
     lines=['# V13 inherited-clock audit and cooperative-pair decision','',
         '**BRANCHING_KINETICS_MODEL_UNCALIBRATED**','',
         '## Decision','',
-        'The first-event nonwinner is far from completion in all eight clean parents. Retain the fresh independent order-three mark as a sequential-null model. A separate default-off cooperative-pair transition is implemented; an inherited-residual implementation is not selected for these first-event states. No branch parameter or seed was tuned. No short branching ensemble was launched.','',
+        'The first-event nonwinner is far from completion in all eight clean parents. Retain the fresh independent order-three mark as a sequential-null model. A separate default-off cooperative-pair transition is implemented for that regime. Later snapshots reveal short inherited residual times in some states, so a default-off inherited-residual/commitment race is also implemented for the near-completion regime. Neither is registered into production. No branch parameter or seed was tuned. No short branching ensemble was launched.','',
         'The earlier phrase is corrected to `no_stochastic_companion_selected_at_the_preregistered_reference_mark`. All eight original exact pair trials were admissible. Record `d10c3eb`, its original compact archive and all parent checkpoint bytes remain preserved.','',
         '## Existing clocks','',
         '| Case | Nonwinner H/eta at primary crossing | Residual post-primary time (s) | Raw balance | Effective balance |',
@@ -76,10 +76,26 @@ def main():
             fmt=lambda x:'unevaluated' if x is None else f'{x:.8g}'
             lines.append(f"| {r['material_case']} | {r['case']} | {r['clean_parent_record']['forward_extension_um']:.6g} | {fmt(state.get('radius_m',0)*1e6) if state else '—'} | {fmt(state.get('shielding_Pa_sqrt_m',0)/1e6) if state else '—'} | {fmt(o.get('raw_arrival_per_s'))} | {o.get('exact_pair_admissible',o.get('reason','unevaluated'))} | {fmt(pmax)} |")
     lines+=['','Only Peak/1000 K and weak-T/1000 K were extended, from their certified first-event checkpoints, with branching disabled and unchanged physical parameters. Sparse captures target the next event and 25/50/100 µm. Full source-process profiles, backstress, persistent-source state, geometry, local tensors, fallback identities and pair costs accompany the frozen records. An inadmissible observation is not assigned a fabricated rate or probability.','',
+        'Both runs reached 101.8321817 µm with 29 canonical single-arm events and unchanged loading parameters. The first-to-final interval is about 14.403 µs for Peak and 14.072 µs for weak-T, at essentially unchanged opening. These are branch-disabled capability trajectories, not observed physical branching ensembles.','',
+        '### Later co-criticality and mechanism change','',
+        '| Case | Snapshot | Native companion K (MPa√m) | Raw / effective pre-event balance | Inherited residual time (µs) | Reference null mark |',
+        '|---|---|---:|---|---:|---|']
+    for r in later['cases']:
+        if not r.get('companions'):
+            continue
+        o=r['companions'][0]
+        factors=r.get('inherited_clock_and_pair_driving_factors',{})
+        residual=r.get('later_nonwinner_residual',{}).get('post_primary_frozen_residual_s')
+        fmt=lambda v:'unevaluated' if v is None else f'{v:.8g}'
+        lines.append(f"| {r['material_case']} | {r['case']} | {fmt(o.get('K_companion_discrete_Pa_sqrt_m',0)/1e6)} | {fmt(factors.get('raw_rate_balance_pre'))} / {fmt(factors.get('effective_rate_balance_pre'))} | {fmt(None if residual is None else residual*1e6)} | {o.get('single_reference_overlay_disposition','unevaluated')} |")
+    lines+=['',
+        'All eight later exact pair trials are admissible. At about 27/53/102 µm, all six unchanged reference marks select and accept the pair. Their full analytic null-model surfaces include both low and high probabilities. Thus negligible first-event branching does not imply negligible later branching under the same null model. No parameter retuning produced this change.','',
+        'At approximately 27 and 102 µm the inherited nonwinner residual completes in about 0.12–0.24 µs under the frozen post-primary effective hazard; near 53 µm it takes about 2.73 µs. These later states are not interchangeable with the eight first-event states. The residual implementation integrates supplied effective-hazard segments toward the preserved eta−H, never draws a new cleavage threshold, and races only private commitment/arrest processes. Exact baseline single fallback, parent identities, RNG objects and pair energy acceptance remain guarded. Commitment/arrest scales and any evolving subgrid state closure are still unspecified; this is a default-off implementation, not a qualified stateful multifront production model.','',
+        'The radius remains 1 µm. The largest measured direct shielding/blunting raw-rate correction among later captures is about 2.12 parts per million. The strong propensity change tracks the native single-to-pair marginal mechanical drive and resulting raw barrier/rate, not a demonstrated large direct shielding/blunting effect. This frozen attribution does not exclude indirect effects of earlier process evolution, nor does it validate the sharp-wake discrete drive as continuum G or applied remote K.','',
         '## Revised ensemble gate','',
         '`NOT_PASSED_NO_ENSEMBLE`','',
         'The revised gate needs at least one intermediate-probability case, measurable variation with material/temperature/evolved state, stable ordering, a physically defensible common model and exact parent/pair/fallback behavior. It does not require all eight cases to be intermediate. For clarity, the original implementation required two robust material classes, not all eight intermediate cases; the new rule reduces that to at least one qualifying case.','',
-        'The new cooperative-pair model has no assigned physical kinetic scales, so later-state diversity or admissible pair mechanics alone cannot pass this gate. No large Monte Carlo run, first-parent rerun, long field atlas, or branching ensemble was performed.','']
+        'The new cooperative-pair and inherited-residual models have no physically established commitment/arrest scales. No physically justified pair attempt-rate/barrier ratio or evolving subgrid closure was selected here. Therefore later-state diversity and positive frozen null marks do not alone qualify a common intended co-critical branch model. This is not a requirement that all eight probabilities be intermediate, nor a claim that physical calibration must precede every capability experiment. No large Monte Carlo run, first-parent rerun, long field atlas, or branching ensemble was performed.','']
     (args.root/'V13_CLOCK_AND_PAIR_MECHANISM.md').write_text('\n'.join(lines))
     print(gate['status'])
 
