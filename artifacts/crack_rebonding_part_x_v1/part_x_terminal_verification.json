@@ -1,0 +1,36 @@
+{
+  "checks": {
+    "no_forbidden_claims_in_any_artifact": true,
+    "px4_decision_scope_labels_present": true,
+    "px4_decision_status_provisional": true,
+    "px4_stage1_classification_complete": true,
+    "px4_stage1_verifier_exits_zero": true,
+    "px5_classification_complete": true,
+    "px5_decision_scope_labels_present": true,
+    "px5_decision_status_provisional": true,
+    "px5_scope_never_expanded_beyond_D2_D5": true,
+    "px5_verifier_exits_zero": true,
+    "synthesis_reports_all_seed_axes_robust": true,
+    "synthesis_reports_px4_verification_consistent": true,
+    "synthesis_reports_px5_verification_consistent": true,
+    "synthesis_scope_labels_present": true
+  },
+  "classification": "PART_X_PX0_THROUGH_PX6_COMPLETE",
+  "details": {
+    "forbidden_claim_hits": [],
+    "px4_stage1_verifier_output_tail": "wrote /Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-crack-rebonding-part-x/artifacts/crack_rebonding_part_x_v1/px4_stage1_verification.json\nclassification=PX4_STAGE1_COMPLETE\noverall_pass=True\n",
+    "px5_registry_protocols_observed": [
+      "D2",
+      "D5"
+    ],
+    "px5_verifier_output_tail": "wrote /Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-crack-rebonding-part-x/artifacts/crack_rebonding_part_x_v1/px5_verification.json\nclassification=PX5_COMPLETE\noverall_pass=True\n"
+  },
+  "overall_pass": true,
+  "schema": "v10230_part_x_terminal_verification_v1",
+  "unclaimed_scope": [
+    "PX5 static-shield attribution for D1/D3/D6 (explicitly out of scope, not tested)",
+    "transient (pre-developed-window) explanatory power of static shielding",
+    "closure-corrected DeltaK_eff",
+    "production-line merge readiness"
+  ]
+}
