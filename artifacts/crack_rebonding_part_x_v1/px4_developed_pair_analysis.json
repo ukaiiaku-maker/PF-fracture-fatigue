@@ -1,14 +1,20 @@
 {
-  "schema": "v10230_part_x_px4_developed_pair_analysis_v1",
+  "schema": "v10230_part_x_px4_developed_pair_analysis_v2",
   "pairs": [
     {
+      "seed": 1720,
       "protocol": "D1",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 12000000.0,
       "R": -0.95,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "de0e3e9c4f36427c5fbdf6a9602db9e11eee4ae42b4cb664f8a5fbec0bee8c98",
       "zero_canonical_job_key": "5369cd8928d1ac46602e106cc1a63b428e0cf86aad024cc5bb9a402a37bccc49",
       "finite_stable_growth": true,
@@ -31,6 +37,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 90177.06180303267,
+        "terminal_cumulative_cycles": 90177.06180303267,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 5835.655290668648,
+        "terminal_cumulative_cycles": 5835.655290668648,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -1.190022511067047,
       "finite_n_events": 30,
@@ -39,13 +55,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D1",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 15000000.0,
       "R": -0.95,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "5c227ccbf33c3ff2da1a000c4a54d70a5d5fd568bc8142addf45b3b73b1390fe",
       "zero_canonical_job_key": "7e70210b8f4ab56ef61b82cc6595353b13e626c3a27dddb4a25a25ead515e62c",
       "finite_stable_growth": true,
@@ -68,6 +90,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 784.8020559848436,
+        "terminal_cumulative_cycles": 784.8020559848436,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 588.4640658005469,
+        "terminal_cumulative_cycles": 588.4640658005469,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.12534200286643923,
       "finite_n_events": 30,
@@ -76,13 +108,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D1",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 21000000.0,
       "R": -0.95,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "8eb2adc0ea2054adda20eac1b1612d93b8a3c6e906b58ec250a408356f1931fc",
       "zero_canonical_job_key": "e71b63e3fee180485ed4d5c8c4efb1cbc7ad1a5639b68bc1cc618d2892b00dc2",
       "finite_stable_growth": true,
@@ -105,6 +143,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 368.80831572268664,
+        "terminal_cumulative_cycles": 368.80831572268664,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 346.9895814127889,
+        "terminal_cumulative_cycles": 346.9895814127889,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.026574271048372105,
       "finite_n_events": 30,
@@ -113,13 +161,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D1",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 24300000.0,
       "R": -0.95,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "aab2d4224c3912d8cbc72551eaafcf3078e2a1f62ae0704259d84b6d22977055",
       "zero_canonical_job_key": "09a9617b7e212b6f66840f724a3f004e1691108e56f3a788ecf8ace70890365b",
       "finite_stable_growth": true,
@@ -142,6 +196,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 326.5934590049767,
+        "terminal_cumulative_cycles": 326.5934590049767,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 312.62744172793674,
+        "terminal_cumulative_cycles": 312.62744172793674,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.019056953815837732,
       "finite_n_events": 30,
@@ -150,13 +214,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D2",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 12000000.0,
       "R": -0.5,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "eb75943e869ac94dd49fc561c1e83a12f8828db13a3026bdb42eb83a7954a302",
       "zero_canonical_job_key": "9ea28a1529877ad528774209345cdc18ee5306e92941e2d6b17a6a1ea1ba84bb",
       "finite_stable_growth": true,
@@ -179,6 +249,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 79034.51470591765,
+        "terminal_cumulative_cycles": 79034.51470591765,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 5111.999127937246,
+        "terminal_cumulative_cycles": 5111.999127937246,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -1.190247585901405,
       "finite_n_events": 30,
@@ -187,13 +267,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D2",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 15000000.0,
       "R": -0.5,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "a6fb71e30fb1511d73fd5ba7ce0e38f3a24e04d0944e71b076d391451d1394de",
       "zero_canonical_job_key": "3ba6f4bd558a8dbd6b914b81fb26a77a0172f320e786ecbf95d2f4157b36c8ff",
       "finite_stable_growth": true,
@@ -216,6 +302,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 686.063096216963,
+        "terminal_cumulative_cycles": 686.063096216963,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 513.7089682953762,
+        "terminal_cumulative_cycles": 513.7089682953762,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.12593677594792968,
       "finite_n_events": 30,
@@ -224,13 +320,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D2",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 21000000.0,
       "R": -0.5,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "9b780af5e7ba60536b728cbb3c7b343db148b49b152ee016da8c5665cabbdb0c",
       "zero_canonical_job_key": "1abb2ac0899790fded62faaaf63182efbc80b679210ec51917f0c0510f953edf",
       "finite_stable_growth": true,
@@ -253,6 +355,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 320.0121757211134,
+        "terminal_cumulative_cycles": 320.0121757211134,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 300.5789149572292,
+        "terminal_cumulative_cycles": 300.5789149572292,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.027322813315269555,
       "finite_n_events": 30,
@@ -261,13 +373,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D2",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 24300000.0,
       "R": -0.5,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "42348cf95208defcc6c110b655b7c4146f39bccad08f5079c8db8a4288a627fb",
       "zero_canonical_job_key": "1351eea1a85d23ea9b646531026c06ff3113eeb24b6b790e468b88f01030b9eb",
       "finite_stable_growth": true,
@@ -290,6 +408,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 282.4385572502018,
+        "terminal_cumulative_cycles": 282.4385572502018,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 269.9670765999904,
+        "terminal_cumulative_cycles": 269.9670765999904,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.019688210372243064,
       "finite_n_events": 30,
@@ -298,13 +426,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D5",
       "row_name": "PASSIVATION_LIMITED",
+      "config_hash": "57e5dc4bd44f626f6062237a31e5014353654a5c9b1c446ac70dc1e8e0bd9fdd",
       "Kmax_Pa_sqrt_m": 12000000.0,
       "R": -0.5,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "1d8ee217debe56611118f3640e014856b2566549090eeb3d4a6ce995b368f61a",
       "zero_canonical_job_key": "cc30ed549f1fffe360ac227677ef3bd2a96556dc5e52e55dfad52e5d6edbdf01",
       "finite_stable_growth": true,
@@ -327,6 +461,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 79026.53421768977,
+        "terminal_cumulative_cycles": 79026.53421768977,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 5111.999127937246,
+        "terminal_cumulative_cycles": 5111.999127937246,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -1.1902023788617737,
       "finite_n_events": 30,
@@ -335,13 +479,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D5",
       "row_name": "PASSIVATION_LIMITED",
+      "config_hash": "57e5dc4bd44f626f6062237a31e5014353654a5c9b1c446ac70dc1e8e0bd9fdd",
       "Kmax_Pa_sqrt_m": 15000000.0,
       "R": -0.5,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "12a1e3ae73ec753e9be281686d7bdf79daa3e15c9891b838f4ce4a56734eb462",
       "zero_canonical_job_key": "cd34961bdcf5d123ef4d595ecea58e872b33af3adaad9046de1d2c087eba74e9",
       "finite_stable_growth": true,
@@ -364,6 +514,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 686.1666698423913,
+        "terminal_cumulative_cycles": 686.1666698423913,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 513.7089682953762,
+        "terminal_cumulative_cycles": 513.7089682953762,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.1260044756006598,
       "finite_n_events": 30,
@@ -372,13 +532,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D5",
       "row_name": "PASSIVATION_LIMITED",
+      "config_hash": "57e5dc4bd44f626f6062237a31e5014353654a5c9b1c446ac70dc1e8e0bd9fdd",
       "Kmax_Pa_sqrt_m": 21000000.0,
       "R": -0.5,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "00d728b3d1512e8ee581723cf3c733ce6a4a882feb5849e715f077fa131542e7",
       "zero_canonical_job_key": "74dd992eca429f995930ffb863a045a489898b3e5ce02e9c3fbd71513c5d4102",
       "finite_stable_growth": true,
@@ -401,6 +567,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 319.99621794138085,
+        "terminal_cumulative_cycles": 319.99621794138085,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 300.5789149572292,
+        "terminal_cumulative_cycles": 300.5789149572292,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.027300440627894502,
       "finite_n_events": 30,
@@ -409,13 +585,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D5",
       "row_name": "PASSIVATION_LIMITED",
+      "config_hash": "57e5dc4bd44f626f6062237a31e5014353654a5c9b1c446ac70dc1e8e0bd9fdd",
       "Kmax_Pa_sqrt_m": 24300000.0,
       "R": -0.5,
       "frequency_Hz": 1000.0,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "34fb6d57084b8860cfd438315bfd7617aca9693f95d4f88859509095d5393289",
       "zero_canonical_job_key": "acd005fcfeb8219cfcef1bc65fa2173559663d3c859aba7cd4b18e6e88cdc78e",
       "finite_stable_growth": true,
@@ -438,6 +620,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 282.4341041324153,
+        "terminal_cumulative_cycles": 282.4341041324153,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 269.9670765999904,
+        "terminal_cumulative_cycles": 269.9670765999904,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.01968113610902707,
       "finite_n_events": 30,
@@ -446,13 +638,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D3",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 12000000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "e1ddc131888f6096e9ea6909b6e34b5988b4a9c673c0ae406b040b54ad61b24c",
       "zero_canonical_job_key": "8904cd785db33ee20f8b68e52aa9d8dab9bbe0777f5dd636211c5fc767483dd5",
       "finite_stable_growth": true,
@@ -475,6 +673,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 4038.654201323441,
+        "terminal_cumulative_cycles": 4038.654201323441,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 1616.5560641222758,
+        "terminal_cumulative_cycles": 1616.5560641222758,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.39854788750969994,
       "finite_n_events": 30,
@@ -483,13 +691,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D3",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 15000000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "246559c1960c83ca01755a208d2e67606eb4c3c9e9cbc3878e9e4a971b375fc1",
       "zero_canonical_job_key": "f9b23ce6e9e1ca9abac75b37a6afb2d340110009f85c0147ae3b3e1c9891c831",
       "finite_stable_growth": true,
@@ -512,6 +726,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 185.95510393517233,
+        "terminal_cumulative_cycles": 185.95510393517233,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 162.44903942686145,
+        "terminal_cumulative_cycles": 162.44903942686145,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.05887629870256568,
       "finite_n_events": 30,
@@ -520,13 +744,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D3",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 18000000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "daa359f07bd71cd4c4761c5e517ee0f4a7a660c2e18b88efb733199ed3f4383a",
       "zero_canonical_job_key": "32ff68fb0cd7925e607c02b4f2525cfdbe53a89f7a748e7fe1019bec999c7623",
       "finite_stable_growth": true,
@@ -549,6 +779,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 118.1422256574908,
+        "terminal_cumulative_cycles": 118.1422256574908,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 112.01699445617693,
+        "terminal_cumulative_cycles": 112.01699445617693,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.02321748644929242,
       "finite_n_events": 30,
@@ -557,13 +797,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D3",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 21000000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "b83c0d0af945f1410eff09d565bfed853f9f4f9f37697ebb437cc706cdde5a62",
       "zero_canonical_job_key": "f0ac181728b90039d8c03eeb467ede74e39ad1a5c3b6cdc7282c68efb5b19526",
       "finite_stable_growth": true,
@@ -586,6 +832,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 98.22367687587297,
+        "terminal_cumulative_cycles": 98.22367687587297,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 95.05139878868978,
+        "terminal_cumulative_cycles": 95.05139878868978,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.014322845338385582,
       "finite_n_events": 30,
@@ -594,13 +850,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D3",
       "row_name": "COMPETING_REVERSIBLE",
+      "config_hash": "947d80130bf1397c4b3455ce514ef29687705ba6d3bf433ef3e5ec6fa7f1aaaf",
       "Kmax_Pa_sqrt_m": 24300000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "3b5371f8d4e4249b9219dea2c390ab5501720e72487b471fd709f43b4ae1c78e",
       "zero_canonical_job_key": "e4ae105ab0463af6eadb1c61498e6ea3a0199ee3cc3638e18f3fba09f9d517d4",
       "finite_stable_growth": true,
@@ -623,6 +885,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 87.41738010446566,
+        "terminal_cumulative_cycles": 87.41738010446566,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 85.3710855313116,
+        "terminal_cumulative_cycles": 85.3710855313116,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.010320299682240162,
       "finite_n_events": 30,
@@ -631,13 +903,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D6_conditional_persistent",
       "row_name": "COMPETING_PERSISTENT",
+      "config_hash": "3ff561ff2ef232d7dcd9d0b0e01db32c4bbe0c3ffe089fbd54080c153b6f611d",
       "Kmax_Pa_sqrt_m": 12000000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "1b2d517b688e54687a05558a2f49fe493956722c26e77fef95c55c970a8959d9",
       "zero_canonical_job_key": "ffd86be4be9ecabb0a043a5eef73fbe661de22d985bf7308cecbb238024d69c7",
       "finite_stable_growth": true,
@@ -660,6 +938,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 24957.798978517058,
+        "terminal_cumulative_cycles": 24957.798978517058,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 1616.5560641222758,
+        "terminal_cumulative_cycles": 1616.5560641222758,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -1.1896255779982863,
       "finite_n_events": 30,
@@ -668,13 +956,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D6_conditional_persistent",
       "row_name": "COMPETING_PERSISTENT",
+      "config_hash": "3ff561ff2ef232d7dcd9d0b0e01db32c4bbe0c3ffe089fbd54080c153b6f611d",
       "Kmax_Pa_sqrt_m": 15000000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "1e92a9316a4609f46240509e4e0081be71ff5e2b608a7c0e15e2165cad9fb448",
       "zero_canonical_job_key": "4c0ba15946ff89f23d378a726545540d70ffa950067ccd5c9d31a29fe84b7d79",
       "finite_stable_growth": true,
@@ -697,6 +991,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 216.3886401522082,
+        "terminal_cumulative_cycles": 216.3886401522082,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 162.44903942686145,
+        "terminal_cumulative_cycles": 162.44903942686145,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.1249217379660838,
       "finite_n_events": 30,
@@ -705,13 +1009,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D6_conditional_persistent",
       "row_name": "COMPETING_PERSISTENT",
+      "config_hash": "3ff561ff2ef232d7dcd9d0b0e01db32c4bbe0c3ffe089fbd54080c153b6f611d",
       "Kmax_Pa_sqrt_m": 18000000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "e47895bf415cfb41c1a49273c67047673adc35fb93ecce10607aa621609fea2c",
       "zero_canonical_job_key": "211ac7fe0e6d98b5624812f2f7815f6281ce5888c5d8527f624229d6696bfc49",
       "finite_stable_growth": true,
@@ -734,6 +1044,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 123.60825124503515,
+        "terminal_cumulative_cycles": 123.60825124503515,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 112.01699445617693,
+        "terminal_cumulative_cycles": 112.01699445617693,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.04291795897047157,
       "finite_n_events": 30,
@@ -742,13 +1062,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D6_conditional_persistent",
       "row_name": "COMPETING_PERSISTENT",
+      "config_hash": "3ff561ff2ef232d7dcd9d0b0e01db32c4bbe0c3ffe089fbd54080c153b6f611d",
       "Kmax_Pa_sqrt_m": 21000000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "a2c4082fb5decb2fb83c06d51a22914ef4718b024c254fd370e562848d38a782",
       "zero_canonical_job_key": "e15f9e37cac25967be6fddf7691621dd72c2205b78b3ae9c0da2f823620bdddf",
       "finite_stable_growth": true,
@@ -771,6 +1097,16 @@
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
       },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 100.94019072435303,
+        "terminal_cumulative_cycles": 100.94019072435303,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 95.05139878868978,
+        "terminal_cumulative_cycles": 95.05139878868978,
+        "hit_cycle_horizon": false
+      },
       "both_stable_growth": true,
       "S_h_developed": -0.026305277419709235,
       "finite_n_events": 30,
@@ -779,13 +1115,19 @@
       "zero_final_extension_um": 150.00000000000006
     },
     {
+      "seed": 1720,
       "protocol": "D6_conditional_persistent",
       "row_name": "COMPETING_PERSISTENT",
+      "config_hash": "3ff561ff2ef232d7dcd9d0b0e01db32c4bbe0c3ffe089fbd54080c153b6f611d",
       "Kmax_Pa_sqrt_m": 24300000.0,
       "R": -0.5,
       "frequency_Hz": 316.22776601683796,
       "minimum_load_hold_s": 0.0,
       "chemistry_factor": 1.0,
+      "finite_K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "zero_K_rebond_max_target_Pa_sqrt_m": 0.0,
+      "control_mode": "dynamic",
+      "physical_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
       "finite_canonical_job_key": "664f942742a6485fa18022e61b67fdc37a67e9f049f40605092d4bb7273c3f96",
       "zero_canonical_job_key": "ad73e6e3edaaac94dd645190a77117b316094e6ba1d33e06133ade5d3deec8b7",
       "finite_stable_growth": true,
@@ -807,6 +1149,16 @@
         "hit_max_accepted_events_budget": true,
         "hit_max_projected_extension_budget": true,
         "stopped_by_budget_exhaustion": true
+      },
+      "finite_cycle_check": {
+        "max_event_cumulative_cycles": 89.21775971414594,
+        "terminal_cumulative_cycles": 89.21775971414594,
+        "hit_cycle_horizon": false
+      },
+      "zero_cycle_check": {
+        "max_event_cumulative_cycles": 85.3710855313116,
+        "terminal_cumulative_cycles": 85.3710855313116,
+        "hit_cycle_horizon": false
       },
       "both_stable_growth": true,
       "S_h_developed": -0.019227444471334846,

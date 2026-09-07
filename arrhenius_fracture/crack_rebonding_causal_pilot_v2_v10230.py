@@ -519,6 +519,32 @@ def run_trajectory(
     accepted events, 150 um, 1e12 cycles) -- PX3's screen budget never
     needed a cycle cap since its 12-event/60um limits were always reached
     first.
+
+    PX4.1 fix: this is an EXACT first-passage horizon, not merely checked
+    between accepted events. Each block-search call passes the exact
+    remaining cycle budget as ``cycle_step_waveform``'s own
+    ``requested_cycles`` argument, which threads into ``choose_block_
+    cycles_diagnostic``'s already-enforced "requested_cap" mode
+    (``base = min(max_block_cycles, requested_cycles)``, and the returned
+    block size is clipped to the MINIMUM of every candidate limit, base
+    included) -- an already-qualified hard ceiling on a single block's
+    size, not a new one invented here. A block that reaches the horizon
+    without firing uses the exact same "did not fire" commit path every
+    ordinary non-firing block already uses (full MPZ/rebonding-state/
+    protocol-cursor advance, no event, no patch, no translation, no new
+    threshold draw) -- reusing already-validated machinery rather than a
+    second commit path. A remaining budget of exactly 0 skips the engine
+    call entirely (no RNG draw at all).
+
+    One inherited, pre-existing precision floor: ``FatigueControllerConfig.
+    min_block_cycles`` (default 1e-6) is a hard floor the adaptive search
+    refuses to resolve below, so a remaining budget SMALLER than that
+    floor can overshoot the horizon by up to the floor's own value. This
+    is utterly negligible for this mission's actual 1e12-cycle horizon
+    (twelve orders of magnitude above where the floor could ever bind) and
+    is not something this fix introduces or could reasonably eliminate
+    without changing ``min_block_cycles`` itself, a shared, already-
+    qualified system parameter well outside Part X's own scope.
     """
     if reset_engine_registry is not None:
         reset_engine_registry()
@@ -556,8 +582,12 @@ def run_trajectory(
             if cumulative_extension_m >= max_projected_extension_m:
                 break
             if cumulative_cycles >= max_cumulative_cycles:
+                # Reached exactly at a prior event's acceptance (the inner
+                # loop's own horizon check normally catches this first, mid-
+                # search) -- same classification either way for a single,
+                # consistent censor_reason string.
                 censored = True
-                censor_reason = "cycle_budget_exhausted"
+                censor_reason = "complete_physical_cycle_censor"
                 break
             if time.monotonic() - start_wall > max_wall_seconds:
                 censored = True
@@ -569,11 +599,30 @@ def run_trajectory(
 
             bulk_action_records_before = len(bulk_action_records)
             fired_result = None
+            reached_cycle_horizon = False
             blocks_used = 0
             for blocks_used in range(1, max_blocks_per_event + 1):
                 if time.monotonic() - start_wall > max_wall_seconds:
                     break
-                result = engine.cycle_step_waveform(ctrl, waveform, T_K_)
+                # Exact first-passage cycle horizon: cap THIS block's own
+                # candidate size at the remaining cycle budget by passing
+                # requested_cycles through to cycle_step_waveform (which
+                # threads it into choose_block_cycles_diagnostic's existing
+                # "requested_cap" mode -- base = min(max_block_cycles, req),
+                # and the returned block size is clipped to the minimum of
+                # every candidate limit, base included -- an ALREADY
+                # enforced, already-qualified hard ceiling, not a new one
+                # built here). A remaining budget of exactly 0 means the
+                # horizon is already reached: no engine call, no RNG draw,
+                # no event/patch/translation -- censor immediately.
+                if math.isfinite(max_cumulative_cycles):
+                    remaining = max_cumulative_cycles - cumulative_cycles
+                    if remaining <= 0.0:
+                        reached_cycle_horizon = True
+                        break
+                    result = engine.cycle_step_waveform(ctrl, waveform, T_K_, requested_cycles=remaining)
+                else:
+                    result = engine.cycle_step_waveform(ctrl, waveform, T_K_)
                 cumulative_time_s += float(result.get("kinetic_dt_consumed_s", 0.0))
                 cumulative_cycles += float(result.get("cycles_consumed", 0.0))
                 if state_sampler is not None:
@@ -581,6 +630,14 @@ def run_trajectory(
                 if result.get("fired"):
                     fired_result = result
                     break
+                if math.isfinite(max_cumulative_cycles) and cumulative_cycles >= max_cumulative_cycles:
+                    reached_cycle_horizon = True
+                    break
+
+            if reached_cycle_horizon:
+                censored = True
+                censor_reason = "complete_physical_cycle_censor"
+                break
 
             if fired_result is None:
                 censored = True

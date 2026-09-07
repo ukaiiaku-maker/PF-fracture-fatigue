@@ -64,24 +64,33 @@ def test_run_trajectory_default_max_cumulative_cycles_is_infinite_and_inert():
 
 
 def test_run_trajectory_cycle_budget_censors_correctly():
+    """PX4.1 superseded the between-events-only cycle cap with an exact
+    first-passage horizon (see test_v10_2_30_crack_rebonding_part_x_
+    px4_1_exact_cycle_horizon.py for the full suite) -- the censor_reason
+    is now the unified "complete_physical_cycle_censor" label used
+    everywhere this horizon triggers, not the old between-events-only
+    "cycle_budget_exhausted". Uses a cap comfortably above
+    FatigueControllerConfig's own min_block_cycles floor (default 1e-6) --
+    a cap smaller than that floor can overshoot by up to the floor's own
+    value, since the adaptive block search refuses to resolve a candidate
+    smaller than it (an existing, already-qualified system limit, not
+    something this fix introduces; utterly negligible in any realistic
+    use since the mission's own horizon is 1e12 cycles, twelve orders of
+    magnitude above where this floor could ever matter)."""
     Engine.configure_hazard(mode="exponential", seed=1720)
     Engine.reset_audit()
-    # The cap is checked at the START of each event's search (same as
-    # max_accepted_events/max_projected_extension_m), so a cap tiny enough
-    # to be exceeded by the first event's own accumulated cycles still
-    # lets that first event complete -- it censors starting the NEXT one.
     result = pilot.run_trajectory(
         name="cycles_capped", build_engine=_build_engine, make_controller=_make_controller,
         waveform_cls=FatigueWaveform, rebonding_cfg=None, R=-0.5,
         reset_engine_registry=Engine.reset_audit,
         Kmax_Pa_sqrt_m=18.0e6, frequency_Hz=1000.0, n_phase=80, T_K_=300.0,
         max_accepted_events=1000, max_projected_extension_m=1.0e300, hazard_rng_seed=1720,
-        max_cumulative_cycles=1.0e-9,
+        max_cumulative_cycles=1.0e-3,
     )
     assert result["censored"] is True
-    assert result["censor_reason"] == "cycle_budget_exhausted"
-    assert result["n_accepted_events"] == 1
-    assert result["cumulative_cycles"] >= 1.0e-9
+    assert result["censor_reason"] == "complete_physical_cycle_censor"
+    assert result["n_accepted_events"] == 0
+    assert result["cumulative_cycles"] == pytest.approx(1.0e-3, rel=1.0e-6)
 
 
 def test_run_one_job_real_budget_selects_developed_settings_for_D_protocols(tmp_path, monkeypatch):

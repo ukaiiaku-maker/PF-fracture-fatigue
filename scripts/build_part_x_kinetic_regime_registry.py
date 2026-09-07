@@ -521,19 +521,40 @@ def _physical_producer_sha() -> str:
 def canonical_job_key(
     *, material_row_hash, rebonding_config_hash, Kmax, R, nominal_frequency_Hz, minimum_load_hold_s,
     T_K, chemistry_factor, K_rebond_max_Pa_sqrt_m, seed, integrator_mode, physical_producer_sha,
+    campaign_stage: str = "",
 ) -> str:
     """The complete physical identity of one scientific job (mission
     section 5's fail-closed dedup key). Two job requests with the same
     canonical key are the SAME physical run and must be launched once,
     referenced by multiple analysis aliases -- never independently
-    recomputed under different panel labels."""
-    canonical = json.dumps({
+    recomputed under different panel labels.
+
+    ``campaign_stage`` (PX4.1 fix, default "" -- omitted from the hashed
+    payload entirely, byte-identical to every existing call site's key):
+    a PX3 screen job (12 accepted events or 60 um) and a PX4 developed job
+    (30 accepted events, 150 um, 1e12 cycles) at otherwise IDENTICAL
+    physical parameters are NOT the same result -- a screen trajectory is
+    deliberately truncated far short of a developed one -- but the
+    canonical key as originally defined had no way to express that,
+    since it hashes only physical CONDITION, never BUDGET. This silently
+    aliased every PX4 developed row at Kmax=18 MPa sqrt(m) (the screen's
+    own reference Kmax) to its already-completed 12-event screen result,
+    since every other hashed field was identical. New call sites that
+    need to avoid this specific collision should pass an explicit,
+    nonempty campaign_stage (e.g. "developed") -- existing call sites are
+    deliberately left unchanged (their already-recorded keys are already
+    correct for the screen/developed conditions they distinguish some
+    other way, and must not be retroactively altered)."""
+    payload = {
         "material_row_hash": material_row_hash, "rebonding_config_hash": rebonding_config_hash,
         "Kmax_Pa_sqrt_m": float(Kmax), "R": float(R), "nominal_frequency_Hz": float(nominal_frequency_Hz),
         "minimum_load_hold_s": float(minimum_load_hold_s), "T_K": float(T_K),
         "chemistry_factor": float(chemistry_factor), "K_rebond_max_Pa_sqrt_m": float(K_rebond_max_Pa_sqrt_m),
         "seed": int(seed), "integrator_mode": str(integrator_mode), "physical_producer_sha": str(physical_producer_sha),
-    }, sort_keys=True)
+    }
+    if campaign_stage:
+        payload["campaign_stage"] = str(campaign_stage)
+    canonical = json.dumps(payload, sort_keys=True)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
