@@ -1,0 +1,36 @@
+# Paper Simulation Completion Decision
+
+**Status:** `COMPLETE_WITH_DISCLOSED_VERIFICATION_DEPTH_LIMITATIONS`
+
+## Primary finding
+
+The common-hazard fracture/fatigue manuscript is a mature draft that already reports complete, specific, quantitative results for every technical claim examined in this closure (four-class K_c(T) comparison, R-curve, 4-decade rate sweep, fatigue crack-growth atlas, cross-phenomenon correlations). No manuscript claim or figure was found to require a new physical simulation. Crack rebonding (Part X, independently complete) is not referenced by the current draft.
+
+## Campaigns reused (not duplicated)
+
+- Four-class 2D PF/CZM (peak/DBTT/weakT/ceramic) -- sobol parameter IDs byte-matched
+- Canonical temperature-fatigue (36-row, 18/11/7) -- exact commit and counts confirmed
+- Crack rebonding Part X -- exact commit confirmed, already published this session
+
+## New work this session
+
+- Pushed crack rebonding Part X to origin and opened a draft PR
+- PX5 transient-regime analysis (resolves Part X's one NOT_ARCHIVED limitation)
+- This paper-evidence completion package
+
+## Genuine gaps found
+
+- Optional SI sensitivity/identifiability analysis -- explicitly framed as optional in discussion_outline.docx, not built
+
+## Verification depth limitations
+
+Five named campaigns (two-scale virtual C(T), A_NATIVE+PT panel, R-ratio/deltaK, analytical overlay, physical-slope-transfer/inverse-design) were confirmed to exist as real branches with plausible terminal commits but were not individually re-verified at the test-suite or figure-number level this session. None were pushed to origin pending that verification. The specific commit(s) that generated the manuscript's Figs. 2-5 were not individually pinpointed beyond confirming the parameter registry and campaign family.
+
+
+## Not claimed
+
+- closure-corrected DeltaK_eff
+- resolved opposing-face contact
+- topological crack healing
+- calibrated physical chemistry
+- production-line merge readiness

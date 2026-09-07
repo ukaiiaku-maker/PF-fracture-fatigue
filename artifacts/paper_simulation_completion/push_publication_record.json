@@ -1,0 +1,30 @@
+{
+  "schema": "v1_push_publication_record",
+  "part_x": {
+    "branch": "codex/v10.2.30-crack-rebonding-part-x",
+    "local_head": "30db009ff7172728a6bdc885886f21b94cbec225",
+    "remote": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue.git",
+    "remote_verified_sha": "30db009ff7172728a6bdc885886f21b94cbec225",
+    "remote_branch_status_before_push": "ABSENT",
+    "action_taken": "push --set-upstream origin (normal push, no force)",
+    "draft_pr": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue/pull/64",
+    "pr_target_branch": "v10.2.30-hazard-energy-gated-fatigue-events (confirmed unambiguous via origin/HEAD)"
+  },
+  "px5_transient_analysis": {
+    "branch": "codex/v10.2.30-crack-rebonding-part-x-px5-transient",
+    "local_head": "7816cbf91a2ceae76cd52162e0fffb4fef9e75aa",
+    "remote_verified_sha": "7816cbf91a2ceae76cd52162e0fffb4fef9e75aa",
+    "remote_branch_status_before_push": "ABSENT",
+    "action_taken": "push --set-upstream origin (normal push, no force)"
+  },
+  "other_campaigns_not_pushed_this_session": [
+    "codex/v10.2.30-joint-fracture-fatigue-archetype-atlas",
+    "codex/v10.2.30-two-scale-virtual-CT",
+    "codex/v10.2.30-A-native-TP-panel",
+    "codex/v10.2.30-R-ratio-nominal-deltaK",
+    "codex/v10.2.30-analytical-overlay-all-1d",
+    "codex/v10.2.30-physical-slope-transfer",
+    "codex/v10.2.30-inverse-fatigue-barrier-design"
+  ],
+  "reason_other_campaigns_not_pushed": "The mission's Section L requires running each branch's focused tests, strict verifier, compileall, shell-syntax checks, JSON/CSV schema checks, and git diff --check BEFORE pushing. This session confirmed each branch's existence and terminal commit but did not re-run their individual verification suites (a multi-hour undertaking per campaign, several campaigns). Pushing under-verified branches to a shared remote was judged an unjustified risk given they were not produced or re-validated in this session; recorded here as explicit remaining work rather than done silently or skipped without disclosure."
+}

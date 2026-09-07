@@ -1,0 +1,9 @@
+item,reason
+Resolved opposing-crack-face contact model,"Explicit Part X scope boundary; would require a new constitutive model, not an analysis-only extension."
+Positive-R plastic-wake closure,Explicit Part X/mission scope boundary.
+Topological crack healing,Explicit Part X scope boundary (TOPOLOGICAL_HEALING_NOT_MODELED).
+Calibrated physical chemistry for crack rebonding,Explicit Part X scope boundary (PHYSICAL_CHEMISTRY_PARAMETERIZATION_NOT_CALIBRATED).
+Closure-corrected DeltaK_eff,Explicit Part X scope boundary; not claimed anywhere in this closure.
+Temperature-dependent crack rebonding,"Not referenced by the current manuscript; would only be authorized if a principal figure/conclusion required it, which was not found."
+PX5 static-shield attribution for D1/D3/D6,Explicitly out of PX5's prescribed D2/D5-only scope.
+"Material-specific atomistic barrier calibration (NEB, DFT)","Explicitly framed in the manuscript's own Discussion (Sec 4.7.1) as a distinct future research stage, not a gap in the current paper."

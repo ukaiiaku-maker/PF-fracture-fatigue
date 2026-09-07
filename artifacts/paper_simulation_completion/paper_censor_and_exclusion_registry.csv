@@ -1,0 +1,5 @@
+campaign,row_class,condition,disposition,note
+Canonical temperature-fatigue,DBTT,"1200K, all 3 anchor points",COMPLETE_PHYSICAL_CYCLE_CENSOR,Genuine physical censor (suppressed but not zero rate); da/dN NOT imputed as zero; survives censor-aware analysis.
+Canonical temperature-fatigue,Peak,3 rows (temperatures not individually re-extracted this session),NUMERICAL_NONTERMINATION_EXCLUDED,Excluded from science per the campaign's own terminal analysis; not reinterpreted as a censor or as da/dN=0.
+Canonical temperature-fatigue,"(unspecified, 4 additional rows)",remaining 4 of the 7 total numerical nonterminations,NUMERICAL_NONTERMINATION_EXCLUDED,Row-level temperature/class breakdown not individually re-extracted this session beyond the 3 Peak rows explicitly named in the campaign's own progress log; recorded as a verification-depth limitation.
+Crack rebonding Part X,"D1 (screen dwell, hold=0.0005s and 0.002s)","finite cohesion, PX3 screen",INVALIDATED_DWELL_DURATION_WEIGHTING_BUG,"A real duration-weighting bug (found and fixed in PX3.5); formally invalidated, never used in any scientific count."
