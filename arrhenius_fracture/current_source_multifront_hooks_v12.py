@@ -142,7 +142,8 @@ def restore_complete_current_source_engine(state: ProcessEngineState) -> Any:
     """Allocate the pinned production classes and restore all checkpoint fields.
 
     Allocation invokes no initializer and therefore no stochastic draw.  The
-    complete archived fields are then restored by the reviewed V11 restorer.
+    complete archived fields are then restored by the reviewed V11 restorer,
+    which rehydrates the runtime methods from the explicit process-model registry.
     The class allow-list prevents arbitrary checkpoint-controlled imports.
     """
     if state.engine_class != "AuditedPersistentSiteStateResolvedTipEngine":

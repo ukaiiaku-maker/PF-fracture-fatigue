@@ -134,6 +134,11 @@ def _restore_shared_engine(engine, payload: Mapping[str, Any]):
         setattr(engine, name, value)
     for name, value in restored_fields["mpz"].items():
         setattr(engine.mpz, name, value)
+    from .current_source_runtime_bindings import (
+        ENGINE_IDS, rehydrate_current_source_runtime_bindings,
+    )
+    if type(engine).__name__ in ENGINE_IDS:
+        rehydrate_current_source_runtime_bindings(engine)
     return engine
 
 

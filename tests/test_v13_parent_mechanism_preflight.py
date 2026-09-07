@@ -1,15 +1,18 @@
 """Narrow executable reproducers; these do not qualify a V13 implementation."""
-from types import MethodType
-
 import pytest
 
 from arrhenius_fracture.current_source_multifront_hooks_v12 import restore_complete_current_source_engine
-from arrhenius_fracture.general_multifront_v12 import ProcessEngineState
-from arrhenius_fracture.persistent_site_audited_engine_v10221 import AuditedPersistentSiteStateResolvedTipEngine
 from arrhenius_fracture.persistent_site_source_v10221 import SOURCE_MODEL, _persistent_emit
 from arrhenius_fracture.sharp_front_v11_branching import _capture_shared_engine
-from arrhenius_fracture.unified_mpz import UnifiedMPZState
 from scripts.audit_v13_parent_mechanism import correlation_timing_counterexample
+from scripts.v13_frozen_support import (
+    saved_owner, initialized_engine, recapture, field_differences,
+    frozen_process_step, rng_hash,
+)
+from arrhenius_fracture.current_source_runtime_bindings import (
+    RuntimeBindingError, rehydrate_current_source_runtime_bindings,
+    runtime_binding_inventory,
+)
 
 
 def test_current_correlation_policy_delays_a_completed_single_arm_clock():
@@ -20,25 +23,54 @@ def test_current_correlation_policy_delays_a_completed_single_arm_clock():
     assert result["runtime_unchanged"]
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "Demonstrated existing V12 restore defect: callable persistent emission "
-    "binding is excluded from capture and not reinstalled by restore."
-))
-def test_persistent_emission_binding_must_survive_accepted_checkpoint_restore():
-    # Minimal call-binding reproducer: no physical initialization, RNG draw,
-    # mechanics, emission evolution, or fabricated material parameters.
-    engine = AuditedPersistentSiteStateResolvedTipEngine.__new__(
-        AuditedPersistentSiteStateResolvedTipEngine
-    )
-    engine.mpz = UnifiedMPZState.__new__(UnifiedMPZState)
-    engine.mpz.source_model = SOURCE_MODEL
-    engine.mpz._emit = MethodType(_persistent_emit, engine.mpz)
-    payload = _capture_shared_engine(engine)
-    saved = ProcessEngineState.from_v11_payload(
-        engine_id="engine:binding-reproducer", source_state_id="source:binding-reproducer",
-        payload=payload, active_ledgers={}, wake_ledgers={}, signed_system_ledgers={},
-        update_count=0, event_renewal_count=0, local_process_coordinate_m=0.0,
-    )
-    restored = restore_complete_current_source_engine(saved)
-    assert restored.mpz.source_model == SOURCE_MODEL
-    assert restored.mpz._emit.__func__ is _persistent_emit
+@pytest.fixture(scope="module")
+def frozen_payload():
+    return saved_owner()[1].complete_checkpoint_payload()
+
+
+def test_persistent_emission_binding_must_survive_accepted_checkpoint_restore(frozen_payload):
+    with initialized_engine(frozen_payload) as engine:
+        before = _capture_shared_engine(engine)
+        restored = restore_complete_current_source_engine(recapture(engine))
+        assert restored.mpz.source_model == SOURCE_MODEL
+        assert restored.mpz._emit.__func__ is _persistent_emit
+        assert runtime_binding_inventory(engine) == runtime_binding_inventory(restored)
+        assert len(runtime_binding_inventory(restored)["mpz"]) == 8
+        assert field_differences(before, _capture_shared_engine(restored)) == []
+        rehydrate_current_source_runtime_bindings(restored)
+        assert field_differences(before, _capture_shared_engine(restored)) == []
+        assert all(not callable(v) for group in ("engine_fields", "mpz_fields") for v in before[group].values())
+
+
+@pytest.mark.parametrize("duration,active", [(0.0, True), (1e-10, False), (1e-10, True)])
+def test_initialized_and_restored_execute_exactly(frozen_payload, duration, active):
+    with initialized_engine(frozen_payload) as engine:
+        restored = restore_complete_current_source_engine(recapture(engine))
+        K = engine._signed_current_K_Pa_sqrt_m if active else 0.0
+        rng = rng_hash(engine)
+        a = frozen_process_step(engine, 300.0, duration, K)
+        b = frozen_process_step(restored, 300.0, duration, K)
+        assert field_differences(a, b) == []
+        assert field_differences(_capture_shared_engine(engine), _capture_shared_engine(restored)) == []
+        assert rng_hash(engine) == rng_hash(restored) == rng
+        if duration and active:
+            assert a["dN_emit"] > 1e-10
+        elif not active:
+            assert a["dN_emit"] == 0.0
+
+
+@pytest.mark.parametrize("field", ["source_model", "state_model", "_signed_transport_mode"])
+def test_unknown_model_ids_fail_without_state_mutation(frozen_payload, field):
+    with initialized_engine(frozen_payload) as engine:
+        setattr(engine.mpz, field, "unqualified")
+        before = _capture_shared_engine(engine)
+        with pytest.raises(RuntimeBindingError, match="model IDs"):
+            rehydrate_current_source_runtime_bindings(engine)
+        assert field_differences(before, _capture_shared_engine(engine)) == []
+
+
+def test_unregistered_callable_fails_closed(frozen_payload):
+    with initialized_engine(frozen_payload) as engine:
+        engine.mpz.unrecognized_update = lambda: None
+        with pytest.raises(RuntimeBindingError, match="unregistered"):
+            rehydrate_current_source_runtime_bindings(engine)
