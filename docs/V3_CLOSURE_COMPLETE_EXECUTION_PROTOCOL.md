@@ -70,3 +70,16 @@ matching recorded package versions. That cross-worker exact comparison remains
 FAIL; missing CPU/BLAS runtime provenance prevents a narrower causal claim.
 The historical files and exact comparator are retained. Later independent
 workflow audits run even if that comparison fails.
+# Failed controlled preparation provenance
+
+Lifecycle schema /4 binds each controlled case's fixed crack and site center
+to decoded accepted checkpoints, including failed preparations. The oblique
+preparation's support rejection is retained with its last actual accepted
+geometric-promotion state; a centered available-site fallback is invalid.
+The /3 paired run at 034af1f is superseded for this evidence defect. No support
+certificate or numerical limit is relaxed. Re-execute the complete lifecycle
+pair from the committed /4 implementation before publication.
+The retained geometric-promotion checkpoint independently identifies nodes
+404 through 408 at y = -0.0005 m as prescribed bottom-boundary nodes. Their
+four tube-intersecting edges are loaded edges, not the root's external free
+component; extending the boundary-terminal exception would be unjustified.

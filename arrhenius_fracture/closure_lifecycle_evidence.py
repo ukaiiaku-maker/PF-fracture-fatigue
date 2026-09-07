@@ -23,7 +23,7 @@ from .voiding_v5 import (
     update_cavity_growth, promote_cavity,
 )
 
-SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/3"
+SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/4"
 PARTITIONS = (1,2,4,8,16)
 CFG = VoidingConfig(enabled=True, promotion_radius_m=5e-5)
 PRECURSORS = {"birth_hit_1": "available_site", "birth_hit_2": "multi_hit_1",
@@ -289,6 +289,24 @@ def resume_to_guard(state, operations):
     return state
 
 
+def validate_controlled_inputs(row, sources):
+    """Bind physical inputs and failed preparation endpoints to owned states."""
+    from .closure_mechanics_evidence import canonical_data
+    cfg=row['input_configuration']; before=sources[row['initial_checkpoint']]
+    if canonical_data(before.crack_network.branches[0].path)!=cfg['fixed_crack_path_m']:
+        raise ValueError('controlled fixed crack does not match accepted source')
+    for reference in [row['initial_checkpoint'],row['terminal_checkpoint'],
+                      *row['actual_preparation_checkpoints'].values()]:
+        if canonical_data(sources[reference].void_state.sites[0].center_m)!=cfg['center_m']:
+            raise ValueError('controlled boundary site does not match physical input')
+    stages=row['actual_preparation_stages']
+    if len(set(stages))!=len(stages) or set(row['actual_preparation_checkpoints'])!=set(stages):
+        raise ValueError('controlled preparation registry mismatch')
+    if row['failure'] and not row['actual_operations'] and stages:
+        if row['terminal_checkpoint']!=row['actual_preparation_checkpoints'][stages[-1]]:
+            raise ValueError('failed preparation lost its last accepted state')
+
+
 def validate_lifecycle(payload, sources, *, executed_code_sha):
     if payload["schema"] != SCHEMA or payload["executed_code_sha"] != executed_code_sha:
         raise ValueError("lifecycle source/schema identity")
@@ -319,6 +337,8 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
         if row["executed_code_sha"] != executed_code_sha or row["input_hash"] != canonical_hash(row["input_configuration"]):
             raise ValueError("actual execution input/source mismatch")
         if row["conservation"] != conservation(after,before): raise ValueError("stagewise conservation recomputation")
+        if row['dataset']=='controlled':
+            validate_controlled_inputs(row,sources)
         if row["dataset"] == "transitions":
             occurred = transition_occurred(row["case_identity"],before,after)
             if row["transition_occurred"] != occurred: raise ValueError("transition falsely claimed")

@@ -1,4 +1,5 @@
 from dataclasses import replace
+from copy import deepcopy
 
 import pytest
 
@@ -7,6 +8,26 @@ from arrhenius_fracture.voiding_production_v5 import build_production_void_state
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint as fingerprint
 from arrhenius_fracture.sharp_wake_backend_v12 import V11_MODEL_ID,V12_MODEL_ID
 from arrhenius_fracture.v12_production_driver import build_loaded_state,execute_event
+
+
+@pytest.mark.parametrize('mutation',['crack','site','fallback','duplicate_stage'])
+def test_failed_controlled_preparation_cannot_substitute_unrelated_state(mutation):
+    from arrhenius_fracture.closure_lifecycle_evidence import validate_controlled_inputs
+    from arrhenius_fracture.closure_mechanics_evidence import canonical_data
+    state,_=build_production_void_state()
+    row={'initial_checkpoint':'first','terminal_checkpoint':'last','failure':{'message':'support gate'},
+         'actual_operations':[], 'actual_preparation_stages':['first','last'],
+         'actual_preparation_checkpoints':{'first':'first','last':'last'},
+         'input_configuration':{'center_m':canonical_data(state.void_state.sites[0].center_m),
+             'fixed_crack_path_m':canonical_data(state.crack_network.branches[0].path)}}
+    sources={'first':state,'last':state}
+    validate_controlled_inputs(row,sources)
+    bad=deepcopy(row)
+    if mutation=='crack': bad['input_configuration']['fixed_crack_path_m'][0][1]+=1e-5
+    elif mutation=='site': bad['input_configuration']['center_m'][1]+=1e-5
+    elif mutation=='fallback': bad['terminal_checkpoint']='first'
+    else: bad['actual_preparation_stages'].append('last')
+    with pytest.raises(ValueError): validate_controlled_inputs(bad,sources)
 
 
 @pytest.mark.parametrize("partitions",[1,2,4,8,16])

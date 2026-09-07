@@ -164,7 +164,13 @@ def main():
                     if case=="delayed_downstream":
                         after=load_state(after,opening); after,_=advance_transition(after,"downstream_child",1,operations=ops)
                 else: after=resume_to_guard(after,ops)
-        except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
+        except Exception as exc:
+            error={"type":type(exc).__name__,"message":str(exc)}
+            if after is available and local_trace:
+                # A failed preparation still owns its actual accepted history.
+                # Never substitute the unrelated centered campaign precursor.
+                before=local_trace[0][1]
+                after=local_trace[-1][1]
         record("controlled",case,before,after,{"center_m":center,"loading_opening_m":opening,
             "fixed_crack_path_m":path,"history_kind":case,'cleavage_theta_deg':angle,
             'seed':CONTROLLED_HEALING_SEED if case=='embryo_healing' else 3621,
