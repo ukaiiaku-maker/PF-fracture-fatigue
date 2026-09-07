@@ -428,6 +428,7 @@ class StaticFEMResult:
     nominal_remote_stress_Pa: float = math.nan
     cavity_perimeter_m: float = math.nan
     cavity_edge_traction_records: tuple[Mapping[str, Any], ...] = ()
+    source_capture: Optional[Mapping[str, np.ndarray]] = None
 
 
 def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticProperties]=None,
@@ -436,7 +437,8 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
                       symmetric_rigid_constraint: bool=True,
                       element_kill_mask: Optional[np.ndarray]=None,
                       rigid_pin_node: Optional[int]=None,
-                      residual_stiffness_kappa: float=1e-6) -> StaticFEMResult:
+                      residual_stiffness_kappa: float=1e-6,
+                      capture_source: bool=False) -> StaticFEMResult:
     """Use the unmodified production CST assembly and displacement solver."""
     mat=mat or ElasticProperties(E=210e9,nu=0.3)
     mesh=hole.mesh
@@ -547,11 +549,26 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
         if len(candidates):
             local=candidates[np.argmin(np.linalg.norm(cent[candidates]-np.asarray(crack_tip_m),axis=1))]
             tip_sigma=float(sigma[1,local])
+    capture = None
+    if capture_source:
+        system = K2.tocsr(copy=True)
+        system.sum_duplicates(); system.sort_indices()
+        capture = {
+            "nodes": mesh.nodes.copy(), "elements": mesh.elems.copy(),
+            "cavity_edges": hole.cavity_edges.copy(), "exterior_edges": hole.exterior_edges.copy(),
+            "top_nodes": hole.boundary.top_nodes.copy(), "bottom_nodes": hole.boundary.bot_nodes.copy(),
+            "support_mask": killed.copy() if crack_tip_m is not None else np.zeros(mesh.ne, bool),
+            "K_data": system.data.copy(), "K_indices": system.indices.astype(np.int64),
+            "K_indptr": system.indptr.astype(np.int64), "K_shape": np.asarray(system.shape, np.int64),
+            "prescribed_dofs": prescribed.copy(), "displacement": u.copy(),
+            "stress": sigma.copy(), "assembled_residual": residual.copy(),
+            "elasticity_D": D.copy(),
+        }
     return StaticFEMResult(u,sigma,top,bottom,energy,compliance,free_norm,traction_norm,
                            hoop_sc,symmetry,tip_sigma,weak_cavity,mirror_xx,mirror_yy,mirror_xy,
                            conditioning_proxy,killed_energy,traction_normal,traction_tangential,
                            resultant_normalized,moment_normalized,math.sqrt(t2),math.sqrt(tn2),math.sqrt(tt2),
-                           remote,perimeter,tuple(edge_records))
+                           remote,perimeter,tuple(edge_records),capture)
 
 
 __all__ = ["HoleMesh","StaticFEMResult","build_explicit_hole_mesh","cavity_edge_traction_geometry",

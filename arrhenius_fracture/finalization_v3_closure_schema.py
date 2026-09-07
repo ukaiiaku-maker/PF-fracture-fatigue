@@ -76,6 +76,11 @@ def expected_registry_keys() -> Mapping[str, set[tuple[str, int | None]]]:
 
 def validate_closure_evidence(rows: Sequence[Mapping], source_rows: Mapping[str, Mapping],
                               *, executed_code_sha: str):
+    # Static sources bind mesh/system/solution arrays, not invented accepted
+    # lifecycle states. Keep the complete lifecycle registry contract intact.
+    if isinstance(rows, Mapping):
+        from .closure_static_evidence import validate_static_evidence
+        return validate_static_evidence(rows, source_rows, executed_code_sha=executed_code_sha)
     validate_evidence_rows(rows, source_rows, executed_code_sha=executed_code_sha)
     errors = []
     observed = {name: set() for name in expected_registry_keys()}

@@ -47,6 +47,9 @@ def _ideal_circle_ray_intersection(origin, direction, center, radius):
 def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e-5,
                           boundary_segments=32, radial_layers=12, tip_layer=3,
                           opening_m=4.0e-7, crack_enabled=True, cavity_enabled=True,
+                          specimen_width_m=1.0e-3, specimen_height_m=1.0e-3,
+                          far_h_m=5.0e-5, material_E_Pa=210e9, material_nu=0.3,
+                          residual_stiffness_kappa=1.0e-6, capture_source=False,
                           ligament_ratio: float | None = None,
                           crack_orientation_deg: float = 0.0,
                           crack_root_m: tuple[float, float] | None = None,
@@ -54,8 +57,8 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
                           crack_path_m: tuple[tuple[float, float], ...] | None = None,
                           geometry_mode: str = "LEGACY_CAVITY_CENTERED_DIAGNOSTIC") -> dict[str, Any]:
     hole = build_explicit_hole_mesh(
-        1.0e-3, 1.0e-3, cavity_center_m, cavity_radius_m,
-        5.0e-5, boundary_segments, radial_layers_override=radial_layers,
+        specimen_width_m, specimen_height_m, cavity_center_m, cavity_radius_m,
+        far_h_m, boundary_segments, radial_layers_override=radial_layers,
     )
     if not cavity_enabled:
         hole = fill_explicit_hole_mesh(hole)
@@ -105,10 +108,10 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
     mask = np.zeros(hole.mesh.ne, dtype=bool)
     mask[support_ids] = True
     result = solve_static_hole(
-        hole, opening_m, ElasticProperties(E=210e9, nu=0.3),
+        hole, opening_m, ElasticProperties(E=material_E_Pa, nu=material_nu),
         crack_tip_m=crack_tip,
         element_kill_mask=mask if crack_enabled else None,
-        residual_stiffness_kappa=1.0e-6,
+        residual_stiffness_kappa=residual_stiffness_kappa, capture_source=capture_source,
     )
     if len(hole.cavity_edges):
         edge_vectors = hole.mesh.nodes[hole.cavity_edges[:, 1]] - hole.mesh.nodes[hole.cavity_edges[:, 0]]
@@ -160,7 +163,13 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
             chosen = hole.mesh.elems[(along >= 0) & (along <= ligament_m) & (lateral <= cavity_h_max)]
             lengths = np.linalg.norm(hole.mesh.nodes[chosen[:, [1,2,0]]] - hole.mesh.nodes[chosen[:, [0,1,2]]], axis=2).ravel()
             ligament_h_max = float(np.max(lengths)); ligament_h_median = float(np.median(lengths))
+    # Cavity resolution exists independently of the presence of a crack.
+    if len(hole.cavity_edges):
+        cavity_lengths = np.linalg.norm(hole.mesh.nodes[hole.cavity_edges[:, 1]] -
+                                       hole.mesh.nodes[hole.cavity_edges[:, 0]], axis=1)
+        cavity_h_max, cavity_h_median = float(np.max(cavity_lengths)), float(np.median(cavity_lengths))
     return {
+        **({"source_capture": result.source_capture} if capture_source else {}),
         "schema": SCHEMA,
         "configuration": {
             "cavity_center_m": list(cavity_center_m), "cavity_radius_m": cavity_radius_m,

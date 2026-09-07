@@ -1,4 +1,4 @@
-name: V5 finalization-v2 clean-worker reproduction
+name: Historical V5 finalization-v2 pinned reproduction
 
 on:
   push:
@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Retained historical harness, NOT an exact-head closure attestation.
+          ref: f20d98f0f3193b501f3a83b62500196c571129a1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

@@ -1,0 +1,45 @@
+name: V5 closure source-resolved traction exact-head qualification
+
+on:
+  push:
+    branches: [codex/sharp-front-stateful-voiding-v5-finalization-v2]
+  workflow_dispatch:
+
+jobs:
+  closure-traction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Require exact implementation head
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Closure, cavity-edge ownership, and fixed-geometry regression
+        run: >-
+          python -m pytest -q tests/test_finalization_v3_closure_schema.py
+          tests/test_closure_static_evidence.py tests/test_explicit_cavity_v5.py
+          tests/test_crack_void_fixed_geometry_v3.py
+      - name: Unique source-resolved traction A and B
+        run: |
+          python scripts/qualify_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-a
+          python scripts/qualify_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-b
+          diff -ru /tmp/voiding_v5_finalization_v3_closure/traction-source-a /tmp/voiding_v5_finalization_v3_closure/traction-source-b
+      - name: Source reassembly, ontology, manifests and committed canonical comparison
+        run: |
+          python scripts/validate_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-a --canonical artifacts/voiding_v5_finalization_v3_closure/traction_source_a
+          python scripts/validate_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-b
+      - name: Clean-worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: voiding-v5-closure-traction-${{ github.sha }}
+          path: /tmp/voiding_v5_finalization_v3_closure
