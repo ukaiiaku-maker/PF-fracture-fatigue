@@ -127,7 +127,8 @@ def predicates(bases):
         add(key+"/quality", [key], {"value": m["mesh_quality"], "limit": LIMITS["mesh_minimum_quality"]}, m["mesh_quality"] >= LIMITS["mesh_minimum_quality"])
         certificate = m["independent_intact_path_certificate"]
         add(key+"/no_intact_cross_crack_path", [key], certificate,
-            not certificate["intact_cross_graph_path_exists"])
+            not certificate["intact_cross_graph_path_exists"]
+            and not certificate["insufficient_seed_segment_ids"])
         add(key+"/fixed_crack_vertices", [key], {"error_m": m["fixed_crack_vertex_error_m"],
             "limit": LIMITS["requested_realized_geometry_abs_m"]},
             m["fixed_crack_vertex_error_m"] <= LIMITS["requested_realized_geometry_abs_m"])

@@ -80,6 +80,21 @@ def test_readonly_rate_diagnostic_uses_existing_hazard_without_consuming_it(conn
     assert fingerprint(connected) == before
 
 
+def test_checkpoint_candidate_measurement_contract_matches_production_runner(connected):
+    from arrhenius_fracture.closure_production_evidence import candidate_measurements
+    from scripts.qualify_voiding_v5_production_transfer import candidate_measurements as runner, canonical
+    before=fingerprint(connected)
+    assert candidate_measurements(connected)==canonical(runner(connected))
+    assert fingerprint(connected)==before
+
+
+def test_transfer_ontology_rejects_missing_physical_registry():
+    from arrhenius_fracture.closure_production_evidence import validate_production, SCHEMA
+    with pytest.raises(ValueError,match="physical registry"):
+        validate_production({"transfer_manifest":{"schema":SCHEMA,"executed_code_sha":"a"},
+                             "rows":[]},{},executed_code_sha="a")
+
+
 def test_resolution_change_requires_fixed_physical_crack():
     with pytest.raises(ValueError, match="explicit fixed crack path"):
         build_production_void_state(boundary_segments=64, radial_layers=24)

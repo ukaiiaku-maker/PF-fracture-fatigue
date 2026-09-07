@@ -1,4 +1,4 @@
-name: V5 closure source-resolved traction exact-head qualification
+name: V5 closure exact-head evidence replay (scientific decision retained)
 
 on:
   push:
@@ -43,4 +43,48 @@ jobs:
         if: always()
         with:
           name: voiding-v5-closure-traction-${{ github.sha }}
+          path: /tmp/voiding_v5_finalization_v3_closure
+
+  closure-campaign:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - phase: mechanics
+            runner: qualify_voiding_v5_closure_mechanics.py
+          - phase: production
+            runner: qualify_voiding_v5_production_transfer.py
+          - phase: lifecycle
+            runner: run_voiding_v5_closure_lifecycle.py
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Require exact implementation head
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Actual source-bound A and B (failed science is retained)
+        run: |
+          python scripts/${{ matrix.runner }} /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-a
+          python scripts/${{ matrix.runner }} /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-b
+      - name: Exact recursive comparison, manifests and recomputed ontology
+        run: |
+          diff -ru /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-a /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-b
+          python scripts/validate_voiding_v5_closure_bundle.py /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-a
+          python scripts/validate_voiding_v5_closure_bundle.py /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-b
+      - name: Clean-worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: voiding-v5-closure-${{ matrix.phase }}-${{ github.sha }}
           path: /tmp/voiding_v5_finalization_v3_closure
