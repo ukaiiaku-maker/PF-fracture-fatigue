@@ -1,0 +1,209 @@
+{
+  "schema": "v10230_part_x_px5_static_shield_analysis_v1",
+  "reproduction_fraction_thresholds": {
+    "dominant_if_both_controls_ge": 0.8,
+    "history_required_if_both_controls_le": 0.3
+  },
+  "pending_conditions": [
+    [
+      "D2",
+      12000000.0,
+      "ceiling_static"
+    ],
+    [
+      "D5",
+      12000000.0,
+      "ceiling_static"
+    ]
+  ],
+  "points": [
+    {
+      "protocol": "D2",
+      "Kmax_Pa_sqrt_m": 12000000.0,
+      "S_h_dynamic": -1.190247585901405,
+      "ceiling_static": null,
+      "orbit_matched_static": {
+        "canonical_job_key": "476371422d32d29d56ec06d9c033b8a965adf69b69d51f490850b46b3842baf4",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 1.4077089297891564e-08,
+        "S_h_static": -0.27107419788684284,
+        "reproduction_fraction_of_dynamic": 0.22774605980952392
+      },
+      "classification": "PENDING_DATA"
+    },
+    {
+      "protocol": "D2",
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "S_h_dynamic": -0.12593677594792968,
+      "ceiling_static": {
+        "canonical_job_key": "fff3f17cef5d6490e127ba5506ee383aad83a62254a05e44e34c73b9f177bcfd",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 1.9527785068412696e-07,
+        "S_h_static": -0.12680770044480927,
+        "reproduction_fraction_of_dynamic": 1.006915569263419
+      },
+      "orbit_matched_static": {
+        "canonical_job_key": "a1c1b625f99fa1700a4a3d9ba26b4a5ce30cff45704e680219d0a4a0d768875e",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 2.424902060925567e-07,
+        "S_h_static": -0.03276648421432156,
+        "reproduction_fraction_of_dynamic": 0.2601820156795924
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D2",
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "S_h_dynamic": -0.0435803582695874,
+      "ceiling_static": {
+        "canonical_job_key": "def756cd42a35474bba54b5db616df172f876721565012c0585ca1a903bcf685",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 3.4235861912696756e-07,
+        "S_h_static": -0.04441265262068267,
+        "reproduction_fraction_of_dynamic": 1.0190979235633335
+      },
+      "orbit_matched_static": {
+        "canonical_job_key": "ca6f809a3d30cba2b869314076e15aa8b41fbbe22bb37fa2f61b88ae0b3ddeeb",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 3.677417825348055e-07,
+        "S_h_static": -0.01335094176780787,
+        "reproduction_fraction_of_dynamic": 0.306352271939096
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D2",
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "S_h_dynamic": -0.027322813315269555,
+      "ceiling_static": {
+        "canonical_job_key": "9a9ef987660b53e316a31fade370f63efa47f5d7782aef63912e68ffbee6fc45",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 4.192510150346499e-07,
+        "S_h_static": -0.027745199395542312,
+        "reproduction_fraction_of_dynamic": 1.0154590991564072
+      },
+      "orbit_matched_static": {
+        "canonical_job_key": "90e09720d1f9cbfa354ea866d59f7acac4a95559a215be7c1a67362e60cf44b2",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 4.37876094234119e-07,
+        "S_h_static": -0.008868086519900441,
+        "reproduction_fraction_of_dynamic": 0.32456710872245526
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D2",
+      "Kmax_Pa_sqrt_m": 24300000.0,
+      "S_h_dynamic": -0.019688210372243064,
+      "ceiling_static": {
+        "canonical_job_key": "8c2fdb9e6ee30fac0119e7ead79eb61f4f93d31ab36c799b6aa1f64f10240177",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 4.751453282101852e-07,
+        "S_h_static": -0.0200405673176567,
+        "reproduction_fraction_of_dynamic": 1.017896849878768
+      },
+      "orbit_matched_static": {
+        "canonical_job_key": "12067287ed910aed12bc8671eee7e30fe611069306c3e967fe4879feb403c24d",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 4.900021046818161e-07,
+        "S_h_static": -0.006669085372771095,
+        "reproduction_fraction_of_dynamic": 0.33873497116697515
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_Pa_sqrt_m": 12000000.0,
+      "S_h_dynamic": -1.1902023788617737,
+      "ceiling_static": null,
+      "orbit_matched_static": {
+        "canonical_job_key": "a62cac7e7ae688016d9ecb4eab6d96770b50f944e5bcbe339adf40832dd4c6f7",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 1.4297111253700183e-08,
+        "S_h_static": -0.2643387667757986,
+        "reproduction_fraction_of_dynamic": 0.2220956464803857
+      },
+      "classification": "PENDING_DATA"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "S_h_dynamic": -0.1260044756006598,
+      "ceiling_static": {
+        "canonical_job_key": "df2881a8baf711e30d2525a989c9396dfc0f84c6ff5a5a050b006c481953a15c",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 1.9527785068412696e-07,
+        "S_h_static": -0.12680770044480927,
+        "reproduction_fraction_of_dynamic": 1.0063745739214462
+      },
+      "orbit_matched_static": {
+        "canonical_job_key": "16043e3c575fa5e04cc53f7bcb454bf1fc5f102475de29e353c2145d9d92cac5",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 2.4198918944459466e-07,
+        "S_h_static": -0.03366472197271349,
+        "reproduction_fraction_of_dynamic": 0.2671708430373977
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "S_h_dynamic": -0.04363093463566765,
+      "ceiling_static": {
+        "canonical_job_key": "311dbe916f74ad8d0d4762409e45c5b4ee7d8b0eaeac8eac7f65a8d75e6bad7f",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 3.4235861912696756e-07,
+        "S_h_static": -0.04441265262068267,
+        "reproduction_fraction_of_dynamic": 1.0179165995764845
+      },
+      "orbit_matched_static": {
+        "canonical_job_key": "68db722ec35024d1cdc41799711ba2e4277e1bb51c5bfa8a04ffa92a84c5eaa9",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 3.668977677821097e-07,
+        "S_h_static": -0.014348849138454555,
+        "reproduction_fraction_of_dynamic": 0.3288687088248754
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "S_h_dynamic": -0.027300440627894502,
+      "ceiling_static": {
+        "canonical_job_key": "13c9093c693e9c82291c22892e4994f50609edcce3cd53756e16aa4fac279425",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 4.192510150346499e-07,
+        "S_h_static": -0.027745199395542312,
+        "reproduction_fraction_of_dynamic": 1.016291267005902
+      },
+      "orbit_matched_static": {
+        "canonical_job_key": "4192bccca955bee71b568568a2193caa76a6bdea32a6029190f4fa4788859095",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 4.3680181407848566e-07,
+        "S_h_static": -0.009934888765095741,
+        "reproduction_fraction_of_dynamic": 0.3639094658034445
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    },
+    {
+      "protocol": "D5",
+      "Kmax_Pa_sqrt_m": 24300000.0,
+      "S_h_dynamic": -0.01968113610902707,
+      "ceiling_static": {
+        "canonical_job_key": "e097ce57ad90b1bdac52505165be35cfb2ec2b91f1cba716b7fef7e3bc606283",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 4.751453282101852e-07,
+        "S_h_static": -0.0200405673176567,
+        "reproduction_fraction_of_dynamic": 1.0182627266352153
+      },
+      "orbit_matched_static": {
+        "canonical_job_key": "b39527c3a7f0182138d3b9e2ca48657611570662ccc252d33d41f89ace60bf1a",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 4.887290364495849e-07,
+        "S_h_static": -0.007798888639307391,
+        "reproduction_fraction_of_dynamic": 0.3962621159725787
+      },
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
+    }
+  ]
+}
