@@ -45,11 +45,20 @@ def regression(path):
         'xml_sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
 
 
+def accounting_coverage(decision):
+    transitions=decision['transition_partitions']
+    observed=decision['stagewise_topology_and_conservation']
+    missing=[r['execution_id'] for r in transitions if not r['actual_transition']]
+    return {'all_observed_states_passed':observed,'unexercised_transition_execution_ids':missing,
+            'complete_lifecycle_passed':bool(observed and len(transitions)==45 and not missing)}
+
+
 def ledger(bundle,spec):
     traction=read(bundle/'traction','traction_convergence.json')
     mechanics=read(bundle/'mechanics','mechanics_matrix.json')
     production=read(bundle/'production','transfer_manifest.json')
     lifecycle=read(bundle/'lifecycle','lifecycle_rows.json');decision=lifecycle['decision'];rows=lifecycle['rows']
+    accounting=accounting_coverage(decision)
     neutrality=read(bundle/'neutrality','neutrality_comparison.json')
     rollback=decision['rollback_attempts'];natural=[r for r in rows if r['dataset']=='natural']
     full=regression(Path(spec['full_regression_xml']));focused=regression(Path(spec['focused_regression_xml']))
@@ -71,10 +80,10 @@ def ledger(bundle,spec):
         'complete_22_lifecycle_rollback_stages':sum(r['case_identity'].startswith('lifecycle:') for r in rollback)==22
             and all(r['passed'] for r in rollback if r['case_identity'].startswith('lifecycle:')),
         'natural_seed_partition_restart_rng':len(natural)==160 and all(r['passed'] for r in decision['natural_partitions_restart']),
-        'stagewise_conservation_and_topology':decision['stagewise_topology_and_conservation'],
+        'stagewise_conservation_and_topology':accounting['complete_lifecycle_passed'],
         'focused_regressions':focused['failed']==0 and focused['tests']>0,
     }
-    return {'schema':'v12.complete-closure-derived-ledger/1','record_kind':'DERIVED_AUDIT_NOT_ADDITIONAL_PHYSICAL_EXECUTIONS',
+    return {'schema':'v12.complete-closure-derived-ledger/2','record_kind':'DERIVED_AUDIT_NOT_ADDITIONAL_PHYSICAL_EXECUTIONS',
         'audit_code_sha':subprocess.check_output(('git','rev-parse','HEAD'),cwd=ROOT,text=True).strip(),
         'source_implementation_shas':{'traction':traction['executed_code_sha'],'mechanics':mechanics['executed_code_sha'],
             'production':production['executed_code_sha'],'lifecycle':lifecycle['executed_code_sha'],
@@ -86,7 +95,9 @@ def ledger(bundle,spec):
             'failed':sum(not r['predicate_result'] for r in mechanics['derived_rows'])},
         'source_refinement_peers':source_peers,'production_comparisons':production['comparisons'],
         'lifecycle_decision':decision,'natural_phase_counts':dict(Counter(r['terminal_classification'] for r in natural if r['partition_count']==1)),
-        'natural_elapsed_window_completed':sum(r['failure'] is None for r in natural),
+        'natural_elapsed_window_completed':sum(r['failure'] is None and
+            r['elapsed_physical_time_s']==r['input_configuration']['duration_s'] for r in natural),
+        'stagewise_accounting_coverage':accounting,
         'historical_neutrality_decision':neutrality['decision'],
         'full_regressions':{**full,'implementation_sha':spec['full_regression_sha'],'classification':'NOT_GREEN' if full['failed'] else 'GREEN'},
         'focused_regressions':{**focused,'implementation_sha':spec['focused_regression_sha']},
