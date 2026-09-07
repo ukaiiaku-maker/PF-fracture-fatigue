@@ -1,0 +1,38 @@
+{
+  "accepted_endpoint_s": 3368.4000000000233,
+  "accepted_interval_count": 401,
+  "accepted_opening_m": 8.020000000000027e-05,
+  "accepted_process_sha256": "8983e372c52fbba30bbcd4403987cf955810e122768ffd8af2b4a818c56ecb92",
+  "accepted_single_checkpoint_sha256": "7c44d1902a0fdf388344f2aef7c8405190c84f2d08272f8fa245a031a3c7d1f7",
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "canonical_source_function": "sharp_front_v11_branching.run_2d(maximum_fronts=1)",
+  "cleavage_rng_and_clocks_sha256": "50152c44bfa320c584dcee22def19707e259cf15477ea18bbedcbd1af4f11736",
+  "event_context_sha256": "17ecc0cb63c187135b0ee633af9af3b7eb09698c02cc05fce03cd7d38f2e7b5d",
+  "event_id": "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001",
+  "event_ordinal": 1,
+  "fresh_initialization": true,
+  "historical_process_state_used": false,
+  "installed_bindings": {
+    "engine": {},
+    "mpz": {
+      "_emit": "arrhenius_fracture.persistent_site_source_v10221._persistent_emit",
+      "_persistent_base_diagnostics": "arrhenius_fracture.signed_burgers_shared_v1025._signed_diagnostics",
+      "active_K_shielding": "arrhenius_fracture.signed_burgers_shared_v1025._active_K",
+      "advance": "arrhenius_fracture.persistent_site_source_v10221._persistent_advance",
+      "diagnostics": "arrhenius_fracture.persistent_site_source_v10221._persistent_diagnostics",
+      "evolve": "arrhenius_fracture.signed_burgers_shared_v1025._signed_evolve_scalar",
+      "shielding_K": "arrhenius_fracture.signed_burgers_shared_v1025._total_K",
+      "wake_K_shielding": "arrhenius_fracture.signed_burgers_shared_v1025._wake_K"
+    }
+  },
+  "parent_call_count_in_accepted_event_interval": 1,
+  "pre_cleavage_checkpoint_sha256": "bbbdfb68253fcec4796d33513c7fced62d8956519813d8dae4f9fc0530f06fcc",
+  "pre_process_sha256": "4cd4c5ccb11f82de59f73432a9c9400de6ccde50b709fd76331807e3175790de",
+  "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+  "raw_first_passage_s": 3363.172621137936,
+  "schema": "v13.clean-physical-parent/1",
+  "single_trial_cost_J_per_m": 3.0548032865575034e-05,
+  "single_trial_energy_release_J_per_m": 0.0026261039180326406,
+  "status": "FIRST_BASELINE_SINGLE_CAPTURED",
+  "winning_candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0"
+}
