@@ -1,0 +1,58 @@
+{
+  "schema": "v12.cross-worker-canonical-diagnostic/1",
+  "workflow_run_id": 34143811572,
+  "current_implementation_sha": "d69187eaca19fe24e1d08ed9ab0eafb8f44f6a48",
+  "canonical_implementation_sha": "123c018993e3fb23134b55d26f244e7706daf95a",
+  "canonical_path": "artifacts/voiding_v5_finalization_v3_closure/traction_linux_a",
+  "current_a_path": "traction-source-a",
+  "current_b_path": "traction-source-b",
+  "all_three_sha256_manifests_valid": true,
+  "current_a_b_exact_recursive_byte_match": true,
+  "historical_canonical_exact_comparison_passed": false,
+  "registered_source_files_changed": [],
+  "recorded_environments_identical": true,
+  "environment": {
+    "assembly": "production_CST_plane_strain_P0_V12_support",
+    "machine": "x86_64",
+    "numpy": "2.5.3",
+    "platform": "linux",
+    "python": "3.12.14",
+    "scipy": "1.18.1",
+    "solver": "scipy.sparse.linalg.spsolve"
+  },
+  "unrecorded_runtime_properties": ["CPU model and instruction dispatch", "BLAS build/configuration", "BLAS thread count", "runner image identity"],
+  "arrays_identical_in_all_11_cases": ["nodes", "elements", "cavity_edges", "exterior_edges", "top_nodes", "bottom_nodes", "support_mask", "K_data", "K_indices", "K_indptr", "K_shape", "prescribed_dofs", "elasticity_D"],
+  "arrays_different_in_all_11_cases": ["displacement", "stress", "assembled_residual"],
+  "absolute_maximum_array_differences": [
+    {"case_id":"cavity:32:12", "displacement_m":2.9116757561866574e-22, "stress_Pa":9.350478649139404e-7, "assembled_residual_N_per_m":6.184563972055912e-11},
+    {"case_id":"cavity:64:24", "displacement_m":8.602678370551488e-22, "stress_Pa":4.244968295097351e-6, "assembled_residual_N_per_m":1.0913936421275139e-10},
+    {"case_id":"cavity:128:48", "displacement_m":6.018566136935829e-21, "stress_Pa":8.318573236465454e-5, "assembled_residual_N_per_m":3.865281428261369e-10},
+    {"case_id":"cavity:256:96", "displacement_m":3.99693671985623e-21, "stress_Pa":4.103220999240875e-5, "assembled_residual_N_per_m":1.8189894035458565e-10},
+    {"case_id":"cavity:512:192", "displacement_m":9.568825326013424e-21, "stress_Pa":0.0003382912836968899, "assembled_residual_N_per_m":3.7820857556880583e-10},
+    {"case_id":"cavity:256:48", "displacement_m":4.698385879301197e-21, "stress_Pa":4.9999915063381195e-5, "assembled_residual_N_per_m":2.0997581451354108e-10},
+    {"case_id":"cavity:512:48", "displacement_m":9.899697571034635e-21, "stress_Pa":0.00012765079736709595, "assembled_residual_N_per_m":5.23509680050438e-10},
+    {"case_id":"cavity:256:192", "displacement_m":3.142624583211463e-20, "stress_Pa":0.0009544631466269493, "assembled_residual_N_per_m":1.4668537495765577e-9},
+    {"case_id":"cracked:128:48", "displacement_m":3.626359805432473e-21, "stress_Pa":3.633834421634674e-5, "assembled_residual_N_per_m":2.1100277081131935e-10},
+    {"case_id":"cracked:256:96", "displacement_m":5.598358385758891e-21, "stress_Pa":5.99520280957222e-5, "assembled_residual_N_per_m":3.065032672111556e-10},
+    {"case_id":"cracked:512:192", "displacement_m":5.07061715495006e-21, "stress_Pa":0.000158804003149271, "assembled_residual_N_per_m":2.986269009852549e-10}
+  ],
+  "first_case_observable_difference_count": 285,
+  "first_lexicographic_observable_difference": {
+    "case_id":"cavity:32:12",
+    "path":"/assembled_cavity_node_residual_relative",
+    "canonical":7.27569489171013e-16,
+    "current":9.319995077346556e-16
+  },
+  "geometry_only_roundoff_example": {
+    "case_id":"cavity:32:12",
+    "path":"/edge_records/5/first_layer_normal_spacing_m",
+    "canonical":1.4553874211211232e-5,
+    "current":1.4553874211211233e-5,
+    "raw_meshes_identical":true
+  },
+  "registered_predicate_count": 69,
+  "all_predicate_ids_and_boolean_results_identical": true,
+  "relaxed_comparison_performed": false,
+  "classification": "STRICT_CROSS_WORKER_NUMERICAL_INCOMPATIBILITY",
+  "cause_assessment": "Observed roundoff-level solver/reduction differences with identical raw geometry, stiffness and registered code; consistent with an unrecorded numerical runtime/CPU/BLAS difference. Available provenance cannot identify the specific backend cause. Historical canonical remains an exact FAIL."
+}

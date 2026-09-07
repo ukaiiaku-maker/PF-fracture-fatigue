@@ -1,0 +1,271 @@
+{
+  "base_authority": {
+    "commit_subject": "Correct Stage II physical branching evidence",
+    "gate": "STAGE_II_BASE_V3_LOCAL",
+    "qualifier": "scripts/qualify_v12_production_integration_v3.py",
+    "qualifier_schema": "v12.production-integration-qualified-evidence/3",
+    "test": "tests/test_v12_stage2_base_v3.py"
+  },
+  "base_sha": "326e3f5973ef623781ab8568798c495a3f68238c",
+  "case_registry": {
+    "checkpoint_restart": {
+      "endpoint_m": [
+        0.000525,
+        0.0
+      ],
+      "seed": 3621
+    },
+    "fixed_mesh_oblique": {
+      "endpoint_m": [
+        0.000525,
+        2.5e-05
+      ],
+      "seed": 3621
+    },
+    "monotonic": {
+      "endpoint_m": [
+        0.000525,
+        0.0
+      ],
+      "seed": 3621
+    },
+    "unload_reload": {
+      "openings_m": [
+        0.0,
+        4e-07
+      ],
+      "seed": 3621
+    }
+  },
+  "comparison_exclusions": [],
+  "current_sha": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+  "decision": "FAIL_FULL_STATE_EQUALITY",
+  "model_identity_retained": true,
+  "rows": [
+    {
+      "base_complete_fingerprint": "26b9d95bfd2b6b8a85288476fe77099dc93e8f457182b04e348a51d360299908",
+      "base_failure": null,
+      "base_model_identity": "sharp_wake_mechanically_separating_v12",
+      "case_id": "monotonic",
+      "checkpoint_continuation_equal": true,
+      "complete_native_fingerprints_equal": false,
+      "current_complete_fingerprint": "1432761c6c2eb85ea0f1b7bbdaef03b2ae60e4bd2c2c5225b66731034cfab5e3",
+      "current_failure": null,
+      "current_model_identity": "sharp_wake_mechanically_separating_v12",
+      "full_component_differences": [
+        {
+          "base": "<MISSING>",
+          "current": 32931.30717216061,
+          "path": "/energy_ledgers/latest_constrained_reaction_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 0.006716579719524896,
+          "path": "/energy_ledgers/latest_energy_reaction_identity"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.095426371341534e-10,
+          "path": "/energy_ledgers/latest_free_dof_residual_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.0320951027259866e-16,
+          "path": "/energy_ledgers/latest_top_bottom_reaction_balance"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_boundary_terminal_certificates"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_graph_support_audit/boundary_terminal_certificates"
+        },
+        {
+          "base": "326e3f5973ef623781ab8568798c495a3f68238c",
+          "current": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+          "path": "/v12_support_state/source_commit"
+        },
+        {
+          "base": "<MISSING>",
+          "current": null,
+          "path": "/void_state"
+        }
+      ],
+      "full_components_equal": false,
+      "model_identity_equal": true,
+      "passed": false
+    },
+    {
+      "base_complete_fingerprint": "75882692a353103ceb3d1103fa6fe076e266c2b48715240720a523b2ada134e5",
+      "base_failure": null,
+      "base_model_identity": "sharp_wake_mechanically_separating_v12",
+      "case_id": "fixed_mesh_oblique",
+      "checkpoint_continuation_equal": true,
+      "complete_native_fingerprints_equal": false,
+      "current_complete_fingerprint": "9ad61f0eab0ae5491901b9b98f9bfc1c59454277908426611c58b59125d0d0c4",
+      "current_failure": null,
+      "current_model_identity": "sharp_wake_mechanically_separating_v12",
+      "full_component_differences": [
+        {
+          "base": "<MISSING>",
+          "current": 32779.16951474737,
+          "path": "/energy_ledgers/latest_constrained_reaction_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 0.006712807540921346,
+          "path": "/energy_ledgers/latest_energy_reaction_identity"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.0488016945562084e-10,
+          "path": "/energy_ledgers/latest_free_dof_residual_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 1.1585713752758903e-16,
+          "path": "/energy_ledgers/latest_top_bottom_reaction_balance"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_boundary_terminal_certificates"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_graph_support_audit/boundary_terminal_certificates"
+        },
+        {
+          "base": "326e3f5973ef623781ab8568798c495a3f68238c",
+          "current": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+          "path": "/v12_support_state/source_commit"
+        },
+        {
+          "base": "<MISSING>",
+          "current": null,
+          "path": "/void_state"
+        }
+      ],
+      "full_components_equal": false,
+      "model_identity_equal": true,
+      "passed": false
+    },
+    {
+      "base_complete_fingerprint": "6a7bad5c38410e22a0eccab7b31d516a25579d6a007c8c6d5f33d07406ed8e9a",
+      "base_failure": null,
+      "base_model_identity": "sharp_wake_mechanically_separating_v12",
+      "case_id": "checkpoint_restart",
+      "checkpoint_continuation_equal": true,
+      "complete_native_fingerprints_equal": false,
+      "current_complete_fingerprint": "6d71012fb97dbd985c6a118546717e6f8b041a269215f5a5d4a722c7d18a1aaf",
+      "current_failure": null,
+      "current_model_identity": "sharp_wake_mechanically_separating_v12",
+      "full_component_differences": [
+        {
+          "base": "<MISSING>",
+          "current": 32931.30717216061,
+          "path": "/energy_ledgers/latest_constrained_reaction_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 0.006716579719524896,
+          "path": "/energy_ledgers/latest_energy_reaction_identity"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.095426371341534e-10,
+          "path": "/energy_ledgers/latest_free_dof_residual_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.0320951027259866e-16,
+          "path": "/energy_ledgers/latest_top_bottom_reaction_balance"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_boundary_terminal_certificates"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_graph_support_audit/boundary_terminal_certificates"
+        },
+        {
+          "base": "326e3f5973ef623781ab8568798c495a3f68238c",
+          "current": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+          "path": "/v12_support_state/source_commit"
+        },
+        {
+          "base": "<MISSING>",
+          "current": null,
+          "path": "/void_state"
+        }
+      ],
+      "full_components_equal": false,
+      "model_identity_equal": true,
+      "passed": false
+    },
+    {
+      "base_complete_fingerprint": "7b95031b4b6cca562741354993b90294ebcb5add32cb2114ae471e766b2043eb",
+      "base_failure": null,
+      "base_model_identity": "sharp_wake_mechanically_separating_v12",
+      "case_id": "unload_reload",
+      "checkpoint_continuation_equal": true,
+      "complete_native_fingerprints_equal": false,
+      "current_complete_fingerprint": "0cf547d1fd329f6c0f9674e770c2c43eb234b66c1d9ebb03797735183b4f797b",
+      "current_failure": null,
+      "current_model_identity": "sharp_wake_mechanically_separating_v12",
+      "full_component_differences": [
+        {
+          "base": "<MISSING>",
+          "current": 33724.357231381764,
+          "path": "/energy_ledgers/latest_constrained_reaction_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 0.00672988996216725,
+          "path": "/energy_ledgers/latest_energy_reaction_identity"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 1.455491289968108e-09,
+          "path": "/energy_ledgers/latest_free_dof_residual_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 5.591649703902077e-16,
+          "path": "/energy_ledgers/latest_top_bottom_reaction_balance"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_boundary_terminal_certificates"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_graph_support_audit/boundary_terminal_certificates"
+        },
+        {
+          "base": "326e3f5973ef623781ab8568798c495a3f68238c",
+          "current": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+          "path": "/v12_support_state/source_commit"
+        },
+        {
+          "base": "<MISSING>",
+          "current": null,
+          "path": "/void_state"
+        }
+      ],
+      "full_components_equal": false,
+      "model_identity_equal": true,
+      "passed": false
+    }
+  ],
+  "schema": "v12.disabled-v5-clean-historical-neutrality/1"
+}

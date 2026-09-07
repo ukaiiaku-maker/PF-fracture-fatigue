@@ -1,0 +1,312 @@
+{
+  "active_tip_ids": [
+    "b00000000"
+  ],
+  "checkpoint_generation": 0,
+  "crack_network": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "branches": [
+      {
+        "branch_id": "b00000000",
+        "generation": 0,
+        "initiation_event": 0,
+        "local_state": {},
+        "orientation_history_rad": [
+          -1.224646799147353e-16
+        ],
+        "parent_branch_id": null,
+        "path_m": [
+          [
+            0.0,
+            8.572527594031472e-20
+          ],
+          [
+            0.0005725993004046688,
+            1.5602085896855586e-20
+          ]
+        ],
+        "physical_path_length_m": 0.0005725993004046688,
+        "projected_extension_m": 0.0005725993004046688,
+        "status": "active"
+      }
+    ],
+    "branching_enabled": false,
+    "geometry_generation": 0,
+    "primary_branch_id": "b00000000",
+    "primary_projected_extension_m": 0.0005725993004046688,
+    "schema": "v11.crack-network/1",
+    "total_physical_crack_length_m": 0.0005725993004046688
+  },
+  "directional_competition": {
+    "candidates": [
+      {
+        "angle_rad": 0.0,
+        "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+        "direction_xy": [
+          1.0,
+          0.0
+        ],
+        "gamma_rel": 1.0,
+        "normal_xy": [
+          0.0,
+          1.0
+        ],
+        "orientation_convention": "bcc-[001]-section:theta_deg=0",
+        "plane_family": "cleavage",
+        "plane_variant": "(100)"
+      }
+    ],
+    "competition_event_index": 0,
+    "consumed_event_ids": [],
+    "global_hazard_seed": 12023,
+    "hazard_states": [
+      {
+        "action": 2.0412288954657132e-22,
+        "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+        "completed_event_count": 0,
+        "current_threshold_action": 0.9704892132378555,
+        "last_completion_time_s": null,
+        "pending_events": [],
+        "previous_rate_per_s": 4.899227018971828e-17,
+        "residual_action": 2.0412288954657132e-22,
+        "threshold_process": "unit_exponential",
+        "threshold_seed": 12023
+      }
+    ],
+    "reservations": [],
+    "schema": "v11.directional-competition/1"
+  },
+  "energy_ledgers": {
+    "emission_work": 1.0,
+    "latest_constrained_reaction_l2_N_per_m": 47908.98251265008,
+    "latest_energy_reaction_identity": 0.005621396286268323,
+    "latest_fem_energy_J_per_m": 0.01324179253122688,
+    "latest_free_dof_residual_l2_N_per_m": 2.6810430413529825e-10,
+    "latest_reaction_N_per_m": 65424.57586201047,
+    "latest_residual_l2_N_per_m": 47908.98251265008,
+    "latest_top_bottom_reaction_balance": 0.0006747370141286849
+  },
+  "event_counters": {
+    "accepted_steps": 0,
+    "mesh_generation": 5,
+    "refinement_operation_index": 5,
+    "topology_actions": 0
+  },
+  "has_production_void_state": true,
+  "has_rng_state": true,
+  "production_void_state": {
+    "available_defect_inventory_area_m2": 4.966822228908758e-10,
+    "cavities": [
+      {
+        "area_m2": 9.503317777109124e-09,
+        "cavity_id": "void:site-1",
+        "center_m": [
+          0.0007,
+          0.0
+        ],
+        "connection_direction_xy": null,
+        "connection_entry_m": null,
+        "connection_exit_m": null,
+        "geometry_generation": 26,
+        "inventory_area_m2": 9.503317777109124e-09,
+        "lineage": [
+          "site-1",
+          "GEOMETRIC_PROMOTION"
+        ],
+        "parent_site_id": "site-1",
+        "phase": "RESOLVED_VOID",
+        "radius_m": 5.5e-05
+      }
+    ],
+    "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
+    "event_history": [
+      {
+        "event": "BIRTH_HIT",
+        "site_id": "site-1"
+      },
+      {
+        "event": "EMBRYO",
+        "site_id": "site-1"
+      },
+      {
+        "event": "STABILIZED",
+        "site_id": "site-1"
+      },
+      {
+        "area_m2": 1.9634954084936207e-09,
+        "cavity_id": "void:site-1",
+        "event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+      },
+      {
+        "cavity_id": "void:site-1",
+        "event": "GEOMETRIC_PROMOTION"
+      }
+    ],
+    "length_ledgers": {
+      "active_front_coordinate_advance_m": 0.0,
+      "connected_free_surface_extent_m": 0.0,
+      "connected_void_free_span_m": 0.0,
+      "fractured_ligament_length_m": 0.0,
+      "ordinary_crack_fractured_length_m": 0.0,
+      "physical_active_front_travel_m": 0.0,
+      "preexisting_void_free_span_m": 0.0,
+      "projected_connected_void_free_span_m": 0.0,
+      "projected_fractured_length_m": 0.0,
+      "projected_free_span_m": 0.0,
+      "projected_front_advance_m": 0.0,
+      "traversed_void_free_span_m": 0.0
+    },
+    "rng_state": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 20081979341874710773816288142832933205,
+        "state": 17575271913749178123071517693206194316
+      },
+      "uinteger": 0
+    },
+    "schema": "v12.production-voiding/5",
+    "sites": [
+      {
+        "birth": {
+          "accumulated": 2.608573471373157,
+          "threshold": 2.608573471373157
+        },
+        "candidate_weight": 0.8,
+        "center_m": [
+          0.0007,
+          0.0
+        ],
+        "healing": {
+          "accumulated": 0.09705141167556353,
+          "threshold": 3.3261303661301325
+        },
+        "hits": 2,
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "phase": "STABLE_SUBGRID_VOID",
+        "required_hits": 2,
+        "site_id": "site-1",
+        "stabilization": {
+          "accumulated": 0.766386207028175,
+          "threshold": 0.766386207028175
+        }
+      }
+    ]
+  },
+  "production_void_state_sha256": "6366c82ef1c4fd711e6a796f55d6f726c18d39cb6def89bf8dc400f7bd297d16",
+  "provider_runtime": null,
+  "schema": "v11.live-fem-branch-checkpoint/1",
+  "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
+  "state_file": "b609b0cf6238bf1274da31de3ea4dcd0e45c6c7e3f95d5d38e0b3cb7ecb92945.json.208849c4215a8ce2a49072aa72afd7a509a34e827b14482c7132bc2be71004e4.state.pkl",
+  "state_sha256": "208849c4215a8ce2a49072aa72afd7a509a34e827b14482c7132bc2be71004e4",
+  "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
+  "v12_support_state": {
+    "accepted_p0_damage_fingerprint": "376c4207a223c480b6d1cd733351eaf9d058c4dabb02c4182fda6dca3cdbf6b6",
+    "active_tip_identities": [
+      "b00000000"
+    ],
+    "branch_vertex_lineage_fingerprint": "d526df5cdcf05a970afcb69b5d09331edc8dc7678e2bc499ea4ea71d4902ade9",
+    "certification_arc_fingerprint": "cffdfd4d2abcde68b40ae45c1aae5ba225d05218bd0fff9ab6c0a9b181d0c50a",
+    "checkpoint_generation": 0,
+    "complete_crack_graph_fingerprint": "7b83f05d1e72b339864a4d8a39c8e7c7c60ff68077506e889e0f47179de6861b",
+    "configuration_hash": "4f237b0a12ef3bff28c763b08c97809770969158ad3115c433315c93177aea50",
+    "mesh_connectivity_fingerprint": "5541f6666dcd2ab92fb7b456f7236916e5a923d182787a1c897a76fb8846be0c",
+    "mesh_generation": 0,
+    "mesh_geometry_fingerprint": "690794737fa458a33f601a019aef6a3e4c0c44d70aa7116b2b3d5beb24e47454",
+    "model_id": "sharp_wake_mechanically_separating_v12",
+    "physical_graph_length_m": 0.0005725993004046688,
+    "previous_accepted_transaction": null,
+    "schema_version": "v12.sharp-wake-support-state/1",
+    "selected_support_elements": [
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287,
+      288,
+      289,
+      346,
+      347,
+      348,
+      349,
+      350,
+      351,
+      352,
+      353,
+      410,
+      411,
+      412,
+      413,
+      414,
+      415,
+      416,
+      417,
+      474,
+      475,
+      476,
+      477,
+      478,
+      479,
+      480,
+      481,
+      538,
+      539,
+      540,
+      541,
+      542,
+      543,
+      544,
+      545,
+      602,
+      603,
+      604,
+      605,
+      606,
+      607,
+      608,
+      609,
+      666,
+      667,
+      668,
+      669,
+      670,
+      671,
+      672,
+      673,
+      730,
+      731,
+      732,
+      733,
+      734,
+      735,
+      736,
+      737,
+      766,
+      767,
+      768,
+      769
+    ],
+    "source_commit": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+    "transaction_identity": "natural-resolved-growth"
+  }
+}

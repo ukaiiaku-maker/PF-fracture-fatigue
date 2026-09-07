@@ -1,0 +1,92 @@
+{
+  "comparisons": [
+    {
+      "case_id": "production:32:12",
+      "classification": "DIAGNOSTIC_TRANSFER_ONLY_NO_RATE_BARRIER_ACCEPTANCE_LIMIT_IN_FROZEN_REGISTRY",
+      "errors": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "candidate_identity_equal": true,
+          "scalar_relative_errors": {
+            "crossing_time_s": 2.018617275252407,
+            "effective_rate_s": 0.6687224948328756,
+            "hazard_barrier_J": 0.0134481225312609,
+            "raw_rate_s": 0.6687224948328756
+          },
+          "tensor_gate": false,
+          "tensor_relative_error": 0.1926542148695939,
+          "threshold_equal": true
+        }
+      ],
+      "qualified": false,
+      "reference_case_id": "production:512:192"
+    },
+    {
+      "case_id": "production:64:24",
+      "classification": "DIAGNOSTIC_TRANSFER_ONLY_NO_RATE_BARRIER_ACCEPTANCE_LIMIT_IN_FROZEN_REGISTRY",
+      "errors": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "candidate_identity_equal": true,
+          "scalar_relative_errors": {
+            "crossing_time_s": 0.4706770263825778,
+            "effective_rate_s": 0.3200410545205166,
+            "hazard_barrier_J": 0.00469519706246278,
+            "raw_rate_s": 0.3200410545205166
+          },
+          "tensor_gate": false,
+          "tensor_relative_error": 0.09870405366636681,
+          "threshold_equal": true
+        }
+      ],
+      "qualified": false,
+      "reference_case_id": "production:512:192"
+    },
+    {
+      "case_id": "production:128:48",
+      "classification": "DIAGNOSTIC_TRANSFER_ONLY_NO_RATE_BARRIER_ACCEPTANCE_LIMIT_IN_FROZEN_REGISTRY",
+      "errors": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "candidate_identity_equal": true,
+          "scalar_relative_errors": {
+            "crossing_time_s": 0.14735061453475687,
+            "effective_rate_s": 0.12842684064322094,
+            "hazard_barrier_J": 0.0016731716060884318,
+            "raw_rate_s": 0.12842684064322094
+          },
+          "tensor_gate": true,
+          "tensor_relative_error": 0.04420686088569489,
+          "threshold_equal": true
+        }
+      ],
+      "qualified": false,
+      "reference_case_id": "production:512:192"
+    }
+  ],
+  "executed_code_sha": "1e5634dd23a14b22ba57453c3fad148c4d4511ec",
+  "frozen_rate_barrier_mesh_transfer_limits": "NOT_DEFINED_IN_ACCEPTED_REGISTRY",
+  "frozen_tensor_limit": 0.05,
+  "physical_registry": [
+    [
+      32,
+      12
+    ],
+    [
+      64,
+      24
+    ],
+    [
+      128,
+      48
+    ],
+    [
+      512,
+      192
+    ]
+  ],
+  "policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED",
+  "production_resolution_cavity_tensor_qualified": false,
+  "schema": "v12.production-source-transfer/2",
+  "static_traction_reference_is_not_matched_production": true
+}
