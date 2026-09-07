@@ -1,0 +1,235 @@
+{
+  "schema": "v10230_part_x_artifact_manifest_v1",
+  "n_requirements": 32,
+  "n_present_and_verified": 20,
+  "n_generated_in_final_closure": 6,
+  "n_not_applicable_with_reason": 5,
+  "n_not_archived_with_explicit_limitation": 1,
+  "n_resolved": 26,
+  "requirements": [
+    {
+      "id": "source_provenance",
+      "description": "Source/provenance records",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/source_provenance.json",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "config_and_bundle_hashes",
+      "description": "Configuration and source-bundle hashes",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/part_x_producer_launch_provenance_closure.json (+ file_hashes.json, inherited_artifact_hashes.json)",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "analytical_kinetic_regime_atlas",
+      "description": "Analytical kinetic-regime atlas",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/analytical_phase_atlas.csv (+ .parquet, kinetic_regime_registry.json)",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "screen_registry_and_ledger",
+      "description": "Screen registry and screen event ledger",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/screen_job_registry.csv, artifacts/crack_rebonding_part_x_v1/screen_event_ledger.json",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "developed_registry_and_ledger",
+      "description": "Developed registry and developed event ledger",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/developed_job_registry.csv, artifacts/crack_rebonding_part_x_v1/developed_event_ledger.json",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "px5_registry_and_ledger",
+      "description": "PX5 static-control registry and event ledger",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px5_static_shield_job_registry.csv (+ wall_budget_retry_registry.csv), artifacts/crack_rebonding_part_x_v1/px5_event_ledger.json",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "rate_tables",
+      "description": "Rate tables",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px4_stage1_rate_table.csv",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "slope_and_curvature_tables",
+      "description": "Slope and curvature tables",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px4_stage1_slope_table.csv (global 3-point fit), artifacts/crack_rebonding_part_x_v1/px4_local_slope_curvature_table.csv (local secant + curvature)",
+      "status": "GENERATED_IN_FINAL_CLOSURE",
+      "reason": ""
+    },
+    {
+      "id": "seed_robustness_table",
+      "description": "Seed-robustness table",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px4_stage1_slope_table.csv",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "attempt_registry",
+      "description": "Attempt registry",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/developed_attempt_registry.csv, artifacts/crack_rebonding_part_x_v1/px5_attempt_registry.csv",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "censor_registry",
+      "description": "Censor registry",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/developed_censor_registry.csv, artifacts/crack_rebonding_part_x_v1/px5_censor_registry.csv",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "invalidated_dwell_bug_records",
+      "description": "Invalidated dwell-bug records",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px3_bug_invalidated_trajectories.json",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "transition_action_flux_table",
+      "description": "Transition-action and transition-flux table",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/analytical_phase_atlas.csv (A_CB/A_BC/A_PC/A_CP, F_CB/F_BC/F_PC/F_CP columns)",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "contact_exposure_table",
+      "description": "Contact-exposure table",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/analytical_phase_atlas.csv (contact_time_s/contact_time_sinusoid_s/contact_time_dwell_s columns)",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "R_sensitivity_table",
+      "description": "R-sensitivity table",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px3_screen_pair_analysis.csv (protocol=7.1_R_panel) + px4_scientific_decision.json (D1_vs_D2)",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "frequency_sensitivity_table",
+      "description": "Frequency-sensitivity table",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px3_screen_pair_analysis.csv (protocol=7.2_frequency_panel), artifacts/crack_rebonding_part_x_v1/px3_5_frequency_bisection.json + px4_scientific_decision.json (D2_vs_D3)",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "dwell_sensitivity_table",
+      "description": "Dwell-sensitivity table",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px3_screen_pair_analysis.csv (protocol=7.3_dwell_panel), artifacts/crack_rebonding_part_x_v1/px3_5_dwell_audit_classification.json",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "passivation_chemistry_table",
+      "description": "Passivation/chemistry-sensitivity table",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px3_screen_pair_analysis.csv (protocol=7.5_passivation_chemistry), artifacts/crack_rebonding_part_x_v1/px3_6_passivation_requalification.json + px4_scientific_decision.json (D2_vs_D5)",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "cohesive_strength_table",
+      "description": "Cohesive-strength-sensitivity table",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px3_screen_pair_analysis.csv (protocol=7.6_cohesive_strength)",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "reversible_vs_persistent_comparison",
+      "description": "Reversible-versus-persistent comparison",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px3_screen_pair_analysis.csv (protocol=7.4_reversible_vs_persistent[_at_transition]) + px4_scientific_decision.json (D3_vs_D6)",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "static_vs_dynamic_attribution_table",
+      "description": "Static-versus-dynamic attribution table",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/px5_static_shield_analysis.csv",
+      "status": "PRESENT_AND_VERIFIED",
+      "reason": ""
+    },
+    {
+      "id": "censor_admissibility_map",
+      "description": "Censor/admissibility map",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/part_x_admissibility_map.csv",
+      "status": "GENERATED_IN_FINAL_CLOSURE",
+      "reason": ""
+    },
+    {
+      "id": "final_decision",
+      "description": "Final decision",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/part_x_final_decision.json",
+      "status": "GENERATED_IN_FINAL_CLOSURE",
+      "reason": ""
+    },
+    {
+      "id": "terminal_verification",
+      "description": "Terminal verification",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/part_x_terminal_verification.json",
+      "status": "GENERATED_IN_FINAL_CLOSURE",
+      "reason": ""
+    },
+    {
+      "id": "final_handoff",
+      "description": "Final handoff",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/part_x_final_handoff.md",
+      "status": "GENERATED_IN_FINAL_CLOSURE",
+      "reason": ""
+    },
+    {
+      "id": "producer_launch_provenance_closure",
+      "description": "Producer-versus-launch source-identity closure",
+      "canonical_file": "artifacts/crack_rebonding_part_x_v1/part_x_producer_launch_provenance_closure.json",
+      "status": "GENERATED_IN_FINAL_CLOSURE",
+      "reason": ""
+    },
+    {
+      "id": "closure_corrected_deltaK_eff",
+      "description": "Closure-corrected DeltaK_eff",
+      "canonical_file": "N/A",
+      "status": "NOT_APPLICABLE_WITH_REASON",
+      "reason": "Explicitly out of Part X scope -- the campaign uses a signed-K surrogate contact model (SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT), never resolves opposing-face contact, and never computes a closure-corrected DeltaK_eff. This is a scope boundary, not a gap."
+    },
+    {
+      "id": "resolved_face_contact_model",
+      "description": "Resolved opposing-face contact model",
+      "canonical_file": "N/A",
+      "status": "NOT_APPLICABLE_WITH_REASON",
+      "reason": "Out of scope by design (surrogate signed-K compression-conditioning is the qualified contact model for this campaign); resolving true opposing-face contact would require a different constitutive model, not an analysis-only closure step."
+    },
+    {
+      "id": "topological_healing_model",
+      "description": "Topological crack-healing model",
+      "canonical_file": "N/A",
+      "status": "NOT_APPLICABLE_WITH_REASON",
+      "reason": "Out of scope by design (TOPOLOGICAL_HEALING_NOT_MODELED) -- the hazard-only cohesive-feedback surrogate never models topological reconnection of crack faces."
+    },
+    {
+      "id": "calibrated_chemistry_parameterization",
+      "description": "Calibrated physical chemistry parameterization",
+      "canonical_file": "N/A",
+      "status": "NOT_APPLICABLE_WITH_REASON",
+      "reason": "Out of scope (PHYSICAL_CHEMISTRY_PARAMETERIZATION_NOT_CALIBRATED) -- chemistry_factor and the bond/rupture/depassivation/repassivation barriers are analytically constructed reference values (PX2's zero-fitting kinetic-regime characterization), never calibrated against an experimental measurement."
+    },
+    {
+      "id": "transient_static_shield_explanatory_power",
+      "description": "Transient (pre-developed-window) explanatory power of static shielding",
+      "canonical_file": "N/A",
+      "status": "NOT_ARCHIVED_WITH_EXPLICIT_LIMITATION",
+      "reason": "PX5's S_h_static/S_h_dynamic comparison is computed ONLY over the stable/developed window (stable_growth_gate's developed_interval); no PX5 analysis characterizes the TRANSIENT (first ~20um) approach to that window. The raw event-by-event data needed to do so IS archived in px5_event_ledger.json (every event, including the transient ones), so this is a genuinely available-but-unanalyzed limitation, not an unrecoverable data gap."
+    },
+    {
+      "id": "px5_d1_d3_d6_static_attribution",
+      "description": "PX5 static-shield attribution for D1/D3/D6",
+      "canonical_file": "N/A",
+      "status": "NOT_APPLICABLE_WITH_REASON",
+      "reason": "Explicitly out of PX5's prescribed scope (D2/D5 only, per the review's own scope-restriction instruction: 'do NOT expand to D1/D3/D6 without new prospective reason'). No physical trajectories exist for this comparison and none were launched to manufacture one."
+    }
+  ]
+}
