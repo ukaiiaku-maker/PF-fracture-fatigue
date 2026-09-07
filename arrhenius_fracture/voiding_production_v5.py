@@ -55,9 +55,10 @@ def _head():
     return subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=Path(__file__).resolve().parents[1], text=True).strip()
 
 
-def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0)):
+def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0), *, boundary_segments=32, radial_layers=12):
     if center_m[1] < 0.0:
-        positive_hole, positive_filled = _geometry(radius_m, (center_m[0], -center_m[1]))
+        positive_hole, positive_filled = _geometry(radius_m, (center_m[0], -center_m[1]),
+                                                 boundary_segments=boundary_segments, radial_layers=radial_layers)
         def mirrored(value):
             nodes = np.asarray(value.mesh.nodes).copy(); nodes[:, 1] *= -1.0
             elems = np.asarray(value.mesh.elems)[:, [0, 2, 1]]
@@ -71,7 +72,8 @@ def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0)):
             return replace(value, mesh=mesh, boundary=boundary,
                            center_m=(float(center_m[0]), float(center_m[1])))
         return mirrored(positive_hole), mirrored(positive_filled)
-    hole = build_explicit_hole_mesh(1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5, 32, radial_layers_override=12)
+    hole = build_explicit_hole_mesh(1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5,
+                                    boundary_segments, radial_layers_override=radial_layers)
     return hole, fill_explicit_hole_mesh(hole)
 
 
@@ -206,8 +208,11 @@ def _refine_state_around_graph(state, levels):
 
 def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
                                 cavity_center_m=(7.0e-4, 0.0), crack_path_m=None,
-                                cleavage_theta_deg=0.0):
-    hole, filled = _geometry(center_m=cavity_center_m)
+                                cleavage_theta_deg=0.0, boundary_segments=32, radial_layers=12):
+    if (boundary_segments, radial_layers) != (32, 12) and crack_path_m is None:
+        raise ValueError("production resolution transfer requires an explicit fixed crack path")
+    hole, filled = _geometry(center_m=cavity_center_m, boundary_segments=boundary_segments,
+                             radial_layers=radial_layers)
     mesh = filled.mesh
     ray = 16
     if crack_path_m is None:
@@ -920,29 +925,16 @@ def _mesh_endpoint_on_direction(state, start, direction, target_distance_m):
     return tuple(map(float, state.mesh.nodes[node]))
 
 
-def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
-                         source_front_id=None, source_cavity_id=None,
-                         source_boundary_site_id=None, source_position_m=None,
-                         source_probe_identity=None, temperature_K=900.0,
-                         maximum_advance_duration_s=None):
-    """Advance all directional clocks through one common earliest-event time."""
+def directional_clock_rates(state, stress_tensor_Pa, *, temperature_K=900.0):
+    """Read-only rates from the existing cleavage law and preserved clocks."""
     material = state.material
     engine = FrontEngine(
         FrontConfig(), default_cleavage_barrier(), default_emission_barrier(material.b),
         material.G, material.nu, material.b,
     )
     stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
-    junction = dict(state.junction_process_state)
-    start_time = float(junction.get("production_time_s", 0.0))
-    source = _source_identity(
-        state, stress, source_kind=source_kind, source_front_id=source_front_id,
-        source_cavity_id=source_cavity_id, source_boundary_site_id=source_boundary_site_id,
-        source_position_m=source_position_m, source_probe_identity=source_probe_identity,
-    )
     rates = []
-    hazards = list(state.competition.hazard_states)
-    crossing_times = []
-    for candidate, hazard in zip(state.competition.candidates, hazards):
+    for candidate, hazard in zip(state.competition.candidates, state.competition.hazard_states):
         normal = np.asarray(candidate.normal_xy, dtype=float)
         resolved_opening = max(float(normal @ stress @ normal), 0.0)
         raw_rate, _, barrier = engine.lambda_cleave(resolved_opening, temperature_K)
@@ -950,12 +942,53 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
         rate = 0.0 if resolved_opening <= zero_tolerance else max(float(raw_rate), 0.0)
         remaining = max(hazard.current_threshold_action - hazard.action, 0.0)
         crossing = math.inf if rate <= 0.0 else remaining / rate
-        crossing_times.append(crossing)
         rates.append({"candidate_id": candidate.candidate_id, "raw_rate_s": float(raw_rate),
                       "effective_rate_s": rate, "rate_s": rate,
                       "resolved_opening_stress_Pa": resolved_opening,
                       "hazard_barrier_J": barrier, "crossing_time_s": crossing})
-    duration = min(crossing_times)
+    return rates
+
+
+def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
+                         source_front_id=None, source_cavity_id=None,
+                         source_boundary_site_id=None, source_position_m=None,
+                         source_probe_identity=None, temperature_K=900.0,
+                         maximum_advance_duration_s=None):
+    """Advance source-owned clocks, never an unqualified cavity first passage."""
+    if maximum_advance_duration_s is not None and (
+        not math.isfinite(float(maximum_advance_duration_s)) or maximum_advance_duration_s < 0):
+        raise ValueError("maximum_advance_duration_s must be finite and nonnegative")
+    stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
+    rates = directional_clock_rates(state, stress, temperature_K=temperature_K)
+    junction = dict(state.junction_process_state)
+    start_time = float(junction.get("production_time_s", 0.0))
+    source = _source_identity(
+        state, stress, source_kind=source_kind, source_front_id=source_front_id,
+        source_cavity_id=source_cavity_id, source_boundary_site_id=source_boundary_site_id,
+        source_position_m=source_position_m, source_probe_identity=source_probe_identity,
+    )
+    # Policy C: no qualified production-resolution transfer exists yet. Neither
+    # a caller-supplied PASS flag nor a static traction screen grants authority.
+    # The accepted connection and all clock/RNG/graph state are returned intact.
+    # Check owned phase/source as well as the argument to prevent source spoofing.
+    owned_cavity = (state.junction_process_state.get("active_event_source", {}).get("source_kind") == "cavity_surface"
+        or (state.void_state is not None and any(c.phase == VoidPhase.CONNECTED_VOID for c in state.void_state.cavities)))
+    if (source_kind == "cavity_surface" or owned_cavity) and any(r["effective_rate_s"] > 0 for r in rates):
+        for rate in rates:
+            rate.update({"unqualified_effective_rate_s": rate["effective_rate_s"],
+                         "unqualified_crossing_time_s": rate["crossing_time_s"],
+                         "effective_rate_s": 0., "rate_s": 0., "crossing_time_s": math.inf,
+                         "common_advance_duration_s": 0., "emitted_event_ids": [], "winner": False,
+                         "instantaneous_status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+                         "source_resolution_policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED"})
+        return state, rates
+    if owned_cavity and not any(r["effective_rate_s"] > 0 for r in rates):
+        # Retain complete candidate geometry/threshold/probe provenance during
+        # dormancy; a bare _source_identity would erase the candidate inventory.
+        source = dict(state.junction_process_state.get("active_event_source", {}))
+    hazards = list(state.competition.hazard_states)
+    crossing_times = [rate["crossing_time_s"] for rate in rates]
+    duration = min(crossing_times, default=math.inf)
     if not math.isfinite(duration):
         duration = 0.0 if maximum_advance_duration_s is None else float(maximum_advance_duration_s)
         if duration < 0.0 or not math.isfinite(duration):
@@ -1283,7 +1316,9 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     )
     if not any(row["winner"] for row in cleavage_audit):
         return state, None, operation_log if operation_log is not None else [], {
-            "status": "NO_KINETICALLY_ACTIVE_CANDIDATE",
+            "status": ("UNQUALIFIED_CAVITY_SOURCE_TENSOR" if any(
+                row.get("instantaneous_status") == "UNQUALIFIED_CAVITY_SOURCE_TENSOR" for row in cleavage_audit)
+                else "NO_KINETICALLY_ACTIVE_CANDIDATE"),
             "tensor_Pa": tensor.tolist(), "boundary_element_ids": boundary_elements,
             "source_kind": source_kind, "source_front_id": child_id if continuation else None,
             "source_position_m": list(start), "source_probe_identity": probe_identity,
@@ -1467,10 +1502,11 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
 
 def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0),
                              crack_path_m=None, cleavage_theta_deg=0.0,
-                             state_trace=None):
+                             state_trace=None, boundary_segments=32, radial_layers=12):
     state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m,
                                               crack_path_m=crack_path_m,
-                                              cleavage_theta_deg=cleavage_theta_deg)
+                                              cleavage_theta_deg=cleavage_theta_deg,
+                                              boundary_segments=boundary_segments, radial_layers=radial_layers)
     cfg = VoidingConfig(enabled=True, promotion_radius_m=5.0e-5)
     rows = [observables(state, "available_site")]
     def capture(label):
@@ -1541,6 +1577,11 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
                  "void_birth_rate_s": rates["birth_s"],
                  "classification": "PRE_CLEAVAGE_SURFACE_PROBE"})
     state, result, operations, causal = downstream_front_transaction(state)
+    if result is None:
+        rows.append({**observables(state, "downstream_first_passage_unavailable"),
+                     "executed_operations": operations, "causal_first_passage": causal})
+        capture("downstream_first_passage_unavailable")
+        return state, rows
     rows.append({**observables(state, "new_graph_front"), "executed_operations": operations,
                  "energy_release_J_per_m": result.energy_release_J_per_m,
                  "causal_first_passage": causal})
