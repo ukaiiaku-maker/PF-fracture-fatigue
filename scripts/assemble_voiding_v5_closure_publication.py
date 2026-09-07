@@ -109,6 +109,23 @@ def write(path,payload):
     path.write_text(json.dumps(payload,sort_keys=True,indent=2,allow_nan=False)+'\n')
 
 
+def copy_audits(spec,output):
+    """Retain single-execution reports outside the independent A/B trees."""
+    reports=spec.get('audits',{}); destination=output/'audits'
+    destination.mkdir()
+    result={}
+    for name,source in reports.items():
+        if Path(name).name!=name or name in ('.','..'):
+            raise ValueError('audit filename escapes publication')
+        source=Path(source)
+        if source.is_symlink() or not source.is_file() or source.stat().st_size>=100*1024*1024:
+            raise ValueError('invalid audit source')
+        shutil.copy2(source,destination/name)
+        result[name]={'sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
+                      'record_kind':'RETAINED_REPORT_NOT_AN_ADDITIONAL_EXECUTION'}
+    write(output/'audit_inventory.json',result)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('specification',type=Path)
     parser.add_argument('output',type=Path);args=parser.parse_args();spec=read(args.specification.parent,args.specification.name)
@@ -132,6 +149,8 @@ def main():
     write(args.output/'paired_comparison.json',{'exact_recursive_comparison':True,'file_count_per_side':len(comparison),
         'meaning':'BYTE_COMPARISON_OF_SEPARATELY_EXECUTED_SOURCE_BUNDLES_NOT_A_NEW_EXECUTION',
         'scientific_decision':read(a,'closure_ledger.json')['scientific_decision']})
+    copy_audits(spec,args.output)
+    write(args.output/'sha256_manifest.json',inventory(args.output))
     print(json.dumps(read(args.output,'paired_comparison.json')))
 
 

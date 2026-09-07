@@ -29,3 +29,13 @@ def test_observed_accounting_does_not_certify_unexercised_lifecycle(downstream_e
     assert result['all_observed_states_passed']
     assert result['complete_lifecycle_passed'] is downstream_exercised
     assert len(result['unexercised_transition_execution_ids'])==(0 if downstream_exercised else 10)
+
+
+def test_audit_report_is_retained_once_not_claimed_as_a_paired_execution(tmp_path):
+    source=tmp_path/'full.xml';source.write_text('<testsuites/>')
+    output=tmp_path/'publication';output.mkdir()
+    package.copy_audits({'audits':{'full.xml':str(source)}},output)
+    assert (output/'audits'/'full.xml').read_bytes()==source.read_bytes()
+    record=json.loads((output/'audit_inventory.json').read_text())['full.xml']
+    assert record['record_kind']=='RETAINED_REPORT_NOT_AN_ADDITIONAL_EXECUTION'
+    assert not (output/'a').exists() and not (output/'b').exists()
