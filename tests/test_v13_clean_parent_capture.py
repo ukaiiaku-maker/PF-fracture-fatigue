@@ -13,6 +13,13 @@ def test_canonical_parent_body_unchanged_except_default_off_capture():
     assert isinstance(after.args.kw_defaults[0], ast.Constant) and after.args.kw_defaults[0].value is None
     after.args = before.args
     class RemoveCapture(ast.NodeTransformer):
+        def visit_Assign(self, node):
+            if len(node.targets) == 1 and isinstance(node.targets[0], ast.Name) and node.targets[0].id in ("probe_tip_id", "probe_tip"):
+                # Demonstrated pre-existing NameError: diagnostic aliases for
+                # the exact controlling observation bound by the process hook.
+                assert isinstance(node.value, ast.Attribute) and node.value.value.id == "controlling"
+                return None
+            return self.generic_visit(node)
         def visit_If(self, node):
             if any(isinstance(n, ast.Name) and n.id == "parent_capture" for n in ast.walk(node.test)):
                 return None
@@ -48,3 +55,12 @@ def test_actual_entry_uses_the_same_pinned_four_class_registry():
     assert "pf_v2_four_class_pf_transfer_selection.json" in text
     assert ROWS["weakT"][0] == "oneD_v2_focused_weak_T_0016"
     assert ROWS["ceramic"][0] == "oneD_v2_focused_ceramic_like_0018"
+
+
+def test_extracted_process_hook_keeps_diagnostic_tip_aliases_defined():
+    tree = ast.parse(Path("arrhenius_fracture/sharp_front_v11_branching.py").read_text())
+    update = next(node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef) and node.name == "update_shared")
+    aliases = {node.targets[0].id: ast.unparse(node.value) for node in update.body
+               if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name)}
+    assert aliases["probe_tip_id"] == "controlling.tip_id"
+    assert aliases["probe_tip"] == "controlling.tip_xy_m"

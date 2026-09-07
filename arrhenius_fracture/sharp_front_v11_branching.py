@@ -1070,6 +1070,10 @@ def run_2d(args, *, parent_capture=None):
                 permitted_physical_hazard_action=target,
             )
             bound_drive = info.pop("explicit_accepted_tensor_drive")
+            # The reusable process hook binds this exact controlling tip.
+            # Keep diagnostic ownership local after the hook extraction.
+            probe_tip_id = controlling.tip_id
+            probe_tip = controlling.tip_xy_m
             info["directional_event_selected"] = expected
             info["directional_event_completion_time_s"] = (
                 None if proposal is None else max(proposal.completion_times_s)
