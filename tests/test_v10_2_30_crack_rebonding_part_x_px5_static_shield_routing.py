@@ -15,11 +15,29 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
+from arrhenius_fracture import crack_rebonding_causal_pilot_v2_v10230 as pilot  # noqa: E402
 import part_x_run_one_job as runner  # noqa: E402
 
 
 def test_static_shield_cohesions_are_exactly_ceiling_and_orbit_matched():
     assert runner.STATIC_SHIELD_COHESIONS == {"ceiling_static", "orbit_matched_static"}
+
+
+def test_max_wall_seconds_override_absent_uses_pilot_default(tmp_path):
+    """PX5 discovered two Kmax=12/ceiling_static conditions genuinely need
+    more than the pilot's own 1800s default wall-clock budget to reach 30
+    events (censor_reason='wall_time_budget_exhausted_mid_event' at only
+    5 events) -- an optional per-job max_wall_seconds_override column lets
+    those two jobs alone use a larger budget, with zero effect on every
+    job that omits or leaves it blank."""
+    job_without = {"max_wall_seconds_override": ""}
+    job_missing = {}
+    for job in (job_without, job_missing):
+        resolved = float(job["max_wall_seconds_override"]) if job.get("max_wall_seconds_override") else pilot.MAX_WALL_SECONDS_PER_TRAJECTORY
+        assert resolved == pilot.MAX_WALL_SECONDS_PER_TRAJECTORY
+    job_with = {"max_wall_seconds_override": "21600.0"}
+    resolved = float(job_with["max_wall_seconds_override"]) if job_with.get("max_wall_seconds_override") else pilot.MAX_WALL_SECONDS_PER_TRAJECTORY
+    assert resolved == 21600.0
 
 
 def test_run_one_job_static_shield_end_to_end(tmp_path, monkeypatch):

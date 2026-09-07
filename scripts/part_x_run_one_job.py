@@ -299,6 +299,10 @@ def main() -> int:
             hazard_rng_seed=seed,
             minimum_load_hold_s=float(job["minimum_load_hold_s"]),
             static_shield_control=static_shield_control,
+            max_wall_seconds=(
+                float(job["max_wall_seconds_override"])
+                if job.get("max_wall_seconds_override") else pilot.MAX_WALL_SECONDS_PER_TRAJECTORY
+            ),
         )
 
         result = {
