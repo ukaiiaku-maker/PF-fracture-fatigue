@@ -402,6 +402,10 @@ class StaticFEMResult:
     mirror_sigma_xy_antisym_relative: float = math.nan
     conditioning_diagonal_ratio: float = math.nan
     killed_element_energy_J_per_m: float = math.nan
+    traction_normal_l2_normalized: float = math.nan
+    traction_tangential_l2_normalized: float = math.nan
+    traction_resultant_normalized: tuple[float, float] = (math.nan, math.nan)
+    traction_moment_normalized: float = math.nan
 
 
 def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticProperties]=None,
@@ -459,18 +463,26 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
     for ei,elem in enumerate(mesh.elems):
         for edge in (tuple(sorted((elem[0],elem[1]))),tuple(sorted((elem[1],elem[2]))),tuple(sorted((elem[2],elem[0])))):
             edge_to_elem.setdefault(edge,[]).append(ei)
-    t2=0.0; hoop=[]; weighted=[]; perimeter=0.0
+    t2=0.0; tn2=0.0; tt2=0.0; resultant=np.zeros(2); moment=0.0
+    hoop=[]; weighted=[]; perimeter=0.0
     c=np.asarray(hole.center_m)
     for a,b in hole.cavity_edges:
         xy=mesh.nodes[[a,b]]; midpoint=xy.mean(axis=0); normal=(midpoint-c); normal/=np.linalg.norm(normal)
         tangent=np.array([-normal[1],normal[0]]); length=float(np.linalg.norm(xy[1]-xy[0])); perimeter+=length
         ei=edge_to_elem[tuple(sorted((int(a),int(b))))][0]
         S=np.array([[sigma[0,ei],sigma[2,ei]],[sigma[2,ei],sigma[1,ei]]])
-        traction=S@normal; t2+=float(traction@traction)*length
+        traction=S@normal; normal_component=float(traction@normal); tangential_component=float(traction@tangent)
+        t2+=float(traction@traction)*length; tn2+=normal_component**2*length; tt2+=tangential_component**2*length
+        force=traction*length; resultant+=force
+        arm=midpoint-c; moment+=float(arm[0]*force[1]-arm[1]*force[0])
         hoop.append(float(tangent@S@tangent)); weighted.append(length)
     remote=abs(top)/max(float(np.ptp(mesh.nodes[:,0])),1e-300)
     traction_norm=(math.sqrt(t2)/max(remote*math.sqrt(perimeter),1e-300)
                    if perimeter > 0 else math.nan)
+    traction_normal=(math.sqrt(tn2)/max(remote*math.sqrt(perimeter),1e-300) if perimeter else math.nan)
+    traction_tangential=(math.sqrt(tt2)/max(remote*math.sqrt(perimeter),1e-300) if perimeter else math.nan)
+    resultant_normalized=(tuple(map(float,resultant/max(remote*perimeter,1e-300))) if perimeter else (math.nan,math.nan))
+    moment_normalized=(float(moment/max(remote*perimeter*max(hole.radius_m,1e-300),1e-300)) if perimeter else math.nan)
     hoop_sc=(float(max(hoop)/max(remote,1e-300)) if hoop else math.nan)
     # Mirror-pair hoop samples after sorting by |x-cx|, y sign.
     symmetry=float(abs(top+bottom)/max(abs(top),1e-300))
@@ -501,9 +513,10 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
             tip_sigma=float(sigma[1,local])
     return StaticFEMResult(u,sigma,top,bottom,energy,compliance,free_norm,traction_norm,
                            hoop_sc,symmetry,tip_sigma,weak_cavity,mirror_xx,mirror_yy,mirror_xy,
-                           conditioning_proxy,killed_energy)
+                           conditioning_proxy,killed_energy,traction_normal,traction_tangential,
+                           resultant_normalized,moment_normalized)
 
 
 __all__ = ["HoleMesh","StaticFEMResult","build_explicit_hole_mesh",
-           "build_solid_plate_mesh","fill_explicit_hole_mesh",
+           "build_solid_plate_mesh","conform_crack_path","fill_explicit_hole_mesh",
            "solve_static_hole","triangle_intersects_open_disk"]

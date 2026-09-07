@@ -74,3 +74,15 @@ def test_crack_and_cavity_derivatives_change_only_the_declared_geometry():
     cavity_b = solve(cavity_radius_m=5.1e-5)
     assert cavity_b["observables"]["crack_root_m"] == crack_a["observables"]["crack_root_m"]
     assert cavity_b["observables"]["crack_tip_m"] == crack_a["observables"]["crack_tip_m"]
+
+
+def test_cavity_traction_diagnostic_separates_weak_and_recovered_quantities():
+    coarse = solve_crack_void_case(crack_enabled=False, boundary_segments=32, radial_layers=12)["observables"]
+    fine = solve_crack_void_case(crack_enabled=False, boundary_segments=64, radial_layers=24)["observables"]
+    assert coarse["weak_cavity_boundary_residual_relative"] < 1e-10
+    assert fine["weak_cavity_boundary_residual_relative"] < 1e-10
+    assert fine["cavity_traction_l2_normalized"] < coarse["cavity_traction_l2_normalized"]
+    assert fine["cavity_traction_normal_l2_normalized"] > 0.0
+    assert fine["cavity_traction_tangential_l2_normalized"] > 0.0
+    assert len(fine["cavity_traction_resultant_normalized"]) == 2
+    assert abs(fine["cavity_traction_moment_normalized"]) < 1e-10
