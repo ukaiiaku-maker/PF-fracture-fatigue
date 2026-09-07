@@ -547,7 +547,7 @@ def _realized_trial_network(state, proposal, candidates, da_phys, cluster):
     return network, trial_cluster, tuple(arms)
 
 
-def run_2d(args):
+def run_2d(args, *, parent_capture=None):
     from . import sharp_front as base
     from .fem import assemble_mechanics, plane_strain_D, solve_dirichlet
     from .mesh import make_boundary_data, make_tri_mesh
@@ -832,6 +832,8 @@ def run_2d(args):
             adaptation_required = False
         trial_fraction = 1.0
         context = AcceptedStepContext(step, physical_time, float(args.dt), _hash((step, state.crack_network, state.competition, mesh_fingerprint(state.mesh))))
+        if parent_capture is not None:
+            parent_capture.begin(state, engine, physical_time, accepted_load, runtime)
 
         def solve_accepted(current, _context):
             nonlocal last_measurement, latest_sigma
@@ -1422,6 +1424,13 @@ def run_2d(args):
         )
         checkpoint_path = out / "checkpoint" / "latest.json"
         write_branch_checkpoint(checkpoint, checkpoint_path)
+        if parent_capture is not None and parent_capture.accept(
+            checkpoint=checkpoint, context=context, result=result,
+            solved_pre_event=latest_interval_pre_event_state,
+            pre_event_sigma=latest_sigma, args=args, cfg=cfg,
+        ):
+            termination = "v13_first_baseline_cleavage_captured"
+            break
         daughter_stop_m = float(
             os.environ.get("PF_QUALIFIED_DAUGHTER_STOP_UM", "inf")
         ) * 1.0e-6
