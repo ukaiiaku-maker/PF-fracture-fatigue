@@ -29,6 +29,9 @@ Before new attesting execution, this protocol freezes:
   the retained 16-picosecond smoke screen nor its historical result.
 - Stagewise inventory, generalized physical/projected length, active-front,
   event ownership, cavity-cycle and independently calculated topology checks.
+  The lifecycle `/3` contract records these inside each accepted production
+  interval and independently replays the natural histories from their complete
+  initial checkpoints to verify every internal measurement and state hash.
 
 Policy C remains fail closed. The bounded coarse and fine source-refinement
 peers execute actual conforming refinement, field transfer, equilibrium and
@@ -44,3 +47,12 @@ limit. A current `/2` ontology is not retrospective attestation of `/1`
 historical evidence. Exact A/B comparison, raw scientific failures, clean-worker
 reproduction and repository-wide inherited-CI classification are distinct
 ledger entries. No RC or merge is authorized by an evidence reproduction PASS.
+
+The d69187e workflow's fresh traction A/B was byte-exact. Its retained Linux
+canonical comparison nevertheless failed: source mesh, stiffness, boundary and
+support arrays were exact, all 69 predicate outcomes agreed, but some recovered
+values and one geometry observable differed at floating-point roundoff despite
+matching recorded package versions. That cross-worker exact comparison remains
+FAIL; missing CPU/BLAS runtime provenance prevents a narrower causal claim.
+The historical files and exact comparator are retained. Later independent
+workflow audits run even if that comparison fails.

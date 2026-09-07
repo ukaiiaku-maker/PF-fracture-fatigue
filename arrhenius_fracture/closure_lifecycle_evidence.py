@@ -23,7 +23,7 @@ from .voiding_v5 import (
     update_cavity_growth, promote_cavity,
 )
 
-SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/2"
+SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/3"
 PARTITIONS = (1,2,4,8,16)
 CFG = VoidingConfig(enabled=True, promotion_radius_m=5e-5)
 PRECURSORS = {"birth_hit_1": "available_site", "birth_hit_2": "multi_hit_1",
@@ -314,6 +314,20 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
             restarted=sources[row["restarted_terminal_checkpoint"]]
             if row["midpoint_restart_exact"] != (fingerprint(after)==fingerprint(restarted)):
                 raise ValueError("natural restart mismatch")
+            # Independently replay actual accepted intervals: every internal
+            # stage's measured conservation/topology must arise from the same
+            # source state, not a caller-authored list of PASS labels.
+            from .voiding_lifecycle_driver_v5 import advance_production_void_interval,NATURAL_WINDOW_S
+            from .closure_mechanics_evidence import canonical_data
+            replay=before;replayed_ops=[];cache={};actual_time=0.;failure=None
+            for _ in range(2*row['partition_count']):
+                replay,trace,result=advance_production_void_interval(replay,NATURAL_WINDOW_S/(2*row['partition_count']),
+                    config=CFG,refinement_attempt_cache=cache)
+                replayed_ops.extend(trace);actual_time+=result['elapsed_duration_s']
+                if result['failure'] is not None: failure=result['failure'];break
+            if (canonical_data(replayed_ops)!=row['actual_operations'] or fingerprint(replay)!=fingerprint(after)
+                or failure!=row['failure'] or actual_time!=row['elapsed_physical_time_s']):
+                raise ValueError('natural internal-stage independent production replay mismatch')
         if row["dataset"] == "neutrality":
             base=sources[row["base_terminal_checkpoint"]]
             if row["exact_neutrality"] != (fingerprint(after)==fingerprint(base)):
@@ -358,6 +372,9 @@ def lifecycle_decision(rows,sources):
             "passed":row["terminal_fingerprint"]==ref["terminal_fingerprint"] and row["midpoint_restart_exact"]
                 and row.get('failure') is None and row.get('replay_failure') is None
                 and row.get('elapsed_physical_time_s')==row['input_configuration'].get('duration_s')
+                and all(op.get('stagewise_conservation',{}).get('passed',False)
+                    and op.get('stagewise_topology',{}).get('passed',False)
+                    for op in row['actual_operations'] if op.get('duration_s',0.)>0. or op.get('api')=='promotion_remesh')
                 and row["conservation"]["passed"]})
     controlled=[]
     for row in [r for r in rows if r["dataset"]=="controlled"]:

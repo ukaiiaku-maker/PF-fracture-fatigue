@@ -61,7 +61,7 @@ def main():
              "initial_checkpoint":checkpoint(before),"terminal_checkpoint":checkpoint(after),
              "initial_fingerprint":fingerprint(before),"terminal_fingerprint":fingerprint(after),
              "actual_operations":canonical_data(operations),"conservation":conservation(after,before),
-             'stagewise_topology':stagewise_topology(after),**extra}
+             'stagewise_topology':stagewise_topology(after),**canonical_data(extra)}
         rows.append(row); write_json(out/"rows"/(str(len(rows))+".json"),row)
         return row
     for index,((previous_name,before),(name,after)) in enumerate(zip(trace,trace[1:])):

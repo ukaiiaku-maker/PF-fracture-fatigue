@@ -36,11 +36,16 @@ def advance_production_void_interval(state,dt_s,*,temperature_K=900.,config=None
     cache={} if refinement_attempt_cache is None else refinement_attempt_cache
     def commit(trial,step,operation):
         nonlocal accepted,remaining,elapsed
+        previous=accepted
         elapsed+=step;remaining=max(duration-elapsed,0.)
         accepted=replace(trial,junction_process_state={**trial.junction_process_state,
             'production_time_s':initial_time+elapsed})
+        from .closure_lifecycle_evidence import conservation,stagewise_topology
+        from .topology_transaction_v11 import complete_accepted_state_fingerprint
         operations.append({**operation,'duration_s':step,'physical_time_s':initial_time+elapsed,
-                           'temperature_K':temperature_K})
+            'temperature_K':temperature_K,'accepted_pre_interval_fingerprint':complete_accepted_state_fingerprint(previous),
+            'accepted_post_interval_fingerprint':complete_accepted_state_fingerprint(accepted),
+            'stagewise_conservation':conservation(accepted,previous),'stagewise_topology':stagewise_topology(accepted)})
     for _ in range(64):
         if remaining<=0.: break
         try:

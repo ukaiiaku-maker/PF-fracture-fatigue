@@ -25,6 +25,8 @@ jobs:
           tests/test_closure_static_evidence.py tests/test_explicit_cavity_v5.py
           tests/test_crack_void_fixed_geometry_v3.py tests/test_production_source_resolution_v3.py
           tests/test_closure_mechanics_evidence.py tests/test_closure_lifecycle_evidence.py
+          tests/test_closure_lifecycle_rollback.py tests/test_voiding_lifecycle_driver_v5.py
+          tests/test_v5_clean_historical_neutrality.py
       - name: Unique source-resolved traction A and B
         run: |
           python scripts/qualify_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-a
@@ -50,6 +52,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - phase: mechanics
@@ -88,3 +91,49 @@ jobs:
         with:
           name: voiding-v5-closure-${{ matrix.phase }}-${{ github.sha }}
           path: /tmp/voiding_v5_finalization_v3_closure
+
+  closure-independent-audits:
+    needs: [closure-traction, closure-campaign]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Exact head and historical Stage-II worker
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git worktree add --detach /tmp/closure-stage2-base 326e3f5973ef623781ab8568798c495a3f68238c
+      - name: Clean historical V12-disabled neutrality A and B
+        run: |
+          python scripts/qualify_v5_disabled_neutrality_clean.py /tmp/closure-independent/neutrality-a --base-worktree /tmp/closure-stage2-base
+          python scripts/qualify_v5_disabled_neutrality_clean.py /tmp/closure-independent/neutrality-b --base-worktree /tmp/closure-stage2-base
+          diff -ru /tmp/closure-independent/neutrality-a /tmp/closure-independent/neutrality-b
+      - name: Full regressions and exact inherited versus Policy-C triage
+        if: always()
+        run: |
+          mkdir -p /tmp/closure-independent/regressions
+          set +e
+          python -m pytest -q --junitxml=/tmp/closure-independent/regressions/full.xml > /tmp/closure-independent/regressions/full.log 2>&1
+          result=$?
+          set -e
+          python scripts/triage_voiding_v5_closure_regressions.py artifacts/voiding_v5_finalization_v3_closure/regressions/full-regression-3cbb11b.xml --rerun /tmp/closure-independent/regressions/full.xml > /tmp/closure-independent/regressions/triage.json
+          test "$result" -le 1
+          python -c 'import json; p=json.load(open("/tmp/closure-independent/regressions/triage.json")); print(p["repository_wide_ci"]); assert not p["rerun_additional_failures"], p["rerun_additional_failures"]'
+      - name: Clean-worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+          test -z "$(git -C /tmp/closure-stage2-base status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: voiding-v5-closure-independent-audits-${{ github.sha }}
+          path: /tmp/closure-independent
