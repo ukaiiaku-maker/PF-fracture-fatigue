@@ -8,7 +8,7 @@
 
 | key | value |
 |---|---|
-| final_sha | 70fae9dcad576a3061474d7114276ce41cf97d44 |
+| final_sha | 0bba73064eeb718451a66fe8ec9ba0f0472ff908 |
 | branch | codex/v10.2.30-crack-rebonding-part-x |
 | merge_base_with_expected_part_x_base | a72d46557f5eba45c8c2e0a428574e5b9b624c81 |
 | expected_part_x_base | a72d46557f5eba45c8c2e0a428574e5b9b624c81 |
