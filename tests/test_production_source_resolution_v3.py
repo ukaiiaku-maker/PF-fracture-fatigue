@@ -10,6 +10,7 @@ from arrhenius_fracture.voiding_production_v5 import (
     _complete_next_clock, deterministic_trajectory, downstream_front_transaction,
     directional_clock_rates, build_production_void_state,
     _geometry, _grow_hole_boundary,
+    _actual_cavity_boundary_edges, _first_ray_cavity_intersection,
 )
 from arrhenius_fracture.voiding_v5 import VoidPhase
 
@@ -95,3 +96,15 @@ def test_resolved_growth_rebuilds_normal_layers_without_overtaking_solid():
     for point in path:
         assert min(np.linalg.norm(grown.mesh.nodes-point, axis=1)) <= 1e-12
     assert grown.radius_m == 5.5e-5
+
+
+def test_fine_radial_nodes_inside_identification_band_are_not_surface_nodes():
+    from types import SimpleNamespace
+    hole,_=_geometry(radius_m=5.5e-5,boundary_segments=256,radial_layers=192)
+    state=SimpleNamespace(mesh=hole.mesh,void_state=SimpleNamespace(cavities=(SimpleNamespace(
+        center_m=hole.center_m,radius_m=hole.radius_m),)))
+    radii=np.linalg.norm(hole.mesh.nodes-np.asarray(hole.center_m),axis=1)
+    assert np.count_nonzero(radii<=hole.radius_m*1.02)>256
+    assert len(np.unique(_actual_cavity_boundary_edges(state)))==256
+    hit=_first_ray_cavity_intersection(state,(.0005725993004046688,0.),(1.,0.))
+    assert hit[0]==pytest.approx(7e-4-5.5e-5/math.cos(math.pi/256),abs=1e-15)

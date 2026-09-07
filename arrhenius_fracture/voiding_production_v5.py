@@ -48,6 +48,18 @@ from .voiding_v5 import (
 SCHEMA = "v12.production-one-void-trajectory/5"
 
 
+def advance_disabled_v5_stage2(state, end_m, *, transaction_identity):
+    """Default-off entry delegates unchanged to the actual Stage-II V12 driver.
+
+    It cannot accept a V11 comparator or silently discard existing void state.
+    This is a mechanics-neutrality screen, not a void-nucleation qualification.
+    """
+    from .v12_production_driver import execute_event
+    if state.sharp_wake_model_id != V12_MODEL_ID or state.void_state is not None:
+        raise ValueError("disabled V5 requires the unchanged void-free Stage-II V12 state")
+    return execute_event(state, end_m, transaction_identity=transaction_identity)
+
+
 def _head():
     declared = os.environ.get("VOIDING_V5_SOURCE_COMMIT")
     if declared:
@@ -358,16 +370,12 @@ def crack_tip_tensor(state, *, branch_id):
 
 def _first_ray_cavity_intersection(state, start, direction):
     """Intersect a candidate ray with the actual polygonal cavity boundary."""
-    cavity = state.void_state.cavities[0]
     nodes = np.asarray(state.mesh.nodes)
-    radii = np.linalg.norm(nodes - np.asarray(cavity.center_m), axis=1)
-    boundary = nodes[np.flatnonzero(radii <= cavity.radius_m * 1.02)]
-    angles = np.arctan2(boundary[:, 1] - cavity.center_m[1], boundary[:, 0] - cavity.center_m[0])
-    boundary = boundary[np.argsort(angles)]
     origin = np.asarray(start, dtype=float)
     ray = np.asarray(direction, dtype=float)
     intersections = []
-    for first, second in zip(boundary, np.vstack((boundary[1:], boundary[:1]))):
+    for edge_ids in _actual_cavity_boundary_edges(state):
+        first, second = nodes[edge_ids]
         edge = second - first
         matrix = np.column_stack((ray, -edge))
         if abs(np.linalg.det(matrix)) <= 1.0e-18:
@@ -441,6 +449,23 @@ def _conform_bulk_point(state, point, *, identity, failure_injector=None):
     )
 
 
+def _actual_cavity_boundary_edges(state):
+    """Radius identifies a component; only one-owner edges define its surface.
+
+    A fine first solid layer can lie inside the 2% identification band. Its
+    nodes must never become an invented polygon or a cavity-surface source.
+    """
+    cavity=state.void_state.cavities[0]
+    nodes=np.asarray(state.mesh.nodes); elements=np.asarray(state.mesh.elems)
+    edges=np.sort(np.concatenate((elements[:,[0,1]],elements[:,[1,2]],elements[:,[2,0]])),axis=1)
+    unique,counts=np.unique(edges,axis=0,return_counts=True)
+    boundary=unique[counts==1]
+    radii=np.linalg.norm(nodes-np.asarray(cavity.center_m),axis=1)
+    selected=boundary[np.all(radii[boundary]<=cavity.radius_m*1.02,axis=1)]
+    if not len(selected): raise ValueError("no actual cavity boundary edges")
+    return selected
+
+
 def cavity_boundary_tensor(state, *, boundary_node: int | None = None,
                            boundary_element: int | None = None):
     """Return the most tensile resolved tensor on the explicit cavity boundary.
@@ -452,10 +477,7 @@ def cavity_boundary_tensor(state, *, boundary_node: int | None = None,
         state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
         state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
     )
-    cavity = state.void_state.cavities[0]
-    center = np.asarray(cavity.center_m)
-    radii = np.linalg.norm(np.asarray(state.mesh.nodes) - center, axis=1)
-    boundary_nodes = np.flatnonzero(radii <= cavity.radius_m * 1.02)
+    boundary_nodes = np.unique(_actual_cavity_boundary_edges(state))
     selected_nodes = boundary_nodes if boundary_node is None else np.asarray((int(boundary_node),))
     if boundary_node is not None and int(boundary_node) not in set(map(int, boundary_nodes)):
         raise ValueError("requested tensor node is not on the cavity boundary")
