@@ -15,7 +15,7 @@ def qualification_gate(results, plan):
         reasons.append("not_all_eight_clean_parent_companion_checks_completed")
     observations = [o for r in results for o in r.get("companions", [])]
     if not any(o.get("single_reference_overlay_disposition") == "PAIR_ACCEPTED" for o in observations):
-        reasons.append("no_positive_exact_pair_through_reference_overlay")
+        reasons.append("no_stochastic_companion_selected_at_the_preregistered_reference_mark")
     valid = {r["case"]: r for r in results if r.get("sensitivity_surface")}
     def key(row):
         return (round(math.log10(row["beta_B"]), 8), row["Q_junction_eV"], row["Q_overlap_eV"])
@@ -84,7 +84,7 @@ def main():
     all_surface = [s for r in summary["cases"] for s in r.get("sensitivity_surface", [])]
     if all_surface:
         maximum = max(row["P_committed"] for row in all_surface)
-        intro = ["## Physical result", "",
+        intro = ["Model scope: **FRESH_INDEPENDENT_POST_PRIMARY_ORDER3_COMPANION_WITH_TAU_B_LE_TAU_C**. This is the qualified independent-sequential null model, not the final co-critical branching model. The original report/archive remains preserved at record `d10c3eb`.", "", "## Physical result", "",
             f"All {len(summary['cases'])} clean-parent checks completed. The largest committed-branch probability across {len(all_surface)} analytic case/parameter evaluations is **{maximum:.8g}**. No physical short ensemble was launched.", "",
             "The stop decision follows from the analytic surface, independently of the eight reference random marks. Exact two-arm mechanical acceptance does not imply appreciable companion-embryo probability.", ""]
         lines[8:8] = intro
