@@ -1,0 +1,583 @@
+{
+  "schema": "v10230_part_x_producer_launch_provenance_closure_v1",
+  "n_producer_launch_pairs": 5,
+  "n_diverged": 0,
+  "overall_decision": "PHYSICS_SOURCE_IDENTICAL_ALLOW_HEAD_DRIFT_CLOSED_FOR_ALL_PAIRS",
+  "pairs": [
+    {
+      "group": "PX5_wall_budget_retry",
+      "n_canonical_job_keys": 2,
+      "canonical_job_keys": [
+        "5a7a538fb1d73d286830542d49090d17c43c7761fe6c9b8e733149ef974dac1d",
+        "516728278cdc9c060cb5155cece1044bac43bbd8db79b5508b7f352da4785752"
+      ],
+      "registry_producer_sha": "2fbca77fe6bb88e6a32a31f030f5bb9ddbd2a802",
+      "actual_launch_head": "8f6254ffae96dc7856de96426ac296f56e7737c4",
+      "physical_source_bundle_sha256_at_producer": "fc8ee3917dda98ddff07e48520209a5e876d1e71d1f90abf89f83f10ab17259f",
+      "physical_source_bundle_sha256_at_launch": "fc8ee3917dda98ddff07e48520209a5e876d1e71d1f90abf89f83f10ab17259f",
+      "per_physics_file": {
+        "arrhenius_fracture/persistent_site_cyclic_v10229.py": {
+          "sha256_at_producer": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "sha256_at_launch": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_v10229.py": {
+          "sha256_at_producer": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "sha256_at_launch": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py": {
+          "sha256_at_producer": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+          "sha256_at_launch": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_audited_v10229.py": {
+          "sha256_at_producer": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "sha256_at_launch": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": {
+          "sha256_at_producer": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "sha256_at_launch": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": {
+          "sha256_at_producer": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "sha256_at_launch": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_v10230.py": {
+          "sha256_at_producer": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "sha256_at_launch": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_kinetics_v10230.py": {
+          "sha256_at_producer": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "sha256_at_launch": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "identical": true
+        },
+        "arrhenius_fracture/a_native_engine_v10230.py": {
+          "sha256_at_producer": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "sha256_at_launch": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "identical": true
+        },
+        "arrhenius_fracture/material_manifest.py": {
+          "sha256_at_producer": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "sha256_at_launch": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "identical": true
+        },
+        "arrhenius_fracture/reduced_shared_state_v1023.py": {
+          "sha256_at_producer": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "sha256_at_launch": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "identical": true
+        },
+        "arrhenius_fracture/fatigue_v1.py": {
+          "sha256_at_producer": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "sha256_at_launch": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_causal_pilot_v2_v10230.py": {
+          "sha256_at_producer": "0b05fa730fe3fdec8e7b817c6107ceb4b7969f0d324d19bac00c6043682034e8",
+          "sha256_at_launch": "0b05fa730fe3fdec8e7b817c6107ceb4b7969f0d324d19bac00c6043682034e8",
+          "identical": true
+        },
+        "scripts/part_x_run_one_job.py": {
+          "sha256_at_producer": "66f52a2866f2962a059d81e727be1a3303d62144f6ddab9ddcbd3e4acb8e140d",
+          "sha256_at_launch": "66f52a2866f2962a059d81e727be1a3303d62144f6ddab9ddcbd3e4acb8e140d",
+          "identical": true
+        }
+      },
+      "all_differing_files": {
+        "artifacts/crack_rebonding_part_x_v1/px5_static_shield_job_registry.csv": "REGISTRY_OR_EVIDENCE_ONLY",
+        "artifacts/crack_rebonding_part_x_v1/px5_static_shield_wall_budget_retry_registry.csv": "REGISTRY_OR_EVIDENCE_ONLY",
+        "scripts/build_part_x_px5_wall_budget_retry_registry.py": "REGISTRY_OR_EVIDENCE_ONLY"
+      },
+      "n_differing_files_total": 3,
+      "n_differing_files_physics_affecting": 0,
+      "admissibility_decision": "PHYSICS_SOURCE_IDENTICAL_ALLOW_HEAD_DRIFT_CLOSED"
+    },
+    {
+      "group": "PX4_developed",
+      "n_canonical_job_keys": 44,
+      "canonical_job_keys": [
+        "de0e3e9c4f36427c5fbdf6a9602db9e11eee4ae42b4cb664f8a5fbec0bee8c98",
+        "5369cd8928d1ac46602e106cc1a63b428e0cf86aad024cc5bb9a402a37bccc49",
+        "5c227ccbf33c3ff2da1a000c4a54d70a5d5fd568bc8142addf45b3b73b1390fe",
+        "7e70210b8f4ab56ef61b82cc6595353b13e626c3a27dddb4a25a25ead515e62c",
+        "8eb2adc0ea2054adda20eac1b1612d93b8a3c6e906b58ec250a408356f1931fc",
+        "e71b63e3fee180485ed4d5c8c4efb1cbc7ad1a5639b68bc1cc618d2892b00dc2",
+        "aab2d4224c3912d8cbc72551eaafcf3078e2a1f62ae0704259d84b6d22977055",
+        "09a9617b7e212b6f66840f724a3f004e1691108e56f3a788ecf8ace70890365b",
+        "eb75943e869ac94dd49fc561c1e83a12f8828db13a3026bdb42eb83a7954a302",
+        "9ea28a1529877ad528774209345cdc18ee5306e92941e2d6b17a6a1ea1ba84bb",
+        "a6fb71e30fb1511d73fd5ba7ce0e38f3a24e04d0944e71b076d391451d1394de",
+        "3ba6f4bd558a8dbd6b914b81fb26a77a0172f320e786ecbf95d2f4157b36c8ff",
+        "9b780af5e7ba60536b728cbb3c7b343db148b49b152ee016da8c5665cabbdb0c",
+        "1abb2ac0899790fded62faaaf63182efbc80b679210ec51917f0c0510f953edf",
+        "42348cf95208defcc6c110b655b7c4146f39bccad08f5079c8db8a4288a627fb",
+        "1351eea1a85d23ea9b646531026c06ff3113eeb24b6b790e468b88f01030b9eb",
+        "1d8ee217debe56611118f3640e014856b2566549090eeb3d4a6ce995b368f61a",
+        "cc30ed549f1fffe360ac227677ef3bd2a96556dc5e52e55dfad52e5d6edbdf01",
+        "12a1e3ae73ec753e9be281686d7bdf79daa3e15c9891b838f4ce4a56734eb462",
+        "cd34961bdcf5d123ef4d595ecea58e872b33af3adaad9046de1d2c087eba74e9",
+        "00d728b3d1512e8ee581723cf3c733ce6a4a882feb5849e715f077fa131542e7",
+        "74dd992eca429f995930ffb863a045a489898b3e5ce02e9c3fbd71513c5d4102",
+        "34fb6d57084b8860cfd438315bfd7617aca9693f95d4f88859509095d5393289",
+        "acd005fcfeb8219cfcef1bc65fa2173559663d3c859aba7cd4b18e6e88cdc78e",
+        "e1ddc131888f6096e9ea6909b6e34b5988b4a9c673c0ae406b040b54ad61b24c",
+        "8904cd785db33ee20f8b68e52aa9d8dab9bbe0777f5dd636211c5fc767483dd5",
+        "246559c1960c83ca01755a208d2e67606eb4c3c9e9cbc3878e9e4a971b375fc1",
+        "f9b23ce6e9e1ca9abac75b37a6afb2d340110009f85c0147ae3b3e1c9891c831",
+        "daa359f07bd71cd4c4761c5e517ee0f4a7a660c2e18b88efb733199ed3f4383a",
+        "32ff68fb0cd7925e607c02b4f2525cfdbe53a89f7a748e7fe1019bec999c7623",
+        "b83c0d0af945f1410eff09d565bfed853f9f4f9f37697ebb437cc706cdde5a62",
+        "f0ac181728b90039d8c03eeb467ede74e39ad1a5c3b6cdc7282c68efb5b19526",
+        "3b5371f8d4e4249b9219dea2c390ab5501720e72487b471fd709f43b4ae1c78e",
+        "e4ae105ab0463af6eadb1c61498e6ea3a0199ee3cc3638e18f3fba09f9d517d4",
+        "1b2d517b688e54687a05558a2f49fe493956722c26e77fef95c55c970a8959d9",
+        "ffd86be4be9ecabb0a043a5eef73fbe661de22d985bf7308cecbb238024d69c7",
+        "1e92a9316a4609f46240509e4e0081be71ff5e2b608a7c0e15e2165cad9fb448",
+        "4c0ba15946ff89f23d378a726545540d70ffa950067ccd5c9d31a29fe84b7d79",
+        "e47895bf415cfb41c1a49273c67047673adc35fb93ecce10607aa621609fea2c",
+        "211ac7fe0e6d98b5624812f2f7815f6281ce5888c5d8527f624229d6696bfc49",
+        "a2c4082fb5decb2fb83c06d51a22914ef4718b024c254fd370e562848d38a782",
+        "e15f9e37cac25967be6fddf7691621dd72c2205b78b3ae9c0da2f823620bdddf",
+        "664f942742a6485fa18022e61b67fdc37a67e9f049f40605092d4bb7273c3f96",
+        "ad73e6e3edaaac94dd645190a77117b316094e6ba1d33e06133ade5d3deec8b7"
+      ],
+      "registry_producer_sha": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
+      "actual_launch_head": "679bcd52912eca55fba8ac44fbcece21f53eb97d",
+      "physical_source_bundle_sha256_at_producer": "d21b13aa3691f77eed7daa247e12defc0758cf1bfa6cc91a394f01505d5d9c7f",
+      "physical_source_bundle_sha256_at_launch": "d21b13aa3691f77eed7daa247e12defc0758cf1bfa6cc91a394f01505d5d9c7f",
+      "per_physics_file": {
+        "arrhenius_fracture/persistent_site_cyclic_v10229.py": {
+          "sha256_at_producer": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "sha256_at_launch": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_v10229.py": {
+          "sha256_at_producer": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "sha256_at_launch": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py": {
+          "sha256_at_producer": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+          "sha256_at_launch": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_audited_v10229.py": {
+          "sha256_at_producer": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "sha256_at_launch": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": {
+          "sha256_at_producer": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "sha256_at_launch": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": {
+          "sha256_at_producer": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "sha256_at_launch": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_v10230.py": {
+          "sha256_at_producer": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "sha256_at_launch": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_kinetics_v10230.py": {
+          "sha256_at_producer": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "sha256_at_launch": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "identical": true
+        },
+        "arrhenius_fracture/a_native_engine_v10230.py": {
+          "sha256_at_producer": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "sha256_at_launch": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "identical": true
+        },
+        "arrhenius_fracture/material_manifest.py": {
+          "sha256_at_producer": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "sha256_at_launch": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "identical": true
+        },
+        "arrhenius_fracture/reduced_shared_state_v1023.py": {
+          "sha256_at_producer": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "sha256_at_launch": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "identical": true
+        },
+        "arrhenius_fracture/fatigue_v1.py": {
+          "sha256_at_producer": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "sha256_at_launch": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_causal_pilot_v2_v10230.py": {
+          "sha256_at_producer": "429edc1d3c19379c9eb42f7260c3ba4fad3c5c6edacdb103b5dffc86c0a33f0c",
+          "sha256_at_launch": "429edc1d3c19379c9eb42f7260c3ba4fad3c5c6edacdb103b5dffc86c0a33f0c",
+          "identical": true
+        },
+        "scripts/part_x_run_one_job.py": {
+          "sha256_at_producer": "1e68781cf7616d86579f66d22851355dbeb9ea5231c29c1c4b6b1ca64c0b79a7",
+          "sha256_at_launch": "1e68781cf7616d86579f66d22851355dbeb9ea5231c29c1c4b6b1ca64c0b79a7",
+          "identical": true
+        }
+      },
+      "all_differing_files": {
+        "artifacts/crack_rebonding_part_x_v1/developed_job_registry.csv": "REGISTRY_OR_EVIDENCE_ONLY",
+        "artifacts/crack_rebonding_part_x_v1/px4_producer_freeze.json": "REGISTRY_OR_EVIDENCE_ONLY"
+      },
+      "n_differing_files_total": 2,
+      "n_differing_files_physics_affecting": 0,
+      "admissibility_decision": "PHYSICS_SOURCE_IDENTICAL_ALLOW_HEAD_DRIFT_CLOSED"
+    },
+    {
+      "group": "PX3_screen",
+      "n_canonical_job_keys": 28,
+      "canonical_job_keys": [
+        "94bd7b36e800ce97cf0a22da247ac047c749eaf9dcb2e36903d2c9c9601334f0",
+        "89de9df3206d0251d7cbb3dcf048289b3781a94819828bcd1635f29ff2416bc5",
+        "b46374586803da44d05c02df29f145a8013b2d3bef80f50df38a3591676f6429",
+        "11adf298081484d66d7f57e5f146468512da908180a855b1b8b0a4a73a3cc8c9",
+        "b70aa81a209cadd92b90fc2a81e32780f995bbc706b03d714647d51a583f19ef",
+        "5afded52213db8889753bf7eafee8c79d22de47038a45b301796c881b8fd41e3",
+        "fafd9fd27252c464e4a1df2ab22c6a4b6efac2097a6311880b9c8f7d174114cb",
+        "4d238dfd56fd378506489e98909fd91b7897b619ceb173d139576c772981ecd9",
+        "acf3a51ccf2954fb04352f35d9de8c1417678119cb8d1321ec41a24e1d6237ee",
+        "15eae7ce2b2c26727671304b329d0937c7f995c7c0292084d7b1418df6540d02",
+        "0119326470e5cbe683c05f6a42d1f242d3c64de459e6ccb90758d94cf69e24b4",
+        "f9ae8c11742212a4dd0b1afff0b2504c285b12950d52967a6b27b0e4ef465ab2",
+        "3d30034af1b472c45d28f9ab22063a56707c5a38b084acfa6dee5871095115d5",
+        "86a24d658d8d04d97a2f57261ab9e8ec03287bcc37e22941229322adc08e229d",
+        "7e27ff50ebf98aefef66e6e3fc08d2266e2765f5ef7b63209bbaa575cdb22274",
+        "68d21e419727e335c786b0ef03ee6f0344bc7ea719890f7fea75405e150f88e8",
+        "499012e9db9e705ab9b36a5838857a17cf61271fe7aceecad36deb73662dcf84",
+        "d9652e0e960e5fe878f7d6df0a61ea257cd343dbaef4fba47af48048cbc79895",
+        "405ea308df2e40942e799754ce1ef58fd76c3d8368fe82a6a41fe63a026cadf0",
+        "5beb4b72022143074a2e92105dd15e2029c780621a656f2d8ea62e5aa099181d",
+        "ff847dca66090087e3e3a5faa0ab6a119bb50b351c62d206eccea118018bb607",
+        "54dc38d52bd09adab75769859a6050ef6ae0dfb0d86a63b33ae6da2065688024",
+        "781ea89d8f45711f754d58c866863111f6c85661f7233cea8b4cca1cb1e0669e",
+        "4719c647660d16d98b25477b20b2d71fcc3ad4a617c22825bc60e9487b795c85",
+        "13f04e3eccae7f0165d25f4f58152bbeb2665b26b3759250d016ea37cd842388",
+        "15050cb8209c08e788e2327e82eb5dba788654b26280a908a1a7f25c0480dfd6",
+        "34a8afa9d28567ebd109ed65c26c4f2eb1b01d0376b03ef173567b9dc181b976",
+        "7aaa06ace5c212ac772a52df896db094e1a90fcf806eaeb7828868e394f3fb9d"
+      ],
+      "registry_producer_sha": "6b9631dc4d0c27367fd444f93a0d4894cdf66fa5",
+      "actual_launch_head": "cc306a8a4174b64a608865e8cd02620a56d030f8",
+      "physical_source_bundle_sha256_at_producer": "857689710fa8d57c038fd253ee52c25a570680f09a631537cf92e1065e13c54f",
+      "physical_source_bundle_sha256_at_launch": "857689710fa8d57c038fd253ee52c25a570680f09a631537cf92e1065e13c54f",
+      "per_physics_file": {
+        "arrhenius_fracture/persistent_site_cyclic_v10229.py": {
+          "sha256_at_producer": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "sha256_at_launch": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_v10229.py": {
+          "sha256_at_producer": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "sha256_at_launch": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py": {
+          "sha256_at_producer": "b413badae311db2d301e5ebfea095224f7a664a531b7b4efe03dd5f91b9313da",
+          "sha256_at_launch": "b413badae311db2d301e5ebfea095224f7a664a531b7b4efe03dd5f91b9313da",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_audited_v10229.py": {
+          "sha256_at_producer": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "sha256_at_launch": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": {
+          "sha256_at_producer": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "sha256_at_launch": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": {
+          "sha256_at_producer": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "sha256_at_launch": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_v10230.py": {
+          "sha256_at_producer": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "sha256_at_launch": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_kinetics_v10230.py": {
+          "sha256_at_producer": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "sha256_at_launch": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "identical": true
+        },
+        "arrhenius_fracture/a_native_engine_v10230.py": {
+          "sha256_at_producer": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "sha256_at_launch": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "identical": true
+        },
+        "arrhenius_fracture/material_manifest.py": {
+          "sha256_at_producer": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "sha256_at_launch": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "identical": true
+        },
+        "arrhenius_fracture/reduced_shared_state_v1023.py": {
+          "sha256_at_producer": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "sha256_at_launch": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "identical": true
+        },
+        "arrhenius_fracture/fatigue_v1.py": {
+          "sha256_at_producer": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "sha256_at_launch": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_causal_pilot_v2_v10230.py": {
+          "sha256_at_producer": "24a5b868413c1c79ec820280f382035084e968f7a54a71f8e18bc60a28e9fe07",
+          "sha256_at_launch": "24a5b868413c1c79ec820280f382035084e968f7a54a71f8e18bc60a28e9fe07",
+          "identical": true
+        },
+        "scripts/part_x_run_one_job.py": {
+          "sha256_at_producer": "cb33cc46446ad08c8c9536108b434dcf69b0940cba018f9205726687b9d8ccc0",
+          "sha256_at_launch": "cb33cc46446ad08c8c9536108b434dcf69b0940cba018f9205726687b9d8ccc0",
+          "identical": true
+        }
+      },
+      "all_differing_files": {
+        "artifacts/crack_rebonding_part_x_v1/developed_job_registry.csv": "REGISTRY_OR_EVIDENCE_ONLY",
+        "artifacts/crack_rebonding_part_x_v1/screen_job_registry.csv": "REGISTRY_OR_EVIDENCE_ONLY"
+      },
+      "n_differing_files_total": 2,
+      "n_differing_files_physics_affecting": 0,
+      "admissibility_decision": "PHYSICS_SOURCE_IDENTICAL_ALLOW_HEAD_DRIFT_CLOSED"
+    },
+    {
+      "group": "PX5_main",
+      "n_canonical_job_keys": 20,
+      "canonical_job_keys": [
+        "95e4e23c6b8495856f82742923c4f54c3a9b85cc1445e1f4d2ccfb40f2d7a48d",
+        "fff3f17cef5d6490e127ba5506ee383aad83a62254a05e44e34c73b9f177bcfd",
+        "def756cd42a35474bba54b5db616df172f876721565012c0585ca1a903bcf685",
+        "9a9ef987660b53e316a31fade370f63efa47f5d7782aef63912e68ffbee6fc45",
+        "8c2fdb9e6ee30fac0119e7ead79eb61f4f93d31ab36c799b6aa1f64f10240177",
+        "476371422d32d29d56ec06d9c033b8a965adf69b69d51f490850b46b3842baf4",
+        "a1c1b625f99fa1700a4a3d9ba26b4a5ce30cff45704e680219d0a4a0d768875e",
+        "ca6f809a3d30cba2b869314076e15aa8b41fbbe22bb37fa2f61b88ae0b3ddeeb",
+        "90e09720d1f9cbfa354ea866d59f7acac4a95559a215be7c1a67362e60cf44b2",
+        "12067287ed910aed12bc8671eee7e30fe611069306c3e967fe4879feb403c24d",
+        "1973ea7df6540425cb421b7baefc70f721eec74fea019f9116391eef39fdd426",
+        "df2881a8baf711e30d2525a989c9396dfc0f84c6ff5a5a050b006c481953a15c",
+        "311dbe916f74ad8d0d4762409e45c5b4ee7d8b0eaeac8eac7f65a8d75e6bad7f",
+        "13c9093c693e9c82291c22892e4994f50609edcce3cd53756e16aa4fac279425",
+        "e097ce57ad90b1bdac52505165be35cfb2ec2b91f1cba716b7fef7e3bc606283",
+        "a62cac7e7ae688016d9ecb4eab6d96770b50f944e5bcbe339adf40832dd4c6f7",
+        "16043e3c575fa5e04cc53f7bcb454bf1fc5f102475de29e353c2145d9d92cac5",
+        "68db722ec35024d1cdc41799711ba2e4277e1bb51c5bfa8a04ffa92a84c5eaa9",
+        "4192bccca955bee71b568568a2193caa76a6bdea32a6029190f4fa4788859095",
+        "b39527c3a7f0182138d3b9e2ca48657611570662ccc252d33d41f89ace60bf1a"
+      ],
+      "registry_producer_sha": "7a044e0673a35de8b8c945c54df009a612b10015",
+      "actual_launch_head": "91756c870963b565925f5a222dd42ad0b6fa17e2",
+      "physical_source_bundle_sha256_at_producer": "c494cb93df909070ad65dc69969d3b3927c5d4d92e14f1c3ddf0565a535553a0",
+      "physical_source_bundle_sha256_at_launch": "c494cb93df909070ad65dc69969d3b3927c5d4d92e14f1c3ddf0565a535553a0",
+      "per_physics_file": {
+        "arrhenius_fracture/persistent_site_cyclic_v10229.py": {
+          "sha256_at_producer": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "sha256_at_launch": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_v10229.py": {
+          "sha256_at_producer": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "sha256_at_launch": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py": {
+          "sha256_at_producer": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+          "sha256_at_launch": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_audited_v10229.py": {
+          "sha256_at_producer": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "sha256_at_launch": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": {
+          "sha256_at_producer": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "sha256_at_launch": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": {
+          "sha256_at_producer": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "sha256_at_launch": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_v10230.py": {
+          "sha256_at_producer": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "sha256_at_launch": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_kinetics_v10230.py": {
+          "sha256_at_producer": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "sha256_at_launch": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "identical": true
+        },
+        "arrhenius_fracture/a_native_engine_v10230.py": {
+          "sha256_at_producer": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "sha256_at_launch": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "identical": true
+        },
+        "arrhenius_fracture/material_manifest.py": {
+          "sha256_at_producer": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "sha256_at_launch": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "identical": true
+        },
+        "arrhenius_fracture/reduced_shared_state_v1023.py": {
+          "sha256_at_producer": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "sha256_at_launch": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "identical": true
+        },
+        "arrhenius_fracture/fatigue_v1.py": {
+          "sha256_at_producer": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "sha256_at_launch": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_causal_pilot_v2_v10230.py": {
+          "sha256_at_producer": "0b05fa730fe3fdec8e7b817c6107ceb4b7969f0d324d19bac00c6043682034e8",
+          "sha256_at_launch": "0b05fa730fe3fdec8e7b817c6107ceb4b7969f0d324d19bac00c6043682034e8",
+          "identical": true
+        },
+        "scripts/part_x_run_one_job.py": {
+          "sha256_at_producer": "7926869d11a4ed8e6e167a113ca19762eb779a13d1c6ebe8855057f01089b756",
+          "sha256_at_launch": "7926869d11a4ed8e6e167a113ca19762eb779a13d1c6ebe8855057f01089b756",
+          "identical": true
+        }
+      },
+      "all_differing_files": {
+        "artifacts/crack_rebonding_part_x_v1/px5_static_shield_job_registry.csv": "REGISTRY_OR_EVIDENCE_ONLY"
+      },
+      "n_differing_files_total": 1,
+      "n_differing_files_physics_affecting": 0,
+      "admissibility_decision": "PHYSICS_SOURCE_IDENTICAL_ALLOW_HEAD_DRIFT_CLOSED"
+    },
+    {
+      "group": "PX4_developed",
+      "n_canonical_job_keys": 36,
+      "canonical_job_keys": [
+        "365a9475584e1552a134a7b9681608946c6e066a074166de444e8993d0f7ecbc",
+        "7deb16dac19ec39abc6ae78da35d1532abdbf12524d391d04fc7823f4239f006",
+        "883c8d97226c95eebb1e585df00af5ccaef5742a64a85a0a8769f61fca6f68cf",
+        "ad2991028fae1ea10249a1c870d117cd5a7e567d46b61671d83dbaf101118af7",
+        "d9715bd5e151776a1530b940cce8dd895b727a45e4738804dd610e9571506260",
+        "06d9da958781a18a55fc9078850bff533d15df50a1a33a55f409333f9251f076",
+        "cc10b9d621c0e5b33e28478a9a509e0d9b755e87fa8506480e621421ca56b42d",
+        "5435223ddfd80ca3edbcb3268057c4f802140ec31d88145ec160a9e0ce878ca3",
+        "670c1cb5f492bc1c75a3fab10872791073296302fc77341cb795938fd17ec4be",
+        "5eb8a58affabfe51ded52536dd0f78d3e076d1778391def69f736bc921561fb6",
+        "48e2ea0bf0ef7013a43df8a55733ed21c514811b9fb5cac9ae849121fb9f9224",
+        "0495343057ab9702c25f2cddda7f3800170510e6d1343fb2cd3f9ad37bf8b5c2",
+        "248b832748571c0e4dfdcd0c99ef54b86447d7f050a9719ef922e1acdd20ac4b",
+        "2d55ef718b2a1cbb54384bb2f3bbb895152b8079f3d89e6e45aa54462ff4ae58",
+        "b03e1086d513efba6ab1c075aaf021e5ab69b6bc3bb9ec2bc1d3a757b99e39d3",
+        "2f3acc81257c160709dd1a0a2e65c4910244bfc464c5f999edb865c2cc9d29c3",
+        "a16d5bf067f24241d7edfd1e3ed6849134b7e739b8e1d69ba4482577ea3b87f8",
+        "d56961c08afe7b57c60a9a1f1c828da0ce07c93bee766d2ad446f1cb118fdccd",
+        "7cfc9c9d3658ca539b37d959d6e3bc67788fe7829597228e5a7da8e17349a0eb",
+        "3d75dca58f846a36e582aff63d8c84f57a58ba35eb6c3465d4683c502922d2a5",
+        "ac5de4e775b47e78afcd962f1b7d2b3d1ef51921f40dedaa81926c8c9fad4695",
+        "78d75b0fe736177d1e1b701c4f9bc7452328191caad0cbc397f33fd407fa6e60",
+        "ce185a54cbe9ffcd29aac26978eba70521695b3c3bd7050fffad412b4269d03d",
+        "5d3f1040a83c867c616aecf5e5f15422a453799d4442f07f01b859fa0f6652a9",
+        "3febb3ae300ffd16f6660ed1e96ea5489e80bba8793b45c1897596c77804160c",
+        "779e5890248fff1994e9a891208571ace3f2bf1028bfa9fbe8f7033c0055f36c",
+        "80a1e60bf48728accce86c2e1b6173901da6a9b6ec5c7e8ce150a4d01abcace5",
+        "0b41425b21f1e551c90de2fb206c70b0f6dba9ddffe6ed770ea86be159d2f933",
+        "b68758849f3fda0801c22ce1cc2c44f4683c1764c17328f3005d15b8ab0edb62",
+        "8001e2596deb0a5622513fc9d5bfe03d2f22bc56720741fae82590f38445dee1",
+        "eb5041ec66c836da76e1e196a5de7c63e2c3908252d4d4c1a562bcce75b3c525",
+        "51fda80481269321138c0feb9ccd33d4bc2ab9c6730892bb925023ceff299fb1",
+        "a0bfc293d98a48e8c995defba38e6a448fa60a91dda9b7b98067ffc13b306213",
+        "c5cf55e5e6e1f4eae3e138d21494e62b2d2a906965a9cb02e900aff8bb2b33f7",
+        "ecc22984515a0fb492c38f717a19620b1f813d711050a3582c481db01adf9134",
+        "fb5b3e5d2344b1dc6b1b8baea59d33161dcad1ab1f7a88f420c29c45bae397d4"
+      ],
+      "registry_producer_sha": "91b66e99ff17aa0010e0c954a279a3b9748277f8",
+      "actual_launch_head": "b535508cab90f30a7f7c6934bd14bedf39a3ce19",
+      "physical_source_bundle_sha256_at_producer": "5fc7d0dd5f1753d37dea22ad2487969cd00778f9062f2889adb63ad11d4a5a7e",
+      "physical_source_bundle_sha256_at_launch": "5fc7d0dd5f1753d37dea22ad2487969cd00778f9062f2889adb63ad11d4a5a7e",
+      "per_physics_file": {
+        "arrhenius_fracture/persistent_site_cyclic_v10229.py": {
+          "sha256_at_producer": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "sha256_at_launch": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_v10229.py": {
+          "sha256_at_producer": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "sha256_at_launch": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py": {
+          "sha256_at_producer": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+          "sha256_at_launch": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_coupled_audited_v10229.py": {
+          "sha256_at_producer": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "sha256_at_launch": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": {
+          "sha256_at_producer": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "sha256_at_launch": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+          "identical": true
+        },
+        "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": {
+          "sha256_at_producer": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "sha256_at_launch": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_v10230.py": {
+          "sha256_at_producer": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "sha256_at_launch": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_kinetics_v10230.py": {
+          "sha256_at_producer": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "sha256_at_launch": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+          "identical": true
+        },
+        "arrhenius_fracture/a_native_engine_v10230.py": {
+          "sha256_at_producer": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "sha256_at_launch": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+          "identical": true
+        },
+        "arrhenius_fracture/material_manifest.py": {
+          "sha256_at_producer": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "sha256_at_launch": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+          "identical": true
+        },
+        "arrhenius_fracture/reduced_shared_state_v1023.py": {
+          "sha256_at_producer": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "sha256_at_launch": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+          "identical": true
+        },
+        "arrhenius_fracture/fatigue_v1.py": {
+          "sha256_at_producer": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "sha256_at_launch": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+          "identical": true
+        },
+        "arrhenius_fracture/crack_rebonding_causal_pilot_v2_v10230.py": {
+          "sha256_at_producer": "0b05fa730fe3fdec8e7b817c6107ceb4b7969f0d324d19bac00c6043682034e8",
+          "sha256_at_launch": "0b05fa730fe3fdec8e7b817c6107ceb4b7969f0d324d19bac00c6043682034e8",
+          "identical": true
+        },
+        "scripts/part_x_run_one_job.py": {
+          "sha256_at_producer": "1e68781cf7616d86579f66d22851355dbeb9ea5231c29c1c4b6b1ca64c0b79a7",
+          "sha256_at_launch": "1e68781cf7616d86579f66d22851355dbeb9ea5231c29c1c4b6b1ca64c0b79a7",
+          "identical": true
+        }
+      },
+      "all_differing_files": {
+        "artifacts/crack_rebonding_part_x_v1/developed_job_registry.csv": "REGISTRY_OR_EVIDENCE_ONLY",
+        "artifacts/crack_rebonding_part_x_v1/px4_1_unlaunched_producer_freeze.json": "REGISTRY_OR_EVIDENCE_ONLY"
+      },
+      "n_differing_files_total": 2,
+      "n_differing_files_physics_affecting": 0,
+      "admissibility_decision": "PHYSICS_SOURCE_IDENTICAL_ALLOW_HEAD_DRIFT_CLOSED"
+    }
+  ]
+}
