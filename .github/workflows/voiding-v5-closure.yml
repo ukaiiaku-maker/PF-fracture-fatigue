@@ -29,6 +29,7 @@ jobs:
           tests/test_v5_clean_historical_neutrality.py
           tests/test_closure_publication_package.py
           tests/test_closure_production_topology_audit.py
+          tests/test_no_legacy_variational_modules.py
           --junitxml=/tmp/voiding_v5_finalization_v3_closure/focused.xml
       - name: Unique source-resolved traction A and B
         run: |

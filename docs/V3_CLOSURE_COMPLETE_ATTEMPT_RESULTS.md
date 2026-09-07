@@ -151,7 +151,8 @@ No force push, rebase, squash, merge, branch deletion, or RC is part of this
 publication. Accepted V2/V3 and earlier checkpoint artifacts remain unchanged
 in branch history. The model remains single-void, two-dimensional plane strain,
 uncalibrated, and not experimentally validated. No multiple-front, fatigue,
-AT1/AT2, GTN, or diffuse resolved-void campaign is enabled. `r_tip != R_void`.
+removed variational-model, GTN, or diffuse resolved-void campaign is enabled.
+`r_tip != R_void`.
 
 The permitted terminal decision after full final CI and PR-ledger publication
 is `V5_V3_CLOSURE_COMPLETE_BUT_BLOCKED`, never a release qualification merely
