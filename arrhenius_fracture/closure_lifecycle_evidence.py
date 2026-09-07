@@ -122,7 +122,15 @@ def transition_occurred(name, before, after):
     a,b = before.void_state.cavities[0],after.void_state.cavities[0]
     if name == "subgrid_growth": return b.radius_m > a.radius_m and after.void_state.consumed_defect_inventory_area_m2 > before.void_state.consumed_defect_inventory_area_m2
     if name == "promotion": return a.phase == VoidPhase.STABLE_SUBGRID_VOID and b.phase == VoidPhase.RESOLVED_VOID and before.mesh.ne != after.mesh.ne
-    if name == "ligament": return b.phase == VoidPhase.CONNECTED_VOID and not after.crack_network.active_tip_ids and len(after.competition.consumed_event_ids) > len(before.competition.consumed_event_ids)
+    if name == "ligament":
+        def consumed(state):
+            return {key for key,value in state.junction_process_state.get("directional_event_provenance",{}).items()
+                    if value.get("status")=="CONSUMED_AT_OWNED_SOURCE"}
+        # The new cavity source correctly owns a fresh competition. The root
+        # event's consumed identity is retained in the source-provenance ledger,
+        # not in that fresh competition's empty consumed-event tuple.
+        return (a.phase == VoidPhase.RESOLVED_VOID and b.phase == VoidPhase.CONNECTED_VOID
+                and not after.crack_network.active_tip_ids and bool(consumed(after)-consumed(before)))
     if name == "downstream_child": return len(after.crack_network.branches)==len(before.crack_network.branches)+1 and b.phase == VoidPhase.DOWNSTREAM_FRONT_ACTIVE and len(after.crack_network.active_tip_ids)==1
     if name == "child_continuation": return len(before.crack_network.active_tip_ids)==1 and a.phase == VoidPhase.DOWNSTREAM_FRONT_ACTIVE and after.crack_network.total_physical_crack_length_m > before.crack_network.total_physical_crack_length_m
     raise ValueError(name)
