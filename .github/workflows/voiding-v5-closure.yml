@@ -28,6 +28,7 @@ jobs:
           tests/test_closure_lifecycle_rollback.py tests/test_voiding_lifecycle_driver_v5.py
           tests/test_v5_clean_historical_neutrality.py
           tests/test_closure_publication_package.py
+          tests/test_closure_production_topology_audit.py
           --junitxml=/tmp/voiding_v5_finalization_v3_closure/focused.xml
       - name: Unique source-resolved traction A and B
         run: |
@@ -87,6 +88,12 @@ jobs:
           diff -ru /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-a /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-b
           python scripts/validate_voiding_v5_closure_bundle.py /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-a
           python scripts/validate_voiding_v5_closure_bundle.py /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-b
+      - name: Independent topology and accounting for every production resolution
+        if: matrix.phase == 'production'
+        run: |
+          python scripts/qualify_voiding_v5_closure_production_topology.py /tmp/voiding_v5_finalization_v3_closure/production-a /tmp/voiding_v5_finalization_v3_closure/production-topology-a.json
+          python scripts/qualify_voiding_v5_closure_production_topology.py /tmp/voiding_v5_finalization_v3_closure/production-b /tmp/voiding_v5_finalization_v3_closure/production-topology-b.json
+          diff -u /tmp/voiding_v5_finalization_v3_closure/production-topology-a.json /tmp/voiding_v5_finalization_v3_closure/production-topology-b.json
       - name: Clean-worktree and diff checks
         if: always()
         run: |
