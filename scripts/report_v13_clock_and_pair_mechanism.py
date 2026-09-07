@@ -36,7 +36,11 @@ def main():
     args=parser.parse_args()
     audit=json.loads((args.root/'clock_audit.json').read_text())
     later=json.loads((args.root/'later_companions/summary.json').read_text())
-    gate=ensemble_gate([])
+    gate=ensemble_gate([],exact_parent_parity=True,exact_pair_and_fallback=True)
+    gate.update({'scope':'intended inherited/cooperative co-critical models, not the retained sequential null model',
+        'accepted_parent_qualification_reopened':False,'existing_exact_pair_and_fallback_checks_preserved':True,
+        'later_null_intermediate_grid_cases':sum(any(.05<=s['P_committed']<=.95 for s in r.get('sensitivity_surface',[])) for r in later['cases']),
+        'later_null_positive_reference_marks':sum(o.get('single_reference_overlay_disposition')=='PAIR_ACCEPTED' for r in later['cases'] for o in r.get('companions',[]))})
     atomic_json(args.root/'revised_ensemble_gate.json',gate)
     lines=['# V13 inherited-clock audit and cooperative-pair decision','',
         '**BRANCHING_KINETICS_MODEL_UNCALIBRATED**','',
