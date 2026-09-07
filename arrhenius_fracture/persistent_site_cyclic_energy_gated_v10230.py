@@ -12,6 +12,8 @@ from __future__ import annotations
 import copy
 from typing import Any
 
+import numpy as np
+
 from .persistent_site_cyclic_coupled_audited_v10229 import (
     AuditedCoupledPersistentSiteCyclicTipEngine,
 )
@@ -22,9 +24,45 @@ from .hazard_energy_event_gate_v10230 import (
     continuum_gate_diagnostics,
     register_engine,
 )
+from .persistent_site_high_cycle_state_v10230 import serialize_active_state
+from .persistent_site_reversible_transport_v10230 import install_reversible_transport
+from . import crack_rebonding_v10230 as _rebond
 
 
 MODEL_ID = "v10.2.30_transactional_persistent_site_energy_gated_cyclic"
+
+
+def transaction_state_snapshot(engine) -> dict[str, Any]:
+    """Serialize the actual constitutive state at an event transaction boundary."""
+    try:
+        snapshot = serialize_active_state(engine)
+    except (AttributeError, TypeError, ValueError):
+        # Lightweight transaction-unit fixtures do not implement the production
+        # state contract. Production engines must always take the complete path.
+        return {
+            "schema": "v10.2.30_event_transaction_state_snapshot_v1",
+            "complete_active_state": False,
+            "engine_type": type(engine).__name__,
+        }
+    return {
+        "schema": "v10.2.30_event_transaction_state_snapshot_v1",
+        "complete_active_state": True,
+        "active_state_model_id": "v10.2.30_complete_high_cycle_active_state_v1",
+        "vector": snapshot.vector.tolist(),
+        "fields": [
+            {
+                "owner": field.owner,
+                "name": field.name,
+                "shape": list(field.shape),
+                "start": int(field.start),
+                "stop": int(field.stop),
+                "floor": float(field.floor),
+            }
+            for field in snapshot.fields
+        ],
+        "diagnostics": dict(snapshot.diagnostics),
+        "geometry_signature": list(snapshot.geometry_signature),
+    }
 
 
 class HazardEnergyGatedPersistentSiteCyclicTipEngine(
@@ -42,6 +80,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
         self.energy_gate_last_continuum: dict[str, Any] = {}
         self.energy_gate_committed_event_count = 0
         self.energy_gate_committed_path_m = 0.0
+        install_reversible_transport(self.mpz)
         register_engine(self)
 
     def __deepcopy__(self, memo):
@@ -103,6 +142,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
 
         fired = bool(result.get("fired", False))
         if fired:
+            pre_event_state = transaction_state_snapshot(self)
             completed_threshold = float(
                 result.get("hazard_threshold_completed_action", threshold_before)
             )
@@ -114,6 +154,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                 "event_advance_m": proposal,
                 "event_length_factor": proposal_factor,
                 "threshold_action": completed_threshold,
+                "hazard_action_completed": completed_action,
                 "hazard_seed": int(self.hazard_cfg.seed),
                 "hazard_event_index": int(self.hazard_event_index - 1),
                 "geometry_subsegment_fraction": float(
@@ -128,7 +169,9 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                 "hazard_burgers_vector_m": float(self.b),
                 "energy_gate_continuum": dict(continuum),
                 "hazard_energy_gate_continuum_affects_hazard": False,
+                "pre_event_state": pre_event_state,
             }
+            rebonding_state = getattr(self, "_rebonding_state", None)
             self._energy_gate_pending = {
                 "descriptor": descriptor,
                 "rng_state_before": rng_state_before,
@@ -139,6 +182,10 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                 "n_adv_before": n_adv_before,
                 "proposal_m": proposal,
                 "proposal_factor": proposal_factor,
+                "rebonding_state_before": (
+                    rebonding_state.snapshot() if rebonding_state is not None else None
+                ),
+                "rebonding_block_context": getattr(self, "_rebonding_block_context", None),
             }
             if not self._energy_gate_provisional:
                 _avalanche_tip._PENDING_GEOMETRY_EVENTS.append(descriptor)
@@ -204,6 +251,178 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
             attach_pending_event_info(self._engine_id, result)
         return result
 
+    def _commit_rebonding_event(
+        self,
+        accepted_length_m: float,
+        pending: dict[str, Any],
+        result_ref: dict[str, Any] | None,
+    ) -> None:
+        """Rebonding-coupled event-time root-find and wake-transaction commit.
+
+        Reuses the existing normalized-progress relationship
+        (``dB/dt = lambda_c/threshold_action``, ``stochastic_hazard_tip.py:58-60``)
+        as a pure closed-form stand-in for the stateful ``_integrate_coupled``
+        (which cannot be safely re-invoked with different trial rates without
+        corrupting ``self.B``/RNG state) -- the phase-resolved action is
+        computed independently via ``crack_rebonding_v10230.phase_resolved_action``
+        and action closure is verified at the converged ``dt_used``, per the
+        event-time-coupling requirement in
+        docs/v10_2_30_crack_rebonding_approved_plan.md.
+        """
+        from . import crack_rebonding_v10230 as _rebond
+
+        rebonding_state = self._rebonding_state
+        ctx = pending.get("rebonding_block_context")
+        event_index = int(self.hazard_event_index) - 1
+        active_patches = [p for p in rebonding_state.active if not p.retired]
+
+        if ctx is None:
+            # No block context was stashed (e.g. rebonding was enabled after
+            # a checkpoint restore mid-run without a preceding cycle block):
+            # fail closed to a length-only commit -- new patch still created
+            # from the accepted length, existing patches simply translate
+            # without an intervening phase-resolved state advance.
+            rebonding_state.commit_event(
+                accepted_length_m=accepted_length_m,
+                event_index=event_index,
+                pre_event_states=None,
+                Eprime_Pa=_rebond.reduced_modulus_Pa(self.G, self.nu),
+            )
+            return
+
+        info = result_ref if isinstance(result_ref, dict) else {}
+        dt_uncoupled = max(
+            float(info.get("kinetic_dt_consumed_s", info.get("dt_consumed", 0.0))), 0.0
+        )
+        threshold_action = max(float(pending["threshold_before"]), 1.0e-300)
+        B_start = float(ctx["B_start"])
+        K_signed_phase = ctx["K_signed_phase"]
+        # ``dt_phase`` is a plain scalar at hold=0 (routes every downstream
+        # phase_resolved_action/propagate call to its byte-identical
+        # original path) or a per-bin duration array (n_phase sinusoidal
+        # bins plus the appended dwell bin) when the minimum-load hold is
+        # active -- must NOT be force-cast to float here, which would raise
+        # on a multi-element array.
+        dt_phase_ctx = (
+            float(ctx["dt_phase"]) if np.isscalar(ctx["dt_phase"]) else np.asarray(ctx["dt_phase"], dtype=float)
+        )
+        n_phase_ctx = int(ctx["n_phase"])
+        r_contact_m_ctx = float(ctx["r_contact_m"])
+        Eprime_Pa_ctx = float(ctx["Eprime_Pa"])
+        T_K_ctx = float(ctx["T_K"])
+        K_shield_ctx = float(ctx["K_shield_Pa_sqrt_m"])
+        r_eff_ctx = float(ctx["r_eff_m"])
+
+        def K_phase_fn(idx: int) -> float:
+            return float(K_signed_phase[idx % n_phase_ctx])
+
+        def lambda_cleave_normalized(sigma: float) -> float:
+            return self.lambda_cleave(float(sigma), T_K_ctx)[0] / threshold_action
+
+        pre_event_states = {p.patch_id: p.state_vector() for p in active_patches}
+
+        def integrate_coupled_fn(lambda_avg: float) -> dict[str, Any]:
+            if lambda_avg <= 0.0:
+                return {"fired": False}
+            return {
+                "fired": True,
+                "dt_consumed": (1.0 - B_start) * threshold_action / lambda_avg,
+            }
+
+        def phase_resolved_action_fn(dt: float):
+            """Wraps ``phase_resolved_action``, enforcing the S8C certified
+            bulk-action bound: on an uncertified bulk result, retry once
+            with an extended transient budget (bounded by
+            ``cfg.bulk_action_max_transient_extensions``); if still
+            uncertified, fail closed rather than let an unbounded-error
+            bulk answer feed the root-finder. Strips the diagnostics dict
+            before returning so ``solve_coupled_event_time`` (which expects
+            exactly ``(action, end_states, end_idx)``) needs no change."""
+            cfg = rebonding_state.cfg
+            transient_budget = 200  # phase_resolved_action's own default
+            extensions = 0
+            while True:
+                action, end_states, end_idx, action_diag = _rebond.phase_resolved_action(
+                    active_patches=active_patches,
+                    patch_states=pre_event_states,
+                    k0=0,
+                    t_interval=dt,
+                    K_phase_fn=K_phase_fn,
+                    dt_phase=dt_phase_ctx,
+                    n_phase=n_phase_ctx,
+                    r_contact_m=r_contact_m_ctx,
+                    cfg=cfg,
+                    T_K=T_K_ctx,
+                    Eprime_Pa=Eprime_Pa_ctx,
+                    K_shield_Pa_sqrt_m=K_shield_ctx,
+                    r_eff_m=r_eff_ctx,
+                    lambda_cleave_fn=lambda_cleave_normalized,
+                    max_transient_cycles=transient_budget,
+                )
+                if action_diag.get("bulk_action_qualified", True):
+                    return action, end_states, end_idx
+                if extensions >= cfg.bulk_action_max_transient_extensions:
+                    raise RuntimeError(
+                        "crack-rebonding bulk-action certificate not qualified "
+                        f"after {extensions} transient-budget extension(s) "
+                        f"(tail_bound={action_diag.get('total_tail_action_error_bound')!r}, "
+                        f"tol_rel={cfg.bulk_action_error_rel_tol!r}); refusing to "
+                        "commit an event on an uncertified bulk-action estimate. "
+                        "Increase bulk_action_max_transient_extensions or "
+                        "bulk_action_error_rel_tol, or use a smaller "
+                        "max_transient_cycles-compatible block, if this "
+                        "configuration is expected to relax this slowly."
+                    )
+                transient_budget *= 2
+                extensions += 1
+
+        if not _rebond.cohesion_present(rebonding_state.cfg):
+            # Zero-cohesion RB2 (mission Section 7/8): K_rebond_max is
+            # exactly 0 regardless of p_B, so the cleavage hazard is
+            # provably unaffected by wake state and the coupled root is
+            # trivially dt_uncoupled -- evolve the P/C/B Markov state to
+            # that KNOWN duration directly (one exact evaluation), rather
+            # than re-deriving an approximate root via
+            # solve_coupled_event_time's bisection (whose eps_B=1e-6
+            # tolerance would otherwise reintroduce the same kind of
+            # baseline-timing drift RB1's strict-parity fix removes). This
+            # still gives honest, dynamically-evolved P/C/B state for the
+            # zero-cohesion vs finite-cohesion causal comparison.
+            _, final_states, _end_idx = phase_resolved_action_fn(dt_uncoupled)
+            dt_for_clock = dt_uncoupled
+        else:
+            lambda_avg_uncoupled = (
+                (1.0 - B_start) * threshold_action / dt_uncoupled if dt_uncoupled > 0.0 else 1.0
+            )
+            root = _rebond.solve_coupled_event_time(
+                integrate_coupled_fn=integrate_coupled_fn,
+                phase_resolved_action_fn=phase_resolved_action_fn,
+                lambda_avg_uncoupled=lambda_avg_uncoupled,
+                B_start=B_start,
+                B_threshold=1.0,
+                eps_B=1.0e-6,
+                dt_block=dt_uncoupled if dt_uncoupled > 0.0 else None,
+            )
+            final_states = root["patch_states"] if root.get("fired") else pre_event_states
+            # Advance the wake's chronological phase clock by the converged
+            # (rebonding-coupled) elapsed time, not the raw uncoupled
+            # estimate -- this is what makes the next block/event's phase
+            # sampling correctly continuous from the true event instant,
+            # not a nominal one.
+            dt_for_clock = float(root["dt_used"]) if root.get("fired") else dt_uncoupled
+
+        rebonding_state.commit_event(
+            accepted_length_m=accepted_length_m,
+            event_index=event_index,
+            pre_event_states=final_states,
+            Eprime_Pa=Eprime_Pa_ctx,
+        )
+        period_s_ctx = float(ctx.get("period_s", 0.0))
+        if period_s_ctx > 0.0:
+            rebonding_state.elapsed_time_s = (
+                rebonding_state.elapsed_time_s + dt_for_clock
+            ) % period_s_ctx
+
     def commit_energy_gated_event(
         self,
         committed_length_m: float,
@@ -219,7 +438,32 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
         if pending is None:
             raise RuntimeError("no pending transactional event exists")
 
+        pre_commit_state = transaction_state_snapshot(self)
         advance = self.mpz.advance(length)
+
+        rebonding_state = getattr(self, "_rebonding_state", None)
+        if rebonding_state is not None and rebonding_state.cfg.enabled:
+            if _rebond.rebonding_kinetics_active(rebonding_state.cfg):
+                self._commit_rebonding_event(length, pending, result_ref)
+            else:
+                # REBOND_OFF/CONTACT_PROXY_ONLY: patch_Q is the exact zero
+                # generator, so there is no kinetics to couple into event
+                # timing. Skip the coupled root-finder entirely (never
+                # construct phase_resolved_action_fn / call
+                # solve_coupled_event_time) so this trajectory is byte-
+                # identical to cfg=None/absent -- only the wake ledger
+                # (patch creation/translation) is maintained, for RB1's own
+                # contact diagnostics archival, exactly mirroring the
+                # existing "no block context stashed" fail-closed branch of
+                # _commit_rebonding_event.
+                rebonding_state.commit_event(
+                    accepted_length_m=length,
+                    event_index=int(self.hazard_event_index) - 1,
+                    pre_event_states=None,
+                    Eprime_Pa=_rebond.reduced_modulus_Pa(self.G, self.nu),
+                )
+        self._rebonding_block_context = None
+
         self.micro_advance_total_m += length
         self.a_adv += length
         self.checkpoint_advance_total_m += length
@@ -229,6 +473,32 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
         self.avalanche_event_length_history.append(length)
         self.energy_gate_committed_event_count += 1
         self.energy_gate_committed_path_m += length
+        post_commit_state = transaction_state_snapshot(self)
+        descriptor = pending.get("descriptor", {})
+        threshold_action = float(
+            descriptor.get("threshold_action", getattr(self, "hazard_threshold_action", 0.0))
+        )
+        transaction_audit = {
+            "schema": "v10.2.30_first_passage_energy_geometry_transaction_v1",
+            "threshold_action": threshold_action,
+            "hazard_action_completed": float(
+                descriptor.get("hazard_action_completed", threshold_action)
+            ),
+            "raw_proposed_advance_m": float(pending["proposal_m"]),
+            "event_length_random_factor": float(pending["proposal_factor"]),
+            "energy_gate_decision": str(gate.get("arrest_reason", "unknown")),
+            "energy_admissible_advance_m": float(
+                gate.get("energy_admissible_event_length_m", length)
+            ),
+            "geometry_committed_advance_m": length,
+            "mpz_translated_advance_m": length,
+            "pre_event_state": descriptor.get(
+                "pre_event_state", pre_commit_state
+            ),
+            "pre_geometry_commit_state": pre_commit_state,
+            "post_event_state": post_commit_state,
+        }
+        gate["event_transaction_audit"] = transaction_audit
 
         info = result_ref if isinstance(result_ref, dict) else {}
         dt_used = max(
@@ -269,6 +539,7 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
                     advance.get("wake_mobile", 0.0)
                     + advance.get("wake_retained", 0.0)
                 ),
+                "event_transaction_audit": transaction_audit,
                 **{
                     key: value
                     for key, value in advance.items()
@@ -329,6 +600,10 @@ class HazardEnergyGatedPersistentSiteCyclicTipEngine(
         ):
             self.hazard_threshold_history.pop()
         self.n_adv = int(pending["n_adv_before"])
+        rebonding_state = getattr(self, "_rebonding_state", None)
+        if rebonding_state is not None:
+            rebonding_state.restore(pending.get("rebonding_state_before"))
+        self._rebonding_block_context = None
         self._set_current_event_length()
         self._energy_gate_pending = None
 

@@ -1,0 +1,42 @@
+{
+  "schema": "v10230_part_x_px3_6_uncertainty_propagation_v1",
+  "certified_source_constant": {
+    "name": "CrackRebondingControls.bulk_action_error_rel_tol",
+    "value": 0.001,
+    "enforcement": "Actively enforced, not a documentation constant: persistent_site_cyclic_energy_gated_v10230.py refuses to accept an event whose accumulated bulk-action tail bound exceeds this relative tolerance (see crack_rebonding_v10230.py's tail_bound <= cfg.bulk_action_error_rel_tol * reference_scale checks)."
+  },
+  "propagation_method": "First-order, conservative: cumulative_cycles' relative error is taken equal to the certified per-event bulk-action relative tolerance (no assumed error cancellation across a trajectory's ~12 events); accepted_length_m is treated as exact (a fixed physical quantity, not subject to action-integration error); epsilon_log10_rate = bulk_action_error_rel_tol / ln(10); epsilon_S_h = 2 * epsilon_log10_rate (linear worst-case combination of the independent finite/zero trajectory errors). This is an order-of-magnitude bound from a real certified system constant, not an exact propagation through the full adaptive bisection search.",
+  "epsilon_log10_rate": 0.0004342944819032518,
+  "epsilon_S_h": 0.0008685889638065036,
+  "gate_measurable_decade": 0.01,
+  "gate_floor_decade": 0.005,
+  "operative_floor_after_uncertainty": 0.005,
+  "decisions": {
+    "D3": {
+      "S_h": -0.023246372066354767,
+      "epsilon_log10_rate_zero": 0.0004342944819032518,
+      "epsilon_log10_rate_finite": 0.0004342944819032518,
+      "epsilon_S_h": 0.0008685889638065036,
+      "operative_gate": 0.005,
+      "clears_gate": true,
+      "margin_factor": 4.649274413270954
+    },
+    "D5": {
+      "S_h": -0.04350738307644659,
+      "epsilon_log10_rate_zero": 0.0004342944819032518,
+      "epsilon_log10_rate_finite": 0.0004342944819032518,
+      "epsilon_S_h": 0.0008685889638065036,
+      "operative_gate": 0.005,
+      "clears_gate": true,
+      "margin_factor": 8.701476615289318
+    },
+    "D6": {
+      "delta_S_h": 0.01969858733501138,
+      "epsilon_S_h_each": 0.0008685889638065036,
+      "epsilon_delta_S_h": 0.0017371779276130071,
+      "operative_gate": 0.008685889638065035,
+      "clears_gate": true,
+      "margin_factor": 2.2678836775319255
+    }
+  }
+}

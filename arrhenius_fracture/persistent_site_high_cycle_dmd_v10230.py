@@ -66,10 +66,10 @@ def dmd_config() -> dict[str, float | int]:
             "V10230_DMD_TRAINING_REL_TOL", 5.0e-4, 1.0e-12
         ),
         "state_validation_relative_tolerance": _env_float(
-            "V10230_DMD_STATE_VALIDATION_REL_TOL", 1.0e-3, 1.0e-12
+            "V10230_DMD_STATE_VALIDATION_REL_TOL", 1.0e-5, 1.0e-12
         ),
         "hazard_validation_relative_tolerance": _env_float(
-            "V10230_DMD_HAZARD_VALIDATION_REL_TOL", 1.0e-3, 1.0e-12
+            "V10230_DMD_HAZARD_VALIDATION_REL_TOL", 1.0e-5, 1.0e-12
         ),
         "ledger_validation_relative_tolerance": _env_float(
             "V10230_DMD_LEDGER_VALIDATION_REL_TOL", 2.0e-3, 1.0e-12

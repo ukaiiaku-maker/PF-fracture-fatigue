@@ -3,6 +3,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 
 from arrhenius_fracture import runtime_grid_binding_v10215  # noqa: F401
 from arrhenius_fracture.signed_kernel_family_v10214 import (
@@ -87,6 +88,19 @@ def test_dbtt_and_peak_80_bin_50um_runtime_binding():
     audit = family.audit_payload()
     assert audit["runtime_grid_binding"]["source_active_bins"] == 40
     assert audit["runtime_grid_binding"]["runtime_active_bins"] == 80
+
+
+def test_opening_validation_normalizes_only_machine_roundoff_at_bounds():
+    family = _family()
+
+    family._prepare_query(1.0, np.nextafter(1.0, np.inf), 0.0)
+    assert family._last_observed_opening_strength_fraction == 1.0
+
+    family._prepare_query(1.0, np.nextafter(0.0, -np.inf), 0.0)
+    assert family._last_observed_opening_strength_fraction == 0.0
+
+    with pytest.raises(ValueError, match="observed=1.000000000001"):
+        family._prepare_query(1.0, 1.0 + 1.0e-12, 0.0)
 
 
 def test_promoted_S0_is_continuum_hazard_budget_not_geometric_site_count():

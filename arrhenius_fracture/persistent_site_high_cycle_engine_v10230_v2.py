@@ -35,6 +35,7 @@ from .persistent_site_high_cycle_state_v10230 import (
 )
 from .persistent_site_periodic_solver_v10230 import solve_periodic_state
 from .persistent_site_poincare_v10230 import PoincareResult, one_cycle_map
+from .persistent_site_first_passage_locator_v10230 import localize_first_passage
 
 
 MODEL_ID = "v10.2.30_production_high_cycle_state_machine_v2"
@@ -58,8 +59,16 @@ def _env_int(name: str, default: int, minimum: int = 1) -> int:
     return max(value, minimum)
 
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return bool(default)
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def high_cycle_config() -> dict[str, float | int]:
     return {
+        "explicit_only": _env_bool("V10230_HIGH_CYCLE_EXPLICIT_ONLY", False),
         "stationary_relative_tolerance": _env_float(
             "V10230_HIGH_CYCLE_STATIONARY_REL_TOL", 1.0e-7, 1.0e-14
         ),
@@ -370,13 +379,21 @@ def integrate_state_coupled_waveform(
             relative_tolerance=float(config["stationary_relative_tolerance"]),
             diagnostic_tolerance=float(config["stationary_diagnostic_tolerance"]),
         )
+        near_event_now = bool(
+            _cycles_to_event(engine, cycle.hazard_action_per_cycle)
+            <= float(config["event_guard_cycles"])
+        )
 
         periodic = None
         periodic_due = bool(
-            int(cache.get("periodic_attempts", 0)) == 0
-            or current_residual.converged
-            or float(cache.get("exact_cycles_since_periodic", 0.0))
-            >= float(cache.get("periodic_retry_cycles", 0.0))
+            not bool(config["explicit_only"])
+            and not near_event_now
+            and (
+                int(cache.get("periodic_attempts", 0)) == 0
+                or current_residual.converged
+                or float(cache.get("exact_cycles_since_periodic", 0.0))
+                >= float(cache.get("periodic_retry_cycles", 0.0))
+            )
         )
         if periodic_due:
             periodic = solve_periodic_state(
@@ -443,7 +460,7 @@ def integrate_state_coupled_waveform(
                 break
             _print_heartbeat(consumed, requested, operations, modes, cache, config)
             remaining = requested - consumed
-            local = _transient.integrate_state_coupled_waveform(
+            local = localize_first_passage(
                 engine,
                 controller,
                 waveform,
@@ -470,10 +487,24 @@ def integrate_state_coupled_waveform(
             last_result = dict(local)
             modes.append(
                 {
-                    "mode": "event_guard_transient",
+                    "mode": "first_passage_cycle_locator",
                     "cycles": local_cycles,
                     "fired": fired,
                     "partial": bool(local.get("coupled_hazard_partial_return", False)),
+                    "bracket_low": local.get("coupled_hazard_locator_bracket_low"),
+                    "bracket_high": local.get("coupled_hazard_locator_bracket_high"),
+                    "trial_evaluations": local.get(
+                        "coupled_hazard_locator_trial_evaluations"
+                    ),
+                    "prefix_reuses": local.get(
+                        "coupled_hazard_locator_prefix_reuses", 0
+                    ),
+                    "initial_rate": local.get("coupled_hazard_locator_initial_rate"),
+                    "initial_estimate_cycles": local.get("coupled_hazard_locator_initial_estimate_cycles"),
+                    "initial_high_cycles": local.get("coupled_hazard_locator_initial_high_cycles"),
+                    "initial_high_action": local.get("coupled_hazard_locator_initial_high_action"),
+                    "initial_high_fired": local.get("coupled_hazard_locator_initial_high_fired"),
+                    "entry_reason": "stationary_tail_event_guard",
                 }
             )
             if fired:
@@ -485,9 +516,13 @@ def integrate_state_coupled_waveform(
             continue
 
         projective_due = bool(
-            int(cache.get("projective_attempts", 0)) == 0
-            or float(cache.get("exact_cycles_since_projective", 0.0))
-            >= float(cache.get("projective_retry_cycles", 0.0))
+            not bool(config["explicit_only"])
+            and not near_event_now
+            and (
+                int(cache.get("projective_attempts", 0)) == 0
+                or float(cache.get("exact_cycles_since_projective", 0.0))
+                >= float(cache.get("projective_retry_cycles", 0.0))
+            )
         )
         projected = None
         if projective_due:
@@ -559,7 +594,7 @@ def integrate_state_coupled_waveform(
                 }
             )
 
-        exact_target = min(
+        exact_target = 0 if near_event_now else min(
             int(cache.get("exact_burst_next_cycles", 1)),
             int(config["exact_burst_maximum_cycles"]),
             max(int(math.floor(remaining)), 0),
@@ -613,7 +648,7 @@ def integrate_state_coupled_waveform(
             continue
 
         local_request = min(remaining, float(config["event_guard_cycles"]))
-        local = _transient.integrate_state_coupled_waveform(
+        local = localize_first_passage(
             engine, controller, waveform, temperature_K, local_request
         )
         (
@@ -636,10 +671,21 @@ def integrate_state_coupled_waveform(
         last_result = dict(local)
         modes.append(
             {
-                "mode": "event_localization_transient",
+                "mode": "first_passage_cycle_locator",
                 "cycles": local_cycles,
                 "fired": fired,
                 "partial": bool(local.get("coupled_hazard_partial_return", False)),
+                "bracket_low": local.get("coupled_hazard_locator_bracket_low"),
+                "bracket_high": local.get("coupled_hazard_locator_bracket_high"),
+                "trial_evaluations": local.get("coupled_hazard_locator_trial_evaluations"),
+                "prefix_reuses": local.get(
+                    "coupled_hazard_locator_prefix_reuses", 0
+                ),
+                "initial_rate": local.get("coupled_hazard_locator_initial_rate"),
+                "initial_estimate_cycles": local.get("coupled_hazard_locator_initial_estimate_cycles"),
+                "initial_high_cycles": local.get("coupled_hazard_locator_initial_high_cycles"),
+                "initial_high_action": local.get("coupled_hazard_locator_initial_high_action"),
+                "initial_high_fired": local.get("coupled_hazard_locator_initial_high_fired"),
             }
         )
         if fired:

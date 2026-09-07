@@ -1,0 +1,30 @@
+{
+  "schema": "v10230_crack_rebonding_part_x_px1_4_static_localizer_parity_finding_v1",
+  "classification": "PRESCRIBED_STATIC_EVENT_LOCALIZATION_PARITY_QUALIFIED",
+  "classification_scope": "the new exact evaluator (arrhenius_fracture.crack_rebonding_v10230.static_shield_phase_resolved_action) itself, validated as numerically correct against an independent fine-stepped reference -- NOT a retroactive re-classification of the already-published static-shield-attribution study (branch codex/v10.2.30-crack-rebonding-static-shield-attribution, commit 767a42a / a72d465), whose static control used the coarser cycle-mean adaptive quadrature (_phase_statistics) and never ran through this exact machinery at all.",
+  "frozen_tolerance": {
+    "metric": "relative agreement of the computed phase-resolved action against an independent fine-stepped reference",
+    "threshold": 1.0e-6,
+    "frozen_before_running": true
+  },
+  "validation_matrix": {
+    "Kmax_MPa_sqrt_m": [15.0, 18.0, 21.0],
+    "K_b_static_MPa_sqrt_m": [0.45, 0.9, 1.8],
+    "starting_phase_bin_indices": [0, 3, 8, 15],
+    "interval_spans": ["partial cycle (0.3x)", "spans one cycle (1.7x)", "spans several cycles (8.3x)"],
+    "firing_inside_minimum_load_hold": true,
+    "R": -0.5,
+    "n_phase": 16
+  },
+  "result": "all 108 parametrized (Kmax x K_b x k0 x interval) no-hold cases plus 9 firing-inside-hold cases (Kmax x K_b) passed at the frozen 1e-6 relative tolerance; typical observed discrepancy was floating-point roundoff level, far under the gate",
+  "key_property_confirmed": "the action contributed by one full cycle is bit-for-bit identical across repeated cycles (no P/C/B or any other state carries over between cycles for a prescribed constant K_b), unlike dynamic rebonding's phase_resolved_action -- so no periodic-orbit bulk-action approximation is needed or applicable here; the evaluator is exact by construction for any interval length once one cycle's action is computed.",
+  "retained_qualifications_unaffected": {
+    "STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED": "still the correct label for the EXISTING static-shield-attribution study's published SAT_EXISTING-row numbers -- those did not use this evaluator. This finding makes the exact evaluator available for future studies (e.g. Part X's PX5 static/dynamic attribution stage) to adopt, which could then legitimately claim PRESCRIBED_STATIC_EVENT_LOCALIZATION_PARITY_QUALIFIED for THEMSELVES if they route their static controls through solve_coupled_event_time + static_shield_phase_resolved_action instead of _phase_statistics's coarser mean-based approach.",
+    "FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT": "unaffected -- remains scoped only to the existing SAT_EXISTING row per mission_scope.json."
+  },
+  "not_done_in_this_pass": [
+    "wiring static_shield_phase_resolved_action into a live production commit path (analogous to persistent_site_cyclic_energy_gated_v10230.py::_commit_rebonding_event for dynamic rebonding) -- deferred to whichever future study (PX5) actually needs a production static-shield trajectory localized this way; PX1.4's mandate was the evaluator and its qualification, not a new physical study",
+    "K_b=0 architectural bypass enforcement at a call site -- there is no call site yet, since production wiring is deferred; the function itself was confirmed not to misbehave at K_b=0 (test_zero_K_b_reduces_to_ordinary_zero_shield_action), but the mission's 'do not route K_b=0 through this path' requirement is an efficiency/architecture decision for whatever future wiring adopts this function, documented in its docstring"
+  ],
+  "test_file": "tests/test_v10_2_30_crack_rebonding_part_x_static_localizer_parity.py"
+}

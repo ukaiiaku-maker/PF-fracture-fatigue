@@ -29,6 +29,18 @@ from .persistent_site_high_cycle_state_v10230 import (
 
 
 MODEL_ID = "v10.2.30_atomic_live_high_cycle_checkpoint_v1"
+_OUTER_STATE_PROVIDER = None
+
+
+def register_outer_state_provider(provider) -> None:
+    """Register the active 2-D driver's committed-state snapshot callback."""
+    global _OUTER_STATE_PROVIDER
+    _OUTER_STATE_PROVIDER = provider
+
+
+def clear_outer_state_provider() -> None:
+    global _OUTER_STATE_PROVIDER
+    _OUTER_STATE_PROVIDER = None
 
 
 def _json_safe(value: Any):
@@ -127,11 +139,28 @@ def write_checkpoint(
         ),
         "metadata": _json_safe(metadata or {}),
     }
+    from .crack_rebonding_v10230 import serialize_rebonding_checkpoint
+
+    rebonding_payload = serialize_rebonding_checkpoint(engine)
+    if rebonding_payload is not None:
+        payload["crack_rebonding"] = rebonding_payload
+
     _atomic_npz(root / "high_cycle_live_state.npz", active_vector=snapshot.vector)
     _atomic_text(
         root / "high_cycle_live_checkpoint.json",
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
     )
+    if _OUTER_STATE_PROVIDER is not None:
+        from .run_state_checkpoint_v10230 import write_combined_checkpoint
+
+        outer, outer_arrays = _OUTER_STATE_PROVIDER(engine, payload)
+        write_combined_checkpoint(
+            root,
+            outer=outer,
+            arrays=outer_arrays,
+            kinetic=payload,
+            kinetic_vector=snapshot.vector,
+        )
     history_path = root / "high_cycle_live_history.jsonl"
     with history_path.open("a", encoding="utf-8") as stream:
         stream.write(json.dumps(payload, sort_keys=True) + "\n")
@@ -177,6 +206,12 @@ def restore_checkpoint(engine, root: str | Path) -> dict[str, Any]:
     directory = Path(root)
     payload = json.loads((directory / "high_cycle_live_checkpoint.json").read_text())
     arrays = np.load(directory / "high_cycle_live_state.npz")
+    restore_checkpoint_payload(engine, payload, arrays["active_vector"])
+    return payload
+
+
+def restore_checkpoint_payload(engine, payload: dict[str, Any], vector) -> None:
+    """Restore an already validated kinetic payload after outer geometry."""
     current = serialize_active_state(engine)
     recorded_geometry = tuple(payload.get("geometry_signature", []))
     if tuple(_json_safe(geometry_signature(engine))) != recorded_geometry:
@@ -184,8 +219,12 @@ def restore_checkpoint(engine, root: str | Path) -> dict[str, Any]:
             "checkpoint geometry differs from the initialized engine; "
             "restore the matching outer crack geometry first"
         )
-    vector = np.asarray(arrays["active_vector"], dtype=float)
+    vector = np.asarray(vector, dtype=float)
     restore_active_state(engine, current, vector)
+
+    from .crack_rebonding_v10230 import restore_rebonding_checkpoint
+
+    restore_rebonding_checkpoint(engine, payload.get("crack_rebonding"))
 
     current_ledgers = capture_ledgers(engine)
     target_ledgers = {
@@ -205,6 +244,13 @@ def restore_checkpoint(engine, root: str | Path) -> dict[str, Any]:
         "hazard_action_current",
         "hazard_event_index",
         "hazard_threshold_history",
+        "avalanche_base_checkpoint_m",
+        "avalanche_event_advance_m",
+        "avalanche_event_length_factor",
+        "avalanche_last_completed_advance_m",
+        "avalanche_last_completed_factor",
+        "avalanche_event_length_history",
+        "avalanche_checkpoint_synchronized",
     ):
         if name in stochastic:
             setattr(engine, name, copy.deepcopy(stochastic[name]))
@@ -215,12 +261,35 @@ def restore_checkpoint(engine, root: str | Path) -> dict[str, Any]:
     engine._v10230_high_cycle_cache = copy.deepcopy(
         payload.get("high_cycle_cache", {})
     )
-    return payload
+    if hasattr(engine, "avalanche_cfg"):
+        from .stochastic_avalanche_tip import threshold_event_length_factor
+
+        expected_factor = threshold_event_length_factor(
+            engine.hazard_threshold_action,
+            mode=engine.avalanche_cfg.mode,
+            minimum_factor=engine.avalanche_cfg.minimum_factor,
+            maximum_factor=engine.avalanche_cfg.maximum_factor,
+            deterministic_threshold=getattr(engine.hazard_cfg, "mode", "") == "deterministic",
+        )
+        if not math.isclose(
+            float(engine.avalanche_event_length_factor), expected_factor,
+            rel_tol=1.0e-14, abs_tol=1.0e-15,
+        ):
+            raise RuntimeError("restored event-length factor differs from restored threshold")
+        expected_advance = float(engine.avalanche_base_checkpoint_m) * expected_factor
+        if not math.isclose(
+            float(engine.avalanche_event_advance_m), expected_advance,
+            rel_tol=1.0e-14, abs_tol=1.0e-18,
+        ):
+            raise RuntimeError("restored event proposal differs from threshold and da_phys")
 
 
 __all__ = [
     "MODEL_ID",
+    "clear_outer_state_provider",
     "maybe_write_checkpoint",
+    "register_outer_state_provider",
     "restore_checkpoint",
+    "restore_checkpoint_payload",
     "write_checkpoint",
 ]

@@ -1,0 +1,13 @@
+{
+  "Kmax_Pa_sqrt_m": 21000000.0,
+  "censored": false,
+  "classification": "EXPOSURE_UNCONDITIONED_COMPLETION",
+  "config_hash_reused": "271f45981545cf80d9d96c14138d9d9c6235b3f1bba20635d8e993e568d76fd2",
+  "n_accepted_events": 7,
+  "n_intervals_complete_excursion": 0,
+  "n_intervals_partial_excursion": 6,
+  "note": "this trajectory was run WITHOUT the >=2-complete-excursion exposure gate applied to admit finite-cohesion twins in the minimal slope screen -- reduced compression exposure at high Kmax is treated as part of the physical effect under study, not a validity failure",
+  "parent_frozen_configuration_sha256": "afaaaa4ce2c9b69cfe65bfdc0887f1df19134d3a435bc7bb79affebcfe3113b0",
+  "schema": "v10.2.30_crack_rebonding_slope_exposure_completion_v1",
+  "seed": 1001723
+}

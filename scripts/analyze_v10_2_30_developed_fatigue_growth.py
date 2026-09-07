@@ -15,6 +15,92 @@ import numpy as np
 SCHEMA = "v10.2.30_developed_event_to_event_fatigue_growth_v1"
 
 
+def _json(path: Path, default):
+    if not path.is_file():
+        return default
+    return json.loads(path.read_text())
+
+
+def _closest_energy_trial(event: dict, committed_m: float) -> dict:
+    rows = [row for row in event.get("trial_rows", []) if isinstance(row, dict)]
+    if not rows:
+        return {}
+    return min(
+        rows,
+        key=lambda row: abs(float(row.get("trial_length_m", 0.0)) - committed_m),
+    )
+
+
+def enrich_events(events: list[dict], root: Path) -> tuple[list[dict], dict]:
+    geometry = _json(root / "stochastic_avalanche_geometry_events.json", [])
+    energy = _json(root / "hazard_energy_gated_events_v10_2_30.json", [])
+    kinetic_payload = _json(root / "kinetic_tip_cell_audit_v101.json", {})
+    kinetic = kinetic_payload.get("records", []) if isinstance(kinetic_payload, dict) else []
+    control = _json(root / "v10_2_30_fixed_deltaK_control.json", {})
+    manifest = _json(root / "high_cycle_run_manifest.json", {})
+    parameter = _json(root / "v10_2_22_parameter_selection.json", {})
+
+    provenance = {
+        "run_path": str(root),
+        "git_head": manifest.get("git_head"),
+        "command": manifest.get("generic_launcher"),
+        "environment": manifest.get("environment", {}),
+        "parameter_option": control.get("parameter_option") or parameter.get("option_key"),
+        "temperature_K": control.get("temperature_K", 300.0),
+        "deltaK_MPa_sqrt_m": control.get("target_deltaK_MPa_sqrt_m"),
+        "Kmax_MPa_sqrt_m": control.get("target_Kmax_MPa_sqrt_m"),
+        "R": control.get("R"),
+        "frequency_Hz": control.get("frequency_Hz"),
+        "hazard_seed": control.get("cleavage_hazard_seed", manifest.get("hazard_seed")),
+        "cycle_censor": control.get("cycles_max", manifest.get("cycles_max_censor")),
+    }
+    for index, row in enumerate(events):
+        geom = geometry[index] if index < len(geometry) else {}
+        gate = energy[index] if index < len(energy) else {}
+        audit = kinetic[index] if index < len(kinetic) else {}
+        committed = float(row.get("path_advance_m", 0.0))
+        trial = _closest_energy_trial(gate, committed)
+        modes = audit.get("coupled_hazard_modes", [])
+        mode_names = [str(item.get("mode")) for item in modes if isinstance(item, dict)]
+        row.update(
+            {
+                "parameter_option": provenance["parameter_option"],
+                "temperature_K": provenance["temperature_K"],
+                "deltaK_MPa_sqrt_m": provenance["deltaK_MPa_sqrt_m"],
+                "Kmax_MPa_sqrt_m": provenance["Kmax_MPa_sqrt_m"],
+                "R": provenance["R"],
+                "frequency_Hz": provenance["frequency_Hz"],
+                "hazard_seed": provenance["hazard_seed"],
+                "threshold_action": geom.get("threshold_action"),
+                "physical_hazard_action": audit.get("physical_hazard_action_block"),
+                "event_length_factor": geom.get("event_length_factor"),
+                "stochastic_proposed_advance_m": geom.get(
+                    "stochastic_proposed_event_length_m"
+                ),
+                "energy_admissible_advance_m": gate.get(
+                    "energy_admissible_event_length_m"
+                ),
+                "energy_available_J_per_m": trial.get("elastic_release_event_J_per_m"),
+                "energy_required_J_per_m": trial.get("hazard_dissipation_J_per_m"),
+                "energy_residual_J_per_m": trial.get("energy_residual_J_per_m"),
+                "energy_gate_outcome": gate.get("arrest_reason"),
+                "geometry_commit_inserted": gate.get("inserted"),
+                "geometry_transaction_mode": geom.get("geometry_transaction_mode"),
+                "acceleration_modes": ";".join(mode_names),
+                "dmd_event_guard": any(
+                    item.get("failure_reason") == "dmd_event_guard"
+                    for item in modes if isinstance(item, dict)
+                ),
+                "exact_fallback_entered": "exact_cycle_burst" in mode_names,
+                "transient_localization_entered": (
+                    "event_localization_transient" in mode_names
+                ),
+                "private_trials_counted_as_cycles": False,
+            }
+        )
+    return events, provenance
+
+
 def _rows(path: Path):
     data = np.atleast_1d(np.genfromtxt(path, delimiter=",", names=True))
     if not data.dtype.names:
@@ -217,6 +303,7 @@ def main(argv=None) -> int:
         raise SystemExit(f"missing completed step history: {steps_path}")
     rows = _rows(steps_path)
     events = extract_events(rows, _path_lengths(root, args.temperature_K))
+    events, provenance = enrich_events(events, root)
     target_m = args.target_extension_um * 1.0e-6
     development_m = args.development_extension_um * 1.0e-6
     stability_m = args.stability_window_um * 1.0e-6
@@ -273,6 +360,12 @@ def main(argv=None) -> int:
         "event_measurements": events,
         "moving_windows": windows,
         "plots": outputs,
+        "provenance": provenance,
+        "censor_or_failure_reason": (
+            None if events else _json(root / "v10_2_30_fixed_deltaK_control.json", {}).get(
+                "censor_status", "no_committed_crack_event"
+            )
+        ),
         "empirical_Paris_law_fit": False,
     }
     (root / "developed_fatigue_growth_summary.json").write_text(

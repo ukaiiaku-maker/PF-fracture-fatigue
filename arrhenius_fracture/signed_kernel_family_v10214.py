@@ -268,8 +268,17 @@ class ActiveOnlySigned2DShieldingKernelFamily(_V10212Family):
         observed_opening = float(opening_strength_fraction)
         if not np.isfinite(observed_r) or observed_r <= 0.0:
             raise ValueError("observed analytical radius must be positive and finite")
-        if not np.isfinite(observed_opening) or not 0.0 <= observed_opening <= 1.0:
-            raise ValueError("observed opening fraction must lie in [0,1]")
+        opening_roundoff_tolerance = 32.0 * np.finfo(float).eps
+        if (
+            not np.isfinite(observed_opening)
+            or observed_opening < -opening_roundoff_tolerance
+            or observed_opening > 1.0 + opening_roundoff_tolerance
+        ):
+            raise ValueError(
+                "observed opening fraction must lie in [0,1] up to floating-point "
+                f"roundoff; observed={observed_opening:.17g}"
+            )
+        observed_opening = min(max(observed_opening, 0.0), 1.0)
         query = super()._prepare_query(
             KERNEL_RADIUS_COMPATIBILITY_COORDINATE,
             OPENING_COMPATIBILITY_COORDINATE,

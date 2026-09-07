@@ -1,0 +1,13 @@
+{
+  "schema": "v10.2.30_qualification_family_source_v1",
+  "family_id": "4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873",
+  "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+  "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c",
+  "bytes": 2392156,
+  "expected_state_count": 7,
+  "expected_state_ids": ["E0000000", "E0000200", "E0000400", "E0000600", "E0000800", "E0001000", "E0001175"],
+  "expected_extension_levels_m": [0.0, 0.0002, 0.0004, 0.0006000000000000001, 0.0008, 0.001, 0.001175],
+  "expected_coverage_m": 0.001175,
+  "source": "authoritative v10.2.28 direct-prescribed-geometry FEM kernel cache",
+  "parameterization_relationship": "candidate-independent mechanics family shared unchanged by all four immutable production material rows"
+}

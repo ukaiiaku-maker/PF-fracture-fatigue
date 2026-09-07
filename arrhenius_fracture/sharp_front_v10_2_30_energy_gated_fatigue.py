@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import sys
 
+from . import crack_rebonding_v10230 as _rebond
 from . import crystal as _crystal
 from . import fatigue_controller_delegate_v10229 as _delegate
 from . import fatigue_v1 as _fatigue_v1
@@ -13,8 +14,14 @@ from . import hazard_energy_event_gate_v10230 as _energy_gate
 from . import persistent_site_cyclic_coupled_v10229 as _coupled_commit
 from . import persistent_site_high_cycle_engine_v10230 as _high_cycle
 from . import persistent_site_forward_selector_v10230 as _forward_selector
+from . import reduced_shared_state_v1023 as _shared_state
 from . import sharp_front_v10_1_7_3 as _avalanche
 from . import sharp_front_v10_2_29_fatigue_audited as _v10229
+from .crack_rebonding_kinetics_v10230 import (
+    RebondModelLevel as _RebondModelLevel,
+    crack_rebonding_config_from_environment,
+    fatigue_integrator_mode_from_environment,
+)
 from .hazard_energy_event_gate_v10230 import (
     OBSERVER,
     audit_payload,
@@ -72,7 +79,12 @@ def _observed_waveform_factory(original):
 
     observed.__name__ = getattr(original, "__name__", "ObservedFatigueWaveform")
     observed.__doc__ = getattr(original, "__doc__", None)
+    if bool(getattr(original, "_prescribed_fixed_deltaK_control", False)):
+        observed._prescribed_fixed_deltaK_control = True
     return observed
+
+
+_LATEST_REBONDING_CFG = None
 
 
 def _write_audit(args: list[str]) -> None:
@@ -84,6 +96,10 @@ def _write_audit(args: list[str]) -> None:
     payload = audit_payload()
     payload.update(
         {
+            "crack_rebonding_enabled": bool(
+                _LATEST_REBONDING_CFG.enabled if _LATEST_REBONDING_CFG is not None else False
+            ),
+            "rebonding_acceleration_qualified": False,
             "schema": MODEL_ID,
             "base_fatigue_entry": (
                 "arrhenius_fracture.sharp_front_v10_2_29_fatigue_audited"
@@ -150,6 +166,36 @@ def main(argv=None):
         raise SystemExit("v10.2.30 requires V10230_ENERGY_GATE_ENABLED=1")
     reset_runtime_state(cfg)
 
+    global _LATEST_REBONDING_CFG
+    rebonding_cfg = crack_rebonding_config_from_environment()
+    _LATEST_REBONDING_CFG = rebonding_cfg
+    integrator_mode = fatigue_integrator_mode_from_environment()
+    rebonding_active = (
+        rebonding_cfg.enabled and rebonding_cfg.model_level != _RebondModelLevel.REBOND_OFF
+    )
+    if integrator_mode == "accelerated":
+        if rebonding_active:
+            # Fail closed before any monkeypatch is applied: crack-rebonding
+            # is incompatible with VHCF DMD/projective/Poincare acceleration
+            # (rebonding_acceleration_qualified=false). Checked here, at the
+            # earliest possible point, so that raising never leaves any of
+            # this function's monkeypatches applied without their matching
+            # restore. Default behavior (integrator_mode unset) is
+            # byte-identical to before this selector existed -- this branch
+            # is the only one reachable without explicitly opting in via
+            # V10230_FATIGUE_INTEGRATOR_MODE=explicit.
+            raise RuntimeError(
+                "crack-rebonding is incompatible with VHCF DMD/projective/Poincare "
+                "acceleration (rebonding_acceleration_qualified=false); rerun with "
+                "V10230_CRACK_REBONDING_ENABLED=0, "
+                "V10230_CRACK_REBONDING_MODEL_LEVEL=REBOND_OFF, or "
+                "V10230_FATIGUE_INTEGRATOR_MODE=explicit"
+            )
+    # integrator_mode == "explicit" (S8D, round-3 follow-up): retain the
+    # original state-coupled phase-resolved integrator -- every other
+    # monkeypatch below still installs normally, only the accelerated-engine
+    # swap further down is skipped.
+
     original_engine = _v10229.AuditedCoupledPersistentSiteCyclicTipEngine
     original_avalanche_builder = _avalanche.build_avalanche_backend
     original_assemble = _fem.assemble_mechanics
@@ -160,6 +206,15 @@ def main(argv=None):
     original_attach_prediction_context = _delegate.attach_prediction_context
     original_select_nonlinear_block = _delegate.select_nonlinear_block
     original_coupled_commit = _coupled_commit.integrate_state_coupled_waveform
+    original_build_shared_engine = _shared_state.build_shared_engine
+
+    def _rebonding_build_shared_engine(*a, **kw):
+        engine = original_build_shared_engine(*a, **kw)
+        if rebonding_cfg.enabled:
+            _rebond.install_crack_rebonding(engine, rebonding_cfg)
+        return engine
+
+    _shared_state.build_shared_engine = _rebonding_build_shared_engine
 
     OBSERVER.original_assemble = original_assemble
     _fem.assemble_mechanics = wrap_assemble_mechanics(original_assemble)
@@ -176,9 +231,15 @@ def main(argv=None):
     _fatigue_v1.FatigueWaveform = _observed_waveform_factory(original_waveform)
     _delegate.attach_prediction_context = _forward_selector.attach_prediction_context
     _delegate.select_nonlinear_block = _forward_selector.select_nonlinear_block
-    _coupled_commit.integrate_state_coupled_waveform = (
-        _high_cycle.integrate_state_coupled_waveform
-    )
+    if integrator_mode == "accelerated":
+        _coupled_commit.integrate_state_coupled_waveform = (
+            _high_cycle.integrate_state_coupled_waveform
+        )
+    # else "explicit": leave _coupled_commit.integrate_state_coupled_waveform
+    # bound to its real, original value (persistent_site_coupled_hazard_v10229
+    # .integrate_state_coupled_waveform -- the confirmed rebonding injection
+    # point) for the duration of this call. The unconditional restore below
+    # (original_coupled_commit) is idempotent either way.
     install_fast_trial_clone()
 
     def gated_builder(
@@ -218,6 +279,7 @@ def main(argv=None):
     finally:
         _avalanche.build_avalanche_backend = original_avalanche_builder
         restore_fast_trial_clone()
+        _shared_state.build_shared_engine = original_build_shared_engine
         _coupled_commit.integrate_state_coupled_waveform = original_coupled_commit
         _delegate.select_nonlinear_block = original_select_nonlinear_block
         _delegate.attach_prediction_context = original_attach_prediction_context

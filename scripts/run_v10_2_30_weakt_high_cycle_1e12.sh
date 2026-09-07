@@ -11,20 +11,27 @@ RUN_LABEL=${RUN_LABEL:-weakt_${TARGET_FRACTION}}
 TARGET_EXT_UM=${TARGET_EXT_UM:-100}
 CYCLES_MAX=${CYCLES_MAX:-1e12}
 HAZARD_SEED=${HAZARD_SEED:-2001726}
+R_RATIO=${R_RATIO:-0.1}
+TEMPERATURE_K=${TEMPERATURE_K:-300}
+FREQUENCY_HZ=${FREQUENCY_HZ:-1000}
 
 if [[ -z "$TARGET_DELTAK" ]]; then
   echo "ERROR: set TARGET_DELTAK in MPa*sqrt(m)" >&2
   exit 2
 fi
-if ! "$PYTHON_BIN" - "$TARGET_DELTAK" "$TARGET_EXT_UM" "$CYCLES_MAX" <<'PY'
+if ! "$PYTHON_BIN" - "$TARGET_DELTAK" "$TARGET_EXT_UM" "$CYCLES_MAX" \
+  "$TEMPERATURE_K" "$FREQUENCY_HZ" <<'PY'
 import math
 import sys
-for value in map(float, sys.argv[1:]):
+target_delta_k, target_extension, cycle_censor, temperature, frequency = map(float, sys.argv[1:])
+for value in (target_delta_k, target_extension, cycle_censor, temperature, frequency):
     if not math.isfinite(value) or value <= 0.0:
         raise SystemExit(1)
+if temperature != round(temperature):
+    raise SystemExit(1)
 PY
 then
-  echo "ERROR: TARGET_DELTAK, TARGET_EXT_UM, and CYCLES_MAX must be finite and positive" >&2
+  echo "ERROR: load, horizon, temperature, and frequency inputs must be finite and positive; TEMPERATURE_K must be an integer" >&2
   exit 2
 fi
 
@@ -32,7 +39,7 @@ SAFE_LABEL=$(printf '%s' "$RUN_LABEL" | tr -cs 'A-Za-z0-9._-' '_')
 OUTROOT=${OUTROOT:-$ROOT/runs/v10_2_30_${SAFE_LABEL}_event_growth_v5_100um_$(date +%Y%m%d_%H%M%S)}
 
 export DELTA_K_MPA_SQRT_M="$TARGET_DELTAK"
-export OUTROOT TARGET_EXT_UM CYCLES_MAX HAZARD_SEED
+export OUTROOT TARGET_EXT_UM CYCLES_MAX HAZARD_SEED R_RATIO TEMPERATURE_K FREQUENCY_HZ
 export V10230_SAVE_ACTIVE_STATE_SNAPSHOT=${V10230_SAVE_ACTIVE_STATE_SNAPSHOT:-1}
 export V10230_HIGH_CYCLE_CHECKPOINT_DIR=${V10230_HIGH_CYCLE_CHECKPOINT_DIR:-$OUTROOT}
 export V10230_HIGH_CYCLE_CHECKPOINT_MIN_SECONDS=${V10230_HIGH_CYCLE_CHECKPOINT_MIN_SECONDS:-30}
@@ -45,6 +52,9 @@ printf '  target_fraction=%s\n' "$TARGET_FRACTION"
 printf '  target_DeltaK_MPa_sqrt_m=%s\n' "$TARGET_DELTAK"
 printf '  crack_extension_target_um=%s\n' "$TARGET_EXT_UM"
 printf '  cycle_censor=%s\n' "$CYCLES_MAX"
+printf '  R_ratio=%s\n' "$R_RATIO"
+printf '  temperature_K=%s\n' "$TEMPERATURE_K"
+printf '  frequency_Hz=%s\n' "$FREQUENCY_HZ"
 printf '  stochastic_threshold=Exp(1) cumulative-hazard draw, seed=%s\n' "$HAZARD_SEED"
 printf '  output=%s\n' "$OUTROOT"
 printf '  live_checkpoint_dir=%s\n' "$V10230_HIGH_CYCLE_CHECKPOINT_DIR"
@@ -108,7 +118,8 @@ fi
 
 "$PYTHON_BIN" - \
   "$OUTROOT" "$RUN_LABEL" "$TARGET_FRACTION" "$TARGET_DELTAK" \
-  "$TARGET_EXT_UM" "$CYCLES_MAX" "$HAZARD_SEED" <<'PY'
+  "$TARGET_EXT_UM" "$CYCLES_MAX" "$HAZARD_SEED" "$TEMPERATURE_K" \
+  "$FREQUENCY_HZ" <<'PY'
 import json
 import math
 import sys
@@ -121,6 +132,8 @@ target_delta_k = float(sys.argv[4])
 target_extension_um = float(sys.argv[5])
 cycle_censor = float(sys.argv[6])
 hazard_seed = int(sys.argv[7])
+temperature_K = float(sys.argv[8])
+frequency_Hz = float(sys.argv[9])
 
 stochastic_metadata = {
     "threshold_is_stochastic": True,
@@ -139,6 +152,8 @@ manifest.update(
         "target_deltaK_MPa_sqrt_m": target_delta_k,
         "target_crack_extension_um": target_extension_um,
         "cycles_max_censor": cycle_censor,
+        "temperature_K": temperature_K,
+        "frequency_Hz": frequency_Hz,
         "primary_objective": "measure_event_resolved_and_developed_da_dN",
         "cycle_horizon_role": "maximum_censor_not_required_target",
         "generic_launcher": "scripts/run_v10_2_30_weakt_high_cycle_1e12.sh",
@@ -159,6 +174,8 @@ summary.update(
         "target_deltaK_MPa_sqrt_m": target_delta_k,
         "target_crack_extension_um": target_extension_um,
         "cycles_max_censor": cycle_censor,
+        "temperature_K": temperature_K,
+        "frequency_Hz": frequency_Hz,
         **stochastic_metadata,
     }
 )
@@ -204,11 +221,12 @@ if [[ -s "$OUTROOT/kinetic_tip_cell_audit_v101.json" ]]; then
   fi
 fi
 
-if [[ -s "$OUTROOT/steps_0300K.csv" ]]; then
+TEMPERATURE_TAG=$(printf '%04d' "$TEMPERATURE_K")
+if [[ -s "$OUTROOT/steps_${TEMPERATURE_TAG}K.csv" ]]; then
   set +e
   "$PYTHON_BIN" scripts/analyze_v10_2_30_developed_fatigue_growth.py \
     "$OUTROOT" \
-    --temperature-K 300 \
+    --temperature-K "$TEMPERATURE_K" \
     --target-extension-um "$TARGET_EXT_UM" \
     --development-extension-um 20 \
     --stability-window-um 50 \

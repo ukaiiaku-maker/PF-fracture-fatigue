@@ -8,6 +8,7 @@ fatigue barrier, source inventory, recovery law, or Paris-type advance law is us
 from __future__ import annotations
 
 import copy
+import dataclasses
 import math
 from typing import Any
 
@@ -50,6 +51,36 @@ class PersistentSiteCyclicTipEngine(PersistentSiteStateResolvedTipEngine):
         dt_phase = float(waveform.period_s) / float(phase.size)
         trial = copy.deepcopy(self)
 
+        # Optional crack-rebonding (v10.2.30, default off): confirmed by
+        # direct construction of the real production engine class
+        # (CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine) that
+        # THIS function -- not kinetic_tip_cell.py::cycle_step_waveform,
+        # which is never reached for the real persistent-site engine
+        # hierarchy (PersistentSiteCyclicTipEngine.cycle_step_waveform does
+        # not call super()) -- is the actual single choke point where the
+        # per-phase cleavage rate is computed for production runs. See
+        # docs/v10_2_30_crack_rebonding_equation_lineage.md for the full
+        # correction record. sig0/sig1 (feeding _plastic_half_step, hence
+        # emission) are never touched; only the local sig_mid_cleave used
+        # for THIS phase bin's lambda_cleave call below is rebond-aware.
+        rebonding_state = getattr(trial, "_rebonding_state", None)
+        rebonding_active = rebonding_state is not None and rebonding_state.cfg.enabled
+        K_signed_phase = None
+        r_contact_m = 0.0
+        Eprime_Pa = 0.0
+        if rebonding_active:
+            from . import crack_rebonding_v10230 as _rebond
+
+            signed_waveform = dataclasses.replace(waveform, closure_clip=False)
+            phase_offset_rad = _rebond.chronological_phase_offset_rad(
+                rebonding_state.elapsed_time_s, waveform.period_s
+            )
+            K_signed_phase = np.asarray(
+                signed_waveform.K_phase(phase + phase_offset_rad), dtype=float
+            )
+            Eprime_Pa = _rebond.reduced_modulus_Pa(trial.G, trial.nu)
+            r_contact_m = max(trial.r_eff(), rebonding_state.cfg.contact_radius_min_m)
+
         mobile0 = float(trial.mpz.mobile_count)
         retained0 = float(trial.mpz.retained_count)
         emitted = trapped = released = escaped = 0.0
@@ -60,14 +91,30 @@ class PersistentSiteCyclicTipEngine(PersistentSiteStateResolvedTipEngine):
         emit_weight = 0.0
         elapsed_s = 0.0
 
-        for kval in Kvals:
-            K = max(float(kval), 0.0)
+        for _bin_index, kval in enumerate(Kvals):
+            K_signed = float(kval)
+            K = max(K_signed, 0.0)
             half = 0.5 * dt_phase
+
+            if bool(getattr(trial.mpz, "_reversible_transport_installed", False)):
+                trial.mpz._reversible_transport_K_signed_Pa_sqrt_m = K_signed
+                trial.mpz._reversible_tip_radius_m = float(trial.r_eff())
 
             sig0 = float(trial.sigma_tip(K))
             first = trial._plastic_half_step(half, T_K, sig0)
+            if bool(getattr(trial.mpz, "_reversible_transport_installed", False)):
+                trial.mpz._reversible_tip_radius_m = float(trial.r_eff())
             sig_mid = float(trial.sigma_tip(K))
-            lam_mid, _raw_mid, _Gc_mid = trial.lambda_cleave(sig_mid, T_K)
+            if rebonding_active:
+                K_rebond_bin = rebonding_state.advance_one_phase_bin(
+                    float(K_signed_phase[_bin_index]), r_contact_m, T_K, Eprime_Pa, dt_phase
+                )
+                sig_mid_cleave = _rebond.cleavage_stress_with_rebond(
+                    float(K_signed_phase[_bin_index]), trial.K_shield(), K_rebond_bin, trial.r_eff()
+                )
+            else:
+                sig_mid_cleave = sig_mid
+            lam_mid, _raw_mid, _Gc_mid = trial.lambda_cleave(sig_mid_cleave, T_K)
             lam_mid = max(float(lam_mid), 0.0) if math.isfinite(lam_mid) else 0.0
 
             remaining_action = max(1.0 - float(trial.B), 0.0)
@@ -186,6 +233,34 @@ class PersistentSiteCyclicTipEngine(PersistentSiteStateResolvedTipEngine):
         N_pre = float(self.N_em)
 
         lambda_avg = pred.mu_cleave * float(waveform.frequency_Hz)
+
+        rebonding_state = getattr(self, "_rebonding_state", None)
+        rebonding_active = rebonding_state is not None and rebonding_state.cfg.enabled
+        if rebonding_active:
+            from . import crack_rebonding_v10230 as _rebond
+
+            phase = np.asarray(controller._phases(), dtype=float)
+            dt_phase = float(waveform.period_s) / float(phase.size)
+            signed_waveform = dataclasses.replace(waveform, closure_clip=False)
+            phase_offset_rad = _rebond.chronological_phase_offset_rad(
+                rebonding_state.elapsed_time_s, waveform.period_s
+            )
+            K_signed_phase = np.asarray(
+                signed_waveform.K_phase(phase + phase_offset_rad), dtype=float
+            )
+            self._rebonding_block_context = {
+                "K_signed_phase": K_signed_phase,
+                "dt_phase": dt_phase,
+                "n_phase": int(phase.size),
+                "r_contact_m": max(self.r_eff(), rebonding_state.cfg.contact_radius_min_m),
+                "Eprime_Pa": _rebond.reduced_modulus_Pa(self.G, self.nu),
+                "T_K": T_K,
+                "K_shield_Pa_sqrt_m": self.K_shield(),
+                "r_eff_m": self.r_eff(),
+                "B_start": float(self.B),
+                "period_s": float(waveform.period_s),
+            }
+
         coupled = self._integrate_coupled(
             float(waveform.Kmax),
             T_K,
@@ -196,9 +271,38 @@ class PersistentSiteCyclicTipEngine(PersistentSiteStateResolvedTipEngine):
             lambda_override=lambda_avg,
         )
         cycles_consumed = cycle_count_from_consumed_time(
-            coupled["dt_consumed"], waveform.frequency_Hz
+            coupled["dt_consumed"], waveform.effective_cycle_frequency_Hz
         )
         cycles_unused = max(cycles_requested - cycles_consumed, 0.0)
+
+        if rebonding_active and not coupled.get("fired", False):
+            # No event fired: the block's full nominal duration was genuinely
+            # consumed, so finalize by committing the exact full-block wake
+            # advance now (mirrors kinetic_tip_cell.py::cycle_step_waveform's
+            # design exactly). If an event did fire, the wake state is left
+            # untouched here -- the transactional commit (accepted) or
+            # rollback (rejected) happens later in
+            # commit_energy_gated_event/restore_geometry_veto.
+            from .crack_rebonding_kinetics_v10230 import build_phase_factors, propagate
+
+            ctx = self._rebonding_block_context
+            active_patches = [p for p in rebonding_state.active if not p.retired]
+            end_states = {}
+            for p in active_patches:
+                Q_list_p = [
+                    _rebond.patch_Q(float(K), p.s_j_m, ctx["r_contact_m"], rebonding_state.cfg, T_K)
+                    for K in ctx["K_signed_phase"]
+                ]
+                factors_p = build_phase_factors(Q_list_p, ctx["dt_phase"])
+                end_states[p.patch_id] = propagate(
+                    p.state_vector(), Q_list_p, factors_p, k0=0,
+                    dt=dt_requested, dt_phase=ctx["dt_phase"],
+                )
+            rebonding_state.commit_no_event_block(end_states, ctx["Eprime_Pa"])
+            rebonding_state.elapsed_time_s = (
+                rebonding_state.elapsed_time_s + dt_requested
+            ) % waveform.period_s
+            self._rebonding_block_context = None
         advance = coupled["advance"]
         plastic = coupled["plastic"]
         diagnostics = self.mpz.diagnostics(self.G, self.nu, self.b, self.f.r0)

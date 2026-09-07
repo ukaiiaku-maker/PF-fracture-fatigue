@@ -1,0 +1,68 @@
+{
+  "schema": "v10230_crack_rebonding_part_x_completion_contract_v1",
+  "terminal_label": "SIGNED_K_CRACK_REBONDING_PART_X_COMPLETE",
+  "required_qualifiers": [
+    "CLEAN_REVERSIBLE_KINETICS_QUALIFIED",
+    "PERSISTENT_KINETICS_DISTINGUISHED|PERSISTENT_KINETICS_NOT_DISTINGUISHED",
+    "PASSIVATION_GATED_REBONDING_QUALIFIED|PASSIVATION_EFFECT_BELOW_RESOLUTION",
+    "FREQUENCY_SENSITIVITY_QUALIFIED|FREQUENCY_SENSITIVITY_SMALL",
+    "DWELL_SENSITIVITY_QUALIFIED|DWELL_SENSITIVITY_SMALL",
+    "KINETIC_CHEMISTRY_SENSITIVITY_QUALIFIED|KINETIC_CHEMISTRY_SENSITIVITY_SMALL",
+    "COHESIVE_STRENGTH_SENSITIVITY_QUALIFIED|COHESIVE_STRENGTH_SENSITIVITY_SMALL",
+    "FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT|MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY|DYNAMIC_REBONDING_HISTORY_REQUIRED",
+    "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT",
+    "HAZARD_ONLY_COHESIVE_FEEDBACK",
+    "TOPOLOGICAL_HEALING_NOT_MODELED",
+    "PHYSICAL_CHEMISTRY_PARAMETERIZATION_NOT_CALIBRATED"
+  ],
+  "commit_sequence": [
+    "PX0 provenance and completion contract",
+    "PX1 dwell/RB3/instrumentation/localizer software qualification",
+    "PX2 kinetic rows and analytical prediction freeze",
+    "PX3 single-K physical screen and adaptive selection",
+    "PX4 developed multi-K Stage 1",
+    "PX5 required second-seed developed confirmation",
+    "PX6 static/dynamic attribution",
+    "PX7 final analysis, figures, portable verifier, and decision"
+  ],
+  "gates": {
+    "screen_measurable_effect": "|S_h| >= 0.01 decade AND |S_h| > max(0.005, 5x numerical/action bound)",
+    "developed_stationarity": {
+      "exclude_first_um": 20,
+      "minimum_total_extension_um": 100,
+      "assess_last_um": 50,
+      "minimum_developed_events": 10,
+      "late_early_rate_ratio_bounds": [
+        0.5,
+        2.0
+      ]
+    },
+    "response_classes": [
+      "REBONDING_NO_MEASURABLE_RATE_EFFECT",
+      "REBONDING_RATE_OFFSET_LIKE",
+      "REBONDING_STEEPENS_RESPONSE",
+      "REBONDING_FLATTENS_RESPONSE",
+      "REBONDING_CURVED_ONSET_OR_CROSSOVER",
+      "REBONDING_SEED_SENSITIVE"
+    ],
+    "static_dynamic_attribution": {
+      "dominant_max_S_h_diff_decade": 0.01,
+      "dominant_max_delta_m_diff": 0.1,
+      "mixed_max_S_h_diff_decade": 0.03,
+      "mixed_max_delta_m_diff": 0.25
+    }
+  },
+  "trajectory_budget": {
+    "max_accepted_events": 30,
+    "max_extension_um": 150,
+    "max_cycles": 1000000000000.0,
+    "max_concurrent_workers": 3,
+    "resume_authorized": false
+  },
+  "not_authorized": [
+    "resolved-face-contact mission",
+    "topological healing",
+    "closure-corrected DeltaK_eff",
+    "automatic production-line merge"
+  ]
+}

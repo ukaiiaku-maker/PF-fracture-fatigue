@@ -60,7 +60,7 @@ class CoupledPersistentSiteCyclicTipEngine(PersistentSiteCyclicTipEngine):
             cycles_requested,
         )
         cycles_consumed = cycle_count_from_consumed_time(
-            coupled["dt_consumed"], waveform.frequency_Hz
+            coupled["dt_consumed"], waveform.effective_cycle_frequency_Hz
         )
         cycles_unused = max(cycles_requested - cycles_consumed, 0.0)
         advance = coupled["advance"]
@@ -95,6 +95,10 @@ class CoupledPersistentSiteCyclicTipEngine(PersistentSiteCyclicTipEngine):
             "DeltaK_Pa_sqrt_m": float(waveform.DeltaK),
             "R": float(waveform.R),
             "frequency_Hz": float(waveform.frequency_Hz),
+            "base_period_s": float(waveform.base_period_s),
+            "minimum_load_hold_s": float(waveform.minimum_load_hold_s),
+            "cycle_period_s": float(waveform.period_s),
+            "effective_cycle_frequency_Hz": float(waveform.effective_cycle_frequency_Hz),
             "T_K": float(T_K),
             "mu_emit": float(pred.mu_emit),
             "mu_peierls": float(pred.mu_peierls),

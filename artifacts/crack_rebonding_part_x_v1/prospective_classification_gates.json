@@ -1,0 +1,37 @@
+{
+  "schema": "v10230_part_x_prospective_classification_gates_v1",
+  "screen_level_effect": {
+    "definition": "|S_h| >= 0.01 decade AND |S_h| > max(0.005 decade, 5x numerical/action bound)"
+  },
+  "response_classes": {
+    "REBONDING_NO_MEASURABLE_RATE_EFFECT": "|S_h| < 0.01 decade after uncertainty accounting",
+    "REBONDING_RATE_OFFSET_LIKE": "max_K S_h - min_K S_h magnitude <0.01 decade AND |Delta m| <0.25",
+    "REBONDING_STEEPENS_RESPONSE": "Delta m >= 0.25, same sign across required seeds",
+    "REBONDING_FLATTENS_RESPONSE": "Delta m <= -0.25, same sign across required seeds",
+    "REBONDING_CURVED_ONSET_OR_CROSSOVER": "adjacent secants differ by >=0.50 or change substantially across the K grid while net response is monotone",
+    "REBONDING_SEED_SENSITIVE": "seed slope signs disagree or |Delta m_seed1 - Delta m_seed2| > 0.25"
+  },
+  "axis_sensitivity_gate": "at least 0.01 decade in S_h or 0.25 in Delta m, AND larger than max(0.005 decade, 5x propagated numerical/action uncertainty)",
+  "static_dynamic_attribution": {
+    "FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT": "max|S_dynamic-S_static|<=0.01 decade AND |delta_m_dynamic-delta_m_static|<=0.10",
+    "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY": "max|S_dynamic-S_static|<=0.03 decade OR |delta_m_dynamic-delta_m_static|<=0.25, dominant gate fails",
+    "DYNAMIC_REBONDING_HISTORY_REQUIRED": "neither gate above satisfied"
+  },
+  "developed_stationarity_gate": {
+    "exclude_first_um": 20,
+    "minimum_total_extension_um": 100,
+    "assess_last_um": 50,
+    "minimum_developed_events": 10,
+    "late_early_rate_ratio_bounds": [
+      0.5,
+      2.0
+    ]
+  },
+  "trajectory_budget": {
+    "max_accepted_events": 30,
+    "max_extension_um": 150,
+    "max_cycles": 1000000000000.0,
+    "max_concurrent_workers": 3,
+    "resume_authorized": false
+  }
+}

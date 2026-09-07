@@ -1,0 +1,142 @@
+{
+  "schema": "v10.2.30_crack_rebonding_static_shield_attribution_protocol_v1",
+  "written_before_any_new_trajectory_exists": true,
+  "purpose": "Attribute how much of the DEVELOPED_REBONDING_STEEPENING_CONFIRMED result is explained by a FIXED, ALWAYS-ON absolute cohesive shield K_b (once at least one crack event has occurred) versus genuine dynamic-rebonding KINETIC HISTORY (contact-gated formation, P/C/B Markov state evolution, wake translation). This is a mechanism-control study, not a new physical rebonding model.",
+
+  "parent_branch": {
+    "branch": "codex/v10.2.30-crack-rebonding-static-shield-attribution",
+    "based_exactly_on_sha": "239a754a7cd5ab9f1a99da2ae8389c39452ed87f",
+    "note": "239a754 itself is the decomposition-repair pass; Section A's documentation-correction commit (78940e4) is also included since it landed on this same branch before this freeze."
+  },
+  "retained_from_prior_passes": {
+    "physical_classification": "DEVELOPED_REBONDING_STEEPENING_CONFIRMED",
+    "qualifiers": [
+      "TRUE_TERMINAL_PERSISTENCE_QUALIFIED",
+      "PAIRED_WAITING_TIME_EFFECT_QUALIFIED",
+      "WINDOW_MATCHED_REBONDING_DIAGNOSTICS_QUALIFIED"
+    ],
+    "explicit_limitations": [
+      "INTER_EVENT_RAW_ACTION_WEIGHTING_NOT_ARCHIVED",
+      "STATIC_COHESIVE_SHIELDING_VERSUS_KINETIC_HISTORY_UNRESOLVED"
+    ],
+    "twelve_developed_trajectories": "unchanged, not rerun -- reused after exact hash and threshold-stream verification"
+  },
+
+  "frozen_material_and_provenance": {
+    "a_native_provenance_path": "artifacts/crack_rebonding_causal_pilot_v2/A_native_provenance.json",
+    "complete_active_material_row_sha256": "04518e244b7a446a120ea6e2d15a68758cb54a225d099609deeb23da32679971",
+    "parent_frozen_configuration_path": "artifacts/crack_rebonding_causal_pilot_v2/frozen_configuration.json",
+    "config_hashes_reused_verbatim": {
+      "RB2_reversible_zero": "f08635f9f5d6b18be8288180ee7ced0dbd03a45ee0ca2b6d1868a2239c715caa",
+      "RB2_reversible_finite": "271f45981545cf80d9d96c14138d9d9c6235b3f1bba20635d8e993e568d76fd2"
+    },
+    "note": "the static-shield trajectories do NOT use CrackRebondingControls/RB2 at all (no rebonding_state is installed) -- config_hashes above are reused only to VERIFY the existing zero-cohesion and dynamic-rebonding (RB2_reversible_finite) trajectories are the correct, unaltered pair before reuse, per Section C's explicit hash-and-threshold-stream verification requirement."
+  },
+
+  "common_settings_frozen": {
+    "T_K": 300.0,
+    "R": -0.95,
+    "frequency_Hz": 1000.0,
+    "n_phase": 80,
+    "mpz_n_bins": 80,
+    "max_accepted_events": 30,
+    "max_projected_extension_m": 1.5e-4,
+    "max_blocks_per_event": 20000,
+    "max_wall_seconds_per_trajectory": 7200.0,
+    "min_accepted_events_for_uncensored": 3,
+    "kmax_grid_Pa_sqrt_m": [15000000.0, 18000000.0, 21000000.0],
+    "stage_1_seed": 1720,
+    "stage_2_seed_conditional": 1001723
+  },
+
+  "developed_and_true_terminal_window_definitions_reused_verbatim": {
+    "developed_growth_and_stationarity_gate": "arrhenius_fracture.crack_rebonding_developed_confirmation_v10230.stable_growth_gate (development_extension_um=20.0, target_extension_um=100.0, stability_window_um=50.0, stability_definition unchanged)",
+    "true_final_half_indices": "arrhenius_fracture.crack_rebonding_developed_confirmation_v10230.true_final_half_indices (last ceil(n/2) events)",
+    "true_final_six_indices": "arrhenius_fracture.crack_rebonding_developed_confirmation_v10230.true_final_six_indices (last 6 events)",
+    "note": "no window definition is altered for this study"
+  },
+
+  "hazard_threshold_stream_and_event_length_semantics": {
+    "common_random_numbers_design": "each static-shield trajectory reuses the EXACT SAME per-event hazard_threshold_action sequence as the corresponding existing zero-cohesion and dynamic-rebonding trajectory at the same (Kmax, seed) -- verified exactly, not merely statistically, per Section C.",
+    "event_length_and_energy_gate_semantics": "unchanged from the existing campaign: fixed ~5.0um deterministic accepted_length_m per event (confirmed empirically in the developed-confirmation campaign), governed by the same commit_energy_gated_event/energy_admissible_event_length_m path; the static-shield ablation does not touch this path at all."
+  },
+
+  "static_shield_control_mechanism": {
+    "name": "PRESCRIBED_POST_FIRST_EVENT_COHESIVE_SHIELD",
+    "default_off": true,
+    "K_b_static_Pa_sqrt_m": 900000.0,
+    "K_b_static_MPa_sqrt_m": 0.9,
+    "K_b_static_source": "the existing configured cohesive ceiling K_rebond_max = eta_K * sqrt(Eprime_Pa * restored_work_of_separation_J_m2) already frozen for RB2_reversible_finite -- used PROSPECTIVELY, not fit to the observed S_h values",
+    "semantics": [
+      "K_b = 0 before the first accepted crack event",
+      "K_b = 0.9 MPa sqrt(m) after the first accepted event",
+      "K_b enters ONLY the cleavage-hazard stress channel via cleavage_stress_with_rebond's existing positive-part subtraction (same function dynamic rebonding uses)",
+      "no P/C/B Markov kinetics",
+      "no contact-gated formation",
+      "no rupture or repassivation",
+      "no rebonding wake-state allocation or translation",
+      "no effect on emission (sig0/sig1 untouched)",
+      "no effect on the energy-admissibility gate",
+      "no topological healing",
+      "no change to MPZ transport, shielding, blunting, event length, or RNG"
+    ],
+    "implementation": "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py, _phase_statistics() -- a new, default-off, mutually-exclusive-with-hazard_coupled branch keyed on engine._static_shield_control (set externally by the run script, not derived from any internal engine counter). This is the CONFIRMED correct injection point for the real production engine hierarchy (CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine), per docs/v10_2_30_crack_rebonding_equation_lineage.md's 'injection-point correction history': CoupledPersistentSiteCyclicTipEngine.cycle_step_waveform bypasses persistent_site_cyclic_v10229.py's own preview_cycle_waveform/cycle_step_waveform entirely (that location is documented dead code for this engine hierarchy, exactly as it was for the original dynamic-rebonding implementation's own first two injection attempts), delegating instead to integrate_state_coupled_waveform/_phase_statistics. An initial implementation attempt was placed at the dead-code location and empirically showed ZERO waiting-time sensitivity even at K_b comparable to Kmax itself -- caught by a direct K_b sensitivity sweep before any real trajectory was run -- and corrected to this location, which shows a consistent, physically sensible ~34% waiting-time increase at K_b=900000 Pa sqrt(m) and correct saturation/censoring at more extreme K_b.",
+    "not_a_physical_rebonding_model": true
+  },
+
+  "reuse_of_existing_trajectories": {
+    "zero_cohesion_reused": [
+      "D1_K15MPa_seed1720_zero", "D1_K18MPa_seed1720_zero", "D1_K21MPa_seed1720_zero"
+    ],
+    "dynamic_rebonding_reused": [
+      "D1_K15MPa_seed1720_finite", "D1_K18MPa_seed1720_finite", "D1_K21MPa_seed1720_finite"
+    ],
+    "verification_required_before_reuse": [
+      "rebonding_cfg_hash matches the frozen RB2_reversible_zero/RB2_reversible_finite hashes exactly",
+      "R == -0.95 for both",
+      "n_accepted_events == 30 and cumulative_extension_m == 150.0um for both",
+      "the hazard_threshold_action sequence the new static-shield trajectory reproduces is IDENTICAL, event-index by event-index, to the corresponding existing zero-cohesion trajectory's sequence"
+    ],
+    "no_rerun_authorized": true
+  },
+
+  "comparison_windows": ["developed", "true_final_half", "true_final_six"],
+  "comparison_formulas": {
+    "S_dynamic": "log10[(da/dN)_dynamic / (da/dN)_zero]",
+    "S_static": "log10[(da/dN)_static / (da/dN)_zero]",
+    "D_history": "S_dynamic(K) - S_static(K)",
+    "delta_m_dynamic_static_history": "delta_m_dynamic - delta_m_static, plus both adjacent secants",
+    "waiting_time_simplification_gate": "usable only after exact accepted-length sequence identity is established for the relevant window"
+  },
+
+  "terminal_classification_gates": {
+    "FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT": "for all three Kmax values and the developed + true_final_half windows: max |D_history(K)| <= 0.01 decade AND |delta_m_dynamic - delta_m_static| <= 0.10",
+    "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY": "max |D_history(K)| <= 0.03 decade OR |delta_m_dynamic - delta_m_static| <= 0.25, but the stricter DOMINANT gate fails",
+    "DYNAMIC_REBONDING_HISTORY_REQUIRED": "otherwise",
+    "stage_2_conditional_gate": "run the same three static-shield trajectories for seed 1001723 ONLY if Stage 1's result is not a clear FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT pass (i.e. it is MIXED, close to either gate, or DYNAMIC_REBONDING_HISTORY_REQUIRED). No threshold or K_b change after seeing Stage 1 seed=1720 results."
+  },
+
+  "future_run_provenance_requirements": [
+    "Kmax_Pa_sqrt_m stored per trajectory",
+    "T_K stored per trajectory",
+    "frequency_Hz stored per trajectory",
+    "full git rev-parse HEAD recorded at launch time",
+    "physical producer-file sha256 hashes recorded at launch time",
+    "explicit no-resume/no-restart marker recorded per trajectory",
+    "an RNG-state or stream identifier recorded per trajectory",
+    "frozen-configuration hash recorded per trajectory"
+  ],
+
+  "authorization_scope": {
+    "new_trajectories_authorized": 3,
+    "trajectories": [
+      {"Kmax_Pa_sqrt_m": 15000000.0, "seed": 1720, "mode": "static_shield"},
+      {"Kmax_Pa_sqrt_m": 18000000.0, "seed": 1720, "mode": "static_shield"},
+      {"Kmax_Pa_sqrt_m": 21000000.0, "seed": 1720, "mode": "static_shield"}
+    ],
+    "no_restart_resume_authorized": true,
+    "part_x_authorized": false,
+    "production_line_merge_authorized": false,
+    "r_frequency_dwell_passivation_chemistry_persistent_regime_sweep_authorized": false
+  }
+}

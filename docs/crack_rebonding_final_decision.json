@@ -1,0 +1,112 @@
+{
+  "schema": "v10.2.30_crack_rebonding_final_decision_v3",
+  "scope": "software_integration_plus_prephysical_qualification_plus_s8",
+  "part_x_physical_campaign_status": "DEFERRED_OUT_OF_SCOPE_THIS_PASS",
+  "branch_merge_status": "NOT_AUTHORIZED_NOT_ATTEMPTED",
+  "classification": {
+    "primary": "REBONDING_PREPHYSICS_INTEGRATION_QUALIFIED",
+    "physical_effect": "PHYSICAL_PARIS_EFFECT_NOT_YET_EVALUATED"
+  },
+  "prephysics_integration_qualified_claimed": true,
+  "prephysics_integration_qualified_caveat": "the mesh-dependent EnergyGatedAvalancheBackend.advance() outer-driver layer has not been exercised (requires a real production kernel-family or a from-scratch synthetic FEM fixture, neither available in this repo; out of scope for this pass); finalize_engine_event() itself (the real glue/registry-lookup layer, no mesh required) and the real file-based checkpoint mechanism are exercised instead",
+  "s8_subgates": {
+    "s8a_full_state_fine_step_reference": "COMPLETE",
+    "s8b_live_causal_bond_formation": "COMPLETE",
+    "s8c_certified_vhcf_bound": "COMPLETE",
+    "s8d_outer_driver_exercise": "PARTIAL_HONESTLY_SCOPED",
+    "s8d_part1_integrator_mode_selector": "COMPLETE",
+    "s8d_part2_finalize_event_glue_and_checkpoint": "COMPLETE",
+    "s8d_part2_full_mesh_backend": "NOT_ATTEMPTED_OUT_OF_SCOPE"
+  },
+  "solver_hash_provenance_classification": "MISSION_SOLVER_HASH_UNREPRODUCED_BUT_BASE_COMMIT_VERIFIED",
+  "branch": "codex/v10.2.30-optional-crack-rebonding",
+  "worktree": "/private/tmp/v10230-crack-rebonding-ablation",
+  "base_commit": "b7bd38b97da551aaef1b43d6d28c9ea44a06655c",
+  "approved_plan_sha256": "8d56ce3dc5d25cd90fb6fee22d42daefb59e980cfedb520a25ec9c2c681654b9",
+  "review_rounds": 4,
+  "review_round_1_points": 12,
+  "review_round_2_points": 9,
+  "review_round_3_points": 4,
+  "review_round_3_followup_s8_points": 4,
+  "new_test_count": 170,
+  "verifier_script": "scripts/verify_v10_2_30_crack_rebonding.py",
+  "verifier_exit_code": 0,
+  "full_production_qualification_test": "tests/test_v10_2_30_crack_rebonding_full_production_qualification.py",
+  "s8_test_files": [
+    "tests/test_v10_2_30_crack_rebonding_full_state_reference.py",
+    "tests/test_v10_2_30_crack_rebonding_causal_bonding.py",
+    "tests/test_v10_2_30_crack_rebonding_finalize_event_glue.py",
+    "tests/test_v10_2_30_crack_rebonding_integrator_mode.py"
+  ],
+  "broader_regression_sweep": {
+    "round3_pass": {
+      "failed_before_changes": 78,
+      "passed_before_changes": 888,
+      "failed_after_changes": 78,
+      "passed_after_changes": 892,
+      "regressions_introduced_net": 0,
+      "regression_found_and_fixed_during_this_sweep": "persistent_site_forward_coupled_hazard_v10230.py::_constant_segment called _commit_constant_segment with the old 6-argument positional signature after a controller parameter was added at the real injection point; fixed by threading controller through"
+    },
+    "s8_pass": {
+      "failed_before_changes": 78,
+      "failed_after_changes": 78,
+      "regressions_introduced_net": 0,
+      "note": "exact FAILED-test-name-set comparison, not just totals; identical set both before and after S8's production-file edits"
+    },
+    "note": "pre-existing failures are overwhelmingly missing-runs-physical-campaign-artifact issues in this isolated worktree, unrelated to this work; confirmed via git stash A/B comparison of exact FAILED-test-name sets, not just totals"
+  },
+  "new_files": [
+    "arrhenius_fracture/crack_rebonding_kinetics_v10230.py",
+    "arrhenius_fracture/crack_rebonding_v10230.py",
+    "scripts/verify_v10_2_30_crack_rebonding.py",
+    "docs/v10_2_30_crack_rebonding_equation_lineage.md",
+    "docs/v10_2_30_crack_rebonding_config_schema.json",
+    "docs/v10_2_30_solver_hash_provenance.md",
+    "docs/v10_2_30_event_time_mechanism_investigation.md",
+    "docs/v10_2_30_crack_rebonding_approved_plan.md",
+    "docs/v10_2_30_crack_rebonding_plan_provenance.md",
+    "docs/crack_rebonding_final_decision.md",
+    "docs/crack_rebonding_final_decision.json",
+    "tests/test_v10_2_30_crack_rebonding_full_production_qualification.py",
+    "tests/_crack_rebonding_engine_fixture.py",
+    "tests/test_v10_2_30_crack_rebonding_full_state_reference.py",
+    "tests/test_v10_2_30_crack_rebonding_causal_bonding.py",
+    "tests/test_v10_2_30_crack_rebonding_finalize_event_glue.py",
+    "tests/test_v10_2_30_crack_rebonding_integrator_mode.py"
+  ],
+  "edited_production_files": [
+    "arrhenius_fracture/kinetic_tip_cell.py",
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py",
+    "arrhenius_fracture/reduced_shared_state_v1023.py",
+    "arrhenius_fracture/sharp_front_v10_2_30_energy_gated_fatigue.py",
+    "arrhenius_fracture/persistent_site_high_cycle_checkpoint_v10230.py",
+    "arrhenius_fracture/persistent_site_cyclic_v10229.py",
+    "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py",
+    "arrhenius_fracture/persistent_site_forward_coupled_hazard_v10230.py",
+    "arrhenius_fracture/crack_rebonding_kinetics_v10230.py",
+    "arrhenius_fracture/crack_rebonding_v10230.py"
+  ],
+  "real_defects_found_and_fixed": [
+    "write_shared_result missing enum JSON-serialization handler, surfaced by adding rebonding config to SharedReducedConfig",
+    "event-time root-finder fixed-point-on-lambda iteration could diverge for super-linear time-dependent rates; replaced with stable bisection on the monotone phase-resolved action",
+    "dead/unreachable NotImplementedError checks in install_crack_rebonding, removed",
+    "emission-unchanged verifier check was vacuous with an empty wake ledger; fixed by seeding a bonded patch to force a genuinely nonzero effect",
+    "three-layer dead injection point: kinetic_tip_cell.py and persistent_site_cyclic_v10229.py are both unreachable by the real production engine class; the real injection point is persistent_site_coupled_hazard_v10229.py, found only by direct __init__ construction of the real class and a live multi-event trace",
+    "persistent_site_forward_coupled_hazard_v10230.py::_constant_segment called _commit_constant_segment with a stale positional signature after the controller parameter was added; caught by a full non--x regression sweep",
+    "false-degeneracy in the periodic-orbit certificate: naively excluding only one eigenvalue-1 index falsely flagged legitimately-reducible patch generators (e.g. a currently-unreached passivated state) as degenerate, inflating the computed subdominant eigenvalue to ~1; fixed by excluding every near-1 eigenvalue and computing the periodic state via forward-simulated matrix_power instead of eigenvector selection",
+    "S8A fine-step reference initially disagreed with production by 1-4 percent on the wake clock/kinetics; traced to a genuine, pre-existing, non-rebonding property of _commit_constant_segment's piecewise-constant-rate-per-segment approximation (amplified by cleavage's Arrhenius-exponential stress sensitivity), confirmed by a direct convergence study before finalizing frozen tolerances"
+  ],
+  "known_limitations": [
+    "phase_resolved_action's transient phase remains O(n_phase * n_transient_cycles); only the post-transient bulk portion is O(log n) via matrix_power. The bulk action representative is now certified (S8C) with caller-side fail-closed enforcement rather than best-effort",
+    "the mesh-dependent EnergyGatedAvalancheBackend.advance() outer-driver layer has not been exercised and is not feasible to exercise in this environment without out-of-scope FEM/mesh engineering; finalize_engine_event() and the real checkpoint mechanism are exercised instead (S8D)"
+  ],
+  "protected_worktree_note": {
+    "path": "/private/tmp/v10230-reversible-energy-integration",
+    "touched_by_this_session": false,
+    "observation": "campaign processes had stopped running by end of session and the .git worktree pointer file is missing, though the directory contents remain intact and the main repository's worktree metadata still references it; this was observed, not caused, and no corrective action was taken",
+    "repair_status": "NOT_YET_PERFORMED_PENDING_EXPLICIT_USER_AUTHORIZATION_TO_PROCEED"
+  },
+  "worktree_clean": true,
+  "s8_changes_committed": true,
+  "s8_commit": "c5adfb3"
+}

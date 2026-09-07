@@ -28,6 +28,8 @@ MPZ_ACTIVE_ARRAYS = (
     "retained_negative",
     "accumulated_slip_positive",
     "accumulated_slip_negative",
+    "returned_slip_positive",
+    "returned_slip_negative",
     "wake_mobile_positive",
     "wake_mobile_negative",
     "wake_retained_positive",
@@ -46,6 +48,16 @@ MPZ_LEDGER_SCALARS = (
     "escaped_total",
     "signed_source_activations_total",
     "signed_line_content_emitted_total",
+    "cumulative_gross_source_activity",
+    "cumulative_gross_return_activity",
+)
+
+MPZ_LEDGER_ARRAYS = (
+    "cumulative_returned_mobile",
+    "cumulative_physical_returned_mobile",
+    "cumulative_escaped_mobile",
+    "cumulative_cancelled_source_slip",
+    "cumulative_source_slip_wake_transfer",
 )
 
 ENGINE_LEDGER_SCALARS = (
@@ -257,6 +269,13 @@ def capture_ledgers(engine) -> dict[str, float]:
     for name in MPZ_LEDGER_SCALARS:
         if hasattr(mpz, name):
             result[f"mpz.{name}"] = _finite(getattr(mpz, name))
+    for name in MPZ_LEDGER_ARRAYS:
+        if not hasattr(mpz, name):
+            continue
+        array = np.asarray(getattr(mpz, name), dtype=float)
+        for index in np.ndindex(array.shape):
+            token = ",".join(str(value) for value in index)
+            result[f"mpz.{name}[{token}]"] = _finite(array[index])
     return result
 
 
@@ -270,6 +289,15 @@ def apply_ledger_delta(engine, delta: dict[str, float], cycles: float = 1.0) -> 
     for key, increment in delta.items():
         owner_name, name = key.split(".", 1)
         owner = _owner(engine, owner_name)
+        if name.endswith("]") and "[" in name:
+            attribute, raw_index = name[:-1].split("[", 1)
+            if not hasattr(owner, attribute):
+                continue
+            index = tuple(int(value) for value in raw_index.split(","))
+            array = np.asarray(getattr(owner, attribute), dtype=float).copy()
+            array[index] = _finite(array[index]) + factor * _finite(increment)
+            setattr(owner, attribute, array)
+            continue
         if not hasattr(owner, name):
             continue
         setattr(owner, name, _finite(getattr(owner, name)) + factor * _finite(increment))
@@ -283,6 +311,27 @@ def capture_stochastic_state(engine) -> dict[str, Any]:
         ),
         "hazard_action_current": _finite(getattr(engine, "hazard_action_current", 0.0)),
         "hazard_event_index": int(getattr(engine, "hazard_event_index", 0)),
+        "avalanche_base_checkpoint_m": _finite(
+            getattr(engine, "avalanche_base_checkpoint_m", 0.0)
+        ),
+        "avalanche_event_advance_m": _finite(
+            getattr(engine, "avalanche_event_advance_m", 0.0)
+        ),
+        "avalanche_event_length_factor": _finite(
+            getattr(engine, "avalanche_event_length_factor", 0.0)
+        ),
+        "avalanche_last_completed_advance_m": _finite(
+            getattr(engine, "avalanche_last_completed_advance_m", 0.0)
+        ),
+        "avalanche_last_completed_factor": _finite(
+            getattr(engine, "avalanche_last_completed_factor", 0.0)
+        ),
+        "avalanche_event_length_history": tuple(
+            float(value) for value in getattr(engine, "avalanche_event_length_history", [])
+        ),
+        "avalanche_checkpoint_synchronized": bool(
+            getattr(engine, "avalanche_checkpoint_synchronized", False)
+        ),
         "hazard_threshold_history": tuple(
             float(value) for value in getattr(engine, "hazard_threshold_history", [])
         ),

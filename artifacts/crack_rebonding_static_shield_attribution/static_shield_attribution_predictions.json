@@ -1,0 +1,19 @@
+{
+  "schema": "v10.2.30_crack_rebonding_static_shield_attribution_frozen_predictions_v1",
+  "written_before_any_new_trajectory_exists": true,
+  "note": "K_b_static is used PROSPECTIVELY at the existing configured cohesive ceiling -- it is NOT fit to the observed S_h(K) values from the dynamic-rebonding campaign. No prediction of S_static(K) or D_history(K) is made here (that would require running the full engine); only the frozen INPUT parameter and its provenance are recorded prospectively.",
+  "K_b_static_Pa_sqrt_m": 900000.0,
+  "K_b_static_MPa_sqrt_m": 0.9,
+  "K_b_static_derivation": "K_rebond_max = rebond_K_geometry_factor * sqrt(Eprime_Pa * restored_work_of_separation_J_m2), eta_K=1.0, Eprime_Pa=444444444444.44446, restored_work_of_separation_J_m2=1.8225 -- identical to RB2_reversible_finite's already-frozen K_rebond_max in artifacts/crack_rebonding_causal_pilot_v2/frozen_configuration.json",
+  "source_config_hash_reused_for_value_only": "271f45981545cf80d9d96c14138d9d9c6235b3f1bba20635d8e993e568d76fd2",
+  "kmax_grid_Pa_sqrt_m": [15000000.0, 18000000.0, 21000000.0],
+  "existing_developed_window_S_dynamic_reference_only": {
+    "note": "for reference only -- NOT a target the static run is tuned to match. From the already-committed developed_confirmation_decision.json, seed=1720, developed window.",
+    "S_h_by_Kmax": {
+      "15000000": -0.12545937189413456,
+      "18000000": -0.042871801689660975,
+      "21000000": -0.026548712588616314
+    },
+    "delta_m": 0.6879247218159502
+  }
+}

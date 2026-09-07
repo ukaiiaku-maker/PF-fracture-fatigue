@@ -1,0 +1,403 @@
+{
+  "K_b_static_Pa_sqrt_m": 900000.0,
+  "frequency_Hz": 1000.0,
+  "kmax_grid_Pa_sqrt_m": [
+    15000000.0,
+    18000000.0,
+    21000000.0
+  ],
+  "localization_parity_audit_reference": "/private/tmp/v10230-crack-rebonding-static-shield-evidence-hardening/artifacts/crack_rebonding_static_shield_attribution/static_shield_localization_parity_audit.json",
+  "localization_parity_classification": "STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED",
+  "multi_K_paris_slope_campaign_authorized": false,
+  "part_x_authorized": false,
+  "production_line_merge_authorized": false,
+  "schema": "v10.2.30_crack_rebonding_static_shield_attribution_decision_v2",
+  "scientific_wording": {
+    "K_b_description": "fixed post-first-event cohesive shield (not an unqualified 'always-on' shield -- K_b=0 for the first accepted event, K_b=0.9 MPa sqrt(m) from the first accepted event onward)",
+    "delta_m_description": "delta_m is the three-point least-squares fitted slope INCREMENT that dynamic (or prescribed-static) rebonding induces in S_h(K) over Kmax=15-21 MPa sqrt(m) -- it is a rebonding-induced correction to the local Paris-slope response over this narrow load range, NOT the complete Paris exponent of the underlying da/dN(K) curve",
+    "load_dependence_note": "K_b/Kmax = 6.0%, 5.0%, 4.29% at Kmax=15/18/21 MPa sqrt(m) respectively -- a fixed absolute subtraction is proportionally larger at low Kmax, naturally producing stronger low-load suppression and a positive delta_m without requiring a strongly load-dependent bonded fraction",
+    "p_c_b_kinetics_claim": "This study does NOT establish that P/C/B bond-formation/rupture kinetics are physically unnecessary. It shows only that, once the near-ceiling cohesive amplitude K_rebond_max is present, the incremental contribution of P/C/B temporal modulation beyond that near-saturated shield amplitude is at most 0.00083 decade (dynamic-history-plus-numerical-path residual) for the tested developed regime -- P/C/B kinetics may still be the mechanism that drives the wake rapidly into, and maintains it near, that saturated bonded state.",
+    "residual_terminology": "dynamic-history-plus-numerical-path residual",
+    "residual_terminology_note": "the localization-parity audit (scripts/audit_static_shield_localization_parity.py) did not reach PRESCRIBED_STATIC_EVENT_LOCALIZATION_PARITY_QUALIFIED -- a naive single-segment model of the static-shield engine's event-time localization showed up to ~32% relative discrepancy against an exact phase-resolved integrator (the real adaptive-quadrature implementation is expected to do much better, consistent with the tiny empirical residual actually observed, but this was not independently proven at the naive-model level) -- so the small residual below is reported as a combined dynamic-history-plus-numerical-path quantity, not attributed solely to genuine P/C/B kinetic history"
+  },
+  "seed_1001723_analysis": null,
+  "seed_1720_analysis": {
+    "all_k_b_step_functions_valid": true,
+    "all_present": true,
+    "all_threshold_streams_identical": true,
+    "all_uncensored_and_gate_pass": true,
+    "fits_by_window": {
+      "developed": {
+        "D_history_by_Kmax": {
+          "15000000": 0.0007073454998771378,
+          "18000000": 0.0008325380277087457,
+          "21000000": 0.0004746490463279976
+        },
+        "S_dynamic_fit": {
+          "by_Kmax": {
+            "15000000": -0.12545937189413456,
+            "18000000": -0.042871801689660975,
+            "21000000": -0.026548712588616314
+          },
+          "delta_m_least_squares": 0.6879247218159502,
+          "secant_15_to_18": 1.0430193300418595,
+          "secant_18_to_21": 0.24382183508887073
+        },
+        "S_static_fit": {
+          "by_Kmax": {
+            "15000000": -0.1261667173940117,
+            "18000000": -0.04370433971736972,
+            "21000000": -0.02702336163494431
+          },
+          "delta_m_least_squares": 0.6894213789009276,
+          "secant_15_to_18": 1.0414382419170742,
+          "secant_18_to_21": 0.24916770728611043
+        },
+        "delta_m_history": -0.0014966570849773708,
+        "max_abs_D_history_decade": 0.0008325380277087457
+      },
+      "true_final_half": {
+        "D_history_by_Kmax": {
+          "15000000": 0.0009924158480674183,
+          "18000000": 0.001011663348054144,
+          "21000000": 0.0005049992917828088
+        },
+        "S_dynamic_fit": {
+          "by_Kmax": {
+            "15000000": -0.12517430154594175,
+            "18000000": -0.04269267636931835,
+            "21000000": -0.02651836234315986
+          },
+          "delta_m_least_squares": 0.686193816470691,
+          "secant_15_to_18": 1.0416813234665847,
+          "secant_18_to_21": 0.2415995466758333
+        },
+        "S_static_fit": {
+          "by_Kmax": {
+            "15000000": -0.12616671739400917,
+            "18000000": -0.043704339717372497,
+            "21000000": -0.027023361634942667
+          },
+          "delta_m_least_squares": 0.6894213789009197,
+          "secant_15_to_18": 1.0414382419170072,
+          "secant_18_to_21": 0.24916770728617643
+        },
+        "delta_m_history": -0.003227562430228703,
+        "max_abs_D_history_decade": 0.001011663348054144
+      },
+      "true_final_six": {
+        "D_history_by_Kmax": {
+          "15000000": 0.0015554157872688656,
+          "18000000": 0.0014325709445554072,
+          "21000000": 0.0005934591079208885
+        },
+        "S_dynamic_fit": {
+          "by_Kmax": {
+            "15000000": -0.12461130160674314,
+            "18000000": -0.04227176877281442,
+            "21000000": -0.026429902527019163
+          },
+          "delta_m_least_squares": 0.6829902297389873,
+          "secant_15_to_18": 1.0398868033019335,
+          "secant_18_to_21": 0.23663369570377685
+        },
+        "S_static_fit": {
+          "by_Kmax": {
+            "15000000": -0.126166717394012,
+            "18000000": -0.043704339717369825,
+            "21000000": -0.02702336163494005
+          },
+          "delta_m_least_squares": 0.6894213789009579,
+          "secant_15_to_18": 1.0414382419170767,
+          "secant_18_to_21": 0.24916770728617563
+        },
+        "delta_m_history": -0.0064311491619706285,
+        "max_abs_D_history_decade": 0.0015554157872688656
+      }
+    },
+    "per_Kmax": {
+      "K15MPa_seed1720": {
+        "Kmax_Pa_sqrt_m": 15000000.0,
+        "k_b_step_function_valid": true,
+        "pair_ok": true,
+        "threshold_stream_identical_static_vs_zero": true,
+        "windows": {
+          "developed": {
+            "D_history_decade": 0.0007073454998771378,
+            "S_dynamic_decade": -0.12545937189413456,
+            "S_static_decade": -0.1261667173940117,
+            "accepted_length_identity_dynamic_vs_zero": true,
+            "accepted_length_identity_static_vs_zero": true,
+            "dynamic": {
+              "dN": 760.229709640685,
+              "da_dN": 1.7100094662367669e-07,
+              "da_m": 0.00013,
+              "event_count": 26
+            },
+            "static": {
+              "dN": 761.4689223021188,
+              "da_dN": 1.7072266010144728e-07,
+              "da_m": 0.00013,
+              "event_count": 26
+            },
+            "waiting_time_simplification_admissible": true,
+            "zero": {
+              "dN": 569.4891652245252,
+              "da_dN": 2.2827475558511557e-07,
+              "da_m": 0.00013,
+              "event_count": 26
+            }
+          },
+          "true_final_half": {
+            "D_history_decade": 0.0009924158480674183,
+            "S_dynamic_decade": -0.12517430154594175,
+            "S_static_decade": -0.12616671739400917,
+            "accepted_length_identity_dynamic_vs_zero": true,
+            "accepted_length_identity_static_vs_zero": true,
+            "dynamic": {
+              "dN": 338.8575433064604,
+              "da_dN": 2.2133194754401708e-07,
+              "da_m": 7.5e-05,
+              "event_count": 15
+            },
+            "static": {
+              "dN": 339.6327595069017,
+              "da_dN": 2.2082675448884638e-07,
+              "da_m": 7.5e-05,
+              "event_count": 15
+            },
+            "waiting_time_simplification_admissible": true,
+            "zero": {
+              "dN": 254.00534549688257,
+              "da_dN": 2.952693765294025e-07,
+              "da_m": 7.5e-05,
+              "event_count": 15
+            }
+          },
+          "true_final_six": {
+            "D_history_decade": 0.0015554157872688656,
+            "S_dynamic_decade": -0.12461130160674314,
+            "S_static_decade": -0.126166717394012,
+            "accepted_length_identity_dynamic_vs_zero": true,
+            "accepted_length_identity_static_vs_zero": true,
+            "dynamic": {
+              "dN": 95.45364621293517,
+              "da_dN": 3.142886750819019e-07,
+              "da_m": 2.9999999999999997e-05,
+              "event_count": 6
+            },
+            "static": {
+              "dN": 95.79612419345796,
+              "da_dN": 3.1316507063913903e-07,
+              "da_m": 2.9999999999999997e-05,
+              "event_count": 6
+            },
+            "waiting_time_simplification_admissible": true,
+            "zero": {
+              "dN": 71.64423025137224,
+              "da_dN": 4.1873574319580873e-07,
+              "da_m": 2.9999999999999997e-05,
+              "event_count": 6
+            }
+          }
+        }
+      },
+      "K18MPa_seed1720": {
+        "Kmax_Pa_sqrt_m": 18000000.0,
+        "k_b_step_function_valid": true,
+        "pair_ok": true,
+        "threshold_stream_identical_static_vs_zero": true,
+        "windows": {
+          "developed": {
+            "D_history_decade": 0.0008325380277087457,
+            "S_dynamic_decade": -0.042871801689660975,
+            "S_static_decade": -0.04370433971736972,
+            "accepted_length_identity_dynamic_vs_zero": true,
+            "accepted_length_identity_static_vs_zero": true,
+            "dynamic": {
+              "dN": 435.25164911299476,
+              "da_dN": 2.986777885044864e-07,
+              "da_m": 0.00013,
+              "event_count": 26
+            },
+            "static": {
+              "dN": 436.0868222737319,
+              "da_dN": 2.98105774722078e-07,
+              "da_m": 0.00013,
+              "event_count": 26
+            },
+            "waiting_time_simplification_admissible": true,
+            "zero": {
+              "dN": 394.3379946716128,
+              "da_dN": 3.296664327470099e-07,
+              "da_m": 0.00013,
+              "event_count": 26
+            }
+          },
+          "true_final_half": {
+            "D_history_decade": 0.001011663348054144,
+            "S_dynamic_decade": -0.04269267636931835,
+            "S_static_decade": -0.043704339717372497,
+            "accepted_length_identity_dynamic_vs_zero": true,
+            "accepted_length_identity_static_vs_zero": true,
+            "dynamic": {
+              "dN": 194.0522534849718,
+              "da_dN": 3.864938368562069e-07,
+              "da_m": 7.5e-05,
+              "event_count": 15
+            },
+            "static": {
+              "dN": 194.50481365103116,
+              "da_dN": 3.855945700889464e-07,
+              "da_m": 7.5e-05,
+              "event_count": 15
+            },
+            "waiting_time_simplification_admissible": true,
+            "zero": {
+              "dN": 175.8838704852628,
+              "da_dN": 4.2641772547462897e-07,
+              "da_m": 7.5e-05,
+              "event_count": 15
+            }
+          },
+          "true_final_six": {
+            "D_history_decade": 0.0014325709445554072,
+            "S_dynamic_decade": -0.04227176877281442,
+            "S_static_decade": -0.043704339717369825,
+            "accepted_length_identity_dynamic_vs_zero": true,
+            "accepted_length_identity_static_vs_zero": true,
+            "dynamic": {
+              "dN": 54.68096212314044,
+              "da_dN": 5.486370179888312e-07,
+              "da_m": 2.9999999999999997e-05,
+              "event_count": 6
+            },
+            "static": {
+              "dN": 54.86163146273515,
+              "da_dN": 5.468302564129459e-07,
+              "da_m": 2.9999999999999997e-05,
+              "event_count": 6
+            },
+            "waiting_time_simplification_admissible": true,
+            "zero": {
+              "dN": 49.60944617090113,
+              "da_dN": 6.047235418966795e-07,
+              "da_m": 2.9999999999999997e-05,
+              "event_count": 6
+            }
+          }
+        }
+      },
+      "K21MPa_seed1720": {
+        "Kmax_Pa_sqrt_m": 21000000.0,
+        "k_b_step_function_valid": true,
+        "pair_ok": true,
+        "threshold_stream_identical_static_vs_zero": true,
+        "windows": {
+          "developed": {
+            "D_history_decade": 0.0004746490463279976,
+            "S_dynamic_decade": -0.026548712588616314,
+            "S_static_decade": -0.02702336163494431,
+            "accepted_length_identity_dynamic_vs_zero": true,
+            "accepted_length_identity_static_vs_zero": true,
+            "dynamic": {
+              "dN": 356.96913378620155,
+              "da_dN": 3.641771450129369e-07,
+              "da_m": 0.00013,
+              "event_count": 26
+            },
+            "static": {
+              "dN": 357.35948569991757,
+              "da_dN": 3.6377934601451656e-07,
+              "da_m": 0.00013,
+              "event_count": 26
+            },
+            "waiting_time_simplification_admissible": true,
+            "zero": {
+              "dN": 335.8009750205435,
+              "da_dN": 3.871340754506353e-07,
+              "da_m": 0.00013,
+              "event_count": 26
+            }
+          },
+          "true_final_half": {
+            "D_history_decade": 0.0005049992917828088,
+            "S_dynamic_decade": -0.02651836234315986,
+            "S_static_decade": -0.027023361634942667,
+            "accepted_length_identity_dynamic_vs_zero": true,
+            "accepted_length_identity_static_vs_zero": true,
+            "dynamic": {
+              "dN": 159.20536752595228,
+              "da_dN": 4.7108964456097335e-07,
+              "da_m": 7.5e-05,
+              "event_count": 15
+            },
+            "static": {
+              "dN": 159.39059981239203,
+              "da_dN": 4.7054217807246763e-07,
+              "da_m": 7.5e-05,
+              "event_count": 15
+            },
+            "waiting_time_simplification_admissible": true,
+            "zero": {
+              "dN": 149.77500519198628,
+              "da_dN": 5.007511093313777e-07,
+              "da_m": 7.5e-05,
+              "event_count": 15
+            }
+          },
+          "true_final_six": {
+            "D_history_decade": 0.0005934591079208885,
+            "S_dynamic_decade": -0.026429902527019163,
+            "S_static_decade": -0.02702336163494005,
+            "accepted_length_identity_dynamic_vs_zero": true,
+            "accepted_length_identity_static_vs_zero": true,
+            "dynamic": {
+              "dN": 44.89599597762989,
+              "da_dN": 6.682110363460464e-07,
+              "da_m": 2.9999999999999997e-05,
+              "event_count": 6
+            },
+            "static": {
+              "dN": 44.957387847585515,
+              "da_dN": 6.672985561729245e-07,
+              "da_m": 2.9999999999999997e-05,
+              "event_count": 6
+            },
+            "waiting_time_simplification_admissible": true,
+            "zero": {
+              "dN": 42.245232819349724,
+              "da_dN": 7.10139298516518e-07,
+              "da_m": 2.9999999999999997e-05,
+              "event_count": 6
+            }
+          }
+        }
+      }
+    },
+    "seed": 1720
+  },
+  "stage1_classification": {
+    "classification": "FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT",
+    "dominant_gate_passed_developed_and_true_final_half": [
+      true,
+      true
+    ],
+    "mixed_gate_passed_developed_and_true_final_half": [
+      true,
+      true
+    ]
+  },
+  "stage2_conditional_gate_authorized": false,
+  "terminal_classification": {
+    "classification": "FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT",
+    "dominant_gate_passed_developed_and_true_final_half": [
+      true,
+      true
+    ],
+    "mixed_gate_passed_developed_and_true_final_half": [
+      true,
+      true
+    ]
+  }
+}

@@ -1,0 +1,593 @@
+# Codex Handoff: PF/Sharp-Front Arrhenius-Hazard Fatigue and Developed da/dN
+
+## 1. Mission
+
+The project objective is to calculate crack-growth rate `da/dN` as a function of fixed local cyclic stress-intensity range `DeltaK` using four existing, fixed material parameterizations in the PF/sharp-front Arrhenius-hazard fracture framework.
+
+The code must span low-cycle fatigue, high-cycle fatigue, and very-high-cycle fatigue. It must not accomplish this by adding a Paris law or a separate fatigue constitutive law. Cyclic crack growth must emerge from the existing state-dependent Arrhenius cleavage first-passage process, persistent-site plasticity, MPZ evolution, stochastic event lengths, and post-first-passage energy-gated geometry transactions.
+
+For active cases, the desired production trajectory is approximately 100 micrometres of crack extension so that initiation can be separated from developed growth and the stability of `da/dN` can be assessed. A total-cycle ceiling of `1e12` is a censor for inactive or extremely slow cases, not the target of every run.
+
+## 2. Codex working baseline
+
+Source repository:
+
+`/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1`
+
+Intended branch at handoff:
+
+`v10.2.30-hazard-energy-gated-fatigue-events`
+
+Observed baseline HEAD at handoff:
+
+`9e884fb0b0845da621d2612bdf1042e481b8df49`
+
+Pull request:
+
+`#51 — Validation v10.2.30 hazard-energy-gated fatigue events`
+
+Conda environment:
+
+`arrhenius-sharp-front-v10`
+
+Editable package:
+
+`arrhenius-sharp-front-mpz==10.2.30`
+
+Before doing any work, verify the actual local branch and HEAD. The repository may have advanced after this handoff.
+
+## 3. Four immutable production parameterizations
+
+Use exactly these current v10.2.30 persistent-site options:
+
+- Peak: `v913_paper_peak01_0242980_persistent_sites`
+- DBTT: `v913_paper_dbtt01_0202500_persistent_sites`
+- Weak-T: `v913_paper_weakT01_0129902_persistent_sites`
+- Ceramic-like: `v913_paper_ceramic01_0077080_persistent_sites`
+
+Do not substitute earlier parameter shelves with similar labels. Do not refit or alter any barrier, entropy, stress scale, reference temperature, site-density parameter, or other row value to improve numerical behavior or force a desired `da/dN` trend.
+
+## 4. Current physical framework
+
+### 4.1 Loading and mechanics
+
+Current qualification scope is:
+
+- temperature: 300 K;
+- fixed local `DeltaK`;
+- `R=0.1`;
+- frequency initially 1000 Hz;
+- crystal orientation 30 degrees;
+- anisotropic cubic BCC tungsten elasticity;
+- one nonbranching crack front;
+- `sharp_wake` geometry backend;
+- tip-only plasticity in the current fatigue branch;
+- FEM supplies the held geometry/tensor probe, while the kinetic engine is the only crack-advance law.
+
+The broader objective is not intrinsically restricted to 1000 Hz or one temperature, but those dimensions must not be expanded until the room-temperature fixed-`DeltaK` event-to-event implementation is qualified.
+
+### 4.2 Cleavage first passage
+
+Cleavage first passage is the only stochastic event trigger.
+
+For every event interval, the code draws an independent unit-exponential integrated-hazard threshold:
+
+`Xi = -log(U), U ~ Uniform(0,1)`.
+
+The physical cleavage hazard action accumulates as `H`. The event occurs when `H >= Xi`. The normalized internal clock is `B = H/Xi`.
+
+The event rule `B=1` is deterministic conditional on the sampled stochastic threshold; the threshold itself is stochastic. After a completed event, the action is reset and the next independent threshold is drawn from the continuing RNG stream.
+
+No noise is added to `K`, barriers, source capacity, shielding, or material properties.
+
+### 4.3 Stochastic event length
+
+The unconstrained event-length proposal is threshold-correlated and mean preserving. The same sampled threshold controls waiting time and the bounded stochastic reward. The current mode is `threshold_scaled` with bounds `[0.5, 4]` relative to the physical checkpoint length and normalization that preserves the mean event length.
+
+The mesh-independent base crack checkpoint is currently intended to be `da_phys = 5 micrometres`.
+
+Do not replace the event distribution with arbitrary random noise or a fixed empirical `da/dN` increment.
+
+### 4.4 Post-first-passage energy gate
+
+First passage creates a stochastic event-length proposal. The proposed event is then truncated by the existing fixed-opening elastic-energy balance at the geometry-event `Kmax`.
+
+The active resistance mapping is based on the existing hazard quantities:
+
+`gamma_rel * m_hits * DeltaG_cleave_eff / b^2`.
+
+The continuum `K^2/E'` comparison is diagnostic only. It cannot suppress, trigger, or rescale cleavage first passage.
+
+Do not add `Gc0_athermal`, a generic fracture-energy floor, or a non-hazard athermal crack criterion.
+
+### 4.5 Persistent-site MPZ state
+
+The persistent-site model has no finite source inventory and no arbitrary refresh or explicit recovery. Persistent statistically independent nucleation sites emit signed line content. Mobile and retained content evolve through transport and storage, producing state-dependent backstress, shielding, and crack-tip blunting.
+
+Crack advance translates the moving MPZ frame and transfers state behind the tip. Geometry and MPZ translation must remain atomic and use the same committed event distance.
+
+## 5. Desired production workflow
+
+For each parameterization and each selected `DeltaK`:
+
+1. Initialize the fixed-`DeltaK` cyclic state with a declared seed.
+2. Accelerate the waiting cycles using exact, periodic, stationary-tail, or independently validated projective evolution.
+3. Guard every projected interval against crossing the remaining stochastic threshold.
+4. Localize first passage with the exact existing stochastic integrator.
+5. Form the existing stochastic event-length proposal.
+6. Apply the existing post-first-passage energy gate.
+7. Commit the checked sharp-wake geometry and MPZ translation atomically.
+8. Record the event cycle, projected extension, path extension, event proposal, admitted length, and state.
+9. Invalidate the old geometry-specific high-cycle model.
+10. Rebuild the local cycle representation at the new tip.
+11. Continue until approximately 100 micrometres of projected extension, `1e12` total cycles, or a declared numerical failure.
+
+The scientific output is an ensemble of stochastic crack-growth trajectories, not one deterministic curve.
+
+## 6. da/dN definitions and analysis
+
+For committed event `i`, record cumulative cycle `N_i`, projected crack extension `a_i`, and actual path length `s_i`.
+
+Event-level rates are:
+
+`(da/dN)_i = (a_i-a_(i-1))/(N_i-N_(i-1))`
+
+`(ds/dN)_i = (s_i-s_(i-1))/(N_i-N_(i-1))`
+
+with tortuosity:
+
+`tau_i = (s_i-s_(i-1))/(a_i-a_(i-1))`.
+
+Initial analysis convention:
+
+- first 20 micrometres: initiation and state-development interval;
+- subsequent growth: developed-growth interval;
+- final 50 micrometres: stability assessment;
+- moving windows: approximately 20–25 micrometres.
+
+Report event-level rates, moving-window rates, cumulative developed rates, initiation cycles, censoring, path tortuosity, and stochastic scatter.
+
+Near the active/inactive transition, use multiple hazard seeds with the same seed set at every `DeltaK` for common-random-number comparisons. Begin with roughly 8 seeds per point and expand near the transition as needed.
+
+## 7. Current high-cycle architecture
+
+Important modules include:
+
+- `arrhenius_fracture/persistent_site_high_cycle_engine_v10230.py`
+- `arrhenius_fracture/persistent_site_high_cycle_engine_v10230_v5.py`
+- `arrhenius_fracture/persistent_site_high_cycle_dmd_v10230_v4.py`
+- `arrhenius_fracture/persistent_site_high_cycle_dmd_v10230_v5.py`
+- `arrhenius_fracture/persistent_site_high_cycle_checkpoint_v10230.py`
+- `arrhenius_fracture/persistent_site_high_cycle_state_v10230.py`
+- `arrhenius_fracture/persistent_site_poincare_v10230.py`
+- `arrhenius_fracture/persistent_site_periodic_solver_v10230.py`
+- `arrhenius_fracture/persistent_site_forward_robust_v10230.py`
+- `arrhenius_fracture/stochastic_hazard_tip.py`
+- `arrhenius_fracture/stochastic_avalanche_tip.py`
+- `arrhenius_fracture/stochastic_avalanche_backend.py`
+- `arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py`
+- `arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py`
+
+The current production alias identifies the v5 event-to-event engine:
+
+`v10.2.30_production_event_to_event_high_cycle_v5_rate_separated_positive_state_dmd`
+
+The v5 design separates active-state DMD projection from cumulative ledger integration, uses positivity-preserving treatment for nonnegative MPZ fields, reuses validated local maps within trust regions, guards against projected first passage, writes atomic live checkpoints, and restarts acceleration after events.
+
+## 8. Current launchers and analyzers
+
+Key launchers:
+
+- `scripts/run_v10_2_30_weakt_high_cycle_1e12.sh`
+- `scripts/run_v10_2_30_weakt_0p55_high_cycle_1e12.sh`
+- `scripts/run_v10_2_30_300K_four_class_fatigue.sh`
+- `scripts/run_v10_2_30_four_class_three_deltaK_energy_gate_qualification.sh`
+- `scripts/run_v10_2_30_three_deltaK_energy_gate_qualification.sh`
+
+Key analyzers:
+
+- `scripts/analyze_v10_2_30_high_cycle_live_checkpoint.py`
+- `scripts/analyze_v10_2_30_high_cycle_visuals.py`
+- `scripts/analyze_v10_2_30_developed_fatigue_growth.py`
+- `scripts/analyze_v10_2_30_energy_gated_qualification.py`
+
+Expected diagnostics include:
+
+- `high_cycle_live_checkpoint.json`
+- `high_cycle_live_state.npz`
+- `high_cycle_live_history.jsonl`
+- `kinetic_tip_cell_audit_v101.json`
+- `stochastic_avalanche_geometry_events.json`
+- `steps_0300K.csv`
+- high-cycle timeline and validation plots;
+- mechanical-response plots;
+- signed MPZ profiles;
+- MPZ activity proxy;
+- crack-extension-versus-cycles and `da/dN` plots.
+
+## 9. Results obtained so far
+
+### 9.1 Weak-T, fraction 0.55
+
+The qualification reached `1e12` cycles with no first passage and no committed crack event. This is a completed stochastic censoring trajectory.
+
+### 9.2 Weak-T, fraction 0.75
+
+The v5 run reached `1e12` cycles in approximately 532 seconds with no first passage and no crack extension.
+
+For seed `2001726`, the final current-interval values were approximately:
+
+- `H = 0.524952466`
+- `Xi = 2.276469549`
+- `B = H/Xi = 0.230599380`
+- ensemble event probability `1-exp(-H) = 0.4084`
+
+Therefore, this one no-event trajectory is not a deterministic fatigue-limit result. It is a valid high-threshold realization with approximately 59.2% ensemble survival at that accumulated action.
+
+### 9.3 Weak-T, fraction 0.95
+
+The latest run used:
+
+- `DeltaK = 12.0677888 MPa*sqrt(m)`
+- `Kmax = 13.4087 MPa*sqrt(m)`
+- `R = 0.1`
+- `T = 300 K`
+- `frequency = 1000 Hz`
+- `seed = 2001726`
+
+The high-cycle engine advanced to approximately 37,668 cycles. A projective proposal was rejected by `dmd_event_guard`, correctly indicating that first passage might lie near the proposed interval. The solver then entered the exact transient fallback and failed with:
+
+`RuntimeError: physical checkpoint length changed after stochastic event evolution began: old=2.000000000e-05 m, new=5.000000000e-06 m`
+
+Call path:
+
+- `persistent_site_high_cycle_engine_v10230_v5.py`
+- v2 high-cycle state-machine fallback
+- `persistent_site_forward_robust_v10230.py`
+- exact constant-segment integration
+- `persistent_site_cyclic_energy_gated_corrected_v10230.py`
+- `persistent_site_cyclic_energy_gated_v10230.py`
+- `stochastic_avalanche_tip.py::_synchronize_driver_checkpoint_length`
+
+This is the current highest-priority blocker.
+
+## 10. Interpretation of the current blocker
+
+The stochastic-avalanche engine is constructed before the 2-D driver applies the final mesh-independent `da_phys=5e-6 m`. The engine initially records an inherited default checkpoint of `20e-6 m`.
+
+The synchronization method is intended to adopt the final driver checkpoint before stochastic event evolution begins. In the 0.95 event-guard path, however, some high-cycle/exact-preview evolution changes `B` or `hazard_action_current` before synchronization occurs. When the exact fallback later calls `_synchronize_driver_checkpoint_length`, the method sees that stochastic evolution has started and correctly refuses to change the checkpoint from 20 to 5 micrometres.
+
+Do not bypass the exception by weakening the guard. Fix initialization/order so the final physical checkpoint is synchronized before any preview, DMD training burst, private trial, exact-cycle fallback, or hazard evolution can occur.
+
+The fix must preserve:
+
+- the same 5 micrometre physical checkpoint;
+- the same stochastic threshold and RNG stream;
+- the same physical hazard action;
+- the same event-length distribution;
+- exact/private-trial state isolation;
+- existing deterministic fixed-mode parity;
+- post-event geometry and energy-gate semantics.
+
+Add a regression that reproduces the event-guard-to-exact-fallback path with driver `da_phys` differing from the inherited constructor default.
+
+## 11. Required tests
+
+At minimum retain and run:
+
+- `tests/test_v10_2_30_high_cycle_launcher.py`
+- `tests/test_v10_2_30_event_growth_v5.py`
+- `tests/test_v10_2_30_high_cycle_affine_dmd.py`
+- `tests/test_v10_2_30_high_cycle_engine.py`
+- `tests/test_v10_2_30_transactional_engine.py`
+- `tests/test_v10_2_29_event_cycle_accounting.py`
+
+Add targeted tests for:
+
+1. physical checkpoint synchronization before any stochastic evolution;
+2. private preview/DMD trials preserving the production RNG and threshold;
+3. event guard followed by exact localization;
+4. one committed event followed by geometry-specific high-cycle cache invalidation;
+5. multiple event-to-event restarts;
+6. 100 micrometre developed-growth analysis;
+7. stochastic seed-ensemble aggregation.
+
+Do not relax physical or DMD validation tolerances merely to make tests pass.
+
+## 12. Acceptance criteria
+
+### Immediate blocker acceptance
+
+The weak-T 0.95 case must pass through the current event guard without checkpoint-length mismatch, localize first passage exactly, preserve threshold provenance, and either:
+
+- commit an energy-admitted crack event and restart at the new geometry; or
+- record a physically valid zero-length/nonpropagating first-passage attempt according to the existing law.
+
+### Event-to-event release gate
+
+A real fixed-`DeltaK` case must:
+
+- produce multiple stochastic first passages;
+- apply the event-energy gate;
+- commit checked geometry transactions;
+- restart the high-cycle engine after every event;
+- preserve cumulative cycle accounting;
+- reach approximately 100 micrometres or a declared censor;
+- emit complete event-level and developed `da/dN` diagnostics.
+
+### Four-parameterization campaign gate
+
+For peak, DBTT, weak-T, and ceramic-like rows:
+
+- identify censored and propagated `DeltaK` regimes;
+- use common seed sets across `DeltaK`;
+- obtain developed-growth intervals where possible;
+- report ensemble event probability, initiation distribution, developed `da/dN`, path-length rate, tortuosity, and scatter;
+- demonstrate event-length convergence under the existing trial-fraction refinement;
+- include at least one positive energy-truncated event across the qualification matrix.
+
+## 13. First task for Codex
+
+1. Read this document and `AGENTS.md`.
+2. Inspect the current branch and reproduce or audit the 0.95 failure from the saved log.
+3. Trace every place where `eng.f.da`, `avalanche_base_checkpoint_m`, `B`, and `hazard_action_current` are initialized or changed.
+4. Design the smallest physics-neutral correction that synchronizes the final driver checkpoint before any stochastic or private-trial evolution.
+5. Add a regression for the exact failure path.
+6. Run the focused tests.
+7. Rerun the weak-T 0.95 qualification to the first event and verify threshold, event length, energy gate, geometry commit, and post-event restart.
+8. Do not begin the four-class sweep until the first real event-to-event restart is demonstrated.
+
+---
+
+## 14. v10.2.30 crack-rebonding causal pilot V2 status (this worktree)
+
+This section tracks the CONTACT-GATED CRACK-REBONDING CAUSAL PILOT V2
+campaign specifically (unrelated to sections 1-13 above, which are an
+earlier, separate da/dN mission). Full writeup:
+`docs/v10_2_30_crack_rebonding_causal_pilot_v2.md`.
+
+**Worktree:** `/private/tmp/v10230-crack-rebonding-causal-pilot-v2`
+**Branch:** `codex/v10.2.30-crack-rebonding-causal-pilot-v2`
+**Required interpreter:**
+`/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python`
+
+Do not touch these preserved/read-only worktrees:
+- `/private/tmp/v10230-crack-rebonding-causal-pilot` (v1 diagnostic pilot, dce8cc0)
+- `/private/tmp/v10230-crack-rebonding-ablation` (S8 milestone, 4d6c1c1)
+- `/private/tmp/v10230-reversible-energy-integration` (read-only provenance source; its `runs/A_native_plus_8PT_fatigue_v1/` tree is now empty — 1371 dirs, 0 files, swept by OS /tmp cleanup)
+- `/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_codex_v10_2_30` (mounted checkout, unrelated v9.14 branch — read from it for provenance lookups only, never edit/commit)
+
+### Status: terminal classification accepted and now replicated under a second seed
+
+**`REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL`**
+(mission completion-contract outcome C) is accepted as final -- no Part X,
+no production-line merge. All four original milestones (V2-A through V2-D)
+are committed, plus a follow-up analysis-only evidence-hardening pass and a
+bounded second-seed replication (seed=1001723, the 4 RB2 zero/finite-
+cohesion trajectories only). The replication corroborates the original
+finding closely: max ratio 0.0436 decades (original seed 1720: 0.0420),
+cumulative-waiting-time ratios 0.0421-0.0422 decades, still below the
+frozen 0.05-decade threshold, which was not touched. See
+`docs/v10_2_30_crack_rebonding_causal_pilot_v2.md` Section 6 for the full
+replication writeup and `artifacts/crack_rebonding_causal_pilot_v2/
+second_seed_replication.json` for the machine-readable record. **Returned
+for review after this replication per the requester's instruction -- no
+further seeds or multi-K matrix launched.**
+
+### Completed
+
+- **V2-A (A_NATIVE provenance):** recovered and cross-verified from an
+  immutable, git-tracked v9.14 source registry (hash-verified) plus a
+  disclosed-constants downstream registry; classified
+  `A_NATIVE_REGISTRY_DETERMINISTICALLY_RECONSTRUCTED_FROM_QUALIFIED_INPUTS`.
+  Frozen at `artifacts/crack_rebonding_causal_pilot_v2/A_native_provenance.json`.
+  Real engine construction in `arrhenius_fracture/a_native_engine_v10230.py
+  ::build_a_native_engine()`.
+- **V2-B (contact gating + strict event-timing parity):** exact
+  `K_signed < 0` contact gate on bond formation
+  (`crack_rebonding_v10230.py::patch_Q`,
+  `crack_rebonding_kinetics_v10230.py::_integrate_A_on`); new
+  `rebonding_kinetics_active()`/`cohesion_present()` predicates used
+  consistently at all routing sites that previously kept RB1 (and,
+  discovered while implementing Section 8, zero-cohesion RB2) on the
+  coupled/root-finder path purely because `cfg.enabled` was true, not
+  whether kinetics/cohesion were actually active
+  (`persistent_site_coupled_hazard_v10229.py::_phase_statistics` and
+  `_commit_constant_segment`, `persistent_site_cyclic_energy_gated_v10230.py
+  ::commit_energy_gated_event`/`_commit_rebonding_event`). Full test suite:
+  918 passed / 77 pre-existing unrelated failures (missing
+  `v10_2_27_paper_four_class_registry.csv`, confirmed untouched by this
+  work) / 1 skipped. All 183 `crack_rebonding`-selected tests pass.
+- **V2-C (protocol preflight):** RB1 contact-only preflight against the
+  real A_NATIVE engine at the reference protocol found 2 of 7
+  post-first-event intervals contain a complete negative-K excursion —
+  meets the mission's bar. `REFERENCE_PROTOCOL_SAMPLES_COMPRESSION`; no
+  frequency escalation needed or attempted. (This also refuted v1's
+  documented "native hazard too fast for one period" finding as an
+  artifact of v1 having actually used the wrong — DBTT test-fixture —
+  material.)
+- **V2-D (corrected 8-case pilot):** C0/C1/C2R/C3R/C2P/C3P/C4/C5, each 7
+  accepted events, uncensored. All 7 hard gates pass, including exact
+  (not 2%-tolerance) C0/C1 parity and a provably-exact-zero C5 residual at
+  R=0.1. The cohesive causal effect is real, correctly signed, and
+  isolated via matching zero-cohesion RB2 controls (not inferred from RB2
+  minus RB1): max 0.042 decades across 4 compression-containing intervals,
+  just under the frozen 0.05-decade expansion threshold. Independently
+  reproduced by `scripts/verify_v10_2_30_crack_rebonding_causal_pilot_v2.py`
+  (`overall_pass: true`).
+- **Evidence hardening (analysis-only, no new physics):** added
+  `scripts/build_v2_event_ledger.py` producing a tracked, portable
+  `artifacts/crack_rebonding_causal_pilot_v2/event_ledger.json`/`.csv`
+  (56 event rows); rewrote `analyze_...py`/`verify_...py` to depend ONLY on
+  tracked artifacts (verify no longer reads any gitignored `runs/...`
+  file); added non-invasive `phase_resolved_action` instrumentation
+  (max/action-weighted K_rebond, converged action) plus pre-event
+  K_rebond, RNG/threshold identifiers, MPZ-state snapshot, and analytic
+  barrier-floor/cooperative-saturation diagnostics. Re-ran the same 8
+  trajectories under the identical seed=1720/frozen config to populate
+  this and confirmed 0 mismatches on every physics field against the
+  original run (pure re-observation). Corrected gate-1 wording to
+  "event-time-and-length parity" (not an unqualified full-state claim) and
+  annotated gate 4's 4 rows as 2 unique intervals x 2 kinetics presets.
+  Classification unchanged: `REBONDING_KINETICALLY_ACTIVE_BUT_
+  MACROSCOPICALLY_SMALL`, max ratio still 0.0420 decades.
+
+- **Second-seed replication (seed=1001723):** 4 RB2 zero/finite-cohesion
+  trajectories, configs reloaded verbatim from the committed
+  `frozen_configuration.json` (hash-checked before running). All 4
+  completed uncensored, 7 events each. 2 unique compression-containing
+  intervals found under this seed's own stochastic timing (different
+  event indices than seed 1720's, as expected). Max ratio **0.0436
+  decades** (vs. seed 1720's 0.0420); cumulative-waiting-time ratios
+  0.0421 (reversible) / 0.0422 (persistent) decades -- all still below
+  the untouched 0.05-decade threshold. A second, independent,
+  correctly-signed confirmation of the same small real effect.
+
+### Active processes
+
+None. Both the primary pilot and the second-seed replication have
+completed; no workers running.
+
+### Remaining authorized-but-not-attempted scope (parent branch)
+
+Per the mission, still unauthorized on the parent branch: full multi-K
+Paris-slope campaign, passivation/repassivation sweep, frequency sweep
+beyond the frozen reference protocol, DMD/Poincare acceleration with
+rebonding, energy-gate coupling, topological crack retreat, mesh-resolved
+contact claims, branch merge into the authoritative production line. None
+of these were attempted.
+
+---
+
+## 15. v10.2.30 crack-rebonding minimal local slope screen (THIS worktree)
+
+This worktree/branch (`codex/v10.2.30-crack-rebonding-minimal-slope-screen`,
+created from the parent's `5bc56c9`) is a separately authorized, staged
+follow-up. Full writeup:
+`docs/v10_2_30_crack_rebonding_minimal_slope_screen.md`. The parent
+worktree/branch (`codex/v10.2.30-crack-rebonding-causal-pilot-v2`,
+`/private/tmp/v10230-crack-rebonding-causal-pilot-v2`) is untouched by this
+worktree and remains the authoritative, preserved two-seed causal pilot.
+
+### Status: STOPPED_EARLY_EXPOSURE_GATE_FAILED
+
+Authorization chain: parent branch's regime-equivalence analysis (commit
+`8737784`, analysis-only, no new physics) found reversible/persistent
+equivalent at both seeds, authorizing this single-regime 8-trajectory
+screen. Frozen predictions (Kmax=15/18/21, `Pi_K` varying naturally, no
+barrier re-inversion) written before any new run. Reused the parent's
+Kmax=18 reversible zero/finite results verbatim (hash-checked).
+
+Ran zero-cohesion first, gating each finite-cohesion twin on `>= 2`
+compression-containing intervals:
+
+- Kmax=15, both seeds: PASS (2/6 each) -- both zero+finite completed.
+- Kmax=21, seed 1720: PASS (5/6) -- both zero+finite completed.
+- Kmax=21, seed 1001723: **FAIL** (1/6) -- **stopped here per the frozen
+  protocol, without launching that finite-cohesion twin and without
+  substituting a different load.**
+
+7 of the planned 8 trajectories ran (all uncensored, 7 events each). No
+3-point slope fit, no secants, no `REBONDING_RATE_OFFSET_LIKE`/
+`STEEPENS`/`FLATTENS`/`WEAK_OR_UNRESOLVED` classification can be assigned
+-- the screen's own terminal status is `STOPPED_EARLY_EXPOSURE_GATE_FAILED`,
+recorded at `artifacts/crack_rebonding_minimal_slope_screen_v1/
+slope_screen_decision.json`.
+`scripts/verify_v2_minimal_slope_screen.py`: `overall_pass: true`. All 183
+`crack_rebonding` tests pass.
+
+### Active processes
+
+None. The screen ran to its own defined stopping point; no workers
+running.
+
+### Remaining scope (unauthorized, not attempted, by that worktree)
+
+Any next step at this Kmax grid or beyond (additional seeds at Kmax=21,
+a different Kmax upper bound, or a frequency ablation per V2-C's original
+Option A/B framing) is new physics requiring its own separate
+authorization. The full multi-K/R/frequency/dwell/passivation Part X
+campaign and any production-line merge remain unauthorized regardless.
+
+---
+
+## 16. v10.2.30 crack-rebonding slope-exposure continuation (THIS worktree)
+
+Branch `codex/v10.2.30-crack-rebonding-slope-exposure-continuation`,
+created from the minimal slope screen's own `c742722` (preserved
+unchanged, untouched by this worktree). Full writeup:
+`docs/v10_2_30_crack_rebonding_slope_exposure_continuation.md`.
+
+### Status: COMPLETE
+
+Per review: the screen's exposure gate correctly stopped it, but reduced
+compression exposure at high Kmax may itself be part of the physical
+effect under study, so the missing finite-cohesion twin
+(Kmax=21, seed=1001723) was run WITHOUT that gate
+(`EXPOSURE_UNCONDITIONED_COMPLETION`), reusing the exact frozen
+configuration verbatim (hash-checked). Completed uncensored, 7 events;
+0 complete + 6 partial compression intervals (less complete exposure than
+its own zero-cohesion twin -- a real coupled-feedback effect, not an
+error).
+
+**Result: all three Kmax points now available for both seeds, and
+`|S_h|` falls monotonically with Kmax for both** (seed 1720:
+-0.1250/-0.0428/-0.0265; seed 1001723: -0.1227/-0.0421/-0.0261 decade at
+Kmax=15/18/21). Three-point least-squares `delta_m`: **0.6849** (seed
+1720), **0.6713** (seed 1001723) -- both clear the 0.25 steepening gate by
+~3x, agreeing to within 0.0136 despite a starkly different Kmax=21
+exposure profile (2 vs 0 complete excursions) between the two seeds,
+evidence the result is not an exposure-counting artifact.
+
+**Terminal classification: `REBONDING_STEEPENS_LOCAL_RESPONSE`**
+(`artifacts/crack_rebonding_slope_exposure_continuation/
+slope_exposure_continuation_decision.json`). Corrected physical reading
+(a units error in the first draft is fixed -- `10^0.125=1.334` is the
+waiting-time multiplier, not a rate-reduction fraction): cohesive
+shielding reduces the local rate **~25%** at Kmax=15 vs **~6%** at Kmax=21
+(waiting-time increase ~33% vs ~6%) -- consistent with faster opening
+renewals at high Kmax leaving less cleavage-hazard-weighted history
+available for bond formation.
+
+**Evidence-hardening pass (per second review, analysis-only, no new
+physics):**
+- Fixed a real logic bug in `classify_slope_effect_v2`: its exposure
+  check was dead code (only evaluated inside a branch already forcing the
+  same outcome) and used the misleading binary complete-excursion count.
+  Now three genuinely independent triggers, using continuous
+  `total_negative_K_contact_time_s` -- which shows the two seeds' Kmax=21
+  exposure differs by only ~21% (1.21x), not the ~infinite ratio the 2-vs-0
+  complete-excursion count implied. `REBONDING_STEEPENS_LOCAL_RESPONSE`
+  confirmed non-tautologically.
+- Added a **late-window** (events 3-6) recomputation: `delta_m` changes
+  by <0.02 and the classification is identical to the all-event window --
+  the result is not a wake-establishment transient artifact.
+- Added a load-dependence decomposition diagnostic: action-weighted
+  `K_rebond` varies only 0-15% across the Kmax grid for both seeds,
+  consistent with the steepening being explained mainly by fixed absolute
+  shielding becoming a smaller fraction of a larger Kmax (`Pi_K` falling),
+  not a strongly load-dependent occupancy mechanism (diagnostic, not a
+  quantitative decomposition).
+- Verifier now **reruns the classifier and requires exact equality** with
+  the saved diagnostics (not membership in an allowed set), and
+  hard-checks accepted-length identity, hazard-threshold-sequence
+  identity, and bulk-action certification for **all six** zero/finite
+  pairs (60/60 checks, `overall_pass: true`).
+- Documented (not rewritten) the pre-existing, harmless `run_trajectory`
+  `"seed"` field mislabeling; fixed going forward via `hazard_rng_seed`.
+- Curvature is substantial (15->18 secant ~1.03 vs 18->21 secant ~0.24):
+  the finding is better described as strong low-K suppression that
+  weakens rapidly with Kmax than a uniform Paris-exponent shift.
+
+All 183 `crack_rebonding` tests pass.
+
+### Active processes
+
+None. All trajectories and analysis complete; no workers running.
+
+### Remaining scope (unauthorized, not attempted)
+
+This does not constitute Part X, a developed Paris-law campaign, or a
+production-line merge -- it is a 3-point/2-seed/1-regime minimal local
+slope screen only. No further seeds, additional Kmax points, frequency
+ablation, or other scope expansion were run or are proposed.

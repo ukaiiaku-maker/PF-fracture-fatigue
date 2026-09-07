@@ -133,6 +133,13 @@ def test_transactional_commit_moves_mpz_and_geometry_state_by_same_length():
     assert info["avalanche_event_advance_m"] == 3.0e-6
     assert info["stochastic_event_proposed_advance_m"] == 5.0e-6
     assert info["N_em_shed_to_wake"] == 5.0
+    audit = info["event_transaction_audit"]
+    assert audit["raw_proposed_advance_m"] == 5.0e-6
+    assert audit["event_length_random_factor"] == 1.0
+    assert audit["geometry_committed_advance_m"] == 3.0e-6
+    assert audit["mpz_translated_advance_m"] == 3.0e-6
+    assert audit["pre_geometry_commit_state"]["schema"].endswith("_v1")
+    assert audit["post_event_state"]["schema"].endswith("_v1")
     assert dummy._energy_gate_pending is None
 
 

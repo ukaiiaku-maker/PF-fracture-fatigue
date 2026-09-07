@@ -1,0 +1,164 @@
+{
+  "classification": "REBONDING_KINETICALLY_ACTIVE_BUT_MACROSCOPICALLY_SMALL",
+  "contact_semantics_label": "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT",
+  "expansion_threshold_exceeded": false,
+  "expansion_threshold_log10_decade": 0.05,
+  "gates": {
+    "gate_1_c0_c1_event_time_and_length_parity": {
+      "fields_compared": [
+        "accepted_length_m",
+        "waiting_time_s_this_event"
+      ],
+      "identical": true,
+      "mismatches": [],
+      "n_accepted_events_a": 7,
+      "n_accepted_events_b": 7,
+      "n_pairs": 7,
+      "note": "event-time-and-length parity only, not an unqualified full-state parity claim",
+      "pass": true
+    },
+    "gate_2_c5_exactly_zero_bond_formation_at_R_positive": {
+      "c4_control_also_zero_bonding": true,
+      "pass": true
+    },
+    "gate_3_dynamic_nonzero_bonding_from_event_created_patch": {
+      "c2p_dynamic": false,
+      "c2r_dynamic": false,
+      "c3p_dynamic": true,
+      "c3r_dynamic": true,
+      "pass": true
+    },
+    "gate_4_delay_in_at_least_two_compression_containing_intervals": {
+      "n_compression_containing_rows": 4,
+      "n_unique_compression_containing_intervals": 2,
+      "note": "each unique interval is evaluated once under the reversible preset and once under the persistent preset -- rows are not independent samples of distinct physical intervals",
+      "pass": true,
+      "rows": [
+        {
+          "accepted_length_m_finite": 4.9999999999999996e-06,
+          "accepted_length_m_zero": 4.9999999999999996e-06,
+          "action_weighted_K_rebond_finite_Pa_sqrt_m": 900000.0000000008,
+          "cleavage_action_finite": 1.475606015717356e-73,
+          "cleavage_action_zero": 0.17347104649539996,
+          "config_pair": "reversible",
+          "contains_complete_negative_excursion": true,
+          "creation_event_index": 0,
+          "delta_t_s": 0.00058556909828366,
+          "elapsed_cycles_zero": 5.764655351314436,
+          "expansion_threshold_exceeded": false,
+          "finite_minus_zero_cleavage_action": -0.17347104649539996,
+          "interval_group_id": "event_0_to_1",
+          "log10_ratio_abs_decade": 0.04201572831339294,
+          "max_phase_resolved_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "negative_contact_duration_s_zero": 0.0029508000760543034,
+          "next_event_index": 1,
+          "pre_event_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "pre_event_p_B_finite": 0.3573723807472884,
+          "pre_event_p_B_zero": 0.7079786947919507,
+          "t_finite_cohesion_s": 0.0063502244495980955,
+          "t_zero_cohesion_s": 0.0057646553513144355
+        },
+        {
+          "accepted_length_m_finite": 4.9999999999999996e-06,
+          "accepted_length_m_zero": 4.9999999999999996e-06,
+          "action_weighted_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "cleavage_action_finite": 3.3043631999872607e-25,
+          "cleavage_action_zero": 0.1584307998582429,
+          "config_pair": "reversible",
+          "contains_complete_negative_excursion": true,
+          "creation_event_index": 2,
+          "delta_t_s": 0.0006212007327200007,
+          "elapsed_cycles_zero": 6.312082717200262,
+          "expansion_threshold_exceeded": false,
+          "finite_minus_zero_cleavage_action": -0.1584307998582429,
+          "interval_group_id": "event_2_to_3",
+          "log10_ratio_abs_decade": 0.0407662741174032,
+          "max_phase_resolved_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "negative_contact_duration_s_zero": 0.0029500581641526535,
+          "next_event_index": 3,
+          "pre_event_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "pre_event_p_B_finite": 0.6727955076698563,
+          "pre_event_p_B_zero": 0.6912631558357359,
+          "t_finite_cohesion_s": 0.006933283449920263,
+          "t_zero_cohesion_s": 0.006312082717200262
+        },
+        {
+          "accepted_length_m_finite": 4.9999999999999996e-06,
+          "accepted_length_m_zero": 4.9999999999999996e-06,
+          "action_weighted_K_rebond_finite_Pa_sqrt_m": 900000.0000000008,
+          "cleavage_action_finite": 1.475606015717356e-73,
+          "cleavage_action_zero": 0.17347104649539996,
+          "config_pair": "persistent",
+          "contains_complete_negative_excursion": true,
+          "creation_event_index": 0,
+          "delta_t_s": 0.00058556909828366,
+          "elapsed_cycles_zero": 5.764655351314436,
+          "expansion_threshold_exceeded": false,
+          "finite_minus_zero_cleavage_action": -0.17347104649539996,
+          "interval_group_id": "event_0_to_1",
+          "log10_ratio_abs_decade": 0.04201572831339294,
+          "max_phase_resolved_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "negative_contact_duration_s_zero": 0.0029508000760543034,
+          "next_event_index": 1,
+          "pre_event_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "pre_event_p_B_finite": 0.9731595715338839,
+          "pre_event_p_B_zero": 0.997047228558997,
+          "t_finite_cohesion_s": 0.0063502244495980955,
+          "t_zero_cohesion_s": 0.0057646553513144355
+        },
+        {
+          "accepted_length_m_finite": 4.9999999999999996e-06,
+          "accepted_length_m_zero": 4.9999999999999996e-06,
+          "action_weighted_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "cleavage_action_finite": 1.9565950303215094e-42,
+          "cleavage_action_zero": 0.1584307998582429,
+          "config_pair": "persistent",
+          "contains_complete_negative_excursion": true,
+          "creation_event_index": 2,
+          "delta_t_s": 0.0006212592600095025,
+          "elapsed_cycles_zero": 6.312082717200262,
+          "expansion_threshold_exceeded": false,
+          "finite_minus_zero_cleavage_action": -0.1584307998582429,
+          "interval_group_id": "event_2_to_3",
+          "log10_ratio_abs_decade": 0.040769940197374135,
+          "max_phase_resolved_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "negative_contact_duration_s_zero": 0.0029500581641526535,
+          "next_event_index": 3,
+          "pre_event_K_rebond_finite_Pa_sqrt_m": 900000.0,
+          "pre_event_p_B_finite": 0.9999952220964244,
+          "pre_event_p_B_zero": 0.9999830799262447,
+          "t_finite_cohesion_s": 0.0069333419772097645,
+          "t_zero_cohesion_s": 0.006312082717200262
+        }
+      ],
+      "unique_interval_ids": [
+        "event_0_to_1",
+        "event_2_to_3"
+      ]
+    },
+    "gate_5_periodic_orbit_or_explicit_actions_only": {
+      "c0": true,
+      "c1": true,
+      "c2p": true,
+      "c2r": true,
+      "c3p": true,
+      "c3r": true,
+      "c4": true,
+      "c5": true,
+      "pass": true
+    },
+    "gate_6_contact_semantics_label": {
+      "contact_semantics_label": "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT",
+      "pass": true
+    },
+    "gate_7_no_paris_slope_inference": {
+      "note": "single Kmax (18 MPa*sqrt(m)) pilot only; multi-K matrix not launched",
+      "pass": true
+    }
+  },
+  "max_log10_ratio_abs_decade_in_compression_containing_intervals": 0.04201572831339294,
+  "multi_K_paris_slope_campaign_authorized": false,
+  "overall_gate_pass": true,
+  "schema": "v10.2.30_crack_rebonding_causal_pilot_v2_causal_decision_v1",
+  "source_ledger_sha256_note": "see file_hashes.json for event_ledger.json's hash"
+}

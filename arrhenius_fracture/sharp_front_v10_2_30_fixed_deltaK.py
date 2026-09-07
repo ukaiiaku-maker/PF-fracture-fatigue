@@ -161,8 +161,8 @@ def main(argv=None):
     )
 
     R = float(_legacy_fixed._option_value(args, "--R", "0.1") or 0.1)
-    if not 0.0 <= R < 1.0:
-        raise SystemExit("v10.2.30 fixed-DeltaK mode requires 0 <= R < 1")
+    if not -1.0 <= R < 1.0:
+        raise SystemExit("v10.2.30 reversible fixed-DeltaK mode requires -1 <= R < 1")
     target_Kmax = target_deltaK / (1.0 - R)
     print(
         "  v10.2.30 persistent-site fixed-DeltaK energy-gated fatigue: "
@@ -170,7 +170,9 @@ def main(argv=None):
         f"Kmax={target_Kmax:g} MPa*sqrt(m) R={R:g}"
     )
 
-    with install_fixed_deltaK_waveform(target_deltaK):
+    with install_fixed_deltaK_waveform(
+        target_deltaK, allow_negative_R=True
+    ):
         fixed_factory = fatigue_v1.FatigueWaveform
 
         def capture_probe(*factory_args, **factory_kwargs):
@@ -179,6 +181,8 @@ def main(argv=None):
             )
             set_latest_probe_K(incoming)
             return fixed_factory(*factory_args, **factory_kwargs)
+
+        capture_probe._prescribed_fixed_deltaK_control = True
 
         fatigue_v1.FatigueWaveform = capture_probe
         try:

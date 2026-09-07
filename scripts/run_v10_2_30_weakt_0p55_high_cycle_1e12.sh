@@ -33,21 +33,51 @@ FAMILY_JSON=${FAMILY_JSON:-$ROOT/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77
 PARAMETER_OPTION=${PARAMETER_OPTION:-v913_paper_weakT01_0129902_persistent_sites}
 DELTA_K_MPA_SQRT_M=${DELTA_K_MPA_SQRT_M:-6.9866145600638339}
 HAZARD_SEED=${HAZARD_SEED:-2001726}
+R_RATIO=${R_RATIO:-0.1}
+TEMPERATURE_K=${TEMPERATURE_K:-300}
+FREQUENCY_HZ=${FREQUENCY_HZ:-1000}
 CYCLES_MAX=${CYCLES_MAX:-1e12}
 TARGET_EXT_UM=${TARGET_EXT_UM:-25}
 STEPS=${STEPS:-20000}
 MAX_WALL_SECONDS=${MAX_WALL_SECONDS:-7200}
+V10230_ENTRY_MODULE=${V10230_ENTRY_MODULE:-arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK}
 OUTROOT=${OUTROOT:-$ROOT/runs/v10_2_30_weakt_0p55_high_cycle_1e12_$(date +%Y%m%d_%H%M%S)}
+
+if ! "$PYTHON_BIN" - "$TEMPERATURE_K" "$FREQUENCY_HZ" <<'PY'
+import math
+import sys
+
+temperature, frequency = map(float, sys.argv[1:])
+if not math.isfinite(temperature) or temperature <= 0.0 or temperature != round(temperature):
+    raise SystemExit(1)
+if not math.isfinite(frequency) or frequency <= 0.0:
+    raise SystemExit(1)
+PY
+then
+  echo "ERROR: TEMPERATURE_K must be a positive integer and FREQUENCY_HZ must be finite and positive" >&2
+  exit 2
+fi
 
 [[ -s "$FAMILY_JSON" ]] || {
   echo "ERROR: missing FAMILY_JSON=$FAMILY_JSON" >&2
   exit 2
 }
-if [[ -e "$OUTROOT" ]]; then
-  echo "ERROR: output already exists: $OUTROOT" >&2
-  exit 2
+if [[ -n "${V10230_RESTART_CHECKPOINT_DIR:-}" ]]; then
+  [[ -d "$OUTROOT" ]] || {
+    echo "ERROR: restart output does not exist: $OUTROOT" >&2
+    exit 2
+  }
+  [[ "$V10230_RESTART_CHECKPOINT_DIR" == "$OUTROOT" ]] || {
+    echo "ERROR: restart checkpoint must equal OUTROOT" >&2
+    exit 2
+  }
+else
+  if [[ -e "$OUTROOT" ]]; then
+    echo "ERROR: output already exists: $OUTROOT" >&2
+    exit 2
+  fi
+  mkdir -p "$OUTROOT"
 fi
-mkdir -p "$OUTROOT"
 
 unset V10230_ACTIVE_STATE_BLOCK_CONTROL || true
 unset V10230_FEEDBACK_STATE_BLOCK_CONTROL || true
@@ -178,9 +208,9 @@ TIMEOUT_MARKER="$OUTROOT/watchdog_timeout.txt"
 START=$(date +%s)
 
 set +e
-"$PYTHON_BIN" -u -m arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK \
+"$PYTHON_BIN" -u -m "$V10230_ENTRY_MODULE" \
   --signed-kernel-family "$FAMILY_JSON" \
-  --mode 2d --temperatures 300 \
+  --mode 2d --temperatures "$TEMPERATURE_K" \
   --nx 36 --ny 72 --dt 8.4 --n-stagger 2 \
   --tip-h-fine 1e-6 --tip-ratio 1.20 \
   --da-phys 5e-6 --target-crack-extension-um "$TARGET_EXT_UM" \
@@ -194,7 +224,7 @@ set +e
   --crystal-aniso --crystal-compete --crystal-theta-deg 30 \
   --crystal-material w --j-decomposition cluster \
   --max-fronts 1 --crack-backend sharp_wake --dU 2e-7 \
-  --fatigue-cycles --fatigue-hold-load --R 0.1 --frequency-Hz 1000 \
+  --fatigue-cycles --fatigue-hold-load --R "$R_RATIO" --frequency-Hz "$FREQUENCY_HZ" \
   --cycle-block-mode hazard_limited --min-block-cycles 1e-6 \
   --target-dB 0.10 \
   --target-dN-store 0.10 --target-dN-emit 0.10 \

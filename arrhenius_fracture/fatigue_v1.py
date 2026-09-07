@@ -37,7 +37,7 @@ can be deposited into spatial fields later.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, asdict, field, replace as _dc_replace
 from typing import Dict, Iterable, List, Optional, Tuple
 import csv
 import json
@@ -193,12 +193,32 @@ class FatigueWaveform:
     Kmax is in Pa*sqrt(m).  R=Kmin/Kmax.  The default clips negative K_eff to
     zero, which is a simple first-pass closure/contact proxy.  More detailed
     closure should be a later addition.
+
+    ``minimum_load_hold_s`` (v10.2.30 Part X, default 0.0 -- exact prior
+    behavior) appends a constant-Kmin dwell segment after the sinusoidal
+    traverse: one complete fatigue cycle is one sinusoidal traverse of
+    duration ``base_period_s`` plus one dwell of duration
+    ``minimum_load_hold_s``. This is a whole-loading-protocol property, not a
+    crack-rebonding-specific one, so it lives on the waveform itself:
+    ``period_s`` -- read by essentially every cycle/block-duration call site
+    across the engine hierarchy as "seconds per cycle" -- is redefined here,
+    ONCE, to mean the complete protocol-cycle period. Every existing call
+    site that already treats ``period_s`` as the whole cycle's duration
+    therefore becomes hold-aware automatically, with no per-site edits.
+    ``frequency_Hz`` remains the archived nominal SINUSOIDAL TRAVERSE
+    frequency (unchanged meaning); ``effective_cycle_frequency_Hz`` is the
+    new, separate, whole-protocol-cycle rate. Only genuinely phase-resolved
+    sub-cycle machinery (crack-rebonding kinetics, the coupled-hazard
+    quadrature's cycle-mean statistics) needs the explicit heterogeneous
+    ``cycle_schedule`` below, since those iterate over the shape *within*
+    one cycle rather than merely counting whole cycles.
     """
 
     Kmax: float
     R: float = 0.1
     frequency_Hz: float = 1000.0
     closure_clip: bool = True
+    minimum_load_hold_s: float = 0.0
 
     def K_phase(self, phase: np.ndarray) -> np.ndarray:
         Kmin = self.R * self.Kmax
@@ -211,12 +231,159 @@ class FatigueWaveform:
         return K
 
     @property
-    def period_s(self) -> float:
+    def base_period_s(self) -> float:
+        """Duration of the sinusoidal traverse alone (``1/frequency_Hz``)."""
         return 1.0 / max(float(self.frequency_Hz), 1.0e-300)
+
+    @property
+    def period_s(self) -> float:
+        """Complete protocol-cycle duration: sinusoidal traverse + dwell."""
+        return self.base_period_s + max(float(self.minimum_load_hold_s), 0.0)
+
+    @property
+    def effective_cycle_frequency_Hz(self) -> float:
+        """1/period_s -- the whole-protocol-cycle rate, distinct from the
+        archived nominal sinusoidal ``frequency_Hz``.
+
+        hold=0 returns ``frequency_Hz`` itself (the exact stored float),
+        not ``1.0/(1.0/frequency_Hz)`` -- mathematically identical but not
+        guaranteed bit-identical after a reciprocal round-trip -- so every
+        call site that switches from ``frequency_Hz`` to this property for
+        Part X's dwell support (seconds-consumed -> cycles-consumed
+        conversions) remains exactly bit-identical when the hold is zero.
+        """
+        if float(self.minimum_load_hold_s) <= 0.0:
+            return float(self.frequency_Hz)
+        return 1.0 / max(self.period_s, 1.0e-300)
 
     @property
     def DeltaK(self) -> float:
         return self.Kmax - self.R * self.Kmax
+
+    def cycle_schedule(
+        self, n_phase: int, *, signed: bool = False, phase_offset_rad: float = 0.0
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """The one authoritative piecewise cycle schedule: ``n_phase``
+        equal-duration sinusoidal bins (each ``base_period_s/n_phase``)
+        followed, when ``minimum_load_hold_s > 0``, by exactly one appended
+        constant-``Kmin`` dwell bin of duration ``minimum_load_hold_s``.
+
+        Returns ``(K_values, dt_values)``, both length ``n_phase`` when the
+        hold is zero (bit-identical to the pre-Part-X uniform-``dt_phase``
+        convention: ``K_values = K_phase(phases)``,
+        ``dt_values[i] = base_period_s/n_phase`` for every ``i``) and length
+        ``n_phase + 1`` otherwise. ``signed=True`` uses the unclipped signed
+        K (``closure_clip=False``), matching the existing rebonding/static-
+        shield convention of sampling the wake's own signed view of the
+        waveform separately from the opening-clipped array that drives
+        cleavage/emission.
+
+        The dwell entry's K is exactly ``Kmin = R*Kmax`` -- the same signed
+        value whether or not ``signed`` is requested, since a constant
+        segment has no phase-shape to clip differently; callers that need
+        the opening-clipped (cleavage/emission) view of the dwell must
+        apply the same ``max(K, 0)`` clipping they already apply everywhere
+        else on this array's entries, exactly as they do for the sinusoidal
+        entries.
+        """
+        n = max(int(n_phase), 1)
+        phase = (np.arange(n, dtype=float) + 0.5) * (2.0 * np.pi / n)
+        source = _dc_replace(self, closure_clip=not signed)
+        K_values = source.K_phase(phase + float(phase_offset_rad))
+        dt_phase = self.base_period_s / n
+        dt_values = np.full(n, dt_phase, dtype=float)
+        hold_s = max(float(self.minimum_load_hold_s), 0.0)
+        if hold_s > 0.0:
+            # The dwell has no phase angle of its own to rotate -- it is a
+            # separate constant segment, always immediately following the
+            # sinusoidal traverse in this fixed n_phase(+1)-bin cycle,
+            # regardless of the chronological phase offset applied to the
+            # sinusoidal content above.
+            Kmin = float(self.R) * float(self.Kmax)
+            Kmin_entry = max(Kmin, 0.0) if not signed else Kmin
+            K_values = np.concatenate([K_values, [Kmin_entry]])
+            dt_values = np.concatenate([dt_values, [hold_s]])
+        return K_values, dt_values
+
+    def cycle_schedule_from_elapsed(
+        self, n_phase: int, elapsed_time_s: float, *, signed: bool = False
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """PX2.5 correctness fix: rotate the cycle schedule so bin 0 of the
+        returned arrays represents "right now" -- wherever the wake's
+        continuous elapsed-time clock (mod ``period_s``) currently sits,
+        whether that is partway through a sinusoidal bin OR partway
+        through the dwell.
+
+        The pre-fix code (``chronological_phase_offset_rad(elapsed_time_s,
+        period_s)`` feeding ``cycle_schedule(..., phase_offset_rad=...)``)
+        maps ``elapsed_time_s`` onto a single angle assuming the WHOLE
+        period is one sinusoidal rotation. That is exactly right when
+        ``minimum_load_hold_s == 0`` (``period_s == base_period_s``), but
+        once the hold is active it silently applies a spurious rotation to
+        the sinusoidal bins whenever the cursor is actually sitting inside
+        the dwell -- e.g. a cursor 30% into a 0.5 ms hold (elapsed_time_s
+        = base_period_s + 0.15 ms) produced a ~276-degree sinusoidal
+        rotation with no physical meaning, silently corrupting every
+        multi-block dwell trajectory's next-block K-schedule. Verified
+        directly: at Kmax=18 MPa sqrt(m), R=-0.5, hold=0.5 ms, this bug
+        substituted K(phase=0)=17.74 MPa sqrt(m) with a spurious
+        K=8.50 MPa sqrt(m) for the immediately-following segment.
+
+        This function instead finds which bin of the UNROTATED schedule
+        (``cycle_schedule`` with no offset) contains the cursor and how
+        much of that bin remains, then returns the schedule reordered to
+        start there: bin 0 is the remaining duration of the cursor's own
+        bin, followed by every subsequent bin in its ordinary order
+        (wrapping around), with the already-consumed portion of the
+        cursor's own bin appended as the final (generally partial) entry
+        -- so the returned schedule still sums to exactly one full period,
+        preserving cycle-mean-statistics correctness, while bin 0 always
+        represents the exact remaining time in whichever segment (sinusoid
+        or dwell) the cursor is actually in.
+
+        hold=0 identity: when ``minimum_load_hold_s == 0`` this dispatches
+        to the byte-for-byte original ``phase_offset_rad`` rotation
+        instead (mathematically DIFFERENT discretizations in general --
+        angle-rotation of a uniform grid versus bin-splitting -- so hold=0
+        must not run through the new bin-splitting logic at all).
+        """
+        n_phase = max(int(n_phase), 1)
+        if float(self.minimum_load_hold_s) <= 0.0:
+            from .crack_rebonding_v10230 import chronological_phase_offset_rad
+
+            offset = chronological_phase_offset_rad(elapsed_time_s, self.period_s)
+            return self.cycle_schedule(n_phase, signed=signed, phase_offset_rad=offset)
+
+        K_full, dt_full = self.cycle_schedule(n_phase, signed=signed)
+        n_total = len(dt_full)
+        total_period = float(dt_full.sum())
+        t = float(elapsed_time_s) % total_period if total_period > 0.0 else 0.0
+
+        cursor = 0.0
+        start_idx = n_total - 1
+        remaining_in_bin = float(dt_full[-1])
+        for i in range(n_total):
+            if t < cursor + dt_full[i] - 1.0e-12 or i == n_total - 1:
+                start_idx = i
+                remaining_in_bin = max((cursor + dt_full[i]) - t, 0.0)
+                break
+            cursor += dt_full[i]
+
+        order_idx = [start_idx]
+        order_dt = [remaining_in_bin]
+        idx = (start_idx + 1) % n_total
+        while idx != start_idx:
+            order_idx.append(idx)
+            order_dt.append(float(dt_full[idx]))
+            idx = (idx + 1) % n_total
+        consumed_in_start_bin = float(dt_full[start_idx]) - remaining_in_bin
+        if consumed_in_start_bin > 1.0e-15:
+            order_idx.append(start_idx)
+            order_dt.append(consumed_in_start_bin)
+
+        K_rot = np.asarray([K_full[i] for i in order_idx], dtype=float)
+        dt_rot = np.asarray(order_dt, dtype=float)
+        return K_rot, dt_rot
 
 
 @dataclass

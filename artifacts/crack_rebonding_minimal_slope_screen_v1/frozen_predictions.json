@@ -1,0 +1,90 @@
+{
+  "config_hashes_reused_verbatim": {
+    "RB2_persistent_finite": "c89787a35fc92ab605125bdc13cc1fb2699f886efaee1735357fc9fdbd414605",
+    "RB2_reversible_finite": "271f45981545cf80d9d96c14138d9d9c6235b3f1bba20635d8e993e568d76fd2"
+  },
+  "kmax_grid_Pa_sqrt_m": [
+    15000000.0,
+    18000000.0,
+    21000000.0
+  ],
+  "material": {
+    "Eprime_Pa": 444444444444.44446,
+    "reference_contact_radius_m": 1e-06
+  },
+  "note": "no barrier re-inversion, no activation-volume search, no Pi_K rescaling at the new loads -- every kinetics/cohesion parameter is held fixed at its Kmax=18 calibrated value; Pi_K = K_rebond_max/Kmax varies naturally with Kmax",
+  "parent_frozen_configuration_sha256": "afaaaa4ce2c9b69cfe65bfdc0887f1df19134d3a435bc7bb79affebcfe3113b0",
+  "predictions": {
+    "persistent": [
+      {
+        "A_off": 0.10000000000003184,
+        "A_on": 9.352429006492397,
+        "K_rebond_max_Pa_sqrt_m": 900000.0,
+        "K_rebond_predicted_Pa_sqrt_m": 814346.9525829115,
+        "Kmax_Pa_sqrt_m": 15000000.0,
+        "P_survive": 0.9047589193761747,
+        "Pi_K_at_this_load": 0.06,
+        "S_h_pred_note": "S_h_pred is not defined from single-patch A_on/A_off alone (S_h is a population/rate-ratio quantity from the real engine's cleavage hazard, not the single-patch bonded-fraction model); p_B_star and K_rebond_predicted are the frozen prospective diagnostics for this model",
+        "p_B_star": 0.9048299473143461
+      },
+      {
+        "A_off": 0.10000000000003184,
+        "A_on": 9.999999999998384,
+        "K_rebond_max_Pa_sqrt_m": 900000.0,
+        "K_rebond_predicted_Pa_sqrt_m": 814350.1577749139,
+        "Kmax_Pa_sqrt_m": 18000000.0,
+        "P_survive": 0.9047963384807054,
+        "Pi_K_at_this_load": 0.05,
+        "S_h_pred_note": "S_h_pred is not defined from single-patch A_on/A_off alone (S_h is a population/rate-ratio quantity from the real engine's cleavage hazard, not the single-patch bonded-fraction model); p_B_star and K_rebond_predicted are the frozen prospective diagnostics for this model",
+        "p_B_star": 0.9048335086387933
+      },
+      {
+        "A_off": 0.10000000000003184,
+        "A_on": 10.416549128843544,
+        "K_rebond_max_Pa_sqrt_m": 900000.0,
+        "K_rebond_predicted_Pa_sqrt_m": 814351.3564820685,
+        "Kmax_Pa_sqrt_m": 21000000.0,
+        "P_survive": 0.9048103335407902,
+        "Pi_K_at_this_load": 0.04285714285714286,
+        "S_h_pred_note": "S_h_pred is not defined from single-patch A_on/A_off alone (S_h is a population/rate-ratio quantity from the real engine's cleavage hazard, not the single-patch bonded-fraction model); p_B_star and K_rebond_predicted are the frozen prospective diagnostics for this model",
+        "p_B_star": 0.9048348405356317
+      }
+    ],
+    "reversible": [
+      {
+        "A_off": 0.9999999999992888,
+        "A_on": 0.9352429002561812,
+        "K_rebond_max_Pa_sqrt_m": 900000.0,
+        "K_rebond_predicted_Pa_sqrt_m": 235084.94997168693,
+        "Kmax_Pa_sqrt_m": 15000000.0,
+        "P_survive": 0.22349024877974571,
+        "Pi_K_at_this_load": 0.06,
+        "S_h_pred_note": "S_h_pred is not defined from single-patch A_on/A_off alone (S_h is a population/rate-ratio quantity from the real engine's cleavage hazard, not the single-patch bonded-fraction model); p_B_star and K_rebond_predicted are the frozen prospective diagnostics for this model",
+        "p_B_star": 0.26120549996854103
+      },
+      {
+        "A_off": 0.9999999999992888,
+        "A_on": 0.9999999995795651,
+        "K_rebond_max_Pa_sqrt_m": 900000.0,
+        "K_rebond_predicted_Pa_sqrt_m": 242047.27918989782,
+        "Kmax_Pa_sqrt_m": 18000000.0,
+        "P_survive": 0.23254415787809532,
+        "Pi_K_at_this_load": 0.05,
+        "S_h_pred_note": "S_h_pred is not defined from single-patch A_on/A_off alone (S_h is a population/rate-ratio quantity from the real engine's cleavage hazard, not the single-patch bonded-fraction model); p_B_star and K_rebond_predicted are the frozen prospective diagnostics for this model",
+        "p_B_star": 0.2689414213221087
+      },
+      {
+        "A_off": 0.9999999999992888,
+        "A_on": 1.0416549124465753,
+        "K_rebond_max_Pa_sqrt_m": 900000.0,
+        "K_rebond_predicted_Pa_sqrt_m": 246222.17711978024,
+        "Kmax_Pa_sqrt_m": 21000000.0,
+        "P_survive": 0.2380657384663088,
+        "Pi_K_at_this_load": 0.04285714285714286,
+        "S_h_pred_note": "S_h_pred is not defined from single-patch A_on/A_off alone (S_h is a population/rate-ratio quantity from the real engine's cleavage hazard, not the single-patch bonded-fraction model); p_B_star and K_rebond_predicted are the frozen prospective diagnostics for this model",
+        "p_B_star": 0.2735801967997558
+      }
+    ]
+  },
+  "schema": "v10.2.30_crack_rebonding_minimal_slope_screen_frozen_predictions_v1"
+}
