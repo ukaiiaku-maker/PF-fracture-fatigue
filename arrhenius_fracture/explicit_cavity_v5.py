@@ -507,6 +507,8 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
           "solid_domain_outward_into_cavity_normal":tuple(map(float,-normal)),
           "center_radial_consistency":geometry["center_radial_consistency"],
           "adjacent_solid_element_count":len(owners),"adjacent_element_id":int(ei),"edge_length_m":length,
+          "adjacent_element_stress_tensor_Pa":tuple(map(tuple,S)),
+          "first_layer_normal_spacing_m":float(max((mesh.nodes[next(int(v) for v in mesh.elems[ei] if int(v) not in (int(a),int(b)))]-midpoint)@normal,0.0)),
           "traction_Pa":tuple(map(float,traction)),"normal_traction_Pa":normal_component,
           "tangential_traction_Pa":tangential_component})
         hoop.append(float(tangent@S@tangent)); weighted.append(length)
