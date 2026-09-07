@@ -8,35 +8,44 @@ Engine.configure_hazard(seed=...) + Engine.reset_audit() on the actual
 leaf production class, called here before any construction, give exact
 reproducibility regardless of arbitrary prior process history.
 
-Two independent budgets, selected by --preflight:
+Three independent budgets:
 
 - ``--preflight``: a bounded handful of blocks (PREFLIGHT_MAX_BLOCKS),
   unconditionally recorded and total-block-counted, sufficient to qualify
   the controller's process-per-job/quarantine/registry machinery end to
   end (PX2.5). Never a physical datum. This code path and its result
-  schema are UNCHANGED from PX2.5 -- do not couple it to the real screen
+  schema are UNCHANGED from PX2.5 -- do not couple it to either real
   budget below.
 
-- real budget (this flag absent): the PX3 screen budget from mission
+- real PX3 screen budget (protocol does not start with "D"): mission
   section 7's common screen settings -- 12 accepted events or 60 um,
-  whichever comes first, driven by the same qualified, PX2.5-extended
+  whichever comes first.
+
+- real PX4 developed budget (protocol starts with "D", e.g. "D1",
+  "D6_conditional_persistent"): mission section 8's trajectory budget --
+  30 accepted events, 150 um, or 1e12 cycles, whichever comes first (the
+  cycle cap is a PX4-only extension, added to run_trajectory as max_
+  cumulative_cycles -- PX3's screen never needed it since its 12-event/
+  60um limits were always reached first).
+
+  Both real budgets are driven by the SAME qualified, PX2.5/PX3.6-extended
   event loop the crack-rebonding causal pilot v2 uses
   (``crack_rebonding_causal_pilot_v2_v10230.run_trajectory``), never a
-  second reimplementation of event acceptance/extension bookkeeping.
-  Only ``engine.cycle_step_waveform``/``commit_energy_gated_event`` are
-  ever called (never the mesh-dependent ``--fatigue-cycles`` CLI
-  backend's accelerated/DMD swap), so this is unconditionally
-  V10230_FATIGUE_INTEGRATOR_MODE=explicit by construction -- DMD/
-  Poincare/projective acceleration is simply never reachable from this
-  code path. This branch additionally resolves each job's
-  ``chemistry_factor`` and ``K_rebond_max_target_Pa_sqrt_m`` screen-panel
-  overrides against the row's frozen base config (PX2's kinetic_regime_
-  registry.json only records each ROW's baseline config; sections 7.5/7.6
-  vary chemistry_factor/restored_work_of_separation_J_m2 per job on top of
-  that baseline -- see build_part_x_kinetic_regime_registry.py's
-  canonical_job_key/_screen_job, whose K_target->G_max mapping
-  (G = (K_target / rebond_K_geometry_factor)**2 / Eprime_Pa) is
-  reproduced here exactly).
+  second reimplementation of event acceptance/extension bookkeeping. Only
+  ``engine.cycle_step_waveform``/``commit_energy_gated_event`` are ever
+  called (never the mesh-dependent ``--fatigue-cycles`` CLI backend's
+  accelerated/DMD swap), so this is unconditionally V10230_FATIGUE_
+  INTEGRATOR_MODE=explicit by construction -- DMD/Poincare/projective
+  acceleration is simply never reachable from this code path. This branch
+  additionally resolves each job's ``chemistry_factor`` and
+  ``K_rebond_max_target_Pa_sqrt_m`` panel overrides against the row's
+  frozen base config (kinetic_regime_registry.json only records each
+  ROW's baseline config; screen sections 7.5/7.6 and every developed row
+  vary chemistry_factor/restored_work_of_separation_J_m2 per job on top
+  of that baseline -- see build_part_x_kinetic_regime_registry.py's
+  canonical_job_key/_screen_job/_developed_job_stage1, whose K_target->
+  G_max mapping (G = (K_target / rebond_K_geometry_factor)**2 /
+  Eprime_Pa) is reproduced here exactly).
 
 A real concurrency bug was caught by the controller's own preflight
 qualification (max 3 workers, run concurrently): ``a_native_engine_
@@ -69,10 +78,26 @@ sys.path.insert(0, str(REPO_ROOT))
 
 PREFLIGHT_MAX_BLOCKS = 5
 
-# Mission section 7 "Common screen settings".
+# Mission section 7 "Common screen settings" (PX3).
 SCREEN_MAX_ACCEPTED_EVENTS = 12
 SCREEN_MAX_PROJECTED_EXTENSION_m = 60.0e-6
 SCREEN_N_PHASE = 80
+
+# Mission section 8 "Trajectory budget" (PX4 developed campaign) -- a
+# materially LARGER budget than PX3's screen, including a cycle cap PX3
+# never needed (its 12-event/60um limits were always reached first).
+DEVELOPED_MAX_ACCEPTED_EVENTS = 30
+DEVELOPED_MAX_PROJECTED_EXTENSION_m = 150.0e-6
+DEVELOPED_MAX_CUMULATIVE_CYCLES = 1.0e12
+DEVELOPED_N_PHASE = 80
+
+# Screen protocols are named "7.<subsection>_..." (mission section 7);
+# developed protocols are named "D<n>[_...]" (mission section 8). This is
+# the one place that distinction is made -- everything else about running
+# a job (engine construction, rebonding-cfg resolution, the event loop
+# itself) is identical between the two budgets.
+def _is_developed_protocol(protocol: str) -> bool:
+    return protocol.startswith("D")
 SCREEN_T_K = 300.0
 
 
@@ -221,6 +246,20 @@ def main() -> int:
 
         status_path.write_text(json.dumps({"status": "PHYSICS_RUNNING"}, indent=2))
 
+        is_developed = _is_developed_protocol(job["protocol"])
+        if is_developed:
+            max_accepted_events = DEVELOPED_MAX_ACCEPTED_EVENTS
+            max_projected_extension_m = DEVELOPED_MAX_PROJECTED_EXTENSION_m
+            max_cumulative_cycles = DEVELOPED_MAX_CUMULATIVE_CYCLES
+            n_phase = DEVELOPED_N_PHASE
+            schema = "v10230_part_x_developed_job_result_v1"
+        else:
+            max_accepted_events = SCREEN_MAX_ACCEPTED_EVENTS
+            max_projected_extension_m = SCREEN_MAX_PROJECTED_EXTENSION_m
+            max_cumulative_cycles = float("inf")
+            n_phase = SCREEN_N_PHASE
+            schema = "v10230_part_x_screen_job_result_v1"
+
         trajectory = pilot.run_trajectory(
             name=job["canonical_job_key"][:16],
             build_engine=_build_engine,
@@ -231,16 +270,17 @@ def main() -> int:
             reset_engine_registry=Engine.reset_audit,
             Kmax_Pa_sqrt_m=float(job["Kmax_Pa_sqrt_m"]),
             frequency_Hz=float(job["frequency_Hz"]),
-            n_phase=SCREEN_N_PHASE,
+            n_phase=n_phase,
             T_K_=SCREEN_T_K,
-            max_accepted_events=SCREEN_MAX_ACCEPTED_EVENTS,
-            max_projected_extension_m=SCREEN_MAX_PROJECTED_EXTENSION_m,
+            max_accepted_events=max_accepted_events,
+            max_projected_extension_m=max_projected_extension_m,
+            max_cumulative_cycles=max_cumulative_cycles,
             hazard_rng_seed=seed,
             minimum_load_hold_s=float(job["minimum_load_hold_s"]),
         )
 
         result = {
-            "schema": "v10230_part_x_screen_job_result_v1",
+            "schema": schema,
             "job": job,
             "actual_config_hash": actual_config_hash,
             "Eprime_Pa": Eprime_Pa,

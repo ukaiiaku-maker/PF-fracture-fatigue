@@ -37,6 +37,7 @@ import copy
 import dataclasses
 import hashlib
 import json
+import math
 import time
 from dataclasses import asdict, replace
 from typing import Any, Callable
@@ -472,6 +473,7 @@ def run_trajectory(
     static_shield_control: dict[str, Any] | None = None,
     minimum_load_hold_s: float = 0.0,
     state_sampler: Callable[[Any, dict[str, Any]], None] | None = None,
+    max_cumulative_cycles: float = math.inf,
 ) -> dict[str, Any]:
     """Drive one fresh, unresumed trajectory in-process via the real
     A_NATIVE production engine's own cycle_step_waveform/
@@ -509,6 +511,14 @@ def run_trajectory(
     ``waveform_cls``, letting this same qualified event loop drive the
     PX3 dwell panel (mission section 7.3) without a second
     reimplementation.
+
+    ``max_cumulative_cycles`` (Part X PX4, default ``math.inf`` -- exact
+    prior behavior for every existing caller) is an additional right-censor
+    condition alongside ``max_accepted_events``/``max_projected_extension_m``,
+    needed for mission section 8's developed-campaign budget (max 30
+    accepted events, 150 um, 1e12 cycles) -- PX3's screen budget never
+    needed a cycle cap since its 12-event/60um limits were always reached
+    first.
     """
     if reset_engine_registry is not None:
         reset_engine_registry()
@@ -544,6 +554,10 @@ def run_trajectory(
             if len(events) >= max_accepted_events:
                 break
             if cumulative_extension_m >= max_projected_extension_m:
+                break
+            if cumulative_cycles >= max_cumulative_cycles:
+                censored = True
+                censor_reason = "cycle_budget_exhausted"
                 break
             if time.monotonic() - start_wall > max_wall_seconds:
                 censored = True
