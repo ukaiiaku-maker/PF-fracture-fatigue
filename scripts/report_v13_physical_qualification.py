@@ -95,6 +95,23 @@ def main():
         "## Ensemble decision", "", f"**{gate['status']}**", ""]
     lines.extend("- " + reason for reason in gate["reasons"])
     lines += ["", "A failed grid-robustness gate is not a universal no-branching theorem. A short physical ensemble is not run unless all required physical checks and a defensible nondegenerate region pass. No long field atlas is authorized.", ""]
+    lines += ["## Candidate-level evidence", "",
+        "| Case | Candidate observation | Raw arrival (s⁻¹) | Raw barrier (eV) | Pair margin (J/m) | Embryo probability range | Committed probability range |",
+        "|---|---|---:|---:|---:|---|---|"]
+    for result in summary["cases"]:
+        for observation in result.get("companions", []):
+            surface = [row for row in result.get("sensitivity_surface", [])
+                       if row["companion_id"] == observation["candidate_id"]]
+            ranges = []
+            for name in ("P_embryo", "P_committed"):
+                values = [row[name] for row in surface]
+                ranges.append(f"{min(values):.6g}–{max(values):.6g}" if values else "unevaluated")
+            raw = observation.get("raw_arrival_per_s")
+            barrier = observation.get("raw_barrier_J")
+            margin = observation.get("pair_energy_margin_J_per_m")
+            fmt = lambda value: "unevaluated" if value is None else f"{value:.8g}"
+            lines.append(f"| {result['case']} | {observation.get('reason', observation['status'])} | {fmt(raw)} | {fmt(None if barrier is None else barrier/1.602176634e-19)} | {fmt(margin)} | {ranges[0]} | {ranges[1]} |")
+    lines += ["", "The full JSON records retain candidate identities, tensor probes, process-state fingerprints, costs, exact fallback identities, and every preregistered grid point. A range spans the entire sensitivity grid and is not a fitted or calibrated uncertainty interval.", ""]
     (args.root/"V13_PHYSICAL_COMPANION_QUALIFICATION.md").write_text("\n".join(lines))
     print(gate["status"], gate["reasons"])
 
