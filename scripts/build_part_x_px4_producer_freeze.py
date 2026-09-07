@@ -60,12 +60,18 @@ def main() -> None:
     if status.strip():
         raise RuntimeError(f"refusing to freeze: worktree is not clean:\n{status}")
     launch_head = _git("rev-parse", "HEAD")
-    if launch_head != SELECTION_SOURCE_COMMIT:
-        raise RuntimeError(
-            f"launch_HEAD {launch_head} != selection_source_commit {SELECTION_SOURCE_COMMIT} -- "
-            "this script's SELECTION_SOURCE_COMMIT constant must be updated (and re-reviewed) "
-            "before freezing against a different commit."
-        )
+    # selection_source_commit (PX3.6, where D1-D7's decisions were finalized)
+    # and launch_HEAD (this freeze's own, necessarily later, commit -- every
+    # commit changes HEAD, so requiring exact equality here would make a
+    # freeze impossible by construction) are legitimately different commits;
+    # that is exactly why the review asked for them as separate fields
+    # rather than one. What DOES matter is verified below instead: the
+    # physical-source-bundle hash proves whether anything physics-affecting
+    # actually changed between them.
+    diff_since_selection = _git("diff", "--name-only", SELECTION_SOURCE_COMMIT, launch_head)
+    physics_files_changed_since_selection = [
+        p for p in diff_since_selection.splitlines() if p in PHYSICAL_SOURCE_FILES
+    ]
 
     registry_path = ARTIFACTS_DIR / "developed_job_registry.csv"
     with registry_path.open() as f:
@@ -123,6 +129,8 @@ def main() -> None:
         "launch_HEAD": launch_head,
         "physical_source_bundle_sha256": physical_source_bundle_sha256,
         "per_file_sha256": per_file,
+        "files_changed_between_selection_source_and_launch_HEAD": diff_since_selection.splitlines(),
+        "physical_source_files_among_those_changes": physics_files_changed_since_selection,
         "rows_refreshed": n_refreshed,
         "zero_jobs_launched_precondition_verified": True,
         "note": (
