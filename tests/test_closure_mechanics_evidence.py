@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 from arrhenius_fracture.closure_mechanics_evidence import REGISTRY, GROUPS, MESHES, measurements
 from arrhenius_fracture.closure_static_evidence import configuration, validate_solver_capture
@@ -43,3 +44,4 @@ def test_matched_crack_only_capture_reassembles_and_has_no_invented_cavity_metri
     assert m["cavity_fields"] is None
     assert m["free_residual_relative"] < 1e-8
     assert m["energy_identity"] < .01
+    assert json.loads(json.dumps(m, allow_nan=False)) == m

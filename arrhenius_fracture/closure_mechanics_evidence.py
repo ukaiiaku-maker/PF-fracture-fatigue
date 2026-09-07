@@ -1,5 +1,6 @@
 """Frozen unique complete-static matrix and directly recomputed predicates."""
 import math
+from dataclasses import asdict, is_dataclass
 import numpy as np
 
 from .closure_static_evidence import (
@@ -12,6 +13,17 @@ SCHEMA = "v12.voiding-v5-closure-mechanics/1"
 MESHES = ((128, 48), (256, 96))
 REGISTRY = {}
 GROUPS = {}
+
+
+def canonical_data(value):
+    if is_dataclass(value): return canonical_data(asdict(value))
+    if isinstance(value, np.ndarray): return canonical_data(value.tolist())
+    if isinstance(value, np.generic): return canonical_data(value.item())
+    if isinstance(value, float) and not math.isfinite(value):
+        return "infinity" if value > 0 else "-infinity" if value < 0 else "NaN"
+    if isinstance(value, dict): return {str(k): canonical_data(v) for k,v in value.items()}
+    if isinstance(value, (tuple,list)): return [canonical_data(v) for v in value]
+    return value
 
 
 def register(label, cfg):
@@ -91,7 +103,7 @@ def measurements(raw, cfg):
         perimeter = float(np.linalg.norm(nodes-np.roll(nodes,-1,axis=0), axis=1).sum())
         result.update(cavity_area_relative=abs(polygon_area-math.pi*cfg["cavity_radius_m"]**2)/(math.pi*cfg["cavity_radius_m"]**2),
                       cavity_perimeter_relative=abs(perimeter-2*math.pi*cfg["cavity_radius_m"])/(2*math.pi*cfg["cavity_radius_m"]))
-    return result
+    return canonical_data(result)
 
 
 def predicates(bases):
