@@ -2,7 +2,8 @@ import pytest
 from copy import deepcopy
 
 from arrhenius_fracture.finalization_v3_closure_schema import (
-    CONTROLLED_TRACE_TOKENS, PARTITIONS, PHYSICAL_INPUT_FIELDS, TRANSITION_TRACE_TOKENS,
+    CONTROLLED_TERMINAL_CLASSIFICATIONS, CONTROLLED_TRACE_TOKENS, PARTITIONS,
+    PHYSICAL_INPUT_FIELDS, TRANSITION_TRACE_TOKENS,
     expected_registry_keys, validate_closure_evidence,
 )
 from arrhenius_fracture.finalization_v3_schema import FROZEN_CASE_REGISTRY, canonical_hash
@@ -57,6 +58,10 @@ def complete_rows():
                 value["input_hash"] = canonical_hash(value["input_configuration"])
             else:
                 value["actual_operation_trace"] = list(CONTROLLED_TRACE_TOKENS[case]) + [case]
+                terminal = CONTROLLED_TERMINAL_CLASSIFICATIONS[case][0]
+                value["input_configuration"]["expected_terminal_classification"] = terminal
+                value["observed_terminal_classification"] = terminal
+                value["input_hash"] = canonical_hash(value["input_configuration"])
             rows.append(value)
     return rows
 
@@ -116,4 +121,27 @@ def test_missing_required_remesh_and_terminal_mismatch_are_rejected():
     promotion["actual_operation_trace"].remove("remesh")
     promotion["observed_terminal_classification"] = "wrong"
     with pytest.raises(ValueError, match="operation_trace"):
+        validate_closure_evidence(rows, sources_for(rows), executed_code_sha="1" * 40)
+
+
+def test_reversed_and_duplicated_required_operations_are_rejected():
+    rows = complete_rows(); promotion = next(item for item in rows
+        if item["input_configuration"]["case_identity"] == "promotion")
+    promotion["actual_operation_trace"] = list(reversed(promotion["actual_operation_trace"]))
+    with pytest.raises(ValueError, match="operation_trace"):
+        validate_closure_evidence(rows, sources_for(rows), executed_code_sha="1" * 40)
+    rows = complete_rows(); promotion = next(item for item in rows
+        if item["input_configuration"]["case_identity"] == "promotion")
+    promotion["actual_operation_trace"].insert(1, "remesh")
+    with pytest.raises(ValueError, match="operation_trace"):
+        validate_closure_evidence(rows, sources_for(rows), executed_code_sha="1" * 40)
+
+
+def test_runner_authored_but_unfrozen_terminal_is_rejected():
+    rows = complete_rows(); centered = next(item for item in rows
+        if item["input_configuration"]["case_identity"] == "centered")
+    centered["input_configuration"]["expected_terminal_classification"] = "OPPORTUNISTIC_PASS"
+    centered["observed_terminal_classification"] = "OPPORTUNISTIC_PASS"
+    centered["input_hash"] = canonical_hash(centered["input_configuration"])
+    with pytest.raises(ValueError, match="frozen_terminal_classification"):
         validate_closure_evidence(rows, sources_for(rows), executed_code_sha="1" * 40)

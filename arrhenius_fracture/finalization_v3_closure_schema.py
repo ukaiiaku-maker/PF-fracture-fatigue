@@ -41,6 +41,28 @@ CONTROLLED_TRACE_TOKENS = {
     "fixed_mesh_oblique": ("ligament", "downstream_child", "child_continuation"),
     "local_remesh_refinement": ("remesh", "field_projection", "equilibrium"),
 }
+CONTROLLED_TERMINAL_CLASSIFICATIONS = {
+    "centered": ("COMPLETED_ONE_VOID_SEQUENCE",),
+    "positive_offset": ("CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE", "DOWNSTREAM_FRONT_ACTIVE"),
+    "negative_offset": ("CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE", "DOWNSTREAM_FRONT_ACTIVE"),
+    "short_ligament": ("CONNECTED_VOID", "DOWNSTREAM_FRONT_ACTIVE"),
+    "long_ligament": ("CONNECTED_VOID", "DOWNSTREAM_FRONT_ACTIVE"),
+    "diffusion_limited": ("STABLE_SUBGRID_VOID", "RESOLVED_VOID"),
+    "accommodation_limited": ("STABLE_SUBGRID_VOID", "RESOLVED_VOID"),
+    "embryo_healing": ("HEALED_SITE",),
+    "downstream_zero_drive": ("CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE",),
+    "delayed_downstream": ("DOWNSTREAM_FRONT_ACTIVE",),
+    "fixed_mesh_oblique": ("DOWNSTREAM_FRONT_CONTINUED",),
+    "local_remesh_refinement": ("REFINEMENT_COMPARISON_COMPLETE",),
+}
+
+
+def _ordered_exactly_once(trace, required):
+    positions=[]
+    for token in required:
+        if trace.count(token)!=1: return False
+        positions.append(trace.index(token))
+    return positions==sorted(positions)
 
 
 def expected_registry_keys() -> Mapping[str, set[tuple[str, int | None]]]:
@@ -93,10 +115,12 @@ def validate_closure_evidence(rows: Sequence[Mapping], source_rows: Mapping[str,
                 errors.append((case_id, "claimed_transition"))
             required = (TRANSITION_TRACE_TOKENS if dataset == "transitions" else CONTROLLED_TRACE_TOKENS).get(configuration.get("case_identity"), ())
             trace = tuple(row.get("actual_operation_trace", ()))
-            if claimed not in trace or any(token not in trace for token in required): errors.append((case_id, "operation_trace"))
+            if claimed not in trace or not _ordered_exactly_once(trace, required): errors.append((case_id, "operation_trace"))
         observed_terminal = row.get("observed_terminal_classification")
         if observed_terminal != configuration.get("expected_terminal_classification"):
             errors.append((case_id, "terminal_classification"))
+        if dataset == "controlled" and observed_terminal not in CONTROLLED_TERMINAL_CLASSIFICATIONS.get(configuration.get("case_identity"), ()):
+            errors.append((case_id, "frozen_terminal_classification"))
         predicate = REGISTERED_SCIENTIFIC_PREDICATES.get(row.get("predicate_name"))
         if predicate is None or bool(predicate(row.get("predicate_inputs", {}))) != bool(row.get("predicate_result")):
             errors.append((case_id, "predicate_recomputation"))
@@ -105,8 +129,15 @@ def validate_closure_evidence(rows: Sequence[Mapping], source_rows: Mapping[str,
             bases = {row.get("shared_base_execution_id") for row in group}
             if len(bases) != 1 or None in bases or next(iter(bases)) not in executions:
                 errors.append((digest, "aliased_physical_input", [row.get("case_id") for row in group]))
-            elif any(not row.get("derived_predicate") for row in group):
-                errors.append((digest, "shared_base_not_derived"))
+            else:
+                base=executions[next(iter(bases))]
+                identity=("input_hash","actual_geometry_fingerprint","initial_fingerprint","terminal_fingerprint")
+                if base.get("derived_predicate") or any(row is not base and not row.get("derived_predicate") for row in group):
+                    errors.append((digest, "shared_base_not_derived"))
+                if any(any(row.get(key)!=base.get(key) for key in identity) or
+                       row.get("source_execution_id")!=base.get("source_execution_id") or
+                       row.get("solver_fingerprint")!=base.get("solver_fingerprint") for row in group):
+                    errors.append((digest, "shared_base_physical_identity"))
     for dataset, expected in expected_registry_keys().items():
         if observed[dataset] != expected:
             errors.append((dataset, "registry", {"missing": sorted(expected-observed[dataset]),
@@ -117,6 +148,6 @@ def validate_closure_evidence(rows: Sequence[Mapping], source_rows: Mapping[str,
     return tuple(rows)
 
 
-__all__ = ["CONTROLLED_TRACE_TOKENS", "PARTITIONS", "PHYSICAL_INPUT_FIELDS", "SCHEMA",
+__all__ = ["CONTROLLED_TERMINAL_CLASSIFICATIONS", "CONTROLLED_TRACE_TOKENS", "PARTITIONS", "PHYSICAL_INPUT_FIELDS", "SCHEMA",
            "TRANSITION_TRACE_TOKENS", "expected_registry_keys",
            "validate_closure_evidence"]
