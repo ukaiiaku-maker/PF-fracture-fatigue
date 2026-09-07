@@ -1,0 +1,19 @@
+{
+  "schema": "v13.later-parent-plan/1",
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "source_record_commit": "d10c3ebd8a3513edec5624faebdc7faf8656d106",
+  "cases": ["Peak_1000K", "weakT_1000K"],
+  "selection_basis": "same temperature and seed, contrasting material rows; first-state raw companion rates differ by approximately 3.27-fold and committed null probabilities by approximately 34.7-fold; no mark/seed tuning",
+  "start": "exact accepted first-cleavage checkpoint certified against d10c3eb",
+  "branching_enabled": false,
+  "target_forward_extension_um": 100,
+  "capture": "next accepted cleavage plus first canonical cleavage at/after 25, 50 and 100 um; final accepted checkpoint",
+  "maximum_additional_accepted_intervals": 1000,
+  "maximum_workers": 2,
+  "stop": "target, interval budget, or unchanged legitimate numerical/model-domain gate",
+  "no_automatic_retry": true,
+  "source_family": "unchanged 1600 um signed family from original parent launch",
+  "material_loading_seed_parameters": "unchanged",
+  "cooperative_pair_transition": "default-off; no kinetic parameters assigned; frozen formula only",
+  "ensemble": "not authorized until revised physical gate passes"
+}
