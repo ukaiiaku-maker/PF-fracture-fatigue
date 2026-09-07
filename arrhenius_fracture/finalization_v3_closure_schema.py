@@ -82,7 +82,7 @@ def validate_closure_evidence(rows: Sequence[Mapping], source_rows: Mapping[str,
         if rows.get("schema") in ("v12.production-source-transfer/1", "v12.production-source-transfer/2"):
             from .closure_production_evidence import validate_production
             return validate_production(rows, source_rows, executed_code_sha=executed_code_sha)
-        if rows.get("schema") in ("v12.voiding-v5-closure-actual-lifecycle/1", "v12.voiding-v5-closure-actual-lifecycle/2", "v12.voiding-v5-closure-actual-lifecycle/3"):
+        if str(rows.get("schema", "")).startswith("v12.voiding-v5-closure-actual-lifecycle/"):
             from .closure_lifecycle_evidence import validate_lifecycle
             return validate_lifecycle(rows, source_rows, executed_code_sha=executed_code_sha)
         if rows.get("schema") in ("v12.voiding-v5-closure-mechanics/1", "v12.voiding-v5-closure-mechanics/2"):

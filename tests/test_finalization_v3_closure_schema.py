@@ -9,6 +9,23 @@ from arrhenius_fracture.finalization_v3_closure_schema import (
 from arrhenius_fracture.finalization_v3_schema import FROZEN_CASE_REGISTRY, canonical_hash
 
 
+def test_current_lifecycle_schema_routes_to_strict_lifecycle_validator(monkeypatch):
+    from arrhenius_fracture import closure_lifecycle_evidence as lifecycle
+    seen=[]
+    def validate(payload,sources,*,executed_code_sha):
+        seen.append((payload,sources,executed_code_sha)); return 'lifecycle'
+    monkeypatch.setattr(lifecycle,'validate_lifecycle',validate)
+    payload={'schema':lifecycle.SCHEMA}; sources={}
+    assert validate_closure_evidence(payload,sources,executed_code_sha='1'*40)=='lifecycle'
+    assert seen==[(payload,sources,'1'*40)]
+
+
+def test_unknown_lifecycle_version_remains_rejected_by_strict_validator():
+    with pytest.raises(ValueError,match='lifecycle source/schema identity'):
+        validate_closure_evidence({'schema':'v12.voiding-v5-closure-actual-lifecycle/999'}, {},
+                                  executed_code_sha='1'*40)
+
+
 def test_registry_requires_45_transition_and_11_restart_cases():
     expected = expected_registry_keys()
     assert len(expected["transitions"]) == 45
