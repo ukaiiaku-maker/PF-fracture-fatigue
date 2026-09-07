@@ -1,0 +1,84 @@
+{
+  "actual_operations": [
+    {
+      "accepted": false,
+      "api": "downstream_front_transaction",
+      "audit": {
+        "boundary_element_ids": [
+          228
+        ],
+        "cleavage": [
+          {
+            "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+            "common_advance_duration_s": 0.0,
+            "crossing_time_s": "infinity",
+            "effective_rate_s": 0.0,
+            "emitted_event_ids": [],
+            "hazard_barrier_J": 3.7695864660791985e-19,
+            "instantaneous_status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+            "rate_s": 0.0,
+            "raw_rate_s": 4.973964401759496e-17,
+            "resolved_opening_stress_Pa": 7276727.979213057,
+            "source_resolution_policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED",
+            "unqualified_crossing_time_s": 3.26320973323245e+16,
+            "unqualified_effective_rate_s": 4.973964401759496e-17,
+            "winner": false
+          }
+        ],
+        "source_front_id": null,
+        "source_kind": "cavity_surface",
+        "source_position_m": [
+          0.0007552661214806971,
+          0.0
+        ],
+        "source_probe_identity": {
+          "boundary_node_id": 0,
+          "element_ids": [
+            228
+          ],
+          "kind": "direct_cavity_boundary_tensor"
+        },
+        "status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+        "tensor_Pa": [
+          [
+            369798.0108822077,
+            1061195.3046726468
+          ],
+          [
+            1061195.3046726468,
+            7276727.979213057
+          ]
+        ]
+      },
+      "operations": []
+    }
+  ],
+  "case_identity": "zero_drive_connected",
+  "conservation": {
+    "active_tip_ids": [],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": []
+  },
+  "continued_front_terminal_reached": false,
+  "dataset": "restarts",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "restarts:zero_drive_connected:None:55:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/d4b999dca5b3b394860db184d924c8bfad0d5d008a28fc75583682f02d2a1774.json",
+  "initial_fingerprint": "d4b999dca5b3b394860db184d924c8bfad0d5d008a28fc75583682f02d2a1774",
+  "input_configuration": {
+    "expected_terminal": "DOWNSTREAM_FRONT_CONTINUED",
+    "reload_policy": "retain_accepted_load",
+    "requested_stage_available": true
+  },
+  "input_hash": "c4034144830dd3f60472fdeb5e5095648099f46f6717aa5ad2eadc5cef69a40b",
+  "partition_count": null,
+  "restart_exact": true,
+  "restored_terminal_checkpoint": "checkpoints/d4b999dca5b3b394860db184d924c8bfad0d5d008a28fc75583682f02d2a1774.json",
+  "terminal_checkpoint": "checkpoints/d4b999dca5b3b394860db184d924c8bfad0d5d008a28fc75583682f02d2a1774.json",
+  "terminal_fingerprint": "d4b999dca5b3b394860db184d924c8bfad0d5d008a28fc75583682f02d2a1774"
+}

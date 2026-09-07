@@ -1,0 +1,29 @@
+{
+  "actual_operations": [
+    {
+      "api": "V12_and_disabled_accepted_unload_reload"
+    }
+  ],
+  "base_terminal_checkpoint": "checkpoints/0656d965ef4698f2af2d6b2516c21d4e47959b51540df343a6f866ec8f5b2a0d.json",
+  "case_identity": "unload_reload",
+  "conservation": {
+    "passed": true,
+    "void_inventory": "NOT_APPLICABLE_DISABLED"
+  },
+  "dataset": "neutrality",
+  "exact_neutrality": true,
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "neutrality:unload_reload:None:71:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/cc899c9c155aed2372f814714b22932f75e97745c2926c25269e86aba48f264c.json",
+  "initial_fingerprint": "cc899c9c155aed2372f814714b22932f75e97745c2926c25269e86aba48f264c",
+  "input_configuration": {
+    "base_model": "sharp_wake_mechanically_separating_v12",
+    "v5_model": "sharp_wake_mechanically_separating_v12",
+    "voiding_enabled": false
+  },
+  "input_hash": "f28c1c3cfc0f406da66e7e27921f8b73f0997c2669d04e4766634f6ed7d37cbf",
+  "partition_count": null,
+  "terminal_checkpoint": "checkpoints/0656d965ef4698f2af2d6b2516c21d4e47959b51540df343a6f866ec8f5b2a0d.json",
+  "terminal_fingerprint": "0656d965ef4698f2af2d6b2516c21d4e47959b51540df343a6f866ec8f5b2a0d"
+}

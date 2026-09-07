@@ -1,0 +1,64 @@
+{
+  "actual_operations": [
+    {
+      "accepted": true,
+      "api": "ligament_transaction",
+      "operations": [
+        "accepted_snapshot",
+        "intersection_alignment",
+        "exit_alignment",
+        "graph_edit",
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "cavity_phase_update",
+        "length_ledger_update:fractured_ligament_length_m",
+        "length_ledger_update:active_front_coordinate_advance_m",
+        "length_ledger_update:physical_active_front_travel_m",
+        "length_ledger_update:projected_fractured_length_m",
+        "length_ledger_update:projected_front_advance_m",
+        "length_ledger_update:preexisting_void_free_span_m",
+        "length_ledger_update:connected_void_free_span_m",
+        "length_ledger_update:projected_connected_void_free_span_m",
+        "length_ledger_update:connected_free_surface_extent_m",
+        "root_status_change",
+        "dormant_support_rebuild",
+        "connected_surface_certification",
+        "field_transfer",
+        "equilibrium",
+        "energy_gate",
+        "process_state_update",
+        "topology_verification",
+        "late_event_veto"
+      ]
+    }
+  ],
+  "case_identity": "ligament",
+  "conservation": {
+    "active_tip_ids": [],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": []
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "transitions:ligament:1:30:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/bb5fd8e3a9efb5ddd8039fead0905a1fd1cb7ee9c0652153278fc86c59332b98.json",
+  "initial_fingerprint": "bb5fd8e3a9efb5ddd8039fead0905a1fd1cb7ee9c0652153278fc86c59332b98",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 1,
+    "predecessor_available": true,
+    "requested_predecessor": "resolved_growth",
+    "seed": 3621
+  },
+  "input_hash": "85587f3f2f2dd7789844599287d454583600847dfa22ca0437ce6c82b5574643",
+  "partition_count": 1,
+  "terminal_checkpoint": "checkpoints/a30f751fb5e47b1e58c5f603b30288e314f2b26b575bbcfdc4504849c8f04d97.json",
+  "terminal_fingerprint": "a30f751fb5e47b1e58c5f603b30288e314f2b26b575bbcfdc4504849c8f04d97",
+  "transition_occurred": true
+}

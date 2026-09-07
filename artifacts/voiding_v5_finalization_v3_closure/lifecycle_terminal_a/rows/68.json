@@ -1,0 +1,75 @@
+{
+  "actual_operations": [
+    {
+      "api": "actual_local_remesh",
+      "operations": [
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "equilibrium"
+      ]
+    }
+  ],
+  "actual_preparation_checkpoints": {
+    "available_site": "checkpoints/5c352e1d5c1f0993b5679433646057d8ae5c57f2805c0c3475a2c1194f4f966c.json",
+    "geometric_promotion": "checkpoints/fa66c6012cc3f1db0ffe5de4ab6057ca306f87047343096345600bc304acb654.json",
+    "multi_hit_1": "checkpoints/37c45843515c5e5baa261bdb625a6c984bea828bcd9a1a8d89d780fecf013f06.json",
+    "multi_hit_2": "checkpoints/73021d76db687bc987ebb84a3c8bbe56a8ada402591be95479e1c5a46caad1d3.json",
+    "resolved_growth": "checkpoints/61aacf62e098843b2341cd39393c7903f269f39f27965a55c0d8a00d54711e6c.json",
+    "stabilization": "checkpoints/5b02c3012caea37900bec538bcbb2421d823d0c74d22b703b911d9570f2b7088.json",
+    "subgrid_growth": "checkpoints/4955c1767aacf6875f245ba90842905018d101745e91cd848f404728473fd24d.json",
+    "subgrid_void": "checkpoints/60e320dda3c67a9b040542e199f4197aa00e9f4ba5f039c7a60c7eb223a0c5e6.json"
+  },
+  "actual_preparation_stages": [
+    "available_site",
+    "multi_hit_1",
+    "multi_hit_2",
+    "stabilization",
+    "subgrid_void",
+    "subgrid_growth",
+    "geometric_promotion",
+    "resolved_growth"
+  ],
+  "case_identity": "local_remesh_refinement",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "controlled",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "controlled:local_remesh_refinement:None:67:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/61aacf62e098843b2341cd39393c7903f269f39f27965a55c0d8a00d54711e6c.json",
+  "initial_fingerprint": "61aacf62e098843b2341cd39393c7903f269f39f27965a55c0d8a00d54711e6c",
+  "input_configuration": {
+    "center_m": [
+      0.0007,
+      0.0
+    ],
+    "fixed_crack_path_m": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0005725993004046688,
+        0.0
+      ]
+    ],
+    "history_kind": "local_remesh_refinement",
+    "loading_opening_m": 4e-07
+  },
+  "input_hash": "49f644f00e4053d4e1bf7685d2e971b303160dfb4420000aaec35b319dcc1b95",
+  "partition_count": null,
+  "terminal_checkpoint": "checkpoints/3322854922905112d7469da4fed0c0672743dc80d1e9c8686ed4d0219eccd3a9.json",
+  "terminal_fingerprint": "3322854922905112d7469da4fed0c0672743dc80d1e9c8686ed4d0219eccd3a9"
+}

@@ -1,0 +1,92 @@
+{
+  "actual_operations": [
+    {
+      "api": "advance_site",
+      "duration_s": 6.876114310941845e-10,
+      "events": [
+        "STABILIZED"
+      ],
+      "rates": {
+        "birth_activation_work_J": 3.4686154333268934e-21,
+        "birth_hydrostatic_work_J": 3.085204713284815e-21,
+        "birth_normal_opening_work_J": 3.6106713305891246e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.2343586983165979e-23,
+        "healing_activation_work_J": -2.8386608264681147e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424075,
+        "local_in_plane_mean_stress_Pa": 177992579.61258548,
+        "local_max_principal_stress_Pa": 283866082.6468115,
+        "local_normal_opening_stress_Pa": 72213426.61178249,
+        "local_sigma_zz_Pa": 106795547.76755129,
+        "local_signed_shear_stress_Pa": 4468717.396633196,
+        "local_von_mises_stress_Pa": 196714547.7023944,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.80175877,
+        "stabilization_activation_work_J": 2.8386608264681147e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.334047,
+        "vacancy_transport_s": 809716953.2985829
+      }
+    },
+    {
+      "api": "advance_site",
+      "duration_s": 1.2508289218636134e-09,
+      "events": [],
+      "rates": {
+        "birth_activation_work_J": 3.4686154333268934e-21,
+        "birth_hydrostatic_work_J": 3.085204713284815e-21,
+        "birth_normal_opening_work_J": 3.6106713305891246e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.2343586983165979e-23,
+        "healing_activation_work_J": -2.8386608264681147e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424075,
+        "local_in_plane_mean_stress_Pa": 177992579.61258548,
+        "local_max_principal_stress_Pa": 283866082.6468115,
+        "local_normal_opening_stress_Pa": 72213426.61178249,
+        "local_sigma_zz_Pa": 106795547.76755129,
+        "local_signed_shear_stress_Pa": 4468717.396633196,
+        "local_von_mises_stress_Pa": 196714547.7023944,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.80175877,
+        "stabilization_activation_work_J": 2.8386608264681147e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.334047,
+        "vacancy_transport_s": 809716953.2985829
+      }
+    }
+  ],
+  "case_identity": "healing",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "transitions:healing:2:16:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/79beeb3791f61c84ec24cfbc11611345de12efaf14ba18ce17ffd6a78614b778.json",
+  "initial_fingerprint": "79beeb3791f61c84ec24cfbc11611345de12efaf14ba18ce17ffd6a78614b778",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 2,
+    "predecessor_available": true,
+    "requested_predecessor": "multi_hit_2",
+    "seed": 3621
+  },
+  "input_hash": "26a43909e54005f1b2a7bc360ebaff66c61f5dda1c6b94f14f8302e24a4ffee6",
+  "partition_count": 2,
+  "terminal_checkpoint": "checkpoints/c27f1420bc2cf7b755c2e85a0b64de43131cda65b73cfb5a1d9f9d8e949775c6.json",
+  "terminal_fingerprint": "c27f1420bc2cf7b755c2e85a0b64de43131cda65b73cfb5a1d9f9d8e949775c6",
+  "transition_occurred": false
+}

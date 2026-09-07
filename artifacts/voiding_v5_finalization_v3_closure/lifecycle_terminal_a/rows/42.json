@@ -1,0 +1,34 @@
+{
+  "actual_operations": [],
+  "case_identity": "child_continuation",
+  "conservation": {
+    "active_tip_ids": [],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": []
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "transitions:child_continuation:2:41:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": {
+    "message": "continued propagation requires the sole active downstream child",
+    "type": "RuntimeError"
+  },
+  "initial_checkpoint": "checkpoints/a30f751fb5e47b1e58c5f603b30288e314f2b26b575bbcfdc4504849c8f04d97.json",
+  "initial_fingerprint": "a30f751fb5e47b1e58c5f603b30288e314f2b26b575bbcfdc4504849c8f04d97",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 2,
+    "predecessor_available": false,
+    "requested_predecessor": "new_graph_front",
+    "seed": 3621
+  },
+  "input_hash": "c567b2dbb2f728aa3b619c70f3db0ae0e19c413191d34a9664f1fc39aa66f4b1",
+  "partition_count": 2,
+  "terminal_checkpoint": "checkpoints/a30f751fb5e47b1e58c5f603b30288e314f2b26b575bbcfdc4504849c8f04d97.json",
+  "terminal_fingerprint": "a30f751fb5e47b1e58c5f603b30288e314f2b26b575bbcfdc4504849c8f04d97",
+  "transition_occurred": false
+}

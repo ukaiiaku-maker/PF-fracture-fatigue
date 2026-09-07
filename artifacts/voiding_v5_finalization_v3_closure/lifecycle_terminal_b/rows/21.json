@@ -1,0 +1,62 @@
+{
+  "actual_operations": [
+    {
+      "api": "update_cavity_growth",
+      "duration_s": 1.0377263083108278e-05,
+      "rates": {
+        "birth_activation_work_J": 3.468615433326888e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848122e-21,
+        "birth_normal_opening_work_J": 3.6106713305891124e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.2343586983165088e-23,
+        "healing_activation_work_J": -2.8386608264681147e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424063,
+        "local_in_plane_mean_stress_Pa": 177992579.61258537,
+        "local_max_principal_stress_Pa": 283866082.6468115,
+        "local_normal_opening_stress_Pa": 72213426.61178225,
+        "local_sigma_zz_Pa": 106795547.76755121,
+        "local_signed_shear_stress_Pa": 4468717.396633018,
+        "local_von_mises_stress_Pa": 196714547.70239455,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.80175877,
+        "stabilization_activation_work_J": 2.8386608264681147e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.334047,
+        "vacancy_transport_s": 809716953.2985829
+      }
+    }
+  ],
+  "case_identity": "subgrid_growth",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "transitions:subgrid_growth:1:20:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/84f063e7871e45bfbed65f681289fd66a5d447509e83c252faa0524154db2342.json",
+  "initial_fingerprint": "84f063e7871e45bfbed65f681289fd66a5d447509e83c252faa0524154db2342",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 1,
+    "predecessor_available": true,
+    "requested_predecessor": "subgrid_void",
+    "seed": 3621
+  },
+  "input_hash": "de2e81a2561240821dfff297f7f67bd1c1af2de5b3edd88dbee35013db405171",
+  "partition_count": 1,
+  "terminal_checkpoint": "checkpoints/736e60963663bd7af2c5b6fa3f91a5f06889382490e721e90e4a4d2d75517ba9.json",
+  "terminal_fingerprint": "736e60963663bd7af2c5b6fa3f91a5f06889382490e721e90e4a4d2d75517ba9",
+  "transition_occurred": true
+}

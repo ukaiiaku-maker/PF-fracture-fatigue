@@ -1,0 +1,75 @@
+{
+  "actual_operations": [
+    {
+      "api": "actual_local_remesh",
+      "operations": [
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "equilibrium"
+      ]
+    }
+  ],
+  "actual_preparation_checkpoints": {
+    "available_site": "checkpoints/f328128097c6cd9994c50569b7b8cf60a7b80174c23103064312bbb957a52c71.json",
+    "geometric_promotion": "checkpoints/ebcfae8a91c65c39257de5b10f93fb5d72814c5abb9c5c17987feb2d4293ca62.json",
+    "multi_hit_1": "checkpoints/4fd6d1854817ff29654d7d63b386f4cf693586145106914d5db01dc348dcb6c2.json",
+    "multi_hit_2": "checkpoints/9ebbf416c36e92482518b71f8bc25a6922479429058b33da4ab3de986a21e7da.json",
+    "resolved_growth": "checkpoints/86536031a5836ffe08144c630fb5e7522c36d8fd184233365fecf50c506ce32c.json",
+    "stabilization": "checkpoints/dc1b37a1de81b6194b2c5803054c146c93abb9bbfd581783b82658bfad70fd5b.json",
+    "subgrid_growth": "checkpoints/b46d449172961f1ba79f783e104bc33087972f1ce5e2d32ca26f90704422c411.json",
+    "subgrid_void": "checkpoints/813a5562325c39c2123ab5ee1ad7f8bb4210794887f225bf64aaeb28856f8f99.json"
+  },
+  "actual_preparation_stages": [
+    "available_site",
+    "multi_hit_1",
+    "multi_hit_2",
+    "stabilization",
+    "subgrid_void",
+    "subgrid_growth",
+    "geometric_promotion",
+    "resolved_growth"
+  ],
+  "case_identity": "local_remesh_refinement",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "controlled",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "controlled:local_remesh_refinement:None:67:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/86536031a5836ffe08144c630fb5e7522c36d8fd184233365fecf50c506ce32c.json",
+  "initial_fingerprint": "86536031a5836ffe08144c630fb5e7522c36d8fd184233365fecf50c506ce32c",
+  "input_configuration": {
+    "center_m": [
+      0.0007,
+      0.0
+    ],
+    "fixed_crack_path_m": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0005725993004046688,
+        0.0
+      ]
+    ],
+    "history_kind": "local_remesh_refinement",
+    "loading_opening_m": 4e-07
+  },
+  "input_hash": "49f644f00e4053d4e1bf7685d2e971b303160dfb4420000aaec35b319dcc1b95",
+  "partition_count": null,
+  "terminal_checkpoint": "checkpoints/04af913599abbbfada018c72b786a48a8be9f1483852ce83025697882d32cdfb.json",
+  "terminal_fingerprint": "04af913599abbbfada018c72b786a48a8be9f1483852ce83025697882d32cdfb"
+}

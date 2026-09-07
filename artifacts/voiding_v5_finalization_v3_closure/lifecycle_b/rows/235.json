@@ -1,0 +1,39 @@
+{
+  "actual_operations": [
+    "remesh",
+    "field_projection",
+    "support_rebuild",
+    "equilibrium"
+  ],
+  "case_identity": "promotion:equilibrium",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "rollback",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "rollback:promotion:equilibrium:None:234:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": {
+    "message": "injected:equilibrium",
+    "type": "RuntimeError"
+  },
+  "initial_checkpoint": "checkpoints/363fc52e792a44a169559a910f87c97377f370c7363d6625d9dd5578064c7526.json",
+  "initial_fingerprint": "363fc52e792a44a169559a910f87c97377f370c7363d6625d9dd5578064c7526",
+  "input_configuration": {
+    "failure_stage": "equilibrium"
+  },
+  "input_hash": "e5bcb14fa9be5dd4302d80e41e8c65ac2c89a9df845036bf71db2ba39b14c540",
+  "partition_count": null,
+  "restored_exactly": true,
+  "terminal_checkpoint": "checkpoints/363fc52e792a44a169559a910f87c97377f370c7363d6625d9dd5578064c7526.json",
+  "terminal_fingerprint": "363fc52e792a44a169559a910f87c97377f370c7363d6625d9dd5578064c7526"
+}

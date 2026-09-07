@@ -1,0 +1,239 @@
+{
+  "actual_lifecycle_rows": 243,
+  "audit_code_sha": "587aeb9250c935527b28df530af5775722296b4c",
+  "basic_conservation_rows_passed": 243,
+  "complete_lifecycle_rollback": "NOT_COMPLETE_PREVOID_FAULT_HOOKS_NOT_IMPLEMENTED_DOWNSTREAM_PREREQUISITE_UNAVAILABLE",
+  "decision": "BLOCKED",
+  "exact_head_clean_worker_full_closure": "NOT_RUN_PUBLICATION_APPROVAL_BLOCKED",
+  "exact_transition_partition_gates_passed": 20,
+  "generalized_length_and_stagewise_topology": "PARTIAL_BASIC_CONSERVATION_NOT_COMPLETE_CERTIFICATION",
+  "kirsch_derived_only": [
+    {
+      "analytic_infinite_plate_maximum": 3.0,
+      "boundary_segments": 32,
+      "frozen_limit": 0.03,
+      "measured_hoop_concentration": 3.1986371655808794,
+      "passed": false,
+      "radial_layers": 12,
+      "relative_error": 0.0662123885269598,
+      "source_execution_id": "cavity:32:12:ea034e82e422f99d99cf3459ce82e76b54a58357",
+      "source_fingerprints": {
+        "assembled_system": "7daf74ec4147680221c1fc6b22306f42387f704b1f8f38886b98cd492522c0a2",
+        "mesh": "0c950b2932f661d8ea5570c9d2ada07cbd8e299fd8c47d5ec9200ed7f99bc311",
+        "solution": "22a76b2794d3d02f23fb9697ce048cadb625005a0df8e2d7023fbceff54a6f4a",
+        "support": "9a33031132d5313ea827a6e79a75c2f66496376519647a9b5fd0ab4205e407cc"
+      },
+      "source_row_id": "cavity:32:12"
+    },
+    {
+      "analytic_infinite_plate_maximum": 3.0,
+      "boundary_segments": 64,
+      "frozen_limit": 0.03,
+      "measured_hoop_concentration": 3.0928487313451827,
+      "passed": false,
+      "radial_layers": 24,
+      "relative_error": 0.030949577115060894,
+      "source_execution_id": "cavity:64:24:ea034e82e422f99d99cf3459ce82e76b54a58357",
+      "source_fingerprints": {
+        "assembled_system": "f59fba6ed17e68ead402b39d747dbdd1d478d8eb90839dcc0a6d72d4f3e6dc4a",
+        "mesh": "a0d7b1e07f6d5a9a7f59e7cfc830f6637d3954ab81548ac9aa81ec39fd90902d",
+        "solution": "fe877e37ceddb9d49f4ce26a5c5f5033a9d15a2fdf16634ef003d64133436042",
+        "support": "e29e2e6f0e043c5bb7216e4ae1c0c41a8288c1d4b99159d08c138bea916df75f"
+      },
+      "source_row_id": "cavity:64:24"
+    },
+    {
+      "analytic_infinite_plate_maximum": 3.0,
+      "boundary_segments": 128,
+      "frozen_limit": 0.03,
+      "measured_hoop_concentration": 3.0646155743584482,
+      "passed": true,
+      "radial_layers": 48,
+      "relative_error": 0.02153852478614941,
+      "source_execution_id": "cavity:128:48:ea034e82e422f99d99cf3459ce82e76b54a58357",
+      "source_fingerprints": {
+        "assembled_system": "801d8f98ade076c4ac42aebbcfa218c3b124779d91cc2f2822f4d2027c3df926",
+        "mesh": "8b0954217c241bc2b27aad1fd24f660a2be5aaf5ec613df282f79bd3bcfcada4",
+        "solution": "bda3f088a1c3b46737be6967e40c85c2f8e56e4aba6967314ddde801b04b7147",
+        "support": "69a7d1fa09dd7e98ff548de91388ef793713eff1c44368eb73e856da50422e4c"
+      },
+      "source_row_id": "cavity:128:48"
+    },
+    {
+      "analytic_infinite_plate_maximum": 3.0,
+      "boundary_segments": 256,
+      "frozen_limit": 0.03,
+      "measured_hoop_concentration": 3.055613196642465,
+      "passed": true,
+      "radial_layers": 96,
+      "relative_error": 0.01853773221415504,
+      "source_execution_id": "cavity:256:96:ea034e82e422f99d99cf3459ce82e76b54a58357",
+      "source_fingerprints": {
+        "assembled_system": "41bad906d0363c1015fac237b13a76d8255f6f6c8272e6aaa93bc9ed293dbaf4",
+        "mesh": "e996cdb5e28389fc543564b3922e949d2a31dd348bff8a9c6798b811870724d3",
+        "solution": "57fe3e8239ea4926216de9a2ff5fa9c54940d1bb56f35caee6bbbe39b758906e",
+        "support": "2d190acd9ee55588e9bbf765ddda5923a72d772f8876e9bb6277b195e6391743"
+      },
+      "source_row_id": "cavity:256:96"
+    },
+    {
+      "analytic_infinite_plate_maximum": 3.0,
+      "boundary_segments": 512,
+      "frozen_limit": 0.03,
+      "measured_hoop_concentration": 3.043051283480711,
+      "passed": true,
+      "radial_layers": 192,
+      "relative_error": 0.014350427826903692,
+      "source_execution_id": "cavity:512:192:ea034e82e422f99d99cf3459ce82e76b54a58357",
+      "source_fingerprints": {
+        "assembled_system": "25ec9a6a142e4beaefb3c0c45239edba4f816679ef9b54a0c958046662524878",
+        "mesh": "3c0e3aa14906d4577f511365c7e33a4391ebaf0d20510c6f00b8d40ee18b4fc4",
+        "solution": "15ca62685225330cac6738864ee82340febbc62ec5184f04a1cd79b3c3b1ad70",
+        "support": "6461ec313afaee9d5d9f86013dba0b3863263a0f06e36ebe1d30afb0395985db"
+      },
+      "source_row_id": "cavity:512:192"
+    },
+    {
+      "analytic_infinite_plate_maximum": 3.0,
+      "boundary_segments": 256,
+      "frozen_limit": 0.03,
+      "measured_hoop_concentration": 3.102590009917817,
+      "passed": false,
+      "radial_layers": 48,
+      "relative_error": 0.034196669972605655,
+      "source_execution_id": "cavity:256:48:ea034e82e422f99d99cf3459ce82e76b54a58357",
+      "source_fingerprints": {
+        "assembled_system": "09e373249c207d839d319b480a9608eb6a326c4323836479bf621617413b3a39",
+        "mesh": "827d381985a8d471f4003a4f49b8cf8789288d1fdcf17f0e7585d54b0b2ab873",
+        "solution": "79c2c68357824ccf5261643f886a85a5709ef1bcaf50b78fdca57156826fc8c1",
+        "support": "25e3dd70514e1fa4f7cfc46f51d678f295489d005358d3bf2732d39a8270d6cc"
+      },
+      "source_row_id": "cavity:256:48"
+    },
+    {
+      "analytic_infinite_plate_maximum": 3.0,
+      "boundary_segments": 512,
+      "frozen_limit": 0.03,
+      "measured_hoop_concentration": 3.1138163493762825,
+      "passed": false,
+      "radial_layers": 48,
+      "relative_error": 0.0379387831254275,
+      "source_execution_id": "cavity:512:48:ea034e82e422f99d99cf3459ce82e76b54a58357",
+      "source_fingerprints": {
+        "assembled_system": "69d7f5431e724e74d3c170af5e76120d4ea7ec04dc5fee804adeaf8568bec017",
+        "mesh": "3c057c4f7a3c8972f14d9b4fb01e94f14a847a1e927df4350b2732ef2fef771a",
+        "solution": "080e5207092be68ff989cfc67afb47dbe527059647c7c0ec3c901e837c68cbb7",
+        "support": "2d190acd9ee55588e9bbf765ddda5923a72d772f8876e9bb6277b195e6391743"
+      },
+      "source_row_id": "cavity:512:48"
+    },
+    {
+      "analytic_infinite_plate_maximum": 3.0,
+      "boundary_segments": 256,
+      "frozen_limit": 0.03,
+      "measured_hoop_concentration": 3.0458356541809226,
+      "passed": true,
+      "radial_layers": 192,
+      "relative_error": 0.015278551393640871,
+      "source_execution_id": "cavity:256:192:ea034e82e422f99d99cf3459ce82e76b54a58357",
+      "source_fingerprints": {
+        "assembled_system": "bf1b7bab8c79d3cbe1f78601caeca8353f5d753830498f67ff179481c9bbe819",
+        "mesh": "25a76fafcd24afb5a5f3db4be428900067d631b4cde9ed57540db3c3c94e0083",
+        "solution": "ef9d97b12c0bef1a080dc5ba927c4b3e38e9bf5b78b789bbb0710425cc64e9cc",
+        "support": "e750c503ee6ddb96ffb8dd9df43560762dc24443f23ce68740a94c716d52072a"
+      },
+      "source_row_id": "cavity:256:192"
+    }
+  ],
+  "local_regression": {
+    "additional_failure_ids": [
+      "tests/test_voiding_v5.py::test_connected_and_downstream_states_own_zero_then_one_active_front",
+      "tests/test_voiding_v5.py::test_continuation_uses_child_tip_source_and_recomputes_three_body_topology",
+      "tests/test_voiding_v5.py::test_deterministic_driver_reaches_real_continued_graph_event",
+      "tests/test_voiding_v5.py::test_downstream_child_activation_rolls_back",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_event_history_update]",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:ordinary_crack_fractured_length_m]",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:projected_front_advance_m]",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_phase_update]",
+      "tests/test_voiding_v5.py::test_equilibrium_metrics_separate_free_residual_from_reactions",
+      "tests/test_voiding_v5.py::test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer",
+      "tests/test_voiding_v5.py::test_zero_drive_connected_state_partitions_restart_and_tensile_reload"
+    ],
+    "classification": "NOT_GREEN_NOT_INHERITED_ONLY",
+    "failure_ids": [
+      "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader",
+      "tests/test_stage2_criterion_v12.py::test_required_matrices_are_complete",
+      "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id",
+      "tests/test_v10214_response_model_id.py::test_v10214_response_model_id",
+      "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly",
+      "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+      "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap",
+      "tests/test_voiding_v5.py::test_deterministic_driver_reaches_real_continued_graph_event",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_phase_update]",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:ordinary_crack_fractured_length_m]",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:projected_front_advance_m]",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_event_history_update]",
+      "tests/test_voiding_v5.py::test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer",
+      "tests/test_voiding_v5.py::test_zero_drive_connected_state_partitions_restart_and_tensile_reload",
+      "tests/test_voiding_v5.py::test_connected_and_downstream_states_own_zero_then_one_active_front",
+      "tests/test_voiding_v5.py::test_downstream_child_activation_rolls_back",
+      "tests/test_voiding_v5.py::test_continuation_uses_child_tip_source_and_recomputes_three_body_topology",
+      "tests/test_voiding_v5.py::test_equilibrium_metrics_separate_free_residual_from_reactions"
+    ],
+    "implementation_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+    "inherited_failure_ids": [
+      "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader",
+      "tests/test_stage2_criterion_v12.py::test_required_matrices_are_complete",
+      "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id",
+      "tests/test_v10214_response_model_id.py::test_v10214_response_model_id",
+      "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+      "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly",
+      "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap"
+    ]
+  },
+  "natural_partition_restart_gates_passed": 32,
+  "reachable_rollback_gates_passed": 11,
+  "reached_downstream_continued_terminal": false,
+  "schema": "v12.closure-source-derived-ledger/1",
+  "source_code_shas": {
+    "lifecycle": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+    "mechanics": "c225d1bf13938b26b81649544d25fc523bde9842",
+    "production": "6134aa521f5c4d527f22d9b458e5a13aa13f3b48",
+    "traction": "ea034e82e422f99d99cf3459ce82e76b54a58357"
+  },
+  "static_predicates": {
+    "failed": 106,
+    "passed": 571
+  },
+  "strict_offset_terminal_reassessment": [
+    {
+      "actual_candidate_rates_s": [
+        2.411798782317034e-13
+      ],
+      "actual_phase": "CONNECTED_VOID",
+      "case_identity": "positive_offset",
+      "classification": "CONNECTED_VOID_UNQUALIFIED_POSITIVE_SOURCE",
+      "frozen_controlled_terminal_passed": false,
+      "source_checkpoint": "checkpoints/614e1cca6273fcdd1b86f14ec8bf122eccfb4203fc6c263401dd60f5e091d934.json",
+      "source_execution_id": "controlled:positive_offset:None:57:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+      "source_fingerprint": "614e1cca6273fcdd1b86f14ec8bf122eccfb4203fc6c263401dd60f5e091d934",
+      "valid_connection": true
+    },
+    {
+      "actual_candidate_rates_s": [
+        0.0
+      ],
+      "actual_phase": "CONNECTED_VOID",
+      "case_identity": "negative_offset",
+      "classification": "CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE",
+      "frozen_controlled_terminal_passed": true,
+      "source_checkpoint": "checkpoints/0a1d9c13ef565cda56e28097bf1591699ac7fdb86788038803644ce5af9bb70a.json",
+      "source_execution_id": "controlled:negative_offset:None:58:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+      "source_fingerprint": "0a1d9c13ef565cda56e28097bf1591699ac7fdb86788038803644ce5af9bb70a",
+      "valid_connection": true
+    }
+  ],
+  "transition_attempts": 45,
+  "transitions_observed": 30,
+  "unique_static_mechanics_solves": 64
+}

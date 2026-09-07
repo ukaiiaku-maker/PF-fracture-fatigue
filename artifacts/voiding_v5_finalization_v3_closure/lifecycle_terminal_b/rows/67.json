@@ -1,0 +1,66 @@
+{
+  "actual_operations": [],
+  "actual_preparation_checkpoints": {
+    "available_site": "checkpoints/0659004917804a418776248df55f1f1509189031e90462458bf3cc7512ad3a8d.json",
+    "geometric_promotion": "checkpoints/aa278505a882e38e95604ec431f309aa58f5b266ff0df8bc321b70b71d1ab215.json",
+    "multi_hit_1": "checkpoints/7e657820ebd3389253a2c87ed652b680dd8ea3ad15c27c8ab1e74231348d4af1.json",
+    "multi_hit_2": "checkpoints/adefa7805235b8e5f62af169061cb5f2712efba458f6185e4056558e6b50b1e1.json",
+    "stabilization": "checkpoints/6ba1533507b1ad614df2346bfddcda1ee2fe0d664661330ac9fca05f77ae09e5.json",
+    "subgrid_growth": "checkpoints/ee9801d0ba9a5f7032df2ccd1449c2bda65b457bead688fb15237c85c0fce127.json",
+    "subgrid_void": "checkpoints/605bdc4627d4b294321c9cf998096c017136e5d10c0f45d47bbc4fa866d1a9be.json"
+  },
+  "actual_preparation_stages": [
+    "available_site",
+    "multi_hit_1",
+    "multi_hit_2",
+    "stabilization",
+    "subgrid_void",
+    "subgrid_growth",
+    "geometric_promotion"
+  ],
+  "case_identity": "fixed_mesh_oblique",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "controlled",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "controlled:fixed_mesh_oblique:None:66:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": {
+    "message": "v12_support_not_certified: INSUFFICIENT_OPPOSITE_SIDE_SEEDS; insufficient_seed_segment_ids=('b00000000:arc0',); boundary_terminal_certificates=({'arc_id': 'b00000000:arc0', 'endpoint': 'start', 'endpoint_coordinate_m': (0.0, -0.0004041451884327379), 'declared_endpoint_coordinate_m': (0.0, -0.0004041451884327379), 'endpoint_graph_role': ('inactive_terminal', 'physical_root'), 'boundary_kind': 'external_free_surface', 'boundary_component_id': 'external-free-component-at-root', 'boundary_edge_ids': ((396, 397), (397, 398), (398, 399), (399, 400), (400, 401), (401, 402), (402, 416), (403, 404), (403, 416)), 'cavity_id': None, 'cavity_cycle_independently_closed': False, 'endpoint_to_boundary_distance_m': 0.0, 'exact_incidence': True, 'incident_crack_tangent': (0.8660254037844387, 0.49999999999999994), 'tangent_enters_or_approaches_solid': True, 'tube_boundary_intersections': ((397, 398), (398, 399), (399, 400), (400, 401), (401, 402), (404, 405), (405, 406), (406, 407), (407, 408)), 'unrelated_boundary_intersections': ((404, 405), (405, 406), (406, 407), (407, 408)), 'maximum_boundary_affected_axial_extent_m': 0.0001316580753730952, 'first_two_sided_axial_station_m': 0.0001316580753730952, 'positive_interior_seed_count': 25, 'negative_interior_seed_count': 13, 'intact_path_exists': False, 'node_star_passed': True, 'only_boundary_clearance_waived': False, 'classification': 'CERTIFICATE_TUBE_INTERSECTS_UNRELATED_BOUNDARY'},); junction_detail=()",
+    "type": "RuntimeError"
+  },
+  "initial_checkpoint": "checkpoints/9b815579274e03e2f8af680dc4f1728c82942ee4462e4a59aa15e9202f9e3777.json",
+  "initial_fingerprint": "9b815579274e03e2f8af680dc4f1728c82942ee4462e4a59aa15e9202f9e3777",
+  "input_configuration": {
+    "center_m": [
+      0.0007,
+      0.0
+    ],
+    "fixed_crack_path_m": [
+      [
+        0.0,
+        -0.0004041451884327379
+      ],
+      [
+        0.0005700961894323342,
+        -7.499999999999998e-05
+      ]
+    ],
+    "history_kind": "fixed_mesh_oblique",
+    "loading_opening_m": 4e-07
+  },
+  "input_hash": "2f49eb8bb4f60f568a7d8a91dbddd237d178ff67c96d9d5a9e1402be876af80b",
+  "partition_count": null,
+  "terminal_checkpoint": "checkpoints/9b815579274e03e2f8af680dc4f1728c82942ee4462e4a59aa15e9202f9e3777.json",
+  "terminal_fingerprint": "9b815579274e03e2f8af680dc4f1728c82942ee4462e4a59aa15e9202f9e3777"
+}

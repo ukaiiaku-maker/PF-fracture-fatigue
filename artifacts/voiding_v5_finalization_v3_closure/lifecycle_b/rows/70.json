@@ -1,0 +1,259 @@
+{
+  "actual_operations": [
+    {
+      "api": "V12_execute_event_vs_disabled_V5_dispatch",
+      "base_event": {
+        "energy_margin_J_per_m": 0.0008909897264593875,
+        "energy_release_J_per_m": 0.0008909897264593875,
+        "final": {
+          "active_tips": [
+            "b00000000"
+          ],
+          "competition_consumed": [
+            "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
+          ],
+          "damage_l1": 1071.5,
+          "density_l2_m2": 67369445753525.06,
+          "displacement_l2_m": 5.13154565226648e-06,
+          "event_counters": {
+            "accepted_steps": 1,
+            "mesh_generation": 1,
+            "refinement_operation_index": 1,
+            "topology_actions": 1
+          },
+          "fingerprint": "27d5311684dafb8398ba44ea79807ec6fe546bf2098bc2fced98953e2455ae0c",
+          "graph_length_m": 0.0003353553390593274,
+          "hazards": [
+            0.0,
+            0.375
+          ],
+          "mesh_elements": 4132,
+          "mesh_generation": 1,
+          "mesh_nodes": 2131,
+          "model": "sharp_wake_mechanically_separating_v12",
+          "plastic_history_l2": 0.0012351392183472419,
+          "reaction_N_per_m": 125602.23339629476,
+          "residual_l2_N_per_m": 32779.16951474737,
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_energy_J_per_m": 0.024785438079712563,
+          "support_elements": 1257,
+          "thresholds": [
+            2.0,
+            1.0
+          ],
+          "tip_process_state": {
+            "hazard_clock_incomplete": true,
+            "mobile": 2.0,
+            "retained": 7.0
+          }
+        },
+        "hazard_dissipation_J_per_m": 0.0,
+        "initial": {
+          "active_tips": [
+            "b00000000"
+          ],
+          "competition_consumed": [],
+          "damage_l1": 68.0,
+          "density_l2_m2": 47535518883836.28,
+          "displacement_l2_m": 4.718557982211314e-06,
+          "event_counters": {
+            "accepted_steps": 1,
+            "mesh_generation": 0,
+            "topology_actions": 0
+          },
+          "fingerprint": "95177e8a71532ce7e73bed5aef7225ece41e72de452a1d905139a4670d49be86",
+          "graph_length_m": 0.00030000000000000003,
+          "hazards": [
+            0.0,
+            0.375
+          ],
+          "mesh_elements": 2048,
+          "mesh_generation": 0,
+          "mesh_nodes": 1089,
+          "model": "sharp_wake_mechanically_separating_v12",
+          "plastic_history_l2": 0.0007504665215717512,
+          "reaction_N_per_m": 130121.84238054068,
+          "residual_l2_N_per_m": 33724.357231381786,
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_energy_J_per_m": 0.02567642780617195,
+          "support_elements": 100,
+          "thresholds": [
+            2.0,
+            1.0
+          ],
+          "tip_process_state": {
+            "hazard_clock_incomplete": true,
+            "mobile": 2.0,
+            "retained": 7.0
+          }
+        },
+        "operations": [
+          "accepted_snapshot",
+          "graph_edit",
+          "remesh",
+          "field_projection",
+          "support_rebuild",
+          "field_transfer",
+          "equilibrium",
+          "energy_gate",
+          "process_state_update",
+          "topology_verification",
+          "late_event_veto"
+        ]
+      },
+      "disabled_event": {
+        "energy_margin_J_per_m": 0.0008909897264593875,
+        "energy_release_J_per_m": 0.0008909897264593875,
+        "final": {
+          "active_tips": [
+            "b00000000"
+          ],
+          "competition_consumed": [
+            "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001"
+          ],
+          "damage_l1": 1071.5,
+          "density_l2_m2": 67369445753525.06,
+          "displacement_l2_m": 5.13154565226648e-06,
+          "event_counters": {
+            "accepted_steps": 1,
+            "mesh_generation": 1,
+            "refinement_operation_index": 1,
+            "topology_actions": 1
+          },
+          "fingerprint": "27d5311684dafb8398ba44ea79807ec6fe546bf2098bc2fced98953e2455ae0c",
+          "graph_length_m": 0.0003353553390593274,
+          "hazards": [
+            0.0,
+            0.375
+          ],
+          "mesh_elements": 4132,
+          "mesh_generation": 1,
+          "mesh_nodes": 2131,
+          "model": "sharp_wake_mechanically_separating_v12",
+          "plastic_history_l2": 0.0012351392183472419,
+          "reaction_N_per_m": 125602.23339629476,
+          "residual_l2_N_per_m": 32779.16951474737,
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_energy_J_per_m": 0.024785438079712563,
+          "support_elements": 1257,
+          "thresholds": [
+            2.0,
+            1.0
+          ],
+          "tip_process_state": {
+            "hazard_clock_incomplete": true,
+            "mobile": 2.0,
+            "retained": 7.0
+          }
+        },
+        "hazard_dissipation_J_per_m": 0.0,
+        "initial": {
+          "active_tips": [
+            "b00000000"
+          ],
+          "competition_consumed": [],
+          "damage_l1": 68.0,
+          "density_l2_m2": 47535518883836.28,
+          "displacement_l2_m": 4.718557982211314e-06,
+          "event_counters": {
+            "accepted_steps": 1,
+            "mesh_generation": 0,
+            "topology_actions": 0
+          },
+          "fingerprint": "95177e8a71532ce7e73bed5aef7225ece41e72de452a1d905139a4670d49be86",
+          "graph_length_m": 0.00030000000000000003,
+          "hazards": [
+            0.0,
+            0.375
+          ],
+          "mesh_elements": 2048,
+          "mesh_generation": 0,
+          "mesh_nodes": 1089,
+          "model": "sharp_wake_mechanically_separating_v12",
+          "plastic_history_l2": 0.0007504665215717512,
+          "reaction_N_per_m": 130121.84238054068,
+          "residual_l2_N_per_m": 33724.357231381786,
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_energy_J_per_m": 0.02567642780617195,
+          "support_elements": 100,
+          "thresholds": [
+            2.0,
+            1.0
+          ],
+          "tip_process_state": {
+            "hazard_clock_incomplete": true,
+            "mobile": 2.0,
+            "retained": 7.0
+          }
+        },
+        "operations": [
+          "accepted_snapshot",
+          "graph_edit",
+          "remesh",
+          "field_projection",
+          "support_rebuild",
+          "field_transfer",
+          "equilibrium",
+          "energy_gate",
+          "process_state_update",
+          "topology_verification",
+          "late_event_veto"
+        ]
+      }
+    }
+  ],
+  "base_terminal_checkpoint": "checkpoints/27d5311684dafb8398ba44ea79807ec6fe546bf2098bc2fced98953e2455ae0c.json",
+  "case_identity": "fixed_mesh_oblique",
+  "conservation": {
+    "passed": true,
+    "void_inventory": "NOT_APPLICABLE_DISABLED"
+  },
+  "dataset": "neutrality",
+  "exact_neutrality": true,
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "neutrality:fixed_mesh_oblique:None:69:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/95177e8a71532ce7e73bed5aef7225ece41e72de452a1d905139a4670d49be86.json",
+  "initial_fingerprint": "95177e8a71532ce7e73bed5aef7225ece41e72de452a1d905139a4670d49be86",
+  "input_configuration": {
+    "base_model": "sharp_wake_mechanically_separating_v12",
+    "v5_model": "sharp_wake_mechanically_separating_v12",
+    "voiding_enabled": false
+  },
+  "input_hash": "f28c1c3cfc0f406da66e7e27921f8b73f0997c2669d04e4766634f6ed7d37cbf",
+  "partition_count": null,
+  "terminal_checkpoint": "checkpoints/27d5311684dafb8398ba44ea79807ec6fe546bf2098bc2fced98953e2455ae0c.json",
+  "terminal_fingerprint": "27d5311684dafb8398ba44ea79807ec6fe546bf2098bc2fced98953e2455ae0c"
+}

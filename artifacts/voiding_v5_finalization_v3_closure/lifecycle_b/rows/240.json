@@ -1,0 +1,57 @@
+{
+  "actual_operations": [
+    "accepted_snapshot",
+    "intersection_alignment",
+    "exit_alignment",
+    "graph_edit",
+    "remesh",
+    "field_projection",
+    "support_rebuild",
+    "cavity_phase_update",
+    "length_ledger_update:fractured_ligament_length_m",
+    "length_ledger_update:active_front_coordinate_advance_m",
+    "length_ledger_update:physical_active_front_travel_m",
+    "length_ledger_update:projected_fractured_length_m",
+    "length_ledger_update:projected_front_advance_m",
+    "length_ledger_update:preexisting_void_free_span_m",
+    "length_ledger_update:connected_void_free_span_m",
+    "length_ledger_update:projected_connected_void_free_span_m",
+    "length_ledger_update:connected_free_surface_extent_m",
+    "root_status_change",
+    "dormant_support_rebuild",
+    "connected_surface_certification",
+    "field_transfer",
+    "equilibrium"
+  ],
+  "case_identity": "ligament:equilibrium",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "rollback",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "rollback:ligament:equilibrium:None:239:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": {
+    "message": "injected:equilibrium",
+    "type": "RuntimeError"
+  },
+  "initial_checkpoint": "checkpoints/69ffea5f8f513c9c001fe0dd675117eaf4eaa0699e442cf68fbe006be8b714f7.json",
+  "initial_fingerprint": "69ffea5f8f513c9c001fe0dd675117eaf4eaa0699e442cf68fbe006be8b714f7",
+  "input_configuration": {
+    "failure_stage": "equilibrium"
+  },
+  "input_hash": "e5bcb14fa9be5dd4302d80e41e8c65ac2c89a9df845036bf71db2ba39b14c540",
+  "partition_count": null,
+  "restored_exactly": true,
+  "terminal_checkpoint": "checkpoints/69ffea5f8f513c9c001fe0dd675117eaf4eaa0699e442cf68fbe006be8b714f7.json",
+  "terminal_fingerprint": "69ffea5f8f513c9c001fe0dd675117eaf4eaa0699e442cf68fbe006be8b714f7"
+}
