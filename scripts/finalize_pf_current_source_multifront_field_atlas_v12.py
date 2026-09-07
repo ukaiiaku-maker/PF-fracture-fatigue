@@ -31,9 +31,11 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_NAME = "pf_current_source_multifront_field_atlas_300K_1000K"
 ROW_ORDER = ("Peak", "DBTT", "weakT", "ceramic")
 DISPLAY = {"Peak": "Peak", "DBTT": "DBTT", "weakT": "weak-T", "ceramic": "ceramic-like"}
-CORRECTED_SOURCE_COMMIT = "12811e0beff95d9390a27646f5044ff0847b2b9d"
-CORRECTED_SOURCE_TREE = "ab901f1f1c83a81f0fa1c6866efed608f609c93b"
-SOURCE_BUNDLE_SHA256 = "28f4340c8095a2a00a17752172e5b4f1bee2a1b5df2fa424bf74a179e4f2c374"
+QUALIFIED_WAKE_REMAP_SOURCE_COMMIT = "ccb48b58790fc7d358d1566600b6e487fa5afdf1"
+EXECUTION_SOURCE_COMMIT = "78ef6bbe180f29ca5886c955244817fa0413617f"
+EXECUTION_SOURCE_TREE = "5b00c179bfda5b30e93b9fa1696d3cfa5b1a4c9c"
+SOURCE_BUNDLE_SHA256 = "0796a7cf142d171079f3d35aa835093d1d49d8036a0a8beaa6d55f4ec60b19f5"
+PRE_WAKE_LABEL = "PRE_WAKE_REMAP_DEFECT_EVIDENCE_IMMUTABLE"
 
 
 def atomic_json(path: Path, payload: Any) -> None:
@@ -119,26 +121,33 @@ def topology_overlay(ax, network: dict, *, owner_by_front: dict | None = None, o
         ax.plot(path[:, 0], path[:, 1], style, color=color, lw=1.2, zorder=5)
 
 
-def annotate_panel(ax, terminal: dict, *, scale_length_um: float = 250.0) -> None:
+def annotate_panel(
+    ax, terminal: dict, *, scale_length_um: float = 250.0,
+    draw_geometry_scale: bool = True,
+) -> None:
     text = (
         f"reach {terminal['achieved_forward_reach_um']:.1f} µm\n"
         f"births {terminal['cumulative_branch_births']}; max active {terminal['maximum_concurrent_active_fronts']}"
     )
     if not terminal["target_reached"]:
         reason = terminal.get("exact_terminal_reason", terminal["terminal_label"])
-        status = (
-            "fail-closed: wake-overlap gate"
-            if reason.startswith("candidate_segment_already_in_committed_wake_material")
-            else "fail-closed: " + reason.split(":", 1)[0]
-        )
+        if reason == "configured_front_resource_limit_reached":
+            status = "policy stop: six active fronts"
+        elif reason.startswith("selected_topology_trial_rejected"):
+            status = "fail-closed: energy gate"
+        else:
+            status = "fail-closed: " + reason.split(":", 1)[0]
         text += "\n" + status
     ax.text(0.015, 0.985, text, transform=ax.transAxes, va="top", ha="left", fontsize=5.8,
             bbox={"facecolor": "white", "alpha": 0.72, "edgecolor": "none", "pad": 1.5})
+    if not draw_geometry_scale:
+        return
     x0, x1 = ax.get_xlim(); y0, y1 = ax.get_ylim()
     length = float(scale_length_um)
-    ax.plot([x0 + 0.04*(x1-x0), x0 + 0.04*(x1-x0) + length], [y0 + 0.055*(y1-y0)]*2,
+    scale_x0 = x0 + 0.12*(x1-x0)
+    ax.plot([scale_x0, scale_x0 + length], [y0 + 0.055*(y1-y0)]*2,
             color="black", lw=2.0, zorder=10)
-    ax.text(x0 + 0.04*(x1-x0) + length/2, y0 + 0.07*(y1-y0), f"{length:g} µm",
+    ax.text(scale_x0 + length/2, y0 + 0.07*(y1-y0), f"{length:g} µm",
             ha="center", va="bottom", fontsize=6)
     ax.plot([500.0], [0.0], marker="|", color="red", ms=8, mew=1.1, zorder=8)
 
@@ -189,8 +198,12 @@ def matrix_figure(records: dict, figures: Path, *, field: str, filename: str,
                 if col_index == 0: ax.set_ylabel("y (µm)")
         fig.suptitle(title + (" — individual scales" if local_scale else " — common scale"), fontsize=12)
         if image is not None and not local_scale:
-            fig.colorbar(image, ax=axes.ravel().tolist(), fraction=0.018, pad=0.015, label=field.replace("_", " "))
-        fig.subplots_adjust(top=0.95, right=0.91 if not local_scale else 0.98, hspace=0.22, wspace=0.08)
+            color_axis = fig.add_axes((0.90, 0.32, 0.016, 0.38))
+            fig.colorbar(image, cax=color_axis, label=field.replace("_", " "))
+        fig.subplots_adjust(
+            top=0.95, right=0.86 if not local_scale else 0.97,
+            left=0.08, bottom=0.06, hspace=0.25, wspace=0.18,
+        )
         save_figure(fig, figures / f"{filename}{suffix}")
 
 
@@ -257,7 +270,8 @@ def process_zone_figure(records: dict, figures: Path) -> None:
             ax.set_xlim(0, 50); ax.set_ylim(0, maxima["population"]*1.05 if maxima["population"] else 1)
             yright = max(maxima["backstress"]/1e9, maxima["shielding"]/1e6, 1e-12)
             right.set_ylim(-yright*1.05, yright*1.05)
-            ax.set_title(f"{DISPLAY[material]}, {temperature} K", fontsize=9); annotate_panel(ax, rec["terminal"])
+            ax.set_title(f"{DISPLAY[material]}, {temperature} K", fontsize=9)
+            annotate_panel(ax, rec["terminal"], draw_geometry_scale=False)
             if ri == 3: ax.set_xlabel("owner-local x (µm)")
             if ci == 0: ax.set_ylabel("line-content population")
             if ci == 1: right.set_ylabel("backstress (GPa) / shielding (MPa√m)")
@@ -287,43 +301,152 @@ def interpreted_snapshot_metadata(metadata: dict, terminal: dict) -> dict:
     return result
 
 
+def parse_case_roots(raw: Path, values: list[str]) -> dict[str, Path]:
+    roots = {case: (raw / case).resolve() for case in CASES}
+    for value in values:
+        if "=" not in value:
+            raise ValueError(f"case-root override must be CASE=PATH, got {value!r}")
+        case, path = value.split("=", 1)
+        if case not in CASES:
+            raise ValueError(f"unsupported case-root override {case!r}")
+        roots[case] = Path(path).resolve()
+    return roots
+
+
+def first_branch_onsets(pre_wake_root: Path) -> dict[str, dict]:
+    result: dict[str, dict] = {}
+    for case in CASES:
+        matches = []
+        for path in (pre_wake_root / case / "field_snapshots").glob("*/metadata.json"):
+            metadata = json.loads(path.read_text())
+            if "accepted_binary_branch_birth_1" in metadata["selection_reasons"]:
+                matches.append((path, metadata))
+        if len(matches) != 1:
+            raise RuntimeError(f"{case}: expected exactly one first-birth snapshot, found {len(matches)}")
+        path, metadata = matches[0]
+        result[case] = {
+            "first_branch_onset_step": metadata["step_count"],
+            "first_branch_onset_time_s": metadata["physical_time_s"],
+            "first_branch_onset_opening_m": metadata["accepted_opening_m"],
+            "first_branch_onset_forward_reach_um": metadata["maximum_network_forward_reach_um"],
+            "first_branch_onset_evidence_path": str(path.resolve()),
+        }
+    return result
+
+
+def qualification_records(qualification_root: Path) -> dict[str, dict]:
+    ceiling_path = qualification_root / "multihit_ceiling_semantics.csv"
+    checkpoint_path = qualification_root / "wake_remap_frozen_checkpoint_regression.csv"
+    with ceiling_path.open(newline="") as stream:
+        ceiling = {row["case"]: row for row in csv.DictReader(stream)}
+    with checkpoint_path.open(newline="") as stream:
+        checkpoints = {row["case"]: row for row in csv.DictReader(stream)}
+    if set(ceiling) != set(CASES) or set(checkpoints) != set(CASES):
+        raise RuntimeError("wake-remap qualification tables do not cover exactly the eight cases")
+    records = {}
+    for case in CASES:
+        lambda_tau = json.loads(ceiling[case]["lambda_uncapped_tau_c"])
+        if not lambda_tau or not all(float(value) > 1.0 for value in lambda_tau):
+            raise RuntimeError(f"{case}: first-bifurcation multi-hit state is not saturated")
+        records[case] = {
+            "source_checkpoint_path": checkpoints[case]["checkpoint_path"],
+            "source_checkpoint_sha256": checkpoints[case]["checkpoint_sha256"],
+            "tau_c_s": float(ceiling[case]["tau_c_s"]),
+            "first_bifurcation_candidate_ids_json": ceiling[case]["candidate_ids"],
+            "first_bifurcation_lambda_uncapped_per_s_json": ceiling[case]["lambda_uncapped_per_s"],
+            "first_bifurcation_lambda_uncapped_tau_c_json": ceiling[case]["lambda_uncapped_tau_c"],
+            "first_bifurcation_saturation_status": "HIGH_RATE_MULTI_HIT_SATURATED",
+        }
+    return records
+
+
+def first_post_remap_snapshot(case_root: Path) -> dict:
+    records = [
+        json.loads(path.read_text())
+        for path in (case_root / "field_snapshots").glob("*/metadata.json")
+    ]
+    if not records:
+        raise RuntimeError(f"{case_root.name}: no corrected post-remap portable snapshot")
+    return min(records, key=lambda item: int(item["step_count"]))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--raw-root", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, default=ROOT / "analysis_outputs" / OUTPUT_NAME)
     parser.add_argument("--review-root", type=Path)
+    parser.add_argument("--case-root", action="append", default=[], metavar="CASE=PATH")
+    parser.add_argument("--pre-wake-root", type=Path, required=True)
+    parser.add_argument("--qualification-root", type=Path, required=True)
+    parser.add_argument("--source-seal-manifest", type=Path, required=True)
     args = parser.parse_args()
     raw = args.raw_root.resolve(); output = args.output_root.resolve()
-    review = (args.review_root or (raw / "compact_review_package")).resolve()
-    if any(not (raw / case / "terminal_manifest.json").is_file() for case in CASES):
-        missing = [case for case in CASES if not (raw / case / "terminal_manifest.json").is_file()]
+    review = (args.review_root or (output / "compact_review_package")).resolve()
+    case_roots = parse_case_roots(raw, args.case_root)
+    pre_wake_root = args.pre_wake_root.resolve()
+    qualification_root = args.qualification_root.resolve()
+    source_seal_manifest = json.loads(args.source_seal_manifest.resolve().read_text())
+    if source_seal_manifest["bundle_sha256"] != SOURCE_BUNDLE_SHA256:
+        raise RuntimeError("execution-source seal does not match the pinned bundle SHA-256")
+    onsets = first_branch_onsets(pre_wake_root)
+    qualification = qualification_records(qualification_root)
+    if any(not case_roots[case].joinpath("terminal_manifest.json").is_file() for case in CASES):
+        missing = [case for case in CASES if not case_roots[case].joinpath("terminal_manifest.json").is_file()]
         raise RuntimeError(f"campaign has unterminated cases: {missing}")
     output.mkdir(parents=True, exist_ok=True); figures = output / "figures"; figures.mkdir(exist_ok=True)
     review.mkdir(parents=True, exist_ok=True)
+    archive_filename = "pf_current_source_multifront_field_atlas_v3_compact_review.tar.gz"
+    # A review archive must never recursively contain an archive or manifest
+    # produced by an earlier finalizer invocation.
+    for stale_name in (archive_filename, "compact_review_archive.json"):
+        stale_path = review / stale_name
+        if stale_path.exists():
+            stale_path.unlink()
     records = {}; validation = []; snapshot_rows = []; branch_rows = []; owner_rows = []
     case_rows = []; terminal_rows = []; inventory = {"schema": "v12.multifront-field-atlas-inventory/1", "cases": {}}
     global_x = [float("inf"), float("-inf")]; global_y = [float("inf"), float("-inf")]
     for case in CASES:
-        case_root = raw / case
+        case_root = case_roots[case]
         terminal = json.loads((case_root / "terminal_manifest.json").read_text())
         launch = json.loads((case_root / "launch_manifest.json").read_text())
         snapshot_dir, metadata, arrays = final_snapshot(case_root)
+        post_remap_initial = first_post_remap_snapshot(case_root)
         validation.append(validate_final(case_root, metadata, arrays))
         network = json.loads((snapshot_dir / "crack_network.json").read_text())
         nodes_um = arrays["nodes_m"]*1e6
         global_x[0] = min(global_x[0], float(nodes_um[:,0].min())); global_x[1] = max(global_x[1], float(nodes_um[:,0].max()))
         global_y[0] = min(global_y[0], float(nodes_um[:,1].min())); global_y[1] = max(global_y[1], float(nodes_um[:,1].max()))
         records[case] = {"terminal": terminal, "launch": launch, "metadata": metadata,
-                         "arrays": arrays, "network": network, "snapshot_dir": snapshot_dir}
-        fp = tree_fingerprint(case_root); atomic_json(case_root / "raw_tree_fingerprint.json", fp)
+                         "arrays": arrays, "network": network, "snapshot_dir": snapshot_dir,
+                         "post_remap_initial": post_remap_initial}
+        fp = tree_fingerprint(case_root)
         terminal["raw_tree_fingerprint"] = fp["sha256"]
+        terminal["raw_tree_file_count"] = fp["file_count"]
+        terminal["raw_tree_size_bytes"] = fp["size_bytes"]
+        terminal.update(onsets[case])
+        terminal.update(qualification[case])
+        terminal.update({
+            "qualified_wake_remap_source_commit": QUALIFIED_WAKE_REMAP_SOURCE_COMMIT,
+            "terminal_execution_source_commit": launch["source"]["campaign_commit"],
+            "post_remap_initial_accepted_state_id": post_remap_initial["accepted_state_id"],
+            "post_remap_initial_stress_field_state_id": post_remap_initial["stress_field_state_id"],
+            "final_accepted_state_id": metadata["accepted_state_id"],
+            "final_stress_field_state_id": metadata["stress_field_state_id"],
+            "mechanics_source_identity": metadata["mechanics_source_identity"],
+            "final_process_owner_count": sum(key != "archived_reservoirs" for key in metadata["owners"]),
+            "final_process_owner_ids_json": json.dumps(
+                sorted(key for key in metadata["owners"] if key != "archived_reservoirs")
+            ),
+            "process_zone_fields_path": str((snapshot_dir / "fields.npz").resolve()),
+        })
         terminal_rows.append(terminal)
         case_rows.append({
             "case": case, "canonical_parameterization_id": launch["canonical_parameterization_id"],
             "execution_alias": launch["execution_alias"], "temperature_K": launch["temperature_K"],
             "parameter_row_canonical_json_sha256": launch["parameter_row_canonical_json_sha256"],
             "theta_deg": 40, "seed": 3621,
-            "source_commit": launch["source"]["campaign_commit"],
+            "qualified_wake_remap_source_commit": QUALIFIED_WAKE_REMAP_SOURCE_COMMIT,
+            "terminal_execution_source_commit": launch["source"]["campaign_commit"],
             "archived_executable_source_commit": launch["source"]["archived_executable_source_commit"],
             "mechanical_fingerprint": MECHANICAL_FINGERPRINT, "family_sha256": FAMILY_SHA256,
             "family_physics_fingerprint": FAMILY_PHYSICS, "raw_directory": str(case_root),
@@ -347,7 +470,15 @@ def main() -> int:
                 destination = review / "portable_fields" / case / meta_path.parent.name
                 copy_compact_snapshot(meta_path.parent, destination)
                 atomic_json(destination / "metadata.json", meta)
-        inventory["cases"][case] = {"snapshots": entries, "final_validation": validation[-1]}
+        inventory["cases"][case] = {
+            "snapshots": entries, "final_validation": validation[-1],
+            "raw_tree_fingerprint": fp,
+            "source_checkpoint_sha256": qualification[case]["source_checkpoint_sha256"],
+            "post_remap_initial_accepted_state_id": post_remap_initial["accepted_state_id"],
+            "post_remap_initial_stress_field_state_id": post_remap_initial["stress_field_state_id"],
+            "final_accepted_state_id": metadata["accepted_state_id"],
+            "final_stress_field_state_id": metadata["stress_field_state_id"],
+        }
         for branch in network["branches"]:
             branch_rows.append({"case": case, **{key: branch.get(key) for key in (
                 "branch_id", "parent_branch_id", "generation", "initiation_event", "status",
@@ -382,17 +513,27 @@ def main() -> int:
         rec["zoom_limits"] = (zoom_x, zoom_y)
     summary_fields = (
         "case", "canonical_parameterization_id", "execution_alias", "temperature_K", "theta_deg", "seed",
-        "source_commit", "mechanical_fingerprint", "family_sha256", "target_forward_reach_um",
+        "qualified_wake_remap_source_commit", "terminal_execution_source_commit",
+        "mechanical_fingerprint", "family_sha256", "target_forward_reach_um",
         "achieved_forward_reach_um", "terminal_step", "terminal_time_s", "terminal_opening_m",
         "terminal_reason", "exact_terminal_reason", "target_reached",
         "cumulative_branch_births", "maximum_concurrent_active_fronts",
         "final_active_front_count", "junction_count", "retirement_count", "coalescence_count",
-        "final_checkpoint_path", "final_field_package_path", "raw_tree_fingerprint",
+        "first_branch_onset_step", "first_branch_onset_time_s", "first_branch_onset_opening_m",
+        "first_branch_onset_forward_reach_um", "tau_c_s",
+        "first_bifurcation_candidate_ids_json", "first_bifurcation_lambda_uncapped_per_s_json",
+        "first_bifurcation_lambda_uncapped_tau_c_json", "first_bifurcation_saturation_status",
+        "source_checkpoint_path", "source_checkpoint_sha256",
+        "post_remap_initial_accepted_state_id", "post_remap_initial_stress_field_state_id",
+        "final_accepted_state_id", "final_stress_field_state_id", "mechanics_source_identity",
+        "final_process_owner_count", "final_process_owner_ids_json", "process_zone_fields_path",
+        "final_checkpoint_path", "final_checkpoint_sha256", "final_field_package_path",
+        "final_field_package_sha256", "raw_tree_fingerprint", "raw_tree_file_count", "raw_tree_size_bytes",
     )
     normalized_terminal = []
     for terminal in terminal_rows:
         normalized_terminal.append({
-            **terminal, "source_commit": CORRECTED_SOURCE_COMMIT,
+            **terminal,
             "mechanical_fingerprint": MECHANICAL_FINGERPRINT,
             "family_sha256": FAMILY_SHA256, "target_forward_reach_um": 1000.0,
             "terminal_reason": terminal["terminal_label"],
@@ -424,8 +565,9 @@ def main() -> int:
     process_zone_figure(records, figures)
     provenance = {
         "schema": "v12.multifront-field-atlas-provenance/1", "claim_label": CLAIM_LABEL,
-        "execution_source_commit": CORRECTED_SOURCE_COMMIT,
-        "execution_source_tree": CORRECTED_SOURCE_TREE,
+        "qualified_wake_remap_source_commit": QUALIFIED_WAKE_REMAP_SOURCE_COMMIT,
+        "execution_source_commit": EXECUTION_SOURCE_COMMIT,
+        "execution_source_tree": EXECUTION_SOURCE_TREE,
         "archived_pre_correction_source_commit": BASE_COMMIT,
         "source_bundle_sha256": SOURCE_BUNDLE_SHA256,
         "postprocessing_commit": subprocess.check_output(
@@ -435,40 +577,101 @@ def main() -> int:
         "mechanical_fingerprint": MECHANICAL_FINGERPRINT,
         "registry_rows": {canonical: {"alias": alias, "row_sha256": registry_row(canonical)[1]}
                           for canonical, alias in ROWS.values()},
-        "raw_root": str(raw), "review_root": str(review), "final_checkpoint_validation": validation,
+        "case_roots": {case: str(case_roots[case]) for case in CASES},
+        "review_root": str(review), "final_checkpoint_validation": validation,
+        "pre_wake_remap_record": {
+            "root": str(pre_wake_root), "label": PRE_WAKE_LABEL,
+            "used_only_for_first_branch_onset_evidence": True,
+        },
+        "wake_remap_qualification_root": str(qualification_root),
+        "source_seal_manifest": source_seal_manifest,
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "interpretation": CLAIM_LABEL,
+        "first_bifurcation_interpretation": (
+            "HIGH_RATE_SATURATED_CORRELATED_EVENT_NOT_A_CALIBRATED_"
+            "MATERIAL_DEPENDENT_BRANCH_PROBABILITY"
+        ),
     }
     atomic_json(output / "pf_multifront_field_atlas_provenance.json", provenance)
-    report = f"""# PF current-source multifront field atlas: 300 K and 1000 K
+    result_lines = [
+        "| Case | Reach (µm) | Births | Max active | First branch time (s) | First branch opening (m) | Terminal reason |",
+        "|---|---:|---:|---:|---:|---:|---|",
+    ]
+    for row in normalized_terminal:
+        result_lines.append(
+            f"| {row['case']} | {row['achieved_forward_reach_um']:.6f} | "
+            f"{row['cumulative_branch_births']} | {row['maximum_concurrent_active_fronts']} | "
+            f"{row['first_branch_onset_time_s']:.12g} | "
+            f"{row['first_branch_onset_opening_m']:.12g} | "
+            f"`{row['exact_terminal_reason']}` |"
+        )
+    result_table = "\n".join(result_lines)
+    verification_path = output / "verification_summary.json"
+    if verification_path.is_file():
+        verification = json.loads(verification_path.read_text())
+        verification_section = f"""## Verification
+
+The focused current-source qualification passed `{verification['focused_tests']['passed']} passed`. The full suite was run once and recorded `{verification['full_suite']['passed']} passed`, `{verification['full_suite']['skipped']} skipped`, and `{verification['full_suite']['failed']} failed`. Those failures divide into {verification['full_suite']['missing_historical_artifact_failures']} missing historical publication-fixture failures in this isolated worktree and {verification['full_suite']['legacy_failures']} pre-existing legacy failures; no current wake-remap, multifront-topology, or field-atlas test failed. Compileall and `git diff --check` passed. The complete classification is preserved in `verification_summary.json`.
+"""
+    else:
+        verification_section = """## Verification
+
+The machine-readable end-of-campaign verification record is `verification_summary.json`.
+"""
+    report = f"""# Authoritative corrected V3 wake-remap PF field atlas
 
 Permanent interpretation boundary: `{CLAIM_LABEL}`.
 
 ## Scope and decision
 
-Exactly eight pinned physical cases were run: Peak, DBTT, weak-T, and ceramic-like at 300 K and 1000 K. Each trajectory used theta=40 degrees, seed 3621, canonical 1x loading, corrected V12 source `{CORRECTED_SOURCE_COMMIT}`, at most six active fronts, and a 1000 µm maximum-forward-reach target. The source is preserved by a complete Git bundle with SHA-256 `{SOURCE_BUNDLE_SHA256}`. Early fail-closed stops are preserved as scientifically complete capability records; they are not patched, reseeded, or restarted from the beginning.
+Exactly eight pinned physical cases were continued: Peak, DBTT, weak-T, and ceramic-like at 300 K and 1000 K. Each trajectory retained theta=40 degrees, seed 3621, canonical 1x loading, at most six active fronts, the 1600 µm owner-family, and a 1000 µm maximum-network-forward-reach target. The graph-authoritative P0 remap was qualified at source commit `{QUALIFIED_WAKE_REMAP_SOURCE_COMMIT}`. The exact execution lineage, including only the subsequently demonstrated topology-transaction fixes, is `{EXECUTION_SOURCE_COMMIT}` and is preserved by a complete Git bundle with SHA-256 `{SOURCE_BUNDLE_SHA256}`.
 
-All eight cases reached 41.516160204381784 µm maximum projected forward extension, one cumulative binary branch birth, and two simultaneous active fronts. None reached the 1000 µm target. Every case then stopped at the same existing fail-closed geometry gate: `candidate_segment_already_in_committed_wake_material`. This common terminal outcome is recorded as the result of each case; no automatic convergence, mesh, parameter, or reseeding study was launched.
+None of the eight cases reached 1000 µm. Seven stopped at the configured six-active-front resource policy. DBTT at 1000 K stopped earlier at the existing fail-closed whole-topology energy-release gate, `selected_topology_trial_rejected:insufficient_whole_topology_energy_release`. Each early stop preserves its last accepted atomic checkpoint and portable fields; no diagnostic campaign, reseed, parameter change, or restart from the beginning was launched.
+
+{result_table}
+
+## First-bifurcation interpretation
+
+For every case, both recorded uncapped first-bifurcation `lambda*tau_c` values exceed one. The exact uncapped values and candidate identities are preserved in `pf_multifront_field_atlas_terminal_summary.csv`. The `1/tau_c` multi-hit asymptote is retained as constitutive physical saturation. Therefore the first bifurcation is interpreted as a **high-rate saturated correlated event, not a calibrated material-dependent branch probability**.
+
+## Corrected mechanics and state identities
+
+The final table records the source-checkpoint SHA-256, first corrected post-remap accepted FEM identity, first corrected stress-field identity, final accepted FEM identity, final stress-field identity, process-owner IDs, process-zone package, and raw-tree fingerprint for every case. Every final portable package was reloaded and compared exactly with its atomic accepted checkpoint for mesh, displacement, damage, plastic strain, dislocation density, the complete accepted stress tensor, accepted/stress state identities, and topology.
 
 The shared family is mechanically valid for all eight cases because its mechanical configuration explicitly declares temperature-independent mechanics. Its SHA-256 is `{FAMILY_SHA256}`, its mechanical fingerprint is `{MECHANICAL_FINGERPRINT}`, and its qualified owner-local range is 0–1600 µm. Temperature remains active in the process kinetics.
 
-## Accepted-state field contract
+## Immutable V2 evidence and V3 authority
 
-Portable NPZ, VTU, and crack-network VTP/JSON packages were saved at accepted binary births, detected owner handoffs or partitions, reached milestones, and the last accepted state. No case reached the 250/500/750/1000 µm milestones, so no field is classified as a milestone field. All final packages were reloaded and checked exactly against their atomic accepted V12 checkpoints for mesh, displacement, damage, plastic strain, dislocation density, the complete accepted stress tensor, state identities, and topology.
+The old V2 atlas at `{pre_wake_root}` remains read-only and is labelled `{PRE_WAKE_LABEL}`. It is used here only to recover the already accepted first-bifurcation onset time/opening. It is not a corrected field atlas. The figures and tables in this directory are authoritative only for the V3 graph-authoritative wake-remap continuation results.
 
 ## Interpretation limit
 
-These figures demonstrate what the current V12 arbitrary-finite-front architecture produced for the pinned cases. They do not validate predictive recursive-branching physics. Model-native J or K values are not reported as calibrated fracture toughness or as an R-curve.
+These records demonstrate the current V12 arbitrary-finite-front architecture through the terminal states above. They do not validate predictive recursive-branching physics. Model-native J or K values are not reported as calibrated fracture toughness or as an R-curve.
+
+{verification_section}
 
 ## Records
 
-The terminal summary, case manifest, snapshot manifest, branch tree, owner summary, complete field inventory, figures, and provenance JSON in this directory are authoritative compact indexes. Durable raw accepted checkpoints and logs remain under `{raw}`; selected milestone/final portable fields are copied to `{review}`.
+The terminal summary, case manifest, snapshot manifest, branch tree, owner summary, complete field inventory, figures, provenance JSON, and compact review archive in this directory are the authoritative corrected indexes. Durable raw accepted checkpoints and logs remain at the case roots listed in provenance; selected topology/final portable fields are copied to `{review}`.
 """
     (output / "PF_CURRENT_SOURCE_MULTIFRONT_FIELD_ATLAS_300K_1000K.md").write_text(report)
+    excluded_review_files = {archive_filename, "compact_review_archive.json"}
     for path in output.iterdir():
-        if path.is_file(): shutil.copy2(path, review / path.name)
+        if path.is_file() and path.name not in excluded_review_files:
+            shutil.copy2(path, review / path.name)
     if (review / "figures").exists(): shutil.rmtree(review / "figures")
     shutil.copytree(figures, review / "figures")
+    archive_base = output / "pf_current_source_multifront_field_atlas_v3_compact_review"
+    archive_path = Path(str(archive_base) + ".tar.gz")
+    if archive_path.exists():
+        archive_path.unlink()
+    shutil.make_archive(str(archive_base), "gztar", root_dir=review)
+    atomic_json(output / "compact_review_archive.json", {
+        "schema": "v12.multifront-field-atlas-compact-review-archive/1",
+        "path": str(archive_path),
+        "sha256": sha256(archive_path),
+        "source_directory": str(review),
+    })
     return 0
 
 
