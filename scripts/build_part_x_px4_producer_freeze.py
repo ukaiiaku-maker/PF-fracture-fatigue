@@ -2,17 +2,29 @@
 current, committed producer identity for every AUTHORIZED_PX4 developed
 row before launch -- distinguishing:
 
-  selection_source_commit    -- the commit at which D1-D7's post-screen
-                                 decisions were finalized (PX3.6, 300ff5a)
+  selection_source_commit    -- the commit this freeze is being run
+                                 against (updated each time this script is
+                                 rerun after a further fix/commit; records
+                                 which commit's diff was checked for
+                                 physics-affecting changes)
   physical_source_commit     -- the commit whose physics-affecting .py
                                  files will actually execute these jobs
+                                 (always == launch_HEAD, since a freeze
+                                 records the state at its own run time)
   launch_HEAD                -- the git HEAD at the moment of this freeze
-                                 (must equal physical_source_commit; no
-                                 drift is tolerated by this script)
   physical_source_bundle_sha256 -- a single aggregate hash over every
                                  physics-affecting file's own content, so
                                  any future producer-identity question can
                                  be settled by comparing one value
+
+Every commit -- including this freeze's own registry update -- advances
+HEAD, so launch_HEAD is necessarily one commit ahead of whatever this
+script's SELECTION_SOURCE_COMMIT was set to when it last ran; there is no
+way to make a freeze commit equal its own future HEAD. What actually
+matters, and is what this script verifies instead of asserting equality
+away, is whether anything PHYSICS-AFFECTING changed between the two
+commits (recorded in physical_source_files_among_those_changes below) --
+if the answer is genuinely "no", the one-commit lag is provably inert.
 
 Regenerates ONLY the 44 rows currently AUTHORIZED_PX4 in developed_job_
 registry.csv (nothing has been physically launched under any of them --
@@ -48,7 +60,7 @@ RUN_ROOT = REPO_ROOT / "runs" / "crack_rebonding_part_x_v1"
 from build_part_x_kinetic_regime_registry import canonical_job_key  # noqa: E402
 from build_part_x_px3_producer_provenance import PHYSICAL_SOURCE_FILES  # noqa: E402
 
-SELECTION_SOURCE_COMMIT = "300ff5ab355c47457da65f45b6428daa39485374"  # PX3.6
+SELECTION_SOURCE_COMMIT = "805f87d914ead09ef76acedf8d635453d9bee34e"  # PX4 budget fix
 
 
 def _git(*args: str) -> str:
