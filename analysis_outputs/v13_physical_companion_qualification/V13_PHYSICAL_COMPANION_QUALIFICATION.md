@@ -6,6 +6,8 @@ Initial V13 sampler/restoration qualification remains accepted. No sampler-only 
 
 The initial record is `55955722db40ef65c43d2f1c08357ad8f77b82fa`. Complete initial history and the physical-source increment are preserved as verified Git bundles on the Data drive.
 
+Model scope: **FRESH_INDEPENDENT_POST_PRIMARY_ORDER3_COMPANION_WITH_TAU_B_LE_TAU_C**. This is the qualified independent-sequential null model, not the final co-critical branching model. The original report/archive remains preserved at record `d10c3eb`.
+
 ## Physical result
 
 All 8 clean-parent checks completed. The largest committed-branch probability across 5096 analytic case/parameter evaluations is **4.4611289e-08**. No physical short ensemble was launched.
@@ -41,7 +43,7 @@ At a newly born junction, separation is zero, so junction and overlap barriers a
 
 **NOT_PASSED_NO_ENSEMBLE**
 
-- no_positive_exact_pair_through_reference_overlay
+- no_stochastic_companion_selected_at_the_preregistered_reference_mark
 - no_common_robust_nondegenerate_material_and_temperature_sensitive_grid_region
 - defensible_process_state_rate_sensitivity_not_demonstrated
 

@@ -1,0 +1,22 @@
+{
+  "schema": "v13.clock-pair-source-preservation/1",
+  "branch": "codex/v13-inherited-clock-and-pair-mechanism",
+  "source_commit": "9af79b061d98865fd31ed66de43156e704e933c9",
+  "incremental_bundle": "final_source_increment.bundle",
+  "incremental_bundle_sha256": "1a4dc46bb19a3f5d13000e8a5a2a2e742043decff095415cd25425f9785e577e",
+  "complete_prerequisite_bundle": "../v13_physical_companion_qualification/source_preservation/v13_initial_5595572.bundle",
+  "prerequisite_commit": "55955722db40ef65c43d2f1c08357ad8f77b82fa",
+  "complete_prerequisite_bundle_sha256": "a5f9f1a29f2883fb2bfe5219e277f73fd3d0280862899c70b41d44d2bd58cc20",
+  "preserved_prior_record": "d10c3ebd8a3513edec5624faebdc7faf8656d106",
+  "prior_record_increment_bundle": "../v13_physical_companion_qualification/source_preservation/v13_record_d10c3eb.incremental.bundle",
+  "prior_record_increment_bundle_sha256": "25b6257414d86f1c382d8ed25618f8541c1b8ee9ecbbdde5c2c0648b50a8cb15",
+  "later_parent_producer_code_commit": "00486dab0d8bfa02e50602e848a96ced3bb80e38",
+  "later_frozen_mechanics_producer_code_commit": "4e6242b120328afada72be54643205d0a63e24d6",
+  "clock_audit_source_commit": "8753594a57685bbd018f79d37ed446c7289dabf2",
+  "later_clock_enrichment_source_captured_in_commit": "ccb8d9b2036cd24785b0f0388f0a70da060e458b",
+  "RNG_statement_scope": "Frozen-audit zero-draw statements refer to authoritative baseline/branch RNG. Isolated constructor fixture RNG is discarded when restoring the exact saved process state. The later frozen null overlay retains one unchanged preregistered reference mark per captured event; no seed screen or Monte Carlo campaign.",
+  "source_bundle_verification": "PASS",
+  "durable_volume": "/Volumes/Data",
+  "remote_push_performed": false,
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED"
+}

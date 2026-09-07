@@ -1,0 +1,51 @@
+{
+  "accepted_endpoint_s": 2234.4000078769104,
+  "accepted_event_ids": [
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000007",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000008",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000005",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000006",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000007"
+  ],
+  "accepted_opening_m": 5.320000018754538e-05,
+  "accepted_process_sha256": "ae20b934acbd45ebe3dde1d94378df441efc870a30a4a785e3ea1700b70956b4",
+  "accepted_single_checkpoint_sha256": "0bc00f4a0abb5d23fb6725feba15d90014796b9991d5b58ef47c2556fbe67c25",
+  "branching_enabled": false,
+  "clean_history": true,
+  "event_context_sha256": "7ac9e8840a752f9d078e7759252c1bffdfd03b59f3fbfdc274a3a95d27b99afe",
+  "event_id": "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000008",
+  "event_ordinal": 8,
+  "forward_extension_um": 52.52305989662614,
+  "fresh_initialization": false,
+  "installed_bindings": {
+    "engine": {},
+    "mpz": {
+      "_emit": "arrhenius_fracture.persistent_site_source_v10221._persistent_emit",
+      "_persistent_base_diagnostics": "arrhenius_fracture.signed_burgers_shared_v1025._signed_diagnostics",
+      "active_K_shielding": "arrhenius_fracture.signed_burgers_shared_v1025._active_K",
+      "advance": "arrhenius_fracture.persistent_site_source_v10221._persistent_advance",
+      "diagnostics": "arrhenius_fracture.persistent_site_source_v10221._persistent_diagnostics",
+      "evolve": "arrhenius_fracture.signed_burgers_shared_v1025._signed_evolve_scalar",
+      "shielding_K": "arrhenius_fracture.signed_burgers_shared_v1025._total_K",
+      "wake_K_shielding": "arrhenius_fracture.signed_burgers_shared_v1025._wake_K"
+    }
+  },
+  "milestones_reached_um": [
+    50.0
+  ],
+  "pre_cleavage_checkpoint_sha256": "14dbcfcb2164512dfac9a9083a5482f81c9680be2fb37946aa743b30218744f2",
+  "raw_first_passage_s": 2234.4000078452723,
+  "schema": "v13.later-clean-parent/1",
+  "source_first_parent_checkpoint_sha256": "766087c037fbd17517f82bd28bc221bc7cb2d8da6fe955e2a4f6acd54580ecb4",
+  "winning_candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300"
+}
