@@ -734,15 +734,19 @@ def _project_fields(state, mesh):
     }
 
 
-def _grow_hole_boundary(hole, radius_m):
-    nodes = np.asarray(hole.mesh.nodes).copy()
-    count = len(hole.prescribed_polygon_nodes)
-    center = np.asarray(hole.center_m)
-    theta = np.arctan2(nodes[:count, 1] - center[1], nodes[:count, 0] - center[0])
-    polygon_radius = float(radius_m) / math.cos(math.pi / count)
-    nodes[:count] = center + polygon_radius * np.c_[np.cos(theta), np.sin(theta)]
-    mesh = rebuild_tri_mesh(nodes, np.asarray(hole.mesh.elems), tip_centers=np.asarray(hole.center_m))
-    return replace(hole, mesh=mesh, radius_m=float(radius_m))
+def _grow_hole_boundary(hole, radius_m, *, crack_path_m):
+    """Rebuild all radial layers, then conform the unchanged physical crack.
+
+    Moving only the boundary can overtake the first solid layer and invert
+    triangles on a fine mesh. No boundary/topology tolerance can repair that.
+    """
+    grown, _ = _geometry(radius_m, hole.center_m,
+                         boundary_segments=len(hole.prescribed_polygon_nodes),
+                         radial_layers=int(hole.validation["radial_layers"]))
+    mesh = grown.mesh
+    for point in crack_path_m:
+        mesh = _insert_point_in_mesh(mesh, point)
+    return replace(grown, mesh=mesh)
 
 
 def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure_stage=None):
@@ -1547,7 +1551,8 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     state = remesh_cavity(state, hole, promoted, "promotion", operations)
     rows.append({**observables(state, "geometric_promotion"), "executed_operations": operations})
     capture("geometric_promotion")
-    grown_hole = _grow_hole_boundary(hole, 5.5e-5)
+    grown_hole = _grow_hole_boundary(hole, 5.5e-5,
+                                    crack_path_m=state.crack_network.branch(ROOT_BRANCH_ID).path)
     tensor = cavity_boundary_tensor(state)[0]
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
     growth_dt = 0.5e-5 / (cfg.radial_growth_scale_m * rates["series_limited_growth_s"])

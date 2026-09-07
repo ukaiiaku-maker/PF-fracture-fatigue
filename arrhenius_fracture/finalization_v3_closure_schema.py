@@ -79,6 +79,9 @@ def validate_closure_evidence(rows: Sequence[Mapping], source_rows: Mapping[str,
     # Static sources bind mesh/system/solution arrays, not invented accepted
     # lifecycle states. Keep the complete lifecycle registry contract intact.
     if isinstance(rows, Mapping):
+        if rows.get("schema") == "v12.voiding-v5-closure-mechanics/1":
+            from .closure_mechanics_evidence import validate
+            return validate(rows, source_rows, executed_code_sha=executed_code_sha)
         from .closure_static_evidence import validate_static_evidence
         return validate_static_evidence(rows, source_rows, executed_code_sha=executed_code_sha)
     validate_evidence_rows(rows, source_rows, executed_code_sha=executed_code_sha)

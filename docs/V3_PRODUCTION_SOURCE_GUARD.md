@@ -34,3 +34,12 @@ The frozen schema defines a 0.05 tensor limit and a 1e-12 transition partition
 time limit, but no barrier/rate MESH-transfer error tolerances. Diagnostic
 errors are reported without inventing or borrowing a scientific limit. No
 production source is authorized until that complete prerequisite is met.
+
+## Resolved-growth remesh repair
+
+The first actual transfer at 128/48 failed the existing exact triangle/polygon
+overlap certificate. Boundary-only radial movement overtook the fixed first
+solid layer. The correction rebuilds every radial layer at the grown radius,
+reconforms the unchanged crack path, and uses the existing conservative field
+projection and equilibrium path. No topology tolerance, cleavage law, or
+scientific predicate changes. The failed first attempt is retained separately.

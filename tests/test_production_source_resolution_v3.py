@@ -9,6 +9,7 @@ from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_
 from arrhenius_fracture.voiding_production_v5 import (
     _complete_next_clock, deterministic_trajectory, downstream_front_transaction,
     directional_clock_rates, build_production_void_state,
+    _geometry, _grow_hole_boundary,
 )
 from arrhenius_fracture.voiding_v5 import VoidPhase
 
@@ -81,3 +82,16 @@ def test_readonly_rate_diagnostic_uses_existing_hazard_without_consuming_it(conn
 def test_resolution_change_requires_fixed_physical_crack():
     with pytest.raises(ValueError, match="explicit fixed crack path"):
         build_production_void_state(boundary_segments=64, radial_layers=24)
+
+
+def test_resolved_growth_rebuilds_normal_layers_without_overtaking_solid():
+    from arrhenius_fracture.explicit_cavity_v5 import triangle_intersects_open_disk
+    hole, _ = _geometry(boundary_segments=128, radial_layers=48)
+    path = ((0., 0.), (0.0005725993004046688, 0.))
+    grown = _grow_hole_boundary(hole, 5.5e-5, crack_path_m=path)
+    assert grown.validation["triangle_disk_intersections"] == 0
+    assert all(not triangle_intersects_open_disk(grown.mesh.nodes[e], grown.center_m, grown.radius_m)
+               for e in grown.mesh.elems)
+    for point in path:
+        assert min(np.linalg.norm(grown.mesh.nodes-point, axis=1)) <= 1e-12
+    assert grown.radius_m == 5.5e-5
