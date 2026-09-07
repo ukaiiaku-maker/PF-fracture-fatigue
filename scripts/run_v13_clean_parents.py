@@ -16,7 +16,7 @@ import time
 import traceback
 
 from scripts.run_pf_current_source_multifront_field_atlas_v12 import (
-    ROOT, CASES, case_parts, common_arguments, campaign_environment, validate_inputs, registry_row,
+    ROOT, CASES, ROWS, case_parts, common_arguments, campaign_environment, validate_inputs, registry_row,
     atomic_json, sha256,
 )
 
@@ -108,6 +108,7 @@ class FirstParentCapture:
 
 def case_run(args):
     from arrhenius_fracture import sharp_front_v11_branching as production
+    from arrhenius_fracture import sharp_front_v10_2_27 as paper
     case_root = args.output_root / args.case
     case_root.mkdir(parents=True, exist_ok=True)
     claim = case_root / "launch_claim.json"
@@ -131,6 +132,13 @@ def case_run(args):
         "family_validation": validation, "baseline_seed": 3621, "fresh_initialization": True,
         "first_cleavage_stop": True, "maximum_accepted_intervals": 2000, "boundary": BOUNDARY})
     capture = FirstParentCapture(case_root)
+    # Match the accepted four-class fresh initializer's explicit registry
+    # routing. The generic paper defaults point at a different, uninstalled
+    # registry, including older weak-T/ceramic candidate IDs.
+    original_paper = paper.DEFAULT_REGISTRY, paper.SELECTION_RECORD, paper.VALID_OPTIONS
+    paper.DEFAULT_REGISTRY = ROOT / "runtime_inputs/pf_current_source_branching/pf_v2_four_class_pf_transfer_registry.csv"
+    paper.SELECTION_RECORD = ROOT / "runtime_inputs/pf_current_source_branching/pf_v2_four_class_pf_transfer_selection.json"
+    paper.VALID_OPTIONS = {alias_value: candidate for candidate, alias_value in ROWS.values()}
     original = production.run_2d
     production.run_2d = partial(original, parent_capture=capture)
     try:
@@ -144,6 +152,7 @@ def case_run(args):
         raise
     finally:
         production.run_2d = original
+        paper.DEFAULT_REGISTRY, paper.SELECTION_RECORD, paper.VALID_OPTIONS = original_paper
 
 
 def queue(args):

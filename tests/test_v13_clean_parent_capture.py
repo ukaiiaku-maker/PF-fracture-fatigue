@@ -38,3 +38,13 @@ def test_physical_sensitivity_preregistered_before_launch():
     assert plan["quenched_disorder_J"] == 0
     assert not plan["sampler_only_Monte_Carlo"] and not plan["historical_atlas_continuation"]
     assert len(plan["beta_B_log10_grid"]) == 13
+
+
+def test_actual_entry_uses_the_same_pinned_four_class_registry():
+    import inspect
+    from scripts.run_v13_clean_parents import case_run, ROWS
+    text = inspect.getsource(case_run)
+    assert "pf_v2_four_class_pf_transfer_registry.csv" in text
+    assert "pf_v2_four_class_pf_transfer_selection.json" in text
+    assert ROWS["weakT"][0] == "oneD_v2_focused_weak_T_0016"
+    assert ROWS["ceramic"][0] == "oneD_v2_focused_ceramic_like_0018"
