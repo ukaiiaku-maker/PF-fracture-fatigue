@@ -28,10 +28,10 @@ def read_tree(path,filename):
     return json.loads((path/filename).read_text())
 
 
-def derive(root,junit,regression_sha):
+def derive(root,junit,regression_sha,lifecycle_directory):
     traction=read_tree(root/"traction_source_a","traction_convergence.json")
     mechanics=read_tree(root/"mechanics_a","mechanics_matrix.json")
-    lifecycle=read_tree(root/"lifecycle_a","lifecycle_rows.json")
+    lifecycle=read_tree(root/lifecycle_directory,"lifecycle_rows.json")
     production=read_tree(root/"production_a","transfer_manifest.json")
     kirsch=[]
     for row in traction["base_rows"]:
@@ -54,7 +54,7 @@ def derive(root,junit,regression_sha):
     offsets=[]
     for row in lifecycle["rows"]:
         if row["dataset"]!="controlled" or row["case_identity"] not in ("positive_offset","negative_offset"): continue
-        state=restore_checkpoint(root/"lifecycle_a"/row["terminal_checkpoint"])
+        state=restore_checkpoint(root/lifecycle_directory/row["terminal_checkpoint"])
         candidates=candidate_measurements(state)
         zero=all(c["rates_before_resolution_guard"]["effective_rate_s"]==0. for c in candidates)
         offsets.append({"source_execution_id":row["execution_id"],"case_identity":row["case_identity"],
@@ -97,4 +97,5 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("evidence_root",type=Path); parser.add_argument("junit",type=Path)
     parser.add_argument("--regression-sha",required=True)
-    args=parser.parse_args(); print(json.dumps(derive(args.evidence_root,args.junit,args.regression_sha),indent=2,sort_keys=True,allow_nan=False))
+    parser.add_argument("--lifecycle-directory",default="lifecycle_terminal_a")
+    args=parser.parse_args(); print(json.dumps(derive(args.evidence_root,args.junit,args.regression_sha,args.lifecycle_directory),indent=2,sort_keys=True,allow_nan=False))
