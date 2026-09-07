@@ -471,6 +471,7 @@ def run_trajectory(
     hazard_rng_seed: int = SEED,
     static_shield_control: dict[str, Any] | None = None,
     minimum_load_hold_s: float = 0.0,
+    state_sampler: Callable[[Any, dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """Drive one fresh, unresumed trajectory in-process via the real
     A_NATIVE production engine's own cycle_step_waveform/
@@ -561,6 +562,8 @@ def run_trajectory(
                 result = engine.cycle_step_waveform(ctrl, waveform, T_K_)
                 cumulative_time_s += float(result.get("kinetic_dt_consumed_s", 0.0))
                 cumulative_cycles += float(result.get("cycles_consumed", 0.0))
+                if state_sampler is not None:
+                    state_sampler(engine, result)
                 if result.get("fired"):
                     fired_result = result
                     break

@@ -1,0 +1,12 @@
+{
+  "schema": "v10230_part_x_px3_6_verifier_v1",
+  "checks": {
+    "dwell_bug_trajectories_invalidated": true,
+    "clean_producer_reruns_present_and_self_consistent": true,
+    "d5_qualified_with_live_cycle_mean_data": true,
+    "uncertainty_gate_satisfied_D3_D5_D6": true,
+    "previously_failing_test_doubles_now_pass": true
+  },
+  "errors": [],
+  "overall_pass": true
+}

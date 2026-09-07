@@ -89,13 +89,26 @@ class Controller:
 
 class Waveform:
     frequency_Hz = 1.0
+    effective_cycle_frequency_Hz = 1.0
     period_s = 1.0
+    base_period_s = 1.0
+    minimum_load_hold_s = 0.0
     Kmax = 10.0
     R = 0.1
     DeltaK = 9.0
 
     def K_phase(self, phases):
         return np.full_like(phases, self.Kmax, dtype=float)
+
+    def cycle_schedule(self, n_phase, *, signed=False, phase_offset_rad=0.0):
+        """PX1.1 added this as _phase_statistics's actual schedule source
+        (replacing a direct K_phase(phases) call); this mock reproduces the
+        pre-PX1.1 uniform-dt behavior exactly (minimum_load_hold_s=0.0 here,
+        so there is no dwell bin to add)."""
+        phases = np.linspace(0.0, 2.0 * np.pi, n_phase, endpoint=False) + phase_offset_rad
+        K_values = self.K_phase(phases)
+        dt_values = np.full(n_phase, self.period_s / n_phase, dtype=float)
+        return K_values, dt_values
 
 
 def _config():

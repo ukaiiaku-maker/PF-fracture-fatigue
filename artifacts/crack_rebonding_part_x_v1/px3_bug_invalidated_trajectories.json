@@ -1,0 +1,49 @@
+{
+  "schema": "v10230_part_x_px3_6_bug_invalidation_manifest_v1",
+  "invalidated_trajectories": [
+    {
+      "canonical_job_key": "3d30034af1b472c45d28f9ab22063a56707c5a38b084acfa6dee5871095115d5",
+      "label": "hold=0.0005s finite cohesion",
+      "original_result_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-crack-rebonding-part-x/runs/crack_rebonding_part_x_v1/7.3_dwell_panel_COMPETING_REVERSIBLE_finite_3d30034af1b4/result.json",
+      "original_result_sha256": "2f0db2492cfec26ede678105d6c96cc8609b06befd29e05832cd9e392bef09aa",
+      "original_producer_commit": "ba1731e0c9b20a0b685245bd12af49c6b437b25a",
+      "defective_source_file": "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py",
+      "defective_source_sha256_at_producer_commit": "b413badae311db2d301e5ebfea095224f7a664a531b7b4efe03dd5f91b9313da",
+      "fixed_source_sha256_at_px3_5_commit": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+      "original_reported_S_h": 0.3551054814755134,
+      "invalidation_reason": "_phase_statistics's hazard_coupled branch duration-weighted cursor-rotated cleavage-hazard samples against the unrotated dt_values array -- corrupting the adaptive block-stepping search's hazard rate whenever hold>0. Fixed in commit c720d590ee1c072460b574399ec28808e5e6727f. This trajectory is NOT a legitimate physical measurement (neither a valid right-censor at hold=0.0005s nor a valid uncensored measurement at hold=0.002s) and must not be used in any scientific screen count, censor statistic, sensitivity classification, or developed-protocol decision.",
+      "status": "INVALIDATED_DWELL_DURATION_WEIGHTING_BUG",
+      "corrected_replacement": {
+        "source": "px3_5_dwell_audit_classification.json",
+        "leg": "dynamic_finite_hold0.0005",
+        "corrected_S_h_vs_zero_cohesion": -0.04398496238856613
+      }
+    },
+    {
+      "canonical_job_key": "7e27ff50ebf98aefef66e6e3fc08d2266e2765f5ef7b63209bbaa575cdb22274",
+      "label": "hold=0.002s finite cohesion",
+      "original_result_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-crack-rebonding-part-x/runs/crack_rebonding_part_x_v1/7.3_dwell_panel_COMPETING_REVERSIBLE_finite_7e27ff50ebf9/result.json",
+      "original_result_sha256": "2893515cc8de343eb3dae111f3707d018ac901338e4786f0e9f7094df1a3ddf9",
+      "original_producer_commit": "ba1731e0c9b20a0b685245bd12af49c6b437b25a",
+      "defective_source_file": "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py",
+      "defective_source_sha256_at_producer_commit": "b413badae311db2d301e5ebfea095224f7a664a531b7b4efe03dd5f91b9313da",
+      "fixed_source_sha256_at_px3_5_commit": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+      "original_reported_S_h": 0.7968632120351952,
+      "invalidation_reason": "_phase_statistics's hazard_coupled branch duration-weighted cursor-rotated cleavage-hazard samples against the unrotated dt_values array -- corrupting the adaptive block-stepping search's hazard rate whenever hold>0. Fixed in commit c720d590ee1c072460b574399ec28808e5e6727f. This trajectory is NOT a legitimate physical measurement (neither a valid right-censor at hold=0.0005s nor a valid uncensored measurement at hold=0.002s) and must not be used in any scientific screen count, censor statistic, sensitivity classification, or developed-protocol decision.",
+      "status": "INVALIDATED_DWELL_DURATION_WEIGHTING_BUG",
+      "corrected_replacement": {
+        "source": "px3_5_dwell_audit_classification.json",
+        "leg": "dynamic_finite_hold0.002",
+        "corrected_S_h_vs_zero_cohesion": -0.044017161426242166
+      }
+    }
+  ],
+  "exclusion_scope": [
+    "scientific screen event/trajectory counts",
+    "censor statistics",
+    "axis-sensitivity classifications",
+    "developed-protocol decisions",
+    "any manuscript table or figure"
+  ],
+  "retained_for": "historical bug-audit evidence only; the portable ledger may still reproduce their raw values"
+}

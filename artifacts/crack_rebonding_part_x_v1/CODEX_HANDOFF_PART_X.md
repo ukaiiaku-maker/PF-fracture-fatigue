@@ -409,24 +409,13 @@ before/after state instead.
      persistent_at_transition.py`): `S_h=-0.0429` vs. reversible's
      `-0.0232` at the same condition, `ΔS_h=0.0197` — clears the gate.
      **New D6 rows authorized** at 316.227766 Hz.
-  7. **D5 passivation chemistry re-qualified with a live-data proxy.**
-     True sub-event p_B/p_P traces aren't archived at this instrumentation
-     depth, so the mean of `pre_event_max_pB`/`max_pB_post_commit` across
-     each chemistry factor's 12 already-completed events is used as the
-     coarsest available *live* (not analytical) proxy for cycle-mean p_B:
-     chem=1.0→0.397 (|Δ from 0.30|=0.097), chem=0.3→0.184 (|Δ|=0.116),
-     chem=0.1→0.064 (|Δ|=0.236) — chem=1.0 remains closest, consistent
-     with the analytical pick and the largest-live-effect ranking
-     (3-way convergent evidence). The literal "mean p_P>=0.30" qualifier
-     is not independently verified (p_P not archived) — documented as
-     such rather than assumed. **D5 stays authorized at chemistry=1.0.**
-  8. **`post_screen_protocol_selection.{json,csv}`** records every D1–D7
+  7. **`post_screen_protocol_selection.{json,csv}`** records every D1–D7
      decision (analytical preselection / observed screen result /
      post-screen amendment / reason / omitted), explicitly *not*
      overwriting `analytical_regime_selection.json` (still an accurate
      record of what was analytically predicted, now superseded for D3/D4/
      D6 by the post-screen amendments above).
-  9. **Strict verifier** (`verify_part_x_px3_5.py`) independently
+  8. **Strict verifier** (`verify_part_x_px3_5.py`) independently
      reproduces all 18 pairwise S_h values from the tracked ledger alone
      (`runs/` hidden), confirms R=+0.10's near-exact parity, the frequency/
      dwell/selection records' self-consistency, that `developed_job_
@@ -434,24 +423,83 @@ before/after state instead.
      protocol_selection.json`, that zero PX4 jobs have been launched yet,
      and the producer-provenance proof — `overall_pass=true` (8/8 checks).
 
-  Final `developed_job_registry.csv` state (102 rows): D1/D2/D5 unchanged
-  (`AUTHORIZED_PX4`, 8 rows each); D3 now `AUTHORIZED_PX4` at 316.227766 Hz
-  (10 new rows; the old 100 Hz rows remain as a labeled historical record,
-  never authorized); D4 `BLOCKED_DWELL_GATE_NOT_SATISFIED` (terminal, not
-  "pending" — the audit is conclusive); D6 old 1000 Hz rows `BLOCKED_
-  PROTOCOL_MISMATCH`, new 316.227766 Hz rows `AUTHORIZED_PX4` (10 rows);
-  D7 unchanged (all aliased, no endpoint selected); D1_confirm/D2_confirm
-  unchanged (`BLOCKED_PENDING_STAGE1_DECISION`, a PX4-Stage-1 concern).
+- **PX3.6 (final pre-PX4 closure) — complete.** External review accepted
+  PX3.5's bug fix but required five more items before authorizing PX4.
+
+  1. **Original bug-contaminated dwell trajectories formally invalidated**
+     (`build_part_x_px3_6_bug_invalidation_manifest.py` →
+     `px3_bug_invalidated_trajectories.json`). The hold=0.0005s/0.002s
+     finite-cohesion PX3 screen results are marked
+     `INVALIDATED_DWELL_DURATION_WEIGHTING_BUG`, excluded from scientific
+     screen counts, censor statistics, sensitivity classifications, and
+     developed-protocol decisions — retained only as historical bug-audit
+     evidence, with a pointer to the PX3.5 dwell-audit's corrected
+     replacement values.
+  2. **Clean-producer reruns.** The PX3.5 physical runs (frequency
+     bisection, dwell audit, persistent-at-transition) were originally
+     launched while `c720d59`'s changes were still uncommitted. Renamed
+     those original result directories to a `_PRECOMMIT_ba1731e` suffix
+     (kept as historical record, not deleted) and reran all three under
+     the actually clean, committed `c720d59` worktree, into fresh virgin
+     paths. Every rerun reproduced its pre-commit counterpart's S_h to
+     the values already reported (316.227766 Hz: `S_h=-0.023246`
+     reversible / `-0.042945` persistent; dwell audit: all four legs
+     `S_h≈-0.044`) — a self-consistency confirmation, not a new physics
+     finding.
+  3. **D5 re-qualified with genuine live cycle-mean data**, replacing
+     PX3.5's event-extrema proxy. Added a minimal, additive
+     `state_sampler` hook to `run_trajectory` (default `None`, zero effect
+     on every existing caller — 3 new regression tests) and used it
+     (`run_part_x_px3_6_passivation_requalification.py`) to compute a
+     genuine duration-weighted cycle-mean p_P/p_C/p_B (length-weighted
+     across active patches the same way `representative_cycle_K_rebond`
+     weights them, accumulated from the first block with an active patch
+     onward) for all three chemistry factors. Result: chem=1.0 → mean
+     p_B=0.317 (|Δ from 0.30|=0.017 — nearly **10x closer** than the next
+     candidate), mean p_P=0.346 (clears the ≥0.30 qualifier). **D5's
+     literal rule-4 criterion is now satisfied outright with live data**,
+     not merely a convergent proxy.
+  4. **Numerical/action uncertainty propagated** for D3/D5/D6
+     (`build_part_x_px3_6_uncertainty_propagation.py`), using this
+     system's already-*enforced* `CrackRebondingControls.
+     bulk_action_error_rel_tol=1e-3` (a real, actively-checked per-event
+     bound — see `crack_rebonding_v10230.py`'s `tail_bound <=
+     bulk_action_error_rel_tol * reference_scale` gates) rather than an
+     invented estimate. First-order conservative propagation gives
+     `epsilon_S_h≈0.00087`, so the operative gate `max(0.005, 5ε)` reduces
+     to the flat `0.005` floor. D3 clears by **4.65×**, D5 by **8.70×**,
+     D6's distinction by **2.27×** — all comfortably measurable.
+  5. **The 8 pre-existing test failures fixed**, verified as a genuine
+     Part-X-introduced regression (not present at all in the authoritative
+     pre-Part-X base `a72d465` — those test doubles never needed
+     `cycle_schedule` there) rather than an inherited gap. Added
+     `cycle_schedule`/`effective_cycle_frequency_Hz`/`base_period_s`/
+     `minimum_load_hold_s` to the three affected mock `Waveform` classes,
+     reproducing the pre-PX1.1 uniform-duration behavior exactly. All 55
+     tests across the affected files now pass (was 47 passed/8 failed).
+
+  **PX3.6 verifier** (`verify_part_x_px3_6.py`, 5/5 checks) plus the
+  existing PX3.5 verifier (8/8) — **13/13 combined checks pass.**
+
+  Final `developed_job_registry.csv` state (102 rows, unchanged from
+  PX3.5's counts — PX3.6 only strengthened the *justification*, not the
+  authorization set): D1/D2/D5 `AUTHORIZED_PX4` (8 rows each); D3
+  `AUTHORIZED_PX4` at 316.227766 Hz (10 rows; old 100 Hz rows kept as
+  labeled history, never authorized); D4 `BLOCKED_DWELL_GATE_NOT_
+  SATISFIED`; D6 old 1000 Hz rows `BLOCKED_PROTOCOL_MISMATCH`, new
+  316.227766 Hz rows `AUTHORIZED_PX4` (10 rows); D7 unchanged (all
+  aliased); D1_confirm/D2_confirm unchanged (Stage-1 concern, not PX3.6's).
 
 ## Terminal and pending counts
 
-- Physical trajectories launched: 28 PX3 screen (all COMPLETE) + 8 PX3.5
-  targeted reruns (4 dwell-causal-audit legs: dynamic-finite + prescribed-
-  static at each of hold=0.0005s/0.002s; 2 frequency-bisection legs at
-  316.227766 Hz; 2 persistent-at-transition legs at the same frequency —
-  all COMPLETE, 0 quarantined). PX4 developed campaigns: 0 launched
-  (verified by `verify_part_x_px3_5.py`'s own check).
-- PX1, PX2, PX2.5, PX3, and PX3.5 are done. PX4–PX7: not started.
+- Physical trajectories launched: 28 PX3 screen (2 now formally
+  invalidated, bug-contaminated) + 8 PX3.5 pre-commit reruns (kept as
+  `_PRECOMMIT_ba1731e` historical record) + 8 PX3.5 clean-producer reruns
+  (4 dwell-audit legs, 2 frequency-bisection legs, 2 persistent-at-
+  transition legs) + 3 PX3.6 passivation-requalification trajectories —
+  all COMPLETE, 0 quarantined. PX4 developed campaigns: 0 launched
+  (verified by both PX3.5 and PX3.6 verifiers' own checks).
+- PX1, PX2, PX2.5, PX3, PX3.5, and PX3.6 are done. PX4–PX7: not started.
 
 ## Exact next action
 
@@ -459,16 +507,16 @@ Launch PX4 (mission section 8): the developed multi-K campaign for every
 row now `AUTHORIZED_PX4` in `developed_job_registry.csv` (D1, D2, D3, D5,
 D6 — 44 rows across their respective Kmax grids) via `part_x_physical_
 controller.py`, respecting the 3-worker cap and the trajectory budget in
-section 8 (max 30 accepted events, 150 μm, 1e12 cycles). Do **not** use a
-general `--allow-head-drift` — require exact launch-HEAD match to each
-row's `physical_producer_sha`, or a fresh producer-provenance proof
-identical in form to `px3_physical_producer_provenance.json` if the
-registry needs another producer-sha refresh first. Per the review's
-explicit instruction, continue automatically through PX5–PX7 without
-stopping merely because each is a new phase; before PX5, wire the
-already-qualified `static_shield_phase_resolved_action` evaluator (PX1.4)
-into the live production static-control commit path (PX3.5 already
-proved out the `run_trajectory` `static_shield_control` hook works
-correctly with `hold>0`, which PX5 will need). This stage will take real
-wall-clock time — launch via background workers and continue via the
-harness's notification system rather than blocking synchronously.
+section 8 (max 30 accepted events, 150 μm, 1e12 cycles). Per review's own
+"selection_source_commit / physical_source_commit / launch_HEAD /
+physical_source_bundle_sha256" distinction: confirm the worktree is clean
+and record the full HEAD immediately before launch; do **not** use a
+general `--allow-head-drift`. Per the review's explicit instruction,
+continue automatically through PX5–PX7 without stopping merely because
+each is a new phase; before PX5, wire the already-qualified
+`static_shield_phase_resolved_action` evaluator (PX1.4) into the live
+production static-control commit path (PX3.5/PX3.6 already proved out the
+`run_trajectory` `static_shield_control` hook works correctly with
+`hold>0`, which PX5 will need). This stage will take real wall-clock
+time — launch via background workers and continue via the harness's
+notification system rather than blocking synchronously.
