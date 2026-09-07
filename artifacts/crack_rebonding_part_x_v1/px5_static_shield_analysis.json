@@ -4,24 +4,19 @@
     "dominant_if_both_controls_ge": 0.8,
     "history_required_if_both_controls_le": 0.3
   },
-  "pending_conditions": [
-    [
-      "D2",
-      12000000.0,
-      "ceiling_static"
-    ],
-    [
-      "D5",
-      12000000.0,
-      "ceiling_static"
-    ]
-  ],
+  "pending_conditions": [],
   "points": [
     {
       "protocol": "D2",
       "Kmax_Pa_sqrt_m": 12000000.0,
       "S_h_dynamic": -1.190247585901405,
-      "ceiling_static": null,
+      "ceiling_static": {
+        "canonical_job_key": "5a7a538fb1d73d286830542d49090d17c43c7761fe6c9b8e733149ef974dac1d",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 1.694721902599015e-09,
+        "S_h_static": -1.1904886211322747,
+        "reproduction_fraction_of_dynamic": 1.0002025084811974
+      },
       "orbit_matched_static": {
         "canonical_job_key": "476371422d32d29d56ec06d9c033b8a965adf69b69d51f490850b46b3842baf4",
         "stable_growth": true,
@@ -29,7 +24,7 @@
         "S_h_static": -0.27107419788684284,
         "reproduction_fraction_of_dynamic": 0.22774605980952392
       },
-      "classification": "PENDING_DATA"
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
     },
     {
       "protocol": "D2",
@@ -115,7 +110,13 @@
       "protocol": "D5",
       "Kmax_Pa_sqrt_m": 12000000.0,
       "S_h_dynamic": -1.1902023788617737,
-      "ceiling_static": null,
+      "ceiling_static": {
+        "canonical_job_key": "516728278cdc9c060cb5155cece1044bac43bbd8db79b5508b7f352da4785752",
+        "stable_growth": true,
+        "developed_da_dN_m_per_cycle": 1.694721902599015e-09,
+        "S_h_static": -1.1904886211322747,
+        "reproduction_fraction_of_dynamic": 1.0002404988223723
+      },
       "orbit_matched_static": {
         "canonical_job_key": "a62cac7e7ae688016d9ecb4eab6d96770b50f944e5bcbe339adf40832dd4c6f7",
         "stable_growth": true,
@@ -123,7 +124,7 @@
         "S_h_static": -0.2643387667757986,
         "reproduction_fraction_of_dynamic": 0.2220956464803857
       },
-      "classification": "PENDING_DATA"
+      "classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY"
     },
     {
       "protocol": "D5",
