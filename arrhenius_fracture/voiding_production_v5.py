@@ -650,7 +650,7 @@ def crack_void_connection_certificate(state, *, branch_id: str, cavity_id: str,
     no_solid_bridge = not uncovered_indices
     intact_certificate = (independent_intact_path_certificate(
         state.mesh, state.crack_network, support_ids,
-        allow_boundary_clip_for_screen=True,
+        boundary_terminal_context=state.junction_process_state.get("boundary_terminal_context"),
     ) if support_ids else {
         "intact_cross_graph_path_exists": True,
         "insufficient_seed_segment_ids": ("all:no-support",),
@@ -798,6 +798,7 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
     def inject(stage, current):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
+    if identity == "promotion": inject("explicit_cavity_creation", trial)
     remesh_junction = dict(trial.junction_process_state)
     remesh_junction["boundary_terminal_context"] = _external_free_root_context(
         hole.mesh, hole.boundary, trial.crack_network.branch(ROOT_BRANCH_ID).root,
@@ -975,6 +976,248 @@ def directional_clock_rates(state, stress_tensor_Pa, *, temperature_K=900.0):
     return rates
 
 
+def cavity_source_resolution_metrics(state):
+    """Source-native tensor and geometrical boundary-recovery diagnostics."""
+    cavity = state.void_state.cavities[0]
+    position = np.asarray(cavity.connection_exit_m)
+    node = int(np.argmin(np.linalg.norm(state.mesh.nodes-position, axis=1)))
+    tensor, selected = cavity_boundary_tensor(state, boundary_node=node)
+    nodes = np.asarray(state.mesh.nodes); elems = np.asarray(state.mesh.elems)
+    edges = _actual_cavity_boundary_edges(state)
+    owned = {}
+    wanted = {tuple(edge) for edge in edges}
+    for eid, triangle in enumerate(elems):
+        for a, b in ((triangle[0],triangle[1]),(triangle[1],triangle[2]),(triangle[2],triangle[0])):
+            edge = tuple(sorted((int(a),int(b))))
+            if edge in wanted: owned.setdefault(edge, []).append(eid)
+    _, assembled_residual, sigma, *_ = assemble_mechanics(state.mesh, state.displacement,
+        state.ep_gp, state.rho_gp, state.damage, state.elasticity_D, state.material,
+        cohesive_network=state.cohesive_network)
+    local_rows = []; all_rows = []; traction_sum = 0.; boundary_length = 0.
+    for a, b in edges:
+        owners = owned[tuple((a,b))]
+        if len(owners) != 1: raise ValueError("cavity source edge has nonunique owner")
+        eid = owners[0]; delta = nodes[b]-nodes[a]; length = float(np.linalg.norm(delta))
+        tangent = delta/length; normal = np.array((-tangent[1],tangent[0]))
+        height = float(2*state.mesh.area_e[eid]/length)
+        tri = nodes[elems[eid]]; sides = np.linalg.norm(tri-tri[[1,2,0]],axis=1)
+        quality = float(4*np.sqrt(3)*state.mesh.area_e[eid]/(sides@sides))
+        stress = np.array(((sigma[0,eid],sigma[2,eid]),(sigma[2,eid],sigma[1,eid])))
+        traction_sum += float(np.linalg.norm(stress@normal)**2)*length
+        boundary_length += length
+        all_rows.append((height/cavity.radius_m,length/cavity.radius_m,
+                         max(height/length,length/height),quality))
+        if np.linalg.norm((nodes[a]+nodes[b])/2-position) <= .25*cavity.radius_m:
+            local_rows.append((height/cavity.radius_m,length/cavity.radius_m,
+                               max(height/length,length/height),quality))
+    if not local_rows: raise ValueError("fixed cavity source has no local boundary neighborhood")
+    local = np.asarray(local_rows)
+    all_boundary = np.asarray(all_rows)
+    remote = abs(float(np.sum(assembled_residual[2*np.asarray(state.boundary.top_nodes)+1])))/float(np.ptp(nodes[:,0]))
+    triangles = nodes[elems]
+    side2 = np.sum((triangles-triangles[:,[1,2,0]])**2,axis=(1,2))
+    global_quality = 4*np.sqrt(3)*np.asarray(state.mesh.area_e)/side2
+    radial = (position-np.asarray(cavity.center_m)); normal = radial/np.linalg.norm(radial)
+    tangent = np.array((-normal[1],normal[0]))
+    return {"tensor_Pa": tensor.tolist(), "probe_element_ids": list(selected),
+        "boundary_node_id": node, "boundary_position_m": position.tolist(),
+        "normal_xy": normal.tolist(), "tangent_xy": tangent.tolist(),
+        "sigma_tt_Pa": float(tangent@tensor@tangent), "sigma_nn_Pa": float(normal@tensor@normal),
+        "sigma_nt_Pa": float(normal@tensor@tangent), "principal_stresses_Pa": np.linalg.eigvalsh(tensor).tolist(),
+        "eta_n_max": float(all_boundary[:,0].max()), "eta_n_median": float(np.median(all_boundary[:,0])),
+        "eta_t_max": float(all_boundary[:,1].max()), "eta_t_median": float(np.median(all_boundary[:,1])),
+        "local_aspect_ratio_max": float(all_boundary[:,2].max()), "local_aspect_ratio_median": float(np.median(all_boundary[:,2])),
+        "source_neighborhood_eta_n_max":float(local[:,0].max()),
+        "source_neighborhood_eta_t_max":float(local[:,1].max()),
+        "minimum_quality": float(global_quality.min()),
+        "local_minimum_quality": float(local[:,3].min()),
+        "normalized_traction": math.sqrt(traction_sum/boundary_length)/max(remote,1e-300),
+        "recovery_operator": "maximum-principal-incident-CST-at-fixed-owned-boundary-node"}
+
+
+def _cavity_resolution_binding(state):
+    digest = hashlib.sha256()
+    for value in (state.mesh.nodes, state.mesh.elems, state.displacement, state.ep_gp,
+                  state.rho_gp, state.damage, state.elasticity_D):
+        array = np.ascontiguousarray(value)
+        digest.update(str((array.shape, array.dtype.str)).encode()); digest.update(array.tobytes())
+    cavity = state.void_state.cavities[0]
+    digest.update(repr((cavity.cavity_id,cavity.center_m,cavity.radius_m,cavity.connection_exit_m,
+        state.crack_network.geometry_generation,tuple((c.candidate_id,c.direction_xy,c.normal_xy)
+        for c in state.competition.candidates))).encode())
+    digest.update(repr(state.material).encode())
+    return digest.hexdigest()
+
+
+def _qualified_cavity_source(state, tensor):
+    from .closure_static_evidence import resolution_screen
+    from .finalization_v3_schema import SCIENTIFIC_ACCEPTANCE_TOLERANCES as limits
+    from .finalization_v3_schema import canonical_hash
+    proof = state.junction_process_state.get("cavity_source_resolution_proof", {})
+    if (proof.get("schema") != "v12.cavity-source-local-refinement/1"
+        or proof.get("current_binding") != _cavity_resolution_binding(state)
+        or not isinstance(proof.get("refinement_count"), int)
+        or proof["refinement_count"] < 1
+        or not all(key in proof for key in ("current_metrics","previous_metrics","previous_binding"))): return False
+    current = proof["current_metrics"]; reference = proof["previous_metrics"]
+    capture = proof.get("previous_source_capture")
+    if not capture: return False
+    previous_state = replace(state, mesh=rebuild_tri_mesh(capture["nodes"], capture["elements"]),
+        boundary=capture["boundary"],
+        displacement=capture["displacement"], damage=capture["damage"],
+        ep_gp=capture["ep_gp"], rho_gp=capture["rho_gp"],
+        energy_ledgers=capture["energy_ledgers"])
+    if (_cavity_resolution_binding(previous_state) != proof["previous_binding"]
+        or canonical_hash(cavity_source_resolution_metrics(state)) != canonical_hash(current)
+        or canonical_hash(cavity_source_resolution_metrics(previous_state)) != canonical_hash(reference)): return False
+    a = np.asarray(current["tensor_Pa"]); b = np.asarray(reference["tensor_Pa"])
+    error = float(np.linalg.norm(a-b)/max(np.linalg.norm(a),1e-300))
+    return bool(np.array_equal(a,np.asarray(tensor)) and resolution_screen(current)
+        and current["normalized_traction"] <= limits["cavity_traction_normalized"]
+        and error <= limits["tensor_probe_relative"])
+
+
+def _bounded_quality_edge_flips(state):
+    """One nonoverlapping convex-quad sweep, preserving every graph edge.
+
+    No node, physical boundary or crack coordinate moves. A flip is accepted
+    only when it strictly improves both triangles' minimum quality. There is
+    no scientific tolerance override: the downstream global-quality gate is
+    evaluated independently after transfer, support rebuild and equilibrium.
+    """
+    from .finalization_v3_schema import SCIENTIFIC_ACCEPTANCE_TOLERANCES as limits
+    nodes = np.asarray(state.mesh.nodes); triangles = np.asarray(state.mesh.elems).copy()
+    def cross(a,b): return float(a[0]*b[1]-a[1]*b[0])
+    def quality(ids):
+        p = nodes[list(ids)]; area2 = abs(cross(p[1]-p[0],p[2]-p[0]))
+        return 2*np.sqrt(3)*area2/float(np.sum((p-p[[1,2,0]])**2))
+    graph_segments = [(np.asarray(a),np.asarray(b)) for branch in state.crack_network.branches
+        for a,b in zip(branch.path,branch.path[1:])]
+    def on_graph_edge(a,b):
+        for p,q in graph_segments:
+            delta = q-p; length = np.linalg.norm(delta)
+            if (abs(cross(nodes[a]-p,delta))/length <= 1e-12
+                and abs(cross(nodes[b]-p,delta))/length <= 1e-12
+                and max((nodes[a]-p)@delta,(nodes[b]-p)@delta) >= 0
+                and min((nodes[a]-p)@delta,(nodes[b]-p)@delta) <= delta@delta): return True
+        return False
+    owners = {}
+    coordinates = nodes[triangles]
+    side2 = np.sum((coordinates-coordinates[:,[1,2,0]])**2,axis=(1,2))
+    initial_quality = 4*np.sqrt(3)*np.asarray(state.mesh.area_e)/side2
+    for eid,tri in enumerate(triangles):
+        for a,b in ((tri[0],tri[1]),(tri[1],tri[2]),(tri[2],tri[0])):
+            owners.setdefault(tuple(sorted((int(a),int(b)))),[]).append(eid)
+    touched = set(); flips = []
+    for (a,b), incident in sorted(owners.items()):
+        if len(incident) != 2 or touched.intersection(incident): continue
+        i,j = incident; original = min(initial_quality[i],initial_quality[j])
+        if original >= limits["mesh_minimum_quality"]: continue
+        if on_graph_edge(a,b): continue
+        c = next(int(n) for n in triangles[i] if n not in (a,b))
+        d = next(int(n) for n in triangles[j] if n not in (a,b))
+        # Diagonals must cross strictly inside a convex quadrilateral.
+        if (cross(nodes[b]-nodes[a],nodes[c]-nodes[a])*cross(nodes[b]-nodes[a],nodes[d]-nodes[a]) >= 0
+            or cross(nodes[d]-nodes[c],nodes[a]-nodes[c])*cross(nodes[d]-nodes[c],nodes[b]-nodes[c]) >= 0): continue
+        if tuple(sorted((c,d))) in owners: continue
+        if any(cross(nodes[d]-nodes[c],p-nodes[c])*cross(nodes[d]-nodes[c],q-nodes[c]) < 0
+            and cross(q-p,nodes[c]-p)*cross(q-p,nodes[d]-p) < 0 for p,q in graph_segments): continue
+        replacement = [(c,d,a),(d,c,b)]
+        if min(map(quality,replacement)) <= original: continue
+        for eid,tri in zip((i,j),replacement):
+            p = nodes[list(tri)]
+            if cross(p[1]-p[0],p[2]-p[0]) < 0: tri = (tri[0],tri[2],tri[1])
+            triangles[eid] = tri
+        touched.update(incident); flips.append((a,b,c,d))
+    mesh = rebuild_tri_mesh(nodes,triangles)
+    return mesh,tuple(flips)
+
+
+def refine_downstream_source(state, *, max_refinement_levels=3,
+                             failure_stage=None, operation_log=None,
+                             refinement_region="source_neighborhood", quality_improvement=False):
+    """Bounded, transactional source refinement; preserves every owned clock.
+
+    Success requires measured convergence on successive meshes of this same
+    accepted material/history problem. An inadequate attempt returns the
+    original state; cached metrics never authorize a changed mechanical state.
+    """
+    from .adaptive_multitip_mesh_v11 import refine_accepted_state
+    if max_refinement_levels not in range(0,9): raise ValueError("source refinement budget must be 0..8")
+    if refinement_region not in ("source_neighborhood","complete_cavity_ring"):
+        raise ValueError("unregistered source refinement region")
+    cavity = state.void_state.cavities[0]
+    if cavity.phase != VoidPhase.CONNECTED_VOID or state.crack_network.active_tip_ids:
+        raise ValueError("source refinement requires a connected dormant cavity")
+    operations = operation_log if operation_log is not None else []
+    def inject(stage, current):
+        operations.append(stage)
+        if stage == failure_stage: raise RuntimeError("injected:" + stage)
+    current = state.isolated_copy(); previous = cavity_source_resolution_metrics(current); rows = []
+    original_clock = (state.competition, state.rng_state)
+    for level in range(1,max_refinement_levels+1):
+        position = np.asarray(cavity.connection_exit_m)
+        centroids = current.mesh.nodes[current.mesh.elems].mean(axis=1)
+        distance = (np.linalg.norm(centroids-position,axis=1) if refinement_region == "source_neighborhood"
+            else np.abs(np.linalg.norm(centroids-np.asarray(cavity.center_m),axis=1)-cavity.radius_m))
+        marked = tuple(np.flatnonzero(distance <= .5*cavity.radius_m + 2*np.sqrt(current.mesh.area_e)))
+        refined, _ = refine_accepted_state(current, marked_parent_elements=marked,
+            active_tip_ids=(), generation=int(current.event_counters.get("mesh_generation",0))+1,
+            operation_index=int(current.event_counters.get("refinement_operation_index",0))+1)
+        flips = ()
+        if quality_improvement:
+            quality_mesh, flips = _bounded_quality_edge_flips(refined)
+            if flips:
+                fields = _project_fields(refined,quality_mesh)
+                refined = replace(refined,mesh=quality_mesh,damage=fields["damage"],
+                    displacement=fields["displacement"],ep_gp=fields["ep_gp"],rho_gp=fields["rho_gp"])
+        inject("downstream_source_refinement", refined)
+        refined = _prepare_connected_ligament_support(refined, entry=cavity.connection_entry_m,
+            exit_point=cavity.connection_exit_m, direction=cavity.connection_direction_xy,
+            new_connection=False)
+        fields = {name: getattr(refined,name) for name in ("damage","displacement","ep_gp","rho_gp","tip_process_state")}
+        fields["source_state"] = refined.junction_process_state.get("source_state",{})
+        rebuilt = remesh_mechanically_separating_v12(refined, mesh=refined.mesh,
+            boundary=refined.boundary, transferred_fields=fields, source_commit=_head(),
+            configuration={"event":"DOWNSTREAM_SOURCE_REFINEMENT","level":level,"region":refinement_region},
+            transaction_identity="source-refinement:"+str(level))
+        inject("source_support_rebuild", rebuilt)
+        trial = equilibrate_fixed_load_with_production_fem(rebuilt)
+        inject("source_equilibrium", trial)
+        if (trial.competition,trial.rng_state) != original_clock:
+            raise RuntimeError("source refinement changed an owned threshold/hazard/RNG")
+        metrics = cavity_source_resolution_metrics(trial)
+        proof = {"schema":"v12.cavity-source-local-refinement/1", "refinement_count":level,
+            "refinement_region":refinement_region,
+            "quality_edge_flips":flips,
+            "previous_metrics":previous,"current_metrics":metrics,
+            "previous_binding":_cavity_resolution_binding(current),"current_binding":_cavity_resolution_binding(trial)}
+        proof["previous_source_capture"] = {"nodes":current.mesh.nodes,"elements":current.mesh.elems,
+            "boundary":current.boundary,
+            "displacement":current.displacement,"damage":current.damage,"ep_gp":current.ep_gp,
+            "rho_gp":current.rho_gp,"energy_ledgers":dict(current.energy_ledgers)}
+        trial = replace(trial,junction_process_state={**trial.junction_process_state,
+            "cavity_source_resolution_proof":proof})
+        passed = _qualified_cavity_source(trial, metrics["tensor_Pa"])
+        rows.append({"level":level,"proof":{key:value for key,value in proof.items()
+            if key != "previous_source_capture"},"qualified":passed})
+        if passed:
+            inject("source_qualification",trial)
+            source = {**trial.junction_process_state.get("active_event_source",{}),
+                **_source_identity(trial,metrics["tensor_Pa"],source_kind="cavity_surface",
+                    source_cavity_id=cavity.cavity_id,source_boundary_site_id="connection_exit",
+                    source_position_m=cavity.connection_exit_m,
+                    source_probe_identity={"kind":"direct_cavity_boundary_tensor",
+                        "boundary_node_id":metrics["boundary_node_id"],
+                        "element_ids":metrics["probe_element_ids"]}),
+                "source_mesh_generation":trial.event_counters.get("mesh_generation",0)}
+            trial = replace(trial,junction_process_state={**trial.junction_process_state,
+                "active_event_source":source})
+            return trial,{"status":"SOURCE_TENSOR_QUALIFIED","attempts":rows,"operations":operations}
+        current = trial; previous = metrics
+    return state,{"status":"SOURCE_TENSOR_UNQUALIFIED","attempts":rows,"operations":operations}
+
+
 def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
                          source_front_id=None, source_cavity_id=None,
                          source_boundary_site_id=None, source_position_m=None,
@@ -999,7 +1242,8 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
     # Check owned phase/source as well as the argument to prevent source spoofing.
     owned_cavity = (state.junction_process_state.get("active_event_source", {}).get("source_kind") == "cavity_surface"
         or (state.void_state is not None and any(c.phase == VoidPhase.CONNECTED_VOID for c in state.void_state.cavities)))
-    if (source_kind == "cavity_surface" or owned_cavity) and any(r["effective_rate_s"] > 0 for r in rates):
+    if ((source_kind == "cavity_surface" or owned_cavity) and any(r["effective_rate_s"] > 0 for r in rates)
+        and not _qualified_cavity_source(state, stress)):
         for rate in rates:
             rate.update({"unqualified_effective_rate_s": rate["effective_rate_s"],
                          "unqualified_crossing_time_s": rate["crossing_time_s"],
@@ -1008,10 +1252,11 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
                          "instantaneous_status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
                          "source_resolution_policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED"})
         return state, rates
-    if owned_cavity and not any(r["effective_rate_s"] > 0 for r in rates):
+    if owned_cavity:
         # Retain complete candidate geometry/threshold/probe provenance during
         # dormancy; a bare _source_identity would erase the candidate inventory.
-        source = dict(state.junction_process_state.get("active_event_source", {}))
+        source = {**state.junction_process_state.get("active_event_source", {}),
+                  **(source if any(r["effective_rate_s"] > 0 for r in rates) else {})}
     hazards = list(state.competition.hazard_states)
     crossing_times = [rate["crossing_time_s"] for rate in rates]
     duration = min(crossing_times, default=math.inf)
@@ -1102,6 +1347,55 @@ def _select_emitted_proposal(state, audit, *, eligible_candidate_ids=None):
     return proposal
 
 
+def _prepare_connected_ligament_support(state, *, entry, exit_point, direction,
+                                        failure_injector=None, new_connection=True):
+    """Stage exact inactive cavity contact before any new support certificate.
+
+    Called only on the refined isolated topology trial. No certificate is
+    waived, and the enclosing energy/topology transaction still owns commit.
+    Boundary IDs are freshly derived from this mesh, never transferred IDs.
+    """
+    cavity = state.void_state.cavities[0]
+    root = state.crack_network.branch(ROOT_BRANCH_ID)
+    if math.dist(root.tip, entry) > 1.0e-12:
+        raise ValueError("connected terminal must equal the realized ligament endpoint")
+    connected = replace(cavity, phase=VoidPhase.CONNECTED_VOID,
+        lineage=cavity.lineage + (("CRACK_TO_VOID_LIGAMENT",) if new_connection else ()),
+        connection_entry_m=entry, connection_exit_m=exit_point,
+        connection_direction_xy=direction)
+    state = replace(state, void_state=replace_cavity(state.void_state, connected))
+    if failure_injector is not None: failure_injector("cavity_phase_update", state)
+    network = replace(state.crack_network, branches=tuple(
+        replace(branch, status="arrested", local_state={**branch.local_state,
+            "terminal_boundary_kind": "traction_free_cavity"})
+        if branch.branch_id == ROOT_BRANCH_ID else branch
+        for branch in state.crack_network.branches))
+    state = replace(state, crack_network=network)
+    if failure_injector is not None: failure_injector("root_status_change", state)
+    cycle = cavity_free_surface_certificate(state)
+    if not cycle["passed"]:
+        raise RuntimeError("connected terminal requires a certified closed cavity cycle")
+    contexts = _external_free_root_context(state.mesh, state.boundary, root.path[0])
+    found = False
+    for arc_start, arc_end, arc_id in certification_arcs(network):
+        if math.dist(arc_end, entry) <= 1.0e-12: endpoint = "end"
+        elif math.dist(arc_start, entry) <= 1.0e-12: endpoint = "start"
+        else: continue
+        found = True
+        context = {"endpoint": endpoint, "endpoint_role": "inactive_terminal",
+            "endpoint_coordinate_m": tuple(map(float, entry)),
+            "boundary_kind": "cavity_free_surface",
+            "boundary_component_id": "cavity-cycle:" + cavity.cavity_id,
+            "boundary_edge_ids": tuple(tuple(map(int, edge)) for edge in cycle["boundary_edge_ids"]),
+            "cavity_id": cavity.cavity_id, "certified_cavity_id": cavity.cavity_id,
+            "cavity_cycle_certified": True, "tangent_enters_or_approaches_solid": True}
+        contexts[arc_id] = tuple(contexts.get(arc_id, ())) + (context,)
+    if not found:
+        raise RuntimeError("connected terminal has no exact certification arc")
+    return replace(state, junction_process_state={**state.junction_process_state,
+        "boundary_terminal_context": contexts})
+
+
 def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     cavity = state.void_state.cavities[0]
     start = state.crack_network.branch(ROOT_BRANCH_ID).tip
@@ -1136,6 +1430,7 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     def inject(stage, current):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
+    inject("ligament_hazard_completion", state)
     def geometry(trial, arms):
         trial, aligned_node, inserted = _conform_cavity_intersection(
             trial, end, failure_injector=inject,
@@ -1152,15 +1447,11 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
         realized = apply_v12_production_trial_geometry(
             trial, arms, source_commit=_head(), configuration={"event": "CRACK_TO_VOID_LIGAMENT"},
             transaction_identity="ligament", failure_injector=inject,
+            prepare_support_state=lambda refined: _prepare_connected_ligament_support(
+                refined, entry=end, exit_point=exit_point, direction=candidate.direction_xy,
+                failure_injector=inject),
         )
-        connected = replace(
-            realized.void_state.cavities[0], phase=VoidPhase.CONNECTED_VOID,
-            lineage=realized.void_state.cavities[0].lineage + ("CRACK_TO_VOID_LIGAMENT",),
-            connection_entry_m=end, connection_exit_m=exit_point,
-            connection_direction_xy=candidate.direction_xy,
-        )
-        void_state = replace_cavity(realized.void_state, connected)
-        inject("cavity_phase_update", replace(realized, void_state=void_state))
+        void_state = realized.void_state
         ledgers = dict(void_state.length_ledgers)
         ligament_length = math.dist(start, end)
         physical_span = math.dist(end, exit_point)
@@ -1187,49 +1478,6 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
                                                         "source_element": source_element},),
         )
         realized = replace(realized, void_state=void_state)
-        root = realized.crack_network.branch(ROOT_BRANCH_ID)
-        dormant_network = replace(
-            realized.crack_network,
-            branches=tuple(replace(
-                branch, status="arrested",
-                local_state={**branch.local_state,
-                             "terminal_boundary_kind": "traction_free_cavity"},
-            ) if branch.branch_id == ROOT_BRANCH_ID else branch
-                           for branch in realized.crack_network.branches),
-        )
-        realized = replace(realized, crack_network=dormant_network)
-        inject("root_status_change", realized)
-        cycle_before_rebuild = cavity_free_surface_certificate(realized)
-        contexts = {key: tuple(value) for key, value in
-                    realized.junction_process_state.get("boundary_terminal_context", {}).items()}
-        for arc_start, arc_end, arc_id in certification_arcs(dormant_network):
-            if np.linalg.norm(np.asarray(arc_end) - np.asarray(end)) <= 1.0e-12:
-                endpoint_name = "end"
-            elif np.linalg.norm(np.asarray(arc_start) - np.asarray(end)) <= 1.0e-12:
-                endpoint_name = "start"
-            else:
-                continue
-            cavity_context = {
-                "endpoint": endpoint_name, "endpoint_role": "inactive_terminal",
-                "endpoint_coordinate_m": tuple(map(float, end)),
-                "boundary_kind": "cavity_free_surface",
-                "boundary_component_id": "cavity-cycle:" + cavity.cavity_id,
-                "boundary_edge_ids": tuple(tuple(map(int, edge))
-                                           for edge in cycle_before_rebuild["boundary_edge_ids"]),
-                "cavity_id": cavity.cavity_id,
-                "certified_cavity_id": cavity.cavity_id,
-                "cavity_cycle_certified": cycle_before_rebuild["passed"],
-                "tangent_enters_or_approaches_solid": True,
-            }
-            contexts[arc_id] = contexts.get(arc_id, ()) + (cavity_context,)
-        junction = dict(realized.junction_process_state)
-        junction["boundary_terminal_context"] = contexts
-        realized = replace(realized, junction_process_state=junction)
-        realized = initialize_mechanically_separating_v12(
-            realized, source_commit=_head(),
-            configuration={"event": "CRACK_TO_VOID_LIGAMENT", "root_status": "arrested"},
-            transaction_identity="ligament-connected-dormant",
-        )
         inject("dormant_support_rebuild", realized)
         cycle = cavity_free_surface_certificate(realized)
         certificate = crack_void_connection_certificate(
@@ -1350,6 +1598,9 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             "source_position_m": list(start), "source_probe_identity": probe_identity,
             "cleavage": cleavage_audit,
         }
+    if operation_log is not None: operation_log.append('downstream_threshold_completion')
+    if failure_stage == 'downstream_threshold_completion':
+        raise RuntimeError('injected:downstream_threshold_completion')
     proposal = _select_emitted_proposal(state, cleavage_audit)
     candidate = next(item for item in state.competition.candidates
                      if item.candidate_id == proposal.member_candidate_ids[0])

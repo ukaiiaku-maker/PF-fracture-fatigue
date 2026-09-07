@@ -46,19 +46,8 @@ def write_json(path, payload):
 
 
 def candidate_measurements(state):
-    cavity = state.void_state.cavities[0]
-    position = np.asarray(cavity.connection_exit_m)
-    node = int(np.argmin(np.linalg.norm(state.mesh.nodes-position, axis=1)))
-    tensor, elements = cavity_boundary_tensor(state, boundary_node=node)
-    rates = directional_clock_rates(state, tensor)
-    delta = position-np.asarray(cavity.center_m)
-    arc = (math.atan2(delta[1], delta[0]) % (2*math.pi))/(2*math.pi)
-    return [{"candidate_identity": asdict(candidate), "boundary_site": "connection_exit",
-             "boundary_position_m": position.tolist(), "arc_fraction": arc,
-             "probe_element_ids": list(elements), "source_tensor_Pa": tensor.tolist(),
-             "hazard": asdict(hazard), "rates_before_resolution_guard": rate,
-             "owned_source": state.junction_process_state["active_event_source"]}
-            for candidate, hazard, rate in zip(state.competition.candidates, state.competition.hazard_states, rates)]
+    from arrhenius_fracture.closure_production_evidence import candidate_measurements as measured
+    return measured(state)
 
 
 def main():
@@ -98,6 +87,10 @@ def main():
                         "child_created": len(guarded.crack_network.branches) != len(connected.crack_network.branches),
                         "active_tip_ids": guarded.crack_network.active_tip_ids,
                         "event_transaction_created": trial is not None or replay_trial is not None})
+            from arrhenius_fracture.closure_production_evidence import REFINEMENT_CASES, execute_refinement_peer
+            if key in REFINEMENT_CASES:
+                print("Executing bounded source refinement peer "+key,flush=True)
+                row["source_refinement_peer"] = execute_refinement_peer(connected,REFINEMENT_CASES[key])
         except Exception as error:
             row["failure"] = {"type": type(error).__name__, "message": str(error),
                               "last_accepted_stage": trace[-1][0] if trace else None}
@@ -105,34 +98,9 @@ def main():
                 write_checkpoint(trace[-1][1], out/"checkpoints"/(key.replace(":", "_")+"_last_accepted.json"))
         rows.append(row)
         write_json(out/(key.replace(":", "_")+".json"), row)
-    reference = rows[-1]
-    comparisons = []
-    for row in rows[:-1]:
-        result = {"case_id": row["case_id"], "reference_case_id": reference["case_id"], "qualified": False}
-        if row["connection_executed"] and reference["connection_executed"]:
-            peer = {r["candidate_identity"]["candidate_id"]: r for r in reference["candidates"]}
-            errors = []
-            for candidate in row["candidates"]:
-                identity = candidate["candidate_identity"]["candidate_id"]
-                ref = peer.get(identity)
-                if ref is None:
-                    errors.append({"candidate_id": identity, "failure": "CANDIDATE_NOT_IN_REFERENCE"}); continue
-                tensor_error = float(np.linalg.norm(np.asarray(candidate["source_tensor_Pa"])-ref["source_tensor_Pa"])/np.linalg.norm(ref["source_tensor_Pa"]))
-                scalar_errors = {}
-                for field in ("hazard_barrier_J", "raw_rate_s", "effective_rate_s", "crossing_time_s"):
-                    a, b = candidate["rates_before_resolution_guard"][field], ref["rates_before_resolution_guard"][field]
-                    scalar_errors[field] = 0. if a == b else abs(a-b)/max(abs(b), 1e-300)
-                errors.append({"candidate_id": identity, "tensor_relative_error": tensor_error,
-                    "candidate_identity_equal": candidate["candidate_identity"] == ref["candidate_identity"],
-                    "threshold_equal": candidate["hazard"]["current_threshold_action"] == ref["hazard"]["current_threshold_action"],
-                    "scalar_relative_errors": scalar_errors,
-                    "tensor_gate": tensor_error <= LIMITS["tensor_probe_relative"]})
-            result["errors"] = errors
-            result["classification"] = "DIAGNOSTIC_TRANSFER_ONLY_NO_RATE_BARRIER_ACCEPTANCE_LIMIT_IN_FROZEN_REGISTRY"
-        else:
-            result["classification"] = "FAIL_CLOSED_CONNECTION_OR_MATCHED_FINE_REFERENCE_UNAVAILABLE"
-        comparisons.append(result)
-    write_json(out/"transfer_manifest.json", {"schema": "v12.production-source-transfer/1", "executed_code_sha": head,
+    from arrhenius_fracture.closure_production_evidence import transfer_comparisons, SCHEMA as TRANSFER_SCHEMA
+    comparisons = transfer_comparisons(rows)
+    write_json(out/"transfer_manifest.json", {"schema": TRANSFER_SCHEMA, "executed_code_sha": head,
         "physical_registry": LEVELS, "comparisons": comparisons, "production_resolution_cavity_tensor_qualified": False,
         "static_traction_reference_is_not_matched_production": True,
         "policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED",

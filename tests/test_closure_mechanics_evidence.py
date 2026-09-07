@@ -45,3 +45,13 @@ def test_matched_crack_only_capture_reassembles_and_has_no_invented_cavity_metri
     assert m["free_residual_relative"] < 1e-8
     assert m["energy_identity"] < .01
     assert json.loads(json.dumps(m, allow_nan=False)) == m
+
+
+def test_static_geometry_predicates_use_actual_closed_edges_and_solid_triangles():
+    cfg = configuration(True,32,12)
+    raw = solve_crack_void_case(**cfg)["source_capture"]
+    observed = measurements(raw,cfg)
+    assert observed["closed_cavity_boundary_cycle"]
+    assert observed["solid_cavity_polygon_overlap_element_ids"] == []
+    broken = dict(raw,cavity_edges=raw["cavity_edges"][:-1])
+    assert not measurements(broken,cfg)["closed_cavity_boundary_cycle"]

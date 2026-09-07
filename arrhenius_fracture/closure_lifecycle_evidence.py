@@ -8,7 +8,7 @@ from dataclasses import replace
 import math
 import numpy as np
 
-from .finalization_v3_schema import FROZEN_CASE_REGISTRY, canonical_hash
+from .finalization_v3_schema import FROZEN_CASE_REGISTRY, canonical_hash, SCIENTIFIC_ACCEPTANCE_TOLERANCES as LIMITS
 from .topology_transaction_v11 import (
     LiveFEMTopologyState, complete_accepted_state_fingerprint as fingerprint,
     equilibrate_fixed_load_with_production_fem as equilibrate,
@@ -23,7 +23,7 @@ from .voiding_v5 import (
     update_cavity_growth, promote_cavity,
 )
 
-SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/1"
+SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/2"
 PARTITIONS = (1,2,4,8,16)
 CFG = VoidingConfig(enabled=True, promotion_radius_m=5e-5)
 PRECURSORS = {"birth_hit_1": "available_site", "birth_hit_2": "multi_hit_1",
@@ -31,6 +31,7 @@ PRECURSORS = {"birth_hit_1": "available_site", "birth_hit_2": "multi_hit_1",
               "subgrid_growth": "subgrid_void", "promotion": "subgrid_growth",
               "ligament": "resolved_growth", "downstream_child": "ligament_rupture",
               "child_continuation": "new_graph_front"}
+_TOPOLOGY_MEASUREMENTS = {}
 
 
 def load_state(state, opening_m):
@@ -103,11 +104,13 @@ def advance_transition(state, name, partitions, *, operations=None, config=CFG):
         operations.append({"api":"ligament_transaction", "accepted":trial.accepted,"operations":trace})
         return state, operations
     if name in ("downstream_child", "child_continuation"):
+        from .voiding_lifecycle_driver_v5 import advance_production_void_interval,NATURAL_WINDOW_S
+        cache={}
         for _ in range(partitions):
-            state, trial, trace, audit = downstream_front_transaction(state,continuation=name=="child_continuation")
-            operations.append({"api":"downstream_front_transaction", "accepted":trial is not None and trial.accepted,
-                               "operations":trace,"audit":audit})
-            if trial is not None: break
+            state,trace,result=advance_production_void_interval(state,NATURAL_WINDOW_S/partitions,
+                config=config,refinement_attempt_cache=cache)
+            operations.extend(trace)
+            if result['failure'] is not None: raise RuntimeError(result['failure']['message'])
         return state, operations
     raise ValueError(name)
 
@@ -136,6 +139,37 @@ def transition_occurred(name, before, after):
     raise ValueError(name)
 
 
+def stagewise_topology(state):
+    from .mechanically_separating_sharp_wake_v12 import independent_intact_path_certificate
+    from .voiding_production_v5 import cavity_free_surface_certificate,crack_void_connection_certificate
+    from .closure_mechanics_evidence import canonical_data
+    from .sharp_wake_backend_v12 import array_fingerprint
+    selected=state.v12_support_state.selected_support_elements
+    source_key=canonical_hash(canonical_data({'nodes':array_fingerprint(state.mesh.nodes),
+        'elements':array_fingerprint(state.mesh.elems),'selected':selected,
+        'network':state.crack_network.to_dict(),'cavities':() if state.void_state is None else state.void_state.cavities,
+        'boundary_context':state.junction_process_state.get('boundary_terminal_context',{})}))
+    if source_key in _TOPOLOGY_MEASUREMENTS: return _TOPOLOGY_MEASUREMENTS[source_key]
+    certificate=independent_intact_path_certificate(state.mesh,state.crack_network,selected,
+        boundary_terminal_context=state.junction_process_state.get('boundary_terminal_context',{}))
+    passed=not certificate['intact_cross_graph_path_exists'] and not certificate['insufficient_seed_segment_ids']
+    result={'independent_cut':canonical_data(certificate),'passed':bool(passed)}
+    if state.void_state and state.void_state.cavities:
+        cavity=state.void_state.cavities[0]
+        if cavity.phase in (VoidPhase.RESOLVED_VOID,VoidPhase.CONNECTED_VOID,VoidPhase.DOWNSTREAM_FRONT_ACTIVE):
+            cycle=cavity_free_surface_certificate(state)
+            result['actual_cavity_cycle']=cycle;result['passed'] &= cycle['passed']
+        if cavity.connection_entry_m is not None:
+            root=state.crack_network.branches[0]
+            combined=crack_void_connection_certificate(state,branch_id=root.branch_id,
+                cavity_id=cavity.cavity_id,intended_intersection=cavity.connection_entry_m)
+            result['actual_component_incidence']=canonical_data(combined)
+            result['passed'] &= combined['passed']
+    result['topology_source_fingerprint']=source_key
+    _TOPOLOGY_MEASUREMENTS[source_key]=result
+    return result
+
+
 def conservation(state, initial):
     voids = state.void_state
     if voids is None:
@@ -152,10 +186,37 @@ def conservation(state, initial):
     expected = (ledger["fractured_ligament_length_m"]+ledger["ordinary_crack_fractured_length_m"]
         -initial.void_state.length_ledgers["fractured_ligament_length_m"]-initial.void_state.length_ledgers["ordinary_crack_fractured_length_m"])
     length_error = abs(added-expected)
+    physical_error=abs(ledger['physical_active_front_travel_m']-
+        ledger['fractured_ligament_length_m']-ledger['ordinary_crack_fractured_length_m']-
+        ledger['traversed_void_free_span_m'])
+    projected_error=abs(ledger['projected_front_advance_m']-
+        ledger['projected_fractured_length_m']-ledger['projected_free_span_m'])
+    chord_error=projected_chord_error=0.
+    chord=None
+    if voids.cavities and voids.cavities[0].connection_entry_m is not None:
+        cavity=voids.cavities[0]
+        delta=np.asarray(cavity.connection_exit_m)-np.asarray(cavity.connection_entry_m)
+        chord={'entry_m':list(cavity.connection_entry_m),'exit_m':list(cavity.connection_exit_m),
+               'physical_length_m':float(np.linalg.norm(delta)),
+               'reporting_direction':[1.,0.],'projected_length_m':float(delta[0])}
+        chord_error=abs(ledger['connected_void_free_span_m']-chord['physical_length_m'])
+        projected_chord_error=abs(ledger['projected_connected_void_free_span_m']-chord['projected_length_m'])
+    hazards=state.competition.hazard_states
+    candidates=[c.candidate_id for c in state.competition.candidates]
+    ownership=(candidates==[h.candidate_id for h in hazards] and len(set(candidates))==len(candidates)
+               and all(h.current_threshold_action>0. and h.action>=0. for h in hazards))
+    connected_dormant=not voids.cavities or voids.cavities[0].phase!=VoidPhase.CONNECTED_VOID or not active
+    errors=(length_error,physical_error,projected_error,chord_error,projected_chord_error)
     return {"inventory_error_m2":inventory_error,"cavity_area_identity_error_m2":radius_error,
             "length_error_m":length_error,"active_tip_ids":list(active),"support_tip_ids":list(support),
+            'physical_travel_identity_error_m':physical_error,'projected_travel_identity_error_m':projected_error,
+            'actual_cavity_chord':chord,'connected_chord_error_m':chord_error,
+            'projected_connected_chord_error_m':projected_chord_error,
+            'candidate_threshold_ownership':ownership,'connected_state_has_no_active_front':connected_dormant,
             "single_void":len(voids.cavities)<=1,
-            "passed":inventory_error<=1e-24 and radius_error<=1e-24 and length_error<=1e-15 and active==support and len(active)<=1 and len(voids.cavities)<=1}
+            "passed":inventory_error<=LIMITS['inventory_identity_abs_m2'] and radius_error<=LIMITS['inventory_identity_abs_m2']
+                and max(errors)<=LIMITS['length_identity_abs_m'] and active==support and len(active)<=1
+                and len(voids.cavities)<=1 and ownership and connected_dormant}
 
 
 def resume_to_guard(state, operations):
@@ -212,6 +273,10 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
     if len(natural)!=160 or {(int(r["case_identity"]),r["partition_count"]) for r in natural} != {
         (seed,p) for seed in range(12000,12032) for p in PARTITIONS}:
         raise ValueError("natural seed/partition registry mismatch")
+    from .closure_rollback_matrix_v5 import ROLLBACK_STAGES
+    observed=[r['case_identity'] for r in rows if r['dataset']=='rollback' and r['case_identity'].startswith('lifecycle:')]
+    if sorted(observed)!=sorted('lifecycle:'+name for name in ROLLBACK_STAGES):
+        raise ValueError('complete lifecycle rollback registry mismatch')
     for row in rows:
         before, after = sources[row["initial_checkpoint"]],sources[row["terminal_checkpoint"]]
         if not isinstance(before,LiveFEMTopologyState) or not isinstance(after,LiveFEMTopologyState):
@@ -243,6 +308,8 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
             restarted=sources[row["restored_terminal_checkpoint"]]
             if row["restart_exact"] != (fingerprint(after)==fingerprint(restarted)):
                 raise ValueError("restart peer mismatch")
+            if row['subsequent_history_exact'] != (row['actual_operations']==row['restarted_operations']):
+                raise ValueError('subsequent restart history mismatch')
         if row["dataset"] == "natural":
             restarted=sources[row["restarted_terminal_checkpoint"]]
             if row["midpoint_restart_exact"] != (fingerprint(after)==fingerprint(restarted)):
@@ -254,6 +321,8 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
         if row["dataset"] == "rollback":
             if row["restored_exactly"] != (fingerprint(after)==fingerprint(before)):
                 raise ValueError("rollback source comparison mismatch")
+        if row.get('stagewise_topology')!=stagewise_topology(after):
+            raise ValueError('stagewise topology does not recompute from accepted source')
     if payload["decision"] != lifecycle_decision(rows,sources):
         raise ValueError("lifecycle decision differs from actual checkpoint comparisons")
     return {"valid":True,"actual_state_rows":len(rows),"transition_attempts":len(transitions),
@@ -286,7 +355,10 @@ def lifecycle_decision(rows,sources):
         ref=next(r for r in rows if r["dataset"]=="natural" and r["case_identity"]==row["case_identity"] and r["partition_count"]==1)
         natural.append({"execution_id":row["execution_id"],"partition_exact":row["terminal_fingerprint"]==ref["terminal_fingerprint"],
             "midpoint_restart_exact":row["midpoint_restart_exact"],
-            "passed":row["terminal_fingerprint"]==ref["terminal_fingerprint"] and row["midpoint_restart_exact"] and row["conservation"]["passed"]})
+            "passed":row["terminal_fingerprint"]==ref["terminal_fingerprint"] and row["midpoint_restart_exact"]
+                and row.get('failure') is None and row.get('replay_failure') is None
+                and row.get('elapsed_physical_time_s')==row['input_configuration'].get('duration_s')
+                and row["conservation"]["passed"]})
     controlled=[]
     for row in [r for r in rows if r["dataset"]=="controlled"]:
         state=sources[row["terminal_checkpoint"]]; case=row["case_identity"]
@@ -299,7 +371,8 @@ def lifecycle_decision(rows,sources):
             success=bool(histories) and all(op["rates"][channel]==min(op["rates"][k] for k in
                 ("surface_reaction_s","vacancy_transport_s","plastic_accommodation_s")) for op in histories)
         elif case=="local_remesh_refinement":
-            success=any(op.get("api")=="actual_local_remesh" for op in row["actual_operations"])
+            success=any(op.get("api")=="refine_downstream_source" for op in row["actual_operations"])
+            success &= phase==VoidPhase.DOWNSTREAM_FRONT_ACTIVE
         elif case in ("positive_offset","negative_offset","short_ligament","long_ligament","downstream_zero_drive"):
             success=phase==VoidPhase.CONNECTED_VOID and state.junction_process_state.get("latest_crack_void_connection_certificate",{}).get("passed",False)
             if case in ("positive_offset","negative_offset","downstream_zero_drive") and success:
@@ -314,18 +387,26 @@ def lifecycle_decision(rows,sources):
         controlled.append({"case_identity":case,"actual_phase":phase.value,
             "passed":bool(success and row["failure"] is None and row["conservation"]["passed"])})
     rollback=[{"case_identity":r["case_identity"],"passed":r["restored_exactly"] and bool(r["failure"])
-        and r["failure"]["message"].startswith("injected:")} for r in rows if r["dataset"]=="rollback"]
+        and r['input_configuration'].get('intended_stage_reached',False)
+        and r["failure"]["message"]=='injected:'+r['input_configuration']['failure_stage']}
+        for r in rows if r["dataset"]=="rollback"]
     neutrality=[{"case_identity":r["case_identity"],"passed":r["exact_neutrality"] and r["failure"] is None}
         for r in rows if r["dataset"]=="neutrality"]
-    continued_restarts=all(bool(r["continued_front_terminal_reached"]) for r in restarts)
+    continued_restarts=bool(restarts) and all(bool(r["continued_front_terminal_reached"])
+        and r.get('subsequent_history_exact',False) and r['input_configuration']['requested_stage_available'] for r in restarts)
     same_terminal=bool(restarts) and len({r["terminal_fingerprint"] for r in restarts})==1
-    downstream_rollback=any(r["dataset"]=="rollback" and r["case_identity"].startswith("downstream:") for r in rows)
+    downstream_rollback=all(any(r['case_identity']=='lifecycle:'+stage and r['passed'] for r in rollback)
+        for stage in ('downstream_source_refinement','downstream_threshold_completion','child_creation',
+                      'child_support_rebuild','child_tip_continuation'))
     complete=(all(r["passed"] for r in partition+natural+controlled+rollback+neutrality)
+              and all(r.get('stagewise_topology',{}).get('passed',False) and r['conservation']['passed'] for r in rows)
               and continued_restarts and same_terminal and downstream_rollback)
     return {"transition_partitions":partition,"natural_partitions_restart":natural,
         "controlled_histories":controlled,"rollback_attempts":rollback,"V12_disabled_neutrality":neutrality,
         "restart_to_attainable_terminal_exact":all(r["restart_exact"] for r in restarts),
         "all_restart_stages_reach_identical_complete_terminal":same_terminal,
         "required_continued_front_restart_terminal":continued_restarts,
-        "downstream_lifecycle_rollback": "NOT_EXERCISED_SOURCE_RESOLUTION_PREREQUISITE",
+        'stagewise_topology_and_conservation':all(r.get('stagewise_topology',{}).get('passed',False)
+            and r['conservation']['passed'] for r in rows),
+        "downstream_lifecycle_rollback": "PASS" if downstream_rollback else "NOT_EXERCISED_SOURCE_RESOLUTION_PREREQUISITE",
         "decision":"PASS" if complete else "BLOCKED"}

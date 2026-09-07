@@ -13,7 +13,7 @@ ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT))
 from arrhenius_fracture.closure_lifecycle_evidence import (
     SCHEMA, PARTITIONS, PRECURSORS, CFG, advance_transition, resume_to_guard,
     conservation, transition_occurred, load_state, validate_lifecycle,
-    lifecycle_decision,
+    lifecycle_decision,stagewise_topology,
 )
 from arrhenius_fracture.closure_mechanics_evidence import canonical_data
 from arrhenius_fracture.finalization_v3_schema import FROZEN_CASE_REGISTRY, canonical_hash
@@ -28,6 +28,10 @@ from arrhenius_fracture.voiding_production_v5 import (
 from arrhenius_fracture.voiding_v5 import advance_site, arrhenius_rates, VoidPhase, update_cavity_growth
 from arrhenius_fracture.sharp_wake_backend_v12 import V12_MODEL_ID
 from arrhenius_fracture.v12_production_driver import build_loaded_state, execute_event
+from arrhenius_fracture.voiding_lifecycle_driver_v5 import (
+    advance_production_void_interval,NATURAL_WINDOW_S,NATURAL_SEEDS,
+)
+from arrhenius_fracture.closure_rollback_matrix_v5 import rollback_attempts
 
 
 def write_json(path,payload):
@@ -43,7 +47,7 @@ def main():
         raise RuntimeError("lifecycle evidence requires a clean committed implementation")
     sha=subprocess.check_output(("git","rev-parse","HEAD"),cwd=ROOT,text=True).strip()
     rows=[]; trace=[]
-    terminal,_=deterministic_trajectory(state_trace=trace)
+    terminal,trajectory_history=deterministic_trajectory(state_trace=trace)
     captured=dict(trace); available=captured["available_site"]
     def checkpoint(state):
         relative="checkpoints/"+fingerprint(state)+".json"
@@ -56,9 +60,14 @@ def main():
              "executed_code_sha":sha,"input_configuration":cfg,"input_hash":canonical_hash(cfg),
              "initial_checkpoint":checkpoint(before),"terminal_checkpoint":checkpoint(after),
              "initial_fingerprint":fingerprint(before),"terminal_fingerprint":fingerprint(after),
-             "actual_operations":canonical_data(operations),"conservation":conservation(after,before),**extra}
+             "actual_operations":canonical_data(operations),"conservation":conservation(after,before),
+             'stagewise_topology':stagewise_topology(after),**extra}
         rows.append(row); write_json(out/"rows"/(str(len(rows))+".json"),row)
         return row
+    for index,((previous_name,before),(name,after)) in enumerate(zip(trace,trace[1:])):
+        record('stagewise',name,before,after,{'stage_index':index,'previous_stage':previous_name,
+            'measurement_kind':'DERIVED_ACCEPTED_TRAJECTORY_STAGE_NOT_NEW_BASE_EXECUTION'},
+            [{'api':'deterministic_trajectory','captured_stage':name,'actual_trajectory_history':trajectory_history}])
     for name in FROZEN_CASE_REGISTRY["transitions"]:
         for partitions in PARTITIONS:
             print(f"Actual transition attempt {name}/{partitions}",flush=True)
@@ -87,13 +96,19 @@ def main():
         if stage=="zero_drive_connected": before=load_state(before,0.)
         restored=restore_checkpoint(out/checkpoint(before)); operations=[]; resumed_ops=[]; after=before; resumed=restored; error=None
         try:
-            after=resume_to_guard(before,operations); resumed=resume_to_guard(restored,resumed_ops)
+            if stage=='zero_drive_connected':
+                after=load_state(before,8e-7);resumed=load_state(restored,8e-7)
+                operations.append({'api':'accepted_tensile_reload','opening_m':8e-7})
+                resumed_ops.append({'api':'accepted_tensile_reload','opening_m':8e-7})
+            after=resume_to_guard(after,operations); resumed=resume_to_guard(resumed,resumed_ops)
         except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
         replay_path=checkpoint(resumed)
         record("restarts",stage,before,after,{"expected_terminal":"DOWNSTREAM_FRONT_CONTINUED",
-            "requested_stage_available":stage_available,"reload_policy":"retain_accepted_load"},operations,
+            "requested_stage_available":stage_available,"reload_policy":"tensile_8e-7" if stage=='zero_drive_connected' else "retain_accepted_load"},operations,
             restored_terminal_checkpoint=replay_path,restart_exact=fingerprint(after)==fingerprint(resumed),
-            continued_front_terminal_reached=after.void_state.cavities and after.void_state.cavities[0].phase==VoidPhase.DOWNSTREAM_FRONT_ACTIVE,
+            restarted_operations=resumed_ops,subsequent_history_exact=canonical_data(operations)==canonical_data(resumed_ops),
+            continued_front_terminal_reached=stage_available and any(op.get('api')=='child_tip_continuation'
+                and op.get('accepted',False) for op in operations),
             failure=error)
     # All controlled rows use actual FEM loading and state updates. Limiter
     # cases never substitute detached rate calculations for a growth history.
@@ -136,6 +151,7 @@ def main():
                     hole=_grow_hole_boundary(hole,cavity.radius_m,crack_path_m=after.crack_network.branches[0].path)
                     audit=[]; after=remesh_cavity(after,hole,after.void_state,"controlled-refinement",audit)
                     ops.append({"api":"actual_local_remesh","operations":audit})
+                    after=resume_to_guard(after,ops)
                 elif case in ("downstream_zero_drive","delayed_downstream"):
                     after,_=advance_transition(after,"ligament",1,operations=ops)
                     after=load_state(after,0.); after,_=advance_transition(after,"downstream_child",1,operations=ops)
@@ -166,25 +182,37 @@ def main():
             base_terminal_checkpoint=checkpoint(base),exact_neutrality=fingerprint(base)==fingerprint(disabled),failure=error)
     # Natural seeds: same physical duration, actual source-native stress, RNG,
     # and midpoint restart under all five timestep partitions.
-    for seed in range(12000,12032):
+    for seed in NATURAL_SEEDS:
         for partitions in PARTITIONS:
+            print(f'Actual natural lifecycle {seed}/{partitions}',flush=True)
             before,_=build_production_void_state(stochastic=True,seed=seed)
-            after=before; ops=[]; restart_exact=True
-            for interval in range(16*partitions):
-                rates=arrhenius_rates(CFG,temperature_K=900.,stress_tensor_Pa=local_site_tensor(after))
-                voids,events=advance_site(after.void_state,"site-1",1e-12/partitions,rates=rates)
-                after=replace(after,void_state=voids)
-                ops.append({"api":"advance_site","duration_s":1e-12/partitions,"events":events,"rates":rates})
-                if interval==8*partitions-1:
-                    restored=restore_checkpoint(out/checkpoint(after)); restart_exact &= fingerprint(restored)==fingerprint(after)
-                    replay=restored
-                elif interval>=8*partitions:
-                    replay_rates=arrhenius_rates(CFG,temperature_K=900.,stress_tensor_Pa=local_site_tensor(replay))
-                    replay_voids,_=advance_site(replay.void_state,"site-1",1e-12/partitions,rates=replay_rates)
-                    replay=replace(replay,void_state=replay_voids)
-            restart_exact &= fingerprint(after)==fingerprint(replay)
-            record("natural",str(seed),before,after,{"seed":seed,"partition_count":partitions,"duration_s":16e-12},ops,
-                midpoint_restart_exact=restart_exact,restarted_terminal_checkpoint=checkpoint(replay))
+            after=before; ops=[]; replay_ops=[]; failure=None; elapsed=0.; cache={}
+            # Two half-windows make the restart point physical and common to
+            # all partitions, rather than an arbitrary event-index checkpoint.
+            for half in range(2):
+                for interval in range(partitions):
+                    after,trace,result=advance_production_void_interval(after,NATURAL_WINDOW_S/(2*partitions),
+                        config=CFG,refinement_attempt_cache=cache)
+                    ops.extend(trace);elapsed+=result['elapsed_duration_s']
+                    if result['failure'] is not None: failure=result['failure'];break
+                if half==0:
+                    midpoint=after; replay=restore_checkpoint(out/checkpoint(midpoint))
+                if failure is not None: break
+            replay_failure=None
+            if failure is None:
+                for interval in range(partitions):
+                    replay,trace,result=advance_production_void_interval(replay,NATURAL_WINDOW_S/(2*partitions),
+                        config=CFG,refinement_attempt_cache={})
+                    replay_ops.extend(trace)
+                    if result['failure'] is not None: replay_failure=result['failure'];break
+            phase=after.void_state.cavities[0].phase if after.void_state.cavities else after.void_state.sites[0].phase
+            record("natural",str(seed),before,after,{"seed":seed,"partition_count":partitions,
+                "duration_s":NATURAL_WINDOW_S,'opening_m':4e-7,'temperature_K':900.,
+                'driver':'advance_production_void_interval','restart_time_s':NATURAL_WINDOW_S/2},ops,
+                elapsed_physical_time_s=elapsed,failure=failure,replay_failure=replay_failure,
+                terminal_classification=phase.value,restarted_operations=replay_ops,
+                midpoint_restart_exact=fingerprint(after)==fingerprint(replay),
+                restarted_terminal_checkpoint=checkpoint(replay))
     # Real rollback injections for stages reachable without unqualified events.
     for stage in ("field_projection","support_rebuild","equilibrium"):
         before=captured["subgrid_growth"]; after=before; ops=[]; error=None
@@ -192,7 +220,7 @@ def main():
         cavity=before.void_state.cavities[0]; hole,_=_geometry(radius_m=cavity.radius_m,center_m=cavity.center_m)
         try: after=remesh_cavity(before,hole,before.void_state,"rollback-promotion",ops,failure_stage=stage)
         except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
-        record("rollback","promotion:"+stage,initial_capture,after,{"failure_stage":stage},ops,failure=error,
+        record("rollback","promotion:"+stage,initial_capture,after,{"failure_stage":stage,'intended_stage_reached':stage in ops},ops,failure=error,
             restored_exactly=fingerprint(initial_capture)==fingerprint(after))
     for stage in ("graph_edit","remesh","field_projection","support_rebuild","equilibrium","energy_gate",
                   "connected_surface_certification","dormant_support_rebuild"):
@@ -200,8 +228,11 @@ def main():
         initial_capture=restore_checkpoint(out/checkpoint(before))
         try: after,_=ligament_transaction(before,failure_stage=stage,operation_log=ops)
         except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
-        record("rollback","ligament:"+stage,initial_capture,after,{"failure_stage":stage},ops,failure=error,
+        record("rollback","ligament:"+stage,initial_capture,after,{"failure_stage":stage,'intended_stage_reached':stage in ops},ops,failure=error,
             restored_exactly=fingerprint(initial_capture)==fingerprint(after))
+    for stage,before,after,configuration,ops,error,restored in rollback_attempts(captured,terminal,out/'rollback_checkpoint.json'):
+        print('Actual lifecycle rollback '+stage,flush=True)
+        record('rollback','lifecycle:'+stage,before,after,configuration,ops,failure=error,restored_exactly=restored)
     class Sources:
         def __getitem__(self,key): return restore_checkpoint(out/key)
     payload={"schema":SCHEMA,"executed_code_sha":sha,"rows":rows,

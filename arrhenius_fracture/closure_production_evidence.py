@@ -13,11 +13,73 @@ from .topology_transaction_v11 import complete_accepted_state_fingerprint as fin
 from .voiding_production_v5 import (
     cavity_boundary_tensor, directional_clock_rates, downstream_front_transaction,
     ligament_transaction,
+    cavity_source_resolution_metrics,
+    refine_downstream_source,
 )
+from .finalization_v3_schema import SCIENTIFIC_ACCEPTANCE_TOLERANCES as LIMITS
 
-SCHEMA = "v12.production-source-transfer/1"
+SCHEMA = "v12.production-source-transfer/2"
 LEVELS = ((32,12),(64,24),(128,48),(512,192))
 PATH = ((0.,0.),(.0005725993004046688,0.))
+REFINEMENT_CASES = {
+    "production:32:12": {"max_refinement_levels":3,"refinement_region":"complete_cavity_ring",
+                          "quality_improvement":False},
+    "production:512:192": {"max_refinement_levels":1,"refinement_region":"complete_cavity_ring",
+                            "quality_improvement":True},
+}
+
+
+def execute_refinement_peer(connected, configuration):
+    """Actual bounded negative/positive-peer attempt, including failed science."""
+    initial = fingerprint(connected); operations = []
+    result = {"configuration":configuration,"initial_state_fingerprint":initial}
+    try:
+        refined,audit = refine_downstream_source(connected,**configuration,operation_log=operations)
+        result.update({"audit":audit,"refined_state_fingerprint":fingerprint(refined),
+            "qualified":audit["status"] == "SOURCE_TENSOR_QUALIFIED",
+            "preserved_clock_and_rng":refined.competition == connected.competition and refined.rng_state == connected.rng_state})
+        try:
+            advanced,trial,trace,source_audit = downstream_front_transaction(refined)
+            result.update({"event_attempted":True,"event_accepted":trial is not None and trial.accepted,
+                "event_state_fingerprint":fingerprint(advanced),"event_operations":trace,"event_audit":source_audit})
+        except Exception as error:
+            result.update({"event_attempted":True,"event_accepted":False,
+                "event_failure":{"type":type(error).__name__,"message":str(error)}})
+    except Exception as error:
+        result.update({"qualified":False,"refinement_failure":{"type":type(error).__name__,"message":str(error)}})
+    result["refinement_operations"] = operations
+    result["caller_restored_exactly"] = fingerprint(connected) == initial
+    return canonical_data(result)
+
+
+def transfer_comparisons(rows):
+    reference = rows[-1]; comparisons = []
+    for row in rows[:-1]:
+        result = {"case_id": row["case_id"], "reference_case_id": reference["case_id"], "qualified": False}
+        if row["connection_executed"] and reference["connection_executed"]:
+            peer = {r["candidate_identity"]["candidate_id"]: r for r in reference["candidates"]}
+            errors = []
+            for candidate in row["candidates"]:
+                identity = candidate["candidate_identity"]["candidate_id"]; ref = peer.get(identity)
+                if ref is None:
+                    errors.append({"candidate_id": identity, "failure": "CANDIDATE_NOT_IN_REFERENCE"}); continue
+                tensor_error = float(np.linalg.norm(np.asarray(candidate["source_tensor_Pa"])-ref["source_tensor_Pa"])/np.linalg.norm(ref["source_tensor_Pa"]))
+                scalar_errors = {}
+                for field in ("hazard_barrier_J", "raw_rate_s", "effective_rate_s", "crossing_time_s"):
+                    a, b = candidate["rates_before_resolution_guard"][field], ref["rates_before_resolution_guard"][field]
+                    if isinstance(a, str): a = float(a)
+                    if isinstance(b, str): b = float(b)
+                    scalar_errors[field] = 0. if a == b else abs(a-b)/max(abs(b), 1e-300)
+                errors.append({"candidate_id": identity, "tensor_relative_error": tensor_error,
+                    "candidate_identity_equal": candidate["candidate_identity"] == ref["candidate_identity"],
+                    "threshold_equal": candidate["hazard"]["current_threshold_action"] == ref["hazard"]["current_threshold_action"],
+                    "scalar_relative_errors": scalar_errors, "tensor_gate": tensor_error <= LIMITS["tensor_probe_relative"]})
+            result["errors"] = errors
+            result["classification"] = "DIAGNOSTIC_TRANSFER_ONLY_NO_RATE_BARRIER_ACCEPTANCE_LIMIT_IN_FROZEN_REGISTRY"
+        else:
+            result["classification"] = "FAIL_CLOSED_CONNECTION_OR_MATCHED_FINE_REFERENCE_UNAVAILABLE"
+        comparisons.append(result)
+    return canonical_data(comparisons)
 
 
 def candidate_measurements(state):
@@ -25,12 +87,15 @@ def candidate_measurements(state):
     position=np.asarray(cavity.connection_exit_m)
     node=int(np.argmin(np.linalg.norm(state.mesh.nodes-position,axis=1)))
     tensor,elements=cavity_boundary_tensor(state,boundary_node=node)
+    metrics = cavity_source_resolution_metrics(state)
     delta=position-np.asarray(cavity.center_m)
     arc=(math.atan2(delta[1],delta[0])%(2*math.pi))/(2*math.pi)
     return canonical_data([
         {"candidate_identity":asdict(candidate),"boundary_site":"connection_exit",
          "boundary_position_m":position.tolist(),"arc_fraction":arc,
          "probe_element_ids":list(elements),"source_tensor_Pa":tensor.tolist(),
+         "source_resolution_metrics":metrics,
+         "candidate_plane_shear_Pa":float(np.asarray(candidate.normal_xy)@tensor@np.asarray(candidate.direction_xy)),
          "hazard":asdict(hazard),"rates_before_resolution_guard":rate,
          "owned_source":state.junction_process_state["active_event_source"]}
         for candidate,hazard,rate in zip(state.competition.candidates,
@@ -88,15 +153,16 @@ def validate_production(payload,sources,*,executed_code_sha):
             "event_transaction_created":trial is not None or replay_trial is not None}
         if any(row.get(key)!=value for key,value in derived.items()):
             raise ValueError("production guard claim differs from actual replay")
+        if row["case_id"] in REFINEMENT_CASES:
+            observed = execute_refinement_peer(connected,REFINEMENT_CASES[row["case_id"]])
+            if row.get("source_refinement_peer") != observed:
+                raise ValueError("source refinement peer does not reproduce from its owned checkpoint")
+        elif "source_refinement_peer" in row:
+            raise ValueError("unregistered source refinement peer")
         passed+=1
-    # The current fine reference fails. A future successful fine reference
-    # needs a prospectively specified comparison contract, not this fail-closed
-    # validator silently accepting newly authored errors or tolerances.
-    if rows[-1]["connection_executed"]:
-        raise ValueError("successful fine reference requires registered transfer predicates")
-    comparisons=[{"case_id":row["case_id"],"reference_case_id":rows[-1]["case_id"],
-        "qualified":False,"classification":"FAIL_CLOSED_CONNECTION_OR_MATCHED_FINE_REFERENCE_UNAVAILABLE"}
-        for row in rows[:-1]]
+    # Successful fine connections are now derived evidence, not an authored
+    # rejection requirement. Comparison never grants event authority by itself.
+    comparisons = transfer_comparisons(rows)
     if manifest["comparisons"]!=comparisons or manifest["production_resolution_cavity_tensor_qualified"] is not False:
         raise ValueError("production reference qualification falsely claimed")
     if manifest["policy"]!="C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED":

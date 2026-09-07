@@ -33,6 +33,33 @@ def test_accepted_ligament_survives_unqualified_source_without_child(connected):
     assert audit["status"] == "UNQUALIFIED_CAVITY_SOURCE_TENSOR"
 
 
+def test_ligament_retires_arriving_front_before_first_support_rebuild():
+    from arrhenius_fracture.voiding_production_v5 import ligament_transaction
+    pre, _ = deterministic_trajectory(stop_before_ligament=True)
+    before = fingerprint(pre)
+    operations = []
+    state, result = ligament_transaction(pre, operation_log=operations)
+    assert result.accepted and fingerprint(pre) == before
+    assert operations.index("root_status_change") < operations.index("support_rebuild")
+    assert operations.index("cavity_phase_update") < operations.index("support_rebuild")
+    assert state.crack_network.active_tip_ids == ()
+    contexts = state.junction_process_state["boundary_terminal_context"]
+    cavity_contexts = [item for values in contexts.values() for item in values
+                       if item["boundary_kind"] == "cavity_free_surface"]
+    assert cavity_contexts and all(item["endpoint_role"] == "inactive_terminal" for item in cavity_contexts)
+    assert all(item["cavity_cycle_certified"] for item in cavity_contexts)
+
+
+@pytest.mark.parametrize("stage", ["cavity_phase_update", "root_status_change", "support_rebuild"])
+def test_pre_support_contact_transition_rolls_back_exactly(stage):
+    from arrhenius_fracture.voiding_production_v5 import ligament_transaction
+    pre, _ = deterministic_trajectory(stop_before_ligament=True)
+    before = fingerprint(pre); operations = []
+    with pytest.raises(RuntimeError, match="injected:" + stage):
+        ligament_transaction(pre, failure_stage=stage, operation_log=operations)
+    assert stage in operations and fingerprint(pre) == before
+
+
 @pytest.mark.parametrize("partitions", [1, 2, 4, 8, 16])
 @pytest.mark.parametrize("source_kind", ["sharp_front", "cavity_surface"])
 def test_no_unqualified_source_can_advance_clock_even_with_source_kind_spoofing(connected, partitions, source_kind):
@@ -123,3 +150,48 @@ def test_fine_radial_nodes_inside_identification_band_are_not_surface_nodes():
     assert len(np.unique(_actual_cavity_boundary_edges(state)))==256
     hit=_first_ray_cavity_intersection(state,(.0005725993004046688,0.),(1.,0.))
     assert hit[0]==pytest.approx(7e-4-5.5e-5/math.cos(math.pi/256),abs=1e-15)
+
+
+def test_bounded_local_refinement_retains_failed_traction_and_complete_accepted_state(connected):
+    from arrhenius_fracture.voiding_production_v5 import refine_downstream_source
+    before = fingerprint(connected)
+    state, audit = refine_downstream_source(connected,max_refinement_levels=3)
+    assert audit["status"] == "SOURCE_TENSOR_UNQUALIFIED"
+    assert len(audit["attempts"]) == 3
+    metric = audit["attempts"][-1]["proof"]["current_metrics"]
+    assert metric["source_neighborhood_eta_n_max"] <= .03 and metric["source_neighborhood_eta_t_max"] <= .025
+    assert metric["eta_t_max"] > .025  # The unrefined cavity is not relabelled resolved.
+    assert metric["normalized_traction"] > .05
+    assert state is connected and fingerprint(state) == before
+    assert state.competition == connected.competition and state.rng_state == connected.rng_state
+
+
+@pytest.mark.parametrize("stage", ["downstream_source_refinement", "source_support_rebuild", "source_equilibrium"])
+def test_source_refinement_failure_restores_complete_connected_state(connected,stage):
+    from arrhenius_fracture.voiding_production_v5 import refine_downstream_source
+    before = fingerprint(connected); operations = []
+    with pytest.raises(RuntimeError,match="injected:"+stage):
+        refine_downstream_source(connected,max_refinement_levels=1,
+            failure_stage=stage,operation_log=operations)
+    assert stage in operations and fingerprint(connected) == before
+
+
+def test_bounded_quality_flip_preserves_nodes_boundary_and_protected_crack_edge():
+    from types import SimpleNamespace
+    from arrhenius_fracture.mesh import rebuild_tri_mesh
+    from arrhenius_fracture.voiding_production_v5 import _bounded_quality_edge_flips
+    from arrhenius_fracture.crack_network_v11 import CrackNetworkState
+    nodes = np.array(((0.,0.),(.5,-.001),(1.,0.),(.5,1.)))
+    mesh = rebuild_tri_mesh(nodes,np.array(((0,1,2),(0,2,3))))
+    state = SimpleNamespace(mesh=mesh,crack_network=SimpleNamespace(branches=()))
+    improved, flips = _bounded_quality_edge_flips(state)
+    assert flips == ((0,2,1,3),)
+    assert np.array_equal(improved.nodes,mesh.nodes)
+    def boundary(elems):
+        edges = np.sort(np.concatenate((elems[:,[0,1]],elems[:,[1,2]],elems[:,[2,0]])),axis=1)
+        unique, counts = np.unique(edges,axis=0,return_counts=True)
+        return unique[counts==1]
+    assert np.array_equal(boundary(improved.elems),boundary(mesh.elems))
+    protected = SimpleNamespace(mesh=mesh,crack_network=CrackNetworkState.one_tip(((0.,0.),(1.,0.))))
+    unchanged, flips = _bounded_quality_edge_flips(protected)
+    assert not flips and np.array_equal(unchanged.elems,mesh.elems)

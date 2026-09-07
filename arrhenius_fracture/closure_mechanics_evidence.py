@@ -9,7 +9,7 @@ from .closure_static_evidence import (
 )
 from .finalization_v3_schema import canonical_hash, SCIENTIFIC_ACCEPTANCE_TOLERANCES as LIMITS
 
-SCHEMA = "v12.voiding-v5-closure-mechanics/1"
+SCHEMA = "v12.voiding-v5-closure-mechanics/2"
 MESHES = ((128, 48), (256, 96))
 REGISTRY = {}
 GROUPS = {}
@@ -97,6 +97,31 @@ def measurements(raw, cfg):
         nodes = raw["nodes"][np.unique(raw["cavity_edges"])]
         theta = np.arctan2(nodes[:,1]-cfg["cavity_center_m"][1], nodes[:,0]-cfg["cavity_center_m"][0])
         nodes = nodes[np.argsort(theta)]
+        edges = np.asarray(raw["cavity_edges"], dtype=int)
+        adjacency = {int(node): set() for node in edges.ravel()}
+        for a, b in edges:
+            adjacency[int(a)].add(int(b)); adjacency[int(b)].add(int(a))
+        visited = set(); pending = [next(iter(adjacency))] if adjacency else []
+        while pending:
+            node = pending.pop()
+            if node not in visited:
+                visited.add(node); pending.extend(adjacency[node] - visited)
+        all_edges = np.sort(np.concatenate((raw["elements"][:,[0,1]],
+            raw["elements"][:,[1,2]], raw["elements"][:,[2,0]])), axis=1)
+        unique, counts = np.unique(all_edges, axis=0, return_counts=True)
+        owners = {tuple(edge): int(count) for edge, count in zip(unique, counts)}
+        result["closed_cavity_boundary_cycle"] = bool(len(edges) >= 3
+            and len({tuple(sorted(edge)) for edge in edges}) == len(edges)
+            and visited == set(adjacency)
+            and all(len(peers) == 2 for peers in adjacency.values())
+            and all(owners.get(tuple(sorted(edge))) == 1 for edge in edges))
+        # Exact SAT on every potentially intersecting material triangle,
+        # including material outside V12 support. Bounding boxes only prune
+        # disjoint pairs; they do not substitute for the interior predicate.
+        near = np.flatnonzero(np.all(tri.max(axis=1) >= nodes.min(axis=0), axis=1)
+            & np.all(tri.min(axis=1) <= nodes.max(axis=0), axis=1))
+        result["solid_cavity_polygon_overlap_element_ids"] = [int(e) for e in near
+            if _convex_polygon_interior_overlaps_triangle(nodes, tri[e])]
         result["support_cavity_polygon_overlap_element_ids"] = [int(e) for e in selected
             if _convex_polygon_interior_overlaps_triangle(nodes, tri[e])]
         polygon_area = abs(.5*np.sum(nodes[:,0]*np.roll(nodes[:,1],-1)-nodes[:,1]*np.roll(nodes[:,0],-1)))
@@ -139,6 +164,10 @@ def predicates(bases):
             add(key+"/unique_live_edge_owner", [key], {"valid": fields.get("edge_owner_valid", False)}, fields.get("edge_owner_valid", False))
             overlap = m["support_cavity_polygon_overlap_element_ids"]
             add(key+"/no_support_cavity_interior_overlap", [key], {"overlap_element_ids": overlap}, not overlap)
+            add(key+"/closed_cavity_boundary_cycle", [key],
+                {"closed": m["closed_cavity_boundary_cycle"]}, m["closed_cavity_boundary_cycle"])
+            overlap = m["solid_cavity_polygon_overlap_element_ids"]
+            add(key+"/no_solid_cavity_interior_overlap", [key], {"overlap_element_ids": overlap}, not overlap)
     derivatives = {}
     for n, layers in MESHES:
         mesh_id = f"{n}:{layers}"; base = get("centered:"+mesh_id)
@@ -163,6 +192,10 @@ def predicates(bases):
                 relative = abs(energy_derivative-compliance_derivative)/max(abs(energy_derivative),abs(compliance_derivative),1e-300)
                 name = f"{family}:{epsilon}:{mesh_id}"
                 derivatives[name] = (energy_derivative, [GROUPS[label] for label in labels])
+                qualities = [low["mesh_quality"], high["mesh_quality"], base["mesh_quality"]]
+                add(name+"/quality_valid_derivative_peers", derivatives[name][1]+[GROUPS["centered:"+mesh_id]],
+                    {"minimum_qualities": qualities, "limit": LIMITS["mesh_minimum_quality"]},
+                    min(qualities) >= LIMITS["mesh_minimum_quality"])
                 add(name+"/energy_compliance", derivatives[name][1]+[GROUPS["centered:"+mesh_id]],
                     {"minus_dU_dp": energy_derivative, "compliance_derivative": compliance_derivative,
                      "parameter": "crack_length_m" if family == "crack_perturb" else "cavity_radius_m",
@@ -183,6 +216,11 @@ def predicates(bases):
                   for field in ("reaction", "energy", "compliance")}
         add(label+"/mesh_global", [coarse_key,fine_key], {"errors": errors,
             "limit": LIMITS["static_mesh_reaction_relative"]}, max(errors.values()) <= LIMITS["static_mesh_reaction_relative"])
+        if coarse["cavity_enabled"]:
+            errors = {field: [coarse[field], fine[field]] for field in
+                ("cavity_area_relative", "cavity_perimeter_relative")}
+            add(label+"/mesh_cavity_geometry_convergence", [coarse_key, fine_key],
+                {"coarse_fine_relative_errors": errors}, all(b <= a for a, b in errors.values()))
         if "tensor_Pa" in coarse["fixed_tip_probe"] and "tensor_Pa" in fine["fixed_tip_probe"]:
             a,b = np.asarray(coarse["fixed_tip_probe"]["tensor_Pa"]), np.asarray(fine["fixed_tip_probe"]["tensor_Pa"])
             error = float(np.linalg.norm(a-b)/max(np.linalg.norm(b),1e-300))

@@ -240,7 +240,7 @@ def refine_accepted_state(
     )
     tips = tuple(sorted(set(str(value) for value in active_tip_ids)))
     centers = np.asarray([state.crack_network.branch(tip).tip for tip in tips], dtype=float)
-    mesh = rebuild_tri_mesh(nodes, elems, tip_centers=centers)
+    mesh = rebuild_tri_mesh(nodes, elems, tip_centers=centers if len(centers) else None)
 
     old_u = np.asarray(state.displacement).reshape(old.nn, 2)
     u = np.empty((mesh.nn, 2), dtype=float); u[:old.nn] = old_u

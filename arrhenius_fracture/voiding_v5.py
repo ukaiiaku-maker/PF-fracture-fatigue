@@ -185,12 +185,17 @@ def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
 
 
 def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
-                 rates: Mapping[str, float]) -> tuple[ProductionVoidState, tuple[str, ...]]:
+                 rates: Mapping[str, float], failure_injector=None) -> tuple[ProductionVoidState, tuple[str, ...]]:
     """Localize all first passages and retain threshold/RNG ownership in state."""
     site = next(item for item in state.sites if item.site_id == site_id)
     remaining = float(dt_s)
     events = []
     current = site
+    def inject(stage):
+        if failure_injector is not None:
+            trial=replace(state,sites=tuple(current if item.site_id==site_id else item for item in state.sites),
+                event_history=state.event_history+tuple({"event":event,"site_id":site_id} for event in events))
+            failure_injector(stage,trial)
     while remaining > max(1.0e-15 * dt_s, 1.0e-18):
         if current.phase == VoidPhase.AVAILABLE_SITE:
             birth_rate = max(float(rates["birth_s"]), 0.0) * current.candidate_weight
@@ -211,9 +216,11 @@ def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
                 state = replace(state, rng_state=rng.bit_generator.state)
                 current = replace(current, hits=hits, birth=HazardClock(0.0, renewed))
                 events.append("BIRTH_HIT")
+                inject("first_hit_threshold_renewal")
                 continue
             current = replace(current, hits=hits, phase=VoidPhase.EMBRYO)
             events.append("EMBRYO")
+            inject("second_hit_embryo_transition")
             continue
         if current.phase == VoidPhase.EMBRYO:
             ts = current.stabilization.crossing_time(float(rates["stabilization_s"]))
@@ -237,6 +244,7 @@ def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
             phase = VoidPhase.HEALED_SITE if th <= ts else VoidPhase.STABLE_SUBGRID_VOID
             current = replace(current, phase=phase)
             events.append("HEALED" if phase == VoidPhase.HEALED_SITE else "STABILIZED")
+            inject("healing" if phase == VoidPhase.HEALED_SITE else "stabilization")
             break
         break
     sites = tuple(current if item.site_id == site_id else item for item in state.sites)
@@ -245,7 +253,7 @@ def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
 
 
 def create_subgrid_cavity(state: ProductionVoidState, site_id: str,
-                          radius_m: float) -> ProductionVoidState:
+                          radius_m: float, *, failure_injector=None) -> ProductionVoidState:
     site = next(item for item in state.sites if item.site_id == site_id)
     if site.phase != VoidPhase.STABLE_SUBGRID_VOID:
         raise ValueError("site has not stabilized")
@@ -256,13 +264,15 @@ def create_subgrid_cavity(state: ProductionVoidState, site_id: str,
         raise ValueError("initial cavity seed exceeds available defect inventory")
     cavity = Cavity2D("void:" + site_id, site_id, site.center_m, radius_m, area, area,
                       VoidPhase.STABLE_SUBGRID_VOID, lineage=(site_id,))
-    return replace(
+    result = replace(
         state, cavities=state.cavities + (cavity,),
         available_defect_inventory_area_m2=state.available_defect_inventory_area_m2 - area,
         consumed_defect_inventory_area_m2=state.consumed_defect_inventory_area_m2 + area,
         event_history=state.event_history + ({"event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT",
                                               "cavity_id": cavity.cavity_id, "area_m2": area},),
     )
+    if failure_injector is not None: failure_injector("initial_inventory_debit",result)
+    return result
 
 
 def grow_cavity_2d(cavity: Cavity2D, delta_radius_m: float) -> Cavity2D:
@@ -307,7 +317,8 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
                          radial_growth_scale_m: float,
                          chemical_potential_drive_J: float = 1.0e-20,
                          chemical_potential_reference_J: float = 1.0e-20,
-                         shrinkage_mobility_m_per_J_s: float = 1.0e8) -> ProductionVoidState:
+                         shrinkage_mobility_m_per_J_s: float = 1.0e8,
+                         failure_injector=None) -> ProductionVoidState:
     """Atomically advance a cavity and its finite 2-D defect inventory.
 
     Growth transfers area from available to consumed inventory.  Shrinkage
@@ -324,6 +335,8 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
         available_inventory_area_m2=state.available_defect_inventory_area_m2,
     )
     delta_area = grown.area_m2 - cavity.area_m2
+    if failure_injector is not None:
+        failure_injector("state_owned_growth",replace_cavity(state,grown))
     if delta_area >= 0.0:
         available = state.available_defect_inventory_area_m2 - delta_area
         consumed = state.consumed_defect_inventory_area_m2 + delta_area
@@ -337,11 +350,14 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
                             inventory_area_m2=cavity.inventory_area_m2 - returned)
         available = state.available_defect_inventory_area_m2 + returned
         consumed = state.consumed_defect_inventory_area_m2 - returned
-    return replace(
+    result = replace(
         replace_cavity(state, grown),
         available_defect_inventory_area_m2=max(float(available), 0.0),
         consumed_defect_inventory_area_m2=max(float(consumed), 0.0),
     )
+    if failure_injector is not None and delta_area < 0.:
+        failure_injector("inventory_return_under_shrinkage",result)
+    return result
 
 
 def replace_cavity(state: ProductionVoidState, cavity: Cavity2D) -> ProductionVoidState:
@@ -351,10 +367,11 @@ def replace_cavity(state: ProductionVoidState, cavity: Cavity2D) -> ProductionVo
 
 
 def promote_cavity(state: ProductionVoidState, cavity_id: str,
-                   minimum_radius_m: float) -> ProductionVoidState:
+                   minimum_radius_m: float, *, failure_injector=None) -> ProductionVoidState:
     cavity = next(item for item in state.cavities if item.cavity_id == cavity_id)
     if cavity.phase != VoidPhase.STABLE_SUBGRID_VOID or cavity.radius_m < minimum_radius_m:
         raise ValueError("cavity is not eligible for geometric promotion")
+    if failure_injector is not None: failure_injector("promotion_criterion",state)
     updated = replace(
         cavity, phase=VoidPhase.RESOLVED_VOID,
         geometry_generation=cavity.geometry_generation + 1,

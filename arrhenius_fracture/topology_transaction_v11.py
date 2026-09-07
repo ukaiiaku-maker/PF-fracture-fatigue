@@ -487,6 +487,7 @@ def apply_v12_production_trial_geometry(
     transaction_identity: str,
     failure_injector: Callable[[str, LiveFEMTopologyState], None] | None = None,
     refinement_levels: int = 3,
+    prepare_support_state: Callable[[LiveFEMTopologyState], LiveFEMTopologyState] | None = None,
 ) -> LiveFEMTopologyState:
     """Perform graph edit, conforming remesh, physical field transfer and support rebuild."""
     from .adaptive_multitip_mesh_v11 import refine_accepted_state
@@ -531,8 +532,20 @@ def apply_v12_production_trial_geometry(
         "refinement_operation_index": int(state.event_counters.get("refinement_operation_index", 0)) + 1,
     })
     refined = replace(refined, event_counters=counters)
+    # A contact event may explicitly retire its arriving front before the
+    # first support certificate. The hook sees the actual refined boundary;
+    # it cannot make an active tip eligible for boundary-terminal clipping.
+    # Its state remains an isolated trial until the caller's energy/topology
+    # transaction commits.
+    support_base = state
+    if prepare_support_state is not None:
+        prepared = prepare_support_state(refined)
+        if prepared.mesh is not refined.mesh:
+            raise ValueError("support preparation must not replace the refined mesh")
+        network = prepared.crack_network
+        support_base = replace(prepared, event_counters=state.event_counters)
     return remesh_mechanically_separating_v12(
-        state,
+        support_base,
         mesh=refined.mesh,
         boundary=refined.boundary,
         tentative_network=network,

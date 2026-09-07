@@ -21,6 +21,7 @@ def _sha256(data: bytes) -> str:
 
 def write_checkpoint(
     state: LiveFEMTopologyState, path: str | Path, *, provider_runtime: Any = None,
+    failure_injector=None,
 ) -> dict[str, Any]:
     """Write the complete accepted state atomically; never checkpoint a trial."""
     target = Path(path)
@@ -31,7 +32,10 @@ def write_checkpoint(
     manifest = {
         "schema": SCHEMA,
         "topology_transaction_model_id": MODEL_ID,
-        "state_file": target.name + ".state.pkl",
+        # Immutable payload names make the manifest replacement the one
+        # publication point. A failed replacement cannot corrupt a prior
+        # checkpoint by overwriting the payload it still references.
+        "state_file": target.name + "." + payload_sha + ".state.pkl",
         "state_sha256": payload_sha,
         "crack_network": state.crack_network.to_dict(),
         "directional_competition": competition_state_to_dict(state.competition),
@@ -56,6 +60,8 @@ def write_checkpoint(
     manifest_tmp = target.with_name(target.name + ".tmp")
     state_tmp.write_bytes(payload)
     manifest_tmp.write_text(json.dumps(manifest, indent=2, sort_keys=True, allow_nan=False) + "\n")
+    if failure_injector is not None:
+        failure_injector("checkpoint_write",state)
     os.replace(state_tmp, state_path)
     os.replace(manifest_tmp, target)
     return manifest
