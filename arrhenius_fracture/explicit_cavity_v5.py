@@ -70,13 +70,15 @@ def _components(edges: np.ndarray) -> list[np.ndarray]:
 def cavity_edge_traction_geometry(a, b, cavity_interior_point, stress_tensor):
     """Return orientation-independent edge geometry and analytic traction."""
     a=np.asarray(a,float); b=np.asarray(b,float); center=np.asarray(cavity_interior_point,float)
+    if tuple(a) > tuple(b): a,b=b,a
     edge=b-a; length=float(np.linalg.norm(edge))
     if not length>0.0: raise ValueError("cavity edge must have positive length")
     tangent=edge/length; normal=np.array((tangent[1],-tangent[0])); midpoint=.5*(a+b); radial=midpoint-center
     if float(normal@radial)<0.0: normal=-normal
     radial_unit=radial/max(float(np.linalg.norm(radial)),1e-300)
     traction=np.asarray(stress_tensor,float)@normal
-    return {"edge_tangent":tangent,"outward_normal":normal,"edge_length_m":length,
+    return {"canonical_edge_tangent":tangent,"cavity_outward_into_solid_normal":normal,
+            "solid_domain_outward_into_cavity_normal":-normal,"edge_length_m":length,
             "center_radial_consistency":float(normal@radial_unit),"traction":traction,
             "normal_traction":float(traction@normal),"tangential_traction":float(traction@tangent)}
 
@@ -488,18 +490,23 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
     c=np.asarray(hole.center_m)
     for a,b in hole.cavity_edges:
         xy=mesh.nodes[[a,b]]; midpoint=xy.mean(axis=0)
-        ei=edge_to_elem[tuple(sorted((int(a),int(b))))][0]
+        owners=edge_to_elem.get(tuple(sorted((int(a),int(b)))),())
+        if len(owners)!=1: raise RuntimeError("CAVITY_BOUNDARY_EDGE_OWNER_COUNT_NOT_ONE")
+        ei=owners[0]
         S=np.array([[sigma[0,ei],sigma[2,ei]],[sigma[2,ei],sigma[1,ei]]])
         geometry=cavity_edge_traction_geometry(xy[0],xy[1],c,S)
-        tangent=geometry["edge_tangent"]; normal=geometry["outward_normal"]
+        tangent=geometry["canonical_edge_tangent"]; normal=geometry["cavity_outward_into_solid_normal"]
         length=geometry["edge_length_m"]; perimeter+=length
         traction=geometry["traction"]; normal_component=geometry["normal_traction"]; tangential_component=geometry["tangential_traction"]
         t2+=float(traction@traction)*length; tn2+=normal_component**2*length; tt2+=tangential_component**2*length
         force=traction*length; resultant+=force
         arm=midpoint-c; moment+=float(arm[0]*force[1]-arm[1]*force[0])
         edge_records.append({"edge_node_ids":(int(a),int(b)),"edge_endpoints_m":tuple(map(tuple,xy)),
-          "edge_tangent":tuple(map(float,tangent)),"outward_normal":tuple(map(float,normal)),
-          "center_radial_consistency":geometry["center_radial_consistency"],"adjacent_element_id":int(ei),"edge_length_m":length,
+          "canonical_edge_tangent":tuple(map(float,tangent)),
+          "cavity_outward_into_solid_normal":tuple(map(float,normal)),
+          "solid_domain_outward_into_cavity_normal":tuple(map(float,-normal)),
+          "center_radial_consistency":geometry["center_radial_consistency"],
+          "adjacent_solid_element_count":len(owners),"adjacent_element_id":int(ei),"edge_length_m":length,
           "traction_Pa":tuple(map(float,traction)),"normal_traction_Pa":normal_component,
           "tangential_traction_Pa":tangential_component})
         hoop.append(float(tangent@S@tangent)); weighted.append(length)

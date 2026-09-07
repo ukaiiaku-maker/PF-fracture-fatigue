@@ -1,9 +1,10 @@
 import numpy as np
 import pytest
+from dataclasses import replace
 
 from arrhenius_fracture.crack_void_mechanics_v5 import solve_crack_void_case
 from arrhenius_fracture.explicit_cavity_v5 import (
-    build_explicit_hole_mesh, cavity_edge_traction_geometry, conform_crack_path,
+    build_explicit_hole_mesh, cavity_edge_traction_geometry, conform_crack_path, solve_static_hole,
 )
 
 
@@ -94,7 +95,7 @@ def test_cavity_traction_diagnostic_separates_weak_and_recovered_quantities():
 def test_edge_normal_comes_from_oriented_edge_and_is_order_independent(a, b):
     stress = np.array(((2.0, 0.5), (0.5, 3.0)))
     result = cavity_edge_traction_geometry(a, b, (0.0, 0.0), stress)
-    assert np.allclose(result["outward_normal"], (1.0, 0.0))
+    assert np.allclose(result["cavity_outward_into_solid_normal"], (1.0, 0.0))
     assert np.allclose(result["traction"], (2.0, 0.5))
     assert result["normal_traction"] == pytest.approx(2.0)
     assert abs(result["tangential_traction"]) == pytest.approx(0.5)
@@ -106,3 +107,16 @@ def test_split_and_oblique_edge_geometry_uses_edge_normal():
     assert result["center_radial_consistency"] > 0.0
     assert result["normal_traction"] == pytest.approx(7.0)
     assert result["tangential_traction"] == pytest.approx(0.0, abs=1e-14)
+
+
+def test_cavity_edge_with_two_solid_owners_fails_closed():
+    hole = build_explicit_hole_mesh(1e-3, 1e-3, (7e-4, 0.0), 5e-5, 5e-5, 32,
+                                    radial_layers_override=12)
+    counts = {}
+    for tri in hole.mesh.elems:
+        for edge in ((tri[0], tri[1]), (tri[1], tri[2]), (tri[2], tri[0])):
+            edge = tuple(sorted(map(int, edge))); counts[edge] = counts.get(edge, 0) + 1
+    internal = next(edge for edge, count in counts.items() if count == 2)
+    invalid = replace(hole, cavity_edges=np.asarray([internal], dtype=int))
+    with pytest.raises(RuntimeError, match="CAVITY_BOUNDARY_EDGE_OWNER_COUNT_NOT_ONE"):
+        solve_static_hole(invalid, 4e-7)
