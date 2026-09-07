@@ -100,6 +100,17 @@ def _is_developed_protocol(protocol: str) -> bool:
     return protocol.startswith("D")
 SCREEN_T_K = 300.0
 
+# PX5 (mission section 8, review-scoped): prescribed static-shield control
+# jobs -- no CrackRebondingControls/P-C-B kinetics at all (rebonding_cfg=
+# None), K_b entering only as the step function run_trajectory's own
+# static_shield_control implements (reused verbatim from the pre-Part-X
+# static_shield_attribution study). "row_name"/"config_hash" are still
+# recorded for these jobs (which base kinetic row's analytical periodic
+# orbit informed the orbit-matched K_b_static value), but that config is
+# NEVER installed on the engine -- only job["K_rebond_max_target_Pa_sqrt_m"]
+# (the frozen K_b_static value itself) drives the physics.
+STATIC_SHIELD_COHESIONS = {"ceiling_static", "orbit_matched_static"}
+
 
 def _load_row_payload(job: dict) -> dict:
     registry = json.loads(
@@ -232,8 +243,18 @@ def main() -> int:
         bare_engine, bare_audit = build_a_native_engine(None)
         Eprime_Pa = reduced_modulus_Pa(bare_engine.G, bare_engine.nu)
 
-        rebonding_cfg = _resolve_screen_rebonding_cfg(job, row_payload, Eprime_Pa)
-        actual_config_hash = rebonding_cfg.config_hash()
+        is_static_shield = job["cohesion"] in STATIC_SHIELD_COHESIONS
+        static_shield_control = None
+        if is_static_shield:
+            rebonding_cfg = None
+            K_b_static = float(job["K_rebond_max_target_Pa_sqrt_m"])
+            actual_config_hash = f"STATIC_SHIELD_NO_KINETICS:K_b_static_Pa_sqrt_m={K_b_static!r}"
+            static_shield_control = {
+                "enabled": True, "K_b_static_Pa_sqrt_m": K_b_static, "first_event_fired": False,
+            }
+        else:
+            rebonding_cfg = _resolve_screen_rebonding_cfg(job, row_payload, Eprime_Pa)
+            actual_config_hash = rebonding_cfg.config_hash()
 
         def _make_controller(n_phase: int):
             return FatigueCycleHazardController(
@@ -277,6 +298,7 @@ def main() -> int:
             max_cumulative_cycles=max_cumulative_cycles,
             hazard_rng_seed=seed,
             minimum_load_hold_s=float(job["minimum_load_hold_s"]),
+            static_shield_control=static_shield_control,
         )
 
         result = {
