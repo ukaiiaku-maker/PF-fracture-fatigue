@@ -1,4 +1,8 @@
-"""Narrow executable reproducers; these do not qualify a V13 implementation."""
+"""Runtime restoration regressions; no trajectory or predictive qualification."""
+import os
+from pathlib import Path
+import subprocess
+import sys
 import pytest
 
 from arrhenius_fracture.current_source_multifront_hooks_v12 import restore_complete_current_source_engine
@@ -44,6 +48,18 @@ def test_persistent_emission_binding_must_survive_accepted_checkpoint_restore(fr
 
 @pytest.mark.parametrize("duration,active", [(0.0, True), (1e-10, False), (1e-10, True)])
 def test_initialized_and_restored_execute_exactly(frozen_payload, duration, active):
+    # Legacy fatigue entry tests install process-wide engine delegates. Run
+    # this production-source comparison in a fresh interpreter, as the
+    # qualification producer does; never inherit a different engine delegate.
+    code = (
+        "import runpy; "
+        f"ns=runpy.run_path({str(Path(__file__).resolve())!r}); "
+        f"ns['_assert_behavior'](ns['saved_owner']()[1].complete_checkpoint_payload(), {duration!r}, {active!r})"
+    )
+    subprocess.run([sys.executable, "-c", code], check=True, env=os.environ.copy())
+
+
+def _assert_behavior(frozen_payload, duration, active):
     with initialized_engine(frozen_payload) as engine:
         restored = restore_complete_current_source_engine(recapture(engine))
         K = engine._signed_current_K_Pa_sqrt_m if active else 0.0

@@ -69,7 +69,7 @@ def fixture():
     return checkpoint, row, base, post, {"base_cache": base_hash, "single_arm_cache": post_hash}
 
 
-def replay(engine, data):
+def replay(engine, data, *, step_function=advance_accepted_step):
     checkpoint, row, base, post, hashes = data
     solved = replace(checkpoint.state,
         displacement=np.asarray(base["base_equilibrium"]["displacement"]),
@@ -136,7 +136,7 @@ def replay(engine, data):
     rng_before = rng_hash(engine)
     observer_before = copy.deepcopy(vars(OBSERVER))
     try:
-        result = advance_accepted_step(checkpoint.state, context, correlation_interval_s=engine.f.tau_c,
+        result = step_function(checkpoint.state, context, correlation_interval_s=engine.f.tau_c,
             solve_accepted=lambda state, ctx: solved, evaluate_directional_rates=lambda state, ctx: rates,
             trial_action=trial, update_shared_state_once=update)
     finally:
