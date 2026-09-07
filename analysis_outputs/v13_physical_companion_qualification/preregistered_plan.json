@@ -19,6 +19,9 @@
   "Q_overlap_eV_grid": [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3],
   "quenched_disorder_J": 0,
   "cooperative_assistance_J": 0,
+  "companion_drive": "prospective arm at original junction; post-primary candidate-ray tensor; exact single-to-pair marginal energy over companion length; existing signed-process sigma_tip and raw barrier on an isolated full-state copy",
+  "companion_drive_boundary": "model-native discrete, not applied remote K or continuum-qualified G",
+  "single_overlay_reference": {"beta_B": 0.01, "Q_junction_eV": 0.1, "Q_overlap_eV": 0.1, "branch_seed": 130001},
   "outputs_separate": ["embryo_probability", "exact_pair_admissibility", "committed_branch_probability"],
   "ensemble_gate": {
     "all_eight_clean_parents_and_candidate_mechanics_required": true,

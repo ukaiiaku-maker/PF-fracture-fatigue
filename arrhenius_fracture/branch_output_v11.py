@@ -116,6 +116,7 @@ class BranchOutputWriter:
         allowed = {
             "target_reached", "branch_cluster_independent_tip_handoff_required",
             "physical_veto_no_branch", "numerical_failure",
+            "v13_first_baseline_cleavage_captured",
         }
         if status not in allowed:
             raise ValueError("unsupported v11 completion status")

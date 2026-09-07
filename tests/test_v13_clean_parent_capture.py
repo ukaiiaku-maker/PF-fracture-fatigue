@@ -64,3 +64,11 @@ def test_extracted_process_hook_keeps_diagnostic_tip_aliases_defined():
                if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name)}
     assert aliases["probe_tip_id"] == "controlling.tip_id"
     assert aliases["probe_tip"] == "controlling.tip_xy_m"
+
+
+def test_first_parent_terminal_label_is_supported_without_rerun(tmp_path):
+    import json
+    from arrhenius_fracture.branch_output_v11 import BranchOutputWriter
+    writer = BranchOutputWriter(tmp_path)
+    writer.complete(status="v13_first_baseline_cleavage_captured", final_checkpoint="parent/accepted_single.json", validation={"first_cleavage": True})
+    assert json.loads((tmp_path/"run_complete.json").read_text())["status"] == "v13_first_baseline_cleavage_captured"
