@@ -1,6 +1,13 @@
 {
   "schema": "v10230_part_x_px5_scientific_decision_v1",
   "status": "PROVISIONAL_PENDING_PX6_PX7",
+  "correction_history": [
+    {
+      "field": "interpretation",
+      "reason": "The original text asserted as fact that 'the developed-regime hazard is dominated by whichever portions of the loading cycle see the crack tip fully shielded.' The two-control PX5 comparison (ceiling vs cycle-mean-occupancy) is CONSISTENT WITH that mechanism but does not uniquely identify or prove it -- it only shows a cycle-averaged proxy underestimates the true suppression. Reworded to state the narrower, defensible claim.",
+      "corrected_in": "part_x_final_decision closure pass"
+    }
+  ],
   "wording_convention": "fold_slowdown and pct_rate_reduction are DIFFERENT numbers computed from the same S_h; report both -- NEVER '{fold}x rate reduction'.",
   "per_point": [
     {
@@ -260,7 +267,7 @@
     "orbit_matched_reproduction_fraction_min": 0.2220956464803857,
     "orbit_matched_reproduction_fraction_max": 0.3962621159725787
   },
-  "interpretation": "At all 10 tested (D2/D5, Kmax) points, the ceiling static control (K_b fixed at the full 900000 Pa*sqrt(m) cohesive-strength constant from the first accepted event onward) reproduces 100.0-101.9% of the dynamic-rebonding developed-regime slowdown -- essentially the ENTIRE effect, including at Kmax=12 MPa*sqrt(m) where the dynamic slowdown itself is largest (approximately 15.5-fold). The analytical periodic-orbit-matched control (K_b = K_rebond_max * cycle-mean bonded occupancy, computed with zero fitting to any physical trajectory) reproduces only 22.2-39.6% -- a naive duration-weighted-average shielding level substantially UNDERESTIMATES the true suppression. This is not evidence that dynamic P/C/B kinetics timing per se is required to explain the developed-regime rate (the ceiling control has NO kinetics, no timing, no formation/rupture dynamics at all, yet reproduces the effect almost exactly) -- rather, it shows that the developed-regime hazard is dominated by whichever portions of the loading cycle see the crack tip fully shielded, and a simple cycle-averaged proxy for that shielding fails specifically because the hazard integral is NOT linear in the instantaneous K_b.",
+  "interpretation": "At all 10 tested (D2/D5, Kmax) points, the ceiling static control (K_b fixed at the full 900000 Pa*sqrt(m) cohesive-strength constant from the first accepted event onward) reproduces 100.0-101.9% of the dynamic-rebonding developed-regime slowdown -- essentially the ENTIRE effect, including at Kmax=12 MPa*sqrt(m) where the dynamic slowdown itself is largest (approximately 15.5-fold). The analytical periodic-orbit-matched control (K_b = K_rebond_max * cycle-mean bonded occupancy, computed with zero fitting to any physical trajectory) reproduces only 22.2-39.6% -- a naive duration-weighted-average shielding level substantially UNDERESTIMATES the true suppression. This is not evidence that dynamic P/C/B kinetics timing per se is required to explain the developed-regime rate (the ceiling control has NO kinetics, no timing, no formation/rupture dynamics at all, yet reproduces the effect almost exactly) -- rather, the result is CONSISTENT WITH the developed-regime hazard being dominated by whichever portions of the loading cycle see the crack tip near-fully shielded, and shows that a simple cycle-averaged proxy for that shielding underestimates the true suppression, because the hazard integral is NOT linear in the instantaneous K_b. This two-control comparison does NOT uniquely identify or prove which specific cycle phase controls the hazard -- near-ceiling phase dominance is one interpretation consistent with the data, not the only one the data rules out alternatives against.",
   "classification_note": "Classified MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY at every point under the review's both-controls-must-agree gate (dominant requires BOTH controls >=80% reproduction) -- not because dynamic kinetic history is confirmed necessary, but because the review's classification scheme correctly refuses to credit 'static shielding in general' when one of the two prescribed static proxies fails this badly. The narrower, better-supported finding is in the interpretation text above: the CEILING level specifically (not a cycle-averaged level) is what matters.",
   "scope_reminder": [
     "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT",

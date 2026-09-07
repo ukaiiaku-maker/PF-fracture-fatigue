@@ -1,6 +1,14 @@
 {
   "schema": "v10230_part_x_px4_scientific_decision_v1",
   "status": "PROVISIONAL_PENDING_PX5_PX6_PX7",
+  "correction_history": [
+    {
+      "field": "interpretation.D3_vs_D6_persistence",
+      "reason": "The original text described the D3-vs-D6 separation as 'an order-of-magnitude difference' without qualifying it as a low-K-endpoint-only statement. The exact recomputed separation is ~6.18-fold at Kmax=12 (NOT a full decade) and decays to ~1.02-fold by Kmax=24.3 -- an explicitly K-dependent result, not a single order-of-magnitude finding.",
+      "old_text": "an order-of-magnitude difference driven entirely by the persistence assumption, not by frequency, since D3 and D6 share the same frequency and R.",
+      "corrected_in": "part_x_final_decision closure pass"
+    }
+  ],
   "wording_convention": "fold_slowdown and pct_rate_reduction are DIFFERENT numbers computed from the same S_h_developed; report both, e.g. 'D1 Kmax=12 gives approximately a 15.5-fold slowdown, or a 93.5% rate reduction' -- NEVER '15.5x rate reduction' (that conflates the two).",
   "per_protocol_seed_1720": {
     "D1": {
@@ -366,7 +374,7 @@
     "D1_vs_D2_R_sensitivity": "max|delta S_h|=0.0007: R has a negligible effect on the developed-regime rebonding slowdown across this Kmax range -- D1 (R=-0.95) and D2 (R=-0.5) are practically indistinguishable.",
     "D2_vs_D5_passivation": "max|delta S_h|=0.0001: the passivation-limited chemistry factor produces an almost identical developed-regime slowdown to the COMPETING_REVERSIBLE baseline -- passivation state does not materially change the STABILIZED rate once the developed window is reached, though it may still govern the transient approach to that window (not assessed by S_h_developed, which is computed only over the stable/developed interval).",
     "D2_vs_D3_frequency": "max|delta S_h|=0.7917: frequency has a LARGE effect -- at Kmax=12 MPa*sqrt(m), D2 (1000Hz) shows a 15.50-fold slowdown while D3 (316.228Hz) shows only a 2.50-fold slowdown; the effect shrinks with Kmax but the frequency-dependence itself does not vanish across the grid.",
-    "D3_vs_D6_persistence": "max|delta S_h|=0.7911: at the SAME frequency (316.228Hz), the conditional-persistence branch (D6) shows a 15.47-fold slowdown at Kmax=12 versus D3's 2.50-fold -- an order-of-magnitude difference driven entirely by the persistence assumption, not by frequency, since D3 and D6 share the same frequency and R."
+    "D3_vs_D6_persistence": "max|delta S_h|=0.7911: at the SAME frequency (316.228Hz), the conditional-persistence branch (D6) shows a 15.47-fold slowdown at Kmax=12 versus D3's 2.50-fold -- a 6.18-fold separation at the low-K endpoint (NOT a full order of magnitude), decaying strongly as Kmax increases (per-Kmax fold separation: 12.0MPa=6.18x, 15.0MPa=1.16x, 18.0MPa=1.05x, 21.0MPa=1.03x, 24.3MPa=1.02x). Persistent bonding materially amplifies the reduced-frequency low-K retardation, with the separation decaying strongly as Kmax increases -- driven entirely by the persistence assumption, not by frequency, since D3 and D6 share the same frequency and R. CORRECTED (see correction_history): an earlier draft of this text described this as 'an order-of-magnitude difference,' which the exact recomputed separation (6.18-fold at Kmax=12, decaying to ~1.02-fold by Kmax=24.3) does not support -- a full decade would require a 10.0-fold separation at the cited point."
   },
   "second_seed_confirmation": "see px4_stage1_slope_table.csv: all 5 protocol axes classify REBONDING_SEED_ROBUST",
   "scope_reminder": [

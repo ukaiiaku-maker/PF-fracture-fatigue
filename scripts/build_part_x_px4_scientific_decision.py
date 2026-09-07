@@ -99,6 +99,23 @@ def main() -> None:
     decision = {
         "schema": "v10230_part_x_px4_scientific_decision_v1",
         "status": "PROVISIONAL_PENDING_PX5_PX6_PX7",
+        "correction_history": [
+            {
+                "field": "interpretation.D3_vs_D6_persistence",
+                "reason": (
+                    "The original text described the D3-vs-D6 separation as 'an order-of-magnitude "
+                    "difference' without qualifying it as a low-K-endpoint-only statement. The exact "
+                    "recomputed separation is ~6.18-fold at Kmax=12 (NOT a full decade) and decays to "
+                    "~1.02-fold by Kmax=24.3 -- an explicitly K-dependent result, not a single order-of-"
+                    "magnitude finding."
+                ),
+                "old_text": (
+                    "an order-of-magnitude difference driven entirely by the persistence assumption, not "
+                    "by frequency, since D3 and D6 share the same frequency and R."
+                ),
+                "corrected_in": "part_x_final_decision closure pass",
+            },
+        ],
         "wording_convention": (
             "fold_slowdown and pct_rate_reduction are DIFFERENT numbers computed from the same "
             "S_h_developed; report both, e.g. 'D1 Kmax=12 gives approximately a 15.5-fold slowdown, "
@@ -133,8 +150,16 @@ def main() -> None:
                 "at the SAME frequency (316.228Hz), the conditional-persistence branch (D6) shows a "
                 f"{per_protocol['D6_conditional_persistent']['points'][0]['fold_slowdown_exact']:.2f}-fold "
                 f"slowdown at Kmax=12 versus D3's {per_protocol['D3']['points'][0]['fold_slowdown_exact']:.2f}-fold -- "
-                "an order-of-magnitude difference driven entirely by the persistence assumption, not by "
-                "frequency, since D3 and D6 share the same frequency and R."
+                f"a {10.0 ** comparisons['D3_vs_D6_persistence']['max_abs_delta_S_h']:.2f}-fold separation at the "
+                "low-K endpoint (NOT a full order of magnitude), decaying strongly as Kmax increases "
+                f"(per-Kmax fold separation: {', '.join(f'{d['Kmax_MPa_sqrt_m']:.1f}MPa={10.0 ** abs(d['delta_S_h_b_minus_a']):.2f}x' for d in comparisons['D3_vs_D6_persistence']['per_Kmax'])}). "
+                "Persistent bonding materially amplifies the reduced-frequency low-K retardation, with the "
+                "separation decaying strongly as Kmax increases -- driven entirely by the persistence "
+                "assumption, not by frequency, since D3 and D6 share the same frequency and R. CORRECTED "
+                "(see correction_history): an earlier draft of this text described this as 'an "
+                "order-of-magnitude difference,' which the exact recomputed separation (6.18-fold at "
+                "Kmax=12, decaying to ~1.02-fold by Kmax=24.3) does not support -- a full decade would "
+                "require a 10.0-fold separation at the cited point."
             ),
         },
         "second_seed_confirmation": "see px4_stage1_slope_table.csv: all 5 protocol axes classify REBONDING_SEED_ROBUST",

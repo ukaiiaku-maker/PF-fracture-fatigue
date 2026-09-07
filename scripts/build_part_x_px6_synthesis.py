@@ -49,6 +49,24 @@ def main() -> None:
             "first-passage 1e12-cycle horizon; PX5 (scoped to D2/D5 only) attributed the dynamic-rebonding "
             "developed-regime slowdown against two prescribed static-shield controls."
         ),
+        "cycle_horizon_qualification": {
+            "classification": "HARD_FIRST_PASSAGE_CYCLE_HORIZON_QUALIFIED_WITH_1E-6_CYCLE_FLOOR",
+            "horizon_cycles": 1.0e12,
+            "inherited_precision_floor_cycles": 1.0e-6,
+            "floor_source": "FatigueControllerConfig.min_block_cycles default (arrhenius_fracture/fatigue_v1.py) -- "
+                             "an inherited, pre-existing adaptive-block-search precision limit, not something the "
+                             "PX4.1 exact-horizon implementation introduces.",
+            "statement": (
+                "The implementation enforces a hard, exact first-passage cycle horizon (max_cumulative_cycles), "
+                "clipping every candidate integration block to the exact remaining budget -- subject only to the "
+                "inherited 1e-6-cycle minimum-block numerical floor (the adaptive search will not resolve a "
+                "candidate block smaller than this floor, so a horizon overshoot of up to 1e-6 cycles is possible "
+                "in principle). All 80 admitted PX4/PX4.1 developed trajectories completed with a maximum observed "
+                "event cumulative-cycle count of ~9.02e4 -- more than 7 orders of magnitude below the 1e12-cycle "
+                "horizon and >10 orders of magnitude above the 1e-6 floor -- so this floor had no effect on any "
+                "campaign conclusion; no trajectory came remotely close to the horizon."
+            ),
+        },
         "px4_findings": {
             "seed_robustness_by_protocol_axis": seed_robustness,
             "all_5_axes_seed_robust": all_seed_robust,
@@ -71,16 +89,21 @@ def main() -> None:
             "seed-robust, Kmax-decaying fatigue-crack-growth slowdown (from ~15.5-fold at Kmax=12 MPa*sqrt(m) "
             "to ~1.04-fold at Kmax=24.3 MPa*sqrt(m)) that is materially insensitive to load ratio R and "
             "passivation-limited chemistry, but strongly sensitive to loading frequency and to whether the "
-            "reduced-frequency condition's rebonded state is allowed to persist across cycles (D3 vs D6 "
-            "differ by an order of magnitude at identical R/frequency). For the two scoped protocols, PX5 "
-            "shows this developed-regime effect is almost entirely explained by the crack tip's ABSOLUTE "
-            "shielding ceiling (a static K_b fixed at full cohesive strength after the first event reproduces "
-            "100.0-101.9% of the dynamic result at every tested point) rather than by a cycle-averaged "
-            "shielding level (which reproduces only 22-40%) -- i.e. the hazard is dominated by whichever "
-            "cycle phase sees full shielding, not by the mean occupancy over the cycle. This is evidence "
-            "AGAINST needing the full P/C/B kinetics timing to explain the STEADY-STATE developed rate for "
-            "D2/D5 specifically, though it says nothing about the TRANSIENT approach to that steady state, "
-            "and has not been tested for D1/D3/D6."
+            "reduced-frequency condition's rebonded state is allowed to persist across cycles. Persistent "
+            "bonding materially amplifies the reduced-frequency low-K retardation: D3 vs D6 separate by "
+            "~6.18-fold at the low-K endpoint (Kmax=12 MPa*sqrt(m)) at identical R/frequency, NOT a full "
+            "order of magnitude, and this separation decays strongly toward ~1.02-fold by Kmax=24.3 -- an "
+            "explicitly K-dependent result. For the two scoped protocols, PX5 shows this developed-regime "
+            "effect is CEILING-STATIC-SHIELD EQUIVALENT: a static K_b fixed at full cohesive strength after "
+            "the first event reproduces 100.0-101.9% of the dynamic result at every tested point, whereas a "
+            "cycle-mean-occupancy static approximation reproduces only 22-40%, because the hazard is "
+            "nonlinear in instantaneous shielding. This pattern is CONSISTENT WITH the developed-regime "
+            "hazard being dominated by whichever cycle phase sees near-full shielding, but the two-control "
+            "comparison does not uniquely PROVE that specific mechanism -- it only shows that a cycle-"
+            "averaged proxy underestimates the effect. This is evidence AGAINST needing the full P/C/B "
+            "kinetics timing to explain the STEADY-STATE developed rate for D2/D5 specifically, though it "
+            "says nothing about the TRANSIENT approach to that steady state, and has not been tested for "
+            "D1/D3/D6."
         ),
         "scope_reminder": [
             "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT", "HAZARD_ONLY_COHESIVE_FEEDBACK",

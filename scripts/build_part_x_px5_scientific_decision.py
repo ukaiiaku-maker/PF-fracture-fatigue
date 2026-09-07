@@ -70,6 +70,20 @@ def main() -> None:
     decision = {
         "schema": "v10230_part_x_px5_scientific_decision_v1",
         "status": "PROVISIONAL_PENDING_PX6_PX7",
+        "correction_history": [
+            {
+                "field": "interpretation",
+                "reason": (
+                    "The original text asserted as fact that 'the developed-regime hazard is dominated by "
+                    "whichever portions of the loading cycle see the crack tip fully shielded.' The two-"
+                    "control PX5 comparison (ceiling vs cycle-mean-occupancy) is CONSISTENT WITH that "
+                    "mechanism but does not uniquely identify or prove it -- it only shows a cycle-averaged "
+                    "proxy underestimates the true suppression. Reworded to state the narrower, defensible "
+                    "claim."
+                ),
+                "corrected_in": "part_x_final_decision closure pass",
+            },
+        ],
         "wording_convention": (
             "fold_slowdown and pct_rate_reduction are DIFFERENT numbers computed from the same S_h; "
             "report both -- NEVER '{fold}x rate reduction'."
@@ -90,10 +104,14 @@ def main() -> None:
             f"naive duration-weighted-average shielding level substantially UNDERESTIMATES the true "
             f"suppression. This is not evidence that dynamic P/C/B kinetics timing per se is required to "
             f"explain the developed-regime rate (the ceiling control has NO kinetics, no timing, no "
-            f"formation/rupture dynamics at all, yet reproduces the effect almost exactly) -- rather, it "
-            f"shows that the developed-regime hazard is dominated by whichever portions of the loading cycle "
-            f"see the crack tip fully shielded, and a simple cycle-averaged proxy for that shielding fails "
-            f"specifically because the hazard integral is NOT linear in the instantaneous K_b."
+            f"formation/rupture dynamics at all, yet reproduces the effect almost exactly) -- rather, the "
+            f"result is CONSISTENT WITH the developed-regime hazard being dominated by whichever portions "
+            f"of the loading cycle see the crack tip near-fully shielded, and shows that a simple "
+            f"cycle-averaged proxy for that shielding underestimates the true suppression, because the "
+            f"hazard integral is NOT linear in the instantaneous K_b. This two-control comparison does NOT "
+            f"uniquely identify or prove which specific cycle phase controls the hazard -- near-ceiling "
+            f"phase dominance is one interpretation consistent with the data, not the only one the data "
+            f"rules out alternatives against."
         ),
         "classification_note": (
             "Classified MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY at every point under the review's "
