@@ -37,7 +37,7 @@ from scripts.v13_value_fingerprint import physical_state_fingerprint as fp
 from scripts.qualify_v13_process_restore import safe_json, selected_state
 
 
-def evaluate_parent(case, parents_root, output_root, plan):
+def evaluate_parent(case, parents_root, output_root, plan, *, later_launch_path=None):
     source = parents_root/case
     record_path = source/"parent/parent_record.json"
     if not record_path.exists():
@@ -48,7 +48,13 @@ def evaluate_parent(case, parents_root, output_root, plan):
         if sha256(source/"parent"/manifest["state_file"]) != record[field] or manifest["state_sha256"] != record[field]:
             raise RuntimeError("parent checkpoint/manifest hash mismatch")
     path = source/"parent/event_context.pkl"
-    if sha256(path) != record["event_context_sha256"] or not record["fresh_initialization"]:
+    clean_history = record["fresh_initialization"]
+    if later_launch_path is not None:
+        from scripts.run_v13_later_clean_parents import certify
+        _, _, initial = certify(later_launch_path.parent.name)
+        clean_history = (record.get("clean_history") is True and
+            record.get("source_first_parent_checkpoint_sha256") == initial["accepted_single_checkpoint_sha256"])
+    if sha256(path) != record["event_context_sha256"] or not clean_history:
         raise RuntimeError("parent hash or clean-history contract failed")
     payload = pickle.loads(path.read_bytes())
     single = payload["accepted_single_checkpoint"]
@@ -56,7 +62,7 @@ def evaluate_parent(case, parents_root, output_root, plan):
     pre = payload["solved_pre_event_state"]
     args = SimpleNamespace(**payload["args"])
     cfg = payload["configuration"]
-    launch = json.loads((source/"launch.json").read_text())
+    launch = json.loads((later_launch_path or source/"launch.json").read_text())
     family = Path(launch["family_validation"]["family_validation"]["family"])
     os.environ.update(campaign_environment(family))
     out = output_root/case
@@ -64,7 +70,8 @@ def evaluate_parent(case, parents_root, output_root, plan):
     candidates = baseline.competition.candidates
     if len(candidates) != 2:
         raise RuntimeError("this physical qualification is preregistered for the unchanged two-plane inventory")
-    if baseline.competition.consumed_event_ids != (record["event_id"],):
+    expected_events = tuple(record["accepted_event_ids"]) if later_launch_path is not None else (record["event_id"],)
+    if baseline.competition.consumed_event_ids != expected_events or record["event_id"] not in expected_events:
         raise RuntimeError("clean parent contains more than the first accepted cleavage")
     primary_id = record["winning_candidate_id"]
     companion_candidates = [c for c in candidates if c.candidate_id != primary_id]

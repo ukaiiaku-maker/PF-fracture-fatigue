@@ -20,7 +20,9 @@ def test_physical_companion_uses_actual_fields_and_exact_native_marginal_energy(
 def test_physical_input_contract_rejects_historical_or_changed_parent():
     from scripts.qualify_v13_physical_companions import evaluate_parent
     source = inspect.getsource(evaluate_parent)
-    assert 'not record["fresh_initialization"]' in source
+    assert 'clean_history = record["fresh_initialization"]' in source
+    assert 'certify(later_launch_path.parent.name)' in source
+    assert 'or not clean_history' in source
     assert 'sha256(path) != record["event_context_sha256"]' in source
     assert "fp(baseline) == before_hash" in source
     assert "fp(_capture_shared_engine(engine)) == process_hash" in source
