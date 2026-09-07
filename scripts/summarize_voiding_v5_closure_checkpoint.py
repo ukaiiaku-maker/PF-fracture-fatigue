@@ -28,7 +28,7 @@ def read_tree(path,filename):
     return json.loads((path/filename).read_text())
 
 
-def derive(root,junit):
+def derive(root,junit,regression_sha):
     traction=read_tree(root/"traction_source_a","traction_convergence.json")
     mechanics=read_tree(root/"mechanics_a","mechanics_matrix.json")
     lifecycle=read_tree(root/"lifecycle_a","lifecycle_rows.json")
@@ -38,10 +38,13 @@ def derive(root,junit):
         cfg=row["input_configuration"]
         if cfg["crack_enabled"]: continue
         measurement=row["measurements"]
-        nominal=abs(measurement["reaction_top_N_per_m"])/cfg["domain_width_m"]
-        concentration=max(float(np.asarray(edge["canonical_edge_tangent"])@
-            np.asarray(edge["adjacent_element_stress_tensor_Pa"])@
-            np.asarray(edge["canonical_edge_tangent"])) for edge in measurement["edge_records"])/nominal
+        nominal=abs(measurement["reaction_top_N_per_m"])/cfg["specimen_width_m"]
+        hoop=[]
+        for edge in measurement["edge_records"]:
+            a,b=np.asarray(edge["edge_endpoints_m"])
+            tangent=(b-a)/np.linalg.norm(b-a)
+            hoop.append(float(tangent@np.asarray(edge["adjacent_element_stress_tensor_Pa"])@tangent))
+        concentration=max(hoop)/nominal
         error=abs(concentration-3.)/3.
         kirsch.append({"source_row_id":row["case_id"],"source_execution_id":row["execution_id"],
             "source_fingerprints":row["source_fingerprints"],"boundary_segments":cfg["boundary_segments"],
@@ -84,7 +87,7 @@ def derive(root,junit):
         "reachable_rollback_gates_passed":sum(r["passed"] for r in decision["rollback_attempts"]),
         "complete_lifecycle_rollback":"NOT_COMPLETE_PREVOID_FAULT_HOOKS_NOT_IMPLEMENTED_DOWNSTREAM_PREREQUISITE_UNAVAILABLE",
         "generalized_length_and_stagewise_topology":"PARTIAL_BASIC_CONSERVATION_NOT_COMPLETE_CERTIFICATION",
-        "local_regression":{"implementation_sha":"6ba4094c5ef42857412f6528a60e22e6dd2be52e",
+        "local_regression":{"implementation_sha":regression_sha,
             "failure_ids":failures,"inherited_failure_ids":sorted(set(failures)&set(inherited)),
             "additional_failure_ids":sorted(set(failures)-set(inherited)),"classification":"NOT_GREEN_NOT_INHERITED_ONLY"},
         "exact_head_clean_worker_full_closure":"NOT_RUN_PUBLICATION_APPROVAL_BLOCKED"}
@@ -93,4 +96,5 @@ def derive(root,junit):
 if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("evidence_root",type=Path); parser.add_argument("junit",type=Path)
-    args=parser.parse_args(); print(json.dumps(derive(args.evidence_root,args.junit),indent=2,sort_keys=True,allow_nan=False))
+    parser.add_argument("--regression-sha",required=True)
+    args=parser.parse_args(); print(json.dumps(derive(args.evidence_root,args.junit,args.regression_sha),indent=2,sort_keys=True,allow_nan=False))

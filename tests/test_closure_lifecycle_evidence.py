@@ -36,3 +36,16 @@ def test_ligament_occurrence_uses_archived_root_event_not_fresh_cavity_clock():
     assert not after.competition.consumed_event_ids
     assert transition_occurred("ligament",before,after)
     assert not transition_occurred("ligament",before,before)
+
+
+@pytest.mark.parametrize("rate,passed",[(0.,True),(2.4e-13,False)])
+def test_frozen_offset_terminal_does_not_treat_positive_unqualified_rate_as_zero(monkeypatch,rate,passed):
+    from arrhenius_fracture.closure_lifecycle_evidence import lifecycle_decision
+    from arrhenius_fracture import closure_production_evidence
+    connected,_=deterministic_trajectory()
+    monkeypatch.setattr(closure_production_evidence,"candidate_measurements",lambda state:[
+        {"rates_before_resolution_guard":{"effective_rate_s":rate}}])
+    row={"dataset":"controlled","case_identity":"positive_offset","terminal_checkpoint":"source",
+         "failure":None,"conservation":{"passed":True}}
+    result=lifecycle_decision([row],{"source":connected})
+    assert result["controlled_histories"][0]["passed"] is passed

@@ -302,9 +302,13 @@ def lifecycle_decision(rows,sources):
             success=any(op.get("api")=="actual_local_remesh" for op in row["actual_operations"])
         elif case in ("positive_offset","negative_offset","short_ligament","long_ligament","downstream_zero_drive"):
             success=phase==VoidPhase.CONNECTED_VOID and state.junction_process_state.get("latest_crack_void_connection_certificate",{}).get("passed",False)
-            if case=="downstream_zero_drive":
-                tensor=cavity_boundary_tensor(state)[0]
-                success &= all(r["effective_rate_s"]==0. for r in directional_clock_rates(state,tensor))
+            if case in ("positive_offset","negative_offset","downstream_zero_drive") and success:
+                from .closure_production_evidence import candidate_measurements
+                # A valid positive-drive connection is not the frozen
+                # CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE terminal. Use the
+                # owned exit probe, not an unrelated maximum surface tensor.
+                success &= all(r["rates_before_resolution_guard"]["effective_rate_s"]==0.
+                               for r in candidate_measurements(state))
         else:
             success=phase==VoidPhase.DOWNSTREAM_FRONT_ACTIVE and bool(state.crack_network.active_tip_ids)
         controlled.append({"case_identity":case,"actual_phase":phase.value,
