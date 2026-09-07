@@ -43,6 +43,10 @@ def evaluate_parent(case, parents_root, output_root, plan):
     if not record_path.exists():
         return {"case": case, "status": "NO_CLEAN_PARENT", "source_terminal": json.loads((source/"terminal.json").read_text())}
     record = json.loads(record_path.read_text())
+    for name, field in (("pre_cleavage", "pre_cleavage_checkpoint_sha256"), ("accepted_single", "accepted_single_checkpoint_sha256")):
+        manifest = json.loads((source/f"parent/{name}.json").read_text())
+        if sha256(source/"parent"/manifest["state_file"]) != record[field] or manifest["state_sha256"] != record[field]:
+            raise RuntimeError("parent checkpoint/manifest hash mismatch")
     path = source/"parent/event_context.pkl"
     if sha256(path) != record["event_context_sha256"] or not record["fresh_initialization"]:
         raise RuntimeError("parent hash or clean-history contract failed")
@@ -58,6 +62,10 @@ def evaluate_parent(case, parents_root, output_root, plan):
     out = output_root/case
     out.mkdir(parents=True, exist_ok=True)
     candidates = baseline.competition.candidates
+    if len(candidates) != 2:
+        raise RuntimeError("this physical qualification is preregistered for the unchanged two-plane inventory")
+    if baseline.competition.consumed_event_ids != (record["event_id"],):
+        raise RuntimeError("clean parent contains more than the first accepted cleavage")
     primary_id = record["winning_candidate_id"]
     companion_candidates = [c for c in candidates if c.candidate_id != primary_id]
     before_hash = fp(baseline)
