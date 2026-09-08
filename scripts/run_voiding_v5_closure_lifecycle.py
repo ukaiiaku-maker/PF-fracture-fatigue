@@ -13,7 +13,7 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT))
 from arrhenius_fracture.closure_lifecycle_evidence import (
     SCHEMA, PARTITIONS, PRECURSORS, CFG, advance_transition, resume_to_guard,
-    conservation, transition_occurred, load_state, validate_lifecycle,
+    conservation, transition_occurred, load_state, validate_lifecycle,continued_front_terminal,
     lifecycle_decision,stagewise_topology,natural_terminal_measurements,build_healing_predecessor,CONTROLLED_HEALING_SEED,
 )
 from arrhenius_fracture.closure_mechanics_evidence import canonical_data
@@ -172,8 +172,7 @@ def main():
             "reload_policy":("common_4e-7_compressive_minus4e-7_zero_drive_16us_"+('4e-7' if args.common_restart_protocol=='v2' else '8e-7')) if args.qualified_fine_history else "tensile_8e-7" if stage=='zero_drive_connected' else "retain_accepted_load"},operations,
             restored_terminal_checkpoint=replay_path,restart_exact=fingerprint(after)==fingerprint(resumed),
             restarted_operations=resumed_ops,subsequent_history_exact=canonical_data(operations)==canonical_data(resumed_ops),
-            continued_front_terminal_reached=stage_available and any(op.get('api')=='child_tip_continuation'
-                and op.get('accepted',False) for op in operations),
+            continued_front_terminal_reached=stage_available and continued_front_terminal(after),
             failure=error,direct_failure=direct_failure,replay_failure=replay_failure)
     # All controlled rows use actual FEM loading and state updates. Limiter
     # cases never substitute detached rate calculations for a growth history.

@@ -1,5 +1,33 @@
 # Source-resolution development findings (nonterminal)
 
+Clean `38a7686` source causality executed all six real interventions. All source
+separation and zero-drive guards pass, but doubling the owned child radius in
+both process state and branch local state leaves continuation rates unchanged.
+The radius-causal-use gate is therefore FAIL, while distinct `r_tip != R_void`
+ownership remains true. This is an actual measured limitation, not merely a
+missing diagnostic or permission to introduce an unqualified stress law.
+
+Repository-wide run `34180123467` at `352d1d7` reached its 90-minute allowance
+and was cancelled; its transcript was uploaded. This is incomplete repository-
+wide CI, not inherited-only qualification and not green. The prospective wall-
+clock allowance is increased to 180 minutes for the repository-wide and final
+full-regression jobs. Focused run `34180123490` at the same head succeeded.
+No test, scientific predicate or tolerance is relaxed by the time allowance.
+
+The a34cdf0 45-case development run exposed loss of the owned child endpoint
+inventory during partial clock intervals: child nucleation passes at all five
+partitions, but child continuation initially passes only unsplit. `facbc24`
+retains the endpoint inventory only for exactly the same front, position and
+graph generation. Different owners do not inherit it. The actual five-partition
+continuation sentinel is required before declaring this repaired scientifically.
+
+The stronger +8e-7 m common reload fails both one- and two-ring timing budgets
+at `c284427`; the second waiting-time transfer error is 0.1037261217. Retain
+those failures. The additional prospective V2 protocol returns from compression
+to the original +4e-7 m tensile load and asks a distinct matched-load restart
+question. Its definition is in `V5_COMMON_TERMINAL_RESTART_PROTOCOL_V2.md`;
+it does not relabel or qualify the stronger-load V1 cases.
+
 At clean a34cdf0, the disabled causal comparison has exact observed causal
 states and event histories in all four cases, but its full prospective future
 sequence still fails. Monotonic, restart and unload/reload cases reach two real

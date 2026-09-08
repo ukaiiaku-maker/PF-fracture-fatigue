@@ -89,7 +89,75 @@ def validate_positive(root):
         'actual_continuation':report.get('continuation',{}).get('accepted',False)}
 
 
+def validate_causality(root):
+    """Recalculate intervention tensors/rates and graph/topology from owned states."""
+    from arrhenius_fracture.voiding_production_v5 import crack_tip_tensor,cavity_boundary_tensor,directional_clock_rates
+    verify_inventory(root);report=json.loads((root/'report.json').read_text())
+    if report['worktree_status'].strip():raise ValueError('causality not from clean implementation')
+    expected=('initial_cavity_source_changed','ordinary_child_continuation','changed_cavity_during_continuation',
+        'changed_child_tip_drive','zero_child_tip_drive','changed_child_owned_radius')
+    rows={row['case']:row for row in report['rows']}
+    if len(report['rows'])!=6 or set(rows)!=set(expected):raise ValueError('incomplete actual source-intervention registry')
+    states={};computed_rates={}
+    for name in expected:
+        row=rows[name];before=restore_checkpoint(root/(name+'_initial.json'));after=restore_checkpoint(root/(name+'.json'))
+        states[name]=before
+        same(fingerprint(before),row['initial_fingerprint'],'intervention initial ownership mismatch')
+        same(fingerprint(after),row['terminal_fingerprint'],'intervention terminal ownership mismatch')
+        same(stagewise_topology(after),row['topology'],'intervention topology does not recompute')
+        same(conservation(after,before),row['conservation'],'intervention conservation does not recompute')
+        def graph(state):return [(b.branch_id,b.path,b.status) for b in state.crack_network.branches]
+        same(row['accepted'],canonical_data(graph(before))!=canonical_data(graph(after)),'intervention event classification mismatch')
+        if row['continuation']:
+            tensor,ids=crack_tip_tensor(before,branch_id='void-front-1')
+        else:
+            cavity=before.void_state.cavities[0]
+            node=int(np.argmin(np.linalg.norm(before.mesh.nodes-np.asarray(cavity.connection_exit_m),axis=1)))
+            tensor,ids=cavity_boundary_tensor(before,boundary_node=node)
+        calls=row['probe_calls'];intervention=row['intervention']
+        relevant=(intervention['probe']=='crack_tip_tensor')==row['continuation']
+        if relevant:
+            if not calls:raise ValueError('source intervention never sampled its declared probe')
+            same(calls[0]['original_tensor_Pa'],tensor,'intervention probe is not source-native')
+            same(calls[0]['element_ids'],list(ids),'intervention tensor stencil mismatch')
+            tensor=intervention['factor']*tensor
+        elif calls:raise ValueError('continuation sampled its forbidden cavity source')
+        same(row['audit']['tensor_Pa'],tensor,'event tensor does not match actual intervention')
+        rates=directional_clock_rates(before,tensor)
+        computed_rates[name]=[r['effective_rate_s'] for r in rates]
+        if row['continuation']:
+            for key in ('candidate_id','effective_rate_s','hazard_barrier_J'):
+                same([r[key] for r in row['audit']['cleavage']],[r[key] for r in rates],
+                    'actual cleavage law does not reproduce intervention '+key)
+    baseline=rows['ordinary_child_continuation'];irrelevant=rows['changed_cavity_during_continuation']
+    zero=rows['zero_child_tip_drive'];changed=rows['initial_cavity_source_changed']
+    child=states['ordinary_child_continuation'];altered=states['changed_child_owned_radius']
+    radius=child.tip_process_state['by_branch']['void-front-1']['r_tip_m']
+    if altered.tip_process_state['by_branch']['void-front-1']['r_tip_m']!=2*radius:
+        raise ValueError('radius intervention did not change its process owner')
+    if altered.crack_network.branch('void-front-1').local_state['r_tip_m']!=2*radius:
+        raise ValueError('radius intervention did not change its branch owner')
+    same(altered.void_state,child.void_state,'radius intervention changed the cavity')
+    gates={
+        'changed_cavity_source_rejected_without_recognition_as_qualified':not changed['accepted']
+            and changed['audit'].get('status')=='UNQUALIFIED_CAVITY_SOURCE_TENSOR',
+        'actual_ordinary_child_continuation':baseline['accepted'],
+        'cavity_probe_cannot_influence_continuation':baseline['accepted'] and irrelevant['accepted']
+            and not irrelevant['probe_calls'] and baseline['terminal_fingerprint']==irrelevant['terminal_fingerprint'],
+        'child_tensor_changes_actual_continuation_rate':baseline['accepted'] and rows['changed_child_tip_drive']['accepted']
+            and bool(computed_rates['ordinary_child_continuation'])
+            and computed_rates['ordinary_child_continuation']!=computed_rates['changed_child_tip_drive'],
+        'zero_child_tip_drive_creates_no_event':not zero['accepted'] and zero['failure'] is None
+            and zero['audit'].get('status')=='NO_KINETICALLY_ACTIVE_CANDIDATE',
+        'owned_radius_causally_enters_continuation_law':bool(computed_rates['ordinary_child_continuation'])
+            and computed_rates['changed_child_owned_radius']!=computed_rates['ordinary_child_continuation'],
+        'radius_separate_from_void_radius':radius!=child.void_state.cavities[0].radius_m}
+    same(gates,report['gates'],'source-causality predicates do not recompute')
+    same(all(gates.values()),report['passed'],'source-causality classification mismatch')
+    return {'valid':True,'actual_interventions':6,'science_passed':all(gates.values())}
+
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('kind',choices=('static','positive'))
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('kind',choices=('static','positive','causality'))
     parser.add_argument('directory',type=Path);args=parser.parse_args()
-    print(json.dumps((validate_static if args.kind=='static' else validate_positive)(args.directory),sort_keys=True))
+    print(json.dumps({'static':validate_static,'positive':validate_positive,'causality':validate_causality}[args.kind](args.directory),sort_keys=True))

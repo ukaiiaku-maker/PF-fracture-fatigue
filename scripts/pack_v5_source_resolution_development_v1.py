@@ -43,7 +43,7 @@ def pack(source,destination):
         data=json.loads(path.read_text())
         if not isinstance(data,dict) or data.get('schema')!=SCHEMA:continue
         blob=path.with_name(data['state_file'])
-        if blob.stat().st_size<90*1024*1024 or data.get('state_encoding')=='pickle+gzip/1':continue
+        if blob.stat().st_size<1024*1024 or data.get('state_encoding')=='pickle+gzip/1':continue
         state,runtime=restore_checkpoint(path,with_provider_runtime=True)
         target=destination/path.relative_to(base)
         packed=write_checkpoint(state,target,provider_runtime=runtime,compression='gzip')

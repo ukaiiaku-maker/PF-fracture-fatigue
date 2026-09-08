@@ -413,6 +413,18 @@ def validate_controlled_inputs(row, sources):
             raise ValueError('failed preparation lost its last accepted state')
 
 
+def continued_front_terminal(state):
+    """Read the actual child path, lineage and source-owned accepted event."""
+    if state.void_state is None or not state.void_state.cavities:return False
+    cavity=state.void_state.cavities[0]
+    if cavity.phase!=VoidPhase.DOWNSTREAM_FRONT_ACTIVE or 'CONTINUED_EVENT' not in cavity.lineage:return False
+    if state.crack_network.active_tip_ids!=('void-front-1',):return False
+    if state.v12_support_state.active_tip_identities!=('void-front-1',):return False
+    if len(state.crack_network.branch('void-front-1').path)<3:return False
+    return any(row.get('event')=='CONTINUED_ACCEPTED_EVENT' and row.get('source_kind')=='sharp_front'
+        and row.get('source_front_id')=='void-front-1' for row in state.void_state.event_history)
+
+
 def validate_lifecycle(payload, sources, *, executed_code_sha):
     if payload["schema"] != SCHEMA or payload["executed_code_sha"] != executed_code_sha:
         raise ValueError("lifecycle source/schema identity")
@@ -469,6 +481,9 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
                 raise ValueError("restart peer mismatch")
             if row['subsequent_history_exact'] != (row['actual_operations']==row['restarted_operations']):
                 raise ValueError('subsequent restart history mismatch')
+            reached=row['input_configuration']['requested_stage_available'] and continued_front_terminal(after)
+            if row['continued_front_terminal_reached']!=reached:
+                raise ValueError('common continued terminal is not owned by the actual source state')
         if row["dataset"] == "natural":
             from .closure_mechanics_evidence import canonical_data
             if row['terminal_measurements']!=canonical_data(natural_terminal_measurements(after)):

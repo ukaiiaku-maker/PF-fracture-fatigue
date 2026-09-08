@@ -2,6 +2,7 @@
 """One independently executed final-campaign phase or disjoint lifecycle shard."""
 import argparse
 import hashlib
+from importlib.metadata import version,PackageNotFoundError
 import json
 import os
 from pathlib import Path
@@ -38,7 +39,8 @@ def run_phase(phase,output,section='all',shard_index=0,shard_count=1,base_worktr
             positive=run('real_source_pair','qualify_voiding_v5_source_positive_v1.py',output/'production',output/'positive')
             if positive:
                 run('positive_ontology','validate_v5_source_resolution_evidence_v1.py','positive',output/'positive')
-                run('source_causality','qualify_v5_child_source_causality_v1.py',output/'positive',output/'causality')
+                if run('source_causality','qualify_v5_child_source_causality_v1.py',output/'positive',output/'causality'):
+                    run('source_causality_ontology','validate_v5_source_resolution_evidence_v1.py','causality',output/'causality')
     elif phase=='recovery':
         run('patch_operator','qualify_cavity_boundary_patch_recovery_v1.py',output/'operator.json')
         run('kirsch_coarse','qualify_cavity_patch_kirsch_fem_v1.py',output/'kirsch_coarse')
@@ -49,9 +51,14 @@ def run_phase(phase,output,section='all',shard_index=0,shard_count=1,base_worktr
         run('causal_neutrality','qualify_v5_disabled_causal_neutrality_v1.py',output/'evidence','--base-worktree',base_worktree)
     else:raise ValueError('unknown phase')
     clean=not git('status','--porcelain') and git('rev-parse','HEAD')==sha
+    packages={}
+    for name in ('numpy','scipy','triangle','gmsh','numba'):
+        try:packages[name]=version(name)
+        except PackageNotFoundError:packages[name]=None
     report={'schema':'v5.source-resolution-final-phase-execution/1','phase':phase,'section':section,
         'shard_index':shard_index,'shard_count':shard_count,'executed_code_sha':sha,
         'python_version':platform.python_version(),'operations':steps,'clean_exact_head_at_end':clean,
+        'numerical_package_versions':packages,
         'numerical_environment':{name:os.environ.get(name) for name in
             ('PYTHONHASHSEED','OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS')},
         'execution_completed':clean and bool(steps) and all(step['returncode']==0 for step in steps),

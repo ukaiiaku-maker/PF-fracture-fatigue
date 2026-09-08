@@ -70,3 +70,17 @@ def test_independent_failed_restart_attempts_retain_both_endpoints(monkeypatch):
     b,eb=harness.resume_attempt(restored,replay_operations,common_restart_protocol=True)
     assert calls==[direct,restored] and a is b is accepted
     assert ea==eb and operations==replay_operations
+
+
+def test_continued_terminal_requires_owned_path_lineage_and_event():
+    from types import SimpleNamespace
+    from arrhenius_fracture.closure_lifecycle_evidence import continued_front_terminal,VoidPhase
+    child=SimpleNamespace(path=((0.,0.),(1.,0.)))
+    cavity=SimpleNamespace(phase=VoidPhase.DOWNSTREAM_FRONT_ACTIVE,lineage=('CONTINUED_EVENT',))
+    event={'event':'CONTINUED_ACCEPTED_EVENT','source_kind':'sharp_front','source_front_id':'void-front-1'}
+    state=SimpleNamespace(void_state=SimpleNamespace(cavities=(cavity,),event_history=(event,)),
+        crack_network=SimpleNamespace(active_tip_ids=('void-front-1',),branch=lambda _:child),
+        v12_support_state=SimpleNamespace(active_tip_identities=('void-front-1',)))
+    assert not continued_front_terminal(state)
+    child.path=(*child.path,(2.,0.));assert continued_front_terminal(state)
+    event['source_kind']='cavity_surface';assert not continued_front_terminal(state)
