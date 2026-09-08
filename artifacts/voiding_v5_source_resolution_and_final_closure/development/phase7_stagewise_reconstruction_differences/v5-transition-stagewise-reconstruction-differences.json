@@ -1,0 +1,19 @@
+{
+  "source_sha": "ec79645f9fe8f7a5dca92fecd94d79d5eda89b28",
+  "case_identity": "continued_accepted_event",
+  "actual_passed": true,
+  "recorded_passed": true,
+  "difference_count": 2,
+  "first_differences": [
+    [
+      "/actual_component_incidence/independent_intact_path_certificate/edge_cut_certificates/0/h_local_median_m",
+      1.3021257146671744e-07,
+      1.3021257146667747e-07
+    ],
+    [
+      "/independent_cut/edge_cut_certificates/0/h_local_median_m",
+      1.3021257146671744e-07,
+      1.3021257146667747e-07
+    ]
+  ]
+}

@@ -60,6 +60,16 @@ not universal cross-platform reproducibility or a retrospective restart PASS.
 The later complete campaign must generate and reconstruct all its own physical
 evidence under the prospectively frozen kernel contract.
 
+Independent Linux section audit `34199690728` at `2fa81f2` validates all 39
+rollback rows and all 45 transition rows. The transition section remains FAIL:
+55/56 total source rows reconstruct, with one extra stagewise
+`continued_accepted_event` certificate failing exact reconstruction. All shard
+decisions recompute and no checkpoint-name/hash collisions occur. The local
+read-only probe isolates two repeated `h_local_median_m` differences,
+1.3021257146671744e-7 versus recorded 1.3021257146667747e-7 m; both topology
+predicates are true. These exact differences remain failures, not toleranced
+passes. The new final runtime contract applies prospectively only.
+
 The a34cdf0 45-case development run exposed loss of the owned child endpoint
 inventory during partial clock intervals: child nucleation passes at all five
 partitions, but child continuation initially passes only unsplit. `facbc24`

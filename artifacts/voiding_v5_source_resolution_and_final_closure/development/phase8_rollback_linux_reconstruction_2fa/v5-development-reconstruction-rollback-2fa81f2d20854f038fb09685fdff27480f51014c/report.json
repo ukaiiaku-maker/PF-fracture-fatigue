@@ -1,0 +1,509 @@
+{
+  "actual_section_cases": 39,
+  "actual_source_rows": 39,
+  "checkpoint_assembly_conflicts": false,
+  "complete_final_campaign": false,
+  "complete_section_registry": true,
+  "decision": {
+    "V12_disabled_neutrality": [],
+    "all_restart_stages_reach_identical_complete_terminal": false,
+    "controlled_histories": [],
+    "decision": "BLOCKED",
+    "downstream_lifecycle_rollback": "PASS",
+    "natural_partitions_restart": [],
+    "required_continued_front_restart_terminal": false,
+    "restart_to_attainable_terminal_exact": true,
+    "rollback_attempts": [
+      {
+        "case_identity": "promotion:field_projection",
+        "passed": true
+      },
+      {
+        "case_identity": "promotion:support_rebuild",
+        "passed": true
+      },
+      {
+        "case_identity": "promotion:equilibrium",
+        "passed": true
+      },
+      {
+        "case_identity": "ligament:graph_edit",
+        "passed": true
+      },
+      {
+        "case_identity": "ligament:remesh",
+        "passed": true
+      },
+      {
+        "case_identity": "ligament:field_projection",
+        "passed": true
+      },
+      {
+        "case_identity": "ligament:support_rebuild",
+        "passed": true
+      },
+      {
+        "case_identity": "ligament:equilibrium",
+        "passed": true
+      },
+      {
+        "case_identity": "ligament:energy_gate",
+        "passed": true
+      },
+      {
+        "case_identity": "ligament:connected_surface_certification",
+        "passed": true
+      },
+      {
+        "case_identity": "ligament:dormant_support_rebuild",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:first_hit_threshold_renewal",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:second_hit_embryo_transition",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:stabilization",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:healing",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:state_owned_growth",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:initial_inventory_debit",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:inventory_return_under_shrinkage",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:promotion_criterion",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:explicit_cavity_creation",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:promotion_remesh",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:field_transfer",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:equilibrium",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:resolved_growth_remesh",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:ligament_hazard_completion",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:ligament_graph_edit",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:cavity_connection",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:downstream_source_refinement",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:downstream_threshold_completion",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:child_creation",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:child_support_rebuild",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:child_tip_continuation",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:checkpoint_write",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:source_quality_geometry",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:source_quality_field_transfer",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:source_quality_support_rebuild",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:source_quality_equilibrium",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:source_quality_acceptance",
+        "passed": true
+      },
+      {
+        "case_identity": "lifecycle:source_qualification",
+        "passed": true
+      }
+    ],
+    "stagewise_topology_and_conservation": true,
+    "transition_partitions": []
+  },
+  "decision_reconstruction_errors": [],
+  "producer_predicate_passed_cases": 39,
+  "python_version": "3.12.14",
+  "record_kind": "READ_ONLY_RECONSTRUCTION_NOT_NEW_PHYSICAL_EXECUTION",
+  "row_reconstruction_results": [
+    {
+      "case_identity": "promotion:field_projection",
+      "dataset": "rollback",
+      "execution_id": "rollback:promotion:field_projection:None:0:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "promotion:support_rebuild",
+      "dataset": "rollback",
+      "execution_id": "rollback:promotion:support_rebuild:None:1:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "promotion:equilibrium",
+      "dataset": "rollback",
+      "execution_id": "rollback:promotion:equilibrium:None:2:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "ligament:graph_edit",
+      "dataset": "rollback",
+      "execution_id": "rollback:ligament:graph_edit:None:3:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "ligament:remesh",
+      "dataset": "rollback",
+      "execution_id": "rollback:ligament:remesh:None:4:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "ligament:field_projection",
+      "dataset": "rollback",
+      "execution_id": "rollback:ligament:field_projection:None:5:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "ligament:support_rebuild",
+      "dataset": "rollback",
+      "execution_id": "rollback:ligament:support_rebuild:None:6:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "ligament:equilibrium",
+      "dataset": "rollback",
+      "execution_id": "rollback:ligament:equilibrium:None:7:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "ligament:energy_gate",
+      "dataset": "rollback",
+      "execution_id": "rollback:ligament:energy_gate:None:8:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "ligament:connected_surface_certification",
+      "dataset": "rollback",
+      "execution_id": "rollback:ligament:connected_surface_certification:None:9:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "ligament:dormant_support_rebuild",
+      "dataset": "rollback",
+      "execution_id": "rollback:ligament:dormant_support_rebuild:None:10:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:first_hit_threshold_renewal",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:first_hit_threshold_renewal:None:11:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:second_hit_embryo_transition",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:second_hit_embryo_transition:None:12:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:stabilization",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:stabilization:None:13:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:healing",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:healing:None:14:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:state_owned_growth",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:state_owned_growth:None:15:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:initial_inventory_debit",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:initial_inventory_debit:None:16:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:inventory_return_under_shrinkage",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:inventory_return_under_shrinkage:None:17:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:promotion_criterion",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:promotion_criterion:None:18:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:explicit_cavity_creation",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:explicit_cavity_creation:None:19:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:promotion_remesh",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:promotion_remesh:None:20:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:field_transfer",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:field_transfer:None:21:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:equilibrium",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:equilibrium:None:22:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:resolved_growth_remesh",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:resolved_growth_remesh:None:23:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:ligament_hazard_completion",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:ligament_hazard_completion:None:24:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:ligament_graph_edit",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:ligament_graph_edit:None:25:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:cavity_connection",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:cavity_connection:None:26:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:downstream_source_refinement",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:downstream_source_refinement:None:27:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:downstream_threshold_completion",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:downstream_threshold_completion:None:28:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:child_creation",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:child_creation:None:29:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:child_support_rebuild",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:child_support_rebuild:None:30:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:child_tip_continuation",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:child_tip_continuation:None:31:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:checkpoint_write",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:checkpoint_write:None:32:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:source_quality_geometry",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:source_quality_geometry:None:33:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:source_quality_field_transfer",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:source_quality_field_transfer:None:34:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:source_quality_support_rebuild",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:source_quality_support_rebuild:None:35:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:source_quality_equilibrium",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:source_quality_equilibrium:None:36:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:source_quality_acceptance",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:source_quality_acceptance:None:37:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "lifecycle:source_qualification",
+      "dataset": "rollback",
+      "execution_id": "rollback:lifecycle:source_qualification:None:38:facbc24dd31040847d25e5be459bdad9024842b8",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    }
+  ],
+  "schema": "v5.development-lifecycle-source-reconstruction/1",
+  "science_passed": true,
+  "section": "rollback",
+  "source_provenance": [
+    {
+      "shard_count": 1,
+      "shard_index": 0,
+      "source_manifest_sha256": "24d588c77dac01478419ce81ffdec7e43b7fea6da92a35aee1c3a2720a4167fc"
+    }
+  ],
+  "source_reconstruction_passed_rows": 39,
+  "source_sha": "facbc24dd31040847d25e5be459bdad9024842b8",
+  "valid": true,
+  "verification_code_sha": "2fa81f2d20854f038fb09685fdff27480f51014c"
+}
