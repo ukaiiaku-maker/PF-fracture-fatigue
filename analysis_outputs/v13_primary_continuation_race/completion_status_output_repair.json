@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "RNG_draws": 0,
+      "case": "Peak_300K_seed3621",
+      "checkpoint_state_sha256": "e35ad533a39bf45cbe909e824c0cb8545ae314644ce1983723e70cb992296195",
+      "mechanics_steps": 0,
+      "original_terminal_sha256": "bbef9883cc0d651f8ab738220a3351f0fa4305d85646ea826b6ccbacd13a80ae",
+      "repaired_terminal_sha256": "9e9e8f2550d3e08eced6a085325bab58036aa9577da35f28763241a002d40051"
+    },
+    {
+      "RNG_draws": 0,
+      "case": "Peak_1000K_seed3621",
+      "checkpoint_state_sha256": "4d50e2930863bee755fee300e9005947ca3f676ee413e0d9c03035d268f7c000",
+      "mechanics_steps": 0,
+      "original_terminal_sha256": "a0d5e5ad82b85267c89b7601f1b88da1961fe18b9d05fa495fcc6aa53c8bb556",
+      "repaired_terminal_sha256": "ee315eb1ec88796b3be52b0dd61079663462d52695563afdcc00bac1a373e2d2"
+    }
+  ],
+  "physical_results_already_complete": true,
+  "reason": "pre-existing daughter-stop reason absent from output-writer allowlist"
+}

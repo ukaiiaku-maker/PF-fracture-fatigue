@@ -35,6 +35,8 @@ def main():
         checkpoint=restore_branch_checkpoint(folder/'checkpoint/latest.json')
         state=checkpoint.state
         initial_tip_x=max(b.tip[0] for b in state.crack_network.branches)-checkpoint.projected_extension_m
+        if r['first_branch']:
+            r['first_branch_junction_forward_um']=(r['first_branch']['branch_junction_xy_m'][0]-initial_tip_x)*1e6
         ax=axes[order.index(group),int(seed)-3621]
         for branch in state.crack_network.branches:
             path=branch.path
@@ -49,7 +51,8 @@ def main():
             'launch_sha256':sha256(folder/'launch.json'),
             'race_ledger_sha256':sha256(folder/'v13_primary_race.jsonl') if (folder/'v13_primary_race.jsonl').exists() else None,
             'checkpoint_state_sha256':r.get('last_checkpoint_state_sha256'),
-            'first_branch_forward_um':r['first_branch']['parent_forward_extension_um'] if r['first_branch'] else None,
+            'first_branch_primary_forward_um':r['first_branch']['parent_forward_extension_um'] if r['first_branch'] else None,
+            'first_branch_junction_forward_um':r.get('first_branch_junction_forward_um'),
             'first_branch_time_s':r['first_branch']['accepted_time_s'] if r['first_branch'] else None,
             'first_branch_opening_m':r['first_branch']['accepted_opening_m'] if r['first_branch'] else None,
             'terminal_forward_um':r.get('forward_extension_um'),
@@ -59,17 +62,17 @@ def main():
     incidence=[]
     for group in order:
         rows=groups[group]
-        births=[r['first_branch']['parent_forward_extension_um'] for r in rows if r['first_branch']]
+        births=[r['first_branch_junction_forward_um'] for r in rows if r['first_branch']]
         incidence.append({'case':group,'seeds':4,'observed_branches':len(births),
-            'first_branch_forward_um':births,'no_branch_terminal_reasons':[r['reason'] for r in rows if not r['first_branch']],
+            'first_branch_junction_forward_um':births,'no_branch_terminal_reasons':[r['reason'] for r in rows if not r['first_branch']],
             'calibrated_probability':None,'recurrent_spacing_estimated':False})
     atomic_json(OUT/'short_gate_incidence_and_spacing.json',{'groups':incidence,'records':records,
         'boundary':'BRANCHING_KINETICS_MODEL_UNCALIBRATED'})
     path=OUT/'V13_PRIMARY_CONTINUATION_RACE.md'
     lines=['','## Completed descriptive incidence','',
-        '| Case | Observed first branches / four seeds | First-branch forward reaches (µm) |','|---|---:|---|']
+        '| Case | Observed first branches / four seeds | First branch-junction distances (µm) |','|---|---:|---|']
     for item in incidence:
-        lines.append(f"| {item['case']} | {item['observed_branches']}/4 | {', '.join(f'{x:.5f}' for x in item['first_branch_forward_um']) or 'none'} |")
+        lines.append(f"| {item['case']} | {item['observed_branches']}/4 | {', '.join(f'{x:.5f}' for x in item['first_branch_junction_forward_um']) or 'none'} |")
     lines+=['','Stops before a branch are retained with their exact reasons, not silently interpreted as full-window nonbranching. These counts are descriptive outcomes of the bounded model, not calibrated material probabilities. Only first-bifurcation distance is observed; this experiment cannot estimate recurrent branch spacing.','']
     path.write_text(path.read_text()+'\n'.join(lines))
     selected=[p for p in OUT.rglob('*') if p.is_file() and p.suffix in ('.json','.md','.png','.jsonl')
@@ -86,7 +89,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--watch',action='store_true')
     args=parser.parse_args()
     if args.watch:
-        pause_name='recovery_queue_pause.json' if (OUT/'snapshot_output_recovery_registry.json').exists() else 'queue_pause.json'
+        pause_name='remaining_queue_pause.json' if (OUT/'short_ensemble/remaining_queue_claim.json').exists() else 'recovery_queue_pause.json' if (OUT/'snapshot_output_recovery_registry.json').exists() else 'queue_pause.json'
         while not all((case_folder(case)/'terminal.json').exists() for case in CASES):
             if (OUT/'short_ensemble'/pause_name).exists():
                 raise RuntimeError('queue paused for software/unclassified stop; no final result invented')

@@ -85,3 +85,11 @@ def test_every_driver_topology_snapshot_call_supplies_required_arguments():
     assert calls
     for call in calls:
         signature.bind(*([None]*len(call.args)),**{kw.arg:None for kw in call.keywords})
+
+
+def test_existing_daughter_stop_status_can_be_published_without_mechanics(tmp_path):
+    import json
+    from arrhenius_fracture.branch_output_v11 import BranchOutputWriter
+    BranchOutputWriter(tmp_path).complete(status='qualified_daughter_early_stop',
+        final_checkpoint='checkpoint/latest.json',validation={'existing_checkpoint':True})
+    assert json.loads((tmp_path/'run_complete.json').read_text())['status']=='qualified_daughter_early_stop'

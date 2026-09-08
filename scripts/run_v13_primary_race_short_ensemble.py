@@ -182,13 +182,21 @@ def resume_snapshot_failure(case):
         if not known:raise
 
 
-def queue(*, recovery=False):
+def queue(*, recovery=False, remaining_only=False):
     if not PLAN.exists():
         raise RuntimeError('preregister before launching')
     root=OUT/'short_ensemble';root.mkdir(exist_ok=True)
-    with (root/('recovery_queue_claim.json' if recovery else 'queue_claim.json')).open('x') as stream:
+    claim='remaining_queue_claim.json' if remaining_only else 'recovery_queue_claim.json' if recovery else 'queue_claim.json'
+    with (root/claim).open('x') as stream:
         json.dump({'pid':os.getpid(),'maximum_workers':2},stream)
     pending=list(CASES);active={}
+    if remaining_only:
+        for case in tuple(pending):
+            terminal=case_folder(case)/'terminal.json'
+            if terminal.exists():
+                if json.loads(terminal.read_text())['status'] not in ('TERMINATED','EXISTING_GATE_STOP'):
+                    raise RuntimeError('unclassified prior case is not a completed condition')
+                pending.remove(case)
     if any((case_folder(c)/'launch_claim.json').exists() for c in pending):
         raise RuntimeError('existing case launch claim; no duplicate/restart')
     while pending or active:
@@ -207,7 +215,8 @@ def queue(*, recovery=False):
                 terminal=case_folder(case)/'terminal.json'
                 if not terminal.exists() or json.loads(terminal.read_text())['status']=='SOFTWARE_OR_UNCLASSIFIED_STOP':
                     # Let an already-running peer finish; never kill its accepted work.
-                    atomic_json(root/('recovery_queue_pause.json' if recovery else 'queue_pause.json'),{'case':case,'reason':'software_or_unclassified_stop','pending':pending})
+                    pause='remaining_queue_pause.json' if remaining_only else 'recovery_queue_pause.json' if recovery else 'queue_pause.json'
+                    atomic_json(root/pause,{'case':case,'reason':'software_or_unclassified_stop','pending':pending})
                     pending=[]
         atomic_json(root/'queue_status.json',{'active':{c:p.pid for c,(p,_) in active.items()},'pending':pending,
             'completed':[c for c in CASES if (case_folder(c)/'terminal.json').exists()]})
@@ -218,5 +227,6 @@ def queue(*, recovery=False):
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--case',choices=CASES);parser.add_argument('--prepare',action='store_true')
     parser.add_argument('--resume-case',choices=CASES);parser.add_argument('--recover-output-failure',action='store_true')
+    parser.add_argument('--continue-qualified-queue',action='store_true')
     args=parser.parse_args()
-    prepare() if args.prepare else worker(args.case) if args.case else resume_snapshot_failure(args.resume_case) if args.resume_case else queue(recovery=args.recover_output_failure)
+    prepare() if args.prepare else worker(args.case) if args.case else resume_snapshot_failure(args.resume_case) if args.resume_case else queue(recovery=args.recover_output_failure,remaining_only=args.continue_qualified_queue)

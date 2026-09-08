@@ -34,7 +34,7 @@ def main():
     complete=len(records)==len(CASES)
     lines.append(f"Terminal records available: {len(records)}/{len(CASES)}. " + ('All requested cases have terminal records.' if complete else 'The short ensemble is not complete; no final incidence conclusion is claimed.'))
     if records:
-        lines+=['','| Case | Branches | Forward reach (µm) | First branch reach (µm) | Terminal reason |','|---|---:|---:|---:|---|']
+        lines+=['','| Case | Branches | Forward reach (µm) | Primary reach at first branch (µm) | Terminal reason |','|---|---:|---:|---:|---|']
         for r in records:
             birth=r.get('first_branch')
             reach=r.get('forward_extension_um')
@@ -44,6 +44,8 @@ def main():
         lines+=['## Execution provenance qualifications','',
             'The two seed-3621 Peak cases saved accepted pair checkpoints, then encountered a missing required `latest_action` argument in the new snapshot call. The original attempts are preserved as software-interruption evidence. The recovery registry seals those exact pair checkpoint hashes; recovery continues from them without replaying loading, regenerating the parent, changing parameters, or reseeding. They are not classified as physical terminal results.','',
             'Independent fresh-launch full process/RNG hashes are not identical to the earlier parent campaign: its launcher imported the legacy compatibility clock before the campaign environment, whereas the new launcher imports afterward. Directional cleavage clocks are unit-exponential with the same specified seed in both. The unchanged production hook disables the legacy topology clock with threshold 1e300. A direct frozen process-step comparison found differences only in compatibility mode/seed and its unused generator state; all other serialized fields were exact in that fixture. This is a bounded source-state check, not a universal proof. No legacy RNG state was silently replaced. Within each accepted mark and checkpoint continuation, the running baseline clocks and RNG remain exact.','']
+    if (OUT/'completion_status_output_repair.json').exists():
+        lines+=['The recovered Peak runs subsequently reached the prescribed 20 µm daughter-growth stop, but the completion writer rejected its existing status string. The allowlist was corrected and completion records regenerated from the same terminal checkpoints; no further mechanics or RNG step occurred. Both output failures and their repairs remain in the provenance bundle.','']
     (OUT/'V13_PRIMARY_CONTINUATION_RACE.md').write_text('\n'.join(lines))
     atomic_json(OUT/'short_ensemble_summary.json',{'records':records,'expected_cases':CASES,'complete':complete,
         'calibrated_probability_claimed':False,'boundary':'BRANCHING_KINETICS_MODEL_UNCALIBRATED'})
