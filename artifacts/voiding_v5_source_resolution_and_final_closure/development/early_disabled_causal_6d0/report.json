@@ -1,0 +1,513 @@
+{
+  "consumer_occurrences": {
+    "boundary_terminal_certificates": [
+      "arrhenius_fracture/mechanically_separating_sharp_wake_v12.py:97:    boundary_terminal_certificates: tuple[dict,...]",
+      "arrhenius_fracture/mechanically_separating_sharp_wake_v12.py:556:      \"edge_cut_certificates\":tuple(edge_certificates),\"boundary_terminal_certificates\":tuple(boundary_terminal_audits),",
+      "arrhenius_fracture/mechanically_separating_sharp_wake_v12.py:675:    certificate[\"boundary_terminal_certificates\"] = tuple({",
+      "arrhenius_fracture/mechanically_separating_sharp_wake_v12.py:679:    } for row in certificate[\"boundary_terminal_certificates\"])",
+      "arrhenius_fracture/mechanically_separating_sharp_wake_v12.py:749:      certificate[\"edge_cut_certificates\"],certificate[\"boundary_terminal_certificates\"],certificate[\"insufficient_seed_segment_ids\"],",
+      "arrhenius_fracture/mechanically_separating_sharp_wake_v12.py:769:            f\"boundary_terminal_certificates={audit.boundary_terminal_certificates!r}; \"",
+      "arrhenius_fracture/mechanically_separating_sharp_wake_v12.py:785:      \"v12_boundary_terminal_certificates\":audit.boundary_terminal_certificates,"
+    ],
+    "latest_constrained_reaction_l2_N_per_m": [
+      "arrhenius_fracture/topology_transaction_v11.py:280:        \"latest_constrained_reaction_l2_N_per_m\": constrained_reaction,",
+      "arrhenius_fracture/voiding_production_v5.py:316:        \"constrained_reaction_l2_N_per_m\": float(state.energy_ledgers.get(\"latest_constrained_reaction_l2_N_per_m\", 0.0)),"
+    ],
+    "latest_energy_reaction_identity": [
+      "arrhenius_fracture/topology_transaction_v11.py:282:        \"latest_energy_reaction_identity\": energy_reaction_identity,",
+      "arrhenius_fracture/voiding_production_v5.py:318:        \"energy_reaction_identity\": float(state.energy_ledgers.get(\"latest_energy_reaction_identity\", 0.0)),"
+    ],
+    "latest_free_dof_residual_l2_N_per_m": [
+      "arrhenius_fracture/topology_transaction_v11.py:279:        \"latest_free_dof_residual_l2_N_per_m\": free_residual,",
+      "arrhenius_fracture/voiding_production_v5.py:315:        \"free_dof_residual_l2_N_per_m\": float(state.energy_ledgers.get(\"latest_free_dof_residual_l2_N_per_m\", 0.0)),"
+    ],
+    "latest_top_bottom_reaction_balance": [
+      "arrhenius_fracture/topology_transaction_v11.py:281:        \"latest_top_bottom_reaction_balance\": reaction_balance,",
+      "arrhenius_fracture/voiding_production_v5.py:317:        \"top_bottom_reaction_balance\": float(state.energy_ledgers.get(\"latest_top_bottom_reaction_balance\", 0.0)),"
+    ],
+    "source_commit": [
+      "arrhenius_fracture/topology_transaction_v11.py:399:    source_commit: str, configuration: Mapping[str, Any], transaction_identity: str,",
+      "arrhenius_fracture/topology_transaction_v11.py:422:        source_commit=source_commit,configuration=configuration,",
+      "arrhenius_fracture/topology_transaction_v11.py:428:    state: LiveFEMTopologyState, *, source_commit: str,",
+      "arrhenius_fracture/topology_transaction_v11.py:443:        source_commit=source_commit,configuration=configuration,",
+      "arrhenius_fracture/topology_transaction_v11.py:450:    transferred_fields: Mapping[str, Any], source_commit: str,",
+      "arrhenius_fracture/topology_transaction_v11.py:475:        base,source_commit=source_commit,configuration=configuration,",
+      "arrhenius_fracture/topology_transaction_v11.py:485:    source_commit: str,",
+      "arrhenius_fracture/topology_transaction_v11.py:560:        source_commit=source_commit,",
+      "arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_selection.json:3:  \"source_commit\": \"0a340f6feb8de47200b7733fe8f1d9663c75a43e\",",
+      "arrhenius_fracture/v12_production_driver.py:113:            source_commit=_git_head(),",
+      "arrhenius_fracture/v12_production_driver.py:180:            source_commit=_git_head(),",
+      "arrhenius_fracture/v12_production_driver.py:279:            trial, values, source_commit=_git_head(),",
+      "arrhenius_fracture/voiding_production_v5.py:290:        state, source_commit=_head(), configuration={\"voiding_enabled\": enabled, \"model\": V12_MODEL_ID},",
+      "arrhenius_fracture/voiding_production_v5.py:433:        source_commit=_head(), configuration={\"event\": \"CAVITY_EDGE_INTERSECTION_INSERTION\"},",
+      "arrhenius_fracture/voiding_production_v5.py:446:        source_commit=_head(), configuration={\"event\": identity},",
+      "arrhenius_fracture/voiding_production_v5.py:809:        source_commit=_head(), configuration={\"voiding_enabled\": True},",
+      "arrhenius_fracture/voiding_production_v5.py:1225:            boundary=refined.boundary, transferred_fields=fields, source_commit=_head(),",
+      "arrhenius_fracture/voiding_production_v5.py:1575:            trial, arms, source_commit=_head(), configuration={\"event\": \"CRACK_TO_VOID_LIGAMENT\"},",
+      "arrhenius_fracture/voiding_production_v5.py:1793:            source_commit=_head(), configuration={\"event\": \"DOWNSTREAM_FRONT\" if not continuation else \"CONTINUED_FRONT\"},",
+      "arrhenius_fracture/source_quality_transaction_v1.py:74:        transferred_fields=fields, source_commit=p._head(), configuration={'event': 'SOURCE_QUALITY_REPAIR_V1'},",
+      "arrhenius_fracture/sharp_wake_backend_v12.py:37:    source_commit: str",
+      "arrhenius_fracture/sharp_wake_backend_v12.py:62:                \"source_commit\":self.source_commit,",
+      "arrhenius_fracture/sharp_wake_backend_v12.py:71:                                  source_commit: str, configuration: Any,",
+      "arrhenius_fracture/sharp_wake_backend_v12.py:90:        source_commit=str(source_commit),configuration_hash=hashlib.sha256(config).hexdigest(),"
+    ],
+    "v12_boundary_terminal_certificates": [
+      "arrhenius_fracture/mechanically_separating_sharp_wake_v12.py:785:      \"v12_boundary_terminal_certificates\":audit.boundary_terminal_certificates,"
+    ],
+    "void_state": [
+      "arrhenius_fracture/topology_transaction_v11.py:114:    void_state: Any = None",
+      "arrhenius_fracture/topology_transaction_v11.py:162:            void_state=self.void_state,",
+      "arrhenius_fracture/topology_transaction_v11.py:335:        \"void_state\": state.void_state,",
+      "arrhenius_fracture/voiding_production_v5.py:58:    if state.sharp_wake_model_id != V12_MODEL_ID or state.void_state is not None:",
+      "arrhenius_fracture/voiding_production_v5.py:221:def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,",
+      "arrhenius_fracture/voiding_production_v5.py:248:    void_state = None",
+      "arrhenius_fracture/voiding_production_v5.py:256:        void_state = ProductionVoidState((site,), rng_state=rng.bit_generator.state)",
+      "arrhenius_fracture/voiding_production_v5.py:272:        void_state=void_state,",
+      "arrhenius_fracture/voiding_production_v5.py:296:    cavity = None if state.void_state is None or not state.void_state.cavities else state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:297:    site = None if state.void_state is None else state.void_state.sites[0]",
+      "arrhenius_fracture/voiding_production_v5.py:324:        \"available_defect_inventory_area_m2\": None if state.void_state is None else state.void_state.available_defect_inventory_area_m2,",
+      "arrhenius_fracture/voiding_production_v5.py:325:        \"consumed_defect_inventory_area_m2\": None if state.void_state is None else state.void_state.consumed_defect_inventory_area_m2,",
+      "arrhenius_fracture/voiding_production_v5.py:326:        \"void_event_history\": [] if state.void_state is None else list(state.void_state.event_history),",
+      "arrhenius_fracture/voiding_production_v5.py:327:        \"length_ledgers\": {} if state.void_state is None else dict(state.void_state.length_ledgers),",
+      "arrhenius_fracture/voiding_production_v5.py:344:    center = np.asarray(state.void_state.sites[0].center_m)",
+      "arrhenius_fracture/voiding_production_v5.py:405:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:458:    cavity=state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:512:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:604:    cavities = [item for item in state.void_state.cavities if item.cavity_id == cavity_id]",
+      "arrhenius_fracture/voiding_production_v5.py:774:def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure_stage=None):",
+      "arrhenius_fracture/voiding_production_v5.py:776:    trial = replace(state, void_state=void_state)",
+      "arrhenius_fracture/voiding_production_v5.py:981:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1051:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1177:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1337:        or (state.void_state is not None and any(c.phase == VoidPhase.CONNECTED_VOID for c in state.void_state.cavities)))",
+      "arrhenius_fracture/voiding_production_v5.py:1454:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1462:    state = replace(state, void_state=replace_cavity(state.void_state, connected))",
+      "arrhenius_fracture/voiding_production_v5.py:1503:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1527:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1581:        void_state = realized.void_state",
+      "arrhenius_fracture/voiding_production_v5.py:1582:        ledgers = dict(void_state.length_ledgers)",
+      "arrhenius_fracture/voiding_production_v5.py:1599:            void_state = replace(void_state, length_ledgers=dict(ledgers))",
+      "arrhenius_fracture/voiding_production_v5.py:1600:            inject(\"length_ledger_update:\" + name, replace(realized, void_state=void_state))",
+      "arrhenius_fracture/voiding_production_v5.py:1601:        void_state = replace(",
+      "arrhenius_fracture/voiding_production_v5.py:1602:            void_state,",
+      "arrhenius_fracture/voiding_production_v5.py:1603:            event_history=void_state.event_history + ({\"event\": \"CRACK_TO_VOID_LIGAMENT\",",
+      "arrhenius_fracture/voiding_production_v5.py:1607:        realized = replace(realized, void_state=void_state)",
+      "arrhenius_fracture/voiding_production_v5.py:1636:    cavity = result_state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1698:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1798:        cavity = realized.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1801:        void_state = replace_cavity(realized.void_state, updated)",
+      "arrhenius_fracture/voiding_production_v5.py:1802:        inject(\"downstream_phase_update\", replace(realized, void_state=void_state))",
+      "arrhenius_fracture/voiding_production_v5.py:1803:        ledgers = dict(void_state.length_ledgers)",
+      "arrhenius_fracture/voiding_production_v5.py:1819:            void_state = replace(void_state, length_ledgers=dict(ledgers))",
+      "arrhenius_fracture/voiding_production_v5.py:1820:            inject(\"downstream_length_ledger_update:\" + name, replace(realized, void_state=void_state))",
+      "arrhenius_fracture/voiding_production_v5.py:1821:        void_state = replace(void_state, event_history=void_state.event_history + ({",
+      "arrhenius_fracture/voiding_production_v5.py:1827:        inject(\"downstream_event_history_update\", replace(realized, void_state=void_state))",
+      "arrhenius_fracture/voiding_production_v5.py:1838:        realized = replace(realized, void_state=void_state, tip_process_state=tip_state)",
+      "arrhenius_fracture/voiding_production_v5.py:1902:    cavity = accepted.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1919:    state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m,",
+      "arrhenius_fracture/voiding_production_v5.py:1930:        site = state.void_state.sites[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1932:        void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)",
+      "arrhenius_fracture/voiding_production_v5.py:1933:        state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))",
+      "arrhenius_fracture/voiding_production_v5.py:1938:    site = state.void_state.sites[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1940:    void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)",
+      "arrhenius_fracture/voiding_production_v5.py:1941:    state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))",
+      "arrhenius_fracture/voiding_production_v5.py:1944:    state = replace(state, void_state=create_subgrid_cavity(state.void_state, \"site-1\", 2.5e-5))",
+      "arrhenius_fracture/voiding_production_v5.py:1950:    state = replace(state, void_state=update_cavity_growth(",
+      "arrhenius_fracture/voiding_production_v5.py:1951:        state.void_state, state.void_state.cavities[0].cavity_id,",
+      "arrhenius_fracture/voiding_production_v5.py:1954:    grown = state.void_state.cavities[0]",
+      "arrhenius_fracture/voiding_production_v5.py:1958:    promoted = promote_cavity(state.void_state, grown.cavity_id, cfg.promotion_radius_m)",
+      "arrhenius_fracture/voiding_production_v5.py:1968:    void_state = update_cavity_growth(",
+      "arrhenius_fracture/voiding_production_v5.py:1969:        state.void_state, state.void_state.cavities[0].cavity_id,",
+      "arrhenius_fracture/voiding_production_v5.py:1972:    state = remesh_cavity(state, grown_hole, void_state, \"resolved-growth\")",
+      "arrhenius_fracture/voiding_production_v5.py:2012:    state, _ = build_production_void_state(enabled=True, stochastic=True, seed=seed)",
+      "arrhenius_fracture/voiding_production_v5.py:2018:        void_state, events = advance_site(state.void_state, \"site-1\", 1.0e-12, rates=rates)",
+      "arrhenius_fracture/voiding_production_v5.py:2019:        state = replace(state, void_state=void_state)",
+      "arrhenius_fracture/voiding_lifecycle_driver_v5.py:34:    if state.void_state is None: raise ValueError('enabled production void state required')",
+      "arrhenius_fracture/voiding_lifecycle_driver_v5.py:57:            voids=accepted.void_state;site=voids.sites[0]",
+      "arrhenius_fracture/voiding_lifecycle_driver_v5.py:68:                commit(replace(accepted,void_state=updated),step,{'api':'advance_site','events':list(events),'rates':rates})",
+      "arrhenius_fracture/voiding_lifecycle_driver_v5.py:72:                commit(equilibrate(replace(accepted,void_state=updated)),0.,",
+      "arrhenius_fracture/voiding_lifecycle_driver_v5.py:97:                        trace=[];trial=equilibrate(replace(accepted,void_state=updated))",
+      "arrhenius_fracture/checkpoint_v11.py:48:        \"has_production_void_state\": state.void_state is not None,",
+      "arrhenius_fracture/checkpoint_v11.py:54:    if state.void_state is not None:",
+      "arrhenius_fracture/checkpoint_v11.py:55:        from .voiding_v5 import fingerprint as void_fingerprint, serialize as serialize_void_state",
+      "arrhenius_fracture/checkpoint_v11.py:56:        manifest[\"production_void_state\"] = json.loads(serialize_void_state(state.void_state))",
+      "arrhenius_fracture/checkpoint_v11.py:57:        manifest[\"production_void_state_sha256\"] = void_fingerprint(state.void_state)",
+      "arrhenius_fracture/checkpoint_v11.py:97:    if state.void_state is not None:",
+      "arrhenius_fracture/checkpoint_v11.py:99:        if void_fingerprint(state.void_state) != manifest.get(\"production_void_state_sha256\"):",
+      "arrhenius_fracture/source_quality_transaction_v1.py:19:    a, b = current.void_state.cavities[0], previous.void_state.cavities[0]",
+      "arrhenius_fracture/source_quality_transaction_v1.py:52:    if state.crack_network.active_tip_ids or state.void_state.cavities[0].phase != p.VoidPhase.CONNECTED_VOID:",
+      "arrhenius_fracture/source_quality_transaction_v1.py:54:    original = fingerprint(state); cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/source_quality_transaction_v1.py:92:        'void_physical_state': trial.void_state == state.void_state,",
+      "arrhenius_fracture/quality_constrained_mesh_v1.py:55:    for cavity in state.void_state.cavities:",
+      "arrhenius_fracture/closure_production_evidence.py:86:    cavity=state.void_state.cavities[0]",
+      "arrhenius_fracture/closure_rollback_matrix_v5.py:35:                site=before.void_state.sites[0]",
+      "arrhenius_fracture/closure_rollback_matrix_v5.py:39:                advance_site(before.void_state,site.site_id,duration,rates=rates,failure_injector=inject)",
+      "arrhenius_fracture/closure_rollback_matrix_v5.py:43:                create_subgrid_cavity(before.void_state,'site-1',2.5e-5,failure_injector=inject)",
+      "arrhenius_fracture/closure_rollback_matrix_v5.py:51:                update_cavity_growth(before.void_state,before.void_state.cavities[0].cavity_id,",
+      "arrhenius_fracture/closure_rollback_matrix_v5.py:58:                promote_cavity(before.void_state,before.void_state.cavities[0].cavity_id,5e-5,failure_injector=inject)",
+      "arrhenius_fracture/closure_rollback_matrix_v5.py:61:                cavity=before.void_state.cavities[0];identity=fingerprint(before)",
+      "arrhenius_fracture/closure_rollback_matrix_v5.py:65:                voids=before.void_state",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:39:    from .voiding_production_v5 import build_production_void_state",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:40:    state,_=build_production_void_state(stochastic=True,seed=CONTROLLED_HEALING_SEED)",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:52:    voids=state.void_state;site=voids.sites[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:83:        site = state.void_state.sites[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:92:                current = state.void_state.sites[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:98:            voids, events = advance_site(state.void_state, site.site_id, dt, rates=rates)",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:99:            state = replace(state, void_state=voids)",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:104:        cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:108:            state = replace(state, void_state=update_cavity_growth(state.void_state, cavity.cavity_id,",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:113:        cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:114:        voids = promote_cavity(state.void_state, cavity.cavity_id, config.promotion_radius_m)",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:152:    old,new = before.void_state.sites[0],after.void_state.sites[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:157:    if not before.void_state.cavities or not after.void_state.cavities: return False",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:158:    a,b = before.void_state.cavities[0],after.void_state.cavities[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:159:    if name == \"subgrid_growth\": return b.radius_m > a.radius_m and after.void_state.consumed_defect_inventory_area_m2 > before.void_state.consumed_defect_inventory_area_m2",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:183:        'network':state.crack_network.to_dict(),'cavities':() if state.void_state is None else state.void_state.cavities,",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:190:    if state.void_state and state.void_state.cavities:",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:191:        cavity=state.void_state.cavities[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:207:    voids = state.void_state",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:209:        return {\"void_inventory\": \"NOT_APPLICABLE_DISABLED\", \"passed\": initial.void_state is None",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:212:    original = initial.void_state.available_defect_inventory_area_m2+initial.void_state.consumed_defect_inventory_area_m2",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:220:        -initial.void_state.length_ledgers[\"fractured_ligament_length_m\"]-initial.void_state.length_ledgers[\"ordinary_crack_fractured_length_m\"])",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:257:    while state.void_state.sites[0].phase == VoidPhase.AVAILABLE_SITE:",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:258:        name = \"birth_hit_1\" if state.void_state.sites[0].hits == 0 else \"birth_hit_2\"",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:262:    if state.void_state.sites[0].phase == VoidPhase.EMBRYO:",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:264:    if state.void_state.sites[0].phase == VoidPhase.HEALED_SITE: return state",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:265:    if not state.void_state.cavities:",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:266:        state = equilibrate(replace(state,void_state=create_subgrid_cavity(state.void_state,\"site-1\",2.5e-5)))",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:268:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:271:    if state.void_state.cavities[0].phase == VoidPhase.STABLE_SUBGRID_VOID:",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:273:    cavity = state.void_state.cavities[0]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:279:        voids = update_cavity_growth(state.void_state,cavity.cavity_id,rates=rates,dt_s=dt,",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:283:    if state.void_state.cavities[0].phase == VoidPhase.RESOLVED_VOID:",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:285:    if state.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID:",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:287:    if state.void_state.cavities[0].phase == VoidPhase.DOWNSTREAM_FRONT_ACTIVE:",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:300:        if canonical_data(sources[reference].void_state.sites[0].center_m)!=cfg['center_m']:",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:350:                    expected_events=[r[\"event\"] for r in after.void_state.event_history[len(before.void_state.event_history):]]",
+      "arrhenius_fracture/closure_lifecycle_evidence.py:438:        phase=state.void_state.sites[0].phase if not state.void_state.cavities else state.void_state.cavities[0].phase"
+    ]
+  },
+  "historical_raw_full_state_identity": "FAIL_RETAINED",
+  "implementation_sha": "6d0c84b7a214476dd48bd136c434bebf0b8ebd68",
+  "passed": false,
+  "protocol_sha256": "271fb5de6fc4549dc5800283fe645949361d9416eaa50e310e4c3c13cd4ebcc0",
+  "rows": [
+    {
+      "base_failure": {
+        "message": "v12_support_not_certified: REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH",
+        "type": "RuntimeError"
+      },
+      "case_id": "monotonic",
+      "causal_differences": [],
+      "causal_fingerprints": [
+        [
+          "bdd3c6c7c96d409dcf7bbddd578d48d907a41e175bfcc95970bfc9a85d6b0315",
+          "bdd3c6c7c96d409dcf7bbddd578d48d907a41e175bfcc95970bfc9a85d6b0315"
+        ]
+      ],
+      "causal_states_exact": false,
+      "current_failure": {
+        "message": "v12_support_not_certified: REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH",
+        "type": "RuntimeError"
+      },
+      "histories_exact": false,
+      "passed": false,
+      "raw_differences": [
+        {
+          "base": "<MISSING>",
+          "current": 32931.30717216061,
+          "path": "/energy_ledgers/latest_constrained_reaction_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 0.006716579719524896,
+          "path": "/energy_ledgers/latest_energy_reaction_identity"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.095426371341534e-10,
+          "path": "/energy_ledgers/latest_free_dof_residual_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.0320951027259866e-16,
+          "path": "/energy_ledgers/latest_top_bottom_reaction_balance"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_boundary_terminal_certificates"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_graph_support_audit/boundary_terminal_certificates"
+        },
+        {
+          "base": "326e3f5973ef623781ab8568798c495a3f68238c",
+          "current": "6d0c84b7a214476dd48bd136c434bebf0b8ebd68",
+          "path": "/v12_support_state/source_commit"
+        },
+        {
+          "base": "<MISSING>",
+          "current": null,
+          "path": "/void_state"
+        }
+      ],
+      "separate_audit_provenance": [
+        [
+          {
+            "v12_support_state/source_commit": "326e3f5973ef623781ab8568798c495a3f68238c"
+          },
+          {
+            "energy_ledgers/latest_constrained_reaction_l2_N_per_m": 32931.30717216061,
+            "energy_ledgers/latest_energy_reaction_identity": 0.006716579719524896,
+            "energy_ledgers/latest_free_dof_residual_l2_N_per_m": 4.095426371341534e-10,
+            "energy_ledgers/latest_top_bottom_reaction_balance": 4.0320951027259866e-16,
+            "junction_process_state/v12_boundary_terminal_certificates": [],
+            "junction_process_state/v12_graph_support_audit/boundary_terminal_certificates": [],
+            "v12_support_state/source_commit": "6d0c84b7a214476dd48bd136c434bebf0b8ebd68"
+          }
+        ]
+      ]
+    },
+    {
+      "base_failure": {
+        "message": "v12_support_not_certified: REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH",
+        "type": "RuntimeError"
+      },
+      "case_id": "fixed_mesh_oblique",
+      "causal_differences": [],
+      "causal_fingerprints": [
+        [
+          "4d5bf56176f2635f1a556a7942269437afebf6d5b2e33b8506698223bc5aa144",
+          "4d5bf56176f2635f1a556a7942269437afebf6d5b2e33b8506698223bc5aa144"
+        ]
+      ],
+      "causal_states_exact": false,
+      "current_failure": {
+        "message": "v12_support_not_certified: REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH",
+        "type": "RuntimeError"
+      },
+      "histories_exact": false,
+      "passed": false,
+      "raw_differences": [
+        {
+          "base": "<MISSING>",
+          "current": 32779.16951474737,
+          "path": "/energy_ledgers/latest_constrained_reaction_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 0.006712807540921346,
+          "path": "/energy_ledgers/latest_energy_reaction_identity"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.0488016945562084e-10,
+          "path": "/energy_ledgers/latest_free_dof_residual_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 1.1585713752758903e-16,
+          "path": "/energy_ledgers/latest_top_bottom_reaction_balance"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_boundary_terminal_certificates"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_graph_support_audit/boundary_terminal_certificates"
+        },
+        {
+          "base": "326e3f5973ef623781ab8568798c495a3f68238c",
+          "current": "6d0c84b7a214476dd48bd136c434bebf0b8ebd68",
+          "path": "/v12_support_state/source_commit"
+        },
+        {
+          "base": "<MISSING>",
+          "current": null,
+          "path": "/void_state"
+        }
+      ],
+      "separate_audit_provenance": [
+        [
+          {
+            "v12_support_state/source_commit": "326e3f5973ef623781ab8568798c495a3f68238c"
+          },
+          {
+            "energy_ledgers/latest_constrained_reaction_l2_N_per_m": 32779.16951474737,
+            "energy_ledgers/latest_energy_reaction_identity": 0.006712807540921346,
+            "energy_ledgers/latest_free_dof_residual_l2_N_per_m": 4.0488016945562084e-10,
+            "energy_ledgers/latest_top_bottom_reaction_balance": 1.1585713752758903e-16,
+            "junction_process_state/v12_boundary_terminal_certificates": [],
+            "junction_process_state/v12_graph_support_audit/boundary_terminal_certificates": [],
+            "v12_support_state/source_commit": "6d0c84b7a214476dd48bd136c434bebf0b8ebd68"
+          }
+        ]
+      ]
+    },
+    {
+      "base_failure": {
+        "message": "v12_support_not_certified: REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH",
+        "type": "RuntimeError"
+      },
+      "case_id": "checkpoint_restart",
+      "causal_differences": [],
+      "causal_fingerprints": [
+        [
+          "c39646d13907258def368898153a04631ccac811ad5a381ee0132573cee2bce5",
+          "c39646d13907258def368898153a04631ccac811ad5a381ee0132573cee2bce5"
+        ]
+      ],
+      "causal_states_exact": false,
+      "current_failure": {
+        "message": "v12_support_not_certified: REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH",
+        "type": "RuntimeError"
+      },
+      "histories_exact": false,
+      "passed": false,
+      "raw_differences": [
+        {
+          "base": "<MISSING>",
+          "current": 32931.30717216061,
+          "path": "/energy_ledgers/latest_constrained_reaction_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 0.006716579719524896,
+          "path": "/energy_ledgers/latest_energy_reaction_identity"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.095426371341534e-10,
+          "path": "/energy_ledgers/latest_free_dof_residual_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.0320951027259866e-16,
+          "path": "/energy_ledgers/latest_top_bottom_reaction_balance"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_boundary_terminal_certificates"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_graph_support_audit/boundary_terminal_certificates"
+        },
+        {
+          "base": "326e3f5973ef623781ab8568798c495a3f68238c",
+          "current": "6d0c84b7a214476dd48bd136c434bebf0b8ebd68",
+          "path": "/v12_support_state/source_commit"
+        },
+        {
+          "base": "<MISSING>",
+          "current": null,
+          "path": "/void_state"
+        }
+      ],
+      "separate_audit_provenance": [
+        [
+          {
+            "v12_support_state/source_commit": "326e3f5973ef623781ab8568798c495a3f68238c"
+          },
+          {
+            "energy_ledgers/latest_constrained_reaction_l2_N_per_m": 32931.30717216061,
+            "energy_ledgers/latest_energy_reaction_identity": 0.006716579719524896,
+            "energy_ledgers/latest_free_dof_residual_l2_N_per_m": 4.095426371341534e-10,
+            "energy_ledgers/latest_top_bottom_reaction_balance": 4.0320951027259866e-16,
+            "junction_process_state/v12_boundary_terminal_certificates": [],
+            "junction_process_state/v12_graph_support_audit/boundary_terminal_certificates": [],
+            "v12_support_state/source_commit": "6d0c84b7a214476dd48bd136c434bebf0b8ebd68"
+          }
+        ]
+      ]
+    },
+    {
+      "base_failure": {
+        "message": "v12_support_not_certified: REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH",
+        "type": "RuntimeError"
+      },
+      "case_id": "unload_reload",
+      "causal_differences": [],
+      "causal_fingerprints": [
+        [
+          "ea7f5576e86c2e99611aac0925df6781f6fc7bdeea941e41aa55b2b2f9e12d36",
+          "ea7f5576e86c2e99611aac0925df6781f6fc7bdeea941e41aa55b2b2f9e12d36"
+        ]
+      ],
+      "causal_states_exact": false,
+      "current_failure": {
+        "message": "v12_support_not_certified: REQUIRES_ACTIVE_TIP_ALIGNMENT_REMESH",
+        "type": "RuntimeError"
+      },
+      "histories_exact": false,
+      "passed": false,
+      "raw_differences": [
+        {
+          "base": "<MISSING>",
+          "current": 32931.30717216062,
+          "path": "/energy_ledgers/latest_constrained_reaction_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 0.006716579719525101,
+          "path": "/energy_ledgers/latest_energy_reaction_identity"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 3.9944181339022416e-10,
+          "path": "/energy_ledgers/latest_free_dof_residual_l2_N_per_m"
+        },
+        {
+          "base": "<MISSING>",
+          "current": 4.0320951027259847e-16,
+          "path": "/energy_ledgers/latest_top_bottom_reaction_balance"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_boundary_terminal_certificates"
+        },
+        {
+          "base": "<MISSING>",
+          "current": [],
+          "path": "/junction_process_state/v12_graph_support_audit/boundary_terminal_certificates"
+        },
+        {
+          "base": "326e3f5973ef623781ab8568798c495a3f68238c",
+          "current": "6d0c84b7a214476dd48bd136c434bebf0b8ebd68",
+          "path": "/v12_support_state/source_commit"
+        },
+        {
+          "base": "<MISSING>",
+          "current": null,
+          "path": "/void_state"
+        }
+      ],
+      "separate_audit_provenance": [
+        [
+          {
+            "v12_support_state/source_commit": "326e3f5973ef623781ab8568798c495a3f68238c"
+          },
+          {
+            "energy_ledgers/latest_constrained_reaction_l2_N_per_m": 32931.30717216062,
+            "energy_ledgers/latest_energy_reaction_identity": 0.006716579719525101,
+            "energy_ledgers/latest_free_dof_residual_l2_N_per_m": 3.9944181339022416e-10,
+            "energy_ledgers/latest_top_bottom_reaction_balance": 4.0320951027259847e-16,
+            "junction_process_state/v12_boundary_terminal_certificates": [],
+            "junction_process_state/v12_graph_support_audit/boundary_terminal_certificates": [],
+            "v12_support_state/source_commit": "6d0c84b7a214476dd48bd136c434bebf0b8ebd68"
+          }
+        ]
+      ]
+    }
+  ],
+  "schema": "v5.disabled-future-causal-neutrality/1"
+}

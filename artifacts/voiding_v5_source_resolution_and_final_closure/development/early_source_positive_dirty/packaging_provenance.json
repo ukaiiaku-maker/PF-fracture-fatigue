@@ -1,0 +1,20 @@
+{
+  "lossless_checkpoint_representation_changes": [
+    {
+      "checkpoint": "qualified_or_preserved_state.json",
+      "complete_state_exact": true,
+      "complete_state_fingerprint": "f6a612d05674d8e518cdc4ada2e8404da0802e35df5490845ab4c099120d962e",
+      "compressed_payload_sha256": "3fdadef5c876dcfb7a531802bda12e48a5d51f05b664434eafdfcfc58c6d2fe0",
+      "original_manifest_sha256": "c31d79e41503ad39a3e7eb634262a23948dff3e65c04e6791c6d242c94f85feb",
+      "original_payload_sha256": "f096b8f2a7c0c3766726dd2144dbf57813f061d7cc7d02ceef276907aa12306d"
+    }
+  ],
+  "original_inventory": {
+    "qualified_or_preserved_state.json": "c31d79e41503ad39a3e7eb634262a23948dff3e65c04e6791c6d242c94f85feb",
+    "qualified_or_preserved_state.json.f096b8f2a7c0c3766726dd2144dbf57813f061d7cc7d02ceef276907aa12306d.state.pkl": "f096b8f2a7c0c3766726dd2144dbf57813f061d7cc7d02ceef276907aa12306d",
+    "result.json": "29b6b7f3285b5f123ad827905f16521cddfa608ebabb45e475279f4165d1128b",
+    "sha256_manifest.json": "850796a185a776b0480f3c5a65cd2c2c76789539e415f417d5c189f66d614422"
+  },
+  "record_kind": "PACKAGING_NOT_NEW_PHYSICAL_EXECUTION_OR_CLEAN_ATTESTATION",
+  "schema": "v5.retained-development-packaging/1"
+}

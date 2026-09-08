@@ -15,6 +15,14 @@ in each original record, rather than this packaging commit, identify its code.
 
 Available development results:
 
+The `early_*` packages retain the initial source, boundary-context, bounded-
+intersection, continuation, static and disabled-neutrality trials. Their original
+dirty-worktree records remain dirty, even where a trial was accepted. The early
+causality package contains five interventions and no completed six-case report;
+its interrupted radius intervention is not a completed causal qualification.
+These packages document development and rejected implementation trials only.
+They neither replace the later clean records nor add independent final A/B rows.
+
 - Phase 1: all 19 controlling bad elements, with their actual source mesh.
   They are inherited near the old tip, not newly created source-ring elements;
   earlier unavailable lineage is explicitly unknown.
@@ -68,3 +76,6 @@ executed tests, zero failures and zero skips. The separate repository-wide run
 Later repository-wide run `34184892468` at `787ebf6` completed with 1115 passed,
 one skipped and exactly the seven inherited failure identities. Its retained
 transcript supports `FAIL_INHERITED_BASELINE`, not green repository-wide CI.
+Focused development run `34186374589` at `99c2ecb` has an uploaded XML report
+with 296 passed, zero failed and zero skipped. The final full focused registry
+and exact-publication-head runs remain separate required executions.

@@ -1,0 +1,30 @@
+{
+  "lossless_checkpoint_representation_changes": [
+    {
+      "checkpoint": "UNACCEPTED_support_trial.json",
+      "complete_state_exact": true,
+      "complete_state_fingerprint": "9a815606eab42ac7c6c3bdd0b3bcf0348d17aca8640ed6106a093c6298124dad",
+      "compressed_payload_sha256": "6b913388221c947d615cf23b38b6823713ea1888237ec93410fd0f290b57e789",
+      "original_manifest_sha256": "8c9c4f878ba3b7cffbfde4be9c4e9cd255a05b2daaa61c89311fe34d6e24209b",
+      "original_payload_sha256": "3685a923db82ccbbf8eac0343187fe4b2888bea2c3d68a6a6cb23f3a4dd28c66"
+    },
+    {
+      "checkpoint": "accepted_or_preserved_state.json",
+      "complete_state_exact": true,
+      "complete_state_fingerprint": "f3de5f63c6d042898fff5140cab20c2170601306e348cf093b1341303fb23660",
+      "compressed_payload_sha256": "d5e6e2b654ec24f0afc7fd7a9c0d84e456a6a2e1d75ba48791032f43a3a3496a",
+      "original_manifest_sha256": "97de7a5be998824594efa885d884c5a9e62c8d6ee4202ffcb2e6575c19bb1010",
+      "original_payload_sha256": "f875776f154a782c6e29a2d56c7251203e4f26ded0ef99acfae556c7bb74c5b5"
+    }
+  ],
+  "original_inventory": {
+    "UNACCEPTED_support_trial.json": "8c9c4f878ba3b7cffbfde4be9c4e9cd255a05b2daaa61c89311fe34d6e24209b",
+    "UNACCEPTED_support_trial.json.3685a923db82ccbbf8eac0343187fe4b2888bea2c3d68a6a6cb23f3a4dd28c66.state.pkl": "3685a923db82ccbbf8eac0343187fe4b2888bea2c3d68a6a6cb23f3a4dd28c66",
+    "accepted_or_preserved_state.json": "97de7a5be998824594efa885d884c5a9e62c8d6ee4202ffcb2e6575c19bb1010",
+    "accepted_or_preserved_state.json.f875776f154a782c6e29a2d56c7251203e4f26ded0ef99acfae556c7bb74c5b5.state.pkl": "f875776f154a782c6e29a2d56c7251203e4f26ded0ef99acfae556c7bb74c5b5",
+    "result.json": "d71c5fd1d6ab33182f55be5de7b6d987db22922c27a7d3bf0436b9251ac0ddd2",
+    "sha256_manifest.json": "ccdfdb186341a73c74e2f36c12831218f74b1b796dee5e3240d5f2b6aeb9ea1d"
+  },
+  "record_kind": "PACKAGING_NOT_NEW_PHYSICAL_EXECUTION_OR_CLEAN_ATTESTATION",
+  "schema": "v5.retained-development-packaging/1"
+}
