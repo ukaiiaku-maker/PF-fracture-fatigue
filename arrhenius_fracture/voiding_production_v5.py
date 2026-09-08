@@ -1351,6 +1351,17 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
         # dormancy; a bare _source_identity would erase the candidate inventory.
         source = {**state.junction_process_state.get("active_event_source", {}),
                   **(source if any(r["effective_rate_s"] > 0 for r in rates) else {})}
+    elif source_kind=='sharp_front':
+        # A partial accepted clock interval does not renew the front or erase
+        # its geometry-owned candidate endpoints. Only retain them for the
+        # same front, position and graph generation; tensor/probe metadata is
+        # refreshed above and the eventual transaction still certifies geometry.
+        previous_source=state.junction_process_state.get('active_event_source',{})
+        same_owner=all(previous_source.get(key)==source.get(key) for key in (
+            'source_kind','source_front_id','source_geometry_generation')) and tuple(
+                previous_source.get('source_position_m') or ())==tuple(source.get('source_position_m') or ())
+        if same_owner:
+            source={**previous_source,**source}
     hazards = list(state.competition.hazard_states)
     crossing_times = [rate["crossing_time_s"] for rate in rates]
     duration = min(crossing_times, default=math.inf)

@@ -1,6 +1,11 @@
 name: V5 bounded Phase-8 restart and rollback development
 
 on:
+  workflow_call:
+    inputs:
+      section:
+        type: string
+        required: true
   workflow_dispatch:
     inputs:
       section:

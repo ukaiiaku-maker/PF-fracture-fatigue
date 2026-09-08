@@ -89,6 +89,28 @@ def test_actual_directional_event_and_anchor_state_are_partition_exact(parts):
     assert clock.seconds_exact() == direct_dt
 
 
+@pytest.mark.parametrize('same_owner',[True,False])
+def test_partial_sharp_clock_retains_only_its_own_endpoint_inventory(same_owner):
+    from dataclasses import replace
+    import numpy as np
+    from arrhenius_fracture.voiding_production_v5 import build_production_void_state,_source_identity,_complete_next_clock
+    state,_=build_production_void_state()
+    tensor=np.eye(2)*1e8;front=state.crack_network.branches[0]
+    kwargs={'source_kind':'sharp_front','source_front_id':front.branch_id,
+        'source_position_m':front.tip,'source_probe_identity':{'kind':'crack_tip_tensor'}}
+    source=_source_identity(state,tensor,**kwargs)
+    source['next_candidate_endpoints_m']={state.competition.candidates[0].candidate_id:[.000525,0.]}
+    source['candidate_source_states']=[{'candidate_id':state.competition.candidates[0].candidate_id}]
+    state=replace(state,junction_process_state={**state.junction_process_state,'active_event_source':source})
+    if not same_owner:kwargs['source_front_id']='different-front'
+    after,audit=_complete_next_clock(state,tensor,maximum_advance_duration_s=0.,**kwargs)
+    saved=after.junction_process_state['active_event_source']
+    assert ('next_candidate_endpoints_m' in saved)==same_owner
+    assert ('candidate_source_states' in saved)==same_owner
+    assert not any(row['winner'] for row in audit)
+    assert state.rng_state==after.rng_state
+
+
 @pytest.mark.parametrize('parts',[1,2,4,8,16])
 def test_growth_target_localization_uses_existing_exact_radius_integral(parts):
     import math

@@ -4,9 +4,16 @@ on:
   push:
     branches: [codex/sharp-front-stateful-voiding-v5-finalization-v2]
   workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [focused, rollback, restarts, final]
+        default: focused
+        required: true
 
 jobs:
   focused:
+    if: github.event_name != 'workflow_dispatch' || inputs.operation == 'focused'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -43,3 +50,11 @@ jobs:
         with:
           name: v5-source-resolution-development-${{ github.sha }}
           path: /tmp/v5-source-resolution
+  phase8:
+    if: github.event_name == 'workflow_dispatch' && (inputs.operation == 'rollback' || inputs.operation == 'restarts')
+    uses: ./.github/workflows/voiding-v5-phase8-development.yml
+    with:
+      section: ${{ inputs.operation }}
+  final-campaign:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final'
+    uses: ./.github/workflows/voiding-v5-source-final-campaign.yml

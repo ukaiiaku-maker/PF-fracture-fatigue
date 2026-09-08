@@ -15,13 +15,16 @@ from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('development_rows',type=Path)
-    parser.add_argument('output',type=Path);args=parser.parse_args()
+    parser.add_argument('output',type=Path)
+    parser.add_argument('--stages',nargs='+',choices=('birth_hit_1','birth_hit_2','stabilization','healing','subgrid_growth','child_continuation'),
+        default=('birth_hit_1','birth_hit_2','stabilization','healing','subgrid_growth'))
+    args=parser.parse_args()
     if args.output.exists():raise ValueError('refusing to overwrite sentinels')
     status=subprocess.check_output(('git','status','--porcelain'),cwd=ROOT,text=True)
     if status.strip():raise ValueError('site sentinel requires clean implementation')
     args.output.mkdir(parents=True);rows=[]
     source_rows=[(p,json.loads(p.read_text())) for p in (args.development_rows/'rows').glob('*.json')]
-    for name in ('birth_hit_1','birth_hit_2','stabilization','healing','subgrid_growth'):
+    for name in args.stages:
         path,row=next((p,r) for p,r in source_rows if r['dataset']=='transitions' and r['case_identity']==name and r['partition_count']==1)
         before=restore_checkpoint(args.development_rows/row['initial_checkpoint']);reference=None
         for count in (1,2,4,8,16):

@@ -1,6 +1,7 @@
 name: V5 source-resolution final complete A-B campaign
 
 on:
+  workflow_call:
   workflow_dispatch:
 
 permissions:
