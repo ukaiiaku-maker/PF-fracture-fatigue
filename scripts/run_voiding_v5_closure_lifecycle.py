@@ -66,6 +66,7 @@ def main():
     parser.add_argument('--section',choices=('all','transitions','restarts','controlled','neutrality','natural','rollback'),default='all')
     parser.add_argument('--shard-index',type=int,default=0)
     parser.add_argument('--shard-count',type=int,default=1)
+    parser.add_argument('--common-restart-protocol',choices=('v1','v2'),default='v2')
     args=parser.parse_args(); out=args.output
     if not 0<=args.shard_index<args.shard_count:raise ValueError('invalid lifecycle shard')
     if args.shard_count>1 and args.section in ('all','rollback','neutrality'):
@@ -82,7 +83,7 @@ def main():
     rows=[]; trace=ProgressTrace()
     fine_options = dict(boundary_segments=512,radial_layers=192,
         crack_path_m=((0.,0.),(.0005725993004046688,0.)),qualify_source=True) if args.qualified_fine_history and args.section not in ('natural','neutrality','controlled') else {}
-    if args.qualified_fine_history and args.section=='restarts':fine_options['common_restart_protocol']=True
+    if args.qualified_fine_history and args.section=='restarts':fine_options['common_restart_protocol']=args.common_restart_protocol
     preparation_failure=None
     try:
         terminal,trajectory_history=deterministic_trajectory(state_trace=trace,**fine_options)
@@ -143,7 +144,7 @@ def main():
             try:
                 restart_terminal,_=deterministic_trajectory(state_trace=restart_trace,
                     boundary_segments=512,radial_layers=192,crack_path_m=((0.,0.),(.0005725993004046688,0.)),
-                    qualify_source=True,common_restart_protocol=True)
+                    qualify_source=True,common_restart_protocol=args.common_restart_protocol)
             except Exception as exc:
                 if not restart_trace:raise
                 restart_terminal=restart_trace[-1][1]
@@ -159,16 +160,16 @@ def main():
             voids,_=advance_site(before.void_state,site.site_id,dt,rates=rates); before=replace(before,void_state=voids)
         if stage=="zero_drive_connected" and not args.qualified_fine_history: before=load_state(before,0.)
         restored=restore_checkpoint(out/checkpoint(before)); operations=[]; resumed_ops=[]; after=before; resumed=restored; error=None
-        after,direct_failure=resume_attempt(after,operations,common_restart_protocol=args.qualified_fine_history,
+        after,direct_failure=resume_attempt(after,operations,common_restart_protocol=args.common_restart_protocol if args.qualified_fine_history else False,
             legacy_reload=stage=='zero_drive_connected' and not args.qualified_fine_history)
-        resumed,replay_failure=resume_attempt(resumed,resumed_ops,common_restart_protocol=args.qualified_fine_history,
+        resumed,replay_failure=resume_attempt(resumed,resumed_ops,common_restart_protocol=args.common_restart_protocol if args.qualified_fine_history else False,
             legacy_reload=stage=='zero_drive_connected' and not args.qualified_fine_history)
         error=direct_failure or replay_failure
         replay_path=checkpoint(resumed)
         record("restarts",stage,before,after,{"expected_terminal":"DOWNSTREAM_FRONT_CONTINUED",
             "requested_stage_available":stage_available,
-            'common_terminal_protocol':'v5.common-terminal-restart-load/1' if args.qualified_fine_history else 'RETAINED_LEGACY_DIFFERENT_LOAD_HISTORIES',
-            "reload_policy":"common_4e-7_compressive_minus4e-7_zero_drive_16us_8e-7" if args.qualified_fine_history else "tensile_8e-7" if stage=='zero_drive_connected' else "retain_accepted_load"},operations,
+            'common_terminal_protocol':'v5.common-terminal-restart-load/'+args.common_restart_protocol[1:] if args.qualified_fine_history else 'RETAINED_LEGACY_DIFFERENT_LOAD_HISTORIES',
+            "reload_policy":("common_4e-7_compressive_minus4e-7_zero_drive_16us_"+('4e-7' if args.common_restart_protocol=='v2' else '8e-7')) if args.qualified_fine_history else "tensile_8e-7" if stage=='zero_drive_connected' else "retain_accepted_load"},operations,
             restored_terminal_checkpoint=replay_path,restart_exact=fingerprint(after)==fingerprint(resumed),
             restarted_operations=resumed_ops,subsequent_history_exact=canonical_data(operations)==canonical_data(resumed_ops),
             continued_front_terminal_reached=stage_available and any(op.get('api')=='child_tip_continuation'

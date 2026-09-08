@@ -4,21 +4,25 @@ from arrhenius_fracture.voiding_production_v5 import deterministic_trajectory,li
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint as fingerprint
 
 
-def test_same_accepted_zero_reload_protocol_resumes_without_repeating_a_load():
+@pytest.mark.parametrize('version',[1,2])
+def test_same_accepted_zero_reload_protocol_resumes_without_repeating_a_load(version):
     pre,_=deterministic_trajectory(stop_before_ligament=True)
     connected,_=ligament_transaction(pre);initial=fingerprint(connected)
     operations=[];trace=[]
-    direct=prepare_common_restart_reload(connected,operations,trace)
+    direct=prepare_common_restart_reload(connected,operations,trace,protocol_version=version)
     assert fingerprint(connected)==initial
     assert [name for name,_ in trace]==['zero_drive_connected']
-    replay_operations=[];resumed=prepare_common_restart_reload(trace[0][1],replay_operations)
+    replay_operations=[];resumed=prepare_common_restart_reload(trace[0][1],replay_operations,protocol_version=version)
     assert fingerprint(resumed)==fingerprint(direct)
     assert operations[1:]==replay_operations
     assert direct.competition==connected.competition and direct.rng_state==connected.rng_state
     assert not direct.crack_network.active_tip_ids
     replay_operations=[]
-    assert prepare_common_restart_reload(direct,replay_operations) is direct
+    assert prepare_common_restart_reload(direct,replay_operations,protocol_version=version) is direct
     assert replay_operations==[]
+    assert operations[-1]['opening_m']==(8e-7 if version==1 else 4e-7)
+    with pytest.raises(ValueError,match='cannot mix'):
+        prepare_common_restart_reload(direct,[],protocol_version=3-version)
 
 
 def test_common_zero_interval_cannot_force_a_positive_raw_candidate(monkeypatch):

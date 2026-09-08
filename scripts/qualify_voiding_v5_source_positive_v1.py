@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--segments', type=int, default=512); parser.add_argument('--layers', type=int, default=192)
     parser.add_argument('--common-restart-reload',action='store_true',
         help='Bounded development sentinel for the frozen compressive/8e-7 common restart protocol')
+    parser.add_argument('--common-restart-version',type=int,choices=(1,2),default=1)
     args = parser.parse_args(); source, output = args.source_bundle, args.output
     if output.exists(): raise ValueError('refusing to overwrite source sentinel')
     expected = json.loads((source/'sha256_manifest.json').read_text())
@@ -45,14 +46,15 @@ def main():
     if args.common_restart_reload:
         from arrhenius_fracture.closure_lifecycle_evidence import prepare_common_restart_reload
         load_operations=[]
-        state=prepare_common_restart_reload(state,load_operations)
+        state=prepare_common_restart_reload(state,load_operations,protocol_version=args.common_restart_version)
+        report['common_restart_protocol']='v5.common-terminal-restart-load/'+str(args.common_restart_version)
         report['common_restart_load_operations']=load_operations
         write_checkpoint(state,output/'accepted_common_reload_state.json',compression='gzip')
         retain()
     source_initial=fingerprint(state)
     print('Quality-valid parent, actual ring refinement, frozen source/time certification', flush=True)
     try:
-        qualified, proof = refine_downstream_source(state, max_refinement_levels=2 if args.common_restart_reload else 1,
+        qualified, proof = refine_downstream_source(state, max_refinement_levels=2 if args.common_restart_reload and args.common_restart_version==1 else 1,
             refinement_region='complete_cavity_ring', quality_improvement='constrained_v1')
         report['qualification'] = proof; report['qualified'] = proof['status'] == 'SOURCE_TENSOR_QUALIFIED'
         report['preexisting_clocks_preserved'] = qualified.competition == state.competition and qualified.rng_state == state.rng_state

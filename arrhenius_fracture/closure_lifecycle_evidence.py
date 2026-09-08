@@ -23,7 +23,7 @@ from .voiding_v5 import (
     update_cavity_growth, promote_cavity,
 )
 
-SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/6"
+SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/7"
 PARTITIONS = (1,2,4,8,16)
 CFG = VoidingConfig(enabled=True, promotion_radius_m=5e-5)
 PRECURSORS = {"birth_hit_1": "available_site", "birth_hit_2": "multi_hit_1",
@@ -291,10 +291,14 @@ def conservation(state, initial):
                 and len(voids.cavities)<=1 and ownership and connected_dormant}
 
 
-def prepare_common_restart_reload(state,operations,state_trace=None,accepted=None):
+def prepare_common_restart_reload(state,operations,state_trace=None,accepted=None,protocol_version=1):
     """One accepted load protocol shared by all eleven checkpoint positions."""
     from .voiding_lifecycle_driver_v5 import NATURAL_WINDOW_S
-    key='common_terminal_restart_protocol_v1'
+    if protocol_version not in (1,2):raise ValueError('unregistered common restart protocol')
+    key='common_terminal_restart_protocol_v'+str(protocol_version)
+    other='common_terminal_restart_protocol_v'+str(3-protocol_version)
+    if other in state.junction_process_state:raise ValueError('cannot mix accepted common restart protocols')
+    reload_opening=8e-7 if protocol_version==1 else 4e-7
     if state.void_state.cavities[0].phase!=VoidPhase.CONNECTED_VOID:
         raise ValueError('common restart reload requires the accepted connected state')
     position=state.junction_process_state.get(key)
@@ -317,10 +321,10 @@ def prepare_common_restart_reload(state,operations,state_trace=None,accepted=Non
         operations.append({'api':'common_restart_dormant_interval','duration_s':NATURAL_WINDOW_S,'audit':audit})
         position='ZERO_INTERVAL_ACCEPTED'
     if position=='ZERO_INTERVAL_ACCEPTED':
-        state=load_state(state,8e-7)
+        state=load_state(state,reload_opening)
         state=replace(state,junction_process_state={**state.junction_process_state,key:'TENSILE_RELOAD_ACCEPTED'})
         if accepted is not None:accepted[0]=state
-        operations.append({'api':'common_restart_tensile_reload','opening_m':8e-7})
+        operations.append({'api':'common_restart_tensile_reload','opening_m':reload_opening})
         position='TENSILE_RELOAD_ACCEPTED'
     if position!='TENSILE_RELOAD_ACCEPTED':raise ValueError('unrecognized common restart protocol position')
     return state
@@ -381,7 +385,8 @@ def _resume_to_guard(state,operations,common_restart_protocol,accepted):
         state,_ = advance_transition(state,"ligament",1,operations=operations)
         keep(state)
     if state.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID:
-        if common_restart_protocol:state=prepare_common_restart_reload(state,operations,accepted=accepted)
+        if common_restart_protocol:state=prepare_common_restart_reload(state,operations,accepted=accepted,
+            protocol_version=2 if common_restart_protocol=='v2' else 1)
         state,_ = advance_transition(state,"downstream_child",1,operations=operations)
         keep(state)
     if state.void_state.cavities[0].phase == VoidPhase.DOWNSTREAM_FRONT_ACTIVE:
