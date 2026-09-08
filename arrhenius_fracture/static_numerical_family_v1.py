@@ -5,6 +5,7 @@ from .finalization_v3_schema import canonical_hash, SCIENTIFIC_ACCEPTANCE_TOLERA
 
 SCHEMA = 'v5.quality-constrained-static-families/1'
 LEVELS = ((128,48),(256,96),(512,192))
+RECOVERY_ARCS = (0., .125, .25, .375, .5)
 REGISTRY = {}; GROUPS = {}
 for label, key in OLD_GROUPS.items():
     if '128:48' not in label: continue
@@ -52,7 +53,9 @@ def classify(rows, groups=GROUPS):
             gates['closed_cavity_and_no_overlap'] = all(m['closed_cavity_boundary_cycle'] and not m['solid_cavity_polygon_overlap_element_ids']
                 and not m['support_cavity_polygon_overlap_element_ids'] for m in (middle,fine))
             recovered = [r['recovery'] for r in peers]
-            if all(all('recovery' in arc for arc in row) for row in recovered):
+            if all(tuple(arc.get('arc_fraction') for arc in row)==RECOVERY_ARCS
+                   and all('recovery' in arc and arc.get('repeat_exact') and arc.get('reversed_edge_order_exact')
+                           for arc in row) for row in recovered):
                 errors = [max(relative(x['recovery']['tensor_Pa'],y['recovery']['tensor_Pa']) for x,y in zip(a,b))
                           for a,b in zip(recovered,recovered[1:])]
                 convergence['recovered_fixed_arc_tensor'] = errors

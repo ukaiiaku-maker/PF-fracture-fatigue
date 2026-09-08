@@ -52,7 +52,10 @@ def candidate_measurements(state):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__); parser.add_argument("output", type=Path)
+    parser.add_argument('--compress-checkpoints',action='store_true')
     args = parser.parse_args(); out = args.output
+    def checkpoint(state,path):
+        return write_checkpoint(state,path,compression='gzip' if args.compress_checkpoints else None)
     if out.exists() and any(out.iterdir()): raise ValueError("refusing to overwrite evidence")
     if subprocess.check_output(("git", "status", "--porcelain"), cwd=ROOT, text=True).strip():
         raise RuntimeError("production transfer requires a clean committed implementation")
@@ -69,15 +72,15 @@ def main():
         try:
             pre, history = deterministic_trajectory(stop_before_ligament=True, crack_path_m=PATH,
                 boundary_segments=segments, radial_layers=layers, state_trace=trace)
-            write_checkpoint(pre, out/"checkpoints"/(key.replace(":", "_")+"_pre.json"))
+            checkpoint(pre, out/"checkpoints"/(key.replace(":", "_")+"_pre.json"))
             connected, result = ligament_transaction(pre)
             row.update({"connection_executed": result.accepted, "initial_state_fingerprint": fingerprint(pre),
                         "connected_state_fingerprint": fingerprint(connected),
                         "candidates": candidate_measurements(connected),
                         "actual_history": history})
-            checkpoint = out/"checkpoints"/(key.replace(":", "_")+"_connected.json")
-            write_checkpoint(connected, checkpoint)
-            restored = restore_checkpoint(checkpoint)
+            checkpoint_path = out/"checkpoints"/(key.replace(":", "_")+"_connected.json")
+            checkpoint(connected, checkpoint_path)
+            restored = restore_checkpoint(checkpoint_path)
             guarded, trial, operations, audit = downstream_front_transaction(connected)
             replay, replay_trial, _, replay_audit = downstream_front_transaction(restored)
             row.update({"guarded_state_fingerprint": fingerprint(guarded),
@@ -95,7 +98,7 @@ def main():
             row["failure"] = {"type": type(error).__name__, "message": str(error),
                               "last_accepted_stage": trace[-1][0] if trace else None}
             if trace:
-                write_checkpoint(trace[-1][1], out/"checkpoints"/(key.replace(":", "_")+"_last_accepted.json"))
+                checkpoint(trace[-1][1], out/"checkpoints"/(key.replace(":", "_")+"_last_accepted.json"))
         rows.append(row)
         write_json(out/(key.replace(":", "_")+".json"), row)
     from arrhenius_fracture.closure_production_evidence import transfer_comparisons, SCHEMA as TRANSFER_SCHEMA

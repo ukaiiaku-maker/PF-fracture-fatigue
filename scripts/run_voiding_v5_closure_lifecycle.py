@@ -4,6 +4,7 @@ from dataclasses import replace
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 import subprocess
 import sys
@@ -39,20 +40,37 @@ def write_json(path,payload):
     path.write_text(json.dumps(canonical_data(payload),sort_keys=True,indent=2,allow_nan=False)+"\n")
 
 
+class ProgressTrace(list):
+    def append(self,item):
+        print('Captured accepted lifecycle stage '+item[0],flush=True)
+        super().append(item)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument("output",type=Path)
     parser.add_argument('--qualified-fine-history',action='store_true',
         help='Execute source-qualified 512/192 transition/restart histories; natural window/seed registry stays unchanged')
     parser.add_argument('--phases-7-8-only',action='store_true',
         help='Development execution of all transitions, restarts and rollback; not a full closure campaign')
+    parser.add_argument('--section',choices=('all','transitions','restarts','controlled','neutrality','natural','rollback'),default='all')
+    parser.add_argument('--shard-index',type=int,default=0)
+    parser.add_argument('--shard-count',type=int,default=1)
     args=parser.parse_args(); out=args.output
+    if not 0<=args.shard_index<args.shard_count:raise ValueError('invalid lifecycle shard')
+    if args.shard_count>1 and args.section in ('all','rollback','neutrality'):
+        raise ValueError('select a case-shardable lifecycle section')
+    if args.phases_7_8_only and args.section!='all':raise ValueError('development subset and section are exclusive')
+    def selected(section,registry):
+        if args.section not in ('all',section):return ()
+        if args.phases_7_8_only and section not in ('transitions','restarts','rollback'):return ()
+        return tuple(case for i,case in enumerate(registry) if i%args.shard_count==args.shard_index)
     if out.exists() and any(out.iterdir()): raise ValueError("refusing to overwrite evidence")
     if subprocess.check_output(("git","status","--porcelain"),cwd=ROOT,text=True).strip():
         raise RuntimeError("lifecycle evidence requires a clean committed implementation")
     sha=subprocess.check_output(("git","rev-parse","HEAD"),cwd=ROOT,text=True).strip()
-    rows=[]; trace=[]
+    rows=[]; trace=ProgressTrace()
     fine_options = dict(boundary_segments=512,radial_layers=192,
-        crack_path_m=((0.,0.),(.0005725993004046688,0.)),qualify_source=True) if args.qualified_fine_history else {}
+        crack_path_m=((0.,0.),(.0005725993004046688,0.)),qualify_source=True) if args.qualified_fine_history and args.section not in ('natural','neutrality','controlled') else {}
     preparation_failure=None
     try:
         terminal,trajectory_history=deterministic_trajectory(state_trace=trace,**fine_options)
@@ -78,10 +96,11 @@ def main():
         rows.append(row); write_json(out/"rows"/(str(len(rows))+".json"),row)
         return row
     for index,((previous_name,before),(name,after)) in enumerate(zip(trace,trace[1:])):
+        if args.section not in ('all','transitions') or args.shard_index!=0:continue
         record('stagewise',name,before,after,{'stage_index':index,'previous_stage':previous_name,
             'measurement_kind':'DERIVED_ACCEPTED_TRAJECTORY_STAGE_NOT_NEW_BASE_EXECUTION'},
             [{'api':'deterministic_trajectory','captured_stage':name,'actual_trajectory_history':trajectory_history}])
-    for name in FROZEN_CASE_REGISTRY["transitions"]:
+    for name in selected('transitions',FROZEN_CASE_REGISTRY["transitions"]):
         for partitions in PARTITIONS:
             print(f"Actual transition attempt {name}/{partitions}",flush=True)
             precursor='source_resolution_attempt' if args.qualified_fine_history and name=='downstream_child' else PRECURSORS[name]
@@ -101,7 +120,7 @@ def main():
         "stable_subgrid_cavity":"subgrid_void","before_promotion":"subgrid_growth","after_promotion":"geometric_promotion",
         "before_ligament":"resolved_growth","connected_before_downstream":"ligament_rupture",
         "downstream_child_before_continuation":"new_graph_front","zero_drive_connected":"ligament_rupture"}
-    for stage in FROZEN_CASE_REGISTRY["restarts"]:
+    for stage in selected('restarts',FROZEN_CASE_REGISTRY["restarts"]):
         print("Actual restart attempt "+stage,flush=True)
         before=captured.get(restart_labels.get(stage),available if stage=="incomplete_first_hit" else terminal)
         stage_available=restart_labels.get(stage) in captured or stage=="incomplete_first_hit"
@@ -134,7 +153,7 @@ def main():
         "accommodation_limited":((7e-4,0.),1e-7),"embryo_healing":((7e-4,0.),-4e-7),
         "downstream_zero_drive":((7e-4,-1e-5),0.),"delayed_downstream":((7e-4,-1e-5),8e-7),
         "fixed_mesh_oblique":((7e-4,0.),4e-7),"local_remesh_refinement":((7e-4,0.),4e-7)}
-    for case in (() if args.phases_7_8_only else FROZEN_CASE_REGISTRY["controlled"]):
+    for case in selected('controlled',FROZEN_CASE_REGISTRY["controlled"]):
         print("Actual controlled history "+case,flush=True)
         center,opening=specs[case]; local_trace=[]; ops=[]; before=available; after=available; error=None
         path=((0.,0.),(.0005725993004046688,0.))
@@ -199,7 +218,7 @@ def main():
             'growth_interval_duration_s':1e-10 if case in ('diffusion_limited','accommodation_limited') else None},ops,
             actual_preparation_stages=[name for name,_ in local_trace],
             actual_preparation_checkpoints={name:checkpoint(state) for name,state in local_trace},failure=error)
-    for case in (() if args.phases_7_8_only else FROZEN_CASE_REGISTRY["neutrality"]):
+    for case in selected('neutrality',FROZEN_CASE_REGISTRY["neutrality"]):
         print("Actual V12 versus disabled V5 "+case,flush=True)
         base=build_loaded_state(V12_MODEL_ID); disabled=build_loaded_state(V12_MODEL_ID)
         before=disabled; ops=[]; error=None
@@ -218,18 +237,18 @@ def main():
             base_terminal_checkpoint=checkpoint(base),exact_neutrality=fingerprint(base)==fingerprint(disabled),failure=error)
     # Natural seeds: same physical duration, actual source-native stress, RNG,
     # and midpoint restart under all five timestep partitions.
-    for seed in (() if args.phases_7_8_only else NATURAL_SEEDS):
+    for seed in selected('natural',NATURAL_SEEDS):
         for partitions in PARTITIONS:
             print(f'Actual natural lifecycle {seed}/{partitions}',flush=True)
             before,_=build_production_void_state(stochastic=True,seed=seed)
-            after=before; ops=[]; replay_ops=[]; failure=None; elapsed=0.; cache={}
+            after=before; ops=[]; replay_ops=[]; failure=None; elapsed_intervals=[]; cache={}
             # Two half-windows make the restart point physical and common to
             # all partitions, rather than an arbitrary event-index checkpoint.
             for half in range(2):
                 for interval in range(partitions):
                     after,trace,result=advance_production_void_interval(after,NATURAL_WINDOW_S/(2*partitions),
                         config=CFG,refinement_attempt_cache=cache)
-                    ops.extend(trace);elapsed+=result['elapsed_duration_s']
+                    ops.extend(trace);elapsed_intervals.append(result['elapsed_duration_s'])
                     if result['failure'] is not None: failure=result['failure'];break
                 if half==0:
                     midpoint=after; replay=restore_checkpoint(out/checkpoint(midpoint))
@@ -245,13 +264,13 @@ def main():
             record("natural",str(seed),before,after,{"seed":seed,"partition_count":partitions,
                 "duration_s":NATURAL_WINDOW_S,'opening_m':4e-7,'temperature_K':900.,
                 'driver':'advance_production_void_interval','restart_time_s':NATURAL_WINDOW_S/2},ops,
-                elapsed_physical_time_s=elapsed,failure=failure,replay_failure=replay_failure,
+                elapsed_physical_time_s=math.fsum(elapsed_intervals),failure=failure,replay_failure=replay_failure,
                 terminal_measurements=natural_terminal_measurements(after),
                 terminal_classification=phase.value,restarted_operations=replay_ops,
                 midpoint_restart_exact=fingerprint(after)==fingerprint(replay),
                 restarted_terminal_checkpoint=checkpoint(replay))
     # Real rollback injections for stages reachable without unqualified events.
-    for stage in ("field_projection","support_rebuild","equilibrium"):
+    for stage in selected('rollback',("field_projection","support_rebuild","equilibrium")):
         before=captured["subgrid_growth"]; after=before; ops=[]; error=None
         initial_capture=restore_checkpoint(out/checkpoint(before))
         cavity=before.void_state.cavities[0]; hole,_=_geometry(radius_m=cavity.radius_m,center_m=cavity.center_m)
@@ -259,24 +278,26 @@ def main():
         except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
         record("rollback","promotion:"+stage,initial_capture,after,{"failure_stage":stage,'intended_stage_reached':stage in ops},ops,failure=error,
             restored_exactly=fingerprint(initial_capture)==fingerprint(after))
-    for stage in ("graph_edit","remesh","field_projection","support_rebuild","equilibrium","energy_gate",
-                  "connected_surface_certification","dormant_support_rebuild"):
+    for stage in selected('rollback',("graph_edit","remesh","field_projection","support_rebuild","equilibrium","energy_gate",
+                  "connected_surface_certification","dormant_support_rebuild")):
         before=captured["resolved_growth"]; after=before; ops=[]; error=None
         initial_capture=restore_checkpoint(out/checkpoint(before))
         try: after,_=ligament_transaction(before,failure_stage=stage,operation_log=ops)
         except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
         record("rollback","ligament:"+stage,initial_capture,after,{"failure_stage":stage,'intended_stage_reached':stage in ops},ops,failure=error,
             restored_exactly=fingerprint(initial_capture)==fingerprint(after))
-    for stage,before,after,configuration,ops,error,restored in rollback_attempts(captured,terminal,out/'rollback_checkpoint.json'):
+    for stage,before,after,configuration,ops,error,restored in (rollback_attempts(captured,terminal,out/'rollback_checkpoint.json')
+            if args.section in ('all','rollback') else ()):
         print('Actual lifecycle rollback '+stage,flush=True)
         record('rollback','lifecycle:'+stage,before,after,configuration,ops,failure=error,restored_exactly=restored)
     class Sources:
         def __getitem__(self,key): return restore_checkpoint(out/key)
     payload={"schema":SCHEMA,"executed_code_sha":sha,"rows":rows,
              "preparation_failure":preparation_failure,
+             "execution_section":args.section,"shard_index":args.shard_index,"shard_count":args.shard_count,
              "decision":lifecycle_decision(rows,Sources())}
-    if args.phases_7_8_only:
-        payload['schema']='v5.source-resolution-development-phases-7-8/1'
+    if args.phases_7_8_only or args.section!='all':
+        payload['schema']='v5.source-resolution-development-phases-7-8/1' if args.phases_7_8_only else 'v5.source-resolution-lifecycle-shard/1'
         validation={'full_closure_ontology':'NOT_APPLICABLE_PARTIAL_DEVELOPMENT_EXECUTION',
             'transition_count':sum(r['dataset']=='transitions' for r in rows),
             'restart_count':sum(r['dataset']=='restarts' for r in rows),

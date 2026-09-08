@@ -11,7 +11,9 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Actual refined-source positive/rollback peers are now included in pytest.
+    # Wall-clock allowance only; no scientific threshold is changed.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

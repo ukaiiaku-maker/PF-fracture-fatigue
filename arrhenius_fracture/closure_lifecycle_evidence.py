@@ -76,6 +76,7 @@ def load_state(state, opening_m):
 
 def advance_transition(state, name, partitions, *, operations=None, config=CFG):
     """Execute a real stage from its accepted predecessor at a fixed load."""
+    from .canonical_kinetic_time_v1 import exact,packed
     operations = [] if operations is None else operations
     initial = state
     if name in ("birth_hit_1", "birth_hit_2", "stabilization", "healing"):
@@ -84,30 +85,27 @@ def advance_transition(state, name, partitions, *, operations=None, config=CFG):
         clock = site.birth if name.startswith("birth") else getattr(site, name)
         channel = "birth_s" if name.startswith("birth") else name+"_s"
         effective = rates[channel]*(site.candidate_weight if name.startswith("birth") else 1.)
-        total = clock.crossing_time(effective)
-        if not math.isfinite(total): raise RuntimeError("NO_KINETICALLY_ACTIVE_CANDIDATE")
+        total = clock.crossing_time_exact(effective)
+        if total is None: raise RuntimeError("NO_KINETICALLY_ACTIVE_CANDIDATE")
         for part in range(partitions):
-            dt = total/partitions if part+1 < partitions else total-total/partitions*(partitions-1)
-            if part+1 == partitions:
-                current = state.void_state.sites[0]
-                owned = current.birth if name.startswith("birth") else getattr(current,name)
-                # Localize the final real first passage from the remaining
-                # owned clock, not a rounded sum of nominal interval lengths.
-                # The actual duration is recorded for the event-time gate.
-                dt = owned.crossing_time(effective)
+            # All partitions end at the same exact analytic first passage.
+            # Re-rounding a remaining crossing can otherwise integrate a tiny
+            # extra interval into the newly renewed clock in only some peers.
+            dt = total/partitions
             voids, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
             state = replace(state, void_state=voids)
-            operations.append({"api": "advance_site", "duration_s": dt, "rates": rates, "events": list(events)})
+            operations.append({"api": "advance_site", "duration_s": float(dt), "duration_exact_s":packed(dt),
+                "rates": rates, "events": list(events)})
         return equilibrate(state), operations
     if name == "subgrid_growth":
         rates = arrhenius_rates(config, temperature_K=900., stress_tensor_Pa=local_site_tensor(state))
         cavity = state.void_state.cavities[0]
-        total = (5e-5-cavity.radius_m)/(config.radial_growth_scale_m*rates["series_limited_growth_s"])
+        total = exact((5e-5-cavity.radius_m)/(config.radial_growth_scale_m*rates["series_limited_growth_s"]))
         for part in range(partitions):
-            dt = total/partitions if part+1 < partitions else total-total/partitions*(partitions-1)
+            dt = total/partitions
             state = replace(state, void_state=update_cavity_growth(state.void_state, cavity.cavity_id,
                 rates=rates, dt_s=dt, radial_growth_scale_m=config.radial_growth_scale_m))
-            operations.append({"api": "update_cavity_growth", "duration_s": dt, "rates": rates})
+            operations.append({"api": "update_cavity_growth", "duration_s": float(dt), "duration_exact_s":packed(dt), "rates": rates})
         return equilibrate(state), operations
     if name == "promotion":
         cavity = state.void_state.cavities[0]
@@ -413,14 +411,14 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
             # source state, not a caller-authored list of PASS labels.
             from .voiding_lifecycle_driver_v5 import advance_production_void_interval,NATURAL_WINDOW_S
             from .closure_mechanics_evidence import canonical_data
-            replay=before;replayed_ops=[];cache={};actual_time=0.;failure=None
+            replay=before;replayed_ops=[];cache={};accepted_intervals=[];failure=None
             for _ in range(2*row['partition_count']):
                 replay,trace,result=advance_production_void_interval(replay,NATURAL_WINDOW_S/(2*row['partition_count']),
                     config=CFG,refinement_attempt_cache=cache)
-                replayed_ops.extend(trace);actual_time+=result['elapsed_duration_s']
+                replayed_ops.extend(trace);accepted_intervals.append(result['elapsed_duration_s'])
                 if result['failure'] is not None: failure=result['failure'];break
             if (canonical_data(replayed_ops)!=row['actual_operations'] or fingerprint(replay)!=fingerprint(after)
-                or failure!=row['failure'] or actual_time!=row['elapsed_physical_time_s']):
+                or failure!=row['failure'] or math.fsum(accepted_intervals)!=row['elapsed_physical_time_s']):
                 raise ValueError('natural internal-stage independent production replay mismatch')
         if row["dataset"] == "neutrality":
             base=sources[row["base_terminal_checkpoint"]]
@@ -443,7 +441,7 @@ def lifecycle_decision(rows,sources):
     partition=[]
     for row in transitions:
         reference=next(r for r in transitions if r["case_identity"]==row["case_identity"] and r["partition_count"]==1)
-        elapsed=lambda r:sum(float(op.get("duration_s",0.)) for op in r["actual_operations"])
+        elapsed=lambda r:math.fsum(float(op.get("duration_s",0.)) for op in r["actual_operations"])
         duration,reference_duration=elapsed(row),elapsed(reference)
         time_error=abs(duration-reference_duration)/max(abs(reference_duration),1e-300)
         if row["case_identity"] in ("ligament","downstream_child","child_continuation"):

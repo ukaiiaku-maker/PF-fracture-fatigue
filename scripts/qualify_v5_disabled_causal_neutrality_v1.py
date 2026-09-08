@@ -136,6 +136,10 @@ def main():
         equal = len(first['raw_states']) == len(second['raw_states']) == 4 and all(x[0] == y[0] for x, y in pairs)
         history_equal = len(first['history']) == len(second['history']) == 3 and first['history'] == second['history']
         rows.append({'case_id': first['case_id'], 'causal_states_exact': equal, 'histories_exact': history_equal,
+            'observed_causal_states_exact':bool(pairs) and len(first['raw_states'])==len(second['raw_states'])
+                and all(x[0]==y[0] for x,y in pairs),
+            'observed_histories_exact':bool(first['history']) and first['history']==second['history'],
+            'observed_future_event_counts':[len(first['history']),len(second['history'])],
             'causal_fingerprints': [(hash_value(x[0]), hash_value(y[0])) for x, y in pairs],
             'separate_audit_provenance': [(x[1], y[1]) for x, y in pairs],
             'raw_differences': differences(first['terminal_components'], second['terminal_components']),

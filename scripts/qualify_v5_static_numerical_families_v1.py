@@ -17,13 +17,19 @@ from qualify_cavity_boundary_patch_recovery_v1 import recover_arcs
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('output',type=Path)
-    parser.add_argument('--sentinel',action='store_true'); args = parser.parse_args()
+    parser.add_argument('--sentinel',action='store_true')
+    parser.add_argument('--shard-index',type=int,default=0)
+    parser.add_argument('--shard-count',type=int,default=1)
+    args = parser.parse_args()
+    if not 0<=args.shard_index<args.shard_count:raise ValueError('invalid static shard')
+    if args.sentinel and args.shard_count!=1:raise ValueError('sentinel cannot be sharded')
     if args.output.exists(): raise ValueError('refusing to overwrite evidence')
     status = subprocess.check_output(('git','status','--porcelain'),cwd=ROOT,text=True)
     if status.strip() and not args.sentinel: raise ValueError('full static qualification requires clean committed code')
     sha = subprocess.check_output(('git','rev-parse','HEAD'),cwd=ROOT,text=True).strip()
     groups = {'centered:{mesh}':GROUPS['centered:{mesh}']} if args.sentinel else GROUPS
     selected = {key for levels in groups.values() for key in levels.values()}
+    selected = {key for i,key in enumerate(sorted(selected)) if i%args.shard_count==args.shard_index}
     (args.output/'sources').mkdir(parents=True); rows = {}
     for key,cfg in REGISTRY.items():
         if key not in selected: continue
@@ -39,8 +45,10 @@ def main():
         except Exception as exc: row['failure']={'type':type(exc).__name__,'message':str(exc)}
         rows[key]=row
         (args.output/(key+'.json')).write_text(json.dumps(canonical_data(row),sort_keys=True,indent=2,allow_nan=False)+'\n')
+    decision=classify(rows,groups) if args.shard_count==1 else {'passed':False,'classification':'INCOMPLETE_SHARD_REQUIRES_FULL_REGISTRY_ASSEMBLY'}
     result={'schema':SCHEMA,'executed_code_sha':sha,'worktree_status':status,'sentinel_only':args.sentinel,
-        'groups':groups,'rows':rows,'decision':classify(rows,groups), 'historical_v3_predicates':'UNCHANGED_RETAINED_683_OF_791'}
+        'shard_index':args.shard_index,'shard_count':args.shard_count,
+        'groups':groups,'rows':rows,'decision':decision, 'historical_v3_predicates':'UNCHANGED_RETAINED_683_OF_791'}
     (args.output/'report.json').write_text(json.dumps(canonical_data(result),sort_keys=True,indent=2,allow_nan=False)+'\n')
     (args.output/'sha256_manifest.json').write_text(json.dumps({str(p.relative_to(args.output)):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(args.output.rglob('*')) if p.is_file()},sort_keys=True,indent=2)+'\n')

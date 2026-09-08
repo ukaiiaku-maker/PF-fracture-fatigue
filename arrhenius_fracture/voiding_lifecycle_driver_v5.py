@@ -47,7 +47,7 @@ def advance_production_void_interval(state,dt_s,*,temperature_K=900.,config=None
             'production_time_s':physical_clock.seconds(), 'canonical_accepted_time_v1':physical_clock})
         from .closure_lifecycle_evidence import conservation,stagewise_topology
         from .topology_transaction_v11 import complete_accepted_state_fingerprint
-        operations.append({**operation,'duration_s':step,'physical_time_s':initial_time+elapsed,
+        operations.append({**operation,'duration_s':step,'physical_time_s':physical_clock.seconds(),
             'temperature_K':temperature_K,'accepted_pre_interval_fingerprint':complete_accepted_state_fingerprint(previous),
             'accepted_post_interval_fingerprint':complete_accepted_state_fingerprint(accepted),
             'stagewise_conservation':conservation(accepted,previous),'stagewise_topology':stagewise_topology(accepted)})

@@ -26,6 +26,7 @@ def main():
     if actual != expected: raise ValueError('trusted source inventory/hash mismatch')
     state = restore_checkpoint(source/f'checkpoints/production_{args.segments}_{args.layers}_connected.json')
     original = fingerprint(state); output.mkdir(parents=True)
+    write_checkpoint(state,output/'initial_unqualified_state.json',compression='gzip')
     report = {'schema': 'v5.source-resolution-positive-sentinel/1',
         'executed_code_sha': subprocess.check_output(('git', 'rev-parse', 'HEAD'), cwd=ROOT, text=True).strip(),
         'worktree_status': subprocess.check_output(('git', 'status', '--short'), cwd=ROOT, text=True),
@@ -35,6 +36,7 @@ def main():
         (output/'result.json').write_text(json.dumps(canonical_data(report), sort_keys=True, indent=2, allow_nan=False)+'\n')
     print('Actual unqualified negative-control event attempt', flush=True)
     negative, event, operations, audit = downstream_front_transaction(state)
+    write_checkpoint(negative,output/'negative_guarded_state.json',compression='gzip')
     report['negative'] = {'full_state_unchanged': fingerprint(negative) == original,
         'event_created': event is not None, 'operations': operations, 'source_audit': audit}
     retain()

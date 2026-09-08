@@ -1,5 +1,15 @@
 # Source-resolution development findings (nonterminal)
 
+At clean a34cdf0, the disabled causal comparison has exact observed causal
+states and event histories in all four cases, but its full prospective future
+sequence still fails. Monotonic, restart and unload/reload cases reach two real
+matching events, then both candidate-plane openings become negative (the
+monotonic case measures about -40.98 and -222.20 MPa). The oblique case reaches
+one matching event and then both implementations reject active-tip leakage.
+These are not changed-mechanics differences or grounds to force a next event.
+Raw historical identity remains FAIL; full future-sequence qualification remains
+FAIL, with observed-prefix equality reported separately.
+
 The preserved c4fbd2f V3 result remains COMPLETE_BUT_BLOCKED. Development has
 located all 19 fine-source global-quality failures in unchanged triangles near
 the old crack tip, roughly 182–183 micrometres from the cavity source. The
