@@ -1,0 +1,26 @@
+{
+  "schema": "v5.development-cross-runtime-reconstruction-diagnostic/1",
+  "record_kind": "READ_ONLY_RECONSTRUCTION_NOT_NEW_PHYSICAL_EXECUTION",
+  "source_workflow_run_id": 34185389845,
+  "source_sha": "787ebf692a8d5058050553f4160b78af062f1d48",
+  "source_shard": 2,
+  "case": "between_birth_hits",
+  "local_python": "3.12.13",
+  "local_numpy": "2.5.1",
+  "local_scipy": "1.18.0",
+  "strict_topology_record_reconstruction": "FAIL",
+  "recorded_topology_predicate": true,
+  "reconstructed_topology_predicate": true,
+  "complete_checkpoint_fingerprints_exact": true,
+  "conservation_reconstructed_exact": true,
+  "difference_count": 2,
+  "different_paths": [
+    "/actual_component_incidence/independent_intact_path_certificate/edge_cut_certificates/0/h_local_median_m",
+    "/independent_cut/edge_cut_certificates/0/h_local_median_m"
+  ],
+  "recorded_value_m": 1.3021257146667747e-7,
+  "local_reconstructed_value_m": 1.3021257146671744e-7,
+  "cause": "NOT_ASSUMED_PROVEN_FROM_VERSION_DIFFERENCE_ALONE",
+  "next_required_check": "STRICT_LINUX_RECONSTRUCTION_UNDER_RECORDED_NUMERICAL_RUNTIME",
+  "comparison_tolerance_relaxed": false
+}
