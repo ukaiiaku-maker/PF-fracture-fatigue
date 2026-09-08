@@ -107,7 +107,12 @@ def test_zero_drive_preserves_complete_candidate_provenance(connected):
     assert state.competition == connected.competition
     assert state.rng_state == connected.rng_state
     assert state.junction_process_state["active_event_source"] == connected.junction_process_state["active_event_source"]
-    assert state.junction_process_state["production_time_s"] == connected.junction_process_state["production_time_s"]+1.
+    from arrhenius_fracture.canonical_kinetic_time_v1 import AcceptedTime
+    before=connected.junction_process_state.get('canonical_accepted_time_v1',
+        AcceptedTime.from_seconds(connected.junction_process_state['production_time_s']))
+    after=state.junction_process_state['canonical_accepted_time_v1']
+    assert after.seconds_exact()-before.seconds_exact()==1
+    assert state.junction_process_state['production_time_s']==after.seconds()
     assert all(r["instantaneous_status"] == "ZERO_DOWNSTREAM_DRIVE" for r in audit)
 
 

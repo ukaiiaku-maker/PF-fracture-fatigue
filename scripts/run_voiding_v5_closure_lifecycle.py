@@ -41,18 +41,30 @@ def write_json(path,payload):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument("output",type=Path)
+    parser.add_argument('--qualified-fine-history',action='store_true',
+        help='Execute source-qualified 512/192 transition/restart histories; natural window/seed registry stays unchanged')
+    parser.add_argument('--phases-7-8-only',action='store_true',
+        help='Development execution of all transitions, restarts and rollback; not a full closure campaign')
     args=parser.parse_args(); out=args.output
     if out.exists() and any(out.iterdir()): raise ValueError("refusing to overwrite evidence")
     if subprocess.check_output(("git","status","--porcelain"),cwd=ROOT,text=True).strip():
         raise RuntimeError("lifecycle evidence requires a clean committed implementation")
     sha=subprocess.check_output(("git","rev-parse","HEAD"),cwd=ROOT,text=True).strip()
     rows=[]; trace=[]
-    terminal,trajectory_history=deterministic_trajectory(state_trace=trace)
+    fine_options = dict(boundary_segments=512,radial_layers=192,
+        crack_path_m=((0.,0.),(.0005725993004046688,0.)),qualify_source=True) if args.qualified_fine_history else {}
+    preparation_failure=None
+    try:
+        terminal,trajectory_history=deterministic_trajectory(state_trace=trace,**fine_options)
+    except Exception as exc:
+        if not trace: raise
+        terminal=trace[-1][1]; trajectory_history=[]
+        preparation_failure={'type':type(exc).__name__,'message':str(exc)}
     captured=dict(trace); available=captured["available_site"]
     captured['healing_peer'],healing_preparation=build_healing_predecessor()
     def checkpoint(state):
         relative="checkpoints/"+fingerprint(state)+".json"
-        if not (out/relative).exists(): write_checkpoint(state,out/relative)
+        if not (out/relative).exists(): write_checkpoint(state,out/relative,compression='gzip' if args.qualified_fine_history else None)
         return relative
     def record(dataset,case,before,after,configuration,operations,**extra):
         cfg=canonical_data(configuration)
@@ -72,7 +84,8 @@ def main():
     for name in FROZEN_CASE_REGISTRY["transitions"]:
         for partitions in PARTITIONS:
             print(f"Actual transition attempt {name}/{partitions}",flush=True)
-            precursor=PRECURSORS[name]; before=captured.get(precursor,terminal)
+            precursor='source_resolution_attempt' if args.qualified_fine_history and name=='downstream_child' else PRECURSORS[name]
+            before=captured.get(precursor,terminal)
             initial_capture=restore_checkpoint(out/checkpoint(before))
             after=before; operations=[]; error=None
             try: after,_=advance_transition(before,name,partitions,operations=operations)
@@ -121,7 +134,7 @@ def main():
         "accommodation_limited":((7e-4,0.),1e-7),"embryo_healing":((7e-4,0.),-4e-7),
         "downstream_zero_drive":((7e-4,-1e-5),0.),"delayed_downstream":((7e-4,-1e-5),8e-7),
         "fixed_mesh_oblique":((7e-4,0.),4e-7),"local_remesh_refinement":((7e-4,0.),4e-7)}
-    for case in FROZEN_CASE_REGISTRY["controlled"]:
+    for case in (() if args.phases_7_8_only else FROZEN_CASE_REGISTRY["controlled"]):
         print("Actual controlled history "+case,flush=True)
         center,opening=specs[case]; local_trace=[]; ops=[]; before=available; after=available; error=None
         path=((0.,0.),(.0005725993004046688,0.))
@@ -133,7 +146,9 @@ def main():
             angle=30. if case=="fixed_mesh_oblique" else 0.
             if case!='embryo_healing':
                 before,_=deterministic_trajectory(stop_before_ligament=True,cavity_center_m=center,
-                    crack_path_m=path,cleavage_theta_deg=angle,state_trace=local_trace)
+                    crack_path_m=path,cleavage_theta_deg=angle,state_trace=local_trace,
+                    boundary_segments=512 if args.qualified_fine_history and case!='local_remesh_refinement' else 32,
+                    radial_layers=192 if args.qualified_fine_history and case!='local_remesh_refinement' else 12)
             if case=="embryo_healing":
                 before,preparation=build_healing_predecessor();ops.extend(preparation)
                 path=before.crack_network.branches[0].path
@@ -176,13 +191,15 @@ def main():
             'seed':CONTROLLED_HEALING_SEED if case=='embryo_healing' else 3621,
             'remesh_boundary_segments':64 if case=='local_remesh_refinement' else 32,
             'remesh_radial_layers':24 if case=='local_remesh_refinement' else 12,
+            'preparation_boundary_segments':512 if args.qualified_fine_history and case not in ('local_remesh_refinement','embryo_healing') else 32,
+            'preparation_radial_layers':192 if args.qualified_fine_history and case not in ('local_remesh_refinement','embryo_healing') else 12,
             'accepted_opening_history_m':([4e-7,0.,opening] if case=='delayed_downstream'
                 else [4e-7,0.] if case=='downstream_zero_drive' else [4e-7,opening]),
             'growth_interval_count':8 if case in ('diffusion_limited','accommodation_limited') else None,
             'growth_interval_duration_s':1e-10 if case in ('diffusion_limited','accommodation_limited') else None},ops,
             actual_preparation_stages=[name for name,_ in local_trace],
             actual_preparation_checkpoints={name:checkpoint(state) for name,state in local_trace},failure=error)
-    for case in FROZEN_CASE_REGISTRY["neutrality"]:
+    for case in (() if args.phases_7_8_only else FROZEN_CASE_REGISTRY["neutrality"]):
         print("Actual V12 versus disabled V5 "+case,flush=True)
         base=build_loaded_state(V12_MODEL_ID); disabled=build_loaded_state(V12_MODEL_ID)
         before=disabled; ops=[]; error=None
@@ -201,7 +218,7 @@ def main():
             base_terminal_checkpoint=checkpoint(base),exact_neutrality=fingerprint(base)==fingerprint(disabled),failure=error)
     # Natural seeds: same physical duration, actual source-native stress, RNG,
     # and midpoint restart under all five timestep partitions.
-    for seed in NATURAL_SEEDS:
+    for seed in (() if args.phases_7_8_only else NATURAL_SEEDS):
         for partitions in PARTITIONS:
             print(f'Actual natural lifecycle {seed}/{partitions}',flush=True)
             before,_=build_production_void_state(stochastic=True,seed=seed)
@@ -256,8 +273,16 @@ def main():
     class Sources:
         def __getitem__(self,key): return restore_checkpoint(out/key)
     payload={"schema":SCHEMA,"executed_code_sha":sha,"rows":rows,
+             "preparation_failure":preparation_failure,
              "decision":lifecycle_decision(rows,Sources())}
-    validation=validate_closure_evidence(payload,Sources(),executed_code_sha=sha)
+    if args.phases_7_8_only:
+        payload['schema']='v5.source-resolution-development-phases-7-8/1'
+        validation={'full_closure_ontology':'NOT_APPLICABLE_PARTIAL_DEVELOPMENT_EXECUTION',
+            'transition_count':sum(r['dataset']=='transitions' for r in rows),
+            'restart_count':sum(r['dataset']=='restarts' for r in rows),
+            'rollback_count':sum(r['dataset']=='rollback' for r in rows)}
+    else:
+        validation=validate_closure_evidence(payload,Sources(),executed_code_sha=sha)
     write_json(out/"lifecycle_rows.json",payload); write_json(out/"ontology_validation.json",validation)
     write_json(out/"sha256_manifest.json",{str(p.relative_to(out)):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(out.rglob("*")) if p.is_file()})

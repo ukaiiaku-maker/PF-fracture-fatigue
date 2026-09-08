@@ -265,6 +265,7 @@ def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
         ),
         {"retained": 4.0, "mobile": 1.0}, {
             "source_state": {"density": 3.0, "clock": 0.125},
+            "production_mesh_resolution": (int(boundary_segments), int(radial_layers)),
             "boundary_terminal_context": _external_free_root_context(mesh, filled.boundary, start),
         },
         {"emission_work": 1.0}, np.random.default_rng(seed).bit_generator.state,
@@ -1795,6 +1796,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             failure_injector=inject, refinement_levels=1,
             prepare_support_state=_refresh_downstream_boundary_context,
         )
+        inject('downstream_child_support_rebuild', realized)
         cavity = realized.void_state.cavities[0]
         updated = replace(cavity, phase=VoidPhase.DOWNSTREAM_FRONT_ACTIVE,
                           lineage=cavity.lineage + (("CONTINUED_EVENT" if continuation else "DOWNSTREAM_FIRST_PASSAGE"),))
@@ -1915,7 +1917,8 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
 
 def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0),
                              crack_path_m=None, cleavage_theta_deg=0.0,
-                             state_trace=None, boundary_segments=32, radial_layers=12):
+                             state_trace=None, boundary_segments=32, radial_layers=12,
+                             qualify_source=False):
     state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m,
                                               crack_path_m=crack_path_m,
                                               cleavage_theta_deg=cleavage_theta_deg,
@@ -1983,6 +1986,11 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
         "event_classification": "physical_cleavage",
     })
     capture("ligament_rupture")
+    if qualify_source:
+        state, source_audit = refine_downstream_source(state, max_refinement_levels=1,
+            refinement_region='complete_cavity_ring', quality_improvement='constrained_v1')
+        rows.append({**observables(state, 'source_resolution_attempt'), 'source_resolution_audit':source_audit})
+        capture('source_resolution_attempt')
     rows.append(observables(state, "connected_topology"))
     tensor, boundary_elements = cavity_boundary_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)

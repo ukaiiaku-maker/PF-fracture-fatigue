@@ -16,6 +16,8 @@ ROLLBACK_STAGES=(
     'equilibrium','resolved_growth_remesh','ligament_hazard_completion','ligament_graph_edit',
     'cavity_connection','downstream_source_refinement','downstream_threshold_completion',
     'child_creation','child_support_rebuild','child_tip_continuation','checkpoint_write',
+    'source_quality_geometry','source_quality_field_transfer','source_quality_support_rebuild',
+    'source_quality_equilibrium','source_quality_acceptance','source_qualification',
 )
 
 
@@ -59,7 +61,8 @@ def rollback_attempts(captured,terminal,checkpoint_path):
             elif stage in ('explicit_cavity_creation','promotion_remesh','field_transfer','equilibrium','resolved_growth_remesh'):
                 before=captured['geometric_promotion' if stage=='resolved_growth_remesh' else 'subgrid_growth']
                 cavity=before.void_state.cavities[0];identity=fingerprint(before)
-                hole,_=_geometry(radius_m=cavity.radius_m,center_m=cavity.center_m)
+                n,layers=before.junction_process_state.get('production_mesh_resolution',(32,12))
+                hole,_=_geometry(radius_m=cavity.radius_m,center_m=cavity.center_m,boundary_segments=n,radial_layers=layers)
                 hole=_grow_hole_boundary(hole,cavity.radius_m,crack_path_m=before.crack_network.branches[0].path)
                 hook={'promotion_remesh':'remesh','field_transfer':'field_projection','resolved_growth_remesh':'remesh'}.get(stage,stage)
                 voids=before.void_state
@@ -69,9 +72,13 @@ def rollback_attempts(captured,terminal,checkpoint_path):
                 before=captured['resolved_growth'];identity=fingerprint(before)
                 hook={'ligament_graph_edit':'graph_edit','cavity_connection':'connected_surface_certification'}.get(stage,stage)
                 ligament_transaction(before,failure_stage=hook,operation_log=ops)
-            elif stage=='downstream_source_refinement':
+            elif stage.startswith('source_quality_'):
+                from .source_quality_transaction_v1 import repair_connected_quality
+                repair_connected_quality(before,failure_stage=stage,operation_log=ops)
+            elif stage in ('downstream_source_refinement','source_qualification'):
                 identity=fingerprint(before)
-                refine_downstream_source(before,max_refinement_levels=1,failure_stage=hook,operation_log=ops)
+                refine_downstream_source(before,max_refinement_levels=1,failure_stage=hook,operation_log=ops,
+                    refinement_region='complete_cavity_ring',quality_improvement='constrained_v1')
             elif stage=='checkpoint_write':
                 before=captured['available_site'];identity=fingerprint(before)
                 write_checkpoint(before,checkpoint_path)
@@ -79,9 +86,10 @@ def rollback_attempts(captured,terminal,checkpoint_path):
                     checkpoint_path,failure_injector=inject)
             else:
                 if stage=='child_tip_continuation': before=captured.get('new_graph_front',terminal)
+                else: before=captured.get('source_resolution_attempt',before)
                 identity=fingerprint(before)
                 hook={'downstream_threshold_completion':'downstream_threshold_completion','child_creation':'downstream_child_activation',
-                    'child_support_rebuild':'support_rebuild','child_tip_continuation':'graph_edit'}[stage]
+                    'child_support_rebuild':'downstream_child_support_rebuild','child_tip_continuation':'graph_edit'}[stage]
                 downstream_front_transaction(before,continuation=stage=='child_tip_continuation',failure_stage=hook,operation_log=ops)
         except Exception as exc: error={'type':type(exc).__name__,'message':str(exc)}
         after=before

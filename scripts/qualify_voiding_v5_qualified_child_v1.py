@@ -34,7 +34,7 @@ def main():
     original_prepare = p._refresh_downstream_boundary_context
     def observe(trial):
         prepared = original_prepare(trial)
-        write_checkpoint(prepared, args.output/'UNACCEPTED_support_trial.json')
+        write_checkpoint(prepared, args.output/'UNACCEPTED_support_trial.json',compression='gzip')
         report['unaccepted_trial_retained'] = True; retain()
         return prepared
     try:
@@ -45,7 +45,7 @@ def main():
             result_fingerprint=fingerprint(after), conservation=conservation(after, before),
             topology=stagewise_topology(after), active_graph_tips=after.crack_network.active_tip_ids,
             active_support_tips=after.v12_support_state.active_tip_identities)
-        write_checkpoint(after, args.output/'accepted_or_preserved_state.json')
+        write_checkpoint(after, args.output/'accepted_or_preserved_state.json',compression='gzip')
     except Exception as exc:
         report.update(accepted=False, failure={'type': type(exc).__name__, 'message': str(exc)})
     report['caller_unchanged'] = fingerprint(before) == original; retain()

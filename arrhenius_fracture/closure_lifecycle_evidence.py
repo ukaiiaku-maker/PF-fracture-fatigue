@@ -23,7 +23,7 @@ from .voiding_v5 import (
     update_cavity_growth, promote_cavity,
 )
 
-SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/4"
+SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/5"
 PARTITIONS = (1,2,4,8,16)
 CFG = VoidingConfig(enabled=True, promotion_radius_m=5e-5)
 PRECURSORS = {"birth_hit_1": "available_site", "birth_hit_2": "multi_hit_1",
@@ -112,7 +112,9 @@ def advance_transition(state, name, partitions, *, operations=None, config=CFG):
     if name == "promotion":
         cavity = state.void_state.cavities[0]
         voids = promote_cavity(state.void_state, cavity.cavity_id, config.promotion_radius_m)
-        hole, _ = _geometry(radius_m=cavity.radius_m, center_m=cavity.center_m)
+        n,layers = state.junction_process_state.get('production_mesh_resolution',(32,12))
+        hole, _ = _geometry(radius_m=cavity.radius_m, center_m=cavity.center_m,
+                            boundary_segments=n,radial_layers=layers)
         hole = _grow_hole_boundary(hole, cavity.radius_m, crack_path_m=state.crack_network.branches[0].path)
         trace = []
         state = remesh_cavity(state, hole, voids, "promotion", trace)
@@ -137,13 +139,48 @@ def advance_transition(state, name, partitions, *, operations=None, config=CFG):
         operations.append({"api":"ligament_transaction", "accepted":trial.accepted,"operations":trace})
         return state, operations
     if name in ("downstream_child", "child_continuation"):
-        from .voiding_lifecycle_driver_v5 import advance_production_void_interval,NATURAL_WINDOW_S
-        cache={}
-        for _ in range(partitions):
-            state,trace,result=advance_production_void_interval(state,NATURAL_WINDOW_S/partitions,
-                config=config,refinement_attempt_cache=cache)
-            operations.extend(trace)
-            if result['failure'] is not None: raise RuntimeError(result['failure']['message'])
+        # Transition partition qualification localizes a real first passage;
+        # the independently frozen natural ensemble still has its 16 us limit.
+        # Long physical waiting times are reported, never labeled rapid events.
+        from .voiding_production_v5 import _qualified_cavity_source,refine_downstream_source
+        continuation = name == 'child_continuation'
+        if continuation:
+            if not state.crack_network.active_tip_ids: raise RuntimeError('NO_ACTIVE_DOWNSTREAM_CHILD')
+            child = state.crack_network.branch(state.crack_network.active_tip_ids[0])
+            tensor,ids = crack_tip_tensor(state,branch_id=child.branch_id)
+            source = dict(source_kind='sharp_front',source_front_id=child.branch_id,source_position_m=child.tip,
+                source_probe_identity={'kind':'child_crack_tip_tensor','element_ids':list(ids)})
+        else:
+            cavity = state.void_state.cavities[0]
+            node = int(np.argmin(np.linalg.norm(state.mesh.nodes-np.asarray(cavity.connection_exit_m),axis=1)))
+            tensor,ids = cavity_boundary_tensor(state,boundary_node=node)
+            if not any(row['effective_rate_s'] > 0 for row in directional_clock_rates(state,tensor)):
+                from .voiding_lifecycle_driver_v5 import NATURAL_WINDOW_S
+                state,audit = _complete_next_clock(state,tensor,source_kind='cavity_surface',
+                    maximum_advance_duration_s=NATURAL_WINDOW_S)
+                operations.append({'api':'zero_drive_connected_interval','duration_s':NATURAL_WINDOW_S,
+                    'audit':audit,'accepted':False})
+                return state,operations
+            if not _qualified_cavity_source(state,tensor):
+                state,audit = refine_downstream_source(state,max_refinement_levels=1,
+                    refinement_region='complete_cavity_ring',quality_improvement='constrained_v1')
+                operations.append({'api':'refine_downstream_source','audit':audit,'duration_s':0.})
+                node = int(np.argmin(np.linalg.norm(state.mesh.nodes-np.asarray(cavity.connection_exit_m),axis=1)))
+                tensor,ids = cavity_boundary_tensor(state,boundary_node=node)
+            if not _qualified_cavity_source(state,tensor): raise RuntimeError('UNQUALIFIED_CAVITY_SOURCE_TENSOR')
+            source = dict(source_kind='cavity_surface',source_cavity_id=cavity.cavity_id,source_boundary_site_id='connection_exit',
+                source_position_m=cavity.connection_exit_m,source_probe_identity={'kind':'direct_cavity_boundary_tensor',
+                    'boundary_node_id':node,'element_ids':list(ids)})
+        total = min(row['crossing_time_s'] for row in directional_clock_rates(state,tensor))
+        if not math.isfinite(total): raise RuntimeError('NO_KINETICALLY_ACTIVE_CANDIDATE')
+        for _ in range(partitions-1):
+            state,audit = _complete_next_clock(state,tensor,maximum_advance_duration_s=total/partitions,**source)
+            if any(row['winner'] for row in audit): raise RuntimeError('EARLY_PARTITION_THRESHOLD_COMPLETION')
+            operations.append({'api':'source_owned_hazard_interval','duration_s':audit[0]['common_advance_duration_s'],'audit':audit})
+        state,result,trace,audit = downstream_front_transaction(state,continuation=continuation)
+        operations.append({'api':'child_tip_continuation' if continuation else 'downstream_front_transaction',
+            'duration_s':audit['cleavage'][0]['common_advance_duration_s'],'operations':trace,'audit':audit,
+            'accepted':result is not None and result.accepted})
         return state, operations
     raise ValueError(name)
 
@@ -272,7 +309,8 @@ def resume_to_guard(state, operations):
         state,_ = advance_transition(state,"promotion",1,operations=operations)
     cavity = state.void_state.cavities[0]
     if cavity.phase == VoidPhase.RESOLVED_VOID and cavity.radius_m < 5.5e-5:
-        hole,_ = _geometry(radius_m=cavity.radius_m,center_m=cavity.center_m)
+        n,layers = state.junction_process_state.get('production_mesh_resolution',(32,12))
+        hole,_ = _geometry(radius_m=cavity.radius_m,center_m=cavity.center_m,boundary_segments=n,radial_layers=layers)
         hole = _grow_hole_boundary(hole,5.5e-5,crack_path_m=state.crack_network.branches[0].path)
         rates = arrhenius_rates(CFG,temperature_K=900.,stress_tensor_Pa=cavity_boundary_tensor(state)[0])
         dt = (5.5e-5-cavity.radius_m)/(CFG.radial_growth_scale_m*rates["series_limited_growth_s"])

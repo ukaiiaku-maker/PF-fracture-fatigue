@@ -289,11 +289,15 @@ def _path(adjacency,starts,targets):
     while hit is not None: result.append(hit); hit=parent[hit]
     return tuple(reversed(result))
 
-def _external_boundary_edges(mesh):
+def _mesh_edge_owners(mesh):
     owners={}
     for eid,element in enumerate(mesh.elems):
         for a,b in ((element[0],element[1]),(element[1],element[2]),(element[2],element[0])):
             owners.setdefault(tuple(sorted((int(a),int(b)))),[]).append(eid)
+    return owners
+
+def _external_boundary_edges(mesh):
+    owners=_mesh_edge_owners(mesh)
     return np.asarray([edge for edge,value in owners.items() if len(value)==1],int)
 
 def selected_support_components(mesh,selected,*,shared_nodes):
@@ -402,7 +406,9 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
     it only consumes the final selected element IDs, geometry, and crack graph.
     """
     selected=set(map(int,np.asarray(selected,int))); cent=np.mean(mesh.nodes[mesh.elems],axis=1)
-    paths=[]; positive_components=set(); negative_components=set(); edge_certificates=[]; insufficient=[]; boundary_edges=_external_boundary_edges(mesh)
+    paths=[]; positive_components=set(); negative_components=set(); edge_certificates=[]; insufficient=[]
+    boundary_owners=_mesh_edge_owners(mesh)
+    boundary_edges=np.asarray([edge for edge,owners in boundary_owners.items() if len(owners)==1],int)
     boundary_terminal_audits=[]; contexts=dict(boundary_terminal_context or {})
     arcs=certification_arcs(network,tolerance) if arcs is None else arcs
     for p0,p1,arc_id in arcs:
@@ -476,10 +482,10 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
             incident_tangent=tangent if endpoint_name=="start" else -tangent
             solid_side=[]
             for edge in exact_edges:
-                owners=np.flatnonzero(np.sum(np.isin(mesh.elems,edge),axis=1)==2)
+                owners=boundary_owners[tuple(sorted(edge))]
                 midpoint=np.mean(mesh.nodes[list(edge)],axis=0)
                 for owner in owners:
-                    centroid=np.mean(mesh.nodes[mesh.elems[int(owner)]],axis=0)
+                    centroid=cent[int(owner)]
                     solid_side.append(float(incident_tangent@(centroid-midpoint)))
             tangent_enters=bool(solid_side and max(solid_side)>tolerance)
             valid=bool(endpoint is not None and declared_endpoint_ok and role_ok and not active_prohibited and kind_ok and identity_ok

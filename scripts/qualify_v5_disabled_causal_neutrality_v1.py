@@ -77,7 +77,12 @@ def worker(repository, output, mode):
         pending = state.competition.pending_events
         if not pending: raise RuntimeError('NO_ACTUAL_FUTURE_THRESHOLD_COMPLETION')
         candidate = candidates[pending[0].candidate_id]
-        endpoint = tuple(tip+25e-6*np.asarray(candidate.direction_xy))
+        direction = np.asarray(candidate.direction_xy); normal = np.asarray((-direction[1],direction[0]))
+        offset = state.mesh.nodes-tip; axial = offset@direction
+        eligible = np.flatnonzero((np.abs(offset@normal) <= 1e-12)&(axial > 1e-8)
+            &(state.mesh.nodes[:,0] < 1e-3-1e-12)&(np.abs(state.mesh.nodes[:,1]) < 5e-4-1e-12))
+        if not len(eligible): raise RuntimeError('NO_MESH_ALIGNED_FUTURE_DIRECTION_ENDPOINT')
+        endpoint = tuple(state.mesh.nodes[int(eligible[np.argmin(np.abs(axial[eligible]-25e-6))])])
         after, audit = event(state, endpoint, transaction_identity='causal-future:'+str(index))
         return after, {'candidate_id': candidate.candidate_id, 'event_ids': [e.event_id for e in pending],
             'source_tensor_Pa': tensor.tolist(), 'source_element_id': eid, 'rates': rates, 'duration_s': dt,

@@ -44,7 +44,7 @@ def main():
             refinement_region='complete_cavity_ring', quality_improvement='constrained_v1')
         report['qualification'] = proof; report['qualified'] = proof['status'] == 'SOURCE_TENSOR_QUALIFIED'
         report['preexisting_clocks_preserved'] = qualified.competition == state.competition and qualified.rng_state == state.rng_state
-        write_checkpoint(qualified, output/'qualified_or_preserved_state.json'); retain()
+        write_checkpoint(qualified, output/'qualified_or_preserved_state.json',compression='gzip'); retain()
         if report['qualified']:
             print('Attempting real downstream first passage and child transaction', flush=True)
             child, event, operations, audit = downstream_front_transaction(qualified)
@@ -52,14 +52,14 @@ def main():
                 'operations': operations, 'fingerprint': fingerprint(child), 'active_graph_tips': child.crack_network.active_tip_ids,
                 'active_support_tips': child.v12_support_state.active_tip_identities,
                 'conservation': conservation(child, qualified), 'topology': stagewise_topology(child)}
-            write_checkpoint(child, output/'child_or_rejected_state.json'); retain()
+            write_checkpoint(child, output/'child_or_rejected_state.json',compression='gzip'); retain()
             if report['child']['accepted']:
                 print('Attempting ordinary child-tip continuation', flush=True)
                 continued, event, operations, audit = downstream_front_transaction(child, continuation=True)
                 report['continuation'] = {'accepted': event is not None and event.accepted,
                     'operations': operations, 'source_audit': audit, 'fingerprint': fingerprint(continued),
                     'conservation': conservation(continued, child), 'topology': stagewise_topology(continued)}
-                write_checkpoint(continued, output/'continued_or_rejected_state.json')
+                write_checkpoint(continued, output/'continued_or_rejected_state.json',compression='gzip')
     except Exception as exc:
         report['failure'] = {'type': type(exc).__name__, 'message': str(exc)}
     report['original_caller_unchanged'] = fingerprint(state) == original

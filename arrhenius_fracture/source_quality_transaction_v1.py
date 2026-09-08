@@ -44,7 +44,7 @@ def source_transfer_budget(current, previous, current_tensor, previous_tensor, *
         'positive_candidate_exists': any(r['positive'] for r in rows)}
 
 
-def repair_connected_quality(state, *, strategy='flips', failure_stage=None):
+def repair_connected_quality(state, *, strategy='flips', failure_stage=None, operation_log=None):
     """Isolated state transfer/support/equilibrium trial with frozen checks."""
     from . import voiding_production_v5 as p
     from .closure_lifecycle_evidence import conservation, stagewise_topology
@@ -55,7 +55,7 @@ def repair_connected_quality(state, *, strategy='flips', failure_stage=None):
     before = p.observables(state, 'quality_repair_before'); old_metrics = p.cavity_source_resolution_metrics(state)
     fixed, edges = production_geometry_constraints(state)
     mesh, geometry = constrained_quality_mesh(state.mesh, fixed_nodes=fixed, protected_edges=edges, strategy=strategy)
-    operations = []
+    operations = [] if operation_log is None else operation_log
     def inject(stage):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError('injected:'+stage)
@@ -80,12 +80,14 @@ def repair_connected_quality(state, *, strategy='flips', failure_stage=None):
     errors = {key: abs(after[key]-before[key])/max(abs(before[key]), 1e-300)
               for key in ('reaction_N_per_m', 'compliance_m2_per_N', 'energy_J_per_m')}
     tensor_error = float(np.linalg.norm(np.asarray(metrics['tensor_Pa'])-old_metrics['tensor_Pa'])/max(np.linalg.norm(old_metrics['tensor_Pa']), 1e-300))
+    kinetic_transfer = source_transfer_budget(trial,state,metrics['tensor_Pa'],old_metrics['tensor_Pa'])
     accounting = conservation(trial, state); topology = stagewise_topology(trial)
     checks = {'quality': metrics['minimum_quality'] >= .05,
         'reaction': errors['reaction_N_per_m'] <= LIMITS['static_mesh_reaction_relative'],
         'compliance': errors['compliance_m2_per_N'] <= LIMITS['static_mesh_reaction_relative'],
         'energy': errors['energy_J_per_m'] <= LIMITS['static_mesh_energy_relative'],
         'fixed_source_tensor': tensor_error <= LIMITS['tensor_probe_relative'],
+        'repair_barrier_rate_waiting_time_budget': kinetic_transfer['passed'],
         'free_residual': after['free_dof_residual_l2_N_per_m'] <= LIMITS['free_residual_relative']*max(after['constrained_reaction_l2_N_per_m'], 1e-300),
         'reaction_balance': after['top_bottom_reaction_balance'] <= LIMITS['reaction_balance_relative'],
         'energy_identity': after['energy_reaction_identity'] <= LIMITS['energy_reaction_identity_relative'],
@@ -96,6 +98,7 @@ def repair_connected_quality(state, *, strategy='flips', failure_stage=None):
     audit = {'schema': 'v5.source-quality-transaction/1', 'accepted': all(checks.values()),
         'checks': checks, 'geometry': geometry, 'relative_errors': errors, 'tensor_relative_error': tensor_error,
         'before': before, 'after': after, 'source_metrics': metrics, 'topology': topology, 'accounting': accounting,
+        'source_transfer_budget': kinetic_transfer,
         'operations': operations}
     if not audit['accepted']: return state, audit
     # Invalidate any prior numerical authority; bind fresh source provenance,
