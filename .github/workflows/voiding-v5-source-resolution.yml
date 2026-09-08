@@ -41,6 +41,7 @@ jobs:
           tests/test_source_resolution_campaign_v1.py
           tests/test_common_restart_protocol_v1.py
           tests/test_final_campaign_archive_v1.py
+          tests/test_v5_numerical_runtime_v1.py
           --junitxml=/tmp/v5-source-resolution/focused.xml
       - name: Clean worktree and diff
         if: always()

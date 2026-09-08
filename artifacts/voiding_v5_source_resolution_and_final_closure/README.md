@@ -45,6 +45,10 @@ They neither replace the later clean records nor add independent final A/B rows.
   continuation partitions pass with identical complete terminal states.
   Variable-source/remesh invariance remains unqualified; the final same-head
   all-45 execution is not replaced by combining these development heads.
+  The unified development run `34189099900` at `ec79645` has now executed all
+  45 registered transitions and reports 45/45 partition passes plus eleven
+  stagewise rows. All three original inventories verify; strict independent
+  Linux source reconstruction remains pending.
 - Phase 8 (`c284427`): the stronger +8e-7 m common reload fails both one- and
   two-ring kinetic-transfer budgets. This is not a zero-drive classification.
   At `787ebf6`, the separately prospective matched return-load V2 source,
@@ -58,6 +62,15 @@ They neither replace the later clean records nor add independent final A/B rows.
   attempts. Independent complete-checkpoint, injection-trace, topology and
   conservation reconstruction verifies 39/39 PASS, including all 28 lifecycle
   stages. This does not substitute for the still-running eleven V2 restarts.
+  Completed restart shards 2 and 3 at the same `787ebf6` implementation report
+  exact direct/replay results for their five cases, but have TWO different
+  complete terminal fingerprints. The retained cross-worker comparison finds
+  identical mesh nodes/connectivity but differing displacement, damage, source
+  stress, accepted time and protected-geometry records. This is a global exact
+  common-terminal FAIL for the completed subset, not merely a provenance
+  difference. Identical declared package versions and thread counts do not
+  establish identical numerical kernels. Read-only dispatch interventions are
+  separately versioned; no old result is relabeled or tolerance relaxed.
 - Phase 10 (`a34cdf0`): observed causal states and histories match, but all four
   full future-sequence/restart gates fail. Historical raw identity remains FAIL.
 - Phase 9 (`a34cdf0`): all 96 unique static solves completed and independently

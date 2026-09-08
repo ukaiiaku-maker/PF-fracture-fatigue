@@ -1,0 +1,952 @@
+{
+  "source_sha": "787ebf692a8d5058050553f4160b78af062f1d48",
+  "case_a": "between_birth_hits",
+  "case_b": "embryo",
+  "fingerprint_a": "3a2b875c057893a83251aa1c66f25d70fc58e1570f572bc68cb0036a64b7215f",
+  "fingerprint_b": "1957d8adedf79605252712bd497787b7beeb9262e25d9595024f96a77178c9e5",
+  "difference_count": 174,
+  "differences": [
+    {
+      "path": "/mesh/element_damage_gp",
+      "kind": "array",
+      "shape_a": [
+        442570
+      ],
+      "shape_b": [
+        442570
+      ],
+      "dtype_a": "float64",
+      "dtype_b": "float64",
+      "count_different": 1294,
+      "max_absolute_difference": 3.3306690738754696e-16
+    },
+    {
+      "path": "/damage",
+      "kind": "array",
+      "shape_a": [
+        222076
+      ],
+      "shape_b": [
+        222076
+      ],
+      "dtype_a": "float64",
+      "dtype_b": "float64",
+      "count_different": 543,
+      "max_absolute_difference": 4.440892098500626e-16
+    },
+    {
+      "path": "/displacement",
+      "kind": "array",
+      "shape_a": [
+        444152
+      ],
+      "shape_b": [
+        444152
+      ],
+      "dtype_a": "float64",
+      "dtype_b": "float64",
+      "count_different": 438145,
+      "max_absolute_difference": 5.360130369343619e-21
+    },
+    {
+      "path": "/junction_process_state/active_event_source/candidate_source_states/0/resolved_opening_stress_Pa",
+      "a": 6272.709469012805,
+      "b": 6272.709469012884
+    },
+    {
+      "path": "/junction_process_state/active_event_source/source_tensor_fingerprint",
+      "a": "bfb583a645abf04cd868d799e7c5c745339c757133e71626923cc5a7b9a60305",
+      "b": "e3c12ef630a5c546178899b3884be916f65c03eb4c100964d3e6079d66796ce6"
+    },
+    {
+      "path": "/junction_process_state/canonical_accepted_time_v1/subtick_denominator",
+      "a": 2593680797187566409955791909066745179597699780304472362713088,
+      "b": 152569458658085645722912358077785494467996404794355305414656
+    },
+    {
+      "path": "/junction_process_state/canonical_accepted_time_v1/subtick_numerator",
+      "a": 143064169218699954743304407984671289430459203428346767005349,
+      "b": 64729663940823470088784089965876120980579234011155995403807
+    },
+    {
+      "path": "/junction_process_state/canonical_accepted_time_v1/ticks",
+      "a": 90868507073474884350394481449555293861327,
+      "b": 90868507073474884545969351881717496937978
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/constrained_quality/geometry_protected_nodes",
+      "kind": "long_sequence",
+      "length_a": 5145,
+      "length_b": 5157,
+      "sha_a": "8f0c5003c24621ae76067826c138981b79b840c7028ad70d608f60065f886e7f",
+      "sha_b": "f41d8df3b7dcb4215f51a0c7947fb087d950ed2992bd01ab3607e7d2d55928d7"
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/constrained_quality/protected_edges",
+      "kind": "long_sequence",
+      "length_a": 5669,
+      "length_b": 5690,
+      "sha_a": "9143603caa08e46063cb5548cd1d99acc9d47a76971afcc4eca4bc1bc3c92209",
+      "sha_b": "0cf079eda67c6212af121d9bf618194f09e3f9c328a854e777f14e97a1d94690"
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_binding",
+      "a": "30674ec85a0a99361751534b6e7c22fca6d3686091dfeeb427f562eed0a3030e",
+      "b": "091258972f91fa61e0d8a66aecd6ffda8a0f55d12b87bd075cb11bd7ba332c15"
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/eta_n_max",
+      "a": 0.0114804677249295,
+      "b": 0.011480467724929498
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/normalized_traction",
+      "a": 0.03693835259486398,
+      "b": 0.036938352594851905
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/principal_stresses_Pa/0",
+      "a": 2759117.2243697685,
+      "b": 2759117.22436896
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/principal_stresses_Pa/1",
+      "a": 778663079.3936604,
+      "b": 778663079.3936586
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/sigma_nn_Pa",
+      "a": 2783245.548214768,
+      "b": 2783245.5482140165
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/sigma_nt_Pa",
+      "a": -4326740.100332729,
+      "b": -4326740.100337834
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/sigma_tt_Pa",
+      "a": 778638951.0698154,
+      "b": 778638951.0698135
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/tensor_Pa/0/0",
+      "a": 2783245.548214768,
+      "b": 2783245.5482140165
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/tensor_Pa/0/1",
+      "a": -4326740.100332729,
+      "b": -4326740.100337834
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/tensor_Pa/1/0",
+      "a": -4326740.100332729,
+      "b": -4326740.100337834
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/current_metrics/tensor_Pa/1/1",
+      "a": 778638951.0698154,
+      "b": 778638951.0698135
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_binding",
+      "a": "78e805efdbbcbeb2703882d4592eac968a459a10f7b190d5e1f773570cc9f035",
+      "b": "b910ee93be7162eae39be17c12bcc1ef50d4eebe060f37034897fbc316145f32"
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/normalized_traction",
+      "a": 0.05430233122398227,
+      "b": 0.05430233122398004
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/principal_stresses_Pa/0",
+      "a": 718200.827590891,
+      "b": 718200.8275931171
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/principal_stresses_Pa/1",
+      "a": 778143013.4379239,
+      "b": 778143013.4379299
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/sigma_nn_Pa",
+      "a": 807026.4958790271,
+      "b": 807026.4958813254
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/sigma_nt_Pa",
+      "a": -8309475.827303723,
+      "b": -8309475.827307127
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/sigma_tt_Pa",
+      "a": 778054187.7696358,
+      "b": 778054187.7696416
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/tensor_Pa/0/0",
+      "a": 807026.4958790271,
+      "b": 807026.4958813254
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/tensor_Pa/0/1",
+      "a": -8309475.827303723,
+      "b": -8309475.827307127
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/tensor_Pa/1/0",
+      "a": -8309475.827303723,
+      "b": -8309475.827307127
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_metrics/tensor_Pa/1/1",
+      "a": 778054187.7696358,
+      "b": 778054187.7696416
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_source_capture/damage",
+      "kind": "array",
+      "shape_a": [
+        112122
+      ],
+      "shape_b": [
+        112122
+      ],
+      "dtype_a": "float64",
+      "dtype_b": "float64",
+      "count_different": 201,
+      "max_absolute_difference": 1.1102230246251565e-16
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_source_capture/displacement",
+      "kind": "array",
+      "shape_a": [
+        224244
+      ],
+      "shape_b": [
+        224244
+      ],
+      "dtype_a": "float64",
+      "dtype_b": "float64",
+      "count_different": 189550,
+      "max_absolute_difference": 1.0587911840678754e-22
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_source_capture/element_damage_gp",
+      "kind": "array",
+      "shape_a": [
+        223202
+      ],
+      "shape_b": [
+        223202
+      ],
+      "dtype_a": "float64",
+      "dtype_b": "float64",
+      "count_different": 226,
+      "max_absolute_difference": 2.220446049250313e-16
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_source_capture/energy_ledgers/latest_constrained_reaction_l2_N_per_m",
+      "a": 12370.903439511369,
+      "b": 12370.90343951135
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_source_capture/energy_ledgers/latest_energy_reaction_identity",
+      "a": 0.0058577863185189745,
+      "b": 0.005857786318519203
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_source_capture/energy_ledgers/latest_free_dof_residual_l2_N_per_m",
+      "a": 6.301138830566198e-09,
+      "b": 6.332255080921876e-09
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_source_capture/energy_ledgers/latest_reaction_N_per_m",
+      "a": 57147.13664882787,
+      "b": 57147.13664882799
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_source_capture/energy_ledgers/latest_residual_l2_N_per_m",
+      "a": 12370.903439511367,
+      "b": 12370.90343951135
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/previous_source_capture/energy_ledgers/latest_top_bottom_reaction_balance",
+      "a": 0.0004303227164258244,
+      "b": 0.0004303227164260155
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/compliance_m2_per_N",
+      "a": 6.99947579977665e-12,
+      "b": 6.999475799776636e-12
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/constrained_reaction_l2_N_per_m",
+      "a": 12370.903439511369,
+      "b": 12370.90343951135
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/energy_reaction_identity",
+      "a": 0.0058577863185189745,
+      "b": 0.005857786318519203
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/field_transfer_audit/projected_density_l2_m2",
+      "a": 507343785787583.75,
+      "b": 507343785787584.1
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/field_transfer_audit/projected_displacement_l2_m",
+      "a": 3.713080446959544e-05,
+      "b": 3.71308044695955e-05
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/field_transfer_audit/projected_plastic_history_l2",
+      "a": 0.005128610798761116,
+      "b": 0.0051286107987604836
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/field_transfer_audit/source_density_l2_m2",
+      "a": 506478911377507.44,
+      "b": 506478911377507.3
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/field_transfer_audit/source_displacement_l2_m",
+      "a": 3.697997517400773e-05,
+      "b": 3.69799751740078e-05
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/field_transfer_audit/source_plastic_history_l2",
+      "a": 0.005120084395102503,
+      "b": 0.005120084395104226
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/fingerprint",
+      "a": "90979747c327a37e2b0c76f289e688b4db6df84c6c60b52fcf0e557e9736fbba",
+      "b": "2ec929519955bfe17e1b348ca550e725f77ea57ac54982d2699aa896430753c0"
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/free_dof_residual_l2_N_per_m",
+      "a": 6.301138830566198e-09,
+      "b": 6.332255080921876e-09
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/full_residual_including_reactions_N_per_m",
+      "a": 12370.903439511367,
+      "b": 12370.90343951135
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/length_ledgers/connected_free_surface_extent_m",
+      "a": 0.0001727897644386748,
+      "b": 0.00017278976443867478
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/reaction_N_per_m",
+      "a": 57147.13664882787,
+      "b": 57147.13664882799
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/after/top_bottom_reaction_balance",
+      "a": 0.0004303227164258244,
+      "b": 0.0004303227164260155
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/compliance_m2_per_N",
+      "a": 6.9994675828769216e-12,
+      "b": 6.999467582876277e-12
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/constrained_reaction_l2_N_per_m",
+      "a": 12370.907524317952,
+      "b": 12370.907524317876
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/energy_J_per_m",
+      "a": 0.011569110619411533,
+      "b": 0.011569110619411536
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/energy_reaction_identity",
+      "a": 0.005857790053316359,
+      "b": 0.0058577900532453585
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/field_transfer_audit/projected_density_l2_m2",
+      "a": 507343785787583.75,
+      "b": 507343785787584.1
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/field_transfer_audit/projected_displacement_l2_m",
+      "a": 3.713080446959544e-05,
+      "b": 3.71308044695955e-05
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/field_transfer_audit/projected_plastic_history_l2",
+      "a": 0.005128610798761116,
+      "b": 0.0051286107987604836
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/field_transfer_audit/source_density_l2_m2",
+      "a": 506478911377507.44,
+      "b": 506478911377507.3
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/field_transfer_audit/source_displacement_l2_m",
+      "a": 3.697997517400773e-05,
+      "b": 3.69799751740078e-05
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/field_transfer_audit/source_plastic_history_l2",
+      "a": 0.005120084395102503,
+      "b": 0.005120084395104226
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/fingerprint",
+      "a": "d00a2c192ed0dc2a1ffc46e158087fbb0cfe077bbc1a49bc16b77090c3047ef5",
+      "b": "63afad77b6506e336be565114995acd0f38f3d1b29206733e1fe81324ccff0b3"
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/free_dof_residual_l2_N_per_m",
+      "a": 5.313842736182372e-08,
+      "b": 5.3146594490083995e-08
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/full_residual_including_reactions_N_per_m",
+      "a": 12370.907524317952,
+      "b": 12370.907524317872
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/length_ledgers/connected_free_surface_extent_m",
+      "a": 0.0001727897644386748,
+      "b": 0.00017278976443867478
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/reaction_N_per_m",
+      "a": 57147.20373568642,
+      "b": 57147.20373569168
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/before/top_bottom_reaction_balance",
+      "a": 0.00043031388710595633,
+      "b": 0.0004303138871323662
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/geometry/geometry_protected_nodes",
+      "kind": "long_sequence",
+      "length_a": 4101,
+      "length_b": 4113,
+      "sha_a": "0bf0d037fd7f09dfc43635a5132f08efb1544795a1bbde01d4f41baceef3f518",
+      "sha_b": "bf5ba879034633078cda280adc79f15a09cd0fce977c472e3e35a3c8b3b5feea"
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/geometry/protected_edges",
+      "kind": "long_sequence",
+      "length_a": 4625,
+      "length_b": 4646,
+      "sha_a": "eae4589a36319e8dccb102844ec2f62cb2d551487824cdc81220f009e5b1073f",
+      "sha_b": "8555be645ac60119222385e607c2598ce5705137329ee917e09d88a37c894b62"
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/relative_errors/compliance_m2_per_N",
+      "a": 1.1739321071849789e-06,
+      "b": 1.1739321972032169e-06
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/relative_errors/energy_J_per_m",
+      "a": 1.1725675120855655e-06,
+      "b": 1.1725675123854539e-06
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/relative_errors/reaction_N_per_m",
+      "a": 1.1739307290379848e-06,
+      "b": 1.1739308190528152e-06
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/normalized_traction",
+      "a": 0.05430233122398227,
+      "b": 0.05430233122398004
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/principal_stresses_Pa/0",
+      "a": 718200.827590891,
+      "b": 718200.8275931171
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/principal_stresses_Pa/1",
+      "a": 778143013.4379239,
+      "b": 778143013.4379299
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/sigma_nn_Pa",
+      "a": 807026.4958790271,
+      "b": 807026.4958813254
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/sigma_nt_Pa",
+      "a": -8309475.827303723,
+      "b": -8309475.827307127
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/sigma_tt_Pa",
+      "a": 778054187.7696358,
+      "b": 778054187.7696416
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/tensor_Pa/0/0",
+      "a": 807026.4958790271,
+      "b": 807026.4958813254
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/tensor_Pa/0/1",
+      "a": -8309475.827303723,
+      "b": -8309475.827307127
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/tensor_Pa/1/0",
+      "a": -8309475.827303723,
+      "b": -8309475.827307127
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_metrics/tensor_Pa/1/1",
+      "a": 778054187.7696358,
+      "b": 778054187.7696416
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_transfer_budget/rows/0/crossing_time_relative_error",
+      "a": 7.510004997733127e-06,
+      "b": 7.510004628105636e-06
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_transfer_budget/rows/0/effective_barrier_error_over_kBT",
+      "a": 2.5033451995703373e-06,
+      "b": 2.5033450755751925e-06
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/source_transfer_budget/rows/0/log_rate_error",
+      "a": 7.510033199764621e-06,
+      "b": 7.510032830282398e-06
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/quality_preparation/tensor_relative_error",
+      "a": 5.091898959585351e-07,
+      "b": 5.091898689264844e-07
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/source_transfer_budget/rows/0/crossing_time_relative_error",
+      "a": 0.011025954140308918,
+      "b": 0.01102595414015458
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/source_transfer_budget/rows/0/effective_barrier_error_over_kBT",
+      "a": 0.0036957313564221,
+      "b": 0.0036957313563717267
+    },
+    {
+      "path": "/junction_process_state/cavity_source_resolution_proof/source_transfer_budget/rows/0/log_rate_error",
+      "a": 0.011087190515006284,
+      "b": 0.011087190514849965
+    },
+    {
+      "path": "/junction_process_state/directional_event_provenance/cleave:cleavage:(100):5d54146b8dbcda7a568e#event:0000000000000001/candidate_source_states/0/resolved_opening_stress_Pa",
+      "a": 6272.709469012805,
+      "b": 6272.709469012884
+    },
+    {
+      "path": "/junction_process_state/directional_event_provenance/cleave:cleavage:(100):5d54146b8dbcda7a568e#event:0000000000000001/source_tensor_fingerprint",
+      "a": "bfb583a645abf04cd868d799e7c5c745339c757133e71626923cc5a7b9a60305",
+      "b": "e3c12ef630a5c546178899b3884be916f65c03eb4c100964d3e6079d66796ce6"
+    },
+    {
+      "path": "/junction_process_state/directional_integration_anchors_v1/cleave:cleavage:(100):5d54146b8dbcda7a568e/initial_time/subtick_denominator",
+      "a": 326268464375026532446093112142043174622199808,
+      "b": 326268464375012640722607446789034568457388032
+    },
+    {
+      "path": "/junction_process_state/directional_integration_anchors_v1/cleave:cleavage:(100):5d54146b8dbcda7a568e/initial_time/subtick_numerator",
+      "a": 323716552866571048336098564297135463194332179,
+      "b": 117875355582332950208047073833983947782212377
+    },
+    {
+      "path": "/junction_process_state/directional_integration_anchors_v1/cleave:cleavage:(100):5d54146b8dbcda7a568e/initial_time/ticks",
+      "a": 16411656665256967857838578629424624561512,
+      "b": 16411656665256968053413449061586827638164
+    },
+    {
+      "path": "/junction_process_state/directional_integration_anchors_v1/cleave:cleavage:(100):5d54146b8dbcda7a568e/source_signature",
+      "a": "c1b7aa9504320bb870bf90f31ffdeb969118ca33e5e7f828ea5876eed1d7804a",
+      "b": "88c4629582f21b7d46b2b8da8b4a9c8157f1dffad3fbabceba9c7d86bb36c1fb"
+    },
+    {
+      "path": "/junction_process_state/latest_crack_void_connection_certificate/independent_intact_path_certificate/boundary_terminal_certificates/1/endpoint_to_boundary_distance_m",
+      "a": 2.53592315677907e-25,
+      "b": 2.535923156794116e-25
+    },
+    {
+      "path": "/junction_process_state/latest_void_remesh_audit/projected_density_l2_m2",
+      "a": 507343785787583.75,
+      "b": 507343785787584.1
+    },
+    {
+      "path": "/junction_process_state/latest_void_remesh_audit/projected_displacement_l2_m",
+      "a": 3.713080446959544e-05,
+      "b": 3.71308044695955e-05
+    },
+    {
+      "path": "/junction_process_state/latest_void_remesh_audit/projected_plastic_history_l2",
+      "a": 0.005128610798761116,
+      "b": 0.0051286107987604836
+    },
+    {
+      "path": "/junction_process_state/latest_void_remesh_audit/source_density_l2_m2",
+      "a": 506478911377507.44,
+      "b": 506478911377507.3
+    },
+    {
+      "path": "/junction_process_state/latest_void_remesh_audit/source_displacement_l2_m",
+      "a": 3.697997517400773e-05,
+      "b": 3.69799751740078e-05
+    },
+    {
+      "path": "/junction_process_state/latest_void_remesh_audit/source_plastic_history_l2",
+      "a": 0.005120084395102503,
+      "b": 0.005120084395104226
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/compliance_m2_per_N",
+      "a": 6.99947579977665e-12,
+      "b": 6.999475799776636e-12
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/constrained_reaction_l2_N_per_m",
+      "a": 12370.903439511369,
+      "b": 12370.90343951135
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/energy_reaction_identity",
+      "a": 0.0058577863185189745,
+      "b": 0.005857786318519203
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/field_transfer_audit/projected_density_l2_m2",
+      "a": 507343785787583.75,
+      "b": 507343785787584.1
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/field_transfer_audit/projected_displacement_l2_m",
+      "a": 3.713080446959544e-05,
+      "b": 3.71308044695955e-05
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/field_transfer_audit/projected_plastic_history_l2",
+      "a": 0.005128610798761116,
+      "b": 0.0051286107987604836
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/field_transfer_audit/source_density_l2_m2",
+      "a": 506478911377507.44,
+      "b": 506478911377507.3
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/field_transfer_audit/source_displacement_l2_m",
+      "a": 3.697997517400773e-05,
+      "b": 3.69799751740078e-05
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/field_transfer_audit/source_plastic_history_l2",
+      "a": 0.005120084395102503,
+      "b": 0.005120084395104226
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/fingerprint",
+      "a": "90979747c327a37e2b0c76f289e688b4db6df84c6c60b52fcf0e557e9736fbba",
+      "b": "2ec929519955bfe17e1b348ca550e725f77ea57ac54982d2699aa896430753c0"
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/free_dof_residual_l2_N_per_m",
+      "a": 6.301138830566198e-09,
+      "b": 6.332255080921876e-09
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/full_residual_including_reactions_N_per_m",
+      "a": 12370.903439511367,
+      "b": 12370.90343951135
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/length_ledgers/connected_free_surface_extent_m",
+      "a": 0.0001727897644386748,
+      "b": 0.00017278976443867478
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/reaction_N_per_m",
+      "a": 57147.13664882787,
+      "b": 57147.13664882799
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/after/top_bottom_reaction_balance",
+      "a": 0.0004303227164258244,
+      "b": 0.0004303227164260155
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/compliance_m2_per_N",
+      "a": 6.9994675828769216e-12,
+      "b": 6.999467582876277e-12
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/constrained_reaction_l2_N_per_m",
+      "a": 12370.907524317952,
+      "b": 12370.907524317876
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/energy_J_per_m",
+      "a": 0.011569110619411533,
+      "b": 0.011569110619411536
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/energy_reaction_identity",
+      "a": 0.005857790053316359,
+      "b": 0.0058577900532453585
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/field_transfer_audit/projected_density_l2_m2",
+      "a": 507343785787583.75,
+      "b": 507343785787584.1
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/field_transfer_audit/projected_displacement_l2_m",
+      "a": 3.713080446959544e-05,
+      "b": 3.71308044695955e-05
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/field_transfer_audit/projected_plastic_history_l2",
+      "a": 0.005128610798761116,
+      "b": 0.0051286107987604836
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/field_transfer_audit/source_density_l2_m2",
+      "a": 506478911377507.44,
+      "b": 506478911377507.3
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/field_transfer_audit/source_displacement_l2_m",
+      "a": 3.697997517400773e-05,
+      "b": 3.69799751740078e-05
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/field_transfer_audit/source_plastic_history_l2",
+      "a": 0.005120084395102503,
+      "b": 0.005120084395104226
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/fingerprint",
+      "a": "d00a2c192ed0dc2a1ffc46e158087fbb0cfe077bbc1a49bc16b77090c3047ef5",
+      "b": "63afad77b6506e336be565114995acd0f38f3d1b29206733e1fe81324ccff0b3"
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/free_dof_residual_l2_N_per_m",
+      "a": 5.313842736182372e-08,
+      "b": 5.3146594490083995e-08
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/full_residual_including_reactions_N_per_m",
+      "a": 12370.907524317952,
+      "b": 12370.907524317872
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/length_ledgers/connected_free_surface_extent_m",
+      "a": 0.0001727897644386748,
+      "b": 0.00017278976443867478
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/reaction_N_per_m",
+      "a": 57147.20373568642,
+      "b": 57147.20373569168
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/before/top_bottom_reaction_balance",
+      "a": 0.00043031388710595633,
+      "b": 0.0004303138871323662
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/geometry/geometry_protected_nodes",
+      "kind": "long_sequence",
+      "length_a": 4101,
+      "length_b": 4113,
+      "sha_a": "0bf0d037fd7f09dfc43635a5132f08efb1544795a1bbde01d4f41baceef3f518",
+      "sha_b": "bf5ba879034633078cda280adc79f15a09cd0fce977c472e3e35a3c8b3b5feea"
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/geometry/protected_edges",
+      "kind": "long_sequence",
+      "length_a": 4625,
+      "length_b": 4646,
+      "sha_a": "eae4589a36319e8dccb102844ec2f62cb2d551487824cdc81220f009e5b1073f",
+      "sha_b": "8555be645ac60119222385e607c2598ce5705137329ee917e09d88a37c894b62"
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/relative_errors/compliance_m2_per_N",
+      "a": 1.1739321071849789e-06,
+      "b": 1.1739321972032169e-06
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/relative_errors/energy_J_per_m",
+      "a": 1.1725675120855655e-06,
+      "b": 1.1725675123854539e-06
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/relative_errors/reaction_N_per_m",
+      "a": 1.1739307290379848e-06,
+      "b": 1.1739308190528152e-06
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/normalized_traction",
+      "a": 0.05430233122398227,
+      "b": 0.05430233122398004
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/principal_stresses_Pa/0",
+      "a": 718200.827590891,
+      "b": 718200.8275931171
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/principal_stresses_Pa/1",
+      "a": 778143013.4379239,
+      "b": 778143013.4379299
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/sigma_nn_Pa",
+      "a": 807026.4958790271,
+      "b": 807026.4958813254
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/sigma_nt_Pa",
+      "a": -8309475.827303723,
+      "b": -8309475.827307127
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/sigma_tt_Pa",
+      "a": 778054187.7696358,
+      "b": 778054187.7696416
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/tensor_Pa/0/0",
+      "a": 807026.4958790271,
+      "b": 807026.4958813254
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/tensor_Pa/0/1",
+      "a": -8309475.827303723,
+      "b": -8309475.827307127
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/tensor_Pa/1/0",
+      "a": -8309475.827303723,
+      "b": -8309475.827307127
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_metrics/tensor_Pa/1/1",
+      "a": 778054187.7696358,
+      "b": 778054187.7696416
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_transfer_budget/rows/0/crossing_time_relative_error",
+      "a": 7.510004997733127e-06,
+      "b": 7.510004628105636e-06
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_transfer_budget/rows/0/effective_barrier_error_over_kBT",
+      "a": 2.5033451995703373e-06,
+      "b": 2.5033450755751925e-06
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/source_transfer_budget/rows/0/log_rate_error",
+      "a": 7.510033199764621e-06,
+      "b": 7.510032830282398e-06
+    },
+    {
+      "path": "/junction_process_state/source_quality_repair_v1/tensor_relative_error",
+      "a": 5.091898959585351e-07,
+      "b": 5.091898689264844e-07
+    },
+    {
+      "path": "/junction_process_state/v12_accepted_mechanical_fingerprint",
+      "a": "c8a1313cc65e07901b8c2b76aecef1040d39631a694650c3c8895e24ad2b48af",
+      "b": "66698dfcfd051fe89cbe681bec3c9f3760d25b5c9c7c9146cf27266aceb5aae3"
+    },
+    {
+      "path": "/junction_process_state/v12_boundary_terminal_certificates/1/endpoint_to_boundary_distance_m",
+      "a": 2.53592315677907e-25,
+      "b": 2.535923156794116e-25
+    },
+    {
+      "path": "/junction_process_state/v12_graph_support_audit/accepted_damage_fingerprint",
+      "a": "c06deb1606e1909df3db2bd382525119ec38d9ce68c9ae851aeafd81a210b53a",
+      "b": "fea2536b73b3dd715a74d74f9685f1f7b8c566f8a609c977dc0bbd89b32b7263"
+    },
+    {
+      "path": "/junction_process_state/v12_graph_support_audit/boundary_terminal_certificates/1/endpoint_to_boundary_distance_m",
+      "a": 2.53592315677907e-25,
+      "b": 2.535923156794116e-25
+    },
+    {
+      "path": "/junction_process_state/v12_graph_support_audit/trial_damage_fingerprint",
+      "a": "e02b5d1d0c6edd018b8475f05fed9abce569ceea40ca8e3523630a370241becb",
+      "b": "ee177971fe07e8f4c2487b8439af5c72f5d9cf1e09fbb2d4e95a4b5f135e8844"
+    },
+    {
+      "path": "/junction_process_state/v12_support_record/accepted_damage_fingerprint",
+      "a": "e02b5d1d0c6edd018b8475f05fed9abce569ceea40ca8e3523630a370241becb",
+      "b": "ee177971fe07e8f4c2487b8439af5c72f5d9cf1e09fbb2d4e95a4b5f135e8844"
+    },
+    {
+      "path": "/junction_process_state/v12_trial_mechanical_fingerprint",
+      "a": "5f40520aace5296d1c2e1c5342d75439163a77e2da2142cdafcf4ae884f1b8b1",
+      "b": "a715fa9e9c24163ece858ebb4ee5df54571b717f8976861c5ddf20fd488b4c8a"
+    },
+    {
+      "path": "/energy_ledgers/hazard_dissipation_J_per_m",
+      "a": 0.00324030724010899,
+      "b": 0.0032403072401089904
+    },
+    {
+      "path": "/energy_ledgers/latest_constrained_reaction_l2_N_per_m",
+      "a": 8154.452618081574,
+      "b": 8154.452618081514
+    },
+    {
+      "path": "/energy_ledgers/latest_energy_reaction_identity",
+      "a": 0.00418219152156317,
+      "b": 0.004182191521562664
+    },
+    {
+      "path": "/energy_ledgers/latest_free_dof_residual_l2_N_per_m",
+      "a": 9.469790274755105e-09,
+      "b": 9.473268200466855e-09
+    },
+    {
+      "path": "/energy_ledgers/latest_reaction_N_per_m",
+      "a": 29835.407486715794,
+      "b": 29835.40748671571
+    },
+    {
+      "path": "/energy_ledgers/latest_residual_l2_N_per_m",
+      "a": 8154.452618081574,
+      "b": 8154.452618081513
+    },
+    {
+      "path": "/energy_ledgers/latest_top_bottom_reaction_balance",
+      "a": 0.004444438702592144,
+      "b": 0.004444438702595174
+    },
+    {
+      "path": "/v12_support_state/accepted_p0_damage_fingerprint",
+      "a": "7ff90c5fb509d0762a1260bf6d16d6055511cf86f1f3ae7b3aa67856d967f9bc",
+      "b": "bbd74e567e5c6c7efb3eaf875f8a1cf748e500de3558e321ba5d8ca9d40feb7b"
+    },
+    {
+      "path": "/void_state/length_ledgers/connected_free_surface_extent_m",
+      "a": 0.0001727897644386748,
+      "b": 0.00017278976443867478
+    }
+  ]
+}

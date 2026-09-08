@@ -24,6 +24,7 @@ FOCUSED_FILES=(
     'test_source_resolution_campaign_v1.py',
     'test_common_restart_protocol_v1.py',
     'test_final_campaign_archive_v1.py',
+    'test_v5_numerical_runtime_v1.py',
 )
 
 
