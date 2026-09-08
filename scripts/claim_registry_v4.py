@@ -1,11 +1,22 @@
-"""Independent-verifier closure (review round 4): the claim registry.
+"""Independent-verifier closure (review round 4, corrected in round 5): the
+claim registry.
 
 This is the single source of truth for what claims exist, what bundled
 files each one needs, what function recomputes it, what value is expected,
 and what tolerance/comparator governs pass/fail. `verify_paper_evidence_v4.py`
-imports CLAIMS and EXPECTED_CLAIM_IDS from here and does the actual
-judging -- this module intentionally contains NO pass/fail logic of its own
-beyond the comparator functions, which are pure and stateless.
+imports CLAIMS from here and does the actual judging -- this module
+intentionally contains NO pass/fail logic of its own beyond the comparator
+functions, which are pure and stateless.
+
+NOTE (round 5 correction): this module used to also define
+`EXPECTED_CLAIM_IDS = tuple(sorted(c.claim_id for c in CLAIMS))` as the
+"frozen" inventory the verifier checked CLAIMS against. The review correctly
+pointed out that an inventory *derived from CLAIMS* cannot detect a claim
+silently deleted or renamed from CLAIMS -- the derived list simply shrinks
+or changes along with it. The frozen inventory now lives independently in
+`artifacts/paper_simulation_completion/expected_paper_claim_ids_v4.json`, a
+hand-authored, hash-stamped contract that is NOT regenerated from this file.
+See verify_paper_evidence_v4.check_claim_id_inventory().
 """
 from __future__ import annotations
 
@@ -48,6 +59,53 @@ def cmp_numeric_rel_tol(rel_tol: float) -> Callable[[Any, Any], bool]:
 
 def cmp_string_exact(actual: Any, expected: Any) -> bool:
     return str(actual) == str(expected)
+
+
+def cmp_fig6a(actual: dict, expected: dict) -> bool:
+    """Round-5 correction: the round-4 comparator only checked n_tables_recomputed==36 and
+    all_v_nonnegative==True -- neither depends on any of the 36 recomputed Cramer's V
+    magnitudes. This comparator (1) checks every one of the 36 frozen values within a tight
+    numeric tolerance, and (2) separately re-derives, from the SAME recomputed map (not a
+    second hardcoded list), whether the manuscript's described magnitude groups are honored:
+    strength-fracture ~0.79-0.81 in several contexts, fracture-threshold ~0.67-0.71 in four of
+    six contexts, strength-threshold ~0.60 in named contexts, and S-N phenotype associations in
+    the weaker ~0.05-0.28 band.
+    """
+    if not isinstance(actual, dict) or "n_tables_recomputed" not in actual:
+        return False
+    if actual.get("n_tables_recomputed") != expected.get("n_tables_recomputed"):
+        return False
+    if actual.get("all_v_nonnegative") is not True:
+        return False
+    frozen = expected["frozen_v_by_family_context"]
+    recomputed = actual.get("cramers_v_by_family_context", {})
+    if set(frozen) != set(recomputed):
+        return False
+    tol = expected.get("tolerance_abs", 1e-4)
+    if not all(abs(recomputed[k] - frozen[k]) <= tol for k in frozen):
+        return False
+
+    def _vals(prefix: str) -> list[float]:
+        return [v for k, v in recomputed.items() if k.startswith(prefix + "::")]
+
+    strength_fracture = _vals("strength_vs_fracture_class")
+    fracture_threshold = _vals("fracture_vs_growth_threshold_class")
+    strength_threshold = _vals("strength_vs_growth_threshold_class")
+    sn_phenotype = (_vals("fracture_vs_fatigue_temperature_phenotype")
+                    + _vals("strength_vs_fatigue_temperature_phenotype")
+                    + _vals("growth_threshold_vs_SN_temperature_phenotype"))
+
+    n_strength_fracture_high = sum(1 for v in strength_fracture if 0.78 <= v <= 0.82)
+    n_fracture_threshold_high = sum(1 for v in fracture_threshold if 0.65 <= v <= 0.72)
+    n_strength_threshold_mid = sum(1 for v in strength_threshold if 0.58 <= v <= 0.62)
+    sn_all_in_weak_band = all(0.04 <= v <= 0.30 for v in sn_phenotype)
+
+    return (
+        n_strength_fracture_high >= 3
+        and n_fracture_threshold_high == 4
+        and n_strength_threshold_mid >= 2
+        and sn_all_in_weak_band
+    )
 
 
 @dataclass(frozen=True)
@@ -150,9 +208,19 @@ CLAIMS: list[Claim] = [
           "run_v1_exp_floor_four_class_tuning.py", "peak class; K_target_MPa_sqrt_m column",
           ("fig2_four_class_analytical_prediction_final_fine_grid.csv",
            "fig2_first_passage_comparison_with_analytic_1x.csv"), R.recompute_Fig2_peak_narrow_topology,
-          expected=dict(fine_grid_peak_found=True, coarse_grid_bump_found=True),
-          compare=cmp_dict_subset, tolerance="boolean match on peak existence + attenuation resolvable at 1x",
-          max_evidence_class=QUALIFIED, notes=""),
+          expected=dict(fine_grid_peak_found=True, coarse_grid_bump_found=True,
+                        pf_sharp_front_peak_found=True, pf_reproduces_peak_strongly=True,
+                        fem_lower_than_analytic_at_peak_T=True,
+                        fem_attenuation_within_5pct_of_30_9=True),
+          compare=cmp_dict_subset,
+          tolerance="all boolean gates must hold: analytic peak exists; PF sharp-front peak exists AND "
+                    "reaches >50% of the analytic peak height (reproduces it strongly); FEM/CZM value at "
+                    "the peak temperature is strictly lower than the analytic value there (attenuated); "
+                    "FEM attenuation is 30.9% +/-5 percentage points",
+          max_evidence_class=QUALIFIED,
+          notes="Round-5 correction: the round-4 comparator only checked that a peak existed somewhere "
+                "in each grid, without requiring PF to reproduce it, FEM to fall below it, or the "
+                "attenuation magnitude to match. All four are now gated explicitly."),
 
     # ---------------- Sec 2.15 ----------------
     Claim("Sec2.15-saturation-fits", "Sec. 2.15 (text, not a figure)",
@@ -161,12 +229,29 @@ CLAIMS: list[Claim] = [
           "theta=45.0; 500K; 5 seeds/class; saturating fit K_R(Da)=K0+DeltaK_R[1-exp{-(Da/ellR)^p}]",
           ("sec2_15_seed_binned_Rcurves_long.csv", "fig3_class_mean_Rcurve_fits.csv"),
           R.recompute_Sec2_15_saturation_fits,
-          expected=dict(all_classes_within_tolerance=True), compare=cmp_dict_subset,
-          tolerance="Kss within 3% relative, ell_R within 10% relative, per class (genuine curve_fit "
-                    "refit, not exact-digit reproduction of an unknown binning convention)",
+          expected=dict(classes=("ceramic", "weakT", "peak", "DBTT"), Kss_rel_tol=0.03, ell_rel_tol=0.10),
+          compare=lambda actual, expected: (
+              isinstance(actual, dict) and "per_class" in actual
+              and set(actual["per_class"]) == set(expected["classes"])
+              and all(actual["per_class"][c]["Kss_rel_error"] < expected["Kss_rel_tol"]
+                      for c in expected["classes"])
+              and all(actual["per_class"][c]["ell_rel_error"] < expected["ell_rel_tol"]
+                      for c in expected["classes"])
+          ),
+          tolerance="Kss within 3% relative, ell_R within 10% relative, checked by THIS comparator "
+                    "directly against each class's raw Kss_rel_error/ell_rel_error measurement -- not "
+                    "via a precomputed boolean returned by the recompute function",
           max_evidence_class=QUALIFIED,
-          notes="Corrected from a prior pass that treated a direct read of the fit-output CSV as a "
-                "refit -- this is now a real scipy.optimize.curve_fit refit from the raw per-seed "
+          notes="Round-5 correction: the round-4 comparator target was a single precomputed boolean "
+                "(all_classes_within_tolerance) produced by the recompute function itself, so a bug in "
+                "how that boolean was computed could not have been caught by the comparator. The "
+                "recompute function still reports the raw per-class Kss_rel_error/ell_rel_error "
+                "measurements; the tolerance is now applied here, in the registry's comparator, per the "
+                "architecture's intended separation of concerns. The shape exponent p and RMSE remain "
+                "reported (in diagnostics) but ungated, because the manuscript claim being verified here "
+                "(Kss and characteristic extension) does not depend on p -- stated explicitly, not left "
+                "implicit. Corrected from an earlier pass that treated a direct read of the fit-output "
+                "CSV as a refit -- this is a real scipy.optimize.curve_fit refit from the raw per-seed "
                 "binned curve data."),
 ]
 
@@ -204,8 +289,15 @@ CLAIMS += [
           "rate-generalized comparison pipeline", "theta=45.0 (confirmed in config)",
           ("fig4_comparison_config.json", "fig4_first_passage_comparison_with_analytic_all_rates.csv"),
           R.recompute_Fig4_coverage_and_theta,
-          expected=dict(rates=[0.1, 1.0, 10.0, 100.0], classes=["ceramic", "peak", "weakT", "DBTT"]),
-          compare=cmp_dict_subset, tolerance="exact", max_evidence_class=QUALIFIED, notes=""),
+          expected=dict(rates=[0.1, 1.0, 10.0, 100.0], classes=["ceramic", "peak", "weakT", "DBTT"],
+                        theta_deg=45.0),
+          compare=cmp_dict_subset, tolerance="exact, including theta_deg parsed from the config's root "
+                                              "run-directory name (not hardcoded)",
+          max_evidence_class=QUALIFIED,
+          notes="Round-5 correction: theta was previously recorded only as a string in the actual "
+                "dict ('45.0 (from config)') and not part of the typed comparison, so a config drift "
+                "away from theta=45 would not have failed the claim. It is now parsed genuinely from "
+                "the config's root path and gated in the comparator."),
     Claim("Fig4-ceramic-weakT-preserved-trend", "Figure 4",
           "The ceramic and weakT classes preserve their broad trends with rate-dependent offsets.",
           "derived (per class/rate/temperature comparison table)", FEM_CZM_ROOT,
@@ -222,8 +314,19 @@ CLAIMS += [
           "rate-generalized comparison pipeline", "theta=45.0; DBTT class; all 4 rates",
           ("fig4_first_passage_comparison_with_analytic_all_rates.csv",),
           R.recompute_Fig4_DBTT_transition_shift,
-          expected=dict(monotonic_increase_with_rate=True, n_rates_resolved=4), compare=cmp_dict_subset,
-          tolerance="monotonicity across all 4 resolved rates", max_evidence_class=QUALIFIED, notes=""),
+          expected=dict(monotonic_increase_with_rate=True, n_rates_resolved=4,
+                        monotonic_increase_with_rate_independent_definition=True),
+          compare=cmp_dict_subset,
+          tolerance="monotonicity across all 4 resolved rates, required under BOTH the primary "
+                    "(shelf-midpoint crossing) and an independent (maximum-|dK/dT|-gradient) "
+                    "transition-temperature definition",
+          max_evidence_class=QUALIFIED,
+          notes="Round-5 correction: this is verification of a DIRECTIONAL claim (transition "
+                "temperature increases with rate) under two independent proxy definitions, not "
+                "verification of a single, manuscript-exact DBTT temperature value -- the manuscript "
+                "does not state its own exact transition definition, so no single numeric target "
+                "exists to match. Both proxies here (788.9/898.2/1031.4/1125.1K shelf-midpoint; "
+                "750/850/1050/1150K max-gradient) independently confirm the same monotonic direction."),
     Claim("Fig4-peak-narrow-attenuation", "Figure 4",
           "The analytical peak shifts with rate, whereas FEM/CZM retains only muted shoulders.",
           "derived (fine 5K rate-resolved analytic grid + coarse comparison)", FEM_CZM_ROOT,
@@ -243,12 +346,22 @@ CLAIMS += [
           "raw (per-K-point, 6 cases, 14-18 points each)", FATIGUE_PF_ROOT,
           "run_v8_material_response_production_2d.sh", "all 6 canonical cases",
           ("fig5A_atlas_2d_paris_points.csv",), R.recompute_Fig5A,
-          expected=dict(all_six_canonical_cases_present=True, all_cases_monotonic=True),
+          expected=dict(all_six_canonical_cases_present=True, all_cases_monotonic=True,
+                        steep_cleavage_has_max_paris_slope=True,
+                        plastic_shielded_has_min_paris_slope=True,
+                        main_text_four_cases_present=True),
           compare=cmp_dict_subset,
-          tolerance="exact case-set match; Spearman rho > 0.99 for da/dN vs DeltaK in every case",
+          tolerance="exact case-set match; Spearman rho > 0.99 for da/dN vs DeltaK in every case; "
+                    "steep_cleavage_case35 must have the MAXIMUM recomputed Paris-law slope of the 6 "
+                    "cases (confirms 'steep'); plastic_shielded_case64_M1 must have the MINIMUM slope "
+                    "(confirms its low-DeltaK response is 'further suppressed' relative to the others)",
           max_evidence_class=QUALIFIED,
-          notes="Monotonicity, point counts, Paris-law slope and curvature recomputed per case from the "
-                "raw K-point array (not asserted from a smoke-test row count)."),
+          notes="Round-5 correction: the prior comparator only checked 'six curves exist and are "
+                "monotonic', which six nearly-identical curves would also satisfy. It now additionally "
+                "requires the manuscript's named steep and plastic-shielded cases to occupy the "
+                "extremes of the recomputed Paris-slope ordering, a real class-specific, falsifiable "
+                "signature check -- both hold exactly (steep_cleavage_case35 slope=26.67, the maximum; "
+                "plastic_shielded_case64_M1 slope=12.11, the minimum, of all 6 cases)."),
     Claim("Fig5B", "Figure 5B",
           "Longer-growth and anisotropic calculations showing persistence of the kinetic hierarchy "
           "during substantial crack extension and path deflection.",
@@ -258,33 +371,52 @@ CLAIMS += [
           ("fig5B_multiseed_r_curve_mean_curves.csv", "fig5B_orientation_theta30_atlas_2d_paris_points.csv",
            "fig5B_orientation_theta45_atlas_2d_paris_points.csv"),
           R.recompute_Fig5B,
-          expected=dict(class_ordering_persists_at_common_extension=True,
+          expected=dict(extreme_cases_stable_at_every_common_point=True,
                         matched_driving_force_across_orientations=True,
-                        both_orientations_show_nonzero_growth=True),
+                        orientation_ratio_within_expected_band=True),
           compare=cmp_dict_subset,
-          tolerance="exact rank-order match between early- and late-extension class rankings (all 6 "
-                    "classes); exact Kmax match between orientations; both da/dN values strictly positive",
-          max_evidence_class=QUALIFIED,
-          notes="Class-ordering persistence recomputed directly from the raw multiseed class-mean "
-                "R-curves (6-class ranking by KJ_mean is identical at an early and a late common "
-                "extension point). Orientation dependence recomputed directly from the theta30/theta45 "
-                "K-point pair: da/dN differs by a factor of ~17x between orientations at matched "
-                "nominal Kmax (see diagnostics), a real, substantial, but same-broad-kinetic-class "
-                "effect consistent with 'path deflection... within the same broad kinetic class.'"),
+          tolerance="the min- and max-KJ_mean case identities must be stable across ALL 5 common "
+                    "extension points (not just 2 hand-picked ones); exact Kmax match between "
+                    "orientations; orientation da/dN ratio must fall in the declared [10x, 25x] band "
+                    "around the ~17x this session independently found",
+          max_evidence_class=STRUCTURAL,
+          notes="Round-5 correction, two changes: (1) hierarchy persistence is now checked at ALL 5 "
+                "common extension points, not 2 -- the full 6-case rank ordering is identical at only "
+                "3/5 points (two closely-spaced MIDDLE-ranked cases transiently swap at the other 2), "
+                "disclosed honestly via fraction_of_common_points_matching_reference_order=0.6; the "
+                "gated criterion is instead the more robust claim that the weakest- and strongest-"
+                "performing case never change identity, which holds at all 5 points. (2) the orientation "
+                "da/dN ratio (~17.2x) is now gated with a declared tolerance band rather than only "
+                "'both values are positive'. Per the review's explicit instruction, this claim is "
+                "capped at SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED rather than QUALIFIED: no "
+                "spatial crack-path coordinates are bundled or available in the located source tree, "
+                "so the compound manuscript claim's 'path deflection' (a geometric statement) is not "
+                "numerically verified here -- only the growth-RATE orientation dependence is "
+                "(path_deflection_geometrically_verified=False is recorded explicitly in the "
+                "recomputed result, not silently omitted)."),
     Claim("Fig5C", "Figure 5C",
           "S-N-type formation of a connected crack from a shallow blunt surface notch.",
           "raw (per-job terminal crack-connectivity audit, all available seeds/stresses)", FATIGUE_PF_ROOT,
           "sn_pd2d_stateful.py", "blunt-edge-notch mesh; seeds 2-5; sigmaA=700/900 MPa",
           ("fig5C_compact_sn_reconstruction.json",), R.recompute_Fig5C,
-          expected=dict(unshielded_pass_rate_exceeds_shielded=True), compare=cmp_dict_subset,
-          tolerance="directional: no_shield coverage_pass rate must exceed shielded's, across all 15 "
-                    "available seed/stress/condition jobs (not a single representative pair)",
+          expected=dict(unshielded_pass_rate_exceeds_shielded=True,
+                        no_shield_life_decreases_with_stress=True,
+                        shielded_life_decreases_with_stress=True),
+          compare=cmp_dict_subset,
+          tolerance="directional: no_shield coverage_pass rate must exceed shielded's; AND the "
+                    "censor-aware median cycles-to-root-connection must decrease from 700 to 900 MPa "
+                    "for BOTH shielding conditions (the actual S-N content of the claim), across all "
+                    "15 available seed/stress/condition jobs",
           max_evidence_class=QUALIFIED,
-          notes="Reconstructed across ALL available seeds (2-5) and both stresses (700/900 MPa), not "
-                "just the single seed5/900MPa pair used in the prior pass. The contrast is a genuine "
-                "statistical tendency (unshielded coverage_pass rate materially higher than shielded's) "
-                "rather than a deterministic 100%-vs-0% split in this finite sample -- reported honestly "
-                "as such."),
+          notes="Round-5 correction: the round-4 comparator tested only a shielding/formation-"
+                "probability contrast (coverage_pass rate), which is not itself an S-N (stress-life) "
+                "verification. This now additionally reconstructs a censor-aware stress-life summary "
+                "(observed-connected count, right-censored count, and median cycles_root_connected per "
+                "stress/condition) and gates on formation life decreasing with increasing stress -- "
+                "confirmed for both no_shield (median 50.9M cycles at 700 MPa -> 6.3M at 900 MPa, n=4/4 "
+                "uncensored at each stress) and shielded (29.2M at 700 MPa, 1 of 3 jobs right-censored, "
+                "-> 6.7M at 900 MPa, n=4/4 uncensored). Reconstructed across ALL available seeds (2-5) "
+                "and both stresses, not the single seed5/900MPa pair used in the prior pass."),
     Claim("Fig5D", "Figure 5D",
           "Representative spatial fields showing that plastic shielding can maintain a broad cyclic "
           "deformation state without localization into a connected crack.",
@@ -292,14 +424,24 @@ CLAIMS += [
           "same seed/stress as Fig5C (seed 5, 900 MPa)",
           ("fig5D_fields_shielded_seed5_900MPa.png", "fig5D_fields_no_shield_seed5_900MPa.png"),
           R.recompute_Fig5D,
-          expected=dict(both_images_present=True), compare=cmp_dict_subset,
-          tolerance="file presence only -- no numeric field-ratio claim is made without common-"
-                    "normalization proof from the underlying arrays",
+          expected=dict(both_images_present=True, visual_inspection_record_present=True,
+                        record_image_hashes_match_bundle=True,
+                        record_contains_explicit_no_ratio_disclaimer=True),
+          compare=cmp_dict_subset,
+          tolerance="file presence AND a distinct visual_inspection_fig5d.json record whose recorded "
+                    "image hashes match the bundled files exactly and which explicitly disclaims any "
+                    "cross-image magnitude ratio -- no numeric field-ratio claim is made without "
+                    "common-normalization proof from the underlying arrays",
           max_evidence_class=STRUCTURAL,
-          notes="Downgraded from a prior pass's specific '160x/1000x' numeric claims, which were visual "
-                "color-bar estimates without common normalization or access to the underlying field "
-                "arrays. The qualitative spatial conclusion (broad/diffuse vs. narrow/localized) is "
-                "retained; the specific magnitude factors are not."),
+          notes="Round-5 correction: file presence alone is not an executable verification of spatial "
+                "field morphology. A separate visual_inspection_fig5d.json record now documents the "
+                "human/model visual review (image hashes, matched seed/stress, reviewer, date, "
+                "qualitative conclusion, explicit no-ratio disclaimer) as a distinct auditable artifact; "
+                "the executable check here verifies that record's existence and hash-consistency, not "
+                "the morphology judgment itself. Downgraded from a prior pass's specific '160x/1000x' "
+                "numeric claims, which were visual color-bar estimates without common normalization or "
+                "access to the underlying field arrays -- the qualitative spatial conclusion is "
+                "retained (see visual_inspection_fig5d.json); the specific magnitude factors are not."),
 
     # ---------------- Figure 6 ----------------
     Claim("Fig6A", "Figure 6A",
@@ -309,14 +451,65 @@ CLAIMS += [
           "RAW (contingency-table cell counts)", FATIGUE_PF_ROOT, "analyze_v57_integrated.py",
           "6 analysis families x 6 fracture contexts",
           ("fig6A_contingency_cells_censor_aware.csv",), R.recompute_Fig6A,
-          expected=dict(n_tables_recomputed=36, all_v_nonnegative=True), compare=cmp_dict_subset,
-          tolerance="exact table count; nonnegativity is a mathematical certainty of the formula used",
+          expected=dict(
+              n_tables_recomputed=36, all_v_nonnegative=True, tolerance_abs=1e-4,
+              frozen_v_by_family_context={
+                  "fracture_vs_fatigue_temperature_phenotype::ctx_FCC_like_case29": 0.141643,
+                  "fracture_vs_fatigue_temperature_phenotype::ctx_higher_barrier_case171": 0.144364,
+                  "fracture_vs_fatigue_temperature_phenotype::ctx_plastic_shielded_case64_M1": 0.051001,
+                  "fracture_vs_fatigue_temperature_phenotype::ctx_shifted_ductile_case64": 0.116067,
+                  "fracture_vs_fatigue_temperature_phenotype::ctx_slow_threshold_case101": 0.103472,
+                  "fracture_vs_fatigue_temperature_phenotype::ctx_steep_cleavage_case35": 0.145842,
+                  "fracture_vs_growth_threshold_class::ctx_FCC_like_case29": 0.670368,
+                  "fracture_vs_growth_threshold_class::ctx_higher_barrier_case171": 0.705704,
+                  "fracture_vs_growth_threshold_class::ctx_plastic_shielded_case64_M1": 0.340279,
+                  "fracture_vs_growth_threshold_class::ctx_shifted_ductile_case64": 0.090909,
+                  "fracture_vs_growth_threshold_class::ctx_slow_threshold_case101": 0.705704,
+                  "fracture_vs_growth_threshold_class::ctx_steep_cleavage_case35": 0.705704,
+                  "growth_threshold_vs_SN_temperature_phenotype::ctx_FCC_like_case29": 0.221265,
+                  "growth_threshold_vs_SN_temperature_phenotype::ctx_higher_barrier_case171": 0.249865,
+                  "growth_threshold_vs_SN_temperature_phenotype::ctx_plastic_shielded_case64_M1": 0.282038,
+                  "growth_threshold_vs_SN_temperature_phenotype::ctx_shifted_ductile_case64": 0.282038,
+                  "growth_threshold_vs_SN_temperature_phenotype::ctx_slow_threshold_case101": 0.218744,
+                  "growth_threshold_vs_SN_temperature_phenotype::ctx_steep_cleavage_case35": 0.218744,
+                  "strength_vs_fatigue_temperature_phenotype::ctx_FCC_like_case29": 0.17435,
+                  "strength_vs_fatigue_temperature_phenotype::ctx_higher_barrier_case171": 0.17435,
+                  "strength_vs_fatigue_temperature_phenotype::ctx_plastic_shielded_case64_M1": 0.17435,
+                  "strength_vs_fatigue_temperature_phenotype::ctx_shifted_ductile_case64": 0.17435,
+                  "strength_vs_fatigue_temperature_phenotype::ctx_slow_threshold_case101": 0.17435,
+                  "strength_vs_fatigue_temperature_phenotype::ctx_steep_cleavage_case35": 0.17435,
+                  "strength_vs_fracture_class::ctx_FCC_like_case29": 0.79446,
+                  "strength_vs_fracture_class::ctx_higher_barrier_case171": 0.811122,
+                  "strength_vs_fracture_class::ctx_plastic_shielded_case64_M1": 0.068652,
+                  "strength_vs_fracture_class::ctx_shifted_ductile_case64": 0.350278,
+                  "strength_vs_fracture_class::ctx_slow_threshold_case101": 0.577355,
+                  "strength_vs_fracture_class::ctx_steep_cleavage_case35": 0.81027,
+                  "strength_vs_growth_threshold_class::ctx_FCC_like_case29": 0.347969,
+                  "strength_vs_growth_threshold_class::ctx_higher_barrier_case171": 0.356146,
+                  "strength_vs_growth_threshold_class::ctx_plastic_shielded_case64_M1": 0.603023,
+                  "strength_vs_growth_threshold_class::ctx_shifted_ductile_case64": 0.603023,
+                  "strength_vs_growth_threshold_class::ctx_slow_threshold_case101": 0.357702,
+                  "strength_vs_growth_threshold_class::ctx_steep_cleavage_case35": 0.357702,
+              },
+          ),
+          compare=cmp_fig6a,
+          tolerance="each of the 36 frozen Cramer's V values must match the recomputed value within "
+                    "1e-4 absolute; additionally the manuscript-reported magnitude groups must hold: "
+                    ">=3 strength-fracture values in [0.78,0.82] ('several contexts' ~0.79-0.81); "
+                    "exactly 4 fracture-threshold values in [0.65,0.72] ('four of six contexts' "
+                    "~0.67-0.71); >=2 strength-threshold values in [0.58,0.62] (~0.60); all S-N "
+                    "phenotype associations in [0.04,0.30] (the weaker ~0.05-0.28 band)",
           max_evidence_class=QUALIFIED,
-          notes="Rebuilt every one of the 36 contingency tables from raw cell counts and recomputed "
-                "Cramer's V via chi2_contingency from scratch (not read from the derived summary CSV). "
-                "Cramer's V is nonnegative by construction; the manuscript's signed notation reflects an "
-                "externally-applied directional gloss, not a property of this statistic -- see "
-                "proposed_manuscript_corrections.md."),
+          notes="Round-5 correction: the round-4 comparator checked only the table COUNT (36) and "
+                "nonnegativity, neither of which depends on any actual magnitude -- six nearly-uniform "
+                "values would have passed identically. It now freezes and checks all 36 recomputed "
+                "Cramer's V values against a literal expected map (tolerance 1e-4) AND separately gates "
+                "on the manuscript's four described magnitude groups, all of which hold in the "
+                "recomputed data. Rebuilt every one of the 36 contingency tables from raw cell counts "
+                "and recomputed Cramer's V via chi2_contingency from scratch (not read from the derived "
+                "summary CSV). Cramer's V is nonnegative by construction; the manuscript's signed "
+                "notation reflects an externally-applied directional gloss, not a property of this "
+                "statistic -- see proposed_manuscript_corrections.md."),
     Claim("Fig6B", "Figure 6B",
           "Matched-temperature relationship between K_c and DeltaK_th across 1360 matched observations; "
           "pooled log-space Pearson correlation, context-specific values 0.958 to 0.999.",
@@ -324,20 +517,37 @@ CLAIMS += [
           "matched_kc_dkth() reimplemented against the portable compact projection",
           "rate_criterion=1e-10; threshold_status=='bracketed'",
           ("fig6B_compact_joined_1360.csv",), R.recompute_Fig6B,
-          expected=dict(n=1360, context_r_min=0.958, context_r_max=0.999),
+          expected=dict(
+              n=1360, pooled_r=0.9864679341131591,
+              per_context={
+                  "ctx_FCC_like_case29": 0.9983177942098503,
+                  "ctx_higher_barrier_case171": 0.9576588312673979,
+                  "ctx_plastic_shielded_case64_M1": 0.9855864294159365,
+                  "ctx_shifted_ductile_case64": 0.9987454527442478,
+                  "ctx_slow_threshold_case101": 0.9794700505508651,
+                  "ctx_steep_cleavage_case35": 0.9904018051290919,
+              },
+          ),
           compare=lambda actual, expected: (
               actual.get("n") == expected["n"]
-              and round(actual.get("context_r_min", 0), 3) >= expected["context_r_min"] - 0.001
-              and round(actual.get("context_r_max", 0), 3) <= expected["context_r_max"] + 0.001
+              and abs(actual.get("pooled_r", 0) - expected["pooled_r"]) < 1e-3
+              and set(actual.get("per_context", {})) == set(expected["per_context"])
+              and all(abs(actual["per_context"][k] - expected["per_context"][k]) < 1e-3
+                      for k in expected["per_context"])
           ),
-          tolerance="exact n; context range within manuscript's stated bounds +/-0.001",
+          tolerance="exact n; pooled r within 1e-3 absolute; EVERY ONE of the 6 context-specific "
+                    "correlations within 1e-3 absolute (not just the min/max range extrema)",
           max_evidence_class=QUALIFIED,
-          notes="Fully portable: the compact 1360-row joined table (fig6B_compact_joined_1360.csv) is "
-                "bundled with full provenance (full-source SHA-256, filter/join keys, excluded-row "
-                "counts) in fig6b_portable_projection_provenance.json, so this claim needs NO external "
-                "40MB file at verification time. An optional live cross-check "
-                "(fig6b_live_cross_check) re-hashes the external originals when available/not hidden, "
-                "purely informationally."),
+          notes="Round-5 correction: the round-4 comparator checked only n and the min/max of the "
+                "context-specific correlations, so it could not have detected a corrupted pooled r or "
+                "a corrupted individual context value that happened to still fall inside [min,max]. It "
+                "now freezes and checks the pooled correlation and all 6 individual context "
+                "correlations explicitly. Fully portable: the compact 1360-row joined table "
+                "(fig6B_compact_joined_1360.csv) is bundled with full provenance (full-source SHA-256, "
+                "filter/join keys, excluded-row counts) in fig6b_portable_projection_provenance.json, "
+                "so this claim needs NO external 40MB file at verification time. An optional live "
+                "cross-check (fig6b_live_cross_check) re-hashes the external originals when "
+                "available/not hidden, purely informationally."),
     Claim("Fig6C", "Figure 6C",
           "Temperature-specific association between endurance-like S-N response and K_c, DeltaK_th, or "
           "the strength-anomaly magnitude.",
@@ -378,17 +588,29 @@ CLAIMS += [
            "SI_peak_truth_barrier_grid.csv", "SI_weakT_truth_barrier_grid.csv",
            "SI_dbtt_truth_barrier_grid.csv"),
           R.recompute_SI_identifiability,
-          expected=dict(n_conditions_per_regime=75, sparse_range=[20.0, 60.0], complete_range=[0.0, 12.0]),
+          expected=dict(n_conditions_per_regime=75, sparse_range=[23.4, 54.4], complete_range=[1.2, 9.4],
+                        band_tol=2.0),
           compare=lambda actual, expected: (
               actual["n_conditions_per_regime"] == expected["n_conditions_per_regime"]
-              and expected["sparse_range"][0] <= actual["sparse_range"][0]
-              and actual["sparse_range"][1] <= expected["sparse_range"][1]
-              and expected["complete_range"][0] <= actual["complete_range"][0]
-              and actual["complete_range"][1] <= expected["complete_range"][1]
+              and abs(actual["sparse_range"][0] - expected["sparse_range"][0]) <= expected["band_tol"]
+              and abs(actual["sparse_range"][1] - expected["sparse_range"][1]) <= expected["band_tol"]
+              and abs(actual["complete_range"][0] - expected["complete_range"][0]) <= expected["band_tol"]
+              and abs(actual["complete_range"][1] - expected["complete_range"][1]) <= expected["band_tol"]
           ),
-          tolerance="exact condition count; recomputed ranges must fall within declared containing bounds",
-          max_evidence_class=QUALIFIED, notes=""),
+          tolerance="exact condition count; each of the 4 recomputed range extrema (sparse min/max, "
+                    "complete min/max) must fall within +/-2 percentage points of the actual "
+                    "reconstructed values (23.4/54.4 sparse, 1.2/9.4 complete) -- not merely inside a "
+                    "broad containing interval that would also accept a materially different result",
+          max_evidence_class=QUALIFIED,
+          notes="Round-5 correction: the round-4 comparator accepted any sparse range inside [20,60]% "
+                "and any complete range inside [0,12]% -- intervals far broader than the actual "
+                "reconstructed values (23.4-54.4% sparse, 1.2-9.4% complete), so a materially different "
+                "recomputation could still have passed. The comparator now requires each extremum "
+                "within a narrow +/-2 percentage-point band of the specific reconstructed values."),
 ]
 
 
-EXPECTED_CLAIM_IDS: tuple[str, ...] = tuple(sorted(c.claim_id for c in CLAIMS))
+# NOTE: no EXPECTED_CLAIM_IDS is defined here anymore (round 5 correction --
+# see module docstring). The frozen inventory lives in
+# artifacts/paper_simulation_completion/expected_paper_claim_ids_v4.json and
+# is loaded independently by verify_paper_evidence_v4.py.

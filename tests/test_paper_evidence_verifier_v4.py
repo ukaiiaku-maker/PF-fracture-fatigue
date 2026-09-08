@@ -116,13 +116,16 @@ def test_duplicate_claim_id_detected():
     dup_a = _trivial_claim(claim_id="DUP")
     dup_b = _trivial_claim(claim_id="DUP")
     unique = _trivial_claim(claim_id="UNIQUE")
-    inventory = verifier.check_claim_id_inventory([dup_a, dup_b, unique])
+    inventory = verifier.check_claim_id_inventory([dup_a, dup_b, unique], expected_ids=("DUP", "UNIQUE"))
     assert inventory["inventory_ok"] is False
     assert "DUP" in inventory["duplicates"]
 
 
 def test_real_registry_has_no_duplicate_ids_and_matches_expected_inventory():
-    inventory = verifier.check_claim_id_inventory(registry.CLAIMS)
+    expected_ids = verifier.load_expected_claim_ids(
+        REPO_ROOT / "artifacts" / "paper_simulation_completion" / "expected_paper_claim_ids_v4.json"
+    )
+    inventory = verifier.check_claim_id_inventory(registry.CLAIMS, expected_ids)
     assert inventory["duplicates"] == []
     assert inventory["missing_from_registry"] == []
     assert inventory["unexpected_in_registry"] == []
@@ -164,11 +167,23 @@ def test_blank_terminal_status_fails_even_with_correct_value(tmp_path):
     assert result["final_evidence_class"] == registry.NOT_REVERIFIED
 
 
-def test_whitespace_only_terminal_status_fails():
-    bundle_dir_check = verifier.check_source_bundle_present  # just to keep import used
-    assert bundle_dir_check is not None
-    # A whitespace-only status must not count as "present" -- str.strip() is used.
-    assert bool("   ".strip()) is False
+def test_whitespace_only_terminal_status_fails(tmp_path):
+    # Round-5 correction: this test previously only asserted a Python truthiness fact
+    # (bool("   ".strip()) is False) without ever calling evaluate_claim -- it could not have
+    # caught a regression in the verifier's own blank-status handling. It now exercises the
+    # real code path: a whitespace-only (not merely empty-string) terminal_or_censor_status,
+    # returned from an otherwise-correct recompute(), must still fail the claim overall.
+    bundle_dir, h = _make_bundle(tmp_path, "input.csv", b"x\n1\n")
+    claim = _trivial_claim(
+        recompute=lambda bundle: dict(actual=42, terminal_or_censor_status="   \t  "),
+        expected=42,
+    )
+    prov = {"input.csv": h}
+    result = verifier.evaluate_claim(claim, prov, bundle_dir=bundle_dir)
+    assert result["numerical_comparison_passed"] is True
+    assert result["terminal_status_present"] is False
+    assert result["pass_fail"] == "FAIL"
+    assert result["final_evidence_class"] == registry.NOT_REVERIFIED
 
 
 # ---------------------------------------------------------------------------
@@ -242,7 +257,7 @@ def test_full_verifier_passes_from_temp_checkout_with_roots_hidden(tmp_path):
         "paper_simulation_completion_verification_v4.json"
     assert verification_path.is_file()
     data = json.loads(verification_path.read_text())
-    assert data["classification"] == "PAPER_SIMULATION_EVIDENCE_COMPLETE"
+    assert data["classification"].startswith("PAPER_SIMULATION_EVIDENCE_COMPLETE")
     assert data["n_unresolved"] == 0
     assert data["claim_id_inventory"]["inventory_ok"] is True
 
@@ -255,6 +270,158 @@ def test_real_verifier_default_invocation_exits_zero_and_is_complete():
     )
     assert proc.returncode == 0, f"stdout={proc.stdout}\nstderr={proc.stderr}"
     assert "classification=PAPER_SIMULATION_EVIDENCE_COMPLETE" in proc.stdout
+
+
+# ---------------------------------------------------------------------------
+# Round-5 additions: prove the TIGHTENED comparators actually reject
+# corrupted/degenerate results that the round-4 comparators would have
+# accepted. Each test uses the REAL registry claim's own `compare` function
+# (not a copy), fed a synthetic `actual` value that is deliberately wrong in
+# exactly the way the fifth review identified as previously undetectable.
+# ---------------------------------------------------------------------------
+
+def _claim(claim_id: str) -> registry.Claim:
+    matches = [c for c in registry.CLAIMS if c.claim_id == claim_id]
+    assert len(matches) == 1, f"expected exactly one claim {claim_id!r}, found {len(matches)}"
+    return matches[0]
+
+
+def test_fig6b_corrupted_pooled_r_with_unchanged_n_and_range_fails():
+    claim = _claim("Fig6B")
+    good_actual = dict(claim.expected)  # a "perfect" actual would equal expected exactly
+    corrupted = dict(good_actual)
+    corrupted["pooled_r"] = 0.5  # wildly wrong, but n and per-context untouched
+    assert claim.compare(good_actual, claim.expected) is True
+    assert claim.compare(corrupted, claim.expected) is False
+
+
+def test_fig6a_values_changed_but_still_nonnegative_fails():
+    claim = _claim("Fig6A")
+    good_actual = dict(n_tables_recomputed=36, all_v_nonnegative=True,
+                        cramers_v_by_family_context=dict(claim.expected["frozen_v_by_family_context"]))
+    assert claim.compare(good_actual, claim.expected) is True
+    corrupted = dict(good_actual)
+    corrupted_map = dict(corrupted["cramers_v_by_family_context"])
+    # Flatten every value to a small, nonnegative constant -- passes the round-4 checks
+    # (count==36, all nonnegative) but destroys every reported magnitude and magnitude group.
+    corrupted_map = {k: 0.01 for k in corrupted_map}
+    corrupted["cramers_v_by_family_context"] = corrupted_map
+    assert claim.compare(corrupted, claim.expected) is False
+
+
+def test_fig5a_monotonic_but_loses_class_distinction_fails():
+    claim = _claim("Fig5A")
+    good_actual = dict(all_six_canonical_cases_present=True, all_cases_monotonic=True,
+                        steep_cleavage_has_max_paris_slope=True,
+                        plastic_shielded_has_min_paris_slope=True,
+                        main_text_four_cases_present=True)
+    assert claim.compare(good_actual, claim.expected) is True
+    # Six curves all monotonic (as six identical curves would be), but the class-specific
+    # extremes are lost -- e.g. some OTHER case has the steepest slope.
+    degenerate = dict(good_actual)
+    degenerate["steep_cleavage_has_max_paris_slope"] = False
+    degenerate["plastic_shielded_has_min_paris_slope"] = False
+    assert claim.compare(degenerate, claim.expected) is False
+
+
+def test_fig5c_coverage_pass_intact_but_stress_life_reversed_fails():
+    claim = _claim("Fig5C")
+    good_actual = dict(unshielded_pass_rate_exceeds_shielded=True,
+                        no_shield_life_decreases_with_stress=True,
+                        shielded_life_decreases_with_stress=True)
+    assert claim.compare(good_actual, claim.expected) is True
+    # The shielding/formation-probability contrast is untouched, but the stress-life ordering
+    # is reversed (life would INCREASE with stress -- physically backwards for an S-N claim).
+    reversed_life = dict(good_actual)
+    reversed_life["no_shield_life_decreases_with_stress"] = False
+    assert claim.compare(reversed_life, claim.expected) is False
+
+
+def test_fig2_peak_exists_but_no_fem_attenuation_fails():
+    claim = _claim("Fig2-peak-narrow-topology")
+    good_actual = dict(fine_grid_peak_found=True, coarse_grid_bump_found=True,
+                        pf_sharp_front_peak_found=True, pf_reproduces_peak_strongly=True,
+                        fem_lower_than_analytic_at_peak_T=True,
+                        fem_attenuation_within_5pct_of_30_9=True)
+    assert claim.compare(good_actual, claim.expected) is True
+    # A peak exists everywhere it should, but FEM/CZM does NOT fall below the analytic/PF peak
+    # (i.e. FEM would have fully -- or over- -- reproduced the peak, contradicting "attenuated").
+    no_attenuation = dict(good_actual)
+    no_attenuation["fem_lower_than_analytic_at_peak_T"] = False
+    no_attenuation["fem_attenuation_within_5pct_of_30_9"] = False
+    assert claim.compare(no_attenuation, claim.expected) is False
+
+
+# ---------------------------------------------------------------------------
+# Round-5: the independent frozen claim-ID inventory must catch deletion,
+# renaming, addition, and duplication -- and, critically, must be loaded
+# from expected_paper_claim_ids_v4.json, NOT derived from CLAIMS itself.
+# ---------------------------------------------------------------------------
+
+EXPECTED_IDS_PATH = REPO_ROOT / "artifacts" / "paper_simulation_completion" / "expected_paper_claim_ids_v4.json"
+
+
+def _load_real_expected_ids() -> tuple[str, ...]:
+    return verifier.load_expected_claim_ids(EXPECTED_IDS_PATH)
+
+
+def test_expected_claim_ids_file_is_independent_of_registry():
+    # The file must exist as a standalone artifact and be internally hash-consistent; loading
+    # it must not require importing claim_registry_v4 at all.
+    doc = json.loads(EXPECTED_IDS_PATH.read_text())
+    assert "claim_ids" in doc and "sha256_of_sorted_newline_joined_ids" in doc
+    ids = _load_real_expected_ids()
+    assert len(ids) == 35
+    assert len(set(ids)) == 35
+
+
+def test_deleting_a_claim_is_detected_against_independent_inventory():
+    expected_ids = _load_real_expected_ids()
+    claims_missing_one = [c for c in registry.CLAIMS if c.claim_id != expected_ids[0]]
+    inventory = verifier.check_claim_id_inventory(claims_missing_one, expected_ids)
+    assert inventory["inventory_ok"] is False
+    assert expected_ids[0] in inventory["missing_from_registry"]
+
+
+def test_renaming_a_claim_is_detected_against_independent_inventory():
+    expected_ids = _load_real_expected_ids()
+    renamed = []
+    for c in registry.CLAIMS:
+        if c.claim_id == expected_ids[0]:
+            renamed.append(_trivial_claim(claim_id=expected_ids[0] + "_RENAMED"))
+        else:
+            renamed.append(c)
+    inventory = verifier.check_claim_id_inventory(renamed, expected_ids)
+    assert inventory["inventory_ok"] is False
+    assert expected_ids[0] in inventory["missing_from_registry"]
+    assert (expected_ids[0] + "_RENAMED") in inventory["unexpected_in_registry"]
+
+
+def test_adding_an_unexpected_claim_is_detected_against_independent_inventory():
+    expected_ids = _load_real_expected_ids()
+    extra = list(registry.CLAIMS) + [_trivial_claim(claim_id="TOTALLY-NEW-CLAIM-NOT-IN-CONTRACT")]
+    inventory = verifier.check_claim_id_inventory(extra, expected_ids)
+    assert inventory["inventory_ok"] is False
+    assert "TOTALLY-NEW-CLAIM-NOT-IN-CONTRACT" in inventory["unexpected_in_registry"]
+
+
+def test_duplicating_a_claim_is_detected_against_independent_inventory():
+    expected_ids = _load_real_expected_ids()
+    duplicated = list(registry.CLAIMS) + [
+        c for c in registry.CLAIMS if c.claim_id == expected_ids[0]
+    ]
+    inventory = verifier.check_claim_id_inventory(duplicated, expected_ids)
+    assert inventory["inventory_ok"] is False
+    assert expected_ids[0] in inventory["duplicates"]
+
+
+def test_real_registry_matches_the_independent_frozen_inventory_exactly():
+    expected_ids = _load_real_expected_ids()
+    inventory = verifier.check_claim_id_inventory(registry.CLAIMS, expected_ids)
+    assert inventory["inventory_ok"] is True
+    assert inventory["missing_from_registry"] == []
+    assert inventory["unexpected_in_registry"] == []
+    assert inventory["duplicates"] == []
 
 
 if __name__ == "__main__":

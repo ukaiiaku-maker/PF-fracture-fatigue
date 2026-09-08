@@ -96,6 +96,22 @@ a coarse grid:
   (`scipy.optimize.curve_fit`) from the raw per-seed binned R-curve data,
   not read from the existing fit-output CSV.
 
+## Round-5 addendum (no new manuscript corrections)
+
+A fifth review hardened the executable verifier's comparators and claim
+inventory (see `PAPER_EVIDENCE_FINAL_HANDOFF_V4.md`'s "Round-5 corrections"
+section) but did not surface any new manuscript wording issue beyond the two
+already recorded above. One evidence-class change is worth noting here for
+completeness: **Fig5B** is now held at
+`SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED` rather than
+`QUALIFIED_SOURCE_RESULT_VERIFIED`, because its compound manuscript claim
+includes a geometric "path deflection" component that this branch has not
+numerically verified (no spatial crack-path coordinates are bundled or
+confirmed available). This is a verification-depth disclosure, not a
+manuscript-correctness concern: the growth-rate orientation-dependence half
+of the claim (~17x da/dN difference between orientations) IS independently
+verified, and no manuscript text is being flagged as unsupported.
+
 ## If a genuine gap re-emerges in a future pass
 
 Should a future review or re-verification find that any row's

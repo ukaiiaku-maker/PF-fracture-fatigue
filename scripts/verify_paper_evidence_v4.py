@@ -1,4 +1,5 @@
-"""Independent-verifier closure (review round 4): the executable verifier.
+"""Independent-verifier closure (review round 4, corrected in round 5): the
+executable verifier.
 
 This is the one and only place PASS/FAIL is decided. It does NOT trust any
 pre-computed `pass_fail` column or `independent_recomputation_method`
@@ -6,8 +7,14 @@ free-text field the way verify_paper_simulation_completion_v3.py did. For
 every claim in claim_registry_v4.CLAIMS it:
 
   1. Checks the claim_id is unique across the registry and that the set of
-     claim_ids exactly matches EXPECTED_CLAIM_IDS (a frozen inventory) --
-     silently dropping or renaming a claim is a hard failure, not a warning.
+     claim_ids exactly matches the INDEPENDENT frozen inventory in
+     expected_paper_claim_ids_v4.json -- a hand-authored, hash-stamped
+     contract that is NOT generated from claim_registry_v4.CLAIMS. (Round 4
+     used `EXPECTED_CLAIM_IDS = tuple(sorted(c.claim_id for c in CLAIMS))`,
+     which the fifth review correctly identified as unable to detect a
+     claim silently deleted or renamed from CLAIMS, since the "expected"
+     list was derived from the very thing being checked. This is fixed.)
+     Silently dropping, renaming, or adding a claim is now a hard failure.
   2. Checks every required_inputs file exists in the bundle AND its SHA-256
      matches a recorded provenance hash (either the original-copy manifest
      from build_source_bundle_figures_2_4.py, or one of the three portable-
@@ -84,15 +91,35 @@ def _load_provenance_hashes() -> dict[str, str]:
     return hashes
 
 
-def check_claim_id_inventory(claims: list) -> dict:
+def load_expected_claim_ids(path: Path = None) -> tuple[str, ...]:
+    """Load the INDEPENDENT, hand-authored frozen claim-id inventory. This
+    file is never written by any code that also builds claim_registry_v4.CLAIMS
+    -- it is a separate, literal contract checked into the same commit."""
+    path = path or (OUT_DIR / "expected_paper_claim_ids_v4.json")
+    doc = json.loads(path.read_text())
+    ids = tuple(doc["claim_ids"])
+    payload = "\n".join(sorted(ids)).encode()
+    actual_hash = hashlib.sha256(payload).hexdigest()
+    recorded_hash = doc["sha256_of_sorted_newline_joined_ids"]
+    if actual_hash != recorded_hash:
+        raise ValueError(
+            f"{path} is internally inconsistent: its own sha256_of_sorted_newline_joined_ids "
+            f"({recorded_hash}) does not match a hash of its own claim_ids list ({actual_hash}). "
+            f"This file must be regenerated deliberately, not hand-edited."
+        )
+    return ids
+
+
+def check_claim_id_inventory(claims: list, expected_ids: tuple[str, ...]) -> dict:
     ids = [c.claim_id for c in claims]
     duplicates = sorted({cid for cid in ids if ids.count(cid) > 1})
     actual_set = set(ids)
-    expected_set = set(registry.EXPECTED_CLAIM_IDS)
+    expected_set = set(expected_ids)
     missing = sorted(expected_set - actual_set)
     unexpected = sorted(actual_set - expected_set)
     return dict(
-        n_claims=len(claims), n_unique=len(actual_set), duplicates=duplicates,
+        n_claims=len(claims), n_unique=len(actual_set), n_expected=len(expected_set),
+        duplicates=duplicates,
         missing_from_registry=missing, unexpected_in_registry=unexpected,
         inventory_ok=(not duplicates and not missing and not unexpected),
     )
@@ -206,7 +233,8 @@ def main() -> int:
                           "default.")
     args = ap.parse_args()
 
-    inventory = check_claim_id_inventory(registry.CLAIMS)
+    expected_ids = load_expected_claim_ids()
+    inventory = check_claim_id_inventory(registry.CLAIMS, expected_ids)
     provenance_hashes = _load_provenance_hashes()
 
     evaluations = [evaluate_claim(c, provenance_hashes) for c in registry.CLAIMS]
@@ -224,13 +252,19 @@ def main() -> int:
         classification = INCOMPLETE_LABEL
     elif structural_only and args.require_all_qualified:
         classification = INCOMPLETE_LABEL
+    elif structural_only:
+        # Round-5 correction: do NOT collapse "30 QUALIFIED + 5(+) STRUCTURAL" into a bare
+        # PAPER_SIMULATION_EVIDENCE_COMPLETE that reads as if every claim were fully
+        # quantitatively verified. The label itself now names the exact count of claims held at
+        # the honest SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED ceiling (topology-only claims
+        # with no manuscript-stated number to reproduce numerically), computed from this run's
+        # own evaluations -- never hardcoded. This is still a terminal, passing classification
+        # (exit 0): zero claims are unresolved/FAILed, and the physical-simulation conclusion
+        # (NO_NEW_PHYSICAL_SIMULATIONS_REQUIRED_FOR_CURRENT_DRAFT) is unaffected by a claim being
+        # honestly qualitative rather than numeric.
+        classification = f"PAPER_SIMULATION_EVIDENCE_COMPLETE_WITH_{len(structural_only)}_STRUCTURAL_ONLY_CLAIMS"
     else:
-        # Default (matches the review's Section 5 instruction): a claim whose comparator
-        # returned True is "passing the independent executable verifier" regardless of whether
-        # its ceiling evidence class is QUALIFIED_SOURCE_RESULT_VERIFIED or the honest
-        # SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED ceiling for a topology-only claim with
-        # no manuscript-stated number to reproduce. Only an actual FAIL
-        # (SOURCE_RESULT_LOCATED_NOT_REVERIFIED) blocks PAPER_SIMULATION_EVIDENCE_COMPLETE.
+        # Every retained claim is QUALIFIED_SOURCE_RESULT_VERIFIED; no honest-ceiling exceptions.
         classification = TERMINAL_OK_LABEL
 
     external_status = external_roots.all_roots_status()
@@ -247,6 +281,8 @@ def main() -> int:
         require_all_qualified_flag=args.require_all_qualified,
         external_roots_status=external_status,
         classification=classification,
+        physical_simulation_conclusion="NO_NEW_PHYSICAL_SIMULATIONS_REQUIRED_FOR_CURRENT_DRAFT",
+        physical_simulations_launched_this_run=0,
         evaluations=evaluations,
     )
     (OUT_DIR / "paper_simulation_completion_verification_v4.json").write_text(
@@ -264,7 +300,10 @@ def main() -> int:
     if structural_only:
         print(f"STRUCTURAL-ONLY (not QUALIFIED): {[e['claim_id'] for e in structural_only]}")
 
-    return 0 if classification == TERMINAL_OK_LABEL else 1
+    passing = classification == TERMINAL_OK_LABEL or classification.startswith(
+        "PAPER_SIMULATION_EVIDENCE_COMPLETE_WITH_"
+    )
+    return 0 if passing else 1
 
 
 if __name__ == "__main__":

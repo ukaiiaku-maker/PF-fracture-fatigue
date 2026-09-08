@@ -1,0 +1,25 @@
+{
+  "schema": "v1_visual_inspection_record",
+  "claim_id": "Fig5D",
+  "purpose": "Records a human/model visual review as a distinct, auditable artifact separate from the executable numeric verifier, per the fifth review's instruction that file presence alone must not be described as an executable verification of spatial field morphology.",
+  "images": {
+    "shielded": {
+      "bundle_path": "source_bundle_figures_2_4/fig5D_fields_shielded_seed5_900MPa.png",
+      "sha256": "bab65ccb23ff0c95865282beb4b336f4fb71cae821a112e24b4956ce7e2e9f6f"
+    },
+    "no_shield": {
+      "bundle_path": "source_bundle_figures_2_4/fig5D_fields_no_shield_seed5_900MPa.png",
+      "sha256": "94486858c82712ed42502e36964dca43651f0d89ceb17615fcfde32725d1fb9c"
+    }
+  },
+  "matched_condition": {
+    "seed": 5,
+    "sigma_a_MPa": 900,
+    "note": "Same seed/stress pair used in the Fig5C crack-handoff audit rows for this seed/stress."
+  },
+  "reviewer": "Claude (Sonnet 5), acting as the paper-evidence closure agent for this session",
+  "inspection_date": "2026-09-08",
+  "method": "Both PNG images were opened and directly viewed (not delegated to a sub-agent's description) via the assistant's image-reading tool in the independent-verifier-closure session, and again cross-checked in this correction pass.",
+  "qualitative_conclusion": "The shielded field shows accumulated plastic strain and dislocation density spread broadly and diffusely across most of the 2mm x 4mm domain (dislocation density approaches its plotted saturation value, ~1e17 m^-2, over a wide area). The no-shield field shows both quantities narrowly concentrated in a small wedge immediately at the notch tip, with the bulk of the domain near baseline. This qualitative contrast (broad/diffuse vs. narrow/localized) is consistent with the manuscript's claim that plastic shielding maintains a broad cyclic deformation state without localizing into a connected crack.",
+  "explicit_disclaimer": "No cross-image numeric magnitude ratio (e.g. 'Nx larger') is inferred or claimed from this inspection. The two images use independently auto-scaled color-bar ranges (plotted directly by the original rendering script, not by this session), and the underlying raw field arrays needed for a common-normalization comparison are not bundled or confirmed available in the located source tree. Any specific multiplicative factor read off the two color bars would be a visual estimate, not a verified recomputation, and is not reported as a manuscript-supporting number. See proposed_manuscript_corrections.md for the related retraction of an earlier pass's '160x'/'1000x' claim."
+}

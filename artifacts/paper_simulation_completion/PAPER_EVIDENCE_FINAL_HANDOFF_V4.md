@@ -1,10 +1,71 @@
 # Paper Evidence Independent-Verifier Closure — Handoff
 
-**Classification:** `PAPER_SIMULATION_EVIDENCE_COMPLETE` (default, non-strict invocation)
-**Claims:** 35 total — 30 `QUALIFIED_SOURCE_RESULT_VERIFIED`, 5 `SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED`, 0 `SOURCE_RESULT_LOCATED_NOT_REVERIFIED`
+**Classification (as of the round-5 correction commit):** `PAPER_SIMULATION_EVIDENCE_COMPLETE_WITH_6_STRUCTURAL_ONLY_CLAIMS` (default, non-strict invocation; the label names the exact count, computed dynamically by the verifier from its own run, never hardcoded)
+**Claims:** 35 total — 29 `QUALIFIED_SOURCE_RESULT_VERIFIED`, 6 `SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED`, 0 `SOURCE_RESULT_LOCATED_NOT_REVERIFIED` (reported separately here on purpose — do not summarize as "35 qualified")
 **Verifier:** `verify_paper_evidence_v4.py` — executable, exits 0
 **Portability:** identical result with `PAPER_EVIDENCE_HIDE_EXTERNAL_ROOTS=1`
 **Physical simulations launched this session:** 0 — `NO_NEW_PHYSICAL_SIMULATIONS_REQUIRED_FOR_CURRENT_DRAFT`
+
+> **Round-5 correction note:** a fifth review accepted this branch's physical-
+> simulation conclusion and executable-verifier architecture, but found the
+> comparators too permissive (e.g. Fig.6A only checked a table count and
+> nonnegativity, not any actual magnitude) and the claim-ID inventory
+> self-referential (`EXPECTED_CLAIM_IDS` was derived from `CLAIMS` itself,
+> so it could not detect a claim silently deleted from `CLAIMS`). Both are
+> fixed in this same branch/commit — see **Round-5 corrections** below. One
+> claim (Fig5B) was additionally downgraded from `QUALIFIED_SOURCE_RESULT_VERIFIED`
+> to `SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED` as part of tightening
+> its comparator (its "path deflection" sub-claim has no bundled geometric
+> data), which is why the structural-only count is 6, not the round-4 count
+> of 5.
+
+## Round-5 corrections
+
+1. **Independent frozen claim inventory.** `expected_paper_claim_ids_v4.json`
+   is now a hand-authored, hash-stamped, 35-ID contract, loaded independently
+   by the verifier and checked against the live registry in both directions.
+   It is never generated from `claim_registry_v4.CLAIMS`.
+2. **Tightened comparators** for `Fig2-peak-narrow-topology` (now requires a
+   PF/sharp-front peak, FEM below the analytic/PF peak, and ~30.9%
+   attenuation, not just "a peak exists somewhere"), `Fig4-coverage-and-theta`
+   (theta is now parsed from the config and gated, not hardcoded as a
+   string), `Fig4-DBTT-transition-shift` (adds an independent max-gradient
+   transition-temperature definition alongside the disclosed shelf-midpoint
+   proxy), `Fig5A` (gates on steep_cleavage having the max Paris slope and
+   plastic_shielded the min, not just "six monotonic curves"), `Fig5B` (checks
+   all 5 common extension points, not 2; gates the ~17x orientation ratio
+   with a declared tolerance; downgraded to STRUCTURAL since path deflection
+   itself is not geometrically verified), `Fig5C` (adds a censor-aware
+   stress-life reconstruction: does median cycles-to-connection decrease from
+   700 to 900 MPa, not just a shielding pass-rate contrast), `Fig5D` (adds a
+   distinct `visual_inspection_fig5d.json` record with image hashes, checked
+   for existence/consistency rather than treating file-presence as morphology
+   verification), `Fig6A` (freezes and checks all 36 Cramer's V values within
+   1e-4, plus the four manuscript-described magnitude groups), `Fig6B`
+   (checks the pooled correlation and all 6 context correlations explicitly,
+   not just n and the min/max range), `Sec2.15` (the 3%/10% tolerances are
+   now applied by the registry's comparator against raw error measurements,
+   not read from a precomputed boolean), and `SI-identifiability` (narrow
+   +/-2-point tolerance around the actual reconstructed extrema, not a broad
+   containing interval).
+3. **Bundle file count reconciled**: 44 files physically present in
+   `source_bundle_figures_2_4/` = 39 manifest-governed + 5 compact-
+   projection-governed (see the reconciliation table below; a round-4 draft
+   of this document incorrectly said "47").
+4. **11 new adversarial tests** (23 total, up from 12): a real whitespace-
+   only terminal-status test (the round-4 version only asserted a Python
+   truthiness fact without calling `evaluate_claim`), plus tests proving
+   each tightened comparator rejects the specific corrupted result the fifth
+   review named (Fig6B pooled-r corruption, Fig6A flattened-but-nonnegative
+   values, Fig5A monotonic-but-undistinguished curves, Fig5C reversed
+   stress-life ordering, Fig2 peak-without-attenuation), and four tests
+   proving the independent frozen inventory catches a deleted, renamed,
+   added, or duplicated claim.
+5. **Dynamic terminal classification**: `PAPER_SIMULATION_EVIDENCE_COMPLETE_WITH_<N>_STRUCTURAL_ONLY_CLAIMS`
+   (N computed live) replaces a bare `PAPER_SIMULATION_EVIDENCE_COMPLETE`
+   whenever any claim is held at the honest `SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED`
+   ceiling, so the label itself cannot be misread as "every claim fully
+   quantitatively verified."
 
 This branch (`codex/v10.2.30-paper-evidence-independent-verifier`) is a child
 of `codex/v10.2.30-paper-evidence-final-closure` (commit `783f207`), created
@@ -91,16 +152,28 @@ proving the committed bundle alone is sufficient.
 | Fig6C | All 39 frozen Panel C rows (AUC + 95% bootstrap CI), not one spot-check, independently reproduced. |
 | Sec2.15 | Saturation R-curve parameters genuinely refit (`scipy.optimize.curve_fit`) from raw per-seed binned R-curve data — not read from the existing fit-output CSV. Kss within 3%, ℓ_R within 10% of the prior fit (shape exponent `p` reported but not gated, since the exact binning/averaging convention used upstream is not fully documented). |
 
-## Adversarial tests (all pass)
+## Adversarial tests (23 total, all pass)
 
-`tests/test_paper_evidence_verifier_v4.py`, 12 tests, proving the verifier:
-alters an expected value → FAIL; ignores a manually-forged `pass_fail`;
-fails before recompute when a required file is missing; catches a
-duplicated claim ID; catches a stale/mismatched hash; fails on a blank
-terminal-status field even with a correct value; flags a multi-input claim
-with only one file present; correctly hides external roots with zero
-filesystem mutation; and reproduces `PAPER_SIMULATION_EVIDENCE_COMPLETE`
-from a clean temporary checkout with external roots hidden.
+`tests/test_paper_evidence_verifier_v4.py`. The original 12 (round 4) prove
+the verifier: alters an expected value → FAIL; ignores a manually-forged
+`pass_fail`; fails before recompute when a required file is missing;
+catches a duplicated claim ID; catches a stale/mismatched hash; fails on a
+blank terminal-status field even with a correct value; flags a multi-input
+claim with only one file present; correctly hides external roots with zero
+filesystem mutation; and reproduces the terminal classification from a
+clean temporary checkout with external roots hidden.
+
+Round 5 adds 11 more (fixing one that was nominal-only, per the review): a
+*real* whitespace-only terminal-status test that calls `evaluate_claim`
+directly (the round-4 version only asserted `bool("   ".strip()) is False`
+without exercising the verifier); five tests proving each tightened
+comparator rejects its specific named corrupted result (Fig6B pooled-r
+corruption with n/range untouched, Fig6A values flattened but still
+nonnegative, Fig5A monotonic-but-undistinguished curves, Fig5C reversed
+stress-life ordering, Fig2 peak-without-attenuation); and five tests proving
+the independent frozen inventory (`expected_paper_claim_ids_v4.json`) is
+genuinely external to the registry and catches a deleted, renamed, added,
+or duplicated claim, plus confirms the real registry matches it exactly.
 
 ## Files in this package (new/changed this round)
 
@@ -119,9 +192,11 @@ from a clean temporary checkout with external roots hidden.
   `fig6c_portable_projection_provenance.json`,
   `fig5c_portable_projection_provenance.json`,
   `paper_completion_contract_v4.json`, `file_hashes_v4.json`
-- `artifacts/paper_simulation_completion/source_bundle_figures_2_4/` grows
-  from 35 to 47 files (compact projections + Fig1/Fig5B/Fig6A/Sec2.15 raw
-  inputs added).
+- `artifacts/paper_simulation_completion/source_bundle_figures_2_4/` — see
+  **Bundle file count reconciliation** below for the exact, non-conflicting
+  counts (a round-4 draft of this document stated "grows from 35 to 47
+  files", which did not match the machine-readable manifest and has been
+  corrected).
 - `proposed_manuscript_corrections.md` updated with two genuine wording
   corrections (Cramer's V sign convention; Fig5D numeric-factor retraction).
 
@@ -145,6 +220,25 @@ python finalize_independent_verifier_closure.py
 `build_source_bundle_figures_2_4.py`, `render_paper_claim_matrix_v4.py`, and
 `finalize_independent_verifier_closure.py` run under the system `python3`
 (stdlib only).
+
+## Bundle file count reconciliation
+
+Three counts describe `source_bundle_figures_2_4/`, and they are consistent
+(the round-4 handoff draft's "47" figure was simply wrong and is corrected
+here):
+
+| Count | Meaning | Value |
+|---|---|---|
+| Manifest-governed | Files copied verbatim from an external original by `build_source_bundle_figures_2_4.py`, tracked with a byte-identity SHA-256 in `paper_source_bundle_manifest.json` | 39 |
+| Compact-projection-governed | Derived/joined files produced in-repo by the three `build_fig*_portable_projection.py` scripts, tracked with their own SHA-256 in `fig6b_portable_projection_provenance.json` / `fig6c_portable_projection_provenance.json` (3 tables) / `fig5c_portable_projection_provenance.json` | 5 |
+| **Total physically present** | `find source_bundle_figures_2_4 -maxdepth 1 -type f \| wc -l` | **44** |
+
+`39 + 5 = 44`, matching the physical file count exactly — there is no
+unexplained gap. `file_hashes_v4.json` covers the entire
+`artifacts/paper_simulation_completion/` directory (not just the bundle
+subdirectory), so its file count is larger still and is not directly
+comparable to the 44 above; see that file's own `n_files` field for its
+scope.
 
 ## Known, disclosed limitation
 

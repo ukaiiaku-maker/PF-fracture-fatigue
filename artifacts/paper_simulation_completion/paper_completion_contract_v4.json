@@ -2,12 +2,12 @@
   "schema": "v4_paper_completion_contract",
   "supersedes": "paper_completion_contract_v3.json",
   "trigger": "Fourth review: replace self-declared verification with an executable one (the verifier itself runs deterministic recomputation functions and derives PASS/FAIL, rather than trusting a pre-declared independent_recomputation_method string or pass_fail column); make Fig.6B genuinely portable via a compact provenance-tracked join projection and prove the full verifier passes with all three external source roots hidden; recompute or honestly reclassify every remaining qualitative claim (Fig.1, Fig.5A-D, Fig.6A/C, Sec.2.15, Fig.4) rather than accepting README-text or single-representative-case matches as full verification; add adversarial tests proving the verifier cannot be fooled by a forged pass_fail, a stale hash, a duplicated claim ID, a blank terminal-status field, a partially-present multi-input claim, or a missing external root.",
-  "headline_finding": "verify_paper_evidence_v4.py -- an EXECUTABLE verifier that runs each claim's own recomputation function and compares its output against a typed expected value using a pure comparator function, deriving pass/fail itself rather than reading any pre-declared field -- reports classification=PAPER_SIMULATION_EVIDENCE_COMPLETE with {'SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED': 5, 'QUALIFIED_SOURCE_RESULT_VERIFIED': 30} across 35 claims, 0 unresolved. The default (non-strict) invocation exits 0; re-running with PAPER_EVIDENCE_HIDE_EXTERNAL_ROOTS=1 (which makes every external, non-git source root report as unavailable, with zero filesystem mutation) reproduces the identical result, proving every claim is satisfiable from the committed bundle alone.",
-  "verifier_classification": "PAPER_SIMULATION_EVIDENCE_COMPLETE",
+  "headline_finding": "verify_paper_evidence_v4.py -- an EXECUTABLE verifier that runs each claim's own recomputation function and compares its output against a typed expected value using a pure comparator function, deriving pass/fail itself rather than reading any pre-declared field -- reports classification=PAPER_SIMULATION_EVIDENCE_COMPLETE_WITH_6_STRUCTURAL_ONLY_CLAIMS with {'SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED': 6, 'QUALIFIED_SOURCE_RESULT_VERIFIED': 29} across 35 claims, 0 unresolved. The default (non-strict) invocation exits 0; re-running with PAPER_EVIDENCE_HIDE_EXTERNAL_ROOTS=1 (which makes every external, non-git source root report as unavailable, with zero filesystem mutation) reproduces the identical result, proving every claim is satisfiable from the committed bundle alone.",
+  "verifier_classification": "PAPER_SIMULATION_EVIDENCE_COMPLETE_WITH_6_STRUCTURAL_ONLY_CLAIMS",
   "n_claim_rows": 35,
   "n_by_final_evidence_class": {
-    "SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED": 5,
-    "QUALIFIED_SOURCE_RESULT_VERIFIED": 30
+    "SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED": 6,
+    "QUALIFIED_SOURCE_RESULT_VERIFIED": 29
   },
   "n_unresolved": 0,
   "claim_id_inventory_ok": true,
@@ -25,5 +25,19 @@
   ],
   "portability_verified": "verify_paper_evidence_v4.py produces an identical classification and per-claim result set with PAPER_EVIDENCE_HIDE_EXTERNAL_ROOTS=1 as without it (see paper_simulation_completion_verification_v4.json's external_roots_status field for both runs, and tests/test_paper_evidence_verifier_v4.py::test_full_verifier_passes_from_temp_checkout_with_roots_hidden).",
   "physical_simulations_launched_this_session": 0,
-  "physical_simulation_conclusion": "NO_NEW_PHYSICAL_SIMULATIONS_REQUIRED_FOR_CURRENT_DRAFT"
+  "physical_simulation_conclusion": "NO_NEW_PHYSICAL_SIMULATIONS_REQUIRED_FOR_CURRENT_DRAFT",
+  "round_5_corrections": [
+    "Independent frozen claim inventory: expected_paper_claim_ids_v4.json is a hand-authored, hash-stamped, 35-ID contract loaded by the verifier and checked against the live registry in both directions -- it is NOT generated from claim_registry_v4.CLAIMS (the round-4 EXPECTED_CLAIM_IDS was, and could not detect a silently deleted or renamed claim as a result).",
+    "Comparators tightened for 9 claims (Fig2-peak-narrow-topology, Fig4-coverage-and-theta, Fig4-DBTT-transition-shift, Fig5A, Fig5B, Fig5C, Fig5D, Fig6A, Fig6B, Sec2.15, SI-identifiability) so that passing requires the actual manuscript-relevant magnitude or relationship, not merely a proxy boolean (e.g. 'a peak exists somewhere') that could pass under a materially wrong result.",
+    "Fig5B downgraded from QUALIFIED to SOURCE_RESULT_LOCATED_AND_STRUCTURALLY_MATCHED: its compound manuscript claim includes a geometric 'path deflection' component that is not numerically verified (no spatial crack-path coordinates are bundled); the growth-rate orientation-dependence component IS verified, and both facts are recorded explicitly rather than the claim being rounded up.",
+    "Fig5D's spatial-morphology conclusion is now recorded in a distinct visual_inspection_fig5d.json artifact (image hashes, matched condition, reviewer, date, explicit no-cross-image-ratio disclaimer) rather than being implied by file-presence alone; the executable check verifies that record's existence and hash-consistency, not the morphology judgment itself.",
+    "Terminal classification is now computed dynamically as PAPER_SIMULATION_EVIDENCE_COMPLETE_WITH_<N>_STRUCTURAL_ONLY_CLAIMS (N from this run's own evaluations, never hardcoded) whenever N>0, rather than collapsing a mix of QUALIFIED and STRUCTURAL rows into a bare PAPER_SIMULATION_EVIDENCE_COMPLETE.",
+    "Bundle file count reconciled: 44 files physically present in source_bundle_figures_2_4/ = 39 manifest-governed (paper_source_bundle_manifest.json) + 5 compact-projection-governed (fig6b/6c/5c provenance JSONs) -- see PAPER_EVIDENCE_FINAL_HANDOFF_V4.md's reconciliation table for the prior draft's incorrect '47' figure."
+  ],
+  "bundle_file_count_reconciliation": {
+    "physically_present_in_source_bundle": 44,
+    "manifest_governed": 39,
+    "compact_projection_governed": 5,
+    "sum_check_passes": true
+  }
 }
