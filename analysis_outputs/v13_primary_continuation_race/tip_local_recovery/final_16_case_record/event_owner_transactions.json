@@ -1,0 +1,3789 @@
+{
+  "rows": [
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "Peak_300K_seed3621",
+      "completion_times_s": [
+        3368.4000045328835
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 3368.4000046259803,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 417,
+      "topology_fingerprint_after": "8877a791f85abb555e6910cf1c3ef1527780c2a65d680688cc4d2fee02819569",
+      "topology_fingerprint_before": "9af5d137b7c1f4cf0e2eaf116f3631e561da5a0623679f8b8dcfbc930e5fd677",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "Peak_300K_seed3621",
+      "completion_times_s": [
+        3368.4000046692813
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3368.40000473098,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 418,
+      "topology_fingerprint_after": "584369b10293527bfb8a3c43b365c7abf2fd7d473f8c0682bc86924b5fde13d1",
+      "topology_fingerprint_before": "814d11a04029116dac47a186782424512ad0cac3ad75dbf725f8a17fb2defb45",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:bc3b85c3b91e363d0089ae27",
+      "case": "Peak_300K_seed3621",
+      "completion_times_s": [
+        3368.400005251045
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3368.400005255979,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          6
+        ]
+      ],
+      "step": 423,
+      "topology_fingerprint_after": "ac3cb756b21173cb35793749661c8effa4e7bd3dfc32a064712632526dde0ead",
+      "topology_fingerprint_before": "386d258e7bb574ec61dbb8a3120b02a79f63e272795765fc4e67382bf5f77ac9",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "Peak_300K_seed3621",
+      "completion_times_s": [
+        3368.400005365388
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 3368.4000054659787,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 425,
+      "topology_fingerprint_after": "8c19719309a1a10c2095ff9cb0aa3f8c817693cfbc9d1d49a828a88cd2b6a7ce",
+      "topology_fingerprint_before": "2790127e4d15fdbf1e51260671b9641d10e1ed72b30d3826278ee03604e387ac",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "Peak_300K_seed3621",
+      "completion_times_s": [
+        3368.400005702285
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 3368.400005780978,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 428,
+      "topology_fingerprint_after": "c364b73181c3976735d7dd7fff7e84fa4f39e1e05537d21ba0beb30f2abb77a3",
+      "topology_fingerprint_before": "5e0356560779336c94dbf91a56c4ecc12302799b68b9b42c1ceae43111852924",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:9a51be60764acfa1836157e7",
+      "case": "Peak_300K_seed3621",
+      "completion_times_s": [
+        3368.4000059822242
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000007"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3368.4000059909777,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          7
+        ]
+      ],
+      "step": 430,
+      "topology_fingerprint_after": "2a3c1c51c03d5d7a174566d71068169e7ce5c91e8bfc2f2eec04aa7ceba948ff",
+      "topology_fingerprint_before": "838f8d31fbd5313d5a6361f5676b633abf794ade0662de1bacae6a647b8aad53",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:a9cc273d8ffb71c9d7091a59",
+      "case": "Peak_300K_seed3621",
+      "completion_times_s": [
+        3368.4000067050893
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 3368.4000067259763,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          5
+        ]
+      ],
+      "step": 437,
+      "topology_fingerprint_after": "4fc6e9c841cdb852ca5aca5dddd290d42d142a03bd09b1fc207df8625d985545",
+      "topology_fingerprint_before": "5c0681169bf9092261e92c5bc79631551771f820030e97b2c25c3e7ab8ac8c5d",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "Peak_1000K_seed3621",
+      "completion_times_s": [
+        3124.8000045540407
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 3124.8000046384027,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 388,
+      "topology_fingerprint_after": "97b39a9fdc08e0e4292cb14b0c28e86daf3a11f9e383eb9ab37a40e1d0e42e80",
+      "topology_fingerprint_before": "5fcf0c1dc932302583dd32b01b4d774891a1b225a8da167cdc29e4ad1bcae652",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "Peak_1000K_seed3621",
+      "completion_times_s": [
+        3124.8000046817037
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3124.8000047434025,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 389,
+      "topology_fingerprint_after": "b467cafbe0cb3a9857aede729d4e9a37f309680cb7a1d5a5731c3451c3aa1f15",
+      "topology_fingerprint_before": "a345dda3e81d41f6bc3329549788c85983e23c64465797ebf88d474407f8a58b",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:bc3b85c3b91e363d0089ae27",
+      "case": "Peak_1000K_seed3621",
+      "completion_times_s": [
+        3124.8000052634675
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3124.8000052684015,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          6
+        ]
+      ],
+      "step": 394,
+      "topology_fingerprint_after": "c285020e889b23139917a11050ee9615b9c48ac05f59295b658f0d6b21834e20",
+      "topology_fingerprint_before": "9081aea2827b55a211debc2d804b48c2cb4e1c58a4cf709e6de1383193b0e058",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "Peak_1000K_seed3621",
+      "completion_times_s": [
+        3124.8000053865453
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 3124.800005478401,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 396,
+      "topology_fingerprint_after": "fd5f516eb1e8fcfdce72c9621bf84101acc480da303124aea8d87ec9506ac30b",
+      "topology_fingerprint_before": "fae80894576a1c24f0a087d862ec884570290e5512d91ec2f9ad16545e7df5b7",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "Peak_1000K_seed3621",
+      "completion_times_s": [
+        3124.800005723442
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 3124.8000057934005,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 399,
+      "topology_fingerprint_after": "44d0a8390012dbe1ddb6bac2669d85d816165497fa328566132ce2018e3f618c",
+      "topology_fingerprint_before": "e589b80d022347f34df163f5268f69cf11d34fc6ddbeb3413d5649320b832b33",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:9a51be60764acfa1836157e7",
+      "case": "Peak_1000K_seed3621",
+      "completion_times_s": [
+        3124.8000059946467
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000007"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3124.8000060034,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          7
+        ]
+      ],
+      "step": 401,
+      "topology_fingerprint_after": "72029060a8e77598afe1ad6f6647204758dd9b59d419920833ff274b3d8a3584",
+      "topology_fingerprint_before": "39c8b0a824488e00f949fa461403d44d636c612df8d9c54226f2d8e8c7af33ca",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:a9cc273d8ffb71c9d7091a59",
+      "case": "Peak_1000K_seed3621",
+      "completion_times_s": [
+        3124.8000067262465
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 3124.8000067383987,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          5
+        ]
+      ],
+      "step": 408,
+      "topology_fingerprint_after": "9e9ffdc6b8a2a21b06135f6ddfab17d676b7568cfadbfcd7a52f021a59368581",
+      "topology_fingerprint_before": "90eb16051dd38e963c19f33bbf40124119e5cf6e8c6067eecd3d0769e64f917f",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2664.3481855348564
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2671.2000000000157,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 318,
+      "topology_fingerprint_after": "863dad46fe95922ad1f571e429b143e3c4a4c8d5d75fba719354edaded35796b",
+      "topology_fingerprint_before": "d804f56c938e7a6905c3950a863637144798c2ebedc791664a12791939b0caf6",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.2000028848015
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2671.200002935892,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 321,
+      "topology_fingerprint_after": "5c9544d7f74fb75c12f4842bb4f68a7f9f4701d9212901c172d13c1da63f54a7",
+      "topology_fingerprint_before": "8bae35e19a55466759513135c5d47c5b628e02aa3331aa617af6a7df63287a8a",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.200003399298
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2671.200003460891,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 326,
+      "topology_fingerprint_after": "a24eb42f61fd8ad3f1fe98acfa8e78b416e95c7e27f08ccfd5cba7dbd5b25de0",
+      "topology_fingerprint_before": "8833733b06072f8f2aac0ae9c4db62b4be5b38ef056eab544838c1096e592795",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.200003907227
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2671.20000398589,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 331,
+      "topology_fingerprint_after": "48efd7833784ac513fe82b67a0c56b239e54b97020d8bb3322359d3b88d9d682",
+      "topology_fingerprint_before": "7e4c12b7bf6bdd8163bbcc36600d496d5b113bb2f881850dcbeff465edde3b34",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.2000040621247
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2671.2000040908897,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 332,
+      "topology_fingerprint_after": "1907329298742fe574c36d86e5e647cc228f0488eaf54dca74fcb3358e828f81",
+      "topology_fingerprint_before": "3c89e4b98432f5c6ca8fe13bc237ba92069df50ecfb18fc9333543ec5bd20b10",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.2000042037685
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 2671.2000043008893,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 334,
+      "topology_fingerprint_after": "5fe22cd44a6fe16dc9646b2fd27ef9abbce25b1f6a918af85e560a732cc1698c",
+      "topology_fingerprint_before": "c7fec938db3dd35b2b41609ed9f6175f7934b6f687677a25d1dee5de16253dd7",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.2000043440257
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 2671.200004405889,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 335,
+      "topology_fingerprint_after": "46c4a0890b3dd6632d197d9a3b78b6063880dd8d9c211f7f5d1432e9bcc5c853",
+      "topology_fingerprint_before": "981a1e43278e6e19046efdc6001899e6c3f6bda824c66e0758c81d69dbc92aca",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:bc3b85c3b91e363d0089ae27",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.2000049257895
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 2671.200004930888,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          6
+        ]
+      ],
+      "step": 340,
+      "topology_fingerprint_after": "2900458db0360bdb795415d03540f529c18101842c54389cecb6e02f198ce179",
+      "topology_fingerprint_before": "647d71116803ff972c50b33d8955ed3f2717e6467d37e28bb25bf90818f1b6ca",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.200005036273
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 2671.2000051408877,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 342,
+      "topology_fingerprint_after": "a444ed28b9b86587173386b74066012ded2f6700e3363f1cf0ae9819c41d9eb9",
+      "topology_fingerprint_before": "f2526c0d73a96e48924e26700837957513445c3d154160c98de3fe36f375ec1b",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.20000537317
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 2671.200005455887,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 345,
+      "topology_fingerprint_after": "75b591a83b17bf36d5b951793efa381698f120a2e65fc2bf3a2ba928ed892edf",
+      "topology_fingerprint_before": "6d43483a67030455b9fcdaf9abeaa27611c688cc481b8036d5dd4b4d2719b580",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:9a51be60764acfa1836157e7",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.200005656968
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000007"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 2671.2000056658867,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          7
+        ]
+      ],
+      "step": 347,
+      "topology_fingerprint_after": "71f282b49fdafa6c9aa4c3b1d3555547f96aaa654a68ac1448e0e8b4f1554f0e",
+      "topology_fingerprint_before": "98956c4ee0bec9b7c6c1be69f13808c7cbb718ec28524ebef1a4600e9111afdc",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:a9cc273d8ffb71c9d7091a59",
+      "case": "weakT_300K_seed3621",
+      "completion_times_s": [
+        2671.2000063759738
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 2671.2000064008853,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          5
+        ]
+      ],
+      "step": 354,
+      "topology_fingerprint_after": "655b57fced755309a1aa22fb79e592a28024585bdda6c40e3dc61d3b72029a1b",
+      "topology_fingerprint_before": "43ed109f548ecffd9151d8782a7cc8034e3c7e235710db42546122dbb0a6ad12",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2231.1291612794957
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2234.400000000011,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 266,
+      "topology_fingerprint_after": "6f119e041136c30c1fd87f9235fc85d90fa4d58558e1c9607ef1e49c7ee4a39f",
+      "topology_fingerprint_before": "a5dfd2f7f5d3ef757f85e3d8cfa09237efb1c769b99b6496ed7b5f1b0c631516",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.4000028908645
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2234.40000294192,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 269,
+      "topology_fingerprint_after": "3039c906108f0fb1c54f0438fadf26d191935000f31a52b2f936925467c67c17",
+      "topology_fingerprint_before": "48c9efa5dcb96f0891ffe2bfe81bdab7b495d9c22d761745836881a932144232",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.400003405361
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2234.400003466919,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 274,
+      "topology_fingerprint_after": "244f63e00d6e0dac03c61d4eb1f8699cbf5746e7419840334a465438a903c059",
+      "topology_fingerprint_before": "0c418871b2843f6b4bd51bad35c6dbbaa780b5f33ab5fe2f0264dc8dcf8bd6e7",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.4000039132898
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2234.400003991918,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 279,
+      "topology_fingerprint_after": "8110ff3060508b3cba68468ef7590e5e723f89e5c5fb47d9b4207496d66cb87d",
+      "topology_fingerprint_before": "f6922ba179bcc0d3a53d63f65cf5332fcb1c9e3a80d3e17f9d29356642e92f31",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.4000040681876
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2234.4000040969177,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 280,
+      "topology_fingerprint_after": "20f65d60cf728b619256d6534a9721aeb574a69c4f139ee74b1e97d3e125fb86",
+      "topology_fingerprint_before": "690d2399f1607cda8759d6eb582b46b3edbfd780ad2091607bbc8afbcf477eda",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.400004226067
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 2234.4000043069173,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 282,
+      "topology_fingerprint_after": "c177b83f066b96902d8158f65ccecc018744aa27042576e190f7aaefcb61bd59",
+      "topology_fingerprint_before": "160a89b2124099a9337e7e1ff25c9a9080b6cf0d2c1277e7e25ab15ab563e89e",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.4000043500887
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 2234.400004411917,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 283,
+      "topology_fingerprint_after": "18854f56c66927fd411502d92883c62d82ffbb3b30adefe3ccd753235d1e4f19",
+      "topology_fingerprint_before": "2bc42e0d0083e057429a101ac3b6b6db2ce1c5d151cb8e1b3db18d13c9546f7b",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:bc3b85c3b91e363d0089ae27",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.4000049318524
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 2234.400004936916,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          6
+        ]
+      ],
+      "step": 288,
+      "topology_fingerprint_after": "05af48b1468b723512d63726ab5671318231b3dbc317be0266fb82f097609115",
+      "topology_fingerprint_before": "f986a1fcd4375721a7da1cf76211dbffb7f65ef271f21349ad8697ed4c880132",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.400005058572
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 2234.4000051469156,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 290,
+      "topology_fingerprint_after": "7302ddf6de5458789e2cf4f53368d68be1845458fc9fb4334717bb5e312b4295",
+      "topology_fingerprint_before": "6ffbbc50a6293a2a55edbfbe8fc15e7e1cffe206512fda375f5cecf79859a639",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.4000053954683
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 2234.400005461915,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 293,
+      "topology_fingerprint_after": "ecc5f7d3ff29ab79601ee340a74f7331b457390d6d35b533670c213634c64e6e",
+      "topology_fingerprint_before": "36da3ee59a497c808e4cf5fe4ec660267b01cb00e071b52da38a42c6d752fd46",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:9a51be60764acfa1836157e7",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.4000056630316
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000007"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 2234.4000056719146,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          7
+        ]
+      ],
+      "step": 295,
+      "topology_fingerprint_after": "46dddf7162b5982a781d53e3e531f073adef8ed93d6849fb299cbfac7c16b4fb",
+      "topology_fingerprint_before": "13e37dd684152a73a24c842dd1fa4c222e891efb51d09bb3941e3f01b482dfa8",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:a9cc273d8ffb71c9d7091a59",
+      "case": "weakT_1000K_seed3621",
+      "completion_times_s": [
+        2234.4000063982726
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 2234.4000064069132,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          5
+        ]
+      ],
+      "step": 302,
+      "topology_fingerprint_after": "34a59cf62e4ffd6f2b69c94b89cb5f8dd4f35fd8e8dad8aba350ddfee5fff205",
+      "topology_fingerprint_before": "47266ea210086dd1ed8f1d91899a93c115b4eeb8a1e907835bd318e9e00847de",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "Peak_300K_seed3622",
+      "completion_times_s": [
+        3446.3575910790873
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3446.7620498963634,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 426,
+      "topology_fingerprint_after": "1c1f678cfde59e26f8bcbfd9efbe240edf0c72f02c5b5bbd59f64aa3db6fd91d",
+      "topology_fingerprint_before": "1fece1afc3e3cb44ce9b072f0c03924b753a3f9b911c0ec3238c51c07fdd64fb",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "Peak_300K_seed3622",
+      "completion_times_s": [
+        3446.7620535862798
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3446.7620536033023,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 436,
+      "topology_fingerprint_after": "57256b272b0804ff20922545d012ed7302deee117a9bf2bb7ae2d8dc60eebfcd",
+      "topology_fingerprint_before": "880c9d3ca53b6b993bc16a9b55c1d5fac06dfa934707e77647a0cd0f0078b31a",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "Peak_300K_seed3622",
+      "completion_times_s": [
+        3446.7620541577767
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3446.762054233301,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 442,
+      "topology_fingerprint_after": "b184539176d5d526c734dd6ea94302917d3ef7f6d1fec7d11551d320da91ec08",
+      "topology_fingerprint_before": "1d17ea2fd41220842109f1af28f83776d0fa76f78c4f06f455c0afba07897702",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "Peak_300K_seed3622",
+      "completion_times_s": [
+        3446.7620543682615
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3446.7620544433007,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 444,
+      "topology_fingerprint_after": "7cbb6e0abf321172d5e4fa0eb18cff480f11425cbd699f1ac68b2eb46a575600",
+      "topology_fingerprint_before": "cceee06e2b18013e7a00aa9be03ec6946309d2551db6d3fcf31bc146fc965bc7",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "Peak_300K_seed3622",
+      "completion_times_s": [
+        3446.7620552997464
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3446.762055388299,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 453,
+      "topology_fingerprint_after": "960bb92549df093f883d0d21be1dbcc089d2cbdf495167f5d9a4ab10642002fd",
+      "topology_fingerprint_before": "8b889c78b662409a726001de0c209c97743b337598ed6b1fab753154e076c8bb",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "Peak_300K_seed3622",
+      "completion_times_s": [
+        3446.762055595445
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "bdbe58a91c396e04",
+      "physical_time_s": 3446.7620555982985,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "bdbe58a91c396e04",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 455,
+      "topology_fingerprint_after": "59adc42c035aaded40992c189ccd2ae3b0b64e78d607a4d1421e7f12944b5542",
+      "topology_fingerprint_before": "f1cc190e8de83df43ec6be666af5ac776580ad311642fd3161edb1f9095d5e3a",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "Peak_300K_seed3622",
+      "completion_times_s": [
+        3446.7620561075532
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3446.7620561232975,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 460,
+      "topology_fingerprint_after": "433a6845e29b96b8aefcf2fbae3494cbea9bcc077f0de6a963acd8605da3a042",
+      "topology_fingerprint_before": "3bc494dbce0ac463e7d47c920850efacce5746cc677b606a76805962975d8b72",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "Peak_300K_seed3622",
+      "completion_times_s": [
+        3446.762056165634
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3446.7620562282973,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 461,
+      "topology_fingerprint_after": "db22796a13f4bb49a8710746a1fd42c9360b342a07fbd7ae03e71f2647b1f97e",
+      "topology_fingerprint_before": "d0ef8617b0f65041624b699596ae6c98626666c884c6a55dec416bfcb101b211",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "Peak_300K_seed3622",
+      "completion_times_s": [
+        3446.7620577145885
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3446.7620578032943,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 476,
+      "topology_fingerprint_after": "654be64d71711c854f7f26691109a7e97a32e3efec360a6da7c39e81fb2bd949",
+      "topology_fingerprint_before": "33ba044510137c437e007c6282824cfb45a87e31a15daf5575bb4eb19bf25e0f",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3219.169317717062
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3220.312206607668,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 399,
+      "topology_fingerprint_after": "bbe5f11dc8b162680f990f4f1e66444018019911c536383777ad2fa608c43749",
+      "topology_fingerprint_before": "a7ee93c77fe8507d433f2941e813aaaf19b7fde660cdd8752dd8539dd649d19f",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3220.312210297067
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3220.3122103141086,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 409,
+      "topology_fingerprint_after": "417f67fa7b15a27d0beeaeed326740f31d40941b9b33f780403b2fe8bcedc372",
+      "topology_fingerprint_before": "3b9368886d0a8baab6baf5ed34476511bf7b5cf7c6ba46ab813974a966adf60a",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3220.3122106627943
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3220.312210734108,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 413,
+      "topology_fingerprint_after": "5e201d570d79d5922881386feb5397333efe865d193ec9b5b426317c6e21d61b",
+      "topology_fingerprint_before": "98453f32b990847147d1ddf902bd982bfe229bf75118cda964122a1c80c0ee94",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3220.312210873279
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3220.3122109441074,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 415,
+      "topology_fingerprint_after": "a21c54b07154e05eb719e485315d8bfb56c96bd23af6e5c6a618735785aac04e",
+      "topology_fingerprint_before": "83488885791a533203080c41656ee0019c7cb258d539a0ce13169ad889ae392d",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3220.3122120105336
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3220.312212099105,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 426,
+      "topology_fingerprint_after": "6da51543372813c7b0abcaf3d7d5e7a44e58ea005e049588399c2211e966783a",
+      "topology_fingerprint_before": "8837744ed58792bf799182cf3f17dfdab60b933940e002363cdfd9d5404dc8fd",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3220.3122121004626
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b34a57a4e4baf3da",
+      "physical_time_s": 3220.312212204105,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "b34a57a4e4baf3da",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 427,
+      "topology_fingerprint_after": "629f0d3a35d49851d50c5dc057bccadc7ad6b7ce3cd505d7f1d340696ad9958f",
+      "topology_fingerprint_before": "2eb98c5ee10e8b84291747578e572013a8c5b88df2b524b5fa5fdcf06fe77be7",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3220.3122128183404
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3220.312212834104,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 433,
+      "topology_fingerprint_after": "2feb9d1b120ed7fe3316d7b806de9ed4a914621a63823d69d3b48edf37d6e954",
+      "topology_fingerprint_before": "95989bf84812d8be8aa58b8f4b29aaffd38f6ddce14de7a4ecd2c560f4e03c4d",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3220.312212876421
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3220.3122129391036,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 434,
+      "topology_fingerprint_after": "ee713566766ab5c634ddb8ff27fc2c794a43713af6269d13221fdac4acdfbb10",
+      "topology_fingerprint_before": "1256aeb13d8f9e4e1780b7c83d70b9ab0f62c3eab449b76541f907bb882aa909",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3220.3122144253757
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3220.3122145141006,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 449,
+      "topology_fingerprint_after": "b127ffe49457b0999d41d6169c3104f7703d53dcdbbb5625127e312f53ec9098",
+      "topology_fingerprint_before": "2f93d822422b81a84347f79da4fc01c47957cd3dd59ad788d25cf12c8bf79895",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:bc3b85c3b91e363d0089ae27",
+      "case": "Peak_1000K_seed3622",
+      "completion_times_s": [
+        3220.3122146203277
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "bae28172e415a797",
+      "physical_time_s": 3220.3122147241,
+      "process_owner_id": "j9f410673b2d72cd",
+      "scoped_event_identities": [
+        [
+          "bae28172e415a797",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          6
+        ]
+      ],
+      "step": 451,
+      "topology_fingerprint_after": "438e202e7d7a6a8ddc765d28dfeb2865a2289f91b0d96f88be26c4152a52f3bb",
+      "topology_fingerprint_before": "d77f236a8464d974d13da7f20768c72644d577503ff1a228b6d223258cfda81c",
+      "trial_participating_front_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "weakT_300K_seed3622",
+      "completion_times_s": [
+        2758.315720443768
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2759.176259314602,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 343,
+      "topology_fingerprint_after": "4b9af37fd6fbd9a8a642a3b14c7ada7e5abc6c2edf46e818c0fde0d2cdae725d",
+      "topology_fingerprint_before": "273d0c4ed1eb2c02d98e278b3e562bde6a313db00c91d3b36a385047acff778b",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "weakT_300K_seed3622",
+      "completion_times_s": [
+        2759.176262690131
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2759.176262709522,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 353,
+      "topology_fingerprint_after": "db473792deb6eb2f228976aede063c61f7625998bf53d37de912a22bdf0f6e2e",
+      "topology_fingerprint_before": "743219f4b5a86d9fcb5fdb390e547c75a3233677938ea924facfde7d79947481",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "weakT_300K_seed3622",
+      "completion_times_s": [
+        2759.176263238411
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2759.1762633395206,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 359,
+      "topology_fingerprint_after": "04611a27dd1e0f3ac31b4403db90967143696aeb43afce1f0b387e4d3dbabab2",
+      "topology_fingerprint_before": "eb7f221936542e4003224fd6be94d3528ce0225f518e2a5b86036036addcbb22",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "weakT_300K_seed3622",
+      "completion_times_s": [
+        2759.176263448896
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2759.17626354952,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 361,
+      "topology_fingerprint_after": "28ed9ab0bc04912d991c569e7d5ce8e5c9242275359710ea810a8ff07571ab23",
+      "topology_fingerprint_before": "fb616ab504e5d25bb56843bb71971c0466f5cc32acb7b485e9ecd758b1f116c0",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "weakT_300K_seed3622",
+      "completion_times_s": [
+        2759.1762644035975
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2759.1762644945184,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 370,
+      "topology_fingerprint_after": "c2bc477a63f4b2e8fea0be07f486961df891bc3ccca91fceca13c31f8e3a9d5d",
+      "topology_fingerprint_before": "3939999364cf53af89c79ec7259af2d63f6bbab21138789d1341c3fb93c25461",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "weakT_300K_seed3622",
+      "completion_times_s": [
+        2759.1762646760794
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "bdbe58a91c396e04",
+      "physical_time_s": 2759.176264704518,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "bdbe58a91c396e04",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 372,
+      "topology_fingerprint_after": "da875314f54faafac118f8b704e0852216657231c9c3aca110984ab42a4f727f",
+      "topology_fingerprint_before": "05cdefbaef196b931e893ac730939ed53931c1b1dfe2e8db4996d52e643d08b0",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "weakT_300K_seed3622",
+      "completion_times_s": [
+        2759.176265211405
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2759.176265229517,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 377,
+      "topology_fingerprint_after": "fd97d4c0ba2f09e6356a37ee3fa710e062660578c626ca31587e2cb4a0a44014",
+      "topology_fingerprint_before": "a7b04400967993dfb83625de18afb2175c59112275d0dfad0ab783aa18560d3c",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "weakT_300K_seed3622",
+      "completion_times_s": [
+        2759.176265269485
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2759.1762653345168,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 378,
+      "topology_fingerprint_after": "0650c7fae0a21622673898c3481d02e400b0c948df6c4ee773bc9ea9de2e7e86",
+      "topology_fingerprint_before": "dd4719ffe04aacd80b3fbd269c9c5e93bebe6a03435adda89f8f5e69ade44276",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "weakT_300K_seed3622",
+      "completion_times_s": [
+        2759.1762668184397
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2759.1762669095137,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 393,
+      "topology_fingerprint_after": "ce2149ea560d5990a29579d1d3d7cca97730a42997186b05dfeac0cb8dd89577",
+      "topology_fingerprint_before": "0037331228ff45221b02c61fb94c80f18385127faabea3a9a787f203a114f9b9",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "weakT_1000K_seed3622",
+      "completion_times_s": [
+        2311.0254496093835
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2311.184866765845,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 291,
+      "topology_fingerprint_after": "4d9bf2737c888604f3b60a2083bb380e350d33f3ab31e2215106ea8ae1736ca7",
+      "topology_fingerprint_before": "69a2b651ffeeb41efe77508d7399f14b13220c11bd2c832a90f936cc783d475a",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "weakT_1000K_seed3622",
+      "completion_times_s": [
+        2311.184870139342
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2311.1848701584036,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 301,
+      "topology_fingerprint_after": "050a96d02baeecd94e12420ee278bfe2ba4f547c4a8c1a205d0f5ec25d4f0a31",
+      "topology_fingerprint_before": "9b02ef70dfa9abd074d41c5b14cf4f0305c1cc0adfc909ca68414300818b3762",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "weakT_1000K_seed3622",
+      "completion_times_s": [
+        2311.184870734137
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2311.1848707884023,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 307,
+      "topology_fingerprint_after": "e1b888b02b3d7a161c488b75428399fcdb8ce554562b42de3ed4b024c17f598c",
+      "topology_fingerprint_before": "e422d06c582426e462d9fec682df84af082ad8ae54e0c13f4b4e8fa801f5d021",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "weakT_1000K_seed3622",
+      "completion_times_s": [
+        2311.1848709446213
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2311.184870998402,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 309,
+      "topology_fingerprint_after": "4db394c8a291a66cb311642b43d8c5a4329878537459fe1a236bbe0326944d3c",
+      "topology_fingerprint_before": "93fda3d240a4acddf1e00a511e8a9dbf1f4f6a0e7b3eb9cdace6c94e3aad9b4b",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "weakT_1000K_seed3622",
+      "completion_times_s": [
+        2311.1848718528086
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2311.1848719434,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 318,
+      "topology_fingerprint_after": "0fe3fce51cd3b8638d1f325dadc763538169337a822cf3b8f3253148d99392d0",
+      "topology_fingerprint_before": "ed1b38d5c0b416687000fa9b78c2edf35daca129f6f7efa1b9619134a2147c94",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "weakT_1000K_seed3622",
+      "completion_times_s": [
+        2311.1848721718047
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "bdbe58a91c396e04",
+      "physical_time_s": 2311.1848722583995,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "bdbe58a91c396e04",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 321,
+      "topology_fingerprint_after": "66d5b27f583ab71feaa130a021e2e74a06d3454059e9537c0347a8e51af68f0b",
+      "topology_fingerprint_before": "8a0f463abb5df5c51f753222d3bc28a035370e6621227813c3656c40fffb4109",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "weakT_1000K_seed3622",
+      "completion_times_s": [
+        2311.1848726606154
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2311.1848726783987,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 325,
+      "topology_fingerprint_after": "7e715093f6108cbc07b49d8ee4019a204eba63a9aee66dd821fcf2a5cf508a02",
+      "topology_fingerprint_before": "6581815abf3e2680e1b04bbfcf2f059bc3c4a257a243af06292921a2dc4e51bd",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "weakT_1000K_seed3622",
+      "completion_times_s": [
+        2311.184872718696
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2311.1848727833985,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 326,
+      "topology_fingerprint_after": "64be86e3d37669c5845cd3ad40d01994e9cbe2c97350ffb528252ff7873211a7",
+      "topology_fingerprint_before": "f4d735b73e4233b06bc984e453fd2e467a7ed5aa61a6b311558d68a2d01f1930",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "weakT_1000K_seed3622",
+      "completion_times_s": [
+        2311.1848742676507
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2311.1848743583955,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 341,
+      "topology_fingerprint_after": "6321f9597fd1b9cee7e145eb11149924e532881f231fd3645cd7287e2ff4c04c",
+      "topology_fingerprint_before": "958c55470aa503a0b79410e4cba2115e0482134b2677621421b34534bc7f5659",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "Peak_300K_seed3623",
+      "completion_times_s": [
+        3344.5918710566275
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3351.600000000023,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 399,
+      "topology_fingerprint_after": "bbe5f11dc8b162680f990f4f1e66444018019911c536383777ad2fa608c43749",
+      "topology_fingerprint_before": "a7ee93c77fe8507d433f2941e813aaaf19b7fde660cdd8752dd8539dd649d19f",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "Peak_300K_seed3623",
+      "completion_times_s": [
+        3351.6000017006013
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3351.600003114409,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 400,
+      "topology_fingerprint_after": "1d8307571d00fed9baebd433150982d14c979e517964501c197017de3480760a",
+      "topology_fingerprint_before": "b71d4c3ff35b63754a2cb028d27c1625e2cec62b4748d43bc712ffff344516fb",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "Peak_300K_seed3623",
+      "completion_times_s": [
+        3351.600003206454
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3351.600003219409,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 401,
+      "topology_fingerprint_after": "ec1cb24864d2bc10a60753e6464436fce67d0368a15916684980dafaab41a637",
+      "topology_fingerprint_before": "bc2826b95a36bd666955806ebe792a956f8d658f3e696641f4a8926a715700f4",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "Peak_300K_seed3623",
+      "completion_times_s": [
+        3351.6000043056297
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3351.6000043744066,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 412,
+      "topology_fingerprint_after": "480d5c139a079994ea59b014ced68e9ecc81c148ea473fd4787ec04f3678dea5",
+      "topology_fingerprint_before": "7ba85b2717f4c17cb2fe2785285ff73ceaea8096e6d3abb1396abaaefaed941a",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "Peak_300K_seed3623",
+      "completion_times_s": [
+        3351.6000043726203
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3351.6000044794064,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 413,
+      "topology_fingerprint_after": "29d0d0ab4c540cb51346e1ffa9e33d432af7c4984e86d18e69d2457d2424b03d",
+      "topology_fingerprint_before": "0008d84a73d148c23e5a1e78b16b780dcb3bcb672fc35e1a4af6ef89bc19c9bc",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "Peak_300K_seed3623",
+      "completion_times_s": [
+        3351.6000047923467
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3351.600004794406,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 416,
+      "topology_fingerprint_after": "22575a59a3b4a30b707ecc753b31a07597a26287787d90ef5d7eac8f54a6f10f",
+      "topology_fingerprint_before": "0911945c8eb293437e720cb444226f1d19d958332983bc3ded1badc25a1a34cd",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "Peak_300K_seed3623",
+      "completion_times_s": [
+        3351.600004957525
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "bdbe58a91c396e04",
+      "physical_time_s": 3351.6000050044054,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "bdbe58a91c396e04",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 418,
+      "topology_fingerprint_after": "4076b7cd1f9a8c665bff2b417d3defe7b71e332f5d7a15263530b99893165f7d",
+      "topology_fingerprint_before": "d4f9656c4219bc7906fc4d29ed7e05200de0ba9b3bbb60a5237d294f1d3a3502",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "Peak_300K_seed3623",
+      "completion_times_s": [
+        3351.600005755154
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3351.6000058444038,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 426,
+      "topology_fingerprint_after": "3aadba6c3bbde576518164c706ba4034f2963231358467267cb93b9451273dc6",
+      "topology_fingerprint_before": "d76379ee206b51e3e6e46eb4bd1690b6cd16aad3724ae7c142b941d9dc99a0bf",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:bc3b85c3b91e363d0089ae27",
+      "case": "Peak_300K_seed3623",
+      "completion_times_s": [
+        3351.6000060203805
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3351.6000060544034,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          6
+        ]
+      ],
+      "step": 428,
+      "topology_fingerprint_after": "33c871ea3d6d0c0f7e9afc40c17011bd327ec8853013a89aa36f396b5b1b7cd8",
+      "topology_fingerprint_before": "51078ef355d932a912972b6dcac306a3c65d36522ba34a80a4ed69dbd4531b41",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "Peak_1000K_seed3623",
+      "completion_times_s": [
+        3102.8989484733233
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3108.0000000000205,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 370,
+      "topology_fingerprint_after": "d67b0ad01ac4f965d9448834fb587026ccaaf98dc6d3fbad223c92e14e6483fc",
+      "topology_fingerprint_before": "252bedcaf08a1ec6eb9dc2ccd3d3498e52d761532ec2ee920f86ade67dad0e04",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "Peak_1000K_seed3623",
+      "completion_times_s": [
+        3108.0000017033794
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3108.0000031195113,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 371,
+      "topology_fingerprint_after": "c9b2d6b157867a2e1763c6074c8e36f1cf95967125c15d4732e9ae0aae8dafb3",
+      "topology_fingerprint_before": "3f908558ca7a3313255ad7f168bfdc55cb6a875fd7e77e9ce9f3cb84321289a0",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "Peak_1000K_seed3623",
+      "completion_times_s": [
+        3108.0000032115563
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3108.000003224511,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 372,
+      "topology_fingerprint_after": "865cb73bdcf2a3b3a572adf0c94ded3f6c87a4510cbc32429186a9f679a6d8af",
+      "topology_fingerprint_before": "e46e971f7f916d329f52088cc7942bd7e7af9b1665d23443856c86eff74b2fd2",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "Peak_1000K_seed3623",
+      "completion_times_s": [
+        3108.000004307243
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3108.000004379509,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 383,
+      "topology_fingerprint_after": "058d62d921b16816d4fce90252b2cccafffa8122934c6a9cd57851b7c9544c02",
+      "topology_fingerprint_before": "78adc4113efc3214497a6753318663db61b1f7bea7e56c0459838886d0501792",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "Peak_1000K_seed3623",
+      "completion_times_s": [
+        3108.0000043777222
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3108.0000044845087,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 384,
+      "topology_fingerprint_after": "7e80b64ede99969f1623b169f0923255a43ff6148d9bfc4fdb5322ef849858b5",
+      "topology_fingerprint_before": "a1b545621a7fe1cf41684e650fa3436db6d3b4633b482b00ca03f72b5e8bb9c4",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "Peak_1000K_seed3623",
+      "completion_times_s": [
+        3108.000004797449
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3108.000004799508,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 387,
+      "topology_fingerprint_after": "17fa7359683a3b1f5040fee22e5d3dddde8f1721018a5d34a198e678955314c0",
+      "topology_fingerprint_before": "152c48782d4e06d8747fa7433cb886af55adfd1dc806697894a17b83d006176d",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "Peak_1000K_seed3623",
+      "completion_times_s": [
+        3108.0000049591386
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "bdbe58a91c396e04",
+      "physical_time_s": 3108.0000050095077,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "bdbe58a91c396e04",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 389,
+      "topology_fingerprint_after": "07eec8d31f98ae52625f7213a951f44efde4be71d70fb0b0e781468474525d1f",
+      "topology_fingerprint_before": "e699d4a564a9dfa6a1cb6abb856405984d7a17743e699d57b6a7ba0335c03e7d",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "Peak_1000K_seed3623",
+      "completion_times_s": [
+        3108.0000057602565
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3108.000005849506,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 397,
+      "topology_fingerprint_after": "fa968b8b559822414a54ef02593891c90e546ac2af4a295c2f8649a610a6e304",
+      "topology_fingerprint_before": "ee8d3fbe694ae506117bdc41e0f6a4178113cb5fa2dd48b8314e7e59a5e56664",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:bc3b85c3b91e363d0089ae27",
+      "case": "Peak_1000K_seed3623",
+      "completion_times_s": [
+        3108.000006025483
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 3108.0000060595057,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          6
+        ]
+      ],
+      "step": 399,
+      "topology_fingerprint_after": "472dfca856877c2f884afd7aaa7d78c33f3c21fdb88d842d0ee617619f5d4440",
+      "topology_fingerprint_before": "5247005a3dd1b89ba8e03dab235043f8eef163a2a2b3f79c95b680bfcef4edfb",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "weakT_300K_seed3623",
+      "completion_times_s": [
+        2643.1819074550053
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2646.0000000000155,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 315,
+      "topology_fingerprint_after": "8cf4416cf8ab5e2512a54e028cc1ad637b4a9bc81a770e18b462fdc4120f71f7",
+      "topology_fingerprint_before": "39f170da8fb3d76c192b4d6bae3327a41eb3d16d58b7a1642816d122a5aa7abf",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "weakT_300K_seed3623",
+      "completion_times_s": [
+        2646.000001530804
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2646.0000028071063,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 316,
+      "topology_fingerprint_after": "065b379adfb8ab70941ac479ec453d5a095c465e4d449701f3ef3c6a957b6d2b",
+      "topology_fingerprint_before": "8c02bf26354ed2b8bf6aa677b11fc2b17d277e6b80864f7c7655eb24b7001c8e",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "weakT_300K_seed3623",
+      "completion_times_s": [
+        2646.0000028990767
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2646.000002912106,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 317,
+      "topology_fingerprint_after": "d27b327561c615facd629fb778dbd65fe43d5fece70cd03ed5f0ccf82e1afc0a",
+      "topology_fingerprint_before": "caba6cedc8d9fe5381fb855d6c83dfbb85219c7af005a8a1d348e8f55eadf76d",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "weakT_300K_seed3623",
+      "completion_times_s": [
+        2646.0000040159007
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2646.000004067104,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 328,
+      "topology_fingerprint_after": "2ab1dd91dd8dee7082d8b0c0fc88f547c9447e67cfb6c536562fb13b7bee9867",
+      "topology_fingerprint_before": "8ee665e9d958a3dbbea39b66fc7ddc6b63e7add76f57fa8535ad76332b0e3246",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "weakT_300K_seed3623",
+      "completion_times_s": [
+        2646.000004065243
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2646.0000041721037,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 329,
+      "topology_fingerprint_after": "ddfa787d9b9739a760650c686fc84e8d542738e007c1ea05c3e83083f29a40a4",
+      "topology_fingerprint_before": "1caca39f16c3f05a1fb7e76597163a2ced203c81115be0b20cf16305e6e42af1",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "weakT_300K_seed3623",
+      "completion_times_s": [
+        2646.0000044849694
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2646.000004487103,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 332,
+      "topology_fingerprint_after": "525dd768ce795e42476b9105acfb59f2d10ceb0dfd31b84721c08188038ba78a",
+      "topology_fingerprint_before": "a950fc51ec8b46eb884182f27d8315111f58bc839f1e380e9329c938020c2a26",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "weakT_300K_seed3623",
+      "completion_times_s": [
+        2646.0000046677956
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "bdbe58a91c396e04",
+      "physical_time_s": 2646.0000046971027,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "bdbe58a91c396e04",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 334,
+      "topology_fingerprint_after": "7b57eef187e4d9e3aea0c0e1f1fb7ddd3128332aad8b1a174acd37bff17005f1",
+      "topology_fingerprint_before": "b9906d0ac28899edab32fa1201060460d9993083d92eac5160e43aed448834b8",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "weakT_300K_seed3623",
+      "completion_times_s": [
+        2646.000005447777
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2646.000005537101,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 342,
+      "topology_fingerprint_after": "35e92a30ad912deb64f0f32b0e8920cbff75de4bbea958af618c6cf3759206af",
+      "topology_fingerprint_before": "aa586e7ac4b46fffe57726221f258df530a51299f4648e20d2516fa54de9548f",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:bc3b85c3b91e363d0089ae27",
+      "case": "weakT_300K_seed3623",
+      "completion_times_s": [
+        2646.0000057130032
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2646.0000057471007,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          6
+        ]
+      ],
+      "step": 344,
+      "topology_fingerprint_after": "a92bf19cc055b591f97363ab91fa31927dbdaed36a681544f61924a6ac92ba2b",
+      "topology_fingerprint_before": "8d7272827b39d901ef0f9fad34f51ff102bd7f3da77294416e62f9c61ded03a3",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "weakT_1000K_seed3623",
+      "completion_times_s": [
+        2213.2608340477764
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2217.600000000011,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 264,
+      "topology_fingerprint_after": "2b60b193c71069780294f4e7aee28d36e59a4cf20a9affbc6ff5f416986d00dc",
+      "topology_fingerprint_before": "d4fde300f8095d36490ad21772c191c7eea19109ad2707a8308e15fc8ea9b1fb",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "weakT_1000K_seed3623",
+      "completion_times_s": [
+        2217.6000015249315
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2217.6000027960995,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 265,
+      "topology_fingerprint_after": "38afc29efa35ad7410c588514854b40a2d29c338b21ee129257900f5fbb947d4",
+      "topology_fingerprint_before": "78843c6534c4a72a543c033246ddd9c9f2eada359eceeefc3292c4d8f85dcb54",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "weakT_1000K_seed3623",
+      "completion_times_s": [
+        2217.600002888075
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2217.6000029010993,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 266,
+      "topology_fingerprint_after": "c7cbe664ed772ed4e801e2b735f9282c71df0b8fb916583517e083d7318bec7c",
+      "topology_fingerprint_before": "c9894ab2b109a49dbb5f404c1db9d0b70512ceba7fc53e2908dbfd4bd033b787",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "weakT_1000K_seed3623",
+      "completion_times_s": [
+        2217.600003997395
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2217.600004056097,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 277,
+      "topology_fingerprint_after": "9786f367d43aefe946a565420de9ff1e2bce78a5660a0a43e1c0deef1b99d3fc",
+      "topology_fingerprint_before": "b584d51ec99fe6ba0d2a576de0c579aac9bb67958869683925b99ad5d597549b",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "weakT_1000K_seed3623",
+      "completion_times_s": [
+        2217.6000040542413
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2217.600004161097,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 278,
+      "topology_fingerprint_after": "86435e43a9129ffe8556cbe37a7d7b813d33e80dff5c311d32b995dcf2c3a69b",
+      "topology_fingerprint_before": "d309960326fa8416dbfb094df9b669eda1ca24a41315637e06557f08ac49b7ed",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:5214cd06aed8b2854408fb4f",
+      "case": "weakT_1000K_seed3623",
+      "completion_times_s": [
+        2217.6000044739676
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2217.6000044760963,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          4
+        ]
+      ],
+      "step": 281,
+      "topology_fingerprint_after": "b01b855b2abaa1822a20de2a16338f6e567cb47b66586f5ebefbe3828dc806b7",
+      "topology_fingerprint_before": "434d126f1452e3176cb774106baa0e01d6092e433835d61480a9b8cef756b87d",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "weakT_1000K_seed3623",
+      "completion_times_s": [
+        2217.60000464929
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "bdbe58a91c396e04",
+      "physical_time_s": 2217.600004686096,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "bdbe58a91c396e04",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 283,
+      "topology_fingerprint_after": "3f20763fb4bf87dac072a2c83841335f7e68ebd0dbde1f57f214c0bd03317410",
+      "topology_fingerprint_before": "e42aecc64e176dd3913677371c360629e58e0e0c71e41fdb43b8e622998a5ace",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:edbd37a74d7ed51c61d5b9f4",
+      "case": "weakT_1000K_seed3623",
+      "completion_times_s": [
+        2217.600005436775
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2217.6000055260943,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          5
+        ]
+      ],
+      "step": 291,
+      "topology_fingerprint_after": "447f57a45d396fe880739be0fc13f9309ff65377028eb5982c2cbcf5e1932813",
+      "topology_fingerprint_before": "61c91e14b35ad03cc446972c765f0e17ce31431e7d5d0c24d2572cdce8377559",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:bc3b85c3b91e363d0089ae27",
+      "case": "weakT_1000K_seed3623",
+      "completion_times_s": [
+        2217.6000057020015
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "b6b03ba774a1dfae",
+      "physical_time_s": 2217.600005736094,
+      "process_owner_id": "j80c4d97a9fc663e",
+      "scoped_event_identities": [
+        [
+          "b6b03ba774a1dfae",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          6
+        ]
+      ],
+      "step": 293,
+      "topology_fingerprint_after": "b323a0251bf18cfb3f3944ead7c456f996729d591af978bf7a2a5c16ed213015",
+      "topology_fingerprint_before": "b1fee994842405dc658f5cf942d4558f9a63fcaf118d5d149f1efa73ab06d00e",
+      "trial_participating_front_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "Peak_300K_seed3624",
+      "completion_times_s": [
+        3424.8555771377714
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 3424.855577222396,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 420,
+      "topology_fingerprint_after": "35ae881fb068308128dbffeaad086bd1a1d918c5719e8b01b47ce3d91e890d95",
+      "topology_fingerprint_before": "6bf61d831c386340c46d2d6c4af369ca5aaad43791769053c2c63084536c88b2",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "Peak_300K_seed3624",
+      "completion_times_s": [
+        3424.8555772088716
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "bb8b71e38dc735de",
+      "physical_time_s": 3424.8555773273956,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "bb8b71e38dc735de",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 421,
+      "topology_fingerprint_after": "643f00c85571dd6b88951a1515fad69c0a15e2b1c89c9f55fcdf009e7a1e5689",
+      "topology_fingerprint_before": "7d6481c92d5080c6a5181ca8b3d94ca31620445bacf2f2983f509209462df739",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "Peak_300K_seed3624",
+      "completion_times_s": [
+        3424.855578102873
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 3424.855578167394,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 429,
+      "topology_fingerprint_after": "5db44df868589a9d5a36fab28e8d45ceb4cc60f90a2ea6ad03d0d5cb26bd3a70",
+      "topology_fingerprint_before": "f2018539a21b769a49d063565d1d23ee3874b7dfe4deb3219bfadfe11234ff7c",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "Peak_300K_seed3624",
+      "completion_times_s": [
+        3424.8555788859458
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "bb8b71e38dc735de",
+      "physical_time_s": 3424.8555789023926,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "bb8b71e38dc735de",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 436,
+      "topology_fingerprint_after": "4031415b5c0e0abb4d0a7493701b5e36bd0b1b4a656cadde96066ec5d5eab660",
+      "topology_fingerprint_before": "afc0fc7330afe95634e339841f3304bcabd0f798190b9715a9d6a94acb69afdb",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:a9cc273d8ffb71c9d7091a59",
+      "case": "Peak_300K_seed3624",
+      "completion_times_s": [
+        3424.8555789384345
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 3424.8555790073924,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          5
+        ]
+      ],
+      "step": 437,
+      "topology_fingerprint_after": "42b0c243d8bb1eb770ec643b31fbd3f7b38885e17e728f3d42a8f2e7fe5ca46d",
+      "topology_fingerprint_before": "712327fa26a79cc38d07ce394eeb0edd7ba559d296a5a4ed32c36db044ee2fd0",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:785d246f2da91903613349ad",
+      "case": "Peak_300K_seed3624",
+      "completion_times_s": [
+        3424.8555813223265
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 3424.855581422388,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          6
+        ]
+      ],
+      "step": 460,
+      "topology_fingerprint_after": "511b5dd635697edf1a1359c48a4e60ccb62364a49baedc8440e092f93dddf653",
+      "topology_fingerprint_before": "f39cc29a16f9e9c4ae7eab1a39b99c810de33afad6a8a9a541883f5b1e8e147f",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "Peak_1000K_seed3624",
+      "completion_times_s": [
+        3191.7969804186914
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3192.8604728180962,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 384,
+      "topology_fingerprint_after": "28fe96c8e02654c64aa62f97f487aabccc2f5070208b7d994d772beb7f3153fb",
+      "topology_fingerprint_before": "a7ba37745185e4dfe2c82380fe7cdbcb6a3663a277d5e75ebba5d97cdc0fbbd1",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "Peak_1000K_seed3624",
+      "completion_times_s": [
+        3192.860475882561
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 3192.8604759798422,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 388,
+      "topology_fingerprint_after": "96821de417b0b33433a9e6aa5584af9ee658fb118ac1288b22fa23e366e794f8",
+      "topology_fingerprint_before": "51b59ad62945ec6fef75d5a09d5554d93521018947e949330b9a06084b2e760e",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "Peak_1000K_seed3624",
+      "completion_times_s": [
+        3192.860475968878
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b9f6de9beb6c53dd",
+      "physical_time_s": 3192.860476084842,
+      "process_owner_id": "j95f110b58d7fd9b",
+      "scoped_event_identities": [
+        [
+          "b9f6de9beb6c53dd",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 389,
+      "topology_fingerprint_after": "d3d7f1619e198083e19226b20d09a54005c73fb611c16f5c7df60b0fdfde8dbb",
+      "topology_fingerprint_before": "cde1641e85bd474d309306af95ac1cdacad796239d7c011568c1707bd905da0e",
+      "trial_participating_front_ids": [
+        "b9f6de9beb6c53dd",
+        "be35e2025dc93aa6"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "Peak_1000K_seed3624",
+      "completion_times_s": [
+        3192.860476386312
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "be35e2025dc93aa6",
+      "physical_time_s": 3192.8604763998414,
+      "process_owner_id": "j95f110b58d7fd9b",
+      "scoped_event_identities": [
+        [
+          "be35e2025dc93aa6",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 392,
+      "topology_fingerprint_after": "ddd6684161ba609e18939211e228599e29856e2e9b2524a908f9d0b5b3a84e7e",
+      "topology_fingerprint_before": "9ff5e79266b5f8c294e564812c53eeb4b5d1375374d76a9460eed80de2a4354f",
+      "trial_participating_front_ids": [
+        "b9f6de9beb6c53dd",
+        "be35e2025dc93aa6"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "Peak_1000K_seed3624",
+      "completion_times_s": [
+        3192.860476618462
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b9f6de9beb6c53dd",
+      "physical_time_s": 3192.860476714841,
+      "process_owner_id": "j95f110b58d7fd9b",
+      "scoped_event_identities": [
+        [
+          "b9f6de9beb6c53dd",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 395,
+      "topology_fingerprint_after": "c7807b6bee15d6d0f17a1eed3565374bfd6bffda3ede4e6e20e84166bf7e9266",
+      "topology_fingerprint_before": "0f90dcb349a958e7373fa5435921e1aa357c3d2586d08bbac7001aa6681709d4",
+      "trial_participating_front_ids": [
+        "b9f6de9beb6c53dd",
+        "be35e2025dc93aa6"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "Peak_1000K_seed3624",
+      "completion_times_s": [
+        3192.860477583564
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b9f6de9beb6c53dd",
+      "physical_time_s": 3192.860477659839,
+      "process_owner_id": "j95f110b58d7fd9b",
+      "scoped_event_identities": [
+        [
+          "b9f6de9beb6c53dd",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 404,
+      "topology_fingerprint_after": "790913d23faa088e6a520940bb5843de0417cca161d0c119fcfecb14984327c4",
+      "topology_fingerprint_before": "2d8901d9ce8227f22be14bb8fd061be8700b6732162938ceb30786aafe45efd7",
+      "trial_participating_front_ids": [
+        "b9f6de9beb6c53dd",
+        "be35e2025dc93aa6"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "Peak_1000K_seed3624",
+      "completion_times_s": [
+        3192.8604780633855
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "be35e2025dc93aa6",
+      "physical_time_s": 3192.8604780798382,
+      "process_owner_id": "j95f110b58d7fd9b",
+      "scoped_event_identities": [
+        [
+          "be35e2025dc93aa6",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 408,
+      "topology_fingerprint_after": "da902d818d5c6711475ef27fb087c1dd067c3e3454f7edaca5d340201b43f285",
+      "topology_fingerprint_before": "a019ba37869a196898a4f7f26445950c8dbedc7f61facdb81eba14d73be267ec",
+      "trial_participating_front_ids": [
+        "b9f6de9beb6c53dd",
+        "be35e2025dc93aa6"
+      ]
+    },
+    {
+      "action_id": "action:1:a9cc273d8ffb71c9d7091a59",
+      "case": "Peak_1000K_seed3624",
+      "completion_times_s": [
+        3192.8604784191252
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b9f6de9beb6c53dd",
+      "physical_time_s": 3192.8604784998374,
+      "process_owner_id": "j95f110b58d7fd9b",
+      "scoped_event_identities": [
+        [
+          "b9f6de9beb6c53dd",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          5
+        ]
+      ],
+      "step": 412,
+      "topology_fingerprint_after": "f559728f123b87860fb02a69145876c570bab0493897b040ff7c7eb028dede23",
+      "topology_fingerprint_before": "2fe26c6dadec2fad8e35a44ec3b1c8e7c9531599939d33c3b0ea933b5fbeb676",
+      "trial_participating_front_ids": [
+        "b9f6de9beb6c53dd",
+        "be35e2025dc93aa6"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "weakT_300K_seed3624",
+      "completion_times_s": [
+        2731.7551570815813
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2734.1623428884645,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 329,
+      "topology_fingerprint_after": "4f7e0048d30a70160ff33d6edf24562749dda151ff8a4d2a0da8fbbb1e7ab16e",
+      "topology_fingerprint_before": "56c5441ac3ab84582a0a55a206cd0e5612f58eec400ea735fbd4477b2435fa1f",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "weakT_300K_seed3624",
+      "completion_times_s": [
+        2733.62887886978
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2734.1623454156634,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 330,
+      "topology_fingerprint_after": "fe6995778a98ff5e78ae2de6c07b841ee3e53fd6716144a3ecfbfdbe8aaa129d",
+      "topology_fingerprint_before": "fc6a5daf30cb102225b601275b2e903a5c6372e924ba6a28bbfaa7d4299942e2",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "weakT_300K_seed3624",
+      "completion_times_s": [
+        2734.162345632265
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2734.1623457306628,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 333,
+      "topology_fingerprint_after": "4c9481b7f2a1f0a98200fa2bbf406d4828623b2d393d1552627e96558367d47c",
+      "topology_fingerprint_before": "31ca2ffca323b31ebbd44c84576f8f3c4986cf73e6cac2ef80c39ebaaa17e239",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "weakT_300K_seed3624",
+      "completion_times_s": [
+        2734.162346061748
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 2734.162346150662,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 337,
+      "topology_fingerprint_after": "dab0c15bb738d187941a5348b53b60afa54fd0a9a7522a4fc981149c9ca33a61",
+      "topology_fingerprint_before": "2c0ef28d9d890ef5389a4a6fd15845e0a95bd798b0b5e50db950fff1f03d8034",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "weakT_300K_seed3624",
+      "completion_times_s": [
+        2734.162346136016
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "bb8b71e38dc735de",
+      "physical_time_s": 2734.1623462556618,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "bb8b71e38dc735de",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 338,
+      "topology_fingerprint_after": "726551d148cbfbc98ebf18f06119413f587df3bd2acc2d119cf04f315a9733b2",
+      "topology_fingerprint_before": "d70cfb364b437c0cf7bf915f9bec089d83b2c379f5b87afa79aa668e6130c551",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "weakT_300K_seed3624",
+      "completion_times_s": [
+        2734.1623470268496
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 2734.16234709566,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 346,
+      "topology_fingerprint_after": "0d247d707462e10d7bcb31d47a50d0ae0b0c976925d4c734ccc9daa608b422e3",
+      "topology_fingerprint_before": "fe8acc85334cebbe8a8378493368892272aa179f359f2692be42019ce32fbc11",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:edd3bdc12e3def4c67802285",
+      "case": "weakT_300K_seed3624",
+      "completion_times_s": [
+        2734.1623478131264
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "bb8b71e38dc735de",
+      "physical_time_s": 2734.1623478306587,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "bb8b71e38dc735de",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          3
+        ]
+      ],
+      "step": 353,
+      "topology_fingerprint_after": "d8c41a8a008886932efb60334c6460b0834e7c87d3d893118acabf4bfaf27cc8",
+      "topology_fingerprint_before": "82729988f8d1bf2c28b5a0b169b0d27813a3641149c0ac827f22f0cd3989c38b",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:a9cc273d8ffb71c9d7091a59",
+      "case": "weakT_300K_seed3624",
+      "completion_times_s": [
+        2734.1623478624115
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 2734.1623479356585,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          5
+        ]
+      ],
+      "step": 354,
+      "topology_fingerprint_after": "a6c1ac1bd6a211f4e91574e333a921ad200757a2a520634d4be9130f596b7db6",
+      "topology_fingerprint_before": "1f8554e4b6ae65d5ffec82cd864af25bc72caf8162989efdb2a49730cae225e4",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:785d246f2da91903613349ad",
+      "case": "weakT_300K_seed3624",
+      "completion_times_s": [
+        2734.162350246303
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 2734.162350350654,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          6
+        ]
+      ],
+      "step": 377,
+      "topology_fingerprint_after": "f806c5ed809a14dedae3764e48034a9f049c4da079709d6de33e03894d955d5d",
+      "topology_fingerprint_before": "24ab08dc9c9d1f0d0940c9cae0d5c4fb39ae142686ca2fb2642cfc12621457e1",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:98d79d459eb5ea00524ef0f0",
+      "case": "weakT_1000K_seed3624",
+      "completion_times_s": [
+        2288.416900527264
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2290.109324160281,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          1
+        ]
+      ],
+      "step": 277,
+      "topology_fingerprint_after": "53956f715efb2ad5919f7a10472712e2988bfce175f98b50a2de9a91fe9ec9e5",
+      "topology_fingerprint_before": "84d8b424606aeabc326068d45bb4cedda76648306d0af9d9dbbfaa52b0bf5a53",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:b01c13d84665d8901afcde8f",
+      "case": "weakT_1000K_seed3624",
+      "completion_times_s": [
+        2290.029806663003
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2290.1093266846437,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          2
+        ]
+      ],
+      "step": 278,
+      "topology_fingerprint_after": "dec0e7338654d9164f0b4533af8e96bd89f0b2e00d61f28fce09d3615adeb951",
+      "topology_fingerprint_before": "c7076ca8f870a87a44f702269560e7355102ea87639cb74b77face44fbcb6618",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:17b693f35ed8b91e0bfc2e51",
+      "case": "weakT_1000K_seed3624",
+      "completion_times_s": [
+        2290.1093269013963
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001"
+      ],
+      "event_owner_tip_id": "b00000000",
+      "physical_time_s": 2290.109326999643,
+      "process_owner_id": "b00000000",
+      "scoped_event_identities": [
+        [
+          "b00000000",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          1
+        ]
+      ],
+      "step": 281,
+      "topology_fingerprint_after": "bdd760e72c274c77dffb4362e202c44e8d1e76830fe9f6db6e95bade46e121f9",
+      "topology_fingerprint_before": "c1a1ed4aae37ea37fc0bf8f0dcbb8ba4e766e6e49b64dce3f171688392c8b1a4",
+      "trial_participating_front_ids": [
+        "b00000000"
+      ]
+    },
+    {
+      "action_id": "action:1:083f1a2d8a8c3f1bbbd50be7",
+      "case": "weakT_1000K_seed3624",
+      "completion_times_s": [
+        2290.109327344312
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000003"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 2290.1093274196423,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          3
+        ]
+      ],
+      "step": 285,
+      "topology_fingerprint_after": "c8ab8b466eb89b4b2e0aefc6fe5476dd2d5ec00b3042a5b192ed0953987c566f",
+      "topology_fingerprint_before": "3e3696b5b844748ba24d850218ea8a5169f6b0d7e7f346b0dddcf6cb53d06d55",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:303ad0fec25fb76c6ff28bae",
+      "case": "weakT_1000K_seed3624",
+      "completion_times_s": [
+        2290.1093274051473
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002"
+      ],
+      "event_owner_tip_id": "bb8b71e38dc735de",
+      "physical_time_s": 2290.109327524642,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "bb8b71e38dc735de",
+          "cleave:cleavage:(010):694b159e5c3c21b95300",
+          2
+        ]
+      ],
+      "step": 286,
+      "topology_fingerprint_after": "03664bdfb706bb0af94de8fe222661de5a09a2459e96f3678628853bc9d8bc30",
+      "topology_fingerprint_before": "4314c2a0b8730abef75392e96d9509e30bf196a90784a639fae592e6c81a9e07",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:99e87f021d33317671453755",
+      "case": "weakT_1000K_seed3624",
+      "completion_times_s": [
+        2290.1093283094137
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000004"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 2290.1093283646405,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          4
+        ]
+      ],
+      "step": 294,
+      "topology_fingerprint_after": "fb758245d3db02c47d95dd8977ffbe1e93a5c4ed4a72f401d4cc05e5b837d18d",
+      "topology_fingerprint_before": "0f541eecd2623f2904f0fd9bf7c12a70db38a836ff581cb7e5fcfde6d85a3683",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:a9cc273d8ffb71c9d7091a59",
+      "case": "weakT_1000K_seed3624",
+      "completion_times_s": [
+        2290.1093291449756
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000005"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 2290.109329204639,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          5
+        ]
+      ],
+      "step": 302,
+      "topology_fingerprint_after": "955b1ea7a06ee7d0b80345d9eda4e91b724359e970336e30f143e6663798d49a",
+      "topology_fingerprint_before": "f49c7ae6bbf338f454f8c4334dd6d69f564fcc5e2912c2c4f297647445eaf46a",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    },
+    {
+      "action_id": "action:1:785d246f2da91903613349ad",
+      "case": "weakT_1000K_seed3624",
+      "completion_times_s": [
+        2290.109331528867
+      ],
+      "consumed_event_ids": [
+        "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000006"
+      ],
+      "event_owner_tip_id": "b042c2d7b4cc6a46",
+      "physical_time_s": 2290.1093316196343,
+      "process_owner_id": "jbe1d699748fbb56",
+      "scoped_event_identities": [
+        [
+          "b042c2d7b4cc6a46",
+          "cleave:cleavage:(100):77278fedde405b16bcd0",
+          6
+        ]
+      ],
+      "step": 325,
+      "topology_fingerprint_after": "97bdc7f62997831da646af7141b04812c2c0136172333d21d987220dfa05bf8b",
+      "topology_fingerprint_before": "272e556453d6fffd2ac456ac17958299d18a62d53f45279ddb3d766ee7757e11",
+      "trial_participating_front_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ]
+    }
+  ],
+  "scope": "accepted transactions in each authoritative output; step419 continuation excludes original accepted prefix, preserved separately",
+  "trial_participating_front_ids_are_not_event_owners": true
+}
