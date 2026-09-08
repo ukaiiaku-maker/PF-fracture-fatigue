@@ -8,7 +8,7 @@ on:
     inputs:
       operation:
         type: choice
-        options: [focused, rollback, restarts, final, audit]
+        options: [focused, rollback, restarts, transitions, final, audit]
         default: focused
         required: true
 
@@ -53,7 +53,7 @@ jobs:
           name: v5-source-resolution-development-${{ github.sha }}
           path: /tmp/v5-source-resolution
   phase8:
-    if: github.event_name == 'workflow_dispatch' && (inputs.operation == 'rollback' || inputs.operation == 'restarts')
+    if: github.event_name == 'workflow_dispatch' && (inputs.operation == 'rollback' || inputs.operation == 'restarts' || inputs.operation == 'transitions')
     uses: ./.github/workflows/voiding-v5-phase8-development.yml
     with:
       section: ${{ inputs.operation }}
