@@ -3,7 +3,9 @@
 These are retained development executions, not the final complete A/B closure
 campaign. The historical `c4fbd2f` result and all its artifacts remain unchanged.
 No release-candidate, calibrated-material, or experimental-validation claim is
-made. The final campaign has not started and its readiness ledger is absent.
+made. All ten development phases have executed and are classified in the
+hash-bound `development_phase_status.json`. This permits the one replacement
+final A/B execution; it is not final scientific qualification or a CI PASS.
 
 Every packaged directory has a complete inventory and packaging provenance.
 Packaging is not another physical execution. Losslessly compressed legacy
@@ -47,8 +49,9 @@ They neither replace the later clean records nor add independent final A/B rows.
   all-45 execution is not replaced by combining these development heads.
   The unified development run `34189099900` at `ec79645` has now executed all
   45 registered transitions and reports 45/45 partition passes plus eleven
-  stagewise rows. All three original inventories verify; strict independent
-  Linux source reconstruction remains pending.
+  stagewise rows. Linux audit `34199690728` validates all 45 transition rows,
+  but the complete section remains FAIL at 55/56 source rows: one stagewise
+  continued-event topology certificate differs in two h-local-median copies.
 - Phase 8 (`c284427`): the stronger +8e-7 m common reload fails both one- and
   two-ring kinetic-transfer budgets. This is not a zero-drive classification.
   At `787ebf6`, the separately prospective matched return-load V2 source,
@@ -61,16 +64,35 @@ They neither replace the later clean records nor add independent final A/B rows.
   Separately, rollback CI `34184427615` at `facbc24` completed all 39 registered
   attempts. Independent complete-checkpoint, injection-trace, topology and
   conservation reconstruction verifies 39/39 PASS, including all 28 lifecycle
-  stages. This does not substitute for the still-running eleven V2 restarts.
-  Completed restart shards 2 and 3 at the same `787ebf6` implementation report
-  exact direct/replay results for their five cases, but have TWO different
-  complete terminal fingerprints. The retained cross-worker comparison finds
+  stages. Independent Linux reconstruction also verifies all 39 rows.
+  All four V2 restart shards at `787ebf6` have now finished: eleven real
+  continued endpoints, eleven exact direct/replay histories, and no execution
+  failures. The eleven cases have TWO complete terminal fingerprints (groups
+  of eight and three), so global common-terminal equality FAILS. The retained cross-worker comparison finds
   identical mesh nodes/connectivity but differing displacement, damage, source
   stress, accepted time and protected-geometry records. This is a global exact
-  common-terminal FAIL for the completed subset, not merely a provenance
+  common-terminal FAIL, not merely a provenance
   difference. Identical declared package versions and thread counts do not
   establish identical numerical kernels. Read-only dispatch interventions are
   separately versioned; no old result is relabeled or tolerance relaxed.
+  The three-worker diagnostic `34197537829` isolates an OpenBLAS SkylakeX versus
+  Haswell effect and verifies identical fixed-policy records across both native
+  target types and all independent repeats. Replacement physical evidence under
+  that prospectively frozen policy remains required.
+  Complete Linux restart audit `34201490540` reconstructs 8/11 source rows;
+  three retained shard-2 stagewise certificates fail exact reconstruction.
+  No checkpoint conflicts or decision-reconstruction errors occur. The complete
+  mixed-kernel development registry remains FAIL, not unexecuted work.
+
+The completed legacy `a34cdf0` 106-row development bundle is retained as a
+lossless, bounded archive because its original lifecycle JSON is 184 MiB. Every
+original file was stream-decoded and hash-compared exactly; no scientific JSON
+was rewritten. It reports 33/45 partition passes (41 actual transitions), 39/39
+rollback passes, and ten successful direct/replay continuations. Its different-
+load zero-drive case fails source qualification; the shared legacy try block
+skips replay continuation after the direct failure. Its reported endpoint
+equality is not an eleventh completed restart. This does not revoke the ten
+successful legacy replays or substitute for the corrected V2 registry.
 - Phase 10 (`a34cdf0`): observed causal states and histories match, but all four
   full future-sequence/restart gates fail. Historical raw identity remains FAIL.
 - Phase 9 (`a34cdf0`): all 96 unique static solves completed and independently

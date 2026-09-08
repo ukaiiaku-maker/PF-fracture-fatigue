@@ -1,0 +1,152 @@
+{
+  "actual_section_cases": 11,
+  "actual_source_rows": 11,
+  "checkpoint_assembly_conflicts": false,
+  "complete_final_campaign": false,
+  "complete_section_registry": true,
+  "decision": {
+    "V12_disabled_neutrality": [],
+    "all_restart_stages_reach_identical_complete_terminal": false,
+    "controlled_histories": [],
+    "decision": "BLOCKED",
+    "downstream_lifecycle_rollback": "NOT_EXERCISED_SOURCE_RESOLUTION_PREREQUISITE",
+    "natural_partitions_restart": [],
+    "required_continued_front_restart_terminal": true,
+    "restart_to_attainable_terminal_exact": true,
+    "rollback_attempts": [],
+    "stagewise_topology_and_conservation": true,
+    "transition_partitions": []
+  },
+  "decision_reconstruction_errors": [],
+  "producer_predicate_passed_cases": 11,
+  "python_version": "3.12.14",
+  "record_kind": "READ_ONLY_RECONSTRUCTION_NOT_NEW_PHYSICAL_EXECUTION",
+  "row_reconstruction_results": [
+    {
+      "case_identity": "available_site",
+      "dataset": "restarts",
+      "execution_id": "restarts:available_site:None:0:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "stable_subgrid_cavity",
+      "dataset": "restarts",
+      "execution_id": "restarts:stable_subgrid_cavity:None:1:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "connected_before_downstream",
+      "dataset": "restarts",
+      "execution_id": "restarts:connected_before_downstream:None:2:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "incomplete_first_hit",
+      "dataset": "restarts",
+      "execution_id": "restarts:incomplete_first_hit:None:0:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "before_promotion",
+      "dataset": "restarts",
+      "execution_id": "restarts:before_promotion:None:1:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "downstream_child_before_continuation",
+      "dataset": "restarts",
+      "execution_id": "restarts:downstream_child_before_continuation:None:2:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "between_birth_hits",
+      "dataset": "restarts",
+      "execution_id": "restarts:between_birth_hits:None:0:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": {
+        "message": "stagewise topology does not recompute from accepted source",
+        "type": "ValueError"
+      },
+      "partition_count": null,
+      "valid": false
+    },
+    {
+      "case_identity": "after_promotion",
+      "dataset": "restarts",
+      "execution_id": "restarts:after_promotion:None:1:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": {
+        "message": "stagewise topology does not recompute from accepted source",
+        "type": "ValueError"
+      },
+      "partition_count": null,
+      "valid": false
+    },
+    {
+      "case_identity": "zero_drive_connected",
+      "dataset": "restarts",
+      "execution_id": "restarts:zero_drive_connected:None:2:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": {
+        "message": "stagewise topology does not recompute from accepted source",
+        "type": "ValueError"
+      },
+      "partition_count": null,
+      "valid": false
+    },
+    {
+      "case_identity": "embryo",
+      "dataset": "restarts",
+      "execution_id": "restarts:embryo:None:0:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    },
+    {
+      "case_identity": "before_ligament",
+      "dataset": "restarts",
+      "execution_id": "restarts:before_ligament:None:1:787ebf692a8d5058050553f4160b78af062f1d48",
+      "failure": null,
+      "partition_count": null,
+      "valid": true
+    }
+  ],
+  "schema": "v5.development-lifecycle-source-reconstruction/1",
+  "science_passed": false,
+  "section": "restarts",
+  "source_provenance": [
+    {
+      "shard_count": 4,
+      "shard_index": 0,
+      "source_manifest_sha256": "aca4070798db119de86ac48fcc398026568cf40de862cf33b64bd4395d8791b5"
+    },
+    {
+      "shard_count": 4,
+      "shard_index": 1,
+      "source_manifest_sha256": "8493a3ed35c69b640d32398f000843c90f068bd2a904d5d975b80c818dc821e9"
+    },
+    {
+      "shard_count": 4,
+      "shard_index": 2,
+      "source_manifest_sha256": "7af6fe0a159759d17a3ca2bdf9b010530985a5abbe299cfe9659658890d08e16"
+    },
+    {
+      "shard_count": 4,
+      "shard_index": 3,
+      "source_manifest_sha256": "f2041554a96b4c566ce466cbec87e7af3e4fcb4c8c54bfecd52726796515738a"
+    }
+  ],
+  "source_reconstruction_passed_rows": 8,
+  "source_sha": "787ebf692a8d5058050553f4160b78af062f1d48",
+  "valid": false,
+  "verification_code_sha": "d6385f78b8630acce03194bb504987d615e8b952"
+}

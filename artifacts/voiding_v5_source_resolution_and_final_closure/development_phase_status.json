@@ -1,0 +1,232 @@
+{
+  "baseline_sha": "c4fbd2fec207d1a0964db1a02069af62bc0aacde",
+  "development_execution_complete": true,
+  "final_complete_AB_started": false,
+  "next_required_action": "One full same-head final A/B campaign under frozen numerical kernels, then exact publication audit and final PR ledger.",
+  "phases": {
+    "1": {
+      "classification": "EXECUTED_PASS",
+      "interpretation": "All 19 bad triangles diagnosed; inherited near old tip, earlier unavailable lineage explicitly UNKNOWN.",
+      "source_records": [
+        {
+          "path": "development/phase1_quality_diagnosis/sha256_manifest.json",
+          "sha256": "be434adafd8ee803467396a5e28a91af531e3307d1aebed0987316372e0a6672"
+        }
+      ]
+    },
+    "10": {
+      "classification": "EXECUTED_FAIL",
+      "interpretation": "Four observed causal prefixes exact; full prospectively required future-sequence/restart neutrality fails. Historical raw full-state identity remains FAIL.",
+      "source_records": [
+        {
+          "path": "development/phase10_causal_a34/sha256_manifest.json",
+          "sha256": "b0d392aaa7caf7fe8bf56aed71534f1de63e1bbb4d3c3bbcd40d3d65a1be49d0"
+        }
+      ]
+    },
+    "2": {
+      "classification": "EXECUTED_PASS",
+      "interpretation": "Two materially distinct constrained strategies executed; physical transaction/source qualification separately bound in Phase 5.",
+      "source_records": [
+        {
+          "path": "development/phase2_quality_strategies/sha256_manifest.json",
+          "sha256": "39931d48c3a4f140689190ec9704151d7d820d4e2b7a9b47f58931c19d430559"
+        },
+        {
+          "path": "development/phase5_positive_clean_38a/sha256_manifest.json",
+          "sha256": "5e4529dfce584471d622de7bc7087d33a8c629f7f0b48b8da79e266c4de34bb9"
+        }
+      ]
+    },
+    "3": {
+      "classification": "EXECUTED_FAIL",
+      "interpretation": "Independent manufactured/Kirsch/recovery A/B executed. Fine recovery converges, but practical 32/64/128 source identity and kinetic transfer remain unqualified; raw fine route separately qualifies.",
+      "source_records": [
+        {
+          "path": "development/phase3_operator_a/sha256_manifest.json",
+          "sha256": "ddc2ea2d8470920d366277648c817cec15be70f1bf1e797f5b9f9445593e76e2"
+        },
+        {
+          "path": "development/phase3_operator_b/sha256_manifest.json",
+          "sha256": "7fa665b2207895425bb8f4bc782a1e1d244bb10baabe84bef8feb9ec3f7fb7c4"
+        },
+        {
+          "path": "development/phase3_kirsch_coarse_a/sha256_manifest.json",
+          "sha256": "c1610a30cac84ac8ac693874fa9f5fb7271b1ebb305adca5f14482df24c8e575"
+        },
+        {
+          "path": "development/phase3_kirsch_coarse_b/sha256_manifest.json",
+          "sha256": "c1610a30cac84ac8ac693874fa9f5fb7271b1ebb305adca5f14482df24c8e575"
+        },
+        {
+          "path": "development/phase3_kirsch_fine_a/sha256_manifest.json",
+          "sha256": "abb6e4ed5c142acc52db3183d2e6fae57b01c7f1d4709820a8e0c322552da92c"
+        },
+        {
+          "path": "development/phase3_kirsch_fine_b/sha256_manifest.json",
+          "sha256": "abb6e4ed5c142acc52db3183d2e6fae57b01c7f1d4709820a8e0c322552da92c"
+        },
+        {
+          "path": "development/phase4_recovery_budget_a/sha256_manifest.json",
+          "sha256": "314e86c5a06431838d46b6df7434e3596f0307ae57a0f32d78b403683d45cae6"
+        },
+        {
+          "path": "development/phase4_recovery_budget_b/sha256_manifest.json",
+          "sha256": "4e03a13a80f5e939a14a11acbc100fac03929692bd8a2c5e6b7662d8b25730d4"
+        }
+      ]
+    },
+    "4": {
+      "classification": "EXECUTED_PASS",
+      "interpretation": "Prospective complete transfer budget defined before qualifying executions; recovered transfer failures are preserved, not fitted away.",
+      "source_records": [
+        {
+          "path": "development/phase4_recovery_budget_a/sha256_manifest.json",
+          "sha256": "314e86c5a06431838d46b6df7434e3596f0307ae57a0f32d78b403683d45cae6"
+        },
+        {
+          "path": "development/phase4_recovery_budget_b/sha256_manifest.json",
+          "sha256": "4e03a13a80f5e939a14a11acbc100fac03929692bd8a2c5e6b7662d8b25730d4"
+        },
+        {
+          "path": "development/phase5_positive_clean_38a/sha256_manifest.json",
+          "sha256": "5e4529dfce584471d622de7bc7087d33a8c629f7f0b48b8da79e266c4de34bb9"
+        }
+      ]
+    },
+    "5": {
+      "classification": "EXECUTED_PASS",
+      "interpretation": "Clean qualified fine source, real preserved-threshold first passage, sole child, checkpoint/rollback exercised; coarse negative retained.",
+      "source_records": [
+        {
+          "path": "development/phase5_positive_clean_38a/sha256_manifest.json",
+          "sha256": "5e4529dfce584471d622de7bc7087d33a8c629f7f0b48b8da79e266c4de34bb9"
+        },
+        {
+          "path": "development/phase8_rollback_ci_facbc/sha256_manifest.json",
+          "sha256": "4966fa93231ccc2a651b8bc8c96626cb6bab17de27a6512d9649af9ae821c596"
+        },
+        {
+          "path": "development/phase8_rollback_linux_reconstruction_2fa/sha256_manifest.json",
+          "sha256": "44863c96b055c22a468cfe3011dc5312f116c00227fc7b1e825d12e2ed54712f"
+        },
+        {
+          "path": "development/phase8_rollback_linux_reconstruction_2fa/v5-development-reconstruction-rollback-2fa81f2d20854f038fb09685fdff27480f51014c/report.json",
+          "sha256": "84643f7c77daee2207f56a67c25c22455b1989573ef2598ebd6728e64ceee969"
+        }
+      ]
+    },
+    "6": {
+      "classification": "EXECUTED_FAIL",
+      "interpretation": "All six actual source interventions executed: source separation and zero-drive pass, doubled owned child radius leaves continuation rate unchanged. Distinct r_tip != R_void does not qualify radius-dependent physics.",
+      "source_records": [
+        {
+          "path": "development/phase6_causality_clean_38a/sha256_manifest.json",
+          "sha256": "36b8acccd087abaca6b96eae84f4f4969932ea3393fd31ee8a075d46c652d03c"
+        }
+      ]
+    },
+    "7": {
+      "classification": "EXECUTED_FAIL",
+      "interpretation": "All 45 physical constant-source transitions executed. Coupled variable-rate/remesh-path partition invariance remains unqualified; original strict reconstruction classification is retained.",
+      "source_records": [
+        {
+          "path": "development/phase7_natural_harness_352/sha256_manifest.json",
+          "sha256": "8b846d695ba07f1f7950199da8e781f000e8ff6fa089c8b57c3177f4f72b8ecf"
+        },
+        {
+          "path": "development/phase7_transitions_ci_ec796_shard0/sha256_manifest.json",
+          "sha256": "a6bbda11889f4458bdd3e7a16c02c03c7d957dda949535ea91eab7318bc49617"
+        },
+        {
+          "path": "development/phase7_transitions_ci_ec796_shard1/sha256_manifest.json",
+          "sha256": "7f27c9d02e2dc5f1afe06c25a0ea5ddcfb8b1dd9cec814bb4ea9ae867b35555c"
+        },
+        {
+          "path": "development/phase7_transitions_ci_ec796_shard2/sha256_manifest.json",
+          "sha256": "60cbdfeda1089e60a7610fc5735c0b215316bcff5e9d58423e8ec71dc76dc303"
+        },
+        {
+          "path": "development/phase7_transitions_linux_reconstruction_2fa/sha256_manifest.json",
+          "sha256": "f4ccb4466aa24484beecfe2b79c3ce97d78fdb48fd5f78278c7f284aefba5df8"
+        },
+        {
+          "path": "development/phase7_transitions_linux_reconstruction_2fa/v5-development-reconstruction-transitions-2fa81f2d20854f038fb09685fdff27480f51014c/report.json",
+          "sha256": "3551897f8ea455249c15cf71e0ba4ef25e2cd6bef4f736021afb9542d9cfb28b"
+        }
+      ]
+    },
+    "8": {
+      "classification": "EXECUTED_FAIL",
+      "interpretation": "All 11 matched-return direct/replay continuations and all 39 reached rollback injections executed and audited. Mixed native-kernel common-terminal failure is retained; three-worker fixed-kernel intervention is exact but is not replacement physical evidence.",
+      "source_records": [
+        {
+          "path": "development/phase8_stronger_reload_two_level_c284/sha256_manifest.json",
+          "sha256": "b38fde7d3fa0a83749636d77ff942c6675387e861653cbb3a7b0b42a0fd14c09"
+        },
+        {
+          "path": "development/phase8_matched_return_source_v2_787/sha256_manifest.json",
+          "sha256": "9d848f2ce0d25b3ab20ce5b46ffba408197988befc71e3fae98996471c60c54f"
+        },
+        {
+          "path": "development/phase8_runtime_dispatch_interventions_c8b/sha256_manifest.json",
+          "sha256": "017e8a3fa4cc6fe6460a259919562e777d35a489a8dcf4a866c160ee90942aa5"
+        },
+        {
+          "path": "development/phase8_matched_restarts_ci_787_shard0/sha256_manifest.json",
+          "sha256": "c6b4af063af5919f8dce969718c85661584266ce9f7b1d93b703f5868e1a5a8d"
+        },
+        {
+          "path": "development/phase8_matched_restarts_ci_787_shard1/sha256_manifest.json",
+          "sha256": "dc84eb03cf924b60b478cedaec868729081708e8657ec8994e1e11f67eb6d87d"
+        },
+        {
+          "path": "development/phase8_matched_restarts_ci_787_shard2/sha256_manifest.json",
+          "sha256": "9519f9c0112f58092376d3474220e0a60780117b0f36e2e30fff108903492c58"
+        },
+        {
+          "path": "development/phase8_matched_restarts_ci_787_shard3/sha256_manifest.json",
+          "sha256": "e2f2f87aa78937ec20ec4e2b942cf9b568ce838c9a5432475c3ac176966c479e"
+        },
+        {
+          "path": "development/phase8_restarts_linux_reconstruction/sha256_manifest.json",
+          "sha256": "7812db27f2756629187fd299b529288affff752e7875fd3158ce11c24bd4014d"
+        },
+        {
+          "path": "development/phase8_restarts_linux_reconstruction/v5-development-reconstruction-restarts-d6385f78b8630acce03194bb504987d615e8b952/report.json",
+          "sha256": "2e80f601567d228ead5bb6a7a12ceded62c66b932f886e729d0b7e3f78556a1d"
+        },
+        {
+          "path": "development/phase8_rollback_linux_reconstruction_2fa/sha256_manifest.json",
+          "sha256": "44863c96b055c22a468cfe3011dc5312f116c00227fc7b1e825d12e2ed54712f"
+        },
+        {
+          "path": "development/phase8_rollback_linux_reconstruction_2fa/v5-development-reconstruction-rollback-2fa81f2d20854f038fb09685fdff27480f51014c/report.json",
+          "sha256": "84643f7c77daee2207f56a67c25c22455b1989573ef2598ebd6728e64ceee969"
+        },
+        {
+          "path": "development/phase8_runtime_dispatch_reconstruction.json",
+          "sha256": "69ac087bb38acb8ced1758fe0d6a253a11e790467c90f4366279d82829ef7fbe"
+        }
+      ]
+    },
+    "9": {
+      "classification": "EXECUTED_FAIL",
+      "interpretation": "All 96 unique static solves and independent reconstruction completed: 434/537 family predicates, 0/33 full families, 8/12 derivative checks. Historical 683/791 unchanged.",
+      "source_records": [
+        {
+          "path": "development/phase9_static_96_a34/sha256_manifest.json",
+          "sha256": "d17f0ed7c16cf87f3d473e29657ceb2895bd93779b40581e31e72ecc1beab517"
+        },
+        {
+          "path": "development/phase9_static_reconstruction.json",
+          "sha256": "3aafcb8d6a0ee3671a25e353f862df415bd504a579e13d90cee5feff93aaa7cc"
+        }
+      ]
+    }
+  },
+  "record_kind": "HASH_BOUND_DEVELOPMENT_CLASSIFICATION_NOT_FINAL_AB_EVIDENCE",
+  "release_candidate_permitted": false,
+  "schema": "v5.source-resolution-development-phase-ledger/1",
+  "scientific_qualification": "BLOCKED"
+}
