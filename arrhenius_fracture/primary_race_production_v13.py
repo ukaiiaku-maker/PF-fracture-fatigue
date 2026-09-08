@@ -27,7 +27,8 @@ class ProductionRaceResult:
     record: dict
 
 
-def evaluate_production_mark(*, checkpoint, selected, solved_pre_event, engine, args, cfg, context, accepted_live):
+def evaluate_production_mark(*, checkpoint, selected, solved_pre_event, engine, args, cfg, context, accepted_live,
+                             evaluate_expired_diagnostics=False):
     from .sharp_front_v11_branching import _request, _realized_trial_network, _capture_shared_engine
     from scripts.v13_value_fingerprint import physical_state_fingerprint as fp
     base = checkpoint.state
@@ -111,7 +112,7 @@ def evaluate_production_mark(*, checkpoint, selected, solved_pre_event, engine, 
     companion=project(cid,eff_j)
     record.update(companion=asdict(companion),T_j_s=companion.completion_s,
         companion_raw_rate_per_s=raw_j,companion_G_discrete_J_per_m2=G_comp,sigma_nn_Pa=sigma_nn)
-    if companion.completion_s>=engine.f.tau_c:
+    if companion.completion_s>=engine.f.tau_c and not evaluate_expired_diagnostics:
         return finish(outcome='SINGLE_CORRELATION_WINDOW_EXPIRED',primary_rate_evaluated=False)
     local=next(d for tip in accepted_live['tips'] for d in tip['directional'] if d['candidate_id']==pid)
     G_primary=local['J_local_signed_J_per_m2']
@@ -136,6 +137,12 @@ def evaluate_production_mark(*, checkpoint, selected, solved_pre_event, engine, 
     trial=trial_conditional_pair(pre_event_state=pair_start,baseline_single_state=base,parent=parent,
         mark=BranchMark(cid,None,()),arms=arms,apply_trial_geometry=geometry,
         equilibrate_fixed_load=equilibrium,network_geometry_already_realized=True)
+    if evaluate_expired_diagnostics:
+        record.update(exact_pair_admissible=trial.accepted,
+            exact_pair_rejection_reason=trial.rejection_reason,
+            pair_energy_release_J_per_m=trial.energy_release_J_per_m,
+            pair_dissipative_cost_J_per_m=trial.hazard_dissipation_J_per_m,
+            diagnostics_only_full_opportunity=True)
     marked=apply_primary_continuation_race(parent=parent,baseline_single_state=base,primary=primary,
         companions=(companion,),tau_c=engine.f.tau_c,exact_pair_trial=lambda *_:trial,enabled=True)
     if marked.state is base:

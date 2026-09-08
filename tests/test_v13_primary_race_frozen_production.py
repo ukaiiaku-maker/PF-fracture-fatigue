@@ -29,7 +29,8 @@ def fingerprint(request):
 
 @pytest.mark.parametrize('case',['Peak_1000K','weakT_1000K'])
 @pytest.mark.parametrize('event',['event00002','event00008','event00015','event00029'])
-def test_actual_production_callback_matches_archived_frozen_race(case,event,monkeypatch):
+@pytest.mark.parametrize('complete_diagnostics',[False,True])
+def test_actual_production_callback_matches_archived_frozen_race(case,event,complete_diagnostics,monkeypatch):
     audit=json.loads((AUDIT/case/event/'race.json').read_text())
     context_path=SOURCE/'later_parents'/case/'events'/event/'parent/event_context.pkl'
     assert sha256(context_path)==audit['source_context_sha256']
@@ -68,7 +69,8 @@ def test_actual_production_callback_matches_archived_frozen_race(case,event,monk
         result=evaluate_production_mark(checkpoint=checkpoint,
             selected=next(t for t in payload['canonical_result'].trials if t.selected),
             solved_pre_event=payload['solved_pre_event_state'],engine=engine,args=SimpleNamespace(**payload['args']),
-            cfg=payload['configuration'],context=payload['context'],accepted_live=accepted)
+            cfg=payload['configuration'],context=payload['context'],accepted_live=accepted,
+            evaluate_expired_diagnostics=complete_diagnostics)
     branch=audit['outcome']=='PAIR_ACCEPTED'
     assert (result.record['outcome']=='PAIR_ACCEPTED')==branch
     if branch:
