@@ -1,0 +1,376 @@
+{
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "branch_incidence_measured": false,
+  "conditions": [
+    {
+      "condition": "theta15_rate1x",
+      "early_gates": 0,
+      "finite_chi_range": [
+        0.1643204110007569,
+        7.50089330362604e+66
+      ],
+      "nonsaturated_opportunity_count": 26,
+      "pair_boundary_distances": [
+        {
+          "case": "theta15_rate1x_Peak_300K_seed3621",
+          "event": 1,
+          "margin_J_per_m": 0.010715350608591372,
+          "margin_over_cost": 172.0445652928656,
+          "margin_over_release": 0.994221141829519
+        },
+        {
+          "case": "theta15_rate1x_Peak_300K_seed3621",
+          "event": 2,
+          "margin_J_per_m": 0.04195378563590678,
+          "margin_over_cost": 861.8773567809131,
+          "margin_over_release": 0.9988410867522001
+        },
+        {
+          "case": "theta15_rate1x_Peak_300K_seed3621",
+          "event": 3,
+          "margin_J_per_m": 0.0823663457418034,
+          "margin_over_cost": 19205.20888905217,
+          "margin_over_release": 0.9999479335039113
+        },
+        {
+          "case": "theta15_rate1x_Peak_1000K_seed3621",
+          "event": 1,
+          "margin_J_per_m": 0.04408181796452321,
+          "margin_over_cost": 389.3691137329207,
+          "margin_over_release": 0.9974383219245051
+        },
+        {
+          "case": "theta15_rate1x_Peak_1000K_seed3621",
+          "event": 2,
+          "margin_J_per_m": 0.1721733561442035,
+          "margin_over_cost": 2733.2165417905617,
+          "margin_over_release": 0.999634264519757
+        },
+        {
+          "case": "theta15_rate1x_Peak_1000K_seed3621",
+          "event": 3,
+          "margin_J_per_m": 0.33776126183721744,
+          "margin_over_cost": 34392.17308173103,
+          "margin_over_release": 0.9999709244623163
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 1,
+          "margin_J_per_m": 0.007839797532111009,
+          "margin_over_cost": 159.4630491984277,
+          "margin_over_release": 0.9937680356630677
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 2,
+          "margin_J_per_m": 0.030698675893890803,
+          "margin_over_cost": 666.0514971746982,
+          "margin_over_release": 0.9985008653691124
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 3,
+          "margin_J_per_m": 0.060254180351117556,
+          "margin_over_cost": 1541.3231699856462,
+          "margin_over_release": 0.9993516274543102
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 4,
+          "margin_J_per_m": 0.043737124730797786,
+          "margin_over_cost": 2779.936597417106,
+          "margin_over_release": 0.9996404089180139
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 5,
+          "margin_J_per_m": 0.035395823178897605,
+          "margin_over_cost": 984.2580289508164,
+          "margin_over_release": 0.998985037451494
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 6,
+          "margin_J_per_m": 0.06012661627197916,
+          "margin_over_cost": 1341.6831888119693,
+          "margin_over_release": 0.9992552226702974
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 7,
+          "margin_J_per_m": 0.06720957806813715,
+          "margin_over_cost": 1738.8722229907562,
+          "margin_over_release": 0.9994252451491632
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 8,
+          "margin_J_per_m": 0.07110005234770989,
+          "margin_over_cost": 2736.3846323968864,
+          "margin_over_release": 0.9996346878008427
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 9,
+          "margin_J_per_m": 0.07650347932944886,
+          "margin_over_cost": 3263.298819160711,
+          "margin_over_release": 0.9996936554968161
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 10,
+          "margin_J_per_m": 0.08789018354946264,
+          "margin_over_cost": 6743.86437801882,
+          "margin_over_release": 0.9998517390500453
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 11,
+          "margin_J_per_m": 0.09014662330451158,
+          "margin_over_cost": 4644.313369036088,
+          "margin_over_release": 0.9997847292700066
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 12,
+          "margin_J_per_m": 0.11532324526198891,
+          "margin_over_cost": 4396.019763373733,
+          "margin_over_release": 0.9997725732305482
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 13,
+          "margin_J_per_m": 0.10414548670668025,
+          "margin_over_cost": 9418.861517606694,
+          "margin_over_release": 0.9998938413268464
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 14,
+          "margin_J_per_m": 0.1414692483063245,
+          "margin_over_cost": 5581.989046323023,
+          "margin_over_release": 0.9998208844775258
+        },
+        {
+          "case": "theta15_rate1x_weakT_300K_seed3621",
+          "event": 15,
+          "margin_J_per_m": 0.14445901546057932,
+          "margin_over_cost": 4835.258360998459,
+          "margin_over_release": 0.9997932285818176
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 1,
+          "margin_J_per_m": 0.009297797586845796,
+          "margin_over_cost": 63.38594677167719,
+          "margin_over_release": 0.9844686604742156
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 2,
+          "margin_J_per_m": 0.03667963745018511,
+          "margin_over_cost": 288.1596808110703,
+          "margin_over_release": 0.9965417031959812
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 3,
+          "margin_J_per_m": 0.07208494456849444,
+          "margin_over_cost": 744.887234700278,
+          "margin_over_release": 0.9986593147684023
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 4,
+          "margin_J_per_m": 0.052346829600164686,
+          "margin_over_cost": 1582.2383431798955,
+          "margin_over_release": 0.9993683831595491
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 5,
+          "margin_J_per_m": 0.042325616167635194,
+          "margin_over_cost": 457.5725430233309,
+          "margin_over_release": 0.9978193199413836
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 6,
+          "margin_J_per_m": 0.07191575142425194,
+          "margin_over_cost": 598.8067299760692,
+          "margin_over_release": 0.998332796299168
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 7,
+          "margin_J_per_m": 0.08041109499806565,
+          "margin_over_cost": 829.5348426141344,
+          "margin_over_release": 0.9987959565948461
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 8,
+          "margin_J_per_m": 0.08509265057674233,
+          "margin_over_cost": 1472.1956919553063,
+          "margin_over_release": 0.999321203553974
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 9,
+          "margin_J_per_m": 0.09156539907910283,
+          "margin_over_cost": 1800.0169033644258,
+          "margin_over_release": 0.9994447581262942
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 10,
+          "margin_J_per_m": 0.1052072150357423,
+          "margin_over_cost": 3692.87076559968,
+          "margin_over_release": 0.9997292812706625
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 11,
+          "margin_J_per_m": 0.10790422367770919,
+          "margin_over_cost": 2666.0604656822493,
+          "margin_over_release": 0.9996250553698098
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 12,
+          "margin_J_per_m": 0.13803608003945161,
+          "margin_over_cost": 2394.0777937762527,
+          "margin_over_release": 0.9995824770274274
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 13,
+          "margin_J_per_m": 0.12467102024029693,
+          "margin_over_cost": 5469.630056440142,
+          "margin_over_release": 0.9998172056984875
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 14,
+          "margin_J_per_m": 0.16933166806933844,
+          "margin_over_cost": 2713.8062628124694,
+          "margin_over_release": 0.9996316495899917
+        },
+        {
+          "case": "theta15_rate1x_weakT_1000K_seed3621",
+          "event": 15,
+          "margin_J_per_m": 0.1729062310073341,
+          "margin_over_cost": 2383.60815590693,
+          "margin_over_release": 0.9995806438900569
+        }
+      ],
+      "pair_mechanics_for_predictions_admissible": true,
+      "predicted_positive_parents": 2,
+      "unbranched_75um_screen_controls": 2,
+      "useful_transition_gate": true
+    },
+    {
+      "condition": "theta30_rate1x",
+      "early_gates": 0,
+      "finite_chi_range": [
+        0.0,
+        1.1870132779893854e+67
+      ],
+      "nonsaturated_opportunity_count": 9,
+      "pair_boundary_distances": [
+        {
+          "case": "theta30_rate1x_Peak_300K_seed3621",
+          "event": 1,
+          "margin_J_per_m": 0.010196063243764203,
+          "margin_over_cost": 160.59082358880553,
+          "margin_over_release": 0.993811529777553
+        },
+        {
+          "case": "theta30_rate1x_Peak_300K_seed3621",
+          "event": 2,
+          "margin_J_per_m": 0.02616015339731107,
+          "margin_over_cost": 1745.7752391433405,
+          "margin_over_release": 0.9994275165014989
+        },
+        {
+          "case": "theta30_rate1x_Peak_300K_seed3621",
+          "event": 3,
+          "margin_J_per_m": 0.0544147557599471,
+          "margin_over_cost": 2175.505217583087,
+          "margin_over_release": 0.9995405478507833
+        },
+        {
+          "case": "theta30_rate1x_Peak_300K_seed3621",
+          "event": 4,
+          "margin_J_per_m": 0.09155401732260159,
+          "margin_over_cost": 26591.34076393018,
+          "margin_over_release": 0.9999623951870624
+        },
+        {
+          "case": "theta30_rate1x_Peak_1000K_seed3621",
+          "event": 1,
+          "margin_J_per_m": 0.01719034203037557,
+          "margin_over_cost": 101.46246612578082,
+          "margin_over_release": 0.9902403286021593
+        },
+        {
+          "case": "theta30_rate1x_Peak_1000K_seed3621",
+          "event": 2,
+          "margin_J_per_m": 0.04427118917821081,
+          "margin_over_cost": 2369.9146162934476,
+          "margin_over_release": 0.9995782218418463
+        },
+        {
+          "case": "theta30_rate1x_weakT_300K_seed3621",
+          "event": 1,
+          "margin_J_per_m": 0.0064199607225387655,
+          "margin_over_cost": 125.35795279347302,
+          "margin_over_release": 0.9920859749790782
+        },
+        {
+          "case": "theta30_rate1x_weakT_300K_seed3621",
+          "event": 2,
+          "margin_J_per_m": 0.01649112675197027,
+          "margin_over_cost": 880.0191041488677,
+          "margin_over_release": 0.9988649508333125
+        },
+        {
+          "case": "theta30_rate1x_weakT_300K_seed3621",
+          "event": 3,
+          "margin_J_per_m": 0.03431180207579917,
+          "margin_over_cost": 1326.3558088097698,
+          "margin_over_release": 0.9992466225006416
+        },
+        {
+          "case": "theta30_rate1x_weakT_300K_seed3621",
+          "event": 4,
+          "margin_J_per_m": 0.05772997976928113,
+          "margin_over_cost": 2955.8195017888834,
+          "margin_over_release": 0.9996617987674273
+        },
+        {
+          "case": "theta30_rate1x_weakT_1000K_seed3621",
+          "event": 1,
+          "margin_J_per_m": 0.005678144925228199,
+          "margin_over_cost": 34.59499798083624,
+          "margin_over_release": 0.9719061650027798
+        },
+        {
+          "case": "theta30_rate1x_weakT_1000K_seed3621",
+          "event": 2,
+          "margin_J_per_m": 0.014852143542708229,
+          "margin_over_cost": 279.0603796782224,
+          "margin_over_release": 0.996429341411488
+        }
+      ],
+      "pair_mechanics_for_predictions_admissible": true,
+      "predicted_positive_parents": 4,
+      "unbranched_75um_screen_controls": 0,
+      "useful_transition_gate": false
+    }
+  ],
+  "followup_ensemble_authorized_by_gate": true,
+  "useful_conditions": [
+    "theta15_rate1x"
+  ]
+}
