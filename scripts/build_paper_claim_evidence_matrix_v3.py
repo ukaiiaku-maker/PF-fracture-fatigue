@@ -502,8 +502,16 @@ def main() -> None:
             expected_value="", recomputed_value="", tolerance="", pass_fail="",
             final_evidence_class=STATUS["MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"],
             notes="Dedicated Figure 1/5/6/SI forensics pass pending merge into this matrix. The "
-                  "'codex/v10.2.30-inverse-fatigue-barrier-design' branch is thematically plausible but "
-                  "was not confirmed by locating the exact 20-55%/1-10%/75-condition dataset.",
+                  "'codex/v10.2.30-inverse-fatigue-barrier-design' branch (commit 5034046) was directly "
+                  "inspected this round (git show of every identif*/inverse*/recovery* file) and CONFIRMED "
+                  "NOT to be the source: it is a prospective inverse-EXP-floor-barrier-fitting tool for "
+                  "declared crack-growth targets, with no 75-condition acquisition sequence, no four "
+                  "hidden-class (ceramic/weakT/peak/DBTT) synthetic-material design, and no 20-55%/1-10% "
+                  "recovery-error figures anywhere in its tracked files. This branch is therefore a ruled-"
+                  "out negative result, not merely an unconfirmed lead. Full repo history (9677 unique "
+                  "tracked paths across all local branches) was also grepped for cramer/auc/identifiab/"
+                  "blunt-notch/spatial_field filenames with no hits -- the SI study's source, if it exists "
+                  "on this filesystem, is not inside this git repository's history at all.",
         ))
 
     with (OUT_DIR / "paper_claim_evidence_matrix_v3.csv").open("w", newline="") as fh:

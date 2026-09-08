@@ -62,8 +62,8 @@
       "py_compile": "PASS (507 files)",
       "git_diff_check": "PASS",
       "strict_verifier": "verify_v10_2_30_inverse_fatigue_barrier_design.py -- requires --root; not completed",
-      "manuscript_link_found": "POSSIBLE -- the manuscript's Sec 4.5 synthetic-identifiability/inverse-recovery study (20-55%/1-10% recovery errors) is thematically consistent with 'inverse fatigue barrier design', but this was NOT confirmed by locating the exact dataset (see paper_claim_evidence_matrix_v2.csv SI-identifiability-recovery-errors row)",
-      "disposition": "NOT_CONCLUSIVELY_LINKED_TO_CURRENT_MANUSCRIPT_PLAUSIBLE_BUT_UNCONFIRMED",
+      "manuscript_link_found": "RULED OUT (final-closure round 3) -- directly inspected every identif*/inverse*/recovery* file at this commit via `git show`: this is a prospective inverse-EXP-floor-barrier-fitting tool for declared crack-growth targets. It contains no 75-condition acquisition sequence, no four hidden-class (ceramic/weakT/peak/DBTT) synthetic-material design, and no 20-55%/1-10% recovery-error figures. The manuscript's Sec 4.5 synthetic-identifiability study is NOT sourced from this branch; the superficial name match was a false lead",
+      "disposition": "RULED_OUT_NOT_THE_MANUSCRIPT_SOURCE",
       "pushed": "NO"
     }
   ]
