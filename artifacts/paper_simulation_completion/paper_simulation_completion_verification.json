@@ -1,0 +1,60 @@
+{
+  "checks": {
+    "all_campaign_branches_diff_check_pass": true,
+    "all_campaign_branches_py_compile_pass": true,
+    "every_qualified_row_has_full_provenance_mapping": true,
+    "fig2_rms_reproduces_manuscript_exactly": true,
+    "fig3_DeltaK_reproduces_manuscript_exactly": true,
+    "fig3_K0_reproduces_manuscript_exactly": true,
+    "fig3_Kss_reproduces_manuscript_exactly": true,
+    "fig4_theta_45_confirmed": true,
+    "n_qualified_rows_is_8": true,
+    "no_duplicate_claim_ids": true,
+    "no_qualified_row_admits_unverified_language": true,
+    "px5_transient_verifier_passes": true,
+    "px5_worktree_clean": true,
+    "remote_sha_matches_codex_v10.2.30-crack-rebonding-part-x": true,
+    "remote_sha_matches_codex_v10.2.30-crack-rebonding-part-x-px5-transient": true,
+    "temperature_fatigue_counts_match_mission_spec": true,
+    "temperature_fatigue_zero_replacements_authorized": true,
+    "this_worktree_diff_check_clean": true,
+    "zero_unresolved_claim_rows": false
+  },
+  "classification": "PAPER_SIMULATION_EVIDENCE_COMPLETE_WITH_EXPLICIT_SOURCE_LIMITATIONS",
+  "details": {
+    "n_unresolved_claim_rows": 6,
+    "px5_transient_verifier_output_tail": "wrote /Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-crack-rebonding-part-x-px5-transient/artifacts/crack_rebonding_part_x_v1/px5_transient_regime_verification.json\noverall_pass=True\n",
+    "recomputed_fig2_rms": {
+      "DBTT": 1.33,
+      "ceramic": 0.23,
+      "peak": 1.18,
+      "weakT": 0.23
+    },
+    "recomputed_fig3_DeltaK": {
+      "DBTT": 10.43,
+      "ceramic": 7.26,
+      "peak": 10.7,
+      "weakT": 4.95
+    },
+    "recomputed_fig3_K0": {
+      "DBTT": 22.77,
+      "ceramic": 9.33,
+      "peak": 16.71,
+      "weakT": 12.83
+    },
+    "recomputed_fig3_Kss": {
+      "DBTT": 33.2,
+      "ceramic": 16.59,
+      "peak": 27.41,
+      "weakT": 17.78
+    }
+  },
+  "fully_resolved_zero_limitations": false,
+  "limitations": [
+    "6 claim rows remain MANUSCRIPT_RESULT_NOT_SOURCE_TRACED (Figures 1, 5, 6, 7 and the SI synthetic-identifiability study) -- their exact source data/scripts were not located this session (see paper_claim_evidence_matrix_v2.csv).",
+    "6 named campaign branches (two-scale virtual C(T), A_NATIVE+PT panel, R-ratio/deltaK, analytical overlay, physical-slope-transfer, inverse-fatigue-barrier-design) pass py_compile and git diff --check but could not be data-level re-verified: their strict verifiers require a --root pointing at gitignored raw result directories not found on this filesystem. None were found to be directly, conclusively cited by the current manuscript and none were pushed to origin.",
+    "The exact per-row (class, temperature, Kmax) identity of 4 of the 7 canonical temperature-fatigue numerical exclusions was not individually re-derived (the raw 36-row output directory is gitignored and was not found on this filesystem); the 3 Peak-class exclusions ARE individually attributed via the campaign's own committed progress log."
+  ],
+  "schema": "v1_paper_simulation_completion_verification",
+  "structural_checks_pass": true
+}

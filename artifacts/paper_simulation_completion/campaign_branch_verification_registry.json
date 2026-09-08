@@ -1,0 +1,70 @@
+{
+  "schema": "v1_campaign_branch_verification_registry",
+  "n_branches": 6,
+  "all_py_compile_pass": true,
+  "all_git_diff_check_pass": true,
+  "all_strict_verifiers_blocked_by_missing_raw_results": true,
+  "n_pushed_this_session": 0,
+  "rows": [
+    {
+      "branch": "codex/v10.2.30-two-scale-virtual-CT",
+      "commit": "d727cbde36f240214086ac2134985bcd023742fc",
+      "py_compile": "PASS (493 files)",
+      "git_diff_check": "PASS",
+      "strict_verifier": "verify_v10_2_30_two_scale_virtual_CT.py -- requires --root pointing at a raw result directory not present on this filesystem; not completed",
+      "manuscript_link_found": "NO",
+      "disposition": "NOT_CONCLUSIVELY_LINKED_TO_CURRENT_MANUSCRIPT",
+      "pushed": "NO"
+    },
+    {
+      "branch": "codex/v10.2.30-A-native-TP-panel",
+      "commit": "f99693632376a5e0308e8e112e9cd1c36a0692f6",
+      "py_compile": "PASS (478 files)",
+      "git_diff_check": "PASS",
+      "strict_verifier": "verify_v10_2_30_A_native_plus_8PT_study.py -- fails on missing A_native_plus_8PT_registry.csv (gitignored raw output, not present); not completed",
+      "manuscript_link_found": "INDIRECT -- referenced BY NAME in the canonical temperature-fatigue campaign's own progress log as an 'exact-row A_NATIVE/PT03/PT08 archival control, reused without resume or retuning' -- i.e. treated as an already-qualified upstream input elsewhere in this codebase, not as unfinished work",
+      "disposition": "NOT_CONCLUSIVELY_LINKED_TO_CURRENT_MANUSCRIPT_DIRECTLY_BUT_REUSED_UPSTREAM",
+      "pushed": "NO"
+    },
+    {
+      "branch": "codex/v10.2.30-R-ratio-nominal-deltaK",
+      "commit": "4b554006d60539d7dec659f4bfe4bf298728780a",
+      "py_compile": "PASS (485 files)",
+      "git_diff_check": "PASS",
+      "strict_verifier": "verify_v10_2_30_R_nominal_deltaK_study.py -- requires --root; not completed",
+      "manuscript_link_found": "NO",
+      "disposition": "NOT_CONCLUSIVELY_LINKED_TO_CURRENT_MANUSCRIPT",
+      "pushed": "NO"
+    },
+    {
+      "branch": "codex/v10.2.30-analytical-overlay-all-1d",
+      "commit": "985ea82992bc22dffcfc365ea68aa9bba4022296",
+      "py_compile": "PASS (498 files)",
+      "git_diff_check": "PASS",
+      "strict_verifier": "verify_v10_2_30_analytical_overlay_all_1d.py -- requires --root; not completed",
+      "manuscript_link_found": "NO",
+      "disposition": "NOT_CONCLUSIVELY_LINKED_TO_CURRENT_MANUSCRIPT",
+      "pushed": "NO"
+    },
+    {
+      "branch": "codex/v10.2.30-physical-slope-transfer",
+      "commit": "43b5ec9a259b636c5a950eec1f6fffbf3ef4b65c",
+      "py_compile": "PASS (512 files)",
+      "git_diff_check": "PASS",
+      "strict_verifier": "verify_v10_2_30_physical_slope_transfer.py -- requires --root; not completed",
+      "manuscript_link_found": "INDIRECT -- CONFIRMED to be the exact starting HEAD the canonical temperature-fatigue campaign branch forked from (43b5ec9a matches that campaign's own recorded 'starting HEAD' verbatim)",
+      "disposition": "NOT_CONCLUSIVELY_LINKED_TO_CURRENT_MANUSCRIPT_DIRECTLY_BUT_CONFIRMED_UPSTREAM_LINEAGE",
+      "pushed": "NO"
+    },
+    {
+      "branch": "codex/v10.2.30-inverse-fatigue-barrier-design",
+      "commit": "5034046963418254f39fc0116c30563bd17c1635",
+      "py_compile": "PASS (507 files)",
+      "git_diff_check": "PASS",
+      "strict_verifier": "verify_v10_2_30_inverse_fatigue_barrier_design.py -- requires --root; not completed",
+      "manuscript_link_found": "POSSIBLE -- the manuscript's Sec 4.5 synthetic-identifiability/inverse-recovery study (20-55%/1-10% recovery errors) is thematically consistent with 'inverse fatigue barrier design', but this was NOT confirmed by locating the exact dataset (see paper_claim_evidence_matrix_v2.csv SI-identifiability-recovery-errors row)",
+      "disposition": "NOT_CONCLUSIVELY_LINKED_TO_CURRENT_MANUSCRIPT_PLAUSIBLE_BUT_UNCONFIRMED",
+      "pushed": "NO"
+    }
+  ]
+}

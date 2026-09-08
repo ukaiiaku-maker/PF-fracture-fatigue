@@ -1,25 +1,34 @@
 {
   "files": {
+    "PAPER_EVIDENCE_PROVENANCE_CLOSURE_HANDOFF.md": "fbe55992958a10655a0f4b02a1cf0cd3d024866d773aa45c147593f109cd1d66",
     "PAPER_SIMULATION_HANDOFF.md": "74226d1a69713d0d9b35a5194c2d8a89829cd1855101ea589a65c9d5fd7c4137",
     "analysis_only_gap_registry.csv": "146b3dfb5fe397b7ba40fda0c0513b6b00d1942aaa2c22667e0ed6466487a12a",
     "authoritative_campaign_inventory.csv": "0fa611893e0a51cb305e7bd5848191174e3e81ae46803b05766d037b26b24d2e",
+    "campaign_branch_verification_registry.csv": "70b59a4c3f82771735d779a4aa3198c9c60b020c3c33e5cd46355c1cdb4fe32c",
+    "campaign_branch_verification_registry.json": "aa6621589d47a059e0deb847cab35488fd19ba15c6017bf053bac5b37942ed6e",
     "excluded_future_scope.csv": "62dd960c9e2cc6b50be32778dbd2e3d4a2af64aeb70ee83e20c54e7ccab1839c",
     "paper_authoritative_result_registry.csv": "0fa611893e0a51cb305e7bd5848191174e3e81ae46803b05766d037b26b24d2e",
     "paper_censor_and_exclusion_registry.csv": "ff0236109836b0be5568dfaddd661d12f2e91e84e97984c2ea782a9a0ad70705",
     "paper_claim_evidence_matrix.csv": "4e03cbcf5126f84e18f18f994dc0897b9077207f6c51e807cd859386ead85215",
     "paper_claim_evidence_matrix.json": "378e4a01c49afaad337cb36593d337b9894d12c007ed3f95f7fe97e54ad0dbd3",
+    "paper_claim_evidence_matrix_v2.csv": "eda9aa7039e23071b6be873153ff0ceb0d8c9bf959d5b922518cdb3e2dd85eda",
+    "paper_claim_evidence_matrix_v2.json": "2795666b37d40cd6edc695a8782b4de650a771d03e6dd1a879284aa5ffbd36cf",
     "paper_completion_contract.json": "582c7cee700c12781d39c311d3b079b9367dd64b92db3db3a93df46fb5abf13c",
+    "paper_completion_contract_v2.json": "3be81cffb9939041bb436a92726aca3e71d2158e9effdfe77972302cee25cf91",
     "paper_cross_fidelity_comparison.csv": "7ffc4a943425a772d750e5b123ed678c973e81501890e5423fa2c0066a9c4ab2",
     "paper_figure_manifest.csv": "b867a0f32d0fe152c1e2e78640df23d719da510880ba89f1e458fd1990a96b00",
     "paper_rebonding_summary.csv": "8a4d2ca713935e82ece430d65095320131cfb5e590de1d73da760874ef70a375",
     "paper_simulation_attempt_registry.csv": "a96b68548ae4324b85cbbc6ab3bec0b20d790741362fd911421560d952de0431",
     "paper_simulation_completion_decision.json": "d7d3f81c4954a0d0be151954354da37f4a853926c9c56547956afd8b2ed34af1",
     "paper_simulation_completion_decision.md": "2740fe1c8e137b963f94f41f73b0d14d72dcbd8e79741da024f1f84572df4316",
+    "paper_simulation_completion_verification.json": "229fa47a70d7191c0855c92f1c4afa19d4ec91804dd4fad3a8b1f9434c8dff42",
     "paper_table_manifest.csv": "4e7b3be86297326eec485957ba68810489951dccaef8769b99814f45a9d45f30",
     "paper_temperature_fracture_fatigue_summary.csv": "3649b55ffd0e668fbfa48c11d891ded8ebcdd7db42087fe1807caf1698eb2115",
     "push_publication_record.json": "d1df0840edf6ea9963d4a9f3c65edb47b6f90107fecbc87e85f2fc8ec79ed7fd",
+    "temperature_fatigue_exclusion_review.csv": "11474070029601b2ce1579f02f354ae1ebaeb33a5e959c6fd20d5210f0ef6871",
+    "temperature_fatigue_exclusion_review.json": "609bd2132ad6d261951f512ba5038f1a80bf225b19512dd109c27455319c281f",
     "unfinished_physical_simulation_registry.csv": "77abff4f74c53090e95bf123977399d7777c34aa516c91aa24cb3c04ed06299e"
   },
-  "n_files": 19,
-  "schema": "v1_file_hashes"
+  "n_files": 28,
+  "schema": "v2_file_hashes"
 }
