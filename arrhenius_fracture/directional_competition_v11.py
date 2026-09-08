@@ -398,8 +398,21 @@ class CompetingActionProposal:
     member_event_ordinals: tuple[int, ...]
     completion_times_s: tuple[float, ...]
     action_type: str
+    # Explicit event-owner scope, distinct from a shared physical process owner.
+    # Legacy event IDs remain checkpoint/RNG keys, not globally scoped identities.
+    event_owner_tip_id: str | None = None
+    branch_opportunity_id: str | None = None
+
+    @property
+    def scoped_event_identities(self) -> tuple[tuple[str, str, int], ...]:
+        if self.event_owner_tip_id is None:
+            return ()
+        return tuple((self.event_owner_tip_id, candidate, ordinal) for candidate, ordinal
+                     in zip(self.member_candidate_ids, self.member_event_ordinals))
 
     def __post_init__(self) -> None:
+        if (self.event_owner_tip_id is None) != (self.branch_opportunity_id is None):
+            raise ValueError("proposal tip and branch-opportunity scope must be specified together")
         size = len(self.member_candidate_ids)
         if size not in (1, 2):
             raise ValueError("directional action must have one or two members")

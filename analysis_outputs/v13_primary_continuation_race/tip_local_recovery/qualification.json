@@ -1,0 +1,21 @@
+{
+  "classification": "CROSS_TIP_EVENTS_INCORRECTLY_GROUPED_AS_ONE_ACTION",
+  "existing_supporting_tests_passed": 22,
+  "frozen_corrected_source_provenance": "uncommitted narrow patch on 651d32e during diagnostic; production file hashes recorded here; commit before live continuation",
+  "initial_test_harness_error": "Forensic caller-frame pickle contains instance-bound methods; load via existing closed runtime-binding registry. Production checkpoint format and physics unchanged. All 10 narrow tests pass after reader correction.",
+  "narrow_regression_count": 10,
+  "narrow_test_result": "10 passed in 21.96s",
+  "no_new_physical_parameters": true,
+  "production_source_sha256": {
+    "arrhenius_fracture/directional_competition_v11.py": "93eacce83d8393cbb6017b1da2e6578342a803b4c02ca27cce4b7f29e3cc99bd",
+    "arrhenius_fracture/production_step_loop_v11.py": "eb0385e52eabb906451f72137ed5668e2227cc6b6527421c591e7e18b7809bd0",
+    "arrhenius_fracture/sharp_front_v11_branching.py": "77ffe83ee6b6d957664c41fac3471cd151a5e00f6520e8b6f0db0474aa665ce2",
+    "arrhenius_fracture/tip_directional_observation_v11.py": "1d508948ad5c619ff5e7a6e198baf6045a0540ddb638df1481d24da6216182d6",
+    "arrhenius_fracture/tip_local_proposals_v13.py": "ba1186561ba720ac02e848b1d89ed33cd7894f8474d7ca7efb42b46d4fca1545"
+  },
+  "status": "PASS",
+  "supporting_scope": "8 actual frozen production callback fixtures, 8 clean-parent/AST/output tests, 6 step-controller tests",
+  "unchanged_input_files": 2932,
+  "unchanged_marked_event_semantics": true,
+  "unchanged_owner_guard": true
+}
