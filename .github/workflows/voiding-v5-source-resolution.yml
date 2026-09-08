@@ -1,4 +1,5 @@
-name: V5 source-resolution exact-head development sentinels
+name: V5 source-resolution exact-head qualification
+run-name: V5 source-resolution ${{ inputs.operation || 'focused' }} @ ${{ github.sha }}
 
 on:
   push:
@@ -7,7 +8,7 @@ on:
     inputs:
       operation:
         type: choice
-        options: [focused, rollback, restarts, final]
+        options: [focused, rollback, restarts, final, audit]
         default: focused
         required: true
 
@@ -39,6 +40,7 @@ jobs:
           tests/test_compressed_closure_checkpoint_v1.py tests/test_disabled_causal_neutrality_v1.py
           tests/test_source_resolution_campaign_v1.py
           tests/test_common_restart_protocol_v1.py
+          tests/test_final_campaign_archive_v1.py
           --junitxml=/tmp/v5-source-resolution/focused.xml
       - name: Clean worktree and diff
         if: always()
@@ -58,3 +60,6 @@ jobs:
   final-campaign:
     if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final'
     uses: ./.github/workflows/voiding-v5-source-final-campaign.yml
+  publication-audit:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'audit'
+    uses: ./.github/workflows/voiding-v5-publication-audit.yml

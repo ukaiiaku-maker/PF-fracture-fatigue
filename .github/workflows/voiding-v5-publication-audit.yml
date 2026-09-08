@@ -1,0 +1,75 @@
+name: V5 exact publication-head evidence audit
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Exact publication head, lossless extraction and unchanged executable tree
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python scripts/package_v5_final_campaign_v1.py unpack artifacts/voiding_v5_source_resolution_and_final_closure/final_campaign_publication /tmp/v5-published-complete --verify-publication-head
+          implementation_sha=$(python -c 'import json; print(json.load(open("artifacts/voiding_v5_source_resolution_and_final_closure/final_campaign_publication/publication.json"))["implementation_sha"])')
+          git worktree add --detach /tmp/v5-published-implementation "$implementation_sha"
+      - name: Reconstruct static, source, causality, all lifecycle ontology and exact A-B evidence
+        run: |
+          python /tmp/v5-published-implementation/scripts/validate_v5_complete_published_campaign_v1.py /tmp/v5-published-complete "$GITHUB_WORKSPACE/artifacts/voiding_v5_source_resolution_and_final_closure/final_campaign_publication/publication.json" "$GITHUB_SHA" /tmp/v5-publication-audit/evidence.json
+      - name: Clean publication and implementation worktrees
+        if: always()
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --check
+          test -z "$(git status --short)"
+          test -z "$(git -C /tmp/v5-published-implementation status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-exact-publication-audit-${{ github.sha }}
+          path: /tmp/v5-publication-audit
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Full focused set at the exact publication head
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python scripts/qualify_v5_source_resolution_focused_results_v1.py /tmp/v5-publication-focused/results.xml /tmp/v5-publication-focused/report.json --execute
+      - name: Clean worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-exact-publication-focused-${{ github.sha }}
+          path: /tmp/v5-publication-focused

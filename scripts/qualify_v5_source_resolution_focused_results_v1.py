@@ -23,6 +23,7 @@ FOCUSED_FILES=(
     'test_disabled_causal_neutrality_v1.py',
     'test_source_resolution_campaign_v1.py',
     'test_common_restart_protocol_v1.py',
+    'test_final_campaign_archive_v1.py',
 )
 
 
@@ -49,7 +50,13 @@ def summarize(xml,expected):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('xml',type=Path);parser.add_argument('output',type=Path)
+    parser.add_argument('--execute',action='store_true',help='Run the entire focused registry before interpreting its actual XML')
     args=parser.parse_args()
+    if args.execute:
+        args.xml.parent.mkdir(parents=True,exist_ok=True)
+        completed=subprocess.run([sys.executable,'-m','pytest','-q',*('tests/'+name for name in FOCUSED_FILES),
+            '--junitxml='+str(args.xml)],cwd=ROOT)
+        if completed.returncode not in (0,1):raise SystemExit(completed.returncode)
     collected=subprocess.check_output([sys.executable,'-m','pytest','--collect-only','-q',*('tests/'+name for name in FOCUSED_FILES)],cwd=ROOT,text=True)
     expected=[line.strip() for line in collected.splitlines() if line.startswith('tests/') and '::' in line]
     report=summarize(args.xml,expected)

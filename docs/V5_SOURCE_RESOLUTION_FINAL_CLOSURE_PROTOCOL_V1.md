@@ -105,3 +105,25 @@ Normal descendant publication is authorized on the existing finalization-v2
 branch. No force, rewrite, squash, rebase, merge or RC before all mandatory
 scientific gates pass. Preserve `r_tip != R_void`; no multiple voids, general
 multifront production, calibration, fatigue or experimental-validation claims.
+
+## Final evidence publication identity
+
+Freeze publication tooling before the one full A/B generation. The completed
+CI bundle may be stored as deterministic gzip/tar parts no larger than 80 MiB.
+No JSON, checkpoint, original inventory or failed scientific result is edited
+inside that archive. Safe extraction rejects traversal, symlinks, duplicate or
+unregistered members, and rechecks every original file hash.
+
+The implementation commit generates the evidence. A later normal descendant
+commit stores it. The exact-publication-head audit requires identical complete
+non-artifact Git trees and permits only changes under the authorized new
+evidence root. It then reconstructs the published evidence in a clean detached
+worker at the explicitly recorded implementation SHA, including all static
+sources, positive and causal sources, lifecycle ontology and full A/B equality.
+This is not falsely described as generation at the later publication SHA.
+The entire focused registry runs separately at the exact publication head;
+repository-wide CI retains its own failure classification.
+
+The registered workflow entry uses operation `final` for the one complete
+campaign and operation `audit` for this later publication audit. Neither is a
+release qualification when a mandatory scientific gate remains failed.

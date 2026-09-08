@@ -18,8 +18,9 @@ The a34cdf0 45-case development run exposed loss of the owned child endpoint
 inventory during partial clock intervals: child nucleation passes at all five
 partitions, but child continuation initially passes only unsplit. `facbc24`
 retains the endpoint inventory only for exactly the same front, position and
-graph generation. Different owners do not inherit it. The actual five-partition
-continuation sentinel is required before declaring this repaired scientifically.
+graph generation. Different owners do not inherit it. Its clean actual
+continuation sentinel passes all five partitions with identical complete states.
+The final same-head all-45 campaign remains a separate required execution.
 
 The stronger +8e-7 m common reload fails both one- and two-ring timing budgets
 at `c284427`; the second waiting-time transfer error is 0.1037261217. Retain
