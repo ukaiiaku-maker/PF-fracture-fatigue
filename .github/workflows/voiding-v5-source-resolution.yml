@@ -1,0 +1,40 @@
+name: V5 source-resolution exact-head development sentinels
+
+on:
+  push:
+    branches: [codex/sharp-front-stateful-voiding-v5-finalization-v2]
+  workflow_dispatch:
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Exact implementation head
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Geometry, recovery, source proof, and physical-clock regressions
+        run: >-
+          python -m pytest -q tests/test_quality_constrained_mesh_v1.py
+          tests/test_source_transfer_budget_v1.py tests/test_cavity_boundary_patch_recovery_v1.py
+          tests/test_cavity_recovery_transfer_budget_v1.py tests/test_canonical_kinetic_time_v1.py
+          tests/test_boundary_segment_bounding_v1.py tests/test_v12_mechanically_separating_wake.py
+          tests/test_production_source_resolution_v3.py tests/test_closure_lifecycle_evidence.py
+          tests/test_closure_lifecycle_rollback.py tests/test_voiding_lifecycle_driver_v5.py
+          --junitxml=/tmp/v5-source-resolution/focused.xml
+      - name: Clean worktree and diff
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-source-resolution-development-${{ github.sha }}
+          path: /tmp/v5-source-resolution

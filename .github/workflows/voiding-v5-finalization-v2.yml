@@ -1,8 +1,6 @@
 name: Historical V5 finalization-v2 pinned reproduction
 
 on:
-  push:
-    branches: [codex/sharp-front-stateful-voiding-v5-finalization-v2]
   workflow_dispatch:
 
 jobs:

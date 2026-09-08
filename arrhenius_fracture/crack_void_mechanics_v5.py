@@ -55,6 +55,7 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
                           crack_root_m: tuple[float, float] | None = None,
                           crack_tip_m: tuple[float, float] | None = None,
                           crack_path_m: tuple[tuple[float, float], ...] | None = None,
+                          quality_strategy: str | None = None,
                           geometry_mode: str = "LEGACY_CAVITY_CENTERED_DIAGNOSTIC") -> dict[str, Any]:
     hole = build_explicit_hole_mesh(
         specimen_width_m, specimen_height_m, cavity_center_m, cavity_radius_m,
@@ -102,6 +103,13 @@ def solve_crack_void_case(*, cavity_center_m=(7.0e-4, 0.0), cavity_radius_m=5.0e
             start_xy = tuple(map(float, hole.mesh.nodes[outer]))
             tip_xy = tuple(map(float, hole.mesh.nodes[tip]))
             path = (start_xy, tip_xy)
+        if quality_strategy is not None:
+            from .quality_constrained_mesh_v1 import constrained_quality_mesh, fixed_path_constraints
+            fixed, protected = fixed_path_constraints(hole.mesh, path)
+            mesh, quality_audit = constrained_quality_mesh(hole.mesh, fixed_nodes=fixed,
+                protected_edges=protected, strategy=quality_strategy)
+            hole = replace(hole, mesh=mesh)
+            conformity_audit = dict(conformity_audit or {}, quality_constrained_mesh_v1=quality_audit)
         network = CrackNetworkState.one_tip(path)
         support_ids, support_audit = mechanically_separating_graph_support(hole.mesh, network)
         crack_tip = tip_xy

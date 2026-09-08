@@ -9,6 +9,7 @@ reported separately from the requested interval.
 from dataclasses import replace
 import math
 import numpy as np
+from .canonical_kinetic_time_v1 import AcceptedTime, exact
 
 from .voiding_v5 import (
     VoidPhase,VoidingConfig,advance_site,arrhenius_rates,create_subgrid_cavity,
@@ -33,13 +34,17 @@ def advance_production_void_interval(state,dt_s,*,temperature_K=900.,config=None
     if state.void_state is None: raise ValueError('enabled production void state required')
     remaining=duration;elapsed=0.;operations=[];error=None;accepted=state
     initial_time=float(state.junction_process_state.get('production_time_s',0.))
+    initial_clock=state.junction_process_state.get('canonical_accepted_time_v1', AcceptedTime.from_seconds(initial_time))
+    elapsed_exact=exact(0)
     cache={} if refinement_attempt_cache is None else refinement_attempt_cache
     def commit(trial,step,operation):
-        nonlocal accepted,remaining,elapsed
+        nonlocal accepted,remaining,elapsed,elapsed_exact
         previous=accepted
-        elapsed+=step;remaining=max(duration-elapsed,0.)
+        elapsed_exact+=exact(step);elapsed=float(elapsed_exact)
+        remaining=float(max(exact(duration)-elapsed_exact,0))
+        physical_clock=initial_clock.advance(elapsed_exact)
         accepted=replace(trial,junction_process_state={**trial.junction_process_state,
-            'production_time_s':initial_time+elapsed})
+            'production_time_s':physical_clock.seconds(), 'canonical_accepted_time_v1':physical_clock})
         from .closure_lifecycle_evidence import conservation,stagewise_topology
         from .topology_transaction_v11 import complete_accepted_state_fingerprint
         operations.append({**operation,'duration_s':step,'physical_time_s':initial_time+elapsed,

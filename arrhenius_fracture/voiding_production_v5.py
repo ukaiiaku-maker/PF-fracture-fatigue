@@ -1056,12 +1056,13 @@ def _cavity_resolution_binding(state):
     return digest.hexdigest()
 
 
-def _qualified_cavity_source(state, tensor):
+def _qualified_cavity_source(state, tensor, *, temperature_K=900.0):
     from .closure_static_evidence import resolution_screen
     from .finalization_v3_schema import SCIENTIFIC_ACCEPTANCE_TOLERANCES as limits
     from .finalization_v3_schema import canonical_hash
     proof = state.junction_process_state.get("cavity_source_resolution_proof", {})
-    if (proof.get("schema") != "v12.cavity-source-local-refinement/1"
+    from .source_quality_transaction_v1 import PROOF_SCHEMA, source_transfer_budget
+    if (proof.get("schema") not in ("v12.cavity-source-local-refinement/1", PROOF_SCHEMA)
         or proof.get("current_binding") != _cavity_resolution_binding(state)
         or not isinstance(proof.get("refinement_count"), int)
         or proof["refinement_count"] < 1
@@ -1081,6 +1082,22 @@ def _qualified_cavity_source(state, tensor):
         or canonical_hash(cavity_source_resolution_metrics(previous_state)) != canonical_hash(reference)): return False
     a = np.asarray(current["tensor_Pa"]); b = np.asarray(reference["tensor_Pa"])
     error = float(np.linalg.norm(a-b)/max(np.linalg.norm(a),1e-300))
+    if proof.get("schema") == PROOF_SCHEMA:
+        # Bind the stored transfer diagnostic to its original owned clocks.
+        # A legitimate partial hazard advance must not invalidate the proof
+        # merely because a relative waiting-time subtraction rounds differently.
+        anchor = proof.get("budget_competition")
+        if anchor is None or anchor.candidates != state.competition.candidates: return False
+        if any((old.candidate_id,old.current_threshold_action,old.threshold_seed) !=
+               (new.candidate_id,new.current_threshold_action,new.threshold_seed)
+               for old,new in zip(anchor.hazard_states,state.competition.hazard_states)): return False
+        anchored_current = replace(state,competition=anchor)
+        anchored_previous = replace(previous_state,competition=anchor)
+        budget = source_transfer_budget(anchored_current, anchored_previous, a, b)
+        if (reference["minimum_quality"] < limits["mesh_minimum_quality"]
+            or canonical_hash(budget) != canonical_hash(proof.get("source_transfer_budget"))
+            or not source_transfer_budget(state, previous_state, a, b, temperature_K=temperature_K)["passed"]):
+            return False
     return bool(np.array_equal(a,np.asarray(tensor)) and resolution_screen(current)
         and current["normalized_traction"] <= limits["cavity_traction_normalized"]
         and error <= limits["tensor_probe_relative"])
@@ -1155,6 +1172,8 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
     if max_refinement_levels not in range(0,9): raise ValueError("source refinement budget must be 0..8")
     if refinement_region not in ("source_neighborhood","complete_cavity_ring"):
         raise ValueError("unregistered source refinement region")
+    if quality_improvement not in (False, True, "constrained_v1"):
+        raise ValueError("unregistered source quality strategy")
     cavity = state.void_state.cavities[0]
     if cavity.phase != VoidPhase.CONNECTED_VOID or state.crack_network.active_tip_ids:
         raise ValueError("source refinement requires a connected dormant cavity")
@@ -1162,7 +1181,14 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
     def inject(stage, current):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
-    current = state.isolated_copy(); previous = cavity_source_resolution_metrics(current); rows = []
+    current = state.isolated_copy(); rows = []; quality_preparation = None
+    if quality_improvement == "constrained_v1":
+        from .source_quality_transaction_v1 import repair_connected_quality
+        current, quality_preparation = repair_connected_quality(current)
+        if not quality_preparation["accepted"]:
+            return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":[],
+                           "quality_preparation":quality_preparation,"operations":operations}
+    previous = cavity_source_resolution_metrics(current)
     original_clock = (state.competition, state.rng_state)
     for level in range(1,max_refinement_levels+1):
         position = np.asarray(cavity.connection_exit_m)
@@ -1174,12 +1200,21 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
             active_tip_ids=(), generation=int(current.event_counters.get("mesh_generation",0))+1,
             operation_index=int(current.event_counters.get("refinement_operation_index",0))+1)
         flips = ()
-        if quality_improvement:
+        if quality_improvement is True:
             quality_mesh, flips = _bounded_quality_edge_flips(refined)
             if flips:
                 fields = _project_fields(refined,quality_mesh)
                 refined = replace(refined,mesh=quality_mesh,damage=fields["damage"],
                     displacement=fields["displacement"],ep_gp=fields["ep_gp"],rho_gp=fields["rho_gp"])
+        constrained_quality = None
+        if quality_improvement == "constrained_v1":
+            from .quality_constrained_mesh_v1 import constrained_quality_mesh, production_geometry_constraints
+            fixed, protected = production_geometry_constraints(refined)
+            quality_mesh, constrained_quality = constrained_quality_mesh(refined.mesh,
+                fixed_nodes=fixed, protected_edges=protected, strategy="flips")
+            fields = _project_fields(refined, quality_mesh)
+            refined = replace(refined,mesh=quality_mesh,damage=fields["damage"],
+                displacement=fields["displacement"],ep_gp=fields["ep_gp"],rho_gp=fields["rho_gp"])
         inject("downstream_source_refinement", refined)
         refined = _prepare_connected_ligament_support(refined, entry=cavity.connection_entry_m,
             exit_point=cavity.connection_exit_m, direction=cavity.connection_direction_xy,
@@ -1206,6 +1241,12 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
             "element_damage_gp":getattr(current.mesh,"element_damage_gp",None),
             "displacement":current.displacement,"damage":current.damage,"ep_gp":current.ep_gp,
             "rho_gp":current.rho_gp,"energy_ledgers":dict(current.energy_ledgers)}
+        if quality_improvement == "constrained_v1":
+            from .source_quality_transaction_v1 import PROOF_SCHEMA, source_transfer_budget
+            proof.update({"schema":PROOF_SCHEMA, "quality_preparation":quality_preparation,
+                "constrained_quality":constrained_quality,
+                "budget_competition":current.competition,
+                "source_transfer_budget":source_transfer_budget(trial,current,metrics["tensor_Pa"],previous["tensor_Pa"])})
         trial = replace(trial,junction_process_state={**trial.junction_process_state,
             "cavity_source_resolution_proof":proof})
         passed = _qualified_cavity_source(trial, metrics["tensor_Pa"])
@@ -1278,11 +1319,16 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
     rates = directional_clock_rates(state, stress, temperature_K=temperature_K)
     junction = dict(state.junction_process_state)
     start_time = float(junction.get("production_time_s", 0.0))
+    from .canonical_kinetic_time_v1 import AcceptedTime
+    accepted_clock = junction.get('canonical_accepted_time_v1', AcceptedTime.from_seconds(start_time))
+    if accepted_clock.seconds() != start_time: accepted_clock = AcceptedTime.from_seconds(start_time)
     source = _source_identity(
         state, stress, source_kind=source_kind, source_front_id=source_front_id,
         source_cavity_id=source_cavity_id, source_boundary_site_id=source_boundary_site_id,
         source_position_m=source_position_m, source_probe_identity=source_probe_identity,
     )
+    from .finalization_v3_schema import canonical_hash
+    source_signature = canonical_hash(source)
     # Policy C: no qualified production-resolution transfer exists yet. Neither
     # a caller-supplied PASS flag nor a static traction screen grants authority.
     # The accepted connection and all clock/RNG/graph state are returned intact.
@@ -1290,7 +1336,7 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
     owned_cavity = (state.junction_process_state.get("active_event_source", {}).get("source_kind") == "cavity_surface"
         or (state.void_state is not None and any(c.phase == VoidPhase.CONNECTED_VOID for c in state.void_state.cavities)))
     if ((source_kind == "cavity_surface" or owned_cavity) and any(r["effective_rate_s"] > 0 for r in rates)
-        and not _qualified_cavity_source(state, stress)):
+        and not _qualified_cavity_source(state, stress, temperature_K=temperature_K)):
         for rate in rates:
             rate.update({"unqualified_effective_rate_s": rate["effective_rate_s"],
                          "unqualified_crossing_time_s": rate["crossing_time_s"],
@@ -1316,7 +1362,8 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
                          "winner": False,
                          "instantaneous_status": "ZERO_DOWNSTREAM_DRIVE"})
         junction.update({
-            "production_time_s": start_time + duration,
+            "production_time_s": accepted_clock.advance(duration).seconds(),
+            "canonical_accepted_time_v1": accepted_clock.advance(duration),
             "active_event_source": source,
             "latest_directional_clock_status": "NO_KINETICALLY_ACTIVE_CANDIDATE",
         })
@@ -1326,17 +1373,17 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
         if bounded < 0.0 or not math.isfinite(bounded):
             raise ValueError("maximum_advance_duration_s must be finite and nonnegative")
         duration = min(duration, bounded)
+    from .canonical_directional_interval_v1 import advance as advance_canonical
+    hazards, completed, anchors, exact_duration = advance_canonical(tuple(hazards), rates,
+        clock=accepted_clock, anchors=junction.get('directional_integration_anchors_v1', {}),
+        source_signature=source_signature, maximum_duration_s=maximum_advance_duration_s)
+    duration = float(exact_duration)
     emitted_winner_ids = []
-    for index, (hazard, rate) in enumerate(zip(hazards, rates)):
-        preview = preview_directional_interval(
-            hazard, lambda_per_s=rate["rate_s"], start_time_s=start_time,
-            duration_s=duration,
-        )
-        hazards[index] = commit_directional_interval(hazard, preview)
+    for rate, events in zip(rates, completed):
         rate["common_advance_duration_s"] = duration
-        rate["emitted_event_ids"] = [event.event_id for event in preview.completed_events]
-        rate["winner"] = bool(preview.completed_events)
-        if preview.completed_events:
+        rate["emitted_event_ids"] = [event.event_id for event in events]
+        rate["winner"] = bool(events)
+        if events:
             emitted_winner_ids.append(rate["candidate_id"])
     pending_new = {
         event.candidate_id for before, after in zip(state.competition.hazard_states, hazards)
@@ -1362,7 +1409,9 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
                 "threshold_identity": threshold_by_candidate[event.candidate_id],
                 "status": "PENDING_SOURCE_VALIDATION",
             }
-    junction.update({"production_time_s": start_time + duration,
+    junction.update({"production_time_s": accepted_clock.advance(exact_duration).seconds(),
+                     "canonical_accepted_time_v1": accepted_clock.advance(exact_duration),
+                     "directional_integration_anchors_v1": anchors,
                      "directional_event_provenance": provenance,
                      "active_event_source": source,
                      "latest_directional_clock_status": (
@@ -1441,6 +1490,37 @@ def _prepare_connected_ligament_support(state, *, entry, exit_point, direction,
         raise RuntimeError("connected terminal has no exact certification arc")
     return replace(state, junction_process_state={**state.junction_process_state,
         "boundary_terminal_context": contexts})
+
+
+def _refresh_downstream_boundary_context(state):
+    """Re-derive endpoint incidence from the actual child-trial mesh.
+
+    Refinement invalidates stored boundary edge IDs. This does not change any
+    role or waive any certificate: active tips remain prohibited, and every
+    new context is independently checked by the existing support verifier.
+    """
+    from .mechanically_separating_sharp_wake_v12 import classify_graph_vertices
+    cavity = state.void_state.cavities[0]
+    root = state.crack_network.branch(ROOT_BRANCH_ID)
+    cycle = cavity_free_surface_certificate(state)
+    if not cycle['passed']: raise RuntimeError('downstream trial cavity cycle is not certified')
+    contexts = _external_free_root_context(state.mesh, state.boundary, root.path[0])
+    roles = classify_graph_vertices(state.crack_network)
+    for first, last, arc_id in certification_arcs(state.crack_network):
+        for endpoint, point in (('start', first), ('end', last)):
+            role = roles.get(tuple(point), frozenset())
+            if 'inactive_terminal' not in role or 'active_tip' in role: continue
+            if not any(anchor is not None and math.dist(point, anchor) <= 1e-12
+                       for anchor in (cavity.connection_entry_m, cavity.connection_exit_m)): continue
+            context = {'endpoint': endpoint, 'endpoint_role': 'inactive_terminal',
+                'endpoint_coordinate_m': tuple(map(float, point)), 'boundary_kind': 'cavity_free_surface',
+                'boundary_component_id': 'cavity-cycle:'+cavity.cavity_id,
+                'boundary_edge_ids': tuple(tuple(map(int, edge)) for edge in cycle['boundary_edge_ids']),
+                'cavity_id': cavity.cavity_id, 'certified_cavity_id': cavity.cavity_id,
+                'cavity_cycle_certified': True}
+            contexts[arc_id] = tuple(contexts.get(arc_id, ()))+(context,)
+    return replace(state, junction_process_state={**state.junction_process_state,
+        'boundary_terminal_context': contexts})
 
 
 def ligament_transaction(state, *, failure_stage=None, operation_log=None):
@@ -1713,6 +1793,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             source_commit=_head(), configuration={"event": "DOWNSTREAM_FRONT" if not continuation else "CONTINUED_FRONT"},
             transaction_identity="downstream-continued" if continuation else "downstream-first-passage",
             failure_injector=inject, refinement_levels=1,
+            prepare_support_state=_refresh_downstream_boundary_context,
         )
         cavity = realized.void_state.cavities[0]
         updated = replace(cavity, phase=VoidPhase.DOWNSTREAM_FRONT_ACTIVE,

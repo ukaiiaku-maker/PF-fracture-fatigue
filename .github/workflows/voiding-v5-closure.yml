@@ -1,9 +1,12 @@
-name: V5 closure exact-head evidence replay (scientific decision retained)
+name: Historical V3 closure archival replay (original comparisons retained)
 
 on:
-  push:
-    branches: [codex/sharp-front-stateful-voiding-v5-finalization-v2]
   workflow_dispatch:
+    inputs:
+      run_legacy_campaign:
+        description: Also replay the superseded complete V3 campaign
+        type: boolean
+        default: false
 
 jobs:
   closure-traction:
@@ -54,6 +57,7 @@ jobs:
           path: /tmp/voiding_v5_finalization_v3_closure
 
   closure-campaign:
+    if: inputs.run_legacy_campaign
     runs-on: ubuntu-latest
     # Full physical A/B execution plus separate raw-source reassembly.
     # This is a wall-clock budget, not a scientific acceptance tolerance.
@@ -108,7 +112,7 @@ jobs:
 
   closure-independent-audits:
     needs: [closure-traction, closure-campaign]
-    if: always()
+    if: always() && inputs.run_legacy_campaign
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:

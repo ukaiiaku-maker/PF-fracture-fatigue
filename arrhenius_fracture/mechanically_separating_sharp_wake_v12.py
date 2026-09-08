@@ -246,6 +246,13 @@ def _point_segment_distance(points,p0,p1):
 def _cross(a,b): return float(a[0]*b[1]-a[1]*b[0])
 
 def _segments_intersect(a,b,c,d,tolerance=1e-12):
+    # Necessary geometric condition in coordinate units. The cross-product
+    # parallel/collinear branch below must not report an intersection between
+    # disjoint bounding boxes when short refined edges have tiny determinants.
+    # Use the existing distance tolerance; do not widen the accepted geometry.
+    if np.any(np.maximum(np.minimum(a,b),np.minimum(c,d)) >
+              np.minimum(np.maximum(a,b),np.maximum(c,d))+tolerance):
+        return False
     ab=b-a; cd=d-c; denominator=_cross(ab,cd)
     if abs(denominator)<=tolerance:
         if abs(_cross(c-a,ab))>tolerance: return False
