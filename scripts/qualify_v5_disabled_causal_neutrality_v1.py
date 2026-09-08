@@ -17,6 +17,16 @@ DIAGNOSTICS = ('latest_free_dof_residual_l2_N_per_m', 'latest_constrained_reacti
                'latest_top_bottom_reaction_balance', 'latest_energy_reaction_identity')
 
 
+def consumer_occurrences(repository,keys):
+    """Keep every consumer hit in deterministic file/line order."""
+    occurrences={}
+    for key in keys:
+        result=subprocess.run(('rg','-n',key,'arrhenius_fracture'),cwd=repository,text=True,capture_output=True)
+        if result.returncode not in (0,1):raise RuntimeError('consumer audit search failed: '+result.stderr)
+        occurrences[key]=sorted(result.stdout.splitlines())
+    return occurrences
+
+
 def causal(components):
     result = deepcopy(components); excluded = {}
     if result.get('void_state') is not None: raise ValueError('causal comparison requires voiding disabled')
@@ -148,10 +158,7 @@ def main():
             'passed': equal and history_equal and first['restart_exact'] and second['restart_exact']
                 and first['failure'] is None and second['failure'] is None})
     keys = (*DIAGNOSTICS, 'v12_boundary_terminal_certificates', 'boundary_terminal_certificates', 'source_commit', 'void_state')
-    occurrences = {}
-    for key in keys:
-        result = subprocess.run(('rg', '-n', key, 'arrhenius_fracture'), cwd=root, text=True, capture_output=True)
-        occurrences[key] = result.stdout.splitlines()
+    occurrences = consumer_occurrences(root,keys)
     report = {'schema': 'v5.disabled-future-causal-neutrality/1', 'implementation_sha': current,
         'historical_raw_full_state_identity': 'FAIL_RETAINED', 'rows': rows, 'passed': all(r['passed'] for r in rows),
         'consumer_occurrences': occurrences,
