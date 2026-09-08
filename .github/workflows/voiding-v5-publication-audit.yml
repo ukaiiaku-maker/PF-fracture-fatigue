@@ -27,7 +27,7 @@ jobs:
             !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
           cache: pip
       - name: Exact publication head, lossless extraction and unchanged executable tree
         id: unpack
@@ -50,7 +50,7 @@ jobs:
           python-version: ${{ steps.unpack.outputs.python_version }}
       - name: Restore the recorded numerical package versions
         run: |
-          pip install -e '.[test]'
+          pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
           python - <<'PY'
           import json,subprocess,sys
           data=json.load(open('artifacts/voiding_v5_source_resolution_and_final_closure/final_campaign_publication/publication.json'))
@@ -87,9 +87,9 @@ jobs:
             !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
           cache: pip
-      - run: pip install -e '.[test]'
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
       - name: Full focused set at the exact publication head
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"

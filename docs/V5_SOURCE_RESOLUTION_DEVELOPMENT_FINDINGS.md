@@ -38,6 +38,17 @@ input identity, conservation ledger and independent topology certificate. All
 This is complete rollback development evidence, not final A/B qualification or
 proof of the separately running common-terminal restart matrix.
 
+Completed transition shard 0 from run `34189099900` records Python 3.12.14,
+NumPy 2.5.3 and SciPy 1.18.1, with the optional mesh/JIT packages absent. The
+final campaign freezes these numerical versions prospectively. A local read-
+only reconstruction of restart shard 2 under Python 3.12.13 / NumPy 2.5.1 /
+SciPy 1.18.0 reproduces complete checkpoint identities and the topology PASS
+predicate, but differs in two copies of `h_local_median_m` by about 4e-20 m.
+That strict reconstruction is NOT a PASS. A dedicated Linux reconstruction
+uses the recorded versions and the identical full-ontology row checks, without
+loosening comparison or running another physical campaign. Every selected
+45/11/39-case registry must be complete before that development audit passes.
+
 The a34cdf0 45-case development run exposed loss of the owned child endpoint
 inventory during partial clock intervals: child nucleation passes at all five
 partitions, but child continuation initially passes only unsplit. `facbc24`

@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
       - id: registry
         name: Require all ten development phases executed and classified
         run: |
@@ -48,9 +48,9 @@ jobs:
             !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
           cache: pip
-      - run: pip install -e '.[test]'
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
       - name: Exact implementation and clean historical base
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
@@ -92,9 +92,9 @@ jobs:
             !/artifacts/
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
           cache: pip
-      - run: pip install -e '.[test]'
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
       - uses: actions/download-artifact@v4
         with:
           pattern: v5-source-final-shard-*-${{ github.sha }}
@@ -130,7 +130,7 @@ jobs:
             !/artifacts/
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
       - uses: actions/download-artifact@v4
         with:
           name: v5-source-final-complete-${{ github.sha }}
@@ -164,9 +164,9 @@ jobs:
             !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
           cache: pip
-      - run: pip install -e '.[test]'
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
       - name: Full regression execution including the full focused set
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"

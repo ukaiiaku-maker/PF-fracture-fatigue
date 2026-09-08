@@ -446,6 +446,20 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
     observed=[r['case_identity'] for r in rows if r['dataset']=='rollback' and r['case_identity'].startswith('lifecycle:')]
     if sorted(observed)!=sorted('lifecycle:'+name for name in ROLLBACK_STAGES):
         raise ValueError('complete lifecycle rollback registry mismatch')
+    validate_lifecycle_rows(rows,sources,executed_code_sha=executed_code_sha)
+    if payload["decision"] != lifecycle_decision(rows,sources):
+        raise ValueError("lifecycle decision differs from actual checkpoint comparisons")
+    return {"valid":True,"actual_state_rows":len(rows),"transition_attempts":len(transitions),
+            "successful_transition_attempts":sum(r["transition_occurred"] for r in transitions)}
+
+
+def validate_lifecycle_rows(rows,sources,*,executed_code_sha):
+    """Shared source-bound reconstruction, without claiming a complete registry.
+
+    The full validator above still requires every final registry. Development
+    adapters must independently enforce their complete selected section.
+    """
+    if len({r['execution_id'] for r in rows})!=len(rows):raise ValueError('aliased lifecycle execution')
     for row in rows:
         before, after = sources[row["initial_checkpoint"]],sources[row["terminal_checkpoint"]]
         if not isinstance(before,LiveFEMTopologyState) or not isinstance(after,LiveFEMTopologyState):
@@ -514,10 +528,7 @@ def validate_lifecycle(payload, sources, *, executed_code_sha):
                 raise ValueError("rollback source comparison mismatch")
         if row.get('stagewise_topology')!=stagewise_topology(after):
             raise ValueError('stagewise topology does not recompute from accepted source')
-    if payload["decision"] != lifecycle_decision(rows,sources):
-        raise ValueError("lifecycle decision differs from actual checkpoint comparisons")
-    return {"valid":True,"actual_state_rows":len(rows),"transition_attempts":len(transitions),
-            "successful_transition_attempts":sum(r["transition_occurred"] for r in transitions)}
+    return {"valid":True,"actual_state_rows":len(rows),"complete_final_registry_checked":False}
 
 
 def lifecycle_decision(rows,sources):

@@ -7,6 +7,17 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from v5_source_resolution_campaign_matrix_v1 import matrix,require_development_complete
 from validate_v5_source_resolution_evidence_v1 import verify_inventory
 from qualify_v5_source_resolution_focused_results_v1 import summarize
+from validate_v5_development_lifecycle_shards_v1 import expected_registry,require_registry
+
+
+@pytest.mark.parametrize('section,count',[('transitions',45),('restarts',11),('rollback',39)])
+def test_development_reconstruction_requires_every_registered_actual_case(section,count):
+    registry=expected_registry(section);assert len(registry)==count
+    rows=[{'dataset':section,'case_identity':case,'partition_count':partition,'execution_id':str(i)}
+        for i,(case,partition) in enumerate(sorted(registry))]
+    assert len(require_registry(section,rows))==count
+    with pytest.raises(ValueError,match='incomplete'):require_registry(section,rows[:-1])
+    with pytest.raises(ValueError,match='aliased'):require_registry(section,rows+[rows[0]])
 
 
 def test_final_matrix_is_disjoint_and_complete():
