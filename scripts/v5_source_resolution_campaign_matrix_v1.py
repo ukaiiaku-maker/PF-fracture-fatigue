@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Frozen disjoint scheduling of one full source-resolution A/B campaign."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -16,12 +17,21 @@ def matrix():
 
 
 def require_development_complete(path):
-    record=json.loads(Path(path).read_text())
+    path=Path(path);record=json.loads(path.read_text())
     if record.get('schema')!='v5.source-resolution-development-phase-ledger/1':raise ValueError('wrong readiness schema')
     if set(record.get('phases',{}))!={str(n) for n in range(1,11)}:raise ValueError('all ten development phases required')
     for number,row in record['phases'].items():
         if row.get('classification') not in ('EXECUTED_PASS','EXECUTED_FAIL') or not row.get('source_records'):
             raise ValueError('phase '+number+' not executed and classified')
+        for source in row['source_records']:
+            if not isinstance(source,dict) or set(source)!={'path','sha256'}:
+                raise ValueError('phase '+number+' requires hash-bound source records')
+            relative=Path(source['path'])
+            if relative.is_absolute() or '..' in relative.parts:
+                raise ValueError('readiness source must remain under its evidence root')
+            target=path.parent/relative
+            if target.is_symlink() or not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest()!=source['sha256']:
+                raise ValueError('readiness source missing or hash mismatch: '+source['path'])
     return record
 
 

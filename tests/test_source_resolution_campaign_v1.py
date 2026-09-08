@@ -20,11 +20,25 @@ def test_final_matrix_is_disjoint_and_complete():
 
 def test_readiness_allows_honest_scientific_failure_but_not_unexecuted_phases(tmp_path):
     path=tmp_path/'readiness.json'
+    source=tmp_path/'retained-source.json';source.write_text('{"actual_failure":"frozen_gate"}')
+    reference={'path':source.name,'sha256':hashlib.sha256(source.read_bytes()).hexdigest()}
     report={'schema':'v5.source-resolution-development-phase-ledger/1','phases':{
-        str(n):{'classification':'EXECUTED_FAIL','source_records':['retained-source.json']} for n in range(1,11)}}
+        str(n):{'classification':'EXECUTED_FAIL','source_records':[reference]} for n in range(1,11)}}
     path.write_text(json.dumps(report));assert require_development_complete(path)==report
     report['phases']['7']['classification']='NOT_EXERCISED';path.write_text(json.dumps(report))
     with pytest.raises(ValueError,match='not executed'):require_development_complete(path)
+
+
+def test_readiness_cannot_reference_missing_or_altered_sources(tmp_path):
+    path=tmp_path/'readiness.json'
+    source=tmp_path/'source.json';source.write_text('{}')
+    report={'schema':'v5.source-resolution-development-phase-ledger/1','phases':{
+        str(n):{'classification':'EXECUTED_FAIL','source_records':[{'path':source.name,
+            'sha256':hashlib.sha256(source.read_bytes()).hexdigest()}]} for n in range(1,11)}}
+    path.write_text(json.dumps(report));source.write_text('{"changed":true}')
+    with pytest.raises(ValueError,match='hash mismatch'):require_development_complete(path)
+    source.unlink()
+    with pytest.raises(ValueError,match='missing'):require_development_complete(path)
 
 
 def test_manifest_binds_nested_manifests_and_all_files(tmp_path):
