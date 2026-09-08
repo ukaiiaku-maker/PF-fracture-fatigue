@@ -23,6 +23,13 @@ CASES=[f'{material}_{temperature}K_seed{seed}' for seed in (3621,3622,3623,3624)
        for material in ('Peak','weakT') for temperature in (300,1000)]
 
 
+def case_folder(case):
+    recovery=OUT/'snapshot_output_recovery_registry.json'
+    if recovery.exists() and case in json.loads(recovery.read_text())['cases']:
+        return OUT/'short_ensemble_recovered'/case
+    return OUT/'short_ensemble'/case
+
+
 def prepare():
     gate=json.loads((OUT/'frozen_summary.json').read_text())
     verification=json.loads((OUT/'verification.json').read_text())
@@ -122,39 +129,94 @@ def worker(case):
             raise
 
 
-def queue():
+def resume_snapshot_failure(case):
+    from arrhenius_fracture import sharp_front_v11_branching as production, sharp_front_v10_2_27 as paper
+    registry=json.loads((OUT/'snapshot_output_recovery_registry.json').read_text())
+    expected=registry['cases'][case]
+    original=OUT/'short_ensemble'/case
+    source=original/'v13_branch/accepted_pair.json'
+    manifest=json.loads(source.read_text())
+    if sha256(source.parent/manifest['state_file'])!=expected['state_sha256'] or sha256(source)!=expected['manifest_sha256']:
+        raise RuntimeError('recovery checkpoint identity mismatch')
+    exception=json.loads((original/'exception.json').read_text())
+    if exception['type']!='TypeError' or exception['reason']!="write_topology_snapshot() missing 1 required keyword-only argument: 'latest_action'":
+        raise RuntimeError('not the demonstrated output-only interruption')
+    folder=case_folder(case);folder.mkdir(parents=True,exist_ok=True)
+    with (folder/'launch_claim.json').open('x') as stream:
+        json.dump({'pid':os.getpid(),'case':case,'resume_only':True},stream)
+    launch=json.loads((original/'launch.json').read_text())
+    family=Path(json.loads(PLAN.read_text())['family'])
+    env=campaign_environment(family);env.update(CLEAVAGE_HAZARD_SEED=str(launch['seed']),PF_QUALIFIED_DAUGHTER_STOP_UM='25')
+    os.environ.update(env)
+    step=manifest['event_counters']['accepted_steps']
+    inputs=folder/'input_checkpoint';inputs.mkdir()
+    checkpoint_path=inputs/f'step{step:07d}.json'
+    shutil.copyfile(source,checkpoint_path);shutil.copyfile(source.parent/manifest['state_file'],inputs/manifest['state_file'])
+    shutil.copyfile(original/'v13_primary_race.jsonl',folder/'v13_primary_race.jsonl')
+    def guard(actual_step,**kwargs):
+        if actual_step!=step or sha256(inputs/manifest['state_file'])!=expected['state_sha256']:
+            raise RuntimeError('recovery is restricted to the sealed accepted V13 pair')
+    production.require_uncontaminated_replay_checkpoint=guard
+    argv=list(launch['arguments']);argv.remove('--v13-inherited-primary-race')
+    argv[argv.index('--out')+1]=str(folder);argv[argv.index('--maximum-fronts')+1]='2'
+    argv+=['--v11-restart-checkpoint',str(checkpoint_path)]
+    paper.DEFAULT_REGISTRY=ROOT/'runtime_inputs/pf_current_source_branching/pf_v2_four_class_pf_transfer_registry.csv'
+    paper.SELECTION_RECORD=ROOT/'runtime_inputs/pf_current_source_branching/pf_v2_four_class_pf_transfer_selection.json'
+    paper.VALID_OPTIONS={alias:c for c,alias in ROWS.values()}
+    atomic_json(folder/'launch.json',dict(launch,source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+        original_source_commit=launch['source_commit'],arguments=argv,fresh_initialization=False,
+        recovery_source=expected,regenerated_parent=False,reseeded=False))
+    from arrhenius_fracture.branch_snapshot_v11 import write_topology_snapshot
+    checkpoint=restore_branch_checkpoint(checkpoint_path)
+    write_topology_snapshot(folder,checkpoint.state,step=step,reason='v13_conditional_branch_birth',
+        physical_extension_m=checkpoint.physical_extension_m,branch_birth_count=1,latest_action=expected['parent_event_id'])
+    try:
+        production.main(argv)
+        terminal_record(folder,json.loads((folder/'checkpoint/latest.json').read_text())['termination_reason'],'TERMINATED')
+    except Exception as exc:
+        atomic_json(folder/'exception.json',{'type':type(exc).__name__,'reason':str(exc),'traceback':traceback.format_exc()})
+        known=any(token in str(exc) for token in ('opening_scale_not_resolved_above_probe_uncertainty',
+            'directional adaptive stepping reached its minimum fraction','family endpoint','outside qualified',
+            'Newton failed','equilibrium did not converge','nonpositive_opening'))
+        terminal_record(folder,str(exc),'EXISTING_GATE_STOP' if known else 'SOFTWARE_OR_UNCLASSIFIED_STOP')
+        if not known:raise
+
+
+def queue(*, recovery=False):
     if not PLAN.exists():
         raise RuntimeError('preregister before launching')
     root=OUT/'short_ensemble';root.mkdir(exist_ok=True)
-    with (root/'queue_claim.json').open('x') as stream:
+    with (root/('recovery_queue_claim.json' if recovery else 'queue_claim.json')).open('x') as stream:
         json.dump({'pid':os.getpid(),'maximum_workers':2},stream)
     pending=list(CASES);active={}
-    if any((root/c/'launch_claim.json').exists() for c in pending):
+    if any((case_folder(c)/'launch_claim.json').exists() for c in pending):
         raise RuntimeError('existing case launch claim; no duplicate/restart')
     while pending or active:
         while pending and len(active)<2:
             if shutil.disk_usage(root).free<1024**3:
                 raise RuntimeError('less than 1 GiB durable space; no next worker launched')
-            case=pending.pop(0);folder=root/case;folder.mkdir(exist_ok=True)
+            case=pending.pop(0);folder=case_folder(case);folder.mkdir(parents=True,exist_ok=True)
             log=(folder/'worker.log').open('a')
             env=dict(os.environ,PYTHONPATH=str(ROOT),PYTHONHASHSEED='0',OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',
                 MPLCONFIGDIR='/tmp/pf-current-source-v13-parent-mpl')
-            active[case]=(subprocess.Popen([sys.executable,str(Path(__file__).resolve()),'--case',case],env=env,stdout=log,stderr=subprocess.STDOUT),log)
+            mode='--resume-case' if recovery and folder.parent.name=='short_ensemble_recovered' else '--case'
+            active[case]=(subprocess.Popen([sys.executable,str(Path(__file__).resolve()),mode,case],env=env,stdout=log,stderr=subprocess.STDOUT),log)
         for case,(process,log) in list(active.items()):
             if process.poll() is not None:
                 log.close();del active[case]
-                terminal=root/case/'terminal.json'
+                terminal=case_folder(case)/'terminal.json'
                 if not terminal.exists() or json.loads(terminal.read_text())['status']=='SOFTWARE_OR_UNCLASSIFIED_STOP':
                     # Let an already-running peer finish; never kill its accepted work.
-                    atomic_json(root/'queue_pause.json',{'case':case,'reason':'software_or_unclassified_stop','pending':pending})
+                    atomic_json(root/('recovery_queue_pause.json' if recovery else 'queue_pause.json'),{'case':case,'reason':'software_or_unclassified_stop','pending':pending})
                     pending=[]
         atomic_json(root/'queue_status.json',{'active':{c:p.pid for c,(p,_) in active.items()},'pending':pending,
-            'completed':[c for c in CASES if (root/c/'terminal.json').exists()]})
+            'completed':[c for c in CASES if (case_folder(c)/'terminal.json').exists()]})
         if active:
             time.sleep(5)
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--case',choices=CASES);parser.add_argument('--prepare',action='store_true')
+    parser.add_argument('--resume-case',choices=CASES);parser.add_argument('--recover-output-failure',action='store_true')
     args=parser.parse_args()
-    prepare() if args.prepare else worker(args.case) if args.case else queue()
+    prepare() if args.prepare else worker(args.case) if args.case else resume_snapshot_failure(args.resume_case) if args.resume_case else queue(recovery=args.recover_output_failure)

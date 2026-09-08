@@ -1461,8 +1461,12 @@ def run_2d(args, *, parent_capture=None, inherited_primary_race=False):
                 write_branch_checkpoint(checkpoint, out / "v13_branch/accepted_pair.json")
                 write_branch_checkpoint(checkpoint, checkpoint_path)
                 write_topology_snapshot(out, state, step=step, reason="v13_conditional_branch_birth",
-                    physical_extension_m=checkpoint.physical_extension_m, branch_birth_count=1)
+                    physical_extension_m=checkpoint.physical_extension_m, branch_birth_count=1,
+                    latest_action=selected.proposal.action_id)
                 adaptation_required = True
+                if checkpoint.projected_extension_m >= float(getattr(args, "target_crack_extension_um", float("inf"))) * 1e-6:
+                    termination = "target_reached"
+                    break
                 continue
         daughter_stop_m = float(
             os.environ.get("PF_QUALIFIED_DAUGHTER_STOP_UM", "inf")

@@ -1,0 +1,18 @@
+{
+  "branch_overlay_changes_baseline_rng": false,
+  "cause": "old launcher imports production before campaign environment; new launcher imports after it",
+  "directional_clock_mode": "unit_exponential in both, seed 3621",
+  "full_state_differences": [
+    "root.engine_fields.hazard_cfg.mode",
+    "root.engine_fields.hazard_cfg.seed",
+    "root.engine_fields._hazard_rng.rng.state.state",
+    "root.engine_fields._hazard_rng.rng.state.inc"
+  ],
+  "independent_launch_full_rng_identity_equal": false,
+  "legacy_compatibility_clock_frozen_at_action_1e300_by_unchanged_production_hook": true,
+  "new_legacy_mode": "exponential",
+  "no_reseed_or_parameter_change_applied": true,
+  "one_frozen_process_step_physical_fields_exact": true,
+  "original_legacy_mode": "deterministic",
+  "scope": "single frozen source-state check; not a universal independence proof"
+}

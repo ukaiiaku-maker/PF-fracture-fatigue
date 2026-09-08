@@ -73,3 +73,15 @@ def test_first_parent_terminal_label_is_supported_without_rerun(tmp_path):
     writer = BranchOutputWriter(tmp_path)
     writer.complete(status="v13_first_baseline_cleavage_captured", final_checkpoint="parent/accepted_single.json", validation={"first_cleavage": True})
     assert json.loads((tmp_path/"run_complete.json").read_text())["status"] == "v13_first_baseline_cleavage_captured"
+
+
+def test_every_driver_topology_snapshot_call_supplies_required_arguments():
+    import inspect
+    from arrhenius_fracture.branch_snapshot_v11 import write_topology_snapshot
+    signature=inspect.signature(write_topology_snapshot)
+    tree=ast.parse(Path('arrhenius_fracture/sharp_front_v11_branching.py').read_text())
+    calls=[n for n in ast.walk(tree) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name)
+           and n.func.id=='write_topology_snapshot']
+    assert calls
+    for call in calls:
+        signature.bind(*([None]*len(call.args)),**{kw.arg:None for kw in call.keywords})
