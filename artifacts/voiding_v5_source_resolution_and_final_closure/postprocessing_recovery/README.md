@@ -31,7 +31,8 @@ changed. The original future-neutrality failures remain scientific failures.
 The recovery workflow is temporary orchestration. After the original campaign
 has executed every independent shard and reached a terminal result, its
 `assemble` operation uses the frozen physical implementation's complete
-assembler and packager with the repaired neutrality envelope. Other failed
+assembler with the explicit path-join repair below, and its unchanged packager
+with the repaired neutrality envelope. Other failed
 physical shards are not accepted by this bridge and require separate inspection.
 All original failure evidence remains in the final lossless archive.
 
@@ -46,3 +47,24 @@ campaign is repeated.
 Status at this implementation checkpoint: local report-only tests passed;
 clean Linux recovery and final complete reassembly are pending. This document
 does not certify a scientific PASS or a terminal mission result.
+
+## Separately retained central path-join failure
+
+Report-only recovery run `34231419781` passed, including independent terminal
+reconstruction and exact A/B completion. The original physical campaign
+`34205485025` then reached terminal FAILURE: 34/35 physical shards succeeded;
+only the known missing-`rg` report failed. Central job `102158191169` correctly
+rejected that original incomplete envelope.
+
+Complete-assembly recovery `34255392088`, job `102159780607`, then exposed a
+mechanical path error before any static reconstruction: `args.shards[s['id']]`
+attempted to subscript a `PosixPath`. It is retained as a failed assembly.
+The separately versioned helper now performs exactly one SHA-bound in-memory
+replacement to `(args.shards/s['id'])`. The frozen script hash is
+`7280e6e03f50915485aa87fb6700edfb99dcdd187760be48a8367cf025711601`.
+Every scientific function, classifier, validator, and tolerance is unchanged;
+the physical I worktree is not edited. The archive records the original and
+executed assembler hashes, helper hash, explicit replacement, recovery SHA,
+and failed run identity. No physical worker is called. Three focused tests
+cover the exact bounded source change, changed-source rejection, and all 35
+shard path resolutions through the actual orchestration main function.

@@ -68,7 +68,7 @@ jobs:
           name: v5-source-final-shard-causal-neutrality-63d53cdbad9125ef0d5180551974ac0e3a3ef721
           path: /tmp/original-causal-neutrality
       - name: Test unchanged predicates and prohibit physical worker invocation
-        run: python -m pytest -q "$RECOVERY_TOOLS/test_retained_neutrality_postprocess.py"
+        run: python -m pytest -q "$RECOVERY_TOOLS/test_retained_neutrality_postprocess.py" "$RECOVERY_TOOLS/test_retained_assembly_path_repair.py"
       - name: Complete A and B reports from retained source-bound captures only
         run: |
           set -euo pipefail
@@ -109,7 +109,7 @@ jobs:
           set -euo pipefail
           mv /tmp/source-final-shards/causal-neutrality /tmp/original-failed-causal-neutrality-for-assembly
           mv /tmp/repaired-causal-neutrality/causal-neutrality /tmp/source-final-shards/causal-neutrality
-          python "$V5_PHYSICAL_WORKTREE/scripts/assemble_v5_source_resolution_campaign_v1.py" /tmp/source-final-shards /tmp/source-final-complete
+          python "$RECOVERY_TOOLS/v5_retained_assembly_path_repair.py" --implementation "$V5_PHYSICAL_WORKTREE" --recovery-sha "$GITHUB_SHA" /tmp/source-final-shards /tmp/source-final-complete
           diff -ru /tmp/source-final-complete/a /tmp/source-final-complete/b
           python "$V5_PHYSICAL_WORKTREE/scripts/package_v5_final_campaign_v1.py" pack /tmp/source-final-complete /tmp/source-final-publication --implementation-sha "$PHYSICAL_SHA"
       - uses: actions/upload-artifact@v4
