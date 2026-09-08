@@ -70,6 +70,8 @@ def pack(source,output,implementation_sha,*,part_bytes=80*1024*1024,code_tree=No
         raise ValueError('original complete campaign inventory mismatch')
     paired=json.loads((source/'paired_comparison.json').read_text())
     if paired['executed_code_sha']!=implementation_sha:raise ValueError('campaign implementation mismatch')
+    runtime_path=source/'a/source/execution.json'
+    runtime=json.loads(runtime_path.read_text()) if runtime_path.exists() else None
     output.mkdir(parents=True)
     with Parts(output,part_bytes) as sink:
         with gzip.GzipFile(fileobj=sink,mode='wb',mtime=0,filename='') as compressed:
@@ -82,6 +84,8 @@ def pack(source,output,implementation_sha,*,part_bytes=80*1024*1024,code_tree=No
         parts=[{'path':p.name,'bytes':p.stat().st_size,'sha256':digest(p)} for p in sink.paths]
     report={'schema':SCHEMA,'record_kind':'LOSSLESS_PACKAGING_NOT_NEW_PHYSICAL_EXECUTION',
         'implementation_sha':implementation_sha,'executable_tree_sha256':code_tree or executable_tree(implementation_sha),
+        'numerical_runtime':None if runtime is None else {key:runtime[key] for key in
+            ('python_version','numerical_package_versions','numerical_environment')},
         'part_limit_bytes':part_bytes,'parts':parts,'original_complete_inventory':files,
         'original_paired_comparison':paired}
     (output/'publication.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')

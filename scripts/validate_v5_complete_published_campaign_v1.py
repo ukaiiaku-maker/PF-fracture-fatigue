@@ -2,6 +2,8 @@
 """Reconstruct the published complete evidence in its exact implementation worker."""
 import argparse
 import json
+from importlib.metadata import version,PackageNotFoundError
+import platform
 from pathlib import Path
 import subprocess
 import sys
@@ -18,6 +20,12 @@ def validate(root,publication_manifest,publication_sha):
     report=json.loads(publication_manifest.read_text());sha=git('rev-parse','HEAD')
     if sha!=report['implementation_sha'] or git('status','--porcelain'):
         raise ValueError('complete reconstruction requires the clean exact implementation worker')
+    runtime=report['numerical_runtime'];packages={}
+    for name in runtime['numerical_package_versions']:
+        try:packages[name]=version(name)
+        except PackageNotFoundError:packages[name]=None
+    if platform.python_version()!=runtime['python_version'] or packages!=runtime['numerical_package_versions']:
+        raise ValueError('publication reconstruction numerical runtime differs from its producer')
     binding=verify_publication_binding(report,publication_sha);verify_inventory(root);results={}
     for side in ('a','b'):
         directory=root/side;verify_inventory(directory)
@@ -40,6 +48,7 @@ def validate(root,publication_manifest,publication_sha):
     return {'schema':'v5.exact-publication-head-complete-evidence-audit/1',**binding,
         'exact_recursive_evidence_comparison':True,'reconstruction_results':results,
         'clean_implementation_worker_at_end':True,'evidence_valid':True,
+        'recorded_numerical_runtime_exact':True,
         'scientific_decision':json.loads((root/'a/scientific_ledger.json').read_text())['scientific_decision'],
         'record_kind':'EXACT_PUBLICATION_HEAD_AUDIT_OF_SEPARATELY_IDENTIFIED_IMPLEMENTATION_EXECUTION'}
 

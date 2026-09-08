@@ -1,5 +1,16 @@
 # Source-resolution development findings (nonterminal)
 
+The full a34cdf0 static development phase completed all 96 unique physical
+solves, with no solver execution failures. Independent raw-source reconstruction
+validates all 96 captures and reproduces the classification: 434/537 family
+predicates pass, 0/33 complete families qualify, and 8/12 derivative checks pass.
+Failures comprise 30 fixed-tip fine-accuracy gates, 13 each reaction/compliance/
+energy stable-limit gates, 12 recovered fixed-arc accuracy gates, 11 two-fine-
+quality gates, six recovered fixed-arc stable-limit gates and five raw full-
+boundary traction gates. All four perturbation-size convergence checks fail;
+the eight individual energy/compliance derivative checks pass. No frozen limit
+or the earlier 683/791 classification is changed.
+
 Clean `38a7686` source causality executed all six real interventions. All source
 separation and zero-drive guards pass, but doubling the owned child radius in
 both process state and branch local state leaves continuation rates unchanged.

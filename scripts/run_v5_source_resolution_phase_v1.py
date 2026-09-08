@@ -52,7 +52,7 @@ def run_phase(phase,output,section='all',shard_index=0,shard_count=1,base_worktr
     else:raise ValueError('unknown phase')
     clean=not git('status','--porcelain') and git('rev-parse','HEAD')==sha
     packages={}
-    for name in ('numpy','scipy','triangle','gmsh','numba'):
+    for name in ('numpy','scipy','triangle','gmsh','numba','llvmlite'):
         try:packages[name]=version(name)
         except PackageNotFoundError:packages[name]=None
     report={'schema':'v5.source-resolution-final-phase-execution/1','phase':phase,'section':section,
