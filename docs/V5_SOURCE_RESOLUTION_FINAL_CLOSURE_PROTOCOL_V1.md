@@ -113,6 +113,12 @@ CI bundle may be stored as deterministic gzip/tar parts no larger than 80 MiB.
 No JSON, checkpoint, original inventory or failed scientific result is edited
 inside that archive. Safe extraction rejects traversal, symlinks, duplicate or
 unregistered members, and rechecks every original file hash.
+After complete ontology and A/B comparison, a separate CI packaging job creates
+these parts from the uploaded complete bundle. Its output is storage, not another
+physical execution. Both the original complete bundle and the lossless parts are
+uploaded, allowing local publication without a second full extracted copy on
+limited local disks. The later exact-head audit still performs full extraction
+and reconstruction; downloading an archive is not an evidence-validity PASS.
 
 The implementation commit generates the evidence. A later normal descendant
 commit stores it. The exact-publication-head audit requires identical complete

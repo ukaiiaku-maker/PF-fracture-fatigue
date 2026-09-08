@@ -116,6 +116,40 @@ jobs:
           name: v5-source-final-complete-${{ github.sha }}
           path: /tmp/source-final-complete
 
+  publication-package:
+    needs: complete-ontology
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: v5-source-final-complete-${{ github.sha }}
+          path: /tmp/source-final-complete
+      - name: Lossless bounded publication archive, not another physical execution
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python scripts/package_v5_final_campaign_v1.py pack /tmp/source-final-complete /tmp/source-final-publication --implementation-sha "$GITHUB_SHA"
+      - name: Clean implementation worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-source-final-publication-${{ github.sha }}
+          path: /tmp/source-final-publication
+
   regressions:
     needs: prepare
     runs-on: ubuntu-latest
