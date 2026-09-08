@@ -8,7 +8,7 @@ on:
     inputs:
       operation:
         type: choice
-        options: [focused, rollback, restarts, transitions, reconstruct-development, final, audit]
+        options: [focused, rollback, restarts, transitions, reconstruct-development, runtime-diagnostic, final, audit]
         default: focused
         required: true
 
@@ -69,3 +69,9 @@ jobs:
       contents: read
       actions: read
     uses: ./.github/workflows/voiding-v5-development-reconstruction.yml
+  runtime-diagnostic:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'runtime-diagnostic'
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/voiding-v5-runtime-diagnostic.yml
