@@ -163,7 +163,8 @@ def advance_transition(state, name, partitions, *, operations=None, config=CFG):
                     'audit':audit,'accepted':False})
                 return state,operations
             if not _qualified_cavity_source(state,tensor):
-                state,audit = refine_downstream_source(state,max_refinement_levels=1,
+                state,audit = refine_downstream_source(state,max_refinement_levels=(2 if
+                    state.junction_process_state.get('common_terminal_restart_protocol_v1') else 1),
                     refinement_region='complete_cavity_ring',quality_improvement='constrained_v1')
                 operations.append({'api':'refine_downstream_source','audit':audit,'duration_s':0.})
                 node = int(np.argmin(np.linalg.norm(state.mesh.nodes-np.asarray(cavity.connection_exit_m),axis=1)))
@@ -290,7 +291,7 @@ def conservation(state, initial):
                 and len(voids.cavities)<=1 and ownership and connected_dormant}
 
 
-def prepare_common_restart_reload(state,operations,state_trace=None):
+def prepare_common_restart_reload(state,operations,state_trace=None,accepted=None):
     """One accepted load protocol shared by all eleven checkpoint positions."""
     from .voiding_lifecycle_driver_v5 import NATURAL_WINDOW_S
     key='common_terminal_restart_protocol_v1'
@@ -300,6 +301,7 @@ def prepare_common_restart_reload(state,operations,state_trace=None):
     if position is None:
         state=load_state(state,-4e-7)
         state=replace(state,junction_process_state={**state.junction_process_state,key:'COMPRESSIVE_LOAD_ACCEPTED'})
+        if accepted is not None:accepted[0]=state
         operations.append({'api':'common_restart_compressive_load','opening_m':-4e-7})
         if state_trace is not None:state_trace.append(('zero_drive_connected',state))
         position='COMPRESSIVE_LOAD_ACCEPTED'
@@ -311,11 +313,13 @@ def prepare_common_restart_reload(state,operations,state_trace=None):
             raise RuntimeError('COMMON_RESTART_DORMANT_LOAD_HAS_POSITIVE_SOURCE_DRIVE')
         state,audit=_complete_next_clock(state,tensor,source_kind='cavity_surface',maximum_advance_duration_s=NATURAL_WINDOW_S)
         state=replace(state,junction_process_state={**state.junction_process_state,key:'ZERO_INTERVAL_ACCEPTED'})
+        if accepted is not None:accepted[0]=state
         operations.append({'api':'common_restart_dormant_interval','duration_s':NATURAL_WINDOW_S,'audit':audit})
         position='ZERO_INTERVAL_ACCEPTED'
     if position=='ZERO_INTERVAL_ACCEPTED':
         state=load_state(state,8e-7)
         state=replace(state,junction_process_state={**state.junction_process_state,key:'TENSILE_RELOAD_ACCEPTED'})
+        if accepted is not None:accepted[0]=state
         operations.append({'api':'common_restart_tensile_reload','opening_m':8e-7})
         position='TENSILE_RELOAD_ACCEPTED'
     if position!='TENSILE_RELOAD_ACCEPTED':raise ValueError('unrecognized common restart protocol position')
@@ -324,22 +328,39 @@ def prepare_common_restart_reload(state,operations,state_trace=None):
 
 def resume_to_guard(state, operations, *, common_restart_protocol=False):
     """Resume the actual accepted lifecycle to its attainable terminal state."""
+    accepted=[state]
+    try:
+        return _resume_to_guard(state,operations,common_restart_protocol,accepted)
+    except Exception as error:
+        error.accepted_lifecycle_state=accepted[0]
+        raise
+
+
+def _resume_to_guard(state,operations,common_restart_protocol,accepted):
+    def keep(value):
+        accepted[0]=value
+        return value
     while state.void_state.sites[0].phase == VoidPhase.AVAILABLE_SITE:
         name = "birth_hit_1" if state.void_state.sites[0].hits == 0 else "birth_hit_2"
         previous = fingerprint(state)
         state,_ = advance_transition(state,name,1,operations=operations)
+        keep(state)
         if fingerprint(state)==previous: raise RuntimeError("birth resume made no progress")
     if state.void_state.sites[0].phase == VoidPhase.EMBRYO:
         state,_ = advance_transition(state,"stabilization",1,operations=operations)
+        keep(state)
     if state.void_state.sites[0].phase == VoidPhase.HEALED_SITE: return state
     if not state.void_state.cavities:
         state = equilibrate(replace(state,void_state=create_subgrid_cavity(state.void_state,"site-1",2.5e-5)))
+        keep(state)
         operations.append({"api":"create_subgrid_cavity","radius_m":2.5e-5})
     cavity = state.void_state.cavities[0]
     if cavity.radius_m < 5e-5:
         state,_ = advance_transition(state,"subgrid_growth",1,operations=operations)
+        keep(state)
     if state.void_state.cavities[0].phase == VoidPhase.STABLE_SUBGRID_VOID:
         state,_ = advance_transition(state,"promotion",1,operations=operations)
+        keep(state)
     cavity = state.void_state.cavities[0]
     if cavity.phase == VoidPhase.RESOLVED_VOID and cavity.radius_m < 5.5e-5:
         n,layers = state.junction_process_state.get('production_mesh_resolution',(32,12))
@@ -354,14 +375,18 @@ def resume_to_guard(state, operations, *, common_restart_protocol=False):
         voids = update_cavity_growth(state.void_state,cavity.cavity_id,rates=rates,dt_s=dt,
                                      radial_growth_scale_m=CFG.radial_growth_scale_m)
         trace=[]; state=remesh_cavity(state,hole,voids,"resolved-growth",trace)
+        keep(state)
         operations.append({"api":"resolved_growth_remesh","duration_s":float(dt),'duration_exact_s':packed(dt),"rates":rates,"operations":trace})
     if state.void_state.cavities[0].phase == VoidPhase.RESOLVED_VOID:
         state,_ = advance_transition(state,"ligament",1,operations=operations)
+        keep(state)
     if state.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID:
-        if common_restart_protocol:state=prepare_common_restart_reload(state,operations)
+        if common_restart_protocol:state=prepare_common_restart_reload(state,operations,accepted=accepted)
         state,_ = advance_transition(state,"downstream_child",1,operations=operations)
+        keep(state)
     if state.void_state.cavities[0].phase == VoidPhase.DOWNSTREAM_FRONT_ACTIVE:
         state,_ = advance_transition(state,"child_continuation",1,operations=operations)
+        keep(state)
     return state
 
 

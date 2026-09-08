@@ -46,6 +46,17 @@ class ProgressTrace(list):
         super().append(item)
 
 
+def resume_attempt(state,operations,*,common_restart_protocol,legacy_reload=False):
+    """Capture one independently executed continuation, including accepted progress."""
+    try:
+        if legacy_reload:
+            state=load_state(state,8e-7)
+            operations.append({'api':'accepted_tensile_reload','opening_m':8e-7})
+        return resume_to_guard(state,operations,common_restart_protocol=common_restart_protocol),None
+    except Exception as exc:
+        return getattr(exc,'accepted_lifecycle_state',state),{'type':type(exc).__name__,'message':str(exc)}
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument("output",type=Path)
     parser.add_argument('--qualified-fine-history',action='store_true',
@@ -96,6 +107,9 @@ def main():
              'stagewise_topology':stagewise_topology(after),**canonical_data(extra)}
         rows.append(row); write_json(out/"rows"/(str(len(rows))+".json"),row)
         return row
+    write_json(out/'preparation.json',{'executed_code_sha':sha,'failure':preparation_failure,
+        'accepted_stage_checkpoints':{name:checkpoint(state) for name,state in trace},
+        'actual_trajectory_history':trajectory_history})
     for index,((previous_name,before),(name,after)) in enumerate(zip(trace,trace[1:])):
         if args.section not in ('all','transitions') or args.shard_index!=0:continue
         record('stagewise',name,before,after,{'stage_index':index,'previous_stage':previous_name,
@@ -145,14 +159,11 @@ def main():
             voids,_=advance_site(before.void_state,site.site_id,dt,rates=rates); before=replace(before,void_state=voids)
         if stage=="zero_drive_connected" and not args.qualified_fine_history: before=load_state(before,0.)
         restored=restore_checkpoint(out/checkpoint(before)); operations=[]; resumed_ops=[]; after=before; resumed=restored; error=None
-        try:
-            if stage=='zero_drive_connected' and not args.qualified_fine_history:
-                after=load_state(before,8e-7);resumed=load_state(restored,8e-7)
-                operations.append({'api':'accepted_tensile_reload','opening_m':8e-7})
-                resumed_ops.append({'api':'accepted_tensile_reload','opening_m':8e-7})
-            after=resume_to_guard(after,operations,common_restart_protocol=args.qualified_fine_history)
-            resumed=resume_to_guard(resumed,resumed_ops,common_restart_protocol=args.qualified_fine_history)
-        except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
+        after,direct_failure=resume_attempt(after,operations,common_restart_protocol=args.qualified_fine_history,
+            legacy_reload=stage=='zero_drive_connected' and not args.qualified_fine_history)
+        resumed,replay_failure=resume_attempt(resumed,resumed_ops,common_restart_protocol=args.qualified_fine_history,
+            legacy_reload=stage=='zero_drive_connected' and not args.qualified_fine_history)
+        error=direct_failure or replay_failure
         replay_path=checkpoint(resumed)
         record("restarts",stage,before,after,{"expected_terminal":"DOWNSTREAM_FRONT_CONTINUED",
             "requested_stage_available":stage_available,
@@ -162,7 +173,7 @@ def main():
             restarted_operations=resumed_ops,subsequent_history_exact=canonical_data(operations)==canonical_data(resumed_ops),
             continued_front_terminal_reached=stage_available and any(op.get('api')=='child_tip_continuation'
                 and op.get('accepted',False) for op in operations),
-            failure=error)
+            failure=error,direct_failure=direct_failure,replay_failure=replay_failure)
     # All controlled rows use actual FEM loading and state updates. Limiter
     # cases never substitute detached rate calculations for a growth history.
     specs={"centered":((7e-4,0.),4e-7),"positive_offset":((7e-4,1e-5),4e-7),
@@ -218,6 +229,7 @@ def main():
                 else: after=resume_to_guard(after,ops)
         except Exception as exc:
             error={"type":type(exc).__name__,"message":str(exc)}
+            after=getattr(exc,'accepted_lifecycle_state',after)
             if after is available and local_trace:
                 # A failed preparation still owns its actual accepted history.
                 # Never substitute the unrelated centered campaign precursor.

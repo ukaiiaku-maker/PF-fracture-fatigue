@@ -1998,7 +1998,7 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
         state=prepare_common_restart_reload(state,load_operations,state_trace)
         rows.append({**observables(state,'common_restart_reload'), 'executed_load_operations':load_operations})
     if qualify_source:
-        state, source_audit = refine_downstream_source(state, max_refinement_levels=1,
+        state, source_audit = refine_downstream_source(state, max_refinement_levels=2 if common_restart_protocol else 1,
             refinement_region='complete_cavity_ring', quality_improvement='constrained_v1')
         rows.append({**observables(state, 'source_resolution_attempt'), 'source_resolution_audit':source_audit})
         capture('source_resolution_attempt')
