@@ -59,6 +59,10 @@ jobs:
           requirements=[name+'=='+value for name,value in packages.items() if value is not None]
           subprocess.run([sys.executable,'-m','pip','install','--force-reinstall',*requirements],check=True)
           PY
+      - name: Configure the prospectively frozen numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify actual selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
       - name: Reconstruct static, source, causality, all lifecycle ontology and exact A-B evidence
         run: |
           python /tmp/v5-published-implementation/scripts/validate_v5_complete_published_campaign_v1.py /tmp/v5-published-complete "$GITHUB_WORKSPACE/artifacts/voiding_v5_source_resolution_and_final_closure/final_campaign_publication/publication.json" "$GITHUB_SHA" /tmp/v5-publication-audit/evidence.json
@@ -90,6 +94,10 @@ jobs:
           python-version: '3.12.14'
           cache: pip
       - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Configure the prospectively frozen numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify actual selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
       - name: Full focused set at the exact publication head
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"

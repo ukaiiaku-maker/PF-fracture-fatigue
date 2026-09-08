@@ -12,11 +12,13 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 
 
-def run_phase(phase,output,section='all',shard_index=0,shard_count=1,base_worktree=None):
+def run_phase(phase,output,section='all',shard_index=0,shard_count=1,base_worktree=None,require_pinned_runtime=False):
     if output.exists():raise ValueError('refusing to overwrite phase execution')
     def git(*args):return subprocess.check_output(('git',*args),cwd=ROOT,text=True).strip()
     sha=git('rev-parse','HEAD')
     if git('status','--porcelain'):raise ValueError('phase requires a clean exact-head worker')
+    from v5_numerical_runtime_v1 import ENVIRONMENT_KEYS,runtime_record,require_pinned
+    kernels=require_pinned(runtime_record()) if require_pinned_runtime else None
     output.mkdir(parents=True);steps=[]
     def run(label,script,*args):
         command=[sys.executable,str(ROOT/'scripts'/script),*map(str,args)]
@@ -59,8 +61,8 @@ def run_phase(phase,output,section='all',shard_index=0,shard_count=1,base_worktr
         'shard_index':shard_index,'shard_count':shard_count,'executed_code_sha':sha,
         'python_version':platform.python_version(),'operations':steps,'clean_exact_head_at_end':clean,
         'numerical_package_versions':packages,
-        'numerical_environment':{name:os.environ.get(name) for name in
-            ('PYTHONHASHSEED','OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS')},
+        'numerical_environment':{name:os.environ.get(name) for name in ENVIRONMENT_KEYS},
+        'selected_numerical_kernels':kernels,
         'execution_completed':clean and bool(steps) and all(step['returncode']==0 for step in steps),
         'scientific_pass':'SEPARATELY_RECOMPUTED_NOT_INFERRED_FROM_PROCESS_EXIT'}
     (output/'execution.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
@@ -74,6 +76,7 @@ if __name__=='__main__':
     parser.add_argument('phase',choices=('static','lifecycle','source','recovery','causal-neutrality'))
     parser.add_argument('output',type=Path);parser.add_argument('--section',default='all')
     parser.add_argument('--shard-index',type=int,default=0);parser.add_argument('--shard-count',type=int,default=1)
-    parser.add_argument('--base-worktree',type=Path);args=parser.parse_args()
-    result=run_phase(args.phase,args.output,args.section,args.shard_index,args.shard_count,args.base_worktree)
+    parser.add_argument('--base-worktree',type=Path)
+    parser.add_argument('--require-pinned-runtime',action='store_true');args=parser.parse_args()
+    result=run_phase(args.phase,args.output,args.section,args.shard_index,args.shard_count,args.base_worktree,args.require_pinned_runtime)
     print(json.dumps(result),flush=True);sys.exit(0 if result['execution_completed'] else 1)

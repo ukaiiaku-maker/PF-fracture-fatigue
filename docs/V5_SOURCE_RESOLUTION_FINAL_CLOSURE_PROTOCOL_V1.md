@@ -141,3 +141,31 @@ repository-wide CI retains its own failure classification.
 The registered workflow entry uses operation `final` for the one complete
 campaign and operation `audit` for this later publication audit. Neither is a
 release qualification when a mandatory scientific gate remains failed.
+
+## Prospective numerical-runtime contract
+
+Same-SHA development restart shards demonstrated different complete terminals
+despite identical declared NumPy/SciPy versions and thread counts. These retained
+results remain exact-equality failures. They cannot establish which CPU dispatch
+caused a difference without a controlled intervention.
+
+Before final generation, the separately executed read-only runtime diagnostic
+compares native, Haswell-only, NumPy-baseline-only and combined selections on
+the same retained state, with an independent combined-policy repeat. This is
+not another physical campaign or retrospective source qualification.
+
+The final x86 clean workers prospectively use Python 3.12.14, NumPy 2.5.3,
+SciPy 1.18.1, one BLAS/OpenMP thread, OpenBLAS `HASWELL`, and no optional NumPy
+CPU-dispatch targets. The bootstrap obtains the installed wheel's dispatch list,
+excludes mandatory baseline features, and configures subsequent processes.
+Actual loaded BLAS architecture/thread count and NumPy dispatch are checked,
+recorded, and required to match every producer, assembler and publication
+reconstructor. An unsupported or ignored policy fails closed. The policy does
+not modify a physical equation, scientific tolerance, or fingerprint field.
+
+Upstream mechanisms: [NumPy runtime dispatch](https://numpy.org/doc/stable/reference/simd/build-options.html),
+[OpenBLAS runtime variables](https://www.openmathlib.org/OpenBLAS/docs/runtime_variables/),
+and [threadpoolctl runtime introspection](https://github.com/joblib/threadpoolctl).
+Portable numerical-kernel selection is not a claim of universal cross-platform
+bitwise reproducibility; the resulting full A/B and source reconstructions must
+still execute and pass independently.

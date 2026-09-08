@@ -51,6 +51,10 @@ jobs:
           python-version: '3.12.14'
           cache: pip
       - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Configure prospective fixed numerical kernels for subsequent processes
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify actual selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
       - name: Exact implementation and clean historical base
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
@@ -58,9 +62,9 @@ jobs:
       - name: Independent physical A and B executions; science failures retained
         run: |
           set +e
-          python scripts/run_v5_source_resolution_phase_v1.py '${{ matrix.phase }}' '/tmp/v5-source-final/${{ matrix.id }}/a' --section '${{ matrix.section }}' --shard-index '${{ matrix.index }}' --shard-count '${{ matrix.count }}' --base-worktree /tmp/source-final-stage2-base
+          python scripts/run_v5_source_resolution_phase_v1.py '${{ matrix.phase }}' '/tmp/v5-source-final/${{ matrix.id }}/a' --section '${{ matrix.section }}' --shard-index '${{ matrix.index }}' --shard-count '${{ matrix.count }}' --base-worktree /tmp/source-final-stage2-base --require-pinned-runtime
           result_a=$?
-          python scripts/run_v5_source_resolution_phase_v1.py '${{ matrix.phase }}' '/tmp/v5-source-final/${{ matrix.id }}/b' --section '${{ matrix.section }}' --shard-index '${{ matrix.index }}' --shard-count '${{ matrix.count }}' --base-worktree /tmp/source-final-stage2-base
+          python scripts/run_v5_source_resolution_phase_v1.py '${{ matrix.phase }}' '/tmp/v5-source-final/${{ matrix.id }}/b' --section '${{ matrix.section }}' --shard-index '${{ matrix.index }}' --shard-count '${{ matrix.count }}' --base-worktree /tmp/source-final-stage2-base --require-pinned-runtime
           result_b=$?
           test "$result_a" -eq 0 && test "$result_b" -eq 0
       - name: Exact recursive evidence comparison
@@ -95,6 +99,10 @@ jobs:
           python-version: '3.12.14'
           cache: pip
       - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Configure prospective fixed numerical kernels for subsequent processes
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify actual selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
       - uses: actions/download-artifact@v4
         with:
           pattern: v5-source-final-shard-*-${{ github.sha }}
@@ -167,6 +175,10 @@ jobs:
           python-version: '3.12.14'
           cache: pip
       - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Configure prospective fixed numerical kernels for subsequent processes
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify actual selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
       - name: Full regression execution including the full focused set
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"

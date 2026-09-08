@@ -41,6 +41,21 @@ def require_registry(section,rows):
     return selected
 
 
+def reconstruct_all_rows(rows,sources,sha,validator=validate_lifecycle_rows):
+    """Audit every independent row; retained errors still fail the CI gate."""
+    outcomes=[]
+    for row in rows:
+        failure=None
+        try:validator([row],sources,executed_code_sha=sha)
+        except Exception as error:failure={'type':type(error).__name__,'message':str(error)}
+        outcomes.append({'execution_id':row['execution_id'],'dataset':row['dataset'],
+            'case_identity':row['case_identity'],'partition_count':row['partition_count'],
+            'valid':failure is None,'failure':failure})
+        print(('Reconstructed ' if failure is None else 'Reconstruction FAILED ')+row['dataset']+':'+
+            row['case_identity']+':'+str(row['partition_count']),flush=True)
+    return outcomes
+
+
 def validate(section,inputs):
     if len({p.resolve() for p in inputs})!=len(inputs):raise ValueError('aliased shard directories')
     rows=[];reports=[];heads=set();owned={};hashes={};provenance=[]
@@ -70,10 +85,11 @@ def validate(section,inputs):
             if key not in owned:raise ValueError('checkpoint not in verified owned inventory')
             return restore_checkpoint(owned[key])
     sources=Sources()
-    for row in rows:
-        validate_lifecycle_rows([row],sources,executed_code_sha=sha)
-        print('Reconstructed '+row['dataset']+':'+row['case_identity']+':'+str(row['partition_count']),flush=True)
-    for report in reports:same(lifecycle_decision(report['rows'],sources),report['decision'],'development decision mismatch')
+    row_audits=reconstruct_all_rows(rows,sources,sha);decision_errors=[]
+    for report in reports:
+        try:same(lifecycle_decision(report['rows'],sources),report['decision'],'development decision mismatch')
+        except Exception as error:decision_errors.append({'shard_index':report['shard_index'],
+            'type':type(error).__name__,'message':str(error)})
     decision=lifecycle_decision(rows,sources)
     if section=='restarts':
         passed=decision['required_continued_front_restart_terminal'] and decision['all_restart_stages_reach_identical_complete_terminal']
@@ -85,12 +101,15 @@ def validate(section,inputs):
         gates=decision['transition_partitions' if section=='transitions' else 'rollback_attempts']
         successes=sum(r['passed'] for r in gates);passed=all(r['passed'] for r in gates)
     passed &= decision['stagewise_topology_and_conservation']
+    valid=all(row['valid'] for row in row_audits) and not decision_errors
     return {'schema':'v5.development-lifecycle-source-reconstruction/1',
         'record_kind':'READ_ONLY_RECONSTRUCTION_NOT_NEW_PHYSICAL_EXECUTION','section':section,
         'source_sha':sha,'verification_code_sha':subprocess.check_output(('git','rev-parse','HEAD'),cwd=ROOT,text=True).strip(),
-        'python_version':platform.python_version(),'valid':True,'complete_section_registry':True,
+        'python_version':platform.python_version(),'valid':valid,'complete_section_registry':True,
         'complete_final_campaign':False,'actual_section_cases':len(selected),'actual_source_rows':len(rows),
-        'passed_cases':successes,'science_passed':bool(passed),'decision':decision,
+        'producer_predicate_passed_cases':successes,'science_passed':bool(valid and passed),'decision':decision,
+        'row_reconstruction_results':row_audits,'decision_reconstruction_errors':decision_errors,
+        'source_reconstruction_passed_rows':sum(row['valid'] for row in row_audits),
         'checkpoint_assembly_conflicts':False,'source_provenance':sorted(provenance,key=lambda r:r['shard_index'])}
 
 
@@ -100,3 +119,4 @@ if __name__=='__main__':
     result=validate(args.section,args.shards);args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')
     print(json.dumps({k:v for k,v in result.items() if k not in ('decision','source_provenance')}),flush=True)
+    if not result['valid']:raise SystemExit(1)

@@ -7,7 +7,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from v5_source_resolution_campaign_matrix_v1 import matrix,require_development_complete
 from validate_v5_source_resolution_evidence_v1 import verify_inventory
 from qualify_v5_source_resolution_focused_results_v1 import summarize
-from validate_v5_development_lifecycle_shards_v1 import expected_registry,require_registry
+from validate_v5_development_lifecycle_shards_v1 import expected_registry,require_registry,reconstruct_all_rows
 
 
 @pytest.mark.parametrize('section,count',[('transitions',45),('restarts',11),('rollback',39)])
@@ -29,6 +29,18 @@ def test_final_matrix_is_disjoint_and_complete():
         observed=[r for r in rows if r['phase']=='lifecycle' and r['section']==section]
         assert sorted(r['index'] for r in observed)==list(range(count))
         assert all(r['count']==count for r in observed)
+
+
+def test_development_reconstruction_continues_independent_rows_without_hiding_failure():
+    rows=[{'execution_id':str(n),'dataset':'restarts','case_identity':str(n),'partition_count':None} for n in range(3)]
+    visited=[]
+    def validator(selected,sources,*,executed_code_sha):
+        visited.append(selected[0]['execution_id'])
+        if selected[0]['execution_id']=='0':raise ValueError('strict topology mismatch')
+    audited=reconstruct_all_rows(rows,{},'a'*40,validator)
+    assert visited==['0','1','2']
+    assert [r['valid'] for r in audited]==[False,True,True]
+    assert audited[0]['failure']=={'type':'ValueError','message':'strict topology mismatch'}
 
 
 def test_readiness_allows_honest_scientific_failure_but_not_unexecuted_phases(tmp_path):

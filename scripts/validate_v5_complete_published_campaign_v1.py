@@ -26,6 +26,10 @@ def validate(root,publication_manifest,publication_sha):
         except PackageNotFoundError:packages[name]=None
     if platform.python_version()!=runtime['python_version'] or packages!=runtime['numerical_package_versions']:
         raise ValueError('publication reconstruction numerical runtime differs from its producer')
+    from v5_numerical_runtime_v1 import require_pinned,runtime_record
+    kernels=require_pinned(runtime_record())
+    same(kernels,runtime['selected_numerical_kernels'],'publication reconstruction selected kernels differ from producer')
+    same(kernels['environment'],runtime['numerical_environment'],'publication reconstruction numerical environment differs')
     binding=verify_publication_binding(report,publication_sha);verify_inventory(root);results={}
     for side in ('a','b'):
         directory=root/side;verify_inventory(directory)

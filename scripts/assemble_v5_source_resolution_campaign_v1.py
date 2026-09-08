@@ -56,11 +56,15 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('shards',type=Path);parser.add_argument('output',type=Path)
     args=parser.parse_args()
     if args.output.exists():raise ValueError('refusing to overwrite campaign')
+    from v5_numerical_runtime_v1 import require_pinned,runtime_record
+    from validate_v5_source_resolution_evidence_v1 import same
+    kernels=require_pinned(runtime_record())
     specs=matrix();shas=set()
     for spec in specs:
         for side in ('a','b'):
             path=args.shards/spec['id']/side;verify_inventory(path);execution=read(path,'execution.json')
             if not execution['execution_completed']:raise ValueError('phase execution incomplete '+spec['id']+'/'+side)
+            same(execution['selected_numerical_kernels'],kernels,'phase/assembler selected numerical kernel mismatch')
             for key in ('phase','section'):
                 if execution[key]!=spec[key]:raise ValueError('wrong phase identity')
             if execution['shard_index']!=spec['index'] or execution['shard_count']!=spec['count']:raise ValueError('wrong shard identity')

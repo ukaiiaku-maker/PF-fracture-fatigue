@@ -28,6 +28,17 @@ def test_complete_archive_is_deterministic_bounded_and_lossless(tmp_path):
     assert inventory(original)==inventory(tmp_path/'restored')
 
 
+def test_archive_retains_selected_numerical_kernel_contract_exactly(tmp_path):
+    original=source(tmp_path);path=original/'a/source/execution.json';path.parent.mkdir()
+    runtime={'python_version':'3.12.14','numerical_package_versions':{'numpy':'2.5.3'},
+        'numerical_environment':{'OPENBLAS_CORETYPE':'HASWELL'},
+        'selected_numerical_kernels':{'schema':'retained-test-runtime','enabled_dispatch':[]}}
+    path.write_text(json.dumps(runtime))
+    (original/'sha256_manifest.json').write_text(json.dumps({k:v for k,v in inventory(original).items() if k!='sha256_manifest.json'}))
+    report=pack(original,tmp_path/'a','a'*40,code_tree='b'*64)
+    assert report['numerical_runtime']==runtime
+
+
 def test_archive_rejects_changed_payload_before_extraction(tmp_path):
     original=source(tmp_path);report=pack(original,tmp_path/'a','a'*40,part_bytes=91,code_tree='b'*64)
     (tmp_path/'a'/report['parts'][0]['path']).write_bytes(b'changed')

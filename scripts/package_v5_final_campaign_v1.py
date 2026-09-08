@@ -85,7 +85,7 @@ def pack(source,output,implementation_sha,*,part_bytes=80*1024*1024,code_tree=No
     report={'schema':SCHEMA,'record_kind':'LOSSLESS_PACKAGING_NOT_NEW_PHYSICAL_EXECUTION',
         'implementation_sha':implementation_sha,'executable_tree_sha256':code_tree or executable_tree(implementation_sha),
         'numerical_runtime':None if runtime is None else {key:runtime[key] for key in
-            ('python_version','numerical_package_versions','numerical_environment')},
+            ('python_version','numerical_package_versions','numerical_environment','selected_numerical_kernels')},
         'part_limit_bytes':part_bytes,'parts':parts,'original_complete_inventory':files,
         'original_paired_comparison':paired}
     (output/'publication.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')
