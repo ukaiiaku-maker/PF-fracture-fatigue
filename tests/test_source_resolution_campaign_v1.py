@@ -8,6 +8,39 @@ from v5_source_resolution_campaign_matrix_v1 import matrix,require_development_c
 from validate_v5_source_resolution_evidence_v1 import verify_inventory
 from qualify_v5_source_resolution_focused_results_v1 import summarize
 from validate_v5_development_lifecycle_shards_v1 import expected_registry,require_registry,reconstruct_all_rows
+from assemble_v5_source_resolution_shards_v1 import copy_owned
+
+
+def test_owned_assembly_storage_preserves_bytes_and_rejects_conflicts(tmp_path):
+    source=tmp_path/'source';source.write_bytes(b'original scientific bytes')
+    target=tmp_path/'assembly'/'owned'
+    assert copy_owned(source,target)==str(target)
+    assert source.stat().st_ino==target.stat().st_ino
+    assert source.read_bytes()==target.read_bytes()==b'original scientific bytes'
+    copy_owned(source,target)
+    conflicting=tmp_path/'conflicting';conflicting.write_bytes(b'different evidence')
+    with pytest.raises(ValueError,match='conflicting owned'):copy_owned(conflicting,target)
+    assert source.read_bytes()==b'original scientific bytes'
+
+
+def test_owned_assembly_cross_filesystem_fallback_and_symlink_guard(monkeypatch,tmp_path):
+    import assemble_v5_source_resolution_shards_v1 as module
+    import errno
+    source=tmp_path/'source';source.write_bytes(b'original')
+    def cross_device(*args,**kwargs):raise OSError(errno.EXDEV,'cross device')
+    monkeypatch.setattr(module.os,'link',cross_device)
+    target=tmp_path/'copy';copy_owned(source,target)
+    assert source.read_bytes()==target.read_bytes()
+    link=tmp_path/'link';link.symlink_to(source)
+    with pytest.raises(ValueError,match='symlink'):copy_owned(link,tmp_path/'unsafe')
+
+
+def test_sdk_cleanup_refuses_to_run_in_a_user_environment():
+    import os,subprocess
+    script=Path(__file__).resolve().parents[1]/'scripts/prepare_v5_ci_storage_v1.sh'
+    environment={**os.environ,'GITHUB_ACTIONS':'false','RUNNER_ENVIRONMENT':'self-hosted','RUNNER_OS':'Linux'}
+    result=subprocess.run(['bash',str(script)],env=environment,text=True,capture_output=True)
+    assert result.returncode==2 and 'Refusing SDK cleanup' in result.stderr
 
 
 @pytest.mark.parametrize('section,count',[('transitions',45),('restarts',11),('rollback',39)])

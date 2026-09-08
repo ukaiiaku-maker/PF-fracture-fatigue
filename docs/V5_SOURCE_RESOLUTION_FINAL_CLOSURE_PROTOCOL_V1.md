@@ -169,3 +169,22 @@ and [threadpoolctl runtime introspection](https://github.com/joblib/threadpoolct
 Portable numerical-kernel selection is not a claim of universal cross-platform
 bitwise reproducibility; the resulting full A/B and source reconstructions must
 still execute and pass independently.
+
+## Storage preflight and immutable assembly
+
+The all-shard assembly must retain every checkpoint and both evidence peers.
+Before the one physical campaign, operation `storage-preflight` verifies at
+least 24 GiB available on a disposable GitHub-hosted Linux runner. If needed,
+only fixed, canonical, non-symlink preinstalled Android/.NET/GHC SDK directories
+are cleared. The script refuses user and self-hosted environments, never targets
+the repository, evidence or Python, and fails if sufficient capacity is still
+unavailable. Each final producer, assembler, packager and publication auditor
+repeats that capacity check. New disposable runners restore the unused SDKs.
+
+Assembly hardlinks immutable source captures on the same filesystem, with
+byte-preserving copying only when links are unsupported or cross-filesystem.
+Conflicting destination hashes and symlinks are rejected. No source JSON is
+rewritten through a shared link, and all original shard inventories are checked
+again after successful complete assembly. This reduces duplicate storage only;
+independent A/B physical executions, every source byte, and all predicates remain
+mandatory.

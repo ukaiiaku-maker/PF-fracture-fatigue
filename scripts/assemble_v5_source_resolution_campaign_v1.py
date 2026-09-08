@@ -7,7 +7,7 @@ from pathlib import Path
 import shutil
 import sys
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
-from assemble_v5_source_resolution_shards_v1 import assemble,write
+from assemble_v5_source_resolution_shards_v1 import assemble,write,copy_owned
 from validate_v5_source_resolution_evidence_v1 import verify_inventory,validate_positive,validate_causality
 from v5_source_resolution_campaign_matrix_v1 import matrix
 
@@ -76,7 +76,7 @@ def main():
             sources=[args.shards[s['id']]/side/'evidence' for s in specs if s['phase']==kind]
             assemble(kind,sources,destination/kind)
         for kind in ('source','recovery','causal-neutrality'):
-            shutil.copytree(args.shards/kind/side,destination/kind)
+            shutil.copytree(args.shards/kind/side,destination/kind,copy_function=copy_owned)
         validate_positive(destination/'source/positive')
         validate_causality(destination/'source/causality')
         write(destination/'scientific_ledger.json',derive_ledger(destination))
@@ -91,6 +91,9 @@ def main():
         for p in sorted(args.output.rglob('*')) if p.is_file()})
     print(json.dumps(comparison),flush=True)
     if a!=b:raise ValueError('full A/B recursive inventory mismatch')
+    # Hardlinked immutable captures must not have changed any original shard.
+    for spec in specs:
+        for side in ('a','b'):verify_inventory(args.shards/spec['id']/side)
 
 
 if __name__=='__main__':main()

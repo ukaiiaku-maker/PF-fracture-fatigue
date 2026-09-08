@@ -20,6 +20,8 @@ jobs:
       matrix: ${{ steps.registry.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -46,6 +48,8 @@ jobs:
           sparse-checkout: |
             /*
             !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -94,6 +98,8 @@ jobs:
           sparse-checkout: |
             /*
             !/artifacts/
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -136,6 +142,8 @@ jobs:
           sparse-checkout: |
             /*
             !/artifacts/
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -170,6 +178,8 @@ jobs:
           sparse-checkout: |
             /*
             !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'

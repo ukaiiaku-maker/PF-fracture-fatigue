@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Assemble disjoint executed shards; never count an assembly as a new solve."""
 import argparse
+import errno
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -21,11 +23,20 @@ def write(path,payload):
 
 
 def copy_owned(source,destination):
+    source,destination=Path(source),Path(destination)
+    if source.is_symlink() or destination.is_symlink():raise ValueError('symlink in owned source storage')
     destination.parent.mkdir(parents=True,exist_ok=True)
     if destination.exists():
         if hashlib.sha256(destination.read_bytes()).digest()!=hashlib.sha256(source.read_bytes()).digest():
             raise ValueError('conflicting owned checkpoint/source '+str(destination))
-    else:shutil.copy2(source,destination)
+    else:
+        # Assembly/reconstruction never edits source files. Hardlinks avoid a
+        # second copy of large immutable captures on the same CI filesystem.
+        try:os.link(source,destination)
+        except OSError as error:
+            if error.errno not in (errno.EXDEV,errno.EPERM,errno.EOPNOTSUPP):raise
+            shutil.copy2(source,destination)
+    return str(destination)
 
 
 def assemble(kind,inputs,output):

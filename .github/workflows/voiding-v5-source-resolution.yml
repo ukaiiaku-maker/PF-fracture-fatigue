@@ -8,11 +8,34 @@ on:
     inputs:
       operation:
         type: choice
-        options: [focused, rollback, restarts, transitions, reconstruct-development, reconstruct-available, reconstruct-restarts, runtime-diagnostic, final, audit]
+        options: [focused, rollback, restarts, transitions, reconstruct-development, reconstruct-available, reconstruct-restarts, runtime-diagnostic, storage-preflight, final, audit]
         default: focused
         required: true
 
 jobs:
+  storage-preflight:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'storage-preflight'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/
+      - name: Verify disposable-runner capacity before the full campaign
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          bash scripts/prepare_v5_ci_storage_v1.sh | tee /tmp/v5-storage-preflight.log
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-storage-preflight-${{ github.sha }}
+          path: /tmp/v5-storage-preflight.log
   focused:
     if: github.event_name != 'workflow_dispatch' || inputs.operation == 'focused'
     runs-on: ubuntu-latest
