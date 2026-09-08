@@ -6,6 +6,12 @@ on:
 permissions:
   contents: read
 
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
 jobs:
   prepare:
     runs-on: ubuntu-latest

@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import platform
 import subprocess
@@ -51,6 +52,8 @@ def run_phase(phase,output,section='all',shard_index=0,shard_count=1,base_worktr
     report={'schema':'v5.source-resolution-final-phase-execution/1','phase':phase,'section':section,
         'shard_index':shard_index,'shard_count':shard_count,'executed_code_sha':sha,
         'python_version':platform.python_version(),'operations':steps,'clean_exact_head_at_end':clean,
+        'numerical_environment':{name:os.environ.get(name) for name in
+            ('PYTHONHASHSEED','OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS')},
         'execution_completed':clean and bool(steps) and all(step['returncode']==0 for step in steps),
         'scientific_pass':'SEPARATELY_RECOMPUTED_NOT_INFERRED_FROM_PROCESS_EXIT'}
     (output/'execution.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\n')

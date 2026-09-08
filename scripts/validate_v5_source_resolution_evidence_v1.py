@@ -32,7 +32,7 @@ def verify_inventory(root):
 
 
 def same(a,b,message):
-    if canonical_hash(a)!=canonical_hash(b):raise ValueError(message)
+    if canonical_hash(canonical_data(a))!=canonical_hash(canonical_data(b)):raise ValueError(message)
 
 
 def validate_static(root):
