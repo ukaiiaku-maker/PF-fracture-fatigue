@@ -1,0 +1,522 @@
+{
+  "schema": "v3_structured_verifier",
+  "n_rows": 35,
+  "n_qualified_source_result_verified": 22,
+  "n_structural_failures": 0,
+  "structural_failures": [],
+  "n_unresolved_manuscript_critical_rows": 13,
+  "unresolved_rows": [
+    {
+      "claim_id": "Fig1A",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig1B",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig1C",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig1D",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig4-peak-narrow-attenuation",
+      "final_evidence_class": "SOURCE_RESULT_LOCATED_NOT_REVERIFIED"
+    },
+    {
+      "claim_id": "Fig5A",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig5B",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig5C",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig5D",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig6A",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig6B",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "Fig6C",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    },
+    {
+      "claim_id": "SI-identifiability-recovery-errors",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED"
+    }
+  ],
+  "n_unknown_evidence_class_rows": 0,
+  "allow_explicit_source_limitations_flag": false,
+  "classification": "PAPER_SIMULATION_EVIDENCE_INCOMPLETE",
+  "row_evaluations": [
+    {
+      "claim_id": "Fig1A",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig1B",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig1C",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig1D",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig2-DBTT-RMS",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (per class/temperature comparison table, paired from per-case FEM run summaries and a V1 analytic evaluation)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig2-ceramic-RMS",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (per class/temperature comparison table, paired from per-case FEM run summaries and a V1 analytic evaluation)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig2-peak-RMS",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (per class/temperature comparison table, paired from per-case FEM run summaries and a V1 analytic evaluation)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig2-weakT-RMS",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (per class/temperature comparison table, paired from per-case FEM run summaries and a V1 analytic evaluation)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig2-peak-narrow-topology",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (fine 5K-resolution analytic evaluation + per-case FEM comparison)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Sec2.15-saturation-fits",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (fit of the class-mean R-curve)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-DBTT-K0",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-DBTT-Kss",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-DBTT-DeltaK",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-ceramic-K0",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-ceramic-Kss",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-ceramic-DeltaK",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-peak-K0",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-peak-Kss",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-peak-DeltaK",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-weakT-K0",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-weakT-Kss",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig3-weakT-DeltaK",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "RAW (per-seed; 5 rows for this class in a 20-row seed-level table, NOT a pre-aggregated summary)",
+      "source_level_raw": true,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig4-coverage-and-theta",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (comparison config + per-rate temperature summaries)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig4-ceramic-weakT-preserved-trend",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (per class/rate/temperature comparison table)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig4-DBTT-transition-shift",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (per class/rate/temperature comparison table)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig4-peak-narrow-attenuation",
+      "final_evidence_class": "SOURCE_RESULT_LOCATED_NOT_REVERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (per class/rate/temperature comparison table + fine 5K analytic grid)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig5A",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "partially known",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig5B",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig5C",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig5D",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig6A",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig6B",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig6C",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "Fig7-peak-900K-cohesive-mapping",
+      "final_evidence_class": "QUALIFIED_SOURCE_RESULT_VERIFIED",
+      "independent_recomputation_performed": true,
+      "source_level": "derived (fitted comparison curves computed directly from the EXP-floor barrier form and a MATLAB cohesive-law fit)",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": true,
+      "terminal_status_verified": true,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    },
+    {
+      "claim_id": "SI-identifiability-recovery-errors",
+      "final_evidence_class": "MANUSCRIPT_RESULT_NOT_SOURCE_TRACED",
+      "independent_recomputation_performed": false,
+      "source_level": "unknown",
+      "source_level_raw": false,
+      "source_bundle_present": true,
+      "numerical_comparison_passed": false,
+      "terminal_status_verified": false,
+      "portability_verified": true,
+      "structural_ok": true,
+      "structural_failure_reasons": []
+    }
+  ]
+}

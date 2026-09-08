@@ -1,0 +1,47 @@
+{
+  "root": "runs/four_class_exp_floor_CZM_rates_no_branch_500um_theta45",
+  "out": "runs/CZM_four_rate_temperature_comparison",
+  "rates": [
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ],
+  "classes": [
+    "ceramic",
+    "peak",
+    "weakT",
+    "DBTT"
+  ],
+  "temps": [
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100,
+    1200
+  ],
+  "target_ext_um": 500.0,
+  "compute_analytic": true,
+  "v1_script": "run_v1_exp_floor_four_class_tuning.py",
+  "params_csv": "four_class_exp_floor_exact_model_inputs.csv",
+  "analytic_csv": "four_class_analytical_prediction_final.csv",
+  "base_kdot": 0.005,
+  "analytic_dK": 0.02,
+  "analytic_Kmax": 100.0,
+  "analytic_T_step": 5.0,
+  "T_min": 300.0,
+  "T_max": 1200.0,
+  "outputs": [
+    "CZM_three_rate_first_passage_vs_analytic.png",
+    "CZM_three_rate_median_Rcurve_vs_analytic.png",
+    "CZM_three_rate_toughness_summary.csv",
+    "analytical_predictions_by_rate.csv",
+    "first_passage_comparison_with_analytic.csv",
+    "median_Rcurve_comparison_with_analytic.csv"
+  ]
+}

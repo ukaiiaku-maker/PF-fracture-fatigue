@@ -1,0 +1,290 @@
+{
+  "schema": "v1_quantitative_reproduction",
+  "fig2_rms_by_class": {
+    "DBTT": {
+      "n": 10,
+      "rmse_recomputed_from_raw_K_columns": 1.3258,
+      "rounds_to": 1.33,
+      "manuscript_value": 1.33,
+      "exact_match": true
+    },
+    "ceramic": {
+      "n": 10,
+      "rmse_recomputed_from_raw_K_columns": 0.2329,
+      "rounds_to": 0.23,
+      "manuscript_value": 0.23,
+      "exact_match": true
+    },
+    "peak": {
+      "n": 10,
+      "rmse_recomputed_from_raw_K_columns": 1.1787,
+      "rounds_to": 1.18,
+      "manuscript_value": 1.18,
+      "exact_match": true
+    },
+    "weakT": {
+      "n": 10,
+      "rmse_recomputed_from_raw_K_columns": 0.2267,
+      "rounds_to": 0.23,
+      "manuscript_value": 0.23,
+      "exact_match": true
+    }
+  },
+  "fig3_seed_level_class_statistics": {
+    "DBTT": {
+      "K0": {
+        "n": 5,
+        "mean": 22.767036,
+        "sample_std": 0.156443,
+        "formatted": "22.77\u00b10.16"
+      },
+      "Kss": {
+        "n": 5,
+        "mean": 33.195615,
+        "sample_std": 4.476261,
+        "formatted": "33.20\u00b14.48"
+      },
+      "DeltaK": {
+        "n": 5,
+        "mean": 10.428579,
+        "sample_std": 4.417304,
+        "formatted": "10.43\u00b14.42"
+      }
+    },
+    "ceramic": {
+      "K0": {
+        "n": 5,
+        "mean": 9.330711,
+        "sample_std": 0.092044,
+        "formatted": "9.33\u00b10.09"
+      },
+      "Kss": {
+        "n": 5,
+        "mean": 16.587907,
+        "sample_std": 1.389651,
+        "formatted": "16.59\u00b11.39"
+      },
+      "DeltaK": {
+        "n": 5,
+        "mean": 7.257196,
+        "sample_std": 1.417478,
+        "formatted": "7.26\u00b11.42"
+      }
+    },
+    "peak": {
+      "K0": {
+        "n": 5,
+        "mean": 16.713039,
+        "sample_std": 0.131248,
+        "formatted": "16.71\u00b10.13"
+      },
+      "Kss": {
+        "n": 5,
+        "mean": 27.414512,
+        "sample_std": 1.685268,
+        "formatted": "27.41\u00b11.69"
+      },
+      "DeltaK": {
+        "n": 5,
+        "mean": 10.701473,
+        "sample_std": 1.677819,
+        "formatted": "10.70\u00b11.68"
+      }
+    },
+    "weakT": {
+      "K0": {
+        "n": 5,
+        "mean": 12.829414,
+        "sample_std": 0.099282,
+        "formatted": "12.83\u00b10.10"
+      },
+      "Kss": {
+        "n": 5,
+        "mean": 17.781511,
+        "sample_std": 1.507449,
+        "formatted": "17.78\u00b11.51"
+      },
+      "DeltaK": {
+        "n": 5,
+        "mean": 4.952096,
+        "sample_std": 1.506398,
+        "formatted": "4.95\u00b11.51"
+      }
+    }
+  },
+  "fig4": {
+    "rmse_recomputed_from_raw_K_columns_by_class_rate": {
+      "DBTT": {
+        "0.1x": {
+          "n": 9,
+          "rmse_recomputed": 1.2241
+        },
+        "1x": {
+          "n": 10,
+          "rmse_recomputed": 1.3258
+        },
+        "10x": {
+          "n": 10,
+          "rmse_recomputed": 1.3407
+        },
+        "100x": {
+          "n": 9,
+          "rmse_recomputed": 1.607
+        }
+      },
+      "ceramic": {
+        "0.1x": {
+          "n": 10,
+          "rmse_recomputed": 0.1857
+        },
+        "1x": {
+          "n": 10,
+          "rmse_recomputed": 0.2329
+        },
+        "10x": {
+          "n": 10,
+          "rmse_recomputed": 0.25
+        },
+        "100x": {
+          "n": 10,
+          "rmse_recomputed": 0.2555
+        }
+      },
+      "peak": {
+        "0.1x": {
+          "n": 10,
+          "rmse_recomputed": 0.6487
+        },
+        "1x": {
+          "n": 10,
+          "rmse_recomputed": 1.1787
+        },
+        "10x": {
+          "n": 10,
+          "rmse_recomputed": 0.665
+        },
+        "100x": {
+          "n": 10,
+          "rmse_recomputed": 0.198
+        }
+      },
+      "weakT": {
+        "0.1x": {
+          "n": 10,
+          "rmse_recomputed": 0.2658
+        },
+        "1x": {
+          "n": 10,
+          "rmse_recomputed": 0.2267
+        },
+        "10x": {
+          "n": 10,
+          "rmse_recomputed": 0.2423
+        },
+        "100x": {
+          "n": 10,
+          "rmse_recomputed": 0.1888
+        }
+      }
+    },
+    "dbtt_transition_shift": {
+      "per_rate": {
+        "0.1x": {
+          "n": 9,
+          "low_T_shelf": 24.408,
+          "high_T_shelf": 53.012,
+          "shelf_span": 28.604,
+          "midpoint": 38.71,
+          "crossing_T_K": 788.9,
+          "status": "RESOLVED"
+        },
+        "1x": {
+          "n": 10,
+          "low_T_shelf": 24.942,
+          "high_T_shelf": 53.389,
+          "shelf_span": 28.447,
+          "midpoint": 39.166,
+          "crossing_T_K": 898.2,
+          "status": "RESOLVED"
+        },
+        "10x": {
+          "n": 10,
+          "low_T_shelf": 25.31,
+          "high_T_shelf": 47.731,
+          "shelf_span": 22.421,
+          "midpoint": 36.521,
+          "crossing_T_K": 1031.4,
+          "status": "RESOLVED"
+        },
+        "100x": {
+          "n": 9,
+          "low_T_shelf": 26.022,
+          "high_T_shelf": 30.602,
+          "shelf_span": 4.58,
+          "midpoint": 28.312,
+          "crossing_T_K": 1125.1,
+          "status": "RESOLVED"
+        }
+      },
+      "rates_with_resolved_crossing": [
+        "0.1x",
+        "1x",
+        "10x",
+        "100x"
+      ],
+      "crossing_temperatures_K": [
+        788.9,
+        898.2,
+        1031.4,
+        1125.1
+      ],
+      "monotonic_increase_with_rate": true,
+      "manuscript_claim": "DBTT transition shifts to lower temperature at lower rate and to higher temperature at higher rate",
+      "verdict": "DIRECTIONALLY_CONFIRMED_ON_RESOLVED_RATES",
+      "method_disclosure": "Self-declared proxy: crossing = linear-interpolation temperature where Kc_first(T) crosses the midpoint of the low-T and high-T shelves (shelf = mean of the first/last two sampled temperatures' Kc_first values). This is NOT the manuscript's own (unstated) exact transition definition; it is an independent, reproducible proxy chosen to test the directional claim only."
+    },
+    "peak_narrow_feature_and_attenuation": {
+      "per_rate": {
+        "0.1x": {
+          "grid_resolves_local_bump": false,
+          "note": "100K-spaced comparison grid does not sample a point where the analytic column is a strict local maximum at this rate; see fine 5K-grid confirmation below for proof the underlying peak is real, just under-sampled by this grid at this rate."
+        },
+        "1x": {
+          "grid_resolves_local_bump": true,
+          "bump_T_K": 900.0,
+          "analytic_value": 11.92,
+          "fem_value": 8.237,
+          "fem_attenuation_percent": 30.9
+        },
+        "10x": {
+          "grid_resolves_local_bump": false,
+          "note": "100K-spaced comparison grid does not sample a point where the analytic column is a strict local maximum at this rate; see fine 5K-grid confirmation below for proof the underlying peak is real, just under-sampled by this grid at this rate."
+        },
+        "100x": {
+          "grid_resolves_local_bump": false,
+          "note": "100K-spaced comparison grid does not sample a point where the analytic column is a strict local maximum at this rate; see fine 5K-grid confirmation below for proof the underlying peak is real, just under-sampled by this grid at this rate."
+        }
+      },
+      "fine_grid_confirmation": "fig2_four_class_analytical_prediction_final_fine_grid.csv, peak class, K_target_MPa_sqrt_m column: local max ~20.7 MPa*sqrt(m) at T=905K (5K resolution), vs ~8.8-9.8 MPa*sqrt(m) on both shoulders (830-860K and 940-990K) -- confirms the narrow intermediate-temperature peak is a genuine feature of the analytic model, not a sampling artifact.",
+      "manuscript_claim": "The analytical peak shifts with rate, whereas FEM/CZM retains only muted shoulders.",
+      "verdict": "CONFIRMED_AT_1x_ONLY: at 1x the 100K grid resolves the bump (T=900K, analytic=11.92, FEM=8.24, 30.9% attenuation -- FEM/CZM clearly under-reproduces the peak height, consistent with 'muted'). At 0.1x/10x/100x the 100K-spaced grid does not happen to sample the peak's ~30-40K-wide window, so this branch cannot independently confirm the rate-shift of the peak location from this grid alone; this is disclosed as a genuine sampling-resolution limitation, not asserted as confirmed."
+    }
+  },
+  "live_external_cross_check": {
+    "performed": true,
+    "per_file": {
+      "fig2_first_passage_comparison_with_analytic_1x.csv": {
+        "live_path_exists": true,
+        "byte_identical_to_bundle": true
+      },
+      "fig3_seed_Rcurve_metrics_and_fits.csv": {
+        "live_path_exists": true,
+        "byte_identical_to_bundle": true
+      },
+      "fig4_first_passage_comparison_with_analytic_all_rates.csv": {
+        "live_path_exists": true,
+        "byte_identical_to_bundle": true
+      }
+    }
+  }
+}
