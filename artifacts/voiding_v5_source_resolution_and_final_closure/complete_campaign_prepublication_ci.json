@@ -1,0 +1,149 @@
+{
+  "schema": "v5.complete-campaign-prepublication-ci-receipt/1",
+  "physical_implementation_sha": "63d53cdbad9125ef0d5180551974ac0e3a3ef721",
+  "postprocessing_recovery_sha": "e79da0661fe365a5b61cb38563e332ad5f727a1b",
+  "original_physical_run": {
+    "id": 34205485025,
+    "conclusion": "failure",
+    "physical_shards": 35,
+    "successful_physical_shards": 34,
+    "failed_physical_shards": [
+      "causal-neutrality: missing rg after raw capture"
+    ],
+    "central_failure": "phase execution incomplete causal-neutrality/a"
+  },
+  "original_path_assembly_failure": {
+    "run_id": 34255392088,
+    "job_id": 102159780607,
+    "conclusion": "failure",
+    "error": "TypeError: 'PosixPath' object is not subscriptable"
+  },
+  "complete_retained_assembly": {
+    "run_id": 34256623174,
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 102163960441,
+        "name": "recovery",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Reserve disposable runner storage",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install the missing code-consumer audit dependency",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Configure unchanged prospective numerical policy",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify kernels and create clean frozen source worktrees",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/download-artifact@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Test unchanged predicates and prohibit physical worker invocation",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete A and B reports from retained source-bound captures only",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Require all original physical shards terminal before complete assembly",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/download-artifact@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Preserve original failure and assemble once using frozen implementation",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Clean recovery, physical implementation and historical worktrees",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ]
+  },
+  "local_lossless_audit": {
+    "all_original_bytes_exact": true,
+    "original_files": 2277,
+    "original_bytes": 10930987846,
+    "archive_bytes": 6564257228,
+    "part_count": 79,
+    "artifact_zip_sha256": "e8a252e45533a8d4ce7a07a4dc65b2af542440df15928741d62aff19bd20bb0d"
+  },
+  "publication_head_ci": "REQUIRED_AFTER_EVIDENCE_COMMIT; TERMINAL_RESULT_TO_BE_RECORDED_IN_PR63",
+  "physical_reruns_during_recovery": 0
+}
