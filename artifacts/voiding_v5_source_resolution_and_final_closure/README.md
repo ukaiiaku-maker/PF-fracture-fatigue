@@ -33,18 +33,31 @@ Available development results:
   ownership is therefore not complete radius-dependent front physics.
 - Phase 7 (`352d1d7`): 25/25 targeted exact-duration physical-stage partitions
   pass. The separate one-seed natural harness is not the 32-seed campaign and
-  retains its subdivision failures. Fine child-continuation partitions and
-  variable-source/remesh invariance remain separately under development.
+  retains its subdivision failures. At `facbc24`, all five actual fine child-
+  continuation partitions pass with identical complete terminal states.
+  Variable-source/remesh invariance remains unqualified; the final same-head
+  all-45 execution is not replaced by combining these development heads.
 - Phase 8 (`c284427`): the stronger +8e-7 m common reload fails both one- and
   two-ring kinetic-transfer budgets. This is not a zero-drive classification.
   At `787ebf6`, the separately prospective matched return-load V2 source,
   actual child and ordinary continuation pass, with 1.10% waiting-time transfer
   error. That source sentinel is not the eleven-position restart matrix.
+  The retained `38a7686` stronger-load harness completed eleven direct failed
+  attempts but skipped all eleven replay calls. Its reported 11 exact matches
+  are INVALID restart claims, explicitly revoked by the separate legacy-harness
+  audit. The repaired independent replay batches are required instead.
 - Phase 10 (`a34cdf0`): observed causal states and histories match, but all four
   full future-sequence/restart gates fail. Historical raw identity remains FAIL.
+- Phase 9 (`a34cdf0`): all 96 unique static solves completed and independently
+  reconstruct. The new version passes 434/537 family predicates, 0/33 full
+  families and 8/12 derivative checks. The scientific result is FAIL.
 
-Static-family, all-45 transition, all-11 common-terminal restart, full rollback,
+Final same-head static-family, all-45 transition, all-11 common-terminal restart, full rollback,
 final same-head source-causality, controlled-history, natural-ensemble, duplicate A/B,
 ontology and exact-head CI results must not be inferred from this package.
 Those independent remaining executions and the final PR ledger are required
 before a terminal mission classification.
+
+Uploaded development CI at `352d1d7`, run `34180123490`, contains exactly 277
+executed tests, zero failures and zero skips. The separate repository-wide run
+`34180123467` timed out at 90 minutes and is not classified inherited-only.
