@@ -13,7 +13,12 @@ def matrix():
         for index in range(count):rows.append({'id':section+'-'+str(index),'phase':'lifecycle','section':section,'index':index,'count':count})
     for phase in ('source','recovery','causal-neutrality'):
         rows.append({'id':phase,'phase':phase,'section':'all','index':0,'count':1})
-    return rows
+    # Start the measured long-running source/restart operations first. This
+    # changes queue order only, never a case, shard identity or execution count.
+    priority={'source':0,'restarts':1,'rollback':2,'causal-neutrality':3,
+        'transitions':4,'controlled':5,'natural':6,'static':7,'neutrality':8,'recovery':9}
+    return sorted(rows,key=lambda row:(priority[row['section'] if row['phase']=='lifecycle'
+        else row['phase']],row['index']))
 
 
 def require_development_complete(path):

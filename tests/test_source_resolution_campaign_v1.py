@@ -11,6 +11,8 @@ from qualify_v5_source_resolution_focused_results_v1 import summarize
 
 def test_final_matrix_is_disjoint_and_complete():
     rows=matrix();assert len(rows)==28 and len({r['id'] for r in rows})==28
+    assert rows[0]['id']=='source'
+    assert [r['id'] for r in rows[1:5]]==['restarts-'+str(i) for i in range(4)]
     assert sum(r['phase']=='static' for r in rows)==8
     for section,count in (('transitions',3),('restarts',4),('controlled',4),('natural',4),('neutrality',1),('rollback',1)):
         observed=[r for r in rows if r['phase']=='lifecycle' and r['section']==section]
