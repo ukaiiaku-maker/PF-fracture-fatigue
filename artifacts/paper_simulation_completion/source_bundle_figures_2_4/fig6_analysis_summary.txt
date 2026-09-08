@@ -1,0 +1,16 @@
+FINAL INTEGRATED V5.7 ANALYSIS
+==================================================
+Strength metric source: descriptor=surface_temperature_descriptors_v5_6.csv; raw_strength=strength_temperature_single_rate.csv
+Preferred Panel C strength metric: SN_endurance_vs_strength_metric::available_anomaly_gain_frac_exact
+Matched Kc-DKth pooled log10 Pearson r = 0.986 (n=1360); context range 0.958-0.999.
+
+Panel C strict S-N definition: endurance_like vs continuous_SN; knees excluded.
+100 K SN_endurance_vs_Kc_same_T: AUC range 0.787-0.905.
+100 K SN_endurance_vs_DKth_same_T: AUC range 0.500-0.819.
+100 K strength metric AUC = 0.461 [0.441, 0.481].
+300 K SN_endurance_vs_Kc_same_T: AUC range 0.132-0.933.
+300 K SN_endurance_vs_DKth_same_T: AUC range 0.003-0.999.
+300 K strength metric AUC = 0.494 [0.477, 0.510].
+500 K SN_endurance_vs_Kc_same_T: AUC range 0.375-0.605.
+500 K SN_endurance_vs_DKth_same_T: AUC range 0.421-0.668.
+500 K strength metric AUC = 0.478 [0.462, 0.496].

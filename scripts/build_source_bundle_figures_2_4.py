@@ -1,5 +1,13 @@
 """Paper-evidence FINAL closure (review round 3): portable source bundle for
-Figures 2, 3, 4, and 7.
+Figures 1, 2, 3, 4, 5, 6, 7, and the SI identifiability study.
+
+NOTE ON SCOPE (name kept as build_source_bundle_figures_2_4.py for history,
+now covers all figures): the Figure 1/5/6/SI sources were located by a
+dedicated forensics pass in
+/Volumes/Data/Data/Nanopillar_calculation/Fatigue-PF/ and
+/Volumes/Data/Data/Nanopillar_calculation/Fatigue_modelfitting_identifyability/
+(NOT Arrhenius_FEM_CZM, which only holds Figs 2/3/4/7). Both external roots
+are handled below.
 
 The second review pointed out that every strict-verifier check for these
 figures depended on a live path to a plain, non-git, mutable directory
@@ -42,6 +50,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = REPO_ROOT / "artifacts" / "paper_simulation_completion"
 BUNDLE_DIR = OUT_DIR / "source_bundle_figures_2_4"
 FEM_CZM_ROOT = Path("/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM")
+FATIGUE_PF_ROOT = Path("/Volumes/Data/Data/Nanopillar_calculation/Fatigue-PF")
+IDENTIFIABILITY_ROOT = Path("/Volumes/Data/Data/Nanopillar_calculation/Fatigue_modelfitting_identifyability")
 
 
 def _sha256(path: Path) -> str:
@@ -50,8 +60,9 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-# Each entry: (original relative-to-FEM_CZM_ROOT path, bundle filename, role,
-# producer_script, source_data_level)
+# Each entry: (original relative-to-`root` path, bundle filename, role,
+# producer_script, source_data_level). `root` defaults to FEM_CZM_ROOT when
+# omitted (Figs 2/3/4/7); explicit root= is given for Figs 1/5/6/SI.
 FILES = [
     dict(
         orig="runs/PF_vs_CZM_first_passage_with_analytic_publication/first_passage_comparison_with_analytic.csv",
@@ -103,6 +114,18 @@ FILES = [
         source_data_level="config",
     ),
     dict(
+        orig="runs/CZM_four_rate_temperature_comparison/analytical_predictions_by_rate.csv",
+        bundle="fig4_analytical_predictions_by_rate_fine_grid.csv",
+        role="V1 analytic K(T) at 5K resolution for ALL 4 rate factors (0.1x/1x/10x/100x), peak class "
+             "(and others). This is the fine-grid file that actually resolves the peak class's narrow "
+             "intermediate-temperature local maximum at every rate -- the 100K-spaced comparison grid "
+             "only happens to catch it at 1x by chance of grid alignment.",
+        producer_script="run_v1_exp_floor_four_class_tuning.py, generalized across rate_factor (per "
+                        "comparison_config.json's 'rates' field)",
+        source_data_level="derived (direct analytic-model evaluation at 4 rates x 5K resolution, not a "
+                          "simulation output)",
+    ),
+    dict(
         orig="four_class_analytical_prediction_final.csv",
         bundle="fig2_four_class_analytical_prediction_final_fine_grid.csv",
         role="V1 analytic K(T) at 5K resolution for all 4 classes (base_kdot=0.005, i.e. nominal 1x). Column K_target_MPa_sqrt_m carries the genuine narrow intermediate-temperature peak for the peak class (e.g. local max ~20.7 MPa*sqrt(m) near T=905K) that the 100K-spaced comparison grids only partially resolve; column K_analytic_MPa_sqrt_m is a smoother companion curve. This file is the fine-grid evidence used to confirm Fig.2/4's 'narrow peak' language is a real feature, not an artifact of coarse sampling.",
@@ -130,6 +153,216 @@ FILES = [
         producer_script="n/a (documentation)",
         source_data_level="documentation",
     ),
+    # ---------------- Figure 1 (V1 reduced-model atlas) ----------------
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/panelA_waterfall_3d_dense/panel_A_waterfall_path.csv",
+        bundle="fig1AB_panel_A_waterfall_path.csv",
+        role="Fig.1A/B continuation path through (H0,c, chi_shield, N_sat) space spanning "
+             "ceramic->peak->weakT->DBTT (regime_hint column)",
+        producer_script="build_panelA_waterfall_3d.py",
+        source_data_level="raw (per-continuation-step path, not an aggregate)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/panelB_fatigue_waterfall_3d/panel_B_fatigue_waterfall_path.csv",
+        bundle="fig1AB_panel_B_fatigue_waterfall_path.csv",
+        role="Fig.1B cyclic first-passage response for the same continuation path as Panel A",
+        producer_script="build_panelB_fatigue_waterfall_3d.py",
+        source_data_level="raw (per-continuation-step path)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/panels_CD_entropy_family_v3/panelC_curve_summary_v3.csv",
+        bundle="fig1CD_panelC_curve_summary_v3.csv",
+        role="Fig.1C S-N-type initiation response across the matched entropy family",
+        producer_script="build_panels_CD_entropy_family_v3.py",
+        source_data_level="derived (per-curve summary of the raw S-N raw file)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/panels_CD_entropy_family_v3/panelD_curve_summary_v3.csv",
+        bundle="fig1CD_panelD_curve_summary_v3.csv",
+        role="Fig.1D fixed-rate strength-temperature response, same entropy family as Panel C",
+        producer_script="build_panels_CD_entropy_family_v3.py",
+        source_data_level="derived (per-curve summary of the raw strength raw file)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/panels_CD_entropy_family_v3/panels_CD_manifest_v3.json",
+        bundle="fig1CD_panels_CD_manifest_v3.json",
+        role="Confirms Panels C and D share the same Lambda_S_ref entropy-family design",
+        producer_script="build_panels_CD_entropy_family_v3.py",
+        source_data_level="config/manifest",
+    ),
+    # ---------------- Figure 5 (six-system fatigue atlas + blunt-notch S-N) ----------------
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v8_material_response_production_2d/atlas_2d_paris_points.csv",
+        bundle="fig5A_atlas_2d_paris_points.csv",
+        role="Fig.5A complete six-case da/dN-vs-DeltaK atlas (14-18 K-points per case, all 6 "
+             "canonical cases present) -- the complete/production counterpart to the sparse "
+             "'smoke' run in Arrhenius_FEM_CZM flagged by the second review",
+        producer_script="run_v8_material_response_production_2d.sh",
+        source_data_level="raw (per-K-point, per-case)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v8_material_response_r_curve_6class_long_growth_multiseed/multiseed_r_curve_analysis/multiseed_r_curve_summary.md",
+        bundle="fig5B_multiseed_r_curve_summary.md",
+        role="Fig.5B longer-growth calculation summary (3 seeds x 6 classes, ~735-750um final "
+             "crack extension)",
+        producer_script="run_v8_r_curve_6class_long_growth.sh",
+        source_data_level="derived (summary of a raw multi-seed run tree)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v8_orientation_plastic_shielded_K7/theta30/atlas_2d_paris_points.csv",
+        bundle="fig5B_orientation_theta30_atlas_2d_paris_points.csv",
+        role="Fig.5B anisotropic/path-deflection calculation, plastic_shielded_case64_M1 at 30deg "
+             "crystal orientation (--crystal-aniso --crystal-branch)",
+        producer_script="run_v8_plastic_shielded_orientation_30_45_v2.sh",
+        source_data_level="raw (per-K-point)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="releases/stateful_pd_v8_5_standalone_v1_1/runs/sn_stateful_pd_v8_5_1_reference_lives_seed5/seed_5/stress_900MPa/job_no_shield/no_shield/sigmaA_900MPa/crack_handoff_audit_final.json",
+        bundle="fig5C_handoff_audit_no_shield_seed5_900MPa.json",
+        role="Fig.5C blunt-notch S-N: no-shield job at 900 MPa, seed 5 -- crack-connectivity gate "
+             "result (root_connected/coverage_pass) for comparison against the shielded job",
+        producer_script="sn_pd2d_stateful.py",
+        source_data_level="raw (per-job terminal audit)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="releases/stateful_pd_v8_5_standalone_v1_1/runs/sn_stateful_pd_v8_5_1_reference_lives_seed5/seed_5/stress_900MPa/job_shielded/shielded/sigmaA_900MPa/crack_handoff_audit_final.json",
+        bundle="fig5C_handoff_audit_shielded_seed5_900MPa.json",
+        role="Fig.5C blunt-notch S-N: shielded job at 900 MPa, seed 5 -- shows coverage_pass=False "
+             "(no connected crack), the direct evidentiary contrast the caption describes",
+        producer_script="sn_pd2d_stateful.py",
+        source_data_level="raw (per-job terminal audit)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="releases/stateful_pd_v8_5_standalone_v1_1/runs/sn_stateful_pd_v8_5_1_reference_lives_seed5/"
+             "seed_5/stress_900MPa/job_no_shield/no_shield/sigmaA_900MPa/fem_fields_final.png",
+        bundle="fig5D_fields_no_shield_seed5_900MPa.png",
+        role="Fig.5D no-shield spatial field snapshot (accumulated eps_p, dislocation density rho, "
+             "residual sigma1) at the same seed/stress as the fig5C handoff audit -- narrow, "
+             "localized concentration at the notch tip (directly viewed and confirmed this session)",
+        producer_script="sn_pd2d_stateful.py",
+        source_data_level="raw (rendered field snapshot of the raw FEM state, not a derived statistic)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="releases/stateful_pd_v8_5_standalone_v1_1/runs/sn_stateful_pd_v8_5_1_reference_lives_seed5/"
+             "seed_5/stress_900MPa/job_shielded/shielded/sigmaA_900MPa/fem_fields_final.png",
+        bundle="fig5D_fields_shielded_seed5_900MPa.png",
+        role="Fig.5D shielded spatial field snapshot, same seed/stress -- broad, diffuse, ~160x larger "
+             "peak plastic strain and >1000x larger dislocation density spread across most of the "
+             "domain without a narrow localized crack-precursor band (directly viewed and confirmed "
+             "this session)",
+        producer_script="sn_pd2d_stateful.py",
+        source_data_level="raw (rendered field snapshot)",
+    ),
+    # ---------------- Figure 6 (Cramer's V / correlation / AUC) ----------------
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v5_7_final_analysis/manuscript_statistics_table.csv",
+        bundle="fig6_manuscript_statistics_table.csv",
+        role="Fig.6A/B/C frozen manuscript statistics table (Cramer's V, Pearson r, AUC), the "
+             "pipeline's own 'freeze the statistical analysis used by the manuscript figures' output",
+        producer_script="analyze_v57_final_integrated.py",
+        source_data_level="derived (frozen aggregate statistics)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v5_7_final_analysis/matched_Kc_DKth_statistics.csv",
+        bundle="fig6B_matched_Kc_DKth_statistics.csv",
+        role="Fig.6B per-context and pooled log10 Pearson r (Kc vs DeltaK_th), n=1360 pooled",
+        producer_script="analyze_v57_final_integrated.py (matched_kc_dkth function)",
+        source_data_level="derived (aggregate of the raw matched-join table)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v5_7_final_analysis/global_class_associations_clean.csv",
+        bundle="fig6A_global_class_associations_clean.csv",
+        role="Fig.6A Cramer's V categorical associations (strength/fracture/DKth/S-N phenotype)",
+        producer_script="analyze_v57_final_integrated.py",
+        source_data_level="derived (contingency-table associations)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v5_7_final_analysis/analysis_summary.txt",
+        bundle="fig6_analysis_summary.txt",
+        role="Human-readable summary confirming n=1360, pooled r=0.986, context range 0.958-0.999, "
+             "and representative AUC values including an exact AUC=0.5 chance-level example",
+        producer_script="analyze_v57_final_integrated.py",
+        source_data_level="derived (text summary)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v5_7_extension/fatigue_thresholds_v5_7.csv",
+        bundle="fig6_raw_fatigue_thresholds_v5_7.csv",
+        role="Fig.6B/A RAW per-surface/per-context/per-temperature DeltaK_th threshold brackets -- "
+             "the genuine raw input this branch used for its own from-scratch Pearson-r recomputation "
+             "(not the frozen aggregate)",
+        producer_script="upstream fatigue-threshold bracketing pipeline (v5.7 extension)",
+        source_data_level="RAW (per-surface)",
+    ),
+    # ---------------- SI synthetic-identifiability study ----------------
+    dict(
+        root=IDENTIFIABILITY_ROOT,
+        orig="runs/synthetic_identifiability_v2/condition_universe.csv",
+        bundle="SI_condition_universe.csv",
+        role="SI: the 75-condition synthetic experimental universe (76 lines = 75 rows, exact "
+             "match to the manuscript's stated dataset size)",
+        producer_script="run_synthetic_identifiability.py",
+        source_data_level="raw (per-condition design)",
+    ),
+    dict(
+        root=IDENTIFIABILITY_ROOT,
+        orig="runs/synthetic_identifiability_v2/inversion_summary.csv",
+        bundle="SI_inversion_summary.csv",
+        role="SI: per-regime/per-noise-realization/per-acquisition-set inversion results including "
+             "rmse_G_emit_eV -- the raw per-fit results this branch used to independently recompute "
+             "the 20-55% (sparse) / 1-10% (complete) emission-landscape recovery-error claim",
+        producer_script="run_synthetic_identifiability.py",
+        source_data_level="RAW (per-fit; 85 rows, not pre-aggregated to a single percentage)",
+    ),
+    dict(
+        root=IDENTIFIABILITY_ROOT,
+        orig="runs/synthetic_identifiability_v2/ceramic/truth_barrier_grid.csv",
+        bundle="SI_ceramic_truth_barrier_grid.csv",
+        role="SI: ceramic regime's true G_emit_eV(T,sigma) grid, needed to compute RMS(G_true) for "
+             "the percentage-error normalization",
+        producer_script="run_synthetic_identifiability.py",
+        source_data_level="raw (ground-truth barrier grid)",
+    ),
+    dict(
+        root=IDENTIFIABILITY_ROOT,
+        orig="runs/synthetic_identifiability_v2/peak/truth_barrier_grid.csv",
+        bundle="SI_peak_truth_barrier_grid.csv",
+        role="SI: peak regime's true G_emit_eV(T,sigma) grid",
+        producer_script="run_synthetic_identifiability.py",
+        source_data_level="raw (ground-truth barrier grid)",
+    ),
+    dict(
+        root=IDENTIFIABILITY_ROOT,
+        orig="runs/synthetic_identifiability_v2/weakT/truth_barrier_grid.csv",
+        bundle="SI_weakT_truth_barrier_grid.csv",
+        role="SI: weakT regime's true G_emit_eV(T,sigma) grid",
+        producer_script="run_synthetic_identifiability.py",
+        source_data_level="raw (ground-truth barrier grid)",
+    ),
+    dict(
+        root=IDENTIFIABILITY_ROOT,
+        orig="runs/synthetic_identifiability_v2/dbtt/truth_barrier_grid.csv",
+        bundle="SI_dbtt_truth_barrier_grid.csv",
+        role="SI: dbtt regime's true G_emit_eV(T,sigma) grid",
+        producer_script="run_synthetic_identifiability.py",
+        source_data_level="raw (ground-truth barrier grid)",
+    ),
 ]
 
 
@@ -138,7 +371,8 @@ def main() -> None:
     manifest_rows = []
     fem_available = FEM_CZM_ROOT.is_dir()
     for entry in FILES:
-        orig = FEM_CZM_ROOT / entry["orig"]
+        root = entry.pop("root", FEM_CZM_ROOT)
+        orig = root / entry["orig"]
         bundle_path = BUNDLE_DIR / entry["bundle"]
         row = dict(entry)
         if not orig.is_file():
@@ -176,7 +410,12 @@ def main() -> None:
 
     all_ok = all(r.get("byte_identical") for r in manifest_rows)
     (OUT_DIR / "paper_source_bundle_manifest.json").write_text(json.dumps({
-        "schema": "v1_paper_source_bundle_manifest",
+        "schema": "v2_paper_source_bundle_manifest",
+        "external_roots": {
+            str(FEM_CZM_ROOT): fem_available,
+            str(FATIGUE_PF_ROOT): FATIGUE_PF_ROOT.is_dir(),
+            str(IDENTIFIABILITY_ROOT): IDENTIFIABILITY_ROOT.is_dir(),
+        },
         "external_root": str(FEM_CZM_ROOT),
         "external_root_available_at_build_time": fem_available,
         "n_files": len(manifest_rows),

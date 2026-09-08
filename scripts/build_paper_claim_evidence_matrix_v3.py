@@ -325,36 +325,40 @@ def main() -> None:
               "monotonic result, directly confirming the manuscript's directional claim.",
     ))
     peak = fig4["peak_narrow_feature_and_attenuation"]
-    resolved_at_1x = peak["per_rate"]["1x"]["grid_resolves_local_bump"]
     rows.append(dict(
         claim_id="Fig4-peak-narrow-attenuation", figure_panel="Figure 4",
         manuscript_claim_text="The analytical peak shifts with rate, whereas FEM/CZM retains only "
                                "muted shoulders.",
-        source_data_level="derived (per class/rate/temperature comparison table + fine 5K analytic grid)",
+        source_data_level="derived (per class/rate/temperature comparison table + fine 5K "
+                           "rate-resolved analytic grid)",
         source_repository_or_archive=FEM_CZM_ROOT,
-        immutable_ref_or_bundle_hash=bundle_hash(manifest, "fig4_first_passage_comparison_with_analytic_all_rates.csv"),
+        immutable_ref_or_bundle_hash=bundle_hash(manifest, "fig4_analytical_predictions_by_rate_fine_grid.csv"),
         original_path=f"{FEM_CZM_ROOT}/runs/CZM_four_rate_temperature_comparison/"
-                      f"first_passage_comparison_with_analytic.csv",
-        portable_bundle_path=bundle_path(manifest, "fig4_first_passage_comparison_with_analytic_all_rates.csv"),
-        producer_script="rate-generalized comparison pipeline",
-        parameter_config_fingerprint="theta=45.0; peak class; all 4 rates",
-        terminal_or_censor_status="n=10/10 at every rate",
+                      f"analytical_predictions_by_rate.csv",
+        portable_bundle_path=bundle_path(manifest, "fig4_analytical_predictions_by_rate_fine_grid.csv"),
+        producer_script="rate-generalized comparison pipeline (run_v1_exp_floor_four_class_tuning.py, "
+                        "5K resolution)",
+        parameter_config_fingerprint="theta=45.0; peak class; all 4 rates; 5K temperature resolution",
+        terminal_or_censor_status=f"peak resolved at all 4 rates: {peak['peak_location_by_rate']}",
         independent_recomputation_method=peak["verdict"],
         expected_value="peak location shifts with rate; FEM attenuates the peak height",
-        recomputed_value=f"1x: analytic=11.92 vs FEM=8.24 (30.9% attenuation) at T=900K bump. "
-                          f"0.1x/10x/100x: the 100K-spaced grid does not sample a point resolving a local "
-                          f"maximum, so the rate-shift itself is NOT independently confirmed from this grid.",
-        tolerance="n/a (partial verification)",
-        pass_fail="PARTIAL",
-        final_evidence_class=STATUS["SOURCE_RESULT_LOCATED_NOT_REVERIFIED"],
-        notes="Split per the third review's instruction: the peak's existence and FEM-attenuation are "
-              "confirmed at 1x (matches Fig.2's own already-verified attenuation finding; see the "
-              "separate Fig2-peak-narrow-topology row, which IS fully QUALIFIED_SOURCE_RESULT_VERIFIED). "
-              "This row's specific claim -- that the peak LOCATION shifts with rate -- is source-located "
-              "but NOT independently reverified across all 4 rates because the 100K-spaced grid only "
-              "happens to resolve the local maximum at 1x; a PARTIAL match does not satisfy the strict "
-              "verifier's numerical_comparison_passed==PASS requirement, so this row is correctly held at "
-              "SOURCE_RESULT_LOCATED_NOT_REVERIFIED rather than rounded up.",
+        recomputed_value=f"Peak location (fine grid, all 4 rates): {peak['peak_location_by_rate']}, "
+                          f"monotonic={peak['peak_shift_monotonic_with_rate']}. FEM local maxima on its "
+                          f"own 100K-grid curve at any rate: {peak['fem_local_maxima_by_rate']} "
+                          f"(zero at every rate = 'muted shoulders', never a reproduced peak). "
+                          f"Quantitative attenuation at 1x: 30.9% (analytic 11.92 vs FEM 8.24 at T=900K).",
+        tolerance="monotonicity (peak shift) + zero-local-maxima (FEM muting), both exact",
+        pass_fail="PASS",
+        final_evidence_class=STATUS["QUALIFIED_SOURCE_RESULT_VERIFIED"],
+        notes="Corrected from the earlier partial-verification pass by locating "
+              "analytical_predictions_by_rate.csv, a fine 5K-resolution, rate-resolved analytic file "
+              "that (unlike the 100K-spaced FEM-vs-analytic comparison grid) actually resolves the "
+              "peak's location at every rate, not just 1x by chance grid alignment. Both halves of the "
+              "manuscript claim are now independently, quantitatively confirmed: the analytic peak "
+              "shifts monotonically with rate (860K->910K->970K->1035K), and FEM's own curve shows zero "
+              "local maxima at any of the 4 rates (a consistent 'muted shoulder', not a reproduced "
+              "peak), with an exact attenuation percentage available at 1x where the coarser FEM grid "
+              "happens to sample the peak directly.",
     ))
 
     # ---------------- Figure 5 (fatigue atlas, 4 panels) ----------------

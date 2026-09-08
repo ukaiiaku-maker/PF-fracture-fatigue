@@ -1,0 +1,83 @@
+figure_panel,scientific_question,analysis_family,context,temperature_K,SN_definition,metric,estimate,ci95_low,ci95_high,p_value,n
+A,Strength ↔ fracture,strength_vs_fracture_class,FCC-like,,global phenotype taxonomy,Cramers_V,0.7944603484579736,,,0.0,3840
+A,Fracture ↔ S-N,fracture_vs_fatigue_temperature_phenotype,FCC-like,,global phenotype taxonomy,Cramers_V,0.1416426479533441,,,1.8657783650976086e-17,3840
+A,Strength ↔ S-N,strength_vs_fatigue_temperature_phenotype,FCC-like,,global phenotype taxonomy,Cramers_V,0.1743504670200381,,,1.6177071285714512e-44,3840
+A,Fracture ↔ ΔKth,fracture_vs_growth_threshold_class,FCC-like,,global phenotype taxonomy,Cramers_V,0.6703675950928767,,,9.670450485048566e-09,96
+A,Strength ↔ ΔKth,strength_vs_growth_threshold_class,FCC-like,,global phenotype taxonomy,Cramers_V,0.3479692818089279,,,0.0006888535712937,96
+A,ΔKth ↔ S-N,growth_threshold_vs_SN_temperature_phenotype,FCC-like,,global phenotype taxonomy,Cramers_V,0.2212653007891958,,,0.3096835741561239,96
+A,Strength ↔ fracture,strength_vs_fracture_class,Shifted ductile,,global phenotype taxonomy,Cramers_V,0.3502784901315587,,,1.344742778147148e-99,3840
+A,Fracture ↔ S-N,fracture_vs_fatigue_temperature_phenotype,Shifted ductile,,global phenotype taxonomy,Cramers_V,0.1160667249580602,,,5.846075622349707e-12,3840
+A,Strength ↔ S-N,strength_vs_fatigue_temperature_phenotype,Shifted ductile,,global phenotype taxonomy,Cramers_V,0.1743504670200381,,,1.6177071285714512e-44,3840
+A,Fracture ↔ ΔKth,fracture_vs_growth_threshold_class,Shifted ductile,,global phenotype taxonomy,Cramers_V,0.0909090909090909,,,0.3730775013741216,96
+A,Strength ↔ ΔKth,strength_vs_growth_threshold_class,Shifted ductile,,global phenotype taxonomy,Cramers_V,0.6030226891555273,,,1.5688306413074852e-06,96
+A,ΔKth ↔ S-N,growth_threshold_vs_SN_temperature_phenotype,Shifted ductile,,global phenotype taxonomy,Cramers_V,0.2820380374088831,,,0.0219677058894354,96
+A,Strength ↔ fracture,strength_vs_fracture_class,Steep cleavage,,global phenotype taxonomy,Cramers_V,0.8102695146373853,,,0.0,3840
+A,Fracture ↔ S-N,fracture_vs_fatigue_temperature_phenotype,Steep cleavage,,global phenotype taxonomy,Cramers_V,0.1458418002505369,,,1.837593305434075e-18,3840
+A,Strength ↔ S-N,strength_vs_fatigue_temperature_phenotype,Steep cleavage,,global phenotype taxonomy,Cramers_V,0.1743504670200381,,,1.6177071285714512e-44,3840
+A,Fracture ↔ ΔKth,fracture_vs_growth_threshold_class,Steep cleavage,,global phenotype taxonomy,Cramers_V,0.7057037421623767,,,1.0340420897416296e-09,96
+A,Strength ↔ ΔKth,strength_vs_growth_threshold_class,Steep cleavage,,global phenotype taxonomy,Cramers_V,0.357702303530377,,,0.0002943650044666,96
+A,ΔKth ↔ S-N,growth_threshold_vs_SN_temperature_phenotype,Steep cleavage,,global phenotype taxonomy,Cramers_V,0.2187442021495106,,,0.3267663590580963,96
+A,Strength ↔ fracture,strength_vs_fracture_class,Slow threshold,,global phenotype taxonomy,Cramers_V,0.5773551281357427,,,0.0,3840
+A,Fracture ↔ S-N,fracture_vs_fatigue_temperature_phenotype,Slow threshold,,global phenotype taxonomy,Cramers_V,0.1034720084059643,,,5.879696223316424e-17,3840
+A,Strength ↔ S-N,strength_vs_fatigue_temperature_phenotype,Slow threshold,,global phenotype taxonomy,Cramers_V,0.1743504670200381,,,1.6177071285714512e-44,3840
+A,Fracture ↔ ΔKth,fracture_vs_growth_threshold_class,Slow threshold,,global phenotype taxonomy,Cramers_V,0.7057037421623767,,,1.0340420897416296e-09,96
+A,Strength ↔ ΔKth,strength_vs_growth_threshold_class,Slow threshold,,global phenotype taxonomy,Cramers_V,0.357702303530377,,,0.0002943650044666,96
+A,ΔKth ↔ S-N,growth_threshold_vs_SN_temperature_phenotype,Slow threshold,,global phenotype taxonomy,Cramers_V,0.2187442021495106,,,0.3267663590580963,96
+A,Strength ↔ fracture,strength_vs_fracture_class,Higher barrier,,global phenotype taxonomy,Cramers_V,0.8111221058853778,,,0.0,3840
+A,Fracture ↔ S-N,fracture_vs_fatigue_temperature_phenotype,Higher barrier,,global phenotype taxonomy,Cramers_V,0.1443635511747451,,,4.1876036578112795e-18,3840
+A,Strength ↔ S-N,strength_vs_fatigue_temperature_phenotype,Higher barrier,,global phenotype taxonomy,Cramers_V,0.1743504670200381,,,1.6177071285714512e-44,3840
+A,Fracture ↔ ΔKth,fracture_vs_growth_threshold_class,Higher barrier,,global phenotype taxonomy,Cramers_V,0.7057037421623767,,,1.0340420897416296e-09,96
+A,Strength ↔ ΔKth,strength_vs_growth_threshold_class,Higher barrier,,global phenotype taxonomy,Cramers_V,0.3561457943593141,,,0.0003383091527097,96
+A,ΔKth ↔ S-N,growth_threshold_vs_SN_temperature_phenotype,Higher barrier,,global phenotype taxonomy,Cramers_V,0.2498646819927924,,,0.1517842726791796,96
+A,Strength ↔ fracture,strength_vs_fracture_class,Strong plastic shielding,,global phenotype taxonomy,Cramers_V,0.068651925910556,,,7.787479377712935e-05,3840
+A,Fracture ↔ S-N,fracture_vs_fatigue_temperature_phenotype,Strong plastic shielding,,global phenotype taxonomy,Cramers_V,0.0510012091444986,,,0.0005047328417164,3840
+A,Strength ↔ S-N,strength_vs_fatigue_temperature_phenotype,Strong plastic shielding,,global phenotype taxonomy,Cramers_V,0.1743504670200381,,,1.6177071285714512e-44,3840
+A,Fracture ↔ ΔKth,fracture_vs_growth_threshold_class,Strong plastic shielding,,global phenotype taxonomy,Cramers_V,0.3402785236893602,,,0.000855958821469,96
+A,Strength ↔ ΔKth,strength_vs_growth_threshold_class,Strong plastic shielding,,global phenotype taxonomy,Cramers_V,0.6030226891555273,,,1.5688306413074852e-06,96
+A,ΔKth ↔ S-N,growth_threshold_vs_SN_temperature_phenotype,Strong plastic shielding,,global phenotype taxonomy,Cramers_V,0.2820380374088831,,,0.0219677058894354,96
+B,Matched monotonic toughness vs crack-growth threshold,matched_Kc_vs_DKth,FCC-like,,not applicable,Pearson_r_log10,0.9983177942098503,,,8.662547937302173e-278,225
+B,Matched monotonic toughness vs crack-growth threshold,matched_Kc_vs_DKth,Shifted ductile,,not applicable,Pearson_r_log10,0.9987454527442478,,,5.217225e-318,245
+B,Matched monotonic toughness vs crack-growth threshold,matched_Kc_vs_DKth,Steep cleavage,,not applicable,Pearson_r_log10,0.9904018051290919,,,6.698122390776956e-223,259
+B,Matched monotonic toughness vs crack-growth threshold,matched_Kc_vs_DKth,Slow threshold,,not applicable,Pearson_r_log10,0.9794700505508651,,,2.6225823983605666e-154,221
+B,Matched monotonic toughness vs crack-growth threshold,matched_Kc_vs_DKth,Higher barrier,,not applicable,Pearson_r_log10,0.9576588312673979,,,4.139331055563981e-123,226
+B,Matched monotonic toughness vs crack-growth threshold,matched_Kc_vs_DKth,Strong plastic shielding,,not applicable,Pearson_r_log10,0.9855864294159365,,,2.1559452329457985e-142,184
+B,Matched monotonic toughness vs crack-growth threshold,matched_Kc_vs_DKth,All contexts,,not applicable,Pearson_r_log10,0.9864679341131591,,,0.0,1360
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,FCC-like,100.0,strict_endurance_vs_continuous,AUC,0.9035676516689455,0.8842795993957461,0.9221324022571498,,3840
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Shifted ductile,100.0,strict_endurance_vs_continuous,AUC,0.9050206905291234,0.8858662877705642,0.9235242981719571,,3840
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Steep cleavage,100.0,strict_endurance_vs_continuous,AUC,0.872420221151559,0.8537697625803218,0.8912396186072606,,3840
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Slow threshold,100.0,strict_endurance_vs_continuous,AUC,0.7865643433249067,0.7449300278625061,0.8284927500893863,,3455
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Higher barrier,100.0,strict_endurance_vs_continuous,AUC,0.9036237215194075,0.8844026124497066,0.9222104047687324,,3840
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Strong plastic shielding,100.0,strict_endurance_vs_continuous,AUC,0.8777410739563842,0.8636138477433802,0.89081370828098,,3840
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,FCC-like,100.0,strict_endurance_vs_continuous,AUC,0.7922116527942925,0.6669675925925925,0.8934889713258052,,87
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Shifted ductile,100.0,strict_endurance_vs_continuous,AUC,0.741455078125,0.6181024667931688,0.8534733072916666,,96
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Steep cleavage,100.0,strict_endurance_vs_continuous,AUC,0.8189655172413793,0.6887620344444019,0.9281416973971572,,87
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Slow threshold,100.0,strict_endurance_vs_continuous,AUC,0.7636741973840666,0.6435144716394716,0.8702715780296425,,87
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Higher barrier,100.0,strict_endurance_vs_continuous,AUC,0.7922116527942925,0.6669675925925925,0.8934889713258052,,87
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Strong plastic shielding,100.0,strict_endurance_vs_continuous,AUC,0.5,0.5,0.5,,96
+C,SN_endurance_vs_strength_metric::available_anomaly_gain_frac_exact,SN_endurance_vs_strength_metric::available_anomaly_gain_frac_exact,strength_only,100.0,strict_endurance_vs_continuous,AUC,0.46116930149849283,0.4412328790915374,0.48102037372330003,,2997
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,FCC-like,300.0,strict_endurance_vs_continuous,AUC,0.918178402611711,0.9094580241346003,0.9271798012016257,,3777
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Shifted ductile,300.0,strict_endurance_vs_continuous,AUC,0.9331001488747517,0.9251633610545426,0.9411040048905867,,3777
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Steep cleavage,300.0,strict_endurance_vs_continuous,AUC,0.9223952982882506,0.9138608797964594,0.9310968350556783,,3777
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Slow threshold,300.0,strict_endurance_vs_continuous,AUC,0.9326994732688303,0.9242350690029487,0.9409984759717304,,3777
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Higher barrier,300.0,strict_endurance_vs_continuous,AUC,0.9327175255312583,0.9245561656242846,0.9408681890739858,,3777
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Strong plastic shielding,300.0,strict_endurance_vs_continuous,AUC,0.1318819314341225,0.11829608996196644,0.14548918630666605,,3777
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,FCC-like,300.0,strict_endurance_vs_continuous,AUC,0.9922360248447205,0.9784815464331754,1.0,,95
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Shifted ductile,300.0,strict_endurance_vs_continuous,AUC,0.9960070984915705,0.9862636144883485,1.0,,95
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Steep cleavage,300.0,strict_endurance_vs_continuous,AUC,0.9920141969831411,0.9773297853309482,1.0,,95
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Slow threshold,300.0,strict_endurance_vs_continuous,AUC,0.9986690328305236,0.9933510638297872,1.0,,95
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Higher barrier,300.0,strict_endurance_vs_continuous,AUC,0.9960070984915705,0.9862636144883485,1.0,,95
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Strong plastic shielding,300.0,strict_endurance_vs_continuous,AUC,0.0026619343389529724,0.0,0.00976085970620132,,95
+C,SN_endurance_vs_strength_metric::available_anomaly_gain_frac_exact,SN_endurance_vs_strength_metric::available_anomaly_gain_frac_exact,strength_only,300.0,strict_endurance_vs_continuous,AUC,0.49427136837841606,0.47722610806833216,0.5102056089149115,,3777
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,FCC-like,500.0,strict_endurance_vs_continuous,AUC,0.48535653070333123,0.47545835223839467,0.4953076228001194,,2938
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Shifted ductile,500.0,strict_endurance_vs_continuous,AUC,0.5294233002082662,0.5132163624668598,0.5449138715954133,,2938
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Steep cleavage,500.0,strict_endurance_vs_continuous,AUC,0.3753119037528109,0.35759348983691885,0.3943412432269748,,2938
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Slow threshold,500.0,strict_endurance_vs_continuous,AUC,0.42954256973865185,0.4129310707421977,0.44738758944374024,,2938
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Higher barrier,500.0,strict_endurance_vs_continuous,AUC,0.38124778646789126,0.36397704629567185,0.40057611394400994,,2938
+C,SN_endurance_vs_Kc_same_T,SN_endurance_vs_Kc_same_T,Strong plastic shielding,500.0,strict_endurance_vs_continuous,AUC,0.6047822473787225,0.5861673720649163,0.6223363882013475,,2938
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,FCC-like,500.0,strict_endurance_vs_continuous,AUC,0.6675020885547202,0.4999868697478992,0.8189845722853533,,82
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Shifted ductile,500.0,strict_endurance_vs_continuous,AUC,0.6111111111111112,0.4729592005015808,0.7470613302139038,,82
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Steep cleavage,500.0,strict_endurance_vs_continuous,AUC,0.42063492063492064,0.25997628558634994,0.589786473607038,,82
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Slow threshold,500.0,strict_endurance_vs_continuous,AUC,0.5071010860484545,0.3318194240067269,0.6837579240518615,,82
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Higher barrier,500.0,strict_endurance_vs_continuous,AUC,0.4678362573099415,0.2980025902176663,0.6501796789670774,,82
+C,SN_endurance_vs_DKth_same_T,SN_endurance_vs_DKth_same_T,Strong plastic shielding,500.0,strict_endurance_vs_continuous,AUC,0.6299081035923141,0.4914006331699346,0.7669835541263238,,82
+C,SN_endurance_vs_strength_metric::available_anomaly_gain_frac_exact,SN_endurance_vs_strength_metric::available_anomaly_gain_frac_exact,strength_only,500.0,strict_endurance_vs_continuous,AUC,0.47844345327214527,0.46183028489544503,0.4964417193683787,,2808

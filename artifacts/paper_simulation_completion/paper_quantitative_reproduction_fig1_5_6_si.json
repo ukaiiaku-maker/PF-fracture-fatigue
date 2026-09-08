@@ -1,0 +1,64 @@
+{
+  "schema": "v1_fig1_5_6_si_recompute",
+  "fig6b_pearson": {
+    "performed": true,
+    "n_pooled": 1360,
+    "pooled_r": 0.9865,
+    "per_context": {
+      "ctx_FCC_like_case29": {
+        "n": 225,
+        "r": 0.9983
+      },
+      "ctx_higher_barrier_case171": {
+        "n": 226,
+        "r": 0.9577
+      },
+      "ctx_plastic_shielded_case64_M1": {
+        "n": 184,
+        "r": 0.9856
+      },
+      "ctx_shifted_ductile_case64": {
+        "n": 245,
+        "r": 0.9987
+      },
+      "ctx_slow_threshold_case101": {
+        "n": 221,
+        "r": 0.9795
+      },
+      "ctx_steep_cleavage_case35": {
+        "n": 259,
+        "r": 0.9904
+      }
+    },
+    "context_r_min": 0.958,
+    "context_r_max": 0.999,
+    "manuscript_claim": "1360 matched observations; pooled log-space Pearson coefficient; context-specific values 0.958 to 0.999",
+    "match": true
+  },
+  "si_identifiability": {
+    "n_conditions_per_regime": 75,
+    "sparse_acquisition_median_percent_by_regime": {
+      "ceramic": 31.9,
+      "peak": 54.4,
+      "weakT": 36.7,
+      "dbtt": 23.4
+    },
+    "complete_acquisition_median_percent_by_regime": {
+      "ceramic": 9.4,
+      "peak": 3.4,
+      "weakT": 1.2,
+      "dbtt": 2.5
+    },
+    "sparse_range": [
+      23.4,
+      54.4
+    ],
+    "complete_range": [
+      1.2,
+      9.4
+    ],
+    "manuscript_claim": "75-condition dataset per hidden class; emission-landscape error ~20-55% (sparse) down to ~1-10% (complete 75-condition dataset)",
+    "match": true,
+    "method": "100 * RMSE(G_fit - G_true) / RMS(G_true), median over 3 noise realizations per (acquisition, regime) cell; RMS(G_true) computed from scratch from each regime's truth_barrier_grid.csv G_emit_eV column; RMSE(G_fit-G_true) read directly from inversion_summary.csv's rmse_G_emit_eV column (a raw per-fit output, not a pre-aggregated percentage)"
+  }
+}

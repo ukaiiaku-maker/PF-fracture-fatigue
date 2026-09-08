@@ -1,0 +1,37 @@
+analysis_family,context_id,cramers_V,chi2_p,n,n_row_classes,n_column_classes,context_label,association_label
+strength_vs_fracture_class,ctx_FCC_like_case29,0.7944603484579736,0.0,3840,6,2,FCC-like,Strength ↔ fracture
+fracture_vs_fatigue_temperature_phenotype,ctx_FCC_like_case29,0.1416426479533441,1.8657783650976086e-17,3840,2,3,FCC-like,Fracture ↔ S-N
+strength_vs_fatigue_temperature_phenotype,ctx_FCC_like_case29,0.1743504670200381,1.6177071285714512e-44,3840,6,3,FCC-like,Strength ↔ S-N
+fracture_vs_growth_threshold_class,ctx_FCC_like_case29,0.6703675950928767,9.670450485048566e-09,96,2,5,FCC-like,Fracture ↔ ΔKth
+strength_vs_growth_threshold_class,ctx_FCC_like_case29,0.3479692818089279,0.0006888535712937,96,6,5,FCC-like,Strength ↔ ΔKth
+growth_threshold_vs_SN_temperature_phenotype,ctx_FCC_like_case29,0.2212653007891958,0.3096835741561239,96,5,3,FCC-like,ΔKth ↔ S-N
+strength_vs_fracture_class,ctx_shifted_ductile_case64,0.3502784901315587,1.344742778147148e-99,3840,6,2,Shifted ductile,Strength ↔ fracture
+fracture_vs_fatigue_temperature_phenotype,ctx_shifted_ductile_case64,0.1160667249580602,5.846075622349707e-12,3840,2,3,Shifted ductile,Fracture ↔ S-N
+strength_vs_fatigue_temperature_phenotype,ctx_shifted_ductile_case64,0.1743504670200381,1.6177071285714512e-44,3840,6,3,Shifted ductile,Strength ↔ S-N
+fracture_vs_growth_threshold_class,ctx_shifted_ductile_case64,0.0909090909090909,0.3730775013741216,96,2,2,Shifted ductile,Fracture ↔ ΔKth
+strength_vs_growth_threshold_class,ctx_shifted_ductile_case64,0.6030226891555273,1.5688306413074852e-06,96,6,2,Shifted ductile,Strength ↔ ΔKth
+growth_threshold_vs_SN_temperature_phenotype,ctx_shifted_ductile_case64,0.2820380374088831,0.0219677058894354,96,2,3,Shifted ductile,ΔKth ↔ S-N
+strength_vs_fracture_class,ctx_steep_cleavage_case35,0.8102695146373853,0.0,3840,6,2,Steep cleavage,Strength ↔ fracture
+fracture_vs_fatigue_temperature_phenotype,ctx_steep_cleavage_case35,0.1458418002505369,1.837593305434075e-18,3840,2,3,Steep cleavage,Fracture ↔ S-N
+strength_vs_fatigue_temperature_phenotype,ctx_steep_cleavage_case35,0.1743504670200381,1.6177071285714512e-44,3840,6,3,Steep cleavage,Strength ↔ S-N
+fracture_vs_growth_threshold_class,ctx_steep_cleavage_case35,0.7057037421623767,1.0340420897416296e-09,96,2,5,Steep cleavage,Fracture ↔ ΔKth
+strength_vs_growth_threshold_class,ctx_steep_cleavage_case35,0.357702303530377,0.0002943650044666,96,6,5,Steep cleavage,Strength ↔ ΔKth
+growth_threshold_vs_SN_temperature_phenotype,ctx_steep_cleavage_case35,0.2187442021495106,0.3267663590580963,96,5,3,Steep cleavage,ΔKth ↔ S-N
+strength_vs_fracture_class,ctx_slow_threshold_case101,0.5773551281357427,0.0,3840,6,3,Slow threshold,Strength ↔ fracture
+fracture_vs_fatigue_temperature_phenotype,ctx_slow_threshold_case101,0.1034720084059643,5.879696223316424e-17,3840,3,3,Slow threshold,Fracture ↔ S-N
+strength_vs_fatigue_temperature_phenotype,ctx_slow_threshold_case101,0.1743504670200381,1.6177071285714512e-44,3840,6,3,Slow threshold,Strength ↔ S-N
+fracture_vs_growth_threshold_class,ctx_slow_threshold_case101,0.7057037421623767,1.0340420897416296e-09,96,2,5,Slow threshold,Fracture ↔ ΔKth
+strength_vs_growth_threshold_class,ctx_slow_threshold_case101,0.357702303530377,0.0002943650044666,96,6,5,Slow threshold,Strength ↔ ΔKth
+growth_threshold_vs_SN_temperature_phenotype,ctx_slow_threshold_case101,0.2187442021495106,0.3267663590580963,96,5,3,Slow threshold,ΔKth ↔ S-N
+strength_vs_fracture_class,ctx_higher_barrier_case171,0.8111221058853778,0.0,3840,6,2,Higher barrier,Strength ↔ fracture
+fracture_vs_fatigue_temperature_phenotype,ctx_higher_barrier_case171,0.1443635511747451,4.1876036578112795e-18,3840,2,3,Higher barrier,Fracture ↔ S-N
+strength_vs_fatigue_temperature_phenotype,ctx_higher_barrier_case171,0.1743504670200381,1.6177071285714512e-44,3840,6,3,Higher barrier,Strength ↔ S-N
+fracture_vs_growth_threshold_class,ctx_higher_barrier_case171,0.7057037421623767,1.0340420897416296e-09,96,2,5,Higher barrier,Fracture ↔ ΔKth
+strength_vs_growth_threshold_class,ctx_higher_barrier_case171,0.3561457943593141,0.0003383091527097,96,6,5,Higher barrier,Strength ↔ ΔKth
+growth_threshold_vs_SN_temperature_phenotype,ctx_higher_barrier_case171,0.2498646819927924,0.1517842726791796,96,5,3,Higher barrier,ΔKth ↔ S-N
+strength_vs_fracture_class,ctx_plastic_shielded_case64_M1,0.068651925910556,7.787479377712935e-05,3840,6,3,Strong plastic shielding,Strength ↔ fracture
+fracture_vs_fatigue_temperature_phenotype,ctx_plastic_shielded_case64_M1,0.0510012091444986,0.0005047328417164,3840,3,3,Strong plastic shielding,Fracture ↔ S-N
+strength_vs_fatigue_temperature_phenotype,ctx_plastic_shielded_case64_M1,0.1743504670200381,1.6177071285714512e-44,3840,6,3,Strong plastic shielding,Strength ↔ S-N
+fracture_vs_growth_threshold_class,ctx_plastic_shielded_case64_M1,0.3402785236893602,0.000855958821469,96,2,2,Strong plastic shielding,Fracture ↔ ΔKth
+strength_vs_growth_threshold_class,ctx_plastic_shielded_case64_M1,0.6030226891555273,1.5688306413074852e-06,96,6,2,Strong plastic shielding,Strength ↔ ΔKth
+growth_threshold_vs_SN_temperature_phenotype,ctx_plastic_shielded_case64_M1,0.2820380374088831,0.0219677058894354,96,2,3,Strong plastic shielding,ΔKth ↔ S-N

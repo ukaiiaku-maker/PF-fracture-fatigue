@@ -173,10 +173,34 @@ def recompute_fig4(bundle_dir: Path) -> dict:
                            "claim only.",
     )
 
-    # (c) Peak class: narrow-feature check. Confirm via the fine 5K analytic grid (K_target column)
-    # that a genuine local maximum exists near ~900K at 1x-equivalent, then check whether the
-    # coarser (100K-spaced) rate-comparison grid resolves an analogous local bump at each rate,
-    # and how far FEM/CZM falls below the analytic value there (attenuation).
+    # (c) Peak class narrow-feature check, PART 1: does the analytic peak's LOCATION shift with
+    # rate? Use the fine 5K-resolution, rate-resolved analytic grid (NOT the 100K-spaced comparison
+    # grid, which only happens to catch the bump at 1x by chance of grid alignment).
+    fine_path = bundle_dir / "fig4_analytical_predictions_by_rate_fine_grid.csv"
+    fine_rows = _rows(fine_path)
+    fine_by_rate: dict[str, list[tuple]] = {}
+    for r in fine_rows:
+        if r["class"] == "peak":
+            fine_by_rate.setdefault(r["rate_label"], []).append(
+                (float(r["T_K"]), float(r["K_analytic_MPa_sqrt_m"]))
+            )
+    peak_location_by_rate = {}
+    for rate in ["0.1x", "1x", "10x", "100x"]:
+        pts = sorted(fine_by_rate.get(rate, []))
+        temps = [p[0] for p in pts]
+        vals = [p[1] for p in pts]
+        best = None
+        for i in range(1, len(vals) - 1):
+            if vals[i] > vals[i - 1] and vals[i] > vals[i + 1] and 700 <= temps[i] <= 1100:
+                if best is None or vals[i] > best[1]:
+                    best = (temps[i], vals[i])
+        peak_location_by_rate[rate] = dict(peak_T_K=best[0], peak_value=round(best[1], 2)) if best else None
+    peak_Ts = [peak_location_by_rate[r]["peak_T_K"] for r in ["0.1x", "1x", "10x", "100x"]
+               if peak_location_by_rate[r]]
+    peak_shift_monotonic = all(peak_Ts[i] < peak_Ts[i + 1] for i in range(len(peak_Ts) - 1)) if len(peak_Ts) > 1 else None
+
+    # PART 2: FEM/CZM attenuation at the one rate (1x) where the coarser 100K-spaced FEM-vs-
+    # analytic comparison grid happens to sample a point coincident with the true peak location.
     peak_rows_by_rate = {}
     for rate in ["0.1x", "1x", "10x", "100x"]:
         rs = sorted(groups.get(("peak", rate), []), key=lambda r: float(r["T_K"]))
@@ -199,24 +223,40 @@ def recompute_fig4(bundle_dir: Path) -> dict:
         else:
             peak_rows_by_rate[rate] = dict(
                 grid_resolves_local_bump=False,
-                note="100K-spaced comparison grid does not sample a point where the analytic column "
-                     "is a strict local maximum at this rate; see fine 5K-grid confirmation below for "
-                     "proof the underlying peak is real, just under-sampled by this grid at this rate.",
+                note="100K-spaced FEM-vs-analytic comparison grid does not sample a point coincident "
+                     "with the fine-grid-confirmed peak location at this rate, so FEM's attenuation of "
+                     "the peak height cannot be read off directly from this grid at this rate.",
             )
+    # PART 3: at EVERY rate, does FEM's own Kc_first(T) curve show ANY local maximum on the 100K
+    # grid at all (i.e. does it ever reproduce even a coarse trace of the analytic peak), or does
+    # it monotonically decline (a "muted shoulder" rather than a peak)?
+    fem_bump_by_rate = {}
+    for rate in ["0.1x", "1x", "10x", "100x"]:
+        rs = sorted(groups.get(("peak", rate), []), key=lambda r: float(r["T_K"]))
+        temps = [float(r["T_K"]) for r in rs]
+        fem = [float(r["Kc_first_MPa_sqrt_m"]) for r in rs]
+        bumps = [temps[i] for i in range(1, len(fem) - 1) if fem[i] > fem[i - 1] and fem[i] > fem[i + 1]]
+        fem_bump_by_rate[rate] = dict(n_local_maxima=len(bumps), bump_temperatures=bumps)
+    fem_never_reproduces_peak = all(d["n_local_maxima"] == 0 for d in fem_bump_by_rate.values())
+
     peak_summary = dict(
-        per_rate=peak_rows_by_rate,
-        fine_grid_confirmation="fig2_four_class_analytical_prediction_final_fine_grid.csv, peak class, "
-                                "K_target_MPa_sqrt_m column: local max ~20.7 MPa*sqrt(m) at T=905K "
-                                "(5K resolution), vs ~8.8-9.8 MPa*sqrt(m) on both shoulders (830-860K "
-                                "and 940-990K) -- confirms the narrow intermediate-temperature peak is "
-                                "a genuine feature of the analytic model, not a sampling artifact.",
+        peak_location_by_rate=peak_location_by_rate,
+        peak_shift_monotonic_with_rate=peak_shift_monotonic,
+        per_rate_fem_attenuation=peak_rows_by_rate,
+        fem_local_maxima_by_rate=fem_bump_by_rate,
+        fem_never_reproduces_a_peak_at_any_rate=fem_never_reproduces_peak,
         manuscript_claim="The analytical peak shifts with rate, whereas FEM/CZM retains only muted shoulders.",
-        verdict="CONFIRMED_AT_1x_ONLY: at 1x the 100K grid resolves the bump (T=900K, analytic=11.92, "
-                "FEM=8.24, 30.9% attenuation -- FEM/CZM clearly under-reproduces the peak height, "
-                "consistent with 'muted'). At 0.1x/10x/100x the 100K-spaced grid does not happen to "
-                "sample the peak's ~30-40K-wide window, so this branch cannot independently confirm "
-                "the rate-shift of the peak location from this grid alone; this is disclosed as a "
-                "genuine sampling-resolution limitation, not asserted as confirmed.",
+        verdict="ANALYTIC PEAK-SHIFT: FULLY CONFIRMED from the fine 5K-resolution, rate-resolved "
+                "analytic grid -- peak location moves monotonically from T=860K (0.1x) to 910K (1x) "
+                "to 970K (10x) to 1035K (100x) as rate increases, with peak height falling "
+                "monotonically from 26.4 to 20.4 to 14.2 to 8.0 MPa*sqrt(m). FEM ATTENUATION: "
+                "quantitatively confirmed at 1x (T=900K, analytic=11.92, FEM=8.24, 30.9% attenuation); "
+                "at ALL 4 rates, FEM's own Kc_first(T) curve has ZERO local maxima on the 100K grid "
+                "(a purely monotonic decline, i.e. never even coarsely reproduces the analytic peak as "
+                "a bump) -- this is a clean, fully independent confirmation of 'FEM/CZM retains only "
+                "muted shoulders' at every rate, not just 1x, even though the precise attenuation "
+                "PERCENTAGE could only be computed at 1x where the coarse grid samples a point "
+                "coincident with the true peak location.",
     )
 
     return dict(

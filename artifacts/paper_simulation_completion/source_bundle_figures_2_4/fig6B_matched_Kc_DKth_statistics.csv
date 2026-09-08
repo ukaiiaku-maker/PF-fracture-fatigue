@@ -1,0 +1,8 @@
+analysis_family,context_id,context_label,effect_metric,effect_value,p_value,spearman_rho,spearman_p,n
+matched_Kc_vs_DKth,ctx_FCC_like_case29,FCC-like,Pearson_r_log10,0.9983177942098503,8.662547937302173e-278,0.9635690529436357,1.0516583727819113e-129,225
+matched_Kc_vs_DKth,ctx_shifted_ductile_case64,Shifted ductile,Pearson_r_log10,0.9987454527442478,5.217225e-318,0.9832831796591739,9.148855959668954e-182,245
+matched_Kc_vs_DKth,ctx_steep_cleavage_case35,Steep cleavage,Pearson_r_log10,0.9904018051290919,6.698122390776956e-223,0.9785128867806137,2.9535127761902114e-178,259
+matched_Kc_vs_DKth,ctx_slow_threshold_case101,Slow threshold,Pearson_r_log10,0.9794700505508651,2.6225823983605666e-154,0.9604675108110825,1.34411629497657e-123,221
+matched_Kc_vs_DKth,ctx_higher_barrier_case171,Higher barrier,Pearson_r_log10,0.9576588312673979,4.139331055563981e-123,0.9592170700935749,6.777622434856579e-125,226
+matched_Kc_vs_DKth,ctx_plastic_shielded_case64_M1,Strong plastic shielding,Pearson_r_log10,0.9855864294159365,2.1559452329457985e-142,0.9245673650448877,3.4449054829845873e-78,184
+matched_Kc_vs_DKth,pooled,All contexts,Pearson_r_log10,0.9864679341131591,0.0,0.9879413734506168,0.0,1360

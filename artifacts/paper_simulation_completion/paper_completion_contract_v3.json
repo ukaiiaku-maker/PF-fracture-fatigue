@@ -1,0 +1,19 @@
+{
+  "schema": "v3_paper_completion_contract",
+  "supersedes": "paper_completion_contract_v2.json",
+  "trigger": "Third review: correct Fig.2-4 overstatements with real recomputation (not rewording), build a portable source bundle, perform exhaustive Fig.1/5/6/SI forensics across additional filesystem locations, rebuild the claim matrix at true claim granularity with a full required field set, and replace the keyword-scanning verifier with a structured-boolean-field verifier.",
+  "headline_finding": "All 35 claim-level rows in paper_claim_evidence_matrix_v3.csv are QUALIFIED_SOURCE_RESULT_VERIFIED. Figures 2, 3, 4, and 7 trace to /Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM/ (already known from the prior pass, now with genuine raw-seed-level Fig.3 recomputation, a real non-reworded Fig.4 DBTT-shift and peak-attenuation recomputation, and a portable source bundle). Figures 1, 5, 6, and the SI synthetic-identifiability study -- previously MANUSCRIPT_RESULT_NOT_SOURCE_TRACED -- were located this round in two previously-unexamined directories, /Volumes/Data/Data/Nanopillar_calculation/Fatigue-PF/ and /Volumes/Data/Data/Nanopillar_calculation/Fatigue_modelfitting_identifyability/, with every numerically load-bearing claim (Fig.6B's 1360-observation/0.958-0.999 Pearson result; the SI's 75-condition/20-55%/1-10% recovery-error ranges; Fig.5A's complete 6-case atlas; Fig.5C/D's blunt-notch shielded-vs-unshielded contrast) independently re-derived from raw data in this session, not merely re-read from a sub-agent's report.",
+  "verifier_classification": "PAPER_SIMULATION_EVIDENCE_COMPLETE",
+  "n_claim_rows": 35,
+  "n_qualified_source_result_verified": 35,
+  "n_structural_failures": 0,
+  "n_unresolved_manuscript_critical_rows": 0,
+  "terminal_condition_met": "A: PAPER_SIMULATION_EVIDENCE_COMPLETE -- every retained claim is source-qualified",
+  "ruled_out_false_leads": [
+    "codex/v10.2.30-inverse-fatigue-barrier-design (commit 5034046) directly inspected via git show and confirmed NOT the SI-identifiability source -- it is a different, unrelated inverse-EXP-floor-barrier-design tool.",
+    "The Arrhenius_FEM_CZM_MPZ_* repositories (\u03b8=0\u00b0 PF/FEM parity investigation) confirmed separate from and not contradicting the manuscript's \u03b8=45\u00b0 comparison.",
+    "The sparse 3-case 'smoke' six-system fatigue run in Arrhenius_FEM_CZM is NOT the Fig.5A source -- a complete 6-case, multi-point atlas exists in Fatigue-PF instead."
+  ],
+  "physical_simulations_launched_this_session": 0,
+  "rerun_policy": "No completed campaign was rerun this round. No replacement trajectory was authorized for any of the 7 temperature-fatigue numerical exclusions (search for the raw 36-row registry continued in additional locations this round with no new hits; the zero-replacements decision from the prior pass stands unchanged). No physical simulation was found to be genuinely missing after exhaustive forensics -- every manuscript-critical figure/panel traced to real, independently-verifiable source data."
+}
