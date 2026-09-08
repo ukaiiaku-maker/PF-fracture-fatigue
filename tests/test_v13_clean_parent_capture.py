@@ -9,8 +9,9 @@ def test_canonical_parent_body_unchanged_except_default_off_capture():
     new = ast.parse(Path(path).read_text())
     before = next(n for n in old.body if isinstance(n, ast.FunctionDef) and n.name == "run_2d")
     after = next(n for n in new.body if isinstance(n, ast.FunctionDef) and n.name == "run_2d")
-    assert len(after.args.kwonlyargs) == 1 and after.args.kwonlyargs[0].arg == "parent_capture"
+    assert [a.arg for a in after.args.kwonlyargs] == ["parent_capture", "inherited_primary_race"]
     assert isinstance(after.args.kw_defaults[0], ast.Constant) and after.args.kw_defaults[0].value is None
+    assert isinstance(after.args.kw_defaults[1], ast.Constant) and after.args.kw_defaults[1].value is False
     after.args = before.args
     class RemoveCapture(ast.NodeTransformer):
         def visit_Assign(self, node):
@@ -21,7 +22,7 @@ def test_canonical_parent_body_unchanged_except_default_off_capture():
                 return None
             return self.generic_visit(node)
         def visit_If(self, node):
-            if any(isinstance(n, ast.Name) and n.id == "parent_capture" for n in ast.walk(node.test)):
+            if any(isinstance(n, ast.Name) and n.id in ("parent_capture", "inherited_primary_race") for n in ast.walk(node.test)):
                 return None
             return self.generic_visit(node)
     after = RemoveCapture().visit(after)

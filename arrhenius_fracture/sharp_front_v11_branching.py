@@ -547,7 +547,7 @@ def _realized_trial_network(state, proposal, candidates, da_phys, cluster):
     return network, trial_cluster, tuple(arms)
 
 
-def run_2d(args, *, parent_capture=None):
+def run_2d(args, *, parent_capture=None, inherited_primary_race=False):
     from . import sharp_front as base
     from .fem import assemble_mechanics, plane_strain_D, solve_dirichlet
     from .mesh import make_boundary_data, make_tri_mesh
@@ -1435,6 +1435,35 @@ def run_2d(args, *, parent_capture=None):
         ):
             termination = "v13_first_baseline_cleavage_captured"
             break
+        if inherited_primary_race and cluster is None and selected is not None:
+            from .primary_race_production_v13 import evaluate_production_mark
+            if selected.proposal.action_type != "one_arm" or maximum_fronts != 1:
+                raise RuntimeError("V13 requires the unchanged branch-disabled canonical parent")
+            marked = evaluate_production_mark(
+                checkpoint=checkpoint, selected=selected,
+                solved_pre_event=latest_interval_pre_event_state, engine=engine,
+                args=args, cfg=cfg, context=context,
+                accepted_live=trial_live_results[selected.proposal.action_id],
+            )
+            with (out / "v13_primary_race.jsonl").open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps(marked.record, sort_keys=True, allow_nan=False) + "\n")
+            if marked.state is not state:
+                # Mark bookkeeping is separate from untouched baseline counters.
+                write_branch_checkpoint(checkpoint, out / "v13_branch/canonical_single.json")
+                state, cluster, runtime = marked.state, marked.cluster, marked.runtime
+                maximum_fronts = 2
+                growth = crack_growth_metrics(state.crack_network, initial_crack_length_m=cfg.geometry.a0)
+                checkpoint = replace(checkpoint, state=state, provider_runtime=runtime,
+                    topology_fingerprint=runtime.routing.topology_fingerprint,
+                    front_competitions={tip:state.competition for tip in state.crack_network.active_tip_ids},
+                    branch_clusters=(cluster,), projected_extension_m=growth.max_forward_projected_extension_m,
+                    physical_extension_m=state.crack_network.total_physical_crack_length_m-cfg.geometry.a0)
+                write_branch_checkpoint(checkpoint, out / "v13_branch/accepted_pair.json")
+                write_branch_checkpoint(checkpoint, checkpoint_path)
+                write_topology_snapshot(out, state, step=step, reason="v13_conditional_branch_birth",
+                    physical_extension_m=checkpoint.physical_extension_m, branch_birth_count=1)
+                adaptation_required = True
+                continue
         daughter_stop_m = float(
             os.environ.get("PF_QUALIFIED_DAUGHTER_STOP_UM", "inf")
         ) * 1.0e-6
@@ -1530,7 +1559,15 @@ def main(argv=None, *, audit_already_written=False):
     os.environ["PF_CURRENT_SOURCE_MAX_BRANCH_BIRTHS"] = str(max(maximum_fronts - 1, 0))
     if restart:
         os.environ["V11_BRANCH_RESTART_CHECKPOINT"] = restart
-    base.run_2d = run_2d
+    inherited_primary_race = "--v13-inherited-primary-race" in args
+    if inherited_primary_race:
+        if maximum_fronts != 1 or restart:
+            raise ValueError("V13 short gate requires a fresh canonical single-front parent")
+        from functools import partial
+        args.remove("--v13-inherited-primary-race")
+        base.run_2d = partial(run_2d, inherited_primary_race=True)
+    else:
+        base.run_2d = run_2d
     # The v10 wrapper's post-run report is specific to its stochastic-avalanche
     # geometry backend, which this audited adapter intentionally never builds.
     avalanche_entry._write_geometry_diagnostics = lambda _args: None
