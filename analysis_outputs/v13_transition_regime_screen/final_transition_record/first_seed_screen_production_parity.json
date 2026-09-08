@@ -1,0 +1,120 @@
+{
+  "rows": [
+    {
+      "case": "theta15_rate1x_Peak_300K_seed3621",
+      "checks": {
+        "accepted_opening_m": true,
+        "accepted_time_s": true,
+        "competition": true,
+        "crack_network": true,
+        "damage": true,
+        "displacement": true,
+        "ep_gp": true,
+        "parent_competition_sha256": true,
+        "parent_engine_rng_sha256": true,
+        "parent_event_id": true,
+        "parent_forward_extension_um": true,
+        "rho_gp": true,
+        "rng_state": true,
+        "shared_process_physical_values": true
+      },
+      "process_fingerprint_comparison": {
+        "excluded_observer_field": "engine_fields/_anisotropic_drive/mechanics_serial",
+        "observer_serials": [
+          2857,
+          2855
+        ],
+        "physical_values_equal": true,
+        "raw_equal": false,
+        "raw_hashes": [
+          "42e952ea4c4c656ade9136e19d3365d47cb55e5237fe38767bc40f6dcf9722a2",
+          "b98f1f421a68cf60f7befaa5e17e248509edf89937c2db6e1b02261670d6f9ca"
+        ]
+      }
+    },
+    {
+      "case": "theta15_rate1x_Peak_1000K_seed3621",
+      "checks": {
+        "accepted_opening_m": true,
+        "accepted_time_s": true,
+        "competition": true,
+        "crack_network": true,
+        "damage": true,
+        "displacement": true,
+        "ep_gp": true,
+        "parent_competition_sha256": true,
+        "parent_engine_rng_sha256": true,
+        "parent_event_id": true,
+        "parent_forward_extension_um": true,
+        "rho_gp": true,
+        "rng_state": true,
+        "shared_process_physical_values": true
+      },
+      "process_fingerprint_comparison": {
+        "excluded_observer_field": "engine_fields/_anisotropic_drive/mechanics_serial",
+        "observer_serials": [
+          5440,
+          5438
+        ],
+        "physical_values_equal": true,
+        "raw_equal": false,
+        "raw_hashes": [
+          "c0840adc50b152168739606da336b182a80f0d731f6e00f482ed0a564e398563",
+          "bf3f48c2b870829d269c42f8e6f6959782a36339531b4aa9c2784fd1ff78c6aa"
+        ]
+      }
+    },
+    {
+      "case": "theta15_rate1x_weakT_300K_seed3621",
+      "checks": {
+        "competition": true,
+        "crack_network": true,
+        "damage": true,
+        "displacement": true,
+        "ep_gp": true,
+        "rho_gp": true,
+        "rng_state": true,
+        "shared_process_physical_values": true
+      },
+      "process_fingerprint_comparison": {
+        "excluded_observer_field": "engine_fields/_anisotropic_drive/mechanics_serial",
+        "observer_serials": [
+          5915,
+          5910
+        ],
+        "physical_values_equal": true,
+        "raw_equal": false,
+        "raw_hashes": [
+          "c6d1ea916672571768e0fef51326390354e204f7fa52cf4e4ec2abaaf6859b0e",
+          "e6557c5d8c11179ffa78d0d411de5945c2312d7abe6d6ea57ee7106e5de2e7b9"
+        ]
+      }
+    },
+    {
+      "case": "theta15_rate1x_weakT_1000K_seed3621",
+      "checks": {
+        "competition": true,
+        "crack_network": true,
+        "damage": true,
+        "displacement": true,
+        "ep_gp": true,
+        "rho_gp": true,
+        "rng_state": true,
+        "shared_process_physical_values": true
+      },
+      "process_fingerprint_comparison": {
+        "excluded_observer_field": "engine_fields/_anisotropic_drive/mechanics_serial",
+        "observer_serials": [
+          6023,
+          6018
+        ],
+        "physical_values_equal": true,
+        "raw_equal": false,
+        "raw_hashes": [
+          "b0b6b4b5ec901c5d4cd1f9786924a8e268153602b0ef8db473250c747d925e7d",
+          "c756481d4af32d9937418d8ccf71e6859fc5f6b95a20efc1ab86c1d2c3d3a834"
+        ]
+      }
+    }
+  ]
+}

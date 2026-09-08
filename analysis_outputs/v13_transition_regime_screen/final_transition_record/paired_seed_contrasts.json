@@ -1,0 +1,52 @@
+{
+  "rows": [
+    {
+      "a": "Peak_300K",
+      "b": "Peak_1000K",
+      "paired_counts": {
+        "both_branch": 8
+      }
+    },
+    {
+      "a": "Peak_300K",
+      "b": "weakT_300K",
+      "paired_counts": {
+        "a_only": 4,
+        "both_branch": 4
+      }
+    },
+    {
+      "a": "Peak_300K",
+      "b": "weakT_1000K",
+      "paired_counts": {
+        "a_only": 2,
+        "both_branch": 6
+      }
+    },
+    {
+      "a": "Peak_1000K",
+      "b": "weakT_300K",
+      "paired_counts": {
+        "a_only": 4,
+        "both_branch": 4
+      }
+    },
+    {
+      "a": "Peak_1000K",
+      "b": "weakT_1000K",
+      "paired_counts": {
+        "a_only": 2,
+        "both_branch": 6
+      }
+    },
+    {
+      "a": "weakT_300K",
+      "b": "weakT_1000K",
+      "paired_counts": {
+        "b_only": 2,
+        "both_branch": 4,
+        "neither": 2
+      }
+    }
+  ]
+}
