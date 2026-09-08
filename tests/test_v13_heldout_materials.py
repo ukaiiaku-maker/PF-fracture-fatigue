@@ -3,6 +3,26 @@ import pytest
 from scripts import run_v13_heldout_materials as heldout
 
 
+def test_storage_continuation_never_relaunches_or_accepts_changed_history(monkeypatch,tmp_path):
+    monkeypatch.setattr(heldout,'OUT',tmp_path)
+    dest=tmp_path/'ensemble';dest.mkdir();monkeypatch.setattr(heldout,'DEST',dest)
+    (dest/'done').mkdir();terminal=dest/'done/terminal.json';terminal.write_text('{}')
+    record={'completed_cases':[{'case':'done','terminal_sha256':heldout.sha256(terminal)}],
+            'unlaunched_cases':['next']}
+    (tmp_path/'HELDOUT_QUEUE_PAUSE.json').write_text(json.dumps(record))
+    (dest/'queue_status.json').write_text(json.dumps(dict(active={},pending=[],paused=True)))
+    (dest/'queue_pause.json').write_text(json.dumps(dict(reason='less than 1 GiB free',pending=['next'])))
+    plan={'cases':['done','next']}
+    assert heldout.continuation_pending(plan)==['next']
+    terminal.write_text('{"changed":true}')
+    with pytest.raises(RuntimeError,match='terminal changed'):heldout.continuation_pending(plan)
+    terminal.write_text('{}');(dest/'next').mkdir()
+    with pytest.raises(RuntimeError,match='relaunch'):heldout.continuation_pending(plan)
+    (dest/'next').rmdir()
+    (dest/'queue_status.json').write_text(json.dumps(dict(active={'next':123},pending=[],paused=True)))
+    with pytest.raises(RuntimeError,match='drained'):heldout.continuation_pending(plan)
+
+
 def test_only_heldout_classes_and_identical_conditions():
     base=json.loads((heldout.ACCEPTED/'transition_ensemble_plan.json').read_text())
     p=heldout.build_plan(base)

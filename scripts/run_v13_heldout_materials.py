@@ -103,7 +103,45 @@ def queue():
     atomic_json(DEST/'queue_claim.json',dict(pid=os.getpid(),maximum_workers=2,
         launcher_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
         frozen_physics_commit=PHYSICS))
-    pending=list(p['cases']);active={};paused=False
+    run_pending(list(p['cases']))
+
+
+def continuation_pending(p):
+    status=json.loads((DEST/'queue_status.json').read_text())
+    pause=json.loads((DEST/'queue_pause.json').read_text())
+    record=json.loads((OUT/'HELDOUT_QUEUE_PAUSE.json').read_text())
+    if status!={'active':{},'pending':[],'paused':True} or pause.get('reason')!='less than 1 GiB free':
+        raise RuntimeError('not a drained storage pause')
+    pending=record['unlaunched_cases']
+    completed=record['completed_cases']
+    if pause['pending']!=pending or [r['case'] for r in completed]+pending!=p['cases']:
+        raise RuntimeError('pause history does not partition the preregistered queue')
+    for row in completed:
+        if sha256(DEST/row['case']/'terminal.json')!=row['terminal_sha256']:
+            raise RuntimeError('completed terminal changed: '+row['case'])
+    for case in pending:
+        if (DEST/case).exists():raise RuntimeError('refusing to relaunch existing path: '+case)
+    return list(pending)
+
+
+def continue_queue():
+    p=verify_source();accepted=verify_accepted()
+    pending=continuation_pending(p)
+    for name,h in p['family']['files'].items():
+        if sha256(Path(name))!=h:raise RuntimeError('family changed: '+name)
+    if sha256(Path(p['source_gate']))!=p['source_gate_sha256']:raise RuntimeError('source gate changed')
+    if shutil.disk_usage(DEST).free<1024**3:raise RuntimeError('less than 1 GiB free')
+    claim=dict(pid=os.getpid(),maximum_workers=2,pending=pending,accepted_verification=accepted,
+        launcher_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+        frozen_physics_commit=PHYSICS,pause_record_sha256=sha256(OUT/'HELDOUT_QUEUE_PAUSE.json'),
+        original_queue_pause=json.loads((DEST/'queue_pause.json').read_text()))
+    # Exclusive claim prevents two continuations; original claim and pause record remain intact.
+    with (DEST/'continuation_claim.json').open('x') as f:json.dump(claim,f,indent=2)
+    run_pending(pending)
+
+
+def run_pending(pending):
+    active={};paused=False
     while pending or active:
         while pending and len(active)<2 and not paused:
             if shutil.disk_usage(DEST).free<1024**3:
@@ -123,6 +161,6 @@ def queue():
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--prepare',action='store_true');parser.add_argument('--queue',action='store_true');parser.add_argument('--case')
+    parser=argparse.ArgumentParser();parser.add_argument('--prepare',action='store_true');parser.add_argument('--queue',action='store_true');parser.add_argument('--continue-queue',action='store_true');parser.add_argument('--case')
     args=parser.parse_args()
-    prepare() if args.prepare else queue() if args.queue else worker(args.case) if args.case else print(verify_accepted())
+    prepare() if args.prepare else queue() if args.queue else continue_queue() if args.continue_queue else worker(args.case) if args.case else print(verify_accepted())
