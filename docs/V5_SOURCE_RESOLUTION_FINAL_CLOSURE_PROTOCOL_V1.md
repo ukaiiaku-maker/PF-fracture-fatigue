@@ -108,6 +108,14 @@ multifront production, calibration, fatigue or experimental-validation claims.
 
 ## Final evidence publication identity
 
+The final scheduling registry uses 35 physical A/B jobs with at most eight
+workers. Each of the 11 common-terminal restart positions owns a separate job,
+after single-side multi-case development shards exceeded 160 minutes. Each job
+still generates A and B independently and sequentially on the same worker.
+The registered 45 transitions, 11 restarts, 12 controlled histories, 39 rollback
+attempts, 160 natural peers and 96 static solves are unchanged. Repeated source
+preparation is execution overhead, not an extra registered restart case.
+
 Freeze publication tooling before the one full A/B generation. The completed
 CI bundle may be stored as deterministic gzip/tar parts no larger than 80 MiB.
 No JSON, checkpoint, original inventory or failed scientific result is edited

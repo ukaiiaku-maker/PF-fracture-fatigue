@@ -9,7 +9,10 @@ from pathlib import Path
 def matrix():
     rows=[]
     for index in range(8):rows.append({'id':'static-'+str(index),'phase':'static','section':'all','index':index,'count':8})
-    for section,count in (('transitions',3),('restarts',4),('controlled',4),('natural',4),('neutrality',1),('rollback',1)):
+    # Measured three-case development restart shards approach the six-hour
+    # limit once both peers are included. Keep A/B on one worker, but give
+    # each registered restart position its own shard; no case is shortened.
+    for section,count in (('transitions',3),('restarts',11),('controlled',4),('natural',4),('neutrality',1),('rollback',1)):
         for index in range(count):rows.append({'id':section+'-'+str(index),'phase':'lifecycle','section':section,'index':index,'count':count})
     for phase in ('source','recovery','causal-neutrality'):
         rows.append({'id':phase,'phase':phase,'section':'all','index':0,'count':1})

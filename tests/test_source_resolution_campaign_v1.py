@@ -21,11 +21,11 @@ def test_development_reconstruction_requires_every_registered_actual_case(sectio
 
 
 def test_final_matrix_is_disjoint_and_complete():
-    rows=matrix();assert len(rows)==28 and len({r['id'] for r in rows})==28
+    rows=matrix();assert len(rows)==35 and len({r['id'] for r in rows})==35
     assert rows[0]['id']=='source'
-    assert [r['id'] for r in rows[1:5]]==['restarts-'+str(i) for i in range(4)]
+    assert [r['id'] for r in rows[1:12]]==['restarts-'+str(i) for i in range(11)]
     assert sum(r['phase']=='static' for r in rows)==8
-    for section,count in (('transitions',3),('restarts',4),('controlled',4),('natural',4),('neutrality',1),('rollback',1)):
+    for section,count in (('transitions',3),('restarts',11),('controlled',4),('natural',4),('neutrality',1),('rollback',1)):
         observed=[r for r in rows if r['phase']=='lifecycle' and r['section']==section]
         assert sorted(r['index'] for r in observed)==list(range(count))
         assert all(r['count']==count for r in observed)
