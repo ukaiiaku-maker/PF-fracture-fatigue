@@ -49,6 +49,17 @@ uses the recorded versions and the identical full-ontology row checks, without
 loosening comparison or running another physical campaign. Every selected
 45/11/39-case registry must be complete before that development audit passes.
 
+Read-only diagnostic `34197537829` at `c8b53a6` completed on three independent
+x86 workers. Two autodetected SkylakeX and one Haswell in both loaded OpenBLAS
+libraries. On the identical retained shard-2 terminal, the native topology
+hashes differ between these targets. Changing only OpenBLAS from SkylakeX to
+Haswell changes the topology hash; disabling optional NumPy dispatch alone does
+not. All three combined fixed-policy records, including their independent
+repeats, are exactly identical. This identifies a genuine BLAS-dispatch effect,
+not universal cross-platform reproducibility or a retrospective restart PASS.
+The later complete campaign must generate and reconstruct all its own physical
+evidence under the prospectively frozen kernel contract.
+
 The a34cdf0 45-case development run exposed loss of the owned child endpoint
 inventory during partial clock intervals: child nucleation passes at all five
 partitions, but child continuation initially passes only unsplit. `facbc24`

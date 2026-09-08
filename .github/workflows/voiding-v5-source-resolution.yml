@@ -8,7 +8,7 @@ on:
     inputs:
       operation:
         type: choice
-        options: [focused, rollback, restarts, transitions, reconstruct-development, runtime-diagnostic, final, audit]
+        options: [focused, rollback, restarts, transitions, reconstruct-development, reconstruct-available, reconstruct-restarts, runtime-diagnostic, final, audit]
         default: focused
         required: true
 
@@ -65,11 +65,13 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.operation == 'audit'
     uses: ./.github/workflows/voiding-v5-publication-audit.yml
   development-reconstruction:
-    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'reconstruct-development'
+    if: github.event_name == 'workflow_dispatch' && (inputs.operation == 'reconstruct-development' || inputs.operation == 'reconstruct-available' || inputs.operation == 'reconstruct-restarts')
     permissions:
       contents: read
       actions: read
     uses: ./.github/workflows/voiding-v5-development-reconstruction.yml
+    with:
+      sections: ${{ inputs.operation == 'reconstruct-available' && '["transitions","rollback"]' || inputs.operation == 'reconstruct-restarts' && '["restarts"]' || '["transitions","restarts","rollback"]' }}
   runtime-diagnostic:
     if: github.event_name == 'workflow_dispatch' && inputs.operation == 'runtime-diagnostic'
     permissions:
