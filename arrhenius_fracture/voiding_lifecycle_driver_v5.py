@@ -32,7 +32,8 @@ def advance_production_void_interval(state,dt_s,*,temperature_K=900.,config=None
     duration=float(dt_s)
     if not math.isfinite(duration) or duration<0.: raise ValueError('finite nonnegative physical duration required')
     if state.void_state is None: raise ValueError('enabled production void state required')
-    remaining=duration;elapsed=0.;operations=[];error=None;accepted=state
+    duration_exact=exact(dt_s)
+    remaining=duration_exact;elapsed=0.;operations=[];error=None;accepted=state
     initial_time=float(state.junction_process_state.get('production_time_s',0.))
     initial_clock=state.junction_process_state.get('canonical_accepted_time_v1', AcceptedTime.from_seconds(initial_time))
     elapsed_exact=exact(0)
@@ -41,13 +42,13 @@ def advance_production_void_interval(state,dt_s,*,temperature_K=900.,config=None
         nonlocal accepted,remaining,elapsed,elapsed_exact
         previous=accepted
         elapsed_exact+=exact(step);elapsed=float(elapsed_exact)
-        remaining=float(max(exact(duration)-elapsed_exact,0))
+        remaining=max(duration_exact-elapsed_exact,0)
         physical_clock=initial_clock.advance(elapsed_exact)
         accepted=replace(trial,junction_process_state={**trial.junction_process_state,
             'production_time_s':physical_clock.seconds(), 'canonical_accepted_time_v1':physical_clock})
         from .closure_lifecycle_evidence import conservation,stagewise_topology
         from .topology_transaction_v11 import complete_accepted_state_fingerprint
-        operations.append({**operation,'duration_s':step,'physical_time_s':physical_clock.seconds(),
+        operations.append({**operation,'duration_s':float(step),'physical_time_s':physical_clock.seconds(),
             'temperature_K':temperature_K,'accepted_pre_interval_fingerprint':complete_accepted_state_fingerprint(previous),
             'accepted_post_interval_fingerprint':complete_accepted_state_fingerprint(accepted),
             'stagewise_conservation':conservation(accepted,previous),'stagewise_topology':stagewise_topology(accepted)})
@@ -59,9 +60,12 @@ def advance_production_void_interval(state,dt_s,*,temperature_K=900.,config=None
                 commit(accepted,remaining,{'api':'healed_site_residence','events':[]});continue
             if site.phase in (VoidPhase.AVAILABLE_SITE,VoidPhase.EMBRYO):
                 rates=arrhenius_rates(config,temperature_K=temperature_K,stress_tensor_Pa=local_site_tensor(accepted))
-                crossing=(site.birth.crossing_time(rates['birth_s']*site.candidate_weight)
-                    if site.phase==VoidPhase.AVAILABLE_SITE else min(site.stabilization.crossing_time(rates['stabilization_s']),
-                        site.healing.crossing_time(rates['healing_s'])))
+                def crossing_time(clock,rate):
+                    value=clock.crossing_time_exact(rate)
+                    return math.inf if value is None else value
+                crossing=(crossing_time(site.birth,rates['birth_s']*site.candidate_weight)
+                    if site.phase==VoidPhase.AVAILABLE_SITE else min(crossing_time(site.stabilization,rates['stabilization_s']),
+                        crossing_time(site.healing,rates['healing_s'])))
                 step=min(remaining,crossing)
                 if step<=0.: raise RuntimeError('NONPOSITIVE_OWNED_SITE_PASSAGE_INTERVAL')
                 updated,events=advance_site(voids,site.site_id,step,rates=rates)
@@ -84,8 +88,10 @@ def advance_production_void_interval(state,dt_s,*,temperature_K=900.,config=None
                 if cavity.radius_m<target:
                     tensor=local_site_tensor(accepted) if cavity.phase==VoidPhase.STABLE_SUBGRID_VOID else cavity_boundary_tensor(accepted)[0]
                     rates=arrhenius_rates(config,temperature_K=temperature_K,stress_tensor_Pa=tensor)
-                    velocity=config.radial_growth_scale_m*rates['series_limited_growth_s']
-                    crossing=math.inf if velocity<=0. else (target-cavity.radius_m)/velocity
+                    from .voiding_v5 import growth_time_to_radius_exact
+                    crossing=growth_time_to_radius_exact(voids,cavity.cavity_id,target,rates=rates,
+                        radial_growth_scale_m=config.radial_growth_scale_m)
+                    crossing=math.inf if crossing is None else crossing
                     step=min(remaining,crossing)
                     updated=update_cavity_growth(voids,cavity.cavity_id,rates=rates,dt_s=step,
                                                 radial_growth_scale_m=config.radial_growth_scale_m)
@@ -94,7 +100,11 @@ def advance_production_void_interval(state,dt_s,*,temperature_K=900.,config=None
                         hole=_grow_hole_boundary(hole,updated.cavities[0].radius_m,crack_path_m=accepted.crack_network.branches[0].path)
                         trace=[];trial=remesh_cavity(accepted,hole,updated,'natural-resolved-growth',trace)
                     else:
-                        trace=[];trial=equilibrate(replace(accepted,void_state=updated))
+                        # Subgrid bookkeeping is not an input to assemble_mechanics.
+                        # With unchanged mesh/u/ep/rho/damage/material/boundary,
+                        # another residual-correction solve only adds caller-
+                        # subdivision-dependent roundoff to an accepted equilibrium.
+                        trace=[];trial=replace(accepted,void_state=updated)
                     commit(trial,step,{'api':'state_owned_growth','rates':rates,'operations':trace});continue
                 root=accepted.crack_network.branches[0]
                 tensor,ids=crack_tip_tensor(accepted,branch_id=root.branch_id)

@@ -53,15 +53,24 @@ def main():
             'probe_calls':calls,'initial_fingerprint':fingerprint(before),'terminal_fingerprint':fingerprint(after),
             'accepted':bool(event is not None and event.accepted),'audit':audit,'operations':operations,'failure':failure,
             'topology':stagewise_topology(after),'conservation':conservation(after,before)}
-        rows.append(row);return row
+        rows.append(row)
+        (args.output/'partial_rows.json').write_text(json.dumps(canonical_data(rows),sort_keys=True,indent=2,allow_nan=False)+'\n')
+        return row
     changed_cavity=attempt('initial_cavity_source_changed',qualified,False,'cavity_boundary_tensor',1.01)
     baseline=attempt('ordinary_child_continuation',child,True,'crack_tip_tensor',1.)
     irrelevant=attempt('changed_cavity_during_continuation',child,True,'cavity_boundary_tensor',1.01)
     changed_tip=attempt('changed_child_tip_drive',child,True,'crack_tip_tensor',2.)
     zero=attempt('zero_child_tip_drive',child,True,'crack_tip_tensor',0.)
-    tip=deepcopy(child.tip_process_state);tip['by_branch']['void-front-1']['r_tip_m']*=2
-    altered=replace(child,tip_process_state=tip)
+    # Accepted mappings deliberately reject mutation, including after deepcopy.
+    tip={**child.tip_process_state,'by_branch':{key:dict(value) for key,value in child.tip_process_state['by_branch'].items()}}
+    tip['by_branch']['void-front-1']['r_tip_m']*=2
+    network=replace(child.crack_network,branches=tuple(replace(branch,local_state={**branch.local_state,
+        'r_tip_m':tip['by_branch']['void-front-1']['r_tip_m']}) if branch.branch_id=='void-front-1' else branch
+        for branch in child.crack_network.branches))
+    altered=replace(child,tip_process_state=tip,crack_network=network)
     radius=attempt('changed_child_owned_radius',altered,True,'crack_tip_tensor',1.)
+    radius['radius_intervention']={'factor':2.,'owned_process_state_and_branch_local_state_changed_together':True,
+        'R_void_unchanged':altered.void_state.cavities[0].radius_m==child.void_state.cavities[0].radius_m}
     def rates(row):return [x['effective_rate_s'] for x in row['audit'].get('cleavage',[])]
     gates={
         'changed_cavity_source_rejected_without_recognition_as_qualified':not changed_cavity['accepted']

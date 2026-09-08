@@ -326,6 +326,25 @@ def grow_cavity_from_rate(cavity: Cavity2D, *, rates: Mapping[str, float],
     return grow_cavity_2d(cavity, delta) if delta != 0.0 else cavity
 
 
+def positive_growth_velocity(rates,radial_growth_scale_m,chemical_potential_drive_J=1e-20,
+                             chemical_potential_reference_J=1e-20):
+    """The existing positive growth law, shared by integration and localization."""
+    return (float(radial_growth_scale_m)*max(float(rates['series_limited_growth_s']),0.)
+        *float(chemical_potential_drive_J)/max(abs(float(chemical_potential_reference_J)),1e-300))
+
+
+def growth_time_to_radius_exact(state,cavity_id,target_radius_m,*,rates,radial_growth_scale_m):
+    """Localize a positive-growth boundary from the accepted integral, not rounded radius."""
+    cavity=next(c for c in state.cavities if c.cavity_id==cavity_id)
+    velocity=positive_growth_velocity(rates,radial_growth_scale_m)
+    if velocity<=0:return None
+    anchor=(state.kinetic_integrals_v1 or {}).get(cavity_id)
+    radius=exact(cavity.radius_m)
+    if anchor is not None and anchor['phase']==cavity.phase.value and anchor['last_radius_m']==cavity.radius_m:
+        radius=exact(anchor['radius_anchor_m'])+unpacked(anchor['integrated_radius_m'])
+    return max(exact(target_radius_m)-radius,0)/exact(velocity)
+
+
 def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
                          rates: Mapping[str, float], dt_s: float,
                          radial_growth_scale_m: float,
@@ -363,8 +382,8 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
                 'consumed_anchor_m2': state.consumed_defect_inventory_area_m2,
                 'total_inventory_m2': owned_total, 'integrated_radius_m': (0, 1),
                 'geometry_generation_anchor': cavity.geometry_generation}
-        velocity = (float(radial_growth_scale_m)*max(float(rates['series_limited_growth_s']), 0.)
-                    *float(chemical_potential_drive_J)/max(abs(float(chemical_potential_reference_J)), 1e-300))
+        velocity = positive_growth_velocity(rates,radial_growth_scale_m,
+            chemical_potential_drive_J,chemical_potential_reference_J)
         integrated = unpacked(anchor['integrated_radius_m'])+exact(velocity)*exact(dt_s)
         radius = float(exact(anchor['radius_anchor_m'])+integrated)
         area = math.pi*radius**2

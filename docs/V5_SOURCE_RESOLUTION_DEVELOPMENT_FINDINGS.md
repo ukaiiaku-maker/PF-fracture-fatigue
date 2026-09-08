@@ -10,6 +10,17 @@ These are not changed-mechanics differences or grounds to force a next event.
 Raw historical identity remains FAIL; full future-sequence qualification remains
 FAIL, with observed-prefix equality reported separately.
 
+The 352d1d7 targeted actual-state rerun passes all 25 site/stabilization/healing/
+subgrid-growth partition cases after supplying the identical exact first-passage
+interval to every partition. The a34cdf0 failures remain retained. Subsequent
+natural-window diagnostics distinguish arithmetic from physical remesh history:
+accepted time is now exactly the requested window for all five partitions;
+remaining seed-12000 differences at 8/16 partitions include an extra actual
+resolved-cavity remesh, different projected density/P0 damage and FEM response.
+Those are not removable audit fields. A variable-rate/remesh-path-independent
+production integrator is still unqualified; the piecewise-linear clock helper
+alone is not evidence that this coupled-FEM requirement passes.
+
 The preserved c4fbd2f V3 result remains COMPLETE_BUT_BLOCKED. Development has
 located all 19 fine-source global-quality failures in unchanged triangles near
 the old crack tip, roughly 182–183 micrometres from the cavity source. The

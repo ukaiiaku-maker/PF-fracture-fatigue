@@ -23,7 +23,7 @@ from .voiding_v5 import (
     update_cavity_growth, promote_cavity,
 )
 
-SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/5"
+SCHEMA = "v12.voiding-v5-closure-actual-lifecycle/6"
 PARTITIONS = (1,2,4,8,16)
 CFG = VoidingConfig(enabled=True, promotion_radius_m=5e-5)
 PRECURSORS = {"birth_hit_1": "available_site", "birth_hit_2": "multi_hit_1",
@@ -100,7 +100,10 @@ def advance_transition(state, name, partitions, *, operations=None, config=CFG):
     if name == "subgrid_growth":
         rates = arrhenius_rates(config, temperature_K=900., stress_tensor_Pa=local_site_tensor(state))
         cavity = state.void_state.cavities[0]
-        total = exact((5e-5-cavity.radius_m)/(config.radial_growth_scale_m*rates["series_limited_growth_s"]))
+        from .voiding_v5 import growth_time_to_radius_exact
+        total = growth_time_to_radius_exact(state.void_state,cavity.cavity_id,5e-5,rates=rates,
+            radial_growth_scale_m=config.radial_growth_scale_m)
+        if total is None:raise RuntimeError('NO_KINETICALLY_ACTIVE_GROWTH_CHANNEL')
         for part in range(partitions):
             dt = total/partitions
             state = replace(state, void_state=update_cavity_growth(state.void_state, cavity.cavity_id,
@@ -287,7 +290,39 @@ def conservation(state, initial):
                 and len(voids.cavities)<=1 and ownership and connected_dormant}
 
 
-def resume_to_guard(state, operations):
+def prepare_common_restart_reload(state,operations,state_trace=None):
+    """One accepted load protocol shared by all eleven checkpoint positions."""
+    from .voiding_lifecycle_driver_v5 import NATURAL_WINDOW_S
+    key='common_terminal_restart_protocol_v1'
+    if state.void_state.cavities[0].phase!=VoidPhase.CONNECTED_VOID:
+        raise ValueError('common restart reload requires the accepted connected state')
+    position=state.junction_process_state.get(key)
+    if position is None:
+        state=load_state(state,-4e-7)
+        state=replace(state,junction_process_state={**state.junction_process_state,key:'COMPRESSIVE_LOAD_ACCEPTED'})
+        operations.append({'api':'common_restart_compressive_load','opening_m':-4e-7})
+        if state_trace is not None:state_trace.append(('zero_drive_connected',state))
+        position='COMPRESSIVE_LOAD_ACCEPTED'
+    if position=='COMPRESSIVE_LOAD_ACCEPTED':
+        cavity=state.void_state.cavities[0]
+        node=int(np.argmin(np.linalg.norm(state.mesh.nodes-np.asarray(cavity.connection_exit_m),axis=1)))
+        tensor,_=cavity_boundary_tensor(state,boundary_node=node)
+        if any(row['effective_rate_s']>0 for row in directional_clock_rates(state,tensor)):
+            raise RuntimeError('COMMON_RESTART_DORMANT_LOAD_HAS_POSITIVE_SOURCE_DRIVE')
+        state,audit=_complete_next_clock(state,tensor,source_kind='cavity_surface',maximum_advance_duration_s=NATURAL_WINDOW_S)
+        state=replace(state,junction_process_state={**state.junction_process_state,key:'ZERO_INTERVAL_ACCEPTED'})
+        operations.append({'api':'common_restart_dormant_interval','duration_s':NATURAL_WINDOW_S,'audit':audit})
+        position='ZERO_INTERVAL_ACCEPTED'
+    if position=='ZERO_INTERVAL_ACCEPTED':
+        state=load_state(state,8e-7)
+        state=replace(state,junction_process_state={**state.junction_process_state,key:'TENSILE_RELOAD_ACCEPTED'})
+        operations.append({'api':'common_restart_tensile_reload','opening_m':8e-7})
+        position='TENSILE_RELOAD_ACCEPTED'
+    if position!='TENSILE_RELOAD_ACCEPTED':raise ValueError('unrecognized common restart protocol position')
+    return state
+
+
+def resume_to_guard(state, operations, *, common_restart_protocol=False):
     """Resume the actual accepted lifecycle to its attainable terminal state."""
     while state.void_state.sites[0].phase == VoidPhase.AVAILABLE_SITE:
         name = "birth_hit_1" if state.void_state.sites[0].hits == 0 else "birth_hit_2"
@@ -311,14 +346,19 @@ def resume_to_guard(state, operations):
         hole,_ = _geometry(radius_m=cavity.radius_m,center_m=cavity.center_m,boundary_segments=n,radial_layers=layers)
         hole = _grow_hole_boundary(hole,5.5e-5,crack_path_m=state.crack_network.branches[0].path)
         rates = arrhenius_rates(CFG,temperature_K=900.,stress_tensor_Pa=cavity_boundary_tensor(state)[0])
-        dt = (5.5e-5-cavity.radius_m)/(CFG.radial_growth_scale_m*rates["series_limited_growth_s"])
+        from .voiding_v5 import growth_time_to_radius_exact
+        from .canonical_kinetic_time_v1 import packed
+        dt = growth_time_to_radius_exact(state.void_state,cavity.cavity_id,5.5e-5,rates=rates,
+            radial_growth_scale_m=CFG.radial_growth_scale_m)
+        if dt is None:raise RuntimeError('NO_KINETICALLY_ACTIVE_GROWTH_CHANNEL')
         voids = update_cavity_growth(state.void_state,cavity.cavity_id,rates=rates,dt_s=dt,
                                      radial_growth_scale_m=CFG.radial_growth_scale_m)
         trace=[]; state=remesh_cavity(state,hole,voids,"resolved-growth",trace)
-        operations.append({"api":"resolved_growth_remesh","duration_s":dt,"rates":rates,"operations":trace})
+        operations.append({"api":"resolved_growth_remesh","duration_s":float(dt),'duration_exact_s':packed(dt),"rates":rates,"operations":trace})
     if state.void_state.cavities[0].phase == VoidPhase.RESOLVED_VOID:
         state,_ = advance_transition(state,"ligament",1,operations=operations)
     if state.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID:
+        if common_restart_protocol:state=prepare_common_restart_reload(state,operations)
         state,_ = advance_transition(state,"downstream_child",1,operations=operations)
     if state.void_state.cavities[0].phase == VoidPhase.DOWNSTREAM_FRONT_ACTIVE:
         state,_ = advance_transition(state,"child_continuation",1,operations=operations)

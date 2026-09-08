@@ -87,3 +87,20 @@ def test_actual_directional_event_and_anchor_state_are_partition_exact(parts):
         clock = clock.advance(dt)
     assert hazards == direct and anchors == direct_anchor
     assert clock.seconds_exact() == direct_dt
+
+
+@pytest.mark.parametrize('parts',[1,2,4,8,16])
+def test_growth_target_localization_uses_existing_exact_radius_integral(parts):
+    import math
+    from arrhenius_fracture.voiding_v5 import Cavity2D,ProductionVoidState,VoidPhase,update_cavity_growth,growth_time_to_radius_exact
+    r=2.5e-5;area=math.pi*r*r
+    cavity=Cavity2D('v','s',(0.,0.),r,area,area,VoidPhase.STABLE_SUBGRID_VOID)
+    before=ProductionVoidState((),(cavity,),available_defect_inventory_area_m2=1e-7-area,consumed_defect_inventory_area_m2=area)
+    kwargs={'rates':{'series_limited_growth_s':137.213},'radial_growth_scale_m':1e-8}
+    total=growth_time_to_radius_exact(before,'v',5e-5,**kwargs)
+    direct=update_cavity_growth(before,'v',dt_s=total,**kwargs);state=before;elapsed=Fraction(0)
+    for index in range(parts):
+        duration=total/parts if index+1<parts else growth_time_to_radius_exact(state,'v',5e-5,**kwargs)
+        state=pickle.loads(pickle.dumps(update_cavity_growth(state,'v',dt_s=duration,**kwargs)))
+        elapsed+=duration
+    assert state==direct and elapsed==total and state.cavities[0].radius_m==5e-5

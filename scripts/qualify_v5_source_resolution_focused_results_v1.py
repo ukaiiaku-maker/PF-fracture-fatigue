@@ -22,6 +22,7 @@ FOCUSED_FILES=(
     'test_voiding_v5.py','test_static_numerical_family_v1.py','test_compressed_closure_checkpoint_v1.py',
     'test_disabled_causal_neutrality_v1.py',
     'test_source_resolution_campaign_v1.py',
+    'test_common_restart_protocol_v1.py',
 )
 
 

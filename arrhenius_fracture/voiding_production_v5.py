@@ -41,7 +41,7 @@ from .topology_transaction_v11 import (
 from .voiding_v5 import (
     Cavity2D, HazardClock, ProductionVoidState, VoidPhase, VoidSite, VoidingConfig,
     advance_site, arrhenius_rates, create_subgrid_cavity, grow_cavity_2d,
-    grow_cavity_from_rate,
+    grow_cavity_from_rate, growth_time_to_radius_exact,
     promote_cavity, replace_cavity, update_cavity_growth,
 )
 
@@ -1918,7 +1918,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
 def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0),
                              crack_path_m=None, cleavage_theta_deg=0.0,
                              state_trace=None, boundary_segments=32, radial_layers=12,
-                             qualify_source=False):
+                             qualify_source=False, common_restart_protocol=False):
     state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m,
                                               crack_path_m=crack_path_m,
                                               cleavage_theta_deg=cleavage_theta_deg,
@@ -1931,7 +1931,8 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     for label in ("multi_hit_1", "multi_hit_2"):
         tensor = local_site_tensor(state); rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
         site = state.void_state.sites[0]
-        dt = max(site.birth.threshold - site.birth.accumulated, 0.0) / (rates["birth_s"] * site.candidate_weight)
+        dt = site.birth.crossing_time_exact(rates["birth_s"] * site.candidate_weight)
+        if dt is None: raise RuntimeError('NO_KINETICALLY_ACTIVE_BIRTH_CANDIDATE')
         void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
         state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))
         rows.append({**observables(state, label), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
@@ -1939,7 +1940,8 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     tensor = local_site_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
     site = state.void_state.sites[0]
-    dt = site.stabilization.threshold / rates["stabilization_s"]
+    dt = site.stabilization.crossing_time_exact(rates["stabilization_s"])
+    if dt is None: raise RuntimeError('NO_KINETICALLY_ACTIVE_STABILIZATION_CANDIDATE')
     void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
     state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))
     rows.append({**observables(state, "stabilization"), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
@@ -1949,14 +1951,16 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     capture("subgrid_void")
     tensor = local_site_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
-    growth_dt = 2.5e-5 / (cfg.radial_growth_scale_m * rates["series_limited_growth_s"])
+    growth_dt = growth_time_to_radius_exact(state.void_state,state.void_state.cavities[0].cavity_id,5e-5,
+        rates=rates,radial_growth_scale_m=cfg.radial_growth_scale_m)
+    if growth_dt is None:raise RuntimeError('NO_KINETICALLY_ACTIVE_GROWTH_CHANNEL')
     state = replace(state, void_state=update_cavity_growth(
         state.void_state, state.void_state.cavities[0].cavity_id,
         rates=rates, dt_s=growth_dt, radial_growth_scale_m=cfg.radial_growth_scale_m,
     ))
     grown = state.void_state.cavities[0]
     state = equilibrate_fixed_load_with_production_fem(state)
-    rows.append({**observables(state, "subgrid_growth"), "rates": rates, "growth_dt_s": growth_dt})
+    rows.append({**observables(state, "subgrid_growth"), "rates": rates, "growth_dt_s": float(growth_dt)})
     capture("subgrid_growth")
     promoted = promote_cavity(state.void_state, grown.cavity_id, cfg.promotion_radius_m)
     operations = []
@@ -1967,13 +1971,15 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
                                     crack_path_m=state.crack_network.branch(ROOT_BRANCH_ID).path)
     tensor = cavity_boundary_tensor(state)[0]
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
-    growth_dt = 0.5e-5 / (cfg.radial_growth_scale_m * rates["series_limited_growth_s"])
+    growth_dt = growth_time_to_radius_exact(state.void_state,state.void_state.cavities[0].cavity_id,5.5e-5,
+        rates=rates,radial_growth_scale_m=cfg.radial_growth_scale_m)
+    if growth_dt is None:raise RuntimeError('NO_KINETICALLY_ACTIVE_GROWTH_CHANNEL')
     void_state = update_cavity_growth(
         state.void_state, state.void_state.cavities[0].cavity_id,
         rates=rates, dt_s=growth_dt, radial_growth_scale_m=cfg.radial_growth_scale_m,
     )
     state = remesh_cavity(state, grown_hole, void_state, "resolved-growth")
-    rows.append({**observables(state, "resolved_growth"), "rates": rates, "growth_dt_s": growth_dt})
+    rows.append({**observables(state, "resolved_growth"), "rates": rates, "growth_dt_s": float(growth_dt)})
     capture("resolved_growth")
     if stop_before_ligament:
         return state, rows
@@ -1986,6 +1992,11 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
         "event_classification": "physical_cleavage",
     })
     capture("ligament_rupture")
+    if common_restart_protocol:
+        from .closure_lifecycle_evidence import prepare_common_restart_reload
+        load_operations=[]
+        state=prepare_common_restart_reload(state,load_operations,state_trace)
+        rows.append({**observables(state,'common_restart_reload'), 'executed_load_operations':load_operations})
     if qualify_source:
         state, source_audit = refine_downstream_source(state, max_refinement_levels=1,
             refinement_region='complete_cavity_ring', quality_improvement='constrained_v1')

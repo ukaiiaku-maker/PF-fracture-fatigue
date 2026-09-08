@@ -71,6 +71,7 @@ def main():
     rows=[]; trace=ProgressTrace()
     fine_options = dict(boundary_segments=512,radial_layers=192,
         crack_path_m=((0.,0.),(.0005725993004046688,0.)),qualify_source=True) if args.qualified_fine_history and args.section not in ('natural','neutrality','controlled') else {}
+    if args.qualified_fine_history and args.section=='restarts':fine_options['common_restart_protocol']=True
     preparation_failure=None
     try:
         terminal,trajectory_history=deterministic_trajectory(state_trace=trace,**fine_options)
@@ -120,26 +121,43 @@ def main():
         "stable_subgrid_cavity":"subgrid_void","before_promotion":"subgrid_growth","after_promotion":"geometric_promotion",
         "before_ligament":"resolved_growth","connected_before_downstream":"ligament_rupture",
         "downstream_child_before_continuation":"new_graph_front","zero_drive_connected":"ligament_rupture"}
+    restart_captured=captured;restart_terminal=terminal
+    if args.qualified_fine_history and selected('restarts',FROZEN_CASE_REGISTRY['restarts']):
+        restart_labels['zero_drive_connected']='zero_drive_connected'
+        if args.section!='restarts':
+            restart_trace=ProgressTrace()
+            try:
+                restart_terminal,_=deterministic_trajectory(state_trace=restart_trace,
+                    boundary_segments=512,radial_layers=192,crack_path_m=((0.,0.),(.0005725993004046688,0.)),
+                    qualify_source=True,common_restart_protocol=True)
+            except Exception as exc:
+                if not restart_trace:raise
+                restart_terminal=restart_trace[-1][1]
+                print('Common restart reference rejected: '+type(exc).__name__+': '+str(exc),flush=True)
+            restart_captured=dict(restart_trace)
     for stage in selected('restarts',FROZEN_CASE_REGISTRY["restarts"]):
         print("Actual restart attempt "+stage,flush=True)
-        before=captured.get(restart_labels.get(stage),available if stage=="incomplete_first_hit" else terminal)
-        stage_available=restart_labels.get(stage) in captured or stage=="incomplete_first_hit"
+        before=restart_captured.get(restart_labels.get(stage),restart_captured['available_site'] if stage=="incomplete_first_hit" else restart_terminal)
+        stage_available=restart_labels.get(stage) in restart_captured or stage=="incomplete_first_hit"
         if stage=="incomplete_first_hit":
             rates=arrhenius_rates(CFG,temperature_K=900.,stress_tensor_Pa=local_site_tensor(before))
-            site=before.void_state.sites[0]; dt=.5*site.birth.crossing_time(rates["birth_s"]*site.candidate_weight)
+            site=before.void_state.sites[0]; dt=site.birth.crossing_time_exact(rates["birth_s"]*site.candidate_weight)/2
             voids,_=advance_site(before.void_state,site.site_id,dt,rates=rates); before=replace(before,void_state=voids)
-        if stage=="zero_drive_connected": before=load_state(before,0.)
+        if stage=="zero_drive_connected" and not args.qualified_fine_history: before=load_state(before,0.)
         restored=restore_checkpoint(out/checkpoint(before)); operations=[]; resumed_ops=[]; after=before; resumed=restored; error=None
         try:
-            if stage=='zero_drive_connected':
+            if stage=='zero_drive_connected' and not args.qualified_fine_history:
                 after=load_state(before,8e-7);resumed=load_state(restored,8e-7)
                 operations.append({'api':'accepted_tensile_reload','opening_m':8e-7})
                 resumed_ops.append({'api':'accepted_tensile_reload','opening_m':8e-7})
-            after=resume_to_guard(after,operations); resumed=resume_to_guard(resumed,resumed_ops)
+            after=resume_to_guard(after,operations,common_restart_protocol=args.qualified_fine_history)
+            resumed=resume_to_guard(resumed,resumed_ops,common_restart_protocol=args.qualified_fine_history)
         except Exception as exc: error={"type":type(exc).__name__,"message":str(exc)}
         replay_path=checkpoint(resumed)
         record("restarts",stage,before,after,{"expected_terminal":"DOWNSTREAM_FRONT_CONTINUED",
-            "requested_stage_available":stage_available,"reload_policy":"tensile_8e-7" if stage=='zero_drive_connected' else "retain_accepted_load"},operations,
+            "requested_stage_available":stage_available,
+            'common_terminal_protocol':'v5.common-terminal-restart-load/1' if args.qualified_fine_history else 'RETAINED_LEGACY_DIFFERENT_LOAD_HISTORIES',
+            "reload_policy":"common_4e-7_compressive_minus4e-7_zero_drive_16us_8e-7" if args.qualified_fine_history else "tensile_8e-7" if stage=='zero_drive_connected' else "retain_accepted_load"},operations,
             restored_terminal_checkpoint=replay_path,restart_exact=fingerprint(after)==fingerprint(resumed),
             restarted_operations=resumed_ops,subsequent_history_exact=canonical_data(operations)==canonical_data(resumed_ops),
             continued_front_terminal_reached=stage_available and any(op.get('api')=='child_tip_continuation'
