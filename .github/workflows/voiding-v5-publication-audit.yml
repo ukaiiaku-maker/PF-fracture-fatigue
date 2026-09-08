@@ -21,6 +21,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -31,7 +35,9 @@ jobs:
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           python scripts/package_v5_final_campaign_v1.py unpack artifacts/voiding_v5_source_resolution_and_final_closure/final_campaign_publication /tmp/v5-published-complete --verify-publication-head
           implementation_sha=$(python -c 'import json; print(json.load(open("artifacts/voiding_v5_source_resolution_and_final_closure/final_campaign_publication/publication.json"))["implementation_sha"])')
-          git worktree add --detach /tmp/v5-published-implementation "$implementation_sha"
+          git worktree add --detach --no-checkout /tmp/v5-published-implementation "$implementation_sha"
+          git -C /tmp/v5-published-implementation sparse-checkout set --no-cone '/*' '!/artifacts/'
+          git -C /tmp/v5-published-implementation checkout
           python - <<'PY'
           import json,os,re
           data=json.load(open('artifacts/voiding_v5_source_resolution_and_final_closure/final_campaign_publication/publication.json'))
@@ -75,6 +81,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

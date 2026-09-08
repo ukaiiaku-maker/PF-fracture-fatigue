@@ -25,6 +25,19 @@ clock allowance is increased to 180 minutes for the repository-wide and final
 full-regression jobs. Focused run `34180123490` at the same head succeeded.
 No test, scientific predicate or tolerance is relaxed by the time allowance.
 
+Later repository-wide run `34184892468` at `787ebf6` completed in 4581.50 seconds:
+1115 passed, one skipped and exactly seven failed. Its complete failure-identity
+set matches the recorded inherited baseline, with no additional failures. This
+does not reclassify the earlier timeout or claim that repository-wide CI is green.
+
+Phase-8 rollback run `34184427615` at `facbc24` completed all 39 attempts. Read-only
+checkpoint reconstruction verifies every initial/terminal complete fingerprint,
+input identity, conservation ledger and independent topology certificate. All
+39 intended injections were reached and complete states restored, including all
+28 lifecycle stages and the five downstream source/child/continuation stages.
+This is complete rollback development evidence, not final A/B qualification or
+proof of the separately running common-terminal restart matrix.
+
 The a34cdf0 45-case development run exposed loss of the owned child endpoint
 inventory during partial clock intervals: child nucleation passes at all five
 partitions, but child continuation initially passes only unsplit. `facbc24`
