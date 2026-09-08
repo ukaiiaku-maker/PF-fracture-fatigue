@@ -31,15 +31,3 @@ Fig4,weakT RMS vs analytic (0.1x),0.2658,,
 Fig4,weakT RMS vs analytic (1x),0.2267,,
 Fig4,weakT RMS vs analytic (10x),0.2423,,
 Fig4,weakT RMS vs analytic (100x),0.1888,,
-Figure 1A,Fig1A,confirmed: regime_hint column transitions ceramic->peak->weakT->dbtt across 40 rows as H0_eV rises 2.6->6.0 eV,continuation path spanning ceramic->peak->weakT->DBTT,PASS
-Figure 1B,Fig1B,confirmed shared continuation path by direct README text match,"cyclic first-passage response, same continuation as Panel A",PASS
-Figure 1C,Fig1C,confirmed by manifest/README correspondence,"S-N-type initiation response, entropy-family driven",PASS
-Figure 1D,Fig1D,confirmed shared entropy-family design file for Panels C and D,"fixed-rate strength-temperature response, same entropy family as Panel C",PASS
-Figure 5A,Fig5A,6/6 cases confirmed present with multi-point (14-18) K-grids,"6-case atlas (4 shown in main text, full 6 in SI) with real da/dN-vs-DeltaK data",PASS
-Figure 5B,Fig5B,confirmed via direct file read (not merely the sub-agent's paraphrase),longer-growth persistence of kinetic hierarchy + anisotropic path deflection,PASS
-Figure 5C,Fig5C,"confirmed directly: shielded job coverage_pass=False, no_shield job passes",unshielded cases form a connected crack; shielded cases do not (at matched amplitude),PASS
-Figure 5D,Fig5D,"confirmed directly by viewing both images: eps_p peak 0.0025 (no-shield, narrow) vs 0.4 (shielded, broad); rho peak 6e13 (no-shield, narrow) vs ~1e17 saturated broadly (shielded) -- qualitative field-","shielded case shows a much broader, more diffuse deformation/residual-stress field without localizing into a connected crack, vs. a narrow localized field in the unshielded case",PASS
-Figure 6A,Fig6A,0.794/0.350/0.810/0.577/0.811/0.069 (strength-fracture); 0.670/0.091/0.706/0.706/0.706/0.340 (fracture-DKth); 0.348/0.603/0.358/0.358/0.356/0.603 (strength-DKth); 0.05-0.28 (S-N phenotype) -- read dir,strength-fracture ~0.81 (several contexts); fracture-DKth ~0.71 (4/6 contexts); strength-DKth ~0.60; S-N phenotype ~0.05-0.28,PASS
-Figure 6B,Fig6B,"n=1360, pooled_r=0.9865, context range [0.958, 0.999]",1360 matched observations; pooled log-space Pearson r; context range 0.958 to 0.999,PASS
-Figure 6C,Fig6C,"AUC ranges 0.132-0.999 across the 3 temperatures/metrics reported, including an exact AUC=0.500 instance","AUC values spanning from near-chance (0.5) toward strong association, varying by temperature and metric",PASS
-SI (synthetic identifiability),SI-identifiability-recovery-errors,"n_conditions=75; sparse range [23.4, 54.4]; complete range [1.2, 9.4] (per-regime medians: sparse={'ceramic': 31.9, 'peak': 54.4, 'weakT': 36.7, 'dbtt': 23.4}, complete={'ceramic': 9.4, 'peak': 3.4, '","75-condition dataset; emission-landscape error ~20-55% sparse, ~1-10% complete",PASS

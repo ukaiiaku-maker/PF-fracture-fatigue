@@ -226,6 +226,27 @@ FILES = [
     ),
     dict(
         root=FATIGUE_PF_ROOT,
+        orig="runs/v8_orientation_plastic_shielded_K7/theta45/atlas_2d_paris_points.csv",
+        bundle="fig5B_orientation_theta45_atlas_2d_paris_points.csv",
+        role="Fig.5B anisotropic/path-deflection calculation, plastic_shielded_case64_M1 at 45deg "
+             "crystal orientation -- paired with the theta30 file above to quantify a real "
+             "orientation-dependence ratio (da/dN differs ~17x between the two orientations at "
+             "matched nominal driving force)",
+        producer_script="run_v8_plastic_shielded_orientation_30_45_v2.sh",
+        source_data_level="raw (per-K-point)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v8_material_response_r_curve_6class_long_growth_multiseed/multiseed_r_curve_analysis/multiseed_r_curve_mean_curves.csv",
+        bundle="fig5B_multiseed_r_curve_mean_curves.csv",
+        role="Fig.5B RAW class-mean KJ(extension) curves, 6 classes x ~250 extension points each -- "
+             "the data needed to directly check whether class ordering/hierarchy persists at common "
+             "extension values (not just read from the prose summary)",
+        producer_script="run_v8_r_curve_6class_long_growth.sh",
+        source_data_level="derived (multiseed mean of raw per-seed R-curves)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
         orig="releases/stateful_pd_v8_5_standalone_v1_1/runs/sn_stateful_pd_v8_5_1_reference_lives_seed5/seed_5/stress_900MPa/job_no_shield/no_shield/sigmaA_900MPa/crack_handoff_audit_final.json",
         bundle="fig5C_handoff_audit_no_shield_seed5_900MPa.json",
         role="Fig.5C blunt-notch S-N: no-shield job at 900 MPa, seed 5 -- crack-connectivity gate "
@@ -290,6 +311,28 @@ FILES = [
         role="Fig.6A Cramer's V categorical associations (strength/fracture/DKth/S-N phenotype)",
         producer_script="analyze_v57_final_integrated.py",
         source_data_level="derived (contingency-table associations)",
+    ),
+    dict(
+        root=FATIGUE_PF_ROOT,
+        orig="runs/v5_7_extension/fourway_class_association_cells_censor_aware_v5_7.csv",
+        bundle="fig6A_contingency_cells_censor_aware.csv",
+        role="Fig.6A RAW contingency-table cell counts (observed/expected/standardized residual) for "
+             "all 6 analysis families x 6 contexts -- the compact, exact input needed to recompute "
+             "every Cramer's V value from scratch via chi2_contingency, with no dependency on the "
+             "23,040-row per-surface classification table",
+        producer_script="analyze_v57_integrated.py (upstream builder of the censor-aware cell counts)",
+        source_data_level="RAW (contingency-table cell counts, not a derived summary statistic)",
+    ),
+    dict(
+        root=FEM_CZM_ROOT,
+        orig="runs/four_class_exp_floor_CZM_500K_5rep_1000um_theta45/Rcurve_analysis/seed_binned_Rcurves_long.csv",
+        bundle="sec2_15_seed_binned_Rcurves_long.csv",
+        role="Sec.2.15 RAW per-seed binned R-curve (K vs crack-extension bin, 5 seeds x 4 classes, "
+             "~40 bins/seed) -- the genuine raw curve data needed to REFIT the saturating R-curve "
+             "model from scratch, rather than reading class_mean_Rcurve_fits.csv's already-fitted "
+             "parameters",
+        producer_script="Rcurve_analysis pipeline",
+        source_data_level="RAW (per-seed binned curve, not a fit output)",
     ),
     dict(
         root=FATIGUE_PF_ROOT,

@@ -7,8 +7,8 @@
   },
   "external_root": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM",
   "external_root_available_at_build_time": true,
-  "n_files": 35,
-  "n_byte_identical": 35,
+  "n_files": 39,
+  "n_byte_identical": 39,
   "all_byte_identical": true,
   "files": [
     {
@@ -272,6 +272,32 @@
       "copy_status": "OK"
     },
     {
+      "orig": "runs/v8_orientation_plastic_shielded_K7/theta45/atlas_2d_paris_points.csv",
+      "bundle": "fig5B_orientation_theta45_atlas_2d_paris_points.csv",
+      "role": "Fig.5B anisotropic/path-deflection calculation, plastic_shielded_case64_M1 at 45deg crystal orientation -- paired with the theta30 file above to quantify a real orientation-dependence ratio (da/dN differs ~17x between the two orientations at matched nominal driving force)",
+      "producer_script": "run_v8_plastic_shielded_orientation_30_45_v2.sh",
+      "source_data_level": "raw (per-K-point)",
+      "original_path": "/Volumes/Data/Data/Nanopillar_calculation/Fatigue-PF/runs/v8_orientation_plastic_shielded_K7/theta45/atlas_2d_paris_points.csv",
+      "original_sha256": "8f335cefdcca8cbed718b10b97af3481985cfc55dbeeebcc1cd666da83643157",
+      "copied_path": "artifacts/paper_simulation_completion/source_bundle_figures_2_4/fig5B_orientation_theta45_atlas_2d_paris_points.csv",
+      "copied_sha256": "8f335cefdcca8cbed718b10b97af3481985cfc55dbeeebcc1cd666da83643157",
+      "byte_identical": true,
+      "copy_status": "OK"
+    },
+    {
+      "orig": "runs/v8_material_response_r_curve_6class_long_growth_multiseed/multiseed_r_curve_analysis/multiseed_r_curve_mean_curves.csv",
+      "bundle": "fig5B_multiseed_r_curve_mean_curves.csv",
+      "role": "Fig.5B RAW class-mean KJ(extension) curves, 6 classes x ~250 extension points each -- the data needed to directly check whether class ordering/hierarchy persists at common extension values (not just read from the prose summary)",
+      "producer_script": "run_v8_r_curve_6class_long_growth.sh",
+      "source_data_level": "derived (multiseed mean of raw per-seed R-curves)",
+      "original_path": "/Volumes/Data/Data/Nanopillar_calculation/Fatigue-PF/runs/v8_material_response_r_curve_6class_long_growth_multiseed/multiseed_r_curve_analysis/multiseed_r_curve_mean_curves.csv",
+      "original_sha256": "c5abc686236de22ba2cf5442d04491b2f241806e7ab7dc74dbb57fe6a71e1bfa",
+      "copied_path": "artifacts/paper_simulation_completion/source_bundle_figures_2_4/fig5B_multiseed_r_curve_mean_curves.csv",
+      "copied_sha256": "c5abc686236de22ba2cf5442d04491b2f241806e7ab7dc74dbb57fe6a71e1bfa",
+      "byte_identical": true,
+      "copy_status": "OK"
+    },
+    {
       "orig": "releases/stateful_pd_v8_5_standalone_v1_1/runs/sn_stateful_pd_v8_5_1_reference_lives_seed5/seed_5/stress_900MPa/job_no_shield/no_shield/sigmaA_900MPa/crack_handoff_audit_final.json",
       "bundle": "fig5C_handoff_audit_no_shield_seed5_900MPa.json",
       "role": "Fig.5C blunt-notch S-N: no-shield job at 900 MPa, seed 5 -- crack-connectivity gate result (root_connected/coverage_pass) for comparison against the shielded job",
@@ -359,6 +385,32 @@
       "original_sha256": "6ffa74ccc5df2623b6efc0013c3c4d8a8716a321827fa6f9ae9bdf1f9b07798e",
       "copied_path": "artifacts/paper_simulation_completion/source_bundle_figures_2_4/fig6A_global_class_associations_clean.csv",
       "copied_sha256": "6ffa74ccc5df2623b6efc0013c3c4d8a8716a321827fa6f9ae9bdf1f9b07798e",
+      "byte_identical": true,
+      "copy_status": "OK"
+    },
+    {
+      "orig": "runs/v5_7_extension/fourway_class_association_cells_censor_aware_v5_7.csv",
+      "bundle": "fig6A_contingency_cells_censor_aware.csv",
+      "role": "Fig.6A RAW contingency-table cell counts (observed/expected/standardized residual) for all 6 analysis families x 6 contexts -- the compact, exact input needed to recompute every Cramer's V value from scratch via chi2_contingency, with no dependency on the 23,040-row per-surface classification table",
+      "producer_script": "analyze_v57_integrated.py (upstream builder of the censor-aware cell counts)",
+      "source_data_level": "RAW (contingency-table cell counts, not a derived summary statistic)",
+      "original_path": "/Volumes/Data/Data/Nanopillar_calculation/Fatigue-PF/runs/v5_7_extension/fourway_class_association_cells_censor_aware_v5_7.csv",
+      "original_sha256": "65d9cd32cd63506bfd9aa31d13d05bf5ee3e53e800f90d1adf6f034f2f606af8",
+      "copied_path": "artifacts/paper_simulation_completion/source_bundle_figures_2_4/fig6A_contingency_cells_censor_aware.csv",
+      "copied_sha256": "65d9cd32cd63506bfd9aa31d13d05bf5ee3e53e800f90d1adf6f034f2f606af8",
+      "byte_identical": true,
+      "copy_status": "OK"
+    },
+    {
+      "orig": "runs/four_class_exp_floor_CZM_500K_5rep_1000um_theta45/Rcurve_analysis/seed_binned_Rcurves_long.csv",
+      "bundle": "sec2_15_seed_binned_Rcurves_long.csv",
+      "role": "Sec.2.15 RAW per-seed binned R-curve (K vs crack-extension bin, 5 seeds x 4 classes, ~40 bins/seed) -- the genuine raw curve data needed to REFIT the saturating R-curve model from scratch, rather than reading class_mean_Rcurve_fits.csv's already-fitted parameters",
+      "producer_script": "Rcurve_analysis pipeline",
+      "source_data_level": "RAW (per-seed binned curve, not a fit output)",
+      "original_path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM/runs/four_class_exp_floor_CZM_500K_5rep_1000um_theta45/Rcurve_analysis/seed_binned_Rcurves_long.csv",
+      "original_sha256": "737a148454796cd457e7336f27802b9349e60efd4a2556a64b0ecd882c952b29",
+      "copied_path": "artifacts/paper_simulation_completion/source_bundle_figures_2_4/sec2_15_seed_binned_Rcurves_long.csv",
+      "copied_sha256": "737a148454796cd457e7336f27802b9349e60efd4a2556a64b0ecd882c952b29",
       "byte_identical": true,
       "copy_status": "OK"
     },

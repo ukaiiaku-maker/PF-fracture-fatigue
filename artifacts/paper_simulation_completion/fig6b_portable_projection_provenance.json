@@ -1,0 +1,47 @@
+{
+  "schema": "v1_fig6b_portable_projection_provenance",
+  "full_source_files": {
+    "fatigue_thresholds_v5_7_csv": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/Fatigue-PF/runs/v5_7_extension/fatigue_thresholds_v5_7.csv",
+      "sha256": "8203504544e4a3c82e650ea89e3dc02e3a68c98cc96c5eb1b31860b7f22e90ad",
+      "n_rows": 5760
+    },
+    "fracture_monotonic_points_v5_7_csv": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/Fatigue-PF/runs/v5_7_extension/fracture_monotonic_points_v5_7.csv",
+      "sha256": "cf3f5f91dce495f259e1d5c03b0fd87c5530157c2b9d6ab8ffa13a72b661c551",
+      "n_rows": 207360
+    }
+  },
+  "filter_and_join_keys": {
+    "rate_criterion_filter": "np.isclose(rate_criterion_m_per_cycle, 1e-10, rtol=1e-6, atol=0.0)",
+    "status_filter": "threshold_status == 'bracketed'",
+    "join_keys": [
+      "surface_id",
+      "fracture_context(=context_id)",
+      "temperature_K(=T_K)"
+    ],
+    "join_type": "inner",
+    "post_join_filter": "finite(DeltaK_th_MPa_sqrtm) & finite(Kc_first_MPa_sqrtm) & DeltaK_th_MPa_sqrtm>0 & Kc_first_MPa_sqrtm>0"
+  },
+  "excluded_row_counts_and_reasons": {
+    "threshold_rows_excluded_wrong_rate_criterion": 2880,
+    "threshold_rows_excluded_not_bracketed_at_primary_rate": 1520,
+    "threshold_rows_remaining_after_rate_and_status_filter": 1360,
+    "rows_dropped_no_join_match_in_monotonic_table": 0,
+    "rows_excluded_nonfinite_or_nonpositive_after_join": 0
+  },
+  "compact_table": {
+    "path": "artifacts/paper_simulation_completion/source_bundle_figures_2_4/fig6B_compact_joined_1360.csv",
+    "sha256": "4b6611dd0048ec1ad9dfc3847d743e3d64573847a10e1d99df292e673fb4c3e2",
+    "n_rows": 1360,
+    "columns": [
+      "surface_id",
+      "fracture_context",
+      "temperature_K",
+      "Kc_first_MPa_sqrtm",
+      "DeltaK_th_MPa_sqrtm"
+    ]
+  },
+  "expected_n_rows": 1360,
+  "n_rows_matches_expected": true
+}

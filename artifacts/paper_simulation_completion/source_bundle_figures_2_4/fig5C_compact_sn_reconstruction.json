@@ -1,0 +1,236 @@
+{
+  "schema": "v1_fig5c_compact_sn",
+  "n_jobs": 15,
+  "jobs": [
+    {
+      "seed": 2,
+      "sigma_a_MPa": 700.0,
+      "condition": "no_shield",
+      "coverage_pass": false,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "slenderness",
+        "tip",
+        "coverage"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 314863766.71453166,
+      "summary_status": "morphology_invalid_stalled"
+    },
+    {
+      "seed": 2,
+      "sigma_a_MPa": 700.0,
+      "condition": "shielded",
+      "coverage_pass": false,
+      "handoff_pass": false,
+      "root_connected": false,
+      "failure_reasons": [
+        "no_surface_connected_component"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": null,
+      "summary_status": "right_censored"
+    },
+    {
+      "seed": 2,
+      "sigma_a_MPa": 900.0,
+      "condition": "no_shield",
+      "coverage_pass": false,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "slenderness",
+        "tip",
+        "coverage"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 18253833.780987244,
+      "summary_status": "morphology_invalid_stalled"
+    },
+    {
+      "seed": 2,
+      "sigma_a_MPa": 900.0,
+      "condition": "shielded",
+      "coverage_pass": false,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "slenderness",
+        "tip",
+        "coverage"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 20836623.5867865,
+      "summary_status": "morphology_invalid_stalled"
+    },
+    {
+      "seed": 3,
+      "sigma_a_MPa": 700.0,
+      "condition": "no_shield",
+      "coverage_pass": true,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "slenderness",
+        "tip",
+        "competition"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 14787193.971776886,
+      "summary_status": "morphology_invalid_stalled"
+    },
+    {
+      "seed": 3,
+      "sigma_a_MPa": 700.0,
+      "condition": "shielded",
+      "coverage_pass": true,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "length",
+        "slenderness",
+        "front",
+        "competition"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 14981283.96104719,
+      "summary_status": "right_censored"
+    },
+    {
+      "seed": 3,
+      "sigma_a_MPa": 900.0,
+      "condition": "no_shield",
+      "coverage_pass": false,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "coverage",
+        "competition"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 4218010.613912432,
+      "summary_status": "morphology_invalid_stalled"
+    },
+    {
+      "seed": 3,
+      "sigma_a_MPa": 900.0,
+      "condition": "shielded",
+      "coverage_pass": false,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "length",
+        "slenderness",
+        "tip",
+        "coverage",
+        "competition"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 4222220.74727404,
+      "summary_status": "morphology_invalid_stalled"
+    },
+    {
+      "seed": 4,
+      "sigma_a_MPa": 700.0,
+      "condition": "no_shield",
+      "coverage_pass": true,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "slenderness",
+        "tip",
+        "competition"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 39147615.867510706,
+      "summary_status": "morphology_invalid_stalled"
+    },
+    {
+      "seed": 4,
+      "sigma_a_MPa": 700.0,
+      "condition": "shielded",
+      "coverage_pass": true,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "length",
+        "slenderness",
+        "front",
+        "competition"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 43385573.880267315,
+      "summary_status": "right_censored"
+    },
+    {
+      "seed": 4,
+      "sigma_a_MPa": 900.0,
+      "condition": "no_shield",
+      "coverage_pass": true,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "tip",
+        "competition"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 4415491.50300586,
+      "summary_status": "morphology_invalid_stalled"
+    },
+    {
+      "seed": 4,
+      "sigma_a_MPa": 900.0,
+      "condition": "shielded",
+      "coverage_pass": false,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "slenderness",
+        "coverage",
+        "competition"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 5238145.524472307,
+      "summary_status": "morphology_invalid_stalled"
+    },
+    {
+      "seed": 5,
+      "sigma_a_MPa": 700.0,
+      "condition": "no_shield",
+      "coverage_pass": true,
+      "handoff_pass": true,
+      "root_connected": true,
+      "failure_reasons": [],
+      "has_summary": true,
+      "cycles_root_connected": 62732027.52156681,
+      "summary_status": "physical_handoff"
+    },
+    {
+      "seed": 5,
+      "sigma_a_MPa": 900.0,
+      "condition": "no_shield",
+      "coverage_pass": true,
+      "handoff_pass": true,
+      "root_connected": true,
+      "failure_reasons": [],
+      "has_summary": true,
+      "cycles_root_connected": 8206564.380639665,
+      "summary_status": "physical_handoff"
+    },
+    {
+      "seed": 5,
+      "sigma_a_MPa": 900.0,
+      "condition": "shielded",
+      "coverage_pass": false,
+      "handoff_pass": false,
+      "root_connected": true,
+      "failure_reasons": [
+        "coverage"
+      ],
+      "has_summary": true,
+      "cycles_root_connected": 8242559.327327359,
+      "summary_status": "morphology_invalid_stalled"
+    }
+  ]
+}

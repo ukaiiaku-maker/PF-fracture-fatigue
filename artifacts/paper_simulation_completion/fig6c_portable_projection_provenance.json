@@ -1,0 +1,59 @@
+{
+  "schema": "v1_fig6c_portable_projection_provenance",
+  "full_source_files": {
+    "fourway_phenotype_summary_v5_7.csv": {
+      "sha256": "7c4cc7e7fd9c7c8834e52469be562e3b1b0d880c5f36d2b37f16c3a6d106c828"
+    },
+    "fracture_monotonic_points_v5_7.csv": {
+      "sha256": "cf3f5f91dce495f259e1d5c03b0fd87c5530157c2b9d6ab8ffa13a72b661c551"
+    },
+    "fatigue_thresholds_v5_7.csv": {
+      "sha256": "8203504544e4a3c82e650ea89e3dc02e3a68c98cc96c5eb1b31860b7f22e90ad"
+    },
+    "temperature_relative_strength_metrics.csv": {
+      "sha256": "0b9fe8b6f345310268da7fde0d8618107b44888bf15918d7db8ee7af072490b4"
+    }
+  },
+  "full_source_row_counts": {
+    "phenotype": 3840,
+    "monotonic": 207360,
+    "thresholds": 5760,
+    "strength": 11520
+  },
+  "filter_and_join_keys": {
+    "sn_definition": "strict_endurance_vs_continuous (endurance_like vs continuous_SN only; knee_threshold_like excluded)",
+    "temperatures_K": [
+      100.0,
+      300.0,
+      500.0
+    ],
+    "join_key": "surface_id (+ context_id for Kc/DKth families)",
+    "dkth_rate_criterion_filter": "rate_criterion_m_per_cycle == 1e-10"
+  },
+  "excluded_row_counts_and_reasons": {
+    "kc_rows_kept": 63330,
+    "dkth_rows_joined_before_null_score_drop": 1638,
+    "dkth_rows_excluded_null_score_after_join": 36,
+    "dkth_rows_kept": 1602,
+    "strength_rows_joined_before_null_score_drop": 10555,
+    "strength_rows_excluded_null_score_after_join": 973,
+    "strength_rows_kept": 9582
+  },
+  "compact_tables": {
+    "kc": {
+      "path": "artifacts/paper_simulation_completion/source_bundle_figures_2_4/fig6C_compact_kc_endurance.csv",
+      "sha256": "26d7988122686d702038d59120d8a84d2f4b77e087853a0de41c1933b8671cf5",
+      "n_rows": 63330
+    },
+    "dkth": {
+      "path": "artifacts/paper_simulation_completion/source_bundle_figures_2_4/fig6C_compact_dkth_endurance.csv",
+      "sha256": "1bd0e91f93958955ee8495585f5e7d957a0e4b5a99e35b3855ecdf6865c338c7",
+      "n_rows": 1602
+    },
+    "strength": {
+      "path": "artifacts/paper_simulation_completion/source_bundle_figures_2_4/fig6C_compact_strength_endurance.csv",
+      "sha256": "06cfd2c30dde7b354916541cd7215418dc8a7d39ee17ceb36e36096f8a6e9358",
+      "n_rows": 9582
+    }
+  }
+}
