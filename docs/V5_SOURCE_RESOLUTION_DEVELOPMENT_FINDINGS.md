@@ -126,6 +126,12 @@ hazards, exact site integrals and cumulative positive subgrid growth. The natura
 Variable FEM-dependent source changes and resolved-remesh subdivision remain
 subject to the full fingerprints, not erased fields.
 
+The current `/7` schema additionally binds the common continued terminal to its
+actual child path, lineage and accepted sharp-front event, and retains separate
+direct/replay failures and the prospectively versioned common-load restart
+protocol. Earlier `/5` and legacy failed restart evidence remain unchanged and
+are not silently promoted to that stronger terminal contract.
+
 Transition and common-terminal restart tests localize the actual next event at
 fixed load, recording its possibly very long waiting time. They are no longer
 conflated with the natural finite-window experiment. The optional fine-history

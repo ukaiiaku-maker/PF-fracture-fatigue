@@ -1330,8 +1330,9 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
     )
     from .finalization_v3_schema import canonical_hash
     source_signature = canonical_hash(source)
-    # Policy C: no qualified production-resolution transfer exists yet. Neither
-    # a caller-supplied PASS flag nor a static traction screen grants authority.
+    # Policy C: activity requires the actual owned production-source transfer
+    # qualification. Neither a caller-supplied PASS flag nor a static traction
+    # screen grants authority; the versioned fine-source transaction may qualify.
     # The accepted connection and all clock/RNG/graph state are returned intact.
     # Check owned phase/source as well as the argument to prevent source spoofing.
     owned_cavity = (state.junction_process_state.get("active_event_source", {}).get("source_kind") == "cavity_surface"
