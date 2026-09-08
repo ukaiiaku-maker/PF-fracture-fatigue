@@ -1,0 +1,25 @@
+{
+  "schema": "v5.development-repository-ci-inheritance/1",
+  "workflow_run_id": 34184892468,
+  "workflow_conclusion": "failure",
+  "executed_sha": "787ebf692a8d5058050553f4160b78af062f1d48",
+  "transcript_sha256": "2d4dfe507386c7b2e493a7abc36fa7e9540799ea9c21be6554a24a6849ede578",
+  "passed": 1115,
+  "failed": 7,
+  "skipped": 1,
+  "elapsed_seconds": 4581.50,
+  "failure_ids": [
+    "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader",
+    "tests/test_stage2_criterion_v12.py::test_required_matrices_are_complete",
+    "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id",
+    "tests/test_v10214_response_model_id.py::test_v10214_response_model_id",
+    "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly",
+    "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+    "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap"
+  ],
+  "recorded_inherited_baseline": "artifacts/voiding_v5_semantic_hardening/general_ci_inheritance.json",
+  "inherited_failure_identity_sets_equal": true,
+  "additional_failure_ids": [],
+  "general_repository_ci": "FAIL_INHERITED_BASELINE",
+  "terminal_final_head_ci": false
+}

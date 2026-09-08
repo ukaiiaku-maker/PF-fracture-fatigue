@@ -46,6 +46,10 @@ Available development results:
   attempts but skipped all eleven replay calls. Its reported 11 exact matches
   are INVALID restart claims, explicitly revoked by the separate legacy-harness
   audit. The repaired independent replay batches are required instead.
+  Separately, rollback CI `34184427615` at `facbc24` completed all 39 registered
+  attempts. Independent complete-checkpoint, injection-trace, topology and
+  conservation reconstruction verifies 39/39 PASS, including all 28 lifecycle
+  stages. This does not substitute for the still-running eleven V2 restarts.
 - Phase 10 (`a34cdf0`): observed causal states and histories match, but all four
   full future-sequence/restart gates fail. Historical raw identity remains FAIL.
 - Phase 9 (`a34cdf0`): all 96 unique static solves completed and independently
@@ -61,3 +65,6 @@ before a terminal mission classification.
 Uploaded development CI at `352d1d7`, run `34180123490`, contains exactly 277
 executed tests, zero failures and zero skips. The separate repository-wide run
 `34180123467` timed out at 90 minutes and is not classified inherited-only.
+Later repository-wide run `34184892468` at `787ebf6` completed with 1115 passed,
+one skipped and exactly the seven inherited failure identities. Its retained
+transcript supports `FAIL_INHERITED_BASELINE`, not green repository-wide CI.
