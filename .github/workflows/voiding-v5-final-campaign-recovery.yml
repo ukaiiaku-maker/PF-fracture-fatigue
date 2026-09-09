@@ -56,10 +56,10 @@ jobs:
           python-version: '3.12.14'
           cache: pip
       - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
-      - name: Configure and verify the frozen numerical runtime
-        run: |
-          python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
-          python scripts/v5_numerical_runtime_v1.py
+      - name: Configure the frozen numerical runtime
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify the frozen numerical runtime
+        run: python scripts/v5_numerical_runtime_v1.py
       - name: Verify exact recovery head and physical ancestor
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
