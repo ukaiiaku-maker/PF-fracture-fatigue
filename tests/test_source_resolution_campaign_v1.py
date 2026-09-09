@@ -165,6 +165,44 @@ def test_exact_head_known_scientific_failure_is_terminal_blocked(monkeypatch,tmp
     assert json.loads(output.read_text())==result
 
 
+def test_exact_head_ledger_extension_is_losslessly_projected(monkeypatch,tmp_path):
+    sha='a'*40;implementation=tmp_path/'implementation';scripts=implementation/'scripts';scripts.mkdir(parents=True)
+    validator=scripts/'validate_v5_complete_published_campaign_v1.py';validator.write_text('# frozen validator\n')
+    evidence=tmp_path/'evidence';evidence.mkdir()
+    (evidence/'paired_comparison.json').write_text(json.dumps({'executed_code_sha':sha,
+        'exact_recursive_comparison':True,'classification':'PASS'}))
+    expected={'schema':'ledger','mandatory_scientific_gates':{'old':False},'scientific_decision':'BLOCKED'}
+    ontology={'valid':False,'classification':'EXECUTED_BLOCKED'}
+    for side in ('a','b'):
+        root=evidence/side;(root/'lifecycle').mkdir(parents=True)
+        (root/'lifecycle/ontology_validation.json').write_text(json.dumps(ontology))
+        extended={**expected,'mandatory_scientific_gates':{**expected['mandatory_scientific_gates'],
+            'complete_lifecycle_evidence_ontology':False},'lifecycle_evidence_ontology':ontology}
+        (root/'scientific_ledger.json').write_text(json.dumps(extended))
+        (root/'sha256_manifest.json').write_text('{}')
+    (evidence/'sha256_manifest.json').write_text('{}')
+    publication=tmp_path/'publication.json';publication.write_text('{}')
+    monkeypatch.setattr(exact_head_classifier,'git',lambda *args:sha if args[1:] == ('rev-parse','HEAD') else '')
+    monkeypatch.setattr(exact_head_classifier,'exact_ledger',lambda *args:expected)
+    calls=[]
+    class Failed:
+        returncode=1;stdout='';stderr='ValueError: published complete scientific classification does not recompute\n'
+    class Passed:
+        returncode=0;stdout='';stderr=''
+    def run(command,**kwargs):
+        calls.append(command)
+        if len(calls)==1:return Failed()
+        Path(command[-1]).write_text(json.dumps({'scientific_decision':'BLOCKED'}))
+        return Passed()
+    monkeypatch.setattr(exact_head_classifier.subprocess,'run',run)
+    output=tmp_path/'audit.json'
+    result=exact_head_classifier.classify(implementation,evidence,publication,sha,output)
+    assert result['classification']=='PASS_WITH_REGISTERED_LEDGER_SCHEMA_EXTENSION'
+    assert result['evidence_valid'] is True and result['predicate_relaxed'] is False
+    assert result['validator_returncode_on_lossless_projection']==0
+    assert len(result['registered_extension']['records'])==2
+
+
 @pytest.mark.parametrize('child,passed',(('',True),('<skipped/>',False),('<failure/>',False)))
 def test_focused_requires_executed_pass_not_skip_or_missing(tmp_path,child,passed):
     path=tmp_path/'run.xml';path.write_text('<testsuites><testsuite><testcase classname="tests.test_voiding_v5" name="test_case">'
