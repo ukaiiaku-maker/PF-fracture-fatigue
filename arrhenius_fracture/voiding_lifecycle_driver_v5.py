@@ -95,15 +95,22 @@ def advance_production_void_interval(state,dt_s,*,temperature_K=900.,config=None
                     step=min(remaining,crossing)
                     updated=update_cavity_growth(voids,cavity.cavity_id,rates=rates,dt_s=step,
                                                 radial_growth_scale_m=config.radial_growth_scale_m)
-                    if cavity.phase==VoidPhase.RESOLVED_VOID and updated.cavities[0].radius_m!=cavity.radius_m:
+                    # The resolved-growth target is a physical remesh event.
+                    # Intermediate API partitions advance the exact owned
+                    # radius integral but must not manufacture extra meshes,
+                    # equilibrium solves, or source tensors.  Commit the one
+                    # represented-geometry update when the target is reached.
+                    if (cavity.phase==VoidPhase.RESOLVED_VOID
+                            and updated.cavities[0].radius_m>=target):
                         hole,_=_geometry(radius_m=cavity.radius_m,center_m=cavity.center_m)
                         hole=_grow_hole_boundary(hole,updated.cavities[0].radius_m,crack_path_m=accepted.crack_network.branches[0].path)
                         trace=[];trial=remesh_cavity(accepted,hole,updated,'natural-resolved-growth',trace)
                     else:
-                        # Subgrid bookkeeping is not an input to assemble_mechanics.
-                        # With unchanged mesh/u/ep/rho/damage/material/boundary,
-                        # another residual-correction solve only adds caller-
-                        # subdivision-dependent roundoff to an accepted equilibrium.
+                        # Subgrid bookkeeping and unresolved increments toward
+                        # the next represented resolved geometry are not inputs
+                        # to assemble_mechanics.  With unchanged mesh/u/ep/rho/
+                        # damage/material/boundary, another solve would add only
+                        # caller-subdivision-dependent state and roundoff.
                         trace=[];trial=replace(accepted,void_state=updated)
                     commit(trial,step,{'api':'state_owned_growth','rates':rates,'operations':trace});continue
                 root=accepted.crack_network.branches[0]

@@ -40,13 +40,14 @@ def test_repeated_physical_growth_preserves_frozen_inventory_tolerance(seed):
         assert conservation(state,before)['passed']
 
 
-@pytest.mark.parametrize('partitions',[1,2,4,8,16])
-def test_complete_natural_window_retains_exact_accepted_time(partitions):
+def test_complete_natural_window_is_full_state_partition_exact():
     from arrhenius_fracture.canonical_kinetic_time_v1 import exact
-    state,_=build_production_void_state(stochastic=True,seed=12000)
-    for _ in range(2*partitions):
-        state,_,result=advance_production_void_interval(state,NATURAL_WINDOW_S/(2*partitions))
-        assert result['failure'] is None
-    assert state.junction_process_state['canonical_accepted_time_v1'].seconds_exact()==exact(NATURAL_WINDOW_S)
-    # This asserts time only. The independently executed full-state partition
-    # matrix still detects resolved-remesh path dependence at fine partitions.
+    reference = None
+    for partitions in (1,2,4,8,16):
+        state,_=build_production_void_state(stochastic=True,seed=12000)
+        for _ in range(2*partitions):
+            state,_,result=advance_production_void_interval(state,NATURAL_WINDOW_S/(2*partitions))
+            assert result['failure'] is None
+        assert state.junction_process_state['canonical_accepted_time_v1'].seconds_exact()==exact(NATURAL_WINDOW_S)
+        if reference is None: reference=fingerprint(state)
+        assert fingerprint(state)==reference
