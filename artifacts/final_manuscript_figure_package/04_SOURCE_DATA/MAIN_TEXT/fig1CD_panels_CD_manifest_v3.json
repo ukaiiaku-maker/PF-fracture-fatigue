@@ -1,0 +1,23 @@
+{
+  "shared_entropy_function": "S*/kB = clip[-A_T F_T(T) - A_sigma F_sigma(sigma), S_min, 0]",
+  "temperature_gate": "F_T(T)=hill(T/T_S,p_T)/hill(T0/T_S,p_T)",
+  "stress_gate": "F_sigma=x^p_sigma/(1+x^p_sigma), x=|sigma|/sigma_S",
+  "derived_coordinate": "Lambda_S_ref = {-T_ref [S(sigma_ref,T_ref)-S(0,T_ref)]}/H0",
+  "shared_barrier": "G*=H(sigma)-T*S*(sigma,T)-sigma*v(sigma)",
+  "panel_C_axes": {
+    "x": "log10 N_i",
+    "y": "Lambda_S_ref",
+    "z": "sigma_a_MPa",
+    "color": "A_T_kB"
+  },
+  "panel_D_axes": {
+    "x": "T_K",
+    "y": "Lambda_S_ref",
+    "z": "sigma_y_MPa",
+    "color": "A_T_kB"
+  },
+  "stress_units": "MPa for all user-facing inputs, CSV stress fields, and plotted stress axes",
+  "sigma_ref_MPa": 400.0,
+  "lambda_T_ref_K": 300.0,
+  "note": "Lambda_S_ref is derived from the shared entropy function. No independent chi_shield, Gshield, or Lambda_sh parameter is swept."
+}

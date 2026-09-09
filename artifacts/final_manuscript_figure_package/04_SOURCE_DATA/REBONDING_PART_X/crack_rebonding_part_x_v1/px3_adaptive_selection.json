@@ -1,0 +1,80 @@
+{
+  "schema": "v10230_part_x_px3_adaptive_selection_v1",
+  "rules": {
+    "rule_1_always_select_reversible_R95_R50": {
+      "resolved": true,
+      "decision": "SELECT_D1_AND_D2",
+      "evidence": {
+        "R=-0.95_S_h_all": -0.04286294066339991,
+        "R=-0.50_S_h_all": -0.043507401620722155
+      },
+      "reasoning": "Rule 1 is unconditional per the mission text -- no gate to evaluate."
+    },
+    "rule_2_frequency_transition": {
+      "resolved": false,
+      "decision": "UNRESOLVED_NEEDS_DECISION",
+      "evidence": {
+        "analytically_preselected_frequency_Hz": 100.0,
+        "analytically_preselected_delta_mean_p_B": 0.049302139911005904,
+        "f=100Hz_S_h_all": -0.001130065723609146,
+        "f=1000Hz_S_h_all(baseline)": -0.043507401620722155,
+        "f=10000Hz_S_h_all": -0.04351107841668626
+      },
+      "reasoning": "The analytically pre-selected condition (100 Hz, largest predicted mean_p_B change from the 1000 Hz baseline) does NOT clear the |S_h|>=0.01 screen-level-effect gate under the live engine (|S_h|=0.0011). The only other screened candidate, 10000 Hz, clears the gate but shows the SAME S_h magnitude as the 1000 Hz baseline (-0.0435 vs -0.0435) -- i.e. it does not exhibit a distinct 'transition' behavior, just a scaled repeat of baseline. Rule 2's literal text presumes the analytically-largest-change candidate would also show the effect; that premise does not hold here. Selecting either candidate mechanically would require reinterpreting what 'transition condition' means beyond the mission's given wording -- this is left UNRESOLVED for an explicit decision rather than guessed. D3 (developed job at the frequency-transition condition) remains BLOCKED_PENDING_PX3_FREQUENCY_GATE pending that decision."
+    },
+    "rule_3_dwell_condition": {
+      "resolved": true,
+      "decision": "SELECT_D4_hold_s=0.002",
+      "evidence": {
+        "zero_hold_S_h_all": -0.043507401620722155,
+        "hold=0.0005s_S_h_all": 0.3551054814755134,
+        "hold=0.0005s_delta_from_zero_hold": 0.39861288309623555,
+        "hold=0.0005s_censored": true,
+        "hold=0.0005s_n_events": 6,
+        "hold=0.002s_S_h_all": 0.7968632120351952,
+        "hold=0.002s_delta_from_zero_hold": 0.8403706136559174,
+        "hold=0.002s_censored": false,
+        "hold=0.002s_n_events": 12
+      },
+      "reasoning": "Section 7.8's rule 3 asks for the nonzero hold with the largest change in transition flux or p_B from zero hold; that per-block instrumentation is not captured in this screen pass, so |S_h - S_h(hold=0)| is used as the best available real-trajectory proxy for 'change from zero hold'. Both nonzero holds clear the measurable-effect gate by a wide margin and both exceed the analytical atlas's prediction by roughly an order of magnitude. hold=0.0005s's finite trajectory was RIGHT-CENSORED at 6/12 events (wall_time_budget_exhausted_mid_event) -- its S_h is computed from that partial trajectory, not the full budget. S_h increases monotonically with hold duration (0 -> 0.0005 -> 0.002 s: -0.0435 -> 0.3551 -> 0.7969), so hold=0.002s's larger, UNCENSORED effect is the more reliable and larger of the two candidates -- overriding the provisional analytical pick of 0.0005s, which was based on the (evidently much weaker predictor) analytical mean_p_B delta."
+    },
+    "rule_4_passivation_chemistry": {
+      "resolved": true,
+      "decision": "SELECT_D5_chemistry_factor=1.0",
+      "evidence": {
+        "chem=1.0_S_h_all": -0.04350738307644659,
+        "chem=0.3_S_h_all": -0.037852645158266536,
+        "chem=0.1_S_h_all": -0.021143844026035773,
+        "analytically_preselected_chemistry_factor": 1.0
+      },
+      "reasoning": "Rule 4's literal criterion (live-engine cycle-mean p_B closest to 0.30 while mean p_P>=0.30) requires sub-event p_B/p_P instrumentation not captured in this screen pass -- NOT independently re-verified live. As a necessary-condition check, all three chemistry factors clear the |S_h|>=0.01 measurable-effect gate, and chemistry_factor=1.0 (the analytically pre-selected value) shows the LARGEST live effect of the three (-0.0435 vs -0.0379 vs -0.0211), consistent with -- not contradicting -- the analytical selection. Retaining chemistry_factor=1.0 for D5."
+    },
+    "rule_5_persistent_vs_reversible": {
+      "resolved": true,
+      "decision": "SELECT_D6",
+      "evidence": {
+        "baseline_persistent_S_h_all": -0.04360688149992394,
+        "baseline_reversible_S_h_all": -0.043507401620722155,
+        "baseline_delta_S_h": 9.94798792017873e-05,
+        "transition_persistent_S_h_all": -0.04241795585838232,
+        "transition_reversible_S_h_all": -0.001130065723609146,
+        "transition_delta_S_h": 0.04128789013477317
+      },
+      "reasoning": "At the R=-0.5/f=1000Hz baseline, persistent and reversible show essentially IDENTICAL live growth-rate effects (delta S_h=0.0001, far below the 0.01 gate) -- the analytical periodic-orbit distinction does not survive into this real, 12-event/60um trajectory at baseline. Per section 7.4's own instruction to also test 'the selected high-frequency transition point when the analytical atlas predicts reopening survival should distinguish them', the f=100Hz transition-point comparison decisively distinguishes them (delta S_h=0.0413, >>0.01). Rule 5's OR-connected criteria are satisfied via this transition-point comparison, so COMPETING_PERSISTENT is selected for D6, distinguished specifically at the frequency-transition condition, not at baseline."
+    },
+    "rule_6_cohesive_strength_endpoint": {
+      "resolved": true,
+      "decision": "DO_NOT_SELECT_D7",
+      "evidence": {
+        "K=0.45MPa_S_h_all": -0.020795266238846057,
+        "K=0.90MPa_S_h_all": -0.043507401620722155,
+        "K=1.80MPa_S_h_all": -0.09812367078027527,
+        "slope_low_segment_per_MPa": -0.05047141195972466,
+        "slope_high_segment_per_MPa": -0.06068474351061457,
+        "slope_ratio_high_over_low": 1.2023587443727546,
+        "same_sign": true
+      },
+      "reasoning": "S_h decreases monotonically and with the SAME sign of slope across both segments (ratio of high/low segment slope = 1.20, same_sign=True) -- this is a documented interpretation of 'visibly nonlinear'/'changes the qualitative slope classification' as a >2x or <0.5x slope-ratio change or a sign flip, neither of which is observed. No cohesive-strength endpoint is selected for developed confirmation; D7 remains at its default (aliased to the D2 baseline)."
+    }
+  }
+}

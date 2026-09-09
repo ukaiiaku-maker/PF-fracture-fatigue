@@ -1,0 +1,274 @@
+{
+  "schema": "v10.2.30_crack_rebonding_developed_confirmation_frozen_protocol_v1",
+  "written_before_any_result_path_exists": true,
+  "no_restart_or_resume_authorized": true,
+  "restart_resume_forbidden_flag_in_common_settings_must_be_true": true,
+
+  "parent_branch": {
+    "branch": "codex/v10.2.30-crack-rebonding-slope-exposure-continuation",
+    "head_sha": "4916fe282d32ed2e0bef15a812878c52b7a9db0b",
+    "must_remain_immutable": true,
+    "terminal_interpretation": [
+      "REBONDING_STEEPENS_LOCAL_RESPONSE",
+      "CONTACT_GATED_REBONDING_FINITE_WINDOW_STEEPENING_DEMONSTRATED",
+      "STRONG_CURVATURE_OR_ONSET_SHIFT_PRESENT",
+      "DEVELOPED_PARIS_SLOPE_NOT_YET_QUALIFIED"
+    ]
+  },
+  "this_branch": {
+    "branch": "codex/v10.2.30-crack-rebonding-developed-confirmation",
+    "based_exactly_on_sha": "4916fe282d32ed2e0bef15a812878c52b7a9db0b",
+    "worktree": "/private/tmp/v10230-crack-rebonding-developed-confirmation"
+  },
+
+  "material_and_provenance": {
+    "a_native_provenance_path": "artifacts/crack_rebonding_causal_pilot_v2/A_native_provenance.json",
+    "a_native_provenance_schema": "v10.2.30_crack_rebonding_causal_pilot_v2_A_native_provenance_v1",
+    "complete_active_material_row_sha256": "04518e244b7a446a120ea6e2d15a68758cb54a225d099609deeb23da32679971",
+    "qualified_production_head": "94871be15702e7fb85116b92af62c1226c61be42",
+    "option_key": "A_NATIVE",
+    "production_engine_mro": [
+      "arrhenius_fracture.persistent_site_cyclic_energy_gated_corrected_v10230.CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_cyclic_energy_gated_v10230.HazardEnergyGatedPersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_cyclic_coupled_audited_v10229.AuditedCoupledPersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_cyclic_coupled_v10229.CoupledPersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_cyclic_v10229.PersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_source_v10221.PersistentSiteStateResolvedTipEngine",
+      "arrhenius_fracture.state_resolved_signed_engine_v10214.StateResolvedSignedBurgersTipEngine",
+      "arrhenius_fracture.state_resolved_signed_engine_v10212.StateResolvedSignedBurgersTipEngine",
+      "arrhenius_fracture.state_resolved_signed_engine_v1029.StateResolvedSignedBurgersTipEngine",
+      "arrhenius_fracture.state_resolved_signed_engine_v1026.StateResolvedSignedBurgersTipEngine",
+      "arrhenius_fracture.signed_burgers_shared_v1025.SignedBurgersAnisotropicTipEngine",
+      "arrhenius_fracture.anisotropic_emission_v10174.AnisotropicStochasticAvalancheTipEngine",
+      "arrhenius_fracture.stochastic_avalanche_tip.StochasticAvalancheDiagnosticTipEngine",
+      "arrhenius_fracture.stochastic_hazard_tip.StochasticHazardDiagnosticTipEngine",
+      "arrhenius_fracture.developed_state_diagnostic_tip.DevelopedStateDiagnosticTipEngine",
+      "arrhenius_fracture.campaign_calibrated_tip.CampaignCalibratedTipEngine",
+      "arrhenius_fracture.separated_source_tip.SeparatedSourceKineticTipEngine",
+      "arrhenius_fracture.continuum_source_tip.ContinuumSourceKineticTipEngine",
+      "arrhenius_fracture.kinetic_tip_cell.KineticMovingTipFrontEngine",
+      "arrhenius_fracture.unified_front.UnifiedMPZFrontEngine",
+      "builtins.object"
+    ],
+    "parent_frozen_configuration_path": "artifacts/crack_rebonding_causal_pilot_v2/frozen_configuration.json",
+    "parent_frozen_configuration_sha256_field": "frozen_configuration_sha256",
+    "config_hashes_reused_verbatim": {
+      "RB2_reversible_zero": "f08635f9f5d6b18be8288180ee7ced0dbd03a45ee0ca2b6d1868a2239c715caa",
+      "RB2_reversible_finite": "271f45981545cf80d9d96c14138d9d9c6235b3f1bba20635d8e993e568d76fd2"
+    },
+    "note_persistent_kinetics_excluded": "this campaign uses ONLY the reversible RB2 kinetics per Section B; RB2_persistent_* config hashes exist in the parent frozen configuration but are not exercised here."
+  },
+
+  "common_settings_frozen": {
+    "T_K": 300.0,
+    "R": -0.95,
+    "frequency_Hz": 1000.0,
+    "n_phase": 80,
+    "mpz_n_bins": 80,
+    "contact_model": "SIGNED_K_COMPRESSION_PROXY",
+    "contact_semantics_label": "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT",
+    "feedback_mode": "HAZARD_ONLY_REBOND_SHIELD",
+    "integrator_mode": "EXPLICIT_PHASE_RESOLVED",
+    "dmd_poincare_acceleration_enabled": false,
+    "topological_healing_enabled": false,
+    "passivation_enabled": false,
+    "restart_resume_forbidden": true,
+    "initial_precrack_wake_mode": "NO_INITIAL_ACTIVE_WAKE",
+    "fresh_surface_clean_fraction": 1.0,
+    "chemistry_factor": 1.0,
+    "kinetics_model_level": "CLEAN_REVERSIBLE_REBOND",
+    "note_kinetics": "RB2 reversible only (CLEAN_REVERSIBLE_REBOND level); persistent kinetics not exercised in this campaign"
+  },
+
+  "kmax_grid_Pa_sqrt_m": [15000000.0, 18000000.0, 21000000.0],
+
+  "cohesion_pair_definition": {
+    "zero_cohesion": {
+      "config_key": "RB2_reversible_zero",
+      "restored_work_of_separation_J_m2": 0.0,
+      "rebond_K_geometry_factor": 1.0,
+      "K_rebond_max_Pa_sqrt_m": 0.0
+    },
+    "finite_cohesion": {
+      "config_key": "RB2_reversible_finite",
+      "restored_work_of_separation_J_m2": 1.8225,
+      "rebond_K_geometry_factor": 1.0,
+      "K_rebond_max_Pa_sqrt_m": 900000.0
+    },
+    "note_no_rescaling": "restored_work_of_separation_J_m2, rebond_K_geometry_factor, and K_rebond_max are held FIXED at their Kmax=18 calibrated values across all three Kmax points -- Pi_K = K_rebond_max/Kmax is NOT rescaled to stay constant; it varies naturally (0.060 at 15, 0.050 at 18, 0.0429 at 21), matching the already-frozen minimal-slope-screen predictions."
+  },
+
+  "common_random_numbers_design": {
+    "stage_1_seed": 1720,
+    "stage_2_seed_conditional": 1001723,
+    "pairing_rule": "the zero-cohesion and finite-cohesion trajectory at a given (seed, Kmax) share an IDENTICAL per-event-index hazard_threshold_action sequence, verified exactly (not merely statistically) after each pair completes",
+    "hazard_configuration_call": "Engine.configure_hazard(mode='exponential', seed=<seed>) called once per trajectory before build_engine/reset_engine_registry, per the existing run_trajectory contract"
+  },
+
+  "admission_gate_for_stage_1_and_2_trajectories": {
+    "complete_compression_excursion_admission_gate_from_minimal_slope_screen": "NOT IMPOSED",
+    "reason": "contact exposure (integrated negative-K contact time, complete vs. partial excursion counts) is now treated as an outcome and a potential source of K-dependence under study, not an admissibility criterion -- consistent with the slope-exposure-continuation branch's already-accepted reasoning",
+    "trajectory_action_path_requirement": "ONLY the qualified phase-resolved / certified periodic-orbit action path (arrhenius_fracture.crack_rebonding_kinetics_v10230's phase_resolved_action, recorded via the existing bulk_action_records / any_bulk_action_used / all_bulk_action_qualified instrumentation in run_trajectory) may be admitted -- no uncertified DMD, projective, or Poincare acceleration shortcuts (dmd_poincare_acceleration_enabled must be false and verified false in the reloaded config for every trajectory)",
+    "horizon_limited_trajectory_semantics": "a trajectory that exhausts its event/extension/wall-time budget before reaching the developed target is CENSORED (censored=true), never reported as da/dN=0; a censored trajectory does not satisfy the developed/stationarity gate below and cannot be used for Stage 1 pass/fail or for Section E's second-seed gate"
+  },
+
+  "developed_growth_and_stationarity_gate": {
+    "source": "scripts/analyze_v10_2_30_developed_fatigue_growth.py, lines 322-359, as cited verbatim by scripts/analyze_v10_2_30_A_native_plus_8PT_final.py:214 ('The 36/36 n80 base trajectories reached 102.668 um and all pass the unchanged stationarity gate.')",
+    "reused_verbatim": true,
+    "not_reinvented": true,
+    "stability_definition_string_verbatim": "at_least_10_events_and_50um_developed_growth_and_late_to_early_cumulative_rate_ratio_between_0p5_and_2",
+    "constants": {
+      "target_extension_um": 100.0,
+      "development_extension_um": 20.0,
+      "stability_window_um": 50.0,
+      "moving_window_um": 25.0
+    },
+    "formula": {
+      "development_m": "development_extension_um * 1e-6",
+      "target_m": "target_extension_um * 1e-6",
+      "developed_interval": "interval_rate(events, development_m, max(final_extension_m, development_m))",
+      "stability_start_m": "max(final_extension_m - stability_window_m, development_m)",
+      "stability_mid_m": "0.5 * (stability_start_m + final_extension_m)",
+      "early_interval": "interval_rate(events, stability_start_m, stability_mid_m)",
+      "late_interval": "interval_rate(events, stability_mid_m, final_extension_m)",
+      "late_to_early_rate_ratio": "late_interval.da_dN / early_interval.da_dN",
+      "stable_growth_provisional": "developed_interval.event_count >= 10 AND (final_extension_m - development_m) >= stability_window_m AND late_to_early_rate_ratio is not None AND 0.5 <= late_to_early_rate_ratio <= 2.0",
+      "interval_rate_definition": "for events with projected_extension_post_m > start_m and projected_extension_pre_m < stop_m: da = sum(projected_advance_m); dN = sum(cycles_between_events); da_dN = da/dN if dN>0 else None"
+    },
+    "schema_adaptation_for_crack_rebonding_event_format": {
+      "reason": "the source script parses a different run harness's steps_{tag}.csv output; the crack-rebonding trajectories (arrhenius_fracture.crack_rebonding_causal_pilot_v2_v10230.run_trajectory) instead emit an in-memory events list keyed by accepted_length_m / cumulative_extension_m / waiting_time_s_this_event / cumulative_time_s -- the GATE FORMULA AND ITS NUMERICAL CONSTANTS above are reused verbatim; only the field-name mapping below is new, not a new criterion",
+      "field_mapping": {
+        "projected_advance_m": "event['accepted_length_m']",
+        "projected_extension_post_m": "event['cumulative_extension_m']",
+        "projected_extension_pre_m": "event['cumulative_extension_m'] - event['accepted_length_m']",
+        "cycles_between_events": "event['waiting_time_s_this_event'] * frequency_Hz  (frequency_Hz=1000.0 fixed, so dN = dt * f exactly; this campaign's run_trajectory records waiting_time_s_this_event, not a native cycle counter, and the waveform is a fixed-frequency sinusoid, so this conversion is exact, not an approximation)",
+        "final_extension_m": "events[-1]['cumulative_extension_m']"
+      }
+    },
+    "production_developed_da_dN_definition": "developed_interval.da_dN from the formula above, evaluated on an UNCENSORED trajectory whose stable_growth_provisional is true; this is the ONLY primary observable used for delta_m / secants in Section C -- all other windows (all-event, post-first-event, final-half, final-six, eventwise, rolling) are secondary/diagnostic per Section C"
+  },
+
+  "windows_final_half_and_final_six": {
+    "definition_basis": "event INDEX windows over the reused ~18-event developed target, using the SAME 0-based event_index convention run_trajectory already assigns (events[0]['event_index']==0, i.e. len(events) at append time before the append) -- distinct from the extension-based developed/stationarity gate above, which is authoritative for pass/fail",
+    "final_half_event_indices_0_based": [9, 10, 11, 12, 13, 14, 15, 16, 17],
+    "final_six_event_indices_0_based": [12, 13, 14, 15, 16, 17],
+    "note": "these are the literal event_index values for an 18-event trajectory (event_index runs 0..17); if a trajectory's actual accepted-event count N differs from 18, the same RELATIVE windows (last 9 of N -> final-half; last 6 of N -> final-six) are recomputed against the ACTUAL final event_index range and recorded explicitly in the analysis output alongside the nominal target, per Section C's requirement to report numerical uncertainty"
+  },
+
+  "rate_shift_statistic": {
+    "definition": "S_h(K) = log10( (sum(finite.accepted_length_m) / sum(finite.waiting_time_s_this_event)) / (sum(zero.accepted_length_m) / sum(zero.waiting_time_s_this_event)) )",
+    "sign_convention": "negative S_h means finite cohesion (rebonding) is SLOWER than zero cohesion at that Kmax/window (rebonding retards growth); positive S_h means rebonding accelerates growth",
+    "waiting_time_simplification_gate": "S_h may be computed via the reciprocal waiting-time simplification (log10(sum(zero waiting times)/sum(finite waiting times))) ONLY after the accepted-length identity (sum(finite.accepted_length_m) == sum(zero.accepted_length_m) over the same window, to numerical tolerance) is explicitly checked and reported for that window; if the identity does not hold, the full length/time ratio form above is used and the simplification is not substituted"
+  },
+
+  "classifier_reused_verbatim": {
+    "module": "arrhenius_fracture.crack_rebonding_slope_exposure_continuation_v10230",
+    "function": "classify_slope_effect_v2",
+    "parameters_frozen": {
+      "rate_offset_span_decade": 0.01,
+      "slope_gate": 0.25,
+      "exposure_disparity_ratio_threshold": 2.0
+    },
+    "note": "this function classifies FINITE-WINDOW seed-pair agreement (REBONDING_STEEPENS_LOCAL_RESPONSE / REBONDING_PHASE_EXPOSURE_SENSITIVE / etc.); the DEVELOPED-confirmation terminal classification (Section F) is a SEPARATE, new function operating on delta_m computed from the developed_da_dN window instead of the finite-window S_h -- Section F's five classifications are new because no developed-window analog existed before this campaign, not a replacement of this reused classifier"
+  },
+
+  "delta_m_and_secant_definitions": {
+    "x": "log10(Kmax_MPa_sqrt_m)",
+    "y": "S_h",
+    "three_point_least_squares_delta_m": "sum((x-xbar)*(y-ybar)) / sum((x-xbar)**2) over the 3 Kmax points in a window",
+    "secant_15_to_18": "(S_h(18)-S_h(15)) / (log10(18)-log10(15))",
+    "secant_18_to_21": "(S_h(21)-S_h(18)) / (log10(21)-log10(18))",
+    "endpoint_curvature": "secant_18_to_21 - secant_15_to_18"
+  },
+
+  "stage_2_conditional_gate": {
+    "seed": 1001723,
+    "authorized_only_if_all_of": [
+      "all six seed-1720 trajectories are uncensored",
+      "all six seed-1720 trajectories individually satisfy stable_growth_provisional (developed/stationarity gate) verbatim as defined above",
+      "each of the 3 zero/finite pairs has an exactly identical hazard_threshold_action sequence per event index (paired threshold provenance)",
+      "each trajectory has a certified action history (all_bulk_action_qualified true for every accepted event, or explicitly reported and justified per-event if not)",
+      "the production developed_da_dN window's 3-point delta_m >= 0.25",
+      "the prospectively-frozen final-half (late) window's 3-point delta_m >= 0.25",
+      "both of the above are the SAME SIGN"
+    ],
+    "if_gate_fails": "STOP -- do not run seed 1001723; do not retune Kmax, frequency, event target, or cohesive strength; report FINITE_WINDOW_STEEPENING_NOT_PERSISTENT or DEVELOPED_REBONDING_SLOPE_EFFECT_WEAK_OR_UNRESOLVED (or SEED_SENSITIVE if a single-seed internal inconsistency is found) per Section F and return control to the user",
+    "if_gate_passes": "run the identical six-trajectory matrix for seed 1001723 with NO retuning of any frozen parameter after seeing the seed-1720 results"
+  },
+
+  "terminal_classifications_section_f": {
+    "DEVELOPED_REBONDING_STEEPENING_CONFIRMED": "both seeds pass the developed/stationarity gate uncensored, both give developed-window delta_m >= 0.25, and both deltas have the same sign",
+    "FINITE_WINDOW_STEEPENING_NOT_PERSISTENT": "developed-window response falls below the 0.25 slope gate, or loses the positive sign the prior finite-window result showed",
+    "DEVELOPED_REBONDING_SEED_SENSITIVE": "the two seeds disagree in sign, or their developed-window delta_m values differ by more than 0.25",
+    "DEVELOPED_REBONDING_RATE_OFFSET_LIKE": "both seeds show |S_h(21)-S_h(15)| < 0.01 decade in the developed window AND |delta_m| < 0.25 for both seeds",
+    "DEVELOPED_REBONDING_SLOPE_EFFECT_WEAK_OR_UNRESOLVED": "none of the above patterns is matched (default/fallback)"
+  },
+
+  "budgets": {
+    "note": "the previous causal-pilot/minimal-slope-screen/slope-exposure-continuation trajectories targeted a 7-8 event / <=30um budget; this campaign's reused developed/stationarity gate requires ~18 events and >=100um of developed growth, so run_trajectory's per-call override parameters (already supported by its existing signature) are widened here. Only the NUMERIC BUDGET is new -- the underlying run_trajectory mechanics, censor semantics, and action-path certification are completely unchanged.",
+    "max_accepted_events": 30,
+    "max_projected_extension_m": 1.5e-4,
+    "max_blocks_per_event": 20000,
+    "max_wall_seconds_per_trajectory": 7200.0,
+    "min_accepted_events_for_uncensored": 3,
+    "block_cycles": 1000.0,
+    "max_block_cycles": 1.0e6,
+    "rationale_for_max_accepted_events_30_vs_target_18": "provides >60% margin above the ~18-event developed target so a trajectory that runs slightly long due to natural stochastic variation in event spacing is not artificially truncated into a false censor; a trajectory that still has not reached the developed/stationarity gate by 30 events or 150um is genuinely horizon-limited and is censored, not truncated early",
+    "censor_is_never_reported_as_zero_rate": true
+  },
+
+  "analysis_windows_recap": [
+    "developed (production, extension-window per the reused gate)",
+    "all-event",
+    "post-first-event",
+    "final-half (event indices 9-17 of an 18-event nominal target)",
+    "final-six (event indices 12-17 of an 18-event nominal target)",
+    "eventwise waiting-time ratio (per matched event index)",
+    "four-event rolling waiting-time ratio"
+  ],
+
+  "figures_to_generate": [
+    "developed_da_dN_vs_Kmax_zero_and_finite.png",
+    "S_h_vs_Kmax_all_windows.png",
+    "local_delta_m_and_secants.png",
+    "eventwise_and_rolling_waiting_time_ratios.png",
+    "pB_contact_time_action_weighted_Krebond_vs_Kmax.png"
+  ],
+
+  "archive_fields_required_section_c": [
+    "integrated_negative_K_contact_time_s (per trajectory)",
+    "actual_trajectory_integrated_A_on_A_off (where available; NOT substituted with frozen analytical predictions)",
+    "frozen_analytical_A_on_A_off (stored separately, from developed_confirmation_predictions.json, for comparison only)",
+    "pre_event_max_pB (per event and trajectory-aggregated)",
+    "fraction_of_events_with_nonzero_bonded_shielding",
+    "action_weighted_K_rebond_unconditional_mean (averaged over ALL events)",
+    "action_weighted_K_rebond_conditional_mean (averaged over events with nonzero K_rebond only)",
+    "action_weighted_K_rebond_nonzero_event_fraction",
+    "max_phase_resolved_K_rebond_Pa_sqrt_m",
+    "finite_minus_zero_cleavage_action",
+    "accepted_event_length_sequences",
+    "hazard_threshold_action_sequences",
+    "mpz_material_config_hashes",
+    "all_bulk_action_certificates"
+  ],
+
+  "decomposition_section_d": {
+    "corrected_conditional_mean_bug": "the prior campaign's 'conditional mean' excluded zero-K_rebond events entirely; this campaign reports BOTH the unconditional mean (over all events) and the conditional mean (over nonzero-K_rebond events only) plus the nonzero-event fraction, for every trajectory and every pooled Kmax window",
+    "fixed_absolute_shielding_benchmark": {
+      "S_abs_shape_preserving": "S_abs(K) = log10( g_zero(K - K_b) / g_zero(K) ), where g_zero is the zero-cohesion rate as a function of K, K_b is the pooled developed action-weighted K_rebond, and the K-K_b evaluation uses shape-preserving interpolation across the zero-cohesion g_zero(K) points",
+      "S_abs_local_power_law_fallback": "S_abs(K) ~= m_zero(K) * log10(1 - K_b/K), used only if shape-preserving interpolation is not admissible (e.g. too few zero-cohesion Kmax points to interpolate reliably), where m_zero(K) is the local zero-cohesion Paris-slope estimate at K",
+      "S_occupancy_residual": "S_occupancy(K) = S_h(K) - S_abs(K), reported strictly as a diagnostic residual (how much of the observed shift is NOT explained by simple absolute load-shielding), never separately fit as its own power law",
+      "attribution_rule": "steepening/flattening is NOT attributed entirely to reduced bond-formation time (an 'occupancy' story) unless the measured occupancy/action diagnostics (unconditional/conditional K_rebond means, nonzero-event fraction, contact-time) actually support that reading for the Kmax range in question"
+    }
+  },
+
+  "verification_requirements_recap": [
+    "independently rebuild the bare A_NATIVE engine and reproduce complete_row_sha256 from scratch",
+    "reload every config from the parent frozen_configuration.json and reproduce config_hash() exactly for RB2_reversible_zero and RB2_reversible_finite",
+    "re-derive all Section C/D analysis values from tracked ledgers only (never from gitignored runs/ directories)",
+    "check exact hazard_threshold_action sequence identity per zero/finite pair",
+    "check dmd_poincare_acceleration_enabled == false and any_bulk_action_used/all_bulk_action_qualified certification for every accepted event",
+    "re-run Section F classification logic and require EXACT dict equality (via JSON round-trip key-type normalization) against the committed classification, not membership-in-allowed-set",
+    "verify no trajectory used restart/resume (restart_resume_forbidden == true reloaded from config, and each trajectory's own record shows a virgin start)"
+  ]
+}

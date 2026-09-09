@@ -1,0 +1,55 @@
+{
+  "schema": "v10230_crack_rebonding_part_x_mission_scope_v1",
+  "mission_name": "SIGNED_K_CRACK_REBONDING_PART_X",
+  "in_scope": [
+    "A: at least one genuinely nonsaturated clean-surface reversible rebonding regime",
+    "B: reversible vs persistent clean-surface kinetics distinguished or shown indistinguishable",
+    "C: RB3 PASSIVATION_GATED_REBOND exercised end to end (active P<->C<->B)",
+    "D: developed sensitivity to Kmax, R, frequency, minimum-load dwell, kinetic chemistry factor, restored cohesive strength",
+    "E: mechanism classification of each response axis",
+    "F: manuscript-grade censor-aware tables, figures, provenance, strict verifier"
+  ],
+  "out_of_scope": [
+    "RESOLVED_GAP_TRACTION / resolved opposing-face contact",
+    "plastic-wake closure at positive nominal R",
+    "crack-length reduction / crack-surface removal / topological healing",
+    "HAZARD_AND_ENERGY_GATE_COUPLED feedback mode",
+    "stochastic healing",
+    "closure-corrected DeltaK_eff reporting",
+    "production-line merge"
+  ],
+  "contact_model_label": "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT",
+  "retained_prior_classifications": {
+    "FIXED_ABSOLUTE_COHESIVE_SHIELDING_DOMINANT": "scoped ONLY to the existing SAT_EXISTING row (A_NATIVE, T=300K, R=-0.95, f=1000Hz, Kmax=15/18/21 MPa sqrt(m), RB2 reversible, K_rebond_max=0.9 MPa sqrt(m), seeds 1720/1001723). Not generalized to new nonsaturated or passivation-limited regimes before testing.",
+    "STATIC_DYNAMIC_LOCALIZER_PARITY_UNRESOLVED": "retained until the static-control event localization is placed on, or demonstrated equivalent to, the exact phase-resolved event-time path (PX1.4)."
+  },
+  "existing_developed_reference": {
+    "material": "A_NATIVE",
+    "T_K": 300.0,
+    "R": -0.95,
+    "frequency_Hz": 1000.0,
+    "Kmax_MPa_sqrt_m": [
+      15.0,
+      18.0,
+      21.0
+    ],
+    "K_rebond_max_MPa_sqrt_m": 0.9,
+    "seeds": [
+      1720,
+      1001723
+    ],
+    "accepted_events": 30,
+    "total_extension_um": 150.0,
+    "delta_m_seed_1720": 0.687925,
+    "delta_m_seed_1001723": 0.687358,
+    "approximate_rate_reduction_pct": {
+      "15": 25,
+      "18": 9,
+      "21": 6
+    }
+  },
+  "persistent_worktree": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-crack-rebonding-part-x",
+  "persistent_run_root": "runs/crack_rebonding_part_x_v1",
+  "tracked_evidence_root": "artifacts/crack_rebonding_part_x_v1",
+  "max_physical_workers": 3
+}

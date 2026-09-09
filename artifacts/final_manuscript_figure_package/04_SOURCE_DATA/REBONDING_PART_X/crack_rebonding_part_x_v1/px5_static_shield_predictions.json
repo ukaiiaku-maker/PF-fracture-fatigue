@@ -1,0 +1,127 @@
+{
+  "schema": "v10230_part_x_px5_static_shield_predictions_v1",
+  "Eprime_Pa": 444444444444.44446,
+  "r_eff_m": 1e-06,
+  "rows": [
+    {
+      "protocol": "D2",
+      "row_name": "COMPETING_REVERSIBLE",
+      "Kmax_Pa_sqrt_m": 12000000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.29770923192830945,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 267938.3087354785,
+      "convergence_residual": 3.1031676915590914e-16
+    },
+    {
+      "protocol": "D2",
+      "row_name": "COMPETING_REVERSIBLE",
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.3091571035432934,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 278241.39318896405,
+      "convergence_residual": 3.925231146709438e-16
+    },
+    {
+      "protocol": "D2",
+      "row_name": "COMPETING_REVERSIBLE",
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.3201259765838885,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 288113.3789254997,
+      "convergence_residual": 4.847302891456678e-16
+    },
+    {
+      "protocol": "D2",
+      "row_name": "COMPETING_REVERSIBLE",
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.33047580003071014,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 297428.2200276391,
+      "convergence_residual": 2.7755575615628914e-17
+    },
+    {
+      "protocol": "D2",
+      "row_name": "COMPETING_REVERSIBLE",
+      "Kmax_Pa_sqrt_m": 24300000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.34099664324155526,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 306896.9789173997,
+      "convergence_residual": 2.618455766672135e-16
+    },
+    {
+      "protocol": "D5",
+      "row_name": "PASSIVATION_LIMITED",
+      "Kmax_Pa_sqrt_m": 12000000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.2910387257995902,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 261934.85321963122,
+      "convergence_residual": 1.6883057536160649e-16
+    },
+    {
+      "protocol": "D5",
+      "row_name": "PASSIVATION_LIMITED",
+      "Kmax_Pa_sqrt_m": 15000000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.31704595727705764,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 285341.3615493519,
+      "convergence_residual": 1.1443916996305594e-16
+    },
+    {
+      "protocol": "D5",
+      "row_name": "PASSIVATION_LIMITED",
+      "Kmax_Pa_sqrt_m": 18000000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.3433568223547891,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 309021.1401193102,
+      "convergence_residual": 7.850462293418876e-17
+    },
+    {
+      "protocol": "D5",
+      "row_name": "PASSIVATION_LIMITED",
+      "Kmax_Pa_sqrt_m": 21000000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.3695489145231268,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 332594.02307081415,
+      "convergence_residual": 1.7554167342883506e-16
+    },
+    {
+      "protocol": "D5",
+      "row_name": "PASSIVATION_LIMITED",
+      "Kmax_Pa_sqrt_m": 24300000.0,
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "mean_p_B_periodic_orbit": 0.39769739756578826,
+      "ceiling_K_b_static_Pa_sqrt_m": 900000.0,
+      "periodic_orbit_matched_K_b_static_Pa_sqrt_m": 357927.6578092094,
+      "convergence_residual": 1.3597399555105182e-16
+    }
+  ]
+}

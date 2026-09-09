@@ -1,0 +1,82 @@
+{
+  "schema": "v1_figure_package_validation_report",
+  "n_main_text_figures": 33,
+  "n_si_figures": 9,
+  "n_part_x_figures": 24,
+  "n_source_data_files": 140,
+  "duplicate_figure_ids": [],
+  "duplicate_source_data_hashes": [
+    {
+      "sha256": "5e8bcd64a84fe11cb51f457a6a1e7f5b74cfa05363f86adf6a07481c98a82bfa",
+      "paths": [
+        "04_SOURCE_DATA/MAIN_TEXT/fig1AB_panel_A_waterfall_path.csv",
+        "04_SOURCE_DATA/SUPPORTING_INFORMATION/fig1AB_panel_A_waterfall_path.csv"
+      ]
+    },
+    {
+      "sha256": "a19a1be0bd7ef132436d392f6ddb77c0524355c8d2e823e6af73c95623cac3e2",
+      "paths": [
+        "04_SOURCE_DATA/MAIN_TEXT/fig2_first_passage_comparison_with_analytic_1x.csv",
+        "04_SOURCE_DATA/SUPPORTING_INFORMATION/fig2_first_passage_comparison_with_analytic_1x.csv"
+      ]
+    },
+    {
+      "sha256": "74b55c6a719ac49c2e9954851c42b667c7c1eeb80b38b3339a748338f72ad5ea",
+      "paths": [
+        "04_SOURCE_DATA/MAIN_TEXT/fig3_class_mean_Rcurve_fits.csv",
+        "04_SOURCE_DATA/SUPPORTING_INFORMATION/fig3_class_mean_Rcurve_fits.csv"
+      ]
+    },
+    {
+      "sha256": "b48bc8c4d937d962a34ec037e7d7fd829e9a7140c35d5a258619eb2a3d45d07b",
+      "paths": [
+        "04_SOURCE_DATA/MAIN_TEXT/fig3_seed_Rcurve_metrics_and_fits.csv",
+        "04_SOURCE_DATA/SUPPORTING_INFORMATION/fig3_seed_Rcurve_metrics_and_fits.csv"
+      ]
+    },
+    {
+      "sha256": "50dd7a22b5826ff80e9a33aa71df5a7055de43fa9c97bee9d53c93cff7a9f7de",
+      "paths": [
+        "04_SOURCE_DATA/MAIN_TEXT/fig4_first_passage_comparison_with_analytic_all_rates.csv",
+        "04_SOURCE_DATA/SUPPORTING_INFORMATION/fig4_first_passage_comparison_with_analytic_all_rates.csv"
+      ]
+    },
+    {
+      "sha256": "8ba10f159ca30608cae446ccf6f858ff3010d7eaa36d92360132143564dbed32",
+      "paths": [
+        "04_SOURCE_DATA/MAIN_TEXT/fig5A_atlas_2d_paris_points.csv",
+        "04_SOURCE_DATA/SUPPORTING_INFORMATION/fig5A_atlas_2d_paris_points.csv"
+      ]
+    },
+    {
+      "sha256": "4b6611dd0048ec1ad9dfc3847d743e3d64573847a10e1d99df292e673fb4c3e2",
+      "paths": [
+        "04_SOURCE_DATA/MAIN_TEXT/fig6B_compact_joined_1360.csv",
+        "04_SOURCE_DATA/SUPPORTING_INFORMATION/fig6B_compact_joined_1360.csv"
+      ]
+    },
+    {
+      "sha256": "ba6f383383509caf60eebfd5ed09cce5e02a2bff8e7c89dd587c7d0108ff46b9",
+      "paths": [
+        "04_SOURCE_DATA/MAIN_TEXT/fig6_manuscript_statistics_table.csv",
+        "04_SOURCE_DATA/SUPPORTING_INFORMATION/fig6_manuscript_statistics_table.csv"
+      ]
+    },
+    {
+      "sha256": "737a148454796cd457e7336f27802b9349e60efd4a2556a64b0ecd882c952b29",
+      "paths": [
+        "04_SOURCE_DATA/MAIN_TEXT/sec2_15_seed_binned_Rcurves_long.csv",
+        "04_SOURCE_DATA/SUPPORTING_INFORMATION/sec2_15_seed_binned_Rcurves_long.csv"
+      ]
+    }
+  ],
+  "checks": {
+    "all_figures_have_pdf": true,
+    "no_duplicate_figure_ids": true,
+    "all_source_files_nonzero_size": true,
+    "figure_manifest_nonempty": true,
+    "source_data_manifest_nonempty": true,
+    "main_text_has_at_least_25_files": true
+  },
+  "all_checks_pass": true
+}

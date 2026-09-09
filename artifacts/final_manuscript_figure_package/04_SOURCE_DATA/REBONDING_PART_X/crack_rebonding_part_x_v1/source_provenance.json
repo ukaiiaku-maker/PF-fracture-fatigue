@@ -1,0 +1,59 @@
+{
+  "schema": "v10230_crack_rebonding_part_x_source_provenance_v1",
+  "authoritative_source_branch": "codex/v10.2.30-crack-rebonding-static-shield-evidence-hardening",
+  "authoritative_full_head_sha": "a72d46557f5eba45c8c2e0a428574e5b9b624c81",
+  "part_x_branch": "codex/v10.2.30-crack-rebonding-part-x",
+  "required_python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "material_row": {
+    "option_key": "A_NATIVE",
+    "candidate_id": "A_NATIVE",
+    "mpz_length_um": 50.0,
+    "mpz_n_bins": 80,
+    "complete_active_material_row_sha256": "04518e244b7a446a120ea6e2d15a68758cb54a225d099609deeb23da32679971",
+    "compatibility_manifest_sha256": "f87de6847bba850c18079dc243ee841b0f0c094f9e720cb76a239cc3e68b64c7",
+    "reconstruction_classification": "A_NATIVE_REGISTRY_DETERMINISTICALLY_RECONSTRUCTED_FROM_QUALIFIED_INPUTS"
+  },
+  "production_engine": {
+    "top_class": "arrhenius_fracture.persistent_site_cyclic_energy_gated_corrected_v10230.CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine",
+    "mro": [
+      "arrhenius_fracture.persistent_site_cyclic_energy_gated_corrected_v10230.CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_cyclic_energy_gated_v10230.HazardEnergyGatedPersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_cyclic_coupled_audited_v10229.AuditedCoupledPersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_cyclic_coupled_v10229.CoupledPersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_cyclic_v10229.PersistentSiteCyclicTipEngine",
+      "arrhenius_fracture.persistent_site_source_v10221.PersistentSiteStateResolvedTipEngine",
+      "arrhenius_fracture.state_resolved_signed_engine_v10214.StateResolvedSignedBurgersTipEngine",
+      "arrhenius_fracture.state_resolved_signed_engine_v10212.StateResolvedSignedBurgersTipEngine",
+      "arrhenius_fracture.state_resolved_signed_engine_v1029.StateResolvedSignedBurgersTipEngine",
+      "arrhenius_fracture.state_resolved_signed_engine_v1026.StateResolvedSignedBurgersTipEngine",
+      "arrhenius_fracture.signed_burgers_shared_v1025.SignedBurgersAnisotropicTipEngine",
+      "arrhenius_fracture.anisotropic_emission_v10174.AnisotropicStochasticAvalancheTipEngine",
+      "arrhenius_fracture.stochastic_avalanche_tip.StochasticAvalancheDiagnosticTipEngine",
+      "arrhenius_fracture.stochastic_hazard_tip.StochasticHazardDiagnosticTipEngine",
+      "arrhenius_fracture.developed_state_diagnostic_tip.DevelopedStateDiagnosticTipEngine",
+      "arrhenius_fracture.campaign_calibrated_tip.CampaignCalibratedTipEngine",
+      "arrhenius_fracture.separated_source_tip.SeparatedSourceKineticTipEngine",
+      "arrhenius_fracture.continuum_source_tip.ContinuumSourceKineticTipEngine",
+      "arrhenius_fracture.kinetic_tip_cell.KineticMovingTipFrontEngine",
+      "arrhenius_fracture.unified_front.UnifiedMPZFrontEngine",
+      "builtins.object"
+    ],
+    "n_phase": 80,
+    "mpz_n_bins": 80,
+    "wake_n_bins": 160,
+    "contact_model_label": "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT"
+  },
+  "production_source_file_sha256": {
+    "arrhenius_fracture/persistent_site_cyclic_v10229.py": "db37cc8cbcc82d9059a538dc32a41445410695500758896b4c934d96a40836e3",
+    "arrhenius_fracture/persistent_site_cyclic_coupled_v10229.py": "7291b2397a4220dc9651779d9cb0d02338dbca20c818223f1d71e417f23a456f",
+    "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py": "a0fb3f8a8ec5e89046cd9979221906de4d28a6988f0162c203452b7b00fb3213",
+    "arrhenius_fracture/persistent_site_cyclic_coupled_audited_v10229.py": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": "1892e23da10fea707cedaa4ef228072a807aab0285a661c0e423ca8bfdee6b9e",
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+    "arrhenius_fracture/crack_rebonding_v10230.py": "4005c4d5ef63366c00c5a97499c12ad9340f351db0a81bb219e30d195475311c",
+    "arrhenius_fracture/crack_rebonding_kinetics_v10230.py": "97bc4431d07829acae85bd765d42258b08963ed050ea97fd744aa19125008542",
+    "arrhenius_fracture/a_native_engine_v10230.py": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+    "arrhenius_fracture/material_manifest.py": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+    "arrhenius_fracture/reduced_shared_state_v1023.py": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace"
+  }
+}

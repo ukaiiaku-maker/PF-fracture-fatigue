@@ -1,0 +1,268 @@
+{
+  "schema": "v10230_part_x_final_decision_v1",
+  "status": "FINAL",
+  "primary_classification": "SIGNED_K_CRACK_REBONDING_PART_X_COMPLETE",
+  "subordinate_verification_classification": "PART_X_PX0_THROUGH_PX6_COMPLETE",
+  "terminal_provenance": {
+    "final_sha": "0bba73064eeb718451a66fe8ec9ba0f0472ff908",
+    "branch": "codex/v10.2.30-crack-rebonding-part-x",
+    "merge_base_with_expected_part_x_base": "a72d46557f5eba45c8c2e0a428574e5b9b624c81",
+    "expected_part_x_base": "a72d46557f5eba45c8c2e0a428574e5b9b624c81"
+  },
+  "supersedes": {
+    "px4_scientific_decision.json": {
+      "original_status_preserved_unchanged": "PROVISIONAL_PENDING_PX5_PX6_PX7",
+      "superseded_by": "this document (part_x_final_decision.json)",
+      "note": "px4_scientific_decision.json is left in place with its original PROVISIONAL status and correction_history intact; this document is the terminal scientific classification for the whole campaign, incorporating and superseding it."
+    },
+    "px5_scientific_decision.json": {
+      "original_status_preserved_unchanged": "PROVISIONAL_PENDING_PX6_PX7",
+      "superseded_by": "this document (part_x_final_decision.json)",
+      "note": "px5_scientific_decision.json is left in place with its original PROVISIONAL status and correction_history intact; this document is the terminal scientific classification for the whole campaign, incorporating and superseding it."
+    }
+  },
+  "campaign_lineage": "PX0 (repo/provenance contract) -> PX1 (exact phase-resolved P/C/B kinetics + one-cycle monodromy primitives, software/numerical qualification) -> PX2 (zero-fitting analytical characterization of 4 candidate kinetic regimes: SAT_EXISTING, COMPETING_REVERSIBLE, COMPETING_PERSISTENT, PASSIVATION_LIMITED) -> PX3 (28-job physical screen across R/frequency/dwell/passivation/cohesive-strength/persistence panels at a Kmax=18 MPa*sqrt(m) reference condition) -> PX3.5/PX3.6 (a real duration-weighting bug found and fixed, dwell-causality audit, live-sampled passivation requalification, final developed-protocol selection: D1/D2/D3/D5/D6) -> PX4/PX4.1 (80-trajectory developed campaign: 5 protocols x 5-point Kmax grid at seed=1720, plus seed=1001723 second-seed confirmation at 3 Kmax across all 5 protocols, under an exact first-passage 1e12-cycle horizon) -> PX5 (scoped to D2/D5: 20-trajectory static-shield attribution against two prescribed controls) -> PX6 (synthesis and figures) -> PX7 (strict portable terminal verifier) -> this final closure (wording corrections, producer/launch provenance closure, artifact/figure manifests, terminal decision).",
+  "job_and_attempt_counts": {
+    "px3_screen_authorized_jobs": 28,
+    "px4_developed_admitted_trajectories": 80,
+    "px4_developed_matched_finite_zero_pairs": 40,
+    "px5_admitted_static_control_trajectories": 20,
+    "total_unique_canonical_job_keys_across_campaign": 165,
+    "disposition_counts": {
+      "ADMITTED": 126,
+      "INVALIDATED_DWELL_DURATION_WEIGHTING_BUG": 2,
+      "NOT_LAUNCHED_BLOCKED": 24,
+      "NOT_LAUNCHED_ALIAS": 8,
+      "SUPERSEDED_WALL_BUDGET_TOO_SMALL": 2,
+      "INTERRUPTED_NOT_SCIENCE": 3
+    }
+  },
+  "kmax_grids": {
+    "seed_1720_five_point_grid_MPa_sqrt_m": [
+      12.0,
+      15.0,
+      18.0,
+      21.0,
+      24.3
+    ],
+    "seed_1001723_three_point_confirmation_grid_MPa_sqrt_m": [
+      15.0,
+      18.0,
+      21.0
+    ],
+    "px5_grid_MPa_sqrt_m": [
+      12.0,
+      15.0,
+      18.0,
+      21.0,
+      24.3
+    ],
+    "px3_screen_reference_Kmax_MPa_sqrt_m": 18.0
+  },
+  "seeds": {
+    "primary": 1720,
+    "second_seed_confirmation": 1001723
+  },
+  "protocol_definitions": {
+    "D1": {
+      "row_name": "COMPETING_REVERSIBLE",
+      "R": -0.95,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "chemistry_factor": 1.0,
+      "K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "purpose": "R-sensitivity leg of the COMPETING_REVERSIBLE kinetic row at near-fully-reversed R"
+    },
+    "D2": {
+      "row_name": "COMPETING_REVERSIBLE",
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "chemistry_factor": 1.0,
+      "K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "purpose": "reference/baseline developed protocol (also a PX5-scoped attribution target)"
+    },
+    "D3": {
+      "row_name": "COMPETING_REVERSIBLE",
+      "R": -0.5,
+      "frequency_Hz": 316.22776601683796,
+      "minimum_load_hold_s": 0.0,
+      "chemistry_factor": 1.0,
+      "K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "purpose": "reduced-frequency leg of COMPETING_REVERSIBLE (frequency-sensitivity)"
+    },
+    "D5": {
+      "row_name": "PASSIVATION_LIMITED",
+      "R": -0.5,
+      "frequency_Hz": 1000.0,
+      "minimum_load_hold_s": 0.0,
+      "chemistry_factor": 1.0,
+      "K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "purpose": "passivation-gated kinetic row at the reference condition (also a PX5-scoped attribution target)"
+    },
+    "D6_conditional_persistent": {
+      "row_name": "COMPETING_PERSISTENT",
+      "R": -0.5,
+      "frequency_Hz": 316.22776601683796,
+      "minimum_load_hold_s": 0.0,
+      "chemistry_factor": 1.0,
+      "K_rebond_max_target_Pa_sqrt_m": 900000.0,
+      "purpose": "conditional-persistence kinetic row at D3's reduced frequency (persistence-vs-reversibility)"
+    }
+  },
+  "developed_da_dN_and_S_h_interpretation": "da/dN is computed over the STABLE/DEVELOPED window only (stable_growth_gate's developed_interval: >=10 events, >=50um final-window growth, late/early rate ratio in [0.5,2.0] -- excludes the first 20um as transient). S_h_developed = log10(da/dN_finite / da/dN_zero); NEGATIVE S_h means cohesive rebonding SLOWS growth relative to the matched zero-cohesion control. fold_slowdown = 10^(-S_h); pct_rate_reduction = (1 - 10^S_h) * 100 -- these are DIFFERENT numbers from the same S_h and must never be conflated as '{fold}x rate reduction'.",
+  "local_slopes_and_curvature": "See px4_local_slope_curvature_table.csv: the log10(Kmax)-vs-S_h_developed relationship is strongly nonlinear for all 5 protocols -- local secant slope decays from ~11 (12-15 MPa*sqrt(m) interval) to ~0.1-0.6 (21-24.3 MPa*sqrt(m) interval), with the largest curvature (second difference) concentrated at the low-Kmax end. This nonlinearity is why the PX3 screen (run only at the Kmax=18 MPa*sqrt(m) reference condition, already in the flat high-Kmax region) could not have detected the large low-Kmax effects PX4's expanded 5-point grid revealed.",
+  "load_ratio_result": {
+    "screen_level_qualifier": "NEGATIVE_R_SENSITIVITY_SMALL_OVER_R_MINUS_0P95_TO_MINUS_0P50",
+    "screen_R_panel_S_h_all": {
+      "-0.95": -0.04286294066339991,
+      "-0.5": -0.043507401620722155,
+      "-0.1": -0.038873734940451994,
+      "0.1": -1.585590377055504e-09
+    },
+    "developed_level_result": "max|delta S_h|=0.0007: R has a negligible effect on the developed-regime rebonding slowdown across this Kmax range -- D1 (R=-0.95) and D2 (R=-0.5) are practically indistinguishable.",
+    "interpretation": "At the screen reference condition, S_h changes by only ~0.0006 between R=-0.95 and R=-0.5 (both compression-conditioned); R=+0.1 collapses the effect to ~0 (no compression phase, no rebonding possible). At the developed level (D1 vs D2, full Kmax grid), R remains practically indistinguishable (max|delta S_h|=0.0007)."
+  },
+  "frequency_result": {
+    "qualifier": "FREQUENCY_SENSITIVITY_QUALIFIED",
+    "screen_frequency_panel_S_h_all": {
+      "100.0": -0.001130065723609146,
+      "1000.0": -0.043507401620722155,
+      "10000.0": -0.04351107841668626
+    },
+    "developed_level_result": "max|delta S_h|=0.7917: frequency has a LARGE effect -- at Kmax=12 MPa*sqrt(m), D2 (1000Hz) shows a 15.50-fold slowdown while D3 (316.228Hz) shows only a 2.50-fold slowdown; the effect shrinks with Kmax but the frequency-dependence itself does not vanish across the grid.",
+    "interpretation": "Screen level: S_h grows from ~-0.0011 at 100Hz to ~-0.0435 at 1000Hz (a ~38x change), then saturates from 1000Hz to 10000Hz (~-0.0435 vs ~-0.0435) -- frequency sensitivity is strong at low frequency and saturates above ~1000Hz at the reference Kmax. Developed level (D2 1000Hz vs D3 316.228Hz, full Kmax grid): frequency has a LARGE effect throughout, largest at low Kmax."
+  },
+  "dwell_result": {
+    "qualifier": "DWELL_SENSITIVITY_BELOW_SCREEN_RESOLUTION_AT_REFERENCE_CONDITION",
+    "invalidated_bug_history": {
+      "classification": "ORIGINAL_DWELL_SIGN_REVERSAL_NOT_REPRODUCED",
+      "root_cause": "persistent_site_coupled_hazard_v10229.py::_phase_statistics's hazard_coupled branch duration-weighted sig_cleave samples (drawn from a cursor-ROTATED K array, cycle_schedule_from_elapsed) using the UNROTATED dt_values array from the plain cycle_schedule -- pairing each sample with the wrong bin's duration whenever bin durations are non-uniform (hold>0). Invisible at hold=0 (all bins equal duration). Proven via a zero-active-patches control (K_rebond provably 0 regardless of cohesion): finite/zero configs matched only at cursor=0 before the fix, diverged by up to ~8x at other cursor positions once hold>0; after the fix they match to floating-point roundoff (~1e-15 relative) at every cursor position. See tests/test_v10_2_30_crack_rebonding_part_x_px3_5_dwell_hazard_fix.py.",
+      "original_buggy_screen_S_h": {
+        "hold=0.0005_censored_partial_unequal_window": 0.3551054814755134,
+        "hold=0.002_uncensored": 0.7968632120351952
+      },
+      "n_invalidated_trajectories": 2,
+      "invalidated_canonical_job_keys": [
+        "3d30034af1b472c45d28f9ab22063a56707c5a38b084acfa6dee5871095115d5",
+        "7e27ff50ebf98aefef66e6e3fc08d2266e2765f5ef7b63209bbaa575cdb22274"
+      ]
+    },
+    "corrected_audit_S_h": {
+      "dynamic_finite_hold0.0005": -0.04398496238856613,
+      "prescribed_static_hold0.0005": -0.04421390547099756,
+      "dynamic_finite_hold0.002": -0.044017161426242166,
+      "prescribed_static_hold0.002": -0.044213905470998516
+    },
+    "interpretation": "The ORIGINAL screen dwell rows (hold=0.0005s, hold=0.002s) reported S_h=+0.355 and +0.799 -- a spurious, SIGN-REVERSED (positive, i.e. apparent acceleration) large effect caused by a real duration-weighting bug in _phase_statistics's cursor-rotated hazard sampling (invisible at hold=0, present whenever hold>0). Those two trajectories are formally INVALIDATED and must never be used in any scientific count or classification. The corrected dwell-causality audit (genuine dynamic + prescribed-static legs, both holds) found S_h in the same narrow ~-0.0440-to-0.0442 range as hold=0's own -0.0435 -- i.e. dwell has NO measurable effect beyond the screen's own resolution once the bug is corrected (classification: ORIGINAL_DWELL_SIGN_REVERSAL_NOT_REPRODUCED)."
+  },
+  "passivation_chemistry_result": {
+    "qualifiers": [
+      "PASSIVATION_GATED_REBONDING_PHYSICALLY_EXERCISED",
+      "PASSIVATION_EFFECT_ON_DEVELOPED_RATE_SMALL_FOR_SELECTED_ROW"
+    ],
+    "screen_passivation_panel_S_h_all": {
+      "1.0": -0.04350738307644659,
+      "0.3": -0.037852645158266536,
+      "0.1": -0.021143844026035773
+    },
+    "developed_level_result": "max|delta S_h|=0.0001: the passivation-limited chemistry factor produces an almost identical developed-regime slowdown to the COMPETING_REVERSIBLE baseline -- passivation state does not materially change the STABILIZED rate once the developed window is reached, though it may still govern the transient approach to that window (not assessed by S_h_developed, which is computed only over the stable/developed interval).",
+    "interpretation": "Screen level: S_h magnitude decreases modestly as chemistry_factor decreases (chem=1.0: -0.0435, chem=0.3: -0.0379, chem=0.1: -0.0211). Developed level (D2 vs D5, the PASSIVATION_LIMITED row at chemistry_factor=1.0 selected via PX3.6's live duration-weighted mean-p_B requalification): the passivation-gated kinetic row is materially and physically exercised (mean_p_B~=0.317, nearest the 0.30 target while retaining mean_p_P>=0.30), yet produces an almost identical developed-regime slowdown to COMPETING_REVERSIBLE (max|delta S_h|=0.0001) -- passivation state does not materially change the STABILIZED developed rate for this selected row, though it may still govern the transient approach."
+  },
+  "reversible_vs_persistent_result": {
+    "qualifiers": [
+      "CLEAN_REVERSIBLE_KINETICS_QUALIFIED",
+      "PERSISTENT_KINETICS_DISTINGUISHED_AT_SELECTED_FREQUENCY"
+    ],
+    "screen_panel_S_h_all": {
+      "COMPETING_PERSISTENT_f1000.0": -0.04360688149992394,
+      "COMPETING_PERSISTENT_f100.0": -0.04241795585838232
+    },
+    "developed_level_result": "max|delta S_h|=0.7911: at the SAME frequency (316.228Hz), the conditional-persistence branch (D6) shows a 15.47-fold slowdown at Kmax=12 versus D3's 2.50-fold -- a 6.18-fold separation at the low-K endpoint (NOT a full order of magnitude), decaying strongly as Kmax increases (per-Kmax fold separation: 12.0MPa=6.18x, 15.0MPa=1.16x, 18.0MPa=1.05x, 21.0MPa=1.03x, 24.3MPa=1.02x). Persistent bonding materially amplifies the reduced-frequency low-K retardation, with the separation decaying strongly as Kmax increases -- driven entirely by the persistence assumption, not by frequency, since D3 and D6 share the same frequency and R. CORRECTED (see correction_history): an earlier draft of this text described this as 'an order-of-magnitude difference,' which the exact recomputed separation (6.18-fold at Kmax=12, decaying to ~1.02-fold by Kmax=24.3) does not support -- a full decade would require a 10.0-fold separation at the cited point.",
+    "interpretation": "At the SCREEN reference condition (Kmax=18 MPa*sqrt(m), already in the flat high-Kmax region), COMPETING_PERSISTENT and COMPETING_REVERSIBLE are nearly indistinguishable (S_h~=-0.0436 vs -0.0435 at f=1000Hz; -0.0424 at f=100Hz). The developed campaign's expanded Kmax grid reveals the effect the screen could not: at D3/D6's shared reduced frequency (316.228Hz), persistence separates from reversibility by ~6.18-fold at the low-K endpoint (Kmax=12 MPa*sqrt(m)) -- NOT a full order of magnitude -- decaying to ~1.02-fold by Kmax=24.3. Persistent bonding materially amplifies the reduced-frequency low-K retardation, with the separation decaying strongly as Kmax increases."
+  },
+  "cohesive_strength_result": {
+    "qualifier": "COHESIVE_STRENGTH_SENSITIVITY_QUALIFIED",
+    "screen_cohesive_panel_S_h_all": {
+      "450000.0": -0.020795266238846057,
+      "900000.0": -0.043507401620722155,
+      "1800000.0": -0.09812367078027527
+    },
+    "interpretation": "Monotonic, substantial sensitivity to the cohesive-strength ceiling at the screen reference condition: S_h=-0.0208 at K_target=450000, -0.0435 at 900000 (baseline), -0.0981 at 1800000 Pa*sqrt(m) -- roughly proportional to K_target over this range."
+  },
+  "seed_robustness": {
+    "qualifier": "REBONDING_SEED_ROBUST",
+    "by_protocol_axis": {
+      "D1": "REBONDING_SEED_ROBUST",
+      "D2": "REBONDING_SEED_ROBUST",
+      "D3": "REBONDING_SEED_ROBUST",
+      "D5": "REBONDING_SEED_ROBUST",
+      "D6_conditional_persistent": "REBONDING_SEED_ROBUST"
+    },
+    "all_5_axes_robust": true
+  },
+  "px5_static_vs_dynamic_attribution": {
+    "scope": "D2 (COMPETING_REVERSIBLE) and D5 (PASSIVATION_LIMITED) only -- explicitly NOT extended to D1/D3/D6",
+    "formal_classification": "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY",
+    "narrower_qualified_result": "CEILING_STATIC_SHIELD_EQUIVALENT_FOR_D2_D5_DEVELOPED_RATE",
+    "interpretation": "At all 10 tested (D2/D5, Kmax) points, the ceiling static control (K_b fixed at the full 900000 Pa*sqrt(m) cohesive-strength constant from the first accepted event onward) reproduces 100.0-101.9% of the dynamic-rebonding developed-regime slowdown -- essentially the ENTIRE effect, including at Kmax=12 MPa*sqrt(m) where the dynamic slowdown itself is largest (approximately 15.5-fold). The analytical periodic-orbit-matched control (K_b = K_rebond_max * cycle-mean bonded occupancy, computed with zero fitting to any physical trajectory) reproduces only 22.2-39.6% -- a naive duration-weighted-average shielding level substantially UNDERESTIMATES the true suppression. This is not evidence that dynamic P/C/B kinetics timing per se is required to explain the developed-regime rate (the ceiling control has NO kinetics, no timing, no formation/rupture dynamics at all, yet reproduces the effect almost exactly) -- rather, the result is CONSISTENT WITH the developed-regime hazard being dominated by whichever portions of the loading cycle see the crack tip near-fully shielded, and shows that a simple cycle-averaged proxy for that shielding underestimates the true suppression, because the hazard integral is NOT linear in the instantaneous K_b. This two-control comparison does NOT uniquely identify or prove which specific cycle phase controls the hazard -- near-ceiling phase dominance is one interpretation consistent with the data, not the only one the data rules out alternatives against.",
+    "classification_note": "Classified MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY at every point under the review's both-controls-must-agree gate (dominant requires BOTH controls >=80% reproduction) -- not because dynamic kinetic history is confirmed necessary, but because the review's classification scheme correctly refuses to credit 'static shielding in general' when one of the two prescribed static proxies fails this badly. The narrower, better-supported finding is in the interpretation text above: the CEILING level specifically (not a cycle-averaged level) is what matters."
+  },
+  "numerical_tolerances_and_censor_qualifications": {
+    "developed_event_extension_contract": "exactly 30 accepted events, ~150um cumulative extension, whichever is not applicable is the binding constraint (all 80 admitted trajectories reached exactly 30 events AND exactly 150.000000um -- both bounds were reached simultaneously by construction of the campaign's own developed target)",
+    "cycle_horizon": {
+      "classification": "HARD_FIRST_PASSAGE_CYCLE_HORIZON_QUALIFIED_WITH_1E-6_CYCLE_FLOOR",
+      "horizon_cycles": 1000000000000.0,
+      "inherited_precision_floor_cycles": 1e-06,
+      "floor_source": "FatigueControllerConfig.min_block_cycles default (arrhenius_fracture/fatigue_v1.py) -- an inherited, pre-existing adaptive-block-search precision limit, not something the PX4.1 exact-horizon implementation introduces.",
+      "statement": "The implementation enforces a hard, exact first-passage cycle horizon (max_cumulative_cycles), clipping every candidate integration block to the exact remaining budget -- subject only to the inherited 1e-6-cycle minimum-block numerical floor (the adaptive search will not resolve a candidate block smaller than this floor, so a horizon overshoot of up to 1e-6 cycles is possible in principle). All 80 admitted PX4/PX4.1 developed trajectories completed with a maximum observed event cumulative-cycle count of ~9.02e4 -- more than 7 orders of magnitude below the 1e12-cycle horizon and >10 orders of magnitude above the 1e-6 floor -- so this floor had no effect on any campaign conclusion; no trajectory came remotely close to the horizon."
+    },
+    "bulk_action_error_rel_tol": "1e-3 (certified numerical/action uncertainty basis, actively enforced by the adaptive block search)",
+    "stable_growth_gate_thresholds": ">=10 events, >=50um final-window growth, late/early rate ratio in [0.5,2.0]"
+  },
+  "physical_vs_analytical_vs_postprocessing_distinction": "PHYSICAL SIMULATION: every da/dN, S_h, and event-ledger quantity in PX3/PX4/PX5 comes from the real A_NATIVE production engine's fresh-process-per-job cyclic integration (part_x_run_one_job.py -> crack_rebonding_causal_pilot_v2_v10230.run_trajectory). ANALYTICAL PREDICTION: PX2's kinetic-regime atlas (mean_p_B, transition actions/fluxes, predicted_static_shield_equivalent_K_b) is computed from the phase-resolved P/C/B monodromy with ZERO fitting to any physical trajectory -- used only to SELECT candidate rows and to construct PX5's periodic-orbit-matched static control value, never substituted for a physical measurement. POST-PROCESSING: every rate/slope/curvature table, seed-robustness classification, and this final decision itself are pure reductions of already-physical or already-analytical tracked artifacts -- no new physics or analytical model evaluation happens in any final-closure script.",
+  "producer_launch_provenance": {
+    "overall_decision": "PHYSICS_SOURCE_IDENTICAL_ALLOW_HEAD_DRIFT_CLOSED_FOR_ALL_PAIRS",
+    "n_producer_launch_pairs_closed": 5,
+    "n_diverged": 0
+  },
+  "component_verifier_results": {
+    "px4_stage1_verification_classification": "PX4_STAGE1_COMPLETE",
+    "px5_verification_classification": "PX5_COMPLETE"
+  },
+  "qualifiers": [
+    "CLEAN_REVERSIBLE_KINETICS_QUALIFIED",
+    "PERSISTENT_KINETICS_DISTINGUISHED_AT_SELECTED_FREQUENCY",
+    "PASSIVATION_GATED_REBONDING_PHYSICALLY_EXERCISED",
+    "PASSIVATION_EFFECT_ON_DEVELOPED_RATE_SMALL_FOR_SELECTED_ROW",
+    "FREQUENCY_SENSITIVITY_QUALIFIED",
+    "DWELL_SENSITIVITY_BELOW_SCREEN_RESOLUTION_AT_REFERENCE_CONDITION",
+    "NEGATIVE_R_SENSITIVITY_SMALL_OVER_R_MINUS_0P95_TO_MINUS_0P50",
+    "COHESIVE_STRENGTH_SENSITIVITY_QUALIFIED",
+    "REBONDING_SEED_ROBUST",
+    "MIXED_STATIC_SHIELDING_AND_KINETIC_HISTORY",
+    "CEILING_STATIC_SHIELD_EQUIVALENT_FOR_D2_D5_DEVELOPED_RATE",
+    "HARD_FIRST_PASSAGE_CYCLE_HORIZON_QUALIFIED_WITH_1E-6_CYCLE_FLOOR",
+    "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT",
+    "HAZARD_ONLY_COHESIVE_FEEDBACK",
+    "TOPOLOGICAL_HEALING_NOT_MODELED",
+    "PHYSICAL_CHEMISTRY_PARAMETERIZATION_NOT_CALIBRATED"
+  ],
+  "explicit_scope_limitations": [
+    "SURROGATE_SIGNED_K_CONTACT_NOT_RESOLVED_FACE_CONTACT: the contact model is a signed-K compression-conditioning proxy, never a resolved opposing-crack-face contact/traction solve.",
+    "HAZARD_ONLY_COHESIVE_FEEDBACK: cohesion feeds back only through the cleavage hazard rate, never through a mechanical stiffness/compliance change.",
+    "TOPOLOGICAL_HEALING_NOT_MODELED: no topological reconnection of crack faces is modeled.",
+    "PHYSICAL_CHEMISTRY_PARAMETERIZATION_NOT_CALIBRATED: chemistry_factor and the bond/rupture/depassivation/repassivation barriers are analytically constructed (PX2), never calibrated against an experimental measurement.",
+    "PX5 static-shield attribution covers ONLY D2 and D5 -- not extended to D1/D3/D6.",
+    "PX5's S_h comparison covers only the STABLE/DEVELOPED window -- not the transient approach."
+  ],
+  "not_claimed": [
+    "closure-corrected DeltaK_eff",
+    "resolved opposing-face contact",
+    "topological crack healing",
+    "calibrated physical chemistry",
+    "production-line merge readiness",
+    "predictive experimental calibration",
+    "PX5 static-shield attribution for D1/D3/D6"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "v10230_crack_rebonding_part_x_px1_source_preimage_manifest_v1",
+  "note": "PX0's source_provenance.json hashed the production files PX1.1 was EXPECTED to touch (crack_rebonding_v10230.py, crack_rebonding_kinetics_v10230.py, persistent_site_coupled_hazard_v10229.py, persistent_site_cyclic_v10229.py, persistent_site_cyclic_energy_gated_v10230.py, and their MRO ancestors) -- all covered there. During implementation, two additional production files needed editing that were not in that original PX0 list; their a72d465 (authoritative base) preimage hashes are recorded here, per the mission's requirement not to silently broaden the edit set without recording provenance, and without rewriting the already-committed PX0 record.",
+  "base_commit_sha": "a72d46557f5eba45c8c2e0a428574e5b9b624c81",
+  "additional_files_touched": {
+    "arrhenius_fracture/fatigue_v1.py": {
+      "reason": "FatigueWaveform/FatigueCycleHazardController are the fundamental waveform/controller pair every cyclic-integration call site already treats period_s/K_phase/_phases() as authoritative. The dwell (minimum_load_hold_s, base_period_s, period_s redefinition, effective_cycle_frequency_Hz, cycle_schedule) is added here so it is a whole-loading-protocol property, not a crack-rebonding-specific one -- consumed by ordinary cleavage/emission cycle-mean statistics (persistent_site_coupled_hazard_v10229.py::_phase_statistics) exactly as by the rebonding wake state, with no separate implementation needed in either place.",
+      "preimage_sha256_at_base": "9cc062401076f527d8a7fbdb5a3bc65b3f227679dbd7078adc0a1f0f7a212428"
+    },
+    "arrhenius_fracture/persistent_site_cyclic_coupled_v10229.py": {
+      "reason": "CoupledPersistentSiteCyclicTipEngine.cycle_step_waveform is the real production cycle_step_waveform override (confirmed via the real engine's MRO in PX0's source_provenance.json). Its dt_consumed->cycles_consumed conversion previously used the nominal waveform.frequency_Hz, which is no longer the correct seconds-per-cycle reciprocal once minimum_load_hold_s>0 (waveform.period_s now includes the dwell) -- fixed to use waveform.effective_cycle_frequency_Hz, which is defined to equal frequency_Hz exactly (not merely numerically) when the hold is zero, preserving bit-identity. Also archives base_period_s/minimum_load_hold_s/cycle_period_s/effective_cycle_frequency_Hz in the returned result dict, per the mission's explicit per-hold-enabled-record requirement.",
+      "preimage_sha256_at_base": "7291b2397a4220dc9651779d9cb0d02338dbca20c818223f1d71e417f23a456f"
+    }
+  }
+}
