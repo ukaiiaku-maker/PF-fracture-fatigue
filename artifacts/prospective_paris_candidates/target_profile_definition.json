@@ -1,0 +1,46 @@
+{
+  "Kstar_MPa_sqrt_m": 18.0,
+  "definition_sha256": "80d85014e0dd28a509ebebde72cec40d97bf6120c2782dff94c4fffa09ab7082",
+  "dense_grid_K_hi": 24.3,
+  "dense_grid_K_lo": 12.0,
+  "dense_grid_n": 4001,
+  "formula_L": "1/(1+exp(-(lnK-lnK_edge)/w_edge))",
+  "formula_m_target": "m_entry + (m_mid-m_entry)*L_on(K) - (m_mid-m_exit)*L_off(K)",
+  "formula_rate": "ln g_target(K) = ln g_star + integral_{lnKstar}^{lnK} m_target(K') dlnK' (exact log-space cumulative trapezoid on a dense >=257-point grid)",
+  "gstar_m_per_cycle": 4.473410023231299e-07,
+  "gstar_provenance_file": "rate_anchor_gstar.json",
+  "gstar_source_row_sha256": "8aeb02005f94e30177a2a9a5c97fd31872ef54ee4004a4eb6ac52945047d6893",
+  "m_entry_fraction": 0.8,
+  "m_exit_fraction": 0.7,
+  "physical_grid_MPa_sqrt_m": [
+    12.0,
+    12.75,
+    13.5,
+    15.0,
+    16.5,
+    18.0,
+    19.5,
+    21.0,
+    24.3
+  ],
+  "schema": "v10.2.30_prospective_paris_target_profile_definition_v1",
+  "targets": {
+    "P25": 2.5,
+    "P40": 4.0,
+    "P55": 5.5
+  },
+  "windows": {
+    "EXTENDED_FLAT_WINDOW": {
+      "K_off": 23.0,
+      "K_on": 12.3,
+      "w_off": 0.045,
+      "w_on": 0.03
+    },
+    "STANDARD_WINDOW": {
+      "K_off": 22.0,
+      "K_on": 12.75,
+      "w_off": 0.06,
+      "w_on": 0.04
+    }
+  }
+}
