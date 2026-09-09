@@ -1,6 +1,17 @@
 name: V5 final campaign postprocess-only recovery
 
 on:
+  workflow_call:
+    inputs:
+      source_run_id:
+        required: true
+        type: string
+      implementation_sha:
+        required: true
+        type: string
+      causal_artifact_digest:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       source_run_id:

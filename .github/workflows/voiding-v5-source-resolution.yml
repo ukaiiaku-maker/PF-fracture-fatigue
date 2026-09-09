@@ -8,9 +8,21 @@ on:
     inputs:
       operation:
         type: choice
-        options: [focused, rollback, restarts, transitions, reconstruct-development, reconstruct-available, reconstruct-restarts, runtime-diagnostic, storage-preflight, final, audit]
+        options: [focused, rollback, restarts, transitions, reconstruct-development, reconstruct-available, reconstruct-restarts, runtime-diagnostic, storage-preflight, final, recover-final, audit]
         default: focused
         required: true
+      source_run_id:
+        description: Source final-campaign run for postprocess-only recovery
+        required: false
+        type: string
+      implementation_sha:
+        description: Exact source final-campaign implementation SHA
+        required: false
+        type: string
+      causal_artifact_digest:
+        description: Digest of the failed causal-neutrality artifact
+        required: false
+        type: string
 
 jobs:
   storage-preflight:
@@ -85,6 +97,16 @@ jobs:
   final-campaign:
     if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final'
     uses: ./.github/workflows/voiding-v5-source-final-campaign.yml
+  final-campaign-recovery:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'recover-final'
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/voiding-v5-final-campaign-recovery.yml
+    with:
+      source_run_id: ${{ inputs.source_run_id }}
+      implementation_sha: ${{ inputs.implementation_sha }}
+      causal_artifact_digest: ${{ inputs.causal_artifact_digest }}
   publication-audit:
     if: github.event_name == 'workflow_dispatch' && inputs.operation == 'audit'
     uses: ./.github/workflows/voiding-v5-publication-audit.yml
