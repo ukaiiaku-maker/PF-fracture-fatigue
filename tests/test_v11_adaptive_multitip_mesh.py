@@ -11,6 +11,9 @@ from arrhenius_fracture.adaptive_multitip_mesh_v11 import (
 )
 import pytest
 from arrhenius_fracture.config import ElasticProperties
+from arrhenius_fracture.causal_sharp_wake_v11 import (
+    apply_causal_segment, rerasterize_refined_topology_damage,
+)
 from arrhenius_fracture.crack_network_v11 import CrackBranchState, CrackNetworkState
 from arrhenius_fracture.directional_competition_v11 import DirectionalCompetitionState, tungsten_cleavage_candidates
 from arrhenius_fracture.fem import assemble_mechanics, plane_strain_D
@@ -70,6 +73,56 @@ def test_intact_and_fully_cracked_parent_fields_are_inherited_exactly():
         refined, _ = refine_accepted_state(state, marked_parent_elements=(0, 1), active_tip_ids=("b00000000",), generation=1, operation_index=1)
         assert np.all(refined.damage == value)
         assert np.isclose(energy(refined), energy(state), rtol=2e-15, atol=1e-12)
+
+
+def test_refined_topology_damage_is_rerasterized_from_physical_graph():
+    state, _ = fixture_state()
+    state = replace(
+        state,
+        crack_network=CrackNetworkState.one_tip(((0.0, 0.5), (0.5, 0.5))),
+    )
+    committed, insertion = apply_causal_segment(
+        state, np.array((0.0, 0.5)), np.array((0.5, 0.5)),
+    )
+    assert insertion.mechanically_resolved
+    graph_before = committed.crack_network.to_json()
+    refined, lineage = refine_accepted_state(
+        committed, marked_parent_elements=(0, 1),
+        active_tip_ids=("b00000000",), generation=1, operation_index=1,
+    )
+    corrected, audit = rerasterize_refined_topology_damage(
+        committed, refined, lineage.parent_to_child_element_map,
+    )
+    assert corrected.crack_network.to_json() == graph_before
+    assert audit.physical_graph_unchanged
+    assert audit.cleared_inherited_child_element_ids
+    trial, visibility = apply_causal_segment(
+        corrected, np.array((0.5, 0.5)), np.array((0.75, 0.5)),
+    )
+    assert visibility.mechanically_resolved
+    assert visibility.newly_degraded_element_count > 0
+    assert trial.crack_network.to_json() == graph_before
+
+
+def test_refinement_remap_preserves_non_topology_damaged_parent():
+    state, _ = fixture_state()
+    state = replace(
+        state,
+        crack_network=CrackNetworkState.one_tip(((0.0, 0.1), (0.75, 0.1))),
+    )
+    # Element 1 does not intersect the committed horizontal segment but owns an
+    # independent material-damage value that topology remapping must preserve.
+    mesh = replace(state.mesh, element_damage_gp=np.array((1.0, 0.625)))
+    state = replace(state, mesh=mesh)
+    refined, lineage = refine_accepted_state(
+        state, marked_parent_elements=(0, 1),
+        active_tip_ids=("b00000000",), generation=1, operation_index=1,
+    )
+    corrected, _ = rerasterize_refined_topology_damage(
+        state, refined, lineage.parent_to_child_element_map,
+    )
+    children = lineage.parent_to_child_element_map[1]
+    assert np.all(corrected.mesh.element_damage_gp[list(children)] == 0.625)
 
 
 def test_mixed_nodal_crack_band_uses_exact_parent_material_inheritance():

@@ -63,11 +63,21 @@ def _replace_value(tokens: list[str], name: str, value: str) -> list[str]:
 
 def build_restart_command(
     checkpoint_path: Path, destination: Path, target_extension_um: float,
+    *, eligibility_record: Path | None = None,
 ) -> tuple[list[str], dict]:
     checkpoint_path = checkpoint_path.resolve()
     destination = destination.resolve()
     if not checkpoint_path.is_file():
         raise ValueError(f"restart checkpoint is missing: {checkpoint_path}")
+    if eligibility_record is not None:
+        eligibility_record = eligibility_record.resolve()
+        if not eligibility_record.is_file():
+            raise ValueError(f"restart eligibility record is missing: {eligibility_record}")
+        eligibility = json.loads(eligibility_record.read_text())
+        if eligibility.get("theta40_final_checkpoint_restart_eligible") is not True:
+            raise RuntimeError(
+                "restart refused: checkpoint is marked restart_eligible=false"
+            )
     if destination.exists():
         raise ValueError(f"restart output must be a fresh path: {destination}")
     checkpoint = restore_branch_checkpoint(checkpoint_path)
@@ -152,10 +162,12 @@ def main() -> int:
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--target-crack-extension-um", type=float, required=True)
+    parser.add_argument("--eligibility-record", type=Path)
     parser.add_argument("--execute", action="store_true")
     args = parser.parse_args()
     command, plan = build_restart_command(
         args.checkpoint, args.out, args.target_crack_extension_um,
+        eligibility_record=args.eligibility_record,
     )
     if not args.execute:
         print(json.dumps(plan, indent=2, sort_keys=True)); return 0

@@ -12,7 +12,13 @@ from arrhenius_fracture.anisotropic_emission_v10174 import (
     _tp_state_diagnostics_mode,
     finite_source_emission_update,
     probe_tensor_ahead,
+    require_admissible_tensor_drive,
     resolve_channel_drives,
+    tensor_normalization_admissibility,
+    bind_explicit_accepted_tensor_drive,
+    evaluate_tensor_conditioning_sentinel_cases,
+    AnisotropicStochasticAvalancheTipEngine,
+    OBSERVER,
 )
 
 
@@ -77,6 +83,216 @@ def test_joint_crystal_and_tensor_rotation_preserves_channel_drives():
         rtol=1.0e-12,
         atol=1.0e-15,
     )
+
+
+@pytest.mark.parametrize(
+    "name,tensor,reliable,admissible,reason",
+    [
+        ("tensile", [[1.0e6, 2.0e5], [2.0e5, 3.0e6]], True, True, None),
+        ("compressive", [[-2.0e6, 1.0e5], [1.0e5, -1.0e6]], True, False,
+         "nonpositive_tensile_opening_scale_for_anisotropic_normalization"),
+        ("near_zero_positive", [[1.0e-12, 0.0], [0.0, 2.0e-12]], True, True, None),
+        ("unreliable", [[1.0e6, 0.0], [0.0, 2.0e6]], False, False,
+         "unreliable_tensor_probe_for_anisotropic_normalization"),
+        ("nonfinite", [[float("nan"), 0.0], [0.0, 1.0]], True, False,
+         "nonfinite_tensor_for_anisotropic_normalization"),
+    ],
+)
+def test_v4_tensor_normalization_is_fail_closed_without_one_pa_floor(
+    name, tensor, reliable, admissible, reason,
+):
+    result = tensor_normalization_admissibility(
+        tensor, [tensor, tensor], probe_reliable=reliable,
+    )
+    assert result["tensor_drive_admissible"] is admissible, name
+    assert result["tensor_drive_rejection_reason"] == reason
+    assert result["opening_normalization_floor_active"] is False
+    if admissible:
+        assert result["drive_factors"] is not None
+    else:
+        assert result["drive_factors"] is None
+        with pytest.raises(RuntimeError, match=reason):
+            require_admissible_tensor_drive(result)
+
+
+def test_v4_mixed_tensor_uses_positive_principal_opening_without_cap_or_clipping():
+    tensor = np.array([[-2.0e6, 3.0e6], [3.0e6, -1.0e6]])
+    result = tensor_normalization_admissibility(tensor, [tensor, -tensor])
+    assert result["sigma_nn_probe_Pa"] < 0.0
+    assert result["sigma1_probe_Pa"] > 0.0
+    assert result["tensor_drive_admissible"] is True
+    assert result["drive_factors"][0] == result["drive_factors"][1]
+
+
+def test_v4_tensor_admissibility_is_order_invariant_and_state_pure():
+    opening = np.array([[2.0e6, 3.0e5], [3.0e5, 4.0e6]])
+    channels = [np.array([[0.0, 2.0e5], [2.0e5, 0.0]]),
+                np.array([[0.0, -7.0e5], [-7.0e5, 0.0]])]
+    before = [value.copy() for value in channels]
+    forward = tensor_normalization_admissibility(opening, channels)
+    reverse = tensor_normalization_admissibility(opening, tuple(reversed(channels)))
+    assert forward["drive_factors"] == list(reversed(reverse["drive_factors"]))
+    assert all(np.array_equal(a, b) for a, b in zip(channels, before))
+
+
+def test_positive_j_does_not_override_invalid_tensor_drive():
+    drive = tensor_normalization_admissibility(
+        [[-2.0, 0.0], [0.0, -1.0]],
+        [[[-2.0, 0.0], [0.0, -1.0]]] * 2,
+    )
+    drive["positive_kinetic_J_J_per_m2"] = 1.0e12
+    with pytest.raises(
+        RuntimeError,
+        match="nonpositive_tensile_opening_scale_for_anisotropic_normalization",
+    ):
+        require_admissible_tensor_drive(drive)
+
+
+def test_contradictory_reliable_and_admissible_flags_fail_closed():
+    drive = {
+        "reliable": True,
+        "tensor_drive_reliable": False,
+        "tensor_drive_admissible": False,
+        "drive_factors": [None, None],
+        "tensor_drive_rejection_reason": "opening_scale_not_resolved_above_probe_uncertainty",
+    }
+    with pytest.raises(RuntimeError, match="opening_scale_not_resolved"):
+        require_admissible_tensor_drive(drive)
+
+
+def test_legacy_observer_adoption_rejects_before_installing_invalid_factors():
+    prior = {"accepted": "unchanged"}
+    calls = []
+    fake = SimpleNamespace(
+        _anisotropic_drive_serial=-1,
+        _anisotropic_drive=prior,
+        _install_current_drive_on_state=lambda: calls.append("installed"),
+    )
+    OBSERVER.latest_drive = {
+        "drive_serial": 4,
+        "reliable": False,
+        "tensor_drive_reliable": False,
+        "tensor_drive_admissible": False,
+        "drive_factors": [None, None],
+        "tensor_drive_rejection_reason": "opening_scale_not_resolved_above_probe_uncertainty",
+    }
+    with pytest.raises(RuntimeError, match="opening_scale_not_resolved"):
+        AnisotropicStochasticAvalancheTipEngine._adopt_latest_drive(fake)
+    assert fake._anisotropic_drive is prior
+    assert fake._anisotropic_drive_serial == -1
+    assert calls == []
+
+
+def test_functional_conditioning_sentinel_executes_production_gate():
+    cases = [{
+        "case": "tensile",
+        "opening_tensor_Pa": [[2.0e6, 0.0], [0.0, 3.0e6]],
+        "channel_tensors_Pa": [
+            [[0.0, 2.0e5], [2.0e5, 0.0]],
+            [[0.0, -3.0e5], [-3.0e5, 0.0]],
+        ],
+        "expected_accepted": True,
+    }, {
+        "case": "compressive",
+        "opening_tensor_Pa": [[-2.0e6, 0.0], [0.0, -3.0e6]],
+        "channel_tensors_Pa": [
+            [[0.0, 2.0e5], [2.0e5, 0.0]],
+            [[0.0, -3.0e5], [-3.0e5, 0.0]],
+        ],
+        "expected_accepted": False,
+        "expected_rejection_reason": "nonpositive_tensile_opening_scale_for_anisotropic_normalization",
+    }]
+    records = evaluate_tensor_conditioning_sentinel_cases(cases)
+    assert all(row["passed"] for row in records)
+    assert records[0]["conditioning_qualification_scope"] == "opening_denominator_only"
+
+
+def test_near_resolution_opening_with_finite_channel_shear_fails_closed():
+    opening = np.array([[1.0e-12, 0.0], [0.0, 2.0e-12]])
+    channels = [
+        np.array([[0.0, 1.0e6], [1.0e6, 0.0]]),
+        np.array([[0.0, -2.0e6], [-2.0e6, 0.0]]),
+    ]
+    state = {"accepted": "unchanged"}
+    rng = np.random.default_rng(3621)
+    state_before = repr(state)
+    rng_before = repr(rng.bit_generator.state)
+
+    result = tensor_normalization_admissibility(opening, channels)
+
+    assert result["sigma_amplitude_Pa"] == pytest.approx(2.0e-12)
+    assert result["probe_uncertainty_Pa"] > result["sigma_amplitude_Pa"]
+    assert result["opening_to_uncertainty_ratio"] < 1.0
+    assert result["tensor_drive_admissible"] is False
+    assert result["drive_factors"] is None
+    assert result["tensor_drive_rejection_reason"] == (
+        "opening_scale_not_resolved_above_probe_uncertainty"
+    )
+    with pytest.raises(RuntimeError, match="opening_scale_not_resolved"):
+        require_admissible_tensor_drive(result)
+    assert repr(state) == state_before
+    assert repr(rng.bit_generator.state) == rng_before
+
+
+def test_explicit_accepted_tensor_binding_ignores_overwritten_global_observer(monkeypatch):
+    stale = {"stress_field_state_id": "trial", "tensor_drive_admissible": True}
+    OBSERVER.latest_drive = stale
+    accepted = {
+        "tensor_drive_admissible": True,
+        "tensor_drive_reliable": True,
+        "reliable": True,
+        "drive_factors": [0.2, 0.4],
+        "tensor_drive_rejection_reason": None,
+    }
+    monkeypatch.setattr(
+        "arrhenius_fracture.anisotropic_emission_v10174.build_front_drive",
+        lambda mesh, sigma_gp, damage, tip_xy, config: dict(accepted),
+    )
+    mesh = object()
+    sigma = np.array([[1.0]])
+    damage = np.array([0.0])
+    rng = np.random.default_rng(3621)
+    rng_before = repr(rng.bit_generator.state)
+    result = bind_explicit_accepted_tensor_drive(
+        mesh=mesh, sigma_gp=sigma, damage=damage, tip_xy=[1.0, 2.0],
+        config=AnisotropicEmissionConfig(), accepted_state_id="accepted",
+        stress_field_state_id="accepted-stress",
+    )
+    assert result["explicit_bound_accepted_state"] is True
+    assert result["accepted_state_id"] == "accepted"
+    assert result["stress_field_state_id"] == "accepted-stress"
+    assert OBSERVER.latest_drive is result
+    assert OBSERVER.latest_drive is not stale
+    assert np.array_equal(sigma, [[1.0]])
+    assert np.array_equal(damage, [0.0])
+    assert repr(rng.bit_generator.state) == rng_before
+
+
+def test_explicit_invalid_tensor_rejects_before_observer_or_rng_mutation(monkeypatch):
+    prior = {"stress_field_state_id": "accepted-prior"}
+    OBSERVER.latest_drive = prior
+    monkeypatch.setattr(
+        "arrhenius_fracture.anisotropic_emission_v10174.build_front_drive",
+        lambda *args, **kwargs: {
+            "tensor_drive_admissible": False,
+            "tensor_drive_reliable": False,
+            "reliable": False,
+            "drive_factors": None,
+            "tensor_drive_rejection_reason": (
+                "nonpositive_tensile_opening_scale_for_anisotropic_normalization"
+            ),
+        },
+    )
+    rng = np.random.default_rng(3621)
+    before = repr(rng.bit_generator.state)
+    with pytest.raises(RuntimeError, match="nonpositive_tensile"):
+        bind_explicit_accepted_tensor_drive(
+            mesh=object(), sigma_gp=np.array([[1.0]]), damage=np.array([0.0]),
+            tip_xy=[0.0, 0.0], config=AnisotropicEmissionConfig(),
+            accepted_state_id="accepted", stress_field_state_id="stress",
+        )
+    assert OBSERVER.latest_drive is prior
+    assert repr(rng.bit_generator.state) == before
 
 
 def test_finite_source_update_is_exact_and_bounded():

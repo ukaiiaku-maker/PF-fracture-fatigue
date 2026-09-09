@@ -41,6 +41,7 @@ class ProductionBranchCheckpoint:
     physical_extension_m: float
     handoff_guard_diagnostics: Mapping[str, Any]
     termination_reason: str | None = None
+    restart_family_migration_provenance: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         for name in (
@@ -106,6 +107,10 @@ class ProductionBranchCheckpoint:
             "termination_reason": self.termination_reason,
             "has_rng_state": self.state.rng_state is not None,
             "shared_process_engine_type": str(self.shared_process_state.get("engine_type", "unknown")),
+            "restart_family_migration_provenance": (
+                None if getattr(self, "restart_family_migration_provenance", None) is None
+                else dict(getattr(self, "restart_family_migration_provenance"))
+            ),
             "fem_reconstruction": {
                 "displacement_shape": list(self.state.displacement.shape),
                 "damage_shape": list(self.state.damage.shape),

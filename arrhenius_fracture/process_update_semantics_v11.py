@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Mapping
+import math
 
 
 MODEL_ID = "v11.process_update_semantics/1"
@@ -82,4 +83,29 @@ def classify_process_update(
     return ProcessUpdateDecision(semantics, refinement, reason, physical_action, diagnostics)
 
 
-__all__ = ["MODEL_ID", "ProcessUpdateDecision", "classify_process_update"]
+def require_full_accepted_interval_consumption(
+    info: Mapping[str, Any], accepted_interval_duration_s: float,
+) -> dict[str, float]:
+    """Require the process observer to consume the whole accepted interval."""
+    requested = float(accepted_interval_duration_s)
+    consumed = float(info.get("kinetic_dt_consumed_s", float("nan")))
+    unused = float(info.get("kinetic_dt_unused_s", float("nan")))
+    tolerance = max(1.0e-15, 1.0e-12 * abs(requested))
+    if not all(math.isfinite(value) for value in (requested, consumed, unused)):
+        raise RuntimeError("process interval accounting is unavailable or nonfinite")
+    if requested < 0.0 or abs(consumed - requested) > tolerance or abs(unused) > tolerance:
+        raise RuntimeError(
+            "process state did not consume the complete accepted physical interval"
+        )
+    return {
+        "accepted_interval_duration_s": requested,
+        "process_dt_requested_s": requested,
+        "process_dt_consumed_s": consumed,
+        "process_dt_unused_s": unused,
+    }
+
+
+__all__ = [
+    "MODEL_ID", "ProcessUpdateDecision", "classify_process_update",
+    "require_full_accepted_interval_consumption",
+]

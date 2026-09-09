@@ -19,6 +19,7 @@ from arrhenius_fracture.kernel_resolver_v10228 import (
     _validate_direct_evidence,
 )
 from arrhenius_fracture.prescribed_geometry_kernel_v10228 import (
+    plan_explicit_prescribed_geometry_anchors,
     plan_prescribed_geometry_anchors,
     prescribed_crack_direction,
 )
@@ -65,6 +66,31 @@ def test_anchor_plan_is_geometric_and_seed_free():
     assert direction[0] == pytest.approx(np.cos(np.deg2rad(30.0)))
     assert direction[1] == pytest.approx(np.sin(np.deg2rad(30.0)))
     assert all(anchor.crack_direction == anchors[0].crack_direction for anchor in anchors)
+
+
+def test_explicit_anchor_plan_preserves_append_only_irregular_levels():
+    configuration = _configuration(theta_deg=40.0, da_phys_m=5.0e-6)
+    levels = (0.0, 200.0, 400.0, 415.0, 420.0, 425.0, 600.0, 745.0)
+    anchors = plan_explicit_prescribed_geometry_anchors(configuration, levels)
+    assert [anchor.state_id for anchor in anchors] == [
+        "E0000000",
+        "E0000200",
+        "E0000400",
+        "E0000415",
+        "E0000420",
+        "E0000425",
+        "E0000600",
+        "E0000745",
+    ]
+    assert [1.0e6 * anchor.extension_m for anchor in anchors] == pytest.approx(levels)
+
+
+def test_explicit_anchor_plan_rejects_off_quantum_and_unsorted_levels():
+    configuration = _configuration(da_phys_m=5.0e-6)
+    with pytest.raises(ValueError, match="align"):
+        plan_explicit_prescribed_geometry_anchors(configuration, (0.0, 421.0))
+    with pytest.raises(ValueError, match="strictly increasing"):
+        plan_explicit_prescribed_geometry_anchors(configuration, (0.0, 420.0, 415.0))
 
 
 def test_orientation_changes_direction_and_mechanical_fingerprint():

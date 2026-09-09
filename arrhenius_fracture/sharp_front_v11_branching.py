@@ -47,11 +47,22 @@ from .network_metrics_v11 import crack_growth_metrics
 from .production_step_loop_v11 import (
     AcceptedStepContext, DirectionalStepRefinementRequired, advance_accepted_step,
 )
-from .process_update_semantics_v11 import classify_process_update
+from .process_update_semantics_v11 import (
+    classify_process_update, require_full_accepted_interval_consumption,
+)
 from .topology_transaction_v11 import (
     LiveFEMTopologyState, TopologyArm, TopologyTrialResult,
     apply_causal_sharp_wake_trial_geometry, clip_arm_at_first_intersection,
     execute_topology_trial, extend_network_arm, mark_coalesced,
+)
+from .tip_directional_observation_v11 import (
+    apply_post_interval_event_renewal, observations_from_provider,
+    marginal_trial_origin, require_same_tip_coupling,
+    require_observation_state_contract,
+    require_uncontaminated_replay_checkpoint,
+    realized_topology_arm_lengths, select_shared_process_renewal_distance,
+    select_controlling_observation, selected_event_owner,
+    serialize_directional_observation,
 )
 
 
@@ -103,11 +114,153 @@ def _restore_shared_engine(engine, payload: Mapping[str, Any]):
         raise ValueError("unsupported shared production-engine state")
     if payload.get("engine_type") != type(engine).__name__:
         raise RuntimeError("restart engine type differs from initialized production engine")
-    for name, value in payload.get("engine_fields", {}).items():
+    engine_fields = payload.get("engine_fields", {})
+    mpz_fields = payload.get("mpz_fields", {})
+    # A restart is an exact accepted-state restore. Drop serializable defaults
+    # introduced by the fresh initializer but absent from the checkpoint. This
+    # is especially important for an already migrated family: otherwise the
+    # initializer can leave an unrecorded second set of process controls alive.
+    from .restart_family_migration_v11 import (
+        _drop_serializable_fields_absent_from_checkpoint,
+    )
+    _drop_serializable_fields_absent_from_checkpoint(
+        engine, engine_fields, frozenset({"mpz"})
+    )
+    _drop_serializable_fields_absent_from_checkpoint(
+        engine.mpz, mpz_fields, frozenset()
+    )
+    restored_fields = copy.deepcopy({"engine": engine_fields, "mpz": mpz_fields})
+    for name, value in restored_fields["engine"].items():
         setattr(engine, name, value)
-    for name, value in payload.get("mpz_fields", {}).items():
+    for name, value in restored_fields["mpz"].items():
         setattr(engine.mpz, name, value)
     return engine
+
+
+def _write_restore_only_sentinel(
+    *,
+    target: Path,
+    restart_path: str,
+    restored: ProductionBranchCheckpoint,
+    state: LiveFEMTopologyState,
+    engine: Any,
+    runtime: LiveTopologyRuntime,
+    source_cache_root: Path,
+    destination_cache_root: Path,
+    start_step: int,
+    physical_time: float,
+    accepted_load: float,
+) -> None:
+    """Seal the real production restore path immediately before its first solve.
+
+    This observer is default-off and deliberately has no continuation mode. It
+    is reached only after the production entrypoint has restored and rebound a
+    checkpoint, and it exits before mesh adaptation, interval construction, a
+    provider lookup, or a mechanics/process update can begin.
+    """
+    from .restart_family_migration_v11 import (
+        _family_references, canonical_hash, family_digest, process_state_digest,
+        rng_digest,
+    )
+
+    manifest_path = Path(restart_path).resolve()
+    manifest = json.loads(manifest_path.read_text())
+    state_path = manifest_path.with_name(manifest["state_file"])
+    migration = dict(restored.restart_family_migration_provenance or {})
+    captured = _capture_shared_engine(engine)
+    engine_refs = _family_references(engine)
+    mpz_refs = _family_references(engine.mpz)
+    family = engine_refs.get("_state_kernel_family")
+    if family is None or mpz_refs.get("_signed_kernel") is not family:
+        raise RuntimeError("restore-only sentinel found split engine/MPZ family identity")
+
+    migration_count_before = int(
+        restored.shared_process_state.get("engine_fields", {}).get(
+            "_restart_family_migration_count", 0
+        )
+    )
+    migration_count_after = int(getattr(engine, "_restart_family_migration_count", 0))
+    runtime_audit = runtime.audit_payload()
+    solve_count = int(runtime_audit.get("live_fem_solve_count", -1))
+    accepted_provider_states = int(runtime_audit.get("accepted_provider_state_count", -1))
+    checks = {
+        "migration_count_remains_one": migration_count_before == migration_count_after == 1,
+        "second_migration_not_performed": migration_count_after == migration_count_before,
+        "target_family_hash_matches_migration": bool(migration.get("target_family_sha256")),
+        "target_family_fingerprint_present": bool(
+            migration.get("target_family_physics_fingerprint")
+        ),
+        "target_bound_family_digest_matches": (
+            family_digest(family) == migration.get("target_bound_family_digest")
+        ),
+        "engine_mpz_same_target_object": engine._state_kernel_family is engine.mpz._signed_kernel,
+        "only_target_family_reachable": (
+            set(engine_refs) == {"_state_kernel_family"}
+            and set(mpz_refs) == {"_signed_kernel"}
+            and {id(value) for value in (*engine_refs.values(), *mpz_refs.values())}
+            == {id(family)}
+        ),
+        "old_family_unreachable": migration.get("old_family_reachable_after_migration") is False,
+        "accepted_state_unchanged": all(
+            canonical_hash(getattr(restored.state, name))
+            == canonical_hash(getattr(state, name))
+            for name in restored.state.__dataclass_fields__
+        ),
+        "process_state_unchanged": (
+            process_state_digest(restored.shared_process_state)
+            == process_state_digest(captured)
+        ),
+        "rng_threshold_state_unchanged": (
+            rng_digest(restored.shared_process_state) == rng_digest(captured)
+        ),
+        "physical_time_unchanged": physical_time == float(restored.physical_time_s),
+        "accepted_opening_unchanged": accepted_load == float(restored.accepted_load),
+        "provider_cache_rebound_before_lookup": (
+            source_cache_root != destination_cache_root
+            and Path(runtime.cache_root).resolve() == destination_cache_root
+        ),
+        "provider_solve_count_zero": solve_count == 0,
+        "accepted_provider_state_count_zero": accepted_provider_states == 0,
+        "accepted_interval_not_begun": (
+            start_step == int(state.event_counters.get("accepted_steps", 0)) + 1
+        ),
+        "no_pf_worker_started": True,
+    }
+    if not all(checks.values()):
+        failed = sorted(key for key, value in checks.items() if not value)
+        raise RuntimeError(f"production restore-only sentinel failed: {failed}")
+
+    payload = {
+        "schema": "pf_branching_production_restore_only_sentinel_v5_4_1/1",
+        "qualification": "PASS",
+        "boundary": "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS",
+        "source_checkpoint": str(manifest_path),
+        "source_checkpoint_manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        "source_checkpoint_state": str(state_path.resolve()),
+        "source_checkpoint_state_sha256": hashlib.sha256(state_path.read_bytes()).hexdigest(),
+        "migration_count_before_restore": migration_count_before,
+        "migration_count_after_restore": migration_count_after,
+        "migration_provenance": migration,
+        "target_bound_family_digest": family_digest(family),
+        "source_provider_cache_root": str(source_cache_root),
+        "destination_provider_cache_root": str(destination_cache_root),
+        "runtime_provider_audit": runtime_audit,
+        "restored_physical_time_s": float(restored.physical_time_s),
+        "restored_accepted_opening_m": float(restored.accepted_load),
+        "restored_projected_extension_m": float(restored.projected_extension_m),
+        "restored_physical_extension_m": float(restored.physical_extension_m),
+        "next_step_if_authorized": int(start_step),
+        "checks": checks,
+        "provider_lookup_performed": False,
+        "mechanics_solve_performed": False,
+        "process_or_stochastic_update_performed": False,
+        "accepted_interval_begun": False,
+        "worker_started": False,
+    }
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = target.with_name(target.name + ".tmp")
+    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n")
+    os.replace(temporary, target)
 
 
 def _request(
@@ -221,6 +374,131 @@ def _direct_measurement(state, candidates, args) -> dict[str, Any]:
         "recoverable_potential_energy_J_per_m": state.stored_energy_J_per_m,
         "directional": directional,
     }
+
+
+def solve_accepted_state_v12_hook(
+    current, context, *, accepted_load: float, trial_fraction: float,
+    args, cfg, base, material, elasticity_D, candidates,
+):
+    """Reusable exact extraction of the reviewed V5.4.2 accepted solve.
+
+    This is the former ``run`` closure with its captured values explicit.  It
+    intentionally performs the identical staggered FEM/plasticity sequence.
+    """
+    from .fem import assemble_mechanics, solve_dirichlet
+    from .plasticity import update_plasticity
+
+    trial_load = float(accepted_load) + float(args.dU) * float(trial_fraction)
+    u = current.displacement.copy()
+    ep = current.ep_gp.copy()
+    rho = current.rho_gp.copy()
+    sigma = None
+    reaction = 0.0
+    for _ in range(int(args.n_stagger)):
+        Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
+            current.mesh, u, ep, rho, current.damage, elasticity_D, material,
+            cohesive_network=current.cohesive_network,
+        )
+        u, reaction = solve_dirichlet(
+            Kmat, Rint, u, current.boundary, 0.5 * trial_load, -0.5 * trial_load
+        )
+        Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
+            current.mesh, u, ep, rho, current.damage, elasticity_D, material,
+            cohesive_network=current.cohesive_network,
+        )
+        plast = base.PlasticityModel(cfg.plasticity_barrier, material)
+        ep, rho, _ = update_plasticity(
+            ep, rho, sigma, material, float(args.temperatures[0]),
+            context.duration_s, plast, cfg.dislocations,
+        )
+    Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
+        current.mesh, u, ep, rho, current.damage, elasticity_D, material,
+        cohesive_network=current.cohesive_network,
+    )
+    u, reaction = solve_dirichlet(
+        Kmat, Rint, u, current.boundary, 0.5 * trial_load, -0.5 * trial_load
+    )
+    Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
+        current.mesh, u, ep, rho, current.damage, elasticity_D, material,
+        cohesive_network=current.cohesive_network,
+    )
+    energy = _stored_energy(current.mesh, u, ep, sigma, elasticity_D)
+    solved = replace(
+        current, displacement=u, ep_gp=ep, rho_gp=rho,
+        stored_energy_J_per_m=energy,
+    )
+    measurement = _direct_measurement(solved, candidates, args)
+    measurement["reaction_force"] = float(reaction)
+    return solved, np.asarray(sigma).copy(), measurement
+
+
+def evolve_process_engine_v12_hook(
+    engine, controlling_observation, accepted_state, accepted_sigma, *,
+    accepted_state_id: str, stress_field_state_id: str,
+    pre_event_topology_fingerprint: str, duration_s: float,
+    temperature_K: float, pre_progress: float,
+    permitted_physical_hazard_action: float,
+):
+    """Execute the V5.4.2 pre-event process interval without topology renewal.
+
+    This is the reusable production form of ``update_shared``.  Directional
+    competition remains the sole cleavage/topology clock.  The returned
+    engine is an isolated accepted candidate; callers commit it only after the
+    complete interval validates and perform moving-frame renewal separately.
+    """
+    require_observation_state_contract(
+        controlling_observation,
+        accepted_state_id=accepted_state_id,
+        stress_field_state_id=stress_field_state_id,
+        pre_event_topology_fingerprint=pre_event_topology_fingerprint,
+    )
+    require_same_tip_coupling(
+        controlling_observation.tip_id, controlling_observation.tip_id,
+    )
+    from .anisotropic_emission_v10174 import bind_explicit_accepted_tensor_drive
+    bound_drive = bind_explicit_accepted_tensor_drive(
+        mesh=accepted_state.mesh, sigma_gp=accepted_sigma,
+        damage=accepted_state.damage,
+        tip_xy=np.asarray(controlling_observation.tip_xy_m),
+        config=engine.anisotropic_cfg,
+        accepted_state_id=accepted_state_id,
+        stress_field_state_id=stress_field_state_id,
+    )
+    engine_trial = copy.deepcopy(engine)
+    engine_trial.B = float(pre_progress)
+    if hasattr(engine_trial, "hazard_action_current"):
+        engine_trial.hazard_action_current = float(pre_progress)
+    if hasattr(engine_trial, "hazard_threshold_action"):
+        engine_trial.hazard_threshold_action = 1.0e300
+    engine_trial._directional_topology_owns_cleavage = True
+    legacy_rng_before = _hash(getattr(engine_trial, "_hazard_rng", None))
+    info = engine_trial.step(
+        float(controlling_observation.directional_K_Pa_sqrt_m),
+        float(temperature_K), float(duration_s),
+    )
+    legacy_rng_after = _hash(getattr(engine_trial, "_hazard_rng", None))
+    info["interval_evolved"] = True
+    info.update(require_full_accepted_interval_consumption(info, duration_s))
+    info["legacy_process_fired"] = bool(info.get("fired", False))
+    info["legacy_process_rng_hash_before"] = legacy_rng_before
+    info["legacy_process_rng_hash_after"] = legacy_rng_after
+    info["directional_event_selected"] = False
+    info["directional_event_completion_time_s"] = None
+    info["explicit_accepted_tensor_drive"] = bound_drive
+    if abs(float(info.get("da", 0.0))) > 1.0e-18:
+        raise RuntimeError("legacy process observer advanced crack geometry")
+    decision = classify_process_update(
+        info, directional_event_expected=False,
+        permitted_physical_hazard_action=float(permitted_physical_hazard_action),
+    )
+    if decision.refinement_required:
+        raise DirectionalStepRefinementRequired(
+            decision.physical_hazard_action_step,
+            float(permitted_physical_hazard_action),
+            refinement_reason=(decision.refinement_reason or "process_update_refinement"),
+            diagnostics={**decision.diagnostics, "info": info},
+        )
+    return engine_trial, info
 
 
 def _candidate_map(candidates):
@@ -355,6 +633,18 @@ def run_2d(args):
         )
     if restart_path:
         restored = restore_branch_checkpoint(restart_path)
+        restart_name = Path(restart_path).name
+        if not restart_name.startswith("step") or len(restart_name) < 11:
+            raise RuntimeError("restart checkpoint filename does not encode its accepted step")
+        restart_step = int(restart_name[4:11])
+        require_uncontaminated_replay_checkpoint(
+            restart_step, first_selected_event_step=287,
+        )
+        expected_branching_policy = maximum_fronts > 1
+        if bool(restored.state.crack_network.branching_enabled) != expected_branching_policy:
+            raise RuntimeError(
+                "restart branching policy differs from the requested maximum-fronts policy"
+            )
         requested_target_m = float(
             getattr(args, "target_crack_extension_um", float("inf"))
         ) * 1.0e-6
@@ -421,6 +711,19 @@ def run_2d(args):
                 resume_clusters=restored.branch_clusters,
             )
         engine = _restore_shared_engine(engine, restored.shared_process_state)
+        restore_only_target = os.environ.get(
+            "PF_V5_4_1_RESTORE_ONLY_SENTINEL_OUT", ""
+        ).strip()
+        if restore_only_target:
+            _write_restore_only_sentinel(
+                target=Path(restore_only_target), restart_path=restart_path,
+                restored=restored, state=state, engine=engine, runtime=runtime,
+                source_cache_root=source_cache_root,
+                destination_cache_root=destination_cache_root,
+                start_step=start_step,
+                physical_time=physical_time, accepted_load=accepted_load,
+            )
+            return None
         if (
             (
                 restored.termination_reason == "branch_cluster_independent_tip_handoff_required"
@@ -527,70 +830,67 @@ def run_2d(args):
 
         def solve_accepted(current, _context):
             nonlocal last_measurement, latest_sigma
-            trial_load = accepted_load + float(args.dU) * trial_fraction
-            u = current.displacement.copy(); ep = current.ep_gp.copy(); rho = current.rho_gp.copy()
-            sigma = psi = None; reaction = 0.0
-            for _ in range(int(args.n_stagger)):
-                Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
-                    current.mesh, u, ep, rho, current.damage, D, mat,
-                    cohesive_network=current.cohesive_network,
-                )
-                u, reaction = solve_dirichlet(
-                    Kmat, Rint, u, current.boundary, 0.5 * trial_load, -0.5 * trial_load
-                )
-                Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
-                    current.mesh, u, ep, rho, current.damage, D, mat,
-                    cohesive_network=current.cohesive_network,
-                )
-                plast = base.PlasticityModel(cfg.plasticity_barrier, mat)
-                ep, rho, _ = update_plasticity(ep, rho, sigma, mat, float(args.temperatures[0]), _context.duration_s, plast, cfg.dislocations)
-            # Transition parity compares equilibrated accepted states.  Plastic
-            # evolution changes the internal force, so close the final accepted
-            # state once more without another constitutive update.
-            Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
-                current.mesh, u, ep, rho, current.damage, D, mat,
-                cohesive_network=current.cohesive_network,
+            solved, latest_sigma, last_measurement = solve_accepted_state_v12_hook(
+                current, _context, accepted_load=accepted_load,
+                trial_fraction=trial_fraction, args=args, cfg=cfg, base=base,
+                material=mat, elasticity_D=D, candidates=candidates,
             )
-            u, reaction = solve_dirichlet(
-                Kmat, Rint, u, current.boundary, 0.5 * trial_load, -0.5 * trial_load
-            )
-            Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
-                current.mesh, u, ep, rho, current.damage, D, mat,
-                cohesive_network=current.cohesive_network,
-            )
-            energy = _stored_energy(current.mesh, u, ep, sigma, D)
-            latest_sigma = np.asarray(sigma).copy()
-            solved = replace(current, displacement=u, ep_gp=ep, rho_gp=rho, stored_energy_J_per_m=energy)
-            last_measurement = _direct_measurement(solved, candidates, args)
-            last_measurement["reaction_force"] = float(reaction)
             return solved
 
+        latest_interval_observations = ()
+        latest_interval_pre_event_state = None
+        latest_stress_field_state_id = ""
+
         def rates(current, _context):
-            nonlocal latest_interval_rates, latest_live_result, runtime
+            nonlocal latest_interval_rates, latest_interval_observations
+            nonlocal latest_interval_pre_event_state, latest_stress_field_state_id
+            nonlocal latest_live_result, runtime
             source = last_measurement["directional"]
+            provider_tips = ({
+                "tip_xy_m": list(current.crack_network.branch(
+                    current.crack_network.active_tip_ids[0]
+                ).tip),
+                "directional": source,
+            },)
             if runtime.routing.active_mechanics_provider == PROVIDER_ID:
                 request = _request(current, candidates, args=args, cfg=cfg, runtime_step=step, cluster=cluster)
                 live, _ = __import__("arrhenius_fracture.kernel_resolver_v11", fromlist=["resolve_live_topology_request"]).resolve_live_topology_request(
                     request, cache_root=runtime.cache_root, accepted=True
                 )
                 latest_live_result = live
-                source = live["tips"][0]["directional"] if len(live["tips"]) == 1 else [
-                    item for tip in live["tips"] for item in tip["directional"]
-                    if item["candidate_id"] in {c.candidate_id for c in candidates}
-                ]
-            by_id = {}
-            for item in source:
-                by_id.setdefault(item["candidate_id"], item)
+                provider_tips = tuple(live["tips"])
+            pre_event_state_id = _hash((
+                _context.accepted_state_id,
+                current.crack_network,
+                current.displacement,
+                current.ep_gp,
+                current.rho_gp,
+            ))
+            latest_interval_pre_event_state = current
+            latest_stress_field_state_id = _hash((
+                pre_event_state_id, latest_sigma, mesh_fingerprint(current.mesh)
+            ))
+            observations = observations_from_provider(
+                current.crack_network,
+                provider_tips,
+                (candidate.candidate_id for candidate in candidates),
+                accepted_state_id=pre_event_state_id,
+                topology_fingerprint=_hash(current.crack_network),
+                stress_field_state_id=latest_stress_field_state_id,
+            )
+            by_id = {item.candidate_id: item for item in observations}
             rows = []
+            updated_observations = []
             for candidate in candidates:
-                local = by_id[candidate.candidate_id]
-                local_signed = float(local.get("J_local_signed_J_per_m2", local["signed_J_J_per_m2"]))
-                local_valid = bool(local.get("local_J_valid", True))
+                observation = by_id[candidate.candidate_id]
+                local_signed = observation.signed_J_J_per_m2
+                local_valid = observation.local_contour_valid
                 marginal = None
                 kinetic = max(local_signed, 0.0)
                 if not local_valid:
-                    tip_id = current.crack_network.active_tip_ids[0]
-                    start = current.crack_network.branch(tip_id).tip
+                    tip_id, start = marginal_trial_origin(
+                        current.crack_network, observation
+                    )
                     raw = TopologyArm(
                         candidate.candidate_id, tip_id, start,
                         (start[0] + da_phys * candidate.direction_xy[0],
@@ -612,10 +912,6 @@ def run_2d(args):
                         marginal_request = replace(
                             marginal_request,
                             cluster_frame={"mode": "candidate_marginal_kinetic_drive"},
-                            candidates_by_tip={
-                                active_tip: tuple(candidates)
-                                for active_tip in ephemeral.crack_network.active_tip_ids
-                            },
                         )
                         runtime, marginal_live = runtime.evaluate_trial(marginal_request)
                         marginal = (
@@ -631,12 +927,21 @@ def run_2d(args):
                     rate, J_local_signed_J_per_m2=local_signed,
                     local_J_valid=local_valid, G_marginal_J_per_m2=marginal,
                     J_kin_used_J_per_m2=kinetic,
-                    local_J_invalid_reason=local.get("local_J_invalid_reason"),
+                    local_J_invalid_reason=observation.local_contour_invalid_reason,
+                ))
+                updated_observations.append(observation.with_kinetics(
+                    kinetic_J_J_per_m2=kinetic,
+                    marginal_J_J_per_m2=marginal,
+                    directional_K_Pa_sqrt_m=rate.K_directional_Pa_sqrt_m,
+                    rate_per_s=rate.lambda_per_s,
                 ))
             latest_interval_rates = tuple(rows)
+            latest_interval_observations = tuple(updated_observations)
             return latest_interval_rates
 
         trial_requests = {}; trial_live_results = {}; trial_clusters = {}; trial_drives = {}
+        trial_observations = {}
+        trial_realized_arm_lengths = {}
 
         def trial_action(current, proposal):
             nonlocal runtime, prebranch_snapshot_written, latest_live_result
@@ -668,6 +973,7 @@ def run_2d(args):
                 })
             network0, trial_cluster, pairs = _realized_trial_network(current, proposal, candidates, da_phys, cluster)
             rate_by_id = {item.candidate_id: item for item in rates(current, context)}
+            trial_observations[proposal.action_id] = latest_interval_observations
             if any(rate_by_id[cid].signed_J_J_per_m2 <= 0.0 for cid in proposal.member_candidate_ids):
                 return TopologyTrialResult(False, current, proposal.action_id, 0.0, 0.0, 0.0, "nonpositive_signed_directional_J")
             arms = []
@@ -706,61 +1012,126 @@ def run_2d(args):
                     stored_energy_J_per_m=float(live["base_equilibrium"]["recoverable_potential_energy_J_per_m"]),
                 )
 
-            return execute_topology_trial(
+            result = execute_topology_trial(
                 current, proposal, tuple(arms), apply_trial_geometry=geometry,
                 equilibrate_fixed_load=equilibrate, network_geometry_already_realized=True,
             )
+            if result.accepted:
+                trial_realized_arm_lengths[proposal.action_id] = realized_topology_arm_lengths(
+                    current.crack_network,
+                    result.state.crack_network,
+                    proposal.member_candidate_ids,
+                )
+            return result
 
-        shared_info = {}
+        shared_info = {}; shared_coupling = {}
         def update_shared(selected_state, _context, proposal):
-            nonlocal runtime, cluster, shared_info, engine
-            from .crystal import near_tip_stress_tensor
-            rate_map = (
-                trial_drives[proposal.action_id] if proposal is not None
-                else {item.candidate_id: item for item in latest_interval_rates}
+            nonlocal runtime, cluster, shared_info, shared_coupling, engine
+            observations = (
+                trial_observations[proposal.action_id] if proposal is not None
+                else latest_interval_observations
             )
-            K = max((item.K_directional_Pa_sqrt_m for item in rate_map.values()), default=0.0)
-            # Populate the installed v10.2.28 tensor-resolved emission observer
-            # from this accepted 2-D FEM state before evolving the one shared MPZ.
-            probe_tip = selected_state.crack_network.branch(
-                selected_state.crack_network.active_tip_ids[0]
-            ).tip
-            near_tip_stress_tensor(
-                latest_sigma, selected_state.mesh, np.asarray(probe_tip),
-                3.0 * max(float(getattr(selected_state.mesh, "hbar_tip", 0.0) or selected_state.mesh.hbar), 1.0e-12),
-            )
-            engine_trial = copy.deepcopy(engine)
+            controlling = select_controlling_observation(observations)
+            if latest_interval_pre_event_state is None:
+                raise RuntimeError("shared update has no accepted pre-event state")
+            pre_event_state = latest_interval_pre_event_state
+            expected_pre_event_state_id = _hash((
+                _context.accepted_state_id,
+                pre_event_state.crack_network,
+                pre_event_state.displacement,
+                pre_event_state.ep_gp,
+                pre_event_state.rho_gp,
+            ))
+            pre_topology_fingerprint = _hash(pre_event_state.crack_network)
             pre_progress = max(
                 (hazard.residual_action for hazard in state.competition.hazard_states),
                 default=0.0,
             )
             expected = proposal is not None
-            engine_trial.B = 1.0 if expected else pre_progress
-            if hasattr(engine_trial, "hazard_action_current"):
-                engine_trial.hazard_action_current = 1.0 if expected else pre_progress
-            if hasattr(engine_trial, "hazard_threshold_action"):
-                engine_trial.hazard_threshold_action = 1.0 if expected else 1.0e300
-            info = engine_trial.step(K, float(args.temperatures[0]), _context.duration_s)
-            target = max(float(getattr(args, "adaptive_event_target", 0.15) or 0.15) * 0.5, 1.0e-6)
-            decision = classify_process_update(
-                info,
-                directional_event_expected=expected,
+            target = max(
+                float(getattr(args, "adaptive_event_target", 0.15) or 0.15) * 0.5,
+                1.0e-6,
+            )
+            engine_trial, info = evolve_process_engine_v12_hook(
+                engine, controlling, pre_event_state, latest_sigma,
+                accepted_state_id=expected_pre_event_state_id,
+                stress_field_state_id=latest_stress_field_state_id,
+                pre_event_topology_fingerprint=pre_topology_fingerprint,
+                duration_s=_context.duration_s,
+                temperature_K=float(args.temperatures[0]),
+                pre_progress=pre_progress,
                 permitted_physical_hazard_action=target,
             )
-            if decision.refinement_required:
-                raise DirectionalStepRefinementRequired(
-                    decision.physical_hazard_action_step,
-                    target,
-                    refinement_reason=decision.refinement_reason or "process_update_refinement",
-                    diagnostics={**decision.diagnostics, "info": info},
-                )
+            bound_drive = info.pop("explicit_accepted_tensor_drive")
+            info["directional_event_selected"] = expected
+            info["directional_event_completion_time_s"] = (
+                None if proposal is None else max(proposal.completion_times_s)
+            )
             engine = engine_trial
+            event_candidate_id, event_tip_id = selected_event_owner(
+                proposal, observations
+            )
+            # The directional topology transaction, rather than the shared
+            # engine's independent clock, owns this physical advance.
+            realized_lengths = (
+                () if proposal is None
+                else trial_realized_arm_lengths.get(proposal.action_id, ())
+            )
+            renewal_distance = (
+                0.0 if proposal is None
+                else select_shared_process_renewal_distance(realized_lengths)
+            )
+            renewal = apply_post_interval_event_renewal(
+                engine.mpz, info, event_selected=proposal is not None,
+                event_distance_m=renewal_distance,
+            )
+            info["realized_arm_lengths_m"] = list(realized_lengths)
+            info["realized_max_tip_advance_m"] = renewal_distance
+            info["realized_total_new_crack_length_m"] = sum(realized_lengths)
+            info["selected_renewal_distance_m"] = renewal_distance
+            info["active_to_wake_transfer"] = float(
+                renewal.get("wake_mobile", 0.0) + renewal.get("wake_retained", 0.0)
+            )
+            info["postrenewal_conservation_residual"] = float(
+                info.get("event_moving_frame_conservation", {}).get(
+                    "active_plus_wake_plus_sinks_residual", 0.0
+                )
+            )
             counters = dict(selected_state.event_counters)
             counters["shared_state_updates"] = counters.get("shared_state_updates", 0) + 1
             counters["accepted_steps"] = step
             ledgers = dict(selected_state.energy_ledgers)
             ledgers["retained"] = float(info.get("N_em", 0.0)); ledgers["emission_work"] = float(info.get("W_emit", engine.W_emit))
             shared_info = info
+            selected_cluster = (
+                trial_clusters.get(proposal.action_id) if proposal is not None
+                else cluster
+            )
+            process_owner_id = (
+                selected_cluster.cluster_id if selected_cluster is not None
+                else controlling.tip_id
+            )
+            pre_event_state_id = controlling.accepted_state_id
+            post_event_state_id = _hash((
+                pre_event_state_id, selected_state.crack_network,
+                selected_state.competition,
+            ))
+            shared_coupling = {
+                "controlling_candidate_id": controlling.candidate_id,
+                "controlling_scalar_K_tip_id": controlling.tip_id,
+                "tensor_probe_tip_id": probe_tip_id,
+                "selected_event_candidate_id": event_candidate_id,
+                "selected_event_tip_id": event_tip_id,
+                "process_owner_id": process_owner_id,
+                "pre_event_state_id": pre_event_state_id,
+                "post_event_state_id": post_event_state_id,
+                "pre_event_topology_fingerprint": controlling.topology_fingerprint,
+                "post_event_topology_fingerprint": _hash(selected_state.crack_network),
+                "stress_field_state_fingerprint": latest_stress_field_state_id,
+                "explicit_accepted_tensor_drive": bound_drive,
+                "tensor_sample_coordinates_m": list(probe_tip),
+                "observations": observations,
+            }
             if proposal is not None:
                 runtime = runtime.accept_trial(
                     trial_requests[proposal.action_id],
@@ -806,7 +1177,6 @@ def run_2d(args):
                 if next_fraction >= trial_fraction or next_fraction <= float(getattr(args, "adaptive_min_frac", 1.0e-8)):
                     raise RuntimeError("v11 directional adaptive stepping reached its minimum fraction") from exc
                 trial_fraction = next_fraction
-        rate_tip_id = state.crack_network.active_tip_ids[0]
         state = result.state
         accepted_load += float(args.dU) * trial_fraction
         physical_time += context.duration_s
@@ -816,11 +1186,29 @@ def run_2d(args):
             }
             for rate in result.rates:
                 hazard = hazard_by_candidate[rate.candidate_id]
+                observation = next(
+                    item for item in shared_coupling["observations"]
+                    if item.candidate_id == rate.candidate_id
+                )
+                ownership = serialize_directional_observation(
+                    observation,
+                    controlling_scalar_K_tip_id=shared_coupling["controlling_scalar_K_tip_id"],
+                    tensor_probe_tip_id=shared_coupling["tensor_probe_tip_id"],
+                    selected_event_tip_id=shared_coupling["selected_event_tip_id"],
+                    process_owner_id=shared_coupling["process_owner_id"],
+                    pre_event_state_id=shared_coupling["pre_event_state_id"],
+                    post_event_state_id=shared_coupling["post_event_state_id"],
+                )
                 stream.write(json.dumps({
                     "step": step, "physical_time_s": physical_time,
                     "accepted_state_id": context.accepted_state_id,
-                    "tip_id": rate_tip_id,
-                    "candidate_id": rate.candidate_id,
+                    **ownership,
+                    "controlling_scalar_K_candidate_id": shared_coupling["controlling_candidate_id"],
+                    "selected_event_candidate_id": shared_coupling["selected_event_candidate_id"],
+                    "pre_event_topology_fingerprint": shared_coupling["pre_event_topology_fingerprint"],
+                    "post_event_topology_fingerprint": shared_coupling["post_event_topology_fingerprint"],
+                    "stress_field_state_fingerprint": shared_coupling["stress_field_state_fingerprint"],
+                    "tensor_sample_coordinates_m": shared_coupling["tensor_sample_coordinates_m"],
                     "J_local_signed_J_per_m2": rate.J_local_signed_J_per_m2,
                     "local_J_valid": rate.local_J_valid,
                     "local_J_invalid_reason": rate.local_J_invalid_reason,
@@ -1029,6 +1417,17 @@ def run_2d(args):
         )
         checkpoint_path = out / "checkpoint" / "latest.json"
         write_branch_checkpoint(checkpoint, checkpoint_path)
+        daughter_stop_m = float(
+            os.environ.get("PF_QUALIFIED_DAUGHTER_STOP_UM", "inf")
+        ) * 1.0e-6
+        daughter_lengths = [
+            sum(math.dist(a, b) for a, b in zip(branch.path, branch.path[1:]))
+            for branch in state.crack_network.branches
+            if branch.generation > 0 and branch.status == "active"
+        ]
+        if daughter_lengths and max(daughter_lengths) >= daughter_stop_m:
+            termination = "qualified_daughter_early_stop"
+            break
         if guard is not None and guard.handoff_required:
             from .resolved_production_v11 import continue_resolved_production
             return continue_resolved_production(

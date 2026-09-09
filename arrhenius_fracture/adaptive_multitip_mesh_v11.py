@@ -658,7 +658,22 @@ def adapt_accepted_state_for_trials(
                 "nested_refinement_stage_a_energy_parity_failure: "
                 f"parent={before:.17g} prolonged={prolonged:.17g}"
             )
-        current = refined; lineages.append(lineage)
+        # Field prolongation above must remain energy-exact.  The committed
+        # sharp-wake graph is then independently re-rasterized on the child
+        # mesh so whole-parent P0 inheritance cannot manufacture wake ahead of
+        # a physical endpoint.
+        from .causal_sharp_wake_v11 import rerasterize_refined_topology_damage
+        current, remap = rerasterize_refined_topology_damage(
+            current, refined, lineage.parent_to_child_element_map,
+        )
+        marking_levels[-1]["topology_damage_remap"] = {
+            **remap.__dict__,
+            "energy_exact_field_prolongation_J_per_m": prolonged,
+            "energy_after_topology_rerasterization_J_per_m": (
+                _stored_energy_and_reaction(current)[0]
+            ),
+        }
+        lineages.append(lineage)
         next_roots = {}
         for parent, children in lineage.parent_to_child_element_map.items():
             for child in children:
