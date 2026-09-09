@@ -23,6 +23,20 @@ def test_consumer_search_error_is_not_an_empty_audit(monkeypatch,tmp_path):
     with pytest.raises(RuntimeError,match='consumer audit search failed'):module.consumer_occurrences(tmp_path,['source_commit'])
 
 
+def test_consumer_audit_falls_back_when_ripgrep_is_unavailable(monkeypatch,tmp_path):
+    import qualify_v5_disabled_causal_neutrality_v1 as module
+    source=tmp_path/'arrhenius_fracture'; source.mkdir()
+    (source/'b.py').write_text('source_commit = "b"\n')
+    (source/'a.py').write_text('# source_commit\nother = 1\n')
+    monkeypatch.setattr(module.subprocess,'run',lambda *args,**kwargs:(_ for _ in ()).throw(FileNotFoundError('rg')))
+    assert module.consumer_occurrences(tmp_path,['source_commit']) == {
+        'source_commit': [
+            'arrhenius_fracture/a.py:1:# source_commit',
+            'arrhenius_fracture/b.py:1:source_commit = "b"',
+        ]
+    }
+
+
 def base():
     return {'energy_ledgers': {'physical_energy': 2.}, 'junction_process_state': {'v12_graph_support_audit': {}},
         'v12_support_state': {'source_commit': 'old', 'support': [1, 2]}, 'hazards': [0.1], 'rng': 3621}

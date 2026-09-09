@@ -28,7 +28,18 @@ def consumer_occurrences(repository,keys):
     """Keep every consumer hit in deterministic file/line order."""
     occurrences={}
     for key in keys:
-        result=subprocess.run(('rg','-n',key,'arrhenius_fracture'),cwd=repository,text=True,capture_output=True)
+        try:
+            result=subprocess.run(('rg','-n',key,'arrhenius_fracture'),cwd=repository,text=True,capture_output=True)
+        except FileNotFoundError:
+            lines=[]
+            source=repository/'arrhenius_fracture'
+            for path in sorted(p for p in source.rglob('*') if p.is_file() and '__pycache__' not in p.parts):
+                try: text=path.read_text()
+                except (OSError,UnicodeError): continue
+                relative=path.relative_to(repository)
+                lines.extend(f'{relative}:{number}:{line}' for number,line in enumerate(text.splitlines(),1) if key in line)
+            occurrences[key]=sorted(lines)
+            continue
         if result.returncode not in (0,1):raise RuntimeError('consumer audit search failed: '+result.stderr)
         occurrences[key]=sorted(result.stdout.splitlines())
     return occurrences
@@ -119,19 +130,9 @@ def worker(repository, output, mode):
     if clean_head(repository) != sha: raise RuntimeError('worker implementation changed')
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('output', type=Path); parser.add_argument('--base-worktree', type=Path)
-    parser.add_argument('--worker', choices=('base', 'disabled')); parser.add_argument('--repository', type=Path)
-    args = parser.parse_args(); root = Path(__file__).resolve().parents[1]
-    if args.output.exists(): raise ValueError('refusing to overwrite evidence')
-    if args.worker: worker(args.repository, args.output, args.worker); return
-    if clean_head(args.base_worktree) != STAGE_II_V3_BASE: raise ValueError('wrong historical base')
-    current = clean_head(root)
-    for mode, repository in (('base', args.base_worktree), ('disabled', root)):
-        subprocess.run((sys.executable, str(Path(__file__).resolve()), str(args.output/mode),
-            '--worker', mode, '--repository', str(repository)), cwd=repository, check=True)
-    a = json.loads((args.output/'base/rows.json').read_text()); b = json.loads((args.output/'disabled/rows.json').read_text())
+def postprocess(output,root,current):
+    """Classify completed worker rows without executing another physical case."""
+    a = json.loads((output/'base/rows.json').read_text()); b = json.loads((output/'disabled/rows.json').read_text())
     rows = []
     for first, second in zip(a['rows'], b['rows']):
         pairs = [(causal(x), causal(y)) for x, y in zip(first['raw_states'], second['raw_states'])]
@@ -156,10 +157,31 @@ def main():
         'historical_raw_full_state_identity': 'FAIL_RETAINED', 'rows': rows, 'passed': all(r['passed'] for r in rows),
         'consumer_occurrences': occurrences,
         'protocol_sha256': hashlib.sha256((root/'docs/V5_DISABLED_CAUSAL_NEUTRALITY_V2.md').read_bytes()).hexdigest()}
-    write_json(args.output/'report.json', report)
-    write_json(args.output/'sha256_manifest.json', {str(p.relative_to(args.output)): hashlib.sha256(p.read_bytes()).hexdigest()
-        for p in sorted(args.output.rglob('*')) if p.is_file()})
+    write_json(output/'report.json', report)
+    write_json(output/'sha256_manifest.json', {str(p.relative_to(output)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in sorted(output.rglob('*')) if p.is_file()})
     print(json.dumps({'passed': report['passed'], 'cases': len(rows)}), flush=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('output', type=Path); parser.add_argument('--base-worktree', type=Path)
+    parser.add_argument('--worker', choices=('base', 'disabled')); parser.add_argument('--repository', type=Path)
+    parser.add_argument('--postprocess-existing', action='store_true')
+    args = parser.parse_args(); root = Path(__file__).resolve().parents[1]
+    if args.postprocess_existing:
+        if args.worker or not args.output.is_dir(): raise ValueError('existing worker evidence directory required')
+        if any((args.output/name).exists() for name in ('report.json','sha256_manifest.json')):
+            raise ValueError('refusing to overwrite completed evidence')
+        postprocess(args.output,root,clean_head(root)); return
+    if args.output.exists(): raise ValueError('refusing to overwrite evidence')
+    if args.worker: worker(args.repository, args.output, args.worker); return
+    if clean_head(args.base_worktree) != STAGE_II_V3_BASE: raise ValueError('wrong historical base')
+    current = clean_head(root)
+    for mode, repository in (('base', args.base_worktree), ('disabled', root)):
+        subprocess.run((sys.executable, str(Path(__file__).resolve()), str(args.output/mode),
+            '--worker', mode, '--repository', str(repository)), cwd=repository, check=True)
+    postprocess(args.output,root,current)
 
 
 if __name__ == '__main__': main()
