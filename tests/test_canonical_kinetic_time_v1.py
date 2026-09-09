@@ -74,6 +74,26 @@ def test_actual_subgrid_growth_inventory_and_generation_are_partition_exact(part
 
 
 @pytest.mark.parametrize('parts', [1, 2, 4, 8, 16])
+def test_resolved_growth_has_one_physical_generation_independent_of_kinetic_partition(parts):
+    import math
+    from arrhenius_fracture.voiding_v5 import Cavity2D, ProductionVoidState, VoidPhase, update_cavity_growth
+    r = 2.5e-5; area = math.pi*r*r
+    cavity = Cavity2D('v', 's', (0., 0.), r, area, area, VoidPhase.RESOLVED_VOID,
+                      geometry_generation=7)
+    state = ProductionVoidState((), (cavity,), available_defect_inventory_area_m2=1e-8-area,
+                                consumed_defect_inventory_area_m2=area)
+    def advance(state, dt):
+        return update_cavity_growth(state, 'v', rates={'series_limited_growth_s': 137.213},
+                                    dt_s=dt, radial_growth_scale_m=1e-8)
+    direct = advance(state, .731)
+    current = state
+    for _ in range(parts): current = pickle.loads(pickle.dumps(advance(current, .731/parts)))
+    assert current == direct
+    assert current.cavities[0].geometry_generation == 8
+    assert advance(current, 0.) == current
+
+
+@pytest.mark.parametrize('parts', [1, 2, 4, 8, 16])
 def test_actual_directional_event_and_anchor_state_are_partition_exact(parts):
     from arrhenius_fracture.canonical_directional_interval_v1 import advance
     from arrhenius_fracture.directional_competition_v11 import DirectionalHazardState

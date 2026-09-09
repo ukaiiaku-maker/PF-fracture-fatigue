@@ -392,9 +392,14 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
             radius = math.sqrt(target/math.pi); area = math.pi*radius**2
             integrated = exact(radius)-exact(anchor['radius_anchor_m'])
         inventory = float(exact(anchor['inventory_anchor_m2'])+exact(area)-exact(anchor['area_anchor_m2']))
+        # ``geometry_generation`` describes a physical represented-geometry
+        # update, not the number of caller-selected kinetic subdivisions.  A
+        # cumulative positive resolved-growth interval therefore owns exactly
+        # one generation beyond its anchor.  Subgrid growth still has no
+        # represented geometry to regenerate.
         grown = replace(grown, radius_m=radius, area_m2=area, inventory_area_m2=inventory,
             geometry_generation=(anchor['geometry_generation_anchor'] if cavity.phase == VoidPhase.STABLE_SUBGRID_VOID
-                                 else grown.geometry_generation))
+                                 else anchor['geometry_generation_anchor'] + 1))
         integrals[cavity_id] = {**anchor, 'integrated_radius_m': packed(integrated), 'last_radius_m': radius}
     elif chemical_potential_drive_J < 0 and dt_s > 0:
         integrals.pop(cavity_id, None)
