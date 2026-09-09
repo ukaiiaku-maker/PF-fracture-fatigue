@@ -565,6 +565,21 @@ def lifecycle_decision(rows,sources):
                     for op in row['actual_operations'] if op.get('duration_s',0.)>0. or op.get('api')=='promotion_remesh')
                 and row["conservation"]["passed"]})
     controlled=[]
+    controlled_v2=[]
+    expected_v2={
+        'accommodation_limited':'STABLE_SUBGRID_VOID_WITH_PLASTIC_ACCOMMODATION_MINIMUM_ALL_INTERVALS',
+        'centered':'DOWNSTREAM_FRONT_ACTIVE',
+        'delayed_downstream':'DOWNSTREAM_FRONT_ACTIVE_AFTER_DORMANT_INTERVAL_AND_RELOAD',
+        'diffusion_limited':'STABLE_SUBGRID_VOID_WITH_VACANCY_TRANSPORT_MINIMUM_ALL_INTERVALS',
+        'downstream_zero_drive':'CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE',
+        'embryo_healing':'HEALED_SITE',
+        'fixed_mesh_oblique':'CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE',
+        'local_remesh_refinement':'DOWNSTREAM_FRONT_ACTIVE_AFTER_QUALIFIED_LOCAL_REFINEMENT',
+        'long_ligament':'DOWNSTREAM_FRONT_ACTIVE',
+        'negative_offset':'CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE',
+        'positive_offset':'CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE',
+        'short_ligament':'DOWNSTREAM_FRONT_ACTIVE',
+    }
     for row in [r for r in rows if r["dataset"]=="controlled"]:
         state=sources[row["terminal_checkpoint"]]; case=row["case_identity"]
         phase=state.void_state.sites[0].phase if not state.void_state.cavities else state.void_state.cavities[0].phase
@@ -591,6 +606,48 @@ def lifecycle_decision(rows,sources):
             success=phase==VoidPhase.DOWNSTREAM_FRONT_ACTIVE and bool(state.crack_network.active_tip_ids)
         controlled.append({"case_identity":case,"actual_phase":phase.value,
             "passed":bool(success and row["failure"] is None and row["conservation"]["passed"])})
+        operations=row.get('actual_operations',[])
+        source_statuses=[op.get('audit',{}).get('status') for op in operations
+            if isinstance(op.get('audit'),dict) and op.get('audit',{}).get('status')]
+        zero_rows=[entry for op in operations if op.get('api')=='zero_drive_connected_interval'
+            for entry in op.get('audit',[]) if isinstance(entry,dict)]
+        growth=[op for op in operations if op.get('api')=='accepted_load_growth_interval']
+        actual=phase.value
+        protocol=False
+        if phase==VoidPhase.HEALED_SITE:
+            actual='HEALED_SITE';protocol=True
+        elif case in ('diffusion_limited','accommodation_limited') and growth:
+            channels=('surface_reaction_s','vacancy_transport_s','plastic_accommodation_s')
+            minima=[min(channels,key=lambda key:op['rates'][key]) for op in growth]
+            actual=('STABLE_SUBGRID_VOID_WITH_'+minima[0].upper()+'_MINIMUM_ALL_INTERVALS'
+                    if len(set(minima))==1 else 'STABLE_SUBGRID_VOID_WITH_MIXED_RATE_MINIMA')
+            protocol=len(growth)==8
+        elif phase==VoidPhase.DOWNSTREAM_FRONT_ACTIVE:
+            if case=='delayed_downstream':
+                actual='DOWNSTREAM_FRONT_ACTIVE_AFTER_DORMANT_INTERVAL_AND_RELOAD'
+                protocol=bool(zero_rows) and all(entry.get('effective_rate_s')==0. for entry in zero_rows)
+            elif case=='local_remesh_refinement':
+                actual='DOWNSTREAM_FRONT_ACTIVE_AFTER_QUALIFIED_LOCAL_REFINEMENT'
+                protocol=(any(op.get('api')=='actual_local_remesh' for op in operations)
+                    and 'SOURCE_TENSOR_QUALIFIED' in source_statuses)
+            else:
+                actual='DOWNSTREAM_FRONT_ACTIVE';protocol=True
+        elif phase==VoidPhase.CONNECTED_VOID:
+            if 'SOURCE_TENSOR_UNQUALIFIED' in source_statuses or (row.get('failure') or {}).get('message')=='UNQUALIFIED_CAVITY_SOURCE_TENSOR':
+                actual='CONNECTED_VOID_SOURCE_UNQUALIFIED';protocol=True
+            elif zero_rows and all(entry.get('effective_rate_s')==0. and not entry.get('winner')
+                                   for entry in zero_rows):
+                actual=('CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE'
+                        if case in ('positive_offset','negative_offset','downstream_zero_drive')
+                        else 'CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE')
+                protocol=True
+            else: actual='CONNECTED_VOID_UNCLASSIFIED_SOURCE_STATE'
+        expected=expected_v2[case]
+        controlled_v2.append({'case_identity':case,'prospective_expected_classification':expected,
+            'final_source_resolved_classification':actual,'source_qualification_statuses':source_statuses,
+            'zero_drive_candidate_count':len(zero_rows),'protocol_complete':protocol,
+            'failure':row.get('failure'),'passed':bool(actual==expected and protocol
+                and row.get('failure') is None and row['conservation']['passed'])})
     rollback=[{"case_identity":r["case_identity"],"passed":r["restored_exactly"] and bool(r["failure"])
         and r['input_configuration'].get('intended_stage_reached',False)
         and r["failure"]["message"]=='injected:'+r['input_configuration']['failure_stage']}
@@ -603,11 +660,12 @@ def lifecycle_decision(rows,sources):
     downstream_rollback=all(any(r['case_identity']=='lifecycle:'+stage and r['passed'] for r in rollback)
         for stage in ('downstream_source_refinement','downstream_threshold_completion','child_creation',
                       'child_support_rebuild','child_tip_continuation'))
-    complete=(all(r["passed"] for r in partition+natural+controlled+rollback+neutrality)
+    complete=(all(r["passed"] for r in partition+natural+controlled_v2+rollback+neutrality)
               and all(r.get('stagewise_topology',{}).get('passed',False) and r['conservation']['passed'] for r in rows)
               and continued_restarts and same_terminal and downstream_rollback)
     return {"transition_partitions":partition,"natural_partitions_restart":natural,
-        "controlled_histories":controlled,"rollback_attempts":rollback,"V12_disabled_neutrality":neutrality,
+        "controlled_histories":controlled,"controlled_histories_v2":controlled_v2,
+        "rollback_attempts":rollback,"V12_disabled_neutrality":neutrality,
         "restart_to_attainable_terminal_exact":all(r["restart_exact"] for r in restarts),
         "all_restart_stages_reach_identical_complete_terminal":same_terminal,
         "required_continued_front_restart_terminal":continued_restarts,

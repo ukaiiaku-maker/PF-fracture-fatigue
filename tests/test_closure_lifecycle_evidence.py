@@ -70,3 +70,17 @@ def test_frozen_offset_terminal_does_not_treat_positive_unqualified_rate_as_zero
          "failure":None,"conservation":{"passed":True}}
     result=lifecycle_decision([row],{"source":connected})
     assert result["controlled_histories"][0]["passed"] is passed
+
+
+def test_v2_controlled_classifier_does_not_infer_connected_zero_drive_from_case_name():
+    from arrhenius_fracture.closure_lifecycle_evidence import lifecycle_decision
+    connected,_=deterministic_trajectory()
+    row={"dataset":"controlled","case_identity":"negative_offset","terminal_checkpoint":"source",
+         "failure":{"type":"RuntimeError","message":"UNQUALIFIED_CAVITY_SOURCE_TENSOR"},
+         "actual_operations":[{"api":"refine_downstream_source",
+             "audit":{"status":"SOURCE_TENSOR_UNQUALIFIED"}}],"conservation":{"passed":True}}
+    result=lifecycle_decision([row],{"source":connected})
+    classified=result['controlled_histories_v2'][0]
+    assert classified['prospective_expected_classification']=='CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE'
+    assert classified['final_source_resolved_classification']=='CONNECTED_VOID_SOURCE_UNQUALIFIED'
+    assert classified['passed'] is False
