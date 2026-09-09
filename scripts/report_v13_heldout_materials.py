@@ -207,7 +207,7 @@ def main():
     assert all(sha256(Path(path))==h for path,h in inputs.items())
     atomic_json(FINAL/'verification.json',dict(status='PASS',inputs_verified=len(inputs),accepted_freeze=verify_accepted(),cases=64))
     entries={'final/'+f.name:f for f in FINAL.iterdir() if f.is_file()}
-    for name in ('heldout_plan.json','PREREGISTERED_HELDOUT_BLOCK.md','launch_gate_tests.xml','full_suite.xml','full_suite.log','full_suite_result.json','full_suite_claim.json','heldout_source_increment.bundle','HELDOUT_QUEUE_PAUSE.json','STORAGE_PAUSE_HANDOFF.md','publication_preflight.json','SIMULATIONS_COMPLETE_STORAGE_HOLD.json'):
+    for name in ('heldout_plan.json','PREREGISTERED_HELDOUT_BLOCK.md','launch_gate_tests.xml','full_suite.xml','full_suite.log','full_suite_result.json','full_suite_claim.json','full_suite_environment.json','heldout_source_increment.bundle','HELDOUT_QUEUE_PAUSE.json','STORAGE_PAUSE_HANDOFF.md','publication_preflight.json','SIMULATIONS_COMPLETE_STORAGE_HOLD.json'):
         entries['provenance/'+name]=OUT/name
     entries['provenance/continuation_claim.json']=DEST/'continuation_claim.json'
     with zipfile.ZipFile(OUT/'V13_FOUR_MATERIAL_REVIEW.zip','x',compression=zipfile.ZIP_DEFLATED) as z:
