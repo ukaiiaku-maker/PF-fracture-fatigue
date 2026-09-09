@@ -1,0 +1,123 @@
+{
+  "schema": "v13.protected-external-raw-data/1",
+  "record_scope": "External native simulation inputs and supporting accepted evidence for the complete V13 compact publication record.",
+  "created_without_scientific_recalculation": true,
+  "git_delivery": {
+    "merge_review_commit": "76be5d83456fb6a61394ea0ddffde65f2bee4a23",
+    "publication_record_commit": "22cb426415126241fbc7e6806dc4619796e19e20",
+    "accepted_transition_record_commit": "b2e0e2d85e048553ad2593d895a98974356213e2",
+    "frozen_physics_commit": "35f4a03c622112cd5bc7cf9bc08c5b7fe2387e46",
+    "compact_archive_git_path": "analysis_outputs/v13_heldout_material_classes/V13_FOUR_MATERIAL_REVIEW.zip",
+    "compact_archive_sha256": "35234f3e78afcbd6679b523aacf402ea025ad9b6ec48f982140729ddcb83e519",
+    "compact_archive_members": 32
+  },
+  "canonical_external_root": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas",
+  "retention": {
+    "status": "PROTECTED_RETAINED_ON_DATA_DRIVE",
+    "raw_files_part_of_pull_request": false,
+    "clean_git_checkout_contains_native_raw_dataset": false,
+    "cleanup_policy": "All paths and hashes referenced here or by the three authoritative manifests are protected. Cleanup must not delete, rewrite, relocate, or deduplicate them without updating and independently requalifying provenance.",
+    "second_durable_copy_status": "NOT_VERIFIED",
+    "long_term_archive_status": "FOLLOW_UP_RECOMMENDED_NOT_SOURCE_PR_BLOCKER",
+    "current_manifest_verification": "PASS_2026-09-09"
+  },
+  "physical_dataset": {
+    "cases": 64,
+    "groups": {
+      "Peak_300K": 8,
+      "Peak_1000K": 8,
+      "weakT_300K": 8,
+      "weakT_1000K": 8,
+      "DBTT_300K": 8,
+      "DBTT_1000K": 8,
+      "ceramic_300K": 8,
+      "ceramic_1000K": 8
+    },
+    "first_branches": 57,
+    "completed_nonbranching_observations": 7,
+    "early_gate_censors": 0,
+    "execution_source_commits": {
+      "35f4a03c622112cd5bc7cf9bc08c5b7fe2387e46": 32,
+      "7c6ef4080b6fed2e21c3f8d4cf6308186853190d": 19,
+      "fdf43801603cbca0eea60b574afa7f9da4d4f180": 13
+    },
+    "frozen_physics_commit": "35f4a03c622112cd5bc7cf9bc08c5b7fe2387e46",
+    "family_sha256": "2eac89aa8fa2658dcae791036287c26c7f34e92d971409b0aad84581b9f5e6b7",
+    "material_parameter_rows": 4
+  },
+  "authoritative_manifests": [
+    {
+      "role": "FINAL_REPORT_INPUTS_AND_HELDOUT_NATIVE_DATA",
+      "git_path": "analysis_outputs/v13_heldout_material_classes/final_four_material_record/provenance.json",
+      "external_path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/final_four_material_record/provenance.json",
+      "sha256": "45efa6d6a1914ed4f80a84fee463ec05ae807564638a0ca26bfb6b9acb324af9",
+      "files_total": 12913,
+      "bytes_total": 1290856937,
+      "tracked_git_inputs": 8,
+      "tracked_git_input_paths": [
+        "analysis_outputs/v13_heldout_material_classes/full_suite.log",
+        "analysis_outputs/v13_heldout_material_classes/full_suite.xml",
+        "analysis_outputs/v13_heldout_material_classes/full_suite_result.json",
+        "analysis_outputs/v13_heldout_material_classes/heldout_plan.json",
+        "analysis_outputs/v13_heldout_material_classes/heldout_source_increment.bundle",
+        "analysis_outputs/v13_transition_regime_screen/final_transition_record/case_table.json",
+        "analysis_outputs/v13_transition_regime_screen/final_transition_record/final_topologies.json",
+        "analysis_outputs/v13_transition_regime_screen/final_transition_record/native_mark_opportunities.json"
+      ],
+      "protected_external_files": 12905,
+      "protected_external_bytes": 1288391086,
+      "external_root": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/ensemble",
+      "case_relationship": "Contains native files for the 32 DBTT and ceramic-like held-out cases plus eight tracked report/transition/source inputs. It is the authoritative explanation of 12,905 versus 12,913."
+    },
+    {
+      "role": "ACCEPTED_PEAK_AND_WEAK_T_TRANSITION_DATA_AND_SUPPORTING_INPUTS",
+      "git_path": "analysis_outputs/v13_heldout_material_classes/accepted_record_freeze.json",
+      "external_path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/accepted_record_freeze.json",
+      "sha256": "381c327ea99ce37572fc96f022cb41218169f2c7a5cbe9382c325bd6d471ecec",
+      "files_total": 17636,
+      "bytes_total": 1751353071,
+      "tracked_git_inputs": 28,
+      "protected_external_files": 17608,
+      "protected_external_bytes": 1746885450,
+      "external_root": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_transition_regime_screen",
+      "case_relationship": "Seals the 32 Peak and weak-T accepted transition cases, parent inputs, and compact transition record."
+    },
+    {
+      "role": "EARLIER_THETA40_ACCEPTED_REFERENCE_EVIDENCE",
+      "git_path": "analysis_outputs/v13_transition_regime_screen/accepted_ensemble_freeze.json",
+      "external_path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_transition_regime_screen/accepted_ensemble_freeze.json",
+      "sha256": "11d9325f950bee8d0719ea589fceb7be670119cc433644af946090fea49d0510",
+      "files_total": 3620,
+      "bytes_total": 1034724213,
+      "tracked_git_inputs": 15,
+      "protected_external_files": 3605,
+      "protected_external_bytes": 1033825906,
+      "external_root": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_primary_continuation_race",
+      "case_relationship": "Earlier accepted theta40 reference evidence verified by the merge review; not an additional member of the final 64-case theta15 cohort."
+    }
+  ],
+  "counts_explained": {
+    "final_report_manifest_total": 12913,
+    "final_report_manifest_tracked": 8,
+    "final_report_manifest_external": 12905,
+    "statement": "12,905 is the untracked external subset; 12,913 is the complete authoritative final-report input manifest including eight tracked auxiliary inputs."
+  },
+  "broader_protected_external_totals": {
+    "files": 34118,
+    "bytes": 4069102442,
+    "overlap_policy": "The three categories are disjoint by canonical external root; tracked files are excluded."
+  },
+  "compact_relationship": {
+    "input_to_report": "The native case, checkpoint, field, branch-ledger, and opportunity records are reduced into committed final tables, figures, test records, provenance, and source bundle.",
+    "compact_record_self_contained_for_review": true,
+    "native_reproduction_self_contained_in_git": false,
+    "regeneration_requires_external_data_verification": true
+  },
+  "verification_instructions": [
+    "Mount the canonical Data-drive root at the recorded absolute path, or explicitly map it without editing the committed manifests.",
+    "Verify SHA-256 and size for all entries in final_four_material_record/provenance.json.",
+    "Verify SHA-256 for all entries in accepted_record_freeze.json and accepted_ensemble_freeze.json.",
+    "Verify V13_FOUR_MATERIAL_REVIEW.zip SHA-256 is 35234f3e78afcbd6679b523aacf402ea025ad9b6ec48f982140729ddcb83e519 and all 32 internal members against SHA256_MANIFEST.json.",
+    "Only after these read-only checks may a separate authorized report-regeneration task consume the native data. This delivery does not authorize regeneration."
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schema": "v13.repository-delivery/1",
+  "status": "READY_FOR_STACKED_PULL_REQUESTS",
+  "storage": {
+    "free_space_target_GiB": 10,
+    "free_space_observed_GiB": 27.49,
+    "deleted_paths": 0,
+    "reclaimed_bytes_claimed": 0,
+    "decision": "No cleanup deletion required; sufficient storage was already restored."
+  },
+  "source": {
+    "merge_review_commit": "76be5d83456fb6a61394ea0ddffde65f2bee4a23",
+    "immediate_v12_base_commit": "b3d0add6cbb0605adaa3e04006fe987961ad6452",
+    "v12_base_branch": "codex/v12-field-atlas-recovery",
+    "published_ancestor_branch": "codex/current-source-branching-qualification-v2",
+    "published_ancestor_commit": "0238aae096aa29e79829d3c562383c38f2290ad6",
+    "v12_prerequisite_commits": 11,
+    "largest_v12_prerequisite_blob_bytes": 124173,
+    "direct_push_oversized_blob_risk_detected": false
+  },
+  "verification": {
+    "clean_delivery_checkout": true,
+    "merge_review_commit_scope_reviewed": true,
+    "merge_record_hashes_verified": 14,
+    "publication_file_hashes_verified": 37,
+    "archive_members_verified": 32,
+    "heldout_seals_verified": 192,
+    "transition_artifacts_verified": 17636,
+    "theta40_artifacts_verified": 3620,
+    "report_input_hashes_verified": 12913,
+    "source_registry_hashes_verified": 251,
+    "source_bundles_verified": 11,
+    "untracked_native_data_disclosed": true,
+    "untracked_native_report_inputs": 12905,
+    "no_untracked_scientific_result_needed_for_compact_git_record": true,
+    "complete_native_dataset_in_git": false
+  },
+  "classification": "MERGE_CLEARED_RELATIVE_TO_ACCEPTED_SEVEN_FAILURE_BASELINE",
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "prohibited_actions_performed": {
+    "simulation": false,
+    "test_rerun": false,
+    "physics_change": false,
+    "figure_regeneration": false,
+    "scientific_archive_regeneration": false,
+    "accepted_data_rewrite": false,
+    "git_gc": false,
+    "git_prune": false,
+    "merge": false
+  }
+}
