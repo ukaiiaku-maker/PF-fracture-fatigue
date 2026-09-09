@@ -1,0 +1,23 @@
+{
+  "schema": "v10.2.30_prospective_paris_historical_status_v1",
+  "identifier": "INV_OPENING_M4_V1",
+  "status": "HISTORICAL_ROW_AND_SOURCE_QUALIFIED_RESULTS_UNRECOVERABLE",
+  "claimed_source_branch": "codex/v10.2.30-physical-slope-transfer",
+  "claimed_terminal_head": "43b5ec9a259b636c5a950eec1f6fffbf3ef4b65c",
+  "verification_performed": [
+    "Confirmed branch exists locally and its tip exactly equals the claimed terminal HEAD (git rev-parse).",
+    "Confirmed this branch was never pushed to origin (git ls-remote origin has no matching ref) -- local-only work.",
+    "Confirmed via git ls-tree at the exact claimed HEAD that source code exists (arrhenius_fracture/physical_slope_transfer_v10230.py, scripts/run_v10_2_30_physical_slope_transfer.py, scripts/analyze_v10_2_30_physical_slope_transfer.py, scripts/verify_v10_2_30_physical_slope_transfer.py, tests/test_v10_2_30_physical_slope_transfer.py) but no artifacts/ or runs/ result directory is committed for this study.",
+    "Exhaustive filesystem search across /Volumes/Data (git-tracked and gitignored runs/ directories in every repo/worktree found) locates no runs/physical_slope_transfer_v1/, no runs/inverse_fatigue_barrier_design_v1/, no corrected_candidate_registry.csv, no inverse_design_candidate_registry.csv anywhere.",
+    "Ran scripts/verify_v10_2_30_physical_slope_transfer.py from a temporary worktree checked out exactly on codex/v10.2.30-physical-slope-transfer @ 43b5ec9a259b636c5a950eec1f6fffbf3ef4b65c: FAIL: missing archive_resolution_audit.csv (first of 27 required artifacts).",
+    "Ran tests/test_v10_2_30_physical_slope_transfer.py from the same worktree: 15 of 17 tests fail with FileNotFoundError on runs/physical_slope_transfer_v1/*; only the 2 pure-math unit tests (test_log_slope_recovers_an_exact_power and one other) pass, since they do not depend on any run artifact.",
+    "Searched all Python source at the claimed HEAD for the string INV_OPENING_M4_V1: every occurrence is a DataFrame lookup (registry[registry.option_key=='INV_OPENING_M4_V1']) against inverse_design_candidate_registry.csv / corrected_candidate_registry.csv -- the five cleavage-field numeric values are never hardcoded in source, so the candidate's exact parameterization is not recoverable from source code either."
+  ],
+  "conclusion": "Neither the physical run results nor the exact candidate parameter row for INV_OPENING_M4_V1 exist anywhere in this environment. A literal REFERENCE_REPRODUCTION rerun (Section 2 of the original mission) is not executable because there is no known row left to rerun. Per the amended campaign decision, this identifier is retired: it is not reused for any newly derived row, and the narrative historical values (approximate physical rate 2.543e-7 m/cycle at Kmax=18; classification EXP_FLOOR_TOO_RESTRICTIVE_AFTER_TRANSFER) are retained ONLY as an UNVERIFIED_HISTORICAL_PRIOR, non-gating retrospective overlay. They must not enter candidate fitting, target normalization, selection scores, or physical acceptance gates.",
+  "replacement_anchor": "See rate_anchor_gstar.json -- a freshly source-qualified A_NATIVE developed rate at Kstar=18 MPa*sqrt(m), R=0.1, T=300K, f=1000Hz, n_bins=80, seed=1720, recovered from codex/v10.2.30-R-ratio-nominal-deltaK (already verified and used in this session's prior focused-dadn-K-plots mission).",
+  "unverified_historical_prior_for_display_only": {
+    "approx_rate_at_Kmax18_m_per_cycle": 2.543e-7,
+    "claimed_final_classification": "EXP_FLOOR_TOO_RESTRICTIVE_AFTER_TRANSFER",
+    "usage_restriction": "May appear only as a labeled, non-gating retrospective overlay in figures/tables. Never used in any computation, fit, score, or acceptance decision."
+  }
+}
