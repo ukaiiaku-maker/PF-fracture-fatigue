@@ -61,6 +61,7 @@ jobs:
           tests/test_closure_lifecycle_rollback.py tests/test_voiding_lifecycle_driver_v5.py
           tests/test_voiding_v5.py tests/test_static_numerical_family_v1.py
           tests/test_compressed_closure_checkpoint_v1.py tests/test_disabled_causal_neutrality_v1.py
+          tests/test_future_causal_state_fingerprint_v1.py
           tests/test_source_resolution_campaign_v1.py
           tests/test_common_restart_protocol_v1.py
           tests/test_final_campaign_archive_v1.py
