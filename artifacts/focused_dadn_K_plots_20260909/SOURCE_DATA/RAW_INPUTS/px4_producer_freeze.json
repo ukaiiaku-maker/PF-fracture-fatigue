@@ -1,0 +1,30 @@
+{
+  "schema": "v10230_part_x_px4_producer_freeze_v1",
+  "selection_source_commit": "805f87d914ead09ef76acedf8d635453d9bee34e",
+  "physical_source_commit": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
+  "launch_HEAD": "578ef3ba77d7fd30880068e5f1ec34915aae5e57",
+  "physical_source_bundle_sha256": "d21b13aa3691f77eed7daa247e12defc0758cf1bfa6cc91a394f01505d5d9c7f",
+  "per_file_sha256": {
+    "arrhenius_fracture/persistent_site_cyclic_v10229.py": "e871e3a7be118275d8acd5a9b06add0eae866e5296f04d9401b5a8f0737f6e29",
+    "arrhenius_fracture/persistent_site_cyclic_coupled_v10229.py": "b017d8ad5ed70da7470b8000ad4c836bca90eaa8b3e4e08194029cc167b7b0cf",
+    "arrhenius_fracture/persistent_site_coupled_hazard_v10229.py": "256ff5804e82f58293abe99fcda9967ff862ad08f785740700d36f19ab1dc9b6",
+    "arrhenius_fracture/persistent_site_cyclic_coupled_audited_v10229.py": "f3915ccf49e84c8a634d8670f39dcabf9921b6428f30fae684a381ec8fb3e72d",
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": "8e57d04277c235db0a71be7af3cb87354c885aa86c3a6a2da84686d48c47a41f",
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+    "arrhenius_fracture/crack_rebonding_v10230.py": "130fb7eb54de8ea87de5b56bdb6f74e1103ac47c7ab2f27565db4c826c8a53c5",
+    "arrhenius_fracture/crack_rebonding_kinetics_v10230.py": "6ca3e979ac7157b4947b76aa99a13e1fd0e1c546573177c35e0a405f317101ab",
+    "arrhenius_fracture/a_native_engine_v10230.py": "b40f96fe1fa486f43d04051283deaca527ae931b3d3a5b0103a91482b4e3c2f1",
+    "arrhenius_fracture/material_manifest.py": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+    "arrhenius_fracture/reduced_shared_state_v1023.py": "bbd444a29bf7a068162f9923636dfba41b88bb712bca9f4e129f9715f05eaace",
+    "arrhenius_fracture/fatigue_v1.py": "ad494281be23dbf44a759dfd411737f753b8693ff86c92caba92018e3bb111ea",
+    "arrhenius_fracture/crack_rebonding_causal_pilot_v2_v10230.py": "429edc1d3c19379c9eb42f7260c3ba4fad3c5c6edacdb103b5dffc86c0a33f0c",
+    "scripts/part_x_run_one_job.py": "1e68781cf7616d86579f66d22851355dbeb9ea5231c29c1c4b6b1ca64c0b79a7"
+  },
+  "files_changed_between_selection_source_and_launch_HEAD": [
+    "scripts/build_part_x_px4_producer_freeze.py"
+  ],
+  "physical_source_files_among_those_changes": [],
+  "rows_refreshed": 44,
+  "zero_jobs_launched_precondition_verified": true,
+  "note": "Only the 44 rows already AUTHORIZED_PX4 in developed_job_registry.csv had their physical_producer_sha/canonical_job_key refreshed to this freeze's launch_HEAD. No BLOCKED_*/ALIAS row, and no already-completed physical result's own recorded producer identity, was touched."
+}
