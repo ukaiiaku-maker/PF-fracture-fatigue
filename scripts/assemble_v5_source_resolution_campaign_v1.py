@@ -18,6 +18,7 @@ def read(root,name):return json.loads((root/name).read_text())
 def derive_ledger(root):
     static=read(root/'static','report.json');life=read(root/'lifecycle','lifecycle_rows.json');d=life['decision']
     positive=read(root/'source/positive','result.json');causality=read(root/'source/causality','report.json')
+    r_tip=read(root/'source/r_tip_causality','report.json')
     coarse=read(root/'source/production','production_32_12.json')
     neutrality=read(root/'causal-neutrality/evidence','report.json')
     rollbacks=d['rollback_attempts'];restarts=[r for r in life['rows'] if r['dataset']=='restarts']
@@ -26,12 +27,18 @@ def derive_ledger(root):
         'coarse_unqualified_negative_retained':coarse.get('guard_preserves_complete_state',False)
             and not coarse.get('event_transaction_created',True) and not coarse.get('child_created',True),
         'actual_downstream_child':positive.get('child',{}).get('accepted',False),
-        'ordinary_child_continuation_and_source_causality':causality['passed'],
+        'ordinary_child_continuation_and_source_tensor_causality':all(value for key,value in causality['gates'].items()
+            if key!='owned_radius_causally_enters_continuation_law'),
+        'r_tip_causal_use':r_tip['classification']=='R_TIP_CAUSALLY_USED'
+            and r_tip['gates']['r_tip_changes_accepted_rate_or_barrier'],
+        'reciprocal_R_void_not_substituted_for_r_tip':
+            r_tip['gates']['reciprocal_R_void_not_substituted_for_r_tip'],
         'complete_static_numerical_families':static['decision']['passed'] and len(static['rows'])==96,
         'all_45_transition_partitions':len(d['transition_partitions'])==45 and all(r['passed'] for r in d['transition_partitions']),
         'all_11_common_terminal_restarts':len(restarts)==11 and d['required_continued_front_restart_terminal']
             and d['all_restart_stages_reach_identical_complete_terminal'] and all(r['restart_exact'] and r['failure'] is None for r in restarts),
-        'all_12_controlled_histories':len(d['controlled_histories'])==12 and all(r['passed'] for r in d['controlled_histories']),
+        'all_12_controlled_histories':len(d['controlled_histories_v2'])==12
+            and all(r['passed'] for r in d['controlled_histories_v2']),
         'disabled_future_causal_neutrality':neutrality['passed'],
         'all_28_lifecycle_rollback_stages':sum(r['case_identity'].startswith('lifecycle:') for r in rollbacks)==28
             and all(r['passed'] for r in rollbacks),
@@ -40,14 +47,19 @@ def derive_ledger(root):
         'same_head_disabled_dispatch':len(d['V12_disabled_neutrality'])==4 and all(r['passed'] for r in d['V12_disabled_neutrality']),
     }
     counts=lambda rows:{'passed':sum(bool(r['passed']) for r in rows),'total':len(rows)}
-    return {'schema':'v5.source-resolution-final-scientific-ledger/1','record_kind':'DERIVED_NOT_ADDITIONAL_EXECUTION',
+    return {'schema':'v5.final-physics-closure-scientific-ledger/2','record_kind':'DERIVED_NOT_ADDITIONAL_EXECUTION',
         'executed_code_sha':life['executed_code_sha'],'mandatory_scientific_gates':gates,
         'scientific_decision':'PASS' if all(gates.values()) else 'BLOCKED','release_candidate_authorized':False,
         'static_families':counts(static['decision']['families']),'static_derivatives':counts(static['decision']['derivatives']),
-        'transition_partitions':counts(d['transition_partitions']),'controlled_histories':counts(d['controlled_histories']),
+        'transition_partitions':counts(d['transition_partitions']),
+        'controlled_histories_v1_retained':counts(d['controlled_histories']),
+        'controlled_histories':counts(d['controlled_histories_v2']),
+        'controlled_history_classifications_v2':d['controlled_histories_v2'],
         'rollback':counts(rollbacks),'natural_partitions_restart':counts(d['natural_partitions_restart']),
         'restart_exact':sum(r['restart_exact'] for r in restarts),'common_terminal_exact':d['all_restart_stages_reach_identical_complete_terminal'],
-        'source_causality_gates':causality['gates'],'historical_raw_full_state_identity':'FAIL_RETAINED',
+        'source_causality_gates':causality['gates'],
+        'r_tip_causal_classification':r_tip['classification'],
+        'r_tip_causal_gates':r_tip['gates'],'historical_raw_full_state_identity':'FAIL_RETAINED',
         'historical_static_result':'UNCHANGED_683_OF_791','mission_terminal':False,
         'remaining_publication_requirements':['exact-head CI terminal result','repository-wide inherited failure classification','final PR63 ledger']}
 
