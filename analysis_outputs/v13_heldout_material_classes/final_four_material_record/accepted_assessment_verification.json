@@ -1,0 +1,229 @@
+{
+  "accepted_births": 26,
+  "groups": {
+    "Peak_1000K": {
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 9.659258262890644,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 6.123724356957902,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 9.659258262890644,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 10.953353488403224,
+          "survival": 0.375
+        },
+        {
+          "at_risk": 3,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 14.488887394335965,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 15.782982619848545,
+          "survival": 0.125
+        },
+        {
+          "at_risk": 1,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 24.14814565722661,
+          "survival": 0.0
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 12.117416799938928,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 24.14814565722661
+    },
+    "Peak_300K": {
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 10.953353488403224,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 6.123724356957902,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 10.953353488403224,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 13.541543939428381,
+          "survival": 0.375
+        },
+        {
+          "at_risk": 3,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 14.488887394335965,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 17.077077845361124,
+          "survival": 0.125
+        },
+        {
+          "at_risk": 1,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 26.73633610825177,
+          "survival": 0.0
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 13.249750122262435,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 26.73633610825177
+    },
+    "weakT_1000K": {
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 43.4666621830079,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 19.318516525781288,
+          "survival": 0.875
+        },
+        {
+          "at_risk": 7,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 38.637033051562575,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 43.4666621830079,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 44.760757408520476,
+          "survival": 0.375
+        },
+        {
+          "at_risk": 3,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 48.29629131445322,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 2,
+          "events": 0,
+          "extension_um": 75.0,
+          "survival": 0.25
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 48.49324033329167,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 75.0
+    },
+    "weakT_300K": {
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 62.78517870878918,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 19.318516525781288,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 62.78517870878918,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 4,
+          "events": 0,
+          "extension_um": 75.0,
+          "survival": 0.5
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 58.02592380864263,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 75.0
+    }
+  },
+  "pending_companion_births": 5,
+  "primary_saturated_births": 26,
+  "source_case_table_sha256": "b12b2915affe1359bd2b10a645f9e44126c4f0cc75dc0619a07b3179493d580e",
+  "source_record_commit": "b2e0e2d85e048553ad2593d895a98974356213e2",
+  "status": "PASS"
+}

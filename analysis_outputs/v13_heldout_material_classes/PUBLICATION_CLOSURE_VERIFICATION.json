@@ -1,0 +1,392 @@
+{
+  "accepted_freeze": {
+    "theta40_files": 3620,
+    "transition_files": 17636
+  },
+  "archive": {
+    "bytes": 2969823,
+    "every_member_sha256": "PASS",
+    "integrity": "PASS",
+    "manifested_members": 31,
+    "members": 32,
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/V13_FOUR_MATERIAL_REVIEW.zip",
+    "sha256": "35234f3e78afcbd6679b523aacf402ea025ad9b6ec48f982140729ddcb83e519"
+  },
+  "automatic_merge": false,
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "branches": 57,
+  "cases": 64,
+  "completed_nonbranching": 7,
+  "durable_free_bytes": 9845301248,
+  "early_gate_censors": 0,
+  "figures": [
+    {
+      "decode": "PASS",
+      "note": "All 64 topology panels inspected; overlapping survival curves are valid. Chi symlog axis includes an empty negative margin; no negative chi observations are present.",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/final_four_material_record/all_64_final_topologies.png",
+      "pixels": [
+        3000,
+        3000
+      ],
+      "sha256": "c9d38603cf068fa9abdb9ccee4d1a586022920c6acdab5d2579e4dc92b7aef6b",
+      "visual_review": "PASS"
+    },
+    {
+      "decode": "PASS",
+      "note": "All 64 topology panels inspected; overlapping survival curves are valid. Chi symlog axis includes an empty negative margin; no negative chi observations are present.",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/final_four_material_record/chi_B_distributions.png",
+      "pixels": [
+        2040,
+        850
+      ],
+      "sha256": "2e856283165beca46bc46a6912d7bf1e77f1c832b1e576c0c5151001edcd8be6",
+      "visual_review": "PASS"
+    },
+    {
+      "decode": "PASS",
+      "note": "All 64 topology panels inspected; overlapping survival curves are valid. Chi symlog axis includes an empty negative margin; no negative chi observations are present.",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/final_four_material_record/eight_group_first_branch_survival.png",
+      "pixels": [
+        2040,
+        765
+      ],
+      "sha256": "5ab16f046c1d1032b9642be3370cbd824ef777da0c2539754a9399c32646927e",
+      "visual_review": "PASS"
+    },
+    {
+      "decode": "PASS",
+      "note": "Labels, counts, units and plotted points visually checked.",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/final_four_material_record/first_branch_distributions.png",
+      "pixels": [
+        2210,
+        935
+      ],
+      "sha256": "600e8505f2269b568fbab8381511bc6c7fd74923add502d96be742865b63999d",
+      "visual_review": "PASS"
+    },
+    {
+      "decode": "PASS",
+      "note": "Labels, counts, units and plotted points visually checked.",
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/final_four_material_record/incidence_and_restricted_mean.png",
+      "pixels": [
+        2040,
+        765
+      ],
+      "sha256": "eeb33ed94054816f3405ead934d7d6641f02368885a99fff17cffe76ee5bcfb2",
+      "visual_review": "PASS"
+    }
+  ],
+  "full_suite": {
+    "counts": {
+      "failed": 31,
+      "passed": 1099,
+      "skipped": 5
+    },
+    "failure_triage": [
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_integrated_envelope_v5_4/pf_branching_v5_2_prefix_parity_reference.json'",
+        "test": {
+          "classname": "tests.test_multifront_v5_4_2_runtime_parity_v12",
+          "name": "test_authoritative_v5_4_2_transaction_and_runtime_parity",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_completion_execution_v5_4_2/pf_branching_completion_terminal_audit_v5_4_2.json'",
+        "test": {
+          "classname": "tests.test_pf_branching_completion_execution_v5_4_2",
+          "name": "test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_completion_execution_v5_4_2/pf_branching_completion_terminal_audit_v5_4_2.json'",
+        "test": {
+          "classname": "tests.test_pf_branching_completion_execution_v5_4_2",
+          "name": "test_v5_4_2_published_kinetic_k_figures_are_not_rcurves",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_execution_20260831T190053Z/final_two_axis_decision.json'",
+        "test": {
+          "classname": "tests.test_pf_current_source_branching_corrected_v5_2_result",
+          "name": "test_committed_v5_2_result_packet_hashes_and_fail_closed_decision",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_corrected_v5_2_1_decision.json'",
+        "test": {
+          "classname": "tests.test_pf_current_source_branching_v5_2_1_decision",
+          "name": "test_superseding_decision_separates_terminal_and_morphology_axes",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_signed_kernel_coverage_failure_audit.json'",
+        "test": {
+          "classname": "tests.test_pf_current_source_branching_v5_2_1_decision",
+          "name": "test_coverage_failure_and_terminal_topology_bounds",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_execution_20260831T190053Z/final_two_axis_decision.json'",
+        "test": {
+          "classname": "tests.test_pf_current_source_branching_v5_2_1_decision",
+          "name": "test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic",
+          "time": "0.001"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_v6_1_1_source_provenance.json'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_1_1_products",
+          "name": "test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_dynamic_provider_source_audit_v6_1_1.json'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_1_1_products",
+          "name": "test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_v5_2_prefix_parity_v6_1_1.json'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_1_1_products",
+          "name": "test_prefix_and_full_terminal_parity_are_separate_and_pass",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/Archive_PF_GENERAL_MULTIFRONT_V6_1_1_COMPLETE.zip'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_1_1_products",
+          "name": "test_exact_compact_archive_positive_removed_and_modified_verification",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1_1.md'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_1_1_products",
+          "name": "test_report_preserves_permanent_execution_boundary",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_v6_1_source_provenance.json'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_1_products",
+          "name": "test_v6_source_patch_and_snapshots_are_commit_bound",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_production_call_graph_v6_1.json'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_1_products",
+          "name": "test_call_graph_scheduler_handoff_and_multiowner_products_pass",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_checkpoint_roundtrip_v6_1.json'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_1_products",
+          "name": "test_checkpoint_runtime_parity_and_no_solve_preflight_pass",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1.md'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_1_products",
+          "name": "test_report_preserves_execution_boundary",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_2_products",
+          "name": "test_required_v6_2_products_exist_and_preserve_boundary",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_v6_2_source_provenance.json'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_2_products",
+          "name": "test_source_and_hook_records_are_fail_closed_and_exactly_bound",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_engine_restore_v6_2.json'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_2_products",
+          "name": "test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_event_consumption_v6_2.csv'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_2_products",
+          "name": "test_event_and_transaction_records_do_not_claim_physical_execution",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_3'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_3_products",
+          "name": "test_v6_3_required_products_and_decisions",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_3/Archive_PF_GENERAL_MULTIFRONT_V6_3_COMPLETE.zip'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_3_products",
+          "name": "test_v6_3_archive_positive_and_negative_verification",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_4'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_4_products",
+          "name": "test_required_v6_4_products_and_fail_closed_decision",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+        "message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_4/Archive_PF_GENERAL_MULTIFRONT_V6_4_COMPLETE.zip'",
+        "test": {
+          "classname": "tests.test_pf_general_multifront_v6_4_products",
+          "name": "test_v6_4_archive_positive_and_tamper_verification",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "ASSERTION_OR_CONTRACT_FAILURE",
+        "message": "AssertionError: /Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/publication_test_temp/pytest-of-shen/pytest-0/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\n  \nassert 1 == 0\n +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\\n\").returncode",
+        "test": {
+          "classname": "tests.test_real_signed_builder_v10212",
+          "name": "test_review_builder_emits_artifact_consumable_by_production_loader",
+          "time": "0.453"
+        }
+      },
+      {
+        "category": "ASSERTION_OR_CONTRACT_FAILURE",
+        "message": "AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'\n  \n  - v10.2.14_live_production_fem_state_capture\n  + v10.2.27_live_production_state_capture_with_frozen_measurement_clone",
+        "test": {
+          "classname": "tests.test_v10214_capture_model_id",
+          "name": "test_v10214_capture_model_id",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "ASSERTION_OR_CONTRACT_FAILURE",
+        "message": "AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'\n  \n  - v10.2.14_exact_endpoint_active_signed_spatial_station_responses\n  ?       ^^\n  + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses\n  ?       ^^               ++++++++++++++",
+        "test": {
+          "classname": "tests.test_v10214_response_model_id",
+          "name": "test_v10214_response_model_id",
+          "time": "0.000"
+        }
+      },
+      {
+        "category": "SANDBOX_PS_PERMISSION",
+        "message": "AssertionError: assert 'state:       not_running' in ''\n +  where '' = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip... child_exception_type(errno_num, err_msg, err_filename)\\nPermissionError: [Errno 1] Operation not permitted: \\'ps\\'\\n').stdout",
+        "test": {
+          "classname": "tests.test_v10215_stage3_schema_and_status",
+          "name": "test_stage3_status_script_parses_and_reports_missing_run",
+          "time": "0.050"
+        }
+      },
+      {
+        "category": "ASSERTION_OR_CONTRACT_FAILURE",
+        "message": "KeyError: 'zero_geometry_events_validated_against_zero_advances'",
+        "test": {
+          "classname": "tests.test_v10_2_27_zero_event_summary",
+          "name": "test_zero_event_summary_is_recorded_explicitly",
+          "time": "0.001"
+        }
+      },
+      {
+        "category": "ASSERTION_OR_CONTRACT_FAILURE",
+        "message": "Failed: DID NOT RAISE RuntimeError",
+        "test": {
+          "classname": "tests.test_v10_2_27_zero_event_summary",
+          "name": "test_empty_geometry_rejects_nonzero_advances",
+          "time": "0.001"
+        }
+      },
+      {
+        "category": "ASSERTION_OR_CONTRACT_FAILURE",
+        "message": "assert 123.0 is None",
+        "test": {
+          "classname": "tests.test_v10_2_29_vhcf_nonlinear_selector",
+          "name": "test_delegate_reenters_selector_under_global_cycle_cap",
+          "time": "0.000"
+        }
+      }
+    ],
+    "invocations": 1,
+    "returncode": 1,
+    "v13_named_tests_passed": 131
+  },
+  "full_suite_and_provenance_reviewed": true,
+  "heldout_preflight_seals_verified": 192,
+  "independent_reductions": "PASS: eight means/medians, 28 paired contrasts, native chi ratios, branch topology and plot bounds",
+  "merge_gate": "NOT_CLEARED_FULL_SUITE_FAILURES",
+  "no_new_simulation_or_physics_change": true,
+  "publication_status": "PUBLICATION_RECORD_COMPLETE_MERGE_BLOCKED_FULL_SUITE_FAILURES",
+  "queue": {
+    "active": {},
+    "paused": false,
+    "pending": []
+  },
+  "report_input_hashes_verified": 12913,
+  "source_bundle": {
+    "base_commit": "b2e0e2d85e048553ad2593d895a98974356213e2",
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/heldout_source_increment.bundle",
+    "producer_commit": "98f9b5d579e9d593c088bcfc1da9f7ccc8529093",
+    "sha256": "ba68b40ee56bb23cd08c8da2d57be5fd03919131096daa648c856848ed9c4c21",
+    "verification": "The bundle contains this ref:\n98f9b5d579e9d593c088bcfc1da9f7ccc8529093 HEAD\nThe bundle requires this ref:\nb2e0e2d85e048553ad2593d895a98974356213e2 \nThe bundle uses this hash algorithm: sha1\n/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/heldout_source_increment.bundle is okay\n"
+  },
+  "supersedes_storage_hold": "SIMULATIONS_COMPLETE_PUBLICATION_HELD_FOR_STORAGE (historical record retained unchanged)",
+  "timestamp": "2026-09-09T02:43:50.625627+00:00",
+  "verifier_sha256": "7aacb4dab8e24bd03552bc75a0990e53be29b8aa002829590e3c0c5b6e7e8ade"
+}

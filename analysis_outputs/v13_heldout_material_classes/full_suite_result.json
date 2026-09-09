@@ -1,0 +1,23 @@
+{
+  "accepted_freeze_after": {
+    "theta40_files": 3620,
+    "transition_files": 17636
+  },
+  "accepted_freeze_before": {
+    "theta40_files": 3620,
+    "transition_files": 17636
+  },
+  "collection_or_environment_failure": false,
+  "command": [
+    "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--junitxml=/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/full_suite.xml"
+  ],
+  "end_utc": "2026-09-09T02:36:24.302076+00:00",
+  "full_suite_invocations": 1,
+  "returncode": 1,
+  "source_commit": "98f9b5d579e9d593c088bcfc1da9f7ccc8529093",
+  "start_utc": "2026-09-09T02:30:42.755073+00:00"
+}
