@@ -1,0 +1,18 @@
+{
+  "schema": "v5.final-physics-natural-partition-sentinel/1",
+  "retained_evidence_implementation_sha": "63d53cdbad9125ef0d5180551974ac0e3a3ef721",
+  "repair_implementation_sha": "d25839dd4a9d1088d9171bcba1e7269d1e0a7750",
+  "seed": 12000,
+  "partition_counts": [1, 2, 4, 8, 16],
+  "retained_failed_peer_count": 60,
+  "retained_unique_first_difference": "/cavities/0/geometry_generation",
+  "retained_difference_count_at_unique_path": 60,
+  "repair_classification": "PHYSICAL_GEOMETRY_GENERATION_AND_REMESH_DECOUPLED_FROM_KINETIC_SUBDIVISION",
+  "terminal_fingerprint": "2186d626391bb30fe62cef576bef2c37a78358be805f199ac16eb7acb4675c0e",
+  "all_partition_terminal_fingerprints_exact": true,
+  "all_terminal_measurements_exact": true,
+  "all_midpoint_restarts_exact": true,
+  "geometry_generation": 2,
+  "all_cases_passed": true,
+  "full_160_peer_rerun_required_in_final_campaign": true
+}

@@ -1,0 +1,401 @@
+{
+  "baseline_R_void_m": 5.500000000000001e-05,
+  "baseline_r_tip_m": 2.1499385833898107e-06,
+  "child_branch_id": "void-front-1",
+  "child_tip_m": [
+    0.0008300010353789476,
+    0.0
+  ],
+  "classification": "MISSING_ACCEPTED_R_TIP_CONSTITUTIVE_LINK",
+  "consumer_graph": {
+    "absent_edges": [
+      {
+        "from": "tip_process_state.r_tip_m",
+        "to": "directional_clock_rates"
+      },
+      {
+        "from": "tip_process_state.r_tip_m",
+        "to": "FrontEngine.lambda_cleave"
+      },
+      {
+        "from": "R_void",
+        "to": "directional_clock_rates"
+      }
+    ],
+    "edges": [
+      {
+        "from": "child_source_tensor",
+        "role": "stress_input",
+        "to": "directional_clock_rates"
+      },
+      {
+        "from": "directional_clock_rates",
+        "role": "resolved_opening_and_temperature",
+        "to": "FrontEngine.lambda_cleave"
+      },
+      {
+        "from": "directional_clock_rates",
+        "role": "rate_and_crossing_time",
+        "to": "downstream_front_transaction"
+      },
+      {
+        "from": "tip_process_state.r_tip_m",
+        "role": "ownership_mirror",
+        "to": "child_branch.local_state.r_tip_m"
+      },
+      {
+        "from": "tip_process_state.r_tip_m",
+        "role": "preserved_state_only",
+        "to": "downstream_front_transaction"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "tip_process_state.r_tip_m",
+        "kind": "owned_state"
+      },
+      {
+        "id": "child_branch.local_state.r_tip_m",
+        "kind": "owned_state_mirror"
+      },
+      {
+        "id": "child_source_tensor",
+        "kind": "measured_FEM_source"
+      },
+      {
+        "first_line": 956,
+        "function": "directional_clock_rates",
+        "id": "directional_clock_rates",
+        "kind": "kinetic_consumer",
+        "last_line": 977,
+        "path": "arrhenius_fracture/voiding_production_v5.py"
+      },
+      {
+        "first_line": 267,
+        "function": "lambda_cleave",
+        "id": "FrontEngine.lambda_cleave",
+        "kind": "accepted_constitutive_law",
+        "last_line": 285,
+        "path": "arrhenius_fracture/sharp_front.py"
+      },
+      {
+        "first_line": 1709,
+        "function": "downstream_front_transaction",
+        "id": "downstream_front_transaction",
+        "kind": "event_and_geometry_consumer",
+        "last_line": 1927,
+        "path": "arrhenius_fracture/voiding_production_v5.py"
+      }
+    ],
+    "schema": "v5.r-tip-consumer-graph/1"
+  },
+  "executed_code_sha": "ab7037b244f722786185fe307a1bc4046f3dcbf8",
+  "gates": {
+    "all_controlled_threshold_events_complete": true,
+    "controlled_peers_hold_required_inputs_fixed": true,
+    "r_tip_changes_accepted_rate_or_barrier": false,
+    "r_tip_distinct_from_R_void": true,
+    "reciprocal_R_void_not_substituted_for_r_tip": true
+  },
+  "passed": false,
+  "r_tip_peers": [
+    {
+      "R_void_m": 5.500000000000001e-05,
+      "candidate_rates": [
+        {
+          "accumulated_action": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "cleavage_barrier_J": 3.77021313365773e-19,
+          "crossing_time_s": 7.445685040821792e+16,
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "effective_cleavage_rate_s": 4.899275838311063e-17,
+          "emission_barrier_J": 3.1324360654671e-19,
+          "emission_effective_stress_Pa": 6272.709469012797,
+          "emission_rate_s": 1.1268084807852936,
+          "microscopic_raw_cleavage_rate_s": 0.06649072288153078,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "resolved_opening_stress_Pa": 6272.709469012797,
+          "source_law_cleavage_rate_s": 4.899275838311063e-17,
+          "threshold_action": 3.6478464820172323
+        }
+      ],
+      "clock_completion_audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 7.445685040821792e+16,
+          "crossing_time_s": 7.445685040821792e+16,
+          "effective_rate_s": 4.899275838311063e-17,
+          "emitted_event_ids": [
+            "cleave:cleavage:(100):5d54146b8dbcda7a568e#event:0000000000000001"
+          ],
+          "hazard_barrier_J": 3.77021313365773e-19,
+          "rate_s": 4.899275838311063e-17,
+          "raw_rate_s": 4.899275838311063e-17,
+          "resolved_opening_stress_Pa": 6272.709469012797,
+          "winner": true
+        }
+      ],
+      "factor": 0.75,
+      "fixed_inputs": {
+        "candidate_ids": [
+          "cleave:cleavage:(100):5d54146b8dbcda7a568e"
+        ],
+        "rng_state": {
+          "bit_generator": "PCG64",
+          "has_uint32": 0,
+          "state": {
+            "inc": 264756758992246958615769943242078180925,
+            "state": 30987806924270815212378740004822260665
+          },
+          "uinteger": 0
+        },
+        "source_element_ids": [
+          367003,
+          367006,
+          367012,
+          367014
+        ],
+        "source_tensor_Pa": [
+          [
+            7016.591217181707,
+            -0.0572172990736135
+          ],
+          [
+            -0.0572172990736135,
+            6272.709469012797
+          ]
+        ],
+        "temperature_K": 900.0,
+        "thresholds": [
+          3.6478464820172323
+        ]
+      },
+      "intervention": "child_r_tip_m",
+      "r_tip_after_threshold_completion_m": 1.612453937542358e-06,
+      "r_tip_before_event_m": 1.612453937542358e-06,
+      "selected_candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+      "selected_event_class": "physical_cleavage_threshold_completion",
+      "terminal_fingerprint": "ddb6034b333b86207b46b20a8704b0c226647fda6d76b13fd37cd19709d110dd",
+      "threshold_event_completed": true
+    },
+    {
+      "R_void_m": 5.500000000000001e-05,
+      "candidate_rates": [
+        {
+          "accumulated_action": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "cleavage_barrier_J": 3.77021313365773e-19,
+          "crossing_time_s": 7.445685040821792e+16,
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "effective_cleavage_rate_s": 4.899275838311063e-17,
+          "emission_barrier_J": 3.1324360654671e-19,
+          "emission_effective_stress_Pa": 6272.709469012797,
+          "emission_rate_s": 1.1268084807852936,
+          "microscopic_raw_cleavage_rate_s": 0.06649072288153078,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "resolved_opening_stress_Pa": 6272.709469012797,
+          "source_law_cleavage_rate_s": 4.899275838311063e-17,
+          "threshold_action": 3.6478464820172323
+        }
+      ],
+      "clock_completion_audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 7.445685040821792e+16,
+          "crossing_time_s": 7.445685040821792e+16,
+          "effective_rate_s": 4.899275838311063e-17,
+          "emitted_event_ids": [
+            "cleave:cleavage:(100):5d54146b8dbcda7a568e#event:0000000000000001"
+          ],
+          "hazard_barrier_J": 3.77021313365773e-19,
+          "rate_s": 4.899275838311063e-17,
+          "raw_rate_s": 4.899275838311063e-17,
+          "resolved_opening_stress_Pa": 6272.709469012797,
+          "winner": true
+        }
+      ],
+      "factor": 1.0,
+      "fixed_inputs": {
+        "candidate_ids": [
+          "cleave:cleavage:(100):5d54146b8dbcda7a568e"
+        ],
+        "rng_state": {
+          "bit_generator": "PCG64",
+          "has_uint32": 0,
+          "state": {
+            "inc": 264756758992246958615769943242078180925,
+            "state": 30987806924270815212378740004822260665
+          },
+          "uinteger": 0
+        },
+        "source_element_ids": [
+          367003,
+          367006,
+          367012,
+          367014
+        ],
+        "source_tensor_Pa": [
+          [
+            7016.591217181707,
+            -0.0572172990736135
+          ],
+          [
+            -0.0572172990736135,
+            6272.709469012797
+          ]
+        ],
+        "temperature_K": 900.0,
+        "thresholds": [
+          3.6478464820172323
+        ]
+      },
+      "intervention": "child_r_tip_m",
+      "r_tip_after_threshold_completion_m": 2.1499385833898107e-06,
+      "r_tip_before_event_m": 2.1499385833898107e-06,
+      "selected_candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+      "selected_event_class": "physical_cleavage_threshold_completion",
+      "terminal_fingerprint": "c8ec154434ccb5d194352ac2443d0a0e556cfa42ef871a610435d6d420212e93",
+      "threshold_event_completed": true
+    },
+    {
+      "R_void_m": 5.500000000000001e-05,
+      "candidate_rates": [
+        {
+          "accumulated_action": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "cleavage_barrier_J": 3.77021313365773e-19,
+          "crossing_time_s": 7.445685040821792e+16,
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "effective_cleavage_rate_s": 4.899275838311063e-17,
+          "emission_barrier_J": 3.1324360654671e-19,
+          "emission_effective_stress_Pa": 6272.709469012797,
+          "emission_rate_s": 1.1268084807852936,
+          "microscopic_raw_cleavage_rate_s": 0.06649072288153078,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "resolved_opening_stress_Pa": 6272.709469012797,
+          "source_law_cleavage_rate_s": 4.899275838311063e-17,
+          "threshold_action": 3.6478464820172323
+        }
+      ],
+      "clock_completion_audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 7.445685040821792e+16,
+          "crossing_time_s": 7.445685040821792e+16,
+          "effective_rate_s": 4.899275838311063e-17,
+          "emitted_event_ids": [
+            "cleave:cleavage:(100):5d54146b8dbcda7a568e#event:0000000000000001"
+          ],
+          "hazard_barrier_J": 3.77021313365773e-19,
+          "rate_s": 4.899275838311063e-17,
+          "raw_rate_s": 4.899275838311063e-17,
+          "resolved_opening_stress_Pa": 6272.709469012797,
+          "winner": true
+        }
+      ],
+      "factor": 1.25,
+      "fixed_inputs": {
+        "candidate_ids": [
+          "cleave:cleavage:(100):5d54146b8dbcda7a568e"
+        ],
+        "rng_state": {
+          "bit_generator": "PCG64",
+          "has_uint32": 0,
+          "state": {
+            "inc": 264756758992246958615769943242078180925,
+            "state": 30987806924270815212378740004822260665
+          },
+          "uinteger": 0
+        },
+        "source_element_ids": [
+          367003,
+          367006,
+          367012,
+          367014
+        ],
+        "source_tensor_Pa": [
+          [
+            7016.591217181707,
+            -0.0572172990736135
+          ],
+          [
+            -0.0572172990736135,
+            6272.709469012797
+          ]
+        ],
+        "temperature_K": 900.0,
+        "thresholds": [
+          3.6478464820172323
+        ]
+      },
+      "intervention": "child_r_tip_m",
+      "r_tip_after_threshold_completion_m": 2.6874232292372634e-06,
+      "r_tip_before_event_m": 2.6874232292372634e-06,
+      "selected_candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+      "selected_event_class": "physical_cleavage_threshold_completion",
+      "terminal_fingerprint": "250b8918457784d952b16cc0c0ca461b1df52d0fb81b2aca5717ea11a32dace1",
+      "threshold_event_completed": true
+    }
+  ],
+  "reciprocal_R_void_peer": {
+    "R_void_m": 4.1250000000000007e-05,
+    "candidate_rates": [
+      {
+        "accumulated_action": 0.0,
+        "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+        "cleavage_barrier_J": 3.77021313365773e-19,
+        "crossing_time_s": 7.445685040821792e+16,
+        "direction_xy": [
+          1.0,
+          0.0
+        ],
+        "effective_cleavage_rate_s": 4.899275838311063e-17,
+        "emission_barrier_J": 3.1324360654671e-19,
+        "emission_effective_stress_Pa": 6272.709469012797,
+        "emission_rate_s": 1.1268084807852936,
+        "microscopic_raw_cleavage_rate_s": 0.06649072288153078,
+        "normal_xy": [
+          0.0,
+          1.0
+        ],
+        "resolved_opening_stress_Pa": 6272.709469012797,
+        "source_law_cleavage_rate_s": 4.899275838311063e-17,
+        "threshold_action": 3.6478464820172323
+      }
+    ],
+    "factor": 0.75,
+    "r_tip_m": 2.1499385833898107e-06,
+    "rates_and_barriers_exactly_equal": true,
+    "source_state_held_fixed": true,
+    "source_tensor_held_fixed": true
+  },
+  "retained_source_actual_continuation": {
+    "continued_child_fingerprint": "7a6c9f213bcdbc0ae26b872aae6c1fed5fb04d32f03ccdba9c6a413aff46ccce",
+    "initial_child_fingerprint": "f88a12136989aef45f291cdbadb6cdea6ac1b645331a7f7fbd0911b490788ac0",
+    "initial_r_tip_m": 2.1499385833898107e-06,
+    "r_tip_preserved_by_accepted_continuation": true,
+    "renewed_r_tip_after_event_m": 2.1499385833898107e-06,
+    "scope": "PREEXISTING_ACCEPTED_TOPOLOGY_EVENT_NOT_RERUN_BY_THIS_BOUNDED_AUDIT"
+  },
+  "schema": "v5.r-tip-causal-use/1",
+  "scope": "SOFTWARE_CAUSAL_INTERVENTIONS_AT_ONE_FIXED_ACCEPTED_CHILD_STATE",
+  "source_pair_manifest_sha256": "5e4529dfce584471d622de7bc7087d33a8c629f7f0b48b8da79e266c4de34bb9"
+}
