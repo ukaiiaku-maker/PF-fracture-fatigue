@@ -35,3 +35,13 @@ def test_pending_event_not_erased_by_zero_instantaneous_rate():
 
 def test_assessment_reductions_reproduce():
     assert audit_accepted()['status']=='PASS'
+
+
+def test_chi_native_waits_missing_infinite_and_pending():
+    r=dict(tau_c_s=1e-6,T_i_next_s=2e-6,T_j_s=5e-7)
+    assert mark_metrics(r)['chi_B']==.5
+    assert mark_metrics(dict(r,T_i_next_s=2e-7))['chi_B']==2.5
+    assert mark_metrics(dict(r,T_j_s=float('inf')))['chi_B_status']=='INFINITE_COMPANION_WAIT'
+    assert mark_metrics(dict(tau_c_s=1e-6))['chi_B'] is None
+    assert mark_metrics(dict(r,T_i_next_s=0))['chi_B'] is None
+    assert mark_metrics(dict(r,T_j_s=0,companion=dict(effective_rate_per_s=0,pending_event_id='done')))['chi_B']==0

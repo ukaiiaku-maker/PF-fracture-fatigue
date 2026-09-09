@@ -2,6 +2,7 @@
 from datetime import datetime,timezone
 import json
 import os
+import shutil
 import subprocess
 import sys
 
@@ -11,6 +12,7 @@ from scripts.run_pf_current_source_multifront_field_atlas_v12 import atomic_json
 
 def main():
     p=verify_source();before=verify_accepted()
+    if shutil.disk_usage(OUT).free<4*1024**3:raise RuntimeError('less than 4 GiB durable publication/test headroom')
     q=json.loads((DEST/'queue_status.json').read_text())
     assert not q['active'] and not q['pending'] and not q['paused']
     for case in p['cases']:
@@ -23,6 +25,7 @@ def main():
             source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()),stream,indent=2)
     env=dict(os.environ,PYTHONPATH=str(ROOT),PYTHONHASHSEED='0',OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',
         MPLCONFIGDIR='/tmp/pf-current-source-v13-parent-mpl')
+    atomic_json(OUT/'full_suite_environment.json',{k:env.get(k) for k in ('PYTHONPATH','PYTHONHASHSEED','OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MPLCONFIGDIR','TMPDIR')})
     with (OUT/'full_suite.log').open('x') as log:
         result=subprocess.run(command,cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT)
     try:
