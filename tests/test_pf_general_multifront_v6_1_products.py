@@ -12,7 +12,7 @@ def load(name):
     return json.loads((OUT / name).read_text())
 
 
-def test_v6_source_patch_and_snapshots_are_commit_bound():
+def test_v6_source_patch_and_snapshots_are_commit_bound(historical_product):
     provenance = load("pf_general_multifront_v6_1_source_provenance.json")
     assert provenance["v6_record_commit"] == "d993dd933f52281b89cf22e3aa9cf0db61d64487"
     assert provenance["v6_record_tree"] == "40aced628472af5803176fb0d8f87334d5fe63f5"
@@ -27,7 +27,7 @@ def test_v6_source_patch_and_snapshots_are_commit_bound():
         assert hashlib.sha256(path.read_bytes()).hexdigest() == row["sha256"]
 
 
-def test_call_graph_scheduler_handoff_and_multiowner_products_pass():
+def test_call_graph_scheduler_handoff_and_multiowner_products_pass(historical_product):
     call_graph = load("pf_general_multifront_production_call_graph_v6_1.json")
     assert call_graph["all_source_bindings_resolved"]
     assert call_graph["v12_source_physics_front_cap"] is None
@@ -51,7 +51,7 @@ def test_call_graph_scheduler_handoff_and_multiowner_products_pass():
     assert interval["unresolved_two_front_owner_count"] >= 1
 
 
-def test_checkpoint_runtime_parity_and_no_solve_preflight_pass():
+def test_checkpoint_runtime_parity_and_no_solve_preflight_pass(historical_product):
     checkpoint = load("pf_general_multifront_checkpoint_roundtrip_v6_1.json")
     assert checkpoint["qualification"] == "PASS"
     assert checkpoint["records"]["multiowner_n8"]["active_front_count"] == 8
@@ -70,7 +70,7 @@ def test_checkpoint_runtime_parity_and_no_solve_preflight_pass():
         assert not row["production_output_root_created"]
 
 
-def test_report_preserves_execution_boundary():
+def test_report_preserves_execution_boundary(historical_product):
     report = (OUT / "PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1.md").read_text()
     assert "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS" in report
     assert "production with more than two fronts remains not executed" in report

@@ -41,7 +41,7 @@ def verify(data: bytes):
                 raise ValueError(f"size mismatch: {name}")
 
 
-def test_required_v6_4_products_and_fail_closed_decision():
+def test_required_v6_4_products_and_fail_closed_decision(historical_product):
     assert REQUIRED.issubset({path.name for path in OUT.iterdir()})
     cli = json.loads((OUT / "pf_general_multifront_integrated_cli_dry_run_v6_4.json").read_text())
     cached = json.loads((OUT / "pf_general_multifront_cached_end_to_end_parity_v6_4.json").read_text())
@@ -58,7 +58,7 @@ def test_required_v6_4_products_and_fail_closed_decision():
     assert sufficiency["cached_N2_end_to_end_parity"] == "FAIL_CLOSED_INCOMPLETE_FRONT_CANDIDATE_COVERAGE"
 
 
-def test_v6_4_archive_positive_and_tamper_verification():
+def test_v6_4_archive_positive_and_tamper_verification(historical_product):
     original = ARCHIVE.read_bytes(); verify(original)
     altered = io.BytesIO()
     with zipfile.ZipFile(io.BytesIO(original)) as source, zipfile.ZipFile(altered, "w") as target:

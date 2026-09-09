@@ -58,7 +58,7 @@ def test_population_and_signed_ledger_equations():
     assert audit["maximum_unsigned_vs_signed_population_residual"] == 0.0
 
 
-def test_committed_v5_2_result_packet_hashes_and_fail_closed_decision():
+def test_committed_v5_2_result_packet_hashes_and_fail_closed_decision(historical_product):
     decision = json.loads((RESULT / "final_two_axis_decision.json").read_text())
     assert decision["pair_terminal_result"] == "CORRECTED_THETA40_REPLAY_STOPPED_FAIL_CLOSED_SIGNED_KERNEL_ENVELOPE"
     assert decision["predictive_branching_physics_validated"] is False

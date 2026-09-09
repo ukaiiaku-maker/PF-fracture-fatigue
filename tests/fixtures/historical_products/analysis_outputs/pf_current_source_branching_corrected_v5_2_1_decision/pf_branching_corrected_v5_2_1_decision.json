@@ -1,0 +1,184 @@
+{
+  "additional_process_ownership_gate": {
+    "postbirth_steps": 438,
+    "same_tip_contract_pass": true
+  },
+  "all_eleven_morphology_success_criteria_pass": true,
+  "atomic_topology_transaction_capability": "DEMONSTRATED",
+  "bounded_300um_pair_completion": "NOT_COMPLETED_SIGNED_KERNEL_ENVELOPE",
+  "cluster_handoff_status": "UNRESOLVED_HANDOFF_NOT_REQUIRED_AT_STOP",
+  "corrected_morphology_capability": "CORRECTED_CURRENT_SOURCE_BRANCHING_MORPHOLOGY_CAPABILITY_DEMONSTRATED_BEFORE_ENVELOPE_STOP",
+  "corrected_process_state_branch_birth": "DEMONSTRATED",
+  "endpoint_semantics": "300 micrometres is the stopping target and hard-negative ceiling, not an additional morphology-success gate.",
+  "final_independent_tip_mechanics": "UNQUALIFIED_ONE_OF_TWO_DAUGHTER_LOCAL_J_CONTOURS_VALID_AT_STOP",
+  "immutable_predecessor_result_commit": "ff6bc653298b13f6da12c6b5722684b9f115afde",
+  "morphology_success_criteria": [
+    {
+      "criterion": 1,
+      "evidence": {
+        "completion_times_s": [
+          2410.800011135129,
+          2410.800011226723
+        ],
+        "correlation_time_difference_s": 9.159430192084983e-08,
+        "pending_event_ids": [
+          "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000014",
+          "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000010"
+        ],
+        "step": 369
+      },
+      "name": "directional_first_passage",
+      "pass": true
+    },
+    {
+      "criterion": 2,
+      "evidence": {
+        "local_J_valid": [
+          true,
+          true
+        ],
+        "signed_directional_J_J_per_m2": [
+          23327.3760714061,
+          25791.839235003165
+        ]
+      },
+      "name": "positive_signed_directional_J",
+      "pass": true
+    },
+    {
+      "criterion": 3,
+      "evidence": {
+        "net_energy_margin_J_per_m": 0.14740394023225453,
+        "released_energy_J_per_m": 0.14741141338225816,
+        "total_cost_J_per_m": 7.473150003639843e-06
+      },
+      "name": "energy_acceptance",
+      "pass": true
+    },
+    {
+      "criterion": 4,
+      "evidence": {
+        "accepted_two_arm_birth_count": 1,
+        "daughter_ids": [
+          "b0fa22bb892937f8",
+          "b7d5efe0822562b9"
+        ]
+      },
+      "name": "valid_daughter_topology",
+      "pass": true
+    },
+    {
+      "criterion": 5,
+      "evidence": {
+        "daughter_event_counts": {
+          "b0fa22bb892937f8": 6,
+          "b7d5efe0822562b9": 57
+        },
+        "daughter_growth_um": {
+          "b0fa22bb892937f8": 30.0,
+          "b7d5efe0822562b9": 285.0
+        }
+      },
+      "name": "nonstub_propagation",
+      "pass": true
+    },
+    {
+      "criterion": 6,
+      "evidence": {
+        "cluster_bookkeeping_valid": true,
+        "final_cluster_unresolved": true
+      },
+      "name": "cluster_bookkeeping",
+      "pass": true
+    },
+    {
+      "criterion": 7,
+      "evidence": {
+        "handoff_length_um": 50.0,
+        "handoff_required_at_stop": false,
+        "independent_local_J_flags": [
+          false,
+          true
+        ],
+        "short_arm_below_handoff_length": true,
+        "short_arm_growth_um": 30.0
+      },
+      "name": "conditional_handoff",
+      "pass": true
+    },
+    {
+      "criterion": 8,
+      "evidence": {
+        "maximum_fronts": 2,
+        "no_front_cap_veto_recorded": true
+      },
+      "name": "no_front_cap_binding",
+      "pass": true
+    },
+    {
+      "criterion": 9,
+      "evidence": {
+        "all_committed_segments_forward_in_x": true,
+        "daughter_statuses_at_stop": {
+          "b0fa22bb892937f8": "active",
+          "b7d5efe0822562b9": "active"
+        },
+        "no_bridge_or_reconnection_veto_recorded": true
+      },
+      "name": "no_immediate_retirement_or_reversal",
+      "pass": true
+    },
+    {
+      "criterion": 10,
+      "evidence": {
+        "hazard_event_ordinal_closure": {
+          "control_max1": {
+            "cleave:cleavage:(010):694b159e5c3c21b95300": true,
+            "cleave:cleavage:(100):77278fedde405b16bcd0": true
+          },
+          "enabled_max2": {
+            "cleave:cleavage:(010):694b159e5c3c21b95300": true,
+            "cleave:cleavage:(100):77278fedde405b16bcd0": true
+          }
+        },
+        "hazard_rng_state_serialized": true,
+        "one_process_update_per_interval": {
+          "control_max1": true,
+          "enabled_max2": true
+        },
+        "population_and_signed_ledgers_pass": true,
+        "renewal_and_geometry_closure_pass": true
+      },
+      "name": "state_hazard_rng_wake_geometry_ledger_closure",
+      "pass": true
+    },
+    {
+      "criterion": 11,
+      "evidence": {
+        "action_rows_each": [
+          23,
+          23
+        ],
+        "directional_rows_each": [
+          736,
+          736
+        ],
+        "identical_through_step": 368
+      },
+      "name": "prebranch_matched_pair_identity",
+      "pass": true
+    }
+  ],
+  "pair_terminal_result": "CORRECTED_THETA40_REPLAY_STOPPED_FAIL_CLOSED_SIGNED_KERNEL_ENVELOPE",
+  "permanent_interpretation_boundary": "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS",
+  "predictive_branching_physics_validated": false,
+  "promoted_execution_source": {
+    "commit": "e2aff736afe0e1d2d1b600c25743de317a71c7ba",
+    "tree": "14a953037a44a25288c41d317a0ae0c7f36d22bc"
+  },
+  "raw_tree_sha256": "cec0e2523bd16ce18b541c1eb7cdf65ee26ba553b5ecfb657da617ed2321565e",
+  "record_scope": "ANALYSIS_ONLY_NO_PF_NO_FEM_NO_PARAMETER_CHANGE",
+  "schema": "pf_branching_corrected_v5_2_1_superseding_decision_v1",
+  "superseded_decision_sha256": "ef517a314f393dab7079d55d20d8949819bfc1e47a02b4dd1213648f05f433f8",
+  "supersedes_only": "analysis_outputs/pf_current_source_branching_corrected_v5_2_execution_20260831T190053Z/final_two_axis_decision.json"
+}

@@ -1,0 +1,195 @@
+{
+  "schema": "historical_product_fixture_manifest/1",
+  "source_record_commit": "1816b4f73a7fb671aad29cb03948b10fc8a62b08",
+  "source_record_statement": "Archive commit attests byte identity to e4130052941a56dca80904eda85740f0a868610c; that original object is not present locally. SHA-256 below is computed from the archived Git blobs, not asserted to be a previously published SHA-256.",
+  "original_source_commit": "e4130052941a56dca80904eda85740f0a868610c",
+  "prior_review_sha256": "12bdb50e17896e877322fd6f4012b2ea2c3447f4db1b7190d6d9d8bc8d56a4c7",
+  "members": {
+    "analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_corrected_v5_2_1_decision.json": {
+      "sha256": "42ae2964906fb7019854fdb59782297148d1908b3ef9d348f4a9d2a0992f1c73",
+      "size_bytes": 5749,
+      "source_git_path": "analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_corrected_v5_2_1_decision.json"
+    },
+    "analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_signed_kernel_coverage_failure_audit.json": {
+      "sha256": "2b2be63340a05f0f398bf10ab9d7f1014c986387fe0bb176c5918680374b9122",
+      "size_bytes": 3118,
+      "source_git_path": "analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_signed_kernel_coverage_failure_audit.json"
+    },
+    "analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_terminal_topology_coverage_bound.json": {
+      "sha256": "e01869ba9b34a35a0ce76886f019c51de922bf00bd879e779b270d1d5a6ce466",
+      "size_bytes": 1945,
+      "source_git_path": "analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_terminal_topology_coverage_bound.json"
+    }
+  },
+  "tests": {
+    "tests/test_multifront_v5_4_2_runtime_parity_v12.py::test_authoritative_v5_4_2_transaction_and_runtime_parity": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": []
+    },
+    "tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "BUNDLE"
+      ]
+    },
+    "tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_published_kinetic_k_figures_are_not_rcurves": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "BUNDLE"
+      ]
+    },
+    "tests/test_pf_current_source_branching_corrected_v5_2_result.py::test_committed_v5_2_result_packet_hashes_and_fail_closed_decision": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "RESULT"
+      ]
+    },
+    "tests/test_pf_current_source_branching_v5_2_1_decision.py::test_superseding_decision_separates_terminal_and_morphology_axes": {
+      "availability": "BUNDLED_COMMIT_VERIFIED",
+      "binding_names": [
+        "OUT"
+      ],
+      "bindings": {
+        "OUT": "analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision"
+      }
+    },
+    "tests/test_pf_current_source_branching_v5_2_1_decision.py::test_coverage_failure_and_terminal_topology_bounds": {
+      "availability": "BUNDLED_COMMIT_VERIFIED",
+      "binding_names": [
+        "OUT"
+      ],
+      "bindings": {
+        "OUT": "analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision"
+      }
+    },
+    "tests/test_pf_current_source_branching_v5_2_1_decision.py::test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "OUT",
+        "V5",
+        "OLD_COVERAGE"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_prefix_and_full_terminal_parity_are_separate_and_pass": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_exact_compact_archive_positive_removed_and_modified_verification": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_report_preserves_permanent_execution_boundary": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_1_products.py::test_v6_source_patch_and_snapshots_are_commit_bound": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_1_products.py::test_call_graph_scheduler_handoff_and_multiowner_products_pass": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_1_products.py::test_checkpoint_runtime_parity_and_no_solve_preflight_pass": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_1_products.py::test_report_preserves_execution_boundary": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_2_products.py::test_required_v6_2_products_exist_and_preserve_boundary": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_2_products.py::test_source_and_hook_records_are_fail_closed_and_exactly_bound": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_2_products.py::test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_2_products.py::test_event_and_transaction_records_do_not_claim_physical_execution": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_required_products_and_decisions": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_archive_positive_and_negative_verification": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_4_products.py::test_required_v6_4_products_and_fail_closed_decision": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    },
+    "tests/test_pf_general_multifront_v6_4_products.py::test_v6_4_archive_positive_and_tamper_verification": {
+      "availability": "OPTIONAL_EXTERNAL_PACKAGE_ABSENT",
+      "binding_names": [
+        "ROOT",
+        "OUT"
+      ]
+    }
+  },
+  "optional_package_policy": "No verified complete compact V5/V6 pack is mounted. Do not use mutable analysis_outputs as a fallback. Explicitly configured missing/corrupt/unpinned packs fail; only intentionally absent optional packs skip.",
+  "external_manifest_sha256": null
+}

@@ -40,7 +40,7 @@ def verify_archive(data: bytes) -> None:
                 raise ValueError(f"archive member size mismatch: {name}")
 
 
-def test_v6_3_required_products_and_decisions():
+def test_v6_3_required_products_and_decisions(historical_product):
     assert REQUIRED.issubset({path.name for path in OUT.iterdir()})
     context = json.loads((OUT / "pf_general_multifront_stateful_hook_context_v6_3.json").read_text())
     dry = json.loads((OUT / "pf_general_multifront_stateful_production_dry_run_v6_3.json").read_text())
@@ -54,7 +54,7 @@ def test_v6_3_required_products_and_decisions():
     assert native["cases"]["enabled_N2_terminal_restore"]["active_front_count"] == 2
 
 
-def test_v6_3_archive_positive_and_negative_verification():
+def test_v6_3_archive_positive_and_negative_verification(historical_product):
     original = ARCHIVE.read_bytes()
     verify_archive(original)
     source = io.BytesIO(original)

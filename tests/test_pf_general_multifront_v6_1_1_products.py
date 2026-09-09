@@ -17,7 +17,7 @@ def load(name):
     return json.loads((OUT / name).read_text())
 
 
-def test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound():
+def test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound(historical_product):
     record = load("pf_general_multifront_v6_1_1_source_provenance.json")
     assert record["v6_1_implementation_commit"] == V6_1_COMMIT
     assert record["v6_1_implementation_tree"] == "ab60dce9a259ca736801444c00103c16a4ba2be5"
@@ -42,7 +42,7 @@ def test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound():
         assert hashlib.sha256(path.read_bytes()).hexdigest() == row["sha256"]
 
 
-def test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim():
+def test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim(historical_product):
     record = load("pf_general_multifront_dynamic_provider_source_audit_v6_1_1.json")
     assert record["qualification"] == "PASS"
     assert all(record["gates"].values())
@@ -51,7 +51,7 @@ def test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim()
     assert record["production_pf_max_fronts_greater_than_two"] == "NOT_YET_EXECUTED"
 
 
-def test_prefix_and_full_terminal_parity_are_separate_and_pass():
+def test_prefix_and_full_terminal_parity_are_separate_and_pass(historical_product):
     prefix = load("pf_general_multifront_v5_2_prefix_parity_v6_1_1.json")
     terminal = load("pf_general_multifront_v5_4_2_full_terminal_parity_v6_1_1.json")
     assert prefix["qualification"] == terminal["qualification"] == "PASS"
@@ -77,7 +77,7 @@ def _rewrite_archive(*, remove=None, modify=None):
     return target.getvalue()
 
 
-def test_exact_compact_archive_positive_removed_and_modified_verification():
+def test_exact_compact_archive_positive_removed_and_modified_verification(historical_product):
     archive = OUT / ARCHIVE_NAME
     ok, reason = verify_archive_bytes(archive.read_bytes())
     assert ok and reason == "exact_member_set_size_and_sha256"
@@ -89,7 +89,7 @@ def test_exact_compact_archive_positive_removed_and_modified_verification():
     assert not ok and reason.startswith("member_")
 
 
-def test_report_preserves_permanent_execution_boundary():
+def test_report_preserves_permanent_execution_boundary(historical_product):
     report = (OUT / "PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1_1.md").read_text()
     assert "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS" in report
     assert "step **813**, not 807" in report
