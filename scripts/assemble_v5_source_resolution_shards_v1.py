@@ -11,7 +11,9 @@ import sys
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from arrhenius_fracture.closure_mechanics_evidence import canonical_data
 from arrhenius_fracture.static_numerical_family_v1 import REGISTRY,GROUPS,SCHEMA as STATIC_SCHEMA,classify
-from arrhenius_fracture.closure_lifecycle_evidence import SCHEMA as LIFECYCLE_SCHEMA,lifecycle_decision
+from arrhenius_fracture.closure_lifecycle_evidence import (
+    SCHEMA as LIFECYCLE_SCHEMA,lifecycle_decision,validate_lifecycle_rows,
+)
 from arrhenius_fracture.checkpoint_v11 import restore_checkpoint
 from arrhenius_fracture.finalization_v3_closure_schema import validate_closure_evidence
 from validate_v5_source_resolution_evidence_v1 import verify_inventory,validate_static
@@ -47,8 +49,25 @@ def classify_ontology(payload,sources,executed_code_sha):
         if (not isinstance(exc,ValueError)
                 or 'natural internal-stage independent production replay mismatch' not in str(exc)):
             raise
+        rows=[]
+        for row in payload['rows']:
+            classification={'execution_id':row['execution_id'],'dataset':row['dataset'],
+                'case_identity':row['case_identity'],'partition_count':row['partition_count']}
+            try:
+                validate_lifecycle_rows([row],sources,executed_code_sha=executed_code_sha)
+                classification.update({'valid':True,'failure':None})
+            except Exception as row_exc:
+                if (not isinstance(row_exc,ValueError)
+                        or 'natural internal-stage independent production replay mismatch' not in str(row_exc)):
+                    raise
+                classification.update({'valid':False,
+                    'failure':{'type':type(row_exc).__name__,'message':str(row_exc)}})
+            rows.append(classification)
         return {'schema':'v5.final-physics-closure-ontology-classification/1',
             'valid':False,'classification':'EXECUTED_BLOCKED','predicate_relaxed':False,
+            'full_registry_checks_reached':True,
+            'source_bound_row_ontology':{'applied':len(rows),'passed':sum(r['valid'] for r in rows),
+                'blocked':sum(not r['valid'] for r in rows),'rows':rows},
             'failure':{'type':type(exc).__name__,'message':str(exc)}}
 
 

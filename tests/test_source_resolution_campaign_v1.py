@@ -125,11 +125,19 @@ def test_causal_neutrality_recovery_accepts_only_the_exact_incomplete_operation(
 def test_strict_ontology_failure_is_retained_without_predicate_relaxation(monkeypatch):
     def fail(*args,**kwargs):raise ValueError('natural internal-stage independent production replay mismatch: exact bits')
     monkeypatch.setattr(shard_assembler,'validate_closure_evidence',fail)
-    result=shard_assembler.classify_ontology({},object(),'a'*40)
+    def validate_rows(rows,*args,**kwargs):
+        if rows[0]['dataset']=='natural':fail()
+    monkeypatch.setattr(shard_assembler,'validate_lifecycle_rows',validate_rows)
+    payload={'rows':[{'execution_id':'one','dataset':'natural','case_identity':'12000','partition_count':1},
+        {'execution_id':'two','dataset':'transitions','case_identity':'birth_hit_1','partition_count':1}]}
+    result=shard_assembler.classify_ontology(payload,object(),'a'*40)
     assert result['valid'] is False and result['classification']=='EXECUTED_BLOCKED'
     assert result['predicate_relaxed'] is False
     assert result['failure']['type']=='ValueError'
     assert 'independent production replay mismatch' in result['failure']['message']
+    assert result['source_bound_row_ontology']['applied']==2
+    assert result['source_bound_row_ontology']['passed']==1
+    assert result['source_bound_row_ontology']['blocked']==1
 
 
 def test_unexpected_ontology_failure_remains_a_workflow_error(monkeypatch):
