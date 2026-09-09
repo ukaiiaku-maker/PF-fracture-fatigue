@@ -86,7 +86,7 @@ def static_diagnostics(report):
             "compliance_sequence": [item["compliance"] for item in measures],
             "energy_sequence": [item["energy"] for item in measures],
             "raw_full_boundary_traction_sequence": [
-                item.get("cavity_fields", {}).get("normalized_traction") for item in measures],
+                (item.get("cavity_fields") or {}).get("normalized_traction") for item in measures],
             "fixed_tip_tensor_sequence_Pa": tensor_sequence(rows,
                 lambda row: row["measurements"]["fixed_tip_probe"].get("tensor_Pa")),
             "cavity_fixed_arc_tensor_sequences_Pa": [[{
