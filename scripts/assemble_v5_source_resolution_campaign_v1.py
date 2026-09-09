@@ -90,7 +90,7 @@ def main():
     for side in ('a','b'):
         destination=args.output/side;destination.mkdir(parents=True)
         for kind in ('static','lifecycle'):
-            sources=[args.shards[s['id']]/side/'evidence' for s in specs if s['phase']==kind]
+            sources=[args.shards/s['id']/side/'evidence' for s in specs if s['phase']==kind]
             assemble(kind,sources,destination/kind)
         for kind in ('source','recovery','causal-neutrality'):
             spec=next(row for row in specs if row['id']==kind)
