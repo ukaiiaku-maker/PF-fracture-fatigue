@@ -1,0 +1,958 @@
+........................................................................ [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 20%]
+............................F........................................... [ 27%]
+.....................................FF................................. [ 34%]
+.................................................F.FFFFFFFFFFFFFFFFFFFF. [ 41%]
+..........F.........ssss................................................ [ 48%]
+......................................F................F................ [ 55%]
+............F........................................................... [ 62%]
+........................................................................ [ 69%]
+.........................FF............................................. [ 76%]
+......................F................................................. [ 83%]
+........................................................................ [ 90%]
+..........................s............................................. [ 97%]
+..........................                                               [100%]
+=================================== FAILURES ===================================
+___________ test_authoritative_v5_4_2_transaction_and_runtime_parity ___________
+
+    def test_authoritative_v5_4_2_transaction_and_runtime_parity():
+>       result = replay_v5_4_2_runtime_parity(Path(__file__).parents[1])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_multifront_v5_4_2_runtime_parity_v12.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+arrhenius_fracture/v5_4_2_runtime_parity_v12.py:123: in replay_v5_4_2_runtime_parity
+    reference = json.loads(reference_path.read_text())
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution.../analysis_outputs/pf_current_source_branching_integrated_envelope_v5_4/pf_branching_v5_2_prefix_parity_reference.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_integrated_envelope_v5_4/pf_branching_v5_2_prefix_parity_reference.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______ test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision _______
+
+    def test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision():
+        audit = json.loads(
+>           (BUNDLE / "pf_branching_completion_terminal_audit_v5_4_2.json").read_text()
+        )
+
+tests/test_pf_branching_completion_execution_v5_4_2.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...is_outputs/pf_current_source_branching_completion_execution_v5_4_2/pf_branching_completion_terminal_audit_v5_4_2.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_completion_execution_v5_4_2/pf_branching_completion_terminal_audit_v5_4_2.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________ test_v5_4_2_published_kinetic_k_figures_are_not_rcurves ____________
+
+    def test_v5_4_2_published_kinetic_k_figures_are_not_rcurves():
+        audit = json.loads(
+>           (BUNDLE / "pf_branching_completion_terminal_audit_v5_4_2.json").read_text()
+        )["figure_audit"]
+
+tests/test_pf_branching_completion_execution_v5_4_2.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...is_outputs/pf_current_source_branching_completion_execution_v5_4_2/pf_branching_completion_terminal_audit_v5_4_2.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_completion_execution_v5_4_2/pf_branching_completion_terminal_audit_v5_4_2.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______ test_committed_v5_2_result_packet_hashes_and_fail_closed_decision _______
+
+    def test_committed_v5_2_result_packet_hashes_and_fail_closed_decision():
+>       decision = json.loads((RESULT / "final_two_axis_decision.json").read_text())
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_current_source_branching_corrected_v5_2_result.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...s/analysis_outputs/pf_current_source_branching_corrected_v5_2_execution_20260831T190053Z/final_two_axis_decision.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_execution_20260831T190053Z/final_two_axis_decision.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______ test_superseding_decision_separates_terminal_and_morphology_axes _______
+
+    def test_superseding_decision_separates_terminal_and_morphology_axes():
+>       decision = json.loads((OUT / "pf_branching_corrected_v5_2_1_decision.json").read_text())
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_current_source_branching_v5_2_1_decision.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...as/analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_corrected_v5_2_1_decision.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_corrected_v5_2_1_decision.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______________ test_coverage_failure_and_terminal_topology_bounds ______________
+
+    def test_coverage_failure_and_terminal_topology_bounds():
+>       coverage = json.loads((OUT / "pf_branching_signed_kernel_coverage_failure_audit.json").read_text())
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_current_source_branching_v5_2_1_decision.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution..._outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_signed_kernel_coverage_failure_audit.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_signed_kernel_coverage_failure_audit.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______ test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic _______
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-85/test_v5_2_predecessor_is_immut0')
+
+    def test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic(tmp_path):
+        old_decision = V5 / "final_two_axis_decision.json"
+>       assert hashlib.sha256(old_decision.read_bytes()).hexdigest() == "ef517a314f393dab7079d55d20d8949819bfc1e47a02b4dd1213648f05f433f8"
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_current_source_branching_v5_2_1_decision.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...s/analysis_outputs/pf_current_source_branching_corrected_v5_2_execution_20260831T190053Z/final_two_axis_decision.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_execution_20260831T190053Z/final_two_axis_decision.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+__ test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound ___
+
+    def test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound():
+>       record = load("pf_general_multifront_v6_1_1_source_provenance.json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_1_1_products.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_pf_general_multifront_v6_1_1_products.py:17: in load
+    return json.loads((OUT / name).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...tlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_v6_1_1_source_provenance.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_v6_1_1_source_provenance.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+__ test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim __
+
+    def test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim():
+>       record = load("pf_general_multifront_dynamic_provider_source_audit_v6_1_1.json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_1_1_products.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_pf_general_multifront_v6_1_1_products.py:17: in load
+    return json.loads((OUT / name).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...s_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_dynamic_provider_source_audit_v6_1_1.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_dynamic_provider_source_audit_v6_1_1.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+__________ test_prefix_and_full_terminal_parity_are_separate_and_pass __________
+
+    def test_prefix_and_full_terminal_parity_are_separate_and_pass():
+>       prefix = load("pf_general_multifront_v5_2_prefix_parity_v6_1_1.json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_1_1_products.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_pf_general_multifront_v6_1_1_products.py:17: in load
+    return json.loads((OUT / name).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...las/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_v5_2_prefix_parity_v6_1_1.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_v5_2_prefix_parity_v6_1_1.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+____ test_exact_compact_archive_positive_removed_and_modified_verification _____
+
+    def test_exact_compact_archive_positive_removed_and_modified_verification():
+        archive = OUT / ARCHIVE_NAME
+>       ok, reason = verify_archive_bytes(archive.read_bytes())
+                                          ^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_1_1_products.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution..._atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/Archive_PF_GENERAL_MULTIFRONT_V6_1_1_COMPLETE.zip')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/Archive_PF_GENERAL_MULTIFRONT_V6_1_1_COMPLETE.zip'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______________ test_report_preserves_permanent_execution_boundary ______________
+
+    def test_report_preserves_permanent_execution_boundary():
+>       report = (OUT / "PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1_1.md").read_text()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_1_1_products.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...eld_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1_1.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1_1.md'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____________ test_v6_source_patch_and_snapshots_are_commit_bound ______________
+
+    def test_v6_source_patch_and_snapshots_are_commit_bound():
+>       provenance = load("pf_general_multifront_v6_1_source_provenance.json")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_1_products.py:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_pf_general_multifront_v6_1_products.py:12: in load
+    return json.loads((OUT / name).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...ld_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_v6_1_source_provenance.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_v6_1_source_provenance.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+________ test_call_graph_scheduler_handoff_and_multiowner_products_pass ________
+
+    def test_call_graph_scheduler_handoff_and_multiowner_products_pass():
+>       call_graph = load("pf_general_multifront_production_call_graph_v6_1.json")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_1_products.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_pf_general_multifront_v6_1_products.py:12: in load
+    return json.loads((OUT / name).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...tlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_production_call_graph_v6_1.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_production_call_graph_v6_1.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+__________ test_checkpoint_runtime_parity_and_no_solve_preflight_pass __________
+
+    def test_checkpoint_runtime_parity_and_no_solve_preflight_pass():
+>       checkpoint = load("pf_general_multifront_checkpoint_roundtrip_v6_1.json")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_1_products.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_pf_general_multifront_v6_1_products.py:12: in load
+    return json.loads((OUT / name).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_checkpoint_roundtrip_v6_1.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_checkpoint_roundtrip_v6_1.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________________ test_report_preserves_execution_boundary ___________________
+
+    def test_report_preserves_execution_boundary():
+>       report = (OUT / "PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1.md").read_text()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_1_products.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...2_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1.md'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________ test_required_v6_2_products_exist_and_preserve_boundary ____________
+
+    def test_required_v6_2_products_exist_and_preserve_boundary():
+        names = {
+            "PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_2.md",
+            "pf_general_multifront_v6_2_source_provenance.json",
+            "pf_general_multifront_current_source_hook_map_v6_2.json",
+            "pf_general_multifront_engine_restore_v6_2.json",
+            "pf_general_multifront_event_consumption_v6_2.csv",
+            "pf_general_multifront_exact_trial_commit_v6_2.json",
+            "pf_general_multifront_accepted_state_rollover_v6_2.json",
+            "pf_general_multifront_daughter_competition_v6_2.json",
+            "pf_general_multifront_checkpoint_roundtrip_v6_2.json",
+            "pf_general_multifront_production_dry_run_v6_2.json",
+        }
+>       assert {path.name for path in OUT.iterdir()} == names
+                                      ^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_2_products.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+>       for name in os.listdir(self):
+                    ^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1056: FileNotFoundError
+________ test_source_and_hook_records_are_fail_closed_and_exactly_bound ________
+
+    def test_source_and_hook_records_are_fail_closed_and_exactly_bound():
+>       source = load("pf_general_multifront_v6_2_source_provenance.json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_2_products.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_pf_general_multifront_v6_2_products.py:11: in load
+    return json.loads((OUT / name).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...ld_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_v6_2_source_provenance.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_v6_2_source_provenance.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______ test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve _______
+
+    def test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve():
+>       engine = load("pf_general_multifront_engine_restore_v6_2.json")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_2_products.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_pf_general_multifront_v6_2_products.py:11: in load
+    return json.loads((OUT / name).read_text())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_engine_restore_v6_2.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_engine_restore_v6_2.json'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______ test_event_and_transaction_records_do_not_claim_physical_execution ______
+
+    def test_event_and_transaction_records_do_not_claim_physical_execution():
+>       with (OUT / "pf_general_multifront_event_consumption_v6_2.csv").open() as stream:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_2_products.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...eld_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_event_consumption_v6_2.csv')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_event_consumption_v6_2.csv'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+__________________ test_v6_3_required_products_and_decisions ___________________
+
+    def test_v6_3_required_products_and_decisions():
+>       assert REQUIRED.issubset({path.name for path in OUT.iterdir()})
+                                                        ^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_3_products.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_3')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+>       for name in os.listdir(self):
+                    ^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_3'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1056: FileNotFoundError
+_____________ test_v6_3_archive_positive_and_negative_verification _____________
+
+    def test_v6_3_archive_positive_and_negative_verification():
+>       original = ARCHIVE.read_bytes()
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_3_products.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...ield_atlas/analysis_outputs/pf_current_source_general_multifront_v6_3/Archive_PF_GENERAL_MULTIFRONT_V6_3_COMPLETE.zip')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_3/Archive_PF_GENERAL_MULTIFRONT_V6_3_COMPLETE.zip'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_____________ test_required_v6_4_products_and_fail_closed_decision _____________
+
+    def test_required_v6_4_products_and_fail_closed_decision():
+>       assert REQUIRED.issubset({path.name for path in OUT.iterdir()})
+                                                        ^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_4_products.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_4')
+
+    def iterdir(self):
+        """Yield path objects of the directory contents.
+    
+        The children are yielded in arbitrary order, and the
+        special entries '.' and '..' are not included.
+        """
+>       for name in os.listdir(self):
+                    ^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_4'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1056: FileNotFoundError
+______________ test_v6_4_archive_positive_and_tamper_verification ______________
+
+    def test_v6_4_archive_positive_and_tamper_verification():
+>       original = ARCHIVE.read_bytes(); verify(original)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests/test_pf_general_multifront_v6_4_products.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution...ield_atlas/analysis_outputs/pf_current_source_general_multifront_v6_4/Archive_PF_GENERAL_MULTIFRONT_V6_4_COMPLETE.zip')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_4/Archive_PF_GENERAL_MULTIFRONT_V6_4_COMPLETE.zip'
+
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/pathlib.py:1013: FileNotFoundError
+______ test_review_builder_emits_artifact_consumable_by_production_loader ______
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-85/test_review_builder_emits_arti0')
+
+    def test_review_builder_emits_artifact_consumable_by_production_loader(tmp_path):
+        responses = []
+        index = 0
+        for opening in (0.0, 0.5, 1.0):
+            for extension in (0.0, 1.0e-5):
+                path = tmp_path / f"S{index:02d}.csv"
+                _write_state(
+                    path,
+                    state_id=f"S{index:02d}",
+                    opening=opening,
+                    extension=extension,
+                    observed_r=1.0 + 0.2 * index,
+                )
+                responses.append(path)
+                index += 1
+    
+        normalization = tmp_path / "normalization.json"
+        normalization.write_text(
+            json.dumps(
+                {
+                    "schema": NORM_SCHEMA,
+                    "normalization_source": "process_zone_geometry_and_line_spacing",
+                    "activation_to_line_content_by_system": [1.0],
+                    "source_capacity_bounds_per_system": [[1.0, 10.0]],
+                    "fitted_to_toughness_or_fatigue": False,
+                    "shielding_attenuation_factor_fitted": False,
+                }
+            )
+        )
+        out = tmp_path / "atlas.json"
+        command = [
+            sys.executable,
+            "scripts/build_v10_2_12_real_signed_atlas.py",
+            "--normalization",
+            str(normalization),
+            "--out",
+            str(out),
+        ]
+        for path in responses:
+            command.extend(["--responses", str(path)])
+        completed = subprocess.run(
+            command,
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+>       assert completed.returncode == 0, completed.stderr + completed.stdout
+E       AssertionError: /private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-85/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\n").returncode
+
+tests/test_real_signed_builder_v10212.py:127: AssertionError
+_________________________ test_v10214_capture_model_id _________________________
+
+    def test_v10214_capture_model_id():
+>       assert MODEL_ID == "v10.2.14_live_production_fem_state_capture"
+E       AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'
+E         
+E         - v10.2.14_live_production_fem_state_capture
+E         + v10.2.27_live_production_state_capture_with_frozen_measurement_clone
+
+tests/test_v10214_capture_model_id.py:5: AssertionError
+________________________ test_v10214_response_model_id _________________________
+
+    def test_v10214_response_model_id():
+>       assert MODEL_ID == "v10.2.14_exact_endpoint_active_signed_spatial_station_responses"
+E       AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'
+E         
+E         - v10.2.14_exact_endpoint_active_signed_spatial_station_responses
+E         ?       ^^
+E         + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses
+E         ?       ^^               ++++++++++++++
+
+tests/test_v10214_response_model_id.py:5: AssertionError
+___________ test_stage3_status_script_parses_and_reports_missing_run ___________
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-85/test_stage3_status_script_pars0')
+
+    def test_stage3_status_script_parses_and_reports_missing_run(tmp_path: Path):
+        script = Path("scripts/status_v10_2_15_stage3.py")
+        ast.parse(script.read_text())
+        completed = subprocess.run(
+            [sys.executable, str(script), "--outroot", str(tmp_path / "absent"), "--tail", "0"],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        assert completed.returncode == 1
+>       assert "state:       not_running" in completed.stdout
+E       AssertionError: assert 'state:       not_running' in ''
+E        +  where '' = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').stdout
+
+tests/test_v10215_stage3_schema_and_status.py:35: AssertionError
+________________ test_zero_event_summary_is_recorded_explicitly ________________
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-85/test_zero_event_summary_is_rec0')
+
+    def test_zero_event_summary_is_recorded_explicitly(tmp_path):
+        case = tmp_path / "case"
+        _write_case(case, n_advances=0)
+    
+        _rewrite_summary_event_semantics(
+            ["--out", str(case), "--da-phys", "5e-6"]
+        )
+    
+        row = json.loads((case / "summary.json").read_text())[0]
+        assert row["n_geometry_events"] == 0
+        assert row["n_equivalent_checkpoints_exact"] == 0.0
+        assert row["n_equivalent_checkpoints_rounded"] == 0
+        assert row["nominal_checkpoint_length_m"] == pytest.approx(5.0e-6)
+        assert row["geometry_path_length_m"] == 0.0
+        assert row["geometry_projected_extension_m"] == 0.0
+>       assert row["zero_geometry_events_validated_against_zero_advances"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'zero_geometry_events_validated_against_zero_advances'
+
+tests/test_v10_2_27_zero_event_summary.py:36: KeyError
+_________________ test_empty_geometry_rejects_nonzero_advances _________________
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-85/test_empty_geometry_rejects_no0')
+
+    def test_empty_geometry_rejects_nonzero_advances(tmp_path):
+        case = tmp_path / "case"
+        _write_case(case, n_advances=1)
+    
+>       with pytest.raises(RuntimeError, match="inconsistent"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/test_v10_2_27_zero_event_summary.py:43: Failed
+____________ test_delegate_reenters_selector_under_global_cycle_cap ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x16b6e0170>
+
+    def test_delegate_reenters_selector_under_global_cycle_cap(monkeypatch):
+        class Front:
+            persistent_site_cyclic_v10229 = True
+    
+            def preview_cycle_waveform(self, ctrl, waveform, temperature):
+                return prediction()
+    
+            def cycle_step_waveform(
+                self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None
+            ):
+                assert force_cycles is None
+                assert requested_cycles == 123.0
+                assert ctrl.cfg.max_block_cycles == 123.0
+                pred = self.preview_cycle_waveform(ctrl, waveform, temperature)
+                return ctrl.choose_block_cycles_diagnostic(pred, requested_cycles)
+    
+        monkeypatch.setattr(
+            delegate,
+            "select_nonlinear_block",
+            lambda ctrl, pred, requested, linear: {
+                "cycles": requested,
+                "limiter": "nonlinear_test",
+                "unlimited_cycles": requested,
+                "candidate_limits": {"nonlinear_selected_cycles": requested},
+            },
+        )
+        ctrl = controller(max_block=1.0e6)
+        original_max = ctrl.cfg.max_block_cycles
+        delegate.install_engine_native_cycle_preview()
+        try:
+>           out = ctrl.cycle_step_front(
+                Front(), SimpleNamespace(), 300.0,
+                requested_cycles=123.0, force_cycles=123.0,
+            )
+
+tests/test_v10_2_29_vhcf_nonlinear_selector.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+arrhenius_fracture/fatigue_controller_delegate_v10229.py:68: in delegated_step
+    return front.cycle_step_waveform(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_v10_2_29_vhcf_nonlinear_selector.test_delegate_reenters_selector_under_global_cycle_cap.<locals>.Front object at 0x16b6e0c50>
+ctrl = <arrhenius_fracture.fatigue_v1.FatigueCycleHazardController object at 0x16b6e01a0>
+waveform = namespace(), temperature = 300.0, requested_cycles = 123.0
+force_cycles = 123.0
+
+    def cycle_step_waveform(
+        self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None
+    ):
+>       assert force_cycles is None
+E       assert 123.0 is None
+
+tests/test_v10_2_29_vhcf_nonlinear_selector.py:121: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_multifront_v5_4_2_runtime_parity_v12.py::test_authoritative_v5_4_2_transaction_and_runtime_parity
+FAILED tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision
+FAILED tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_published_kinetic_k_figures_are_not_rcurves
+FAILED tests/test_pf_current_source_branching_corrected_v5_2_result.py::test_committed_v5_2_result_packet_hashes_and_fail_closed_decision
+FAILED tests/test_pf_current_source_branching_v5_2_1_decision.py::test_superseding_decision_separates_terminal_and_morphology_axes
+FAILED tests/test_pf_current_source_branching_v5_2_1_decision.py::test_coverage_failure_and_terminal_topology_bounds
+FAILED tests/test_pf_current_source_branching_v5_2_1_decision.py::test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic
+FAILED tests/test_pf_general_multifront_v6_1_1_products.py::test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound
+FAILED tests/test_pf_general_multifront_v6_1_1_products.py::test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim
+FAILED tests/test_pf_general_multifront_v6_1_1_products.py::test_prefix_and_full_terminal_parity_are_separate_and_pass
+FAILED tests/test_pf_general_multifront_v6_1_1_products.py::test_exact_compact_archive_positive_removed_and_modified_verification
+FAILED tests/test_pf_general_multifront_v6_1_1_products.py::test_report_preserves_permanent_execution_boundary
+FAILED tests/test_pf_general_multifront_v6_1_products.py::test_v6_source_patch_and_snapshots_are_commit_bound
+FAILED tests/test_pf_general_multifront_v6_1_products.py::test_call_graph_scheduler_handoff_and_multiowner_products_pass
+FAILED tests/test_pf_general_multifront_v6_1_products.py::test_checkpoint_runtime_parity_and_no_solve_preflight_pass
+FAILED tests/test_pf_general_multifront_v6_1_products.py::test_report_preserves_execution_boundary
+FAILED tests/test_pf_general_multifront_v6_2_products.py::test_required_v6_2_products_exist_and_preserve_boundary
+FAILED tests/test_pf_general_multifront_v6_2_products.py::test_source_and_hook_records_are_fail_closed_and_exactly_bound
+FAILED tests/test_pf_general_multifront_v6_2_products.py::test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve
+FAILED tests/test_pf_general_multifront_v6_2_products.py::test_event_and_transaction_records_do_not_claim_physical_execution
+FAILED tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_required_products_and_decisions
+FAILED tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_archive_positive_and_negative_verification
+FAILED tests/test_pf_general_multifront_v6_4_products.py::test_required_v6_4_products_and_fail_closed_decision
+FAILED tests/test_pf_general_multifront_v6_4_products.py::test_v6_4_archive_positive_and_tamper_verification
+FAILED tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader
+FAILED tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id - ...
+FAILED tests/test_v10214_response_model_id.py::test_v10214_response_model_id
+FAILED tests/test_v10215_stage3_schema_and_status.py::test_stage3_status_script_parses_and_reports_missing_run
+FAILED tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly
+FAILED tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances
+FAILED tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap
+31 failed, 998 passed, 5 skipped in 73.02s (0:01:13)

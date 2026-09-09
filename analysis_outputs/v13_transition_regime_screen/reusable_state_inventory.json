@@ -1,0 +1,90 @@
+{
+  "excluded": "Older scalar canonical tables are not complete canonical-event payloads. Historical restored V12 atlas bindings failed the intended-persistent-source audit; no state or threshold substitution.",
+  "no_theta40_trajectory_rerun": true,
+  "qualified_states": [
+    {
+      "case": "Peak_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_physical_companion_qualification/physical_parents/Peak_1000K/parent/event_context.pkl",
+      "role": "first_cleavage_control",
+      "sha256": "3c96b61322185e490415d248d1c8f2b8da8ff59883294f18723b8c0fe7123186",
+      "theta_deg": 40
+    },
+    {
+      "case": "Peak_300K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_physical_companion_qualification/physical_parents/Peak_300K/parent/event_context.pkl",
+      "role": "first_cleavage_control",
+      "sha256": "17ecc0cb63c187135b0ee633af9af3b7eb09698c02cc05fce03cd7d38f2e7b5d",
+      "theta_deg": 40
+    },
+    {
+      "case": "weakT_300K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_physical_companion_qualification/physical_parents/weakT_300K/parent/event_context.pkl",
+      "role": "first_cleavage_control",
+      "sha256": "f3c49c8c21518d88f8dd91f197604f53810408e625ce0125b06f3840942ba35c",
+      "theta_deg": 40
+    },
+    {
+      "case": "weakT_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_physical_companion_qualification/physical_parents/weakT_1000K/parent/event_context.pkl",
+      "role": "first_cleavage_control",
+      "sha256": "212eb32f7b81c5a7616f19e59de5e708a1c8a851a017e1eb8433f753d3ded4c3",
+      "theta_deg": 40
+    },
+    {
+      "case": "Peak_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_clock_and_pair_mechanism/later_parents/Peak_1000K/events/event00002/parent/event_context.pkl",
+      "role": "later_sparse_control",
+      "sha256": "84f498cba793c91f1825d4d62f4d22b21b1385315741e1fa82354adba4df986c",
+      "theta_deg": 40
+    },
+    {
+      "case": "Peak_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_clock_and_pair_mechanism/later_parents/Peak_1000K/events/event00029/parent/event_context.pkl",
+      "role": "later_sparse_control",
+      "sha256": "315f49a3643b906216307ce269ad9e6fd6195474266e0319603d7e26fa8bd97d",
+      "theta_deg": 40
+    },
+    {
+      "case": "Peak_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_clock_and_pair_mechanism/later_parents/Peak_1000K/events/event00008/parent/event_context.pkl",
+      "role": "later_sparse_control",
+      "sha256": "b2982e7074096b59fc5c3633a4811187dae81e76e054b9064225ca54ef747b68",
+      "theta_deg": 40
+    },
+    {
+      "case": "Peak_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_clock_and_pair_mechanism/later_parents/Peak_1000K/events/event00015/parent/event_context.pkl",
+      "role": "later_sparse_control",
+      "sha256": "ab533e712aa2e2dcfab9905f6d629ff18f65b143c602d56aa39f71d2c41035a3",
+      "theta_deg": 40
+    },
+    {
+      "case": "weakT_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_clock_and_pair_mechanism/later_parents/weakT_1000K/events/event00002/parent/event_context.pkl",
+      "role": "later_sparse_control",
+      "sha256": "3cecfdc6e6ee456f64dd7a16f00d4a329961d0d24fad6aba9208dbc3657976a9",
+      "theta_deg": 40
+    },
+    {
+      "case": "weakT_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_clock_and_pair_mechanism/later_parents/weakT_1000K/events/event00029/parent/event_context.pkl",
+      "role": "later_sparse_control",
+      "sha256": "f9a8596030bfcb188c6bf2cb59f5dee5e427b67901f6e7785cdf8d29ae465593",
+      "theta_deg": 40
+    },
+    {
+      "case": "weakT_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_clock_and_pair_mechanism/later_parents/weakT_1000K/events/event00008/parent/event_context.pkl",
+      "role": "later_sparse_control",
+      "sha256": "f1984ce58cb2867637610c842a3b301691f7999642ea5f9d50b7f359b934cd1e",
+      "theta_deg": 40
+    },
+    {
+      "case": "weakT_1000K",
+      "context": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_clock_and_pair_mechanism/later_parents/weakT_1000K/events/event00015/parent/event_context.pkl",
+      "role": "later_sparse_control",
+      "sha256": "7ac9e8840a752f9d078e7759252c1bffdfd03b59f3fbfdc274a3a95d27b99afe",
+      "theta_deg": 40
+    }
+  ]
+}

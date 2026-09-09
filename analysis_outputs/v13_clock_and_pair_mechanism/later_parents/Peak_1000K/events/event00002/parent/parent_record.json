@@ -1,0 +1,36 @@
+{
+  "accepted_endpoint_s": 3124.8000032734053,
+  "accepted_event_ids": [
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001"
+  ],
+  "accepted_opening_m": 7.440000007793785e-05,
+  "accepted_process_sha256": "1f320af1598dacb25050d2eebe41a0404ea7bcf2017307535d999ee9261fc0fb",
+  "accepted_single_checkpoint_sha256": "60a9ca0fe60bd7b1a3b718a9c36741fed188e1e6232eeed654ce305b51340cc4",
+  "branching_enabled": false,
+  "clean_history": true,
+  "event_context_sha256": "84f498cba793c91f1825d4d62f4d22b21b1385315741e1fa82354adba4df986c",
+  "event_id": "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001",
+  "event_ordinal": 1,
+  "forward_extension_um": 7.044160264027631,
+  "fresh_initialization": false,
+  "installed_bindings": {
+    "engine": {},
+    "mpz": {
+      "_emit": "arrhenius_fracture.persistent_site_source_v10221._persistent_emit",
+      "_persistent_base_diagnostics": "arrhenius_fracture.signed_burgers_shared_v1025._signed_diagnostics",
+      "active_K_shielding": "arrhenius_fracture.signed_burgers_shared_v1025._active_K",
+      "advance": "arrhenius_fracture.persistent_site_source_v10221._persistent_advance",
+      "diagnostics": "arrhenius_fracture.persistent_site_source_v10221._persistent_diagnostics",
+      "evolve": "arrhenius_fracture.signed_burgers_shared_v1025._signed_evolve_scalar",
+      "shielding_K": "arrhenius_fracture.signed_burgers_shared_v1025._total_K",
+      "wake_K_shielding": "arrhenius_fracture.signed_burgers_shared_v1025._wake_K"
+    }
+  },
+  "milestones_reached_um": [],
+  "pre_cleavage_checkpoint_sha256": "776272a1bf867e1e1279603be5b498f6929ad700b4c1462be74a281c4cafb1bf",
+  "raw_first_passage_s": 3124.8000032224795,
+  "schema": "v13.later-clean-parent/1",
+  "source_first_parent_checkpoint_sha256": "5c99b31db5335aa0c9207734a4acdcbfd3bef6cc963e4ececae12e975b487f5c",
+  "winning_candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300"
+}

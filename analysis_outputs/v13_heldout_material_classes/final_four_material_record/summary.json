@@ -1,0 +1,610 @@
+{
+  "accepted_transition_record_commit": "b2e0e2d85e048553ad2593d895a98974356213e2",
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "experimental_calibration": false,
+  "frozen_physics_commit": "35f4a03c622112cd5bc7cf9bc08c5b7fe2387e46",
+  "groups": [
+    {
+      "branches": 8,
+      "cases": 8,
+      "companion_saturated_births": 7,
+      "completed_nonbranching": 0,
+      "early_gate_censored": 0,
+      "first_branch_event_range": [
+        2,
+        7
+      ],
+      "first_branch_reach_range_um": [
+        6.123724356957902,
+        26.73633610825177
+      ],
+      "group": "Peak_300K",
+      "held_out_material_class": false,
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 10.953353488403224,
+      "pending_companion_births": 1,
+      "primary_saturated_births": 8,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 6.123724356957902,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 10.953353488403224,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 13.541543939428381,
+          "survival": 0.375
+        },
+        {
+          "at_risk": 3,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 14.488887394335965,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 17.077077845361124,
+          "survival": 0.125
+        },
+        {
+          "at_risk": 1,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 26.73633610825177,
+          "survival": 0.0
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 13.249750122262435,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 26.73633610825177
+    },
+    {
+      "branches": 8,
+      "cases": 8,
+      "companion_saturated_births": 6,
+      "completed_nonbranching": 0,
+      "early_gate_censored": 0,
+      "first_branch_event_range": [
+        2,
+        5
+      ],
+      "first_branch_reach_range_um": [
+        6.123724356957902,
+        24.14814565722661
+      ],
+      "group": "Peak_1000K",
+      "held_out_material_class": false,
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 9.659258262890644,
+      "pending_companion_births": 3,
+      "primary_saturated_births": 8,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 6.123724356957902,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 9.659258262890644,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 10.953353488403224,
+          "survival": 0.375
+        },
+        {
+          "at_risk": 3,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 14.488887394335965,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 15.782982619848545,
+          "survival": 0.125
+        },
+        {
+          "at_risk": 1,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 24.14814565722661,
+          "survival": 0.0
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 12.117416799938928,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 24.14814565722661
+    },
+    {
+      "branches": 4,
+      "cases": 8,
+      "companion_saturated_births": 3,
+      "completed_nonbranching": 4,
+      "early_gate_censored": 0,
+      "first_branch_event_range": [
+        4,
+        13
+      ],
+      "first_branch_reach_range_um": [
+        19.318516525781288,
+        62.78517870878918
+      ],
+      "group": "weakT_300K",
+      "held_out_material_class": false,
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 62.78517870878918,
+      "pending_companion_births": 0,
+      "primary_saturated_births": 4,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 19.318516525781288,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 62.78517870878918,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 4,
+          "events": 0,
+          "extension_um": 75.0,
+          "survival": 0.5
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 58.02592380864263,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 75.0
+    },
+    {
+      "branches": 6,
+      "cases": 8,
+      "companion_saturated_births": 3,
+      "completed_nonbranching": 2,
+      "early_gate_censored": 0,
+      "first_branch_event_range": [
+        4,
+        10
+      ],
+      "first_branch_reach_range_um": [
+        19.318516525781288,
+        48.29629131445322
+      ],
+      "group": "weakT_1000K",
+      "held_out_material_class": false,
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 43.4666621830079,
+      "pending_companion_births": 1,
+      "primary_saturated_births": 6,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 19.318516525781288,
+          "survival": 0.875
+        },
+        {
+          "at_risk": 7,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 38.637033051562575,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 43.4666621830079,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 44.760757408520476,
+          "survival": 0.375
+        },
+        {
+          "at_risk": 3,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 48.29629131445322,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 2,
+          "events": 0,
+          "extension_um": 75.0,
+          "survival": 0.25
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 48.49324033329167,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 75.0
+    },
+    {
+      "branches": 8,
+      "cases": 8,
+      "companion_saturated_births": 6,
+      "completed_nonbranching": 0,
+      "early_gate_censored": 0,
+      "first_branch_event_range": [
+        2,
+        7
+      ],
+      "first_branch_reach_range_um": [
+        6.123724356957902,
+        26.73633610825177
+      ],
+      "group": "DBTT_300K",
+      "held_out_material_class": true,
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 10.953353488403224,
+      "pending_companion_births": 2,
+      "primary_saturated_births": 8,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 6.123724356957902,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 9.659258262890644,
+          "survival": 0.625
+        },
+        {
+          "at_risk": 5,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 10.953353488403224,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 13.541543939428381,
+          "survival": 0.375
+        },
+        {
+          "at_risk": 3,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 14.488887394335965,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 17.077077845361124,
+          "survival": 0.125
+        },
+        {
+          "at_risk": 1,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 26.73633610825177,
+          "survival": 0.0
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 13.087988219073361,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 26.73633610825177
+    },
+    {
+      "branches": 7,
+      "cases": 8,
+      "companion_saturated_births": 7,
+      "completed_nonbranching": 1,
+      "early_gate_censored": 0,
+      "first_branch_event_range": [
+        3,
+        14
+      ],
+      "first_branch_reach_range_um": [
+        14.488887394335965,
+        67.6148078402345
+      ],
+      "group": "DBTT_1000K",
+      "held_out_material_class": true,
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 33.80740392011725,
+      "pending_companion_births": 1,
+      "primary_saturated_births": 7,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 14.488887394335965,
+          "survival": 0.75
+        },
+        {
+          "at_risk": 6,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 24.14814565722661,
+          "survival": 0.625
+        },
+        {
+          "at_risk": 5,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 33.80740392011725,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 2,
+          "extension_um": 48.29629131445322,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 67.6148078402345,
+          "survival": 0.125
+        },
+        {
+          "at_risk": 1,
+          "censored": 1,
+          "events": 0,
+          "extension_um": 75.0,
+          "survival": 0.125
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 40.767589354394595,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 75.0
+    },
+    {
+      "branches": 8,
+      "cases": 8,
+      "companion_saturated_births": 8,
+      "completed_nonbranching": 0,
+      "early_gate_censored": 0,
+      "first_branch_event_range": [
+        3,
+        7
+      ],
+      "first_branch_reach_range_um": [
+        10.953353488403224,
+        26.73633610825177
+      ],
+      "group": "ceramic_300K",
+      "held_out_material_class": true,
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 10.953353488403224,
+      "pending_companion_births": 1,
+      "primary_saturated_births": 8,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 4,
+          "extension_um": 10.953353488403224,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 17.077077845361124,
+          "survival": 0.375
+        },
+        {
+          "at_risk": 3,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 19.318516525781288,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 19.665268296386284,
+          "survival": 0.125
+        },
+        {
+          "at_risk": 1,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 26.73633610825177,
+          "survival": 0.0
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 15.82632659117417,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 26.73633610825177
+    },
+    {
+      "branches": 8,
+      "cases": 8,
+      "companion_saturated_births": 8,
+      "completed_nonbranching": 0,
+      "early_gate_censored": 0,
+      "first_branch_event_range": [
+        3,
+        7
+      ],
+      "first_branch_reach_range_um": [
+        10.953353488403224,
+        26.73633610825177
+      ],
+      "group": "ceramic_1000K",
+      "held_out_material_class": true,
+      "horizon_um": 75.0,
+      "informative_early_censoring_possible": false,
+      "median_definition": "first reach with product-limit survival <= 0.5; not a median conditional on branching",
+      "median_first_branch_reach_um": 10.953353488403224,
+      "pending_companion_births": 1,
+      "primary_saturated_births": 8,
+      "product_limit": [
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 0,
+          "extension_um": 0.0,
+          "survival": 1.0
+        },
+        {
+          "at_risk": 8,
+          "censored": 0,
+          "events": 4,
+          "extension_um": 10.953353488403224,
+          "survival": 0.5
+        },
+        {
+          "at_risk": 4,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 17.077077845361124,
+          "survival": 0.375
+        },
+        {
+          "at_risk": 3,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 19.318516525781288,
+          "survival": 0.25
+        },
+        {
+          "at_risk": 2,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 19.665268296386284,
+          "survival": 0.125
+        },
+        {
+          "at_risk": 1,
+          "censored": 0,
+          "events": 1,
+          "extension_um": 26.73633610825177,
+          "survival": 0.0
+        }
+      ],
+      "restricted_mean_branch_free_reach_um": 15.82632659117417,
+      "restricted_mean_supported_to_75um": true,
+      "support_end_um": 26.73633610825177
+    }
+  ],
+  "heldout_results_used_to_retune": false,
+  "launch_commits": [
+    "7c6ef4080b6fed2e21c3f8d4cf6308186853190d",
+    "fdf43801603cbca0eea60b574afa7f9da4d4f180"
+  ],
+  "merge_gate": "NOT_CLEARED_FULL_SUITE_FAILURES",
+  "new_cases": 32,
+  "predictive_branching_validated": false,
+  "recursive_spacing_tested": false,
+  "report_producer_code_commit": "98f9b5d579e9d593c088bcfc1da9f7ccc8529093",
+  "reused_cases": 32,
+  "simulation_program_stopped": true,
+  "source_physics_changed": false,
+  "status": "COMPLETE"
+}

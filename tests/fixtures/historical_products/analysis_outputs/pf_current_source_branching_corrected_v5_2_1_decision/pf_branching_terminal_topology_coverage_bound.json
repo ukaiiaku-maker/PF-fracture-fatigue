@@ -1,0 +1,42 @@
+{
+  "active_front_count": 2,
+  "active_fronts": {
+    "b0fa22bb892937f8": {
+      "additional_events_possible_while_remaining_strictly_below_target": 63,
+      "angle_deg": -49.99999999999982,
+      "one_event_positive_x_projection_um": 3.2139380484327082,
+      "projected_extension_um": 95.53682286057597,
+      "projected_gap_to_target_um": 204.46317713942403,
+      "tip_x_um": 595.536822860576
+    },
+    "b7d5efe0822562b9": {
+      "additional_events_possible_while_remaining_strictly_below_target": 1,
+      "angle_deg": 39.99999999999992,
+      "one_event_positive_x_projection_um": 3.8302222155948944,
+      "projected_extension_um": 294.5758608588892,
+      "projected_gap_to_target_um": 5.4241391411108,
+      "tip_x_um": 794.5758608588892
+    }
+  },
+  "derivation": "current shared extension + fixed event length * sum of per-active-front events that can occur while that front remains strictly below target",
+  "fixed_topology_event_length_um": 5.0,
+  "long_arm_id": "b7d5efe0822562b9",
+  "maximum_forward_reach_um": 294.5758608588892,
+  "maximum_fronts": 2,
+  "maximum_pre_event_shared_extension_query_um": 740.0000000000014,
+  "measured_endpoint_with_one_quantum_guard_um": 745.0000000000014,
+  "no_new_kernel_calculation_performed": true,
+  "one_below_target_long_arm_event_remains_possible": true,
+  "one_topology_quantum_guard_um": 5.0,
+  "remaining_branch_capacity": 0,
+  "schema": "pf_branching_terminal_topology_coverage_bound_v5_2_1",
+  "scope": "strict bound for the exact V5.2 terminal topology only; not a universal branch-family bound",
+  "shared_process_extension_um": 420.0000000000013,
+  "short_arm_below_target_events_remaining": 63,
+  "short_arm_id": "b0fa22bb892937f8",
+  "target_maximum_forward_reach_um": 300.0,
+  "terminal_step": 806,
+  "these_are_distinct_coordinates": true,
+  "total_additional_events_possible_while_all_tips_remain_below_target": 64,
+  "total_network_new_geometry_um": 425.00000000000125
+}

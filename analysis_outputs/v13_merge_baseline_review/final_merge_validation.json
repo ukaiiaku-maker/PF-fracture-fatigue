@@ -1,0 +1,148 @@
+{
+  "schema": "v13.final-merge-validation/1",
+  "timestamp_utc": "2026-09-09T05:58:30.057236+00:00",
+  "classification": "MERGE_CLEARED_RELATIVE_TO_ACCEPTED_SEVEN_FAILURE_BASELINE",
+  "merge_gate_cleared": true,
+  "automatic_merge": false,
+  "push_performed": false,
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "publication_record": "22cb426415126241fbc7e6806dc4619796e19e20",
+  "frozen_physics_commit": "35f4a03c622112cd5bc7cf9bc08c5b7fe2387e46",
+  "accepted_transition_record": "b2e0e2d85e048553ad2593d895a98974356213e2",
+  "original_final_report_test_producer": "98f9b5d579e9d593c088bcfc1da9f7ccc8529093",
+  "merge_test_producer": "Publication record plus explicit source_file_hashes in full_claim.json; new test-infrastructure source is distinct from frozen physics and original report producer.",
+  "physical_program": {
+    "cases": 64,
+    "first_branches": 57,
+    "completed_nonbranching": 7,
+    "early_gate_censors": 0,
+    "unchanged": true
+  },
+  "criteria": {
+    "all_original_131_v13_tests_pass": true,
+    "all_140_current_v13_tests_pass": true,
+    "historical_product_verified_passes": 2,
+    "historical_product_explicit_unavailable_skips": 22,
+    "only_exact_seven_accepted_legacy_failures": true,
+    "seven_failure_messages_match": true,
+    "seven_repository_traceback_frames_match": true,
+    "sandbox_ps_is_environment_limitation": true,
+    "no_new_failure": true,
+    "all_original_1135_test_nodes_collected": true,
+    "additional_fixture_loader_tests": 9,
+    "full_suite_total_tests": 1144,
+    "compileall_pass": true,
+    "git_diff_check_pass": true,
+    "original_207_assertions_unchanged": true,
+    "all_accepted_hashes_unchanged": true,
+    "all_archive_members_sha256_verified": true
+  },
+  "full_suite": {
+    "status_counts": {
+      "failed": 7,
+      "passed": 1110,
+      "skipped": 27
+    },
+    "returncode": 1,
+    "invocations": 1,
+    "relative_gate_pass": true,
+    "v13_passed": 140,
+    "original_131_v13_pass": true,
+    "start_utc": "2026-09-09T05:49:21.470310+00:00",
+    "end_utc": "2026-09-09T05:54:53.931043+00:00",
+    "new_failure_node_ids": []
+  },
+  "focused_suite": {
+    "status_counts": {
+      "failed": 5,
+      "passed": 144,
+      "skipped": 22
+    },
+    "returncode": 1,
+    "invocations": 1,
+    "relative_gate_pass": false,
+    "v13_passed": 140,
+    "original_131_v13_pass": true,
+    "start_utc": "2026-09-09T05:43:58.881778+00:00",
+    "end_utc": "2026-09-09T05:48:40.952642+00:00",
+    "contextual_gate_pass": true,
+    "strict_seven_failure_match": false,
+    "note": "Two zero-event legacy tests passed in focused collection only. Their full-suite failures reproduce unchanged. Original focused result preserved; context review is separate; no rerun."
+  },
+  "invocations": {
+    "previous_publication_full_suite": 1,
+    "previous_suite_retained_unchanged": true,
+    "this_merge_focused_suite": 1,
+    "this_merge_complete_suite": 1,
+    "no_tests_repeated_for_different_counts": true
+  },
+  "skip_inventory": {
+    "optional_historical_products": 22,
+    "unchanged_preexisting_skips": 5,
+    "total": 27
+  },
+  "immutable_verification": {
+    "accepted_freezes": {
+      "theta40_files": 3620,
+      "transition_files": 17636
+    },
+    "all_archive_member_hashes_verified": true,
+    "archive_members": 32,
+    "heldout_seals": 192,
+    "report_input_hashes": 12913,
+    "source_registry_files": 251,
+    "publication_files": 37,
+    "before_and_after_equal": true,
+    "unchanged_review_archive_sha256": "35234f3e78afcbd6679b523aacf402ea025ad9b6ec48f982140729ddcb83e519",
+    "prior_one_time_suite_review_sha256": "12bdb50e17896e877322fd6f4012b2ea2c3447f4db1b7190d6d9d8bc8d56a4c7",
+    "detailed_publication_hashes_record": "full_result.json: immutable_before and immutable_after",
+    "source_hashes_record": "full_claim.json: source_file_hashes"
+  },
+  "review": {
+    "one_time_full_suite_result_reviewed": true,
+    "final_provenance_reviewed": true,
+    "numerical_assertions_reviewed_by_ast": true,
+    "legacy_failure_messages_and_frames_reviewed": true,
+    "historical_fixture_absence_not_classified_as_v13_regression": true
+  },
+  "prohibited_operations": {
+    "simulations": 0,
+    "continuations": 0,
+    "restarts": 0,
+    "reseeds": 0,
+    "parameter_changes": 0,
+    "physics_changes": 0,
+    "figure_regenerations": 0,
+    "accepted_archive_rewrites": 0,
+    "accepted_data_deletions": 0
+  },
+  "storage": {
+    "data_drive_free_bytes": 196550656,
+    "macintosh_scratch_free_bytes": 2037010432,
+    "scratch_location": "/private/tmp/v13-merge-<phase>-<unique>",
+    "records_location": "Data drive; analysis_outputs/v13_merge_baseline_review",
+    "headroom_basis": "Prior suite retained 9 MiB scratch. New validation required 64 MiB durable record headroom and 512 MiB temporary headroom; no accepted files deleted."
+  },
+  "record_sha256": {
+    "V13_MERGE_BASELINE_REVIEW.md": "11ecf5857b4cafc5888bfd25e1d710a885efabb06e81180ee6d574eaadd65ca5",
+    ".gitattributes": "e4eb2555dc963d3cd2f3822aad3e139e3f84e7dc1a414e30406208e118452428",
+    "focused.log": "ee213c01fa6dc9591daf039a72fed007de3204156dd7fe0acc68e4343dc0aa45",
+    "focused.xml": "6d20ab4b7989b15506e89cc0688a647db1367089be40df140185d95cfec51524",
+    "focused_claim.json": "05e5c1099a57c4a216d4aadb4ab35f88b14bde69315968ecb4a2eb7e5977a82b",
+    "focused_context_review.json": "2eb7c9067bc3a50c84010c1d77b5ba7efed2f3d19846ab0ca03fc0c3d39e1528",
+    "focused_result.json": "1bed64811552dc82aa085272cb006e3e9061537888db4e186856163cd881a802",
+    "focused_runner_source.py": "1d877d16a40563f5380e2693b648425ea3b5f7ca11c6608a7aea310200a3865c",
+    "full.log": "a467e2cd2ada882aa580121212803cd437c931065aa397966232a7f3f002f329",
+    "full.xml": "6dc153b9052aed7e3d5f6ce5b4b5720e4b54cbcbfb15295d858e9dcf34a9c053",
+    "full_claim.json": "3cc4f3e941e0d088bf490c4be98af431da3c739674cacdb72ba151aba03e452c",
+    "full_result.json": "6d7e533129034d2a9d829ba8dba95e100f669ca01ebe99f3750c98259a5c57e6",
+    "historical_product_fixture_manifest.json": "2f02b2e12409f46727d8d55c3228f4469418af70ff74103f2791d59dd6bdf3ec",
+    "v13_merge_failure_comparison.json": "add72fee38ec61d7a29cab3c5e7f30adc37289c1731a8ea79b0ee93ebdbc32b4"
+  },
+  "raw_test_evidence_git_policy": {
+    "files": ["focused.log", "focused.xml", "full.log", "full.xml"],
+    "exact_emitted_bytes_preserved": true,
+    "directory_local_binary_attributes": true,
+    "reason": "Pytest diagnostics contain trailing spaces. Exact raw evidence is not rewritten; ordinary source, JSON and report whitespace checks remain active."
+  }
+}

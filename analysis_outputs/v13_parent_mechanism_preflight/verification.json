@@ -1,0 +1,18 @@
+{
+  "schema": "v13.parent-mechanism-prerequisite-verification/1",
+  "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "tests": {
+    "command": "python -m pytest -q tests/test_v13_parent_mechanism_preflight.py tests/test_directional_competition_transactions_v11.py tests/test_multifront_checkpoint_output_v12.py",
+    "passed": 15,
+    "xfailed": 1,
+    "failed": 0,
+    "expected_failure": "test_persistent_emission_binding_must_survive_accepted_checkpoint_restore",
+    "expected_failure_is_an_unresolved_production_defect": true
+  },
+  "py_compile_passed": true,
+  "git_diff_check_passed": true,
+  "production_module_diff_from_baseline": "empty",
+  "v13_parity_qualified": false,
+  "pf_execution_authorized_by_gate": false,
+  "physical_steps_run": 0
+}

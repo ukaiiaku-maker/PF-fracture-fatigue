@@ -1,0 +1,102 @@
+{
+  "additional_seed_cases": 28,
+  "additional_seed_completed_nonbranching": 4,
+  "additional_seed_observed_branches": 24,
+  "archive_theta40_unchanged_files": 3620,
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "calibrated_probability": false,
+  "cases": 32,
+  "condition": "theta15_rate1x",
+  "decision": "MIXED_FIRST_BRANCH_INCIDENCE_DEMONSTRATED_IN_TESTED_MODEL",
+  "group_summaries": [
+    {
+      "branch_fraction_bounds_if_early_gates": [
+        1.0,
+        1.0
+      ],
+      "branch_fraction_observed": 1.0,
+      "completed_75um_nonbranching": 0,
+      "early_gate_censored": 0,
+      "group": "Peak_300K",
+      "inferential_probability_calibration": false,
+      "observed_branches": 8,
+      "observed_first_branch_event_range": [
+        2,
+        7
+      ],
+      "observed_first_branch_reach_range_um": [
+        6.123724356957902,
+        26.73633610825177
+      ],
+      "seeds": 8
+    },
+    {
+      "branch_fraction_bounds_if_early_gates": [
+        1.0,
+        1.0
+      ],
+      "branch_fraction_observed": 1.0,
+      "completed_75um_nonbranching": 0,
+      "early_gate_censored": 0,
+      "group": "Peak_1000K",
+      "inferential_probability_calibration": false,
+      "observed_branches": 8,
+      "observed_first_branch_event_range": [
+        2,
+        5
+      ],
+      "observed_first_branch_reach_range_um": [
+        6.123724356957902,
+        24.14814565722661
+      ],
+      "seeds": 8
+    },
+    {
+      "branch_fraction_bounds_if_early_gates": [
+        0.5,
+        0.5
+      ],
+      "branch_fraction_observed": 0.5,
+      "completed_75um_nonbranching": 4,
+      "early_gate_censored": 0,
+      "group": "weakT_300K",
+      "inferential_probability_calibration": false,
+      "observed_branches": 4,
+      "observed_first_branch_event_range": [
+        4,
+        13
+      ],
+      "observed_first_branch_reach_range_um": [
+        19.318516525781288,
+        62.78517870878918
+      ],
+      "seeds": 8
+    },
+    {
+      "branch_fraction_bounds_if_early_gates": [
+        0.75,
+        0.75
+      ],
+      "branch_fraction_observed": 0.75,
+      "completed_75um_nonbranching": 2,
+      "early_gate_censored": 0,
+      "group": "weakT_1000K",
+      "inferential_probability_calibration": false,
+      "observed_branches": 6,
+      "observed_first_branch_event_range": [
+        4,
+        10
+      ],
+      "observed_first_branch_reach_range_um": [
+        19.318516525781288,
+        48.29629131445322
+      ],
+      "seeds": 8
+    }
+  ],
+  "material_parameters_changed": false,
+  "observed_branches": 26,
+  "recursive_spacing_validated": false,
+  "report_producer_code_commit": "95c98fc5b75addeba31a84f563d40a683c32f496",
+  "status": "COMPLETE"
+}

@@ -11,7 +11,7 @@ def load(name):
     return json.loads((OUT / name).read_text())
 
 
-def test_required_v6_2_products_exist_and_preserve_boundary():
+def test_required_v6_2_products_exist_and_preserve_boundary(historical_product):
     names = {
         "PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_2.md",
         "pf_general_multifront_v6_2_source_provenance.json",
@@ -31,7 +31,7 @@ def test_required_v6_2_products_exist_and_preserve_boundary():
     assert "generic_N1_N2_PF_reproduction`: `NOT_EXECUTED" in report
 
 
-def test_source_and_hook_records_are_fail_closed_and_exactly_bound():
+def test_source_and_hook_records_are_fail_closed_and_exactly_bound(historical_product):
     source = load("pf_general_multifront_v6_2_source_provenance.json")
     assert source["v6_1_1_record_commit"] == "cfc107ac88b7e8415b8fe6ae951bb9129c5bdef5"
     assert source["v6_1_1_record_tree"] == "46bb3c192915bdb08ba6c93adf0c5b75cdd7a369"
@@ -42,7 +42,7 @@ def test_source_and_hook_records_are_fail_closed_and_exactly_bound():
     assert all(row["status"] == "QUALIFIED" for row in hooks["hooks"].values())
 
 
-def test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve():
+def test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve(historical_product):
     engine = load("pf_general_multifront_engine_restore_v6_2.json")
     assert engine["qualification"] == "PASS"
     assert all(engine["gates"].values())
@@ -53,7 +53,7 @@ def test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve():
     assert not dry["pf_worker_started"] and not dry["fem_worker_started"]
 
 
-def test_event_and_transaction_records_do_not_claim_physical_execution():
+def test_event_and_transaction_records_do_not_claim_physical_execution(historical_product):
     with (OUT / "pf_general_multifront_event_consumption_v6_2.csv").open() as stream:
         rows = list(csv.DictReader(stream))
     assert {row["sentinel"] for row in rows} >= {

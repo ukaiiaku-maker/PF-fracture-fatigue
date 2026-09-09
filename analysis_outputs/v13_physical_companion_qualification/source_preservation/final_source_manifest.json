@@ -1,0 +1,16 @@
+{
+  "schema": "v13.physical-source-preservation/1",
+  "physical_source_commit": "658ebdc80819618be6444bef0b26ea20a61a6beb",
+  "companion_mechanics_producer_code_commit": "ef149bba25eec594055594f5705f22507ebfa86b",
+  "incremental_bundle": "v13_physical_658ebdc.incremental.bundle",
+  "incremental_bundle_sha256": "76f174d51f8dd19e8f0df3e7ade6da76a80bf46eef1bc945754f259d5a8602fb",
+  "prerequisite_commit": "55955722db40ef65c43d2f1c08357ad8f77b82fa",
+  "complete_prerequisite_bundle": "v13_initial_5595572.bundle",
+  "complete_prerequisite_bundle_sha256": "a5f9f1a29f2883fb2bfe5219e277f73fd3d0280862899c70b41d44d2bd58cc20",
+  "restoration_producer": "c359ee015c606a0378a2bad548faa58f407bef10",
+  "conditional_mark_producer": "23e55e0872af251e46be6b0078a786b72fa3f03f",
+  "verification": "git bundle verify PASS; complete initial history plus dependent physical-source increment",
+  "parent_source_commits": "Each physical_parents/<case>/launch.json records its actual launch source; only diagnostic/capture/reporting code differs across launches.",
+  "durable_volume": "/Volumes/Data",
+  "remote_push_performed": false
+}

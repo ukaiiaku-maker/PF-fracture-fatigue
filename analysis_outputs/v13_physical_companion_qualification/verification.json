@@ -1,0 +1,81 @@
+{
+  "compileall": "PASS",
+  "compileall_exit_code": 0,
+  "diff_check_exit_code": 0,
+  "focused_tests": {
+    "exit_code": 0,
+    "failed": 0,
+    "modules": [
+      "test_v13_clean_parent_capture",
+      "test_v13_physical_companion_contract",
+      "test_topology_transaction_v11",
+      "test_directional_competition_transactions_v11",
+      "test_multifront_checkpoint_output_v12"
+    ],
+    "passed": 35,
+    "stderr": "",
+    "stdout": "...................................                                      [100%]\n35 passed in 0.94s\n"
+  },
+  "full_suite_repeated": false,
+  "git_diff_check": "PASS",
+  "producer_code_commit": "658ebdc80819618be6444bef0b26ea20a61a6beb",
+  "record_integrity": [
+    {
+      "analytic_grid_rows": 637,
+      "case": "Peak_300K",
+      "companion_record_sha256": "79bbbedce6b09ebd5ac4b7e503113a975e43d07a796ada8eedb77f743bb4094b",
+      "parent_record_sha256": "90dd6d648367fa1f856885f63d4470e8667776576fca78f9f315fbbd6e839e59",
+      "status": "PASS"
+    },
+    {
+      "analytic_grid_rows": 637,
+      "case": "Peak_1000K",
+      "companion_record_sha256": "e243913ae7d3698254ff1c276b8655d440bfe503f6d2790aadb26f8a35fd6dd3",
+      "parent_record_sha256": "3476154a352e7d751dc426f8f2c54b76f44d3847644a2ca871e86a995204fa75",
+      "status": "PASS"
+    },
+    {
+      "analytic_grid_rows": 637,
+      "case": "DBTT_300K",
+      "companion_record_sha256": "53a7a6db10086abba67ecd6c9121f264e527486a91800e3421b59f33ccd1b521",
+      "parent_record_sha256": "01c9b627590f5e0bc174be5c3740bc8d79e3ef1eac00026f46d278f2b88fc86e",
+      "status": "PASS"
+    },
+    {
+      "analytic_grid_rows": 637,
+      "case": "DBTT_1000K",
+      "companion_record_sha256": "2d75b82469a043e925a0ea3f5eb372f3adb0cc9a2674363cc848fa6bb7e3561e",
+      "parent_record_sha256": "33ce002691293a37190f7ff0c7819813c00649cadea30993589adbcb56871434",
+      "status": "PASS"
+    },
+    {
+      "analytic_grid_rows": 637,
+      "case": "weakT_300K",
+      "companion_record_sha256": "62bd6d43ea3724d47fd97e8a2610dd0b05443a156a21956c428be7cc139747f6",
+      "parent_record_sha256": "db196189c48c3457bb3e60e8bcf15a3e928d122d3bb930797795bf84dff87302",
+      "status": "PASS"
+    },
+    {
+      "analytic_grid_rows": 637,
+      "case": "weakT_1000K",
+      "companion_record_sha256": "415ecbc900527af25894800170042e6843ca215a88660437d731477a50c95c33",
+      "parent_record_sha256": "49d59c0ee2c31ab67754bb02967a967deaf9595066eff91602244590178815cb",
+      "status": "PASS"
+    },
+    {
+      "analytic_grid_rows": 637,
+      "case": "ceramic_300K",
+      "companion_record_sha256": "4dc0689fe8e70e745dc53ac8c53e22e1dfa5f994aa4fe3e4ed983fe137b89808",
+      "parent_record_sha256": "a095e543444ddd414e7fa21653f56dddcf46f26021a762491ee68ea751e22e3a",
+      "status": "PASS"
+    },
+    {
+      "analytic_grid_rows": 637,
+      "case": "ceramic_1000K",
+      "companion_record_sha256": "8a2cf5dc3bb40641561ea71c01afc25e877a27612f1500eea55c3d7a9e5dfb1f",
+      "parent_record_sha256": "4c256b3e7b371241245e92ba94f30d39bcd79677000d5e1e0035d873dbe16ddc",
+      "status": "PASS"
+    }
+  ],
+  "sampler_only_Monte_Carlo_repeated": false
+}

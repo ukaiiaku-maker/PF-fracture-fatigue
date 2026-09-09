@@ -1,0 +1,60 @@
+{
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "cases": [
+    "Peak_300K_seed3621",
+    "Peak_1000K_seed3621",
+    "weakT_300K_seed3621",
+    "weakT_1000K_seed3621",
+    "Peak_300K_seed3622",
+    "Peak_1000K_seed3622",
+    "weakT_300K_seed3622",
+    "weakT_1000K_seed3622",
+    "Peak_300K_seed3623",
+    "Peak_1000K_seed3623",
+    "weakT_300K_seed3623",
+    "weakT_1000K_seed3623",
+    "Peak_300K_seed3624",
+    "Peak_1000K_seed3624",
+    "weakT_300K_seed3624",
+    "weakT_1000K_seed3624"
+  ],
+  "common_random_numbers": true,
+  "daughter_growth_after_birth_um": 20.0,
+  "daughter_total_length_stop_um": 25.0,
+  "default_off_option": "--v13-inherited-primary-race",
+  "family": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/analysis_outputs/pf_current_source_general_multifront_v12_1000um_cap6/theta40_signed_kernel_append_only_1600um/family.json",
+  "family_sha256": "f30cc083e2f284bb043170ea69f5501cf2aeca43dd71f3e477750c995f4af62e",
+  "frozen_summary_sha256": "9a6bd7dcb4dd235fa7dbfe61f38df7e7cf5516778806ddcbf98667e46bd90c89",
+  "incidence_is_not_calibrated_probability": true,
+  "materials": [
+    "Peak",
+    "weakT"
+  ],
+  "maximum_accepted_intervals": 2000,
+  "maximum_workers": 2,
+  "mechanical_configuration_sha256": "3ccc690c103f96da8eca7ee4bc67272653bd888b402bb0878c1b1f6eb9dee6f9",
+  "new_material_parameters": false,
+  "parent_maximum_fronts": 1,
+  "physical_event_length_um": 5.0,
+  "post_birth_maximum_fronts": 2,
+  "reuse_of_archived_different_source_trajectories": false,
+  "schema": "v13.primary-race-short-ensemble/1",
+  "seed_screen": false,
+  "seeds": [
+    3621,
+    3622,
+    3623,
+    3624
+  ],
+  "target_forward_um": 125.0,
+  "temperatures_K": [
+    300,
+    1000
+  ],
+  "terminal_rules": [
+    "first branch plus 20 um daughter growth",
+    "125 um maximum forward reach",
+    "existing legitimate numerical/model-domain gate"
+  ],
+  "verification_sha256": "9c01e18f52d7c8d88c3c10a3225f8b4b8a0aef8adf8a9049598f14b7982c811b"
+}

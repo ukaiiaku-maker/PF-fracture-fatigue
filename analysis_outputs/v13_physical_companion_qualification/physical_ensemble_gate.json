@@ -1,0 +1,13 @@
+{
+  "barrier_identifiability": "at zero junction separation, only Q_junction+Q_overlap is identifiable",
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "physical_ensemble_launched": false,
+  "process_state_sensitivity_demonstrated": false,
+  "reasons": [
+    "no_stochastic_companion_selected_at_the_preregistered_reference_mark",
+    "no_common_robust_nondegenerate_material_and_temperature_sensitive_grid_region",
+    "defensible_process_state_rate_sensitivity_not_demonstrated"
+  ],
+  "robust_regions": [],
+  "status": "NOT_PASSED_NO_ENSEMBLE"
+}

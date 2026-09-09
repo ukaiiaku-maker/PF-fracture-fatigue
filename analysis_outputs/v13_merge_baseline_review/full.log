@@ -1,0 +1,219 @@
+........................................................................ [  6%]
+........................................................................ [ 12%]
+........................................................................ [ 18%]
+............................s........................................... [ 25%]
+.....................................ss................................. [ 31%]
+.................................................s...ssssssssssssssssss. [ 37%]
+..........F.........ssss................................................ [ 44%]
+......................................F................F................ [ 50%]
+............F........................................................... [ 56%]
+........................................................................ [ 62%]
+.........................FF............................................. [ 69%]
+......................F................................................. [ 75%]
+........................................................................ [ 81%]
+..........................s............................................. [ 88%]
+........................................................................ [ 94%]
+................................................................         [100%]
+=================================== FAILURES ===================================
+______ test_review_builder_emits_artifact_consumable_by_production_loader ______
+
+tmp_path = PosixPath('/private/tmp/v13-merge-full-zar6_8vo/pytest-of-shen/pytest-0/test_review_builder_emits_arti0')
+
+    def test_review_builder_emits_artifact_consumable_by_production_loader(tmp_path):
+        responses = []
+        index = 0
+        for opening in (0.0, 0.5, 1.0):
+            for extension in (0.0, 1.0e-5):
+                path = tmp_path / f"S{index:02d}.csv"
+                _write_state(
+                    path,
+                    state_id=f"S{index:02d}",
+                    opening=opening,
+                    extension=extension,
+                    observed_r=1.0 + 0.2 * index,
+                )
+                responses.append(path)
+                index += 1
+    
+        normalization = tmp_path / "normalization.json"
+        normalization.write_text(
+            json.dumps(
+                {
+                    "schema": NORM_SCHEMA,
+                    "normalization_source": "process_zone_geometry_and_line_spacing",
+                    "activation_to_line_content_by_system": [1.0],
+                    "source_capacity_bounds_per_system": [[1.0, 10.0]],
+                    "fitted_to_toughness_or_fatigue": False,
+                    "shielding_attenuation_factor_fitted": False,
+                }
+            )
+        )
+        out = tmp_path / "atlas.json"
+        command = [
+            sys.executable,
+            "scripts/build_v10_2_12_real_signed_atlas.py",
+            "--normalization",
+            str(normalization),
+            "--out",
+            str(out),
+        ]
+        for path in responses:
+            command.extend(["--responses", str(path)])
+        completed = subprocess.run(
+            command,
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+>       assert completed.returncode == 0, completed.stderr + completed.stdout
+E       AssertionError: /private/tmp/v13-merge-full-zar6_8vo/pytest-of-shen/pytest-0/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\n").returncode
+
+tests/test_real_signed_builder_v10212.py:127: AssertionError
+_________________________ test_v10214_capture_model_id _________________________
+
+    def test_v10214_capture_model_id():
+>       assert MODEL_ID == "v10.2.14_live_production_fem_state_capture"
+E       AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'
+E         
+E         - v10.2.14_live_production_fem_state_capture
+E         + v10.2.27_live_production_state_capture_with_frozen_measurement_clone
+
+tests/test_v10214_capture_model_id.py:5: AssertionError
+________________________ test_v10214_response_model_id _________________________
+
+    def test_v10214_response_model_id():
+>       assert MODEL_ID == "v10.2.14_exact_endpoint_active_signed_spatial_station_responses"
+E       AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'
+E         
+E         - v10.2.14_exact_endpoint_active_signed_spatial_station_responses
+E         ?       ^^
+E         + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses
+E         ?       ^^               ++++++++++++++
+
+tests/test_v10214_response_model_id.py:5: AssertionError
+___________ test_stage3_status_script_parses_and_reports_missing_run ___________
+
+tmp_path = PosixPath('/private/tmp/v13-merge-full-zar6_8vo/pytest-of-shen/pytest-0/test_stage3_status_script_pars0')
+
+    def test_stage3_status_script_parses_and_reports_missing_run(tmp_path: Path):
+        script = Path("scripts/status_v10_2_15_stage3.py")
+        ast.parse(script.read_text())
+        completed = subprocess.run(
+            [sys.executable, str(script), "--outroot", str(tmp_path / "absent"), "--tail", "0"],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        assert completed.returncode == 1
+>       assert "state:       not_running" in completed.stdout
+E       AssertionError: assert 'state:       not_running' in ''
+E        +  where '' = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').stdout
+
+tests/test_v10215_stage3_schema_and_status.py:35: AssertionError
+________________ test_zero_event_summary_is_recorded_explicitly ________________
+
+tmp_path = PosixPath('/private/tmp/v13-merge-full-zar6_8vo/pytest-of-shen/pytest-0/test_zero_event_summary_is_rec0')
+
+    def test_zero_event_summary_is_recorded_explicitly(tmp_path):
+        case = tmp_path / "case"
+        _write_case(case, n_advances=0)
+    
+        _rewrite_summary_event_semantics(
+            ["--out", str(case), "--da-phys", "5e-6"]
+        )
+    
+        row = json.loads((case / "summary.json").read_text())[0]
+        assert row["n_geometry_events"] == 0
+        assert row["n_equivalent_checkpoints_exact"] == 0.0
+        assert row["n_equivalent_checkpoints_rounded"] == 0
+        assert row["nominal_checkpoint_length_m"] == pytest.approx(5.0e-6)
+        assert row["geometry_path_length_m"] == 0.0
+        assert row["geometry_projected_extension_m"] == 0.0
+>       assert row["zero_geometry_events_validated_against_zero_advances"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'zero_geometry_events_validated_against_zero_advances'
+
+tests/test_v10_2_27_zero_event_summary.py:36: KeyError
+_________________ test_empty_geometry_rejects_nonzero_advances _________________
+
+tmp_path = PosixPath('/private/tmp/v13-merge-full-zar6_8vo/pytest-of-shen/pytest-0/test_empty_geometry_rejects_no0')
+
+    def test_empty_geometry_rejects_nonzero_advances(tmp_path):
+        case = tmp_path / "case"
+        _write_case(case, n_advances=1)
+    
+>       with pytest.raises(RuntimeError, match="inconsistent"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/test_v10_2_27_zero_event_summary.py:43: Failed
+____________ test_delegate_reenters_selector_under_global_cycle_cap ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x16e07e5d0>
+
+    def test_delegate_reenters_selector_under_global_cycle_cap(monkeypatch):
+        class Front:
+            persistent_site_cyclic_v10229 = True
+    
+            def preview_cycle_waveform(self, ctrl, waveform, temperature):
+                return prediction()
+    
+            def cycle_step_waveform(
+                self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None
+            ):
+                assert force_cycles is None
+                assert requested_cycles == 123.0
+                assert ctrl.cfg.max_block_cycles == 123.0
+                pred = self.preview_cycle_waveform(ctrl, waveform, temperature)
+                return ctrl.choose_block_cycles_diagnostic(pred, requested_cycles)
+    
+        monkeypatch.setattr(
+            delegate,
+            "select_nonlinear_block",
+            lambda ctrl, pred, requested, linear: {
+                "cycles": requested,
+                "limiter": "nonlinear_test",
+                "unlimited_cycles": requested,
+                "candidate_limits": {"nonlinear_selected_cycles": requested},
+            },
+        )
+        ctrl = controller(max_block=1.0e6)
+        original_max = ctrl.cfg.max_block_cycles
+        delegate.install_engine_native_cycle_preview()
+        try:
+>           out = ctrl.cycle_step_front(
+                Front(), SimpleNamespace(), 300.0,
+                requested_cycles=123.0, force_cycles=123.0,
+            )
+
+tests/test_v10_2_29_vhcf_nonlinear_selector.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+arrhenius_fracture/fatigue_controller_delegate_v10229.py:68: in delegated_step
+    return front.cycle_step_waveform(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_v10_2_29_vhcf_nonlinear_selector.test_delegate_reenters_selector_under_global_cycle_cap.<locals>.Front object at 0x16e07f230>
+ctrl = <arrhenius_fracture.fatigue_v1.FatigueCycleHazardController object at 0x16e07c7a0>
+waveform = namespace(), temperature = 300.0, requested_cycles = 123.0
+force_cycles = 123.0
+
+    def cycle_step_waveform(
+        self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None
+    ):
+>       assert force_cycles is None
+E       assert 123.0 is None
+
+tests/test_v10_2_29_vhcf_nonlinear_selector.py:121: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader
+FAILED tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id - ...
+FAILED tests/test_v10214_response_model_id.py::test_v10214_response_model_id
+FAILED tests/test_v10215_stage3_schema_and_status.py::test_stage3_status_script_parses_and_reports_missing_run
+FAILED tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly
+FAILED tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances
+FAILED tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap
+7 failed, 1110 passed, 27 skipped in 322.42s (0:05:22)

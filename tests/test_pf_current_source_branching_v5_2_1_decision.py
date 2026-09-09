@@ -30,7 +30,7 @@ def test_strict_below_target_event_semantics():
     assert strict_below_target_events(0.0, 3.0) == 0
 
 
-def test_superseding_decision_separates_terminal_and_morphology_axes():
+def test_superseding_decision_separates_terminal_and_morphology_axes(historical_product):
     decision = json.loads((OUT / "pf_branching_corrected_v5_2_1_decision.json").read_text())
     assert decision["pair_terminal_result"] == "CORRECTED_THETA40_REPLAY_STOPPED_FAIL_CLOSED_SIGNED_KERNEL_ENVELOPE"
     assert decision["corrected_morphology_capability"] == "CORRECTED_CURRENT_SOURCE_BRANCHING_MORPHOLOGY_CAPABILITY_DEMONSTRATED_BEFORE_ENVELOPE_STOP"
@@ -42,7 +42,7 @@ def test_superseding_decision_separates_terminal_and_morphology_axes():
     assert all("300" not in item["name"] for item in decision["morphology_success_criteria"])
 
 
-def test_coverage_failure_and_terminal_topology_bounds():
+def test_coverage_failure_and_terminal_topology_bounds(historical_product):
     coverage = json.loads((OUT / "pf_branching_signed_kernel_coverage_failure_audit.json").read_text())
     assert coverage["old_planner_reproduction"]["required_um"] == pytest.approx(410.0009075646826)
     assert coverage["old_planner_reproduction"]["measured_endpoint_um"] == pytest.approx(415.0)
@@ -63,7 +63,7 @@ def test_coverage_failure_and_terminal_topology_bounds():
     assert bound["shared_process_extension_um"] != bound["maximum_forward_reach_um"]
 
 
-def test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic(tmp_path):
+def test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic(tmp_path, historical_product):
     old_decision = V5 / "final_two_axis_decision.json"
     assert hashlib.sha256(old_decision.read_bytes()).hexdigest() == "ef517a314f393dab7079d55d20d8949819bfc1e47a02b4dd1213648f05f433f8"
     raw = json.loads((V5 / "raw_tree_freeze_manifest.json").read_text())
@@ -80,7 +80,7 @@ def test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic(tmp_path):
             "--out",
             str(tmp_path),
         ],
-        cwd=ROOT,
+        cwd=historical_product.root,
         check=True,
         capture_output=True,
         text=True,

@@ -1,0 +1,396 @@
+{
+  "schema": "v13.merge-failure-comparison/1",
+  "classification": "MERGE_CLEARED_RELATIVE_TO_ACCEPTED_SEVEN_FAILURE_BASELINE",
+  "prior_publication_record": "22cb426415126241fbc7e6806dc4619796e19e20",
+  "prior_one_time_suite": {
+    "sha256": "12bdb50e17896e877322fd6f4012b2ea2c3447f4db1b7190d6d9d8bc8d56a4c7",
+    "status_counts": {
+      "passed": 1099,
+      "skipped": 5,
+      "failed": 31
+    },
+    "invocations": 1,
+    "retained_unchanged": true
+  },
+  "accepted_node_id_baseline": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_validation_v6_1_1.json",
+    "sha256": "9f057b4894da948da6a04279301ceccbfc6941045b7b2b71c79a28fa7d33e2c1"
+  },
+  "signature_baseline": "Existing full_suite_review.json, SHA-256 above. Failure messages and repository traceback frames compared, not merely counts.",
+  "normalization": "Only volatile pytest paths ending /S00.audit.json, repr backslash escapes, and whitespace are normalized in messages. Raw messages and exact repository traceback frames are retained.",
+  "classification_of_original_31": {
+    "missing_historical_product_fixtures": 24,
+    "exact_accepted_legacy_failures": 7,
+    "scientific_or_v13_source_regressions_from_missing_files": 0,
+    "sandbox_ps_environment_limitations_within_seven": 1
+  },
+  "historical_products": [
+    {
+      "allowed": true,
+      "node_id": "tests/test_multifront_v5_4_2_runtime_parity_v12.py::test_authoritative_v5_4_2_transaction_and_runtime_parity",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_multifront_v5_4_2_runtime_parity_v12.py::test_authoritative_v5_4_2_transaction_and_runtime_parity",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_integrated_envelope_v5_4/pf_branching_v5_2_prefix_parity_reference.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_completion_execution_v5_4_2/pf_branching_completion_terminal_audit_v5_4_2.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_published_kinetic_k_figures_are_not_rcurves",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_published_kinetic_k_figures_are_not_rcurves",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_completion_execution_v5_4_2/pf_branching_completion_terminal_audit_v5_4_2.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_current_source_branching_corrected_v5_2_result.py::test_committed_v5_2_result_packet_hashes_and_fail_closed_decision",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_current_source_branching_corrected_v5_2_result.py::test_committed_v5_2_result_packet_hashes_and_fail_closed_decision",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_execution_20260831T190053Z/final_two_axis_decision.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_current_source_branching_v5_2_1_decision.py::test_superseding_decision_separates_terminal_and_morphology_axes",
+      "reason": "",
+      "status": "passed",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_corrected_v5_2_1_decision.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_current_source_branching_v5_2_1_decision.py::test_coverage_failure_and_terminal_topology_bounds",
+      "reason": "",
+      "status": "passed",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_1_decision/pf_branching_signed_kernel_coverage_failure_audit.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_current_source_branching_v5_2_1_decision.py::test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_current_source_branching_v5_2_1_decision.py::test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_branching_corrected_v5_2_execution_20260831T190053Z/final_two_axis_decision.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_1_1_products.py::test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_1_1_products.py::test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_v6_1_1_source_provenance.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_1_1_products.py::test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_1_1_products.py::test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_dynamic_provider_source_audit_v6_1_1.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_1_1_products.py::test_prefix_and_full_terminal_parity_are_separate_and_pass",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_1_1_products.py::test_prefix_and_full_terminal_parity_are_separate_and_pass",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/pf_general_multifront_v5_2_prefix_parity_v6_1_1.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_1_1_products.py::test_exact_compact_archive_positive_removed_and_modified_verification",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_1_1_products.py::test_exact_compact_archive_positive_removed_and_modified_verification",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/Archive_PF_GENERAL_MULTIFRONT_V6_1_1_COMPLETE.zip'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_1_1_products.py::test_report_preserves_permanent_execution_boundary",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_1_1_products.py::test_report_preserves_permanent_execution_boundary",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1_1/PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1_1.md'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_1_products.py::test_v6_source_patch_and_snapshots_are_commit_bound",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_1_products.py::test_v6_source_patch_and_snapshots_are_commit_bound",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_v6_1_source_provenance.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_1_products.py::test_call_graph_scheduler_handoff_and_multiowner_products_pass",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_1_products.py::test_call_graph_scheduler_handoff_and_multiowner_products_pass",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_production_call_graph_v6_1.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_1_products.py::test_checkpoint_runtime_parity_and_no_solve_preflight_pass",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_1_products.py::test_checkpoint_runtime_parity_and_no_solve_preflight_pass",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/pf_general_multifront_checkpoint_roundtrip_v6_1.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_1_products.py::test_report_preserves_execution_boundary",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_1_products.py::test_report_preserves_execution_boundary",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_1/PF_CURRENT_SOURCE_GENERAL_MULTIFRONT_V6_1.md'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_2_products.py::test_required_v6_2_products_exist_and_preserve_boundary",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_2_products.py::test_required_v6_2_products_exist_and_preserve_boundary",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_2_products.py::test_source_and_hook_records_are_fail_closed_and_exactly_bound",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_2_products.py::test_source_and_hook_records_are_fail_closed_and_exactly_bound",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_v6_2_source_provenance.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_2_products.py::test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_2_products.py::test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_engine_restore_v6_2.json'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_2_products.py::test_event_and_transaction_records_do_not_claim_physical_execution",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_2_products.py::test_event_and_transaction_records_do_not_claim_physical_execution",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_2/pf_general_multifront_event_consumption_v6_2.csv'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_required_products_and_decisions",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_required_products_and_decisions",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_3'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_archive_positive_and_negative_verification",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_archive_positive_and_negative_verification",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_3/Archive_PF_GENERAL_MULTIFRONT_V6_3_COMPLETE.zip'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_4_products.py::test_required_v6_4_products_and_fail_closed_decision",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_4_products.py::test_required_v6_4_products_and_fail_closed_decision",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_4'"
+    },
+    {
+      "allowed": true,
+      "node_id": "tests/test_pf_general_multifront_v6_4_products.py::test_v6_4_archive_positive_and_tamper_verification",
+      "reason": "HISTORICAL_PRODUCT_FIXTURE_UNAVAILABLE: optional verified external V5/V6 product package is intentionally not installed; tests/test_pf_general_multifront_v6_4_products.py::test_v6_4_archive_positive_and_tamper_verification",
+      "status": "skipped",
+      "original_category": "MISSING_HISTORICAL_PRODUCT_FIXTURE",
+      "original_message": "FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/pf_current_source_general_multifront_v6_4/Archive_PF_GENERAL_MULTIFRONT_V6_4_COMPLETE.zip'"
+    }
+  ],
+  "legacy_failures": [
+    {
+      "baseline_message": "AssertionError: /Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_theta0_pf_parity_claude/.campaign_execution/PF-fracture-fatigue_v12_field_atlas/analysis_outputs/v13_heldout_material_classes/publication_test_temp/pytest-of-shen/pytest-0/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\n  \nassert 1 == 0\n +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\\n\").returncode",
+      "baseline_signature": "AssertionError: <PYTEST_TMP>/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses'] assert 1 == 0 + where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']n\").returncode",
+      "category": "INHERITED_BASELINE_FAILURE",
+      "current_message": "AssertionError: /private/tmp/v13-merge-full-zar6_8vo/pytest-of-shen/pytest-0/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\n  \nassert 1 == 0\n +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\\n\").returncode",
+      "current_signature": "AssertionError: <PYTEST_TMP>/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses'] assert 1 == 0 + where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']n\").returncode",
+      "match": true,
+      "node_id": "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader",
+      "baseline_frames": [
+        "tests/test_real_signed_builder_v10212.py:127: AssertionError"
+      ],
+      "current_frames": [
+        "tests/test_real_signed_builder_v10212.py:127: AssertionError"
+      ],
+      "traceback_frames_match": true
+    },
+    {
+      "baseline_message": "AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'\n  \n  - v10.2.14_live_production_fem_state_capture\n  + v10.2.27_live_production_state_capture_with_frozen_measurement_clone",
+      "baseline_signature": "AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture' - v10.2.14_live_production_fem_state_capture + v10.2.27_live_production_state_capture_with_frozen_measurement_clone",
+      "category": "INHERITED_BASELINE_FAILURE",
+      "current_message": "AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'\n  \n  - v10.2.14_live_production_fem_state_capture\n  + v10.2.27_live_production_state_capture_with_frozen_measurement_clone",
+      "current_signature": "AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture' - v10.2.14_live_production_fem_state_capture + v10.2.27_live_production_state_capture_with_frozen_measurement_clone",
+      "match": true,
+      "node_id": "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id",
+      "baseline_frames": [
+        "tests/test_v10214_capture_model_id.py:5: AssertionError"
+      ],
+      "current_frames": [
+        "tests/test_v10214_capture_model_id.py:5: AssertionError"
+      ],
+      "traceback_frames_match": true
+    },
+    {
+      "baseline_message": "AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'\n  \n  - v10.2.14_exact_endpoint_active_signed_spatial_station_responses\n  ?       ^^\n  + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses\n  ?       ^^               ++++++++++++++",
+      "baseline_signature": "AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses' - v10.2.14_exact_endpoint_active_signed_spatial_station_responses ? ^^ + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses ? ^^ ++++++++++++++",
+      "category": "INHERITED_BASELINE_FAILURE",
+      "current_message": "AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'\n  \n  - v10.2.14_exact_endpoint_active_signed_spatial_station_responses\n  ?       ^^\n  + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses\n  ?       ^^               ++++++++++++++",
+      "current_signature": "AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses' - v10.2.14_exact_endpoint_active_signed_spatial_station_responses ? ^^ + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses ? ^^ ++++++++++++++",
+      "match": true,
+      "node_id": "tests/test_v10214_response_model_id.py::test_v10214_response_model_id",
+      "baseline_frames": [
+        "tests/test_v10214_response_model_id.py:5: AssertionError"
+      ],
+      "current_frames": [
+        "tests/test_v10214_response_model_id.py:5: AssertionError"
+      ],
+      "traceback_frames_match": true
+    },
+    {
+      "baseline_message": "AssertionError: assert 'state:       not_running' in ''\n +  where '' = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip... child_exception_type(errno_num, err_msg, err_filename)\\nPermissionError: [Errno 1] Operation not permitted: \\'ps\\'\\n').stdout",
+      "baseline_signature": "AssertionError: assert 'state: not_running' in '' + where '' = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip... child_exception_type(errno_num, err_msg, err_filename)nPermissionError: [Errno 1] Operation not permitted: 'ps'n').stdout",
+      "category": "ENVIRONMENT_LIMITATION_SANDBOX_PS",
+      "current_message": "AssertionError: assert 'state:       not_running' in ''\n +  where '' = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip... child_exception_type(errno_num, err_msg, err_filename)\\nPermissionError: [Errno 1] Operation not permitted: \\'ps\\'\\n').stdout",
+      "current_signature": "AssertionError: assert 'state: not_running' in '' + where '' = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip... child_exception_type(errno_num, err_msg, err_filename)nPermissionError: [Errno 1] Operation not permitted: 'ps'n').stdout",
+      "match": true,
+      "node_id": "tests/test_v10215_stage3_schema_and_status.py::test_stage3_status_script_parses_and_reports_missing_run",
+      "baseline_frames": [
+        "tests/test_v10215_stage3_schema_and_status.py:35: AssertionError"
+      ],
+      "current_frames": [
+        "tests/test_v10215_stage3_schema_and_status.py:35: AssertionError"
+      ],
+      "traceback_frames_match": true
+    },
+    {
+      "baseline_message": "KeyError: 'zero_geometry_events_validated_against_zero_advances'",
+      "baseline_signature": "KeyError: 'zero_geometry_events_validated_against_zero_advances'",
+      "category": "INHERITED_BASELINE_FAILURE",
+      "current_message": "KeyError: 'zero_geometry_events_validated_against_zero_advances'",
+      "current_signature": "KeyError: 'zero_geometry_events_validated_against_zero_advances'",
+      "match": true,
+      "node_id": "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly",
+      "baseline_frames": [
+        "tests/test_v10_2_27_zero_event_summary.py:36: KeyError"
+      ],
+      "current_frames": [
+        "tests/test_v10_2_27_zero_event_summary.py:36: KeyError"
+      ],
+      "traceback_frames_match": true
+    },
+    {
+      "baseline_message": "Failed: DID NOT RAISE RuntimeError",
+      "baseline_signature": "Failed: DID NOT RAISE RuntimeError",
+      "category": "INHERITED_BASELINE_FAILURE",
+      "current_message": "Failed: DID NOT RAISE RuntimeError",
+      "current_signature": "Failed: DID NOT RAISE RuntimeError",
+      "match": true,
+      "node_id": "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+      "baseline_frames": [
+        "tests/test_v10_2_27_zero_event_summary.py:43: Failed"
+      ],
+      "current_frames": [
+        "tests/test_v10_2_27_zero_event_summary.py:43: Failed"
+      ],
+      "traceback_frames_match": true
+    },
+    {
+      "baseline_message": "assert 123.0 is None",
+      "baseline_signature": "assert 123.0 is None",
+      "category": "INHERITED_BASELINE_FAILURE",
+      "current_message": "assert 123.0 is None",
+      "current_signature": "assert 123.0 is None",
+      "match": true,
+      "node_id": "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap",
+      "baseline_frames": [
+        "tests/test_v10_2_29_vhcf_nonlinear_selector.py:141: ",
+        "arrhenius_fracture/fatigue_controller_delegate_v10229.py:68: in delegated_step",
+        "tests/test_v10_2_29_vhcf_nonlinear_selector.py:121: AssertionError"
+      ],
+      "current_frames": [
+        "tests/test_v10_2_29_vhcf_nonlinear_selector.py:141: ",
+        "arrhenius_fracture/fatigue_controller_delegate_v10229.py:68: in delegated_step",
+        "tests/test_v10_2_29_vhcf_nonlinear_selector.py:121: AssertionError"
+      ],
+      "traceback_frames_match": true
+    }
+  ],
+  "focused_run": {
+    "status_counts": {
+      "failed": 5,
+      "passed": 144,
+      "skipped": 22
+    },
+    "returncode": 1,
+    "invocations": 1,
+    "relative_gate_pass": false,
+    "v13_passed": 140,
+    "original_131_v13_pass": true,
+    "start_utc": "2026-09-09T05:43:58.881778+00:00",
+    "end_utc": "2026-09-09T05:48:40.952642+00:00"
+  },
+  "focused_context_review": {
+    "contextual_relative_gate_pass": true,
+    "focused_invocations": 1,
+    "focused_result_sha256": "1bed64811552dc82aa085272cb006e3e9061537888db4e186856163cd881a802",
+    "isolated_legacy_passes": [
+      "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+      "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly"
+    ],
+    "reason": "Full collection imports zero_event_summary_v10215, which replaces the summary function at import time. Only validation orchestration recognizes the focused context; numerical tests and source are unchanged. Full gate still requires all seven exact signatures.",
+    "source_changes_after_focus": [
+      "scripts/validate_v13_merge_baseline.py"
+    ],
+    "strict_original_result_preserved": true
+  },
+  "full_run": {
+    "status_counts": {
+      "failed": 7,
+      "passed": 1110,
+      "skipped": 27
+    },
+    "returncode": 1,
+    "invocations": 1,
+    "relative_gate_pass": true,
+    "v13_passed": 140,
+    "original_131_v13_pass": true,
+    "start_utc": "2026-09-09T05:49:21.470310+00:00",
+    "end_utc": "2026-09-09T05:54:53.931043+00:00",
+    "new_failure_node_ids": []
+  },
+  "full_inventory_count": 1144,
+  "added_fixture_loader_tests": 9,
+  "original_five_skips_preserved": [
+    "tests/test_restart_family_migration_v5_4.py::test_actual_step1_restart_family_migration_is_state_exact[checkpoint_path0]",
+    "tests/test_restart_family_migration_v5_4.py::test_actual_step1_restart_family_migration_is_state_exact[checkpoint_path1]",
+    "tests/test_restart_family_migration_v5_4.py::test_actual_migrated_pair_remains_policy_only",
+    "tests/test_restart_family_migration_v5_4.py::test_actual_migration_rejects_second_application",
+    "tests/test_v11_production_counts.py::test_preserved_step481_distinguishes_branch_objects_from_births"
+  ],
+  "new_failure_node_ids": [],
+  "legacy_failures_fixed": false,
+  "legacy_failures_claimed_passing": false,
+  "no_physics_change": true,
+  "no_accepted_result_change": true
+}

@@ -1,0 +1,68 @@
+{
+  "candidate_inventory": {
+    "cleave:cleavage:(010):694b159e5c3c21b95300": {
+      "angle_deg": -49.99999999999982,
+      "angle_rad": -0.8726646259971617,
+      "fixed_event_length_um": 5.0,
+      "positive_x_projection_um": 3.2139380484327082
+    },
+    "cleave:cleavage:(100):77278fedde405b16bcd0": {
+      "angle_deg": 39.99999999999992,
+      "angle_rad": 0.6981317007977305,
+      "fixed_event_length_um": 5.0,
+      "positive_x_projection_um": 3.8302222155948944
+    }
+  },
+  "corrected_event_contract": {
+    "fixed_realized_arm_length_um": 5.0,
+    "legacy_threshold_scaled_setting_retained_as_engine_provenance_only": true,
+    "topology_owner": "V11 directional topology"
+  },
+  "corrected_single_front_semantics": {
+    "maximum_events_while_strictly_below_300um": 93,
+    "maximum_pre_event_shared_extension_query_um": 465.0,
+    "minimum_positive_candidate_projection_um": 3.2139380484327082,
+    "one_topology_quantum_guard_endpoint_um": 470.0,
+    "scope": "conservative single-front bound for this exact candidate inventory"
+  },
+  "coverage_disposition": "PLANNING_ERROR_NOT_FRACTURE_OR_BRANCHING_FAILURE",
+  "failure_cause": [
+    "The old planner assumed one fixed +40 degree path instead of the actual +40/-50 candidate inventory.",
+    "The old planner used the inherited threshold-scaled event reward instead of the corrected fixed 5 micrometre topology arm length.",
+    "For multiple active fronts, shared process extension is not maximum forward reach and can increase when a nonleading front advances."
+  ],
+  "no_new_kernel_calculation_performed": true,
+  "observed_control": {
+    "accepted_event_count": 84,
+    "accepted_events_by_angle_deg": {
+      "-50": 40,
+      "40": 44
+    },
+    "accepted_events_by_candidate": {
+      "cleave:cleavage:(010):694b159e5c3c21b95300": 40,
+      "cleave:cleavage:(100):77278fedde405b16bcd0": 44
+    },
+    "either_permitted_next_event_crosses_target": true,
+    "failed_query_um": 420.00000000000097,
+    "next_projected_reach_um_by_candidate": {
+      "cleave:cleavage:(010):694b159e5c3c21b95300": 300.30123747191755,
+      "cleave:cleavage:(100):77278fedde405b16bcd0": 300.9175216390798
+    },
+    "projected_extension_um": 297.08729942348486,
+    "qualified_family_maximum_um": 415.00000000000006,
+    "shared_process_extension_um": 420.00000000000165
+  },
+  "old_coverage_audit": "analysis_outputs/pf_current_source_branching_capability/theta40_signed_kernel_cache/adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0/portable_assembly/coverage_audit.json",
+  "old_coverage_audit_sha256": "fc4bc9b352eb144a8628406634cc709104cba3fa31571cbdf4328f295af4e9de",
+  "old_planner_reproduction": {
+    "coverage_margin_um": 4.999092435317436,
+    "fixed_path_angle_deg": 40.0,
+    "formula_reproduced": true,
+    "legacy_threshold_scaled_maximum_event_margin_um": 18.378720764998985,
+    "measured_endpoint_um": 415.00000000000006,
+    "required_um": 410.0009075646826,
+    "target_divided_by_cos_theta_um": 391.6221867996836,
+    "target_projected_um": 300.0
+  },
+  "schema": "pf_branching_signed_kernel_coverage_failure_audit_v5_2_1"
+}

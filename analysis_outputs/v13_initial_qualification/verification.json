@@ -1,0 +1,89 @@
+{
+  "assembler_source_sha256": "2b58c6c5d9767ac8740418cd8039011c4560d4c075f375ce01658c66ae46e5b5",
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "campaign_cli_enabled": false,
+  "canonical_parent_producer_commit": "c359ee015c606a0378a2bad548faa58f407bef10",
+  "canonical_unique_mark_draws": 1440000,
+  "checkpoint_sha256_reverified": {
+    "DBTT_1000K": "06e8f1d8867479c7fa87266cc8b3ba6140ec7d7954024d51f22db131abbffd31",
+    "DBTT_300K": "9dec4ae18b06ed2735ae62de6833ab8192e8abc7c6f360a9bc917f95cbda666c",
+    "Peak_1000K": "8a657323270afc985fe18a9a2b72d01472be4b3286afe964c950b950dbf68c7c",
+    "Peak_300K": "9bd176df16c76ba48914ecec32fe58aaf82bccb79e5a6240ea3ba5a2fddc925d",
+    "ceramic_1000K": "9acc03aa0dc558e9f19cf9e78220fddcb69844ba8cee6d68b43f258381a30bb1",
+    "ceramic_300K": "28037cba8e05655e49f56872757187e7fbf6670622e4d6a5801bfa4f68dbcfe2",
+    "weakT_1000K": "d943aa30a410b8b76ab0a720d83f13b8c22faf478e6eb5a1b60522c463edf5a8",
+    "weakT_300K": "c8f971fe37a6dab3b2d82174db5c7bd584d23d41e4acd653c3c6509b5aa340e8"
+  },
+  "compileall_pass": true,
+  "focused_summary": "57 passed in 24.75s",
+  "full_suite_green": false,
+  "full_suite_summary": "31 failed, 998 passed, 5 skipped in 73.02s (0:01:13)",
+  "git_diff_check_pass": true,
+  "historical_product_failures": [
+    "tests/test_multifront_v5_4_2_runtime_parity_v12.py::test_authoritative_v5_4_2_transaction_and_runtime_parity",
+    "tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision",
+    "tests/test_pf_branching_completion_execution_v5_4_2.py::test_v5_4_2_published_kinetic_k_figures_are_not_rcurves",
+    "tests/test_pf_current_source_branching_corrected_v5_2_result.py::test_committed_v5_2_result_packet_hashes_and_fail_closed_decision",
+    "tests/test_pf_current_source_branching_v5_2_1_decision.py::test_superseding_decision_separates_terminal_and_morphology_axes",
+    "tests/test_pf_current_source_branching_v5_2_1_decision.py::test_coverage_failure_and_terminal_topology_bounds",
+    "tests/test_pf_current_source_branching_v5_2_1_decision.py::test_v5_2_predecessor_is_immutable_and_publisher_is_deterministic",
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_actual_v6_1_commit_tree_ancestry_patches_and_all_snapshots_are_bound",
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_dynamic_provider_source_audit_passes_without_n_greater_than_two_claim",
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_prefix_and_full_terminal_parity_are_separate_and_pass",
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_exact_compact_archive_positive_removed_and_modified_verification",
+    "tests/test_pf_general_multifront_v6_1_1_products.py::test_report_preserves_permanent_execution_boundary",
+    "tests/test_pf_general_multifront_v6_1_products.py::test_v6_source_patch_and_snapshots_are_commit_bound",
+    "tests/test_pf_general_multifront_v6_1_products.py::test_call_graph_scheduler_handoff_and_multiowner_products_pass",
+    "tests/test_pf_general_multifront_v6_1_products.py::test_checkpoint_runtime_parity_and_no_solve_preflight_pass",
+    "tests/test_pf_general_multifront_v6_1_products.py::test_report_preserves_execution_boundary",
+    "tests/test_pf_general_multifront_v6_2_products.py::test_required_v6_2_products_exist_and_preserve_boundary",
+    "tests/test_pf_general_multifront_v6_2_products.py::test_source_and_hook_records_are_fail_closed_and_exactly_bound",
+    "tests/test_pf_general_multifront_v6_2_products.py::test_engine_restore_and_dry_run_are_zero_time_zero_rng_zero_solve",
+    "tests/test_pf_general_multifront_v6_2_products.py::test_event_and_transaction_records_do_not_claim_physical_execution",
+    "tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_required_products_and_decisions",
+    "tests/test_pf_general_multifront_v6_3_products.py::test_v6_3_archive_positive_and_negative_verification",
+    "tests/test_pf_general_multifront_v6_4_products.py::test_required_v6_4_products_and_fail_closed_decision",
+    "tests/test_pf_general_multifront_v6_4_products.py::test_v6_4_archive_positive_and_tamper_verification"
+  ],
+  "legacy_failures": [
+    "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader",
+    "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id",
+    "tests/test_v10214_response_model_id.py::test_v10214_response_model_id",
+    "tests/test_v10215_stage3_schema_and_status.py::test_stage3_status_script_parses_and_reports_missing_run",
+    "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly",
+    "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+    "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap"
+  ],
+  "new_fem_equilibrium_solves": 0,
+  "physical_trajectories": 0,
+  "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "repeat_artifact_hashes": {
+    "branch_mark_qualification.json": {
+      "canonical_sha256": "c448b507cccc8c455256985c9f573629e8467cbe9d35bf29490ff0205a9f51a2",
+      "repeat_sha256": "c448b507cccc8c455256985c9f573629e8467cbe9d35bf29490ff0205a9f51a2"
+    },
+    "frozen_mark_validation.png": {
+      "canonical_sha256": "d378ba828b66b2704c9e83d06a12be35fd8ff62a8f0925b3eb5e83aae18e0d02",
+      "repeat_sha256": "d378ba828b66b2704c9e83d06a12be35fd8ff62a8f0925b3eb5e83aae18e0d02"
+    }
+  },
+  "repeat_uses_same_counter_keys_not_new_physical_ensemble": true,
+  "restoration_producer_commit": "c359ee015c606a0378a2bad548faa58f407bef10",
+  "schema": "v13.initial-qualification-verification/1",
+  "source_code_commit": "23e55e0872af251e46be6b0078a786b72fa3f03f",
+  "source_files_sha256": {
+    "arrhenius_fracture/accepted_step_overlay_v13.py": "7ced0852113121af2295471e6760ca5164dc44f97385669a96566c09bafd03dc",
+    "arrhenius_fracture/conditional_branch_mark_v13.py": "998cce3a66c8a29a5e8f96646b07ec756a8fd164276a6fe48f3590755f5646be",
+    "arrhenius_fracture/current_source_multifront_hooks_v12.py": "cab0950efabff170c6a5ac588714618958d38892713452a8db46f4bf07f3581e",
+    "arrhenius_fracture/current_source_runtime_bindings.py": "28cb934835cc41709bfe6a7f3069dfb14beff0406b665b2d655143d7fac5af16",
+    "arrhenius_fracture/marked_topology_trial_v13.py": "48d7f75a9db45e200b17bb0f57baad4cb22136ae7adc50d7d32a7d1ec5439537",
+    "arrhenius_fracture/sharp_front_v11_branching.py": "ee1d519e83360ab079d5791c261e4c4ec35594dc4d9835c14507073d895477c0",
+    "scripts/qualify_v13_branch_marks.py": "34d798b36d7339e3df5148b1f3fb97859872cca7c0b07362995b8eecfbe7c83e",
+    "scripts/qualify_v13_process_restore.py": "909625d32d173d60a631d8bceaf259c0fb3e9c2d3394b1bed704845f07e8cde5",
+    "scripts/trace_v13_canonical_parent.py": "abc938e23b9c9b564d60560a8bc46fa75def69299772ae5386dd703ae7ef7ecc",
+    "scripts/v13_frozen_support.py": "8803afeeee28b9918d3d3685506becdc0a0f7bfbe9711b0bbb39d215d228ab06",
+    "scripts/v13_value_fingerprint.py": "6773fdae677a0c40149282aeca8aa0485751156de4bf5a6b3d48d0c7d09ef54b"
+  },
+  "test_isolation": "behavioral source fixtures use fresh interpreter; legacy fatigue tests install global delegates",
+  "v13_tests_pass": true
+}

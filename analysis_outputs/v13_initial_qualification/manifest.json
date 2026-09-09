@@ -1,0 +1,42 @@
+{
+  "artifacts": {
+    "V13_INITIAL_QUALIFICATION.md": {
+      "bytes": 10051,
+      "sha256": "626944f083f00e95a992982ec8ea60ec7cb6ea5c2002279622a8e3fc978b16c6"
+    },
+    "branch_mark_qualification.json": {
+      "bytes": 705090,
+      "sha256": "c448b507cccc8c455256985c9f573629e8467cbe9d35bf29490ff0205a9f51a2"
+    },
+    "canonical_parent.json": {
+      "bytes": 120384,
+      "sha256": "72eb86917d1745352698fd7ce4943455813a00cb0869cb4f8291b34b5bdc8a8c"
+    },
+    "focused_tests.log": {
+      "bytes": 100,
+      "sha256": "5557f12f872d13b37dff3c1266d0ca882498defa8aff0794e362c96ab1d9b18c"
+    },
+    "frozen_mark_validation.png": {
+      "bytes": 260064,
+      "sha256": "d378ba828b66b2704c9e83d06a12be35fd8ff62a8f0925b3eb5e83aae18e0d02"
+    },
+    "full_suite.log": {
+      "bytes": 62372,
+      "sha256": "57d848be76ffb544cfd36b2c9a0f8cf82ec9016e8e6e34ad1eeff8688917d8db"
+    },
+    "process_restore_qualification.json": {
+      "bytes": 4874813,
+      "sha256": "8a477f6d56c28233c939d343c28a06dcc7bafb4b3c15ccecfac1fe3af2e844d6"
+    },
+    "verification.json": {
+      "bytes": 7284,
+      "sha256": "e2ab75d2970fd7e7f1e7d8fbc3e6abd5f597e6d873786dca6a96e5748ff9557b"
+    }
+  },
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "producer_commits": {
+    "conditional_mark": "23e55e0872af251e46be6b0078a786b72fa3f03f",
+    "restoration_parent": "c359ee015c606a0378a2bad548faa58f407bef10"
+  },
+  "schema": "v13.initial-review-manifest/1"
+}

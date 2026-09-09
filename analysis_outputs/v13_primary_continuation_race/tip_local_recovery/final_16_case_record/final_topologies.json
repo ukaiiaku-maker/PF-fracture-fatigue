@@ -1,0 +1,4634 @@
+{
+  "rows": [
+    {
+      "case": "Peak_300K_seed3621",
+      "checkpoint_state_sha256": "e35ad533a39bf45cbe909e824c0cb8545ae314644ce1983723e70cb992296195",
+      "front_competition_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b34a57a4e4baf3da",
+          "bae28172e415a797"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              -0.8726646259971617,
+              -0.8726646259971619
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ]
+            ],
+            "physical_path_length_m": 0.0005200000000000001,
+            "projected_extension_m": 0.0005134720363608931,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b34a57a4e4baf3da",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919284e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005211324807920829,
+                    -1.8488525014865842e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919284e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005249627030076778,
+                    1.365085546946116e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005211324807920829,
+                    -1.8488525014865842e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 11,
+                  "end_point_m": [
+                    0.0005287929252232727,
+                    4.579023595378816e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005249627030076778,
+                    1.365085546946116e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 13,
+                  "end_point_m": [
+                    0.0005326231474388676,
+                    7.792961643811516e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005287929252232727,
+                    4.579023595378816e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977328,
+              0.6981317007977303,
+              0.6981317007977303,
+              0.6981317007977302,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ],
+              [
+                0.000517302258576488,
+                -5.062790549919284e-06
+              ],
+              [
+                0.0005211324807920829,
+                -1.8488525014865842e-06
+              ],
+              [
+                0.0005249627030076778,
+                1.365085546946116e-06
+              ],
+              [
+                0.0005287929252232727,
+                4.579023595378816e-06
+              ],
+              [
+                0.0005326231474388676,
+                7.792961643811516e-06
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000083e-05,
+            "projected_extension_m": 1.915111107797453e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bae28172e415a797",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005166859744093258,
+                    -1.21069508139469e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005198999124577585,
+                    -1.59371730295418e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005166859744093258,
+                    -1.21069508139469e-05
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136698e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005198999124577585,
+                    -1.59371730295418e-05
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 12,
+                  "end_point_m": [
+                    0.000526327788554624,
+                    -2.3597617460731597e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136698e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ],
+              [
+                0.0005166859744093258,
+                -1.21069508139469e-05
+              ],
+              [
+                0.0005198999124577585,
+                -1.59371730295418e-05
+              ],
+              [
+                0.0005231138505061913,
+                -1.9767395245136698e-05
+              ],
+              [
+                0.000526327788554624,
+                -2.3597617460731597e-05
+              ]
+            ],
+            "physical_path_length_m": 2.00000000000001e-05,
+            "projected_extension_m": 1.2855752193730897e-05,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 13,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005134720363608931,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005650000000000003
+      },
+      "process_owner_ids": [
+        "j9f410673b2d72cd"
+      ]
+    },
+    {
+      "case": "Peak_1000K_seed3621",
+      "checkpoint_state_sha256": "4d50e2930863bee755fee300e9005947ca3f676ee413e0d9c03035d268f7c000",
+      "front_competition_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b34a57a4e4baf3da",
+          "bae28172e415a797"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              -0.8726646259971617,
+              -0.8726646259971619
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ]
+            ],
+            "physical_path_length_m": 0.0005200000000000001,
+            "projected_extension_m": 0.0005134720363608931,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b34a57a4e4baf3da",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919284e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005211324807920829,
+                    -1.8488525014865842e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919284e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005249627030076778,
+                    1.365085546946116e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005211324807920829,
+                    -1.8488525014865842e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 11,
+                  "end_point_m": [
+                    0.0005287929252232727,
+                    4.579023595378816e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005249627030076778,
+                    1.365085546946116e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 13,
+                  "end_point_m": [
+                    0.0005326231474388676,
+                    7.792961643811516e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005287929252232727,
+                    4.579023595378816e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977328,
+              0.6981317007977303,
+              0.6981317007977303,
+              0.6981317007977302,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ],
+              [
+                0.000517302258576488,
+                -5.062790549919284e-06
+              ],
+              [
+                0.0005211324807920829,
+                -1.8488525014865842e-06
+              ],
+              [
+                0.0005249627030076778,
+                1.365085546946116e-06
+              ],
+              [
+                0.0005287929252232727,
+                4.579023595378816e-06
+              ],
+              [
+                0.0005326231474388676,
+                7.792961643811516e-06
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000083e-05,
+            "projected_extension_m": 1.915111107797453e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bae28172e415a797",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005166859744093258,
+                    -1.21069508139469e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005198999124577585,
+                    -1.59371730295418e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005166859744093258,
+                    -1.21069508139469e-05
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136698e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005198999124577585,
+                    -1.59371730295418e-05
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 12,
+                  "end_point_m": [
+                    0.000526327788554624,
+                    -2.3597617460731597e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136698e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ],
+              [
+                0.0005166859744093258,
+                -1.21069508139469e-05
+              ],
+              [
+                0.0005198999124577585,
+                -1.59371730295418e-05
+              ],
+              [
+                0.0005231138505061913,
+                -1.9767395245136698e-05
+              ],
+              [
+                0.000526327788554624,
+                -2.3597617460731597e-05
+              ]
+            ],
+            "physical_path_length_m": 2.00000000000001e-05,
+            "projected_extension_m": 1.2855752193730897e-05,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 13,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005134720363608931,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005650000000000003
+      },
+      "process_owner_ids": [
+        "j9f410673b2d72cd"
+      ]
+    },
+    {
+      "case": "weakT_300K_seed3621",
+      "checkpoint_state_sha256": "796d37f4adc3029d085cd637f14cf52d7df6047ece3c0142ee528d395aaf92f9",
+      "front_competition_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b34a57a4e4baf3da",
+          "bae28172e415a797"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              -0.8726646259971617,
+              -0.8726646259971619
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ]
+            ],
+            "physical_path_length_m": 0.0005200000000000001,
+            "projected_extension_m": 0.0005134720363608931,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b34a57a4e4baf3da",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919284e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005211324807920829,
+                    -1.8488525014865842e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919284e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005249627030076778,
+                    1.365085546946116e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005211324807920829,
+                    -1.8488525014865842e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 11,
+                  "end_point_m": [
+                    0.0005287929252232727,
+                    4.579023595378816e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005249627030076778,
+                    1.365085546946116e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 13,
+                  "end_point_m": [
+                    0.0005326231474388676,
+                    7.792961643811516e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005287929252232727,
+                    4.579023595378816e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977328,
+              0.6981317007977303,
+              0.6981317007977303,
+              0.6981317007977302,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ],
+              [
+                0.000517302258576488,
+                -5.062790549919284e-06
+              ],
+              [
+                0.0005211324807920829,
+                -1.8488525014865842e-06
+              ],
+              [
+                0.0005249627030076778,
+                1.365085546946116e-06
+              ],
+              [
+                0.0005287929252232727,
+                4.579023595378816e-06
+              ],
+              [
+                0.0005326231474388676,
+                7.792961643811516e-06
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000083e-05,
+            "projected_extension_m": 1.915111107797453e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bae28172e415a797",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005166859744093258,
+                    -1.21069508139469e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005198999124577585,
+                    -1.59371730295418e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005166859744093258,
+                    -1.21069508139469e-05
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136698e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005198999124577585,
+                    -1.59371730295418e-05
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 12,
+                  "end_point_m": [
+                    0.000526327788554624,
+                    -2.3597617460731597e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136698e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ],
+              [
+                0.0005166859744093258,
+                -1.21069508139469e-05
+              ],
+              [
+                0.0005198999124577585,
+                -1.59371730295418e-05
+              ],
+              [
+                0.0005231138505061913,
+                -1.9767395245136698e-05
+              ],
+              [
+                0.000526327788554624,
+                -2.3597617460731597e-05
+              ]
+            ],
+            "physical_path_length_m": 2.00000000000001e-05,
+            "projected_extension_m": 1.2855752193730897e-05,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 13,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005134720363608931,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005650000000000003
+      },
+      "process_owner_ids": [
+        "j9f410673b2d72cd"
+      ]
+    },
+    {
+      "case": "weakT_1000K_seed3621",
+      "checkpoint_state_sha256": "e2074413a71b543e32b3aea3c523ce8cfec4d4bc9a16b7ccaccff24a7ff9b287",
+      "front_competition_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b34a57a4e4baf3da",
+          "bae28172e415a797"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              -0.8726646259971617,
+              -0.8726646259971619
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ]
+            ],
+            "physical_path_length_m": 0.0005200000000000001,
+            "projected_extension_m": 0.0005134720363608931,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b34a57a4e4baf3da",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919284e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005211324807920829,
+                    -1.8488525014865842e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919284e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005249627030076778,
+                    1.365085546946116e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005211324807920829,
+                    -1.8488525014865842e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 11,
+                  "end_point_m": [
+                    0.0005287929252232727,
+                    4.579023595378816e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005249627030076778,
+                    1.365085546946116e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 13,
+                  "end_point_m": [
+                    0.0005326231474388676,
+                    7.792961643811516e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005287929252232727,
+                    4.579023595378816e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977328,
+              0.6981317007977303,
+              0.6981317007977303,
+              0.6981317007977302,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ],
+              [
+                0.000517302258576488,
+                -5.062790549919284e-06
+              ],
+              [
+                0.0005211324807920829,
+                -1.8488525014865842e-06
+              ],
+              [
+                0.0005249627030076778,
+                1.365085546946116e-06
+              ],
+              [
+                0.0005287929252232727,
+                4.579023595378816e-06
+              ],
+              [
+                0.0005326231474388676,
+                7.792961643811516e-06
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000083e-05,
+            "projected_extension_m": 1.915111107797453e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bae28172e415a797",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005166859744093258,
+                    -1.21069508139469e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005198999124577585,
+                    -1.59371730295418e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005166859744093258,
+                    -1.21069508139469e-05
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136698e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005198999124577585,
+                    -1.59371730295418e-05
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 12,
+                  "end_point_m": [
+                    0.000526327788554624,
+                    -2.3597617460731597e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136698e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ],
+              [
+                0.0005166859744093258,
+                -1.21069508139469e-05
+              ],
+              [
+                0.0005198999124577585,
+                -1.59371730295418e-05
+              ],
+              [
+                0.0005231138505061913,
+                -1.9767395245136698e-05
+              ],
+              [
+                0.000526327788554624,
+                -2.3597617460731597e-05
+              ]
+            ],
+            "physical_path_length_m": 2.00000000000001e-05,
+            "projected_extension_m": 1.2855752193730897e-05,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 13,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005134720363608931,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005650000000000003
+      },
+      "process_owner_ids": [
+        "j9f410673b2d72cd"
+      ]
+    },
+    {
+      "case": "Peak_300K_seed3622",
+      "checkpoint_state_sha256": "ff21e9a2f3cebbf5076e740199c05c4103d9b1528ce1b09a8a3ce7d8a16da46d",
+      "front_competition_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b6b03ba774a1dfae",
+          "bdbe58a91c396e04"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              0.6981317007977303
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ]
+            ],
+            "physical_path_length_m": 0.000515,
+            "projected_extension_m": 0.0005108743824796225,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b6b03ba774a1dfae",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343244106e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919311e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343244106e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005205161966249207,
+                    -8.89301276551421e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919311e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005237301346733534,
+                    -1.2723234981109112e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005205161966249207,
+                    -8.89301276551421e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005269440727217862,
+                    -1.655345719670401e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005237301346733534,
+                    -1.2723234981109112e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971632,
+              -0.8726646259971618,
+              -0.8726646259971618,
+              -0.8726646259971619,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343244106e-06
+              ],
+              [
+                0.000517302258576488,
+                -5.062790549919311e-06
+              ],
+              [
+                0.0005205161966249207,
+                -8.89301276551421e-06
+              ],
+              [
+                0.0005237301346733534,
+                -1.2723234981109112e-05
+              ],
+              [
+                0.0005269440727217862,
+                -1.655345719670401e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000133e-05,
+            "projected_extension_m": 1.6069690242163622e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bdbe58a91c396e04",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005147046046952175,
+                    5.811591929703201e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                },
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005185348269108124,
+                    9.025529978135902e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005147046046952175,
+                    5.811591929703201e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977305,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005147046046952175,
+                5.811591929703201e-06
+              ],
+              [
+                0.0005185348269108124,
+                9.025529978135902e-06
+              ]
+            ],
+            "physical_path_length_m": 1.000000000000003e-05,
+            "projected_extension_m": 7.660444431189812e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 10,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005108743824796225,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005500000000000002
+      },
+      "process_owner_ids": [
+        "j80c4d97a9fc663e"
+      ]
+    },
+    {
+      "case": "Peak_1000K_seed3622",
+      "checkpoint_state_sha256": "9ef9a2055fd8f8dedca40749268f38556710b8cf03c96c3f5b5c3abeb9c0eb85",
+      "front_competition_ids": [
+        "b34a57a4e4baf3da",
+        "bae28172e415a797"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b34a57a4e4baf3da",
+          "bae28172e415a797"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005147046046952175,
+                    5.811591929703201e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              0.6981317007977303,
+              0.6981317007977305
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005147046046952175,
+                5.811591929703201e-06
+              ]
+            ],
+            "physical_path_length_m": 0.0005200000000000001,
+            "projected_extension_m": 0.0005147046046952175,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b34a57a4e4baf3da",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.0005185348269108124,
+                    9.025529978135917e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005147046046952175,
+                    5.811591929703201e-06
+                  ]
+                },
+                {
+                  "branch_id": "b34a57a4e4baf3da",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005223650491264073,
+                    1.2239468026568618e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005185348269108124,
+                    9.025529978135917e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977328,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005147046046952175,
+                5.811591929703201e-06
+              ],
+              [
+                0.0005185348269108124,
+                9.025529978135917e-06
+              ],
+              [
+                0.0005223650491264073,
+                1.2239468026568618e-05
+              ]
+            ],
+            "physical_path_length_m": 1.000000000000004e-05,
+            "projected_extension_m": 7.660444431189812e-06,
+            "status": "active"
+          },
+          {
+            "branch_id": "bae28172e415a797",
+            "generation": 1,
+            "initiation_event": 5,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005179185427436502,
+                    1.981369714108301e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005147046046952175,
+                    5.811591929703201e-06
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005211324807920829,
+                    -1.848852501486599e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005179185427436502,
+                    1.981369714108301e-06
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005243464188405156,
+                    -5.679074717081499e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005211324807920829,
+                    -1.848852501486599e-06
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005275603568889484,
+                    -9.509296932676399e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005243464188405156,
+                    -5.679074717081499e-06
+                  ]
+                },
+                {
+                  "branch_id": "bae28172e415a797",
+                  "commit_event_id": 11,
+                  "end_point_m": [
+                    0.0005307742949373811,
+                    -1.33395191482713e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005275603568889484,
+                    -9.509296932676399e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971618,
+              -0.8726646259971618,
+              -0.8726646259971618,
+              -0.8726646259971618,
+              -0.8726646259971619
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005147046046952175,
+                5.811591929703201e-06
+              ],
+              [
+                0.0005179185427436502,
+                1.981369714108301e-06
+              ],
+              [
+                0.0005211324807920829,
+                -1.848852501486599e-06
+              ],
+              [
+                0.0005243464188405156,
+                -5.679074717081499e-06
+              ],
+              [
+                0.0005275603568889484,
+                -9.509296932676399e-06
+              ],
+              [
+                0.0005307742949373811,
+                -1.33395191482713e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000127e-05,
+            "projected_extension_m": 1.6069690242163622e-05,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 11,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005147046046952175,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005550000000000003
+      },
+      "process_owner_ids": [
+        "j9f410673b2d72cd"
+      ]
+    },
+    {
+      "case": "weakT_300K_seed3622",
+      "checkpoint_state_sha256": "4a78e3815ba2a2a9dd1a0f658d5de1e08622ce7da17f376330fe627a22b88d5e",
+      "front_competition_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b6b03ba774a1dfae",
+          "bdbe58a91c396e04"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              0.6981317007977303
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ]
+            ],
+            "physical_path_length_m": 0.000515,
+            "projected_extension_m": 0.0005108743824796225,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b6b03ba774a1dfae",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343244106e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919311e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343244106e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005205161966249207,
+                    -8.89301276551421e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919311e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005237301346733534,
+                    -1.2723234981109112e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005205161966249207,
+                    -8.89301276551421e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005269440727217862,
+                    -1.655345719670401e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005237301346733534,
+                    -1.2723234981109112e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971632,
+              -0.8726646259971618,
+              -0.8726646259971618,
+              -0.8726646259971619,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343244106e-06
+              ],
+              [
+                0.000517302258576488,
+                -5.062790549919311e-06
+              ],
+              [
+                0.0005205161966249207,
+                -8.89301276551421e-06
+              ],
+              [
+                0.0005237301346733534,
+                -1.2723234981109112e-05
+              ],
+              [
+                0.0005269440727217862,
+                -1.655345719670401e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000133e-05,
+            "projected_extension_m": 1.6069690242163622e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bdbe58a91c396e04",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005147046046952175,
+                    5.811591929703201e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                },
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005185348269108124,
+                    9.025529978135902e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005147046046952175,
+                    5.811591929703201e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977305,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005147046046952175,
+                5.811591929703201e-06
+              ],
+              [
+                0.0005185348269108124,
+                9.025529978135902e-06
+              ]
+            ],
+            "physical_path_length_m": 1.000000000000003e-05,
+            "projected_extension_m": 7.660444431189812e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 10,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005108743824796225,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005500000000000002
+      },
+      "process_owner_ids": [
+        "j80c4d97a9fc663e"
+      ]
+    },
+    {
+      "case": "weakT_1000K_seed3622",
+      "checkpoint_state_sha256": "dec338d3cd6de95c4b0917d8994308ef6a8d0b6cbae94885eab5f6681431f855",
+      "front_competition_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b6b03ba774a1dfae",
+          "bdbe58a91c396e04"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              0.6981317007977303
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ]
+            ],
+            "physical_path_length_m": 0.000515,
+            "projected_extension_m": 0.0005108743824796225,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b6b03ba774a1dfae",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343244106e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919311e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343244106e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005205161966249207,
+                    -8.89301276551421e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.000517302258576488,
+                    -5.062790549919311e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005237301346733534,
+                    -1.2723234981109112e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005205161966249207,
+                    -8.89301276551421e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005269440727217862,
+                    -1.655345719670401e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005237301346733534,
+                    -1.2723234981109112e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971632,
+              -0.8726646259971618,
+              -0.8726646259971618,
+              -0.8726646259971619,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343244106e-06
+              ],
+              [
+                0.000517302258576488,
+                -5.062790549919311e-06
+              ],
+              [
+                0.0005205161966249207,
+                -8.89301276551421e-06
+              ],
+              [
+                0.0005237301346733534,
+                -1.2723234981109112e-05
+              ],
+              [
+                0.0005269440727217862,
+                -1.655345719670401e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000133e-05,
+            "projected_extension_m": 1.6069690242163622e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bdbe58a91c396e04",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005147046046952175,
+                    5.811591929703201e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                },
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005185348269108124,
+                    9.025529978135902e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005147046046952175,
+                    5.811591929703201e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977305,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005147046046952175,
+                5.811591929703201e-06
+              ],
+              [
+                0.0005185348269108124,
+                9.025529978135902e-06
+              ]
+            ],
+            "physical_path_length_m": 1.000000000000003e-05,
+            "projected_extension_m": 7.660444431189812e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 10,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005108743824796225,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005500000000000002
+      },
+      "process_owner_ids": [
+        "j80c4d97a9fc663e"
+      ]
+    },
+    {
+      "case": "Peak_300K_seed3623",
+      "checkpoint_state_sha256": "0771a83efa457293d15df91afdaa4e70b65861a0b6660ccb4dc5155fb9f3536e",
+      "front_competition_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b6b03ba774a1dfae",
+          "bdbe58a91c396e04"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ]
+            ],
+            "physical_path_length_m": 0.000515,
+            "projected_extension_m": 0.0005102580983124604,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b6b03ba774a1dfae",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005134720363608931,
+                    -8.27672859835201e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.0005166859744093258,
+                    -1.210695081394691e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.27672859835201e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005198999124577585,
+                    -1.593717302954181e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005166859744093258,
+                    -1.210695081394691e-05
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136708e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005198999124577585,
+                    -1.593717302954181e-05
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.000526327788554624,
+                    -2.3597617460731607e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136708e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971632,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005134720363608931,
+                -8.27672859835201e-06
+              ],
+              [
+                0.0005166859744093258,
+                -1.210695081394691e-05
+              ],
+              [
+                0.0005198999124577585,
+                -1.593717302954181e-05
+              ],
+              [
+                0.0005231138505061913,
+                -1.9767395245136708e-05
+              ],
+              [
+                0.000526327788554624,
+                -2.3597617460731607e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000133e-05,
+            "projected_extension_m": 1.6069690242163622e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bdbe58a91c396e04",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243992e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                },
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005179185427436502,
+                    1.981369714108301e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243992e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977303,
+              0.6981317007977303
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343243992e-06
+              ],
+              [
+                0.0005179185427436502,
+                1.981369714108301e-06
+              ]
+            ],
+            "physical_path_length_m": 1.000000000000003e-05,
+            "projected_extension_m": 7.660444431189812e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 10,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005102580983124604,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005500000000000002
+      },
+      "process_owner_ids": [
+        "j80c4d97a9fc663e"
+      ]
+    },
+    {
+      "case": "Peak_1000K_seed3623",
+      "checkpoint_state_sha256": "8068d5a1c4edffd0cdc3aaea595afc8582814c4b10d9c6144138bbeb1962bca6",
+      "front_competition_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b6b03ba774a1dfae",
+          "bdbe58a91c396e04"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ]
+            ],
+            "physical_path_length_m": 0.000515,
+            "projected_extension_m": 0.0005102580983124604,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b6b03ba774a1dfae",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005134720363608931,
+                    -8.27672859835201e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.0005166859744093258,
+                    -1.210695081394691e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.27672859835201e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005198999124577585,
+                    -1.593717302954181e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005166859744093258,
+                    -1.210695081394691e-05
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136708e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005198999124577585,
+                    -1.593717302954181e-05
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.000526327788554624,
+                    -2.3597617460731607e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136708e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971632,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005134720363608931,
+                -8.27672859835201e-06
+              ],
+              [
+                0.0005166859744093258,
+                -1.210695081394691e-05
+              ],
+              [
+                0.0005198999124577585,
+                -1.593717302954181e-05
+              ],
+              [
+                0.0005231138505061913,
+                -1.9767395245136708e-05
+              ],
+              [
+                0.000526327788554624,
+                -2.3597617460731607e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000133e-05,
+            "projected_extension_m": 1.6069690242163622e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bdbe58a91c396e04",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243992e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                },
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005179185427436502,
+                    1.981369714108301e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243992e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977303,
+              0.6981317007977303
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343243992e-06
+              ],
+              [
+                0.0005179185427436502,
+                1.981369714108301e-06
+              ]
+            ],
+            "physical_path_length_m": 1.000000000000003e-05,
+            "projected_extension_m": 7.660444431189812e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 10,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005102580983124604,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005500000000000002
+      },
+      "process_owner_ids": [
+        "j80c4d97a9fc663e"
+      ]
+    },
+    {
+      "case": "weakT_300K_seed3623",
+      "checkpoint_state_sha256": "c09b63e0fbb7b8d629a751786a59196a52ccb8fbea012533e8324b9b54607e6b",
+      "front_competition_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b6b03ba774a1dfae",
+          "bdbe58a91c396e04"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ]
+            ],
+            "physical_path_length_m": 0.000515,
+            "projected_extension_m": 0.0005102580983124604,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b6b03ba774a1dfae",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005134720363608931,
+                    -8.27672859835201e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.0005166859744093258,
+                    -1.210695081394691e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.27672859835201e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005198999124577585,
+                    -1.593717302954181e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005166859744093258,
+                    -1.210695081394691e-05
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136708e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005198999124577585,
+                    -1.593717302954181e-05
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.000526327788554624,
+                    -2.3597617460731607e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136708e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971632,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005134720363608931,
+                -8.27672859835201e-06
+              ],
+              [
+                0.0005166859744093258,
+                -1.210695081394691e-05
+              ],
+              [
+                0.0005198999124577585,
+                -1.593717302954181e-05
+              ],
+              [
+                0.0005231138505061913,
+                -1.9767395245136708e-05
+              ],
+              [
+                0.000526327788554624,
+                -2.3597617460731607e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000133e-05,
+            "projected_extension_m": 1.6069690242163622e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bdbe58a91c396e04",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243992e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                },
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005179185427436502,
+                    1.981369714108301e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243992e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977303,
+              0.6981317007977303
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343243992e-06
+              ],
+              [
+                0.0005179185427436502,
+                1.981369714108301e-06
+              ]
+            ],
+            "physical_path_length_m": 1.000000000000003e-05,
+            "projected_extension_m": 7.660444431189812e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 10,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005102580983124604,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005500000000000002
+      },
+      "process_owner_ids": [
+        "j80c4d97a9fc663e"
+      ]
+    },
+    {
+      "case": "weakT_1000K_seed3623",
+      "checkpoint_state_sha256": "ef771c4dc809dbb2e33b22318527bb82af6f7bd819fc5d461975739f6cc4f74d",
+      "front_competition_ids": [
+        "b6b03ba774a1dfae",
+        "bdbe58a91c396e04"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b6b03ba774a1dfae",
+          "bdbe58a91c396e04"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              -0.8726646259971618,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ]
+            ],
+            "physical_path_length_m": 0.000515,
+            "projected_extension_m": 0.0005102580983124604,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b6b03ba774a1dfae",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005134720363608931,
+                    -8.27672859835201e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.0005166859744093258,
+                    -1.210695081394691e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005134720363608931,
+                    -8.27672859835201e-06
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005198999124577585,
+                    -1.593717302954181e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005166859744093258,
+                    -1.210695081394691e-05
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136708e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005198999124577585,
+                    -1.593717302954181e-05
+                  ]
+                },
+                {
+                  "branch_id": "b6b03ba774a1dfae",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.000526327788554624,
+                    -2.3597617460731607e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005231138505061913,
+                    -1.9767395245136708e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971632,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617,
+              -0.8726646259971617
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005134720363608931,
+                -8.27672859835201e-06
+              ],
+              [
+                0.0005166859744093258,
+                -1.210695081394691e-05
+              ],
+              [
+                0.0005198999124577585,
+                -1.593717302954181e-05
+              ],
+              [
+                0.0005231138505061913,
+                -1.9767395245136708e-05
+              ],
+              [
+                0.000526327788554624,
+                -2.3597617460731607e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000133e-05,
+            "projected_extension_m": 1.6069690242163622e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bdbe58a91c396e04",
+            "generation": 1,
+            "initiation_event": 4,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243992e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                },
+                {
+                  "branch_id": "bdbe58a91c396e04",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005179185427436502,
+                    1.981369714108301e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243992e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977303,
+              0.6981317007977303
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343243992e-06
+              ],
+              [
+                0.0005179185427436502,
+                1.981369714108301e-06
+              ]
+            ],
+            "physical_path_length_m": 1.000000000000003e-05,
+            "projected_extension_m": 7.660444431189812e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 10,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005102580983124604,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005500000000000002
+      },
+      "process_owner_ids": [
+        "j80c4d97a9fc663e"
+      ]
+    },
+    {
+      "case": "Peak_300K_seed3624",
+      "checkpoint_state_sha256": "d3d745b481a7ad3c78490653328aa4749ac49da881bfa861fffadc02b48e5047",
+      "front_competition_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b042c2d7b4cc6a46",
+          "bb8b71e38dc735de"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654004e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              0.6981317007977303
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005076604444311898,
+                6.4278760968654004e-06
+              ]
+            ],
+            "physical_path_length_m": 0.00051,
+            "projected_extension_m": 0.0005076604444311898,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b042c2d7b4cc6a46",
+            "generation": 1,
+            "initiation_event": 3,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005114906666467847,
+                    9.641814145298117e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654004e-06
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005153208888623796,
+                    1.2855752193730818e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005114906666467847,
+                    9.641814145298117e-06
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005191511110779745,
+                    1.6069690242163517e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005153208888623796,
+                    1.2855752193730818e-05
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005229813332935694,
+                    1.9283628290596217e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005191511110779745,
+                    1.6069690242163517e-05
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005268115555091644,
+                    2.2497566339028918e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005229813332935694,
+                    1.9283628290596217e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977329,
+              0.6981317007977305,
+              0.6981317007977301,
+              0.6981317007977305,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005076604444311898,
+                6.4278760968654004e-06
+              ],
+              [
+                0.0005114906666467847,
+                9.641814145298117e-06
+              ],
+              [
+                0.0005153208888623796,
+                1.2855752193730818e-05
+              ],
+              [
+                0.0005191511110779745,
+                1.6069690242163517e-05
+              ],
+              [
+                0.0005229813332935694,
+                1.9283628290596217e-05
+              ],
+              [
+                0.0005268115555091644,
+                2.2497566339028918e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000083e-05,
+            "projected_extension_m": 1.915111107797453e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bb8b71e38dc735de",
+            "generation": 1,
+            "initiation_event": 3,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bb8b71e38dc735de",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654004e-06
+                  ]
+                },
+                {
+                  "branch_id": "bb8b71e38dc735de",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243996e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                },
+                {
+                  "branch_id": "bb8b71e38dc735de",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.000517302258576488,
+                    -5.0627905499193e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243996e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971618,
+              -0.8726646259971618,
+              -0.8726646259971618
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005076604444311898,
+                6.4278760968654004e-06
+              ],
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343243996e-06
+              ],
+              [
+                0.000517302258576488,
+                -5.0627905499193e-06
+              ]
+            ],
+            "physical_path_length_m": 1.5000000000000075e-05,
+            "projected_extension_m": 9.641814145298173e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 10,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005076604444311898,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005500000000000001
+      },
+      "process_owner_ids": [
+        "jbe1d699748fbb56"
+      ]
+    },
+    {
+      "case": "Peak_1000K_seed3624",
+      "checkpoint_state_sha256": "30129efda8a1d64c5e1c2646979972c064d594c01b65bc66a35cc6177030a13c",
+      "front_competition_ids": [
+        "b9f6de9beb6c53dd",
+        "be35e2025dc93aa6"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b9f6de9beb6c53dd",
+          "be35e2025dc93aa6"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ]
+            ],
+            "physical_path_length_m": 0.000505,
+            "projected_extension_m": 0.0005038302222155949,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b9f6de9beb6c53dd",
+            "generation": 1,
+            "initiation_event": 2,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b9f6de9beb6c53dd",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654165e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "b9f6de9beb6c53dd",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005114906666467847,
+                    9.641814145298117e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654165e-06
+                  ]
+                },
+                {
+                  "branch_id": "b9f6de9beb6c53dd",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.0005153208888623796,
+                    1.2855752193730818e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005114906666467847,
+                    9.641814145298117e-06
+                  ]
+                },
+                {
+                  "branch_id": "b9f6de9beb6c53dd",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005191511110779745,
+                    1.6069690242163517e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005153208888623796,
+                    1.2855752193730818e-05
+                  ]
+                },
+                {
+                  "branch_id": "b9f6de9beb6c53dd",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005229813332935694,
+                    1.9283628290596217e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005191511110779745,
+                    1.6069690242163517e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977328,
+              0.6981317007977305,
+              0.6981317007977305,
+              0.6981317007977301,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005076604444311898,
+                6.4278760968654165e-06
+              ],
+              [
+                0.0005114906666467847,
+                9.641814145298117e-06
+              ],
+              [
+                0.0005153208888623796,
+                1.2855752193730818e-05
+              ],
+              [
+                0.0005191511110779745,
+                1.6069690242163517e-05
+              ],
+              [
+                0.0005229813332935694,
+                1.9283628290596217e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000083e-05,
+            "projected_extension_m": 1.915111107797453e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "be35e2025dc93aa6",
+            "generation": 1,
+            "initiation_event": 2,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "be35e2025dc93aa6",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                },
+                {
+                  "branch_id": "be35e2025dc93aa6",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005070441602640276,
+                    -6.162841671621998e-07
+                  ]
+                },
+                {
+                  "branch_id": "be35e2025dc93aa6",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005134720363608931,
+                    -8.276728598352e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005102580983124604,
+                    -4.446506382757099e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971618,
+              -0.8726646259971617,
+              -0.8726646259971619
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005070441602640276,
+                -6.162841671621998e-07
+              ],
+              [
+                0.0005102580983124604,
+                -4.446506382757099e-06
+              ],
+              [
+                0.0005134720363608931,
+                -8.276728598352e-06
+              ]
+            ],
+            "physical_path_length_m": 1.5000000000000077e-05,
+            "projected_extension_m": 9.641814145298173e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 9,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005038302222155949,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005450000000000001
+      },
+      "process_owner_ids": [
+        "j95f110b58d7fd9b"
+      ]
+    },
+    {
+      "case": "weakT_300K_seed3624",
+      "checkpoint_state_sha256": "59b44fbbd10f802e3adc2c7c7a87220b40f5108da5c5f2da214197d8417568e7",
+      "front_competition_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b042c2d7b4cc6a46",
+          "bb8b71e38dc735de"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654004e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              0.6981317007977303
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005076604444311898,
+                6.4278760968654004e-06
+              ]
+            ],
+            "physical_path_length_m": 0.00051,
+            "projected_extension_m": 0.0005076604444311898,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b042c2d7b4cc6a46",
+            "generation": 1,
+            "initiation_event": 3,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005114906666467847,
+                    9.641814145298117e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654004e-06
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005153208888623796,
+                    1.2855752193730818e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005114906666467847,
+                    9.641814145298117e-06
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005191511110779745,
+                    1.6069690242163517e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005153208888623796,
+                    1.2855752193730818e-05
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005229813332935694,
+                    1.9283628290596217e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005191511110779745,
+                    1.6069690242163517e-05
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 10,
+                  "end_point_m": [
+                    0.0005268115555091644,
+                    2.2497566339028918e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005229813332935694,
+                    1.9283628290596217e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977329,
+              0.6981317007977305,
+              0.6981317007977301,
+              0.6981317007977305,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005076604444311898,
+                6.4278760968654004e-06
+              ],
+              [
+                0.0005114906666467847,
+                9.641814145298117e-06
+              ],
+              [
+                0.0005153208888623796,
+                1.2855752193730818e-05
+              ],
+              [
+                0.0005191511110779745,
+                1.6069690242163517e-05
+              ],
+              [
+                0.0005229813332935694,
+                1.9283628290596217e-05
+              ],
+              [
+                0.0005268115555091644,
+                2.2497566339028918e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000083e-05,
+            "projected_extension_m": 1.915111107797453e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bb8b71e38dc735de",
+            "generation": 1,
+            "initiation_event": 3,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bb8b71e38dc735de",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654004e-06
+                  ]
+                },
+                {
+                  "branch_id": "bb8b71e38dc735de",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243996e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                },
+                {
+                  "branch_id": "bb8b71e38dc735de",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.000517302258576488,
+                    -5.0627905499193e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243996e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971618,
+              -0.8726646259971618,
+              -0.8726646259971618
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005076604444311898,
+                6.4278760968654004e-06
+              ],
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343243996e-06
+              ],
+              [
+                0.000517302258576488,
+                -5.0627905499193e-06
+              ]
+            ],
+            "physical_path_length_m": 1.5000000000000075e-05,
+            "projected_extension_m": 9.641814145298173e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 10,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005076604444311898,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005500000000000001
+      },
+      "process_owner_ids": [
+        "jbe1d699748fbb56"
+      ]
+    },
+    {
+      "case": "weakT_1000K_seed3624",
+      "checkpoint_state_sha256": "46ae53153f0490f33dcec6523bf4daff93406d71a33fb40ef92cb376b21d7870",
+      "front_competition_ids": [
+        "b042c2d7b4cc6a46",
+        "bb8b71e38dc735de"
+      ],
+      "network": {
+        "active_tip_ids": [
+          "b042c2d7b4cc6a46",
+          "bb8b71e38dc735de"
+        ],
+        "branches": [
+          {
+            "branch_id": "b00000000",
+            "generation": 0,
+            "initiation_event": 0,
+            "local_state": {
+              "committed_edges": [
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 1,
+                  "end_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005,
+                    0.0
+                  ]
+                },
+                {
+                  "branch_id": "b00000000",
+                  "commit_event_id": 2,
+                  "end_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654004e-06
+                  ],
+                  "parent_or_junction_id": null,
+                  "start_point_m": [
+                    0.0005038302222155949,
+                    3.2139380484327002e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.0,
+              0.6981317007977303,
+              0.6981317007977303
+            ],
+            "parent_branch_id": null,
+            "path_m": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                0.0005,
+                0.0
+              ],
+              [
+                0.0005038302222155949,
+                3.2139380484327002e-06
+              ],
+              [
+                0.0005076604444311898,
+                6.4278760968654004e-06
+              ]
+            ],
+            "physical_path_length_m": 0.00051,
+            "projected_extension_m": 0.0005076604444311898,
+            "status": "terminated"
+          },
+          {
+            "branch_id": "b042c2d7b4cc6a46",
+            "generation": 1,
+            "initiation_event": 3,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 4,
+                  "end_point_m": [
+                    0.0005114906666467847,
+                    9.641814145298117e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654004e-06
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 5,
+                  "end_point_m": [
+                    0.0005153208888623796,
+                    1.2855752193730818e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005114906666467847,
+                    9.641814145298117e-06
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 7,
+                  "end_point_m": [
+                    0.0005191511110779745,
+                    1.6069690242163517e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005153208888623796,
+                    1.2855752193730818e-05
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 8,
+                  "end_point_m": [
+                    0.0005229813332935694,
+                    1.9283628290596217e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005191511110779745,
+                    1.6069690242163517e-05
+                  ]
+                },
+                {
+                  "branch_id": "b042c2d7b4cc6a46",
+                  "commit_event_id": 9,
+                  "end_point_m": [
+                    0.0005268115555091644,
+                    2.2497566339028918e-05
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005229813332935694,
+                    1.9283628290596217e-05
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              0.6981317007977329,
+              0.6981317007977305,
+              0.6981317007977301,
+              0.6981317007977305,
+              0.6981317007977305
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005076604444311898,
+                6.4278760968654004e-06
+              ],
+              [
+                0.0005114906666467847,
+                9.641814145298117e-06
+              ],
+              [
+                0.0005153208888623796,
+                1.2855752193730818e-05
+              ],
+              [
+                0.0005191511110779745,
+                1.6069690242163517e-05
+              ],
+              [
+                0.0005229813332935694,
+                1.9283628290596217e-05
+              ],
+              [
+                0.0005268115555091644,
+                2.2497566339028918e-05
+              ]
+            ],
+            "physical_path_length_m": 2.5000000000000083e-05,
+            "projected_extension_m": 1.915111107797453e-05,
+            "status": "active"
+          },
+          {
+            "branch_id": "bb8b71e38dc735de",
+            "generation": 1,
+            "initiation_event": 3,
+            "local_state": {
+              "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+              "cluster_unresolved": true,
+              "committed_edges": [
+                {
+                  "branch_id": "bb8b71e38dc735de",
+                  "commit_event_id": 3,
+                  "end_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005076604444311898,
+                    6.4278760968654004e-06
+                  ]
+                },
+                {
+                  "branch_id": "bb8b71e38dc735de",
+                  "commit_event_id": 6,
+                  "end_point_m": [
+                    0.0005140883205280553,
+                    -1.2325683343243996e-06
+                  ],
+                  "parent_or_junction_id": "b00000000",
+                  "start_point_m": [
+                    0.0005108743824796225,
+                    2.5976538812705004e-06
+                  ]
+                }
+              ]
+            },
+            "orientation_history_rad": [
+              -0.8726646259971618,
+              -0.8726646259971618
+            ],
+            "parent_branch_id": "b00000000",
+            "path_m": [
+              [
+                0.0005076604444311898,
+                6.4278760968654004e-06
+              ],
+              [
+                0.0005108743824796225,
+                2.5976538812705004e-06
+              ],
+              [
+                0.0005140883205280553,
+                -1.2325683343243996e-06
+              ]
+            ],
+            "physical_path_length_m": 1.000000000000005e-05,
+            "projected_extension_m": 6.427876096865449e-06,
+            "status": "active"
+          }
+        ],
+        "branching_enabled": true,
+        "geometry_generation": 9,
+        "primary_branch_id": "b00000000",
+        "primary_projected_extension_m": 0.0005076604444311898,
+        "schema": "v11.crack-network/1",
+        "total_physical_crack_length_m": 0.0005450000000000001
+      },
+      "process_owner_ids": [
+        "jbe1d699748fbb56"
+      ]
+    }
+  ]
+}

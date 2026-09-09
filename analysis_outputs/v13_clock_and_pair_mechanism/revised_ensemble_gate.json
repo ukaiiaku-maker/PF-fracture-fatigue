@@ -1,0 +1,18 @@
+{
+  "accepted_parent_qualification_reopened": false,
+  "all_eight_intermediate_probabilities_required": false,
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "existing_exact_pair_and_fallback_checks_preserved": true,
+  "later_null_intermediate_grid_cases": 6,
+  "later_null_positive_reference_marks": 6,
+  "minimum_intermediate_cases": 1,
+  "reasons": [
+    "common_pair_model_kinetic_scales_not_physically_established",
+    "no_established_intermediate_probability_case",
+    "measurable_material_temperature_or_evolved_state_response_not_established",
+    "stable_ordering_under_modest_parameter_variation_not_established"
+  ],
+  "scope": "intended inherited/cooperative co-critical models, not the retained sequential null model",
+  "short_ensemble_launched": false,
+  "status": "NOT_PASSED_NO_ENSEMBLE"
+}

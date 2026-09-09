@@ -1,0 +1,1882 @@
+{
+  "boundary": "BRANCHING_KINETICS_MODEL_UNCALIBRATED",
+  "cases": [
+    {
+      "accepted_endpoint_s": 3368.4000000000233,
+      "candidates": [
+        {
+          "H_at_raw_primary_crossing_left_limit": 5.53720026765733e-06,
+          "H_last_accepted": 4.878906865342371e-06,
+          "H_pre_topology_at_accepted_endpoint": 6.621839393076703e-06,
+          "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+          "clock_snapshot_sha256": "f722549f0ec67a8ff64bfe12e88115d7280466c748431a9d0e79e6fcc3fd3b9e",
+          "effective_rate_pre_per_s": 2.403299942190531e-07,
+          "eta_fixed_for_parent_event": 0.26408072918302444,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.00811875013412652,
+          "interval_logmean_rate_per_s": 2.0749196758742047e-07,
+          "normalized_progress_at_crossing": 2.0967831635377317e-05,
+          "normalized_progress_at_endpoint": 2.5075057212854615e-05,
+          "post_primary_effective_rate_per_s": 6.935037454448118e-05,
+          "post_primary_raw_rate_per_s": 746.7027621021739,
+          "post_primary_scope": "saved_actual_single_to_pair_companion_drive",
+          "predicted_remaining_post_s_from_endpoint": 3807.8252508103583,
+          "predicted_remaining_post_s_from_raw_crossing": 3807.8408907997973,
+          "predicted_remaining_pre_s": 1098802.4729949466,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 9.486639598818241e-20,
+          "raw_rate_pre_per_s": 112.97924686109371,
+          "residual_at_endpoint": 0.26407410734363135,
+          "residual_eta_minus_H_at_crossing": 0.2640751919827568,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": false
+        },
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.15920307693798386,
+          "H_last_accepted": 0.14146930733076285,
+          "H_pre_topology_at_accepted_endpoint": 0.1884221763388344,
+          "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+          "clock_snapshot_sha256": "9a0f9bc75bd4e73c7eb42829f47369a6eb450fe78f7e6e2e4a0efdbf63b720c8",
+          "effective_rate_pre_per_s": 0.0064146758364469975,
+          "eta_fixed_for_parent_event": 0.15920307693798513,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.00811875013412652,
+          "interval_logmean_rate_per_s": 0.0055896272628656605,
+          "normalized_progress_at_crossing": 0.999999999999992,
+          "normalized_progress_at_endpoint": 1.1835335092941142,
+          "post_primary_effective_rate_per_s": null,
+          "post_primary_raw_rate_per_s": null,
+          "post_primary_scope": "primary_already_consumed_no_second_event_rate_invented",
+          "predicted_remaining_post_s_from_endpoint": 0.0,
+          "predicted_remaining_post_s_from_raw_crossing": 0.0,
+          "predicted_remaining_pre_s": 0.0,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 8.079132075848089e-20,
+          "raw_rate_pre_per_s": 3379.160694510357,
+          "residual_at_endpoint": 0.0,
+          "residual_eta_minus_H_at_crossing": 0.0,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": true
+        }
+      ],
+      "canonical_quadrature_reproduced": true,
+      "case": "Peak_300K",
+      "effective_rate_balance_pre": 0.0001498513677820779,
+      "event_context_sha256": "17ecc0cb63c187135b0ee633af9af3b7eb09698c02cc05fce03cd7d38f2e7b5d",
+      "inverse_requirements": [
+        {
+          "barrier_reduction_eV": 0.16467294486754447,
+          "independent_complete_site_multiplicity": 144921147.42230672,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 583.9608304791936,
+          "required_beta_B": 583.9608304791936,
+          "required_lambda_tau": 0.4360451650782932,
+          "required_tau_B_s": 0.0005839608304791937,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.01
+        },
+        {
+          "barrier_reduction_eV": 0.18092711140738568,
+          "independent_complete_site_multiplicity": 739625340.4928985,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 1095.0695359180497,
+          "required_beta_B": 1095.0695359180497,
+          "required_lambda_tau": 0.8176914471639534,
+          "required_tau_B_s": 0.0010950695359180497,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.05
+        },
+        {
+          "barrier_reduction_eV": 0.21155832519311277,
+          "independent_complete_site_multiplicity": 9994858500.603008,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 3581.157656622758,
+          "required_beta_B": 3581.157656622758,
+          "required_lambda_tau": 2.6740603137235617,
+          "required_tau_B_s": 0.0035811576566227576,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.5
+        }
+      ],
+      "near_completion_diagnostic": false,
+      "order_sensitivity": [
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.06720729219887825,
+              "independent_complete_site_multiplicity": 13.45962056602949,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 13.45962056602948,
+              "required_beta_B": 13.45962056602948,
+              "required_lambda_tau": 0.010050335853501437,
+              "required_tau_B_s": 1.3459620566029478e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.10934486208316725,
+              "independent_complete_site_multiplicity": 68.69305564525541,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 68.6930556452554,
+              "required_beta_B": 68.6930556452554,
+              "required_lambda_tau": 0.05129329438755053,
+              "required_tau_B_s": 6.869305564525539e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.1766552570824727,
+              "independent_complete_site_multiplicity": 928.2772419490525,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 928.2772419490526,
+              "required_beta_B": 928.2772419490526,
+              "required_lambda_tau": 0.6931471805599455,
+              "required_tau_B_s": 0.0009282772419490525,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 1,
+          "probability_at_tau_c_zero_extra_barrier": 0.0007464240489709796
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.13683571014271723,
+              "independent_complete_site_multiplicity": 36068.757360059615,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 198.9476238644725,
+              "required_beta_B": 198.9476238644725,
+              "required_lambda_tau": 0.14855474025326595,
+              "required_tau_B_s": 0.00019894762386447247,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.15938336159950883,
+              "independent_complete_site_multiplicity": 184081.9467558505,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 475.90758831294727,
+              "required_beta_B": 475.90758831294727,
+              "required_lambda_tau": 0.35536151069866195,
+              "required_tau_B_s": 0.00047590758831294726,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.1995167568665794,
+              "independent_complete_site_multiplicity": 2487574.3293410437,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 2247.6774898912286,
+              "required_beta_B": 2247.6774898912286,
+              "required_lambda_tau": 1.6783469900166612,
+              "required_tau_B_s": 0.0022476774898912283,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 2,
+          "probability_at_tau_c_zero_extra_barrier": 2.786437678720474e-07
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.16467294486754447,
+              "independent_complete_site_multiplicity": 144921147.42230672,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 583.9608304791936,
+              "required_beta_B": 583.9608304791936,
+              "required_lambda_tau": 0.4360451650782932,
+              "required_tau_B_s": 0.0005839608304791937,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.18092711140738568,
+              "independent_complete_site_multiplicity": 739625340.4928985,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 1095.0695359180497,
+              "required_beta_B": 1095.0695359180497,
+              "required_lambda_tau": 0.8176914471639534,
+              "required_tau_B_s": 0.0010950695359180497,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.21155832519311277,
+              "independent_complete_site_multiplicity": 9994858500.603008,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 3581.157656622758,
+              "required_beta_B": 3581.157656622758,
+              "required_lambda_tau": 2.6740603137235617,
+              "required_tau_B_s": 0.0035811576566227576,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 3,
+          "probability_at_tau_c_zero_extra_barrier": 6.935037454448118e-11
+        }
+      ],
+      "parent_record_sha256": "90dd6d648367fa1f856885f63d4470e8667776576fca78f9f315fbbd6e839e59",
+      "raw_primary_crossing_s": 3363.172621137936,
+      "raw_rate_balance_pre": 0.12522303736459647,
+      "source_unchanged": true,
+      "tau_c_s": 1e-06
+    },
+    {
+      "accepted_endpoint_s": 3124.8000000000206,
+      "candidates": [
+        {
+          "H_at_raw_primary_crossing_left_limit": 6.4551167815079225e-06,
+          "H_last_accepted": 5.034728947710432e-06,
+          "H_pre_topology_at_accepted_endpoint": 6.6091753554356365e-06,
+          "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+          "clock_snapshot_sha256": "4a0cc9114910ff992b8fb4d3b6366aa247a7fd1777b0311d12af3f7f6e84a85c",
+          "effective_rate_pre_per_s": 2.1350916816333062e-07,
+          "eta_fixed_for_parent_event": 0.26408072918302444,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.006875005126008112,
+          "interval_logmean_rate_per_s": 1.874340961577624e-07,
+          "normalized_progress_at_crossing": 2.4443725225531785e-05,
+          "normalized_progress_at_endpoint": 2.502710203763132e-05,
+          "post_primary_effective_rate_per_s": 0.04357191758297923,
+          "post_primary_raw_rate_per_s": 6404.4408148741595,
+          "post_primary_scope": "saved_actual_single_to_pair_companion_drive",
+          "predicted_remaining_post_s_from_endpoint": 6.060649488394927,
+          "predicted_remaining_post_s_from_raw_crossing": 6.060653024125795,
+          "predicted_remaining_pre_s": 1236828.7335756512,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 3.1676592366947374e-19,
+          "raw_rate_pre_per_s": 108.6094760008743,
+          "residual_at_endpoint": 0.264074120007669,
+          "residual_eta_minus_H_at_crossing": 0.26407427406624295,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": false
+        },
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.15920307693798547,
+          "H_last_accepted": 0.12599921889110702,
+          "H_pre_topology_at_accepted_endpoint": 0.16280444474604688,
+          "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+          "clock_snapshot_sha256": "7a6d8fb4ff3c1c7dfe953a7cb40655b5479ced827472904633af07064fef13ad",
+          "effective_rate_pre_per_s": 0.004952257190344413,
+          "eta_fixed_for_parent_event": 0.15920307693798513,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.006875005126008112,
+          "interval_logmean_rate_per_s": 0.004381574506540458,
+          "normalized_progress_at_crossing": 1.000000000000002,
+          "normalized_progress_at_endpoint": 1.02262121987419,
+          "post_primary_effective_rate_per_s": null,
+          "post_primary_raw_rate_per_s": null,
+          "post_primary_scope": "primary_already_consumed_no_second_event_rate_invented",
+          "predicted_remaining_post_s_from_endpoint": 0.0,
+          "predicted_remaining_post_s_from_raw_crossing": 0.0,
+          "predicted_remaining_pre_s": 0.0,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 2.7049615364760105e-19,
+          "raw_rate_pre_per_s": 3099.7119295705043,
+          "residual_at_endpoint": 0.0,
+          "residual_eta_minus_H_at_crossing": 0.0,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": true
+        }
+      ],
+      "canonical_quadrature_reproduced": true,
+      "case": "Peak_1000K",
+      "effective_rate_balance_pre": 0.0001724391532109191,
+      "event_context_sha256": "3c96b61322185e490415d248d1c8f2b8da8ff59883294f18723b8c0fe7123186",
+      "inverse_requirements": [
+        {
+          "barrier_reduction_eV": 0.36371645563694377,
+          "independent_complete_site_multiplicity": 230660.8520362956,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 68.08481453456308,
+          "required_beta_B": 68.08481453456308,
+          "required_lambda_tau": 0.4360451650782932,
+          "required_tau_B_s": 6.808481453456308e-05,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.01
+        },
+        {
+          "barrier_reduction_eV": 0.4178970107697477,
+          "independent_complete_site_multiplicity": 1177209.9121502505,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 127.67569734814079,
+          "required_beta_B": 127.67569734814079,
+          "required_lambda_tau": 0.8176914471639534,
+          "required_tau_B_s": 0.0001276756973481408,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.05
+        },
+        {
+          "barrier_reduction_eV": 0.5200010567221715,
+          "independent_complete_site_multiplicity": 15908117.060467355,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 417.53220788817674,
+          "required_beta_B": 417.53220788817674,
+          "required_lambda_tau": 2.6740603137235617,
+          "required_tau_B_s": 0.00041753220788817675,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.5
+        }
+      ],
+      "near_completion_diagnostic": false,
+      "order_sensitivity": [
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.038830946741389684,
+              "independent_complete_site_multiplicity": 1.5692760920141187,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 1.5692760920141184,
+              "required_beta_B": 1.5692760920141184,
+              "required_lambda_tau": 0.010050335853501437,
+              "required_tau_B_s": 1.5692760920141184e-06,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.179289513022353,
+              "independent_complete_site_multiplicity": 8.00901997070893,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 8.009019970708932,
+              "required_beta_B": 8.009019970708932,
+              "required_lambda_tau": 0.05129329438755053,
+              "required_tau_B_s": 8.009019970708932e-06,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.4036574963533711,
+              "independent_complete_site_multiplicity": 108.2291492100493,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 108.22914921004936,
+              "required_beta_B": 108.22914921004936,
+              "required_lambda_tau": 0.6931471805599455,
+              "required_tau_B_s": 0.00010822914921004936,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 1,
+          "probability_at_tau_c_zero_extra_barrier": 0.006383976095466627
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.27092567322085287,
+              "independent_complete_site_multiplicity": 492.149993325892,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 23.19558327531908,
+              "required_beta_B": 23.19558327531908,
+              "required_lambda_tau": 0.14855474025326595,
+              "required_tau_B_s": 2.319558327531908e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.3460845114101583,
+              "independent_complete_site_multiplicity": 2511.7563092880364,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 55.48673505942055,
+              "required_beta_B": 55.48673505942055,
+              "required_lambda_tau": 0.35536151069866195,
+              "required_tau_B_s": 5.5486735059420555e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.47986249563372674,
+              "independent_complete_site_multiplicity": 33942.38613106553,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 262.0598797819695,
+              "required_beta_B": 262.0598797819695,
+              "required_lambda_tau": 1.6783469900166612,
+              "required_tau_B_s": 0.00026205987978196953,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 2,
+          "probability_at_tau_c_zero_extra_barrier": 2.0421077659453754e-05
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.36371645563694377,
+              "independent_complete_site_multiplicity": 230660.8520362956,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 68.08481453456308,
+              "required_beta_B": 68.08481453456308,
+              "required_lambda_tau": 0.4360451650782932,
+              "required_tau_B_s": 6.808481453456308e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.4178970107697477,
+              "independent_complete_site_multiplicity": 1177209.9121502505,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 127.67569734814079,
+              "required_beta_B": 127.67569734814079,
+              "required_lambda_tau": 0.8176914471639534,
+              "required_tau_B_s": 0.0001276756973481408,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.5200010567221715,
+              "independent_complete_site_multiplicity": 15908117.060467355,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 417.53220788817674,
+              "required_beta_B": 417.53220788817674,
+              "required_lambda_tau": 2.6740603137235617,
+              "required_tau_B_s": 0.00041753220788817675,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 3,
+          "probability_at_tau_c_zero_extra_barrier": 4.3571917582979225e-08
+        }
+      ],
+      "parent_record_sha256": "3476154a352e7d751dc426f8f2c54b76f44d3847644a2ca871e86a995204fa75",
+      "raw_primary_crossing_s": 3123.9780653729395,
+      "raw_rate_balance_pre": 0.13082577216632302,
+      "source_unchanged": true,
+      "tau_c_s": 1e-06
+    },
+    {
+      "accepted_endpoint_s": 3360.000000000023,
+      "candidates": [
+        {
+          "H_at_raw_primary_crossing_left_limit": 5.212271574221083e-07,
+          "H_last_accepted": 3.790617357897118e-07,
+          "H_pre_topology_at_accepted_endpoint": 5.429707370283765e-07,
+          "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+          "clock_snapshot_sha256": "a39d47fc2c19afcfd82b516f59a75239c3a7808ca338971c0467e29c4dd7847f",
+          "effective_rate_pre_per_s": 2.3215571259542217e-08,
+          "eta_fixed_for_parent_event": 0.26408072918302444,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.008077679316310054,
+          "interval_logmean_rate_per_s": 1.9512976337936278e-08,
+          "normalized_progress_at_crossing": 1.9737417381215474e-06,
+          "normalized_progress_at_endpoint": 2.056078604100127e-06,
+          "post_primary_effective_rate_per_s": 2.302606241112139e-05,
+          "post_primary_raw_rate_per_s": 517.0268660024468,
+          "post_primary_scope": "saved_actual_single_to_pair_companion_drive",
+          "predicted_remaining_post_s_from_endpoint": 11468.751430324402,
+          "predicted_remaining_post_s_from_raw_crossing": 11468.752374627395,
+          "predicted_remaining_pre_s": 11375132.879718522,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 9.809329795721892e-20,
+          "raw_rate_pre_per_s": 51.83811131531319,
+          "residual_at_endpoint": 0.2640801862122874,
+          "residual_eta_minus_H_at_crossing": 0.264080207955867,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": false
+        },
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.15920307693798527,
+          "H_last_accepted": 0.11492430636598497,
+          "H_pre_topology_at_accepted_endpoint": 0.16597532128365658,
+          "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+          "clock_snapshot_sha256": "2348638a7f43488bc58bd74fb975bfa42bf5d33a02f8bcb54059cdf9d89387b0",
+          "effective_rate_pre_per_s": 0.007253827284076703,
+          "eta_fixed_for_parent_event": 0.15920307693798513,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.008077679316310054,
+          "interval_logmean_rate_per_s": 0.0060775017759132875,
+          "normalized_progress_at_crossing": 1.0000000000000009,
+          "normalized_progress_at_endpoint": 1.0425384011158871,
+          "post_primary_effective_rate_per_s": null,
+          "post_primary_raw_rate_per_s": null,
+          "post_primary_scope": "primary_already_consumed_no_second_event_rate_invented",
+          "predicted_remaining_post_s_from_endpoint": 0.0,
+          "predicted_remaining_post_s_from_raw_crossing": 0.0,
+          "predicted_remaining_pre_s": 0.0,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 8.062143623726023e-20,
+          "raw_rate_pre_per_s": 3520.640673987277,
+          "residual_at_endpoint": 0.0,
+          "residual_eta_minus_H_at_crossing": 0.0,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": true
+        }
+      ],
+      "canonical_quadrature_reproduced": true,
+      "case": "DBTT_300K",
+      "effective_rate_balance_pre": 1.2801750993043208e-05,
+      "event_context_sha256": "51b897470ca6fb9ed98606688a72899ae24904ba5c11e9c08c00611aebfbf9f1",
+      "inverse_requirements": [
+        {
+          "barrier_reduction_eV": 0.1741754254078855,
+          "independent_complete_site_multiplicity": 436476531.41648346,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 843.3704198965739,
+          "required_beta_B": 843.3704198965739,
+          "required_lambda_tau": 0.4360451650782932,
+          "required_tau_B_s": 0.0008433704198965739,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.01
+        },
+        {
+          "barrier_reduction_eV": 0.1904295919477267,
+          "independent_complete_site_multiplicity": 2227619011.498283,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 1581.5260307190374,
+          "required_beta_B": 1581.5260307190374,
+          "required_lambda_tau": 0.8176914471639534,
+          "required_tau_B_s": 0.0015815260307190375,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.05
+        },
+        {
+          "barrier_reduction_eV": 0.2210608057334538,
+          "independent_complete_site_multiplicity": 30102723087.260506,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 5171.994899218461,
+          "required_beta_B": 5171.994899218461,
+          "required_lambda_tau": 2.6740603137235617,
+          "required_tau_B_s": 0.005171994899218461,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.5
+        }
+      ],
+      "near_completion_diagnostic": false,
+      "order_sensitivity": [
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.07670977273921928,
+              "independent_complete_site_multiplicity": 19.43871105037292,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 19.43871105037291,
+              "required_beta_B": 19.43871105037291,
+              "required_lambda_tau": 0.010050335853501437,
+              "required_tau_B_s": 1.943871105037291e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.11884734262350827,
+              "independent_complete_site_multiplicity": 99.20818000066518,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 99.20818000066517,
+              "required_beta_B": 99.20818000066517,
+              "required_lambda_tau": 0.05129329438755053,
+              "required_tau_B_s": 9.920818000066516e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.18615773762281373,
+              "independent_complete_site_multiplicity": 1340.6405472102972,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 1340.6405472102977,
+              "required_beta_B": 1340.6405472102977,
+              "required_lambda_tau": 0.6931471805599455,
+              "required_tau_B_s": 0.0013406405472102976,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 1,
+          "probability_at_tau_c_zero_extra_barrier": 0.0005168932306443784
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.14633819068305826,
+              "independent_complete_site_multiplicity": 75220.11819625579,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 287.32499222305967,
+              "required_beta_B": 287.32499222305967,
+              "required_lambda_tau": 0.14855474025326595,
+              "required_tau_B_s": 0.00028732499222305967,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.16888584213984986,
+              "independent_complete_site_multiplicity": 383896.3913989704,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 687.3173021863437,
+              "required_beta_B": 687.3173021863437,
+              "required_lambda_tau": 0.35536151069866195,
+              "required_tau_B_s": 0.0006873173021863437,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.20901923740692044,
+              "independent_complete_site_multiplicity": 5187748.3110135,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 3246.150442806426,
+              "required_beta_B": 3246.150442806426,
+              "required_lambda_tau": 1.6783469900166612,
+              "required_tau_B_s": 0.003246150442806426,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 2,
+          "probability_at_tau_c_zero_extra_barrier": 1.3361232902951367e-07
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.1741754254078855,
+              "independent_complete_site_multiplicity": 436476531.41648346,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 843.3704198965739,
+              "required_beta_B": 843.3704198965739,
+              "required_lambda_tau": 0.4360451650782932,
+              "required_tau_B_s": 0.0008433704198965739,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.1904295919477267,
+              "independent_complete_site_multiplicity": 2227619011.498283,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 1581.5260307190374,
+              "required_beta_B": 1581.5260307190374,
+              "required_lambda_tau": 0.8176914471639534,
+              "required_tau_B_s": 0.0015815260307190375,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.2210608057334538,
+              "independent_complete_site_multiplicity": 30102723087.260506,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 5171.994899218461,
+              "required_beta_B": 5171.994899218461,
+              "required_lambda_tau": 2.6740603137235617,
+              "required_tau_B_s": 0.005171994899218461,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 3,
+          "probability_at_tau_c_zero_extra_barrier": 2.3026062411121387e-11
+        }
+      ],
+      "parent_record_sha256": "01c9b627590f5e0bc174be5c3740bc8d79e3ef1eac00026f46d278f2b88fc86e",
+      "raw_primary_crossing_s": 3358.885686159341,
+      "raw_rate_balance_pre": 0.05719940963706801,
+      "source_unchanged": true,
+      "tau_c_s": 1e-06
+    },
+    {
+      "accepted_endpoint_s": 3301.2000000000226,
+      "candidates": [
+        {
+          "H_at_raw_primary_crossing_left_limit": 5.392369770746112e-08,
+          "H_last_accepted": 4.042036734651707e-08,
+          "H_pre_topology_at_accepted_endpoint": 6.024056667932146e-08,
+          "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+          "clock_snapshot_sha256": "332355e694b1d351a955592caa191ff35c8a55a3785f965e9f575e6d748d345d",
+          "effective_rate_pre_per_s": 2.858014948999243e-09,
+          "eta_fixed_for_parent_event": 0.26408072918302444,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.007678755852941536,
+          "interval_logmean_rate_per_s": 2.3595475396195693e-09,
+          "normalized_progress_at_crossing": 2.0419398974806916e-07,
+          "normalized_progress_at_endpoint": 2.28114209112059e-07,
+          "post_primary_effective_rate_per_s": 0.04461128919514142,
+          "post_primary_raw_rate_per_s": 6455.047009795081,
+          "post_primary_scope": "saved_actual_single_to_pair_companion_drive",
+          "predicted_remaining_post_s_from_endpoint": 5.919592858823245,
+          "predicted_remaining_post_s_from_raw_crossing": 5.919593000421237,
+          "predicted_remaining_pre_s": 92400032.88009277,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 3.366178825246733e-19,
+          "raw_rate_pre_per_s": 25.787429201823144,
+          "residual_at_endpoint": 0.26408066894245774,
+          "residual_eta_minus_H_at_crossing": 0.2640806752593267,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": false
+        },
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.15920307693798552,
+          "H_last_accepted": 0.1198501970970253,
+          "H_pre_topology_at_accepted_endpoint": 0.17761238626953404,
+          "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+          "clock_snapshot_sha256": "ddc54f65781554e7fdf83abac604bfa0c79762233c9a3911202e1939b51212e4",
+          "effective_rate_pre_per_s": 0.008301248370830565,
+          "eta_fixed_for_parent_event": 0.15920307693798513,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.007678755852941536,
+          "interval_logmean_rate_per_s": 0.006876451091965328,
+          "normalized_progress_at_crossing": 1.0000000000000024,
+          "normalized_progress_at_endpoint": 1.1156341302292792,
+          "post_primary_effective_rate_per_s": null,
+          "post_primary_raw_rate_per_s": null,
+          "post_primary_scope": "primary_already_consumed_no_second_event_rate_invented",
+          "predicted_remaining_post_s_from_endpoint": 0.0,
+          "predicted_remaining_post_s_from_raw_crossing": 0.0,
+          "predicted_remaining_pre_s": 0.0,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 2.681168370666523e-19,
+          "raw_rate_pre_per_s": 3682.6860089324205,
+          "residual_at_endpoint": 0.0,
+          "residual_eta_minus_H_at_crossing": 0.0,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": true
+        }
+      ],
+      "canonical_quadrature_reproduced": true,
+      "case": "DBTT_1000K",
+      "effective_rate_balance_pre": 1.3771485219432943e-06,
+      "event_context_sha256": "50935715a695f8e832f80241e96f340906d265fd77cbc5631cf1badcfd60f936",
+      "inverse_requirements": [
+        {
+          "barrier_reduction_eV": 0.3630382129200705,
+          "independent_complete_site_multiplicity": 225286.82337243,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 67.55104407708035,
+          "required_beta_B": 67.55104407708035,
+          "required_lambda_tau": 0.4360451650782932,
+          "required_tau_B_s": 6.755104407708034e-05,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.01
+        },
+        {
+          "barrier_reduction_eV": 0.4172187680528745,
+          "independent_complete_site_multiplicity": 1149782.8054026926,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 126.67474705035671,
+          "required_beta_B": 126.67474705035671,
+          "required_lambda_tau": 0.8176914471639534,
+          "required_tau_B_s": 0.0001266747470503567,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.05
+        },
+        {
+          "barrier_reduction_eV": 0.5193228140052981,
+          "independent_complete_site_multiplicity": 15537483.394995466,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 414.2588442293081,
+          "required_beta_B": 414.2588442293081,
+          "required_lambda_tau": 2.6740603137235617,
+          "required_tau_B_s": 0.00041425884422930813,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.5
+        }
+      ],
+      "near_completion_diagnostic": false,
+      "order_sensitivity": [
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.038152704024516426,
+              "independent_complete_site_multiplicity": 1.556973301395136,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 1.5569733013951343,
+              "required_beta_B": 1.5569733013951343,
+              "required_lambda_tau": 0.010050335853501437,
+              "required_tau_B_s": 1.5569733013951342e-06,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.17861127030547974,
+              "independent_complete_site_multiplicity": 7.946230958460347,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 7.946230958460342,
+              "required_beta_B": 7.946230958460342,
+              "required_lambda_tau": 0.05129329438755053,
+              "required_tau_B_s": 7.946230958460342e-06,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.4029792536364979,
+              "independent_complete_site_multiplicity": 107.38065571143687,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 107.38065571143684,
+              "required_beta_B": 107.38065571143684,
+              "required_lambda_tau": 0.6931471805599455,
+              "required_tau_B_s": 0.00010738065571143684,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 1,
+          "probability_at_tau_c_zero_extra_barrier": 0.006434257949351506
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.27024743050397965,
+              "independent_complete_site_multiplicity": 484.4797973099114,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 23.013734838467414,
+              "required_beta_B": 23.013734838467414,
+              "required_lambda_tau": 0.14855474025326595,
+              "required_tau_B_s": 2.3013734838467414e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.345406268693285,
+              "independent_complete_site_multiplicity": 2472.61039138114,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 55.05173086414798,
+              "required_beta_B": 55.05173086414798,
+              "required_lambda_tau": 0.35536151069866195,
+              "required_tau_B_s": 5.5051730864147975e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.47918425291685357,
+              "independent_complete_site_multiplicity": 33413.39139692768,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 260.00538609089716,
+              "required_beta_B": 260.00538609089716,
+              "required_lambda_tau": 1.6783469900166612,
+              "required_tau_B_s": 0.00026000538609089716,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 2,
+          "probability_at_tau_c_zero_extra_barrier": 2.0744377092640005e-05
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.3630382129200705,
+              "independent_complete_site_multiplicity": 225286.82337243,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 67.55104407708035,
+              "required_beta_B": 67.55104407708035,
+              "required_lambda_tau": 0.4360451650782932,
+              "required_tau_B_s": 6.755104407708034e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.4172187680528745,
+              "independent_complete_site_multiplicity": 1149782.8054026926,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 126.67474705035671,
+              "required_beta_B": 126.67474705035671,
+              "required_lambda_tau": 0.8176914471639534,
+              "required_tau_B_s": 0.0001266747470503567,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.5193228140052981,
+              "independent_complete_site_multiplicity": 15537483.394995466,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 414.2588442293081,
+              "required_beta_B": 414.2588442293081,
+              "required_lambda_tau": 2.6740603137235617,
+              "required_tau_B_s": 0.00041425884422930813,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 3,
+          "probability_at_tau_c_zero_extra_barrier": 4.461128919514142e-08
+        }
+      ],
+      "parent_record_sha256": "33ce002691293a37190f7ff0c7819813c00649cadea30993589adbcb56871434",
+      "raw_primary_crossing_s": 3298.5228473401194,
+      "raw_rate_balance_pre": 0.027621190068568727,
+      "source_unchanged": true,
+      "tau_c_s": 1e-06
+    },
+    {
+      "accepted_endpoint_s": 2671.2000000000157,
+      "candidates": [
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.00013940037118196144,
+          "H_last_accepted": 0.00013214509781127475,
+          "H_pre_topology_at_accepted_endpoint": 0.00017151008020018296,
+          "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+          "clock_snapshot_sha256": "bb7939e282a660556b9ff0ee33da279005e9b37f809c839dd4bd61f529ad47a2",
+          "effective_rate_pre_per_s": 5.313723068318374e-06,
+          "eta_fixed_for_parent_event": 0.26408072918302444,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.005093228716048885,
+          "interval_logmean_rate_per_s": 4.686307427250979e-06,
+          "normalized_progress_at_crossing": 0.0005278702903207613,
+          "normalized_progress_at_endpoint": 0.0006494607945486085,
+          "post_primary_effective_rate_per_s": 0.00025295074672530366,
+          "post_primary_raw_rate_per_s": 1149.5306194743168,
+          "post_primary_scope": "saved_actual_single_to_pair_companion_drive",
+          "predicted_remaining_post_s_from_endpoint": 1043.322553973012,
+          "predicted_remaining_post_s_from_raw_crossing": 1043.4494945313375,
+          "predicted_remaining_pre_s": 49671.638024480555,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 9.05916469050585e-20,
+          "raw_rate_pre_per_s": 317.11575496238305,
+          "residual_at_endpoint": 0.2639092191028243,
+          "residual_eta_minus_H_at_crossing": 0.26394132881184246,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": false
+        },
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.15920307693798552,
+          "H_last_accepted": 0.15116461808276116,
+          "H_pre_topology_at_accepted_endpoint": 0.1947789348841584,
+          "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+          "clock_snapshot_sha256": "97d24943e87b192fc90b22cd363309314c5efccf8482569ed54f775b254d4e4b",
+          "effective_rate_pre_per_s": 0.0058656678776852515,
+          "eta_fixed_for_parent_event": 0.15920307693798513,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.005093228716048885,
+          "interval_logmean_rate_per_s": 0.00519218057159491,
+          "normalized_progress_at_crossing": 1.0000000000000024,
+          "normalized_progress_at_endpoint": 1.2234621254213023,
+          "post_primary_effective_rate_per_s": null,
+          "post_primary_raw_rate_per_s": null,
+          "post_primary_scope": "primary_already_consumed_no_second_event_rate_invented",
+          "predicted_remaining_post_s_from_endpoint": 0.0,
+          "predicted_remaining_post_s_from_raw_crossing": 0.0,
+          "predicted_remaining_pre_s": 0.0,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 8.091495322607099e-20,
+          "raw_rate_pre_per_s": 3279.7870161046126,
+          "residual_at_endpoint": 0.0,
+          "residual_eta_minus_H_at_crossing": 0.0,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": true
+        }
+      ],
+      "canonical_quadrature_reproduced": true,
+      "case": "weakT_300K",
+      "effective_rate_balance_pre": 0.0036170535499881864,
+      "event_context_sha256": "f3c49c8c21518d88f8dd91f197604f53810408e625ce0125b06f3840942ba35c",
+      "inverse_requirements": [
+        {
+          "barrier_reduction_eV": 0.1535193119611121,
+          "independent_complete_site_multiplicity": 39732382.61733484,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 379.3245327190134,
+          "required_beta_B": 379.3245327190134,
+          "required_lambda_tau": 0.4360451650782932,
+          "required_tau_B_s": 0.0003793245327190134,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.01
+        },
+        {
+          "barrier_reduction_eV": 0.16977347850095328,
+          "independent_complete_site_multiplicity": 202779770.54863593,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 711.326373835858,
+          "required_beta_B": 711.326373835858,
+          "required_lambda_tau": 0.8176914471639534,
+          "required_tau_B_s": 0.0007113263738358581,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.05
+        },
+        {
+          "barrier_reduction_eV": 0.20040469228668037,
+          "independent_complete_site_multiplicity": 2740245638.5116534,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 2326.2193006624007,
+          "required_beta_B": 2326.2193006624007,
+          "required_lambda_tau": 2.6740603137235617,
+          "required_tau_B_s": 0.002326219300662401,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.5
+        }
+      ],
+      "near_completion_diagnostic": false,
+      "order_sensitivity": [
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.05605365929244585,
+              "independent_complete_site_multiplicity": 8.742990994095905,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 8.742990994095903,
+              "required_beta_B": 8.742990994095903,
+              "required_lambda_tau": 0.010050335853501437,
+              "required_tau_B_s": 8.742990994095904e-06,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.09819122917673484,
+              "independent_complete_site_multiplicity": 44.62107708884437,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 44.62107708884438,
+              "required_beta_B": 44.62107708884438,
+              "required_lambda_tau": 0.05129329438755053,
+              "required_tau_B_s": 4.462107708884438e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.1655016241760403,
+              "independent_complete_site_multiplicity": 602.982790381802,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 602.9827903818025,
+              "required_beta_B": 602.9827903818025,
+              "required_lambda_tau": 0.6931471805599455,
+              "required_tau_B_s": 0.0006029827903818025,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 1,
+          "probability_at_tau_c_zero_extra_barrier": 0.0011488701622479386
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.12568207723628483,
+              "independent_complete_site_multiplicity": 15223.066577469654,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 129.23078144817092,
+              "required_beta_B": 129.23078144817092,
+              "required_lambda_tau": 0.14855474025326595,
+              "required_tau_B_s": 0.0001292307814481709,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.14822972869307643,
+              "independent_complete_site_multiplicity": 77693.04895093577,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 309.1361853946697,
+              "required_beta_B": 309.1361853946697,
+              "required_lambda_tau": 0.35536151069866195,
+              "required_tau_B_s": 0.0003091361853946697,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.18836312396014698,
+              "independent_complete_site_multiplicity": 1049897.8174916683,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 1460.0280858844571,
+              "required_beta_B": 1460.0280858844571,
+              "required_lambda_tau": 1.6783469900166612,
+              "required_tau_B_s": 0.0014600280858844572,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 2,
+          "probability_at_tau_c_zero_extra_barrier": 6.602042029257574e-07
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.1535193119611121,
+              "independent_complete_site_multiplicity": 39732382.61733484,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 379.3245327190134,
+              "required_beta_B": 379.3245327190134,
+              "required_lambda_tau": 0.4360451650782932,
+              "required_tau_B_s": 0.0003793245327190134,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.16977347850095328,
+              "independent_complete_site_multiplicity": 202779770.54863593,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 711.326373835858,
+              "required_beta_B": 711.326373835858,
+              "required_lambda_tau": 0.8176914471639534,
+              "required_tau_B_s": 0.0007113263738358581,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.20040469228668037,
+              "independent_complete_site_multiplicity": 2740245638.5116534,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 2326.2193006624007,
+              "required_beta_B": 2326.2193006624007,
+              "required_lambda_tau": 2.6740603137235617,
+              "required_tau_B_s": 0.002326219300662401,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 3,
+          "probability_at_tau_c_zero_extra_barrier": 2.5295074672530365e-10
+        }
+      ],
+      "parent_record_sha256": "db196189c48c3457bb3e60e8bcf15a3e928d122d3bb930797795bf84dff87302",
+      "raw_primary_crossing_s": 2664.3481855348564,
+      "raw_rate_balance_pre": 0.32156298830165864,
+      "source_unchanged": true,
+      "tau_c_s": 1e-06
+    },
+    {
+      "accepted_endpoint_s": 2234.400000000011,
+      "candidates": [
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.00012219136684086157,
+          "H_last_accepted": 0.00010001045952545206,
+          "H_pre_topology_at_accepted_endpoint": 0.0001363360128268592,
+          "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+          "clock_snapshot_sha256": "70c98a4acd7e0230be93155333a293fed57aa4a825aeb2a11de96d2a94744a25",
+          "effective_rate_pre_per_s": 5.017038252677723e-06,
+          "eta_fixed_for_parent_event": 0.26408072918302444,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.003452294640529422,
+          "interval_logmean_rate_per_s": 4.324470631119898e-06,
+          "normalized_progress_at_crossing": 0.000462704594988358,
+          "normalized_progress_at_endpoint": 0.0005162664206836911,
+          "post_primary_effective_rate_per_s": 0.0012550085104135586,
+          "post_primary_raw_rate_per_s": 1961.0057938391326,
+          "post_primary_scope": "saved_actual_single_to_pair_companion_drive",
+          "predicted_remaining_post_s_from_endpoint": 210.31283133149503,
+          "predicted_remaining_post_s_from_raw_crossing": 210.32410188931883,
+          "predicted_remaining_pre_s": 52612.42281246353,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 3.0223658503047117e-19,
+          "raw_rate_pre_per_s": 311.0999905368207,
+          "residual_at_endpoint": 0.2639443931701976,
+          "residual_eta_minus_H_at_crossing": 0.26395853781618356,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": false
+        },
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.1592030769379845,
+          "H_last_accepted": 0.13114981204023501,
+          "H_pre_topology_at_accepted_endpoint": 0.17709249395269847,
+          "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+          "clock_snapshot_sha256": "37cdb41953ccdf35aa8ce8f0550d0fbe2ed26ba852a9018c735e7175c02eed7f",
+          "effective_rate_pre_per_s": 0.006315076840085869,
+          "eta_fixed_for_parent_event": 0.15920307693798513,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.003452294640529422,
+          "interval_logmean_rate_per_s": 0.005469366894340886,
+          "normalized_progress_at_crossing": 0.999999999999996,
+          "normalized_progress_at_endpoint": 1.112368538088506,
+          "post_primary_effective_rate_per_s": null,
+          "post_primary_raw_rate_per_s": null,
+          "post_primary_scope": "primary_already_consumed_no_second_event_rate_invented",
+          "predicted_remaining_post_s_from_endpoint": 0.0,
+          "predicted_remaining_post_s_from_raw_crossing": 0.0,
+          "predicted_remaining_pre_s": 0.0,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 2.6937648039198807e-19,
+          "raw_rate_pre_per_s": 3361.565489654231,
+          "residual_at_endpoint": 0.0,
+          "residual_eta_minus_H_at_crossing": 0.0,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": true
+        }
+      ],
+      "canonical_quadrature_reproduced": true,
+      "case": "weakT_1000K",
+      "effective_rate_balance_pre": 0.0031727728777075984,
+      "event_context_sha256": "212eb32f7b81c5a7616f19e59de5e708a1c8a851a017e1eb8433f753d3ded4c3",
+      "inverse_requirements": [
+        {
+          "barrier_reduction_eV": 0.46570553548744126,
+          "independent_complete_site_multiplicity": 8008181.4296884425,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 222.35791778291062,
+          "required_beta_B": 222.35791778291062,
+          "required_lambda_tau": 0.4360451650782932,
+          "required_tau_B_s": 0.0002223579177829106,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.01
+        },
+        {
+          "barrier_reduction_eV": 0.5198860906202453,
+          "independent_complete_site_multiplicity": 40870873.72695287,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 416.97553864087723,
+          "required_beta_B": 416.97553864087723,
+          "required_lambda_tau": 0.8176914471639534,
+          "required_tau_B_s": 0.0004169755386408772,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.05
+        },
+        {
+          "barrier_reduction_eV": 0.6219901365726689,
+          "independent_complete_site_multiplicity": 552304764.7673577,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 1363.6167328646472,
+          "required_beta_B": 1363.6167328646472,
+          "required_lambda_tau": 2.6740603137235617,
+          "required_tau_B_s": 0.001363616732864647,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.5
+        }
+      ],
+      "near_completion_diagnostic": false,
+      "order_sensitivity": [
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.1408200265918872,
+              "independent_complete_site_multiplicity": 5.1250923812037925,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 5.125092381203794,
+              "required_beta_B": 5.125092381203794,
+              "required_lambda_tau": 0.010050335853501437,
+              "required_tau_B_s": 5.125092381203794e-06,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.2812785928728505,
+              "independent_complete_site_multiplicity": 26.156625619719225,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 26.156625619719247,
+              "required_beta_B": 26.156625619719247,
+              "required_lambda_tau": 0.05129329438755053,
+              "required_tau_B_s": 2.6156625619719243e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.5056465762038687,
+              "independent_complete_site_multiplicity": 353.4651364812876,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 353.465136481288,
+              "required_beta_B": 353.465136481288,
+              "required_lambda_tau": 0.6931471805599455,
+              "required_tau_B_s": 0.000353465136481288,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 1,
+          "probability_at_tau_c_zero_extra_barrier": 0.001959084278217052
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.3729147530713504,
+              "independent_complete_site_multiplicity": 5233.836154325329,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 75.75436070611241,
+              "required_beta_B": 75.75436070611241,
+              "required_lambda_tau": 0.14855474025326595,
+              "required_tau_B_s": 7.57543607061124e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.44807359126065577,
+              "independent_complete_site_multiplicity": 26711.614671711224,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 181.2139014658176,
+              "required_beta_B": 181.2139014658176,
+              "required_lambda_tau": 0.35536151069866195,
+              "required_tau_B_s": 0.00018121390146581758,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.5818515754842243,
+              "independent_complete_site_multiplicity": 360964.9296067465,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 855.8602913308584,
+              "required_beta_B": 855.8602913308584,
+              "required_lambda_tau": 1.6783469900166612,
+              "required_tau_B_s": 0.0008558602913308584,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 2,
+          "probability_at_tau_c_zero_extra_barrier": 1.920259998120813e-06
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.46570553548744126,
+              "independent_complete_site_multiplicity": 8008181.4296884425,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 222.35791778291062,
+              "required_beta_B": 222.35791778291062,
+              "required_lambda_tau": 0.4360451650782932,
+              "required_tau_B_s": 0.0002223579177829106,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.5198860906202453,
+              "independent_complete_site_multiplicity": 40870873.72695287,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 416.97553864087723,
+              "required_beta_B": 416.97553864087723,
+              "required_lambda_tau": 0.8176914471639534,
+              "required_tau_B_s": 0.0004169755386408772,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.6219901365726689,
+              "independent_complete_site_multiplicity": 552304764.7673577,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 1363.6167328646472,
+              "required_beta_B": 1363.6167328646472,
+              "required_lambda_tau": 2.6740603137235617,
+              "required_tau_B_s": 0.001363616732864647,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 3,
+          "probability_at_tau_c_zero_extra_barrier": 1.2550085104135586e-09
+        }
+      ],
+      "parent_record_sha256": "49d59c0ee2c31ab67754bb02967a967deaf9595066eff91602244590178815cb",
+      "raw_primary_crossing_s": 2231.1291612794957,
+      "raw_rate_balance_pre": 0.3101264585051294,
+      "source_unchanged": true,
+      "tau_c_s": 1e-06
+    },
+    {
+      "accepted_endpoint_s": 2167.2000000000103,
+      "candidates": [
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.000210637323733313,
+          "H_last_accepted": 0.00016330105694537485,
+          "H_pre_topology_at_accepted_endpoint": 0.00022082268340928773,
+          "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+          "clock_snapshot_sha256": "25602666125d4aeaab7a0d517a08001497a3826cc235ef031b2ceb967279c1fd",
+          "effective_rate_pre_per_s": 7.915956504126351e-06,
+          "eta_fixed_for_parent_event": 0.26408072918302444,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.0033387237076911176,
+          "interval_logmean_rate_per_s": 6.847812674275344e-06,
+          "normalized_progress_at_crossing": 0.0007976247429524787,
+          "normalized_progress_at_endpoint": 0.0008361938566757131,
+          "post_primary_effective_rate_per_s": 0.00030018601558806353,
+          "post_primary_raw_rate_per_s": 1217.0620083075246,
+          "post_primary_scope": "saved_actual_single_to_pair_companion_drive",
+          "predicted_remaining_post_s_from_endpoint": 878.988003430854,
+          "predicted_remaining_post_s_from_raw_crossing": 879.0219335913113,
+          "predicted_remaining_pre_s": 33333.94918500923,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 9.004129039423913e-20,
+          "raw_rate_pre_per_s": 362.1797845245092,
+          "residual_at_endpoint": 0.26385990649961516,
+          "residual_eta_minus_H_at_crossing": 0.2638700918592911,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": false
+        },
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.15920307693798427,
+          "H_last_accepted": 0.12404606926844156,
+          "H_pre_topology_at_accepted_endpoint": 0.16676782153116246,
+          "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+          "clock_snapshot_sha256": "bf13fca29d791896fe03bc9f43d93cde6dac8be16d9efca6ae681a1262bc1abc",
+          "effective_rate_pre_per_s": 0.005861565990761128,
+          "eta_fixed_for_parent_event": 0.15920307693798513,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.0033387237076911176,
+          "interval_logmean_rate_per_s": 0.005085922888419155,
+          "normalized_progress_at_crossing": 0.9999999999999946,
+          "normalized_progress_at_endpoint": 1.0475163215351928,
+          "post_primary_effective_rate_per_s": null,
+          "post_primary_raw_rate_per_s": null,
+          "post_primary_scope": "primary_already_consumed_no_second_event_rate_invented",
+          "predicted_remaining_post_s_from_endpoint": 0.0,
+          "predicted_remaining_post_s_from_raw_crossing": 0.0,
+          "predicted_remaining_pre_s": 0.0,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 8.091591984999209e-20,
+          "raw_rate_pre_per_s": 3279.0216874611006,
+          "residual_at_endpoint": 0.0,
+          "residual_eta_minus_H_at_crossing": 0.0,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": true
+        }
+      ],
+      "canonical_quadrature_reproduced": true,
+      "case": "ceramic_300K",
+      "effective_rate_balance_pre": 0.005387378724702811,
+      "event_context_sha256": "df56f5b4242ab9771219db68504908b9d6f5846085745c26e3171fb795efe74e",
+      "inverse_requirements": [
+        {
+          "barrier_reduction_eV": 0.15204352308807054,
+          "independent_complete_site_multiplicity": 33480359.94383142,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 358.27686847662596,
+          "required_beta_B": 358.27686847662596,
+          "required_lambda_tau": 0.4360451650782932,
+          "required_tau_B_s": 0.00035827686847662594,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.01
+        },
+        {
+          "barrier_reduction_eV": 0.16829768962791175,
+          "independent_complete_site_multiplicity": 170871698.60117686,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 671.8568500063975,
+          "required_beta_B": 671.8568500063975,
+          "required_lambda_tau": 0.8176914471639534,
+          "required_tau_B_s": 0.0006718568500063974,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.05
+        },
+        {
+          "barrier_reduction_eV": 0.19892890341363884,
+          "independent_complete_site_multiplicity": 2309058865.044181,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 2197.1438558353934,
+          "required_beta_B": 2197.1438558353934,
+          "required_lambda_tau": 2.6740603137235617,
+          "required_tau_B_s": 0.002197143855835393,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.5
+        }
+      ],
+      "near_completion_diagnostic": false,
+      "order_sensitivity": [
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.054577870419404304,
+              "independent_complete_site_multiplicity": 8.257866719114569,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 8.257866719114562,
+              "required_beta_B": 8.257866719114562,
+              "required_lambda_tau": 0.010050335853501437,
+              "required_tau_B_s": 8.257866719114561e-06,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.0967154403036933,
+              "independent_complete_site_multiplicity": 42.145177515548475,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 42.145177515548454,
+              "required_beta_B": 42.145177515548454,
+              "required_lambda_tau": 0.05129329438755053,
+              "required_tau_B_s": 4.2145177515548455e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.16402583530299875,
+              "independent_complete_site_multiplicity": 569.5249509298648,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 569.5249509298648,
+              "required_beta_B": 569.5249509298648,
+              "required_lambda_tau": 0.6931471805599455,
+              "required_tau_B_s": 0.0005695249509298647,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 1,
+          "probability_at_tau_c_zero_extra_barrier": 0.001216321688710235
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.12420628836324328,
+              "independent_complete_site_multiplicity": 13581.175334528058,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 122.06012449591597,
+              "required_beta_B": 122.06012449591597,
+              "required_lambda_tau": 0.14855474025326595,
+              "required_tau_B_s": 0.00012206012449591596,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.1467539398200349,
+              "independent_complete_site_multiplicity": 69313.42740354202,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 291.9830775038621,
+              "required_beta_B": 291.9830775038621,
+              "required_lambda_tau": 0.35536151069866195,
+              "required_tau_B_s": 0.00029198307750386205,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.18688733508710545,
+              "independent_complete_site_multiplicity": 936660.5782172674,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 1379.0151845678024,
+              "required_beta_B": 1379.0151845678024,
+              "required_lambda_tau": 1.6783469900166612,
+              "required_tau_B_s": 0.0013790151845678024,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 2,
+          "probability_at_tau_c_zero_extra_barrier": 7.400193199205817e-07
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.15204352308807054,
+              "independent_complete_site_multiplicity": 33480359.94383142,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 358.27686847662596,
+              "required_beta_B": 358.27686847662596,
+              "required_lambda_tau": 0.4360451650782932,
+              "required_tau_B_s": 0.00035827686847662594,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.16829768962791175,
+              "independent_complete_site_multiplicity": 170871698.60117686,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 671.8568500063975,
+              "required_beta_B": 671.8568500063975,
+              "required_lambda_tau": 0.8176914471639534,
+              "required_tau_B_s": 0.0006718568500063974,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.19892890341363884,
+              "independent_complete_site_multiplicity": 2309058865.044181,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 2197.1438558353934,
+              "required_beta_B": 2197.1438558353934,
+              "required_lambda_tau": 2.6740603137235617,
+              "required_tau_B_s": 0.002197143855835393,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 3,
+          "probability_at_tau_c_zero_extra_barrier": 3.0018601558806354e-10
+        }
+      ],
+      "parent_record_sha256": "a095e543444ddd414e7fa21653f56dddcf46f26021a762491ee68ea751e22e3a",
+      "raw_primary_crossing_s": 2165.7126112292517,
+      "raw_rate_balance_pre": 0.3582936136299391,
+      "source_unchanged": true,
+      "tau_c_s": 1e-06
+    },
+    {
+      "accepted_endpoint_s": 1923.6000000000079,
+      "candidates": [
+        {
+          "H_at_raw_primary_crossing_left_limit": 4.295385256022597e-05,
+          "H_last_accepted": 3.643447039825177e-05,
+          "H_pre_topology_at_accepted_endpoint": 5.5640314088924624e-05,
+          "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+          "clock_snapshot_sha256": "63ccb0af9f841b6a211f21d6ccafbde6b89d51caf69d479f573a25e129226e41",
+          "effective_rate_pre_per_s": 2.7959475265159854e-06,
+          "eta_fixed_for_parent_event": 0.26408072918302444,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.00251563562261138,
+          "interval_logmean_rate_per_s": 2.28640996317534e-06,
+          "normalized_progress_at_crossing": 0.0001626542485440362,
+          "normalized_progress_at_endpoint": 0.00021069433676988378,
+          "post_primary_effective_rate_per_s": 0.00036966480440572174,
+          "post_primary_raw_rate_per_s": 1304.552075200818,
+          "post_primary_scope": "saved_actual_single_to_pair_companion_drive",
+          "predicted_remaining_post_s_from_endpoint": 714.2283650546226,
+          "predicted_remaining_post_s_from_raw_crossing": 714.2626838790753,
+          "predicted_remaining_pre_s": 94435.88365890409,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 3.049275160966393e-19,
+          "raw_rate_pre_per_s": 256.0085979750538,
+          "residual_at_endpoint": 0.2640250888689355,
+          "residual_eta_minus_H_at_crossing": 0.26403777533046424,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": false
+        },
+        {
+          "H_at_raw_primary_crossing_left_limit": 0.1592030769379857,
+          "H_last_accepted": 0.13625183286388615,
+          "H_pre_topology_at_accepted_endpoint": 0.20386529610963555,
+          "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+          "clock_snapshot_sha256": "9699a894017b2aed9849cff966f0f541813ff8ee5b3919ceec2daac860b51c2c",
+          "effective_rate_pre_per_s": 0.00974632475663181,
+          "eta_fixed_for_parent_event": 0.15920307693798513,
+          "event_ordinal": 1,
+          "exact_pair_energy_margin_J_per_m": 0.00251563562261138,
+          "interval_logmean_rate_per_s": 0.008049221814970168,
+          "normalized_progress_at_crossing": 1.0000000000000036,
+          "normalized_progress_at_endpoint": 1.28053615564885,
+          "post_primary_effective_rate_per_s": null,
+          "post_primary_raw_rate_per_s": null,
+          "post_primary_scope": "primary_already_consumed_no_second_event_rate_invented",
+          "predicted_remaining_post_s_from_endpoint": 0.0,
+          "predicted_remaining_post_s_from_raw_crossing": 0.0,
+          "predicted_remaining_pre_s": 0.0,
+          "process_rng_sha256": "e951892def35bcfcf4e22f61297358e2827d2b882f2eeb146b7b44a8f5fb1023",
+          "raw_barrier_pre_J": 2.673775627982084e-19,
+          "raw_rate_pre_per_s": 3885.2518072324883,
+          "residual_at_endpoint": 0.0,
+          "residual_eta_minus_H_at_crossing": 0.0,
+          "threshold_rng_identity": {
+            "candidate_id": "cleave:cleavage:(100):77278fedde405b16bcd0",
+            "ordinal": 1,
+            "scheme": "v11-directional-threshold",
+            "seed": 3621
+          },
+          "winner": true
+        }
+      ],
+      "canonical_quadrature_reproduced": true,
+      "case": "ceramic_1000K",
+      "effective_rate_balance_pre": 0.0011468298577268449,
+      "event_context_sha256": "9b595ed2cdcfec99b459d5a458a004dad3899f493601fb659828944b5969ca39",
+      "inverse_requirements": [
+        {
+          "barrier_reduction_eV": 0.500829592601425,
+          "independent_complete_site_multiplicity": 27187700.132288422,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 334.2489528531623,
+          "required_beta_B": 334.2489528531623,
+          "required_lambda_tau": 0.4360451650782932,
+          "required_tau_B_s": 0.00033424895285316225,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.01
+        },
+        {
+          "barrier_reduction_eV": 0.555010147734229,
+          "independent_complete_site_multiplicity": 138756229.3373579,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 626.7986251434853,
+          "required_beta_B": 626.7986251434853,
+          "required_lambda_tau": 0.8176914471639534,
+          "required_tau_B_s": 0.0006267986251434853,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.05
+        },
+        {
+          "barrier_reduction_eV": 0.6571141936866527,
+          "independent_complete_site_multiplicity": 1875069447.160766,
+          "order": 3,
+          "raw_arrival_multiplicity_factor": 2049.791928246273,
+          "required_beta_B": 2049.791928246273,
+          "required_lambda_tau": 2.6740603137235617,
+          "required_tau_B_s": 0.002049791928246273,
+          "scope": "inverse_requirements_not_fitted_parameters",
+          "target_probability": 0.5
+        }
+      ],
+      "near_completion_diagnostic": false,
+      "order_sensitivity": [
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.17594408370587092,
+              "independent_complete_site_multiplicity": 7.7040511027160985,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 7.7040511027160985,
+              "required_beta_B": 7.7040511027160985,
+              "required_lambda_tau": 0.010050335853501437,
+              "required_tau_B_s": 7.704051102716098e-06,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.31640264998683426,
+              "independent_complete_site_multiplicity": 39.31870207607819,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 39.3187020760782,
+              "required_beta_B": 39.3187020760782,
+              "required_lambda_tau": 0.05129329438755053,
+              "required_tau_B_s": 3.93187020760782e-05,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.5407706333178524,
+              "independent_complete_site_multiplicity": 531.3296369968554,
+              "order": 1,
+              "raw_arrival_multiplicity_factor": 531.3296369968557,
+              "required_beta_B": 531.3296369968557,
+              "required_lambda_tau": 0.6931471805599455,
+              "required_tau_B_s": 0.0005313296369968557,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 1,
+          "probability_at_tau_c_zero_extra_barrier": 0.0013037015170483698
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.40803881018533417,
+              "independent_complete_site_multiplicity": 11821.299809037648,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 113.87413586414169,
+              "required_beta_B": 113.87413586414169,
+              "required_lambda_tau": 0.14855474025326595,
+              "required_tau_B_s": 0.0001138741358641417,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.4831976483746395,
+              "independent_complete_site_multiplicity": 60331.656572174674,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 272.4011693009333,
+              "required_beta_B": 272.4011693009333,
+              "required_lambda_tau": 0.35536151069866195,
+              "required_tau_B_s": 0.0002724011693009333,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.616975632598208,
+              "independent_complete_site_multiplicity": 815286.250392676,
+              "order": 2,
+              "raw_arrival_multiplicity_factor": 1286.5312331501236,
+              "required_beta_B": 1286.5312331501236,
+              "required_lambda_tau": 1.6783469900166612,
+              "required_tau_B_s": 0.0012865312331501236,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 2,
+          "probability_at_tau_c_zero_extra_barrier": 8.501883670590792e-07
+        },
+        {
+          "inverse_requirements": [
+            {
+              "barrier_reduction_eV": 0.500829592601425,
+              "independent_complete_site_multiplicity": 27187700.132288422,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 334.2489528531623,
+              "required_beta_B": 334.2489528531623,
+              "required_lambda_tau": 0.4360451650782932,
+              "required_tau_B_s": 0.00033424895285316225,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.01
+            },
+            {
+              "barrier_reduction_eV": 0.555010147734229,
+              "independent_complete_site_multiplicity": 138756229.3373579,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 626.7986251434853,
+              "required_beta_B": 626.7986251434853,
+              "required_lambda_tau": 0.8176914471639534,
+              "required_tau_B_s": 0.0006267986251434853,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.05
+            },
+            {
+              "barrier_reduction_eV": 0.6571141936866527,
+              "independent_complete_site_multiplicity": 1875069447.160766,
+              "order": 3,
+              "raw_arrival_multiplicity_factor": 2049.791928246273,
+              "required_beta_B": 2049.791928246273,
+              "required_lambda_tau": 2.6740603137235617,
+              "required_tau_B_s": 0.002049791928246273,
+              "scope": "inverse_requirements_not_fitted_parameters",
+              "target_probability": 0.5
+            }
+          ],
+          "order": 3,
+          "probability_at_tau_c_zero_extra_barrier": 3.696648044057217e-10
+        }
+      ],
+      "parent_record_sha256": "4c256b3e7b371241245e92ba94f30d39bcd79677000d5e1e0035d873dbe16ddc",
+      "raw_primary_crossing_s": 1918.0513618585435,
+      "raw_rate_balance_pre": 0.23198966271959662,
+      "source_unchanged": true,
+      "tau_c_s": 1e-06
+    }
+  ],
+  "existing_mark_inherits_baseline_action": false,
+  "fem_solves": 0,
+  "fresh_gamma_source_evidence": "def draw_branch_mark(opportunity, channels, parameters):\n    if not parameters.enabled:\n        return BranchMark(None, None, ())\n    channels = tuple(sorted(channels, key=lambda c: c.candidate_id))\n    if len({c.candidate_id for c in channels}) != len(channels):\n        raise ValueError(\"duplicate companion identity\")\n    completed, identities = [], []\n    for channel in channels:\n        if channel.candidate_id == opportunity.parent.primary_candidate_id:\n            raise ValueError(\"primary cannot be its own companion\")\n        if channel.state_sha256 != opportunity.parent.process_state_sha256:\n            raise ValueError(\"stale companion process state\")\n        if not channel.geometrically_admissible:\n            continue\n        rate = channel.arrival_rate(parameters)\n        if rate == 0.0:\n            continue\n        u, identity = branch_uniform(opportunity, channel.candidate_id, parameters.branch_seed)\n        identities.append((channel.candidate_id, identity))\n        time = float(gammaincinv(channel.multihit_order, u)) / rate\n        if time <= parameters.exposure_time_s:\n            completed.append((time, channel.candidate_id))\n    if not completed:\n        return BranchMark(None, None, tuple(identities))\n    time, candidate = min(completed)\n    return BranchMark(candidate, time, tuple(identities))\n",
+  "mechanism_decision": "SEPARATE_COOPERATIVE_PAIR_TRANSITION_REQUIRED_FOR_APPRECIABLE_BRANCHING",
+  "near_completion_definition": "H/eta >= 0.9 at raw crossing OR frozen post-primary residual time <= tau_c; diagnostic only",
+  "new_parent_runs": 0,
+  "new_rng_draws": 0,
+  "null_model": "FRESH_INDEPENDENT_POST_PRIMARY_ORDER3_COMPANION_WITH_TAU_B_LE_TAU_C",
+  "process_steps": 0,
+  "producer_code_commit": "00486dab0d8bfa02e50602e848a96ced3bb80e38",
+  "schema": "v13.inherited-clock-audit/1",
+  "source_record_commit": "d10c3ebd8a3513edec5624faebdc7faf8656d106",
+  "time_interpretation": "H at raw crossing is reconstructed exactly under canonical constant logmean interval quadrature, not a separately archived continuous physical state. Pre rates use actual frozen pre-update process and solved endpoint mechanics. Residual completion times freeze post-primary mechanics/process; no global-time advance."
+}

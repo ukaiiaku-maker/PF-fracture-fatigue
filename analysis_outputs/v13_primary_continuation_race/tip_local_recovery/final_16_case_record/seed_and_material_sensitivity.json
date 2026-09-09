@@ -1,0 +1,162 @@
+{
+  "branch_junction_forward_um": {
+    "SS_material_temperature_group": 0.0,
+    "SS_seed": 100.26430879989775,
+    "SS_seed_group_interaction": 22.005903331255134,
+    "SS_total": 122.27021213115285,
+    "fractions": {
+      "material_temperature_group": 0.0,
+      "seed": 0.8200223672823065,
+      "seed_group_interaction": 0.1799776327176938
+    },
+    "values_by_group_then_seed": [
+      [
+        13.472036360893078,
+        10.874382479622536,
+        10.258098312460355,
+        7.660444431189812
+      ],
+      [
+        13.472036360893078,
+        14.704604695217443,
+        10.258098312460355,
+        3.830222215594906
+      ],
+      [
+        13.472036360893078,
+        10.874382479622536,
+        10.258098312460355,
+        7.660444431189812
+      ],
+      [
+        13.472036360893078,
+        10.874382479622536,
+        10.258098312460355,
+        7.660444431189812
+      ]
+    ],
+    "within_group_seed_ranges": [
+      5.811591929703266,
+      10.874382479622536,
+      5.811591929703266,
+      5.811591929703266
+    ],
+    "within_seed_group_ranges": [
+      0.0,
+      3.8302222155949064,
+      0.0,
+      3.830222215594906
+    ]
+  },
+  "first_branch_event_number": {
+    "SS_material_temperature_group": 0.0,
+    "SS_seed": 10.5,
+    "SS_seed_group_interaction": 1.5,
+    "SS_total": 12.0,
+    "fractions": {
+      "material_temperature_group": 0.0,
+      "seed": 0.875,
+      "seed_group_interaction": 0.125
+    },
+    "values_by_group_then_seed": [
+      [
+        5.0,
+        4.0,
+        4.0,
+        3.0
+      ],
+      [
+        5.0,
+        5.0,
+        4.0,
+        2.0
+      ],
+      [
+        5.0,
+        4.0,
+        4.0,
+        3.0
+      ],
+      [
+        5.0,
+        4.0,
+        4.0,
+        3.0
+      ]
+    ],
+    "within_group_seed_ranges": [
+      2.0,
+      3.0,
+      2.0,
+      2.0
+    ],
+    "within_seed_group_ranges": [
+      0.0,
+      1.0,
+      0.0,
+      1.0
+    ]
+  },
+  "first_branch_primary_forward_um": {
+    "SS_material_temperature_group": 0.07121365775527269,
+    "SS_seed": 104.63589276931857,
+    "SS_seed_group_interaction": 18.67878634224496,
+    "SS_total": 123.38589276931883,
+    "fractions": {
+      "material_temperature_group": 0.0005771620738556645,
+      "seed": 0.848037732846371,
+      "seed_group_interaction": 0.15138510507977318
+    },
+    "values_by_group_then_seed": [
+      [
+        16.685974409325805,
+        14.704604695217443,
+        14.088320528055261,
+        10.874382479622536
+      ],
+      [
+        16.685974409325805,
+        17.918542743650168,
+        14.088320528055261,
+        7.044160264027631
+      ],
+      [
+        16.685974409325805,
+        14.704604695217443,
+        14.088320528055261,
+        10.874382479622536
+      ],
+      [
+        16.685974409325805,
+        14.704604695217443,
+        14.088320528055261,
+        10.874382479622536
+      ]
+    ],
+    "within_group_seed_ranges": [
+      5.811591929703269,
+      10.874382479622536,
+      5.811591929703269,
+      5.811591929703269
+    ],
+    "within_seed_group_ranges": [
+      0.0,
+      3.213938048432725,
+      0.0,
+      3.8302222155949055
+    ]
+  },
+  "groups": [
+    "Peak_300K",
+    "Peak_1000K",
+    "weakT_300K",
+    "weakT_1000K"
+  ],
+  "interpretation": "descriptive balanced-table sum of squares only; no independent error estimate, significance test, or probability calibration",
+  "seeds": [
+    3621,
+    3622,
+    3623,
+    3624
+  ]
+}

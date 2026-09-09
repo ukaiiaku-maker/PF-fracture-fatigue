@@ -6,8 +6,10 @@ from arrhenius_fracture.v5_4_2_runtime_parity_v12 import (
 )
 
 
-def test_authoritative_v5_4_2_transaction_and_runtime_parity():
-    result = replay_v5_4_2_runtime_parity(Path(__file__).parents[1])
+def test_authoritative_v5_4_2_transaction_and_runtime_parity(historical_product):
+    result = replay_v5_4_2_runtime_parity(
+        historical_product.root, source_root=historical_product.source_root,
+    )
     assert result["qualification"] == "PASS"
     assert all(result["gates"].values())
     enabled = result["cases"]["theta40_corrected_enabled_max2_seed3621"]

@@ -1,0 +1,44 @@
+{
+  "accepted_endpoint_s": 3124.8000052684015,
+  "accepted_event_ids": [
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000001",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000002",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000003",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000004",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000005",
+    "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000001",
+    "cleave:cleavage:(100):77278fedde405b16bcd0#event:0000000000000002"
+  ],
+  "accepted_opening_m": 7.440000012543774e-05,
+  "accepted_process_sha256": "5903ce9d0007a9a2b594e4141803fd6d39401baba67cbbf42907b2c526d4910c",
+  "accepted_single_checkpoint_sha256": "2f64d66d1fdfc3701df5a8503654688f14b77f25640a65f48cb2021391a94887",
+  "branching_enabled": false,
+  "clean_history": true,
+  "event_context_sha256": "b2982e7074096b59fc5c3633a4811187dae81e76e054b9064225ca54ef747b68",
+  "event_id": "cleave:cleavage:(010):694b159e5c3c21b95300#event:0000000000000006",
+  "event_ordinal": 6,
+  "forward_extension_um": 26.944072721786156,
+  "fresh_initialization": false,
+  "installed_bindings": {
+    "engine": {},
+    "mpz": {
+      "_emit": "arrhenius_fracture.persistent_site_source_v10221._persistent_emit",
+      "_persistent_base_diagnostics": "arrhenius_fracture.signed_burgers_shared_v1025._signed_diagnostics",
+      "active_K_shielding": "arrhenius_fracture.signed_burgers_shared_v1025._active_K",
+      "advance": "arrhenius_fracture.persistent_site_source_v10221._persistent_advance",
+      "diagnostics": "arrhenius_fracture.persistent_site_source_v10221._persistent_diagnostics",
+      "evolve": "arrhenius_fracture.signed_burgers_shared_v1025._signed_evolve_scalar",
+      "shielding_K": "arrhenius_fracture.signed_burgers_shared_v1025._total_K",
+      "wake_K_shielding": "arrhenius_fracture.signed_burgers_shared_v1025._wake_K"
+    }
+  },
+  "milestones_reached_um": [
+    25.0
+  ],
+  "pre_cleavage_checkpoint_sha256": "635d942fef6fb80bfdcec52f0d654380ca5c372f1ed2ad96f3383d6ea913fe92",
+  "raw_first_passage_s": 3124.8000052634675,
+  "schema": "v13.later-clean-parent/1",
+  "source_first_parent_checkpoint_sha256": "5c99b31db5335aa0c9207734a4acdcbfd3bef6cc963e4ececae12e975b487f5c",
+  "winning_candidate_id": "cleave:cleavage:(010):694b159e5c3c21b95300"
+}

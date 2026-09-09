@@ -1,0 +1,14 @@
+{
+  "contextual_relative_gate_pass": true,
+  "focused_invocations": 1,
+  "focused_result_sha256": "1bed64811552dc82aa085272cb006e3e9061537888db4e186856163cd881a802",
+  "isolated_legacy_passes": [
+    "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+    "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly"
+  ],
+  "reason": "Full collection imports zero_event_summary_v10215, which replaces the summary function at import time. Only validation orchestration recognizes the focused context; numerical tests and source are unchanged. Full gate still requires all seven exact signatures.",
+  "source_changes_after_focus": [
+    "scripts/validate_v13_merge_baseline.py"
+  ],
+  "strict_original_result_preserved": true
+}

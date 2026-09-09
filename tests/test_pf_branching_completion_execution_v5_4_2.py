@@ -64,7 +64,7 @@ def test_v5_4_2_counts_compute_worker_not_shell_supervisor():
     assert not launch.is_heavy_compute_command(supervisor)
 
 
-def test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision():
+def test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision(historical_product):
     audit = json.loads(
         (BUNDLE / "pf_branching_completion_terminal_audit_v5_4_2.json").read_text()
     )
@@ -85,7 +85,7 @@ def test_v5_4_2_terminal_bundle_preserves_bounded_scientific_decision():
     )
 
 
-def test_v5_4_2_published_kinetic_k_figures_are_not_rcurves():
+def test_v5_4_2_published_kinetic_k_figures_are_not_rcurves(historical_product):
     audit = json.loads(
         (BUNDLE / "pf_branching_completion_terminal_audit_v5_4_2.json").read_text()
     )["figure_audit"]
