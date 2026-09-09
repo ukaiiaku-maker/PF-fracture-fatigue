@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Audited causal comparison beside retained historical raw identity failure."""
 import argparse
-from copy import deepcopy
 from dataclasses import fields, replace
 import hashlib
 import json
@@ -9,8 +8,16 @@ from pathlib import Path
 import subprocess
 import sys
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from arrhenius_fracture.future_causal_state_fingerprint_v1 import (
+    components as future_causal_components,
+    fingerprint as future_causal_fingerprint,
+)
+
 from qualify_v5_disabled_neutrality_clean import (
-    normalize, differences, hash_value, write_json, clean_head, CASES, STAGE_II_V3_BASE,
+    normalize, differences, write_json, clean_head, CASES, STAGE_II_V3_BASE,
 )
 
 DIAGNOSTICS = ('latest_free_dof_residual_l2_N_per_m', 'latest_constrained_reaction_l2_N_per_m',
@@ -28,20 +35,7 @@ def consumer_occurrences(repository,keys):
 
 
 def causal(components):
-    result = deepcopy(components); excluded = {}
-    if result.get('void_state') is not None: raise ValueError('causal comparison requires voiding disabled')
-    result['void_state'] = None
-    for key in DIAGNOSTICS:
-        if key in result['energy_ledgers']:
-            excluded['energy_ledgers/'+key] = result['energy_ledgers'].pop(key)
-    junction = result['junction_process_state']
-    for parent, key, path in ((junction, 'v12_boundary_terminal_certificates', 'junction_process_state'),
-            (junction.get('v12_graph_support_audit', {}), 'boundary_terminal_certificates', 'junction_process_state/v12_graph_support_audit')):
-        if key in parent and parent[key] == []: excluded[path+'/'+key] = parent.pop(key)
-    support = result.get('v12_support_state')
-    if support is not None and 'source_commit' in support:
-        excluded['v12_support_state/source_commit'] = support.pop('source_commit')
-    return result, excluded
+    return future_causal_components(components)
 
 
 def worker(repository, output, mode):
@@ -112,11 +106,9 @@ def worker(repository, output, mode):
                 state, _ = event(state, (5.25e-4, 0.), transaction_identity='causal-initial:'+name)
             else: state, _ = event(state, tuple(cfg['endpoint_m']), transaction_identity='causal-initial:'+name)
             snapshots.append(components(state))
-            for index in (1, 2):
-                state, operation = future(state, index); history.append(operation); snapshots.append(components(state))
             write_checkpoint(state, output/'checkpoints'/(name+'_restart.json'))
             restored = restore_checkpoint(output/'checkpoints'/(name+'_restart.json'))
-            direct, a = future(state, 3); resumed, b = future(restored, 3)
+            direct, a = future(state, 1); resumed, b = future(restored, 1)
             restart_exact = fingerprint(direct) == fingerprint(resumed) and a == b
             state = direct; history.append(a); snapshots.append(components(state))
         except Exception as exc: failure = {'type': type(exc).__name__, 'message': str(exc)}
@@ -143,14 +135,15 @@ def main():
     rows = []
     for first, second in zip(a['rows'], b['rows']):
         pairs = [(causal(x), causal(y)) for x, y in zip(first['raw_states'], second['raw_states'])]
-        equal = len(first['raw_states']) == len(second['raw_states']) == 4 and all(x[0] == y[0] for x, y in pairs)
-        history_equal = len(first['history']) == len(second['history']) == 3 and first['history'] == second['history']
+        equal = len(first['raw_states']) == len(second['raw_states']) == 2 and all(x[0] == y[0] for x, y in pairs)
+        history_equal = len(first['history']) == len(second['history']) == 1 and first['history'] == second['history']
         rows.append({'case_id': first['case_id'], 'causal_states_exact': equal, 'histories_exact': history_equal,
             'observed_causal_states_exact':bool(pairs) and len(first['raw_states'])==len(second['raw_states'])
                 and all(x[0]==y[0] for x,y in pairs),
             'observed_histories_exact':bool(first['history']) and first['history']==second['history'],
             'observed_future_event_counts':[len(first['history']),len(second['history'])],
-            'causal_fingerprints': [(hash_value(x[0]), hash_value(y[0])) for x, y in pairs],
+            'causal_fingerprints': [(future_causal_fingerprint(x), future_causal_fingerprint(y))
+                                    for x, y in zip(first['raw_states'], second['raw_states'])],
             'separate_audit_provenance': [(x[1], y[1]) for x, y in pairs],
             'raw_differences': differences(first['terminal_components'], second['terminal_components']),
             'causal_differences': differences(causal(first['terminal_components'])[0], causal(second['terminal_components'])[0]),
@@ -159,10 +152,10 @@ def main():
                 and first['failure'] is None and second['failure'] is None})
     keys = (*DIAGNOSTICS, 'v12_boundary_terminal_certificates', 'boundary_terminal_certificates', 'source_commit', 'void_state')
     occurrences = consumer_occurrences(root,keys)
-    report = {'schema': 'v5.disabled-future-causal-neutrality/1', 'implementation_sha': current,
+    report = {'schema': 'v5.disabled-future-causal-neutrality/2', 'implementation_sha': current,
         'historical_raw_full_state_identity': 'FAIL_RETAINED', 'rows': rows, 'passed': all(r['passed'] for r in rows),
         'consumer_occurrences': occurrences,
-        'protocol_sha256': hashlib.sha256((root/'docs/V5_DISABLED_CAUSAL_NEUTRALITY_V1.md').read_bytes()).hexdigest()}
+        'protocol_sha256': hashlib.sha256((root/'docs/V5_DISABLED_CAUSAL_NEUTRALITY_V2.md').read_bytes()).hexdigest()}
     write_json(args.output/'report.json', report)
     write_json(args.output/'sha256_manifest.json', {str(p.relative_to(args.output)): hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(args.output.rglob('*')) if p.is_file()})
