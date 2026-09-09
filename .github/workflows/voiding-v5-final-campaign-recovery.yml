@@ -94,9 +94,10 @@ jobs:
       - name: Exact implementation-head reconstruction audit
         run: |
           git worktree add --detach /tmp/v5-final-implementation '${{ inputs.implementation_sha }}'
-          python /tmp/v5-final-implementation/scripts/validate_v5_complete_published_campaign_v1.py \
-            /tmp/source-final-complete /tmp/source-final-publication/publication.json \
-            '${{ inputs.implementation_sha }}' /tmp/v5-final-audit/evidence.json
+          python scripts/classify_v5_exact_head_reconstruction_v1.py \
+            /tmp/v5-final-implementation /tmp/source-final-complete \
+            /tmp/source-final-publication/publication.json '${{ inputs.implementation_sha }}' \
+            /tmp/v5-final-audit/evidence.json
       - name: Clean worktree and immutable implementation checks
         if: always()
         run: |

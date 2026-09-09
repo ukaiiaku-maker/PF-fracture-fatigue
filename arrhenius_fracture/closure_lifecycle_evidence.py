@@ -516,9 +516,16 @@ def validate_lifecycle_rows(rows,sources,*,executed_code_sha):
                     config=CFG,refinement_attempt_cache=cache)
                 replayed_ops.extend(trace);accepted_intervals.append(result['elapsed_duration_s'])
                 if result['failure'] is not None: failure=result['failure'];break
-            if (canonical_data(replayed_ops)!=row['actual_operations'] or fingerprint(replay)!=fingerprint(after)
-                or failure!=row['failure'] or math.fsum(accepted_intervals)!=row['elapsed_physical_time_s']):
-                raise ValueError('natural internal-stage independent production replay mismatch')
+            replay_checks={
+                'operations_exact':canonical_data(replayed_ops)==row['actual_operations'],
+                'terminal_fingerprint_exact':fingerprint(replay)==fingerprint(after),
+                'failure_exact':failure==row['failure'],
+                'elapsed_physical_time_exact':math.fsum(accepted_intervals)==row['elapsed_physical_time_s'],
+            }
+            if not all(replay_checks.values()):
+                raise ValueError('natural internal-stage independent production replay mismatch: '
+                    f"case_identity={row['case_identity']} partition_count={row['partition_count']} "
+                    f"checks={replay_checks}")
         if row["dataset"] == "neutrality":
             base=sources[row["base_terminal_checkpoint"]]
             if row["exact_neutrality"] != (fingerprint(after)==fingerprint(base)):

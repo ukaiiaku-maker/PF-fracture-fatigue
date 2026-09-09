@@ -10,6 +10,8 @@ from qualify_v5_source_resolution_focused_results_v1 import summarize
 from validate_v5_development_lifecycle_shards_v1 import expected_registry,require_registry,reconstruct_all_rows
 from assemble_v5_source_resolution_shards_v1 import copy_owned
 from recover_v5_causal_neutrality_postprocess_v1 import require_failed_execution
+import assemble_v5_source_resolution_shards_v1 as shard_assembler
+import classify_v5_exact_head_reconstruction_v1 as exact_head_classifier
 
 
 def test_owned_assembly_storage_preserves_bytes_and_rejects_conflicts(tmp_path):
@@ -118,6 +120,41 @@ def test_causal_neutrality_recovery_accepts_only_the_exact_incomplete_operation(
     for changed in ({**report,'execution_completed':True},{**report,'phase':'source'},
                     {**report,'clean_exact_head_at_end':False},{**report,'operations':[]}):
         with pytest.raises(ValueError):require_failed_execution(changed,sha)
+
+
+def test_strict_ontology_failure_is_retained_without_predicate_relaxation(monkeypatch):
+    def fail(*args,**kwargs):raise ValueError('natural internal-stage independent production replay mismatch: exact bits')
+    monkeypatch.setattr(shard_assembler,'validate_closure_evidence',fail)
+    result=shard_assembler.classify_ontology({},object(),'a'*40)
+    assert result['valid'] is False and result['classification']=='EXECUTED_BLOCKED'
+    assert result['predicate_relaxed'] is False
+    assert result['failure']['type']=='ValueError'
+    assert 'independent production replay mismatch' in result['failure']['message']
+
+
+def test_unexpected_ontology_failure_remains_a_workflow_error(monkeypatch):
+    def fail(*args,**kwargs):raise ValueError('missing checkpoint')
+    monkeypatch.setattr(shard_assembler,'validate_closure_evidence',fail)
+    with pytest.raises(ValueError,match='missing checkpoint'):
+        shard_assembler.classify_ontology({},object(),'a'*40)
+
+
+def test_exact_head_known_scientific_failure_is_terminal_blocked(monkeypatch,tmp_path):
+    sha='a'*40;implementation=tmp_path/'implementation';scripts=implementation/'scripts';scripts.mkdir(parents=True)
+    validator=scripts/'validate_v5_complete_published_campaign_v1.py';validator.write_text('# frozen validator\n')
+    evidence=tmp_path/'evidence';evidence.mkdir()
+    (evidence/'paired_comparison.json').write_text(json.dumps({'executed_code_sha':sha,
+        'exact_recursive_comparison':True,'classification':'PASS'}))
+    publication=tmp_path/'publication.json';publication.write_text('{}')
+    monkeypatch.setattr(exact_head_classifier,'git',lambda *args:sha if args[1:] == ('rev-parse','HEAD') else '')
+    class Completed:
+        returncode=1;stdout='';stderr='ValueError: natural internal-stage independent production replay mismatch: exact bits\n'
+    monkeypatch.setattr(exact_head_classifier.subprocess,'run',lambda *args,**kwargs:Completed())
+    output=tmp_path/'audit.json'
+    result=exact_head_classifier.classify(implementation,evidence,publication,sha,output)
+    assert result['classification']=='EXECUTED_BLOCKED' and result['exact_head_audit_completed'] is True
+    assert result['evidence_valid'] is False and result['predicate_relaxed'] is False
+    assert json.loads(output.read_text())==result
 
 
 @pytest.mark.parametrize('child,passed',(('',True),('<skipped/>',False),('<failure/>',False)))

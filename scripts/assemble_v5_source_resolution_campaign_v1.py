@@ -17,6 +17,7 @@ def read(root,name):return json.loads((root/name).read_text())
 
 def derive_ledger(root):
     static=read(root/'static','report.json');life=read(root/'lifecycle','lifecycle_rows.json');d=life['decision']
+    lifecycle_ontology=read(root/'lifecycle','ontology_validation.json')
     positive=read(root/'source/positive','result.json');causality=read(root/'source/causality','report.json')
     r_tip=read(root/'source/r_tip_causality','report.json')
     coarse=read(root/'source/production','production_32_12.json')
@@ -45,6 +46,7 @@ def derive_ledger(root):
         'natural_32_seed_160_partition_restart_peers':len(d['natural_partitions_restart'])==160 and all(r['passed'] for r in d['natural_partitions_restart']),
         'stagewise_topology_and_conservation':d['stagewise_topology_and_conservation'] and all(r['actual_transition'] for r in d['transition_partitions']),
         'same_head_disabled_dispatch':len(d['V12_disabled_neutrality'])==4 and all(r['passed'] for r in d['V12_disabled_neutrality']),
+        'complete_lifecycle_evidence_ontology':lifecycle_ontology.get('valid') is True,
     }
     counts=lambda rows:{'passed':sum(bool(r['passed']) for r in rows),'total':len(rows)}
     return {'schema':'v5.final-physics-closure-scientific-ledger/2','record_kind':'DERIVED_NOT_ADDITIONAL_EXECUTION',
@@ -60,6 +62,7 @@ def derive_ledger(root):
         'source_causality_gates':causality['gates'],
         'r_tip_causal_classification':r_tip['classification'],
         'r_tip_causal_gates':r_tip['gates'],'historical_raw_full_state_identity':'FAIL_RETAINED',
+        'lifecycle_evidence_ontology':lifecycle_ontology,
         'historical_static_result':'UNCHANGED_683_OF_791','mission_terminal':False,
         'remaining_publication_requirements':['exact-head CI terminal result','repository-wide inherited failure classification','final PR63 ledger']}
 

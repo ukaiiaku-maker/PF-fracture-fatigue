@@ -39,6 +39,19 @@ def copy_owned(source,destination):
     return str(destination)
 
 
+def classify_ontology(payload,sources,executed_code_sha):
+    """Execute the strict ontology without turning a scientific FAIL into lost evidence."""
+    try:
+        return validate_closure_evidence(payload,sources,executed_code_sha=executed_code_sha)
+    except Exception as exc:
+        if (not isinstance(exc,ValueError)
+                or 'natural internal-stage independent production replay mismatch' not in str(exc)):
+            raise
+        return {'schema':'v5.final-physics-closure-ontology-classification/1',
+            'valid':False,'classification':'EXECUTED_BLOCKED','predicate_relaxed':False,
+            'failure':{'type':type(exc).__name__,'message':str(exc)}}
+
+
 def assemble(kind,inputs,output):
     if output.exists():raise ValueError('refusing to overwrite assembly')
     if len({p.resolve() for p in inputs})!=len(inputs):raise ValueError('aliased shard directories')
@@ -92,11 +105,13 @@ def assemble(kind,inputs,output):
             'shard_provenance':sorted(provenance,key=lambda p:(p['section'],p['shard_index'])),
             'decision':lifecycle_decision(rows,Sources())}
         for index,row in enumerate(rows):write(output/'rows'/(str(index+1)+'.json'),row)
-        write(output/'ontology_validation.json',validate_closure_evidence(payload,Sources(),executed_code_sha=payload['executed_code_sha']))
+        ontology=classify_ontology(payload,Sources(),payload['executed_code_sha'])
+        write(output/'ontology_validation.json',ontology)
     write(output/filename,payload)
     write(output/'sha256_manifest.json',{str(p.relative_to(output)):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(output.rglob('*')) if p.is_file()})
-    return validate_static(output) if kind=='static' else {'valid':True,'actual_state_rows':len(rows),'decision':payload['decision']['decision']}
+    return validate_static(output) if kind=='static' else {'valid':ontology['valid'],
+        'actual_state_rows':len(rows),'decision':payload['decision']['decision']}
 
 
 if __name__=='__main__':
