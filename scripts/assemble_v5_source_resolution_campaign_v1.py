@@ -66,15 +66,20 @@ def derive_ledger(root):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('shards',type=Path);parser.add_argument('output',type=Path)
+    parser.add_argument('--causal-neutrality-replacement',type=Path)
     args=parser.parse_args()
     if args.output.exists():raise ValueError('refusing to overwrite campaign')
     from v5_numerical_runtime_v1 import require_pinned,runtime_record
     from validate_v5_source_resolution_evidence_v1 import same
     kernels=require_pinned(runtime_record())
     specs=matrix();shas=set()
+    def phase_directory(spec,side):
+        if spec['id']=='causal-neutrality' and args.causal_neutrality_replacement is not None:
+            return args.causal_neutrality_replacement/side
+        return args.shards/spec['id']/side
     for spec in specs:
         for side in ('a','b'):
-            path=args.shards/spec['id']/side;verify_inventory(path);execution=read(path,'execution.json')
+            path=phase_directory(spec,side);verify_inventory(path);execution=read(path,'execution.json')
             if not execution['execution_completed']:raise ValueError('phase execution incomplete '+spec['id']+'/'+side)
             same(execution['selected_numerical_kernels'],kernels,'phase/assembler selected numerical kernel mismatch')
             for key in ('phase','section'):
@@ -88,7 +93,8 @@ def main():
             sources=[args.shards[s['id']]/side/'evidence' for s in specs if s['phase']==kind]
             assemble(kind,sources,destination/kind)
         for kind in ('source','recovery','causal-neutrality'):
-            shutil.copytree(args.shards/kind/side,destination/kind,copy_function=copy_owned)
+            spec=next(row for row in specs if row['id']==kind)
+            shutil.copytree(phase_directory(spec,side),destination/kind,copy_function=copy_owned)
         validate_positive(destination/'source/positive')
         validate_causality(destination/'source/causality')
         write(destination/'scientific_ledger.json',derive_ledger(destination))
@@ -105,7 +111,7 @@ def main():
     if a!=b:raise ValueError('full A/B recursive inventory mismatch')
     # Hardlinked immutable captures must not have changed any original shard.
     for spec in specs:
-        for side in ('a','b'):verify_inventory(args.shards/spec['id']/side)
+        for side in ('a','b'):verify_inventory(phase_directory(spec,side))
 
 
 if __name__=='__main__':main()

@@ -1,0 +1,114 @@
+name: V5 final campaign postprocess-only recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Exact final-campaign run containing the immutable shards
+        required: true
+        type: string
+      implementation_sha:
+        description: Exact physical implementation SHA of every source shard
+        required: true
+        type: string
+      causal_artifact_digest:
+        description: GitHub digest of the failed causal-neutrality artifact
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  recover-assemble-package-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Configure and verify the frozen numerical runtime
+        run: |
+          python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+          python scripts/v5_numerical_runtime_v1.py
+      - name: Verify exact recovery head and physical ancestor
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor '${{ inputs.implementation_sha }}' "$GITHUB_SHA"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v5-source-final-shard-*-${{ inputs.implementation_sha }}
+          path: /tmp/source-final-shards
+          merge-multiple: true
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Recover only the completed causal-neutrality report stage
+        run: >-
+          python scripts/recover_v5_causal_neutrality_postprocess_v1.py
+          /tmp/source-final-shards/causal-neutrality /tmp/causal-neutrality-recovered
+          --implementation-sha '${{ inputs.implementation_sha }}'
+          --repair-sha "$GITHUB_SHA"
+          --source-run-id '${{ inputs.source_run_id }}'
+          --artifact-name 'v5-source-final-shard-causal-neutrality-${{ inputs.implementation_sha }}'
+          --artifact-digest '${{ inputs.causal_artifact_digest }}'
+      - name: Assemble ontology and require exact recursive A-B identity
+        run: |
+          python scripts/assemble_v5_source_resolution_campaign_v1.py \
+            /tmp/source-final-shards /tmp/source-final-complete \
+            --causal-neutrality-replacement /tmp/causal-neutrality-recovered
+          diff -ru /tmp/source-final-complete/a /tmp/source-final-complete/b
+      - name: Create lossless bounded large-artifact package
+        run: >-
+          python scripts/package_v5_final_campaign_v1.py pack
+          /tmp/source-final-complete /tmp/source-final-publication
+          --implementation-sha '${{ inputs.implementation_sha }}'
+      - name: Exact implementation-head reconstruction audit
+        run: |
+          git worktree add --detach /tmp/v5-final-implementation '${{ inputs.implementation_sha }}'
+          python /tmp/v5-final-implementation/scripts/validate_v5_complete_published_campaign_v1.py \
+            /tmp/source-final-complete /tmp/source-final-publication/publication.json \
+            '${{ inputs.implementation_sha }}' /tmp/v5-final-audit/evidence.json
+      - name: Clean worktree and immutable implementation checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+          if test -d /tmp/v5-final-implementation; then
+            test "$(git -C /tmp/v5-final-implementation rev-parse HEAD)" = '${{ inputs.implementation_sha }}'
+            test -z "$(git -C /tmp/v5-final-implementation status --short)"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-final-campaign-recovery-audit-${{ inputs.implementation_sha }}
+          path: |
+            /tmp/causal-neutrality-recovered/recovery.json
+            /tmp/v5-final-audit/evidence.json
+            /tmp/source-final-complete/paired_comparison.json
+            /tmp/source-final-complete/a/scientific_ledger.json
+            /tmp/source-final-publication/publication.json
+            /tmp/source-final-publication/sha256_manifest.json
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: v5-source-final-publication-recovered-${{ inputs.implementation_sha }}
+          path: /tmp/source-final-publication
+          compression-level: 0

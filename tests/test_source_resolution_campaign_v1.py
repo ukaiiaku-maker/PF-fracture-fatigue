@@ -9,6 +9,7 @@ from validate_v5_source_resolution_evidence_v1 import verify_inventory
 from qualify_v5_source_resolution_focused_results_v1 import summarize
 from validate_v5_development_lifecycle_shards_v1 import expected_registry,require_registry,reconstruct_all_rows
 from assemble_v5_source_resolution_shards_v1 import copy_owned
+from recover_v5_causal_neutrality_postprocess_v1 import require_failed_execution
 
 
 def test_owned_assembly_storage_preserves_bytes_and_rejects_conflicts(tmp_path):
@@ -106,6 +107,17 @@ def test_manifest_binds_nested_manifests_and_all_files(tmp_path):
     assert verify_inventory(tmp_path)==inventory
     (nested/'sha256_manifest.json').write_text('{"altered":true}')
     with pytest.raises(ValueError,match='inventory/hash'):verify_inventory(tmp_path)
+
+
+def test_causal_neutrality_recovery_accepts_only_the_exact_incomplete_operation():
+    sha='a'*40
+    report={'executed_code_sha':sha,'execution_completed':False,'phase':'causal-neutrality','section':'all',
+        'clean_exact_head_at_end':True,'operations':[{'operation':'causal_neutrality',
+        'script':'qualify_v5_disabled_causal_neutrality_v1.py','returncode':1}]}
+    assert require_failed_execution(report,sha)==report
+    for changed in ({**report,'execution_completed':True},{**report,'phase':'source'},
+                    {**report,'clean_exact_head_at_end':False},{**report,'operations':[]}):
+        with pytest.raises(ValueError):require_failed_execution(changed,sha)
 
 
 @pytest.mark.parametrize('child,passed',(('',True),('<skipped/>',False),('<failure/>',False)))
