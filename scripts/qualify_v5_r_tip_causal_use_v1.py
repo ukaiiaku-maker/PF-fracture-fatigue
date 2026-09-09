@@ -119,6 +119,7 @@ def main():
         raise ValueError("source-pair manifest mismatch")
 
     state = restore_checkpoint(args.source_pair / "child_or_rejected_state.json")
+    continued = restore_checkpoint(args.source_pair / "continued_or_rejected_state.json")
     child_id = state.tip_process_state["active_branch_id"]
     child = state.crack_network.branch(child_id)
     tensor, element_ids = production.crack_tip_tensor(state, branch_id=child_id)
@@ -131,20 +132,23 @@ def main():
     for factor in (0.75, 1.0, 1.25):
         peer = replace_child_radius(state, child_id, factor)
         rows = rate_rows(peer, tensor, args.temperature_K)
-        operations = []
-        after, event, operations, audit = production.downstream_front_transaction(
-            peer, continuation=True, operation_log=operations)
+        source = peer.junction_process_state["active_event_source"]
+        after, audit = production._complete_next_clock(
+            peer, tensor, source_kind="sharp_front", source_front_id=child_id,
+            source_position_m=child.tip,
+            source_probe_identity=source["source_probe_identity"])
+        winners = [row for row in audit if row["winner"]]
         peers.append({
             "intervention": "child_r_tip_m", "factor": factor,
             "r_tip_before_event_m": peer.tip_process_state["by_branch"][child_id]["r_tip_m"],
             "R_void_m": peer.void_state.cavities[0].radius_m,
             "candidate_rates": rows,
-            "selected_event_class": "physical_cleavage" if event is not None and event.accepted else None,
-            "selected_candidate_id": audit.get("candidate_id"),
-            "event_accepted": bool(event is not None and event.accepted),
-            "renewed_r_tip_after_event_m": after.tip_process_state["by_branch"][child_id]["r_tip_m"],
+            "selected_event_class": "physical_cleavage_threshold_completion" if winners else None,
+            "selected_candidate_id": winners[0]["candidate_id"] if winners else None,
+            "threshold_event_completed": bool(winners),
+            "r_tip_after_threshold_completion_m": after.tip_process_state["by_branch"][child_id]["r_tip_m"],
             "terminal_fingerprint": complete_accepted_state_fingerprint(after),
-            "operation_trace": operations,
+            "clock_completion_audit": audit,
             "fixed_inputs": {
                 "source_tensor_Pa": tensor.tolist(), "source_element_ids": list(element_ids),
                 "candidate_ids": [item.candidate_id for item in peer.competition.candidates],
@@ -196,7 +200,7 @@ def main():
         "controlled_peers_hold_required_inputs_fixed": all(
             peer["R_void_m"] == baseline_void_radius and
             peer["fixed_inputs"] == peers[1]["fixed_inputs"] for peer in peers),
-        "all_controlled_events_complete": all(peer["event_accepted"] for peer in peers),
+        "all_controlled_threshold_events_complete": all(peer["threshold_event_completed"] for peer in peers),
         "r_tip_changes_accepted_rate_or_barrier": not r_tip_exact,
         "reciprocal_R_void_not_substituted_for_r_tip": reciprocal_exact,
         "r_tip_distinct_from_R_void": baseline_tip_radius != baseline_void_radius,
@@ -212,6 +216,15 @@ def main():
         "child_branch_id": child_id, "child_tip_m": list(child.tip),
         "baseline_r_tip_m": baseline_tip_radius, "baseline_R_void_m": baseline_void_radius,
         "consumer_graph": graph, "r_tip_peers": peers,
+        "retained_source_actual_continuation": {
+            "scope": "PREEXISTING_ACCEPTED_TOPOLOGY_EVENT_NOT_RERUN_BY_THIS_BOUNDED_AUDIT",
+            "initial_r_tip_m": baseline_tip_radius,
+            "renewed_r_tip_after_event_m": continued.tip_process_state["by_branch"][child_id]["r_tip_m"],
+            "r_tip_preserved_by_accepted_continuation":
+                continued.tip_process_state["by_branch"][child_id]["r_tip_m"] == baseline_tip_radius,
+            "initial_child_fingerprint": complete_accepted_state_fingerprint(state),
+            "continued_child_fingerprint": complete_accepted_state_fingerprint(continued),
+        },
         "reciprocal_R_void_peer": {
             "factor": 0.75, "r_tip_m": reciprocal.tip_process_state["by_branch"][child_id]["r_tip_m"],
             "R_void_m": reciprocal.void_state.cavities[0].radius_m,
