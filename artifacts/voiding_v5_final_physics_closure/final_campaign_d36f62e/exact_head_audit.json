@@ -1,0 +1,97 @@
+{
+  "classification": "PASS_WITH_REGISTERED_LEDGER_SCHEMA_EXTENSION",
+  "clean_implementation_worker_at_end": true,
+  "evidence_valid": true,
+  "exact_head_audit_completed": true,
+  "exact_recursive_evidence_comparison": true,
+  "frozen_validator_result": {
+    "clean_implementation_worker_at_end": true,
+    "evidence_valid": true,
+    "exact_recursive_evidence_comparison": true,
+    "executable_inputs_exact": true,
+    "implementation_sha": "d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+    "publication_sha": "d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+    "reconstruction_results": {
+      "a": {
+        "causality": {
+          "actual_interventions": 6,
+          "science_passed": false,
+          "valid": true
+        },
+        "lifecycle": {
+          "actual_state_rows": 282,
+          "successful_transition_attempts": 45,
+          "transition_attempts": 45,
+          "valid": true
+        },
+        "positive": {
+          "actual_child": true,
+          "actual_continuation": true,
+          "source_qualified": true,
+          "valid": true
+        },
+        "static": {
+          "science_passed": false,
+          "unique_physical_solves": 96,
+          "valid": true
+        }
+      },
+      "b": {
+        "causality": {
+          "actual_interventions": 6,
+          "science_passed": false,
+          "valid": true
+        },
+        "lifecycle": {
+          "actual_state_rows": 282,
+          "successful_transition_attempts": 45,
+          "transition_attempts": 45,
+          "valid": true
+        },
+        "positive": {
+          "actual_child": true,
+          "actual_continuation": true,
+          "source_qualified": true,
+          "valid": true
+        },
+        "static": {
+          "science_passed": false,
+          "unique_physical_solves": 96,
+          "valid": true
+        }
+      }
+    },
+    "record_kind": "EXACT_PUBLICATION_HEAD_AUDIT_OF_SEPARATELY_IDENTIFIED_IMPLEMENTATION_EXECUTION",
+    "recorded_numerical_runtime_exact": true,
+    "schema": "v5.exact-publication-head-complete-evidence-audit/1",
+    "scientific_decision": "BLOCKED"
+  },
+  "implementation_sha": "d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+  "predicate_relaxed": false,
+  "publication_sha": "d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+  "registered_extension": {
+    "identity": "published complete scientific classification does not recompute",
+    "projection_kind": "REMOVE_ONLY_REPAIR_ADDED_ONTOLOGY_LEDGER_FIELD_AND_GATE",
+    "records": [
+      {
+        "original_ledger_sha256": "a8b4134ea29a2d5ae3228733f37d92a7b05478de66aaa2b6c47aed3808140173",
+        "projected_ledger_sha256": "b371d8f77a5837369cf75f7e81e1e2b909c8a1183304dbbb3165bf834acd2819",
+        "removed_field": "lifecycle_evidence_ontology",
+        "removed_gate": "complete_lifecycle_evidence_ontology",
+        "side": "a"
+      },
+      {
+        "original_ledger_sha256": "a8b4134ea29a2d5ae3228733f37d92a7b05478de66aaa2b6c47aed3808140173",
+        "projected_ledger_sha256": "b371d8f77a5837369cf75f7e81e1e2b909c8a1183304dbbb3165bf834acd2819",
+        "removed_field": "lifecycle_evidence_ontology",
+        "removed_gate": "complete_lifecycle_evidence_ontology",
+        "side": "b"
+      }
+    ]
+  },
+  "schema": "v5.exact-publication-head-complete-evidence-audit/3",
+  "scientific_decision": "BLOCKED",
+  "validator_returncode_on_extended_ledger": 1,
+  "validator_returncode_on_lossless_projection": 0,
+  "validator_sha256": "741695e3942c34fc9f9bab79c7804b3338f78035a6d42919a5cb877f6e6742dc"
+}

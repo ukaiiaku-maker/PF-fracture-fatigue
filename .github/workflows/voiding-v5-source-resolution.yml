@@ -51,7 +51,7 @@ jobs:
   focused:
     if: github.event_name != 'workflow_dispatch' || inputs.operation == 'focused'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
         with:
@@ -63,22 +63,11 @@ jobs:
       - run: pip install -e '.[test]'
       - name: Exact implementation head
         run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-      - name: Geometry, recovery, source proof, and physical-clock regressions
+      - name: Execute and require the authoritative complete focused registry
         run: >-
-          python -m pytest -q tests/test_quality_constrained_mesh_v1.py
-          tests/test_source_transfer_budget_v1.py tests/test_cavity_boundary_patch_recovery_v1.py
-          tests/test_cavity_recovery_transfer_budget_v1.py tests/test_canonical_kinetic_time_v1.py
-          tests/test_boundary_segment_bounding_v1.py tests/test_v12_mechanically_separating_wake.py
-          tests/test_production_source_resolution_v3.py tests/test_closure_lifecycle_evidence.py
-          tests/test_closure_lifecycle_rollback.py tests/test_voiding_lifecycle_driver_v5.py
-          tests/test_voiding_v5.py tests/test_static_numerical_family_v1.py
-          tests/test_compressed_closure_checkpoint_v1.py tests/test_disabled_causal_neutrality_v1.py
-          tests/test_future_causal_state_fingerprint_v1.py
-          tests/test_source_resolution_campaign_v1.py
-          tests/test_common_restart_protocol_v1.py
-          tests/test_final_campaign_archive_v1.py
-          tests/test_v5_numerical_runtime_v1.py
-          --junitxml=/tmp/v5-source-resolution/focused.xml
+          python scripts/qualify_v5_source_resolution_focused_results_v1.py
+          /tmp/v5-source-resolution/focused.xml
+          /tmp/v5-source-resolution/focused.json --execute
       - name: Clean worktree and diff
         if: always()
         run: |

@@ -1,0 +1,109 @@
+{
+  "schema": "v5.final-physics-closure-pre-ci-decision/1",
+  "record_kind": "DERIVED_SMALL_CANONICAL_RECORD_NOT_NEW_PHYSICAL_EXECUTION",
+  "retained_start_sha": "5e2f92c50aca38aba151155facb847e5966227f2",
+  "implementation_sha": "d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+  "postprocess_repair_sha": "6bd88db5e9163a9bad75ec09326efec500812a1a",
+  "source_campaign": {
+    "run_id": 34301599004,
+    "url": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue/actions/runs/34301599004",
+    "conclusion": "FAILURE_RETAINED_MISSING_RG_AFTER_CAUSAL_ROWS_CAPTURED",
+    "physical_phase_jobs_executed": 35,
+    "physical_phase_jobs_success": 34,
+    "physical_workers_rerun_during_recovery": false,
+    "focused_regressions": {
+      "passed": 400,
+      "failed": 0,
+      "skipped": 0,
+      "complete_registry_exact": true
+    },
+    "repository_regressions": {
+      "passed": 1147,
+      "failed": 7,
+      "skipped": 1,
+      "classification": "FAIL_INHERITED_BASELINE",
+      "additional_failure_identities": []
+    }
+  },
+  "postprocess_recovery": {
+    "run_id": 34372970094,
+    "url": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue/actions/runs/34372970094",
+    "head_sha": "6bd88db5e9163a9bad75ec09326efec500812a1a",
+    "conclusion": "SUCCESS",
+    "causal_source_artifact": {
+      "id": 10090382857,
+      "digest": "sha256:2f0a964aadc2206e84b8012ed00c76325c9ea1f5cd440103b25e078be39454cd"
+    },
+    "small_audit_artifact": {
+      "id": 10122480709,
+      "name": "v5-final-campaign-recovery-audit-d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+      "bytes": 119644,
+      "digest": "sha256:5debfd1b9f6f788ef568b43ec711386e98fc0e767ae6296a682b42edf6a5abe5"
+    },
+    "large_publication_artifact": {
+      "id": 10122532888,
+      "name": "v5-source-final-publication-recovered-d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+      "bytes": 6353047046,
+      "digest": "sha256:e24ac5848009a388fd11c335f3cd19b404f3d494c97f3b999684c64c1fc95815",
+      "archive_part_count": 76,
+      "archive_part_bytes": 6352695895,
+      "original_file_count": 1986,
+      "committed_to_ordinary_git": false
+    }
+  },
+  "paired_evidence": {
+    "classification": "PASS",
+    "exact_recursive_comparison": true,
+    "files_per_side": 991,
+    "independent_disjoint_a_b_executions": true
+  },
+  "scientific_results": {
+    "qualified_production_source": true,
+    "coarse_unqualified_negative_fail_closed": true,
+    "actual_downstream_child": true,
+    "ordinary_child_continuation": true,
+    "static_unique_solves": 96,
+    "static_families": {"passed": 0, "total": 33},
+    "static_derivatives": {"passed": 8, "total": 12},
+    "r_tip_causal_classification": "MISSING_ACCEPTED_R_TIP_CONSTITUTIVE_LINK",
+    "r_tip_distinct_from_R_void": true,
+    "reciprocal_R_void_not_substituted_for_r_tip": true,
+    "transition_partitions": {"passed": 45, "total": 45},
+    "common_terminal_restarts": {"passed": 11, "total": 11},
+    "rollback_stages": {"passed": 39, "total": 39},
+    "controlled_histories": {"passed": 6, "total": 12},
+    "natural_partition_restart_peers": {"passed": 160, "total": 160},
+    "natural_source_native_exact_replays": {"passed": 10, "blocked": 150, "total": 160},
+    "future_causal_disabled_neutrality": {"passed": 4, "total": 4},
+    "historical_raw_full_state_identity": "FAIL_RETAINED",
+    "stagewise_topology_front_length_inventory_conservation": true,
+    "source_bound_ontology": {"applied": 282, "passed": 132, "blocked": 150},
+    "source_bound_ontology_failure_identity": "natural internal-stage independent production replay mismatch",
+    "scientific_decision": "BLOCKED"
+  },
+  "controlled_rate_interpretation": {
+    "downstream_first_passage_s": 4593376243926.258,
+    "child_continuation_s": 7.445685040821792e16,
+    "CAUSAL_PATH_EXECUTABLE": "PASS",
+    "EXPERIMENTALLY_RELEVANT_RATE": "NOT_ESTABLISHED",
+    "MATERIAL_CALIBRATION": "NOT_RUN"
+  },
+  "exact_implementation_audit": {
+    "classification": "PASS_WITH_REGISTERED_LEDGER_SCHEMA_EXTENSION",
+    "evidence_valid": true,
+    "scientific_decision": "BLOCKED",
+    "predicate_relaxed": false,
+    "clean_implementation_worker_at_end": true,
+    "frozen_validator_returncode_on_remove_only_projection": 0
+  },
+  "current_head_ci": {
+    "terminal": false,
+    "authoritative_focused_expected_count": 406,
+    "repository_baseline_expected_failure_count": 7,
+    "next_action": "Commit this bounded record and workflow coverage correction, then run exact-head focused and repository CI to terminal before updating the external controller and PR ledgers."
+  },
+  "provisional_terminal_classification": "V5_FINAL_PHYSICS_CLOSURE_COMPLETE_BUT_BLOCKED",
+  "mission_terminal": false,
+  "release_candidate_authorized": false,
+  "merge_authorized": false
+}
