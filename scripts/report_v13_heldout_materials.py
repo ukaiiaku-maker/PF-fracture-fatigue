@@ -74,6 +74,10 @@ def audit_accepted():
 def read_new_case(case):
     folder=DEST/case;t=json.loads((folder/'terminal.json').read_text());launch=json.loads((folder/'launch.json').read_text())
     assert t['status'] in ('TERMINATED','EXISTING_GATE_STOP'), 'unfinished/unclassified '+case
+    manifest=folder/'checkpoint/latest.json'
+    assert sha256(manifest)==t['last_checkpoint_manifest_sha256'], 'terminal checkpoint changed '+case
+    assert json.loads(manifest.read_text())['state_sha256']==t['last_checkpoint_state_sha256']
+    assert sha256(folder/'final_accepted_fields.npz')==t['final_fields_sha256'], 'terminal fields changed '+case
     cp=restore_branch_checkpoint(folder/'checkpoint/latest.json')
     ledger=folder/'v13_primary_race.jsonl'
     records=list(map(json.loads,ledger.read_text().splitlines())) if ledger.exists() else []
@@ -175,8 +179,9 @@ def main():
     assert all(sha256(Path(path))==h for path,h in inputs.items())
     atomic_json(FINAL/'verification.json',dict(status='PASS',inputs_verified=len(inputs),accepted_freeze=verify_accepted(),cases=64))
     entries={'final/'+f.name:f for f in FINAL.iterdir() if f.is_file()}
-    for name in ('heldout_plan.json','PREREGISTERED_HELDOUT_BLOCK.md','launch_gate_tests.xml','full_suite.xml','full_suite.log','full_suite_result.json','full_suite_claim.json','heldout_source_increment.bundle'):
+    for name in ('heldout_plan.json','PREREGISTERED_HELDOUT_BLOCK.md','launch_gate_tests.xml','full_suite.xml','full_suite.log','full_suite_result.json','full_suite_claim.json','heldout_source_increment.bundle','HELDOUT_QUEUE_PAUSE.json','STORAGE_PAUSE_HANDOFF.md'):
         entries['provenance/'+name]=OUT/name
+    entries['provenance/continuation_claim.json']=DEST/'continuation_claim.json'
     with zipfile.ZipFile(OUT/'V13_FOUR_MATERIAL_REVIEW.zip','x',compression=zipfile.ZIP_DEFLATED) as z:
         for name,path in entries.items():z.write(path,name)
         z.writestr('SHA256_MANIFEST.json',json.dumps({name:sha256(path) for name,path in entries.items()},indent=2,sort_keys=True)+'\n')
