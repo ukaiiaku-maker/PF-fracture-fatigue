@@ -1,7 +1,7 @@
 from dataclasses import replace
 import numpy as np
 
-from arrhenius_fracture.natural_future_physical_replay_v2 import compare_states, exact_projection
+from arrhenius_fracture.natural_future_physical_replay_v2 import compare_states, exact_projection, solver_budget
 from arrhenius_fracture.voiding_production_v5 import build_production_void_state
 
 
@@ -68,3 +68,11 @@ def test_missing_event_selection_margin_fails_closed():
                             solver_condition_number=100.0, free_residual_relative=1e-12,
                             subsequent_crossing=crossing)
     assert not result["passed"]
+
+
+def test_solver_budget_is_measured_from_the_free_system():
+    state, _ = build_production_void_state(stochastic=True, seed=12000)
+    budget = solver_budget(state)
+    assert budget["condition_number"] >= 1.0
+    assert budget["free_residual_relative"] >= 0.0
+    assert budget["free_dof_count"] < state.mesh.ndof

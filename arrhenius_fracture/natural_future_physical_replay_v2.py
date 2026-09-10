@@ -185,6 +185,46 @@ def _stress_and_reaction(state) -> tuple[np.ndarray, np.ndarray]:
     return np.asarray(stress, dtype=float), reaction
 
 
+def solver_budget(state) -> dict:
+    """Independently estimate the accepted free-system numerical budget."""
+    from scipy.sparse.linalg import eigsh
+    from .fem import assemble_mechanics
+    stiffness, residual, *_ = assemble_mechanics(
+        state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
+    )
+    prescribed = np.zeros(state.mesh.ndof, dtype=bool)
+    top = np.asarray(state.boundary.top_nodes, dtype=int)
+    bottom = np.asarray(state.boundary.bot_nodes, dtype=int)
+    prescribed[2 * top + 1] = True
+    prescribed[2 * bottom + 1] = True
+    prescribed[2 * int(state.boundary.left_bot)] = True
+    prescribed[2 * int(state.boundary.left_bot) + 1] = True
+    prescribed[2 * int(state.boundary.right_bot)] = True
+    free = np.flatnonzero(~prescribed)
+    matrix = stiffness.tocsr()[free][:, free]
+    largest = float(eigsh(matrix, k=1, which="LM", return_eigenvectors=False, tol=1e-8)[0])
+    smallest = float(eigsh(
+        matrix, k=1, sigma=0.0, which="LM", return_eigenvectors=False, tol=1e-8
+    )[0])
+    if not math.isfinite(largest + smallest) or smallest <= 0.0:
+        raise ValueError("free stiffness is not numerically positive definite")
+    reaction_scale = max(
+        float(state.energy_ledgers.get("latest_constrained_reaction_l2_N_per_m", 0.0)),
+        np.finfo(float).tiny,
+    )
+    return {
+        "method": "symmetric_extreme_eigenvalues_of_free_CST_stiffness",
+        "free_dof_count": int(len(free)),
+        "largest_eigenvalue_N_per_m2": largest,
+        "smallest_eigenvalue_N_per_m2": smallest,
+        "condition_number": largest / smallest,
+        "free_residual_l2_N_per_m": float(np.linalg.norm(np.asarray(residual)[free])),
+        "reaction_scale_N_per_m": reaction_scale,
+        "free_residual_relative": float(np.linalg.norm(np.asarray(residual)[free])) / reaction_scale,
+    }
+
+
 def compare_states(reference, replay, *, case_identity: str, seed: int,
                    solver_condition_number: float, free_residual_relative: float,
                    subsequent_crossing: Mapping[str, Any] | None) -> dict:
@@ -294,4 +334,4 @@ def compare_states(reference, replay, *, case_identity: str, seed: int,
     }
 
 
-__all__ = ["SCHEMA", "compare_states", "exact_projection"]
+__all__ = ["SCHEMA", "compare_states", "exact_projection", "solver_budget"]
