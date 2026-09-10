@@ -27,6 +27,18 @@ def validate_decision(claim,computed):
         raise ValueError('final classification does not follow independent local/global gates')
 
 
+def validate_final_selection(selection,decisions,selected_rows,eligible):
+    from arrhenius_fracture.prospective_paris_candidate_engine_v10230 import digest
+    retained={d['candidate_id'] for d in decisions.values() if d['classification'] in ('PARIS_WINDOW_TRANSFER_VALIDATED','EFFECTIVE_GLOBAL_SLOPE_ONLY')}
+    if len(selection['retained_candidate_ids'])!=len(retained) or set(selection['retained_candidate_ids'])!=retained or selection['targets']!=decisions:
+        raise ValueError('final selection disagrees with terminal classifications')
+    if len(selected_rows)!=len(retained) or {r['candidate_id'] for r in selected_rows}!=retained:
+        raise ValueError('retained parameter rows substituted or omitted')
+    for row in selected_rows:
+        if row['candidate_id'] not in eligible or digest(row)!=eligible[row['candidate_id']]['complete_row_sha256']:
+            raise ValueError('retained complete parameter row changed')
+
+
 def validate_history(attempts):
     paths=[r['attempt_path'] for r in attempts]
     if len(paths)!=len(set(paths)):raise ValueError('physical path reused')
@@ -141,8 +153,11 @@ def verify():
             if not path.is_dir():raise ValueError('preflight evidence directory missing')
             if any((path/name).exists() for name in ('kinetic_audit.json','kinetic_tip_cell_audit_v101.json','high_cycle_live_checkpoint.json','stochastic_avalanche_geometry_events.json','developed_fatigue_growth_summary.json')):
                 raise ValueError('preflight no-physics claim contradicted by physical artifacts')
-    decisions=read(ART/'prospective_paris_candidate_decision.json')['targets']
+    decision_payload=read(ART/'prospective_paris_candidate_decision.json')
+    if decision_payload['original_P40_classification']!=transfer['original_pilot_classification']:raise ValueError('original P40 classification changed')
+    decisions=decision_payload['targets']
     registry=list(csv.DictReader((ART/'physical_job_registry_final.csv').open()))
+    if len(registry)!=len(freeze['jobs']):raise ValueError('extra or missing planned job registry rows')
     results=[]
     for job in freeze['jobs']:
         validate_generation(job)
@@ -164,6 +179,10 @@ def verify():
             raise ValueError('censor or numerical exclusion converted to a finite rate')
         if record['physical_rate'] is not None and not math.isclose(float(declared),record['physical_rate'],rel_tol=1e-12):
             raise ValueError('rate calculation mismatch')
+    if len(attempts)!=len(results)+9:raise ValueError('physical attempt accounting incomplete')
+    validate_final_selection(read(ART/'final_candidate_selection.json'),decisions,
+        list(csv.DictReader((ART/'final_candidate_parameter_rows.csv').open())),
+        {c['candidate_id']:c for c in freeze['candidates']})
     seed_ranks=[]
     for target,claim in decisions.items():
         primary=[r for r in results if r['target']==target and r['R']==.1 and r['seed']==1720]

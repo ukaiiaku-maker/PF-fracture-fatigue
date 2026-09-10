@@ -94,3 +94,19 @@ def test_complete_event_action_uses_transaction_not_partial_block():
 def test_missing_completed_action_is_not_invented_from_threshold():
     from scripts.analyze_v10_2_30_prospective_campaign import completed_event_action
     with pytest.raises(KeyError):completed_event_action({'threshold_action':1,'event_transaction_audit':{}})
+
+
+@pytest.mark.parametrize('mutation',['row_change','substitution','classification'])
+def test_terminal_selection_cannot_rewrite_frozen_rows_or_gates(mutation):
+    import copy
+    from arrhenius_fracture.prospective_paris_candidate_engine_v10230 import digest
+    from scripts.verify_v10_2_30_prospective_campaign import validate_final_selection
+    row={'candidate_id':'frozen','cleavage':'unchanged'}
+    decisions={'P25':{'candidate_id':'frozen','classification':'EFFECTIVE_GLOBAL_SLOPE_ONLY'}}
+    selected={'retained_candidate_ids':['frozen'],'targets':copy.deepcopy(decisions)}
+    eligible={'frozen':{'complete_row_sha256':digest(row)}}
+    validate_final_selection(selected,decisions,[row],eligible)
+    if mutation=='row_change':row['cleavage']='changed'
+    elif mutation=='substitution':row['candidate_id']='ineligible'
+    else:selected['targets']['P25']['classification']='PARIS_WINDOW_TRANSFER_VALIDATED'
+    with pytest.raises(ValueError):validate_final_selection(selected,decisions,[row],eligible)

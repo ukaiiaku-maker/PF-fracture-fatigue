@@ -44,6 +44,15 @@ def main():
                 m1=m2=None
             seed_comparison.append(dict(candidate_id=cid,m_seed1=m1,m_seed2=m2,passed=d['seed_transfer_passed'],median_abs_prediction_residual_decade=float(np.median([abs(r['prediction_residual_decade']) for r in seed2])) if all('prediction_residual_decade' in r for r in seed2) else None))
             for r in rt:R_comparison.append(dict(candidate_id=cid,Kmax=r['Kmax'],R=r['R'],applied_full_DeltaK=(1-r['R'])*r['Kmax'],seed=r['seed'],physical_rate=r['physical_rate'],predicted_rate=r['predicted_rate'],developed_qualified=r['developed_qualified']))
+            d['R_transfer_diagnostics']={}
+            for ratio in (-.95,.5):
+                group=sorted([r for r in rt if r['R']==ratio],key=lambda r:r['Kmax'])
+                good=len(group)==3 and all(r['developed_qualified'] for r in group)
+                d['R_transfer_diagnostics'][str(ratio)]={
+                    'developed_qualified':good,
+                    'global_slope':float(np.polyfit(np.log([r['Kmax'] for r in group]),np.log([r['physical_rate'] for r in group]),1)[0]) if good else None,
+                    'median_abs_prediction_residual_decade':float(np.median([abs(r['prediction_residual_decade']) for r in group])) if good else None,
+                    'scope':'fixed-row transfer diagnostic; no additional fitted R parameter or invented R acceptance tolerance'}
             if d['seed_transfer_passed'] and all(r['developed_qualified'] for r in rt):retained.append(cid)
             else:
                 d['pre_transfer_classification']=d['classification'];d['classification']='TARGET_NOT_TRANSFERRED_WITH_SINGLE_EXP_FLOOR';d['transfer_failure']=True
@@ -130,6 +139,32 @@ def main():
     lines+=['','Only the separately recorded retained rows are admitted as fatigue-response controls. The monotonic side check reveals substantial side effects and does not establish material archetypes.','',
         'All raw trajectories remain under runs/. Each launch was fresh, committed, hash-qualified, and capped by the original 1e12-cycle censor. No trajectory was resumed.','',
         'The first 20 µm are excluded using whole events. Local slopes, interval rates, event-size/waiting decomposition, seed transfer, and full nominal ΔK are available in the accompanying tables. No closure-corrected ΔK_eff is reported.']
+    lines+=['','Window diagnostics (P55 is a three-point pilot only):','',
+        '| Target | Target fit | Predicted fit | Physical fit | Physical local range | RMS prediction residual (decade) |',
+        '|---|---:|---:|---:|---|---:|']
+    for target,d in decisions.items():
+        m=d.get('sampled_window_diagnostics')
+        if m:
+            lo,hi=m['physical_local_slope_range']
+            lines.append(f"| {target} | {m['target_global_slope']:.6f} | {m['predicted_global_slope']:.6f} | {m['physical_global_slope']:.6f} | {lo:.6f}–{hi:.6f} | {m['RMS_prediction_residual_decade']:.6f} |")
+    lines+=['','Second-seed comparisons use the same Kmax = 15, 18, 21 subset for both seeds.','',
+        '| Candidate | Seed 1720 slope | Seed 1001723 slope | Median absolute prediction residual | Passed |',
+        '|---|---:|---:|---:|---|']
+    for r in seed_comparison:lines.append(f"| {r['candidate_id']} | {r['m_seed1']} | {r['m_seed2']} | {r['median_abs_prediction_residual_decade']} | {r['passed']} |")
+    lines+=['','R-transfer results hold every material field fixed. Full applied DeltaK is (1−R)Kmax.','',
+        '| Candidate | R | Kmax | Full DeltaK | Physical da/dN (m/cycle) |',
+        '|---|---:|---:|---:|---:|']
+    for r in R_comparison:lines.append(f"| {r['candidate_id']} | {r['R']} | {r['Kmax']} | {r['applied_full_DeltaK']} | {r['physical_rate']} |")
+    lines+=['','Monotonic first-passage K values below are reduced no-feedback screening values, not state-resolved fracture toughness.','',
+        '| Row | 300 K | 600 K | 900 K | 1200 K |','|---|---:|---:|---:|---:|']
+    mono=list(csv.DictReader((WORK/'monotonic_side_effect_check_all_frozen.csv').open()))
+    for cid in dict.fromkeys(r['candidate_id'] for r in mono):
+        values=[float(r['K_first_MPa_sqrt_m']) for r in mono if r['candidate_id']==cid]
+        lines.append('| '+cid+' | '+' | '.join(f'{v:.6g}' for v in values)+' |')
+    lines+=['','Exact retained rows are in final_candidate_parameter_rows.csv; all tested frozen rows remain in transfer_candidate_registry_v1.csv.',
+        'Complete event actions come from checked event transactions. The legacy block and summary increments are preserved but are not substituted for whole-event hazard action.',
+        'The qualified physical source snapshot is f2d692263518b64a9bbef5619fea9fe359dee037. Later producer commits change analysis only; exact source-tree equivalence is recorded in physical_source_equivalence.json.',
+        'Terminal verification command: `python scripts/verify_v10_2_30_prospective_campaign.py` using the qualified environment.']
     (ART/'prospective_paris_candidate_decision.md').write_text('\n'.join(lines)+'\n')
     (ART/'PROSPECTIVE_PARIS_CANDIDATE_HANDOFF.md').write_text('\n'.join(lines)+'\n\nAuthoritative physical run roots: runs/prospective_paris_p40_pilot_v1 and runs/prospective_paris_transfer_v1.\n')
     shutil.copytree(WORK/'figures',ART/'figures',dirs_exist_ok=True)
@@ -137,7 +172,7 @@ def main():
     existing={r['attempt_path'] for r in old}
     for r in rows:
         if r['result_path'] not in existing:
-            old.append(dict(r,attempt_path=r['result_path'],resume=False,physical_initialization=True))
+            old.append(dict(r,attempt_path=r['result_path'],attempt_number=r['attempt'],parameter_option=r['candidate_id'],Kmax_MPa_sqrt_m=r['Kmax'],deltaK_MPa_sqrt_m=r['applied_full_DeltaK'],cycles_max=1e12,target_ext_um=100,fresh=True,max_wall_seconds=43200,resume=False,physical_initialization=True))
     write_csv(ART/'physical_attempt_registry.csv',old)
     print(json.dumps(payload,indent=2))
 
