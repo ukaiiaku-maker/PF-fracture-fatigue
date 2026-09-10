@@ -9,11 +9,12 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from scripts.analyze_v10_2_30_prospective_campaign import harvest,grid_gate,slopes,read,completed_event_action
+from scripts.audit_v10_2_30_prospective_first_passage import validate_first_passage_history,first_passage_attempt_rows
 from scripts.verify_v10_2_30_prospective_launch import verify as verify_original
 ART=ROOT/'artifacts/prospective_paris_candidates'
 RUN=ROOT/'runs/prospective_paris_transfer_v1'
 REQUIRED=['p40_launch_pathway_amendment.json','p40_launch_pathway_verification.json',
- 'physical_attempt_registry.csv','physical_event_ledger.csv','physical_job_registry_final.csv','p40_pilot_physical_results.csv',
+ 'physical_attempt_registry.csv','physical_first_passage_attempts.csv','physical_event_ledger.csv','physical_job_registry_final.csv','p40_pilot_physical_results.csv',
  'p40_pilot_prediction_comparison.csv','p40_pilot_local_slopes.csv','p40_transfer_update.json',
  'final_candidate_parameter_rows.csv','final_candidate_selection.json','physical_developed_rates.csv',
  'physical_local_slopes.csv','physical_state_summary.csv','analytical_vs_physical_rates.csv',
@@ -92,11 +93,9 @@ def independently_check_event_ledger(path,job,measured_rate):
         raise ValueError('raw cycle/event rate disagrees with summary')
     engine_ids={int(r['engine_id']) for r in kinetic}
     if len(engine_ids)!=1:raise ValueError('unexpected engine/seed mapping')
-    rng=np.random.default_rng(np.random.SeedSequence([job['seed'],next(iter(engine_ids))]))
+    validate_first_passage_history(geometry,kinetic,read(path/'hazard_energy_gated_events_v10_2_30.json'),read(path/'high_cycle_live_checkpoint.json')['stochastic'],int(job['seed']),next(iter(engine_ids)))
     for event in geometry:
         completed_event_action(event)
-        expected=max(float(rng.exponential(1.0)),1e-12)
-        if not math.isclose(event['threshold_action'],expected,rel_tol=1e-12):raise ValueError('threshold RNG provenance changed')
         if event['committed_event_length_m']>event['stochastic_proposed_event_length_m']*(1+1e-8):raise ValueError('event exceeds proposal')
     if any(not r['event_localized'] or not r['coupled_hazard_event_restart'] for r in kinetic if r['fired']):
         raise ValueError('first passage or event restart not qualified')
@@ -220,12 +219,44 @@ def verify():
             if claim['classification']!=expected:raise ValueError('failed-pilot classification mismatch')
     if [r[0] for r in sorted(seed_ranks,key=lambda r:r[1])] != [r[0] for r in sorted(seed_ranks,key=lambda r:r[2])]:
         raise ValueError('candidate slope ranking changed under second seed')
+    published_R=list(csv.DictReader((ART/'R_transfer_comparison.csv').open()))
+    actual_R=[r for r in results if r['stage']=='R_TRANSFER']
+    def condition_key(r):return r['candidate_id'],float(r['Kmax']),float(r['R']),int(r['seed'])
+    indexed_R={condition_key(r):r for r in published_R}
+    if len(indexed_R)!=len(actual_R) or len(published_R)!=len(actual_R):raise ValueError('R-transfer table incomplete or duplicated')
+    for r in actual_R:
+        published=indexed_R[condition_key(r)]
+        if not math.isclose(float(published['applied_full_DeltaK']),(1-r['R'])*r['Kmax'],rel_tol=1e-12):raise ValueError('published full DeltaK incorrect')
+        if r['physical_rate'] is not None and not math.isclose(float(published['physical_rate']),r['physical_rate'],rel_tol=1e-12):raise ValueError('R-transfer published rate mismatch')
+        if r['physical_rate'] is None and published['physical_rate'] not in ('','None','nan','NaN'):raise ValueError('R exclusion published as finite')
+    published_seed=list(csv.DictReader((ART/'second_seed_comparison.csv').open()))
+    seed_ids={r['candidate_id'] for r in results if r['stage']=='SEED2'}
+    if len(published_seed)!=len(seed_ids) or {r['candidate_id'] for r in published_seed}!=seed_ids:raise ValueError('second-seed table incomplete')
+    for published in published_seed:
+        group=[r for r in results if r['candidate_id']==published['candidate_id']]
+        try:
+            m1,m2=validate_seed_transfer([r for r in group if r['R']==.1 and r['seed']==1720],[r for r in group if r['seed']==1001723]);passed=True
+        except ValueError:passed=False
+        if (published['passed']=='True')!=passed:raise ValueError('published seed gate differs from recomputed gate')
+        if passed and (not math.isclose(float(published['m_seed1']),m1,rel_tol=1e-12) or not math.isclose(float(published['m_seed2']),m2,rel_tol=1e-12)):raise ValueError('published seed slope mismatch')
     mono=list(csv.DictReader((ART/'monotonic_side_effect_check.csv').open()))
     for candidate in ['A_NATIVE']+[v['candidate_id'] for v in decisions.values() if v['classification'] in ('PARIS_WINDOW_TRANSFER_VALIDATED','EFFECTIVE_GLOBAL_SLOPE_ONLY')]:
         subset=[r for r in mono if r['candidate_id']==candidate]
         if sorted(float(r['temperature_K']) for r in subset)!=[300,600,900,1200]:raise ValueError('missing monotonic temperature check')
         for r in subset:
             if r['classification']=='FIRST_PASSAGE' and (not math.isfinite(float(r['K_first_MPa_sqrt_m'])) or abs(float(r['hazard_action'])-1)>1e-7):raise ValueError('invalid monotonic first passage')
+    from scipy.integrate import quad
+    from scripts.analyze_v10_2_30_prospective_monotonic import AnalyticalMechanics,AnalyticalControl,_effective_cleavage_rate,_local_state,build_frozen_manifest,build_transfer_manifest
+    mechanics=AnalyticalMechanics(r0_m=1e-6,sigma_cap_Pa=30e9,cleavage_hits=3.,cleavage_tau_s=1e-6,source_bin_count=2)
+    control=AnalyticalControl().validate()
+    for r in mono:
+        manifest,_=build_frozen_manifest('A_NATIVE') if r['candidate_id']=='A_NATIVE' else build_transfer_manifest(r['candidate_id'])
+        if not math.isclose(float(r['barrier_floor_eV']),manifest.cleavage.G00_eV*manifest.cleavage.floor_fraction,rel_tol=1e-12):raise ValueError('monotonic barrier floor changed')
+        if not math.isclose(float(r['characteristic_cleavage_stress_Pa']),manifest.cleavage.sigc0_Pa,rel_tol=1e-12):raise ValueError('monotonic cleavage stress changed')
+        if float(r['Kdot_MPa_sqrt_m_s'])!=control.Kdot_MPa_sqrt_m_s:raise ValueError('monotonic ramp changed')
+        if r['classification']=='FIRST_PASSAGE':
+            action=quad(lambda K:_effective_cleavage_rate(manifest,_local_state(K,mechanics)[0],float(r['temperature_K']),mechanics),0,float(r['K_first_MPa_sqrt_m']),epsabs=1e-10,epsrel=1e-9,limit=200)[0]/control.Kdot_MPa_sqrt_m_s
+            if abs(action-1)>1e-7:raise ValueError('monotonic K does not integrate to first passage')
     figures=['target_prediction_physical_rates.png','target_prediction_physical_local_slopes.png','barrier_profiles.png','prediction_residuals.png','state_stress_transmission.png','seed_transfer.png','R_transfer.png','P25_P40_P55_comparison.png','monotonic_side_effects.png']
     for name in figures:
         if not (ART/'figures'/name).is_file():raise ValueError('missing figure: '+name)
@@ -264,6 +295,24 @@ def verify():
         if not math.isclose(float(event['physical_hazard_action']),action,rel_tol=1e-12):raise ValueError('published complete event action mismatch')
         if not math.isclose(float(event['threshold_action']),threshold,rel_tol=1e-12):raise ValueError('published event threshold mismatch')
         if not math.isclose(float(event['stochastic_event_probability']),-math.expm1(-action),rel_tol=1e-12):raise ValueError('event probability mismatch')
+    published_passages=list(csv.DictReader((ART/'physical_first_passage_attempts.csv').open()))
+    expected_passages={}
+    for run in results+original_rows:
+        path=Path(run['result_path']);geometry=read(path/'stochastic_avalanche_geometry_events.json')
+        kinetic=read(path/'kinetic_tip_cell_audit_v101.json')['records'];energy=read(path/'hazard_energy_gated_events_v10_2_30.json');stochastic=read(path/'high_cycle_live_checkpoint.json')['stochastic']
+        for row in first_passage_attempt_rows(geometry,kinetic,energy,stochastic,1000.):expected_passages[(str(path),row['hazard_event_index'])]=row
+    if len(published_passages)!=len(expected_passages):raise ValueError('first-passage table incomplete')
+    seen=set()
+    for row in published_passages:
+        key=(row['result_path'],int(row['hazard_event_index']))
+        if key in seen or key not in expected_passages:raise ValueError('duplicate or substituted first passage')
+        seen.add(key);expected=expected_passages[key]
+        if (row['geometry_advanced']=='True')!=expected['geometry_advanced']:raise ValueError('non-advancing first passage misclassified')
+        for field in ('threshold_action','cycles_total','projected_extension_m','proposed_length_m','energy_admitted_length_m','committed_length_m'):
+            if not math.isclose(float(row[field]),expected[field],rel_tol=1e-12,abs_tol=1e-14):raise ValueError('first-passage audit field mismatch: '+field)
+        if expected['physical_hazard_action'] is None:
+            if row['physical_hazard_action'] not in ('','None'):raise ValueError('unrecorded zero-length action invented')
+        elif not math.isclose(float(row['physical_hazard_action']),expected['physical_hazard_action'],rel_tol=1e-12):raise ValueError('first-passage action mismatch')
     hashes=read(ART/'file_hashes.json')
     if not set(REQUIRED)-{'file_hashes.json'} <= set(hashes):raise ValueError('required artifact omitted from hash manifest')
     for name,expected in hashes.items():
@@ -273,7 +322,7 @@ def verify():
     process_lines=subprocess.check_output(['ps','-axo','command'],text=True).splitlines()
     if any(' -m arrhenius_fracture.sharp_front_v10_2_30_' in line for line in process_lines):raise ValueError('physical workers remain active')
     subprocess.run(['git','diff','--check'],cwd=ROOT,check=True)
-    return dict(passed=True,terminal_jobs=len(results),physical_trajectories_total=len(results)+3,events=len(published_events),attempts=len(attempts),original_freeze_preserved=True,transfer_updates=1)
+    return dict(passed=True,terminal_jobs=len(results),physical_trajectories_total=len(results)+3,events=len(published_events),first_passages=len(published_passages),zero_length_first_passages=sum(r['geometry_advanced']=='False' for r in published_passages),attempts=len(attempts),original_freeze_preserved=True,transfer_updates=1)
 
 
 if __name__=='__main__':

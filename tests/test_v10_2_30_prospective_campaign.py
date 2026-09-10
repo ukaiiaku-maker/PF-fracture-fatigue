@@ -110,3 +110,16 @@ def test_terminal_selection_cannot_rewrite_frozen_rows_or_gates(mutation):
     elif mutation=='substitution':row['candidate_id']='ineligible'
     else:selected['targets']['P25']['classification']='PARIS_WINDOW_TRANSFER_VALIDATED'
     with pytest.raises(ValueError):validate_final_selection(selected,decisions,[row],eligible)
+
+
+def test_terminal_checkpoint_state_is_separate_from_event_state(tmp_path):
+    import json
+    from scripts.analyze_v10_2_30_prospective_campaign import saved_terminal_checkpoint_state
+    (tmp_path/'high_cycle_live_checkpoint.json').write_text(json.dumps({'diagnostics':{
+        'tip_radius_m':1e-6,'mobile_count':0.,'retained_count':0.,'sigma_back_Pa':7e8,'active_K_shield_Pa_sqrt_m':0.}}))
+    event={'terminal_radius_m':1.1e-6,'mobile_count':580.}
+    event.update(saved_terminal_checkpoint_state(tmp_path))
+    assert event['terminal_radius_m']==1.1e-6
+    assert event['mobile_count']==580.
+    assert event['post_geometry_checkpoint_radius_m']==1e-6
+    assert event['post_geometry_checkpoint_mobile_count']==0.

@@ -13,6 +13,7 @@ from scripts.analyze_v10_2_30_prospective_campaign import read,slopes,target_rat
 from arrhenius_fracture.prospective_paris_transfer_engine_v10230 import build_transfer_manifest
 ART=ROOT/'artifacts/prospective_paris_candidates';WORK=ROOT/'runs/prospective_paris_transfer_v1/analysis_work'
 COLORS={'P25':'#16786d','P40':'#ae5f10','P55':'#754ba0'}
+LABELS={'P25':'P25','P40':'P40 GEN2','P55':'P55'}
 
 
 def main():
@@ -45,24 +46,26 @@ def main():
     ax.set(xlabel='Cleavage stress (GPa)',ylabel='Barrier (eV)',title='Frozen single-EXP barriers, 300 K');ax.legend(fontsize=7);save(fig,'barrier_profiles.png')
     fig,ax=base()
     for t,color in COLORS.items():
-        selected=sorted([r for r in primary if r['target']==t],key=lambda r:r['Kmax']);ax.plot([r['Kmax'] for r in selected],[r['prediction_residual_decade'] for r in selected],'o-',color=color,label=t)
+        selected=sorted([r for r in primary if r['target']==t],key=lambda r:r['Kmax']);ax.plot([r['Kmax'] for r in selected],[r['prediction_residual_decade'] for r in selected],'o-',color=color,label=LABELS[t])
     ax.axhline(.2,color='gray',ls=':');ax.axhline(-.2,color='gray',ls=':');ax.set(xlabel='Kmax (MPa √m)',ylabel='log10(physical / frozen prediction)');ax.legend();save(fig,'prediction_residuals.png')
     fig,axes=plt.subplots(1,2,figsize=(10,4),constrained_layout=True)
     for t,color in COLORS.items():
         selected=sorted([r for r in primary if r['target']==t],key=lambda r:r['Kmax']);ks=[r['Kmax'] for r in selected]
-        axes[0].plot(ks,[r['terminal_radius_m']*1e6 for r in selected],'o-',color=color,label=t)
+        axes[0].plot(ks,[r['terminal_radius_m']*1e6 for r in selected],'o-',color=color,label=LABELS[t])
         axes[1].plot(ks,[r['max_recorded_stress_Pa']/(r['Kmax']*1e6/np.sqrt(2*np.pi*1e-6)) for r in selected],'o-',color=color)
-    axes[0].set(xlabel='Kmax (MPa √m)',ylabel='Terminal r_eff (µm)');axes[0].legend();axes[1].set(xlabel='Kmax (MPa √m)',ylabel='Recorded peak stress / nominal r0 stress');save(fig,'state_stress_transmission.png')
+    axes[0].set(xlabel='Kmax (MPa √m)',ylabel='Last-event r_eff before tip advance (µm)');axes[0].legend();axes[1].set(xlabel='Kmax (MPa √m)',ylabel='Recorded peak stress / nominal r0 stress');save(fig,'state_stress_transmission.png')
     for name,selector in [('seed_transfer.png','seed'),('R_transfer.png','R')]:
         fig,ax=base();anydata=False
         values=[1720,1001723] if selector=='seed' else [-.95,.1,.5]
         for t,color in COLORS.items():
+            if not any(r['target']==t and (r['seed']==1001723 if selector=='seed' else r['R'] in (-.95,.5)) for r in rows):continue
             for value,style in zip(values,['o-','s--','^:']):
                 selected=sorted([r for r in rows if r['target']==t and r[selector]==value and r['Kmax'] in (15,18,21) and (r['R']==.1 if selector=='seed' else r['seed']==1720)],key=lambda r:r['Kmax'])
-                if selected:anydata=True;ax.plot([r['Kmax'] for r in selected],[r['physical_rate'] for r in selected],style,color=color,label=f'{t} {selector}={value}')
+                if selected:anydata=True;ax.plot([r['Kmax'] for r in selected],[r['physical_rate'] for r in selected],style,color=color,label=f'{LABELS[t]} {selector}={value}')
         ax.set(xlabel='Kmax (MPa √m)',ylabel='Developed da/dN (m/cycle)');ax.set_yscale('log')
         if anydata:ax.legend(fontsize=7,ncol=2)
         else:ax.text(.5,.5,'No qualified transfer trajectories',ha='center',transform=ax.transAxes)
+        fig.text(.5,-.02,'P55 did not advance beyond the failed pilot gate.',ha='center',fontsize=7)
         save(fig,name)
     fig,ax=base()
     for t,color in COLORS.items():

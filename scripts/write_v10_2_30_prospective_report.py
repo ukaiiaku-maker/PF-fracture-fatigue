@@ -10,6 +10,7 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from scripts.analyze_v10_2_30_prospective_campaign import read,grid_gate,slopes,target_rate,completed_event_action
+from scripts.audit_v10_2_30_prospective_first_passage import validate_first_passage_history,first_passage_attempt_rows
 from scripts.verify_v10_2_30_prospective_campaign import validate_seed_transfer,physical_source_identity
 ART=ROOT/'artifacts/prospective_paris_candidates';WORK=ROOT/'runs/prospective_paris_transfer_v1/analysis_work'
 
@@ -93,11 +94,17 @@ def main():
     for r in registry:r['qualified_physical_source_commit']=source_commit
     write_csv(ART/'physical_job_registry_final.csv',registry)
     write_csv(ART/'physical_developed_rates.csv',rows)
-    event_rows=[]
+    event_rows=[];passage_rows=[]
     original_runs=list(csv.DictReader((ART/'p40_pilot_physical_results.csv').open()))
     for run in rows+original_runs:
         path=Path(run['result_path']);summary=read(path/'developed_fatigue_growth_summary.json');geometry=read(path/'stochastic_avalanche_geometry_events.json')
         if len(summary['event_measurements'])!=len(geometry):raise ValueError('event ledger incomplete')
+        kinetic=read(path/'kinetic_tip_cell_audit_v101.json')['records'];energy=read(path/'hazard_energy_gated_events_v10_2_30.json');stochastic=read(path/'high_cycle_live_checkpoint.json')['stochastic']
+        engine_ids={int(r['engine_id']) for r in kinetic}
+        if len(engine_ids)!=1:raise ValueError('ambiguous engine seed mapping')
+        validate_first_passage_history(geometry,kinetic,energy,stochastic,int(run['seed']),next(iter(engine_ids)))
+        for passage in first_passage_attempt_rows(geometry,kinetic,energy,stochastic,1000.):
+            passage_rows.append(dict(passage,candidate_id=run['candidate_id'],result_path=str(path),Kmax=float(run['Kmax']),R=float(run['R']),seed=int(run['seed']),producer_head=run.get('launch_head',run.get('producer_head'))))
         for event,transaction in zip(summary['event_measurements'],geometry):
             action=completed_event_action(transaction)
             record=dict(event,candidate_id=run['candidate_id'],result_path=str(path),producer_head=run.get('launch_head',run.get('producer_head')),
@@ -108,6 +115,7 @@ def main():
             for field in ('x0','x1','y0','y1'):record[field]=transaction.get(field)
             event_rows.append(record)
     write_csv(ART/'physical_event_ledger.csv',event_rows)
+    write_csv(ART/'physical_first_passage_attempts.csv',passage_rows)
     locals=[]
     for cid in [c['candidate_id'] for c in freeze['candidates']]:
         for R,seed in ((.1,1720),(.1,1001723),(-.95,1720),(.5,1720)):
@@ -116,7 +124,7 @@ def main():
     write_csv(ART/'analytical_vs_physical_slopes.csv',locals,fields=list(locals[0]) if locals else ['candidate_id','Klo','Khi','physical_slope'])
     write_csv(ART/'slope_error_decomposition.csv',locals,fields=list(locals[0]) if locals else ['candidate_id','event_size_contribution','waiting_contribution'])
     write_csv(ART/'analytical_vs_physical_rates.csv',rows)
-    write_csv(ART/'physical_state_summary.csv',[{k:r.get(k) for k in ('candidate_id','Kmax','R','seed','terminal_radius_m','mobile_count','retained_count','K_shield','sigma_back','barrier_floor_active','stress_cap_active','maximum_recorded_renewal_fraction')} for r in rows])
+    write_csv(ART/'physical_state_summary.csv',[{k:r.get(k) for k in ('candidate_id','Kmax','R','seed','terminal_radius_m','mobile_count','retained_count','K_shield','sigma_back','barrier_floor_active','stress_cap_active','maximum_recorded_renewal_fraction','terminal_radius_scope','post_geometry_checkpoint_radius_m','post_geometry_checkpoint_mobile_count','post_geometry_checkpoint_retained_count','post_geometry_checkpoint_sigma_back_Pa','post_geometry_checkpoint_K_shield_Pa_sqrt_m')} for r in rows])
     write_csv(ART/'second_seed_comparison.csv',seed_comparison,fields=['candidate_id','m_seed1','m_seed2','passed','median_abs_prediction_residual_decade'])
     write_csv(ART/'R_transfer_comparison.csv',R_comparison,fields=['candidate_id','Kmax','R','applied_full_DeltaK','seed','physical_rate','predicted_rate','developed_qualified'])
     shutil.copyfile(WORK/'monotonic_side_effect_check_all_frozen.csv',ART/'monotonic_side_effect_check.csv')
@@ -128,7 +136,8 @@ def main():
         gstar=4.473410023231299e-7,physics_scope='new rows change only five cleavage coordinates; canonical rows, Peierls, Taylor, source closure, first passage, and energy transaction unchanged',
         monotonic_side_effect='No-feedback monotonic screening finds substantial low-load thermal first passage for new rows and high-temperature renewal saturation. No material-archetype promotion.',
         development_convention='Only events wholly beyond 20 micrometres; boundary-overlap estimates preserved separately for original P40',
-        limitations=['Monotonic values are analysis-only no-plastic screening, not full state-resolved monotonic fracture validation.','Generation-2 original pilot loads remain calibration loads, not independent validation.','Recorded pathology diagnostics do not reconstruct unsaved phasewise histories.','Legacy block and developed-summary hazard increments omit committed locator-prefix contributions. The campaign event ledger uses the complete action saved by the checked event transaction; raw files and physical evolution are unchanged.'])
+        limitations=['Monotonic values are analysis-only no-plastic screening, not full state-resolved monotonic fracture validation.','Generation-2 original pilot loads remain calibration loads, not independent validation.','Recorded pathology diagnostics do not reconstruct unsaved phasewise histories.','The frozen radius-transfer input is the last recorded pre-geometry cleavage event radius. The translated terminal new-tip checkpoint is a distinct state and is reported separately; frozen inputs and predictions remain unchanged.','Legacy block and developed-summary hazard increments omit committed locator-prefix contributions. The campaign event ledger uses the complete action saved by the checked event transaction; raw files and physical evolution are unchanged.'])
+    payload['first_passage_accounting']=dict(total=len(passage_rows),committed_geometry_events=len(event_rows),zero_length_energy_gated_attempts=sum(not r['geometry_advanced'] for r in passage_rows),zero_length_full_action_scope='No missing complete action is invented; thresholds and partial block increments are preserved, and every consumed threshold is verified against RNG history.')
     payload['attempt_accounting']=dict(physical_trajectories=len(rows)+3,preflight_no_physics=6,interrupted_trajectories=0,resumed_trajectories=0,physical_censors=sum(r['status']=='PHYSICAL_CENSOR' for r in rows),numerically_unresolved=sum(r['status']=='NUMERICALLY_UNRESOLVED' for r in rows),developed_unqualified=sum(not r['developed_qualified'] for r in rows))
     payload['bounded_candidate_search']='One prospectively selected single-EXP row per target, plus the explicitly allowed P40 generation-2 correction. All were analytically eligible, so no dual-barrier family was admitted. Failed physical transfer is a result for the tested row, not a proof that every row in the family must fail.'
     (ART/'prospective_paris_candidate_decision.json').write_text(json.dumps(payload,indent=2)+'\n')
@@ -162,6 +171,7 @@ def main():
         values=[float(r['K_first_MPa_sqrt_m']) for r in mono if r['candidate_id']==cid]
         lines.append('| '+cid+' | '+' | '.join(f'{v:.6g}' for v in values)+' |')
     lines+=['','Exact retained rows are in final_candidate_parameter_rows.csv; all tested frozen rows remain in transfer_candidate_registry_v1.csv.',
+        f"First-passage accounting: {len(passage_rows)} passages, {len(event_rows)} committed geometry events, {sum(not r['geometry_advanced'] for r in passage_rows)} consumed zero-length energy-gated attempts. These are physical non-advancing passages, not numerical exclusions or censored trajectories.",
         'Complete event actions come from checked event transactions. The legacy block and summary increments are preserved but are not substituted for whole-event hazard action.',
         'The qualified physical source snapshot is f2d692263518b64a9bbef5619fea9fe359dee037. Later producer commits change analysis only; exact source-tree equivalence is recorded in physical_source_equivalence.json.',
         'Terminal verification command: `python scripts/verify_v10_2_30_prospective_campaign.py` using the qualified environment.']

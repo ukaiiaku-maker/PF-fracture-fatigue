@@ -1,0 +1,16 @@
+{
+  "status": "READY_FOR_TERMINAL_VERIFICATION",
+  "strict_campaign_verifier_passed": false,
+  "pending": "Strict verifier requires the assembled artifacts on a clean commit.",
+  "focused_tests": {
+    "passed": 88,
+    "failed": 0
+  },
+  "production_launcher_shell_syntax": "PASS (both launchers)",
+  "git_diff_check": "PASS",
+  "original_frozen_artifact_check": {
+    "passed": true,
+    "files": 37
+  },
+  "physical_workers": 0
+}

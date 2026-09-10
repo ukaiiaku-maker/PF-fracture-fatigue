@@ -58,6 +58,13 @@ def recorded_renewal_fraction(step_rows,tau_s):
     return max(float(row['lambda_c']) for row in step_rows)*float(tau_s)
 
 
+def saved_terminal_checkpoint_state(path):
+    diagnostic=read(path/'high_cycle_live_checkpoint.json')['diagnostics']
+    fields={'radius_m':'tip_radius_m','mobile_count':'mobile_count','retained_count':'retained_count',
+            'sigma_back_Pa':'sigma_back_Pa','K_shield_Pa_sqrt_m':'active_K_shield_Pa_sqrt_m'}
+    return {'post_geometry_checkpoint_'+name:diagnostic[source] for name,source in fields.items()}
+
+
 def completed_event_action(event):
     # The block/summary increment can omit a committed locator prefix.
     # The checked transaction preserves the engine's complete interval H.
@@ -104,6 +111,8 @@ def harvest(job,result,freeze):
         terminal_radius_m=last['persistent_tip_radius_m'],mobile_count=last['state_mobile_count'],retained_count=last['state_retained_count'],K_shield=last['state_active_K_shield_signed_Pa_sqrt_m'],
         sigma_back=last['persistent_sigma_back_Pa'],floor_eV=floor,minimum_event_barrier_eV=barrier,
         max_recorded_stress_Pa=stress,stress_cap_active=stress>=args['sigma_cap_GPa']*1e9,barrier_floor_active=barrier<=floor*(1+1e-10),renewal_ceiling_active=renewal>=.1,maximum_recorded_renewal_fraction=renewal)
+    base.update(saved_terminal_checkpoint_state(p))
+    base['terminal_radius_scope']='last recorded cleavage event state before geometry and MPZ translation; translated terminal checkpoint reported separately'
     base['initiation_cycles']=events[0]['cycles_post'] if events else None
     developed_path=sum(e['path_advance_m'] for e in selected)
     base['developed_path_rate']=developed_path/stat['dN'] if qualified else None

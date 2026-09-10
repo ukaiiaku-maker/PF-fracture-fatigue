@@ -1,0 +1,255 @@
+{
+  "targets": {
+    "P40": {
+      "classification": "EFFECTIVE_GLOBAL_SLOPE_ONLY",
+      "window_qualified": true,
+      "m_global": 3.69873195352322,
+      "R_squared": 0.9947990945742438,
+      "RMS_local_slope_error": 0.5518070709059708,
+      "max_local_slope_error": 0.9359220955705703,
+      "RMS_rate_error": 0.02871220525145997,
+      "max_rate_error": 0.06120811687973589,
+      "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "target": "P40",
+      "family": "single_EXP_floor",
+      "generation": 2,
+      "candidate_row_sha256": "142e0c7dc0c00193d62aa1cb9c5120cea0261a0f41a7949071dac710ec97a729",
+      "pilot": {
+        "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+        "completed_pilots": 3,
+        "qualified": true,
+        "pilot_prediction_gate_passed": true,
+        "local_slopes": [
+          {
+            "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+            "Klo": 15.0,
+            "Khi": 16.5,
+            "R": 0.1,
+            "seed": 1720,
+            "physical_slope": 4.098296911896031,
+            "target_slope": 3.9898585495179755,
+            "predicted_slope": 3.9996086609304426,
+            "event_size_contribution": 0.0,
+            "waiting_contribution": 4.098296911896032
+          },
+          {
+            "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+            "Klo": 16.5,
+            "Khi": 19.5,
+            "R": 0.1,
+            "seed": 1720,
+            "physical_slope": 3.475205988320647,
+            "target_slope": 3.9490814807563734,
+            "predicted_slope": 3.9427267705564155,
+            "event_size_contribution": 0.0,
+            "waiting_contribution": 3.4752059883206465
+          }
+        ]
+      },
+      "seed_transfer_passed": true,
+      "R_transfer_diagnostics": {
+        "-0.95": {
+          "developed_qualified": true,
+          "global_slope": 3.512761682949404,
+          "median_abs_prediction_residual_decade": 0.005165044844612599,
+          "scope": "fixed-row transfer diagnostic; no additional fitted R parameter or invented R acceptance tolerance"
+        },
+        "0.5": {
+          "developed_qualified": true,
+          "global_slope": 3.5014488718842576,
+          "median_abs_prediction_residual_decade": 0.004453512716434809,
+          "scope": "fixed-row transfer diagnostic; no additional fitted R parameter or invented R acceptance tolerance"
+        }
+      },
+      "sampled_window_diagnostics": {
+        "point_count": 6,
+        "scope": "complete six-point primary window",
+        "target_global_slope": 3.9365287720174815,
+        "predicted_global_slope": 3.9365891792292125,
+        "physical_global_slope": 3.69873195352322,
+        "target_local_slope_range": [
+          3.7540639869913828,
+          3.9898585495179755
+        ],
+        "physical_local_slope_range": [
+          2.8181418914208125,
+          4.204155352503832
+        ],
+        "RMS_prediction_residual_decade": 0.028671133193594003,
+        "max_abs_prediction_residual_decade": 0.06121384880787413
+      },
+      "retained": true
+    },
+    "P25": {
+      "classification": "EFFECTIVE_GLOBAL_SLOPE_ONLY",
+      "window_qualified": true,
+      "m_global": 2.4715673454590834,
+      "R_squared": 0.9944487683685128,
+      "RMS_local_slope_error": 0.32018796267216326,
+      "max_local_slope_error": 0.4016515461083121,
+      "RMS_rate_error": 0.012004785973755512,
+      "max_rate_error": 0.017791809890152402,
+      "candidate_id": "P25_TRANSFER_V1_RANK1",
+      "target": "P25",
+      "family": "single_EXP_floor",
+      "generation": 1,
+      "candidate_row_sha256": "6aad4fbcce5e9e9a6dcbcb52c954627226332e3e55d7daf8d995d50cecf3d88a",
+      "pilot": {
+        "candidate_id": "P25_TRANSFER_V1_RANK1",
+        "completed_pilots": 3,
+        "qualified": true,
+        "pilot_prediction_gate_passed": true,
+        "local_slopes": [
+          {
+            "candidate_id": "P25_TRANSFER_V1_RANK1",
+            "Klo": 13.5,
+            "Khi": 18.0,
+            "R": 0.1,
+            "seed": 1720,
+            "physical_slope": 2.704642316623849,
+            "target_slope": 2.479705039670285,
+            "predicted_slope": 2.4814650631735526,
+            "event_size_contribution": 0.0,
+            "waiting_contribution": 2.704642316623849
+          },
+          {
+            "candidate_id": "P25_TRANSFER_V1_RANK1",
+            "Klo": 18.0,
+            "Khi": 21.0,
+            "R": 0.1,
+            "seed": 1720,
+            "physical_slope": 2.009434220882237,
+            "target_slope": 2.39951383580944,
+            "predicted_slope": 2.3961789893495906,
+            "event_size_contribution": 0.0,
+            "waiting_contribution": 2.0094342208822376
+          }
+        ]
+      },
+      "seed_transfer_passed": true,
+      "R_transfer_diagnostics": {
+        "-0.95": {
+          "developed_qualified": true,
+          "global_slope": 2.3451617896793997,
+          "median_abs_prediction_residual_decade": 0.008995212550656039,
+          "scope": "fixed-row transfer diagnostic; no additional fitted R parameter or invented R acceptance tolerance"
+        },
+        "0.5": {
+          "developed_qualified": true,
+          "global_slope": 2.3810516136329127,
+          "median_abs_prediction_residual_decade": 0.009091663683955321,
+          "scope": "fixed-row transfer diagnostic; no additional fitted R parameter or invented R acceptance tolerance"
+        }
+      },
+      "sampled_window_diagnostics": {
+        "point_count": 6,
+        "scope": "complete six-point primary window",
+        "target_global_slope": 2.460330482510934,
+        "predicted_global_slope": 2.460364891079024,
+        "physical_global_slope": 2.4715673454590834,
+        "target_local_slope_range": [
+          2.3462899918696025,
+          2.493661593448743
+        ],
+        "physical_local_slope_range": [
+          1.9446384457612904,
+          2.8616460052911776
+        ],
+        "RMS_prediction_residual_decade": 0.011955111255522547,
+        "max_abs_prediction_residual_decade": 0.017564966532961596
+      },
+      "retained": true
+    },
+    "P55": {
+      "classification": "TARGET_NOT_TRANSFERRED_WITH_SINGLE_EXP_FLOOR",
+      "window_qualified": false,
+      "candidate_id": "P55_TRANSFER_V1_RANK1",
+      "target": "P55",
+      "family": "single_EXP_floor",
+      "generation": 1,
+      "candidate_row_sha256": "6c43fd32c4c5e74d028b71441f07fad32d4cecd18cf6239e6897ab3290a093cd",
+      "pilot": {
+        "candidate_id": "P55_TRANSFER_V1_RANK1",
+        "completed_pilots": 3,
+        "qualified": true,
+        "pilot_prediction_gate_passed": false,
+        "local_slopes": [
+          {
+            "candidate_id": "P55_TRANSFER_V1_RANK1",
+            "Klo": 13.5,
+            "Khi": 18.0,
+            "R": 0.1,
+            "seed": 1720,
+            "physical_slope": 5.3601282148169975,
+            "target_slope": 5.4553510872746385,
+            "predicted_slope": 5.459145749257384,
+            "event_size_contribution": 0.0,
+            "waiting_contribution": 5.360128214816998
+          },
+          {
+            "candidate_id": "P55_TRANSFER_V1_RANK1",
+            "Klo": 18.0,
+            "Khi": 21.0,
+            "R": 0.1,
+            "seed": 1720,
+            "physical_slope": 4.0000109450424,
+            "target_slope": 5.2789304387807565,
+            "predicted_slope": 5.271734442050154,
+            "event_size_contribution": 0.0,
+            "waiting_contribution": 4.0000109450423995
+          }
+        ]
+      },
+      "sampled_window_diagnostics": {
+        "point_count": 3,
+        "scope": "three-point pilot diagnostic only; not a qualified full window",
+        "target_global_slope": 5.401635942263303,
+        "predicted_global_slope": 5.402084256573044,
+        "physical_global_slope": 4.946010610091776,
+        "target_local_slope_range": [
+          5.2789304387807565,
+          5.4553510872746385
+        ],
+        "physical_local_slope_range": [
+          4.0000109450424,
+          5.3601282148169975
+        ],
+        "RMS_prediction_residual_decade": 0.06800256744662986,
+        "max_abs_prediction_residual_decade": 0.11327993449907507
+      },
+      "retained": false
+    }
+  },
+  "terminal": true,
+  "physical_jobs_executed": 42,
+  "zero_physics_preflight_failures": 6,
+  "transfer_updates": 1,
+  "original_P40_classification": "P40_EFFECTIVE_RATE_TRANSFER_ONLY",
+  "gstar": 4.473410023231299e-07,
+  "physics_scope": "new rows change only five cleavage coordinates; canonical rows, Peierls, Taylor, source closure, first passage, and energy transaction unchanged",
+  "monotonic_side_effect": "No-feedback monotonic screening finds substantial low-load thermal first passage for new rows and high-temperature renewal saturation. No material-archetype promotion.",
+  "development_convention": "Only events wholly beyond 20 micrometres; boundary-overlap estimates preserved separately for original P40",
+  "limitations": [
+    "Monotonic values are analysis-only no-plastic screening, not full state-resolved monotonic fracture validation.",
+    "Generation-2 original pilot loads remain calibration loads, not independent validation.",
+    "Recorded pathology diagnostics do not reconstruct unsaved phasewise histories.",
+    "The frozen radius-transfer input is the last recorded pre-geometry cleavage event radius. The translated terminal new-tip checkpoint is a distinct state and is reported separately; frozen inputs and predictions remain unchanged.",
+    "Legacy block and developed-summary hazard increments omit committed locator-prefix contributions. The campaign event ledger uses the complete action saved by the checked event transaction; raw files and physical evolution are unchanged."
+  ],
+  "first_passage_accounting": {
+    "total": 738,
+    "committed_geometry_events": 737,
+    "zero_length_energy_gated_attempts": 1,
+    "zero_length_full_action_scope": "No missing complete action is invented; thresholds and partial block increments are preserved, and every consumed threshold is verified against RNG history."
+  },
+  "attempt_accounting": {
+    "physical_trajectories": 42,
+    "preflight_no_physics": 6,
+    "interrupted_trajectories": 0,
+    "resumed_trajectories": 0,
+    "physical_censors": 0,
+    "numerically_unresolved": 0,
+    "developed_unqualified": 0
+  },
+  "bounded_candidate_search": "One prospectively selected single-EXP row per target, plus the explicitly allowed P40 generation-2 correction. All were analytically eligible, so no dual-barrier family was admitted. Failed physical transfer is a result for the tested row, not a proof that every row in the family must fail."
+}

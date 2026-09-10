@@ -1,0 +1,20 @@
+{
+  "scope": "diagnostic labeling and additional terminal-checkpoint fields only",
+  "frozen_transfer_model": "p40_transfer_update.json",
+  "frozen_transfer_commit": "46aa535b",
+  "radius_input_source": "kinetic_tip_cell_audit_v101.json records[-1].persistent_tip_radius_m",
+  "radius_input_meaning": "last recorded cleavage event state before checked geometry and MPZ moving-frame translation",
+  "separate_terminal_source": "high_cycle_live_checkpoint.json diagnostics",
+  "example": {
+    "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+    "Kmax": 18,
+    "R": -0.95,
+    "recorded_event_radius_m": 1.1000505419210866e-06,
+    "post_geometry_checkpoint_radius_m": 1e-06
+  },
+  "frozen_inputs_changed": false,
+  "frozen_predictions_changed": false,
+  "physical_evolution_changed": false,
+  "historical_B1_interpretation_changed": false,
+  "explanation": "The new physical bundles preserve both coordinate states. The frozen calibration coefficients continue to use exactly the recorded event-state radii from which they were derived. No replacement, re-fit, or reinterpretation of the historical B1 records is made."
+}
