@@ -1,7 +1,6 @@
 {
-  "status": "READY_FOR_TERMINAL_VERIFICATION",
-  "strict_campaign_verifier_passed": false,
-  "pending": "Strict verifier requires the assembled artifacts on a clean commit.",
+  "status": "PASS",
+  "strict_campaign_verifier_passed": true,
   "focused_tests": {
     "passed": 88,
     "failed": 0
@@ -12,5 +11,20 @@
     "passed": true,
     "files": 37
   },
-  "physical_workers": 0
+  "physical_workers": 0,
+  "validated_commit": "734fdbe7c717492b079e8e274177cbe40ac88081",
+  "strict_campaign_verifier": {
+    "passed": true,
+    "terminal_jobs": 39,
+    "physical_trajectories_total": 42,
+    "events": 737,
+    "first_passages": 738,
+    "zero_length_first_passages": 1,
+    "attempts": 48,
+    "original_freeze_preserved": true,
+    "transfer_updates": 1
+  },
+  "verifier_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/verify_v10_2_30_prospective_campaign.py",
+  "verification_scope": "Complete real-run artifacts, independent campaign gates, exact provenance, hashes, clean worktree, and zero physical workers. Final evidence-record commit is verified again before push.",
+  "historical_physical_slope_transfer_verifier": "Inherited missing historical fixture; not rerun or represented as passing."
 }
