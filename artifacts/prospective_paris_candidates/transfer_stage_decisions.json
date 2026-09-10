@@ -1,19 +1,35 @@
 {
   "admitted_stages": {
     "P40_TRANSFER_CALIBRATED_GEN2": [
-      "GRID"
+      "GRID",
+      "SEED2"
     ],
     "P25_TRANSFER_V1_RANK1": [
-      "GRID"
+      "GRID",
+      "SEED2"
     ],
     "P55_TRANSFER_V1_RANK1": []
   },
   "evidence_decisions": {
     "P40_TRANSFER_CALIBRATED_GEN2": {
-      "status": "PILOT_PASSED"
+      "classification": "EFFECTIVE_GLOBAL_SLOPE_ONLY",
+      "window_qualified": true,
+      "m_global": 3.69873195352322,
+      "R_squared": 0.9947990945742438,
+      "RMS_local_slope_error": 0.5518070709059708,
+      "max_local_slope_error": 0.9359220955705703,
+      "RMS_rate_error": 0.02871220525145997,
+      "max_rate_error": 0.06120811687973589
     },
     "P25_TRANSFER_V1_RANK1": {
-      "status": "PILOT_PASSED"
+      "classification": "EFFECTIVE_GLOBAL_SLOPE_ONLY",
+      "window_qualified": true,
+      "m_global": 2.4715673454590834,
+      "R_squared": 0.9944487683685128,
+      "RMS_local_slope_error": 0.32018796267216326,
+      "max_local_slope_error": 0.4016515461083121,
+      "RMS_rate_error": 0.012004785973755512,
+      "max_rate_error": 0.017791809890152402
     },
     "P55_TRANSFER_V1_RANK1": {
       "status": "TERMINAL_BOUNDED_PILOT_FAILURE",

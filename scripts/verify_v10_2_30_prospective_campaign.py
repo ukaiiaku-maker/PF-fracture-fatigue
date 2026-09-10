@@ -8,12 +8,12 @@ import subprocess
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from scripts.analyze_v10_2_30_prospective_campaign import harvest,grid_gate,slopes,read
+from scripts.analyze_v10_2_30_prospective_campaign import harvest,grid_gate,slopes,read,completed_event_action
 from scripts.verify_v10_2_30_prospective_launch import verify as verify_original
 ART=ROOT/'artifacts/prospective_paris_candidates'
 RUN=ROOT/'runs/prospective_paris_transfer_v1'
 REQUIRED=['p40_launch_pathway_amendment.json','p40_launch_pathway_verification.json',
- 'physical_attempt_registry.csv','physical_job_registry_final.csv','p40_pilot_physical_results.csv',
+ 'physical_attempt_registry.csv','physical_event_ledger.csv','physical_job_registry_final.csv','p40_pilot_physical_results.csv',
  'p40_pilot_prediction_comparison.csv','p40_pilot_local_slopes.csv','p40_transfer_update.json',
  'final_candidate_parameter_rows.csv','final_candidate_selection.json','physical_developed_rates.csv',
  'physical_local_slopes.csv','physical_state_summary.csv','analytical_vs_physical_rates.csv',
@@ -52,6 +52,13 @@ def physical_source_identity(head):
 
 def independently_check_event_ledger(path,job,measured_rate):
     import numpy as np
+    checkpoint=read(path/'run_state_checkpoint.json')
+    generation=path/'run_state_generations'/checkpoint['generation']
+    if set(checkpoint['files'])!={'kinetic.json','outer.json','state.npz'}:raise ValueError('incomplete atomic checkpoint manifest')
+    for name,expected in checkpoint['files'].items():
+        if hashlib.sha256((generation/name).read_bytes()).hexdigest()!=expected:raise ValueError('atomic checkpoint checksum mismatch')
+    for name in ('high_cycle_live_checkpoint.json','final_mechanical_response.png','final_mpz_state_profiles.png','event_da_dN_vs_extension.png','window_da_dN_vs_extension.png','crack_extension_vs_cycles.png'):
+        if not (path/name).is_file():raise ValueError('missing physical diagnostic: '+name)
     steps=list(csv.DictReader((path/'steps_0300K.csv').open()))
     geometry=read(path/'stochastic_avalanche_geometry_events.json')
     kinetic=read(path/'kinetic_tip_cell_audit_v101.json')['records']
@@ -75,6 +82,7 @@ def independently_check_event_ledger(path,job,measured_rate):
     if len(engine_ids)!=1:raise ValueError('unexpected engine/seed mapping')
     rng=np.random.default_rng(np.random.SeedSequence([job['seed'],next(iter(engine_ids))]))
     for event in geometry:
+        completed_event_action(event)
         expected=max(float(rng.exponential(1.0)),1e-12)
         if not math.isclose(event['threshold_action'],expected,rel_tol=1e-12):raise ValueError('threshold RNG provenance changed')
         if event['committed_event_length_m']>event['stochastic_proposed_event_length_m']*(1+1e-8):raise ValueError('event exceeds proposal')
@@ -101,6 +109,17 @@ def verify():
     missing=[name for name in REQUIRED if not (ART/name).is_file()]
     if missing:raise ValueError('missing campaign completion artifacts: '+', '.join(missing))
     verify_original()
+    for name in ('p40_launch_pathway_amendment.json','p40_launch_pathway_verification.json'):
+        original_amendment=subprocess.check_output(['git','show','ef390c94:artifacts/prospective_paris_candidates/'+name],cwd=ROOT)
+        if (ART/name).read_bytes()!=original_amendment:raise ValueError('prelaunch pathway amendment changed')
+    from scripts.analyze_v10_2_30_prospective_pilots import analyze as analyze_original
+    original_jobs=read(ART/'prediction_freeze_manifest.json')['physical_jobs']
+    original_rows=list(csv.DictReader((ART/'p40_pilot_physical_results.csv').open()))
+    if len(original_rows)!=3:raise ValueError('original pilot result accounting incomplete')
+    for job,declared in zip(original_jobs,original_rows):
+        measured=analyze_original(job)
+        if not measured['developed_qualified'] or not math.isclose(measured['physical_rate'],float(declared['physical_rate']),rel_tol=1e-12):raise ValueError('original pilot rate or qualification mismatch')
+        independently_check_event_ledger(Path(measured['result_path']),{'seed':job['seed']},measured['physical_rate'])
     transfer=read(ART/'p40_transfer_update.json')
     if transfer['transfer_update_number']!=1:raise ValueError('more than one transfer update')
     frozen_transfer=subprocess.check_output(['git','show','46aa535b:artifacts/prospective_paris_candidates/p40_transfer_update.json'],cwd=ROOT)
@@ -110,6 +129,18 @@ def verify():
     if (ART/'transfer_candidate_freeze_v1.json').read_bytes()!=original:raise ValueError('prediction or candidate freeze changed after physical launch')
     attempts=list(csv.DictReader((ART/'physical_attempt_registry.csv').open()));validate_history(attempts)
     if sum('NO_PHYSICS' in r['status'] for r in attempts)!=6:raise ValueError('lost preflight attempt accounting')
+    import io
+    preserved=list(csv.DictReader(io.StringIO(subprocess.check_output(['git','show','46aa535b:artifacts/prospective_paris_candidates/physical_attempt_registry.csv'],cwd=ROOT,text=True))))
+    indexed={r['attempt_path']:r for r in attempts}
+    for prior in preserved:
+        current=indexed.get(prior['attempt_path'],{})
+        if any(current.get(k)!=v for k,v in prior.items()):raise ValueError('preserved attempt history changed')
+    for attempt in attempts:
+        if 'NO_PHYSICS' in attempt['status']:
+            path=Path(attempt['attempt_path'])
+            if not path.is_dir():raise ValueError('preflight evidence directory missing')
+            if any((path/name).exists() for name in ('kinetic_audit.json','kinetic_tip_cell_audit_v101.json','high_cycle_live_checkpoint.json','stochastic_avalanche_geometry_events.json','developed_fatigue_growth_summary.json')):
+                raise ValueError('preflight no-physics claim contradicted by physical artifacts')
     decisions=read(ART/'prospective_paris_candidate_decision.json')['targets']
     registry=list(csv.DictReader((ART/'physical_job_registry_final.csv').open()))
     results=[]
@@ -179,13 +210,51 @@ def verify():
     figures=['target_prediction_physical_rates.png','target_prediction_physical_local_slopes.png','barrier_profiles.png','prediction_residuals.png','state_stress_transmission.png','seed_transfer.png','R_transfer.png','P25_P40_P55_comparison.png','monotonic_side_effects.png']
     for name in figures:
         if not (ART/'figures'/name).is_file():raise ValueError('missing figure: '+name)
+    rates=list(csv.DictReader((ART/'physical_developed_rates.csv').open()))
+    bykey={(r['candidate_id'],r['job_key']):r for r in rates}
+    if len(bykey)!=len(results) or len(rates)!=len(results):raise ValueError('rate table missing or duplicated results')
+    for r in results:
+        declared=bykey[(r['candidate_id'],r['job_key'])]['physical_rate']
+        if r['physical_rate'] is None:
+            if declared not in ('','None','nan','NaN'):raise ValueError('unqualified rate published as finite')
+        elif not math.isclose(float(declared),r['physical_rate'],rel_tol=1e-12):raise ValueError('published rate table mismatch')
+    expected_slopes=[]
+    for cid in {r['candidate_id'] for r in results}:
+        for ratio,seed in ((.1,1720),(.1,1001723),(-.95,1720),(.5,1720)):
+            expected_slopes.extend(slopes([r for r in results if r['candidate_id']==cid and r['R']==ratio and r['seed']==seed]))
+    def slope_key(r):return r['candidate_id'],float(r['R']),int(r['seed']),float(r['Klo']),float(r['Khi'])
+    for table in ('physical_local_slopes.csv','analytical_vs_physical_slopes.csv','slope_error_decomposition.csv'):
+        published=list(csv.DictReader((ART/table).open()));indexed={slope_key(r):r for r in published}
+        if len(indexed)!=len(expected_slopes) or len(published)!=len(expected_slopes):raise ValueError('missing or duplicate local slope')
+        for expected in expected_slopes:
+            actual=indexed[slope_key(expected)]
+            for field in ('physical_slope','predicted_slope','target_slope','event_size_contribution','waiting_contribution'):
+                if not math.isclose(float(actual[field]),expected[field],rel_tol=1e-12,abs_tol=1e-12):raise ValueError('published local slope calculation mismatch')
+    published_events=list(csv.DictReader((ART/'physical_event_ledger.csv').open()))
+    expected_events={}
+    for run in results+original_rows:
+        path=Path(run['result_path'])
+        for event_index,event in enumerate(read(path/'stochastic_avalanche_geometry_events.json'),1):
+            expected_events[(str(path),event_index)]=(completed_event_action(event),event['threshold_action'])
+    if len(published_events)!=len(expected_events):raise ValueError('published event count mismatch')
+    seen=set()
+    for event in published_events:
+        key=(event['result_path'],int(event['event_index']))
+        if key in seen or key not in expected_events:raise ValueError('duplicate or substituted event')
+        seen.add(key);action,threshold=expected_events[key]
+        if not math.isclose(float(event['physical_hazard_action']),action,rel_tol=1e-12):raise ValueError('published complete event action mismatch')
+        if not math.isclose(float(event['threshold_action']),threshold,rel_tol=1e-12):raise ValueError('published event threshold mismatch')
+        if not math.isclose(float(event['stochastic_event_probability']),-math.expm1(-action),rel_tol=1e-12):raise ValueError('event probability mismatch')
     hashes=read(ART/'file_hashes.json')
+    if not set(REQUIRED)-{'file_hashes.json'} <= set(hashes):raise ValueError('required artifact omitted from hash manifest')
     for name,expected in hashes.items():
         if hashlib.sha256((ART/name).read_bytes()).hexdigest()!=expected:raise ValueError('artifact hash mismatch: '+name)
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():
         raise ValueError('worktree not clean')
+    process_lines=subprocess.check_output(['ps','-axo','command'],text=True).splitlines()
+    if any(' -m arrhenius_fracture.sharp_front_v10_2_30_' in line for line in process_lines):raise ValueError('physical workers remain active')
     subprocess.run(['git','diff','--check'],cwd=ROOT,check=True)
-    return dict(passed=True,terminal_jobs=len(results),attempts=len(attempts),original_freeze_preserved=True,transfer_updates=1)
+    return dict(passed=True,terminal_jobs=len(results),physical_trajectories_total=len(results)+3,events=len(published_events),attempts=len(attempts),original_freeze_preserved=True,transfer_updates=1)
 
 
 if __name__=='__main__':

@@ -37,6 +37,10 @@ def validate_identity(job,result,freeze):
     actual=MaterialManifest.from_csv(p/'selected_material_manifest_v10_2_22.csv')
     if digest(actual.as_dict())!=selected['material_manifest_sha256']:
         raise ValueError('physical material manifest mismatch')
+    from arrhenius_fracture.prospective_paris_transfer_engine_v10230 import build_transfer_manifest
+    expected_manifest,expected_audit=build_transfer_manifest(job['candidate_id'])
+    if selected!=expected_audit or actual.as_dict()!=expected_manifest.as_dict():
+        raise ValueError('run manifest differs from exact frozen candidate construction')
     args=read(p/'run_args.json');control=read(p/'v10_2_30_fixed_deltaK_control.json')
     expected={'R':job['R'],'frequency_Hz':1000.,'mpz_n_bins':80,'cycles_max':1e12,
               'da_phys':5e-6,'crack_backend':'sharp_wake','target_crack_extension_um':100.,'temperatures':[300.]}
@@ -54,6 +58,16 @@ def recorded_renewal_fraction(step_rows,tau_s):
     return max(float(row['lambda_c']) for row in step_rows)*float(tau_s)
 
 
+def completed_event_action(event):
+    # The block/summary increment can omit a committed locator prefix.
+    # The checked transaction preserves the engine's complete interval H.
+    action=float(event['event_transaction_audit']['hazard_action_completed'])
+    threshold=float(event['threshold_action'])
+    if not math.isfinite(action) or not math.isclose(action,threshold,rel_tol=1e-10,abs_tol=1e-14):
+        raise ValueError('completed event action does not localize the sampled threshold')
+    return action
+
+
 def interval(events):
     da=sum(e['projected_advance_m'] for e in events);dn=sum(e['cycles_between_events'] for e in events)
     return dict(da_m=da,dN=dn,event_count=len(events),rate=da/dn if da>0 and dn>0 else None)
@@ -61,7 +75,7 @@ def interval(events):
 
 def harvest(job,result,freeze):
     base=dict(job,**{k:result[k] for k in ('result_path','launch_head','exit_code','wall_seconds','status','attempt','launch_time_unix','completion_time_unix','freeze_sha256','result_path_virgin_at_launch','resume')})
-    base.update(physical_rate=None,developed_qualified=False)
+    base.update(physical_rate=None,developed_qualified=False,applied_full_DeltaK=(1-job['R'])*job['Kmax'])
     if result['exit_code']!=0:return base
     p,audit,args,material=validate_identity(job,result,freeze)
     summary=read(p/'developed_fatigue_growth_summary.json')

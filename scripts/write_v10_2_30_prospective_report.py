@@ -9,7 +9,7 @@ import sys
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from scripts.analyze_v10_2_30_prospective_campaign import read,grid_gate,slopes,target_rate
+from scripts.analyze_v10_2_30_prospective_campaign import read,grid_gate,slopes,target_rate,completed_event_action
 from scripts.verify_v10_2_30_prospective_campaign import validate_seed_transfer,physical_source_identity
 ART=ROOT/'artifacts/prospective_paris_candidates';WORK=ROOT/'runs/prospective_paris_transfer_v1/analysis_work'
 
@@ -47,6 +47,19 @@ def main():
             if d['seed_transfer_passed'] and all(r['developed_qualified'] for r in rt):retained.append(cid)
             else:
                 d['pre_transfer_classification']=d['classification'];d['classification']='TARGET_NOT_TRANSFERRED_WITH_SINGLE_EXP_FLOOR';d['transfer_failure']=True
+        diagnostic_window=sorted([r for r in primary if 13.5<=r['Kmax']<=21],key=lambda r:r['Kmax'])
+        if diagnostic_window and all(r['developed_qualified'] for r in diagnostic_window):
+            x=np.log([r['Kmax'] for r in diagnostic_window]);local=slopes(diagnostic_window)
+            d['sampled_window_diagnostics']={
+                'point_count':len(diagnostic_window),
+                'scope':'complete six-point primary window' if len(diagnostic_window)==6 else 'three-point pilot diagnostic only; not a qualified full window',
+                'target_global_slope':float(np.polyfit(x,np.log([target_rate(target,r['Kmax']) for r in diagnostic_window]),1)[0]),
+                'predicted_global_slope':float(np.polyfit(x,np.log([r['predicted_rate'] for r in diagnostic_window]),1)[0]),
+                'physical_global_slope':float(np.polyfit(x,np.log([r['physical_rate'] for r in diagnostic_window]),1)[0]),
+                'target_local_slope_range':[min(r['target_slope'] for r in local),max(r['target_slope'] for r in local)],
+                'physical_local_slope_range':[min(r['physical_slope'] for r in local),max(r['physical_slope'] for r in local)],
+                'RMS_prediction_residual_decade':float(np.sqrt(np.mean([r['prediction_residual_decade']**2 for r in diagnostic_window]))),
+                'max_abs_prediction_residual_decade':max(abs(r['prediction_residual_decade']) for r in diagnostic_window)}
         d['retained']=cid in retained;decisions[target]=d
     registry=[]
     for job in freeze['jobs']:
@@ -71,6 +84,21 @@ def main():
     for r in registry:r['qualified_physical_source_commit']=source_commit
     write_csv(ART/'physical_job_registry_final.csv',registry)
     write_csv(ART/'physical_developed_rates.csv',rows)
+    event_rows=[]
+    original_runs=list(csv.DictReader((ART/'p40_pilot_physical_results.csv').open()))
+    for run in rows+original_runs:
+        path=Path(run['result_path']);summary=read(path/'developed_fatigue_growth_summary.json');geometry=read(path/'stochastic_avalanche_geometry_events.json')
+        if len(summary['event_measurements'])!=len(geometry):raise ValueError('event ledger incomplete')
+        for event,transaction in zip(summary['event_measurements'],geometry):
+            action=completed_event_action(transaction)
+            record=dict(event,candidate_id=run['candidate_id'],result_path=str(path),producer_head=run.get('launch_head',run.get('producer_head')),
+                legacy_summary_physical_hazard_action=event['physical_hazard_action'],physical_hazard_action=action,
+                physical_hazard_action_source='stochastic_avalanche_geometry_events.json:event_transaction_audit.hazard_action_completed',
+                stochastic_event_probability=-math.expm1(-action),threshold_distribution='unit_exponential',seed_mapping='SeedSequence([seed, engine_id]); NumPy exponential(1)',
+                source_row_sha256=run.get('candidate_row_sha256',run.get('source_row_sha256')),material_manifest_sha256=run['material_manifest_sha256'])
+            for field in ('x0','x1','y0','y1'):record[field]=transaction.get(field)
+            event_rows.append(record)
+    write_csv(ART/'physical_event_ledger.csv',event_rows)
     locals=[]
     for cid in [c['candidate_id'] for c in freeze['candidates']]:
         for R,seed in ((.1,1720),(.1,1001723),(-.95,1720),(.5,1720)):
@@ -91,7 +119,9 @@ def main():
         gstar=4.473410023231299e-7,physics_scope='new rows change only five cleavage coordinates; canonical rows, Peierls, Taylor, source closure, first passage, and energy transaction unchanged',
         monotonic_side_effect='No-feedback monotonic screening finds substantial low-load thermal first passage for new rows and high-temperature renewal saturation. No material-archetype promotion.',
         development_convention='Only events wholly beyond 20 micrometres; boundary-overlap estimates preserved separately for original P40',
-        limitations=['Monotonic values are analysis-only no-plastic screening, not full state-resolved monotonic fracture validation.','Generation-2 original pilot loads remain calibration loads, not independent validation.','Recorded pathology diagnostics do not reconstruct unsaved phasewise histories.'])
+        limitations=['Monotonic values are analysis-only no-plastic screening, not full state-resolved monotonic fracture validation.','Generation-2 original pilot loads remain calibration loads, not independent validation.','Recorded pathology diagnostics do not reconstruct unsaved phasewise histories.','Legacy block and developed-summary hazard increments omit committed locator-prefix contributions. The campaign event ledger uses the complete action saved by the checked event transaction; raw files and physical evolution are unchanged.'])
+    payload['attempt_accounting']=dict(physical_trajectories=len(rows)+3,preflight_no_physics=6,interrupted_trajectories=0,resumed_trajectories=0,physical_censors=sum(r['status']=='PHYSICAL_CENSOR' for r in rows),numerically_unresolved=sum(r['status']=='NUMERICALLY_UNRESOLVED' for r in rows),developed_unqualified=sum(not r['developed_qualified'] for r in rows))
+    payload['bounded_candidate_search']='One prospectively selected single-EXP row per target, plus the explicitly allowed P40 generation-2 correction. All were analytically eligible, so no dual-barrier family was admitted. Failed physical transfer is a result for the tested row, not a proof that every row in the family must fail.'
     (ART/'prospective_paris_candidate_decision.json').write_text(json.dumps(payload,indent=2)+'\n')
     lines=['# Prospective Paris-slope candidate campaign','',
         'The original P40 row transferred sensitivity-predicted rates but missed the target local-slope profile. Its row and original predictions remain unchanged. One analysis-only transfer update was frozen before deriving the three new single-EXP candidates.','',

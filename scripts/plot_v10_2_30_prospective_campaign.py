@@ -37,6 +37,7 @@ def main():
                 ax.plot([r['Kmax'] for r in physical],[r['physical_rate'] for r in physical],'o-',color=color,label=target+' physical'+(' GEN2' if target=='P40' else ''))
         ax.set(xlabel='Kmax (MPa √m)',ylabel=ylabel);ax.legend(fontsize=7,ncol=2)
         if not local:ax.set_yscale('log')
+        fig.text(.5,-.02,'P40 GEN2: Kmax 13.5, 18 and 21 are calibration loads.',ha='center',fontsize=7)
         save(fig,name)
     fig,ax=base();sigma=np.linspace(0,15e9,300)
     for c in frozen['candidates']:
@@ -71,6 +72,16 @@ def main():
     for cid in dict.fromkeys(r['candidate_id'] for r in mono):
         selected=[r for r in mono if r['candidate_id']==cid];ax.plot([float(r['temperature_K']) for r in selected],[float(r['K_first_MPa_sqrt_m']) for r in selected],'o-',label=cid)
     ax.set(xlabel='Temperature (K)',ylabel='No-feedback first-passage K (MPa √m)',title='Reduced monotonic side check — analysis only');ax.set_yscale('log');ax.legend(fontsize=7);save(fig,'monotonic_side_effects.png')
+    original=list(csv.DictReader((ART/'p40_pilot_prediction_comparison.csv').open()))
+    original_local=list(csv.DictReader((ART/'p40_pilot_local_slopes.csv').open()))
+    fig,axes=plt.subplots(1,2,figsize=(10,4),constrained_layout=True)
+    for field,label,style in [('target_rate','Frozen target',':'),('predicted_rate','Pre-pilot sensitivity prediction','--'),('physical_rate','Physical original P40','o-')]:
+        axes[0].plot([float(r['Kmax']) for r in original],[float(r[field]) for r in original],style,label=label)
+    for field,label,style in [('target_slope','Frozen target',':'),('predicted_slope','Pre-pilot sensitivity prediction','--'),('physical_slope','Physical original P40','o-')]:
+        axes[1].plot([np.sqrt(float(r['Klo'])*float(r['Khi'])) for r in original_local],[float(r[field]) for r in original_local],style,label=label)
+    axes[0].set(xlabel='Kmax (MPa √m)',ylabel='Developed da/dN (m/cycle)',yscale='log');axes[1].set(xlabel='Interval geometric mean Kmax (MPa √m)',ylabel='Adjacent local slope')
+    axes[0].legend(fontsize=7);fig.suptitle('Original P40: immutable pre-pilot prediction versus physical pilots')
+    save(fig,'original_P40_sensitivity_pilot_comparison.png')
     print(json.dumps({'figures':[str(p) for p in sorted(out.glob('*.png'))]},indent=2))
 
 

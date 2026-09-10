@@ -63,3 +63,34 @@ def test_renewal_diagnostic_uses_rate_not_normalized_action():
     rows=[{'lambda_c':'100','B':'1','state_coupled_cleavage_hazard':'1'},
           {'lambda_c':'2000','B':'1','state_coupled_cleavage_hazard':'1'}]
     assert recorded_renewal_fraction(rows,1e-6)==pytest.approx(.002)
+
+
+def test_self_consistent_manifest_tampering_still_fails(tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    from scripts import analyze_v10_2_30_prospective_campaign as analysis
+    import arrhenius_fracture.prospective_paris_transfer_engine_v10230 as builder
+    path=tmp_path/'physical';path.mkdir();(path/'high_cycle_run_manifest.json').touch()
+    actual=SimpleNamespace(as_dict=lambda:{'cleavage':'changed'})
+    expected=SimpleNamespace(as_dict=lambda:{'cleavage':'frozen'})
+    selected=dict(candidate_row_sha256='row',rebonding=False,PT_substitution=False,material_manifest_sha256=analysis.digest(actual.as_dict()))
+    documents={'high_cycle_run_manifest.json':dict(git_head='head',prospective_candidate=selected),
+        'physical__launch.json':dict(result_path_virgin_at_launch=True,resume=False,launch_time_unix=0,launch_head='head')}
+    monkeypatch.setattr(analysis,'read',lambda p:documents[p.name])
+    monkeypatch.setattr(analysis.MaterialManifest,'from_csv',lambda p:actual)
+    monkeypatch.setattr(builder,'build_transfer_manifest',lambda cid:(expected,selected))
+    with pytest.raises(ValueError,match='exact frozen'):
+        analysis.validate_identity({'candidate_id':'candidate'},dict(result_path=str(path),launch_head='head'),{'candidates':[dict(candidate_id='candidate',complete_row_sha256='row')]})
+
+
+def test_complete_event_action_uses_transaction_not_partial_block():
+    from scripts.analyze_v10_2_30_prospective_campaign import completed_event_action
+    event={'threshold_action':.4332087756327596,'physical_hazard_action_block':.3027119702988727,
+           'event_transaction_audit':{'hazard_action_completed':.43320877563275967}}
+    assert completed_event_action(event)==pytest.approx(.4332087756327596)
+    event['event_transaction_audit']['hazard_action_completed']=.3027119702988727
+    with pytest.raises(ValueError,match='localize'):completed_event_action(event)
+
+
+def test_missing_completed_action_is_not_invented_from_threshold():
+    from scripts.analyze_v10_2_30_prospective_campaign import completed_event_action
+    with pytest.raises(KeyError):completed_event_action({'threshold_action':1,'event_transaction_audit':{}})
