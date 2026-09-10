@@ -10,6 +10,8 @@ from pathlib import Path
 import subprocess
 import sys
 
+import numpy as np
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
@@ -20,9 +22,10 @@ from arrhenius_fracture.natural_future_physical_replay_v2 import compare_states,
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint as fingerprint
 from arrhenius_fracture.voiding_lifecycle_driver_v5 import NATURAL_WINDOW_S, advance_production_void_interval
 from arrhenius_fracture.voiding_production_v5 import (
-    build_production_void_state, crack_tip_tensor, directional_clock_rates,
+    _complete_next_clock, build_production_void_state, crack_tip_tensor, directional_clock_rates,
 )
 from arrhenius_fracture.voiding_v5 import VoidPhase
+from arrhenius_fracture.v12_production_driver import execute_event
 
 
 def write_json(path: Path, value) -> None:
@@ -44,7 +47,54 @@ def advance_half(state, partitions):
 def subsequent_growth_crossing(state):
     cavity = state.void_state.cavities[0] if state.void_state.cavities else None
     if cavity is None:
-        raise RuntimeError("V2 registered subsequent crossing requires an owned cavity")
+        if not state.crack_network.active_tip_ids:
+            raise RuntimeError("cavity-free terminal has no active sharp-front source")
+        root = state.crack_network.branch(state.crack_network.active_tip_ids[0])
+        tensor, element_ids = crack_tip_tensor(state, branch_id=root.branch_id)
+        rows = directional_clock_rates(state, tensor)
+        finite = sorted(row["crossing_time_s"] for row in rows if math.isfinite(row["crossing_time_s"]))
+        if not finite:
+            raise RuntimeError("cavity-free terminal has no positive sharp-front first passage")
+        hazards = state.competition.hazard_states
+        margin = min(hazard.current_threshold_action - hazard.action for hazard in hazards)
+        armed, clock_audit = _complete_next_clock(
+            state, tensor, source_kind="sharp_front", source_front_id=root.branch_id,
+            source_position_m=root.tip,
+            source_probe_identity={"kind": "crack_tip_tensor", "element_ids": list(element_ids)},
+            maximum_advance_duration_s=finite[0],
+        )
+        if not armed.competition.pending_events:
+            raise RuntimeError("positive sharp-front passage did not emit its owned event")
+        event = armed.competition.pending_events[0]
+        candidates = {candidate.candidate_id: candidate for candidate in armed.competition.candidates}
+        candidate = candidates[event.candidate_id]
+        direction = np.asarray(candidate.direction_xy, dtype=float)
+        normal = np.asarray((-direction[1], direction[0]))
+        offset = np.asarray(armed.mesh.nodes) - np.asarray(root.tip)
+        axial = offset @ direction
+        eligible = np.flatnonzero(
+            (np.abs(offset @ normal) <= 1.0e-12) & (axial > 1.0e-8)
+            & (armed.mesh.nodes[:, 0] < 1.0e-3 - 1.0e-12)
+            & (np.abs(armed.mesh.nodes[:, 1]) < 5.0e-4 - 1.0e-12)
+        )
+        if not len(eligible):
+            raise RuntimeError("sharp-front passage has no mesh-aligned endpoint")
+        endpoint_id = int(eligible[np.argmin(axial[eligible])])
+        endpoint = tuple(map(float, armed.mesh.nodes[endpoint_id]))
+        crossed, transaction = execute_event(
+            armed, endpoint, transaction_identity="v2-replay-subsequent-root",
+        )
+        return crossed, {
+            "real_crossing_executed": True,
+            "selected_event_identity": event.event_id,
+            "minimum_event_selection_margin_action": margin,
+            "event_selection_margin_quantity": "remaining_owned_hazard_action",
+            "crossing_time_s": finite[0],
+            "next_competitor_crossing_time_s": finite[1] if len(finite) > 1 else None,
+            "endpoint_m": endpoint,
+            "clock_audit": clock_audit,
+            "operations": transaction["operations"],
+        }
     if cavity.phase == VoidPhase.STABLE_SUBGRID_VOID:
         margin = 5.0e-5 - cavity.radius_m
         if margin <= 0.0:
@@ -131,7 +181,10 @@ def replay(args):
         "selected_event_identity_exact": crossing_a["selected_event_identity"] == crossing_b["selected_event_identity"],
         "accepted_topology_exact": exact_after_crossing,
         "categorical_terminal_exact": (
-            reference_crossed.void_state.cavities[0].phase == replay_crossed.void_state.cavities[0].phase
+            tuple(cavity.phase.value for cavity in reference_crossed.void_state.cavities)
+            == tuple(cavity.phase.value for cavity in replay_crossed.void_state.cavities)
+            and tuple(site.phase.value for site in reference_crossed.void_state.sites)
+            == tuple(site.phase.value for site in replay_crossed.void_state.sites)
         ),
         "minimum_event_selection_margin_action": min(
             crossing_a["minimum_event_selection_margin_action"],

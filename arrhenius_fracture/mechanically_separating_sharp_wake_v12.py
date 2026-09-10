@@ -408,7 +408,8 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
     selected=set(map(int,np.asarray(selected,int))); cent=np.mean(mesh.nodes[mesh.elems],axis=1)
     paths=[]; positive_components=set(); negative_components=set(); edge_certificates=[]; insufficient=[]
     boundary_owners=_mesh_edge_owners(mesh)
-    boundary_edges=np.asarray([edge for edge,owners in boundary_owners.items() if len(owners)==1],int)
+    boundary_edge_set={tuple(sorted(map(int,edge))) for edge,owners in boundary_owners.items() if len(owners)==1}
+    boundary_edges=np.asarray(sorted(boundary_edge_set),int)
     boundary_terminal_audits=[]; contexts=dict(boundary_terminal_context or {})
     arcs=certification_arcs(network,tolerance) if arcs is None else arcs
     for p0,p1,arc_id in arcs:
@@ -449,7 +450,7 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
             node_count=int(getattr(mesh,"nn",len(mesh.nodes)))
             edge_ids=tuple(tuple(map(int,edge)) for edge in context.get("boundary_edge_ids",())
                            if len(edge)==2 and min(edge)>=0 and max(edge)<node_count)
-            exact_edges=tuple(edge for edge in edge_ids if edge in boundary_edges or tuple(reversed(edge)) in boundary_edges)
+            exact_edges=tuple(edge for edge in edge_ids if tuple(sorted(edge)) in boundary_edge_set)
             edge_degree={}
             for a,b in exact_edges:
                 edge_degree[a]=edge_degree.get(a,0)+1; edge_degree[b]=edge_degree.get(b,0)+1

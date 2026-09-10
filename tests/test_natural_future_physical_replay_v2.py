@@ -2,6 +2,8 @@ from dataclasses import replace
 import numpy as np
 
 from arrhenius_fracture.natural_future_physical_replay_v2 import compare_states, exact_projection, solver_budget
+from arrhenius_fracture.voiding_lifecycle_driver_v5 import NATURAL_WINDOW_S, advance_production_void_interval
+from scripts.run_v5_natural_physical_replay_v2 import subsequent_growth_crossing
 from arrhenius_fracture.voiding_production_v5 import build_production_void_state
 
 
@@ -77,3 +79,15 @@ def test_solver_budget_is_measured_from_the_free_system():
     assert budget["condition_number"] >= 1.0
     assert budget["free_residual_relative"] >= 0.0
     assert budget["free_dof_count"] < state.mesh.ndof
+
+
+def test_healed_natural_terminal_uses_real_root_front_first_passage():
+    state, _ = build_production_void_state(stochastic=True, seed=12010)
+    terminal, _, result = advance_production_void_interval(state, NATURAL_WINDOW_S)
+    assert result["failure"] is None
+    assert not terminal.void_state.cavities
+    crossed, audit = subsequent_growth_crossing(terminal)
+    assert audit["real_crossing_executed"]
+    assert audit["crossing_time_s"] > 0.0
+    assert crossed.crack_network.branches[0].tip != terminal.crack_network.branches[0].tip
+    assert not crossed.competition.pending_events
