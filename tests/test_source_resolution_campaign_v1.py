@@ -10,6 +10,7 @@ from qualify_v5_source_resolution_focused_results_v1 import summarize
 from validate_v5_development_lifecycle_shards_v1 import expected_registry,require_registry,reconstruct_all_rows
 from assemble_v5_source_resolution_shards_v1 import copy_owned
 from recover_v5_causal_neutrality_postprocess_v1 import require_failed_execution
+from repair_v5_source_resolution_recovery_phase_v1 import require_missing_input_failure
 import assemble_v5_source_resolution_shards_v1 as shard_assembler
 import classify_v5_exact_head_reconstruction_v1 as exact_head_classifier
 
@@ -120,6 +121,26 @@ def test_causal_neutrality_recovery_accepts_only_the_exact_incomplete_operation(
     for changed in ({**report,'execution_completed':True},{**report,'phase':'source'},
                     {**report,'clean_exact_head_at_end':False},{**report,'operations':[]}):
         with pytest.raises(ValueError):require_failed_execution(changed,sha)
+
+
+def test_recovery_repair_accepts_only_the_exact_missing_input_failure():
+    sha='b'*40
+    operations=[{'operation':name,'script':script,'returncode':1 if name in ('patch_operator','recovery_transfer') else 0}
+        for name,script in (('patch_operator','qualify_cavity_boundary_patch_recovery_v1.py'),
+            ('kirsch_coarse','qualify_cavity_patch_kirsch_fem_v1.py'),
+            ('kirsch_fine','qualify_cavity_patch_kirsch_fem_v1.py'),
+            ('recovery_transfer','qualify_cavity_recovery_transfer_budget_v1.py'))]
+    report={'schema':'v5.source-resolution-final-phase-execution/1','executed_code_sha':sha,
+        'execution_completed':False,'phase':'recovery','section':'all','shard_index':0,'shard_count':1,
+        'clean_exact_head_at_end':True,'operations':operations}
+    logs={'patch_operator':'FileNotFoundError: traction/sha256_manifest.json',
+        'recovery_transfer':'FileNotFoundError: production/sha256_manifest.json'}
+    assert set(require_missing_input_failure(report,sha,logs))=={row['operation'] for row in operations}
+    with pytest.raises(ValueError,match='authorized missing-input'):
+        require_missing_input_failure(report,sha,{**logs,'patch_operator':'scientific predicate failed'})
+    changed={**report,'operations':[dict(row,returncode=0) if row['operation']=='patch_operator' else row for row in operations]}
+    with pytest.raises(ValueError,match='unexpected missing-input'):
+        require_missing_input_failure(changed,sha,logs)
 
 
 def test_strict_ontology_failure_is_retained_without_predicate_relaxation(monkeypatch):

@@ -70,6 +70,7 @@ def derive_ledger(root):
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('shards',type=Path);parser.add_argument('output',type=Path)
     parser.add_argument('--causal-neutrality-replacement',type=Path)
+    parser.add_argument('--recovery-replacement',type=Path)
     args=parser.parse_args()
     if args.output.exists():raise ValueError('refusing to overwrite campaign')
     from v5_numerical_runtime_v1 import require_pinned,runtime_record
@@ -79,6 +80,8 @@ def main():
     def phase_directory(spec,side):
         if spec['id']=='causal-neutrality' and args.causal_neutrality_replacement is not None:
             return args.causal_neutrality_replacement/side
+        if spec['id']=='recovery' and args.recovery_replacement is not None:
+            return args.recovery_replacement/side
         return args.shards/spec['id']/side
     for spec in specs:
         for side in ('a','b'):

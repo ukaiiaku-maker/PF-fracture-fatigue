@@ -90,11 +90,15 @@ jobs:
 
   assemble-immutable-evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 360
+    defaults:
+      run:
+        working-directory: recovery-head
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          path: recovery-head
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /arrhenius_fracture/
@@ -102,17 +106,45 @@ jobs:
             /runtime_inputs/
             /pyproject.toml
             /requirements-v5-source-resolution-ci.txt
+      - name: Check out exact physical implementation and retained recovery inputs
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.implementation_sha }}
+          fetch-depth: 0
+          path: physical-implementation
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /docs/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+            /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/traction/
+            /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/production/
+            /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sha256_manifest.json
+            /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/59761248ee9012f466ef21b55e4d373b6d56f6b6967681d8c14c39cdd4c645f7.npz
+            /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/602a12cfe7d34f15dce151503b8536ed519a441149fb35d4eef2b38298431cfe.npz
+            /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/6386a45ced6f6707e6f31bb0b1655d3719c27f48392fc3b728254c52665b5e82.npz
+            /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/742ad35936dc54023803a008f4ec4ba5aea1cf166e3cd0dea84115a9da3157cf.npz
       - name: Reserve disposable runner storage
         run: bash scripts/prepare_v5_ci_storage_v1.sh
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
           cache: pip
-      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+          cache-dependency-path: recovery-head/requirements-v5-source-resolution-ci.txt
+      - run: pip install -e '../physical-implementation[test]' -r ../physical-implementation/requirements-v5-source-resolution-ci.txt
+      - name: Configure the original fixed numerical kernels
+        run: python ../physical-implementation/scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
       - name: Verify recovery head and physical ancestor
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           git merge-base --is-ancestor '${{ inputs.implementation_sha }}' "$GITHUB_SHA"
+          test "$(git -C ../physical-implementation rev-parse HEAD)" = '${{ inputs.implementation_sha }}'
+          test -z "$(git -C ../physical-implementation status --short)"
       - uses: actions/download-artifact@v4
         with:
           name: v5-one-void-bounded-${{ inputs.implementation_sha }}
@@ -141,22 +173,36 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/download-artifact@v4
         with:
-          name: v5-source-final-ledger-${{ inputs.implementation_sha }}
-          path: /tmp/final-baseline
+          pattern: v5-source-final-shard-*-${{ inputs.implementation_sha }}
+          path: /tmp/source-final-shards
+          merge-multiple: true
           run-id: ${{ inputs.source_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Repair only recovery operations blocked by omitted retained inputs
+        run: |
+          python scripts/repair_v5_source_resolution_recovery_phase_v1.py \
+            /tmp/source-final-shards/recovery /tmp/recovery-replacement \
+            --implementation-root ../physical-implementation --require-pinned-runtime
+          diff -ru /tmp/recovery-replacement/a /tmp/recovery-replacement/b
+      - name: Reassemble immutable physical baseline with repaired recovery shard
+        run: |
+          python scripts/assemble_v5_source_resolution_campaign_v1.py \
+            /tmp/source-final-shards /tmp/final-baseline \
+            --recovery-replacement /tmp/recovery-replacement
+          diff -ru /tmp/final-baseline/a /tmp/final-baseline/b
       - name: Native final schema, ontology, and exact-pair audit
-        run: >-
-          python scripts/assemble_v5_one_void_final_closure_v2.py
-          /tmp/final-baseline/a/scientific_ledger.json /tmp/final-bounded
-          /tmp/final-static /tmp/final-controlled /tmp/final-replay
-          /tmp/one-void-final-recovery/ledger
+        run: |
+          python scripts/assemble_v5_one_void_final_closure_v2.py \
+            /tmp/final-baseline/a/scientific_ledger.json /tmp/final-bounded \
+            /tmp/final-static /tmp/final-controlled /tmp/final-replay \
+            /tmp/one-void-final-recovery/ledger
       - name: Exact-head validator and clean checks
         run: |
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           python -c 'import json; from arrhenius_fracture.one_void_final_closure_v2 import validate; r=json.load(open("/tmp/one-void-final-recovery/ledger/scientific_ledger.json")); assert r["physical_baseline_implementation_sha"] == "${{ inputs.implementation_sha }}"; assert validate(r)["valid"]'
           git diff --check
           test -z "$(git status --short)"
+          test -z "$(git -C ../physical-implementation status --short)"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

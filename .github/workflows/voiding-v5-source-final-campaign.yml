@@ -60,6 +60,17 @@ jobs:
             /runtime_inputs/
             /pyproject.toml
             /requirements-v5-source-resolution-ci.txt
+      - name: Materialize retained recovery inputs only for the recovery phase
+        if: matrix.phase == 'recovery'
+        run: >-
+          git sparse-checkout add
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/traction/
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/production/
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sha256_manifest.json
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/59761248ee9012f466ef21b55e4d373b6d56f6b6967681d8c14c39cdd4c645f7.npz
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/602a12cfe7d34f15dce151503b8536ed519a441149fb35d4eef2b38298431cfe.npz
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/6386a45ced6f6707e6f31bb0b1655d3719c27f48392fc3b728254c52665b5e82.npz
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/742ad35936dc54023803a008f4ec4ba5aea1cf166e3cd0dea84115a9da3157cf.npz
       - name: Reserve disposable runner storage
         run: bash scripts/prepare_v5_ci_storage_v1.sh
       - uses: actions/setup-python@v5
