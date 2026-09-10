@@ -2,10 +2,36 @@ name: V5 finalization-v3 exact-head qualification
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Full physical campaign or postprocess-only recovery
+        required: true
+        default: full
+        type: choice
+        options:
+          - full
+          - recover
+      source_run_id:
+        description: Source run ID; required only for recover mode
+        required: false
+        type: string
+      implementation_sha:
+        description: Immutable physical implementation SHA; required only for recover mode
+        required: false
+        type: string
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   final-one-void-closure:
+    if: inputs.mode == 'full'
     uses: ./.github/workflows/voiding-v5-one-void-final-closure.yml
+
+  postprocess-only-recovery:
+    if: inputs.mode == 'recover'
+    uses: ./.github/workflows/voiding-v5-one-void-final-recovery.yml
+    with:
+      source_run_id: ${{ inputs.source_run_id }}
+      implementation_sha: ${{ inputs.implementation_sha }}
