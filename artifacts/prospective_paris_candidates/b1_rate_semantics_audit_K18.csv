@@ -1,0 +1,4 @@
+source,window,da_dN,events_per_cycle,mean_event_length_m,product_check,radius_statistic,radius_m,delta_r_m,action_per_cycle,events,cycles,note
+PHYSICAL_QUALIFIED_SUMMARY,"developed (post-20um, final 50um)",4.473410023231299e-07,0.08251727858568088,5.611545615967007e-06,4.630494728890057e-07,terminal r0+net_source_linked_blunting,1.1004741824397272e-06,1.0047418243972728e-07,0.0951647619816961,18,218.13613231694143,whole-run rate = 4.630495e-07 m/cycle
+B1_HORIZON_MATCHED,"burn=4, sample=14 (total 18 events)",4.7075953947664557e-08,0.006161971830985915,7.639754812078134e-06,4.7075953947664557e-08,post-burn-in mean of post-event radii,1.0092940934459729e-06,9.294093445972929e-09,0.006161971830985915,18,2347,fixed_point_converged=True
+B1_LONG_ORBIT_ASYMPTOTIC_DIAGNOSTIC,"burn=30, sample=160",5.351850503626498e-08,nan,5.290973204147747e-06,nan,post-burn-in mean of post-event radii,1.0178188849604302e-06,1.781888496043029e-08,nan,190,19028,from completed sweep; not rerun

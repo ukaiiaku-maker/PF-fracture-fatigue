@@ -1,0 +1,78 @@
+{
+  "schema": "v10.2.30_prospective_paris_rate_semantics_audit_v1",
+  "Kmax_MPa_sqrt_m": 18.0,
+  "R": 0.1,
+  "temperature_K": 300.0,
+  "frequency_Hz": 1000.0,
+  "seed": 1720,
+  "fitted_parameters": "NONE",
+  "physical_event_ledger_path": "/private/tmp/v10230-reversible-energy-integration/runs/A_native_plus_8PT_fatigue_v1/developed/n80/A_NATIVE/DK_16.2",
+  "physical_event_ledger_available": false,
+  "exact_window_matched_audit_status": "UNAVAILABLE_EVENTWISE -- the physical eventwise ledger does not survive and was NOT reconstructed. The accepted-event horizon (18) and cycle count (218.136) come from the surviving qualified summary row, which is sufficient to horizon-match B1 and to decompose the rate, but not to match the threshold stream event-by-event.",
+  "radius_semantics": {
+    "resolved": true,
+    "identity": "tip_radius_m == r0_m + net_source_linked_blunting_m",
+    "identity_residual_m": 0.0,
+    "physical_statistic": "TERMINAL",
+    "b1_r_eff_statistic": "POST_BURN_IN_MEAN_OF_POST_EVENT_RADII",
+    "conclusion": "Physical tip_radius_m is a terminal radius. B1's r_eff_m is a post-burn-in mean. These are different statistics; the earlier sweep comparisons remain labelled semantics_matched=false."
+  },
+  "physical": {
+    "developed_da_dN": 4.473410023231299e-07,
+    "whole_run_da_dN": 4.630494728890057e-07,
+    "events": 18,
+    "cycles": 218.13613231694143,
+    "final_extension_um": 102.66778366452745,
+    "events_per_cycle": 0.08251727858568088,
+    "mean_event_length_m": 5.611545615967007e-06,
+    "cleavage_action": 20.758873111549498,
+    "emission_action": 2078513.9368093682,
+    "action_per_cycle": 0.0951647619816961,
+    "tip_radius_m": 1.1004741824397272e-06,
+    "delta_r_m": 1.0047418243972728e-07
+  },
+  "b1_horizon_matched": {
+    "da_dN": 4.7075953947664557e-08,
+    "events": 18,
+    "cycles": 2347,
+    "events_per_cycle": 0.006161971830985915,
+    "mean_event_length_m": 7.639754812078134e-06,
+    "r_eff_m": 1.0092940934459729e-06,
+    "delta_r_m": 9.294093445972929e-09,
+    "fixed_point_converged": true,
+    "burn_events": 4,
+    "sample_events": 14
+  },
+  "b1_long_orbit": {
+    "da_dN": 5.351850503626498e-08,
+    "r_eff_m": 1.0178188849604302e-06,
+    "mean_event_length_m": 5.290973204147747e-06
+  },
+  "gap_decomposition_horizon_matched": {
+    "physical_over_b1_rate_ratio": 9.502537172596638,
+    "event_frequency_ratio": 13.391375496190498,
+    "event_length_ratio": 0.7345190721429158,
+    "product_check": 9.836220704179224,
+    "dominant_term": "EVENT_FREQUENCY_CLEAVAGE_ACTION_ACCUMULATION"
+  },
+  "gap_decomposition_long_orbit": {
+    "physical_over_b1_rate_ratio": 8.35862291033736,
+    "event_length_ratio": 1.0605885532680366,
+    "implied_event_frequency_ratio": 7.8811174084253315
+  },
+  "no_fit_window_matched_rate_error_decade": 0.9778395771777486,
+  "termination_gate": {
+    "required_rate_error_decade": 0.3,
+    "required_local_slope_direction_corrected": true,
+    "rate_gate_passed": false,
+    "b1_local_slope_direction_from_postmortem": {
+      "physical_m_15_18": 2.1850340481159014,
+      "b1_m_15_18": 2.8900448602415167,
+      "physical_m_18_24": 0.7687404115110859,
+      "b1_m_18_24": 0.4903176918603456,
+      "direction_corrected": false
+    },
+    "decision": "TERMINATE_B1_DEVELOPMENT"
+  },
+  "conclusion": "B1 development terminates here. The no-fit horizon-matched rate error is 0.978 decade (gate 0.30) and the local-slope direction is not corrected (B1 is too steep on 15->18 and too shallow on 18->24). The decomposition shows the physical/B1 rate ratio of 9.50 is carried almost entirely by the event-frequency / cleavage-action-accumulation term (13.39x), not by the event-length term (0.73x) and not by the tip radius. Combined with the postmortem's radius-only impossibility result, the omitted transfer is in the within-renewal cleavage action accumulation (event triggering), not in tip-radius amplitude."
+}
