@@ -1,0 +1,187 @@
+{
+  "schema": "v10.2.30_prospective_paris_p40_derivation_stage1_v1",
+  "status": "STAGE1_OBSERVED_ENVELOPE_ONLY_B1_SCENARIOS_PENDING",
+  "transfer_model_status": "B1_TRANSFER_NOT_QUALIFIED_FOR_CANDIDATE_SELECTION",
+  "prediction_status": "NOT_A_QUALIFIED_PHYSICAL_PREDICTION",
+  "reduced_model_deficit": {
+    "D_frozen_scalar": 4.674437017203595,
+    "D_source": "A_NATIVE K=18 under OBSERVED_A_NATIVE_ENVELOPE radius",
+    "log10_deficit_by_K": {
+      "12.0": 0.6849866741539955,
+      "15.0": 0.6694550880933888,
+      "18.0": 0.6697293125251278,
+      "24.0": 0.6611979096191161
+    },
+    "log10_deficit_spread_K15_24": 0.008531402906011731,
+    "note": "measured on A_NATIVE only; never fitted to a candidate; its K-variation is a recorded design uncertainty, not a tuned parameter"
+  },
+  "radius_scenario": "OBSERVED_A_NATIVE_ENVELOPE",
+  "alpha_r_frozen_for_scaled_scenario": 5.638634665572309,
+  "candidate_vector": {
+    "cleave_G00_eV": 0.4790483322243405,
+    "cleave_sigc0_GPa": 2.085663601132855,
+    "cleave_exp_a": 0.43996044363863324,
+    "cleave_exp_n": 0.9107424704232079,
+    "cleave_floor_frac": 0.7999999999999999
+  },
+  "a_native_vector": {
+    "cleave_G00_eV": 1.8433725545182824,
+    "cleave_sigc0_GPa": 2.0952987279742956,
+    "cleave_exp_a": 0.41946418629859783,
+    "cleave_exp_n": 2.9225786491297185,
+    "cleave_floor_frac": 0.22289373425133724
+  },
+  "fit_diagnostics": {
+    "cost": 0.07773674675726351,
+    "success": true,
+    "nfev": 145,
+    "barrier_RMS_eV": 0.000854026475255095,
+    "derivative_RMS_eV": 0.007516912421998593,
+    "log_growth_RMS": 0.0055117413253146985,
+    "slope_RMS": 0.0737136965897801,
+    "minimum_saturation_margin": 0.9999193516585236
+  },
+  "design_K": [
+    13.5,
+    15.0,
+    16.5,
+    18.0,
+    19.5,
+    21.0
+  ],
+  "pilot_K": [
+    13.5,
+    18.0,
+    21.0
+  ],
+  "full_grid": [
+    12.0,
+    12.75,
+    13.5,
+    15.0,
+    16.5,
+    18.0,
+    19.5,
+    21.0,
+    24.3
+  ],
+  "score_13p5_to_21": {
+    "E_rate": 0.9749218054714529,
+    "E_slope": 0.3609213028751618,
+    "E_max": 0.33542845627829987,
+    "J": 1.5035573364857646,
+    "rms_log10_rate_error": 0.04874609027357265,
+    "rms_slope_error": 0.09023032571879044,
+    "max_abs_slope_error": 0.16771422813914993
+  },
+  "predictions": [
+    {
+      "Kmax_MPa_sqrt_m": 12.0,
+      "radius_m": 1.0105318630661543e-06,
+      "reduced_da_dN": 2.2890756089807626e-08,
+      "predicted_physical_da_dN": 1.0700139761797539e-07,
+      "target_da_dN": 9.357867978912683e-08,
+      "log10_rate_error": 0.0582125364780801,
+      "local_slope": 3.9071330943882963,
+      "target_slope": 3.344037,
+      "cooperative_saturation_fraction": 1.0811043895962437e-05,
+      "slope_error": 0.5630960943882961
+    },
+    {
+      "Kmax_MPa_sqrt_m": 12.75,
+      "radius_m": 1.0157666281471806e-06,
+      "reduced_da_dN": 2.874123171556648e-08,
+      "predicted_physical_da_dN": 1.3434907745126993e-07,
+      "target_da_dN": 1.1542515340158278e-07,
+      "log10_rate_error": 0.06593422815773466,
+      "local_slope": 3.9338355382808876,
+      "target_slope": 3.599865,
+      "cooperative_saturation_fraction": 1.3637818919097266e-05,
+      "slope_error": 0.33397053828088774
+    },
+    {
+      "Kmax_MPa_sqrt_m": 13.5,
+      "radius_m": 1.0229185339820165e-06,
+      "reduced_da_dN": 3.55107286723192e-08,
+      "predicted_physical_da_dN": 1.6599266461376195e-07,
+      "target_da_dN": 1.4286990725190266e-07,
+      "log10_rate_error": 0.06514813374944463,
+      "local_slope": 3.9490856890771395,
+      "target_slope": 3.845041,
+      "cooperative_saturation_fraction": 1.690344262020315e-05,
+      "slope_error": 0.10404468907713937
+    },
+    {
+      "Kmax_MPa_sqrt_m": 15.0,
+      "radius_m": 1.041289045198725e-06,
+      "reduced_da_dN": 5.199665921524466e-08,
+      "predicted_physical_da_dN": 2.430551086066601e-07,
+      "target_da_dN": 2.1636125289894813e-07,
+      "log10_rate_error": 0.050525265962666564,
+      "local_slope": 3.9523421908988,
+      "target_slope": 3.98445,
+      "cooperative_saturation_fraction": 2.4820230139756864e-05,
+      "slope_error": -0.0321078091011997
+    },
+    {
+      "Kmax_MPa_sqrt_m": 16.5,
+      "radius_m": 1.0663625106903613e-06,
+      "reduced_da_dN": 7.224409355642985e-08,
+      "predicted_physical_da_dN": 3.3770046519449545e-07,
+      "target_da_dN": 3.164684692952013e-07,
+      "log10_rate_error": 0.028201212447827424,
+      "local_slope": 3.928842566562721,
+      "target_slope": 3.988885,
+      "cooperative_saturation_fraction": 3.446080223846374e-05,
+      "slope_error": -0.060042433437278664
+    },
+    {
+      "Kmax_MPa_sqrt_m": 18.0,
+      "radius_m": 1.1004741824397272e-06,
+      "reduced_da_dN": 9.546224421530231e-08,
+      "predicted_physical_da_dN": 4.462322481053389e-07,
+      "target_da_dN": 4.473410023231301e-07,
+      "log10_rate_error": -0.0010777540295961213,
+      "local_slope": 3.888736165471393,
+      "target_slope": 3.958965,
+      "cooperative_saturation_fraction": 4.539973039468005e-05,
+      "slope_error": -0.07022883452860729
+    },
+    {
+      "Kmax_MPa_sqrt_m": 19.5,
+      "radius_m": 1.1446855221298254e-06,
+      "reduced_da_dN": 1.2054353530393485e-07,
+      "predicted_physical_da_dN": 5.634731636093015e-07,
+      "target_da_dN": 6.121233445390226e-07,
+      "log10_rate_error": -0.035965705653667336,
+      "local_slope": 3.84014983389996,
+      "target_slope": 3.85825,
+      "cooperative_saturation_fraction": 5.70808643921393e-05,
+      "slope_error": -0.01810016610003995
+    },
+    {
+      "Kmax_MPa_sqrt_m": 21.0,
+      "radius_m": 1.2002790621499003e-06,
+      "reduced_da_dN": 1.461008284598198e-07,
+      "predicted_physical_da_dN": 6.829391207966942e-07,
+      "target_da_dN": 8.084670106097001e-07,
+      "log10_rate_error": -0.07328031215599454,
+      "local_slope": 3.78931922813915,
+      "target_slope": 3.621605,
+      "cooperative_saturation_fraction": 6.88456580998395e-05,
+      "slope_error": 0.16771422813914993
+    },
+    {
+      "Kmax_MPa_sqrt_m": 24.3,
+      "radius_m": 1.3596262151035292e-06,
+      "reduced_da_dN": 1.9973337876928565e-07,
+      "predicted_physical_da_dN": 9.336410992902955e-07,
+      "target_da_dN": 1.305503893129134e-06,
+      "log10_rate_error": -0.14559820997429576,
+      "local_slope": 3.6847310421040653,
+      "target_slope": 2.992161,
+      "cooperative_saturation_fraction": 9.311220456119573e-05,
+      "slope_error": 0.6925700421040655
+    }
+  ]
+}

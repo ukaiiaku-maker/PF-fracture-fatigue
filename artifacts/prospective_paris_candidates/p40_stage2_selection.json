@@ -1,0 +1,296 @@
+{
+  "schema": "v10.2.30_prospective_paris_p40_stage2_v1",
+  "prediction_status": "NOT_A_QUALIFIED_PHYSICAL_PREDICTION",
+  "transfer_model_status": "B1_TRANSFER_NOT_QUALIFIED_FOR_CANDIDATE_SELECTION",
+  "bound_provenance": {
+    "module_default_floor_fraction_max": 0.8,
+    "production_limit_floor_fraction_max": 0.95,
+    "production_limit_sources": [
+      "MaterialManifest.ExpFloorBarrier.floor_max_fraction=0.95",
+      "campaign admissibility rule: floor <= 0.95 * G0"
+    ],
+    "decision": "use the production limit 0.95; the 0.80 module default parks the optimum exactly on the bound and is recorded as a rejection"
+  },
+  "dual_exponential_family_required": false,
+  "dual_family_justification": "the single EXP-floor family satisfies every analytical gate with all five parameters strictly interior under the production bound, so no new production barrier class is added",
+  "reduced_model_deficit": {
+    "12.0": {
+      "radius_m": 1.0105318630661543e-06,
+      "g_a0": 5.056535996221934e-09,
+      "g_phys": 2.448159884833225e-08,
+      "deficit": 4.841575115182418,
+      "log10_deficit": 0.6849866741539955
+    },
+    "15.0": {
+      "radius_m": 1.041289045198725e-06,
+      "g_a0": 6.429391915956136e-08,
+      "g_phys": 3.003481684450034e-07,
+      "deficit": 4.671486392042997,
+      "log10_deficit": 0.6694550880933888
+    },
+    "18.0": {
+      "radius_m": 1.1004741824397272e-06,
+      "g_a0": 9.569943945693471e-08,
+      "g_phys": 4.473410023231299e-07,
+      "deficit": 4.674437017203595,
+      "log10_deficit": 0.6697293125251278
+    },
+    "24.0": {
+      "radius_m": 1.343158213754612e-06,
+      "g_a0": 1.2175484514975785e-07,
+      "g_phys": 5.580641987406302e-07,
+      "deficit": 4.583507112626311,
+      "log10_deficit": 0.6611979096191161
+    }
+  },
+  "alpha_r_frozen": 5.638634665572309,
+  "b1_radius_points_seed_candidate": [
+    {
+      "Kmax_MPa_sqrt_m": 13.5,
+      "r_eff_m": 1.0055050239857317e-06,
+      "delta_r_m": 5.505023985731733e-09,
+      "converged": true,
+      "b1_da_dN": 2.701213606956102e-08,
+      "wall_seconds": 187.3097059726715
+    },
+    {
+      "Kmax_MPa_sqrt_m": 15.0,
+      "r_eff_m": 1.0083297192511934e-06,
+      "delta_r_m": 8.329719251193453e-09,
+      "converged": true,
+      "b1_da_dN": 3.5200467634039066e-08,
+      "wall_seconds": 143.24165391921997
+    },
+    {
+      "Kmax_MPa_sqrt_m": 16.5,
+      "r_eff_m": 1.0113532863727406e-06,
+      "delta_r_m": 1.1353286372740621e-08,
+      "converged": true,
+      "b1_da_dN": 4.279505099532643e-08,
+      "wall_seconds": 118.7823851108551
+    },
+    {
+      "Kmax_MPa_sqrt_m": 18.0,
+      "r_eff_m": 1.0170392704899094e-06,
+      "delta_r_m": 1.7039270489909402e-08,
+      "converged": true,
+      "b1_da_dN": 4.9752062590600453e-08,
+      "wall_seconds": 99.22691893577576
+    },
+    {
+      "Kmax_MPa_sqrt_m": 21.0,
+      "r_eff_m": 1.0286473252919856e-06,
+      "delta_r_m": 2.864732529198567e-08,
+      "converged": true,
+      "b1_da_dN": 5.690627265508472e-08,
+      "wall_seconds": 82.54400205612183
+    }
+  ],
+  "radius_scenarios": [
+    "OBSERVED_A_NATIVE_ENVELOPE",
+    "RAW_B1",
+    "RADIUS_SCALED_B1"
+  ],
+  "rejection_registry": [
+    {
+      "candidate_id": "P40_SINGLE_EXP_MODULE_DEFAULT_BOUND_V0",
+      "bounds_source": "inverse_fatigue_barrier_design_v10230.ExpFloorBounds default floor_fraction<=0.80",
+      "vector": {
+        "cleave_G00_eV": 0.47904813486604153,
+        "cleave_sigc0_GPa": 1.9985386675308574,
+        "cleave_exp_a": 0.4231887355038957,
+        "cleave_exp_n": 0.910741989725098,
+        "cleave_floor_frac": 0.7999999999999999
+      },
+      "cost": 0.07426424981444589,
+      "log_growth_RMS": 0.005511957120478791,
+      "slope_RMS": 0.07371370029577738,
+      "rejection_reason": "floor_fraction parked exactly on the 0.80 module-default upper bound; campaign rule forbids a parameter at an optimization bound without separate justification. The 0.80 default has no production basis: the production limit (MaterialManifest.floor_max_fraction and the campaign admissibility rule floor<=0.95*G0) is 0.95.",
+      "admissibility": {
+        "all_parameters_interior": false,
+        "parameters_at_bound": {
+          "cleave_floor_frac": 1.3895156753756653e-16
+        },
+        "relative_bound_margins": {
+          "cleave_G00_eV": 0.021957815240567086,
+          "cleave_sigc0_GPa": 0.23058188045267403,
+          "cleave_exp_a": 0.08096159347467784,
+          "cleave_exp_n": 0.056233360827667916,
+          "cleave_floor_frac": 1.3895156753756653e-16
+        },
+        "G0_finite_positive": true,
+        "sigc_finite_positive": true,
+        "floor_le_0p95_G0": true,
+        "floor_ge_production_minimum": true,
+        "floor_eV": 0.3832385078928332,
+        "G0_minus_floor_eV": 0.09580962697320833,
+        "barrier_monotone_nonincreasing_in_stress": true,
+        "predicted_rate_monotone_increasing": true,
+        "max_cooperative_saturation_fraction": 6.884567080707536e-05,
+        "cooperative_saturation_below_10pct_of_window": true,
+        "all_rates_finite_positive": true,
+        "admissible": false
+      }
+    }
+  ],
+  "candidates": {
+    "P40_RAW_B1_ENVELOPE_V1": {
+      "candidate_id": "P40_RAW_B1_ENVELOPE_V1",
+      "fitted_under_scenario": "RAW_B1",
+      "D_used": 4.391573415630597,
+      "vector": {
+        "cleave_G00_eV": 0.45228382734748124,
+        "cleave_sigc0_GPa": 2.08322806762971,
+        "cleave_exp_a": 0.20134252037589737,
+        "cleave_exp_n": 1.5761890574057957,
+        "cleave_floor_frac": 0.8722951826103614
+      },
+      "row_sha256": "0c4fc23e61746e1782694eca45030f05912147f5b28083a6d40a65cdb9e350c4",
+      "fit_diagnostics": {
+        "cost": 0.004474574898454548,
+        "success": true,
+        "nfev": 27,
+        "barrier_RMS_eV": 4.1266257888884124e-05,
+        "derivative_RMS_eV": 0.0005401826384565748,
+        "log_growth_RMS": 0.001055529925369269,
+        "slope_RMS": 0.019185230781501438,
+        "minimum_saturation_margin": 0.9999143662321058
+      },
+      "admissibility": {
+        "all_parameters_interior": true,
+        "parameters_at_bound": {},
+        "relative_bound_margins": {
+          "cleave_G00_eV": 0.014523285374300338,
+          "cleave_sigc0_GPa": 0.24143949584996283,
+          "cleave_exp_a": 0.03641416071805168,
+          "cleave_exp_n": 0.11286715382176984,
+          "cleave_floor_frac": 0.08188073486790151
+        },
+        "G0_finite_positive": true,
+        "sigc_finite_positive": true,
+        "floor_le_0p95_G0": true,
+        "floor_ge_production_minimum": true,
+        "floor_eV": 0.3945250037677843,
+        "G0_minus_floor_eV": 0.057758823579696916,
+        "barrier_monotone_nonincreasing_in_stress": true,
+        "predicted_rate_monotone_increasing": true,
+        "max_cooperative_saturation_fraction": 8.400760388949997e-05,
+        "cooperative_saturation_below_10pct_of_window": true,
+        "all_rates_finite_positive": true,
+        "admissible": true
+      },
+      "scores_by_scenario": {
+        "OBSERVED_A_NATIVE_ENVELOPE": {
+          "E_rate": 1.136606385137449,
+          "E_slope": 0.3854239013759342,
+          "E_max": 0.4417222234666758,
+          "J": 1.7428913982467211,
+          "rms_log10_rate_error": 0.05683031925687245,
+          "rms_slope_error": 0.09635597534398355,
+          "max_abs_slope_error": 0.2208611117333379
+        },
+        "RAW_B1": {
+          "E_rate": 0.13838152642216106,
+          "E_slope": 0.08544969883915335,
+          "E_max": 0.07319277422042969,
+          "J": 0.2604276123715292,
+          "rms_log10_rate_error": 0.006919076321108053,
+          "rms_slope_error": 0.021362424709788337,
+          "max_abs_slope_error": 0.036596387110214845
+        },
+        "RADIUS_SCALED_B1": {
+          "E_rate": 0.9136919198034622,
+          "E_slope": 0.3295950378742194,
+          "E_max": 0.3739011860391672,
+          "J": 1.430237550697265,
+          "rms_log10_rate_error": 0.04568459599017311,
+          "rms_slope_error": 0.08239875946855485,
+          "max_abs_slope_error": 0.1869505930195836
+        }
+      },
+      "minimax_J": 1.7428913982467211,
+      "minimax_scenario": "OBSERVED_A_NATIVE_ENVELOPE",
+      "eligible": false
+    },
+    "P40_RADIUS_SCALED_ENVELOPE_V1": {
+      "candidate_id": "P40_RADIUS_SCALED_ENVELOPE_V1",
+      "fitted_under_scenario": "RADIUS_SCALED_B1",
+      "D_used": 4.658615762277856,
+      "vector": {
+        "cleave_G00_eV": 0.45271827215231697,
+        "cleave_sigc0_GPa": 2.078969749443161,
+        "cleave_exp_a": 0.21255661092531794,
+        "cleave_exp_n": 1.5774437495047364,
+        "cleave_floor_frac": 0.8725371017994713
+      },
+      "row_sha256": "e756966337275030787bb0b49427db6addaa3bae7bea70455551a644e449c203",
+      "fit_diagnostics": {
+        "cost": 0.0072427572787840695,
+        "success": true,
+        "nfev": 20,
+        "barrier_RMS_eV": 0.000568251592318642,
+        "derivative_RMS_eV": 0.004251438821740992,
+        "log_growth_RMS": 0.0010321154833345288,
+        "slope_RMS": 0.019196030690989588,
+        "minimum_saturation_margin": 0.9999192585464705
+      },
+      "admissibility": {
+        "all_parameters_interior": true,
+        "parameters_at_bound": {},
+        "relative_bound_margins": {
+          "cleave_G00_eV": 0.014643964486754707,
+          "cleave_sigc0_GPa": 0.2408935576209181,
+          "cleave_exp_a": 0.038665986129581914,
+          "cleave_exp_n": 0.11297393612806267,
+          "cleave_floor_frac": 0.08162581475292799
+        },
+        "G0_finite_positive": true,
+        "sigc_finite_positive": true,
+        "floor_le_0p95_G0": true,
+        "floor_ge_production_minimum": true,
+        "floor_eV": 0.3950134891154469,
+        "G0_minus_floor_eV": 0.057704783036870044,
+        "barrier_monotone_nonincreasing_in_stress": true,
+        "predicted_rate_monotone_increasing": true,
+        "max_cooperative_saturation_fraction": 7.310121706701218e-05,
+        "cooperative_saturation_below_10pct_of_window": true,
+        "all_rates_finite_positive": true,
+        "admissible": true
+      },
+      "scores_by_scenario": {
+        "OBSERVED_A_NATIVE_ENVELOPE": {
+          "E_rate": 0.9206425909226565,
+          "E_slope": 0.2486276083674949,
+          "E_max": 0.2802488716168039,
+          "J": 1.3093946350985535,
+          "rms_log10_rate_error": 0.04603212954613283,
+          "rms_slope_error": 0.062156902091873724,
+          "max_abs_slope_error": 0.14012443580840195
+        },
+        "RAW_B1": {
+          "E_rate": 0.7911826723822349,
+          "E_slope": 0.2610124867116102,
+          "E_max": 0.22146403877128762,
+          "J": 1.162927178479489,
+          "rms_log10_rate_error": 0.03955913361911175,
+          "rms_slope_error": 0.06525312167790255,
+          "max_abs_slope_error": 0.11073201938564381
+        },
+        "RADIUS_SCALED_B1": {
+          "E_rate": 0.7157903163796643,
+          "E_slope": 0.1843419876244184,
+          "E_max": 0.19932712035601163,
+          "J": 0.9997958641820885,
+          "rms_log10_rate_error": 0.035789515818983215,
+          "rms_slope_error": 0.0460854969061046,
+          "max_abs_slope_error": 0.09966356017800582
+        }
+      },
+      "minimax_J": 1.3093946350985535,
+      "minimax_scenario": "OBSERVED_A_NATIVE_ENVELOPE",
+      "eligible": true
+    }
+  },
+  "selected_candidate": "P40_RADIUS_SCALED_ENVELOPE_V1",
+  "selection_rule": "minimax J across the three frozen radius scenarios, eligible candidates only"
+}

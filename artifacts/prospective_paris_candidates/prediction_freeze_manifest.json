@@ -1,0 +1,381 @@
+{
+  "schema": "v10.2.30_prospective_paris_p40_prediction_freeze_v1",
+  "frozen_at_head": "7e1f8fafb83adc4ace2b0f2e8255fae5b3e80653",
+  "branch": "codex/v10.2.30-prospective-paris-candidate-design",
+  "worktree_clean_at_freeze": false,
+  "prediction_status": "NOT_A_QUALIFIED_PHYSICAL_PREDICTION",
+  "transfer_model_status": "B1_TRANSFER_NOT_QUALIFIED_FOR_CANDIDATE_SELECTION",
+  "selected_candidate": "P40_RADIUS_SCALED_ENVELOPE_V1",
+  "selection_rule": "minimax J across the three frozen radius scenarios, eligible candidates only",
+  "candidates_considered": [
+    "P40_RAW_B1_ENVELOPE_V1",
+    "P40_RADIUS_SCALED_ENVELOPE_V1"
+  ],
+  "rejection_registry": [
+    {
+      "candidate_id": "P40_SINGLE_EXP_MODULE_DEFAULT_BOUND_V0",
+      "bounds_source": "inverse_fatigue_barrier_design_v10230.ExpFloorBounds default floor_fraction<=0.80",
+      "vector": {
+        "cleave_G00_eV": 0.47904813486604153,
+        "cleave_sigc0_GPa": 1.9985386675308574,
+        "cleave_exp_a": 0.4231887355038957,
+        "cleave_exp_n": 0.910741989725098,
+        "cleave_floor_frac": 0.7999999999999999
+      },
+      "cost": 0.07426424981444589,
+      "log_growth_RMS": 0.005511957120478791,
+      "slope_RMS": 0.07371370029577738,
+      "rejection_reason": "floor_fraction parked exactly on the 0.80 module-default upper bound; campaign rule forbids a parameter at an optimization bound without separate justification. The 0.80 default has no production basis: the production limit (MaterialManifest.floor_max_fraction and the campaign admissibility rule floor<=0.95*G0) is 0.95.",
+      "admissibility": {
+        "all_parameters_interior": false,
+        "parameters_at_bound": {
+          "cleave_floor_frac": 1.3895156753756653e-16
+        },
+        "relative_bound_margins": {
+          "cleave_G00_eV": 0.021957815240567086,
+          "cleave_sigc0_GPa": 0.23058188045267403,
+          "cleave_exp_a": 0.08096159347467784,
+          "cleave_exp_n": 0.056233360827667916,
+          "cleave_floor_frac": 1.3895156753756653e-16
+        },
+        "G0_finite_positive": true,
+        "sigc_finite_positive": true,
+        "floor_le_0p95_G0": true,
+        "floor_ge_production_minimum": true,
+        "floor_eV": 0.3832385078928332,
+        "G0_minus_floor_eV": 0.09580962697320833,
+        "barrier_monotone_nonincreasing_in_stress": true,
+        "predicted_rate_monotone_increasing": true,
+        "max_cooperative_saturation_fraction": 6.884567080707536e-05,
+        "cooperative_saturation_below_10pct_of_window": true,
+        "all_rates_finite_positive": true,
+        "admissible": false
+      }
+    }
+  ],
+  "bound_provenance": {
+    "module_default_floor_fraction_max": 0.8,
+    "production_limit_floor_fraction_max": 0.95,
+    "production_limit_sources": [
+      "MaterialManifest.ExpFloorBarrier.floor_max_fraction=0.95",
+      "campaign admissibility rule: floor <= 0.95 * G0"
+    ],
+    "decision": "use the production limit 0.95; the 0.80 module default parks the optimum exactly on the bound and is recorded as a rejection"
+  },
+  "dual_exponential_family_required": false,
+  "candidate_vector": {
+    "cleave_G00_eV": 0.45271827215231697,
+    "cleave_sigc0_GPa": 2.078969749443161,
+    "cleave_exp_a": 0.21255661092531794,
+    "cleave_exp_n": 1.5774437495047364,
+    "cleave_floor_frac": 0.8725371017994713
+  },
+  "candidate_vector_sha256": "e756966337275030787bb0b49427db6addaa3bae7bea70455551a644e449c203",
+  "complete_candidate_row": {
+    "L_pz_um_recommended": "50",
+    "Tref_K": "300.0",
+    "c_blunt": "2.6710070092231035",
+    "campaign_parent_family": "global_300K_existing_physics",
+    "campaign_parent_id": "",
+    "candidate_id": "P40_RADIUS_SCALED_ENVELOPE_V1",
+    "cleavage_surface_modified": "True",
+    "cleave_G00_eV": "0.45271827215231697",
+    "cleave_exp_a": "0.21255661092531794",
+    "cleave_exp_n": "1.5774437495047364",
+    "cleave_floor_frac": "0.8725371017994713",
+    "cleave_gT_eV_per_K": "0.0",
+    "cleave_sT_GPa_per_K": "0.0",
+    "cleave_sigc0_GPa": "2.078969749443161",
+    "emit_G00_eV": "1.6206148624420167",
+    "emit_exp_a": "0.3812504687253847",
+    "emit_exp_n": "2.1357398161664602",
+    "emit_floor_frac": "0.02957268757716202",
+    "emit_gT_eV_per_K": "0.0",
+    "emit_sT_GPa_per_K": "0.0",
+    "emit_sigc0_GPa": "1.6865767389535904",
+    "encounter_efficiency": "0.7869294861098416",
+    "endurance_mechanism_class": "A",
+    "exact_spatial_Tref_active": "1",
+    "explicit_recovery_active": "0",
+    "generator": "seeded_scrambled_sobol_global_300K_existing_physics",
+    "generator_seed": "1914",
+    "legacy_source_refresh_active": "0",
+    "legacy_source_sites_active": "0",
+    "material_class": "DBTT",
+    "max_K_shield_MPa_sqrt_m": "0",
+    "mechanism_summary": "P40 target m_mid=4.0 at Kstar=18; opening-cleavage surface only; A_NATIVE background held fixed; transfer model NOT qualified",
+    "mobile_shield_fraction": "0",
+    "n_bins_recommended": "80",
+    "n_slip_channels": "2",
+    "option_key": "P40_RADIUS_SCALED_ENVELOPE_V1",
+    "peierls_H0_eV": "3.6593758589588106",
+    "peierls_activation_entropy_kB": "-17.06620840355754",
+    "peierls_exp_a": "0.26733986329149567",
+    "peierls_exp_n": "1.996950289234519",
+    "peierls_nu0_s": "1000000000000.0",
+    "peierls_stress_fraction": "0.5773502691896258",
+    "persistent_source_closure_modified": "False",
+    "physics__blunting_length_m": "8.204647996828617e-07",
+    "physics__blunting_slip_fraction": "0.292558920039094",
+    "physics__cleavage_correlation_time_s": "6.992153587194454e-07",
+    "physics__cleavage_hits": "3.2732414351776242",
+    "physics__encounter_efficiency": "0.7869294861098416",
+    "physics__mobile_transport_velocity_scale": "0.7360197436064482",
+    "physics__persistent_backstress_scale": "0.5307370433372857",
+    "physics__taylor_phi_max": "5.6104322148902",
+    "recovery_H0_eV": "0",
+    "recovery_activation_entropy_kB": "0",
+    "recovery_nu0_s": "0",
+    "reference_front_width_um": "10",
+    "reference_source_area_um2": "25",
+    "retained_recovery_rate_s": "0",
+    "rho_forest_floor_m2": "5000000000000",
+    "rho_source0_m2": "3855551510837146.5",
+    "role": "fresh prospective P40 fatigue-slope design candidate",
+    "source_recovery_rate_s": "0",
+    "source_refresh_length_um": "0",
+    "source_sites_per_system": "141.0590567476921",
+    "source_zone_length_um": "2",
+    "taylor_H0_eV": "1.1918544578552246",
+    "taylor_activation_entropy_kB": "0.8347971364855766",
+    "taylor_corr_rho_c_m2": "749611920129.9166",
+    "taylor_corr_scale": "1.818093050430288",
+    "taylor_exp_a": "0.5542682043898324",
+    "taylor_exp_n": "2.2843412086367607",
+    "taylor_nu0_s": "100000000000.0",
+    "taylor_stress_fraction": "0.5773502691896258",
+    "validation_status": "PROSPECTIVE_FROZEN"
+  },
+  "complete_candidate_row_sha256": "eb1373bd5a124b296e8f12dcc2a2c07fd0bb9af42d1dd0f28f36179d2eda8281",
+  "a_native_background_row_sha256": "04518e244b7a446a120ea6e2d15a68758cb54a225d099609deeb23da32679971",
+  "changed_constitutive_fields": [
+    "cleave_G00_eV",
+    "cleave_exp_a",
+    "cleave_exp_n",
+    "cleave_floor_frac",
+    "cleave_sigc0_GPa"
+  ],
+  "changed_identity_fields": [
+    "candidate_id",
+    "mechanism_summary",
+    "option_key",
+    "role",
+    "validation_status"
+  ],
+  "launcher_artifacts": {
+    "registry_csv": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-prospective-paris-candidate-design/artifacts/prospective_paris_candidates/p40_candidate_registry.csv",
+    "registry_csv_sha256": "19381a199511dbfa9584dd841aaeb1ed582f0ff07444e6cd6fac654ae8aa470d",
+    "selection_json": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-prospective-paris-candidate-design/artifacts/prospective_paris_candidates/p40_candidate_selection.json",
+    "selection_json_sha256": "19da44d356f44541b4c1585118e9d7e08a09db53448d81f8a746d2ba20946b20",
+    "canonical_option_order": [
+      "A_NATIVE",
+      "P40_RADIUS_SCALED_ENVELOPE_V1"
+    ],
+    "entry_module": "arrhenius_fracture.sharp_front_v10_2_30_candidate_fixed_deltaK",
+    "launcher": "scripts/run_v10_2_30_weakt_high_cycle_1e12.sh"
+  },
+  "rate_anchor": 4.473410023231299e-07,
+  "target_profile_sha256": "c5164674b4685c4ffb75b6ed2f2e85ede8a29d4b9397f174d34c513d936c7924",
+  "radius_scenarios": [
+    "OBSERVED_A_NATIVE_ENVELOPE",
+    "RAW_B1",
+    "RADIUS_SCALED_B1"
+  ],
+  "alpha_r_frozen": 5.638634665572309,
+  "reduced_model_deficit": {
+    "12.0": {
+      "radius_m": 1.0105318630661543e-06,
+      "g_a0": 5.056535996221934e-09,
+      "g_phys": 2.448159884833225e-08,
+      "deficit": 4.841575115182418,
+      "log10_deficit": 0.6849866741539955
+    },
+    "15.0": {
+      "radius_m": 1.041289045198725e-06,
+      "g_a0": 6.429391915956136e-08,
+      "g_phys": 3.003481684450034e-07,
+      "deficit": 4.671486392042997,
+      "log10_deficit": 0.6694550880933888
+    },
+    "18.0": {
+      "radius_m": 1.1004741824397272e-06,
+      "g_a0": 9.569943945693471e-08,
+      "g_phys": 4.473410023231299e-07,
+      "deficit": 4.674437017203595,
+      "log10_deficit": 0.6697293125251278
+    },
+    "24.0": {
+      "radius_m": 1.343158213754612e-06,
+      "g_a0": 1.2175484514975785e-07,
+      "g_phys": 5.580641987406302e-07,
+      "deficit": 4.583507112626311,
+      "log10_deficit": 0.6611979096191161
+    }
+  },
+  "scores_by_scenario": {
+    "OBSERVED_A_NATIVE_ENVELOPE": {
+      "E_rate": 0.9206425909226565,
+      "E_slope": 0.2486276083674949,
+      "E_max": 0.2802488716168039,
+      "J": 1.3093946350985535,
+      "rms_log10_rate_error": 0.04603212954613283,
+      "rms_slope_error": 0.062156902091873724,
+      "max_abs_slope_error": 0.14012443580840195
+    },
+    "RAW_B1": {
+      "E_rate": 0.7911826723822349,
+      "E_slope": 0.2610124867116102,
+      "E_max": 0.22146403877128762,
+      "J": 1.162927178479489,
+      "rms_log10_rate_error": 0.03955913361911175,
+      "rms_slope_error": 0.06525312167790255,
+      "max_abs_slope_error": 0.11073201938564381
+    },
+    "RADIUS_SCALED_B1": {
+      "E_rate": 0.7157903163796643,
+      "E_slope": 0.1843419876244184,
+      "E_max": 0.19932712035601163,
+      "J": 0.9997958641820885,
+      "rms_log10_rate_error": 0.035789515818983215,
+      "rms_slope_error": 0.0460854969061046,
+      "max_abs_slope_error": 0.09966356017800582
+    }
+  },
+  "minimax_J": 1.3093946350985535,
+  "minimax_scenario": "OBSERVED_A_NATIVE_ENVELOPE",
+  "admissibility": {
+    "all_parameters_interior": true,
+    "parameters_at_bound": {},
+    "relative_bound_margins": {
+      "cleave_G00_eV": 0.014643964486754707,
+      "cleave_sigc0_GPa": 0.2408935576209181,
+      "cleave_exp_a": 0.038665986129581914,
+      "cleave_exp_n": 0.11297393612806267,
+      "cleave_floor_frac": 0.08162581475292799
+    },
+    "G0_finite_positive": true,
+    "sigc_finite_positive": true,
+    "floor_le_0p95_G0": true,
+    "floor_ge_production_minimum": true,
+    "floor_eV": 0.3950134891154469,
+    "G0_minus_floor_eV": 0.057704783036870044,
+    "barrier_monotone_nonincreasing_in_stress": true,
+    "predicted_rate_monotone_increasing": true,
+    "max_cooperative_saturation_fraction": 7.310121706701218e-05,
+    "cooperative_saturation_below_10pct_of_window": true,
+    "all_rates_finite_positive": true,
+    "admissible": true
+  },
+  "physical_jobs": [
+    {
+      "composite_id": "P40_RADIUS_SCALED_ENVELOPE_V1__DK_12.15__R0p1__n80__seed1720",
+      "parameter_option": "P40_RADIUS_SCALED_ENVELOPE_V1",
+      "Kmax_MPa_sqrt_m": 13.5,
+      "deltaK_MPa_sqrt_m": 12.15,
+      "R": 0.1,
+      "n_bins": 80,
+      "seed": 1720,
+      "temperature_K": 300.0,
+      "frequency_Hz": 1000.0,
+      "target_ext_um": 100,
+      "cycles_max": "1000000000000",
+      "max_wall_seconds": 43200,
+      "fresh": true,
+      "resume": false,
+      "status": "PENDING",
+      "result_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-prospective-paris-candidate-design/runs/prospective_paris_p40_pilot_v1/P40_RADIUS_SCALED_ENVELOPE_V1/K_13.5_R_0.1_seed_1720",
+      "predicted_da_dN_OBSERVED_A_NATIVE_ENVELOPE": 1.639877259141026e-07,
+      "predicted_da_dN_RAW_B1": 1.5931509897421866e-07,
+      "predicted_da_dN_RADIUS_SCALED_B1": 1.6093510660331768e-07,
+      "predicted_local_slope_RADIUS_SCALED_B1": 3.891273588808393,
+      "target_da_dN": 1.4286990725190266e-07,
+      "target_local_slope": 3.845041
+    },
+    {
+      "composite_id": "P40_RADIUS_SCALED_ENVELOPE_V1__DK_16.2__R0p1__n80__seed1720",
+      "parameter_option": "P40_RADIUS_SCALED_ENVELOPE_V1",
+      "Kmax_MPa_sqrt_m": 18.0,
+      "deltaK_MPa_sqrt_m": 16.2,
+      "R": 0.1,
+      "n_bins": 80,
+      "seed": 1720,
+      "temperature_K": 300.0,
+      "frequency_Hz": 1000.0,
+      "target_ext_um": 100,
+      "cycles_max": "1000000000000",
+      "max_wall_seconds": 43200,
+      "fresh": true,
+      "resume": false,
+      "status": "PENDING",
+      "result_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-prospective-paris-candidate-design/runs/prospective_paris_p40_pilot_v1/P40_RADIUS_SCALED_ENVELOPE_V1/K_18_R_0.1_seed_1720",
+      "predicted_da_dN_OBSERVED_A_NATIVE_ENVELOPE": 4.4600484050445897e-07,
+      "predicted_da_dN_RAW_B1": 4.892810925738828e-07,
+      "predicted_da_dN_RADIUS_SCALED_B1": 4.4802918940557583e-07,
+      "predicted_local_slope_RADIUS_SCALED_B1": 3.9557352967800177,
+      "target_da_dN": 4.473410023231301e-07,
+      "target_local_slope": 3.958965
+    },
+    {
+      "composite_id": "P40_RADIUS_SCALED_ENVELOPE_V1__DK_18.9__R0p1__n80__seed1720",
+      "parameter_option": "P40_RADIUS_SCALED_ENVELOPE_V1",
+      "Kmax_MPa_sqrt_m": 21.0,
+      "deltaK_MPa_sqrt_m": 18.9,
+      "R": 0.1,
+      "n_bins": 80,
+      "seed": 1720,
+      "temperature_K": 300.0,
+      "frequency_Hz": 1000.0,
+      "target_ext_um": 100,
+      "cycles_max": "1000000000000",
+      "max_wall_seconds": 43200,
+      "fresh": true,
+      "resume": false,
+      "status": "PENDING",
+      "result_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-prospective-paris-candidate-design/runs/prospective_paris_p40_pilot_v1/P40_RADIUS_SCALED_ENVELOPE_V1/K_21_R_0.1_seed_1720",
+      "predicted_da_dN_OBSERVED_A_NATIVE_ENVELOPE": 6.847496691312505e-07,
+      "predicted_da_dN_RAW_B1": 8.532069680810729e-07,
+      "predicted_da_dN_RADIUS_SCALED_B1": 7.256402392769669e-07,
+      "predicted_local_slope_RADIUS_SCALED_B1": 3.721268560178006,
+      "target_da_dN": 8.084670106097001e-07,
+      "target_local_slope": 3.621605
+    }
+  ],
+  "physical_contract": {
+    "temperature_K": 300.0,
+    "R": 0.1,
+    "frequency_Hz": 1000.0,
+    "mpz_n_bins": 80,
+    "seed": 1720,
+    "target_extension_um": 100,
+    "cycles_max": 1000000000000.0,
+    "max_workers": 3,
+    "fresh_virgin_paths_only": true,
+    "resume_forbidden": true,
+    "rebonding": false,
+    "PT_substitution": false,
+    "explicit_evolution": "primary"
+  },
+  "acceptance_gates": {
+    "all_three_terminal_physical_results": true,
+    "developed_growth_gate": {
+      "transient_exclusion_um": 20,
+      "min_developed_events": 10,
+      "min_developed_growth_um": 50,
+      "late_over_early_rate_ratio_range": [
+        0.5,
+        2.0
+      ],
+      "requires_physical_target_or_qualified_censor": true
+    },
+    "max_abs_log10_rate_error_decade": 0.2,
+    "max_abs_adjacent_slope_error": 1.0,
+    "physical_rate_ordering_monotonic": true,
+    "no_barrier_floor_stress_cap_or_renewal_ceiling_pathology": true,
+    "event_size_not_dominant_source_of_rate_difference": true,
+    "on_failure": "second-ranked eligible candidate is NOT run: P40_RAW_B1_ENVELOPE_V1 is ineligible (E_rate=1.1366>1.0 under OBSERVED_A_NATIVE_ENVELOPE). A single TRANSFER_CALIBRATED_GENERATION_2 row with a new id/hash may then be derived, never overwriting P40_RADIUS_SCALED_ENVELOPE_V1."
+  },
+  "second_candidate_not_launched": {
+    "candidate_id": "P40_RAW_B1_ENVELOPE_V1",
+    "reason": "ineligible under the frozen minimax gates (E_rate=1.1366 > 1.0 in the OBSERVED_A_NATIVE_ENVELOPE scenario) and its five parameters differ from the selected row by <0.5% in every coordinate, so a physical run would be nearly redundant while consuming a second 3-job x 12h wall-clock budget"
+  }
+}

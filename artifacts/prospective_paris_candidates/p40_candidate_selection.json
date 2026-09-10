@@ -1,0 +1,33 @@
+{
+  "canonical_option_order": [
+    "A_NATIVE",
+    "P40_RADIUS_SCALED_ENVELOPE_V1"
+  ],
+  "physics_contract": {
+    "PT_substitution": false,
+    "base_model": "v10.2.30 audited persistent-site sharp-front model",
+    "explicit_recovery": false,
+    "parameter_transfer_only": true,
+    "persistent_sites": true,
+    "physical_front_width": true,
+    "rebonding": false,
+    "source_refresh": false,
+    "stochastic_cleavage": true
+  },
+  "primary_candidates": [
+    {
+      "candidate_id": "A_NATIVE",
+      "option_key": "A_NATIVE",
+      "paper_order": 1,
+      "role": "unchanged A_NATIVE control"
+    },
+    {
+      "candidate_id": "P40_RADIUS_SCALED_ENVELOPE_V1",
+      "option_key": "P40_RADIUS_SCALED_ENVELOPE_V1",
+      "paper_order": 2,
+      "role": "fresh prospective P40 design candidate"
+    }
+  ],
+  "purpose": "Fresh prospective P40 candidate plus the unchanged A_NATIVE control.",
+  "schema": "v10.2.30_prospective_paris_p40_selection_v1"
+}
