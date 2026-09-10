@@ -626,7 +626,11 @@ def lifecycle_decision(rows,sources):
         elif case in ('diffusion_limited','accommodation_limited') and growth:
             channels=('surface_reaction_s','vacancy_transport_s','plastic_accommodation_s')
             minima=[min(channels,key=lambda key:op['rates'][key]) for op in growth]
-            actual=('STABLE_SUBGRID_VOID_WITH_'+minima[0].upper()+'_MINIMUM_ALL_INTERVALS'
+            # Channel keys carry the dimensional ``_s`` suffix.  It is not
+            # part of the controlled-history taxonomy and previously leaked
+            # into only the accommodation enum.
+            limiter=minima[0][:-2] if minima[0].endswith('_s') else minima[0]
+            actual=('STABLE_SUBGRID_VOID_WITH_'+limiter.upper()+'_MINIMUM_ALL_INTERVALS'
                     if len(set(minima))==1 else 'STABLE_SUBGRID_VOID_WITH_MIXED_RATE_MINIMA')
             protocol=len(growth)==8
         elif phase==VoidPhase.DOWNSTREAM_FRONT_ACTIVE:

@@ -84,3 +84,19 @@ def test_v2_controlled_classifier_does_not_infer_connected_zero_drive_from_case_
     assert classified['prospective_expected_classification']=='CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE'
     assert classified['final_source_resolved_classification']=='CONNECTED_VOID_SOURCE_UNQUALIFIED'
     assert classified['passed'] is False
+
+
+def test_v2_accommodation_taxonomy_excludes_dimensional_suffix():
+    from arrhenius_fracture.closure_lifecycle_evidence import lifecycle_decision
+    trace=[]
+    deterministic_trajectory(stop_before_ligament=True,state_trace=trace)
+    state=dict(trace)['subgrid_void']
+    rates={'surface_reaction_s':3.,'vacancy_transport_s':2.,'plastic_accommodation_s':1.}
+    row={'dataset':'controlled','case_identity':'accommodation_limited','terminal_checkpoint':'source',
+         'failure':None,'actual_operations':[{'api':'accepted_load_growth_interval','rates':rates}]*8,
+         'conservation':{'passed':True}}
+    result=lifecycle_decision([row],{'source':state})
+    classified=result['controlled_histories_v2'][0]
+    assert classified['final_source_resolved_classification'] == (
+        'STABLE_SUBGRID_VOID_WITH_PLASTIC_ACCOMMODATION_MINIMUM_ALL_INTERVALS')
+    assert classified['passed']
