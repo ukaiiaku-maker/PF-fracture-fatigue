@@ -9,6 +9,8 @@ INTERRUPTED_NOT_SCIENCE and must be relaunched into a NEW virgin path.
 from __future__ import annotations
 
 import json
+import csv
+import hashlib
 import os
 import shutil
 import subprocess
@@ -58,7 +60,7 @@ def next_virgin_path(base: Path) -> Path:
     """
     for n in range(1, 100):
         cand = base.parent / f"{base.name}__attempt{n}"
-        if not cand.exists():
+        if not cand.exists() and not (cand.parent / f"{cand.name}__launch.json").exists():
             return cand
     raise SystemExit(f"too many attempts for {base}")
 
@@ -77,7 +79,7 @@ def run_one(job: dict, head: str) -> dict:
         "PYTHON_BIN": PY, "CONDA_ENV": "arrhenius-sharp-front-v10-codex",
         "CONDA_DEFAULT_ENV": "arrhenius-sharp-front-v10-codex",
         "EXPECTED_BRANCH": BRANCH, "EXPECTED_HEAD": head, "FAMILY_JSON": FAMILY,
-        "V10230_ENTRY_MODULE": "arrhenius_fracture.sharp_front_v10_2_30_candidate_fixed_deltaK",
+        "V10230_ENTRY_MODULE": "arrhenius_fracture.sharp_front_v10_2_30_prospective_candidate_fixed_deltaK",
         "V10230_CANDIDATE_REGISTRY": str((OUT / "p40_candidate_registry.csv").resolve()),
         "V10230_CANDIDATE_SELECTION": str((OUT / "p40_candidate_selection.json").resolve()),
         "TARGET_FRACTION": "p40_pilot", "TARGET_EXT_UM": "100",
@@ -87,16 +89,25 @@ def run_one(job: dict, head: str) -> dict:
         "TARGET_DELTAK": str(job["deltaK_MPa_sqrt_m"]), "R_RATIO": str(job["R"]),
         "RUN_LABEL": job["composite_id"], "OUTROOT": str(out.resolve()),
     })
-    t0 = time.time()
-    proc = subprocess.run(["bash", "scripts/run_v10_2_30_weakt_high_cycle_1e12.sh"],
-                          cwd=ROOT, env=env, capture_output=True, text=True)
-    rec["exit_code"] = proc.returncode
-    rec["wall_seconds"] = time.time() - t0
-    # the launcher creates OUTROOT; if it failed before that, keep the logs beside it
-    log_dir = out if out.is_dir() else out.parent
-    prefix = "" if out.is_dir() else f"{out.name}__"
-    (log_dir / f"{prefix}launch_stdout.log").write_text(proc.stdout[-200000:])
-    (log_dir / f"{prefix}launch_stderr.log").write_text(proc.stderr[-200000:])
+    rec['launch_head'] = head
+    rec['launch_time_unix'] = time.time()
+    rec['result_path_virgin_at_launch'] = not out.exists()
+    rec['resume'] = False
+    launch_record = out.parent / f'{out.name}__launch.json'
+    if launch_record.exists():
+        raise RuntimeError('launch record already exists; attempt cannot be reused')
+    launch_record.write_text(json.dumps(rec, indent=2, sort_keys=True) + '\n')
+    t0 = time.monotonic()
+    # File-backed output prevents orphan watchdog sleep processes holding a
+    # captured pipe open for twelve hours after a preflight failure.
+    stdout_path = out.parent / f'{out.name}__launch_stdout.log'
+    stderr_path = out.parent / f'{out.name}__launch_stderr.log'
+    with stdout_path.open('x') as stdout, stderr_path.open('x') as stderr:
+        proc = subprocess.run(['bash', 'scripts/run_v10_2_30_weakt_high_cycle_1e12.sh'],
+                              cwd=ROOT, env=env, stdout=stdout, stderr=stderr)
+    rec['exit_code'] = proc.returncode
+    rec['wall_seconds'] = time.monotonic() - t0
+    rec['completion_time_unix'] = time.time()
     summary = out / "developed_fatigue_growth_summary.json"
     checkpoint = out / "high_cycle_live_checkpoint.json"
     if proc.returncode == 0 and summary.is_file():
@@ -146,6 +157,16 @@ def main() -> None:
     jobs = freeze["physical_jobs"]
     print(json.dumps(dict(head=head, jobs=len(jobs), free_gib=round(free_gib(), 1))), flush=True)
 
+    sys.path.insert(0, str(ROOT))
+    from scripts.verify_v10_2_30_prospective_launch import verify
+    verify()
+    processes = subprocess.check_output(['ps', '-axo', 'pid,command'], text=True)
+    conflicts = [line for line in processes.splitlines()
+                 if str(os.getpid()) != line.strip().split(None, 1)[0]
+                 and (' -m arrhenius_fracture.sharp_front_v10_2_30_' in line
+                      or ('/python' in line and 'run_p40_pilots.py' in line))]
+    if conflicts:
+        raise SystemExit('conflicting workers: ' + '\n'.join(conflicts))
     results = []
     with ThreadPoolExecutor(max_workers=3) as ex:
         futs = {ex.submit(run_one, j, head): j for j in jobs}
@@ -160,7 +181,8 @@ def main() -> None:
             # tracked worktree while jobs are live would dirty it and trip the
             # launcher's clean-tree gate for any job that starts afterwards.
             _write_attempts(results, PROGRESS)
-    _write_attempts(results, ATTEMPTS)
+    # Tracked attempt accounting is imported after workers finish.
+    _write_attempts(results, PROGRESS)
     print(json.dumps(dict(completed=len(results),
                           statuses={r["composite_id"]: r["status"] for r in results}),
                      indent=2, default=str))
