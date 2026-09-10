@@ -1,0 +1,25 @@
+{
+  "admitted_stages": {
+    "P40_TRANSFER_CALIBRATED_GEN2": [
+      "GRID"
+    ],
+    "P25_TRANSFER_V1_RANK1": [
+      "GRID"
+    ],
+    "P55_TRANSFER_V1_RANK1": []
+  },
+  "evidence_decisions": {
+    "P40_TRANSFER_CALIBRATED_GEN2": {
+      "status": "PILOT_PASSED"
+    },
+    "P25_TRANSFER_V1_RANK1": {
+      "status": "PILOT_PASSED"
+    },
+    "P55_TRANSFER_V1_RANK1": {
+      "status": "TERMINAL_BOUNDED_PILOT_FAILURE",
+      "classification": "TARGET_NOT_TRANSFERRED_WITH_SINGLE_EXP_FLOOR"
+    }
+  },
+  "source_results": "runs/prospective_paris_transfer_v1/analysis_work/harvested_results.json",
+  "automatic_promotion_from_global_slope_alone": false
+}
