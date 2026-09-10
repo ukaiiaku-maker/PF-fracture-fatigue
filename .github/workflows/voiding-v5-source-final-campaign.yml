@@ -129,6 +129,14 @@ jobs:
         with:
           name: v5-source-final-complete-${{ github.sha }}
           path: /tmp/source-final-complete
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-source-final-ledger-${{ github.sha }}
+          path: |
+            /tmp/source-final-complete/a/scientific_ledger.json
+            /tmp/source-final-complete/b/scientific_ledger.json
+            /tmp/source-final-complete/paired_comparison.json
 
   publication-package:
     needs: complete-ontology
