@@ -202,9 +202,17 @@ def solver_budget(state) -> dict:
     prescribed[2 * int(state.boundary.right_bot)] = True
     free = np.flatnonzero(~prescribed)
     matrix = stiffness.tocsr()[free][:, free]
-    largest = float(eigsh(matrix, k=1, which="LM", return_eigenvectors=False, tol=1e-8)[0])
+    # ARPACK otherwise chooses a random initial residual. That is harmless for
+    # this estimate but makes independently repeated evidence differ in its
+    # last few bits. Freeze a full-support vector without rounding any result.
+    initial = np.linspace(1.0, 2.0, matrix.shape[0], dtype=float)
+    initial /= np.linalg.norm(initial)
+    largest = float(eigsh(
+        matrix, k=1, which="LM", return_eigenvectors=False, tol=1e-8, v0=initial
+    )[0])
     smallest = float(eigsh(
-        matrix, k=1, sigma=0.0, which="LM", return_eigenvectors=False, tol=1e-8
+        matrix, k=1, sigma=0.0, which="LM", return_eigenvectors=False, tol=1e-8,
+        v0=initial,
     )[0])
     if not math.isfinite(largest + smallest) or smallest <= 0.0:
         raise ValueError("free stiffness is not numerically positive definite")

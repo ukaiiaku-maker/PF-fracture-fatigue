@@ -73,6 +73,7 @@ def test_missing_event_selection_margin_fails_closed():
 def test_solver_budget_is_measured_from_the_free_system():
     state, _ = build_production_void_state(stochastic=True, seed=12000)
     budget = solver_budget(state)
+    assert budget == solver_budget(state)
     assert budget["condition_number"] >= 1.0
     assert budget["free_residual_relative"] >= 0.0
     assert budget["free_dof_count"] < state.mesh.ndof
