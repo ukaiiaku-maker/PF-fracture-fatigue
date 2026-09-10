@@ -1,0 +1,54 @@
+{
+  "calibration_Kmax": [
+    13.5,
+    18.0,
+    21.0
+  ],
+  "calibration_R": 0.1,
+  "calibration_candidate": "P40_RADIUS_SCALED_ENVELOPE_V1",
+  "calibration_inputs_sha256": "a49e2660ae692895782725eb34a9b1dcd5593d5f58ec2a26d1a5ff334414c195",
+  "calibration_role": "not independent validation of generation 2",
+  "calibration_seed": 1720,
+  "cleavage_hits": 3.2732414351776242,
+  "cleavage_tau_s": 6.992153587194454e-07,
+  "correction_fit_residuals": [
+    -0.001510119665141807,
+    0.004328364485112868,
+    -0.0028182448199709498
+  ],
+  "fitted_log10_offsets": [
+    0.7243529629463972,
+    0.6484625585981133,
+    0.6077976769704466
+  ],
+  "formula": "r=10**(a_r+b_r*log10(Kmax/18)); g_transfer=g_A0(Kmax,R,r)*10**(a_g+b_g*log10(Kmax/18))",
+  "gen2_reason": "Original P40 matches sensitivity prediction rates but fails the target adjacent-slope profile by more than 1.0; one separately identified P40_TRANSFER_CALIBRATED_GEN2 is necessary.",
+  "gstar": 4.473410023231299e-07,
+  "gstar_changed": false,
+  "log10_radius_coefficients": [
+    -5.950992142054003,
+    0.33885863061218446
+  ],
+  "log10_rate_correction_coefficients": [
+    0.6484625585981133,
+    -0.607420936120162
+  ],
+  "method_prospectively_recorded": "runs/prospective_paris_p40_pilot_v1/analysis_work/transfer_method_before_terminal_results.json",
+  "original_candidate_row_sha256": "eb1373bd5a124b296e8f12dcc2a2c07fd0bb9af42d1dd0f28f36179d2eda8281",
+  "original_pilot_classification": "P40_EFFECTIVE_RATE_TRANSFER_ONLY",
+  "original_prediction_adjacent_slope_gate_passed": true,
+  "original_predictions_changed": false,
+  "original_target_adjacent_slope_gate_passed": false,
+  "original_target_slope_errors": [
+    -1.0593043459699003,
+    -1.6949514635719392
+  ],
+  "physical_solver_changed": false,
+  "raw_log10_offsets": [
+    0.7228428432812554,
+    0.6527909230832262,
+    0.6049794321504757
+  ],
+  "scope": "analysis-only transfer; no empirical law enters physical solver",
+  "transfer_update_number": 1
+}
