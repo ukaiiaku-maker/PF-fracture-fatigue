@@ -110,7 +110,6 @@ def exact_projection(state) -> dict:
         "complete_crack_graph_fingerprint": support.complete_crack_graph_fingerprint,
         "certification_arc_fingerprint": support.certification_arc_fingerprint,
         "selected_support_elements": list(support.selected_support_elements),
-        "accepted_p0_damage_fingerprint": support.accepted_p0_damage_fingerprint,
         "active_tip_identities": list(support.active_tip_identities),
         "transaction_identity": support.transaction_identity,
         "previous_accepted_transaction": support.previous_accepted_transaction,

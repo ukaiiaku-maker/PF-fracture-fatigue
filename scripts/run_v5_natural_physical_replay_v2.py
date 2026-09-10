@@ -19,7 +19,9 @@ from arrhenius_fracture.closure_mechanics_evidence import canonical_data
 from arrhenius_fracture.natural_future_physical_replay_v2 import compare_states, exact_projection, solver_budget
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint as fingerprint
 from arrhenius_fracture.voiding_lifecycle_driver_v5 import NATURAL_WINDOW_S, advance_production_void_interval
-from arrhenius_fracture.voiding_production_v5 import build_production_void_state
+from arrhenius_fracture.voiding_production_v5 import (
+    build_production_void_state, crack_tip_tensor, directional_clock_rates,
+)
 from arrhenius_fracture.voiding_v5 import VoidPhase
 
 
@@ -41,20 +43,41 @@ def advance_half(state, partitions):
 
 def subsequent_growth_crossing(state):
     cavity = state.void_state.cavities[0] if state.void_state.cavities else None
-    if cavity is None or cavity.phase != VoidPhase.STABLE_SUBGRID_VOID:
-        raise RuntimeError("V2 registered subsequent crossing requires the retained stable-subgrid terminal")
-    margin = 5.0e-5 - cavity.radius_m
-    if margin <= 0.0:
-        raise RuntimeError("subsequent growth crossing has no positive radius margin")
-    grown, first = advance_transition(state, "subgrid_growth", 1)
-    promoted, second = advance_transition(grown, "promotion", 1)
-    return promoted, {
-        "real_crossing_executed": True,
-        "selected_event_identity": "SUBGRID_RADIUS_CROSSING_THEN_GEOMETRIC_PROMOTION",
-        "minimum_event_selection_margin_action": margin,
-        "event_selection_margin_quantity": "remaining_radius_to_promotion_m",
-        "operations": first + second,
-    }
+    if cavity is None:
+        raise RuntimeError("V2 registered subsequent crossing requires an owned cavity")
+    if cavity.phase == VoidPhase.STABLE_SUBGRID_VOID:
+        margin = 5.0e-5 - cavity.radius_m
+        if margin <= 0.0:
+            raise RuntimeError("subsequent growth crossing has no positive radius margin")
+        grown, first = advance_transition(state, "subgrid_growth", 1)
+        promoted, second = advance_transition(grown, "promotion", 1)
+        return promoted, {
+            "real_crossing_executed": True,
+            "selected_event_identity": "SUBGRID_RADIUS_CROSSING_THEN_GEOMETRIC_PROMOTION",
+            "minimum_event_selection_margin_action": margin,
+            "event_selection_margin_quantity": "remaining_radius_to_promotion_m",
+            "operations": first + second,
+        }
+    if cavity.phase == VoidPhase.RESOLVED_VOID:
+        root = state.crack_network.branches[0]
+        tensor, _ = crack_tip_tensor(state, branch_id=root.branch_id)
+        rows = directional_clock_rates(state, tensor)
+        finite = sorted(row["crossing_time_s"] for row in rows if math.isfinite(row["crossing_time_s"]))
+        if not finite:
+            raise RuntimeError("resolved terminal has no active ligament crossing")
+        hazards = state.competition.hazard_states
+        margin = min(hazard.current_threshold_action - hazard.action for hazard in hazards)
+        crossed, operations = advance_transition(state, "ligament", 1)
+        return crossed, {
+            "real_crossing_executed": True,
+            "selected_event_identity": "CRACK_TO_VOID_LIGAMENT",
+            "minimum_event_selection_margin_action": margin,
+            "event_selection_margin_quantity": "remaining_owned_hazard_action",
+            "crossing_time_s": finite[0],
+            "next_competitor_crossing_time_s": finite[1] if len(finite) > 1 else None,
+            "operations": operations,
+        }
+    raise RuntimeError("unregistered V2 subsequent crossing phase: " + cavity.phase.value)
 
 
 def clean_head():
