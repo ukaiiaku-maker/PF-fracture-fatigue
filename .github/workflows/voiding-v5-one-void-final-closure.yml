@@ -19,6 +19,12 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
+            /artifacts/voiding_v5_source_resolution_and_final_closure/development/phase9_static_96_a34/report.json
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -49,6 +55,11 @@ jobs:
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -95,6 +106,11 @@ jobs:
           - negative_offset
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -129,6 +145,11 @@ jobs:
                12024, 12025, 12026, 12027, 12028, 12029, 12030, 12031]
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -177,6 +198,11 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
