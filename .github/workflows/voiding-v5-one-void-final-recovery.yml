@@ -1,0 +1,166 @@
+name: V5 one-void final postprocess-only recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Exact one-void closure run containing immutable A/B artifacts
+        required: true
+        type: string
+      implementation_sha:
+        description: Exact implementation SHA used by every source artifact
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  regression-triage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /tests/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+            /artifacts/voiding_v5_finalization_v3_closure/regressions/full-regression-3cbb11b.xml
+            /artifacts/voiding_v5_semantic_hardening/general_ci_inheritance.json
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Configure prospective fixed numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
+      - name: Exact-head regression and inherited-failure comparison
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor '${{ inputs.implementation_sha }}' "$GITHUB_SHA"
+          mkdir -p /tmp/one-void-final-recovery/regressions
+          set +e
+          python -m pytest -q --junitxml=/tmp/one-void-final-recovery/regressions/full.xml > /tmp/one-void-final-recovery/regressions/full.log 2>&1
+          test_result=$?
+          set -e
+          python scripts/triage_voiding_v5_closure_regressions.py \
+            artifacts/voiding_v5_finalization_v3_closure/regressions/full-regression-3cbb11b.xml \
+            --rerun /tmp/one-void-final-recovery/regressions/full.xml \
+            > /tmp/one-void-final-recovery/regressions/inheritance.json
+          python scripts/qualify_v5_source_resolution_focused_results_v1.py \
+            /tmp/one-void-final-recovery/regressions/full.xml \
+            /tmp/one-void-final-recovery/regressions/focused.json
+          test "$test_result" -le 1
+          python -c 'import json; r=json.load(open("/tmp/one-void-final-recovery/regressions/inheritance.json")); assert not r["rerun_additional_failures"], r["rerun_additional_failures"]'
+      - name: Clean worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-one-void-final-recovery-regressions-${{ github.sha }}
+          path: /tmp/one-void-final-recovery/regressions
+
+  assemble-immutable-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Verify recovery head and physical ancestor
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor '${{ inputs.implementation_sha }}' "$GITHUB_SHA"
+      - uses: actions/download-artifact@v4
+        with:
+          name: v5-one-void-bounded-${{ inputs.implementation_sha }}
+          path: /tmp/final-bounded
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: v5-one-void-static-${{ inputs.implementation_sha }}
+          path: /tmp/final-static
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v5-one-void-controlled-*-${{ inputs.implementation_sha }}
+          path: /tmp/final-controlled
+          merge-multiple: true
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v5-one-void-replay-*-${{ inputs.implementation_sha }}
+          path: /tmp/final-replay
+          merge-multiple: true
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: v5-source-final-ledger-${{ inputs.implementation_sha }}
+          path: /tmp/final-baseline
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Native final schema, ontology, and exact-pair audit
+        run: >-
+          python scripts/assemble_v5_one_void_final_closure_v2.py
+          /tmp/final-baseline/a/scientific_ledger.json /tmp/final-bounded
+          /tmp/final-static /tmp/final-controlled /tmp/final-replay
+          /tmp/one-void-final-recovery/ledger
+      - name: Exact-head validator and clean checks
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python -c 'import json; from arrhenius_fracture.one_void_final_closure_v2 import validate; r=json.load(open("/tmp/one-void-final-recovery/ledger/scientific_ledger.json")); assert r["physical_baseline_implementation_sha"] == "${{ inputs.implementation_sha }}"; assert validate(r)["valid"]'
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-one-void-final-recovered-ledger-${{ github.sha }}
+          path: /tmp/one-void-final-recovery/ledger
+
+  terminal:
+    needs: [regression-triage, assemble-immutable-evidence]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require exact-head triage and native recovered assembly
+        run: |
+          test '${{ needs.regression-triage.result }}' = success
+          test '${{ needs.assemble-immutable-evidence.result }}' = success
