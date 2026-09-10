@@ -25,6 +25,20 @@ FAMILY = ("/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_2
 BRANCH = "codex/v10.2.30-prospective-paris-candidate-design"
 MIN_FREE_GIB = 3.0
 ATTEMPTS = OUT / "physical_attempt_registry.csv"
+PROGRESS = ROOT / "runs" / "prospective_paris_p40_pilot_v1" / "attempt_progress.csv"
+
+
+def _write_attempts(results, path) -> None:
+    import csv
+    if not results:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fields = sorted({k for row in results for k in row})
+    with path.open("w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=fields, lineterminator="\n")
+        w.writeheader()
+        for row in results:
+            w.writerow({k: row.get(k, "") for k in fields})
 
 
 def git(*a) -> str:
@@ -132,7 +146,6 @@ def main() -> None:
     jobs = freeze["physical_jobs"]
     print(json.dumps(dict(head=head, jobs=len(jobs), free_gib=round(free_gib(), 1))), flush=True)
 
-    import csv
     results = []
     with ThreadPoolExecutor(max_workers=3) as ex:
         futs = {ex.submit(run_one, j, head): j for j in jobs}
@@ -143,12 +156,11 @@ def main() -> None:
                               ("composite_id", "status", "exit_code", "wall_seconds",
                                "developed_da_dN", "event_count", "final_extension_um")},
                              default=str), flush=True)
-            fields = sorted({k for row in results for k in row})
-            with ATTEMPTS.open("w", newline="") as fh:
-                w = csv.DictWriter(fh, fieldnames=fields, lineterminator="\n")
-                w.writeheader()
-                for row in results:
-                    w.writerow({k: row.get(k, "") for k in fields})
+            # progress goes to the gitignored runs/ tree: writing into the
+            # tracked worktree while jobs are live would dirty it and trip the
+            # launcher's clean-tree gate for any job that starts afterwards.
+            _write_attempts(results, PROGRESS)
+    _write_attempts(results, ATTEMPTS)
     print(json.dumps(dict(completed=len(results),
                           statuses={r["composite_id"]: r["status"] for r in results}),
                      indent=2, default=str))
