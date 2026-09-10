@@ -38,16 +38,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /arrhenius_fracture/
-            /scripts/
-            /tests/
-            /runtime_inputs/
-            /pyproject.toml
-            /requirements-v5-source-resolution-ci.txt
-            /artifacts/voiding_v5_finalization_v3_closure/regressions/full-regression-3cbb11b.xml
-            /artifacts/voiding_v5_semantic_hardening/general_ci_inheritance.json
       - name: Reserve disposable runner storage
         run: bash scripts/prepare_v5_ci_storage_v1.sh
       - uses: actions/setup-python@v5
