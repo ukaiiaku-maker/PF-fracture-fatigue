@@ -35,6 +35,19 @@ def _digest(value: Any) -> str:
     return hashlib.sha256(json.dumps(_canonical(value), sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def _maximum_ulp_difference(first: np.ndarray, second: np.ndarray) -> int:
+    """Return the largest representable-float step between finite arrays."""
+    left = np.asarray(first, dtype=np.float64)
+    right = np.asarray(second, dtype=np.float64)
+    if left.shape != right.shape or not np.isfinite(left).all() or not np.isfinite(right).all():
+        raise ValueError("ULP comparison requires equal-shape finite arrays")
+    def ordered(value):
+        bits = value.view(np.int64)
+        return np.where(bits < 0, np.iinfo(np.int64).min - bits, bits)
+    delta = np.abs(ordered(left).astype(object) - ordered(right).astype(object))
+    return int(max(delta.flat, default=0))
+
+
 def _branch_exact(branch) -> dict:
     return {
         "branch_id": branch.branch_id,
@@ -73,7 +86,7 @@ def exact_projection(state) -> dict:
         for cavity in state.void_state.cavities:
             cavity_topology.append({
                 "cavity_id": cavity.cavity_id,
-                "source_site_id": cavity.source_site_id,
+                "parent_site_id": cavity.parent_site_id,
                 "phase": cavity.phase.value,
                 "lineage": _canonical(cavity.lineage),
                 "center_m": _canonical(cavity.center_m),
@@ -211,7 +224,9 @@ def compare_states(reference, replay, *, case_identity: str, seed: int,
             "quantity": name, "units_from_quantity_name": name.split("_", 1)[-1],
             "physical_scale": scale, "absolute_error": absolute_error,
             "normalized_error": normalized_error, "relative_limit": relative_limit,
-            "absolute_limit": limit, "passed": absolute_error <= limit,
+            "absolute_limit": limit,
+            "maximum_ulp_difference": _maximum_ulp_difference(a, b),
+            "passed": absolute_error <= limit,
         })
     threshold_margins = [
         abs(hazard.current_threshold_action - hazard.action)
@@ -228,11 +243,22 @@ def compare_states(reference, replay, *, case_identity: str, seed: int,
         or maximum_action_error < DECISION_MARGIN_FRACTION * minimum_threshold_margin
     )
     crossing = dict(subsequent_crossing or {})
+    selection_margin = crossing.get("minimum_event_selection_margin_action")
+    selection_error = crossing.get("maximum_event_selection_perturbation_action")
+    selection_safe = bool(
+        isinstance(selection_margin, (int, float))
+        and isinstance(selection_error, (int, float))
+        and math.isfinite(float(selection_margin))
+        and math.isfinite(float(selection_error))
+        and float(selection_margin) > 0.0
+        and 0.0 <= float(selection_error) < DECISION_MARGIN_FRACTION * float(selection_margin)
+    )
     crossing_passed = bool(
         crossing.get("real_crossing_executed")
         and crossing.get("selected_event_identity_exact")
         and crossing.get("accepted_topology_exact")
         and crossing.get("categorical_terminal_exact")
+        and selection_safe
     )
     passed = bool(
         all(exact_checks.values())
@@ -259,6 +285,11 @@ def compare_states(reference, replay, *, case_identity: str, seed: int,
             "passed": threshold_safe,
         },
         "subsequent_real_crossing": crossing,
+        "event_selection_safety": {
+            "minimum_margin_action": selection_margin,
+            "maximum_perturbation_action": selection_error,
+            "passed": selection_safe,
+        },
         "passed": passed,
     }
 

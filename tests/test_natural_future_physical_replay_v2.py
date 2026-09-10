@@ -10,6 +10,8 @@ CROSSING = {
     "selected_event_identity_exact": True,
     "accepted_topology_exact": True,
     "categorical_terminal_exact": True,
+    "minimum_event_selection_margin_action": 0.25,
+    "maximum_event_selection_perturbation_action": 0.0,
 }
 
 
@@ -48,4 +50,21 @@ def test_missing_subsequent_real_crossing_fails_closed():
     result = compare_states(state, state, case_identity="12000", seed=12000,
                             solver_condition_number=100.0, free_residual_relative=1e-12,
                             subsequent_crossing=None)
+    assert not result["passed"]
+
+
+def test_exact_projection_covers_a_real_cavity_checkpoint():
+    from arrhenius_fracture.voiding_production_v5 import deterministic_trajectory
+    trace = []
+    deterministic_trajectory(stop_before_ligament=True, state_trace=trace)
+    projected = exact_projection(dict(trace)["subgrid_void"])
+    assert projected["cavity_topology"][0]["parent_site_id"] == "site-1"
+
+
+def test_missing_event_selection_margin_fails_closed():
+    state, _ = build_production_void_state(stochastic=True, seed=12000)
+    crossing = {key: value for key, value in CROSSING.items() if "margin" not in key}
+    result = compare_states(state, state, case_identity="12000", seed=12000,
+                            solver_condition_number=100.0, free_residual_relative=1e-12,
+                            subsequent_crossing=crossing)
     assert not result["passed"]
