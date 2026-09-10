@@ -1,6 +1,7 @@
 name: V5 one-void final scientific closure
 
 on:
+  workflow_call:
   workflow_dispatch:
 
 permissions:

@@ -3,54 +3,9 @@ name: V5 finalization-v3 exact-head qualification
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  qualify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: pip
-      - run: pip install -e '.[test]'
-      - name: Require exact workflow head
-        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-      - name: Complete focused regression set
-        run: >-
-          python -m pytest -q tests/test_explicit_cavity_v5.py tests/test_voiding_v5.py
-          tests/test_evidence_ontology_v5.py tests/test_voiding_v5_ci_inheritance.py
-          tests/test_v12_stage2_base_v3.py tests/test_topology_transaction_v11.py
-          tests/test_sharp_wake_backend_v12.py tests/test_v12_mechanically_separating_wake.py
-          tests/test_crack_void_fixed_geometry_v3.py tests/test_finalization_v3_schema.py
-      - name: V3 static, production, and complete campaign A/B
-        shell: bash
-        run: |
-          set +e
-          python scripts/run_voiding_v5_finalization_v3.py /tmp/v3-a --criteria-sha da742b231b4413b3118e0546256bfadaf9022a55 --implementation-sha "$GITHUB_SHA"
-          a=$?
-          python scripts/run_voiding_v5_finalization_v3.py /tmp/v3-b --criteria-sha da742b231b4413b3118e0546256bfadaf9022a55 --implementation-sha "$GITHUB_SHA"
-          b=$?
-          set -e
-          test "$a" -eq "$b"
-          test "$a" -eq 0 -o "$a" -eq 2
-          diff -ru /tmp/v3-a /tmp/v3-b
-      - name: Substantive ontology and manifests
-        if: always()
-        run: |
-          python -m json.tool /tmp/v3-a/evidence_rows.json >/dev/null
-          python -m json.tool /tmp/v3-a/campaign_manifest.json >/dev/null
-          python -m json.tool /tmp/v3-a/sha256_manifest.json >/dev/null
-      - name: Clean-worktree and diff checks
-        if: always()
-        run: |
-          git diff --check
-          test -z "$(git status --short)"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: voiding-v5-finalization-v3-${{ github.sha }}
-          path: |
-            /tmp/v3-a
-            /tmp/v3-b
+  final-one-void-closure:
+    uses: ./.github/workflows/voiding-v5-one-void-final-closure.yml
