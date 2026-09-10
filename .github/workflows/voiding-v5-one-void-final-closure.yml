@@ -22,8 +22,12 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            /*
-            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
+            /arrhenius_fracture/
+            /scripts/
+            /tests/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
             /artifacts/voiding_v5_source_resolution_and_final_closure/development/phase9_static_96_a34/report.json
       - uses: actions/setup-python@v5
         with:
@@ -58,8 +62,11 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            /*
-            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -109,8 +116,11 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            /*
-            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -148,8 +158,11 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            /*
-            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -201,8 +214,11 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            /*
-            !/artifacts/voiding_v5_source_resolution_and_final_closure/development/
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
