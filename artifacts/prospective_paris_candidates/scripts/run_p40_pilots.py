@@ -35,16 +35,29 @@ def free_gib() -> float:
     return shutil.disk_usage(ROOT).free / 2 ** 30
 
 
+def next_virgin_path(base: Path) -> Path:
+    """Return a never-used attempt directory for this frozen job key.
+
+    The low-level launcher refuses to write into an existing OUTROOT, and the
+    contract forbids resuming, so every attempt gets its own virgin directory
+    and the launcher (not this controller) creates it.
+    """
+    for n in range(1, 100):
+        cand = base.parent / f"{base.name}__attempt{n}"
+        if not cand.exists():
+            return cand
+    raise SystemExit(f"too many attempts for {base}")
+
+
 def run_one(job: dict, head: str) -> dict:
     rec = dict(job)
-    out = Path(job["result_path"])
-    if out.exists():
-        rec["status"] = "REFUSED_RESULT_PATH_EXISTS_NOT_VIRGIN"
-        return rec
     if free_gib() < MIN_FREE_GIB:
         rec["status"] = "REFUSED_INSUFFICIENT_DISK"
         return rec
-    out.mkdir(parents=True, exist_ok=False)
+    out = next_virgin_path(Path(job["result_path"]))
+    rec["attempt_path"] = str(out)
+    # create only the PARENT; the launcher must create OUTROOT itself
+    out.parent.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env.update({
         "PYTHON_BIN": PY, "CONDA_ENV": "arrhenius-sharp-front-v10-codex",
@@ -65,8 +78,11 @@ def run_one(job: dict, head: str) -> dict:
                           cwd=ROOT, env=env, capture_output=True, text=True)
     rec["exit_code"] = proc.returncode
     rec["wall_seconds"] = time.time() - t0
-    (out / "launch_stdout.log").write_text(proc.stdout[-200000:])
-    (out / "launch_stderr.log").write_text(proc.stderr[-200000:])
+    # the launcher creates OUTROOT; if it failed before that, keep the logs beside it
+    log_dir = out if out.is_dir() else out.parent
+    prefix = "" if out.is_dir() else f"{out.name}__"
+    (log_dir / f"{prefix}launch_stdout.log").write_text(proc.stdout[-200000:])
+    (log_dir / f"{prefix}launch_stderr.log").write_text(proc.stderr[-200000:])
     summary = out / "developed_fatigue_growth_summary.json"
     checkpoint = out / "high_cycle_live_checkpoint.json"
     if proc.returncode == 0 and summary.is_file():
