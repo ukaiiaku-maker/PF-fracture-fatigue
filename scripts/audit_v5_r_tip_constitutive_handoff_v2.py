@@ -22,7 +22,11 @@ def main() -> None:
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("refusing to overwrite evidence")
-    status = subprocess.check_output(("git", "status", "--porcelain"), cwd=ROOT, text=True)
+    # Canonical calculations must use committed code.  Untracked audit bundles
+    # are outside the import graph and do not make the implementation dirty.
+    status = subprocess.check_output(
+        ("git", "status", "--porcelain", "--untracked-files=no"), cwd=ROOT, text=True
+    )
     if status.strip() and not args.allow_dirty_development:
         raise ValueError("canonical audit requires a clean committed implementation")
     payload = {
