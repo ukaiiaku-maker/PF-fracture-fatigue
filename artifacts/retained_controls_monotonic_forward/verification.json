@@ -1,4 +1,28 @@
 {
-  "status": "PENDING_STRICT_CLEAN_COMMIT_VERIFICATION",
-  "passed": false
+  "status": "PASS",
+  "passed": true,
+  "validated_commit": "83546a994baeda30e314c6562280d1b64b0dde38",
+  "strict_verifier": {
+    "passed": true,
+    "conditions": 444,
+    "tier_records": 1776,
+    "F0_roots_independently_verified": 444,
+    "F1_roots_reintegrated": 211,
+    "derivative_records": 655,
+    "figures": 10,
+    "new_physical_trajectories": 0,
+    "production_source_and_fatigue_freeze_unchanged": true
+  },
+  "focused_tests_passed": 113,
+  "shell_syntax": "PASS both production launchers",
+  "git_diff_check": "PASS",
+  "new_physical_trajectories": 0,
+  "physical_source_unchanged": true,
+  "limitations": {
+    "F1_admitted": 211,
+    "F1_unavailable": 233,
+    "F2_unavailable": 444
+  },
+  "final_evidence_commit_policy": "Rerun strict verifier on final clean evidence commit; recording this result does not claim unavailable states converged.",
+  "plot_QA": "Absolute scales visible on logarithmic axis; BEST sampled points are not joined across F1-unavailable branches."
 }

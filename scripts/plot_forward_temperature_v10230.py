@@ -19,6 +19,11 @@ def main():
  def line(ax,p,table,rows,x,y,label,**kw):
   vals=[(float(r[x]),float(r[y])) for r in rows if r.get(x) not in ('',None) and r.get(y) not in ('',None)]
   xx=[v[0] for v in vals]; yy=[v[1] for v in vals]
+  # BEST may select different available tiers at neighboring temperatures.
+  # Show sampled values without connecting across unavailable F1 branches.
+  if rows and rows[0].get('tier')=='BEST_CURRENT_MONOTONIC_FORWARD':
+   marker={':':'v','-':'o','--':'^'}.get(kw.get('ls','-'),'o')
+   kw.update(ls='none',marker=marker,ms=3)
   ax.plot(xx,yy,label=label,**kw);p['series'].append(dict(table=table,x_column=x,y_column=y,x=xx,y=yy,label=label))
  def finish(fig,ax,p,xlabel,ylabel,log=False,legend=True):
   ax.set_xlabel(xlabel);ax.set_ylabel(ylabel)
@@ -83,7 +88,7 @@ def main():
   if r['fatigue_global_slope']:line(ax,p,'fatigue_fracture_forward_crosswalk.csv',[r],'fatigue_global_slope','K_FP_300K',LABELS[r['candidate_id']],marker='o',ls='none',color=COLORS[r['candidate_id']])
  finish(fig,ax,p,'Physical fatigue global slope (P55: pilot only)','KFP at 300 K (MPa √m)',True)
  fig,ax=plt.subplots(figsize=(12,5));ax.axis('off');ax.set_title('Final forward classifications — full signed state remains unavailable')
- cells=[[LABELS[r['candidate_id']],f"{float(r['K_FP_300K']):.4g}",f"{float(r['K_FP_1200K']):.4g}",'Inadmissible over full T interval','F2 unavailable'] for r in cross]
+ cells=[[LABELS[r['candidate_id']],f"{float(r['K_FP_300K']):.4g}",f"{float(r['K_FP_1200K']):.4g}",('Inadmissible over full T interval' if r['forward_classification']=='FRACTURE_INADMISSIBLE_DESPITE_FATIGUE_CONTROL' else r['forward_classification']),'F2 unavailable'] for r in cross]
  t=ax.table(cellText=cells,colLabels=['Row','KFP 300 K','KFP 1200 K','Available forward hierarchy','Full state'],loc='center',cellLoc='center');t.auto_set_font_size(False);t.set_fontsize(9);t.scale(1,2)
  p=dict(name='10_FINAL_FORWARD_CLASSIFICATION',series=[],classification_rows=cross,source_hashes={'fatigue_fracture_forward_crosswalk.csv':hashlib.sha256((ART/'fatigue_fracture_forward_crosswalk.csv').read_bytes()).hexdigest()})
  fig.tight_layout();fig.savefig(FIG/(p['name']+'.png'),dpi=150);plt.close(fig);plots.append(p)
