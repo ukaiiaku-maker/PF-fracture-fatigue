@@ -14,7 +14,7 @@
     "arrhenius_fracture/stochastic_hazard_tip.py": "b312bec87e4a7cdd2caa25f9bf4d007499f5ca79ed941ec1d5aaef5f3a2dd499",
     "scripts/run_v10_2_30_four_class_monotonic_parity.sh": "27a6cc1b259dce373cc7f0eb557a1406825283ebaea2ab2ef32bb6dde44073a8",
     "scripts/forward_temperature_model_v10230.py": "c8134722eab8bc7c506dae8fbbdb7cfa45a7c8a5f4e5203c6eaf82554780da64",
-    "scripts/analyze_forward_temperature_v10230.py": "b93eac1deb84e1dfa0b05fa10dc9c2a66fbf240a5d652d4f4f5a344869ad8f1f"
+    "scripts/analyze_forward_temperature_v10230.py": "813c2e97a23e32d8230eda9215519949bd389814f8c8b9dc7135cbbe6191982a"
   },
   "executed_fatigue_controls": {
     "multihit_m": 3.0,
@@ -87,5 +87,6 @@
     "canonical_targets": false,
     "fracture_fit": false,
     "only_current_fatigue_rows_and_current_source": true
-  }
+  },
+  "numerical_admission_amendment": "F1 roots must additionally pass fresh tighter integration ending exactly at K_FP, after P25 925 K reference-rate root failed this unchanged verifier check. Rejected pre-admission results are preserved under runs/conditions; no physics or gate tolerance changed."
 }

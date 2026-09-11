@@ -54,6 +54,12 @@ def verify():
     from arrhenius_fracture.stochastic_hazard_tip import draw_hazard_threshold
     xi=draw_hazard_threshold(mode='exponential',rng=np.random.default_rng(np.random.SeedSequence([1720,1])))
     verified_f0=0;verified_f1=0
+    action_rows=read('monotonic_cumulative_action.csv')
+    action_groups={}
+    for ar in action_rows:
+        key=(ar['candidate_id'],float(ar['temperature_K']),float(ar['Kdot']),ar['tier'])
+        action_groups.setdefault(key,[]).append(ar)
+    gx,gw=np.polynomial.legendre.leggauss(96);gx=(gx+1)/2;gw=gw/2
     for r in records:
         close(r['threshold_action'],xi,1e-14,0)
         if r['tier']=='F2_CURRENT_STATE':
@@ -68,10 +74,36 @@ def verify():
             def lam(k):return float(gammainc(3.,float(m.cleavage.rate(min(k*1e6/math.sqrt(2*math.pi*1e-6),30e9),T))*1e-6)/1e-6)
             action=quad(lam,0,K,epsabs=1e-14,epsrel=5e-11,limit=250)[0]/rate
             close(action,xi,1e-7,1e-12);close(K*lam(K)/(rate*action),r['AK'],1e-7,1e-10);verified_f0+=1
+            sigma_at=lambda kk: min(kk*1e6/math.sqrt(2*math.pi*1e-6),30e9)
+            curve=action_groups[(cid,T,rate,r['tier'])]
+            kk=np.array([float(a['K']) for a in curve])
+            stress_grid=np.minimum(kk[:,None]*gx[None,:]*1e6/math.sqrt(2*math.pi*1e-6),30e9)
+            exact_curve=kk/rate*((gammainc(3.,m.cleavage.rate(stress_grid,T)*1e-6)/1e-6)@gw)
+            dt=.05
+            def temperature_action(temp):
+                return K/rate*float((gammainc(3.,m.cleavage.rate(np.minimum(K*gx*1e6/math.sqrt(2*math.pi*1e-6),30e9),temp)*1e-6)/1e-6)@gw)
+            independent_AT=(math.log(temperature_action(T+dt))-math.log(temperature_action(T-dt)))/(2*dt)
+            close(r['AT'],independent_AT)
         if r['tier']=='F1_EMISSION_BLUNTING':
             # Fresh independent stricter transient solve, not a cached root.
             f=TransientBlunting(m,source[cid][0],T,rate);v,_=f.solve(K,rtol=5e-10)
             close(v(K)[2],xi,1e-6,1e-10);close(f.state(K,v(K)[:2])[0],r['r_eff_m'],1e-6,1e-14);verified_f1+=1
+            sigma_at=lambda kk:f.state(kk,v(kk)[:2])[1]
+            curve=action_groups[(cid,T,rate,r['tier'])]
+            exact_curve=np.array([float(v(float(a['K']))[2]) for a in curve])
+        if r['tier'] in ('F0_INTRINSIC_OPENING','F1_EMISSION_BLUNTING'):
+            if len(curve)!=65:raise ValueError('cumulative action curve incomplete')
+            for ar,expected in zip(curve,exact_curve):
+                close(ar['cumulative_action'],expected,1e-6,xi*1e-7)
+                close(ar['action_over_threshold'],float(ar['cumulative_action'])/xi,1e-12,1e-14)
+            zero=float(gammainc(3.,float(m.cleavage.rate(0.,T))*1e-6)/1e-6)
+            close(r['zero_load_action_fraction'],zero*K/(rate*xi),1e-12,1e-14)
+            stresses=np.array([sigma_at(K*x) for x in (np.arange(256)+.5)/256])
+            renewal_fraction=gammainc(3.,m.cleavage.rate(stresses,T)*1e-6)
+            close(r['renewal_ceiling_ramp_fraction'],np.mean(renewal_fraction>=.99),1e-12,1e-14)
+            close(r['stress_cap_ramp_fraction'],np.mean(stresses>=30e9),1e-12,1e-14)
+        baseline=index[(cid,300.,rate,r['tier'])]
+        if baseline['K_FP']:close(r['K_over_300K'],K/float(baseline['K_FP']),1e-12,1e-14)
         actual,_=accessibility(float(r['zero_load_action_fraction']),float(r['renewal_ceiling_ramp_fraction']),float(r['stress_cap_ramp_fraction']),K,float(r['root_relative_residual']))
         if actual!=r['accessibility']:raise ValueError('accessibility changed')
         if r['tier']=='BEST_CURRENT_MONOTONIC_FORWARD':

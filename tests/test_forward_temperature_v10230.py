@@ -73,3 +73,18 @@ def test_verifier_rejects_saturated_peak_and_fabricated_plot():
         validate_classification('PEAK_T_FORWARD_PREDICTION',[dict(accessibility='RENEWAL_CEILING_DOMINATED')])
     with pytest.raises(ValueError,match='figure coordinates'):
         validate_series(dict(x_column='T',y_column='K',x=[300],y=[10]),[dict(T='300',K='1e-9')])
+
+
+def test_root_endpoint_stiffness_cannot_retain_F1_or_full_state(monkeypatch):
+    from scripts import analyze_forward_temperature_v10230 as analysis
+    base=dict(candidate_id='P25_TRANSFER_V1_RANK1',temperature_K=925.,Kdot=.005,threshold_action=.07509316036236147,threshold_mode='EXPONENTIAL_CRN_1720_ENGINE1',status='FIRST_PASSAGE',K_FP=3.7546580181180735e-10)
+    result=dict(records=[dict(base,tier=t) for t in ['F0_INTRINSIC_OPENING','F1_EMISSION_BLUNTING','BEST_CURRENT_MONOTONIC_FORWARD']],traces=[dict(tier='F1_EMISSION_BLUNTING')],descriptors=[],derivatives=[])
+    def fail(*a,**k):raise ValueError('Required step size is less than spacing between numbers.')
+    monkeypatch.setattr(analysis.TransientBlunting,'solve',fail)
+    m,_=build_frozen_manifest('A_NATIVE')
+    final=analysis.qualify_independent_f1(result,{'rho_source0_m2':1e15},m)
+    assert final['records'][1]['status']=='STATE_CLOSURE_UNAVAILABLE'
+    assert final['records'][1]['K_FP'] is None
+    assert final['records'][2]['best_scope']=='F0_ONLY_F1_UNAVAILABLE'
+    assert not final['traces']
+    assert result['records'][1]['status']=='FIRST_PASSAGE' # raw evidence preserved

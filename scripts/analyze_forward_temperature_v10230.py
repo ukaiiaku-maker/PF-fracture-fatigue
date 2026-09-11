@@ -120,6 +120,28 @@ def condition(cid,row,m,T,rate,xi):
     return dict(records=records,traces=traces,descriptors=descriptors,derivatives=dchecks)
 
 
+
+def qualify_independent_f1(result,row,manifest):
+    """Fail closed if changing the transient endpoint exposes gate stiffness."""
+    import copy
+    result=copy.deepcopy(result)
+    f1=next(r for r in result['records'] if r['tier']=='F1_EMISSION_BLUNTING')
+    if f1['status']!='FIRST_PASSAGE':return result
+    try:
+        model=TransientBlunting(manifest,row,f1['temperature_K'],f1['Kdot'])
+        v,_=model.solve(f1['K_FP'],rtol=5e-10)
+        if not math.isclose(float(v(f1['K_FP'])[2]),f1['threshold_action'],rel_tol=1e-6,abs_tol=1e-10):
+            raise ValueError('first-passage-endpoint action disagreement')
+    except ValueError as exc:
+        base={k:f1[k] for k in ('candidate_id','temperature_K','Kdot','threshold_action','threshold_mode','tier')}
+        rejected=dict(**base,status='STATE_CLOSURE_UNAVAILABLE',reason='Independent root-endpoint reintegration: '+str(exc),K_FP=None,full_state_available=False)
+        f0=next(r for r in result['records'] if r['tier']=='F0_INTRINSIC_OPENING')
+        result['records']=[rejected if r['tier']=='F1_EMISSION_BLUNTING' else dict(f0,tier='BEST_CURRENT_MONOTONIC_FORWARD',selected_tier='F0_INTRINSIC_OPENING',best_scope='F0_ONLY_F1_UNAVAILABLE') if r['tier']=='BEST_CURRENT_MONOTONIC_FORWARD' else r for r in result['records']]
+        for name in ('traces','descriptors','derivatives'):
+            result[name]=[r for r in result[name] if r['tier']!='F1_EMISSION_BLUNTING']
+    return result
+
+
 def main():
     RUN.mkdir(parents=True,exist_ok=True);(RUN/'conditions').mkdir(exist_ok=True)
     config=json.loads((ART/'monotonic_forward_configuration.json').read_text());rows=source_rows()
@@ -135,6 +157,7 @@ def main():
                 else:
                     result=condition(cid,row,m,float(T),rate,xi)
                     path.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
+                result=qualify_independent_f1(result,row,m)
                 all_results.append(result)
             print(cid,'rate',rate,'complete',flush=True)
     records=[r for x in all_results for r in x['records']];traces=[r for x in all_results for r in x['traces']]
@@ -181,6 +204,7 @@ def main():
     lines=['# Current-row monotonic forward prediction','',decision['interpretation'],'',f"444 row-temperature-rate conditions; T=300–1200 K every 25 K, Kdot=0.0005/0.005/0.05 MPa√m/s. Primary common exponential threshold Xi={xi:.17g}, seed 1720, engine 1. Unit-action screen is separately tabulated.",'','| Row | Fatigue classification | KFP 300 K | KFP 1200 K | Forward classification |','|---|---|---:|---:|---|']
     for r in cross:lines.append(f"| {r['candidate_id']} | {r['fatigue_classification']} | {r['K_FP_300K']:.9g} | {r['K_FP_1200K']:.9g} | {r['forward_classification']} |")
     lines+=['','Only five cleavage coordinates differ from A_NATIVE. Explicit cleavage and emission gT and sT remain zero. Temperature response still arises through Arrhenius and cooperative renewal, plus the conditional F1 emission/blunting transient. This is P1/P2 design intent, not an independent P3 correction.','',f"F1 sensitivity/refinement or state failures: {decision['F1_unavailable']}/444, recorded as unavailable; F0 remains labeled intrinsic. F2 is unavailable at every condition because a qualified monotonic tensor-drive/state replay is not available in this analysis. No zero state correction is assigned to F2.",'','P25/P40 show no interpretable accessible full-range DBTT, Peak-T, weak-T, or ceramic topology in the available forward hierarchy. Their fatigue classifications are preserved. P55 retains nonzero fixed-load D1/D2 descriptors despite failed fatigue transfer, but its first-passage derivatives are suppressed by zero-load opening and renewal saturation. Finite collapsed loads are resolved roots, not a numerical floor.','',decision['additional_constitutive_freedom'],'','All comparisons use absolute loads first. Normalized curves carry the same accessibility masks. This is analytical prediction, not experimental material identification.']
+    lines += ['', 'At 300 K and the reference ramp, zero-load action fractions are above 0.999997 for P25/P40/P55. Their first-passage AK is approximately one. Thus their low-load monotonic response is governed primarily by the zero-stress barrier value and Arrhenius/renewal rate, while the fatigue-load D1/D2 remain distinct.', '', 'At the fixed intrinsic K=18 MPa√m surface probe, the 300 K cleavage D1 values are approximately 0.02848, 0.04236 and 0.05640 eV for P25/P40/P55; D2 values are −0.02219, −0.02986 and −0.03652 eV. At their actual low-load first passage, D1 is only about 1.2e-9, 7.4e-9 and 7.9e-8 eV, respectively. This separates the retained fatigue-load derivative signature from the collapsed monotonic scale. All cleavage DT values are zero.', '', 'For A_NATIVE, the reference-ramp F0 load at 300 K is about 9.9045 MPa√m; converged F1 raises it to about 10.1008 MPa√m, a 1.98% reduced blunting shift. F2 transport and retained-shielding shifts remain unknown. At higher temperatures even the baseline loses full-range accessibility; this does not invalidate its accessible low-temperature intrinsic branch.', '', 'The positive saturated limit is KFP = Xi × Kdot × tau, with tau=1e-6 s. It scales exactly with the applied ramp rate. A flat saturated branch is not weak-T; there is no interpreted Peak-T extremum in that branch.']
     (ART/'forward_prediction_decision.md').write_text('\n'.join(lines)+'\n')
     print(json.dumps(decision,indent=2))
 
