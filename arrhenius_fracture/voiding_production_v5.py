@@ -46,6 +46,65 @@ from .voiding_v5 import (
 )
 
 SCHEMA = "v12.production-one-void-trajectory/5"
+FRONT_ENGINE_STATE_SCHEMA = "v5.downstream-child-front-engine-state/1"
+_FRONT_ENGINE_STATE_FIELDS = ("N_em", "B", "a_adv", "n_adv", "W_emit", "t", "K_prev")
+
+
+def fresh_sharp_front_engine(material):
+    """Use the established ordinary-front constructor/reset policy unchanged."""
+    engine = FrontEngine(
+        FrontConfig(), default_cleavage_barrier(), default_emission_barrier(material.b),
+        material.G, material.nu, material.b,
+    )
+    # The production drivers admit at most one geometric renewal per accepted
+    # transaction; this is the same numerical event policy used by build_engine.
+    engine.f.max_advances_per_step = 1
+    return engine
+
+
+def capture_sharp_front_engine(engine) -> dict[str, Any]:
+    """Checkpoint the old engine's canonical owned ledgers, not a radius copy."""
+    return {
+        "schema": FRONT_ENGINE_STATE_SCHEMA,
+        "engine_type": type(engine).__name__,
+        "initialization_policy": "FrontEngine.__init__->reset",
+        "canonical_state": {name: getattr(engine, name) for name in _FRONT_ENGINE_STATE_FIELDS},
+    }
+
+
+def restore_sharp_front_engine(material, payload):
+    engine = fresh_sharp_front_engine(material)
+    if payload.get("schema") != FRONT_ENGINE_STATE_SCHEMA:
+        raise ValueError("unsupported downstream child front-engine state")
+    if payload.get("engine_type") != type(engine).__name__:
+        raise ValueError("downstream child engine type differs from the established engine")
+    fields = payload.get("canonical_state", {})
+    if set(fields) != set(_FRONT_ENGINE_STATE_FIELDS):
+        raise ValueError("downstream child front-engine checkpoint is incomplete")
+    for name in _FRONT_ENGINE_STATE_FIELDS:
+        setattr(engine, name, fields[name])
+    return engine
+
+
+def sharp_front_constitutive_response(engine, *, K_Pa_sqrt_m, temperature_K, dt_s):
+    """Read-only response through the pre-void K -> FrontEngine interface."""
+    K = max(float(K_Pa_sqrt_m), 0.0)
+    T = float(temperature_K)
+    dt = max(float(dt_s), 0.0)
+    sigma = engine.sigma_tip(K)
+    cleavage_rate, cleavage_raw_rate, cleavage_barrier = engine.lambda_cleave(sigma, T)
+    emission_rate, emission_stress, emission_barrier = engine.lambda_emit(sigma, T)
+    return {
+        "r_eff_m": float(engine.r_eff()),
+        "sigma_tip_Pa": float(sigma),
+        "cleavage_barrier_J": float(cleavage_barrier),
+        "cleavage_rate_s": float(cleavage_rate),
+        "cleavage_raw_rate_s": float(cleavage_raw_rate),
+        "emission_barrier_J": float(emission_barrier),
+        "emission_rate_s": float(emission_rate),
+        "emission_effective_stress_Pa": float(emission_stress),
+        "clock_increment": float(engine.predict_clock_increment(K, T, dt)),
+    }
 
 
 def advance_disabled_v5_stage2(state, end_m, *, transaction_identity):
@@ -825,17 +884,23 @@ def _tensor_fingerprint(tensor) -> str:
 
 def _source_identity(state, tensor, *, source_kind, source_front_id=None,
                      source_cavity_id=None, source_boundary_site_id=None,
-                     source_position_m=None, source_probe_identity=None):
-    return {
+                     source_position_m=None, source_probe_identity=None,
+                     source_load_payload=None):
+    identity = {
         "source_kind": source_kind,
         "source_front_id": source_front_id,
         "source_cavity_id": source_cavity_id,
         "source_boundary_site_id": source_boundary_site_id,
         "source_position_m": None if source_position_m is None else list(map(float, source_position_m)),
         "source_geometry_generation": int(state.crack_network.geometry_generation),
-        "source_tensor_fingerprint": _tensor_fingerprint(tensor),
+        "source_tensor_fingerprint": None if tensor is None else _tensor_fingerprint(tensor),
         "source_probe_identity": source_probe_identity,
     }
+    if source_load_payload is not None:
+        identity["source_load_fingerprint"] = hashlib.sha256(
+            json.dumps(source_load_payload, sort_keys=True, separators=(",", ":"), default=str).encode()
+        ).hexdigest()
+    return identity
 
 
 def _transition_competition_source(state, source, *, candidates=None):
@@ -974,6 +1039,62 @@ def directional_clock_rates(state, stress_tensor_Pa, *, temperature_K=900.0):
                       "effective_rate_s": rate, "rate_s": rate,
                       "resolved_opening_stress_Pa": resolved_opening,
                       "hazard_barrier_J": barrier, "crossing_time_s": crossing})
+    return rates
+
+
+def sharp_front_load_provider(state, *, branch_id, candidates=None):
+    """Reuse the pre-void directional J/K provider for an explicit active tip."""
+    from .sharp_front_v11_branching import measure_directional_front_loads
+    payload = state.tip_process_state.get("by_branch", {}).get(branch_id)
+    if payload is None:
+        raise ValueError("active child has no canonical sharp-front engine state")
+    engine = restore_sharp_front_engine(state.material, payload)
+    inventory = state.competition.candidates if candidates is None else tuple(candidates)
+    return measure_directional_front_loads(
+        state, inventory, branch_id=branch_id,
+        contour_radius_m=max(float(engine.f.L_pz), 1.0e-6),
+        provider_contract_contour_radius_m=max(float(engine.f.L_pz), 1.0e-6),
+    )
+
+
+def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=900.0):
+    """Preview child rates through the unchanged old engine and owned ledgers."""
+    payload = state.tip_process_state.get("by_branch", {}).get(branch_id)
+    if payload is None:
+        raise ValueError("active child has no canonical sharp-front engine state")
+    engine = restore_sharp_front_engine(state.material, payload)
+    by_candidate = {row["candidate_id"]: row for row in load_rows}
+    rates = []
+    for candidate, hazard in zip(state.competition.candidates, state.competition.hazard_states):
+        load = by_candidate[candidate.candidate_id]
+        directional_K = max(float(load["K_directional_Pa_sqrt_m"]), 0.0)
+        effective_K = directional_K / math.sqrt(float(candidate.gamma_rel))
+        response = sharp_front_constitutive_response(
+            engine, K_Pa_sqrt_m=effective_K, temperature_K=temperature_K, dt_s=1.0,
+        )
+        rate = 0.0 if directional_K <= 0.0 else max(response["cleavage_rate_s"], 0.0)
+        remaining = max(hazard.current_threshold_action - hazard.action, 0.0)
+        rates.append({
+            "candidate_id": candidate.candidate_id,
+            "raw_rate_s": response["cleavage_raw_rate_s"],
+            "effective_rate_s": rate,
+            "rate_s": rate,
+            "resolved_opening_stress_Pa": response["sigma_tip_Pa"],
+            "hazard_barrier_J": response["cleavage_barrier_J"],
+            "crossing_time_s": math.inf if rate <= 0.0 else remaining / rate,
+            "K_directional_Pa_sqrt_m": directional_K,
+            "K_effective_Pa_sqrt_m": effective_K,
+            "signed_J_J_per_m2": float(load["signed_J_J_per_m2"]),
+            "positive_J_J_per_m2": float(load["positive_J_J_per_m2"]),
+            "r_eff_m": response["r_eff_m"],
+            "sigma_tip_Pa": response["sigma_tip_Pa"],
+            "cleavage_barrier_J": response["cleavage_barrier_J"],
+            "cleavage_rate_s": response["cleavage_rate_s"],
+            "emission_barrier_J": response["emission_barrier_J"],
+            "emission_rate_s": response["emission_rate_s"],
+            "clock_increment_per_second": response["clock_increment"],
+            "constitutive_engine": "FrontEngine",
+        })
     return rates
 
 
@@ -1307,17 +1428,26 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
     return state,{"status":"SOURCE_TENSOR_UNQUALIFIED","attempts":rows,"operations":operations}
 
 
-def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
+def _complete_next_clock(state, stress_tensor_Pa=None, *, source_kind="sharp_front",
                          source_front_id=None, source_cavity_id=None,
                          source_boundary_site_id=None, source_position_m=None,
                          source_probe_identity=None, temperature_K=900.0,
-                         maximum_advance_duration_s=None):
+                         maximum_advance_duration_s=None, front_load_rows=None):
     """Advance source-owned clocks, never an unqualified cavity first passage."""
     if maximum_advance_duration_s is not None and (
         not math.isfinite(float(maximum_advance_duration_s)) or maximum_advance_duration_s < 0):
         raise ValueError("maximum_advance_duration_s must be finite and nonnegative")
-    stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
-    rates = directional_clock_rates(state, stress, temperature_K=temperature_K)
+    if front_load_rows is None:
+        stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
+        rates = directional_clock_rates(state, stress, temperature_K=temperature_K)
+    else:
+        if source_kind != "sharp_front" or source_front_id is None:
+            raise ValueError("directional J/K loads require an explicit sharp-front owner")
+        stress = None
+        rates = directional_sharp_front_rates(
+            state, front_load_rows, branch_id=source_front_id,
+            temperature_K=temperature_K,
+        )
     junction = dict(state.junction_process_state)
     start_time = float(junction.get("production_time_s", 0.0))
     from .canonical_kinetic_time_v1 import AcceptedTime
@@ -1327,6 +1457,7 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
         state, stress, source_kind=source_kind, source_front_id=source_front_id,
         source_cavity_id=source_cavity_id, source_boundary_site_id=source_boundary_site_id,
         source_position_m=source_position_m, source_probe_identity=source_probe_identity,
+        source_load_payload=front_load_rows,
     )
     from .finalization_v3_schema import canonical_hash
     source_signature = canonical_hash(source)
@@ -1711,13 +1842,21 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     cavity = state.void_state.cavities[0]
     nodes = np.asarray(state.mesh.nodes)
     active_source = state.junction_process_state.get("active_event_source", {})
+    front_load_rows = None
     if continuation:
         if state.crack_network.active_tip_ids != (child_id,):
             raise RuntimeError("continued propagation requires the sole active downstream child")
         start = state.crack_network.branch(child_id).tip
-        tensor, boundary_elements = crack_tip_tensor(state, branch_id=child_id)
+        front_load_rows = sharp_front_load_provider(
+            state, branch_id=child_id,
+        )["directional"]
+        tensor, boundary_elements = None, ()
         source_kind = "sharp_front"
-        probe_identity = {"kind": "child_crack_tip_tensor", "element_ids": list(boundary_elements)}
+        probe_identity = {
+            "kind": "established_directional_J_K_provider",
+            "branch_id": child_id,
+            "candidate_ids": [row["candidate_id"] for row in front_load_rows],
+        }
     else:
         if cavity.connection_exit_m is None:
             raise RuntimeError("downstream nucleation requires the stored connection exit")
@@ -1735,13 +1874,16 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         source_cavity_id=None if continuation else cavity.cavity_id,
         source_boundary_site_id=None if continuation else "connection_exit",
         source_position_m=start, source_probe_identity=probe_identity,
+        front_load_rows=front_load_rows,
     )
     if not any(row["winner"] for row in cleavage_audit):
         return state, None, operation_log if operation_log is not None else [], {
             "status": ("UNQUALIFIED_CAVITY_SOURCE_TENSOR" if any(
                 row.get("instantaneous_status") == "UNQUALIFIED_CAVITY_SOURCE_TENSOR" for row in cleavage_audit)
                 else "NO_KINETICALLY_ACTIVE_CANDIDATE"),
-            "tensor_Pa": tensor.tolist(), "boundary_element_ids": boundary_elements,
+            "tensor_Pa": None if tensor is None else tensor.tolist(),
+            "front_load_rows": front_load_rows,
+            "boundary_element_ids": boundary_elements,
             "source_kind": source_kind, "source_front_id": child_id if continuation else None,
             "source_position_m": list(start), "source_probe_identity": probe_identity,
             "cleavage": cleavage_audit,
@@ -1761,21 +1903,19 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     if continuation:
         base_network = state.crack_network
     else:
-        r_tip = max(float(state.mesh.hbar_tip), 10.0 * float(state.material.b))
         child = CrackBranchState(child_id, ROOT_BRANCH_ID, 1,
                                  int(state.event_counters.get("topology_actions", 0)) + 1,
                                  (start,), (candidate.angle_rad,), local_state={
                                      "nucleation_source": "direct_cavity_boundary_tensor",
                                      "upstream_lineage_branch_id": ROOT_BRANCH_ID,
-                                     "active_source": "child_crack_tip_tensor",
-                                     "r_tip_m": r_tip,
-                                     "r_tip_initialization_policy": "fresh_moving_tip_renewal_no_historical_partition",
+                                     "active_source": "established_directional_J_K_provider",
+                                     "front_engine_state_owner": child_id,
+                                     "front_engine_initialization_policy": "FrontEngine.__init__->reset",
                                  })
         base_network = replace(state.crack_network, branches=state.crack_network.branches + (child,),
                                geometry_generation=state.crack_network.geometry_generation + 1,
                                branching_enabled=True)
-    engine = FrontEngine(FrontConfig(), default_cleavage_barrier(), default_emission_barrier(state.material.b),
-                         state.material.G, state.material.nu, state.material.b)
+    engine = fresh_sharp_front_engine(state.material)
     winner = next(item for item in cleavage_audit if item["candidate_id"] == candidate.candidate_id)
     barrier = winner["hazard_barrier_J"]
     resistance = hazard_resistance_J_per_m2(
@@ -1843,11 +1983,9 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         if not continuation:
             tip_state.update({
                 "active_branch_id": child_id,
-                "by_branch": {child_id: {
-                    "r_tip_m": r_tip,
-                    "initialization_policy": "fresh_moving_tip_renewal_no_historical_partition",
-                    "historical_state_imported": False,
-                }},
+                "by_branch": {child_id: capture_sharp_front_engine(
+                    fresh_sharp_front_engine(realized.material)
+                )},
             })
         realized = replace(realized, void_state=void_state, tip_process_state=tip_state)
         certificate = crack_void_connection_certificate(
@@ -1869,8 +2007,36 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     )
     if not result.accepted: raise RuntimeError("downstream front event rejected")
     accepted = _mark_consumed_event_provenance(result.state, proposal.member_event_ids)
+    if continuation:
+        payload = accepted.tip_process_state.get("by_branch", {}).get(child_id)
+        child_engine = restore_sharp_front_engine(accepted.material, payload)
+        # Directional first passage is authoritative, as in the pre-void v11
+        # adapter.  Synchronize the scalar compatibility clock, then let the
+        # unchanged engine perform emission, renewal, and wake retention.
+        child_engine.B = 1.0
+        duration = float(winner["common_advance_duration_s"])
+        step_info = child_engine.step(
+            float(winner["K_effective_Pa_sqrt_m"]), 900.0, duration,
+        )
+        if not step_info["fired"]:
+            raise RuntimeError("accepted child first passage did not renew the established front engine")
+        tip_state = dict(accepted.tip_process_state)
+        by_branch = dict(tip_state.get("by_branch", {}))
+        by_branch[child_id] = {
+            **capture_sharp_front_engine(child_engine),
+            "last_event_identity": tuple(proposal.member_event_ids),
+            "last_step_audit": step_info,
+        }
+        tip_state["by_branch"] = by_branch
+        accepted = replace(accepted, tip_process_state=tip_state)
     if not continuation:
-        child_tensor, _ = crack_tip_tensor(accepted, branch_id=child_id)
+        child_load_rows = sharp_front_load_provider(
+            accepted, branch_id=child_id,
+        )["directional"]
+        child_load_by_id = {row["candidate_id"]: row for row in child_load_rows}
+        child_rates = {row["candidate_id"]: row for row in directional_sharp_front_rates(
+            accepted, child_load_rows, branch_id=child_id,
+        )}
         child_tip = np.asarray(accepted.crack_network.branch(child_id).tip, dtype=float)
         child_candidates = tuple(accepted.competition.candidates)
         child_endpoints = {}
@@ -1881,8 +2047,9 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             if not (1.0e-12 < endpoint[0] < 1.0e-3 - 1.0e-12
                     and abs(endpoint[1]) < 5.0e-4 - 1.0e-12):
                 continue
-            normal = np.asarray(child_candidate.normal_xy, dtype=float)
-            opening = max(float(normal @ child_tensor @ normal), 0.0)
+            load = child_load_by_id[child_candidate.candidate_id]
+            response = child_rates[child_candidate.candidate_id]
+            opening = float(response["sigma_tip_Pa"])
             child_endpoints[child_candidate.candidate_id] = list(map(float, endpoint))
             child_rows.append({
                 "candidate_id": child_candidate.candidate_id,
@@ -1895,17 +2062,22 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
                 "instantaneous_status": "ZERO_DOWNSTREAM_DRIVE"
                                         if opening <= 0.0 else "POSITIVE_DOWNSTREAM_DRIVE",
                 "resolved_opening_stress_Pa": opening,
-                "effective_rate_s": 0.0 if opening <= 0.0 else None,
-                "crossing_time_s": "infinity" if opening <= 0.0 else None,
+                "K_directional_Pa_sqrt_m": float(load["K_directional_Pa_sqrt_m"]),
+                "signed_J_J_per_m2": float(load["signed_J_J_per_m2"]),
+                "effective_rate_s": response["effective_rate_s"],
+                "crossing_time_s": (response["crossing_time_s"] if math.isfinite(
+                    response["crossing_time_s"]
+                ) else "infinity"),
             })
         child_candidates = tuple(item for item in child_candidates
                                  if item.candidate_id in child_endpoints)
         if not child_candidates:
             raise RuntimeError("active child has no geometrically admissible continuation direction")
         child_source = _source_identity(
-            accepted, child_tensor, source_kind="sharp_front", source_front_id=child_id,
+            accepted, None, source_kind="sharp_front", source_front_id=child_id,
             source_position_m=accepted.crack_network.branch(child_id).tip,
-            source_probe_identity={"kind": "child_crack_tip_tensor"},
+            source_probe_identity={"kind": "established_directional_J_K_provider", "branch_id": child_id},
+            source_load_payload=child_load_rows,
         )
         child_source["candidate_source_states"] = tuple(child_rows)
         child_source["next_candidate_endpoints_m"] = child_endpoints
@@ -1913,12 +2085,18 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             accepted, child_source, candidates=child_candidates,
         )
         result = replace(result, state=accepted)
+    else:
+        result = replace(result, state=accepted)
     cavity = accepted.void_state.cavities[0]
     return accepted, result, operations, {
-        "tensor_Pa": tensor.tolist(), "boundary_element_ids": boundary_elements,
+        "tensor_Pa": None if tensor is None else tensor.tolist(),
+        "front_load_rows": front_load_rows,
+        "boundary_element_ids": boundary_elements,
         "source_kind": source_kind, "source_front_id": child_id if continuation else None,
         "source_position_m": list(start), "source_probe_identity": probe_identity,
-        "r_tip_m": accepted.tip_process_state.get("by_branch", {}).get(child_id, {}).get("r_tip_m"),
+        "r_eff_m": (restore_sharp_front_engine(
+            accepted.material, accepted.tip_process_state.get("by_branch", {}).get(child_id)
+        ).r_eff() if child_id in accepted.tip_process_state.get("by_branch", {}) else None),
         "candidate_id": proposal.member_candidate_ids[0],
         "selected_proposal_candidate_ids": list(proposal.member_candidate_ids),
         "emitted_winner_candidate_ids": [row["candidate_id"] for row in cleavage_audit if row["winner"]],

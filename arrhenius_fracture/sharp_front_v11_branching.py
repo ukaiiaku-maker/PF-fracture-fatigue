@@ -164,7 +164,17 @@ def _provider_contract_interaction_length(args) -> float:
     return float(getattr(args, "rJ", None) or max(args.L_pz, 1.0e-6))
 
 
-def _direct_measurement(state, candidates, args) -> dict[str, Any]:
+def measure_directional_front_loads(
+    state, candidates, *, branch_id: str, contour_radius_m: float,
+    provider_contract_contour_radius_m: float | None = None,
+) -> dict[str, Any]:
+    """Evaluate the established directional J/K provider for one active tip.
+
+    The pre-void driver historically selected ``active_tip_ids[0]`` inside
+    ``_direct_measurement``.  Making that owner explicit lets an ordinary root
+    and a post-void child use the same provider without adding a second stress
+    intensity definition.
+    """
     from .fem import assemble_mechanics
     from .j_integral import compute_J_integral
     Kmat, Rint, sigma, seq, s1, psi = assemble_mechanics(
@@ -175,10 +185,14 @@ def _direct_measurement(state, candidates, args) -> dict[str, Any]:
         (np.asarray(a), np.asarray(b)) for branch in state.crack_network.branches
         for a, b in zip(branch.path, branch.path[1:])
     ]
-    branch = state.crack_network.branch(state.crack_network.active_tip_ids[0])
+    if branch_id not in state.crack_network.active_tip_ids:
+        raise ValueError("directional J/K load provider requires an active branch")
+    branch = state.crack_network.branch(branch_id)
     directional = []
-    ell = float(getattr(args, "rJ", None) or max(args.L_pz, 1.0e-6))
-    contract_ell = _provider_contract_interaction_length(args)
+    ell = float(contour_radius_m)
+    contract_ell = float(provider_contract_contour_radius_m or ell)
+    if ell <= 0.0 or contract_ell <= 0.0:
+        raise ValueError("directional J/K contour radii must be positive")
     exclude = max(float(getattr(state.mesh, "hbar_tip", 0.0) or state.mesh.hbar), 1.0e-12)
     for candidate in candidates:
         _, _, info = compute_J_integral(
@@ -221,6 +235,17 @@ def _direct_measurement(state, candidates, args) -> dict[str, Any]:
         "recoverable_potential_energy_J_per_m": state.stored_energy_J_per_m,
         "directional": directional,
     }
+
+
+def _direct_measurement(state, candidates, args) -> dict[str, Any]:
+    active = tuple(state.crack_network.active_tip_ids)
+    if not active:
+        raise ValueError("directional measurement requires an active tip")
+    ell = float(getattr(args, "rJ", None) or max(args.L_pz, 1.0e-6))
+    return measure_directional_front_loads(
+        state, candidates, branch_id=active[0], contour_radius_m=ell,
+        provider_contract_contour_radius_m=_provider_contract_interaction_length(args),
+    )
 
 
 def _candidate_map(candidates):
@@ -1067,4 +1092,4 @@ def main(argv=None, *, audit_already_written=False):
 if __name__ == "__main__": main()
 
 
-__all__ = ["MODEL_ID", "main", "run_2d"]
+__all__ = ["MODEL_ID", "main", "measure_directional_front_loads", "run_2d"]

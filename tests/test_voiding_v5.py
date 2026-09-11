@@ -681,14 +681,20 @@ def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(m
     ),)
     assert ("branch:void-front-1", "cavity:void:site-1") in certificate["combined_incidence_edges"]
     assert downstream.tip_process_state["active_branch_id"] == "void-front-1"
-    assert downstream.tip_process_state["by_branch"]["void-front-1"]["r_tip_m"] > 0.0
+    payload = downstream.tip_process_state["by_branch"]["void-front-1"]
+    assert payload["schema"] == "v5.downstream-child-front-engine-state/1"
+    assert payload["canonical_state"]["N_em"] == 0.0
+    assert "r_tip_m" not in payload
 
-    original_tip = production.crack_tip_tensor
+    original_provider = production.sharp_front_load_provider
     calls = []
-    def child_tip_only(state, branch_id="b00000000"):
+    def child_tip_only(state, *, branch_id, candidates=None):
         calls.append(branch_id)
-        return original_tip(state, branch_id=branch_id)
-    monkeypatch.setattr(production, "crack_tip_tensor", child_tip_only)
+        return original_provider(state, branch_id=branch_id, candidates=candidates)
+    monkeypatch.setattr(production, "sharp_front_load_provider", child_tip_only)
+    monkeypatch.setattr(production, "crack_tip_tensor",
+                        lambda *args, **kwargs: (_ for _ in ()).throw(
+                            AssertionError("continued front reused tensor probe")))
     monkeypatch.setattr(production, "cavity_boundary_tensor",
                         lambda *args, **kwargs: (_ for _ in ()).throw(
                             AssertionError("continued front reused cavity probe")))
@@ -696,6 +702,8 @@ def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(m
     assert calls == ["void-front-1"]
     assert causal["source_kind"] == "sharp_front"
     assert causal["source_front_id"] == "void-front-1"
+    assert causal["tensor_Pa"] is None
+    assert causal["source_probe_identity"]["kind"] == "established_directional_J_K_provider"
     assert continued.junction_process_state["latest_topology_certificate_stage"] == "POST_CONTINUATION"
 
 

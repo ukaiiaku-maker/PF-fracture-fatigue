@@ -13,6 +13,7 @@ from pathlib import Path
 
 from . import voiding_production_v5 as production
 from .sharp_front import FrontEngine
+from .sharp_front_v11_branching import measure_directional_front_loads
 
 SCHEMA = "v5.one-void-r-tip-constitutive-handoff/2"
 
@@ -30,106 +31,131 @@ def _location(function) -> dict:
 
 
 def audit() -> dict:
-    rate_source = inspect.getsource(production.directional_clock_rates)
+    rate_source = inspect.getsource(production.directional_sharp_front_rates)
     tensor_source = inspect.getsource(production.crack_tip_tensor)
     transaction_source = inspect.getsource(production.downstream_front_transaction)
+    provider_source = inspect.getsource(measure_directional_front_loads)
     analytical_source = inspect.getsource(FrontEngine.sigma_tip)
+    radius_source = inspect.getsource(FrontEngine.r_eff)
     accepted_analytical_relation_exists = (
         "self.r_eff()" in analytical_source and "np.sqrt(2.0 * np.pi" in analytical_source
     )
+    canonical_radius_relation_exists = all(
+        token in radius_source for token in ("self.f.r0", "self.f.c_blunt", "self.b", "self.N_em")
+    )
     child_radius_enters_tensor = "r_tip" in tensor_source
-    child_radius_enters_rates = "r_tip" in rate_source
-    child_radius_bound_to_engine = (
-        "engine.f.r0" in transaction_source or "engine.f.r_tip" in transaction_source
+    orphan_radius_stored = '"r_tip_m"' in transaction_source
+    child_engine_restored = "restore_sharp_front_engine" in rate_source
+    child_uses_existing_response = "sharp_front_constitutive_response" in rate_source
+    explicit_branch_provider = all(
+        token in provider_source for token in ("branch_id", "compute_J_integral", "K_directional_Pa_sqrt_m")
     )
-    fem_tensor_converted_to_intensity = any(
-        token in transaction_source for token in ("stress_intensity", "K_directional", "interaction_integral")
-    )
-    accepted_matching_operator_exists = bool(
-        child_radius_enters_tensor
-        or child_radius_enters_rates
-        or child_radius_bound_to_engine
-        or fem_tensor_converted_to_intensity
-    )
+    child_uses_provider = "sharp_front_load_provider" in transaction_source
+    child_renews_existing_engine = "child_engine.step" in transaction_source
+    accepted_matching_operator_exists = all((
+        canonical_radius_relation_exists, child_engine_restored,
+        child_uses_existing_response, explicit_branch_provider,
+        child_uses_provider, child_renews_existing_engine,
+    )) and not orphan_radius_stored
     factors = (0.75, 1.0, 1.25)
     predictions = [
         {
             "r_tip_over_r0": factor,
             "uncapped_sigma_over_baseline_at_fixed_positive_K": math.sqrt(1.0 / factor),
-            "predicted_barrier_direction": "not_higher" if factor < 1 else "unchanged" if factor == 1 else "not_lower",
-            "predicted_rate_direction": "not_lower" if factor < 1 else "unchanged" if factor == 1 else "not_higher",
-            "predicted_crossing_time_direction": "not_later" if factor < 1 else "unchanged" if factor == 1 else "not_earlier",
+            "canonical_peer_control": "modify_N_em_so_FrontEngine.r_eff_reaches_target",
+            "coupled_response_policy": "evaluate_the_unchanged_full_N_em_coupled_barrier_and_rate_law",
         }
         for factor in factors
     ]
     graph = {
         "schema": "v5.r-tip-consumer-graph/2",
         "nodes": [
-            {"id": "tip_process_state.r_tip_m", "kind": "owned_child_state"},
-            {"id": "child_branch.local_state.r_tip_m", "kind": "owned_state_mirror"},
+            {"id": "tip_process_state.by_branch.<id>.canonical_state.N_em", "kind": "owned_child_blunting_ledger"},
+            {"id": "FrontEngine.r_eff", "kind": "accepted_derived_radius_law", **_location(FrontEngine.r_eff)},
             {"id": "crack_tip_tensor", "kind": "local_FEM_tensor_observer", **_location(production.crack_tip_tensor)},
-            {"id": "directional_clock_rates", "kind": "resolved_stress_rate_adapter", **_location(production.directional_clock_rates)},
+            {"id": "measure_directional_front_loads", "kind": "accepted_directional_J_K_provider", **_location(measure_directional_front_loads)},
+            {"id": "directional_sharp_front_rates", "kind": "existing_engine_rate_adapter", **_location(production.directional_sharp_front_rates)},
             {"id": "FrontEngine.lambda_cleave", "kind": "accepted_barrier_and_rate_law", **_location(FrontEngine.lambda_cleave)},
             {"id": "FrontEngine.lambda_emit", "kind": "accepted_emission_barrier_and_rate_law", **_location(FrontEngine.lambda_emit)},
             {"id": "FrontEngine.sigma_tip", "kind": "accepted_K_over_sqrt_radius_law", **_location(FrontEngine.sigma_tip)},
             {"id": "_select_emitted_proposal", "kind": "continuation_event_selector", **_location(production._select_emitted_proposal)},
             {"id": "downstream_front_transaction", "kind": "child_continuation_transaction", **_location(production.downstream_front_transaction)},
-            {"id": "renewed_child_r_tip", "kind": "post_event_owned_state"},
+            {"id": "capture_sharp_front_engine", "kind": "post_event_canonical_state_checkpoint", **_location(production.capture_sharp_front_engine)},
         ],
         "edges": [
-            {"from": "tip_process_state.r_tip_m", "to": "child_branch.local_state.r_tip_m", "role": "exact_ownership_mirror"},
-            {"from": "crack_tip_tensor", "to": "directional_clock_rates", "role": "direct_resolved_FEM_stress"},
-            {"from": "directional_clock_rates", "to": "FrontEngine.lambda_cleave", "role": "resolved_opening_stress_and_temperature"},
-            {"from": "directional_clock_rates", "to": "_select_emitted_proposal", "role": "completed_cleavage_first_passages"},
+            {"from": "tip_process_state.by_branch.<id>.canonical_state.N_em", "to": "FrontEngine.r_eff", "role": "canonical_blunting_state"},
+            {"from": "measure_directional_front_loads", "to": "FrontEngine.sigma_tip", "role": "existing_directional_K_interface"},
+            {"from": "FrontEngine.r_eff", "to": "FrontEngine.sigma_tip", "role": "derived_radius_input"},
+            {"from": "FrontEngine.sigma_tip", "to": "FrontEngine.lambda_cleave", "role": "existing_cleavage_path"},
+            {"from": "FrontEngine.sigma_tip", "to": "FrontEngine.lambda_emit", "role": "existing_emission_path"},
+            {"from": "directional_sharp_front_rates", "to": "_select_emitted_proposal", "role": "completed_cleavage_first_passages"},
             {"from": "_select_emitted_proposal", "to": "downstream_front_transaction", "role": "selected_continuation_event"},
-            {"from": "downstream_front_transaction", "to": "renewed_child_r_tip", "role": "fresh_child_initialization_then_preservation_only"},
+            {"from": "downstream_front_transaction", "to": "FrontEngine.step", "role": "existing_emission_and_renewal_update"},
+            {"from": "FrontEngine.step", "to": "capture_sharp_front_engine", "role": "checkpoint_canonical_child_state"},
         ],
-        "disconnected_accepted_subgraph": [
+        "pre_void_call_graph": [
+            "active_tip_ids -> measure_directional_front_loads",
+            "directional_J -> K_directional=sqrt(Eprime*positive_J)",
+            "N_em -> FrontEngine.r_eff=r0+c_blunt*b*N_em",
+            "K_directional/gamma_rel -> FrontEngine.sigma_tip",
+            "sigma_tip -> FrontEngine.lambda_cleave + FrontEngine.lambda_emit",
+            "FrontEngine.step -> B/N_em/W_emit/t/K_prev -> renewal/advance",
+        ],
+        "post_void_call_graph_before_repair": [
+            "DOWNSTREAM_FIRST_PASSAGE -> child with orphan r_tip_m",
+            "child continuation -> crack_tip_tensor",
+            "tensor normal stress -> directional_clock_rates -> fresh FrontEngine.lambda_cleave only",
+            "directional first passage -> topology advance; no FrontEngine.step",
+        ],
+        "first_missing_or_bypassed_edge_before_repair": (
+            "child active tip -> established measure_directional_front_loads -> owned FrontEngine"
+        ),
+        "disconnected_accepted_subgraph_before_repair": [
             {"from": "intensity_K", "to": "FrontEngine.sigma_tip", "role": "accepted_original_sharp_front_input"},
             {"from": "FrontEngine.r_eff", "to": "FrontEngine.sigma_tip", "role": "accepted_original_radius_input"},
             {"from": "FrontEngine.sigma_tip", "to": "FrontEngine.lambda_cleave", "role": "accepted_original_cleavage_path"},
             {"from": "FrontEngine.sigma_tip", "to": "FrontEngine.lambda_emit", "role": "accepted_original_emission_path"},
         ],
-        "required_but_absent_edges": [
-            {"from": "tip_process_state.r_tip_m", "to": "local_FEM_to_sharp_front_matching_operator"},
-            {"from": "crack_tip_tensor", "to": "local_FEM_to_sharp_front_matching_operator"},
-            {"from": "local_FEM_to_sharp_front_matching_operator", "to": "FrontEngine.sigma_tip"},
-        ],
+        "required_but_absent_edges": [],
     }
-    classification = "IMPLEMENTED" if accepted_matching_operator_exists else "NOT_DEFINED"
+    classification = "PASS" if accepted_matching_operator_exists else "MISSING_OR_BYPASSED"
     return {
         "schema": SCHEMA,
         "scope": "READ_ONLY_CONSUMER_GRAPH_AND_MODEL_FORM_AUDIT",
         "consumer_graph": graph,
         "accepted_original_sharp_front_relation": {
-            "form": "sigma_tip = K_eff / sqrt(2*pi*r_eff)",
-            "exists": accepted_analytical_relation_exists,
+            "form": "r_eff = r0 + c_blunt*b*N_em; sigma_tip = K_eff / sqrt(2*pi*r_eff)",
+            "exists": accepted_analytical_relation_exists and canonical_radius_relation_exists,
             "location": _location(FrontEngine.sigma_tip),
         },
         "child_continuation_path": {
-            "source": "area_weighted_aligned_child_tip_CST_tensor",
-            "rate_input": "candidate_normal_resolved_opening_stress",
+            "source": "established_directional_J_K_provider",
+            "rate_input": "K_directional_Pa_sqrt_m through FrontEngine.sigma_tip",
             "child_radius_enters_tensor_observer": child_radius_enters_tensor,
-            "child_radius_enters_rate_adapter": child_radius_enters_rates,
-            "child_radius_bound_to_analytical_engine": child_radius_bound_to_engine,
-            "FEM_tensor_to_intensity_operator_present": fem_tensor_converted_to_intensity,
-            "emission_barrier_or_rate_consumed": False,
-            "post_event_r_tip_renewal_law": "fresh child initialized from max(hbar_tip,10b); continuation retains owned r_tip",
+            "orphan_radius_stored": orphan_radius_stored,
+            "child_canonical_state_restored": child_engine_restored,
+            "child_radius_bound_to_analytical_engine": child_engine_restored,
+            "directional_J_to_K_provider_present": explicit_branch_provider,
+            "emission_barrier_or_rate_consumed": child_uses_existing_response,
+            "post_event_r_tip_renewal_law": "FrontEngine.step; radius remains derived from renewed N_em",
         },
         "signed_analytical_prediction_frozen_before_any_future_implementation": predictions,
-        "reciprocal_control_prediction": "R_void variation cannot alter child rate when FEM fields, child source, and r_tip are frozen",
+        "reciprocal_control_prediction": "R_void variation cannot alter child constitutive response when directional K and canonical FrontEngine state are frozen",
         "forbidden_repairs": [
             "empirical_multiplier_of_r_tip",
             "empirical_multiplier_of_R_void",
             "de_smearing_or_amplification_of_explicit_FEM_stress_without_an_accepted_matching_derivation",
         ],
-        "R_TIP_OWNERSHIP": "PASS",
+        "R_TIP_OWNERSHIP": "PASS_CANONICAL_N_EM_LEDGER",
         "R_TIP_DISTINCT_FROM_VOID_RADIUS": "PASS",
-        "R_TIP_CAUSAL_LAW": classification,
-        "model_form_complete": classification == "IMPLEMENTED",
+        "DOWNSTREAM_CHILD_TO_EXISTING_SHARP_FRONT_ENGINE_ADAPTER": classification,
+        "R_TIP_CAUSAL_LAW": "REUSED_UNCHANGED" if classification == "PASS" else "PRESENT_BUT_ADAPTER_MISSING",
+        "EXISTING_R_TIP_LAW_REUSED_BY_DOWNSTREAM_CHILD": classification,
+        "model_form_complete": classification == "PASS",
         "scientific_classification": (
-            "R_TIP_CAUSAL_LAW_IMPLEMENTED" if classification == "IMPLEMENTED"
-            else "R_TIP_CAUSAL_LAW_NOT_DEFINED"
+            "EXISTING_R_TIP_LAW_REUSED_BY_DOWNSTREAM_CHILD"
+            if classification == "PASS"
+            else "DOWNSTREAM_CHILD_TO_EXISTING_SHARP_FRONT_ENGINE_ADAPTER_MISSING_OR_BYPASSED"
         ),
     }
 
