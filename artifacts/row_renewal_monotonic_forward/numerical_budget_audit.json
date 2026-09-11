@@ -1,0 +1,14 @@
+{
+  "status": "FAIL_CLOSED_ANALYTICAL_WORK_BUDGET",
+  "maximum_state_evaluations_per_transient_solve": 100000,
+  "trigger": {
+    "candidate_id": "P25_TRANSFER_V1_RANK1",
+    "temperature_K": 375,
+    "threshold_mode": "UNIT_ACTION",
+    "Kdot": 0.05
+  },
+  "reason": "Unbounded Radau iteration stalled for several minutes without completing a condition. Deterministic work limit raises unavailable F1 and never supplies a finite F1 root.",
+  "scope": "Only new analytical adapter; original generic model, barriers, physics, prospective classification gates, and numerical accuracy tolerances unchanged.",
+  "completed_condition_cache_preserved": 632,
+  "previous_execution_log": "runs/row_renewal_monotonic_forward_v1/pre_budget_execution.log"
+}

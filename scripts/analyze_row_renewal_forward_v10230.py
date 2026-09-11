@@ -12,6 +12,23 @@ ART=ROOT/'artifacts/row_renewal_monotonic_forward'
 OLD=ROOT/'artifacts/retained_controls_monotonic_forward'
 RUN=ROOT/'runs/row_renewal_monotonic_forward_v1'
 
+
+_UnboundedTransientBlunting=TransientBlunting
+class TransientBlunting(_UnboundedTransientBlunting):
+    """Same transient equations with a deterministic fail-closed work budget."""
+    max_state_evaluations=100000
+    def state(self,K,N):
+        if getattr(self,'_budget_active',False):
+            self._state_evaluations+=1
+            if self._state_evaluations>self.max_state_evaluations:
+                raise ValueError('F1_STATE_CLOSURE_UNAVAILABLE: analytical state-evaluation budget exhausted (100000 per solve)')
+        return super().state(K,N)
+    def solve(self,Kend,rtol=None):
+        self._state_evaluations=0;self._budget_active=True
+        try:return super().solve(Kend,rtol)
+        finally:self._budget_active=False
+
+
 def row_controls(row):
     m=float(row['physics__cleavage_hits']);tau=float(row['physics__cleavage_correlation_time_s'])
     if not math.isfinite(m) or m<=1 or not math.isfinite(tau) or tau<=0:raise ValueError('invalid exact row renewal')
