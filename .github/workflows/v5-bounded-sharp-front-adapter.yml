@@ -19,8 +19,14 @@ jobs:
     timeout-minutes: 45
     env:
       ADAPTER_IMPLEMENTATION_SHA: 9536705c173a8b3b5f94a31640edb7db0b0a9447
-      ATTESTATION_DIR: ${{ runner.temp }}/v5-bounded-adapter-attestation
     steps:
+      - name: Initialize bounded attestation directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-bounded-adapter-attestation" >> "$GITHUB_ENV"
+          mkdir -p "${RUNNER_TEMP}/v5-bounded-adapter-attestation"
+
       - name: Depth-one partial sparse checkout of bounded inputs
         env:
           GH_TOKEN: ${{ github.token }}
