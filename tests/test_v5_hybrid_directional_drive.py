@@ -1,6 +1,7 @@
 from dataclasses import replace
 import copy
 import inspect
+import json
 import math
 import os
 from pathlib import Path
@@ -232,6 +233,12 @@ def _synthetic_family(values):
         local_mesh_levels=(2, 3),
         expected_identity=_synthetic_marginal_identity(),
     )
+
+
+def _print_marginal_diagnostics(label, diagnostics):
+    print("MARGINAL_DIAGNOSTICS " + json.dumps(
+        {"case": label, **diagnostics}, sort_keys=True,
+    ))
 
 
 def test_1_no_void_root_provider_parity_is_exact():
@@ -469,6 +476,7 @@ def test_8_converged_marginal_family_uses_smallest_delta_on_finest_mesh():
         (2.0e-5, 3): 104.0,
     }
     diagnostics = _synthetic_family(values)
+    _print_marginal_diagnostics("CONVERGED", diagnostics)
     assert diagnostics["marginal_convergence_passed"]
     assert diagnostics["authoritative_delta_a_m"] == 2.0e-5
     assert diagnostics["authoritative_mesh_level"] == 3
@@ -485,6 +493,7 @@ def test_9_mesh_nonconvergence_rejects_finite_certified_family():
         (2.0e-5, 2): 100.0,
         (2.0e-5, 3): 101.0,
     })
+    _print_marginal_diagnostics("MESH_NONCONVERGED", diagnostics)
     assert not diagnostics["marginal_convergence_passed"]
     assert diagnostics["marginal_unavailable_reason"] == "MARGINAL_G_MESH_NOT_CONVERGED"
     assert diagnostics["authoritative_G_marginal_J_per_m2"] is None
@@ -497,6 +506,7 @@ def test_10_delta_a_nonconvergence_rejects_mesh_converged_family():
         (2.0e-5, 2): 100.0,
         (2.0e-5, 3): 101.0,
     })
+    _print_marginal_diagnostics("DELTA_A_NONCONVERGED", diagnostics)
     assert all(
         value <= MARGINAL_G_MESH_RELATIVE_LIMIT
         for value in diagnostics["marginal_mesh_relative_errors_by_delta"].values()
@@ -529,6 +539,8 @@ def test_11_incomplete_or_uncertified_marginal_family_is_unavailable():
         local_mesh_levels=(2, 3),
         expected_identity=_synthetic_marginal_identity(),
     )
+    _print_marginal_diagnostics("INCOMPLETE", incomplete)
+    _print_marginal_diagnostics("UNCERTIFIED", uncertified)
     assert uncertified["marginal_unavailable_reason"] == "MARGINAL_TRIAL_NOT_CERTIFIED"
     assert not incomplete["marginal_convergence_passed"]
     assert not uncertified["marginal_convergence_passed"]
@@ -550,6 +562,8 @@ def test_12_sign_inconsistent_family_is_unavailable_except_at_numerical_zero():
         (2.0e-5, 2): -zero_scale,
         (2.0e-5, 3): zero_scale,
     })
+    _print_marginal_diagnostics("SIGN_INCONSISTENT", inconsistent)
+    _print_marginal_diagnostics("SIGNED_NUMERICAL_ZERO", numerical_zero)
     assert numerical_zero["marginal_signed_G_consistent"]
     assert numerical_zero["marginal_zero_drive_classification"] == (
         "ALL_SIGNED_G_WITHIN_NUMERICAL_ZERO"

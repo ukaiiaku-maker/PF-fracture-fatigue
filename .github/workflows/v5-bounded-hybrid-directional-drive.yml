@@ -1,4 +1,4 @@
-name: V5 bounded hybrid directional drive
+name: V5 bounded hybrid directional drive hardening
 
 on:
   push:
@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: 90
     env:
       VOIDING_V5_SOURCE_COMMIT: ${{ github.sha }}
+      PRIOR_HYBRID_IMPLEMENTATION_SHA: 2faba01ed68d0e2474c88ecf98d2c75b0ce05eb9
+      HARDENING_IMPLEMENTATION_SHA: b58997bdb18cf4e9a32c251c073115d8b405bb27
     steps:
       - name: Initialize bounded attestation directory
         shell: bash
@@ -68,13 +70,18 @@ jobs:
         run: |
           set -euo pipefail
           {
-            echo "hybrid_implementation_sha=$GITHUB_SHA"
+            echo "prior_hybrid_implementation_sha=$PRIOR_HYBRID_IMPLEMENTATION_SHA"
+            echo "hardening_implementation_sha=$HARDENING_IMPLEMENTATION_SHA"
+            echo "workflow_sha=$GITHUB_SHA"
             python --version
             python -m pip --version
             python -m pip freeze
           } | tee "$ATTESTATION_DIR/environment.txt"
 
-      - name: Freeze and collect exactly seven bounded tests
+      - name: Compile bounded provider sources
+        run: python -m compileall -q arrhenius_fracture tests/test_v5_hybrid_directional_drive.py
+
+      - name: Freeze and collect exactly fifteen bounded tests
         run: |
           set -euo pipefail
           TEST_NODES=(
@@ -82,22 +89,30 @@ jobs:
             tests/test_v5_hybrid_directional_drive.py::test_2_two_tip_branching_ownership_never_mixes_scalar_or_state_identity
             tests/test_v5_hybrid_directional_drive.py::test_3_far_void_child_uses_valid_nested_local_J
             tests/test_v5_hybrid_directional_drive.py::test_4_overlap_local_and_marginal_agree_without_blending
-            tests/test_v5_hybrid_directional_drive.py::test_5_near_void_rejects_contour_and_uses_converged_exact_marginal
+            tests/test_v5_hybrid_directional_drive.py::test_5_near_void_rejects_contour_and_requires_converged_exact_marginal
             tests/test_v5_hybrid_directional_drive.py::test_6_reflected_candidate_pair_has_symmetric_directional_drive
             tests/test_v5_hybrid_directional_drive.py::test_7_real_child_continuation_uses_one_hybrid_first_passage_and_topology_action
+            tests/test_v5_hybrid_directional_drive.py::test_8_converged_marginal_family_uses_smallest_delta_on_finest_mesh
+            tests/test_v5_hybrid_directional_drive.py::test_9_mesh_nonconvergence_rejects_finite_certified_family
+            tests/test_v5_hybrid_directional_drive.py::test_10_delta_a_nonconvergence_rejects_mesh_converged_family
+            tests/test_v5_hybrid_directional_drive.py::test_11_incomplete_or_uncertified_marginal_family_is_unavailable
+            tests/test_v5_hybrid_directional_drive.py::test_12_sign_inconsistent_family_is_unavailable_except_at_numerical_zero
+            tests/test_v5_hybrid_directional_drive.py::test_13_actual_process_owner_and_absent_owner_fail_closed_before_trial
+            tests/test_v5_hybrid_directional_drive.py::test_14_two_fronts_share_one_process_owner_without_cache_or_observation_collision
+            tests/test_v5_hybrid_directional_drive.py::test_15_expected_noncertification_fails_closed_and_programming_errors_propagate
           )
           printf '%s\n' "${TEST_NODES[@]}" | tee "$ATTESTATION_DIR/requested-node-inventory.txt"
-          test "$(sort -u "$ATTESTATION_DIR/requested-node-inventory.txt" | wc -l | tr -d ' ')" = 7
+          test "$(sort -u "$ATTESTATION_DIR/requested-node-inventory.txt" | wc -l | tr -d ' ')" = 15
           python -m pytest --collect-only -q -p no:cacheprovider "${TEST_NODES[@]}" \
             | tee "$ATTESTATION_DIR/collect-only.log"
           grep -E '^[^[:space:]]+::' "$ATTESTATION_DIR/collect-only.log" \
             > "$ATTESTATION_DIR/collected-node-inventory.txt"
-          test "$(sort -u "$ATTESTATION_DIR/collected-node-inventory.txt" | wc -l | tr -d ' ')" = 7
+          test "$(sort -u "$ATTESTATION_DIR/collected-node-inventory.txt" | wc -l | tr -d ' ')" = 15
           diff -u \
             <(sort "$ATTESTATION_DIR/requested-node-inventory.txt") \
             <(sort "$ATTESTATION_DIR/collected-node-inventory.txt")
 
-      - name: Run the seven bounded tests once
+      - name: Run the fifteen bounded tests once
         id: bounded_tests
         shell: bash
         run: |
@@ -107,13 +122,21 @@ jobs:
             tests/test_v5_hybrid_directional_drive.py::test_2_two_tip_branching_ownership_never_mixes_scalar_or_state_identity
             tests/test_v5_hybrid_directional_drive.py::test_3_far_void_child_uses_valid_nested_local_J
             tests/test_v5_hybrid_directional_drive.py::test_4_overlap_local_and_marginal_agree_without_blending
-            tests/test_v5_hybrid_directional_drive.py::test_5_near_void_rejects_contour_and_uses_converged_exact_marginal
+            tests/test_v5_hybrid_directional_drive.py::test_5_near_void_rejects_contour_and_requires_converged_exact_marginal
             tests/test_v5_hybrid_directional_drive.py::test_6_reflected_candidate_pair_has_symmetric_directional_drive
             tests/test_v5_hybrid_directional_drive.py::test_7_real_child_continuation_uses_one_hybrid_first_passage_and_topology_action
+            tests/test_v5_hybrid_directional_drive.py::test_8_converged_marginal_family_uses_smallest_delta_on_finest_mesh
+            tests/test_v5_hybrid_directional_drive.py::test_9_mesh_nonconvergence_rejects_finite_certified_family
+            tests/test_v5_hybrid_directional_drive.py::test_10_delta_a_nonconvergence_rejects_mesh_converged_family
+            tests/test_v5_hybrid_directional_drive.py::test_11_incomplete_or_uncertified_marginal_family_is_unavailable
+            tests/test_v5_hybrid_directional_drive.py::test_12_sign_inconsistent_family_is_unavailable_except_at_numerical_zero
+            tests/test_v5_hybrid_directional_drive.py::test_13_actual_process_owner_and_absent_owner_fail_closed_before_trial
+            tests/test_v5_hybrid_directional_drive.py::test_14_two_fronts_share_one_process_owner_without_cache_or_observation_collision
+            tests/test_v5_hybrid_directional_drive.py::test_15_expected_noncertification_fails_closed_and_programming_errors_propagate
           )
           started="$(date +%s)"
           set +e
-          python -m pytest -vv -p no:cacheprovider --durations=0 \
+          python -m pytest -vv -s -p no:cacheprovider --durations=0 \
             --junitxml="$ATTESTATION_DIR/pytest-junit.xml" "${TEST_NODES[@]}" \
             2>&1 | tee "$ATTESTATION_DIR/pytest.log"
           pytest_status="${PIPESTATUS[0]}"
@@ -135,9 +158,16 @@ jobs:
           print(f"skipped={totals['skipped']}")
           PY
           cat "$ATTESTATION_DIR/pytest-counts.txt"
+          sed -n 's/^.*MARGINAL_DIAGNOSTICS //p' "$ATTESTATION_DIR/pytest.log" \
+            > "$ATTESTATION_DIR/convergence-diagnostics.jsonl"
+          test "$(wc -l < "$ATTESTATION_DIR/convergence-diagnostics.jsonl" | tr -d ' ')" = 7
+          grep -q 'test_7_real_child_continuation_uses_one_hybrid_first_passage_and_topology_action' \
+            "$ATTESTATION_DIR/pytest.log"
+          echo 'retained_child_continuation=PASS_ONCE' \
+            > "$ATTESTATION_DIR/retained-child-continuation.txt"
           test "$pytest_status" = 0
-          grep -Fxq 'tests=7' "$ATTESTATION_DIR/pytest-counts.txt"
-          grep -Fxq 'passed=7' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'tests=15' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'passed=15' "$ATTESTATION_DIR/pytest-counts.txt"
 
       - name: Verify clean worker and record classifications
         if: always()
@@ -151,13 +181,22 @@ jobs:
           test ! -s "$ATTESTATION_DIR/git-status.txt"
           echo 'clean_worktree=PASS' > "$ATTESTATION_DIR/clean-worktree.txt"
           {
-            echo "hybrid_implementation_sha=$GITHUB_SHA"
+            echo "prior_hybrid_implementation_sha=$PRIOR_HYBRID_IMPLEMENTATION_SHA"
+            echo "hardening_implementation_sha=$HARDENING_IMPLEMENTATION_SHA"
+            echo "workflow_sha=$GITHUB_SHA"
             echo "bounded_test_step_outcome=$TEST_OUTCOME"
             if test "$TEST_OUTCOME" = success; then
-              echo 'DIRECTIONAL_CRACK_DRIVE_PROVIDER=PASS_HYBRID_LOCAL_J_AND_EXACT_MARGINAL_G'
+              echo 'DIRECTIONAL_CRACK_DRIVE_PROVIDER=PASS_HYBRID_LOCAL_J_AND_CONVERGED_EXACT_MARGINAL_G'
               echo 'DIRECTIONAL_K_KINETIC_INTERPRETATION=ENERGY_EQUIVALENT_CANDIDATE_LOAD'
               echo 'VOID_INTERACTION_IN_DIRECTIONAL_DRIVE=PASS_EXACT_FEM'
+              echo 'PRODUCTION_RUNTIME_MARGINAL_CONVERGENCE_GUARD=PASS'
+              echo 'PROCESS_OWNER_IDENTITY=PASS_CANONICAL_PRODUCTION_OWNER'
+              echo 'EXPECTED_NONCERTIFICATION_EXCEPTION_TAXONOMY=PASS'
+              echo 'UNEXPECTED_PROGRAMMING_EXCEPTIONS_PROPAGATE=PASS'
+              echo 'EXISTING_R_TIP_LAW_REUSED_BY_DOWNSTREAM_CHILD=PASS'
+              echo 'DIRECT_R_VOID_SUBSTITUTION=ABSENT'
               echo 'CLASSICAL_ABSOLUTE_WILLIAMS_KI_KII=NOT_CLAIMED'
+              echo 'CONFORMING_TIP_PATCH=NOT_REQUIRED_FOR_KINETIC_EVENT_SELECTION'
               echo 'FIRST_PASSAGE_AND_TOPOLOGY_OWNERSHIP=PASS_SINGLE_ACTION'
               echo 'CHECKPOINT_RESTORE=PASS_IDENTICAL_DIRECTIONAL_DRIVE'
             else

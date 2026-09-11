@@ -124,9 +124,11 @@ MARGINAL_G_MESH_RELATIVE_LIMIT = 0.10
 MARGINAL_G_DELTA_A_RELATIVE_LIMIT = 0.10
 MARGINAL_ENERGY_RELATIVE_ACCURACY = 1.0e-8
 MARGINAL_ENERGY_ABSOLUTE_ACCURACY_J_PER_M = 1.0e-12
+MARGINAL_DELTA_A_VALUES_M = (3.0e-5, 2.0e-5)
+MARGINAL_LOCAL_MESH_LEVELS = (2, 3, 4)
 ```
 
-The dedicated clean-worker matrix contains exactly seven tests:
+The original dedicated clean-worker matrix contained exactly seven tests:
 
 1. no-void root provider parity;
 2. two-tip candidate/observation ownership;
@@ -142,16 +144,61 @@ No static matrix, natural-seed ensemble, complete void trajectory, full A/B
 campaign, V13 branching ensemble, fatigue calculation, or calibration belongs
 to this checkpoint.
 
+That original exact-head clean-worker attestation is complete:
+
+- implementation SHA: `2faba01ed68d0e2474c88ecf98d2c75b0ce05eb9`;
+- workflow run: `34567120033`;
+- result: 7 passed / 0 failed / 0 errors / 0 skipped;
+- artifact ID: `10186464166`;
+- artifact digest:
+  `sha256:fead9b7e97144cf3dc111a3eb23634942f3ebbfed6b458bac8f8db26124a1d2a`.
+
+## Final runtime hardening
+
+The hardening implementation is
+`b58997bdb18cf4e9a32c251c073115d8b405bb27`, a normal descendant of the
+prospective contract commit `8f55a6f`.  It makes the fixed runtime marginal
+family 30 and 20 micrometres across local refinement levels 2, 3, and 4.  All
+six signed rows remain in diagnostics; only levels 3 and 4 control the mesh
+gate, and only 20 micrometres at level 4 becomes authoritative after every
+gate passes.
+
+The provider now receives an explicit front-to-process-owner map.  The owner
+must exist in the accepted process registry and match both the branch process
+region and any checkpoint owner map.  Trial cache and output identities retain
+both front and owner, including the shared-owner/multiple-front case.
+
+Only `MarginalDriveNotCertified` is converted into an unavailable drive.
+Recognized endpoint-domain and V12-support failures are translated at their
+narrow call boundaries.  Other runtime errors, value errors, malformed data,
+identity inconsistencies, mutation detections, and cache failures propagate.
+
+The new bounded matrix contains the prior seven provider/continuation tests and
+eight hardening tests covering converged, mesh-nonconverged,
+delta-a-nonconverged, incomplete/uncertified, and sign-inconsistent families;
+distinct and shared process owners; fail-before-solve owner rejection; and the
+expected/unexpected exception taxonomy.  The retained real child continuation
+appears exactly once.  Local bounded verification passed all 14 non-continuation
+nodes together and the one retained continuation separately.  The clean-worker
+record will be appended after the dedicated exact-head workflow completes.
+
 ## Terminal classifications
 
-Pending the dedicated exact-head clean-worker result, the implementation's
-target classifications are:
+The implementation classifications, pending the final dedicated exact-head
+clean-worker attestation, are:
 
 ```text
-DIRECTIONAL_CRACK_DRIVE_PROVIDER = PASS_HYBRID_LOCAL_J_AND_EXACT_MARGINAL_G
+DIRECTIONAL_CRACK_DRIVE_PROVIDER = PASS_HYBRID_LOCAL_J_AND_CONVERGED_EXACT_MARGINAL_G
 DIRECTIONAL_K_KINETIC_INTERPRETATION = ENERGY_EQUIVALENT_CANDIDATE_LOAD
 VOID_INTERACTION_IN_DIRECTIONAL_DRIVE = PASS_EXACT_FEM
+PRODUCTION_RUNTIME_MARGINAL_CONVERGENCE_GUARD = PASS
+PROCESS_OWNER_IDENTITY = PASS_CANONICAL_PRODUCTION_OWNER
+EXPECTED_NONCERTIFICATION_EXCEPTION_TAXONOMY = PASS
+UNEXPECTED_PROGRAMMING_EXCEPTIONS_PROPAGATE = PASS
+EXISTING_R_TIP_LAW_REUSED_BY_DOWNSTREAM_CHILD = PASS
+DIRECT_R_VOID_SUBSTITUTION = ABSENT
 CLASSICAL_ABSOLUTE_WILLIAMS_KI_KII = NOT_CLAIMED
+CONFORMING_TIP_PATCH = NOT_REQUIRED_FOR_KINETIC_EVENT_SELECTION
 ```
 
 A conforming-tip patch remains a possible separately scoped reporting route for
