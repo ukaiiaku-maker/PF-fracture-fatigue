@@ -56,3 +56,19 @@ def test_stiff_analytical_solve_fails_closed_and_releases_budget(monkeypatch):
     with pytest.raises(ValueError,match='budget exhausted'):model.solve(.001)
     assert not model._budget_active
     assert np.isfinite(model.state(.001,np.zeros(2))[0])
+
+
+def test_pre_budget_cache_must_repeat_current_admission(monkeypatch):
+    import scripts.analyze_row_renewal_forward_v10230 as audit
+    calls=[]
+    def reject_prior(result,row,manifest):
+        calls.append(result)
+        return dict(result,F1_status='STATE_CLOSURE_UNAVAILABLE')
+    monkeypatch.setattr(audit,'qualify_independent_f1',reject_prior)
+    old={'F1_status':'FIRST_PASSAGE'}
+    new=audit.qualify_cached_result(old,{},None)
+    assert new['F1_status']=='STATE_CLOSURE_UNAVAILABLE'
+    assert old['F1_status']=='FIRST_PASSAGE'
+    assert new['analytical_work_budget']==100000
+    assert audit.qualify_cached_result(new,{},None) is new
+    assert len(calls)==1

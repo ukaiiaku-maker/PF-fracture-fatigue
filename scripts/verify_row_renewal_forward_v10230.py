@@ -181,6 +181,9 @@ def verify():
             if hashlib.sha256((ART/name).read_bytes()).hexdigest()!=h:raise ValueError('figure source stale')
         for s in p['series']:validate_series(s,read(s['table']))
     newrun=ROOT/'runs/row_renewal_monotonic_forward_v1'
+    cached=list((newrun/'conditions').glob('*.json'))
+    if len(cached)!=1332:raise ValueError('analytical condition cache incomplete')
+    if any(json.loads(p.read_text()).get('analytical_work_budget')!=100000 for p in cached):raise ValueError('cache lacks current budget admission')
     for pattern in ['**/run_args.json','**/steps_*.csv','**/stochastic_avalanche_geometry_events.json','**/high_cycle_run_manifest.json']:
         if list(newrun.glob(pattern)):raise ValueError('new physical trajectory in analysis root')
     hashes=json.loads((ART/'file_hashes.json').read_text())

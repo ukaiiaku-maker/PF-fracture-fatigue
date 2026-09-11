@@ -15,8 +15,8 @@
     "scripts/run_v10_2_30_four_class_monotonic_parity.sh": "27a6cc1b259dce373cc7f0eb557a1406825283ebaea2ab2ef32bb6dde44073a8",
     "scripts/forward_temperature_model_v10230.py": "c8134722eab8bc7c506dae8fbbdb7cfa45a7c8a5f4e5203c6eaf82554780da64",
     "scripts/analyze_forward_temperature_v10230.py": "813c2e97a23e32d8230eda9215519949bd389814f8c8b9dc7135cbbe6191982a",
-    "scripts/analyze_row_renewal_forward_v10230.py": "031c174ce944e829549d74d4b40ed7dd1ce940aab5a33e1c038dc0f9d96d7e9f",
-    "scripts/verify_row_renewal_forward_v10230.py": "8e747d039d21bfb594320dd1d48736ce9edd151b12275f97d3c2e5e0b41f220c",
+    "scripts/analyze_row_renewal_forward_v10230.py": "d56d40b26101fdcfa1128b408f7f0c18b8ada8120d628bf05060406da136a914",
+    "scripts/verify_row_renewal_forward_v10230.py": "673d5f793632a67c40f6c1aea057c8b8de18705cf0c32acdff8c7c90c64d765a",
     "scripts/plot_row_renewal_forward_v10230.py": "7437028c87a1afe361c69b26637723b698d46978ac8d171b590455a1429e7d9b"
   },
   "executed_fatigue_controls": {
@@ -96,5 +96,6 @@
   "previous_generic_equation_audit": "artifacts/retained_controls_monotonic_forward/source_equation_audit.json",
   "renewal_override": "Read exactly physics__cleavage_hits and physics__cleavage_correlation_time_s from each complete row. Other reduced controls unchanged.",
   "generic_protocol_freeze_commit": "1f1c201c8584e8b0bbc5c02a27d394af711a66fe",
-  "analytical_budget_commit": "313ed166c36d7dafb8526a17382d049d2d930e73"
+  "analytical_budget_commit": "313ed166c36d7dafb8526a17382d049d2d930e73",
+  "cache_admission_amendment": "Strict verification exposed a pre-budget cached root exceeding the current evaluation budget. Every cached F1 result is requalified when its admission-budget stamp is absent or differs. Prior records are preserved under runs/row_renewal_monotonic_forward_v1/pre_budget_admission_records; no accuracy tolerance or classification gate changed."
 }

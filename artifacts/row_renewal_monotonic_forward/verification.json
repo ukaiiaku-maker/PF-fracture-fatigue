@@ -1,10 +1,11 @@
 {
   "status": "PENDING_STRICT_VERIFIER",
   "passed": false,
-  "focused_tests_passed": 120,
+  "focused_tests_passed": 121,
   "focused_test_log": "runs/row_renewal_monotonic_forward_v1/focused_tests.log",
   "shell_syntax": "PASS both production launchers",
   "git_diff_check": "PASS",
   "new_physical_trajectories": 0,
-  "plot_QA": "Inspected absolute-load and three-threshold figures; absolute scales and inaccessible plateaus visible; BEST samples are not joined across unavailable F1 conditions."
+  "plot_QA": "Inspected absolute-load and three-threshold figures; absolute scales and inaccessible plateaus visible; BEST samples are not joined across unavailable F1 conditions.",
+  "initial_verifier_failure": "Pre-budget cached F1 exceeded current state-evaluation budget; cache admission fixed and all prior results requalified with records preserved."
 }

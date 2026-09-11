@@ -129,6 +129,13 @@ def qualify_independent_f1(result,row,manifest):
     return result
 
 
+def qualify_cached_result(result,row,manifest):
+    if result.get('analytical_work_budget')==TransientBlunting.max_state_evaluations:return result
+    result=qualify_independent_f1(result,row,manifest)
+    result['analytical_work_budget']=TransientBlunting.max_state_evaluations
+    return result
+
+
 def main():
     cfg=json.loads((ART/'monotonic_forward_configuration.json').read_text());rows=source_rows();results=[]
     RUN.mkdir(parents=True,exist_ok=True);(RUN/'conditions').mkdir(exist_ok=True)
@@ -139,9 +146,16 @@ def main():
         rate=.005*factor
         for T in range(300,1201,25):
           p=RUN/'conditions'/f'{cid}_{label}_{rate:g}_{T}.json'
-          if p.exists():result=json.loads(p.read_text())
+          if p.exists():
+            original=json.loads(p.read_text())
+            result=qualify_cached_result(original,row,m)
+            if result!=original:
+                prior=RUN/'pre_budget_admission_records';prior.mkdir(exist_ok=True)
+                (prior/p.name).write_bytes(p.read_bytes())
+                p.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
           else:
             result=qualify_independent_f1(condition(cid,row,m,float(T),rate,xi,label),row,m)
+            result['analytical_work_budget']=TransientBlunting.max_state_evaluations
             p.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
           results.append(result)
         print(cid,label,rate,'complete',flush=True)

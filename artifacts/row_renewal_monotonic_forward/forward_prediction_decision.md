@@ -38,6 +38,6 @@ A_NATIVE is reported separately as an accessible low-temperature branch with hig
 
 The saturated limit is KFP=Xi*Kdot*tau. The corrected plateau is 0.6992153587194454 times the old generic plateau at the same threshold and rate; neither is a numerical lower bound. Fixed-load D1/D2/DT surfaces are unchanged, but action-weighted descriptors, AK, AT and first-passage derivatives were recomputed.
 
-F1 admitted: 541; F1 unavailable: 791. Unavailable F1/F2 states are not represented as full-state predictions. No physical trajectory was launched.
+F1 admitted: 539; F1 unavailable: 793. Unavailable F1/F2 states are not represented as full-state predictions. No physical trajectory was launched.
 
-The deterministic analytical budget rejected 17 F1 conditions at 100,000 state evaluations per solve. These are included in the unavailable count. No accuracy or classification tolerance was relaxed; the stopped pre-budget analytical attempt and all completed condition records are retained under runs/row_renewal_monotonic_forward_v1.
+The deterministic analytical budget rejected 19 F1 conditions at 100,000 state evaluations per solve. These are included in the unavailable count. No accuracy or classification tolerance was relaxed; the stopped pre-budget analytical attempt and all completed condition records are retained under runs/row_renewal_monotonic_forward_v1.
