@@ -1042,50 +1042,109 @@ def directional_clock_rates(state, stress_tensor_Pa, *, temperature_K=900.0):
     return rates
 
 
-def sharp_front_load_provider(state, *, branch_id, candidates=None):
-    """Reuse the pre-void directional J/K provider for an explicit active tip."""
-    from .sharp_front_v11_branching import measure_directional_front_loads
+def sharp_front_load_provider(
+    state, *, branch_id, candidates=None, evaluate_overlap_marginals=False,
+    marginal_delta_a_m=None, marginal_mesh_levels=(2, 3),
+):
+    """Use valid nested local J, else an exact fixed-void marginal G trial."""
+    from .hybrid_directional_drive_v5 import hybrid_directional_drive_provider
     payload = state.tip_process_state.get("by_branch", {}).get(branch_id)
     if payload is None:
         raise ValueError("active child has no canonical sharp-front engine state")
     engine = restore_sharp_front_engine(state.material, payload)
     inventory = state.competition.candidates if candidates is None else tuple(candidates)
-    return measure_directional_front_loads(
-        state, inventory, branch_id=branch_id,
+    if branch_id not in state.crack_network.active_tip_ids:
+        raise ValueError("hybrid directional drive requires an active branch")
+    candidates_by_tip = {
+        tip_id: inventory if tip_id == branch_id else ()
+        for tip_id in state.crack_network.active_tip_ids
+    }
+    return hybrid_directional_drive_provider(
+        state, candidates_by_tip,
         contour_radius_m=max(float(engine.f.L_pz), 1.0e-6),
         provider_contract_contour_radius_m=max(float(engine.f.L_pz), 1.0e-6),
+        marginal_delta_a_m=marginal_delta_a_m,
+        marginal_mesh_levels=marginal_mesh_levels,
+        evaluate_overlap_marginals=bool(evaluate_overlap_marginals),
+        source_commit=_head(),
+        prepare_support_state=_refresh_downstream_boundary_context,
+        conform_trial_endpoint=lambda trial, endpoint: _conform_bulk_point(
+            trial, endpoint, identity="HYBRID_MARGINAL_ENDPOINT_CONFORMING",
+        ),
     )
 
 
 def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=900.0):
     """Preview child rates through the unchanged old engine and owned ledgers."""
+    from .directional_competition_v11 import preview_production_cleavage_rate
+    from .hybrid_directional_drive_v5 import K_INTERPRETATION
     payload = state.tip_process_state.get("by_branch", {}).get(branch_id)
     if payload is None:
         raise ValueError("active child has no canonical sharp-front engine state")
     engine = restore_sharp_front_engine(state.material, payload)
     by_candidate = {row["candidate_id"]: row for row in load_rows}
+    expected_candidates = {item.candidate_id for item in state.competition.candidates}
+    if set(by_candidate) != expected_candidates:
+        raise RuntimeError("hybrid load rows do not exactly match the owned candidate inventory")
+    identity_tuples = {
+        (row.get("accepted_state_id"), row.get("stress_field_state_id"),
+         row.get("topology_fingerprint"))
+        for row in load_rows
+    }
+    if len(identity_tuples) != 1:
+        raise RuntimeError("hybrid load rows mix accepted mechanics identities")
     rates = []
     for candidate, hazard in zip(state.competition.candidates, state.competition.hazard_states):
         load = by_candidate[candidate.candidate_id]
-        directional_K = max(float(load["K_directional_Pa_sqrt_m"]), 0.0)
+        if str(load.get("tip_id", branch_id)) != str(branch_id):
+            raise RuntimeError("directional scalar drive is detached from its owning front")
+        if str(load.get("controlling_scalar_tip_id", branch_id)) != str(
+            load.get("tensor_probe_tip_id", branch_id)
+        ):
+            raise RuntimeError("hybrid scalar and tensor observations have different tip owners")
+        G_kinetic = max(float(load.get(
+            "G_kinetic_used_J_per_m2", load["positive_J_J_per_m2"]
+        )), 0.0)
+        available = load.get("directional_drive_status", "AVAILABLE") == "AVAILABLE"
+        directional_K = math.sqrt(float(state.material.Eprime) * G_kinetic)
         effective_K = directional_K / math.sqrt(float(candidate.gamma_rel))
         response = sharp_front_constitutive_response(
             engine, K_Pa_sqrt_m=effective_K, temperature_K=temperature_K, dt_s=1.0,
         )
-        rate = 0.0 if directional_K <= 0.0 else max(response["cleavage_rate_s"], 0.0)
+        adapted = preview_production_cleavage_rate(
+            engine, candidate, signed_J_J_per_m2=G_kinetic,
+            Eprime_Pa=float(state.material.Eprime), temperature_K=temperature_K,
+        )
+        rate = 0.0 if (not available or G_kinetic <= 0.0) else max(adapted.lambda_per_s, 0.0)
         remaining = max(hazard.current_threshold_action - hazard.action, 0.0)
         rates.append({
             "candidate_id": candidate.candidate_id,
             "raw_rate_s": response["cleavage_raw_rate_s"],
             "effective_rate_s": rate,
             "rate_s": rate,
+            "rate": rate,
             "resolved_opening_stress_Pa": response["sigma_tip_Pa"],
             "hazard_barrier_J": response["cleavage_barrier_J"],
             "crossing_time_s": math.inf if rate <= 0.0 else remaining / rate,
             "K_directional_Pa_sqrt_m": directional_K,
+            "K_energy_equivalent_Pa_sqrt_m": directional_K,
             "K_effective_Pa_sqrt_m": effective_K,
-            "signed_J_J_per_m2": float(load["signed_J_J_per_m2"]),
-            "positive_J_J_per_m2": float(load["positive_J_J_per_m2"]),
+            "K_interpretation": load.get("K_interpretation", K_INTERPRETATION),
+            "signed_J_J_per_m2": float(load.get("G_local_J_per_m2", load["signed_J_J_per_m2"])),
+            "positive_J_J_per_m2": G_kinetic,
+            "G_local_J_per_m2": float(load.get("G_local_J_per_m2", load["signed_J_J_per_m2"])),
+            "G_local": float(load.get("G_local_J_per_m2", load["signed_J_J_per_m2"])),
+            "local_contour_valid": bool(load.get("local_contour_valid", True)),
+            "G_marginal_J_per_m2": load.get("G_marginal_J_per_m2"),
+            "G_marginal": load.get("G_marginal_J_per_m2"),
+            "G_kinetic_used_J_per_m2": G_kinetic,
+            "G_kinetic_used": G_kinetic,
+            "drive_source": load.get("drive_source", "LEGACY_DIRECTIONAL_J"),
+            "tip_id": str(load.get("tip_id", branch_id)),
+            "accepted_state_id": load.get("accepted_state_id"),
+            "stress_field_state_id": load.get("stress_field_state_id"),
+            "topology_fingerprint": load.get("topology_fingerprint"),
+            "directional_drive_status": load.get("directional_drive_status", "AVAILABLE"),
             "r_eff_m": response["r_eff_m"],
             "sigma_tip_Pa": response["sigma_tip_Pa"],
             "cleavage_barrier_J": response["cleavage_barrier_J"],
@@ -1094,6 +1153,7 @@ def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=
             "emission_rate_s": response["emission_rate_s"],
             "clock_increment_per_second": response["clock_increment"],
             "constitutive_engine": "FrontEngine",
+            "production_rate_adapter": "preview_production_cleavage_rate",
         })
     return rates
 
