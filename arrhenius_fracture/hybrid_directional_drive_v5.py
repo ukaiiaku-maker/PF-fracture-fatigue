@@ -28,6 +28,14 @@ from .topology_transaction_v11 import (
 
 MODEL_ID = "v5.hybrid-candidate-directional-drive/1"
 K_INTERPRETATION = "CANDIDATE_ENERGY_EQUIVALENT_NOT_WILLIAMS_ABSOLUTE_K"
+MARGINAL_G_MESH_RELATIVE_LIMIT = 0.10
+MARGINAL_G_DELTA_A_RELATIVE_LIMIT = 0.10
+# These are the already-established topology-transaction energy tolerances.
+# The directional-G floor is derived from them and the requested delta-a; it is
+# therefore dimensionally an energy-release-rate accuracy, not an arbitrary
+# absolute scale selected from the observed marginal values.
+MARGINAL_ENERGY_RELATIVE_ACCURACY = 1.0e-8
+MARGINAL_ENERGY_ABSOLUTE_ACCURACY_J_PER_M = 1.0e-12
 SOURCE_COMMITS = {
     "live_topology_kernel_v11": "0238aae096aa29e79829d3c562383c38f2290ad6",
     "v12_directional_ownership_and_trial_pattern": "b3d0add6cbb0605adaa3e04006fe987961ad6452",

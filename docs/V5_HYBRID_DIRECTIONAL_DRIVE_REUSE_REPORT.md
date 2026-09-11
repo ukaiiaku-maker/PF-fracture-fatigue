@@ -105,6 +105,27 @@ downstream_front_transaction(continuation=True)
 
 ## Bounded qualification definition
 
+The runtime marginal route is prospectively governed by the following fixed
+contract.  It requires at least two positive delta-a values, at least two local
+mesh levels, and the complete Cartesian product.  Every row must be a
+`CERTIFIED_EXACT_FIXED_VOID_MARGINAL` observation with identical candidate,
+front, process-owner, accepted-state, stress-field-state, topology, void, and
+source identities.  The two finest mesh levels must agree within 10% at each
+delta-a, and the two smallest delta-a values must agree within 10% on the
+finest mesh.  A sign change is accepted only when every signed G lies within a
+numerical-zero floor derived from the existing `1e-8` relative and `1e-12 J/m`
+absolute topology-transaction energy tolerances.  Only after all gates pass may
+the smallest delta-a at the finest mesh level control kinetics.  Otherwise the
+provider returns an unavailable drive with zero G, zero energy-equivalent K,
+and zero rate without changing accepted or process state.
+
+```text
+MARGINAL_G_MESH_RELATIVE_LIMIT = 0.10
+MARGINAL_G_DELTA_A_RELATIVE_LIMIT = 0.10
+MARGINAL_ENERGY_RELATIVE_ACCURACY = 1.0e-8
+MARGINAL_ENERGY_ABSOLUTE_ACCURACY_J_PER_M = 1.0e-12
+```
+
 The dedicated clean-worker matrix contains exactly seven tests:
 
 1. no-void root provider parity;
