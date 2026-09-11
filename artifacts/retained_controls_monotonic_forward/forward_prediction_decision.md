@@ -1,0 +1,22 @@
+# Current-row monotonic forward prediction
+
+F1 is a conditional source-bin moment. No full signed-state fracture archetype is established. Collapsed forward opening response cannot be labeled weak-T, Peak-T, DBTT, or ceramic.
+
+444 row-temperature-rate conditions; T=300–1200 K every 25 K, Kdot=0.0005/0.005/0.05 MPa√m/s. Primary common exponential threshold Xi=0.075093160362361466, seed 1720, engine 1. Unit-action screen is separately tabulated.
+
+| Row | Fatigue classification | KFP 300 K | KFP 1200 K | Forward classification |
+|---|---|---:|---:|---|
+| A_NATIVE | QUALIFIED_A_NATIVE_BASELINE | 10.1008472 | 0.000383789628 | FRACTURE_INADMISSIBLE_DESPITE_FATIGUE_CONTROL |
+| P25_TRANSFER_V1_RANK1 | EFFECTIVE_GLOBAL_SLOPE_ONLY | 0.000115572788 | 3.75465802e-10 | FRACTURE_INADMISSIBLE_DESPITE_FATIGUE_CONTROL |
+| P40_TRANSFER_CALIBRATED_GEN2 | EFFECTIVE_GLOBAL_SLOPE_ONLY | 0.000513190611 | 3.75465802e-10 | FRACTURE_INADMISSIBLE_DESPITE_FATIGUE_CONTROL |
+| P55_TRANSFER_V1_RANK1 | TARGET_NOT_TRANSFERRED_WITH_SINGLE_EXP_FLOOR | 0.00239722364 | 3.75465802e-10 | FRACTURE_INADMISSIBLE_DESPITE_FATIGUE_CONTROL |
+
+Only five cleavage coordinates differ from A_NATIVE. Explicit cleavage and emission gT and sT remain zero. Temperature response still arises through Arrhenius and cooperative renewal, plus the conditional F1 emission/blunting transient. This is P1/P2 design intent, not an independent P3 correction.
+
+F1 sensitivity/refinement or state failures: 224/444, recorded as unavailable; F0 remains labeled intrinsic. F2 is unavailable at every condition because a qualified monotonic tensor-drive/state replay is not available in this analysis. No zero state correction is assigned to F2.
+
+P25/P40 show no interpretable accessible full-range DBTT, Peak-T, weak-T, or ceramic topology in the available forward hierarchy. Their fatigue classifications are preserved. P55 retains nonzero fixed-load D1/D2 descriptors despite failed fatigue transfer, but its first-passage derivatives are suppressed by zero-load opening and renewal saturation. Finite collapsed loads are resolved roots, not a numerical floor.
+
+Opening barrier-height/floor restoration is the first analytical direction to test; explicit thermal derivatives or a second bounded component may provide independent shape control. No such change is selected or validated here. State-coupling changes are not justified by unavailable F2 evidence.
+
+All comparisons use absolute loads first. Normalized curves carry the same accessibility masks. This is analytical prediction, not experimental material identification.

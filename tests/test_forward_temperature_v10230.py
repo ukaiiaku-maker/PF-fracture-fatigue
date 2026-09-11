@@ -56,3 +56,20 @@ def test_f1_integrator_failure_fails_closed(monkeypatch):
     monkeypatch.setattr(model,'solve_ivp',lambda *a,**k:SimpleNamespace(success=False,message='Required step size is less than spacing between numbers.',y=np.zeros((3,2))))
     with pytest.raises(ValueError,match='STATE_CLOSURE_UNAVAILABLE'):
         TransientBlunting(m,{'rho_source0_m2':1e15},600,.005).solve(1.)
+
+
+def test_verifier_rejects_parameter_mutation():
+    from scripts.verify_forward_temperature_v10230 import validate_registry
+    from scripts.analyze_forward_temperature_v10230 import source_rows
+    from arrhenius_fracture.prospective_paris_candidate_engine_v10230 import digest
+    rows=source_rows();reg=[dict(candidate_id=k,complete_parameter_vector=dict(v[0]),complete_row_sha256=digest(v[0])) for k,v in rows.items()]
+    reg[1]['complete_parameter_vector']['cleave_G00_eV']='99'
+    with pytest.raises(ValueError,match='parameter changed'):validate_registry(reg,rows)
+
+
+def test_verifier_rejects_saturated_peak_and_fabricated_plot():
+    from scripts.verify_forward_temperature_v10230 import validate_classification,validate_series
+    with pytest.raises(ValueError,match='classification'):
+        validate_classification('PEAK_T_FORWARD_PREDICTION',[dict(accessibility='RENEWAL_CEILING_DOMINATED')])
+    with pytest.raises(ValueError,match='figure coordinates'):
+        validate_series(dict(x_column='T',y_column='K',x=[300],y=[10]),[dict(T='300',K='1e-9')])

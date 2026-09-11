@@ -1,0 +1,91 @@
+{
+  "source_head": "b29d1b54c6d69c9db969a9d95cd56a7cf429d022",
+  "protocol_freeze_commit": "1f1c201c8584e8b0bbc5c02a27d394af711a66fe",
+  "source_hashes": {
+    "arrhenius_fracture/material_manifest.py": "89c08bce0e3af82143bde7fbeab0d24ebd68e6f0e257ee915bb47ad2b831ba5a",
+    "arrhenius_fracture/analytical_screen_v1028.py": "bf633798a8fdd42337003643b923952a68758f94c119a71ba0386877c3de18af",
+    "arrhenius_fracture/persistent_site_source_v10221.py": "a9a073806c00fc709f0782110d83be89a51a271d5a42744be439fef7922f8794",
+    "arrhenius_fracture/persistent_site_physical_width_v10222.py": "f0be43e0551a349597b207ce689aaf96220ae2eb9265487bb79ec430ef4dae0e",
+    "arrhenius_fracture/campaign_calibrated_tip.py": "4b7fbfa1b18cb0e9d921807fd5f12d457d343996b1db8f0cacc8d1fdb76eecc1",
+    "arrhenius_fracture/unified_mpz.py": "ef26d6ee99805197f006a83387b3b2e968005cf5d57250c12495c21fcd93a1a2",
+    "arrhenius_fracture/inverse_fatigue_barrier_design_v10230.py": "fbab603f1a8c253aaf9902535ad475277d8577a9c896416d9990a7583cd07c42",
+    "arrhenius_fracture/state_resolved_drive_family_v1027.py": "8bb51fdbcc52dc94dfe08e192e49ca5ecb524539036fc385c93c05ca53fb89f2",
+    "arrhenius_fracture/state_resolved_reduced_campaign_v1029.py": "aff46850ad28d46274476e8c92668c9e7094dddca09b4a6ac78f56438c0276bf",
+    "arrhenius_fracture/stochastic_hazard_tip.py": "b312bec87e4a7cdd2caa25f9bf4d007499f5ca79ed941ec1d5aaef5f3a2dd499",
+    "scripts/run_v10_2_30_four_class_monotonic_parity.sh": "27a6cc1b259dce373cc7f0eb557a1406825283ebaea2ab2ef32bb6dde44073a8",
+    "scripts/forward_temperature_model_v10230.py": "c8134722eab8bc7c506dae8fbbdb7cfa45a7c8a5f4e5203c6eaf82554780da64",
+    "scripts/analyze_forward_temperature_v10230.py": "b93eac1deb84e1dfa0b05fa10dc9c2a66fbf240a5d652d4f4f5a344869ad8f1f"
+  },
+  "executed_fatigue_controls": {
+    "multihit_m": 3.0,
+    "multihit_tau": 1e-06,
+    "r_pz": 1e-06,
+    "sigma_cap_GPa": 30.0,
+    "mpz_n_bins": 80,
+    "mpz_length_um": 50.0,
+    "mpz_blunting_length_m": 5e-07,
+    "nu0_cleave": 1000000000000.0,
+    "nu0_emit": 100000000000.0
+  },
+  "executed_control_source": "runs/prospective_paris_transfer_v1/P40_TRANSFER_CALIBRATED_GEN2/K_18_R_0.1_seed_1720__attempt0/run_args.json",
+  "executed_control_source_sha256": "c5b90c829bd7c167519c158fa4933018bf012158f5aaa79ed6988f1dbb131402",
+  "source_config": {
+    "rho_site0_m2": 3855551510837146.5,
+    "reference_source_area_m2": 2.5e-11,
+    "reference_front_width_m": 9.999999999999999e-06,
+    "reference_density_m2": 5000000000000.0,
+    "source_zone_length_m": 2e-06,
+    "minimum_front_width_m": 0.0,
+    "maximum_front_width_m": 4.9999999999999996e-05,
+    "implicit_tolerance": 1e-10,
+    "implicit_max_iterations": 96
+  },
+  "activation_to_line_content": [
+    0.9124087591240877,
+    0.9124087591240877
+  ],
+  "analysis_controls": {
+    "r0": 1e-06,
+    "cap": 30000000000.0,
+    "hits": 3.0,
+    "tau": 1e-06,
+    "Kmax": 80.0,
+    "rtol": 2e-09,
+    "atol": 2e-11,
+    "b": 2.74e-10,
+    "G": 160000000000.0,
+    "L": 5e-05,
+    "bins": 80,
+    "Lq": 5e-07,
+    "line": 0.9124087591240877
+  },
+  "mechanical_reduction_scope": "Scalar K/sqrt(2 pi r), cap 30 GPa. F1 ideal mode-I drive from current inverse module; G=160 GPa and b=2.74e-10 m are current B1 reduced defaults, not fitted to fracture and not a claim of exact anisotropic tensor replay.",
+  "inactive_provenance_fields": "physics__* coordinates and CSV Tref_K are retained byte-exact; scoped manifest/launcher does not apply those physics__ overrides. Current active m=3, tau=1e-6, Lq=0.5um are verified from executed run_args. Manifest Tref=481.33, gT=sT=0.",
+  "F1_equations": [
+    "N_s prime = M(r,w) lambda_emit(max(f_s sigma_open - G b sqrt(rho_s)/taylor_fraction,0),T), with mechanical zero-drive gate",
+    "M=rho_site0*(25e-12/(r0*10e-6))*r*w; w=current physical density-limited width",
+    "rho_s = source-bin local-density moment times N_s; r=r0+c_blunt*b*local source-linked slip",
+    "No translation occurs before first passage; no source inventory, refresh, recovery, fitted radius or fitted shielding. Transport and shielding deliberately absent in this conditional F1 tier."
+  ],
+  "F2_audit": {
+    "status": "STATE_CLOSURE_UNAVAILABLE",
+    "reason": "Current persistent source requires reliable signed 2-D tensor drive. Current state-resolved reduced replay requires a candidate-independent drive family and exact production config. Campaign holds a geometry-dependent kernel but obtains emission drive from live 2-D probe, not a complete portable monotonic drive-state family. The available legacy replay is v10.2.9, not persistent-site v10.2.30; not executed as F2.",
+    "no_legacy_state_reactivated": true,
+    "no_new_FEM": true
+  },
+  "derivative_equations": [
+    "u=a*(sigma/sigc)^n; G=F+(G0-F)*exp(-u)",
+    "D1=(G0-F)*n*u*exp(-u); D2=(G0-F)*n^2*u*(1-u)*exp(-u)",
+    "DT=F_T+(G0_T-F_T)*exp(-u)+(G0-F)*exp(-u)*n*u*sigc_T/sigc",
+    "Lambda=P(m,lambda_raw*tau)/tau; dLambda/dln(lambda_raw)=x^m exp(-x)/(Gamma(m)*tau)",
+    "AK=K Lambda_endpoint/(Kdot B); AT=integral(partial_T Lambda)/Kdot/B; dlnK/dT=-AT/AK",
+    "F0 AT uses independent analytic integrand; F1 AT includes transient state response through fixed-load finite differences; independent root finite differences check the implicit relation."
+  ],
+  "input_policy": {
+    "historical_P1_P4_rows": false,
+    "historical_fracture_curves": false,
+    "canonical_targets": false,
+    "fracture_fit": false,
+    "only_current_fatigue_rows_and_current_source": true
+  }
+}
