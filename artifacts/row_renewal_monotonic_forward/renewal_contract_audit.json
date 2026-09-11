@@ -10,7 +10,6 @@
   "finding": "Both original forward and executed physical fatigue runs used generic renewal controls. Complete-row physics__ renewal fields were not applied by the scoped launcher. No barrier, production implementation, trajectory, or fatigue classification is changed in this bounded analytical correction.",
   "old_hashes": {
     "retained_fatigue_controls_registry.json": "9269a29f32f7d6be28e284407bdb8c5d2dcb4f805cdf3bf5fea64d3b804421a0",
-    ".DS_Store": "b96ac158076b622a1328deb23c59eac52c13a0cb6a79de1279ccbe02b714412a",
     "retained_fatigue_controls_registry.csv": "177ff72d62b102fbef6d9bfa8ddb4d01f144c084591387c14fcf075765c24588",
     "unit_action_preliminary_screen_comparison.csv": "901b46b2bf8fdef197ed7d8008dc58a108c384a3ff4dee3ec56b76210357b2a4",
     "forward_prediction_decision.md": "3b1fdf9e7bff767a3e90480fc7b429e6fda8054f45506d0e097e38ffdc41c5b7",
@@ -41,5 +40,17 @@
     "figures/10_FINAL_FORWARD_CLASSIFICATION.png": "48d9ca74dae3c310c2d96996d2ffc9308f4fc67e66e206d93426a15abfb82f32",
     "figures/08_ACCESSIBILITY_AND_SATURATION.png": "020a82366568f38e9bd737513db94a0784f2c887dd4d20a25b0cd23f7bb25973",
     "figures/02_ABSOLUTE_KFP_VS_T.png": "141240ebebbfa80d7ce2790939532c00e79e0736d7d7840e69d3859e277c9c9e"
-  }
+  },
+  "executed_campaign_evidence": {
+    "records": 42,
+    "table": "executed_candidate_campaign_renewal.csv",
+    "scope": "Original P40 pilots plus new P25/P40gen2/P55 cohort only. This audit does not infer the executed historical A_NATIVE anchor settings from these records.",
+    "m_values": [
+      3.0
+    ],
+    "tau_values_s": [
+      1e-06
+    ]
+  },
+  "preservation_scope": "Every scientific file in the original bundle remains byte-identical. Untracked operating-system .DS_Store metadata is not an analytical artifact."
 }
