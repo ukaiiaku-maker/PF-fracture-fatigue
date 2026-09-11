@@ -1,6 +1,6 @@
 {
-  "status": "PENDING_STRICT_VERIFIER",
-  "passed": false,
+  "status": "PASS",
+  "passed": true,
   "focused_tests_passed": 122,
   "focused_test_log": "runs/row_renewal_monotonic_forward_v1/focused_tests.log",
   "shell_syntax": "PASS both production launchers",
@@ -11,5 +11,24 @@
   "resolved_verifier_failures": [
     "Pre-budget cache admission",
     "Independent endpoint blunting radius mismatch"
-  ]
+  ],
+  "validated_commit": "6cee71918ed3c6ec0259a3218ec2c182a19465eb",
+  "strict_verifier": {
+    "passed": true,
+    "conditions": 1332,
+    "tier_records": 5328,
+    "F0_roots_independently_verified": 1332,
+    "F1_roots_reintegrated": 530,
+    "derivative_records": 1862,
+    "figures": 12,
+    "new_physical_trajectories": 0,
+    "production_source_and_fatigue_freeze_unchanged": true
+  },
+  "limitations": {
+    "F1_admitted": 530,
+    "F1_unavailable": 802,
+    "F2_unavailable": 1332,
+    "F1_work_budget_rejections": 19
+  },
+  "final_evidence_commit_policy": "Rerun all three strict verifiers on final clean evidence commit before normal push."
 }
