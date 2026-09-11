@@ -1042,25 +1042,49 @@ def directional_clock_rates(state, stress_tensor_Pa, *, temperature_K=900.0):
     return rates
 
 
+def _canonical_front_process_owner(state, branch_id):
+    """Read one front's process owner from accepted branch/runtime provenance."""
+    branch_id = str(branch_id)
+    if branch_id not in state.crack_network.active_tip_ids:
+        raise ValueError("hybrid directional drive requires an active branch")
+    owner = state.crack_network.branch(branch_id).local_state.get(
+        "front_engine_state_owner"
+    )
+    if owner is None:
+        raise RuntimeError("active front has no canonical process-owner identity")
+    owner = str(owner)
+    registry = state.tip_process_state.get("by_branch", {})
+    if owner not in registry:
+        raise RuntimeError("active front process owner is absent from accepted state")
+    checkpoint_mapping = state.tip_process_state.get("owner_by_front")
+    if checkpoint_mapping is not None and str(checkpoint_mapping.get(branch_id)) != owner:
+        raise RuntimeError("active front process owner disagrees with checkpoint registry")
+    return owner
+
+
 def sharp_front_load_provider(
     state, *, branch_id, candidates=None, evaluate_overlap_marginals=False,
-    marginal_delta_a_m=None, marginal_mesh_levels=(2, 3),
+    marginal_delta_a_m=(3.0e-5, 2.0e-5), marginal_mesh_levels=(2, 3, 4),
 ):
     """Use valid nested local J, else an exact fixed-void marginal G trial."""
     from .hybrid_directional_drive_v5 import hybrid_directional_drive_provider
-    payload = state.tip_process_state.get("by_branch", {}).get(branch_id)
+    process_owner_by_tip = {
+        tip_id: _canonical_front_process_owner(state, tip_id)
+        for tip_id in state.crack_network.active_tip_ids
+    }
+    process_owner_id = process_owner_by_tip[str(branch_id)]
+    payload = state.tip_process_state.get("by_branch", {}).get(process_owner_id)
     if payload is None:
         raise ValueError("active child has no canonical sharp-front engine state")
     engine = restore_sharp_front_engine(state.material, payload)
     inventory = state.competition.candidates if candidates is None else tuple(candidates)
-    if branch_id not in state.crack_network.active_tip_ids:
-        raise ValueError("hybrid directional drive requires an active branch")
     candidates_by_tip = {
         tip_id: inventory if tip_id == branch_id else ()
         for tip_id in state.crack_network.active_tip_ids
     }
     return hybrid_directional_drive_provider(
         state, candidates_by_tip,
+        process_owner_by_tip=process_owner_by_tip,
         contour_radius_m=max(float(engine.f.L_pz), 1.0e-6),
         provider_contract_contour_radius_m=max(float(engine.f.L_pz), 1.0e-6),
         marginal_delta_a_m=marginal_delta_a_m,
@@ -1078,7 +1102,8 @@ def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=
     """Preview child rates through the unchanged old engine and owned ledgers."""
     from .directional_competition_v11 import preview_production_cleavage_rate
     from .hybrid_directional_drive_v5 import K_INTERPRETATION
-    payload = state.tip_process_state.get("by_branch", {}).get(branch_id)
+    process_owner_id = _canonical_front_process_owner(state, branch_id)
+    payload = state.tip_process_state.get("by_branch", {}).get(process_owner_id)
     if payload is None:
         raise ValueError("active child has no canonical sharp-front engine state")
     engine = restore_sharp_front_engine(state.material, payload)
@@ -1098,6 +1123,8 @@ def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=
         load = by_candidate[candidate.candidate_id]
         if str(load.get("tip_id", branch_id)) != str(branch_id):
             raise RuntimeError("directional scalar drive is detached from its owning front")
+        if str(load.get("process_owner_id")) != process_owner_id:
+            raise RuntimeError("directional scalar drive is detached from its process owner")
         if str(load.get("controlling_scalar_tip_id", branch_id)) != str(
             load.get("tensor_probe_tip_id", branch_id)
         ):
@@ -1141,6 +1168,7 @@ def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=
             "G_kinetic_used": G_kinetic,
             "drive_source": load.get("drive_source", "LEGACY_DIRECTIONAL_J"),
             "tip_id": str(load.get("tip_id", branch_id)),
+            "process_owner_id": process_owner_id,
             "accepted_state_id": load.get("accepted_state_id"),
             "stress_field_state_id": load.get("stress_field_state_id"),
             "topology_fingerprint": load.get("topology_fingerprint"),
@@ -2046,6 +2074,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
                 "by_branch": {child_id: capture_sharp_front_engine(
                     fresh_sharp_front_engine(realized.material)
                 )},
+                "owner_by_front": {child_id: child_id},
             })
         realized = replace(realized, void_state=void_state, tip_process_state=tip_state)
         certificate = crack_void_connection_certificate(
@@ -2068,7 +2097,8 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     if not result.accepted: raise RuntimeError("downstream front event rejected")
     accepted = _mark_consumed_event_provenance(result.state, proposal.member_event_ids)
     if continuation:
-        payload = accepted.tip_process_state.get("by_branch", {}).get(child_id)
+        process_owner_id = _canonical_front_process_owner(accepted, child_id)
+        payload = accepted.tip_process_state.get("by_branch", {}).get(process_owner_id)
         child_engine = restore_sharp_front_engine(accepted.material, payload)
         # Directional first passage is authoritative, as in the pre-void v11
         # adapter.  Synchronize the scalar compatibility clock, then let the
@@ -2082,7 +2112,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             raise RuntimeError("accepted child first passage did not renew the established front engine")
         tip_state = dict(accepted.tip_process_state)
         by_branch = dict(tip_state.get("by_branch", {}))
-        by_branch[child_id] = {
+        by_branch[process_owner_id] = {
             **capture_sharp_front_engine(child_engine),
             "last_event_identity": tuple(proposal.member_event_ids),
             "last_step_audit": step_info,
@@ -2148,6 +2178,10 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     else:
         result = replace(result, state=accepted)
     cavity = accepted.void_state.cavities[0]
+    child_process_owner = (
+        _canonical_front_process_owner(accepted, child_id)
+        if child_id in accepted.crack_network.active_tip_ids else None
+    )
     return accepted, result, operations, {
         "tensor_Pa": None if tensor is None else tensor.tolist(),
         "front_load_rows": front_load_rows,
@@ -2155,8 +2189,9 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         "source_kind": source_kind, "source_front_id": child_id if continuation else None,
         "source_position_m": list(start), "source_probe_identity": probe_identity,
         "r_eff_m": (restore_sharp_front_engine(
-            accepted.material, accepted.tip_process_state.get("by_branch", {}).get(child_id)
-        ).r_eff() if child_id in accepted.tip_process_state.get("by_branch", {}) else None),
+            accepted.material,
+            accepted.tip_process_state.get("by_branch", {}).get(child_process_owner),
+        ).r_eff() if child_process_owner is not None else None),
         "candidate_id": proposal.member_candidate_ids[0],
         "selected_proposal_candidate_ids": list(proposal.member_candidate_ids),
         "emitted_winner_candidate_ids": [row["candidate_id"] for row in cleavage_audit if row["winner"]],
