@@ -119,6 +119,11 @@ def qualify_independent_f1(result,row,manifest):
         v,_=model.solve(f1['K_FP'],rtol=5e-10)
         if not math.isclose(float(v(f1['K_FP'])[2]),f1['threshold_action'],rel_tol=1e-6,abs_tol=1e-10):
             raise ValueError('first-passage-endpoint action disagreement')
+        if not math.isclose(float(model.state(f1['K_FP'],v(f1['K_FP'])[:2])[0]),f1['r_eff_m'],rel_tol=1e-6,abs_tol=1e-14):
+            raise ValueError('first-passage-endpoint blunting-radius disagreement')
+        for trace in result['traces']:
+            if trace['tier']=='F1_EMISSION_BLUNTING' and not math.isclose(float(v(trace['K'])[2]),trace['cumulative_action'],rel_tol=1e-6,abs_tol=f1['threshold_action']*1e-7):
+                raise ValueError('independent cumulative-action-curve disagreement')
     except ValueError as exc:
         base={k:f1[k] for k in ('candidate_id','temperature_K','Kdot','threshold_action','threshold_mode','tier','renewal_hits','renewal_tau_s')}
         rejected=dict(**base,status='STATE_CLOSURE_UNAVAILABLE',reason='Independent root-endpoint reintegration: '+str(exc),K_FP=None,full_state_available=False)
@@ -130,9 +135,10 @@ def qualify_independent_f1(result,row,manifest):
 
 
 def qualify_cached_result(result,row,manifest):
-    if result.get('analytical_work_budget')==TransientBlunting.max_state_evaluations:return result
+    if result.get('analytical_work_budget')==TransientBlunting.max_state_evaluations and result.get('endpoint_admission_version')==2:return result
     result=qualify_independent_f1(result,row,manifest)
     result['analytical_work_budget']=TransientBlunting.max_state_evaluations
+    result['endpoint_admission_version']=2
     return result
 
 
@@ -151,11 +157,12 @@ def main():
             result=qualify_cached_result(original,row,m)
             if result!=original:
                 prior=RUN/'pre_budget_admission_records';prior.mkdir(exist_ok=True)
-                (prior/p.name).write_bytes(p.read_bytes())
+                if not (prior/p.name).exists():(prior/p.name).write_bytes(p.read_bytes())
                 p.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
           else:
             result=qualify_independent_f1(condition(cid,row,m,float(T),rate,xi,label),row,m)
             result['analytical_work_budget']=TransientBlunting.max_state_evaluations
+            result['endpoint_admission_version']=2
             p.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
           results.append(result)
         print(cid,label,rate,'complete',flush=True)
@@ -192,7 +199,7 @@ def main():
         for t in accessible:
             if not contiguous or t-contiguous[-1][-1]>25:contiguous.append([t])
             else:contiguous[-1].append(t)
-        branches.append(dict(candidate_id=cid,threshold_mode=label,threshold_action=cfg['threshold_cases'][label],Kdot=rate,frozen_full_interval_classification=topology(curve,False),branch_classification='ACCESSIBLE_LOW_T_BRANCH_WITH_HIGH_T_LOSS_OF_ACCESSIBILITY' if curve[0]['accessibility']=='FRACTURE_RESPONSE_ACCESSIBLE' and len(accessible)<37 else 'ZERO_LOAD_DOMINATED_FROM_300K' if float(curve[0]['zero_load_action_fraction'])>=.99 else 'OTHER',accessible_intervals_K=json.dumps([[x[0],x[-1]] for x in contiguous]),K_FP_300K=curve[0]['K_FP'],K_FP_1200K=curve[-1]['K_FP'],zero_load_fraction_300K=curve[0]['zero_load_action_fraction'],saturated_plateau=cfg['threshold_cases'][label]*rate*row_controls(rows[cid][0]).tau,renewal_hits=row_controls(rows[cid][0]).hits,renewal_tau_s=row_controls(rows[cid][0]).tau))
+        branches.append(dict(candidate_id=cid,threshold_mode=label,threshold_action=cfg['threshold_cases'][label],Kdot=rate,frozen_full_interval_classification=topology(curve,False),branch_classification='ISOLATED_ACCESSIBLE_300K_SAMPLE' if accessible==[300.] else 'ACCESSIBLE_LOW_T_BRANCH_WITH_HIGH_T_LOSS_OF_ACCESSIBILITY' if curve[0]['accessibility']=='FRACTURE_RESPONSE_ACCESSIBLE' and len(accessible)<37 else 'ZERO_LOAD_DOMINATED_FROM_300K' if float(curve[0]['zero_load_action_fraction'])>=.99 else 'OTHER',accessible_intervals_K=json.dumps([[x[0],x[-1]] for x in contiguous]),K_FP_300K=curve[0]['K_FP'],K_FP_1200K=curve[-1]['K_FP'],zero_load_fraction_300K=curve[0]['zero_load_action_fraction'],saturated_plateau=cfg['threshold_cases'][label]*rate*row_controls(rows[cid][0]).tau,renewal_hits=row_controls(rows[cid][0]).hits,renewal_tau_s=row_controls(rows[cid][0]).tau))
     write_csv(ART/'threshold_robustness.csv',branches)
     oldregistry=json.loads((OLD/'retained_fatigue_controls_registry.json').read_text());cross=[];registry=[]
     for r in oldregistry:
@@ -212,7 +219,7 @@ def main():
     for cr in compare:
         if cr['tier']=='BEST_CURRENT_MONOTONIC_FORWARD' and cr['temperature_K']==300 and cr['Kdot']==.005:
             lines.append(f"| {cr['candidate_id']} | {float(cr['old_K_FP']):.10g} | {cr['new_K_FP']:.10g} | {cr['K_FP_ratio']:.6g} |")
-    lines+=['','The [complete comparison](generic_vs_row_renewal_comparison.csv) includes all frozen-threshold roots, AK, AT, statuses and accessibility classifications. [Threshold robustness](threshold_robustness.csv) includes all nine threshold/rate combinations for every row. P25/P40 retain their fatigue-control roles, and P55 its boundary/falsification role; none becomes a qualified DBTT-, Peak-T-, weak-T-, or ceramic-like fracture archetype.','','A_NATIVE is reported separately as an accessible low-temperature branch with high-temperature loss of accessibility. Its unchanged full-interval gate is not used to erase the low-temperature branch. P25/P40/P55 are zero-load dominated already at 300 K.','','The saturated limit is KFP=Xi*Kdot*tau. The corrected plateau is 0.6992153587194454 times the old generic plateau at the same threshold and rate; neither is a numerical lower bound. Fixed-load D1/D2/DT surfaces are unchanged, but action-weighted descriptors, AK, AT and first-passage derivatives were recomputed.','',f"F1 admitted: {decision['F1_admitted']}; F1 unavailable: {decision['F1_unavailable']}. Unavailable F1/F2 states are not represented as full-state predictions. No physical trajectory was launched."]
+    lines+=['','The [complete comparison](generic_vs_row_renewal_comparison.csv) includes all frozen-threshold roots, AK, AT, statuses and accessibility classifications. [Threshold robustness](threshold_robustness.csv) includes all nine threshold/rate combinations for every row. P25/P40 retain their fatigue-control roles, and P55 its boundary/falsification role; none becomes a qualified DBTT-, Peak-T-, weak-T-, or ceramic-like fracture archetype.','','A_NATIVE is reported separately as an accessible low-temperature branch with high-temperature loss of accessibility. Its unchanged full-interval gate is not used to erase the low-temperature branch. At the reference ramp, P25/P40/P55 are zero-load dominated already at 300 K for all three thresholds. At the highest ramp (0.05 MPa sqrt(m)/s), P40 and P55 have an isolated accessible 300 K sample for ln(2) and unit action; all higher sampled temperatures are inaccessible. These isolated samples do not satisfy the unchanged full-interval archetype gates. P25 has no accessible sample in any threshold/rate combination.','','The saturated limit is KFP=Xi*Kdot*tau. The corrected plateau is 0.6992153587194454 times the old generic plateau at the same threshold and rate; neither is a numerical lower bound. Fixed-load D1/D2/DT surfaces are unchanged, but action-weighted descriptors, AK, AT and first-passage derivatives were recomputed.','',f"F1 admitted: {decision['F1_admitted']}; F1 unavailable: {decision['F1_unavailable']}. Unavailable F1/F2 states are not represented as full-state predictions. No physical trajectory was launched."]
     lines += ['',f"The deterministic analytical budget rejected {decision['F1_work_budget_rejections']} F1 conditions at 100,000 state evaluations per solve. These are included in the unavailable count. No accuracy or classification tolerance was relaxed; the stopped pre-budget analytical attempt and all completed condition records are retained under runs/row_renewal_monotonic_forward_v1."]
     (ART/'forward_prediction_decision.md').write_text('\n'.join(lines)+'\n')
     print(json.dumps({k:v for k,v in decision.items() if k!='candidates'},indent=2))

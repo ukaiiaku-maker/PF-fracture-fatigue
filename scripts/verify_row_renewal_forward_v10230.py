@@ -184,6 +184,7 @@ def verify():
     cached=list((newrun/'conditions').glob('*.json'))
     if len(cached)!=1332:raise ValueError('analytical condition cache incomplete')
     if any(json.loads(p.read_text()).get('analytical_work_budget')!=100000 for p in cached):raise ValueError('cache lacks current budget admission')
+    if any(json.loads(p.read_text()).get('endpoint_admission_version')!=2 for p in cached):raise ValueError('cache lacks current endpoint admission')
     for pattern in ['**/run_args.json','**/steps_*.csv','**/stochastic_avalanche_geometry_events.json','**/high_cycle_run_manifest.json']:
         if list(newrun.glob(pattern)):raise ValueError('new physical trajectory in analysis root')
     hashes=json.loads((ART/'file_hashes.json').read_text())

@@ -8,4 +8,4 @@ The corrected bundle uses each complete row's `physics__cleavage_hits` and `phys
 
 The 42 recorded prospective fatigue trajectories also executed generic renewal defaults. Their physical records and accepted fatigue-response classifications are preserved; this analytical audit neither changes them nor retrospectively qualifies a physical trajectory using the row-specified renewal contract. The historical A_NATIVE anchor's executed settings are not inferred from that 42-run audit.
 
-F2 remains unavailable. A_NATIVE's accessible low-temperature branch is reported explicitly; it is not conflated with P25/P40/P55 zero-load domination already at 300 K.
+F2 remains unavailable. A_NATIVE's accessible low-temperature branch is reported explicitly; it is not conflated with P25/P40/P55 zero-load domination already at 300 K at the reference ramp. At the highest ramp, P40/P55 have isolated accessible 300 K samples for ln(2) and unit action; these do not qualify an archetype.

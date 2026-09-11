@@ -72,3 +72,15 @@ def test_pre_budget_cache_must_repeat_current_admission(monkeypatch):
     assert new['analytical_work_budget']==100000
     assert audit.qualify_cached_result(new,{},None) is new
     assert len(calls)==1
+
+
+def test_saturated_action_does_not_admit_unstable_blunting_radius():
+    from scripts.analyze_row_renewal_forward_v10230 import condition,qualify_independent_f1
+    row,m,_=source_rows()['P25_TRANSFER_V1_RANK1']
+    raw=condition('P25_TRANSFER_V1_RANK1',row,m,600.,.05,math.log(2),'MEDIAN_LN2')
+    assert next(r for r in raw['records'] if r['tier']=='F1_EMISSION_BLUNTING')['status']=='FIRST_PASSAGE'
+    admitted=qualify_independent_f1(raw,row,m)
+    f1=next(r for r in admitted['records'] if r['tier']=='F1_EMISSION_BLUNTING')
+    assert f1['K_FP'] is None and 'blunting-radius disagreement' in f1['reason']
+    best=next(r for r in admitted['records'] if r['tier']=='BEST_CURRENT_MONOTONIC_FORWARD')
+    assert best['selected_tier']=='F0_INTRINSIC_OPENING'

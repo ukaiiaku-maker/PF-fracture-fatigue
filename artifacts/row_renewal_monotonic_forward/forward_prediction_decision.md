@@ -34,10 +34,10 @@ Direct old/new comparison at 300 K, reference ramp, frozen Xi (available F0/F1 t
 
 The [complete comparison](generic_vs_row_renewal_comparison.csv) includes all frozen-threshold roots, AK, AT, statuses and accessibility classifications. [Threshold robustness](threshold_robustness.csv) includes all nine threshold/rate combinations for every row. P25/P40 retain their fatigue-control roles, and P55 its boundary/falsification role; none becomes a qualified DBTT-, Peak-T-, weak-T-, or ceramic-like fracture archetype.
 
-A_NATIVE is reported separately as an accessible low-temperature branch with high-temperature loss of accessibility. Its unchanged full-interval gate is not used to erase the low-temperature branch. P25/P40/P55 are zero-load dominated already at 300 K.
+A_NATIVE is reported separately as an accessible low-temperature branch with high-temperature loss of accessibility. Its unchanged full-interval gate is not used to erase the low-temperature branch. At the reference ramp, P25/P40/P55 are zero-load dominated already at 300 K for all three thresholds. At the highest ramp (0.05 MPa sqrt(m)/s), P40 and P55 have an isolated accessible 300 K sample for ln(2) and unit action; all higher sampled temperatures are inaccessible. These isolated samples do not satisfy the unchanged full-interval archetype gates. P25 has no accessible sample in any threshold/rate combination.
 
 The saturated limit is KFP=Xi*Kdot*tau. The corrected plateau is 0.6992153587194454 times the old generic plateau at the same threshold and rate; neither is a numerical lower bound. Fixed-load D1/D2/DT surfaces are unchanged, but action-weighted descriptors, AK, AT and first-passage derivatives were recomputed.
 
-F1 admitted: 539; F1 unavailable: 793. Unavailable F1/F2 states are not represented as full-state predictions. No physical trajectory was launched.
+F1 admitted: 530; F1 unavailable: 802. Unavailable F1/F2 states are not represented as full-state predictions. No physical trajectory was launched.
 
 The deterministic analytical budget rejected 19 F1 conditions at 100,000 state evaluations per solve. These are included in the unavailable count. No accuracy or classification tolerance was relaxed; the stopped pre-budget analytical attempt and all completed condition records are retained under runs/row_renewal_monotonic_forward_v1.
