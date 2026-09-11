@@ -1,0 +1,74 @@
+{
+  "schema": "row_specified_renewal_forward_v2",
+  "source_head": "b29d1b54c6d69c9db969a9d95cd56a7cf429d022",
+  "source_branch": "codex/v10.2.30-prospective-paris-candidate-design",
+  "candidate_ids": [
+    "A_NATIVE",
+    "P25_TRANSFER_V1_RANK1",
+    "P40_TRANSFER_CALIBRATED_GEN2",
+    "P55_TRANSFER_V1_RANK1"
+  ],
+  "temperature_start_K": 300,
+  "temperature_end_K": 1200,
+  "temperature_step_K": 25,
+  "Kdot_reference_MPa_sqrt_m_s": 0.005,
+  "Kdot_factors": [
+    0.1,
+    1.0,
+    10.0
+  ],
+  "ramp_max_MPa_sqrt_m": 80.0,
+  "threshold_primary": "exponential CRN seed 1720 engine 1, drawn with current draw_hazard_threshold and SeedSequence([1720,1]); same Xi for all temperatures, rates, and rows",
+  "threshold_supplementary": "Full F0/F1 grid also computed for ln(2) and 1.",
+  "root_method": "F0 logarithmic bracket and dimensionless action quadrature; F1 Radau transient with dense root",
+  "quadrature_relative_tolerance": 2e-10,
+  "state_relative_tolerance": 2e-09,
+  "state_absolute_tolerance": 2e-11,
+  "derivative_relative_tolerance": 0.0005,
+  "derivative_absolute_tolerance": 2e-07,
+  "derivative_T_step_K": 0.05,
+  "derivative_logK_step": 0.0001,
+  "accessibility_rules": {
+    "zero_load_action_fraction": 0.99,
+    "renewal_ceiling_rate_fraction": 0.99,
+    "renewal_ceiling_ramp_occupancy": 0.95,
+    "stress_cap_ramp_occupancy": 0.95,
+    "maximum_root_relative_residual": 1e-06
+  },
+  "topology_rules": {
+    "requires_entire_interval_accessible": true,
+    "peak_prominence_fraction": 0.01,
+    "thermal_sign_uncertainty_per_K": 2e-07,
+    "weak_log_span": 0.01,
+    "weak_absolute_span_over_median": 0.01,
+    "DBTT_requires_converged_full_state_and_rate_shift": true,
+    "ceramic_requires_converged_full_state_and_small_state_and_rate_corrections": true
+  },
+  "rules_scope": "Prospectively declared operational screening thresholds; not universal material gates, not derived from candidate curves or canonical targets. Non-accessible segments are never interpolated into an archetype.",
+  "F0": "Current unchanged barrier and mechanical closure, with m and tau read strictly from each complete row.",
+  "F1": "Transient source-bin moment of current persistent-site multiplicity, density backstress and blunting equations; current analytical ideal mode-I drive, no finite inventory, refresh, recovery, geometry evolution, or PT retuning. Conditional reduced prediction, not the production 2-D tensor replay.",
+  "F2": "Unavailable unless a current signed mobile/retained monotonic replay with a source-qualified drive across the ramp is established. Never replace with F0/F1 while labeling full-state.",
+  "best_policy": "Select converged F1 reduced model when available; otherwise explicitly F0_ONLY_F1_UNAVAILABLE. F2 status remains separate.",
+  "historical_data_ingestion": false,
+  "canonical_reference_ingestion": false,
+  "fracture_fitting": false,
+  "new_PF_FEM_trajectories": 0,
+  "constitutive_changes": false,
+  "limitations": [
+    "F1 remains a conditional reduced moment; F2 unavailable.",
+    "Only the two renewal controls change relative to the generic screen. Other reduction controls are preserved; this is not a full spatial replay.",
+    "Original executed fatigue runs used m=3,tau=1e-6; the row-specified prediction does not retroactively change them."
+  ],
+  "renewal_contract": "ROW_SPECIFIED_RENEWAL_FORWARD",
+  "audit_parent_head": "9912d34164ed0d7c3631ffca7daf0c458210d91f",
+  "renewal_fields": [
+    "physics__cleavage_hits",
+    "physics__cleavage_correlation_time_s"
+  ],
+  "threshold_cases": {
+    "SEED_1720": 0.07509316036236147,
+    "MEDIAN_LN2": 0.6931471805599453,
+    "UNIT_ACTION": 1.0
+  },
+  "condition_count": 1332
+}
