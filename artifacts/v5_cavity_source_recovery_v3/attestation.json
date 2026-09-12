@@ -1,0 +1,75 @@
+{
+  "branch": "codex/v5-unified-fracture-multitip-voiding",
+  "central_dbtt_record_commit": "105e9cde9e36155b72acb1b5f836a6fff3ee7e02",
+  "lineage": {
+    "DBTT_positive_continuation": "PASS_POSITIVE_CONTINUATION",
+    "Peak_negative_energy_gate": "REJECTED_NEGATIVE_ENERGY_MARGIN",
+    "qualified_core_inventory": "238_OF_244_EXACT_BLOBS_WITH_SIX_REVIEWED_ADAPTERS"
+  },
+  "preserved_v1_v2": {
+    "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2_MANUFACTURED_AND_KIRSCH": "PASS",
+    "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
+    "DBTT_V2_CAVITY_TRACTION": "PASS",
+    "DBTT_V2_FIXED_ARC_TENSOR_CONVERGENCE": "FAIL",
+    "V2_ETA_N_AND_ETA_T_TAXONOMY": "B_STILL_MANDATORY_V2_GATES",
+    "V2_FAILURE_CLASSIFICATION": [
+      "TANGENTIAL_STRESS_CONVERGENCE",
+      "NORMAL_DIRECTION_RESOLUTION"
+    ]
+  },
+  "published_worker_head": "5f7ea04d10343ee5a49b6e750409de7c785da68d",
+  "repository": "ukaiiaku-maker/PF-fracture-fatigue",
+  "schema": "v5.cavity-source-recovery-v3-attestation/1",
+  "scope": {
+    "broad_push_workflow_disposition": "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE",
+    "cancelled_broad_push_workflow_run_ids": [
+      34719493562,
+      34719548038,
+      34719642271,
+      34719718222
+    ],
+    "core_physics_changed": false,
+    "fatigue_started": false,
+    "oracle_generated": false,
+    "paired_trajectories_run": false,
+    "r_tip_equals_R_void": false,
+    "r_tip_law_changed": false,
+    "scientific_tolerances_changed": false,
+    "successful_prior_42_test_worker_preserved": true
+  },
+  "taxonomy_commit": "311e2fa4c9a761b7e50aef0a944821832eca37d3",
+  "v3": {
+    "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3_MANUFACTURED_AND_KIRSCH": "PASS",
+    "DBTT_SOURCE_READINESS": "BLOCKED_WITH_EXACT_V3_FAILURE_CLASS",
+    "accepted_pre_source_state_unchanged": true,
+    "exact_failure_class": [
+      "SOURCE_GEOMETRY_IDENTITY"
+    ],
+    "next_bounded_step": "DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE",
+    "oracle_states_accepted": 0,
+    "paired_trajectories_run": 0,
+    "refinement_levels_requested": 3,
+    "refinement_levels_run": 0,
+    "scientific_unavailability": "the exact source coordinate is inconsistent with the owned cavity",
+    "thresholds_and_rng_unchanged": true,
+    "unexpected_programming_exceptions_caught": false
+  },
+  "v3_exception_boundary_commit": "bb046019f3c5c518f031b98a677993b70cf81f6b",
+  "v3_operator_commit": "80bbcabd7e910e8da09d6765116b2a97b06f2300",
+  "workflow": {
+    "artifact_digest": "sha256:1ba6ac364d3c168a160e277fbb457124d8868704e3560d49f2aff7830bc54883",
+    "artifact_id": 10305429296,
+    "artifact_name": "v5-cavity-source-recovery-v3-5f7ea04d10343ee5a49b6e750409de7c785da68d",
+    "conclusion": "success",
+    "errors": 0,
+    "failures": 0,
+    "job_count": 1,
+    "job_id": 103623202953,
+    "name": "V5 unified cavity source recovery V3",
+    "run_id": 34719718024,
+    "run_url": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue/actions/runs/34719718024",
+    "skipped": 0,
+    "tests_collected": 22,
+    "tests_passed": 22
+  }
+}

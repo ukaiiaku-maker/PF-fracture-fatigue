@@ -8,10 +8,23 @@
   },
   "bounded_validation": {
     "broad_campaigns_run": false,
-    "test_cavity_source_recovery_v2": "7 passed",
-    "test_v5_bounded_sharp_front_adapter": "6 passed",
-    "test_v5_hybrid_directional_drive": "15 passed",
-    "test_v5_unified_model_lineage": "14 passed"
+    "retained_v2_worker": {
+      "artifact_digest": "sha256:5c865dcedca1db7862e3fc875b0d4b1745f43bdf9bcdba54a69513e850ff8623",
+      "artifact_id": 10304792588,
+      "conclusion": "success",
+      "test_count": 42,
+      "workflow_run_id": 34715245549
+    },
+    "v3_worker": {
+      "artifact_digest": "sha256:1ba6ac364d3c168a160e277fbb457124d8868704e3560d49f2aff7830bc54883",
+      "artifact_id": 10305429296,
+      "conclusion": "success",
+      "job_count": 1,
+      "passed": 22,
+      "test_count": 22,
+      "workflow_head": "5f7ea04d10343ee5a49b6e750409de7c785da68d",
+      "workflow_run_id": 34719718024
+    }
   },
   "branches": {
     "field_atlas": "codex/v12-field-atlas-recovery",
@@ -506,6 +519,10 @@
     {
       "classification": "BENCHMARK_ONLY",
       "path": "artifacts/v5_cavity_source_recovery_v2/attestation.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v3/attestation.json"
     },
     {
       "classification": "BENCHMARK_ONLY",

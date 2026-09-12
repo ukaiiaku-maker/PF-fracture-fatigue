@@ -302,6 +302,11 @@ def test_10_reports_encode_terminal_passes_and_no_unresolved_core_divergence():
     assert lineage["oracle_states_accepted"] == 0
     assert lineage["paired_trajectories_run"] == 0
     assert lineage["next_bounded_step"] == "DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE"
+    worker = lineage["bounded_validation"]["v3_worker"]
+    assert worker["workflow_run_id"] == 34719718024
+    assert worker["job_count"] == 1
+    assert worker["test_count"] == worker["passed"] == 22
+    assert worker["conclusion"] == "success"
 
 
 def test_10b_v2_patch_audit_is_geometry_only_and_records_shrinking_footprint():
