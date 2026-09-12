@@ -24,6 +24,10 @@ from arrhenius_fracture.hybrid_directional_drive_v5 import (
 )
 from arrhenius_fracture.live_topology_kernel_v11 import evaluate_exact_topology
 from arrhenius_fracture.topology_transaction_v11 import LiveFEMTopologyState
+from arrhenius_fracture.unified_fracture_material_v5 import benchmark_material_bundle, bind_identity
+
+BUNDLE = benchmark_material_bundle("DBTT")
+
 from arrhenius_fracture.voiding_production_v5 import (
     _conform_bulk_point,
     _refresh_downstream_boundary_context,
@@ -48,9 +52,9 @@ CHECKPOINT_ROOT = Path(os.environ.get(
 
 
 def _checkpoint(name):
-    return restore_checkpoint(
+    return bind_identity(restore_checkpoint(
         CHECKPOINT_ROOT / "artifacts/voiding_v5_finalization_v2/checkpoints" / name
-    )
+    ), BUNDLE)
 
 
 @pytest.fixture(scope="module")
@@ -68,7 +72,7 @@ def far_child_state():
         for branch in state.crack_network.branches
     )
     state = replace(state, crack_network=replace(state.crack_network, branches=branches))
-    payload = capture_sharp_front_engine(fresh_sharp_front_engine(state.material))
+    payload = capture_sharp_front_engine(fresh_sharp_front_engine(state.material, BUNDLE))
     tips = dict(state.tip_process_state)
     by_branch = dict(tips.get("by_branch", {}))
     prior = by_branch.get(CHILD_ID, {})
@@ -108,7 +112,7 @@ def near_void_child_state():
         geometry_generation=state.crack_network.geometry_generation + 1,
         branching_enabled=True,
     )
-    payload = capture_sharp_front_engine(fresh_sharp_front_engine(state.material))
+    payload = capture_sharp_front_engine(fresh_sharp_front_engine(state.material, BUNDLE))
     return replace(
         state,
         crack_network=network,
@@ -458,7 +462,7 @@ def test_7_real_child_continuation_uses_one_hybrid_first_passage_and_topology_ac
     payload = continued.tip_process_state["by_branch"][CHILD_ID]
     assert payload["last_step_audit"]["fired"]
     assert payload["last_step_audit"]["n_fire"] == 1
-    engine = restore_sharp_front_engine(continued.material, payload)
+    engine = restore_sharp_front_engine(continued.material, BUNDLE, payload)
     assert engine.r_eff() == pytest.approx(
         engine.f.r0 + engine.f.c_blunt * engine.b * engine.N_em
     )

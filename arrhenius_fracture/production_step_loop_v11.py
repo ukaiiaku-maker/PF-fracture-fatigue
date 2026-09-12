@@ -25,6 +25,7 @@ from .topology_transaction_v11 import (
     TopologyArm,
     TopologyTrialResult,
 )
+from .tip_local_proposals_v13 import construct_tip_local_proposals
 
 
 MODEL_ID = "v11.monotonic_tip_only_mechanistic_branching_step_loop/1"
@@ -145,6 +146,27 @@ def _select(
     admissible = tuple(item for item in diagnostics if item.result.accepted)
     if not admissible:
         return None
+    if any(item.proposal.event_owner_tip_id is not None for item in admissible):
+        if any(item.proposal.event_owner_tip_id is None for item in admissible):
+            raise RuntimeError("mixed scoped and unscoped event proposals")
+        # Preserve the canonical same-tip correlation choice, then compare
+        # independent tip-local winners by physical completion time globally.
+        groups = {}
+        for item in admissible:
+            key = (item.proposal.event_owner_tip_id, item.proposal.branch_opportunity_id)
+            groups.setdefault(key, []).append(item)
+        winners = []
+        for group in groups.values():
+            pairs = tuple(item for item in group if item.proposal.action_type == 'two_arm')
+            pool = pairs or tuple(group)
+            chosen = select_temporal_or_degenerate_proposal(
+                (item.proposal for item in pool), global_hazard_seed=state.global_hazard_seed,
+                competition_event_index=state.competition_event_index)
+            winners.append(next(item for item in pool if item.proposal == chosen))
+        chosen = select_temporal_or_degenerate_proposal(
+            (item.proposal for item in winners), global_hazard_seed=state.global_hazard_seed,
+            competition_event_index=state.competition_event_index)
+        return next(item for item in winners if item.proposal == chosen)
     two_arm = tuple(item for item in admissible if item.proposal.action_type == "two_arm")
     pool = two_arm or tuple(item for item in admissible if item.proposal.action_type == "one_arm")
     chosen = select_temporal_or_degenerate_proposal(
@@ -190,9 +212,14 @@ def advance_accepted_step(
             raise DirectionalStepRefinementRequired(predicted, target)
     competition = _commit_interval(solved.competition, rates, context)
     interval_state = replace(solved, competition=competition)
-    proposals = construct_action_proposals(
-        competition.hazard_states, correlation_interval_s=correlation_interval_s
-    )
+    if len(interval_state.crack_network.active_tip_ids) > 1:
+        proposals = construct_tip_local_proposals(
+            interval_state, correlation_interval_s=correlation_interval_s)
+    else:
+        # The continuous-emission single-tip parent retains its exact path.
+        proposals = construct_action_proposals(
+            competition.hazard_states, correlation_interval_s=correlation_interval_s
+        )
 
     diagnostics = tuple(
         ActionTrialDiagnostic(proposal, trial_action(interval_state, proposal))

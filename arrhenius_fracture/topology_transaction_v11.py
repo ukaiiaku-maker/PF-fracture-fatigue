@@ -227,65 +227,29 @@ EquilibrateTrial = Callable[[LiveFEMTopologyState], LiveFEMTopologyState]
 def equilibrate_fixed_load_with_production_fem(
     state: LiveFEMTopologyState,
 ) -> LiveFEMTopologyState:
-    """Equilibrate with the production assembler at the accepted opening.
+    """Equilibrate directly with the production assembler at fixed opening."""
+    from .fem import assemble_mechanics, solve_dirichlet
+    from .hazard_energy_event_gate_v10230 import _infer_boundary_opening, _stored_energy
 
-    This deliberately calls the public FEM assembly and Dirichlet solver.  It
-    does not depend on a test observer or replace energy with a synthetic value.
-    """
-    from .fem import assemble_mechanics, elastic_energy_densities, solve_dirichlet
-
-    u0 = np.asarray(state.displacement, dtype=float).copy()
-    top = np.asarray(state.boundary.top_nodes, dtype=int)
-    bot = np.asarray(state.boundary.bot_nodes, dtype=int)
-    top_opening = float(np.mean(u0[2 * top + 1])) if top.size else 0.0
-    bottom_opening = float(np.mean(u0[2 * bot + 1])) if bot.size else 0.0
-    Kmat, Rint, *_ = assemble_mechanics(
-        state.mesh, u0, state.ep_gp, state.rho_gp, state.damage,
-        state.elasticity_D, state.material,
-        cohesive_network=state.cohesive_network,
-    )
-    displacement, reaction = solve_dirichlet(
-        Kmat, Rint, u0, state.boundary, top_opening, bottom_opening,
-    )
-    _, residual, sigma_gp, *_ = assemble_mechanics(
+    displacement = np.asarray(state.displacement, dtype=float).copy()
+    top, bottom = _infer_boundary_opening(state.boundary, displacement)
+    matrix, residual, *_ = assemble_mechanics(
         state.mesh, displacement, state.ep_gp, state.rho_gp, state.damage,
         state.elasticity_D, state.material,
         cohesive_network=state.cohesive_network,
     )
-    density, _ = elastic_energy_densities(
+    displacement, _ = solve_dirichlet(
+        matrix, residual, displacement, state.boundary, top, bottom,
+    )
+    _, _, sigma_gp, *_ = assemble_mechanics(
+        state.mesh, displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material,
+        cohesive_network=state.cohesive_network,
+    )
+    energy = _stored_energy(
         state.mesh, displacement, state.ep_gp, sigma_gp, state.elasticity_D,
     )
-    energy = float(np.sum(density * state.mesh.area_e))
-    prescribed = np.zeros(state.mesh.ndof, dtype=bool)
-    prescribed[2 * top + 1] = True
-    prescribed[2 * bot + 1] = True
-    prescribed[2 * int(state.boundary.left_bot)] = True
-    prescribed[2 * int(state.boundary.left_bot) + 1] = True
-    prescribed[2 * int(state.boundary.right_bot)] = True
-    free_residual = float(np.linalg.norm(residual[~prescribed]))
-    constrained_reaction = float(np.linalg.norm(residual[prescribed]))
-    top_reaction = float(np.sum(residual[2 * top + 1]))
-    bottom_reaction = float(np.sum(residual[2 * bot + 1]))
-    reaction_scale = max(abs(top_reaction) + abs(bottom_reaction), 1.0e-300)
-    reaction_balance = abs(top_reaction + bottom_reaction) / reaction_scale
-    boundary_work = top_reaction * top_opening + bottom_reaction * bottom_opening
-    energy_reaction_identity = abs(2.0 * energy - boundary_work) / max(
-        abs(2.0 * energy) + abs(boundary_work), 1.0e-300,
-    )
-    ledger = dict(state.energy_ledgers)
-    ledger.update({
-        "latest_reaction_N_per_m": float(reaction),
-        "latest_residual_l2_N_per_m": float(np.linalg.norm(residual)),
-        "latest_free_dof_residual_l2_N_per_m": free_residual,
-        "latest_constrained_reaction_l2_N_per_m": constrained_reaction,
-        "latest_top_bottom_reaction_balance": reaction_balance,
-        "latest_energy_reaction_identity": energy_reaction_identity,
-        "latest_fem_energy_J_per_m": energy,
-    })
-    return replace(
-        state, displacement=displacement, stored_energy_J_per_m=energy,
-        energy_ledgers=ledger,
-    )
+    return replace(state, displacement=displacement, stored_energy_J_per_m=energy)
 
 
 def complete_accepted_state_fingerprint(state: LiveFEMTopologyState) -> str:

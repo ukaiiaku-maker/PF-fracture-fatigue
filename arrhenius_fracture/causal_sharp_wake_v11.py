@@ -35,6 +35,23 @@ class CausalSupportAudit:
         )
 
 
+@dataclass(frozen=True)
+class TopologyDamageRemapAudit:
+    """Exact P0 transfer audit for a nested refinement operation.
+
+    Only children of fully topology-damaged parent support are replaced.  This
+    preserves unrelated material damage while preventing a coarse P0 element
+    from extending a committed wake beyond the physical graph after splitting.
+    """
+
+    topology_damaged_parent_element_ids: tuple[int, ...]
+    replaced_child_element_ids: tuple[int, ...]
+    rerasterized_child_element_ids: tuple[int, ...]
+    cleared_inherited_child_element_ids: tuple[int, ...]
+    topology_segment_count: int
+    physical_graph_unchanged: bool
+
+
 def element_damage(mesh, nodal_damage: np.ndarray) -> np.ndarray:
     inherited = getattr(mesh, "element_damage_gp", None)
     if inherited is not None:
@@ -121,6 +138,78 @@ def causal_segment_support(
     return np.asarray(selected, dtype=int), np.asarray(represented, dtype=float)
 
 
+def committed_physical_segments(network) -> tuple[tuple[np.ndarray, np.ndarray], ...]:
+    """Return the authoritative positive-length segments in a crack network."""
+    result: list[tuple[np.ndarray, np.ndarray]] = []
+    for branch in network.branches:
+        for start, end in zip(branch.path[:-1], branch.path[1:]):
+            p0 = np.asarray(start, dtype=float)
+            p1 = np.asarray(end, dtype=float)
+            if float(np.linalg.norm(p1 - p0)) > 0.0:
+                result.append((p0, p1))
+    return tuple(result)
+
+
+def _network_support(mesh, segments) -> np.ndarray:
+    selected: set[int] = set()
+    for start, end in segments:
+        ids, _ = causal_segment_support(mesh, start, end)
+        selected.update(int(value) for value in ids)
+    return np.asarray(sorted(selected), dtype=int)
+
+
+def rerasterize_refined_topology_damage(
+    parent_state, refined_state, parent_to_child_element_map,
+    *, fully_damaged_tolerance: float = 1.0e-12,
+):
+    """Transfer committed sharp-wake P0 damage by physical geometry.
+
+    Exact field prolongation remains the first refinement stage.  This second,
+    explicit topology stage replaces inherited P0 values only for children of
+    parents that are both fully damaged and intersected by the committed crack
+    graph.  Child support is then selected afresh on the refined mesh.  Because
+    ``causal_segment_support`` requires positive-length contact and is half-open
+    at the advancing endpoint, material merely lying ahead of a physical tip is
+    not inherited as wake.
+    """
+    before_graph = parent_state.crack_network.to_json()
+    after_graph = refined_state.crack_network.to_json()
+    if before_graph != after_graph:
+        raise RuntimeError("topology changed during P0 refinement remap")
+    segments = committed_physical_segments(parent_state.crack_network)
+    old_damage = element_damage(parent_state.mesh, parent_state.damage)
+    new_damage = element_damage(refined_state.mesh, refined_state.damage)
+    old_support = _network_support(parent_state.mesh, segments)
+    threshold = 1.0 - max(float(fully_damaged_tolerance), 0.0)
+    topology_parents = tuple(
+        int(value) for value in old_support if old_damage[int(value)] >= threshold
+    )
+    replaced_children = tuple(sorted({
+        int(child)
+        for parent in topology_parents
+        for child in parent_to_child_element_map[int(parent)]
+    }))
+    refined_support = _network_support(refined_state.mesh, segments)
+    rerasterized = tuple(sorted(set(replaced_children).intersection(
+        int(value) for value in refined_support
+    )))
+    remapped = new_damage.copy()
+    if replaced_children:
+        remapped[np.asarray(replaced_children, dtype=int)] = 0.0
+    if rerasterized:
+        remapped[np.asarray(rerasterized, dtype=int)] = 1.0
+    cleared = tuple(sorted(set(replaced_children).difference(rerasterized)))
+    mesh = replace(refined_state.mesh, element_damage_gp=remapped)
+    return replace(refined_state, mesh=mesh), TopologyDamageRemapAudit(
+        topology_damaged_parent_element_ids=topology_parents,
+        replaced_child_element_ids=replaced_children,
+        rerasterized_child_element_ids=rerasterized,
+        cleared_inherited_child_element_ids=cleared,
+        topology_segment_count=len(segments),
+        physical_graph_unchanged=before_graph == after_graph,
+    )
+
+
 def apply_causal_segment(
     state, p0: np.ndarray, p1: np.ndarray, *, tolerance: float = 1.0e-12,
 ):
@@ -153,6 +242,8 @@ def apply_causal_segment(
 
 
 __all__ = [
-    "CRACK_REPRESENTATION", "CausalSupportAudit", "apply_causal_segment",
-    "causal_segment_support", "element_damage", "mechanical_fingerprint",
+    "CRACK_REPRESENTATION", "CausalSupportAudit", "TopologyDamageRemapAudit",
+    "apply_causal_segment", "causal_segment_support",
+    "committed_physical_segments", "element_damage", "mechanical_fingerprint",
+    "rerasterize_refined_topology_damage",
 ]

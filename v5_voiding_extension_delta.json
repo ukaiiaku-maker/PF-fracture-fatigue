@@ -1,0 +1,62 @@
+{
+  "added_state": [
+    "LiveFEMTopologyState.void_state",
+    "ProductionVoidState",
+    "VoidSite",
+    "Cavity2D",
+    "void event history",
+    "void length ledgers"
+  ],
+  "added_topology": [
+    "cavity free-surface contour invalidation",
+    "explicit cavity remesh",
+    "crack-to-void ligament transaction",
+    "downstream front nucleation and continuation"
+  ],
+  "decision": "VOIDING_EXTENSION_DELTA_ONLY",
+  "fatigue_implementation": "NOT_STARTED_BY_CONTRACT",
+  "qualified_core_commit": "ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e",
+  "r_tip_equals_void_radius": false,
+  "r_tip_law": "r_tip = r0 + c_blunt*b*local_weighted_accumulated_slip",
+  "retained_void_commit": "619b66b0f538742482e7385ddd3d0171cb3edd8b",
+  "schema": "v5.voiding-extension-delta/1",
+  "scientific_tolerances_changed": false,
+  "shared_core_preserved": [
+    "qualified V13 current-source multi-front ownership",
+    "hazard renewal",
+    "whole-topology energy gate",
+    "RNG and threshold ownership",
+    "fixed-load FEM equilibrium",
+    "checkpoint process-owner registry"
+  ],
+  "void_extension_components": [
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/hybrid_directional_drive_v5.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "3d6ce839a4356c4186f775d500fc037109743448",
+      "retained_v5_blob": "3d6ce839a4356c4186f775d500fc037109743448",
+      "role": "hybrid void directional drive"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/voiding_v5.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "3c7754bf2d4e3d6dd9f22644b3b2cbd40be5019c",
+      "retained_v5_blob": "3c7754bf2d4e3d6dd9f22644b3b2cbd40be5019c",
+      "role": "void state and kinetics"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/voiding_production_v5.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "3baa7619fbb48dbceaaaa72db222798076f352eb",
+      "retained_v5_blob": "31dfcada0efc4638d8ca7fbdb626cb69cb140b22",
+      "role": "void production driver"
+    }
+  ],
+  "void_kinetics_ownership": "separate common reference row; no family-specific fit"
+}

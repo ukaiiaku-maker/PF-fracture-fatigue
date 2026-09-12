@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 
 from .directional_competition_v11 import CompetingActionProposal
 
@@ -20,10 +21,13 @@ def branch_birth_policy(
     proposal: CompetingActionProposal,
     *,
     committed_branch_birth_count: int,
-    maximum_branch_births: int = MAX_BRANCH_BIRTHS,
+    maximum_branch_births: int | None = None,
 ) -> BranchPolicyDecision:
     count = int(committed_branch_birth_count)
-    maximum = int(maximum_branch_births)
+    maximum = int(
+        os.environ.get("PF_CURRENT_SOURCE_MAX_BRANCH_BIRTHS", MAX_BRANCH_BIRTHS)
+        if maximum_branch_births is None else maximum_branch_births
+    )
     if count < 0 or maximum < 0:
         raise ValueError("branch-birth counts must be nonnegative")
     if proposal.action_type == "two_arm" and count >= maximum:

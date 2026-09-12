@@ -5,6 +5,7 @@ from dataclasses import replace
 import copy
 import json
 import math
+import os
 from pathlib import Path
 import time
 from typing import Any
@@ -31,11 +32,16 @@ from .adaptive_multitip_mesh_v11 import adapt_accepted_state_for_trials, mesh_fi
 from .production_step_loop_v11 import AcceptedStepContext, DirectionalStepRefinementRequired
 from .resolved_tip_state_v11 import resolve_unresolved_cluster, tip_lineage_seed
 from .process_state_ownership_v11 import ProcessStateOwner, ProcessStateOwnerRegistry
-from .process_update_semantics_v11 import classify_process_update
+from .process_update_semantics_v11 import (
+    classify_process_update, require_full_accepted_interval_consumption,
+)
 from .topology_transaction_v11 import (
     TopologyArm, TopologyTrialResult, apply_causal_sharp_wake_trial_geometry,
     clip_arm_at_first_intersection, execute_topology_trial, extend_network_arm,
     mark_coalesced,
+)
+from .tip_directional_observation_v11 import (
+    apply_post_interval_event_renewal, select_shared_process_renewal_distance,
 )
 
 
@@ -110,6 +116,7 @@ def continue_resolved_production(
     latest_sigma = None
     latest_live = None
     latest_rates = {}
+    latest_pre_event_state = None
     branch_birth_count = int(state.event_counters.get("branch_birth_count", 1))
     coalescence_count = int(state.event_counters.get("coalescence_count", 0))
     termination = None
@@ -237,7 +244,8 @@ def continue_resolved_production(
             return replace(current, displacement=u, ep_gp=ep, rho_gp=rho, stored_energy_J_per_m=_stored_energy(current.mesh, u, ep, sigma, D))
 
         def evaluate_rates(current, _context):
-            nonlocal latest_live, latest_rates, runtime
+            nonlocal latest_live, latest_rates, runtime, latest_pre_event_state
+            latest_pre_event_state = current
             request = _request(current, candidates, args=args, cfg=cfg, runtime_step=step, cluster=None)
             request = replace(request, cluster_frame={
                 "mode": "multi_tip_with_junction_reservoirs",
@@ -392,33 +400,115 @@ def continue_resolved_production(
 
         def update_process(current, local_context, selected_tip, proposal):
             nonlocal engines
-            from .crystal import near_tip_stress_tensor
+            from .anisotropic_emission_v10174 import (
+                bind_explicit_accepted_tensor_drive,
+            )
+            if latest_pre_event_state is None:
+                raise RuntimeError("resolved process update has no accepted pre-event state")
             selected_owner = owner_by_tip.get(selected_tip) if selected_tip else None
             evolved = {}
             for owner in sorted(set(owner_by_tip.values())):
                 engine = copy.deepcopy(engines[owner])
                 owner_tips = [tip for tip, value in owner_by_tip.items() if value == owner]
-                K = max((rate.K_directional_Pa_sqrt_m for tip in owner_tips for rate in latest_rates[tip]), default=0.0)
-                probe_tip = current.crack_network.branch(owner_tips[0]).tip
-                near_tip_stress_tensor(
-                    latest_sigma, current.mesh, np.asarray(probe_tip),
-                    3.0 * max(float(getattr(current.mesh, "hbar_tip", 0.0) or current.mesh.hbar), 1e-12),
+                controlling_K, controlling_tip = max(
+                    (
+                        (rate.K_directional_Pa_sqrt_m, tip)
+                        for tip in owner_tips for rate in latest_rates[tip]
+                    ),
+                    default=(0.0, owner_tips[0]),
+                )
+                probe_tip = latest_pre_event_state.crack_network.branch(controlling_tip).tip
+                accepted_state_id = _hash((
+                    local_context.accepted_state_id,
+                    latest_pre_event_state.crack_network,
+                    latest_pre_event_state.displacement,
+                    latest_pre_event_state.ep_gp,
+                    latest_pre_event_state.rho_gp,
+                ))
+                stress_field_state_id = _hash((
+                    accepted_state_id, latest_sigma,
+                    mesh_fingerprint(latest_pre_event_state.mesh),
+                ))
+                bind_explicit_accepted_tensor_drive(
+                    mesh=latest_pre_event_state.mesh,
+                    sigma_gp=latest_sigma,
+                    damage=latest_pre_event_state.damage,
+                    tip_xy=np.asarray(probe_tip),
+                    config=engine.anisotropic_cfg,
+                    accepted_state_id=accepted_state_id,
+                    stress_field_state_id=stress_field_state_id,
                 )
                 residual = max((hazard.residual_action for tip in owner_tips for hazard in competitions[tip].hazard_states), default=0.0)
                 expected = selected_owner == owner
-                engine.B = 1.0 if expected else residual
+                engine.B = residual
                 if hasattr(engine, "hazard_action_current"):
-                    engine.hazard_action_current = 1.0 if expected else residual
+                    engine.hazard_action_current = residual
                 if hasattr(engine, "hazard_threshold_action"):
                     # Directional clocks are authoritative.  A kinetically
                     # complete but energy-vetoed event remains pending, so the
                     # scalar compatibility observer must not consume it.
-                    engine.hazard_threshold_action = 1.0 if expected else 1.0e300
-                info = engine.step(K, float(args.temperatures[0]), local_context.duration_s)
+                    engine.hazard_threshold_action = 1.0e300
+                engine._directional_topology_owns_cleavage = True
+                legacy_rng_before = _hash(getattr(engine, "_hazard_rng", None))
+                info = engine.step(
+                    controlling_K, float(args.temperatures[0]),
+                    local_context.duration_s,
+                )
+                legacy_rng_after = _hash(getattr(engine, "_hazard_rng", None))
+                info["interval_evolved"] = True
+                info.update(require_full_accepted_interval_consumption(
+                    info, local_context.duration_s,
+                ))
+                if abs(float(info.get("da", 0.0))) > 1.0e-18:
+                    raise RuntimeError("resolved legacy process observer advanced crack geometry")
+                realized_lengths = ()
+                if expected and proposal is not None:
+                    payload = trial_data.get((selected_tip, proposal.action_id))
+                    if payload is None:
+                        raise RuntimeError("selected resolved event has no realized trial geometry")
+                    realized_lengths = tuple(
+                        math.dist(arm.start_xy_m, arm.end_xy_m)
+                        for arm, _target in payload[1]
+                    )
+                renewal_distance = (
+                    select_shared_process_renewal_distance(realized_lengths)
+                    if realized_lengths else 0.0
+                )
+                renewal = apply_post_interval_event_renewal(
+                    engine.mpz, info, event_selected=expected,
+                    event_distance_m=renewal_distance,
+                )
+                info.update({
+                    "legacy_process_fired": bool(info.get("fired", False)),
+                    "legacy_process_rng_hash_before": legacy_rng_before,
+                    "legacy_process_rng_hash_after": legacy_rng_after,
+                    "directional_event_selected": expected,
+                    "directional_event_completion_time_s": (
+                        None if not expected or proposal is None
+                        else max(proposal.completion_times_s)
+                    ),
+                    "realized_arm_lengths_m": list(realized_lengths),
+                    "realized_max_tip_advance_m": renewal_distance,
+                    "realized_total_new_crack_length_m": sum(realized_lengths),
+                    "selected_renewal_distance_m": renewal_distance,
+                    "active_to_wake_transfer": float(
+                        renewal.get("wake_mobile", 0.0)
+                        + renewal.get("wake_retained", 0.0)
+                    ),
+                    "postrenewal_conservation_residual": float(
+                        info.get("event_moving_frame_conservation", {}).get(
+                            "active_plus_wake_plus_sinks_residual", 0.0
+                        )
+                    ),
+                    "controlling_scalar_K_tip_id": controlling_tip,
+                    "tensor_probe_tip_id": controlling_tip,
+                    "accepted_state_id": accepted_state_id,
+                    "stress_field_state_id": stress_field_state_id,
+                })
                 target = max(float(getattr(args, "adaptive_event_target", 0.15)) * 0.5, 1e-6)
                 decision = classify_process_update(
                     info,
-                    directional_event_expected=expected,
+                    directional_event_expected=False,
                     permitted_physical_hazard_action=target,
                 )
                 process_record = {
@@ -509,6 +599,10 @@ def continue_resolved_production(
             after_equilibrium = {} if after_live is None else after_live.get("base_equilibrium", {})
             reaction_before = before_equilibrium.get("reaction_force")
             reaction_after = after_equilibrium.get("reaction_force")
+            actual_trial_arm_lengths = [] if trial_payload is None else [
+                math.dist(arm.start_xy_m, arm.end_xy_m)
+                for arm, _target in trial_payload[1]
+            ]
 
             def apparent_compliance(reaction):
                 if reaction is None or not math.isfinite(float(reaction)) or abs(float(reaction)) <= 1.0e-300:
@@ -542,7 +636,7 @@ def continue_resolved_production(
                 "topology_fingerprint_before": (latest_live or {}).get("topology_fingerprint"),
                 "topology_fingerprint_after": None if after_live is None else after_live.get("topology_fingerprint"),
                 "proposed_arm_lengths_m": [da_phys] * arm_count,
-                "realized_arm_lengths_m": [da_phys] * arm_count if result_item.accepted else [0.0] * arm_count,
+                "realized_arm_lengths_m": actual_trial_arm_lengths if result_item.accepted else [0.0] * arm_count,
                 "pretrial_potential_energy_J_per_m": result_item.state.stored_energy_J_per_m + result_item.energy_release_J_per_m,
                 "posttrial_potential_energy_J_per_m": result_item.state.stored_energy_J_per_m,
                 "released_energy_J_per_m": result_item.energy_release_J_per_m,
@@ -759,6 +853,7 @@ def continue_resolved_production(
         }
         growth = crack_growth_metrics(state.crack_network, initial_crack_length_m=cfg.geometry.a0)
         extension = growth.max_root_to_tip_path_extension_m
+        forward_extension = growth.max_forward_projected_extension_m
         checkpoint = ProductionBranchCheckpoint(
             state=state, shared_process_state=bundle, physical_time_s=physical_time,
             accepted_load=accepted_load, mesh_identity=_mesh_identity(state.mesh),
@@ -791,7 +886,17 @@ def continue_resolved_production(
             )
             last_snapshot_extension = extension
         target = float(getattr(args, "target_crack_extension_um", float("inf"))) * 1e-6
-        if extension >= target:
+        daughter_stop_m = float(
+            os.environ.get("PF_QUALIFIED_DAUGHTER_STOP_UM", "inf")
+        ) * 1.0e-6
+        daughter_lengths = [
+            sum(math.dist(a, b) for a, b in zip(branch.path, branch.path[1:]))
+            for branch in state.crack_network.branches
+            if branch.generation > 0 and branch.status == "active"
+        ]
+        if daughter_lengths and max(daughter_lengths) >= daughter_stop_m:
+            termination = "qualified_daughter_early_stop"; break
+        if forward_extension >= target:
             termination = "target_reached"; break
         if not active:
             termination = "physical_veto_no_branch"; break

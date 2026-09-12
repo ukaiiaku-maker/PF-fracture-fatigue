@@ -398,8 +398,21 @@ class CompetingActionProposal:
     member_event_ordinals: tuple[int, ...]
     completion_times_s: tuple[float, ...]
     action_type: str
+    # Explicit event-owner scope, distinct from a shared physical process owner.
+    # Legacy event IDs remain checkpoint/RNG keys, not globally scoped identities.
+    event_owner_tip_id: str | None = None
+    branch_opportunity_id: str | None = None
+
+    @property
+    def scoped_event_identities(self) -> tuple[tuple[str, str, int], ...]:
+        if self.event_owner_tip_id is None:
+            return ()
+        return tuple((self.event_owner_tip_id, candidate, ordinal) for candidate, ordinal
+                     in zip(self.member_candidate_ids, self.member_event_ordinals))
 
     def __post_init__(self) -> None:
+        if (self.event_owner_tip_id is None) != (self.branch_opportunity_id is None):
+            raise ValueError("proposal tip and branch-opportunity scope must be specified together")
         size = len(self.member_candidate_ids)
         if size not in (1, 2):
             raise ValueError("directional action must have one or two members")
@@ -858,12 +871,15 @@ def preview_directional_interval(
     lambda_per_s: float,
     start_time_s: float,
     duration_s: float,
+    maximum_completed_events: int | None = None,
 ) -> DirectionalIntervalPreview:
     rate = _finite(lambda_per_s, "lambda_per_s")
     start_time = _finite(start_time_s, "start_time_s")
     duration = _finite(duration_s, "duration_s")
     if rate < 0.0 or duration < 0.0:
         raise ValueError("rate and duration must be nonnegative")
+    if maximum_completed_events is not None and maximum_completed_events <= 0:
+        raise ValueError("maximum_completed_events must be positive when specified")
     increment = rate * duration
     end = state.action + increment
     events = []
@@ -882,6 +898,11 @@ def preview_directional_interval(
                     action_after=boundary,
                 )
             )
+            if (
+                maximum_completed_events is not None
+                and len(events) >= maximum_completed_events
+            ):
+                break
         ordinal += 1
         boundary += (
             _exponential_threshold_increment(

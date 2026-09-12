@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import copy
 import math
+import os
 from dataclasses import asdict, dataclass
 from types import MethodType
 from typing import Any, Callable
@@ -24,6 +25,20 @@ from .stochastic_avalanche_tip import StochasticAvalancheDiagnosticTipEngine
 
 
 MODEL_ID = "v10.1.7.4_reduced_2d_slip_trace_anisotropic_emission"
+TP_STATE_DIAGNOSTIC_ENV = "ONED_V2_TP_STATE_DIAGNOSTICS"
+
+
+def _tp_state_diagnostics_mode() -> str:
+    value = os.environ.get(TP_STATE_DIAGNOSTIC_ENV, "0").strip().lower()
+    if value in {"1", "true", "yes", "on", "all"}:
+        return "all"
+    if value in {"event", "events", "event_boundaries", "sparse"}:
+        return "events"
+    return "off"
+
+
+def _tp_state_diagnostics_enabled() -> bool:
+    return _tp_state_diagnostics_mode() != "off"
 
 
 def _unit(vector) -> np.ndarray:
@@ -32,6 +47,35 @@ def _unit(vector) -> np.ndarray:
     if not np.isfinite(norm) or norm <= 1.0e-30:
         return np.array([1.0, 0.0], dtype=float)
     return value / norm
+
+
+def _tensor_normalization_uncertainty(
+    opening_tensor,
+    channel_tensors,
+    reported_probe_uncertainty_Pa: float = 0.0,
+) -> tuple[float, float]:
+    """Return a source-derived lower bound on resolvable stress amplitude.
+
+    The reported probe uncertainty is combined with the floating-point
+    roundoff envelope of every tensor participating in the ratio.  This is an
+    admissibility bound, not a fitted stress threshold or a factor cap.
+    """
+    tensors = [np.asarray(opening_tensor, dtype=float), *(
+        np.asarray(value, dtype=float) for value in channel_tensors
+    )]
+    finite_values = [
+        np.abs(value[np.isfinite(value)]) for value in tensors
+        if np.any(np.isfinite(value))
+    ]
+    stress_scale = max(
+        (float(np.max(value)) for value in finite_values if value.size),
+        default=0.0,
+    )
+    roundoff = 64.0 * np.finfo(float).eps * stress_scale
+    reported = float(reported_probe_uncertainty_Pa)
+    if not math.isfinite(reported) or reported < 0.0:
+        return float("nan"), float(roundoff)
+    return max(reported, float(roundoff)), float(roundoff)
 
 
 @dataclass
@@ -206,12 +250,23 @@ def probe_tensor_ahead(
     syy = float(weights @ stress[1, indices])
     sxy = float(weights @ stress[2, indices])
     tensor = np.array([[sxx, sxy], [sxy, syy]], dtype=float)
+    samples = stress[:, indices]
+    means = np.array([sxx, syy, sxy], dtype=float)
+    variance = np.sum(
+        weights[None, :] * (samples - means[:, None]) ** 2,
+        axis=1,
+    )
+    effective_count = 1.0 / float(np.sum(weights ** 2))
+    tensor_uncertainty = float(
+        np.sqrt(max(float(np.max(variance)), 0.0) / max(effective_count, 1.0))
+    )
     return {
         "reliable": bool(np.all(np.isfinite(tensor))),
         "n_elements": int(indices.size),
         "expansion": float(expansion_used),
         "ray_direction": ray.tolist(),
         "tensor": tensor,
+        "tensor_uncertainty_Pa": tensor_uncertainty,
     }
 
 
@@ -220,13 +275,14 @@ def resolve_channel_drives(
     channel_tensors,
     crystal_theta_deg: float,
     schmid_reference: float = 0.5,
+    probe_uncertainty_Pa: float = 0.0,
 ) -> dict[str, Any]:
     """Resolve two BCC slip-trace channels without normalization or clipping."""
     from .crystal import bcc_slip_traces
 
     opening = np.asarray(opening_tensor, dtype=float).reshape(2, 2)
-    eig = np.linalg.eigvalsh(opening)
-    sigma1 = float(eig[-1])
+    finite_opening = bool(np.all(np.isfinite(opening)))
+    sigma1 = float(np.linalg.eigvalsh(opening)[-1]) if finite_opening else float("nan")
     traces = bcc_slip_traces(float(crystal_theta_deg))
     if len(traces) != 2:
         raise RuntimeError(
@@ -236,10 +292,33 @@ def resolve_channel_drives(
     if len(tensors) != len(traces):
         raise ValueError("one tensor is required for each slip-trace channel")
 
-    # The opening normal is perpendicular to the local crack direction.  The
-    # caller stores sigma_nn explicitly; sigma1 is the positive amplitude floor.
-    sigma_nn = float(max(opening[1, 1], 0.0))
-    sigma_amplitude = max(sigma1, sigma_nn, 1.0)
+    # No artificial 1 Pa scale is admissible: a tensor without a positive
+    # tensile opening scale cannot define the anisotropic normalization.
+    sigma_nn = float(opening[1, 1])
+    sigma_amplitude = max(sigma1, sigma_nn)
+    finite_tensor = bool(
+        finite_opening
+        and all(np.all(np.isfinite(value)) for value in tensors)
+    )
+    uncertainty, roundoff = _tensor_normalization_uncertainty(
+        opening, tensors, probe_uncertainty_Pa,
+    )
+    amplitude_resolved = bool(
+        math.isfinite(uncertainty) and sigma_amplitude > uncertainty
+    )
+    admissible = (
+        finite_tensor and math.isfinite(sigma_amplitude)
+        and sigma_amplitude > 0.0 and amplitude_resolved
+    )
+    reason = None
+    if not finite_tensor:
+        reason = "nonfinite_tensor_for_anisotropic_normalization"
+    elif not math.isfinite(sigma_amplitude) or sigma_amplitude <= 0.0:
+        reason = "nonpositive_tensile_opening_scale_for_anisotropic_normalization"
+    elif not math.isfinite(uncertainty):
+        reason = "invalid_probe_uncertainty_for_anisotropic_normalization"
+    elif not amplitude_resolved:
+        reason = "opening_scale_not_resolved_above_probe_uncertainty"
     reference = max(abs(float(schmid_reference)), 1.0e-12)
 
     names: list[str] = []
@@ -253,7 +332,9 @@ def resolve_channel_drives(
         tau = float(t @ tensor @ n)
         names.append(str(trace["name"]))
         signed.append(tau)
-        factors.append(abs(tau) / (reference * sigma_amplitude))
+        factors.append(
+            abs(tau) / (reference * sigma_amplitude) if admissible else None
+        )
         directions.append(t.tolist())
         normals.append(n.tolist())
 
@@ -264,11 +345,162 @@ def resolve_channel_drives(
         "tau_signed_Pa": signed,
         "drive_factors": factors,
         "sigma_amplitude_Pa": float(sigma_amplitude),
+        "sigma_nn_probe_Pa": float(sigma_nn),
         "sigma1_probe_Pa": float(sigma1),
+        "probe_uncertainty_Pa": float(uncertainty),
+        "roundoff_uncertainty_Pa": float(roundoff),
+        "opening_to_uncertainty_ratio": (
+            float(sigma_amplitude / uncertainty) if uncertainty > 0.0 else None
+        ),
+        "opening_normalization_floor_active": False,
+        "tensor_drive_admissible": bool(admissible),
+        "tensor_drive_reliable": bool(admissible),
+        "reliable": bool(admissible),
+        "tensor_drive_rejection_reason": reason,
+        "conditioning_qualification_scope": "opening_denominator_only",
+        "channel_amplitude_uncertainty_propagated": False,
+        "channel_reliability_contract": (
+            "each_channel_probe_must_be_finite_and_reliable; channel-amplitude-"
+            "uncertainty_is_not_propagated"
+        ),
         "schmid_reference": float(reference),
         "factors_normalized": False,
         "factors_clipped": False,
     }
+
+
+def tensor_normalization_admissibility(
+    opening_tensor,
+    channel_tensors,
+    *,
+    sigma_nn_Pa: float | None = None,
+    probe_reliable: bool = True,
+    schmid_reference: float = 0.5,
+    probe_uncertainty_Pa: float = 0.0,
+) -> dict[str, Any]:
+    """Pure V4 tensor-normalization audit independent of J or event state."""
+    opening = np.asarray(opening_tensor, dtype=float).reshape(2, 2)
+    channels = [np.asarray(value, dtype=float).reshape(2, 2) for value in channel_tensors]
+    finite = bool(
+        np.all(np.isfinite(opening))
+        and all(np.all(np.isfinite(value)) for value in channels)
+    )
+    sigma1 = float(np.linalg.eigvalsh(opening)[-1]) if finite else float("nan")
+    sigma_nn = float(opening[1, 1] if sigma_nn_Pa is None else sigma_nn_Pa)
+    amplitude = max(sigma1, sigma_nn) if finite else float("nan")
+    uncertainty, roundoff = _tensor_normalization_uncertainty(
+        opening, channels, probe_uncertainty_Pa,
+    )
+    amplitude_resolved = bool(
+        math.isfinite(uncertainty) and amplitude > uncertainty
+    )
+    admissible = bool(
+        probe_reliable and finite and math.isfinite(amplitude)
+        and amplitude > 0.0 and amplitude_resolved
+    )
+    if not probe_reliable:
+        reason = "unreliable_tensor_probe_for_anisotropic_normalization"
+    elif not finite:
+        reason = "nonfinite_tensor_for_anisotropic_normalization"
+    elif not math.isfinite(amplitude) or amplitude <= 0.0:
+        reason = "nonpositive_tensile_opening_scale_for_anisotropic_normalization"
+    elif not math.isfinite(uncertainty):
+        reason = "invalid_probe_uncertainty_for_anisotropic_normalization"
+    elif not amplitude_resolved:
+        reason = "opening_scale_not_resolved_above_probe_uncertainty"
+    else:
+        reason = None
+    reference = abs(float(schmid_reference))
+    factors = None
+    if admissible:
+        if not math.isfinite(reference) or reference <= 0.0:
+            raise ValueError("schmid_reference must be finite and positive")
+        factors = []
+        for tensor in channels:
+            # Audit factors use the same fixed specimen axes as the pure helper;
+            # production channel projections remain in resolve_channel_drives.
+            factors.append(abs(float(tensor[0, 1])) / (reference * amplitude))
+    return {
+        "finite_tensor": finite,
+        "probe_reliable": bool(probe_reliable),
+        "sigma1_probe_Pa": sigma1,
+        "sigma_nn_probe_Pa": sigma_nn,
+        "sigma_amplitude_Pa": amplitude,
+        "probe_uncertainty_Pa": float(uncertainty),
+        "roundoff_uncertainty_Pa": float(roundoff),
+        "opening_to_uncertainty_ratio": (
+            float(amplitude / uncertainty) if uncertainty > 0.0 else None
+        ),
+        "opening_normalization_floor_active": False,
+        "drive_factors": factors,
+        "tensor_drive_admissible": admissible,
+        "tensor_drive_reliable": admissible,
+        "reliable": admissible,
+        "tensor_drive_rejection_reason": reason,
+        "conditioning_qualification_scope": "opening_denominator_only",
+        "channel_amplitude_uncertainty_propagated": False,
+        "channel_reliability_contract": (
+            "each_channel_probe_must_be_finite_and_reliable; channel-amplitude-"
+            "uncertainty_is_not_propagated"
+        ),
+    }
+
+
+def evaluate_tensor_conditioning_sentinel_cases(
+    cases: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+) -> list[dict[str, Any]]:
+    """Execute frozen conditioning cases through the production gate.
+
+    This is the launcher's functional contract.  It deliberately accepts
+    explicit tensors and expectations so the execution source contains no
+    campaign-specific fitted state and the caller can hash-bind its fixtures.
+    """
+    records: list[dict[str, Any]] = []
+    for case in cases:
+        result = tensor_normalization_admissibility(
+            case["opening_tensor_Pa"],
+            case["channel_tensors_Pa"],
+            probe_reliable=bool(case.get("probe_reliable", True)),
+            probe_uncertainty_Pa=float(case.get("probe_uncertainty_Pa", 0.0)),
+        )
+        accepted = True
+        failure = None
+        try:
+            require_admissible_tensor_drive(result)
+        except RuntimeError as exc:
+            accepted = False
+            failure = str(exc)
+        expected = bool(case["expected_accepted"])
+        expected_reason = case.get("expected_rejection_reason")
+        passed = accepted == expected and (
+            accepted or result["tensor_drive_rejection_reason"] == expected_reason
+        )
+        def finite_or_none(value):
+            return float(value) if math.isfinite(float(value)) else None
+
+        records.append({
+            "case": str(case["case"]),
+            "accepted": accepted,
+            "expected_accepted": expected,
+            "rejection_reason": result["tensor_drive_rejection_reason"],
+            "expected_rejection_reason": expected_reason,
+            "gate_failure": failure,
+            "tensor_drive_admissible": result["tensor_drive_admissible"],
+            "tensor_drive_reliable": result["tensor_drive_reliable"],
+            "reliable": result["reliable"],
+            "sigma_amplitude_Pa": finite_or_none(result["sigma_amplitude_Pa"]),
+            "probe_uncertainty_Pa": finite_or_none(result["probe_uncertainty_Pa"]),
+            "opening_to_uncertainty_ratio": (
+                None if result["opening_to_uncertainty_ratio"] is None else
+                finite_or_none(result["opening_to_uncertainty_ratio"])
+            ),
+            "drive_factors": result["drive_factors"],
+            "conditioning_qualification_scope": result[
+                "conditioning_qualification_scope"
+            ],
+            "passed": passed,
+        })
+    return records
 
 
 def build_front_drive(
@@ -310,35 +542,106 @@ def build_front_drive(
         channel_tensors,
         cfg.crystal_theta_deg,
         cfg.schmid_reference,
+        probe_uncertainty_Pa=float(
+            opening_probe.get("tensor_uncertainty_Pa", 0.0)
+        ),
     )
     eig = np.linalg.eigvalsh(opening_tensor)
     sigma1 = float(eig[-1])
-    sigma_amplitude = max(sigma1, max(sigma_nn, 0.0), 1.0)
+    sigma_amplitude = max(sigma1, sigma_nn)
+    admissible = (
+        bool(opening_probe.get("reliable", False))
+        and bool(drive["tensor_drive_admissible"])
+        and all(probe.get("reliable", False) for probe in channel_probes)
+    )
     # Recompute factors with the crack-local opening amplitude rather than the
     # specimen-y component used by the pure tensor helper.
     drive["sigma_amplitude_Pa"] = float(sigma_amplitude)
     drive["sigma_nn_probe_Pa"] = float(sigma_nn)
     drive["sigma1_probe_Pa"] = float(sigma1)
-    drive["drive_factors"] = [
-        abs(float(tau)) / (cfg.schmid_reference * sigma_amplitude)
-        for tau in drive["tau_signed_Pa"]
-    ]
+    drive["drive_factors"] = (
+        [abs(float(tau)) / (cfg.schmid_reference * sigma_amplitude)
+         for tau in drive["tau_signed_Pa"]]
+        if admissible else [None for _ in drive["tau_signed_Pa"]]
+    )
+    drive["opening_normalization_floor_active"] = False
+    drive["tensor_drive_admissible"] = bool(admissible)
+    drive["tensor_drive_rejection_reason"] = (
+        None if admissible else drive.get("tensor_drive_rejection_reason")
+        or "unreliable_tensor_probe_for_anisotropic_normalization"
+    )
     drive.update({
         "model_id": MODEL_ID,
-        "reliable": True,
+        "reliable": bool(admissible),
+        "tensor_drive_reliable": bool(admissible),
         "front_direction": forward.tolist(),
         "front_normal": normal.tolist(),
         "tip_xy_m": np.asarray(tip_xy, dtype=float).reshape(2).tolist(),
         "opening_probe_elements": int(opening_probe["n_elements"]),
         "opening_probe_expansion": float(opening_probe["expansion"]),
+        "opening_probe_uncertainty_Pa": float(
+            opening_probe.get("tensor_uncertainty_Pa", 0.0)
+        ),
         "channel_probe_elements": [
             int(probe["n_elements"]) for probe in channel_probes
         ],
         "channel_probe_expansion": [
             float(probe["expansion"]) for probe in channel_probes
         ],
+        "channel_probe_uncertainty_Pa": [
+            float(probe.get("tensor_uncertainty_Pa", 0.0))
+            for probe in channel_probes
+        ],
         "mechanics_serial": int(OBSERVER.mechanics_serial),
     })
+    if _tp_state_diagnostics_enabled():
+        drive["opening_tensor_Pa"] = opening_tensor.tolist()
+        drive["channel_tensors_Pa"] = [tensor.tolist() for tensor in channel_tensors]
+    return drive
+
+
+def require_admissible_tensor_drive(drive: dict[str, Any] | None) -> dict[str, Any]:
+    """Fail closed before a tensor-resolved process-state update."""
+    if not isinstance(drive, dict) or not (
+        bool(drive.get("tensor_drive_admissible", False))
+        and bool(drive.get("tensor_drive_reliable", drive.get("reliable", False)))
+        and bool(drive.get("reliable", False))
+    ):
+        reason = (
+            drive.get("tensor_drive_rejection_reason")
+            if isinstance(drive, dict) else None
+        ) or "unreliable_tensor_probe_for_anisotropic_normalization"
+        raise RuntimeError(str(reason))
+    factors = drive.get("drive_factors")
+    if not isinstance(factors, (list, tuple)) or not factors or not all(
+        math.isfinite(float(value)) for value in factors
+    ):
+        raise RuntimeError("nonfinite_drive_factor_for_anisotropic_normalization")
+    return drive
+
+
+def bind_explicit_accepted_tensor_drive(
+    *,
+    mesh,
+    sigma_gp,
+    damage,
+    tip_xy,
+    config: AnisotropicEmissionConfig,
+    accepted_state_id: str,
+    stress_field_state_id: str,
+) -> dict[str, Any]:
+    """Bind a drive from explicit accepted fields, never observer leftovers."""
+    if not accepted_state_id or not stress_field_state_id:
+        raise RuntimeError("explicit accepted tensor binding requires state identities")
+    drive = build_front_drive(mesh, sigma_gp, damage, tip_xy, config)
+    drive["accepted_state_id"] = str(accepted_state_id)
+    drive["stress_field_state_id"] = str(stress_field_state_id)
+    drive["explicit_bound_accepted_state"] = True
+    require_admissible_tensor_drive(drive)
+    OBSERVER.drive_serial += 1
+    drive["drive_serial"] = int(OBSERVER.drive_serial)
+    OBSERVER.latest_drive = drive
+    OBSERVER.reliable_drive_count += 1
     return drive
 
 
@@ -385,6 +688,7 @@ def wrap_near_tip_stress_tensor(
                 tip_xy,
                 cfg,
             )
+            require_admissible_tensor_drive(drive)
             OBSERVER.drive_serial += 1
             drive["drive_serial"] = int(OBSERVER.drive_serial)
             OBSERVER.latest_drive = drive
@@ -395,13 +699,18 @@ def wrap_near_tip_stress_tensor(
             OBSERVER.latest_drive = {
                 "model_id": MODEL_ID,
                 "reliable": False,
-                "fallback_scalar": True,
+                "tensor_drive_reliable": False,
+                "fallback_scalar": False,
                 "drive_serial": int(OBSERVER.drive_serial),
                 "mechanics_serial": int(OBSERVER.mechanics_serial),
                 "tip_xy_m": np.asarray(tip_xy, dtype=float).reshape(2).tolist(),
-                "drive_factors": [1.0, 1.0],
-                "tau_signed_Pa": [0.0, 0.0],
+                "drive_factors": None,
+                "tau_signed_Pa": None,
                 "channel_names": ["(110)", "(1-10)"],
+                "opening_normalization_floor_active": False,
+                "tensor_drive_admissible": False,
+                "tensor_drive_rejection_reason": "unreliable_tensor_probe_for_anisotropic_normalization",
+                "tensor_drive_invalid_reason": "unreliable_tensor_probe_for_anisotropic_normalization",
                 "failure": f"{type(exc).__name__}: {exc}",
             }
             OBSERVER.fallback_drive_count += 1
@@ -781,6 +1090,10 @@ class AnisotropicStochasticAvalancheTipEngine(
         serial = int(drive.get("drive_serial", -1))
         if serial <= self._anisotropic_drive_serial:
             return
+        # The observer path is legacy, but it must obey the same acceptance
+        # contract as explicit accepted-state binding.  In particular, never
+        # convert rejected/None factors into the MPZ state.
+        require_admissible_tensor_drive(drive)
         self._anisotropic_drive = copy.deepcopy(drive)
         self._anisotropic_drive_serial = serial
         self._install_current_drive_on_state()
@@ -791,6 +1104,7 @@ class AnisotropicStochasticAvalancheTipEngine(
             tau = np.zeros(self.mpz.n_systems, dtype=float)
             reliable = False
         else:
+            require_admissible_tensor_drive(self._anisotropic_drive)
             factors = np.asarray(
                 self._anisotropic_drive.get(
                     "drive_factors", np.ones(self.mpz.n_systems)
@@ -847,9 +1161,9 @@ class AnisotropicStochasticAvalancheTipEngine(
         self._install_current_drive_on_state()
         return super()._plastic_half_step(dt, T, cleavage_stress)
 
-    def _anisotropic_diagnostics(self) -> dict[str, Any]:
+    def _anisotropic_diagnostics(self, include_tensor_state: bool | None = None) -> dict[str, Any]:
         drive = self._anisotropic_drive or {}
-        return {
+        result = {
             "anisotropic_emission_model_id": MODEL_ID,
             "anisotropic_emission_enabled": bool(
                 self.anisotropic_cfg.enabled
@@ -929,11 +1243,84 @@ class AnisotropicStochasticAvalancheTipEngine(
                 self._anisotropic_fallback_count
             ),
         }
+        if include_tensor_state is None:
+            include_tensor_state = _tp_state_diagnostics_mode() == "all"
+        if include_tensor_state:
+            result.update({
+                "opening_tensor_Pa": copy.deepcopy(drive.get("opening_tensor_Pa")),
+                "channel_tensors_Pa": copy.deepcopy(drive.get("channel_tensors_Pa")),
+            })
+        return result
+
+    def _taylor_peierls_state_diagnostics(
+        self, temperature_K: float, step_result: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Serialize existing MPZ fields and rates without feedback."""
+        state = self.mpz
+        opening = float(getattr(state, "anisotropic_last_sigma_opening_Pa", 0.0))
+        stress = state.local_stress_profile_Pa(opening)
+        forest = state.local_forest_density_m2(False)
+        rates = state._transport_rates(stress, forest, float(temperature_K), self.b)
+        velocity = np.asarray(rates["velocity"], dtype=float)
+        encounter = np.asarray(rates["encounter"], dtype=float)
+        taylor = np.asarray(rates["taylor"], dtype=float)
+        distance = np.maximum(float(state.length_m) - np.asarray(state.x), state.dx)
+        transport_time = distance / np.maximum(np.abs(velocity), 1.0e-300)
+        retention_time = 1.0 / np.maximum(encounter, 1.0e-300)
+        taylor_time = 1.0 / np.maximum(taylor, 1.0e-300)
+        profile = {
+            "taylor_peierls_state_profile_schema": "oneD_v2_pf_existing_mpz_observer_v1",
+            "taylor_peierls_state_profile_feedback": False,
+            "taylor_peierls_state_profile_spatial_state": True,
+            "temperature_K": float(temperature_K),
+            "active_x_ahead_of_tip_m": np.asarray(state.x, dtype=float).tolist(),
+            "wake_x_behind_tip_m": (-np.asarray(state.wake_x, dtype=float)).tolist(),
+            "mobile_active_by_system_bin": np.asarray(state.mobile, dtype=float).tolist(),
+            "retained_active_by_system_bin": np.asarray(state.retained, dtype=float).tolist(),
+            "mobile_wake_by_system_bin": np.asarray(state.wake_mobile, dtype=float).tolist(),
+            "retained_wake_by_system_bin": np.asarray(state.wake_retained, dtype=float).tolist(),
+            "forest_density_active_m2_by_bin": forest.tolist(),
+            "source_opening_stress_Pa": opening,
+            "local_transport_stress_Pa_by_bin": np.asarray(stress, dtype=float).tolist(),
+            "peierls_rate_s_by_bin": np.asarray(rates["peierls"], dtype=float).tolist(),
+            "peierls_velocity_m_s_by_bin": velocity.tolist(),
+            "encounter_rate_s_by_bin": encounter.tolist(),
+            "taylor_completion_rate_s_by_bin": taylor.tolist(),
+            "taylor_single_hit_rate_s_by_bin": np.asarray(rates["taylor_single"], dtype=float).tolist(),
+            "taylor_correlation_order_by_bin": np.asarray(rates["m"], dtype=float).tolist(),
+            "transport_distance_to_active_zone_exit_m_by_bin": distance.tolist(),
+            "transport_time_s_by_bin": transport_time.tolist(),
+            "retention_encounter_time_s_by_bin": retention_time.tolist(),
+            "taylor_completion_time_s_by_bin": taylor_time.tolist(),
+            "chi_ret_by_bin": (transport_time / retention_time).tolist(),
+            "chi_taylor_completion_by_bin": (transport_time / taylor_time).tolist(),
+            "source_rate_max_peierls_s": float(step_result.get("peierls_rate_s", 0.0)),
+            "source_rate_max_encounter_s": float(step_result.get("encounter_rate_s", 0.0)),
+            "source_rate_max_taylor_completion_s": float(
+                step_result.get("taylor_completion_rate_s", 0.0)
+            ),
+        }
+        for name in (
+            "mobile_positive", "mobile_negative", "retained_positive", "retained_negative",
+            "wake_mobile_positive", "wake_mobile_negative",
+            "wake_retained_positive", "wake_retained_negative",
+        ):
+            if hasattr(state, name):
+                profile[f"{name}_by_system_bin"] = np.asarray(
+                    getattr(state, name), dtype=float
+                ).tolist()
+        return profile
 
     def step(self, K, T, dt):
         self._adopt_latest_drive()
         result = super().step(K, T, dt)
-        diagnostics = self._anisotropic_diagnostics()
+        mode = _tp_state_diagnostics_mode()
+        include_profile = mode == "all" or (
+            mode == "events" and bool(result.get("fired", False))
+        )
+        diagnostics = self._anisotropic_diagnostics(include_profile)
+        if include_profile:
+            diagnostics.update(self._taylor_peierls_state_diagnostics(T, result))
         result.update(diagnostics)
         if type(self)._audit_records:
             type(self)._audit_records[-1].update(diagnostics)

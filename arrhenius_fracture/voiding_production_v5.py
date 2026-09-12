@@ -8,7 +8,7 @@ import math
 import os
 from pathlib import Path
 import subprocess
-from typing import Any
+from typing import Any, Mapping
 
 import numpy as np
 from scipy.interpolate import LinearNDInterpolator
@@ -23,9 +23,9 @@ from .directional_competition_v11 import (
 from .explicit_cavity_v5 import build_explicit_hole_mesh, fill_explicit_hole_mesh, triangle_intersects_open_disk
 from .mesh import BoundaryData, rebuild_tri_mesh
 from .fem import assemble_mechanics, plane_strain_D
-from .sharp_front import (
-    FrontConfig, FrontEngine, default_cleavage_barrier,
-    default_emission_barrier, make_emergent_config,
+from .unified_fracture_material_v5 import (
+    UnifiedFractureMaterialBundle, bind_identity, canonical_front_engine,
+    elastic_material, require_bound_identity,
 )
 from .hazard_energy_event_gate_v10230 import hazard_resistance_J_per_m2
 from .mechanically_separating_sharp_wake_v12 import (
@@ -46,45 +46,86 @@ from .voiding_v5 import (
 )
 
 SCHEMA = "v12.production-one-void-trajectory/5"
-FRONT_ENGINE_STATE_SCHEMA = "v5.downstream-child-front-engine-state/1"
+FRONT_ENGINE_STATE_SCHEMA = "v5.downstream-child-front-engine-state/2"
 _FRONT_ENGINE_STATE_FIELDS = ("N_em", "B", "a_adv", "n_adv", "W_emit", "t", "K_prev")
 
 
-def fresh_sharp_front_engine(material):
-    """Use the established ordinary-front constructor/reset policy unchanged."""
-    engine = FrontEngine(
-        FrontConfig(), default_cleavage_barrier(), default_emission_barrier(material.b),
-        material.G, material.nu, material.b,
+def _bundle_from_state(state) -> UnifiedFractureMaterialBundle:
+    require_bound_identity(state)
+    return UnifiedFractureMaterialBundle(
+        **dict(state.junction_process_state["unified_material_bundle"])
     )
-    # The production drivers admit at most one geometric renewal per accepted
-    # transaction; this is the same numerical event policy used by build_engine.
-    engine.f.max_advances_per_step = 1
-    return engine
+
+
+def fresh_sharp_front_engine(material, bundle: UnifiedFractureMaterialBundle):
+    """Construct every root, branch and downstream engine through one factory."""
+    return canonical_front_engine(bundle, material)
 
 
 def capture_sharp_front_engine(engine) -> dict[str, Any]:
-    """Checkpoint the old engine's canonical owned ledgers, not a radius copy."""
+    """Checkpoint the qualified engine and complete spatial MPZ ownership."""
+    from .sharp_front_v11_branching import _capture_shared_engine
     return {
         "schema": FRONT_ENGINE_STATE_SCHEMA,
-        "engine_type": type(engine).__name__,
-        "initialization_policy": "FrontEngine.__init__->reset",
-        "canonical_state": {name: getattr(engine, name) for name in _FRONT_ENGINE_STATE_FIELDS},
+        "initialization_policy": "canonical_front_engine->reset",
+        "material_bundle_id": getattr(engine, "_unified_bundle_id", None),
+        "material_bundle_sha256": getattr(engine, "_unified_bundle_hash", None),
+        "core_model_id": getattr(engine, "_unified_core_model_id", None),
+        "shared_engine_state": _capture_shared_engine(engine),
     }
 
 
-def restore_sharp_front_engine(material, payload):
-    engine = fresh_sharp_front_engine(material)
+def sharp_front_engine_fingerprint(engine) -> str:
+    """Hash every serializable engine and spatial-MPZ field by value."""
+    from dataclasses import is_dataclass, fields
+    from .sharp_front_v11_branching import _capture_shared_engine
+    def normalize(value):
+        if isinstance(value, np.ndarray):
+            array = np.ascontiguousarray(value)
+            return {"dtype": array.dtype.str, "shape": list(array.shape),
+                    "sha256": hashlib.sha256(array.tobytes()).hexdigest()}
+        if isinstance(value, dict) or hasattr(value, "items"):
+            return {str(key): normalize(item) for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))}
+        if isinstance(value, (tuple, list)):
+            return [normalize(item) for item in value]
+        if is_dataclass(value):
+            return {item.name: normalize(getattr(value, item.name)) for item in fields(value)}
+        if hasattr(value, "__dict__"):
+            return normalize(vars(value))
+        if isinstance(value, np.generic):
+            return value.item()
+        if isinstance(value, float) and not math.isfinite(value):
+            return {"nonfinite": str(value)}
+        return value
+    encoded = json.dumps(normalize(_capture_shared_engine(engine)), sort_keys=True,
+                         separators=(",", ":"), allow_nan=False).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def restore_sharp_front_engine(material, bundle, payload):
+    engine = fresh_sharp_front_engine(material, bundle)
     if payload.get("schema") != FRONT_ENGINE_STATE_SCHEMA:
         raise ValueError("unsupported downstream child front-engine state")
-    if payload.get("engine_type") != type(engine).__name__:
-        raise ValueError("downstream child engine type differs from the established engine")
-    fields = payload.get("canonical_state", {})
-    if set(fields) != set(_FRONT_ENGINE_STATE_FIELDS):
-        raise ValueError("downstream child front-engine checkpoint is incomplete")
-    for name in _FRONT_ENGINE_STATE_FIELDS:
-        setattr(engine, name, fields[name])
-    return engine
-
+    expected = {
+        "material_bundle_id": bundle.bundle_id,
+        "material_bundle_sha256": bundle.bundle_hash,
+        "core_model_id": getattr(engine, "_unified_core_model_id", None),
+    }
+    if any(payload.get(key) != value for key, value in expected.items()):
+        raise ValueError("downstream child engine material/core identity differs from accepted state")
+    from .sharp_front_v11_branching import _restore_shared_engine
+    import copy
+    def thaw(value):
+        if isinstance(value, np.ndarray):
+            return np.asarray(value).copy()
+        if isinstance(value, Mapping):
+            return {key: thaw(item) for key, item in value.items()}
+        if isinstance(value, tuple):
+            return tuple(thaw(item) for item in value)
+        if isinstance(value, list):
+            return [thaw(item) for item in value]
+        return copy.deepcopy(value)
+    return _restore_shared_engine(engine, thaw(payload.get("shared_engine_state", {})))
 
 def sharp_front_constitutive_response(engine, *, K_Pa_sqrt_m, temperature_K, dt_s):
     """Read-only response through the pre-void K -> FrontEngine interface."""
@@ -277,7 +318,7 @@ def _refine_state_around_graph(state, levels):
     return result
 
 
-def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
+def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enabled=True, stochastic=False, seed=3621,
                                 cavity_center_m=(7.0e-4, 0.0), crack_path_m=None,
                                 cleavage_theta_deg=0.0, boundary_segments=32, radial_layers=12):
     if (boundary_segments, radial_layers) != (32, 12) and crack_path_m is None:
@@ -299,7 +340,7 @@ def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
             mesh = _insert_point_in_mesh(mesh, point)
             hole = replace(hole, mesh=_insert_point_in_mesh(hole.mesh, point))
         filled = replace(filled, mesh=mesh)
-    cfg = make_emergent_config()
+    material = elastic_material(bundle)
     element_x = np.asarray(mesh.nodes)[np.asarray(mesh.elems)].mean(axis=1)[:, 0]
     u = np.zeros(mesh.ndof)
     u[2 * np.asarray(filled.boundary.top_nodes) + 1] = 2.0e-7
@@ -317,12 +358,14 @@ def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
         mesh, filled.boundary, np.zeros(mesh.nn), u,
         np.vstack((np.full(mesh.ne, 1.0e-5), np.full(mesh.ne, -0.5e-5),
                    np.full(mesh.ne, 0.25e-5 * (1.0 if cavity_center_m[1] >= 0.0 else -1.0)))),
-        1.0e12 + 2.0e11 * element_x / 1.0e-3,
-        plane_strain_D(cfg.material), cfg.material, None,
-        CrackNetworkState.one_tip(crack_path), DirectionalCompetitionState.initialize(
+        np.full(mesh.ne, float(bundle.fracture_row["rho_source0_m2"])),
+        plane_strain_D(material), material, None,
+        CrackNetworkState.one_tip(crack_path, local_state={"front_engine_state_owner": ROOT_BRANCH_ID}), DirectionalCompetitionState.initialize(
             tungsten_cleavage_candidates(theta_deg=cleavage_theta_deg), global_hazard_seed=seed,
         ),
-        {"retained": 4.0, "mobile": 1.0}, {
+        {"active_branch_id": ROOT_BRANCH_ID,
+         "by_branch": {ROOT_BRANCH_ID: capture_sharp_front_engine(fresh_sharp_front_engine(material, bundle))},
+         "owner_by_front": {ROOT_BRANCH_ID: ROOT_BRANCH_ID}}, {
             "source_state": {"density": 3.0, "clock": 0.125},
             "production_mesh_resolution": (int(boundary_segments), int(radial_layers)),
             "boundary_terminal_context": _external_free_root_context(mesh, filled.boundary, start),
@@ -346,6 +389,7 @@ def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
             state.mesh, state.boundary, start,
         )
         state = replace(state, junction_process_state=junction)
+    state = bind_identity(state, bundle)
     state = initialize_mechanically_separating_v12(
         state, source_commit=_head(), configuration={"voiding_enabled": enabled, "model": V12_MODEL_ID},
     )
@@ -1021,10 +1065,7 @@ def _mesh_endpoint_on_direction(state, start, direction, target_distance_m):
 def directional_clock_rates(state, stress_tensor_Pa, *, temperature_K=900.0):
     """Read-only rates from the existing cleavage law and preserved clocks."""
     material = state.material
-    engine = FrontEngine(
-        FrontConfig(), default_cleavage_barrier(), default_emission_barrier(material.b),
-        material.G, material.nu, material.b,
-    )
+    engine = fresh_sharp_front_engine(material, _bundle_from_state(state))
     stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
     rates = []
     for candidate, hazard in zip(state.competition.candidates, state.competition.hazard_states):
@@ -1076,7 +1117,7 @@ def sharp_front_load_provider(
     payload = state.tip_process_state.get("by_branch", {}).get(process_owner_id)
     if payload is None:
         raise ValueError("active child has no canonical sharp-front engine state")
-    engine = restore_sharp_front_engine(state.material, payload)
+    engine = restore_sharp_front_engine(state.material, _bundle_from_state(state), payload)
     inventory = state.competition.candidates if candidates is None else tuple(candidates)
     candidates_by_tip = {
         tip_id: inventory if tip_id == branch_id else ()
@@ -1106,7 +1147,7 @@ def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=
     payload = state.tip_process_state.get("by_branch", {}).get(process_owner_id)
     if payload is None:
         raise ValueError("active child has no canonical sharp-front engine state")
-    engine = restore_sharp_front_engine(state.material, payload)
+    engine = restore_sharp_front_engine(state.material, _bundle_from_state(state), payload)
     by_candidate = {row["candidate_id"]: row for row in load_rows}
     expected_candidates = {item.candidate_id for item in state.competition.candidates}
     if set(by_candidate) != expected_candidates:
@@ -1772,8 +1813,7 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     end = intersections[candidate.candidate_id]
     if end is None:
         raise RuntimeError("selected candidate ray does not intersect the cavity polygon")
-    engine = FrontEngine(FrontConfig(), default_cleavage_barrier(), default_emission_barrier(state.material.b),
-                         state.material.G, state.material.nu, state.material.b)
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
     winner = next(item for item in cleavage_audit if item["candidate_id"] == candidate.candidate_id)
     barrier = winner["hazard_barrier_J"]
     resistance = hazard_resistance_J_per_m2(
@@ -2003,7 +2043,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         base_network = replace(state.crack_network, branches=state.crack_network.branches + (child,),
                                geometry_generation=state.crack_network.geometry_generation + 1,
                                branching_enabled=True)
-    engine = fresh_sharp_front_engine(state.material)
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
     winner = next(item for item in cleavage_audit if item["candidate_id"] == candidate.candidate_id)
     barrier = winner["hazard_barrier_J"]
     resistance = hazard_resistance_J_per_m2(
@@ -2072,7 +2112,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             tip_state.update({
                 "active_branch_id": child_id,
                 "by_branch": {child_id: capture_sharp_front_engine(
-                    fresh_sharp_front_engine(realized.material)
+                    fresh_sharp_front_engine(realized.material, _bundle_from_state(realized))
                 )},
                 "owner_by_front": {child_id: child_id},
             })
@@ -2094,12 +2134,18 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         equilibrate_fixed_load=equilibrate_fixed_load_with_production_fem,
         network_geometry_already_realized=True, failure_injector=inject,
     )
-    if not result.accepted: raise RuntimeError("downstream front event rejected")
+    if not result.accepted:
+        raise RuntimeError(
+            "downstream front event rejected: "
+            f"release={result.energy_release_J_per_m!r} "
+            f"dissipation={result.hazard_dissipation_J_per_m!r} "
+            f"margin={result.energy_margin_J_per_m!r}"
+        )
     accepted = _mark_consumed_event_provenance(result.state, proposal.member_event_ids)
     if continuation:
         process_owner_id = _canonical_front_process_owner(accepted, child_id)
         payload = accepted.tip_process_state.get("by_branch", {}).get(process_owner_id)
-        child_engine = restore_sharp_front_engine(accepted.material, payload)
+        child_engine = restore_sharp_front_engine(accepted.material, _bundle_from_state(accepted), payload)
         # Directional first passage is authoritative, as in the pre-void v11
         # adapter.  Synchronize the scalar compatibility clock, then let the
         # unchanged engine perform emission, renewal, and wake retention.
@@ -2189,7 +2235,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         "source_kind": source_kind, "source_front_id": child_id if continuation else None,
         "source_position_m": list(start), "source_probe_identity": probe_identity,
         "r_eff_m": (restore_sharp_front_engine(
-            accepted.material,
+            accepted.material, _bundle_from_state(accepted),
             accepted.tip_process_state.get("by_branch", {}).get(child_process_owner),
         ).r_eff() if child_process_owner is not None else None),
         "candidate_id": proposal.member_candidate_ids[0],
@@ -2200,11 +2246,11 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     }
 
 
-def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0),
+def deterministic_trajectory(*, bundle: UnifiedFractureMaterialBundle, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0),
                              crack_path_m=None, cleavage_theta_deg=0.0,
                              state_trace=None, boundary_segments=32, radial_layers=12,
                              qualify_source=False, common_restart_protocol=False):
-    state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m,
+    state, hole = build_production_void_state(bundle=bundle, enabled=True, cavity_center_m=cavity_center_m,
                                               crack_path_m=crack_path_m,
                                               cleavage_theta_deg=cleavage_theta_deg,
                                               boundary_segments=boundary_segments, radial_layers=radial_layers)
@@ -2313,8 +2359,8 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     return state, rows
 
 
-def natural_trajectory(seed=3621, steps=6):
-    state, _ = build_production_void_state(enabled=True, stochastic=True, seed=seed)
+def natural_trajectory(*, bundle: UnifiedFractureMaterialBundle, seed=3621, steps=6):
+    state, _ = build_production_void_state(bundle=bundle, enabled=True, stochastic=True, seed=seed)
     cfg = VoidingConfig(enabled=True)
     rows = []
     for step in range(steps):

@@ -1,6 +1,8 @@
 from dataclasses import replace
 import inspect
 import math
+import hashlib
+import pickle
 
 import pytest
 
@@ -15,6 +17,10 @@ from arrhenius_fracture.directional_competition_v11 import (
     tungsten_cleavage_candidates,
 )
 from arrhenius_fracture.sharp_front import make_emergent_config
+from arrhenius_fracture.unified_fracture_material_v5 import benchmark_material_bundle, bind_identity
+
+BUNDLE = benchmark_material_bundle("DBTT")
+
 from arrhenius_fracture.voiding_production_v5 import (
     build_production_void_state,
     capture_sharp_front_engine,
@@ -23,6 +29,7 @@ from arrhenius_fracture.voiding_production_v5 import (
     fresh_sharp_front_engine,
     restore_sharp_front_engine,
     sharp_front_constitutive_response,
+    sharp_front_engine_fingerprint,
 )
 
 
@@ -30,8 +37,12 @@ def _material():
     return make_emergent_config().material
 
 
+def _payload_digest(payload):
+    return hashlib.sha256(pickle.dumps(payload, protocol=5)).hexdigest()
+
+
 def _owned_engine(*, N_em=37.0, B=0.125, W_emit=2.5e-9, K_prev=2.0e6):
-    engine = fresh_sharp_front_engine(_material())
+    engine = fresh_sharp_front_engine(_material(), BUNDLE)
     engine.N_em = N_em
     engine.B = B
     engine.W_emit = W_emit
@@ -41,7 +52,7 @@ def _owned_engine(*, N_em=37.0, B=0.125, W_emit=2.5e-9, K_prev=2.0e6):
 
 def test_a_root_child_engine_equivalence():
     root = _owned_engine()
-    child = restore_sharp_front_engine(_material(), capture_sharp_front_engine(root))
+    child = restore_sharp_front_engine(_material(), BUNDLE, capture_sharp_front_engine(root))
     root_competition = DirectionalCompetitionState.initialize(
         tungsten_cleavage_candidates(theta_deg=0.0), global_hazard_seed=3621,
     )
@@ -54,18 +65,20 @@ def test_a_root_child_engine_equivalence():
     root_response = sharp_front_constitutive_response(root, **inputs)
     child_response = sharp_front_constitutive_response(child, **inputs)
     assert child_response == root_response
-    assert capture_sharp_front_engine(child) == capture_sharp_front_engine(root)
+    assert sharp_front_engine_fingerprint(child) == sharp_front_engine_fingerprint(root)
 
 
 def test_b_canonical_radius_sensitivity_uses_N_em_ledger():
-    baseline = fresh_sharp_front_engine(_material())
+    baseline = fresh_sharp_front_engine(_material(), BUNDLE)
     baseline_radius = 2.0 * baseline.f.r0
     responses = []
     for factor in (0.75, 1.0, 1.25):
-        engine = fresh_sharp_front_engine(_material())
-        engine.N_em = (
+        engine = fresh_sharp_front_engine(_material(), BUNDLE)
+        target_slip = (
             factor * baseline_radius - engine.f.r0
-        ) / (engine.f.c_blunt * engine.b)
+        ) / (engine.manifest.c_blunt * engine.b)
+        weight0 = math.exp(-engine.mpz.x[0] / max(engine.mpz.cfg.blunting_length_m, engine.mpz.dx))
+        engine.mpz.accumulated_slip[0, 0] = target_slip / weight0
         response = sharp_front_constitutive_response(
             engine, K_Pa_sqrt_m=1.0e6, temperature_K=900.0, dt_s=1.0e-9,
         )
@@ -90,7 +103,7 @@ def test_c_reciprocal_void_radius_control_has_no_constitutive_input():
     inputs = dict(K_Pa_sqrt_m=5.0e6, temperature_K=900.0, dt_s=2.0e-9)
     controls = {
         R_void: sharp_front_constitutive_response(
-            restore_sharp_front_engine(_material(), capture_sharp_front_engine(engine)),
+            restore_sharp_front_engine(_material(), BUNDLE, capture_sharp_front_engine(engine)),
             **inputs,
         )
         for R_void in (2.5e-5, 5.0e-5, 1.0e-4)
@@ -113,7 +126,7 @@ def test_d_cavity_and_child_stages_have_distinct_sources():
 
 
 def test_e_child_canonical_state_checkpoint_round_trip(tmp_path):
-    state, _ = build_production_void_state()
+    state, _ = build_production_void_state(bundle=BUNDLE)
     root = replace(state.crack_network.branch(ROOT_BRANCH_ID), status="terminated")
     child_id = "void-front-1"
     child = CrackBranchState(
@@ -136,8 +149,8 @@ def test_e_child_canonical_state_checkpoint_round_trip(tmp_path):
     write_checkpoint(child_state, checkpoint)
     restored = restore_checkpoint(checkpoint)
     restored_payload = restored.tip_process_state["by_branch"][child_id]
-    assert restored_payload == payload
-    restored_engine = restore_sharp_front_engine(restored.material, restored_payload)
+    restored_engine = restore_sharp_front_engine(restored.material, BUNDLE, restored_payload)
+    assert sharp_front_engine_fingerprint(restored_engine) == sharp_front_engine_fingerprint(engine)
     inputs = dict(K_Pa_sqrt_m=4.0e6, temperature_K=900.0, dt_s=3.0e-9)
     assert sharp_front_constitutive_response(restored_engine, **inputs) == sharp_front_constitutive_response(
         engine, **inputs
@@ -145,5 +158,5 @@ def test_e_child_canonical_state_checkpoint_round_trip(tmp_path):
     assert restored_payload["last_event_identity"] == event_identity
     assert "r_tip_m" not in restored_payload
     assert restored_engine.r_eff() == pytest.approx(
-        restored_engine.f.r0 + restored_engine.f.c_blunt * restored_engine.b * restored_engine.N_em
+        restored_engine.f.r0 + restored_engine.manifest.c_blunt * restored_engine.b * restored_engine.mpz.local_slip_count()
     )

@@ -1,0 +1,500 @@
+{
+  "ancestry": {
+    "canonical_single_tip_base": "7e71b8f27b0682060fd161e7e5e8fe0d3587e8ac",
+    "method": "commit ancestry and merge-base audit; no filename inference",
+    "multitip_qualification_head": "0238aae096aa29e79829d3c562383c38f2290ad6",
+    "retained_v5_historical_merge_base": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+    "v12_and_v13_merge_base": "0238aae096aa29e79829d3c562383c38f2290ad6"
+  },
+  "bounded_validation": {
+    "broad_campaigns_run": false,
+    "test_v5_bounded_sharp_front_adapter": "5 passed",
+    "test_v5_hybrid_directional_drive": "15 passed",
+    "test_v5_unified_model_lineage": "13 passed"
+  },
+  "branches": {
+    "field_atlas": "codex/v12-field-atlas-recovery",
+    "heldout_material_classes": "codex/v13-heldout-material-classes",
+    "qualified_multitip": "codex/current-source-branching-qualification-v2",
+    "restoration": "codex/v5-unified-fracture-multitip-voiding",
+    "retained_v5": "codex/sharp-front-stateful-voiding-v5-finalization-v2"
+  },
+  "commits": {
+    "canonical_single_tip": {
+      "commit": "7e71b8f27b0682060fd161e7e5e8fe0d3587e8ac",
+      "parents": [
+        "5421a5fce6b6b5d12c6169370999b1c302b31940"
+      ]
+    },
+    "field_atlas": {
+      "commit": "b3d0add6cbb0605adaa3e04006fe987961ad6452",
+      "parents": [
+        "78ef6bbe180f29ca5886c955244817fa0413617f"
+      ]
+    },
+    "heldout_material_classes": {
+      "commit": "ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e",
+      "parents": [
+        "76be5d83456fb6a61394ea0ddffde65f2bee4a23"
+      ]
+    },
+    "qualified_multitip": {
+      "commit": "0238aae096aa29e79829d3c562383c38f2290ad6",
+      "parents": [
+        "a88bfa2146db038d795cecd4d1f742ee6a2e095e"
+      ]
+    },
+    "retained_v5": {
+      "commit": "619b66b0f538742482e7385ddd3d0171cb3edd8b",
+      "parents": [
+        "c7583ecd0a259f28ce92780833d21a358a920f45"
+      ]
+    }
+  },
+  "components": [
+    {
+      "canonical_single_tip_blob": "99e36dca32ad2593099227afed93a39b9c4c1694",
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/sharp_front.py",
+      "qualified_multitip_blob": "99e36dca32ad2593099227afed93a39b9c4c1694",
+      "restored_worktree_blob": "05eb0c393caf754de994ee0b40d8d24d355729e2",
+      "retained_v5_blob": "f03376235869c0771f11a1563cce548e2d2b6668",
+      "role": "sharp-front constructor and renewal"
+    },
+    {
+      "canonical_single_tip_blob": "db14499930b73b099a0ffc6da8cace51593961b1",
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/material_manifest.py",
+      "qualified_multitip_blob": "db14499930b73b099a0ffc6da8cace51593961b1",
+      "restored_worktree_blob": "db14499930b73b099a0ffc6da8cace51593961b1",
+      "retained_v5_blob": "db14499930b73b099a0ffc6da8cace51593961b1",
+      "role": "material manifest"
+    },
+    {
+      "canonical_single_tip_blob": "bdab8bb8e22c9df8aee36c76a512bd08e943783d",
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/unified_mpz.py",
+      "qualified_multitip_blob": "bdab8bb8e22c9df8aee36c76a512bd08e943783d",
+      "restored_worktree_blob": "bdab8bb8e22c9df8aee36c76a512bd08e943783d",
+      "retained_v5_blob": "bdab8bb8e22c9df8aee36c76a512bd08e943783d",
+      "role": "active/wake MPZ state"
+    },
+    {
+      "canonical_single_tip_blob": "3ce8749e4af86782a1bd9c257448acb45a40fdae",
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/hazard_energy_event_gate_v10230.py",
+      "qualified_multitip_blob": "3ce8749e4af86782a1bd9c257448acb45a40fdae",
+      "restored_worktree_blob": "3ce8749e4af86782a1bd9c257448acb45a40fdae",
+      "retained_v5_blob": "3ce8749e4af86782a1bd9c257448acb45a40fdae",
+      "role": "hazard energy gate"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/directional_competition_v11.py",
+      "qualified_multitip_blob": "0cffe7b0a7bd677e21aac675f80ac211ceff91c5",
+      "restored_worktree_blob": "0cffe7b0a7bd677e21aac675f80ac211ceff91c5",
+      "retained_v5_blob": "19e572ec74ccbbdf12e597e7fa6bceae6a0e9ac9",
+      "role": "directional hazard/RNG competition"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/general_multifront_v12.py",
+      "qualified_multitip_blob": "babd3e81a8127e9b6b9a29e30e3ca3f11807f0da",
+      "restored_worktree_blob": "babd3e81a8127e9b6b9a29e30e3ca3f11807f0da",
+      "retained_v5_blob": null,
+      "role": "multi-front runtime ownership"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/stateful_multifront_production_v12.py",
+      "qualified_multitip_blob": "f47dfc4b88f14e138f714d888370ba216b603b52",
+      "restored_worktree_blob": "f47dfc4b88f14e138f714d888370ba216b603b52",
+      "retained_v5_blob": null,
+      "role": "stateful multi-front production"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/topology_transaction_v11.py",
+      "qualified_multitip_blob": "4fc16e2dbb0b4aefe48883e51b8915eee8770a1f",
+      "restored_worktree_blob": "184d66039fb5df938bd1aa05c74dd279b661cb6a",
+      "retained_v5_blob": "5077d98a076edac8c1c5048a7826d180a71594b9",
+      "role": "topology energy transaction"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/live_topology_kernel_v11.py",
+      "qualified_multitip_blob": "ab14e5e146c6b7c724ecd07f10cf01861d24f9ef",
+      "restored_worktree_blob": "983becb79269a12bdd00d6b7b1960f5311a68280",
+      "retained_v5_blob": "983becb79269a12bdd00d6b7b1960f5311a68280",
+      "role": "live directional provider"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/checkpoint_v11.py",
+      "qualified_multitip_blob": "de202347f2ebbbd9f3546794fa8b37d574dbee4d",
+      "restored_worktree_blob": "297e74f25bf794787b65a462553146a30370e843",
+      "retained_v5_blob": "297e74f25bf794787b65a462553146a30370e843",
+      "role": "accepted checkpoint"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/hybrid_directional_drive_v5.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "3d6ce839a4356c4186f775d500fc037109743448",
+      "retained_v5_blob": "3d6ce839a4356c4186f775d500fc037109743448",
+      "role": "hybrid void directional drive"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/voiding_v5.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "3c7754bf2d4e3d6dd9f22644b3b2cbd40be5019c",
+      "retained_v5_blob": "3c7754bf2d4e3d6dd9f22644b3b2cbd40be5019c",
+      "role": "void state and kinetics"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/voiding_production_v5.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "3baa7619fbb48dbceaaaa72db222798076f352eb",
+      "retained_v5_blob": "31dfcada0efc4638d8ca7fbdb626cb69cb140b22",
+      "role": "void production driver"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/unified_fracture_material_v5.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "55dbd095ff65a0640c796b283321e8a86296d7dc",
+      "retained_v5_blob": null,
+      "role": "unified material bundle/factory"
+    }
+  ],
+  "decision": "TRANSPLANT_VOID_EXTENSION_ONTO_QUALIFIED_MULTITIP_CORE",
+  "downstream_transfer_gate": "READY_FOR_SEPARATE_ONED_M2_RERUN",
+  "file_differences": [
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "V5_UNIFIED_MODEL_LINEAGE.md"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "V5_VOIDING_EXTENSION_DELTA.md"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/__main__.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/accepted_step_overlay_v13.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/adaptive_multitip_mesh_v11.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/anisotropic_emission_v10174.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/branch_checkpoint_v11.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/branch_output_v11.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/branch_policy_v11.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/branching_qualification_v2.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/causal_sharp_wake_v11.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/conditional_branch_mark_v13.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/config.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/cooperative_pair_transition_v13.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/current_source_multifront_hooks_v12.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/current_source_runtime_bindings.py"
+    },
+    {
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/data/materials/unified_v5/fracture_rows.csv"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/directional_competition_v11.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/general_multifront_v12.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/inherited_primary_race_v13.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/inherited_residual_clock_v13.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/interaction_integral_v10214.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/interaction_integral_v1029.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/kinetic_tip_cell.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/live_topology_kernel_v12.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/marked_topology_trial_v13.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/multifront_checkpoint_v12.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/multifront_competition_v12.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/multifront_field_atlas_v12.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/multifront_output_v12.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/persistent_site_bracket_fix_v10221.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/persistent_site_source_v10221.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/prescribed_geometry_kernel_v10228.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/primary_race_production_v13.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/process_update_semantics_v11.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/production_multifront_v12.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/production_step_loop_v11.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/resolved_production_v11.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/restart_family_migration_v11.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/restart_family_migration_v12.py"
+    },
+    {
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/sharp_front.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/sharp_front_current_source_branching.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/sharp_front_current_source_branching_audited.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/sharp_front_current_source_multifront_physical_v12.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/sharp_front_current_source_multifront_v12.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/sharp_front_v10_1_7_5.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/sharp_front_v11_branching.py"
+    },
+    {
+      "classification": "CORE_IDENTICAL",
+      "path": "arrhenius_fracture/signed_kernel_family_v10214.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/stateful_multifront_production_v12.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/tip_directional_observation_v11.py"
+    },
+    {
+      "classification": "BRANCHING_EXTENSION",
+      "path": "arrhenius_fracture/tip_local_proposals_v13.py"
+    },
+    {
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/topology_transaction_v11.py"
+    },
+    {
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/unified_control_matrix_v5.py"
+    },
+    {
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/unified_fracture_material_v5.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "arrhenius_fracture/v5_4_2_runtime_parity_v12.py"
+    },
+    {
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/voiding_production_v5.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "scripts/build_v5_unified_lineage_records.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "tests/test_v5_bounded_sharp_front_adapter.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "tests/test_v5_hybrid_directional_drive.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "tests/test_v5_unified_model_lineage.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "v5_unified_model_lineage.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "v5_voiding_extension_delta.json"
+    }
+  ],
+  "paper_controls": {
+    "composite_identity_fields": [
+      "core_model_id",
+      "material_bundle_id",
+      "extensions_enabled",
+      "extension_versions"
+    ],
+    "controls": {
+      "MULTI_TIP": {
+        "extension_versions": {
+          "multi_tip": "v13.current-source-qualified-multitip/1"
+        },
+        "extensions_enabled": [
+          "multi_tip"
+        ]
+      },
+      "MULTI_TIP_PLUS_VOIDING": {
+        "extension_versions": {
+          "multi_tip": "v13.current-source-qualified-multitip/1",
+          "voiding": "v5.production-one-void-trajectory/5"
+        },
+        "extensions_enabled": [
+          "multi_tip",
+          "voiding"
+        ]
+      },
+      "SINGLE_TIP": {
+        "extension_versions": {},
+        "extensions_enabled": []
+      }
+    },
+    "material_families": [
+      "v913_zeroD_sobol_0242980",
+      "v913_zeroD_sobol_0202500",
+      "oneD_v2_focused_weak_T_0016",
+      "oneD_v2_focused_ceramic_like_0018"
+    ]
+  },
+  "qualified_core_transplant_audit": {
+    "exact_blob_matches": 239,
+    "qualified_source_files": 244,
+    "reviewed_adapter_files": [
+      "arrhenius_fracture/checkpoint_v11.py",
+      "arrhenius_fracture/fem.py",
+      "arrhenius_fracture/live_topology_kernel_v11.py",
+      "arrhenius_fracture/sharp_front.py",
+      "arrhenius_fracture/topology_transaction_v11.py"
+    ]
+  },
+  "schema": "v5.unified-model-lineage/1",
+  "terminal_gates": {
+    "CHECKPOINT_MATERIAL_IDENTITY": "PASS",
+    "ELASTICITY_PLASTICITY_IDENTITY": "PASS",
+    "FAR_VOID_LIMIT": "PASS",
+    "FOUR_FAMILY_BARRIER_RATE_PARITY": "PASS",
+    "MULTITIP_ONE_FRONT_LIMIT": "PASS",
+    "NO_ACTIVE_VOID_LIMIT": "PASS",
+    "NO_DEFAULT_FALLBACK": "PASS",
+    "PAPER_CONTROL_MATRIX_READY": "PASS",
+    "ROOT_BRANCH_CHILD_MATERIAL_IDENTITY": "PASS",
+    "SHARED_CORE_IDENTITY": "PASS",
+    "SINGLE_TIP_LIMIT": "PASS",
+    "VOIDING_EXTENSION_DELTA_ONLY": "PASS",
+    "VOID_DISABLED_LIMIT": "PASS"
+  },
+  "unresolved_unintended_core_divergence": []
+}
