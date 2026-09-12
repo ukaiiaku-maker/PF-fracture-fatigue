@@ -277,6 +277,7 @@ def build_solid_plate_mesh(width_m: float, height_m: float, h_m: float) -> HoleM
 def build_explicit_hole_mesh(
     width_m: float, height_m: float, center_m: tuple[float,float], radius_m: float,
     far_h_m: float, boundary_segments: int, *, radial_layers_override: Optional[int]=None,
+    angular_phase_rad: float=0.0,
 ) -> HoleMesh:
     """Build, prune, and derive the actual cavity boundary from retained connectivity."""
     cx,cy=center_m
@@ -287,7 +288,7 @@ def build_explicit_hole_mesh(
     # Body-fitted polar-to-rectangle mapping.  Every angular ray begins on the
     # prescribed cavity and ends on the exterior rectangle, so the cavity cycle
     # is actual retained connectivity rather than a synthetic edge list.
-    theta=2*np.pi*np.arange(boundary_segments)/boundary_segments
+    theta=float(angular_phase_rad)+2*np.pi*np.arange(boundary_segments)/boundary_segments
     direction=np.c_[np.cos(theta),np.sin(theta)]
     distances=[]
     for dx,dy in direction:
@@ -362,12 +363,93 @@ def build_explicit_hole_mesh(
                     (side[:,0]**2+side[:,2]**2-side[:,1]**2)/(2*side[:,0]*side[:,2]),-1,1))).min()),
                 "local_edge_min_m":float(lengths.min()),"local_edge_max_m":float(lengths.max())}
     validation["radial_layers"]=radial_layers
+    validation["polygon_angular_phase_rad"]=float(angular_phase_rad)
+    validation["polygon_apothem_m"]=float(radius_m)
+    validation["polygon_circumradius_m"]=float(polygon_radius)
     x,y=nodes[:,0],nodes[:,1]
     top=np.where(np.isclose(y,height_m/2,atol=tol))[0]; bot=np.where(np.isclose(y,-height_m/2,atol=tol))[0]
     lb=int(np.argmin(x*x+(y+height_m/2)**2)); rb=int(np.argmin((x-width_m)**2+(y+height_m/2)**2))
     boundary=BoundaryData(top,bot,lb,rb,np.array([],int))
     return HoleMesh(mesh,boundary,center_m,radius_m,cavity_edges,exterior_edges,
                     np.arange(boundary_segments,dtype=int),validation)
+
+
+def _split_cavity_facet(hole: HoleMesh, point_m: Sequence[float]) -> HoleMesh:
+    """Split one cavity facet at an exact collinear point without moving it."""
+    point = np.asarray(point_m, dtype=float)
+    nodes = np.asarray(hole.mesh.nodes, dtype=float)
+    candidates = []
+    for raw in np.asarray(hole.cavity_edges, dtype=int):
+        a_id, b_id = map(int, raw)
+        a, b = nodes[a_id], nodes[b_id]
+        delta = b - a
+        fraction = float((point - a) @ delta / max(float(delta @ delta), 1.0e-300))
+        projection = a + fraction * delta
+        candidates.append((float(np.linalg.norm(point - projection)), abs(fraction - 0.5),
+                           a_id, b_id, fraction))
+    distance, midpoint_error, a_id, b_id, fraction = min(candidates)
+    tolerance = max(1.0e-12, 1.0e-10 * float(hole.radius_m))
+    if distance > tolerance or midpoint_error > 1.0e-10 or not 0.0 < fraction < 1.0:
+        raise ValueError("physical source is not the midpoint of a cavity facet")
+    new_node = len(nodes)
+    owner_ids = [index for index, tri in enumerate(np.asarray(hole.mesh.elems, dtype=int))
+                 if a_id in tri and b_id in tri]
+    if len(owner_ids) != 1:
+        raise ValueError("cavity facet must have exactly one solid owner")
+    owner = owner_ids[0]
+    old = tuple(map(int, hole.mesh.elems[owner]))
+    third = next(node for node in old if node not in (a_id, b_id))
+    replacements = [(a_id, new_node, third), (new_node, b_id, third)]
+    expanded_nodes = np.vstack((nodes, point))
+    oriented = []
+    for tri in replacements:
+        xy = expanded_nodes[list(tri)]
+        first, second = xy[1] - xy[0], xy[2] - xy[0]
+        signed = float(first[0] * second[1] - first[1] * second[0])
+        oriented.append(tri if signed > 0.0 else (tri[0], tri[2], tri[1]))
+    elements = np.delete(np.asarray(hole.mesh.elems, dtype=int), owner, axis=0)
+    elements = np.vstack((elements, np.asarray(oriented, dtype=int)))
+    mesh = rebuild_tri_mesh(expanded_nodes, elements)
+    cavity_edges = _replace_split_edge(hole.cavity_edges, (a_id, b_id), new_node)
+    updated = replace(hole, mesh=mesh, cavity_edges=cavity_edges)
+    return replace(updated, validation=_final_mesh_validation(updated))
+
+
+def build_source_conforming_hole_mesh(
+    width_m: float, height_m: float, center_m: tuple[float, float], radius_m: float,
+    far_h_m: float, boundary_segments: int, *, radial_layers_override: Optional[int]=None,
+    source_direction_xy: Sequence[float]=(1.0, 0.0), failure_injector=None,
+) -> HoleMesh:
+    """Build a circumscribed polygon with exact near/far physical source nodes."""
+    direction = np.asarray(source_direction_xy, dtype=float)
+    magnitude = float(np.linalg.norm(direction))
+    if direction.shape != (2,) or not np.isfinite(direction).all() or magnitude <= 0.0:
+        raise ValueError("source direction must be a finite nonzero 2-vector")
+    direction /= magnitude
+    source_angle = math.atan2(float(direction[1]), float(direction[0]))
+    phase = source_angle - math.pi / int(boundary_segments)
+    hole = build_explicit_hole_mesh(
+        width_m, height_m, center_m, radius_m, far_h_m, boundary_segments,
+        radial_layers_override=radial_layers_override, angular_phase_rad=phase,
+    )
+    base = hole
+    inject = failure_injector or (lambda _stage, _current: None)
+    center = np.asarray(center_m, dtype=float)
+    for label, sign in (("far", 1.0), ("near", -1.0)):
+        hole = _split_cavity_facet(hole, center + sign * float(radius_m) * direction)
+        inject(f"source_node_inserted:{label}", hole)
+    validation = dict(hole.validation)
+    validation.update({
+        "geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+        "source_direction_xy": direction.tolist(),
+        "source_coordinates_m": {
+            "near": (center - float(radius_m) * direction).tolist(),
+            "far": (center + float(radius_m) * direction).tolist(),
+        },
+        "solid_domain_area_before_source_splits_m2": float(np.sum(base.mesh.area_e)),
+        "solid_domain_area_after_source_splits_m2": float(np.sum(hole.mesh.area_e)),
+    })
+    return replace(hole, validation=validation)
 
 
 def fill_explicit_hole_mesh(hole: HoleMesh) -> HoleMesh:
@@ -571,6 +653,6 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
                            remote,perimeter,tuple(edge_records),capture)
 
 
-__all__ = ["HoleMesh","StaticFEMResult","build_explicit_hole_mesh","cavity_edge_traction_geometry",
+__all__ = ["HoleMesh","StaticFEMResult","build_explicit_hole_mesh","build_source_conforming_hole_mesh","cavity_edge_traction_geometry",
            "build_solid_plate_mesh","conform_crack_path","fill_explicit_hole_mesh",
            "solve_static_hole","triangle_intersects_open_disk"]

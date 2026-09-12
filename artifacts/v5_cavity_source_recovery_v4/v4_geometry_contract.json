@@ -1,0 +1,487 @@
+{
+  "acceptance_gates": {
+    "angular_levels": [
+      32,
+      64,
+      128
+    ],
+    "bounded_patch_conditioning": true,
+    "eta_n_max": 0.03,
+    "eta_t_max": 0.025,
+    "maximum_angular_levels": 3,
+    "minimum_mesh_quality": 0.05,
+    "normalized_cavity_traction_max": 0.05,
+    "tensor_relative_max": 0.05
+  },
+  "geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+  "length_ledger_conventions": {
+    "active_front_coordinate_advance_m": "same_physical_ligament_length",
+    "connected_free_surface_extent_m": "actual_polygon_boundary_arc_between_source_nodes",
+    "connected_void_free_span_m": "same_actual_source_node_chord",
+    "fractured_ligament_length_m": "crack_tip_to_actual_near_source_node",
+    "physical_active_front_travel_m": "same_physical_ligament_length",
+    "preexisting_void_free_span_m": "actual_near_to_far_source_node_chord",
+    "projected_connected_void_free_span_m": "laboratory_x_projection_of_source_node_chord",
+    "projected_fractured_length_m": "laboratory_x_projection_to_actual_near_source_node",
+    "projected_front_advance_m": "same_laboratory_x_projection"
+  },
+  "prospectively_frozen_before_central_dbtt_evaluation": true,
+  "radius_convention": {
+    "actual_fem_boundary_edges": [
+      [
+        0,
+        31
+      ],
+      [
+        0,
+        416
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        416
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        7,
+        8
+      ],
+      [
+        8,
+        9
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        11,
+        12
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        13,
+        14
+      ],
+      [
+        14,
+        15
+      ],
+      [
+        15,
+        16
+      ],
+      [
+        16,
+        417
+      ],
+      [
+        17,
+        18
+      ],
+      [
+        17,
+        417
+      ],
+      [
+        18,
+        19
+      ],
+      [
+        19,
+        20
+      ],
+      [
+        20,
+        21
+      ],
+      [
+        21,
+        22
+      ],
+      [
+        22,
+        23
+      ],
+      [
+        23,
+        24
+      ],
+      [
+        24,
+        25
+      ],
+      [
+        25,
+        26
+      ],
+      [
+        26,
+        27
+      ],
+      [
+        27,
+        28
+      ],
+      [
+        28,
+        29
+      ],
+      [
+        29,
+        30
+      ],
+      [
+        30,
+        31
+      ]
+    ],
+    "actual_polygon_edges": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        7,
+        8
+      ],
+      [
+        8,
+        9
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        11,
+        12
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        13,
+        14
+      ],
+      [
+        14,
+        15
+      ],
+      [
+        15,
+        16
+      ],
+      [
+        16,
+        17
+      ],
+      [
+        17,
+        18
+      ],
+      [
+        18,
+        19
+      ],
+      [
+        19,
+        20
+      ],
+      [
+        20,
+        21
+      ],
+      [
+        21,
+        22
+      ],
+      [
+        22,
+        23
+      ],
+      [
+        23,
+        24
+      ],
+      [
+        24,
+        25
+      ],
+      [
+        25,
+        26
+      ],
+      [
+        26,
+        27
+      ],
+      [
+        27,
+        28
+      ],
+      [
+        28,
+        29
+      ],
+      [
+        29,
+        30
+      ],
+      [
+        30,
+        31
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    "actual_polygon_vertices_m": [
+      [
+        0.000755,
+        -5.417027184644034e-06
+      ],
+      [
+        0.000755,
+        5.417027184644034e-06
+      ],
+      [
+        0.0007528863808443553,
+        1.6042908237130072e-05
+      ],
+      [
+        0.0007487403677318862,
+        2.6052269323029797e-05
+      ],
+      [
+        0.0007427212896213938,
+        3.506045630912644e-05
+      ],
+      [
+        0.0007350604563091264,
+        4.272128962139378e-05
+      ],
+      [
+        0.0007260522693230298,
+        4.8740367731886185e-05
+      ],
+      [
+        0.0007160429082371301,
+        5.288638084435535e-05
+      ],
+      [
+        0.000705417027184644,
+        5.4999999999999995e-05
+      ],
+      [
+        0.000694582972815356,
+        5.5e-05
+      ],
+      [
+        0.0006839570917628699,
+        5.2886380844355355e-05
+      ],
+      [
+        0.0006739477306769703,
+        4.8740367731886206e-05
+      ],
+      [
+        0.0006649395436908736,
+        4.272128962139379e-05
+      ],
+      [
+        0.0006572787103786062,
+        3.506045630912644e-05
+      ],
+      [
+        0.0006512596322681138,
+        2.605226932302981e-05
+      ],
+      [
+        0.0006471136191556447,
+        1.60429082371301e-05
+      ],
+      [
+        0.000645,
+        5.417027184644046e-06
+      ],
+      [
+        0.000645,
+        -5.417027184644033e-06
+      ],
+      [
+        0.0006471136191556447,
+        -1.6042908237130062e-05
+      ],
+      [
+        0.0006512596322681138,
+        -2.6052269323029777e-05
+      ],
+      [
+        0.0006572787103786062,
+        -3.506045630912643e-05
+      ],
+      [
+        0.0006649395436908736,
+        -4.2721289621393796e-05
+      ],
+      [
+        0.0006739477306769701,
+        -4.8740367731886185e-05
+      ],
+      [
+        0.0006839570917628699,
+        -5.288638084435535e-05
+      ],
+      [
+        0.000694582972815356,
+        -5.5e-05
+      ],
+      [
+        0.000705417027184644,
+        -5.4999999999999995e-05
+      ],
+      [
+        0.0007160429082371301,
+        -5.288638084435534e-05
+      ],
+      [
+        0.0007260522693230298,
+        -4.874036773188619e-05
+      ],
+      [
+        0.0007350604563091264,
+        -4.2721289621393775e-05
+      ],
+      [
+        0.0007427212896213938,
+        -3.506045630912643e-05
+      ],
+      [
+        0.0007487403677318862,
+        -2.6052269323029817e-05
+      ],
+      [
+        0.0007528863808443553,
+        -1.6042908237130083e-05
+      ]
+    ],
+    "boundary_segment_count": 32,
+    "cavity_area_convention": "pi_times_nominal_circle_radius_squared",
+    "finite_element_boundary_convention": "actual_circumscribed_polygon",
+    "finite_element_polygon_area_m2": 9.53396784497351e-09,
+    "finite_element_polygon_perimeter_m": 0.0003466897398172182,
+    "geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+    "length_ledger_boundary_convention": "actual_source_conforming_polygon_intersections",
+    "nominal_circle_area_m2": 9.503317777109124e-09,
+    "nominal_circle_radius_m": 5.5e-05,
+    "physical_source_coordinate_m": [
+      0.000755,
+      0.0
+    ],
+    "polygon_angular_phase_rad": -0.09817477042468103,
+    "polygon_apothem_m": 5.5e-05,
+    "polygon_circumradius_m": 5.526612148069713e-05,
+    "schema": "v5.cavity-source-conforming-geometry/4",
+    "sha256": "fb8bcf8515c20b5f83ad9b849f8bb25baf3903ea81e65238e5cb8f0ec9ba7205",
+    "topological_connection_coordinate_m": [
+      0.000755,
+      0.0
+    ],
+    "void_kinetics_radius_convention": "nominal_physical_circle_radius"
+  },
+  "recovery": {
+    "fixed_window_reused_unchanged": true,
+    "operator": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
+    "scientific_noncertification_fails_closed": true,
+    "unexpected_programming_exceptions_propagate": true,
+    "v3_coordinate_check_relaxed": false
+  },
+  "retained_v1_v2_v3_files_modified": false,
+  "schema": "v5.cavity-source-conforming-geometry-contract/4",
+  "scope": {
+    "cavity_area_and_inventory_use_nominal_circle": true,
+    "fatigue_started": false,
+    "finite_activation_zone_observable_derived": false,
+    "oracle_generated": false,
+    "paired_trajectories_run": false,
+    "polygon_used_only_as_fem_boundary": true,
+    "r_tip_equals_R_void": false,
+    "r_tip_law_changed": false,
+    "scientific_tolerances_changed": false,
+    "void_kinetics_use_nominal_circle_radius": true
+  },
+  "source_boundary_construction": {
+    "facet_geometry_changed_by_split": false,
+    "near_and_far_nodes_inserted": true,
+    "polygon_type": "regular_circumscribed",
+    "required_boundary_owner_count_per_incident_edge": 1,
+    "required_source_collinearity": true,
+    "required_source_degree": 2,
+    "source_facet_centered_on_ray": true,
+    "source_node_location": "facet_midpoint_at_nominal_circle_radius",
+    "source_ray_xy": [
+      1.0,
+      0.0
+    ]
+  }
+}
