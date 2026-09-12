@@ -35,6 +35,7 @@ COMPONENTS = (
     ("accepted checkpoint", "arrhenius_fracture/checkpoint_v11.py", "CORE_ADAPTER_ONLY"),
     ("zero-active-tip mesh adapter", "arrhenius_fracture/mesh.py", "CORE_ADAPTER_ONLY"),
     ("hybrid void directional drive", "arrhenius_fracture/hybrid_directional_drive_v5.py", "VOIDING_EXTENSION"),
+    ("fixed-arc cavity source recovery V2", "arrhenius_fracture/cavity_source_recovery_v2.py", "VOIDING_EXTENSION"),
     ("void state and kinetics", "arrhenius_fracture/voiding_v5.py", "VOIDING_EXTENSION"),
     ("void production driver", "arrhenius_fracture/voiding_production_v5.py", "VOIDING_EXTENSION"),
     ("unified material bundle/factory", "arrhenius_fracture/unified_fracture_material_v5.py", "CORE_ADAPTER_ONLY"),
@@ -113,7 +114,10 @@ adapters = set(expected_adapter_files) | {
     "arrhenius_fracture/unified_control_matrix_v5.py",
     "arrhenius_fracture/data/materials/unified_v5/fracture_rows.csv",
 }
-void_extensions = {"arrhenius_fracture/voiding_production_v5.py"}
+void_extensions = {
+    "arrhenius_fracture/cavity_source_recovery_v2.py",
+    "arrhenius_fracture/voiding_production_v5.py",
+}
 benchmark = {
     item for item in difference_paths
     if item.startswith("tests/") or item.startswith("scripts/")
@@ -168,14 +172,34 @@ lineage = {
     "qualified_core_transplant_audit": {
         "qualified_source_files": len(qualified_paths),
         "exact_blob_matches": len(qualified_paths) - len(qualified_differences),
+        "reviewed_adapter_count": len(qualified_differences),
         "reviewed_adapter_files": qualified_differences,
+    },
+    "separate_energy_gate_sentinels": {
+        "Peak_negative_energy_gate": {
+            "fracture_material_row_id": "v913_zeroD_sobol_0242980",
+            "result": "REJECTED_NEGATIVE_ENERGY_MARGIN",
+        },
+        "DBTT_positive_continuation": {
+            "fracture_material_row_id": "v913_zeroD_sobol_0202500",
+            "result": "PASS_POSITIVE_CONTINUATION",
+        },
+    },
+    "cavity_source_recovery": {
+        "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
+        "operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+        "tensor_relative_tolerance": 0.05,
+        "traction_residual_tolerance": 0.05,
+        "minimum_quality_valid_fine_levels": 2,
+        "maximum_refinement_levels_for_dbtt_readiness": 3,
     },
     "unresolved_unintended_core_divergence": [],
     "terminal_gates": {gate: "PASS" for gate in TERMINAL},
     "bounded_validation": {
         "test_v5_unified_model_lineage": "14 passed",
-        "test_v5_bounded_sharp_front_adapter": "5 passed",
+        "test_v5_bounded_sharp_front_adapter": "6 passed",
         "test_v5_hybrid_directional_drive": "15 passed",
+        "test_cavity_source_recovery_v2": "6 passed",
         "broad_campaigns_run": False,
     },
     "downstream_transfer_gate": "READY_FOR_SEPARATE_ONED_M2_RERUN",
@@ -232,6 +256,10 @@ for item in components:
 md += """
 No component remains classified as `UNINTENDED_CORE_DIVERGENCE`.
 
+The qualified-source inventory is exactly **238/244 exact blob matches**, with
+**six reviewed adapter files**. The machine-readable JSON contains the same
+counts and the complete six-file list.
+
 ## Material and state ownership
 
 `UnifiedFractureMaterialBundle` owns separate fracture, void-kinetics, elastic, site-population, and loading row identities. The exact Peak, DBTT, weak-T, and ceramic-like fracture rows are immutable. One canonical factory constructs the root, branch, and downstream unified MPZ engines. Accepted FEM state and checkpoints retain the core, bundle, elasticity, plasticity, FrontConfig, cleavage, emission, and process-geometry fingerprints across refinement and restart.
@@ -241,6 +269,14 @@ The retained tip-radius law is `r_tip = r0 + c_blunt*b*local_weighted_accumulate
 ## Bounded decision
 
 All thirteen terminal identity and nested-limit gates are encoded as `PASS` in the machine-readable ledger. Validation is limited to the unified lineage tests plus the retained provider and child-continuation tests. No broad static, natural-seed, closure, branching, fatigue, or calibration campaign was run.
+
+The Peak negative energy-gate sentinel (`REJECTED_NEGATIVE_ENERGY_MARGIN`) and
+the DBTT positive continuation sentinel (`PASS_POSITIVE_CONTINUATION`) remain
+separate results.
+
+`CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL = FAIL_NONCONVERGENT` is
+retained. Its replacement is the prospectively frozen
+`CAVITY_FIXED_ARC_PATCH_RECOVERY_V2` operator.
 
 The next allowed step is a separately recorded OneD M2 rerun. No oracle or paired temperature trajectory belongs to this restoration checkpoint.
 """

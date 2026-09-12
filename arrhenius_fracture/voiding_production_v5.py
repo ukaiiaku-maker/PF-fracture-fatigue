@@ -611,6 +611,35 @@ def cavity_boundary_recovery_operator(state, boundary_node: int) -> dict[str, An
             "recovery_operator_id": f"incident-element:{selected}", "recovery_weights": [1.0]}
 
 
+def cavity_fixed_arc_patch_recovery_v2(state, *, boundary_node: int | None = None):
+    """Apply the frozen V2 solid-side patch operator at the owned exit arc."""
+    from .cavity_source_recovery_v2 import recover_fixed_arc_patch_v2
+    cavity = state.void_state.cavities[0]
+    position = np.asarray(cavity.connection_exit_m, dtype=float)
+    if boundary_node is None:
+        boundary_node = int(np.argmin(np.linalg.norm(np.asarray(state.mesh.nodes) - position, axis=1)))
+    node = int(boundary_node)
+    if np.linalg.norm(np.asarray(state.mesh.nodes)[node] - position) > 1.0e-12:
+        raise ValueError("stored connection exit is not an aligned cavity-boundary node")
+    _, _, sigma, *_ = assemble_mechanics(
+        state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
+    )
+    damage = getattr(state.mesh, "element_damage_gp", None)
+    solid = None if damage is None else np.asarray(damage, dtype=float) < 0.5
+    return recover_fixed_arc_patch_v2(
+        nodes=state.mesh.nodes,
+        elements=state.mesh.elems,
+        stress_Pa=sigma,
+        boundary_node=node,
+        cavity_id=cavity.cavity_id,
+        cavity_center_m=cavity.center_m,
+        cavity_radius_m=cavity.radius_m,
+        owned_boundary_edges=_actual_cavity_boundary_edges(state),
+        solid_element_mask=solid,
+    )
+
+
 def cavity_free_surface_certificate(state) -> dict[str, Any]:
     """Certify one connected, closed mesh-boundary cycle at the cavity."""
     cavity = state.void_state.cavities[0]
@@ -1232,7 +1261,9 @@ def cavity_source_resolution_metrics(state):
     cavity = state.void_state.cavities[0]
     position = np.asarray(cavity.connection_exit_m)
     node = int(np.argmin(np.linalg.norm(state.mesh.nodes-position, axis=1)))
-    tensor, selected = cavity_boundary_tensor(state, boundary_node=node)
+    recovery = cavity_fixed_arc_patch_recovery_v2(state, boundary_node=node)
+    tensor = np.asarray(recovery["tensor_Pa"], dtype=float)
+    selected = tuple(map(int, recovery["stencil_element_ids"]))
     nodes = np.asarray(state.mesh.nodes); elems = np.asarray(state.mesh.elems)
     edges = _actual_cavity_boundary_edges(state)
     owned = {}
@@ -1282,8 +1313,10 @@ def cavity_source_resolution_metrics(state):
         "source_neighborhood_eta_t_max":float(local[:,1].max()),
         "minimum_quality": float(global_quality.min()),
         "local_minimum_quality": float(local[:,3].min()),
-        "normalized_traction": math.sqrt(traction_sum/boundary_length)/max(remote,1e-300),
-        "recovery_operator": "maximum-principal-incident-CST-at-fixed-owned-boundary-node"}
+        "normalized_traction": float(recovery["traction_residual"]),
+        "incident_cst_boundary_traction_v1": math.sqrt(traction_sum/boundary_length)/max(remote,1e-300),
+        "recovery_operator": recovery["recovery_operator"],
+        "recovery_record": recovery}
 
 
 def _cavity_resolution_binding(state):
@@ -1319,6 +1352,11 @@ def _qualified_cavity_source(state, tensor, *, temperature_K=900.0):
         or proof["refinement_count"] < 1
         or not all(key in proof for key in ("current_metrics","previous_metrics","previous_binding"))): return False
     current = proof["current_metrics"]; reference = proof["previous_metrics"]
+    if (current.get("recovery_operator") != "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2"
+        or reference.get("recovery_operator") != "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2"
+        or not current.get("recovery_record", {}).get("available")
+        or not reference.get("recovery_record", {}).get("available")):
+        return False
     capture = proof.get("previous_source_capture")
     if not capture or "element_damage_gp" not in capture: return False
     previous_mesh = replace(rebuild_tri_mesh(capture["nodes"], capture["elements"]),
@@ -1439,7 +1477,12 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
         if not quality_preparation["accepted"]:
             return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":[],
                            "quality_preparation":quality_preparation,"operations":operations}
-    previous = cavity_source_resolution_metrics(current)
+    from .cavity_source_recovery_v2 import CavitySourceRecoveryUnavailable
+    try:
+        previous = cavity_source_resolution_metrics(current)
+    except CavitySourceRecoveryUnavailable as exc:
+        return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":[],
+                       "scientific_unavailability":str(exc), "operations":operations}
     original_clock = (state.competition, state.rng_state)
     for level in range(1,max_refinement_levels+1):
         position = np.asarray(cavity.connection_exit_m)
@@ -1481,7 +1524,11 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
         inject("source_equilibrium", trial)
         if (trial.competition,trial.rng_state) != original_clock:
             raise RuntimeError("source refinement changed an owned threshold/hazard/RNG")
-        metrics = cavity_source_resolution_metrics(trial)
+        try:
+            metrics = cavity_source_resolution_metrics(trial)
+        except CavitySourceRecoveryUnavailable as exc:
+            return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":rows,
+                           "scientific_unavailability":str(exc), "operations":operations}
         proof = {"schema":"v12.cavity-source-local-refinement/1", "refinement_count":level,
             "refinement_region":refinement_region,
             "quality_edge_flips":flips,
@@ -1524,8 +1571,9 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
                     or row.get("source_boundary_site_id","connection_exit") != "connection_exit"
                     or math.dist(row.get("source_position_m",cavity.connection_exit_m),cavity.connection_exit_m)>1e-12):
                     raise RuntimeError("source refinement candidate boundary-site identity mismatch")
-            candidate_probe = {"kind":"direct_cavity_boundary_tensor",
-                "boundary_node_id":metrics["boundary_node_id"],"element_ids":metrics["probe_element_ids"]}
+            candidate_probe = {"kind":"CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+                "boundary_node_id":metrics["boundary_node_id"],"element_ids":metrics["probe_element_ids"],
+                "physical_arc_identity":metrics["recovery_record"]["physical_arc_identity"]}
             candidate_rows = tuple({**row,
                 "source_kind":"cavity_surface","source_cavity_id":cavity.cavity_id,
                 "source_boundary_site_id":"connection_exit","source_position_m":list(cavity.connection_exit_m),
@@ -1545,9 +1593,10 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
                 **_source_identity(trial,metrics["tensor_Pa"],source_kind="cavity_surface",
                     source_cavity_id=cavity.cavity_id,source_boundary_site_id="connection_exit",
                     source_position_m=cavity.connection_exit_m,
-                    source_probe_identity={"kind":"direct_cavity_boundary_tensor",
+                    source_probe_identity={"kind":"CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
                         "boundary_node_id":metrics["boundary_node_id"],
-                        "element_ids":metrics["probe_element_ids"]}),
+                        "element_ids":metrics["probe_element_ids"],
+                        "physical_arc_identity":metrics["recovery_record"]["physical_arc_identity"]}),
                 "source_mesh_generation":trial.event_counters.get("mesh_generation",0),
                 "candidate_source_states":candidate_rows}
             trial = replace(trial,junction_process_state={**trial.junction_process_state,
@@ -1908,7 +1957,23 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     cavity = result_state.void_state.cavities[0]
     exit_nodes = np.asarray(result_state.mesh.nodes)
     exit_node = int(np.argmin(np.linalg.norm(exit_nodes - np.asarray(cavity.connection_exit_m), axis=1)))
-    surface_tensor, boundary_elements = cavity_boundary_tensor(result_state, boundary_node=exit_node)
+    from .cavity_source_recovery_v2 import CavitySourceRecoveryUnavailable
+    try:
+        surface_recovery = cavity_fixed_arc_patch_recovery_v2(result_state, boundary_node=exit_node)
+        surface_tensor = np.asarray(surface_recovery["tensor_Pa"], dtype=float)
+        boundary_elements = tuple(map(int, surface_recovery["stencil_element_ids"]))
+    except CavitySourceRecoveryUnavailable as exc:
+        surface_tensor = np.zeros((2, 2), dtype=float)
+        boundary_elements = ()
+        surface_recovery = {
+            "recovery_operator":"CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+            "available":False,
+            "scientific_unavailability":str(exc),
+            "physical_arc_identity":{
+                "cavity_id":cavity.cavity_id,
+                "boundary_position_m":list(map(float, cavity.connection_exit_m)),
+            },
+        }
     origin = np.asarray(cavity.connection_exit_m, dtype=float)
     candidate_inventory = tuple(result_state.competition.candidates)
     candidate_rows = []
@@ -1930,8 +1995,9 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
             "source_geometry_generation":int(result_state.crack_network.geometry_generation),
             "source_mesh_generation":int(result_state.event_counters.get("mesh_generation",0)),
             "source_tensor_fingerprint":_tensor_fingerprint(surface_tensor),
-            "source_probe_identity":{"kind":"direct_cavity_boundary_tensor",
-                "boundary_node_id":exit_node,"element_ids":list(boundary_elements)},
+            "source_probe_identity":{"kind":"CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+                "boundary_node_id":exit_node,"element_ids":list(boundary_elements),
+                "physical_arc_identity":surface_recovery["physical_arc_identity"]},
             "direction_xy": list(surface_candidate.direction_xy),
             "normal_xy": list(surface_candidate.normal_xy),
             "tangent_xy": list(surface_candidate.direction_xy),
@@ -1952,9 +2018,10 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
         result_state, surface_tensor, source_kind="cavity_surface",
         source_cavity_id=cavity.cavity_id, source_boundary_site_id="connection_exit",
         source_position_m=cavity.connection_exit_m,
-        source_probe_identity={"kind": "direct_cavity_boundary_tensor",
+        source_probe_identity={"kind": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
                                "boundary_node_id": exit_node,
-                               "element_ids": list(boundary_elements)},
+                               "element_ids": list(boundary_elements),
+                               "physical_arc_identity":surface_recovery["physical_arc_identity"]},
     )
     surface_source["candidate_source_states"] = tuple(candidate_rows)
     surface_source["source_mesh_generation"] = int(result_state.event_counters.get("mesh_generation",0))
@@ -1992,10 +2059,23 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         exit_node = int(np.argmin(np.linalg.norm(nodes - np.asarray(start), axis=1)))
         if np.linalg.norm(nodes[exit_node] - np.asarray(start)) > 1.0e-12:
             raise RuntimeError("stored connection exit is not an aligned cavity-boundary node")
-        tensor, boundary_elements = cavity_boundary_tensor(state, boundary_node=exit_node)
+        from .cavity_source_recovery_v2 import CavitySourceRecoveryUnavailable
+        try:
+            recovery = cavity_fixed_arc_patch_recovery_v2(state, boundary_node=exit_node)
+        except CavitySourceRecoveryUnavailable as exc:
+            return state, None, operation_log if operation_log is not None else [], {
+                "status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+                "scientific_unavailability": str(exc),
+                "recovery_operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+                "source_kind": "cavity_surface",
+                "source_position_m": list(start),
+            }
+        tensor = np.asarray(recovery["tensor_Pa"], dtype=float)
+        boundary_elements = tuple(map(int, recovery["stencil_element_ids"]))
         source_kind = "cavity_surface"
-        probe_identity = {"kind": "direct_cavity_boundary_tensor", "boundary_node_id": exit_node,
-                          "element_ids": list(boundary_elements)}
+        probe_identity = {"kind": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2", "boundary_node_id": exit_node,
+                          "element_ids": list(boundary_elements),
+                          "physical_arc_identity": recovery["physical_arc_identity"]}
     state, cleavage_audit = _complete_next_clock(
         state, tensor, source_kind=source_kind,
         source_front_id=child_id if continuation else None,
@@ -2034,7 +2114,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         child = CrackBranchState(child_id, ROOT_BRANCH_ID, 1,
                                  int(state.event_counters.get("topology_actions", 0)) + 1,
                                  (start,), (candidate.angle_rad,), local_state={
-                                     "nucleation_source": "direct_cavity_boundary_tensor",
+                                     "nucleation_source": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
                                      "upstream_lineage_branch_id": ROOT_BRANCH_ID,
                                      "active_source": "established_directional_J_K_provider",
                                      "front_engine_state_owner": child_id,
@@ -2335,10 +2415,13 @@ def deterministic_trajectory(*, bundle: UnifiedFractureMaterialBundle, stop_befo
         rows.append({**observables(state, 'source_resolution_attempt'), 'source_resolution_audit':source_audit})
         capture('source_resolution_attempt')
     rows.append(observables(state, "connected_topology"))
-    tensor, boundary_elements = cavity_boundary_tensor(state)
+    source_recovery = cavity_fixed_arc_patch_recovery_v2(state)
+    tensor = np.asarray(source_recovery["tensor_Pa"], dtype=float)
+    boundary_elements = tuple(map(int, source_recovery["stencil_element_ids"]))
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
-    rows.append({**observables(state, "downstream_surface_probe"), "direct_cavity_boundary_tensor_Pa": tensor.tolist(),
+    rows.append({**observables(state, "downstream_surface_probe"), "cavity_fixed_arc_patch_recovery_v2_tensor_Pa": tensor.tolist(),
                  "cavity_boundary_element_ids": boundary_elements,
+                 "cavity_source_recovery": source_recovery,
                  "void_birth_rate_s": rates["birth_s"],
                  "classification": "PRE_CLEAVAGE_SURFACE_PROBE"})
     state, result, operations, causal = downstream_front_transaction(state)

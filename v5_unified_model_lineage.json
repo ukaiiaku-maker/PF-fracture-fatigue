@@ -8,7 +8,8 @@
   },
   "bounded_validation": {
     "broad_campaigns_run": false,
-    "test_v5_bounded_sharp_front_adapter": "5 passed",
+    "test_cavity_source_recovery_v2": "6 passed",
+    "test_v5_bounded_sharp_front_adapter": "6 passed",
     "test_v5_hybrid_directional_drive": "15 passed",
     "test_v5_unified_model_lineage": "14 passed"
   },
@@ -18,6 +19,14 @@
     "qualified_multitip": "codex/current-source-branching-qualification-v2",
     "restoration": "codex/v5-unified-fracture-multitip-voiding",
     "retained_v5": "codex/sharp-front-stateful-voiding-v5-finalization-v2"
+  },
+  "cavity_source_recovery": {
+    "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
+    "maximum_refinement_levels_for_dbtt_readiness": 3,
+    "minimum_quality_valid_fine_levels": 2,
+    "operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+    "tensor_relative_tolerance": 0.05,
+    "traction_residual_tolerance": 0.05
   },
   "commits": {
     "canonical_single_tip": {
@@ -163,6 +172,15 @@
     {
       "canonical_single_tip_blob": null,
       "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/cavity_source_recovery_v2.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "cf52505ba7d044691f1e87d459b89f12efbc8f74",
+      "retained_v5_blob": null,
+      "role": "fixed-arc cavity source recovery V2"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/voiding_v5.py",
       "qualified_multitip_blob": null,
       "restored_worktree_blob": "3c7754bf2d4e3d6dd9f22644b3b2cbd40be5019c",
@@ -174,7 +192,7 @@
       "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/voiding_production_v5.py",
       "qualified_multitip_blob": null,
-      "restored_worktree_blob": "3baa7619fbb48dbceaaaa72db222798076f352eb",
+      "restored_worktree_blob": "42255c27311fe90b21b560072f8a5cf17d06b635",
       "retained_v5_blob": "31dfcada0efc4638d8ca7fbdb626cb69cb140b22",
       "role": "void production driver"
     },
@@ -485,6 +503,7 @@
   "qualified_core_transplant_audit": {
     "exact_blob_matches": 238,
     "qualified_source_files": 244,
+    "reviewed_adapter_count": 6,
     "reviewed_adapter_files": [
       "arrhenius_fracture/checkpoint_v11.py",
       "arrhenius_fracture/fem.py",
@@ -495,6 +514,16 @@
     ]
   },
   "schema": "v5.unified-model-lineage/1",
+  "separate_energy_gate_sentinels": {
+    "DBTT_positive_continuation": {
+      "fracture_material_row_id": "v913_zeroD_sobol_0202500",
+      "result": "PASS_POSITIVE_CONTINUATION"
+    },
+    "Peak_negative_energy_gate": {
+      "fracture_material_row_id": "v913_zeroD_sobol_0242980",
+      "result": "REJECTED_NEGATIVE_ENERGY_MARGIN"
+    }
+  },
   "terminal_gates": {
     "CHECKPOINT_MATERIAL_IDENTITY": "PASS",
     "ELASTICITY_PLASTICITY_IDENTITY": "PASS",

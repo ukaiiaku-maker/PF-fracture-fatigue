@@ -257,6 +257,22 @@ def test_10_reports_encode_terminal_passes_and_no_unresolved_core_divergence():
     assert delta["decision"] == "VOIDING_EXTENSION_DELTA_ONLY"
     assert delta["scientific_tolerances_changed"] is False
     assert delta["r_tip_equals_void_radius"] is False
+    audit = lineage["qualified_core_transplant_audit"]
+    assert (audit["exact_blob_matches"], audit["qualified_source_files"]) == (238, 244)
+    assert audit["reviewed_adapter_count"] == len(audit["reviewed_adapter_files"]) == 6
+    assert lineage["separate_energy_gate_sentinels"] == {
+        "Peak_negative_energy_gate": {
+            "fracture_material_row_id": "v913_zeroD_sobol_0242980",
+            "result": "REJECTED_NEGATIVE_ENERGY_MARGIN",
+        },
+        "DBTT_positive_continuation": {
+            "fracture_material_row_id": "v913_zeroD_sobol_0202500",
+            "result": "PASS_POSITIVE_CONTINUATION",
+        },
+    }
+    assert lineage["cavity_source_recovery"][
+        "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL"
+    ] == "FAIL_NONCONVERGENT"
 
 
 def test_11_connected_topology_mesh_rebuild_accepts_no_active_tip_centers():

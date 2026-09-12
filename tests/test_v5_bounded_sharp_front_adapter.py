@@ -3,9 +3,12 @@ import inspect
 import math
 import hashlib
 import pickle
+from pathlib import Path
 
 import pytest
 
+import arrhenius_fracture.voiding_production_v5 as production_v5
+from arrhenius_fracture.cavity_source_recovery_v2 import CavitySourceRecoveryUnavailable
 from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
 from arrhenius_fracture.crack_network_v11 import (
     CrackBranchState,
@@ -115,7 +118,7 @@ def test_c_reciprocal_void_radius_control_has_no_constitutive_input():
 def test_d_cavity_and_child_stages_have_distinct_sources():
     transaction = inspect.getsource(downstream_front_transaction)
     child_rates = inspect.getsource(directional_sharp_front_rates)
-    assert "cavity_boundary_tensor" in transaction
+    assert "cavity_fixed_arc_patch_recovery_v2" in transaction
     assert "source_kind = \"cavity_surface\"" in transaction
     assert "sharp_front_load_provider" in transaction
     assert "established_directional_J_K_provider" in transaction
@@ -123,6 +126,29 @@ def test_d_cavity_and_child_stages_have_distinct_sources():
     assert "sharp_front_constitutive_response" in child_rates
     assert "cavity_boundary_tensor" not in child_rates
     assert '"r_tip_m"' not in transaction
+
+
+def test_d2_only_expected_recovery_noncertification_becomes_unavailable(monkeypatch):
+    root = Path(__file__).resolve().parents[1]
+    state = bind_identity(restore_checkpoint(
+        root / "artifacts/voiding_v5_finalization_v2/checkpoints/connected_before_downstream.json"
+    ), BUNDLE)
+
+    def unavailable(*args, **kwargs):
+        raise CavitySourceRecoveryUnavailable("bounded scientific non-certification")
+
+    monkeypatch.setattr(production_v5, "cavity_fixed_arc_patch_recovery_v2", unavailable)
+    returned, result, _, audit = downstream_front_transaction(state)
+    assert returned is state
+    assert result is None
+    assert audit["status"] == "UNQUALIFIED_CAVITY_SOURCE_TENSOR"
+
+    def programming_error(*args, **kwargs):
+        raise RuntimeError("unexpected programming exception")
+
+    monkeypatch.setattr(production_v5, "cavity_fixed_arc_patch_recovery_v2", programming_error)
+    with pytest.raises(RuntimeError, match="unexpected programming exception"):
+        downstream_front_transaction(state)
 
 
 def test_e_child_canonical_state_checkpoint_round_trip(tmp_path):

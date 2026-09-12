@@ -26,11 +26,16 @@ The retained V5 source differed materially in the front, FEM/source, process-own
 | accepted checkpoint | `arrhenius_fracture/checkpoint_v11.py` | `CORE_ADAPTER_ONLY` |
 | zero-active-tip mesh adapter | `arrhenius_fracture/mesh.py` | `CORE_ADAPTER_ONLY` |
 | hybrid void directional drive | `arrhenius_fracture/hybrid_directional_drive_v5.py` | `VOIDING_EXTENSION` |
+| fixed-arc cavity source recovery V2 | `arrhenius_fracture/cavity_source_recovery_v2.py` | `VOIDING_EXTENSION` |
 | void state and kinetics | `arrhenius_fracture/voiding_v5.py` | `VOIDING_EXTENSION` |
 | void production driver | `arrhenius_fracture/voiding_production_v5.py` | `VOIDING_EXTENSION` |
 | unified material bundle/factory | `arrhenius_fracture/unified_fracture_material_v5.py` | `CORE_ADAPTER_ONLY` |
 
 No component remains classified as `UNINTENDED_CORE_DIVERGENCE`.
+
+The qualified-source inventory is exactly **238/244 exact blob matches**, with
+**six reviewed adapter files**. The machine-readable JSON contains the same
+counts and the complete six-file list.
 
 ## Material and state ownership
 
@@ -41,5 +46,13 @@ The retained tip-radius law is `r_tip = r0 + c_blunt*b*local_weighted_accumulate
 ## Bounded decision
 
 All thirteen terminal identity and nested-limit gates are encoded as `PASS` in the machine-readable ledger. Validation is limited to the unified lineage tests plus the retained provider and child-continuation tests. No broad static, natural-seed, closure, branching, fatigue, or calibration campaign was run.
+
+The Peak negative energy-gate sentinel (`REJECTED_NEGATIVE_ENERGY_MARGIN`) and
+the DBTT positive continuation sentinel (`PASS_POSITIVE_CONTINUATION`) remain
+separate results.
+
+`CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL = FAIL_NONCONVERGENT` is
+retained. Its replacement is the prospectively frozen
+`CAVITY_FIXED_ARC_PATCH_RECOVERY_V2` operator.
 
 The next allowed step is a separately recorded OneD M2 rerun. No oracle or paired temperature trajectory belongs to this restoration checkpoint.
