@@ -17,12 +17,14 @@ jobs:
   bounded-recovery-v3:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      ATTESTATION_DIR: ${{ runner.temp }}/v5-cavity-source-recovery-v3
-      MPLCONFIGDIR: ${{ runner.temp }}/matplotlib-v5-cavity-source-recovery-v3
     steps:
       - name: Initialize bounded attestation directory
-        run: mkdir -p "$ATTESTATION_DIR" "$MPLCONFIGDIR"
+        run: |
+          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-cavity-source-recovery-v3" >> "$GITHUB_ENV"
+          echo "MPLCONFIGDIR=${RUNNER_TEMP}/matplotlib-v5-cavity-source-recovery-v3" >> "$GITHUB_ENV"
+          mkdir -p \
+            "${RUNNER_TEMP}/v5-cavity-source-recovery-v3" \
+            "${RUNNER_TEMP}/matplotlib-v5-cavity-source-recovery-v3"
 
       - name: Partial sparse checkout of bounded inputs
         env:
