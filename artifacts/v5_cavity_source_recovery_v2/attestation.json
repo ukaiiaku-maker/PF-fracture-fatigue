@@ -1,0 +1,115 @@
+{
+  "schema": "v5.cavity-source-recovery-v2-attestation/1",
+  "repository": "ukaiiaku-maker/PF-fracture-fatigue",
+  "branch": "codex/v5-unified-fracture-multitip-voiding",
+  "implementation_commit": "d4fe089a5047a8587af2683a398004a691f5d844",
+  "preserved_restoration_checkpoint": "45b702b008574ffbaf8955b1254333459e7e1a7c",
+  "historical_recovery": {
+    "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT"
+  },
+  "frozen_operator": {
+    "operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+    "patch_ring_count": 2,
+    "fit": "weighted affine least squares at exact owned solid-side arc coordinate",
+    "traction_free_limit": "sigma_nn=sigma_nt=0; sigma_tt=weighted-affine-solid-side-limit",
+    "tensor_relative_tolerance": 0.05,
+    "traction_residual_tolerance": 0.05,
+    "minimum_quality_valid_fine_levels": 2,
+    "maximum_design_condition": 1000000.0,
+    "maximum_dbtt_refinement_levels": 3
+  },
+  "manufactured_and_kirsch_qualification": {
+    "status": "PASS",
+    "checks": [
+      "constant stress oracle",
+      "affine stress oracle",
+      "rigid rotation",
+      "reversed edge ordering",
+      "Kirsch circular-hole family",
+      "one reflected pair"
+    ],
+    "kirsch_levels": [
+      {
+        "sectors": 64,
+        "tensor_relative_error": 0.05414930382708708,
+        "traction_residual": 0.028155183421904092,
+        "design_condition": 5.225110674902832,
+        "minimum_element_quality": 0.840699007762631
+      },
+      {
+        "sectors": 128,
+        "tensor_relative_error": 0.015331936472380002,
+        "traction_residual": 0.00845663758000164,
+        "design_condition": 5.239267278327932,
+        "minimum_element_quality": 0.8543047419727591
+      },
+      {
+        "sectors": 256,
+        "tensor_relative_error": 0.004071398167649905,
+        "traction_residual": 0.002330332476301329,
+        "design_condition": 5.243483296088457,
+        "minimum_element_quality": 0.860428377583879
+      }
+    ],
+    "quality_valid_fine_levels_within_both_frozen_error_limits": 2
+  },
+  "central_dbtt_readiness": {
+    "status": "SOURCE_TENSOR_UNQUALIFIED",
+    "failure_classification": "TANGENTIAL_STRESS_CONVERGENCE",
+    "material_class": "DBTT",
+    "fracture_material_row_id": "v913_zeroD_sobol_0202500",
+    "opening_scale_from_4e-7_m": 2.0,
+    "accepted_pre_source_state_unchanged": true,
+    "ligament_energy_gate": {
+      "accepted": true,
+      "energy_release_J_per_m": 0.005739662590192835,
+      "hazard_dissipation_J_per_m": 0.0021732561414383616,
+      "energy_margin_J_per_m": 0.0035664064487544735
+    },
+    "refinement_levels_run": 3,
+    "attempts": [
+      {
+        "level": 1,
+        "tensor_relative_change": 0.10636255970669334,
+        "traction_residual": 0.039290171156949674,
+        "minimum_mesh_quality": 0.19108365548715264,
+        "qualified": false
+      },
+      {
+        "level": 2,
+        "tensor_relative_change": 0.026791817313149703,
+        "traction_residual": 0.024058321815199565,
+        "minimum_mesh_quality": 0.19108365548715264,
+        "qualified": false
+      },
+      {
+        "level": 3,
+        "tensor_relative_change": 0.055653380815576595,
+        "traction_residual": 0.020367426159639445,
+        "minimum_mesh_quality": 0.14426449443452138,
+        "qualified": false
+      }
+    ],
+    "final_predicates": {
+      "tensor_convergence_at_or_below_5_percent": false,
+      "traction_residual_at_or_below_5_percent": true,
+      "patch_conditioning": true,
+      "mechanics_consistency": true
+    },
+    "returned_original_state_on_noncertification": true,
+    "unexpected_programming_exceptions_caught": false,
+    "oracle_states_generated": 0,
+    "paired_trajectories_run": 0
+  },
+  "scope": {
+    "broad_static_campaign_run": false,
+    "natural_seed_campaign_run": false,
+    "closure_campaign_run": false,
+    "branching_campaign_run": false,
+    "fatigue_campaign_run": false,
+    "calibration_campaign_run": false,
+    "r_tip_law_changed": false,
+    "r_tip_equals_R_void": false,
+    "scientific_tolerances_changed": false
+  }
+}
