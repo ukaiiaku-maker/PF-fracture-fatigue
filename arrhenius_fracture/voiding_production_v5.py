@@ -1517,13 +1517,17 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
     current = state.isolated_copy(); rows = []; quality_preparation = None
+    from .cavity_source_recovery_v3 import CavitySourceRecoveryV3Unavailable
     if quality_improvement == "constrained_v1":
         from .source_quality_transaction_v1 import repair_connected_quality
-        current, quality_preparation = repair_connected_quality(current)
+        try:
+            current, quality_preparation = repair_connected_quality(current)
+        except CavitySourceRecoveryV3Unavailable as exc:
+            return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":[],
+                           "scientific_unavailability":str(exc), "operations":operations}
         if not quality_preparation["accepted"]:
             return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":[],
                            "quality_preparation":quality_preparation,"operations":operations}
-    from .cavity_source_recovery_v3 import CavitySourceRecoveryV3Unavailable
     try:
         previous = cavity_source_resolution_metrics(current)
     except CavitySourceRecoveryV3Unavailable as exc:
