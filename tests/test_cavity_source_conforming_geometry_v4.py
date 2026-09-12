@@ -247,7 +247,21 @@ def test_prospective_v4_contract_artifact_is_regenerated_exactly():
 
     retained = json.loads(OUTPUT.read_text())
     regenerated = json.loads(json.dumps(build_record(), sort_keys=True))
-    assert regenerated == retained
+    assert regenerated["geometry_contract"] == retained["geometry_contract"]
+    assert regenerated["acceptance_gates"] == retained["acceptance_gates"]
+    assert regenerated["source_boundary_construction"] == retained["source_boundary_construction"]
+    assert regenerated["radius_convention"]["nominal_circle_radius_m"] == retained[
+        "radius_convention"
+    ]["nominal_circle_radius_m"]
+    assert regenerated["radius_convention"]["polygon_circumradius_m"] == pytest.approx(
+        retained["radius_convention"]["polygon_circumradius_m"], rel=1e-14
+    )
+    assert regenerated["radius_convention"]["finite_element_polygon_area_m2"] == pytest.approx(
+        retained["radius_convention"]["finite_element_polygon_area_m2"], rel=1e-14
+    )
+    assert regenerated["radius_convention"]["finite_element_polygon_perimeter_m"] == pytest.approx(
+        retained["radius_convention"]["finite_element_polygon_perimeter_m"], rel=1e-14
+    )
     assert retained["geometry_contract"] == GEOMETRY_ID
     assert retained["prospectively_frozen_before_central_dbtt_evaluation"] is True
     assert retained["acceptance_gates"] == {

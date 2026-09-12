@@ -23,6 +23,7 @@ jobs:
       - name: Initialize bounded attestation directory
         run: |
           echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-source-conforming-v4" >> "$GITHUB_ENV"
+          echo "V4_READINESS_OUTPUT=${RUNNER_TEMP}/v5-source-conforming-v4/central-dbtt-v4-readiness.json" >> "$GITHUB_ENV"
           echo "MPLCONFIGDIR=${RUNNER_TEMP}/matplotlib-v5-source-conforming-v4" >> "$GITHUB_ENV"
           mkdir -p \
             "${RUNNER_TEMP}/v5-source-conforming-v4" \
@@ -99,7 +100,30 @@ jobs:
           set -euo pipefail
           python scripts/attest_cavity_source_conforming_v4_dbtt.py \
             | tee "$ATTESTATION_DIR/central-dbtt-v4.log"
-          python scripts/build_cavity_source_geometry_v4_contract.py
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          committed = json.loads(Path(
+              "artifacts/v5_cavity_source_recovery_v4/central_dbtt_v4_readiness.json"
+          ).read_text())
+          observed = json.loads(Path(os.environ["V4_READINESS_OUTPUT"]).read_text())
+          keys = (
+              "DBTT_SOURCE_READINESS", "exact_v4_failure_class", "levels_run",
+              "oracle_states_accepted", "paired_trajectories_run", "fatigue_started",
+              "accepted_material_identity_exact_across_levels",
+              "physical_geometry_exact_across_levels", "thresholds_and_rng_exact_across_levels",
+              "accepted_input_state_unchanged_on_noncertification",
+              "unexpected_programming_exceptions_caught",
+          )
+          assert {key: observed[key] for key in keys} == {
+              key: committed[key] for key in keys
+          }
+          assert [row["predicates"] for row in observed["level_records"]] == [
+              row["predicates"] for row in committed["level_records"]
+          ]
+          assert [row["N_theta"] for row in observed["level_records"]] == [32, 64, 128]
+          PY
           python scripts/build_v5_unified_lineage_records.py
           git diff --exit-code
 

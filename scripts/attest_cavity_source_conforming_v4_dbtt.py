@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import replace
 import json
 import math
+import os
 from pathlib import Path
 import sys
 
@@ -262,8 +263,9 @@ def build_record():
 
 def main():
     payload = build_record()
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    destination = Path(os.environ.get("V4_READINESS_OUTPUT", str(OUTPUT)))
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     print("DBTT_SOURCE_READINESS=" + payload["DBTT_SOURCE_READINESS"])
     print("V4_FAILURE_CLASS=" + "+".join(payload["exact_v4_failure_class"]))
     print("LEVELS_RUN=" + str(payload["levels_run"]) + "/3")
