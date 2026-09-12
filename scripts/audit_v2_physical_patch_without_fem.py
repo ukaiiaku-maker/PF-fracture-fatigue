@@ -61,6 +61,19 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _stable_diagnostic(value):
+    """Remove irrelevant BLAS/SVD last-bit variation from diagnostic replay."""
+    if isinstance(value, float):
+        return float(format(value, ".14g"))
+    if isinstance(value, list):
+        return [_stable_diagnostic(item) for item in value]
+    if isinstance(value, tuple):
+        return [_stable_diagnostic(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _stable_diagnostic(item) for key, item in value.items()}
+    return value
+
+
 def _quality_mesh(state):
     fixed, protected = production_geometry_constraints(state)
     mesh, audit = constrained_quality_mesh(
@@ -106,21 +119,29 @@ def _geometry_record(state, level: int) -> dict[str, object]:
         "mesh_element_count": int(state.mesh.ne),
         "patch_element_ids": ids.tolist(),
         "sample_count": int(len(ids)),
-        "physical_tangential_extent_m": [float(np.min(s)), float(np.max(s))],
-        "physical_normal_extent_m": [float(np.min(n)), float(np.max(n))],
-        "centroid_distribution_local_s_n_m": np.column_stack((s, n)).tolist(),
-        "weight_distribution": weights.tolist(),
-        "weighted_moments": {
+        "physical_tangential_extent_m": _stable_diagnostic(
+            [float(np.min(s)), float(np.max(s))]
+        ),
+        "physical_normal_extent_m": _stable_diagnostic(
+            [float(np.min(n)), float(np.max(n))]
+        ),
+        "centroid_distribution_local_s_n_m": _stable_diagnostic(
+            np.column_stack((s, n)).tolist()
+        ),
+        "weight_distribution": _stable_diagnostic(weights.tolist()),
+        "weighted_moments": _stable_diagnostic({
             "sum_w": float(np.sum(weights)),
             "sum_w_s_m": float(weights @ s),
             "sum_w_n_m": float(weights @ n),
             "sum_w_s2_m2": float(weights @ (s * s)),
             "sum_w_sn_m2": float(weights @ (s * n)),
             "sum_w_n2_m2": float(weights @ (n * n)),
-        },
+        }),
         "polynomial_design_rank": int(recovery["design_rank"]),
-        "polynomial_design_condition": float(recovery["design_condition"]),
-        "patch_scale_m": float(recovery["patch_scale_m"]),
+        "polynomial_design_condition": _stable_diagnostic(
+            float(recovery["design_condition"])
+        ),
+        "patch_scale_m": _stable_diagnostic(float(recovery["patch_scale_m"])),
         "recovered_sigma_tt_Pa": retained["sigma_tt_Pa"],
         "fit_residual": {
             "status": "NOT_RETAINED_IN_V2_EVIDENCE_NO_NEW_FEM_SOLVE_PERMITTED",
@@ -217,20 +238,20 @@ def build() -> dict[str, object]:
                 "NORMAL_DIRECTION_RESOLUTION",
             ],
         },
-        "quality_preparation_geometry": preparation,
+        "quality_preparation_geometry": _stable_diagnostic(preparation),
         "levels": rows,
         "physical_footprint_decision": {
             "two_ring_rule_changes_physical_footprint_across_levels": True,
-            "tangential_full_width_m_by_level": tangential_widths,
-            "normal_depth_m_by_level": normal_depths,
-            "successive_tangential_width_ratios": [
+            "tangential_full_width_m_by_level": _stable_diagnostic(tangential_widths),
+            "normal_depth_m_by_level": _stable_diagnostic(normal_depths),
+            "successive_tangential_width_ratios": _stable_diagnostic([
                 tangential_widths[index + 1] / tangential_widths[index]
                 for index in range(2)
-            ],
-            "successive_normal_depth_ratios": [
+            ]),
+            "successive_normal_depth_ratios": _stable_diagnostic([
                 normal_depths[index + 1] / normal_depths[index]
                 for index in range(2)
-            ],
+            ]),
             "fixed_source_arc_coordinate_across_levels": all(
                 value == coordinate_identities[0] for value in coordinate_identities[1:]
             ),
