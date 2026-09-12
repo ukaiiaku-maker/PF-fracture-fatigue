@@ -25,8 +25,32 @@
     "maximum_refinement_levels_for_dbtt_readiness": 3,
     "minimum_quality_valid_fine_levels": 2,
     "operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+    "readiness_gate_taxonomy": {
+      "decision": "B_STILL_MANDATORY_V2_GATES",
+      "eta_n": {
+        "classification": "MANDATORY_V2_GATE",
+        "final_value": 0.05312759574778982,
+        "limit": 0.03,
+        "passed": false
+      },
+      "eta_t": {
+        "classification": "MANDATORY_V2_GATE",
+        "final_value": 0.02462285083929259,
+        "limit": 0.025,
+        "passed": true
+      },
+      "failure_classification": [
+        "TANGENTIAL_STRESS_CONVERGENCE",
+        "NORMAL_DIRECTION_RESOLUTION"
+      ]
+    },
     "tensor_relative_tolerance": 0.05,
-    "traction_residual_tolerance": 0.05
+    "traction_residual_tolerance": 0.05,
+    "v2_readiness_results": {
+      "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2_MANUFACTURED_AND_KIRSCH": "PASS",
+      "DBTT_V2_CAVITY_TRACTION": "PASS",
+      "DBTT_V2_FIXED_ARC_TENSOR_CONVERGENCE": "FAIL"
+    }
   },
   "commits": {
     "canonical_single_tip": {
@@ -448,6 +472,14 @@
     {
       "classification": "BENCHMARK_ONLY",
       "path": "artifacts/v5_cavity_source_recovery_v2/attestation.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v3/v2_readiness_taxonomy_and_patch_audit.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "scripts/audit_v2_physical_patch_without_fem.py"
     },
     {
       "classification": "BENCHMARK_ONLY",

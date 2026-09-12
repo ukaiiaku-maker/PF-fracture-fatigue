@@ -55,4 +55,10 @@ separate results.
 retained. Its replacement is the prospectively frozen
 `CAVITY_FIXED_ARC_PATCH_RECOVERY_V2` operator.
 
+The frozen production source still applies `eta_n <= 0.03` and
+`eta_t <= 0.025` as mandatory V2 readiness gates. The final DBTT V2 row passes
+the tangential-resolution gate and fails the normal-resolution gate; together
+with the failed tensor-change predicate, its complete failure classification
+is `TANGENTIAL_STRESS_CONVERGENCE + NORMAL_DIRECTION_RESOLUTION`.
+
 The next allowed step is a separately recorded OneD M2 rerun. No oracle or paired temperature trajectory belongs to this restoration checkpoint.

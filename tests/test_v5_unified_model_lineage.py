@@ -273,6 +273,47 @@ def test_10_reports_encode_terminal_passes_and_no_unresolved_core_divergence():
     assert lineage["cavity_source_recovery"][
         "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL"
     ] == "FAIL_NONCONVERGENT"
+    taxonomy = lineage["cavity_source_recovery"]["readiness_gate_taxonomy"]
+    assert taxonomy["decision"] == "B_STILL_MANDATORY_V2_GATES"
+    assert taxonomy["eta_n"] == {
+        "classification": "MANDATORY_V2_GATE",
+        "limit": 0.03,
+        "final_value": 0.05312759574778982,
+        "passed": False,
+    }
+    assert taxonomy["eta_t"] == {
+        "classification": "MANDATORY_V2_GATE",
+        "limit": 0.025,
+        "final_value": 0.02462285083929259,
+        "passed": True,
+    }
+    assert taxonomy["failure_classification"] == [
+        "TANGENTIAL_STRESS_CONVERGENCE",
+        "NORMAL_DIRECTION_RESOLUTION",
+    ]
+
+
+def test_10b_v2_patch_audit_is_geometry_only_and_records_shrinking_footprint():
+    import inspect
+    import json
+    from scripts import audit_v2_physical_patch_without_fem as audit_module
+
+    source = inspect.getsource(audit_module)
+    assert "assemble_mechanics(" not in source
+    assert "equilibrate_fixed_load_with_production_fem(" not in source
+    audit = json.loads((Path(__file__).resolve().parents[1] /
+                        audit_module.OUTPUT).read_text())
+    assert audit["audit_kind"] == "DIAGNOSTIC_ONLY_NO_NEW_FEM_SOLVE"
+    assert audit["readiness_gate_taxonomy"]["decision"] == "B_STILL_MANDATORY_V2_GATES"
+    assert len(audit["levels"]) == 3
+    assert all(row["fit_residual"]["value"] is None for row in audit["levels"])
+    decision = audit["physical_footprint_decision"]
+    assert decision["two_ring_rule_changes_physical_footprint_across_levels"] is True
+    assert decision["fixed_source_arc_coordinate_across_levels"] is True
+    widths = decision["tangential_full_width_m_by_level"]
+    depths = decision["normal_depth_m_by_level"]
+    assert widths[0] > widths[1] > widths[2]
+    assert depths[0] > depths[1] > depths[2]
 
 
 def test_11_connected_topology_mesh_rebuild_accepts_no_active_tip_centers():

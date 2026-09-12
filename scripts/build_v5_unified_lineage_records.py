@@ -193,6 +193,30 @@ lineage = {
         "traction_residual_tolerance": 0.05,
         "minimum_quality_valid_fine_levels": 2,
         "maximum_refinement_levels_for_dbtt_readiness": 3,
+        "v2_readiness_results": {
+            "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2_MANUFACTURED_AND_KIRSCH": "PASS",
+            "DBTT_V2_CAVITY_TRACTION": "PASS",
+            "DBTT_V2_FIXED_ARC_TENSOR_CONVERGENCE": "FAIL",
+        },
+        "readiness_gate_taxonomy": {
+            "decision": "B_STILL_MANDATORY_V2_GATES",
+            "eta_n": {
+                "classification": "MANDATORY_V2_GATE",
+                "limit": 0.03,
+                "final_value": 0.05312759574778982,
+                "passed": False,
+            },
+            "eta_t": {
+                "classification": "MANDATORY_V2_GATE",
+                "limit": 0.025,
+                "final_value": 0.02462285083929259,
+                "passed": True,
+            },
+            "failure_classification": [
+                "TANGENTIAL_STRESS_CONVERGENCE",
+                "NORMAL_DIRECTION_RESOLUTION",
+            ],
+        },
     },
     "unresolved_unintended_core_divergence": [],
     "terminal_gates": {gate: "PASS" for gate in TERMINAL},
@@ -278,6 +302,12 @@ separate results.
 `CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL = FAIL_NONCONVERGENT` is
 retained. Its replacement is the prospectively frozen
 `CAVITY_FIXED_ARC_PATCH_RECOVERY_V2` operator.
+
+The frozen production source still applies `eta_n <= 0.03` and
+`eta_t <= 0.025` as mandatory V2 readiness gates. The final DBTT V2 row passes
+the tangential-resolution gate and fails the normal-resolution gate; together
+with the failed tensor-change predicate, its complete failure classification
+is `TANGENTIAL_STRESS_CONVERGENCE + NORMAL_DIRECTION_RESOLUTION`.
 
 The next allowed step is a separately recorded OneD M2 rerun. No oracle or paired temperature trajectory belongs to this restoration checkpoint.
 """
