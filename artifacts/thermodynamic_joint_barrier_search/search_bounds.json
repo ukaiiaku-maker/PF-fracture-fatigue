@@ -1,0 +1,77 @@
+{
+  "reference_temperature_K": 300,
+  "primary_parents": [
+    "P25_TRANSFER_V1_RANK1",
+    "P40_TRANSFER_CALIBRATED_GEN2"
+  ],
+  "boundary_parent": "P55_TRANSFER_V1_RANK1",
+  "structured_rows_target": 3072,
+  "sobol_rows_per_primary_parent": 65536,
+  "sobol_seed": 260911,
+  "cleavage_zero_target_eV": [
+    1,
+    2
+  ],
+  "guard_log10_q_low": [
+    -8,
+    -3
+  ],
+  "guard_exponent": [
+    1.5,
+    8
+  ],
+  "cleavage_entropy_zero_kB": [
+    -50,
+    50
+  ],
+  "cleavage_entropy_active_kB": [
+    -40,
+    40
+  ],
+  "cleavage_entropy_infinity_kB": [
+    -20,
+    20
+  ],
+  "emission_entropy_active_preferred_kB": [
+    20,
+    60
+  ],
+  "emission_entropy_active_control_kB": [
+    0,
+    20
+  ],
+  "emission_entropy_infinity_kB": [
+    -5,
+    15
+  ],
+  "emission_zero_entropy_admissible_kB": [
+    -20,
+    100
+  ],
+  "heat_capacity_kB": [
+    -15,
+    15
+  ],
+  "single_exp_bounds": {
+    "G00_eV": [
+      1,
+      2
+    ],
+    "sigc_GPa": [
+      0.2,
+      8
+    ],
+    "alpha": [
+      0.02,
+      5
+    ],
+    "exponent": [
+      0.25,
+      12
+    ],
+    "floor_fraction": [
+      0.001,
+      0.8
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "reference_temperature_K": 300,
+  "cleavage_reference": "exact parent EXP-floor plus low-stress guard",
+  "emission_reference": "exact A_NATIVE 300 K emission surface",
+  "G": "G_r-(T-Tr)S_r+DeltaCp*((T-Tr)-T*ln(T/Tr))",
+  "S": "S_r+DeltaCp*ln(T/Tr)",
+  "H": "G+T*S",
+  "V": "-partial G/partial sigma",
+  "Maxwell": "partial V/partial T=partial S/partial sigma",
+  "entropy_units": "k_B",
+  "activation_volume_units": [
+    "m^3",
+    "nm^3",
+    "angstrom^3"
+  ],
+  "attempt_frequencies_fixed": true,
+  "no_extra_entropy_prefactor": true
+}

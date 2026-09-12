@@ -1,0 +1,117 @@
+{
+  "schema": "thermodynamic_joint_search_protocol_v1",
+  "parent_head": "0399e12e8f015071b3d3d8c7ad8cb03b435d6aaf",
+  "branch": "codex/v10.2.30-thermodynamic-joint-barrier-search",
+  "analytical_only": true,
+  "new_physical_trajectories": 0,
+  "workers_maximum": 4,
+  "search_data_excludes_historical_fracture_rows": true,
+  "canonical_comparison_gating": false,
+  "thresholds": {
+    "primary": "LN2",
+    "LN2": 0.6931471805599453,
+    "UNIT_ACTION": 1.0,
+    "SEED_1720": 0.07509316036236147
+  },
+  "temperatures_full_K": [
+    300,
+    325,
+    350,
+    375,
+    400,
+    425,
+    450,
+    475,
+    500,
+    525,
+    550,
+    575,
+    600,
+    625,
+    650,
+    675,
+    700,
+    725,
+    750,
+    775,
+    800,
+    825,
+    850,
+    875,
+    900,
+    925,
+    950,
+    975,
+    1000,
+    1025,
+    1050,
+    1075,
+    1100,
+    1125,
+    1150,
+    1175,
+    1200
+  ],
+  "temperatures_coarse_K": [
+    300,
+    450,
+    600,
+    750,
+    900,
+    1050,
+    1200
+  ],
+  "ramp_rates": [
+    0.0005,
+    0.005,
+    0.05
+  ],
+  "fatigue_Kmax": [
+    12,
+    12.75,
+    13.5,
+    15,
+    16.5,
+    18,
+    19.5,
+    21,
+    24.3
+  ],
+  "fatigue_gate": {
+    "rms_log10_rate_error_max": 0.05,
+    "max_log10_rate_error_max": 0.1,
+    "global_slope_change_max": 0.15,
+    "adjacent_local_slope_change_max": 0.3,
+    "guard_contribution_diagnostic_eV": 0.005
+  },
+  "accessibility_primary": {
+    "KFP_300K": [
+      1,
+      50
+    ],
+    "zero_load_action_fraction_max": 0.001,
+    "AK_min": 0
+  },
+  "topology_accessible_fraction_min": 0.8,
+  "topology": {
+    "ceramic_ratio_max": 0.7,
+    "weak_ratio_max": 1.25,
+    "dbtt_transition_width_K_min": 100,
+    "dbtt_ratio_min": 1.5,
+    "peak_prominence_min": 0.15
+  },
+  "derivative_tolerances": {
+    "G_eV_abs": 2e-08,
+    "S_kB_abs": 2e-06,
+    "V_m3_abs": 1e-34,
+    "Maxwell_m3_per_K_abs": 1e-34,
+    "relative": 2e-05
+  },
+  "stage_limits": {
+    "full_F0": 5000,
+    "F1": 500,
+    "deltaCp_parents": 128,
+    "deltaCp_variants": 32768
+  },
+  "F2": "STATE_CLOSURE_UNAVAILABLE"
+}
