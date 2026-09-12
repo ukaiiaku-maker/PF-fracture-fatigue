@@ -179,13 +179,29 @@ delta-a-nonconverged, incomplete/uncertified, and sign-inconsistent families;
 distinct and shared process owners; fail-before-solve owner rejection; and the
 expected/unexpected exception taxonomy.  The retained real child continuation
 appears exactly once.  Local bounded verification passed all 14 non-continuation
-nodes together and the one retained continuation separately.  The clean-worker
-record will be appended after the dedicated exact-head workflow completes.
+nodes together and the one retained continuation separately.
+
+The final exact-head clean-worker attestation is complete:
+
+- workflow/attestation SHA: `c7583ecd0a259f28ce92780833d21a358a920f45`;
+- dedicated run: `34665060866`, terminal **SUCCESS** in 4m17s;
+- frozen collection: **15/15 unique explicit nodes**;
+- result: **15 passed / 0 failed / 0 errors / 0 skipped** in 232.42 seconds;
+- retained real child-continuation invocation: **PASS_ONCE** in 136.33 seconds;
+- seven convergence-diagnostic records captured;
+- compile, clean-worktree, workflow-only diff, and final-classification checks:
+  **PASS**;
+- artifact:
+  `v5-bounded-hybrid-directional-drive-c7583ecd0a259f28ce92780833d21a358a920f45`
+  (artifact ID `10288995754`, 7,775 bytes), digest
+  `sha256:ea75d477c82e52c5b836fd1204d753f78c5b98eea8a75f5d4da250394f46f3aa`;
+- automatically triggered runs `34665068255`, `34665060892`, `34665061045`,
+  and `34665060880` are terminal
+  `CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE`.
 
 ## Terminal classifications
 
-The implementation classifications, pending the final dedicated exact-head
-clean-worker attestation, are:
+The final exact-head clean-worker classifications are:
 
 ```text
 DIRECTIONAL_CRACK_DRIVE_PROVIDER = PASS_HYBRID_LOCAL_J_AND_CONVERGED_EXACT_MARGINAL_G
