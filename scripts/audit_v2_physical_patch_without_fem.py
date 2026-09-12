@@ -64,6 +64,8 @@ def _sha256(path: Path) -> str:
 def _stable_diagnostic(value):
     """Remove irrelevant BLAS/SVD last-bit variation from diagnostic replay."""
     if isinstance(value, float):
+        if abs(value) < 1.0e-18:
+            return 0.0
         return float(format(value, ".14g"))
     if isinstance(value, list):
         return [_stable_diagnostic(item) for item in value]
