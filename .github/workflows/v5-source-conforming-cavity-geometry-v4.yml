@@ -1,27 +1,32 @@
-name: V5 unified cavity source recovery V3
+name: V5 source-conforming cavity geometry V4
 
 on:
+  push:
+    branches:
+      - codex/v5-unified-fracture-multitip-voiding
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: v5-unified-cavity-source-recovery-v3-${{ github.ref }}
+  group: v5-source-conforming-cavity-geometry-v4-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  bounded-recovery-v3:
+  bounded-source-conforming-v4:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      VOIDING_V5_SOURCE_COMMIT: b358b9f180b9c288c192911a6aa6b15ee4dcb07b
     steps:
       - name: Initialize bounded attestation directory
         run: |
-          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-cavity-source-recovery-v3" >> "$GITHUB_ENV"
-          echo "MPLCONFIGDIR=${RUNNER_TEMP}/matplotlib-v5-cavity-source-recovery-v3" >> "$GITHUB_ENV"
+          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-source-conforming-v4" >> "$GITHUB_ENV"
+          echo "MPLCONFIGDIR=${RUNNER_TEMP}/matplotlib-v5-source-conforming-v4" >> "$GITHUB_ENV"
           mkdir -p \
-            "${RUNNER_TEMP}/v5-cavity-source-recovery-v3" \
-            "${RUNNER_TEMP}/matplotlib-v5-cavity-source-recovery-v3"
+            "${RUNNER_TEMP}/v5-source-conforming-v4" \
+            "${RUNNER_TEMP}/matplotlib-v5-source-conforming-v4"
 
       - name: Partial sparse checkout of bounded inputs
         env:
@@ -39,12 +44,16 @@ jobs:
             /artifacts/voiding_v5_finalization_v2/checkpoints/connected_before_downstream.json.state.pkl \
             /artifacts/v5_cavity_source_recovery_v2/attestation.json \
             /artifacts/v5_cavity_source_recovery_v3/ \
+            /artifacts/v5_cavity_source_recovery_v4/ \
             /scripts/audit_v2_physical_patch_without_fem.py \
             /scripts/attest_cavity_source_recovery_v3_dbtt.py \
+            /scripts/attest_cavity_source_conforming_v4_dbtt.py \
+            /scripts/build_cavity_source_geometry_v4_contract.py \
             /scripts/build_v5_unified_lineage_records.py \
             /tests/__init__.py \
             /tests/test_v5_unified_model_lineage.py \
             /tests/test_cavity_source_recovery_v3.py \
+            /tests/test_cavity_source_conforming_geometry_v4.py \
             /V5_UNIFIED_MODEL_LINEAGE.md \
             /V5_VOIDING_EXTENSION_DELTA.md \
             /v5_unified_model_lineage.json \
@@ -78,32 +87,44 @@ jobs:
         run: |
           python -m compileall -q \
             arrhenius_fracture \
-            scripts/audit_v2_physical_patch_without_fem.py \
-            scripts/attest_cavity_source_recovery_v3_dbtt.py \
+            scripts/attest_cavity_source_conforming_v4_dbtt.py \
+            scripts/build_cavity_source_geometry_v4_contract.py \
             scripts/build_v5_unified_lineage_records.py \
             tests/test_v5_unified_model_lineage.py \
-            tests/test_cavity_source_recovery_v3.py
+            tests/test_cavity_source_recovery_v3.py \
+            tests/test_cavity_source_conforming_geometry_v4.py
 
-      - name: Collect exactly twenty-two bounded tests
+      - name: Invoke one central DBTT V4 evaluation and verify ledgers
+        run: |
+          set -euo pipefail
+          python scripts/attest_cavity_source_conforming_v4_dbtt.py \
+            | tee "$ATTESTATION_DIR/central-dbtt-v4.log"
+          python scripts/build_cavity_source_geometry_v4_contract.py
+          python scripts/build_v5_unified_lineage_records.py
+          git diff --exit-code
+
+      - name: Collect exactly thirty-six bounded tests
         run: |
           set -euo pipefail
           TEST_FILES=(
             tests/test_v5_unified_model_lineage.py
             tests/test_cavity_source_recovery_v3.py
+            tests/test_cavity_source_conforming_geometry_v4.py
           )
           python -m pytest --collect-only -q -p no:cacheprovider "${TEST_FILES[@]}" \
             | tee "$ATTESTATION_DIR/collect-only.log"
           grep -E '^[^[:space:]]+::' "$ATTESTATION_DIR/collect-only.log" \
             > "$ATTESTATION_DIR/collected-node-inventory.txt"
-          test "$(wc -l < "$ATTESTATION_DIR/collected-node-inventory.txt" | tr -d ' ')" = 22
+          test "$(wc -l < "$ATTESTATION_DIR/collected-node-inventory.txt" | tr -d ' ')" = 36
 
-      - name: Run bounded lineage, V3 recovery, and one DBTT readiness invocation
+      - name: Run bounded lineage, geometry, V3 regression, and V4 record tests
         id: bounded_tests
         run: |
           set -euo pipefail
           TEST_FILES=(
             tests/test_v5_unified_model_lineage.py
             tests/test_cavity_source_recovery_v3.py
+            tests/test_cavity_source_conforming_geometry_v4.py
           )
           python -m pytest -vv -p no:cacheprovider \
             --junitxml="$ATTESTATION_DIR/pytest-junit.xml" "${TEST_FILES[@]}" \
@@ -121,39 +142,33 @@ jobs:
           print(f"errors={totals['errors']}")
           print(f"skipped={totals['skipped']}")
           PY
-          grep -Fxq 'tests=22' "$ATTESTATION_DIR/pytest-counts.txt"
-          grep -Fxq 'passed=22' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'tests=36' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'passed=36' "$ATTESTATION_DIR/pytest-counts.txt"
 
-      - name: Verify ledger consistency and clean worker
+      - name: Verify clean bounded worker
         if: always()
         env:
           TEST_OUTCOME: ${{ steps.bounded_tests.outcome }}
         run: |
           set -euo pipefail
-          python scripts/audit_v2_physical_patch_without_fem.py
-          python scripts/build_v5_unified_lineage_records.py
-          git diff --exit-code
           git diff --check
           test -z "$(git status --porcelain=v1)"
           {
             echo "workflow_sha=$GITHUB_SHA"
             echo "bounded_test_step_outcome=$TEST_OUTCOME"
-            echo 'bounded_test_count=22'
-            echo 'CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL=FAIL_NONCONVERGENT'
-            echo 'CAVITY_FIXED_ARC_PATCH_RECOVERY_V2_MANUFACTURED_AND_KIRSCH=PASS'
-            echo 'DBTT_V2_CAVITY_TRACTION=PASS'
-            echo 'DBTT_V2_FIXED_ARC_TENSOR_CONVERGENCE=FAIL'
-            echo 'V2_ETA_N_AND_ETA_T_TAXONOMY=B_STILL_MANDATORY_V2_GATES'
-            echo 'CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3_MANUFACTURED_AND_KIRSCH=PASS'
-            echo 'DBTT_SOURCE_READINESS=BLOCKED_WITH_EXACT_V3_FAILURE_CLASS'
-            echo 'V3_FAILURE_CLASS=SOURCE_GEOMETRY_IDENTITY'
-            echo 'V3_REFINEMENT_LEVELS_RUN=0'
+            echo 'bounded_test_count=36'
+            echo 'V1_INCIDENT_CST_RECOVERY=FAIL_NONCONVERGENT'
+            echo 'V2_TWO_RING_RECOVERY=PASS_MANUFACTURED_AND_KIRSCH'
+            echo 'V3_OPERATOR_MANUFACTURED_AND_KIRSCH=PASS'
+            echo 'V3_CENTRAL_DBTT_GEOMETRY_REGISTRATION=FAIL_POLYGON_VERTEX_VS_NOMINAL_CIRCLE'
+            echo 'V3_CENTRAL_DBTT_TENSOR_CONVERGENCE=NOT_RUN'
+            echo 'V4_SOURCE_CONFORMING_GEOMETRY=PASS_GEOMETRY_REGISTRATION'
+            echo 'V4_CENTRAL_DBTT_TENSOR_CONVERGENCE=PASS'
+            echo 'DBTT_SOURCE_READINESS=BLOCKED_WITH_EXACT_V4_FAILURE_CLASS'
+            echo 'V4_FAILURE_CLASS=NORMAL_DIRECTION_RESOLUTION+TANGENTIAL_DIRECTION_RESOLUTION+MESH_QUALITY'
             echo 'ORACLE_STATES_ACCEPTED=0/18'
             echo 'PAIRED_TRAJECTORIES_RUN=0/12'
             echo 'FATIGUE_IMPLEMENTATION=NOT_STARTED_BY_CONTRACT'
-            echo 'NEXT_BOUNDED_STEP=DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE'
-            echo 'core_physics_changed=false'
-            echo 'scientific_tolerances_changed=false'
             echo 'clean_worktree=PASS'
             echo 'diff_check=PASS'
           } | tee "$ATTESTATION_DIR/classifications.txt"
@@ -162,7 +177,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v5-cavity-source-recovery-v3-${{ github.sha }}
-          path: ${{ runner.temp }}/v5-cavity-source-recovery-v3/
+          name: v5-source-conforming-cavity-geometry-v4-${{ github.sha }}
+          path: ${{ runner.temp }}/v5-source-conforming-v4/
           if-no-files-found: error
           retention-days: 14

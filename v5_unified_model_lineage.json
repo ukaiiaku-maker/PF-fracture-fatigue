@@ -577,11 +577,19 @@
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v4/central_dbtt_v4_readiness.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "artifacts/v5_cavity_source_recovery_v4/v3_geometry_diagnosis.json"
     },
     {
       "classification": "BENCHMARK_ONLY",
       "path": "artifacts/v5_cavity_source_recovery_v4/v4_geometry_contract.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "scripts/attest_cavity_source_conforming_v4_dbtt.py"
     },
     {
       "classification": "BENCHMARK_ONLY",
