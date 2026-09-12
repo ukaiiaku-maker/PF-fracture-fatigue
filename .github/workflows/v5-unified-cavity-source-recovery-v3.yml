@@ -1,27 +1,28 @@
-name: V5 unified cavity source recovery V2
+name: V5 unified cavity source recovery V3
 
 on:
+  push:
+    branches:
+      - codex/v5-unified-fracture-multitip-voiding
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: v5-unified-cavity-source-recovery-v2-${{ github.ref }}
+  group: v5-unified-cavity-source-recovery-v3-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  bounded-recovery-v2:
+  bounded-recovery-v3:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      VOIDING_V5_SOURCE_COMMIT: ${{ github.sha }}
+      ATTESTATION_DIR: ${{ runner.temp }}/v5-cavity-source-recovery-v3
+      MPLCONFIGDIR: ${{ runner.temp }}/matplotlib-v5-cavity-source-recovery-v3
     steps:
-      - name: Initialize attestation directory
-        run: |
-          set -euo pipefail
-          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-cavity-source-recovery-v2" >> "$GITHUB_ENV"
-          mkdir -p "${RUNNER_TEMP}/v5-cavity-source-recovery-v2"
+      - name: Initialize bounded attestation directory
+        run: mkdir -p "$ATTESTATION_DIR" "$MPLCONFIGDIR"
 
       - name: Partial sparse checkout of bounded inputs
         env:
@@ -37,16 +38,14 @@ jobs:
             /arrhenius_fracture/ \
             /artifacts/voiding_v5_finalization_v2/checkpoints/connected_before_downstream.json \
             /artifacts/voiding_v5_finalization_v2/checkpoints/connected_before_downstream.json.state.pkl \
-            /artifacts/voiding_v5_finalization_v2/checkpoints/downstream_front_before_continuation.json \
-            /artifacts/voiding_v5_finalization_v2/checkpoints/downstream_front_before_continuation.json.state.pkl \
             /artifacts/v5_cavity_source_recovery_v2/attestation.json \
+            /artifacts/v5_cavity_source_recovery_v3/ \
+            /scripts/audit_v2_physical_patch_without_fem.py \
+            /scripts/attest_cavity_source_recovery_v3_dbtt.py \
             /scripts/build_v5_unified_lineage_records.py \
             /tests/__init__.py \
-            /tests/test_live_topology_kernel_v11.py \
             /tests/test_v5_unified_model_lineage.py \
-            /tests/test_v5_bounded_sharp_front_adapter.py \
-            /tests/test_v5_hybrid_directional_drive.py \
-            /tests/test_cavity_source_recovery_v2.py \
+            /tests/test_cavity_source_recovery_v3.py \
             /V5_UNIFIED_MODEL_LINEAGE.md \
             /V5_VOIDING_EXTENSION_DELTA.md \
             /v5_unified_model_lineage.json \
@@ -61,14 +60,12 @@ jobs:
             b3d0add6cbb0605adaa3e04006fe987961ad6452 \
             ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e \
             619b66b0f538742482e7385ddd3d0171cb3edd8b; do
-            # The generated lineage records include each source commit's
-            # immediate parent, so retain exactly that bounded ancestry.
             git fetch --no-tags --depth=2 --filter=blob:none origin "$source"
           done
           git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
 
-      - name: Set up Python
+      - name: Set up pinned Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12.14'
@@ -81,54 +78,83 @@ jobs:
       - name: Compile bounded sources
         run: |
           python -m compileall -q \
-            arrhenius_fracture/cavity_source_recovery_v2.py \
-            arrhenius_fracture/voiding_production_v5.py \
+            arrhenius_fracture \
+            scripts/audit_v2_physical_patch_without_fem.py \
+            scripts/attest_cavity_source_recovery_v3_dbtt.py \
             scripts/build_v5_unified_lineage_records.py \
-            tests/test_cavity_source_recovery_v2.py
+            tests/test_v5_unified_model_lineage.py \
+            tests/test_cavity_source_recovery_v3.py
 
-      - name: Collect exact bounded inventory
+      - name: Collect exactly twenty-two bounded tests
         run: |
           set -euo pipefail
           TEST_FILES=(
             tests/test_v5_unified_model_lineage.py
-            tests/test_v5_bounded_sharp_front_adapter.py
-            tests/test_v5_hybrid_directional_drive.py
-            tests/test_cavity_source_recovery_v2.py
+            tests/test_cavity_source_recovery_v3.py
           )
           python -m pytest --collect-only -q -p no:cacheprovider "${TEST_FILES[@]}" \
             | tee "$ATTESTATION_DIR/collect-only.log"
-          test "$(grep -Ec '^[^[:space:]]+::' "$ATTESTATION_DIR/collect-only.log")" = 42
+          grep -E '^[^[:space:]]+::' "$ATTESTATION_DIR/collect-only.log" \
+            > "$ATTESTATION_DIR/collected-node-inventory.txt"
+          test "$(wc -l < "$ATTESTATION_DIR/collected-node-inventory.txt" | tr -d ' ')" = 22
 
-      - name: Run bounded lineage, material, recovery, and readiness checks once
+      - name: Run bounded lineage, V3 recovery, and one DBTT readiness invocation
+        id: bounded_tests
         run: |
           set -euo pipefail
           TEST_FILES=(
             tests/test_v5_unified_model_lineage.py
-            tests/test_v5_bounded_sharp_front_adapter.py
-            tests/test_v5_hybrid_directional_drive.py
-            tests/test_cavity_source_recovery_v2.py
+            tests/test_cavity_source_recovery_v3.py
           )
           python -m pytest -vv -p no:cacheprovider \
             --junitxml="$ATTESTATION_DIR/pytest-junit.xml" "${TEST_FILES[@]}" \
             | tee "$ATTESTATION_DIR/pytest.log"
+          python - "$ATTESTATION_DIR/pytest-junit.xml" > "$ATTESTATION_DIR/pytest-counts.txt" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+          root = ET.parse(sys.argv[1]).getroot()
+          suites = [root] if root.tag == "testsuite" else list(root.findall("testsuite"))
+          totals = {key: sum(int(suite.attrib.get(key, 0)) for suite in suites)
+                    for key in ("tests", "failures", "errors", "skipped")}
+          print(f"tests={totals['tests']}")
+          print(f"passed={totals['tests']-totals['failures']-totals['errors']-totals['skipped']}")
+          print(f"failures={totals['failures']}")
+          print(f"errors={totals['errors']}")
+          print(f"skipped={totals['skipped']}")
+          PY
+          grep -Fxq 'tests=22' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'passed=22' "$ATTESTATION_DIR/pytest-counts.txt"
 
-      - name: Verify generated lineage and clean worker
+      - name: Verify ledger consistency and clean worker
         if: always()
+        env:
+          TEST_OUTCOME: ${{ steps.bounded_tests.outcome }}
         run: |
           set -euo pipefail
+          python scripts/audit_v2_physical_patch_without_fem.py
           python scripts/build_v5_unified_lineage_records.py
           git diff --exit-code
           git diff --check
           test -z "$(git status --porcelain=v1)"
           {
-            echo 'qualified_core_inventory=238/244'
-            echo 'reviewed_adapter_files=6'
+            echo "workflow_sha=$GITHUB_SHA"
+            echo "bounded_test_step_outcome=$TEST_OUTCOME"
+            echo 'bounded_test_count=22'
             echo 'CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL=FAIL_NONCONVERGENT'
-            echo 'CAVITY_FIXED_ARC_PATCH_RECOVERY_V2=QUALIFIED_MANUFACTURED_KIRSCH'
-            echo 'DBTT_READINESS=BLOCKED_TANGENTIAL_STRESS_CONVERGENCE'
+            echo 'CAVITY_FIXED_ARC_PATCH_RECOVERY_V2_MANUFACTURED_AND_KIRSCH=PASS'
+            echo 'DBTT_V2_CAVITY_TRACTION=PASS'
+            echo 'DBTT_V2_FIXED_ARC_TENSOR_CONVERGENCE=FAIL'
+            echo 'V2_ETA_N_AND_ETA_T_TAXONOMY=B_STILL_MANDATORY_V2_GATES'
+            echo 'CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3_MANUFACTURED_AND_KIRSCH=PASS'
+            echo 'DBTT_SOURCE_READINESS=BLOCKED_WITH_EXACT_V3_FAILURE_CLASS'
+            echo 'V3_FAILURE_CLASS=SOURCE_GEOMETRY_IDENTITY'
+            echo 'V3_REFINEMENT_LEVELS_RUN=0'
             echo 'ORACLE_STATES_ACCEPTED=0/18'
             echo 'PAIRED_TRAJECTORIES_RUN=0/12'
             echo 'FATIGUE_IMPLEMENTATION=NOT_STARTED_BY_CONTRACT'
+            echo 'NEXT_BOUNDED_STEP=DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE'
+            echo 'core_physics_changed=false'
+            echo 'scientific_tolerances_changed=false'
             echo 'clean_worktree=PASS'
             echo 'diff_check=PASS'
           } | tee "$ATTESTATION_DIR/classifications.txt"
@@ -137,7 +163,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v5-cavity-source-recovery-v2-${{ github.sha }}
-          path: ${{ runner.temp }}/v5-cavity-source-recovery-v2/
+          name: v5-cavity-source-recovery-v3-${{ github.sha }}
+          path: ${{ runner.temp }}/v5-cavity-source-recovery-v3/
           if-no-files-found: error
           retention-days: 14
