@@ -1,0 +1,14 @@
+{
+  "N_theta": 32,
+  "R_vertex_m": 5.526612148069713e-05,
+  "R_vertex_minus_R_void_m": 2.6612148069713e-07,
+  "R_void_m": 5.5e-05,
+  "classifications": {
+    "V3_CENTRAL_DBTT_GEOMETRY_REGISTRATION": "FAIL_POLYGON_VERTEX_VS_NOMINAL_CIRCLE",
+    "V3_CENTRAL_DBTT_TENSOR_CONVERGENCE": "NOT_RUN",
+    "V3_OPERATOR_MANUFACTURED_AND_KIRSCH": "PASS"
+  },
+  "formula": "R_vertex=R_void/cos(pi/N_theta)",
+  "retained_v3_files_modified": false,
+  "schema": "v5.retained-v3-cavity-geometry-diagnosis/1"
+}
