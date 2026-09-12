@@ -121,6 +121,7 @@ void_extensions = {
 benchmark = {
     item for item in difference_paths
     if item.startswith("tests/") or item.startswith("scripts/")
+    or item.startswith(".github/workflows/")
     or item.endswith(".md") or item.endswith(".json")
     or item.endswith("v5_4_2_runtime_parity_v12.py")
 }
@@ -199,7 +200,7 @@ lineage = {
         "test_v5_unified_model_lineage": "14 passed",
         "test_v5_bounded_sharp_front_adapter": "6 passed",
         "test_v5_hybrid_directional_drive": "15 passed",
-        "test_cavity_source_recovery_v2": "6 passed",
+        "test_cavity_source_recovery_v2": "7 passed",
         "broad_campaigns_run": False,
     },
     "downstream_transfer_gate": "READY_FOR_SEPARATE_ONED_M2_RERUN",

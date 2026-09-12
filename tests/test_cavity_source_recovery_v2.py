@@ -146,3 +146,48 @@ def test_inadequate_support_fails_closed_as_scientific_unavailability():
             boundary_node=0, cavity_id="owned-cavity", cavity_center_m=(0.0, 0.0),
             cavity_radius_m=1.0, owned_boundary_edges=edges, solid_element_mask=solid,
         )
+
+
+def test_single_central_dbtt_readiness_case_fails_closed_after_three_levels():
+    from dataclasses import replace
+    from arrhenius_fracture.unified_fracture_material_v5 import material_bundle, require_bound_identity
+    from arrhenius_fracture.voiding_production_v5 import (
+        _cavity_resolution_binding,
+        deterministic_trajectory,
+        equilibrate_fixed_load_with_production_fem,
+        ligament_transaction,
+        refine_downstream_source,
+    )
+
+    bundle = material_bundle("DBTT")
+    preconnection, _ = deterministic_trajectory(bundle=bundle, stop_before_ligament=True)
+    loaded = equilibrate_fixed_load_with_production_fem(
+        replace(preconnection, displacement=preconnection.displacement * 2.0)
+    )
+    connected, ligament = ligament_transaction(loaded)
+    accepted_binding = _cavity_resolution_binding(connected)
+    accepted_clocks = (connected.competition, connected.rng_state)
+    qualified, audit = refine_downstream_source(
+        connected,
+        max_refinement_levels=3,
+        refinement_region="complete_cavity_ring",
+        quality_improvement="constrained_v1",
+    )
+    assert bundle.fracture_material_row_id == "v913_zeroD_sobol_0202500"
+    assert dict(require_bound_identity(connected))["material_bundle_id"] == bundle.bundle_id
+    assert ligament.accepted and ligament.energy_margin_J_per_m > 0.0
+    assert qualified is connected
+    assert _cavity_resolution_binding(qualified) == accepted_binding
+    assert (qualified.competition, qualified.rng_state) == accepted_clocks
+    assert audit["status"] == "SOURCE_TENSOR_UNQUALIFIED"
+    assert len(audit["attempts"]) == 3
+    final = audit["attempts"][-1]["proof"]
+    previous = np.asarray(final["previous_metrics"]["tensor_Pa"], dtype=float)
+    current = np.asarray(final["current_metrics"]["tensor_Pa"], dtype=float)
+    relative_change = np.linalg.norm(current - previous) / np.linalg.norm(current)
+    assert relative_change > TENSOR_RELATIVE_TOLERANCE
+    assert final["current_metrics"]["normalized_traction"] <= TRACTION_RESIDUAL_TOLERANCE
+    recovery = final["current_metrics"]["recovery_record"]
+    assert recovery["recovery_operator"] == RECOVERY_ID
+    assert recovery["design_rank"] == 3
+    assert recovery["design_condition"] <= MAXIMUM_DESIGN_CONDITION

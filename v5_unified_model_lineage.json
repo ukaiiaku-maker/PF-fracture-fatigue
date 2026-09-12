@@ -8,7 +8,7 @@
   },
   "bounded_validation": {
     "broad_campaigns_run": false,
-    "test_cavity_source_recovery_v2": "6 passed",
+    "test_cavity_source_recovery_v2": "7 passed",
     "test_v5_bounded_sharp_front_adapter": "6 passed",
     "test_v5_hybrid_directional_drive": "15 passed",
     "test_v5_unified_model_lineage": "14 passed"
@@ -211,6 +211,10 @@
   "file_differences": [
     {
       "classification": "BENCHMARK_ONLY",
+      "path": ".github/workflows/v5-unified-cavity-source-recovery-v2.yml"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "V5_UNIFIED_MODEL_LINEAGE.md"
     },
     {
@@ -252,6 +256,10 @@
     {
       "classification": "CORE_IDENTICAL",
       "path": "arrhenius_fracture/causal_sharp_wake_v11.py"
+    },
+    {
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/cavity_source_recovery_v2.py"
     },
     {
       "classification": "BRANCHING_EXTENSION",
@@ -439,7 +447,15 @@
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v2/attestation.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "scripts/build_v5_unified_lineage_records.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "tests/test_cavity_source_recovery_v2.py"
     },
     {
       "classification": "BENCHMARK_ONLY",
