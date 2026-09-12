@@ -24,6 +24,32 @@
       "test_count": 22,
       "workflow_head": "5f7ea04d10343ee5a49b6e750409de7c785da68d",
       "workflow_run_id": 34719718024
+    },
+    "v4_cancelled_scope_control_runs": [
+      {
+        "classification": "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE",
+        "name": "v10 sharp-front MPZ CI",
+        "run_id": 34723715321
+      },
+      {
+        "classification": "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE",
+        "name": "v10 sharp-front MPZ CI",
+        "run_id": 34723836397
+      }
+    ],
+    "v4_worker": {
+      "artifact_digest": "sha256:70666a9df0c0b43e2b358059cc8960fb88d01db28bf5165c929c5323456199f3",
+      "artifact_id": 10307550298,
+      "artifact_name": "v5-source-conforming-cavity-geometry-v4-b12e21b5c7485c490bf0cb5139feb2d736844a16",
+      "conclusion": "success",
+      "job_count": 1,
+      "job_id": 103634364801,
+      "name": "V5 source-conforming cavity geometry V4",
+      "run_id": 34723836462,
+      "run_url": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue/actions/runs/34723836462",
+      "tests_collected": 36,
+      "tests_passed": 36,
+      "workflow_head": "b12e21b5c7485c490bf0cb5139feb2d736844a16"
     }
   },
   "branches": {

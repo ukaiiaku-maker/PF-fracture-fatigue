@@ -318,6 +318,20 @@ def test_10_reports_encode_terminal_passes_and_no_unresolved_core_divergence():
     assert worker["job_count"] == 1
     assert worker["test_count"] == worker["passed"] == 22
     assert worker["conclusion"] == "success"
+    v4_worker = lineage["bounded_validation"]["v4_worker"]
+    assert v4_worker["workflow_head"] == "b12e21b5c7485c490bf0cb5139feb2d736844a16"
+    assert v4_worker["run_id"] == 34723836462
+    assert v4_worker["job_count"] == 1
+    assert v4_worker["tests_collected"] == v4_worker["tests_passed"] == 36
+    assert v4_worker["conclusion"] == "success"
+    assert v4_worker["artifact_id"] == 10307550298
+    assert v4_worker["artifact_digest"] == (
+        "sha256:70666a9df0c0b43e2b358059cc8960fb88d01db28bf5165c929c5323456199f3"
+    )
+    cancelled = lineage["bounded_validation"]["v4_cancelled_scope_control_runs"]
+    assert {item["run_id"] for item in cancelled} == {34723715321, 34723836397}
+    assert all(item["classification"] == "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE"
+               for item in cancelled)
 
 
 def test_10b_v2_patch_audit_is_geometry_only_and_records_shrinking_footprint():

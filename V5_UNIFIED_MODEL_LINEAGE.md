@@ -92,4 +92,10 @@ The oracle remains `0/18`; point-source numerical development stops. A finite
 activation-zone work observable is outside this mission and may be formulated
 separately.
 
+The one-job V4 clean worker at `b12e21b5c7485c490bf0cb5139feb2d736844a16`
+passed all 36 bounded tests in run `34723836462`. Artifact `10307550298` has
+digest `sha256:70666a9df0c0b43e2b358059cc8960fb88d01db28bf5165c929c5323456199f3`.
+Automatically triggered broad repository runs were cancelled as
+`CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE`.
+
 No paired temperature trajectory or fatigue run belongs to this checkpoint.

@@ -150,6 +150,8 @@ for item in difference_paths:
 v4_readiness = json.loads(
     (ROOT / "artifacts/v5_cavity_source_recovery_v4/central_dbtt_v4_readiness.json").read_text()
 )
+v4_attestation_path = ROOT / "artifacts/v5_cavity_source_recovery_v4/attestation.json"
+v4_attestation = json.loads(v4_attestation_path.read_text()) if v4_attestation_path.exists() else None
 
 lineage = {
     "schema": "v5.unified-model-lineage/1",
@@ -279,6 +281,10 @@ lineage = {
             "artifact_id": 10305429296,
             "artifact_digest": "sha256:1ba6ac364d3c168a160e277fbb457124d8868704e3560d49f2aff7830bc54883",
         },
+        "v4_worker": None if v4_attestation is None else v4_attestation["bounded_worker"],
+        "v4_cancelled_scope_control_runs": (
+            [] if v4_attestation is None else v4_attestation["cancelled_scope_control_runs"]
+        ),
         "broad_campaigns_run": False,
     },
     "downstream_transfer_gate": "BLOCKED_CENTRAL_DBTT_V4_RESOLUTION_AND_QUALITY",
@@ -394,6 +400,12 @@ and global mesh quality at the final level. Its exact failure classification is
 The oracle remains `0/18`; point-source numerical development stops. A finite
 activation-zone work observable is outside this mission and may be formulated
 separately.
+
+The one-job V4 clean worker at `b12e21b5c7485c490bf0cb5139feb2d736844a16`
+passed all 36 bounded tests in run `34723836462`. Artifact `10307550298` has
+digest `sha256:70666a9df0c0b43e2b358059cc8960fb88d01db28bf5165c929c5323456199f3`.
+Automatically triggered broad repository runs were cancelled as
+`CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE`.
 
 No paired temperature trajectory or fatigue run belongs to this checkpoint.
 """
