@@ -293,15 +293,26 @@ def test_10_reports_encode_terminal_passes_and_no_unresolved_core_divergence():
     ]
     v3 = lineage["cavity_source_recovery"]["v3_frozen_operator"]
     assert v3["manufactured_and_kirsch"] == "PASS"
-    assert v3["central_dbtt"] == "BLOCKED_WITH_EXACT_V3_FAILURE_CLASS"
-    assert v3["exact_v3_failure_class"] == ["SOURCE_GEOMETRY_IDENTITY"]
+    assert v3["central_dbtt_geometry_registration"] == "FAIL_POLYGON_VERTEX_VS_NOMINAL_CIRCLE"
+    assert v3["central_dbtt_tensor_convergence"] == "NOT_RUN"
+    assert v3["exact_v3_failure_class"] == ["FAIL_POLYGON_VERTEX_VS_NOMINAL_CIRCLE"]
     assert v3["refinement_levels_run"] == 0
     assert lineage["cavity_source_recovery"]["active_operator"] == (
         "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3"
     )
+    v4 = lineage["cavity_source_recovery"]["v4_source_conforming_geometry"]
+    assert v4["contract"] == "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4"
+    assert v4["central_dbtt"] == "BLOCKED_WITH_EXACT_V4_FAILURE_CLASS"
+    assert v4["exact_v4_failure_class"] == [
+        "NORMAL_DIRECTION_RESOLUTION", "TANGENTIAL_DIRECTION_RESOLUTION", "MESH_QUALITY"
+    ]
+    assert v4["geometry_registration"] == "PASS"
+    assert v4["tensor_convergence"] == "PASS"
+    assert v4["traction"] == "PASS"
+    assert v4["oracle_states_accepted"] == 0
     assert lineage["oracle_states_accepted"] == 0
     assert lineage["paired_trajectories_run"] == 0
-    assert lineage["next_bounded_step"] == "DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE"
+    assert lineage["next_bounded_step"] == "SEPARATELY_FORMULATE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE"
     worker = lineage["bounded_validation"]["v3_worker"]
     assert worker["workflow_run_id"] == 34719718024
     assert worker["job_count"] == 1

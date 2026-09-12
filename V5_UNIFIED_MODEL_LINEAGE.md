@@ -28,6 +28,7 @@ The retained V5 source differed materially in the front, FEM/source, process-own
 | hybrid void directional drive | `arrhenius_fracture/hybrid_directional_drive_v5.py` | `VOIDING_EXTENSION` |
 | fixed-arc cavity source recovery V2 | `arrhenius_fracture/cavity_source_recovery_v2.py` | `VOIDING_EXTENSION` |
 | fixed-physical-arc cavity source recovery V3 | `arrhenius_fracture/cavity_source_recovery_v3.py` | `VOIDING_EXTENSION` |
+| source-conforming cavity geometry V4 | `arrhenius_fracture/cavity_source_conforming_geometry_v4.py` | `VOIDING_EXTENSION` |
 | void state and kinetics | `arrhenius_fracture/voiding_v5.py` | `VOIDING_EXTENSION` |
 | void production driver | `arrhenius_fracture/voiding_production_v5.py` | `VOIDING_EXTENSION` |
 | unified material bundle/factory | `arrhenius_fracture/unified_fracture_material_v5.py` | `CORE_ADAPTER_ONLY` |
@@ -69,12 +70,26 @@ are each `0.5*min(R_void,L_pz)`. Its quadratic curvilinear WLS fit enforces
 `sigma_nn(s,0)=sigma_nt(s,0)=0`; its bounded manufactured, Kirsch, rotation,
 edge-order, and reflection tests pass before the central DBTT evaluation.
 
-The single central DBTT V3 evaluation fails closed as
-`SOURCE_GEOMETRY_IDENTITY`: the exact owned polygon source coordinate is
+The single central DBTT V3 evaluation fails before recovery as
+`FAIL_POLYGON_VERTEX_VS_NOMINAL_CIRCLE`: the exact owned polygon source coordinate is
 `0.2661214806971317 um` outside the nominal circular radius, beyond the frozen
-V3 geometry-identity tolerance. No V3 refinement level ran, the accepted state
-and clocks remained unchanged, and the oracle remains `0/18`. Further
-point-source refinement stops here; the next separately derived candidate is a
-finite activation-zone work observable.
+V3 geometry-identity tolerance. V3 tensor convergence is `NOT_RUN`; this is not
+a failed V3 stress-recovery result.
+
+The prospective `CAVITY_SOURCE_CONFORMING_GEOMETRY_V4` contract rotates the
+circumscribed polygon to center a facet on the source ray, splits that facet at
+the exact nominal-circle point, and certifies a degree-two collinear node with
+one-owner incident boundary edges. Both aligned near and far points satisfy the
+contract. Cavity area and kinetics continue to use the nominal circle; the
+actual polygon is only the FEM boundary.
+
+The bounded 32/64/128 central DBTT V4 evaluation passes geometry registration,
+successive tensor convergence, traction, physical-window identity, and patch
+conditioning. It fails closed on mandatory normal and tangential resolution
+and global mesh quality at the final level. Its exact failure classification is
+`NORMAL_DIRECTION_RESOLUTION + TANGENTIAL_DIRECTION_RESOLUTION + MESH_QUALITY`.
+The oracle remains `0/18`; point-source numerical development stops. A finite
+activation-zone work observable is outside this mission and may be formulated
+separately.
 
 No paired temperature trajectory or fatigue run belongs to this checkpoint.

@@ -1,0 +1,357 @@
+{
+  "DBTT_SOURCE_READINESS": "BLOCKED_WITH_EXACT_V4_FAILURE_CLASS",
+  "accepted_input_state_unchanged_on_noncertification": true,
+  "accepted_material_identity_exact_across_levels": true,
+  "exact_v4_failure_class": [
+    "NORMAL_DIRECTION_RESOLUTION",
+    "TANGENTIAL_DIRECTION_RESOLUTION",
+    "MESH_QUALITY"
+  ],
+  "fatigue_started": false,
+  "fracture_material_row_id": "v913_zeroD_sobol_0202500",
+  "geometry": {
+    "cavity_center_m": [
+      0.0007,
+      0.0
+    ],
+    "connection_entry_m": [
+      0.000645,
+      1.5602085896855586e-20
+    ],
+    "connection_exit_m": [
+      0.000755,
+      0.0
+    ],
+    "nominal_cavity_radius_m": 5.5e-05
+  },
+  "geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+  "level_records": [
+    {
+      "N_theta": 32,
+      "accepted_input_state_fingerprint": "47fb47f27fcb3bd55871613e2556b991eb6d51ecfc18d89f55d084a50dd609eb",
+      "accepted_input_state_unchanged": true,
+      "angular_geometry_error_m": 2.661214806971249e-07,
+      "eta_n": 0.3989985538951308,
+      "eta_t": 0.19698280671433013,
+      "ligament_energy_gate": {
+        "accepted": true,
+        "energy_margin_J_per_m": 0.004533531903558824,
+        "energy_release_J_per_m": 0.006714805699739333,
+        "hazard_dissipation_J_per_m": 0.0021812737961805096
+      },
+      "material_identity_matches_reference": true,
+      "mechanical_binding": "35186a68995bb0f1c71858f6d34ad3a0eb5c86b27e501452d4f60c0de9060973",
+      "minimum_quality": 0.17103746754259488,
+      "normalized_cavity_traction": 0.0,
+      "patch_condition": {
+        "limit": 1000000.0,
+        "maximum": 30.585901208042465,
+        "sigma_nn": 7.139201076378897,
+        "sigma_nt": 7.139201076378897,
+        "sigma_tt": 30.585901208042465
+      },
+      "physical_geometry_matches_reference": true,
+      "physical_window_identity": "97f7965380c8c8d340b071c898f04d481d7c22c99911e795774b9ec0d0d47b0a",
+      "predicates": {
+        "cavity_traction": true,
+        "minimum_mesh_quality": true,
+        "normal_direction_resolution": false,
+        "patch_conditioning": true,
+        "physical_window_identity": true,
+        "source_geometry": true,
+        "tangential_direction_resolution": false,
+        "tensor_convergence": true
+      },
+      "radial_layers": 12,
+      "radial_mesh_error_eta_n": 0.3989985538951308,
+      "source_node_certificate": {
+        "boundary_node_id": 416,
+        "boundary_position_m": [
+          0.000755,
+          0.0
+        ],
+        "collinearity_residual": 0.0,
+        "degree": 2,
+        "geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+        "incident_boundary_edges": [
+          [
+            0,
+            416
+          ],
+          [
+            1,
+            416
+          ]
+        ],
+        "incident_solid_owner_counts": {
+          "0:416": 1,
+          "1:416": 1
+        },
+        "nominal_circle_radius_m": 5.5e-05,
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "radial_error_m": 3.3881317890172014e-20,
+        "schema": "v5.cavity-source-conforming-geometry/4",
+        "sha256": "d9763f3ae91daebe3e074da50924047c893e6010b4241010e2384dcd361c627a",
+        "tangent_xy": [
+          -0.0,
+          1.0
+        ],
+        "unique_tangent_and_outward_normal": true
+      },
+      "source_tensor_Pa": [
+        [
+          0.0,
+          -0.0
+        ],
+        [
+          -0.0,
+          816317860.984788
+        ]
+      ],
+      "tensor_relative_change_from_previous_level": null,
+      "thresholds_and_rng_match_reference": true
+    },
+    {
+      "N_theta": 64,
+      "accepted_input_state_fingerprint": "c078118224b278e6517db3508c9921f7c0ea99d4057cad7f45d01321650c13c1",
+      "accepted_input_state_unchanged": true,
+      "angular_geometry_error_m": 6.632980587159364e-08,
+      "eta_n": 0.19534012105008614,
+      "eta_t": 0.0982536995389361,
+      "ligament_energy_gate": {
+        "accepted": true,
+        "energy_margin_J_per_m": 0.007386936316666122,
+        "energy_release_J_per_m": 0.009568210112846632,
+        "hazard_dissipation_J_per_m": 0.0021812737961805096
+      },
+      "material_identity_matches_reference": true,
+      "mechanical_binding": "99fa5a1f92dc1212e7495a461de41711d3ed72cebb6809133275281a1ae3a213",
+      "minimum_quality": 0.13516891585970464,
+      "normalized_cavity_traction": 0.0,
+      "patch_condition": {
+        "limit": 1000000.0,
+        "maximum": 27.983159459326142,
+        "sigma_nn": 7.186821257106288,
+        "sigma_nt": 7.186821257106288,
+        "sigma_tt": 27.983159459326142
+      },
+      "physical_geometry_matches_reference": true,
+      "physical_window_identity": "97f7965380c8c8d340b071c898f04d481d7c22c99911e795774b9ec0d0d47b0a",
+      "predicates": {
+        "cavity_traction": true,
+        "minimum_mesh_quality": true,
+        "normal_direction_resolution": false,
+        "patch_conditioning": true,
+        "physical_window_identity": true,
+        "source_geometry": true,
+        "tangential_direction_resolution": false,
+        "tensor_convergence": true
+      },
+      "radial_layers": 24,
+      "radial_mesh_error_eta_n": 0.19534012105008614,
+      "source_node_certificate": {
+        "boundary_node_id": 1600,
+        "boundary_position_m": [
+          0.000755,
+          0.0
+        ],
+        "collinearity_residual": 0.0,
+        "degree": 2,
+        "geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+        "incident_boundary_edges": [
+          [
+            0,
+            1600
+          ],
+          [
+            1,
+            1600
+          ]
+        ],
+        "incident_solid_owner_counts": {
+          "0:1600": 1,
+          "1:1600": 1
+        },
+        "nominal_circle_radius_m": 5.5e-05,
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "radial_error_m": 3.3881317890172014e-20,
+        "schema": "v5.cavity-source-conforming-geometry/4",
+        "sha256": "b2fdad176e1a74be60e99be16dc1f5772fc7071a2f021a54352f1f3309144ed7",
+        "tangent_xy": [
+          -0.0,
+          1.0
+        ],
+        "unique_tangent_and_outward_normal": true
+      },
+      "source_tensor_Pa": [
+        [
+          0.0,
+          -0.0
+        ],
+        [
+          -0.0,
+          790460332.4455984
+        ]
+      ],
+      "tensor_relative_change_from_previous_level": 0.032711987531606035,
+      "thresholds_and_rng_match_reference": true
+    },
+    {
+      "N_theta": 128,
+      "accepted_input_state_fingerprint": "eb1777b046750a348e93a2ee533efdddaa17fd67043020c56e7a22779fadff20",
+      "accepted_input_state_unchanged": true,
+      "angular_geometry_error_m": 1.656996227160796e-08,
+      "eta_n": 0.09543819890514414,
+      "eta_t": 0.049097244217852845,
+      "ligament_energy_gate": {
+        "accepted": true,
+        "energy_margin_J_per_m": 0.008748620623191117,
+        "energy_release_J_per_m": 0.010929894419371627,
+        "hazard_dissipation_J_per_m": 0.0021812737961805096
+      },
+      "material_identity_matches_reference": true,
+      "mechanical_binding": "ee32734cd6900c2c968f730b9713e8edbd5c6131ba3cf31c3d968ed86710f220",
+      "minimum_quality": 0.01211501008373052,
+      "normalized_cavity_traction": 0.0,
+      "patch_condition": {
+        "limit": 1000000.0,
+        "maximum": 27.432313977297778,
+        "sigma_nn": 7.201050379093442,
+        "sigma_nt": 7.201050379093442,
+        "sigma_tt": 27.432313977297778
+      },
+      "physical_geometry_matches_reference": true,
+      "physical_window_identity": "97f7965380c8c8d340b071c898f04d481d7c22c99911e795774b9ec0d0d47b0a",
+      "predicates": {
+        "cavity_traction": true,
+        "minimum_mesh_quality": false,
+        "normal_direction_resolution": false,
+        "patch_conditioning": true,
+        "physical_window_identity": true,
+        "source_geometry": true,
+        "tangential_direction_resolution": false,
+        "tensor_convergence": true
+      },
+      "radial_layers": 48,
+      "radial_mesh_error_eta_n": 0.09543819890514414,
+      "source_node_certificate": {
+        "boundary_node_id": 6272,
+        "boundary_position_m": [
+          0.000755,
+          0.0
+        ],
+        "collinearity_residual": 0.0,
+        "degree": 2,
+        "geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+        "incident_boundary_edges": [
+          [
+            0,
+            6272
+          ],
+          [
+            1,
+            6272
+          ]
+        ],
+        "incident_solid_owner_counts": {
+          "0:6272": 1,
+          "1:6272": 1
+        },
+        "nominal_circle_radius_m": 5.5e-05,
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "radial_error_m": 3.3881317890172014e-20,
+        "schema": "v5.cavity-source-conforming-geometry/4",
+        "sha256": "5aec8551bda484a5e40b10a1809affce520789209edd0b13c4a86918d832394c",
+        "tangent_xy": [
+          -0.0,
+          1.0
+        ],
+        "unique_tangent_and_outward_normal": true
+      },
+      "source_tensor_Pa": [
+        [
+          0.0,
+          -0.0
+        ],
+        [
+          -0.0,
+          785107254.8176461
+        ]
+      ],
+      "tensor_relative_change_from_previous_level": 0.006818275586047867,
+      "thresholds_and_rng_match_reference": true
+    }
+  ],
+  "levels_requested": [
+    {
+      "N_theta": 32,
+      "radial_layers": 12
+    },
+    {
+      "N_theta": 64,
+      "radial_layers": 24
+    },
+    {
+      "N_theta": 128,
+      "radial_layers": 48
+    }
+  ],
+  "levels_run": 3,
+  "material_class": "DBTT",
+  "material_identity": {
+    "FrontConfig_fingerprint": "1237d55a97fe33301a13a64d5cab80bd79737f08bd8f918e34dc3830b2038152",
+    "cleavage_barrier_fingerprint": "4a3b6f59846bf3b0140f61b6b83cb44b8f4c40eb83ee30bc382e4b338b75a05f",
+    "core_model_id": "v13.current-source-qualified-multitip/ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e",
+    "elasticity_fingerprint": "f950f823cb066c03da0d817c42716bd30911bb8c6eac1477bf174403985cd4ff",
+    "emission_barrier_fingerprint": "5cb8b5bcaf466e86fe6a30a1e61f153a5b10869dba96b2ec50eeb42af74ecf1e",
+    "material_bundle_id": "v5.unified-fracture-material-bundle/1:DBTT:c0759db2db3b09ec",
+    "material_bundle_sha256": "c0759db2db3b09ec6ebf3b2717d39396350e8cd89a37d25a9e5fb92738dcc2bc",
+    "plasticity_fingerprint": "c040927e3334994f724c9aa447c37979d0d11843e033ad28e1a0c8bbbcba1381",
+    "process_zone_fingerprint": "2b287cb57f41196795ceea01424d3405942ea951d2e6f7fd258a7394d81e5b11"
+  },
+  "missing_fields_inferred_or_synthesized": false,
+  "next_bounded_step": "STOP_POINT_SOURCE_DEVELOPMENT_AND_SEPARATELY_FORMULATE_ACTIVATION_ZONE_OBSERVABLE",
+  "opening_scale_from_4e-7_m": 2.0,
+  "oracle_generated_in_this_record": false,
+  "oracle_states_accepted": 0,
+  "paired_trajectories_run": 0,
+  "physical_geometry_exact_across_levels": true,
+  "preserved_v1_v2_v3": {
+    "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2_MANUFACTURED_AND_KIRSCH": "PASS",
+    "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
+    "V3_CENTRAL_DBTT_GEOMETRY_REGISTRATION": "FAIL_POLYGON_VERTEX_VS_NOMINAL_CIRCLE",
+    "V3_CENTRAL_DBTT_TENSOR_CONVERGENCE": "NOT_RUN",
+    "V3_OPERATOR_MANUFACTURED_AND_KIRSCH": "PASS"
+  },
+  "retained_initial_thresholds_and_rng_captured_unchanged_before_run": true,
+  "retained_physical_crack_path_m": [
+    [
+      0.0,
+      8.572527594031472e-20
+    ],
+    [
+      0.0005725993004046688,
+      1.5602085896855586e-20
+    ]
+  ],
+  "schema": "v5.central-dbtt-source-conforming-geometry-v4-readiness/1",
+  "scope": {
+    "fatigue_started": false,
+    "finite_activation_zone_observable_derived": false,
+    "paired_trajectories_run": false,
+    "r_tip_equals_R_void": false,
+    "r_tip_law_changed": false,
+    "scientific_tolerances_changed": false
+  },
+  "thresholds_and_rng_exact_across_levels": true,
+  "unexpected_programming_exceptions_caught": false
+}

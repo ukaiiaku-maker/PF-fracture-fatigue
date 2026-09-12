@@ -348,9 +348,21 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
     mesh = filled.mesh
     ray = 16
     if crack_path_m is None:
-        start = tuple(map(float, mesh.nodes[12 * 32 + ray]))
-        tip = tuple(map(float, mesh.nodes[3 * 32 + ray]))
+        path_mesh = mesh
+        if source_conforming_geometry:
+            _, retained_filled = _geometry(
+                center_m=cavity_center_m, boundary_segments=32, radial_layers=12,
+                source_conforming_geometry=False,
+            )
+            path_mesh = retained_filled.mesh
+        start = tuple(map(float, path_mesh.nodes[12 * 32 + ray]))
+        tip = tuple(map(float, path_mesh.nodes[3 * 32 + ray]))
         crack_path = (start, tip)
+        if source_conforming_geometry:
+            for point in crack_path:
+                mesh = _insert_point_in_mesh(mesh, point)
+                hole = replace(hole, mesh=_insert_point_in_mesh(hole.mesh, point))
+            filled = replace(filled, mesh=mesh)
     else:
         crack_path = tuple(tuple(map(float, point)) for point in crack_path_m)
         if len(crack_path) < 2:
@@ -702,6 +714,38 @@ def cavity_fixed_physical_arc_patch_recovery_v3(
         owned_boundary_edges=_actual_cavity_boundary_edges(state),
         material_fingerprints=identity,
         state_fingerprint=_cavity_resolution_binding(state),
+        solid_element_mask=solid,
+    )
+
+
+def cavity_source_conforming_recovery_v4(state, *, boundary_node: int | None = None):
+    """Apply V3 WLS only after the prospective V4 geometry certificate passes."""
+    from .cavity_source_conforming_geometry_v4 import recover_source_conforming_geometry_v4
+
+    cavity = state.void_state.cavities[0]
+    position = np.asarray(cavity.connection_exit_m, dtype=float)
+    if boundary_node is None:
+        boundary_node = int(
+            np.argmin(np.linalg.norm(np.asarray(state.mesh.nodes) - position, axis=1))
+        )
+    node = int(boundary_node)
+    if np.linalg.norm(np.asarray(state.mesh.nodes)[node] - position) > 1.0e-12:
+        raise ValueError("stored connection exit is not an aligned cavity-boundary node")
+    identity = dict(require_bound_identity(state))
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
+    _, _, sigma, *_ = assemble_mechanics(
+        state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
+    )
+    damage = getattr(state.mesh, "element_damage_gp", None)
+    solid = None if damage is None else np.asarray(damage, dtype=float) < 0.5
+    return recover_source_conforming_geometry_v4(
+        nodes=state.mesh.nodes, elements=state.mesh.elems, stress_Pa=sigma,
+        boundary_node=node, cavity_id=cavity.cavity_id,
+        cavity_center_m=cavity.center_m, cavity_radius_m=cavity.radius_m,
+        process_length_m=engine.f.L_pz, poisson_ratio=state.material.nu,
+        owned_boundary_edges=_actual_cavity_boundary_edges(state),
+        material_fingerprints=identity, state_fingerprint=_cavity_resolution_binding(state),
         solid_element_mask=solid,
     )
 
@@ -1330,12 +1374,17 @@ def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=
     return rates
 
 
-def cavity_source_resolution_metrics(state):
+def cavity_source_resolution_metrics(state, *, geometry_contract=None):
     """Source-native tensor and geometrical boundary-recovery diagnostics."""
     cavity = state.void_state.cavities[0]
     position = np.asarray(cavity.connection_exit_m)
     node = int(np.argmin(np.linalg.norm(state.mesh.nodes-position, axis=1)))
-    recovery = cavity_fixed_physical_arc_patch_recovery_v3(state, boundary_node=node)
+    if geometry_contract is None:
+        recovery = cavity_fixed_physical_arc_patch_recovery_v3(state, boundary_node=node)
+    elif geometry_contract == "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4":
+        recovery = cavity_source_conforming_recovery_v4(state, boundary_node=node)
+    else:
+        raise ValueError("unregistered cavity source geometry contract")
     tensor = np.asarray(recovery["tensor_Pa"], dtype=float)
     selected = tuple(map(int, recovery["stencil_element_ids"]))
     nodes = np.asarray(state.mesh.nodes); elems = np.asarray(state.mesh.elems)

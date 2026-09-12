@@ -260,3 +260,33 @@ def test_prospective_v4_contract_artifact_is_regenerated_exactly():
         "tensor_relative_max": 0.05,
         "angular_levels": [32, 64, 128],
     }
+
+
+def test_central_dbtt_v4_record_preserves_exact_bounded_failure():
+    record = json.loads(
+        (ROOT / "artifacts/v5_cavity_source_recovery_v4/central_dbtt_v4_readiness.json").read_text()
+    )
+    assert record["DBTT_SOURCE_READINESS"] == "BLOCKED_WITH_EXACT_V4_FAILURE_CLASS"
+    assert record["exact_v4_failure_class"] == [
+        "NORMAL_DIRECTION_RESOLUTION",
+        "TANGENTIAL_DIRECTION_RESOLUTION",
+        "MESH_QUALITY",
+    ]
+    assert record["levels_run"] == 3
+    assert [row["N_theta"] for row in record["level_records"]] == [32, 64, 128]
+    final = record["level_records"][-1]
+    assert final["tensor_relative_change_from_previous_level"] <= 0.05
+    assert final["normalized_cavity_traction"] <= 0.05
+    assert final["patch_condition"]["maximum"] <= final["patch_condition"]["limit"]
+    assert final["predicates"]["source_geometry"] is True
+    assert final["predicates"]["normal_direction_resolution"] is False
+    assert final["predicates"]["tangential_direction_resolution"] is False
+    assert final["predicates"]["minimum_mesh_quality"] is False
+    assert record["accepted_material_identity_exact_across_levels"] is True
+    assert record["physical_geometry_exact_across_levels"] is True
+    assert record["thresholds_and_rng_exact_across_levels"] is True
+    assert record["accepted_input_state_unchanged_on_noncertification"] is True
+    assert record["unexpected_programming_exceptions_caught"] is False
+    assert record["oracle_states_accepted"] == 0
+    assert record["paired_trajectories_run"] == 0
+    assert record["fatigue_started"] is False

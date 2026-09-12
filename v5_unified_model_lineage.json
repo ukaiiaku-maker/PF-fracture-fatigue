@@ -35,6 +35,7 @@
   },
   "cavity_source_recovery": {
     "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
+    "active_geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
     "active_operator": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
     "maximum_refinement_levels_for_dbtt_readiness": 3,
     "minimum_quality_valid_fine_levels": 2,
@@ -67,15 +68,36 @@
     },
     "v3_frozen_operator": {
       "accepted_pre_source_state_unchanged": true,
-      "central_dbtt": "BLOCKED_WITH_EXACT_V3_FAILURE_CLASS",
+      "central_dbtt_geometry_registration": "FAIL_POLYGON_VERTEX_VS_NOMINAL_CIRCLE",
+      "central_dbtt_tensor_convergence": "NOT_RUN",
       "exact_v3_failure_class": [
-        "SOURCE_GEOMETRY_IDENTITY"
+        "FAIL_POLYGON_VERTEX_VS_NOMINAL_CIRCLE"
       ],
       "manufactured_and_kirsch": "PASS",
       "physical_window": "abs(s)<=0.5*min(R_void,L_pz); 0<=n<=0.5*min(R_void,L_pz)",
       "polynomial_order": 2,
       "refinement_levels_run": 0,
       "traction_free_boundary": "sigma_nn(s,0)=sigma_nt(s,0)=0"
+    },
+    "v4_source_conforming_geometry": {
+      "angular_levels": [
+        32,
+        64,
+        128
+      ],
+      "central_dbtt": "BLOCKED_WITH_EXACT_V4_FAILURE_CLASS",
+      "contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+      "exact_v4_failure_class": [
+        "NORMAL_DIRECTION_RESOLUTION",
+        "TANGENTIAL_DIRECTION_RESOLUTION",
+        "MESH_QUALITY"
+      ],
+      "geometry_registration": "PASS",
+      "levels_run": 3,
+      "oracle_states_accepted": 0,
+      "tensor_convergence": "PASS",
+      "traction": "PASS",
+      "v3_fixed_physical_window_wls_reused_unchanged": true
     }
   },
   "commits": {
@@ -240,6 +262,15 @@
     {
       "canonical_single_tip_blob": null,
       "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/cavity_source_conforming_geometry_v4.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "9d17bb9ec46d95bd503529f85496e5913b06b963",
+      "retained_v5_blob": null,
+      "role": "source-conforming cavity geometry V4"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/voiding_v5.py",
       "qualified_multitip_blob": null,
       "restored_worktree_blob": "3c7754bf2d4e3d6dd9f22644b3b2cbd40be5019c",
@@ -251,7 +282,7 @@
       "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/voiding_production_v5.py",
       "qualified_multitip_blob": null,
-      "restored_worktree_blob": "0ac1f0b53830788b68e87a87570d7f6416fc35b4",
+      "restored_worktree_blob": "0f790888d5825d2e958d38513c55e9a1e78abe64",
       "retained_v5_blob": "31dfcada0efc4638d8ca7fbdb626cb69cb140b22",
       "role": "void production driver"
     },
@@ -266,7 +297,7 @@
     }
   ],
   "decision": "TRANSPLANT_VOID_EXTENSION_ONTO_QUALIFIED_MULTITIP_CORE",
-  "downstream_transfer_gate": "BLOCKED_CENTRAL_DBTT_V3_SOURCE_GEOMETRY_IDENTITY",
+  "downstream_transfer_gate": "BLOCKED_CENTRAL_DBTT_V4_RESOLUTION_AND_QUALITY",
   "file_differences": [
     {
       "classification": "BENCHMARK_ONLY",
@@ -322,6 +353,10 @@
     },
     {
       "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/cavity_source_conforming_geometry_v4.py"
+    },
+    {
+      "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/cavity_source_recovery_v2.py"
     },
     {
@@ -355,6 +390,10 @@
     {
       "classification": "CORE_IDENTICAL",
       "path": "arrhenius_fracture/directional_competition_v11.py"
+    },
+    {
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/explicit_cavity_v5.py"
     },
     {
       "classification": "BRANCHING_EXTENSION",
@@ -538,6 +577,14 @@
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v4/v3_geometry_diagnosis.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v4/v4_geometry_contract.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "scripts/attest_cavity_source_recovery_v3_dbtt.py"
     },
     {
@@ -546,7 +593,15 @@
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "scripts/build_cavity_source_geometry_v4_contract.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "scripts/build_v5_unified_lineage_records.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "tests/test_cavity_source_conforming_geometry_v4.py"
     },
     {
       "classification": "BENCHMARK_ONLY",
@@ -577,7 +632,7 @@
       "path": "v5_voiding_extension_delta.json"
     }
   ],
-  "next_bounded_step": "DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE",
+  "next_bounded_step": "SEPARATELY_FORMULATE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE",
   "oracle_states_accepted": 0,
   "paired_trajectories_run": 0,
   "paper_controls": {
