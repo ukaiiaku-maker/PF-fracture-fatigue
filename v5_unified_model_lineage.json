@@ -22,9 +22,9 @@
   },
   "cavity_source_recovery": {
     "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
+    "active_operator": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
     "maximum_refinement_levels_for_dbtt_readiness": 3,
     "minimum_quality_valid_fine_levels": 2,
-    "operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
     "readiness_gate_taxonomy": {
       "decision": "B_STILL_MANDATORY_V2_GATES",
       "eta_n": {
@@ -44,12 +44,20 @@
         "NORMAL_DIRECTION_RESOLUTION"
       ]
     },
+    "retained_v2_operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
     "tensor_relative_tolerance": 0.05,
     "traction_residual_tolerance": 0.05,
     "v2_readiness_results": {
       "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2_MANUFACTURED_AND_KIRSCH": "PASS",
       "DBTT_V2_CAVITY_TRACTION": "PASS",
       "DBTT_V2_FIXED_ARC_TENSOR_CONVERGENCE": "FAIL"
+    },
+    "v3_frozen_operator": {
+      "central_dbtt": "NOT_EVALUATED_IN_OPERATOR_FREEZE_COMMIT",
+      "manufactured_and_kirsch": "PASS",
+      "physical_window": "abs(s)<=0.5*min(R_void,L_pz); 0<=n<=0.5*min(R_void,L_pz)",
+      "polynomial_order": 2,
+      "traction_free_boundary": "sigma_nn(s,0)=sigma_nt(s,0)=0"
     }
   },
   "commits": {
@@ -205,6 +213,15 @@
     {
       "canonical_single_tip_blob": null,
       "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/cavity_source_recovery_v3.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "7c88d47839aecfbfb8f662620fb9f6ff73646ef3",
+      "retained_v5_blob": null,
+      "role": "fixed-physical-arc cavity source recovery V3"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/voiding_v5.py",
       "qualified_multitip_blob": null,
       "restored_worktree_blob": "3c7754bf2d4e3d6dd9f22644b3b2cbd40be5019c",
@@ -216,7 +233,7 @@
       "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/voiding_production_v5.py",
       "qualified_multitip_blob": null,
-      "restored_worktree_blob": "42255c27311fe90b21b560072f8a5cf17d06b635",
+      "restored_worktree_blob": "1af57d7d62319e004cd7cf3cccc57e11cb336f84",
       "retained_v5_blob": "31dfcada0efc4638d8ca7fbdb626cb69cb140b22",
       "role": "void production driver"
     },
@@ -284,6 +301,10 @@
     {
       "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/cavity_source_recovery_v2.py"
+    },
+    {
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/cavity_source_recovery_v3.py"
     },
     {
       "classification": "BRANCHING_EXTENSION",
@@ -438,6 +459,10 @@
       "path": "arrhenius_fracture/signed_kernel_family_v10214.py"
     },
     {
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/source_quality_transaction_v1.py"
+    },
+    {
       "classification": "BRANCHING_EXTENSION",
       "path": "arrhenius_fracture/stateful_multifront_production_v12.py"
     },
@@ -479,6 +504,10 @@
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v3/v3_frozen_operator.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "scripts/audit_v2_physical_patch_without_fem.py"
     },
     {
@@ -488,6 +517,10 @@
     {
       "classification": "BENCHMARK_ONLY",
       "path": "tests/test_cavity_source_recovery_v2.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "tests/test_cavity_source_recovery_v3.py"
     },
     {
       "classification": "BENCHMARK_ONLY",

@@ -1,0 +1,97 @@
+{
+  "bounded_qualification": {
+    "fixed_physical_window_identity_sha256": "56927df6c272daa04487a189385d38a538d632c3e36a2d9829d7ad25f533319b",
+    "kirsch_levels": [
+      {
+        "constrained_fit_residual": 0.017733105499308427,
+        "maximum_design_condition": 34.7966665286264,
+        "minimum_element_quality": 0.8176149377219203,
+        "sample_count": 80,
+        "sectors": 64,
+        "tensor_relative_error": 0.02690685870980819,
+        "traction_residual": 0.0
+      },
+      {
+        "constrained_fit_residual": 0.00941192970795899,
+        "maximum_design_condition": 108.03037251287267,
+        "minimum_element_quality": 0.8473698335625945,
+        "sample_count": 160,
+        "sectors": 128,
+        "tensor_relative_error": 0.013243714750554721,
+        "traction_residual": 0.0
+      },
+      {
+        "constrained_fit_residual": 0.005071843263322735,
+        "maximum_design_condition": 402.7935924935523,
+        "minimum_element_quality": 0.8585263476272817,
+        "sample_count": 328,
+        "sectors": 256,
+        "tensor_relative_error": 0.0069997099335746766,
+        "traction_residual": 0.0
+      }
+    ],
+    "quality_valid_fine_levels_within_frozen_limits": 2,
+    "status": "PASS",
+    "test_count": 6,
+    "tests": [
+      "constant stress oracle",
+      "affine stress oracle",
+      "rigid rotation",
+      "reversed edge ordering",
+      "Kirsch circular-hole refinement family",
+      "reflected cavity pair"
+    ]
+  },
+  "central_dbtt_v3_evaluated_in_this_record": false,
+  "coordinates": "circular-cavity arc length s and outward radial depth n; actual radial normal and counterclockwise tangent",
+  "failure_policy": [
+    "insufficient sampling",
+    "rank deficiency",
+    "condition above 1e6",
+    "poor support quality",
+    "source geometry mismatch",
+    "incomplete material/state ownership"
+  ],
+  "fit": {
+    "equilibrium_constraints": {
+      "included": false,
+      "reason": "not independently qualified for the curvilinear polynomial basis"
+    },
+    "sigma_nn": "n times affine in normalized s,n",
+    "sigma_nt": "n times affine in normalized s,n",
+    "sigma_tt": "quadratic in normalized s,n",
+    "traction_free_boundary": "sigma_nn(s,0)=sigma_nt(s,0)=0 exactly",
+    "weights": "triangle_area*(1-(s/S)^2)^2*(1-(n/N)^2)^2"
+  },
+  "frozen_before_central_dbtt_v3_evaluation": true,
+  "frozen_limits": {
+    "maximum_design_condition": 1000000.0,
+    "minimum_element_quality": 0.05,
+    "minimum_quality_valid_fine_levels": 2,
+    "tensor_relative_error_max": 0.05,
+    "traction_residual_max": 0.05
+  },
+  "implementation_path": "arrhenius_fracture/cavity_source_recovery_v3.py",
+  "implementation_sha256": "3cd04f10a2679eae3732e845e2d6fb4c38b41b2e415429cf3f4106e8fc6d04ba",
+  "operator": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
+  "physical_window": {
+    "central_dbtt_values_not_used_to_select_window": true,
+    "normal_depth": "0.5*physical_scale",
+    "physical_scale": "min(R_void, canonical_process_length)",
+    "tangential_half_width": "0.5*physical_scale"
+  },
+  "physics_or_tolerance_changes": false,
+  "plane_strain": {
+    "mean_stress": "(sigma_xx+sigma_yy+sigma_zz)/3",
+    "poisson_source": "accepted material bundle",
+    "sigma_zz": "nu*(sigma_xx+sigma_yy)"
+  },
+  "preserved": {
+    "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2_MANUFACTURED_AND_KIRSCH": "PASS",
+    "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
+    "DBTT_V2_CAVITY_TRACTION": "PASS",
+    "DBTT_V2_FIXED_ARC_TENSOR_CONVERGENCE": "FAIL"
+  },
+  "schema": "v5.cavity-source-recovery-v3-frozen-operator/1",
+  "source_base_commit": "311e2fa4c9a761b7e50aef0a944821832eca37d3"
+}

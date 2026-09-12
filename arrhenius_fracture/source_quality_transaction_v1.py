@@ -105,7 +105,10 @@ def repair_connected_quality(state, *, strategy='flips', failure_stage=None, ope
     # but keep every clock unavailable until a separate refinement proof passes.
     junction = dict(trial.junction_process_state); junction.pop('cavity_source_resolution_proof', None)
     old_source = junction.get('active_event_source', {})
-    probe = {'kind': 'direct_cavity_boundary_tensor', 'boundary_node_id': metrics['boundary_node_id'], 'element_ids': metrics['probe_element_ids']}
+    probe = {'kind': 'CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3',
+        'boundary_node_id': metrics['boundary_node_id'],
+        'element_ids': metrics['probe_element_ids'],
+        'physical_arc_identity': metrics['recovery_record']['physical_arc_identity']}
     source = {**old_source, **p._source_identity(trial, metrics['tensor_Pa'], source_kind='cavity_surface',
         source_cavity_id=cavity.cavity_id, source_boundary_site_id='connection_exit',
         source_position_m=cavity.connection_exit_m, source_probe_identity=probe)}

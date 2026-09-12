@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 import arrhenius_fracture.voiding_production_v5 as production_v5
-from arrhenius_fracture.cavity_source_recovery_v2 import CavitySourceRecoveryUnavailable
+from arrhenius_fracture.cavity_source_recovery_v3 import CavitySourceRecoveryV3Unavailable
 from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
 from arrhenius_fracture.crack_network_v11 import (
     CrackBranchState,
@@ -118,7 +118,7 @@ def test_c_reciprocal_void_radius_control_has_no_constitutive_input():
 def test_d_cavity_and_child_stages_have_distinct_sources():
     transaction = inspect.getsource(downstream_front_transaction)
     child_rates = inspect.getsource(directional_sharp_front_rates)
-    assert "cavity_fixed_arc_patch_recovery_v2" in transaction
+    assert "cavity_fixed_physical_arc_patch_recovery_v3" in transaction
     assert "source_kind = \"cavity_surface\"" in transaction
     assert "sharp_front_load_provider" in transaction
     assert "established_directional_J_K_provider" in transaction
@@ -135,9 +135,9 @@ def test_d2_only_expected_recovery_noncertification_becomes_unavailable(monkeypa
     ), BUNDLE)
 
     def unavailable(*args, **kwargs):
-        raise CavitySourceRecoveryUnavailable("bounded scientific non-certification")
+        raise CavitySourceRecoveryV3Unavailable("bounded scientific non-certification")
 
-    monkeypatch.setattr(production_v5, "cavity_fixed_arc_patch_recovery_v2", unavailable)
+    monkeypatch.setattr(production_v5, "cavity_fixed_physical_arc_patch_recovery_v3", unavailable)
     returned, result, _, audit = downstream_front_transaction(state)
     assert returned is state
     assert result is None
@@ -146,7 +146,7 @@ def test_d2_only_expected_recovery_noncertification_becomes_unavailable(monkeypa
     def programming_error(*args, **kwargs):
         raise RuntimeError("unexpected programming exception")
 
-    monkeypatch.setattr(production_v5, "cavity_fixed_arc_patch_recovery_v2", programming_error)
+    monkeypatch.setattr(production_v5, "cavity_fixed_physical_arc_patch_recovery_v3", programming_error)
     with pytest.raises(RuntimeError, match="unexpected programming exception"):
         downstream_front_transaction(state)
 

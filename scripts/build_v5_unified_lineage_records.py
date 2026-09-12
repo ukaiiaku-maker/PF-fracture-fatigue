@@ -36,6 +36,7 @@ COMPONENTS = (
     ("zero-active-tip mesh adapter", "arrhenius_fracture/mesh.py", "CORE_ADAPTER_ONLY"),
     ("hybrid void directional drive", "arrhenius_fracture/hybrid_directional_drive_v5.py", "VOIDING_EXTENSION"),
     ("fixed-arc cavity source recovery V2", "arrhenius_fracture/cavity_source_recovery_v2.py", "VOIDING_EXTENSION"),
+    ("fixed-physical-arc cavity source recovery V3", "arrhenius_fracture/cavity_source_recovery_v3.py", "VOIDING_EXTENSION"),
     ("void state and kinetics", "arrhenius_fracture/voiding_v5.py", "VOIDING_EXTENSION"),
     ("void production driver", "arrhenius_fracture/voiding_production_v5.py", "VOIDING_EXTENSION"),
     ("unified material bundle/factory", "arrhenius_fracture/unified_fracture_material_v5.py", "CORE_ADAPTER_ONLY"),
@@ -116,6 +117,8 @@ adapters = set(expected_adapter_files) | {
 }
 void_extensions = {
     "arrhenius_fracture/cavity_source_recovery_v2.py",
+    "arrhenius_fracture/cavity_source_recovery_v3.py",
+    "arrhenius_fracture/source_quality_transaction_v1.py",
     "arrhenius_fracture/voiding_production_v5.py",
 }
 benchmark = {
@@ -188,7 +191,8 @@ lineage = {
     },
     "cavity_source_recovery": {
         "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
-        "operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+        "retained_v2_operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
+        "active_operator": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
         "tensor_relative_tolerance": 0.05,
         "traction_residual_tolerance": 0.05,
         "minimum_quality_valid_fine_levels": 2,
@@ -216,6 +220,13 @@ lineage = {
                 "TANGENTIAL_STRESS_CONVERGENCE",
                 "NORMAL_DIRECTION_RESOLUTION",
             ],
+        },
+        "v3_frozen_operator": {
+            "physical_window": "abs(s)<=0.5*min(R_void,L_pz); 0<=n<=0.5*min(R_void,L_pz)",
+            "polynomial_order": 2,
+            "traction_free_boundary": "sigma_nn(s,0)=sigma_nt(s,0)=0",
+            "manufactured_and_kirsch": "PASS",
+            "central_dbtt": "NOT_EVALUATED_IN_OPERATOR_FREEZE_COMMIT",
         },
     },
     "unresolved_unintended_core_divergence": [],
@@ -301,13 +312,20 @@ separate results.
 
 `CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL = FAIL_NONCONVERGENT` is
 retained. Its replacement is the prospectively frozen
-`CAVITY_FIXED_ARC_PATCH_RECOVERY_V2` operator.
+`CAVITY_FIXED_ARC_PATCH_RECOVERY_V2` operator. V2 remains retained evidence.
 
 The frozen production source still applies `eta_n <= 0.03` and
 `eta_t <= 0.025` as mandatory V2 readiness gates. The final DBTT V2 row passes
 the tangential-resolution gate and fails the normal-resolution gate; together
 with the failed tensor-change predicate, its complete failure classification
 is `TANGENTIAL_STRESS_CONVERGENCE + NORMAL_DIRECTION_RESOLUTION`.
+
+The active V3 source operator is prospectively frozen as
+`CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3`. It uses one identical physical
+arc window at every mesh level: tangential half-width and outward normal depth
+are each `0.5*min(R_void,L_pz)`. Its quadratic curvilinear WLS fit enforces
+`sigma_nn(s,0)=sigma_nt(s,0)=0`; its bounded manufactured, Kirsch, rotation,
+edge-order, and reflection tests pass before the central DBTT evaluation.
 
 The next allowed step is a separately recorded OneD M2 rerun. No oracle or paired temperature trajectory belongs to this restoration checkpoint.
 """
