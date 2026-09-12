@@ -64,7 +64,9 @@ jobs:
             b3d0add6cbb0605adaa3e04006fe987961ad6452 \
             ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e \
             619b66b0f538742482e7385ddd3d0171cb3edd8b; do
-            git fetch --no-tags --depth=1 --filter=blob:none origin "$source"
+            # The generated lineage records include each source commit's
+            # immediate parent, so retain exactly that bounded ancestry.
+            git fetch --no-tags --depth=2 --filter=blob:none origin "$source"
           done
           git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
