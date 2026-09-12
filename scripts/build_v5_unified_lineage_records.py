@@ -226,7 +226,10 @@ lineage = {
             "polynomial_order": 2,
             "traction_free_boundary": "sigma_nn(s,0)=sigma_nt(s,0)=0",
             "manufactured_and_kirsch": "PASS",
-            "central_dbtt": "NOT_EVALUATED_IN_OPERATOR_FREEZE_COMMIT",
+            "central_dbtt": "BLOCKED_WITH_EXACT_V3_FAILURE_CLASS",
+            "exact_v3_failure_class": ["SOURCE_GEOMETRY_IDENTITY"],
+            "refinement_levels_run": 0,
+            "accepted_pre_source_state_unchanged": True,
         },
     },
     "unresolved_unintended_core_divergence": [],
@@ -238,7 +241,10 @@ lineage = {
         "test_cavity_source_recovery_v2": "7 passed",
         "broad_campaigns_run": False,
     },
-    "downstream_transfer_gate": "READY_FOR_SEPARATE_ONED_M2_RERUN",
+    "downstream_transfer_gate": "BLOCKED_CENTRAL_DBTT_V3_SOURCE_GEOMETRY_IDENTITY",
+    "oracle_states_accepted": 0,
+    "paired_trajectories_run": 0,
+    "next_bounded_step": "DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE",
 }
 (ROOT / "v5_unified_model_lineage.json").write_text(json.dumps(lineage, indent=2, sort_keys=True) + "\n")
 
@@ -327,7 +333,15 @@ are each `0.5*min(R_void,L_pz)`. Its quadratic curvilinear WLS fit enforces
 `sigma_nn(s,0)=sigma_nt(s,0)=0`; its bounded manufactured, Kirsch, rotation,
 edge-order, and reflection tests pass before the central DBTT evaluation.
 
-The next allowed step is a separately recorded OneD M2 rerun. No oracle or paired temperature trajectory belongs to this restoration checkpoint.
+The single central DBTT V3 evaluation fails closed as
+`SOURCE_GEOMETRY_IDENTITY`: the exact owned polygon source coordinate is
+`0.2661214806971317 um` outside the nominal circular radius, beyond the frozen
+V3 geometry-identity tolerance. No V3 refinement level ran, the accepted state
+and clocks remained unchanged, and the oracle remains `0/18`. Further
+point-source refinement stops here; the next separately derived candidate is a
+finite activation-zone work observable.
+
+No paired temperature trajectory or fatigue run belongs to this checkpoint.
 """
 (ROOT / "V5_UNIFIED_MODEL_LINEAGE.md").write_text(md)
 

@@ -238,3 +238,27 @@ def test_inadequate_support_and_incomplete_ownership_fail_closed():
             material_fingerprints={},
             state_fingerprint="",
         )
+
+
+def test_single_central_dbtt_v3_readiness_fails_closed_on_source_geometry_identity():
+    import json
+    from pathlib import Path
+    from scripts.attest_cavity_source_recovery_v3_dbtt import OUTPUT, build_record
+
+    retained = json.loads((Path(__file__).resolve().parents[1] / OUTPUT).read_text())
+    observed = build_record()
+    assert observed["DBTT_SOURCE_READINESS"] == "BLOCKED_WITH_EXACT_V3_FAILURE_CLASS"
+    assert observed["exact_v3_failure_class"] == ["SOURCE_GEOMETRY_IDENTITY"]
+    assert observed["scientific_unavailability"] == (
+        "the exact source coordinate is inconsistent with the owned cavity"
+    )
+    assert observed["requested_refinement_levels"] == 3
+    assert observed["refinement_levels_run"] == 0
+    assert observed["accepted_pre_source_state_unchanged_on_noncertification"] is True
+    assert observed["thresholds_and_rng_unchanged_on_noncertification"] is True
+    assert observed["unexpected_programming_exceptions_caught"] is False
+    assert observed["oracle_states_accepted"] == 0
+    assert observed["paired_trajectories_run"] == 0
+    assert observed["next_bounded_step"] == "DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE"
+    assert observed["source_geometry_diagnostic"] == retained["source_geometry_diagnostic"]
+    assert observed["ligament_energy_gate"] == retained["ligament_energy_gate"]

@@ -293,10 +293,15 @@ def test_10_reports_encode_terminal_passes_and_no_unresolved_core_divergence():
     ]
     v3 = lineage["cavity_source_recovery"]["v3_frozen_operator"]
     assert v3["manufactured_and_kirsch"] == "PASS"
-    assert v3["central_dbtt"] == "NOT_EVALUATED_IN_OPERATOR_FREEZE_COMMIT"
+    assert v3["central_dbtt"] == "BLOCKED_WITH_EXACT_V3_FAILURE_CLASS"
+    assert v3["exact_v3_failure_class"] == ["SOURCE_GEOMETRY_IDENTITY"]
+    assert v3["refinement_levels_run"] == 0
     assert lineage["cavity_source_recovery"]["active_operator"] == (
         "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3"
     )
+    assert lineage["oracle_states_accepted"] == 0
+    assert lineage["paired_trajectories_run"] == 0
+    assert lineage["next_bounded_step"] == "DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE"
 
 
 def test_10b_v2_patch_audit_is_geometry_only_and_records_shrinking_footprint():

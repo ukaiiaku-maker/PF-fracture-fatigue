@@ -53,10 +53,15 @@
       "DBTT_V2_FIXED_ARC_TENSOR_CONVERGENCE": "FAIL"
     },
     "v3_frozen_operator": {
-      "central_dbtt": "NOT_EVALUATED_IN_OPERATOR_FREEZE_COMMIT",
+      "accepted_pre_source_state_unchanged": true,
+      "central_dbtt": "BLOCKED_WITH_EXACT_V3_FAILURE_CLASS",
+      "exact_v3_failure_class": [
+        "SOURCE_GEOMETRY_IDENTITY"
+      ],
       "manufactured_and_kirsch": "PASS",
       "physical_window": "abs(s)<=0.5*min(R_void,L_pz); 0<=n<=0.5*min(R_void,L_pz)",
       "polynomial_order": 2,
+      "refinement_levels_run": 0,
       "traction_free_boundary": "sigma_nn(s,0)=sigma_nt(s,0)=0"
     }
   },
@@ -233,7 +238,7 @@
       "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/voiding_production_v5.py",
       "qualified_multitip_blob": null,
-      "restored_worktree_blob": "1af57d7d62319e004cd7cf3cccc57e11cb336f84",
+      "restored_worktree_blob": "0ac1f0b53830788b68e87a87570d7f6416fc35b4",
       "retained_v5_blob": "31dfcada0efc4638d8ca7fbdb626cb69cb140b22",
       "role": "void production driver"
     },
@@ -248,7 +253,7 @@
     }
   ],
   "decision": "TRANSPLANT_VOID_EXTENSION_ONTO_QUALIFIED_MULTITIP_CORE",
-  "downstream_transfer_gate": "READY_FOR_SEPARATE_ONED_M2_RERUN",
+  "downstream_transfer_gate": "BLOCKED_CENTRAL_DBTT_V3_SOURCE_GEOMETRY_IDENTITY",
   "file_differences": [
     {
       "classification": "BENCHMARK_ONLY",
@@ -500,11 +505,19 @@
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v3/central_dbtt_v3_readiness.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "artifacts/v5_cavity_source_recovery_v3/v2_readiness_taxonomy_and_patch_audit.json"
     },
     {
       "classification": "BENCHMARK_ONLY",
       "path": "artifacts/v5_cavity_source_recovery_v3/v3_frozen_operator.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "scripts/attest_cavity_source_recovery_v3_dbtt.py"
     },
     {
       "classification": "BENCHMARK_ONLY",
@@ -543,6 +556,9 @@
       "path": "v5_voiding_extension_delta.json"
     }
   ],
+  "next_bounded_step": "DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE",
+  "oracle_states_accepted": 0,
+  "paired_trajectories_run": 0,
   "paper_controls": {
     "composite_identity_fields": [
       "core_model_id",

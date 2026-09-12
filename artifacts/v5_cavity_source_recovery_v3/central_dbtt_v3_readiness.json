@@ -1,0 +1,90 @@
+{
+  "DBTT_SOURCE_READINESS": "BLOCKED_WITH_EXACT_V3_FAILURE_CLASS",
+  "accepted_material_identity_complete": {
+    "FrontConfig_fingerprint": "1237d55a97fe33301a13a64d5cab80bd79737f08bd8f918e34dc3830b2038152",
+    "cleavage_barrier_fingerprint": "4a3b6f59846bf3b0140f61b6b83cb44b8f4c40eb83ee30bc382e4b338b75a05f",
+    "core_model_id": "v13.current-source-qualified-multitip/ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e",
+    "elasticity_fingerprint": "f950f823cb066c03da0d817c42716bd30911bb8c6eac1477bf174403985cd4ff",
+    "emission_barrier_fingerprint": "5cb8b5bcaf466e86fe6a30a1e61f153a5b10869dba96b2ec50eeb42af74ecf1e",
+    "material_bundle_id": "v5.unified-fracture-material-bundle/1:DBTT:c0759db2db3b09ec",
+    "material_bundle_sha256": "c0759db2db3b09ec6ebf3b2717d39396350e8cd89a37d25a9e5fb92738dcc2bc",
+    "plasticity_fingerprint": "c040927e3334994f724c9aa447c37979d0d11843e033ad28e1a0c8bbbcba1381",
+    "process_zone_fingerprint": "2b287cb57f41196795ceea01424d3405942ea951d2e6f7fd258a7394d81e5b11"
+  },
+  "accepted_pre_source_mechanical_binding": "aad63c19b7faa83a935d47aa068834da9e2790cf21a99bed6851f5f44f668b91",
+  "accepted_pre_source_state_fingerprint": "74f82c0bb083d7447de9f1476491c028863ebf94d713ed55d4c5d59805dcf91f",
+  "accepted_pre_source_state_unchanged_on_noncertification": true,
+  "attempts": [],
+  "exact_v3_failure_class": [
+    "SOURCE_GEOMETRY_IDENTITY"
+  ],
+  "fatigue_started": false,
+  "fracture_material_row_id": "v913_zeroD_sobol_0202500",
+  "geometry": {
+    "cavity_center_m": [
+      0.0007,
+      0.0
+    ],
+    "cavity_radius_m": 5.5e-05,
+    "connection_entry_m": [
+      0.0006447338785193029,
+      1.5602085896855586e-20
+    ],
+    "connection_exit_m": [
+      0.0007552661214806971,
+      0.0
+    ],
+    "opening_scale_from_4e-7_m": 2.0
+  },
+  "ligament_energy_gate": {
+    "accepted": true,
+    "energy_margin_J_per_m": 0.0035664064487544735,
+    "energy_release_J_per_m": 0.005739662590192835,
+    "hazard_dissipation_J_per_m": 0.0021732561414383616
+  },
+  "material_class": "DBTT",
+  "material_identity": {
+    "FrontConfig_fingerprint": "1237d55a97fe33301a13a64d5cab80bd79737f08bd8f918e34dc3830b2038152",
+    "cleavage_barrier_fingerprint": "4a3b6f59846bf3b0140f61b6b83cb44b8f4c40eb83ee30bc382e4b338b75a05f",
+    "core_model_id": "v13.current-source-qualified-multitip/ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e",
+    "elasticity_fingerprint": "f950f823cb066c03da0d817c42716bd30911bb8c6eac1477bf174403985cd4ff",
+    "emission_barrier_fingerprint": "5cb8b5bcaf466e86fe6a30a1e61f153a5b10869dba96b2ec50eeb42af74ecf1e",
+    "material_bundle_id": "v5.unified-fracture-material-bundle/1:DBTT:c0759db2db3b09ec",
+    "material_bundle_sha256": "c0759db2db3b09ec6ebf3b2717d39396350e8cd89a37d25a9e5fb92738dcc2bc",
+    "plasticity_fingerprint": "c040927e3334994f724c9aa447c37979d0d11843e033ad28e1a0c8bbbcba1381",
+    "process_zone_fingerprint": "2b287cb57f41196795ceea01424d3405942ea951d2e6f7fd258a7394d81e5b11"
+  },
+  "missing_fields_inferred_or_synthesized": false,
+  "next_bounded_step": "DERIVE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE",
+  "operator": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
+  "oracle_states_accepted": 0,
+  "paired_trajectories_run": 0,
+  "preserved_v1_v2": {
+    "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2_MANUFACTURED_AND_KIRSCH": "PASS",
+    "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
+    "DBTT_V2_CAVITY_TRACTION": "PASS",
+    "DBTT_V2_FIXED_ARC_TENSOR_CONVERGENCE": "FAIL"
+  },
+  "refinement_levels_run": 0,
+  "requested_refinement_levels": 3,
+  "schema": "v5.central-dbtt-cavity-source-recovery-v3-readiness/1",
+  "scientific_unavailability": "the exact source coordinate is inconsistent with the owned cavity",
+  "scope": {
+    "core_physics_changed": false,
+    "new_broad_campaign_run": false,
+    "r_tip_equals_R_void": false,
+    "r_tip_law_changed": false,
+    "scientific_tolerances_changed": false
+  },
+  "source_exception_boundary_commit": "bb046019f3c5c518f031b98a677993b70cf81f6b",
+  "source_geometry_diagnostic": {
+    "absolute_radial_mismatch_m": 2.661214806971317e-07,
+    "classification": "OWNED_POLYGON_BOUNDARY_DIFFERS_FROM_NOMINAL_CIRCLE",
+    "nominal_cavity_radius_m": 5.5e-05,
+    "owned_source_radial_distance_m": 5.5266121480697134e-05
+  },
+  "source_implementation_commit": "80bbcabd7e910e8da09d6765116b2a97b06f2300",
+  "source_qualification_status": "SOURCE_TENSOR_UNQUALIFIED",
+  "thresholds_and_rng_unchanged_on_noncertification": true,
+  "unexpected_programming_exceptions_caught": false
+}

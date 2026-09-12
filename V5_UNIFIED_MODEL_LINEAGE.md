@@ -69,4 +69,12 @@ are each `0.5*min(R_void,L_pz)`. Its quadratic curvilinear WLS fit enforces
 `sigma_nn(s,0)=sigma_nt(s,0)=0`; its bounded manufactured, Kirsch, rotation,
 edge-order, and reflection tests pass before the central DBTT evaluation.
 
-The next allowed step is a separately recorded OneD M2 rerun. No oracle or paired temperature trajectory belongs to this restoration checkpoint.
+The single central DBTT V3 evaluation fails closed as
+`SOURCE_GEOMETRY_IDENTITY`: the exact owned polygon source coordinate is
+`0.2661214806971317 um` outside the nominal circular radius, beyond the frozen
+V3 geometry-identity tolerance. No V3 refinement level ran, the accepted state
+and clocks remained unchanged, and the oracle remains `0/18`. Further
+point-source refinement stops here; the next separately derived candidate is a
+finite activation-zone work observable.
+
+No paired temperature trajectory or fatigue run belongs to this checkpoint.
