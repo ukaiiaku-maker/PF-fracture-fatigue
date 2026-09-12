@@ -33,6 +33,7 @@ COMPONENTS = (
     ("topology energy transaction", "arrhenius_fracture/topology_transaction_v11.py", "CORE_ADAPTER_ONLY"),
     ("live directional provider", "arrhenius_fracture/live_topology_kernel_v11.py", "CORE_ADAPTER_ONLY"),
     ("accepted checkpoint", "arrhenius_fracture/checkpoint_v11.py", "CORE_ADAPTER_ONLY"),
+    ("zero-active-tip mesh adapter", "arrhenius_fracture/mesh.py", "CORE_ADAPTER_ONLY"),
     ("hybrid void directional drive", "arrhenius_fracture/hybrid_directional_drive_v5.py", "VOIDING_EXTENSION"),
     ("void state and kinetics", "arrhenius_fracture/voiding_v5.py", "VOIDING_EXTENSION"),
     ("void production driver", "arrhenius_fracture/voiding_production_v5.py", "VOIDING_EXTENSION"),
@@ -93,6 +94,7 @@ expected_adapter_files = [
     "arrhenius_fracture/checkpoint_v11.py",
     "arrhenius_fracture/fem.py",
     "arrhenius_fracture/live_topology_kernel_v11.py",
+    "arrhenius_fracture/mesh.py",
     "arrhenius_fracture/sharp_front.py",
     "arrhenius_fracture/topology_transaction_v11.py",
 ]
@@ -171,7 +173,7 @@ lineage = {
     "unresolved_unintended_core_divergence": [],
     "terminal_gates": {gate: "PASS" for gate in TERMINAL},
     "bounded_validation": {
-        "test_v5_unified_model_lineage": "13 passed",
+        "test_v5_unified_model_lineage": "14 passed",
         "test_v5_bounded_sharp_front_adapter": "5 passed",
         "test_v5_hybrid_directional_drive": "15 passed",
         "broad_campaigns_run": False,

@@ -24,6 +24,7 @@ The retained V5 source differed materially in the front, FEM/source, process-own
 | topology energy transaction | `arrhenius_fracture/topology_transaction_v11.py` | `CORE_ADAPTER_ONLY` |
 | live directional provider | `arrhenius_fracture/live_topology_kernel_v11.py` | `CORE_ADAPTER_ONLY` |
 | accepted checkpoint | `arrhenius_fracture/checkpoint_v11.py` | `CORE_ADAPTER_ONLY` |
+| zero-active-tip mesh adapter | `arrhenius_fracture/mesh.py` | `CORE_ADAPTER_ONLY` |
 | hybrid void directional drive | `arrhenius_fracture/hybrid_directional_drive_v5.py` | `VOIDING_EXTENSION` |
 | void state and kinetics | `arrhenius_fracture/voiding_v5.py` | `VOIDING_EXTENSION` |
 | void production driver | `arrhenius_fracture/voiding_production_v5.py` | `VOIDING_EXTENSION` |

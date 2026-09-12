@@ -8,6 +8,7 @@ import pytest
 from arrhenius_fracture.adaptive_multitip_mesh_v11 import refine_accepted_state
 from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
 from arrhenius_fracture.fem import assemble_mechanics
+from arrhenius_fracture.mesh import rebuild_tri_mesh
 from arrhenius_fracture.crack_network_v11 import ROOT_BRANCH_ID
 from arrhenius_fracture.sharp_front import build_engine
 from arrhenius_fracture.unified_control_matrix_v5 import (
@@ -256,3 +257,9 @@ def test_10_reports_encode_terminal_passes_and_no_unresolved_core_divergence():
     assert delta["decision"] == "VOIDING_EXTENSION_DELTA_ONLY"
     assert delta["scientific_tolerances_changed"] is False
     assert delta["r_tip_equals_void_radius"] is False
+
+
+def test_11_connected_topology_mesh_rebuild_accepts_no_active_tip_centers():
+    state, _ = build_production_void_state(bundle=material_bundle("DBTT"), enabled=False)
+    rebuilt = rebuild_tri_mesh(state.mesh.nodes, state.mesh.elems, tip_centers=())
+    assert rebuilt.hbar_tip == rebuilt.hbar

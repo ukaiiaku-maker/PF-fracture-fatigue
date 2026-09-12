@@ -10,7 +10,7 @@
     "broad_campaigns_run": false,
     "test_v5_bounded_sharp_front_adapter": "5 passed",
     "test_v5_hybrid_directional_drive": "15 passed",
-    "test_v5_unified_model_lineage": "13 passed"
+    "test_v5_unified_model_lineage": "14 passed"
   },
   "branches": {
     "field_atlas": "codex/v12-field-atlas-recovery",
@@ -141,6 +141,15 @@
       "restored_worktree_blob": "297e74f25bf794787b65a462553146a30370e843",
       "retained_v5_blob": "297e74f25bf794787b65a462553146a30370e843",
       "role": "accepted checkpoint"
+    },
+    {
+      "canonical_single_tip_blob": "c375896702a60c01fc36c0565487b7981cd2454d",
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/mesh.py",
+      "qualified_multitip_blob": "62a934a963c63d5fb3f9f546b6ba0af25bf32125",
+      "restored_worktree_blob": "e9173dd552207b559f0311ffa4a2ad2154ecb2b6",
+      "retained_v5_blob": "62a934a963c63d5fb3f9f546b6ba0af25bf32125",
+      "role": "zero-active-tip mesh adapter"
     },
     {
       "canonical_single_tip_blob": null,
@@ -285,6 +294,10 @@
     {
       "classification": "BRANCHING_EXTENSION",
       "path": "arrhenius_fracture/marked_topology_trial_v13.py"
+    },
+    {
+      "classification": "CORE_ADAPTER_ONLY",
+      "path": "arrhenius_fracture/mesh.py"
     },
     {
       "classification": "BRANCHING_EXTENSION",
@@ -470,12 +483,13 @@
     ]
   },
   "qualified_core_transplant_audit": {
-    "exact_blob_matches": 239,
+    "exact_blob_matches": 238,
     "qualified_source_files": 244,
     "reviewed_adapter_files": [
       "arrhenius_fracture/checkpoint_v11.py",
       "arrhenius_fracture/fem.py",
       "arrhenius_fracture/live_topology_kernel_v11.py",
+      "arrhenius_fracture/mesh.py",
       "arrhenius_fracture/sharp_front.py",
       "arrhenius_fracture/topology_transaction_v11.py"
     ]

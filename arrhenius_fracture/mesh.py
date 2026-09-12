@@ -190,8 +190,11 @@ def rebuild_tri_mesh(nodes: np.ndarray, elems: np.ndarray, tip_centers=None, val
         hbar_tip = hbar
     else:
         tc = np.asarray(tip_centers, dtype=float)
-        tc = tc.reshape(1,2) if tc.ndim == 1 else tc[:, :2]
-        hbar_tip = float(min(_estimate_hbar_tip(nodes, elems, float(c[0]), float(c[1])) for c in tc))
+        if tc.size == 0:
+            hbar_tip = hbar
+        else:
+            tc = tc.reshape(1,2) if tc.ndim == 1 else tc[:, :2]
+            hbar_tip = float(min(_estimate_hbar_tip(nodes, elems, float(c[0]), float(c[1])) for c in tc))
     return TriMesh(
         nodes=nodes, elems=elems, nn=len(nodes), ne=len(elems), ndof=2*len(nodes),
         hbar=float(hbar), area_e=area_e, dNdx_e=dNdx_e, B_e=B_e,
