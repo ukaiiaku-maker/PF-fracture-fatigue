@@ -1,0 +1,79 @@
+[
+  {
+    "exception": "injected:graph_edit",
+    "execution_id": "rollback-00",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "graph_edit"
+  },
+  {
+    "exception": "injected:remesh",
+    "execution_id": "rollback-01",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "remesh"
+  },
+  {
+    "exception": "injected:field_projection",
+    "execution_id": "rollback-02",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "field_projection"
+  },
+  {
+    "exception": "injected:support_rebuild",
+    "execution_id": "rollback-03",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "support_rebuild"
+  },
+  {
+    "exception": "injected:equilibrium",
+    "execution_id": "rollback-04",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "equilibrium"
+  },
+  {
+    "exception": "injected:energy_gate",
+    "execution_id": "rollback-05",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "energy_gate"
+  },
+  {
+    "exception": "injected:process_state_update",
+    "execution_id": "rollback-06",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "process_state_update"
+  },
+  {
+    "exception": "injected:topology_verification",
+    "execution_id": "rollback-07",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "topology_verification"
+  },
+  {
+    "exception": "injected:late_event_veto",
+    "execution_id": "rollback-08",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "late_event_veto"
+  },
+  {
+    "exception": "injected:intersection_alignment",
+    "execution_id": "rollback-09",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "intersection_alignment"
+  },
+  {
+    "exception": "injected:connected_surface_certification",
+    "execution_id": "rollback-10",
+    "passed": true,
+    "restored_exactly": true,
+    "stage": "connected_surface_certification"
+  }
+]

@@ -1,0 +1,263 @@
+name: V5 one-void final scientific closure
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  bounded-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /tests/
+            /docs/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+            /artifacts/voiding_v5_source_resolution_and_final_closure/development/phase9_static_96_a34/report.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Exact committed implementation
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA" && test -z "$(git status --short)"
+      - name: Independent bounded A and B reductions
+        run: |
+          python scripts/audit_v5_r_tip_constitutive_handoff_v2.py /tmp/bounded/a/r_tip
+          python scripts/build_v5_static_family_failure_atlas_v2.py artifacts/voiding_v5_source_resolution_and_final_closure/development/phase9_static_96_a34/report.json /tmp/bounded/a/static_atlas
+          python scripts/audit_v5_r_tip_constitutive_handoff_v2.py /tmp/bounded/b/r_tip
+          python scripts/build_v5_static_family_failure_atlas_v2.py artifacts/voiding_v5_source_resolution_and_final_closure/development/phase9_static_96_a34/report.json /tmp/bounded/b/static_atlas
+          diff -ru /tmp/bounded/a /tmp/bounded/b
+      - name: Focused schema tests
+        run: >-
+          python -m pytest -q tests/test_r_tip_constitutive_handoff_v2.py
+          tests/test_static_numerical_family_v2.py tests/test_controlled_history_v3.py
+          tests/test_natural_future_physical_replay_v2.py tests/test_one_void_final_closure_v2.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-one-void-bounded-${{ github.sha }}
+          path: /tmp/bounded
+
+  static-sentinels:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Five-family V2 sentinel A and B
+        run: |
+          python scripts/qualify_v5_static_numerical_families_v1.py /tmp/static/a --sentinel-v2
+          python scripts/qualify_v5_static_numerical_families_v1.py /tmp/static/b --sentinel-v2
+          diff -ru /tmp/static/a /tmp/static/b
+      - name: Expand once only if every sentinel is stable
+        run: |
+          if python -c 'import json; assert json.load(open("/tmp/static/a/report.json"))["decision"]["passed"]'; then
+            python scripts/qualify_v5_static_numerical_families_v1.py /tmp/static/full-a
+            python scripts/qualify_v5_static_numerical_families_v1.py /tmp/static/full-b
+            diff -ru /tmp/static/full-a /tmp/static/full-b
+          else
+            echo 'STATIC_FAMILY_V2 blocked at prospectively frozen sentinels; full matrix not authorized.'
+          fi
+      - name: Clean implementation checks
+        if: always()
+        run: git diff --check && test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-one-void-static-${{ github.sha }}
+          path: /tmp/static
+          compression-level: 0
+
+  controlled-v3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        case:
+          - accommodation_limited
+          - diffusion_limited
+          - delayed_downstream
+          - downstream_zero_drive
+          - local_remesh_refinement
+          - negative_offset
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Independent controlled V3 A and B
+        run: |
+          python scripts/run_voiding_v5_controlled_history_v3.py '${{ matrix.case }}' '/tmp/controlled/${{ matrix.case }}/a'
+          python scripts/run_voiding_v5_controlled_history_v3.py '${{ matrix.case }}' '/tmp/controlled/${{ matrix.case }}/b'
+          diff -ru '/tmp/controlled/${{ matrix.case }}/a' '/tmp/controlled/${{ matrix.case }}/b'
+      - name: Clean implementation checks
+        if: always()
+        run: git diff --check && test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-one-void-controlled-${{ matrix.case }}-${{ github.sha }}
+          path: /tmp/controlled
+          compression-level: 0
+
+  physical-replay-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        seed: [12000, 12001, 12002, 12003, 12004, 12005, 12006, 12007,
+               12008, 12009, 12010, 12011, 12012, 12013, 12014, 12015,
+               12016, 12017, 12018, 12019, 12020, 12021, 12022, 12023,
+               12024, 12025, 12026, 12027, 12028, 12029, 12030, 12031]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Independent source and replay process A
+        run: |
+          python scripts/run_v5_natural_physical_replay_v2.py source '/tmp/replay/${{ matrix.seed }}/source-a' --seed '${{ matrix.seed }}'
+          python scripts/run_v5_natural_physical_replay_v2.py replay '/tmp/replay/${{ matrix.seed }}/a' --source '/tmp/replay/${{ matrix.seed }}/source-a' --seed '${{ matrix.seed }}'
+      - name: Independent source and replay process B
+        run: |
+          python scripts/run_v5_natural_physical_replay_v2.py source '/tmp/replay/${{ matrix.seed }}/source-b' --seed '${{ matrix.seed }}'
+          python scripts/run_v5_natural_physical_replay_v2.py replay '/tmp/replay/${{ matrix.seed }}/b' --source '/tmp/replay/${{ matrix.seed }}/source-b' --seed '${{ matrix.seed }}'
+          diff -ru '/tmp/replay/${{ matrix.seed }}/a' '/tmp/replay/${{ matrix.seed }}/b'
+      - name: Clean implementation checks
+        if: always()
+        run: git diff --check && test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-one-void-replay-${{ matrix.seed }}-${{ github.sha }}
+          path: /tmp/replay
+          compression-level: 0
+
+  bounded-ready:
+    needs: [bounded-audit, static-sentinels, controlled-v3, physical-replay-v2]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require all bounded workstreams to finish execution
+        run: |
+          test '${{ needs.bounded-audit.result }}' = success
+          test '${{ needs.static-sentinels.result }}' = success
+          test '${{ needs.controlled-v3.result }}' = success
+          test '${{ needs.physical-replay-v2.result }}' = success
+
+  physical-baseline:
+    needs: bounded-ready
+    uses: ./.github/workflows/voiding-v5-source-final-campaign.yml
+
+  assemble:
+    needs: [bounded-audit, static-sentinels, controlled-v3, physical-replay-v2, physical-baseline]
+    if: always() && needs.physical-baseline.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - uses: actions/download-artifact@v4
+        with:
+          name: v5-one-void-bounded-${{ github.sha }}
+          path: /tmp/final-bounded
+      - uses: actions/download-artifact@v4
+        with:
+          name: v5-one-void-static-${{ github.sha }}
+          path: /tmp/final-static
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v5-one-void-controlled-*-${{ github.sha }}
+          path: /tmp/final-controlled
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v5-one-void-replay-*-${{ github.sha }}
+          path: /tmp/final-replay
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: v5-source-final-ledger-${{ github.sha }}
+          path: /tmp/final-baseline
+      - name: Native final schema, ontology, and exact-pair audit
+        run: >-
+          python scripts/assemble_v5_one_void_final_closure_v2.py
+          /tmp/final-baseline/a/scientific_ledger.json /tmp/final-bounded
+          /tmp/final-static /tmp/final-controlled /tmp/final-replay /tmp/final-ledger
+      - name: Exact-head final validator and clean checks
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python -c 'import json; from arrhenius_fracture.one_void_final_closure_v2 import validate; r=json.load(open("/tmp/final-ledger/scientific_ledger.json")); assert validate(r)["valid"]'
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-one-void-final-ledger-${{ github.sha }}
+          path: /tmp/final-ledger

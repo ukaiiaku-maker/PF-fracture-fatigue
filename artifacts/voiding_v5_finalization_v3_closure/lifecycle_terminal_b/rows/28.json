@@ -1,0 +1,45 @@
+{
+  "actual_operations": [
+    {
+      "api": "remesh_cavity",
+      "operations": [
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "equilibrium"
+      ]
+    }
+  ],
+  "case_identity": "promotion",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "transitions:promotion:4:27:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/736e60963663bd7af2c5b6fa3f91a5f06889382490e721e90e4a4d2d75517ba9.json",
+  "initial_fingerprint": "736e60963663bd7af2c5b6fa3f91a5f06889382490e721e90e4a4d2d75517ba9",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 4,
+    "predecessor_available": true,
+    "requested_predecessor": "subgrid_growth",
+    "seed": 3621
+  },
+  "input_hash": "84c97b2bea10f9dde01b12f6f574ac2dd9a4b127b2706da012a35653ca35b55a",
+  "partition_count": 4,
+  "terminal_checkpoint": "checkpoints/2d32721175e6d7dce0718a0b651da0721c5b0244b6d9f95b4bd7ea8df08579de.json",
+  "terminal_fingerprint": "2d32721175e6d7dce0718a0b651da0721c5b0244b6d9f95b4bd7ea8df08579de",
+  "transition_occurred": true
+}

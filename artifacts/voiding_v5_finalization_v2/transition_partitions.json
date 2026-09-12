@@ -1,0 +1,2697 @@
+[
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "BIRTH_HIT",
+      "EMBRYO"
+    ],
+    "execution_id": "partition-birth-1",
+    "partition_equivalent": true,
+    "partitions": 1,
+    "passed": true,
+    "state": "ed39407df8140122a9cf0861988af95c1f5ba525892c515eb6480f90b60980e4",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.0,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "EMBRYO",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "birth_hits"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "STABILIZED"
+    ],
+    "execution_id": "partition-stabilization-1",
+    "partition_equivalent": true,
+    "partitions": 1,
+    "passed": true,
+    "state": "338de5e46732b03e5454aa614e884690ca67e453edc1d1563c903e77fd7a68d1",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.012585350350611401,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "STABLE_SUBGRID_VOID",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.31470367257160115,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "stabilization"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "HEALED"
+    ],
+    "execution_id": "partition-healing-1",
+    "partition_equivalent": true,
+    "partitions": 1,
+    "passed": true,
+    "state": "6bcd3643bcde4bd2c2c1974efbd76b8d4c90df40a4f37572f12d2ca4879c24a6",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "HEALED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.7168175169891265,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "HEALED_SITE",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "healing"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-growth-1",
+    "partition_equivalent": true,
+    "partitions": 1,
+    "passed": true,
+    "radius_m": 2.5322429412530188e-05,
+    "state": "5c941ac7b5c8f5d5403f7e7b2963510c16e951668bd73867f90bb4b706f9d6af",
+    "state_measurement": {
+      "area_m2": 2.0144691044321926e-09,
+      "cavity_id": "partition-void",
+      "center_m": [
+        0.0,
+        0.0
+      ],
+      "connection_direction_xy": null,
+      "connection_entry_m": null,
+      "connection_exit_m": null,
+      "geometry_generation": 1,
+      "inventory_area_m2": 2.0144691044321926e-09,
+      "lineage": [],
+      "parent_site_id": "site-1",
+      "phase": "STABLE_SUBGRID_VOID",
+      "radius_m": 2.5322429412530188e-05
+    },
+    "transition": "subgrid_growth"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-promotion-1",
+    "partition_equivalent": true,
+    "partitions": 1,
+    "passed": true,
+    "state": "16b864208257697aaf251a056534cd9f1823b19d8cd2f55283fd92febe1c6c12",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [
+        {
+          "area_m2": 7.853981633974483e-09,
+          "cavity_id": "partition-void",
+          "center_m": [
+            0.0,
+            0.0
+          ],
+          "connection_direction_xy": null,
+          "connection_entry_m": null,
+          "connection_exit_m": null,
+          "geometry_generation": 2,
+          "inventory_area_m2": 7.853981633974483e-09,
+          "lineage": [
+            "GEOMETRIC_PROMOTION"
+          ],
+          "parent_site_id": "site-1",
+          "phase": "RESOLVED_VOID",
+          "radius_m": 5e-05
+        }
+      ],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "cavity_id": "partition-void",
+          "event": "GEOMETRIC_PROMOTION"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {},
+      "schema": "v12.production-voiding/5",
+      "sites": []
+    },
+    "transition": "promotion"
+  },
+  {
+    "clock": "182b8644c834144982909599500d3c762ae9b0f9373af12785440bc820a52777",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 3621,
+      "hazard_states": [
+        {
+          "action": 0.8038270723477087,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.1547081236869112,
+          "last_completion_time_s": 1.6407222328455144e+16,
+          "pending_events": [
+            {
+              "action_after": 0.8038270723477087,
+              "action_before": 0.0,
+              "action_increment": 0.8038270723477087,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.6407222328455144e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 4.899227037069075e-17,
+          "residual_action": 0.8038270723477087,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 3621
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 1.6407222328455144e+16,
+    "execution_id": "partition-ligament-1",
+    "partition_equivalent": true,
+    "partitions": 1,
+    "passed": true,
+    "transition": "ligament_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "071182a6275953f0d04386986c375bdda9a20e27e3866363fec547ec031a7fa6",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 6110078214787410712,
+      "hazard_states": [
+        {
+          "action": 1.6231089048573308,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.7403901100881438,
+          "last_completion_time_s": 1.6424079798433724e+16,
+          "pending_events": [
+            {
+              "action_after": 1.6231089048573308,
+              "action_before": 0.0,
+              "action_increment": 1.6231089048573308,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.6424079798433724e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.628425302964671e-14,
+          "residual_action": 0.6231089048573308,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 6110078214787410712
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 16857469978580.633,
+    "execution_id": "partition-downstream-1",
+    "partition_equivalent": true,
+    "partitions": 1,
+    "passed": true,
+    "transition": "downstream_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "fd18b3b2d8c3dc72d911a4fb07d8935c00474110f6ddd3d4df8dc6f541a5dbc5",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 2727424630291586728,
+      "hazard_states": [
+        {
+          "action": 3.6478464820172323,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 5.750875509490085,
+          "last_completion_time_s": 5.677926561830192e+16,
+          "pending_events": [
+            {
+              "action_after": 3.6478464820172323,
+              "action_before": 0.0,
+              "action_increment": 3.6478464820172323,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 5.677926561830192e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.03934998168507e-17,
+          "residual_action": 0.6478464820172323,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 2727424630291586728
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 4.03551858198682e+16,
+    "execution_id": "partition-child-1",
+    "partition_equivalent": true,
+    "partitions": 1,
+    "passed": true,
+    "transition": "child_continuation",
+    "winner_count": 1
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "BIRTH_HIT",
+      "EMBRYO"
+    ],
+    "execution_id": "partition-birth-2",
+    "partition_equivalent": true,
+    "partitions": 2,
+    "passed": true,
+    "state": "ed39407df8140122a9cf0861988af95c1f5ba525892c515eb6480f90b60980e4",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.0,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "EMBRYO",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "birth_hits"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "STABILIZED"
+    ],
+    "execution_id": "partition-stabilization-2",
+    "partition_equivalent": true,
+    "partitions": 2,
+    "passed": true,
+    "state": "338de5e46732b03e5454aa614e884690ca67e453edc1d1563c903e77fd7a68d1",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.012585350350611401,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "STABLE_SUBGRID_VOID",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.31470367257160115,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "stabilization"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "HEALED"
+    ],
+    "execution_id": "partition-healing-2",
+    "partition_equivalent": true,
+    "partitions": 2,
+    "passed": true,
+    "state": "6bcd3643bcde4bd2c2c1974efbd76b8d4c90df40a4f37572f12d2ca4879c24a6",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "HEALED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.7168175169891265,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "HEALED_SITE",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "healing"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-growth-2",
+    "partition_equivalent": true,
+    "partitions": 2,
+    "passed": true,
+    "radius_m": 2.5322429412530188e-05,
+    "state": "9e79d248e6cc57f7ce06f6d9ff84a54090fc854028eddd3f104e7bec98ada8e7",
+    "state_measurement": {
+      "area_m2": 2.0144691044321926e-09,
+      "cavity_id": "partition-void",
+      "center_m": [
+        0.0,
+        0.0
+      ],
+      "connection_direction_xy": null,
+      "connection_entry_m": null,
+      "connection_exit_m": null,
+      "geometry_generation": 2,
+      "inventory_area_m2": 2.0144691044321926e-09,
+      "lineage": [],
+      "parent_site_id": "site-1",
+      "phase": "STABLE_SUBGRID_VOID",
+      "radius_m": 2.5322429412530188e-05
+    },
+    "transition": "subgrid_growth"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-promotion-2",
+    "partition_equivalent": true,
+    "partitions": 2,
+    "passed": true,
+    "state": "6a014f2ecbe5abb1e348a6c3a18de238bebc5a21a06f79fb80277692673280d3",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [
+        {
+          "area_m2": 7.853981633974483e-09,
+          "cavity_id": "partition-void",
+          "center_m": [
+            0.0,
+            0.0
+          ],
+          "connection_direction_xy": null,
+          "connection_entry_m": null,
+          "connection_exit_m": null,
+          "geometry_generation": 3,
+          "inventory_area_m2": 7.853981633974483e-09,
+          "lineage": [
+            "GEOMETRIC_PROMOTION"
+          ],
+          "parent_site_id": "site-1",
+          "phase": "RESOLVED_VOID",
+          "radius_m": 5e-05
+        }
+      ],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "cavity_id": "partition-void",
+          "event": "GEOMETRIC_PROMOTION"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {},
+      "schema": "v12.production-voiding/5",
+      "sites": []
+    },
+    "transition": "promotion"
+  },
+  {
+    "clock": "01ee681b46b60b9aa666656b26ed5fbb4535ebd465317296d435ef1baed7ec16",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 3621,
+      "hazard_states": [
+        {
+          "action": 0.8038270723477087,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.1547081236869112,
+          "last_completion_time_s": 1.6407222328455144e+16,
+          "pending_events": [
+            {
+              "action_after": 0.8038270723477087,
+              "action_before": 0.40191353617385434,
+              "action_increment": 0.40191353617385434,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.6407222328455144e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 4.899227037069075e-17,
+          "residual_action": 0.8038270723477087,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 3621
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 1.6407222328455144e+16,
+    "execution_id": "partition-ligament-2",
+    "partition_equivalent": true,
+    "partitions": 2,
+    "passed": true,
+    "transition": "ligament_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "4f60ae86c915d642a70911125dc4c37e5d12f9757b000b99df1b7526fd750961",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 6110078214787410712,
+      "hazard_states": [
+        {
+          "action": 1.6231089048573308,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.7403901100881438,
+          "last_completion_time_s": 1.6424079798433724e+16,
+          "pending_events": [
+            {
+              "action_after": 1.6231089048573308,
+              "action_before": 0.8115544524286654,
+              "action_increment": 0.8115544524286654,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.6424079798433724e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.628425302964671e-14,
+          "residual_action": 0.6231089048573308,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 6110078214787410712
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 16857469978580.633,
+    "execution_id": "partition-downstream-2",
+    "partition_equivalent": true,
+    "partitions": 2,
+    "passed": true,
+    "transition": "downstream_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "c45884a73149227ba44c833a2947a468912a8060d7d5a312a9dfa0fa9b900154",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 2727424630291586728,
+      "hazard_states": [
+        {
+          "action": 3.6478464820172323,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 5.750875509490085,
+          "last_completion_time_s": 5.677926561830192e+16,
+          "pending_events": [
+            {
+              "action_after": 3.6478464820172323,
+              "action_before": 1.8239232410086161,
+              "action_increment": 1.8239232410086161,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 5.677926561830192e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.03934998168507e-17,
+          "residual_action": 0.6478464820172323,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 2727424630291586728
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 4.03551858198682e+16,
+    "execution_id": "partition-child-2",
+    "partition_equivalent": true,
+    "partitions": 2,
+    "passed": true,
+    "transition": "child_continuation",
+    "winner_count": 1
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "BIRTH_HIT",
+      "EMBRYO"
+    ],
+    "execution_id": "partition-birth-4",
+    "partition_equivalent": true,
+    "partitions": 4,
+    "passed": true,
+    "state": "ed39407df8140122a9cf0861988af95c1f5ba525892c515eb6480f90b60980e4",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.0,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "EMBRYO",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "birth_hits"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "STABILIZED"
+    ],
+    "execution_id": "partition-stabilization-4",
+    "partition_equivalent": true,
+    "partitions": 4,
+    "passed": true,
+    "state": "338de5e46732b03e5454aa614e884690ca67e453edc1d1563c903e77fd7a68d1",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.012585350350611401,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "STABLE_SUBGRID_VOID",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.31470367257160115,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "stabilization"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "HEALED"
+    ],
+    "execution_id": "partition-healing-4",
+    "partition_equivalent": true,
+    "partitions": 4,
+    "passed": true,
+    "state": "6bcd3643bcde4bd2c2c1974efbd76b8d4c90df40a4f37572f12d2ca4879c24a6",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "HEALED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.7168175169891265,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "HEALED_SITE",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "healing"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-growth-4",
+    "partition_equivalent": true,
+    "partitions": 4,
+    "passed": true,
+    "radius_m": 2.532242941253018e-05,
+    "state": "fc7cf73e5a93b6c001583c875fd055607d47c718416399363676c8684b8fdc4f",
+    "state_measurement": {
+      "area_m2": 2.014469104432192e-09,
+      "cavity_id": "partition-void",
+      "center_m": [
+        0.0,
+        0.0
+      ],
+      "connection_direction_xy": null,
+      "connection_entry_m": null,
+      "connection_exit_m": null,
+      "geometry_generation": 4,
+      "inventory_area_m2": 2.014469104432192e-09,
+      "lineage": [],
+      "parent_site_id": "site-1",
+      "phase": "STABLE_SUBGRID_VOID",
+      "radius_m": 2.532242941253018e-05
+    },
+    "transition": "subgrid_growth"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-promotion-4",
+    "partition_equivalent": true,
+    "partitions": 4,
+    "passed": true,
+    "state": "d2d9f513cc81e8222e8f67b8fca533d5d8f5be1d08776e28786e5899105a8942",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [
+        {
+          "area_m2": 7.853981633974483e-09,
+          "cavity_id": "partition-void",
+          "center_m": [
+            0.0,
+            0.0
+          ],
+          "connection_direction_xy": null,
+          "connection_entry_m": null,
+          "connection_exit_m": null,
+          "geometry_generation": 5,
+          "inventory_area_m2": 7.853981633974483e-09,
+          "lineage": [
+            "GEOMETRIC_PROMOTION"
+          ],
+          "parent_site_id": "site-1",
+          "phase": "RESOLVED_VOID",
+          "radius_m": 5e-05
+        }
+      ],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "cavity_id": "partition-void",
+          "event": "GEOMETRIC_PROMOTION"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {},
+      "schema": "v12.production-voiding/5",
+      "sites": []
+    },
+    "transition": "promotion"
+  },
+  {
+    "clock": "4159118c580e8de2195e7fce7305cb739e2d545d42ef1bca44def9da76c1f4ba",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 3621,
+      "hazard_states": [
+        {
+          "action": 0.8038270723477087,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.1547081236869112,
+          "last_completion_time_s": 1.6407222328455144e+16,
+          "pending_events": [
+            {
+              "action_after": 0.8038270723477087,
+              "action_before": 0.6028703042607815,
+              "action_increment": 0.2009567680869272,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.6407222328455144e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 4.899227037069075e-17,
+          "residual_action": 0.8038270723477087,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 3621
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 1.6407222328455144e+16,
+    "execution_id": "partition-ligament-4",
+    "partition_equivalent": true,
+    "partitions": 4,
+    "passed": true,
+    "transition": "ligament_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "d5e2c8e2ff3d656ac49a208ec1a9435bf72d9ae91ca6366e0f5815172bfc6392",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 6110078214787410712,
+      "hazard_states": [
+        {
+          "action": 1.6231089048573308,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.7403901100881438,
+          "last_completion_time_s": 1.6424079798433728e+16,
+          "pending_events": [
+            {
+              "action_after": 1.6231089048573308,
+              "action_before": 1.2173316786429982,
+              "action_increment": 0.40577722621433265,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.6424079798433728e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.628425302964671e-14,
+          "residual_action": 0.6231089048573308,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 6110078214787410712
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 16857469978580.633,
+    "execution_id": "partition-downstream-4",
+    "partition_equivalent": true,
+    "partitions": 4,
+    "passed": true,
+    "transition": "downstream_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "3e60fcae2de27e80877b6cdf046e9fb6b3d4e37b6cb4254a146d9e87fc8d8c38",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 2727424630291586728,
+      "hazard_states": [
+        {
+          "action": 3.6478464820172323,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 5.750875509490085,
+          "last_completion_time_s": 5.677926561830192e+16,
+          "pending_events": [
+            {
+              "action_after": 3.6478464820172323,
+              "action_before": 2.735884861512924,
+              "action_increment": 0.9119616205043082,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 5.677926561830192e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.03934998168507e-17,
+          "residual_action": 0.6478464820172323,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 2727424630291586728
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 4.03551858198682e+16,
+    "execution_id": "partition-child-4",
+    "partition_equivalent": true,
+    "partitions": 4,
+    "passed": true,
+    "transition": "child_continuation",
+    "winner_count": 1
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "BIRTH_HIT",
+      "EMBRYO"
+    ],
+    "execution_id": "partition-birth-8",
+    "partition_equivalent": true,
+    "partitions": 8,
+    "passed": true,
+    "state": "ed39407df8140122a9cf0861988af95c1f5ba525892c515eb6480f90b60980e4",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.0,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "EMBRYO",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "birth_hits"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "STABILIZED"
+    ],
+    "execution_id": "partition-stabilization-8",
+    "partition_equivalent": true,
+    "partitions": 8,
+    "passed": true,
+    "state": "a802f4dfa87053836233cb06c1b58d42ed310f930a4395c5d6975363315df7d9",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.012585350350611398,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "STABLE_SUBGRID_VOID",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.31470367257160115,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "stabilization"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "HEALED"
+    ],
+    "execution_id": "partition-healing-8",
+    "partition_equivalent": true,
+    "partitions": 8,
+    "passed": true,
+    "state": "6bcd3643bcde4bd2c2c1974efbd76b8d4c90df40a4f37572f12d2ca4879c24a6",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "HEALED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.7168175169891265,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "HEALED_SITE",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "healing"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-growth-8",
+    "partition_equivalent": true,
+    "partitions": 8,
+    "passed": true,
+    "radius_m": 2.5322429412530195e-05,
+    "state": "ce4f31dbf55c25ccc061c4a6d72abf17116f8c225de4a789a440d2268287013d",
+    "state_measurement": {
+      "area_m2": 2.0144691044321935e-09,
+      "cavity_id": "partition-void",
+      "center_m": [
+        0.0,
+        0.0
+      ],
+      "connection_direction_xy": null,
+      "connection_entry_m": null,
+      "connection_exit_m": null,
+      "geometry_generation": 8,
+      "inventory_area_m2": 2.0144691044321935e-09,
+      "lineage": [],
+      "parent_site_id": "site-1",
+      "phase": "STABLE_SUBGRID_VOID",
+      "radius_m": 2.5322429412530195e-05
+    },
+    "transition": "subgrid_growth"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-promotion-8",
+    "partition_equivalent": true,
+    "partitions": 8,
+    "passed": true,
+    "state": "b508a1a7fbc2876c42c2493b192a8663c5f6080c808b800ea4eebe50cf90e4ce",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [
+        {
+          "area_m2": 7.853981633974483e-09,
+          "cavity_id": "partition-void",
+          "center_m": [
+            0.0,
+            0.0
+          ],
+          "connection_direction_xy": null,
+          "connection_entry_m": null,
+          "connection_exit_m": null,
+          "geometry_generation": 9,
+          "inventory_area_m2": 7.853981633974483e-09,
+          "lineage": [
+            "GEOMETRIC_PROMOTION"
+          ],
+          "parent_site_id": "site-1",
+          "phase": "RESOLVED_VOID",
+          "radius_m": 5e-05
+        }
+      ],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "cavity_id": "partition-void",
+          "event": "GEOMETRIC_PROMOTION"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {},
+      "schema": "v12.production-voiding/5",
+      "sites": []
+    },
+    "transition": "promotion"
+  },
+  {
+    "clock": "24d0f179ee76bd93e6f7531a4aaad9779241f8993d4ef751d43a493d093dd787",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 3621,
+      "hazard_states": [
+        {
+          "action": 0.8038270723477086,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.1547081236869112,
+          "last_completion_time_s": 1.6407222328455142e+16,
+          "pending_events": [
+            {
+              "action_after": 0.8038270723477087,
+              "action_before": 0.703348688304245,
+              "action_increment": 0.10047838404346365,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.6407222328455142e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 4.899227037069075e-17,
+          "residual_action": 0.8038270723477086,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 3621
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 1.6407222328455144e+16,
+    "execution_id": "partition-ligament-8",
+    "partition_equivalent": true,
+    "partitions": 8,
+    "passed": true,
+    "transition": "ligament_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "7e4875459f338ef98777bd1ea68b6e4637b33798bda022d91e231d5cd1ea5f77",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 6110078214787410712,
+      "hazard_states": [
+        {
+          "action": 1.6231089048573308,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.7403901100881438,
+          "last_completion_time_s": 1.642407979843372e+16,
+          "pending_events": [
+            {
+              "action_after": 1.6231089048573308,
+              "action_before": 1.4202202917501645,
+              "action_increment": 0.20288861310716633,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.642407979843372e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.628425302964671e-14,
+          "residual_action": 0.6231089048573308,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 6110078214787410712
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 16857469978580.633,
+    "execution_id": "partition-downstream-8",
+    "partition_equivalent": true,
+    "partitions": 8,
+    "passed": true,
+    "transition": "downstream_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "36fbfd70f8cfe698fdeb39f391cd7e947b29fe526b42b13661dece4f03959015",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 2727424630291586728,
+      "hazard_states": [
+        {
+          "action": 3.6478464820172323,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 5.750875509490085,
+          "last_completion_time_s": 5.677926561830194e+16,
+          "pending_events": [
+            {
+              "action_after": 3.6478464820172323,
+              "action_before": 3.191865671765078,
+              "action_increment": 0.4559808102521541,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 5.677926561830194e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.03934998168507e-17,
+          "residual_action": 0.6478464820172323,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 2727424630291586728
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 4.03551858198682e+16,
+    "execution_id": "partition-child-8",
+    "partition_equivalent": true,
+    "partitions": 8,
+    "passed": true,
+    "transition": "child_continuation",
+    "winner_count": 1
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "BIRTH_HIT",
+      "EMBRYO"
+    ],
+    "execution_id": "partition-birth-16",
+    "partition_equivalent": true,
+    "partitions": 16,
+    "passed": true,
+    "state": "ed39407df8140122a9cf0861988af95c1f5ba525892c515eb6480f90b60980e4",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.0,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "EMBRYO",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "birth_hits"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "STABILIZED"
+    ],
+    "execution_id": "partition-stabilization-16",
+    "partition_equivalent": true,
+    "partitions": 16,
+    "passed": true,
+    "state": "a802f4dfa87053836233cb06c1b58d42ed310f930a4395c5d6975363315df7d9",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.012585350350611398,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "STABLE_SUBGRID_VOID",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.31470367257160115,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "stabilization"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "events": [
+      "HEALED"
+    ],
+    "execution_id": "partition-healing-16",
+    "partition_equivalent": true,
+    "partitions": 16,
+    "passed": true,
+    "state": "6bcd3643bcde4bd2c2c1974efbd76b8d4c90df40a4f37572f12d2ca4879c24a6",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "HEALED",
+          "site_id": "site-1"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {
+        "bit_generator": "PCG64",
+        "has_uint32": 0,
+        "state": {
+          "inc": 193238063681881664105517598447031341809,
+          "state": 203819190728690053753681478636643766586
+        },
+        "uinteger": 0
+      },
+      "schema": "v12.production-voiding/5",
+      "sites": [
+        {
+          "birth": {
+            "accumulated": 0.3605853904457229,
+            "threshold": 0.3605853904457229
+          },
+          "candidate_weight": 0.8,
+          "center_m": [
+            0.0007,
+            0.0
+          ],
+          "healing": {
+            "accumulated": 0.7168175169891265,
+            "threshold": 0.7168175169891265
+          },
+          "hits": 2,
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "phase": "HEALED_SITE",
+          "required_hits": 2,
+          "site_id": "site-1",
+          "stabilization": {
+            "accumulated": 0.0,
+            "threshold": 0.31470367257160115
+          }
+        }
+      ]
+    },
+    "transition": "healing"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-growth-16",
+    "partition_equivalent": true,
+    "partitions": 16,
+    "passed": true,
+    "radius_m": 2.5322429412530195e-05,
+    "state": "96b8f66b2d9f4c6e7c42ed0d124d12d1700c4f354912e39819149c7dc1131e4c",
+    "state_measurement": {
+      "area_m2": 2.0144691044321935e-09,
+      "cavity_id": "partition-void",
+      "center_m": [
+        0.0,
+        0.0
+      ],
+      "connection_direction_xy": null,
+      "connection_entry_m": null,
+      "connection_exit_m": null,
+      "geometry_generation": 16,
+      "inventory_area_m2": 2.0144691044321935e-09,
+      "lineage": [],
+      "parent_site_id": "site-1",
+      "phase": "STABLE_SUBGRID_VOID",
+      "radius_m": 2.5322429412530195e-05
+    },
+    "transition": "subgrid_growth"
+  },
+  {
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "execution_id": "partition-promotion-16",
+    "partition_equivalent": true,
+    "partitions": 16,
+    "passed": true,
+    "state": "153aac47ee2f776ae5c58b1cfc5655560a1384a8a92703215477bd2b155c763c",
+    "state_measurement": {
+      "available_defect_inventory_area_m2": 1e-08,
+      "cavities": [
+        {
+          "area_m2": 7.853981633974483e-09,
+          "cavity_id": "partition-void",
+          "center_m": [
+            0.0,
+            0.0
+          ],
+          "connection_direction_xy": null,
+          "connection_entry_m": null,
+          "connection_exit_m": null,
+          "geometry_generation": 17,
+          "inventory_area_m2": 7.853981633974483e-09,
+          "lineage": [
+            "GEOMETRIC_PROMOTION"
+          ],
+          "parent_site_id": "site-1",
+          "phase": "RESOLVED_VOID",
+          "radius_m": 5e-05
+        }
+      ],
+      "consumed_defect_inventory_area_m2": 0.0,
+      "event_history": [
+        {
+          "cavity_id": "partition-void",
+          "event": "GEOMETRIC_PROMOTION"
+        }
+      ],
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "rng_state": {},
+      "schema": "v12.production-voiding/5",
+      "sites": []
+    },
+    "transition": "promotion"
+  },
+  {
+    "clock": "e8383e7bd1b21345dda8ad260ce855bdccc47508f5b880f3dda8d44be73d3161",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 3621,
+      "hazard_states": [
+        {
+          "action": 0.8038270723477084,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.1547081236869112,
+          "last_completion_time_s": 1.6407222328455142e+16,
+          "pending_events": [
+            {
+              "action_after": 0.8038270723477087,
+              "action_before": 0.7535878803259767,
+              "action_increment": 0.05023919202173199,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.6407222328455142e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 4.899227037069075e-17,
+          "residual_action": 0.8038270723477084,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 3621
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 1.6407222328455144e+16,
+    "execution_id": "partition-ligament-16",
+    "partition_equivalent": true,
+    "partitions": 16,
+    "passed": true,
+    "transition": "ligament_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "f7eb794de38add563030e23f12fe765f1d2c837aa6822730c530b906872543c5",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 6110078214787410712,
+      "hazard_states": [
+        {
+          "action": 1.6231089048573308,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 1.7403901100881438,
+          "last_completion_time_s": 1.6424079798433736e+16,
+          "pending_events": [
+            {
+              "action_after": 1.6231089048573308,
+              "action_before": 1.5216645983037482,
+              "action_increment": 0.10144430655358261,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 1.6424079798433736e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.628425302964671e-14,
+          "residual_action": 0.6231089048573308,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 6110078214787410712
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 16857469978580.633,
+    "execution_id": "partition-downstream-16",
+    "partition_equivalent": true,
+    "partitions": 16,
+    "passed": true,
+    "transition": "downstream_first_passage",
+    "winner_count": 1
+  },
+  {
+    "clock": "7ab0245070dec168a0d90fd0600b0b267428518070d9bd7537bb9820f4aaea1e",
+    "clock_measurement": {
+      "candidates": [
+        {
+          "angle_rad": 0.0,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "direction_xy": [
+            1.0,
+            0.0
+          ],
+          "gamma_rel": 1.0,
+          "normal_xy": [
+            0.0,
+            1.0
+          ],
+          "orientation_convention": "bcc-[001]-section:theta_deg=0",
+          "plane_family": "cleavage",
+          "plane_variant": "(100)"
+        }
+      ],
+      "competition_event_index": 0,
+      "consumed_event_ids": [],
+      "global_hazard_seed": 2727424630291586728,
+      "hazard_states": [
+        {
+          "action": 3.647846482017231,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "completed_event_count": 1,
+          "current_threshold_action": 5.750875509490085,
+          "last_completion_time_s": 5.677926561830193e+16,
+          "pending_events": [
+            {
+              "action_after": 3.6478464820172323,
+              "action_before": 3.419856076891154,
+              "action_increment": 0.22799040512607816,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completion_time_s": 5.677926561830193e+16,
+              "event_ordinal": 1
+            }
+          ],
+          "previous_rate_per_s": 9.03934998168507e-17,
+          "residual_action": 0.6478464820172309,
+          "threshold_process": "unit_exponential",
+          "threshold_seed": 2727424630291586728
+        }
+      ],
+      "reservations": []
+    },
+    "comparison_projection_excludes": [
+      "geometry_generation",
+      "pending_event.action_before",
+      "pending_event.action_increment"
+    ],
+    "duration_s": 4.03551858198682e+16,
+    "execution_id": "partition-child-16",
+    "partition_equivalent": true,
+    "partitions": 16,
+    "passed": true,
+    "transition": "child_continuation",
+    "winner_count": 1
+  }
+]

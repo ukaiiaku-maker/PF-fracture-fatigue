@@ -1,0 +1,26 @@
+[
+  {
+    "classification": "CLEAN_WORKTREE_PATHS_NOT_SUPPLIED",
+    "execution_id": "neutrality-monotonic",
+    "passed": false,
+    "trajectory": "monotonic"
+  },
+  {
+    "classification": "CLEAN_WORKTREE_PATHS_NOT_SUPPLIED",
+    "execution_id": "neutrality-oblique",
+    "passed": false,
+    "trajectory": "oblique"
+  },
+  {
+    "classification": "CLEAN_WORKTREE_PATHS_NOT_SUPPLIED",
+    "execution_id": "neutrality-checkpoint_restart",
+    "passed": false,
+    "trajectory": "checkpoint_restart"
+  },
+  {
+    "classification": "CLEAN_WORKTREE_PATHS_NOT_SUPPLIED",
+    "execution_id": "neutrality-unload_reload",
+    "passed": false,
+    "trajectory": "unload_reload"
+  }
+]

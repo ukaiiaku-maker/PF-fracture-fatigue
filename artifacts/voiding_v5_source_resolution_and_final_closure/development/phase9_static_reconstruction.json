@@ -1,0 +1,21 @@
+{
+  "schema": "v5.development-static-independent-reconstruction/1",
+  "record_kind": "READ_ONLY_DEVELOPMENT_VALIDATION_NOT_NEW_SOLVES_OR_FINAL_CI_ATTESTATION",
+  "source_execution_sha": "a34cdf00306eeaf9b10df17ae0ea5864611c828d",
+  "source_worker_head_and_clean_tree_rechecked_after_completion": true,
+  "original_complete_manifest_sha256": "55e89470ade87743bf3bfe4b3fd2c59d90e0cdfdddec438c7c7dc2e1151ab7e7",
+  "original_report_sha256": "b326c3823dc3b5d08896a0d3b5b73369cff36622f7855ced20d391fafc6d53bd",
+  "validator_file_sha256": "5b3d128596b80be08cf07ed29e0618b2fe43a5974e4153a32e16f64f25e10050",
+  "validator": "scripts/validate_v5_source_resolution_evidence_v1.py static",
+  "valid": true,
+  "unique_physical_solves": 96,
+  "solver_execution_failures": 0,
+  "family_predicates_passed": 434,
+  "family_predicates_total": 537,
+  "complete_families_passed": 0,
+  "complete_families_total": 33,
+  "derivative_checks_passed": 8,
+  "derivative_checks_total": 12,
+  "science_passed": false,
+  "historical_static_result": "UNCHANGED_683_OF_791"
+}

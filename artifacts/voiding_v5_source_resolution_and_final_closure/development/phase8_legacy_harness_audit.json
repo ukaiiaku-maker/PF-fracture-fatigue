@@ -1,0 +1,16 @@
+{
+  "schema": "v5.retained-restart-harness-defect-audit/1",
+  "record_kind": "AUDIT_OF_RETAINED_FAILED_DEVELOPMENT_NOT_NEW_EXECUTION",
+  "retained_bundle": "phase8_stronger_reload_legacy_harness_38a",
+  "execution_sha": "38a7686df46a27a76248064e7944707c5d3398ff",
+  "direct_source_guard_failures": 11,
+  "observed_failure": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+  "reported_restart_exact_count": 11,
+  "validated_independent_restart_pass_count": 0,
+  "restarted_operation_counts": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "continued_front_count": 0,
+  "paired_execution_classification": "INVALID_LEGACY_HARNESS_CLAIM",
+  "cause": "The direct exception skipped the second continuation call and discarded the last internally accepted state. Equality of the unchanged outer variables is not restart evidence.",
+  "repair_commit": "c2844279abdeb59dc5e0418e64266e88732c7c8e",
+  "replacement": "Separate direct/restored attempt handlers preserve last accepted state; newly versioned matched-return-load restarts run independently in workflow 34185389845."
+}

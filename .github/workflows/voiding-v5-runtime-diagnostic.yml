@@ -1,0 +1,50 @@
+name: V5 read-only numerical dispatch diagnosis
+on:
+  workflow_call:
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        worker: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: '34185389845'
+          name: v5-phase8-development-restarts-2-787ebf692a8d5058050553f4160b78af062f1d48
+          path: /tmp/v5-runtime-source
+      - name: Independent read-only dispatch interventions; no full campaign
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python scripts/diagnose_v5_cross_worker_runtime_v1.py /tmp/v5-runtime-source /tmp/v5-runtime-diagnostic/report.json
+      - name: Clean worktree and diff
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-runtime-diagnostic-${{ matrix.worker }}-${{ github.sha }}
+          path: /tmp/v5-runtime-diagnostic

@@ -1,0 +1,45 @@
+{
+  "actual_operations": [
+    {
+      "api": "remesh_cavity",
+      "operations": [
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "equilibrium"
+      ]
+    }
+  ],
+  "case_identity": "promotion",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "transitions:promotion:2:26:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/363fc52e792a44a169559a910f87c97377f370c7363d6625d9dd5578064c7526.json",
+  "initial_fingerprint": "363fc52e792a44a169559a910f87c97377f370c7363d6625d9dd5578064c7526",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 2,
+    "predecessor_available": true,
+    "requested_predecessor": "subgrid_growth",
+    "seed": 3621
+  },
+  "input_hash": "dfb3791430cb1071f192d9014c0d62274af437f9ddf38d0c0a62beab87f40553",
+  "partition_count": 2,
+  "terminal_checkpoint": "checkpoints/eef1f5680587056645533c532b92c67c83e31d1d436366f949fc273696b8cb7f.json",
+  "terminal_fingerprint": "eef1f5680587056645533c532b92c67c83e31d1d436366f949fc273696b8cb7f",
+  "transition_occurred": true
+}

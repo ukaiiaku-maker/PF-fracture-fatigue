@@ -1,0 +1,292 @@
+{
+  "case_id": "3fb96a6f2788eeb22e0a4f78da45accd1545f7dddca56076f0179b5868247299",
+  "environment_identity": {
+    "assembly": "production_CST_plane_strain_P0_V12_support",
+    "machine": "arm64",
+    "numpy": "2.5.1",
+    "platform": "darwin",
+    "python": "3.12.13",
+    "scipy": "1.18.0",
+    "solver": "scipy.sparse.linalg.spsolve"
+  },
+  "executed_code_sha": "3cd013ce3cf2967aaf474354218f3b04191c5343",
+  "execution_id": "3fb96a6f2788eeb22e0a4f78da45accd1545f7dddca56076f0179b5868247299:3cd013ce3cf2967aaf474354218f3b04191c5343",
+  "input_configuration": {
+    "boundary_segments": 128,
+    "capture_source": true,
+    "cavity_center_m": [
+      0.0012,
+      0.0
+    ],
+    "cavity_enabled": false,
+    "cavity_radius_m": 5e-05,
+    "crack_enabled": true,
+    "crack_orientation_deg": 0.0,
+    "crack_path_m": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0005,
+        0.0
+      ]
+    ],
+    "crack_root_m": null,
+    "crack_tip_m": null,
+    "far_h_m": 5e-05,
+    "geometry_mode": "V3_FIXED_LABORATORY_GEOMETRY",
+    "ligament_ratio": null,
+    "material_E_Pa": 210000000000.0,
+    "material_nu": 0.3,
+    "opening_m": 4e-07,
+    "radial_layers": 48,
+    "residual_stiffness_kappa": 1e-06,
+    "specimen_height_m": 0.002,
+    "specimen_width_m": 0.003,
+    "tip_layer": 3
+  },
+  "input_hash": "3fb96a6f2788eeb22e0a4f78da45accd1545f7dddca56076f0179b5868247299",
+  "measurement_source": "sources/3fb96a6f2788eeb22e0a4f78da45accd1545f7dddca56076f0179b5868247299.npz",
+  "measurements": {
+    "cavity_enabled": false,
+    "cavity_fields": null,
+    "compliance": 3.3042386534344306e-12,
+    "energy": 0.024211326236029236,
+    "energy_identity": 1.3040164324329814e-14,
+    "fixed_crack_vertex_error_m": 1.4695761589768237e-19,
+    "fixed_tip_probe": {
+      "candidate_planes": [
+        {
+          "normal": [
+            1.0,
+            0.0
+          ],
+          "normal_opening_Pa": 6511354.151411584,
+          "shear_Pa": -2.3981556296348572e-08
+        },
+        {
+          "normal": [
+            0.0,
+            1.0
+          ],
+          "normal_opening_Pa": 112147958.35204305,
+          "shear_Pa": 2.3981556296348572e-08
+        },
+        {
+          "normal": [
+            0.7071067811865476,
+            0.7071067811865476
+          ],
+          "normal_opening_Pa": 59329656.2517273,
+          "shear_Pa": 52818302.100315735
+        },
+        {
+          "normal": [
+            0.7071067811865476,
+            -0.7071067811865476
+          ],
+          "normal_opening_Pa": 59329656.25172734,
+          "shear_Pa": -52818302.100315735
+        }
+      ],
+      "element_ids": [
+        8574,
+        8576
+      ],
+      "operator": "area_weighted_containing_live_CST_at_fixed_25um_ahead_v1",
+      "physical_position_m": [
+        0.000525,
+        0.0
+      ],
+      "principal_stresses_Pa": [
+        6511354.151411584,
+        112147958.35204305
+      ],
+      "sigma_nn_Pa": 112147958.35204305,
+      "sigma_nt_Pa": 2.3981556296348572e-08,
+      "sigma_tt_Pa": 6511354.151411584,
+      "tensor_Pa": [
+        [
+          6511354.151411584,
+          -2.3981556296348572e-08
+        ],
+        [
+          -2.3981556296348572e-08,
+          112147958.35204305
+        ]
+      ],
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    "free_residual_relative": 2.0956302490014185e-14,
+    "independent_intact_path_certificate": {
+      "boundary_terminal_certificates": [],
+      "bridge_element_ids": [],
+      "bridge_node_ids": [],
+      "certificate_fingerprint": "6450ad8ccf0b7304edbaceea1cd65f071f600bf9cabb04cca85456cf698e2828",
+      "edge_cut_certificates": [
+        {
+          "backward_undershoot_m": 0.0,
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "972542a00398007f11239c94f74eb61f0c3d1e562241dbf14b6984e3303056a8",
+          "endpoint_footprint_error_m": 1.8259316914948998e-06,
+          "forward_leakage_m": 1.8259316914948998e-06,
+          "forward_leakage_over_h_local": 0.02614870997347839,
+          "forward_overshoot_m": 1.8259316914948998e-06,
+          "h_local_max_m": 6.982874846777797e-05,
+          "h_local_median_m": 5.814456375293613e-05,
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_component_count": 1,
+          "negative_component_labels": [
+            2
+          ],
+          "negative_seed_count": 55,
+          "positive_component_count": 1,
+          "positive_component_labels": [
+            1
+          ],
+          "positive_seed_count": 55,
+          "segment_id": "b00000000:arc0",
+          "selected_area_m2": 9.380925663976629e-08,
+          "selected_area_over_length_h_local": 2.686837690727164,
+          "signed_tip_footprint_m": 1.8259316914948998e-06,
+          "sufficient_opposite_side_seeds": true,
+          "support_width_m": 0.00011818968402859738,
+          "support_width_over_h_local": 1.6925648335675851,
+          "tube_boundary_clearance_m": 0.0001
+        }
+      ],
+      "insufficient_seed_segment_ids": [],
+      "intact_cross_graph_path_exists": false,
+      "minimum_crossing_path_length": null,
+      "negative_seed_element_ids": [
+        9602,
+        9603,
+        9604,
+        9605,
+        9606,
+        9607,
+        9608,
+        9609,
+        9858,
+        9859,
+        9860,
+        9861,
+        9862,
+        9863,
+        9864,
+        10114,
+        10115,
+        10116,
+        10117,
+        10118,
+        10119,
+        10370,
+        10371,
+        10372,
+        10373,
+        10374,
+        10375,
+        10626,
+        10627,
+        10628,
+        10629,
+        10630,
+        10631,
+        10882,
+        10883,
+        10884,
+        10885,
+        10886,
+        10887,
+        11138,
+        11139,
+        11140,
+        11141,
+        11142,
+        11143,
+        11394,
+        11395,
+        11396,
+        11397,
+        11398,
+        11399,
+        11650,
+        11651,
+        11652,
+        11653
+      ],
+      "positive_seed_element_ids": [
+        9586,
+        9587,
+        9588,
+        9589,
+        9590,
+        9591,
+        9592,
+        9593,
+        9842,
+        9844,
+        9845,
+        9846,
+        9847,
+        9848,
+        9849,
+        10100,
+        10101,
+        10102,
+        10103,
+        10104,
+        10105,
+        10356,
+        10357,
+        10358,
+        10359,
+        10360,
+        10361,
+        10612,
+        10613,
+        10614,
+        10615,
+        10616,
+        10617,
+        10868,
+        10869,
+        10870,
+        10871,
+        10872,
+        10873,
+        11124,
+        11125,
+        11126,
+        11127,
+        11128,
+        11129,
+        11380,
+        11381,
+        11382,
+        11383,
+        11384,
+        11385,
+        11638,
+        11639,
+        11640,
+        11641
+      ]
+    },
+    "mesh_quality": 0.04830431138521841,
+    "reaction": 121056.63118014777,
+    "reaction_balance": 1.238137270061075e-14
+  },
+  "source_fingerprints": {
+    "assembled_system": "ecd1eca370b7396a50556a95258845077445014a5c0a7a052514d8d3fd9e9391",
+    "mesh": "5e705ee08fea0afbe6041c2da748762b4103653b069147c162a1424e12fbbbeb",
+    "solution": "f1372be566bb0313eb6751060da2ed432b79879e1a7667e08a95c5fa39d310df",
+    "support": "6bdd5fc83448eaa95b55148dac0f5b66833e12ec462869792213c4e7e15d0aab"
+  }
+}

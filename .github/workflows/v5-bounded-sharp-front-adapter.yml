@@ -1,0 +1,208 @@
+name: V5 bounded downstream sharp-front adapter
+
+on:
+  push:
+    branches:
+      - codex/sharp-front-stateful-voiding-v5-finalization-v2
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-bounded-downstream-sharp-front-adapter-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bounded-adapter-attestation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      ADAPTER_IMPLEMENTATION_SHA: 9536705c173a8b3b5f94a31640edb7db0b0a9447
+    steps:
+      - name: Initialize bounded attestation directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-bounded-adapter-attestation" >> "$GITHUB_ENV"
+          mkdir -p "${RUNNER_TEMP}/v5-bounded-adapter-attestation"
+
+      - name: Depth-one partial sparse checkout of bounded inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git config remote.origin.promisor true
+          git config remote.origin.partialclonefilter blob:none
+          git sparse-checkout init --no-cone
+          git sparse-checkout set --no-cone \
+            /arrhenius_fracture/ \
+            /tests/__init__.py \
+            /tests/test_live_topology_kernel_v11.py \
+            /tests/test_r_tip_constitutive_handoff_v2.py \
+            /tests/test_v11_resolved_tip_handoff.py \
+            /tests/test_v11_shared_cluster_production.py \
+            /tests/test_v5_bounded_sharp_front_adapter.py \
+            /tests/test_voiding_v5.py \
+            /pyproject.toml \
+            /requirements-v5-source-resolution-ci.txt \
+            /docs/V5_BOUNDED_SHARP_FRONT_INTEGRATION_REPORT.md \
+            /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/production/checkpoints/production_512_192_connected.json \
+            /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/production/checkpoints/production_512_192_connected.json.06d65af4bdfce996659df140e4b693017cbe839e0a309d20473c598e5af84c08.state.pkl
+          git -c protocol.version=2 fetch --no-tags --depth=1 --filter=blob:none origin "$GITHUB_SHA"
+          git checkout --detach FETCH_HEAD
+          git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Set up pinned Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+          cache-dependency-path: requirements-v5-source-resolution-ci.txt
+
+      - name: Install frozen numerical environment
+        run: python -m pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+
+      - name: Record environment and identities
+        run: |
+          set -euo pipefail
+          mkdir -p "$ATTESTATION_DIR"
+          {
+            echo "adapter_implementation_sha=$ADAPTER_IMPLEMENTATION_SHA"
+            echo "workflow_attestation_sha=$GITHUB_SHA"
+            python --version
+            python -m pip --version
+            python -m pip freeze
+          } | tee "$ATTESTATION_DIR/environment.txt"
+
+      - name: Freeze and verify the explicit 18-node inventory
+        run: |
+          set -euo pipefail
+          TEST_NODES=(
+            tests/test_v5_bounded_sharp_front_adapter.py::test_a_root_child_engine_equivalence
+            tests/test_v5_bounded_sharp_front_adapter.py::test_b_canonical_radius_sensitivity_uses_N_em_ledger
+            tests/test_v5_bounded_sharp_front_adapter.py::test_c_reciprocal_void_radius_control_has_no_constitutive_input
+            tests/test_v5_bounded_sharp_front_adapter.py::test_d_cavity_and_child_stages_have_distinct_sources
+            tests/test_v5_bounded_sharp_front_adapter.py::test_e_child_canonical_state_checkpoint_round_trip
+            tests/test_r_tip_constitutive_handoff_v2.py::test_existing_analytical_radius_law_is_reused_by_child_adapter
+            tests/test_r_tip_constitutive_handoff_v2.py::test_signed_prediction_and_reciprocal_control_are_frozen
+            tests/test_r_tip_constitutive_handoff_v2.py::test_consumer_graph_covers_both_original_hazards_and_event_selection
+            tests/test_voiding_v5.py::test_zero_drive_returns_dormant_without_first_passage_or_state_consumption
+            tests/test_voiding_v5.py::test_directional_candidates_advance_over_one_common_earliest_interval
+            tests/test_voiding_v5.py::test_directional_exact_tie_fires_only_prospectively_equal_candidates
+            tests/test_voiding_v5.py::test_zero_rate_candidate_keeps_residual_while_peer_wins
+            tests/test_v11_resolved_tip_handoff.py::test_handoff_retains_all_history_at_junction_and_creates_fresh_tips
+            tests/test_v11_resolved_tip_handoff.py::test_handoff_is_deterministic_under_arm_enumeration
+            tests/test_v11_resolved_tip_handoff.py::test_handoff_rejects_any_factory_that_imports_historical_state
+            tests/test_v11_shared_cluster_production.py::test_correlated_A12_uses_real_live_fem_and_updates_shared_state_once
+            tests/test_voiding_v5.py::test_connected_and_downstream_states_own_zero_then_one_active_front
+            tests/test_voiding_v5.py::test_continuation_uses_child_tip_source_and_recomputes_three_body_topology
+          )
+          printf '%s\n' "${TEST_NODES[@]}" | tee "$ATTESTATION_DIR/requested-node-inventory.txt"
+          requested_count="$(sort -u "$ATTESTATION_DIR/requested-node-inventory.txt" | wc -l | tr -d ' ')"
+          test "$requested_count" = 18
+          integration_node='tests/test_voiding_v5.py::test_continuation_uses_child_tip_source_and_recomputes_three_body_topology'
+          integration_count="$(grep -Fxc "$integration_node" "$ATTESTATION_DIR/requested-node-inventory.txt")"
+          test "$integration_count" = 1
+          python -m pytest --collect-only -q -p no:cacheprovider "${TEST_NODES[@]}" \
+            | tee "$ATTESTATION_DIR/collect-only.log"
+          grep -E '^[^[:space:]]+::' "$ATTESTATION_DIR/collect-only.log" \
+            > "$ATTESTATION_DIR/collected-node-inventory.txt"
+          collected_count="$(sort -u "$ATTESTATION_DIR/collected-node-inventory.txt" | wc -l | tr -d ' ')"
+          test "$collected_count" = 18
+          diff -u \
+            <(sort "$ATTESTATION_DIR/requested-node-inventory.txt") \
+            <(sort "$ATTESTATION_DIR/collected-node-inventory.txt")
+          echo "collection_count=18" | tee "$ATTESTATION_DIR/collection-result.txt"
+
+      - name: Run the bounded adapter inventory once
+        id: bounded_tests
+        run: |
+          set -euo pipefail
+          mapfile -t TEST_NODES < "$ATTESTATION_DIR/requested-node-inventory.txt"
+          started="$(date +%s)"
+          set +e
+          python -m pytest -vv -p no:cacheprovider --durations=0 \
+            --junitxml="$ATTESTATION_DIR/pytest-junit.xml" "${TEST_NODES[@]}" \
+            2>&1 | tee "$ATTESTATION_DIR/pytest.log"
+          pytest_status="${PIPESTATUS[0]}"
+          set -e
+          finished="$(date +%s)"
+          echo "elapsed_seconds=$((finished - started))" \
+            | tee "$ATTESTATION_DIR/elapsed.txt"
+          python - "$ATTESTATION_DIR/pytest-junit.xml" \
+            > "$ATTESTATION_DIR/pytest-counts.txt" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse(sys.argv[1]).getroot()
+          suites = [root] if root.tag == "testsuite" else list(root.findall("testsuite"))
+          totals = {
+              key: sum(int(suite.attrib.get(key, 0)) for suite in suites)
+              for key in ("tests", "failures", "errors", "skipped")
+          }
+          passed = totals["tests"] - totals["failures"] - totals["errors"] - totals["skipped"]
+          print(f"tests={totals['tests']}")
+          print(f"passed={passed}")
+          print(f"failures={totals['failures']}")
+          print(f"errors={totals['errors']}")
+          print(f"skipped={totals['skipped']}")
+          PY
+          cat "$ATTESTATION_DIR/pytest-counts.txt"
+          test "$pytest_status" = 0
+          grep -Fxq 'tests=18' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'passed=18' "$ATTESTATION_DIR/pytest-counts.txt"
+
+      - name: Verify workflow-only diff and clean worktree
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p "$ATTESTATION_DIR"
+          if git diff --check > "$ATTESTATION_DIR/worktree-diff-check.txt"; then
+            echo 'worktree_diff_check=PASS' | tee -a "$ATTESTATION_DIR/worktree-diff-check.txt"
+          else
+            cat "$ATTESTATION_DIR/worktree-diff-check.txt"
+            exit 1
+          fi
+          git status --porcelain=v1 > "$ATTESTATION_DIR/git-status.txt"
+          if test -s "$ATTESTATION_DIR/git-status.txt"; then
+            cat "$ATTESTATION_DIR/git-status.txt"
+            echo 'clean_worktree=FAIL' | tee "$ATTESTATION_DIR/clean-worktree.txt"
+            exit 1
+          fi
+          echo 'clean_worktree=PASS' | tee "$ATTESTATION_DIR/clean-worktree.txt"
+
+      - name: Record bounded classifications
+        if: always()
+        env:
+          TEST_OUTCOME: ${{ steps.bounded_tests.outcome }}
+        run: |
+          set -euo pipefail
+          {
+            echo "adapter_implementation_sha=$ADAPTER_IMPLEMENTATION_SHA"
+            echo "workflow_attestation_sha=$GITHUB_SHA"
+            echo "bounded_test_step_outcome=$TEST_OUTCOME"
+            echo 'integration_test_invocations=1'
+            if test "$TEST_OUTCOME" = success; then
+              echo 'EXISTING_R_TIP_LAW_REUSED_BY_DOWNSTREAM_CHILD=PASS_CLEAN_WORKER_ATTESTED'
+              echo 'DOWNSTREAM_CHILD_ENGINE_ADAPTER=PASS_CLEAN_WORKER_ATTESTED'
+              echo 'DIRECT_R_VOID_SUBSTITUTION=ABSENT'
+              echo 'CHILD_ENGINE_CHECKPOINT_RESTART=PASS'
+              echo 'SINGLE_FIRST_PASSAGE_OWNERSHIP=PASS'
+            else
+              echo 'BOUNDED_SCIENTIFIC_CLASSIFICATIONS=NOT_ATTESTED'
+            fi
+            echo 'CHILD_DIRECTIONAL_K_PROVIDER_QUALIFICATION=OPEN_SEPARATE_LOAD_PROVIDER_QUESTION'
+          } | tee "$ATTESTATION_DIR/classifications.txt"
+
+      - name: Upload bounded attestation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-bounded-sharp-front-adapter-${{ github.sha }}
+          path: ${{ runner.temp }}/v5-bounded-adapter-attestation/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,299 @@
+{
+  "executed_code_sha": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+  "inherited_failure_count": 7,
+  "initial_failures": 18,
+  "policy_c_expectation_count": 11,
+  "repository_wide_ci": "NOT_GREEN",
+  "rerun_additional_failures": [],
+  "rows": [
+    {
+      "affected_physics": "UNRELATED_INHERITED_BASELINE",
+      "base_branch_status": "FAIL_RECORDED_INHERITED_BASELINE",
+      "code_or_test_wrong": "OUTSIDE_CLOSURE_SCOPE",
+      "corrective_action": "RETAIN_AND_REPORT_SEPARATELY",
+      "current_branch_status": "FAIL",
+      "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_review_builder_emits_arti0')\n\n    def test_review_builder_emits_artifact_consumable_by_production_loader(tmp_path):\n        responses = []\n        index = 0\n        for opening in (0.0, 0.5, 1.0):\n            for extension in (0.0, 1.0e-5):\n                path = tmp_path / f\"S{index:02d}.csv\"\n                _write_state(\n                    path,\n                    state_id=f\"S{index:02d}\",\n                    opening=opening,\n                    extension=extension,\n                    observed_r=1.0 + 0.2 * index,\n                )\n                responses.append(path)\n                index += 1\n    \n        normalization = tmp_path / \"normalization.json\"\n        normalization.write_text(\n            json.dumps(\n                {\n                    \"schema\": NORM_SCHEMA,\n                    \"normalization_source\": \"process_zone_geometry_and_line_spacing\",\n                    \"activation_to_line_content_by_system\": [1.0],\n                    \"source_capacity_bounds_per_system\": [[1.0, 10.0]],\n                    \"fitted_to_toughness_or_fatigue\": False,\n                    \"shielding_attenuation_factor_fitted\": False,\n                }\n            )\n        )\n        out = tmp_path / \"atlas.json\"\n        command = [\n            sys.executable,\n            \"scripts/build_v10_2_12_real_signed_atlas.py\",\n            \"--normalization\",\n            str(normalization),\n            \"--out\",\n            str(out),\n        ]\n        for path in responses:\n            command.extend([\"--responses\", str(path)])\n        completed = subprocess.run(\n            command,\n            cwd=ROOT,\n            text=True,\n            capture_output=True,\n            check=False,\n        )\n>       assert completed.returncode == 0, completed.stderr + completed.stdout\nE       AssertionError: /private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\\n\").returncode\n\ntests/test_real_signed_builder_v10212.py:127: AssertionError",
+      "exact_message": "AssertionError: /private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\n  \nassert 1 == 0\n +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\\n\").returncode",
+      "expectation_predates_policy_c": false,
+      "rerun_result": {
+        "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-97/test_review_builder_emits_arti0')\n\n    def test_review_builder_emits_artifact_consumable_by_production_loader(tmp_path):\n        responses = []\n        index = 0\n        for opening in (0.0, 0.5, 1.0):\n            for extension in (0.0, 1.0e-5):\n                path = tmp_path / f\"S{index:02d}.csv\"\n                _write_state(\n                    path,\n                    state_id=f\"S{index:02d}\",\n                    opening=opening,\n                    extension=extension,\n                    observed_r=1.0 + 0.2 * index,\n                )\n                responses.append(path)\n                index += 1\n    \n        normalization = tmp_path / \"normalization.json\"\n        normalization.write_text(\n            json.dumps(\n                {\n                    \"schema\": NORM_SCHEMA,\n                    \"normalization_source\": \"process_zone_geometry_and_line_spacing\",\n                    \"activation_to_line_content_by_system\": [1.0],\n                    \"source_capacity_bounds_per_system\": [[1.0, 10.0]],\n                    \"fitted_to_toughness_or_fatigue\": False,\n                    \"shielding_attenuation_factor_fitted\": False,\n                }\n            )\n        )\n        out = tmp_path / \"atlas.json\"\n        command = [\n            sys.executable,\n            \"scripts/build_v10_2_12_real_signed_atlas.py\",\n            \"--normalization\",\n            str(normalization),\n            \"--out\",\n            str(out),\n        ]\n        for path in responses:\n            command.extend([\"--responses\", str(path)])\n        completed = subprocess.run(\n            command,\n            cwd=ROOT,\n            text=True,\n            capture_output=True,\n            check=False,\n        )\n>       assert completed.returncode == 0, completed.stderr + completed.stdout\nE       AssertionError: /private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-97/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\\n\").returncode\n\ntests/test_real_signed_builder_v10212.py:127: AssertionError",
+        "message": "AssertionError: /private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-97/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\n  \nassert 1 == 0\n +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\\n\").returncode",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader"
+    },
+    {
+      "affected_physics": "UNRELATED_INHERITED_BASELINE",
+      "base_branch_status": "FAIL_RECORDED_INHERITED_BASELINE",
+      "code_or_test_wrong": "OUTSIDE_CLOSURE_SCOPE",
+      "corrective_action": "RETAIN_AND_REPORT_SEPARATELY",
+      "current_branch_status": "FAIL",
+      "exact_error": "def test_required_matrices_are_complete():\n>       assert len(ROLLBACK_STAGES)==11 and \"late_event_veto\" in ROLLBACK_STAGES\nE       AssertionError: assert (9 == 11)\nE        +  where 9 = len(('graph_edit', 'remesh', 'field_projection', 'support_rebuild', 'equilibrium', 'energy_gate', ...))\n\ntests/test_stage2_criterion_v12.py:3: AssertionError",
+      "exact_message": "AssertionError: assert (9 == 11)\n +  where 9 = len(('graph_edit', 'remesh', 'field_projection', 'support_rebuild', 'equilibrium', 'energy_gate', ...))",
+      "expectation_predates_policy_c": false,
+      "rerun_result": {
+        "exact_error": "def test_required_matrices_are_complete():\n>       assert len(ROLLBACK_STAGES)==11 and \"late_event_veto\" in ROLLBACK_STAGES\nE       AssertionError: assert (9 == 11)\nE        +  where 9 = len(('graph_edit', 'remesh', 'field_projection', 'support_rebuild', 'equilibrium', 'energy_gate', ...))\n\ntests/test_stage2_criterion_v12.py:3: AssertionError",
+        "message": "AssertionError: assert (9 == 11)\n +  where 9 = len(('graph_edit', 'remesh', 'field_projection', 'support_rebuild', 'equilibrium', 'energy_gate', ...))",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_stage2_criterion_v12.py::test_required_matrices_are_complete"
+    },
+    {
+      "affected_physics": "UNRELATED_INHERITED_BASELINE",
+      "base_branch_status": "FAIL_RECORDED_INHERITED_BASELINE",
+      "code_or_test_wrong": "OUTSIDE_CLOSURE_SCOPE",
+      "corrective_action": "RETAIN_AND_REPORT_SEPARATELY",
+      "current_branch_status": "FAIL",
+      "exact_error": "def test_v10214_capture_model_id():\n>       assert MODEL_ID == \"v10.2.14_live_production_fem_state_capture\"\nE       AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'\nE         \nE         - v10.2.14_live_production_fem_state_capture\nE         + v10.2.27_live_production_state_capture_with_frozen_measurement_clone\n\ntests/test_v10214_capture_model_id.py:5: AssertionError",
+      "exact_message": "AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'\n  \n  - v10.2.14_live_production_fem_state_capture\n  + v10.2.27_live_production_state_capture_with_frozen_measurement_clone",
+      "expectation_predates_policy_c": false,
+      "rerun_result": {
+        "exact_error": "def test_v10214_capture_model_id():\n>       assert MODEL_ID == \"v10.2.14_live_production_fem_state_capture\"\nE       AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'\nE         \nE         - v10.2.14_live_production_fem_state_capture\nE         + v10.2.27_live_production_state_capture_with_frozen_measurement_clone\n\ntests/test_v10214_capture_model_id.py:5: AssertionError",
+        "message": "AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'\n  \n  - v10.2.14_live_production_fem_state_capture\n  + v10.2.27_live_production_state_capture_with_frozen_measurement_clone",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id"
+    },
+    {
+      "affected_physics": "UNRELATED_INHERITED_BASELINE",
+      "base_branch_status": "FAIL_RECORDED_INHERITED_BASELINE",
+      "code_or_test_wrong": "OUTSIDE_CLOSURE_SCOPE",
+      "corrective_action": "RETAIN_AND_REPORT_SEPARATELY",
+      "current_branch_status": "FAIL",
+      "exact_error": "def test_v10214_response_model_id():\n>       assert MODEL_ID == \"v10.2.14_exact_endpoint_active_signed_spatial_station_responses\"\nE       AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'\nE         \nE         - v10.2.14_exact_endpoint_active_signed_spatial_station_responses\nE         ?       ^^\nE         + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses\nE         ?       ^^               ++++++++++++++\n\ntests/test_v10214_response_model_id.py:5: AssertionError",
+      "exact_message": "AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'\n  \n  - v10.2.14_exact_endpoint_active_signed_spatial_station_responses\n  ?       ^^\n  + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses\n  ?       ^^               ++++++++++++++",
+      "expectation_predates_policy_c": false,
+      "rerun_result": {
+        "exact_error": "def test_v10214_response_model_id():\n>       assert MODEL_ID == \"v10.2.14_exact_endpoint_active_signed_spatial_station_responses\"\nE       AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'\nE         \nE         - v10.2.14_exact_endpoint_active_signed_spatial_station_responses\nE         ?       ^^\nE         + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses\nE         ?       ^^               ++++++++++++++\n\ntests/test_v10214_response_model_id.py:5: AssertionError",
+        "message": "AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'\n  \n  - v10.2.14_exact_endpoint_active_signed_spatial_station_responses\n  ?       ^^\n  + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses\n  ?       ^^               ++++++++++++++",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_v10214_response_model_id.py::test_v10214_response_model_id"
+    },
+    {
+      "affected_physics": "UNRELATED_INHERITED_BASELINE",
+      "base_branch_status": "FAIL_RECORDED_INHERITED_BASELINE",
+      "code_or_test_wrong": "OUTSIDE_CLOSURE_SCOPE",
+      "corrective_action": "RETAIN_AND_REPORT_SEPARATELY",
+      "current_branch_status": "FAIL",
+      "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_zero_event_summary_is_rec0')\n\n    def test_zero_event_summary_is_recorded_explicitly(tmp_path):\n        case = tmp_path / \"case\"\n        _write_case(case, n_advances=0)\n    \n        _rewrite_summary_event_semantics(\n            [\"--out\", str(case), \"--da-phys\", \"5e-6\"]\n        )\n    \n        row = json.loads((case / \"summary.json\").read_text())[0]\n        assert row[\"n_geometry_events\"] == 0\n        assert row[\"n_equivalent_checkpoints_exact\"] == 0.0\n        assert row[\"n_equivalent_checkpoints_rounded\"] == 0\n        assert row[\"nominal_checkpoint_length_m\"] == pytest.approx(5.0e-6)\n        assert row[\"geometry_path_length_m\"] == 0.0\n        assert row[\"geometry_projected_extension_m\"] == 0.0\n>       assert row[\"zero_geometry_events_validated_against_zero_advances\"] is True\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       KeyError: 'zero_geometry_events_validated_against_zero_advances'\n\ntests/test_v10_2_27_zero_event_summary.py:36: KeyError",
+      "exact_message": "KeyError: 'zero_geometry_events_validated_against_zero_advances'",
+      "expectation_predates_policy_c": false,
+      "rerun_result": {
+        "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-97/test_zero_event_summary_is_rec0')\n\n    def test_zero_event_summary_is_recorded_explicitly(tmp_path):\n        case = tmp_path / \"case\"\n        _write_case(case, n_advances=0)\n    \n        _rewrite_summary_event_semantics(\n            [\"--out\", str(case), \"--da-phys\", \"5e-6\"]\n        )\n    \n        row = json.loads((case / \"summary.json\").read_text())[0]\n        assert row[\"n_geometry_events\"] == 0\n        assert row[\"n_equivalent_checkpoints_exact\"] == 0.0\n        assert row[\"n_equivalent_checkpoints_rounded\"] == 0\n        assert row[\"nominal_checkpoint_length_m\"] == pytest.approx(5.0e-6)\n        assert row[\"geometry_path_length_m\"] == 0.0\n        assert row[\"geometry_projected_extension_m\"] == 0.0\n>       assert row[\"zero_geometry_events_validated_against_zero_advances\"] is True\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       KeyError: 'zero_geometry_events_validated_against_zero_advances'\n\ntests/test_v10_2_27_zero_event_summary.py:36: KeyError",
+        "message": "KeyError: 'zero_geometry_events_validated_against_zero_advances'",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly"
+    },
+    {
+      "affected_physics": "UNRELATED_INHERITED_BASELINE",
+      "base_branch_status": "FAIL_RECORDED_INHERITED_BASELINE",
+      "code_or_test_wrong": "OUTSIDE_CLOSURE_SCOPE",
+      "corrective_action": "RETAIN_AND_REPORT_SEPARATELY",
+      "current_branch_status": "FAIL",
+      "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_empty_geometry_rejects_no0')\n\n    def test_empty_geometry_rejects_nonzero_advances(tmp_path):\n        case = tmp_path / \"case\"\n        _write_case(case, n_advances=1)\n    \n>       with pytest.raises(RuntimeError, match=\"inconsistent\"):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_v10_2_27_zero_event_summary.py:43: Failed",
+      "exact_message": "Failed: DID NOT RAISE RuntimeError",
+      "expectation_predates_policy_c": false,
+      "rerun_result": {
+        "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-97/test_empty_geometry_rejects_no0')\n\n    def test_empty_geometry_rejects_nonzero_advances(tmp_path):\n        case = tmp_path / \"case\"\n        _write_case(case, n_advances=1)\n    \n>       with pytest.raises(RuntimeError, match=\"inconsistent\"):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_v10_2_27_zero_event_summary.py:43: Failed",
+        "message": "Failed: DID NOT RAISE RuntimeError",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances"
+    },
+    {
+      "affected_physics": "UNRELATED_INHERITED_BASELINE",
+      "base_branch_status": "FAIL_RECORDED_INHERITED_BASELINE",
+      "code_or_test_wrong": "OUTSIDE_CLOSURE_SCOPE",
+      "corrective_action": "RETAIN_AND_REPORT_SEPARATELY",
+      "current_branch_status": "FAIL",
+      "exact_error": "monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x16fd6eed0>\n\n    def test_delegate_reenters_selector_under_global_cycle_cap(monkeypatch):\n        class Front:\n            persistent_site_cyclic_v10229 = True\n    \n            def preview_cycle_waveform(self, ctrl, waveform, temperature):\n                return prediction()\n    \n            def cycle_step_waveform(\n                self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None\n            ):\n                assert force_cycles is None\n                assert requested_cycles == 123.0\n                assert ctrl.cfg.max_block_cycles == 123.0\n                pred = self.preview_cycle_waveform(ctrl, waveform, temperature)\n                return ctrl.choose_block_cycles_diagnostic(pred, requested_cycles)\n    \n        monkeypatch.setattr(\n            delegate,\n            \"select_nonlinear_block\",\n            lambda ctrl, pred, requested, linear: {\n                \"cycles\": requested,\n                \"limiter\": \"nonlinear_test\",\n                \"unlimited_cycles\": requested,\n                \"candidate_limits\": {\"nonlinear_selected_cycles\": requested},\n            },\n        )\n        ctrl = controller(max_block=1.0e6)\n        original_max = ctrl.cfg.max_block_cycles\n        delegate.install_engine_native_cycle_preview()\n        try:\n>           out = ctrl.cycle_step_front(\n                Front(), SimpleNamespace(), 300.0,\n                requested_cycles=123.0, force_cycles=123.0,\n            )\n\ntests/test_v10_2_29_vhcf_nonlinear_selector.py:141: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \narrhenius_fracture/fatigue_controller_delegate_v10229.py:68: in delegated_step\n    return front.cycle_step_waveform(\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <test_v10_2_29_vhcf_nonlinear_selector.test_delegate_reenters_selector_under_global_cycle_cap.<locals>.Front object at 0x16fd6f560>\nctrl = <arrhenius_fracture.fatigue_v1.FatigueCycleHazardController object at 0x16fd6f3b0>\nwaveform = namespace(), temperature = 300.0, requested_cycles = 123.0\nforce_cycles = 123.0\n\n    def cycle_step_waveform(\n        self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None\n    ):\n>       assert force_cycles is None\nE       assert 123.0 is None\n\ntests/test_v10_2_29_vhcf_nonlinear_selector.py:121: AssertionError",
+      "exact_message": "assert 123.0 is None",
+      "expectation_predates_policy_c": false,
+      "rerun_result": {
+        "exact_error": "monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x12a4aa9f0>\n\n    def test_delegate_reenters_selector_under_global_cycle_cap(monkeypatch):\n        class Front:\n            persistent_site_cyclic_v10229 = True\n    \n            def preview_cycle_waveform(self, ctrl, waveform, temperature):\n                return prediction()\n    \n            def cycle_step_waveform(\n                self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None\n            ):\n                assert force_cycles is None\n                assert requested_cycles == 123.0\n                assert ctrl.cfg.max_block_cycles == 123.0\n                pred = self.preview_cycle_waveform(ctrl, waveform, temperature)\n                return ctrl.choose_block_cycles_diagnostic(pred, requested_cycles)\n    \n        monkeypatch.setattr(\n            delegate,\n            \"select_nonlinear_block\",\n            lambda ctrl, pred, requested, linear: {\n                \"cycles\": requested,\n                \"limiter\": \"nonlinear_test\",\n                \"unlimited_cycles\": requested,\n                \"candidate_limits\": {\"nonlinear_selected_cycles\": requested},\n            },\n        )\n        ctrl = controller(max_block=1.0e6)\n        original_max = ctrl.cfg.max_block_cycles\n        delegate.install_engine_native_cycle_preview()\n        try:\n>           out = ctrl.cycle_step_front(\n                Front(), SimpleNamespace(), 300.0,\n                requested_cycles=123.0, force_cycles=123.0,\n            )\n\ntests/test_v10_2_29_vhcf_nonlinear_selector.py:141: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \narrhenius_fracture/fatigue_controller_delegate_v10229.py:68: in delegated_step\n    return front.cycle_step_waveform(\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <test_v10_2_29_vhcf_nonlinear_selector.test_delegate_reenters_selector_under_global_cycle_cap.<locals>.Front object at 0x12a4a8890>\nctrl = <arrhenius_fracture.fatigue_v1.FatigueCycleHazardController object at 0x12a4abd70>\nwaveform = namespace(), temperature = 300.0, requested_cycles = 123.0\nforce_cycles = 123.0\n\n    def cycle_step_waveform(\n        self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None\n    ):\n>       assert force_cycles is None\nE       assert 123.0 is None\n\ntests/test_v10_2_29_vhcf_nonlinear_selector.py:121: AssertionError",
+        "message": "assert 123.0 is None",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "def test_deterministic_driver_reaches_real_continued_graph_event():\n        final, rows = deterministic_trajectory()\n>       assert rows[-1][\"operation\"] == \"continued_accepted_event\"\nE       AssertionError: assert 'downstream_f...e_unavailable' == 'continued_accepted_event'\nE         \nE         - continued_accepted_event\nE         + downstream_first_passage_unavailable\n\ntests/test_voiding_v5.py:31: AssertionError",
+      "exact_message": "AssertionError: assert 'downstream_f...e_unavailable' == 'continued_accepted_event'\n  \n  - continued_accepted_event\n  + downstream_first_passage_unavailable",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "def test_deterministic_driver_reaches_real_continued_graph_event():\n        final, rows = deterministic_trajectory()\n>       assert rows[-1][\"operation\"] == \"continued_accepted_event\"\nE       AssertionError: assert 'downstream_f...e_unavailable' == 'continued_accepted_event'\nE         \nE         - continued_accepted_event\nE         + downstream_first_passage_unavailable\n\ntests/test_voiding_v5.py:31: AssertionError",
+        "message": "AssertionError: assert 'downstream_f...e_unavailable' == 'continued_accepted_event'\n  \n  - continued_accepted_event\n  + downstream_first_passage_unavailable",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_deterministic_driver_reaches_real_continued_graph_event"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "stage = 'downstream_phase_update'\n\n    @pytest.mark.parametrize(\"stage\", [\n        \"downstream_phase_update\",\n        \"downstream_length_ledger_update:ordinary_crack_fractured_length_m\",\n        \"downstream_length_ledger_update:projected_front_advance_m\",\n        \"downstream_event_history_update\",\n    ])\n    def test_downstream_state_updates_rollback_atomically(stage):\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:\" + stage):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:256: Failed",
+      "exact_message": "Failed: DID NOT RAISE RuntimeError",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "stage = 'downstream_phase_update'\n\n    @pytest.mark.parametrize(\"stage\", [\n        \"downstream_phase_update\",\n        \"downstream_length_ledger_update:ordinary_crack_fractured_length_m\",\n        \"downstream_length_ledger_update:projected_front_advance_m\",\n        \"downstream_event_history_update\",\n    ])\n    def test_downstream_state_updates_rollback_atomically(stage):\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:\" + stage):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:256: Failed",
+        "message": "Failed: DID NOT RAISE RuntimeError",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_phase_update]"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "stage = 'downstream_length_ledger_update:ordinary_crack_fractured_length_m'\n\n    @pytest.mark.parametrize(\"stage\", [\n        \"downstream_phase_update\",\n        \"downstream_length_ledger_update:ordinary_crack_fractured_length_m\",\n        \"downstream_length_ledger_update:projected_front_advance_m\",\n        \"downstream_event_history_update\",\n    ])\n    def test_downstream_state_updates_rollback_atomically(stage):\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:\" + stage):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:256: Failed",
+      "exact_message": "Failed: DID NOT RAISE RuntimeError",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "stage = 'downstream_length_ledger_update:ordinary_crack_fractured_length_m'\n\n    @pytest.mark.parametrize(\"stage\", [\n        \"downstream_phase_update\",\n        \"downstream_length_ledger_update:ordinary_crack_fractured_length_m\",\n        \"downstream_length_ledger_update:projected_front_advance_m\",\n        \"downstream_event_history_update\",\n    ])\n    def test_downstream_state_updates_rollback_atomically(stage):\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:\" + stage):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:256: Failed",
+        "message": "Failed: DID NOT RAISE RuntimeError",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:ordinary_crack_fractured_length_m]"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "stage = 'downstream_length_ledger_update:projected_front_advance_m'\n\n    @pytest.mark.parametrize(\"stage\", [\n        \"downstream_phase_update\",\n        \"downstream_length_ledger_update:ordinary_crack_fractured_length_m\",\n        \"downstream_length_ledger_update:projected_front_advance_m\",\n        \"downstream_event_history_update\",\n    ])\n    def test_downstream_state_updates_rollback_atomically(stage):\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:\" + stage):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:256: Failed",
+      "exact_message": "Failed: DID NOT RAISE RuntimeError",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "stage = 'downstream_length_ledger_update:projected_front_advance_m'\n\n    @pytest.mark.parametrize(\"stage\", [\n        \"downstream_phase_update\",\n        \"downstream_length_ledger_update:ordinary_crack_fractured_length_m\",\n        \"downstream_length_ledger_update:projected_front_advance_m\",\n        \"downstream_event_history_update\",\n    ])\n    def test_downstream_state_updates_rollback_atomically(stage):\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:\" + stage):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:256: Failed",
+        "message": "Failed: DID NOT RAISE RuntimeError",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:projected_front_advance_m]"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "stage = 'downstream_event_history_update'\n\n    @pytest.mark.parametrize(\"stage\", [\n        \"downstream_phase_update\",\n        \"downstream_length_ledger_update:ordinary_crack_fractured_length_m\",\n        \"downstream_length_ledger_update:projected_front_advance_m\",\n        \"downstream_event_history_update\",\n    ])\n    def test_downstream_state_updates_rollback_atomically(stage):\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:\" + stage):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:256: Failed",
+      "exact_message": "Failed: DID NOT RAISE RuntimeError",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "stage = 'downstream_event_history_update'\n\n    @pytest.mark.parametrize(\"stage\", [\n        \"downstream_phase_update\",\n        \"downstream_length_ledger_update:ordinary_crack_fractured_length_m\",\n        \"downstream_length_ledger_update:projected_front_advance_m\",\n        \"downstream_event_history_update\",\n    ])\n    def test_downstream_state_updates_rollback_atomically(stage):\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:\" + stage):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:256: Failed",
+        "message": "Failed: DID NOT RAISE RuntimeError",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_event_history_update]"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "def test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer():\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted = replace(accepted, competition=_two_horizontal_candidate_competition())\n        accepted, _ = ligament_transaction(accepted)\n        accepted = replace(accepted, competition=replace(\n            accepted.competition,\n            hazard_states=tuple(replace(hazard, current_threshold_action=1.0)\n                                for hazard in accepted.competition.hazard_states),\n        ))\n        downstream, _, _, causal = downstream_front_transaction(accepted)\n>       assert len(causal[\"emitted_winner_candidate_ids\"]) == 2\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       KeyError: 'emitted_winner_candidate_ids'\n\ntests/test_voiding_v5.py:311: KeyError",
+      "exact_message": "KeyError: 'emitted_winner_candidate_ids'",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "def test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer():\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted = replace(accepted, competition=_two_horizontal_candidate_competition())\n        accepted, _ = ligament_transaction(accepted)\n        accepted = replace(accepted, competition=replace(\n            accepted.competition,\n            hazard_states=tuple(replace(hazard, current_threshold_action=1.0)\n                                for hazard in accepted.competition.hazard_states),\n        ))\n        downstream, _, _, causal = downstream_front_transaction(accepted)\n>       assert len(causal[\"emitted_winner_candidate_ids\"]) == 2\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       KeyError: 'emitted_winner_candidate_ids'\n\ntests/test_voiding_v5.py:311: KeyError",
+        "message": "KeyError: 'emitted_winner_candidate_ids'",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_zero_drive_connected_stat0')\n\n    def test_zero_drive_connected_state_partitions_restart_and_tensile_reload(tmp_path):\n        from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n    \n        fixed_path = ((0.0, 0.0), (0.0005725993004046688, 0.0))\n        accepted, _ = deterministic_trajectory(\n            stop_before_ligament=True, cavity_center_m=(7.0e-4, -1.0e-5),\n            crack_path_m=fixed_path,\n        )\n        connected, result = ligament_transaction(accepted)\n        assert result.accepted\n        assert connected.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID\n        assert connected.crack_network.active_tip_ids == ()\n        assert connected.v12_support_state.active_tip_identities == ()\n        assert all(branch.branch_id != \"void-front-1\" for branch in connected.crack_network.branches)\n        source = connected.junction_process_state[\"active_event_source\"]\n        assert source[\"candidate_source_states\"][0][\"geometry_status\"] == \\\n            \"GEOMETRICALLY_VALID_KINETICALLY_DORMANT\"\n        assert source[\"candidate_source_states\"][0][\"instantaneous_status\"] == \\\n            \"ZERO_DOWNSTREAM_DRIVE\"\n    \n        def invariant(state):\n            return (state.competition, state.rng_state, state.crack_network,\n                    state.v12_support_state, state.void_state.cavities)\n    \n        for partitions in (1, 2, 4, 8, 16):\n            trial = connected\n            before = invariant(trial)\n            for _ in range(partitions):\n                trial, audit = _complete_next_clock(\n                    trial, np.zeros((2, 2)), source_kind=\"cavity_surface\",\n                    source_cavity_id=\"void:site-1\", source_boundary_site_id=\"connection_exit\",\n                    source_position_m=trial.void_state.cavities[0].connection_exit_m,\n                    source_probe_identity={\"kind\": \"direct_cavity_boundary_tensor\"},\n                    maximum_advance_duration_s=16.0 / partitions,\n                )\n                assert all(row[\"effective_rate_s\"] == 0.0 for row in audit)\n            assert invariant(trial) == before\n    \n        checkpoint = tmp_path / \"zero-drive-connected.json\"\n        write_checkpoint(connected, checkpoint)\n        restored = restore_checkpoint(checkpoint)\n        assert complete_accepted_state_fingerprint(restored) == \\\n            complete_accepted_state_fingerprint(connected)\n    \n        tensile = np.eye(2) * 8.0e8\n        direct, direct_audit = _complete_next_clock(connected, tensile)\n        restarted, restarted_audit = _complete_next_clock(restored, tensile)\n        assert direct.competition == restarted.competition\n        assert direct_audit == restarted_audit\n>       assert any(row[\"winner\"] for row in direct_audit)\nE       assert False\nE        +  where False = any(<generator object test_zero_drive_connected_state_partitions_restart_and_tensile_reload.<locals>.<genexpr> at 0x117926dc0>)\n\ntests/test_voiding_v5.py:421: AssertionError",
+      "exact_message": "assert False\n +  where False = any(<generator object test_zero_drive_connected_state_partitions_restart_and_tensile_reload.<locals>.<genexpr> at 0x117926dc0>)",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-97/test_zero_drive_connected_stat0')\n\n    def test_zero_drive_connected_state_partitions_restart_and_tensile_reload(tmp_path):\n        from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n    \n        fixed_path = ((0.0, 0.0), (0.0005725993004046688, 0.0))\n        accepted, _ = deterministic_trajectory(\n            stop_before_ligament=True, cavity_center_m=(7.0e-4, -1.0e-5),\n            crack_path_m=fixed_path,\n        )\n        connected, result = ligament_transaction(accepted)\n        assert result.accepted\n        assert connected.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID\n        assert connected.crack_network.active_tip_ids == ()\n        assert connected.v12_support_state.active_tip_identities == ()\n        assert all(branch.branch_id != \"void-front-1\" for branch in connected.crack_network.branches)\n        source = connected.junction_process_state[\"active_event_source\"]\n        assert source[\"candidate_source_states\"][0][\"geometry_status\"] == \\\n            \"GEOMETRICALLY_VALID_KINETICALLY_DORMANT\"\n        assert source[\"candidate_source_states\"][0][\"instantaneous_status\"] == \\\n            \"ZERO_DOWNSTREAM_DRIVE\"\n    \n        def invariant(state):\n            return (state.competition, state.rng_state, state.crack_network,\n                    state.v12_support_state, state.void_state.cavities)\n    \n        for partitions in (1, 2, 4, 8, 16):\n            trial = connected\n            before = invariant(trial)\n            for _ in range(partitions):\n                trial, audit = _complete_next_clock(\n                    trial, np.zeros((2, 2)), source_kind=\"cavity_surface\",\n                    source_cavity_id=\"void:site-1\", source_boundary_site_id=\"connection_exit\",\n                    source_position_m=trial.void_state.cavities[0].connection_exit_m,\n                    source_probe_identity={\"kind\": \"direct_cavity_boundary_tensor\"},\n                    maximum_advance_duration_s=16.0 / partitions,\n                )\n                assert all(row[\"effective_rate_s\"] == 0.0 for row in audit)\n            assert invariant(trial) == before\n    \n        checkpoint = tmp_path / \"zero-drive-connected.json\"\n        write_checkpoint(connected, checkpoint)\n        restored = restore_checkpoint(checkpoint)\n        assert complete_accepted_state_fingerprint(restored) == \\\n            complete_accepted_state_fingerprint(connected)\n    \n        tensile = np.eye(2) * 8.0e8\n        direct, direct_audit = _complete_next_clock(connected, tensile)\n        restarted, restarted_audit = _complete_next_clock(restored, tensile)\n        assert direct.competition == restarted.competition\n        assert direct_audit == restarted_audit\n>       assert any(row[\"winner\"] for row in direct_audit)\nE       assert False\nE        +  where False = any(<generator object test_zero_drive_connected_state_partitions_restart_and_tensile_reload.<locals>.<genexpr> at 0x12a427ac0>)\n\ntests/test_voiding_v5.py:421: AssertionError",
+        "message": "assert False\n +  where False = any(<generator object test_zero_drive_connected_state_partitions_restart_and_tensile_reload.<locals>.<genexpr> at 0x12a427ac0>)",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_zero_drive_connected_state_partitions_restart_and_tensile_reload"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_connected_and_downstream_0')\n\n    def test_connected_and_downstream_states_own_zero_then_one_active_front(tmp_path):\n        from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        connected, _ = ligament_transaction(accepted)\n        assert connected.crack_network.active_tip_ids == ()\n        assert connected.v12_support_state.active_tip_identities == ()\n        connected_path = tmp_path / \"connected.json\"\n        write_checkpoint(connected, connected_path)\n        assert complete_accepted_state_fingerprint(restore_checkpoint(connected_path)) == complete_accepted_state_fingerprint(connected)\n    \n        downstream, _, _, _ = downstream_front_transaction(connected)\n        assert downstream.crack_network.branch(\"b00000000\").status == \"arrested\"\n>       assert downstream.crack_network.active_tip_ids == (\"void-front-1\",)\nE       AssertionError: assert () == ('void-front-1',)\nE         \nE         Right contains one more item: 'void-front-1'\nE         Use -v to get more diff\n\ntests/test_voiding_v5.py:489: AssertionError",
+      "exact_message": "AssertionError: assert () == ('void-front-1',)\n  \n  Right contains one more item: 'void-front-1'\n  Use -v to get more diff",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-97/test_connected_and_downstream_0')\n\n    def test_connected_and_downstream_states_own_zero_then_one_active_front(tmp_path):\n        from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        connected, _ = ligament_transaction(accepted)\n        assert connected.crack_network.active_tip_ids == ()\n        assert connected.v12_support_state.active_tip_identities == ()\n        connected_path = tmp_path / \"connected.json\"\n        write_checkpoint(connected, connected_path)\n        assert complete_accepted_state_fingerprint(restore_checkpoint(connected_path)) == complete_accepted_state_fingerprint(connected)\n    \n        downstream, _, _, _ = downstream_front_transaction(connected)\n        assert downstream.crack_network.branch(\"b00000000\").status == \"arrested\"\n>       assert downstream.crack_network.active_tip_ids == (\"void-front-1\",)\nE       AssertionError: assert () == ('void-front-1',)\nE         \nE         Right contains one more item: 'void-front-1'\nE         Use -v to get more diff\n\ntests/test_voiding_v5.py:489: AssertionError",
+        "message": "AssertionError: assert () == ('void-front-1',)\n  \n  Right contains one more item: 'void-front-1'\n  Use -v to get more diff",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_connected_and_downstream_states_own_zero_then_one_active_front"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "def test_downstream_child_activation_rolls_back():\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:downstream_child_activation\"):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:501: Failed",
+      "exact_message": "Failed: DID NOT RAISE RuntimeError",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "def test_downstream_child_activation_rolls_back():\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        accepted, _ = ligament_transaction(accepted)\n        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint\n        before = complete_accepted_state_fingerprint(accepted)\n>       with pytest.raises(RuntimeError, match=\"injected:downstream_child_activation\"):\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       Failed: DID NOT RAISE RuntimeError\n\ntests/test_voiding_v5.py:501: Failed",
+        "message": "Failed: DID NOT RAISE RuntimeError",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_downstream_child_activation_rolls_back"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x17d538d70>\n\n    def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(monkeypatch):\n        import arrhenius_fracture.voiding_production_v5 as production\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        connected, _ = ligament_transaction(accepted)\n        downstream, _, _, first = downstream_front_transaction(connected)\n        assert first[\"source_kind\"] == \"cavity_surface\"\n        certificate = downstream.junction_process_state[\"latest_crack_void_connection_certificate\"]\n>       assert certificate[\"combined_components\"] == ((\n            \"branch:b00000000\", \"branch:void-front-1\", \"cavity:void:site-1\",\n        ),)\nE       AssertionError: assert (('branch:b00...oid:site-1'),) == (('branch:b00...oid:site-1'),)\nE         \nE         At index 0 diff: ('branch:b00000000', 'cavity:void:site-1') != ('branch:b00000000', 'branch:void-front-1', 'cavity:void:site-1')\nE         Use -v to get more diff\n\ntests/test_voiding_v5.py:623: AssertionError",
+      "exact_message": "AssertionError: assert (('branch:b00...oid:site-1'),) == (('branch:b00...oid:site-1'),)\n  \n  At index 0 diff: ('branch:b00000000', 'cavity:void:site-1') != ('branch:b00000000', 'branch:void-front-1', 'cavity:void:site-1')\n  Use -v to get more diff",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x12a57fbf0>\n\n    def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(monkeypatch):\n        import arrhenius_fracture.voiding_production_v5 as production\n        accepted, _ = deterministic_trajectory(stop_before_ligament=True)\n        connected, _ = ligament_transaction(accepted)\n        downstream, _, _, first = downstream_front_transaction(connected)\n        assert first[\"source_kind\"] == \"cavity_surface\"\n        certificate = downstream.junction_process_state[\"latest_crack_void_connection_certificate\"]\n>       assert certificate[\"combined_components\"] == ((\n            \"branch:b00000000\", \"branch:void-front-1\", \"cavity:void:site-1\",\n        ),)\nE       AssertionError: assert (('branch:b00...oid:site-1'),) == (('branch:b00...oid:site-1'),)\nE         \nE         At index 0 diff: ('branch:b00000000', 'cavity:void:site-1') != ('branch:b00000000', 'branch:void-front-1', 'cavity:void:site-1')\nE         Use -v to get more diff\n\ntests/test_voiding_v5.py:623: AssertionError",
+        "message": "AssertionError: assert (('branch:b00...oid:site-1'),) == (('branch:b00...oid:site-1'),)\n  \n  At index 0 diff: ('branch:b00000000', 'cavity:void:site-1') != ('branch:b00000000', 'branch:void-front-1', 'cavity:void:site-1')\n  Use -v to get more diff",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_continuation_uses_child_tip_source_and_recomputes_three_body_topology"
+    },
+    {
+      "affected_physics": "CAVITY_DOWNSTREAM_FIRST_PASSAGE_AND_GRAPH_OWNERSHIP",
+      "base_branch_status": "PASS_PRE_POLICY_C_CI_34078968131",
+      "code_or_test_wrong": "OBSOLETE_UNQUALIFIED_DOWNSTREAM_EXPECTATION_REQUIRES_QUALIFIED_POSITIVE_PEER",
+      "corrective_action": "KEEP_COARSE_NO_EVENT_ASSERTION_AND_EXERCISE_PROOF_QUALIFIED_REFINEMENT_PEER_NO_XFAIL",
+      "current_branch_status": "FAIL",
+      "exact_error": "def test_equilibrium_metrics_separate_free_residual_from_reactions():\n        final, rows = deterministic_trajectory()\n        row = rows[-1]\n        assert row[\"free_dof_residual_l2_N_per_m\"] < 1.0e-8 * row[\"constrained_reaction_l2_N_per_m\"]\n        assert row[\"top_bottom_reaction_balance\"] < 3.0e-2\n        assert row[\"energy_reaction_identity\"] < 1.0e-2\n        assert row[\"full_residual_including_reactions_N_per_m\"] == pytest.approx(\n            row[\"constrained_reaction_l2_N_per_m\"], rel=1.0e-12\n        )\n>       assert final.crack_network.active_tip_ids == (\"void-front-1\",)\nE       AssertionError: assert () == ('void-front-1',)\nE         \nE         Right contains one more item: 'void-front-1'\nE         Use -v to get more diff\n\ntests/test_voiding_v5.py:672: AssertionError",
+      "exact_message": "AssertionError: assert () == ('void-front-1',)\n  \n  Right contains one more item: 'void-front-1'\n  Use -v to get more diff",
+      "expectation_predates_policy_c": true,
+      "rerun_result": {
+        "exact_error": "def test_equilibrium_metrics_separate_free_residual_from_reactions():\n        final, rows = deterministic_trajectory()\n        row = rows[-1]\n        assert row[\"free_dof_residual_l2_N_per_m\"] < 1.0e-8 * row[\"constrained_reaction_l2_N_per_m\"]\n        assert row[\"top_bottom_reaction_balance\"] < 3.0e-2\n        assert row[\"energy_reaction_identity\"] < 1.0e-2\n        assert row[\"full_residual_including_reactions_N_per_m\"] == pytest.approx(\n            row[\"constrained_reaction_l2_N_per_m\"], rel=1.0e-12\n        )\n>       assert final.crack_network.active_tip_ids == (\"void-front-1\",)\nE       AssertionError: assert () == ('void-front-1',)\nE         \nE         Right contains one more item: 'void-front-1'\nE         Use -v to get more diff\n\ntests/test_voiding_v5.py:672: AssertionError",
+        "message": "AssertionError: assert () == ('void-front-1',)\n  \n  Right contains one more item: 'void-front-1'\n  Use -v to get more diff",
+        "status": "FAIL"
+      },
+      "test_node_id": "tests/test_voiding_v5.py::test_equilibrium_metrics_separate_free_residual_from_reactions"
+    }
+  ],
+  "schema": "v12.closure-regression-triage/1"
+}

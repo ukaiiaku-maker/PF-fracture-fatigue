@@ -246,6 +246,13 @@ def _point_segment_distance(points,p0,p1):
 def _cross(a,b): return float(a[0]*b[1]-a[1]*b[0])
 
 def _segments_intersect(a,b,c,d,tolerance=1e-12):
+    # Necessary geometric condition in coordinate units. The cross-product
+    # parallel/collinear branch below must not report an intersection between
+    # disjoint bounding boxes when short refined edges have tiny determinants.
+    # Use the existing distance tolerance; do not widen the accepted geometry.
+    if np.any(np.maximum(np.minimum(a,b),np.minimum(c,d)) >
+              np.minimum(np.maximum(a,b),np.maximum(c,d))+tolerance):
+        return False
     ab=b-a; cd=d-c; denominator=_cross(ab,cd)
     if abs(denominator)<=tolerance:
         if abs(_cross(c-a,ab))>tolerance: return False
@@ -282,11 +289,15 @@ def _path(adjacency,starts,targets):
     while hit is not None: result.append(hit); hit=parent[hit]
     return tuple(reversed(result))
 
-def _external_boundary_edges(mesh):
+def _mesh_edge_owners(mesh):
     owners={}
     for eid,element in enumerate(mesh.elems):
         for a,b in ((element[0],element[1]),(element[1],element[2]),(element[2],element[0])):
             owners.setdefault(tuple(sorted((int(a),int(b)))),[]).append(eid)
+    return owners
+
+def _external_boundary_edges(mesh):
+    owners=_mesh_edge_owners(mesh)
     return np.asarray([edge for edge,value in owners.items() if len(value)==1],int)
 
 def selected_support_components(mesh,selected,*,shared_nodes):
@@ -395,7 +406,10 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
     it only consumes the final selected element IDs, geometry, and crack graph.
     """
     selected=set(map(int,np.asarray(selected,int))); cent=np.mean(mesh.nodes[mesh.elems],axis=1)
-    paths=[]; positive_components=set(); negative_components=set(); edge_certificates=[]; insufficient=[]; boundary_edges=_external_boundary_edges(mesh)
+    paths=[]; positive_components=set(); negative_components=set(); edge_certificates=[]; insufficient=[]
+    boundary_owners=_mesh_edge_owners(mesh)
+    boundary_edge_set={tuple(sorted(map(int,edge))) for edge,owners in boundary_owners.items() if len(owners)==1}
+    boundary_edges=np.asarray(sorted(boundary_edge_set),int)
     boundary_terminal_audits=[]; contexts=dict(boundary_terminal_context or {})
     arcs=certification_arcs(network,tolerance) if arcs is None else arcs
     for p0,p1,arc_id in arcs:
@@ -436,7 +450,7 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
             node_count=int(getattr(mesh,"nn",len(mesh.nodes)))
             edge_ids=tuple(tuple(map(int,edge)) for edge in context.get("boundary_edge_ids",())
                            if len(edge)==2 and min(edge)>=0 and max(edge)<node_count)
-            exact_edges=tuple(edge for edge in edge_ids if edge in boundary_edges or tuple(reversed(edge)) in boundary_edges)
+            exact_edges=tuple(edge for edge in edge_ids if tuple(sorted(edge)) in boundary_edge_set)
             edge_degree={}
             for a,b in exact_edges:
                 edge_degree[a]=edge_degree.get(a,0)+1; edge_degree[b]=edge_degree.get(b,0)+1
@@ -469,10 +483,10 @@ def independent_intact_path_certificate(mesh,network,selected,*,edge_supports=No
             incident_tangent=tangent if endpoint_name=="start" else -tangent
             solid_side=[]
             for edge in exact_edges:
-                owners=np.flatnonzero(np.sum(np.isin(mesh.elems,edge),axis=1)==2)
+                owners=boundary_owners[tuple(sorted(edge))]
                 midpoint=np.mean(mesh.nodes[list(edge)],axis=0)
                 for owner in owners:
-                    centroid=np.mean(mesh.nodes[mesh.elems[int(owner)]],axis=0)
+                    centroid=cent[int(owner)]
                     solid_side.append(float(incident_tangent@(centroid-midpoint)))
             tangent_enters=bool(solid_side and max(solid_side)>tolerance)
             valid=bool(endpoint is not None and declared_endpoint_ok and role_ok and not active_prohibited and kind_ok and identity_ok

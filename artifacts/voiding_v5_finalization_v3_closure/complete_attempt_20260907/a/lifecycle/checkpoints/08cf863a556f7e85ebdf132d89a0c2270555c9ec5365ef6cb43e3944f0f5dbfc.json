@@ -1,0 +1,285 @@
+{
+  "active_tip_ids": [
+    "b00000000"
+  ],
+  "checkpoint_generation": 0,
+  "crack_network": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "branches": [
+      {
+        "branch_id": "b00000000",
+        "generation": 0,
+        "initiation_event": 0,
+        "local_state": {},
+        "orientation_history_rad": [
+          0.0
+        ],
+        "parent_branch_id": null,
+        "path_m": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0005725993004046688,
+            0.0
+          ]
+        ],
+        "physical_path_length_m": 0.0005725993004046688,
+        "projected_extension_m": 0.0005725993004046688,
+        "status": "active"
+      }
+    ],
+    "branching_enabled": false,
+    "geometry_generation": 0,
+    "primary_branch_id": "b00000000",
+    "primary_projected_extension_m": 0.0005725993004046688,
+    "schema": "v11.crack-network/1",
+    "total_physical_crack_length_m": 0.0005725993004046688
+  },
+  "directional_competition": {
+    "candidates": [
+      {
+        "angle_rad": 0.0,
+        "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+        "direction_xy": [
+          1.0,
+          0.0
+        ],
+        "gamma_rel": 1.0,
+        "normal_xy": [
+          0.0,
+          1.0
+        ],
+        "orientation_convention": "bcc-[001]-section:theta_deg=0",
+        "plane_family": "cleavage",
+        "plane_variant": "(100)"
+      }
+    ],
+    "competition_event_index": 0,
+    "consumed_event_ids": [],
+    "global_hazard_seed": 3621,
+    "hazard_states": [
+      {
+        "action": 0.0,
+        "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+        "completed_event_count": 0,
+        "current_threshold_action": 0.8038270723477087,
+        "last_completion_time_s": null,
+        "pending_events": [],
+        "previous_rate_per_s": null,
+        "residual_action": 0.0,
+        "threshold_process": "unit_exponential",
+        "threshold_seed": 3621
+      }
+    ],
+    "reservations": [],
+    "schema": "v11.directional-competition/1"
+  },
+  "energy_ledgers": {
+    "emission_work": 1.0,
+    "latest_constrained_reaction_l2_N_per_m": 54417.10925490914,
+    "latest_energy_reaction_identity": 0.005941752885239826,
+    "latest_fem_energy_J_per_m": 0.016313435593401388,
+    "latest_free_dof_residual_l2_N_per_m": 2.504853366363057e-10,
+    "latest_reaction_N_per_m": 80603.5992833779,
+    "latest_residual_l2_N_per_m": 54417.109254909155,
+    "latest_top_bottom_reaction_balance": 4.513419796927032e-16
+  },
+  "event_counters": {
+    "accepted_steps": 0,
+    "mesh_generation": 0,
+    "topology_actions": 0
+  },
+  "has_production_void_state": true,
+  "has_rng_state": true,
+  "production_void_state": {
+    "available_defect_inventory_area_m2": 8.036504591506379e-09,
+    "cavities": [
+      {
+        "area_m2": 1.9634954084936207e-09,
+        "cavity_id": "void:site-1",
+        "center_m": [
+          0.0007,
+          -1e-05
+        ],
+        "connection_direction_xy": null,
+        "connection_entry_m": null,
+        "connection_exit_m": null,
+        "geometry_generation": 0,
+        "inventory_area_m2": 1.9634954084936207e-09,
+        "lineage": [
+          "site-1"
+        ],
+        "parent_site_id": "site-1",
+        "phase": "STABLE_SUBGRID_VOID",
+        "radius_m": 2.5e-05
+      }
+    ],
+    "consumed_defect_inventory_area_m2": 1.9634954084936207e-09,
+    "event_history": [
+      {
+        "event": "BIRTH_HIT",
+        "site_id": "site-1"
+      },
+      {
+        "event": "EMBRYO",
+        "site_id": "site-1"
+      },
+      {
+        "event": "STABILIZED",
+        "site_id": "site-1"
+      },
+      {
+        "area_m2": 1.9634954084936207e-09,
+        "cavity_id": "void:site-1",
+        "event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+      }
+    ],
+    "length_ledgers": {
+      "active_front_coordinate_advance_m": 0.0,
+      "connected_free_surface_extent_m": 0.0,
+      "connected_void_free_span_m": 0.0,
+      "fractured_ligament_length_m": 0.0,
+      "ordinary_crack_fractured_length_m": 0.0,
+      "physical_active_front_travel_m": 0.0,
+      "preexisting_void_free_span_m": 0.0,
+      "projected_connected_void_free_span_m": 0.0,
+      "projected_fractured_length_m": 0.0,
+      "projected_free_span_m": 0.0,
+      "projected_front_advance_m": 0.0,
+      "traversed_void_free_span_m": 0.0
+    },
+    "rng_state": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 264756758992246958615769943242078180925,
+        "state": 338604556362447844298279301770049525018
+      },
+      "uinteger": 0
+    },
+    "schema": "v12.production-voiding/5",
+    "sites": [
+      {
+        "birth": {
+          "accumulated": 2.943644392292234,
+          "threshold": 2.943644392292234
+        },
+        "candidate_weight": 0.8,
+        "center_m": [
+          0.0007,
+          -1e-05
+        ],
+        "healing": {
+          "accumulated": 0.03253420880048259,
+          "threshold": 0.35
+        },
+        "hits": 2,
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "phase": "STABLE_SUBGRID_VOID",
+        "required_hits": 2,
+        "site_id": "site-1",
+        "stabilization": {
+          "accumulated": 0.24999999999999997,
+          "threshold": 0.25
+        }
+      }
+    ]
+  },
+  "production_void_state_sha256": "fa2ba80b4a088c4a6ca3374fa780b62e0b10f03b77aa1b867c773c96793d0e19",
+  "provider_runtime": null,
+  "schema": "v11.live-fem-branch-checkpoint/1",
+  "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
+  "state_file": "08cf863a556f7e85ebdf132d89a0c2270555c9ec5365ef6cb43e3944f0f5dbfc.json.db80465c9bdbc2e1b1384eb8187ea94fb67d84cc05395a1a7b1a4b89d9326b3c.state.pkl",
+  "state_sha256": "db80465c9bdbc2e1b1384eb8187ea94fb67d84cc05395a1a7b1a4b89d9326b3c",
+  "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
+  "v12_support_state": {
+    "accepted_p0_damage_fingerprint": "ac6ffcc1d3f4afffbc1dfb77558a2b7206dc9fcad7dd988da7be9d61b531df59",
+    "active_tip_identities": [
+      "b00000000"
+    ],
+    "branch_vertex_lineage_fingerprint": "4fe54ef6c3206c66ba786e4cf2fa5717de8e82a56eb0e05ee7f4765e9c3944e7",
+    "certification_arc_fingerprint": "8c1f514a65adae4ed4280a3b1c2d048d2f077e87c5b1fa0fb687caea753fd158",
+    "checkpoint_generation": 0,
+    "complete_crack_graph_fingerprint": "a503498a1ed4f230a09013d330bcfa320e462fbee6a9842588a90284c829d4b1",
+    "configuration_hash": "e7d8c0742ffb5447c32104fe4d369123e1ec359841748a4f21e06a206465e148",
+    "mesh_connectivity_fingerprint": "82cf2bc5274b5358f15b58c93253e8f5270815ead997484b4a7e92469dbc530d",
+    "mesh_generation": 0,
+    "mesh_geometry_fingerprint": "dbcc3e5dceb7d6ff38e7011666995fb7caea4e175c66afdf273c420ed84199dc",
+    "model_id": "sharp_wake_mechanically_separating_v12",
+    "physical_graph_length_m": 0.0005725993004046688,
+    "previous_accepted_transaction": null,
+    "schema_version": "v12.sharp-wake-support-state/1",
+    "selected_support_elements": [
+      160,
+      161,
+      162,
+      163,
+      222,
+      223,
+      224,
+      225,
+      226,
+      285,
+      286,
+      287,
+      288,
+      289,
+      290,
+      349,
+      350,
+      351,
+      352,
+      353,
+      354,
+      413,
+      414,
+      415,
+      416,
+      417,
+      418,
+      477,
+      478,
+      479,
+      480,
+      481,
+      482,
+      541,
+      542,
+      543,
+      544,
+      545,
+      546,
+      605,
+      606,
+      607,
+      608,
+      609,
+      610,
+      669,
+      670,
+      671,
+      672,
+      673,
+      674,
+      733,
+      734,
+      735,
+      736,
+      737,
+      798,
+      799,
+      800,
+      801,
+      802
+    ],
+    "source_commit": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+    "transaction_identity": "v12-initial"
+  }
+}

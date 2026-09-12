@@ -1,0 +1,16 @@
+{
+  "schema": "v5.final-physics-natural-partition-matrix/1",
+  "executed_code_sha": "208d9de66282730810343568608f319958b2ecaf",
+  "seed_range": [12000, 12031],
+  "seed_count": 32,
+  "partition_counts": [1, 2, 4, 8, 16],
+  "peer_count": 160,
+  "passed_peer_count": 160,
+  "execution_failure_count": 0,
+  "midpoint_restart_exact_count": 160,
+  "seeds_with_one_exact_terminal_fingerprint": 32,
+  "seeds_with_one_exact_terminal_measurement_record": 32,
+  "classification": "PASS",
+  "full_worker_evidence_location": "EPHEMERAL_LOCAL_WORKER_NOT_COMMITTED",
+  "final_A_B_campaign_reexecution_required": true
+}

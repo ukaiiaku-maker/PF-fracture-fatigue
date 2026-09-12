@@ -1,0 +1,4413 @@
+{
+  "actual_operations": [
+    {
+      "accepted": true,
+      "api": "ligament_transaction",
+      "operations": [
+        "ligament_hazard_completion",
+        "accepted_snapshot",
+        "intersection_alignment",
+        "exit_alignment",
+        "graph_edit",
+        "cavity_phase_update",
+        "root_status_change",
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "length_ledger_update:fractured_ligament_length_m",
+        "length_ledger_update:active_front_coordinate_advance_m",
+        "length_ledger_update:physical_active_front_travel_m",
+        "length_ledger_update:projected_fractured_length_m",
+        "length_ledger_update:projected_front_advance_m",
+        "length_ledger_update:preexisting_void_free_span_m",
+        "length_ledger_update:connected_void_free_span_m",
+        "length_ledger_update:projected_connected_void_free_span_m",
+        "length_ledger_update:connected_free_surface_extent_m",
+        "dormant_support_rebuild",
+        "connected_surface_certification",
+        "field_transfer",
+        "equilibrium",
+        "energy_gate",
+        "process_state_update",
+        "topology_verification",
+        "late_event_veto"
+      ]
+    },
+    {
+      "api": "refine_downstream_source",
+      "audit": {
+        "attempts": [
+          {
+            "level": 1,
+            "proof": {
+              "current_binding": "db2bb160616676dd304cdbba7c60bf4e491bee71612ce2a1259d57c3020d128a",
+              "current_metrics": {
+                "boundary_node_id": 0,
+                "boundary_position_m": [
+                  0.0007902661214806971,
+                  0.0
+                ],
+                "eta_n_max": 0.44776485983697606,
+                "eta_n_median": 0.09376265886258428,
+                "eta_t_max": 0.19698280671432972,
+                "eta_t_median": 0.09849140335716439,
+                "local_aspect_ratio_max": 2.2731164577543104,
+                "local_aspect_ratio_median": 1.5970664627502469,
+                "local_minimum_quality": 0.7247060080824022,
+                "minimum_quality": 0.14674391295824543,
+                "normal_xy": [
+                  1.0,
+                  0.0
+                ],
+                "normalized_traction": 0.7379357232064822,
+                "principal_stresses_Pa": [
+                  38367629.90790848,
+                  760084982.5183249
+                ],
+                "probe_element_ids": [
+                  274
+                ],
+                "recovery_operator": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+                "sigma_nn_Pa": 44528185.24977316,
+                "sigma_nt_Pa": 66394482.07359074,
+                "sigma_tt_Pa": 753924427.1764601,
+                "source_neighborhood_eta_n_max": 0.05806373889259689,
+                "source_neighborhood_eta_t_max": 0.09849140335716461,
+                "tangent_xy": [
+                  -0.0,
+                  1.0
+                ],
+                "tensor_Pa": [
+                  [
+                    44528185.24977316,
+                    66394482.07359074
+                  ],
+                  [
+                    66394482.07359074,
+                    753924427.1764601
+                  ]
+                ]
+              },
+              "previous_binding": "4d509f889b7ba250cf561ffa8715d3a44bce49cb60d802680a505dd2b39f3351",
+              "previous_metrics": {
+                "boundary_node_id": 0,
+                "boundary_position_m": [
+                  0.0007902661214806971,
+                  0.0
+                ],
+                "eta_n_max": 0.44776485983697606,
+                "eta_n_median": 0.1649347443282822,
+                "eta_t_max": 0.19698280671432972,
+                "eta_t_median": 0.19698280671432777,
+                "local_aspect_ratio_max": 2.2731164577543104,
+                "local_aspect_ratio_median": 1.5970664627502331,
+                "local_minimum_quality": 0.7247060080824056,
+                "minimum_quality": 0.14674391295824543,
+                "normal_xy": [
+                  1.0,
+                  0.0
+                ],
+                "normalized_traction": 0.8406196139130039,
+                "principal_stresses_Pa": [
+                  18148151.5808793,
+                  739430031.2867367
+                ],
+                "probe_element_ids": [
+                  228
+                ],
+                "recovery_operator": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+                "sigma_nn_Pa": 34831289.526312366,
+                "sigma_nt_Pa": 108420099.63548148,
+                "sigma_tt_Pa": 722746893.3413037,
+                "source_neighborhood_eta_n_max": 0.11612747778519564,
+                "source_neighborhood_eta_t_max": 0.19698280671432905,
+                "tangent_xy": [
+                  -0.0,
+                  1.0
+                ],
+                "tensor_Pa": [
+                  [
+                    34831289.526312366,
+                    108420099.63548148
+                  ],
+                  [
+                    108420099.63548148,
+                    722746893.3413037
+                  ]
+                ]
+              },
+              "quality_edge_flips": [],
+              "refinement_count": 1,
+              "refinement_region": "source_neighborhood",
+              "schema": "v12.cavity-source-local-refinement/1"
+            },
+            "qualified": false
+          },
+          {
+            "level": 2,
+            "proof": {
+              "current_binding": "68d4bcb491e1597f8c21d4682b979d373892c1f453ee6b1174f969f9a21ef8ce",
+              "current_metrics": {
+                "boundary_node_id": 0,
+                "boundary_position_m": [
+                  0.0007902661214806971,
+                  0.0
+                ],
+                "eta_n_max": 0.44776485983697606,
+                "eta_n_median": 0.04688132943129216,
+                "eta_t_max": 0.19698280671432972,
+                "eta_t_median": 0.049245701678582304,
+                "local_aspect_ratio_max": 2.7676975520025455,
+                "local_aspect_ratio_median": 1.6962635413359817,
+                "local_minimum_quality": 0.7247060080823954,
+                "minimum_quality": 0.14674391295824543,
+                "normal_xy": [
+                  1.0,
+                  0.0
+                ],
+                "normalized_traction": 0.6769879675793568,
+                "principal_stresses_Pa": [
+                  25513036.539402433,
+                  797869721.8669924
+                ],
+                "probe_element_ids": [
+                  406
+                ],
+                "recovery_operator": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+                "sigma_nn_Pa": 28829364.86711589,
+                "sigma_nt_Pa": 50501389.2984496,
+                "sigma_tt_Pa": 794553393.5392789,
+                "source_neighborhood_eta_n_max": 0.029031869446300408,
+                "source_neighborhood_eta_t_max": 0.04924570167858231,
+                "tangent_xy": [
+                  -0.0,
+                  1.0
+                ],
+                "tensor_Pa": [
+                  [
+                    28829364.86711589,
+                    50501389.2984496
+                  ],
+                  [
+                    50501389.2984496,
+                    794553393.5392789
+                  ]
+                ]
+              },
+              "previous_binding": "db2bb160616676dd304cdbba7c60bf4e491bee71612ce2a1259d57c3020d128a",
+              "previous_metrics": {
+                "boundary_node_id": 0,
+                "boundary_position_m": [
+                  0.0007902661214806971,
+                  0.0
+                ],
+                "eta_n_max": 0.44776485983697606,
+                "eta_n_median": 0.09376265886258428,
+                "eta_t_max": 0.19698280671432972,
+                "eta_t_median": 0.09849140335716439,
+                "local_aspect_ratio_max": 2.2731164577543104,
+                "local_aspect_ratio_median": 1.5970664627502469,
+                "local_minimum_quality": 0.7247060080824022,
+                "minimum_quality": 0.14674391295824543,
+                "normal_xy": [
+                  1.0,
+                  0.0
+                ],
+                "normalized_traction": 0.7379357232064822,
+                "principal_stresses_Pa": [
+                  38367629.90790848,
+                  760084982.5183249
+                ],
+                "probe_element_ids": [
+                  274
+                ],
+                "recovery_operator": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+                "sigma_nn_Pa": 44528185.24977316,
+                "sigma_nt_Pa": 66394482.07359074,
+                "sigma_tt_Pa": 753924427.1764601,
+                "source_neighborhood_eta_n_max": 0.05806373889259689,
+                "source_neighborhood_eta_t_max": 0.09849140335716461,
+                "tangent_xy": [
+                  -0.0,
+                  1.0
+                ],
+                "tensor_Pa": [
+                  [
+                    44528185.24977316,
+                    66394482.07359074
+                  ],
+                  [
+                    66394482.07359074,
+                    753924427.1764601
+                  ]
+                ]
+              },
+              "quality_edge_flips": [],
+              "refinement_count": 2,
+              "refinement_region": "source_neighborhood",
+              "schema": "v12.cavity-source-local-refinement/1"
+            },
+            "qualified": false
+          },
+          {
+            "level": 3,
+            "proof": {
+              "current_binding": "071d6242a09d602c01e392ead11a2cafa8c0697ace71798d816d274c2bd47709",
+              "current_metrics": {
+                "boundary_node_id": 0,
+                "boundary_position_m": [
+                  0.0007902661214806971,
+                  0.0
+                ],
+                "eta_n_max": 0.44776485983697606,
+                "eta_n_median": 0.017793021366425577,
+                "eta_t_max": 0.19698280671432972,
+                "eta_t_median": 0.024622850839291173,
+                "local_aspect_ratio_max": 2.7676975520025455,
+                "local_aspect_ratio_median": 1.6962635413358713,
+                "local_minimum_quality": 0.7247060080823681,
+                "minimum_quality": 0.14674391295824543,
+                "normal_xy": [
+                  1.0,
+                  0.0
+                ],
+                "normalized_traction": 0.6315574233361707,
+                "principal_stresses_Pa": [
+                  27478937.874646604,
+                  856525895.0921215
+                ],
+                "probe_element_ids": [
+                  882
+                ],
+                "recovery_operator": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+                "sigma_nn_Pa": 30607468.484520502,
+                "sigma_nt_Pa": 50832185.46256663,
+                "sigma_tt_Pa": 853397364.4822476,
+                "source_neighborhood_eta_n_max": 0.014515934723150263,
+                "source_neighborhood_eta_t_max": 0.024622850839291256,
+                "tangent_xy": [
+                  -0.0,
+                  1.0
+                ],
+                "tensor_Pa": [
+                  [
+                    30607468.484520502,
+                    50832185.46256663
+                  ],
+                  [
+                    50832185.46256663,
+                    853397364.4822476
+                  ]
+                ]
+              },
+              "previous_binding": "68d4bcb491e1597f8c21d4682b979d373892c1f453ee6b1174f969f9a21ef8ce",
+              "previous_metrics": {
+                "boundary_node_id": 0,
+                "boundary_position_m": [
+                  0.0007902661214806971,
+                  0.0
+                ],
+                "eta_n_max": 0.44776485983697606,
+                "eta_n_median": 0.04688132943129216,
+                "eta_t_max": 0.19698280671432972,
+                "eta_t_median": 0.049245701678582304,
+                "local_aspect_ratio_max": 2.7676975520025455,
+                "local_aspect_ratio_median": 1.6962635413359817,
+                "local_minimum_quality": 0.7247060080823954,
+                "minimum_quality": 0.14674391295824543,
+                "normal_xy": [
+                  1.0,
+                  0.0
+                ],
+                "normalized_traction": 0.6769879675793568,
+                "principal_stresses_Pa": [
+                  25513036.539402433,
+                  797869721.8669924
+                ],
+                "probe_element_ids": [
+                  406
+                ],
+                "recovery_operator": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+                "sigma_nn_Pa": 28829364.86711589,
+                "sigma_nt_Pa": 50501389.2984496,
+                "sigma_tt_Pa": 794553393.5392789,
+                "source_neighborhood_eta_n_max": 0.029031869446300408,
+                "source_neighborhood_eta_t_max": 0.04924570167858231,
+                "tangent_xy": [
+                  -0.0,
+                  1.0
+                ],
+                "tensor_Pa": [
+                  [
+                    28829364.86711589,
+                    50501389.2984496
+                  ],
+                  [
+                    50501389.2984496,
+                    794553393.5392789
+                  ]
+                ]
+              },
+              "quality_edge_flips": [],
+              "refinement_count": 3,
+              "refinement_region": "source_neighborhood",
+              "schema": "v12.cavity-source-local-refinement/1"
+            },
+            "qualified": false
+          }
+        ],
+        "operations": [
+          "downstream_source_refinement",
+          "source_support_rebuild",
+          "source_equilibrium",
+          "downstream_source_refinement",
+          "source_support_rebuild",
+          "source_equilibrium",
+          "downstream_source_refinement",
+          "source_support_rebuild",
+          "source_equilibrium"
+        ],
+        "status": "SOURCE_TENSOR_UNQUALIFIED"
+      },
+      "duration_s": 0.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "8d86d9e9c356fdb14c0e0118479720cd7371536f1b642b5936ff5c4c454b208b",
+      "accepted_pre_interval_fingerprint": "8d86d9e9c356fdb14c0e0118479720cd7371536f1b642b5936ff5c4c454b208b",
+      "api": "downstream_hazard_interval",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 0.0,
+          "crossing_time_s": "infinity",
+          "effective_rate_s": 0.0,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.4452608919473873e-19,
+          "instantaneous_status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+          "rate_s": 0.0,
+          "raw_rate_s": 1.2512521314504503e-13,
+          "resolved_opening_stress_Pa": 722746893.3413037,
+          "source_resolution_policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED",
+          "unqualified_crossing_time_s": 12971877242485.29,
+          "unqualified_effective_rate_s": 1.2512521314504503e-13,
+          "winner": false
+        }
+      ],
+      "duration_s": 1.6e-05,
+      "events": [],
+      "physical_time_s": 1.640722461259558e+16,
+      "stagewise_conservation": {
+        "active_tip_ids": [],
+        "actual_cavity_chord": {
+          "entry_m": [
+            0.0006797338785193028,
+            0.0
+          ],
+          "exit_m": [
+            0.0007902661214806971,
+            0.0
+          ],
+          "physical_length_m": 0.00011053224296139427,
+          "projected_length_m": 0.00011053224296139427,
+          "reporting_direction": [
+            1.0,
+            0.0
+          ]
+        },
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": []
+      },
+      "stagewise_topology": {
+        "actual_cavity_cycle": {
+          "boundary_edge_count": 44,
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              417
+            ],
+            [
+              15,
+              417
+            ],
+            [
+              15,
+              542
+            ],
+            [
+              420,
+              542
+            ],
+            [
+              420,
+              872
+            ],
+            [
+              544,
+              872
+            ],
+            [
+              544,
+              794
+            ],
+            [
+              16,
+              794
+            ],
+            [
+              16,
+              795
+            ],
+            [
+              545,
+              795
+            ],
+            [
+              545,
+              874
+            ],
+            [
+              422,
+              874
+            ],
+            [
+              422,
+              549
+            ],
+            [
+              17,
+              549
+            ],
+            [
+              17,
+              426
+            ],
+            [
+              18,
+              426
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_node_count": 44,
+          "boundary_node_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            417,
+            420,
+            422,
+            426,
+            542,
+            544,
+            545,
+            549,
+            794,
+            795,
+            872,
+            874
+          ],
+          "connected_component_count": 1,
+          "passed": true,
+          "topology": "single_closed_cavity_boundary_cycle"
+        },
+        "actual_component_incidence": {
+          "active_tip_ids": [],
+          "branch_endpoint_m": [
+            0.0006797338785193028,
+            0.0
+          ],
+          "branch_id": "b00000000",
+          "bridge_search_sample_count": 63,
+          "bridge_search_uncovered_sample_indices": [],
+          "cavity_id": "void:site-1",
+          "closed_cavity_boundary_cycle": {
+            "boundary_edge_count": 44,
+            "boundary_edge_ids": [
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                6,
+                7
+              ],
+              [
+                7,
+                8
+              ],
+              [
+                8,
+                9
+              ],
+              [
+                9,
+                10
+              ],
+              [
+                10,
+                11
+              ],
+              [
+                11,
+                12
+              ],
+              [
+                12,
+                13
+              ],
+              [
+                13,
+                14
+              ],
+              [
+                14,
+                417
+              ],
+              [
+                15,
+                417
+              ],
+              [
+                15,
+                542
+              ],
+              [
+                420,
+                542
+              ],
+              [
+                420,
+                872
+              ],
+              [
+                544,
+                872
+              ],
+              [
+                544,
+                794
+              ],
+              [
+                16,
+                794
+              ],
+              [
+                16,
+                795
+              ],
+              [
+                545,
+                795
+              ],
+              [
+                545,
+                874
+              ],
+              [
+                422,
+                874
+              ],
+              [
+                422,
+                549
+              ],
+              [
+                17,
+                549
+              ],
+              [
+                17,
+                426
+              ],
+              [
+                18,
+                426
+              ],
+              [
+                18,
+                19
+              ],
+              [
+                19,
+                20
+              ],
+              [
+                20,
+                21
+              ],
+              [
+                21,
+                22
+              ],
+              [
+                22,
+                23
+              ],
+              [
+                23,
+                24
+              ],
+              [
+                24,
+                25
+              ],
+              [
+                25,
+                26
+              ],
+              [
+                26,
+                27
+              ],
+              [
+                27,
+                28
+              ],
+              [
+                28,
+                29
+              ],
+              [
+                29,
+                30
+              ],
+              [
+                30,
+                31
+              ],
+              [
+                0,
+                31
+              ]
+            ],
+            "boundary_node_count": 44,
+            "boundary_node_ids": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              417,
+              420,
+              422,
+              426,
+              542,
+              544,
+              545,
+              549,
+              794,
+              795,
+              872,
+              874
+            ],
+            "connected_component_count": 1,
+            "passed": true,
+            "topology": "single_closed_cavity_boundary_cycle"
+          },
+          "combined_components": [
+            [
+              "branch:b00000000",
+              "cavity:void:site-1"
+            ]
+          ],
+          "combined_incidence_component_count": 1,
+          "combined_incidence_edges": [
+            [
+              "branch:b00000000",
+              "cavity:void:site-1"
+            ]
+          ],
+          "crack_graph_outside_cavity": true,
+          "crack_segment_cavity_intersections": [
+            {
+              "branch_id": "b00000000",
+              "intersects_cavity_open_disk": false,
+              "minimum_center_distance_m": 0.00016240069959533115,
+              "segment_index": 0
+            },
+            {
+              "branch_id": "b00000000",
+              "intersects_cavity_open_disk": false,
+              "minimum_center_distance_m": 5.5266121480697134e-05,
+              "segment_index": 1
+            }
+          ],
+          "endpoint_matches_intersection": true,
+          "endpoint_on_cavity_boundary": true,
+          "exact_no_intact_node_or_element_path": true,
+          "exact_triangle_polygon_interior_overlap_absent": true,
+          "independent_intact_path_certificate": {
+            "boundary_terminal_certificates": [
+              {
+                "arc_id": "b00000000:arc0",
+                "boundary_component_id": "external-free-component-at-root",
+                "boundary_edge_ids": [
+                  [
+                    396,
+                    397
+                  ],
+                  [
+                    397,
+                    398
+                  ],
+                  [
+                    398,
+                    399
+                  ],
+                  [
+                    399,
+                    540
+                  ],
+                  [
+                    400,
+                    866
+                  ],
+                  [
+                    400,
+                    867
+                  ],
+                  [
+                    401,
+                    402
+                  ],
+                  [
+                    401,
+                    541
+                  ],
+                  [
+                    402,
+                    403
+                  ],
+                  [
+                    403,
+                    404
+                  ],
+                  [
+                    540,
+                    654
+                  ],
+                  [
+                    541,
+                    655
+                  ],
+                  [
+                    654,
+                    866
+                  ],
+                  [
+                    655,
+                    867
+                  ]
+                ],
+                "boundary_kind": "external_free_surface",
+                "cavity_cycle_independently_closed": false,
+                "cavity_id": null,
+                "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+                "declared_endpoint_coordinate_m": [
+                  0.0,
+                  0.0
+                ],
+                "endpoint": "start",
+                "endpoint_coordinate_m": [
+                  0.0,
+                  0.0
+                ],
+                "endpoint_graph_role": [
+                  "inactive_terminal",
+                  "physical_root"
+                ],
+                "endpoint_to_boundary_distance_m": 1.2037062152420224e-35,
+                "exact_incidence": true,
+                "first_two_sided_axial_station_m": 3.9508882043920625e-05,
+                "incident_crack_tangent": [
+                  1.0,
+                  0.0
+                ],
+                "intact_path_exists": false,
+                "maximum_boundary_affected_axial_extent_m": 3.9508882043920625e-05,
+                "negative_interior_seed_count": 177,
+                "node_star_passed": null,
+                "only_boundary_clearance_waived": true,
+                "positive_interior_seed_count": 177,
+                "tangent_enters_or_approaches_solid": true,
+                "tube_boundary_intersections": [],
+                "unrelated_boundary_intersections": []
+              },
+              {
+                "arc_id": "b00000000:arc0",
+                "boundary_component_id": "cavity-cycle:void:site-1",
+                "boundary_edge_ids": [
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    2
+                  ],
+                  [
+                    2,
+                    3
+                  ],
+                  [
+                    3,
+                    4
+                  ],
+                  [
+                    4,
+                    5
+                  ],
+                  [
+                    5,
+                    6
+                  ],
+                  [
+                    6,
+                    7
+                  ],
+                  [
+                    7,
+                    8
+                  ],
+                  [
+                    8,
+                    9
+                  ],
+                  [
+                    9,
+                    10
+                  ],
+                  [
+                    10,
+                    11
+                  ],
+                  [
+                    11,
+                    12
+                  ],
+                  [
+                    12,
+                    13
+                  ],
+                  [
+                    13,
+                    14
+                  ],
+                  [
+                    14,
+                    417
+                  ],
+                  [
+                    15,
+                    417
+                  ],
+                  [
+                    15,
+                    542
+                  ],
+                  [
+                    420,
+                    542
+                  ],
+                  [
+                    420,
+                    872
+                  ],
+                  [
+                    544,
+                    872
+                  ],
+                  [
+                    544,
+                    794
+                  ],
+                  [
+                    16,
+                    794
+                  ],
+                  [
+                    16,
+                    795
+                  ],
+                  [
+                    545,
+                    795
+                  ],
+                  [
+                    545,
+                    874
+                  ],
+                  [
+                    422,
+                    874
+                  ],
+                  [
+                    422,
+                    549
+                  ],
+                  [
+                    17,
+                    549
+                  ],
+                  [
+                    17,
+                    426
+                  ],
+                  [
+                    18,
+                    426
+                  ],
+                  [
+                    18,
+                    19
+                  ],
+                  [
+                    19,
+                    20
+                  ],
+                  [
+                    20,
+                    21
+                  ],
+                  [
+                    21,
+                    22
+                  ],
+                  [
+                    22,
+                    23
+                  ],
+                  [
+                    23,
+                    24
+                  ],
+                  [
+                    24,
+                    25
+                  ],
+                  [
+                    25,
+                    26
+                  ],
+                  [
+                    26,
+                    27
+                  ],
+                  [
+                    27,
+                    28
+                  ],
+                  [
+                    28,
+                    29
+                  ],
+                  [
+                    29,
+                    30
+                  ],
+                  [
+                    30,
+                    31
+                  ],
+                  [
+                    0,
+                    31
+                  ]
+                ],
+                "boundary_kind": "cavity_free_surface",
+                "cavity_cycle_independently_closed": true,
+                "cavity_id": "void:site-1",
+                "classification": "CERTIFIED_RELATIVE_TO_CAVITY_FREE_BOUNDARY",
+                "declared_endpoint_coordinate_m": [
+                  0.0006797338785193028,
+                  0.0
+                ],
+                "endpoint": "end",
+                "endpoint_coordinate_m": [
+                  0.0006797338785193028,
+                  0.0
+                ],
+                "endpoint_graph_role": [
+                  "inactive_terminal"
+                ],
+                "endpoint_to_boundary_distance_m": 6.50240318255023e-23,
+                "exact_incidence": true,
+                "first_two_sided_axial_station_m": 3.9508882043920625e-05,
+                "incident_crack_tangent": [
+                  -1.0,
+                  -0.0
+                ],
+                "intact_path_exists": false,
+                "maximum_boundary_affected_axial_extent_m": 3.9508882043920625e-05,
+                "negative_interior_seed_count": 177,
+                "node_star_passed": null,
+                "only_boundary_clearance_waived": true,
+                "positive_interior_seed_count": 177,
+                "tangent_enters_or_approaches_solid": true,
+                "tube_boundary_intersections": [],
+                "unrelated_boundary_intersections": []
+              }
+            ],
+            "bridge_element_ids": [],
+            "bridge_node_ids": [],
+            "certificate_fingerprint": "f0e04e05487b382940d916066d6490fc00dab75fb1e1c0576f6b93c08a4c180a",
+            "edge_cut_certificates": [
+              {
+                "backward_undershoot_m": 0.0,
+                "bridge_element_ids": [],
+                "bridge_node_ids": [],
+                "certificate_fingerprint": "02aa115024170f4b0986f205f64ec4d0d5bfb704bfd251fb0b61321304435739",
+                "endpoint_footprint_error_m": 0.0,
+                "forward_leakage_m": 0.0,
+                "forward_leakage_over_h_local": 0.0,
+                "forward_overshoot_m": 0.0,
+                "h_local_max_m": 1.9754441021960312e-05,
+                "h_local_median_m": 8.733775550752084e-06,
+                "intact_cross_graph_path_exists": false,
+                "minimum_crossing_path_length": null,
+                "negative_component_count": 1,
+                "negative_component_labels": [
+                  2
+                ],
+                "negative_seed_count": 177,
+                "positive_component_count": 1,
+                "positive_component_labels": [
+                  1
+                ],
+                "positive_seed_count": 177,
+                "segment_id": "b00000000:arc0",
+                "selected_area_m2": 2.5675422603898594e-08,
+                "selected_area_over_length_h_local": 1.9121146954903714,
+                "signed_tip_footprint_m": 0.0,
+                "sufficient_opposite_side_seeds": true,
+                "support_width_m": 3.423439361679388e-05,
+                "support_width_over_h_local": 1.732997333548275,
+                "tube_boundary_clearance_m": 3.95088820439206e-05
+              }
+            ],
+            "insufficient_seed_segment_ids": [],
+            "intact_cross_graph_path_exists": false,
+            "minimum_crossing_path_length": null,
+            "negative_seed_element_ids": [
+              438,
+              445,
+              448,
+              449,
+              607,
+              652,
+              668,
+              669,
+              670,
+              671,
+              672,
+              673,
+              674,
+              675,
+              676,
+              677,
+              678,
+              679,
+              767,
+              769,
+              770,
+              785,
+              790,
+              792,
+              793,
+              794,
+              795,
+              796,
+              797,
+              798,
+              799,
+              800,
+              947,
+              948,
+              949,
+              951,
+              952,
+              953,
+              955,
+              988,
+              989,
+              990,
+              991,
+              1006,
+              1007,
+              1008,
+              1009,
+              1010,
+              1011,
+              1178,
+              1179,
+              1180,
+              1181,
+              1196,
+              1197,
+              1198,
+              1212,
+              1213,
+              1214,
+              1215,
+              1216,
+              1217,
+              1218,
+              1220,
+              1221,
+              1223,
+              1363,
+              1364,
+              1366,
+              1368,
+              1371,
+              1372,
+              1373,
+              1374,
+              1375,
+              1376,
+              1377,
+              1378,
+              1379,
+              1390,
+              1406,
+              1412,
+              1413,
+              1414,
+              1415,
+              1421,
+              1422,
+              1424,
+              1425,
+              1427,
+              1430,
+              1580,
+              1596,
+              1602,
+              1603,
+              1604,
+              1605,
+              1611,
+              1612,
+              1614,
+              1615,
+              1617,
+              1620,
+              1621,
+              1622,
+              1624,
+              1625,
+              1630,
+              1631,
+              1634,
+              1636,
+              1637,
+              1638,
+              1639,
+              1640,
+              1641,
+              1762,
+              1763,
+              1764,
+              1765,
+              1766,
+              1767,
+              1768,
+              1769,
+              1778,
+              1779,
+              1792,
+              1793,
+              1798,
+              1799,
+              1804,
+              1805,
+              1806,
+              1807,
+              1929,
+              1930,
+              1943,
+              1944,
+              1949,
+              1950,
+              1955,
+              1956,
+              1957,
+              1958,
+              1959,
+              1960,
+              1965,
+              1966,
+              1967,
+              1968,
+              1969,
+              1970,
+              2087,
+              2088,
+              2089,
+              2090,
+              2092,
+              2093,
+              2103,
+              2104,
+              2117,
+              2118,
+              2129,
+              2130,
+              2131,
+              2132,
+              2253,
+              2254,
+              2267,
+              2268,
+              2279,
+              2280,
+              2281,
+              2282,
+              2284,
+              2452,
+              2500
+            ],
+            "positive_seed_element_ids": [
+              257,
+              258,
+              260,
+              265,
+              502,
+              503,
+              504,
+              505,
+              506,
+              507,
+              508,
+              509,
+              510,
+              511,
+              512,
+              513,
+              519,
+              558,
+              732,
+              734,
+              735,
+              736,
+              737,
+              738,
+              739,
+              740,
+              741,
+              742,
+              743,
+              745,
+              746,
+              762,
+              856,
+              857,
+              858,
+              859,
+              860,
+              861,
+              863,
+              864,
+              865,
+              866,
+              880,
+              881,
+              883,
+              900,
+              901,
+              902,
+              903,
+              1068,
+              1070,
+              1072,
+              1073,
+              1074,
+              1075,
+              1076,
+              1077,
+              1124,
+              1125,
+              1126,
+              1127,
+              1128,
+              1142,
+              1143,
+              1144,
+              1145,
+              1282,
+              1286,
+              1287,
+              1288,
+              1289,
+              1290,
+              1292,
+              1294,
+              1295,
+              1300,
+              1304,
+              1305,
+              1306,
+              1307,
+              1313,
+              1324,
+              1325,
+              1326,
+              1327,
+              1333,
+              1345,
+              1346,
+              1348,
+              1349,
+              1354,
+              1498,
+              1499,
+              1500,
+              1501,
+              1502,
+              1518,
+              1535,
+              1536,
+              1542,
+              1543,
+              1546,
+              1548,
+              1549,
+              1550,
+              1551,
+              1552,
+              1554,
+              1555,
+              1556,
+              1557,
+              1562,
+              1566,
+              1567,
+              1568,
+              1569,
+              1708,
+              1709,
+              1710,
+              1711,
+              1716,
+              1717,
+              1718,
+              1719,
+              1724,
+              1725,
+              1734,
+              1735,
+              1740,
+              1741,
+              1750,
+              1751,
+              1756,
+              1757,
+              1871,
+              1872,
+              1873,
+              1874,
+              1887,
+              1888,
+              1901,
+              1906,
+              1907,
+              1908,
+              1909,
+              1910,
+              1911,
+              1912,
+              1917,
+              1918,
+              1919,
+              1920,
+              2033,
+              2035,
+              2036,
+              2041,
+              2042,
+              2043,
+              2049,
+              2050,
+              2065,
+              2066,
+              2075,
+              2076,
+              2081,
+              2082,
+              2197,
+              2198,
+              2211,
+              2212,
+              2225,
+              2230,
+              2231,
+              2232,
+              2235,
+              2343,
+              2392
+            ]
+          },
+          "intended_intersection_m": [
+            0.0006797338785193028,
+            0.0
+          ],
+          "intersected_cavity_edge_id": [
+            16,
+            794
+          ],
+          "no_surviving_solid_ligament_bridge": true,
+          "passed": true,
+          "supplemental_open_disk_overlap_element_ids": [],
+          "support_triangle_cavity_overlap_element_ids": [],
+          "topology": "connected_crack_graph_and_traction_free_cavity_cycle",
+          "wake_support_outside_cavity": true
+        },
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  540
+                ],
+                [
+                  400,
+                  866
+                ],
+                [
+                  400,
+                  867
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  401,
+                  541
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ],
+                [
+                  540,
+                  654
+                ],
+                [
+                  541,
+                  655
+                ],
+                [
+                  654,
+                  866
+                ],
+                [
+                  655,
+                  867
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                0.0
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                0.0
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 1.2037062152420224e-35,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 3.9508882043920625e-05,
+              "incident_crack_tangent": [
+                1.0,
+                0.0
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 3.9508882043920625e-05,
+              "negative_interior_seed_count": 177,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 177,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            },
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "cavity-cycle:void:site-1",
+              "boundary_edge_ids": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  3
+                ],
+                [
+                  3,
+                  4
+                ],
+                [
+                  4,
+                  5
+                ],
+                [
+                  5,
+                  6
+                ],
+                [
+                  6,
+                  7
+                ],
+                [
+                  7,
+                  8
+                ],
+                [
+                  8,
+                  9
+                ],
+                [
+                  9,
+                  10
+                ],
+                [
+                  10,
+                  11
+                ],
+                [
+                  11,
+                  12
+                ],
+                [
+                  12,
+                  13
+                ],
+                [
+                  13,
+                  14
+                ],
+                [
+                  14,
+                  417
+                ],
+                [
+                  15,
+                  417
+                ],
+                [
+                  15,
+                  542
+                ],
+                [
+                  420,
+                  542
+                ],
+                [
+                  420,
+                  872
+                ],
+                [
+                  544,
+                  872
+                ],
+                [
+                  544,
+                  794
+                ],
+                [
+                  16,
+                  794
+                ],
+                [
+                  16,
+                  795
+                ],
+                [
+                  545,
+                  795
+                ],
+                [
+                  545,
+                  874
+                ],
+                [
+                  422,
+                  874
+                ],
+                [
+                  422,
+                  549
+                ],
+                [
+                  17,
+                  549
+                ],
+                [
+                  17,
+                  426
+                ],
+                [
+                  18,
+                  426
+                ],
+                [
+                  18,
+                  19
+                ],
+                [
+                  19,
+                  20
+                ],
+                [
+                  20,
+                  21
+                ],
+                [
+                  21,
+                  22
+                ],
+                [
+                  22,
+                  23
+                ],
+                [
+                  23,
+                  24
+                ],
+                [
+                  24,
+                  25
+                ],
+                [
+                  25,
+                  26
+                ],
+                [
+                  26,
+                  27
+                ],
+                [
+                  27,
+                  28
+                ],
+                [
+                  28,
+                  29
+                ],
+                [
+                  29,
+                  30
+                ],
+                [
+                  30,
+                  31
+                ],
+                [
+                  0,
+                  31
+                ]
+              ],
+              "boundary_kind": "cavity_free_surface",
+              "cavity_cycle_independently_closed": true,
+              "cavity_id": "void:site-1",
+              "classification": "CERTIFIED_RELATIVE_TO_CAVITY_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0006797338785193028,
+                0.0
+              ],
+              "endpoint": "end",
+              "endpoint_coordinate_m": [
+                0.0006797338785193028,
+                0.0
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal"
+              ],
+              "endpoint_to_boundary_distance_m": 6.50240318255023e-23,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 3.9508882043920625e-05,
+              "incident_crack_tangent": [
+                -1.0,
+                -0.0
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 3.9508882043920625e-05,
+              "negative_interior_seed_count": 177,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 177,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "f0e04e05487b382940d916066d6490fc00dab75fb1e1c0576f6b93c08a4c180a",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "02aa115024170f4b0986f205f64ec4d0d5bfb704bfd251fb0b61321304435739",
+              "endpoint_footprint_error_m": 0.0,
+              "forward_leakage_m": 0.0,
+              "forward_leakage_over_h_local": 0.0,
+              "forward_overshoot_m": 0.0,
+              "h_local_max_m": 1.9754441021960312e-05,
+              "h_local_median_m": 8.733775550752084e-06,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 177,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 177,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 2.5675422603898594e-08,
+              "selected_area_over_length_h_local": 1.9121146954903714,
+              "signed_tip_footprint_m": 0.0,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 3.423439361679388e-05,
+              "support_width_over_h_local": 1.732997333548275,
+              "tube_boundary_clearance_m": 3.95088820439206e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            438,
+            445,
+            448,
+            449,
+            607,
+            652,
+            668,
+            669,
+            670,
+            671,
+            672,
+            673,
+            674,
+            675,
+            676,
+            677,
+            678,
+            679,
+            767,
+            769,
+            770,
+            785,
+            790,
+            792,
+            793,
+            794,
+            795,
+            796,
+            797,
+            798,
+            799,
+            800,
+            947,
+            948,
+            949,
+            951,
+            952,
+            953,
+            955,
+            988,
+            989,
+            990,
+            991,
+            1006,
+            1007,
+            1008,
+            1009,
+            1010,
+            1011,
+            1178,
+            1179,
+            1180,
+            1181,
+            1196,
+            1197,
+            1198,
+            1212,
+            1213,
+            1214,
+            1215,
+            1216,
+            1217,
+            1218,
+            1220,
+            1221,
+            1223,
+            1363,
+            1364,
+            1366,
+            1368,
+            1371,
+            1372,
+            1373,
+            1374,
+            1375,
+            1376,
+            1377,
+            1378,
+            1379,
+            1390,
+            1406,
+            1412,
+            1413,
+            1414,
+            1415,
+            1421,
+            1422,
+            1424,
+            1425,
+            1427,
+            1430,
+            1580,
+            1596,
+            1602,
+            1603,
+            1604,
+            1605,
+            1611,
+            1612,
+            1614,
+            1615,
+            1617,
+            1620,
+            1621,
+            1622,
+            1624,
+            1625,
+            1630,
+            1631,
+            1634,
+            1636,
+            1637,
+            1638,
+            1639,
+            1640,
+            1641,
+            1762,
+            1763,
+            1764,
+            1765,
+            1766,
+            1767,
+            1768,
+            1769,
+            1778,
+            1779,
+            1792,
+            1793,
+            1798,
+            1799,
+            1804,
+            1805,
+            1806,
+            1807,
+            1929,
+            1930,
+            1943,
+            1944,
+            1949,
+            1950,
+            1955,
+            1956,
+            1957,
+            1958,
+            1959,
+            1960,
+            1965,
+            1966,
+            1967,
+            1968,
+            1969,
+            1970,
+            2087,
+            2088,
+            2089,
+            2090,
+            2092,
+            2093,
+            2103,
+            2104,
+            2117,
+            2118,
+            2129,
+            2130,
+            2131,
+            2132,
+            2253,
+            2254,
+            2267,
+            2268,
+            2279,
+            2280,
+            2281,
+            2282,
+            2284,
+            2452,
+            2500
+          ],
+          "positive_seed_element_ids": [
+            257,
+            258,
+            260,
+            265,
+            502,
+            503,
+            504,
+            505,
+            506,
+            507,
+            508,
+            509,
+            510,
+            511,
+            512,
+            513,
+            519,
+            558,
+            732,
+            734,
+            735,
+            736,
+            737,
+            738,
+            739,
+            740,
+            741,
+            742,
+            743,
+            745,
+            746,
+            762,
+            856,
+            857,
+            858,
+            859,
+            860,
+            861,
+            863,
+            864,
+            865,
+            866,
+            880,
+            881,
+            883,
+            900,
+            901,
+            902,
+            903,
+            1068,
+            1070,
+            1072,
+            1073,
+            1074,
+            1075,
+            1076,
+            1077,
+            1124,
+            1125,
+            1126,
+            1127,
+            1128,
+            1142,
+            1143,
+            1144,
+            1145,
+            1282,
+            1286,
+            1287,
+            1288,
+            1289,
+            1290,
+            1292,
+            1294,
+            1295,
+            1300,
+            1304,
+            1305,
+            1306,
+            1307,
+            1313,
+            1324,
+            1325,
+            1326,
+            1327,
+            1333,
+            1345,
+            1346,
+            1348,
+            1349,
+            1354,
+            1498,
+            1499,
+            1500,
+            1501,
+            1502,
+            1518,
+            1535,
+            1536,
+            1542,
+            1543,
+            1546,
+            1548,
+            1549,
+            1550,
+            1551,
+            1552,
+            1554,
+            1555,
+            1556,
+            1557,
+            1562,
+            1566,
+            1567,
+            1568,
+            1569,
+            1708,
+            1709,
+            1710,
+            1711,
+            1716,
+            1717,
+            1718,
+            1719,
+            1724,
+            1725,
+            1734,
+            1735,
+            1740,
+            1741,
+            1750,
+            1751,
+            1756,
+            1757,
+            1871,
+            1872,
+            1873,
+            1874,
+            1887,
+            1888,
+            1901,
+            1906,
+            1907,
+            1908,
+            1909,
+            1910,
+            1911,
+            1912,
+            1917,
+            1918,
+            1919,
+            1920,
+            2033,
+            2035,
+            2036,
+            2041,
+            2042,
+            2043,
+            2049,
+            2050,
+            2065,
+            2066,
+            2075,
+            2076,
+            2081,
+            2082,
+            2197,
+            2198,
+            2211,
+            2212,
+            2225,
+            2230,
+            2231,
+            2232,
+            2235,
+            2343,
+            2392
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "e1912e87e4668129db0f07eafa89de25bf8dd3e5b2261ac24f77678927189710"
+      },
+      "temperature_K": 900.0
+    }
+  ],
+  "actual_preparation_checkpoints": {
+    "available_site": "checkpoints/722b59eae2e9c3173d63837ae5f7b7bf7d4d3409a975f36274163979bab6d9a0.json",
+    "geometric_promotion": "checkpoints/42489ba6c80845a3465da3699cd84eb77bb7752fef2f862bbf8a9c7bad6b3926.json",
+    "multi_hit_1": "checkpoints/99d6ab04371e00070d612b1c3abc9a90901c9906faf96d1c54a6a99df28e071a.json",
+    "multi_hit_2": "checkpoints/dc3d7dceb1b12c1b5ddaa3266bbf0a72ae12be844c1c1e811387f9f20fd33cd3.json",
+    "resolved_growth": "checkpoints/508a1fd49edbca17214eb6606ac074d6198155ca77d1c41e6e6f54ee086ba2ae.json",
+    "stabilization": "checkpoints/51f594111c41deeaba8c43a24f923be0ca787cfbb58ad26f10a2543d47f6d155.json",
+    "subgrid_growth": "checkpoints/95f9bdabfced6a26e684b45ebf179e3e0dd5cb03365187593ce0ade3e9a27c2d.json",
+    "subgrid_void": "checkpoints/3f6734de24769f5f65a7458eed56dc1ae0fa5f2f1aa27ea533e7998b4ec8da8d.json"
+  },
+  "actual_preparation_stages": [
+    "available_site",
+    "multi_hit_1",
+    "multi_hit_2",
+    "stabilization",
+    "subgrid_void",
+    "subgrid_growth",
+    "geometric_promotion",
+    "resolved_growth"
+  ],
+  "case_identity": "long_ligament",
+  "conservation": {
+    "active_tip_ids": [],
+    "actual_cavity_chord": {
+      "entry_m": [
+        0.0006797338785193028,
+        0.0
+      ],
+      "exit_m": [
+        0.0007902661214806971,
+        0.0
+      ],
+      "physical_length_m": 0.00011053224296139427,
+      "projected_length_m": 0.00011053224296139427,
+      "reporting_direction": [
+        1.0,
+        0.0
+      ]
+    },
+    "candidate_threshold_ownership": true,
+    "cavity_area_identity_error_m2": 0.0,
+    "connected_chord_error_m": 0.0,
+    "connected_state_has_no_active_front": true,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "physical_travel_identity_error_m": 0.0,
+    "projected_connected_chord_error_m": 0.0,
+    "projected_travel_identity_error_m": 0.0,
+    "single_void": true,
+    "support_tip_ids": []
+  },
+  "dataset": "controlled",
+  "executed_code_sha": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+  "execution_id": "controlled:long_ligament:None:69:3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/508a1fd49edbca17214eb6606ac074d6198155ca77d1c41e6e6f54ee086ba2ae.json",
+  "initial_fingerprint": "508a1fd49edbca17214eb6606ac074d6198155ca77d1c41e6e6f54ee086ba2ae",
+  "input_configuration": {
+    "accepted_opening_history_m": [
+      4e-07,
+      4e-07
+    ],
+    "center_m": [
+      0.000735,
+      0.0
+    ],
+    "cleavage_theta_deg": 0.0,
+    "fixed_crack_path_m": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0005725993004046688,
+        0.0
+      ]
+    ],
+    "growth_interval_count": null,
+    "growth_interval_duration_s": null,
+    "history_kind": "long_ligament",
+    "loading_opening_m": 4e-07,
+    "remesh_boundary_segments": 32,
+    "remesh_radial_layers": 12,
+    "seed": 3621
+  },
+  "input_hash": "7ad198dd039a75719f98bdd6c282b3853fd7618a116650daec2f22ae5516556f",
+  "partition_count": null,
+  "stagewise_topology": {
+    "actual_cavity_cycle": {
+      "boundary_edge_count": 44,
+      "boundary_edge_ids": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          14,
+          417
+        ],
+        [
+          15,
+          417
+        ],
+        [
+          15,
+          542
+        ],
+        [
+          420,
+          542
+        ],
+        [
+          420,
+          872
+        ],
+        [
+          544,
+          872
+        ],
+        [
+          544,
+          794
+        ],
+        [
+          16,
+          794
+        ],
+        [
+          16,
+          795
+        ],
+        [
+          545,
+          795
+        ],
+        [
+          545,
+          874
+        ],
+        [
+          422,
+          874
+        ],
+        [
+          422,
+          549
+        ],
+        [
+          17,
+          549
+        ],
+        [
+          17,
+          426
+        ],
+        [
+          18,
+          426
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          19,
+          20
+        ],
+        [
+          20,
+          21
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ],
+        [
+          23,
+          24
+        ],
+        [
+          24,
+          25
+        ],
+        [
+          25,
+          26
+        ],
+        [
+          26,
+          27
+        ],
+        [
+          27,
+          28
+        ],
+        [
+          28,
+          29
+        ],
+        [
+          29,
+          30
+        ],
+        [
+          30,
+          31
+        ],
+        [
+          0,
+          31
+        ]
+      ],
+      "boundary_node_count": 44,
+      "boundary_node_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        417,
+        420,
+        422,
+        426,
+        542,
+        544,
+        545,
+        549,
+        794,
+        795,
+        872,
+        874
+      ],
+      "connected_component_count": 1,
+      "passed": true,
+      "topology": "single_closed_cavity_boundary_cycle"
+    },
+    "actual_component_incidence": {
+      "active_tip_ids": [],
+      "branch_endpoint_m": [
+        0.0006797338785193028,
+        0.0
+      ],
+      "branch_id": "b00000000",
+      "bridge_search_sample_count": 63,
+      "bridge_search_uncovered_sample_indices": [],
+      "cavity_id": "void:site-1",
+      "closed_cavity_boundary_cycle": {
+        "boundary_edge_count": 44,
+        "boundary_edge_ids": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            14,
+            417
+          ],
+          [
+            15,
+            417
+          ],
+          [
+            15,
+            542
+          ],
+          [
+            420,
+            542
+          ],
+          [
+            420,
+            872
+          ],
+          [
+            544,
+            872
+          ],
+          [
+            544,
+            794
+          ],
+          [
+            16,
+            794
+          ],
+          [
+            16,
+            795
+          ],
+          [
+            545,
+            795
+          ],
+          [
+            545,
+            874
+          ],
+          [
+            422,
+            874
+          ],
+          [
+            422,
+            549
+          ],
+          [
+            17,
+            549
+          ],
+          [
+            17,
+            426
+          ],
+          [
+            18,
+            426
+          ],
+          [
+            18,
+            19
+          ],
+          [
+            19,
+            20
+          ],
+          [
+            20,
+            21
+          ],
+          [
+            21,
+            22
+          ],
+          [
+            22,
+            23
+          ],
+          [
+            23,
+            24
+          ],
+          [
+            24,
+            25
+          ],
+          [
+            25,
+            26
+          ],
+          [
+            26,
+            27
+          ],
+          [
+            27,
+            28
+          ],
+          [
+            28,
+            29
+          ],
+          [
+            29,
+            30
+          ],
+          [
+            30,
+            31
+          ],
+          [
+            0,
+            31
+          ]
+        ],
+        "boundary_node_count": 44,
+        "boundary_node_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          417,
+          420,
+          422,
+          426,
+          542,
+          544,
+          545,
+          549,
+          794,
+          795,
+          872,
+          874
+        ],
+        "connected_component_count": 1,
+        "passed": true,
+        "topology": "single_closed_cavity_boundary_cycle"
+      },
+      "combined_components": [
+        [
+          "branch:b00000000",
+          "cavity:void:site-1"
+        ]
+      ],
+      "combined_incidence_component_count": 1,
+      "combined_incidence_edges": [
+        [
+          "branch:b00000000",
+          "cavity:void:site-1"
+        ]
+      ],
+      "crack_graph_outside_cavity": true,
+      "crack_segment_cavity_intersections": [
+        {
+          "branch_id": "b00000000",
+          "intersects_cavity_open_disk": false,
+          "minimum_center_distance_m": 0.00016240069959533115,
+          "segment_index": 0
+        },
+        {
+          "branch_id": "b00000000",
+          "intersects_cavity_open_disk": false,
+          "minimum_center_distance_m": 5.5266121480697134e-05,
+          "segment_index": 1
+        }
+      ],
+      "endpoint_matches_intersection": true,
+      "endpoint_on_cavity_boundary": true,
+      "exact_no_intact_node_or_element_path": true,
+      "exact_triangle_polygon_interior_overlap_absent": true,
+      "independent_intact_path_certificate": {
+        "boundary_terminal_certificates": [
+          {
+            "arc_id": "b00000000:arc0",
+            "boundary_component_id": "external-free-component-at-root",
+            "boundary_edge_ids": [
+              [
+                396,
+                397
+              ],
+              [
+                397,
+                398
+              ],
+              [
+                398,
+                399
+              ],
+              [
+                399,
+                540
+              ],
+              [
+                400,
+                866
+              ],
+              [
+                400,
+                867
+              ],
+              [
+                401,
+                402
+              ],
+              [
+                401,
+                541
+              ],
+              [
+                402,
+                403
+              ],
+              [
+                403,
+                404
+              ],
+              [
+                540,
+                654
+              ],
+              [
+                541,
+                655
+              ],
+              [
+                654,
+                866
+              ],
+              [
+                655,
+                867
+              ]
+            ],
+            "boundary_kind": "external_free_surface",
+            "cavity_cycle_independently_closed": false,
+            "cavity_id": null,
+            "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+            "declared_endpoint_coordinate_m": [
+              0.0,
+              0.0
+            ],
+            "endpoint": "start",
+            "endpoint_coordinate_m": [
+              0.0,
+              0.0
+            ],
+            "endpoint_graph_role": [
+              "inactive_terminal",
+              "physical_root"
+            ],
+            "endpoint_to_boundary_distance_m": 1.2037062152420224e-35,
+            "exact_incidence": true,
+            "first_two_sided_axial_station_m": 3.9508882043920625e-05,
+            "incident_crack_tangent": [
+              1.0,
+              0.0
+            ],
+            "intact_path_exists": false,
+            "maximum_boundary_affected_axial_extent_m": 3.9508882043920625e-05,
+            "negative_interior_seed_count": 177,
+            "node_star_passed": null,
+            "only_boundary_clearance_waived": true,
+            "positive_interior_seed_count": 177,
+            "tangent_enters_or_approaches_solid": true,
+            "tube_boundary_intersections": [],
+            "unrelated_boundary_intersections": []
+          },
+          {
+            "arc_id": "b00000000:arc0",
+            "boundary_component_id": "cavity-cycle:void:site-1",
+            "boundary_edge_ids": [
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                6,
+                7
+              ],
+              [
+                7,
+                8
+              ],
+              [
+                8,
+                9
+              ],
+              [
+                9,
+                10
+              ],
+              [
+                10,
+                11
+              ],
+              [
+                11,
+                12
+              ],
+              [
+                12,
+                13
+              ],
+              [
+                13,
+                14
+              ],
+              [
+                14,
+                417
+              ],
+              [
+                15,
+                417
+              ],
+              [
+                15,
+                542
+              ],
+              [
+                420,
+                542
+              ],
+              [
+                420,
+                872
+              ],
+              [
+                544,
+                872
+              ],
+              [
+                544,
+                794
+              ],
+              [
+                16,
+                794
+              ],
+              [
+                16,
+                795
+              ],
+              [
+                545,
+                795
+              ],
+              [
+                545,
+                874
+              ],
+              [
+                422,
+                874
+              ],
+              [
+                422,
+                549
+              ],
+              [
+                17,
+                549
+              ],
+              [
+                17,
+                426
+              ],
+              [
+                18,
+                426
+              ],
+              [
+                18,
+                19
+              ],
+              [
+                19,
+                20
+              ],
+              [
+                20,
+                21
+              ],
+              [
+                21,
+                22
+              ],
+              [
+                22,
+                23
+              ],
+              [
+                23,
+                24
+              ],
+              [
+                24,
+                25
+              ],
+              [
+                25,
+                26
+              ],
+              [
+                26,
+                27
+              ],
+              [
+                27,
+                28
+              ],
+              [
+                28,
+                29
+              ],
+              [
+                29,
+                30
+              ],
+              [
+                30,
+                31
+              ],
+              [
+                0,
+                31
+              ]
+            ],
+            "boundary_kind": "cavity_free_surface",
+            "cavity_cycle_independently_closed": true,
+            "cavity_id": "void:site-1",
+            "classification": "CERTIFIED_RELATIVE_TO_CAVITY_FREE_BOUNDARY",
+            "declared_endpoint_coordinate_m": [
+              0.0006797338785193028,
+              0.0
+            ],
+            "endpoint": "end",
+            "endpoint_coordinate_m": [
+              0.0006797338785193028,
+              0.0
+            ],
+            "endpoint_graph_role": [
+              "inactive_terminal"
+            ],
+            "endpoint_to_boundary_distance_m": 6.50240318255023e-23,
+            "exact_incidence": true,
+            "first_two_sided_axial_station_m": 3.9508882043920625e-05,
+            "incident_crack_tangent": [
+              -1.0,
+              -0.0
+            ],
+            "intact_path_exists": false,
+            "maximum_boundary_affected_axial_extent_m": 3.9508882043920625e-05,
+            "negative_interior_seed_count": 177,
+            "node_star_passed": null,
+            "only_boundary_clearance_waived": true,
+            "positive_interior_seed_count": 177,
+            "tangent_enters_or_approaches_solid": true,
+            "tube_boundary_intersections": [],
+            "unrelated_boundary_intersections": []
+          }
+        ],
+        "bridge_element_ids": [],
+        "bridge_node_ids": [],
+        "certificate_fingerprint": "f0e04e05487b382940d916066d6490fc00dab75fb1e1c0576f6b93c08a4c180a",
+        "edge_cut_certificates": [
+          {
+            "backward_undershoot_m": 0.0,
+            "bridge_element_ids": [],
+            "bridge_node_ids": [],
+            "certificate_fingerprint": "02aa115024170f4b0986f205f64ec4d0d5bfb704bfd251fb0b61321304435739",
+            "endpoint_footprint_error_m": 0.0,
+            "forward_leakage_m": 0.0,
+            "forward_leakage_over_h_local": 0.0,
+            "forward_overshoot_m": 0.0,
+            "h_local_max_m": 1.9754441021960312e-05,
+            "h_local_median_m": 8.733775550752084e-06,
+            "intact_cross_graph_path_exists": false,
+            "minimum_crossing_path_length": null,
+            "negative_component_count": 1,
+            "negative_component_labels": [
+              2
+            ],
+            "negative_seed_count": 177,
+            "positive_component_count": 1,
+            "positive_component_labels": [
+              1
+            ],
+            "positive_seed_count": 177,
+            "segment_id": "b00000000:arc0",
+            "selected_area_m2": 2.5675422603898594e-08,
+            "selected_area_over_length_h_local": 1.9121146954903714,
+            "signed_tip_footprint_m": 0.0,
+            "sufficient_opposite_side_seeds": true,
+            "support_width_m": 3.423439361679388e-05,
+            "support_width_over_h_local": 1.732997333548275,
+            "tube_boundary_clearance_m": 3.95088820439206e-05
+          }
+        ],
+        "insufficient_seed_segment_ids": [],
+        "intact_cross_graph_path_exists": false,
+        "minimum_crossing_path_length": null,
+        "negative_seed_element_ids": [
+          438,
+          445,
+          448,
+          449,
+          607,
+          652,
+          668,
+          669,
+          670,
+          671,
+          672,
+          673,
+          674,
+          675,
+          676,
+          677,
+          678,
+          679,
+          767,
+          769,
+          770,
+          785,
+          790,
+          792,
+          793,
+          794,
+          795,
+          796,
+          797,
+          798,
+          799,
+          800,
+          947,
+          948,
+          949,
+          951,
+          952,
+          953,
+          955,
+          988,
+          989,
+          990,
+          991,
+          1006,
+          1007,
+          1008,
+          1009,
+          1010,
+          1011,
+          1178,
+          1179,
+          1180,
+          1181,
+          1196,
+          1197,
+          1198,
+          1212,
+          1213,
+          1214,
+          1215,
+          1216,
+          1217,
+          1218,
+          1220,
+          1221,
+          1223,
+          1363,
+          1364,
+          1366,
+          1368,
+          1371,
+          1372,
+          1373,
+          1374,
+          1375,
+          1376,
+          1377,
+          1378,
+          1379,
+          1390,
+          1406,
+          1412,
+          1413,
+          1414,
+          1415,
+          1421,
+          1422,
+          1424,
+          1425,
+          1427,
+          1430,
+          1580,
+          1596,
+          1602,
+          1603,
+          1604,
+          1605,
+          1611,
+          1612,
+          1614,
+          1615,
+          1617,
+          1620,
+          1621,
+          1622,
+          1624,
+          1625,
+          1630,
+          1631,
+          1634,
+          1636,
+          1637,
+          1638,
+          1639,
+          1640,
+          1641,
+          1762,
+          1763,
+          1764,
+          1765,
+          1766,
+          1767,
+          1768,
+          1769,
+          1778,
+          1779,
+          1792,
+          1793,
+          1798,
+          1799,
+          1804,
+          1805,
+          1806,
+          1807,
+          1929,
+          1930,
+          1943,
+          1944,
+          1949,
+          1950,
+          1955,
+          1956,
+          1957,
+          1958,
+          1959,
+          1960,
+          1965,
+          1966,
+          1967,
+          1968,
+          1969,
+          1970,
+          2087,
+          2088,
+          2089,
+          2090,
+          2092,
+          2093,
+          2103,
+          2104,
+          2117,
+          2118,
+          2129,
+          2130,
+          2131,
+          2132,
+          2253,
+          2254,
+          2267,
+          2268,
+          2279,
+          2280,
+          2281,
+          2282,
+          2284,
+          2452,
+          2500
+        ],
+        "positive_seed_element_ids": [
+          257,
+          258,
+          260,
+          265,
+          502,
+          503,
+          504,
+          505,
+          506,
+          507,
+          508,
+          509,
+          510,
+          511,
+          512,
+          513,
+          519,
+          558,
+          732,
+          734,
+          735,
+          736,
+          737,
+          738,
+          739,
+          740,
+          741,
+          742,
+          743,
+          745,
+          746,
+          762,
+          856,
+          857,
+          858,
+          859,
+          860,
+          861,
+          863,
+          864,
+          865,
+          866,
+          880,
+          881,
+          883,
+          900,
+          901,
+          902,
+          903,
+          1068,
+          1070,
+          1072,
+          1073,
+          1074,
+          1075,
+          1076,
+          1077,
+          1124,
+          1125,
+          1126,
+          1127,
+          1128,
+          1142,
+          1143,
+          1144,
+          1145,
+          1282,
+          1286,
+          1287,
+          1288,
+          1289,
+          1290,
+          1292,
+          1294,
+          1295,
+          1300,
+          1304,
+          1305,
+          1306,
+          1307,
+          1313,
+          1324,
+          1325,
+          1326,
+          1327,
+          1333,
+          1345,
+          1346,
+          1348,
+          1349,
+          1354,
+          1498,
+          1499,
+          1500,
+          1501,
+          1502,
+          1518,
+          1535,
+          1536,
+          1542,
+          1543,
+          1546,
+          1548,
+          1549,
+          1550,
+          1551,
+          1552,
+          1554,
+          1555,
+          1556,
+          1557,
+          1562,
+          1566,
+          1567,
+          1568,
+          1569,
+          1708,
+          1709,
+          1710,
+          1711,
+          1716,
+          1717,
+          1718,
+          1719,
+          1724,
+          1725,
+          1734,
+          1735,
+          1740,
+          1741,
+          1750,
+          1751,
+          1756,
+          1757,
+          1871,
+          1872,
+          1873,
+          1874,
+          1887,
+          1888,
+          1901,
+          1906,
+          1907,
+          1908,
+          1909,
+          1910,
+          1911,
+          1912,
+          1917,
+          1918,
+          1919,
+          1920,
+          2033,
+          2035,
+          2036,
+          2041,
+          2042,
+          2043,
+          2049,
+          2050,
+          2065,
+          2066,
+          2075,
+          2076,
+          2081,
+          2082,
+          2197,
+          2198,
+          2211,
+          2212,
+          2225,
+          2230,
+          2231,
+          2232,
+          2235,
+          2343,
+          2392
+        ]
+      },
+      "intended_intersection_m": [
+        0.0006797338785193028,
+        0.0
+      ],
+      "intersected_cavity_edge_id": [
+        16,
+        794
+      ],
+      "no_surviving_solid_ligament_bridge": true,
+      "passed": true,
+      "supplemental_open_disk_overlap_element_ids": [],
+      "support_triangle_cavity_overlap_element_ids": [],
+      "topology": "connected_crack_graph_and_traction_free_cavity_cycle",
+      "wake_support_outside_cavity": true
+    },
+    "independent_cut": {
+      "boundary_terminal_certificates": [
+        {
+          "arc_id": "b00000000:arc0",
+          "boundary_component_id": "external-free-component-at-root",
+          "boundary_edge_ids": [
+            [
+              396,
+              397
+            ],
+            [
+              397,
+              398
+            ],
+            [
+              398,
+              399
+            ],
+            [
+              399,
+              540
+            ],
+            [
+              400,
+              866
+            ],
+            [
+              400,
+              867
+            ],
+            [
+              401,
+              402
+            ],
+            [
+              401,
+              541
+            ],
+            [
+              402,
+              403
+            ],
+            [
+              403,
+              404
+            ],
+            [
+              540,
+              654
+            ],
+            [
+              541,
+              655
+            ],
+            [
+              654,
+              866
+            ],
+            [
+              655,
+              867
+            ]
+          ],
+          "boundary_kind": "external_free_surface",
+          "cavity_cycle_independently_closed": false,
+          "cavity_id": null,
+          "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+          "declared_endpoint_coordinate_m": [
+            0.0,
+            0.0
+          ],
+          "endpoint": "start",
+          "endpoint_coordinate_m": [
+            0.0,
+            0.0
+          ],
+          "endpoint_graph_role": [
+            "inactive_terminal",
+            "physical_root"
+          ],
+          "endpoint_to_boundary_distance_m": 1.2037062152420224e-35,
+          "exact_incidence": true,
+          "first_two_sided_axial_station_m": 3.9508882043920625e-05,
+          "incident_crack_tangent": [
+            1.0,
+            0.0
+          ],
+          "intact_path_exists": false,
+          "maximum_boundary_affected_axial_extent_m": 3.9508882043920625e-05,
+          "negative_interior_seed_count": 177,
+          "node_star_passed": null,
+          "only_boundary_clearance_waived": true,
+          "positive_interior_seed_count": 177,
+          "tangent_enters_or_approaches_solid": true,
+          "tube_boundary_intersections": [],
+          "unrelated_boundary_intersections": []
+        },
+        {
+          "arc_id": "b00000000:arc0",
+          "boundary_component_id": "cavity-cycle:void:site-1",
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              417
+            ],
+            [
+              15,
+              417
+            ],
+            [
+              15,
+              542
+            ],
+            [
+              420,
+              542
+            ],
+            [
+              420,
+              872
+            ],
+            [
+              544,
+              872
+            ],
+            [
+              544,
+              794
+            ],
+            [
+              16,
+              794
+            ],
+            [
+              16,
+              795
+            ],
+            [
+              545,
+              795
+            ],
+            [
+              545,
+              874
+            ],
+            [
+              422,
+              874
+            ],
+            [
+              422,
+              549
+            ],
+            [
+              17,
+              549
+            ],
+            [
+              17,
+              426
+            ],
+            [
+              18,
+              426
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_kind": "cavity_free_surface",
+          "cavity_cycle_independently_closed": true,
+          "cavity_id": "void:site-1",
+          "classification": "CERTIFIED_RELATIVE_TO_CAVITY_FREE_BOUNDARY",
+          "declared_endpoint_coordinate_m": [
+            0.0006797338785193028,
+            0.0
+          ],
+          "endpoint": "end",
+          "endpoint_coordinate_m": [
+            0.0006797338785193028,
+            0.0
+          ],
+          "endpoint_graph_role": [
+            "inactive_terminal"
+          ],
+          "endpoint_to_boundary_distance_m": 6.50240318255023e-23,
+          "exact_incidence": true,
+          "first_two_sided_axial_station_m": 3.9508882043920625e-05,
+          "incident_crack_tangent": [
+            -1.0,
+            -0.0
+          ],
+          "intact_path_exists": false,
+          "maximum_boundary_affected_axial_extent_m": 3.9508882043920625e-05,
+          "negative_interior_seed_count": 177,
+          "node_star_passed": null,
+          "only_boundary_clearance_waived": true,
+          "positive_interior_seed_count": 177,
+          "tangent_enters_or_approaches_solid": true,
+          "tube_boundary_intersections": [],
+          "unrelated_boundary_intersections": []
+        }
+      ],
+      "bridge_element_ids": [],
+      "bridge_node_ids": [],
+      "certificate_fingerprint": "f0e04e05487b382940d916066d6490fc00dab75fb1e1c0576f6b93c08a4c180a",
+      "edge_cut_certificates": [
+        {
+          "backward_undershoot_m": 0.0,
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "02aa115024170f4b0986f205f64ec4d0d5bfb704bfd251fb0b61321304435739",
+          "endpoint_footprint_error_m": 0.0,
+          "forward_leakage_m": 0.0,
+          "forward_leakage_over_h_local": 0.0,
+          "forward_overshoot_m": 0.0,
+          "h_local_max_m": 1.9754441021960312e-05,
+          "h_local_median_m": 8.733775550752084e-06,
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_component_count": 1,
+          "negative_component_labels": [
+            2
+          ],
+          "negative_seed_count": 177,
+          "positive_component_count": 1,
+          "positive_component_labels": [
+            1
+          ],
+          "positive_seed_count": 177,
+          "segment_id": "b00000000:arc0",
+          "selected_area_m2": 2.5675422603898594e-08,
+          "selected_area_over_length_h_local": 1.9121146954903714,
+          "signed_tip_footprint_m": 0.0,
+          "sufficient_opposite_side_seeds": true,
+          "support_width_m": 3.423439361679388e-05,
+          "support_width_over_h_local": 1.732997333548275,
+          "tube_boundary_clearance_m": 3.95088820439206e-05
+        }
+      ],
+      "insufficient_seed_segment_ids": [],
+      "intact_cross_graph_path_exists": false,
+      "minimum_crossing_path_length": null,
+      "negative_seed_element_ids": [
+        438,
+        445,
+        448,
+        449,
+        607,
+        652,
+        668,
+        669,
+        670,
+        671,
+        672,
+        673,
+        674,
+        675,
+        676,
+        677,
+        678,
+        679,
+        767,
+        769,
+        770,
+        785,
+        790,
+        792,
+        793,
+        794,
+        795,
+        796,
+        797,
+        798,
+        799,
+        800,
+        947,
+        948,
+        949,
+        951,
+        952,
+        953,
+        955,
+        988,
+        989,
+        990,
+        991,
+        1006,
+        1007,
+        1008,
+        1009,
+        1010,
+        1011,
+        1178,
+        1179,
+        1180,
+        1181,
+        1196,
+        1197,
+        1198,
+        1212,
+        1213,
+        1214,
+        1215,
+        1216,
+        1217,
+        1218,
+        1220,
+        1221,
+        1223,
+        1363,
+        1364,
+        1366,
+        1368,
+        1371,
+        1372,
+        1373,
+        1374,
+        1375,
+        1376,
+        1377,
+        1378,
+        1379,
+        1390,
+        1406,
+        1412,
+        1413,
+        1414,
+        1415,
+        1421,
+        1422,
+        1424,
+        1425,
+        1427,
+        1430,
+        1580,
+        1596,
+        1602,
+        1603,
+        1604,
+        1605,
+        1611,
+        1612,
+        1614,
+        1615,
+        1617,
+        1620,
+        1621,
+        1622,
+        1624,
+        1625,
+        1630,
+        1631,
+        1634,
+        1636,
+        1637,
+        1638,
+        1639,
+        1640,
+        1641,
+        1762,
+        1763,
+        1764,
+        1765,
+        1766,
+        1767,
+        1768,
+        1769,
+        1778,
+        1779,
+        1792,
+        1793,
+        1798,
+        1799,
+        1804,
+        1805,
+        1806,
+        1807,
+        1929,
+        1930,
+        1943,
+        1944,
+        1949,
+        1950,
+        1955,
+        1956,
+        1957,
+        1958,
+        1959,
+        1960,
+        1965,
+        1966,
+        1967,
+        1968,
+        1969,
+        1970,
+        2087,
+        2088,
+        2089,
+        2090,
+        2092,
+        2093,
+        2103,
+        2104,
+        2117,
+        2118,
+        2129,
+        2130,
+        2131,
+        2132,
+        2253,
+        2254,
+        2267,
+        2268,
+        2279,
+        2280,
+        2281,
+        2282,
+        2284,
+        2452,
+        2500
+      ],
+      "positive_seed_element_ids": [
+        257,
+        258,
+        260,
+        265,
+        502,
+        503,
+        504,
+        505,
+        506,
+        507,
+        508,
+        509,
+        510,
+        511,
+        512,
+        513,
+        519,
+        558,
+        732,
+        734,
+        735,
+        736,
+        737,
+        738,
+        739,
+        740,
+        741,
+        742,
+        743,
+        745,
+        746,
+        762,
+        856,
+        857,
+        858,
+        859,
+        860,
+        861,
+        863,
+        864,
+        865,
+        866,
+        880,
+        881,
+        883,
+        900,
+        901,
+        902,
+        903,
+        1068,
+        1070,
+        1072,
+        1073,
+        1074,
+        1075,
+        1076,
+        1077,
+        1124,
+        1125,
+        1126,
+        1127,
+        1128,
+        1142,
+        1143,
+        1144,
+        1145,
+        1282,
+        1286,
+        1287,
+        1288,
+        1289,
+        1290,
+        1292,
+        1294,
+        1295,
+        1300,
+        1304,
+        1305,
+        1306,
+        1307,
+        1313,
+        1324,
+        1325,
+        1326,
+        1327,
+        1333,
+        1345,
+        1346,
+        1348,
+        1349,
+        1354,
+        1498,
+        1499,
+        1500,
+        1501,
+        1502,
+        1518,
+        1535,
+        1536,
+        1542,
+        1543,
+        1546,
+        1548,
+        1549,
+        1550,
+        1551,
+        1552,
+        1554,
+        1555,
+        1556,
+        1557,
+        1562,
+        1566,
+        1567,
+        1568,
+        1569,
+        1708,
+        1709,
+        1710,
+        1711,
+        1716,
+        1717,
+        1718,
+        1719,
+        1724,
+        1725,
+        1734,
+        1735,
+        1740,
+        1741,
+        1750,
+        1751,
+        1756,
+        1757,
+        1871,
+        1872,
+        1873,
+        1874,
+        1887,
+        1888,
+        1901,
+        1906,
+        1907,
+        1908,
+        1909,
+        1910,
+        1911,
+        1912,
+        1917,
+        1918,
+        1919,
+        1920,
+        2033,
+        2035,
+        2036,
+        2041,
+        2042,
+        2043,
+        2049,
+        2050,
+        2065,
+        2066,
+        2075,
+        2076,
+        2081,
+        2082,
+        2197,
+        2198,
+        2211,
+        2212,
+        2225,
+        2230,
+        2231,
+        2232,
+        2235,
+        2343,
+        2392
+      ]
+    },
+    "passed": true,
+    "topology_source_fingerprint": "e1912e87e4668129db0f07eafa89de25bf8dd3e5b2261ac24f77678927189710"
+  },
+  "terminal_checkpoint": "checkpoints/8d86d9e9c356fdb14c0e0118479720cd7371536f1b642b5936ff5c4c454b208b.json",
+  "terminal_fingerprint": "8d86d9e9c356fdb14c0e0118479720cd7371536f1b642b5936ff5c4c454b208b"
+}

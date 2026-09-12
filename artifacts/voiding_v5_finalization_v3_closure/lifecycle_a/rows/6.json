@@ -1,0 +1,65 @@
+{
+  "actual_operations": [
+    {
+      "api": "advance_site",
+      "duration_s": 4.351846674591577e-08,
+      "events": [
+        "EMBRYO"
+      ],
+      "rates": {
+        "birth_activation_work_J": 3.4686154333268836e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848092e-21,
+        "birth_normal_opening_work_J": 3.6106713305890997e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.234358698316509e-23,
+        "healing_activation_work_J": -2.8386608264681125e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424048,
+        "local_in_plane_mean_stress_Pa": 177992579.61258516,
+        "local_max_principal_stress_Pa": 283866082.64681125,
+        "local_normal_opening_stress_Pa": 72213426.611782,
+        "local_sigma_zz_Pa": 106795547.7675511,
+        "local_signed_shear_stress_Pa": 4468717.396633019,
+        "local_von_mises_stress_Pa": 196714547.7023946,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.8017587,
+        "stabilization_activation_work_J": 2.8386608264681125e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.3340435,
+        "vacancy_transport_s": 809716953.2985822
+      }
+    }
+  ],
+  "case_identity": "birth_hit_2",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "transitions:birth_hit_2:1:5:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/23506eb4683b1ceceef77f27fc33fd962206ea413f5c4532abc4bba199358d23.json",
+  "initial_fingerprint": "23506eb4683b1ceceef77f27fc33fd962206ea413f5c4532abc4bba199358d23",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 1,
+    "predecessor_available": true,
+    "requested_predecessor": "multi_hit_1",
+    "seed": 3621
+  },
+  "input_hash": "b31955b268092debac7e3d53bd1fc73fdd3f5009515224bae7a127c1777d4d26",
+  "partition_count": 1,
+  "terminal_checkpoint": "checkpoints/252bb9eb9f33340b9cecf8ce5c7232d56a99a10c4d9e2424b26cc4c704910ebc.json",
+  "terminal_fingerprint": "252bb9eb9f33340b9cecf8ce5c7232d56a99a10c4d9e2424b26cc4c704910ebc",
+  "transition_occurred": true
+}

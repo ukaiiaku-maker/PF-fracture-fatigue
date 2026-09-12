@@ -1,0 +1,40 @@
+{
+  "lossless_checkpoint_representation_changes": [
+    {
+      "checkpoint": "child_or_rejected_state.json",
+      "complete_state_exact": true,
+      "complete_state_fingerprint": "d8a9a5d7d876d36fd7b29cf6d3b10dd736012d277dfb66449e9d9ef176c0995f",
+      "compressed_payload_sha256": "f1321543b4496c919526a8f199f3664915b494c620ad2ec369d5f6f7465ac2ee",
+      "original_manifest_sha256": "80839574f56af8a74599aa49c0d1ad12fa0ad7bcfe266afa4c74d6f2671e54a0",
+      "original_payload_sha256": "dd74875d8e331a954915e50cbb3665b075a7a997db36367ace2f194ba6f6c86e"
+    },
+    {
+      "checkpoint": "continued_or_rejected_state.json",
+      "complete_state_exact": true,
+      "complete_state_fingerprint": "b36f5c6f7bf4d851eb990dd5aecd0abe77923ba4872ff9b5ae5e5700d2b2c166",
+      "compressed_payload_sha256": "8affaa8d40daa2128f6b64bd30bf2d3b102f09719380f397daf7a0572d4e6536",
+      "original_manifest_sha256": "4c2223d27d4c0389edd0ceace46c596e5491ace872a03f27c69d8bb63e43ed20",
+      "original_payload_sha256": "3028d99766fc8a3deb9d00e3f323392ceabf8e2f72062df27ddf719739b6f833"
+    },
+    {
+      "checkpoint": "qualified_or_preserved_state.json",
+      "complete_state_exact": true,
+      "complete_state_fingerprint": "b51cb294bffb564a88108e606b6bcd706b7f748c3a9c9ad6aa6e6fa718008890",
+      "compressed_payload_sha256": "da1aa518df7ecec54ce978e9d0cfb9128c88bbb79f4969b30dae4c2635de94f5",
+      "original_manifest_sha256": "717bb9b5d34e5728adf0799c0e254eedd796078fb3917faac5d472d78e5142d4",
+      "original_payload_sha256": "b4539de03a0a9181d656db3d1e0f8bbff7811a620e4ee141af8c2e7465edfcea"
+    }
+  ],
+  "original_inventory": {
+    "child_or_rejected_state.json": "80839574f56af8a74599aa49c0d1ad12fa0ad7bcfe266afa4c74d6f2671e54a0",
+    "child_or_rejected_state.json.dd74875d8e331a954915e50cbb3665b075a7a997db36367ace2f194ba6f6c86e.state.pkl": "dd74875d8e331a954915e50cbb3665b075a7a997db36367ace2f194ba6f6c86e",
+    "continued_or_rejected_state.json": "4c2223d27d4c0389edd0ceace46c596e5491ace872a03f27c69d8bb63e43ed20",
+    "continued_or_rejected_state.json.3028d99766fc8a3deb9d00e3f323392ceabf8e2f72062df27ddf719739b6f833.state.pkl": "3028d99766fc8a3deb9d00e3f323392ceabf8e2f72062df27ddf719739b6f833",
+    "qualified_or_preserved_state.json": "717bb9b5d34e5728adf0799c0e254eedd796078fb3917faac5d472d78e5142d4",
+    "qualified_or_preserved_state.json.b4539de03a0a9181d656db3d1e0f8bbff7811a620e4ee141af8c2e7465edfcea.state.pkl": "b4539de03a0a9181d656db3d1e0f8bbff7811a620e4ee141af8c2e7465edfcea",
+    "result.json": "645eb0a568b3377786a6e8f48b8d93220d616f2adf440f29df95e1fd651b29ba",
+    "sha256_manifest.json": "b2424b5e630809679926bddadb7775749ae321de7ccd65603d40b214370b61e2"
+  },
+  "record_kind": "PACKAGING_NOT_NEW_PHYSICAL_EXECUTION_OR_CLEAN_ATTESTATION",
+  "schema": "v5.retained-development-packaging/1"
+}

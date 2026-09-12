@@ -1,0 +1,29 @@
+{
+  "actual_operations": [
+    {
+      "api": "V12_and_disabled_accepted_unload_reload"
+    }
+  ],
+  "base_terminal_checkpoint": "checkpoints/5869d90147b2d67dba3ad9710e38b87f93b0058cef7c1b9637d7e52cdb375b40.json",
+  "case_identity": "unload_reload",
+  "conservation": {
+    "passed": true,
+    "void_inventory": "NOT_APPLICABLE_DISABLED"
+  },
+  "dataset": "neutrality",
+  "exact_neutrality": true,
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "neutrality:unload_reload:None:71:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/95177e8a71532ce7e73bed5aef7225ece41e72de452a1d905139a4670d49be86.json",
+  "initial_fingerprint": "95177e8a71532ce7e73bed5aef7225ece41e72de452a1d905139a4670d49be86",
+  "input_configuration": {
+    "base_model": "sharp_wake_mechanically_separating_v12",
+    "v5_model": "sharp_wake_mechanically_separating_v12",
+    "voiding_enabled": false
+  },
+  "input_hash": "f28c1c3cfc0f406da66e7e27921f8b73f0997c2669d04e4766634f6ed7d37cbf",
+  "partition_count": null,
+  "terminal_checkpoint": "checkpoints/5869d90147b2d67dba3ad9710e38b87f93b0058cef7c1b9637d7e52cdb375b40.json",
+  "terminal_fingerprint": "5869d90147b2d67dba3ad9710e38b87f93b0058cef7c1b9637d7e52cdb375b40"
+}

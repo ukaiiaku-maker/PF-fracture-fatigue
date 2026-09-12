@@ -67,6 +67,22 @@ def _components(edges: np.ndarray) -> list[np.ndarray]:
     return out
 
 
+def cavity_edge_traction_geometry(a, b, cavity_interior_point, stress_tensor):
+    """Return orientation-independent edge geometry and analytic traction."""
+    a=np.asarray(a,float); b=np.asarray(b,float); center=np.asarray(cavity_interior_point,float)
+    if tuple(a) > tuple(b): a,b=b,a
+    edge=b-a; length=float(np.linalg.norm(edge))
+    if not length>0.0: raise ValueError("cavity edge must have positive length")
+    tangent=edge/length; normal=np.array((tangent[1],-tangent[0])); midpoint=.5*(a+b); radial=midpoint-center
+    if float(normal@radial)<0.0: normal=-normal
+    radial_unit=radial/max(float(np.linalg.norm(radial)),1e-300)
+    traction=np.asarray(stress_tensor,float)@normal
+    return {"canonical_edge_tangent":tangent,"cavity_outward_into_solid_normal":normal,
+            "solid_domain_outward_into_cavity_normal":-normal,"edge_length_m":length,
+            "center_radial_consistency":float(normal@radial_unit),"traction":traction,
+            "normal_traction":float(traction@normal),"tangential_traction":float(traction@tangent)}
+
+
 @dataclass(frozen=True)
 class HoleMesh:
     mesh: TriMesh
@@ -77,6 +93,166 @@ class HoleMesh:
     exterior_edges: np.ndarray
     prescribed_polygon_nodes: np.ndarray
     validation: Mapping[str, Any]
+
+
+def _replace_split_edge(edges: np.ndarray, edge: tuple[int, int], new: int) -> np.ndarray:
+    """Replace a boundary edge by its two conforming children, if present."""
+    edge = tuple(sorted(edge))
+    out = []
+    found = False
+    for raw in np.asarray(edges, dtype=int).reshape((-1, 2)):
+        if tuple(sorted(map(int, raw))) == edge:
+            out.extend(((edge[0], new), (new, edge[1])))
+            found = True
+        else:
+            out.append(tuple(map(int, raw)))
+    return np.asarray(out, dtype=int).reshape((-1, 2)) if found else np.asarray(edges, dtype=int)
+
+
+def _final_mesh_validation(hole: HoleMesh) -> dict[str, Any]:
+    """Recompute geometry/topology/quality facts from the realized mesh."""
+    mesh = hole.mesh
+    edges, counts = _edge_counts(mesh.elems)
+    boundary_edges = edges[counts == 1]
+    components = _components(boundary_edges)
+    cavity_nodes = set(map(int, np.asarray(hole.cavity_edges).ravel()))
+    degrees = {node: 0 for node in cavity_nodes}
+    for a, b in np.asarray(hole.cavity_edges, dtype=int).reshape((-1, 2)):
+        degrees[int(a)] += 1; degrees[int(b)] += 1
+    tri = mesh.nodes[mesh.elems]
+    side = np.linalg.norm(tri[:, [1, 2, 0]] - tri[:, [0, 1, 2]], axis=2)
+    area = np.asarray(mesh.area_e, dtype=float)
+    quality = 4.0 * np.sqrt(3.0) * area / np.maximum(np.sum(side ** 2, axis=1), 1e-300)
+    cavity_lengths = (np.linalg.norm(mesh.nodes[hole.cavity_edges[:, 1]] -
+                                     mesh.nodes[hole.cavity_edges[:, 0]], axis=1)
+                      if len(hole.cavity_edges) else np.empty(0))
+    validation = dict(hole.validation)
+    validation.update({
+        "actual_boundary_components": len(components),
+        "actual_internal_components": 1 if cavity_nodes else 0,
+        "cavity_cycle": bool(cavity_nodes) and all(value == 2 for value in degrees.values()),
+        "triangle_disk_intersections": int(sum(triangle_intersects_open_disk(t, hole.center_m, hole.radius_m)
+                                                   for t in tri)) if hole.radius_m else 0,
+        "orphan_nodes": int(mesh.nn - len(np.unique(mesh.elems))),
+        "minimum_quality": float(np.min(quality)),
+        "maximum_aspect_ratio": float(np.max(side.max(axis=1) / side.min(axis=1))),
+        "local_edge_min_m": float(np.min(cavity_lengths)) if len(cavity_lengths) else math.nan,
+        "local_edge_max_m": float(np.max(cavity_lengths)) if len(cavity_lengths) else math.nan,
+    })
+    return validation
+
+
+def conform_crack_path(hole: HoleMesh, crack_path_m: Sequence[Sequence[float]],
+                       *, tolerance_m: float = 1.0e-12) -> tuple[HoleMesh, Mapping[str, Any]]:
+    """Insert every fixed laboratory-frame crack vertex into a ``HoleMesh``.
+
+    Boundary edge registries and displacement boundary node sets are updated
+    when an inserted vertex splits an edge.  The first vertex must lie on the
+    actual exterior boundary; subsequent vertices must lie in the material or
+    on its boundary.  The returned audit records element ancestry and the
+    post-insertion geometry generation.
+    """
+    requested = np.asarray(crack_path_m, dtype=float)
+    if requested.ndim != 2 or requested.shape[0] < 2 or requested.shape[1] != 2:
+        raise ValueError("crack_path_m must contain at least root and tip")
+    if not np.all(np.isfinite(requested)):
+        raise ValueError("crack_path_m must be finite")
+    current = hole
+    records = []
+    generation = int(current.validation.get("geometry_generation", 0))
+    for path_index, point in enumerate(requested):
+        mesh = current.mesh
+        distances = np.linalg.norm(mesh.nodes - point, axis=1)
+        nearest = int(np.argmin(distances))
+        split_edge = None
+        parents: list[int] = []
+        if float(distances[nearest]) <= tolerance_m:
+            node = nearest
+        else:
+            owners = []
+            for index, ids in enumerate(np.asarray(mesh.elems, dtype=int)):
+                tri = mesh.nodes[ids]
+                matrix = np.column_stack((tri[1] - tri[0], tri[2] - tri[0]))
+                if abs(float(np.linalg.det(matrix))) <= 1e-24:
+                    continue
+                uv = np.linalg.solve(matrix, point - tri[0])
+                if uv[0] >= -tolerance_m and uv[1] >= -tolerance_m and uv.sum() <= 1.0 + tolerance_m:
+                    owners.append((index, uv))
+            if not owners:
+                raise ValueError(f"crack path point {path_index} is outside the specimen mesh")
+            strict = [(index, uv) for index, uv in owners
+                      if uv[0] > 1e-10 and uv[1] > 1e-10 and uv.sum() < 1.0 - 1e-10]
+            source = np.asarray(mesh.elems, dtype=int)
+            node = mesh.nn
+            replacements = []
+            removed = set()
+            if strict:
+                owner = strict[0][0]; parents = [owner]
+                a, b, c = map(int, source[owner]); removed.add(owner)
+                replacements.extend(((a, b, node), (b, c, node), (c, a, node)))
+            else:
+                candidates = []
+                for owner, _ in owners:
+                    ids = source[owner]
+                    for u, v in ((ids[0], ids[1]), (ids[1], ids[2]), (ids[2], ids[0])):
+                        delta = mesh.nodes[v] - mesh.nodes[u]
+                        fraction = float((point - mesh.nodes[u]) @ delta / max(delta @ delta, 1e-300))
+                        distance = abs(float(delta[0] * (point - mesh.nodes[u])[1] -
+                                             delta[1] * (point - mesh.nodes[u])[0])) / math.sqrt(max(delta @ delta, 1e-300))
+                        if -tolerance_m <= fraction <= 1 + tolerance_m and distance <= tolerance_m:
+                            candidates.append(tuple(sorted((int(u), int(v)))))
+                if not candidates:
+                    raise ValueError(f"cannot conform crack path point {path_index}")
+                split_edge = min(candidates)
+                for owner, ids in enumerate(source):
+                    if not set(split_edge).issubset(map(int, ids)): continue
+                    parents.append(owner); removed.add(owner)
+                    u, v = split_edge; w = next(int(value) for value in ids if int(value) not in split_edge)
+                    original = mesh.nodes[ids]
+                    oa, ob = original[1] - original[0], original[2] - original[0]
+                    original_sign = oa[0] * ob[1] - oa[1] * ob[0]
+                    for candidate in ((u, node, w), (node, v, w)):
+                        xyz = np.vstack(tuple(point if q == node else mesh.nodes[q] for q in candidate))
+                        ca, cb = xyz[1] - xyz[0], xyz[2] - xyz[0]
+                        sign = ca[0] * cb[1] - ca[1] * cb[0]
+                        replacements.append(candidate if sign * original_sign > 0 else (candidate[0], candidate[2], candidate[1]))
+            elems = np.vstack((np.delete(source, sorted(removed), axis=0), replacements))
+            rebuilt = rebuild_tri_mesh(np.vstack((mesh.nodes, point)), elems, tip_centers=requested[-1])
+            exterior = current.exterior_edges
+            cavity = current.cavity_edges
+            boundary = current.boundary
+            polygon = current.prescribed_polygon_nodes
+            if split_edge is not None:
+                exterior = _replace_split_edge(exterior, split_edge, node)
+                cavity = _replace_split_edge(cavity, split_edge, node)
+                if tuple(sorted(split_edge)) in {tuple(sorted(map(int, e))) for e in current.cavity_edges}:
+                    polygon = np.append(polygon, node)
+                top = np.asarray(boundary.top_nodes)
+                bot = np.asarray(boundary.bot_nodes)
+                if set(split_edge).issubset(map(int, top)): top = np.append(top, node)
+                if set(split_edge).issubset(map(int, bot)): bot = np.append(bot, node)
+                boundary = BoundaryData(np.unique(top), np.unique(bot), boundary.left_bot,
+                                        boundary.right_bot, boundary.notch_nodes)
+            current = replace(current, mesh=rebuilt, boundary=boundary, cavity_edges=cavity,
+                              exterior_edges=exterior, prescribed_polygon_nodes=polygon)
+            generation += 1
+        realized = current.mesh.nodes[node]
+        records.append({"path_index": path_index, "node_id": int(node),
+                        "requested_m": point.tolist(), "realized_m": realized.tolist(),
+                        "error_m": float(np.linalg.norm(realized - point)),
+                        "parent_element_ids": parents,
+                        "split_boundary_edge": None if split_edge is None else list(split_edge)})
+    exterior_nodes = set(map(int, np.asarray(current.exterior_edges).ravel()))
+    if records[0]["node_id"] not in exterior_nodes:
+        raise ValueError("crack root is not on the actual exterior boundary component")
+    validation = _final_mesh_validation(current)
+    validation["geometry_generation"] = generation
+    current = replace(current, validation=validation)
+    audit = {"mode": "V3_FIXED_LABORATORY_GEOMETRY", "geometry_generation": generation,
+             "path_records": records, "root_boundary_component": "exterior_traction_free",
+             "maximum_requested_realized_error_m": max(r["error_m"] for r in records),
+             "post_insertion_validation": validation}
+    return current, audit
 
 
 def build_solid_plate_mesh(width_m: float, height_m: float, h_m: float) -> HoleMesh:
@@ -242,6 +418,17 @@ class StaticFEMResult:
     mirror_sigma_xy_antisym_relative: float = math.nan
     conditioning_diagonal_ratio: float = math.nan
     killed_element_energy_J_per_m: float = math.nan
+    traction_normal_l2_normalized: float = math.nan
+    traction_tangential_l2_normalized: float = math.nan
+    traction_resultant_normalized: tuple[float, float] = (math.nan, math.nan)
+    traction_moment_normalized: float = math.nan
+    traction_l2_dimensional_Pa_sqrt_m: float = math.nan
+    traction_normal_l2_dimensional_Pa_sqrt_m: float = math.nan
+    traction_tangential_l2_dimensional_Pa_sqrt_m: float = math.nan
+    nominal_remote_stress_Pa: float = math.nan
+    cavity_perimeter_m: float = math.nan
+    cavity_edge_traction_records: tuple[Mapping[str, Any], ...] = ()
+    source_capture: Optional[Mapping[str, np.ndarray]] = None
 
 
 def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticProperties]=None,
@@ -250,7 +437,8 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
                       symmetric_rigid_constraint: bool=True,
                       element_kill_mask: Optional[np.ndarray]=None,
                       rigid_pin_node: Optional[int]=None,
-                      residual_stiffness_kappa: float=1e-6) -> StaticFEMResult:
+                      residual_stiffness_kappa: float=1e-6,
+                      capture_source: bool=False) -> StaticFEMResult:
     """Use the unmodified production CST assembly and displacement solver."""
     mat=mat or ElasticProperties(E=210e9,nu=0.3)
     mesh=hole.mesh
@@ -299,18 +487,40 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
     for ei,elem in enumerate(mesh.elems):
         for edge in (tuple(sorted((elem[0],elem[1]))),tuple(sorted((elem[1],elem[2]))),tuple(sorted((elem[2],elem[0])))):
             edge_to_elem.setdefault(edge,[]).append(ei)
-    t2=0.0; hoop=[]; weighted=[]; perimeter=0.0
+    t2=0.0; tn2=0.0; tt2=0.0; resultant=np.zeros(2); moment=0.0
+    hoop=[]; weighted=[]; perimeter=0.0; edge_records=[]
     c=np.asarray(hole.center_m)
     for a,b in hole.cavity_edges:
-        xy=mesh.nodes[[a,b]]; midpoint=xy.mean(axis=0); normal=(midpoint-c); normal/=np.linalg.norm(normal)
-        tangent=np.array([-normal[1],normal[0]]); length=float(np.linalg.norm(xy[1]-xy[0])); perimeter+=length
-        ei=edge_to_elem[tuple(sorted((int(a),int(b))))][0]
+        xy=mesh.nodes[[a,b]]; midpoint=xy.mean(axis=0)
+        owners=edge_to_elem.get(tuple(sorted((int(a),int(b)))),())
+        if len(owners)!=1: raise RuntimeError("CAVITY_BOUNDARY_EDGE_OWNER_COUNT_NOT_ONE")
+        ei=owners[0]
         S=np.array([[sigma[0,ei],sigma[2,ei]],[sigma[2,ei],sigma[1,ei]]])
-        traction=S@normal; t2+=float(traction@traction)*length
+        geometry=cavity_edge_traction_geometry(xy[0],xy[1],c,S)
+        tangent=geometry["canonical_edge_tangent"]; normal=geometry["cavity_outward_into_solid_normal"]
+        length=geometry["edge_length_m"]; perimeter+=length
+        traction=geometry["traction"]; normal_component=geometry["normal_traction"]; tangential_component=geometry["tangential_traction"]
+        t2+=float(traction@traction)*length; tn2+=normal_component**2*length; tt2+=tangential_component**2*length
+        force=traction*length; resultant+=force
+        arm=midpoint-c; moment+=float(arm[0]*force[1]-arm[1]*force[0])
+        edge_records.append({"edge_node_ids":(int(a),int(b)),"edge_endpoints_m":tuple(map(tuple,xy)),
+          "canonical_edge_tangent":tuple(map(float,tangent)),
+          "cavity_outward_into_solid_normal":tuple(map(float,normal)),
+          "solid_domain_outward_into_cavity_normal":tuple(map(float,-normal)),
+          "center_radial_consistency":geometry["center_radial_consistency"],
+          "adjacent_solid_element_count":len(owners),"adjacent_element_id":int(ei),"edge_length_m":length,
+          "adjacent_element_stress_tensor_Pa":tuple(map(tuple,S)),
+          "first_layer_normal_spacing_m":float(max((mesh.nodes[next(int(v) for v in mesh.elems[ei] if int(v) not in (int(a),int(b)))]-midpoint)@normal,0.0)),
+          "traction_Pa":tuple(map(float,traction)),"normal_traction_Pa":normal_component,
+          "tangential_traction_Pa":tangential_component})
         hoop.append(float(tangent@S@tangent)); weighted.append(length)
     remote=abs(top)/max(float(np.ptp(mesh.nodes[:,0])),1e-300)
     traction_norm=(math.sqrt(t2)/max(remote*math.sqrt(perimeter),1e-300)
                    if perimeter > 0 else math.nan)
+    traction_normal=(math.sqrt(tn2)/max(remote*math.sqrt(perimeter),1e-300) if perimeter else math.nan)
+    traction_tangential=(math.sqrt(tt2)/max(remote*math.sqrt(perimeter),1e-300) if perimeter else math.nan)
+    resultant_normalized=(tuple(map(float,resultant/max(remote*perimeter,1e-300))) if perimeter else (math.nan,math.nan))
+    moment_normalized=(float(moment/max(remote*perimeter*max(hole.radius_m,1e-300),1e-300)) if perimeter else math.nan)
     hoop_sc=(float(max(hoop)/max(remote,1e-300)) if hoop else math.nan)
     # Mirror-pair hoop samples after sorting by |x-cx|, y sign.
     symmetry=float(abs(top+bottom)/max(abs(top),1e-300))
@@ -339,11 +549,28 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
         if len(candidates):
             local=candidates[np.argmin(np.linalg.norm(cent[candidates]-np.asarray(crack_tip_m),axis=1))]
             tip_sigma=float(sigma[1,local])
+    capture = None
+    if capture_source:
+        system = K2.tocsr(copy=True)
+        system.sum_duplicates(); system.sort_indices()
+        capture = {
+            "nodes": mesh.nodes.copy(), "elements": mesh.elems.copy(),
+            "cavity_edges": hole.cavity_edges.copy(), "exterior_edges": hole.exterior_edges.copy(),
+            "top_nodes": hole.boundary.top_nodes.copy(), "bottom_nodes": hole.boundary.bot_nodes.copy(),
+            "support_mask": killed.copy() if crack_tip_m is not None else np.zeros(mesh.ne, bool),
+            "K_data": system.data.copy(), "K_indices": system.indices.astype(np.int64),
+            "K_indptr": system.indptr.astype(np.int64), "K_shape": np.asarray(system.shape, np.int64),
+            "prescribed_dofs": prescribed.copy(), "displacement": u.copy(),
+            "stress": sigma.copy(), "assembled_residual": residual.copy(),
+            "elasticity_D": D.copy(),
+        }
     return StaticFEMResult(u,sigma,top,bottom,energy,compliance,free_norm,traction_norm,
                            hoop_sc,symmetry,tip_sigma,weak_cavity,mirror_xx,mirror_yy,mirror_xy,
-                           conditioning_proxy,killed_energy)
+                           conditioning_proxy,killed_energy,traction_normal,traction_tangential,
+                           resultant_normalized,moment_normalized,math.sqrt(t2),math.sqrt(tn2),math.sqrt(tt2),
+                           remote,perimeter,tuple(edge_records),capture)
 
 
-__all__ = ["HoleMesh","StaticFEMResult","build_explicit_hole_mesh",
-           "build_solid_plate_mesh","fill_explicit_hole_mesh",
+__all__ = ["HoleMesh","StaticFEMResult","build_explicit_hole_mesh","cavity_edge_traction_geometry",
+           "build_solid_plate_mesh","conform_crack_path","fill_explicit_hole_mesh",
            "solve_static_hole","triangle_intersects_open_disk"]

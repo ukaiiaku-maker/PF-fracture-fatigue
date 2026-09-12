@@ -1,0 +1,136 @@
+{
+  "actual_operations": [
+    {
+      "accepted": false,
+      "api": "downstream_front_transaction",
+      "audit": {
+        "boundary_element_ids": [
+          0
+        ],
+        "cleavage": [
+          {
+            "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+            "common_advance_duration_s": 0.0,
+            "crossing_time_s": "infinity",
+            "effective_rate_s": 0.0,
+            "emitted_event_ids": [],
+            "hazard_barrier_J": 3.4484802278038915e-19,
+            "instantaneous_status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+            "rate_s": 0.0,
+            "raw_rate_s": 1.1576818381531435e-13,
+            "resolved_opening_stress_Pa": 718462135.1944888,
+            "source_resolution_policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED",
+            "unqualified_crossing_time_s": 14020336601692.62,
+            "unqualified_effective_rate_s": 1.1576818381531435e-13,
+            "winner": false
+          }
+        ],
+        "source_front_id": null,
+        "source_kind": "cavity_surface",
+        "source_position_m": [
+          0.0007552661214806971,
+          0.0
+        ],
+        "source_probe_identity": {
+          "boundary_node_id": 0,
+          "element_ids": [
+            0
+          ],
+          "kind": "direct_cavity_boundary_tensor"
+        },
+        "status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+        "tensor_Pa": [
+          [
+            36248392.30717645,
+            -102294862.40460402
+          ],
+          [
+            -102294862.40460402,
+            718462135.1944888
+          ]
+        ]
+      },
+      "operations": []
+    },
+    {
+      "accepted": false,
+      "api": "downstream_front_transaction",
+      "audit": {
+        "boundary_element_ids": [
+          0
+        ],
+        "cleavage": [
+          {
+            "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+            "common_advance_duration_s": 0.0,
+            "crossing_time_s": "infinity",
+            "effective_rate_s": 0.0,
+            "emitted_event_ids": [],
+            "hazard_barrier_J": 3.4484802278038915e-19,
+            "instantaneous_status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+            "rate_s": 0.0,
+            "raw_rate_s": 1.1576818381531435e-13,
+            "resolved_opening_stress_Pa": 718462135.1944888,
+            "source_resolution_policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED",
+            "unqualified_crossing_time_s": 14020336601692.62,
+            "unqualified_effective_rate_s": 1.1576818381531435e-13,
+            "winner": false
+          }
+        ],
+        "source_front_id": null,
+        "source_kind": "cavity_surface",
+        "source_position_m": [
+          0.0007552661214806971,
+          0.0
+        ],
+        "source_probe_identity": {
+          "boundary_node_id": 0,
+          "element_ids": [
+            0
+          ],
+          "kind": "direct_cavity_boundary_tensor"
+        },
+        "status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+        "tensor_Pa": [
+          [
+            36248392.30717645,
+            -102294862.40460402
+          ],
+          [
+            -102294862.40460402,
+            718462135.1944888
+          ]
+        ]
+      },
+      "operations": []
+    }
+  ],
+  "case_identity": "downstream_child",
+  "conservation": {
+    "active_tip_ids": [],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": []
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "transitions:downstream_child:2:36:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/674c681483e45738d1687d8589fba7192fc1bdd78c90d5ca82f5d5d06c17b61d.json",
+  "initial_fingerprint": "674c681483e45738d1687d8589fba7192fc1bdd78c90d5ca82f5d5d06c17b61d",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 2,
+    "predecessor_available": true,
+    "requested_predecessor": "ligament_rupture",
+    "seed": 3621
+  },
+  "input_hash": "872d21fa4390fb5c9ea3415a809a4358dedca770d0de876cfa3e4ef0c925464d",
+  "partition_count": 2,
+  "terminal_checkpoint": "checkpoints/674c681483e45738d1687d8589fba7192fc1bdd78c90d5ca82f5d5d06c17b61d.json",
+  "terminal_fingerprint": "674c681483e45738d1687d8589fba7192fc1bdd78c90d5ca82f5d5d06c17b61d",
+  "transition_occurred": false
+}

@@ -1,0 +1,72 @@
+name: V5 bounded lifecycle development
+
+on:
+  workflow_call:
+    inputs:
+      section:
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      section:
+        type: choice
+        options: [rollback, restarts, transitions]
+        required: true
+        default: rollback
+
+permissions:
+  contents: read
+
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  registry:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - id: plan
+        env:
+          SECTION: ${{ inputs.section }}
+        run: |
+          if test "$SECTION" = restarts; then
+            echo 'matrix={"include":[{"index":0,"count":4},{"index":1,"count":4},{"index":2,"count":4},{"index":3,"count":4}]}' >> "$GITHUB_OUTPUT"
+          elif test "$SECTION" = transitions; then
+            echo 'matrix={"include":[{"index":0,"count":3},{"index":1,"count":3},{"index":2,"count":3}]}' >> "$GITHUB_OUTPUT"
+          else
+            echo 'matrix={"include":[{"index":0,"count":1}]}' >> "$GITHUB_OUTPUT"
+          fi
+  phase:
+    needs: registry
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.registry.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Actual selected lifecycle development execution, not final A-B evidence
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python scripts/run_v5_source_resolution_phase_v1.py lifecycle /tmp/v5-phase8-development --section '${{ inputs.section }}' --shard-index '${{ matrix.index }}' --shard-count '${{ matrix.count }}'
+      - name: Clean worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-phase8-development-${{ inputs.section }}-${{ matrix.index }}-${{ github.sha }}
+          path: /tmp/v5-phase8-development

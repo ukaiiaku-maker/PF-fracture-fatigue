@@ -1,0 +1,265 @@
+{
+  "active_tip_ids": [
+    "b00000000"
+  ],
+  "checkpoint_generation": 1,
+  "crack_network": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "branches": [
+      {
+        "branch_id": "b00000000",
+        "generation": 0,
+        "initiation_event": 0,
+        "local_state": {},
+        "orientation_history_rad": [
+          0.0
+        ],
+        "parent_branch_id": null,
+        "path_m": [
+          [
+            0.0002,
+            0.0
+          ],
+          [
+            0.0005,
+            0.0
+          ]
+        ],
+        "physical_path_length_m": 0.00030000000000000003,
+        "projected_extension_m": 0.00030000000000000003,
+        "status": "active"
+      }
+    ],
+    "branching_enabled": false,
+    "geometry_generation": 0,
+    "primary_branch_id": "b00000000",
+    "primary_projected_extension_m": 0.00030000000000000003,
+    "schema": "v11.crack-network/1",
+    "total_physical_crack_length_m": 0.00030000000000000003
+  },
+  "directional_competition": {
+    "candidates": [
+      {
+        "angle_rad": -0.7853981633974483,
+        "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+        "direction_xy": [
+          0.70710678118655,
+          -0.70710678118655
+        ],
+        "gamma_rel": 1.0,
+        "normal_xy": [
+          0.70710678118655,
+          0.70710678118655
+        ],
+        "orientation_convention": "bcc-[001]-section:theta_deg=45",
+        "plane_family": "cleavage",
+        "plane_variant": "(010)"
+      },
+      {
+        "angle_rad": 0.7853981633974483,
+        "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+        "direction_xy": [
+          0.70710678118655,
+          0.70710678118655
+        ],
+        "gamma_rel": 1.0,
+        "normal_xy": [
+          -0.70710678118655,
+          0.70710678118655
+        ],
+        "orientation_convention": "bcc-[001]-section:theta_deg=45",
+        "plane_family": "cleavage",
+        "plane_variant": "(100)"
+      }
+    ],
+    "competition_event_index": 0,
+    "consumed_event_ids": [],
+    "global_hazard_seed": 3621,
+    "hazard_states": [
+      {
+        "action": 1.0,
+        "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+        "completed_event_count": 1,
+        "current_threshold_action": 2.0,
+        "last_completion_time_s": 1.0,
+        "pending_events": [
+          {
+            "action_after": 1.0,
+            "action_before": 0.0,
+            "action_increment": 1.0,
+            "candidate_id": "cleave:cleavage:(010):ee49045e2199f60d44a1",
+            "completion_time_s": 1.0,
+            "event_id": "cleave:cleavage:(010):ee49045e2199f60d44a1#event:0000000000000001",
+            "event_ordinal": 1
+          }
+        ],
+        "previous_rate_per_s": 1.0,
+        "residual_action": 0.0,
+        "threshold_process": "unit_deterministic",
+        "threshold_seed": 0
+      },
+      {
+        "action": 0.375,
+        "candidate_id": "cleave:cleavage:(100):5b8d6e5e817cefaf59a4",
+        "completed_event_count": 0,
+        "current_threshold_action": 1.0,
+        "last_completion_time_s": null,
+        "pending_events": [],
+        "previous_rate_per_s": 1.0,
+        "residual_action": 0.375,
+        "threshold_process": "unit_deterministic",
+        "threshold_seed": 0
+      }
+    ],
+    "reservations": [],
+    "schema": "v11.directional-competition/1"
+  },
+  "energy_ledgers": {
+    "emission_work": 3.0,
+    "latest_constrained_reaction_l2_N_per_m": 33724.357231381786,
+    "latest_energy_reaction_identity": 0.006729889962167382,
+    "latest_fem_energy_J_per_m": 0.02567642780617195,
+    "latest_free_dof_residual_l2_N_per_m": 1.404761714256978e-09,
+    "latest_reaction_N_per_m": 130121.84238054068,
+    "latest_residual_l2_N_per_m": 33724.357231381786,
+    "latest_top_bottom_reaction_balance": 2.012993893404747e-15,
+    "source_work": 1.25
+  },
+  "event_counters": {
+    "accepted_steps": 1,
+    "mesh_generation": 0,
+    "topology_actions": 0
+  },
+  "has_production_void_state": false,
+  "has_rng_state": true,
+  "provider_runtime": null,
+  "schema": "v11.live-fem-branch-checkpoint/1",
+  "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
+  "state_file": "95177e8a71532ce7e73bed5aef7225ece41e72de452a1d905139a4670d49be86.json.state.pkl",
+  "state_sha256": "2abf7988a9cd7be5275ece5e21e93fbad241f656c83380454e6158a6053566c0",
+  "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
+  "v12_support_state": {
+    "accepted_p0_damage_fingerprint": "7b453ccd6876540353bdc5656aee2da3785379de1e46cdd4a2fd2719d8b78d72",
+    "active_tip_identities": [
+      "b00000000"
+    ],
+    "branch_vertex_lineage_fingerprint": "5d8b1aaed27a98a802bb32f06a0030d447d6f4e708a4d0a1c8c25e095ff3b31b",
+    "certification_arc_fingerprint": "53d14a12a0a6a5d18e22f678ca1046958808861531fce03b37cd249c81286544",
+    "checkpoint_generation": 1,
+    "complete_crack_graph_fingerprint": "c445bced3a0f70cb9b1340d49591e8958ce9fed5f2934fd6b9bcdb892d39b55c",
+    "configuration_hash": "6921d77caf817fdf497b3480cc577e4f6b813e735580bf3767de2c3198475268",
+    "mesh_connectivity_fingerprint": "ccd07e90cf807422cb8d75af8f887f285a4dad937579bcc9630e33044c894644",
+    "mesh_generation": 0,
+    "mesh_geometry_fingerprint": "0e668cacae0cbf5ca15621d052a171c6c7306c5d05e0628f62dab93b9c225e14",
+    "model_id": "sharp_wake_mechanically_separating_v12",
+    "physical_graph_length_m": 0.00030000000000000003,
+    "previous_accepted_transaction": null,
+    "schema_version": "v12.sharp-wake-support-state/1",
+    "selected_support_elements": [
+      912,
+      913,
+      914,
+      915,
+      916,
+      917,
+      918,
+      919,
+      920,
+      921,
+      922,
+      923,
+      924,
+      925,
+      926,
+      927,
+      928,
+      929,
+      930,
+      931,
+      932,
+      933,
+      934,
+      935,
+      974,
+      975,
+      976,
+      977,
+      978,
+      979,
+      980,
+      981,
+      982,
+      983,
+      984,
+      985,
+      986,
+      987,
+      988,
+      989,
+      990,
+      991,
+      992,
+      993,
+      994,
+      995,
+      996,
+      997,
+      998,
+      999,
+      1038,
+      1039,
+      1040,
+      1041,
+      1042,
+      1043,
+      1044,
+      1045,
+      1046,
+      1047,
+      1048,
+      1049,
+      1050,
+      1051,
+      1052,
+      1053,
+      1054,
+      1055,
+      1056,
+      1057,
+      1058,
+      1059,
+      1060,
+      1061,
+      1062,
+      1063,
+      1104,
+      1105,
+      1106,
+      1107,
+      1108,
+      1109,
+      1110,
+      1111,
+      1112,
+      1113,
+      1114,
+      1115,
+      1116,
+      1117,
+      1118,
+      1119,
+      1120,
+      1121,
+      1122,
+      1123,
+      1124,
+      1125,
+      1126,
+      1127
+    ],
+    "source_commit": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+    "transaction_identity": "v12-initial"
+  }
+}

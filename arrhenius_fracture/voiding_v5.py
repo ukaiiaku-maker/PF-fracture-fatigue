@@ -9,6 +9,7 @@ import math
 from typing import Any, Mapping
 
 import numpy as np
+from .canonical_kinetic_time_v1 import exact, packed, unpacked
 
 KB = 1.380649e-23
 SCHEMA = "v12.production-voiding/5"
@@ -57,9 +58,24 @@ class VoidingConfig:
 class HazardClock:
     accumulated: float
     threshold: float
+    integrated_action_exact: tuple[int, int] | None = None
+
+    def action_exact(self):
+        stored = self.integrated_action_exact
+        return exact(self.accumulated) if stored is None else unpacked(stored)
+
+    def crossing_time_exact(self, rate_s):
+        return None if rate_s <= 0 else max(exact(self.threshold)-self.action_exact(), 0)/exact(rate_s)
+
+    def advance(self, rate_s, duration_s):
+        if rate_s < 0 or duration_s < 0: raise ValueError('negative hazard interval')
+        if rate_s == 0 or duration_s == 0: return self
+        value = min(exact(self.threshold), self.action_exact()+exact(rate_s)*exact(duration_s))
+        return replace(self, accumulated=float(value), integrated_action_exact=packed(value))
 
     def crossing_time(self, rate_s: float) -> float:
-        return math.inf if rate_s <= 0.0 else max(self.threshold - self.accumulated, 0.0) / rate_s
+        value = self.crossing_time_exact(rate_s)
+        return math.inf if value is None else float(value)
 
 
 @dataclass(frozen=True)
@@ -120,6 +136,7 @@ class ProductionVoidState:
     available_defect_inventory_area_m2: float = 1.0e-8
     consumed_defect_inventory_area_m2: float = 0.0
     schema: str = SCHEMA
+    kinetic_integrals_v1: Mapping[str, Any] | None = None
 
 
 def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
@@ -185,23 +202,28 @@ def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
 
 
 def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
-                 rates: Mapping[str, float]) -> tuple[ProductionVoidState, tuple[str, ...]]:
+                 rates: Mapping[str, float], failure_injector=None) -> tuple[ProductionVoidState, tuple[str, ...]]:
     """Localize all first passages and retain threshold/RNG ownership in state."""
     site = next(item for item in state.sites if item.site_id == site_id)
-    remaining = float(dt_s)
+    if not math.isfinite(float(dt_s)) or dt_s < 0: raise ValueError('finite nonnegative site interval required')
+    remaining = exact(dt_s)
     events = []
     current = site
-    while remaining > max(1.0e-15 * dt_s, 1.0e-18):
+    def inject(stage):
+        if failure_injector is not None:
+            trial=replace(state,sites=tuple(current if item.site_id==site_id else item for item in state.sites),
+                event_history=state.event_history+tuple({"event":event,"site_id":site_id} for event in events))
+            failure_injector(stage,trial)
+    while remaining > 0:
         if current.phase == VoidPhase.AVAILABLE_SITE:
             birth_rate = max(float(rates["birth_s"]), 0.0) * current.candidate_weight
-            crossing = current.birth.crossing_time(birth_rate)
-            step = min(remaining, crossing)
-            clock = replace(current.birth, accumulated=min(
-                current.birth.threshold, current.birth.accumulated + birth_rate * step,
-            ))
+            crossing = current.birth.crossing_time_exact(birth_rate)
+            reached = crossing is not None and float(crossing) <= float(remaining)
+            step = crossing if reached else remaining
+            clock = current.birth.advance(birth_rate, step)
             current = replace(current, birth=clock)
-            remaining -= step
-            if crossing > step or not math.isfinite(crossing):
+            remaining = max(remaining-step, 0)
+            if not reached:
                 break
             hits = current.hits + 1
             if hits < current.required_hits:
@@ -211,32 +233,32 @@ def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
                 state = replace(state, rng_state=rng.bit_generator.state)
                 current = replace(current, hits=hits, birth=HazardClock(0.0, renewed))
                 events.append("BIRTH_HIT")
+                inject("first_hit_threshold_renewal")
                 continue
             current = replace(current, hits=hits, phase=VoidPhase.EMBRYO)
             events.append("EMBRYO")
+            inject("second_hit_embryo_transition")
             continue
         if current.phase == VoidPhase.EMBRYO:
-            ts = current.stabilization.crossing_time(float(rates["stabilization_s"]))
-            th = current.healing.crossing_time(float(rates["healing_s"]))
+            ts = current.stabilization.crossing_time_exact(float(rates["stabilization_s"]))
+            th = current.healing.crossing_time_exact(float(rates["healing_s"]))
+            ts = math.inf if ts is None else ts
+            th = math.inf if th is None else th
             crossing = min(ts, th)
-            step = min(remaining, crossing)
+            reached = math.isfinite(crossing) and float(crossing) <= float(remaining)
+            step = crossing if reached else remaining
             current = replace(
                 current,
-                stabilization=replace(current.stabilization, accumulated=min(
-                    current.stabilization.threshold,
-                    current.stabilization.accumulated + float(rates["stabilization_s"]) * step,
-                )),
-                healing=replace(current.healing, accumulated=min(
-                    current.healing.threshold,
-                    current.healing.accumulated + float(rates["healing_s"]) * step,
-                )),
+                stabilization=current.stabilization.advance(float(rates['stabilization_s']), step),
+                healing=current.healing.advance(float(rates['healing_s']), step),
             )
-            remaining -= step
-            if crossing > step or not math.isfinite(crossing):
+            remaining = max(remaining-step, 0)
+            if not reached:
                 break
             phase = VoidPhase.HEALED_SITE if th <= ts else VoidPhase.STABLE_SUBGRID_VOID
             current = replace(current, phase=phase)
             events.append("HEALED" if phase == VoidPhase.HEALED_SITE else "STABILIZED")
+            inject("healing" if phase == VoidPhase.HEALED_SITE else "stabilization")
             break
         break
     sites = tuple(current if item.site_id == site_id else item for item in state.sites)
@@ -245,7 +267,7 @@ def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
 
 
 def create_subgrid_cavity(state: ProductionVoidState, site_id: str,
-                          radius_m: float) -> ProductionVoidState:
+                          radius_m: float, *, failure_injector=None) -> ProductionVoidState:
     site = next(item for item in state.sites if item.site_id == site_id)
     if site.phase != VoidPhase.STABLE_SUBGRID_VOID:
         raise ValueError("site has not stabilized")
@@ -256,13 +278,15 @@ def create_subgrid_cavity(state: ProductionVoidState, site_id: str,
         raise ValueError("initial cavity seed exceeds available defect inventory")
     cavity = Cavity2D("void:" + site_id, site_id, site.center_m, radius_m, area, area,
                       VoidPhase.STABLE_SUBGRID_VOID, lineage=(site_id,))
-    return replace(
+    result = replace(
         state, cavities=state.cavities + (cavity,),
         available_defect_inventory_area_m2=state.available_defect_inventory_area_m2 - area,
         consumed_defect_inventory_area_m2=state.consumed_defect_inventory_area_m2 + area,
         event_history=state.event_history + ({"event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT",
                                               "cavity_id": cavity.cavity_id, "area_m2": area},),
     )
+    if failure_injector is not None: failure_injector("initial_inventory_debit",result)
+    return result
 
 
 def grow_cavity_2d(cavity: Cavity2D, delta_radius_m: float) -> Cavity2D:
@@ -302,12 +326,32 @@ def grow_cavity_from_rate(cavity: Cavity2D, *, rates: Mapping[str, float],
     return grow_cavity_2d(cavity, delta) if delta != 0.0 else cavity
 
 
+def positive_growth_velocity(rates,radial_growth_scale_m,chemical_potential_drive_J=1e-20,
+                             chemical_potential_reference_J=1e-20):
+    """The existing positive growth law, shared by integration and localization."""
+    return (float(radial_growth_scale_m)*max(float(rates['series_limited_growth_s']),0.)
+        *float(chemical_potential_drive_J)/max(abs(float(chemical_potential_reference_J)),1e-300))
+
+
+def growth_time_to_radius_exact(state,cavity_id,target_radius_m,*,rates,radial_growth_scale_m):
+    """Localize a positive-growth boundary from the accepted integral, not rounded radius."""
+    cavity=next(c for c in state.cavities if c.cavity_id==cavity_id)
+    velocity=positive_growth_velocity(rates,radial_growth_scale_m)
+    if velocity<=0:return None
+    anchor=(state.kinetic_integrals_v1 or {}).get(cavity_id)
+    radius=exact(cavity.radius_m)
+    if anchor is not None and anchor['phase']==cavity.phase.value and anchor['last_radius_m']==cavity.radius_m:
+        radius=exact(anchor['radius_anchor_m'])+unpacked(anchor['integrated_radius_m'])
+    return max(exact(target_radius_m)-radius,0)/exact(velocity)
+
+
 def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
                          rates: Mapping[str, float], dt_s: float,
                          radial_growth_scale_m: float,
                          chemical_potential_drive_J: float = 1.0e-20,
                          chemical_potential_reference_J: float = 1.0e-20,
-                         shrinkage_mobility_m_per_J_s: float = 1.0e8) -> ProductionVoidState:
+                         shrinkage_mobility_m_per_J_s: float = 1.0e8,
+                         failure_injector=None) -> ProductionVoidState:
     """Atomically advance a cavity and its finite 2-D defect inventory.
 
     Growth transfers area from available to consumed inventory.  Shrinkage
@@ -315,6 +359,8 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
     never become negative.
     """
     cavity = next(item for item in state.cavities if item.cavity_id == cavity_id)
+    owned_total=math.fsum((state.available_defect_inventory_area_m2,
+                          state.consumed_defect_inventory_area_m2))
     grown = grow_cavity_from_rate(
         cavity, rates=rates, dt_s=dt_s,
         radial_growth_scale_m=radial_growth_scale_m,
@@ -323,10 +369,48 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
         shrinkage_mobility_m_per_J_s=shrinkage_mobility_m_per_J_s,
         available_inventory_area_m2=state.available_defect_inventory_area_m2,
     )
+    integrals = dict(state.kinetic_integrals_v1 or {})
+    # The positive constant-rate law has an exact cumulative-radius update.
+    # Persist its anchor, not a list/count of caller subdivisions. Bounded
+    # shrinkage retains its existing safety rule and is qualified separately.
+    if chemical_potential_drive_J > 0 and dt_s > 0 and rates['series_limited_growth_s'] > 0:
+        anchor = integrals.get(cavity_id)
+        if (anchor is None or anchor['phase'] != cavity.phase.value
+                or anchor['last_radius_m'] != cavity.radius_m):
+            anchor = {'phase': cavity.phase.value, 'radius_anchor_m': cavity.radius_m,
+                'area_anchor_m2': cavity.area_m2, 'inventory_anchor_m2': cavity.inventory_area_m2,
+                'consumed_anchor_m2': state.consumed_defect_inventory_area_m2,
+                'total_inventory_m2': owned_total, 'integrated_radius_m': (0, 1),
+                'geometry_generation_anchor': cavity.geometry_generation}
+        velocity = positive_growth_velocity(rates,radial_growth_scale_m,
+            chemical_potential_drive_J,chemical_potential_reference_J)
+        integrated = unpacked(anchor['integrated_radius_m'])+exact(velocity)*exact(dt_s)
+        radius = float(exact(anchor['radius_anchor_m'])+integrated)
+        area = math.pi*radius**2
+        target = cavity.area_m2+state.available_defect_inventory_area_m2
+        if area > target:
+            radius = math.sqrt(target/math.pi); area = math.pi*radius**2
+            integrated = exact(radius)-exact(anchor['radius_anchor_m'])
+        inventory = float(exact(anchor['inventory_anchor_m2'])+exact(area)-exact(anchor['area_anchor_m2']))
+        # ``geometry_generation`` describes a physical represented-geometry
+        # update, not the number of caller-selected kinetic subdivisions.  A
+        # cumulative positive resolved-growth interval therefore owns exactly
+        # one generation beyond its anchor.  Subgrid growth still has no
+        # represented geometry to regenerate.
+        grown = replace(grown, radius_m=radius, area_m2=area, inventory_area_m2=inventory,
+            geometry_generation=(anchor['geometry_generation_anchor'] if cavity.phase == VoidPhase.STABLE_SUBGRID_VOID
+                                 else anchor['geometry_generation_anchor'] + 1))
+        integrals[cavity_id] = {**anchor, 'integrated_radius_m': packed(integrated), 'last_radius_m': radius}
+    elif chemical_potential_drive_J < 0 and dt_s > 0:
+        integrals.pop(cavity_id, None)
     delta_area = grown.area_m2 - cavity.area_m2
+    if failure_injector is not None:
+        failure_injector("state_owned_growth",replace_cavity(state,grown))
     if delta_area >= 0.0:
-        available = state.available_defect_inventory_area_m2 - delta_area
-        consumed = state.consumed_defect_inventory_area_m2 + delta_area
+        anchor = integrals.get(cavity_id)
+        consumed = (float(exact(anchor['consumed_anchor_m2'])+exact(grown.area_m2)-exact(anchor['area_anchor_m2']))
+                    if anchor is not None else state.consumed_defect_inventory_area_m2 + delta_area)
+        if anchor is not None: owned_total = anchor['total_inventory_m2']
     else:
         returned = min(-delta_area, state.consumed_defect_inventory_area_m2)
         # A cavity cannot return inventory that was not previously consumed.
@@ -335,13 +419,20 @@ def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
             grown = replace(grown, radius_m=math.sqrt(target_area / math.pi),
                             area_m2=target_area,
                             inventory_area_m2=cavity.inventory_area_m2 - returned)
-        available = state.available_defect_inventory_area_m2 + returned
         consumed = state.consumed_defect_inventory_area_m2 - returned
-    return replace(
+    # Compute the complementary account once. Independently adding and
+    # subtracting the same transfer let repeated partitions drift by an ULP
+    # beyond the frozen inventory tolerance; no physical transfer is changed.
+    available=owned_total-consumed
+    result = replace(
         replace_cavity(state, grown),
         available_defect_inventory_area_m2=max(float(available), 0.0),
         consumed_defect_inventory_area_m2=max(float(consumed), 0.0),
+        kinetic_integrals_v1=integrals or None,
     )
+    if failure_injector is not None and delta_area < 0.:
+        failure_injector("inventory_return_under_shrinkage",result)
+    return result
 
 
 def replace_cavity(state: ProductionVoidState, cavity: Cavity2D) -> ProductionVoidState:
@@ -351,10 +442,11 @@ def replace_cavity(state: ProductionVoidState, cavity: Cavity2D) -> ProductionVo
 
 
 def promote_cavity(state: ProductionVoidState, cavity_id: str,
-                   minimum_radius_m: float) -> ProductionVoidState:
+                   minimum_radius_m: float, *, failure_injector=None) -> ProductionVoidState:
     cavity = next(item for item in state.cavities if item.cavity_id == cavity_id)
     if cavity.phase != VoidPhase.STABLE_SUBGRID_VOID or cavity.radius_m < minimum_radius_m:
         raise ValueError("cavity is not eligible for geometric promotion")
+    if failure_injector is not None: failure_injector("promotion_criterion",state)
     updated = replace(
         cavity, phase=VoidPhase.RESOLVED_VOID,
         geometry_generation=cavity.geometry_generation + 1,
@@ -374,7 +466,8 @@ def serialize(state: ProductionVoidState | None) -> str:
     def encode(value):
         if isinstance(value, Enum): return value.value
         if hasattr(value, "__dataclass_fields__"):
-            return {name: encode(getattr(value, name)) for name in value.__dataclass_fields__}
+            return {name: encode(getattr(value, name)) for name in value.__dataclass_fields__
+                    if not (name in ('integrated_action_exact', 'kinetic_integrals_v1') and getattr(value, name) is None)}
         if isinstance(value, Mapping): return {str(k): encode(v) for k, v in value.items()}
         if isinstance(value, (tuple, list)): return [encode(v) for v in value]
         if isinstance(value, np.generic): return value.item()

@@ -5,6 +5,7 @@ from dataclasses import asdict, replace
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import subprocess
 from typing import Any
@@ -40,20 +41,95 @@ from .topology_transaction_v11 import (
 from .voiding_v5 import (
     Cavity2D, HazardClock, ProductionVoidState, VoidPhase, VoidSite, VoidingConfig,
     advance_site, arrhenius_rates, create_subgrid_cavity, grow_cavity_2d,
-    grow_cavity_from_rate,
+    grow_cavity_from_rate, growth_time_to_radius_exact,
     promote_cavity, replace_cavity, update_cavity_growth,
 )
 
 SCHEMA = "v12.production-one-void-trajectory/5"
+FRONT_ENGINE_STATE_SCHEMA = "v5.downstream-child-front-engine-state/1"
+_FRONT_ENGINE_STATE_FIELDS = ("N_em", "B", "a_adv", "n_adv", "W_emit", "t", "K_prev")
+
+
+def fresh_sharp_front_engine(material):
+    """Use the established ordinary-front constructor/reset policy unchanged."""
+    engine = FrontEngine(
+        FrontConfig(), default_cleavage_barrier(), default_emission_barrier(material.b),
+        material.G, material.nu, material.b,
+    )
+    # The production drivers admit at most one geometric renewal per accepted
+    # transaction; this is the same numerical event policy used by build_engine.
+    engine.f.max_advances_per_step = 1
+    return engine
+
+
+def capture_sharp_front_engine(engine) -> dict[str, Any]:
+    """Checkpoint the old engine's canonical owned ledgers, not a radius copy."""
+    return {
+        "schema": FRONT_ENGINE_STATE_SCHEMA,
+        "engine_type": type(engine).__name__,
+        "initialization_policy": "FrontEngine.__init__->reset",
+        "canonical_state": {name: getattr(engine, name) for name in _FRONT_ENGINE_STATE_FIELDS},
+    }
+
+
+def restore_sharp_front_engine(material, payload):
+    engine = fresh_sharp_front_engine(material)
+    if payload.get("schema") != FRONT_ENGINE_STATE_SCHEMA:
+        raise ValueError("unsupported downstream child front-engine state")
+    if payload.get("engine_type") != type(engine).__name__:
+        raise ValueError("downstream child engine type differs from the established engine")
+    fields = payload.get("canonical_state", {})
+    if set(fields) != set(_FRONT_ENGINE_STATE_FIELDS):
+        raise ValueError("downstream child front-engine checkpoint is incomplete")
+    for name in _FRONT_ENGINE_STATE_FIELDS:
+        setattr(engine, name, fields[name])
+    return engine
+
+
+def sharp_front_constitutive_response(engine, *, K_Pa_sqrt_m, temperature_K, dt_s):
+    """Read-only response through the pre-void K -> FrontEngine interface."""
+    K = max(float(K_Pa_sqrt_m), 0.0)
+    T = float(temperature_K)
+    dt = max(float(dt_s), 0.0)
+    sigma = engine.sigma_tip(K)
+    cleavage_rate, cleavage_raw_rate, cleavage_barrier = engine.lambda_cleave(sigma, T)
+    emission_rate, emission_stress, emission_barrier = engine.lambda_emit(sigma, T)
+    return {
+        "r_eff_m": float(engine.r_eff()),
+        "sigma_tip_Pa": float(sigma),
+        "cleavage_barrier_J": float(cleavage_barrier),
+        "cleavage_rate_s": float(cleavage_rate),
+        "cleavage_raw_rate_s": float(cleavage_raw_rate),
+        "emission_barrier_J": float(emission_barrier),
+        "emission_rate_s": float(emission_rate),
+        "emission_effective_stress_Pa": float(emission_stress),
+        "clock_increment": float(engine.predict_clock_increment(K, T, dt)),
+    }
+
+
+def advance_disabled_v5_stage2(state, end_m, *, transaction_identity):
+    """Default-off entry delegates unchanged to the actual Stage-II V12 driver.
+
+    It cannot accept a V11 comparator or silently discard existing void state.
+    This is a mechanics-neutrality screen, not a void-nucleation qualification.
+    """
+    from .v12_production_driver import execute_event
+    if state.sharp_wake_model_id != V12_MODEL_ID or state.void_state is not None:
+        raise ValueError("disabled V5 requires the unchanged void-free Stage-II V12 state")
+    return execute_event(state, end_m, transaction_identity=transaction_identity)
 
 
 def _head():
+    declared = os.environ.get("VOIDING_V5_SOURCE_COMMIT")
+    if declared:
+        return declared
     return subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=Path(__file__).resolve().parents[1], text=True).strip()
 
 
-def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0)):
+def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0), *, boundary_segments=32, radial_layers=12):
     if center_m[1] < 0.0:
-        positive_hole, positive_filled = _geometry(radius_m, (center_m[0], -center_m[1]))
+        positive_hole, positive_filled = _geometry(radius_m, (center_m[0], -center_m[1]),
+                                                 boundary_segments=boundary_segments, radial_layers=radial_layers)
         def mirrored(value):
             nodes = np.asarray(value.mesh.nodes).copy(); nodes[:, 1] *= -1.0
             elems = np.asarray(value.mesh.elems)[:, [0, 2, 1]]
@@ -67,7 +143,8 @@ def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0)):
             return replace(value, mesh=mesh, boundary=boundary,
                            center_m=(float(center_m[0]), float(center_m[1])))
         return mirrored(positive_hole), mirrored(positive_filled)
-    hole = build_explicit_hole_mesh(1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5, 32, radial_layers_override=12)
+    hole = build_explicit_hole_mesh(1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5,
+                                    boundary_segments, radial_layers_override=radial_layers)
     return hole, fill_explicit_hole_mesh(hole)
 
 
@@ -202,8 +279,11 @@ def _refine_state_around_graph(state, levels):
 
 def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
                                 cavity_center_m=(7.0e-4, 0.0), crack_path_m=None,
-                                cleavage_theta_deg=0.0):
-    hole, filled = _geometry(center_m=cavity_center_m)
+                                cleavage_theta_deg=0.0, boundary_segments=32, radial_layers=12):
+    if (boundary_segments, radial_layers) != (32, 12) and crack_path_m is None:
+        raise ValueError("production resolution transfer requires an explicit fixed crack path")
+    hole, filled = _geometry(center_m=cavity_center_m, boundary_segments=boundary_segments,
+                             radial_layers=radial_layers)
     mesh = filled.mesh
     ray = 16
     if crack_path_m is None:
@@ -244,6 +324,7 @@ def build_production_void_state(*, enabled=True, stochastic=False, seed=3621,
         ),
         {"retained": 4.0, "mobile": 1.0}, {
             "source_state": {"density": 3.0, "clock": 0.125},
+            "production_mesh_resolution": (int(boundary_segments), int(radial_layers)),
             "boundary_terminal_context": _external_free_root_context(mesh, filled.boundary, start),
         },
         {"emission_work": 1.0}, np.random.default_rng(seed).bit_generator.state,
@@ -349,16 +430,12 @@ def crack_tip_tensor(state, *, branch_id):
 
 def _first_ray_cavity_intersection(state, start, direction):
     """Intersect a candidate ray with the actual polygonal cavity boundary."""
-    cavity = state.void_state.cavities[0]
     nodes = np.asarray(state.mesh.nodes)
-    radii = np.linalg.norm(nodes - np.asarray(cavity.center_m), axis=1)
-    boundary = nodes[np.flatnonzero(radii <= cavity.radius_m * 1.02)]
-    angles = np.arctan2(boundary[:, 1] - cavity.center_m[1], boundary[:, 0] - cavity.center_m[0])
-    boundary = boundary[np.argsort(angles)]
     origin = np.asarray(start, dtype=float)
     ray = np.asarray(direction, dtype=float)
     intersections = []
-    for first, second in zip(boundary, np.vstack((boundary[1:], boundary[:1]))):
+    for edge_ids in _actual_cavity_boundary_edges(state):
+        first, second = nodes[edge_ids]
         edge = second - first
         matrix = np.column_stack((ray, -edge))
         if abs(np.linalg.det(matrix)) <= 1.0e-18:
@@ -432,6 +509,23 @@ def _conform_bulk_point(state, point, *, identity, failure_injector=None):
     )
 
 
+def _actual_cavity_boundary_edges(state):
+    """Radius identifies a component; only one-owner edges define its surface.
+
+    A fine first solid layer can lie inside the 2% identification band. Its
+    nodes must never become an invented polygon or a cavity-surface source.
+    """
+    cavity=state.void_state.cavities[0]
+    nodes=np.asarray(state.mesh.nodes); elements=np.asarray(state.mesh.elems)
+    edges=np.sort(np.concatenate((elements[:,[0,1]],elements[:,[1,2]],elements[:,[2,0]])),axis=1)
+    unique,counts=np.unique(edges,axis=0,return_counts=True)
+    boundary=unique[counts==1]
+    radii=np.linalg.norm(nodes-np.asarray(cavity.center_m),axis=1)
+    selected=boundary[np.all(radii[boundary]<=cavity.radius_m*1.02,axis=1)]
+    if not len(selected): raise ValueError("no actual cavity boundary edges")
+    return selected
+
+
 def cavity_boundary_tensor(state, *, boundary_node: int | None = None,
                            boundary_element: int | None = None):
     """Return the most tensile resolved tensor on the explicit cavity boundary.
@@ -443,10 +537,7 @@ def cavity_boundary_tensor(state, *, boundary_node: int | None = None,
         state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
         state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
     )
-    cavity = state.void_state.cavities[0]
-    center = np.asarray(cavity.center_m)
-    radii = np.linalg.norm(np.asarray(state.mesh.nodes) - center, axis=1)
-    boundary_nodes = np.flatnonzero(radii <= cavity.radius_m * 1.02)
+    boundary_nodes = np.unique(_actual_cavity_boundary_edges(state))
     selected_nodes = boundary_nodes if boundary_node is None else np.asarray((int(boundary_node),))
     if boundary_node is not None and int(boundary_node) not in set(map(int, boundary_nodes)):
         raise ValueError("requested tensor node is not on the cavity boundary")
@@ -619,7 +710,7 @@ def crack_void_connection_certificate(state, *, branch_id: str, cavity_id: str,
     no_solid_bridge = not uncovered_indices
     intact_certificate = (independent_intact_path_certificate(
         state.mesh, state.crack_network, support_ids,
-        allow_boundary_clip_for_screen=True,
+        boundary_terminal_context=state.junction_process_state.get("boundary_terminal_context"),
     ) if support_ids else {
         "intact_cross_graph_path_exists": True,
         "insufficient_seed_segment_ids": ("all:no-support",),
@@ -725,15 +816,19 @@ def _project_fields(state, mesh):
     }
 
 
-def _grow_hole_boundary(hole, radius_m):
-    nodes = np.asarray(hole.mesh.nodes).copy()
-    count = len(hole.prescribed_polygon_nodes)
-    center = np.asarray(hole.center_m)
-    theta = np.arctan2(nodes[:count, 1] - center[1], nodes[:count, 0] - center[0])
-    polygon_radius = float(radius_m) / math.cos(math.pi / count)
-    nodes[:count] = center + polygon_radius * np.c_[np.cos(theta), np.sin(theta)]
-    mesh = rebuild_tri_mesh(nodes, np.asarray(hole.mesh.elems), tip_centers=np.asarray(hole.center_m))
-    return replace(hole, mesh=mesh, radius_m=float(radius_m))
+def _grow_hole_boundary(hole, radius_m, *, crack_path_m):
+    """Rebuild all radial layers, then conform the unchanged physical crack.
+
+    Moving only the boundary can overtake the first solid layer and invert
+    triangles on a fine mesh. No boundary/topology tolerance can repair that.
+    """
+    grown, _ = _geometry(radius_m, hole.center_m,
+                         boundary_segments=len(hole.prescribed_polygon_nodes),
+                         radial_layers=int(hole.validation["radial_layers"]))
+    mesh = grown.mesh
+    for point in crack_path_m:
+        mesh = _insert_point_in_mesh(mesh, point)
+    return replace(grown, mesh=mesh)
 
 
 def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure_stage=None):
@@ -763,6 +858,7 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
     def inject(stage, current):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
+    if identity == "promotion": inject("explicit_cavity_creation", trial)
     remesh_junction = dict(trial.junction_process_state)
     remesh_junction["boundary_terminal_context"] = _external_free_root_context(
         hole.mesh, hole.boundary, trial.crack_network.branch(ROOT_BRANCH_ID).root,
@@ -788,17 +884,23 @@ def _tensor_fingerprint(tensor) -> str:
 
 def _source_identity(state, tensor, *, source_kind, source_front_id=None,
                      source_cavity_id=None, source_boundary_site_id=None,
-                     source_position_m=None, source_probe_identity=None):
-    return {
+                     source_position_m=None, source_probe_identity=None,
+                     source_load_payload=None):
+    identity = {
         "source_kind": source_kind,
         "source_front_id": source_front_id,
         "source_cavity_id": source_cavity_id,
         "source_boundary_site_id": source_boundary_site_id,
         "source_position_m": None if source_position_m is None else list(map(float, source_position_m)),
         "source_geometry_generation": int(state.crack_network.geometry_generation),
-        "source_tensor_fingerprint": _tensor_fingerprint(tensor),
+        "source_tensor_fingerprint": None if tensor is None else _tensor_fingerprint(tensor),
         "source_probe_identity": source_probe_identity,
     }
+    if source_load_payload is not None:
+        identity["source_load_fingerprint"] = hashlib.sha256(
+            json.dumps(source_load_payload, sort_keys=True, separators=(",", ":"), default=str).encode()
+        ).hexdigest()
+    return identity
 
 
 def _transition_competition_source(state, source, *, candidates=None):
@@ -812,7 +914,17 @@ def _transition_competition_source(state, source, *, candidates=None):
                        "stale_at_geometry_generation": int(state.crack_network.geometry_generation)})
         provenance[event.event_id] = record
         stale.append(record)
-    seed_payload = json.dumps({"source": source, "seed": state.competition.global_hazard_seed},
+    seed_source = {
+        key: source.get(key) for key in (
+            "source_kind", "source_front_id", "source_cavity_id",
+            "source_boundary_site_id", "source_geometry_generation",
+        )
+    }
+    seed_source["candidate_ids"] = sorted(
+        candidate.candidate_id
+        for candidate in (state.competition.candidates if candidates is None else candidates)
+    )
+    seed_payload = json.dumps({"source": seed_source, "seed": state.competition.global_hazard_seed},
                               sort_keys=True, separators=(",", ":")).encode()
     seed = int.from_bytes(hashlib.sha256(seed_payload).digest()[:8], "big") & ((1 << 63) - 1)
     competition = DirectionalCompetitionState.initialize(
@@ -906,29 +1018,16 @@ def _mesh_endpoint_on_direction(state, start, direction, target_distance_m):
     return tuple(map(float, state.mesh.nodes[node]))
 
 
-def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
-                         source_front_id=None, source_cavity_id=None,
-                         source_boundary_site_id=None, source_position_m=None,
-                         source_probe_identity=None, temperature_K=900.0,
-                         maximum_advance_duration_s=None):
-    """Advance all directional clocks through one common earliest-event time."""
+def directional_clock_rates(state, stress_tensor_Pa, *, temperature_K=900.0):
+    """Read-only rates from the existing cleavage law and preserved clocks."""
     material = state.material
     engine = FrontEngine(
         FrontConfig(), default_cleavage_barrier(), default_emission_barrier(material.b),
         material.G, material.nu, material.b,
     )
     stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
-    junction = dict(state.junction_process_state)
-    start_time = float(junction.get("production_time_s", 0.0))
-    source = _source_identity(
-        state, stress, source_kind=source_kind, source_front_id=source_front_id,
-        source_cavity_id=source_cavity_id, source_boundary_site_id=source_boundary_site_id,
-        source_position_m=source_position_m, source_probe_identity=source_probe_identity,
-    )
     rates = []
-    hazards = list(state.competition.hazard_states)
-    crossing_times = []
-    for candidate, hazard in zip(state.competition.candidates, hazards):
+    for candidate, hazard in zip(state.competition.candidates, state.competition.hazard_states):
         normal = np.asarray(candidate.normal_xy, dtype=float)
         resolved_opening = max(float(normal @ stress @ normal), 0.0)
         raw_rate, _, barrier = engine.lambda_cleave(resolved_opening, temperature_K)
@@ -936,12 +1035,556 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
         rate = 0.0 if resolved_opening <= zero_tolerance else max(float(raw_rate), 0.0)
         remaining = max(hazard.current_threshold_action - hazard.action, 0.0)
         crossing = math.inf if rate <= 0.0 else remaining / rate
-        crossing_times.append(crossing)
         rates.append({"candidate_id": candidate.candidate_id, "raw_rate_s": float(raw_rate),
                       "effective_rate_s": rate, "rate_s": rate,
                       "resolved_opening_stress_Pa": resolved_opening,
                       "hazard_barrier_J": barrier, "crossing_time_s": crossing})
-    duration = min(crossing_times)
+    return rates
+
+
+def _canonical_front_process_owner(state, branch_id):
+    """Read one front's process owner from accepted branch/runtime provenance."""
+    branch_id = str(branch_id)
+    if branch_id not in state.crack_network.active_tip_ids:
+        raise ValueError("hybrid directional drive requires an active branch")
+    owner = state.crack_network.branch(branch_id).local_state.get(
+        "front_engine_state_owner"
+    )
+    if owner is None:
+        raise RuntimeError("active front has no canonical process-owner identity")
+    owner = str(owner)
+    registry = state.tip_process_state.get("by_branch", {})
+    if owner not in registry:
+        raise RuntimeError("active front process owner is absent from accepted state")
+    checkpoint_mapping = state.tip_process_state.get("owner_by_front")
+    if checkpoint_mapping is not None and str(checkpoint_mapping.get(branch_id)) != owner:
+        raise RuntimeError("active front process owner disagrees with checkpoint registry")
+    return owner
+
+
+def sharp_front_load_provider(
+    state, *, branch_id, candidates=None, evaluate_overlap_marginals=False,
+    marginal_delta_a_m=(3.0e-5, 2.0e-5), marginal_mesh_levels=(2, 3, 4),
+):
+    """Use valid nested local J, else an exact fixed-void marginal G trial."""
+    from .hybrid_directional_drive_v5 import hybrid_directional_drive_provider
+    process_owner_by_tip = {
+        tip_id: _canonical_front_process_owner(state, tip_id)
+        for tip_id in state.crack_network.active_tip_ids
+    }
+    process_owner_id = process_owner_by_tip[str(branch_id)]
+    payload = state.tip_process_state.get("by_branch", {}).get(process_owner_id)
+    if payload is None:
+        raise ValueError("active child has no canonical sharp-front engine state")
+    engine = restore_sharp_front_engine(state.material, payload)
+    inventory = state.competition.candidates if candidates is None else tuple(candidates)
+    candidates_by_tip = {
+        tip_id: inventory if tip_id == branch_id else ()
+        for tip_id in state.crack_network.active_tip_ids
+    }
+    return hybrid_directional_drive_provider(
+        state, candidates_by_tip,
+        process_owner_by_tip=process_owner_by_tip,
+        contour_radius_m=max(float(engine.f.L_pz), 1.0e-6),
+        provider_contract_contour_radius_m=max(float(engine.f.L_pz), 1.0e-6),
+        marginal_delta_a_m=marginal_delta_a_m,
+        marginal_mesh_levels=marginal_mesh_levels,
+        evaluate_overlap_marginals=bool(evaluate_overlap_marginals),
+        source_commit=_head(),
+        prepare_support_state=_refresh_downstream_boundary_context,
+        conform_trial_endpoint=lambda trial, endpoint: _conform_bulk_point(
+            trial, endpoint, identity="HYBRID_MARGINAL_ENDPOINT_CONFORMING",
+        ),
+    )
+
+
+def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=900.0):
+    """Preview child rates through the unchanged old engine and owned ledgers."""
+    from .directional_competition_v11 import preview_production_cleavage_rate
+    from .hybrid_directional_drive_v5 import K_INTERPRETATION
+    process_owner_id = _canonical_front_process_owner(state, branch_id)
+    payload = state.tip_process_state.get("by_branch", {}).get(process_owner_id)
+    if payload is None:
+        raise ValueError("active child has no canonical sharp-front engine state")
+    engine = restore_sharp_front_engine(state.material, payload)
+    by_candidate = {row["candidate_id"]: row for row in load_rows}
+    expected_candidates = {item.candidate_id for item in state.competition.candidates}
+    if set(by_candidate) != expected_candidates:
+        raise RuntimeError("hybrid load rows do not exactly match the owned candidate inventory")
+    identity_tuples = {
+        (row.get("accepted_state_id"), row.get("stress_field_state_id"),
+         row.get("topology_fingerprint"))
+        for row in load_rows
+    }
+    if len(identity_tuples) != 1:
+        raise RuntimeError("hybrid load rows mix accepted mechanics identities")
+    rates = []
+    for candidate, hazard in zip(state.competition.candidates, state.competition.hazard_states):
+        load = by_candidate[candidate.candidate_id]
+        if str(load.get("tip_id", branch_id)) != str(branch_id):
+            raise RuntimeError("directional scalar drive is detached from its owning front")
+        if str(load.get("process_owner_id")) != process_owner_id:
+            raise RuntimeError("directional scalar drive is detached from its process owner")
+        if str(load.get("controlling_scalar_tip_id", branch_id)) != str(
+            load.get("tensor_probe_tip_id", branch_id)
+        ):
+            raise RuntimeError("hybrid scalar and tensor observations have different tip owners")
+        G_kinetic = max(float(load.get(
+            "G_kinetic_used_J_per_m2", load["positive_J_J_per_m2"]
+        )), 0.0)
+        available = load.get("directional_drive_status", "AVAILABLE") == "AVAILABLE"
+        directional_K = math.sqrt(float(state.material.Eprime) * G_kinetic)
+        effective_K = directional_K / math.sqrt(float(candidate.gamma_rel))
+        response = sharp_front_constitutive_response(
+            engine, K_Pa_sqrt_m=effective_K, temperature_K=temperature_K, dt_s=1.0,
+        )
+        adapted = preview_production_cleavage_rate(
+            engine, candidate, signed_J_J_per_m2=G_kinetic,
+            Eprime_Pa=float(state.material.Eprime), temperature_K=temperature_K,
+        )
+        rate = 0.0 if (not available or G_kinetic <= 0.0) else max(adapted.lambda_per_s, 0.0)
+        remaining = max(hazard.current_threshold_action - hazard.action, 0.0)
+        rates.append({
+            "candidate_id": candidate.candidate_id,
+            "raw_rate_s": response["cleavage_raw_rate_s"],
+            "effective_rate_s": rate,
+            "rate_s": rate,
+            "rate": rate,
+            "resolved_opening_stress_Pa": response["sigma_tip_Pa"],
+            "hazard_barrier_J": response["cleavage_barrier_J"],
+            "crossing_time_s": math.inf if rate <= 0.0 else remaining / rate,
+            "K_directional_Pa_sqrt_m": directional_K,
+            "K_energy_equivalent_Pa_sqrt_m": directional_K,
+            "K_effective_Pa_sqrt_m": effective_K,
+            "K_interpretation": load.get("K_interpretation", K_INTERPRETATION),
+            "signed_J_J_per_m2": float(load.get("G_local_J_per_m2", load["signed_J_J_per_m2"])),
+            "positive_J_J_per_m2": G_kinetic,
+            "G_local_J_per_m2": float(load.get("G_local_J_per_m2", load["signed_J_J_per_m2"])),
+            "G_local": float(load.get("G_local_J_per_m2", load["signed_J_J_per_m2"])),
+            "local_contour_valid": bool(load.get("local_contour_valid", True)),
+            "G_marginal_J_per_m2": load.get("G_marginal_J_per_m2"),
+            "G_marginal": load.get("G_marginal_J_per_m2"),
+            "G_kinetic_used_J_per_m2": G_kinetic,
+            "G_kinetic_used": G_kinetic,
+            "drive_source": load.get("drive_source", "LEGACY_DIRECTIONAL_J"),
+            "tip_id": str(load.get("tip_id", branch_id)),
+            "process_owner_id": process_owner_id,
+            "accepted_state_id": load.get("accepted_state_id"),
+            "stress_field_state_id": load.get("stress_field_state_id"),
+            "topology_fingerprint": load.get("topology_fingerprint"),
+            "directional_drive_status": load.get("directional_drive_status", "AVAILABLE"),
+            "r_eff_m": response["r_eff_m"],
+            "sigma_tip_Pa": response["sigma_tip_Pa"],
+            "cleavage_barrier_J": response["cleavage_barrier_J"],
+            "cleavage_rate_s": response["cleavage_rate_s"],
+            "emission_barrier_J": response["emission_barrier_J"],
+            "emission_rate_s": response["emission_rate_s"],
+            "clock_increment_per_second": response["clock_increment"],
+            "constitutive_engine": "FrontEngine",
+            "production_rate_adapter": "preview_production_cleavage_rate",
+        })
+    return rates
+
+
+def cavity_source_resolution_metrics(state):
+    """Source-native tensor and geometrical boundary-recovery diagnostics."""
+    cavity = state.void_state.cavities[0]
+    position = np.asarray(cavity.connection_exit_m)
+    node = int(np.argmin(np.linalg.norm(state.mesh.nodes-position, axis=1)))
+    tensor, selected = cavity_boundary_tensor(state, boundary_node=node)
+    nodes = np.asarray(state.mesh.nodes); elems = np.asarray(state.mesh.elems)
+    edges = _actual_cavity_boundary_edges(state)
+    owned = {}
+    wanted = {tuple(edge) for edge in edges}
+    for eid, triangle in enumerate(elems):
+        for a, b in ((triangle[0],triangle[1]),(triangle[1],triangle[2]),(triangle[2],triangle[0])):
+            edge = tuple(sorted((int(a),int(b))))
+            if edge in wanted: owned.setdefault(edge, []).append(eid)
+    _, assembled_residual, sigma, *_ = assemble_mechanics(state.mesh, state.displacement,
+        state.ep_gp, state.rho_gp, state.damage, state.elasticity_D, state.material,
+        cohesive_network=state.cohesive_network)
+    local_rows = []; all_rows = []; traction_sum = 0.; boundary_length = 0.
+    for a, b in edges:
+        owners = owned[tuple((a,b))]
+        if len(owners) != 1: raise ValueError("cavity source edge has nonunique owner")
+        eid = owners[0]; delta = nodes[b]-nodes[a]; length = float(np.linalg.norm(delta))
+        tangent = delta/length; normal = np.array((-tangent[1],tangent[0]))
+        height = float(2*state.mesh.area_e[eid]/length)
+        tri = nodes[elems[eid]]; sides = np.linalg.norm(tri-tri[[1,2,0]],axis=1)
+        quality = float(4*np.sqrt(3)*state.mesh.area_e[eid]/(sides@sides))
+        stress = np.array(((sigma[0,eid],sigma[2,eid]),(sigma[2,eid],sigma[1,eid])))
+        traction_sum += float(np.linalg.norm(stress@normal)**2)*length
+        boundary_length += length
+        all_rows.append((height/cavity.radius_m,length/cavity.radius_m,
+                         max(height/length,length/height),quality))
+        if np.linalg.norm((nodes[a]+nodes[b])/2-position) <= .25*cavity.radius_m:
+            local_rows.append((height/cavity.radius_m,length/cavity.radius_m,
+                               max(height/length,length/height),quality))
+    if not local_rows: raise ValueError("fixed cavity source has no local boundary neighborhood")
+    local = np.asarray(local_rows)
+    all_boundary = np.asarray(all_rows)
+    remote = abs(float(np.sum(assembled_residual[2*np.asarray(state.boundary.top_nodes)+1])))/float(np.ptp(nodes[:,0]))
+    triangles = nodes[elems]
+    side2 = np.sum((triangles-triangles[:,[1,2,0]])**2,axis=(1,2))
+    global_quality = 4*np.sqrt(3)*np.asarray(state.mesh.area_e)/side2
+    radial = (position-np.asarray(cavity.center_m)); normal = radial/np.linalg.norm(radial)
+    tangent = np.array((-normal[1],normal[0]))
+    return {"tensor_Pa": tensor.tolist(), "probe_element_ids": list(selected),
+        "boundary_node_id": node, "boundary_position_m": position.tolist(),
+        "normal_xy": normal.tolist(), "tangent_xy": tangent.tolist(),
+        "sigma_tt_Pa": float(tangent@tensor@tangent), "sigma_nn_Pa": float(normal@tensor@normal),
+        "sigma_nt_Pa": float(normal@tensor@tangent), "principal_stresses_Pa": np.linalg.eigvalsh(tensor).tolist(),
+        "eta_n_max": float(all_boundary[:,0].max()), "eta_n_median": float(np.median(all_boundary[:,0])),
+        "eta_t_max": float(all_boundary[:,1].max()), "eta_t_median": float(np.median(all_boundary[:,1])),
+        "local_aspect_ratio_max": float(all_boundary[:,2].max()), "local_aspect_ratio_median": float(np.median(all_boundary[:,2])),
+        "source_neighborhood_eta_n_max":float(local[:,0].max()),
+        "source_neighborhood_eta_t_max":float(local[:,1].max()),
+        "minimum_quality": float(global_quality.min()),
+        "local_minimum_quality": float(local[:,3].min()),
+        "normalized_traction": math.sqrt(traction_sum/boundary_length)/max(remote,1e-300),
+        "recovery_operator": "maximum-principal-incident-CST-at-fixed-owned-boundary-node"}
+
+
+def _cavity_resolution_binding(state):
+    digest = hashlib.sha256()
+    for value in (state.mesh.nodes, state.mesh.elems, state.displacement, state.ep_gp,
+                  state.rho_gp, state.damage, state.elasticity_D):
+        array = np.ascontiguousarray(value)
+        digest.update(str((array.shape, array.dtype.str)).encode()); digest.update(array.tobytes())
+    p0 = getattr(state.mesh,"element_damage_gp",None)
+    if p0 is None:
+        digest.update(b"element_damage_gp:None")
+    else:
+        array = np.ascontiguousarray(p0)
+        digest.update(b"element_damage_gp:")
+        digest.update(str((array.shape,array.dtype.str)).encode());digest.update(array.tobytes())
+    cavity = state.void_state.cavities[0]
+    digest.update(repr((cavity.cavity_id,cavity.center_m,cavity.radius_m,cavity.connection_exit_m,
+        state.crack_network.geometry_generation,tuple((c.candidate_id,c.direction_xy,c.normal_xy)
+        for c in state.competition.candidates))).encode())
+    digest.update(repr(state.material).encode())
+    return digest.hexdigest()
+
+
+def _qualified_cavity_source(state, tensor, *, temperature_K=900.0):
+    from .closure_static_evidence import resolution_screen
+    from .finalization_v3_schema import SCIENTIFIC_ACCEPTANCE_TOLERANCES as limits
+    from .finalization_v3_schema import canonical_hash
+    proof = state.junction_process_state.get("cavity_source_resolution_proof", {})
+    from .source_quality_transaction_v1 import PROOF_SCHEMA, source_transfer_budget
+    if (proof.get("schema") not in ("v12.cavity-source-local-refinement/1", PROOF_SCHEMA)
+        or proof.get("current_binding") != _cavity_resolution_binding(state)
+        or not isinstance(proof.get("refinement_count"), int)
+        or proof["refinement_count"] < 1
+        or not all(key in proof for key in ("current_metrics","previous_metrics","previous_binding"))): return False
+    current = proof["current_metrics"]; reference = proof["previous_metrics"]
+    capture = proof.get("previous_source_capture")
+    if not capture or "element_damage_gp" not in capture: return False
+    previous_mesh = replace(rebuild_tri_mesh(capture["nodes"], capture["elements"]),
+        element_damage_gp=capture["element_damage_gp"])
+    previous_state = replace(state, mesh=previous_mesh,
+        boundary=capture["boundary"],
+        displacement=capture["displacement"], damage=capture["damage"],
+        ep_gp=capture["ep_gp"], rho_gp=capture["rho_gp"],
+        energy_ledgers=capture["energy_ledgers"])
+    if (_cavity_resolution_binding(previous_state) != proof["previous_binding"]
+        or canonical_hash(cavity_source_resolution_metrics(state)) != canonical_hash(current)
+        or canonical_hash(cavity_source_resolution_metrics(previous_state)) != canonical_hash(reference)): return False
+    a = np.asarray(current["tensor_Pa"]); b = np.asarray(reference["tensor_Pa"])
+    error = float(np.linalg.norm(a-b)/max(np.linalg.norm(a),1e-300))
+    if proof.get("schema") == PROOF_SCHEMA:
+        # Bind the stored transfer diagnostic to its original owned clocks.
+        # A legitimate partial hazard advance must not invalidate the proof
+        # merely because a relative waiting-time subtraction rounds differently.
+        anchor = proof.get("budget_competition")
+        if anchor is None or anchor.candidates != state.competition.candidates: return False
+        if any((old.candidate_id,old.current_threshold_action,old.threshold_seed) !=
+               (new.candidate_id,new.current_threshold_action,new.threshold_seed)
+               for old,new in zip(anchor.hazard_states,state.competition.hazard_states)): return False
+        anchored_current = replace(state,competition=anchor)
+        anchored_previous = replace(previous_state,competition=anchor)
+        budget = source_transfer_budget(anchored_current, anchored_previous, a, b)
+        if (reference["minimum_quality"] < limits["mesh_minimum_quality"]
+            or canonical_hash(budget) != canonical_hash(proof.get("source_transfer_budget"))
+            or not source_transfer_budget(state, previous_state, a, b, temperature_K=temperature_K)["passed"]):
+            return False
+    return bool(np.array_equal(a,np.asarray(tensor)) and resolution_screen(current)
+        and current["normalized_traction"] <= limits["cavity_traction_normalized"]
+        and error <= limits["tensor_probe_relative"])
+
+
+def _bounded_quality_edge_flips(state):
+    """One nonoverlapping convex-quad sweep, preserving every graph edge.
+
+    No node, physical boundary or crack coordinate moves. A flip is accepted
+    only when it strictly improves both triangles' minimum quality. There is
+    no scientific tolerance override: the downstream global-quality gate is
+    evaluated independently after transfer, support rebuild and equilibrium.
+    """
+    from .finalization_v3_schema import SCIENTIFIC_ACCEPTANCE_TOLERANCES as limits
+    nodes = np.asarray(state.mesh.nodes); triangles = np.asarray(state.mesh.elems).copy()
+    def cross(a,b): return float(a[0]*b[1]-a[1]*b[0])
+    def quality(ids):
+        p = nodes[list(ids)]; area2 = abs(cross(p[1]-p[0],p[2]-p[0]))
+        return 2*np.sqrt(3)*area2/float(np.sum((p-p[[1,2,0]])**2))
+    graph_segments = [(np.asarray(a),np.asarray(b)) for branch in state.crack_network.branches
+        for a,b in zip(branch.path,branch.path[1:])]
+    def on_graph_edge(a,b):
+        for p,q in graph_segments:
+            delta = q-p; length = np.linalg.norm(delta)
+            if (abs(cross(nodes[a]-p,delta))/length <= 1e-12
+                and abs(cross(nodes[b]-p,delta))/length <= 1e-12
+                and max((nodes[a]-p)@delta,(nodes[b]-p)@delta) >= 0
+                and min((nodes[a]-p)@delta,(nodes[b]-p)@delta) <= delta@delta): return True
+        return False
+    owners = {}
+    coordinates = nodes[triangles]
+    side2 = np.sum((coordinates-coordinates[:,[1,2,0]])**2,axis=(1,2))
+    initial_quality = 4*np.sqrt(3)*np.asarray(state.mesh.area_e)/side2
+    for eid,tri in enumerate(triangles):
+        for a,b in ((tri[0],tri[1]),(tri[1],tri[2]),(tri[2],tri[0])):
+            owners.setdefault(tuple(sorted((int(a),int(b)))),[]).append(eid)
+    touched = set(); flips = []
+    for (a,b), incident in sorted(owners.items()):
+        if len(incident) != 2 or touched.intersection(incident): continue
+        i,j = incident; original = min(initial_quality[i],initial_quality[j])
+        if original >= limits["mesh_minimum_quality"]: continue
+        if on_graph_edge(a,b): continue
+        c = next(int(n) for n in triangles[i] if n not in (a,b))
+        d = next(int(n) for n in triangles[j] if n not in (a,b))
+        # Diagonals must cross strictly inside a convex quadrilateral.
+        if (cross(nodes[b]-nodes[a],nodes[c]-nodes[a])*cross(nodes[b]-nodes[a],nodes[d]-nodes[a]) >= 0
+            or cross(nodes[d]-nodes[c],nodes[a]-nodes[c])*cross(nodes[d]-nodes[c],nodes[b]-nodes[c]) >= 0): continue
+        if tuple(sorted((c,d))) in owners: continue
+        if any(cross(nodes[d]-nodes[c],p-nodes[c])*cross(nodes[d]-nodes[c],q-nodes[c]) < 0
+            and cross(q-p,nodes[c]-p)*cross(q-p,nodes[d]-p) < 0 for p,q in graph_segments): continue
+        replacement = [(c,d,a),(d,c,b)]
+        if min(map(quality,replacement)) <= original: continue
+        for eid,tri in zip((i,j),replacement):
+            p = nodes[list(tri)]
+            if cross(p[1]-p[0],p[2]-p[0]) < 0: tri = (tri[0],tri[2],tri[1])
+            triangles[eid] = tri
+        touched.update(incident); flips.append((a,b,c,d))
+    mesh = rebuild_tri_mesh(nodes,triangles)
+    return mesh,tuple(flips)
+
+
+def refine_downstream_source(state, *, max_refinement_levels=3,
+                             failure_stage=None, operation_log=None,
+                             refinement_region="source_neighborhood", quality_improvement=False):
+    """Bounded, transactional source refinement; preserves every owned clock.
+
+    Success requires measured convergence on successive meshes of this same
+    accepted material/history problem. An inadequate attempt returns the
+    original state; cached metrics never authorize a changed mechanical state.
+    """
+    from .adaptive_multitip_mesh_v11 import refine_accepted_state
+    if max_refinement_levels not in range(0,9): raise ValueError("source refinement budget must be 0..8")
+    if refinement_region not in ("source_neighborhood","complete_cavity_ring"):
+        raise ValueError("unregistered source refinement region")
+    if quality_improvement not in (False, True, "constrained_v1"):
+        raise ValueError("unregistered source quality strategy")
+    cavity = state.void_state.cavities[0]
+    if cavity.phase != VoidPhase.CONNECTED_VOID or state.crack_network.active_tip_ids:
+        raise ValueError("source refinement requires a connected dormant cavity")
+    operations = operation_log if operation_log is not None else []
+    def inject(stage, current):
+        operations.append(stage)
+        if stage == failure_stage: raise RuntimeError("injected:" + stage)
+    current = state.isolated_copy(); rows = []; quality_preparation = None
+    if quality_improvement == "constrained_v1":
+        from .source_quality_transaction_v1 import repair_connected_quality
+        current, quality_preparation = repair_connected_quality(current)
+        if not quality_preparation["accepted"]:
+            return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":[],
+                           "quality_preparation":quality_preparation,"operations":operations}
+    previous = cavity_source_resolution_metrics(current)
+    original_clock = (state.competition, state.rng_state)
+    for level in range(1,max_refinement_levels+1):
+        position = np.asarray(cavity.connection_exit_m)
+        centroids = current.mesh.nodes[current.mesh.elems].mean(axis=1)
+        distance = (np.linalg.norm(centroids-position,axis=1) if refinement_region == "source_neighborhood"
+            else np.abs(np.linalg.norm(centroids-np.asarray(cavity.center_m),axis=1)-cavity.radius_m))
+        marked = tuple(np.flatnonzero(distance <= .5*cavity.radius_m + 2*np.sqrt(current.mesh.area_e)))
+        refined, _ = refine_accepted_state(current, marked_parent_elements=marked,
+            active_tip_ids=(), generation=int(current.event_counters.get("mesh_generation",0))+1,
+            operation_index=int(current.event_counters.get("refinement_operation_index",0))+1)
+        flips = ()
+        if quality_improvement is True:
+            quality_mesh, flips = _bounded_quality_edge_flips(refined)
+            if flips:
+                fields = _project_fields(refined,quality_mesh)
+                refined = replace(refined,mesh=quality_mesh,damage=fields["damage"],
+                    displacement=fields["displacement"],ep_gp=fields["ep_gp"],rho_gp=fields["rho_gp"])
+        constrained_quality = None
+        if quality_improvement == "constrained_v1":
+            from .quality_constrained_mesh_v1 import constrained_quality_mesh, production_geometry_constraints
+            fixed, protected = production_geometry_constraints(refined)
+            quality_mesh, constrained_quality = constrained_quality_mesh(refined.mesh,
+                fixed_nodes=fixed, protected_edges=protected, strategy="flips")
+            fields = _project_fields(refined, quality_mesh)
+            refined = replace(refined,mesh=quality_mesh,damage=fields["damage"],
+                displacement=fields["displacement"],ep_gp=fields["ep_gp"],rho_gp=fields["rho_gp"])
+        inject("downstream_source_refinement", refined)
+        refined = _prepare_connected_ligament_support(refined, entry=cavity.connection_entry_m,
+            exit_point=cavity.connection_exit_m, direction=cavity.connection_direction_xy,
+            new_connection=False)
+        fields = {name: getattr(refined,name) for name in ("damage","displacement","ep_gp","rho_gp","tip_process_state")}
+        fields["source_state"] = refined.junction_process_state.get("source_state",{})
+        rebuilt = remesh_mechanically_separating_v12(refined, mesh=refined.mesh,
+            boundary=refined.boundary, transferred_fields=fields, source_commit=_head(),
+            configuration={"event":"DOWNSTREAM_SOURCE_REFINEMENT","level":level,"region":refinement_region},
+            transaction_identity="source-refinement:"+str(level))
+        inject("source_support_rebuild", rebuilt)
+        trial = equilibrate_fixed_load_with_production_fem(rebuilt)
+        inject("source_equilibrium", trial)
+        if (trial.competition,trial.rng_state) != original_clock:
+            raise RuntimeError("source refinement changed an owned threshold/hazard/RNG")
+        metrics = cavity_source_resolution_metrics(trial)
+        proof = {"schema":"v12.cavity-source-local-refinement/1", "refinement_count":level,
+            "refinement_region":refinement_region,
+            "quality_edge_flips":flips,
+            "previous_metrics":previous,"current_metrics":metrics,
+            "previous_binding":_cavity_resolution_binding(current),"current_binding":_cavity_resolution_binding(trial)}
+        proof["previous_source_capture"] = {"nodes":current.mesh.nodes,"elements":current.mesh.elems,
+            "boundary":current.boundary,
+            "element_damage_gp":getattr(current.mesh,"element_damage_gp",None),
+            "displacement":current.displacement,"damage":current.damage,"ep_gp":current.ep_gp,
+            "rho_gp":current.rho_gp,"energy_ledgers":dict(current.energy_ledgers)}
+        if quality_improvement == "constrained_v1":
+            from .source_quality_transaction_v1 import PROOF_SCHEMA, source_transfer_budget
+            proof.update({"schema":PROOF_SCHEMA, "quality_preparation":quality_preparation,
+                "constrained_quality":constrained_quality,
+                "budget_competition":current.competition,
+                "source_transfer_budget":source_transfer_budget(trial,current,metrics["tensor_Pa"],previous["tensor_Pa"])})
+        trial = replace(trial,junction_process_state={**trial.junction_process_state,
+            "cavity_source_resolution_proof":proof})
+        passed = _qualified_cavity_source(trial, metrics["tensor_Pa"])
+        rows.append({"level":level,"proof":{key:value for key,value in proof.items()
+            if key != "previous_source_capture"},"qualified":passed})
+        if passed:
+            inject("source_qualification",trial)
+            rates = {row["candidate_id"]:row for row in directional_clock_rates(trial,metrics["tensor_Pa"])}
+            source_candidates = trial.junction_process_state.get("active_event_source",{}).get("candidate_source_states",())
+            candidates = {item.candidate_id:item for item in trial.competition.candidates}
+            hazards = {item.candidate_id:item for item in trial.competition.hazard_states}
+            if len(source_candidates) != len(candidates) or {row["candidate_id"] for row in source_candidates} != set(candidates):
+                raise RuntimeError("source refinement changed candidate inventory")
+            for row in source_candidates:
+                owned = candidates[row["candidate_id"]]; clock = hazards[row["candidate_id"]]
+                if (tuple(row["direction_xy"]) != tuple(owned.direction_xy)
+                    or tuple(row["normal_xy"]) != tuple(owned.normal_xy)
+                    or tuple(row["tangent_xy"]) != tuple(owned.direction_xy)
+                    or row["threshold_identity"]["threshold_action"] != clock.current_threshold_action
+                    or row["threshold_identity"]["threshold_seed"] != clock.threshold_seed
+                    or row["rng_provenance"]["global_hazard_seed"] != trial.competition.global_hazard_seed):
+                    raise RuntimeError("source refinement candidate geometry/threshold/RNG provenance mismatch")
+                if (row.get("source_cavity_id",cavity.cavity_id) != cavity.cavity_id
+                    or row.get("source_boundary_site_id","connection_exit") != "connection_exit"
+                    or math.dist(row.get("source_position_m",cavity.connection_exit_m),cavity.connection_exit_m)>1e-12):
+                    raise RuntimeError("source refinement candidate boundary-site identity mismatch")
+            candidate_probe = {"kind":"direct_cavity_boundary_tensor",
+                "boundary_node_id":metrics["boundary_node_id"],"element_ids":metrics["probe_element_ids"]}
+            candidate_rows = tuple({**row,
+                "source_kind":"cavity_surface","source_cavity_id":cavity.cavity_id,
+                "source_boundary_site_id":"connection_exit","source_position_m":list(cavity.connection_exit_m),
+                "source_geometry_generation":int(trial.crack_network.geometry_generation),
+                "source_mesh_generation":int(trial.event_counters.get("mesh_generation",0)),
+                "source_tensor_fingerprint":_tensor_fingerprint(metrics["tensor_Pa"]),
+                "source_probe_identity":candidate_probe,
+                "geometry_status":"GEOMETRICALLY_VALID_KINETICALLY_ACTIVE" if rates[row["candidate_id"]]["effective_rate_s"] > 0
+                    else "GEOMETRICALLY_VALID_KINETICALLY_DORMANT",
+                "instantaneous_status":"POSITIVE_DOWNSTREAM_DRIVE" if rates[row["candidate_id"]]["effective_rate_s"] > 0
+                    else "ZERO_DOWNSTREAM_DRIVE",
+                "effective_rate_s":rates[row["candidate_id"]]["effective_rate_s"],
+                "crossing_time_s":rates[row["candidate_id"]]["crossing_time_s"],
+                "resolved_opening_stress_Pa":rates[row["candidate_id"]]["resolved_opening_stress_Pa"]}
+                for row in source_candidates)
+            source = {**trial.junction_process_state.get("active_event_source",{}),
+                **_source_identity(trial,metrics["tensor_Pa"],source_kind="cavity_surface",
+                    source_cavity_id=cavity.cavity_id,source_boundary_site_id="connection_exit",
+                    source_position_m=cavity.connection_exit_m,
+                    source_probe_identity={"kind":"direct_cavity_boundary_tensor",
+                        "boundary_node_id":metrics["boundary_node_id"],
+                        "element_ids":metrics["probe_element_ids"]}),
+                "source_mesh_generation":trial.event_counters.get("mesh_generation",0),
+                "candidate_source_states":candidate_rows}
+            trial = replace(trial,junction_process_state={**trial.junction_process_state,
+                "active_event_source":source})
+            return trial,{"status":"SOURCE_TENSOR_QUALIFIED","attempts":rows,"operations":operations}
+        current = trial; previous = metrics
+    return state,{"status":"SOURCE_TENSOR_UNQUALIFIED","attempts":rows,"operations":operations}
+
+
+def _complete_next_clock(state, stress_tensor_Pa=None, *, source_kind="sharp_front",
+                         source_front_id=None, source_cavity_id=None,
+                         source_boundary_site_id=None, source_position_m=None,
+                         source_probe_identity=None, temperature_K=900.0,
+                         maximum_advance_duration_s=None, front_load_rows=None):
+    """Advance source-owned clocks, never an unqualified cavity first passage."""
+    if maximum_advance_duration_s is not None and (
+        not math.isfinite(float(maximum_advance_duration_s)) or maximum_advance_duration_s < 0):
+        raise ValueError("maximum_advance_duration_s must be finite and nonnegative")
+    if front_load_rows is None:
+        stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
+        rates = directional_clock_rates(state, stress, temperature_K=temperature_K)
+    else:
+        if source_kind != "sharp_front" or source_front_id is None:
+            raise ValueError("directional J/K loads require an explicit sharp-front owner")
+        stress = None
+        rates = directional_sharp_front_rates(
+            state, front_load_rows, branch_id=source_front_id,
+            temperature_K=temperature_K,
+        )
+    junction = dict(state.junction_process_state)
+    start_time = float(junction.get("production_time_s", 0.0))
+    from .canonical_kinetic_time_v1 import AcceptedTime
+    accepted_clock = junction.get('canonical_accepted_time_v1', AcceptedTime.from_seconds(start_time))
+    if accepted_clock.seconds() != start_time: accepted_clock = AcceptedTime.from_seconds(start_time)
+    source = _source_identity(
+        state, stress, source_kind=source_kind, source_front_id=source_front_id,
+        source_cavity_id=source_cavity_id, source_boundary_site_id=source_boundary_site_id,
+        source_position_m=source_position_m, source_probe_identity=source_probe_identity,
+        source_load_payload=front_load_rows,
+    )
+    from .finalization_v3_schema import canonical_hash
+    source_signature = canonical_hash(source)
+    # Policy C: activity requires the actual owned production-source transfer
+    # qualification. Neither a caller-supplied PASS flag nor a static traction
+    # screen grants authority; the versioned fine-source transaction may qualify.
+    # The accepted connection and all clock/RNG/graph state are returned intact.
+    # Check owned phase/source as well as the argument to prevent source spoofing.
+    owned_cavity = (state.junction_process_state.get("active_event_source", {}).get("source_kind") == "cavity_surface"
+        or (state.void_state is not None and any(c.phase == VoidPhase.CONNECTED_VOID for c in state.void_state.cavities)))
+    if ((source_kind == "cavity_surface" or owned_cavity) and any(r["effective_rate_s"] > 0 for r in rates)
+        and not _qualified_cavity_source(state, stress, temperature_K=temperature_K)):
+        for rate in rates:
+            rate.update({"unqualified_effective_rate_s": rate["effective_rate_s"],
+                         "unqualified_crossing_time_s": rate["crossing_time_s"],
+                         "effective_rate_s": 0., "rate_s": 0., "crossing_time_s": math.inf,
+                         "common_advance_duration_s": 0., "emitted_event_ids": [], "winner": False,
+                         "instantaneous_status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+                         "source_resolution_policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED"})
+        return state, rates
+    if owned_cavity:
+        # Retain complete candidate geometry/threshold/probe provenance during
+        # dormancy; a bare _source_identity would erase the candidate inventory.
+        source = {**state.junction_process_state.get("active_event_source", {}),
+                  **(source if any(r["effective_rate_s"] > 0 for r in rates) else {})}
+    elif source_kind=='sharp_front':
+        # A partial accepted clock interval does not renew the front or erase
+        # its geometry-owned candidate endpoints. Only retain them for the
+        # same front, position and graph generation; tensor/probe metadata is
+        # refreshed above and the eventual transaction still certifies geometry.
+        previous_source=state.junction_process_state.get('active_event_source',{})
+        same_owner=all(previous_source.get(key)==source.get(key) for key in (
+            'source_kind','source_front_id','source_geometry_generation')) and tuple(
+                previous_source.get('source_position_m') or ())==tuple(source.get('source_position_m') or ())
+        if same_owner:
+            source={**previous_source,**source}
+    hazards = list(state.competition.hazard_states)
+    crossing_times = [rate["crossing_time_s"] for rate in rates]
+    duration = min(crossing_times, default=math.inf)
     if not math.isfinite(duration):
         duration = 0.0 if maximum_advance_duration_s is None else float(maximum_advance_duration_s)
         if duration < 0.0 or not math.isfinite(duration):
@@ -951,7 +1594,8 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
                          "winner": False,
                          "instantaneous_status": "ZERO_DOWNSTREAM_DRIVE"})
         junction.update({
-            "production_time_s": start_time + duration,
+            "production_time_s": accepted_clock.advance(duration).seconds(),
+            "canonical_accepted_time_v1": accepted_clock.advance(duration),
             "active_event_source": source,
             "latest_directional_clock_status": "NO_KINETICALLY_ACTIVE_CANDIDATE",
         })
@@ -961,17 +1605,17 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
         if bounded < 0.0 or not math.isfinite(bounded):
             raise ValueError("maximum_advance_duration_s must be finite and nonnegative")
         duration = min(duration, bounded)
+    from .canonical_directional_interval_v1 import advance as advance_canonical
+    hazards, completed, anchors, exact_duration = advance_canonical(tuple(hazards), rates,
+        clock=accepted_clock, anchors=junction.get('directional_integration_anchors_v1', {}),
+        source_signature=source_signature, maximum_duration_s=maximum_advance_duration_s)
+    duration = float(exact_duration)
     emitted_winner_ids = []
-    for index, (hazard, rate) in enumerate(zip(hazards, rates)):
-        preview = preview_directional_interval(
-            hazard, lambda_per_s=rate["rate_s"], start_time_s=start_time,
-            duration_s=duration,
-        )
-        hazards[index] = commit_directional_interval(hazard, preview)
+    for rate, events in zip(rates, completed):
         rate["common_advance_duration_s"] = duration
-        rate["emitted_event_ids"] = [event.event_id for event in preview.completed_events]
-        rate["winner"] = bool(preview.completed_events)
-        if preview.completed_events:
+        rate["emitted_event_ids"] = [event.event_id for event in events]
+        rate["winner"] = bool(events)
+        if events:
             emitted_winner_ids.append(rate["candidate_id"])
     pending_new = {
         event.candidate_id for before, after in zip(state.competition.hazard_states, hazards)
@@ -997,7 +1641,9 @@ def _complete_next_clock(state, stress_tensor_Pa, *, source_kind="sharp_front",
                 "threshold_identity": threshold_by_candidate[event.candidate_id],
                 "status": "PENDING_SOURCE_VALIDATION",
             }
-    junction.update({"production_time_s": start_time + duration,
+    junction.update({"production_time_s": accepted_clock.advance(exact_duration).seconds(),
+                     "canonical_accepted_time_v1": accepted_clock.advance(exact_duration),
+                     "directional_integration_anchors_v1": anchors,
                      "directional_event_provenance": provenance,
                      "active_event_source": source,
                      "latest_directional_clock_status": (
@@ -1027,6 +1673,86 @@ def _select_emitted_proposal(state, audit, *, eligible_candidate_ids=None):
     if not set(proposal.member_candidate_ids).issubset(winners):
         raise AssertionError("selected proposal is not owned by emitted winners")
     return proposal
+
+
+def _prepare_connected_ligament_support(state, *, entry, exit_point, direction,
+                                        failure_injector=None, new_connection=True):
+    """Stage exact inactive cavity contact before any new support certificate.
+
+    Called only on the refined isolated topology trial. No certificate is
+    waived, and the enclosing energy/topology transaction still owns commit.
+    Boundary IDs are freshly derived from this mesh, never transferred IDs.
+    """
+    cavity = state.void_state.cavities[0]
+    root = state.crack_network.branch(ROOT_BRANCH_ID)
+    if math.dist(root.tip, entry) > 1.0e-12:
+        raise ValueError("connected terminal must equal the realized ligament endpoint")
+    connected = replace(cavity, phase=VoidPhase.CONNECTED_VOID,
+        lineage=cavity.lineage + (("CRACK_TO_VOID_LIGAMENT",) if new_connection else ()),
+        connection_entry_m=entry, connection_exit_m=exit_point,
+        connection_direction_xy=direction)
+    state = replace(state, void_state=replace_cavity(state.void_state, connected))
+    if failure_injector is not None: failure_injector("cavity_phase_update", state)
+    network = replace(state.crack_network, branches=tuple(
+        replace(branch, status="arrested", local_state={**branch.local_state,
+            "terminal_boundary_kind": "traction_free_cavity"})
+        if branch.branch_id == ROOT_BRANCH_ID else branch
+        for branch in state.crack_network.branches))
+    state = replace(state, crack_network=network)
+    if failure_injector is not None: failure_injector("root_status_change", state)
+    cycle = cavity_free_surface_certificate(state)
+    if not cycle["passed"]:
+        raise RuntimeError("connected terminal requires a certified closed cavity cycle")
+    contexts = _external_free_root_context(state.mesh, state.boundary, root.path[0])
+    found = False
+    for arc_start, arc_end, arc_id in certification_arcs(network):
+        if math.dist(arc_end, entry) <= 1.0e-12: endpoint = "end"
+        elif math.dist(arc_start, entry) <= 1.0e-12: endpoint = "start"
+        else: continue
+        found = True
+        context = {"endpoint": endpoint, "endpoint_role": "inactive_terminal",
+            "endpoint_coordinate_m": tuple(map(float, entry)),
+            "boundary_kind": "cavity_free_surface",
+            "boundary_component_id": "cavity-cycle:" + cavity.cavity_id,
+            "boundary_edge_ids": tuple(tuple(map(int, edge)) for edge in cycle["boundary_edge_ids"]),
+            "cavity_id": cavity.cavity_id, "certified_cavity_id": cavity.cavity_id,
+            "cavity_cycle_certified": True, "tangent_enters_or_approaches_solid": True}
+        contexts[arc_id] = tuple(contexts.get(arc_id, ())) + (context,)
+    if not found:
+        raise RuntimeError("connected terminal has no exact certification arc")
+    return replace(state, junction_process_state={**state.junction_process_state,
+        "boundary_terminal_context": contexts})
+
+
+def _refresh_downstream_boundary_context(state):
+    """Re-derive endpoint incidence from the actual child-trial mesh.
+
+    Refinement invalidates stored boundary edge IDs. This does not change any
+    role or waive any certificate: active tips remain prohibited, and every
+    new context is independently checked by the existing support verifier.
+    """
+    from .mechanically_separating_sharp_wake_v12 import classify_graph_vertices
+    cavity = state.void_state.cavities[0]
+    root = state.crack_network.branch(ROOT_BRANCH_ID)
+    cycle = cavity_free_surface_certificate(state)
+    if not cycle['passed']: raise RuntimeError('downstream trial cavity cycle is not certified')
+    contexts = _external_free_root_context(state.mesh, state.boundary, root.path[0])
+    roles = classify_graph_vertices(state.crack_network)
+    for first, last, arc_id in certification_arcs(state.crack_network):
+        for endpoint, point in (('start', first), ('end', last)):
+            role = roles.get(tuple(point), frozenset())
+            if 'inactive_terminal' not in role or 'active_tip' in role: continue
+            if not any(anchor is not None and math.dist(point, anchor) <= 1e-12
+                       for anchor in (cavity.connection_entry_m, cavity.connection_exit_m)): continue
+            context = {'endpoint': endpoint, 'endpoint_role': 'inactive_terminal',
+                'endpoint_coordinate_m': tuple(map(float, point)), 'boundary_kind': 'cavity_free_surface',
+                'boundary_component_id': 'cavity-cycle:'+cavity.cavity_id,
+                'boundary_edge_ids': tuple(tuple(map(int, edge)) for edge in cycle['boundary_edge_ids']),
+                'cavity_id': cavity.cavity_id, 'certified_cavity_id': cavity.cavity_id,
+                'cavity_cycle_certified': True}
+            contexts[arc_id] = tuple(contexts.get(arc_id, ()))+(context,)
+    return replace(state, junction_process_state={**state.junction_process_state,
+        'boundary_terminal_context': contexts})
 
 
 def ligament_transaction(state, *, failure_stage=None, operation_log=None):
@@ -1063,6 +1789,7 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     def inject(stage, current):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
+    inject("ligament_hazard_completion", state)
     def geometry(trial, arms):
         trial, aligned_node, inserted = _conform_cavity_intersection(
             trial, end, failure_injector=inject,
@@ -1079,15 +1806,11 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
         realized = apply_v12_production_trial_geometry(
             trial, arms, source_commit=_head(), configuration={"event": "CRACK_TO_VOID_LIGAMENT"},
             transaction_identity="ligament", failure_injector=inject,
+            prepare_support_state=lambda refined: _prepare_connected_ligament_support(
+                refined, entry=end, exit_point=exit_point, direction=candidate.direction_xy,
+                failure_injector=inject),
         )
-        connected = replace(
-            realized.void_state.cavities[0], phase=VoidPhase.CONNECTED_VOID,
-            lineage=realized.void_state.cavities[0].lineage + ("CRACK_TO_VOID_LIGAMENT",),
-            connection_entry_m=end, connection_exit_m=exit_point,
-            connection_direction_xy=candidate.direction_xy,
-        )
-        void_state = replace_cavity(realized.void_state, connected)
-        inject("cavity_phase_update", replace(realized, void_state=void_state))
+        void_state = realized.void_state
         ledgers = dict(void_state.length_ledgers)
         ligament_length = math.dist(start, end)
         physical_span = math.dist(end, exit_point)
@@ -1114,49 +1837,6 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
                                                         "source_element": source_element},),
         )
         realized = replace(realized, void_state=void_state)
-        root = realized.crack_network.branch(ROOT_BRANCH_ID)
-        dormant_network = replace(
-            realized.crack_network,
-            branches=tuple(replace(
-                branch, status="arrested",
-                local_state={**branch.local_state,
-                             "terminal_boundary_kind": "traction_free_cavity"},
-            ) if branch.branch_id == ROOT_BRANCH_ID else branch
-                           for branch in realized.crack_network.branches),
-        )
-        realized = replace(realized, crack_network=dormant_network)
-        inject("root_status_change", realized)
-        cycle_before_rebuild = cavity_free_surface_certificate(realized)
-        contexts = {key: tuple(value) for key, value in
-                    realized.junction_process_state.get("boundary_terminal_context", {}).items()}
-        for arc_start, arc_end, arc_id in certification_arcs(dormant_network):
-            if np.linalg.norm(np.asarray(arc_end) - np.asarray(end)) <= 1.0e-12:
-                endpoint_name = "end"
-            elif np.linalg.norm(np.asarray(arc_start) - np.asarray(end)) <= 1.0e-12:
-                endpoint_name = "start"
-            else:
-                continue
-            cavity_context = {
-                "endpoint": endpoint_name, "endpoint_role": "inactive_terminal",
-                "endpoint_coordinate_m": tuple(map(float, end)),
-                "boundary_kind": "cavity_free_surface",
-                "boundary_component_id": "cavity-cycle:" + cavity.cavity_id,
-                "boundary_edge_ids": tuple(tuple(map(int, edge))
-                                           for edge in cycle_before_rebuild["boundary_edge_ids"]),
-                "cavity_id": cavity.cavity_id,
-                "certified_cavity_id": cavity.cavity_id,
-                "cavity_cycle_certified": cycle_before_rebuild["passed"],
-                "tangent_enters_or_approaches_solid": True,
-            }
-            contexts[arc_id] = contexts.get(arc_id, ()) + (cavity_context,)
-        junction = dict(realized.junction_process_state)
-        junction["boundary_terminal_context"] = contexts
-        realized = replace(realized, junction_process_state=junction)
-        realized = initialize_mechanically_separating_v12(
-            realized, source_commit=_head(),
-            configuration={"event": "CRACK_TO_VOID_LIGAMENT", "root_status": "arrested"},
-            transaction_identity="ligament-connected-dormant",
-        )
         inject("dormant_support_rebuild", realized)
         cycle = cavity_free_surface_certificate(realized)
         certificate = crack_void_connection_certificate(
@@ -1205,17 +1885,24 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
         endpoints[surface_candidate.candidate_id] = list(map(float, endpoint))
         candidate_rows.append({
             "candidate_id": surface_candidate.candidate_id,
+            "source_kind":"cavity_surface","source_cavity_id":cavity.cavity_id,
+            "source_boundary_site_id":"connection_exit","source_position_m":list(cavity.connection_exit_m),
+            "source_geometry_generation":int(result_state.crack_network.geometry_generation),
+            "source_mesh_generation":int(result_state.event_counters.get("mesh_generation",0)),
+            "source_tensor_fingerprint":_tensor_fingerprint(surface_tensor),
+            "source_probe_identity":{"kind":"direct_cavity_boundary_tensor",
+                "boundary_node_id":exit_node,"element_ids":list(boundary_elements)},
             "direction_xy": list(surface_candidate.direction_xy),
             "normal_xy": list(surface_candidate.normal_xy),
             "tangent_xy": list(surface_candidate.direction_xy),
             "planned_endpoint_m": endpoints[surface_candidate.candidate_id],
             "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_DORMANT"
-                               if opening <= 0.0 else "GEOMETRICALLY_VALID_KINETICALLY_ACTIVE",
+                               if opening <= 0.0 else "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
             "instantaneous_status": "ZERO_DOWNSTREAM_DRIVE"
-                                    if opening <= 0.0 else "POSITIVE_DOWNSTREAM_DRIVE",
+                                    if opening <= 0.0 else "SOURCE_TENSOR_UNQUALIFIED",
             "resolved_opening_stress_Pa": opening,
-            "effective_rate_s": 0.0 if opening <= 0.0 else None,
-            "crossing_time_s": "infinity" if opening <= 0.0 else None,
+            "effective_rate_s": 0.0,
+            "crossing_time_s": "infinity",
         })
     candidate_inventory = tuple(candidate for candidate in candidate_inventory
                                 if candidate.candidate_id in endpoints)
@@ -1230,6 +1917,7 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
                                "element_ids": list(boundary_elements)},
     )
     surface_source["candidate_source_states"] = tuple(candidate_rows)
+    surface_source["source_mesh_generation"] = int(result_state.event_counters.get("mesh_generation",0))
     surface_source["next_candidate_endpoints_m"] = endpoints
     transitioned = _transition_competition_source(
         result_state, surface_source, candidates=candidate_inventory,
@@ -1242,13 +1930,21 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     cavity = state.void_state.cavities[0]
     nodes = np.asarray(state.mesh.nodes)
     active_source = state.junction_process_state.get("active_event_source", {})
+    front_load_rows = None
     if continuation:
         if state.crack_network.active_tip_ids != (child_id,):
             raise RuntimeError("continued propagation requires the sole active downstream child")
         start = state.crack_network.branch(child_id).tip
-        tensor, boundary_elements = crack_tip_tensor(state, branch_id=child_id)
+        front_load_rows = sharp_front_load_provider(
+            state, branch_id=child_id,
+        )["directional"]
+        tensor, boundary_elements = None, ()
         source_kind = "sharp_front"
-        probe_identity = {"kind": "child_crack_tip_tensor", "element_ids": list(boundary_elements)}
+        probe_identity = {
+            "kind": "established_directional_J_K_provider",
+            "branch_id": child_id,
+            "candidate_ids": [row["candidate_id"] for row in front_load_rows],
+        }
     else:
         if cavity.connection_exit_m is None:
             raise RuntimeError("downstream nucleation requires the stored connection exit")
@@ -1266,15 +1962,23 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         source_cavity_id=None if continuation else cavity.cavity_id,
         source_boundary_site_id=None if continuation else "connection_exit",
         source_position_m=start, source_probe_identity=probe_identity,
+        front_load_rows=front_load_rows,
     )
     if not any(row["winner"] for row in cleavage_audit):
         return state, None, operation_log if operation_log is not None else [], {
-            "status": "NO_KINETICALLY_ACTIVE_CANDIDATE",
-            "tensor_Pa": tensor.tolist(), "boundary_element_ids": boundary_elements,
+            "status": ("UNQUALIFIED_CAVITY_SOURCE_TENSOR" if any(
+                row.get("instantaneous_status") == "UNQUALIFIED_CAVITY_SOURCE_TENSOR" for row in cleavage_audit)
+                else "NO_KINETICALLY_ACTIVE_CANDIDATE"),
+            "tensor_Pa": None if tensor is None else tensor.tolist(),
+            "front_load_rows": front_load_rows,
+            "boundary_element_ids": boundary_elements,
             "source_kind": source_kind, "source_front_id": child_id if continuation else None,
             "source_position_m": list(start), "source_probe_identity": probe_identity,
             "cleavage": cleavage_audit,
         }
+    if operation_log is not None: operation_log.append('downstream_threshold_completion')
+    if failure_stage == 'downstream_threshold_completion':
+        raise RuntimeError('injected:downstream_threshold_completion')
     proposal = _select_emitted_proposal(state, cleavage_audit)
     candidate = next(item for item in state.competition.candidates
                      if item.candidate_id == proposal.member_candidate_ids[0])
@@ -1287,21 +1991,19 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     if continuation:
         base_network = state.crack_network
     else:
-        r_tip = max(float(state.mesh.hbar_tip), 10.0 * float(state.material.b))
         child = CrackBranchState(child_id, ROOT_BRANCH_ID, 1,
                                  int(state.event_counters.get("topology_actions", 0)) + 1,
                                  (start,), (candidate.angle_rad,), local_state={
                                      "nucleation_source": "direct_cavity_boundary_tensor",
                                      "upstream_lineage_branch_id": ROOT_BRANCH_ID,
-                                     "active_source": "child_crack_tip_tensor",
-                                     "r_tip_m": r_tip,
-                                     "r_tip_initialization_policy": "fresh_moving_tip_renewal_no_historical_partition",
+                                     "active_source": "established_directional_J_K_provider",
+                                     "front_engine_state_owner": child_id,
+                                     "front_engine_initialization_policy": "FrontEngine.__init__->reset",
                                  })
         base_network = replace(state.crack_network, branches=state.crack_network.branches + (child,),
                                geometry_generation=state.crack_network.geometry_generation + 1,
                                branching_enabled=True)
-    engine = FrontEngine(FrontConfig(), default_cleavage_barrier(), default_emission_barrier(state.material.b),
-                         state.material.G, state.material.nu, state.material.b)
+    engine = fresh_sharp_front_engine(state.material)
     winner = next(item for item in cleavage_audit if item["candidate_id"] == candidate.candidate_id)
     barrier = winner["hazard_barrier_J"]
     resistance = hazard_resistance_J_per_m2(
@@ -1332,7 +2034,9 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             source_commit=_head(), configuration={"event": "DOWNSTREAM_FRONT" if not continuation else "CONTINUED_FRONT"},
             transaction_identity="downstream-continued" if continuation else "downstream-first-passage",
             failure_injector=inject, refinement_levels=1,
+            prepare_support_state=_refresh_downstream_boundary_context,
         )
+        inject('downstream_child_support_rebuild', realized)
         cavity = realized.void_state.cavities[0]
         updated = replace(cavity, phase=VoidPhase.DOWNSTREAM_FRONT_ACTIVE,
                           lineage=cavity.lineage + (("CONTINUED_EVENT" if continuation else "DOWNSTREAM_FIRST_PASSAGE"),))
@@ -1367,11 +2071,10 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         if not continuation:
             tip_state.update({
                 "active_branch_id": child_id,
-                "by_branch": {child_id: {
-                    "r_tip_m": r_tip,
-                    "initialization_policy": "fresh_moving_tip_renewal_no_historical_partition",
-                    "historical_state_imported": False,
-                }},
+                "by_branch": {child_id: capture_sharp_front_engine(
+                    fresh_sharp_front_engine(realized.material)
+                )},
+                "owner_by_front": {child_id: child_id},
             })
         realized = replace(realized, void_state=void_state, tip_process_state=tip_state)
         certificate = crack_void_connection_certificate(
@@ -1393,8 +2096,37 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
     )
     if not result.accepted: raise RuntimeError("downstream front event rejected")
     accepted = _mark_consumed_event_provenance(result.state, proposal.member_event_ids)
+    if continuation:
+        process_owner_id = _canonical_front_process_owner(accepted, child_id)
+        payload = accepted.tip_process_state.get("by_branch", {}).get(process_owner_id)
+        child_engine = restore_sharp_front_engine(accepted.material, payload)
+        # Directional first passage is authoritative, as in the pre-void v11
+        # adapter.  Synchronize the scalar compatibility clock, then let the
+        # unchanged engine perform emission, renewal, and wake retention.
+        child_engine.B = 1.0
+        duration = float(winner["common_advance_duration_s"])
+        step_info = child_engine.step(
+            float(winner["K_effective_Pa_sqrt_m"]), 900.0, duration,
+        )
+        if not step_info["fired"]:
+            raise RuntimeError("accepted child first passage did not renew the established front engine")
+        tip_state = dict(accepted.tip_process_state)
+        by_branch = dict(tip_state.get("by_branch", {}))
+        by_branch[process_owner_id] = {
+            **capture_sharp_front_engine(child_engine),
+            "last_event_identity": tuple(proposal.member_event_ids),
+            "last_step_audit": step_info,
+        }
+        tip_state["by_branch"] = by_branch
+        accepted = replace(accepted, tip_process_state=tip_state)
     if not continuation:
-        child_tensor, _ = crack_tip_tensor(accepted, branch_id=child_id)
+        child_load_rows = sharp_front_load_provider(
+            accepted, branch_id=child_id,
+        )["directional"]
+        child_load_by_id = {row["candidate_id"]: row for row in child_load_rows}
+        child_rates = {row["candidate_id"]: row for row in directional_sharp_front_rates(
+            accepted, child_load_rows, branch_id=child_id,
+        )}
         child_tip = np.asarray(accepted.crack_network.branch(child_id).tip, dtype=float)
         child_candidates = tuple(accepted.competition.candidates)
         child_endpoints = {}
@@ -1405,8 +2137,9 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             if not (1.0e-12 < endpoint[0] < 1.0e-3 - 1.0e-12
                     and abs(endpoint[1]) < 5.0e-4 - 1.0e-12):
                 continue
-            normal = np.asarray(child_candidate.normal_xy, dtype=float)
-            opening = max(float(normal @ child_tensor @ normal), 0.0)
+            load = child_load_by_id[child_candidate.candidate_id]
+            response = child_rates[child_candidate.candidate_id]
+            opening = float(response["sigma_tip_Pa"])
             child_endpoints[child_candidate.candidate_id] = list(map(float, endpoint))
             child_rows.append({
                 "candidate_id": child_candidate.candidate_id,
@@ -1419,17 +2152,22 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
                 "instantaneous_status": "ZERO_DOWNSTREAM_DRIVE"
                                         if opening <= 0.0 else "POSITIVE_DOWNSTREAM_DRIVE",
                 "resolved_opening_stress_Pa": opening,
-                "effective_rate_s": 0.0 if opening <= 0.0 else None,
-                "crossing_time_s": "infinity" if opening <= 0.0 else None,
+                "K_directional_Pa_sqrt_m": float(load["K_directional_Pa_sqrt_m"]),
+                "signed_J_J_per_m2": float(load["signed_J_J_per_m2"]),
+                "effective_rate_s": response["effective_rate_s"],
+                "crossing_time_s": (response["crossing_time_s"] if math.isfinite(
+                    response["crossing_time_s"]
+                ) else "infinity"),
             })
         child_candidates = tuple(item for item in child_candidates
                                  if item.candidate_id in child_endpoints)
         if not child_candidates:
             raise RuntimeError("active child has no geometrically admissible continuation direction")
         child_source = _source_identity(
-            accepted, child_tensor, source_kind="sharp_front", source_front_id=child_id,
+            accepted, None, source_kind="sharp_front", source_front_id=child_id,
             source_position_m=accepted.crack_network.branch(child_id).tip,
-            source_probe_identity={"kind": "child_crack_tip_tensor"},
+            source_probe_identity={"kind": "established_directional_J_K_provider", "branch_id": child_id},
+            source_load_payload=child_load_rows,
         )
         child_source["candidate_source_states"] = tuple(child_rows)
         child_source["next_candidate_endpoints_m"] = child_endpoints
@@ -1437,12 +2175,23 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             accepted, child_source, candidates=child_candidates,
         )
         result = replace(result, state=accepted)
+    else:
+        result = replace(result, state=accepted)
     cavity = accepted.void_state.cavities[0]
+    child_process_owner = (
+        _canonical_front_process_owner(accepted, child_id)
+        if child_id in accepted.crack_network.active_tip_ids else None
+    )
     return accepted, result, operations, {
-        "tensor_Pa": tensor.tolist(), "boundary_element_ids": boundary_elements,
+        "tensor_Pa": None if tensor is None else tensor.tolist(),
+        "front_load_rows": front_load_rows,
+        "boundary_element_ids": boundary_elements,
         "source_kind": source_kind, "source_front_id": child_id if continuation else None,
         "source_position_m": list(start), "source_probe_identity": probe_identity,
-        "r_tip_m": accepted.tip_process_state.get("by_branch", {}).get(child_id, {}).get("r_tip_m"),
+        "r_eff_m": (restore_sharp_front_engine(
+            accepted.material,
+            accepted.tip_process_state.get("by_branch", {}).get(child_process_owner),
+        ).r_eff() if child_process_owner is not None else None),
         "candidate_id": proposal.member_candidate_ids[0],
         "selected_proposal_candidate_ids": list(proposal.member_candidate_ids),
         "emitted_winner_candidate_ids": [row["candidate_id"] for row in cleavage_audit if row["winner"]],
@@ -1453,10 +2202,12 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
 
 def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0e-4, 0.0),
                              crack_path_m=None, cleavage_theta_deg=0.0,
-                             state_trace=None):
+                             state_trace=None, boundary_segments=32, radial_layers=12,
+                             qualify_source=False, common_restart_protocol=False):
     state, hole = build_production_void_state(enabled=True, cavity_center_m=cavity_center_m,
                                               crack_path_m=crack_path_m,
-                                              cleavage_theta_deg=cleavage_theta_deg)
+                                              cleavage_theta_deg=cleavage_theta_deg,
+                                              boundary_segments=boundary_segments, radial_layers=radial_layers)
     cfg = VoidingConfig(enabled=True, promotion_radius_m=5.0e-5)
     rows = [observables(state, "available_site")]
     def capture(label):
@@ -1465,7 +2216,8 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     for label in ("multi_hit_1", "multi_hit_2"):
         tensor = local_site_tensor(state); rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
         site = state.void_state.sites[0]
-        dt = max(site.birth.threshold - site.birth.accumulated, 0.0) / (rates["birth_s"] * site.candidate_weight)
+        dt = site.birth.crossing_time_exact(rates["birth_s"] * site.candidate_weight)
+        if dt is None: raise RuntimeError('NO_KINETICALLY_ACTIVE_BIRTH_CANDIDATE')
         void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
         state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))
         rows.append({**observables(state, label), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
@@ -1473,7 +2225,8 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     tensor = local_site_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
     site = state.void_state.sites[0]
-    dt = site.stabilization.threshold / rates["stabilization_s"]
+    dt = site.stabilization.crossing_time_exact(rates["stabilization_s"])
+    if dt is None: raise RuntimeError('NO_KINETICALLY_ACTIVE_STABILIZATION_CANDIDATE')
     void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
     state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))
     rows.append({**observables(state, "stabilization"), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
@@ -1483,30 +2236,35 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
     capture("subgrid_void")
     tensor = local_site_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
-    growth_dt = 2.5e-5 / (cfg.radial_growth_scale_m * rates["series_limited_growth_s"])
+    growth_dt = growth_time_to_radius_exact(state.void_state,state.void_state.cavities[0].cavity_id,5e-5,
+        rates=rates,radial_growth_scale_m=cfg.radial_growth_scale_m)
+    if growth_dt is None:raise RuntimeError('NO_KINETICALLY_ACTIVE_GROWTH_CHANNEL')
     state = replace(state, void_state=update_cavity_growth(
         state.void_state, state.void_state.cavities[0].cavity_id,
         rates=rates, dt_s=growth_dt, radial_growth_scale_m=cfg.radial_growth_scale_m,
     ))
     grown = state.void_state.cavities[0]
     state = equilibrate_fixed_load_with_production_fem(state)
-    rows.append({**observables(state, "subgrid_growth"), "rates": rates, "growth_dt_s": growth_dt})
+    rows.append({**observables(state, "subgrid_growth"), "rates": rates, "growth_dt_s": float(growth_dt)})
     capture("subgrid_growth")
     promoted = promote_cavity(state.void_state, grown.cavity_id, cfg.promotion_radius_m)
     operations = []
     state = remesh_cavity(state, hole, promoted, "promotion", operations)
     rows.append({**observables(state, "geometric_promotion"), "executed_operations": operations})
     capture("geometric_promotion")
-    grown_hole = _grow_hole_boundary(hole, 5.5e-5)
+    grown_hole = _grow_hole_boundary(hole, 5.5e-5,
+                                    crack_path_m=state.crack_network.branch(ROOT_BRANCH_ID).path)
     tensor = cavity_boundary_tensor(state)[0]
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
-    growth_dt = 0.5e-5 / (cfg.radial_growth_scale_m * rates["series_limited_growth_s"])
+    growth_dt = growth_time_to_radius_exact(state.void_state,state.void_state.cavities[0].cavity_id,5.5e-5,
+        rates=rates,radial_growth_scale_m=cfg.radial_growth_scale_m)
+    if growth_dt is None:raise RuntimeError('NO_KINETICALLY_ACTIVE_GROWTH_CHANNEL')
     void_state = update_cavity_growth(
         state.void_state, state.void_state.cavities[0].cavity_id,
         rates=rates, dt_s=growth_dt, radial_growth_scale_m=cfg.radial_growth_scale_m,
     )
     state = remesh_cavity(state, grown_hole, void_state, "resolved-growth")
-    rows.append({**observables(state, "resolved_growth"), "rates": rates, "growth_dt_s": growth_dt})
+    rows.append({**observables(state, "resolved_growth"), "rates": rates, "growth_dt_s": float(growth_dt)})
     capture("resolved_growth")
     if stop_before_ligament:
         return state, rows
@@ -1519,6 +2277,17 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
         "event_classification": "physical_cleavage",
     })
     capture("ligament_rupture")
+    if common_restart_protocol:
+        from .closure_lifecycle_evidence import prepare_common_restart_reload
+        load_operations=[]
+        state=prepare_common_restart_reload(state,load_operations,state_trace,
+            protocol_version=2 if common_restart_protocol=='v2' else 1)
+        rows.append({**observables(state,'common_restart_reload'), 'executed_load_operations':load_operations})
+    if qualify_source:
+        state, source_audit = refine_downstream_source(state, max_refinement_levels=2 if common_restart_protocol in (True,'v1') else 1,
+            refinement_region='complete_cavity_ring', quality_improvement='constrained_v1')
+        rows.append({**observables(state, 'source_resolution_attempt'), 'source_resolution_audit':source_audit})
+        capture('source_resolution_attempt')
     rows.append(observables(state, "connected_topology"))
     tensor, boundary_elements = cavity_boundary_tensor(state)
     rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
@@ -1527,6 +2296,11 @@ def deterministic_trajectory(*, stop_before_ligament=False, cavity_center_m=(7.0
                  "void_birth_rate_s": rates["birth_s"],
                  "classification": "PRE_CLEAVAGE_SURFACE_PROBE"})
     state, result, operations, causal = downstream_front_transaction(state)
+    if result is None:
+        rows.append({**observables(state, "downstream_first_passage_unavailable"),
+                     "executed_operations": operations, "causal_first_passage": causal})
+        capture("downstream_first_passage_unavailable")
+        return state, rows
     rows.append({**observables(state, "new_graph_front"), "executed_operations": operations,
                  "energy_release_J_per_m": result.energy_release_J_per_m,
                  "causal_first_passage": causal})

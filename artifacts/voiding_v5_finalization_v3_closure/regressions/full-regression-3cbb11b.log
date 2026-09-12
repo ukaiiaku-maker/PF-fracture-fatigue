@@ -1,0 +1,458 @@
+........................................................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 22%]
+......................................F................................F [ 30%]
+........................................................................ [ 38%]
+......F................F................................................ [ 45%]
+........................................................................ [ 53%]
+.................................................................FF..... [ 60%]
+............................................................F........... [ 68%]
+........................................................................ [ 76%]
+...........................................................s............ [ 83%]
+........................................................................ [ 91%]
+......................................F................FFFF...F..F...FF. [ 98%]
+...F.F.....                                                              [100%]
+=================================== FAILURES ===================================
+______ test_review_builder_emits_artifact_consumable_by_production_loader ______
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_review_builder_emits_arti0')
+
+    def test_review_builder_emits_artifact_consumable_by_production_loader(tmp_path):
+        responses = []
+        index = 0
+        for opening in (0.0, 0.5, 1.0):
+            for extension in (0.0, 1.0e-5):
+                path = tmp_path / f"S{index:02d}.csv"
+                _write_state(
+                    path,
+                    state_id=f"S{index:02d}",
+                    opening=opening,
+                    extension=extension,
+                    observed_r=1.0 + 0.2 * index,
+                )
+                responses.append(path)
+                index += 1
+    
+        normalization = tmp_path / "normalization.json"
+        normalization.write_text(
+            json.dumps(
+                {
+                    "schema": NORM_SCHEMA,
+                    "normalization_source": "process_zone_geometry_and_line_spacing",
+                    "activation_to_line_content_by_system": [1.0],
+                    "source_capacity_bounds_per_system": [[1.0, 10.0]],
+                    "fitted_to_toughness_or_fatigue": False,
+                    "shielding_attenuation_factor_fitted": False,
+                }
+            )
+        )
+        out = tmp_path / "atlas.json"
+        command = [
+            sys.executable,
+            "scripts/build_v10_2_12_real_signed_atlas.py",
+            "--normalization",
+            str(normalization),
+            "--out",
+            str(out),
+        ]
+        for path in responses:
+            command.extend(["--responses", str(path)])
+        completed = subprocess.run(
+            command,
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+>       assert completed.returncode == 0, completed.stderr + completed.stdout
+E       AssertionError: /private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_review_builder_emits_arti0/S00.audit.json must use one of ['v10.2.12_fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python', 'scrip..._fem_resolved_signed_spatial_station_responses', 'v10.2.14_exact_endpoint_active_signed_spatial_station_responses']\n").returncode
+
+tests/test_real_signed_builder_v10212.py:127: AssertionError
+_____________________ test_required_matrices_are_complete ______________________
+
+    def test_required_matrices_are_complete():
+>       assert len(ROLLBACK_STAGES)==11 and "late_event_veto" in ROLLBACK_STAGES
+E       AssertionError: assert (9 == 11)
+E        +  where 9 = len(('graph_edit', 'remesh', 'field_projection', 'support_rebuild', 'equilibrium', 'energy_gate', ...))
+
+tests/test_stage2_criterion_v12.py:3: AssertionError
+_________________________ test_v10214_capture_model_id _________________________
+
+    def test_v10214_capture_model_id():
+>       assert MODEL_ID == "v10.2.14_live_production_fem_state_capture"
+E       AssertionError: assert 'v10.2.27_liv...urement_clone' == 'v10.2.14_liv...state_capture'
+E         
+E         - v10.2.14_live_production_fem_state_capture
+E         + v10.2.27_live_production_state_capture_with_frozen_measurement_clone
+
+tests/test_v10214_capture_model_id.py:5: AssertionError
+________________________ test_v10214_response_model_id _________________________
+
+    def test_v10214_response_model_id():
+>       assert MODEL_ID == "v10.2.14_exact_endpoint_active_signed_spatial_station_responses"
+E       AssertionError: assert 'v10.2.27_exa...ion_responses' == 'v10.2.14_exa...ion_responses'
+E         
+E         - v10.2.14_exact_endpoint_active_signed_spatial_station_responses
+E         ?       ^^
+E         + v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses
+E         ?       ^^               ++++++++++++++
+
+tests/test_v10214_response_model_id.py:5: AssertionError
+________________ test_zero_event_summary_is_recorded_explicitly ________________
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_zero_event_summary_is_rec0')
+
+    def test_zero_event_summary_is_recorded_explicitly(tmp_path):
+        case = tmp_path / "case"
+        _write_case(case, n_advances=0)
+    
+        _rewrite_summary_event_semantics(
+            ["--out", str(case), "--da-phys", "5e-6"]
+        )
+    
+        row = json.loads((case / "summary.json").read_text())[0]
+        assert row["n_geometry_events"] == 0
+        assert row["n_equivalent_checkpoints_exact"] == 0.0
+        assert row["n_equivalent_checkpoints_rounded"] == 0
+        assert row["nominal_checkpoint_length_m"] == pytest.approx(5.0e-6)
+        assert row["geometry_path_length_m"] == 0.0
+        assert row["geometry_projected_extension_m"] == 0.0
+>       assert row["zero_geometry_events_validated_against_zero_advances"] is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'zero_geometry_events_validated_against_zero_advances'
+
+tests/test_v10_2_27_zero_event_summary.py:36: KeyError
+_________________ test_empty_geometry_rejects_nonzero_advances _________________
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_empty_geometry_rejects_no0')
+
+    def test_empty_geometry_rejects_nonzero_advances(tmp_path):
+        case = tmp_path / "case"
+        _write_case(case, n_advances=1)
+    
+>       with pytest.raises(RuntimeError, match="inconsistent"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/test_v10_2_27_zero_event_summary.py:43: Failed
+____________ test_delegate_reenters_selector_under_global_cycle_cap ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x16fd6eed0>
+
+    def test_delegate_reenters_selector_under_global_cycle_cap(monkeypatch):
+        class Front:
+            persistent_site_cyclic_v10229 = True
+    
+            def preview_cycle_waveform(self, ctrl, waveform, temperature):
+                return prediction()
+    
+            def cycle_step_waveform(
+                self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None
+            ):
+                assert force_cycles is None
+                assert requested_cycles == 123.0
+                assert ctrl.cfg.max_block_cycles == 123.0
+                pred = self.preview_cycle_waveform(ctrl, waveform, temperature)
+                return ctrl.choose_block_cycles_diagnostic(pred, requested_cycles)
+    
+        monkeypatch.setattr(
+            delegate,
+            "select_nonlinear_block",
+            lambda ctrl, pred, requested, linear: {
+                "cycles": requested,
+                "limiter": "nonlinear_test",
+                "unlimited_cycles": requested,
+                "candidate_limits": {"nonlinear_selected_cycles": requested},
+            },
+        )
+        ctrl = controller(max_block=1.0e6)
+        original_max = ctrl.cfg.max_block_cycles
+        delegate.install_engine_native_cycle_preview()
+        try:
+>           out = ctrl.cycle_step_front(
+                Front(), SimpleNamespace(), 300.0,
+                requested_cycles=123.0, force_cycles=123.0,
+            )
+
+tests/test_v10_2_29_vhcf_nonlinear_selector.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+arrhenius_fracture/fatigue_controller_delegate_v10229.py:68: in delegated_step
+    return front.cycle_step_waveform(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_v10_2_29_vhcf_nonlinear_selector.test_delegate_reenters_selector_under_global_cycle_cap.<locals>.Front object at 0x16fd6f560>
+ctrl = <arrhenius_fracture.fatigue_v1.FatigueCycleHazardController object at 0x16fd6f3b0>
+waveform = namespace(), temperature = 300.0, requested_cycles = 123.0
+force_cycles = 123.0
+
+    def cycle_step_waveform(
+        self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None
+    ):
+>       assert force_cycles is None
+E       assert 123.0 is None
+
+tests/test_v10_2_29_vhcf_nonlinear_selector.py:121: AssertionError
+_________ test_deterministic_driver_reaches_real_continued_graph_event _________
+
+    def test_deterministic_driver_reaches_real_continued_graph_event():
+        final, rows = deterministic_trajectory()
+>       assert rows[-1]["operation"] == "continued_accepted_event"
+E       AssertionError: assert 'downstream_f...e_unavailable' == 'continued_accepted_event'
+E         
+E         - continued_accepted_event
+E         + downstream_first_passage_unavailable
+
+tests/test_voiding_v5.py:31: AssertionError
+__ test_downstream_state_updates_rollback_atomically[downstream_phase_update] __
+
+stage = 'downstream_phase_update'
+
+    @pytest.mark.parametrize("stage", [
+        "downstream_phase_update",
+        "downstream_length_ledger_update:ordinary_crack_fractured_length_m",
+        "downstream_length_ledger_update:projected_front_advance_m",
+        "downstream_event_history_update",
+    ])
+    def test_downstream_state_updates_rollback_atomically(stage):
+        accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+        accepted, _ = ligament_transaction(accepted)
+        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+        before = complete_accepted_state_fingerprint(accepted)
+>       with pytest.raises(RuntimeError, match="injected:" + stage):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/test_voiding_v5.py:256: Failed
+_ test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:ordinary_crack_fractured_length_m] _
+
+stage = 'downstream_length_ledger_update:ordinary_crack_fractured_length_m'
+
+    @pytest.mark.parametrize("stage", [
+        "downstream_phase_update",
+        "downstream_length_ledger_update:ordinary_crack_fractured_length_m",
+        "downstream_length_ledger_update:projected_front_advance_m",
+        "downstream_event_history_update",
+    ])
+    def test_downstream_state_updates_rollback_atomically(stage):
+        accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+        accepted, _ = ligament_transaction(accepted)
+        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+        before = complete_accepted_state_fingerprint(accepted)
+>       with pytest.raises(RuntimeError, match="injected:" + stage):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/test_voiding_v5.py:256: Failed
+_ test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:projected_front_advance_m] _
+
+stage = 'downstream_length_ledger_update:projected_front_advance_m'
+
+    @pytest.mark.parametrize("stage", [
+        "downstream_phase_update",
+        "downstream_length_ledger_update:ordinary_crack_fractured_length_m",
+        "downstream_length_ledger_update:projected_front_advance_m",
+        "downstream_event_history_update",
+    ])
+    def test_downstream_state_updates_rollback_atomically(stage):
+        accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+        accepted, _ = ligament_transaction(accepted)
+        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+        before = complete_accepted_state_fingerprint(accepted)
+>       with pytest.raises(RuntimeError, match="injected:" + stage):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/test_voiding_v5.py:256: Failed
+_ test_downstream_state_updates_rollback_atomically[downstream_event_history_update] _
+
+stage = 'downstream_event_history_update'
+
+    @pytest.mark.parametrize("stage", [
+        "downstream_phase_update",
+        "downstream_length_ledger_update:ordinary_crack_fractured_length_m",
+        "downstream_length_ledger_update:projected_front_advance_m",
+        "downstream_event_history_update",
+    ])
+    def test_downstream_state_updates_rollback_atomically(stage):
+        accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+        accepted, _ = ligament_transaction(accepted)
+        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+        before = complete_accepted_state_fingerprint(accepted)
+>       with pytest.raises(RuntimeError, match="injected:" + stage):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/test_voiding_v5.py:256: Failed
+___ test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer ___
+
+    def test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer():
+        accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+        accepted = replace(accepted, competition=_two_horizontal_candidate_competition())
+        accepted, _ = ligament_transaction(accepted)
+        accepted = replace(accepted, competition=replace(
+            accepted.competition,
+            hazard_states=tuple(replace(hazard, current_threshold_action=1.0)
+                                for hazard in accepted.competition.hazard_states),
+        ))
+        downstream, _, _, causal = downstream_front_transaction(accepted)
+>       assert len(causal["emitted_winner_candidate_ids"]) == 2
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'emitted_winner_candidate_ids'
+
+tests/test_voiding_v5.py:311: KeyError
+____ test_zero_drive_connected_state_partitions_restart_and_tensile_reload _____
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_zero_drive_connected_stat0')
+
+    def test_zero_drive_connected_state_partitions_restart_and_tensile_reload(tmp_path):
+        from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
+        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+    
+        fixed_path = ((0.0, 0.0), (0.0005725993004046688, 0.0))
+        accepted, _ = deterministic_trajectory(
+            stop_before_ligament=True, cavity_center_m=(7.0e-4, -1.0e-5),
+            crack_path_m=fixed_path,
+        )
+        connected, result = ligament_transaction(accepted)
+        assert result.accepted
+        assert connected.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID
+        assert connected.crack_network.active_tip_ids == ()
+        assert connected.v12_support_state.active_tip_identities == ()
+        assert all(branch.branch_id != "void-front-1" for branch in connected.crack_network.branches)
+        source = connected.junction_process_state["active_event_source"]
+        assert source["candidate_source_states"][0]["geometry_status"] == \
+            "GEOMETRICALLY_VALID_KINETICALLY_DORMANT"
+        assert source["candidate_source_states"][0]["instantaneous_status"] == \
+            "ZERO_DOWNSTREAM_DRIVE"
+    
+        def invariant(state):
+            return (state.competition, state.rng_state, state.crack_network,
+                    state.v12_support_state, state.void_state.cavities)
+    
+        for partitions in (1, 2, 4, 8, 16):
+            trial = connected
+            before = invariant(trial)
+            for _ in range(partitions):
+                trial, audit = _complete_next_clock(
+                    trial, np.zeros((2, 2)), source_kind="cavity_surface",
+                    source_cavity_id="void:site-1", source_boundary_site_id="connection_exit",
+                    source_position_m=trial.void_state.cavities[0].connection_exit_m,
+                    source_probe_identity={"kind": "direct_cavity_boundary_tensor"},
+                    maximum_advance_duration_s=16.0 / partitions,
+                )
+                assert all(row["effective_rate_s"] == 0.0 for row in audit)
+            assert invariant(trial) == before
+    
+        checkpoint = tmp_path / "zero-drive-connected.json"
+        write_checkpoint(connected, checkpoint)
+        restored = restore_checkpoint(checkpoint)
+        assert complete_accepted_state_fingerprint(restored) == \
+            complete_accepted_state_fingerprint(connected)
+    
+        tensile = np.eye(2) * 8.0e8
+        direct, direct_audit = _complete_next_clock(connected, tensile)
+        restarted, restarted_audit = _complete_next_clock(restored, tensile)
+        assert direct.competition == restarted.competition
+        assert direct_audit == restarted_audit
+>       assert any(row["winner"] for row in direct_audit)
+E       assert False
+E        +  where False = any(<generator object test_zero_drive_connected_state_partitions_restart_and_tensile_reload.<locals>.<genexpr> at 0x117926dc0>)
+
+tests/test_voiding_v5.py:421: AssertionError
+_____ test_connected_and_downstream_states_own_zero_then_one_active_front ______
+
+tmp_path = PosixPath('/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/pytest-of-shen/pytest-63/test_connected_and_downstream_0')
+
+    def test_connected_and_downstream_states_own_zero_then_one_active_front(tmp_path):
+        from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
+        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+        accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+        connected, _ = ligament_transaction(accepted)
+        assert connected.crack_network.active_tip_ids == ()
+        assert connected.v12_support_state.active_tip_identities == ()
+        connected_path = tmp_path / "connected.json"
+        write_checkpoint(connected, connected_path)
+        assert complete_accepted_state_fingerprint(restore_checkpoint(connected_path)) == complete_accepted_state_fingerprint(connected)
+    
+        downstream, _, _, _ = downstream_front_transaction(connected)
+        assert downstream.crack_network.branch("b00000000").status == "arrested"
+>       assert downstream.crack_network.active_tip_ids == ("void-front-1",)
+E       AssertionError: assert () == ('void-front-1',)
+E         
+E         Right contains one more item: 'void-front-1'
+E         Use -v to get more diff
+
+tests/test_voiding_v5.py:489: AssertionError
+_________________ test_downstream_child_activation_rolls_back __________________
+
+    def test_downstream_child_activation_rolls_back():
+        accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+        accepted, _ = ligament_transaction(accepted)
+        from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+        before = complete_accepted_state_fingerprint(accepted)
+>       with pytest.raises(RuntimeError, match="injected:downstream_child_activation"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/test_voiding_v5.py:501: Failed
+__ test_continuation_uses_child_tip_source_and_recomputes_three_body_topology __
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x17d538d70>
+
+    def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(monkeypatch):
+        import arrhenius_fracture.voiding_production_v5 as production
+        accepted, _ = deterministic_trajectory(stop_before_ligament=True)
+        connected, _ = ligament_transaction(accepted)
+        downstream, _, _, first = downstream_front_transaction(connected)
+        assert first["source_kind"] == "cavity_surface"
+        certificate = downstream.junction_process_state["latest_crack_void_connection_certificate"]
+>       assert certificate["combined_components"] == ((
+            "branch:b00000000", "branch:void-front-1", "cavity:void:site-1",
+        ),)
+E       AssertionError: assert (('branch:b00...oid:site-1'),) == (('branch:b00...oid:site-1'),)
+E         
+E         At index 0 diff: ('branch:b00000000', 'cavity:void:site-1') != ('branch:b00000000', 'branch:void-front-1', 'cavity:void:site-1')
+E         Use -v to get more diff
+
+tests/test_voiding_v5.py:623: AssertionError
+________ test_equilibrium_metrics_separate_free_residual_from_reactions ________
+
+    def test_equilibrium_metrics_separate_free_residual_from_reactions():
+        final, rows = deterministic_trajectory()
+        row = rows[-1]
+        assert row["free_dof_residual_l2_N_per_m"] < 1.0e-8 * row["constrained_reaction_l2_N_per_m"]
+        assert row["top_bottom_reaction_balance"] < 3.0e-2
+        assert row["energy_reaction_identity"] < 1.0e-2
+        assert row["full_residual_including_reactions_N_per_m"] == pytest.approx(
+            row["constrained_reaction_l2_N_per_m"], rel=1.0e-12
+        )
+>       assert final.crack_network.active_tip_ids == ("void-front-1",)
+E       AssertionError: assert () == ('void-front-1',)
+E         
+E         Right contains one more item: 'void-front-1'
+E         Use -v to get more diff
+
+tests/test_voiding_v5.py:672: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader
+FAILED tests/test_stage2_criterion_v12.py::test_required_matrices_are_complete
+FAILED tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id - ...
+FAILED tests/test_v10214_response_model_id.py::test_v10214_response_model_id
+FAILED tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly
+FAILED tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances
+FAILED tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap
+FAILED tests/test_voiding_v5.py::test_deterministic_driver_reaches_real_continued_graph_event
+FAILED tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_phase_update]
+FAILED tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:ordinary_crack_fractured_length_m]
+FAILED tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:projected_front_advance_m]
+FAILED tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_event_history_update]
+FAILED tests/test_voiding_v5.py::test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer
+FAILED tests/test_voiding_v5.py::test_zero_drive_connected_state_partitions_restart_and_tensile_reload
+FAILED tests/test_voiding_v5.py::test_connected_and_downstream_states_own_zero_then_one_active_front
+FAILED tests/test_voiding_v5.py::test_downstream_child_activation_rolls_back
+FAILED tests/test_voiding_v5.py::test_continuation_uses_child_tip_source_and_recomputes_three_body_topology
+FAILED tests/test_voiding_v5.py::test_equilibrium_metrics_separate_free_residual_from_reactions
+18 failed, 928 passed, 1 skipped in 141.39s (0:02:21)

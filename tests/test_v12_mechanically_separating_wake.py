@@ -102,6 +102,18 @@ def test_boundary_terminal_context_fail_closed_classifications(mutation,expected
                           return_uncertified_audit_for_screen=True)
     assert audit.boundary_terminal_certificates[0]["classification"]==expected
 
+def test_boundary_terminal_context_filters_non_edges_without_array_membership_aliasing():
+    m=mesh(n=65); net=network(((0.,0.),(.75,.2)))
+    context=left_free_context(m,net)
+    arc_id=next(iter(context)); row=dict(context[arc_id][0])
+    # Both node IDs occur somewhere on the boundary, but this pair is not an
+    # edge. NumPy array membership used to admit it and then raise KeyError.
+    row["boundary_edge_ids"]=(row["boundary_edge_ids"][0],(64,4160))
+    _,audit=_graph_support(m,net,boundary_terminal_context={arc_id:(row,)},
+                          allow_offgrid_active_tips_for_screen=True,
+                          return_uncertified_audit_for_screen=True)
+    assert audit.boundary_terminal_certificates[0]["classification"]=="BOUNDARY_ENDPOINT_NOT_EXACTLY_INCIDENT"
+
 def test_active_tip_may_not_use_boundary_terminal_clipping():
     m=mesh(n=65); net=network(((.25,0.),(1.,0.)))
     n=65; right=tuple((j*n+n-1,(j+1)*n+n-1) for j in range(n-1))

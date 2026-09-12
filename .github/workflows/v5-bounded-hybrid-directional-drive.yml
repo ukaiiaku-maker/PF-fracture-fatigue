@@ -1,0 +1,214 @@
+name: V5 bounded hybrid directional drive hardening
+
+on:
+  push:
+    branches:
+      - codex/sharp-front-stateful-voiding-v5-finalization-v2
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-bounded-hybrid-directional-drive-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bounded-hybrid-directional-drive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      VOIDING_V5_SOURCE_COMMIT: ${{ github.sha }}
+      PRIOR_HYBRID_IMPLEMENTATION_SHA: 2faba01ed68d0e2474c88ecf98d2c75b0ce05eb9
+      HARDENING_IMPLEMENTATION_SHA: b58997bdb18cf4e9a32c251c073115d8b405bb27
+    steps:
+      - name: Initialize bounded attestation directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-hybrid-directional-drive" >> "$GITHUB_ENV"
+          mkdir -p "${RUNNER_TEMP}/v5-hybrid-directional-drive"
+
+      - name: Depth-one partial sparse checkout of bounded inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git config remote.origin.promisor true
+          git config remote.origin.partialclonefilter blob:none
+          git sparse-checkout init --no-cone
+          git sparse-checkout set --no-cone \
+            /arrhenius_fracture/ \
+            /tests/__init__.py \
+            /tests/test_live_topology_kernel_v11.py \
+            /tests/test_v5_hybrid_directional_drive.py \
+            /pyproject.toml \
+            /requirements-v5-source-resolution-ci.txt \
+            /docs/V5_HYBRID_DIRECTIONAL_DRIVE_REUSE_REPORT.md \
+            /artifacts/voiding_v5_finalization_v2/checkpoints/connected_before_downstream.json \
+            /artifacts/voiding_v5_finalization_v2/checkpoints/connected_before_downstream.json.state.pkl \
+            /artifacts/voiding_v5_finalization_v2/checkpoints/downstream_front_before_continuation.json \
+            /artifacts/voiding_v5_finalization_v2/checkpoints/downstream_front_before_continuation.json.state.pkl
+          git -c protocol.version=2 fetch --no-tags --depth=1 --filter=blob:none origin "$GITHUB_SHA"
+          git checkout --detach FETCH_HEAD
+          git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Set up pinned Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+          cache-dependency-path: requirements-v5-source-resolution-ci.txt
+
+      - name: Install frozen numerical environment
+        run: python -m pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+
+      - name: Record environment and exact-head identity
+        run: |
+          set -euo pipefail
+          {
+            echo "prior_hybrid_implementation_sha=$PRIOR_HYBRID_IMPLEMENTATION_SHA"
+            echo "hardening_implementation_sha=$HARDENING_IMPLEMENTATION_SHA"
+            echo "workflow_sha=$GITHUB_SHA"
+            python --version
+            python -m pip --version
+            python -m pip freeze
+          } | tee "$ATTESTATION_DIR/environment.txt"
+
+      - name: Compile bounded provider sources
+        run: python -m compileall -q arrhenius_fracture tests/test_v5_hybrid_directional_drive.py
+
+      - name: Freeze and collect exactly fifteen bounded tests
+        run: |
+          set -euo pipefail
+          TEST_NODES=(
+            tests/test_v5_hybrid_directional_drive.py::test_1_no_void_root_provider_parity_is_exact
+            tests/test_v5_hybrid_directional_drive.py::test_2_two_tip_branching_ownership_never_mixes_scalar_or_state_identity
+            tests/test_v5_hybrid_directional_drive.py::test_3_far_void_child_uses_valid_nested_local_J
+            tests/test_v5_hybrid_directional_drive.py::test_4_overlap_local_and_marginal_agree_without_blending
+            tests/test_v5_hybrid_directional_drive.py::test_5_near_void_rejects_contour_and_requires_converged_exact_marginal
+            tests/test_v5_hybrid_directional_drive.py::test_6_reflected_candidate_pair_has_symmetric_directional_drive
+            tests/test_v5_hybrid_directional_drive.py::test_7_real_child_continuation_uses_one_hybrid_first_passage_and_topology_action
+            tests/test_v5_hybrid_directional_drive.py::test_8_converged_marginal_family_uses_smallest_delta_on_finest_mesh
+            tests/test_v5_hybrid_directional_drive.py::test_9_mesh_nonconvergence_rejects_finite_certified_family
+            tests/test_v5_hybrid_directional_drive.py::test_10_delta_a_nonconvergence_rejects_mesh_converged_family
+            tests/test_v5_hybrid_directional_drive.py::test_11_incomplete_or_uncertified_marginal_family_is_unavailable
+            tests/test_v5_hybrid_directional_drive.py::test_12_sign_inconsistent_family_is_unavailable_except_at_numerical_zero
+            tests/test_v5_hybrid_directional_drive.py::test_13_actual_process_owner_and_absent_owner_fail_closed_before_trial
+            tests/test_v5_hybrid_directional_drive.py::test_14_two_fronts_share_one_process_owner_without_cache_or_observation_collision
+            tests/test_v5_hybrid_directional_drive.py::test_15_expected_noncertification_fails_closed_and_programming_errors_propagate
+          )
+          printf '%s\n' "${TEST_NODES[@]}" | tee "$ATTESTATION_DIR/requested-node-inventory.txt"
+          test "$(sort -u "$ATTESTATION_DIR/requested-node-inventory.txt" | wc -l | tr -d ' ')" = 15
+          python -m pytest --collect-only -q -p no:cacheprovider "${TEST_NODES[@]}" \
+            | tee "$ATTESTATION_DIR/collect-only.log"
+          grep -E '^[^[:space:]]+::' "$ATTESTATION_DIR/collect-only.log" \
+            > "$ATTESTATION_DIR/collected-node-inventory.txt"
+          test "$(sort -u "$ATTESTATION_DIR/collected-node-inventory.txt" | wc -l | tr -d ' ')" = 15
+          diff -u \
+            <(sort "$ATTESTATION_DIR/requested-node-inventory.txt") \
+            <(sort "$ATTESTATION_DIR/collected-node-inventory.txt")
+
+      - name: Run the fifteen bounded tests once
+        id: bounded_tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          TEST_NODES=(
+            tests/test_v5_hybrid_directional_drive.py::test_1_no_void_root_provider_parity_is_exact
+            tests/test_v5_hybrid_directional_drive.py::test_2_two_tip_branching_ownership_never_mixes_scalar_or_state_identity
+            tests/test_v5_hybrid_directional_drive.py::test_3_far_void_child_uses_valid_nested_local_J
+            tests/test_v5_hybrid_directional_drive.py::test_4_overlap_local_and_marginal_agree_without_blending
+            tests/test_v5_hybrid_directional_drive.py::test_5_near_void_rejects_contour_and_requires_converged_exact_marginal
+            tests/test_v5_hybrid_directional_drive.py::test_6_reflected_candidate_pair_has_symmetric_directional_drive
+            tests/test_v5_hybrid_directional_drive.py::test_7_real_child_continuation_uses_one_hybrid_first_passage_and_topology_action
+            tests/test_v5_hybrid_directional_drive.py::test_8_converged_marginal_family_uses_smallest_delta_on_finest_mesh
+            tests/test_v5_hybrid_directional_drive.py::test_9_mesh_nonconvergence_rejects_finite_certified_family
+            tests/test_v5_hybrid_directional_drive.py::test_10_delta_a_nonconvergence_rejects_mesh_converged_family
+            tests/test_v5_hybrid_directional_drive.py::test_11_incomplete_or_uncertified_marginal_family_is_unavailable
+            tests/test_v5_hybrid_directional_drive.py::test_12_sign_inconsistent_family_is_unavailable_except_at_numerical_zero
+            tests/test_v5_hybrid_directional_drive.py::test_13_actual_process_owner_and_absent_owner_fail_closed_before_trial
+            tests/test_v5_hybrid_directional_drive.py::test_14_two_fronts_share_one_process_owner_without_cache_or_observation_collision
+            tests/test_v5_hybrid_directional_drive.py::test_15_expected_noncertification_fails_closed_and_programming_errors_propagate
+          )
+          started="$(date +%s)"
+          set +e
+          python -m pytest -vv -s -p no:cacheprovider --durations=0 \
+            --junitxml="$ATTESTATION_DIR/pytest-junit.xml" "${TEST_NODES[@]}" \
+            2>&1 | tee "$ATTESTATION_DIR/pytest.log"
+          pytest_status="${PIPESTATUS[0]}"
+          set -e
+          finished="$(date +%s)"
+          echo "elapsed_seconds=$((finished - started))" | tee "$ATTESTATION_DIR/elapsed.txt"
+          python - "$ATTESTATION_DIR/pytest-junit.xml" > "$ATTESTATION_DIR/pytest-counts.txt" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse(sys.argv[1]).getroot()
+          suites = [root] if root.tag == "testsuite" else list(root.findall("testsuite"))
+          totals = {key: sum(int(suite.attrib.get(key, 0)) for suite in suites)
+                    for key in ("tests", "failures", "errors", "skipped")}
+          print(f"tests={totals['tests']}")
+          print(f"passed={totals['tests']-totals['failures']-totals['errors']-totals['skipped']}")
+          print(f"failures={totals['failures']}")
+          print(f"errors={totals['errors']}")
+          print(f"skipped={totals['skipped']}")
+          PY
+          cat "$ATTESTATION_DIR/pytest-counts.txt"
+          sed -n 's/^.*MARGINAL_DIAGNOSTICS //p' "$ATTESTATION_DIR/pytest.log" \
+            > "$ATTESTATION_DIR/convergence-diagnostics.jsonl"
+          test "$(wc -l < "$ATTESTATION_DIR/convergence-diagnostics.jsonl" | tr -d ' ')" = 7
+          grep -q 'test_7_real_child_continuation_uses_one_hybrid_first_passage_and_topology_action' \
+            "$ATTESTATION_DIR/pytest.log"
+          echo 'retained_child_continuation=PASS_ONCE' \
+            > "$ATTESTATION_DIR/retained-child-continuation.txt"
+          test "$pytest_status" = 0
+          grep -Fxq 'tests=15' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'passed=15' "$ATTESTATION_DIR/pytest-counts.txt"
+
+      - name: Verify clean worker and record classifications
+        if: always()
+        env:
+          TEST_OUTCOME: ${{ steps.bounded_tests.outcome }}
+        run: |
+          set -euo pipefail
+          git diff --check > "$ATTESTATION_DIR/worktree-diff-check.txt"
+          echo 'worktree_diff_check=PASS' >> "$ATTESTATION_DIR/worktree-diff-check.txt"
+          git status --porcelain=v1 > "$ATTESTATION_DIR/git-status.txt"
+          test ! -s "$ATTESTATION_DIR/git-status.txt"
+          echo 'clean_worktree=PASS' > "$ATTESTATION_DIR/clean-worktree.txt"
+          {
+            echo "prior_hybrid_implementation_sha=$PRIOR_HYBRID_IMPLEMENTATION_SHA"
+            echo "hardening_implementation_sha=$HARDENING_IMPLEMENTATION_SHA"
+            echo "workflow_sha=$GITHUB_SHA"
+            echo "bounded_test_step_outcome=$TEST_OUTCOME"
+            if test "$TEST_OUTCOME" = success; then
+              echo 'DIRECTIONAL_CRACK_DRIVE_PROVIDER=PASS_HYBRID_LOCAL_J_AND_CONVERGED_EXACT_MARGINAL_G'
+              echo 'DIRECTIONAL_K_KINETIC_INTERPRETATION=ENERGY_EQUIVALENT_CANDIDATE_LOAD'
+              echo 'VOID_INTERACTION_IN_DIRECTIONAL_DRIVE=PASS_EXACT_FEM'
+              echo 'PRODUCTION_RUNTIME_MARGINAL_CONVERGENCE_GUARD=PASS'
+              echo 'PROCESS_OWNER_IDENTITY=PASS_CANONICAL_PRODUCTION_OWNER'
+              echo 'EXPECTED_NONCERTIFICATION_EXCEPTION_TAXONOMY=PASS'
+              echo 'UNEXPECTED_PROGRAMMING_EXCEPTIONS_PROPAGATE=PASS'
+              echo 'EXISTING_R_TIP_LAW_REUSED_BY_DOWNSTREAM_CHILD=PASS'
+              echo 'DIRECT_R_VOID_SUBSTITUTION=ABSENT'
+              echo 'CLASSICAL_ABSOLUTE_WILLIAMS_KI_KII=NOT_CLAIMED'
+              echo 'CONFORMING_TIP_PATCH=NOT_REQUIRED_FOR_KINETIC_EVENT_SELECTION'
+              echo 'FIRST_PASSAGE_AND_TOPOLOGY_OWNERSHIP=PASS_SINGLE_ACTION'
+              echo 'CHECKPOINT_RESTORE=PASS_IDENTICAL_DIRECTIONAL_DRIVE'
+            else
+              echo 'BOUNDED_HYBRID_CLASSIFICATIONS=NOT_ATTESTED'
+            fi
+          } | tee "$ATTESTATION_DIR/classifications.txt"
+
+      - name: Upload bounded attestation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-bounded-hybrid-directional-drive-${{ github.sha }}
+          path: ${{ runner.temp }}/v5-hybrid-directional-drive/
+          if-no-files-found: error
+          retention-days: 14

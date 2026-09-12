@@ -1,0 +1,5667 @@
+{
+  "actual_operations": [
+    {
+      "accepted_post_interval_fingerprint": "84f19c4252009925b871626500a5a653f9f3db271f2c4469928038f0c90892fc",
+      "accepted_pre_interval_fingerprint": "d7ce97c451aac303897bbdd2dcdb6c751ae14df27d872c75a0b194e4a58769bb",
+      "api": "advance_site",
+      "duration_s": 1.1520726638668516e-09,
+      "events": [
+        "BIRTH_HIT"
+      ],
+      "physical_time_s": 1.1520726638668516e-09,
+      "rates": {
+        "birth_activation_work_J": 3.468615433326868e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848066e-21,
+        "birth_normal_opening_work_J": 3.6106713305891086e-22,
+        "birth_s": 84551588.452059,
+        "birth_signed_shear_work_J": 2.234358698315032e-23,
+        "healing_activation_work_J": -2.838660826468107e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424033,
+        "local_in_plane_mean_stress_Pa": 177992579.612585,
+        "local_max_principal_stress_Pa": 283866082.6468107,
+        "local_normal_opening_stress_Pa": 72213426.61178216,
+        "local_sigma_zz_Pa": 106795547.767551,
+        "local_signed_shear_stress_Pa": 4468717.396630065,
+        "local_von_mises_stress_Pa": 196714547.70239383,
+        "plastic_accommodation_s": 374681522.67328364,
+        "series_limited_growth_s": 240911305.80175853,
+        "stabilization_activation_work_J": 2.838660826468107e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.3340435,
+        "vacancy_transport_s": 809716953.2985822
+      },
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "7cc170c7f58389d1c30080ee44a9fc2ca55984a1a5d2ecfbb282a0a448bef3e2",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "802b90c7a23cdebe31f62c473186550df796f5535a231a735e059f1eb43723b4"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "d63286add4ce4dd41e86f902d48f2533e3a0a70124a99f7eb0ef65a864490dc6",
+      "accepted_pre_interval_fingerprint": "84f19c4252009925b871626500a5a653f9f3db271f2c4469928038f0c90892fc",
+      "api": "advance_site",
+      "duration_s": 7.1770747378857805e-09,
+      "events": [
+        "EMBRYO"
+      ],
+      "physical_time_s": 8.329147401752632e-09,
+      "rates": {
+        "birth_activation_work_J": 3.468615433326868e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848066e-21,
+        "birth_normal_opening_work_J": 3.6106713305891086e-22,
+        "birth_s": 84551588.452059,
+        "birth_signed_shear_work_J": 2.234358698315032e-23,
+        "healing_activation_work_J": -2.838660826468107e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424033,
+        "local_in_plane_mean_stress_Pa": 177992579.612585,
+        "local_max_principal_stress_Pa": 283866082.6468107,
+        "local_normal_opening_stress_Pa": 72213426.61178216,
+        "local_sigma_zz_Pa": 106795547.767551,
+        "local_signed_shear_stress_Pa": 4468717.396630065,
+        "local_von_mises_stress_Pa": 196714547.70239383,
+        "plastic_accommodation_s": 374681522.67328364,
+        "series_limited_growth_s": 240911305.80175853,
+        "stabilization_activation_work_J": 2.838660826468107e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.3340435,
+        "vacancy_transport_s": 809716953.2985822
+      },
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "7cc170c7f58389d1c30080ee44a9fc2ca55984a1a5d2ecfbb282a0a448bef3e2",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "802b90c7a23cdebe31f62c473186550df796f5535a231a735e059f1eb43723b4"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "803bada07ce7f74faf4d5d039ca86adb1cdd078eb20e8b0deb36266aa990ff84",
+      "accepted_pre_interval_fingerprint": "d63286add4ce4dd41e86f902d48f2533e3a0a70124a99f7eb0ef65a864490dc6",
+      "api": "advance_site",
+      "duration_s": 2.38426253027109e-10,
+      "events": [
+        "STABILIZED"
+      ],
+      "physical_time_s": 8.56757365477974e-09,
+      "rates": {
+        "birth_activation_work_J": 3.468615433326868e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848066e-21,
+        "birth_normal_opening_work_J": 3.6106713305891086e-22,
+        "birth_s": 84551588.452059,
+        "birth_signed_shear_work_J": 2.234358698315032e-23,
+        "healing_activation_work_J": -2.838660826468107e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424033,
+        "local_in_plane_mean_stress_Pa": 177992579.612585,
+        "local_max_principal_stress_Pa": 283866082.6468107,
+        "local_normal_opening_stress_Pa": 72213426.61178216,
+        "local_sigma_zz_Pa": 106795547.767551,
+        "local_signed_shear_stress_Pa": 4468717.396630065,
+        "local_von_mises_stress_Pa": 196714547.70239383,
+        "plastic_accommodation_s": 374681522.67328364,
+        "series_limited_growth_s": 240911305.80175853,
+        "stabilization_activation_work_J": 2.838660826468107e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.3340435,
+        "vacancy_transport_s": 809716953.2985822
+      },
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "7cc170c7f58389d1c30080ee44a9fc2ca55984a1a5d2ecfbb282a0a448bef3e2",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "802b90c7a23cdebe31f62c473186550df796f5535a231a735e059f1eb43723b4"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "6d7bbeb18f91bc0b93ccb4f78e308fa8e3fbafba1becb2eefceade54a5fca160",
+      "accepted_pre_interval_fingerprint": "803bada07ce7f74faf4d5d039ca86adb1cdd078eb20e8b0deb36266aa990ff84",
+      "api": "create_subgrid_cavity",
+      "duration_s": 0.0,
+      "events": [
+        "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+      ],
+      "physical_time_s": 8.56757365477974e-09,
+      "radius_m": 2.5e-05,
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "7cc170c7f58389d1c30080ee44a9fc2ca55984a1a5d2ecfbb282a0a448bef3e2",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "72daa55a2cdd830288031933b6425d7cf4eb9cbba55e7e70531a6d039a329e70"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "581278390533ec2c6c5af23e0574ad3da3b2a824315154fafa0524a46ab0dbcf",
+      "accepted_pre_interval_fingerprint": "6d7bbeb18f91bc0b93ccb4f78e308fa8e3fbafba1becb2eefceade54a5fca160",
+      "api": "state_owned_growth",
+      "duration_s": 3.99143242634522e-06,
+      "operations": [],
+      "physical_time_s": 4e-06,
+      "rates": {
+        "birth_activation_work_J": 3.4686154333268836e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848092e-21,
+        "birth_normal_opening_work_J": 3.6106713305890997e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.234358698316509e-23,
+        "healing_activation_work_J": -2.8386608264681125e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424048,
+        "local_in_plane_mean_stress_Pa": 177992579.61258516,
+        "local_max_principal_stress_Pa": 283866082.64681125,
+        "local_normal_opening_stress_Pa": 72213426.611782,
+        "local_sigma_zz_Pa": 106795547.7675511,
+        "local_signed_shear_stress_Pa": 4468717.396633019,
+        "local_von_mises_stress_Pa": 196714547.7023946,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.8017587,
+        "stabilization_activation_work_J": 2.8386608264681125e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.3340435,
+        "vacancy_transport_s": 809716953.2985822
+      },
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "7cc170c7f58389d1c30080ee44a9fc2ca55984a1a5d2ecfbb282a0a448bef3e2",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "05d44fa8caa8fdff491a9b708cf1db69ad4c4ac3767d5f8d8aef4b7ca637eeb1"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "743d275b00aca1cb0f6a03482f37d59e1f8ef5f799092f810d6daba42ca485e9",
+      "accepted_pre_interval_fingerprint": "581278390533ec2c6c5af23e0574ad3da3b2a824315154fafa0524a46ab0dbcf",
+      "api": "state_owned_growth",
+      "duration_s": 4e-06,
+      "operations": [],
+      "physical_time_s": 8e-06,
+      "rates": {
+        "birth_activation_work_J": 3.4686154333268934e-21,
+        "birth_hydrostatic_work_J": 3.085204713284815e-21,
+        "birth_normal_opening_work_J": 3.6106713305891246e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.2343586983165979e-23,
+        "healing_activation_work_J": -2.8386608264681147e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424075,
+        "local_in_plane_mean_stress_Pa": 177992579.61258548,
+        "local_max_principal_stress_Pa": 283866082.6468115,
+        "local_normal_opening_stress_Pa": 72213426.61178249,
+        "local_sigma_zz_Pa": 106795547.76755129,
+        "local_signed_shear_stress_Pa": 4468717.396633196,
+        "local_von_mises_stress_Pa": 196714547.7023944,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.80175877,
+        "stabilization_activation_work_J": 2.8386608264681147e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.334047,
+        "vacancy_transport_s": 809716953.2985829
+      },
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "7cc170c7f58389d1c30080ee44a9fc2ca55984a1a5d2ecfbb282a0a448bef3e2",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "4cfd31cce4957974416c78bf106d7a335f72eec6fe746fe9797c059611cbc1ac"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "e2c3f5239022efb637fb3cd3fe82efa9affaea0f6886d6fde402be91ca282f8e",
+      "accepted_pre_interval_fingerprint": "743d275b00aca1cb0f6a03482f37d59e1f8ef5f799092f810d6daba42ca485e9",
+      "api": "state_owned_growth",
+      "duration_s": 2.3858306567630593e-06,
+      "operations": [],
+      "physical_time_s": 1.0385830656763059e-05,
+      "rates": {
+        "birth_activation_work_J": 3.468615433326889e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848122e-21,
+        "birth_normal_opening_work_J": 3.6106713305891166e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.234358698316501e-23,
+        "healing_activation_work_J": -2.8386608264681136e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424063,
+        "local_in_plane_mean_stress_Pa": 177992579.61258537,
+        "local_max_principal_stress_Pa": 283866082.64681137,
+        "local_normal_opening_stress_Pa": 72213426.61178233,
+        "local_sigma_zz_Pa": 106795547.76755121,
+        "local_signed_shear_stress_Pa": 4468717.396633002,
+        "local_von_mises_stress_Pa": 196714547.70239446,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.80175877,
+        "stabilization_activation_work_J": 2.8386608264681136e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.334047,
+        "vacancy_transport_s": 809716953.2985829
+      },
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "7cc170c7f58389d1c30080ee44a9fc2ca55984a1a5d2ecfbb282a0a448bef3e2",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "45187de23cd323681b8163b82583f698d78c528a774cbc4f7a6a02fb3777d788"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "395c8f31bdad006c1ddf0f399cd0914c743ac5fffdf7771da3913be9d5aa3a83",
+      "accepted_pre_interval_fingerprint": "e2c3f5239022efb637fb3cd3fe82efa9affaea0f6886d6fde402be91ca282f8e",
+      "api": "promotion_remesh",
+      "duration_s": 0.0,
+      "events": [
+        "GEOMETRIC_PROMOTION"
+      ],
+      "operations": [
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "equilibrium"
+      ],
+      "physical_time_s": 1.0385830656763059e-05,
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "actual_cavity_cycle": {
+          "boundary_edge_count": 32,
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              16
+            ],
+            [
+              16,
+              17
+            ],
+            [
+              17,
+              18
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_node_count": 32,
+          "boundary_node_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "connected_component_count": 1,
+          "passed": true,
+          "topology": "single_closed_cavity_boundary_cycle"
+        },
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "e512cb6d8fbcab7f1a596ff86fdd4fa555853f1a961115fdf2703ab92b8a3014",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "312fe07f30a71f40e42757e0f546c935724d96491d324136c1679384330e098b",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "6ff20968040e256340abf0c6d852aa87f099c84d4c109d29189274d54137fe1f"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "0b01b0ab286975e1c02b402ffa602fb1251d1fdf7e679929fb5e2ad119591f41",
+      "accepted_pre_interval_fingerprint": "395c8f31bdad006c1ddf0f399cd0914c743ac5fffdf7771da3913be9d5aa3a83",
+      "api": "state_owned_growth",
+      "duration_s": 1.4132348815927171e-06,
+      "operations": [
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "equilibrium"
+      ],
+      "physical_time_s": 1.1799065538355775e-05,
+      "rates": {
+        "birth_activation_work_J": 9.180339212754163e-21,
+        "birth_hydrostatic_work_J": 8.906149793634459e-21,
+        "birth_normal_opening_work_J": 3.6506734725398405e-22,
+        "birth_s": 133891106.05406214,
+        "birth_signed_shear_work_J": -9.087792813428097e-23,
+        "healing_activation_work_J": -9.54993756071183e-21,
+        "healing_s": 148296094.83058313,
+        "local_hydrostatic_stress_Pa": 445307489.68172294,
+        "local_in_plane_mean_stress_Pa": 513816334.2481419,
+        "local_max_principal_stress_Pa": 954993756.0711831,
+        "local_normal_opening_stress_Pa": 73013469.45079681,
+        "local_sigma_zz_Pa": 308289800.5488851,
+        "local_signed_shear_stress_Pa": -18175585.626856193,
+        "local_von_mises_stress_Pa": 791298748.0299135,
+        "plastic_accommodation_s": 604609379.5369382,
+        "series_limited_growth_s": 353798230.2251834,
+        "stabilization_activation_work_J": 9.54993756071183e-21,
+        "stabilization_s": 3449101936.7601285,
+        "surface_reaction_s": 5117703890.900219,
+        "vacancy_transport_s": 1023427078.1937077
+      },
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "actual_cavity_cycle": {
+          "boundary_edge_count": 32,
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              16
+            ],
+            [
+              16,
+              17
+            ],
+            [
+              17,
+              18
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_node_count": 32,
+          "boundary_node_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "connected_component_count": 1,
+          "passed": true,
+          "topology": "single_closed_cavity_boundary_cycle"
+        },
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "cffdfd4d2abcde68b40ae45c1aae5ba225d05218bd0fff9ab6c0a9b181d0c50a",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "84428b3fbc7714bd4b40d2958c813a40c4152c8148d02d0237d23bb6d0972d35",
+              "endpoint_footprint_error_m": 3.127613045673396e-05,
+              "forward_leakage_m": 3.127613045673396e-05,
+              "forward_leakage_over_h_local": 0.20800967007373042,
+              "forward_overshoot_m": 3.127613045673396e-05,
+              "h_local_max_m": 0.00015035902150918238,
+              "h_local_median_m": 8.766453237906849e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.989436857684215e-07,
+              "selected_area_over_length_h_local": 2.310733474754197,
+              "signed_tip_footprint_m": 3.127613045673396e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9283810891484114,
+              "tube_boundary_clearance_m": 3.467993576123583e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            420,
+            421,
+            483,
+            484,
+            485,
+            486,
+            487,
+            546,
+            547,
+            548,
+            549,
+            550,
+            551,
+            610,
+            611,
+            612,
+            613,
+            614,
+            615,
+            617,
+            674,
+            675,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            740,
+            741,
+            742,
+            743,
+            744,
+            745
+          ],
+          "positive_seed_element_ids": [
+            406,
+            407,
+            468,
+            469,
+            470,
+            471,
+            473,
+            532,
+            533,
+            534,
+            535,
+            536,
+            537,
+            595,
+            596,
+            597,
+            598,
+            599,
+            600,
+            601,
+            658,
+            659,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            722,
+            723,
+            724,
+            725,
+            726,
+            727
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "2384c1fedecb30edd14ffd332e3294c28d3a5c713ef7ab9762a90339bdca30ea"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "54195f2a0e138e373ec275b2be67b0b153356ac1d3cd73ff3c6de8ce13629da7",
+      "accepted_pre_interval_fingerprint": "0b01b0ab286975e1c02b402ffa602fb1251d1fdf7e679929fb5e2ad119591f41",
+      "api": "ligament_hazard_interval",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 2.009344616442232e-07,
+          "crossing_time_s": 375091633557684.0,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927937,
+          "winner": false
+        }
+      ],
+      "duration_s": 2.009344616442232e-07,
+      "events": [],
+      "physical_time_s": 1.2e-05,
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "actual_cavity_cycle": {
+          "boundary_edge_count": 32,
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              16
+            ],
+            [
+              16,
+              17
+            ],
+            [
+              17,
+              18
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_node_count": 32,
+          "boundary_node_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "connected_component_count": 1,
+          "passed": true,
+          "topology": "single_closed_cavity_boundary_cycle"
+        },
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "cffdfd4d2abcde68b40ae45c1aae5ba225d05218bd0fff9ab6c0a9b181d0c50a",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "84428b3fbc7714bd4b40d2958c813a40c4152c8148d02d0237d23bb6d0972d35",
+              "endpoint_footprint_error_m": 3.127613045673396e-05,
+              "forward_leakage_m": 3.127613045673396e-05,
+              "forward_leakage_over_h_local": 0.20800967007373042,
+              "forward_overshoot_m": 3.127613045673396e-05,
+              "h_local_max_m": 0.00015035902150918238,
+              "h_local_median_m": 8.766453237906849e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.989436857684215e-07,
+              "selected_area_over_length_h_local": 2.310733474754197,
+              "signed_tip_footprint_m": 3.127613045673396e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9283810891484114,
+              "tube_boundary_clearance_m": 3.467993576123583e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            420,
+            421,
+            483,
+            484,
+            485,
+            486,
+            487,
+            546,
+            547,
+            548,
+            549,
+            550,
+            551,
+            610,
+            611,
+            612,
+            613,
+            614,
+            615,
+            617,
+            674,
+            675,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            740,
+            741,
+            742,
+            743,
+            744,
+            745
+          ],
+          "positive_seed_element_ids": [
+            406,
+            407,
+            468,
+            469,
+            470,
+            471,
+            473,
+            532,
+            533,
+            534,
+            535,
+            536,
+            537,
+            595,
+            596,
+            597,
+            598,
+            599,
+            600,
+            601,
+            658,
+            659,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            722,
+            723,
+            724,
+            725,
+            726,
+            727
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "2384c1fedecb30edd14ffd332e3294c28d3a5c713ef7ab9762a90339bdca30ea"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "3768575ba06bce1ccaaaefcfd0544e35b063f3ac702441c8f491783edf15a45c",
+      "accepted_pre_interval_fingerprint": "54195f2a0e138e373ec275b2be67b0b153356ac1d3cd73ff3c6de8ce13629da7",
+      "api": "ligament_hazard_interval",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 4e-06,
+          "crossing_time_s": 375091633557684.0,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927937,
+          "winner": false
+        }
+      ],
+      "duration_s": 4e-06,
+      "events": [],
+      "physical_time_s": 1.6e-05,
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "actual_cavity_cycle": {
+          "boundary_edge_count": 32,
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              16
+            ],
+            [
+              16,
+              17
+            ],
+            [
+              17,
+              18
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_node_count": 32,
+          "boundary_node_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "connected_component_count": 1,
+          "passed": true,
+          "topology": "single_closed_cavity_boundary_cycle"
+        },
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "cffdfd4d2abcde68b40ae45c1aae5ba225d05218bd0fff9ab6c0a9b181d0c50a",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "84428b3fbc7714bd4b40d2958c813a40c4152c8148d02d0237d23bb6d0972d35",
+              "endpoint_footprint_error_m": 3.127613045673396e-05,
+              "forward_leakage_m": 3.127613045673396e-05,
+              "forward_leakage_over_h_local": 0.20800967007373042,
+              "forward_overshoot_m": 3.127613045673396e-05,
+              "h_local_max_m": 0.00015035902150918238,
+              "h_local_median_m": 8.766453237906849e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.989436857684215e-07,
+              "selected_area_over_length_h_local": 2.310733474754197,
+              "signed_tip_footprint_m": 3.127613045673396e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9283810891484114,
+              "tube_boundary_clearance_m": 3.467993576123583e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            420,
+            421,
+            483,
+            484,
+            485,
+            486,
+            487,
+            546,
+            547,
+            548,
+            549,
+            550,
+            551,
+            610,
+            611,
+            612,
+            613,
+            614,
+            615,
+            617,
+            674,
+            675,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            740,
+            741,
+            742,
+            743,
+            744,
+            745
+          ],
+          "positive_seed_element_ids": [
+            406,
+            407,
+            468,
+            469,
+            470,
+            471,
+            473,
+            532,
+            533,
+            534,
+            535,
+            536,
+            537,
+            595,
+            596,
+            597,
+            598,
+            599,
+            600,
+            601,
+            658,
+            659,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            722,
+            723,
+            724,
+            725,
+            726,
+            727
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "2384c1fedecb30edd14ffd332e3294c28d3a5c713ef7ab9762a90339bdca30ea"
+      },
+      "temperature_K": 900.0
+    }
+  ],
+  "case_identity": "12011",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "actual_cavity_chord": null,
+    "candidate_threshold_ownership": true,
+    "cavity_area_identity_error_m2": 0.0,
+    "connected_chord_error_m": 0.0,
+    "connected_state_has_no_active_front": true,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "physical_travel_identity_error_m": 0.0,
+    "projected_connected_chord_error_m": 0.0,
+    "projected_travel_identity_error_m": 0.0,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "natural",
+  "elapsed_physical_time_s": 1.6e-05,
+  "executed_code_sha": "3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+  "execution_id": "natural:12011:2:137:3fa95a8f93aed6bcca2df977813fa08dafe5b33f",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/d7ce97c451aac303897bbdd2dcdb6c751ae14df27d872c75a0b194e4a58769bb.json",
+  "initial_fingerprint": "d7ce97c451aac303897bbdd2dcdb6c751ae14df27d872c75a0b194e4a58769bb",
+  "input_configuration": {
+    "driver": "advance_production_void_interval",
+    "duration_s": 1.6e-05,
+    "opening_m": 4e-07,
+    "partition_count": 2,
+    "restart_time_s": 8e-06,
+    "seed": 12011,
+    "temperature_K": 900.0
+  },
+  "input_hash": "15930a6483d6a109f63bf2b10570360aa29e93a210887786e82b6897a24f0595",
+  "midpoint_restart_exact": true,
+  "partition_count": 2,
+  "replay_failure": null,
+  "restarted_operations": [
+    {
+      "accepted_post_interval_fingerprint": "e2c3f5239022efb637fb3cd3fe82efa9affaea0f6886d6fde402be91ca282f8e",
+      "accepted_pre_interval_fingerprint": "743d275b00aca1cb0f6a03482f37d59e1f8ef5f799092f810d6daba42ca485e9",
+      "api": "state_owned_growth",
+      "duration_s": 2.3858306567630593e-06,
+      "operations": [],
+      "physical_time_s": 1.0385830656763059e-05,
+      "rates": {
+        "birth_activation_work_J": 3.468615433326889e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848122e-21,
+        "birth_normal_opening_work_J": 3.6106713305891166e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.234358698316501e-23,
+        "healing_activation_work_J": -2.8386608264681136e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424063,
+        "local_in_plane_mean_stress_Pa": 177992579.61258537,
+        "local_max_principal_stress_Pa": 283866082.64681137,
+        "local_normal_opening_stress_Pa": 72213426.61178233,
+        "local_sigma_zz_Pa": 106795547.76755121,
+        "local_signed_shear_stress_Pa": 4468717.396633002,
+        "local_von_mises_stress_Pa": 196714547.70239446,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.80175877,
+        "stabilization_activation_work_J": 2.8386608264681136e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.334047,
+        "vacancy_transport_s": 809716953.2985829
+      },
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "7cc170c7f58389d1c30080ee44a9fc2ca55984a1a5d2ecfbb282a0a448bef3e2",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "45187de23cd323681b8163b82583f698d78c528a774cbc4f7a6a02fb3777d788"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "395c8f31bdad006c1ddf0f399cd0914c743ac5fffdf7771da3913be9d5aa3a83",
+      "accepted_pre_interval_fingerprint": "e2c3f5239022efb637fb3cd3fe82efa9affaea0f6886d6fde402be91ca282f8e",
+      "api": "promotion_remesh",
+      "duration_s": 0.0,
+      "events": [
+        "GEOMETRIC_PROMOTION"
+      ],
+      "operations": [
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "equilibrium"
+      ],
+      "physical_time_s": 1.0385830656763059e-05,
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "actual_cavity_cycle": {
+          "boundary_edge_count": 32,
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              16
+            ],
+            [
+              16,
+              17
+            ],
+            [
+              17,
+              18
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_node_count": 32,
+          "boundary_node_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "connected_component_count": 1,
+          "passed": true,
+          "topology": "single_closed_cavity_boundary_cycle"
+        },
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "e512cb6d8fbcab7f1a596ff86fdd4fa555853f1a961115fdf2703ab92b8a3014",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "312fe07f30a71f40e42757e0f546c935724d96491d324136c1679384330e098b",
+              "endpoint_footprint_error_m": 3.5595535731960015e-05,
+              "forward_leakage_m": 3.5595535731960015e-05,
+              "forward_leakage_over_h_local": 0.23628295563220136,
+              "forward_overshoot_m": 3.5595535731960015e-05,
+              "h_local_max_m": 0.00015064791972286022,
+              "h_local_median_m": 9.013927476766264e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.993055324722909e-07,
+              "selected_area_over_length_h_local": 2.3104969647600226,
+              "signed_tip_footprint_m": 3.5595535731960015e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9246830237986212,
+              "tube_boundary_clearance_m": 3.382431053363709e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            422,
+            423,
+            485,
+            486,
+            487,
+            488,
+            489,
+            548,
+            549,
+            550,
+            551,
+            552,
+            553,
+            612,
+            613,
+            614,
+            615,
+            616,
+            617,
+            619,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            682,
+            683,
+            742,
+            743,
+            744,
+            745,
+            746,
+            747
+          ],
+          "positive_seed_element_ids": [
+            408,
+            409,
+            470,
+            471,
+            472,
+            473,
+            475,
+            534,
+            535,
+            536,
+            537,
+            538,
+            539,
+            597,
+            598,
+            599,
+            600,
+            601,
+            602,
+            603,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            666,
+            667,
+            724,
+            725,
+            726,
+            727,
+            728,
+            729
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "6ff20968040e256340abf0c6d852aa87f099c84d4c109d29189274d54137fe1f"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "0b01b0ab286975e1c02b402ffa602fb1251d1fdf7e679929fb5e2ad119591f41",
+      "accepted_pre_interval_fingerprint": "395c8f31bdad006c1ddf0f399cd0914c743ac5fffdf7771da3913be9d5aa3a83",
+      "api": "state_owned_growth",
+      "duration_s": 1.4132348815927171e-06,
+      "operations": [
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "equilibrium"
+      ],
+      "physical_time_s": 1.1799065538355775e-05,
+      "rates": {
+        "birth_activation_work_J": 9.180339212754163e-21,
+        "birth_hydrostatic_work_J": 8.906149793634459e-21,
+        "birth_normal_opening_work_J": 3.6506734725398405e-22,
+        "birth_s": 133891106.05406214,
+        "birth_signed_shear_work_J": -9.087792813428097e-23,
+        "healing_activation_work_J": -9.54993756071183e-21,
+        "healing_s": 148296094.83058313,
+        "local_hydrostatic_stress_Pa": 445307489.68172294,
+        "local_in_plane_mean_stress_Pa": 513816334.2481419,
+        "local_max_principal_stress_Pa": 954993756.0711831,
+        "local_normal_opening_stress_Pa": 73013469.45079681,
+        "local_sigma_zz_Pa": 308289800.5488851,
+        "local_signed_shear_stress_Pa": -18175585.626856193,
+        "local_von_mises_stress_Pa": 791298748.0299135,
+        "plastic_accommodation_s": 604609379.5369382,
+        "series_limited_growth_s": 353798230.2251834,
+        "stabilization_activation_work_J": 9.54993756071183e-21,
+        "stabilization_s": 3449101936.7601285,
+        "surface_reaction_s": 5117703890.900219,
+        "vacancy_transport_s": 1023427078.1937077
+      },
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "actual_cavity_cycle": {
+          "boundary_edge_count": 32,
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              16
+            ],
+            [
+              16,
+              17
+            ],
+            [
+              17,
+              18
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_node_count": 32,
+          "boundary_node_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "connected_component_count": 1,
+          "passed": true,
+          "topology": "single_closed_cavity_boundary_cycle"
+        },
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "cffdfd4d2abcde68b40ae45c1aae5ba225d05218bd0fff9ab6c0a9b181d0c50a",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "84428b3fbc7714bd4b40d2958c813a40c4152c8148d02d0237d23bb6d0972d35",
+              "endpoint_footprint_error_m": 3.127613045673396e-05,
+              "forward_leakage_m": 3.127613045673396e-05,
+              "forward_leakage_over_h_local": 0.20800967007373042,
+              "forward_overshoot_m": 3.127613045673396e-05,
+              "h_local_max_m": 0.00015035902150918238,
+              "h_local_median_m": 8.766453237906849e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.989436857684215e-07,
+              "selected_area_over_length_h_local": 2.310733474754197,
+              "signed_tip_footprint_m": 3.127613045673396e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9283810891484114,
+              "tube_boundary_clearance_m": 3.467993576123583e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            420,
+            421,
+            483,
+            484,
+            485,
+            486,
+            487,
+            546,
+            547,
+            548,
+            549,
+            550,
+            551,
+            610,
+            611,
+            612,
+            613,
+            614,
+            615,
+            617,
+            674,
+            675,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            740,
+            741,
+            742,
+            743,
+            744,
+            745
+          ],
+          "positive_seed_element_ids": [
+            406,
+            407,
+            468,
+            469,
+            470,
+            471,
+            473,
+            532,
+            533,
+            534,
+            535,
+            536,
+            537,
+            595,
+            596,
+            597,
+            598,
+            599,
+            600,
+            601,
+            658,
+            659,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            722,
+            723,
+            724,
+            725,
+            726,
+            727
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "2384c1fedecb30edd14ffd332e3294c28d3a5c713ef7ab9762a90339bdca30ea"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "54195f2a0e138e373ec275b2be67b0b153356ac1d3cd73ff3c6de8ce13629da7",
+      "accepted_pre_interval_fingerprint": "0b01b0ab286975e1c02b402ffa602fb1251d1fdf7e679929fb5e2ad119591f41",
+      "api": "ligament_hazard_interval",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 2.009344616442232e-07,
+          "crossing_time_s": 375091633557684.0,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927937,
+          "winner": false
+        }
+      ],
+      "duration_s": 2.009344616442232e-07,
+      "events": [],
+      "physical_time_s": 1.2e-05,
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "actual_cavity_cycle": {
+          "boundary_edge_count": 32,
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              16
+            ],
+            [
+              16,
+              17
+            ],
+            [
+              17,
+              18
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_node_count": 32,
+          "boundary_node_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "connected_component_count": 1,
+          "passed": true,
+          "topology": "single_closed_cavity_boundary_cycle"
+        },
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "cffdfd4d2abcde68b40ae45c1aae5ba225d05218bd0fff9ab6c0a9b181d0c50a",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "84428b3fbc7714bd4b40d2958c813a40c4152c8148d02d0237d23bb6d0972d35",
+              "endpoint_footprint_error_m": 3.127613045673396e-05,
+              "forward_leakage_m": 3.127613045673396e-05,
+              "forward_leakage_over_h_local": 0.20800967007373042,
+              "forward_overshoot_m": 3.127613045673396e-05,
+              "h_local_max_m": 0.00015035902150918238,
+              "h_local_median_m": 8.766453237906849e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.989436857684215e-07,
+              "selected_area_over_length_h_local": 2.310733474754197,
+              "signed_tip_footprint_m": 3.127613045673396e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9283810891484114,
+              "tube_boundary_clearance_m": 3.467993576123583e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            420,
+            421,
+            483,
+            484,
+            485,
+            486,
+            487,
+            546,
+            547,
+            548,
+            549,
+            550,
+            551,
+            610,
+            611,
+            612,
+            613,
+            614,
+            615,
+            617,
+            674,
+            675,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            740,
+            741,
+            742,
+            743,
+            744,
+            745
+          ],
+          "positive_seed_element_ids": [
+            406,
+            407,
+            468,
+            469,
+            470,
+            471,
+            473,
+            532,
+            533,
+            534,
+            535,
+            536,
+            537,
+            595,
+            596,
+            597,
+            598,
+            599,
+            600,
+            601,
+            658,
+            659,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            722,
+            723,
+            724,
+            725,
+            726,
+            727
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "2384c1fedecb30edd14ffd332e3294c28d3a5c713ef7ab9762a90339bdca30ea"
+      },
+      "temperature_K": 900.0
+    },
+    {
+      "accepted_post_interval_fingerprint": "3768575ba06bce1ccaaaefcfd0544e35b063f3ac702441c8f491783edf15a45c",
+      "accepted_pre_interval_fingerprint": "54195f2a0e138e373ec275b2be67b0b153356ac1d3cd73ff3c6de8ce13629da7",
+      "api": "ligament_hazard_interval",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 4e-06,
+          "crossing_time_s": 375091633557684.0,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927937,
+          "winner": false
+        }
+      ],
+      "duration_s": 4e-06,
+      "events": [],
+      "physical_time_s": 1.6e-05,
+      "stagewise_conservation": {
+        "active_tip_ids": [
+          "b00000000"
+        ],
+        "actual_cavity_chord": null,
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": [
+          "b00000000"
+        ]
+      },
+      "stagewise_topology": {
+        "actual_cavity_cycle": {
+          "boundary_edge_count": 32,
+          "boundary_edge_ids": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              9
+            ],
+            [
+              9,
+              10
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              12
+            ],
+            [
+              12,
+              13
+            ],
+            [
+              13,
+              14
+            ],
+            [
+              14,
+              15
+            ],
+            [
+              15,
+              16
+            ],
+            [
+              16,
+              17
+            ],
+            [
+              17,
+              18
+            ],
+            [
+              18,
+              19
+            ],
+            [
+              19,
+              20
+            ],
+            [
+              20,
+              21
+            ],
+            [
+              21,
+              22
+            ],
+            [
+              22,
+              23
+            ],
+            [
+              23,
+              24
+            ],
+            [
+              24,
+              25
+            ],
+            [
+              25,
+              26
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              27,
+              28
+            ],
+            [
+              28,
+              29
+            ],
+            [
+              29,
+              30
+            ],
+            [
+              30,
+              31
+            ],
+            [
+              0,
+              31
+            ]
+          ],
+          "boundary_node_count": 32,
+          "boundary_node_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "connected_component_count": 1,
+          "passed": true,
+          "topology": "single_closed_cavity_boundary_cycle"
+        },
+        "independent_cut": {
+          "boundary_terminal_certificates": [
+            {
+              "arc_id": "b00000000:arc0",
+              "boundary_component_id": "external-free-component-at-root",
+              "boundary_edge_ids": [
+                [
+                  396,
+                  397
+                ],
+                [
+                  397,
+                  398
+                ],
+                [
+                  398,
+                  399
+                ],
+                [
+                  399,
+                  400
+                ],
+                [
+                  400,
+                  401
+                ],
+                [
+                  401,
+                  402
+                ],
+                [
+                  402,
+                  403
+                ],
+                [
+                  403,
+                  404
+                ]
+              ],
+              "boundary_kind": "external_free_surface",
+              "cavity_cycle_independently_closed": false,
+              "cavity_id": null,
+              "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+              "declared_endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint": "start",
+              "endpoint_coordinate_m": [
+                0.0,
+                8.572527594031472e-20
+              ],
+              "endpoint_graph_role": [
+                "inactive_terminal",
+                "physical_root"
+              ],
+              "endpoint_to_boundary_distance_m": 0.0,
+              "exact_incidence": true,
+              "first_two_sided_axial_station_m": 0.00011451986008093377,
+              "incident_crack_tangent": [
+                1.0,
+                -1.224646799147353e-16
+              ],
+              "intact_path_exists": false,
+              "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+              "negative_interior_seed_count": 34,
+              "node_star_passed": null,
+              "only_boundary_clearance_waived": true,
+              "positive_interior_seed_count": 34,
+              "tangent_enters_or_approaches_solid": true,
+              "tube_boundary_intersections": [],
+              "unrelated_boundary_intersections": []
+            }
+          ],
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "cffdfd4d2abcde68b40ae45c1aae5ba225d05218bd0fff9ab6c0a9b181d0c50a",
+          "edge_cut_certificates": [
+            {
+              "backward_undershoot_m": 0.0,
+              "bridge_element_ids": [],
+              "bridge_node_ids": [],
+              "certificate_fingerprint": "84428b3fbc7714bd4b40d2958c813a40c4152c8148d02d0237d23bb6d0972d35",
+              "endpoint_footprint_error_m": 3.127613045673396e-05,
+              "forward_leakage_m": 3.127613045673396e-05,
+              "forward_leakage_over_h_local": 0.20800967007373042,
+              "forward_overshoot_m": 3.127613045673396e-05,
+              "h_local_max_m": 0.00015035902150918238,
+              "h_local_median_m": 8.766453237906849e-05,
+              "intact_cross_graph_path_exists": false,
+              "minimum_crossing_path_length": null,
+              "negative_component_count": 1,
+              "negative_component_labels": [
+                2
+              ],
+              "negative_seed_count": 34,
+              "positive_component_count": 1,
+              "positive_component_labels": [
+                1
+              ],
+              "positive_seed_count": 34,
+              "segment_id": "b00000000:arc0",
+              "selected_area_m2": 1.989436857684215e-07,
+              "selected_area_over_length_h_local": 2.310733474754197,
+              "signed_tip_footprint_m": 3.127613045673396e-05,
+              "sufficient_opposite_side_seeds": true,
+              "support_width_m": 0.00028994949366116654,
+              "support_width_over_h_local": 1.9283810891484114,
+              "tube_boundary_clearance_m": 3.467993576123583e-05
+            }
+          ],
+          "insufficient_seed_segment_ids": [],
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_seed_element_ids": [
+            420,
+            421,
+            483,
+            484,
+            485,
+            486,
+            487,
+            546,
+            547,
+            548,
+            549,
+            550,
+            551,
+            610,
+            611,
+            612,
+            613,
+            614,
+            615,
+            617,
+            674,
+            675,
+            676,
+            677,
+            678,
+            679,
+            680,
+            681,
+            740,
+            741,
+            742,
+            743,
+            744,
+            745
+          ],
+          "positive_seed_element_ids": [
+            406,
+            407,
+            468,
+            469,
+            470,
+            471,
+            473,
+            532,
+            533,
+            534,
+            535,
+            536,
+            537,
+            595,
+            596,
+            597,
+            598,
+            599,
+            600,
+            601,
+            658,
+            659,
+            660,
+            661,
+            662,
+            663,
+            664,
+            665,
+            722,
+            723,
+            724,
+            725,
+            726,
+            727
+          ]
+        },
+        "passed": true,
+        "topology_source_fingerprint": "2384c1fedecb30edd14ffd332e3294c28d3a5c713ef7ab9762a90339bdca30ea"
+      },
+      "temperature_K": 900.0
+    }
+  ],
+  "restarted_terminal_checkpoint": "checkpoints/3768575ba06bce1ccaaaefcfd0544e35b063f3ac702441c8f491783edf15a45c.json",
+  "stagewise_topology": {
+    "actual_cavity_cycle": {
+      "boundary_edge_count": 32,
+      "boundary_edge_ids": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          15,
+          16
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          17,
+          18
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          19,
+          20
+        ],
+        [
+          20,
+          21
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ],
+        [
+          23,
+          24
+        ],
+        [
+          24,
+          25
+        ],
+        [
+          25,
+          26
+        ],
+        [
+          26,
+          27
+        ],
+        [
+          27,
+          28
+        ],
+        [
+          28,
+          29
+        ],
+        [
+          29,
+          30
+        ],
+        [
+          30,
+          31
+        ],
+        [
+          0,
+          31
+        ]
+      ],
+      "boundary_node_count": 32,
+      "boundary_node_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "connected_component_count": 1,
+      "passed": true,
+      "topology": "single_closed_cavity_boundary_cycle"
+    },
+    "independent_cut": {
+      "boundary_terminal_certificates": [
+        {
+          "arc_id": "b00000000:arc0",
+          "boundary_component_id": "external-free-component-at-root",
+          "boundary_edge_ids": [
+            [
+              396,
+              397
+            ],
+            [
+              397,
+              398
+            ],
+            [
+              398,
+              399
+            ],
+            [
+              399,
+              400
+            ],
+            [
+              400,
+              401
+            ],
+            [
+              401,
+              402
+            ],
+            [
+              402,
+              403
+            ],
+            [
+              403,
+              404
+            ]
+          ],
+          "boundary_kind": "external_free_surface",
+          "cavity_cycle_independently_closed": false,
+          "cavity_id": null,
+          "classification": "CERTIFIED_RELATIVE_TO_EXTERNAL_FREE_BOUNDARY",
+          "declared_endpoint_coordinate_m": [
+            0.0,
+            8.572527594031472e-20
+          ],
+          "endpoint": "start",
+          "endpoint_coordinate_m": [
+            0.0,
+            8.572527594031472e-20
+          ],
+          "endpoint_graph_role": [
+            "inactive_terminal",
+            "physical_root"
+          ],
+          "endpoint_to_boundary_distance_m": 0.0,
+          "exact_incidence": true,
+          "first_two_sided_axial_station_m": 0.00011451986008093377,
+          "incident_crack_tangent": [
+            1.0,
+            -1.224646799147353e-16
+          ],
+          "intact_path_exists": false,
+          "maximum_boundary_affected_axial_extent_m": 0.00011451986008093377,
+          "negative_interior_seed_count": 34,
+          "node_star_passed": null,
+          "only_boundary_clearance_waived": true,
+          "positive_interior_seed_count": 34,
+          "tangent_enters_or_approaches_solid": true,
+          "tube_boundary_intersections": [],
+          "unrelated_boundary_intersections": []
+        }
+      ],
+      "bridge_element_ids": [],
+      "bridge_node_ids": [],
+      "certificate_fingerprint": "cffdfd4d2abcde68b40ae45c1aae5ba225d05218bd0fff9ab6c0a9b181d0c50a",
+      "edge_cut_certificates": [
+        {
+          "backward_undershoot_m": 0.0,
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "84428b3fbc7714bd4b40d2958c813a40c4152c8148d02d0237d23bb6d0972d35",
+          "endpoint_footprint_error_m": 3.127613045673396e-05,
+          "forward_leakage_m": 3.127613045673396e-05,
+          "forward_leakage_over_h_local": 0.20800967007373042,
+          "forward_overshoot_m": 3.127613045673396e-05,
+          "h_local_max_m": 0.00015035902150918238,
+          "h_local_median_m": 8.766453237906849e-05,
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_component_count": 1,
+          "negative_component_labels": [
+            2
+          ],
+          "negative_seed_count": 34,
+          "positive_component_count": 1,
+          "positive_component_labels": [
+            1
+          ],
+          "positive_seed_count": 34,
+          "segment_id": "b00000000:arc0",
+          "selected_area_m2": 1.989436857684215e-07,
+          "selected_area_over_length_h_local": 2.310733474754197,
+          "signed_tip_footprint_m": 3.127613045673396e-05,
+          "sufficient_opposite_side_seeds": true,
+          "support_width_m": 0.00028994949366116654,
+          "support_width_over_h_local": 1.9283810891484114,
+          "tube_boundary_clearance_m": 3.467993576123583e-05
+        }
+      ],
+      "insufficient_seed_segment_ids": [],
+      "intact_cross_graph_path_exists": false,
+      "minimum_crossing_path_length": null,
+      "negative_seed_element_ids": [
+        420,
+        421,
+        483,
+        484,
+        485,
+        486,
+        487,
+        546,
+        547,
+        548,
+        549,
+        550,
+        551,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        617,
+        674,
+        675,
+        676,
+        677,
+        678,
+        679,
+        680,
+        681,
+        740,
+        741,
+        742,
+        743,
+        744,
+        745
+      ],
+      "positive_seed_element_ids": [
+        406,
+        407,
+        468,
+        469,
+        470,
+        471,
+        473,
+        532,
+        533,
+        534,
+        535,
+        536,
+        537,
+        595,
+        596,
+        597,
+        598,
+        599,
+        600,
+        601,
+        658,
+        659,
+        660,
+        661,
+        662,
+        663,
+        664,
+        665,
+        722,
+        723,
+        724,
+        725,
+        726,
+        727
+      ]
+    },
+    "passed": true,
+    "topology_source_fingerprint": "2384c1fedecb30edd14ffd332e3294c28d3a5c713ef7ab9762a90339bdca30ea"
+  },
+  "terminal_checkpoint": "checkpoints/3768575ba06bce1ccaaaefcfd0544e35b063f3ac702441c8f491783edf15a45c.json",
+  "terminal_classification": "RESOLVED_VOID",
+  "terminal_fingerprint": "3768575ba06bce1ccaaaefcfd0544e35b063f3ac702441c8f491783edf15a45c",
+  "terminal_measurements": {
+    "accepted_topology_actions": 0,
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "birth_hit_count": 2,
+    "cavities": [
+      {
+        "cavity_id": "void:site-1",
+        "entry_m": null,
+        "exit_m": null,
+        "geometry_generation": 5,
+        "phase": "RESOLVED_VOID",
+        "radius_m": 5.5e-05
+      }
+    ],
+    "cavity_count": 1,
+    "clocks": {
+      "birth": {
+        "integrated_hazard": 0.48546645562191026,
+        "threshold": 0.48546645562191026,
+        "threshold_margin": 0.0
+      },
+      "healing": {
+        "integrated_hazard": 0.06068048376297122,
+        "threshold": 0.9219360895590074,
+        "threshold_margin": 0.8612556057960362
+      },
+      "stabilization": {
+        "integrated_hazard": 0.47917577899021563,
+        "threshold": 0.47917577899021563,
+        "threshold_margin": 0.0
+      }
+    },
+    "directional_event_provenance": {},
+    "event_history": [
+      {
+        "event": "BIRTH_HIT",
+        "site_id": "site-1"
+      },
+      {
+        "event": "EMBRYO",
+        "site_id": "site-1"
+      },
+      {
+        "event": "STABILIZED",
+        "site_id": "site-1"
+      },
+      {
+        "area_m2": 1.9634954084936207e-09,
+        "cavity_id": "void:site-1",
+        "event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+      },
+      {
+        "cavity_id": "void:site-1",
+        "event": "GEOMETRIC_PROMOTION"
+      }
+    ],
+    "global_rng_identity": "d037e8c8b2fb19dc96e799f47e08ff49aee5f7368f70773848ad631dfd71d469",
+    "length_ledgers": {
+      "active_front_coordinate_advance_m": 0.0,
+      "connected_free_surface_extent_m": 0.0,
+      "connected_void_free_span_m": 0.0,
+      "fractured_ligament_length_m": 0.0,
+      "ordinary_crack_fractured_length_m": 0.0,
+      "physical_active_front_travel_m": 0.0,
+      "preexisting_void_free_span_m": 0.0,
+      "projected_connected_void_free_span_m": 0.0,
+      "projected_fractured_length_m": 0.0,
+      "projected_free_span_m": 0.0,
+      "projected_front_advance_m": 0.0,
+      "traversed_void_free_span_m": 0.0
+    },
+    "site_id": "site-1",
+    "site_phase": "STABLE_SUBGRID_VOID",
+    "void_rng_identity": "7585b9baaab24a772150308ac2cafb27d8d0e272904a0f2995b5f5f17ffbf753"
+  }
+}

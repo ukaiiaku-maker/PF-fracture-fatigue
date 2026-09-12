@@ -1,0 +1,153 @@
+{
+  "actual_fixed_kernel_contract": {
+    "blas_libraries": [
+      {
+        "architecture": "Haswell",
+        "internal_api": "openblas",
+        "num_threads": 1,
+        "prefix": "libscipy_openblas",
+        "threading_layer": "pthreads",
+        "user_api": "blas",
+        "version": "0.3.31.dev"
+      },
+      {
+        "architecture": "Haswell",
+        "internal_api": "openblas",
+        "num_threads": 1,
+        "prefix": "libscipy_openblas",
+        "threading_layer": "pthreads",
+        "user_api": "blas",
+        "version": "0.3.34.106.0"
+      }
+    ],
+    "enabled_dispatch": [],
+    "environment": {
+      "MKL_NUM_THREADS": "1",
+      "NPY_DISABLE_CPU_FEATURES": "AVX512_ICL,AVX512_SPR,X86_V3,X86_V4",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_CORETYPE": "HASWELL",
+      "OPENBLAS_NUM_THREADS": "1",
+      "PYTHONHASHSEED": "0"
+    },
+    "machine": "x86_64",
+    "numpy_baseline": [
+      "X86_V2"
+    ],
+    "numpy_dispatch": [
+      "X86_V3",
+      "X86_V4",
+      "AVX512_ICL",
+      "AVX512_SPR"
+    ],
+    "numpy_version": "2.5.3",
+    "schema": "v5.pinned-x86-numerical-runtime/1",
+    "scipy_version": "1.18.1"
+  },
+  "all_independent_fixed_policy_repeats_exact": true,
+  "jobs": [
+    {
+      "completedAt": "2026-09-08T07:17:41Z",
+      "conclusion": "success",
+      "databaseId": 101968527010,
+      "name": "runtime-diagnostic / runtime (1)",
+      "startedAt": "2026-09-08T07:04:20Z",
+      "status": "completed"
+    },
+    {
+      "completedAt": "2026-09-08T07:23:56Z",
+      "conclusion": "success",
+      "databaseId": 101968527144,
+      "name": "runtime-diagnostic / runtime (2)",
+      "startedAt": "2026-09-08T07:04:21Z",
+      "status": "completed"
+    },
+    {
+      "completedAt": "2026-09-08T07:21:23Z",
+      "conclusion": "success",
+      "databaseId": 101968527201,
+      "name": "runtime-diagnostic / runtime (0)",
+      "startedAt": "2026-09-08T07:04:20Z",
+      "status": "completed"
+    }
+  ],
+  "old_mixed_kernel_restart_gate_requalified": false,
+  "record_kind": "READ_ONLY_RECONSTRUCTION_AND_DISPATCH_INTERVENTION_NOT_NEW_PHYSICAL_EXECUTION",
+  "retained_checkpoint_fingerprint": "3a2b875c057893a83251aa1c66f25d70fc58e1570f572bc68cb0036a64b7215f",
+  "run_conclusion": "success",
+  "run_id": 34197537829,
+  "schema": "v5.cross-worker-dispatch-reconstruction-receipt/1",
+  "scientific_qualification": false,
+  "scope": "Fixed-policy reproducibility on one identical retained checkpoint and small algebra sentinel; final physical A/B still required.",
+  "source_code_sha": "c8b53a6a186cb72f99a0e3e4a9ebf1915dcb0caa",
+  "source_pack_manifest_sha256": "017e8a3fa4cc6fe6460a259919562e777d35a489a8dcf4a866c160ee90942aa5",
+  "three_fixed_policy_reports_exact": true,
+  "url": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue/actions/runs/34197537829",
+  "workers": [
+    {
+      "native_blas_targets": [
+        "SkylakeX",
+        "SkylakeX"
+      ],
+      "old_recorded_topology_exact": {
+        "fixed-policy": false,
+        "fixed-policy-repeat": false,
+        "haswell-only": false,
+        "native": true,
+        "numpy-baseline-only": true
+      },
+      "relative_report_path": "worker0/v5-runtime-diagnostic-0-c8b53a6a186cb72f99a0e3e4a9ebf1915dcb0caa/report.json",
+      "report_sha256": "4eb96773643f2bedf5c521ace2f17762192156204e00325dc2e46797ed88e72f",
+      "topology_hashes": {
+        "fixed-policy": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "fixed-policy-repeat": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "haswell-only": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "native": "e8ad41f85d78407d178d8cb57c5cd1673451c116a0d4e328e4e0b0c38aab120e",
+        "numpy-baseline-only": "e8ad41f85d78407d178d8cb57c5cd1673451c116a0d4e328e4e0b0c38aab120e"
+      }
+    },
+    {
+      "native_blas_targets": [
+        "SkylakeX",
+        "SkylakeX"
+      ],
+      "old_recorded_topology_exact": {
+        "fixed-policy": false,
+        "fixed-policy-repeat": false,
+        "haswell-only": false,
+        "native": true,
+        "numpy-baseline-only": true
+      },
+      "relative_report_path": "worker1/v5-runtime-diagnostic-1-c8b53a6a186cb72f99a0e3e4a9ebf1915dcb0caa/report.json",
+      "report_sha256": "dd34e0ee269f301631091a198210a68e75b72156eced8f72ffd4cdd1cb5e9927",
+      "topology_hashes": {
+        "fixed-policy": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "fixed-policy-repeat": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "haswell-only": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "native": "e8ad41f85d78407d178d8cb57c5cd1673451c116a0d4e328e4e0b0c38aab120e",
+        "numpy-baseline-only": "e8ad41f85d78407d178d8cb57c5cd1673451c116a0d4e328e4e0b0c38aab120e"
+      }
+    },
+    {
+      "native_blas_targets": [
+        "Haswell",
+        "Haswell"
+      ],
+      "old_recorded_topology_exact": {
+        "fixed-policy": false,
+        "fixed-policy-repeat": false,
+        "haswell-only": false,
+        "native": false,
+        "numpy-baseline-only": false
+      },
+      "relative_report_path": "worker2/v5-runtime-diagnostic-2-c8b53a6a186cb72f99a0e3e4a9ebf1915dcb0caa/report.json",
+      "report_sha256": "e8c9e1fc96e8026b2f4f86bb70e3155a806bec4a0512ef335917990dd8a374e6",
+      "topology_hashes": {
+        "fixed-policy": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "fixed-policy-repeat": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "haswell-only": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "native": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6",
+        "numpy-baseline-only": "98d9776fd6951153501eb6dfad3f01e2036ca911ced45fa9d11867276677a9e6"
+      }
+    }
+  ]
+}

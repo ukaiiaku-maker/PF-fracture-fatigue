@@ -1,0 +1,7 @@
+# Runtime observed in transition development run 34189099900, ec79645.
+# Freeze numerical wheels before the one final A/B campaign. Python 3.12.14
+# is selected separately in its workflows. Optional mesh/JIT packages were
+# absent in that worker; every phase records the complete numerical inventory.
+numpy==2.5.3
+scipy==1.18.1
+threadpoolctl==3.6.0

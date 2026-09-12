@@ -1,0 +1,82 @@
+{
+  "actual_operations": [
+    {
+      "api": "_complete_next_clock",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 8203611185234705.0,
+          "crossing_time_s": 1.640722237046941e+16,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927935,
+          "winner": false
+        }
+      ],
+      "duration_s": 8203611185234705.0
+    },
+    {
+      "accepted": true,
+      "api": "ligament_transaction",
+      "operations": [
+        "accepted_snapshot",
+        "intersection_alignment",
+        "exit_alignment",
+        "graph_edit",
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "cavity_phase_update",
+        "length_ledger_update:fractured_ligament_length_m",
+        "length_ledger_update:active_front_coordinate_advance_m",
+        "length_ledger_update:physical_active_front_travel_m",
+        "length_ledger_update:projected_fractured_length_m",
+        "length_ledger_update:projected_front_advance_m",
+        "length_ledger_update:preexisting_void_free_span_m",
+        "length_ledger_update:connected_void_free_span_m",
+        "length_ledger_update:projected_connected_void_free_span_m",
+        "length_ledger_update:connected_free_surface_extent_m",
+        "root_status_change",
+        "dormant_support_rebuild",
+        "connected_surface_certification",
+        "field_transfer",
+        "equilibrium",
+        "energy_gate",
+        "process_state_update",
+        "topology_verification",
+        "late_event_veto"
+      ]
+    }
+  ],
+  "case_identity": "ligament",
+  "conservation": {
+    "active_tip_ids": [],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": []
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "transitions:ligament:2:31:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/69ffea5f8f513c9c001fe0dd675117eaf4eaa0699e442cf68fbe006be8b714f7.json",
+  "initial_fingerprint": "69ffea5f8f513c9c001fe0dd675117eaf4eaa0699e442cf68fbe006be8b714f7",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 2,
+    "predecessor_available": true,
+    "requested_predecessor": "resolved_growth",
+    "seed": 3621
+  },
+  "input_hash": "ad408ee4a7492c51c3d4e42d25f635b1e28b9b39d9a1ef85491a38319becbe1a",
+  "partition_count": 2,
+  "terminal_checkpoint": "checkpoints/674c681483e45738d1687d8589fba7192fc1bdd78c90d5ca82f5d5d06c17b61d.json",
+  "terminal_fingerprint": "674c681483e45738d1687d8589fba7192fc1bdd78c90d5ca82f5d5d06c17b61d",
+  "transition_occurred": true
+}

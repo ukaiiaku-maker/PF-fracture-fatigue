@@ -1,0 +1,116 @@
+{
+  "actual_operations": [
+    {
+      "accepted": true,
+      "api": "ligament_transaction",
+      "operations": [
+        "accepted_snapshot",
+        "intersection_alignment",
+        "exit_alignment",
+        "graph_edit",
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "cavity_phase_update",
+        "length_ledger_update:fractured_ligament_length_m",
+        "length_ledger_update:active_front_coordinate_advance_m",
+        "length_ledger_update:physical_active_front_travel_m",
+        "length_ledger_update:projected_fractured_length_m",
+        "length_ledger_update:projected_front_advance_m",
+        "length_ledger_update:preexisting_void_free_span_m",
+        "length_ledger_update:connected_void_free_span_m",
+        "length_ledger_update:projected_connected_void_free_span_m",
+        "length_ledger_update:connected_free_surface_extent_m",
+        "root_status_change",
+        "dormant_support_rebuild",
+        "connected_surface_certification",
+        "field_transfer",
+        "equilibrium",
+        "energy_gate",
+        "process_state_update",
+        "topology_verification",
+        "late_event_veto"
+      ]
+    },
+    {
+      "accepted": false,
+      "api": "downstream_front_transaction",
+      "audit": {
+        "boundary_element_ids": [
+          0
+        ],
+        "cleavage": [
+          {
+            "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+            "common_advance_duration_s": 0.0,
+            "crossing_time_s": "infinity",
+            "effective_rate_s": 0.0,
+            "emitted_event_ids": [],
+            "hazard_barrier_J": 3.4484802278038915e-19,
+            "instantaneous_status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+            "rate_s": 0.0,
+            "raw_rate_s": 1.1576818381531435e-13,
+            "resolved_opening_stress_Pa": 718462135.1944888,
+            "source_resolution_policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED",
+            "unqualified_crossing_time_s": 14020336601692.62,
+            "unqualified_effective_rate_s": 1.1576818381531435e-13,
+            "winner": false
+          }
+        ],
+        "source_front_id": null,
+        "source_kind": "cavity_surface",
+        "source_position_m": [
+          0.0007552661214806971,
+          0.0
+        ],
+        "source_probe_identity": {
+          "boundary_node_id": 0,
+          "element_ids": [
+            0
+          ],
+          "kind": "direct_cavity_boundary_tensor"
+        },
+        "status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+        "tensor_Pa": [
+          [
+            36248392.30717645,
+            -102294862.40460402
+          ],
+          [
+            -102294862.40460402,
+            718462135.1944888
+          ]
+        ]
+      },
+      "operations": []
+    }
+  ],
+  "case_identity": "before_ligament",
+  "conservation": {
+    "active_tip_ids": [],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": []
+  },
+  "continued_front_terminal_reached": false,
+  "dataset": "restarts",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "restarts:before_ligament:None:52:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/69ffea5f8f513c9c001fe0dd675117eaf4eaa0699e442cf68fbe006be8b714f7.json",
+  "initial_fingerprint": "69ffea5f8f513c9c001fe0dd675117eaf4eaa0699e442cf68fbe006be8b714f7",
+  "input_configuration": {
+    "expected_terminal": "DOWNSTREAM_FRONT_CONTINUED",
+    "reload_policy": "retain_accepted_load",
+    "requested_stage_available": true
+  },
+  "input_hash": "c4034144830dd3f60472fdeb5e5095648099f46f6717aa5ad2eadc5cef69a40b",
+  "partition_count": null,
+  "restart_exact": true,
+  "restored_terminal_checkpoint": "checkpoints/674c681483e45738d1687d8589fba7192fc1bdd78c90d5ca82f5d5d06c17b61d.json",
+  "terminal_checkpoint": "checkpoints/674c681483e45738d1687d8589fba7192fc1bdd78c90d5ca82f5d5d06c17b61d.json",
+  "terminal_fingerprint": "674c681483e45738d1687d8589fba7192fc1bdd78c90d5ca82f5d5d06c17b61d"
+}

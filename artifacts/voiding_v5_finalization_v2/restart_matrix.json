@@ -1,0 +1,102 @@
+[
+  {
+    "checkpoint_fingerprint": "9762e226d97681b46409fc2b3e6c858923a02cb120e2ee6d97021fa70095b128",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-00",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "9762e226d97681b46409fc2b3e6c858923a02cb120e2ee6d97021fa70095b128",
+    "restored_fingerprint": "370c32f32591acbd1c44824dcbda2b3e7707cd15e69c0812bcd0984f4a178911",
+    "stage": "available_site",
+    "uninterrupted_fingerprint": "370c32f32591acbd1c44824dcbda2b3e7707cd15e69c0812bcd0984f4a178911"
+  },
+  {
+    "checkpoint_fingerprint": "8899f761a079b3261e42407455ea4d9916ed9874ef642e81456676e0e0f58ebd",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-01",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "8899f761a079b3261e42407455ea4d9916ed9874ef642e81456676e0e0f58ebd",
+    "restored_fingerprint": "7a1ff74010c20d0186f8da7fcc0f340c5a5b6be4d5ceb8f6c44cdda9e0ce649a",
+    "stage": "incomplete_first_hit",
+    "uninterrupted_fingerprint": "7a1ff74010c20d0186f8da7fcc0f340c5a5b6be4d5ceb8f6c44cdda9e0ce649a"
+  },
+  {
+    "checkpoint_fingerprint": "370c32f32591acbd1c44824dcbda2b3e7707cd15e69c0812bcd0984f4a178911",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-02",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "370c32f32591acbd1c44824dcbda2b3e7707cd15e69c0812bcd0984f4a178911",
+    "restored_fingerprint": "ac75b780396fda30260b003f1df4ecd0ed1d2b2d6487c43ae12af8a29faa80df",
+    "stage": "between_birth_hits",
+    "uninterrupted_fingerprint": "ac75b780396fda30260b003f1df4ecd0ed1d2b2d6487c43ae12af8a29faa80df"
+  },
+  {
+    "checkpoint_fingerprint": "ac75b780396fda30260b003f1df4ecd0ed1d2b2d6487c43ae12af8a29faa80df",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-03",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "ac75b780396fda30260b003f1df4ecd0ed1d2b2d6487c43ae12af8a29faa80df",
+    "restored_fingerprint": "6ebd760b1d4ba468ff91768111fca4608809fd9ff9a361d16599e2b7f322ad96",
+    "stage": "embryo",
+    "uninterrupted_fingerprint": "6ebd760b1d4ba468ff91768111fca4608809fd9ff9a361d16599e2b7f322ad96"
+  },
+  {
+    "checkpoint_fingerprint": "6ebd760b1d4ba468ff91768111fca4608809fd9ff9a361d16599e2b7f322ad96",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-04",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "6ebd760b1d4ba468ff91768111fca4608809fd9ff9a361d16599e2b7f322ad96",
+    "restored_fingerprint": "951d61036fbcdee8dfdb42ad2c73b3f46088123cddaf41458f74a268e993bf34",
+    "stage": "stable_subgrid_cavity",
+    "uninterrupted_fingerprint": "951d61036fbcdee8dfdb42ad2c73b3f46088123cddaf41458f74a268e993bf34"
+  },
+  {
+    "checkpoint_fingerprint": "60f90b4b7f96d52c31caa51b7f3f3458d505e7a11a979ed8363b1730f650a23b",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-05",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "60f90b4b7f96d52c31caa51b7f3f3458d505e7a11a979ed8363b1730f650a23b",
+    "restored_fingerprint": "a5c2e1059d051212b7ec6d738837668ba043eaca96fbf3bfb54597dda36e0f5b",
+    "stage": "before_promotion",
+    "uninterrupted_fingerprint": "a5c2e1059d051212b7ec6d738837668ba043eaca96fbf3bfb54597dda36e0f5b"
+  },
+  {
+    "checkpoint_fingerprint": "48bfce6cbcddd82bbb5b209a2b97d75bd5e02272a3704270e72f761fe198df6c",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-06",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "48bfce6cbcddd82bbb5b209a2b97d75bd5e02272a3704270e72f761fe198df6c",
+    "restored_fingerprint": "a6cb346a8883ce3a3860dcda3ba0fcbb87687f40845c2a938af65e3ff5ea2475",
+    "stage": "after_promotion",
+    "uninterrupted_fingerprint": "a6cb346a8883ce3a3860dcda3ba0fcbb87687f40845c2a938af65e3ff5ea2475"
+  },
+  {
+    "checkpoint_fingerprint": "54c6a1f7fee54de63c0b4b7af55ea5b37e540638165f991b949cb1f4a9ba2859",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-07",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "54c6a1f7fee54de63c0b4b7af55ea5b37e540638165f991b949cb1f4a9ba2859",
+    "restored_fingerprint": "648c2a73b0b18b8f0b73739be16d34d41d7235211177866b617515774da5a516",
+    "stage": "before_ligament",
+    "uninterrupted_fingerprint": "648c2a73b0b18b8f0b73739be16d34d41d7235211177866b617515774da5a516"
+  },
+  {
+    "checkpoint_fingerprint": "648c2a73b0b18b8f0b73739be16d34d41d7235211177866b617515774da5a516",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-08",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "648c2a73b0b18b8f0b73739be16d34d41d7235211177866b617515774da5a516",
+    "restored_fingerprint": "7b12c11106b0e0a37a31c8dfbb2994c7c10aaa8ec836929f92cdad299afd0c1b",
+    "stage": "connected_before_downstream",
+    "uninterrupted_fingerprint": "7b12c11106b0e0a37a31c8dfbb2994c7c10aaa8ec836929f92cdad299afd0c1b"
+  },
+  {
+    "checkpoint_fingerprint": "7b12c11106b0e0a37a31c8dfbb2994c7c10aaa8ec836929f92cdad299afd0c1b",
+    "classification": "STAGE_SPECIFIC_CONTINUATION_EXACT",
+    "execution_id": "restart-09",
+    "passed": true,
+    "restored_checkpoint_fingerprint": "7b12c11106b0e0a37a31c8dfbb2994c7c10aaa8ec836929f92cdad299afd0c1b",
+    "restored_fingerprint": "6a9cacf2018cdbace84093ed0375829fb994f0c4420dac3339bd83e650faffb4",
+    "stage": "downstream_front_before_continuation",
+    "uninterrupted_fingerprint": "6a9cacf2018cdbace84093ed0375829fb994f0c4420dac3339bd83e650faffb4"
+  }
+]

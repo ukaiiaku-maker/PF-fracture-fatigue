@@ -1,0 +1,47 @@
+{
+  "comparisons": [
+    {
+      "case_id": "production:32:12",
+      "classification": "FAIL_CLOSED_CONNECTION_OR_MATCHED_FINE_REFERENCE_UNAVAILABLE",
+      "qualified": false,
+      "reference_case_id": "production:512:192"
+    },
+    {
+      "case_id": "production:64:24",
+      "classification": "FAIL_CLOSED_CONNECTION_OR_MATCHED_FINE_REFERENCE_UNAVAILABLE",
+      "qualified": false,
+      "reference_case_id": "production:512:192"
+    },
+    {
+      "case_id": "production:128:48",
+      "classification": "FAIL_CLOSED_CONNECTION_OR_MATCHED_FINE_REFERENCE_UNAVAILABLE",
+      "qualified": false,
+      "reference_case_id": "production:512:192"
+    }
+  ],
+  "executed_code_sha": "6134aa521f5c4d527f22d9b458e5a13aa13f3b48",
+  "frozen_rate_barrier_mesh_transfer_limits": "NOT_DEFINED_IN_ACCEPTED_REGISTRY",
+  "frozen_tensor_limit": 0.05,
+  "physical_registry": [
+    [
+      32,
+      12
+    ],
+    [
+      64,
+      24
+    ],
+    [
+      128,
+      48
+    ],
+    [
+      512,
+      192
+    ]
+  ],
+  "policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED",
+  "production_resolution_cavity_tensor_qualified": false,
+  "schema": "v12.production-source-transfer/1",
+  "static_traction_reference_is_not_matched_production": true
+}

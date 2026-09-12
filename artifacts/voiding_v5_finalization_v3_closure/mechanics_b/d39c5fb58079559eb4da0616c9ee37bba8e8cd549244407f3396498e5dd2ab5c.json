@@ -1,0 +1,5120 @@
+{
+  "case_id": "d39c5fb58079559eb4da0616c9ee37bba8e8cd549244407f3396498e5dd2ab5c",
+  "environment_identity": {
+    "assembly": "production_CST_plane_strain_P0_V12_support",
+    "machine": "arm64",
+    "numpy": "2.5.1",
+    "platform": "darwin",
+    "python": "3.12.13",
+    "scipy": "1.18.0",
+    "solver": "scipy.sparse.linalg.spsolve"
+  },
+  "executed_code_sha": "c225d1bf13938b26b81649544d25fc523bde9842",
+  "execution_id": "d39c5fb58079559eb4da0616c9ee37bba8e8cd549244407f3396498e5dd2ab5c:c225d1bf13938b26b81649544d25fc523bde9842",
+  "input_configuration": {
+    "boundary_segments": 128,
+    "capture_source": true,
+    "cavity_center_m": [
+      0.0012,
+      0.0
+    ],
+    "cavity_enabled": true,
+    "cavity_radius_m": 5e-05,
+    "crack_enabled": true,
+    "crack_orientation_deg": 0.0,
+    "crack_path_m": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0005,
+        0.0
+      ]
+    ],
+    "crack_root_m": null,
+    "crack_tip_m": null,
+    "far_h_m": 5e-05,
+    "geometry_mode": "V3_FIXED_LABORATORY_GEOMETRY",
+    "ligament_ratio": null,
+    "material_E_Pa": 210000000000.0,
+    "material_nu": 0.3,
+    "opening_m": 4e-07,
+    "radial_layers": 48,
+    "residual_stiffness_kappa": 1e-06,
+    "specimen_height_m": 0.002,
+    "specimen_width_m": 0.003,
+    "tip_layer": 3
+  },
+  "input_hash": "d39c5fb58079559eb4da0616c9ee37bba8e8cd549244407f3396498e5dd2ab5c",
+  "measurement_source": "sources/d39c5fb58079559eb4da0616c9ee37bba8e8cd549244407f3396498e5dd2ab5c.npz",
+  "measurements": {
+    "cavity_area_relative": 0.00020084601099772475,
+    "cavity_enabled": true,
+    "cavity_fields": {
+      "assembled_cavity_node_residual_relative": 3.901397367862467e-15,
+      "compliance_m2_per_N": 3.3167791551488134e-12,
+      "edge_owner_valid": true,
+      "edge_records": [
+        {
+          "adjacent_element_id": 0,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19799993.73815247,
+              269425.02882720396
+            ],
+            [
+              269425.02882720396,
+              130574575.34400105
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001250015063602065,
+              0.0
+            ],
+            [
+              0.0012499548182675552,
+              2.454122852291229e-06
+            ]
+          ],
+          "edge_length_m": 2.4548622108925435e-06,
+          "edge_node_ids": [
+            0,
+            1
+          ],
+          "first_layer_normal_spacing_m": 1.1479853734292941e-05,
+          "traction_Pa": [
+            19800642.37142551,
+            3473804.3758426458
+          ]
+        },
+        {
+          "adjacent_element_id": 254,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19799993.738152564,
+              -269425.02882700093
+            ],
+            [
+              -269425.02882700093,
+              130574575.34400107
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001250015063602065,
+              0.0
+            ],
+            [
+              0.0012499548182675552,
+              -2.4541228522912326e-06
+            ]
+          ],
+          "edge_length_m": 2.454862210892547e-06,
+          "edge_node_ids": [
+            0,
+            127
+          ],
+          "first_layer_normal_spacing_m": 1.1479853734292943e-05,
+          "traction_Pa": [
+            19800642.3714256,
+            -3473804.375842439
+          ]
+        },
+        {
+          "adjacent_element_id": 2,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20366172.553389486,
+              -8159550.743514758
+            ],
+            [
+              -8159550.743514758,
+              129125539.22463979
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012499548182675552,
+              2.454122852291229e-06
+            ],
+            [
+              0.0012497742274003136,
+              4.902333507675513e-06
+            ]
+          ],
+          "edge_length_m": 2.454862210892546e-06,
+          "edge_node_ids": [
+            1,
+            2
+          ],
+          "first_layer_normal_spacing_m": 1.1479853734292943e-05,
+          "traction_Pa": [
+            19710735.7369507,
+            1361621.8553409826
+          ]
+        },
+        {
+          "adjacent_element_id": 4,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19687765.69451341,
+              -7544825.011254857
+            ],
+            [
+              -7544825.011254857,
+              127505333.1733978
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012497742274003136,
+              4.902333507675513e-06
+            ],
+            [
+              0.0012494737260595572,
+              7.338734012246106e-06
+            ]
+          ],
+          "edge_length_m": 2.4548622108925456e-06,
+          "edge_node_ids": [
+            2,
+            3
+          ],
+          "first_layer_normal_spacing_m": 1.1594672613046043e-05,
+          "traction_Pa": [
+            18616137.409891445,
+            8119929.509458157
+          ]
+        },
+        {
+          "adjacent_element_id": 6,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21256573.947562214,
+              -15220155.540552834
+            ],
+            [
+              -15220155.540552834,
+              123326640.51256543
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012494737260595572,
+              7.338734012246106e-06
+            ],
+            [
+              0.0012490540381793367,
+              9.757454863784015e-06
+            ]
+          ],
+          "edge_length_m": 2.4548622108925355e-06,
+          "edge_node_ids": [
+            3,
+            4
+          ],
+          "first_layer_normal_spacing_m": 1.1594672613045936e-05,
+          "traction_Pa": [
+            18341560.525882147,
+            6088076.428699757
+          ]
+        },
+        {
+          "adjacent_element_id": 8,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19897553.48305882,
+              -14401370.905765211
+            ],
+            [
+              -14401370.905765211,
+              120214442.75599673
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012490540381793367,
+              9.757454863784015e-06
+            ],
+            [
+              0.0012485161748245158,
+              1.2152669151902962e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892568e-06,
+          "edge_node_ids": [
+            4,
+            5
+          ],
+          "first_layer_normal_spacing_m": 1.1829981229543081e-05,
+          "traction_Pa": [
+            16258727.09056301,
+            12287685.22438116
+          ]
+        },
+        {
+          "adjacent_element_id": 10,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22113286.890826367,
+              -20700501.26573561
+            ],
+            [
+              -20700501.26573561,
+              113785211.57088082
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012485161748245158,
+              1.2152669151902962e-05
+            ],
+            [
+              0.0012478614317550278,
+              1.4518606595586873e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892521e-06,
+          "edge_node_ids": [
+            5,
+            6
+          ],
+          "first_layer_normal_spacing_m": 1.1829981229543078e-05,
+          "traction_Pa": [
+            15791168.867750404,
+            10397319.868046308
+          ]
+        },
+        {
+          "adjacent_element_id": 12,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20138539.792703994,
+              -19602291.959113583
+            ],
+            [
+              -19602291.959113583,
+              109408119.13718936
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012478614317550278,
+              1.4518606595586873e-05
+            ],
+            [
+              0.0012470913863042755,
+              1.684956744430227e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925626e-06,
+          "edge_node_ids": [
+            6,
+            7
+          ],
+          "first_layer_normal_spacing_m": 1.2197821574569155e-05,
+          "traction_Pa": [
+            12973229.991624204,
+            15706400.605334593
+          ]
+        },
+        {
+          "adjacent_element_id": 14,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22526868.544384584,
+              -24153509.460672047
+            ],
+            [
+              -24153509.460672047,
+              101437862.4944508
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012470913863042755,
+              1.684956744430227e-05
+            ],
+            [
+              0.001246207893579198,
+              1.9139936209196543e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892517e-06,
+          "edge_node_ids": [
+            7,
+            8
+          ],
+          "first_layer_normal_spacing_m": 1.2197821574569155e-05,
+          "traction_Pa": [
+            12324677.962411823,
+            13971932.835074484
+          ]
+        },
+        {
+          "adjacent_element_id": 16,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20233015.799629044,
+              -22714105.984996963
+            ],
+            [
+              -22714105.984996963,
+              96073402.99229224
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001246207893579198,
+              1.9139936209196543e-05
+            ],
+            [
+              0.0012452130819911548,
+              2.1384195191302443e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925613e-06,
+          "edge_node_ids": [
+            8,
+            9
+          ],
+          "first_layer_normal_spacing_m": 1.2718173720553861e-05,
+          "traction_Pa": [
+            9292526.27551525,
+            18167454.785960987
+          ]
+        },
+        {
+          "adjacent_element_id": 18,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22412178.690802403,
+              -25493511.51952501
+            ],
+            [
+              -25493511.51952501,
+              87357677.14626428
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012452130819911548,
+              2.1384195191302443e-05
+            ],
+            [
+              0.0012441093481283965,
+              2.3576937774158213e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892539e-06,
+          "edge_node_ids": [
+            9,
+            10
+          ],
+          "first_layer_normal_spacing_m": 1.2718173720553856e-05,
+          "traction_Pa": [
+            8556931.037502445,
+            16505577.365221854
+          ]
+        },
+        {
+          "adjacent_element_id": 20,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20179970.70994683,
+              -24667816.8056865
+            ],
+            [
+              -24667816.8056865,
+              83863634.33697312
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012441093481283965,
+              2.3576937774158213e-05
+            ],
+            [
+              0.0012428993509824744,
+              2.5712881448820184e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892521e-06,
+          "edge_node_ids": [
+            10,
+            11
+          ],
+          "first_layer_normal_spacing_m": 1.2416542803150908e-05,
+          "traction_Pa": [
+            5399607.685901689,
+            19873087.25683171
+          ]
+        },
+        {
+          "adjacent_element_id": 22,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21953320.396254525,
+              -25926800.087884415
+            ],
+            [
+              -25926800.087884415,
+              74404418.74557956
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012428993509824744,
+              2.5712881448820184e-05
+            ],
+            [
+              0.0012415860055424962,
+              2.778688053988953e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925173e-06,
+          "edge_node_ids": [
+            11,
+            12
+          ],
+          "first_layer_normal_spacing_m": 1.2416542803150825e-05,
+          "traction_Pa": [
+            4676564.667538609,
+            17901837.44820103
+          ]
+        },
+        {
+          "adjacent_element_id": 24,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20619310.194497433,
+              -26362445.787245404
+            ],
+            [
+              -26362445.787245404,
+              72895087.3490699
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012415860055424962,
+              2.778688053988953e-05
+            ],
+            [
+              0.001240172475772662,
+              2.9793938601894995e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926e-06,
+          "edge_node_ids": [
+            12,
+            13
+          ],
+          "first_layer_normal_spacing_m": 1.0670887517208508e-05,
+          "traction_Pa": [
+            1678322.6425769294,
+            20420053.096532304
+          ]
+        },
+        {
+          "adjacent_element_id": 26,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21913430.106504925,
+              -26212160.401155427
+            ],
+            [
+              -26212160.401155427,
+              62131418.13789806
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001240172475772662,
+              2.9793938601894995e-05
+            ],
+            [
+              0.0012386621669899984,
+              3.1729220456167685e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925113e-06,
+          "edge_node_ids": [
+            13,
+            14
+          ],
+          "first_layer_normal_spacing_m": 1.0670887517208591e-05,
+          "traction_Pa": [
+            1148825.205351693,
+            17560948.19338144
+          ]
+        },
+        {
+          "adjacent_element_id": 28,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19801072.431686327,
+              -25806050.850653287
+            ],
+            [
+              -25806050.850653287,
+              58130724.65702413
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012386621669899984,
+              3.1729220456167685e-05
+            ],
+            [
+              0.00123705871766065,
+              3.3588063839209985e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892522e-06,
+          "edge_node_ids": [
+            14,
+            15
+          ],
+          "first_layer_normal_spacing_m": 9.428482345505014e-06,
+          "traction_Pa": [
+            -1862264.3839420925,
+            18428840.689680263
+          ]
+        },
+        {
+          "adjacent_element_id": 30,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19905960.387075555,
+              -24247776.198657244
+            ],
+            [
+              -24247776.198657244,
+              47687157.52777145
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.00123705871766065,
+              3.3588063839209985e-05
+            ],
+            [
+              0.0012353659906344965,
+              3.53659906344967e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926532e-06,
+          "edge_node_ids": [
+            15,
+            16
+          ],
+          "first_layer_normal_spacing_m": 9.428482345505083e-06,
+          "traction_Pa": [
+            -2302991.064999117,
+            15320847.398726683
+          ]
+        },
+        {
+          "adjacent_element_id": 32,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              17294856.914520208,
+              -22667025.083615333
+            ],
+            [
+              -22667025.083615333,
+              42483772.24480979
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012353659906344965,
+              3.53659906344967e-05
+            ],
+            [
+              0.0012335880638392098,
+              3.7058717660649986e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892521e-06,
+          "edge_node_ids": [
+            16,
+            17
+          ],
+          "first_layer_normal_spacing_m": 8.51478909476001e-06,
+          "traction_Pa": [
+            -4491021.738007976,
+            15138915.297352675
+          ]
+        },
+        {
+          "adjacent_element_id": 34,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              15865882.79909715,
+              -20199470.6829506
+            ],
+            [
+              -20199470.6829506,
+              33488460.937223114
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012335880638392098,
+              3.7058717660649986e-05
+            ],
+            [
+              0.0012317292204561676,
+              3.8662166989998466e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924724e-06,
+          "edge_node_ids": [
+            17,
+            18
+          ],
+          "first_layer_normal_spacing_m": 8.514789094760088e-06,
+          "traction_Pa": [
+            -4932054.122020189,
+            12164013.185406873
+          ]
+        },
+        {
+          "adjacent_element_id": 36,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              12789669.9375702,
+              -17615161.982150115
+            ],
+            [
+              -17615161.982150115,
+              28195683.692277327
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012317292204561676,
+              3.8662166989998466e-05
+            ],
+            [
+              0.0012297939386018948,
+              4.0172475772662154e-05
+            ]
+          ],
+          "edge_length_m": 2.45486221089261e-06,
+          "edge_node_ids": [
+            18,
+            19
+          ],
+          "first_layer_normal_spacing_m": 7.829410772680013e-06,
+          "traction_Pa": [
+            -6018241.042000016,
+            11390562.38868374
+          ]
+        },
+        {
+          "adjacent_element_id": 38,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              9889240.855601748,
+              -14931792.675696457
+            ],
+            [
+              -14931792.675696457,
+              21216784.556988645
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012297939386018948,
+              4.0172475772662154e-05
+            ],
+            [
+              0.0012277868805398895,
+              4.158600554249621e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924465e-06,
+          "edge_node_ids": [
+            19,
+            20
+          ],
+          "first_layer_normal_spacing_m": 7.829410772680015e-06,
+          "traction_Pa": [
+            -6513701.033217452,
+            8748672.302483208
+          ]
+        },
+        {
+          "adjacent_element_id": 40,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              6403431.956953754,
+              -11772391.2980363
+            ],
+            [
+              -11772391.2980363,
+              16611986.161745941
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012277868805398895,
+              4.158600554249621e-05
+            ],
+            [
+              0.00122571288144882,
+              4.28993509824745e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926176e-06,
+          "edge_node_ids": [
+            20,
+            21
+          ],
+          "first_layer_normal_spacing_m": 7.310908790186637e-06,
+          "traction_Pa": [
+            -6520125.903581569,
+            7736494.409801196
+          ]
+        },
+        {
+          "adjacent_element_id": 42,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              2430427.0928315464,
+              -9518344.155010814
+            ],
+            [
+              -9518344.155010814,
+              11723921.270933388
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.00122571288144882,
+              4.28993509824745e-05
+            ],
+            [
+              0.0012235769377741581,
+              4.4109348128396635e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892532e-06,
+          "edge_node_ids": [
+            21,
+            22
+          ],
+          "first_layer_normal_spacing_m": 7.310908790186686e-06,
+          "traction_Pa": [
+            -7083834.305767605,
+            5509256.755596119
+          ]
+        },
+        {
+          "adjacent_element_id": 44,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -1285607.7146480093,
+              -6277020.5287270155
+            ],
+            [
+              -6277020.5287270155,
+              8200949.614923042
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012235769377741581,
+              4.4109348128396635e-05
+            ],
+            [
+              0.0012213841951913024,
+              4.521308199115489e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924876e-06,
+          "edge_node_ids": [
+            22,
+            23
+          ],
+          "first_layer_normal_spacing_m": 6.9200116348755766e-06,
+          "traction_Pa": [
+            -6184811.069359177,
+            4503067.9427389
+          ]
+        },
+        {
+          "adjacent_element_id": 46,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -5727267.480496559,
+              -4898426.1196776675
+            ],
+            [
+              -4898426.1196776675,
+              5134001.050475678
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012213841951913024,
+              4.521308199115489e-05
+            ],
+            [
+              0.0012191399362091965,
+              4.620789357919818e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925698e-06,
+          "edge_node_ids": [
+            23,
+            24
+          ],
+          "first_layer_normal_spacing_m": 6.920011634875583e-06,
+          "traction_Pa": [
+            -6799114.345656772,
+            2708509.20884253
+          ]
+        },
+        {
+          "adjacent_element_id": 48,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -9358749.41634975,
+              -1986571.966409316
+            ],
+            [
+              -1986571.966409316,
+              2748387.2639193973
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012191399362091965,
+              4.620789357919818e-05
+            ],
+            [
+              0.0012168495674443021,
+              4.709138630427571e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892603e-06,
+          "edge_node_ids": [
+            24,
+            25
+          ],
+          "first_layer_normal_spacing_m": 6.6309271093284534e-06,
+          "traction_Pa": [
+            -5221624.802145776,
+            1849268.135215671
+          ]
+        },
+        {
+          "adjacent_element_id": 50,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -13601122.063431868,
+              -1673783.1225965754
+            ],
+            [
+              -1673783.1225965754,
+              1061009.6088437224
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012168495674443021,
+              4.709138630427571e-05
+            ],
+            [
+              0.0012145186065955868,
+              4.786143175502795e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924533e-06,
+          "edge_node_ids": [
+            25,
+            26
+          ],
+          "first_layer_normal_spacing_m": 6.63092710932846e-06,
+          "traction_Pa": [
+            -5855727.883341657,
+            482423.3205307044
+          ]
+        },
+        {
+          "adjacent_element_id": 52,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -16747747.830031509,
+              672832.170962
+            ],
+            [
+              672832.170962,
+              -361489.84925130266
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012145186065955868,
+              4.786143175502795e-05
+            ],
+            [
+              0.001212152669151903,
+              4.851617482451603e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925596e-06,
+          "edge_node_ids": [
+            26,
+            27
+          ],
+          "first_layer_normal_spacing_m": 6.426571362091756e-06,
+          "traction_Pa": [
+            -3818378.4625715814,
+            -168942.34110131013
+          ]
+        },
+        {
+          "adjacent_element_id": 54,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -20176532.3014454,
+              -26438.412489822713
+            ],
+            [
+              -26438.412489822713,
+              -1136214.813152509
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001212152669151903,
+              4.851617482451603e-05
+            ],
+            [
+              0.001209757454863784,
+              4.905403817933682e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926172e-06,
+          "edge_node_ids": [
+            27,
+            28
+          ],
+          "first_layer_normal_spacing_m": 6.4265713620917825e-06,
+          "traction_Pa": [
+            -4446499.264692865,
+            -1114399.9023385323
+          ]
+        },
+        {
+          "adjacent_element_id": 56,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -22436517.084932044,
+              1728894.2227650096
+            ],
+            [
+              1728894.2227650096,
+              -1868712.125551018
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001209757454863784,
+              4.905403817933682e-05
+            ],
+            [
+              0.001207338734012246,
+              4.9473726059557304e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925096e-06,
+          "edge_node_ids": [
+            28,
+            29
+          ],
+          "first_layer_normal_spacing_m": 6.295844352926762e-06,
+          "traction_Pa": [
+            -2132348.5142970574,
+            -1545625.255575848
+          ]
+        },
+        {
+          "adjacent_element_id": 58,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -24575276.586993687,
+              265908.3577953666
+            ],
+            [
+              265908.3577953666,
+              -2120599.896035148
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001207338734012246,
+              4.9473726059557304e-05
+            ],
+            [
+              0.0012049023335076754,
+              4.9774227400313696e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926223e-06,
+          "edge_node_ids": [
+            29,
+            30
+          ],
+          "first_layer_normal_spacing_m": 6.295844352926763e-06,
+          "traction_Pa": [
+            -2744367.5970305884,
+            -2072101.9762681937
+          ]
+        },
+        {
+          "adjacent_element_id": 60,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -25634654.221254807,
+              1592261.207097555
+            ],
+            [
+              1592261.207097555,
+              -2415940.9024412883
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012049023335076754,
+              4.9774227400313696e-05
+            ],
+            [
+              0.0012024541228522912,
+              4.995481826755532e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892402e-06,
+          "edge_node_ids": [
+            30,
+            31
+          ],
+          "first_layer_normal_spacing_m": 6.232056086952859e-06,
+          "traction_Pa": [
+            -297855.2444370031,
+            -2292260.8050675807
+          ]
+        },
+        {
+          "adjacent_element_id": 62,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -26197952.89289175,
+              -257532.07616972565
+            ],
+            [
+              -257532.07616972565,
+              -2396333.370035559
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012024541228522912,
+              4.995481826755532e-05
+            ],
+            [
+              0.0012,
+              5.00150636020651e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926308e-06,
+          "edge_node_ids": [
+            31,
+            32
+          ],
+          "first_layer_normal_spacing_m": 6.232056086952868e-06,
+          "traction_Pa": [
+            -900384.4611001932,
+            -2401931.7927601035
+          ]
+        },
+        {
+          "adjacent_element_id": 64,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -25900932.492125362,
+              926713.471238496
+            ],
+            [
+              926713.471238496,
+              -2401242.3517635236
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012,
+              5.00150636020651e-05
+            ],
+            [
+              0.0011975458771477086,
+              4.995481826755532e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926308e-06,
+          "edge_node_ids": [
+            32,
+            33
+          ],
+          "first_layer_normal_spacing_m": 6.232056086952868e-06,
+          "traction_Pa": [
+            1562075.065712746,
+            -2423261.829534215
+          ]
+        },
+        {
+          "adjacent_element_id": 66,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -24821064.487096734,
+              -876097.8917907603
+            ],
+            [
+              -876097.8917907603,
+              -2193880.48120336
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011975458771477086,
+              4.995481826755532e-05
+            ],
+            [
+              0.0011950976664923244,
+              4.9774227400313696e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892402e-06,
+          "edge_node_ids": [
+            33,
+            34
+          ],
+          "first_layer_normal_spacing_m": 6.232056086952859e-06,
+          "traction_Pa": [
+            952226.7104733296,
+            -2123486.3079175833
+          ]
+        },
+        {
+          "adjacent_element_id": 68,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -23205330.408783425,
+              488855.4401909342
+            ],
+            [
+              488855.4401909342,
+              -1907711.757590259
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011950976664923244,
+              4.9774227400313696e-05
+            ],
+            [
+              0.0011926612659877538,
+              4.9473726059557304e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926223e-06,
+          "edge_node_ids": [
+            34,
+            35
+          ],
+          "first_layer_normal_spacing_m": 6.295844352926763e-06,
+          "traction_Pa": [
+            3325759.183326692,
+            -1953206.001830248
+          ]
+        },
+        {
+          "adjacent_element_id": 70,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -20635625.65446782,
+              -848602.7245419674
+            ],
+            [
+              -848602.7245419674,
+              -1425240.2826258047
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011926612659877538,
+              4.9473726059557304e-05
+            ],
+            [
+              0.001190242545136216,
+              4.905403817933682e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925096e-06,
+          "edge_node_ids": [
+            35,
+            36
+          ],
+          "first_layer_normal_spacing_m": 6.295844352926762e-06,
+          "traction_Pa": [
+            2691796.2458768743,
+            -1259178.6609084648
+          ]
+        },
+        {
+          "adjacent_element_id": 72,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -17925569.23229001,
+              961784.6309248608
+            ],
+            [
+              961784.6309248608,
+              -707250.7995920257
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001190242545136216,
+              4.905403817933682e-05
+            ],
+            [
+              0.0011878473308480969,
+              4.851617482451603e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926172e-06,
+          "edge_node_ids": [
+            36,
+            37
+          ],
+          "first_layer_normal_spacing_m": 6.4265713620917825e-06,
+          "traction_Pa": [
+            4865929.76234417,
+            -900794.3170328415
+          ]
+        },
+        {
+          "adjacent_element_id": 74,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -14221376.999534579,
+              422864.11888966186
+            ],
+            [
+              422864.11888966186,
+              288940.0727731389
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011878473308480969,
+              4.851617482451603e-05
+            ],
+            [
+              0.001185481393404413,
+              4.786143175502796e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925575e-06,
+          "edge_node_ids": [
+            37,
+            38
+          ],
+          "first_layer_normal_spacing_m": 6.426571362091754e-06,
+          "traction_Pa": [
+            4200568.991505457,
+            165690.27140169038
+          ]
+        },
+        {
+          "adjacent_element_id": 76,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -10781473.878173104,
+              2805396.9163540797
+            ],
+            [
+              2805396.9163540797,
+              1666269.458855303
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001185481393404413,
+              4.786143175502796e-05
+            ],
+            [
+              0.0011831504325556976,
+              4.709138630427571e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924554e-06,
+          "edge_node_ids": [
+            38,
+            39
+          ],
+          "first_layer_normal_spacing_m": 6.6309271093284585e-06,
+          "traction_Pa": [
+            6045754.919997652,
+            702168.0204129472
+          ]
+        },
+        {
+          "adjacent_element_id": 78,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -6458513.296077604,
+              3249386.4177386016
+            ],
+            [
+              3249386.4177386016,
+              3521186.7754010526
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011831504325556976,
+              4.709138630427571e-05
+            ],
+            [
+              0.0011808600637908033,
+              4.620789357919818e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892603e-06,
+          "edge_node_ids": [
+            39,
+            40
+          ],
+          "first_layer_normal_spacing_m": 6.6309271093284534e-06,
+          "traction_Pa": [
+            5356041.007035036,
+            2115803.861273009
+          ]
+        },
+        {
+          "adjacent_element_id": 80,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -2717786.5924109523,
+              6144664.749229455
+            ],
+            [
+              6144664.749229455,
+              5781702.414257239
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011808600637908033,
+              4.620789357919818e-05
+            ],
+            [
+              0.0011786158048086974,
+              4.521308199115489e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925698e-06,
+          "edge_node_ids": [
+            40,
+            41
+          ],
+          "first_layer_normal_spacing_m": 6.920011634875589e-06,
+          "traction_Pa": [
+            6718871.869166915,
+            2795616.7345907763
+          ]
+        },
+        {
+          "adjacent_element_id": 82,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              1613701.2192645946,
+              7555902.37348099
+            ],
+            [
+              7555902.37348099,
+              8872475.115405474
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011786158048086974,
+              4.521308199115489e-05
+            ],
+            [
+              0.0011764230622258417,
+              4.410934812839664e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924847e-06,
+          "edge_node_ids": [
+            41,
+            42
+          ],
+          "first_layer_normal_spacing_m": 6.920011634875579e-06,
+          "traction_Pa": [
+            6023577.266595212,
+            4527891.07195132
+          ]
+        },
+        {
+          "adjacent_element_id": 84,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              5247688.840130083,
+              10716241.352188203
+            ],
+            [
+              10716241.352188203,
+              12124666.917335788
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011764230622258417,
+              4.410934812839664e-05
+            ],
+            [
+              0.0011742871185511797,
+              4.28993509824745e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925355e-06,
+          "edge_node_ids": [
+            42,
+            43
+          ],
+          "first_layer_normal_spacing_m": 7.310908790186683e-06,
+          "traction_Pa": [
+            6737485.851435649,
+            5267498.966308404
+          ]
+        },
+        {
+          "adjacent_element_id": 86,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              8974669.918443574,
+              12851940.072267134
+            ],
+            [
+              12851940.072267134,
+              16753018.5598409
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011742871185511797,
+              4.28993509824745e-05
+            ],
+            [
+              0.0011722131194601103,
+              4.1586005542496215e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926142e-06,
+          "edge_node_ids": [
+            43,
+            44
+          ],
+          "first_layer_normal_spacing_m": 7.310908790186638e-06,
+          "traction_Pa": [
+            6056580.344791115,
+            7278090.109381972
+          ]
+        },
+        {
+          "adjacent_element_id": 88,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              12188397.123944035,
+              15894677.772575662
+            ],
+            [
+              15894677.772575662,
+              20878895.763445187
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011722131194601103,
+              4.1586005542496215e-05
+            ],
+            [
+              0.001170206061398105,
+              4.017247577266216e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924465e-06,
+          "edge_node_ids": [
+            44,
+            45
+          ],
+          "first_layer_normal_spacing_m": 7.829410772680008e-06,
+          "traction_Pa": [
+            5977068.252574631,
+            7917982.430170736
+          ]
+        },
+        {
+          "adjacent_element_id": 90,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              14810875.320326522,
+              18300368.535659704
+            ],
+            [
+              18300368.535659704,
+              27132082.53335308
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001170206061398105,
+              4.017247577266216e-05
+            ],
+            [
+              0.0011682707795438322,
+              3.866216698999847e-05
+            ]
+          ],
+          "edge_length_m": 2.45486221089261e-06,
+          "edge_node_ids": [
+            45,
+            46
+          ],
+          "first_layer_normal_spacing_m": 7.829410772680018e-06,
+          "traction_Pa": [
+            5314911.778122392,
+            10130515.496834313
+          ]
+        },
+        {
+          "adjacent_element_id": 92,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              17414437.495084926,
+              20830135.788472272
+            ],
+            [
+              20830135.788472272,
+              31692714.93079997
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011682707795438322,
+              3.866216698999847e-05
+            ],
+            [
+              0.00116641193616079,
+              3.7058717660649986e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892477e-06,
+          "edge_node_ids": [
+            46,
+            47
+          ],
+          "first_layer_normal_spacing_m": 8.51478909476009e-06,
+          "traction_Pa": [
+            4398125.44585629,
+            10392325.103339186
+          ]
+        },
+        {
+          "adjacent_element_id": 94,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              18678866.11949524,
+              22918754.243905015
+            ],
+            [
+              22918754.243905015,
+              39273350.808186926
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.00116641193616079,
+              3.7058717660649986e-05
+            ],
+            [
+              0.0011646340093655033,
+              3.5365990634496706e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925164e-06,
+          "edge_node_ids": [
+            47,
+            48
+          ],
+          "first_layer_normal_spacing_m": 8.514789094760009e-06,
+          "traction_Pa": [
+            3719005.386922053,
+            12640199.474521464
+          ]
+        },
+        {
+          "adjacent_element_id": 96,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20525138.521586973,
+              24789649.25706487
+            ],
+            [
+              24789649.25706487,
+              43406340.77997524
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011646340093655033,
+              3.5365990634496706e-05
+            ],
+            [
+              0.0011629412823393498,
+              3.358806383921e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892648e-06,
+          "edge_node_ids": [
+            48,
+            49
+          ],
+          "first_layer_normal_spacing_m": 9.428482345505085e-06,
+          "traction_Pa": [
+            2228196.5511247246,
+            11976600.704649981
+          ]
+        },
+        {
+          "adjacent_element_id": 98,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20583546.999176674,
+              26012991.453996405
+            ],
+            [
+              26012991.453996405,
+              51373066.17427342
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011629412823393498,
+              3.358806383921e-05
+            ],
+            [
+              0.0011613378330100014,
+              3.1729220456167685e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925325e-06,
+          "edge_node_ids": [
+            49,
+            50
+          ],
+          "first_layer_normal_spacing_m": 9.42848234550501e-06,
+          "traction_Pa": [
+            1404935.701480134,
+            13858224.431238312
+          ]
+        },
+        {
+          "adjacent_element_id": 100,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22445416.019619714,
+              28066725.343842667
+            ],
+            [
+              28066725.343842667,
+              55987056.33993546
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011613378330100014,
+              3.1729220456167685e-05
+            ],
+            [
+              0.0011598275242273377,
+              2.9793938601895002e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925063e-06,
+          "edge_node_ids": [
+            50,
+            51
+          ],
+          "first_layer_normal_spacing_m": 9.46083112166038e-06,
+          "traction_Pa": [
+            -427227.4599788478,
+            12318703.063949205
+          ]
+        },
+        {
+          "adjacent_element_id": 102,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21493099.66495809,
+              28204926.94638003
+            ],
+            [
+              28204926.94638003,
+              64389444.815075
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011598275242273377,
+              2.9793938601895002e-05
+            ],
+            [
+              0.0011584139944575036,
+              2.778688053988953e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926054e-06,
+          "edge_node_ids": [
+            51,
+            52
+          ],
+          "first_layer_normal_spacing_m": 9.460831121660297e-06,
+          "traction_Pa": [
+            -1331803.8995545541,
+            14016049.837959325
+          ]
+        },
+        {
+          "adjacent_element_id": 104,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              23194626.778819352,
+              30752799.368645713
+            ],
+            [
+              30752799.368645713,
+              70403751.83012892
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011584139944575036,
+              2.778688053988953e-05
+            ],
+            [
+              0.0011571006490175254,
+              2.571288144882019e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925113e-06,
+          "edge_node_ids": [
+            52,
+            53
+          ],
+          "first_layer_normal_spacing_m": 8.838628742668307e-06,
+          "traction_Pa": [
+            -3143388.6616316107,
+            11684227.472230311
+          ]
+        },
+        {
+          "adjacent_element_id": 106,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21387981.881010063,
+              29501117.328784827
+            ],
+            [
+              29501117.328784827,
+              79276223.79340556
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011571006490175254,
+              2.571288144882019e-05
+            ],
+            [
+              0.0011558906518716033,
+              2.3576937774158226e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892515e-06,
+          "edge_node_ids": [
+            53,
+            54
+          ],
+          "first_layer_normal_spacing_m": 8.838628742668392e-06,
+          "traction_Pa": [
+            -4068357.4006193983,
+            13406568.98362476
+          ]
+        },
+        {
+          "adjacent_element_id": 108,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22642950.905629102,
+              31374438.45339794
+            ],
+            [
+              31374438.45339794,
+              85250478.77473363
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011558906518716033,
+              2.3576937774158226e-05
+            ],
+            [
+              0.001154786918008845,
+              2.138419519130244e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892554e-06,
+          "edge_node_ids": [
+            54,
+            55
+          ],
+          "first_layer_normal_spacing_m": 8.369552156295184e-06,
+          "traction_Pa": [
+            -6118931.009486303,
+            10305170.252661122
+          ]
+        },
+        {
+          "adjacent_element_id": 110,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20105012.845384326,
+              28355366.876435358
+            ],
+            [
+              28355366.876435358,
+              93963704.91954994
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001154786918008845,
+              2.138419519130244e-05
+            ],
+            [
+              0.0011537921064208017,
+              1.9139936209196546e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892555e-06,
+          "edge_node_ids": [
+            55,
+            56
+          ],
+          "first_layer_normal_spacing_m": 8.369552156295188e-06,
+          "traction_Pa": [
+            -6889432.749694275,
+            12155222.225387443
+          ]
+        },
+        {
+          "adjacent_element_id": 112,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20704442.594739746,
+              29455815.94885228
+            ],
+            [
+              29455815.94885228,
+              99503423.35349138
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011537921064208017,
+              1.9139936209196546e-05
+            ],
+            [
+              0.0011529086136957242,
+              1.6849567444302285e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892507e-06,
+          "edge_node_ids": [
+            56,
+            57
+          ],
+          "first_layer_normal_spacing_m": 8.02265072563877e-06,
+          "traction_Pa": [
+            -8716093.887700384,
+            8328724.019077466
+          ]
+        },
+        {
+          "adjacent_element_id": 114,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              17925024.09572227,
+              24595349.326385062
+            ],
+            [
+              24595349.326385062,
+              107295719.2169684
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011529086136957242,
+              1.6849567444302285e-05
+            ],
+            [
+              0.001152138568244972,
+              1.4518606595586875e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892574e-06,
+          "edge_node_ids": [
+            57,
+            58
+          ],
+          "first_layer_normal_spacing_m": 8.022650725638769e-06,
+          "traction_Pa": [
+            -9305203.534277748,
+            10302730.644399084
+          ]
+        },
+        {
+          "adjacent_element_id": 116,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              18017288.4391691,
+              24842842.578720156
+            ],
+            [
+              24842842.578720156,
+              111971067.2905759
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001152138568244972,
+              1.4518606595586875e-05
+            ],
+            [
+              0.001151483825175484,
+              1.2152669151902972e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892513e-06,
+          "edge_node_ids": [
+            58,
+            59
+          ],
+          "first_layer_normal_spacing_m": 7.777423828954707e-06,
+          "traction_Pa": [
+            -10738728.320519721,
+            5921175.030778837
+          ]
+        },
+        {
+          "adjacent_element_id": 118,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              15548131.070883868,
+              18340455.57127786
+            ],
+            [
+              18340455.57127786,
+              118123820.69181515
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001151483825175484,
+              1.2152669151902972e-05
+            ],
+            [
+              0.001150945961820663,
+              9.757454863784034e-06
+            ]
+          ],
+          "edge_length_m": 2.45486221089256e-06,
+          "edge_node_ids": [
+            59,
+            60
+          ],
+          "first_layer_normal_spacing_m": 7.77742382895471e-06,
+          "traction_Pa": [
+            -11151928.043269722,
+            7986254.0388769
+          ]
+        },
+        {
+          "adjacent_element_id": 120,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              15397390.226556014,
+              17809392.698204074
+            ],
+            [
+              17809392.698204074,
+              121519669.25024417
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001150945961820663,
+              9.757454863784034e-06
+            ],
+            [
+              0.0011505262739404426,
+              7.338734012246109e-06
+            ]
+          ],
+          "edge_length_m": 2.4548622108925516e-06,
+          "edge_node_ids": [
+            60,
+            61
+          ],
+          "first_layer_normal_spacing_m": 7.6205514179565795e-06,
+          "traction_Pa": [
+            -12125976.928005137,
+            3228035.7264811536
+          ]
+        },
+        {
+          "adjacent_element_id": 122,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              13708659.156238744,
+              10084527.671438623
+            ],
+            [
+              10084527.671438623,
+              125457815.68357168
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011505262739404426,
+              7.338734012246109e-06
+            ],
+            [
+              0.0011502257725996862,
+              4.902333507675524e-06
+            ]
+          ],
+          "edge_length_m": 2.454862210892537e-06,
+          "edge_node_ids": [
+            61,
+            62
+          ],
+          "first_layer_normal_spacing_m": 7.620551417956685e-06,
+          "traction_Pa": [
+            -12371109.818030147,
+            5348688.596848095
+          ]
+        },
+        {
+          "adjacent_element_id": 124,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              13561134.882952932,
+              9009848.287749322
+            ],
+            [
+              9009848.287749322,
+              127246126.70928839
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011502257725996862,
+              4.902333507675524e-06
+            ],
+            [
+              0.0011500451817324446,
+              2.4541228522912263e-06
+            ]
+          ],
+          "edge_length_m": 2.4548622108925596e-06,
+          "edge_node_ids": [
+            62,
+            63
+          ],
+          "first_layer_normal_spacing_m": 7.5440054987879324e-06,
+          "traction_Pa": [
+            -12861584.843113853,
+            375370.06762287446
+          ]
+        },
+        {
+          "adjacent_element_id": 126,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              12962386.317283524,
+              634740.8439628853
+            ],
+            [
+              634740.8439628853,
+              128601072.95220658
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011500451817324446,
+              2.4541228522912263e-06
+            ],
+            [
+              0.0011499849363979348,
+              6.125078754942031e-21
+            ]
+          ],
+          "edge_length_m": 2.4548622108925346e-06,
+          "edge_node_ids": [
+            63,
+            64
+          ],
+          "first_layer_normal_spacing_m": 7.544005498787932e-06,
+          "traction_Pa": [
+            -12942904.96876768,
+            2521478.6477214773
+          ]
+        },
+        {
+          "adjacent_element_id": 128,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              12962386.31728375,
+              -634740.8439623895
+            ],
+            [
+              -634740.8439623895,
+              128601072.95220643
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011499849363979348,
+              6.125078754942031e-21
+            ],
+            [
+              0.0011500451817324446,
+              -2.454122852291214e-06
+            ]
+          ],
+          "edge_length_m": 2.4548622108925346e-06,
+          "edge_node_ids": [
+            64,
+            65
+          ],
+          "first_layer_normal_spacing_m": 7.54400549878793e-06,
+          "traction_Pa": [
+            -12942904.968767915,
+            -2521478.6477219695
+          ]
+        },
+        {
+          "adjacent_element_id": 130,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              13561134.882952834,
+              -9009848.28774841
+            ],
+            [
+              -9009848.28774841,
+              127246126.70928764
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011500451817324446,
+              -2.454122852291214e-06
+            ],
+            [
+              0.0011502257725996862,
+              -4.902333507675512e-06
+            ]
+          ],
+          "edge_length_m": 2.45486221089256e-06,
+          "edge_node_ids": [
+            65,
+            66
+          ],
+          "first_layer_normal_spacing_m": 7.5440054987879324e-06,
+          "traction_Pa": [
+            -12861584.843113821,
+            -375370.0676237287
+          ]
+        },
+        {
+          "adjacent_element_id": 132,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              13708659.156237965,
+              -10084527.671437683
+            ],
+            [
+              -10084527.671437683,
+              125457815.68357022
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011502257725996862,
+              -4.902333507675512e-06
+            ],
+            [
+              0.0011505262739404426,
+              -7.338734012246098e-06
+            ]
+          ],
+          "edge_length_m": 2.454862210892538e-06,
+          "edge_node_ids": [
+            66,
+            67
+          ],
+          "first_layer_normal_spacing_m": 7.6205514179566845e-06,
+          "traction_Pa": [
+            -12371109.81802949,
+            -5348688.596848846
+          ]
+        },
+        {
+          "adjacent_element_id": 134,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              15397390.226555143,
+              -17809392.698203247
+            ],
+            [
+              -17809392.698203247,
+              121519669.25024241
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011505262739404426,
+              -7.338734012246098e-06
+            ],
+            [
+              0.001150945961820663,
+              -9.75745486378402e-06
+            ]
+          ],
+          "edge_length_m": 2.454862210892549e-06,
+          "edge_node_ids": [
+            67,
+            68
+          ],
+          "first_layer_normal_spacing_m": 7.6205514179565795e-06,
+          "traction_Pa": [
+            -12125976.928004416,
+            -3228035.7264816924
+          ]
+        },
+        {
+          "adjacent_element_id": 136,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              15548131.070883462,
+              -18340455.5712778
+            ],
+            [
+              -18340455.5712778,
+              118123820.6918126
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001150945961820663,
+              -9.75745486378402e-06
+            ],
+            [
+              0.001151483825175484,
+              -1.2152669151902958e-05
+            ]
+          ],
+          "edge_length_m": 2.45486221089256e-06,
+          "edge_node_ids": [
+            68,
+            69
+          ],
+          "first_layer_normal_spacing_m": 7.77742382895471e-06,
+          "traction_Pa": [
+            -11151928.043269338,
+            -7986254.038876402
+          ]
+        },
+        {
+          "adjacent_element_id": 138,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              18017288.439168334,
+              -24842842.578719776
+            ],
+            [
+              -24842842.578719776,
+              111971067.29057325
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001151483825175484,
+              -1.2152669151902958e-05
+            ],
+            [
+              0.001152138568244972,
+              -1.4518606595586861e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892513e-06,
+          "edge_node_ids": [
+            69,
+            70
+          ],
+          "first_layer_normal_spacing_m": 7.777423828954707e-06,
+          "traction_Pa": [
+            -10738728.32051908,
+            -5921175.030778496
+          ]
+        },
+        {
+          "adjacent_element_id": 140,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              17925024.095721506,
+              -24595349.326384913
+            ],
+            [
+              -24595349.326384913,
+              107295719.21696688
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001152138568244972,
+              -1.4518606595586861e-05
+            ],
+            [
+              0.0011529086136957242,
+              -1.684956744430227e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892574e-06,
+          "edge_node_ids": [
+            70,
+            71
+          ],
+          "first_layer_normal_spacing_m": 8.022650725638769e-06,
+          "traction_Pa": [
+            -9305203.534277072,
+            -10302730.644398749
+          ]
+        },
+        {
+          "adjacent_element_id": 142,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20704442.59473868,
+              -29455815.948851768
+            ],
+            [
+              -29455815.948851768,
+              99503423.35349008
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011529086136957242,
+              -1.684956744430227e-05
+            ],
+            [
+              0.0011537921064208017,
+              -1.9139936209196536e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925105e-06,
+          "edge_node_ids": [
+            71,
+            72
+          ],
+          "first_layer_normal_spacing_m": 8.022650725638767e-06,
+          "traction_Pa": [
+            -8716093.887699587,
+            -8328724.019077427
+          ]
+        },
+        {
+          "adjacent_element_id": 144,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20105012.84538347,
+              -28355366.876434658
+            ],
+            [
+              -28355366.876434658,
+              93963704.91954766
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011537921064208017,
+              -1.9139936209196536e-05
+            ],
+            [
+              0.001154786918008845,
+              -2.138419519130243e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892555e-06,
+          "edge_node_ids": [
+            72,
+            73
+          ],
+          "first_layer_normal_spacing_m": 8.369552156295186e-06,
+          "traction_Pa": [
+            -6889432.749693776,
+            -12155222.22538716
+          ]
+        },
+        {
+          "adjacent_element_id": 146,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22642950.90562809,
+              -31374438.453397
+            ],
+            [
+              -31374438.453397,
+              85250478.77473162
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001154786918008845,
+              -2.138419519130243e-05
+            ],
+            [
+              0.0011558906518716033,
+              -2.3576937774158213e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892551e-06,
+          "edge_node_ids": [
+            73,
+            74
+          ],
+          "first_layer_normal_spacing_m": 8.369552156295182e-06,
+          "traction_Pa": [
+            -6118931.009485802,
+            -10305170.252661109
+          ]
+        },
+        {
+          "adjacent_element_id": 148,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21387981.881009586,
+              -29501117.32878394
+            ],
+            [
+              -29501117.32878394,
+              79276223.79340242
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011558906518716033,
+              -2.3576937774158213e-05
+            ],
+            [
+              0.0011571006490175254,
+              -2.5712881448820177e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892515e-06,
+          "edge_node_ids": [
+            74,
+            75
+          ],
+          "first_layer_normal_spacing_m": 8.83862874266839e-06,
+          "traction_Pa": [
+            -4068357.4006194184,
+            -13406568.983623985
+          ]
+        },
+        {
+          "adjacent_element_id": 150,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              23194626.77881932,
+              -30752799.368644908
+            ],
+            [
+              -30752799.368644908,
+              70403751.83012727
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011571006490175254,
+              -2.5712881448820177e-05
+            ],
+            [
+              0.0011584139944575036,
+              -2.778688053988952e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925143e-06,
+          "edge_node_ids": [
+            75,
+            76
+          ],
+          "first_layer_normal_spacing_m": 8.838628742668304e-06,
+          "traction_Pa": [
+            -3143388.661632043,
+            -11684227.47223005
+          ]
+        },
+        {
+          "adjacent_element_id": 152,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21493099.66495772,
+              -28204926.946379002
+            ],
+            [
+              -28204926.946379002,
+              64389444.81507408
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011584139944575036,
+              -2.778688053988952e-05
+            ],
+            [
+              0.0011598275242273377,
+              -2.9793938601894992e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926054e-06,
+          "edge_node_ids": [
+            76,
+            77
+          ],
+          "first_layer_normal_spacing_m": 9.460831121660293e-06,
+          "traction_Pa": [
+            -1331803.8995548445,
+            -14016049.83795963
+          ]
+        },
+        {
+          "adjacent_element_id": 154,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22445416.01961884,
+              -28066725.34384144
+            ],
+            [
+              -28066725.34384144,
+              55987056.33993383
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011598275242273377,
+              -2.9793938601894992e-05
+            ],
+            [
+              0.0011613378330100014,
+              -3.172922045616767e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925033e-06,
+          "edge_node_ids": [
+            77,
+            78
+          ],
+          "first_layer_normal_spacing_m": 9.46083112166038e-06,
+          "traction_Pa": [
+            -427227.4599788797,
+            -12318703.06394922
+          ]
+        },
+        {
+          "adjacent_element_id": 156,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20583546.99917636,
+              -26012991.45399564
+            ],
+            [
+              -26012991.45399564,
+              51373066.174271844
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011613378330100014,
+              -3.172922045616767e-05
+            ],
+            [
+              0.0011629412823393498,
+              -3.358806383920999e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925376e-06,
+          "edge_node_ids": [
+            78,
+            79
+          ],
+          "first_layer_normal_spacing_m": 9.428482345505009e-06,
+          "traction_Pa": [
+            1404935.7014798129,
+            -13858224.431237765
+          ]
+        },
+        {
+          "adjacent_element_id": 158,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20525138.52158709,
+              -24789649.257064298
+            ],
+            [
+              -24789649.257064298,
+              43406340.779972985
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011629412823393498,
+              -3.358806383920999e-05
+            ],
+            [
+              0.0011646340093655033,
+              -3.53659906344967e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892648e-06,
+          "edge_node_ids": [
+            79,
+            80
+          ],
+          "first_layer_normal_spacing_m": 9.428482345505085e-06,
+          "traction_Pa": [
+            2228196.5511242454,
+            -11976600.704648841
+          ]
+        },
+        {
+          "adjacent_element_id": 160,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              18678866.119495712,
+              -22918754.243904497
+            ],
+            [
+              -22918754.243904497,
+              39273350.80818718
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011646340093655033,
+              -3.53659906344967e-05
+            ],
+            [
+              0.00116641193616079,
+              -3.705871766064998e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925164e-06,
+          "edge_node_ids": [
+            80,
+            81
+          ],
+          "first_layer_normal_spacing_m": 8.514789094760004e-06,
+          "traction_Pa": [
+            3719005.38692135,
+            -12640199.474522004
+          ]
+        },
+        {
+          "adjacent_element_id": 162,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              17414437.49508518,
+              -20830135.788471576
+            ],
+            [
+              -20830135.788471576,
+              31692714.930799488
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.00116641193616079,
+              -3.705871766064998e-05
+            ],
+            [
+              0.0011682707795438322,
+              -3.866216698999845e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892468e-06,
+          "edge_node_ids": [
+            81,
+            82
+          ],
+          "first_layer_normal_spacing_m": 8.514789094760085e-06,
+          "traction_Pa": [
+            4398125.445855709,
+            -10392325.10333943
+          ]
+        },
+        {
+          "adjacent_element_id": 164,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              14810875.320326122,
+              -18300368.535659052
+            ],
+            [
+              -18300368.535659052,
+              27132082.533353087
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011682707795438322,
+              -3.866216698999845e-05
+            ],
+            [
+              0.001170206061398105,
+              -4.017247577266217e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926265e-06,
+          "edge_node_ids": [
+            82,
+            83
+          ],
+          "first_layer_normal_spacing_m": 7.829410772680011e-06,
+          "traction_Pa": [
+            5314911.778121923,
+            -10130515.496834451
+          ]
+        },
+        {
+          "adjacent_element_id": 166,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              12188397.123943392,
+              -15894677.77257511
+            ],
+            [
+              -15894677.77257511,
+              20878895.763445165
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001170206061398105,
+              -4.017247577266217e-05
+            ],
+            [
+              0.0011722131194601103,
+              -4.158600554249621e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924385e-06,
+          "edge_node_ids": [
+            83,
+            84
+          ],
+          "first_layer_normal_spacing_m": 7.829410772680008e-06,
+          "traction_Pa": [
+            5977068.2525746375,
+            -7917982.43017115
+          ]
+        },
+        {
+          "adjacent_element_id": 168,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              8974669.918443596,
+              -12851940.072267422
+            ],
+            [
+              -12851940.072267422,
+              16753018.559842117
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011722131194601103,
+              -4.158600554249621e-05
+            ],
+            [
+              0.0011742871185511797,
+              -4.289935098247449e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926142e-06,
+          "edge_node_ids": [
+            84,
+            85
+          ],
+          "first_layer_normal_spacing_m": 7.310908790186632e-06,
+          "traction_Pa": [
+            6056580.344791347,
+            -7278090.109382845
+          ]
+        },
+        {
+          "adjacent_element_id": 170,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              5247688.840129953,
+              -10716241.352188827
+            ],
+            [
+              -10716241.352188827,
+              12124666.917337852
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011742871185511797,
+              -4.289935098247449e-05
+            ],
+            [
+              0.0011764230622258417,
+              -4.4109348128396635e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925355e-06,
+          "edge_node_ids": [
+            85,
+            86
+          ],
+          "first_layer_normal_spacing_m": 7.310908790186683e-06,
+          "traction_Pa": [
+            6737485.851436256,
+            -5267498.966309892
+          ]
+        },
+        {
+          "adjacent_element_id": 172,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              1613701.219262999,
+              -7555902.373481375
+            ],
+            [
+              -7555902.373481375,
+              8872475.115406832
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011764230622258417,
+              -4.4109348128396635e-05
+            ],
+            [
+              0.0011786158048086974,
+              -4.5213081991154875e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924817e-06,
+          "edge_node_ids": [
+            86,
+            87
+          ],
+          "first_layer_normal_spacing_m": 6.9200116348755766e-06,
+          "traction_Pa": [
+            6023577.266596286,
+            -4527891.071952387
+          ]
+        },
+        {
+          "adjacent_element_id": 174,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -2717786.5924124336,
+              -6144664.749229355
+            ],
+            [
+              -6144664.749229355,
+              5781702.414257771
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011786158048086974,
+              -4.5213081991154875e-05
+            ],
+            [
+              0.0011808600637908033,
+              -4.6207893579198164e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925698e-06,
+          "edge_node_ids": [
+            87,
+            88
+          ],
+          "first_layer_normal_spacing_m": 6.920011634875589e-06,
+          "traction_Pa": [
+            6718871.869167424,
+            -2795616.734591304
+          ]
+        },
+        {
+          "adjacent_element_id": 176,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -6458513.296080427,
+              -3249386.417737415
+            ],
+            [
+              -3249386.417737415,
+              3521186.775400492
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011808600637908033,
+              -4.6207893579198164e-05
+            ],
+            [
+              0.0011831504325556976,
+              -4.709138630427571e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892608e-06,
+          "edge_node_ids": [
+            88,
+            89
+          ],
+          "first_layer_normal_spacing_m": 6.630927109328453e-06,
+          "traction_Pa": [
+            5356041.007034969,
+            -2115803.8612728906
+          ]
+        },
+        {
+          "adjacent_element_id": 178,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -10781473.87817496,
+              -2805396.916352451
+            ],
+            [
+              -2805396.916352451,
+              1666269.4588543274
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011831504325556976,
+              -4.709138630427571e-05
+            ],
+            [
+              0.001185481393404413,
+              -4.786143175502795e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924533e-06,
+          "edge_node_ids": [
+            89,
+            90
+          ],
+          "first_layer_normal_spacing_m": 6.63092710932846e-06,
+          "traction_Pa": [
+            6045754.919996663,
+            -702168.0204125401
+          ]
+        },
+        {
+          "adjacent_element_id": 180,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -14221376.999535488,
+              -422864.11888898973
+            ],
+            [
+              -422864.11888898973,
+              288940.0727735246
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001185481393404413,
+              -4.786143175502795e-05
+            ],
+            [
+              0.0011878473308480969,
+              -4.851617482451603e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925596e-06,
+          "edge_node_ids": [
+            90,
+            91
+          ],
+          "first_layer_normal_spacing_m": 6.426571362091756e-06,
+          "traction_Pa": [
+            4200568.991505086,
+            -165690.27140224012
+          ]
+        },
+        {
+          "adjacent_element_id": 182,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -17925569.232291054,
+              -961784.6309239195
+            ],
+            [
+              -961784.6309239195,
+              -707250.7995919406
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011878473308480969,
+              -4.851617482451603e-05
+            ],
+            [
+              0.001190242545136216,
+              -4.9054038179336816e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926155e-06,
+          "edge_node_ids": [
+            91,
+            92
+          ],
+          "first_layer_normal_spacing_m": 6.426571362091786e-06,
+          "traction_Pa": [
+            4865929.762343435,
+            900794.3170325501
+          ]
+        },
+        {
+          "adjacent_element_id": 184,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -20635625.654468376,
+              848602.724542807
+            ],
+            [
+              848602.724542807,
+              -1425240.2826258945
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001190242545136216,
+              -4.9054038179336816e-05
+            ],
+            [
+              0.0011926612659877538,
+              -4.94737260595573e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925096e-06,
+          "edge_node_ids": [
+            92,
+            93
+          ],
+          "first_layer_normal_spacing_m": 6.2958443529267556e-06,
+          "traction_Pa": [
+            2691796.2458761423,
+            1259178.6609084099
+          ]
+        },
+        {
+          "adjacent_element_id": 186,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -23205330.40878367,
+              -488855.4401901154
+            ],
+            [
+              -488855.4401901154,
+              -1907711.7575902322
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011926612659877538,
+              -4.94737260595573e-05
+            ],
+            [
+              0.0011950976664923244,
+              -4.9774227400313696e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892623e-06,
+          "edge_node_ids": [
+            93,
+            94
+          ],
+          "first_layer_normal_spacing_m": 6.295844352926767e-06,
+          "traction_Pa": [
+            3325759.1833259724,
+            1953206.0018301217
+          ]
+        },
+        {
+          "adjacent_element_id": 188,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -24821064.48709699,
+              876097.8917910822
+            ],
+            [
+              876097.8917910822,
+              -2193880.4812038806
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011950976664923244,
+              -4.9774227400313696e-05
+            ],
+            [
+              0.0011975458771477086,
+              -4.995481826755532e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892402e-06,
+          "edge_node_ids": [
+            94,
+            95
+          ],
+          "first_layer_normal_spacing_m": 6.232056086952859e-06,
+          "traction_Pa": [
+            952226.7104730275,
+            2123486.3079180787
+          ]
+        },
+        {
+          "adjacent_element_id": 190,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -25900932.492125083,
+              -926713.4712381354
+            ],
+            [
+              -926713.4712381354,
+              -2401242.351763626
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0011975458771477086,
+              -4.995481826755532e-05
+            ],
+            [
+              0.0012,
+              -5.00150636020651e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926308e-06,
+          "edge_node_ids": [
+            95,
+            96
+          ],
+          "first_layer_normal_spacing_m": 6.232056086952868e-06,
+          "traction_Pa": [
+            1562075.0657123786,
+            2423261.8295343085
+          ]
+        },
+        {
+          "adjacent_element_id": 192,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -26197952.892891247,
+              257532.07616988
+            ],
+            [
+              257532.07616988,
+              -2396333.3700357787
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012,
+              -5.00150636020651e-05
+            ],
+            [
+              0.0012024541228522912,
+              -4.995481826755532e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926308e-06,
+          "edge_node_ids": [
+            96,
+            97
+          ],
+          "first_layer_normal_spacing_m": 6.232056086952868e-06,
+          "traction_Pa": [
+            -900384.4611003351,
+            2401931.792760327
+          ]
+        },
+        {
+          "adjacent_element_id": 194,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -25634654.221254233,
+              -1592261.207096745
+            ],
+            [
+              -1592261.207096745,
+              -2415940.90244131
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012024541228522912,
+              -4.995481826755532e-05
+            ],
+            [
+              0.0012049023335076754,
+              -4.9774227400313696e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892402e-06,
+          "edge_node_ids": [
+            97,
+            98
+          ],
+          "first_layer_normal_spacing_m": 6.232056086952859e-06,
+          "traction_Pa": [
+            -297855.24443776876,
+            2292260.805067662
+          ]
+        },
+        {
+          "adjacent_element_id": 196,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -24575276.58699298,
+              -265908.3577968739
+            ],
+            [
+              -265908.3577968739,
+              -2120599.896035386
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012049023335076754,
+              -4.9774227400313696e-05
+            ],
+            [
+              0.001207338734012246,
+              -4.94737260595573e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892623e-06,
+          "edge_node_ids": [
+            98,
+            99
+          ],
+          "first_layer_normal_spacing_m": 6.295844352926767e-06,
+          "traction_Pa": [
+            -2744367.597029073,
+            2072101.976268244
+          ]
+        },
+        {
+          "adjacent_element_id": 198,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -22436517.084931288,
+              -1728894.222765015
+            ],
+            [
+              -1728894.222765015,
+              -1868712.1255506687
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001207338734012246,
+              -4.94737260595573e-05
+            ],
+            [
+              0.001209757454863784,
+              -4.905403817933682e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925084e-06,
+          "edge_node_ids": [
+            99,
+            100
+          ],
+          "first_layer_normal_spacing_m": 6.29584435292676e-06,
+          "traction_Pa": [
+            -2132348.5142968614,
+            1545625.2555755086
+          ]
+        },
+        {
+          "adjacent_element_id": 200,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -20176532.30144425,
+              26438.41249019051
+            ],
+            [
+              26438.41249019051,
+              -1136214.8131527363
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001209757454863784,
+              -4.905403817933682e-05
+            ],
+            [
+              0.001212152669151903,
+              -4.851617482451603e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926172e-06,
+          "edge_node_ids": [
+            100,
+            101
+          ],
+          "first_layer_normal_spacing_m": 6.4265713620917825e-06,
+          "traction_Pa": [
+            -4446499.264692972,
+            1114399.9023388345
+          ]
+        },
+        {
+          "adjacent_element_id": 202,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -16747747.830030391,
+              -672832.1709616082
+            ],
+            [
+              -672832.1709616082,
+              -361489.84925167233
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001212152669151903,
+              -4.851617482451603e-05
+            ],
+            [
+              0.0012145186065955868,
+              -4.786143175502796e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925575e-06,
+          "edge_node_ids": [
+            101,
+            102
+          ],
+          "first_layer_normal_spacing_m": 6.426571362091754e-06,
+          "traction_Pa": [
+            -3818378.4625716186,
+            168942.34110177288
+          ]
+        },
+        {
+          "adjacent_element_id": 204,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -13601122.063431041,
+              1673783.1225970353
+            ],
+            [
+              1673783.1225970353,
+              1061009.60884392
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012145186065955868,
+              -4.786143175502796e-05
+            ],
+            [
+              0.0012168495674443021,
+              -4.709138630427572e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924533e-06,
+          "edge_node_ids": [
+            102,
+            103
+          ],
+          "first_layer_normal_spacing_m": 6.630927109328454e-06,
+          "traction_Pa": [
+            -5855727.883341835,
+            -482423.3205307478
+          ]
+        },
+        {
+          "adjacent_element_id": 206,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -9358749.416348591,
+              1986571.9664097386
+            ],
+            [
+              1986571.9664097386,
+              2748387.263919576
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012168495674443021,
+              -4.709138630427572e-05
+            ],
+            [
+              0.0012191399362091965,
+              -4.620789357919817e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892608e-06,
+          "edge_node_ids": [
+            103,
+            104
+          ],
+          "first_layer_normal_spacing_m": 6.630927109328453e-06,
+          "traction_Pa": [
+            -5221624.802145795,
+            -1849268.1352156713
+          ]
+        },
+        {
+          "adjacent_element_id": 208,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -5727267.480495134,
+              4898426.119677886
+            ],
+            [
+              4898426.119677886,
+              5134001.050475771
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012191399362091965,
+              -4.620789357919817e-05
+            ],
+            [
+              0.0012213841951913024,
+              -4.521308199115489e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892567e-06,
+          "edge_node_ids": [
+            104,
+            105
+          ],
+          "first_layer_normal_spacing_m": 6.92001163487558e-06,
+          "traction_Pa": [
+            -6799114.3456563875,
+            -2708509.2088425425
+          ]
+        },
+        {
+          "adjacent_element_id": 210,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              -1285607.7146464777,
+              6277020.528727197
+            ],
+            [
+              6277020.528727197,
+              8200949.614923071
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012213841951913024,
+              -4.521308199115489e-05
+            ],
+            [
+              0.0012235769377741581,
+              -4.410934812839664e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924847e-06,
+          "edge_node_ids": [
+            105,
+            106
+          ],
+          "first_layer_normal_spacing_m": 6.920011634875573e-06,
+          "traction_Pa": [
+            -6184811.069358654,
+            -4503067.942738866
+          ]
+        },
+        {
+          "adjacent_element_id": 212,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              2430427.0928326556,
+              9518344.155011302
+            ],
+            [
+              9518344.155011302,
+              11723921.270933885
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012235769377741581,
+              -4.410934812839664e-05
+            ],
+            [
+              0.00122571288144882,
+              -4.2899350982474506e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892532e-06,
+          "edge_node_ids": [
+            106,
+            107
+          ],
+          "first_layer_normal_spacing_m": 7.310908790186674e-06,
+          "traction_Pa": [
+            -7083834.305767482,
+            -5509256.755596311
+          ]
+        },
+        {
+          "adjacent_element_id": 214,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              6403431.956955179,
+              11772391.29803689
+            ],
+            [
+              11772391.29803689,
+              16611986.161746835
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.00122571288144882,
+              -4.2899350982474506e-05
+            ],
+            [
+              0.0012277868805398895,
+              -4.158600554249622e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926142e-06,
+          "edge_node_ids": [
+            107,
+            108
+          ],
+          "first_layer_normal_spacing_m": 7.310908790186627e-06,
+          "traction_Pa": [
+            -6520125.903581331,
+            -7736494.409801678
+          ]
+        },
+        {
+          "adjacent_element_id": 216,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              9889240.855603037,
+              14931792.675697587
+            ],
+            [
+              14931792.675697587,
+              21216784.55699021
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012277868805398895,
+              -4.158600554249622e-05
+            ],
+            [
+              0.0012297939386018948,
+              -4.0172475772662174e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108924427e-06,
+          "edge_node_ids": [
+            108,
+            109
+          ],
+          "first_layer_normal_spacing_m": 7.829410772679891e-06,
+          "traction_Pa": [
+            -6513701.03321767,
+            -8748672.30248389
+          ]
+        },
+        {
+          "adjacent_element_id": 218,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              12789669.937571302,
+              17615161.98215124
+            ],
+            [
+              17615161.98215124,
+              28195683.692278568
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012297939386018948,
+              -4.0172475772662174e-05
+            ],
+            [
+              0.0012317292204561676,
+              -3.866216698999846e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926265e-06,
+          "edge_node_ids": [
+            109,
+            110
+          ],
+          "first_layer_normal_spacing_m": 7.829410772679888e-06,
+          "traction_Pa": [
+            -6018241.042000043,
+            -11390562.388683755
+          ]
+        },
+        {
+          "adjacent_element_id": 220,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              15865882.799097655,
+              20199470.682950567
+            ],
+            [
+              20199470.682950567,
+              33488460.937223915
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012317292204561676,
+              -3.866216698999846e-05
+            ],
+            [
+              0.0012335880638392098,
+              -3.7058717660649986e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892468e-06,
+          "edge_node_ids": [
+            110,
+            111
+          ],
+          "first_layer_normal_spacing_m": 8.51478909476009e-06,
+          "traction_Pa": [
+            -4932054.122019887,
+            -12164013.185407579
+          ]
+        },
+        {
+          "adjacent_element_id": 222,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              17294856.91452072,
+              22667025.083615527
+            ],
+            [
+              22667025.083615527,
+              42483772.24481015
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012335880638392098,
+              -3.7058717660649986e-05
+            ],
+            [
+              0.0012353659906344965,
+              -3.536599063449671e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925118e-06,
+          "edge_node_ids": [
+            111,
+            112
+          ],
+          "first_layer_normal_spacing_m": 8.514789094760007e-06,
+          "traction_Pa": [
+            -4491021.738007877,
+            -15138915.297352985
+          ]
+        },
+        {
+          "adjacent_element_id": 224,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19905960.38707614,
+              24247776.19865749
+            ],
+            [
+              24247776.19865749,
+              47687157.5277719
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012353659906344965,
+              -3.536599063449671e-05
+            ],
+            [
+              0.00123705871766065,
+              -3.358806383921e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108926532e-06,
+          "edge_node_ids": [
+            112,
+            113
+          ],
+          "first_layer_normal_spacing_m": 9.428482345505083e-06,
+          "traction_Pa": [
+            -2302991.064998862,
+            -15320847.398726813
+          ]
+        },
+        {
+          "adjacent_element_id": 226,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19801072.431686617,
+              25806050.85065359
+            ],
+            [
+              25806050.85065359,
+              58130724.65702445
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.00123705871766065,
+              -3.358806383921e-05
+            ],
+            [
+              0.0012386621669899984,
+              -3.1729220456167706e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892517e-06,
+          "edge_node_ids": [
+            113,
+            114
+          ],
+          "first_layer_normal_spacing_m": 9.428482345505016e-06,
+          "traction_Pa": [
+            -1862264.3839421284,
+            -18428840.689680353
+          ]
+        },
+        {
+          "adjacent_element_id": 228,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21913430.106505066,
+              26212160.401155777
+            ],
+            [
+              26212160.401155777,
+              62131418.13789806
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012386621669899984,
+              -3.1729220456167706e-05
+            ],
+            [
+              0.001240172475772662,
+              -2.9793938601894992e-05
+            ]
+          ],
+          "edge_length_m": 2.45486221089253e-06,
+          "edge_node_ids": [
+            114,
+            115
+          ],
+          "first_layer_normal_spacing_m": 1.0670887517208595e-05,
+          "traction_Pa": [
+            1148825.20535179,
+            -17560948.193380777
+          ]
+        },
+        {
+          "adjacent_element_id": 230,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20619310.194497228,
+              26362445.78724556
+            ],
+            [
+              26362445.78724556,
+              72895087.34906948
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001240172475772662,
+              -2.9793938601894992e-05
+            ],
+            [
+              0.0012415860055424962,
+              -2.778688053988953e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892597e-06,
+          "edge_node_ids": [
+            115,
+            116
+          ],
+          "first_layer_normal_spacing_m": 1.0670887517208512e-05,
+          "traction_Pa": [
+            1678322.6425766428,
+            -20420053.09653199
+          ]
+        },
+        {
+          "adjacent_element_id": 232,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21953320.39625457,
+              25926800.08788467
+            ],
+            [
+              25926800.08788467,
+              74404418.74557902
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012415860055424962,
+              -2.778688053988953e-05
+            ],
+            [
+              0.0012428993509824744,
+              -2.5712881448820194e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892509e-06,
+          "edge_node_ids": [
+            116,
+            117
+          ],
+          "first_layer_normal_spacing_m": 1.2416542803150824e-05,
+          "traction_Pa": [
+            4676564.667538436,
+            -17901837.448200703
+          ]
+        },
+        {
+          "adjacent_element_id": 234,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20179970.709946804,
+              24667816.80568675
+            ],
+            [
+              24667816.80568675,
+              83863634.3369718
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012428993509824744,
+              -2.5712881448820194e-05
+            ],
+            [
+              0.0012441093481283965,
+              -2.357693777415823e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892515e-06,
+          "edge_node_ids": [
+            117,
+            118
+          ],
+          "first_layer_normal_spacing_m": 1.2416542803150907e-05,
+          "traction_Pa": [
+            5399607.6859015,
+            -19873087.256830957
+          ]
+        },
+        {
+          "adjacent_element_id": 236,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22412178.69080274,
+              25493511.519525476
+            ],
+            [
+              25493511.519525476,
+              87357677.14626455
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012441093481283965,
+              -2.357693777415823e-05
+            ],
+            [
+              0.0012452130819911548,
+              -2.1384195191302466e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892533e-06,
+          "edge_node_ids": [
+            118,
+            119
+          ],
+          "first_layer_normal_spacing_m": 1.271817372055386e-05,
+          "traction_Pa": [
+            8556931.0375025,
+            -16505577.365221664
+          ]
+        },
+        {
+          "adjacent_element_id": 238,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20233015.799629238,
+              22714105.984997466
+            ],
+            [
+              22714105.984997466,
+              96073402.99229197
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012452130819911548,
+              -2.1384195191302466e-05
+            ],
+            [
+              0.001246207893579198,
+              -1.9139936209196573e-05
+            ]
+          ],
+          "edge_length_m": 2.454862210892555e-06,
+          "edge_node_ids": [
+            119,
+            120
+          ],
+          "first_layer_normal_spacing_m": 1.2718173720553865e-05,
+          "traction_Pa": [
+            9292526.275515195,
+            -18167454.78596053
+          ]
+        },
+        {
+          "adjacent_element_id": 240,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22526868.544385426,
+              24153509.46067256
+            ],
+            [
+              24153509.46067256,
+              101437862.49445148
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.001246207893579198,
+              -1.9139936209196573e-05
+            ],
+            [
+              0.0012470913863042755,
+              -1.6849567444302268e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925486e-06,
+          "edge_node_ids": [
+            120,
+            121
+          ],
+          "first_layer_normal_spacing_m": 1.2197821574569156e-05,
+          "traction_Pa": [
+            12324677.962412573,
+            -13971932.835073743
+          ]
+        },
+        {
+          "adjacent_element_id": 242,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20138539.7927045,
+              19602291.95911393
+            ],
+            [
+              19602291.95911393,
+              109408119.13718958
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012470913863042755,
+              -1.6849567444302268e-05
+            ],
+            [
+              0.0012478614317550278,
+              -1.4518606595586882e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925516e-06,
+          "edge_node_ids": [
+            121,
+            122
+          ],
+          "first_layer_normal_spacing_m": 1.2197821574569155e-05,
+          "traction_Pa": [
+            12973229.991624538,
+            -15706400.605334496
+          ]
+        },
+        {
+          "adjacent_element_id": 244,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              22113286.890826795,
+              20700501.265735872
+            ],
+            [
+              20700501.265735872,
+              113785211.57088113
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012478614317550278,
+              -1.4518606595586882e-05
+            ],
+            [
+              0.0012485161748245158,
+              -1.2152669151902977e-05
+            ]
+          ],
+          "edge_length_m": 2.4548622108925147e-06,
+          "edge_node_ids": [
+            122,
+            123
+          ],
+          "first_layer_normal_spacing_m": 1.1829981229543076e-05,
+          "traction_Pa": [
+            15791168.867750727,
+            -10397319.868046226
+          ]
+        },
+        {
+          "adjacent_element_id": 246,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19897553.483059317,
+              14401370.905765489
+            ],
+            [
+              14401370.905765489,
+              120214442.7559972
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012485161748245158,
+              -1.2152669151902977e-05
+            ],
+            [
+              0.0012490540381793367,
+              -9.757454863784039e-06
+            ]
+          ],
+          "edge_length_m": 2.45486221089256e-06,
+          "edge_node_ids": [
+            123,
+            124
+          ],
+          "first_layer_normal_spacing_m": 1.182998122954308e-05,
+          "traction_Pa": [
+            16258727.09056342,
+            -12287685.22438108
+          ]
+        },
+        {
+          "adjacent_element_id": 248,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              21256573.94756266,
+              15220155.540553244
+            ],
+            [
+              15220155.540553244,
+              123326640.5125657
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012490540381793367,
+              -9.757454863784039e-06
+            ],
+            [
+              0.0012494737260595572,
+              -7.3387340122461375e-06
+            ]
+          ],
+          "edge_length_m": 2.454862210892528e-06,
+          "edge_node_ids": [
+            124,
+            125
+          ],
+          "first_layer_normal_spacing_m": 1.159467261304594e-05,
+          "traction_Pa": [
+            18341560.525882512,
+            -6088076.428699464
+          ]
+        },
+        {
+          "adjacent_element_id": 250,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              19687765.69451367,
+              7544825.011255106
+            ],
+            [
+              7544825.011255106,
+              127505333.17339781
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012494737260595572,
+              -7.3387340122461375e-06
+            ],
+            [
+              0.0012497742274003136,
+              -4.902333507675509e-06
+            ]
+          ],
+          "edge_length_m": 2.454862210892581e-06,
+          "edge_node_ids": [
+            125,
+            126
+          ],
+          "first_layer_normal_spacing_m": 1.1594672613046041e-05,
+          "traction_Pa": [
+            18616137.40989169,
+            -8119929.509457688
+          ]
+        },
+        {
+          "adjacent_element_id": 252,
+          "adjacent_element_stress_tensor_Pa": [
+            [
+              20366172.553389583,
+              8159550.743514992
+            ],
+            [
+              8159550.743514992,
+              129125539.2246398
+            ]
+          ],
+          "adjacent_solid_element_count": 1,
+          "edge_endpoints_m": [
+            [
+              0.0012497742274003136,
+              -4.902333507675509e-06
+            ],
+            [
+              0.0012499548182675552,
+              -2.4541228522912326e-06
+            ]
+          ],
+          "edge_length_m": 2.454862210892538e-06,
+          "edge_node_ids": [
+            126,
+            127
+          ],
+          "first_layer_normal_spacing_m": 1.1479853734292943e-05,
+          "traction_Pa": [
+            19710735.736950777,
+            -1361621.8553407802
+          ]
+        }
+      ],
+      "energy_reaction_identity_relative": 2.272709392701583e-14,
+      "eta_n_max": 0.25436347441107726,
+      "eta_n_median": 0.1565882154536002,
+      "eta_t_max": 0.04909724421785306,
+      "eta_t_median": 0.049097244217850826,
+      "fixed_arc_probes": [
+        {
+          "arc_fraction": 0.0,
+          "candidate_planes": [
+            {
+              "normal": [
+                1.0,
+                0.0
+              ],
+              "normal_opening_Pa": 19799993.738152515,
+              "shear_Pa": 1.0101939551532269e-07
+            },
+            {
+              "normal": [
+                0.0,
+                1.0
+              ],
+              "normal_opening_Pa": 130574575.34400105,
+              "shear_Pa": -1.0101939551532269e-07
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                0.7071067811865476
+              ],
+              "normal_opening_Pa": 75187284.5410769,
+              "shear_Pa": 55387290.80292427
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                -0.7071067811865476
+              ],
+              "normal_opening_Pa": 75187284.54107669,
+              "shear_Pa": -55387290.802924275
+            }
+          ],
+          "edge_node_ids": [
+            [
+              0,
+              127
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "element_ids": [
+            254,
+            0
+          ],
+          "operator": "periodic_linear_edge_mid_angle_adjacent_CST_v1",
+          "physical_position_m": [
+            0.0012499999999999998,
+            0.0
+          ],
+          "principal_stresses_Pa": [
+            19799993.738152515,
+            130574575.34400105
+          ],
+          "sigma_nn_Pa": 19799993.738152515,
+          "sigma_nt_Pa": 1.0101939551532269e-07,
+          "sigma_tt_Pa": 130574575.34400105,
+          "tensor_Pa": [
+            [
+              19799993.738152515,
+              1.0101939551532269e-07
+            ],
+            [
+              1.0101939551532269e-07,
+              130574575.34400105
+            ]
+          ],
+          "weights": [
+            0.5000000000000009,
+            0.49999999999999906
+          ]
+        },
+        {
+          "arc_fraction": 0.125,
+          "candidate_planes": [
+            {
+              "normal": [
+                1.0,
+                0.0
+              ],
+              "normal_opening_Pa": 18600408.650797866,
+              "shear_Pa": -23457400.64113628
+            },
+            {
+              "normal": [
+                0.0,
+                1.0
+              ],
+              "normal_opening_Pa": 45085464.886290595,
+              "shear_Pa": 23457400.64113628
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                0.7071067811865476
+              ],
+              "normal_opening_Pa": 8385536.127407949,
+              "shear_Pa": 13242528.117746368
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                -0.7071067811865476
+              ],
+              "normal_opening_Pa": 55300337.40968052,
+              "shear_Pa": -13242528.117746366
+            }
+          ],
+          "edge_node_ids": [
+            [
+              15,
+              16
+            ],
+            [
+              16,
+              17
+            ]
+          ],
+          "element_ids": [
+            30,
+            32
+          ],
+          "operator": "periodic_linear_edge_mid_angle_adjacent_CST_v1",
+          "physical_position_m": [
+            0.0012353553390593273,
+            3.535533905932738e-05
+          ],
+          "principal_stresses_Pa": [
+            4905709.817945104,
+            58780163.71914336
+          ],
+          "sigma_nn_Pa": 8385536.127407947,
+          "sigma_nt_Pa": 13242528.11774636,
+          "sigma_tt_Pa": 55300337.40968051,
+          "tensor_Pa": [
+            [
+              18600408.650797866,
+              -23457400.64113628
+            ],
+            [
+              -23457400.64113628,
+              45085464.886290595
+            ]
+          ],
+          "weights": [
+            0.49999999999999434,
+            0.5000000000000057
+          ]
+        },
+        {
+          "arc_fraction": 0.25,
+          "candidate_planes": [
+            {
+              "normal": [
+                1.0,
+                0.0
+              ],
+              "normal_opening_Pa": -26049442.692508556,
+              "shear_Pa": 334590.6975343825
+            },
+            {
+              "normal": [
+                0.0,
+                1.0
+              ],
+              "normal_opening_Pa": -2398787.8608995415,
+              "shear_Pa": -334590.6975343825
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                0.7071067811865476
+              ],
+              "normal_opening_Pa": -13889524.579169668,
+              "shear_Pa": 11825327.415804507
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                -0.7071067811865476
+              ],
+              "normal_opening_Pa": -14558705.974238431,
+              "shear_Pa": -11825327.41580451
+            }
+          ],
+          "edge_node_ids": [
+            [
+              31,
+              32
+            ],
+            [
+              32,
+              33
+            ]
+          ],
+          "element_ids": [
+            62,
+            64
+          ],
+          "operator": "periodic_linear_edge_mid_angle_adjacent_CST_v1",
+          "physical_position_m": [
+            0.0012,
+            5e-05
+          ],
+          "principal_stresses_Pa": [
+            -26054175.269191585,
+            -2394055.284216511
+          ],
+          "sigma_nn_Pa": -2398787.8608995415,
+          "sigma_nt_Pa": -334590.6975343811,
+          "sigma_tt_Pa": -26049442.692508556,
+          "tensor_Pa": [
+            [
+              -26049442.692508556,
+              334590.6975343825
+            ],
+            [
+              334590.6975343825,
+              -2398787.8608995415
+            ]
+          ],
+          "weights": [
+            0.5000000000000022,
+            0.4999999999999977
+          ]
+        },
+        {
+          "arc_fraction": 0.375,
+          "candidate_planes": [
+            {
+              "normal": [
+                1.0,
+                0.0
+              ],
+              "normal_opening_Pa": 19602002.3205411,
+              "shear_Pa": 23854201.750484936
+            },
+            {
+              "normal": [
+                0.0,
+                1.0
+              ],
+              "normal_opening_Pa": 41339845.79408106,
+              "shear_Pa": -23854201.750484936
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                0.7071067811865476
+              ],
+              "normal_opening_Pa": 54325125.807796024,
+              "shear_Pa": 10868921.736769984
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                -0.7071067811865476
+              ],
+              "normal_opening_Pa": 6616722.306826144,
+              "shear_Pa": -10868921.736769984
+            }
+          ],
+          "edge_node_ids": [
+            [
+              47,
+              48
+            ],
+            [
+              48,
+              49
+            ]
+          ],
+          "element_ids": [
+            94,
+            96
+          ],
+          "operator": "periodic_linear_edge_mid_angle_adjacent_CST_v1",
+          "physical_position_m": [
+            0.0011646446609406725,
+            3.535533905932738e-05
+          ],
+          "principal_stresses_Pa": [
+            4257255.85019307,
+            56684592.26442909
+          ],
+          "sigma_nn_Pa": 6616722.306826146,
+          "sigma_nt_Pa": -10868921.736769985,
+          "sigma_tt_Pa": 54325125.80779601,
+          "tensor_Pa": [
+            [
+              19602002.3205411,
+              23854201.750484936
+            ],
+            [
+              23854201.750484936,
+              41339845.79408106
+            ]
+          ],
+          "weights": [
+            0.5000000000000044,
+            0.4999999999999955
+          ]
+        },
+        {
+          "arc_fraction": 0.5,
+          "candidate_planes": [
+            {
+              "normal": [
+                1.0,
+                0.0
+              ],
+              "normal_opening_Pa": 12962386.317283638,
+              "shear_Pa": 2.4208566173911095e-07
+            },
+            {
+              "normal": [
+                0.0,
+                1.0
+              ],
+              "normal_opening_Pa": 128601072.9522065,
+              "shear_Pa": -2.4208566173911095e-07
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                0.7071067811865476
+              ],
+              "normal_opening_Pa": 70781729.63474533,
+              "shear_Pa": 57819343.31746144
+            },
+            {
+              "normal": [
+                0.7071067811865476,
+                -0.7071067811865476
+              ],
+              "normal_opening_Pa": 70781729.63474484,
+              "shear_Pa": -57819343.31746144
+            }
+          ],
+          "edge_node_ids": [
+            [
+              63,
+              64
+            ],
+            [
+              64,
+              65
+            ]
+          ],
+          "element_ids": [
+            126,
+            128
+          ],
+          "operator": "periodic_linear_edge_mid_angle_adjacent_CST_v1",
+          "physical_position_m": [
+            0.00115,
+            6.123233995736766e-21
+          ],
+          "principal_stresses_Pa": [
+            12962386.317283638,
+            128601072.9522065
+          ],
+          "sigma_nn_Pa": 12962386.317283638,
+          "sigma_nt_Pa": 2.2792400699460474e-07,
+          "sigma_tt_Pa": 128601072.9522065,
+          "tensor_Pa": [
+            [
+              12962386.317283638,
+              2.4208566173911095e-07
+            ],
+            [
+              2.4208566173911095e-07,
+              128601072.9522065
+            ]
+          ],
+          "weights": [
+            0.49999999999999545,
+            0.5000000000000046
+          ]
+        }
+      ],
+      "fixed_tip_probe": {
+        "candidate_planes": [
+          {
+            "normal": [
+              1.0,
+              0.0
+            ],
+            "normal_opening_Pa": 6515026.264833927,
+            "shear_Pa": -1.3364478945732117e-07
+          },
+          {
+            "normal": [
+              0.0,
+              1.0
+            ],
+            "normal_opening_Pa": 112018918.73221758,
+            "shear_Pa": 1.3364478945732117e-07
+          },
+          {
+            "normal": [
+              0.7071067811865476,
+              0.7071067811865476
+            ],
+            "normal_opening_Pa": 59266972.49852563,
+            "shear_Pa": 52751946.23369184
+          },
+          {
+            "normal": [
+              0.7071067811865476,
+              -0.7071067811865476
+            ],
+            "normal_opening_Pa": 59266972.4985259,
+            "shear_Pa": -52751946.233691834
+          }
+        ],
+        "element_ids": [
+          8574,
+          8576
+        ],
+        "operator": "area_weighted_containing_live_CST_at_fixed_25um_ahead_v1",
+        "physical_position_m": [
+          0.000525,
+          0.0
+        ],
+        "principal_stresses_Pa": [
+          6515026.264833927,
+          112018918.73221758
+        ],
+        "sigma_nn_Pa": 112018918.73221758,
+        "sigma_nt_Pa": 1.3364478945732117e-07,
+        "sigma_tt_Pa": 6515026.264833927,
+        "tensor_Pa": [
+          [
+            6515026.264833927,
+            -1.3364478945732117e-07
+          ],
+          [
+            -1.3364478945732117e-07,
+            112018918.73221758
+          ]
+        ],
+        "weights": [
+          0.5,
+          0.5
+        ]
+      },
+      "free_residual_relative": 2.0982120738401654e-14,
+      "local_aspect_ratio_max": 5.30201158330131,
+      "local_aspect_ratio_median": 3.3666988520918695,
+      "minimum_quality": 0.04830431138521841,
+      "normalized_traction": 0.3227192385708491,
+      "reaction_balance_relative": 2.3891417102985182e-14,
+      "reaction_bottom_N_per_m": -120598.92482713208,
+      "reaction_top_N_per_m": 120598.92482713496,
+      "stored_energy_J_per_m": 0.024119784965426442
+    },
+    "cavity_perimeter_relative": 0.0002008460110012187,
+    "compliance": 3.3167791551488134e-12,
+    "energy": 0.024119784965426442,
+    "energy_identity": 2.272709392701583e-14,
+    "fixed_crack_vertex_error_m": 1.4695761589768237e-19,
+    "fixed_tip_probe": {
+      "candidate_planes": [
+        {
+          "normal": [
+            1.0,
+            0.0
+          ],
+          "normal_opening_Pa": 6515026.264833927,
+          "shear_Pa": -1.3364478945732117e-07
+        },
+        {
+          "normal": [
+            0.0,
+            1.0
+          ],
+          "normal_opening_Pa": 112018918.73221758,
+          "shear_Pa": 1.3364478945732117e-07
+        },
+        {
+          "normal": [
+            0.7071067811865476,
+            0.7071067811865476
+          ],
+          "normal_opening_Pa": 59266972.49852563,
+          "shear_Pa": 52751946.23369184
+        },
+        {
+          "normal": [
+            0.7071067811865476,
+            -0.7071067811865476
+          ],
+          "normal_opening_Pa": 59266972.4985259,
+          "shear_Pa": -52751946.233691834
+        }
+      ],
+      "element_ids": [
+        8574,
+        8576
+      ],
+      "operator": "area_weighted_containing_live_CST_at_fixed_25um_ahead_v1",
+      "physical_position_m": [
+        0.000525,
+        0.0
+      ],
+      "principal_stresses_Pa": [
+        6515026.264833927,
+        112018918.73221758
+      ],
+      "sigma_nn_Pa": 112018918.73221758,
+      "sigma_nt_Pa": 1.3364478945732117e-07,
+      "sigma_tt_Pa": 6515026.264833927,
+      "tensor_Pa": [
+        [
+          6515026.264833927,
+          -1.3364478945732117e-07
+        ],
+        [
+          -1.3364478945732117e-07,
+          112018918.73221758
+        ]
+      ],
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    "free_residual_relative": 2.0982120738401654e-14,
+    "independent_intact_path_certificate": {
+      "boundary_terminal_certificates": [],
+      "bridge_element_ids": [],
+      "bridge_node_ids": [],
+      "certificate_fingerprint": "d3c3dde98ab9cf1c8328e920ce85ae7c956d343f632c8d026fb7243498f66edc",
+      "edge_cut_certificates": [
+        {
+          "backward_undershoot_m": 0.0,
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "195aaf32b5ed10b3d9dfc00a92bf701e0fd10ea8209d4258e518ca3906bb5b59",
+          "endpoint_footprint_error_m": 1.8259316914948998e-06,
+          "forward_leakage_m": 1.8259316914948998e-06,
+          "forward_leakage_over_h_local": 0.02614870997347839,
+          "forward_overshoot_m": 1.8259316914948998e-06,
+          "h_local_max_m": 6.982874846777797e-05,
+          "h_local_median_m": 5.814456375293613e-05,
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_component_count": 1,
+          "negative_component_labels": [
+            2
+          ],
+          "negative_seed_count": 55,
+          "positive_component_count": 1,
+          "positive_component_labels": [
+            1
+          ],
+          "positive_seed_count": 55,
+          "segment_id": "b00000000:arc0",
+          "selected_area_m2": 9.380925663976629e-08,
+          "selected_area_over_length_h_local": 2.686837690727164,
+          "signed_tip_footprint_m": 1.8259316914948998e-06,
+          "sufficient_opposite_side_seeds": true,
+          "support_width_m": 0.00011818968402859738,
+          "support_width_over_h_local": 1.6925648335675851,
+          "tube_boundary_clearance_m": 0.0001
+        }
+      ],
+      "insufficient_seed_segment_ids": [],
+      "intact_cross_graph_path_exists": false,
+      "minimum_crossing_path_length": null,
+      "negative_seed_element_ids": [
+        9602,
+        9603,
+        9604,
+        9605,
+        9606,
+        9607,
+        9608,
+        9609,
+        9858,
+        9859,
+        9860,
+        9861,
+        9862,
+        9863,
+        9864,
+        10114,
+        10115,
+        10116,
+        10117,
+        10118,
+        10119,
+        10370,
+        10371,
+        10372,
+        10373,
+        10374,
+        10375,
+        10626,
+        10627,
+        10628,
+        10629,
+        10630,
+        10631,
+        10882,
+        10883,
+        10884,
+        10885,
+        10886,
+        10887,
+        11138,
+        11139,
+        11140,
+        11141,
+        11142,
+        11143,
+        11394,
+        11395,
+        11396,
+        11397,
+        11398,
+        11399,
+        11650,
+        11651,
+        11652,
+        11653
+      ],
+      "positive_seed_element_ids": [
+        9586,
+        9587,
+        9588,
+        9589,
+        9590,
+        9591,
+        9592,
+        9593,
+        9842,
+        9844,
+        9845,
+        9846,
+        9847,
+        9848,
+        9849,
+        10100,
+        10101,
+        10102,
+        10103,
+        10104,
+        10105,
+        10356,
+        10357,
+        10358,
+        10359,
+        10360,
+        10361,
+        10612,
+        10613,
+        10614,
+        10615,
+        10616,
+        10617,
+        10868,
+        10869,
+        10870,
+        10871,
+        10872,
+        10873,
+        11124,
+        11125,
+        11126,
+        11127,
+        11128,
+        11129,
+        11380,
+        11381,
+        11382,
+        11383,
+        11384,
+        11385,
+        11638,
+        11639,
+        11640,
+        11641
+      ]
+    },
+    "mesh_quality": 0.04830431138521841,
+    "reaction": 120598.92482713496,
+    "reaction_balance": 2.3891417102985182e-14,
+    "support_cavity_polygon_overlap_element_ids": []
+  },
+  "source_fingerprints": {
+    "assembled_system": "47b4e26b825d65bcbedbb0b70ab6c7dde8ec62880343c180e7005abecbf41869",
+    "mesh": "fb9ad184ca19a407abd70a53afb410cc8ed91bb6f45072c541845af580873db0",
+    "solution": "1fda0c6d8a9e1c9586ee91290d8f6ae5af29f028cf293f4483e0cd855af7c814",
+    "support": "4ecdbd1b5c126d246dcaea3b2d5585554128ddd67169deef7bcb0eb7fb002e77"
+  }
+}

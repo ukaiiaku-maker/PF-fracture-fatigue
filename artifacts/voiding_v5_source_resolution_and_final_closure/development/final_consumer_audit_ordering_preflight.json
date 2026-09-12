@@ -1,0 +1,15 @@
+{
+  "schema": "v5.final-consumer-audit-ordering-preflight/1",
+  "record_kind": "READ_ONLY_SEARCH_AND_TARGETED_REGRESSION_NOT_PHYSICAL_QUALIFICATION",
+  "search_key": "source_commit",
+  "search_directory": "arrhenius_fracture",
+  "unsorted_repetitions": 12,
+  "distinct_unsorted_outputs": 8,
+  "sorted_repetitions": 12,
+  "sorted_outputs_exact": true,
+  "retained_hits_per_sorted_output": 24,
+  "targeted_tests_passed": 60,
+  "targeted_tests_failed": 0,
+  "change": "Sort complete code-consumer hit listings; search errors fail closed. No physical fingerprint, audit field, scientific predicate or tolerance is removed.",
+  "final_physical_campaign_started_before_fix": false
+}

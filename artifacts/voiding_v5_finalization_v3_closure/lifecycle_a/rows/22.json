@@ -1,0 +1,88 @@
+{
+  "actual_operations": [
+    {
+      "api": "update_cavity_growth",
+      "duration_s": 5.188631541554139e-06,
+      "rates": {
+        "birth_activation_work_J": 3.468615433326888e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848122e-21,
+        "birth_normal_opening_work_J": 3.6106713305891124e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.2343586983165088e-23,
+        "healing_activation_work_J": -2.8386608264681147e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424063,
+        "local_in_plane_mean_stress_Pa": 177992579.61258537,
+        "local_max_principal_stress_Pa": 283866082.6468115,
+        "local_normal_opening_stress_Pa": 72213426.61178225,
+        "local_sigma_zz_Pa": 106795547.76755121,
+        "local_signed_shear_stress_Pa": 4468717.396633018,
+        "local_von_mises_stress_Pa": 196714547.70239455,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.80175877,
+        "stabilization_activation_work_J": 2.8386608264681147e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.334047,
+        "vacancy_transport_s": 809716953.2985829
+      }
+    },
+    {
+      "api": "update_cavity_growth",
+      "duration_s": 5.188631541554139e-06,
+      "rates": {
+        "birth_activation_work_J": 3.468615433326888e-21,
+        "birth_hydrostatic_work_J": 3.0852047132848122e-21,
+        "birth_normal_opening_work_J": 3.6106713305891124e-22,
+        "birth_s": 84551588.45205915,
+        "birth_signed_shear_work_J": 2.2343586983165088e-23,
+        "healing_activation_work_J": -2.8386608264681147e-21,
+        "healing_s": 254504204.09900025,
+        "local_hydrostatic_stress_Pa": 154260235.66424063,
+        "local_in_plane_mean_stress_Pa": 177992579.61258537,
+        "local_max_principal_stress_Pa": 283866082.6468115,
+        "local_normal_opening_stress_Pa": 72213426.61178225,
+        "local_sigma_zz_Pa": 106795547.76755121,
+        "local_signed_shear_stress_Pa": 4468717.396633018,
+        "local_von_mises_stress_Pa": 196714547.70239455,
+        "plastic_accommodation_s": 374681522.673284,
+        "series_limited_growth_s": 240911305.80175877,
+        "stabilization_activation_work_J": 2.8386608264681147e-21,
+        "stabilization_s": 2009744199.3341796,
+        "surface_reaction_s": 4049034553.334047,
+        "vacancy_transport_s": 809716953.2985829
+      }
+    }
+  ],
+  "case_identity": "subgrid_growth",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "transitions:subgrid_growth:2:21:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/5da327b4b12d6dbc858eb0c6b61141fd23731db491df26de6045d8dd19c2031c.json",
+  "initial_fingerprint": "5da327b4b12d6dbc858eb0c6b61141fd23731db491df26de6045d8dd19c2031c",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 2,
+    "predecessor_available": true,
+    "requested_predecessor": "subgrid_void",
+    "seed": 3621
+  },
+  "input_hash": "f21f751c1ca8d65275604a03a2a583e02123dadd323a6a9e7f77b06fc60af2b3",
+  "partition_count": 2,
+  "terminal_checkpoint": "checkpoints/80d1e70be1c7337db420c31914066c8fc31c7159785a78f0ad6e8969c9e82db2.json",
+  "terminal_fingerprint": "80d1e70be1c7337db420c31914066c8fc31c7159785a78f0ad6e8969c9e82db2",
+  "transition_occurred": true
+}

@@ -1,0 +1,60 @@
+name: V5 complete development-section source reconstruction
+
+on:
+  workflow_call:
+    inputs:
+      sections:
+        type: string
+        default: '["transitions","restarts","rollback"]'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  reconstruct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        section: ${{ fromJson(inputs.sections) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/artifacts/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ fromJson('{"transitions":"34189099900","restarts":"34185389845","rollback":"34184427615"}')[matrix.section] }}
+          pattern: v5-phase8-development-${{ matrix.section }}-*-${{ fromJson('{"transitions":"ec79645f9fe8f7a5dca92fecd94d79d5eda89b28","restarts":"787ebf692a8d5058050553f4160b78af062f1d48","rollback":"facbc24dd31040847d25e5be459bdad9024842b8"}')[matrix.section] }}
+          path: /tmp/v5-development-shards
+      - name: Strict complete-section source reconstruction, no new physical execution
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          mkdir -p /tmp/v5-development-reconstruction
+          python scripts/validate_v5_development_lifecycle_shards_v1.py '${{ matrix.section }}' /tmp/v5-development-reconstruction/report.json /tmp/v5-development-shards/* > /tmp/v5-development-reconstruction/reconstruction.log 2>&1
+      - name: Clean worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-development-reconstruction-${{ matrix.section }}-${{ github.sha }}
+          path: /tmp/v5-development-reconstruction

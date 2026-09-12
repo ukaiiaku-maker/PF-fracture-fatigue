@@ -1,0 +1,258 @@
+name: V5 source-resolution final complete A-B campaign
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONHASHSEED: '0'
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.registry.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/
+            /artifacts/voiding_v5_source_resolution_and_final_closure/development_phase_status.json
+            /artifacts/voiding_v5_source_resolution_and_final_closure/development/*/sha256_manifest.json
+            /artifacts/voiding_v5_source_resolution_and_final_closure/development/*/*/report.json
+            /artifacts/voiding_v5_source_resolution_and_final_closure/development/*.json
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - id: registry
+        name: Require all ten development phases executed and classified
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          matrix=$(python scripts/v5_source_resolution_campaign_matrix_v1.py --readiness artifacts/voiding_v5_source_resolution_and_final_closure/development_phase_status.json)
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  phase:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /docs/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+      - name: Materialize retained recovery inputs only for the recovery phase
+        if: matrix.phase == 'recovery'
+        run: >-
+          git sparse-checkout add
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/traction/
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/production/
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sha256_manifest.json
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/59761248ee9012f466ef21b55e4d373b6d56f6b6967681d8c14c39cdd4c645f7.npz
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/602a12cfe7d34f15dce151503b8536ed519a441149fb35d4eef2b38298431cfe.npz
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/6386a45ced6f6707e6f31bb0b1655d3719c27f48392fc3b728254c52665b5e82.npz
+          /artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/mechanics/sources/742ad35936dc54023803a008f4ec4ba5aea1cf166e3cd0dea84115a9da3157cf.npz
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Configure prospective fixed numerical kernels for subsequent processes
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify actual selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
+      - name: Exact implementation and clean historical base
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git worktree add --detach --no-checkout /tmp/source-final-stage2-base 326e3f5973ef623781ab8568798c495a3f68238c
+          git -C /tmp/source-final-stage2-base sparse-checkout init --cone
+          git -C /tmp/source-final-stage2-base sparse-checkout set arrhenius_fracture docs
+          git -C /tmp/source-final-stage2-base checkout
+      - name: Independent physical A and B executions; science failures retained
+        run: |
+          set +e
+          python scripts/run_v5_source_resolution_phase_v1.py '${{ matrix.phase }}' '/tmp/v5-source-final/${{ matrix.id }}/a' --section '${{ matrix.section }}' --shard-index '${{ matrix.index }}' --shard-count '${{ matrix.count }}' --base-worktree /tmp/source-final-stage2-base --require-pinned-runtime
+          result_a=$?
+          python scripts/run_v5_source_resolution_phase_v1.py '${{ matrix.phase }}' '/tmp/v5-source-final/${{ matrix.id }}/b' --section '${{ matrix.section }}' --shard-index '${{ matrix.index }}' --shard-count '${{ matrix.count }}' --base-worktree /tmp/source-final-stage2-base --require-pinned-runtime
+          result_b=$?
+          test "$result_a" -eq 0 && test "$result_b" -eq 0
+      - name: Exact recursive evidence comparison
+        run: diff -ru '/tmp/v5-source-final/${{ matrix.id }}/a' '/tmp/v5-source-final/${{ matrix.id }}/b'
+      - name: Clean worktrees and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+          test -z "$(git -C /tmp/source-final-stage2-base status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-source-final-shard-${{ matrix.id }}-${{ github.sha }}
+          path: /tmp/v5-source-final
+
+  complete-ontology:
+    needs: [prepare, phase]
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Configure prospective fixed numerical kernels for subsequent processes
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify actual selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v5-source-final-shard-*-${{ github.sha }}
+          path: /tmp/source-final-shards
+          merge-multiple: true
+      - name: Complete registries, source reassembly, lifecycle ontology, and A-B equality
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python scripts/assemble_v5_source_resolution_campaign_v1.py /tmp/source-final-shards /tmp/source-final-complete
+          diff -ru /tmp/source-final-complete/a /tmp/source-final-complete/b
+      - name: Clean worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-source-final-complete-${{ github.sha }}
+          path: /tmp/source-final-complete
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-source-final-ledger-${{ github.sha }}
+          path: |
+            /tmp/source-final-complete/a/scientific_ledger.json
+            /tmp/source-final-complete/b/scientific_ledger.json
+            /tmp/source-final-complete/paired_comparison.json
+
+  publication-package:
+    needs: complete-ontology
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /runtime_inputs/
+            /pyproject.toml
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - uses: actions/download-artifact@v4
+        with:
+          name: v5-source-final-complete-${{ github.sha }}
+          path: /tmp/source-final-complete
+      - name: Lossless bounded publication archive, not another physical execution
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python scripts/package_v5_final_campaign_v1.py pack /tmp/source-final-complete /tmp/source-final-publication --implementation-sha "$GITHUB_SHA"
+      - name: Clean implementation worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-source-final-publication-${{ github.sha }}
+          path: /tmp/source-final-publication
+
+  regressions:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /arrhenius_fracture/
+            /scripts/
+            /tests/
+            /runtime_inputs/
+            /pyproject.toml
+            /requirements-v5-source-resolution-ci.txt
+            /artifacts/voiding_v5_finalization_v3_closure/regressions/full-regression-3cbb11b.xml
+            /artifacts/voiding_v5_semantic_hardening/general_ci_inheritance.json
+      - name: Reserve disposable runner storage
+        run: bash scripts/prepare_v5_ci_storage_v1.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - run: pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+      - name: Configure prospective fixed numerical kernels for subsequent processes
+        run: python scripts/v5_numerical_runtime_v1.py --github-env "$GITHUB_ENV"
+      - name: Verify actual selected numerical kernels
+        run: python scripts/v5_numerical_runtime_v1.py
+      - name: Full regression execution including the full focused set
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          mkdir -p /tmp/source-final-regressions
+          set +e
+          python -m pytest -q --junitxml=/tmp/source-final-regressions/full.xml > /tmp/source-final-regressions/full.log 2>&1
+          test_result=$?
+          set -e
+          python scripts/triage_voiding_v5_closure_regressions.py artifacts/voiding_v5_finalization_v3_closure/regressions/full-regression-3cbb11b.xml --rerun /tmp/source-final-regressions/full.xml > /tmp/source-final-regressions/inheritance.json
+          python scripts/qualify_v5_source_resolution_focused_results_v1.py /tmp/source-final-regressions/full.xml /tmp/source-final-regressions/focused.json
+          test "$test_result" -le 1
+          python -c 'import json; r=json.load(open("/tmp/source-final-regressions/inheritance.json")); assert not r["rerun_additional_failures"], r["rerun_additional_failures"]'
+      - name: Clean worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-source-final-regressions-${{ github.sha }}
+          path: /tmp/source-final-regressions

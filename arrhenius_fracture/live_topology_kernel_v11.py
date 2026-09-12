@@ -158,6 +158,7 @@ class LiveTopologyRequest:
     exclude_radius_m: float
     provider_contract_contour_radius_m: float | None = None
     shared_perturbations: tuple[SlipRibbonPerturbation, ...] = ()
+    cavity_free_surface_inventory: tuple[Mapping[str, Any], ...] = ()
 
 
 def _segments(network: CrackNetworkState):
@@ -173,7 +174,7 @@ def _tip_direction(branch) -> np.ndarray:
 
 
 def request_contour_definitions(request: LiveTopologyRequest) -> dict[str, Any]:
-    return {
+    definitions = {
         "radius_m": request.contour_radius_m,
         "exclude_radius_m": request.exclude_radius_m,
         "provider_contract_radius_m": request.provider_contract_contour_radius_m,
@@ -189,6 +190,74 @@ def request_contour_definitions(request: LiveTopologyRequest) -> dict[str, Any]:
             key=lambda item: json.dumps(item, sort_keys=True),
         ),
     }
+    if request.cavity_free_surface_inventory:
+        definitions["cavity_free_surface_inventory"] = [
+            {
+                "surface_id": str(item["surface_id"]),
+                "polygon_xy_m": [_point(point) for point in item["polygon_xy_m"]],
+                "boundary_segments_xy_m": [
+                    [_point(segment[0]), _point(segment[1])]
+                    for segment in item.get("boundary_segments_xy_m", ())
+                ],
+            }
+            for item in sorted(
+                request.cavity_free_surface_inventory,
+                key=lambda value: str(value["surface_id"]),
+            )
+        ]
+    return definitions
+
+
+def _point_segment_distance(point, start, end) -> float:
+    delta = end - start
+    scale = float(delta @ delta)
+    if scale <= np.finfo(float).tiny:
+        return float(np.linalg.norm(point - start))
+    fraction = min(1.0, max(0.0, float((point - start) @ delta) / scale))
+    return float(np.linalg.norm(point - (start + fraction * delta)))
+
+
+def _point_in_polygon(point: np.ndarray, polygon: np.ndarray) -> bool:
+    """Return interior-or-boundary containment for a simple polygon."""
+    if len(polygon) < 3:
+        return False
+    inside = False
+    x, y = map(float, point)
+    for first, second in zip(polygon, np.roll(polygon, -1, axis=0)):
+        if _point_segment_distance(point, first, second) <= 1.0e-15:
+            return True
+        x1, y1 = map(float, first)
+        x2, y2 = map(float, second)
+        if (y1 > y) != (y2 > y):
+            crossing_x = x1 + (y - y1) * (x2 - x1) / (y2 - y1)
+            if crossing_x >= x:
+                inside = not inside
+    return inside
+
+
+def _cavity_contour_intersections(
+    request: LiveTopologyRequest, tip_xy: np.ndarray, radius_m: float,
+) -> tuple[bool, bool, tuple[str, ...]]:
+    boundary_hit = False
+    polygon_hit = False
+    surface_ids: list[str] = []
+    for item in request.cavity_free_surface_inventory:
+        polygon = np.asarray(item["polygon_xy_m"], dtype=float)
+        raw_segments = item.get("boundary_segments_xy_m", ())
+        segments = tuple(
+            (np.asarray(segment[0], dtype=float), np.asarray(segment[1], dtype=float))
+            for segment in raw_segments
+        ) or tuple(zip(polygon, np.roll(polygon, -1, axis=0)))
+        intersects_boundary = any(
+            _point_segment_distance(tip_xy, start, end) <= radius_m
+            for start, end in segments
+        )
+        intersects_polygon = _point_in_polygon(tip_xy, polygon) or intersects_boundary
+        if intersects_polygon:
+            surface_ids.append(str(item["surface_id"]))
+        boundary_hit = boundary_hit or intersects_boundary
+        polygon_hit = polygon_hit or intersects_polygon
+    return polygon_hit, boundary_hit, tuple(sorted(surface_ids))
 
 
 def _shared_unit_response(request: LiveTopologyRequest, base: Mapping[str, Any], perturbation):
@@ -258,14 +327,6 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
     domain_min = np.min(request.mesh.nodes, axis=0)
     domain_max = np.max(request.mesh.nodes, axis=0)
 
-    def point_segment_distance(point, start, end):
-        delta = end - start
-        scale = float(delta @ delta)
-        if scale <= np.finfo(float).tiny:
-            return float(np.linalg.norm(point - start))
-        fraction = min(1.0, max(0.0, float((point - start) @ delta) / scale))
-        return float(np.linalg.norm(point - (start + fraction * delta)))
-
     tips = []
     for branch_id in request.crack_network.active_tip_ids:
         branch = request.crack_network.branch(branch_id)
@@ -277,7 +338,7 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
             for segment in values
         )
         nearest_other = min(
-            (point_segment_distance(tip_xy, *segment) for segment in other_segments),
+            (_point_segment_distance(tip_xy, *segment) for segment in other_segments),
             default=math.inf,
         )
         nearest_junction = min(
@@ -306,8 +367,13 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
                 another_crack = nearest_other <= radius
                 contains_junction = nearest_junction <= radius
                 boundary_intersection = nearest_boundary <= radius
+                cavity_polygon, cavity_boundary, cavity_surface_ids = (
+                    _cavity_contour_intersections(request, tip_xy, radius)
+                )
                 adequate_support = bool(info.get("n_active_elements", 0) > 0 and math.isfinite(signed_radius))
                 reasons = []
+                if cavity_polygon or cavity_boundary:
+                    reasons.append("cavity_free_surface_intersects_contour")
                 if another_crack: reasons.append("another_committed_crack_in_contour")
                 if contains_junction: reasons.append("junction_in_contour")
                 if boundary_intersection: reasons.append("specimen_boundary_in_contour")
@@ -316,6 +382,9 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
                     "radius_m": radius, "signed_J_J_per_m2": signed_radius,
                     "another_committed_crack_intersects": another_crack,
                     "another_wake_intersects": another_crack,
+                    "cavity_polygon_intersects": cavity_polygon,
+                    "cavity_boundary_intersects": cavity_boundary,
+                    "cavity_surface_ids": list(cavity_surface_ids),
                     "junction_intersects": contains_junction,
                     "specimen_boundary_intersects": boundary_intersection,
                     "adequate_finite_element_support": adequate_support,
@@ -391,6 +460,9 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
                 "nearest_specimen_boundary_distance_m": nearest_boundary,
                 "another_committed_crack_intersects_J_domain": selected_row["another_committed_crack_intersects"],
                 "another_wake_intersects_J_domain": selected_row["another_wake_intersects"],
+                "cavity_polygon_intersects_J_domain": selected_row["cavity_polygon_intersects"],
+                "cavity_boundary_intersects_J_domain": selected_row["cavity_boundary_intersects"],
+                "cavity_surface_ids_in_J_domain": selected_row["cavity_surface_ids"],
                 "local_contour_active_elements": int(selected_row["integration"].get("n_active_elements", 0)),
                 "contour_diagnostics": selected_row["integration"],
                 "nested_contour_diagnostics": contour_rows,

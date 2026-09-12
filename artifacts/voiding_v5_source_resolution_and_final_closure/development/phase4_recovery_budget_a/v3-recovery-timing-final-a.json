@@ -1,0 +1,2695 @@
+{
+  "child_created": false,
+  "clean_worktree": false,
+  "combined_recovered_practical_to_raw_fine": {
+    "128/48": {
+      "allocated_transfer_budget_passed": false,
+      "candidate_rows": [
+        {
+          "allocated_log_rate_limit": 0.024395082084716004,
+          "allocated_waiting_time_relative_limit": 0.02469507659595984,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "classification": "POSITIVE_EXISTING_THRESHOLD",
+          "effective_barrier_error_over_kBT": 0.08345174610992,
+          "log_rate_error": 0.25035516147259784,
+          "passed": false,
+          "positive": true,
+          "total_budget_passed": false,
+          "waiting_time_relative_error": 0.2844815340384458
+        }
+      ],
+      "compared_operator_ids": [
+        "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "maximum-principal-incident-CST-at-fixed-owned-boundary-node"
+      ],
+      "current_tensor_fingerprint": "2cb0599d68ea1c9c4f934ab7bad1c0c293f953e6831ef61ad553c7c0cf0cd9ca",
+      "exact_identity_checks": {
+        "candidate_records": true,
+        "complete_candidate_set": true,
+        "consumed_event_ids": true,
+        "hazard_records": true,
+        "normal_xy": true,
+        "owned_source_identity": false,
+        "pending_event_ids": true,
+        "rng_state": true,
+        "stored_raw_source_provenance": false,
+        "tangent_xy": true
+      },
+      "full_stored_raw_source_provenance_equal": false,
+      "interpretation": "TRANSFER_BUDGET_ONLY_NO_GEOMETRY_MECHANICS_TOPOLOGY_OR_EVENT_CERTIFICATE",
+      "positive_candidate_exists": true,
+      "reference_tensor_fingerprint": "49f7089cb598996122c029669a8dc93552a11512f7d29e23aa51a9aae9650738",
+      "source_qualified": false,
+      "tensor_gate": true,
+      "tensor_relative_error": 0.02328056332902582,
+      "total_transfer_budget_passed": false
+    },
+    "32/12": {
+      "allocated_transfer_budget_passed": false,
+      "candidate_rows": [
+        {
+          "allocated_log_rate_limit": 0.024395082084716004,
+          "allocated_waiting_time_relative_limit": 0.02469507659595984,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "classification": "POSITIVE_EXISTING_THRESHOLD",
+          "effective_barrier_error_over_kBT": 0.8155621267899862,
+          "log_rate_error": 2.4466858450982123,
+          "passed": false,
+          "positive": true,
+          "total_budget_passed": false,
+          "waiting_time_relative_error": 10.550004713907194
+        }
+      ],
+      "compared_operator_ids": [
+        "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "maximum-principal-incident-CST-at-fixed-owned-boundary-node"
+      ],
+      "current_tensor_fingerprint": "fc5bda246d2f44f2ba11cdd7ffbc54263923fdfc4f5d3f64cfb272f0f0231531",
+      "exact_identity_checks": {
+        "candidate_records": true,
+        "complete_candidate_set": true,
+        "consumed_event_ids": true,
+        "hazard_records": true,
+        "normal_xy": true,
+        "owned_source_identity": false,
+        "pending_event_ids": true,
+        "rng_state": true,
+        "stored_raw_source_provenance": false,
+        "tangent_xy": true
+      },
+      "full_stored_raw_source_provenance_equal": false,
+      "interpretation": "TRANSFER_BUDGET_ONLY_NO_GEOMETRY_MECHANICS_TOPOLOGY_OR_EVENT_CERTIFICATE",
+      "positive_candidate_exists": true,
+      "reference_tensor_fingerprint": "49f7089cb598996122c029669a8dc93552a11512f7d29e23aa51a9aae9650738",
+      "source_qualified": false,
+      "tensor_gate": false,
+      "tensor_relative_error": 0.18718191593715042,
+      "total_transfer_budget_passed": false
+    },
+    "64/24": {
+      "allocated_transfer_budget_passed": false,
+      "candidate_rows": [
+        {
+          "allocated_log_rate_limit": 0.024395082084716004,
+          "allocated_waiting_time_relative_limit": 0.02469507659595984,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "classification": "POSITIVE_EXISTING_THRESHOLD",
+          "effective_barrier_error_over_kBT": 0.2769150958747046,
+          "log_rate_error": 0.8307450554326721,
+          "passed": false,
+          "positive": true,
+          "total_budget_passed": false,
+          "waiting_time_relative_error": 1.295028026527904
+        }
+      ],
+      "compared_operator_ids": [
+        "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "maximum-principal-incident-CST-at-fixed-owned-boundary-node"
+      ],
+      "current_tensor_fingerprint": "a0615dff7cd38579b5fe92090b85369d72fb6605fd1fb0cc942a5396cae820c5",
+      "exact_identity_checks": {
+        "candidate_records": true,
+        "complete_candidate_set": true,
+        "consumed_event_ids": true,
+        "hazard_records": true,
+        "normal_xy": true,
+        "owned_source_identity": false,
+        "pending_event_ids": true,
+        "rng_state": true,
+        "stored_raw_source_provenance": false,
+        "tangent_xy": true
+      },
+      "full_stored_raw_source_provenance_equal": false,
+      "interpretation": "TRANSFER_BUDGET_ONLY_NO_GEOMETRY_MECHANICS_TOPOLOGY_OR_EVENT_CERTIFICATE",
+      "positive_candidate_exists": true,
+      "reference_tensor_fingerprint": "49f7089cb598996122c029669a8dc93552a11512f7d29e23aa51a9aae9650738",
+      "source_qualified": false,
+      "tensor_gate": false,
+      "tensor_relative_error": 0.0628872110157333,
+      "total_transfer_budget_passed": false
+    }
+  },
+  "fine_raw_to_recovered_representation": {
+    "allocated_transfer_budget_passed": true,
+    "candidate_rows": [
+      {
+        "allocated_log_rate_limit": 0.024395082084716004,
+        "allocated_waiting_time_relative_limit": 0.02469507659595984,
+        "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+        "classification": "POSITIVE_EXISTING_THRESHOLD",
+        "effective_barrier_error_over_kBT": 0.0006752675986101381,
+        "log_rate_error": 0.0020258021478340993,
+        "passed": true,
+        "positive": true,
+        "total_budget_passed": true,
+        "waiting_time_relative_error": 0.002027855471313452
+      }
+    ],
+    "compared_operator_ids": [
+      "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+      "maximum-principal-incident-CST-at-fixed-owned-boundary-node"
+    ],
+    "current_tensor_fingerprint": "83c0653115bd0e0c8e2cc4b3d94d73602ee1a1aec67bb638aa180700fcaca642",
+    "exact_identity_checks": {
+      "candidate_records": true,
+      "complete_candidate_set": true,
+      "consumed_event_ids": true,
+      "hazard_records": true,
+      "normal_xy": true,
+      "owned_source_identity": true,
+      "pending_event_ids": true,
+      "rng_state": true,
+      "stored_raw_source_provenance": true,
+      "tangent_xy": true
+    },
+    "full_stored_raw_source_provenance_equal": true,
+    "interpretation": "TRANSFER_BUDGET_ONLY_NO_GEOMETRY_MECHANICS_TOPOLOGY_OR_EVENT_CERTIFICATE",
+    "positive_candidate_exists": true,
+    "reference_tensor_fingerprint": "49f7089cb598996122c029669a8dc93552a11512f7d29e23aa51a9aae9650738",
+    "source_qualified": false,
+    "tensor_gate": true,
+    "tensor_relative_error": 0.015123803667333213,
+    "total_transfer_budget_passed": true
+  },
+  "git_head": "d8514159fdaba9bf6d008ff0505f0d347d3b9b1c",
+  "implementation_file_sha256": "9e067a421f126d4c89a98662edc728e1ef9d1625abc3ef29371483ad3b80e971",
+  "limits": {
+    "allocated_log_rate": 0.024395082084716004,
+    "allocated_waiting_time_relative": 0.02469507659595984,
+    "tensor_relative": 0.05,
+    "total_log_rate": 0.04879016416943201,
+    "total_waiting_time_relative": 0.05
+  },
+  "pending_or_completed_event_created": false,
+  "protocol_sha256": "29e78a8dad38d6fdf0ae7418db5b713473be147e7917511a0679408b40792a07",
+  "recovered_resolution_comparisons": {
+    "128/48": {
+      "allocated_transfer_budget_passed": false,
+      "candidate_rows": [
+        {
+          "allocated_log_rate_limit": 0.024395082084716004,
+          "allocated_waiting_time_relative_limit": 0.02469507659595984,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "classification": "POSITIVE_EXISTING_THRESHOLD",
+          "effective_barrier_error_over_kBT": 0.08277647851130986,
+          "log_rate_error": 0.24832935932476374,
+          "passed": false,
+          "positive": true,
+          "total_budget_passed": false,
+          "waiting_time_relative_error": 0.28188206248445813
+        }
+      ],
+      "compared_operator_ids": [
+        "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "CAVITY_BOUNDARY_PATCH_RECOVERY_V1"
+      ],
+      "current_tensor_fingerprint": "2cb0599d68ea1c9c4f934ab7bad1c0c293f953e6831ef61ad553c7c0cf0cd9ca",
+      "exact_identity_checks": {
+        "candidate_records": true,
+        "complete_candidate_set": true,
+        "consumed_event_ids": true,
+        "hazard_records": true,
+        "normal_xy": true,
+        "owned_source_identity": false,
+        "pending_event_ids": true,
+        "rng_state": true,
+        "stored_raw_source_provenance": false,
+        "tangent_xy": true
+      },
+      "full_stored_raw_source_provenance_equal": false,
+      "interpretation": "TRANSFER_BUDGET_ONLY_NO_GEOMETRY_MECHANICS_TOPOLOGY_OR_EVENT_CERTIFICATE",
+      "positive_candidate_exists": true,
+      "reference_tensor_fingerprint": "83c0653115bd0e0c8e2cc4b3d94d73602ee1a1aec67bb638aa180700fcaca642",
+      "source_qualified": false,
+      "tensor_gate": true,
+      "tensor_relative_error": 0.017835807834140713,
+      "total_transfer_budget_passed": false
+    },
+    "32/12": {
+      "allocated_transfer_budget_passed": false,
+      "candidate_rows": [
+        {
+          "allocated_log_rate_limit": 0.024395082084716004,
+          "allocated_waiting_time_relative_limit": 0.02469507659595984,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "classification": "POSITIVE_EXISTING_THRESHOLD",
+          "effective_barrier_error_over_kBT": 0.814886859191376,
+          "log_rate_error": 2.444660042950378,
+          "passed": false,
+          "positive": true,
+          "total_budget_passed": false,
+          "waiting_time_relative_error": 10.526630373438609
+        }
+      ],
+      "compared_operator_ids": [
+        "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "CAVITY_BOUNDARY_PATCH_RECOVERY_V1"
+      ],
+      "current_tensor_fingerprint": "fc5bda246d2f44f2ba11cdd7ffbc54263923fdfc4f5d3f64cfb272f0f0231531",
+      "exact_identity_checks": {
+        "candidate_records": true,
+        "complete_candidate_set": true,
+        "consumed_event_ids": true,
+        "hazard_records": true,
+        "normal_xy": true,
+        "owned_source_identity": false,
+        "pending_event_ids": true,
+        "rng_state": true,
+        "stored_raw_source_provenance": false,
+        "tangent_xy": true
+      },
+      "full_stored_raw_source_provenance_equal": false,
+      "interpretation": "TRANSFER_BUDGET_ONLY_NO_GEOMETRY_MECHANICS_TOPOLOGY_OR_EVENT_CERTIFICATE",
+      "positive_candidate_exists": true,
+      "reference_tensor_fingerprint": "83c0653115bd0e0c8e2cc4b3d94d73602ee1a1aec67bb638aa180700fcaca642",
+      "source_qualified": false,
+      "tensor_gate": false,
+      "tensor_relative_error": 0.18677412744528624,
+      "total_transfer_budget_passed": false
+    },
+    "64/24": {
+      "allocated_transfer_budget_passed": false,
+      "candidate_rows": [
+        {
+          "allocated_log_rate_limit": 0.024395082084716004,
+          "allocated_waiting_time_relative_limit": 0.02469507659595984,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "classification": "POSITIVE_EXISTING_THRESHOLD",
+          "effective_barrier_error_over_kBT": 0.27623982827609445,
+          "log_rate_error": 0.828719253284838,
+          "passed": false,
+          "positive": true,
+          "total_budget_passed": false,
+          "waiting_time_relative_error": 1.2903834598973454
+        }
+      ],
+      "compared_operator_ids": [
+        "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "CAVITY_BOUNDARY_PATCH_RECOVERY_V1"
+      ],
+      "current_tensor_fingerprint": "a0615dff7cd38579b5fe92090b85369d72fb6605fd1fb0cc942a5396cae820c5",
+      "exact_identity_checks": {
+        "candidate_records": true,
+        "complete_candidate_set": true,
+        "consumed_event_ids": true,
+        "hazard_records": true,
+        "normal_xy": true,
+        "owned_source_identity": false,
+        "pending_event_ids": true,
+        "rng_state": true,
+        "stored_raw_source_provenance": false,
+        "tangent_xy": true
+      },
+      "full_stored_raw_source_provenance_equal": false,
+      "interpretation": "TRANSFER_BUDGET_ONLY_NO_GEOMETRY_MECHANICS_TOPOLOGY_OR_EVENT_CERTIFICATE",
+      "positive_candidate_exists": true,
+      "reference_tensor_fingerprint": "83c0653115bd0e0c8e2cc4b3d94d73602ee1a1aec67bb638aa180700fcaca642",
+      "source_qualified": false,
+      "tensor_gate": false,
+      "tensor_relative_error": 0.06122297186901765,
+      "total_transfer_budget_passed": false
+    }
+  },
+  "schema": "v5.recovery-owned-source-timing-transfer/1",
+  "source_operator_sha256": "e1bf6b6ec7e73922e411a1fbc0b3b5c689757fedbfb7e99c837797b32177258c",
+  "source_qualified": false,
+  "states": {
+    "128/48": {
+      "accepted_state_fingerprint": "d39cba83fb96677ea7b28cedc3519dc640883218d0c36145481b4b18473abb4f",
+      "accepted_state_unchanged": true,
+      "checkpoint_sha256": "a7d3575bd5fb6dc9e4a1d88389a8b71f3ca875c12fe82d28f63dfd012cece25c",
+      "raw_element_ids": [
+        0
+      ],
+      "records": {
+        "raw": {
+          "candidate_records": [
+            {
+              "angle_rad": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "direction_xy": [
+                1.0,
+                0.0
+              ],
+              "gamma_rel": 1.0,
+              "normal_xy": [
+                0.0,
+                1.0
+              ],
+              "orientation_convention": "bcc-[001]-section:theta_deg=0",
+              "plane_family": "cleavage",
+              "plane_variant": "(100)"
+            }
+          ],
+          "consumed_event_ids": [],
+          "hazard_records": [
+            {
+              "action": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completed_event_count": 0,
+              "current_threshold_action": 1.6231089048573308,
+              "last_completion_time_s": null,
+              "pending_events": [],
+              "previous_rate_per_s": null,
+              "residual_action": 0.0,
+              "threshold_process": "unit_exponential",
+              "threshold_seed": 6110078214787410712
+            }
+          ],
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "operator_id": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+          "owned_source_identity": {
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_position_m": [
+              0.0007550165699622716,
+              0.0
+            ]
+          },
+          "pending_event_ids": [],
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_raw_source_provenance": {
+            "candidate_source_states": [
+              {
+                "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+                "crossing_time_s": "infinity",
+                "direction_xy": [
+                  1.0,
+                  0.0
+                ],
+                "effective_rate_s": 0.0,
+                "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
+                "instantaneous_status": "SOURCE_TENSOR_UNQUALIFIED",
+                "normal_xy": [
+                  0.0,
+                  1.0
+                ],
+                "planned_endpoint_m": [
+                  0.0008300165699622715,
+                  0.0
+                ],
+                "resolved_opening_stress_Pa": 770783688.2012554,
+                "rng_provenance": {
+                  "global_hazard_seed": 6110078214787410712,
+                  "source_seed": 6110078214787410712
+                },
+                "source_boundary_site_id": "connection_exit",
+                "source_cavity_id": "void:site-1",
+                "source_geometry_generation": 1,
+                "source_kind": "cavity_surface",
+                "source_mesh_generation": 3,
+                "source_position_m": [
+                  0.0007550165699622716,
+                  0.0
+                ],
+                "source_probe_identity": {
+                  "boundary_node_id": 0,
+                  "element_ids": [
+                    0
+                  ],
+                  "kind": "direct_cavity_boundary_tensor"
+                },
+                "source_tensor_fingerprint": "75ecd57a2faca36fac8a71bc38712620b63cfb168ee202d13ebb5b4eadbdef76",
+                "tangent_xy": [
+                  1.0,
+                  0.0
+                ],
+                "threshold_identity": {
+                  "threshold_action": 1.6231089048573308,
+                  "threshold_process": "unit_exponential",
+                  "threshold_seed": 6110078214787410712
+                }
+              }
+            ],
+            "next_candidate_endpoints_m": {
+              "cleave:cleavage:(100):5d54146b8dbcda7a568e": [
+                0.0008300165699622715,
+                0.0
+              ]
+            },
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_mesh_generation": 3,
+            "source_position_m": [
+              0.0007550165699622716,
+              0.0
+            ],
+            "source_probe_identity": {
+              "boundary_node_id": 0,
+              "element_ids": [
+                0
+              ],
+              "kind": "direct_cavity_boundary_tensor"
+            },
+            "source_tensor_fingerprint": "75ecd57a2faca36fac8a71bc38712620b63cfb168ee202d13ebb5b4eadbdef76"
+          },
+          "tangent_xy": [
+            -0.0,
+            1.0
+          ],
+          "tensor_Pa": [
+            [
+              4876448.034013293,
+              -31909199.29537549
+            ],
+            [
+              -31909199.29537549,
+              770783688.2012554
+            ]
+          ],
+          "tensor_fingerprint": "75ecd57a2faca36fac8a71bc38712620b63cfb168ee202d13ebb5b4eadbdef76",
+          "unguarded_candidate_rates": [
+            {
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "crossing_time_s": 5329010056298.406,
+              "effective_rate_s": 3.045798164593372e-13,
+              "hazard_barrier_J": 3.4084133664164544e-19,
+              "rate_s": 3.045798164593372e-13,
+              "raw_rate_s": 3.045798164593372e-13,
+              "resolved_opening_stress_Pa": 770783688.2012554
+            }
+          ]
+        },
+        "recovered": {
+          "candidate_records": [
+            {
+              "angle_rad": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "direction_xy": [
+                1.0,
+                0.0
+              ],
+              "gamma_rel": 1.0,
+              "normal_xy": [
+                0.0,
+                1.0
+              ],
+              "orientation_convention": "bcc-[001]-section:theta_deg=0",
+              "plane_family": "cleavage",
+              "plane_variant": "(100)"
+            }
+          ],
+          "consumed_event_ids": [],
+          "hazard_records": [
+            {
+              "action": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completed_event_count": 0,
+              "current_threshold_action": 1.6231089048573308,
+              "last_completion_time_s": null,
+              "pending_events": [],
+              "previous_rate_per_s": null,
+              "residual_action": 0.0,
+              "threshold_process": "unit_exponential",
+              "threshold_seed": 6110078214787410712
+            }
+          ],
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "operator_id": "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+          "owned_source_identity": {
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_position_m": [
+              0.0007550165699622716,
+              0.0
+            ]
+          },
+          "pending_event_ids": [],
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_raw_source_provenance": {
+            "candidate_source_states": [
+              {
+                "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+                "crossing_time_s": "infinity",
+                "direction_xy": [
+                  1.0,
+                  0.0
+                ],
+                "effective_rate_s": 0.0,
+                "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
+                "instantaneous_status": "SOURCE_TENSOR_UNQUALIFIED",
+                "normal_xy": [
+                  0.0,
+                  1.0
+                ],
+                "planned_endpoint_m": [
+                  0.0008300165699622715,
+                  0.0
+                ],
+                "resolved_opening_stress_Pa": 770783688.2012554,
+                "rng_provenance": {
+                  "global_hazard_seed": 6110078214787410712,
+                  "source_seed": 6110078214787410712
+                },
+                "source_boundary_site_id": "connection_exit",
+                "source_cavity_id": "void:site-1",
+                "source_geometry_generation": 1,
+                "source_kind": "cavity_surface",
+                "source_mesh_generation": 3,
+                "source_position_m": [
+                  0.0007550165699622716,
+                  0.0
+                ],
+                "source_probe_identity": {
+                  "boundary_node_id": 0,
+                  "element_ids": [
+                    0
+                  ],
+                  "kind": "direct_cavity_boundary_tensor"
+                },
+                "source_tensor_fingerprint": "75ecd57a2faca36fac8a71bc38712620b63cfb168ee202d13ebb5b4eadbdef76",
+                "tangent_xy": [
+                  1.0,
+                  0.0
+                ],
+                "threshold_identity": {
+                  "threshold_action": 1.6231089048573308,
+                  "threshold_process": "unit_exponential",
+                  "threshold_seed": 6110078214787410712
+                }
+              }
+            ],
+            "next_candidate_endpoints_m": {
+              "cleave:cleavage:(100):5d54146b8dbcda7a568e": [
+                0.0008300165699622715,
+                0.0
+              ]
+            },
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_mesh_generation": 3,
+            "source_position_m": [
+              0.0007550165699622716,
+              0.0
+            ],
+            "source_probe_identity": {
+              "boundary_node_id": 0,
+              "element_ids": [
+                0
+              ],
+              "kind": "direct_cavity_boundary_tensor"
+            },
+            "source_tensor_fingerprint": "75ecd57a2faca36fac8a71bc38712620b63cfb168ee202d13ebb5b4eadbdef76"
+          },
+          "tangent_xy": [
+            -0.0,
+            1.0
+          ],
+          "tensor_Pa": [
+            [
+              4563197.736989678,
+              -3801.2124348490343
+            ],
+            [
+              -3801.2124348490343,
+              764783597.9616376
+            ]
+          ],
+          "tensor_fingerprint": "2cb0599d68ea1c9c4f934ab7bad1c0c293f953e6831ef61ad553c7c0cf0cd9ca",
+          "unguarded_candidate_rates": [
+            {
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "crossing_time_s": 5965931359871.279,
+              "effective_rate_s": 2.720629532841878e-13,
+              "hazard_barrier_J": 3.413089613158994e-19,
+              "rate_s": 2.720629532841878e-13,
+              "raw_rate_s": 2.720629532841878e-13,
+              "resolved_opening_stress_Pa": 764783597.9616376
+            }
+          ]
+        }
+      },
+      "recovery_stencil": {
+        "candidate_planes": [
+          {
+            "normal_xy": [
+              0.0,
+              1.0
+            ],
+            "opening_Pa": 764783597.9616376,
+            "shear_Pa": 3801.2124348490343,
+            "tangent_xy": [
+              -1.0,
+              0.0
+            ]
+          }
+        ],
+        "centroid_offsets_normal_tangent_scaled": [
+          [
+            0.10547974505098504,
+            0.39214509967232825
+          ],
+          [
+            0.2251603556824435,
+            0.19889655069855544
+          ],
+          [
+            0.08651523132040113,
+            0.7781766449388223
+          ],
+          [
+            0.1873556182201164,
+            0.9822921522242544
+          ],
+          [
+            0.08651523132040113,
+            -0.7781766449388225
+          ],
+          [
+            0.1873556182201164,
+            -0.9822921522242539
+          ],
+          [
+            0.10547974505098504,
+            -0.3921450996723288
+          ],
+          [
+            0.2251603556824435,
+            -0.19889655069855575
+          ],
+          [
+            0.4656899815722214,
+            0.19889655069855544
+          ],
+          [
+            0.46568998157219815,
+            -0.19889655069855575
+          ]
+        ],
+        "condition_number": 7.491746116690253,
+        "coordinate_scale_m": 4.656412949119954e-06,
+        "element_ids": [
+          0,
+          1,
+          2,
+          3,
+          434,
+          435,
+          436,
+          437,
+          438,
+          874
+        ],
+        "evaluation_weights": [
+          0.29477886304125417,
+          0.14956398824177988,
+          0.1826065380582041,
+          0.07705936108393248,
+          0.18260653805819996,
+          0.0770593610839289,
+          0.2947788630412515,
+          0.14956398824177827,
+          -0.20400875042517613,
+          -0.20400875042515257
+        ],
+        "full_raw_stress_fingerprint": "58d6456f03a0291cffd6581bccdba26aca259d3b9e655b3f29746fd4756cae08",
+        "intact_mask_fingerprint": "c35567b718e8b6bdce605d3a96fadee00694c9f9caea39a08585db560403ffbc",
+        "mesh_elements_fingerprint": "4d71541c96fb12b472808469989171e0eb8387c11b3c8248ae19dfb23693307b",
+        "mesh_nodes_fingerprint": "19ddc1395b82820e46ffecaa5aca7f049fea5cf129dce86b092634b54e85a02d",
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "operator_id": "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "principal_stresses_Pa": [
+          4563197.717983063,
+          764783597.9806442
+        ],
+        "rank": 3,
+        "raw_CST_tensors_Pa": [
+          [
+            [
+              4876448.034013293,
+              -31909199.29537549
+            ],
+            [
+              -31909199.29537549,
+              770783688.2012554
+            ]
+          ],
+          [
+            [
+              18669641.088216405,
+              -3676117.110308056
+            ],
+            [
+              -3676117.110308056,
+              722708553.0341437
+            ]
+          ],
+          [
+            [
+              4345555.910102412,
+              -41027457.947405994
+            ],
+            [
+              -41027457.947405994,
+              766191667.8862396
+            ]
+          ],
+          [
+            [
+              25530345.297190625,
+              -62453850.26646898
+            ],
+            [
+              -62453850.26646898,
+              713475804.0495576
+            ]
+          ],
+          [
+            [
+              4333817.581355538,
+              41008285.44595215
+            ],
+            [
+              41008285.44595215,
+              766116474.2188417
+            ]
+          ],
+          [
+            [
+              25533257.955120508,
+              62431348.36135504
+            ],
+            [
+              62431348.36135504,
+              713406870.4045871
+            ]
+          ],
+          [
+            [
+              4884453.5561574055,
+              31892211.297902636
+            ],
+            [
+              31892211.297902636,
+              770758762.1911534
+            ]
+          ],
+          [
+            [
+              18660365.369135417,
+              3660661.6087907483
+            ],
+            [
+              3660661.6087907483,
+              722684701.1850783
+            ]
+          ],
+          [
+            [
+              23084541.215026934,
+              -3657874.312182735
+            ],
+            [
+              -3657874.312182735,
+              724424555.2617124
+            ]
+          ],
+          [
+            [
+              23076093.31805626,
+              3614968.8822805206
+            ],
+            [
+              3614968.8822805206,
+              724402832.0980716
+            ]
+          ]
+        ],
+        "regression_weights": [
+          0.12062887455733916,
+          0.14193401268736064,
+          0.0685477722371486,
+          0.051620423324610074,
+          0.06854777223714835,
+          0.051620423324609914,
+          0.12062887455733924,
+          0.14193401268736086,
+          0.11726891719353962,
+          0.1172689171935435
+        ],
+        "seed_element_ids": [
+          0,
+          436
+        ],
+        "sigma_nn_Pa": 4563197.736989678,
+        "sigma_nt_Pa": -3801.2124348490343,
+        "sigma_tt_Pa": 764783597.9616376,
+        "singular_values": [
+          1.0265541608055284,
+          0.49014735717451463,
+          0.13702468621014155
+        ],
+        "source_edge_node_ids": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            127
+          ]
+        ],
+        "source_point_m": [
+          0.0007550165699622716,
+          0.0
+        ],
+        "status": "NUMERICALLY_ADMISSIBLE_NOT_SOURCE_QUALIFIED",
+        "tangent_xy": [
+          -0.0,
+          1.0
+        ],
+        "tensor_Pa": [
+          [
+            4563197.736989678,
+            -3801.2124348490343
+          ],
+          [
+            -3801.2124348490343,
+            764783597.9616376
+          ]
+        ],
+        "weighted_residual_norm_Pa": 21111475.05611243
+      }
+    },
+    "32/12": {
+      "accepted_state_fingerprint": "ad50912ea5fdcbb8e7c9b044e02a19823ba17ffbd8d94d5b0b8cc58e33db3fd5",
+      "accepted_state_unchanged": true,
+      "checkpoint_sha256": "4470cf57baf1cff9086bc31fcc592fa15600dea6c4ada1ce9b35da7cee8a8a83",
+      "raw_element_ids": [
+        0
+      ],
+      "records": {
+        "raw": {
+          "candidate_records": [
+            {
+              "angle_rad": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "direction_xy": [
+                1.0,
+                0.0
+              ],
+              "gamma_rel": 1.0,
+              "normal_xy": [
+                0.0,
+                1.0
+              ],
+              "orientation_convention": "bcc-[001]-section:theta_deg=0",
+              "plane_family": "cleavage",
+              "plane_variant": "(100)"
+            }
+          ],
+          "consumed_event_ids": [],
+          "hazard_records": [
+            {
+              "action": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completed_event_count": 0,
+              "current_threshold_action": 1.6231089048573308,
+              "last_completion_time_s": null,
+              "pending_events": [],
+              "previous_rate_per_s": null,
+              "residual_action": 0.0,
+              "threshold_process": "unit_exponential",
+              "threshold_seed": 6110078214787410712
+            }
+          ],
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "operator_id": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+          "owned_source_identity": {
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_position_m": [
+              0.0007552661214806971,
+              0.0
+            ]
+          },
+          "pending_event_ids": [],
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_raw_source_provenance": {
+            "candidate_source_states": [
+              {
+                "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+                "crossing_time_s": "infinity",
+                "direction_xy": [
+                  1.0,
+                  0.0
+                ],
+                "effective_rate_s": 0.0,
+                "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
+                "instantaneous_status": "SOURCE_TENSOR_UNQUALIFIED",
+                "normal_xy": [
+                  0.0,
+                  1.0
+                ],
+                "planned_endpoint_m": [
+                  0.0008302661214806971,
+                  0.0
+                ],
+                "resolved_opening_stress_Pa": 718462135.1944888,
+                "rng_provenance": {
+                  "global_hazard_seed": 6110078214787410712,
+                  "source_seed": 6110078214787410712
+                },
+                "source_boundary_site_id": "connection_exit",
+                "source_cavity_id": "void:site-1",
+                "source_geometry_generation": 1,
+                "source_kind": "cavity_surface",
+                "source_mesh_generation": 3,
+                "source_position_m": [
+                  0.0007552661214806971,
+                  0.0
+                ],
+                "source_probe_identity": {
+                  "boundary_node_id": 0,
+                  "element_ids": [
+                    0
+                  ],
+                  "kind": "direct_cavity_boundary_tensor"
+                },
+                "source_tensor_fingerprint": "e46990ab2c5c365bd5742e1a0c940d091a8a9b4ae514e35d87e11e58cbf42834",
+                "tangent_xy": [
+                  1.0,
+                  0.0
+                ],
+                "threshold_identity": {
+                  "threshold_action": 1.6231089048573308,
+                  "threshold_process": "unit_exponential",
+                  "threshold_seed": 6110078214787410712
+                }
+              }
+            ],
+            "next_candidate_endpoints_m": {
+              "cleave:cleavage:(100):5d54146b8dbcda7a568e": [
+                0.0008302661214806971,
+                0.0
+              ]
+            },
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_mesh_generation": 3,
+            "source_position_m": [
+              0.0007552661214806971,
+              0.0
+            ],
+            "source_probe_identity": {
+              "boundary_node_id": 0,
+              "element_ids": [
+                0
+              ],
+              "kind": "direct_cavity_boundary_tensor"
+            },
+            "source_tensor_fingerprint": "e46990ab2c5c365bd5742e1a0c940d091a8a9b4ae514e35d87e11e58cbf42834"
+          },
+          "tangent_xy": [
+            -0.0,
+            1.0
+          ],
+          "tensor_Pa": [
+            [
+              36248392.30717645,
+              -102294862.40460402
+            ],
+            [
+              -102294862.40460402,
+              718462135.1944888
+            ]
+          ],
+          "tensor_fingerprint": "e46990ab2c5c365bd5742e1a0c940d091a8a9b4ae514e35d87e11e58cbf42834",
+          "unguarded_candidate_rates": [
+            {
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "crossing_time_s": 14020336601692.62,
+              "effective_rate_s": 1.1576818381531435e-13,
+              "hazard_barrier_J": 3.4484802278038915e-19,
+              "rate_s": 1.1576818381531435e-13,
+              "raw_rate_s": 1.1576818381531435e-13,
+              "resolved_opening_stress_Pa": 718462135.1944888
+            }
+          ]
+        },
+        "recovered": {
+          "candidate_records": [
+            {
+              "angle_rad": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "direction_xy": [
+                1.0,
+                0.0
+              ],
+              "gamma_rel": 1.0,
+              "normal_xy": [
+                0.0,
+                1.0
+              ],
+              "orientation_convention": "bcc-[001]-section:theta_deg=0",
+              "plane_family": "cleavage",
+              "plane_variant": "(100)"
+            }
+          ],
+          "consumed_event_ids": [],
+          "hazard_records": [
+            {
+              "action": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completed_event_count": 0,
+              "current_threshold_action": 1.6231089048573308,
+              "last_completion_time_s": null,
+              "pending_events": [],
+              "previous_rate_per_s": null,
+              "residual_action": 0.0,
+              "threshold_process": "unit_exponential",
+              "threshold_seed": 6110078214787410712
+            }
+          ],
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "operator_id": "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+          "owned_source_identity": {
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_position_m": [
+              0.0007552661214806971,
+              0.0
+            ]
+          },
+          "pending_event_ids": [],
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_raw_source_provenance": {
+            "candidate_source_states": [
+              {
+                "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+                "crossing_time_s": "infinity",
+                "direction_xy": [
+                  1.0,
+                  0.0
+                ],
+                "effective_rate_s": 0.0,
+                "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
+                "instantaneous_status": "SOURCE_TENSOR_UNQUALIFIED",
+                "normal_xy": [
+                  0.0,
+                  1.0
+                ],
+                "planned_endpoint_m": [
+                  0.0008302661214806971,
+                  0.0
+                ],
+                "resolved_opening_stress_Pa": 718462135.1944888,
+                "rng_provenance": {
+                  "global_hazard_seed": 6110078214787410712,
+                  "source_seed": 6110078214787410712
+                },
+                "source_boundary_site_id": "connection_exit",
+                "source_cavity_id": "void:site-1",
+                "source_geometry_generation": 1,
+                "source_kind": "cavity_surface",
+                "source_mesh_generation": 3,
+                "source_position_m": [
+                  0.0007552661214806971,
+                  0.0
+                ],
+                "source_probe_identity": {
+                  "boundary_node_id": 0,
+                  "element_ids": [
+                    0
+                  ],
+                  "kind": "direct_cavity_boundary_tensor"
+                },
+                "source_tensor_fingerprint": "e46990ab2c5c365bd5742e1a0c940d091a8a9b4ae514e35d87e11e58cbf42834",
+                "tangent_xy": [
+                  1.0,
+                  0.0
+                ],
+                "threshold_identity": {
+                  "threshold_action": 1.6231089048573308,
+                  "threshold_process": "unit_exponential",
+                  "threshold_seed": 6110078214787410712
+                }
+              }
+            ],
+            "next_candidate_endpoints_m": {
+              "cleave:cleavage:(100):5d54146b8dbcda7a568e": [
+                0.0008302661214806971,
+                0.0
+              ]
+            },
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_mesh_generation": 3,
+            "source_position_m": [
+              0.0007552661214806971,
+              0.0
+            ],
+            "source_probe_identity": {
+              "boundary_node_id": 0,
+              "element_ids": [
+                0
+              ],
+              "kind": "direct_cavity_boundary_tensor"
+            },
+            "source_tensor_fingerprint": "e46990ab2c5c365bd5742e1a0c940d091a8a9b4ae514e35d87e11e58cbf42834"
+          },
+          "tangent_xy": [
+            -0.0,
+            1.0
+          ],
+          "tensor_Pa": [
+            [
+              50995222.39294826,
+              -13342.387058502169
+            ],
+            [
+              -13342.387058502169,
+              641823600.2257326
+            ]
+          ],
+          "tensor_fingerprint": "fc5bda246d2f44f2ba11cdd7ffbc54263923fdfc4f5d3f64cfb272f0f0231531",
+          "unguarded_candidate_rates": [
+            {
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "crossing_time_s": 53645407507506.92,
+              "effective_rate_s": 3.0256250819423814e-14,
+              "hazard_barrier_J": 3.504060485006794e-19,
+              "rate_s": 3.0256250819423814e-14,
+              "raw_rate_s": 3.0256250819423814e-14,
+              "resolved_opening_stress_Pa": 641823600.2257326
+            }
+          ]
+        }
+      },
+      "recovery_stencil": {
+        "candidate_planes": [
+          {
+            "normal_xy": [
+              0.0,
+              1.0
+            ],
+            "opening_Pa": 641823600.2257326,
+            "shear_Pa": 13342.387058502169,
+            "tangent_xy": [
+              -1.0,
+              0.0
+            ]
+          }
+        ],
+        "centroid_offsets_normal_tangent_scaled": [
+          [
+            0.09014228194836714,
+            0.39790182395552937
+          ],
+          [
+            0.23479378131686354,
+            0.21156664137122633
+          ],
+          [
+            0.01743790040175387,
+            0.7634114325553951
+          ],
+          [
+            0.09155605183926056,
+            0.9957999243681449
+          ],
+          [
+            0.01743790040175387,
+            -0.7634114325553966
+          ],
+          [
+            0.09155605183926056,
+            -0.9957999243681467
+          ],
+          [
+            0.09014228194836714,
+            -0.39790182395553036
+          ],
+          [
+            0.2347937813168523,
+            -0.21156664137122685
+          ],
+          [
+            0.5285125853655892,
+            0.21156664137122633
+          ],
+          [
+            0.5285125853655892,
+            -0.21156664137122685
+          ]
+        ],
+        "condition_number": 5.615648534657866,
+        "coordinate_scale_m": 1.928761794868172e-05,
+        "element_ids": [
+          0,
+          1,
+          2,
+          3,
+          226,
+          227,
+          228,
+          229,
+          230,
+          474
+        ],
+        "evaluation_weights": [
+          0.21594124959007288,
+          0.13725986543177557,
+          0.15896814598791703,
+          0.10992778284715668,
+          0.15896814598791648,
+          0.10992778284715388,
+          0.21594124959007457,
+          0.13725986543178603,
+          -0.12209704385692571,
+          -0.12209704385692724
+        ],
+        "full_raw_stress_fingerprint": "d384527fe9cd121225de46f46d4ae1f03617843e9b25a4d781e77f23512a662f",
+        "intact_mask_fingerprint": "3bc84320f8312df9fb1e7a7a726c25458ff1275b6f0ca893434d59b8be894adf",
+        "mesh_elements_fingerprint": "a75c5c5f4d9b04f0e867c3c1a58165c0e995feed31800ae98b75345156672a33",
+        "mesh_nodes_fingerprint": "46f300591886c66d9fe9bac376e07798dca9a9f199b8461e43dccfc2699a0fcf",
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "operator_id": "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "principal_stresses_Pa": [
+          50995222.09164368,
+          641823600.5270371
+        ],
+        "rank": 3,
+        "raw_CST_tensors_Pa": [
+          [
+            [
+              36248392.30717645,
+              -102294862.40460402
+            ],
+            [
+              -102294862.40460402,
+              718462135.1944888
+            ]
+          ],
+          [
+            [
+              65914791.91726171,
+              -3134649.1794986557
+            ],
+            [
+              -3134649.1794986557,
+              565278804.7435082
+            ]
+          ],
+          [
+            [
+              31007079.989127535,
+              -129916348.60153203
+            ],
+            [
+              -129916348.60153203,
+              659999052.995087
+            ]
+          ],
+          [
+            [
+              111563642.53839388,
+              -131107955.66576125
+            ],
+            [
+              -131107955.66576125,
+              477488756.9058766
+            ]
+          ],
+          [
+            [
+              30979175.126275156,
+              129876904.26743156
+            ],
+            [
+              129876904.26743156,
+              659921786.3083221
+            ]
+          ],
+          [
+            [
+              111525772.25789729,
+              131067275.6011913
+            ],
+            [
+              131067275.6011913,
+              477441783.27869534
+            ]
+          ],
+          [
+            [
+              36247252.493548214,
+              102270802.4909439
+            ],
+            [
+              102270802.4909439,
+              718435975.3959594
+            ]
+          ],
+          [
+            [
+              65906523.416537054,
+              3114306.104877496
+            ],
+            [
+              3114306.104877496,
+              565257542.8845019
+            ]
+          ],
+          [
+            [
+              70155740.6014836,
+              -3037456.1705831666
+            ],
+            [
+              -3037456.1705831666,
+              566925282.7359638
+            ]
+          ],
+          [
+            [
+              70150019.43514097,
+              2993329.873637394
+            ],
+            [
+              2993329.873637394,
+              566910571.1653677
+            ]
+          ]
+        ],
+        "regression_weights": [
+          0.1107804337198124,
+          0.1381251424932474,
+          0.06543132010858983,
+          0.05666575070570452,
+          0.06543132010859053,
+          0.056665750705704426,
+          0.11078043371981434,
+          0.13812514249324903,
+          0.12899735297264364,
+          0.1289973529726439
+        ],
+        "seed_element_ids": [
+          0,
+          228
+        ],
+        "sigma_nn_Pa": 50995222.39294826,
+        "sigma_nt_Pa": -13342.387058502169,
+        "sigma_tt_Pa": 641823600.2257326,
+        "singular_values": [
+          1.027900460156135,
+          0.49763411570221583,
+          0.18304216401939763
+        ],
+        "source_edge_node_ids": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            31
+          ]
+        ],
+        "source_point_m": [
+          0.0007552661214806971,
+          0.0
+        ],
+        "status": "NUMERICALLY_ADMISSIBLE_NOT_SOURCE_QUALIFIED",
+        "tangent_xy": [
+          -0.0,
+          1.0
+        ],
+        "tensor_Pa": [
+          [
+            50995222.39294826,
+            -13342.387058502169
+          ],
+          [
+            -13342.387058502169,
+            641823600.2257326
+          ]
+        ],
+        "weighted_residual_norm_Pa": 84822436.27242695
+      }
+    },
+    "512/192": {
+      "accepted_state_fingerprint": "a6696b19f69538cbd55681c4324ed8e818abc5f526ff36211ea671b490687e55",
+      "accepted_state_unchanged": true,
+      "checkpoint_sha256": "7d8b077a3fd729c146fd242a69d99f498c49a50767fb5d7d7c6043f38f26d157",
+      "raw_element_ids": [
+        0
+      ],
+      "records": {
+        "raw": {
+          "candidate_records": [
+            {
+              "angle_rad": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "direction_xy": [
+                1.0,
+                0.0
+              ],
+              "gamma_rel": 1.0,
+              "normal_xy": [
+                0.0,
+                1.0
+              ],
+              "orientation_convention": "bcc-[001]-section:theta_deg=0",
+              "plane_family": "cleavage",
+              "plane_variant": "(100)"
+            }
+          ],
+          "consumed_event_ids": [],
+          "hazard_records": [
+            {
+              "action": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completed_event_count": 0,
+              "current_threshold_action": 1.6231089048573308,
+              "last_completion_time_s": null,
+              "pending_events": [],
+              "previous_rate_per_s": null,
+              "residual_action": 0.0,
+              "threshold_process": "unit_exponential",
+              "threshold_seed": 6110078214787410712
+            }
+          ],
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "operator_id": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+          "owned_source_identity": {
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_position_m": [
+              0.0007550010353789476,
+              0.0
+            ]
+          },
+          "pending_event_ids": [],
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_raw_source_provenance": {
+            "candidate_source_states": [
+              {
+                "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+                "crossing_time_s": "infinity",
+                "direction_xy": [
+                  1.0,
+                  0.0
+                ],
+                "effective_rate_s": 0.0,
+                "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
+                "instantaneous_status": "SOURCE_TENSOR_UNQUALIFIED",
+                "normal_xy": [
+                  0.0,
+                  1.0
+                ],
+                "planned_endpoint_m": [
+                  0.0008300010353789476,
+                  0.0
+                ],
+                "resolved_opening_stress_Pa": 778053791.5919999,
+                "rng_provenance": {
+                  "global_hazard_seed": 6110078214787410712,
+                  "source_seed": 6110078214787410712
+                },
+                "source_boundary_site_id": "connection_exit",
+                "source_cavity_id": "void:site-1",
+                "source_geometry_generation": 1,
+                "source_kind": "cavity_surface",
+                "source_mesh_generation": 3,
+                "source_position_m": [
+                  0.0007550010353789476,
+                  0.0
+                ],
+                "source_probe_identity": {
+                  "boundary_node_id": 0,
+                  "element_ids": [
+                    0
+                  ],
+                  "kind": "direct_cavity_boundary_tensor"
+                },
+                "source_tensor_fingerprint": "49f7089cb598996122c029669a8dc93552a11512f7d29e23aa51a9aae9650738",
+                "tangent_xy": [
+                  1.0,
+                  0.0
+                ],
+                "threshold_identity": {
+                  "threshold_action": 1.6231089048573308,
+                  "threshold_process": "unit_exponential",
+                  "threshold_seed": 6110078214787410712
+                }
+              }
+            ],
+            "next_candidate_endpoints_m": {
+              "cleave:cleavage:(100):5d54146b8dbcda7a568e": [
+                0.0008300010353789476,
+                0.0
+              ]
+            },
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_mesh_generation": 3,
+            "source_position_m": [
+              0.0007550010353789476,
+              0.0
+            ],
+            "source_probe_identity": {
+              "boundary_node_id": 0,
+              "element_ids": [
+                0
+              ],
+              "kind": "direct_cavity_boundary_tensor"
+            },
+            "source_tensor_fingerprint": "49f7089cb598996122c029669a8dc93552a11512f7d29e23aa51a9aae9650738"
+          },
+          "tangent_xy": [
+            -0.0,
+            1.0
+          ],
+          "tensor_Pa": [
+            [
+              807026.0522253524,
+              -8309471.658162043
+            ],
+            [
+              -8309471.658162043,
+              778053791.5919999
+            ]
+          ],
+          "tensor_fingerprint": "49f7089cb598996122c029669a8dc93552a11512f7d29e23aa51a9aae9650738",
+          "unguarded_candidate_rates": [
+            {
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "crossing_time_s": 4644622131012.049,
+              "effective_rate_s": 3.49459839589504e-13,
+              "hazard_barrier_J": 3.4027200318756517e-19,
+              "rate_s": 3.49459839589504e-13,
+              "raw_rate_s": 3.49459839589504e-13,
+              "resolved_opening_stress_Pa": 778053791.5919999
+            }
+          ]
+        },
+        "recovered": {
+          "candidate_records": [
+            {
+              "angle_rad": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "direction_xy": [
+                1.0,
+                0.0
+              ],
+              "gamma_rel": 1.0,
+              "normal_xy": [
+                0.0,
+                1.0
+              ],
+              "orientation_convention": "bcc-[001]-section:theta_deg=0",
+              "plane_family": "cleavage",
+              "plane_variant": "(100)"
+            }
+          ],
+          "consumed_event_ids": [],
+          "hazard_records": [
+            {
+              "action": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completed_event_count": 0,
+              "current_threshold_action": 1.6231089048573308,
+              "last_completion_time_s": null,
+              "pending_events": [],
+              "previous_rate_per_s": null,
+              "residual_action": 0.0,
+              "threshold_process": "unit_exponential",
+              "threshold_seed": 6110078214787410712
+            }
+          ],
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "operator_id": "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+          "owned_source_identity": {
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_position_m": [
+              0.0007550010353789476,
+              0.0
+            ]
+          },
+          "pending_event_ids": [],
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_raw_source_provenance": {
+            "candidate_source_states": [
+              {
+                "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+                "crossing_time_s": "infinity",
+                "direction_xy": [
+                  1.0,
+                  0.0
+                ],
+                "effective_rate_s": 0.0,
+                "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
+                "instantaneous_status": "SOURCE_TENSOR_UNQUALIFIED",
+                "normal_xy": [
+                  0.0,
+                  1.0
+                ],
+                "planned_endpoint_m": [
+                  0.0008300010353789476,
+                  0.0
+                ],
+                "resolved_opening_stress_Pa": 778053791.5919999,
+                "rng_provenance": {
+                  "global_hazard_seed": 6110078214787410712,
+                  "source_seed": 6110078214787410712
+                },
+                "source_boundary_site_id": "connection_exit",
+                "source_cavity_id": "void:site-1",
+                "source_geometry_generation": 1,
+                "source_kind": "cavity_surface",
+                "source_mesh_generation": 3,
+                "source_position_m": [
+                  0.0007550010353789476,
+                  0.0
+                ],
+                "source_probe_identity": {
+                  "boundary_node_id": 0,
+                  "element_ids": [
+                    0
+                  ],
+                  "kind": "direct_cavity_boundary_tensor"
+                },
+                "source_tensor_fingerprint": "49f7089cb598996122c029669a8dc93552a11512f7d29e23aa51a9aae9650738",
+                "tangent_xy": [
+                  1.0,
+                  0.0
+                ],
+                "threshold_identity": {
+                  "threshold_action": 1.6231089048573308,
+                  "threshold_process": "unit_exponential",
+                  "threshold_seed": 6110078214787410712
+                }
+              }
+            ],
+            "next_candidate_endpoints_m": {
+              "cleave:cleavage:(100):5d54146b8dbcda7a568e": [
+                0.0008300010353789476,
+                0.0
+              ]
+            },
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_mesh_generation": 3,
+            "source_position_m": [
+              0.0007550010353789476,
+              0.0
+            ],
+            "source_probe_identity": {
+              "boundary_node_id": 0,
+              "element_ids": [
+                0
+              ],
+              "kind": "direct_cavity_boundary_tensor"
+            },
+            "source_tensor_fingerprint": "49f7089cb598996122c029669a8dc93552a11512f7d29e23aa51a9aae9650738"
+          },
+          "tangent_xy": [
+            -0.0,
+            1.0
+          ],
+          "tensor_Pa": [
+            [
+              175577.01440326334,
+              -229.8197344638919
+            ],
+            [
+              -229.8197344638919,
+              777946919.9352968
+            ]
+          ],
+          "tensor_fingerprint": "83c0653115bd0e0c8e2cc4b3d94d73602ee1a1aec67bb638aa180700fcaca642",
+          "unguarded_candidate_rates": [
+            {
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "crossing_time_s": 4654040753412.612,
+              "effective_rate_s": 3.4875261968154734e-13,
+              "hazard_barrier_J": 3.4028039395537795e-19,
+              "rate_s": 3.4875261968154734e-13,
+              "raw_rate_s": 3.4875261968154734e-13,
+              "resolved_opening_stress_Pa": 777946919.9352968
+            }
+          ]
+        }
+      },
+      "recovery_stencil": {
+        "candidate_planes": [
+          {
+            "normal_xy": [
+              0.0,
+              1.0
+            ],
+            "opening_Pa": 777946919.9352968,
+            "shear_Pa": 229.8197344638919,
+            "tangent_xy": [
+              -1.0,
+              0.0
+            ]
+          }
+        ],
+        "centroid_offsets_normal_tangent_scaled": [
+          [
+            0.10933359288470591,
+            0.3905958076784737
+          ],
+          [
+            0.2222477215266135,
+            0.19598345509771462
+          ],
+          [
+            0.10455720701346168,
+            0.7797912049355337
+          ],
+          [
+            0.21270250358463982,
+            0.9771170067953971
+          ],
+          [
+            0.10455720701346168,
+            -0.7797912049355569
+          ],
+          [
+            0.21270250358463982,
+            -0.9771170067954125
+          ],
+          [
+            0.10933359288470591,
+            -0.3905958076784943
+          ],
+          [
+            0.2222477215266135,
+            -0.1959834550977249
+          ],
+          [
+            0.44837050868686384,
+            0.19598345509771462
+          ],
+          [
+            0.44837050868686384,
+            -0.1959834550977249
+          ]
+        ],
+        "condition_number": 8.174849146756598,
+        "coordinate_scale_m": 1.1560542491376657e-06,
+        "element_ids": [
+          0,
+          1,
+          2,
+          3,
+          1202,
+          1203,
+          1204,
+          1205,
+          1206,
+          2410
+        ],
+        "evaluation_weights": [
+          0.3248484373378969,
+          0.1543811262842628,
+          0.18761214798216336,
+          0.06210855583374448,
+          0.1876121479821498,
+          0.062108555833741065,
+          0.3248484373379056,
+          0.15438112628427,
+          -0.22895026743806152,
+          -0.22895026743807198
+        ],
+        "full_raw_stress_fingerprint": "981b89dc91bb94e227e3798f7335f89195af1981e33d83b3f32422092e380c87",
+        "intact_mask_fingerprint": "a44dab42c3e1492a51d1f8fa29b982d858415971ecc158674177d3ce96b880cb",
+        "mesh_elements_fingerprint": "012318be85d90e09fa0ade173dabbf6872e5258150ef330f00e6b299299b8e11",
+        "mesh_nodes_fingerprint": "fde5c4d9d26995124860209a7046f4856ea292da542586fe9572c10de812fdbb",
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "operator_id": "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "principal_stresses_Pa": [
+          175577.01433535505,
+          777946919.9353647
+        ],
+        "rank": 3,
+        "raw_CST_tensors_Pa": [
+          [
+            [
+              807026.0522253524,
+              -8309471.658162043
+            ],
+            [
+              -8309471.658162043,
+              778053791.5919999
+            ]
+          ],
+          [
+            [
+              4749330.24957216,
+              -1101782.8992371042
+            ],
+            [
+              -1101782.8992371042,
+              765487378.1428841
+            ]
+          ],
+          [
+            [
+              770896.7817200905,
+              -10628738.09049954
+            ],
+            [
+              -10628738.09049954,
+              777757470.5036522
+            ]
+          ],
+          [
+            [
+              5237642.813842989,
+              -17421526.789049983
+            ],
+            [
+              -17421526.789049983,
+              764856506.1002408
+            ]
+          ],
+          [
+            [
+              768980.6752250758,
+              10625831.182843558
+            ],
+            [
+              10625831.182843558,
+              777743394.1624924
+            ]
+          ],
+          [
+            [
+              5239197.944048487,
+              17418490.503981587
+            ],
+            [
+              17418490.503981587,
+              764842810.6600846
+            ]
+          ],
+          [
+            [
+              808791.2067525523,
+              8306658.745602207
+            ],
+            [
+              8306658.745602207,
+              778049176.2206599
+            ]
+          ],
+          [
+            [
+              4747515.899770092,
+              1099103.8100480249
+            ],
+            [
+              1099103.8100480249,
+              765482712.6719615
+            ]
+          ],
+          [
+            [
+              6017594.265554423,
+              -1102085.6127723705
+            ],
+            [
+              -1102085.6127723705,
+              765980546.9730483
+            ]
+          ],
+          [
+            [
+              6015821.109808535,
+              1094086.0510682305
+            ],
+            [
+              1094086.0510682305,
+              765975987.4296943
+            ]
+          ]
+        ],
+        "regression_weights": [
+          0.12340147275916925,
+          0.14295231940136424,
+          0.0695342841465998,
+          0.051278971857960536,
+          0.06953428414659463,
+          0.05127897185795741,
+          0.12340147275917242,
+          0.14295231940137063,
+          0.11283295183490283,
+          0.11283295183490806
+        ],
+        "seed_element_ids": [
+          0,
+          1204
+        ],
+        "sigma_nn_Pa": 175577.01440326334,
+        "sigma_nt_Pa": -229.8197344638919,
+        "sigma_tt_Pa": 777946919.9352968,
+        "singular_values": [
+          1.0260823571280315,
+          0.4896781544889828,
+          0.12551697758669145
+        ],
+        "source_edge_node_ids": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            511
+          ]
+        ],
+        "source_point_m": [
+          0.0007550010353789476,
+          0.0
+        ],
+        "status": "NUMERICALLY_ADMISSIBLE_NOT_SOURCE_QUALIFIED",
+        "tangent_xy": [
+          -0.0,
+          1.0
+        ],
+        "tensor_Pa": [
+          [
+            175577.01440326334,
+            -229.8197344638919
+          ],
+          [
+            -229.8197344638919,
+            777946919.9352968
+          ]
+        ],
+        "weighted_residual_norm_Pa": 5221596.272751922
+      }
+    },
+    "64/24": {
+      "accepted_state_fingerprint": "191d01ee33c875149783f46c79489aede4110ba5080bcedcefb71fd4cc3347f1",
+      "accepted_state_unchanged": true,
+      "checkpoint_sha256": "e5811ce2f0e1e5dc853fa8c1f651e6feb1c3563cc15086165de0fc287208112b",
+      "raw_element_ids": [
+        0
+      ],
+      "records": {
+        "raw": {
+          "candidate_records": [
+            {
+              "angle_rad": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "direction_xy": [
+                1.0,
+                0.0
+              ],
+              "gamma_rel": 1.0,
+              "normal_xy": [
+                0.0,
+                1.0
+              ],
+              "orientation_convention": "bcc-[001]-section:theta_deg=0",
+              "plane_family": "cleavage",
+              "plane_variant": "(100)"
+            }
+          ],
+          "consumed_event_ids": [],
+          "hazard_records": [
+            {
+              "action": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completed_event_count": 0,
+              "current_threshold_action": 1.6231089048573308,
+              "last_completion_time_s": null,
+              "pending_events": [],
+              "previous_rate_per_s": null,
+              "residual_action": 0.0,
+              "threshold_process": "unit_exponential",
+              "threshold_seed": 6110078214787410712
+            }
+          ],
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "operator_id": "maximum-principal-incident-CST-at-fixed-owned-boundary-node",
+          "owned_source_identity": {
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_position_m": [
+              0.0007550663298058716,
+              0.0
+            ]
+          },
+          "pending_event_ids": [],
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_raw_source_provenance": {
+            "candidate_source_states": [
+              {
+                "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+                "crossing_time_s": "infinity",
+                "direction_xy": [
+                  1.0,
+                  0.0
+                ],
+                "effective_rate_s": 0.0,
+                "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
+                "instantaneous_status": "SOURCE_TENSOR_UNQUALIFIED",
+                "normal_xy": [
+                  0.0,
+                  1.0
+                ],
+                "planned_endpoint_m": [
+                  0.0008300663298058716,
+                  0.0
+                ],
+                "resolved_opening_stress_Pa": 757554292.3062365,
+                "rng_provenance": {
+                  "global_hazard_seed": 6110078214787410712,
+                  "source_seed": 6110078214787410712
+                },
+                "source_boundary_site_id": "connection_exit",
+                "source_cavity_id": "void:site-1",
+                "source_geometry_generation": 1,
+                "source_kind": "cavity_surface",
+                "source_mesh_generation": 3,
+                "source_position_m": [
+                  0.0007550663298058716,
+                  0.0
+                ],
+                "source_probe_identity": {
+                  "boundary_node_id": 0,
+                  "element_ids": [
+                    0
+                  ],
+                  "kind": "direct_cavity_boundary_tensor"
+                },
+                "source_tensor_fingerprint": "cc3cb9dc645b51339d93750f507ad758121c5f2f10c4fab1e67d4bd5032d31a3",
+                "tangent_xy": [
+                  1.0,
+                  0.0
+                ],
+                "threshold_identity": {
+                  "threshold_action": 1.6231089048573308,
+                  "threshold_process": "unit_exponential",
+                  "threshold_seed": 6110078214787410712
+                }
+              }
+            ],
+            "next_candidate_endpoints_m": {
+              "cleave:cleavage:(100):5d54146b8dbcda7a568e": [
+                0.0008300663298058716,
+                0.0
+              ]
+            },
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_mesh_generation": 3,
+            "source_position_m": [
+              0.0007550663298058716,
+              0.0
+            ],
+            "source_probe_identity": {
+              "boundary_node_id": 0,
+              "element_ids": [
+                0
+              ],
+              "kind": "direct_cavity_boundary_tensor"
+            },
+            "source_tensor_fingerprint": "cc3cb9dc645b51339d93750f507ad758121c5f2f10c4fab1e67d4bd5032d31a3"
+          },
+          "tangent_xy": [
+            -0.0,
+            1.0
+          ],
+          "tensor_Pa": [
+            [
+              13426505.573291566,
+              -59883010.96248952
+            ],
+            [
+              -59883010.96248952,
+              757554292.3062365
+            ]
+          ],
+          "tensor_fingerprint": "cc3cb9dc645b51339d93750f507ad758121c5f2f10c4fab1e67d4bd5032d31a3",
+          "unguarded_candidate_rates": [
+            {
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "crossing_time_s": 6830739064307.512,
+              "effective_rate_s": 2.3761834401470855e-13,
+              "hazard_barrier_J": 3.4186964729736975e-19,
+              "rate_s": 2.3761834401470855e-13,
+              "raw_rate_s": 2.3761834401470855e-13,
+              "resolved_opening_stress_Pa": 757554292.3062365
+            }
+          ]
+        },
+        "recovered": {
+          "candidate_records": [
+            {
+              "angle_rad": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "direction_xy": [
+                1.0,
+                0.0
+              ],
+              "gamma_rel": 1.0,
+              "normal_xy": [
+                0.0,
+                1.0
+              ],
+              "orientation_convention": "bcc-[001]-section:theta_deg=0",
+              "plane_family": "cleavage",
+              "plane_variant": "(100)"
+            }
+          ],
+          "consumed_event_ids": [],
+          "hazard_records": [
+            {
+              "action": 0.0,
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "completed_event_count": 0,
+              "current_threshold_action": 1.6231089048573308,
+              "last_completion_time_s": null,
+              "pending_events": [],
+              "previous_rate_per_s": null,
+              "residual_action": 0.0,
+              "threshold_process": "unit_exponential",
+              "threshold_seed": 6110078214787410712
+            }
+          ],
+          "normal_xy": [
+            1.0,
+            0.0
+          ],
+          "operator_id": "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+          "owned_source_identity": {
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_position_m": [
+              0.0007550663298058716,
+              0.0
+            ]
+          },
+          "pending_event_ids": [],
+          "rng_state": {
+            "bit_generator": "PCG64",
+            "has_uint32": 0,
+            "state": {
+              "inc": 264756758992246958615769943242078180925,
+              "state": 30987806924270815212378740004822260665
+            },
+            "uinteger": 0
+          },
+          "stored_raw_source_provenance": {
+            "candidate_source_states": [
+              {
+                "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+                "crossing_time_s": "infinity",
+                "direction_xy": [
+                  1.0,
+                  0.0
+                ],
+                "effective_rate_s": 0.0,
+                "geometry_status": "GEOMETRICALLY_VALID_KINETICALLY_UNAVAILABLE",
+                "instantaneous_status": "SOURCE_TENSOR_UNQUALIFIED",
+                "normal_xy": [
+                  0.0,
+                  1.0
+                ],
+                "planned_endpoint_m": [
+                  0.0008300663298058716,
+                  0.0
+                ],
+                "resolved_opening_stress_Pa": 757554292.3062365,
+                "rng_provenance": {
+                  "global_hazard_seed": 6110078214787410712,
+                  "source_seed": 6110078214787410712
+                },
+                "source_boundary_site_id": "connection_exit",
+                "source_cavity_id": "void:site-1",
+                "source_geometry_generation": 1,
+                "source_kind": "cavity_surface",
+                "source_mesh_generation": 3,
+                "source_position_m": [
+                  0.0007550663298058716,
+                  0.0
+                ],
+                "source_probe_identity": {
+                  "boundary_node_id": 0,
+                  "element_ids": [
+                    0
+                  ],
+                  "kind": "direct_cavity_boundary_tensor"
+                },
+                "source_tensor_fingerprint": "cc3cb9dc645b51339d93750f507ad758121c5f2f10c4fab1e67d4bd5032d31a3",
+                "tangent_xy": [
+                  1.0,
+                  0.0
+                ],
+                "threshold_identity": {
+                  "threshold_action": 1.6231089048573308,
+                  "threshold_process": "unit_exponential",
+                  "threshold_seed": 6110078214787410712
+                }
+              }
+            ],
+            "next_candidate_endpoints_m": {
+              "cleave:cleavage:(100):5d54146b8dbcda7a568e": [
+                0.0008300663298058716,
+                0.0
+              ]
+            },
+            "source_boundary_site_id": "connection_exit",
+            "source_cavity_id": "void:site-1",
+            "source_front_id": null,
+            "source_geometry_generation": 1,
+            "source_kind": "cavity_surface",
+            "source_mesh_generation": 3,
+            "source_position_m": [
+              0.0007550663298058716,
+              0.0
+            ],
+            "source_probe_identity": {
+              "boundary_node_id": 0,
+              "element_ids": [
+                0
+              ],
+              "kind": "direct_cavity_boundary_tensor"
+            },
+            "source_tensor_fingerprint": "cc3cb9dc645b51339d93750f507ad758121c5f2f10c4fab1e67d4bd5032d31a3"
+          },
+          "tangent_xy": [
+            -0.0,
+            1.0
+          ],
+          "tensor_Pa": [
+            [
+              17300328.624266695,
+              -5035.936832348337
+            ],
+            [
+              -5035.936832348337,
+              733503804.381376
+            ]
+          ],
+          "tensor_fingerprint": "a0615dff7cd38579b5fe92090b85369d72fb6605fd1fb0cc942a5396cae820c5",
+          "unguarded_candidate_rates": [
+            {
+              "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+              "crossing_time_s": 10659537963304.402,
+              "effective_rate_s": 1.522682231110677e-13,
+              "hazard_barrier_J": 3.43712906139404e-19,
+              "rate_s": 1.522682231110677e-13,
+              "raw_rate_s": 1.522682231110677e-13,
+              "resolved_opening_stress_Pa": 733503804.381376
+            }
+          ]
+        }
+      },
+      "recovery_stencil": {
+        "candidate_planes": [
+          {
+            "normal_xy": [
+              0.0,
+              1.0
+            ],
+            "opening_Pa": 733503804.381376,
+            "shear_Pa": 5035.936832348337,
+            "tangent_xy": [
+              -1.0,
+              0.0
+            ]
+          }
+        ],
+        "centroid_offsets_normal_tangent_scaled": [
+          [
+            0.10036435151934696,
+            0.39421197173322775
+          ],
+          [
+            0.22878463307416458,
+            0.20297381842658663
+          ],
+          [
+            0.06287511770130819,
+            0.7748465503887583
+          ],
+          [
+            0.15432034069355638,
+            0.9880208664032462
+          ],
+          [
+            0.06287511770130819,
+            -0.774846550388759
+          ],
+          [
+            0.15432034069355638,
+            -0.9880208664032479
+          ],
+          [
+            0.10036435151934696,
+            -0.39421197173322736
+          ],
+          [
+            0.22878463307416458,
+            -0.20297381842658643
+          ],
+          [
+            0.487928440753472,
+            0.20297381842658663
+          ],
+          [
+            0.487928440753472,
+            -0.20297381842658643
+          ]
+        ],
+        "condition_number": 6.732819940822656,
+        "coordinate_scale_m": 9.407892868465149e-06,
+        "element_ids": [
+          0,
+          1,
+          2,
+          3,
+          298,
+          299,
+          300,
+          301,
+          302,
+          610
+        ],
+        "evaluation_weights": [
+          0.26254956955072045,
+          0.1446601748884274,
+          0.1748406249908213,
+          0.09114004837572037,
+          0.1748406249908204,
+          0.09114004837571887,
+          0.2625495695507185,
+          0.1446601748884263,
+          -0.17319041780568678,
+          -0.17319041780568747
+        ],
+        "full_raw_stress_fingerprint": "6c2ed8c9d867581c4e1657db07edb65a432bcf8c4418a4cebe0202157c95bec6",
+        "intact_mask_fingerprint": "383c8e838bd431ad7c40ed67d5c5c624b163544a79b5de31d98cbe341f84369b",
+        "mesh_elements_fingerprint": "725740433f4478a9dec5d72c7e416b0d0fa670a0f1cd6d1878754159e8a62574",
+        "mesh_nodes_fingerprint": "ab845b7ae99fa358147cd594fe1826c94805803745e29fe8c0e5ea8887d365c6",
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "operator_id": "CAVITY_BOUNDARY_PATCH_RECOVERY_V1",
+        "principal_stresses_Pa": [
+          17300328.588856842,
+          733503804.4167858
+        ],
+        "rank": 3,
+        "raw_CST_tensors_Pa": [
+          [
+            [
+              13426505.573291566,
+              -59883010.96248952
+            ],
+            [
+              -59883010.96248952,
+              757554292.3062365
+            ]
+          ],
+          [
+            [
+              36174362.790525414,
+              -5365897.617666061
+            ],
+            [
+              -5365897.617666061,
+              667633056.2366588
+            ]
+          ],
+          [
+            [
+              11586934.074271942,
+              -77124641.20359892
+            ],
+            [
+              -77124641.20359892,
+              740281287.9583175
+            ]
+          ],
+          [
+            [
+              58205773.35236336,
+              -104377380.92893785
+            ],
+            [
+              -104377380.92893785,
+              635706875.4007989
+            ]
+          ],
+          [
+            [
+              11575272.379620647,
+              77105676.74121961
+            ],
+            [
+              77105676.74121961,
+              740225547.06748
+            ]
+          ],
+          [
+            [
+              58202233.74651143,
+              104355386.91580783
+            ],
+            [
+              104355386.91580783,
+              635657348.6263415
+            ]
+          ],
+          [
+            [
+              13430395.209865063,
+              59869252.146390736
+            ],
+            [
+              59869252.146390736,
+              757535652.9431331
+            ]
+          ],
+          [
+            [
+              36167454.77236638,
+              5353349.077691084
+            ],
+            [
+              5353349.077691084,
+              667615292.7613937
+            ]
+          ],
+          [
+            [
+              42947052.53233109,
+              -5281632.724503364
+            ],
+            [
+              -5281632.724503364,
+              670265584.5024586
+            ]
+          ],
+          [
+            [
+              42941331.68404535,
+              5248651.671927399
+            ],
+            [
+              5248651.671927399,
+              670250873.7497265
+            ]
+          ]
+        ],
+        "regression_weights": [
+          0.11717134344080515,
+          0.14066388269210794,
+          0.06738530424148113,
+          0.052640331412189205,
+          0.06738530424148148,
+          0.0526403314121894,
+          0.1171713434408051,
+          0.14066388269210783,
+          0.12213913821341649,
+          0.12213913821341636
+        ],
+        "seed_element_ids": [
+          0,
+          300
+        ],
+        "sigma_nn_Pa": 17300328.624266695,
+        "sigma_nt_Pa": -5035.936832348337,
+        "sigma_tt_Pa": 733503804.381376,
+        "singular_values": [
+          1.0271361909130803,
+          0.4916906152542654,
+          0.152556610742746
+        ],
+        "source_edge_node_ids": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            63
+          ]
+        ],
+        "source_point_m": [
+          0.0007550663298058716,
+          0.0
+        ],
+        "status": "NUMERICALLY_ADMISSIBLE_NOT_SOURCE_QUALIFIED",
+        "tangent_xy": [
+          -0.0,
+          1.0
+        ],
+        "tensor_Pa": [
+          [
+            17300328.624266695,
+            -5035.936832348337
+          ],
+          [
+            -5035.936832348337,
+            733503804.381376
+          ]
+        ],
+        "weighted_residual_norm_Pa": 43081514.58926297
+      }
+    }
+  },
+  "temperature_K": 900.0
+}

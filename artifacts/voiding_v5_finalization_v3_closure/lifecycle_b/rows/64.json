@@ -1,0 +1,95 @@
+{
+  "actual_operations": [
+    {
+      "api": "advance_site",
+      "duration_s": 1.0943576983780953e-09,
+      "events": [
+        "STABILIZED"
+      ],
+      "rates": {
+        "birth_activation_work_J": -3.0463354695439374e-21,
+        "birth_hydrostatic_work_J": -3.025948502323404e-21,
+        "birth_normal_opening_work_J": 0.0,
+        "birth_s": 50051637.6547894,
+        "birth_signed_shear_work_J": -2.0386967220533605e-23,
+        "healing_activation_work_J": -0.0,
+        "healing_s": 319822303.5472965,
+        "local_hydrostatic_stress_Pa": -151297425.1161702,
+        "local_in_plane_mean_stress_Pa": -174573952.05711946,
+        "local_max_principal_stress_Pa": 0.0,
+        "local_normal_opening_stress_Pa": -70797652.66427124,
+        "local_sigma_zz_Pa": -104744371.23427168,
+        "local_signed_shear_stress_Pa": -4077393.4441067213,
+        "local_von_mises_stress_Pa": 192962708.09876963,
+        "plastic_accommodation_s": 373551921.1699995,
+        "series_limited_growth_s": 229628373.22619972,
+        "stabilization_activation_work_J": 0.0,
+        "stabilization_s": 1599289174.7103782,
+        "surface_reaction_s": 3576317953.4169464,
+        "vacancy_transport_s": 715184135.6560752
+      }
+    }
+  ],
+  "actual_preparation_checkpoints": {
+    "available_site": "checkpoints/f328128097c6cd9994c50569b7b8cf60a7b80174c23103064312bbb957a52c71.json",
+    "geometric_promotion": "checkpoints/ebcfae8a91c65c39257de5b10f93fb5d72814c5abb9c5c17987feb2d4293ca62.json",
+    "multi_hit_1": "checkpoints/4fd6d1854817ff29654d7d63b386f4cf693586145106914d5db01dc348dcb6c2.json",
+    "multi_hit_2": "checkpoints/9ebbf416c36e92482518b71f8bc25a6922479429058b33da4ab3de986a21e7da.json",
+    "resolved_growth": "checkpoints/86536031a5836ffe08144c630fb5e7522c36d8fd184233365fecf50c506ce32c.json",
+    "stabilization": "checkpoints/dc1b37a1de81b6194b2c5803054c146c93abb9bbfd581783b82658bfad70fd5b.json",
+    "subgrid_growth": "checkpoints/b46d449172961f1ba79f783e104bc33087972f1ce5e2d32ca26f90704422c411.json",
+    "subgrid_void": "checkpoints/813a5562325c39c2123ab5ee1ad7f8bb4210794887f225bf64aaeb28856f8f99.json"
+  },
+  "actual_preparation_stages": [
+    "available_site",
+    "multi_hit_1",
+    "multi_hit_2",
+    "stabilization",
+    "subgrid_void",
+    "subgrid_growth",
+    "geometric_promotion",
+    "resolved_growth"
+  ],
+  "case_identity": "embryo_healing",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "controlled",
+  "executed_code_sha": "31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "execution_id": "controlled:embryo_healing:None:63:31b3b18e6b4528afa6d0277321f47334919ece5a",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/017293f03a44fb8ca55a0e9bc1e5a65c750255d6756641880b00bf4d7f7da628.json",
+  "initial_fingerprint": "017293f03a44fb8ca55a0e9bc1e5a65c750255d6756641880b00bf4d7f7da628",
+  "input_configuration": {
+    "center_m": [
+      0.0007,
+      0.0
+    ],
+    "fixed_crack_path_m": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0005725993004046688,
+        0.0
+      ]
+    ],
+    "history_kind": "embryo_healing",
+    "loading_opening_m": -4e-07
+  },
+  "input_hash": "fafeaff7fb0a2715ff10cc5e4d76377646378ca9b9ca5a5a17196bc8a2a53676",
+  "partition_count": null,
+  "terminal_checkpoint": "checkpoints/7e08d7ca49b28ed746278828e462fb3da8ccf34b6e2851deaa6a397ca98bb13e.json",
+  "terminal_fingerprint": "7e08d7ca49b28ed746278828e462fb3da8ccf34b6e2851deaa6a397ca98bb13e"
+}

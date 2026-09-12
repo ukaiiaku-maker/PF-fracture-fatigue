@@ -1,0 +1,41 @@
+{
+  "actual_operations": [
+    "accepted_snapshot",
+    "intersection_alignment",
+    "exit_alignment",
+    "graph_edit",
+    "remesh",
+    "field_projection"
+  ],
+  "case_identity": "ligament:field_projection",
+  "conservation": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": [
+      "b00000000"
+    ]
+  },
+  "dataset": "rollback",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "rollback:ligament:field_projection:None:237:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": {
+    "message": "injected:field_projection",
+    "type": "RuntimeError"
+  },
+  "initial_checkpoint": "checkpoints/bb5fd8e3a9efb5ddd8039fead0905a1fd1cb7ee9c0652153278fc86c59332b98.json",
+  "initial_fingerprint": "bb5fd8e3a9efb5ddd8039fead0905a1fd1cb7ee9c0652153278fc86c59332b98",
+  "input_configuration": {
+    "failure_stage": "field_projection"
+  },
+  "input_hash": "e1f2e377ad42daf4824a6e131b45843f40bee47aabc592f7593bdc6c9100a027",
+  "partition_count": null,
+  "restored_exactly": true,
+  "terminal_checkpoint": "checkpoints/bb5fd8e3a9efb5ddd8039fead0905a1fd1cb7ee9c0652153278fc86c59332b98.json",
+  "terminal_fingerprint": "bb5fd8e3a9efb5ddd8039fead0905a1fd1cb7ee9c0652153278fc86c59332b98"
+}

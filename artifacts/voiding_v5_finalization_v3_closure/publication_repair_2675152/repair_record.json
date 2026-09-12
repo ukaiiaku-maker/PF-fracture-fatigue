@@ -1,0 +1,66 @@
+{
+  "additional_failures": [],
+  "final_exact_head_ci": "REQUIRED_AFTER_THIS_PUBLICATION",
+  "focused_regressions": {
+    "failed": 0,
+    "failure_ids": [],
+    "passed": 138,
+    "skipped": 0,
+    "tests": 138,
+    "xml_sha256": "d42687775cb59cf6fc841adf9dae2be29e9d8d993e76d971cb3b6ce990f6999f"
+  },
+  "full_regressions": {
+    "failed": 18,
+    "failure_ids": [
+      "tests/test_real_signed_builder_v10212.py::test_review_builder_emits_artifact_consumable_by_production_loader",
+      "tests/test_stage2_criterion_v12.py::test_required_matrices_are_complete",
+      "tests/test_v10214_capture_model_id.py::test_v10214_capture_model_id",
+      "tests/test_v10214_response_model_id.py::test_v10214_response_model_id",
+      "tests/test_v10_2_27_zero_event_summary.py::test_zero_event_summary_is_recorded_explicitly",
+      "tests/test_v10_2_27_zero_event_summary.py::test_empty_geometry_rejects_nonzero_advances",
+      "tests/test_v10_2_29_vhcf_nonlinear_selector.py::test_delegate_reenters_selector_under_global_cycle_cap",
+      "tests/test_voiding_v5.py::test_deterministic_driver_reaches_real_continued_graph_event",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_phase_update]",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:ordinary_crack_fractured_length_m]",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_length_ledger_update:projected_front_advance_m]",
+      "tests/test_voiding_v5.py::test_downstream_state_updates_rollback_atomically[downstream_event_history_update]",
+      "tests/test_voiding_v5.py::test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer",
+      "tests/test_voiding_v5.py::test_zero_drive_connected_state_partitions_restart_and_tensile_reload",
+      "tests/test_voiding_v5.py::test_connected_and_downstream_states_own_zero_then_one_active_front",
+      "tests/test_voiding_v5.py::test_downstream_child_activation_rolls_back",
+      "tests/test_voiding_v5.py::test_continuation_uses_child_tip_source_and_recomputes_three_body_topology",
+      "tests/test_voiding_v5.py::test_equilibrium_metrics_separate_free_residual_from_reactions"
+    ],
+    "passed": 989,
+    "skipped": 1,
+    "tests": 1008,
+    "xml_sha256": "ec98996755c8dda1b5347d13c79e9a58c40368415fc8c100c15cd1cd6e903dd5"
+  },
+  "implementation_sha": "2675152744e47340f42d35df7ba726704256cda7",
+  "inherited_failures": 7,
+  "no_rc_or_merge": true,
+  "policy_c_expectation_failures": 11,
+  "prior_historical_v2_ci": {
+    "comparator_tolerances_unchanged": true,
+    "conclusion": "failure",
+    "first_canonical_mismatch": "checkpoints/after_promotion.json.energy_ledgers.latest_free_dof_residual_l2_N_per_m",
+    "fresh_AB_exact": true,
+    "replay_value": 2.9540695603988566e-10,
+    "retained_value": 3.0210850882173e-10,
+    "run": 34153519279
+  },
+  "prior_publication_sha": "7865272f446595ee08d104d32dfed1593091e3ef",
+  "prior_repository_ci": {
+    "additional_failure": "tests/test_no_legacy_variational_modules.py::test_removed_model_labels_are_absent_from_repository_text",
+    "failed": 19,
+    "passed": 988,
+    "run": 34153529166,
+    "skipped": 1
+  },
+  "record_kind": "REGRESSION_AND_CI_REPAIR_NOT_A_NEW_PHYSICAL_CAMPAIGN",
+  "repair": "Reword documentation exclusions to satisfy the unchanged removed-model guard; include that guard in focused CI",
+  "repository_wide_classification": "NOT_GREEN",
+  "retained_closure_manifest_sha256": "d2451bb0ef96a37d93d290cfa52d970c65e55b30f1d39001ce11f2f0dfda5be4",
+  "schema": "v12.closure-publication-regression-repair/1",
+  "scientific_decision": "BLOCKED"
+}

@@ -1,0 +1,266 @@
+{
+  "active_tip_ids": [
+    "b00000000"
+  ],
+  "checkpoint_generation": 0,
+  "crack_network": {
+    "active_tip_ids": [
+      "b00000000"
+    ],
+    "branches": [
+      {
+        "branch_id": "b00000000",
+        "generation": 0,
+        "initiation_event": 0,
+        "local_state": {},
+        "orientation_history_rad": [
+          -1.224646799147353e-16
+        ],
+        "parent_branch_id": null,
+        "path_m": [
+          [
+            0.0,
+            8.572527594031472e-20
+          ],
+          [
+            0.0005725993004046688,
+            1.5602085896855586e-20
+          ]
+        ],
+        "physical_path_length_m": 0.0005725993004046688,
+        "projected_extension_m": 0.0005725993004046688,
+        "status": "active"
+      }
+    ],
+    "branching_enabled": false,
+    "geometry_generation": 0,
+    "primary_branch_id": "b00000000",
+    "primary_projected_extension_m": 0.0005725993004046688,
+    "schema": "v11.crack-network/1",
+    "total_physical_crack_length_m": 0.0005725993004046688
+  },
+  "directional_competition": {
+    "candidates": [
+      {
+        "angle_rad": 0.0,
+        "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+        "direction_xy": [
+          1.0,
+          0.0
+        ],
+        "gamma_rel": 1.0,
+        "normal_xy": [
+          0.0,
+          1.0
+        ],
+        "orientation_convention": "bcc-[001]-section:theta_deg=0",
+        "plane_family": "cleavage",
+        "plane_variant": "(100)"
+      }
+    ],
+    "competition_event_index": 0,
+    "consumed_event_ids": [],
+    "global_hazard_seed": 12019,
+    "hazard_states": [
+      {
+        "action": 0.0,
+        "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+        "completed_event_count": 0,
+        "current_threshold_action": 2.207866560348176,
+        "last_completion_time_s": null,
+        "pending_events": [],
+        "previous_rate_per_s": null,
+        "residual_action": 0.0,
+        "threshold_process": "unit_exponential",
+        "threshold_seed": 12019
+      }
+    ],
+    "reservations": [],
+    "schema": "v11.directional-competition/1"
+  },
+  "energy_ledgers": {
+    "emission_work": 1.0,
+    "latest_constrained_reaction_l2_N_per_m": 53883.9193554197,
+    "latest_energy_reaction_identity": 0.004392766132767941,
+    "latest_fem_energy_J_per_m": 0.016000029548810663,
+    "latest_free_dof_residual_l2_N_per_m": 1.113809760588001e-09,
+    "latest_reaction_N_per_m": 79088.6975653969,
+    "latest_residual_l2_N_per_m": 53883.91935541969,
+    "latest_top_bottom_reaction_balance": 0.002669346994977367
+  },
+  "event_counters": {
+    "accepted_steps": 0,
+    "mesh_generation": 0,
+    "topology_actions": 0
+  },
+  "has_production_void_state": true,
+  "has_rng_state": true,
+  "production_void_state": {
+    "available_defect_inventory_area_m2": 1e-08,
+    "cavities": [],
+    "consumed_defect_inventory_area_m2": 0.0,
+    "event_history": [],
+    "length_ledgers": {
+      "active_front_coordinate_advance_m": 0.0,
+      "connected_free_surface_extent_m": 0.0,
+      "connected_void_free_span_m": 0.0,
+      "fractured_ligament_length_m": 0.0,
+      "ordinary_crack_fractured_length_m": 0.0,
+      "physical_active_front_travel_m": 0.0,
+      "preexisting_void_free_span_m": 0.0,
+      "projected_connected_void_free_span_m": 0.0,
+      "projected_fractured_length_m": 0.0,
+      "projected_free_span_m": 0.0,
+      "projected_front_advance_m": 0.0,
+      "traversed_void_free_span_m": 0.0
+    },
+    "rng_state": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 290595151774233520972553389764179937861,
+        "state": 115364767974805253570654712181349860041
+      },
+      "uinteger": 0
+    },
+    "schema": "v12.production-voiding/5",
+    "sites": [
+      {
+        "birth": {
+          "accumulated": 0.0005411301660931779,
+          "threshold": 0.7934351668992244
+        },
+        "candidate_weight": 0.8,
+        "center_m": [
+          0.0007,
+          0.0
+        ],
+        "healing": {
+          "accumulated": 0.0,
+          "threshold": 1.9191769314222171
+        },
+        "hits": 0,
+        "normal_xy": [
+          1.0,
+          0.0
+        ],
+        "phase": "AVAILABLE_SITE",
+        "required_hits": 2,
+        "site_id": "site-1",
+        "stabilization": {
+          "accumulated": 0.0,
+          "threshold": 2.441106639737266
+        }
+      }
+    ]
+  },
+  "production_void_state_sha256": "7e8bc08a9590b6744710945cea1c3dcabc8dcddda4f354752aeca7583c968334",
+  "provider_runtime": null,
+  "schema": "v11.live-fem-branch-checkpoint/1",
+  "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
+  "state_file": "5e0d54509178f6c59c225a2b8e6089ed55b17c25211d72d33e8ae5f310aca911.json.state.pkl",
+  "state_sha256": "65349347fc878300b65653fc2c45f41496e01eb00d75bb76bd5e8390face43a8",
+  "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1",
+  "v12_support_state": {
+    "accepted_p0_damage_fingerprint": "ba8e5ef7c098e3a0b09a57c88cb8fd71116e90b9559d8da3251d5ff0150cae61",
+    "active_tip_identities": [
+      "b00000000"
+    ],
+    "branch_vertex_lineage_fingerprint": "d526df5cdcf05a970afcb69b5d09331edc8dc7678e2bc499ea4ea71d4902ade9",
+    "certification_arc_fingerprint": "c48e5d4ff90078805b11e68cf0494eb114be4e0dc17eb1ca35e79963494e0755",
+    "checkpoint_generation": 0,
+    "complete_crack_graph_fingerprint": "7b83f05d1e72b339864a4d8a39c8e7c7c60ff68077506e889e0f47179de6861b",
+    "configuration_hash": "e7d8c0742ffb5447c32104fe4d369123e1ec359841748a4f21e06a206465e148",
+    "mesh_connectivity_fingerprint": "f3838b076ebf070bd63b55d18716f1d4be45747ae19ad32eb62b6f50a49ef673",
+    "mesh_generation": 0,
+    "mesh_geometry_fingerprint": "b3ba1de05dc2ab9c52178913e46730944ef081fc6f03e0d4e662f615ef55f843",
+    "model_id": "sharp_wake_mechanically_separating_v12",
+    "physical_graph_length_m": 0.0005725993004046688,
+    "previous_accepted_transaction": null,
+    "schema_version": "v12.sharp-wake-support-state/1",
+    "selected_support_elements": [
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      284,
+      285,
+      286,
+      287,
+      288,
+      289,
+      290,
+      291,
+      348,
+      349,
+      350,
+      351,
+      352,
+      353,
+      354,
+      355,
+      412,
+      413,
+      414,
+      415,
+      416,
+      417,
+      418,
+      419,
+      476,
+      477,
+      478,
+      479,
+      480,
+      481,
+      482,
+      483,
+      540,
+      541,
+      542,
+      543,
+      544,
+      545,
+      546,
+      547,
+      604,
+      605,
+      606,
+      607,
+      608,
+      609,
+      610,
+      611,
+      668,
+      669,
+      670,
+      671,
+      672,
+      673,
+      674,
+      675,
+      732,
+      733,
+      734,
+      735,
+      736,
+      737,
+      738,
+      739
+    ],
+    "source_commit": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+    "transaction_identity": "v12-initial"
+  }
+}

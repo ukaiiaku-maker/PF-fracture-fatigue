@@ -312,6 +312,7 @@ def main(argv=None):
     parser.add_argument("--neutrality-base-worktree",default=os.environ.get("V5_NEUTRALITY_BASE_WORKTREE"))
     parser.add_argument("--neutrality-head-worktree",default=os.environ.get("V5_NEUTRALITY_HEAD_WORKTREE")); args=parser.parse_args(argv)
     out=Path(args.out).resolve(); out.mkdir(parents=True,exist_ok=True); head=subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()
+    os.environ["VOIDING_V5_SOURCE_COMMIT"] = args.implementation_sha or head
     transitions=transition_partition_rows(); controlled=controlled_rows(); restarts=restart_rows(out); natural=natural_rows(); static=run_static(out)
     conservation=[]
     for row in controlled:

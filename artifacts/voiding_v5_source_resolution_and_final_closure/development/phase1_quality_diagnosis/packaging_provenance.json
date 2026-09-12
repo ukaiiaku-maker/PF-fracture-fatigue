@@ -1,0 +1,21 @@
+{
+  "lossless_checkpoint_representation_changes": [
+    {
+      "checkpoint": "rejected_refined_trial.json",
+      "complete_state_exact": true,
+      "complete_state_fingerprint": "810eb9ac67ac218b70ad7c738a7f632f6cfd17cc072465a8153c84d87495964c",
+      "compressed_payload_sha256": "2e1912211c3cf080e83c4b94b335f2b3fab25bbf1c30e33c0a9dbc4188016f24",
+      "original_manifest_sha256": "148f6d7f7c25f0543f23da43e1130f49084763a24f32b73060bc3c88d64bfc80",
+      "original_payload_sha256": "4f4d4b83ef814c08cdb6ab3723e141ebff887a409a2f888f543804b5b5249aa2"
+    }
+  ],
+  "original_inventory": {
+    "bad_elements.json": "8602da5314cfbfeca8b3a5b418f853a48a123d0aec2ab84b828484288d300cdf",
+    "mesh.npz": "c491289cf78247c45fb23e8c651d5b8e0244dec0b3ec19487fb38821be378ddc",
+    "rejected_refined_trial.json": "148f6d7f7c25f0543f23da43e1130f49084763a24f32b73060bc3c88d64bfc80",
+    "rejected_refined_trial.json.4f4d4b83ef814c08cdb6ab3723e141ebff887a409a2f888f543804b5b5249aa2.state.pkl": "4f4d4b83ef814c08cdb6ab3723e141ebff887a409a2f888f543804b5b5249aa2",
+    "sha256_manifest.json": "acdfd876c6095fc60b5f4527affa7493e852a2bf029c06ce0bea9aee458c4c1c"
+  },
+  "record_kind": "PACKAGING_NOT_NEW_PHYSICAL_EXECUTION_OR_CLEAN_ATTESTATION",
+  "schema": "v5.retained-development-packaging/1"
+}

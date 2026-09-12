@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import pickle
+import gzip
 from typing import Any
 
 from .directional_competition_v11 import competition_state_to_dict
@@ -21,17 +22,24 @@ def _sha256(data: bytes) -> str:
 
 def write_checkpoint(
     state: LiveFEMTopologyState, path: str | Path, *, provider_runtime: Any = None,
+    failure_injector=None,
+    compression: str | None = None,
 ) -> dict[str, Any]:
     """Write the complete accepted state atomically; never checkpoint a trial."""
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     payload_object = {"state": state, "provider_runtime": provider_runtime}
     payload = pickle.dumps(payload_object, protocol=5)
+    if compression not in (None, 'gzip'): raise ValueError('unsupported checkpoint compression')
+    if compression == 'gzip': payload = gzip.compress(payload, compresslevel=6, mtime=0)
     payload_sha = _sha256(payload)
     manifest = {
         "schema": SCHEMA,
         "topology_transaction_model_id": MODEL_ID,
-        "state_file": target.name + ".state.pkl",
+        # Immutable payload names make the manifest replacement the one
+        # publication point. A failed replacement cannot corrupt a prior
+        # checkpoint by overwriting the payload it still references.
+        "state_file": target.name + "." + payload_sha + (".state.pkl.gz" if compression == 'gzip' else ".state.pkl"),
         "state_sha256": payload_sha,
         "crack_network": state.crack_network.to_dict(),
         "directional_competition": competition_state_to_dict(state.competition),
@@ -47,6 +55,7 @@ def write_checkpoint(
             provider_runtime.audit_payload() if provider_runtime is not None else None
         ),
     }
+    if compression == 'gzip': manifest['state_encoding'] = 'pickle+gzip/1'
     if state.void_state is not None:
         from .voiding_v5 import fingerprint as void_fingerprint, serialize as serialize_void_state
         manifest["production_void_state"] = json.loads(serialize_void_state(state.void_state))
@@ -56,6 +65,8 @@ def write_checkpoint(
     manifest_tmp = target.with_name(target.name + ".tmp")
     state_tmp.write_bytes(payload)
     manifest_tmp.write_text(json.dumps(manifest, indent=2, sort_keys=True, allow_nan=False) + "\n")
+    if failure_injector is not None:
+        failure_injector("checkpoint_write",state)
     os.replace(state_tmp, state_path)
     os.replace(manifest_tmp, target)
     return manifest
@@ -70,6 +81,9 @@ def restore_checkpoint(path: str | Path, *, with_provider_runtime: bool = False)
     payload = state_path.read_bytes()
     if _sha256(payload) != manifest.get("state_sha256"):
         raise ValueError("v11 checkpoint state hash mismatch")
+    encoding=manifest.get('state_encoding','pickle/1')
+    if encoding == 'pickle+gzip/1': payload=gzip.decompress(payload)
+    elif encoding != 'pickle/1': raise ValueError('unsupported checkpoint state encoding')
     restored = pickle.loads(payload)
     if isinstance(restored, LiveFEMTopologyState):
         state, provider_runtime = restored, None

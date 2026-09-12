@@ -1,8 +1,6 @@
-name: V5 finalization-v2 clean-worker reproduction
+name: Historical V5 finalization-v2 pinned reproduction
 
 on:
-  push:
-    branches: [codex/sharp-front-stateful-voiding-v5-finalization-v2]
   workflow_dispatch:
 
 jobs:
@@ -12,6 +10,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Retained historical harness, NOT an exact-head closure attestation.
+          ref: f20d98f0f3193b501f3a83b62500196c571129a1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -37,17 +37,22 @@ jobs:
       - name: Exact broad and committed-evidence comparison
         run: |
           diff -ru /tmp/campaign-a /tmp/campaign-b
-          diff -ru artifacts/voiding_v5_finalization_v2 /tmp/campaign-a
+          python scripts/compare_voiding_v5_finalization_v2.py artifacts/voiding_v5_finalization_v2 /tmp/campaign-a
       - name: Evidence ontology and integrity manifests
+        if: always()
         run: |
           python -m pytest -q tests/test_evidence_ontology_v5.py
           python -m json.tool /tmp/campaign-a/campaign_manifest.json
           python -m json.tool /tmp/campaign-a/sha256_manifest.json
       - name: Clean worktree and diff checks
+        if: always()
         run: |
           git diff --check
           test -z "$(git status --short)"
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: voiding-v5-finalization-v2-${{ github.sha }}
-          path: /tmp/campaign-a
+          path: |
+            /tmp/campaign-a
+            /tmp/campaign-b

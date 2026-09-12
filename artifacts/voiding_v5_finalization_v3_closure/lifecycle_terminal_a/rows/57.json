@@ -1,0 +1,146 @@
+{
+  "actual_operations": [
+    {
+      "accepted": true,
+      "api": "ligament_transaction",
+      "operations": [
+        "accepted_snapshot",
+        "intersection_alignment",
+        "exit_alignment",
+        "graph_edit",
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "cavity_phase_update",
+        "length_ledger_update:fractured_ligament_length_m",
+        "length_ledger_update:active_front_coordinate_advance_m",
+        "length_ledger_update:physical_active_front_travel_m",
+        "length_ledger_update:projected_fractured_length_m",
+        "length_ledger_update:projected_front_advance_m",
+        "length_ledger_update:preexisting_void_free_span_m",
+        "length_ledger_update:connected_void_free_span_m",
+        "length_ledger_update:projected_connected_void_free_span_m",
+        "length_ledger_update:connected_free_surface_extent_m",
+        "root_status_change",
+        "dormant_support_rebuild",
+        "connected_surface_certification",
+        "field_transfer",
+        "equilibrium",
+        "energy_gate",
+        "process_state_update",
+        "topology_verification",
+        "late_event_veto"
+      ]
+    },
+    {
+      "accepted": false,
+      "api": "downstream_front_transaction",
+      "audit": {
+        "boundary_element_ids": [
+          0
+        ],
+        "cleavage": [
+          {
+            "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+            "common_advance_duration_s": 0.0,
+            "crossing_time_s": "infinity",
+            "effective_rate_s": 0.0,
+            "emitted_event_ids": [],
+            "hazard_barrier_J": 3.4484802278038915e-19,
+            "instantaneous_status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+            "rate_s": 0.0,
+            "raw_rate_s": 1.1576818381531435e-13,
+            "resolved_opening_stress_Pa": 718462135.1944888,
+            "source_resolution_policy": "C_FIRST_PASSAGE_UNAVAILABLE_UNTIL_QUALIFIED",
+            "unqualified_crossing_time_s": 14020336601692.62,
+            "unqualified_effective_rate_s": 1.1576818381531435e-13,
+            "winner": false
+          }
+        ],
+        "source_front_id": null,
+        "source_kind": "cavity_surface",
+        "source_position_m": [
+          0.0007552661214806971,
+          0.0
+        ],
+        "source_probe_identity": {
+          "boundary_node_id": 0,
+          "element_ids": [
+            0
+          ],
+          "kind": "direct_cavity_boundary_tensor"
+        },
+        "status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+        "tensor_Pa": [
+          [
+            36248392.30717645,
+            -102294862.40460402
+          ],
+          [
+            -102294862.40460402,
+            718462135.1944888
+          ]
+        ]
+      },
+      "operations": []
+    }
+  ],
+  "actual_preparation_checkpoints": {
+    "available_site": "checkpoints/5c352e1d5c1f0993b5679433646057d8ae5c57f2805c0c3475a2c1194f4f966c.json",
+    "geometric_promotion": "checkpoints/fa66c6012cc3f1db0ffe5de4ab6057ca306f87047343096345600bc304acb654.json",
+    "multi_hit_1": "checkpoints/37c45843515c5e5baa261bdb625a6c984bea828bcd9a1a8d89d780fecf013f06.json",
+    "multi_hit_2": "checkpoints/73021d76db687bc987ebb84a3c8bbe56a8ada402591be95479e1c5a46caad1d3.json",
+    "resolved_growth": "checkpoints/61aacf62e098843b2341cd39393c7903f269f39f27965a55c0d8a00d54711e6c.json",
+    "stabilization": "checkpoints/5b02c3012caea37900bec538bcbb2421d823d0c74d22b703b911d9570f2b7088.json",
+    "subgrid_growth": "checkpoints/4955c1767aacf6875f245ba90842905018d101745e91cd848f404728473fd24d.json",
+    "subgrid_void": "checkpoints/60e320dda3c67a9b040542e199f4197aa00e9f4ba5f039c7a60c7eb223a0c5e6.json"
+  },
+  "actual_preparation_stages": [
+    "available_site",
+    "multi_hit_1",
+    "multi_hit_2",
+    "stabilization",
+    "subgrid_void",
+    "subgrid_growth",
+    "geometric_promotion",
+    "resolved_growth"
+  ],
+  "case_identity": "centered",
+  "conservation": {
+    "active_tip_ids": [],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": []
+  },
+  "dataset": "controlled",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "controlled:centered:None:56:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/61aacf62e098843b2341cd39393c7903f269f39f27965a55c0d8a00d54711e6c.json",
+  "initial_fingerprint": "61aacf62e098843b2341cd39393c7903f269f39f27965a55c0d8a00d54711e6c",
+  "input_configuration": {
+    "center_m": [
+      0.0007,
+      0.0
+    ],
+    "fixed_crack_path_m": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0005725993004046688,
+        0.0
+      ]
+    ],
+    "history_kind": "centered",
+    "loading_opening_m": 4e-07
+  },
+  "input_hash": "1c4c344ee697a88cfd06cda853fe42490d2952acc71bbc019d7a1c9c62bcc44c",
+  "partition_count": null,
+  "terminal_checkpoint": "checkpoints/e3d30a169d2d029db2d3882f0f60dc706ea2936d7c1310211f29c21d1a50f029.json",
+  "terminal_fingerprint": "e3d30a169d2d029db2d3882f0f60dc706ea2936d7c1310211f29c21d1a50f029"
+}

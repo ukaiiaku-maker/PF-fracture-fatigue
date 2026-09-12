@@ -1,0 +1,212 @@
+{
+  "audit_code_sha": "da19bc2c8beac2ebd45956c8af02baa49369b5d9",
+  "audit_worker_still_clean": true,
+  "classification": "DERIVED_EXISTING_CHECKPOINTS_NOT_NEW_PHYSICAL_EXECUTIONS",
+  "input_bundle_unchanged": true,
+  "input_manifest_sha256": "ea5224c9db4df7d29f3fdfdfd7f2e1447b0ebd5e8d6965d292c824bd34978239",
+  "passed": true,
+  "producer_code_sha": "1e5634dd23a14b22ba57453c3fad148c4d4511ec",
+  "rows": [
+    {
+      "case_id": "production:32:12",
+      "cavity_cycle_passed": true,
+      "certificate_fingerprints": {
+        "actual_cavity_cycle": "1ebc2e80c9d5f61718883a1e9a6d89a1d67375a91ed490681d4f897ccf6dbe26",
+        "actual_component_incidence": "6786ff53904797588383d228de63f713f1dfe6d58225c1524265429dfa5e3751",
+        "independent_cut": "a528c786a4561ac9d5bba713cb39e10bbbca28aeea9e30bd49f346ac94be73fc"
+      },
+      "component_incidence_passed": true,
+      "connected_state_fingerprint": "0d6f4130460d6a6ea6621abe2fb758b01d4de1f985478781989585417f4817a9",
+      "connected_unchanged": true,
+      "conservation": {
+        "active_tip_ids": [],
+        "actual_cavity_chord": {
+          "entry_m": [
+            0.0006447338785193029,
+            0.0
+          ],
+          "exit_m": [
+            0.0007552661214806971,
+            0.0
+          ],
+          "physical_length_m": 0.00011053224296139427,
+          "projected_length_m": 0.00011053224296139427,
+          "reporting_direction": [
+            1.0,
+            0.0
+          ]
+        },
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": []
+      },
+      "independent_cut_has_sufficient_seeds": true,
+      "independent_cut_no_intact_path": true,
+      "passed": true,
+      "pre_state_fingerprint": "87068239cb77577c3938dc6f18e7dd15dc9298e9b7bd91304f286c8519da2a91",
+      "pre_unchanged": true,
+      "topology_passed": true,
+      "topology_source_fingerprint": "525162816116f0a63fc879851fe404c3acac6f4c5eabf6245cb27a4ec627bb22"
+    },
+    {
+      "case_id": "production:64:24",
+      "cavity_cycle_passed": true,
+      "certificate_fingerprints": {
+        "actual_cavity_cycle": "6318db28f0ad4a66de2746bb0e65d0f530f14f070db4f58d9806c9e4745ab57c",
+        "actual_component_incidence": "899d2b4f1c9262cde2a2b1bf14804e88a1328729d833538c054aae5f00d62df3",
+        "independent_cut": "bb7a16c43342c5e5327824263a0128e92386cfeac30911922bfd9c352b2b1ce8"
+      },
+      "component_incidence_passed": true,
+      "connected_state_fingerprint": "c278bf3ca4ea8bd6ec12b3f8e0b0d08a26450b70cdd632f0565d1ebf2bf46a73",
+      "connected_unchanged": true,
+      "conservation": {
+        "active_tip_ids": [],
+        "actual_cavity_chord": {
+          "entry_m": [
+            0.0006449336701941284,
+            0.0
+          ],
+          "exit_m": [
+            0.0007550663298058716,
+            0.0
+          ],
+          "physical_length_m": 0.00011013265961174325,
+          "projected_length_m": 0.00011013265961174325,
+          "reporting_direction": [
+            1.0,
+            0.0
+          ]
+        },
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": []
+      },
+      "independent_cut_has_sufficient_seeds": true,
+      "independent_cut_no_intact_path": true,
+      "passed": true,
+      "pre_state_fingerprint": "ee701a0131d86f608c962bfaa36b44bff30fe36c31f7df7f66c5cb103a600301",
+      "pre_unchanged": true,
+      "topology_passed": true,
+      "topology_source_fingerprint": "53d1dc62daa1713889a7d24832603db712a44026fa6919f3ee07a2f0ec75b941"
+    },
+    {
+      "case_id": "production:128:48",
+      "cavity_cycle_passed": true,
+      "certificate_fingerprints": {
+        "actual_cavity_cycle": "536830fa7d3ba7253e9214d44ffa90e24387ad5c7f01d185f03359f7d465704b",
+        "actual_component_incidence": "371071cd7beb98fe7bc13100cbef4623b3d7bc9157b878f2b17718c7a864c087",
+        "independent_cut": "731d0f9a74591f5526799615397b458f1cfe13511c0dec2b1604491e988bf962"
+      },
+      "component_incidence_passed": true,
+      "connected_state_fingerprint": "5a844ed575545fd9f465539606237570098c697748191ce33c8ff65c6e005c13",
+      "connected_unchanged": true,
+      "conservation": {
+        "active_tip_ids": [],
+        "actual_cavity_chord": {
+          "entry_m": [
+            0.0006449834300377284,
+            0.0
+          ],
+          "exit_m": [
+            0.0007550165699622716,
+            0.0
+          ],
+          "physical_length_m": 0.00011003313992454314,
+          "projected_length_m": 0.00011003313992454314,
+          "reporting_direction": [
+            1.0,
+            0.0
+          ]
+        },
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": []
+      },
+      "independent_cut_has_sufficient_seeds": true,
+      "independent_cut_no_intact_path": true,
+      "passed": true,
+      "pre_state_fingerprint": "a0b19fd1760dc3ee5621db1d5402f315b221fe073281c487596fd1744ad73509",
+      "pre_unchanged": true,
+      "topology_passed": true,
+      "topology_source_fingerprint": "bf7be268f2c4fbe5eff3598e6713350409d81ffbd6b9e71a9e71a674da3a5c04"
+    },
+    {
+      "case_id": "production:512:192",
+      "cavity_cycle_passed": true,
+      "certificate_fingerprints": {
+        "actual_cavity_cycle": "5c2d1762192e4187583f5df70544c2981633073e1d45b72180c9262a40cead90",
+        "actual_component_incidence": "b8cff42a969551776d93d1891ecc72131ee1d28928a73ef050c2ac60e60a371f",
+        "independent_cut": "3bf1f403690d7abf0f99c9ac0077cf951415eee4c8725965d187cbc0da7fa9d6"
+      },
+      "component_incidence_passed": true,
+      "connected_state_fingerprint": "4e99b038eeab73433c038549af98787ee04a98464e6050a81065af70d7f73d20",
+      "connected_unchanged": true,
+      "conservation": {
+        "active_tip_ids": [],
+        "actual_cavity_chord": {
+          "entry_m": [
+            0.0006449989646210523,
+            0.0
+          ],
+          "exit_m": [
+            0.0007550010353789476,
+            0.0
+          ],
+          "physical_length_m": 0.0001100020707578953,
+          "projected_length_m": 0.0001100020707578953,
+          "reporting_direction": [
+            1.0,
+            0.0
+          ]
+        },
+        "candidate_threshold_ownership": true,
+        "cavity_area_identity_error_m2": 0.0,
+        "connected_chord_error_m": 0.0,
+        "connected_state_has_no_active_front": true,
+        "inventory_error_m2": 0.0,
+        "length_error_m": 0.0,
+        "passed": true,
+        "physical_travel_identity_error_m": 0.0,
+        "projected_connected_chord_error_m": 0.0,
+        "projected_travel_identity_error_m": 0.0,
+        "single_void": true,
+        "support_tip_ids": []
+      },
+      "independent_cut_has_sufficient_seeds": true,
+      "independent_cut_no_intact_path": true,
+      "passed": true,
+      "pre_state_fingerprint": "758f09457a9ca8a92c5078b197eb779348cbb09c359efe707f78e5b5d2b73d15",
+      "pre_unchanged": true,
+      "topology_passed": true,
+      "topology_source_fingerprint": "426ed9b89006e70f2a03a7f8ae252f724791a5c64bb60d39447d29a59c70d874"
+    }
+  ],
+  "schema": "v12.closure-production-derived-topology-diagnostic/1"
+}

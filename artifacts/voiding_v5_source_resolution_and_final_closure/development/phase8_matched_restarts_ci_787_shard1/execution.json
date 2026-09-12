@@ -1,0 +1,25 @@
+{
+  "clean_exact_head_at_end": true,
+  "executed_code_sha": "787ebf692a8d5058050553f4160b78af062f1d48",
+  "execution_completed": true,
+  "numerical_environment": {
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "operations": [
+    {
+      "operation": "lifecycle",
+      "returncode": 0,
+      "script": "run_voiding_v5_closure_lifecycle.py"
+    }
+  ],
+  "phase": "lifecycle",
+  "python_version": "3.12.14",
+  "schema": "v5.source-resolution-final-phase-execution/1",
+  "scientific_pass": "SEPARATELY_RECOMPUTED_NOT_INFERRED_FROM_PROCESS_EXIT",
+  "section": "restarts",
+  "shard_count": 4,
+  "shard_index": 1
+}

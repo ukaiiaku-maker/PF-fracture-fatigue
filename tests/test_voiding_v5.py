@@ -3,6 +3,7 @@ import math
 
 import numpy as np
 import pytest
+from pathlib import Path
 
 from arrhenius_fracture.voiding_production_v5 import (
     _complete_next_clock, build_production_void_state,
@@ -17,6 +18,33 @@ from arrhenius_fracture.voiding_v5 import (
 )
 
 
+@pytest.fixture(scope='module')
+def qualified_positive_peer():
+    """One actual fine source/child/continuation, shared assertions not aliases."""
+    from arrhenius_fracture.checkpoint_v11 import restore_checkpoint
+    from arrhenius_fracture.voiding_production_v5 import refine_downstream_source
+    source = Path(__file__).resolve().parents[1]/'artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/production/checkpoints/production_512_192_connected.json'
+    connected = restore_checkpoint(source)
+    qualified, proof = refine_downstream_source(connected,max_refinement_levels=1,
+        refinement_region='complete_cavity_ring',quality_improvement='constrained_v1')
+    assert proof['status']=='SOURCE_TENSOR_QUALIFIED'
+    assert qualified.competition==connected.competition and qualified.rng_state==connected.rng_state
+    child, event, _, child_audit = downstream_front_transaction(qualified)
+    assert event.accepted
+    continued, event, _, continuation_audit = downstream_front_transaction(child,continuation=True)
+    assert event.accepted
+    return {'connected':connected,'qualified':qualified,'child':child,'continued':continued,
+        'child_audit':child_audit,'continuation_audit':continuation_audit}
+
+
+def assert_coarse_no_child(state):
+    from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint as fingerprint
+    original=fingerprint(state); result,event,operations,audit=downstream_front_transaction(state)
+    assert event is None and not operations and fingerprint(result)==original
+    assert not result.crack_network.active_tip_ids
+    assert audit['status']=='UNQUALIFIED_CAVITY_SOURCE_TENSOR'
+
+
 def test_plane_strain_cavity_inventory_is_area_not_spherical_inventory():
     radius = 5.0e-5
     cavity = Cavity2D("v", "s", (0.0, 0.0), radius, math.pi * radius**2,
@@ -26,10 +54,12 @@ def test_plane_strain_cavity_inventory_is_area_not_spherical_inventory():
     assert grown.inventory_area_m2 - cavity.inventory_area_m2 == grown.area_m2 - cavity.area_m2
 
 
-def test_deterministic_driver_reaches_real_continued_graph_event():
-    final, rows = deterministic_trajectory()
-    assert rows[-1]["operation"] == "continued_accepted_event"
-    assert rows[-1]["event_counters"]["topology_actions"] >= 3
+def test_deterministic_driver_reaches_real_continued_graph_event(qualified_positive_peer):
+    coarse, rows = deterministic_trajectory()
+    assert rows[-1]['operation']=='downstream_first_passage_unavailable'
+    assert_coarse_no_child(coarse)
+    final=qualified_positive_peer['continued']
+    assert final.event_counters['topology_actions'] >= 3
     assert final.void_state.cavities[0].phase == VoidPhase.DOWNSTREAM_FRONT_ACTIVE
 
 
@@ -248,9 +278,11 @@ def test_full_deterministic_trajectory_preserves_total_defect_inventory():
     "downstream_length_ledger_update:projected_front_advance_m",
     "downstream_event_history_update",
 ])
-def test_downstream_state_updates_rollback_atomically(stage):
+def test_downstream_state_updates_rollback_atomically(stage,qualified_positive_peer):
     accepted, _ = deterministic_trajectory(stop_before_ligament=True)
     accepted, _ = ligament_transaction(accepted)
+    assert_coarse_no_child(accepted)
+    accepted=qualified_positive_peer['qualified']
     from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
     before = complete_accepted_state_fingerprint(accepted)
     with pytest.raises(RuntimeError, match="injected:" + stage):
@@ -298,15 +330,31 @@ def test_exact_tie_ligament_transaction_selects_one_arm_and_preserves_peer():
     assert connected.void_state.cavities[0].phase == VoidPhase.CONNECTED_VOID
 
 
-def test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer():
+def test_exact_tie_downstream_transaction_selects_one_arm_and_preserves_peer(qualified_positive_peer):
     accepted, _ = deterministic_trajectory(stop_before_ligament=True)
     accepted = replace(accepted, competition=_two_horizontal_candidate_competition())
     accepted, _ = ligament_transaction(accepted)
+    assert_coarse_no_child(accepted)
+    # This retained synthetic same-direction ownership test is not the distinct-
+    # crystallographic-direction scientific gate. Establish its controlled unit
+    # thresholds BEFORE qualification and preserve them through the real event.
+    from arrhenius_fracture.checkpoint_v11 import restore_checkpoint
+    from arrhenius_fracture.voiding_production_v5 import refine_downstream_source
+    source=Path(__file__).resolve().parents[1]/'artifacts/voiding_v5_finalization_v3_closure/complete_attempt_20260907/a/production/checkpoints/production_512_192_pre.json'
+    accepted=replace(restore_checkpoint(source),competition=_two_horizontal_candidate_competition())
+    accepted,_=ligament_transaction(accepted)
     accepted = replace(accepted, competition=replace(
         accepted.competition,
         hazard_states=tuple(replace(hazard, current_threshold_action=1.0)
                             for hazard in accepted.competition.hazard_states),
     ))
+    junction=dict(accepted.junction_process_state);source=dict(junction['active_event_source'])
+    source['candidate_source_states']=tuple({**row,'threshold_identity':{**row['threshold_identity'],'threshold_action':1.}}
+        for row in source['candidate_source_states'])
+    junction['active_event_source']=source;accepted=replace(accepted,junction_process_state=junction)
+    accepted,proof=refine_downstream_source(accepted,max_refinement_levels=1,
+        refinement_region='complete_cavity_ring',quality_improvement='constrained_v1')
+    assert proof['status']=='SOURCE_TENSOR_QUALIFIED'
     downstream, _, _, causal = downstream_front_transaction(accepted)
     assert len(causal["emitted_winner_candidate_ids"]) == 2
     assert len(causal["selected_proposal_candidate_ids"]) == 1
@@ -368,7 +416,7 @@ def test_true_fixed_crack_positive_negative_offset_pair_is_mirrored_and_atomic()
     assert positive_shear_increment == pytest.approx(-negative_shear_increment, rel=2.0e-2)
 
 
-def test_zero_drive_connected_state_partitions_restart_and_tensile_reload(tmp_path):
+def test_zero_drive_connected_state_partitions_restart_and_tensile_reload(tmp_path,qualified_positive_peer):
     from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
     from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
 
@@ -418,8 +466,12 @@ def test_zero_drive_connected_state_partitions_restart_and_tensile_reload(tmp_pa
     restarted, restarted_audit = _complete_next_clock(restored, tensile)
     assert direct.competition == restarted.competition
     assert direct_audit == restarted_audit
-    assert any(row["winner"] for row in direct_audit)
-    assert direct.competition.pending_events
+    assert not any(row['winner'] for row in direct_audit)
+    assert not direct.competition.pending_events  # arbitrary tensile input cannot qualify a source
+    from arrhenius_fracture.voiding_production_v5 import cavity_source_resolution_metrics
+    peer=qualified_positive_peer['qualified'];tensor=np.asarray(cavity_source_resolution_metrics(peer)['tensor_Pa'])
+    positive,positive_audit=_complete_next_clock(peer,tensor,source_kind='cavity_surface')
+    assert any(row['winner'] for row in positive_audit) and positive.competition.pending_events
 
 
 def test_oblique_interior_edge_intersection_is_inserted_and_rollback_safe():
@@ -473,7 +525,7 @@ def test_connected_dormant_ownership_rolls_back(stage):
     assert complete_accepted_state_fingerprint(accepted) == before
 
 
-def test_connected_and_downstream_states_own_zero_then_one_active_front(tmp_path):
+def test_connected_and_downstream_states_own_zero_then_one_active_front(tmp_path,qualified_positive_peer):
     from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
     from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
     accepted, _ = deterministic_trajectory(stop_before_ligament=True)
@@ -484,7 +536,8 @@ def test_connected_and_downstream_states_own_zero_then_one_active_front(tmp_path
     write_checkpoint(connected, connected_path)
     assert complete_accepted_state_fingerprint(restore_checkpoint(connected_path)) == complete_accepted_state_fingerprint(connected)
 
-    downstream, _, _, _ = downstream_front_transaction(connected)
+    assert_coarse_no_child(connected)
+    downstream=qualified_positive_peer['child']
     assert downstream.crack_network.branch("b00000000").status == "arrested"
     assert downstream.crack_network.active_tip_ids == ("void-front-1",)
     assert downstream.v12_support_state.active_tip_identities == ("void-front-1",)
@@ -493,9 +546,11 @@ def test_connected_and_downstream_states_own_zero_then_one_active_front(tmp_path
     assert complete_accepted_state_fingerprint(restore_checkpoint(downstream_path)) == complete_accepted_state_fingerprint(downstream)
 
 
-def test_downstream_child_activation_rolls_back():
+def test_downstream_child_activation_rolls_back(qualified_positive_peer):
     accepted, _ = deterministic_trajectory(stop_before_ligament=True)
     accepted, _ = ligament_transaction(accepted)
+    assert_coarse_no_child(accepted)
+    accepted=qualified_positive_peer['qualified']
     from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
     before = complete_accepted_state_fingerprint(accepted)
     with pytest.raises(RuntimeError, match="injected:downstream_child_activation"):
@@ -613,11 +668,12 @@ def test_combined_certificate_detects_support_triangle_overlap_with_centroid_out
     assert certificate["passed"] is False
 
 
-def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(monkeypatch):
+def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(monkeypatch,qualified_positive_peer):
     import arrhenius_fracture.voiding_production_v5 as production
     accepted, _ = deterministic_trajectory(stop_before_ligament=True)
     connected, _ = ligament_transaction(accepted)
-    downstream, _, _, first = downstream_front_transaction(connected)
+    assert_coarse_no_child(connected)
+    downstream=qualified_positive_peer['child'];first=qualified_positive_peer['child_audit']
     assert first["source_kind"] == "cavity_surface"
     certificate = downstream.junction_process_state["latest_crack_void_connection_certificate"]
     assert certificate["combined_components"] == ((
@@ -625,14 +681,20 @@ def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(m
     ),)
     assert ("branch:void-front-1", "cavity:void:site-1") in certificate["combined_incidence_edges"]
     assert downstream.tip_process_state["active_branch_id"] == "void-front-1"
-    assert downstream.tip_process_state["by_branch"]["void-front-1"]["r_tip_m"] > 0.0
+    payload = downstream.tip_process_state["by_branch"]["void-front-1"]
+    assert payload["schema"] == "v5.downstream-child-front-engine-state/1"
+    assert payload["canonical_state"]["N_em"] == 0.0
+    assert "r_tip_m" not in payload
 
-    original_tip = production.crack_tip_tensor
+    original_provider = production.sharp_front_load_provider
     calls = []
-    def child_tip_only(state, branch_id="b00000000"):
+    def child_tip_only(state, *, branch_id, candidates=None):
         calls.append(branch_id)
-        return original_tip(state, branch_id=branch_id)
-    monkeypatch.setattr(production, "crack_tip_tensor", child_tip_only)
+        return original_provider(state, branch_id=branch_id, candidates=candidates)
+    monkeypatch.setattr(production, "sharp_front_load_provider", child_tip_only)
+    monkeypatch.setattr(production, "crack_tip_tensor",
+                        lambda *args, **kwargs: (_ for _ in ()).throw(
+                            AssertionError("continued front reused tensor probe")))
     monkeypatch.setattr(production, "cavity_boundary_tensor",
                         lambda *args, **kwargs: (_ for _ in ()).throw(
                             AssertionError("continued front reused cavity probe")))
@@ -640,6 +702,8 @@ def test_continuation_uses_child_tip_source_and_recomputes_three_body_topology(m
     assert calls == ["void-front-1"]
     assert causal["source_kind"] == "sharp_front"
     assert causal["source_front_id"] == "void-front-1"
+    assert causal["tensor_Pa"] is None
+    assert causal["source_probe_identity"]["kind"] == "established_directional_J_K_provider"
     assert continued.junction_process_state["latest_topology_certificate_stage"] == "POST_CONTINUATION"
 
 
@@ -660,9 +724,10 @@ def test_event_provenance_is_source_bound_and_stale_root_event_cannot_rebind():
     assert connected.junction_process_state["active_event_source"]["source_kind"] == "cavity_surface"
 
 
-def test_equilibrium_metrics_separate_free_residual_from_reactions():
-    final, rows = deterministic_trajectory()
-    row = rows[-1]
+def test_equilibrium_metrics_separate_free_residual_from_reactions(qualified_positive_peer):
+    coarse,_=deterministic_trajectory();assert_coarse_no_child(coarse)
+    from arrhenius_fracture.voiding_production_v5 import observables
+    final=qualified_positive_peer['continued'];row=observables(final,'continued_accepted_event')
     assert row["free_dof_residual_l2_N_per_m"] < 1.0e-8 * row["constrained_reaction_l2_N_per_m"]
     assert row["top_bottom_reaction_balance"] < 3.0e-2
     assert row["energy_reaction_identity"] < 1.0e-2

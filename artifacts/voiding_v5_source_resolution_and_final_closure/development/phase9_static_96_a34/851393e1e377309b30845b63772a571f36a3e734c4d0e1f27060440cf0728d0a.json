@@ -1,0 +1,1105 @@
+{
+  "case_id": "851393e1e377309b30845b63772a571f36a3e734c4d0e1f27060440cf0728d0a",
+  "executed_code_sha": "a34cdf00306eeaf9b10df17ae0ea5864611c828d",
+  "geometry_conformity_audit": {
+    "geometry_generation": 1,
+    "maximum_requested_realized_error_m": 1.4695761589768237e-19,
+    "mode": "V3_FIXED_LABORATORY_GEOMETRY",
+    "path_records": [
+      {
+        "error_m": 1.4695761589768237e-19,
+        "node_id": 6208,
+        "parent_element_ids": [],
+        "path_index": 0,
+        "realized_m": [
+          0.0,
+          1.4695761589768237e-19
+        ],
+        "requested_m": [
+          0.0,
+          0.0
+        ],
+        "split_boundary_edge": null
+      },
+      {
+        "error_m": 0.0,
+        "node_id": 6273,
+        "parent_element_ids": [
+          8831,
+          8833
+        ],
+        "path_index": 1,
+        "realized_m": [
+          0.0005,
+          0.0
+        ],
+        "requested_m": [
+          0.0005,
+          0.0
+        ],
+        "split_boundary_edge": [
+          4416,
+          4544
+        ]
+      }
+    ],
+    "post_insertion_validation": {
+      "actual_boundary_components": 1,
+      "actual_internal_components": 0,
+      "cavity_cycle": false,
+      "geometry_generation": 1,
+      "local_edge_max_m": "NaN",
+      "local_edge_min_m": "NaN",
+      "matched_parent_elements": 12288,
+      "matched_parent_nodes": 6272,
+      "maximum_aspect_ratio": 27.640003470986997,
+      "minimum_quality": 0.04830431138521841,
+      "orphan_nodes": 0,
+      "triangle_disk_intersections": 0
+    },
+    "quality_constrained_mesh_v1": {
+      "bad_elements_remaining": [],
+      "geometrical_quality_target_passed": true,
+      "geometry_protected_nodes": [
+        4544,
+        4672,
+        4800,
+        4928,
+        5056,
+        5184,
+        5312,
+        5440,
+        5568,
+        5696,
+        5824,
+        5952,
+        6080,
+        6144,
+        6145,
+        6146,
+        6147,
+        6148,
+        6149,
+        6150,
+        6151,
+        6152,
+        6153,
+        6154,
+        6155,
+        6156,
+        6157,
+        6158,
+        6159,
+        6160,
+        6161,
+        6162,
+        6163,
+        6164,
+        6165,
+        6166,
+        6167,
+        6168,
+        6169,
+        6170,
+        6171,
+        6172,
+        6173,
+        6174,
+        6175,
+        6176,
+        6177,
+        6178,
+        6179,
+        6180,
+        6181,
+        6182,
+        6183,
+        6184,
+        6185,
+        6186,
+        6187,
+        6188,
+        6189,
+        6190,
+        6191,
+        6192,
+        6193,
+        6194,
+        6195,
+        6196,
+        6197,
+        6198,
+        6199,
+        6200,
+        6201,
+        6202,
+        6203,
+        6204,
+        6205,
+        6206,
+        6207,
+        6208,
+        6209,
+        6210,
+        6211,
+        6212,
+        6213,
+        6214,
+        6215,
+        6216,
+        6217,
+        6218,
+        6219,
+        6220,
+        6221,
+        6222,
+        6223,
+        6224,
+        6225,
+        6226,
+        6227,
+        6228,
+        6229,
+        6230,
+        6231,
+        6232,
+        6233,
+        6234,
+        6235,
+        6236,
+        6237,
+        6238,
+        6239,
+        6240,
+        6241,
+        6242,
+        6243,
+        6244,
+        6245,
+        6246,
+        6247,
+        6248,
+        6249,
+        6250,
+        6251,
+        6252,
+        6253,
+        6254,
+        6255,
+        6256,
+        6257,
+        6258,
+        6259,
+        6260,
+        6261,
+        6262,
+        6263,
+        6264,
+        6265,
+        6266,
+        6267,
+        6268,
+        6269,
+        6270,
+        6271,
+        6273
+      ],
+      "minimum_quality_after": 0.08488545669419405,
+      "minimum_quality_before": 0.048304311385218415,
+      "operations": [
+        {
+          "added_edge": [
+            4415,
+            6273
+          ],
+          "element_ids": [
+            8830,
+            12414
+          ],
+          "minimum_quality_after": 0.08666937188817467,
+          "minimum_quality_before": 0.048304311385222475,
+          "operation": "legal_fixed_node_flip",
+          "removed_edge": [
+            4416,
+            4543
+          ],
+          "sweep": 0
+        },
+        {
+          "added_edge": [
+            4417,
+            6273
+          ],
+          "element_ids": [
+            8831,
+            12416
+          ],
+          "minimum_quality_after": 0.08666937188817511,
+          "minimum_quality_before": 0.048304311385218415,
+          "operation": "legal_fixed_node_flip",
+          "removed_edge": [
+            4416,
+            4545
+          ],
+          "sweep": 0
+        }
+      ],
+      "original_mesh_fingerprint": "a227960fec033e885a3ad88927a26aa184b4ac25acd97ff593216bb3ecc9008e",
+      "proposed_mesh_fingerprint": "19d69518934c217eee2f4189e3a82dc27f1bba4933e858045b24db3a9623540c",
+      "protected_edges": [
+        [
+          4544,
+          4672
+        ],
+        [
+          4544,
+          6273
+        ],
+        [
+          4672,
+          4800
+        ],
+        [
+          4800,
+          4928
+        ],
+        [
+          4928,
+          5056
+        ],
+        [
+          5056,
+          5184
+        ],
+        [
+          5184,
+          5312
+        ],
+        [
+          5312,
+          5440
+        ],
+        [
+          5440,
+          5568
+        ],
+        [
+          5568,
+          5696
+        ],
+        [
+          5696,
+          5824
+        ],
+        [
+          5824,
+          5952
+        ],
+        [
+          5952,
+          6080
+        ],
+        [
+          6080,
+          6208
+        ],
+        [
+          6144,
+          6145
+        ],
+        [
+          6144,
+          6271
+        ],
+        [
+          6145,
+          6146
+        ],
+        [
+          6146,
+          6147
+        ],
+        [
+          6147,
+          6148
+        ],
+        [
+          6148,
+          6149
+        ],
+        [
+          6149,
+          6150
+        ],
+        [
+          6150,
+          6151
+        ],
+        [
+          6151,
+          6152
+        ],
+        [
+          6152,
+          6153
+        ],
+        [
+          6153,
+          6154
+        ],
+        [
+          6154,
+          6155
+        ],
+        [
+          6155,
+          6156
+        ],
+        [
+          6156,
+          6157
+        ],
+        [
+          6157,
+          6158
+        ],
+        [
+          6158,
+          6159
+        ],
+        [
+          6159,
+          6160
+        ],
+        [
+          6160,
+          6161
+        ],
+        [
+          6161,
+          6162
+        ],
+        [
+          6162,
+          6163
+        ],
+        [
+          6163,
+          6164
+        ],
+        [
+          6164,
+          6165
+        ],
+        [
+          6165,
+          6166
+        ],
+        [
+          6166,
+          6167
+        ],
+        [
+          6167,
+          6168
+        ],
+        [
+          6168,
+          6169
+        ],
+        [
+          6169,
+          6170
+        ],
+        [
+          6170,
+          6171
+        ],
+        [
+          6171,
+          6172
+        ],
+        [
+          6172,
+          6173
+        ],
+        [
+          6173,
+          6174
+        ],
+        [
+          6174,
+          6175
+        ],
+        [
+          6175,
+          6176
+        ],
+        [
+          6176,
+          6177
+        ],
+        [
+          6177,
+          6178
+        ],
+        [
+          6178,
+          6179
+        ],
+        [
+          6179,
+          6180
+        ],
+        [
+          6180,
+          6181
+        ],
+        [
+          6181,
+          6182
+        ],
+        [
+          6182,
+          6183
+        ],
+        [
+          6183,
+          6184
+        ],
+        [
+          6184,
+          6185
+        ],
+        [
+          6185,
+          6186
+        ],
+        [
+          6186,
+          6187
+        ],
+        [
+          6187,
+          6188
+        ],
+        [
+          6188,
+          6189
+        ],
+        [
+          6189,
+          6190
+        ],
+        [
+          6190,
+          6191
+        ],
+        [
+          6191,
+          6192
+        ],
+        [
+          6192,
+          6193
+        ],
+        [
+          6193,
+          6194
+        ],
+        [
+          6194,
+          6195
+        ],
+        [
+          6195,
+          6196
+        ],
+        [
+          6196,
+          6197
+        ],
+        [
+          6197,
+          6198
+        ],
+        [
+          6198,
+          6199
+        ],
+        [
+          6199,
+          6200
+        ],
+        [
+          6200,
+          6201
+        ],
+        [
+          6201,
+          6202
+        ],
+        [
+          6202,
+          6203
+        ],
+        [
+          6203,
+          6204
+        ],
+        [
+          6204,
+          6205
+        ],
+        [
+          6205,
+          6206
+        ],
+        [
+          6206,
+          6207
+        ],
+        [
+          6207,
+          6208
+        ],
+        [
+          6208,
+          6209
+        ],
+        [
+          6209,
+          6210
+        ],
+        [
+          6210,
+          6211
+        ],
+        [
+          6211,
+          6212
+        ],
+        [
+          6212,
+          6213
+        ],
+        [
+          6213,
+          6214
+        ],
+        [
+          6214,
+          6215
+        ],
+        [
+          6215,
+          6216
+        ],
+        [
+          6216,
+          6217
+        ],
+        [
+          6217,
+          6218
+        ],
+        [
+          6218,
+          6219
+        ],
+        [
+          6219,
+          6220
+        ],
+        [
+          6220,
+          6221
+        ],
+        [
+          6221,
+          6222
+        ],
+        [
+          6222,
+          6223
+        ],
+        [
+          6223,
+          6224
+        ],
+        [
+          6224,
+          6225
+        ],
+        [
+          6225,
+          6226
+        ],
+        [
+          6226,
+          6227
+        ],
+        [
+          6227,
+          6228
+        ],
+        [
+          6228,
+          6229
+        ],
+        [
+          6229,
+          6230
+        ],
+        [
+          6230,
+          6231
+        ],
+        [
+          6231,
+          6232
+        ],
+        [
+          6232,
+          6233
+        ],
+        [
+          6233,
+          6234
+        ],
+        [
+          6234,
+          6235
+        ],
+        [
+          6235,
+          6236
+        ],
+        [
+          6236,
+          6237
+        ],
+        [
+          6237,
+          6238
+        ],
+        [
+          6238,
+          6239
+        ],
+        [
+          6239,
+          6240
+        ],
+        [
+          6240,
+          6241
+        ],
+        [
+          6241,
+          6242
+        ],
+        [
+          6242,
+          6243
+        ],
+        [
+          6243,
+          6244
+        ],
+        [
+          6244,
+          6245
+        ],
+        [
+          6245,
+          6246
+        ],
+        [
+          6246,
+          6247
+        ],
+        [
+          6247,
+          6248
+        ],
+        [
+          6248,
+          6249
+        ],
+        [
+          6249,
+          6250
+        ],
+        [
+          6250,
+          6251
+        ],
+        [
+          6251,
+          6252
+        ],
+        [
+          6252,
+          6253
+        ],
+        [
+          6253,
+          6254
+        ],
+        [
+          6254,
+          6255
+        ],
+        [
+          6255,
+          6256
+        ],
+        [
+          6256,
+          6257
+        ],
+        [
+          6257,
+          6258
+        ],
+        [
+          6258,
+          6259
+        ],
+        [
+          6259,
+          6260
+        ],
+        [
+          6260,
+          6261
+        ],
+        [
+          6261,
+          6262
+        ],
+        [
+          6262,
+          6263
+        ],
+        [
+          6263,
+          6264
+        ],
+        [
+          6264,
+          6265
+        ],
+        [
+          6265,
+          6266
+        ],
+        [
+          6266,
+          6267
+        ],
+        [
+          6267,
+          6268
+        ],
+        [
+          6268,
+          6269
+        ],
+        [
+          6269,
+          6270
+        ],
+        [
+          6270,
+          6271
+        ]
+      ],
+      "schema": "v5.quality-constrained-mesh/1",
+      "scientific_source_qualification": "NOT_EVALUATED_REQUIRES_FULL_STATE_TRANSACTION",
+      "strategy": "flips_and_free_node_optimization",
+      "target_minimum_quality": 0.05
+    },
+    "root_boundary_component": "exterior_traction_free"
+  },
+  "input_configuration": {
+    "boundary_segments": 128,
+    "capture_source": true,
+    "cavity_center_m": [
+      0.0012,
+      0.0
+    ],
+    "cavity_enabled": false,
+    "cavity_radius_m": 5e-05,
+    "crack_enabled": true,
+    "crack_orientation_deg": 0.0,
+    "crack_path_m": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0005,
+        0.0
+      ]
+    ],
+    "crack_root_m": null,
+    "crack_tip_m": null,
+    "far_h_m": 5e-05,
+    "geometry_mode": "V3_FIXED_LABORATORY_GEOMETRY",
+    "ligament_ratio": null,
+    "material_E_Pa": 210000000000.0,
+    "material_nu": 0.3,
+    "opening_m": 4e-07,
+    "quality_strategy": "flips_and_free_node_optimization",
+    "radial_layers": 48,
+    "residual_stiffness_kappa": 1e-06,
+    "specimen_height_m": 0.002,
+    "specimen_width_m": 0.003,
+    "tip_layer": 3
+  },
+  "measurements": {
+    "cavity_enabled": false,
+    "cavity_fields": null,
+    "compliance": 3.30395599132585e-12,
+    "energy": 0.024213397578547943,
+    "energy_identity": 2.106307882992132e-14,
+    "fixed_crack_vertex_error_m": 1.4695761589768237e-19,
+    "fixed_tip_probe": {
+      "candidate_planes": [
+        {
+          "normal": [
+            1.0,
+            0.0
+          ],
+          "normal_opening_Pa": 5951141.304716496,
+          "shear_Pa": 5.122274160385132e-09
+        },
+        {
+          "normal": [
+            0.0,
+            1.0
+          ],
+          "normal_opening_Pa": 111221972.56192258,
+          "shear_Pa": -5.122274160385132e-09
+        },
+        {
+          "normal": [
+            0.7071067811865476,
+            0.7071067811865476
+          ],
+          "normal_opening_Pa": 58586556.933319554,
+          "shear_Pa": 52635415.62860305
+        },
+        {
+          "normal": [
+            0.7071067811865476,
+            -0.7071067811865476
+          ],
+          "normal_opening_Pa": 58586556.93331954,
+          "shear_Pa": -52635415.62860305
+        }
+      ],
+      "element_ids": [
+        8574,
+        8576
+      ],
+      "operator": "area_weighted_containing_live_CST_at_fixed_25um_ahead_v1",
+      "physical_position_m": [
+        0.000525,
+        0.0
+      ],
+      "principal_stresses_Pa": [
+        5951141.304716496,
+        111221972.56192258
+      ],
+      "sigma_nn_Pa": 111221972.56192258,
+      "sigma_nt_Pa": -5.122274160385132e-09,
+      "sigma_tt_Pa": 5951141.304716496,
+      "tensor_Pa": [
+        [
+          5951141.304716496,
+          5.122274160385132e-09
+        ],
+        [
+          5.122274160385132e-09,
+          111221972.56192258
+        ]
+      ],
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    "free_residual_relative": 2.150296496079126e-14,
+    "independent_intact_path_certificate": {
+      "boundary_terminal_certificates": [],
+      "bridge_element_ids": [],
+      "bridge_node_ids": [],
+      "certificate_fingerprint": "14f697eb371e637d797ddc07722eb45ce9fc7a0a89781d2c1f319bba6afc9d39",
+      "edge_cut_certificates": [
+        {
+          "backward_undershoot_m": 0.0,
+          "bridge_element_ids": [],
+          "bridge_node_ids": [],
+          "certificate_fingerprint": "f3766b65816934dbbbb56285c74aa742fc63b0767c2bc91f94430c29031eb92f",
+          "endpoint_footprint_error_m": 1.8259316914948998e-06,
+          "forward_leakage_m": 1.8259316914948998e-06,
+          "forward_leakage_over_h_local": 0.02614870997347839,
+          "forward_overshoot_m": 1.8259316914948998e-06,
+          "h_local_max_m": 6.982874846777797e-05,
+          "h_local_median_m": 5.814456375293613e-05,
+          "intact_cross_graph_path_exists": false,
+          "minimum_crossing_path_length": null,
+          "negative_component_count": 1,
+          "negative_component_labels": [
+            2
+          ],
+          "negative_seed_count": 55,
+          "positive_component_count": 1,
+          "positive_component_labels": [
+            1
+          ],
+          "positive_seed_count": 55,
+          "segment_id": "b00000000:arc0",
+          "selected_area_m2": 9.375022609268851e-08,
+          "selected_area_over_length_h_local": 2.6851469673969297,
+          "signed_tip_footprint_m": 1.8259316914948998e-06,
+          "sufficient_opposite_side_seeds": true,
+          "support_width_m": 0.00011818968402859738,
+          "support_width_over_h_local": 1.6925648335675851,
+          "tube_boundary_clearance_m": 0.0001
+        }
+      ],
+      "insufficient_seed_segment_ids": [],
+      "intact_cross_graph_path_exists": false,
+      "minimum_crossing_path_length": null,
+      "negative_seed_element_ids": [
+        9602,
+        9603,
+        9604,
+        9605,
+        9606,
+        9607,
+        9608,
+        9609,
+        9858,
+        9859,
+        9860,
+        9861,
+        9862,
+        9863,
+        9864,
+        10114,
+        10115,
+        10116,
+        10117,
+        10118,
+        10119,
+        10370,
+        10371,
+        10372,
+        10373,
+        10374,
+        10375,
+        10626,
+        10627,
+        10628,
+        10629,
+        10630,
+        10631,
+        10882,
+        10883,
+        10884,
+        10885,
+        10886,
+        10887,
+        11138,
+        11139,
+        11140,
+        11141,
+        11142,
+        11143,
+        11394,
+        11395,
+        11396,
+        11397,
+        11398,
+        11399,
+        11650,
+        11651,
+        11652,
+        11653
+      ],
+      "positive_seed_element_ids": [
+        9586,
+        9587,
+        9588,
+        9589,
+        9590,
+        9591,
+        9592,
+        9593,
+        9842,
+        9844,
+        9845,
+        9846,
+        9847,
+        9848,
+        9849,
+        10100,
+        10101,
+        10102,
+        10103,
+        10104,
+        10105,
+        10356,
+        10357,
+        10358,
+        10359,
+        10360,
+        10361,
+        10612,
+        10613,
+        10614,
+        10615,
+        10616,
+        10617,
+        10868,
+        10869,
+        10870,
+        10871,
+        10872,
+        10873,
+        11124,
+        11125,
+        11126,
+        11127,
+        11128,
+        11129,
+        11380,
+        11381,
+        11382,
+        11383,
+        11384,
+        11385,
+        11638,
+        11639,
+        11640,
+        11641
+      ]
+    },
+    "mesh_quality": 0.08488545669419405,
+    "reaction": 121066.98789274227,
+    "reaction_balance": 2.0193132751691986e-14
+  },
+  "recovery": [],
+  "solver_validation": null,
+  "source_fingerprints": {
+    "assembled_system": "323a7b84490ae14653741c92ac5494b1c3a121bc7c8468b87c46b1d4e3ce95ad",
+    "mesh": "0c6b9196091ff19b6399e2be059ee3f9e164b59150916692b79e70f28c4fd567",
+    "solution": "cf51224fffd425796d7396243e5db999958aefb84a463eed31cf452dd1c29be7",
+    "support": "5ef8361aeb12e2c8c0887e7ed451befebaaa787e765beaf8c20ca25cd822f2d9"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "lossless_checkpoint_representation_changes": [
+    {
+      "checkpoint": "UNACCEPTED_support_trial.json",
+      "complete_state_exact": true,
+      "complete_state_fingerprint": "fcc9fb611164d98d1c3114d630b880507563b8e01703ffd7ced8fc26cda50fbc",
+      "compressed_payload_sha256": "87db48b8c02fae1a43a0547464603302fbd7b57cf9a942d301e8f64c980b2dd6",
+      "original_manifest_sha256": "7c40389601b7af50598db74194d17a2673331edba06f4156fc46a101ddcecbbe",
+      "original_payload_sha256": "6695f8617d7698d9b82897a64e105baf47ab3e2167636521c36a473032f0569d"
+    }
+  ],
+  "original_inventory": {
+    "UNACCEPTED_support_trial.json": "7c40389601b7af50598db74194d17a2673331edba06f4156fc46a101ddcecbbe",
+    "UNACCEPTED_support_trial.json.6695f8617d7698d9b82897a64e105baf47ab3e2167636521c36a473032f0569d.state.pkl": "6695f8617d7698d9b82897a64e105baf47ab3e2167636521c36a473032f0569d",
+    "result.json": "70f13a36e4bfa2bb3e5102f3101ff59bd42d488d9a4c5beea8ce2936edc701af",
+    "sha256_manifest.json": "185a28079d35d7bc313bffabc21b2c18e61ab3f9906937561c63de469cef583f"
+  },
+  "record_kind": "PACKAGING_NOT_NEW_PHYSICAL_EXECUTION_OR_CLEAN_ATTESTATION",
+  "schema": "v5.retained-development-packaging/1"
+}

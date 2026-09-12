@@ -1,0 +1,2952 @@
+{
+  "common_terminal_exact": true,
+  "controlled_histories": {
+    "passed": 6,
+    "total": 12
+  },
+  "controlled_histories_v1_retained": {
+    "passed": 4,
+    "total": 12
+  },
+  "controlled_history_classifications_v2": [
+    {
+      "case_identity": "accommodation_limited",
+      "failure": null,
+      "final_source_resolved_classification": "STABLE_SUBGRID_VOID_WITH_PLASTIC_ACCOMMODATION_S_MINIMUM_ALL_INTERVALS",
+      "passed": false,
+      "prospective_expected_classification": "STABLE_SUBGRID_VOID_WITH_PLASTIC_ACCOMMODATION_MINIMUM_ALL_INTERVALS",
+      "protocol_complete": true,
+      "source_qualification_statuses": [],
+      "zero_drive_candidate_count": 0
+    },
+    {
+      "case_identity": "centered",
+      "failure": null,
+      "final_source_resolved_classification": "DOWNSTREAM_FRONT_ACTIVE",
+      "passed": true,
+      "prospective_expected_classification": "DOWNSTREAM_FRONT_ACTIVE",
+      "protocol_complete": true,
+      "source_qualification_statuses": [
+        "SOURCE_TENSOR_QUALIFIED"
+      ],
+      "zero_drive_candidate_count": 0
+    },
+    {
+      "case_identity": "delayed_downstream",
+      "failure": {
+        "message": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+        "type": "RuntimeError"
+      },
+      "final_source_resolved_classification": "CONNECTED_VOID_SOURCE_UNQUALIFIED",
+      "passed": false,
+      "prospective_expected_classification": "DOWNSTREAM_FRONT_ACTIVE_AFTER_DORMANT_INTERVAL_AND_RELOAD",
+      "protocol_complete": true,
+      "source_qualification_statuses": [
+        "SOURCE_TENSOR_UNQUALIFIED"
+      ],
+      "zero_drive_candidate_count": 0
+    },
+    {
+      "case_identity": "diffusion_limited",
+      "failure": null,
+      "final_source_resolved_classification": "STABLE_SUBGRID_VOID_WITH_PLASTIC_ACCOMMODATION_S_MINIMUM_ALL_INTERVALS",
+      "passed": false,
+      "prospective_expected_classification": "STABLE_SUBGRID_VOID_WITH_VACANCY_TRANSPORT_MINIMUM_ALL_INTERVALS",
+      "protocol_complete": true,
+      "source_qualification_statuses": [],
+      "zero_drive_candidate_count": 0
+    },
+    {
+      "case_identity": "downstream_zero_drive",
+      "failure": {
+        "message": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+        "type": "RuntimeError"
+      },
+      "final_source_resolved_classification": "CONNECTED_VOID_SOURCE_UNQUALIFIED",
+      "passed": false,
+      "prospective_expected_classification": "CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE",
+      "protocol_complete": true,
+      "source_qualification_statuses": [
+        "SOURCE_TENSOR_UNQUALIFIED"
+      ],
+      "zero_drive_candidate_count": 0
+    },
+    {
+      "case_identity": "embryo_healing",
+      "failure": null,
+      "final_source_resolved_classification": "HEALED_SITE",
+      "passed": true,
+      "prospective_expected_classification": "HEALED_SITE",
+      "protocol_complete": true,
+      "source_qualification_statuses": [],
+      "zero_drive_candidate_count": 0
+    },
+    {
+      "case_identity": "fixed_mesh_oblique",
+      "failure": null,
+      "final_source_resolved_classification": "CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE",
+      "passed": true,
+      "prospective_expected_classification": "CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE",
+      "protocol_complete": true,
+      "source_qualification_statuses": [],
+      "zero_drive_candidate_count": 2
+    },
+    {
+      "case_identity": "local_remesh_refinement",
+      "failure": {
+        "message": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+        "type": "RuntimeError"
+      },
+      "final_source_resolved_classification": "CONNECTED_VOID_SOURCE_UNQUALIFIED",
+      "passed": false,
+      "prospective_expected_classification": "DOWNSTREAM_FRONT_ACTIVE_AFTER_QUALIFIED_LOCAL_REFINEMENT",
+      "protocol_complete": true,
+      "source_qualification_statuses": [
+        "SOURCE_TENSOR_UNQUALIFIED"
+      ],
+      "zero_drive_candidate_count": 0
+    },
+    {
+      "case_identity": "long_ligament",
+      "failure": null,
+      "final_source_resolved_classification": "DOWNSTREAM_FRONT_ACTIVE",
+      "passed": true,
+      "prospective_expected_classification": "DOWNSTREAM_FRONT_ACTIVE",
+      "protocol_complete": true,
+      "source_qualification_statuses": [
+        "SOURCE_TENSOR_QUALIFIED"
+      ],
+      "zero_drive_candidate_count": 0
+    },
+    {
+      "case_identity": "negative_offset",
+      "failure": {
+        "message": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
+        "type": "RuntimeError"
+      },
+      "final_source_resolved_classification": "CONNECTED_VOID_SOURCE_UNQUALIFIED",
+      "passed": false,
+      "prospective_expected_classification": "CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE",
+      "protocol_complete": true,
+      "source_qualification_statuses": [
+        "SOURCE_TENSOR_UNQUALIFIED"
+      ],
+      "zero_drive_candidate_count": 0
+    },
+    {
+      "case_identity": "positive_offset",
+      "failure": null,
+      "final_source_resolved_classification": "CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE",
+      "passed": true,
+      "prospective_expected_classification": "CONNECTED_VOID_ZERO_DOWNSTREAM_DRIVE_WITH_QUALIFIED_SOURCE",
+      "protocol_complete": true,
+      "source_qualification_statuses": [],
+      "zero_drive_candidate_count": 1
+    },
+    {
+      "case_identity": "short_ligament",
+      "failure": null,
+      "final_source_resolved_classification": "DOWNSTREAM_FRONT_ACTIVE",
+      "passed": true,
+      "prospective_expected_classification": "DOWNSTREAM_FRONT_ACTIVE",
+      "protocol_complete": true,
+      "source_qualification_statuses": [
+        "SOURCE_TENSOR_QUALIFIED"
+      ],
+      "zero_drive_candidate_count": 0
+    }
+  ],
+  "executed_code_sha": "d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+  "historical_raw_full_state_identity": "FAIL_RETAINED",
+  "historical_static_result": "UNCHANGED_683_OF_791",
+  "lifecycle_evidence_ontology": {
+    "classification": "EXECUTED_BLOCKED",
+    "failure": {
+      "message": "natural internal-stage independent production replay mismatch: case_identity=12000 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+      "type": "ValueError"
+    },
+    "full_registry_checks_reached": true,
+    "predicate_relaxed": false,
+    "schema": "v5.final-physics-closure-ontology-classification/1",
+    "source_bound_row_ontology": {
+      "applied": 282,
+      "blocked": 150,
+      "passed": 132,
+      "rows": [
+        {
+          "case_identity": "accommodation_limited",
+          "dataset": "controlled",
+          "execution_id": "controlled:accommodation_limited:None:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "centered",
+          "dataset": "controlled",
+          "execution_id": "controlled:centered:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "delayed_downstream",
+          "dataset": "controlled",
+          "execution_id": "controlled:delayed_downstream:None:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "diffusion_limited",
+          "dataset": "controlled",
+          "execution_id": "controlled:diffusion_limited:None:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "downstream_zero_drive",
+          "dataset": "controlled",
+          "execution_id": "controlled:downstream_zero_drive:None:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "embryo_healing",
+          "dataset": "controlled",
+          "execution_id": "controlled:embryo_healing:None:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "fixed_mesh_oblique",
+          "dataset": "controlled",
+          "execution_id": "controlled:fixed_mesh_oblique:None:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "local_remesh_refinement",
+          "dataset": "controlled",
+          "execution_id": "controlled:local_remesh_refinement:None:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "long_ligament",
+          "dataset": "controlled",
+          "execution_id": "controlled:long_ligament:None:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "negative_offset",
+          "dataset": "controlled",
+          "execution_id": "controlled:negative_offset:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "positive_offset",
+          "dataset": "controlled",
+          "execution_id": "controlled:positive_offset:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "short_ligament",
+          "dataset": "controlled",
+          "execution_id": "controlled:short_ligament:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "12000",
+          "dataset": "natural",
+          "execution_id": "natural:12000:1:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12000 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12000",
+          "dataset": "natural",
+          "execution_id": "natural:12000:2:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12000 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12000",
+          "dataset": "natural",
+          "execution_id": "natural:12000:4:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12000 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12000",
+          "dataset": "natural",
+          "execution_id": "natural:12000:8:3:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12000 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12000",
+          "dataset": "natural",
+          "execution_id": "natural:12000:16:4:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12000 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12001",
+          "dataset": "natural",
+          "execution_id": "natural:12001:1:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12001 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12001",
+          "dataset": "natural",
+          "execution_id": "natural:12001:2:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12001 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12001",
+          "dataset": "natural",
+          "execution_id": "natural:12001:4:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12001 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12001",
+          "dataset": "natural",
+          "execution_id": "natural:12001:8:3:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12001 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12001",
+          "dataset": "natural",
+          "execution_id": "natural:12001:16:4:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12001 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12002",
+          "dataset": "natural",
+          "execution_id": "natural:12002:1:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12002 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12002",
+          "dataset": "natural",
+          "execution_id": "natural:12002:2:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12002 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12002",
+          "dataset": "natural",
+          "execution_id": "natural:12002:4:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12002 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12002",
+          "dataset": "natural",
+          "execution_id": "natural:12002:8:3:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12002 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12002",
+          "dataset": "natural",
+          "execution_id": "natural:12002:16:4:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12002 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12003",
+          "dataset": "natural",
+          "execution_id": "natural:12003:1:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12003 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12003",
+          "dataset": "natural",
+          "execution_id": "natural:12003:2:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12003 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12003",
+          "dataset": "natural",
+          "execution_id": "natural:12003:4:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12003 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12003",
+          "dataset": "natural",
+          "execution_id": "natural:12003:8:3:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12003 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12003",
+          "dataset": "natural",
+          "execution_id": "natural:12003:16:4:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12003 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12004",
+          "dataset": "natural",
+          "execution_id": "natural:12004:1:5:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12004 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12004",
+          "dataset": "natural",
+          "execution_id": "natural:12004:2:6:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12004 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12004",
+          "dataset": "natural",
+          "execution_id": "natural:12004:4:7:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12004 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12004",
+          "dataset": "natural",
+          "execution_id": "natural:12004:8:8:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12004 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12004",
+          "dataset": "natural",
+          "execution_id": "natural:12004:16:9:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12004 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12005",
+          "dataset": "natural",
+          "execution_id": "natural:12005:1:5:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12005 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12005",
+          "dataset": "natural",
+          "execution_id": "natural:12005:2:6:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12005 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12005",
+          "dataset": "natural",
+          "execution_id": "natural:12005:4:7:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12005 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12005",
+          "dataset": "natural",
+          "execution_id": "natural:12005:8:8:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12005 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12005",
+          "dataset": "natural",
+          "execution_id": "natural:12005:16:9:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12005 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12006",
+          "dataset": "natural",
+          "execution_id": "natural:12006:1:5:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12006 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12006",
+          "dataset": "natural",
+          "execution_id": "natural:12006:2:6:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12006 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12006",
+          "dataset": "natural",
+          "execution_id": "natural:12006:4:7:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12006 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12006",
+          "dataset": "natural",
+          "execution_id": "natural:12006:8:8:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12006 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12006",
+          "dataset": "natural",
+          "execution_id": "natural:12006:16:9:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12006 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12007",
+          "dataset": "natural",
+          "execution_id": "natural:12007:1:5:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12007 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12007",
+          "dataset": "natural",
+          "execution_id": "natural:12007:2:6:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12007 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12007",
+          "dataset": "natural",
+          "execution_id": "natural:12007:4:7:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12007 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12007",
+          "dataset": "natural",
+          "execution_id": "natural:12007:8:8:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12007 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12007",
+          "dataset": "natural",
+          "execution_id": "natural:12007:16:9:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12007 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12008",
+          "dataset": "natural",
+          "execution_id": "natural:12008:1:10:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12008 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12008",
+          "dataset": "natural",
+          "execution_id": "natural:12008:2:11:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12008 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12008",
+          "dataset": "natural",
+          "execution_id": "natural:12008:4:12:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12008 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12008",
+          "dataset": "natural",
+          "execution_id": "natural:12008:8:13:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12008 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12008",
+          "dataset": "natural",
+          "execution_id": "natural:12008:16:14:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12008 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12009",
+          "dataset": "natural",
+          "execution_id": "natural:12009:1:10:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12009 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12009",
+          "dataset": "natural",
+          "execution_id": "natural:12009:2:11:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12009 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12009",
+          "dataset": "natural",
+          "execution_id": "natural:12009:4:12:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12009 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12009",
+          "dataset": "natural",
+          "execution_id": "natural:12009:8:13:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12009 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12009",
+          "dataset": "natural",
+          "execution_id": "natural:12009:16:14:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12009 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12010",
+          "dataset": "natural",
+          "execution_id": "natural:12010:1:10:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "12010",
+          "dataset": "natural",
+          "execution_id": "natural:12010:2:11:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "12010",
+          "dataset": "natural",
+          "execution_id": "natural:12010:4:12:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "12010",
+          "dataset": "natural",
+          "execution_id": "natural:12010:8:13:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "12010",
+          "dataset": "natural",
+          "execution_id": "natural:12010:16:14:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "12011",
+          "dataset": "natural",
+          "execution_id": "natural:12011:1:10:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12011 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12011",
+          "dataset": "natural",
+          "execution_id": "natural:12011:2:11:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12011 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12011",
+          "dataset": "natural",
+          "execution_id": "natural:12011:4:12:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12011 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12011",
+          "dataset": "natural",
+          "execution_id": "natural:12011:8:13:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12011 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12011",
+          "dataset": "natural",
+          "execution_id": "natural:12011:16:14:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12011 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12012",
+          "dataset": "natural",
+          "execution_id": "natural:12012:1:15:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12012 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12012",
+          "dataset": "natural",
+          "execution_id": "natural:12012:2:16:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12012 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12012",
+          "dataset": "natural",
+          "execution_id": "natural:12012:4:17:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12012 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12012",
+          "dataset": "natural",
+          "execution_id": "natural:12012:8:18:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12012 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12012",
+          "dataset": "natural",
+          "execution_id": "natural:12012:16:19:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12012 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12013",
+          "dataset": "natural",
+          "execution_id": "natural:12013:1:15:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12013 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12013",
+          "dataset": "natural",
+          "execution_id": "natural:12013:2:16:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12013 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12013",
+          "dataset": "natural",
+          "execution_id": "natural:12013:4:17:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12013 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12013",
+          "dataset": "natural",
+          "execution_id": "natural:12013:8:18:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12013 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12013",
+          "dataset": "natural",
+          "execution_id": "natural:12013:16:19:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12013 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12014",
+          "dataset": "natural",
+          "execution_id": "natural:12014:1:15:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12014 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12014",
+          "dataset": "natural",
+          "execution_id": "natural:12014:2:16:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12014 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12014",
+          "dataset": "natural",
+          "execution_id": "natural:12014:4:17:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12014 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12014",
+          "dataset": "natural",
+          "execution_id": "natural:12014:8:18:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12014 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12014",
+          "dataset": "natural",
+          "execution_id": "natural:12014:16:19:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12014 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12015",
+          "dataset": "natural",
+          "execution_id": "natural:12015:1:15:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12015 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12015",
+          "dataset": "natural",
+          "execution_id": "natural:12015:2:16:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12015 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12015",
+          "dataset": "natural",
+          "execution_id": "natural:12015:4:17:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12015 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12015",
+          "dataset": "natural",
+          "execution_id": "natural:12015:8:18:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12015 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12015",
+          "dataset": "natural",
+          "execution_id": "natural:12015:16:19:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12015 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12016",
+          "dataset": "natural",
+          "execution_id": "natural:12016:1:20:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12016 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12016",
+          "dataset": "natural",
+          "execution_id": "natural:12016:2:21:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12016 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12016",
+          "dataset": "natural",
+          "execution_id": "natural:12016:4:22:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12016 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12016",
+          "dataset": "natural",
+          "execution_id": "natural:12016:8:23:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12016 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12016",
+          "dataset": "natural",
+          "execution_id": "natural:12016:16:24:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12016 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12017",
+          "dataset": "natural",
+          "execution_id": "natural:12017:1:20:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12017 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12017",
+          "dataset": "natural",
+          "execution_id": "natural:12017:2:21:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12017 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12017",
+          "dataset": "natural",
+          "execution_id": "natural:12017:4:22:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12017 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12017",
+          "dataset": "natural",
+          "execution_id": "natural:12017:8:23:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12017 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12017",
+          "dataset": "natural",
+          "execution_id": "natural:12017:16:24:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12017 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12018",
+          "dataset": "natural",
+          "execution_id": "natural:12018:1:20:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12018 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12018",
+          "dataset": "natural",
+          "execution_id": "natural:12018:2:21:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12018 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12018",
+          "dataset": "natural",
+          "execution_id": "natural:12018:4:22:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12018 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12018",
+          "dataset": "natural",
+          "execution_id": "natural:12018:8:23:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12018 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12018",
+          "dataset": "natural",
+          "execution_id": "natural:12018:16:24:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12018 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12019",
+          "dataset": "natural",
+          "execution_id": "natural:12019:1:20:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12019 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12019",
+          "dataset": "natural",
+          "execution_id": "natural:12019:2:21:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12019 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12019",
+          "dataset": "natural",
+          "execution_id": "natural:12019:4:22:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12019 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12019",
+          "dataset": "natural",
+          "execution_id": "natural:12019:8:23:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12019 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12019",
+          "dataset": "natural",
+          "execution_id": "natural:12019:16:24:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12019 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12020",
+          "dataset": "natural",
+          "execution_id": "natural:12020:1:25:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12020 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12020",
+          "dataset": "natural",
+          "execution_id": "natural:12020:2:26:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12020 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12020",
+          "dataset": "natural",
+          "execution_id": "natural:12020:4:27:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12020 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12020",
+          "dataset": "natural",
+          "execution_id": "natural:12020:8:28:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12020 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12020",
+          "dataset": "natural",
+          "execution_id": "natural:12020:16:29:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12020 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12021",
+          "dataset": "natural",
+          "execution_id": "natural:12021:1:25:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12021 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12021",
+          "dataset": "natural",
+          "execution_id": "natural:12021:2:26:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12021 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12021",
+          "dataset": "natural",
+          "execution_id": "natural:12021:4:27:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12021 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12021",
+          "dataset": "natural",
+          "execution_id": "natural:12021:8:28:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12021 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12021",
+          "dataset": "natural",
+          "execution_id": "natural:12021:16:29:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12021 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12022",
+          "dataset": "natural",
+          "execution_id": "natural:12022:1:25:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12022 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12022",
+          "dataset": "natural",
+          "execution_id": "natural:12022:2:26:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12022 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12022",
+          "dataset": "natural",
+          "execution_id": "natural:12022:4:27:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12022 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12022",
+          "dataset": "natural",
+          "execution_id": "natural:12022:8:28:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12022 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12022",
+          "dataset": "natural",
+          "execution_id": "natural:12022:16:29:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12022 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12023",
+          "dataset": "natural",
+          "execution_id": "natural:12023:1:25:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12023 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12023",
+          "dataset": "natural",
+          "execution_id": "natural:12023:2:26:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12023 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12023",
+          "dataset": "natural",
+          "execution_id": "natural:12023:4:27:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12023 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12023",
+          "dataset": "natural",
+          "execution_id": "natural:12023:8:28:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12023 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12023",
+          "dataset": "natural",
+          "execution_id": "natural:12023:16:29:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12023 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12024",
+          "dataset": "natural",
+          "execution_id": "natural:12024:1:30:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12024 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12024",
+          "dataset": "natural",
+          "execution_id": "natural:12024:2:31:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12024 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12024",
+          "dataset": "natural",
+          "execution_id": "natural:12024:4:32:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12024 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12024",
+          "dataset": "natural",
+          "execution_id": "natural:12024:8:33:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12024 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12024",
+          "dataset": "natural",
+          "execution_id": "natural:12024:16:34:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12024 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12025",
+          "dataset": "natural",
+          "execution_id": "natural:12025:1:30:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12025 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12025",
+          "dataset": "natural",
+          "execution_id": "natural:12025:2:31:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12025 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12025",
+          "dataset": "natural",
+          "execution_id": "natural:12025:4:32:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12025 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12025",
+          "dataset": "natural",
+          "execution_id": "natural:12025:8:33:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12025 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12025",
+          "dataset": "natural",
+          "execution_id": "natural:12025:16:34:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12025 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12026",
+          "dataset": "natural",
+          "execution_id": "natural:12026:1:30:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12026 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12026",
+          "dataset": "natural",
+          "execution_id": "natural:12026:2:31:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12026 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12026",
+          "dataset": "natural",
+          "execution_id": "natural:12026:4:32:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12026 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12026",
+          "dataset": "natural",
+          "execution_id": "natural:12026:8:33:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12026 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12026",
+          "dataset": "natural",
+          "execution_id": "natural:12026:16:34:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12026 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12027",
+          "dataset": "natural",
+          "execution_id": "natural:12027:1:30:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "12027",
+          "dataset": "natural",
+          "execution_id": "natural:12027:2:31:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "12027",
+          "dataset": "natural",
+          "execution_id": "natural:12027:4:32:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "12027",
+          "dataset": "natural",
+          "execution_id": "natural:12027:8:33:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "12027",
+          "dataset": "natural",
+          "execution_id": "natural:12027:16:34:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "12028",
+          "dataset": "natural",
+          "execution_id": "natural:12028:1:35:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12028 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12028",
+          "dataset": "natural",
+          "execution_id": "natural:12028:2:36:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12028 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12028",
+          "dataset": "natural",
+          "execution_id": "natural:12028:4:37:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12028 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12028",
+          "dataset": "natural",
+          "execution_id": "natural:12028:8:38:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12028 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12028",
+          "dataset": "natural",
+          "execution_id": "natural:12028:16:39:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12028 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12029",
+          "dataset": "natural",
+          "execution_id": "natural:12029:1:35:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12029 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12029",
+          "dataset": "natural",
+          "execution_id": "natural:12029:2:36:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12029 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12029",
+          "dataset": "natural",
+          "execution_id": "natural:12029:4:37:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12029 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12029",
+          "dataset": "natural",
+          "execution_id": "natural:12029:8:38:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12029 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12029",
+          "dataset": "natural",
+          "execution_id": "natural:12029:16:39:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12029 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12030",
+          "dataset": "natural",
+          "execution_id": "natural:12030:1:35:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12030 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12030",
+          "dataset": "natural",
+          "execution_id": "natural:12030:2:36:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12030 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12030",
+          "dataset": "natural",
+          "execution_id": "natural:12030:4:37:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12030 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12030",
+          "dataset": "natural",
+          "execution_id": "natural:12030:8:38:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12030 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12030",
+          "dataset": "natural",
+          "execution_id": "natural:12030:16:39:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12030 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "12031",
+          "dataset": "natural",
+          "execution_id": "natural:12031:1:35:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12031 partition_count=1 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 1,
+          "valid": false
+        },
+        {
+          "case_identity": "12031",
+          "dataset": "natural",
+          "execution_id": "natural:12031:2:36:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12031 partition_count=2 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 2,
+          "valid": false
+        },
+        {
+          "case_identity": "12031",
+          "dataset": "natural",
+          "execution_id": "natural:12031:4:37:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12031 partition_count=4 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 4,
+          "valid": false
+        },
+        {
+          "case_identity": "12031",
+          "dataset": "natural",
+          "execution_id": "natural:12031:8:38:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12031 partition_count=8 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 8,
+          "valid": false
+        },
+        {
+          "case_identity": "12031",
+          "dataset": "natural",
+          "execution_id": "natural:12031:16:39:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": {
+            "message": "natural internal-stage independent production replay mismatch: case_identity=12031 partition_count=16 checks={'operations_exact': False, 'terminal_fingerprint_exact': False, 'failure_exact': True, 'elapsed_physical_time_exact': True}",
+            "type": "ValueError"
+          },
+          "partition_count": 16,
+          "valid": false
+        },
+        {
+          "case_identity": "checkpoint_restart",
+          "dataset": "neutrality",
+          "execution_id": "neutrality:checkpoint_restart:None:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "fixed_mesh_oblique",
+          "dataset": "neutrality",
+          "execution_id": "neutrality:fixed_mesh_oblique:None:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "monotonic",
+          "dataset": "neutrality",
+          "execution_id": "neutrality:monotonic:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "unload_reload",
+          "dataset": "neutrality",
+          "execution_id": "neutrality:unload_reload:None:3:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "after_promotion",
+          "dataset": "restarts",
+          "execution_id": "restarts:after_promotion:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "available_site",
+          "dataset": "restarts",
+          "execution_id": "restarts:available_site:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "before_ligament",
+          "dataset": "restarts",
+          "execution_id": "restarts:before_ligament:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "before_promotion",
+          "dataset": "restarts",
+          "execution_id": "restarts:before_promotion:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "between_birth_hits",
+          "dataset": "restarts",
+          "execution_id": "restarts:between_birth_hits:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "connected_before_downstream",
+          "dataset": "restarts",
+          "execution_id": "restarts:connected_before_downstream:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "downstream_child_before_continuation",
+          "dataset": "restarts",
+          "execution_id": "restarts:downstream_child_before_continuation:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "embryo",
+          "dataset": "restarts",
+          "execution_id": "restarts:embryo:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "incomplete_first_hit",
+          "dataset": "restarts",
+          "execution_id": "restarts:incomplete_first_hit:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "stable_subgrid_cavity",
+          "dataset": "restarts",
+          "execution_id": "restarts:stable_subgrid_cavity:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "zero_drive_connected",
+          "dataset": "restarts",
+          "execution_id": "restarts:zero_drive_connected:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:cavity_connection",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:cavity_connection:None:26:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:checkpoint_write",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:checkpoint_write:None:32:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:child_creation",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:child_creation:None:29:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:child_support_rebuild",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:child_support_rebuild:None:30:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:child_tip_continuation",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:child_tip_continuation:None:31:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:downstream_source_refinement",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:downstream_source_refinement:None:27:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:downstream_threshold_completion",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:downstream_threshold_completion:None:28:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:equilibrium",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:equilibrium:None:22:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:explicit_cavity_creation",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:explicit_cavity_creation:None:19:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:field_transfer",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:field_transfer:None:21:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:first_hit_threshold_renewal",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:first_hit_threshold_renewal:None:11:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:healing",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:healing:None:14:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:initial_inventory_debit",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:initial_inventory_debit:None:16:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:inventory_return_under_shrinkage",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:inventory_return_under_shrinkage:None:17:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:ligament_graph_edit",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:ligament_graph_edit:None:25:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:ligament_hazard_completion",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:ligament_hazard_completion:None:24:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:promotion_criterion",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:promotion_criterion:None:18:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:promotion_remesh",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:promotion_remesh:None:20:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:resolved_growth_remesh",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:resolved_growth_remesh:None:23:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:second_hit_embryo_transition",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:second_hit_embryo_transition:None:12:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:source_qualification",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:source_qualification:None:38:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:source_quality_acceptance",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:source_quality_acceptance:None:37:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:source_quality_equilibrium",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:source_quality_equilibrium:None:36:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:source_quality_field_transfer",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:source_quality_field_transfer:None:34:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:source_quality_geometry",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:source_quality_geometry:None:33:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:source_quality_support_rebuild",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:source_quality_support_rebuild:None:35:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:stabilization",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:stabilization:None:13:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "lifecycle:state_owned_growth",
+          "dataset": "rollback",
+          "execution_id": "rollback:lifecycle:state_owned_growth:None:15:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament:connected_surface_certification",
+          "dataset": "rollback",
+          "execution_id": "rollback:ligament:connected_surface_certification:None:9:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament:dormant_support_rebuild",
+          "dataset": "rollback",
+          "execution_id": "rollback:ligament:dormant_support_rebuild:None:10:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament:energy_gate",
+          "dataset": "rollback",
+          "execution_id": "rollback:ligament:energy_gate:None:8:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament:equilibrium",
+          "dataset": "rollback",
+          "execution_id": "rollback:ligament:equilibrium:None:7:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament:field_projection",
+          "dataset": "rollback",
+          "execution_id": "rollback:ligament:field_projection:None:5:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament:graph_edit",
+          "dataset": "rollback",
+          "execution_id": "rollback:ligament:graph_edit:None:3:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament:remesh",
+          "dataset": "rollback",
+          "execution_id": "rollback:ligament:remesh:None:4:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament:support_rebuild",
+          "dataset": "rollback",
+          "execution_id": "rollback:ligament:support_rebuild:None:6:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "promotion:equilibrium",
+          "dataset": "rollback",
+          "execution_id": "rollback:promotion:equilibrium:None:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "promotion:field_projection",
+          "dataset": "rollback",
+          "execution_id": "rollback:promotion:field_projection:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "promotion:support_rebuild",
+          "dataset": "rollback",
+          "execution_id": "rollback:promotion:support_rebuild:None:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "continued_accepted_event",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:continued_accepted_event:None:10:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "geometric_promotion",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:geometric_promotion:None:5:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament_rupture",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:ligament_rupture:None:7:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "multi_hit_1",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:multi_hit_1:None:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "multi_hit_2",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:multi_hit_2:None:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "new_graph_front",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:new_graph_front:None:9:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "resolved_growth",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:resolved_growth:None:6:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "source_resolution_attempt",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:source_resolution_attempt:None:8:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "stabilization",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:stabilization:None:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "subgrid_growth",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:subgrid_growth:None:4:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "subgrid_void",
+          "dataset": "stagewise",
+          "execution_id": "stagewise:subgrid_void:None:3:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": null,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_1",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_1:1:11:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_1",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_1:2:12:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_1",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_1:4:13:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_1",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_1:8:14:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_1",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_1:16:15:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_2",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_2:1:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_2",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_2:2:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_2",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_2:4:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_2",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_2:8:3:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "birth_hit_2",
+          "dataset": "transitions",
+          "execution_id": "transitions:birth_hit_2:16:4:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "child_continuation",
+          "dataset": "transitions",
+          "execution_id": "transitions:child_continuation:1:10:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "child_continuation",
+          "dataset": "transitions",
+          "execution_id": "transitions:child_continuation:2:11:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "child_continuation",
+          "dataset": "transitions",
+          "execution_id": "transitions:child_continuation:4:12:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "child_continuation",
+          "dataset": "transitions",
+          "execution_id": "transitions:child_continuation:8:13:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "child_continuation",
+          "dataset": "transitions",
+          "execution_id": "transitions:child_continuation:16:14:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "downstream_child",
+          "dataset": "transitions",
+          "execution_id": "transitions:downstream_child:1:10:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "downstream_child",
+          "dataset": "transitions",
+          "execution_id": "transitions:downstream_child:2:11:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "downstream_child",
+          "dataset": "transitions",
+          "execution_id": "transitions:downstream_child:4:12:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "downstream_child",
+          "dataset": "transitions",
+          "execution_id": "transitions:downstream_child:8:13:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "downstream_child",
+          "dataset": "transitions",
+          "execution_id": "transitions:downstream_child:16:14:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "healing",
+          "dataset": "transitions",
+          "execution_id": "transitions:healing:1:16:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "healing",
+          "dataset": "transitions",
+          "execution_id": "transitions:healing:2:17:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "healing",
+          "dataset": "transitions",
+          "execution_id": "transitions:healing:4:18:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "healing",
+          "dataset": "transitions",
+          "execution_id": "transitions:healing:8:19:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "healing",
+          "dataset": "transitions",
+          "execution_id": "transitions:healing:16:20:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament",
+          "dataset": "transitions",
+          "execution_id": "transitions:ligament:1:21:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament",
+          "dataset": "transitions",
+          "execution_id": "transitions:ligament:2:22:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament",
+          "dataset": "transitions",
+          "execution_id": "transitions:ligament:4:23:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament",
+          "dataset": "transitions",
+          "execution_id": "transitions:ligament:8:24:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "ligament",
+          "dataset": "transitions",
+          "execution_id": "transitions:ligament:16:25:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "promotion",
+          "dataset": "transitions",
+          "execution_id": "transitions:promotion:1:5:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "promotion",
+          "dataset": "transitions",
+          "execution_id": "transitions:promotion:2:6:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "promotion",
+          "dataset": "transitions",
+          "execution_id": "transitions:promotion:4:7:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "promotion",
+          "dataset": "transitions",
+          "execution_id": "transitions:promotion:8:8:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "promotion",
+          "dataset": "transitions",
+          "execution_id": "transitions:promotion:16:9:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "stabilization",
+          "dataset": "transitions",
+          "execution_id": "transitions:stabilization:1:0:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "stabilization",
+          "dataset": "transitions",
+          "execution_id": "transitions:stabilization:2:1:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "stabilization",
+          "dataset": "transitions",
+          "execution_id": "transitions:stabilization:4:2:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "stabilization",
+          "dataset": "transitions",
+          "execution_id": "transitions:stabilization:8:3:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "stabilization",
+          "dataset": "transitions",
+          "execution_id": "transitions:stabilization:16:4:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        },
+        {
+          "case_identity": "subgrid_growth",
+          "dataset": "transitions",
+          "execution_id": "transitions:subgrid_growth:1:5:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 1,
+          "valid": true
+        },
+        {
+          "case_identity": "subgrid_growth",
+          "dataset": "transitions",
+          "execution_id": "transitions:subgrid_growth:2:6:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 2,
+          "valid": true
+        },
+        {
+          "case_identity": "subgrid_growth",
+          "dataset": "transitions",
+          "execution_id": "transitions:subgrid_growth:4:7:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 4,
+          "valid": true
+        },
+        {
+          "case_identity": "subgrid_growth",
+          "dataset": "transitions",
+          "execution_id": "transitions:subgrid_growth:8:8:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 8,
+          "valid": true
+        },
+        {
+          "case_identity": "subgrid_growth",
+          "dataset": "transitions",
+          "execution_id": "transitions:subgrid_growth:16:9:d36f62e8f4f7350c67e2edcd800748ccb63e1fb9",
+          "failure": null,
+          "partition_count": 16,
+          "valid": true
+        }
+      ]
+    },
+    "valid": false
+  },
+  "mandatory_scientific_gates": {
+    "actual_downstream_child": true,
+    "all_11_common_terminal_restarts": true,
+    "all_12_controlled_histories": false,
+    "all_28_lifecycle_rollback_stages": true,
+    "all_45_transition_partitions": true,
+    "coarse_unqualified_negative_retained": true,
+    "complete_lifecycle_evidence_ontology": false,
+    "complete_static_numerical_families": false,
+    "disabled_future_causal_neutrality": true,
+    "natural_32_seed_160_partition_restart_peers": true,
+    "ordinary_child_continuation_and_source_tensor_causality": true,
+    "qualified_production_source": true,
+    "r_tip_causal_use": false,
+    "reciprocal_R_void_not_substituted_for_r_tip": true,
+    "same_head_disabled_dispatch": true,
+    "stagewise_topology_and_conservation": true
+  },
+  "mission_terminal": false,
+  "natural_partitions_restart": {
+    "passed": 160,
+    "total": 160
+  },
+  "r_tip_causal_classification": "MISSING_ACCEPTED_R_TIP_CONSTITUTIVE_LINK",
+  "r_tip_causal_gates": {
+    "all_controlled_threshold_events_complete": true,
+    "controlled_peers_hold_required_inputs_fixed": true,
+    "r_tip_changes_accepted_rate_or_barrier": false,
+    "r_tip_distinct_from_R_void": true,
+    "reciprocal_R_void_not_substituted_for_r_tip": true
+  },
+  "record_kind": "DERIVED_NOT_ADDITIONAL_EXECUTION",
+  "release_candidate_authorized": false,
+  "remaining_publication_requirements": [
+    "exact-head CI terminal result",
+    "repository-wide inherited failure classification",
+    "final PR63 ledger"
+  ],
+  "restart_exact": 11,
+  "rollback": {
+    "passed": 39,
+    "total": 39
+  },
+  "schema": "v5.final-physics-closure-scientific-ledger/2",
+  "scientific_decision": "BLOCKED",
+  "source_causality_gates": {
+    "actual_ordinary_child_continuation": true,
+    "cavity_probe_cannot_influence_continuation": true,
+    "changed_cavity_source_rejected_without_recognition_as_qualified": true,
+    "child_tensor_changes_actual_continuation_rate": true,
+    "owned_radius_causally_enters_continuation_law": false,
+    "radius_separate_from_void_radius": true,
+    "zero_child_tip_drive_creates_no_event": true
+  },
+  "static_derivatives": {
+    "passed": 8,
+    "total": 12
+  },
+  "static_families": {
+    "passed": 0,
+    "total": 33
+  },
+  "transition_partitions": {
+    "passed": 45,
+    "total": 45
+  }
+}

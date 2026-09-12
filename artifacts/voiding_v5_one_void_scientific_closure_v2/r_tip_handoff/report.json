@@ -1,0 +1,211 @@
+{
+  "R_TIP_CAUSAL_LAW": "NOT_DEFINED",
+  "R_TIP_DISTINCT_FROM_VOID_RADIUS": "PASS",
+  "R_TIP_OWNERSHIP": "PASS",
+  "accepted_original_sharp_front_relation": {
+    "exists": true,
+    "form": "sigma_tip = K_eff / sqrt(2*pi*r_eff)",
+    "location": {
+      "first_line": 241,
+      "function": "sigma_tip",
+      "last_line": 247,
+      "path": "arrhenius_fracture/sharp_front.py",
+      "sha256": "1cdfaa008d86abb07c5781bf230045d3212248a4505ca2c9e7e52b2eea86673f"
+    }
+  },
+  "canonical_evidence": true,
+  "child_continuation_path": {
+    "FEM_tensor_to_intensity_operator_present": false,
+    "child_radius_bound_to_analytical_engine": false,
+    "child_radius_enters_rate_adapter": false,
+    "child_radius_enters_tensor_observer": false,
+    "emission_barrier_or_rate_consumed": false,
+    "post_event_r_tip_renewal_law": "fresh child initialized from max(hbar_tip,10b); continuation retains owned r_tip",
+    "rate_input": "candidate_normal_resolved_opening_stress",
+    "source": "area_weighted_aligned_child_tip_CST_tensor"
+  },
+  "consumer_graph": {
+    "disconnected_accepted_subgraph": [
+      {
+        "from": "intensity_K",
+        "role": "accepted_original_sharp_front_input",
+        "to": "FrontEngine.sigma_tip"
+      },
+      {
+        "from": "FrontEngine.r_eff",
+        "role": "accepted_original_radius_input",
+        "to": "FrontEngine.sigma_tip"
+      },
+      {
+        "from": "FrontEngine.sigma_tip",
+        "role": "accepted_original_cleavage_path",
+        "to": "FrontEngine.lambda_cleave"
+      },
+      {
+        "from": "FrontEngine.sigma_tip",
+        "role": "accepted_original_emission_path",
+        "to": "FrontEngine.lambda_emit"
+      }
+    ],
+    "edges": [
+      {
+        "from": "tip_process_state.r_tip_m",
+        "role": "exact_ownership_mirror",
+        "to": "child_branch.local_state.r_tip_m"
+      },
+      {
+        "from": "crack_tip_tensor",
+        "role": "direct_resolved_FEM_stress",
+        "to": "directional_clock_rates"
+      },
+      {
+        "from": "directional_clock_rates",
+        "role": "resolved_opening_stress_and_temperature",
+        "to": "FrontEngine.lambda_cleave"
+      },
+      {
+        "from": "directional_clock_rates",
+        "role": "completed_cleavage_first_passages",
+        "to": "_select_emitted_proposal"
+      },
+      {
+        "from": "_select_emitted_proposal",
+        "role": "selected_continuation_event",
+        "to": "downstream_front_transaction"
+      },
+      {
+        "from": "downstream_front_transaction",
+        "role": "fresh_child_initialization_then_preservation_only",
+        "to": "renewed_child_r_tip"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "tip_process_state.r_tip_m",
+        "kind": "owned_child_state"
+      },
+      {
+        "id": "child_branch.local_state.r_tip_m",
+        "kind": "owned_state_mirror"
+      },
+      {
+        "first_line": 351,
+        "function": "crack_tip_tensor",
+        "id": "crack_tip_tensor",
+        "kind": "local_FEM_tensor_observer",
+        "last_line": 369,
+        "path": "arrhenius_fracture/voiding_production_v5.py",
+        "sha256": "590fdbc652428a8f7038853b97b66e75c2080988d33c17ec8489265ea5049674"
+      },
+      {
+        "first_line": 956,
+        "function": "directional_clock_rates",
+        "id": "directional_clock_rates",
+        "kind": "resolved_stress_rate_adapter",
+        "last_line": 977,
+        "path": "arrhenius_fracture/voiding_production_v5.py",
+        "sha256": "78722786409523305099cf8f00aa1e6fbc7ddaec2a5a2d1f6344659e360cce81"
+      },
+      {
+        "first_line": 267,
+        "function": "lambda_cleave",
+        "id": "FrontEngine.lambda_cleave",
+        "kind": "accepted_barrier_and_rate_law",
+        "last_line": 285,
+        "path": "arrhenius_fracture/sharp_front.py",
+        "sha256": "0994422f934fa46ae51b1c9837b35912f776996193896978a920838efd32902e"
+      },
+      {
+        "first_line": 261,
+        "function": "lambda_emit",
+        "id": "FrontEngine.lambda_emit",
+        "kind": "accepted_emission_barrier_and_rate_law",
+        "last_line": 265,
+        "path": "arrhenius_fracture/sharp_front.py",
+        "sha256": "1e4fd70ca8028ffd9a4c44bbe72f411534e6aac38432ca8d5cbbf654b1f4557b"
+      },
+      {
+        "first_line": 241,
+        "function": "sigma_tip",
+        "id": "FrontEngine.sigma_tip",
+        "kind": "accepted_K_over_sqrt_radius_law",
+        "last_line": 247,
+        "path": "arrhenius_fracture/sharp_front.py",
+        "sha256": "1cdfaa008d86abb07c5781bf230045d3212248a4505ca2c9e7e52b2eea86673f"
+      },
+      {
+        "first_line": 1438,
+        "function": "_select_emitted_proposal",
+        "id": "_select_emitted_proposal",
+        "kind": "continuation_event_selector",
+        "last_line": 1456,
+        "path": "arrhenius_fracture/voiding_production_v5.py",
+        "sha256": "768364dec8fc9174140c8433d2159ae8e0e21bd2df22c57d901f83c881697fcd"
+      },
+      {
+        "first_line": 1709,
+        "function": "downstream_front_transaction",
+        "id": "downstream_front_transaction",
+        "kind": "child_continuation_transaction",
+        "last_line": 1927,
+        "path": "arrhenius_fracture/voiding_production_v5.py",
+        "sha256": "36973cb627c0cdf2c190b694c2a3f2c8d0eb62838a943998bed59e345c54fa78"
+      },
+      {
+        "id": "renewed_child_r_tip",
+        "kind": "post_event_owned_state"
+      }
+    ],
+    "required_but_absent_edges": [
+      {
+        "from": "tip_process_state.r_tip_m",
+        "to": "local_FEM_to_sharp_front_matching_operator"
+      },
+      {
+        "from": "crack_tip_tensor",
+        "to": "local_FEM_to_sharp_front_matching_operator"
+      },
+      {
+        "from": "local_FEM_to_sharp_front_matching_operator",
+        "to": "FrontEngine.sigma_tip"
+      }
+    ],
+    "schema": "v5.r-tip-consumer-graph/2"
+  },
+  "executed_code_sha": "757ad9bae3ac6d2b035917660cd22514b9a7aa33",
+  "forbidden_repairs": [
+    "empirical_multiplier_of_r_tip",
+    "empirical_multiplier_of_R_void",
+    "de_smearing_or_amplification_of_explicit_FEM_stress_without_an_accepted_matching_derivation"
+  ],
+  "model_form_complete": false,
+  "protocol_sha256": "c9e335c9917d37bae8df8138d91cedf80af8d32f571f32d4c6a2bdb44e85bc60",
+  "reciprocal_control_prediction": "R_void variation cannot alter child rate when FEM fields, child source, and r_tip are frozen",
+  "schema": "v5.one-void-r-tip-constitutive-handoff/2",
+  "scientific_classification": "R_TIP_CAUSAL_LAW_NOT_DEFINED",
+  "scope": "READ_ONLY_CONSUMER_GRAPH_AND_MODEL_FORM_AUDIT",
+  "signed_analytical_prediction_frozen_before_any_future_implementation": [
+    {
+      "predicted_barrier_direction": "not_higher",
+      "predicted_crossing_time_direction": "not_later",
+      "predicted_rate_direction": "not_lower",
+      "r_tip_over_r0": 0.75,
+      "uncapped_sigma_over_baseline_at_fixed_positive_K": 1.1547005383792515
+    },
+    {
+      "predicted_barrier_direction": "unchanged",
+      "predicted_crossing_time_direction": "unchanged",
+      "predicted_rate_direction": "unchanged",
+      "r_tip_over_r0": 1.0,
+      "uncapped_sigma_over_baseline_at_fixed_positive_K": 1.0
+    },
+    {
+      "predicted_barrier_direction": "not_lower",
+      "predicted_crossing_time_direction": "not_earlier",
+      "predicted_rate_direction": "not_higher",
+      "r_tip_over_r0": 1.25,
+      "uncapped_sigma_over_baseline_at_fixed_positive_K": 0.8944271909999159
+    }
+  ],
+  "worktree_status": ""
+}

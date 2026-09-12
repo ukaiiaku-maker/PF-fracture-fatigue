@@ -1,0 +1,33 @@
+{
+  "clean_exact_head_at_end": true,
+  "executed_code_sha": "ec79645f9fe8f7a5dca92fecd94d79d5eda89b28",
+  "execution_completed": true,
+  "numerical_environment": {
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "numerical_package_versions": {
+    "gmsh": null,
+    "llvmlite": null,
+    "numba": null,
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "triangle": null
+  },
+  "operations": [
+    {
+      "operation": "lifecycle",
+      "returncode": 0,
+      "script": "run_voiding_v5_closure_lifecycle.py"
+    }
+  ],
+  "phase": "lifecycle",
+  "python_version": "3.12.14",
+  "schema": "v5.source-resolution-final-phase-execution/1",
+  "scientific_pass": "SEPARATELY_RECOMPUTED_NOT_INFERRED_FROM_PROCESS_EXIT",
+  "section": "transitions",
+  "shard_count": 3,
+  "shard_index": 1
+}

@@ -1,0 +1,157 @@
+name: Historical V3 closure archival replay (original comparisons retained)
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_legacy_campaign:
+        description: Also replay the superseded complete V3 campaign
+        type: boolean
+        default: false
+
+jobs:
+  closure-traction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Require exact implementation head
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Closure, cavity-edge ownership, and fixed-geometry regression
+        run: >-
+          python -m pytest -q tests/test_finalization_v3_closure_schema.py
+          tests/test_closure_static_evidence.py tests/test_explicit_cavity_v5.py
+          tests/test_crack_void_fixed_geometry_v3.py tests/test_production_source_resolution_v3.py
+          tests/test_closure_mechanics_evidence.py tests/test_closure_lifecycle_evidence.py
+          tests/test_closure_lifecycle_rollback.py tests/test_voiding_lifecycle_driver_v5.py
+          tests/test_v5_clean_historical_neutrality.py
+          tests/test_closure_publication_package.py
+          tests/test_closure_production_topology_audit.py
+          tests/test_no_legacy_variational_modules.py
+          --junitxml=/tmp/voiding_v5_finalization_v3_closure/focused.xml
+      - name: Unique source-resolved traction A and B
+        run: |
+          python scripts/qualify_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-a
+          python scripts/qualify_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-b
+          diff -ru /tmp/voiding_v5_finalization_v3_closure/traction-source-a /tmp/voiding_v5_finalization_v3_closure/traction-source-b
+      - name: Source reassembly, ontology and manifests for both fresh peers
+        run: |
+          python scripts/validate_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-a
+          python scripts/validate_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-b
+      - name: Strict retained historical canonical comparison
+        run: python scripts/validate_voiding_v5_closure_traction.py /tmp/voiding_v5_finalization_v3_closure/traction-source-a --canonical artifacts/voiding_v5_finalization_v3_closure/traction_linux_a
+      - name: Clean-worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: voiding-v5-closure-traction-${{ github.sha }}
+          path: /tmp/voiding_v5_finalization_v3_closure
+
+  closure-campaign:
+    if: inputs.run_legacy_campaign
+    runs-on: ubuntu-latest
+    # Full physical A/B execution plus separate raw-source reassembly.
+    # This is a wall-clock budget, not a scientific acceptance tolerance.
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - phase: mechanics
+            runner: qualify_voiding_v5_closure_mechanics.py
+          - phase: production
+            runner: qualify_voiding_v5_production_transfer.py
+          - phase: lifecycle
+            runner: run_voiding_v5_closure_lifecycle.py
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Require exact implementation head
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Actual source-bound A and B (failed science is retained)
+        run: |
+          python scripts/${{ matrix.runner }} /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-a
+          python scripts/${{ matrix.runner }} /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-b
+      - name: Exact recursive comparison, manifests and recomputed ontology
+        run: |
+          diff -ru /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-a /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-b
+          python scripts/validate_voiding_v5_closure_bundle.py /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-a
+          python scripts/validate_voiding_v5_closure_bundle.py /tmp/voiding_v5_finalization_v3_closure/${{ matrix.phase }}-b
+      - name: Independent topology and accounting for every production resolution
+        if: matrix.phase == 'production'
+        run: |
+          python scripts/qualify_voiding_v5_closure_production_topology.py /tmp/voiding_v5_finalization_v3_closure/production-a /tmp/voiding_v5_finalization_v3_closure/production-topology-a.json
+          python scripts/qualify_voiding_v5_closure_production_topology.py /tmp/voiding_v5_finalization_v3_closure/production-b /tmp/voiding_v5_finalization_v3_closure/production-topology-b.json
+          diff -u /tmp/voiding_v5_finalization_v3_closure/production-topology-a.json /tmp/voiding_v5_finalization_v3_closure/production-topology-b.json
+      - name: Clean-worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: voiding-v5-closure-${{ matrix.phase }}-${{ github.sha }}
+          path: /tmp/voiding_v5_finalization_v3_closure
+
+  closure-independent-audits:
+    needs: [closure-traction, closure-campaign]
+    if: always() && inputs.run_legacy_campaign
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e '.[test]'
+      - name: Exact head and historical Stage-II worker
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git worktree add --detach /tmp/closure-stage2-base 326e3f5973ef623781ab8568798c495a3f68238c
+      - name: Clean historical V12-disabled neutrality A and B
+        run: |
+          python scripts/qualify_v5_disabled_neutrality_clean.py /tmp/closure-independent/neutrality-a --base-worktree /tmp/closure-stage2-base
+          python scripts/qualify_v5_disabled_neutrality_clean.py /tmp/closure-independent/neutrality-b --base-worktree /tmp/closure-stage2-base
+          diff -ru /tmp/closure-independent/neutrality-a /tmp/closure-independent/neutrality-b
+      - name: Full regressions and exact inherited versus Policy-C triage
+        if: always()
+        run: |
+          mkdir -p /tmp/closure-independent/regressions
+          set +e
+          python -m pytest -q --junitxml=/tmp/closure-independent/regressions/full.xml > /tmp/closure-independent/regressions/full.log 2>&1
+          result=$?
+          set -e
+          python scripts/triage_voiding_v5_closure_regressions.py artifacts/voiding_v5_finalization_v3_closure/regressions/full-regression-3cbb11b.xml --rerun /tmp/closure-independent/regressions/full.xml > /tmp/closure-independent/regressions/triage.json
+          test "$result" -le 1
+          python -c 'import json; p=json.load(open("/tmp/closure-independent/regressions/triage.json")); print(p["repository_wide_ci"]); assert not p["rerun_additional_failures"], p["rerun_additional_failures"]'
+      - name: Clean-worktree and diff checks
+        if: always()
+        run: |
+          git diff --check
+          test -z "$(git status --short)"
+          test -z "$(git -C /tmp/closure-stage2-base status --short)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: voiding-v5-closure-independent-audits-${{ github.sha }}
+          path: /tmp/closure-independent

@@ -1,0 +1,190 @@
+{
+  "actual_operations": [
+    {
+      "api": "_complete_next_clock",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 2050902796308676.2,
+          "crossing_time_s": 1.640722237046941e+16,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927935,
+          "winner": false
+        }
+      ],
+      "duration_s": 2050902796308676.2
+    },
+    {
+      "api": "_complete_next_clock",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 2050902796308676.2,
+          "crossing_time_s": 1.4356319574160736e+16,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927935,
+          "winner": false
+        }
+      ],
+      "duration_s": 2050902796308676.2
+    },
+    {
+      "api": "_complete_next_clock",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 2050902796308676.2,
+          "crossing_time_s": 1.2305416777852058e+16,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927935,
+          "winner": false
+        }
+      ],
+      "duration_s": 2050902796308676.2
+    },
+    {
+      "api": "_complete_next_clock",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 2050902796308676.2,
+          "crossing_time_s": 1.0254513981543382e+16,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927935,
+          "winner": false
+        }
+      ],
+      "duration_s": 2050902796308676.2
+    },
+    {
+      "api": "_complete_next_clock",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 2050902796308676.2,
+          "crossing_time_s": 8203611185234705.0,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927935,
+          "winner": false
+        }
+      ],
+      "duration_s": 2050902796308676.2
+    },
+    {
+      "api": "_complete_next_clock",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 2050902796308676.2,
+          "crossing_time_s": 6152708388926029.0,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927935,
+          "winner": false
+        }
+      ],
+      "duration_s": 2050902796308676.2
+    },
+    {
+      "api": "_complete_next_clock",
+      "audit": [
+        {
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "common_advance_duration_s": 2050902796308676.2,
+          "crossing_time_s": 4101805592617353.5,
+          "effective_rate_s": 4.899227024523537e-17,
+          "emitted_event_ids": [],
+          "hazard_barrier_J": 3.770213546341437e-19,
+          "rate_s": 4.899227024523537e-17,
+          "raw_rate_s": 4.899227024523537e-17,
+          "resolved_opening_stress_Pa": 1240.5836116927935,
+          "winner": false
+        }
+      ],
+      "duration_s": 2050902796308676.2
+    },
+    {
+      "accepted": true,
+      "api": "ligament_transaction",
+      "operations": [
+        "accepted_snapshot",
+        "intersection_alignment",
+        "exit_alignment",
+        "graph_edit",
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "cavity_phase_update",
+        "length_ledger_update:fractured_ligament_length_m",
+        "length_ledger_update:active_front_coordinate_advance_m",
+        "length_ledger_update:physical_active_front_travel_m",
+        "length_ledger_update:projected_fractured_length_m",
+        "length_ledger_update:projected_front_advance_m",
+        "length_ledger_update:preexisting_void_free_span_m",
+        "length_ledger_update:connected_void_free_span_m",
+        "length_ledger_update:projected_connected_void_free_span_m",
+        "length_ledger_update:connected_free_surface_extent_m",
+        "root_status_change",
+        "dormant_support_rebuild",
+        "connected_surface_certification",
+        "field_transfer",
+        "equilibrium",
+        "energy_gate",
+        "process_state_update",
+        "topology_verification",
+        "late_event_veto"
+      ]
+    }
+  ],
+  "case_identity": "ligament",
+  "conservation": {
+    "active_tip_ids": [],
+    "cavity_area_identity_error_m2": 0.0,
+    "inventory_error_m2": 0.0,
+    "length_error_m": 0.0,
+    "passed": true,
+    "single_void": true,
+    "support_tip_ids": []
+  },
+  "dataset": "transitions",
+  "executed_code_sha": "3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "execution_id": "transitions:ligament:8:33:3cbb11b7eb073c3a376e24d0a0d93610fe5eb717",
+  "failure": null,
+  "initial_checkpoint": "checkpoints/bb5fd8e3a9efb5ddd8039fead0905a1fd1cb7ee9c0652153278fc86c59332b98.json",
+  "initial_fingerprint": "bb5fd8e3a9efb5ddd8039fead0905a1fd1cb7ee9c0652153278fc86c59332b98",
+  "input_configuration": {
+    "fixed_opening_m": 4e-07,
+    "partition_count": 8,
+    "predecessor_available": true,
+    "requested_predecessor": "resolved_growth",
+    "seed": 3621
+  },
+  "input_hash": "0fb626a24eb4ead78fc2f1ff93461ebb3a5562afd18781ee5e151a8bd82360fb",
+  "partition_count": 8,
+  "terminal_checkpoint": "checkpoints/35aa2ff112a2f6031616ced194bf03f2a32f435d2ffb9bd2cb50844560f4d1d0.json",
+  "terminal_fingerprint": "35aa2ff112a2f6031616ced194bf03f2a32f435d2ffb9bd2cb50844560f4d1d0",
+  "transition_occurred": true
+}
