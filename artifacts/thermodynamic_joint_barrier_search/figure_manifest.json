@@ -1,0 +1,114 @@
+[
+  {
+    "figure": "01_300K_SINGLE_EXP_AND_GUARD_SURFACES.png",
+    "source_artifacts": [
+      "retained_joint_candidates.json"
+    ]
+  },
+  {
+    "figure": "02_CLEAVAGE_ENTROPY_VS_STRESS.png",
+    "source_artifacts": [
+      "entropy_activation_volume_fields.parquet"
+    ]
+  },
+  {
+    "figure": "03_EMISSION_ENTROPY_VS_STRESS.png",
+    "source_artifacts": [
+      "entropy_activation_volume_fields.parquet"
+    ]
+  },
+  {
+    "figure": "04_ACTIVATION_VOLUME_VS_STRESS_AND_T.png",
+    "source_artifacts": [
+      "entropy_activation_volume_fields.parquet"
+    ]
+  },
+  {
+    "figure": "05_MAXWELL_CROSS_DERIVATIVE_RESIDUAL.png",
+    "source_artifacts": [
+      "maxwell_relation_audit.csv"
+    ]
+  },
+  {
+    "figure": "06_300K_FATIGUE_PRESERVATION.png",
+    "source_artifacts": [
+      "temperature_dependent_fatigue_predictions.parquet"
+    ]
+  },
+  {
+    "figure": "07_TEMPERATURE_DEPENDENT_FATIGUE_RATES.png",
+    "source_artifacts": [
+      "temperature_dependent_fatigue_predictions.parquet"
+    ]
+  },
+  {
+    "figure": "08_ABSOLUTE_KFP_VS_T.png",
+    "source_artifacts": [
+      "threshold_rate_robustness.csv"
+    ]
+  },
+  {
+    "figure": "09_NORMALIZED_KFP_VS_T.png",
+    "source_artifacts": [
+      "threshold_rate_robustness.csv"
+    ]
+  },
+  {
+    "figure": "10_F0_VS_F1_STATE_CONTRIBUTION.png",
+    "source_artifacts": [
+      "f1_state_screen.parquet"
+    ]
+  },
+  {
+    "figure": "11_ACCESSIBILITY_AND_SATURATION_MAP.png",
+    "source_artifacts": [
+      "threshold_rate_robustness.csv"
+    ]
+  },
+  {
+    "figure": "12_EMISSION_MINUS_CLEAVAGE_COMPETITION.png",
+    "source_artifacts": [
+      "emission_cleavage_competition.csv"
+    ]
+  },
+  {
+    "figure": "13_TOPOLOGY_DESCRIPTOR_MAP.png",
+    "source_artifacts": [
+      "topology_descriptors.csv"
+    ]
+  },
+  {
+    "figure": "14_FATIGUE_SLOPE_VS_FRACTURE_SCALE.png",
+    "source_artifacts": [
+      "fatigue_preservation_metrics.csv",
+      "topology_descriptors.csv"
+    ]
+  },
+  {
+    "figure": "15_EMISSION_ENTROPY_VS_RESPONSE_TOPOLOGY.png",
+    "source_artifacts": [
+      "retained_joint_candidates.csv",
+      "topology_descriptors.csv"
+    ]
+  },
+  {
+    "figure": "16_CLEAVAGE_ENTROPY_VS_RESPONSE_TOPOLOGY.png",
+    "source_artifacts": [
+      "retained_joint_candidates.csv",
+      "topology_descriptors.csv"
+    ]
+  },
+  {
+    "figure": "17_PARETO_CANDIDATE_COMPARISON.png",
+    "source_artifacts": [
+      "pareto_front.csv"
+    ]
+  },
+  {
+    "figure": "18_FINAL_RETAINED_JOINT_CANDIDATES.png",
+    "source_artifacts": [
+      "threshold_rate_robustness.csv",
+      "temperature_dependent_fatigue_predictions.parquet"
+    ]
+  }
+]

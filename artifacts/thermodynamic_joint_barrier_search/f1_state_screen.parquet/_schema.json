@@ -1,0 +1,16 @@
+{
+  "candidate_id": "str",
+  "parent_id": "str",
+  "temperature_K": "float64",
+  "Kdot": "float64",
+  "threshold": "str",
+  "F0_K_FP": "float64",
+  "F1_status": "str",
+  "F1_K_FP": "float64",
+  "F1_over_F0": "float64",
+  "r_eff_m": "float64",
+  "action": "float64",
+  "nfev": "float64",
+  "accessibility": "str",
+  "failure_reason": "str"
+}

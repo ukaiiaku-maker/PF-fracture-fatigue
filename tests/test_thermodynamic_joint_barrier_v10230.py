@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from scripts.analyze_forward_temperature_v10230 import source_rows
-from arrhenius_fracture.thermodynamic_joint_barrier_v10230 import (
+from scripts.thermodynamic_joint_barrier_v10230 import (
     KB_EV_PER_K, EV_J, candidate_surface_from_parameters,
 )
 

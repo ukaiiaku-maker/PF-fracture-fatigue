@@ -1,0 +1,15 @@
+{
+  "candidate_counts": {
+    "delta_cp_extension": 32768,
+    "primary_sobol": 131072,
+    "retained": 12,
+    "structured": 3072
+  },
+  "figures": 18,
+  "independent_maxwell_max_abs_m3_per_K": 9.944631486382175e-41,
+  "independent_root_max_abs_error_MPa_sqrt_m": 0.00012185150277588264,
+  "physical_simulations_launched": 0,
+  "production_solver_modified": false,
+  "status": "PASS",
+  "verifier": "STRICT_INDEPENDENT_ANALYTICAL_RECOMPUTATION"
+}
