@@ -131,7 +131,11 @@ def _boundary_fingerprints(state):
         local_id = {node: index for index, node in enumerate(ordered)}
         return _hash({
             "coordinates_m": nodes[ordered].tolist(),
-            "edges_local": [[local_id[a], local_id[b]] for a, b in canonical_edges],
+            "edges_local": (
+                sorted(sorted((local_id[a], local_id[b])) for a, b in canonical_edges)
+                if historical_arc_order else
+                [[local_id[a], local_id[b]] for a, b in canonical_edges]
+            ),
         })
 
     midpoints = nodes[edges].mean(axis=1) - center
