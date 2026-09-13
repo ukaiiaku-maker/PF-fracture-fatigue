@@ -78,6 +78,20 @@ def _compact_observables(full):
     return compact
 
 
+def _compact_equilibrated_recovery(full):
+    keys = (
+        "schema", "operator", "available", "scientific_unavailability",
+        "zero_boundary_traction_imposed", "equilibrium_constraint",
+        "internal_traction_continuity", "airy_maximum_degree", "rank",
+        "required_rank", "condition", "condition_limit", "fit_residual",
+        "fit_residual_limit", "minimum_support_quality", "source_tensor_Pa",
+        "boundary_resultant_N_per_m", "boundary_traction_rms_Pa",
+        "normalized_boundary_traction", "remote_traction_scale_Pa",
+        "window_identity", "state_fingerprint",
+    )
+    return {key: full[key] for key in keys if key in full}
+
+
 def _hash(value):
     encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
     return hashlib.sha256(encoded.encode()).hexdigest()
@@ -223,9 +237,9 @@ def _run_level(bundle, retained_path, *, sectors, local_level, reference):
         "raw_adjacent_element_traction_normalized": metrics[
             "raw_adjacent_element_traction_normalized"
         ],
-        "equilibrated_boundary_traction_recovery_v1": metrics[
-            "equilibrated_boundary_traction_recovery_v1"
-        ],
+        "equilibrated_boundary_traction_recovery_v1": _compact_equilibrated_recovery(
+            metrics["equilibrated_boundary_traction_recovery_v1"]
+        ),
         "assembled_weak_cavity_boundary_residual_normalized": metrics[
             "assembled_weak_cavity_boundary_residual_normalized"
         ],
