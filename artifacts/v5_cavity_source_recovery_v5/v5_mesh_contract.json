@@ -1,0 +1,85 @@
+{
+  "acceptance_minimum_quality": 0.05,
+  "angular_geometry_family": {
+    "conditional_level_256": "ONLY_IF_64_TO_128_FAILS",
+    "fixed_polygon_selection_rule": "SELECT_128_IF_64_TO_128_PASSES_ELSE_RUN_256_AND_SELECT_256_ONLY_IF_128_TO_256_PASSES",
+    "matched_boundary_node_count": 512,
+    "matched_local_resolution": true,
+    "required_levels": [
+      64,
+      128
+    ]
+  },
+  "construction_target_minimum_quality": 0.1,
+  "diagnostic_separation": [
+    "constrained_boundary_limit_tensor",
+    "raw_adjacent_element_traction",
+    "assembled_weak_cavity_boundary_residual",
+    "constrained_fit_residual",
+    "patch_rank_and_condition",
+    "local_and_global_source_tensor",
+    "eta_n_and_eta_t",
+    "local_and_global_minimum_quality"
+  ],
+  "fixed_acceptance": {
+    "accepted_input_state_unchanged_on_noncertification": true,
+    "bounded_patch_conditioning": true,
+    "eta_n_max": 0.03,
+    "eta_t_max": 0.025,
+    "fixed_discrete_cavity_boundary_fingerprint": true,
+    "fixed_physical_window_identity": true,
+    "minimum_quality": 0.05,
+    "raw_normalized_traction_max": 0.05,
+    "tensor_relative_max": 0.05
+  },
+  "local_levels": [
+    {
+      "discrete_cavity_boundary_fingerprint": "b1dd9e1aa4952807ac081036fe5be5a579df9ccd297af2e7a4162374fcce8cb7",
+      "element_count": 26368,
+      "eta_n_target": 0.06,
+      "eta_t_target": 0.05,
+      "first_strip_radial_subdivisions": 2,
+      "level": "A",
+      "node_count": 13568,
+      "polygon_geometry_fingerprint": "7cb16adf9f7464ef5233ba4f56992e455d11770fe4d219939ff28479bf10d11b",
+      "pre_fem_minimum_quality": 0.20252814641506897
+    },
+    {
+      "discrete_cavity_boundary_fingerprint": "b1dd9e1aa4952807ac081036fe5be5a579df9ccd297af2e7a4162374fcce8cb7",
+      "element_count": 28416,
+      "eta_n_target": 0.03,
+      "eta_t_target": 0.025,
+      "first_strip_radial_subdivisions": 4,
+      "level": "B",
+      "node_count": 14592,
+      "polygon_geometry_fingerprint": "7cb16adf9f7464ef5233ba4f56992e455d11770fe4d219939ff28479bf10d11b",
+      "pre_fem_minimum_quality": 0.20252814641506897
+    },
+    {
+      "discrete_cavity_boundary_fingerprint": "b1dd9e1aa4952807ac081036fe5be5a579df9ccd297af2e7a4162374fcce8cb7",
+      "element_count": 32512,
+      "eta_n_target": 0.015,
+      "eta_t_target": 0.0125,
+      "first_strip_radial_subdivisions": 8,
+      "level": "C",
+      "node_count": 16640,
+      "polygon_geometry_fingerprint": "7cb16adf9f7464ef5233ba4f56992e455d11770fe4d219939ff28479bf10d11b",
+      "pre_fem_minimum_quality": 0.20252814641506897
+    }
+  ],
+  "maximum_mesh_construction_strategies": 2,
+  "mesh_contract": "CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5",
+  "prospectively_frozen_before_central_dbtt_evaluation": true,
+  "schema": "v5.cavity-source-shape-regular-local-patch-contract/1",
+  "scope": {
+    "fatigue_started": false,
+    "finite_activation_zone_observable_derived": false,
+    "material_or_core_law_changed": false,
+    "oracle_generated": false,
+    "paired_trajectories_run": false,
+    "r_tip_equals_R_void": false,
+    "r_tip_law_changed": false,
+    "scientific_tolerance_changed": false
+  },
+  "selected_construction_strategy": "DETERMINISTIC_TWO_TO_ONE_STRUCTURED_LOCAL_PATCH"
+}
