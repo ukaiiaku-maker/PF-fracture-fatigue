@@ -176,7 +176,10 @@ def _boundary_fingerprints(state):
     }
 
 
-def _run_level(bundle, retained_path, *, sectors, local_level, reference):
+def _run_level(
+    bundle, retained_path, *, sectors, local_level, reference,
+    final_traction_verification=False,
+):
     preconnection, _ = deterministic_trajectory(
         bundle=bundle, stop_before_ligament=True, crack_path_m=retained_path,
         boundary_segments=sectors, radial_layers=RADIAL_LAYERS,
@@ -190,7 +193,8 @@ def _run_level(bundle, retained_path, *, sectors, local_level, reference):
     binding = _cavity_resolution_binding(connected)
     try:
         metrics = cavity_source_resolution_metrics(
-            connected, geometry_contract=MESH_CONTRACT_ID
+            connected, geometry_contract=MESH_CONTRACT_ID,
+            final_traction_verification=final_traction_verification,
         )
         scientific_unavailability = None
     except CavitySourceGeometryV4Unavailable as exc:
@@ -248,6 +252,12 @@ def _run_level(bundle, retained_path, *, sectors, local_level, reference):
         "equilibrated_boundary_traction_recovery_v1": _compact_equilibrated_recovery(
             metrics["equilibrated_boundary_traction_recovery_v1"]
         ),
+        **({
+            "arc_resolved_cavity_traction_v1": metrics["arc_resolved_cavity_traction_v1"],
+            "piecewise_equilibrated_boundary_stress_v2": metrics[
+                "piecewise_equilibrated_boundary_stress_v2"
+            ],
+        } if final_traction_verification else {}),
         "assembled_weak_cavity_boundary_residual_normalized": metrics[
             "assembled_weak_cavity_boundary_residual_normalized"
         ],

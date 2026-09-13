@@ -1407,7 +1407,9 @@ def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=
     return rates
 
 
-def cavity_source_resolution_metrics(state, *, geometry_contract=None):
+def cavity_source_resolution_metrics(
+    state, *, geometry_contract=None, final_traction_verification=False,
+):
     """Source-native tensor and geometrical boundary-recovery diagnostics."""
     cavity = state.void_state.cavities[0]
     position = np.asarray(cavity.connection_exit_m)
@@ -1496,6 +1498,43 @@ def cavity_source_resolution_metrics(state, *, geometry_contract=None):
             "operator": "EQUILIBRATED_BOUNDARY_TRACTION_RECOVERY_V1",
             "available": False, "scientific_unavailability": str(exc),
         }
+    final_records = {}
+    if final_traction_verification:
+        from .arc_resolved_cavity_traction_v1 import diagnose_arc_resolved_cavity_traction_v1
+        arc_diagnosis = diagnose_arc_resolved_cavity_traction_v1(
+            nodes=nodes, elements=elems, stress_Pa=sigma, owned_boundary_edges=edges,
+            cavity_center_m=cavity.center_m, cavity_radius_m=cavity.radius_m,
+            source_position_m=cavity.connection_exit_m,
+            junction_position_m=(cavity.connection_entry_m or cavity.connection_exit_m),
+            process_length_m=engine.f.L_pz, remote_traction_scale_Pa=remote,
+            plastic_strain=state.ep_gp, density_m2=state.rho_gp,
+        )
+        if not math.isclose(
+            arc_diagnosis["recomputed_raw_adjacent_element_traction_normalized"],
+            raw_traction, rel_tol=0.0, abs_tol=2.0e-15,
+        ):
+            raise RuntimeError("ARC_TRACTION_ROWS_DO_NOT_RECOMPUTE_RETAINED_SCALAR")
+        from .piecewise_equilibrated_boundary_stress_v2 import (
+            PiecewiseEquilibratedStressUnavailable,
+            recover_piecewise_equilibrated_boundary_stress_v2,
+        )
+        try:
+            piecewise = recover_piecewise_equilibrated_boundary_stress_v2(
+                nodes=nodes, elements=elems, stress_Pa=sigma, boundary_node=node,
+                cavity_center_m=cavity.center_m, cavity_radius_m=cavity.radius_m,
+                process_length_m=engine.f.L_pz, owned_boundary_edges=edges,
+                remote_traction_scale_Pa=remote,
+                state_fingerprint=_cavity_resolution_binding(state), solid_element_mask=solid,
+            )
+        except PiecewiseEquilibratedStressUnavailable as exc:
+            piecewise = {
+                "operator": "PIECEWISE_EQUILIBRATED_BOUNDARY_STRESS_V2",
+                "available": False, "scientific_unavailability": str(exc),
+            }
+        final_records = {
+            "arc_resolved_cavity_traction_v1": arc_diagnosis,
+            "piecewise_equilibrated_boundary_stress_v2": piecewise,
+        }
     plastic_active = bool(np.any(np.abs(np.asarray(state.ep_gp, dtype=float)) > 0.0))
     return {"tensor_Pa": tensor.tolist(), "probe_element_ids": list(selected),
         "boundary_node_id": node, "boundary_position_m": position.tolist(),
@@ -1514,6 +1553,7 @@ def cavity_source_resolution_metrics(state, *, geometry_contract=None):
         "raw_adjacent_element_traction_normalized": raw_traction,
         "incident_cst_boundary_traction_v1": raw_traction,
         "equilibrated_boundary_traction_recovery_v1": equilibrated,
+        **final_records,
         "assembled_weak_cavity_boundary_residual_normalized": weak_residual,
         "source_tensor_local_nt_Pa": local_tensor.tolist(),
         "source_tensor_global_xy_Pa": tensor.tolist(),
