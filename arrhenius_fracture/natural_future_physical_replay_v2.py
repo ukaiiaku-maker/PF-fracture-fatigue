@@ -216,10 +216,9 @@ def solver_budget(state) -> dict:
     )[0])
     if not math.isfinite(largest + smallest) or smallest <= 0.0:
         raise ValueError("free stiffness is not numerically positive definite")
-    reaction_scale = max(
-        float(state.energy_ledgers.get("latest_constrained_reaction_l2_N_per_m", 0.0)),
-        np.finfo(float).tiny,
-    )
+    from .topology_transaction_v11 import require_equilibrium_observables
+    equilibrium = require_equilibrium_observables(state)
+    reaction_scale = float(equilibrium["latest_constrained_reaction_l2_N_per_m"])
     return {
         "method": "symmetric_extreme_eigenvalues_of_free_CST_stiffness",
         "free_dof_count": int(len(free)),

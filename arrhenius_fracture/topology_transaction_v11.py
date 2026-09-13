@@ -13,7 +13,7 @@ import hashlib
 import json
 import math
 import time
-from typing import Any, Callable, Iterable, Mapping
+from typing import Any, Callable, Iterable, Iterator, Mapping
 
 import numpy as np
 
@@ -31,7 +31,8 @@ from .directional_competition_v11 import (
 
 
 MODEL_ID = "v11.monotonic_tip_only_live_fem_topology_transaction/1"
-EQUILIBRIUM_OBSERVABLE_SCHEMA = "v6.accepted-fem-equilibrium-observables/1"
+EQUILIBRIUM_OBSERVABLE_SCHEMA = "unified-2d.accepted-fem-equilibrium-observables/2"
+LEGACY_EQUILIBRIUM_OBSERVABLE_SCHEMA = "v6.accepted-fem-equilibrium-observables/1"
 REACTION_ABSOLUTE_FLOOR_N_PER_M = 1.0e-12
 ENERGY_ABSOLUTE_FLOOR_J_PER_M = 1.0e-18
 EQUILIBRIUM_OBSERVABLE_KEYS = (
@@ -56,6 +57,107 @@ class EquilibriumObservablesUnavailable(RuntimeError):
     """The accepted FEM state cannot provide certified physical observables."""
 
 
+def _canonical_observation_fingerprint(value: Any) -> str:
+    """Hash numerical ownership without relying on object ids or repr addresses."""
+    def normalize(item):
+        if isinstance(item, np.ndarray):
+            array = np.ascontiguousarray(item)
+            return {
+                "dtype": array.dtype.str, "shape": array.shape,
+                "sha256": hashlib.sha256(array.tobytes()).hexdigest(),
+            }
+        if is_dataclass(item):
+            return normalize({name: getattr(item, name) for name in item.__dataclass_fields__})
+        if isinstance(item, Mapping):
+            return {str(key): normalize(entry) for key, entry in sorted(
+                item.items(), key=lambda pair: str(pair[0]),
+            )}
+        if isinstance(item, (tuple, list)):
+            return [normalize(entry) for entry in item]
+        if isinstance(item, np.generic):
+            return item.item()
+        if isinstance(item, float) and not math.isfinite(item):
+            return {"nonfinite": str(item)}
+        if isinstance(item, (str, int, float, bool)) or item is None:
+            return item
+        return {"type": type(item).__qualname__, "state": normalize(getattr(item, "__dict__", {}))}
+
+    encoded = json.dumps(normalize(value), sort_keys=True, separators=(",", ":"), allow_nan=False)
+    return hashlib.sha256(encoded.encode()).hexdigest()
+
+
+@dataclass(frozen=True)
+class EquilibriumObservables(Mapping[str, float]):
+    """Physical measurements reassembled from one accepted constitutive state.
+
+    The mapping interface is a backward-compatible view for retained V6
+    exporters.  New production code owns this typed object directly; the
+    energy ledger is no longer the source of reaction or compliance.
+    """
+
+    signed_top_reaction_vector_N_per_m: tuple[float, float]
+    signed_bottom_reaction_vector_N_per_m: tuple[float, float]
+    top_normal_resultant_N_per_m: float
+    bottom_normal_resultant_N_per_m: float
+    mean_reaction_magnitude_N_per_m: float
+    top_bottom_balance_residual: float
+    applied_top_displacement_m: float
+    applied_bottom_displacement_m: float
+    total_opening_m: float
+    free_dof_residual_l2_N_per_m: float
+    full_residual_including_reactions_l2_N_per_m: float
+    constrained_reaction_l2_N_per_m: float
+    recoverable_elastic_energy_J_per_m: float
+    total_stored_internal_energy_J_per_m: float
+    plastic_eigenstrain_half_work_J_per_m: float
+    plastic_internal_dissipation_J_per_m: float | None
+    topology_event_dissipation_J_per_m: float | None
+    external_reaction_work_J_per_m: float
+    compliance_m2_per_N: float
+    energy_identity_reference_J_per_m: float
+    energy_identity_residual: float
+    free_dof_residual_relative: float
+    observation_schema: str
+    source_state_fingerprint: str
+    mesh_fingerprint: str
+    material_fingerprint: str
+
+    def _legacy(self) -> dict[str, float | str]:
+        return {
+            "equilibrium_observable_schema": self.observation_schema,
+            "equilibrium_reaction_absolute_floor_N_per_m": REACTION_ABSOLUTE_FLOOR_N_PER_M,
+            "equilibrium_energy_absolute_floor_J_per_m": ENERGY_ABSOLUTE_FLOOR_J_PER_M,
+            "latest_top_reaction_N_per_m": self.top_normal_resultant_N_per_m,
+            "latest_bottom_reaction_N_per_m": self.bottom_normal_resultant_N_per_m,
+            "latest_reaction_N_per_m": self.top_normal_resultant_N_per_m,
+            "latest_applied_opening_m": self.total_opening_m,
+            "latest_compliance_m2_per_N": self.compliance_m2_per_N,
+            "latest_external_work_J_per_m": self.external_reaction_work_J_per_m,
+            "latest_stored_recoverable_energy_J_per_m": self.recoverable_elastic_energy_J_per_m,
+            "latest_plastic_eigenstrain_half_work_J_per_m": self.plastic_eigenstrain_half_work_J_per_m,
+            "latest_energy_identity_reference_J_per_m": self.energy_identity_reference_J_per_m,
+            "latest_residual_l2_N_per_m": self.full_residual_including_reactions_l2_N_per_m,
+            "latest_free_dof_residual_l2_N_per_m": self.free_dof_residual_l2_N_per_m,
+            "latest_free_dof_residual_relative": self.free_dof_residual_relative,
+            "latest_constrained_reaction_l2_N_per_m": self.constrained_reaction_l2_N_per_m,
+            "latest_top_bottom_reaction_balance": self.top_bottom_balance_residual,
+            "latest_energy_reaction_identity": self.energy_identity_residual,
+        }
+
+    def __getitem__(self, key: str):
+        return self._legacy()[key]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._legacy())
+
+    def __len__(self) -> int:
+        return len(self._legacy())
+
+    def to_dict(self) -> dict[str, Any]:
+        from dataclasses import asdict
+        return asdict(self)
+
+
 def _accepted_dirichlet_partition(state: "LiveFEMTopologyState") -> tuple[np.ndarray, np.ndarray]:
     """Return the exact constrained/free partition used by ``solve_dirichlet``."""
     prescribed = np.zeros(state.mesh.ndof, dtype=bool)
@@ -67,10 +169,29 @@ def _accepted_dirichlet_partition(state: "LiveFEMTopologyState") -> tuple[np.nda
     return prescribed, ~prescribed
 
 
-def require_equilibrium_observables(state: "LiveFEMTopologyState") -> dict[str, float]:
-    """Read a complete certified ledger; missing entries never become zero."""
+def require_equilibrium_observables(
+    state: "LiveFEMTopologyState",
+) -> EquilibriumObservables | Mapping[str, float]:
+    """Return typed observations, with a read-only legacy-checkpoint adapter."""
+    typed = getattr(state, "equilibrium_observables", None)
+    if typed is not None:
+        if not isinstance(typed, EquilibriumObservables):
+            raise EquilibriumObservablesUnavailable("accepted equilibrium observations have the wrong type")
+        values = tuple(
+            value for value in typed.to_dict().values()
+            if isinstance(value, (int, float)) and value is not None
+        )
+        if not all(math.isfinite(float(value)) for value in values):
+            raise EquilibriumObservablesUnavailable("accepted equilibrium observations are nonfinite")
+        if typed.mean_reaction_magnitude_N_per_m <= REACTION_ABSOLUTE_FLOOR_N_PER_M:
+            raise EquilibriumObservablesUnavailable("accepted reaction is below the declared physical floor")
+        if typed.compliance_m2_per_N <= 0.0:
+            raise EquilibriumObservablesUnavailable("accepted compliance is not positive")
+        return typed
     ledger = state.energy_ledgers
-    if ledger.get("equilibrium_observable_schema") != EQUILIBRIUM_OBSERVABLE_SCHEMA:
+    if ledger.get("equilibrium_observable_schema") not in {
+        EQUILIBRIUM_OBSERVABLE_SCHEMA, LEGACY_EQUILIBRIUM_OBSERVABLE_SCHEMA,
+    }:
         raise EquilibriumObservablesUnavailable("accepted state has no certified equilibrium-observable ledger")
     missing = [key for key in EQUILIBRIUM_OBSERVABLE_KEYS if key not in ledger]
     if missing:
@@ -90,15 +211,19 @@ def require_equilibrium_observables(state: "LiveFEMTopologyState") -> dict[str, 
 def _measure_accepted_equilibrium(
     state: "LiveFEMTopologyState", residual: np.ndarray, sigma_gp: np.ndarray,
     stored_energy_J_per_m: float,
-) -> dict[str, float | str]:
+) -> EquilibriumObservables:
     """Measure reactions and the plastic-strain-aware production energy identity."""
     prescribed, free = _accepted_dirichlet_partition(state)
     vector = np.asarray(residual, dtype=float)
     displacement = np.asarray(state.displacement, dtype=float)
     top_dofs = 2 * np.asarray(state.boundary.top_nodes, dtype=int) + 1
     bottom_dofs = 2 * np.asarray(state.boundary.bot_nodes, dtype=int) + 1
+    top_x_dofs = 2 * np.asarray(state.boundary.top_nodes, dtype=int)
+    bottom_x_dofs = 2 * np.asarray(state.boundary.bot_nodes, dtype=int)
     top = float(np.sum(vector[top_dofs]))
     bottom = float(np.sum(vector[bottom_dofs]))
+    top_vector = (float(np.sum(vector[top_x_dofs])), top)
+    bottom_vector = (float(np.sum(vector[bottom_x_dofs])), bottom)
     top_opening = float(np.mean(displacement[top_dofs]))
     bottom_opening = float(np.mean(displacement[bottom_dofs]))
     opening = top_opening - bottom_opening
@@ -136,26 +261,55 @@ def _measure_accepted_equilibrium(
         raise EquilibriumObservablesUnavailable("accepted free-DOF residual is above tolerance")
     if energy_identity > limits["energy_reaction_identity_relative"]:
         raise EquilibriumObservablesUnavailable("accepted production energy identity is above tolerance")
-    return {
-        "equilibrium_observable_schema": EQUILIBRIUM_OBSERVABLE_SCHEMA,
-        "equilibrium_reaction_absolute_floor_N_per_m": REACTION_ABSOLUTE_FLOOR_N_PER_M,
-        "equilibrium_energy_absolute_floor_J_per_m": ENERGY_ABSOLUTE_FLOOR_J_PER_M,
-        "latest_top_reaction_N_per_m": top,
-        "latest_bottom_reaction_N_per_m": bottom,
-        "latest_reaction_N_per_m": top,
-        "latest_applied_opening_m": opening,
-        "latest_compliance_m2_per_N": opening / abs(top),
-        "latest_external_work_J_per_m": boundary_half_work,
-        "latest_stored_recoverable_energy_J_per_m": stored,
-        "latest_plastic_eigenstrain_half_work_J_per_m": plastic_half_work,
-        "latest_energy_identity_reference_J_per_m": energy_reference,
-        "latest_residual_l2_N_per_m": full_norm,
-        "latest_free_dof_residual_l2_N_per_m": free_norm,
-        "latest_free_dof_residual_relative": free_relative,
-        "latest_constrained_reaction_l2_N_per_m": constrained_norm,
-        "latest_top_bottom_reaction_balance": balance,
-        "latest_energy_reaction_identity": energy_identity,
-    }
+    mesh_fingerprint = _canonical_observation_fingerprint({
+        "nodes": getattr(state.mesh, "nodes", None),
+        "elements": getattr(state.mesh, "elems", None),
+    })
+    material_fingerprint = _canonical_observation_fingerprint({
+        "material": getattr(state, "material", None),
+        "elasticity_D": getattr(state, "elasticity_D", None),
+    })
+    source_fingerprint = _canonical_observation_fingerprint({
+        name: getattr(state, name, None) for name in (
+            "damage", "displacement", "ep_gp", "rho_gp", "elasticity_D",
+            "material", "cohesive_network", "crack_network", "competition",
+            "tip_process_state", "junction_process_state", "rng_state",
+            "event_counters", "stored_energy_J_per_m", "sharp_wake_model_id",
+            "v12_support_state", "void_state", "checkpoint_generation",
+        )
+    })
+    topology_dissipation = (
+        float(state.energy_ledgers["hazard_dissipation_J_per_m"])
+        if "hazard_dissipation_J_per_m" in getattr(state, "energy_ledgers", {}) else None
+    )
+    return EquilibriumObservables(
+        signed_top_reaction_vector_N_per_m=top_vector,
+        signed_bottom_reaction_vector_N_per_m=bottom_vector,
+        top_normal_resultant_N_per_m=top,
+        bottom_normal_resultant_N_per_m=bottom,
+        mean_reaction_magnitude_N_per_m=reaction_scale,
+        top_bottom_balance_residual=balance,
+        applied_top_displacement_m=top_opening,
+        applied_bottom_displacement_m=bottom_opening,
+        total_opening_m=opening,
+        free_dof_residual_l2_N_per_m=free_norm,
+        full_residual_including_reactions_l2_N_per_m=full_norm,
+        constrained_reaction_l2_N_per_m=constrained_norm,
+        recoverable_elastic_energy_J_per_m=stored,
+        total_stored_internal_energy_J_per_m=stored,
+        plastic_eigenstrain_half_work_J_per_m=plastic_half_work,
+        plastic_internal_dissipation_J_per_m=None,
+        topology_event_dissipation_J_per_m=topology_dissipation,
+        external_reaction_work_J_per_m=boundary_half_work,
+        compliance_m2_per_N=opening / reaction_scale,
+        energy_identity_reference_J_per_m=energy_reference,
+        energy_identity_residual=energy_identity,
+        free_dof_residual_relative=free_relative,
+        observation_schema=EQUILIBRIUM_OBSERVABLE_SCHEMA,
+        source_state_fingerprint=source_fingerprint,
+        mesh_fingerprint=mesh_fingerprint,
+        material_fingerprint=material_fingerprint,
+    )
 
 
 class FrozenMapping(dict):
@@ -237,6 +391,7 @@ class LiveFEMTopologyState:
     sharp_wake_model_id: str = "sharp_wake_causal_v11"
     v12_support_state: Any = None
     void_state: Any = None
+    equilibrium_observables: EquilibriumObservables | None = None
     checkpoint_generation: int = 0
 
     def __post_init__(self) -> None:
@@ -262,6 +417,10 @@ class LiveFEMTopologyState:
         object.__setattr__(self, "energy_ledgers", _freeze(self.energy_ledgers))
         object.__setattr__(self, "event_counters", _freeze(self.event_counters))
         object.__setattr__(self, "rng_state", _freeze(self.rng_state))
+        if self.equilibrium_observables is not None and not isinstance(
+            self.equilibrium_observables, EquilibriumObservables
+        ):
+            raise TypeError("equilibrium_observables must have the accepted typed schema")
         from .sharp_wake_backend_v12 import V11_MODEL_ID, V12_MODEL_ID, select_sharp_wake_model
         selected=select_sharp_wake_model(self.sharp_wake_model_id)
         if selected==V11_MODEL_ID and self.v12_support_state is not None:
@@ -285,6 +444,7 @@ class LiveFEMTopologyState:
             sharp_wake_model_id=self.sharp_wake_model_id,
             v12_support_state=self.v12_support_state,
             void_state=self.void_state,
+            equilibrium_observables=self.equilibrium_observables,
             checkpoint_generation=self.checkpoint_generation,
         )
 
@@ -374,11 +534,18 @@ def equilibrate_fixed_load_with_production_fem(
     energy = _stored_energy(
         state.mesh, displacement, state.ep_gp, sigma_gp, state.elasticity_D,
     )
-    accepted = replace(state, displacement=displacement, stored_energy_J_per_m=energy)
-    equilibrium_ledger = _measure_accepted_equilibrium(
+    accepted = replace(
+        state, displacement=displacement, stored_energy_J_per_m=energy,
+        equilibrium_observables=None,
+    )
+    equilibrium_observables = _measure_accepted_equilibrium(
         accepted, accepted_residual, sigma_gp, energy,
     )
-    return replace(accepted, energy_ledgers={**accepted.energy_ledgers, **equilibrium_ledger})
+    return replace(
+        accepted,
+        equilibrium_observables=equilibrium_observables,
+        energy_ledgers={**accepted.energy_ledgers, **dict(equilibrium_observables)},
+    )
 
 
 def complete_accepted_state_fingerprint(state: LiveFEMTopologyState) -> str:
@@ -426,6 +593,7 @@ def complete_accepted_state_fingerprint(state: LiveFEMTopologyState) -> str:
         "sharp_wake_model_id": state.sharp_wake_model_id,
         "v12_support_state": state.v12_support_state,
         "void_state": state.void_state,
+        "equilibrium_observables": getattr(state, "equilibrium_observables", None),
         "checkpoint_generation": state.checkpoint_generation,
     }
     encoded = json.dumps(normalize(payload), sort_keys=True, separators=(",", ":"), allow_nan=False).encode()

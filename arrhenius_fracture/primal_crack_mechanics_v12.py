@@ -74,8 +74,16 @@ def _solve_normal_opening(mesh,boundary,opening_m,normal,damage=None,kappa=0.,pi
     residual=K@u; reaction=float(np.sum(residual.reshape(-1,2)[boundary.top_nodes]@normal)); energy=float(.5*u@(K@u))
     degradation=np.ones(mesh.ne) if damage is None else (1-np.asarray(damage))**2+kappa
     strain,sigma=recover_element_fields(mesh,u,D,degradation)
-    residual_q=np.asarray(transform.T@residual); free_res=float(np.linalg.norm(residual_q[free])/max(abs(reaction),1e-300))
-    identity=abs(energy-.5*reaction*opening_m)/max(abs(energy),1e-300)
+    from .topology_transaction_v11 import (
+        ENERGY_ABSOLUTE_FLOOR_J_PER_M, REACTION_ABSOLUTE_FLOOR_N_PER_M,
+        EquilibriumObservablesUnavailable,
+    )
+    if not np.isfinite(reaction) or abs(reaction) <= REACTION_ABSOLUTE_FLOOR_N_PER_M:
+        raise EquilibriumObservablesUnavailable('primal solve has no physical platen reaction')
+    if not np.isfinite(energy) or abs(energy) <= ENERGY_ABSOLUTE_FLOOR_J_PER_M:
+        raise EquilibriumObservablesUnavailable('primal solve has no physical stored energy')
+    residual_q=np.asarray(transform.T@residual); free_res=float(np.linalg.norm(residual_q[free])/abs(reaction))
+    identity=abs(energy-.5*reaction*opening_m)/abs(energy)
     diag=Kff.diagonal(); cond=float(np.max(diag)/np.min(diag))
     return PrimalResult(u,sigma,strain,reaction,opening_m/abs(reaction),energy,free_res,identity,cond,float("nan"))
 

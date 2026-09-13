@@ -1251,7 +1251,8 @@ def run_2d(args, *, parent_capture=None, inherited_primary_race=False):
             reaction_after = after_equilibrium.get("reaction_force")
 
             def apparent_compliance(reaction):
-                if reaction is None or not math.isfinite(float(reaction)) or abs(float(reaction)) <= 1.0e-300:
+                from .topology_transaction_v11 import REACTION_ABSOLUTE_FLOOR_N_PER_M
+                if reaction is None or not math.isfinite(float(reaction)) or abs(float(reaction)) <= REACTION_ABSOLUTE_FLOOR_N_PER_M:
                     return None
                 return float(accepted_load) / abs(float(reaction))
 

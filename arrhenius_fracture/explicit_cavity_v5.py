@@ -563,7 +563,14 @@ def solve_static_hole(hole: HoleMesh, opening_m: float, mat: Optional[ElasticPro
     diagonal=np.abs(K.diagonal()[free]); positive=diagonal[diagonal>0]
     conditioning_proxy=float(np.max(positive)/np.min(positive)) if len(positive) else math.inf
     killed_energy=(float(np.sum(psi[killed]*mesh.area_e[killed])) if crack_tip_m is not None else math.nan)
-    compliance=float(opening_m/max(abs(top),1e-300))
+    from .topology_transaction_v11 import (
+        REACTION_ABSOLUTE_FLOOR_N_PER_M, EquilibriumObservablesUnavailable,
+    )
+    if not math.isfinite(top) or abs(top) <= REACTION_ABSOLUTE_FLOOR_N_PER_M:
+        raise EquilibriumObservablesUnavailable(
+            "EQUILIBRIUM_OBSERVATION_UNAVAILABLE: static cavity reaction"
+        )
+    compliance=float(opening_m/abs(top))
     # Boundary traction from the unique adjacent CST, integrated edgewise.
     edge_to_elem={}
     for ei,elem in enumerate(mesh.elems):

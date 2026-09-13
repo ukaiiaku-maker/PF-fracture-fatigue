@@ -77,6 +77,10 @@ def repair_connected_quality(state, *, strategy='flips', failure_stage=None, ope
     trial = p.equilibrate_fixed_load_with_production_fem(trial)
     inject('source_quality_equilibrium')
     after = p.observables(trial, 'quality_repair_after'); metrics = p.cavity_source_resolution_metrics(trial)
+    reaction_norm = after['constrained_reaction_l2_N_per_m']
+    if not math.isfinite(reaction_norm) or reaction_norm <= 0.0:
+        from .topology_transaction_v11 import EquilibriumObservablesUnavailable
+        raise EquilibriumObservablesUnavailable('source-quality state has no physical reaction scale')
     errors = {key: abs(after[key]-before[key])/max(abs(before[key]), 1e-300)
               for key in ('reaction_N_per_m', 'compliance_m2_per_N', 'energy_J_per_m')}
     tensor_error = float(np.linalg.norm(np.asarray(metrics['tensor_Pa'])-old_metrics['tensor_Pa'])/max(np.linalg.norm(old_metrics['tensor_Pa']), 1e-300))
@@ -88,7 +92,7 @@ def repair_connected_quality(state, *, strategy='flips', failure_stage=None, ope
         'energy': errors['energy_J_per_m'] <= LIMITS['static_mesh_energy_relative'],
         'fixed_source_tensor': tensor_error <= LIMITS['tensor_probe_relative'],
         'repair_barrier_rate_waiting_time_budget': kinetic_transfer['passed'],
-        'free_residual': after['free_dof_residual_l2_N_per_m'] <= LIMITS['free_residual_relative']*max(after['constrained_reaction_l2_N_per_m'], 1e-300),
+        'free_residual': after['free_dof_residual_l2_N_per_m'] <= LIMITS['free_residual_relative']*reaction_norm,
         'reaction_balance': after['top_bottom_reaction_balance'] <= LIMITS['reaction_balance_relative'],
         'energy_identity': after['energy_reaction_identity'] <= LIMITS['energy_reaction_identity_relative'],
         'void_physical_state': trial.void_state == state.void_state,

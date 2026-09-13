@@ -46,6 +46,10 @@ def write_checkpoint(
         "active_tip_ids": list(state.crack_network.active_tip_ids),
         "event_counters": dict(state.event_counters),
         "energy_ledgers": dict(state.energy_ledgers),
+        "equilibrium_observables": (
+            state.equilibrium_observables.to_dict()
+            if state.equilibrium_observables is not None else None
+        ),
         "has_rng_state": state.rng_state is not None,
         "sharp_wake_model_id": state.sharp_wake_model_id,
         "v12_support_state": state.v12_support_state.__dict__ if state.v12_support_state is not None else None,
@@ -98,6 +102,16 @@ def restore_checkpoint(path: str | Path, *, with_provider_runtime: bool = False)
         raise ValueError("v11 checkpoint directional state does not match manifest")
     if state.sharp_wake_model_id != manifest.get("sharp_wake_model_id", "sharp_wake_causal_v11"):
         raise ValueError("checkpoint sharp-wake model identity mismatch")
+    if "equilibrium_observables" in manifest:
+        restored_observables = getattr(state, "equilibrium_observables", None)
+        expected_observables = (
+            restored_observables.to_dict() if restored_observables is not None else None
+        )
+        expected_observables = json.loads(json.dumps(
+            expected_observables, sort_keys=True, allow_nan=False,
+        ))
+        if expected_observables != manifest["equilibrium_observables"]:
+            raise ValueError("checkpoint equilibrium observations do not match manifest")
     expected_support=state.v12_support_state.__dict__ if state.v12_support_state is not None else None
     expected_support=json.loads(json.dumps(expected_support,sort_keys=True,allow_nan=False))
     if expected_support != manifest.get("v12_support_state"):

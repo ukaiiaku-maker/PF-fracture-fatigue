@@ -6,6 +6,7 @@ import pytest
 
 from arrhenius_fracture.topology_transaction_v11 import (
     EQUILIBRIUM_OBSERVABLE_SCHEMA,
+    EquilibriumObservables,
     EquilibriumObservablesUnavailable,
     _measure_accepted_equilibrium,
     require_equilibrium_observables,
@@ -73,6 +74,25 @@ def test_accepted_dbtt_state_has_physical_reaction_compliance_and_energy():
     assert row["stored_recoverable_energy_J_per_m"] > 0.0
     assert row["top_bottom_reaction_balance"] <= 0.03
     assert row["energy_reaction_identity"] <= 0.01
-    missing = replace(state, energy_ledgers={})
+    assert isinstance(state.equilibrium_observables, EquilibriumObservables)
+    assert state.equilibrium_observables.mean_reaction_magnitude_N_per_m > 0.0
+    assert state.equilibrium_observables.source_state_fingerprint
+    assert state.equilibrium_observables.mesh_fingerprint
+    assert state.equilibrium_observables.material_fingerprint
+    missing = replace(state, energy_ledgers={}, equilibrium_observables=None)
     with pytest.raises(EquilibriumObservablesUnavailable, match="no certified"):
         observables(missing, "V6_MISSING_LEDGER")
+
+
+def test_typed_equilibrium_observations_survive_checkpoint_restart(tmp_path):
+    from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
+    from arrhenius_fracture.unified_fracture_material_v5 import material_bundle
+    from arrhenius_fracture.voiding_production_v5 import build_production_void_state
+
+    state, _ = build_production_void_state(bundle=material_bundle("DBTT"), enabled=True)
+    path = tmp_path / "accepted.json"
+    manifest = write_checkpoint(state, path)
+    restored = restore_checkpoint(path)
+    assert manifest["equilibrium_observables"] == state.equilibrium_observables.to_dict()
+    assert restored.equilibrium_observables == state.equilibrium_observables
+    assert dict(require_equilibrium_observables(restored)) == dict(require_equilibrium_observables(state))

@@ -487,10 +487,14 @@ def evaluate_exact_topology(request: LiveTopologyRequest) -> dict[str, Any]:
     responses = [_shared_unit_response(request, base, item) for item in request.shared_perturbations]
     applied_opening = float(Uy_top - Uy_bot)
     reaction_force = float(base["reaction_top"])
-    apparent_compliance = (
-        applied_opening / abs(reaction_force)
-        if abs(reaction_force) > 1.0e-300 else None
+    from .topology_transaction_v11 import (
+        REACTION_ABSOLUTE_FLOOR_N_PER_M, EquilibriumObservablesUnavailable,
     )
+    if not math.isfinite(reaction_force) or abs(reaction_force) <= REACTION_ABSOLUTE_FLOOR_N_PER_M:
+        raise EquilibriumObservablesUnavailable(
+            "EQUILIBRIUM_OBSERVATION_UNAVAILABLE: live-kernel reaction"
+        )
+    apparent_compliance = applied_opening / abs(reaction_force)
     return {
         "schema": SCHEMA, "kernel_provider_id": PROVIDER_ID,
         "branching_mode": "direct_fem",

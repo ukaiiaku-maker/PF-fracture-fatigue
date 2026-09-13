@@ -81,8 +81,9 @@ PREDICATES: dict[str, Callable[[Mapping[str, Any]], bool]] = {
         and values["topology_stage"] == "POST_CONTINUATION"
     ),
     "free_equilibrium_metrics": lambda values: (
-        values["free_residual_l2"] <= values["free_residual_relative_tolerance"]
-            * max(values["constrained_reaction_l2"], 1.0e-300)
+        values["constrained_reaction_l2"] > 1.0e-12
+        and values["free_residual_l2"] <= values["free_residual_relative_tolerance"]
+            * values["constrained_reaction_l2"]
         and values["reaction_balance"] <= values["reaction_balance_tolerance"]
         and values["energy_reaction_identity"] <= values["energy_identity_tolerance"]
     ),
