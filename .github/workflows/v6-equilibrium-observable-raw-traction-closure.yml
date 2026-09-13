@@ -1,0 +1,213 @@
+name: V6 equilibrium observable and raw traction closure
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v6-equilibrium-observable-raw-traction-closure-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bounded-v6-closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      V6_SOURCE_COMMIT: 612b1221b625235d1e502d36d9428d9321199ab3
+    steps:
+      - name: Initialize bounded attestation directory
+        run: |
+          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v6-closure" >> "$GITHUB_ENV"
+          echo "V6_READINESS_OUTPUT=${RUNNER_TEMP}/v6-closure/central-dbtt-v6-readiness.json" >> "$GITHUB_ENV"
+          echo "MPLCONFIGDIR=${RUNNER_TEMP}/matplotlib-v6-closure" >> "$GITHUB_ENV"
+          mkdir -p "${RUNNER_TEMP}/v6-closure" "${RUNNER_TEMP}/matplotlib-v6-closure"
+
+      - name: Partial sparse checkout of bounded inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git config remote.origin.promisor true
+          git config remote.origin.partialclonefilter blob:none
+          git sparse-checkout init --no-cone
+          git sparse-checkout set --no-cone \
+            /arrhenius_fracture/ \
+            /artifacts/v5_cavity_source_recovery_v2/attestation.json \
+            /artifacts/v5_cavity_source_recovery_v3/ \
+            /artifacts/v5_cavity_source_recovery_v4/ \
+            /artifacts/v5_cavity_source_recovery_v5/ \
+            /artifacts/v6_cavity_source_raw_traction_closure/ \
+            /scripts/attest_cavity_source_raw_traction_closure_v6_dbtt.py \
+            /scripts/attest_cavity_source_shape_regular_v5_dbtt.py \
+            /scripts/audit_v2_physical_patch_without_fem.py \
+            /scripts/build_cavity_source_raw_traction_closure_v6_contract.py \
+            /scripts/build_cavity_source_shape_regular_v5_contract.py \
+            /scripts/build_v5_unified_lineage_records.py \
+            /tests/__init__.py \
+            /tests/test_v5_unified_model_lineage.py \
+            /tests/test_cavity_source_shape_regular_mesh_v5.py \
+            /tests/test_equilibrium_observables_v6.py \
+            /tests/test_cavity_source_raw_traction_closure_v6.py \
+            /V5_UNIFIED_MODEL_LINEAGE.md \
+            /V5_VOIDING_EXTENSION_DELTA.md \
+            /V6_CAVITY_SOURCE_RAW_TRACTION_CLOSURE.md \
+            /v5_unified_model_lineage.json \
+            /v5_voiding_extension_delta.json \
+            /pyproject.toml \
+            /requirements-v5-source-resolution-ci.txt
+          git -c protocol.version=2 fetch --no-tags --depth=1 --filter=blob:none origin "$GITHUB_SHA"
+          git checkout --detach FETCH_HEAD
+          for source in \
+            7e71b8f27b0682060fd161e7e5e8fe0d3587e8ac \
+            0238aae096aa29e79829d3c562383c38f2290ad6 \
+            b3d0add6cbb0605adaa3e04006fe987961ad6452 \
+            ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e \
+            619b66b0f538742482e7385ddd3d0171cb3edd8b; do
+            git fetch --no-tags --depth=2 --filter=blob:none origin "$source"
+          done
+          git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Set up pinned Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+          cache-dependency-path: requirements-v5-source-resolution-ci.txt
+
+      - name: Install frozen numerical environment
+        run: python -m pip install -e '.[test]' -r requirements-v5-source-resolution-ci.txt
+
+      - name: Compile bounded sources
+        run: |
+          python -m compileall -q \
+            arrhenius_fracture \
+            scripts/attest_cavity_source_raw_traction_closure_v6_dbtt.py \
+            scripts/attest_cavity_source_shape_regular_v5_dbtt.py \
+            scripts/build_cavity_source_raw_traction_closure_v6_contract.py \
+            tests/test_v5_unified_model_lineage.py \
+            tests/test_cavity_source_shape_regular_mesh_v5.py \
+            tests/test_equilibrium_observables_v6.py \
+            tests/test_cavity_source_raw_traction_closure_v6.py
+
+      - name: Reproduce only the frozen D and E central DBTT family
+        run: |
+          set -euo pipefail
+          python scripts/attest_cavity_source_raw_traction_closure_v6_dbtt.py \
+            | tee "$ATTESTATION_DIR/central-dbtt-v6.log"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          committed = json.loads(Path(
+              "artifacts/v6_cavity_source_raw_traction_closure/central_dbtt_v6_readiness.json"
+          ).read_text())
+          observed = json.loads(Path(os.environ["V6_READINESS_OUTPUT"]).read_text())
+          keys = (
+              "DBTT_SOURCE_READINESS", "exact_v6_failure_class",
+              "oracle_states_accepted", "paired_trajectories_run", "fatigue_started",
+              "unexpected_programming_exceptions_caught",
+          )
+          assert {key: observed[key] for key in keys} == {key: committed[key] for key in keys}
+          assert observed["fixed_geometry_local_family"]["predicates"] == committed[
+              "fixed_geometry_local_family"
+          ]["predicates"]
+          observed_rows = observed["fixed_geometry_local_family"]["new_rows"]
+          committed_rows = committed["fixed_geometry_local_family"]["new_rows"]
+          assert [row["local_level"] for row in observed_rows] == ["D", "E"]
+          assert [row["raw_adjacent_element_traction_normalized"] for row in observed_rows] == [
+              row["raw_adjacent_element_traction_normalized"] for row in committed_rows
+          ]
+          assert observed["exact_v6_failure_class"] == [
+              "RAW_ADJACENT_ELEMENT_TRACTION_E", "MESH_QUALITY", "FIXED_GEOMETRY_IDENTITY",
+          ]
+          assert observed["oracle_states_accepted"] == 0
+          PY
+
+      - name: Collect exactly thirty-four bounded tests
+        run: |
+          set -euo pipefail
+          TEST_FILES=(
+            tests/test_v5_unified_model_lineage.py
+            tests/test_cavity_source_shape_regular_mesh_v5.py
+            tests/test_equilibrium_observables_v6.py
+            tests/test_cavity_source_raw_traction_closure_v6.py
+          )
+          python -m pytest --collect-only -q -p no:cacheprovider "${TEST_FILES[@]}" \
+            | tee "$ATTESTATION_DIR/collect-only.log"
+          grep -E '^[^[:space:]]+::' "$ATTESTATION_DIR/collect-only.log" \
+            > "$ATTESTATION_DIR/collected-node-inventory.txt"
+          test "$(wc -l < "$ATTESTATION_DIR/collected-node-inventory.txt" | tr -d ' ')" = 34
+
+      - name: Run bounded lineage mesh equilibrium and V6 tests
+        id: bounded_tests
+        run: |
+          set -euo pipefail
+          TEST_FILES=(
+            tests/test_v5_unified_model_lineage.py
+            tests/test_cavity_source_shape_regular_mesh_v5.py
+            tests/test_equilibrium_observables_v6.py
+            tests/test_cavity_source_raw_traction_closure_v6.py
+          )
+          python -m pytest -vv -p no:cacheprovider \
+            --junitxml="$ATTESTATION_DIR/pytest-junit.xml" "${TEST_FILES[@]}" \
+            | tee "$ATTESTATION_DIR/pytest.log"
+          python - "$ATTESTATION_DIR/pytest-junit.xml" > "$ATTESTATION_DIR/pytest-counts.txt" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+          root = ET.parse(sys.argv[1]).getroot()
+          suites = [root] if root.tag == "testsuite" else list(root.findall("testsuite"))
+          totals = {key: sum(int(suite.attrib.get(key, 0)) for suite in suites)
+                    for key in ("tests", "failures", "errors", "skipped")}
+          print(f"tests={totals['tests']}")
+          print(f"passed={totals['tests']-totals['failures']-totals['errors']-totals['skipped']}")
+          print(f"failures={totals['failures']}")
+          print(f"errors={totals['errors']}")
+          print(f"skipped={totals['skipped']}")
+          PY
+          grep -Fxq 'tests=34' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'passed=34' "$ATTESTATION_DIR/pytest-counts.txt"
+
+      - name: Verify clean bounded worker
+        if: always()
+        env:
+          TEST_OUTCOME: ${{ steps.bounded_tests.outcome }}
+        run: |
+          set -euo pipefail
+          git diff --check
+          test -z "$(git status --porcelain=v1)"
+          {
+            echo "workflow_sha=$GITHUB_SHA"
+            echo "bounded_test_step_outcome=$TEST_OUTCOME"
+            echo 'bounded_test_count=34'
+            echo 'V5_SOURCE_CONFORMING_GEOMETRY=PASS'
+            echo 'V5_SHAPE_REGULAR_LOCAL_PATCH=PASS'
+            echo 'V5_SOURCE_TENSOR_CONVERGENCE=PASS'
+            echo 'V5_WEAK_CAVITY_BOUNDARY_RESIDUAL=PASS'
+            echo 'V5_RAW_ADJACENT_ELEMENT_TRACTION=FAIL_0.06715193304848284_GT_0.05'
+            echo 'V5_REACTION_COMPLIANCE_OBSERVATION=INVALID_DEFAULT_OR_STALE_LEDGER'
+            echo 'V5_DBTT_SOURCE_READINESS=BLOCKED'
+            echo 'V6_RAW_TRACTION_D=0.05795457514046478'
+            echo 'V6_RAW_TRACTION_E=0.055309963627059575'
+            echo 'V6_FAILURE_CLASS=RAW_ADJACENT_ELEMENT_TRACTION_E+MESH_QUALITY+FIXED_GEOMETRY_IDENTITY'
+            echo 'DBTT_SOURCE_READINESS=BLOCKED_WITH_EXACT_V6_FAILURE_CLASS'
+            echo 'ORACLE_STATES_ACCEPTED=0/18'
+            echo 'PAIRED_TRAJECTORIES_RUN=0/12'
+            echo 'FATIGUE_IMPLEMENTATION=NOT_STARTED_BY_CONTRACT'
+            echo 'NEXT_BOUNDED_STEP=EQUILIBRATED_BOUNDARY_STRESS_RECONSTRUCTION'
+            echo 'clean_worktree=PASS'
+            echo 'diff_check=PASS'
+          } | tee "$ATTESTATION_DIR/classifications.txt"
+
+      - name: Upload bounded attestation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v6-equilibrium-observable-raw-traction-closure-${{ github.sha }}
+          path: ${{ runner.temp }}/v6-closure/
+          if-no-files-found: error
+          retention-days: 14
