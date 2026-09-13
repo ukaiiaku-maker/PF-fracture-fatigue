@@ -26,6 +26,10 @@ LOCAL_LEVELS = {
     "B": {"first_strip_radial_subdivisions": 4, "eta_n_target": 0.03, "eta_t_target": 0.025},
     "C": {"first_strip_radial_subdivisions": 8, "eta_n_target": 0.015, "eta_t_target": 0.0125},
 }
+V6_LOCAL_LEVELS = {
+    "D": {"first_strip_radial_subdivisions": 16, "eta_n_target": 0.0075, "eta_t_target": 0.0125},
+    "E": {"first_strip_radial_subdivisions": 32, "eta_n_target": 0.00375, "eta_t_target": 0.0125},
+}
 CONSTRUCTION_TARGET_MINIMUM_QUALITY = 0.10
 ACCEPTANCE_MINIMUM_QUALITY = 0.05
 
@@ -100,8 +104,9 @@ def build_shape_regular_source_patch_hole_mesh(
     base_radial_layers: int=BASE_RADIAL_LAYERS, source_direction_xy: Sequence[float]=(1.0, 0.0),
 ) -> HoleMesh:
     """Refine local resolution independently of one fixed polygon geometry."""
-    if local_level not in LOCAL_LEVELS:
-        raise ValueError("local level must be A, B, or C")
+    available_levels = {**LOCAL_LEVELS, **V6_LOCAL_LEVELS}
+    if local_level not in available_levels:
+        raise ValueError("local level must be one of A, B, C, D, or E")
     if polygon_sectors not in (64, 128, 256):
         raise ValueError("polygon sectors must be one of the prospectively bounded levels")
     direction = np.asarray(source_direction_xy, dtype=float)
@@ -123,7 +128,7 @@ def build_shape_regular_source_patch_hole_mesh(
     if radial_scale < 1:
         radial_scale = 1
     radial_subdivisions = (
-        LOCAL_LEVELS[local_level]["first_strip_radial_subdivisions"] * radial_scale
+        available_levels[local_level]["first_strip_radial_subdivisions"] * radial_scale
     )
     for step in range(1, radial_subdivisions + 1):
         fine_rings.append(fine_rings[0] + (step / radial_subdivisions) * (first_outer - fine_rings[0]))
@@ -194,6 +199,6 @@ __all__ = [
     "ACCEPTANCE_MINIMUM_QUALITY", "BASE_RADIAL_LAYERS",
     "CONSTRUCTION_TARGET_MINIMUM_QUALITY", "LOCAL_LEVELS",
     "MATCHED_BOUNDARY_NODE_COUNT", "MATCHED_OUTER_RING_NODE_COUNT", "MESH_CONTRACT_ID",
-    "POLYGON_SECTORS", "build_shape_regular_source_patch_hole_mesh",
+    "POLYGON_SECTORS", "V6_LOCAL_LEVELS", "build_shape_regular_source_patch_hole_mesh",
     "discrete_cavity_boundary_fingerprint",
 ]

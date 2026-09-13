@@ -31,6 +31,131 @@ from .directional_competition_v11 import (
 
 
 MODEL_ID = "v11.monotonic_tip_only_live_fem_topology_transaction/1"
+EQUILIBRIUM_OBSERVABLE_SCHEMA = "v6.accepted-fem-equilibrium-observables/1"
+REACTION_ABSOLUTE_FLOOR_N_PER_M = 1.0e-12
+ENERGY_ABSOLUTE_FLOOR_J_PER_M = 1.0e-18
+EQUILIBRIUM_OBSERVABLE_KEYS = (
+    "latest_top_reaction_N_per_m",
+    "latest_bottom_reaction_N_per_m",
+    "latest_reaction_N_per_m",
+    "latest_applied_opening_m",
+    "latest_compliance_m2_per_N",
+    "latest_external_work_J_per_m",
+    "latest_stored_recoverable_energy_J_per_m",
+    "latest_plastic_eigenstrain_half_work_J_per_m",
+    "latest_energy_identity_reference_J_per_m",
+    "latest_residual_l2_N_per_m",
+    "latest_free_dof_residual_l2_N_per_m",
+    "latest_constrained_reaction_l2_N_per_m",
+    "latest_top_bottom_reaction_balance",
+    "latest_energy_reaction_identity",
+)
+
+
+class EquilibriumObservablesUnavailable(RuntimeError):
+    """The accepted FEM state cannot provide certified physical observables."""
+
+
+def _accepted_dirichlet_partition(state: "LiveFEMTopologyState") -> tuple[np.ndarray, np.ndarray]:
+    """Return the exact constrained/free partition used by ``solve_dirichlet``."""
+    prescribed = np.zeros(state.mesh.ndof, dtype=bool)
+    prescribed[2 * np.asarray(state.boundary.top_nodes, dtype=int) + 1] = True
+    prescribed[2 * np.asarray(state.boundary.bot_nodes, dtype=int) + 1] = True
+    prescribed[2 * int(state.boundary.left_bot)] = True
+    prescribed[2 * int(state.boundary.left_bot) + 1] = True
+    prescribed[2 * int(state.boundary.right_bot)] = True
+    return prescribed, ~prescribed
+
+
+def require_equilibrium_observables(state: "LiveFEMTopologyState") -> dict[str, float]:
+    """Read a complete certified ledger; missing entries never become zero."""
+    ledger = state.energy_ledgers
+    if ledger.get("equilibrium_observable_schema") != EQUILIBRIUM_OBSERVABLE_SCHEMA:
+        raise EquilibriumObservablesUnavailable("accepted state has no certified equilibrium-observable ledger")
+    missing = [key for key in EQUILIBRIUM_OBSERVABLE_KEYS if key not in ledger]
+    if missing:
+        raise EquilibriumObservablesUnavailable(
+            "accepted equilibrium-observable ledger is incomplete: " + ",".join(missing)
+        )
+    values = {key: float(ledger[key]) for key in EQUILIBRIUM_OBSERVABLE_KEYS}
+    if not all(math.isfinite(value) for value in values.values()):
+        raise EquilibriumObservablesUnavailable("accepted equilibrium-observable ledger is nonfinite")
+    if abs(values["latest_reaction_N_per_m"]) <= REACTION_ABSOLUTE_FLOOR_N_PER_M:
+        raise EquilibriumObservablesUnavailable("accepted top reaction is below the declared physical floor")
+    if values["latest_compliance_m2_per_N"] <= 0.0:
+        raise EquilibriumObservablesUnavailable("accepted compliance is not positive")
+    return values
+
+
+def _measure_accepted_equilibrium(
+    state: "LiveFEMTopologyState", residual: np.ndarray, sigma_gp: np.ndarray,
+    stored_energy_J_per_m: float,
+) -> dict[str, float | str]:
+    """Measure reactions and the plastic-strain-aware production energy identity."""
+    prescribed, free = _accepted_dirichlet_partition(state)
+    vector = np.asarray(residual, dtype=float)
+    displacement = np.asarray(state.displacement, dtype=float)
+    top_dofs = 2 * np.asarray(state.boundary.top_nodes, dtype=int) + 1
+    bottom_dofs = 2 * np.asarray(state.boundary.bot_nodes, dtype=int) + 1
+    top = float(np.sum(vector[top_dofs]))
+    bottom = float(np.sum(vector[bottom_dofs]))
+    top_opening = float(np.mean(displacement[top_dofs]))
+    bottom_opening = float(np.mean(displacement[bottom_dofs]))
+    opening = top_opening - bottom_opening
+    stored = float(stored_energy_J_per_m)
+    quantities = np.asarray((top, bottom, opening, stored), dtype=float)
+    if not np.all(np.isfinite(vector)) or not np.all(np.isfinite(quantities)):
+        raise EquilibriumObservablesUnavailable("accepted equilibrium contains nonfinite values")
+    if abs(top) <= REACTION_ABSOLUTE_FLOOR_N_PER_M:
+        raise EquilibriumObservablesUnavailable("accepted top reaction is below the declared physical floor")
+    if abs(bottom) <= REACTION_ABSOLUTE_FLOOR_N_PER_M:
+        raise EquilibriumObservablesUnavailable("accepted bottom reaction is below the declared physical floor")
+    if opening <= 0.0:
+        raise EquilibriumObservablesUnavailable("accepted applied opening is not positive")
+    if stored <= ENERGY_ABSOLUTE_FLOOR_J_PER_M:
+        raise EquilibriumObservablesUnavailable(
+            "nonzero accepted reaction has no finite stored mechanical energy"
+        )
+    reaction_scale = 0.5 * (abs(top) + abs(bottom))
+    balance = abs(top + bottom) / reaction_scale
+    free_norm = float(np.linalg.norm(vector[free]))
+    full_norm = float(np.linalg.norm(vector))
+    constrained_norm = float(np.linalg.norm(vector[prescribed]))
+    free_relative = free_norm / reaction_scale
+    boundary_half_work = 0.5 * float(np.dot(displacement[prescribed], vector[prescribed]))
+    plastic_half_work = 0.5 * float(np.sum(
+        np.asarray(state.ep_gp, dtype=float).T * np.asarray(sigma_gp, dtype=float).T
+        * np.asarray(state.mesh.area_e, dtype=float)[:, None]
+    ))
+    energy_reference = boundary_half_work - plastic_half_work
+    energy_identity = abs(stored - energy_reference) / stored
+    from .finalization_v3_schema import SCIENTIFIC_ACCEPTANCE_TOLERANCES as limits
+    if balance > limits["reaction_balance_relative"]:
+        raise EquilibriumObservablesUnavailable("accepted top and bottom reactions do not balance")
+    if free_relative > limits["free_residual_relative"]:
+        raise EquilibriumObservablesUnavailable("accepted free-DOF residual is above tolerance")
+    if energy_identity > limits["energy_reaction_identity_relative"]:
+        raise EquilibriumObservablesUnavailable("accepted production energy identity is above tolerance")
+    return {
+        "equilibrium_observable_schema": EQUILIBRIUM_OBSERVABLE_SCHEMA,
+        "equilibrium_reaction_absolute_floor_N_per_m": REACTION_ABSOLUTE_FLOOR_N_PER_M,
+        "equilibrium_energy_absolute_floor_J_per_m": ENERGY_ABSOLUTE_FLOOR_J_PER_M,
+        "latest_top_reaction_N_per_m": top,
+        "latest_bottom_reaction_N_per_m": bottom,
+        "latest_reaction_N_per_m": top,
+        "latest_applied_opening_m": opening,
+        "latest_compliance_m2_per_N": opening / abs(top),
+        "latest_external_work_J_per_m": boundary_half_work,
+        "latest_stored_recoverable_energy_J_per_m": stored,
+        "latest_plastic_eigenstrain_half_work_J_per_m": plastic_half_work,
+        "latest_energy_identity_reference_J_per_m": energy_reference,
+        "latest_residual_l2_N_per_m": full_norm,
+        "latest_free_dof_residual_l2_N_per_m": free_norm,
+        "latest_free_dof_residual_relative": free_relative,
+        "latest_constrained_reaction_l2_N_per_m": constrained_norm,
+        "latest_top_bottom_reaction_balance": balance,
+        "latest_energy_reaction_identity": energy_identity,
+    }
 
 
 class FrozenMapping(dict):
@@ -241,7 +366,7 @@ def equilibrate_fixed_load_with_production_fem(
     displacement, _ = solve_dirichlet(
         matrix, residual, displacement, state.boundary, top, bottom,
     )
-    _, _, sigma_gp, *_ = assemble_mechanics(
+    _, accepted_residual, sigma_gp, *_ = assemble_mechanics(
         state.mesh, displacement, state.ep_gp, state.rho_gp, state.damage,
         state.elasticity_D, state.material,
         cohesive_network=state.cohesive_network,
@@ -249,7 +374,11 @@ def equilibrate_fixed_load_with_production_fem(
     energy = _stored_energy(
         state.mesh, displacement, state.ep_gp, sigma_gp, state.elasticity_D,
     )
-    return replace(state, displacement=displacement, stored_energy_J_per_m=energy)
+    accepted = replace(state, displacement=displacement, stored_energy_J_per_m=energy)
+    equilibrium_ledger = _measure_accepted_equilibrium(
+        accepted, accepted_residual, sigma_gp, energy,
+    )
+    return replace(accepted, energy_ledgers={**accepted.energy_ledgers, **equilibrium_ledger})
 
 
 def complete_accepted_state_fingerprint(state: LiveFEMTopologyState) -> str:
@@ -693,6 +822,10 @@ __all__ = [
     "LiveFEMTopologyState", "MODEL_ID", "TopologyArm", "TopologyTrialResult",
     "apply_sharp_wake_trial_geometry", "apply_causal_sharp_wake_trial_geometry", "apply_mechanically_separating_v12_trial_geometry", "apply_v12_production_trial_geometry", "initialize_mechanically_separating_v12", "remesh_mechanically_separating_v12",
     "clip_arm_at_first_intersection",
-    "complete_accepted_state_fingerprint", "equilibrate_fixed_load_with_production_fem", "execute_topology_trial",
+    "EQUILIBRIUM_OBSERVABLE_KEYS", "EQUILIBRIUM_OBSERVABLE_SCHEMA",
+    "ENERGY_ABSOLUTE_FLOOR_J_PER_M", "EquilibriumObservablesUnavailable",
+    "REACTION_ABSOLUTE_FLOOR_N_PER_M", "complete_accepted_state_fingerprint",
+    "equilibrate_fixed_load_with_production_fem", "execute_topology_trial",
+    "require_equilibrium_observables",
     "extend_network_arm", "mark_coalesced",
 ]

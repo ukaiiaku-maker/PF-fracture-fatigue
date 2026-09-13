@@ -446,6 +446,8 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
 
 
 def observables(state, operation):
+    from .topology_transaction_v11 import require_equilibrium_observables
+
     cavity = None if state.void_state is None or not state.void_state.cavities else state.void_state.cavities[0]
     site = None if state.void_state is None else state.void_state.sites[0]
     tri = np.asarray(state.mesh.nodes)[np.asarray(state.mesh.elems)]
@@ -453,7 +455,8 @@ def observables(state, operation):
     avec, bvec = tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]
     area = np.abs(avec[:, 0] * bvec[:, 1] - avec[:, 1] * bvec[:, 0]) / 2.0
     quality = 4.0 * np.sqrt(3.0) * area / np.maximum(np.sum(side**2, axis=1), 1.0e-300)
-    reaction = float(state.energy_ledgers.get("latest_reaction_N_per_m", 0.0))
+    equilibrium = require_equilibrium_observables(state)
+    reaction = equilibrium["latest_reaction_N_per_m"]
     active_branches = [branch.branch_id for branch in state.crack_network.branches
                        if branch.status == "active"]
     support_active = [] if state.v12_support_state is None else list(state.v12_support_state.active_tip_identities)
@@ -462,13 +465,20 @@ def observables(state, operation):
         "mesh_nodes": int(state.mesh.nn), "mesh_elements": int(state.mesh.ne),
         "graph_length_m": float(state.crack_network.total_physical_crack_length_m),
         "reaction_N_per_m": reaction,
-        "compliance_m2_per_N": 4.0e-7 / max(abs(reaction), 1.0e-300),
+        "top_reaction_N_per_m": equilibrium["latest_top_reaction_N_per_m"],
+        "bottom_reaction_N_per_m": equilibrium["latest_bottom_reaction_N_per_m"],
+        "applied_opening_m": equilibrium["latest_applied_opening_m"],
+        "compliance_m2_per_N": equilibrium["latest_compliance_m2_per_N"],
         "energy_J_per_m": float(state.stored_energy_J_per_m),
-        "full_residual_including_reactions_N_per_m": float(state.energy_ledgers.get("latest_residual_l2_N_per_m", 0.0)),
-        "free_dof_residual_l2_N_per_m": float(state.energy_ledgers.get("latest_free_dof_residual_l2_N_per_m", 0.0)),
-        "constrained_reaction_l2_N_per_m": float(state.energy_ledgers.get("latest_constrained_reaction_l2_N_per_m", 0.0)),
-        "top_bottom_reaction_balance": float(state.energy_ledgers.get("latest_top_bottom_reaction_balance", 0.0)),
-        "energy_reaction_identity": float(state.energy_ledgers.get("latest_energy_reaction_identity", 0.0)),
+        "external_work_J_per_m": equilibrium["latest_external_work_J_per_m"],
+        "stored_recoverable_energy_J_per_m": equilibrium["latest_stored_recoverable_energy_J_per_m"],
+        "plastic_eigenstrain_half_work_J_per_m": equilibrium["latest_plastic_eigenstrain_half_work_J_per_m"],
+        "energy_identity_reference_J_per_m": equilibrium["latest_energy_identity_reference_J_per_m"],
+        "full_residual_including_reactions_N_per_m": equilibrium["latest_residual_l2_N_per_m"],
+        "free_dof_residual_l2_N_per_m": equilibrium["latest_free_dof_residual_l2_N_per_m"],
+        "constrained_reaction_l2_N_per_m": equilibrium["latest_constrained_reaction_l2_N_per_m"],
+        "top_bottom_reaction_balance": equilibrium["latest_top_bottom_reaction_balance"],
+        "energy_reaction_identity": equilibrium["latest_energy_reaction_identity"],
         "void_phase": None if cavity is None else cavity.phase.value,
         "site_phase": None if site is None else site.phase.value,
         "cavity_radius_m": None if cavity is None else cavity.radius_m,

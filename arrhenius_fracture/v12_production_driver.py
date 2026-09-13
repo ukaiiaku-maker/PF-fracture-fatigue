@@ -123,6 +123,9 @@ def _git_head() -> str:
 
 
 def _observables(state: LiveFEMTopologyState) -> dict[str, Any]:
+    from .topology_transaction_v11 import require_equilibrium_observables
+
+    equilibrium = require_equilibrium_observables(state)
     support = state.v12_support_state
     return {
         "fingerprint": complete_accepted_state_fingerprint(state),
@@ -137,8 +140,8 @@ def _observables(state: LiveFEMTopologyState) -> dict[str, Any]:
         "displacement_l2_m": float(np.linalg.norm(state.displacement)),
         "plastic_history_l2": float(np.linalg.norm(state.ep_gp)),
         "density_l2_m2": float(np.linalg.norm(state.rho_gp)),
-        "reaction_N_per_m": float(state.energy_ledgers.get("latest_reaction_N_per_m", 0.0)),
-        "residual_l2_N_per_m": float(state.energy_ledgers.get("latest_residual_l2_N_per_m", 0.0)),
+        "reaction_N_per_m": equilibrium["latest_reaction_N_per_m"],
+        "residual_l2_N_per_m": equilibrium["latest_residual_l2_N_per_m"],
         "stored_energy_J_per_m": float(state.stored_energy_J_per_m),
         "competition_consumed": list(state.competition.consumed_event_ids),
         "hazards": [float(item.residual_action) for item in state.competition.hazard_states],
