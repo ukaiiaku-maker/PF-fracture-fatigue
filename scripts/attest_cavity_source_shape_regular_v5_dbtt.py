@@ -143,8 +143,16 @@ def _boundary_fingerprints(state):
             if historical_arc_order else sorted(unique)
         )
         local_id = {node: index for index, node in enumerate(ordered)}
-        return _hash({
+        coordinate_record = ({
             "coordinates_m": nodes[ordered].tolist(),
+        } if historical_arc_order else {
+            "coordinate_quantum_m": 1.0e-15,
+            "coordinates_in_quanta": np.rint(
+                nodes[ordered] / 1.0e-15
+            ).astype(np.int64).tolist(),
+        })
+        return _hash({
+            **coordinate_record,
             "edges_local": (
                 sorted(sorted((local_id[a], local_id[b])) for a, b in canonical_edges)
                 if historical_arc_order else

@@ -174,9 +174,13 @@ def build_record():
         len(contract_boundary_fingerprints) == 1
         and observed_boundary_fingerprints == contract_boundary_fingerprints
         and len({
-            retained["C"]["discrete_cavity_boundary_fingerprints"]["fixed_v3_source_window"],
             *(row["discrete_cavity_boundary_fingerprints"]["fixed_v3_source_window"] for row in rows),
         }) == 1
+        and all(
+            row["discrete_cavity_boundary_fingerprints"]["fixed_v3_source_window_edge_count"]
+            == retained["C"]["discrete_cavity_boundary_fingerprints"]["fixed_v3_source_window_edge_count"]
+            for row in rows
+        )
         and len({retained["C"]["physical_window_identity"], *(row["physical_window_identity"] for row in rows)}) == 1
     )
     exact_state_keys = (

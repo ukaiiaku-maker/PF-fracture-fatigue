@@ -92,7 +92,10 @@ def discrete_cavity_boundary_fingerprint(hole: HoleMesh) -> str:
     edges = sorted(tuple(sorted(map(int, edge))) for edge in np.asarray(hole.cavity_edges))
     nodes = sorted(set(item for edge in edges for item in edge))
     record = {
-        "coordinates_m": np.asarray(hole.mesh.nodes)[nodes].tolist(),
+        "coordinate_quantum_m": 1.0e-15,
+        "coordinates_in_quanta": np.rint(
+            np.asarray(hole.mesh.nodes)[nodes] / 1.0e-15
+        ).astype(np.int64).tolist(),
         "edges_local": [[nodes.index(a), nodes.index(b)] for a, b in edges],
     }
     return _sha256(record)
