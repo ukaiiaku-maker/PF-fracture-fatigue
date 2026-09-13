@@ -121,9 +121,13 @@ def _boundary_fingerprints(state):
     radius = float(state.void_state.cavities[0].radius_m)
     half_width = 0.5 * min(radius, 5.0e-5)
 
-    def fingerprint(selected_edges):
+    def fingerprint(selected_edges, *, historical_arc_order=False):
         canonical_edges = sorted(tuple(sorted(map(int, edge))) for edge in selected_edges)
-        ordered = sorted(set(item for edge in canonical_edges for item in edge))
+        unique = set(item for edge in canonical_edges for item in edge)
+        ordered = (
+            sorted(unique, key=lambda node: math.atan2(*(nodes[node] - center)[::-1]))
+            if historical_arc_order else sorted(unique)
+        )
         local_id = {node: index for index, node in enumerate(ordered)}
         return _hash({
             "coordinates_m": nodes[ordered].tolist(),
@@ -140,7 +144,7 @@ def _boundary_fingerprints(state):
         raise ValueError("source window has inadequate discrete cavity boundary support")
     return {
         "complete_boundary": fingerprint(edges),
-        "fixed_v3_source_window": fingerprint(source_edges),
+        "fixed_v3_source_window": fingerprint(source_edges, historical_arc_order=True),
         "fixed_v3_source_window_edge_count": int(len(source_edges)),
         "fixed_v3_source_window_half_width_m": half_width,
     }

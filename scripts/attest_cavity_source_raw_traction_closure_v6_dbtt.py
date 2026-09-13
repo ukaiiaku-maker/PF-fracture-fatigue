@@ -278,6 +278,10 @@ def build_record():
             "PASS_PRODUCTION_TRACTION_CLOSURE" if passed
             else "BLOCKED_WITH_EXACT_V6_FAILURE_CLASS"
         ),
+        "UNIFIED_2D_ONE_VOID_CODE": (
+            "PRODUCTION_READY_WITH_DECLARED_SCOPE" if passed
+            else "BLOCKED_" + "+".join(failures)
+        ),
         "oracle_states_accepted": 0,
         "oracle_generated_in_this_record": False,
         "paired_trajectories_run": 0,
@@ -310,7 +314,7 @@ def build_record():
         },
         "next_bounded_step": (
             "GENERATE_FROZEN_18_STATE_ORACLE_WITHOUT_MAP_FITTING"
-            if passed else "EQUILIBRATED_BOUNDARY_STRESS_RECONSTRUCTION"
+            if passed else "STOP_SOURCE_QUALIFICATION_PRIMARY_AND_FALLBACK_FAILED"
         ),
     }
 
