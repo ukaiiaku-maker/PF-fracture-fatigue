@@ -1,0 +1,56 @@
+{
+  "acceptance_limits": {
+    "maximum_equilibrium_residual": 1e-12,
+    "maximum_interface_traction_jump_relative": 1e-08,
+    "maximum_moment_residual_relative": 1e-08,
+    "maximum_resultant_residual_relative": 1e-08,
+    "maximum_scaled_condition": 100000000.0,
+    "maximum_stress_fit_residual": 0.35,
+    "minimum_mesh_quality": 0.05,
+    "normalized_equilibrated_boundary_traction": 0.05,
+    "traction_mesh_relative_change": 0.05,
+    "weak_fem_residual": 1e-08
+  },
+  "additional_production_mesh_level": "PROHIBITED",
+  "boundary_evaluation": "ACTUAL_OWNED_CAVITY_EDGES_AFTER_SOLVE",
+  "central_levels": [
+    "D",
+    "E"
+  ],
+  "constraints": {
+    "internal_normal_traction_continuity": "EDGE_ENDPOINT_EQUALITY",
+    "local_in_plane_equilibrium": "EXACT_BY_PARAMETERIZATION",
+    "patch_moment_balance": true,
+    "patch_resultant_balance": true,
+    "tensor_symmetry": "EXACT_BY_PARAMETERIZATION",
+    "zero_cavity_traction_imposed": false
+  },
+  "contract": "PIECEWISE_EQUILIBRATED_BOUNDARY_STRESS_V2_QUALIFICATION",
+  "fit_target": "ACCEPTED_CST_STRESS",
+  "immutable_model_boundary": {
+    "fracture_or_void_kinetics_changed": false,
+    "material_or_constitutive_model_changed": false,
+    "physical_equilibrium_observation_changed": false,
+    "qualified_D_E_geometry_changed": false,
+    "r_tip_or_R_void_changed": false,
+    "shared_v13_fracture_core_changed": false,
+    "source_tensor_definition_changed": false,
+    "threshold_or_RNG_changed": false,
+    "traction_limit_changed": false
+  },
+  "operator": "PIECEWISE_EQUILIBRATED_BOUNDARY_STRESS_V2",
+  "physical_patch": "EXACT_V3_FIXED_PHYSICAL_SOURCE_PATCH",
+  "prospectively_frozen_before_central_D_E_evaluation": true,
+  "qualification_cases": [
+    "constant_stress",
+    "affine_self_equilibrated_stress",
+    "rigid_rotation",
+    "reversed_normals_and_edge_order",
+    "Kirsch",
+    "reflected_cavity_geometry",
+    "two_shape_regular_refinement_levels"
+  ],
+  "raw_CST_traction_role": "RETAINED_NON_AUTHORITATIVE_DIAGNOSTIC",
+  "schema": "unified-2d-one-void.piecewise-equilibrated-stress-contract/1",
+  "stress_space": "ELEMENT_LOCAL_AFFINE_SYMMETRIC_DIVERGENCE_FREE"
+}
