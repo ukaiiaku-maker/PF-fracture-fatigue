@@ -1,0 +1,2673 @@
+{
+  "cause_decision": {
+    "A_source_facet_insertion_without_matched_radial_column": false,
+    "B_annular_to_background_transition": false,
+    "C_crack_support_cavity_interaction": true,
+    "D_other_explicit_mesh_location": false,
+    "classification": "C_CRACK_SUPPORT_CAVITY_INTERACTION",
+    "evidence": {
+      "N128_base_mesh_quality_above_acceptance": true,
+      "N128_quality_drops_below_acceptance_after_fixed_crack_path_insertion": true,
+      "N128_worst_element_location": "crack_support_region",
+      "retained_connected_mesh_collapses_further_in_same_construction_path": true
+    }
+  },
+  "levels": [
+    {
+      "N_theta": 32,
+      "base_source_conforming_mesh_minimum_quality": 0.3545364591613867,
+      "geometry_only_crack_path_mesh_minimum_quality": 0.3545364591613867,
+      "lowest_quality_elements": [
+        {
+          "aspect_ratio": 2.6666314462739713,
+          "centroid_m": [
+            0.0009761858805435909,
+            -0.0003014184288875189
+          ],
+          "connectivity": [
+            380,
+            412,
+            381
+          ],
+          "coordinates_m": [
+            [
+              0.0009637547985367346,
+              -0.00032138615190775753
+            ],
+            [
+              0.001,
+              -0.00036555105767639283
+            ],
+            [
+              0.0009648028430940379,
+              -0.00021731807707840636
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00035364626405029,
+          "distance_to_crack_support_m": 0.0005037213485065438,
+          "distance_to_source_node_m": 0.00037386663802065024,
+          "edge_length_ratio": 2.6666314462739713,
+          "edge_lengths_m": [
+            5.713364622238924e-05,
+            0.00015235437765691523,
+            0.00010407335199791312
+          ],
+          "element_id": 756,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 140.04800748762256,
+          "minimum_angle_deg": 13.934219434071432,
+          "quality": 0.3545364591613867,
+          "rank": 1,
+          "signed_double_area_jacobian_m2": 3.818255127198645e-09
+        },
+        {
+          "aspect_ratio": 2.5727610376534353,
+          "centroid_m": [
+            0.00020000061295726959,
+            -0.0004579451398028501
+          ],
+          "connectivity": [
+            372,
+            404,
+            373
+          ],
+          "coordinates_m": [
+            [
+              0.00016825275332754013,
+              -0.0004363936874256235
+            ],
+            [
+              9.074823720601154e-05,
+              -0.0005
+            ],
+            [
+              0.00034100084833825706,
+              -0.00043744173198292675
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0006228440526446923,
+          "distance_to_crack_support_m": 0.00045794513980285014,
+          "distance_to_source_node_m": 0.0007195401800364303,
+          "edge_length_ratio": 2.5727610376534353,
+          "edge_lengths_m": [
+            0.00010026321867236046,
+            0.0002579533025099754,
+            0.00017275127416961584
+          ],
+          "element_id": 740,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 140.27739678534255,
+          "minimum_angle_deg": 14.38279408872069,
+          "quality": 0.3602598251285974,
+          "rank": 2,
+          "signed_double_area_jacobian_m2": 1.106909751416734e-08
+        },
+        {
+          "aspect_ratio": 1.9028962083371688,
+          "centroid_m": [
+            0.000569803933468223,
+            1.5365090666003468e-20
+          ],
+          "connectivity": [
+            112,
+            113,
+            419
+          ],
+          "coordinates_m": [
+            [
+              0.00056840625,
+              1.2960853110531863e-05
+            ],
+            [
+              0.00056840625,
+              -1.2960853110531833e-05
+            ],
+            [
+              0.0005725993004046688,
+              1.5602085896855586e-20
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 7.519606653177697e-05,
+          "distance_to_crack_support_m": 5.793289479681892e-22,
+          "distance_to_source_node_m": 0.00018519606653177704,
+          "edge_length_ratio": 1.9028962083371688,
+          "edge_lengths_m": [
+            2.5921706221063696e-05,
+            1.3622238621051844e-05,
+            1.3622238621051844e-05
+          ],
+          "element_id": 771,
+          "local_resolution_contributors": [],
+          "location": "crack_support_region",
+          "maximum_angle_deg": 144.14549530846608,
+          "minimum_angle_deg": 17.92725234576699,
+          "quality": 0.36097128702110187,
+          "rank": 3,
+          "signed_double_area_jacobian_m2": 1.0869102075993742e-10
+        },
+        {
+          "aspect_ratio": 4.262065479029921,
+          "centroid_m": [
+            0.0006385798611111111,
+            -6.323284889145676e-07
+          ],
+          "connectivity": [
+            16,
+            49,
+            417
+          ],
+          "coordinates_m": [
+            [
+              0.000645,
+              5.417027184644046e-06
+            ],
+            [
+              0.0006257395833333333,
+              -7.314012651387749e-06
+            ],
+            [
+              0.000645,
+              0.0
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 6.4201388888888164e-06,
+          "distance_to_crack_support_m": 6.598359061504923e-05,
+          "distance_to_source_node_m": 0.00011642185610196254,
+          "edge_length_ratio": 4.262065479029921,
+          "edge_lengths_m": [
+            2.3087724562638032e-05,
+            2.0602388969201392e-05,
+            5.417027184644046e-06
+          ],
+          "element_id": 766,
+          "local_resolution_contributors": [
+            {
+              "boundary_edge": [
+                16,
+                417
+              ],
+              "eta_n": 0.3501893939393939,
+              "eta_t": 0.09849140335716447
+            }
+          ],
+          "location": "first_radial_ring",
+          "maximum_angle_deg": 110.79393393369912,
+          "minimum_angle_deg": 12.670571710677232,
+          "quality": 0.3662419514475816,
+          "rank": 4,
+          "signed_double_area_jacobian_m2": 1.043342006709046e-10
+        },
+        {
+          "aspect_ratio": 3.346052263795779,
+          "centroid_m": [
+            0.0009882676143646793,
+            -0.00027635759066779904
+          ],
+          "connectivity": [
+            381,
+            412,
+            413
+          ],
+          "coordinates_m": [
+            [
+              0.0009648028430940379,
+              -0.00021731807707840636
+            ],
+            [
+              0.001,
+              -0.00036555105767639283
+            ],
+            [
+              0.001,
+              -0.0002462036372485979
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00034426342333254386,
+          "distance_to_crack_support_m": 0.000499152947652389,
+          "distance_to_source_node_m": 0.00036164526518551223,
+          "edge_length_ratio": 3.346052263795779,
+          "edge_lengths_m": [
+            0.00015235437765691523,
+            0.00011934742042779491,
+            4.5532575598231585e-05
+          ],
+          "element_id": 757,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 129.37499999999997,
+          "minimum_angle_deg": 13.357226921694014,
+          "quality": 0.36812621875875084,
+          "rank": 5,
+          "signed_double_area_jacobian_m2": 4.2006898831189265e-09
+        },
+        {
+          "aspect_ratio": 2.5374724039605407,
+          "centroid_m": [
+            0.0009419824012376147,
+            0.0002640771062086248
+          ],
+          "connectivity": [
+            324,
+            357,
+            325
+          ],
+          "coordinates_m": [
+            [
+              0.0009321070069834233,
+              0.0001904852978340153
+            ],
+            [
+              0.0009637547985367346,
+              0.00032138615190775764
+            ],
+            [
+              0.0009300853981926862,
+              0.00028035986888410154
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00030301004740765315,
+          "distance_to_crack_support_m": 0.0004540711323179261,
+          "distance_to_source_node_m": 0.00032357245926701737,
+          "edge_length_ratio": 2.5374724039605407,
+          "edge_lengths_m": [
+            0.0001346722551509294,
+            5.307338709998583e-05,
+            8.989730487361558e-05
+          ],
+          "element_id": 645,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 139.33642503539392,
+          "minimum_angle_deg": 14.880115272042307,
+          "quality": 0.37092432257023406,
+          "rank": 6,
+          "signed_double_area_jacobian_m2": 3.1089620078468746e-09
+        },
+        {
+          "aspect_ratio": 2.4448268395281003,
+          "centroid_m": [
+            0.0002657315448234359,
+            0.0003976768456820592
+          ],
+          "connectivity": [
+            332,
+            365,
+            333
+          ],
+          "coordinates_m": [
+            [
+              0.00038869254684954313,
+              0.00037932922920564565
+            ],
+            [
+              0.00016825275332754035,
+              0.0004363936874256235
+            ],
+            [
+              0.00024024933429322412,
+              0.0003773076204149084
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0005336664020679495,
+          "distance_to_crack_support_m": 0.0003976768456820591,
+          "distance_to_source_node_m": 0.0006305001941494498,
+          "edge_length_ratio": 2.4448268395281003,
+          "edge_lengths_m": [
+            0.00022770607141655845,
+            9.313791379209099e-05,
+            0.000148456977795398
+          ],
+          "element_id": 661,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 139.84475219098982,
+          "minimum_angle_deg": 15.293609970847255,
+          "quality": 0.374103712374579,
+          "rank": 7,
+          "signed_double_area_jacobian_m2": 8.91647452537174e-09
+        },
+        {
+          "aspect_ratio": 3.1874379780660083,
+          "centroid_m": [
+            0.0002404698967099796,
+            -0.00047914724399430894
+          ],
+          "connectivity": [
+            373,
+            404,
+            405
+          ],
+          "coordinates_m": [
+            [
+              0.00034100084833825706,
+              -0.00043744173198292675
+            ],
+            [
+              9.074823720601154e-05,
+              -0.0005
+            ],
+            [
+              0.00028966060458567017,
+              -0.0005
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0006088038229663104,
+          "distance_to_crack_support_m": 0.000479147243994309,
+          "distance_to_source_node_m": 0.0007030812958819065,
+          "edge_length_ratio": 3.1874379780660083,
+          "edge_lengths_m": [
+            0.0002579533025099754,
+            0.00019891236737965863,
+            8.092810096543108e-05
+          ],
+          "element_id": 741,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 129.37500000000006,
+          "minimum_angle_deg": 14.035190874063174,
+          "quality": 0.3826353904246816,
+          "rank": 8,
+          "signed_double_area_jacobian_m2": 1.2443613190447227e-08
+        },
+        {
+          "aspect_ratio": 2.5521025553039594,
+          "centroid_m": [
+            0.0009550893277378523,
+            0.0004198837757385075
+          ],
+          "connectivity": [
+            357,
+            390,
+            358
+          ],
+          "coordinates_m": [
+            [
+              0.0009637547985367346,
+              0.00032138615190775764
+            ],
+            [
+              0.000967255567975396,
+              0.0005
+            ],
+            [
+              0.0009342576167014264,
+              0.00043826517530776496
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004361254446074938,
+          "distance_to_crack_support_m": 0.0005679797585634234,
+          "distance_to_source_node_m": 0.0004651216230224208,
+          "edge_length_ratio": 2.5521025553039594,
+          "edge_lengths_m": [
+            0.00017864815173122082,
+            7.00003811993925e-05,
+            0.00012054372587225224
+          ],
+          "element_id": 711,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 137.7108298753224,
+          "minimum_angle_deg": 15.28700375714094,
+          "quality": 0.3830556609106694,
+          "rank": 9,
+          "signed_double_area_jacobian_m2": 5.677771668620317e-09
+        },
+        {
+          "aspect_ratio": 3.183985283551306,
+          "centroid_m": [
+            0.0009535548828713986,
+            0.00024306317560672647
+          ],
+          "connectivity": [
+            324,
+            356,
+            357
+          ],
+          "coordinates_m": [
+            [
+              0.0009321070069834233,
+              0.0001904852978340153
+            ],
+            [
+              0.0009648028430940379,
+              0.0002173180770784065
+            ],
+            [
+              0.0009637547985367346,
+              0.00032138615190775764
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0002961687614822074,
+          "distance_to_crack_support_m": 0.0004518925349555928,
+          "distance_to_source_node_m": 0.00031385306888431276,
+          "edge_length_ratio": 3.183985283551306,
+          "edge_lengths_m": [
+            4.2296758043027346e-05,
+            0.00010407335199791311,
+            0.0001346722551509294
+          ],
+          "element_id": 646,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 128.79800748762258,
+          "minimum_angle_deg": 14.168532819813603,
+          "quality": 0.3863961026346071,
+          "rank": 10,
+          "signed_double_area_jacobian_m2": 3.4307146672120427e-09
+        },
+        {
+          "aspect_ratio": 2.317035936841728,
+          "centroid_m": [
+            0.0003265743381719388,
+            -0.00034190397035030635
+          ],
+          "connectivity": [
+            308,
+            340,
+            309
+          ],
+          "coordinates_m": [
+            [
+              0.00030673798010306334,
+              -0.00032274179896785437
+            ],
+            [
+              0.000240249334293224,
+              -0.00037730762041490837
+            ],
+            [
+              0.000432735700119529,
+              -0.0003256624916681564
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004511300520977801,
+          "distance_to_crack_support_m": 0.0003419039703503064,
+          "distance_to_source_node_m": 0.0005481303427599274,
+          "edge_length_ratio": 2.317035936841728,
+          "edge_lengths_m": [
+            8.601260891182201e-05,
+            0.00019929430587020466,
+            0.00012603156705840511
+          ],
+          "element_id": 613,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 139.29709183320074,
+          "minimum_angle_deg": 16.346947773824297,
+          "quality": 0.3887119705913778,
+          "rank": 11,
+          "signed_double_area_jacobian_m2": 7.069361995624131e-09
+        },
+        {
+          "aspect_ratio": 2.4088477684307343,
+          "centroid_m": [
+            0.0009103298962762322,
+            -0.0002295124590016501
+          ],
+          "connectivity": [
+            316,
+            348,
+            317
+          ],
+          "coordinates_m": [
+            [
+              0.0008989917989678545,
+              -0.00024247220860542442
+            ],
+            [
+              0.0009300853981926862,
+              -0.00028035986888410143
+            ],
+            [
+              0.0009019124916681564,
+              -0.0001657052995154244
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0002561451103277721,
+          "distance_to_crack_support_m": 0.00040833555346644185,
+          "distance_to_source_node_m": 0.00027713416518749395,
+          "edge_length_ratio": 2.4088477684307343,
+          "edge_lengths_m": [
+            4.901312797758264e-05,
+            0.00011806516395260993,
+            7.682244969461675e-05
+          ],
+          "element_id": 629,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 138.44616157981193,
+          "minimum_angle_deg": 15.984042873979947,
+          "quality": 0.3889701097628674,
+          "rank": 12,
+          "signed_double_area_jacobian_m2": 2.497617717781002e-09
+        },
+        {
+          "aspect_ratio": 2.429198485972778,
+          "centroid_m": [
+            0.0009226492374639334,
+            -0.00036651421374407503
+          ],
+          "connectivity": [
+            347,
+            379,
+            348
+          ],
+          "coordinates_m": [
+            [
+              0.0009036046974976881,
+              -0.00038091759704035887
+            ],
+            [
+              0.0009342576167014262,
+              -0.0004382651753077649
+            ],
+            [
+              0.0009300853981926862,
+              -0.00028035986888410143
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0003736717611642252,
+          "distance_to_crack_support_m": 0.000506821099907682,
+          "distance_to_source_node_m": 0.0004030371393540251,
+          "edge_length_ratio": 2.429198485972778,
+          "edge_lengths_m": [
+            6.502573481974008e-05,
+            0.00015796041657337997,
+            0.00010398598079186367
+          ],
+          "element_id": 691,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 137.12177085333238,
+          "minimum_angle_deg": 16.2667622283628,
+          "quality": 0.39852809671460765,
+          "rank": 13,
+          "signed_double_area_jacobian_m2": 4.600991972167377e-09
+        },
+        {
+          "aspect_ratio": 3.028938095710026,
+          "centroid_m": [
+            0.0002993153828384468,
+            0.0004177215495380653
+          ],
+          "connectivity": [
+            332,
+            364,
+            365
+          ],
+          "coordinates_m": [
+            [
+              0.00038869254684954313,
+              0.00037932922920564565
+            ],
+            [
+              0.00034100084833825684,
+              0.0004374417319829268
+            ],
+            [
+              0.00016825275332754035,
+              0.0004363936874256235
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0005237425149218005,
+          "distance_to_crack_support_m": 0.00041772154953806525,
+          "distance_to_source_node_m": 0.0006181745411015838,
+          "edge_length_ratio": 3.028938095710026,
+          "edge_lengths_m": [
+            7.517686536382677e-05,
+            0.0001727512741696154,
+            0.00022770607141655845
+          ],
+          "element_id": 662,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 129.0273967853425,
+          "minimum_angle_deg": 14.86096537649458,
+          "quality": 0.400123713682214,
+          "rank": 14,
+          "signed_double_area_jacobian_m2": 1.0088807176133594e-08
+        },
+        {
+          "aspect_ratio": 3.126846675177071,
+          "centroid_m": [
+            0.0009770034555040437,
+            0.0003956457365280502
+          ],
+          "connectivity": [
+            357,
+            389,
+            390
+          ],
+          "coordinates_m": [
+            [
+              0.0009637547985367346,
+              0.00032138615190775764
+            ],
+            [
+              0.001,
+              0.00036555105767639294
+            ],
+            [
+              0.000967255567975396,
+              0.0005
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004278926034460062,
+          "distance_to_crack_support_m": 0.0005657546018323339,
+          "distance_to_source_node_m": 0.0004536750853733972,
+          "edge_length_ratio": 3.126846675177071,
+          "edge_lengths_m": [
+            5.713364622238924e-05,
+            0.00013837888538556213,
+            0.00017864815173122082
+          ],
+          "element_id": 712,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 126.93734453777749,
+          "minimum_angle_deg": 14.810489094685746,
+          "quality": 0.4029338104090035,
+          "rank": 15,
+          "signed_double_area_jacobian_m2": 6.319283755856212e-09
+        },
+        {
+          "aspect_ratio": 2.1893762656022155,
+          "centroid_m": [
+            0.0003825289930027784,
+            0.0002906265138075918
+          ],
+          "connectivity": [
+            268,
+            301,
+            269
+          ],
+          "coordinates_m": [
+            [
+              0.00047313030814821397,
+              0.0002764415193704592
+            ],
+            [
+              0.00030673798010306345,
+              0.0003227417989678544
+            ],
+            [
+              0.00036771869075705795,
+              0.0002726962230844618
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0003752351488645568,
+          "distance_to_crack_support_m": 0.00029062651380759173,
+          "distance_to_source_node_m": 0.00047243880194314974,
+          "edge_length_ratio": 2.1893762656022155,
+          "edge_lengths_m": [
+            0.00017271399110402712,
+            7.888730403155254e-05,
+            0.00010547813197667738
+          ],
+          "element_id": 533,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 138.5901252409188,
+          "minimum_angle_deg": 17.58461683346228,
+          "quality": 0.4041131202861622,
+          "rank": 16,
+          "signed_double_area_jacobian_m2": 5.503775926270129e-09
+        },
+        {
+          "aspect_ratio": 3.022588869549006,
+          "centroid_m": [
+            0.0009213682989480887,
+            -0.00021218348874451365
+          ],
+          "connectivity": [
+            317,
+            348,
+            349
+          ],
+          "coordinates_m": [
+            [
+              0.0009019124916681564,
+              -0.0001657052995154244
+            ],
+            [
+              0.0009300853981926862,
+              -0.00028035986888410143
+            ],
+            [
+              0.0009321070069834233,
+              -0.0001904852978340152
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.000251569717097427,
+          "distance_to_crack_support_m": 0.0004082421429014564,
+          "distance_to_source_node_m": 0.0002696298273386566,
+          "edge_length_ratio": 3.022588869549006,
+          "edge_lengths_m": [
+            0.00011806516395260993,
+            8.989730487361555e-05,
+            3.9060940487823005e-05
+          ],
+          "element_id": 630,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 128.086425035394,
+          "minimum_angle_deg": 15.093779418398018,
+          "quality": 0.40660256366089115,
+          "rank": 17,
+          "signed_double_area_jacobian_m2": 2.7638145744601873e-09
+        },
+        {
+          "aspect_ratio": 2.2808720396833055,
+          "centroid_m": [
+            0.0008812283656594437,
+            0.00019772448726659508
+          ],
+          "connectivity": [
+            260,
+            293,
+            261
+          ],
+          "coordinates_m": [
+            [
+              0.000874219297148237,
+              0.00014297808212263417
+            ],
+            [
+              0.0008989917989678545,
+              0.0002424722086054245
+            ],
+            [
+              0.0008704740008622395,
+              0.00020772317107172665
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.000213051751938537,
+          "distance_to_crack_support_m": 0.00036653359025452765,
+          "distance_to_source_node_m": 0.0002345816982671328,
+          "edge_length_ratio": 2.2808720396833055,
+          "edge_lengths_m": [
+            0.00010253174167532917,
+            4.495286885517939e-05,
+            6.485332518302977e-05
+          ],
+          "element_id": 517,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 137.31431194550566,
+          "minimum_angle_deg": 17.292160683577002,
+          "quality": 0.4090278603776737,
+          "rank": 18,
+          "signed_double_area_jacobian_m2": 1.9765328161972457e-09
+        },
+        {
+          "aspect_ratio": 2.3067394764930444,
+          "centroid_m": [
+            0.0008926311022765748,
+            0.0003171156902811883
+          ],
+          "connectivity": [
+            293,
+            326,
+            294
+          ],
+          "coordinates_m": [
+            [
+              0.0008989917989678545,
+              0.0002424722086054245
+            ],
+            [
+              0.0009036046974976882,
+              0.00038091759704035887
+            ],
+            [
+              0.0008752968103641814,
+              0.00032795726519778157
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00031586994371355905,
+          "distance_to_crack_support_m": 0.0004505360310029525,
+          "distance_to_source_node_m": 0.0003456944913306828,
+          "edge_length_ratio": 2.3067394764930444,
+          "edge_lengths_m": [
+            0.00013852221631112607,
+            6.005108844008798e-05,
+            8.870821487058957e-05
+          ],
+          "element_id": 583,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 136.3825408316566,
+          "minimum_angle_deg": 17.400806416536046,
+          "quality": 0.4151446909835288,
+          "rank": 19,
+          "signed_double_area_jacobian_m2": 3.6747957930745024e-09
+        },
+        {
+          "aspect_ratio": 2.8706157445423583,
+          "centroid_m": [
+            0.0003538925270874321,
+            -0.00036076644709623676
+          ],
+          "connectivity": [
+            309,
+            340,
+            341
+          ],
+          "coordinates_m": [
+            [
+              0.000432735700119529,
+              -0.0003256624916681564
+            ],
+            [
+              0.000240249334293224,
+              -0.00037730762041490837
+            ],
+            [
+              0.0003886925468495433,
+              -0.0003793292292056456
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.000444862865084398,
+          "distance_to_crack_support_m": 0.0003607664470962368,
+          "distance_to_source_node_m": 0.0005394808932453014,
+          "edge_length_ratio": 2.8706157445423583,
+          "edge_lengths_m": [
+            0.00019929430587020466,
+            0.00014845697779539827,
+            6.942562976222257e-05
+          ],
+          "element_id": 614,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 128.5947521909898,
+          "minimum_angle_deg": 15.799287416035243,
+          "quality": 0.4191359939376927,
+          "rank": 20,
+          "signed_double_area_jacobian_m2": 8.055500953304099e-09
+        }
+      ],
+      "lowest_twenty_location_counts": {
+        "annular_transition": 0,
+        "crack_support_region": 1,
+        "far_field_transition": 18,
+        "first_radial_ring": 1,
+        "split_source_facet": 0
+      },
+      "radial_layers": 12,
+      "retained_connected_v4_minimum_quality": 0.17103746754259488
+    },
+    {
+      "N_theta": 64,
+      "base_source_conforming_mesh_minimum_quality": 0.24401334324674806,
+      "geometry_only_crack_path_mesh_minimum_quality": 0.24401334324674806,
+      "lowest_quality_elements": [
+        {
+          "aspect_ratio": 3.3186494170675838,
+          "centroid_m": [
+            0.0009872941126031914,
+            -0.00044930026818930927
+          ],
+          "connectivity": [
+            1526,
+            1590,
+            1527
+          ],
+          "coordinates_m": [
+            [
+              0.000980795608343458,
+              -0.0004684791698915633
+            ],
+            [
+              0.0009996884668409616,
+              -0.0005
+            ],
+            [
+              0.0009813982626251546,
+              -0.0003794216346763644
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004782591542488026,
+          "distance_to_crack_support_m": 0.0006114266254092581,
+          "distance_to_source_node_m": 0.0005057976727359364,
+          "edge_length_ratio": 3.3186494170675838,
+          "edge_lengths_m": [
+            3.67491881941849e-05,
+            0.00012195767197833865,
+            8.905957427918482e-05
+          ],
+          "element_id": 3048,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 148.67478412944507,
+          "minimum_angle_deg": 9.013004697875965,
+          "quality": 0.24401334324674806,
+          "rank": 1,
+          "signed_double_area_jacobian_m2": 1.7015475741846649e-09
+        },
+        {
+          "aspect_ratio": 3.905554567889713,
+          "centroid_m": [
+            0.0009936955764887052,
+            -0.00042797493624079346
+          ],
+          "connectivity": [
+            1527,
+            1590,
+            1591
+          ],
+          "coordinates_m": [
+            [
+              0.0009813982626251546,
+              -0.0003794216346763644
+            ],
+            [
+              0.0009996884668409616,
+              -0.0005
+            ],
+            [
+              0.001,
+              -0.00040450317404601584
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00046403164031859036,
+          "distance_to_crack_support_m": 0.0006004037139976353,
+          "distance_to_source_node_m": 0.0004900389007880768,
+          "edge_length_ratio": 3.905554567889713,
+          "edge_lengths_m": [
+            0.00012195767197833865,
+            9.549733409993561e-05,
+            3.1226723339378665e-05
+          ],
+          "element_id": 3049,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 143.250588323156,
+          "minimum_angle_deg": 8.812200504164952,
+          "quality": 0.24754053462697712,
+          "rank": 2,
+          "signed_double_area_jacobian_m2": 1.7842206077207134e-09
+        },
+        {
+          "aspect_ratio": 3.2308111618653688,
+          "centroid_m": [
+            0.0009689346405665349,
+            0.0004205845825188993
+          ],
+          "connectivity": [
+            1418,
+            1483,
+            1419
+          ],
+          "coordinates_m": [
+            [
+              0.0009634459624653909,
+              0.0003552157600228606
+            ],
+            [
+              0.0009807956083434583,
+              0.0004684791698915633
+            ],
+            [
+              0.0009625623508907554,
+              0.0004380588176422741
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00044417621865937594,
+          "distance_to_crack_support_m": 0.0005779040516502882,
+          "distance_to_source_node_m": 0.0004718680127821013,
+          "edge_length_ratio": 3.2308111618653688,
+          "edge_lengths_m": [
+            0.00011458451128830671,
+            3.5466174142517574e-05,
+            8.284776982603875e-05
+          ],
+          "element_id": 2833,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 148.45140118659694,
+          "minimum_angle_deg": 9.319950661868704,
+          "quality": 0.25060384426814897,
+          "rank": 3,
+          "signed_double_area_jacobian_m2": 1.5373785730958282e-09
+        },
+        {
+          "aspect_ratio": 3.8021820642814363,
+          "centroid_m": [
+            0.0009752132778113345,
+            0.00040103885486359614
+          ],
+          "connectivity": [
+            1418,
+            1482,
+            1483
+          ],
+          "coordinates_m": [
+            [
+              0.0009634459624653909,
+              0.0003552157600228606
+            ],
+            [
+              0.0009813982626251543,
+              0.0003794216346763645
+            ],
+            [
+              0.0009807956083434583,
+              0.0004684791698915633
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004313647351765063,
+          "distance_to_crack_support_m": 0.000568269458895619,
+          "distance_to_source_node_m": 0.000457521639744741,
+          "edge_length_ratio": 3.8021820642814363,
+          "edge_lengths_m": [
+            3.0136513546981267e-05,
+            8.905957427918477e-05,
+            0.00011458451128830671
+          ],
+          "element_id": 2834,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 143.0497841294453,
+          "minimum_angle_deg": 9.096567719020392,
+          "quality": 0.2543942606230439,
+          "rank": 4,
+          "signed_double_area_jacobian_m2": 1.6133753776740876e-09
+        },
+        {
+          "aspect_ratio": 3.1429320846192006,
+          "centroid_m": [
+            0.0009512313816314391,
+            -0.00039289443699330344
+          ],
+          "connectivity": [
+            1398,
+            1462,
+            1399
+          ],
+          "coordinates_m": [
+            [
+              0.0009449886944828527,
+              -0.0004087389432521323
+            ],
+            [
+              0.0009625623508907552,
+              -0.0004380588176422741
+            ],
+            [
+              0.0009461430995207091,
+              -0.000331885550085504
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004113108274493089,
+          "distance_to_crack_support_m": 0.0005456448401244168,
+          "distance_to_source_node_m": 0.0004391728517990022,
+          "edge_length_ratio": 3.1429320846192006,
+          "edge_lengths_m": [
+            3.418316009085035e-05,
+            0.00010743535060320814,
+            7.686206276321095e-05
+          ],
+          "element_id": 2793,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 148.20193210624234,
+          "minimum_angle_deg": 9.651482556011814,
+          "quality": 0.2575834471323548,
+          "rank": 5,
+          "signed_double_area_jacobian_m2": 1.3844421359970588e-09
+        },
+        {
+          "aspect_ratio": 3.6987615192260974,
+          "centroid_m": [
+            0.000957383804292285,
+            -0.00037505337591687947
+          ],
+          "connectivity": [
+            1399,
+            1462,
+            1463
+          ],
+          "coordinates_m": [
+            [
+              0.0009461430995207091,
+              -0.000331885550085504
+            ],
+            [
+              0.0009625623508907552,
+              -0.0004380588176422741
+            ],
+            [
+              0.0009634459624653909,
+              -0.00035521576002286044
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0003998510469962447,
+          "distance_to_crack_support_m": 0.0005373305772228927,
+          "distance_to_source_node_m": 0.000426173953951278,
+          "edge_length_ratio": 3.6987615192260974,
+          "edge_lengths_m": [
+            0.00010743535060320814,
+            8.284776982603891e-05,
+            2.904630375458409e-05
+          ],
+          "element_id": 2794,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 142.8264011865967,
+          "minimum_angle_deg": 9.402013475657393,
+          "quality": 0.2616615684678161,
+          "rank": 6,
+          "signed_double_area_jacobian_m2": 1.4540369154464135e-09
+        },
+        {
+          "aspect_ratio": 3.0550055936684797,
+          "centroid_m": [
+            0.0009341843357979045,
+            0.0003662298316125217
+          ],
+          "connectivity": [
+            1290,
+            1355,
+            1291
+          ],
+          "coordinates_m": [
+            [
+              0.0009294896737911092,
+              0.00030943100486429493
+            ],
+            [
+              0.000944988694482853,
+              0.0004087389432521323
+            ],
+            [
+              0.0009280746391197512,
+              0.0003805195467211379
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00037966298540735544,
+          "distance_to_crack_support_m": 0.0005146533079494034,
+          "distance_to_source_node_m": 0.0004077147480264507,
+          "edge_length_ratio": 3.0550055936684797,
+          "edge_lengths_m": [
+            0.00010051013018221398,
+            3.290014603918301e-05,
+            7.110262376630877e-05
+          ],
+          "element_id": 2577,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 147.9221642006843,
+          "minimum_angle_deg": 10.010944538635984,
+          "quality": 0.26499200985424987,
+          "rank": 7,
+          "signed_double_area_jacobian_m2": 1.2423269571449715e-09
+        },
+        {
+          "aspect_ratio": 3.5952851753239443,
+          "centroid_m": [
+            0.000940207155931557,
+            0.0003500184994006438
+          ],
+          "connectivity": [
+            1290,
+            1354,
+            1355
+          ],
+          "coordinates_m": [
+            [
+              0.0009294896737911092,
+              0.00030943100486429493
+            ],
+            [
+              0.0009461430995207091,
+              0.00033188555008550403
+            ],
+            [
+              0.000944988694482853,
+              0.0004087389432521323
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.000369490581716433,
+          "distance_to_crack_support_m": 0.000507590864149224,
+          "distance_to_source_node_m": 0.00039599828349493456,
+          "edge_length_ratio": 3.5952851753239443,
+          "edge_lengths_m": [
+            2.7956093962186954e-05,
+            7.68620627632109e-05,
+            0.00010051013018221398
+          ],
+          "element_id": 2578,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 142.5769321062424,
+          "minimum_angle_deg": 9.731176633077775,
+          "quality": 0.2693847610710008,
+          "rank": 8,
+          "signed_double_area_jacobian_m2": 1.3057939152943213e-09
+        },
+        {
+          "aspect_ratio": 2.9670239611160283,
+          "centroid_m": [
+            0.0009177935030659307,
+            -0.00034059076637655395
+          ],
+          "connectivity": [
+            1270,
+            1334,
+            1271
+          ],
+          "coordinates_m": [
+            [
+              0.0009118201848014499,
+              -0.0003534006280492909
+            ],
+            [
+              0.000928074639119751,
+              -0.0003805195467211379
+            ],
+            [
+              0.0009134856852765912,
+              -0.00028785212435923315
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00034923269842358464,
+          "distance_to_crack_support_m": 0.00048493412716771404,
+          "distance_to_source_node_m": 0.0003774967480408878,
+          "edge_length_ratio": 2.9670239611160283,
+          "edge_lengths_m": [
+            3.161713198751573e-05,
+            9.380878818872721e-05,
+            6.55696593542944e-05
+          ],
+          "element_id": 2537,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 147.60700346147993,
+          "minimum_angle_deg": 10.402335529108505,
+          "quality": 0.27287580453720955,
+          "rank": 9,
+          "signed_double_area_jacobian_m2": 1.110621730796317e-09
+        },
+        {
+          "aspect_ratio": 3.4917439379945536,
+          "centroid_m": [
+            0.0009236833327291505,
+            -0.00032593422531488865
+          ],
+          "connectivity": [
+            1271,
+            1334,
+            1335
+          ],
+          "coordinates_m": [
+            [
+              0.0009134856852765912,
+              -0.00028785212435923315
+            ],
+            [
+              0.000928074639119751,
+              -0.0003805195467211379
+            ],
+            [
+              0.0009294896737911093,
+              -0.0003094310048642949
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0003402833465767464,
+          "distance_to_crack_support_m": 0.00047905439877412074,
+          "distance_to_source_node_m": 0.00036699752856419874,
+          "edge_length_ratio": 3.4917439379945536,
+          "edge_lengths_m": [
+            9.380878818872721e-05,
+            7.110262376630883e-05,
+            2.6865884169789753e-05
+          ],
+          "element_id": 2538,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 142.29716420068385,
+          "minimum_angle_deg": 10.087174789904429,
+          "quality": 0.27761272854622865,
+          "rank": 10,
+          "signed_double_area_jacobian_m2": 1.1682350714745126e-09
+        },
+        {
+          "aspect_ratio": 2.878978107408453,
+          "centroid_m": [
+            0.0009020588834355183,
+            0.00031597724128540035
+          ],
+          "connectivity": [
+            1162,
+            1227,
+            1163
+          ],
+          "coordinates_m": [
+            [
+              0.0008981311339771553,
+              0.00026714890857031906
+            ],
+            [
+              0.00091182018480145,
+              0.00035340062804929077
+            ],
+            [
+              0.0008962253315279496,
+              0.0003273821872365912
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0003200199738098516,
+          "distance_to_crack_support_m": 0.00045649231522687576,
+          "distance_to_source_node_m": 0.0003485224988542827,
+          "edge_length_ratio": 2.878978107408453,
+          "edge_lengths_m": [
+            8.733126144485347e-05,
+            3.0334117935848344e-05,
+            6.02634212592033e-05
+          ],
+          "element_id": 2321,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 147.2502456684011,
+          "minimum_angle_deg": 10.830476329367867,
+          "quality": 0.28128898085303805,
+          "rank": 11,
+          "signed_double_area_jacobian_m2": 9.889151512077338e-10
+        },
+        {
+          "aspect_ratio": 3.3881271219600477,
+          "centroid_m": [
+            0.0009078123346850656,
+            0.0003028005536596144
+          ],
+          "connectivity": [
+            1162,
+            1226,
+            1227
+          ],
+          "coordinates_m": [
+            [
+              0.0008981311339771553,
+              0.00026714890857031906
+            ],
+            [
+              0.0009134856852765912,
+              0.00028785212435923326
+            ],
+            [
+              0.00091182018480145,
+              0.00035340062804929077
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0003122293504830652,
+          "distance_to_crack_support_m": 0.0004517255291081516,
+          "distance_to_source_node_m": 0.00033917515376051576,
+          "edge_length_ratio": 3.3881271219600477,
+          "edge_lengths_m": [
+            2.5775674377392287e-05,
+            6.556965935429418e-05,
+            8.733126144485347e-05
+          ],
+          "element_id": 2322,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 141.98200346148016,
+          "minimum_angle_deg": 10.473718536288894,
+          "quality": 0.28640237735994367,
+          "rank": 12,
+          "signed_double_area_jacobian_m2": 1.0409490782436448e-09
+        },
+        {
+          "aspect_ratio": 2.790857343824036,
+          "centroid_m": [
+            0.0008869804769066667,
+            -0.0002923892563390609
+          ],
+          "connectivity": [
+            1142,
+            1206,
+            1143
+          ],
+          "coordinates_m": [
+            [
+              0.0008812900792992496,
+              -0.00030246422428303925
+            ],
+            [
+              0.0008962253315279495,
+              -0.00032738218723659133
+            ],
+            [
+              0.000883426019892801,
+              -0.0002473213574975522
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00029202482073571945,
+          "distance_to_crack_support_m": 0.000429333205519081,
+          "distance_to_source_node_m": 0.0003207963894856366,
+          "edge_length_ratio": 2.790857343824036,
+          "edge_lengths_m": [
+            2.9051103884181016e-05,
+            8.107748662136156e-05,
+            5.51842187544696e-05
+          ],
+          "element_id": 2281,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 146.8442759937799,
+          "minimum_angle_deg": 11.301229027407475,
+          "quality": 0.29029545847434274,
+          "rank": 13,
+          "signed_double_area_jacobian_m2": 8.767959126359456e-10
+        },
+        {
+          "aspect_ratio": 2.6755324127293316,
+          "centroid_m": [
+            0.0005753655654126674,
+            2.7322545700778937e-07
+          ],
+          "connectivity": [
+            353,
+            416,
+            1603
+          ],
+          "coordinates_m": [
+            [
+              0.0005850911458333333,
+              -5.645110015827472e-06
+            ],
+            [
+              0.00056840625,
+              6.464786386850825e-06
+            ],
+            [
+              0.0005725993004046688,
+              1.5602085896855586e-20
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 6.963443458733254e-05,
+          "distance_to_crack_support_m": 2.779725570058044e-06,
+          "distance_to_source_node_m": 0.00017963464237629955,
+          "edge_length_ratio": 2.6755324127293316,
+          "edge_lengths_m": [
+            2.0616385227599508e-05,
+            7.70552624573461e-06,
+            1.3708153387836056e-05
+          ],
+          "element_id": 3074,
+          "local_resolution_contributors": [],
+          "location": "crack_support_region",
+          "maximum_angle_deg": 147.28576157371913,
+          "minimum_angle_deg": 11.653760420798793,
+          "quality": 0.29413612290777236,
+          "rank": 14,
+          "signed_double_area_jacobian_m2": 5.708688143760912e-11
+        },
+        {
+          "aspect_ratio": 3.284422148191787,
+          "centroid_m": [
+            0.0008925941617993018,
+            -0.0002806174844348208
+          ],
+          "connectivity": [
+            1143,
+            1206,
+            1207
+          ],
+          "coordinates_m": [
+            [
+              0.000883426019892801,
+              -0.0002473213574975522
+            ],
+            [
+              0.0008962253315279495,
+              -0.00032738218723659133
+            ],
+            [
+              0.0008981311339771551,
+              -0.0002671489085703189
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00028532860450030935,
+          "distance_to_crack_support_m": 0.00042560883906410743,
+          "distance_to_source_node_m": 0.0003125353194949002,
+          "edge_length_ratio": 3.284422148191787,
+          "edge_lengths_m": [
+            8.107748662136156e-05,
+            6.026342125920357e-05,
+            2.4685464584994998e-05
+          ],
+          "element_id": 2282,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 141.62524566840108,
+          "minimum_angle_deg": 10.895259352786386,
+          "quality": 0.29582045803773327,
+          "rank": 15,
+          "signed_double_area_jacobian_m2": 9.235246298584582e-10
+        },
+        {
+          "aspect_ratio": 2.702649066372103,
+          "centroid_m": [
+            0.0008725582834793764,
+            0.00026982681153753544
+          ],
+          "connectivity": [
+            1034,
+            1099,
+            1035
+          ],
+          "coordinates_m": [
+            [
+              0.0008693703430235287,
+              0.00022836947114093282
+            ],
+            [
+              0.0008812900792992497,
+              0.00030246422428303914
+            ],
+            [
+              0.0008670144281153504,
+              0.00027864673918863436
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0002652472508305329,
+          "distance_to_crack_support_m": 0.0004034623895132301,
+          "distance_to_source_node_m": 0.0002943237303363935,
+          "edge_length_ratio": 2.702649066372103,
+          "edge_lengths_m": [
+            7.504740206078033e-05,
+            2.776808983251388e-05,
+            5.033243504336947e-05
+          ],
+          "element_id": 2065,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 146.3796709423613,
+          "minimum_angle_deg": 11.821787890722874,
+          "quality": 0.29997139879436757,
+          "rank": 16,
+          "signed_double_area_jacobian_m2": 7.738527093376178e-10
+        },
+        {
+          "aspect_ratio": 3.0576195495326446,
+          "centroid_m": [
+            0.0009876957805419245,
+            0.0003649069378068397
+          ],
+          "connectivity": [
+            1481,
+            1546,
+            1482
+          ],
+          "coordinates_m": [
+            [
+              0.0009816890790006194,
+              0.0003107960046981387
+            ],
+            [
+              0.001,
+              0.000404503174046016
+            ],
+            [
+              0.0009813982626251543,
+              0.0003794216346763645
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004096391575130933,
+          "distance_to_crack_support_m": 0.0005526863134562895,
+          "distance_to_source_node_m": 0.00043278678300241594,
+          "edge_length_ratio": 3.0576195495326446,
+          "edge_lengths_m": [
+            9.547943975033218e-05,
+            3.122672333937888e-05,
+            6.862624617500653e-05
+          ],
+          "element_id": 2959,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 143.19469784007586,
+          "minimum_angle_deg": 11.299406365299154,
+          "quality": 0.3004789608727443,
+          "rank": 17,
+          "signed_double_area_jacobian_m2": 1.2838500684088593e-09
+        },
+        {
+          "aspect_ratio": 3.5017393592753256,
+          "centroid_m": [
+            0.000993896359666873,
+            0.00034876605715473247
+          ],
+          "connectivity": [
+            1481,
+            1545,
+            1546
+          ],
+          "coordinates_m": [
+            [
+              0.0009816890790006194,
+              0.0003107960046981387
+            ],
+            [
+              0.001,
+              0.00033099899272004277
+            ],
+            [
+              0.001,
+              0.000404503174046016
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004010586766832412,
+          "distance_to_crack_support_m": 0.000546926845900107,
+          "distance_to_source_node_m": 0.00042274014865558026,
+          "edge_length_ratio": 3.5017393592753256,
+          "edge_lengths_m": [
+            2.7266289678992944e-05,
+            7.350418132597323e-05,
+            9.547943975033218e-05
+          ],
+          "element_id": 2960,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 137.8124999999998,
+          "minimum_angle_deg": 11.056604205375093,
+          "quality": 0.3054803185902005,
+          "rank": 18,
+          "signed_double_area_jacobian_m2": 1.3459292573840431e-09
+        },
+        {
+          "aspect_ratio": 3.180614183675759,
+          "centroid_m": [
+            0.0008780288140718598,
+            0.00025938501764050803
+          ],
+          "connectivity": [
+            1034,
+            1098,
+            1099
+          ],
+          "coordinates_m": [
+            [
+              0.0008693703430235287,
+              0.00022836947114093282
+            ],
+            [
+              0.000883426019892801,
+              0.00024732135749755223
+            ],
+            [
+              0.0008812900792992497,
+              0.00030246422428303914
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0002595811225275389,
+          "distance_to_crack_support_m": 0.0004007090904825388,
+          "distance_to_source_node_m": 0.0002870830480336568,
+          "edge_length_ratio": 3.180614183675759,
+          "edge_lengths_m": [
+            2.3595254792597906e-05,
+            5.518421875446943e-05,
+            7.504740206078033e-05
+          ],
+          "element_id": 2066,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 141.21927599377997,
+          "minimum_angle_deg": 11.357182839304276,
+          "quality": 0.3059459255080572,
+          "rank": 19,
+          "signed_double_area_jacobian_m2": 8.155504205756089e-10
+        },
+        {
+          "aspect_ratio": 2.9546642729455614,
+          "centroid_m": [
+            9.313725994762134e-05,
+            0.0004784133731345172
+          ],
+          "connectivity": [
+            1497,
+            1562,
+            1498
+          ],
+          "coordinates_m": [
+            [
+              0.00018390033766451058,
+              0.0004677654678895084
+            ],
+            [
+              2.5828043256639573e-05,
+              0.0005
+            ],
+            [
+              6.968339892171388e-05,
+              0.0004674746515140433
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0007177217953820448,
+          "distance_to_crack_support_m": 0.00047841337313451717,
+          "distance_to_source_node_m": 0.000816664951043933,
+          "edge_length_ratio": 2.9546642729455614,
+          "edge_lengths_m": [
+            0.00016132549494655505,
+            5.460027943740849e-05,
+            0.0001142173089769673
+          ],
+          "element_id": 2991,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 143.2916152030236,
+          "minimum_angle_deg": 11.671764167168346,
+          "quality": 0.30707018400213376,
+          "rank": 20,
+          "signed_double_area_jacobian_m2": 3.727699591187885e-09
+        }
+      ],
+      "lowest_twenty_location_counts": {
+        "annular_transition": 0,
+        "crack_support_region": 1,
+        "far_field_transition": 19,
+        "first_radial_ring": 0,
+        "split_source_facet": 0
+      },
+      "radial_layers": 24,
+      "retained_connected_v4_minimum_quality": 0.13516891585970464
+    },
+    {
+      "N_theta": 128,
+      "base_source_conforming_mesh_minimum_quality": 0.24271987183102878,
+      "geometry_only_crack_path_mesh_minimum_quality": 0.02826654538079532,
+      "lowest_quality_elements": [
+        {
+          "aspect_ratio": 1.9995759727070423,
+          "centroid_m": [
+            0.0005726500706210008,
+            6.986874543373023e-08
+          ],
+          "connectivity": [
+            1473,
+            1600,
+            6275
+          ],
+          "coordinates_m": [
+            [
+              0.0005769446614583333,
+              -3.020839004345238e-06
+            ],
+            [
+              0.00056840625,
+              3.230445240646413e-06
+            ],
+            [
+              0.0005725993004046688,
+              1.5602085896855586e-20
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 7.23499293789992e-05,
+          "distance_to_crack_support_m": 8.63669870660792e-08,
+          "distance_to_source_node_m": 0.00018234994276436617,
+          "edge_length_ratio": 1.9995759727070423,
+          "edge_lengths_m": [
+            1.0582203217831278e-05,
+            5.29315106046562e-06,
+            5.292223632545957e-06
+          ],
+          "element_id": 12290,
+          "local_resolution_contributors": [],
+          "location": "crack_support_region",
+          "maximum_angle_deg": 177.19485049811914,
+          "minimum_angle_deg": 1.4024518410842075,
+          "quality": 0.02826654538079532,
+          "rank": 1,
+          "signed_double_area_jacobian_m2": 1.3709207250914923e-12
+        },
+        {
+          "aspect_ratio": 3.4848691402487355,
+          "centroid_m": [
+            0.000993692711155041,
+            -0.0004483635312602715
+          ],
+          "connectivity": [
+            6124,
+            6252,
+            6125
+          ],
+          "coordinates_m": [
+            [
+              0.0009904996480378989,
+              -0.0004587490751835461
+            ],
+            [
+              0.001,
+              -0.00047375177038806303
+            ],
+            [
+              0.0009905784854272231,
+              -0.00041258974820920536
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004809806856093464,
+          "distance_to_crack_support_m": 0.0006151012247927669,
+          "distance_to_source_node_m": 0.000507941006931636,
+          "edge_length_ratio": 3.4848691402487355,
+          "edge_lengths_m": [
+            1.7757746219704616e-05,
+            6.188342180141726e-05,
+            4.61593942990813e-05
+          ],
+          "element_id": 12244,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 147.558392306224,
+          "minimum_angle_deg": 8.854976174815592,
+          "quality": 0.24271987183102878,
+          "rank": 2,
+          "signed_double_area_jacobian_m2": 4.397126259126978e-10
+        },
+        {
+          "aspect_ratio": 3.782086299498187,
+          "centroid_m": [
+            0.0009968594951424079,
+            -0.00043743626321516546
+          ],
+          "connectivity": [
+            6125,
+            6252,
+            6253
+          ],
+          "coordinates_m": [
+            [
+              0.0009905784854272231,
+              -0.00041258974820920536
+            ],
+            [
+              0.001,
+              -0.00047375177038806303
+            ],
+            [
+              0.001,
+              -0.00042596727104822816
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004736476106304941,
+          "distance_to_crack_support_m": 0.000609382636128198,
+          "distance_to_source_node_m": 0.0004998464761966297,
+          "edge_length_ratio": 3.782086299498187,
+          "edge_lengths_m": [
+            6.188342180141726e-05,
+            4.778449933983488e-05,
+            1.6362244777341026e-05
+          ],
+          "element_id": 12245,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 144.84374999999972,
+          "minimum_angle_deg": 8.757118481039873,
+          "quality": 0.24441856562349817,
+          "rank": 3,
+          "signed_double_area_jacobian_m2": 4.502023568831013e-10
+        },
+        {
+          "aspect_ratio": 3.4389718573934682,
+          "centroid_m": [
+            0.0009843277879442588,
+            0.00043406626971718575
+          ],
+          "connectivity": [
+            5908,
+            6037,
+            5909
+          ],
+          "coordinates_m": [
+            [
+              0.0009813200131338269,
+              0.0003994437276195595
+            ],
+            [
+              0.0009904996480378989,
+              0.00045874907518354585
+            ],
+            [
+              0.0009811637026610506,
+              0.00044400600634845187
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004638893860210118,
+          "distance_to_crack_support_m": 0.0005982757507686827,
+          "distance_to_source_node_m": 0.0004909223572313646,
+          "edge_length_ratio": 3.4389718573934682,
+          "edge_lengths_m": [
+            6.0011581770998806e-05,
+            1.7450442824060776e-05,
+            4.456255287206278e-05
+          ],
+          "element_id": 11813,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 147.4552752314592,
+          "minimum_angle_deg": 8.999731260755626,
+          "quality": 0.24596458237612243,
+          "rank": 4,
+          "signed_double_area_jacobian_m2": 4.1833549614061296e-10
+        },
+        {
+          "aspect_ratio": 3.7322745339238748,
+          "centroid_m": [
+            0.0009874660488663164,
+            0.00042359418367077006
+          ],
+          "connectivity": [
+            5908,
+            6036,
+            6037
+          ],
+          "coordinates_m": [
+            [
+              0.0009813200131338269,
+              0.0003994437276195595
+            ],
+            [
+              0.0009905784854272234,
+              0.000412589748209205
+            ],
+            [
+              0.0009904996480378989,
+              0.00045874907518354585
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004569192264677038,
+          "distance_to_crack_support_m": 0.000592913527775211,
+          "distance_to_source_node_m": 0.00048318991743953295,
+          "edge_length_ratio": 3.7322745339238748,
+          "edge_lengths_m": [
+            1.607909097402502e-05,
+            4.6159394299081405e-05,
+            6.0011581770998806e-05
+          ],
+          "element_id": 11814,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 144.7458923062233,
+          "minimum_angle_deg": 8.896614185990355,
+          "quality": 0.24772498479000563,
+          "rank": 5,
+          "signed_double_area_jacobian_m2": 4.284012478170582e-10
+        },
+        {
+          "aspect_ratio": 3.3930643414458164,
+          "centroid_m": [
+            0.0009751268165501055,
+            -0.00042001925983684187
+          ],
+          "connectivity": [
+            5868,
+            5996,
+            5869
+          ],
+          "coordinates_m": [
+            [
+              0.0009719921638694548,
+              -0.0004295225638827813
+            ],
+            [
+              0.0009811637026610506,
+              -0.00044400600634845214
+            ],
+            [
+              0.0009722245831198114,
+              -0.000386529209279292
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00044709726376079964,
+          "distance_to_crack_support_m": 0.0005817598988312131,
+          "distance_to_source_node_m": 0.00047420669965572216,
+          "edge_length_ratio": 3.3930643414458164,
+          "edge_lengths_m": [
+            1.7143139428416988e-05,
+            5.81677750949955e-05,
+            4.2993982820498366e-05
+          ],
+          "element_id": 11733,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 147.34651579745343,
+          "minimum_angle_deg": 9.14987900360933,
+          "quality": 0.2493021887068627,
+          "rank": 6,
+          "signed_double_area_jacobian_m2": 3.976814503671923e-10
+        },
+        {
+          "aspect_ratio": 3.6824516624983903,
+          "centroid_m": [
+            0.0009782360996382297,
+            -0.0004099929810824347
+          ],
+          "connectivity": [
+            5869,
+            5996,
+            5997
+          ],
+          "coordinates_m": [
+            [
+              0.0009722245831198114,
+              -0.000386529209279292
+            ],
+            [
+              0.0009811637026610506,
+              -0.00044400600634845214
+            ],
+            [
+              0.0009813200131338269,
+              -0.0003994437276195599
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00044048196788068456,
+          "distance_to_crack_support_m": 0.0005767455742607046,
+          "distance_to_source_node_m": 0.00046682823470581904,
+          "edge_length_ratio": 3.6824516624983903,
+          "edge_lengths_m": [
+            5.81677750949955e-05,
+            4.456255287206267e-05,
+            1.5795937170708462e-05
+          ],
+          "element_id": 11734,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 144.64277523145913,
+          "minimum_angle_deg": 9.041119569604367,
+          "quality": 0.25112708876554257,
+          "rank": 7,
+          "signed_double_area_jacobian_m2": 4.073317619111347e-10
+        },
+        {
+          "aspect_ratio": 3.3471458220134727,
+          "centroid_m": [
+            0.000966089796972581,
+            0.0004062225016192384
+          ],
+          "connectivity": [
+            5652,
+            5781,
+            5653
+          ],
+          "coordinates_m": [
+            [
+              0.0009632921953851763,
+              0.0003738461931884011
+            ],
+            [
+              0.0009719921638694548,
+              0.00042952256388278107
+            ],
+            [
+              0.0009629850316631118,
+              0.00041529874778653314
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004306043189591117,
+          "distance_to_crack_support_m": 0.0005655541456934555,
+          "distance_to_source_node_m": 0.00045779430228839416,
+          "edge_length_ratio": 3.3471458220134727,
+          "edge_lengths_m": [
+            5.635199823720054e-05,
+            1.6835836032773152e-05,
+            4.1453692625184445e-05
+          ],
+          "element_id": 11301,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 147.2316956399171,
+          "minimum_angle_deg": 9.305751515638299,
+          "quality": 0.2527371410460822,
+          "rank": 8,
+          "signed_double_area_jacobian_m2": 3.7773767985011093e-10
+        },
+        {
+          "aspect_ratio": 3.63261684912401,
+          "centroid_m": [
+            0.0009691696474581475,
+            0.0003966326554501579
+          ],
+          "connectivity": [
+            5652,
+            5780,
+            5781
+          ],
+          "coordinates_m": [
+            [
+              0.0009632921953851763,
+              0.0003738461931884011
+            ],
+            [
+              0.0009722245831198114,
+              0.00038652920927929164
+            ],
+            [
+              0.0009719921638694548,
+              0.00042952256388278107
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004243358350153569,
+          "distance_to_crack_support_m": 0.0005608792236583204,
+          "distance_to_source_node_m": 0.0004507616900999805,
+          "edge_length_ratio": 3.63261684912401,
+          "edge_lengths_m": [
+            1.551278336739246e-05,
+            4.299398282049853e-05,
+            5.635199823720054e-05
+          ],
+          "element_id": 11302,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 144.53401579745375,
+          "minimum_angle_deg": 9.190931358101125,
+          "quality": 0.25462946610432,
+          "rank": 9,
+          "signed_double_area_jacobian_m2": 3.8698109042313244e-10
+        },
+        {
+          "aspect_ratio": 3.3012154665186473,
+          "centroid_m": [
+            0.000957216729211685,
+            -0.00039267599506437675
+          ],
+          "connectivity": [
+            5612,
+            5740,
+            5613
+          ],
+          "coordinates_m": [
+            [
+              0.0009541423060420214,
+              -0.0004013345580597086
+            ],
+            [
+              0.0009629850316631118,
+              -0.0004152987477865334
+            ],
+            [
+              0.0009545228499299218,
+              -0.0003613946793468883
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00041441055175963504,
+          "distance_to_crack_support_m": 0.0005496589885027976,
+          "distance_to_source_node_m": 0.00044168545671424404,
+          "edge_length_ratio": 3.3012154665186473,
+          "edge_lengths_m": [
+            1.6528532637129245e-05,
+            5.456424758054931e-05,
+            3.994169156715096e-05
+          ],
+          "element_id": 11221,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 147.11035703161286,
+          "minimum_angle_deg": 9.467709744635467,
+          "quality": 0.2562742107240183,
+          "rank": 10,
+          "signed_double_area_jacobian_m2": 3.584913758471214e-10
+        },
+        {
+          "aspect_ratio": 3.582769190214298,
+          "centroid_m": [
+            0.0009602666923260698,
+            -0.00038351320677394105
+          ],
+          "connectivity": [
+            5613,
+            5740,
+            5741
+          ],
+          "coordinates_m": [
+            [
+              0.0009545228499299218,
+              -0.0003613946793468883
+            ],
+            [
+              0.0009629850316631118,
+              -0.0004152987477865334
+            ],
+            [
+              0.0009632921953851763,
+              -0.0003738461931884014
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0004084808280321607,
+          "distance_to_crack_support_m": 0.0005453149425141152,
+          "distance_to_source_node_m": 0.00043499056857421295,
+          "edge_length_ratio": 3.582769190214298,
+          "edge_lengths_m": [
+            5.456424758054931e-05,
+            4.1453692625184384e-05,
+            1.5229629564076282e-05
+          ],
+          "element_id": 11222,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 144.41919563991686,
+          "minimum_angle_deg": 9.346371136331458,
+          "quality": 0.2582370323089507,
+          "rank": 11,
+          "signed_double_area_jacobian_m2": 3.6733642461071525e-10
+        },
+        {
+          "aspect_ratio": 3.2552723746343997,
+          "centroid_m": [
+            0.0009485076132674177,
+            0.00037937974017225574
+          ],
+          "connectivity": [
+            5396,
+            5525,
+            5397
+          ],
+          "coordinates_m": [
+            [
+              0.0009459165467540478,
+              0.0003491746677547521
+            ],
+            [
+              0.0009541423060420214,
+              0.0004013345580597084
+            ],
+            [
+              0.0009454639870061837,
+              0.0003876299947023066
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00039851596232100744,
+          "distance_to_crack_support_m": 0.0005340749450521776,
+          "distance_to_source_node_m": 0.0004258804804703084,
+          "edge_length_ratio": 3.2552723746343997,
+          "edge_lengths_m": [
+            5.2804519432419404e-05,
+            1.622122924148548e-05,
+            3.845798981965513e-05
+          ],
+          "element_id": 10789,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 146.98199837799834,
+          "minimum_angle_deg": 9.636146681811079,
+          "quality": 0.25991852204764787,
+          "rank": 12,
+          "signed_double_area_jacobian_m2": 3.399297296159385e-10
+        },
+        {
+          "aspect_ratio": 3.5329077086553076,
+          "centroid_m": [
+            0.0009515272342419971,
+            0.00037063463505378284
+          ],
+          "connectivity": [
+            5396,
+            5524,
+            5525
+          ],
+          "coordinates_m": [
+            [
+              0.0009459165467540478,
+              0.0003491746677547521
+            ],
+            [
+              0.0009545228499299218,
+              0.00036139467934688795
+            ],
+            [
+              0.0009541423060420214,
+              0.0004013345580597084
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00039291694710784434,
+          "distance_to_crack_support_m": 0.0005300532159544713,
+          "distance_to_source_node_m": 0.000419515180297757,
+          "edge_length_ratio": 3.5329077086553076,
+          "edge_lengths_m": [
+            1.4946475760760197e-05,
+            3.994169156715107e-05,
+            5.2804519432419404e-05
+          ],
+          "element_id": 10790,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 144.29785703161318,
+          "minimum_angle_deg": 9.507788028196538,
+          "quality": 0.2619550615915624,
+          "rank": 13,
+          "signed_double_area_jacobian_m2": 3.4838495573162464e-10
+        },
+        {
+          "aspect_ratio": 3.209315572185546,
+          "centroid_m": [
+            0.0009399624491397788,
+            -0.0003663337369428763
+          ],
+          "connectivity": [
+            5356,
+            5484,
+            5357
+          ],
+          "coordinates_m": [
+            [
+              0.0009369500745555988,
+              -0.0003741850577143281
+            ],
+            [
+              0.0009454639870061837,
+              -0.0003876299947023068
+            ],
+            [
+              0.0009374732858575543,
+              -0.0003371861584119941
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00038292055081874313,
+          "distance_to_crack_support_m": 0.0005188025538401936,
+          "distance_to_source_node_m": 0.0004103797197892675,
+          "edge_length_ratio": 3.209315572185546,
+          "edge_lengths_m": [
+            1.5913925845841564e-05,
+            5.107281003166537e-05,
+            3.7002598552679306e-05
+          ],
+          "element_id": 10709,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 146.8460691047253,
+          "minimum_angle_deg": 9.81149100055027,
+          "quality": 0.26367558817174214,
+          "rank": 14,
+          "signed_double_area_jacobian_m2": 3.220399324142708e-10
+        },
+        {
+          "aspect_ratio": 3.483031347186487,
+          "centroid_m": [
+            0.0009429512732059285,
+            -0.0003579969402896844
+          ],
+          "connectivity": [
+            5357,
+            5484,
+            5485
+          ],
+          "coordinates_m": [
+            [
+              0.0009374732858575543,
+              -0.0003371861584119941
+            ],
+            [
+              0.0009454639870061837,
+              -0.0003876299947023068
+            ],
+            [
+              0.0009459165467540477,
+              -0.0003491746677547524
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00037764419243752957,
+          "distance_to_crack_support_m": 0.0005150945476459257,
+          "distance_to_source_node_m": 0.00040433586330735667,
+          "edge_length_ratio": 3.483031347186487,
+          "edge_lengths_m": [
+            5.107281003166537e-05,
+            3.845798981965502e-05,
+            1.4663321957443998e-05
+          ],
+          "element_id": 10710,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 144.16949837799834,
+          "minimum_angle_deg": 9.67556172727685,
+          "quality": 0.2657892225328779,
+          "rank": 15,
+          "signed_double_area_jacobian_m2": 3.3011387504358053e-10
+        },
+        {
+          "aspect_ratio": 3.1633440044633967,
+          "centroid_m": [
+            0.0009315812368287688,
+            0.0003535379853762377
+          ],
+          "connectivity": [
+            5140,
+            5269,
+            5141
+          ],
+          "coordinates_m": [
+            [
+              0.0009291930672404415,
+              0.0003254291513186129
+            ],
+            [
+              0.0009369500745555987,
+              0.00037418505771432786
+            ],
+            [
+              0.0009286005686902664,
+              0.0003609997470957722
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00036762431744745004,
+          "distance_to_crack_support_m": 0.0005038423739451511,
+          "distance_to_source_node_m": 0.00039518355267377536,
+          "edge_length_ratio": 3.1633440044633967,
+          "edge_lengths_m": [
+            4.936911555775657e-05,
+            1.5606622450197646e-05,
+            3.5575530051905414e-05
+          ],
+          "element_id": 10277,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 146.7019638424177,
+          "minimum_angle_deg": 9.994211193235621,
+          "quality": 0.2675513515680099,
+          "rank": 16,
+          "signed_double_area_jacobian_m2": 3.048091754998554e-10
+        },
+        {
+          "aspect_ratio": 3.433138961145262,
+          "centroid_m": [
+            0.000934538809217865,
+            0.00034560012248164483
+          ],
+          "connectivity": [
+            5140,
+            5268,
+            5269
+          ],
+          "coordinates_m": [
+            [
+              0.0009291930672404415,
+              0.0003254291513186129
+            ],
+            [
+              0.0009374732858575544,
+              0.0003371861584119938
+            ],
+            [
+              0.0009369500745555987,
+              0.00037418505771432786
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0003626625642370851,
+          "distance_to_crack_support_m": 0.0005004394595745479,
+          "distance_to_source_node_m": 0.00038945298647551394,
+          "edge_length_ratio": 3.433138961145262,
+          "edge_lengths_m": [
+            1.4380168154127822e-05,
+            3.700259855267936e-05,
+            4.936911555775657e-05
+          ],
+          "element_id": 10278,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 144.03356910472468,
+          "minimum_angle_deg": 9.850105930928295,
+          "quality": 0.26974561820916637,
+          "rank": 17,
+          "signed_double_area_jacobian_m2": 3.125103738043008e-10
+        },
+        {
+          "aspect_ratio": 3.1173565288999354,
+          "centroid_m": [
+            0.0009233639763343874,
+            -0.0003409924854723406
+          ],
+          "connectivity": [
+            5100,
+            5228,
+            5101
+          ],
+          "coordinates_m": [
+            [
+              0.0009204154694101867,
+              -0.0003480740628466397
+            ],
+            [
+              0.0009286005686902664,
+              -0.0003609997470957724
+            ],
+            [
+              0.0009210758909027092,
+              -0.00031390364647460956
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00035262726242340294,
+          "distance_to_crack_support_m": 0.0004891949846724565,
+          "distance_to_source_node_m": 0.00038029239234532497,
+          "edge_length_ratio": 3.1173565288999354,
+          "edge_lengths_m": [
+            1.5299319054553997e-05,
+            4.769343214243709e-05,
+            3.4176797854475656e-05
+          ],
+          "element_id": 10197,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 146.5490157975174,
+          "minimum_angle_deg": 10.184820285147717,
+          "quality": 0.2715522297900657,
+          "rank": 18,
+          "signed_double_area_jacobian_m2": 2.882246501304172e-10
+        },
+        {
+          "aspect_ratio": 3.3209037257671468,
+          "centroid_m": [
+            0.0009937443761734199,
+            0.0004036655083563162
+          ],
+          "connectivity": [
+            6035,
+            6164,
+            6036
+          ],
+          "coordinates_m": [
+            [
+              0.0009906546430930364,
+              0.0003724395058115158
+            ],
+            [
+              0.001,
+              0.0004259672710482278
+            ],
+            [
+              0.0009905784854272234,
+              0.000412589748209205
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.00044422184643641435,
+          "distance_to_crack_support_m": 0.0005833601096071193,
+          "distance_to_source_node_m": 0.0004689826433792604,
+          "edge_length_ratio": 3.3209037257671468,
+          "edge_lengths_m": [
+            5.4337439642985434e-05,
+            1.63622447773409e-05,
+            4.0150314626205114e-05
+          ],
+          "element_id": 12067,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 144.73507051676683,
+          "minimum_angle_deg": 10.012072396952346,
+          "quality": 0.2719012477038098,
+          "rank": 19,
+          "signed_double_area_jacobian_m2": 3.7929489476412436e-10
+        },
+        {
+          "aspect_ratio": 3.383229310516431,
+          "centroid_m": [
+            0.0009262898422778056,
+            -0.00033344418162966504
+          ],
+          "connectivity": [
+            5101,
+            5228,
+            5229
+          ],
+          "coordinates_m": [
+            [
+              0.0009210758909027092,
+              -0.00031390364647460956
+            ],
+            [
+              0.0009286005686902664,
+              -0.0003609997470957724
+            ],
+            [
+              0.0009291930672404415,
+              -0.00032542915131861315
+            ]
+          ],
+          "distance_to_cavity_boundary_m": 0.0003479720627458752,
+          "distance_to_crack_support_m": 0.0004860884916074337,
+          "distance_to_source_node_m": 0.00037486695283824706,
+          "edge_length_ratio": 3.383229310516431,
+          "edge_lengths_m": [
+            4.769343214243709e-05,
+            3.5575530051905305e-05,
+            1.4097014350811755e-05
+          ],
+          "element_id": 10198,
+          "local_resolution_contributors": [],
+          "location": "far_field_transition",
+          "maximum_angle_deg": 143.88946384241726,
+          "minimum_angle_deg": 10.031872240248076,
+          "quality": 0.2738308314519444,
+          "rank": 20,
+          "signed_double_area_jacobian_m2": 2.9556164327150804e-10
+        }
+      ],
+      "lowest_twenty_location_counts": {
+        "annular_transition": 0,
+        "crack_support_region": 1,
+        "far_field_transition": 19,
+        "first_radial_ring": 0,
+        "split_source_facet": 0
+      },
+      "radial_layers": 48,
+      "retained_connected_v4_minimum_quality": 0.01211501008373052
+    }
+  ],
+  "new_fem_solve_run": false,
+  "prohibited_resolution_response": {
+    "N_theta_256_or_512_added": false,
+    "global_sector_count_used_as_only_control": false
+  },
+  "retained_v4_interpretation": {
+    "DBTT_SOURCE_READINESS": "BLOCKED_WITH_EXACT_V4_FAILURE_CLASS",
+    "FINITE_ACTIVATION_ZONE_REQUIRED": "NOT_ESTABLISHED",
+    "V4_FAILURE_CLASS": [
+      "NORMAL_DIRECTION_RESOLUTION",
+      "TANGENTIAL_DIRECTION_RESOLUTION",
+      "MESH_QUALITY"
+    ],
+    "V4_POINT_SOURCE_FORMULATION": "REMAINS_VIABLE",
+    "V4_SOURCE_GEOMETRY": "PASS",
+    "V4_SOURCE_TENSOR_RELATIVE_CHANGE_64_TO_128": 0.006818275586047867,
+    "zero_recovered_boundary_traction_interpretation": "traction-free constraint of the recovered boundary-limit tensor; not an independent raw adjacent-element traction measurement"
+  },
+  "schema": "v5.v4-mesh-failure-geometry-only-audit/1"
+}
