@@ -1,0 +1,89 @@
+{
+  "acceptance": {
+    "bounded_patch_conditioning": true,
+    "eta_n_max": 0.03,
+    "eta_t_max": 0.025,
+    "exact_geometry_and_state_identity": true,
+    "minimum_quality": 0.05,
+    "physical_equilibrium_observables": true,
+    "raw_traction_E_max": 0.05,
+    "source_tensor_D_to_E_relative_max": 0.05,
+    "strict_raw_traction_order": "C>D>E",
+    "weak_residual_within_retained_limit": true
+  },
+  "additional_level_after_D_or_E": "PROHIBITED",
+  "conditional_N256_diagnostic": {
+    "raw_traction": 0.038672813574278736,
+    "role": "RETAINED_LOW_QUALITY_DIAGNOSTIC_ONLY_NOT_A_QUALIFICATION_LEVEL"
+  },
+  "construction_target_minimum_quality": 0.1,
+  "contract": "CAVITY_SOURCE_RAW_TRACTION_CLOSURE_V6",
+  "fixed_N_theta": 128,
+  "fixed_across_A_through_E": [
+    "N128_polygon",
+    "polygon_fingerprint",
+    "complete_cavity_boundary_fingerprint",
+    "source_coordinate",
+    "source_node_incidence",
+    "tangential_boundary_discretization",
+    "outer_mesh",
+    "crack_support_geometry",
+    "physical_source_window",
+    "recovery_operator"
+  ],
+  "maximum_new_levels": 2,
+  "new_levels": [
+    {
+      "discrete_cavity_boundary_fingerprint": "b1dd9e1aa4952807ac081036fe5be5a579df9ccd297af2e7a4162374fcce8cb7",
+      "element_count": 40704,
+      "eta_n_target": 0.0075,
+      "eta_t_target": 0.0125,
+      "first_strip_radial_subdivisions": 16,
+      "level": "D",
+      "node_count": 20736,
+      "polygon_geometry_fingerprint": "7cb16adf9f7464ef5233ba4f56992e455d11770fe4d219939ff28479bf10d11b",
+      "pre_fem_minimum_quality": 0.20252814641506897
+    },
+    {
+      "discrete_cavity_boundary_fingerprint": "b1dd9e1aa4952807ac081036fe5be5a579df9ccd297af2e7a4162374fcce8cb7",
+      "element_count": 57088,
+      "eta_n_target": 0.00375,
+      "eta_t_target": 0.0125,
+      "first_strip_radial_subdivisions": 32,
+      "level": "E",
+      "node_count": 28928,
+      "polygon_geometry_fingerprint": "7cb16adf9f7464ef5233ba4f56992e455d11770fe4d219939ff28479bf10d11b",
+      "pre_fem_minimum_quality": 0.12443783683877849
+    }
+  ],
+  "prospectively_frozen_before_D_or_E_fem_evaluation": true,
+  "retained_levels": {
+    "A": {
+      "first_strip_radial_subdivisions": 2,
+      "raw_traction": 0.14906976345973477
+    },
+    "B": {
+      "first_strip_radial_subdivisions": 4,
+      "raw_traction": 0.09144336014017264
+    },
+    "C": {
+      "first_strip_radial_subdivisions": 8,
+      "raw_traction": 0.06715193304848284
+    }
+  },
+  "retained_v5_mesh_contract": "CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5",
+  "schema": "v6.cavity-source-raw-traction-closure-contract/1",
+  "scope": {
+    "fatigue_started": false,
+    "finite_activation_zone_observable_derived": false,
+    "material_or_core_law_changed": false,
+    "oracle_generated": false,
+    "paired_trajectories_run": false,
+    "r_tip_equals_R_void": false,
+    "r_tip_law_changed": false,
+    "raw_traction_normalization_changed": false,
+    "recovery_operator_changed": false,
+    "scientific_tolerance_changed": false,
+    "v1_through_v5_reinterpreted": false
+  }
+}
