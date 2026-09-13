@@ -1,6 +1,9 @@
 name: V6 equilibrium observable and raw traction closure
 
 on:
+  push:
+    branches:
+      - codex/v5-unified-fracture-multitip-voiding
   workflow_dispatch:
 
 permissions:
