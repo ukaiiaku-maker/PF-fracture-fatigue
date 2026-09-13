@@ -53,6 +53,9 @@ def _compact_observables(full):
     scalar_keys = (
         "operation", "fingerprint", "mesh_nodes", "mesh_elements", "graph_length_m",
         "reaction_N_per_m", "compliance_m2_per_N", "energy_J_per_m",
+        "top_reaction_N_per_m", "bottom_reaction_N_per_m", "applied_opening_m",
+        "external_work_J_per_m", "stored_recoverable_energy_J_per_m",
+        "plastic_eigenstrain_half_work_J_per_m", "energy_identity_reference_J_per_m",
         "full_residual_including_reactions_N_per_m", "free_dof_residual_l2_N_per_m",
         "constrained_reaction_l2_N_per_m", "top_bottom_reaction_balance",
         "energy_reaction_identity", "void_phase", "site_phase", "cavity_radius_m",
