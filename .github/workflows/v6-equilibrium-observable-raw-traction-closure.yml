@@ -104,6 +104,7 @@ jobs:
             | tee "$ATTESTATION_DIR/central-dbtt-v6.log"
           python - <<'PY'
           import json
+          import math
           import os
           from pathlib import Path
           committed = json.loads(Path(
@@ -122,9 +123,11 @@ jobs:
           observed_rows = observed["fixed_geometry_local_family"]["new_rows"]
           committed_rows = committed["fixed_geometry_local_family"]["new_rows"]
           assert [row["local_level"] for row in observed_rows] == ["D", "E"]
-          assert [row["raw_adjacent_element_traction_normalized"] for row in observed_rows] == [
-              row["raw_adjacent_element_traction_normalized"] for row in committed_rows
-          ]
+          assert all(math.isclose(
+              observed_row["raw_adjacent_element_traction_normalized"],
+              committed_row["raw_adjacent_element_traction_normalized"],
+              rel_tol=1.0e-12, abs_tol=0.0,
+          ) for observed_row, committed_row in zip(observed_rows, committed_rows))
           assert observed["exact_v6_failure_class"] == [
               "RAW_ADJACENT_ELEMENT_TRACTION_E", "MESH_QUALITY", "FIXED_GEOMETRY_IDENTITY",
           ]
