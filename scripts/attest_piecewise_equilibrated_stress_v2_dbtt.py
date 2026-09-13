@@ -104,8 +104,9 @@ def build_record():
 
 
 def main():
-    record=build_record(); OUTPUT.parent.mkdir(parents=True,exist_ok=True)
-    OUTPUT.write_text(json.dumps(record,indent=2,sort_keys=True)+"\n")
+    record=build_record(); destination=Path(os.environ.get("V7_READINESS_OUTPUT",str(OUTPUT)))
+    destination.parent.mkdir(parents=True,exist_ok=True)
+    destination.write_text(json.dumps(record,indent=2,sort_keys=True)+"\n")
     print("DBTT_SOURCE_READINESS="+record["DBTT_SOURCE_READINESS"])
     print("PIECEWISE_TRACTION_D="+str(record["piecewise_traction_D"]))
     print("PIECEWISE_TRACTION_E="+str(record["piecewise_traction_E"]))
