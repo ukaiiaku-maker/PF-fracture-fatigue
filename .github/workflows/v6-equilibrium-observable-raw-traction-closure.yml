@@ -1,4 +1,4 @@
-name: V6 equilibrium observable and raw traction closure
+name: Unified one-void production closure
 
 on:
   push:
@@ -17,8 +17,6 @@ jobs:
   bounded-v6-closure:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      V6_SOURCE_COMMIT: 612b1221b625235d1e502d36d9428d9321199ab3
     steps:
       - name: Initialize bounded attestation directory
         run: |
@@ -55,6 +53,7 @@ jobs:
             /tests/test_cavity_source_shape_regular_mesh_v5.py \
             /tests/test_equilibrium_observables_v6.py \
             /tests/test_cavity_source_raw_traction_closure_v6.py \
+            /tests/test_production_closure_contract.py \
             /V5_UNIFIED_MODEL_LINEAGE.md \
             /V5_VOIDING_EXTENSION_DELTA.md \
             /V6_CAVITY_SOURCE_RAW_TRACTION_CLOSURE.md \
@@ -95,7 +94,8 @@ jobs:
             tests/test_v5_unified_model_lineage.py \
             tests/test_cavity_source_shape_regular_mesh_v5.py \
             tests/test_equilibrium_observables_v6.py \
-            tests/test_cavity_source_raw_traction_closure_v6.py
+            tests/test_cavity_source_raw_traction_closure_v6.py \
+            tests/test_production_closure_contract.py
 
       - name: Reproduce only the frozen D and E central DBTT family
         run: |
@@ -128,13 +128,12 @@ jobs:
               committed_row["raw_adjacent_element_traction_normalized"],
               rel_tol=1.0e-12, abs_tol=0.0,
           ) for observed_row, committed_row in zip(observed_rows, committed_rows))
-          assert observed["exact_v6_failure_class"] == [
-              "RAW_ADJACENT_ELEMENT_TRACTION_E", "MESH_QUALITY", "FIXED_GEOMETRY_IDENTITY",
-          ]
+          assert observed["exact_v6_failure_class"] == ["TRACTION_FREE_BOUNDARY_VERIFICATION"]
+          assert observed["UNIFIED_2D_ONE_VOID_CODE"] == "BLOCKED_TRACTION_FREE_BOUNDARY_VERIFICATION"
           assert observed["oracle_states_accepted"] == 0
           PY
 
-      - name: Collect exactly thirty-four bounded tests
+      - name: Collect exactly forty-three bounded tests
         run: |
           set -euo pipefail
           TEST_FILES=(
@@ -142,12 +141,13 @@ jobs:
             tests/test_cavity_source_shape_regular_mesh_v5.py
             tests/test_equilibrium_observables_v6.py
             tests/test_cavity_source_raw_traction_closure_v6.py
+            tests/test_production_closure_contract.py
           )
           python -m pytest --collect-only -q -p no:cacheprovider "${TEST_FILES[@]}" \
             | tee "$ATTESTATION_DIR/collect-only.log"
           grep -E '^[^[:space:]]+::' "$ATTESTATION_DIR/collect-only.log" \
             > "$ATTESTATION_DIR/collected-node-inventory.txt"
-          test "$(wc -l < "$ATTESTATION_DIR/collected-node-inventory.txt" | tr -d ' ')" = 34
+          test "$(wc -l < "$ATTESTATION_DIR/collected-node-inventory.txt" | tr -d ' ')" = 43
 
       - name: Run bounded lineage mesh equilibrium and V6 tests
         id: bounded_tests
@@ -158,6 +158,7 @@ jobs:
             tests/test_cavity_source_shape_regular_mesh_v5.py
             tests/test_equilibrium_observables_v6.py
             tests/test_cavity_source_raw_traction_closure_v6.py
+            tests/test_production_closure_contract.py
           )
           python -m pytest -vv -p no:cacheprovider \
             --junitxml="$ATTESTATION_DIR/pytest-junit.xml" "${TEST_FILES[@]}" \
@@ -175,8 +176,8 @@ jobs:
           print(f"errors={totals['errors']}")
           print(f"skipped={totals['skipped']}")
           PY
-          grep -Fxq 'tests=34' "$ATTESTATION_DIR/pytest-counts.txt"
-          grep -Fxq 'passed=34' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'tests=43' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'passed=43' "$ATTESTATION_DIR/pytest-counts.txt"
 
       - name: Verify clean bounded worker
         if: always()
@@ -189,7 +190,7 @@ jobs:
           {
             echo "workflow_sha=$GITHUB_SHA"
             echo "bounded_test_step_outcome=$TEST_OUTCOME"
-            echo 'bounded_test_count=34'
+            echo 'bounded_test_count=43'
             echo 'V5_SOURCE_CONFORMING_GEOMETRY=PASS'
             echo 'V5_SHAPE_REGULAR_LOCAL_PATCH=PASS'
             echo 'V5_SOURCE_TENSOR_CONVERGENCE=PASS'
@@ -198,9 +199,10 @@ jobs:
             echo 'V5_REACTION_COMPLIANCE_OBSERVATION=INVALID_DEFAULT_OR_STALE_LEDGER'
             echo 'DBTT_SOURCE_READINESS_V5=BLOCKED'
             echo 'FINITE_ACTIVATION_ZONE_REQUIRED=NOT_ESTABLISHED'
-            echo 'V6_RAW_TRACTION_D=0.05795457514046478'
-            echo 'V6_RAW_TRACTION_E=0.055309963627059575'
-            echo 'V6_FAILURE_CLASS=RAW_ADJACENT_ELEMENT_TRACTION_E+MESH_QUALITY+FIXED_GEOMETRY_IDENTITY'
+            echo 'RAW_CST_TRACTION=DIAGNOSTIC_FAIL'
+            echo 'TRACTION_FREE_BOUNDARY_VERIFICATION=FAIL'
+            echo 'UNIFIED_2D_ONE_VOID_CODE=BLOCKED_TRACTION_FREE_BOUNDARY_VERIFICATION'
+            echo 'V6_FAILURE_CLASS=TRACTION_FREE_BOUNDARY_VERIFICATION'
             echo 'DBTT_SOURCE_READINESS=BLOCKED_WITH_EXACT_V6_FAILURE_CLASS'
             echo 'ORACLE_STATES_ACCEPTED=0/18'
             echo 'PAIRED_TRAJECTORIES_RUN=0/12'

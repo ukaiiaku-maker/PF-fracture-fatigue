@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import pytest
 
 from arrhenius_fracture.cavity_source_shape_regular_mesh_v5 import (
     V6_LOCAL_LEVELS, build_shape_regular_source_patch_hole_mesh,
@@ -56,15 +57,18 @@ def _readiness():
     )
 
 
-def test_v6_result_is_blocked_by_exact_raw_quality_and_boundary_identity_failures():
+def test_production_result_is_blocked_only_when_both_traction_routes_fail():
     record = _readiness()
     assert record["DBTT_SOURCE_READINESS"] == "BLOCKED_WITH_EXACT_V6_FAILURE_CLASS"
-    assert record["exact_v6_failure_class"] == [
-        "RAW_ADJACENT_ELEMENT_TRACTION_E", "MESH_QUALITY", "FIXED_GEOMETRY_IDENTITY",
-    ]
+    assert record["exact_v6_failure_class"] == ["TRACTION_FREE_BOUNDARY_VERIFICATION"]
+    assert record["UNIFIED_2D_ONE_VOID_CODE"] == "BLOCKED_TRACTION_FREE_BOUNDARY_VERIFICATION"
+    assert record["RAW_CST_TRACTION"] == "DIAGNOSTIC_FAIL"
+    assert record["TRACTION_FREE_BOUNDARY_VERIFICATION"] == "FAIL"
     predicates = record["fixed_geometry_local_family"]["predicates"]
-    assert {key for key, passed in predicates.items() if not passed} == {
-        "raw_traction_E", "minimum_mesh_quality", "fixed_geometry_identity",
+    assert {key for key, passed in predicates.items() if not passed} == {"raw_traction_E"}
+    fallback = record["fixed_geometry_local_family"]["fallback_predicates"]
+    assert {key for key, passed in fallback.items() if not passed} == {
+        "normalized_recovered_boundary_traction",
     }
 
 
@@ -72,12 +76,18 @@ def test_v6_D_E_report_physical_observables_and_converged_retained_quantities():
     record = _readiness()
     d, e = record["fixed_geometry_local_family"]["new_rows"]
     assert d["local_level"] == "D" and e["local_level"] == "E"
-    assert d["raw_adjacent_element_traction_normalized"] == 0.05795457514046478
-    assert e["raw_adjacent_element_traction_normalized"] == 0.055309963627059575
+    assert d["raw_adjacent_element_traction_normalized"] == pytest.approx(0.05804714016621954)
+    assert e["raw_adjacent_element_traction_normalized"] == pytest.approx(0.055397417629352)
     assert 0.06715193304848284 > d["raw_adjacent_element_traction_normalized"] > e[
         "raw_adjacent_element_traction_normalized"
     ]
-    assert e["global_minimum_quality"] == 0.047548651614431246
+    assert d["global_minimum_quality"] >= 0.05
+    assert e["global_minimum_quality"] >= 0.05
+    assert d["discrete_cavity_boundary_fingerprints"]["complete_boundary"] == (
+        e["discrete_cavity_boundary_fingerprints"]["complete_boundary"]
+    )
+    assert d["equilibrated_boundary_traction_recovery_v1"]["normalized_boundary_traction"] == pytest.approx(0.06630974471574953)
+    assert e["equilibrated_boundary_traction_recovery_v1"]["normalized_boundary_traction"] == pytest.approx(0.06850161639893818)
     assert all(all(row["physical_equilibrium_observable_predicates"].values()) for row in (d, e))
     assert all(row["observables"]["reaction_N_per_m"] != 0.0 for row in (d, e))
     assert all(row["observables"]["compliance_m2_per_N"] < 1.0e-9 for row in (d, e))
@@ -95,7 +105,7 @@ def test_v6_failure_keeps_oracle_and_downstream_campaigns_closed():
     assert record["oracle_generated_in_this_record"] is False
     assert record["paired_trajectories_run"] == 0
     assert record["fatigue_started"] is False
-    assert record["next_bounded_step"] == "EQUILIBRATED_BOUNDARY_STRESS_RECONSTRUCTION"
+    assert record["next_bounded_step"] == "STOP_SOURCE_QUALIFICATION_PRIMARY_AND_FALLBACK_FAILED"
     assert record["preserved_v5"]["DBTT_SOURCE_READINESS"] == "BLOCKED"
     assert record["preserved_v5"]["FINITE_ACTIVATION_ZONE_REQUIRED"] == "NOT_ESTABLISHED"
     assert record["preserved_v5"]["V5_WEAK_TRACTION_FREE_BOUNDARY"] == "PASS"
