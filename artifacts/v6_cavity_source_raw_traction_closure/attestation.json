@@ -1,0 +1,68 @@
+{
+  "bounded_worker": {
+    "artifact_digest": "sha256:034be555d5d4f3f65cf16202d23a1612520612392bc6ab34dcd7086d5c84f748",
+    "artifact_id": 10323943431,
+    "artifact_name": "v6-equilibrium-observable-raw-traction-closure-774db759df503b2eef4580041f51586376b0125b",
+    "artifact_size_bytes": 11672,
+    "conclusion": "success",
+    "job_count": 1,
+    "job_id": 103778647069,
+    "run_id": 34777671961,
+    "tests_collected": 34,
+    "tests_passed": 34,
+    "workflow_head": "774db759df503b2eef4580041f51586376b0125b",
+    "workflow_name": "V6 equilibrium observable and raw traction closure"
+  },
+  "cancelled_scope_control_runs": [
+    {
+      "classification": "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE",
+      "run_id": 34777449388,
+      "workflow": "v10 sharp-front MPZ CI"
+    },
+    {
+      "classification": "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE",
+      "run_id": 34777449405,
+      "workflow": "V5 shape-regular cavity source mesh V5"
+    },
+    {
+      "classification": "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE",
+      "run_id": 34777671903,
+      "workflow": "v10 sharp-front MPZ CI"
+    },
+    {
+      "classification": "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE",
+      "run_id": 34777672014,
+      "workflow": "V5 shape-regular cavity source mesh V5"
+    }
+  ],
+  "corrected_attestation_attempt": {
+    "classification": "ATTESTATION_HARNESS_EXACT_FLOAT_COMPARISON_NOT_A_SCIENTIFIC_TEST_FAILURE",
+    "cross_platform_relative_tolerance": 1e-12,
+    "initial_run_id": 34777449422,
+    "initial_run_result": "failure",
+    "scientific_classification_reproduced": true
+  },
+  "decision": {
+    "DBTT_SOURCE_READINESS": "BLOCKED_WITH_EXACT_V6_FAILURE_CLASS",
+    "NEXT_BOUNDED_STEP": "EQUILIBRATED_BOUNDARY_STRESS_RECONSTRUCTION",
+    "ORACLE_STATES_ACCEPTED": "0_OF_18",
+    "PAIRED_TRAJECTORIES_RUN": "0_OF_12",
+    "V6_FAILURE_CLASS": [
+      "RAW_ADJACENT_ELEMENT_TRACTION_E",
+      "MESH_QUALITY",
+      "FIXED_GEOMETRY_IDENTITY"
+    ],
+    "V6_RAW_TRACTION_D": 0.05795457514046478,
+    "V6_RAW_TRACTION_E": 0.055309963627059575
+  },
+  "preserved_v5": {
+    "V5_DBTT_SOURCE_READINESS": "BLOCKED",
+    "V5_RAW_ADJACENT_ELEMENT_TRACTION": "FAIL_0.06715193304848284_GT_0.05",
+    "V5_REACTION_COMPLIANCE_OBSERVATION": "INVALID_DEFAULT_OR_STALE_LEDGER",
+    "V5_SHAPE_REGULAR_LOCAL_PATCH": "PASS",
+    "V5_SOURCE_CONFORMING_GEOMETRY": "PASS",
+    "V5_SOURCE_TENSOR_CONVERGENCE": "PASS",
+    "V5_WEAK_CAVITY_BOUNDARY_RESIDUAL": "PASS"
+  },
+  "schema": "v6.equilibrium-observable-raw-traction-closure-attestation/1"
+}

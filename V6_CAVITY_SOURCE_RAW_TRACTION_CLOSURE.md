@@ -54,3 +54,11 @@ NEXT_BOUNDED_STEP = EQUILIBRATED_BOUNDARY_STRESS_RECONSTRUCTION
 V6 adds no recovery level, activation-zone observable, mechanics-map fit,
 trajectory, fatigue model, or change to the established `r_tip` law. The
 source radius remains distinct from `R_void`.
+
+The dedicated clean worker at
+`774db759df503b2eef4580041f51586376b0125b` passed exactly 34/34 bounded
+tests in run `34777671961`, job `103778647069`. Artifact `10323943431` has
+digest
+`sha256:034be555d5d4f3f65cf16202d23a1612520612392bc6ab34dcd7086d5c84f748`.
+Automatically triggered non-V6 runs were cancelled as
+`CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE`.
