@@ -445,6 +445,17 @@ diagnostic reaches lower raw traction but has minimum quality
 family. The oracle remains `0/18`, and point-source mesh development stops.
 No finite activation-zone observable was derived.
 
+The one-job V5 clean worker at
+`{v5_attestation['bounded_worker']['workflow_head'] if v5_attestation else 'NOT_YET_ATTESTED'}`
+passed exactly
+`{v5_attestation['bounded_worker']['tests_passed'] if v5_attestation else 0}` bounded tests in run
+`{v5_attestation['bounded_worker']['run_id'] if v5_attestation else 'NOT_YET_ATTESTED'}`.
+Artifact `{v5_attestation['bounded_worker']['artifact_id'] if v5_attestation else 'NOT_YET_ATTESTED'}`
+has digest
+`{v5_attestation['bounded_worker']['artifact_digest'] if v5_attestation else 'NOT_YET_ATTESTED'}`.
+The automatically triggered broad repository run was cancelled as
+`CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE`.
+
 The one-job V4 clean worker at `b12e21b5c7485c490bf0cb5139feb2d736844a16`
 passed all 36 bounded tests in run `34723836462`. Artifact `10307550298` has
 digest `sha256:70666a9df0c0b43e2b358059cc8960fb88d01db28bf5165c929c5323456199f3`.

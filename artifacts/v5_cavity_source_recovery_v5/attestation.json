@@ -1,0 +1,64 @@
+{
+  "schema": "v5.shape-regular-cavity-source-mesh-attestation/1",
+  "implementation_chain": {
+    "v4_mesh_failure_audit": "0606f6fbd95a731162e77c5639b0eb3a56140220",
+    "prospective_v5_mesh_contract": "f26ad8752741fa95ac6b54284b977a74de9b0eaa",
+    "v5_production_integration": "c0011abb0dd48ee259f4838a354947cf34e4cd46",
+    "v5_evidence_and_workflow": "cb6fc268cd71b407d41c037e581eab4e0e3f806d"
+  },
+  "bounded_worker": {
+    "name": "V5 shape-regular cavity source mesh V5",
+    "workflow_head": "cb6fc268cd71b407d41c037e581eab4e0e3f806d",
+    "run_id": 34772119070,
+    "run_url": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue/actions/runs/34772119070",
+    "job_id": 103763491612,
+    "job_count": 1,
+    "conclusion": "success",
+    "tests_collected": 46,
+    "tests_passed": 46,
+    "tests_failed": 0,
+    "tests_errored": 0,
+    "tests_skipped": 0,
+    "artifact_name": "v5-shape-regular-cavity-source-mesh-v5-cb6fc268cd71b407d41c037e581eab4e0e3f806d",
+    "artifact_id": 10322053051,
+    "artifact_size_bytes": 14700,
+    "artifact_digest": "sha256:64d2ef9e85379905df9bd021167fce3d2643f971def31bfeafa7a19c261376d4",
+    "central_dbtt_reproduced": true,
+    "lineage_ledger_consistent": true,
+    "compileall": "PASS",
+    "git_diff_check": "PASS",
+    "clean_worktree": "PASS"
+  },
+  "cancelled_scope_control_runs": [
+    {
+      "name": "v10 sharp-front MPZ CI",
+      "run_id": 34772119055,
+      "classification": "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE"
+    }
+  ],
+  "scientific_ledger": {
+    "V4_MESH_FAILURE_CAUSE": "C_CRACK_SUPPORT_CAVITY_INTERACTION",
+    "CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5": "PASS_CONSTRUCTION_AND_REQUIRED_MESH_QUALITY",
+    "V5_ANGULAR_SOURCE_TENSOR_CONVERGENCE": "PASS",
+    "V5_LOCAL_SOURCE_TENSOR_CONVERGENCE": "PASS",
+    "V5_REACTION_COMPLIANCE_ENERGY_CONVERGENCE": "PASS",
+    "V5_RAW_ADJACENT_ELEMENT_TRACTION": "FAIL",
+    "DBTT_SOURCE_READINESS": "BLOCKED_WITH_EXACT_V5_FAILURE_CLASS",
+    "V5_FAILURE_CLASS": [
+      "RAW_ADJACENT_ELEMENT_TRACTION"
+    ],
+    "ORACLE_STATES_ACCEPTED": "0_OF_18",
+    "PAIRED_TRAJECTORIES_RUN": "0_OF_12",
+    "FATIGUE_IMPLEMENTATION": "NOT_STARTED_BY_CONTRACT"
+  },
+  "scope": {
+    "broad_campaigns_run": false,
+    "finite_activation_zone_observable_derived": false,
+    "r_tip_law_changed": false,
+    "r_tip_equals_R_void": false,
+    "scientific_tolerances_changed": false,
+    "oracle_generated": false,
+    "paired_trajectories_run": false,
+    "fatigue_started": false
+  }
+}

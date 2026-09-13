@@ -51,8 +51,36 @@
       "tests_passed": 36,
       "workflow_head": "b12e21b5c7485c490bf0cb5139feb2d736844a16"
     },
-    "v5_cancelled_scope_control_runs": [],
-    "v5_worker": null
+    "v5_cancelled_scope_control_runs": [
+      {
+        "classification": "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE",
+        "name": "v10 sharp-front MPZ CI",
+        "run_id": 34772119055
+      }
+    ],
+    "v5_worker": {
+      "artifact_digest": "sha256:64d2ef9e85379905df9bd021167fce3d2643f971def31bfeafa7a19c261376d4",
+      "artifact_id": 10322053051,
+      "artifact_name": "v5-shape-regular-cavity-source-mesh-v5-cb6fc268cd71b407d41c037e581eab4e0e3f806d",
+      "artifact_size_bytes": 14700,
+      "central_dbtt_reproduced": true,
+      "clean_worktree": "PASS",
+      "compileall": "PASS",
+      "conclusion": "success",
+      "git_diff_check": "PASS",
+      "job_count": 1,
+      "job_id": 103763491612,
+      "lineage_ledger_consistent": true,
+      "name": "V5 shape-regular cavity source mesh V5",
+      "run_id": 34772119070,
+      "run_url": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue/actions/runs/34772119070",
+      "tests_collected": 46,
+      "tests_errored": 0,
+      "tests_failed": 0,
+      "tests_passed": 46,
+      "tests_skipped": 0,
+      "workflow_head": "cb6fc268cd71b407d41c037e581eab4e0e3f806d"
+    }
   },
   "branches": {
     "field_atlas": "codex/v12-field-atlas-recovery",
@@ -664,6 +692,10 @@
     {
       "classification": "BENCHMARK_ONLY",
       "path": "artifacts/v5_cavity_source_recovery_v4/v4_geometry_contract.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v5/attestation.json"
     },
     {
       "classification": "BENCHMARK_ONLY",

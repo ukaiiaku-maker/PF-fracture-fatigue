@@ -339,6 +339,16 @@ def test_10_reports_encode_terminal_passes_and_no_unresolved_core_divergence():
     assert v4_worker["artifact_digest"] == (
         "sha256:70666a9df0c0b43e2b358059cc8960fb88d01db28bf5165c929c5323456199f3"
     )
+    v5_worker = lineage["bounded_validation"]["v5_worker"]
+    assert v5_worker["workflow_head"] == "cb6fc268cd71b407d41c037e581eab4e0e3f806d"
+    assert v5_worker["run_id"] == 34772119070
+    assert v5_worker["job_count"] == 1
+    assert v5_worker["tests_collected"] == v5_worker["tests_passed"] == 46
+    assert v5_worker["conclusion"] == "success"
+    assert v5_worker["artifact_id"] == 10322053051
+    assert v5_worker["artifact_digest"] == (
+        "sha256:64d2ef9e85379905df9bd021167fce3d2643f971def31bfeafa7a19c261376d4"
+    )
     cancelled = lineage["bounded_validation"]["v4_cancelled_scope_control_runs"]
     assert {item["run_id"] for item in cancelled} == {34723715321, 34723836397}
     assert all(item["classification"] == "CANCELLED_SCOPE_CONTROL_NOT_A_TEST_FAILURE"
