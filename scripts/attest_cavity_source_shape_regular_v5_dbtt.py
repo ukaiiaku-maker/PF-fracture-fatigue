@@ -92,6 +92,26 @@ def _compact_equilibrated_recovery(full):
     return {key: full[key] for key in keys if key in full}
 
 
+def _compact_piecewise_recovery(full):
+    keys = (
+        "schema", "operator", "available", "scientific_unavailability",
+        "zero_boundary_traction_imposed", "stress_space", "equilibrium_constraint",
+        "internal_traction_continuity", "rank", "required_rank", "condition",
+        "condition_limit", "stress_fit_residual", "stress_fit_residual_limit",
+        "equilibrium_residual", "interface_traction_jump_residual",
+        "resultant_residual", "moment_residual", "constraint_limits", "solver",
+        "internal_patch_edge_count", "patch_boundary_edge_count",
+        "minimum_support_quality", "boundary_edge_rows", "boundary_resultant_N_per_m",
+        "boundary_traction_rms_Pa", "normalized_boundary_traction",
+        "remote_traction_scale_Pa", "state_fingerprint",
+    )
+    compact = {key: full[key] for key in keys if key in full}
+    if full.get("available"):
+        compact["stencil_element_count"] = len(full["stencil_element_ids"])
+        compact["window_identity_sha256"] = full["window_identity"]["sha256"]
+    return compact
+
+
 def _hash(value):
     encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
     return hashlib.sha256(encoded.encode()).hexdigest()
@@ -254,9 +274,9 @@ def _run_level(
         ),
         **({
             "arc_resolved_cavity_traction_v1": metrics["arc_resolved_cavity_traction_v1"],
-            "piecewise_equilibrated_boundary_stress_v2": metrics[
-                "piecewise_equilibrated_boundary_stress_v2"
-            ],
+            "piecewise_equilibrated_boundary_stress_v2": _compact_piecewise_recovery(
+                metrics["piecewise_equilibrated_boundary_stress_v2"]
+            ),
         } if final_traction_verification else {}),
         "assembled_weak_cavity_boundary_residual_normalized": metrics[
             "assembled_weak_cavity_boundary_residual_normalized"
