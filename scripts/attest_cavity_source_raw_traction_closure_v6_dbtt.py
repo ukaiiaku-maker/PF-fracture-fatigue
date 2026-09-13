@@ -164,11 +164,15 @@ def build_record():
     c_raw = retained["C"]["raw_adjacent_element_traction_normalized"]
     d_raw = d["raw_adjacent_element_traction_normalized"]
     e_raw = e["raw_adjacent_element_traction_normalized"]
+    contract_boundary_fingerprints = {
+        row["discrete_cavity_boundary_fingerprint"] for row in contract["new_levels"]
+    }
+    observed_boundary_fingerprints = {
+        row["discrete_cavity_boundary_fingerprints"]["complete_boundary"] for row in rows
+    }
     fixed_geometry = (
-        len({
-            retained["C"]["discrete_cavity_boundary_fingerprints"]["complete_boundary"],
-            *(row["discrete_cavity_boundary_fingerprints"]["complete_boundary"] for row in rows),
-        }) == 1
+        len(contract_boundary_fingerprints) == 1
+        and observed_boundary_fingerprints == contract_boundary_fingerprints
         and len({
             retained["C"]["discrete_cavity_boundary_fingerprints"]["fixed_v3_source_window"],
             *(row["discrete_cavity_boundary_fingerprints"]["fixed_v3_source_window"] for row in rows),

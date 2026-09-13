@@ -2115,6 +2115,7 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
         realized = apply_v12_production_trial_geometry(
             trial, arms, source_commit=_head(), configuration={"event": "CRACK_TO_VOID_LIGAMENT"},
             transaction_identity="ligament", failure_injector=inject,
+            preserve_cavity_boundary_edges=True,
             prepare_support_state=lambda refined: _prepare_connected_ligament_support(
                 refined, entry=end, exit_point=exit_point, direction=candidate.direction_xy,
                 failure_injector=inject),

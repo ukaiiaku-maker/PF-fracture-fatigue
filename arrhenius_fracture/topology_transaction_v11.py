@@ -749,6 +749,7 @@ def apply_v12_production_trial_geometry(
     failure_injector: Callable[[str, LiveFEMTopologyState], None] | None = None,
     refinement_levels: int = 3,
     prepare_support_state: Callable[[LiveFEMTopologyState], LiveFEMTopologyState] | None = None,
+    preserve_cavity_boundary_edges: bool = False,
 ) -> LiveFEMTopologyState:
     """Perform graph edit, conforming remesh, physical field transfer and support rebuild."""
     from .adaptive_multitip_mesh_v11 import refine_accepted_state
@@ -764,6 +765,23 @@ def apply_v12_production_trial_geometry(
         (a, b) for branch in network.branches for a, b in zip(branch.path, branch.path[1:])
     )
     refined = graph_state
+    protected_boundary_edges = ()
+    if preserve_cavity_boundary_edges:
+        if refined.void_state is None or not refined.void_state.cavities:
+            raise ValueError("cavity-boundary preservation requires an explicit cavity")
+        from .voiding_production_v5 import _actual_cavity_boundary_edges
+        cavity_edges = {tuple(sorted(map(int, edge))) for edge in
+                        _actual_cavity_boundary_edges(refined)}
+        protected = set(cavity_edges)
+        for triangle in np.asarray(refined.mesh.elems, dtype=int):
+            triangle_edges = {
+                tuple(sorted((int(triangle[0]), int(triangle[1])))),
+                tuple(sorted((int(triangle[1]), int(triangle[2])))),
+                tuple(sorted((int(triangle[2]), int(triangle[0])))),
+            }
+            if triangle_edges & cavity_edges:
+                protected.update(triangle_edges)
+        protected_boundary_edges = tuple(sorted(protected))
     if refinement_levels < 1:
         raise ValueError("production V12 remesh requires at least one refinement level")
     for level in range(int(refinement_levels)):
@@ -786,6 +804,8 @@ def apply_v12_production_trial_geometry(
             active_tip_ids=network.active_tip_ids,
             generation=int(state.event_counters.get("mesh_generation", 0)) + 1,
             operation_index=int(state.event_counters.get("refinement_operation_index", 0)) + level + 1,
+            longest_edge_closure=preserve_cavity_boundary_edges,
+            protected_edges=protected_boundary_edges,
         )
     counters = dict(refined.event_counters)
     counters.update({

@@ -158,6 +158,7 @@ class _NestedRefinementProgressGuard:
 def _subdivide(
     nodes: np.ndarray, elems: np.ndarray, marked: Iterable[int], *,
     longest_edge_closure: bool = False,
+    protected_edges: Iterable[Edge] = (),
 ):
     marked_ids = tuple(sorted(set(int(index) for index in marked)))
     if any(index < 0 or index >= len(elems) for index in marked_ids):
@@ -177,6 +178,8 @@ def _subdivide(
             split_edges.add(longest((a, b, c)))
         else:
             split_edges.update((_edge(a, b), _edge(b, c), _edge(c, a)))
+    protected = {_edge(*edge) for edge in protected_edges}
+    split_edges.difference_update(protected)
     if longest_edge_closure:
         # Conformity closure: a triangle touched by a split edge is never bisected
         # across a shorter edge while retaining its longest edge.  This is the
@@ -192,6 +195,7 @@ def _subdivide(
                     edge = longest(triangle)
                     if edge not in split_edges:
                         split_edges.add(edge); changed = True
+        split_edges.difference_update(protected)
     new_nodes = [tuple(point) for point in np.asarray(nodes, dtype=float)]
     midpoint: dict[Edge, int] = {}
     interpolation: dict[int, tuple[int, int, float, float]] = {}
@@ -241,11 +245,13 @@ def _subdivide(
 def refine_accepted_state(
     state, *, marked_parent_elements: Iterable[int], active_tip_ids: Iterable[str],
     generation: int, operation_index: int, longest_edge_closure: bool = False,
+    protected_edges: Iterable[Edge] = (),
 ):
     old = state.mesh
     marked = tuple(sorted(set(int(value) for value in marked_parent_elements)))
     nodes, elems, midpoint, interpolation, parent_map, conformity = _subdivide(
         old.nodes, old.elems, marked, longest_edge_closure=longest_edge_closure,
+        protected_edges=protected_edges,
     )
     tips = tuple(sorted(set(str(value) for value in active_tip_ids)))
     centers = np.asarray([state.crack_network.branch(tip).tip for tip in tips], dtype=float)

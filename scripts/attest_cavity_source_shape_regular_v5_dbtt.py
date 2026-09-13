@@ -122,16 +122,12 @@ def _boundary_fingerprints(state):
     half_width = 0.5 * min(radius, 5.0e-5)
 
     def fingerprint(selected_edges):
-        unique = np.unique(selected_edges)
-        ordered = sorted(map(int, unique), key=lambda node: math.atan2(
-            *(nodes[node] - center)[::-1]
-        ))
+        canonical_edges = sorted(tuple(sorted(map(int, edge))) for edge in selected_edges)
+        ordered = sorted(set(item for edge in canonical_edges for item in edge))
         local_id = {node: index for index, node in enumerate(ordered)}
         return _hash({
             "coordinates_m": nodes[ordered].tolist(),
-            "edges_local": sorted(
-                sorted((local_id[int(a)], local_id[int(b)])) for a, b in selected_edges
-            ),
+            "edges_local": [[local_id[a], local_id[b]] for a, b in canonical_edges],
         })
 
     midpoints = nodes[edges].mean(axis=1) - center

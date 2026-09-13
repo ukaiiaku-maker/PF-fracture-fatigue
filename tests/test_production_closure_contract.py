@@ -162,3 +162,23 @@ def test_final_geometry_levels_pass_construction_before_fem(level, radial):
     assert discrete_cavity_boundary_fingerprint(hole) == (
         "b1dd9e1aa4952807ac081036fe5be5a579df9ccd297af2e7a4162374fcce8cb7"
     )
+
+
+def test_longest_edge_refinement_preserves_frozen_boundary_edges():
+    from arrhenius_fracture.adaptive_multitip_mesh_v11 import _subdivide
+
+    nodes = np.asarray(((0.0, 0.0), (1.0, 0.0), (0.0, 1.0), (1.0, 1.0)))
+    elements = np.asarray(((0, 1, 2), (1, 3, 2)))
+    refined_nodes, refined_elements, midpoints, *_ = _subdivide(
+        nodes, elements, (0, 1), longest_edge_closure=True,
+        protected_edges=((0, 1),),
+    )
+    edge_counts = {}
+    for triangle in refined_elements:
+        for edge in ((triangle[0], triangle[1]), (triangle[1], triangle[2]),
+                     (triangle[2], triangle[0])):
+            key = tuple(sorted(map(int, edge)))
+            edge_counts[key] = edge_counts.get(key, 0) + 1
+    assert (0, 1) not in midpoints
+    assert edge_counts[(0, 1)] == 1
+    assert not any(np.array_equal(point, (0.5, 0.0)) for point in refined_nodes[4:])
