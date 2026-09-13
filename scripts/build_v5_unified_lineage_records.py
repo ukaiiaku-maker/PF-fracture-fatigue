@@ -38,6 +38,7 @@ COMPONENTS = (
     ("fixed-arc cavity source recovery V2", "arrhenius_fracture/cavity_source_recovery_v2.py", "VOIDING_EXTENSION"),
     ("fixed-physical-arc cavity source recovery V3", "arrhenius_fracture/cavity_source_recovery_v3.py", "VOIDING_EXTENSION"),
     ("source-conforming cavity geometry V4", "arrhenius_fracture/cavity_source_conforming_geometry_v4.py", "VOIDING_EXTENSION"),
+    ("shape-regular cavity source mesh V5", "arrhenius_fracture/cavity_source_shape_regular_mesh_v5.py", "VOIDING_EXTENSION"),
     ("void state and kinetics", "arrhenius_fracture/voiding_v5.py", "VOIDING_EXTENSION"),
     ("void production driver", "arrhenius_fracture/voiding_production_v5.py", "VOIDING_EXTENSION"),
     ("unified material bundle/factory", "arrhenius_fracture/unified_fracture_material_v5.py", "CORE_ADAPTER_ONLY"),
@@ -120,6 +121,7 @@ void_extensions = {
     "arrhenius_fracture/cavity_source_recovery_v2.py",
     "arrhenius_fracture/cavity_source_recovery_v3.py",
     "arrhenius_fracture/cavity_source_conforming_geometry_v4.py",
+    "arrhenius_fracture/cavity_source_shape_regular_mesh_v5.py",
     "arrhenius_fracture/explicit_cavity_v5.py",
     "arrhenius_fracture/source_quality_transaction_v1.py",
     "arrhenius_fracture/voiding_production_v5.py",
@@ -152,6 +154,11 @@ v4_readiness = json.loads(
 )
 v4_attestation_path = ROOT / "artifacts/v5_cavity_source_recovery_v4/attestation.json"
 v4_attestation = json.loads(v4_attestation_path.read_text()) if v4_attestation_path.exists() else None
+v5_readiness = json.loads(
+    (ROOT / "artifacts/v5_cavity_source_recovery_v5/central_dbtt_v5_readiness.json").read_text()
+)
+v5_attestation_path = ROOT / "artifacts/v5_cavity_source_recovery_v5/attestation.json"
+v5_attestation = json.loads(v5_attestation_path.read_text()) if v5_attestation_path.exists() else None
 
 lineage = {
     "schema": "v5.unified-model-lineage/1",
@@ -202,7 +209,7 @@ lineage = {
         "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
         "retained_v2_operator": "CAVITY_FIXED_ARC_PATCH_RECOVERY_V2",
         "active_operator": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
-        "active_geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+        "active_geometry_contract": "CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5",
         "tensor_relative_tolerance": 0.05,
         "traction_residual_tolerance": 0.05,
         "minimum_quality_valid_fine_levels": 2,
@@ -260,6 +267,24 @@ lineage = {
             ),
             "oracle_states_accepted": v4_readiness["oracle_states_accepted"],
         },
+        "v5_shape_regular_local_patch": {
+            "contract": "CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5",
+            "v3_fixed_physical_window_wls_reused_unchanged": True,
+            "v4_mesh_failure_cause": "C_CRACK_SUPPORT_CAVITY_INTERACTION",
+            "angular_levels_required": [64, 128],
+            "conditional_angular_level_run": 256,
+            "fixed_polygon_local_levels": ["A", "B", "C"],
+            "central_dbtt": v5_readiness["DBTT_SOURCE_READINESS"],
+            "exact_v5_failure_class": v5_readiness["exact_v5_failure_class"],
+            "raw_adjacent_traction_N128_C": v5_readiness[
+                "fixed_geometry_local_family"
+            ]["rows"][-1]["raw_adjacent_element_traction_normalized"],
+            "tensor_convergence": "PASS",
+            "reaction_compliance_energy_convergence": "PASS",
+            "source_window_boundary_identity": "PASS",
+            "mesh_quality_required_families": "PASS",
+            "oracle_states_accepted": v5_readiness["oracle_states_accepted"],
+        },
     },
     "unresolved_unintended_core_divergence": [],
     "terminal_gates": {gate: "PASS" for gate in TERMINAL},
@@ -285,12 +310,16 @@ lineage = {
         "v4_cancelled_scope_control_runs": (
             [] if v4_attestation is None else v4_attestation["cancelled_scope_control_runs"]
         ),
+        "v5_worker": None if v5_attestation is None else v5_attestation["bounded_worker"],
+        "v5_cancelled_scope_control_runs": (
+            [] if v5_attestation is None else v5_attestation["cancelled_scope_control_runs"]
+        ),
         "broad_campaigns_run": False,
     },
-    "downstream_transfer_gate": "BLOCKED_CENTRAL_DBTT_V4_RESOLUTION_AND_QUALITY",
+    "downstream_transfer_gate": "BLOCKED_CENTRAL_DBTT_V5_RAW_ADJACENT_ELEMENT_TRACTION",
     "oracle_states_accepted": 0,
     "paired_trajectories_run": 0,
-    "next_bounded_step": "SEPARATELY_FORMULATE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE",
+    "next_bounded_step": "STOP_POINT_SOURCE_MESH_DEVELOPMENT",
 }
 (ROOT / "v5_unified_model_lineage.json").write_text(json.dumps(lineage, indent=2, sort_keys=True) + "\n")
 
@@ -397,9 +426,24 @@ successive tensor convergence, traction, physical-window identity, and patch
 conditioning. It fails closed on mandatory normal and tangential resolution
 and global mesh quality at the final level. Its exact failure classification is
 `NORMAL_DIRECTION_RESOLUTION + TANGENTIAL_DIRECTION_RESOLUTION + MESH_QUALITY`.
-The oracle remains `0/18`; point-source numerical development stops. A finite
-activation-zone work observable is outside this mission and may be formulated
-separately.
+The V4 source tensor changes by `0.006818275586047867` from N64 to N128, so the
+point-source formulation remains viable. Its zero boundary traction is the
+traction-free constraint of the recovered boundary-limit tensor, not an
+independent raw adjacent-element traction measurement. The geometry-only V4
+audit locates the quality collapse in the crack-support/cavity interaction.
+
+The prospective `CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5` contract fixes a
+512-edge discrete source boundary, a matched radial source column, and
+deterministic structured connectivity. The required N64/N128 angular family
+and fixed-polygon A/B/C local family pass tensor, reaction, compliance, energy,
+resolution, quality, conditioning, source-window identity, and accepted-state
+immutability checks. The independent raw adjacent-element traction remains
+`0.06715193304848284` at N128/C, above the frozen `0.05` limit. The exact V5
+failure class is `RAW_ADJACENT_ELEMENT_TRACTION`. The conditional N256 angular
+diagnostic reaches lower raw traction but has minimum quality
+`0.00814983630892272`, below the frozen `0.05` gate, and cannot qualify the
+family. The oracle remains `0/18`, and point-source mesh development stops.
+No finite activation-zone observable was derived.
 
 The one-job V4 clean worker at `b12e21b5c7485c490bf0cb5139feb2d736844a16`
 passed all 36 bounded tests in run `34723836462`. Artifact `10307550298` has

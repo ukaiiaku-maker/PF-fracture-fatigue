@@ -310,9 +310,20 @@ def test_10_reports_encode_terminal_passes_and_no_unresolved_core_divergence():
     assert v4["tensor_convergence"] == "PASS"
     assert v4["traction"] == "PASS"
     assert v4["oracle_states_accepted"] == 0
+    v5 = lineage["cavity_source_recovery"]["v5_shape_regular_local_patch"]
+    assert v5["contract"] == "CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5"
+    assert v5["v4_mesh_failure_cause"] == "C_CRACK_SUPPORT_CAVITY_INTERACTION"
+    assert v5["central_dbtt"] == "BLOCKED_WITH_EXACT_V5_FAILURE_CLASS"
+    assert v5["exact_v5_failure_class"] == ["RAW_ADJACENT_ELEMENT_TRACTION"]
+    assert v5["tensor_convergence"] == "PASS"
+    assert v5["reaction_compliance_energy_convergence"] == "PASS"
+    assert v5["source_window_boundary_identity"] == "PASS"
+    assert v5["mesh_quality_required_families"] == "PASS"
+    assert v5["raw_adjacent_traction_N128_C"] > 0.05
+    assert v5["oracle_states_accepted"] == 0
     assert lineage["oracle_states_accepted"] == 0
     assert lineage["paired_trajectories_run"] == 0
-    assert lineage["next_bounded_step"] == "SEPARATELY_FORMULATE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE"
+    assert lineage["next_bounded_step"] == "STOP_POINT_SOURCE_MESH_DEVELOPMENT"
     worker = lineage["bounded_validation"]["v3_worker"]
     assert worker["workflow_run_id"] == 34719718024
     assert worker["job_count"] == 1

@@ -95,3 +95,59 @@ def test_v5_contract_is_prospective_and_records_measured_pre_fem_quality():
     assert len({row["polygon_geometry_fingerprint"] for row in retained["local_levels"]}) == 1
     assert len({row["discrete_cavity_boundary_fingerprint"] for row in retained["local_levels"]}) == 1
     assert retained["scope"]["finite_activation_zone_observable_derived"] is False
+
+
+def _readiness():
+    return json.loads(
+        (ROOT / "artifacts/v5_cavity_source_recovery_v5/central_dbtt_v5_readiness.json").read_text()
+    )
+
+
+def test_central_dbtt_v5_fails_only_the_independent_raw_traction_gate():
+    record = _readiness()
+    assert record["DBTT_SOURCE_READINESS"] == "BLOCKED_WITH_EXACT_V5_FAILURE_CLASS"
+    assert record["exact_v5_failure_class"] == ["RAW_ADJACENT_ELEMENT_TRACTION"]
+    angular = record["angular_family"]["required_64_to_128"]
+    assert angular["predicates"]["source_tensor_convergence"] is True
+    assert angular["predicates"]["minimum_mesh_quality"] is True
+    assert angular["predicates"]["exact_material_load_threshold_rng_source_identity"] is True
+    assert angular["predicates"]["raw_adjacent_traction"] is False
+    local = record["fixed_geometry_local_family"]["B_to_C"]
+    assert {key for key, passed in local["predicates"].items() if not passed} == {
+        "raw_adjacent_traction"
+    }
+
+
+def test_v5_source_diagnostics_keep_constrained_raw_and_weak_residuals_separate():
+    rows = _readiness()["fixed_geometry_local_family"]["rows"]
+    assert [row["local_level"] for row in rows] == ["A", "B", "C"]
+    assert all(row["constrained_boundary_limit_traction_residual"] == 0.0 for row in rows)
+    assert rows[1]["raw_adjacent_element_traction_normalized"] > 0.05
+    assert rows[2]["raw_adjacent_element_traction_normalized"] > 0.05
+    assert all(row["assembled_weak_cavity_boundary_residual_normalized"] > 0.0 for row in rows)
+    assert all(row["sigma_zz_and_mean_stress_audit"]["classification"] == "DIAGNOSTIC_ONLY"
+               for row in rows)
+    assert all(row["sigma_zz_and_mean_stress_audit"][
+        "mean_stress_consumed_by_cavity_source_kinetics"
+    ] is False for row in rows)
+
+
+def test_v5_fixed_source_window_identity_and_scope_are_preserved():
+    record = _readiness()
+    rows = record["fixed_geometry_local_family"]["rows"]
+    assert len({row["physical_window_identity"] for row in rows}) == 1
+    assert len({
+        row["discrete_cavity_boundary_fingerprints"]["fixed_v3_source_window"]
+        for row in rows
+    }) == 1
+    assert all(row["accepted_input_state_unchanged"] for row in rows)
+    conditional = record["angular_family"]["conditional_256_row"]
+    assert conditional["N_theta"] == 256
+    assert conditional["global_minimum_quality"] < 0.05
+    assert record["oracle_states_accepted"] == 0
+    assert record["oracle_generated_in_this_record"] is False
+    assert record["paired_trajectories_run"] == 0
+    assert record["fatigue_started"] is False
+    assert record["scope"]["finite_activation_zone_observable_derived"] is False
+    assert record["scope"]["r_tip_law_changed"] is False
+    assert record["scope"]["r_tip_equals_R_void"] is False

@@ -8,6 +8,7 @@ import json
 import math
 import os
 from pathlib import Path
+import subprocess
 import sys
 
 import numpy as np
@@ -431,6 +432,9 @@ def build_record():
     passed = not failures
     return {
         "schema": "v5.central-dbtt-shape-regular-local-patch-readiness/1",
+        "executed_code_sha": os.environ.get("V5_SOURCE_COMMIT") or subprocess.check_output(
+            ("git", "rev-parse", "HEAD"), cwd=ROOT, text=True
+        ).strip(),
         "mesh_contract": MESH_CONTRACT_ID,
         "material_class": "DBTT",
         "fracture_material_row_id": bundle.fracture_material_row_id,

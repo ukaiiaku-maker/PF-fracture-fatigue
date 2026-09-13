@@ -29,6 +29,7 @@ The retained V5 source differed materially in the front, FEM/source, process-own
 | fixed-arc cavity source recovery V2 | `arrhenius_fracture/cavity_source_recovery_v2.py` | `VOIDING_EXTENSION` |
 | fixed-physical-arc cavity source recovery V3 | `arrhenius_fracture/cavity_source_recovery_v3.py` | `VOIDING_EXTENSION` |
 | source-conforming cavity geometry V4 | `arrhenius_fracture/cavity_source_conforming_geometry_v4.py` | `VOIDING_EXTENSION` |
+| shape-regular cavity source mesh V5 | `arrhenius_fracture/cavity_source_shape_regular_mesh_v5.py` | `VOIDING_EXTENSION` |
 | void state and kinetics | `arrhenius_fracture/voiding_v5.py` | `VOIDING_EXTENSION` |
 | void production driver | `arrhenius_fracture/voiding_production_v5.py` | `VOIDING_EXTENSION` |
 | unified material bundle/factory | `arrhenius_fracture/unified_fracture_material_v5.py` | `CORE_ADAPTER_ONLY` |
@@ -88,9 +89,24 @@ successive tensor convergence, traction, physical-window identity, and patch
 conditioning. It fails closed on mandatory normal and tangential resolution
 and global mesh quality at the final level. Its exact failure classification is
 `NORMAL_DIRECTION_RESOLUTION + TANGENTIAL_DIRECTION_RESOLUTION + MESH_QUALITY`.
-The oracle remains `0/18`; point-source numerical development stops. A finite
-activation-zone work observable is outside this mission and may be formulated
-separately.
+The V4 source tensor changes by `0.006818275586047867` from N64 to N128, so the
+point-source formulation remains viable. Its zero boundary traction is the
+traction-free constraint of the recovered boundary-limit tensor, not an
+independent raw adjacent-element traction measurement. The geometry-only V4
+audit locates the quality collapse in the crack-support/cavity interaction.
+
+The prospective `CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5` contract fixes a
+512-edge discrete source boundary, a matched radial source column, and
+deterministic structured connectivity. The required N64/N128 angular family
+and fixed-polygon A/B/C local family pass tensor, reaction, compliance, energy,
+resolution, quality, conditioning, source-window identity, and accepted-state
+immutability checks. The independent raw adjacent-element traction remains
+`0.06715193304848284` at N128/C, above the frozen `0.05` limit. The exact V5
+failure class is `RAW_ADJACENT_ELEMENT_TRACTION`. The conditional N256 angular
+diagnostic reaches lower raw traction but has minimum quality
+`0.00814983630892272`, below the frozen `0.05` gate, and cannot qualify the
+family. The oracle remains `0/18`, and point-source mesh development stops.
+No finite activation-zone observable was derived.
 
 The one-job V4 clean worker at `b12e21b5c7485c490bf0cb5139feb2d736844a16`
 passed all 36 bounded tests in run `34723836462`. Artifact `10307550298` has

@@ -1,30 +1,34 @@
-name: V5 source-conforming cavity geometry V4
+name: V5 shape-regular cavity source mesh V5
 
 on:
+  push:
+    branches:
+      - codex/v5-unified-fracture-multitip-voiding
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: v5-source-conforming-cavity-geometry-v4-${{ github.ref }}
+  group: v5-shape-regular-cavity-source-mesh-v5-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  bounded-source-conforming-v4:
+  bounded-shape-regular-v5:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      VOIDING_V5_SOURCE_COMMIT: b358b9f180b9c288c192911a6aa6b15ee4dcb07b
+      VOIDING_V5_SOURCE_COMMIT: c0011abb0dd48ee259f4838a354947cf34e4cd46
+      V5_SOURCE_COMMIT: c0011abb0dd48ee259f4838a354947cf34e4cd46
     steps:
       - name: Initialize bounded attestation directory
         run: |
-          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-source-conforming-v4" >> "$GITHUB_ENV"
-          echo "V4_READINESS_OUTPUT=${RUNNER_TEMP}/v5-source-conforming-v4/central-dbtt-v4-readiness.json" >> "$GITHUB_ENV"
-          echo "MPLCONFIGDIR=${RUNNER_TEMP}/matplotlib-v5-source-conforming-v4" >> "$GITHUB_ENV"
+          echo "ATTESTATION_DIR=${RUNNER_TEMP}/v5-shape-regular-v5" >> "$GITHUB_ENV"
+          echo "V5_READINESS_OUTPUT=${RUNNER_TEMP}/v5-shape-regular-v5/central-dbtt-v5-readiness.json" >> "$GITHUB_ENV"
+          echo "MPLCONFIGDIR=${RUNNER_TEMP}/matplotlib-v5-shape-regular-v5" >> "$GITHUB_ENV"
           mkdir -p \
-            "${RUNNER_TEMP}/v5-source-conforming-v4" \
-            "${RUNNER_TEMP}/matplotlib-v5-source-conforming-v4"
+            "${RUNNER_TEMP}/v5-shape-regular-v5" \
+            "${RUNNER_TEMP}/matplotlib-v5-shape-regular-v5"
 
       - name: Partial sparse checkout of bounded inputs
         env:
@@ -43,15 +47,19 @@ jobs:
             /artifacts/v5_cavity_source_recovery_v2/attestation.json \
             /artifacts/v5_cavity_source_recovery_v3/ \
             /artifacts/v5_cavity_source_recovery_v4/ \
+            /artifacts/v5_cavity_source_recovery_v5/ \
             /scripts/audit_v2_physical_patch_without_fem.py \
             /scripts/attest_cavity_source_recovery_v3_dbtt.py \
-            /scripts/attest_cavity_source_conforming_v4_dbtt.py \
+            /scripts/attest_cavity_source_shape_regular_v5_dbtt.py \
+            /scripts/audit_v4_mesh_failure_without_fem.py \
+            /scripts/build_cavity_source_shape_regular_v5_contract.py \
             /scripts/build_cavity_source_geometry_v4_contract.py \
             /scripts/build_v5_unified_lineage_records.py \
             /tests/__init__.py \
             /tests/test_v5_unified_model_lineage.py \
             /tests/test_cavity_source_recovery_v3.py \
             /tests/test_cavity_source_conforming_geometry_v4.py \
+            /tests/test_cavity_source_shape_regular_mesh_v5.py \
             /V5_UNIFIED_MODEL_LINEAGE.md \
             /V5_VOIDING_EXTENSION_DELTA.md \
             /v5_unified_model_lineage.json \
@@ -85,60 +93,66 @@ jobs:
         run: |
           python -m compileall -q \
             arrhenius_fracture \
-            scripts/attest_cavity_source_conforming_v4_dbtt.py \
+            scripts/attest_cavity_source_shape_regular_v5_dbtt.py \
+            scripts/audit_v4_mesh_failure_without_fem.py \
+            scripts/build_cavity_source_shape_regular_v5_contract.py \
             scripts/build_cavity_source_geometry_v4_contract.py \
             scripts/build_v5_unified_lineage_records.py \
             tests/test_v5_unified_model_lineage.py \
             tests/test_cavity_source_recovery_v3.py \
-            tests/test_cavity_source_conforming_geometry_v4.py
+            tests/test_cavity_source_conforming_geometry_v4.py \
+            tests/test_cavity_source_shape_regular_mesh_v5.py
 
-      - name: Invoke one central DBTT V4 evaluation and verify ledgers
+      - name: Invoke one central DBTT V5 evaluation and verify ledgers
         run: |
           set -euo pipefail
-          python scripts/attest_cavity_source_conforming_v4_dbtt.py \
-            | tee "$ATTESTATION_DIR/central-dbtt-v4.log"
+          python scripts/attest_cavity_source_shape_regular_v5_dbtt.py \
+            | tee "$ATTESTATION_DIR/central-dbtt-v5.log"
           python - <<'PY'
           import json
           import os
           from pathlib import Path
           committed = json.loads(Path(
-              "artifacts/v5_cavity_source_recovery_v4/central_dbtt_v4_readiness.json"
+              "artifacts/v5_cavity_source_recovery_v5/central_dbtt_v5_readiness.json"
           ).read_text())
-          observed = json.loads(Path(os.environ["V4_READINESS_OUTPUT"]).read_text())
+          observed = json.loads(Path(os.environ["V5_READINESS_OUTPUT"]).read_text())
           keys = (
-              "DBTT_SOURCE_READINESS", "exact_v4_failure_class", "levels_run",
+              "DBTT_SOURCE_READINESS", "exact_v5_failure_class",
               "oracle_states_accepted", "paired_trajectories_run", "fatigue_started",
-              "accepted_material_identity_exact_across_levels",
-              "physical_geometry_exact_across_levels", "thresholds_and_rng_exact_across_levels",
-              "accepted_input_state_unchanged_on_noncertification",
               "unexpected_programming_exceptions_caught",
           )
           assert {key: observed[key] for key in keys} == {
               key: committed[key] for key in keys
           }
-          assert [row["predicates"] for row in observed["level_records"]] == [
-              row["predicates"] for row in committed["level_records"]
-          ]
-          assert [row["N_theta"] for row in observed["level_records"]] == [32, 64, 128]
+          assert observed["angular_family"]["required_64_to_128"]["predicates"] == committed[
+              "angular_family"
+          ]["required_64_to_128"]["predicates"]
+          assert observed["fixed_geometry_local_family"]["B_to_C"]["predicates"] == committed[
+              "fixed_geometry_local_family"
+          ]["B_to_C"]["predicates"]
+          assert [row["N_theta"] for row in observed["angular_family"]["required_rows"]] == [64, 128]
+          assert [row["local_level"] for row in observed["fixed_geometry_local_family"]["rows"]] == ["A", "B", "C"]
+          assert observed["exact_v5_failure_class"] == ["RAW_ADJACENT_ELEMENT_TRACTION"]
           PY
           python scripts/build_v5_unified_lineage_records.py
           git diff --exit-code
 
-      - name: Collect exactly thirty-six bounded tests
+      - name: Collect exactly forty-six bounded tests
         run: |
           set -euo pipefail
           TEST_FILES=(
             tests/test_v5_unified_model_lineage.py
             tests/test_cavity_source_recovery_v3.py
             tests/test_cavity_source_conforming_geometry_v4.py
+            tests/test_cavity_source_shape_regular_mesh_v5.py
           )
           python -m pytest --collect-only -q -p no:cacheprovider "${TEST_FILES[@]}" \
             | tee "$ATTESTATION_DIR/collect-only.log"
           grep -E '^[^[:space:]]+::' "$ATTESTATION_DIR/collect-only.log" \
             > "$ATTESTATION_DIR/collected-node-inventory.txt"
-          test "$(wc -l < "$ATTESTATION_DIR/collected-node-inventory.txt" | tr -d ' ')" = 36
+          test "$(wc -l < "$ATTESTATION_DIR/collected-node-inventory.txt" | tr -d ' ')" = 46
 
-      - name: Run bounded lineage, geometry, V3 regression, and V4 record tests
+      - name: Run bounded lineage, geometry, recovery, and V5 record tests
         id: bounded_tests
         run: |
           set -euo pipefail
@@ -146,6 +160,7 @@ jobs:
             tests/test_v5_unified_model_lineage.py
             tests/test_cavity_source_recovery_v3.py
             tests/test_cavity_source_conforming_geometry_v4.py
+            tests/test_cavity_source_shape_regular_mesh_v5.py
           )
           python -m pytest -vv -p no:cacheprovider \
             --junitxml="$ATTESTATION_DIR/pytest-junit.xml" "${TEST_FILES[@]}" \
@@ -163,8 +178,8 @@ jobs:
           print(f"errors={totals['errors']}")
           print(f"skipped={totals['skipped']}")
           PY
-          grep -Fxq 'tests=36' "$ATTESTATION_DIR/pytest-counts.txt"
-          grep -Fxq 'passed=36' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'tests=46' "$ATTESTATION_DIR/pytest-counts.txt"
+          grep -Fxq 'passed=46' "$ATTESTATION_DIR/pytest-counts.txt"
 
       - name: Verify clean bounded worker
         if: always()
@@ -177,7 +192,7 @@ jobs:
           {
             echo "workflow_sha=$GITHUB_SHA"
             echo "bounded_test_step_outcome=$TEST_OUTCOME"
-            echo 'bounded_test_count=36'
+            echo 'bounded_test_count=46'
             echo 'V1_INCIDENT_CST_RECOVERY=FAIL_NONCONVERGENT'
             echo 'V2_TWO_RING_RECOVERY=PASS_MANUFACTURED_AND_KIRSCH'
             echo 'V3_OPERATOR_MANUFACTURED_AND_KIRSCH=PASS'
@@ -185,8 +200,13 @@ jobs:
             echo 'V3_CENTRAL_DBTT_TENSOR_CONVERGENCE=NOT_RUN'
             echo 'V4_SOURCE_CONFORMING_GEOMETRY=PASS_GEOMETRY_REGISTRATION'
             echo 'V4_CENTRAL_DBTT_TENSOR_CONVERGENCE=PASS'
-            echo 'DBTT_SOURCE_READINESS=BLOCKED_WITH_EXACT_V4_FAILURE_CLASS'
             echo 'V4_FAILURE_CLASS=NORMAL_DIRECTION_RESOLUTION+TANGENTIAL_DIRECTION_RESOLUTION+MESH_QUALITY'
+            echo 'V5_MESH_CONTRACT=CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5'
+            echo 'V5_REQUIRED_MESH_QUALITY=PASS'
+            echo 'V5_TENSOR_CONVERGENCE=PASS'
+            echo 'V5_RAW_ADJACENT_TRACTION=FAIL'
+            echo 'DBTT_SOURCE_READINESS=BLOCKED_WITH_EXACT_V5_FAILURE_CLASS'
+            echo 'V5_FAILURE_CLASS=RAW_ADJACENT_ELEMENT_TRACTION'
             echo 'ORACLE_STATES_ACCEPTED=0/18'
             echo 'PAIRED_TRAJECTORIES_RUN=0/12'
             echo 'FATIGUE_IMPLEMENTATION=NOT_STARTED_BY_CONTRACT'
@@ -198,7 +218,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v5-source-conforming-cavity-geometry-v4-${{ github.sha }}
-          path: ${{ runner.temp }}/v5-source-conforming-v4/
+          name: v5-shape-regular-cavity-source-mesh-v5-${{ github.sha }}
+          path: ${{ runner.temp }}/v5-shape-regular-v5/
           if-no-files-found: error
           retention-days: 14

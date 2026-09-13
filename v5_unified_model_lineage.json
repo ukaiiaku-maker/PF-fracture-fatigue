@@ -50,7 +50,9 @@
       "tests_collected": 36,
       "tests_passed": 36,
       "workflow_head": "b12e21b5c7485c490bf0cb5139feb2d736844a16"
-    }
+    },
+    "v5_cancelled_scope_control_runs": [],
+    "v5_worker": null
   },
   "branches": {
     "field_atlas": "codex/v12-field-atlas-recovery",
@@ -61,7 +63,7 @@
   },
   "cavity_source_recovery": {
     "CAVITY_SOURCE_RECOVERY_V1_INCIDENT_CST_MAX_PRINCIPAL": "FAIL_NONCONVERGENT",
-    "active_geometry_contract": "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4",
+    "active_geometry_contract": "CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5",
     "active_operator": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
     "maximum_refinement_levels_for_dbtt_readiness": 3,
     "minimum_quality_valid_fine_levels": 2,
@@ -124,6 +126,31 @@
       "tensor_convergence": "PASS",
       "traction": "PASS",
       "v3_fixed_physical_window_wls_reused_unchanged": true
+    },
+    "v5_shape_regular_local_patch": {
+      "angular_levels_required": [
+        64,
+        128
+      ],
+      "central_dbtt": "BLOCKED_WITH_EXACT_V5_FAILURE_CLASS",
+      "conditional_angular_level_run": 256,
+      "contract": "CAVITY_SOURCE_SHAPE_REGULAR_LOCAL_PATCH_V5",
+      "exact_v5_failure_class": [
+        "RAW_ADJACENT_ELEMENT_TRACTION"
+      ],
+      "fixed_polygon_local_levels": [
+        "A",
+        "B",
+        "C"
+      ],
+      "mesh_quality_required_families": "PASS",
+      "oracle_states_accepted": 0,
+      "raw_adjacent_traction_N128_C": 0.06715193304848284,
+      "reaction_compliance_energy_convergence": "PASS",
+      "source_window_boundary_identity": "PASS",
+      "tensor_convergence": "PASS",
+      "v3_fixed_physical_window_wls_reused_unchanged": true,
+      "v4_mesh_failure_cause": "C_CRACK_SUPPORT_CAVITY_INTERACTION"
     }
   },
   "commits": {
@@ -297,6 +324,15 @@
     {
       "canonical_single_tip_blob": null,
       "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/cavity_source_shape_regular_mesh_v5.py",
+      "qualified_multitip_blob": null,
+      "restored_worktree_blob": "41c7d8e8531c1fdb4fba3df4a0148ff8681e30a9",
+      "retained_v5_blob": null,
+      "role": "shape-regular cavity source mesh V5"
+    },
+    {
+      "canonical_single_tip_blob": null,
+      "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/voiding_v5.py",
       "qualified_multitip_blob": null,
       "restored_worktree_blob": "3c7754bf2d4e3d6dd9f22644b3b2cbd40be5019c",
@@ -308,7 +344,7 @@
       "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/voiding_production_v5.py",
       "qualified_multitip_blob": null,
-      "restored_worktree_blob": "0f790888d5825d2e958d38513c55e9a1e78abe64",
+      "restored_worktree_blob": "41c8d3d9103a1d56542b2c5828336f037e3e9f66",
       "retained_v5_blob": "31dfcada0efc4638d8ca7fbdb626cb69cb140b22",
       "role": "void production driver"
     },
@@ -323,8 +359,12 @@
     }
   ],
   "decision": "TRANSPLANT_VOID_EXTENSION_ONTO_QUALIFIED_MULTITIP_CORE",
-  "downstream_transfer_gate": "BLOCKED_CENTRAL_DBTT_V4_RESOLUTION_AND_QUALITY",
+  "downstream_transfer_gate": "BLOCKED_CENTRAL_DBTT_V5_RAW_ADJACENT_ELEMENT_TRACTION",
   "file_differences": [
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": ".github/workflows/v5-shape-regular-cavity-source-mesh-v5.yml"
+    },
     {
       "classification": "BENCHMARK_ONLY",
       "path": ".github/workflows/v5-source-conforming-cavity-geometry-v4.yml"
@@ -392,6 +432,10 @@
     {
       "classification": "VOIDING_EXTENSION",
       "path": "arrhenius_fracture/cavity_source_recovery_v3.py"
+    },
+    {
+      "classification": "VOIDING_EXTENSION",
+      "path": "arrhenius_fracture/cavity_source_shape_regular_mesh_v5.py"
     },
     {
       "classification": "BRANCHING_EXTENSION",
@@ -607,6 +651,10 @@
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v4/attestation.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "artifacts/v5_cavity_source_recovery_v4/central_dbtt_v4_readiness.json"
     },
     {
@@ -619,6 +667,18 @@
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v5/central_dbtt_v5_readiness.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v5/v4_mesh_failure_audit.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "artifacts/v5_cavity_source_recovery_v5/v5_mesh_contract.json"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "scripts/attest_cavity_source_conforming_v4_dbtt.py"
     },
     {
@@ -627,11 +687,23 @@
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "scripts/attest_cavity_source_shape_regular_v5_dbtt.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "scripts/audit_v2_physical_patch_without_fem.py"
     },
     {
       "classification": "BENCHMARK_ONLY",
+      "path": "scripts/audit_v4_mesh_failure_without_fem.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
       "path": "scripts/build_cavity_source_geometry_v4_contract.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "scripts/build_cavity_source_shape_regular_v5_contract.py"
     },
     {
       "classification": "BENCHMARK_ONLY",
@@ -648,6 +720,10 @@
     {
       "classification": "BENCHMARK_ONLY",
       "path": "tests/test_cavity_source_recovery_v3.py"
+    },
+    {
+      "classification": "BENCHMARK_ONLY",
+      "path": "tests/test_cavity_source_shape_regular_mesh_v5.py"
     },
     {
       "classification": "BENCHMARK_ONLY",
@@ -670,7 +746,7 @@
       "path": "v5_voiding_extension_delta.json"
     }
   ],
-  "next_bounded_step": "SEPARATELY_FORMULATE_FINITE_ACTIVATION_ZONE_WORK_OBSERVABLE",
+  "next_bounded_step": "STOP_POINT_SOURCE_MESH_DEVELOPMENT",
   "oracle_states_accepted": 0,
   "paired_trajectories_run": 0,
   "paper_controls": {
