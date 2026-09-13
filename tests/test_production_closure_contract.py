@@ -132,3 +132,33 @@ def test_edge_and_normal_orientation_do_not_author_traction():
         reverse["normalized_boundary_traction"], rel=0, abs=1e-14,
     )
     assert forward["window_identity"] == reverse["window_identity"]
+
+
+@pytest.mark.parametrize("level,radial", (("D", 16), ("E", 32)))
+def test_final_geometry_levels_pass_construction_before_fem(level, radial):
+    from arrhenius_fracture.cavity_source_shape_regular_mesh_v5 import (
+        build_shape_regular_source_patch_hole_mesh,
+        discrete_cavity_boundary_fingerprint,
+    )
+
+    hole = build_shape_regular_source_patch_hole_mesh(
+        1.0e-3, 1.0e-3, (7.0e-4, 0.0), 5.5e-5, 5.0e-5,
+        local_level=level, polygon_sectors=128,
+    )
+    edges = np.sort(np.concatenate((
+        hole.mesh.elems[:, (0, 1)], hole.mesh.elems[:, (1, 2)],
+        hole.mesh.elems[:, (2, 0)],
+    )), axis=1)
+    unique, counts = np.unique(edges, axis=0, return_counts=True)
+    owners = {tuple(edge): int(count) for edge, count in zip(unique, counts)}
+    assert all(owners[tuple(sorted(map(int, edge)))] == 1 for edge in hole.cavity_edges)
+    assert len(np.unique(hole.cavity_edges)) == len(hole.cavity_edges)
+    assert np.all(hole.mesh.area_e > 0.0)
+    assert set(np.unique(hole.mesh.elems)) == set(range(hole.mesh.nn))
+    assert hole.validation["minimum_quality"] >= 0.10
+    assert hole.validation["first_strip_radial_subdivisions"] == radial
+    assert any(np.linalg.norm(point - np.asarray((7.55e-4, 0.0))) <= 1.0e-12
+               for point in hole.mesh.nodes)
+    assert discrete_cavity_boundary_fingerprint(hole) == (
+        "b1dd9e1aa4952807ac081036fe5be5a579df9ccd297af2e7a4162374fcce8cb7"
+    )

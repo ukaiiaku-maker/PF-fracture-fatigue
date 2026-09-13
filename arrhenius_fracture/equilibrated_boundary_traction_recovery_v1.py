@@ -223,6 +223,7 @@ def recover_equilibrated_boundary_traction_v1(
     )
     boundary_global = np.einsum("ia,nab,jb->nij", basis, boundary_local, basis)
     traction = np.einsum("nij,nj->ni", boundary_global, boundary_normals)
+    resultant = np.sum(lengths[:, None] * traction, axis=0)
     rms = float(np.sqrt(np.sum(lengths * np.sum(traction**2, axis=1)) / np.sum(lengths)))
     normalized = rms / remote
     source_local = _evaluate(coefficients, np.asarray((0.0,)), np.asarray((0.0,)))[0]
@@ -254,6 +255,7 @@ def recover_equilibrated_boundary_traction_v1(
         "source_tensor_Pa": source_global.tolist(),
         "boundary_edge_ids": boundary_edges.tolist(),
         "boundary_traction_vectors_Pa": traction.tolist(),
+        "boundary_resultant_N_per_m": resultant.tolist(),
         "boundary_traction_rms_Pa": rms,
         "normalized_boundary_traction": normalized,
         "remote_traction_scale_Pa": remote,

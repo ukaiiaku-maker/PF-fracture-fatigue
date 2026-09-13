@@ -219,6 +219,9 @@ def _run_level(bundle, retained_path, *, sectors, local_level, reference):
         "raw_adjacent_element_traction_normalized": metrics[
             "raw_adjacent_element_traction_normalized"
         ],
+        "equilibrated_boundary_traction_recovery_v1": metrics[
+            "equilibrated_boundary_traction_recovery_v1"
+        ],
         "assembled_weak_cavity_boundary_residual_normalized": metrics[
             "assembled_weak_cavity_boundary_residual_normalized"
         ],

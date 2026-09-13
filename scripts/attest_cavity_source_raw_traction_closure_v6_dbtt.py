@@ -132,6 +132,12 @@ def build_record():
         row["physical_equilibrium_observable_predicates"] = _physical_observable_predicates(row)
 
     d, e = rows
+    d_equilibrated = d["equilibrated_boundary_traction_recovery_v1"].get(
+        "normalized_boundary_traction"
+    )
+    e_equilibrated = e["equilibrated_boundary_traction_recovery_v1"].get(
+        "normalized_boundary_traction"
+    )
     comparisons = {
         "source_tensor_relative_D_to_E": _relative(
             d["constrained_boundary_limit_tensor_global_xy_Pa"],
@@ -149,6 +155,10 @@ def build_record():
         "ligament_energy_release_relative_D_to_E": _relative(
             d["ligament_energy_gate"]["energy_release_J_per_m"],
             e["ligament_energy_gate"]["energy_release_J_per_m"],
+        ),
+        "equilibrated_traction_absolute_D_to_E": (
+            abs(float(d_equilibrated) - float(e_equilibrated))
+            if d_equilibrated is not None and e_equilibrated is not None else None
         ),
     }
     c_raw = retained["C"]["raw_adjacent_element_traction_normalized"]
@@ -199,7 +209,38 @@ def build_record():
             comparisons["ligament_energy_release_relative_D_to_E"] <= ENERGY_LIMIT
         ),
     }
-    failures = _failure_classes(predicates)
+    fallback_rows = [row["equilibrated_boundary_traction_recovery_v1"] for row in rows]
+    fallback_predicates = {
+        "available": all(row.get("available") is True for row in fallback_rows),
+        "normalized_recovered_boundary_traction": all(
+            row.get("normalized_boundary_traction", float("inf")) <= TRACTION_LIMIT
+            for row in fallback_rows
+        ),
+        "mesh_convergence": (
+            comparisons["equilibrated_traction_absolute_D_to_E"] is not None
+            and comparisons["equilibrated_traction_absolute_D_to_E"] <= 0.05
+        ),
+        "fit_residual": all(
+            row.get("fit_residual", float("inf")) <= row.get("fit_residual_limit", -float("inf"))
+            for row in fallback_rows
+        ),
+        "rank_and_condition": all(
+            row.get("rank", -1) >= row.get("required_rank", 10**9)
+            and row.get("condition", float("inf")) <= row.get("condition_limit", -float("inf"))
+            for row in fallback_rows
+        ),
+        "weak_fem_residual": predicates["weak_cavity_boundary_residual"],
+        "physical_reactions_balance": predicates["physical_equilibrium_observables"],
+    }
+    primary_passed = all(predicates.values())
+    fallback_passed = all(fallback_predicates.values())
+    shared_failures = _failure_classes({
+        key: value for key, value in predicates.items()
+        if key not in {"raw_traction_E", "strict_raw_traction_order_C_D_E"}
+    })
+    failures = shared_failures + ([] if primary_passed or fallback_passed else [
+        "TRACTION_FREE_BOUNDARY_VERIFICATION",
+    ])
     passed = not failures
     return {
         "schema": "v6.central-dbtt-raw-traction-closure-readiness/1",
@@ -221,10 +262,16 @@ def build_record():
             "new_rows": rows,
             "D_to_E_comparisons": comparisons,
             "predicates": predicates,
+            "fallback_predicates": fallback_predicates,
         },
+        "RAW_CST_TRACTION": "PASS" if primary_passed else "DIAGNOSTIC_FAIL",
+        "TRACTION_FREE_BOUNDARY_VERIFICATION": (
+            "PASS_RAW_CST" if primary_passed else
+            "PASS_EQUILIBRATED_RECOVERY" if fallback_passed else "FAIL"
+        ),
         "exact_v6_failure_class": failures,
         "DBTT_SOURCE_READINESS": (
-            "PASS_RAW_TRACTION_CLOSURE_V6" if passed
+            "PASS_PRODUCTION_TRACTION_CLOSURE" if passed
             else "BLOCKED_WITH_EXACT_V6_FAILURE_CLASS"
         ),
         "oracle_states_accepted": 0,

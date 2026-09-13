@@ -1453,7 +1453,16 @@ def cavity_source_resolution_metrics(state, *, geometry_contract=None):
     if not local_rows: raise ValueError("fixed cavity source has no local boundary neighborhood")
     local = np.asarray(local_rows)
     all_boundary = np.asarray(all_rows)
-    remote = abs(float(np.sum(assembled_residual[2*np.asarray(state.boundary.top_nodes)+1])))/float(np.ptp(nodes[:,0]))
+    from .topology_transaction_v11 import require_equilibrium_observables
+    equilibrium = require_equilibrium_observables(state)
+    specimen_width = float(np.ptp(nodes[:, 0]))
+    if not np.isfinite(specimen_width) or specimen_width <= 0.0:
+        raise ValueError("specimen width must be finite and positive")
+    reaction_magnitude = 0.5 * (
+        abs(float(equilibrium["latest_top_reaction_N_per_m"]))
+        + abs(float(equilibrium["latest_bottom_reaction_N_per_m"]))
+    )
+    remote = reaction_magnitude / specimen_width
     triangles = nodes[elems]
     side2 = np.sum((triangles-triangles[:,[1,2,0]])**2,axis=(1,2))
     global_quality = 4*np.sqrt(3)*np.asarray(state.mesh.area_e)/side2
@@ -1463,10 +1472,30 @@ def cavity_source_resolution_metrics(state, *, geometry_contract=None):
     local_tensor = basis.T @ tensor @ basis
     cavity_nodes = np.unique(edges)
     weak_force = np.asarray(assembled_residual).reshape(-1, 2)[cavity_nodes]
-    weak_residual = float(
-        np.linalg.norm(weak_force) / max(remote * boundary_length, 1.0e-300)
+    if not np.isfinite(boundary_length) or boundary_length <= 0.0:
+        raise ValueError("cavity boundary length must be finite and positive")
+    weak_residual = float(np.linalg.norm(weak_force) / (remote * boundary_length))
+    raw_traction = math.sqrt(traction_sum/boundary_length)/remote
+    from .equilibrated_boundary_traction_recovery_v1 import (
+        EquilibratedBoundaryTractionUnavailable,
+        recover_equilibrated_boundary_traction_v1,
     )
-    raw_traction = math.sqrt(traction_sum/boundary_length)/max(remote,1e-300)
+    damage = getattr(state.mesh, "element_damage_gp", None)
+    solid = None if damage is None else np.asarray(damage, dtype=float) < 0.5
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
+    try:
+        equilibrated = recover_equilibrated_boundary_traction_v1(
+            nodes=nodes, elements=elems, stress_Pa=sigma, boundary_node=node,
+            cavity_center_m=cavity.center_m, cavity_radius_m=cavity.radius_m,
+            process_length_m=engine.f.L_pz, owned_boundary_edges=edges,
+            remote_traction_scale_Pa=remote,
+            state_fingerprint=_cavity_resolution_binding(state), solid_element_mask=solid,
+        )
+    except EquilibratedBoundaryTractionUnavailable as exc:
+        equilibrated = {
+            "operator": "EQUILIBRATED_BOUNDARY_TRACTION_RECOVERY_V1",
+            "available": False, "scientific_unavailability": str(exc),
+        }
     plastic_active = bool(np.any(np.abs(np.asarray(state.ep_gp, dtype=float)) > 0.0))
     return {"tensor_Pa": tensor.tolist(), "probe_element_ids": list(selected),
         "boundary_node_id": node, "boundary_position_m": position.tolist(),
@@ -1484,6 +1513,7 @@ def cavity_source_resolution_metrics(state, *, geometry_contract=None):
         "constrained_boundary_limit_traction_residual": float(recovery["traction_residual"]),
         "raw_adjacent_element_traction_normalized": raw_traction,
         "incident_cst_boundary_traction_v1": raw_traction,
+        "equilibrated_boundary_traction_recovery_v1": equilibrated,
         "assembled_weak_cavity_boundary_residual_normalized": weak_residual,
         "source_tensor_local_nt_Pa": local_tensor.tolist(),
         "source_tensor_global_xy_Pa": tensor.tolist(),
