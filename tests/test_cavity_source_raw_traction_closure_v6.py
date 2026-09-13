@@ -96,5 +96,10 @@ def test_v6_failure_keeps_oracle_and_downstream_campaigns_closed():
     assert record["paired_trajectories_run"] == 0
     assert record["fatigue_started"] is False
     assert record["next_bounded_step"] == "EQUILIBRATED_BOUNDARY_STRESS_RECONSTRUCTION"
-    assert record["preserved_v5"]["V5_DBTT_SOURCE_READINESS"] == "BLOCKED"
+    assert record["preserved_v5"]["DBTT_SOURCE_READINESS"] == "BLOCKED"
+    assert record["preserved_v5"]["FINITE_ACTIVATION_ZONE_REQUIRED"] == "NOT_ESTABLISHED"
+    assert record["preserved_v5"]["V5_WEAK_TRACTION_FREE_BOUNDARY"] == "PASS"
+    assert record["preserved_v5"]["V5_RAW_ADJACENT_ELEMENT_TRACTION"] == (
+        "FAIL_0.0671519_GT_0.05"
+    )
     assert all(value is False for value in record["scope"].values())
