@@ -45,8 +45,9 @@ def build_record():
         "angular_geometry_family": {
             "required_levels": [64, 128],
             "conditional_level_256": "ONLY_IF_64_TO_128_FAILS",
-            "fixed_polygon_selection_rule": (
-                "SELECT_128_IF_64_TO_128_PASSES_ELSE_RUN_256_AND_SELECT_256_ONLY_IF_128_TO_256_PASSES"
+            "selected_fixed_polygon_sectors_for_local_family": 128,
+            "conditional_level_256_role": (
+                "BOUNDED_ANGULAR_DIAGNOSTIC_ONLY; DOES_NOT_CHANGE_THE_FROZEN_LOCAL_FAMILY"
             ),
             "matched_local_resolution": True,
             "matched_boundary_node_count": 512,

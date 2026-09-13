@@ -24,6 +24,10 @@ from .explicit_cavity_v5 import (
     build_explicit_hole_mesh, build_source_conforming_hole_mesh,
     fill_explicit_hole_mesh, triangle_intersects_open_disk,
 )
+from .cavity_source_shape_regular_mesh_v5 import (
+    MESH_CONTRACT_ID as SHAPE_REGULAR_MESH_V5_ID,
+    build_shape_regular_source_patch_hole_mesh,
+)
 from .mesh import BoundaryData, rebuild_tri_mesh
 from .fem import assemble_mechanics, plane_strain_D
 from .unified_fracture_material_v5 import (
@@ -172,13 +176,14 @@ def _head():
 
 def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0), *, boundary_segments=32,
               radial_layers=12, source_conforming_geometry=False,
-              source_direction_xy=(1.0, 0.0)):
+              source_direction_xy=(1.0, 0.0), shape_regular_local_level=None):
     if center_m[1] < 0.0:
         positive_hole, positive_filled = _geometry(
             radius_m, (center_m[0], -center_m[1]),
             boundary_segments=boundary_segments, radial_layers=radial_layers,
             source_conforming_geometry=source_conforming_geometry,
             source_direction_xy=(source_direction_xy[0], -source_direction_xy[1]),
+            shape_regular_local_level=shape_regular_local_level,
         )
         def mirrored(value):
             nodes = np.asarray(value.mesh.nodes).copy(); nodes[:, 1] *= -1.0
@@ -193,13 +198,23 @@ def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0), *, boundary_segments=32,
             return replace(value, mesh=mesh, boundary=boundary,
                            center_m=(float(center_m[0]), float(center_m[1])))
         return mirrored(positive_hole), mirrored(positive_filled)
-    builder = (build_source_conforming_hole_mesh if source_conforming_geometry
-               else build_explicit_hole_mesh)
-    builder_kwargs = ({"source_direction_xy": source_direction_xy}
-                      if source_conforming_geometry else {})
-    hole = builder(1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5,
-                   boundary_segments, radial_layers_override=radial_layers,
-                   **builder_kwargs)
+    if shape_regular_local_level is not None:
+        if source_conforming_geometry:
+            raise ValueError("V4 and V5 cavity geometry contracts are mutually exclusive")
+        hole = build_shape_regular_source_patch_hole_mesh(
+            1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5,
+            local_level=shape_regular_local_level,
+            polygon_sectors=boundary_segments, base_radial_layers=radial_layers,
+            source_direction_xy=source_direction_xy,
+        )
+    else:
+        builder = (build_source_conforming_hole_mesh if source_conforming_geometry
+                   else build_explicit_hole_mesh)
+        builder_kwargs = ({"source_direction_xy": source_direction_xy}
+                          if source_conforming_geometry else {})
+        hole = builder(1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5,
+                       boundary_segments, radial_layers_override=radial_layers,
+                       **builder_kwargs)
     return hole, fill_explicit_hole_mesh(hole)
 
 
@@ -335,7 +350,8 @@ def _refine_state_around_graph(state, levels):
 def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enabled=True, stochastic=False, seed=3621,
                                 cavity_center_m=(7.0e-4, 0.0), crack_path_m=None,
                                 cleavage_theta_deg=0.0, boundary_segments=32, radial_layers=12,
-                                source_conforming_geometry=False):
+                                source_conforming_geometry=False,
+                                shape_regular_local_level=None):
     if (boundary_segments, radial_layers) != (32, 12) and crack_path_m is None:
         raise ValueError("production resolution transfer requires an explicit fixed crack path")
     source_direction = (math.cos(math.radians(cleavage_theta_deg)),
@@ -344,12 +360,13 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
         center_m=cavity_center_m, boundary_segments=boundary_segments,
         radial_layers=radial_layers, source_conforming_geometry=source_conforming_geometry,
         source_direction_xy=source_direction,
+        shape_regular_local_level=shape_regular_local_level,
     )
     mesh = filled.mesh
     ray = 16
     if crack_path_m is None:
         path_mesh = mesh
-        if source_conforming_geometry:
+        if source_conforming_geometry or shape_regular_local_level is not None:
             _, retained_filled = _geometry(
                 center_m=cavity_center_m, boundary_segments=32, radial_layers=12,
                 source_conforming_geometry=False,
@@ -358,7 +375,7 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
         start = tuple(map(float, path_mesh.nodes[12 * 32 + ray]))
         tip = tuple(map(float, path_mesh.nodes[3 * 32 + ray]))
         crack_path = (start, tip)
-        if source_conforming_geometry:
+        if source_conforming_geometry or shape_regular_local_level is not None:
             for point in crack_path:
                 mesh = _insert_point_in_mesh(mesh, point)
                 hole = replace(hole, mesh=_insert_point_in_mesh(hole.mesh, point))
@@ -1009,12 +1026,18 @@ def _grow_hole_boundary(hole, radius_m, *, crack_path_m):
         hole.validation.get("geometry_contract")
         == "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4"
     )
+    shape_regular_level = (
+        hole.validation.get("local_level")
+        if hole.validation.get("geometry_contract") == SHAPE_REGULAR_MESH_V5_ID
+        else None
+    )
     grown, _ = _geometry(
         radius_m, hole.center_m,
         boundary_segments=len(hole.prescribed_polygon_nodes),
         radial_layers=int(hole.validation["radial_layers"]),
         source_conforming_geometry=source_conforming,
         source_direction_xy=hole.validation.get("source_direction_xy", (1.0, 0.0)),
+        shape_regular_local_level=shape_regular_level,
     )
     mesh = grown.mesh
     for point in crack_path_m:
@@ -1381,7 +1404,9 @@ def cavity_source_resolution_metrics(state, *, geometry_contract=None):
     node = int(np.argmin(np.linalg.norm(state.mesh.nodes-position, axis=1)))
     if geometry_contract is None:
         recovery = cavity_fixed_physical_arc_patch_recovery_v3(state, boundary_node=node)
-    elif geometry_contract == "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4":
+    elif geometry_contract in (
+        "CAVITY_SOURCE_CONFORMING_GEOMETRY_V4", SHAPE_REGULAR_MESH_V5_ID,
+    ):
         recovery = cavity_source_conforming_recovery_v4(state, boundary_node=node)
     else:
         raise ValueError("unregistered cavity source geometry contract")
@@ -1424,6 +1449,15 @@ def cavity_source_resolution_metrics(state, *, geometry_contract=None):
     global_quality = 4*np.sqrt(3)*np.asarray(state.mesh.area_e)/side2
     radial = (position-np.asarray(cavity.center_m)); normal = radial/np.linalg.norm(radial)
     tangent = np.array((-normal[1],normal[0]))
+    basis = np.column_stack((normal, tangent))
+    local_tensor = basis.T @ tensor @ basis
+    cavity_nodes = np.unique(edges)
+    weak_force = np.asarray(assembled_residual).reshape(-1, 2)[cavity_nodes]
+    weak_residual = float(
+        np.linalg.norm(weak_force) / max(remote * boundary_length, 1.0e-300)
+    )
+    raw_traction = math.sqrt(traction_sum/boundary_length)/max(remote,1e-300)
+    plastic_active = bool(np.any(np.abs(np.asarray(state.ep_gp, dtype=float)) > 0.0))
     return {"tensor_Pa": tensor.tolist(), "probe_element_ids": list(selected),
         "boundary_node_id": node, "boundary_position_m": position.tolist(),
         "normal_xy": normal.tolist(), "tangent_xy": tangent.tolist(),
@@ -1437,7 +1471,26 @@ def cavity_source_resolution_metrics(state, *, geometry_contract=None):
         "minimum_quality": float(global_quality.min()),
         "local_minimum_quality": float(local[:,3].min()),
         "normalized_traction": float(recovery["traction_residual"]),
-        "incident_cst_boundary_traction_v1": math.sqrt(traction_sum/boundary_length)/max(remote,1e-300),
+        "constrained_boundary_limit_traction_residual": float(recovery["traction_residual"]),
+        "raw_adjacent_element_traction_normalized": raw_traction,
+        "incident_cst_boundary_traction_v1": raw_traction,
+        "assembled_weak_cavity_boundary_residual_normalized": weak_residual,
+        "source_tensor_local_nt_Pa": local_tensor.tolist(),
+        "source_tensor_global_xy_Pa": tensor.tolist(),
+        "constrained_fit_residual": float(recovery["constrained_fit_residual"]),
+        "patch_rank": recovery["rank"],
+        "patch_condition": recovery["condition"],
+        "sigma_zz_and_mean_stress_audit": {
+            "plastic_strain_active": plastic_active,
+            "mean_stress_consumed_by_cavity_source_kinetics": False,
+            "classification": "DIAGNOSTIC_ONLY",
+            "reported_plane_strain_sigma_zz_Pa": float(recovery["plane_strain_sigma_zz_Pa"]),
+            "reported_mean_stress_Pa": float(recovery["mean_stress_Pa"]),
+            "interpretation": (
+                "elastic projection of the constrained in-plane boundary-limit tensor; "
+                "not a constitutive plastic sigma_zz recovery and not consumed by source kinetics"
+            ),
+        },
         "recovery_operator": recovery["recovery_operator"],
         "recovery_record": recovery}
 
@@ -2461,12 +2514,14 @@ def deterministic_trajectory(*, bundle: UnifiedFractureMaterialBundle, stop_befo
                              crack_path_m=None, cleavage_theta_deg=0.0,
                              state_trace=None, boundary_segments=32, radial_layers=12,
                              qualify_source=False, common_restart_protocol=False,
-                             source_conforming_geometry=False):
+                             source_conforming_geometry=False,
+                             shape_regular_local_level=None):
     state, hole = build_production_void_state(bundle=bundle, enabled=True, cavity_center_m=cavity_center_m,
                                               crack_path_m=crack_path_m,
                                               cleavage_theta_deg=cleavage_theta_deg,
                                               boundary_segments=boundary_segments, radial_layers=radial_layers,
-                                              source_conforming_geometry=source_conforming_geometry)
+                                              source_conforming_geometry=source_conforming_geometry,
+                                              shape_regular_local_level=shape_regular_local_level)
     cfg = VoidingConfig(enabled=True, promotion_radius_m=5.0e-5)
     rows = [observables(state, "available_site")]
     def capture(label):

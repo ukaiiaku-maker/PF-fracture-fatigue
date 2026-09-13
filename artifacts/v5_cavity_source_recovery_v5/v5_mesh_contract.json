@@ -2,13 +2,14 @@
   "acceptance_minimum_quality": 0.05,
   "angular_geometry_family": {
     "conditional_level_256": "ONLY_IF_64_TO_128_FAILS",
-    "fixed_polygon_selection_rule": "SELECT_128_IF_64_TO_128_PASSES_ELSE_RUN_256_AND_SELECT_256_ONLY_IF_128_TO_256_PASSES",
+    "conditional_level_256_role": "BOUNDED_ANGULAR_DIAGNOSTIC_ONLY; DOES_NOT_CHANGE_THE_FROZEN_LOCAL_FAMILY",
     "matched_boundary_node_count": 512,
     "matched_local_resolution": true,
     "required_levels": [
       64,
       128
-    ]
+    ],
+    "selected_fixed_polygon_sectors_for_local_family": 128
   },
   "construction_target_minimum_quality": 0.1,
   "diagnostic_separation": [
