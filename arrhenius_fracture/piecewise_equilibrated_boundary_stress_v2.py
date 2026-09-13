@@ -133,6 +133,22 @@ def recover_piecewise_equilibrated_boundary_stress_v2(
     selected, normal, tangent = _selected_patch(xy, tri, center, source, radius, scale, solid)
     basis = np.column_stack((normal, tangent))
     local_points = (xy - source) @ basis / scale
+    element_centers_local = local_points[tri[selected]].mean(axis=1)
+    element_scales_local = np.sqrt(
+        2.0 * np.asarray([
+            abs(np.linalg.det(np.column_stack((
+                local_points[element[1]] - local_points[element[0]],
+                local_points[element[2]] - local_points[element[0]],
+            )))) / 2.0
+            for element in tri[selected]
+        ])
+    )
+    if np.any(element_scales_local <= 0.0):
+        raise ValueError("selected patch contains a degenerate element")
+
+    def element_coordinates(patch_id: int, point: np.ndarray) -> np.ndarray:
+        return (np.asarray(point) - element_centers_local[patch_id]) / element_scales_local[patch_id]
+
     stresses = _stress_rows(stress_Pa, len(tri))[selected]
     tensors = np.zeros((len(selected), 2, 2))
     tensors[:, 0, 0], tensors[:, 1, 1], tensors[:, 0, 1] = stresses.T
@@ -151,7 +167,7 @@ def recover_piecewise_equilibrated_boundary_stress_v2(
         target = np.asarray((local_targets[patch_id, 0, 0],
                              local_targets[patch_id, 1, 1], local_targets[patch_id, 0, 1]))
         for vertex in tri[eid]:
-            design = _component_design(*local_points[int(vertex)])
+            design = _component_design(*element_coordinates(patch_id, local_points[int(vertex)]))
             for component in range(3):
                 for coefficient, value in enumerate(design[component]):
                     if value:
@@ -181,9 +197,12 @@ def recover_piecewise_equilibrated_boundary_stress_v2(
         edge_normal_global = np.asarray((edge_vector[1], -edge_vector[0])) / np.linalg.norm(edge_vector)
         edge_normal_local = basis.T @ edge_normal_global
         for vertex in edge:
-            design = _traction_design(*local_points[vertex], edge_normal_local)
             for component in range(2):
                 for sign, eid in ((1., owners[0]), (-1., owners[1])):
+                    patch_id = local_index[eid]
+                    design = _traction_design(
+                        *element_coordinates(patch_id, local_points[vertex]), edge_normal_local,
+                    )
                     offset = 7 * local_index[eid]
                     for coefficient, value in enumerate(design[component]):
                         if value:
@@ -234,7 +253,11 @@ def recover_piecewise_equilibrated_boundary_stress_v2(
         if float(outward @ (centroid - midpoint)) > 0: outward = -outward
         for offset in (-1 / math.sqrt(3), 1 / math.sqrt(3)):
             point = midpoint + 0.5 * offset * vector
-            local_tensor = _tensor(coefficients[local_index[eid]], *((point-source) @ basis / scale))
+            patch_id = local_index[eid]
+            point_local = (point-source) @ basis / scale
+            local_tensor = _tensor(
+                coefficients[patch_id], *element_coordinates(patch_id, point_local)
+            )
             traction = local_tensor @ (basis.T @ outward)
             force = 0.5 * length * traction
             patch_resultant += force
@@ -256,7 +279,11 @@ def recover_piecewise_equilibrated_boundary_stress_v2(
         if abs(radius * angle) > scale:
             continue
         eid = owners[0]
-        local_tensor = _tensor(coefficients[local_index[eid]], *((midpoint - source) @ basis / scale))
+        patch_id = local_index[eid]
+        midpoint_local = (midpoint - source) @ basis / scale
+        local_tensor = _tensor(
+            coefficients[patch_id], *element_coordinates(patch_id, midpoint_local)
+        )
         global_tensor = remote * basis @ local_tensor @ basis.T
         geometry = cavity_edge_traction_geometry(xy[edge[0]], xy[edge[1]], center, global_tensor)
         traction = np.asarray(geometry["traction"])

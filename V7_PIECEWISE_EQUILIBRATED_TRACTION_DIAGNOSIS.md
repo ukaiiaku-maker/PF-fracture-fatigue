@@ -50,10 +50,10 @@ results are:
 
 | level | piecewise traction | fit residual | max interface jump |
 |---|---:|---:|---:|
-| D | 0.1376619 | 0.04391 | 3.65e-11 |
-| E | 0.1333834 | 0.04388 | 4.41e-10 |
+| D | 0.1376379 | 0.04391 | 6.81e-13 |
+| E | 0.1333688 | 0.04388 | 2.61e-12 |
 
-The D-to-E absolute change is 0.00428 and the fractional change is about 3.21%,
+The D-to-E absolute change is 0.00427 and the fractional change is about 3.20%,
 so convergence passes.  Rank/conditioning, local equilibrium, interface
 continuity, resultant/moment balance, weak FEM residual, source-tensor
 convergence, reactions/compliance/energy, mesh quality, and accepted-state
