@@ -76,11 +76,17 @@ def _run(field, *, reverse=False, **mesh):
 
 
 def _compact(row):
-    return {key: row[key] for key in (
+    compact = {key: row[key] for key in (
         "normalized_boundary_traction", "stress_fit_residual", "equilibrium_residual",
         "interface_traction_jump_residual", "resultant_residual", "moment_residual",
-        "rank", "required_rank", "condition", "minimum_support_quality", "window_identity",
+        "rank", "required_rank", "condition", "minimum_support_quality",
     )}
+    compact.update({
+        "window_identity_sha256": row["window_identity"]["sha256"],
+        "stencil_element_count": len(row["stencil_element_ids"]),
+        "boundary_edge_count": len(row["boundary_edge_rows"]),
+    })
+    return compact
 
 
 def build_record():
