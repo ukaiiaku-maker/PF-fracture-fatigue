@@ -1,0 +1,33 @@
+{
+  "schema": "v10.2.30_v2_2_preflight_and_source_diff_inventory_v1",
+  "immutable_parent_head": "7bb4a341b1c5370c826a3a6bc0253c042fd2e6fc",
+  "immutable_parent_tree": "b44418fd428e13c993ce8f5954e036411c3dc660",
+  "child_branch": "codex/v10.2.30-v2-2-1d-rising-resistance-and-high-stress-fatigue",
+  "preflight": {
+    "initial_worktree_clean": true,
+    "related_workers": 0,
+    "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "data_volume_free_GiB": 6.1,
+    "v2_1_archive_sha256": "99deb87263fb888b4512f8041f496b86b95d9ef52ca938521eae88d92aa670ae",
+    "strict_v2_1_verifier": "PASS",
+    "strict_inherited_v2_verifier": "PASS",
+    "frozen_rows_loaded": 8,
+    "frozen_rows_byte_fields_round_trip_exact": true
+  },
+  "parent_reproductions": {
+    "archived_reduced_monotonic_event_to_event": "PASS_ORIGINAL_SENTINEL_TOLERANCES",
+    "archived_finite_v9_14_fatigue": "PASS_EXACT_SCIENTIFIC_AND_STATE_FIELDS"
+  },
+  "new_paths_from_parent": [
+    "ONE_D_RISING_RESISTANCE_PROTOCOL.md",
+    "one_d_rising_resistance_protocol.json",
+    "fatigue_entrypoint_capability_audit.csv",
+    "arrhenius_fracture/canonical_v2_registry_v10230.py",
+    "tests/test_canonical_v2_registry_v10230.py",
+    "analysis_outputs/v2_2_1d_rising_resistance_and_fatigue/parent_case_reproduction.json",
+    "analysis_outputs/v2_2_1d_rising_resistance_and_fatigue/preflight_and_source_diff_inventory.json"
+  ],
+  "production_physics_modified": false,
+  "accepted_v2_1_raw_results_modified": false,
+  "new_physical_trajectory_started": false
+}

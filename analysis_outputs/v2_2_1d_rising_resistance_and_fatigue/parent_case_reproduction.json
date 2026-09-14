@@ -1,0 +1,24 @@
+{
+  "schema": "v10.2.30_v2_2_parent_case_reproduction_v1",
+  "status": "PASS",
+  "monotonic": {
+    "candidate_id": "v912_targeted_local_peak_013476_0368",
+    "temperature_K": 900.0,
+    "events_compared": 8,
+    "K_first_MPa_sqrt_m": 28.545464751367057,
+    "K_10um_MPa_sqrt_m": 30.553134428908567,
+    "K_25um_MPa_sqrt_m": 55.820058631720926,
+    "comparison": "PASS_ORIGINAL_SENTINEL_TOLERANCES"
+  },
+  "fatigue": {
+    "candidate_id": "v913_zeroD_sobol_0202500",
+    "fraction": 1.2,
+    "seed": 1720,
+    "events_compared": 6,
+    "final_cycles": 2.4170640929036935,
+    "final_extension_m": 0.000028888107103674025,
+    "scientific_and_state_field_difference_count": 0,
+    "excluded_metadata_fields": ["git_head", "wall_seconds"],
+    "comparison": "PASS_EXACT"
+  }
+}

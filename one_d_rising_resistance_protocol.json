@@ -1,0 +1,24 @@
+{
+  "schema": "v10.2.30_v2_2_1d_rising_resistance_protocol_v1",
+  "immutable_parent_head": "7bb4a341b1c5370c826a3a6bc0253c042fd2e6fc",
+  "observable": "1D_RELOAD_SEPARATED_EFFECTIVE_RESISTANCE",
+  "temperature_K": 900.0,
+  "Kdot_MPa_sqrt_m_s": 0.005,
+  "K_censor_MPa_sqrt_m": 80.0,
+  "threshold_action": 0.6931471805599453,
+  "event_advance_m": 0.000005,
+  "maximum_events": 10,
+  "target_extension_m": 0.00005,
+  "unload_K_MPa_sqrt_m": 0.0,
+  "unload_dwell_s": 0.0,
+  "modes": ["FULL_PRODUCTION_STATE", "OPENING_ONLY_FROZEN_STATE"],
+  "opening_only_existing_ablation": "KineticTipConfig.plasticity_enabled=False",
+  "classification_gates": {
+    "strong": {"minimum_points": 8, "theil_sen_slope_gt": 0.0, "spearman_rho_gte": 0.8, "nonnegative_successive_increments_gte": 7, "rise_fraction_gte": 0.2, "full_rise_exceeds_opening_only": true, "state_mediated_fraction_gte": 0.5},
+    "moderate": {"minimum_points": 8, "theil_sen_slope_gt": 0.0, "rise_fraction_gte": 0.1, "full_rise_exceeds_opening_only": true}
+  },
+  "fatigue": {"temperature_K": 300.0, "R": 0.1, "frequency_Hz": 1000.0, "maximum_candidates": 3, "new_points_per_candidate": 3, "upper_fraction_of_monotonic_boundary": 0.9, "minimum_events": 5, "target_extension_m": 0.000025},
+  "barrier_refit_or_retune": false,
+  "spatial_execution_authorized": false,
+  "protocol_frozen_before_physical_execution": true
+}
