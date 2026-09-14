@@ -1,0 +1,132 @@
+{
+  "schema": "corrected_sign_explicit_thermodynamic_joint_search_v2",
+  "protocol_frozen_before_v2_candidate_generation": true,
+  "parent_branch": "codex/v10.2.30-thermodynamic-joint-barrier-search",
+  "parent_head": "97916f6f42ba063d5d6fe4a8c4590bd35047b197",
+  "parent_artifact_hashes": {
+    "analytical_joint_search_decision.json": "725a8df8d6d662d22c4f9d0736b7fce2ad4f3cb865ff57fb3f686630e8eff261",
+    "file_hashes.json": "706fcb5fa133e0dc90dc0aab7de1f3510e1f0df3218cf15602bb81935546651e"
+  },
+  "branch": "codex/v10.2.30-thermodynamic-joint-barrier-search-v2",
+  "reference_temperature_K": 300.0,
+  "entropy_sign_convention": {
+    "activation_entropy_over_kB": "Delta S^dagger/k_B",
+    "barrier_temperature_derivative_over_kB": "(partial Delta G^dagger/partial T)_sigma/k_B",
+    "identity": "barrier_temperature_derivative_over_kB=-activation_entropy_over_kB",
+    "primary_emission_prior_kB": [-50.0, -30.0],
+    "structured_emission_entropy_kB": [-60, -50, -45, -40, -35, -30, -25, -20, -10, 0, 10, 20, 30, 40, 50, 60],
+    "opening_entropy_bounds_kB": [-60.0, 60.0],
+    "heat_capacity_bounds_kB": [-15.0, 15.0],
+    "entropy_representation": "DIRECT_FREE_ENERGY_SURFACE_NO_PREFACTOR_DOUBLE_COUNTING"
+  },
+  "independent_parameters": [
+    "legacy_candidate_id", "emission_activation_entropy_active_over_kB",
+    "opening_activation_entropy_zero_over_kB", "opening_activation_entropy_active_over_kB",
+    "opening_activation_entropy_infinity_over_kB", "emission_activation_entropy_infinity_over_kB",
+    "opening_activation_heat_capacity_components_over_kB",
+    "emission_activation_heat_capacity_components_over_kB"
+  ],
+  "derived_parameters": [
+    "barrier_temperature_derivative_over_kB", "entropy_basis_amplitudes",
+    "activation_volume_m3", "activation_enthalpy_eV", "guard_stress_scale_Pa"
+  ],
+  "inherited_nonentropy_coordinates_immutable": true,
+  "attempt_frequencies_fixed": true,
+  "cooperative_renewal": {"m_c": 3.2732414351776242, "tau_c_s": 6.992153587194454e-7},
+  "search": {
+    "structured_rows": 3072,
+    "paired_primary_sobol_rows": 131072,
+    "paired_delta_cp_rows": 32768,
+    "sobol_seeds": {"P25": 260911, "P40": 260912, "delta_cp": 260913},
+    "analytical_workers": 1,
+    "f0_downselection_max": 768,
+    "f1a_candidate_count": 24,
+    "f1b_candidate_count": 24,
+    "f2r_candidate_max": 6
+  },
+  "grids": {
+    "temperature_full_K": [300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700,725,750,775,800,825,850,875,900,925,950,975,1000,1025,1050,1075,1100,1125,1150,1175,1200],
+    "temperature_core_state_K": [300,450,600,750,900,1050,1200],
+    "temperature_fatigue_diagnostic_K": [300,600,1200],
+    "loading_rates_MPa_sqrt_m_per_s": [0.0005,0.005,0.05],
+    "core_state_loading_rate": 0.005,
+    "rate_anchor_temperature_K": [450,750,1050],
+    "thresholds": {"LN2": 0.6931471805599453, "UNIT_ACTION": 1.0, "SEED_1720": 0.07509316036236147},
+    "primary_threshold": "LN2",
+    "stress_domain_Pa": [0.0,30000000000.0],
+    "fatigue_Kmax_MPa_sqrt_m": [12,12.75,13.5,15,16.5,18,19.5,21,24.3]
+  },
+  "condition_counts": {
+    "preserved_core_F1A": 168,
+    "preserved_core_F1B": 168,
+    "core_definition": "24 candidates x 7 temperatures x one primary rate x LN2",
+    "additional_F1B_rate_anchors": 144,
+    "rate_anchor_definition": "24 candidates x 3 temperatures x two nonprimary rates",
+    "F2R_maximum": 78
+  },
+  "thermodynamic_gates": {
+    "both_processes_G_strictly_positive": true,
+    "finite_G_H_S_V_and_elementary_rate": true,
+    "exact_Tref_surface_abs_eV": 2e-12,
+    "entropy_finite_difference_abs_kB": 2e-6,
+    "activation_volume_finite_difference_abs_m3": 2e-31,
+    "maxwell_abs_m3_per_K": 1e-34,
+    "maximum_floor_path_fraction": 0.80,
+    "maximum_numerical_ceiling_path_fraction": 0.80,
+    "isolated_constitutive_ceiling_contact_rejects": false,
+    "complete_path_loss_of_discrimination_rejects": true
+  },
+  "fatigue_gates_300K": {
+    "RMS_log10_rate_error_max_decade": 0.05,
+    "maximum_log10_rate_error_max_decade": 0.10,
+    "absolute_global_slope_change_max": 0.15,
+    "maximum_adjacent_local_slope_change_max": 0.30,
+    "guard_active_window_max_eV": 0.005,
+    "monotonic_positive_required": true,
+    "new_renewal_ceiling_forbidden": true,
+    "event_length_m": 5e-6
+  },
+  "accessibility": {
+    "KFP_300K_MPa_sqrt_m": [1.0,50.0],
+    "zero_load_action_fraction_300K_max": 0.001,
+    "temperature_path_zero_load_fraction_max": 0.10,
+    "A_K_temperature_path_min": 1.5,
+    "required_F1B_core_fraction": 0.80,
+    "missing_states_interpolated": false,
+    "all_class_defining_anchors_required": true
+  },
+  "topology_rules": {
+    "apply_only_to": ["F1B_FULL_PRODUCTION_STATE","F2R_PRODUCTION_REDUCED_REPLAY"],
+    "ceramic_like": {"K1200_over_K300_max": 0.70,"no_sign_reversal": true,"opening_precedes_substantial_relaxation": true,"F1B_close_to_F0_fraction": 0.10},
+    "weak_T": {"max_over_min_max": 1.25,"full_state_required": true,"direct_state_cancellation_required": true},
+    "DBTT_like": {"high_over_low_min": 1.50,"positive_interval_width_K_min": 100,"plastic_state_increase_required": true,"expected_loading_rate_shift_required": true},
+    "Peak_T": {"prominence_fraction_min": 0.15,"positive_to_negative_derivative_required": true,"valid_branches_both_sides": true,"state_ablation_contribution_required": true}
+  },
+  "promotion_order": [
+    "thermodynamic_admissibility","emission_admissibility","300K_fatigue_preservation",
+    "F1B_accessibility","coupled_response_topology","causal_mechanism_consistency",
+    "multi_temperature_fatigue_reasonableness","minimum_complexity","numerical_margin"
+  ],
+  "fidelity_labels": ["F0_INTRINSIC_OPENING_ONLY","F1A_REDUCED_STATE_ONLY","F1B_PROVISIONAL_COUPLED_RESPONSE","F2R_CONFIRMED_PRODUCTION_REDUCED_RESPONSE"],
+  "state_engine": {
+    "constructor": "CorrectedHazardEnergyGatedPersistentSiteCyclicTipEngine",
+    "entrypoint": "sharp_front_v10_2_30_energy_gated_fatigue",
+    "continuous_emission_only": true,
+    "discrete_emission_topology_clock": false,
+    "required_processes": ["persistent_emission","signed_mobile_retained","Peierls_transport","Taylor_release","retention","physical_return","source_multiplicity","channel_backstress","active_shielding","wake_shielding","total_shielding","radius_blunting"],
+    "initialized_restore_parity_required": true,
+    "unknown_model_id_fails_closed": true
+  },
+  "ablation_order": ["A0_OPENING_ONLY","A1_OPENING_PLUS_EMISSION_RATE_FROZEN_STATE","A2_OPENING_PLUS_REDUCED_BLUNTING","A3_FULL_PRODUCTION_STATE"],
+  "execution_limits": {"F1B_F2R_workers_systemwide": 2,"two_dimensional_PF_FEM_CZM": false,"multifront": false,"branching": false,"continuation_1000_um": false},
+  "stop_rules": [
+    "stop_before candidate generation if protocol is not committed",
+    "stop F1B if production constructor/runtime parity fails",
+    "do not promote any row with failed state conservation or less than 80 percent F1B core accessibility",
+    "skip F2R and classify CORRECTED_SEARCH_BLOCKED_FULL_STATE_CLOSURE if no F1B row is promotable",
+    "stop after at most six F2R candidates and 78 conditions",
+    "stop before any spatial PF/FEM/CZM execution"
+  ],
+  "previous_artifacts_mutable": false,
+  "external_canonical_curves_used_for_search": false
+}
