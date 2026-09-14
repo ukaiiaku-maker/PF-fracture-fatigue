@@ -1,0 +1,103 @@
+{
+  "candidate_hashes": {
+    "P25_TJBSV2_S_002987": {
+      "candidate_id": "P25_TJBSV2_S_002987",
+      "complete_bound_row_sha256": "8a16415705c47c7708ec35385cde6c9a53bb6b9de6edf98b902a1f40626a9f72",
+      "emission_surface_sha256": "4a7bb592484604cab9a3dc67300efd1644cddba29047f8b3741afc6b6bbe5f34",
+      "opening_surface_sha256": "8e72f93e8603486d10bbef45af29d1b268e8acac0f00bee7a962af5710c96a52",
+      "parent_id": "P25_TRANSFER_V1_RANK1",
+      "production_role": "P25_DBTT_LIKE",
+      "rank_frozen_before_new_execution": true,
+      "source_V2_head": "6d56fd936699d244004d5e66c35d3718d8fcc357"
+    },
+    "P25_TJBSV2_S_004127": {
+      "candidate_id": "P25_TJBSV2_S_004127",
+      "complete_bound_row_sha256": "c794af3a2912fa91d587d06ae9177ba87af1da6d30e4ad7310d5f673edf741e3",
+      "emission_surface_sha256": "b599b4889f36dc1e2c3eefe155674ba11cda405a476e873c5820e9e1d0f180bb",
+      "opening_surface_sha256": "3c4442083258b190af4b117e78ffe65cf1971273261be90d7f5aa23c3d740fba",
+      "parent_id": "P25_TRANSFER_V1_RANK1",
+      "production_role": "P25_CERAMIC_LIKE",
+      "rank_frozen_before_new_execution": true,
+      "source_V2_head": "6d56fd936699d244004d5e66c35d3718d8fcc357"
+    },
+    "P25_TJBSV2_S_026704": {
+      "candidate_id": "P25_TJBSV2_S_026704",
+      "complete_bound_row_sha256": "85f8d9d2ddbe1e7c7c0c34589883b886023507089d0fe423c1ce2c4eb60d0041",
+      "emission_surface_sha256": "fc54bfb3a818d17e647dc92f88aa93dc5481a907dc0a9af7c0308cbb87f34b9f",
+      "opening_surface_sha256": "0aac489e702a9be4f5bc2abb858922e56f47c89935d37e35f6632fb2ec09bc6e",
+      "parent_id": "P25_TRANSFER_V1_RANK1",
+      "production_role": "P25_WEAK_T",
+      "rank_frozen_before_new_execution": true,
+      "source_V2_head": "6d56fd936699d244004d5e66c35d3718d8fcc357"
+    },
+    "P25_TJBSV2_S_064036": {
+      "candidate_id": "P25_TJBSV2_S_064036",
+      "complete_bound_row_sha256": "e9b7ad4446555e84c75b93fb9d80a7a1015b2b33e648fc8130a258dcec76f9f6",
+      "emission_surface_sha256": "5145069340728142d5fa9056974efccc4ed51b3ce89184dcd64070e9bad32a45",
+      "opening_surface_sha256": "32e07592ae5fe26da0c604d8d7fae2c4251f2e74ae51561d75bd813603f6938d",
+      "parent_id": "P25_TRANSFER_V1_RANK1",
+      "production_role": "P25_ACCESSIBLE_CONTROL",
+      "rank_frozen_before_new_execution": true,
+      "source_V2_head": "6d56fd936699d244004d5e66c35d3718d8fcc357"
+    },
+    "P40_TJBSV2_S_031027": {
+      "candidate_id": "P40_TJBSV2_S_031027",
+      "complete_bound_row_sha256": "d76e6a011ba83f762b5830c03c75571c851936677d213cfa1fb600a00a286cfa",
+      "emission_surface_sha256": "8a4656f3cef65b0145312dd80bea3c20a0a1a2860eff982ca58783e88759be0b",
+      "opening_surface_sha256": "6fcfcc91b66435266ff2f748c471a3f1ce5b897f7f92edf06554c507e1a48626",
+      "parent_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "production_role": "P40_CERAMIC_LIKE",
+      "rank_frozen_before_new_execution": true,
+      "source_V2_head": "6d56fd936699d244004d5e66c35d3718d8fcc357"
+    },
+    "P40_TJBSV2_S_038278": {
+      "candidate_id": "P40_TJBSV2_S_038278",
+      "complete_bound_row_sha256": "98908d7eecb5916a86dc886900b6e4fd687f4d67daa2bd77e4d75ebaef06b3d6",
+      "emission_surface_sha256": "a9da057405c0fa56d1cfe010f05e94ec03a6b47c041d36bae0d713f191e20204",
+      "opening_surface_sha256": "2f8e8696ebe11a9488b3c865d86e194773f1efad270b61ece1746a0b21dd5060",
+      "parent_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "production_role": "P40_WEAK_T",
+      "rank_frozen_before_new_execution": true,
+      "source_V2_head": "6d56fd936699d244004d5e66c35d3718d8fcc357"
+    },
+    "P40_TJBSV2_S_038503": {
+      "candidate_id": "P40_TJBSV2_S_038503",
+      "complete_bound_row_sha256": "be0343fd982eda89f7f7240bf599298a0e07e06eea87570ee34fa9935dabcbfa",
+      "emission_surface_sha256": "ef7a10a923e43d97c7bc5c403d357b4e5a7d11481f1f0748f69e0e6eac8d1aca",
+      "opening_surface_sha256": "92251954f6a0d2c8cacb9510cc8c4a3bb02cb6f28433369112a7fab23f13830b",
+      "parent_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "production_role": "P40_DBTT_LIKE",
+      "rank_frozen_before_new_execution": true,
+      "source_V2_head": "6d56fd936699d244004d5e66c35d3718d8fcc357"
+    },
+    "P40_TJBSV2_S_043821": {
+      "candidate_id": "P40_TJBSV2_S_043821",
+      "complete_bound_row_sha256": "8a3e2b1c5ab49546c9b350c2fe46a65ff00fd900509e6e86a32e1481f062e0a9",
+      "emission_surface_sha256": "5857fc35359078d80a9a90aa6b90462171fd01ac572a4d9b11428284e37c81a6",
+      "opening_surface_sha256": "b5524ea09f9c8905be34fa59fc794c2d32068b111c39a040e01c1df44da01d12",
+      "parent_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "production_role": "P40_ACCESSIBLE_CONTROL",
+      "rank_frozen_before_new_execution": true,
+      "source_V2_head": "6d56fd936699d244004d5e66c35d3718d8fcc357"
+    }
+  },
+  "production_physics_files_differ_from_published": false,
+  "production_source_blobs": {
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": "89fe8180f3f06a148023c4bdc06c1e594365e984",
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": "4a501dff4fdde13cfa45743981c134992d955554",
+    "arrhenius_fracture/persistent_site_high_cycle_engine_v10230_v5.py": "40f0090c303938e4d7761289b8ed2f0d5e7c5473",
+    "arrhenius_fracture/persistent_site_reversible_transport_v10230.py": "70c200b9039192ba2f35e6c82d08f2274cd2cf12",
+    "arrhenius_fracture/persistent_site_source_v10221.py": "0dfb254090c39d2bd92a0f052ea76e6999271c24",
+    "arrhenius_fracture/stochastic_avalanche_tip.py": "ecd3b92cf93649119051833e3348294648f18a4e",
+    "arrhenius_fracture/stochastic_hazard_tip.py": "02012dbeecd76732411f7c060d1fa4677512baf5"
+  },
+  "working_source_sha256": {
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_corrected_v10230.py": "62eade2ed25c784269e34c389e394f391d2caec4915a910ececee548677b45a2",
+    "arrhenius_fracture/persistent_site_cyclic_energy_gated_v10230.py": "af62e0dec3d3522d7d6cf455f1ee7f1d39f1544368b867e7aa935d0261f7d3b6",
+    "arrhenius_fracture/persistent_site_high_cycle_engine_v10230_v5.py": "2bc6dd6912dea1d9da572c3a98cde3db599a85e83da2ec789f0e31cd8da9d517",
+    "arrhenius_fracture/persistent_site_reversible_transport_v10230.py": "f70b42cf60fa7c839189b311b00fe0733fd8a7f6ebb7b8da62e0bb5f1a2519d9",
+    "arrhenius_fracture/persistent_site_source_v10221.py": "a9a073806c00fc709f0782110d83be89a51a271d5a42744be439fef7922f8794",
+    "arrhenius_fracture/stochastic_avalanche_tip.py": "412f5f98bff3e1d90d0a7ad96c81b9e10daeeb3acb1458d94497fac4548f61e3",
+    "arrhenius_fracture/stochastic_hazard_tip.py": "b312bec87e4a7cdd2caa25f9bf4d007499f5ca79ed941ec1d5aaef5f3a2dd499"
+  }
+}

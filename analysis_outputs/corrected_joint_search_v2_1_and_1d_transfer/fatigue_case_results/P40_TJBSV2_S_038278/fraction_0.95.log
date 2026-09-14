@@ -1,0 +1,14 @@
+  v10.2.30 high-cycle heartbeat: consumed=120/1e+10 mode=exact_cycle_burst operations=4 next_exact=128 projective_retry=64 detail=dmd_hazard_validation_failed
+  v10.2.30 high-cycle heartbeat: consumed=880/1e+10 mode=exact_cycle_burst operations=8 next_exact=256 projective_retry=8 detail=dmd_hazard_validation_failed
+  v10.2.30 high-cycle heartbeat: consumed=1904/1e+10 mode=exact_cycle_burst operations=12 next_exact=256 projective_retry=128 detail=dmd_hazard_validation_failed
+  v10.2.30 high-cycle heartbeat: consumed=2760/1e+10 mode=slow_projective operations=16 next_exact=256 projective_retry=8 detail=none
+  v10.2.30 high-cycle heartbeat: consumed=3784/1e+10 mode=exact_cycle_burst operations=20 next_exact=256 projective_retry=32 detail=dmd_hazard_validation_failed
+  v10.2.30 high-cycle heartbeat: consumed=4664/1e+10 mode=exact_cycle_burst operations=24 next_exact=256 projective_retry=8 detail=dmd_hazard_validation_failed
+  v10.2.30 high-cycle heartbeat: consumed=5288/1e+10 mode=exact_cycle_burst operations=28 next_exact=256 projective_retry=8 detail=None
+{
+  "status": "PRODUCTION_WATCHDOG_TIMEOUT",
+  "candidate_id": "P40_TJBSV2_S_038278",
+  "fraction": 0.95,
+  "cycles": 5360.99999997373,
+  "path": "/private/tmp/v10230-joint-search-v2-1-production-transfer/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/fatigue_case_results/P40_TJBSV2_S_038278/fraction_0.95.json"
+}

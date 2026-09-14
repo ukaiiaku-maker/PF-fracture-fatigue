@@ -1,0 +1,19 @@
+{
+  "V2_record_head": "6d56fd936699d244004d5e66c35d3718d8fcc357",
+  "barrier_refit_or_retune": false,
+  "legacy_V1_label": "LEGACY_F0_INTRINSIC_OPENING_CONTROL",
+  "new_complete_sobol_search": false,
+  "published_production_head": "97916f6f42ba063d5d6fe4a8c4590bd35047b197",
+  "ranking_order": [
+    "hard thermodynamic admissibility",
+    "mandatory F1B anchors",
+    "F1B accessible fraction",
+    "existing F2R confirmation",
+    "minimum normalized gate margin",
+    "minimum complexity and zero Delta Cp",
+    "emission entropy in [-50,-30] kB",
+    "distance to -40 kB",
+    "candidate ID"
+  ],
+  "schema": "v10.2.30_corrected_joint_search_v2_1_review_protocol_v1"
+}

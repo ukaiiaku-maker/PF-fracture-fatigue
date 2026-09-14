@@ -1,0 +1,22 @@
+{
+  "active_state_vector_modified": false,
+  "checkpoint_sha256_after": "9855447c25264fdbd4f4c00c1cbd4ca634759ac4cb95e9e994ae15a6f00c673c",
+  "checkpoint_sha256_before": "7caaa6ddd4db6d7c75b16078ba39f1b318252efdaf324b1425f35edc84d26dc4",
+  "corrected_cache": {
+    "avalanche_base_checkpoint_m": 7e-09,
+    "avalanche_event_advance_m": 7e-09,
+    "avalanche_event_length_factor": 1.0
+  },
+  "hazard_action_modified": false,
+  "hazard_event_index": 0,
+  "hazard_threshold_history_count": 0,
+  "ledgers_modified": false,
+  "original_cache": {
+    "avalanche_base_checkpoint_m": 7e-09,
+    "avalanche_event_advance_m": 2.2973400956248734e-06,
+    "avalanche_event_length_factor": 0.45946801912497465
+  },
+  "reason": "correct cached proposal to mission-fixed 7 nm quantum",
+  "rng_state_modified": false,
+  "status": "PASS_PRE_EVENT_CACHE_ONLY_REPAIR"
+}

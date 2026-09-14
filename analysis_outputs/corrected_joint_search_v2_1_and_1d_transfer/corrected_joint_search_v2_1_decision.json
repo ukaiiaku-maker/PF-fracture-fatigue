@@ -1,0 +1,63 @@
+{
+  "F1B_classes": {
+    "ACCESSIBLE_UNCLASSIFIED_COUPLED_CONTROL": 6,
+    "CERAMIC_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 2,
+    "DBTT_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 11,
+    "STATE_UNRESOLVED": 2,
+    "WEAK_T_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 3
+  },
+  "F2R_candidate_counts": {
+    "CERAMIC_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 2,
+    "DBTT_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 2,
+    "WEAK_T_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 2
+  },
+  "F2R_condition_counts": {
+    "CERAMIC_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 26,
+    "DBTT_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 26,
+    "WEAK_T_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 26
+  },
+  "F2R_conditions_total": 78,
+  "F2R_first_passage_conditions": 78,
+  "P25_P40_300K_fatigue_preserved": true,
+  "accepted_V2_results_modified": false,
+  "answers": {
+    "DBTT_recovered_F1B": true,
+    "DBTT_recovered_F2R": true,
+    "Peak_T_recovered_F1B": false,
+    "Peak_T_recovered_F2R": false,
+    "fatigue_away_from_300K": "DIAGNOSTIC_ONLY_NO_POST_HOC_TARGET",
+    "negative_entropy_can_still_increase_rate_with_T": "YES_WHEN_ENTHALPIC_ARRHENIUS_TERM_DOMINATES",
+    "nonidentifiable": [
+      "activation entropy versus heat capacity tradeoff",
+      "emission entropy versus evolving stress path",
+      "opening versus state-mediated cancellation"
+    ],
+    "opening_dominated_classes": [
+      "ACCESSIBLE_UNCLASSIFIED_COUPLED_CONTROL",
+      "CERAMIC_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS"
+    ],
+    "state_mediated_classes": [
+      "DBTT_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS",
+      "WEAK_T_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS"
+    ]
+  },
+  "barrier_refit_or_retune": false,
+  "bounded_domain": {
+    "emission_entropy_over_kB": [
+      -50,
+      -30
+    ],
+    "heat_capacity_over_kB": [
+      -15,
+      15
+    ]
+  },
+  "corrected_joint_thermodynamic_count": 4182,
+  "legacy_rows_label": "LEGACY_F0_INTRINSIC_OPENING_CONTROL",
+  "new_spatial_execution": false,
+  "old_code_entropy_sign": "POSITIVE",
+  "old_published_entropy_sign": "AMBIGUOUS",
+  "old_retained_count": 12,
+  "overall_classification": "CORRECTED_SIGN_EXPLICIT_JOINT_SEARCH_COMPLETE",
+  "review_version": "V2.1"
+}

@@ -1,0 +1,13 @@
+{
+  "candidate_count": 4,
+  "classification": "PRODUCTION_1D_STATE_CLOSURE_FAILED",
+  "interpretation": "Production 1-D first-passage/censor boundaries are retained. Geometry-dependent post-passage energy closure was not fabricated without prohibited 2-D mechanics.",
+  "status_counts": {
+    "PRODUCTION_1D_STATE_CLOSURE_FAILED": 1,
+    "PRODUCTION_WATCHDOG_TIMEOUT": 11
+  },
+  "tier": 1,
+  "tier2_executed": false,
+  "trajectory_count": 12,
+  "two_dimensional_PF_FEM_CZM_executed": false
+}
