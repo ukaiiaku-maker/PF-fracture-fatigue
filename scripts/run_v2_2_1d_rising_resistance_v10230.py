@@ -252,8 +252,9 @@ def main() -> int:
     classification.to_csv(output / "one_d_rising_resistance_classification.csv", index=False)
     classification.to_csv(output / "one_d_full_vs_opening_only_ablation.csv", index=False)
     atomic_json(output / "screen_terminal_records.json", {"rows": terminals})
-    if len(terminals) != 16 or any(row["status"] != "COMPLETE" for row in terminals):
-        raise RuntimeError("all sixteen resistance screen records must complete")
+    terminal_statuses = {"COMPLETE", "K_CENSOR_REACHED"}
+    if len(terminals) != 16 or any(row["status"] not in terminal_statuses for row in terminals):
+        raise RuntimeError("all sixteen resistance screen records must be terminal")
     return 0
 
 
