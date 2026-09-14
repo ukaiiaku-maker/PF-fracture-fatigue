@@ -129,8 +129,9 @@ def delta():
         p['candidate_id']=f"{base['parent_id'].split('_')[0]}_TJBSV2_CP_{i:06d}"
         p['delta_cp_pair_id']=f"CPPAIR_{base['candidate_id']}_{i//len(source):03d}"
         # Symmetric, bounded Cp perturbations preserve the 300 K reference surface.
-        p['cleavage_heat_capacity_active_kB']=float(np.clip(float(base.get('cleavage_heat_capacity_active_kB',0.))+rng.uniform(-5,5),-15,15))
-        p['emission_heat_capacity_active_kB']=float(np.clip(float(base.get('emission_heat_capacity_active_kB',0.))+rng.uniform(-5,5),-15,15))
+        p['cleavage_heat_capacity_base_kB']=float(rng.uniform(-15,15))
+        p['cleavage_heat_capacity_guard_kB']=float(rng.uniform(-15,15))
+        p['emission_heat_capacity_base_kB']=float(rng.uniform(-15,15))
         records.append(p)
     frame=pd.DataFrame(records);frame.to_parquet(DURABLE/'paired_delta_cp_candidate_bank.parquet',index=False,compression='zstd')
     legacy_adm=pd.read_csv(LEGACY_ART/'candidate_admissibility.csv');legacy_fat=pd.read_csv(LEGACY_ART/'fatigue_preservation_metrics.csv')

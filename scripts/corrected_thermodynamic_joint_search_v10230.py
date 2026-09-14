@@ -118,7 +118,7 @@ def classify_coupled(curve,fidelity:str,accessible_fraction:float,causal:Mapping
     if span<=1.25 and causal.get("direct_state_cancellation",False):return "WEAK_T_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS"
     imax=int(np.argmax(K))
     if 0<imax<len(K)-1 and K[imax]>=1.15*max(K[0],K[-1]) and np.all(d[:imax]>0) and np.all(d[imax:]<0) and causal.get("state_peak_contribution",False):return "PEAK_T_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS"
-    if ratio>=1.5 and causal.get("positive_interval_width_K",0)>=100 and causal.get("plastic_state_increase",False) and causal.get("expected_rate_shift",False):return "DBTT_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS"
+    if ratio>=1.5 and causal.get("positive_interval_width_K",0)>=100 and causal.get("plastic_state_increase",False) and causal.get("state_transition_contribution_MPa_sqrt_m",0)>=.5 and causal.get("expected_rate_shift",False):return "DBTT_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS"
     return "ACCESSIBLE_UNCLASSIFIED_COUPLED_CONTROL"
 
 __all__=["ENTROPY_REPRESENTATION","barrier_temperature_derivative_over_kB","sign_explicit_fields","corrected_entropy_from_legacy","paired_parameters","serialize_surface","deserialize_surface","exact_Tref_equal","finite_difference_audit","thermodynamic_rate_gate","classify_coupled","candidate_surface_from_parameters"]

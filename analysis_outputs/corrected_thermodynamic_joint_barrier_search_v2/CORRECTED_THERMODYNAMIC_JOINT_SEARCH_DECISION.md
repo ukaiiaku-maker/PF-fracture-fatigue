@@ -1,0 +1,11 @@
+# Corrected thermodynamic joint search v2 decision
+
+The result is **CORRECTED_SIGN_EXPLICIT_JOINT_SEARCH_COMPLETE**. The v1 code used positive emission activation entropy while its published language was sign-ambiguous; its 12 rows are retained externally as `LEGACY_F0_INTRINSIC_OPENING_CONTROL`.
+
+The sign-corrected paired bank has 4,182 joint thermodynamic passes. Final labels use the complete F1B process state only. F1B class counts are `{"ACCESSIBLE_UNCLASSIFIED_COUPLED_CONTROL": 6, "CERAMIC_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 2, "DBTT_LIKE_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 11, "STATE_UNRESOLVED": 2, "WEAK_T_PROVISIONAL_COUPLED_MODEL_RESPONSE_CLASS": 3}`. F2R confirms two candidates in each of the DBTT-like, weak-T, and ceramic-like classes; all 78 conditions reached first passage. No Peak-T row passes either tier. No barrier was fitted or retuned.
+
+Negative activation entropy raises the free-energy barrier with temperature relative to the reference surface, yet emission can still increase with temperature when the enthalpic Arrhenius contribution dominates. The 300 K P25/P40 transfer gates remain satisfied because the reference surface is invariant. Away from 300 K the fatigue calculations are diagnostics and impose no fitted target.
+
+The response answers are: (1) v1 was positive in code and ambiguous in prose; (2) corrected retention rises to 4,182 joint passes; (3) negative entropy can coexist with a temperature-increasing total rate through the enthalpic term; (4) the ceramic-like and accessible-unclassified controls are opening dominated; (5) DBTT-like and weak-T classes require the measured state contribution/cancellation gates; (6) DBTT-like, but no Peak-T, is recovered at F1B and F2R; (7) P25/P40 pass the frozen 300 K gates; (8) off-reference fatigue is reported diagnostically without a fitted target; (9) entropy/Cp and direct/state decompositions remain nonidentifiable; and (10) every null result is bounded by the frozen search domain.
+
+The result is bounded by the frozen entropy, Cp, stress, rate, temperature, and candidate domains. A missing class is a bounded negative search result, not a proof of physical impossibility. No PF, FEM, CZM, or multifront execution was launched.

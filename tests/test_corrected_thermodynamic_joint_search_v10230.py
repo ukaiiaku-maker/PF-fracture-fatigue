@@ -55,6 +55,12 @@ def test_class_rules_use_coupled_causal_state():
     causal={'all_class_anchors_valid':True,'opening_precedes_relaxation':True,'emission_admissible':True}
     assert classify_coupled([10,8,6],'F1B_FULL_PRODUCTION_STATE',1.,causal).startswith('CERAMIC')
 
+def test_dbtt_requires_material_state_contribution():
+    causal={'all_class_anchors_valid':True,'positive_interval_width_K':900,'plastic_state_increase':True,'expected_rate_shift':True,'state_transition_contribution_MPa_sqrt_m':0.1}
+    assert not classify_coupled([10,16],'F1B_FULL_PRODUCTION_STATE',1.,causal).startswith('DBTT')
+    causal['state_transition_contribution_MPa_sqrt_m']=1.0
+    assert classify_coupled([10,16],'F1B_FULL_PRODUCTION_STATE',1.,causal).startswith('DBTT')
+
 def test_partition_order_and_pair_generation_deterministic():
     rows=[{'candidate_id':str(i),'emission_entropy_active_kB':20+i,'emission_entropy_infinity_kB':i,'emission_stratum':'PREFERRED','x':i} for i in range(8)]
     one={r['candidate_id']:paired_parameters(r,'N'+r['candidate_id']) for r in rows};two={r['candidate_id']:paired_parameters(r,'N'+r['candidate_id']) for r in reversed(rows)};assert one==two
