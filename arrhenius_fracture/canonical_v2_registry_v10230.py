@@ -12,6 +12,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_rows.csv"
@@ -85,5 +87,59 @@ def round_trip(row: dict[str, str]) -> dict[str, str]:
     return json.loads(json.dumps(row, sort_keys=True, separators=(",", ":")))
 
 
-__all__ = ["REGISTRY", "MANIFEST", "canonical_hash", "decoded_contract",
-           "load_row", "load_rows", "round_trip"]
+class ThermodynamicBarrierAdapter:
+    """One exact surface exposed through all supported barrier method names."""
+
+    def __init__(self, surface, parent: dict[str, Any]):
+        self.surface = surface
+        self.parent = dict(parent)
+
+    def values_eV(self, stress_Pa, temperature_K):
+        return self.surface.G_eV(stress_Pa, temperature_K)
+
+    def barrier_eV(self, stress_Pa, temperature_K):
+        return self.surface.G_eV(stress_Pa, temperature_K)
+
+    def rate(self, stress_Pa, temperature_K):
+        return self.surface.raw_rate_s(stress_Pa, temperature_K)
+
+    @property
+    def Tref_K(self) -> float:
+        return 300.0
+
+    @property
+    def sigc0_Pa(self) -> float:
+        return float(self.parent["sigc0_Pa"])
+
+    @property
+    def floor_fraction(self) -> float:
+        return float(self.parent["floor_fraction"])
+
+    @property
+    def floor_min_eV(self) -> float:
+        return float(self.parent["floor_min_eV"])
+
+    @property
+    def floor_max_fraction(self) -> float:
+        return float(self.parent["floor_max_fraction"])
+
+    def parity(self, stress_Pa, temperature_K: float) -> bool:
+        expected = np.asarray(self.surface.G_eV(stress_Pa, temperature_K))
+        return bool(np.array_equal(expected, np.asarray(self.values_eV(stress_Pa, temperature_K)))
+                    and np.array_equal(expected, np.asarray(self.barrier_eV(stress_Pa, temperature_K))))
+
+
+def surface_adapters(row: dict[str, str]):
+    from scripts.corrected_thermodynamic_joint_search_v10230 import deserialize_surface
+
+    manifest = json.loads(row["parent_material_manifest_json"])
+    opening = deserialize_surface(json.loads(row["opening_surface_json"]))
+    emission = deserialize_surface(json.loads(row["emission_surface_json"]))
+    return (
+        ThermodynamicBarrierAdapter(opening, manifest["cleavage"]),
+        ThermodynamicBarrierAdapter(emission, manifest["emission"]),
+    )
+
+
+__all__ = ["REGISTRY", "MANIFEST", "ThermodynamicBarrierAdapter", "canonical_hash",
+           "decoded_contract", "load_row", "load_rows", "round_trip", "surface_adapters"]

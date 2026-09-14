@@ -1,0 +1,271 @@
+{
+  "cycles_from_engine_time": null,
+  "diagnostics": {
+    "active_K_shield_Pa_sqrt_m": 5.330279816473236e-13,
+    "emission_hazard_s": 2.2391150469319957e-103,
+    "mobile_count": 0.0008632844999942542,
+    "retained_count": 6.07725199085476e-14,
+    "sigma_back_Pa": 570842.4877583495,
+    "tip_radius_m": 1.0000001928034502e-06
+  },
+  "engine_time_s": 11875.473893051587,
+  "fields": [
+    {
+      "floor": 1.0,
+      "name": "mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 0,
+      "stop": 160
+    },
+    {
+      "floor": 1.0,
+      "name": "mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 160,
+      "stop": 320
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 320,
+      "stop": 480
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 480,
+      "stop": 640
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 640,
+      "stop": 800
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 800,
+      "stop": 960
+    },
+    {
+      "floor": 1.0,
+      "name": "returned_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 960,
+      "stop": 1120
+    },
+    {
+      "floor": 1.0,
+      "name": "returned_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 1120,
+      "stop": 1280
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1280,
+      "stop": 1600
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1600,
+      "stop": 1920
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1920,
+      "stop": 2240
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2240,
+      "stop": 2560
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2560,
+      "stop": 2880
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2880,
+      "stop": 3200
+    },
+    {
+      "floor": 1.0,
+      "name": "W_emit",
+      "owner": "engine",
+      "shape": [],
+      "start": 3200,
+      "stop": 3201
+    },
+    {
+      "floor": 1.0,
+      "name": "K_prev",
+      "owner": "engine",
+      "shape": [],
+      "start": 3201,
+      "stop": 3202
+    }
+  ],
+  "geometry_signature": [
+    10,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    80,
+    160,
+    [
+      2,
+      80
+    ]
+  ],
+  "high_cycle_cache": {},
+  "ledgers": {
+    "engine.N_em": 0.0008632845000550268,
+    "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,1]": 1.1280620182590874e-17,
+    "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[1,1]": 1.1280620182590874e-17,
+    "mpz.cumulative_gross_return_activity": 0.0,
+    "mpz.cumulative_gross_source_activity": 0.0008632845000550299,
+    "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+    "mpz.emitted_total": 0.0008632845000550299,
+    "mpz.escaped_total": 2.2561240365181748e-17,
+    "mpz.signed_line_content_emitted_total": 0.0008632845000550299,
+    "mpz.signed_source_activations_total": 0.0009461598120603124
+  },
+  "metadata": {
+    "K_reinit_MPa_sqrt_m": 5.9377372421564765,
+    "candidate_id": "P25_TJBSV2_S_064036",
+    "event_index": 9,
+    "mode": "FULL_PRODUCTION_STATE"
+  },
+  "reason": "first_passage",
+  "schema": "v10.2.30_atomic_live_high_cycle_checkpoint_v1",
+  "stochastic": {
+    "B": 0.0,
+    "avalanche_base_checkpoint_m": 5e-06,
+    "avalanche_checkpoint_synchronized": true,
+    "avalanche_event_advance_m": 5e-06,
+    "avalanche_event_length_factor": 1.0,
+    "avalanche_event_length_history": [],
+    "avalanche_last_completed_advance_m": 0.0,
+    "avalanche_last_completed_factor": 0.0,
+    "hazard_action_current": 0.0,
+    "hazard_event_index": 10,
+    "hazard_threshold_action": 0.6996681625154944,
+    "hazard_threshold_history": [
+      0.6931471805599453,
+      0.6931471805599453,
+      0.6931471805599453,
+      0.6931471805599453,
+      0.6931471805599453,
+      0.6931471805599453,
+      0.6931471805599453,
+      0.6931471805599453,
+      0.6931471805599453,
+      0.6931471805599453
+    ],
+    "rng_state": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 94775774536471976734140803912828630299,
+        "state": 87726483324690903625246315496601767568
+      },
+      "uinteger": 0
+    }
+  },
+  "temperature_K": 900.0,
+  "timestamp_unix_s": 1789420590.264647
+}

@@ -32,6 +32,11 @@ EVENT_M = 5.0e-6
 MAX_EVENTS = 10
 
 
+def merge_event_and_state(after: dict, event_fields: dict) -> dict:
+    """Preserve event-contract fields when the state snapshot has like-named keys."""
+    return {**after, **event_fields}
+
+
 def atomic_json(path: Path, value) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -124,7 +129,7 @@ def run_case(row: dict[str, str], mode: str, output: Path) -> tuple[list[dict], 
         maximum_conservation = max(maximum_conservation, cres)
         raw_rate = float(final_info.get("lambda_c_raw", 0.0))
         ceiling = bool(raw_rate * float(parent["physics__cleavage_correlation_time_s"]) >= 20.0)
-        event = {
+        event = merge_event_and_state(after, {
             "candidate_id": row["candidate_id"], "parent_id": row["parent_id"],
             "mode": mode, "temperature_K": T_K, "event_index": event_index,
             "cumulative_advance_um": (event_index + 1) * 5.0,
@@ -139,8 +144,7 @@ def run_case(row: dict[str, str], mode: str, output: Path) -> tuple[list[dict], 
             "N_sat_active": bool(final_info.get("N_sat_active", False)),
             "conservation_relative": cres,
             "complete_bound_row_sha256": row["complete_bound_row_sha256"],
-            **after,
-        }
+        })
         event["J_equiv_J_m2"] = (K_event * 1.0e6) ** 2 / (
             float(engine.G) * 2.0 * (1.0 + float(engine.nu)) / (1.0 - float(engine.nu) ** 2)
         )
