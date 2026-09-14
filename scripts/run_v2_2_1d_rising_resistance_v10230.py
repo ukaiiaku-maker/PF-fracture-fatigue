@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr, theilslopes
 
-from arrhenius_fracture.canonical_v2_registry_v10230 import load_rows
+from arrhenius_fracture.canonical_v2_registry_v10230 import REGISTRY, load_rows
 from arrhenius_fracture.persistent_site_high_cycle_checkpoint_v10230 import write_checkpoint
 from arrhenius_fracture.persistent_site_high_cycle_state_v10230 import capture_ledgers
 import scripts.complete_corrected_thermodynamic_joint_search_v10230 as v2
@@ -60,7 +60,10 @@ def conservation(state: dict[str, float]) -> float:
 
 
 def prepare_engine(row: dict[str, str], mode: str):
-    candidate = {key: value for key, value in row.items()}
+    # The authoritative loader preserves CSV field bytes.  The inherited V2
+    # constructor consumes pandas' explicit numeric parsing, as it did in V2.1.
+    table = pd.read_csv(REGISTRY).set_index("candidate_id", drop=False)
+    candidate = table.loc[row["candidate_id"]].to_dict()
     engine, cleavage, emission, parent = v2.build_engine(candidate, v2.ROWS, v2.ACTIVE)
     # The frozen screen uses the accepted fixed 5 um reduced convention.
     engine.avalanche_cfg.mode = "fixed"

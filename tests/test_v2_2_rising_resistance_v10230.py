@@ -2,7 +2,9 @@ import math
 
 import pandas as pd
 
-from scripts.run_v2_2_1d_rising_resistance_v10230 import classify
+from arrhenius_fracture.canonical_v2_registry_v10230 import load_rows
+from scripts.run_v2_2_1d_rising_resistance_v10230 import classify, prepare_engine
+import scripts.complete_corrected_thermodynamic_joint_search_v10230 as v2
 
 
 def frame(values, candidate="x"):
@@ -24,3 +26,13 @@ def test_preregistered_strong_gate_and_opening_ablation():
 
 def test_flat_gate_is_not_promoted():
     assert classify(frame([10] * 10), frame([10] * 10))["classification"] == "1D_EFFECTIVE_RESISTANCE_FLAT"
+
+
+def test_canonical_byte_row_is_explicitly_adapted_to_production_numeric_types():
+    v2.ROWS = v2.source_rows()
+    v2.ACTIVE = v2.active_stresses(v2.ROWS)
+    row = next(iter(load_rows().values()))
+    engine, _cleavage, _emission, parent = prepare_engine(row, "FULL_PRODUCTION_STATE")
+    assert engine.f.da == 5.0e-6
+    assert engine.f.m_hits == float(parent["physics__cleavage_hits"])
+    assert engine.f.tau_c == float(parent["physics__cleavage_correlation_time_s"])
