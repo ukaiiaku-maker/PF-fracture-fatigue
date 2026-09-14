@@ -1,0 +1,48 @@
+{
+  "baseline_files_modified": false,
+  "decision_sha256": "725a8df8d6d662d22c4f9d0736b7fce2ad4f3cb865ff57fb3f686630e8eff261",
+  "file_hash_manifest_sha256": "706fcb5fa133e0dc90dc0aab7de1f3510e1f0df3218cf15602bb81935546651e",
+  "hash_mismatches": [],
+  "parent_head": "97916f6f42ba063d5d6fe4a8c4590bd35047b197",
+  "reproduced_counts": {
+    "F1_candidates_initial": 24,
+    "F1_conditions_initial": 168,
+    "combined_full_F0": 477,
+    "delta_cp_generated": 32768,
+    "extension_full_F0": 256,
+    "extension_rejections": {
+      "": 26848,
+      "CLEAVAGE_THERMODYNAMIC_ADMISSIBILITY": 4848,
+      "TEMPERATURE_ACCESSIBILITY": 1072
+    },
+    "primary_full_F0": 221,
+    "primary_rejections": {
+      "CLEAVAGE_THERMODYNAMIC_ADMISSIBILITY": 129217,
+      "EMISSION_ZERO_ENTROPY_BOUND": 4646,
+      "PASS": 221,
+      "TEMPERATURE_ACCESSIBILITY": 60
+    },
+    "retained": 12,
+    "retained_F1_available": 43,
+    "retained_F1_conditions": 612,
+    "sobol_generated": 131072,
+    "structured_generated": 3072
+  },
+  "retained_candidate_ids": [
+    "P25_TJBS_S_014188",
+    "P25_TJBS_S_028493",
+    "P25_TJBS_S_039907",
+    "P25_TJBS_S_047409",
+    "P25_TJBS_S_016645",
+    "P25_TJBS_S_064760",
+    "P40_TJBS_S_037582",
+    "P40_TJBS_S_040211",
+    "P40_TJBS_S_008683",
+    "P40_TJBS_S_049735",
+    "P40_TJBS_S_053775",
+    "P40_TJBS_S_064772"
+  ],
+  "retained_rows_exact": true,
+  "status": "PASS",
+  "verified_file_count": 63
+}

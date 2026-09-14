@@ -1,0 +1,30 @@
+{
+  "Tref_K": 300,
+  "attempt_frequency_varied": false,
+  "convention": "Delta S^dagger=-partial_T Delta G^dagger",
+  "entropy_representation": "DIRECT_FREE_ENERGY_SURFACE_NO_PREFACTOR_DOUBLE_COUNTING",
+  "identity": "barrier_temperature_derivative_over_kB=-activation_entropy_over_kB",
+  "legacy_implementation": {
+    "code_sign": "POSITIVE_ACTIVATION_ENTROPY",
+    "published_wording": "SIGN_AMBIGUOUS",
+    "retained_active_entropy_range_kB": [
+      0.7741320878267288,
+      17.282673940062523
+    ]
+  },
+  "primary_emission_hypothesis": {
+    "activation_entropy_over_kB": [
+      -50,
+      -30
+    ],
+    "barrier_temperature_derivative_over_kB": [
+      30,
+      50
+    ]
+  },
+  "reference_surface_invariant": true,
+  "stored_fields": [
+    "activation_entropy_over_kB",
+    "barrier_temperature_derivative_over_kB"
+  ]
+}
