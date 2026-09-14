@@ -1,7 +1,9 @@
 """Deterministic staged driver for the sign-corrected v2 analytical bank."""
 from __future__ import annotations
 from pathlib import Path
-import argparse,hashlib,json,math,sys
+import argparse,hashlib,json,math,sys,copy
+from dataclasses import replace
+from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 import numpy as np
 import pandas as pd
@@ -15,6 +17,7 @@ from scripts.run_thermodynamic_joint_search_v10230 import (
     ART as LEGACY_ART,COARSE,HITS,KGRID,PARENTS,TAU,active_stresses,
     accessibility,fatigue_metrics,full_f0,physical_controls,root_curve,source_rows,
 )
+from scripts.analyze_row_renewal_forward_v10230 import TransientBlunting,Controls
 
 OUT=ROOT/'analysis_outputs/corrected_thermodynamic_joint_barrier_search_v2'
 DURABLE=Path('/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_codex_v10_2_30/analysis_outputs/corrected_thermodynamic_joint_barrier_search_v2')
@@ -116,7 +119,31 @@ def paired():
     manifest={'paired_bank_path':str(DURABLE/'paired_sobol_candidate_bank.parquet'),'paired_bank_sha256':sha(DURABLE/'paired_sobol_candidate_bank.parquet'),'thermodynamic_gate_path':str(DURABLE/'thermodynamic_gate_results.parquet'),'thermodynamic_gate_sha256':sha(DURABLE/'thermodynamic_gate_results.parquet'),'counts':{'paired_rows':len(pairs),'opening_admissible':int(adm.opening_admissible.sum()),'emission_admissible':int(adm.emission_admissible.sum()),'joint_thermodynamic_pass':int(adm.joint_thermodynamic_pass.sum()),'fatigue_pass':int(adm.fatigue_pass.sum()),'F0_pass':int(adm.f0_pass.sum()),'F0_downselected':len(chosen)}}
     (OUT/'paired_bank_partition_manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n');print(json.dumps(manifest,indent=2))
 
+def delta():
+    """Frozen 32,768-row paired heat-capacity perturbation bank."""
+    rows=source_rows();active=active_stresses(rows);physical=physical_controls()
+    source=pd.read_parquet(OUT/'f0_downselected_candidates.parquet').sort_values('candidate_id').reset_index(drop=True)
+    rng=np.random.default_rng(260913);records=[]
+    for i in range(32768):
+        base=clean(source.iloc[i%len(source)].to_dict());p=dict(base)
+        p['candidate_id']=f"{base['parent_id'].split('_')[0]}_TJBSV2_CP_{i:06d}"
+        p['delta_cp_pair_id']=f"CPPAIR_{base['candidate_id']}_{i//len(source):03d}"
+        # Symmetric, bounded Cp perturbations preserve the 300 K reference surface.
+        p['cleavage_heat_capacity_active_kB']=float(np.clip(float(base.get('cleavage_heat_capacity_active_kB',0.))+rng.uniform(-5,5),-15,15))
+        p['emission_heat_capacity_active_kB']=float(np.clip(float(base.get('emission_heat_capacity_active_kB',0.))+rng.uniform(-5,5),-15,15))
+        records.append(p)
+    frame=pd.DataFrame(records);frame.to_parquet(DURABLE/'paired_delta_cp_candidate_bank.parquet',index=False,compression='zstd')
+    legacy_adm=pd.read_csv(LEGACY_ART/'candidate_admissibility.csv');legacy_fat=pd.read_csv(LEGACY_ART/'fatigue_preservation_metrics.csv')
+    # Every Cp row descends from an already opening-admissible paired row. Supply a
+    # compact synthetic admission index solely to avoid reusing the old sign result.
+    oldids=frame.legacy_candidate_id.unique();la=pd.DataFrame({'candidate_id':oldids,'rejection':''})
+    adm,fat,f0,survivors=_screen_paired(frame,la,legacy_fat,rows,active,physical,'PAIRED_DELTA_CP')
+    adm.to_parquet(DURABLE/'delta_cp_thermodynamic_gate_results.parquet',index=False,compression='zstd')
+    pd.DataFrame(survivors).to_parquet(OUT/'delta_cp_admissible_candidates.parquet',index=False,compression='zstd')
+    manifest={'rows':len(frame),'joint_thermodynamic_pass':int(adm.joint_thermodynamic_pass.sum()),'fatigue_pass':int(adm.fatigue_pass.sum()),'F0_pass':int(adm.f0_pass.sum()),'bank_path':str(DURABLE/'paired_delta_cp_candidate_bank.parquet'),'bank_sha256':sha(DURABLE/'paired_delta_cp_candidate_bank.parquet'),'gate_sha256':sha(DURABLE/'delta_cp_thermodynamic_gate_results.parquet')}
+    (OUT/'delta_cp_bank_partition_manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n');print(json.dumps(manifest,indent=2))
+
 def main():
     OUT.mkdir(parents=True,exist_ok=True);DURABLE.mkdir(parents=True,exist_ok=True)
-    p=argparse.ArgumentParser();p.add_argument('--stage',choices=['phase0','structured','paired'],required=True);a=p.parse_args();globals()[a.stage]()
+    p=argparse.ArgumentParser();p.add_argument('--stage',choices=['phase0','structured','paired','delta'],required=True);a=p.parse_args();globals()[a.stage]()
 if __name__=='__main__':main()

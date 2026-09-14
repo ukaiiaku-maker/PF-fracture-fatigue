@@ -1,0 +1,15 @@
+{
+  "counts": {
+    "F0_downselected": 768,
+    "F0_pass": 3345,
+    "emission_admissible": 4505,
+    "fatigue_pass": 4182,
+    "joint_thermodynamic_pass": 4182,
+    "opening_admissible": 4406,
+    "paired_rows": 131072
+  },
+  "paired_bank_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_codex_v10_2_30/analysis_outputs/corrected_thermodynamic_joint_barrier_search_v2/paired_sobol_candidate_bank.parquet",
+  "paired_bank_sha256": "8696d42e210b41c04ace0e4be6308da5a25abb129beb6352707501cf38ec63fb",
+  "thermodynamic_gate_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_codex_v10_2_30/analysis_outputs/corrected_thermodynamic_joint_barrier_search_v2/thermodynamic_gate_results.parquet",
+  "thermodynamic_gate_sha256": "eaf8e90385a8887e88d7a660f9b87c3a389cf7c91722d76d07abed22ff514b8e"
+}
