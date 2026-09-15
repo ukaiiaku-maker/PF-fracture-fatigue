@@ -1,0 +1,86 @@
+{
+  "accepted_v2_source_commit": "6a81911e4fa208fdccad83ca7bde40c4d7b975c4",
+  "aliases": [
+    {
+      "alias": "DBTT_V2",
+      "candidate_id": "P25_TJBSV2_S_002987",
+      "row_sha256": "8a16415705c47c7708ec35385cde6c9a53bb6b9de6edf98b902a1f40626a9f72"
+    },
+    {
+      "alias": "DBTT_V2_P40",
+      "candidate_id": "P40_TJBSV2_S_038503",
+      "row_sha256": "be0343fd982eda89f7f7240bf599298a0e07e06eea87570ee34fa9935dabcbfa"
+    },
+    {
+      "alias": "weakT_V2_P25",
+      "candidate_id": "P25_TJBSV2_S_026704",
+      "row_sha256": "85f8d9d2ddbe1e7c7c0c34589883b886023507089d0fe423c1ce2c4eb60d0041"
+    },
+    {
+      "alias": "weakT_V2_P40",
+      "candidate_id": "P40_TJBSV2_S_038278",
+      "row_sha256": "98908d7eecb5916a86dc886900b6e4fd687f4d67daa2bd77e4d75ebaef06b3d6"
+    },
+    {
+      "alias": "ceramic_V2_P25",
+      "candidate_id": "P25_TJBSV2_S_004127",
+      "row_sha256": "c794af3a2912fa91d587d06ae9177ba87af1da6d30e4ad7310d5f673edf741e3"
+    },
+    {
+      "alias": "ceramic_V2_P40",
+      "candidate_id": "P40_TJBSV2_S_031027",
+      "row_sha256": "d76e6a011ba83f762b5830c03c75571c851936677d213cfa1fb600a00a286cfa"
+    }
+  ],
+  "branching": false,
+  "case_count": 12,
+  "classification": "V2_NAMED_PARAMETERIZATION_SINGLE_CRACK_SPATIAL_TRANSFER_TEST",
+  "common_random_numbers": true,
+  "dU_m": 2e-07,
+  "dt_s": 8.4,
+  "entrypoint": "arrhenius_fracture.sharp_front_v10_2_30_v2_named_single_crack",
+  "field_export": "sparse_accepted_v1",
+  "git_head": "060f77ee3e31643549451e964ec06e97b364771a",
+  "git_tree": "f9b6eb46dcb036a8b8f21b9bf4f19b5e4a4f1037",
+  "kernel_family": "/private/tmp/v10230-v2-2d-single-crack-300K-1200K/runs/v10_2_28_kernel_cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/family.json",
+  "kernel_family_sha256": "f241e2b5d3b61fd4d8b88db8cc48ed02fb1b4edc4e4baa8cd68b2195b8ea7a51",
+  "launcher": "/private/tmp/v10230-v2-2d-single-crack-300K-1200K/scripts/run_v2_2d_single_crack_campaign_v10230.py",
+  "launcher_sha256": "172c90ec3bfc7d66a70a342cb46d18d1099c81c8e069998ac6638191d14b8f4c",
+  "maximum_fronts": 1,
+  "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python3.12",
+  "python_sha256": "ba75aea91964fe01b84ca9c58ba0d30e9a61278ed3437ac583f2257695aa3c9b",
+  "schema": "v10.2.30_v2_named_single_crack_campaign_v1",
+  "seed": 3621,
+  "source_diff_from_parent": [
+    "A\tV2_2D_SINGLE_CRACK_CAMPAIGN_PROTOCOL.md",
+    "A\tV2_PARAMETERIZATION_CATALOG.md",
+    "M\tarrhenius_fracture/sharp_front.py",
+    "A\tarrhenius_fracture/sharp_front_v10_2_30_v2_named_single_crack.py",
+    "A\tarrhenius_fracture/sparse_accepted_field_export_v10230.py",
+    "A\tarrhenius_fracture/v2_named_parameterizations.py",
+    "A\tscripts/build_v2_named_parameterizations_v10230.py",
+    "A\tscripts/report_v2_2d_single_crack_campaign_v10230.py",
+    "A\tscripts/run_v2_2d_single_crack_campaign_v10230.py",
+    "A\tscripts/verify_v2_2d_single_crack_campaign_v10230.py",
+    "A\tscripts/verify_v2_named_parameterizations_v10230.py",
+    "A\ttests/test_v10_2_30_v2_2d_campaign.py",
+    "A\ttests/test_v2_named_parameterizations_v10230.py",
+    "A\tv2_2d_single_crack_campaign_manifest.json",
+    "A\tv2_named_parameterization_provenance.json",
+    "A\tv2_named_parameterization_registry.csv",
+    "A\tv2_named_parameterization_registry.json",
+    "A\tv2_parameterization_evidence_cards/DBTT_V2.md",
+    "A\tv2_parameterization_evidence_cards/DBTT_V2_P40.md",
+    "A\tv2_parameterization_evidence_cards/ceramic_V2_P25.md",
+    "A\tv2_parameterization_evidence_cards/ceramic_V2_P40.md",
+    "A\tv2_parameterization_evidence_cards/weakT_V2_P25.md",
+    "A\tv2_parameterization_evidence_cards/weakT_V2_P40.md"
+  ],
+  "source_parent_commit": "c1b3f08d956242844ee1206bf10576f08f8a2859",
+  "target_projected_extension_um": 1000.0,
+  "temperatures_K": [
+    300,
+    1200
+  ],
+  "theta_deg": 0.0
+}
