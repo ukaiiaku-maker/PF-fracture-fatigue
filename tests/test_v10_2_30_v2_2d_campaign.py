@@ -51,11 +51,13 @@ def _checkpoint(root, *, step, events, extension):
     write_combined_checkpoint(root,outer=outer,arrays=arrays,kinetic={},kinetic_vector=np.zeros(1))
 
 
-def test_sparse_export_roles_are_milestone_accurate_and_reloadable(tmp_path):
+def test_sparse_export_roles_are_milestone_accurate_and_reloadable(tmp_path, monkeypatch):
+    monkeypatch.setenv("V10230_PRUNE_CHECKPOINT_GENERATIONS", "1")
     _checkpoint(tmp_path,step=0,events=0,extension=0.)
     export_latest_checkpoint(tmp_path,reason="outer_driver_initial_committed_state")
     assert (tmp_path/"portable_fields/initial.npz").is_file()
     _checkpoint(tmp_path,step=9,events=1,extension=500e-6)
+    assert len(list((tmp_path / "run_state_generations").iterdir())) == 1
     export_latest_checkpoint(tmp_path,reason="outer_driver_geometry_committed")
     meta=json.loads((tmp_path/"portable_fields/first_post_event.json").read_text())
     assert set(meta["roles"]) == {"FIRST_ACCEPTED_POST_EVENT","FIRST_ACCEPTED_AT_OR_BEYOND_250UM","FIRST_ACCEPTED_AT_OR_BEYOND_500UM"}

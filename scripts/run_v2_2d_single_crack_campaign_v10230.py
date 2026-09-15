@@ -163,7 +163,7 @@ async def run_one(sem, output, alias, temp, python, family, steps):
             "ANISOTROPIC_TRANSPORT_MODE": "validated_scalar", "ANISOTROPIC_USE_AVALANCHE_BACKEND": "1",
             "ANISOTROPIC_EMISSION_ENABLED": "1", "PERSISTENT_SOURCE_MIN_WIDTH_UM": "0",
             "EXPECTED_HEAD": git("rev-parse", "HEAD"), "V10230_HIGH_CYCLE_CHECKPOINT_DIR": str(case),
-            "V10230_SPARSE_FIELD_EXPORT_DIR": str(case)})
+            "V10230_SPARSE_FIELD_EXPORT_DIR": str(case), "V10230_PRUNE_CHECKPOINT_GENERATIONS": "1"})
         if (case / "run_state_checkpoint.json").is_file() and not (case / "terminal_record.json").is_file():
             env["V10230_RESTART_CHECKPOINT_DIR"] = str(case)
         status = {"state": "RUNNING", "pid": None, "started_unix_s": time.time()}

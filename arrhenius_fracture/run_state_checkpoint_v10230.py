@@ -140,6 +140,14 @@ def write_combined_checkpoint(
             "files": files,
         }
         _atomic_json(root / MANIFEST, manifest)
+        # Long accepted-step campaigns need one atomic *latest* generation,
+        # not an unbounded history of otherwise redundant restart trees.  The
+        # opt-in pruning happens only after the new manifest is durable, so an
+        # interruption always leaves its referenced generation intact.
+        if os.environ.get("V10230_PRUNE_CHECKPOINT_GENERATIONS", "0") == "1":
+            for previous in generations.iterdir():
+                if previous.is_dir() and previous.name != generation_id and not previous.name.startswith(".pending-"):
+                    shutil.rmtree(previous)
         return manifest
     finally:
         if temporary.exists():
