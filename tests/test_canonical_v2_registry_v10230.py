@@ -1,3 +1,6 @@
+from dataclasses import asdict
+import json
+
 import pytest
 
 from arrhenius_fracture.canonical_v2_registry_v10230 import (
@@ -50,3 +53,4 @@ def test_exact_surface_adapter_exposes_legacy_transport_parent_contract():
     assert opening.exp_a > 0.0 and opening.exp_n > 0.0
     assert emission.sigc0_Pa > 0.0
     assert emission.floor_min_eV > 0.0
+    assert json.loads(json.dumps(asdict(opening)))["parent"]["Tref_K"] == 481.33

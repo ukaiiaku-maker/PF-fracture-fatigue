@@ -7,6 +7,7 @@ change the canonical serialized row.
 from __future__ import annotations
 
 import csv
+from dataclasses import dataclass
 import hashlib
 import json
 from pathlib import Path
@@ -87,12 +88,12 @@ def round_trip(row: dict[str, str]) -> dict[str, str]:
     return json.loads(json.dumps(row, sort_keys=True, separators=(",", ":")))
 
 
+@dataclass(frozen=True)
 class ThermodynamicBarrierAdapter:
     """One exact surface exposed through all supported barrier method names."""
 
-    def __init__(self, surface, parent: dict[str, Any]):
-        self.surface = surface
-        self.parent = dict(parent)
+    surface: Any
+    parent: dict[str, Any]
 
     def values_eV(self, stress_Pa, temperature_K):
         return self.surface.G_eV(stress_Pa, temperature_K)

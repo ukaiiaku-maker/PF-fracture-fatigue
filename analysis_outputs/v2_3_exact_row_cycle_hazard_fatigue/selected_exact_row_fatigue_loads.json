@@ -1,0 +1,41 @@
+{
+  "barrier_or_renewal_retuned": false,
+  "candidate_contract_sha256": "d214d5021d80070d4dd382594a6734ca24bdbfb1d0c311325c6114f47c9e64b4",
+  "candidate_id": "P25_TJBSV2_S_002987",
+  "complete_bound_row_sha256": "8a16415705c47c7708ec35385cde6c9a53bb6b9de6edf98b902a1f40626a9f72",
+  "external_driver_commit": "a74c4c38aad706209c7c9a8157971c847d2bf9bd",
+  "external_driver_sha256": "088b5b73d6b804aa22aaa815fc1ce74a75dfbc9949a969f8e07fe0248ea0c0a0",
+  "monotonic_ramp_cap_applied": false,
+  "physics_contract_sha256": "e3a620fcbfc614ae749f5bda474b6d3ecd078a71a137d462458fb9531873593c",
+  "schema": "v10.2.30_v2_3_selected_exact_row_fatigue_loads_v1",
+  "selected_loads_in_ascending_Kmax": [
+    {
+      "DeltaK_MPa_sqrt_m": 3.375,
+      "Kmax_MPa_sqrt_m": 3.75,
+      "barrier_or_renewal_retuned": false,
+      "candidate_id": "P25_TJBSV2_S_002987",
+      "fresh_state_cycle_hazard_action": 0.00010404171198519247,
+      "projected_median_first_passage_cycles": 6662.204680547703,
+      "target_median_first_passage_cycles": 10000.0
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 5.4,
+      "Kmax_MPa_sqrt_m": 6.0,
+      "barrier_or_renewal_retuned": false,
+      "candidate_id": "P25_TJBSV2_S_002987",
+      "fresh_state_cycle_hazard_action": 0.0007049309911783174,
+      "projected_median_first_passage_cycles": 983.2837387406177,
+      "target_median_first_passage_cycles": 1000.0
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 11.475,
+      "Kmax_MPa_sqrt_m": 12.75,
+      "barrier_or_renewal_retuned": false,
+      "candidate_id": "P25_TJBSV2_S_002987",
+      "fresh_state_cycle_hazard_action": 0.0067496131115752775,
+      "projected_median_first_passage_cycles": 102.69435730638095,
+      "target_median_first_passage_cycles": 100.0
+    }
+  ],
+  "selection_rule": "nearest_log10_fresh_state_cycle_hazard_projection"
+}
