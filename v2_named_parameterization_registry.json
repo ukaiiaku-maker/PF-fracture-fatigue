@@ -1,0 +1,260 @@
+{
+  "accepted_parent_commit": "c1b3f08d956242844ee1206bf10576f08f8a2859",
+  "catalog_version": "2.0.1",
+  "entries": [
+    {
+      "complete_bound_row_sha256": "8a16415705c47c7708ec35385cde6c9a53bb6b9de6edf98b902a1f40626a9f72",
+      "cross_code_loaders": [
+        "analytical",
+        "monotonic_reduced_1D",
+        "fatigue_reduced_1D",
+        "PF_sharp_front",
+        "FEM_CZM",
+        "checkpoint_serialization"
+      ],
+      "developed_fatigue_status": "UNRESOLVED",
+      "display_name": "DBTT V2",
+      "entropy_convention": "DIRECT_FREE_ENERGY_SURFACE_NO_PREFACTOR_DOUBLE_COUNTING",
+      "fatigue_status": "THREE_FINITE_EXACT_ROW_SHORT_GROWTH_POINTS_CURVED",
+      "generation": "CORRECTED_JOINT_THERMODYNAMIC_V2",
+      "limitations": [
+        "NOT_EXPERIMENTALLY_CALIBRATED",
+        "NOT_ASTM_KIC",
+        "NOT_CONVENTIONAL_R_CURVE",
+        "DEVELOPED_FATIGUE_RATE_PENDING",
+        "SPATIAL_R_CURVE_TRANSFER_PENDING",
+        "NOT_DEFAULT_CANONICAL_PARAMETERIZATION"
+      ],
+      "parent_background": "P25",
+      "registry_alias": "DBTT_V2",
+      "renewal_fingerprint": "5840b23b0e3d775b980fc4c8b0592a8b76f6dff2e0dbe7f5bc46561cdd55f172",
+      "response_evidence": {
+        "missing": "Developed post-initiation fatigue and spatial R-curve transfer.",
+        "principal": "Reduced 1-D rising resistance through 100 um with exact restart parity and three finite curved exact-row 300 K short-growth points."
+      },
+      "rising_resistance_status": "1D_STRONG_RISING_RESISTANCE",
+      "source_candidate_id": "P25_TJBSV2_S_002987",
+      "source_commit": "6d56fd936699d244004d5e66c35d3718d8fcc357",
+      "spatial_transfer_status": "NOT_TESTED",
+      "status": "NAMED_V2_PROSPECTIVE_PARAMETERIZATION",
+      "temperature_response_classification": "DBTT_LIKE_CONFIRMED_REDUCED_PRODUCTION",
+      "thermodynamic_surface_fingerprint": "56dee619b2a1f5b80b273b78d506a8126d4f1655aee950962203ec7eea8a0a54",
+      "transfer_commit": "7bb4a341b1c5370c826a3a6bc0253c042fd2e6fc"
+    },
+    {
+      "complete_bound_row_sha256": "be0343fd982eda89f7f7240bf599298a0e07e06eea87570ee34fa9935dabcbfa",
+      "cross_code_loaders": [
+        "analytical",
+        "monotonic_reduced_1D",
+        "fatigue_reduced_1D",
+        "PF_sharp_front",
+        "FEM_CZM",
+        "checkpoint_serialization"
+      ],
+      "developed_fatigue_status": "UNRESOLVED",
+      "display_name": "DBTT V2-P40",
+      "entropy_convention": "DIRECT_FREE_ENERGY_SURFACE_NO_PREFACTOR_DOUBLE_COUNTING",
+      "fatigue_status": "NOT_TESTED_EXACT_ROW",
+      "generation": "CORRECTED_JOINT_THERMODYNAMIC_V2",
+      "limitations": [
+        "NOT_EXPERIMENTALLY_CALIBRATED",
+        "NOT_ASTM_KIC",
+        "NOT_CONVENTIONAL_R_CURVE",
+        "DEVELOPED_FATIGUE_RATE_PENDING",
+        "SPATIAL_R_CURVE_TRANSFER_PENDING",
+        "NOT_DEFAULT_CANONICAL_PARAMETERIZATION"
+      ],
+      "parent_background": "P40",
+      "registry_alias": "DBTT_V2_P40",
+      "renewal_fingerprint": "5840b23b0e3d775b980fc4c8b0592a8b76f6dff2e0dbe7f5bc46561cdd55f172",
+      "response_evidence": {
+        "missing": "Rising resistance beyond the 80 MPa sqrt(m) censor, exact-row fatigue, and spatial transfer.",
+        "principal": "Confirmed coupled DBTT-like reduced production response."
+      },
+      "rising_resistance_status": "UNRESOLVED_AT_80_MPa_sqrt_m_CENSOR",
+      "source_candidate_id": "P40_TJBSV2_S_038503",
+      "source_commit": "6d56fd936699d244004d5e66c35d3718d8fcc357",
+      "spatial_transfer_status": "NOT_TESTED",
+      "status": "NAMED_V2_ALTERNATE_PARAMETERIZATION",
+      "temperature_response_classification": "DBTT_LIKE_CONFIRMED_REDUCED_PRODUCTION",
+      "thermodynamic_surface_fingerprint": "63c9a376345acb638b7f9c1b611105cfd24e15fe990e3009d4ae5dde9da38a4c",
+      "transfer_commit": "7bb4a341b1c5370c826a3a6bc0253c042fd2e6fc"
+    },
+    {
+      "complete_bound_row_sha256": "85f8d9d2ddbe1e7c7c0c34589883b886023507089d0fe423c1ce2c4eb60d0041",
+      "cross_code_loaders": [
+        "analytical",
+        "monotonic_reduced_1D",
+        "fatigue_reduced_1D",
+        "PF_sharp_front",
+        "FEM_CZM",
+        "checkpoint_serialization"
+      ],
+      "developed_fatigue_status": "UNRESOLVED",
+      "display_name": "weak-T V2-P25",
+      "entropy_convention": "DIRECT_FREE_ENERGY_SURFACE_NO_PREFACTOR_DOUBLE_COUNTING",
+      "fatigue_status": "NOT_TESTED_EXACT_ROW",
+      "generation": "CORRECTED_JOINT_THERMODYNAMIC_V2",
+      "limitations": [
+        "NOT_EXPERIMENTALLY_CALIBRATED",
+        "NOT_ASTM_KIC",
+        "NOT_CONVENTIONAL_R_CURVE",
+        "DEVELOPED_FATIGUE_RATE_PENDING",
+        "SPATIAL_R_CURVE_TRANSFER_PENDING",
+        "NOT_DEFAULT_CANONICAL_PARAMETERIZATION"
+      ],
+      "parent_background": "P25",
+      "registry_alias": "weakT_V2_P25",
+      "renewal_fingerprint": "5840b23b0e3d775b980fc4c8b0592a8b76f6dff2e0dbe7f5bc46561cdd55f172",
+      "response_evidence": {
+        "missing": "Exact-row fatigue and spatial transfer.",
+        "principal": "Confirmed coupled weak-T reduced production response."
+      },
+      "rising_resistance_status": "1D_EFFECTIVE_RESISTANCE_FLAT",
+      "source_candidate_id": "P25_TJBSV2_S_026704",
+      "source_commit": "6d56fd936699d244004d5e66c35d3718d8fcc357",
+      "spatial_transfer_status": "NOT_TESTED",
+      "status": "NAMED_V2_ALTERNATE_PARAMETERIZATION",
+      "temperature_response_classification": "WEAK_T_CONFIRMED_REDUCED_PRODUCTION",
+      "thermodynamic_surface_fingerprint": "526e8cc403bc3d9155fe54ee318bb57e5ee5b5dbdc15649dc3b4f885c7ffd1ca",
+      "transfer_commit": "7bb4a341b1c5370c826a3a6bc0253c042fd2e6fc"
+    },
+    {
+      "complete_bound_row_sha256": "98908d7eecb5916a86dc886900b6e4fd687f4d67daa2bd77e4d75ebaef06b3d6",
+      "cross_code_loaders": [
+        "analytical",
+        "monotonic_reduced_1D",
+        "fatigue_reduced_1D",
+        "PF_sharp_front",
+        "FEM_CZM",
+        "checkpoint_serialization"
+      ],
+      "developed_fatigue_status": "UNRESOLVED",
+      "display_name": "weak-T V2-P40",
+      "entropy_convention": "DIRECT_FREE_ENERGY_SURFACE_NO_PREFACTOR_DOUBLE_COUNTING",
+      "fatigue_status": "NOT_TESTED_EXACT_ROW",
+      "generation": "CORRECTED_JOINT_THERMODYNAMIC_V2",
+      "limitations": [
+        "NOT_EXPERIMENTALLY_CALIBRATED",
+        "NOT_ASTM_KIC",
+        "NOT_CONVENTIONAL_R_CURVE",
+        "DEVELOPED_FATIGUE_RATE_PENDING",
+        "SPATIAL_R_CURVE_TRANSFER_PENDING",
+        "NOT_DEFAULT_CANONICAL_PARAMETERIZATION"
+      ],
+      "parent_background": "P40",
+      "registry_alias": "weakT_V2_P40",
+      "renewal_fingerprint": "5840b23b0e3d775b980fc4c8b0592a8b76f6dff2e0dbe7f5bc46561cdd55f172",
+      "response_evidence": {
+        "missing": "Exact-row fatigue and spatial transfer.",
+        "principal": "Confirmed coupled weak-T reduced production response."
+      },
+      "rising_resistance_status": "1D_EFFECTIVE_RESISTANCE_FLAT",
+      "source_candidate_id": "P40_TJBSV2_S_038278",
+      "source_commit": "6d56fd936699d244004d5e66c35d3718d8fcc357",
+      "spatial_transfer_status": "NOT_TESTED",
+      "status": "NAMED_V2_ALTERNATE_PARAMETERIZATION",
+      "temperature_response_classification": "WEAK_T_CONFIRMED_REDUCED_PRODUCTION",
+      "thermodynamic_surface_fingerprint": "e486eaa76c27a00f5a3dbcef9a147fb78fc333d7d71efdbce9a15e8cb0f71924",
+      "transfer_commit": "7bb4a341b1c5370c826a3a6bc0253c042fd2e6fc"
+    },
+    {
+      "complete_bound_row_sha256": "c794af3a2912fa91d587d06ae9177ba87af1da6d30e4ad7310d5f673edf741e3",
+      "cross_code_loaders": [
+        "analytical",
+        "monotonic_reduced_1D",
+        "fatigue_reduced_1D",
+        "PF_sharp_front",
+        "FEM_CZM",
+        "checkpoint_serialization"
+      ],
+      "developed_fatigue_status": "UNRESOLVED",
+      "display_name": "ceramic-like V2-P25",
+      "entropy_convention": "DIRECT_FREE_ENERGY_SURFACE_NO_PREFACTOR_DOUBLE_COUNTING",
+      "fatigue_status": "NOT_TESTED_EXACT_ROW",
+      "generation": "CORRECTED_JOINT_THERMODYNAMIC_V2",
+      "limitations": [
+        "NOT_EXPERIMENTALLY_CALIBRATED",
+        "NOT_ASTM_KIC",
+        "NOT_CONVENTIONAL_R_CURVE",
+        "DEVELOPED_FATIGUE_RATE_PENDING",
+        "SPATIAL_R_CURVE_TRANSFER_PENDING",
+        "NOT_DEFAULT_CANONICAL_PARAMETERIZATION"
+      ],
+      "parent_background": "P25",
+      "registry_alias": "ceramic_V2_P25",
+      "renewal_fingerprint": "5840b23b0e3d775b980fc4c8b0592a8b76f6dff2e0dbe7f5bc46561cdd55f172",
+      "response_evidence": {
+        "missing": "Exact-row fatigue and spatial transfer.",
+        "principal": "Confirmed coupled ceramic-like reduced production response."
+      },
+      "rising_resistance_status": "1D_EFFECTIVE_RESISTANCE_FLAT",
+      "source_candidate_id": "P25_TJBSV2_S_004127",
+      "source_commit": "6d56fd936699d244004d5e66c35d3718d8fcc357",
+      "spatial_transfer_status": "NOT_TESTED",
+      "status": "NAMED_V2_ALTERNATE_PARAMETERIZATION",
+      "temperature_response_classification": "CERAMIC_LIKE_CONFIRMED_REDUCED_PRODUCTION",
+      "thermodynamic_surface_fingerprint": "cfa915f707c8d02e3e3081a8d0bb5d2318ea47986b5a116f9bc1986fe8e165c0",
+      "transfer_commit": "7bb4a341b1c5370c826a3a6bc0253c042fd2e6fc"
+    },
+    {
+      "complete_bound_row_sha256": "d76e6a011ba83f762b5830c03c75571c851936677d213cfa1fb600a00a286cfa",
+      "cross_code_loaders": [
+        "analytical",
+        "monotonic_reduced_1D",
+        "fatigue_reduced_1D",
+        "PF_sharp_front",
+        "FEM_CZM",
+        "checkpoint_serialization"
+      ],
+      "developed_fatigue_status": "UNRESOLVED",
+      "display_name": "ceramic-like V2-P40",
+      "entropy_convention": "DIRECT_FREE_ENERGY_SURFACE_NO_PREFACTOR_DOUBLE_COUNTING",
+      "fatigue_status": "NOT_TESTED_EXACT_ROW",
+      "generation": "CORRECTED_JOINT_THERMODYNAMIC_V2",
+      "limitations": [
+        "NOT_EXPERIMENTALLY_CALIBRATED",
+        "NOT_ASTM_KIC",
+        "NOT_CONVENTIONAL_R_CURVE",
+        "DEVELOPED_FATIGUE_RATE_PENDING",
+        "SPATIAL_R_CURVE_TRANSFER_PENDING",
+        "NOT_DEFAULT_CANONICAL_PARAMETERIZATION"
+      ],
+      "parent_background": "P40",
+      "registry_alias": "ceramic_V2_P40",
+      "renewal_fingerprint": "5840b23b0e3d775b980fc4c8b0592a8b76f6dff2e0dbe7f5bc46561cdd55f172",
+      "response_evidence": {
+        "missing": "Exact-row fatigue and spatial transfer.",
+        "principal": "Confirmed coupled ceramic-like reduced production response."
+      },
+      "rising_resistance_status": "1D_EFFECTIVE_RESISTANCE_FLAT",
+      "source_candidate_id": "P40_TJBSV2_S_031027",
+      "source_commit": "6d56fd936699d244004d5e66c35d3718d8fcc357",
+      "spatial_transfer_status": "NOT_TESTED",
+      "status": "NAMED_V2_ALTERNATE_PARAMETERIZATION",
+      "temperature_response_classification": "CERAMIC_LIKE_CONFIRMED_REDUCED_PRODUCTION",
+      "thermodynamic_surface_fingerprint": "b3927423e589813d14e5ab6f0d9adbf29bc49447e39c155415991e2bf1d1b078",
+      "transfer_commit": "7bb4a341b1c5370c826a3a6bc0253c042fd2e6fc"
+    }
+  ],
+  "exact_only_controls": [
+    "P25_TJBSV2_S_064036",
+    "P40_TJBSV2_S_043821"
+  ],
+  "generation": "CORRECTED_JOINT_THERMODYNAMIC_V2",
+  "named_aliases": [
+    "DBTT_V2",
+    "DBTT_V2_P40",
+    "weakT_V2_P25",
+    "weakT_V2_P40",
+    "ceramic_V2_P25",
+    "ceramic_V2_P40"
+  ],
+  "policy": "Separate additive V2 overlay; no established parameterization is represented or intercepted.",
+  "reserved_absent_aliases": [
+    "Peak_V2",
+    "weakT_V2",
+    "ceramic_V2"
+  ],
+  "schema": "v10.2.30_opt_in_named_v2_parameterizations_v1"
+}
