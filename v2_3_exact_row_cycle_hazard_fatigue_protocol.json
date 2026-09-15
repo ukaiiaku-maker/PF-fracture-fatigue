@@ -1,0 +1,37 @@
+{
+  "schema": "v10.2.30_v2_3_exact_row_cycle_hazard_fatigue_protocol_v1",
+  "immutable_parent_head": "f3ae18503c243b2afa6f5af7f323c69c6aa681ca",
+  "candidate_id": "P25_TJBSV2_S_002987",
+  "temperature_K": 300.0,
+  "R": 0.1,
+  "frequency_Hz": 1000.0,
+  "cycle_hazard_selection": {
+    "Kmax_grid_start_MPa_sqrt_m": 1.0,
+    "Kmax_grid_stop_MPa_sqrt_m": 30.0,
+    "Kmax_grid_step_MPa_sqrt_m": 0.25,
+    "phase_steps": 64,
+    "median_first_passage_target_cycles": [100.0, 1000.0, 10000.0],
+    "selection_metric": "nearest_log10_fresh_state_cycle_hazard_projection",
+    "monotonic_ramp_cap_applied": false
+  },
+  "physical_trajectory": {
+    "seed": 1720,
+    "maximum_cycles": 100000000.0,
+    "target_extension_m": 0.000025,
+    "base_event_length_m": 0.000005,
+    "event_length_factor_min": 0.5,
+    "event_length_factor_max": 4.0,
+    "threshold_distribution": "independent_unit_exponential",
+    "middle_load_explicit_overlap": true
+  },
+  "qualified_driver": {
+    "model_id": "v9.14_event_driven_cyclic_first_passage",
+    "external_commit": "a74c4c38aad706209c7c9a8157971c847d2bf9bd",
+    "fatigue_v914_sha256": "088b5b73d6b804aa22aaa815fc1ce74a75dfbc9949a969f8e07fe0248ea0c0a0"
+  },
+  "barrier_refit_or_retune": false,
+  "canonical_production_promotion_authorized": false,
+  "additive_prospective_registry_authorized": true,
+  "spatial_or_two_dimensional_execution_authorized": false,
+  "protocol_frozen_before_physical_execution": true
+}

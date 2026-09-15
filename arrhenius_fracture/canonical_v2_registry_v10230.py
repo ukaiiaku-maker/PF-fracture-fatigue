@@ -105,7 +105,27 @@ class ThermodynamicBarrierAdapter:
 
     @property
     def Tref_K(self) -> float:
-        return 300.0
+        return float(self.parent["Tref_K"])
+
+    @property
+    def G00_eV(self) -> float:
+        return float(self.parent["G00_eV"])
+
+    @property
+    def gT_eV_per_K(self) -> float:
+        return float(self.parent["gT_eV_per_K"])
+
+    @property
+    def sT_Pa_per_K(self) -> float:
+        return float(self.parent["sT_Pa_per_K"])
+
+    @property
+    def exp_a(self) -> float:
+        return float(self.parent["alpha"])
+
+    @property
+    def exp_n(self) -> float:
+        return float(self.parent["exponent"])
 
     @property
     def sigc0_Pa(self) -> float:

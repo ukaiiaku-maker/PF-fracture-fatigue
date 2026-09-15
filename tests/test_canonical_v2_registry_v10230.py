@@ -40,3 +40,13 @@ def test_fixed_event_threshold_is_not_shadowed_by_post_event_engine_snapshot():
     )
     assert merged["threshold_action"] == 0.6931471805599453
     assert merged["physical_hazard_action"] == 0.6931471805599453
+
+
+def test_exact_surface_adapter_exposes_legacy_transport_parent_contract():
+    row = load_row("P25_TJBSV2_S_002987")
+    opening, emission = surface_adapters(row)
+    assert opening.Tref_K == 481.33
+    assert opening.G00_eV > 0.0 and emission.G00_eV > 0.0
+    assert opening.exp_a > 0.0 and opening.exp_n > 0.0
+    assert emission.sigc0_Pa > 0.0
+    assert emission.floor_min_eV > 0.0
