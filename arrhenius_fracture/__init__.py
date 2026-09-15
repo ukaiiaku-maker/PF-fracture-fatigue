@@ -29,6 +29,7 @@ from .stochastic_avalanche_tip import (
     AvalancheLengthConfig,
     StochasticAvalancheDiagnosticTipEngine,
 )
+from . import named_parameterization_registry
 
 _continuum_source_tip.ContinuumSourceKineticTipEngine = (
     SeparatedSourceKineticTipEngine
@@ -55,4 +56,5 @@ __all__ = [
     "StochasticHazardDiagnosticTipEngine",
     "AvalancheLengthConfig",
     "StochasticAvalancheDiagnosticTipEngine",
+    "named_parameterization_registry",
 ]
