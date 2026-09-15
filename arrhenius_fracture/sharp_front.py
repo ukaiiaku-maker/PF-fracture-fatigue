@@ -2521,6 +2521,13 @@ def run_2d(args):
                 'rho_gp': rho_gp, 'pz_store_gp': pz_store_gp,
                 'pz_mobile_gp': pz_mobile_gp, 'pz_escape_gp': pz_escape_gp,
                 'pz_emit_gp': pz_emit_gp,
+                # Accepted native integration-point diagnostics.  These are
+                # restart-opaque (the solver recomputes them after restore),
+                # but retaining the raw cell representation prevents a later
+                # plotting pass from inventing a nodal stress projection.
+                'sigma_gp': sigma_gp, 'sigma1_gp': s1_gp,
+                'von_mises_gp': seq_gp, 'elastic_energy_density_gp': psi_gp,
+                'plastic_rate_gp': dot_ep,
             }
             return outer, arrays
 
@@ -2592,8 +2599,13 @@ def run_2d(args):
         def _commit_outer_checkpoint(reason):
             register_outer_state_provider(_outer_checkpoint_provider)
             try:
-                return write_checkpoint(eng, waveform=None, temperature_K=T,
-                                        reason=reason)
+                committed = write_checkpoint(eng, waveform=None, temperature_K=T,
+                                             reason=reason)
+                export_root = os.environ.get('V10230_SPARSE_FIELD_EXPORT_DIR', '').strip()
+                if committed is not None and export_root:
+                    from .sparse_accepted_field_export_v10230 import export_latest_checkpoint
+                    export_latest_checkpoint(export_root, reason=str(reason))
+                return committed
             finally:
                 clear_outer_state_provider()
 
