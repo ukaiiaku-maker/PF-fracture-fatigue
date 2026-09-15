@@ -1,0 +1,3 @@
+# V2.3 final decision
+
+P25_TJBSV2_S_002987 demonstrates reduced 1-D rising resistance dominated by progressive effective-radius/blunting transfer through 100 micrometres with exact restart parity. This is not an ASTM or conventional R-curve. P40 remains unresolved at the 80 MPa sqrt(m) censor. The previous no-fatigue-interval result applies only to the frozen monotonic-cap rule. Cycle-hazard selection now supplies three finite exact-row 300 K short-growth fatigue points. Canonical production promotion remains withheld; one additive prospective cross-code registry row is justified with `NOT_EXPERIMENTALLY_CALIBRATED_NOT_ASTMR_CURVE` qualification. No spatial or two-dimensional calculation was launched.

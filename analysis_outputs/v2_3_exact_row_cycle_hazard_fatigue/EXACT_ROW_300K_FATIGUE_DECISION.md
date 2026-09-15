@@ -1,0 +1,3 @@
+# Exact-row 300 K fatigue decision
+
+`P25_TJBSV2_S_002987` was tested at Kmax 3.75, 6.00, and 12.75 MPa sqrt(m) with common seed 1720. All three trajectories reached six events and 28.888 micrometres without a physical censor. Cumulative short-growth rates are 5.991e-10, 4.049e-9, and 2.075e-8 m/cycle. Adjacent log slopes are 4.07 and 2.17, so this is a curved three-point short-growth response, not a broad Paris exponent. Only one event lies beyond the existing 20 micrometre initiation boundary; developed da/dN remains unresolved at the frozen 25 micrometre target. The 6.00 MPa sqrt(m) explicit overlap passes with 7.83e-4 terminal-cycle relative difference and an exact threshold/event-size sequence.
