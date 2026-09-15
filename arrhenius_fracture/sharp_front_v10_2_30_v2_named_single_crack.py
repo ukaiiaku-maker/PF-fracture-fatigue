@@ -19,6 +19,7 @@ from . import sharp_front_v10_1_5 as _campaign
 from . import sharp_front_v10_2_28_audited as _audited
 from .canonical_v2_registry_v10230 import surface_adapters
 from .material_manifest import MaterialManifest
+from . import parameter_registry_v9111 as _registry
 from .v2_named_parameterizations import NAMED_ALIASES, load_exact_candidate, load_for
 
 MODEL_ID = "v10.2.30_v2_named_parameter_single_crack_parameter_adapter_v1"
@@ -99,6 +100,36 @@ def _exact_manifest(base: MaterialManifest, row: dict[str, str]) -> MaterialMani
     )
 
 
+def _select_v2_option(option_key, registry_path, *, canonical_stage3_only=False):
+    """Select a complete direct-surface V2 row under its own exact contract."""
+    source = Path(registry_path).resolve()
+    matches = [r for r in _registry.read_registry(source) if r["option_key"] == option_key]
+    if len(matches) != 1:
+        raise ValueError(f"expected exactly one V2 runtime row; found {len(matches)}")
+    row = matches[0]
+    required_exact = {
+        "Tref_K": 300.0, "exact_spatial_Tref_active": 1.0,
+        "n_slip_channels": 2.0, "rho_forest_floor_m2": 5.0e12,
+        "peierls_stress_fraction": 1.0 / math.sqrt(3.0),
+        "taylor_stress_fraction": 1.0 / math.sqrt(3.0),
+        "mobile_shield_fraction": 0.0, "source_recovery_rate_s": 0.0,
+    }
+    for name, expected in required_exact.items():
+        value = float(row[name])
+        if not math.isfinite(value) or not math.isclose(value, expected, rel_tol=1e-12, abs_tol=1e-15):
+            raise ValueError(f"V2 spatial contract mismatch for {name}: {value!r}")
+    bins = float(row["n_bins_recommended"]); length = float(row["L_pz_um_recommended"])
+    if not bins.is_integer() or bins < 4 or not math.isfinite(length) or length <= 0:
+        raise ValueError("invalid V2 process-zone discretization")
+    return _registry.SelectedResponseOption(
+        option_key=option_key, candidate_id=row["candidate_id"].strip(),
+        material_class=row["material_class"].strip(), role=row.get("role", "").strip(),
+        mechanism_summary=row.get("mechanism_summary", "").strip(),
+        validation_status=row.get("validation_status", "").strip(),
+        mpz_length_um=length, mpz_n_bins=int(bins), row=dict(row),
+        registry_path=str(source), registry_sha256=_registry.sha256_file(source))
+
+
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     alias = _value(args, "--v2-parameter-alias") or os.environ.get("V2_PARAMETER_ALIAS", "")
@@ -139,6 +170,7 @@ def main(argv=None):
     v227 = _audited._entry._base
     original_registry, original_selection = v227.DEFAULT_REGISTRY, v227.SELECTION_RECORD
     original_options = v227.VALID_OPTIONS
+    original_source_selector = v227._SOURCE_SELECT_OPTION
     original_manifest_symbol = _driver.MaterialManifest
     original_backstress = _campaign.BACKSTRESS_SCALE
     bound_factory = MaterialManifest.from_csv
@@ -151,6 +183,7 @@ def main(argv=None):
     v227.DEFAULT_REGISTRY = runtime_registry
     v227.SELECTION_RECORD = runtime_selection
     v227.VALID_OPTIONS = {alias: record.source_candidate_id}
+    v227._SOURCE_SELECT_OPTION = _select_v2_option
     _driver.MaterialManifest = ExactV2MaterialManifest
     _campaign.BACKSTRESS_SCALE = physical("physics__persistent_backstress_scale")
     try:
@@ -158,6 +191,7 @@ def main(argv=None):
     finally:
         v227.DEFAULT_REGISTRY, v227.SELECTION_RECORD = original_registry, original_selection
         v227.VALID_OPTIONS = original_options
+        v227._SOURCE_SELECT_OPTION = original_source_selector
         _driver.MaterialManifest = original_manifest_symbol
         _campaign.BACKSTRESS_SCALE = original_backstress
 
@@ -182,6 +216,8 @@ def main(argv=None):
         },
         "source_design_metadata": {"blunting_slip_fraction": blunting_slip_fraction},
         "direct_opening_surface": True, "direct_emission_surface": True,
+        "direct_surface_reference_temperature_K": 300.0,
+        "v2_direct_surface_contract_validated": True,
         "mechanics_changed": False, "event_transaction_changed": False,
     }
     (out / "v2_exact_parameter_binding.json").write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n")
