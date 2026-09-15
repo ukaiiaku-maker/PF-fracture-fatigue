@@ -1,4 +1,5 @@
 from dataclasses import asdict
+import hashlib
 import json
 
 import pytest
@@ -54,3 +55,20 @@ def test_exact_surface_adapter_exposes_legacy_transport_parent_contract():
     assert emission.sigc0_Pa > 0.0
     assert emission.floor_min_eV > 0.0
     assert json.loads(json.dumps(asdict(opening)))["parent"]["Tref_K"] == 481.33
+
+
+def test_v914_exact_row_candidate_and_physics_match_frozen_selection_contract():
+    from scripts.select_v2_3_exact_row_cycle_hazard_loads_v10230 import (
+        OUT, exact_candidate_and_physics, load_external_fatigue,
+    )
+    fatigue = load_external_fatigue()
+    candidate, physics, _ = exact_candidate_and_physics(fatigue)
+    frozen = json.loads((OUT / "selected_exact_row_fatigue_loads.json").read_text())
+    candidate_hash = hashlib.sha256(json.dumps(
+        asdict(candidate), sort_keys=True, separators=(",", ":")
+    ).encode()).hexdigest()
+    physics_hash = hashlib.sha256(json.dumps(
+        asdict(physics), sort_keys=True, separators=(",", ":"), allow_nan=True
+    ).encode()).hexdigest()
+    assert candidate_hash == frozen["candidate_contract_sha256"]
+    assert physics_hash == frozen["physics_contract_sha256"]
