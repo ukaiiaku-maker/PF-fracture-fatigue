@@ -76,7 +76,11 @@ def resolve_kernel(output_parent: Path, python: Path) -> Path:
         "--maximum-fronts", "1", "--process-zone-length-um", "50", "--process-zone-bins", "80",
         "--mesh-nx", "36", "--mesh-ny", "72", "--tip-h-fine-um", "1", "--tip-ratio", "1.20",
         "--da-phys-um", "5", "--mode", "auto", "--cache-root", str(cache)]
-    result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True)
+    environment = os.environ.copy()
+    environment.update({"PYTHON_BIN": str(python),
+                        "CONDA_ENV": "arrhenius-sharp-front-v10-codex",
+                        "CONDA_DEFAULT_ENV": "arrhenius-sharp-front-v10-codex"})
+    result = subprocess.run(command, cwd=ROOT, env=environment, text=True, capture_output=True)
     if result.returncode: raise SystemExit(result.stdout + result.stderr)
     family = Path(result.stdout.strip().splitlines()[-1]).resolve()
     if not family.is_file(): raise SystemExit("kernel resolver did not return a file")
