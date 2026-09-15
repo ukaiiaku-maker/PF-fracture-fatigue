@@ -68,7 +68,9 @@ def preflight(output: Path, python: Path, *, allow_resume: bool = False) -> list
 
 
 def resolve_kernel(output_parent: Path, python: Path) -> Path:
-    cache = output_parent / "v10_2_28_kernel_cache"
+    # Reuse the repository's audited direct-kernel cache.  Raw campaign data
+    # still goes to the separately frozen Data-volume output root.
+    cache = Path(os.environ.get("V10230_KERNEL_CACHE_ROOT", ROOT / "runs/v10_2_28_kernel_cache")).resolve()
     command = [str(python), str(ROOT / "scripts/ensure_v10_2_28_signed_kernel.py"),
         "--theta-deg", "0", "--target-extension-um", "1000", "--branching-mode", "single_front",
         "--maximum-fronts", "1", "--process-zone-length-um", "50", "--process-zone-bins", "80",
