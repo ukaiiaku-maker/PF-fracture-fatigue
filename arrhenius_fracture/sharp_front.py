@@ -1318,6 +1318,13 @@ def run_2d(args):
         u = np.zeros(mesh.ndof)
         ep_gp = np.zeros((3, mesh.ne))
         rho_gp = np.full(mesh.ne, eng.f.rho0)
+        # Accepted diagnostic fields are initialized explicitly so the initial
+        # atomic checkpoint has the same portable schema as later generations.
+        sigma_gp = np.zeros((3, mesh.ne))
+        seq_gp = np.zeros(mesh.ne)
+        s1_gp = np.zeros(mesh.ne)
+        psi_gp = np.zeros(mesh.ne)
+        dot_ep = np.zeros(mesh.ne)
 
         # Spatial process-zone state used by the v8 fatigue adapter.  The old
         # scalar N_em ledger remains the V1 reduction, but the 2-D driver now
