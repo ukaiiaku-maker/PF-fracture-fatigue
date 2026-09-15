@@ -114,6 +114,26 @@ def manifest(output: Path, python: Path, family: Path, rows: list[dict]) -> None
                 w.writerow({"case_id": f"{alias}_{temp}K_theta0", **by[alias], "temperature_K": temp, "seed": SEED})
 
 
+def record_resume(output: Path) -> None:
+    path = output / "resume_manifest_1.json"
+    prior = json.loads((output / "immutable_launch_manifest.json").read_text())
+    current = git("rev-parse", "HEAD")
+    if prior.get("git_head") == current:
+        return
+    if path.exists():
+        recorded = json.loads(path.read_text())
+        if recorded.get("resume_git_head") != current:
+            raise SystemExit("campaign has already consumed its one permitted software-fix resume")
+        return
+    payload = {"schema": "v10.2.30_campaign_narrow_resume_v1", "resume_number": 1,
+        "reason": "bounded checkpoint generation retention fix",
+        "original_git_head": prior.get("git_head"), "resume_git_head": current,
+        "resume_git_tree": git("rev-parse", "HEAD^{tree}"),
+        "changed_files": git("diff", "--name-status", str(prior.get("git_head")), current).splitlines(),
+        "restart_source": "latest hash-validated accepted checkpoint", "physics_changed": False}
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
 def command(case: Path, alias: str, temp: int, python: Path, family: Path, steps: int) -> list[str]:
     return [str(python), "-u", "-m", "arrhenius_fracture.sharp_front_v10_2_30_v2_named_single_crack",
         "--v2-parameter-alias", alias, "--signed-kernel-family", str(family), "--mode", "2d",
@@ -198,6 +218,7 @@ def main():
         print(json.dumps({"preflight": "PASS", "cases": 12, "kernel": str(family)}, indent=2)); return
     output.mkdir(parents=True, exist_ok=True)
     if not (output / "immutable_launch_manifest.json").exists(): manifest(output, python, family, rows)
+    else: record_resume(output)
     results = asyncio.run(campaign(args, output, python, family))
     (output / "campaign_terminal_records.json").write_text(json.dumps(results, indent=2, sort_keys=True) + "\n")
     subprocess.check_call([str(python), str(ROOT / "scripts/report_v2_2d_single_crack_campaign_v10230.py"), "--campaign-root", str(output)], cwd=ROOT)
