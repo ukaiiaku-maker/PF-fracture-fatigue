@@ -103,6 +103,15 @@ class ProductionBranchCheckpoint:
             "event_counters": dict(self.state.event_counters),
             **production_front_counts(self.state),
             "energy_ledgers": dict(self.state.energy_ledgers),
+            "vacancy_ledgers": dict(self.state.vacancy_ledgers),
+            "vacancy_temperature_K": self.state.vacancy_temperature_K,
+            "vacancy_transport_state_v2": (
+                None if self.state.vacancy_transport_state_v2 is None else
+                __import__("arrhenius_fracture.vacancy_transport_phase_field_v2",
+                           fromlist=["_state_payload"])._state_payload(
+                    self.state.vacancy_transport_state_v2
+                )
+            ),
             "handoff_guard_diagnostics": dict(self.handoff_guard_diagnostics),
             "termination_reason": self.termination_reason,
             "has_rng_state": self.state.rng_state is not None,
@@ -116,6 +125,7 @@ class ProductionBranchCheckpoint:
                 "damage_shape": list(self.state.damage.shape),
                 "ep_gp_shape": list(self.state.ep_gp.shape),
                 "rho_gp_shape": list(self.state.rho_gp.shape),
+                "vacancy_fraction_gp_shape": list(self.state.vacancy_fraction_gp.shape),
             },
         }
 

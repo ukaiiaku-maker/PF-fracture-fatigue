@@ -6,7 +6,7 @@ extension trial.  No trial owns or advances a kinetic clock.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import hashlib
 import math
 import pickle
@@ -20,9 +20,12 @@ from .live_topology_kernel_v11 import LiveTopologyRequest, evaluate_exact_topolo
 from .topology_transaction_v11 import (
     LiveFEMTopologyState,
     TopologyArm,
+    apply_mechanically_separating_v12_trial_geometry,
     apply_v12_production_trial_geometry,
     complete_accepted_state_fingerprint,
+    ExactDirichletFactorizationCache,
     equilibrate_fixed_load_with_production_fem,
+    initialize_mechanically_separating_v12,
 )
 
 
@@ -30,6 +33,7 @@ MODEL_ID = "v5.hybrid-candidate-directional-drive/1"
 K_INTERPRETATION = "CANDIDATE_ENERGY_EQUIVALENT_NOT_WILLIAMS_ABSOLUTE_K"
 MARGINAL_G_MESH_RELATIVE_LIMIT = 0.10
 MARGINAL_G_DELTA_A_RELATIVE_LIMIT = 0.10
+LOCAL_MARGINAL_RELATIVE_LIMIT = 0.15
 MARGINAL_DELTA_A_VALUES_M = (3.0e-5, 2.0e-5)
 MARGINAL_LOCAL_MESH_LEVELS = (2, 3, 4)
 # These are the already-established topology-transaction energy tolerances.
@@ -44,6 +48,12 @@ SOURCE_COMMITS = {
     "v13_isolated_trial_ownership_pattern_read_only": "ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e",
 }
 
+# Read-only marginal trials repeatedly rebuild current transferred fields, but
+# their linear operators remain exactly reusable while the assembled matrix
+# and constraint key are byte-identical.  The bounded cache never stores a
+# displacement, RHS, stress, energy, or accepted-state observation.
+_MARGINAL_FACTORIZATION_CACHE = ExactDirichletFactorizationCache(16)
+
 
 class MarginalDriveNotCertified(RuntimeError):
     """Expected scientific or numerical unavailability of one marginal trial."""
@@ -56,7 +66,7 @@ def _pickle_hash(value: Any) -> str:
 def _kinetic_process_payload(state: LiveFEMTopologyState) -> tuple[Any, ...]:
     mechanics_only = {
         "boundary_terminal_context", "crack_representation",
-        "latest_causal_support_trials",
+        "latest_causal_support_trials", "transport_boundary_tags_v2",
     }
     junction = {
         key: value for key, value in state.junction_process_state.items()
@@ -121,7 +131,16 @@ def _ordered_surface_nodes(edges: np.ndarray) -> tuple[int, ...]:
 def cavity_free_surface_inventory(
     state: LiveFEMTopologyState,
 ) -> tuple[dict[str, Any], ...]:
-    """Extract actual one-owner cavity edges; an absent void gives an empty set."""
+    """Extract actual one-owner cavity edges from geometry-owning cavities.
+
+    A ``STABLE_SUBGRID_VOID`` (including the residual-loop-bearing analytical
+    representation) owns kinetics and inventory but deliberately has no hole
+    in the FEM mesh.  It therefore contributes no explicit free-surface
+    polygon to the directional mechanics request.  Promotion changes both the
+    representation and mesh atomically; only then may this observer require
+    actual cavity edges.
+    """
+    from .voiding_v5 import VoidPhase
     void_state = state.void_state
     if void_state is None or not void_state.cavities:
         return ()
@@ -134,6 +153,8 @@ def cavity_free_surface_inventory(
     one_owner = unique[counts == 1]
     inventory = []
     for cavity in sorted(void_state.cavities, key=lambda item: item.cavity_id):
+        if cavity.phase == VoidPhase.STABLE_SUBGRID_VOID:
+            continue
         radii = np.linalg.norm(nodes - np.asarray(cavity.center_m, dtype=float), axis=1)
         edges = one_owner[np.all(radii[one_owner] <= float(cavity.radius_m) * 1.02, axis=1)]
         if not len(edges):
@@ -441,9 +462,15 @@ def _exact_marginal_trial(
     conform_trial_endpoint: Callable[
         [LiveFEMTopologyState, tuple[float, float]], LiveFEMTopologyState
     ] | None,
+    matched_discretization: bool = False,
+    virtual_mechanical_trial_transport: str = "full",
+    mechanical_refinement_policy: str = "legacy_accumulated_generations",
+    batched_state_validation: bool = False,
 ) -> dict[str, Any]:
-    accepted_before = complete_accepted_state_fingerprint(state)
-    process_before = _pickle_hash(_kinetic_process_payload(state))
+    accepted_before = (None if batched_state_validation else
+                       complete_accepted_state_fingerprint(state))
+    process_before = (None if batched_state_validation else
+                      _pickle_hash(_kinetic_process_payload(state)))
     base = state.isolated_copy()
     start = tuple(map(float, base.crack_network.branch(branch_id).tip))
     direction = np.asarray(candidate.direction_xy, dtype=float)
@@ -466,7 +493,10 @@ def _exact_marginal_trial(
                     "EXACT_V12_SUPPORT_REQUIRES_ACTIVE_TIP_ALIGNMENT"
                 ) from exc
             raise
-    base = equilibrate_fixed_load_with_production_fem(base)
+    cache_before = dict(_MARGINAL_FACTORIZATION_CACHE.audit())
+    base = equilibrate_fixed_load_with_production_fem(
+        base, exact_linear_solver_cache=_MARGINAL_FACTORIZATION_CACHE)
+    parent_energy = float(base.stored_energy_J_per_m)
     arm = TopologyArm(
         candidate.candidate_id,
         branch_id,
@@ -477,28 +507,144 @@ def _exact_marginal_trial(
         candidate_direction_xy=tuple(map(float, direction)),
         first_intersection_xy_m=end,
     )
+    configuration = {
+        "model": MODEL_ID,
+        "trial_kind": "fixed_void_virtual_candidate_extension",
+        "candidate_id": candidate.candidate_id,
+        "owning_front_id": branch_id,
+        "process_owner_id": process_owner_id,
+        "delta_a_m": float(delta_a_m),
+        "local_mesh_level": int(local_mesh_level),
+        "matched_discretization": bool(matched_discretization),
+    }
+    transaction_identity = (
+        f"v5-hybrid-marginal-{branch_id}-{process_owner_id}-"
+        f"{candidate.candidate_id}-{float(delta_a_m).hex()}-"
+        f"L{int(local_mesh_level)}"
+    )
     try:
-        trial = apply_v12_production_trial_geometry(
-            base,
-            (arm,),
-            source_commit=str(source_commit),
-            configuration={
-                "model": MODEL_ID,
-                "trial_kind": "fixed_void_virtual_candidate_extension",
-                "candidate_id": candidate.candidate_id,
-                "owning_front_id": branch_id,
-                "process_owner_id": process_owner_id,
-                "delta_a_m": float(delta_a_m),
-                "local_mesh_level": int(local_mesh_level),
-            },
-            transaction_identity=(
-                f"v5-hybrid-marginal-{branch_id}-{process_owner_id}-"
-                f"{candidate.candidate_id}-{float(delta_a_m).hex()}-"
-                f"L{int(local_mesh_level)}"
-            ),
-            refinement_levels=int(local_mesh_level),
-            prepare_support_state=prepare_support_state,
-        )
+        if matched_discretization:
+            from .adaptive_multitip_mesh_v11 import refine_accepted_state
+            from .causal_sharp_wake_v11 import rerasterize_refined_topology_damage
+            matched = base
+            if mechanical_refinement_policy == "legacy_accumulated_generations":
+                segments = tuple(
+                    (np.asarray(a, float), np.asarray(b, float))
+                    for branch in matched.crack_network.branches
+                    for a, b in zip(branch.path, branch.path[1:])
+                ) + ((np.asarray(start, float), np.asarray(end, float)),)
+            elif mechanical_refinement_policy == "physical_candidate_support":
+                # The accepted graph already owns certified physical
+                # resolution.  Refine the new finite extension and the two
+                # adjacent accepted segments needed to resolve both sides of
+                # a retained kink under the unchanged junction-sector
+                # certificate, never the historical wake.
+                branch_path = matched.crack_network.branch(branch_id).path
+                adjacent = tuple(
+                    (np.asarray(a, float), np.asarray(b, float))
+                    for a, b in zip(branch_path[-3:-1], branch_path[-2:])
+                )
+                segments = adjacent + ((
+                    np.asarray(start, float), np.asarray(end, float),
+                ),)
+            else:
+                raise ValueError("unknown marginal mechanical refinement policy")
+            # Level labels retain their established ordering, but the target is
+            # an absolute physical size tied to the finite extension.  The
+            # extra support margin is required by the unchanged junction-sector
+            # certificate and by the measured level-pair energy convergence;
+            # its sampling annulus extends beyond the crack-line corridor.
+            target_resolution_m = float(delta_a_m) / (2.0 ** (int(local_mesh_level) + 3))
+            refinement_passes = 0
+            maximum_refinement_passes = int(local_mesh_level) + 5
+            legacy_policy = (
+                mechanical_refinement_policy == "legacy_accumulated_generations"
+            )
+            maximum_refinement_passes = (
+                int(local_mesh_level) if legacy_policy else maximum_refinement_passes
+            )
+            while refinement_passes < maximum_refinement_passes:
+                centroids = np.asarray(matched.mesh.nodes)[
+                    np.asarray(matched.mesh.elems)].mean(axis=1)
+                local_h = np.sqrt(np.maximum(np.asarray(matched.mesh.area_e), 1.0e-300))
+                marked: set[int] = set()
+                for a, b in segments:
+                    delta = b-a
+                    fraction = np.clip(
+                        ((centroids-a) @ delta)/max(float(delta @ delta), 1.0e-300),
+                        0.0, 1.0)
+                    distance = np.linalg.norm(
+                        centroids-(a+fraction[:, None]*delta), axis=1)
+                    eligible = distance <= 2.0*local_h
+                    if not legacy_policy:
+                        eligible &= local_h > target_resolution_m
+                    marked.update(np.flatnonzero(eligible).tolist())
+                # The unchanged junction certificate samples intact sectors
+                # out to 5h.  Refining only a two-element line corridor makes
+                # its finest annulus under-resolved even though the crack
+                # support itself is fine.  Refine the complete local material
+                # patch around the old junction and proposed endpoint on both
+                # members of the matched pair.
+                support_points = [np.asarray(start, float), np.asarray(end, float)]
+                if not legacy_policy and len(branch_path) >= 2:
+                    # ``start`` is the current tip.  A retained kink is the
+                    # preceding vertex, and its full material sector must be
+                    # refined as well as the new tip/endpoint patches.
+                    support_points.insert(0, np.asarray(branch_path[-2], float))
+                for point in support_points:
+                    radial = np.linalg.norm(centroids-point[None, :], axis=1)
+                    eligible = radial <= 7.0*local_h
+                    if not legacy_policy:
+                        eligible &= local_h > target_resolution_m
+                    marked.update(np.flatnonzero(eligible).tolist())
+                if not marked and not legacy_policy:
+                    break
+                refined, lineage = refine_accepted_state(
+                    matched, marked_parent_elements=tuple(sorted(marked)),
+                    active_tip_ids=matched.crack_network.active_tip_ids,
+                    generation=int(matched.event_counters.get("mesh_generation", 0))+1,
+                    operation_index=int(matched.event_counters.get(
+                        "refinement_operation_index", 0))+1,
+                    rebuild_vacancy_transport=(
+                        virtual_mechanical_trial_transport == "full"
+                    ),
+                )
+                matched, _ = rerasterize_refined_topology_damage(
+                    matched, refined, lineage.parent_to_child_element_map)
+                refinement_passes += 1
+            if marked and not legacy_policy:
+                raise MarginalDriveNotCertified(
+                    "PHYSICAL_RESOLUTION_REFINEMENT_BUDGET_EXHAUSTED"
+                )
+            if prepare_support_state is not None:
+                matched = prepare_support_state(matched)
+            junction = {
+                key: value for key, value in matched.junction_process_state.items()
+                if not key.startswith("v12_")
+            }
+            matched = replace(
+                matched, junction_process_state=junction,
+                v12_support_state=None, sharp_wake_model_id="sharp_wake_causal_v11")
+            matched = initialize_mechanically_separating_v12(
+                matched, source_commit=str(source_commit),
+                configuration={**configuration, "pair_member": "unextended"},
+                transaction_identity=transaction_identity+"-unextended",
+            )
+            base = equilibrate_fixed_load_with_production_fem(
+                matched, exact_linear_solver_cache=_MARGINAL_FACTORIZATION_CACHE)
+            trial = apply_mechanically_separating_v12_trial_geometry(
+                base, (arm,), source_commit=str(source_commit),
+                configuration={**configuration, "pair_member": "extended"},
+                transaction_identity=transaction_identity+"-extended",
+            )
+        else:
+            trial = apply_v12_production_trial_geometry(
+                base, (arm,), source_commit=str(source_commit),
+                configuration=configuration,
+                transaction_identity=transaction_identity,
+                refinement_levels=int(local_mesh_level),
+                prepare_support_state=prepare_support_state,
+            )
     except RuntimeError as exc:
         classifications = {
             "production V12 remesh found no physical event support":
@@ -508,12 +654,23 @@ def _exact_marginal_trial(
         }
         if str(exc) in classifications:
             raise MarginalDriveNotCertified(classifications[str(exc)]) from exc
+        # A candidate-specific V12 certificate rejection is a scientific
+        # unavailability of that isolated mesh level, not a provider crash.
+        # Preserve the full certificate reason and allow the declared refined
+        # family to continue; no rejected support is ever accepted or used.
+        if str(exc).startswith("v12_support_not_certified:"):
+            raise MarginalDriveNotCertified(
+                "V12_SUPPORT_CERTIFICATE_REJECTED: " + str(exc)
+            ) from exc
         raise
-    trial = equilibrate_fixed_load_with_production_fem(trial)
-    accepted_after = complete_accepted_state_fingerprint(state)
-    process_after = _pickle_hash(_kinetic_process_payload(state))
-    if accepted_before != accepted_after or process_before != process_after:
-        raise RuntimeError("virtual marginal trial mutated the accepted state")
+    trial = equilibrate_fixed_load_with_production_fem(
+        trial, exact_linear_solver_cache=_MARGINAL_FACTORIZATION_CACHE)
+    cache_after = dict(_MARGINAL_FACTORIZATION_CACHE.audit())
+    if not batched_state_validation:
+        accepted_after = complete_accepted_state_fingerprint(state)
+        process_after = _pickle_hash(_kinetic_process_payload(state))
+        if accepted_before != accepted_after or process_before != process_after:
+            raise RuntimeError("virtual marginal trial mutated the accepted state")
     if _pickle_hash(base.void_state) != _pickle_hash(trial.void_state):
         raise RuntimeError("virtual marginal trial changed fixed void geometry or inventory")
     if _pickle_hash(_kinetic_process_payload(base)) != _pickle_hash(
@@ -530,8 +687,25 @@ def _exact_marginal_trial(
         ) / float(delta_a_m),
         "Pi_base_J_per_m": float(base.stored_energy_J_per_m),
         "Pi_trial_J_per_m": float(trial.stored_energy_J_per_m),
+        "Pi_parent_before_candidate_refinement_J_per_m": parent_energy,
+        "Pi_refined_unextended_J_per_m": float(base.stored_energy_J_per_m),
+        "Pi_refined_extended_J_per_m": float(trial.stored_energy_J_per_m),
+        "baseline_remesh_energy_change_J_per_m": (
+            float(base.stored_energy_J_per_m)-parent_energy),
+        "physical_crack_extension_energy_change_J_per_m": (
+            float(trial.stored_energy_J_per_m)-float(base.stored_energy_J_per_m)),
+        "matched_discretization": bool(matched_discretization),
+        "matched_mesh_element_count": int(base.mesh.ne),
+        "extended_mesh_element_count": int(trial.mesh.ne),
         "delta_a_m": float(delta_a_m),
         "local_mesh_level": int(local_mesh_level),
+        "target_mechanical_resolution_m": (
+            float(delta_a_m) / (2.0 ** (int(local_mesh_level) + 3))
+        ),
+        "mechanical_refinement_passes": (
+            refinement_passes if matched_discretization else None
+        ),
+        "mechanical_refinement_policy": mechanical_refinement_policy,
         "owning_front_id": branch_id,
         "process_owner_id": process_owner_id,
         "candidate_id": candidate.candidate_id,
@@ -540,6 +714,14 @@ def _exact_marginal_trial(
         "kinetic_process_state_preserved": True,
         "trial_topology_generation": int(trial.crack_network.geometry_generation),
         "trial_support_transaction_identity": trial.v12_support_state.transaction_identity,
+        "virtual_mechanical_trial_transport": virtual_mechanical_trial_transport,
+        "transport_owner_retained": trial.vacancy_transport_state_v2 is not None,
+        "transport_solve_performed": False,
+        "exact_factorization_cache": {
+            "hits_this_trial": cache_after["hits"]-cache_before["hits"],
+            "misses_this_trial": cache_after["misses"]-cache_before["misses"],
+            "cumulative": cache_after,
+        },
     }
 
 
@@ -558,6 +740,11 @@ def hybrid_directional_drive_provider(
     conform_trial_endpoint: Callable[
         [LiveFEMTopologyState, tuple[float, float]], LiveFEMTopologyState
     ] | None = None,
+    finite_increment_mode: bool = False,
+    matched_discretization: bool = False,
+    virtual_mechanical_trial_transport: str = "full",
+    mechanical_refinement_policy: str = "legacy_accumulated_generations",
+    batched_state_validation: bool = False,
 ) -> dict[str, Any]:
     """Return candidate-specific local J or an unblended exact marginal G."""
     active = tuple(state.crack_network.active_tip_ids)
@@ -592,6 +779,12 @@ def hybrid_directional_drive_provider(
         marginal_delta_a_m or (default_delta, (2.0 / 3.0) * default_delta)
     ))
     levels = tuple(int(value) for value in marginal_mesh_levels)
+    if virtual_mechanical_trial_transport not in ("full", "deferred_read_only"):
+        raise ValueError("unknown virtual mechanical trial transport mode")
+    if mechanical_refinement_policy not in (
+        "legacy_accumulated_generations", "physical_candidate_support",
+    ):
+        raise ValueError("unknown marginal mechanical refinement policy")
     if not deltas or any(value <= 0.0 or not math.isfinite(value) for value in deltas):
         raise ValueError("marginal delta-a values must be finite and positive")
     if not levels or any(value < 1 for value in levels):
@@ -640,7 +833,8 @@ def hybrid_directional_drive_provider(
                 "marginal_unavailable_reason": None,
             }
             if not local_valid or evaluate_overlap_marginals:
-                if len(set(deltas)) < 2 or len(set(levels)) < 2:
+                minimum_delta_count = 1 if finite_increment_mode else 2
+                if len(set(deltas)) < minimum_delta_count or len(set(levels)) < 2:
                     marginal_diagnostics.update({
                         "marginal_trial_count_expected": len(set(deltas)) * len(set(levels)),
                         "marginal_unavailable_reason": "INCOMPLETE_MARGINAL_TRIAL_FAMILY",
@@ -661,6 +855,20 @@ def hybrid_directional_drive_provider(
                                     local_mesh_level=level, source_commit=source_commit,
                                     prepare_support_state=prepare_support_state,
                                     conform_trial_endpoint=conform_trial_endpoint,
+                                    # Every energy-difference observation uses
+                                    # an unextended/extended pair on the same
+                                    # candidate-compatible mesh.  Retaining an
+                                    # unmatched legacy path here would make the
+                                    # scientific meaning depend on which
+                                    # consumer requested the marginal.
+                                    matched_discretization=True,
+                                    virtual_mechanical_trial_transport=(
+                                        virtual_mechanical_trial_transport
+                                    ),
+                                    mechanical_refinement_policy=(
+                                        mechanical_refinement_policy
+                                    ),
+                                    batched_state_validation=batched_state_validation,
                                 )
                             except MarginalDriveNotCertified as exc:
                                 outcome = {
@@ -669,11 +877,11 @@ def hybrid_directional_drive_provider(
                                     "delta_a_m": delta,
                                     "local_mesh_level": level,
                                 }
-                            if (
+                            if (not batched_state_validation and (
                                 complete_accepted_state_fingerprint(state) != accepted_before_trials
                                 or _pickle_hash(_kinetic_process_payload(state)) != process_before_trials
                                 or "void:" + _pickle_hash(state.void_state) != void_id
-                            ):
+                            )):
                                 raise RuntimeError(
                                     "marginal observation mutated accepted or process state"
                                 )
@@ -685,26 +893,112 @@ def hybrid_directional_drive_provider(
                             }
                             cache.create(key, recorded)
                             marginal_rows.append(cache.observe_and_discard(key))
-                    marginal_diagnostics = marginal_convergence_diagnostics(
-                        marginal_rows,
-                        delta_a_values_m=deltas,
-                        local_mesh_levels=levels,
-                        expected_identity=expected_identity,
-                    )
+                    if finite_increment_mode:
+                        certified = [
+                            row for row in marginal_rows
+                            if row.get("status") == "CERTIFIED_EXACT_FIXED_VOID_MARGINAL"
+                        ]
+                        ordered_levels = tuple(sorted(set(levels)))
+                        delta = tuple(sorted(set(deltas)))[0]
+                        by_level = {
+                            int(row["local_mesh_level"]): row for row in certified
+                            if float(row["delta_a_m"]) == delta
+                        }
+                        finest = by_level.get(ordered_levels[-1])
+                        previous = by_level.get(ordered_levels[-2])
+                        mesh_error = None
+                        if finest is not None and previous is not None:
+                            first = float(previous["G_marginal_J_per_m2"])
+                            second = float(finest["G_marginal_J_per_m2"])
+                            mesh_error = abs(second-first)/max(
+                                abs(first), abs(second), 1.0e-300)
+                        converged = (
+                            len(certified) == len(set(levels))
+                            and mesh_error is not None
+                            and mesh_error <= MARGINAL_G_MESH_RELATIVE_LIMIT
+                        )
+                        marginal_diagnostics.update({
+                            "marginal_trial_count_expected": len(set(levels)),
+                            "marginal_trial_count_observed": len(certified),
+                            "marginal_all_trials_certified": (
+                                len(certified) == len(set(levels))
+                            ),
+                            "marginal_mesh_relative_errors_by_delta": {
+                                float(delta).hex(): mesh_error,
+                            },
+                            "marginal_delta_a_relative_error_at_finest_mesh": None,
+                            "marginal_signed_G_consistent": bool(
+                                certified and all(
+                                    math.copysign(1.0, float(row["G_marginal_J_per_m2"]))
+                                    == math.copysign(
+                                        1.0, float(certified[0]["G_marginal_J_per_m2"])
+                                    ) for row in certified
+                                )
+                            ),
+                            "marginal_convergence_passed": converged,
+                            "authoritative_delta_a_m": delta if converged else None,
+                            "authoritative_mesh_level": (
+                                ordered_levels[-1] if converged else None
+                            ),
+                            "authoritative_G_marginal_J_per_m2": (
+                                float(finest["G_marginal_J_per_m2"])
+                                if converged and finest is not None else None
+                            ),
+                            "marginal_unavailable_reason": (
+                                None if converged else
+                                "FINITE_INCREMENT_MESH_NOT_CONVERGED"
+                            ),
+                            "finite_increment_mode": True,
+                            "finite_increment_physical_delta_a_m": delta,
+                        })
+                    else:
+                        marginal_diagnostics = marginal_convergence_diagnostics(
+                            marginal_rows,
+                            delta_a_values_m=deltas,
+                            local_mesh_levels=levels,
+                            expected_identity=expected_identity,
+                        )
             authoritative_marginal = (
                 marginal_diagnostics["authoritative_G_marginal_J_per_m2"]
                 if marginal_diagnostics["marginal_convergence_passed"] else None
             )
-            available = local_valid or authoritative_marginal is not None
-            if not available:
+            local_marginal_relative_error = None
+            local_marginal_consistency_passed = None
+            if (
+                evaluate_overlap_marginals and local_valid
+                and authoritative_marginal is not None
+                and not finite_increment_mode
+            ):
+                local_value = float(local["J_local_signed_J_per_m2"])
+                marginal_value = float(authoritative_marginal)
+                local_marginal_relative_error = abs(
+                    local_value-marginal_value
+                )/max(abs(local_value), abs(marginal_value), 1.0e-300)
+                local_marginal_consistency_passed = (
+                    local_marginal_relative_error <= LOCAL_MARGINAL_RELATIVE_LIMIT
+                )
+            available = (
+                authoritative_marginal is not None
+                if finite_increment_mode else
+                local_valid or authoritative_marginal is not None
+            )
+            if local_marginal_consistency_passed is False:
+                available = False
+                G_used = 0.0
+                drive_source = "LOCAL_J_MARGINAL_G_INCONSISTENT"
+            elif not available:
                 G_used = 0.0
                 drive_source = "MARGINAL_G_NOT_CONVERGED"
-            elif local_valid:
+            elif local_valid and not finite_increment_mode:
                 G_used = max(float(local["J_local_signed_J_per_m2"]), 0.0)
                 drive_source = "VALID_NESTED_LOCAL_J"
             else:
                 G_used = max(float(authoritative_marginal), 0.0)
-                drive_source = "EXACT_FIXED_VOID_VIRTUAL_EXTENSION_MARGINAL_G"
+                drive_source = (
+                    "EXACT_FIXED_VOID_FINITE_INCREMENT_G"
+                    if finite_increment_mode else
+                    "EXACT_FIXED_VOID_VIRTUAL_EXTENSION_MARGINAL_G"
+                )
             K_energy = math.sqrt(float(state.material.Eprime) * G_used)
             output_rows.append({
                 **local,
@@ -741,8 +1035,15 @@ def hybrid_directional_drive_provider(
                     "AVAILABLE" if available else "DIRECTIONAL_DRIVE_UNAVAILABLE"
                 ),
                 "directional_drive_unavailable_reason": (
-                    None if available else marginal_diagnostics["marginal_unavailable_reason"]
+                    None if available else (
+                        "LOCAL_J_MARGINAL_G_INCONSISTENT"
+                        if local_marginal_consistency_passed is False else
+                        marginal_diagnostics["marginal_unavailable_reason"]
+                    )
                 ),
+                "local_marginal_relative_error": local_marginal_relative_error,
+                "local_marginal_consistency_limit": LOCAL_MARGINAL_RELATIVE_LIMIT,
+                "local_marginal_consistency_passed": local_marginal_consistency_passed,
                 "effective_rate": 0.0 if not available else None,
             })
     if seen_pairs != expected_pairs:
@@ -769,6 +1070,9 @@ def hybrid_directional_drive_provider(
         "local_provider": provider,
         "trial_cache_creation_count": cache.creation_count,
         "trial_cache_destruction_count": cache.destruction_count,
+        "state_validation_policy": (
+            "BATCHED_BEFORE_AFTER_COMPLETE_ACCEPTED_AND_PROCESS_FINGERPRINT"
+            if batched_state_validation else "PER_TRIAL_PLUS_PROVIDER_BOUNDARY"),
     }
 
 

@@ -8,12 +8,39 @@ dilation.  The advancing endpoint is half open: an element touched only at
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from collections import OrderedDict
 import hashlib
 
 import numpy as np
 
 
 CRACK_REPRESENTATION = "sharp_wake_causal_v11"
+_SUPPORT_CACHE_MAXIMUM_ENTRIES = 256
+_SUPPORT_CACHE = OrderedDict()
+_SUPPORT_CACHE_HITS = 0
+_SUPPORT_CACHE_MISSES = 0
+
+
+def _support_cache_key(mesh, start, end, tolerance):
+    digest=hashlib.sha256()
+    for value in (np.asarray(mesh.nodes,dtype=np.float64),
+                  np.asarray(mesh.elems,dtype=np.int64),
+                  np.asarray(start,dtype=np.float64),np.asarray(end,dtype=np.float64),
+                  np.asarray([tolerance],dtype=np.float64)):
+        array=np.ascontiguousarray(value)
+        digest.update(array.dtype.str.encode())
+        digest.update(np.asarray(array.shape,dtype=np.int64).tobytes())
+        digest.update(array.tobytes())
+    return digest.hexdigest()
+
+
+def causal_support_cache_audit():
+    return {"schema":"v11.exact-causal-support-geometry-cache/1",
+            "maximum_entries":_SUPPORT_CACHE_MAXIMUM_ENTRIES,
+            "resident_entries":len(_SUPPORT_CACHE),"hits":_SUPPORT_CACHE_HITS,
+            "misses":_SUPPORT_CACHE_MISSES,
+            "dependency_contract":"MESH_NODES_ELEMENTS_SEGMENT_ENDPOINTS_TOLERANCE",
+            "field_values_cached":False}
 
 
 @dataclass(frozen=True)
@@ -119,6 +146,13 @@ def causal_segment_support(
     length = float(np.linalg.norm(end - start))
     if not np.isfinite(length) or length <= 0.0:
         raise ValueError("causal crack segment must have positive finite length")
+    global _SUPPORT_CACHE_HITS, _SUPPORT_CACHE_MISSES
+    key=_support_cache_key(mesh,start,end,float(tolerance))
+    cached=_SUPPORT_CACHE.get(key)
+    if cached is not None:
+        _SUPPORT_CACHE.move_to_end(key); _SUPPORT_CACHE_HITS+=1
+        return cached[0].copy(),cached[1].copy()
+    _SUPPORT_CACHE_MISSES+=1
     selected: list[int] = []
     represented: list[float] = []
     endpoint_cut = max(0.0, 1.0 - float(tolerance))
@@ -135,7 +169,11 @@ def causal_segment_support(
             continue
         selected.append(int(element_id))
         represented.append(length * (hi - lo))
-    return np.asarray(selected, dtype=int), np.asarray(represented, dtype=float)
+    result=(np.asarray(selected,dtype=int),np.asarray(represented,dtype=float))
+    _SUPPORT_CACHE[key]=(result[0].copy(),result[1].copy())
+    if len(_SUPPORT_CACHE)>_SUPPORT_CACHE_MAXIMUM_ENTRIES:
+        _SUPPORT_CACHE.popitem(last=False)
+    return result
 
 
 def committed_physical_segments(network) -> tuple[tuple[np.ndarray, np.ndarray], ...]:
@@ -181,9 +219,38 @@ def rerasterize_refined_topology_damage(
     new_damage = element_damage(refined_state.mesh, refined_state.damage)
     old_support = _network_support(parent_state.mesh, segments)
     threshold = 1.0 - max(float(fully_damaged_tolerance), 0.0)
-    topology_parents = tuple(
+    topology_parents = set(
         int(value) for value in old_support if old_damage[int(value)] >= threshold
     )
+    # A V12 wake owns a certified node-star closure wider than the elements
+    # intersected by the physical graph.  Prolonging those coarse closure
+    # elements verbatim makes the representation width permanent and can
+    # consume a later short physical extension.  When (and only when) the
+    # ownership record belongs to this exact parent mesh, replace all of its
+    # children and rebuild support from the authoritative crack graph below.
+    # Unrelated fully damaged material is deliberately not touched.
+    ownership = getattr(parent_state, "v12_support_state", None)
+    if ownership is not None:
+        from .sharp_wake_backend_v12 import array_fingerprint
+        ownership_matches_parent = (
+            ownership.mesh_geometry_fingerprint
+            == array_fingerprint(parent_state.mesh.nodes)
+            and ownership.mesh_connectivity_fingerprint
+            == array_fingerprint(parent_state.mesh.elems)
+            and int(ownership.mesh_generation) == int(getattr(
+                parent_state.mesh, "geometry_generation",
+                getattr(parent_state.mesh, "generation", 0),
+            ))
+        )
+        if ownership_matches_parent:
+            for value in ownership.selected_support_elements:
+                element_id = int(value)
+                if element_id < 0 or element_id >= len(old_damage):
+                    raise RuntimeError("V12 remesh ownership contains an invalid parent element")
+                if old_damage[element_id] < threshold:
+                    raise RuntimeError("V12 remesh ownership is inconsistent with accepted damage")
+                topology_parents.add(element_id)
+    topology_parents = tuple(sorted(topology_parents))
     replaced_children = tuple(sorted({
         int(child)
         for parent in topology_parents
@@ -243,7 +310,7 @@ def apply_causal_segment(
 
 __all__ = [
     "CRACK_REPRESENTATION", "CausalSupportAudit", "TopologyDamageRemapAudit",
-    "apply_causal_segment", "causal_segment_support",
+    "apply_causal_segment", "causal_segment_support", "causal_support_cache_audit",
     "committed_physical_segments", "element_damage", "mechanical_fingerprint",
     "rerasterize_refined_topology_damage",
 ]

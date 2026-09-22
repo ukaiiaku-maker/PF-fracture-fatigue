@@ -21,13 +21,14 @@ from arrhenius_fracture.unified_fracture_material_v5 import (
 )
 from arrhenius_fracture.voiding_production_v5 import (
     _canonical_front_process_owner, build_production_void_state, crack_tip_tensor,
-    capture_sharp_front_engine, directional_clock_rates, fresh_sharp_front_engine,
+    capture_sharp_front_engine, create_subgrid_cavity_from_vacancies,
+    directional_clock_rates, fresh_sharp_front_engine,
     remesh_cavity, restore_sharp_front_engine, sharp_front_constitutive_response,
     sharp_front_engine_fingerprint,
 )
 from arrhenius_fracture.voiding_v5 import (
     ProductionVoidState, VoidPhase, VoidSite, HazardClock,
-    create_subgrid_cavity, promote_cavity,
+    promote_cavity,
 )
 
 
@@ -133,12 +134,18 @@ def _resolved_far_void_error(bundle, center_x):
     path = ((0.0, 0.0), (0.0005725993004046688, 0.0))
     no_void, hole = build_production_void_state(
         bundle=bundle, enabled=True, cavity_center_m=(center_x, 0.0), crack_path_m=path,
+        initial_vacancy_fraction_gp=1.0,
+        test_only_extreme_reservoir=True,
     )
     site = replace(no_void.void_state.sites[0], phase=VoidPhase.STABLE_SUBGRID_VOID)
-    void_state = replace(no_void.void_state, sites=(site,))
-    void_state = create_subgrid_cavity(void_state, site.site_id, 5.0e-5)
-    void_state = promote_cavity(void_state, void_state.cavities[0].cavity_id, 5.0e-5)
-    resolved = remesh_cavity(no_void, hole, void_state, "bounded-far-void-limit")
+    seeded = replace(no_void, void_state=replace(no_void.void_state, sites=(site,)))
+    seeded, _ = create_subgrid_cavity_from_vacancies(
+        seeded, site.site_id, 5.0e-5, process_zone_length_m=5.0e-5,
+    )
+    void_state = promote_cavity(
+        seeded.void_state, seeded.void_state.cavities[0].cavity_id, 5.0e-5,
+    )
+    resolved = remesh_cavity(seeded, hole, void_state, "bounded-far-void-limit")
 
     def reaction(state):
         _, residual, *_ = assemble_mechanics(

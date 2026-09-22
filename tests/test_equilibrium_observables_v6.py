@@ -9,12 +9,17 @@ from arrhenius_fracture.topology_transaction_v11 import (
     EquilibriumObservables,
     EquilibriumObservablesUnavailable,
     _measure_accepted_equilibrium,
+    complete_equilibrium_force_accounting,
     require_equilibrium_observables,
 )
 
 
 def test_manufactured_equilibrium_records_direct_reactions_and_energy_identity():
-    mesh = SimpleNamespace(ndof=8, area_e=np.asarray((1.0,)))
+    mesh = SimpleNamespace(
+        ndof=8, area_e=np.asarray((1.0,)),
+        nodes=np.asarray(((0.0, -1.0), (1.0, -1.0),
+                          (0.0, 1.0), (1.0, 1.0))),
+    )
     boundary = SimpleNamespace(
         top_nodes=np.asarray((2, 3)), bot_nodes=np.asarray((0, 1)),
         left_bot=0, right_bot=1,
@@ -34,6 +39,37 @@ def test_manufactured_equilibrium_records_direct_reactions_and_energy_identity()
     assert ledger["latest_compliance_m2_per_N"] == pytest.approx(0.02)
     assert ledger["latest_external_work_J_per_m"] == pytest.approx(1.0)
     assert ledger["latest_energy_reaction_identity"] == pytest.approx(0.0)
+
+
+def test_complete_force_accounting_includes_off_grip_auxiliary_y_pin():
+    mesh = SimpleNamespace(
+        ndof=10, area_e=np.asarray((1.0,)),
+        nodes=np.asarray(((0.2, -1.0), (0.8, -1.0),
+                          (0.2, 1.0), (0.8, 1.0), (0.5, -0.9))),
+    )
+    boundary = SimpleNamespace(
+        top_nodes=np.asarray((2, 3)), bot_nodes=np.asarray((0, 1)),
+        left_bot=4, right_bot=1,
+    )
+    state = SimpleNamespace(
+        mesh=mesh, boundary=boundary,
+        displacement=np.asarray((0.0, -0.1, 0.0, -0.1, 0.0, 0.1,
+                                 0.0, 0.1, 0.0, -0.1)),
+        ep_gp=np.zeros((3, 1)),
+    )
+    # The two grips alone differ by 20%, but the explicitly constrained
+    # off-grip auxiliary y pin carries the missing physical reaction.
+    residual = np.asarray((0.0, -4.0, 0.0, -4.0, 0.0, 5.0,
+                           0.0, 5.0, 0.0, -2.0))
+    sigma = np.zeros((3, 1))
+    measured = _measure_accepted_equilibrium(state, residual, sigma, 1.0)
+    accounting = complete_equilibrium_force_accounting(state, residual)
+    assert measured.top_bottom_balance_residual == pytest.approx(2.0/9.0)
+    assert accounting["boundary_groups"][
+        "left_auxiliary_pin_y_outside_grip"]["reaction_N_per_m"] == -2.0
+    assert accounting["all_support_resultant_N_per_m"] == pytest.approx([0.0, 0.0])
+    assert accounting["missing_constrained_dof_ids"] == []
+    assert accounting["duplicated_constrained_dof_ids"] == []
 
 
 def test_omitted_or_zero_reaction_ledger_fails_closed_instead_of_becoming_zero():
@@ -96,3 +132,29 @@ def test_typed_equilibrium_observations_survive_checkpoint_restart(tmp_path):
     assert manifest["equilibrium_observables"] == state.equilibrium_observables.to_dict()
     assert restored.equilibrium_observables == state.equilibrium_observables
     assert dict(require_equilibrium_observables(restored)) == dict(require_equilibrium_observables(state))
+
+
+def test_exact_factorization_cache_reuses_operator_with_current_eigenstrain_rhs():
+    from arrhenius_fracture.topology_transaction_v11 import (
+        ExactDirichletFactorizationCache,
+        equilibrate_fixed_load_with_production_fem,
+    )
+    from arrhenius_fracture.unified_fracture_material_v5 import material_bundle
+    from arrhenius_fracture.voiding_production_v5 import build_production_void_state
+
+    state, _ = build_production_void_state(bundle=material_bundle("DBTT"), enabled=True)
+    cache = ExactDirichletFactorizationCache(2)
+    first = equilibrate_fixed_load_with_production_fem(
+        state, exact_linear_solver_cache=cache)
+    changed_ep = np.asarray(state.ep_gp).copy()
+    changed_ep[0, 0] += 1.0e-8
+    changed = replace(state, ep_gp=changed_ep)
+    cached = equilibrate_fixed_load_with_production_fem(
+        changed, exact_linear_solver_cache=cache)
+    direct = equilibrate_fixed_load_with_production_fem(changed)
+    assert cache.audit()["hits"] == 1
+    assert np.allclose(cached.displacement, direct.displacement,
+                       rtol=1.0e-12, atol=1.0e-18)
+    assert cached.stored_energy_J_per_m == pytest.approx(
+        direct.stored_energy_J_per_m, rel=1.0e-12, abs=1.0e-18)
+    assert np.allclose(first.ep_gp, state.ep_gp)

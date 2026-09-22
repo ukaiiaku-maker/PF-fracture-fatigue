@@ -304,6 +304,15 @@ def recover_piecewise_equilibrated_boundary_stress_v2(
     boundary_resultant = np.sum([
         np.asarray(row["traction_vector_Pa"]) * row["edge_length_m"] for row in boundary_rows
     ], axis=0)
+    source_patch_id = min(
+        range(len(selected)),
+        key=lambda patch_id: float(np.linalg.norm(
+            xy[tri[selected[patch_id]]].mean(axis=0)-source)))
+    source_local_point = (source-source) @ basis / scale
+    source_local_tensor = _tensor(
+        coefficients[source_patch_id],
+        *element_coordinates(source_patch_id, source_local_point))
+    source_tensor = remote*basis@source_local_tensor@basis.T
     window_identity = {
         "source_coordinate_m": source.tolist(), "cavity_center_m": center.tolist(),
         "cavity_radius_m": radius, "half_width_and_depth_m": scale,
@@ -323,6 +332,8 @@ def recover_piecewise_equilibrated_boundary_stress_v2(
         "interface_traction_jump_residual": interface_jump,
         "resultant_residual": resultant_residual, "moment_residual": abs(moment_value),
         "constraint_limits": {
+            "normalized_boundary_traction": ACCEPTANCE_LIMITS[
+                "normalized_equilibrated_boundary_traction"],
             "equilibrium": ACCEPTANCE_LIMITS["maximum_equilibrium_residual"],
             "interface_traction_jump": ACCEPTANCE_LIMITS["maximum_interface_traction_jump_relative"],
             "resultant": ACCEPTANCE_LIMITS["maximum_resultant_residual_relative"],
@@ -340,6 +351,11 @@ def recover_piecewise_equilibrated_boundary_stress_v2(
         "boundary_resultant_N_per_m": np.asarray(boundary_resultant).tolist(),
         "boundary_traction_rms_Pa": rms,
         "normalized_boundary_traction": rms / remote,
+        "source_tensor_Pa": source_tensor.tolist(),
+        "source_sigma_tt_Pa": float(tangent@source_tensor@tangent),
+        "source_sigma_nn_Pa": float(normal@source_tensor@normal),
+        "source_sigma_nt_Pa": float(normal@source_tensor@tangent),
+        "source_tensor_element_id": int(selected[source_patch_id]),
         "remote_traction_scale_Pa": remote,
         "window_identity": {**window_identity, "sha256": _sha(window_identity)},
         "state_fingerprint": str(state_fingerprint),

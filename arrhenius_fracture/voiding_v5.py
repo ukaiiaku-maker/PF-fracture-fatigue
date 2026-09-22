@@ -137,11 +137,23 @@ class ProductionVoidState:
     consumed_defect_inventory_area_m2: float = 0.0
     schema: str = SCHEMA
     kinetic_integrals_v1: Mapping[str, Any] | None = None
+    # The direct dislocation-interaction owner is nested here so topology
+    # commits, isolated trials, checkpoints, rollback, and the complete state
+    # fingerprint carry both birth mechanisms atomically.  ``None`` preserves
+    # checkpoints made before the mechanism-completeness extension.
+    dislocation_interaction_state: Any = None
+    # One mechanism-resolved physical owner per born embryo/cavity. Nested
+    # ownership makes topology commit, rollback, fingerprint and checkpoint
+    # atomic without adding a parallel scientific checkpoint path.
+    embryo_growth_states: tuple[Any, ...] = ()
+    embryo_growth_configuration: Any = None
 
 
 def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
                     stress_tensor_Pa: np.ndarray,
-                    normal_xy: tuple[float, float] = (1.0, 0.0)) -> dict[str, float]:
+                    normal_xy: tuple[float, float] = (1.0, 0.0),
+                    vacancy_attachment_frequency_s: float | None = None,
+                    vacancy_growth: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """Compute rates from the local production tensor; no candidate weight here."""
     stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
     eigenvalues = np.linalg.eigvalsh(stress)
@@ -177,8 +189,17 @@ def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
     accommodation = rate(config.plastic_accommodation_barrier_J, von_mises_3d * config.stabilization_activation_volume_m3)
     series = 0.0 if surface <= 0.0 or transport <= 0.0 else 1.0 / (1.0 / surface + 1.0 / transport)
     series = 0.0 if series <= 0.0 or accommodation <= 0.0 else 1.0 / (1.0 / series + 1.0 / accommodation)
-    return {
-        "birth_s": rate(config.birth_barrier_J, birth_work),
+    birth_prefactor = (
+        config.attempt_frequency_s
+        if vacancy_attachment_frequency_s is None
+        else float(vacancy_attachment_frequency_s)
+    )
+    if not math.isfinite(birth_prefactor) or birth_prefactor < 0.0:
+        raise ValueError("vacancy attachment frequency must be finite and nonnegative")
+    birth_effective = max(float(config.birth_barrier_J) - birth_work, 0.0)
+    birth = birth_prefactor * math.exp(-birth_effective / thermal)
+    result = {
+        "birth_s": birth,
         "stabilization_s": rate(config.stabilization_barrier_J, stabilization_work),
         "healing_s": rate(config.healing_barrier_J, healing_work),
         "local_max_principal_stress_Pa": tensile,
@@ -199,6 +220,18 @@ def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
         "plastic_accommodation_s": accommodation,
         "series_limited_growth_s": series,
     }
+    if vacancy_growth is not None:
+        radial_scale = float(config.radial_growth_scale_m)
+        result.update({
+            "vacancy_transport_s": float(vacancy_growth["Rdot_diff_m_s"]) / radial_scale,
+            "plastic_accommodation_s": float(vacancy_growth["Rdot_plast_m_s"]) / radial_scale,
+            "series_limited_growth_s": float(vacancy_growth["Rdot_m_s"]) / radial_scale,
+            "Rdot_diff_m_s": float(vacancy_growth["Rdot_diff_m_s"]),
+            "Rdot_plast_m_s": float(vacancy_growth["Rdot_plast_m_s"]),
+            "Rdot_m_s": float(vacancy_growth["Rdot_m_s"]),
+            "controlling_branch": str(vacancy_growth["controlling_branch"]),
+        })
+    return result
 
 
 def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
@@ -240,7 +273,15 @@ def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
             inject("second_hit_embryo_transition")
             continue
         if current.phase == VoidPhase.EMBRYO:
-            ts = current.stabilization.crossing_time_exact(float(rates["stabilization_s"]))
+            growth_at_start = next((item for item in state.embryo_growth_states
+                                    if item.site_id == site_id), None)
+            waiting = bool(growth_at_start is not None and
+                growth_at_start.stabilization_action_complete_waiting_for_radius)
+            below_stable_radius = bool(waiting and growth_at_start.radius_m <
+                growth_at_start.cavity_emission_state.parameter_row.minimum_stable_radius_m)
+            stabilization_rate = (0.0 if below_stable_radius else
+                                  float(rates["stabilization_s"]))
+            ts = current.stabilization.crossing_time_exact(stabilization_rate)
             th = current.healing.crossing_time_exact(float(rates["healing_s"]))
             ts = math.inf if ts is None else ts
             th = math.inf if th is None else th
@@ -249,13 +290,45 @@ def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
             step = crossing if reached else remaining
             current = replace(
                 current,
-                stabilization=current.stabilization.advance(float(rates['stabilization_s']), step),
+                stabilization=current.stabilization.advance(stabilization_rate, step),
                 healing=current.healing.advance(float(rates['healing_s']), step),
             )
             remaining = max(remaining-step, 0)
             if not reached:
                 break
+            growth = next((item for item in state.embryo_growth_states
+                           if item.site_id == site_id), None)
+            if th <= ts and growth is not None and growth.emitted_loop_count_effective > 0.0:
+                # Escaped/retained loops are accepted plastic defects and may
+                # not disappear in a pristine-site healing transition.
+                from .embryo_growth_v1 import heal_embryo
+                residual, _ = heal_embryo(growth)
+                state = replace(state, embryo_growth_states=tuple(
+                    residual if item.site_id == site_id else item
+                    for item in state.embryo_growth_states
+                ))
+                phase = VoidPhase.STABLE_SUBGRID_VOID
+                current = replace(current, phase=phase)
+                events.append("HEALING_PROHIBITED_RESIDUAL_DEFECT")
+                inject("healing")
+                break
+            if ts < th and growth is not None:
+                minimum = growth.cavity_emission_state.parameter_row.minimum_stable_radius_m
+                if growth.radius_m < minimum:
+                    state = replace(state, embryo_growth_states=tuple(
+                        replace(item, stabilization_action_complete_waiting_for_radius=True)
+                        if item.site_id == site_id else item
+                        for item in state.embryo_growth_states
+                    ))
+                    events.append("STABILIZATION_RADIUS_NOT_REACHED")
+                    break
             phase = VoidPhase.HEALED_SITE if th <= ts else VoidPhase.STABLE_SUBGRID_VOID
+            if phase == VoidPhase.STABLE_SUBGRID_VOID and growth is not None:
+                state = replace(state, embryo_growth_states=tuple(
+                    replace(item, stabilization_action_complete_waiting_for_radius=False)
+                    if item.site_id == site_id else item
+                    for item in state.embryo_growth_states
+                ))
             current = replace(current, phase=phase)
             events.append("HEALED" if phase == VoidPhase.HEALED_SITE else "STABILIZED")
             inject("healing" if phase == VoidPhase.HEALED_SITE else "stabilization")
@@ -273,15 +346,27 @@ def create_subgrid_cavity(state: ProductionVoidState, site_id: str,
         raise ValueError("site has not stabilized")
     if any(item.parent_site_id == site_id for item in state.cavities):
         raise ValueError("a stabilized site may own only one cavity")
-    area = math.pi * float(radius_m) ** 2
-    if area > state.available_defect_inventory_area_m2:
+    growth = next((item for item in state.embryo_growth_states
+                   if item.site_id == site_id), None)
+    area = growth.area_m2 if growth is not None else math.pi * float(radius_m) ** 2
+    radius_m = growth.radius_m if growth is not None else float(radius_m)
+    if growth is None and area > state.available_defect_inventory_area_m2:
         raise ValueError("initial cavity seed exceeds available defect inventory")
     cavity = Cavity2D("void:" + site_id, site_id, site.center_m, radius_m, area, area,
                       VoidPhase.STABLE_SUBGRID_VOID, lineage=(site_id,))
+    growth_states = state.embryo_growth_states
+    if growth is not None:
+        growth_states = tuple(
+            replace(item, cavity_id=cavity.cavity_id)
+            if item.site_id == site_id else item for item in growth_states
+        )
     result = replace(
         state, cavities=state.cavities + (cavity,),
-        available_defect_inventory_area_m2=state.available_defect_inventory_area_m2 - area,
-        consumed_defect_inventory_area_m2=state.consumed_defect_inventory_area_m2 + area,
+        available_defect_inventory_area_m2=(state.available_defect_inventory_area_m2
+            if growth is not None else state.available_defect_inventory_area_m2-area),
+        consumed_defect_inventory_area_m2=(state.consumed_defect_inventory_area_m2
+            if growth is not None else state.consumed_defect_inventory_area_m2+area),
+        embryo_growth_states=growth_states,
         event_history=state.event_history + ({"event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT",
                                               "cavity_id": cavity.cavity_id, "area_m2": area},),
     )
@@ -452,8 +537,14 @@ def promote_cavity(state: ProductionVoidState, cavity_id: str,
         geometry_generation=cavity.geometry_generation + 1,
         lineage=cavity.lineage + ("GEOMETRIC_PROMOTION",),
     )
+    growth_states = state.embryo_growth_states
+    growth = next((item for item in growth_states if item.cavity_id == cavity_id), None)
+    if growth is not None:
+        from .embryo_growth_v1 import promote_representation
+        promoted_growth = promote_representation(growth, cavity_id)
+        growth_states = tuple(promoted_growth if item is growth else item for item in growth_states)
     return replace(
-        replace_cavity(state, updated),
+        replace_cavity(state, updated), embryo_growth_states=growth_states,
         event_history=state.event_history + ({"event": "GEOMETRIC_PROMOTION", "cavity_id": cavity_id},),
     )
 
@@ -467,10 +558,28 @@ def serialize(state: ProductionVoidState | None) -> str:
         if isinstance(value, Enum): return value.value
         if hasattr(value, "__dataclass_fields__"):
             return {name: encode(getattr(value, name)) for name in value.__dataclass_fields__
-                    if not (name in ('integrated_action_exact', 'kinetic_integrals_v1') and getattr(value, name) is None)}
+                    if not ((name in (
+                        'integrated_action_exact', 'kinetic_integrals_v1',
+                        'dislocation_interaction_state', 'embryo_growth_configuration',
+                    ) and getattr(value, name) is None)
+                    or (name == 'cavity_emission_parameter_row'
+                        and getattr(value, name) is None)
+                    or (name == 'embryo_growth_states' and not getattr(value, name)))}
         if isinstance(value, Mapping): return {str(k): encode(v) for k, v in value.items()}
         if isinstance(value, (tuple, list)): return [encode(v) for v in value]
         if isinstance(value, np.generic): return value.item()
+        # Infinity is a legitimate *identity* value for an exhausted or
+        # currently ineligible stochastic clock.  JSON's non-standard bare
+        # ``Infinity`` token is deliberately disabled below, so preserve the
+        # value with an explicit, reversible tag instead of dropping it or
+        # replacing it with a finite sentinel.  This is primarily encountered
+        # after a final direct-interaction hit; it is not a kinetic estimate.
+        if isinstance(value, float) and not math.isfinite(value):
+            if math.isnan(value):
+                return {"__nonfinite_float__": "nan"}
+            return {"__nonfinite_float__": (
+                "positive_infinity" if value > 0.0 else "negative_infinity"
+            )}
         return value
     return json.dumps(encode(state), sort_keys=True, separators=(",", ":"), allow_nan=False)
 

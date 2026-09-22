@@ -25,6 +25,7 @@ from arrhenius_fracture.hybrid_directional_drive_v5 import (
 from arrhenius_fracture.live_topology_kernel_v11 import evaluate_exact_topology
 from arrhenius_fracture.topology_transaction_v11 import LiveFEMTopologyState
 from arrhenius_fracture.unified_fracture_material_v5 import benchmark_material_bundle, bind_identity
+from arrhenius_fracture.voiding_v5 import Cavity2D, ProductionVoidState, VoidPhase
 
 BUNDLE = benchmark_material_bundle("DBTT")
 
@@ -128,6 +129,8 @@ def _hybrid(
     state, candidates_by_tip, *, contour_radius_m=6.0e-5,
     overlap=False, deltas=(3.0e-5, 2.0e-5), levels=(2, 3),
     process_owner_by_tip=None,
+    virtual_mechanical_trial_transport="full",
+    mechanical_refinement_policy="legacy_accumulated_generations",
 ):
     if process_owner_by_tip is None:
         process_owner_by_tip = {
@@ -150,6 +153,8 @@ def _hybrid(
         conform_trial_endpoint=lambda trial, endpoint: _conform_bulk_point(
             trial, endpoint, identity="HYBRID_TEST_ENDPOINT_CONFORMING",
         ),
+        virtual_mechanical_trial_transport=virtual_mechanical_trial_transport,
+        mechanical_refinement_policy=mechanical_refinement_policy,
     )
 
 
@@ -201,6 +206,39 @@ def _relative(first, second):
     return abs(float(first) - float(second)) / max(abs(float(first)), abs(float(second)), 1.0e-12)
 
 
+def test_subgrid_cavity_has_no_explicit_mesh_surface_inventory():
+    state = _state_from_request(live_straight_request(10.0e-6))
+    radius_m = 42.0e-9
+    cavity = Cavity2D(
+        cavity_id="void:subgrid-test",
+        parent_site_id="site:subgrid-test",
+        center_m=(4.0e-4, 0.0),
+        radius_m=radius_m,
+        area_m2=math.pi * radius_m**2,
+        inventory_area_m2=math.pi * radius_m**2,
+        phase=VoidPhase.STABLE_SUBGRID_VOID,
+        lineage=("RESIDUAL_LOOP_BEARING_DEFECT",),
+    )
+    subgrid = replace(
+        state,
+        void_state=ProductionVoidState(sites=(), cavities=(cavity,)),
+    )
+
+    assert hybrid_module.cavity_free_surface_inventory(subgrid) == ()
+    refreshed = _refresh_downstream_boundary_context(subgrid)
+    assert "boundary_terminal_context" in refreshed.junction_process_state
+
+    resolved = replace(
+        subgrid,
+        void_state=replace(
+            subgrid.void_state,
+            cavities=(replace(cavity, phase=VoidPhase.RESOLVED_VOID),),
+        ),
+    )
+    with pytest.raises(RuntimeError, match="no actual free-surface edges"):
+        hybrid_module.cavity_free_surface_inventory(resolved)
+
+
 def _synthetic_marginal_identity(front_id="front-A", owner_id="owner-A"):
     return {
         "candidate_id": "candidate-A",
@@ -237,6 +275,71 @@ def _synthetic_family(values):
         local_mesh_levels=(2, 3),
         expected_identity=_synthetic_marginal_identity(),
     )
+
+
+def test_finite_increment_mode_requires_mesh_convergence_not_second_physical_increment(monkeypatch):
+    request = live_straight_request(10.0e-6)
+    state = _state_from_request(request)
+    tip_id = state.crack_network.active_tip_ids[0]
+    candidate = request.candidates_by_tip[tip_id][0]
+    calls = []
+
+    def exact(_state, **kwargs):
+        calls.append((kwargs["delta_a_m"], kwargs["local_mesh_level"]))
+        value = 10.0 if kwargs["local_mesh_level"] == 1 else 10.02
+        return {
+            "status": "CERTIFIED_EXACT_FIXED_VOID_MARGINAL",
+            "G_marginal_J_per_m2": value,
+            "Pi_base_J_per_m": 1.0,
+            "Pi_trial_J_per_m": 1.0-value*kwargs["delta_a_m"],
+            "delta_a_m": kwargs["delta_a_m"],
+            "local_mesh_level": kwargs["local_mesh_level"],
+        }
+
+    monkeypatch.setattr(hybrid_module, "_exact_marginal_trial", exact)
+    result = hybrid_directional_drive_provider(
+        state, {tip_id: (candidate,)},
+        process_owner_by_tip={tip_id: f"process-owner:{tip_id}"},
+        contour_radius_m=1.0e-5,
+        marginal_delta_a_m=(7.5e-5,), marginal_mesh_levels=(1, 2),
+        evaluate_overlap_marginals=True, finite_increment_mode=True,
+    )
+    row = result["directional"][0]
+    assert calls == [(7.5e-5, 1), (7.5e-5, 2)]
+    assert row["marginal_convergence_passed"]
+    assert row["drive_source"] == "EXACT_FIXED_VOID_FINITE_INCREMENT_G"
+    assert row["G_kinetic_used_J_per_m2"] == pytest.approx(10.02)
+
+
+def test_finite_increment_mode_fails_closed_when_mesh_levels_disagree(monkeypatch):
+    request = live_straight_request(10.0e-6)
+    state = _state_from_request(request)
+    tip_id = state.crack_network.active_tip_ids[0]
+    candidate = request.candidates_by_tip[tip_id][0]
+
+    def exact(_state, **kwargs):
+        value = 10.0 if kwargs["local_mesh_level"] == 1 else 20.0
+        return {
+            "status": "CERTIFIED_EXACT_FIXED_VOID_MARGINAL",
+            "G_marginal_J_per_m2": value,
+            "Pi_base_J_per_m": 1.0,
+            "Pi_trial_J_per_m": 1.0-value*kwargs["delta_a_m"],
+            "delta_a_m": kwargs["delta_a_m"],
+            "local_mesh_level": kwargs["local_mesh_level"],
+        }
+
+    monkeypatch.setattr(hybrid_module, "_exact_marginal_trial", exact)
+    row = hybrid_directional_drive_provider(
+        state, {tip_id: (candidate,)},
+        process_owner_by_tip={tip_id: f"process-owner:{tip_id}"},
+        contour_radius_m=1.0e-5, marginal_delta_a_m=(7.5e-5,),
+        marginal_mesh_levels=(1, 2), evaluate_overlap_marginals=True,
+        finite_increment_mode=True,
+    )["directional"][0]
+    assert not row["marginal_convergence_passed"]
+    assert row["directional_drive_status"] == "DIRECTIONAL_DRIVE_UNAVAILABLE"
+    assert row["drive_source"] == "MARGINAL_G_NOT_CONVERGED"
+    assert row["G_kinetic_used_J_per_m2"] == 0.0
 
 
 def _print_marginal_diagnostics(label, diagnostics):
@@ -315,18 +418,22 @@ def test_4_overlap_local_and_marginal_agree_without_blending(far_child_state):
     )
     row = result["directional"][0]
     assert row["local_contour_valid"]
-    assert row["drive_source"] == "VALID_NESTED_LOCAL_J"
     assert len(row["marginal_trial_rows"]) == 4
     finest_smallest = next(
         trial for trial in row["marginal_trial_rows"]
         if trial["delta_a_m"] == 2.0e-5 and trial["local_mesh_level"] == 3
     )
-    assert _relative(
-        row["G_local_J_per_m2"], finest_smallest["G_marginal_J_per_m2"]
-    ) <= 0.15
-    assert not row["marginal_convergence_passed"]
-    assert row["G_marginal_J_per_m2"] is None
-    assert row["G_kinetic_used_J_per_m2"] == max(row["G_local_J_per_m2"], 0.0)
+    relative = _relative(
+        row["G_local_J_per_m2"], finest_smallest["G_marginal_J_per_m2"])
+    assert relative > 0.15
+    assert row["local_marginal_relative_error"] == pytest.approx(relative)
+    assert row["local_marginal_consistency_passed"] is False
+    assert row["drive_source"] == "LOCAL_J_MARGINAL_G_INCONSISTENT"
+    assert row["directional_drive_status"] == "DIRECTIONAL_DRIVE_UNAVAILABLE"
+    assert row["G_kinetic_used_J_per_m2"] == 0.0
+    assert row["marginal_convergence_passed"]
+    assert row["G_marginal_J_per_m2"] == pytest.approx(
+        finest_smallest["G_marginal_J_per_m2"])
 
 
 def test_5_near_void_rejects_contour_and_requires_converged_exact_marginal(
@@ -460,8 +567,10 @@ def test_7_real_child_continuation_uses_one_hybrid_first_passage_and_topology_ac
     assert operations.count("accepted_snapshot") == 1
     assert operations.count("topology_verification") == 1
     payload = continued.tip_process_state["by_branch"][CHILD_ID]
-    assert payload["last_step_audit"]["fired"]
-    assert payload["last_step_audit"]["n_fire"] == 1
+    assert not payload["last_step_audit"]["fired"]
+    assert payload["last_step_audit"]["n_fire"] == 0
+    assert payload["last_step_audit"]["event_moving_frame_renewal_count"] == 1
+    assert payload["last_step_audit"]["event_moving_frame_advance_m"] > 0.0
     engine = restore_sharp_front_engine(continued.material, BUNDLE, payload)
     assert engine.r_eff() == pytest.approx(
         engine.f.r0 + engine.f.c_blunt * engine.b * engine.N_em
@@ -763,3 +872,51 @@ def test_15_expected_noncertification_fails_closed_and_programming_errors_propag
             {CHILD_ID: near_void_child_state.competition.candidates},
         )
     assert pickle.dumps(near_void_child_state, protocol=5) == before
+
+
+def test_16_read_only_transport_and_physical_refinement_policy_are_explicit(
+    far_child_state, monkeypatch,
+):
+    before = pickle.dumps(far_child_state, protocol=5)
+    observed = []
+
+    def converged_trial(_state, *, delta_a_m, local_mesh_level, **kwargs):
+        observed.append((
+            kwargs["virtual_mechanical_trial_transport"],
+            kwargs["mechanical_refinement_policy"],
+        ))
+        return {
+            "status": "CERTIFIED_EXACT_FIXED_VOID_MARGINAL",
+            "G_marginal_J_per_m2": 100.0 + 0.01 * int(local_mesh_level),
+            "Pi_base_J_per_m": 1.0,
+            "Pi_trial_J_per_m": 1.0 - 100.0 * float(delta_a_m),
+            "delta_a_m": float(delta_a_m),
+            "local_mesh_level": int(local_mesh_level),
+        }
+
+    monkeypatch.setattr(hybrid_module, "_exact_marginal_trial", converged_trial)
+    result = _hybrid(
+        far_child_state,
+        {CHILD_ID: far_child_state.competition.candidates},
+        overlap=True,
+        virtual_mechanical_trial_transport="deferred_read_only",
+        mechanical_refinement_policy="physical_candidate_support",
+    )
+    assert result["trial_cache_creation_count"] == 4
+    assert observed == [
+        ("deferred_read_only", "physical_candidate_support")
+    ] * 4
+    assert pickle.dumps(far_child_state, protocol=5) == before
+
+    with pytest.raises(ValueError, match="unknown virtual mechanical"):
+        _hybrid(
+            far_child_state,
+            {CHILD_ID: far_child_state.competition.candidates},
+            virtual_mechanical_trial_transport="drop_transport",
+        )
+    with pytest.raises(ValueError, match="unknown marginal mechanical"):
+        _hybrid(
+            far_child_state,
+            {CHILD_ID: far_child_state.competition.candidates},
+            mechanical_refinement_policy="refine_nothing",
+        )

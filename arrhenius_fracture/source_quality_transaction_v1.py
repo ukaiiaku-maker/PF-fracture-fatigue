@@ -64,11 +64,23 @@ def repair_connected_quality(state, *, strategy='flips', failure_stage=None, ope
         return state, {'accepted': False, 'geometry': geometry, 'failure': 'GLOBAL_QUALITY_TARGET_UNRESOLVED'}
     fields = p._project_fields(state, mesh)
     trial = replace(state, mesh=mesh, damage=fields['damage'], displacement=fields['displacement'],
-                    ep_gp=fields['ep_gp'], rho_gp=fields['rho_gp'])
+                    ep_gp=fields['ep_gp'], rho_gp=fields['rho_gp'],
+                    vacancy_fraction_gp=fields['vacancy_fraction_gp'],
+                    vacancy_ledgers=fields['vacancy_ledgers'],
+                    vacancy_temperature_K=fields['vacancy_temperature_K'],
+                    vacancy_transport_state_v2=fields.get(
+                        'vacancy_transport_state_v2', state.vacancy_transport_state_v2,
+                    ),
+                    junction_process_state={**dict(state.junction_process_state),
+                        **({'transport_boundary_tags_v2': fields['transport_boundary_tags_v2']}
+                           if 'transport_boundary_tags_v2' in fields else {})})
     inject('source_quality_field_transfer')
     trial = p._prepare_connected_ligament_support(trial, entry=cavity.connection_entry_m,
         exit_point=cavity.connection_exit_m, direction=cavity.connection_direction_xy, new_connection=False)
-    fields = {name: getattr(trial, name) for name in ('damage', 'displacement', 'ep_gp', 'rho_gp', 'tip_process_state')}
+    fields = {name: getattr(trial, name) for name in (
+        'damage', 'displacement', 'ep_gp', 'rho_gp', 'vacancy_fraction_gp',
+        'vacancy_ledgers', 'vacancy_temperature_K', 'tip_process_state',
+    )}
     fields['source_state'] = trial.junction_process_state.get('source_state', {})
     trial = p.remesh_mechanically_separating_v12(trial, mesh=trial.mesh, boundary=trial.boundary,
         transferred_fields=fields, source_commit=p._head(), configuration={'event': 'SOURCE_QUALITY_REPAIR_V1'},

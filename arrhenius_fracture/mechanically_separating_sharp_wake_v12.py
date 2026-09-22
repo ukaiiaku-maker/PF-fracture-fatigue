@@ -366,7 +366,23 @@ def junction_sector_certificates(mesh,network,selected,tolerance=1e-12):
                 support_nodes=np.unique(mesh.elems[np.asarray(sorted(support),int)])
                 closure=set(map(int,np.flatnonzero(np.any(np.isin(mesh.elems,support_nodes),axis=1))))
                 incident_supports.append((support|closure)&selected_set)
-        h=float(np.max(_element_diameters(mesh,np.asarray(sorted(exact),int))))
+        # The sector certificate is local to this graph vertex.  Using the
+        # maximum size anywhere along a long incident arm lets a coarse remote
+        # root set the junction annulus even after the kink neighborhood has
+        # been properly refined.  Measure h from exact-support elements that
+        # are incident on the junction node; connectivity acceptance below is
+        # otherwise unchanged.
+        exact_array=np.asarray(sorted(exact),int)
+        exact_vertices=mesh.nodes[mesh.elems[exact_array]]
+        vertex_incident=np.any(
+            np.linalg.norm(exact_vertices-center[None,None,:],axis=2)<=tolerance,
+            axis=1,
+        )
+        local_exact=exact_array[vertex_incident]
+        if not len(local_exact):
+            local_exact=exact_array[[int(np.argmin(np.linalg.norm(
+                centroids[exact_array]-center[None,:],axis=1)))]]
+        h=float(np.max(_element_diameters(mesh,local_exact)))
         rel=centroids-center; radius=np.linalg.norm(rel,axis=1); local=[int(e) for e in np.flatnonzero((radius>=.75*h)&(radius<=5.5*h)) if int(e) not in selected_set]
         by_node={}
         for eid in local:
@@ -620,10 +636,33 @@ def mechanically_separating_graph_support(mesh,network,active_tip_ids=None,previ
     # discrete P1 displacement graph cannot reconnect the two material sectors
     # around the corner. Straight interiors retain the narrower one-ring wake.
     vertex_classes = classify_graph_vertices(network)
-    if any({"kink_vertex", "branch_junction", "merged_vertex"} & set(value)
-           for value in vertex_classes.values()):
-        closure_nodes = np.unique(mesh.elems[np.asarray(sorted(selected), int)])
-        selected.update(map(int, np.flatnonzero(np.any(np.isin(mesh.elems, closure_nodes), axis=1))))
+    junction_points = [
+        np.asarray(point, float) for point, value in vertex_classes.items()
+        if {"kink_vertex", "branch_junction", "merged_vertex"} & set(value)
+    ]
+    if junction_points:
+        centroids = np.mean(mesh.nodes[mesh.elems], axis=1)
+        selected_array = np.asarray(sorted(selected), int)
+        for point in junction_points:
+            incident = selected_array[np.any(
+                np.linalg.norm(
+                    mesh.nodes[mesh.elems[selected_array]]-point[None, None, :],
+                    axis=2) <= tolerance,
+                axis=1,
+            )]
+            if not len(incident):
+                incident = selected_array[[int(np.argmin(
+                    np.linalg.norm(centroids[selected_array]-point[None, :], axis=1)))]]
+            h_vertex = float(np.max(_element_diameters(mesh, incident)))
+            local_selected = selected_array[
+                np.linalg.norm(centroids[selected_array]-point[None, :], axis=1)
+                <= 6.0*h_vertex]
+            closure_nodes = np.unique(mesh.elems[local_selected])
+            extra = np.flatnonzero(np.any(np.isin(mesh.elems, closure_nodes), axis=1))
+            extra = extra[
+                np.linalg.norm(centroids[extra]-point[None, :], axis=1)
+                <= 7.0*h_vertex]
+            selected.update(map(int, extra))
     if previous_support is not None and (accepted_network is None or accepted_damage is None):
         raise ValueError("accepted_network and accepted_damage are required with previous_support")
     previous=_validated_previous(mesh,previous_support,accepted_network,accepted_damage)

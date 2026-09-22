@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import asdict, replace
+from dataclasses import asdict, dataclass, replace
+import hashlib
 import json
 from pathlib import Path
+import pickle
 import subprocess
 from typing import Any
 
@@ -41,6 +43,86 @@ from .topology_transaction_v11 import (
 )
 
 SCHEMA = "v12.executable-production-evidence/2"
+
+
+@dataclass(frozen=True)
+class PhysicalCleavageEventContext:
+    accepted_state_fingerprint: str
+    candidate_id: str
+    front_id: str
+    source_fingerprint: str
+    event_ids: tuple[str, ...]
+    hazard_barrier_J: float
+    cooperative_hits: float
+    burgers_vector_m: float
+    gamma_relative: float
+    material_context_fingerprint: str
+
+
+class PhysicalEnergyVeto(RuntimeError):
+    """Expected native topology rejection with elapsed pregeometry state."""
+    def __init__(self, accepted_state, audit):
+        super().__init__("physical topology event vetoed by native energy gate")
+        self.accepted_state=accepted_state
+        self.audit=audit
+
+
+def _material_context_fingerprint(state, bundle) -> str:
+    return hashlib.sha256(pickle.dumps(
+        (state.material,bundle),protocol=5)).hexdigest()
+
+
+def build_physical_cleavage_event_context(
+    state, *, candidate_id: str, front_id: str, source_fingerprint: str,
+    event_ids, hazard_barrier_J: float,
+) -> PhysicalCleavageEventContext:
+    """Bind native resistance coefficients to one selected accepted state."""
+    from .voiding_production_v5 import _bundle_from_state,fresh_sharp_front_engine
+    candidate=next(item for item in state.competition.candidates
+                   if item.candidate_id==str(candidate_id))
+    bundle=_bundle_from_state(state)
+    engine=fresh_sharp_front_engine(state.material,bundle)
+    return PhysicalCleavageEventContext(
+        accepted_state_fingerprint=complete_accepted_state_fingerprint(state),
+        candidate_id=str(candidate_id),front_id=str(front_id),
+        source_fingerprint=str(source_fingerprint),
+        event_ids=tuple(map(str,event_ids)),hazard_barrier_J=float(hazard_barrier_J),
+        cooperative_hits=float(engine.f.m_hits),burgers_vector_m=float(engine.b),
+        gamma_relative=float(candidate.gamma_rel),
+        material_context_fingerprint=_material_context_fingerprint(state,bundle))
+
+
+def physical_cleavage_resistance(context: PhysicalCleavageEventContext) -> float:
+    """Existing native resistance law evaluated only from bound context."""
+    return hazard_resistance_J_per_m2(
+        barrier_J=context.hazard_barrier_J,
+        cooperative_hits=context.cooperative_hits,
+        burgers_vector_m=context.burgers_vector_m,
+        gamma_relative=context.gamma_relative)
+
+
+def validate_physical_cleavage_event_context(
+    state,context: PhysicalCleavageEventContext,
+) -> float:
+    """Reject stale ownership/material binding before any trial remesh."""
+    from .voiding_production_v5 import _bundle_from_state,fresh_sharp_front_engine
+    if context.accepted_state_fingerprint != complete_accepted_state_fingerprint(state):
+        raise RuntimeError("stale physical cleavage event context")
+    if (context.front_id != ROOT_BRANCH_ID or not context.source_fingerprint
+            or not context.event_ids):
+        raise RuntimeError("physical cleavage event context ownership mismatch")
+    candidate=next((item for item in state.competition.candidates
+                    if item.candidate_id==context.candidate_id),None)
+    if candidate is None:
+        raise RuntimeError("physical cleavage candidate is absent from accepted state")
+    bundle=_bundle_from_state(state)
+    engine=fresh_sharp_front_engine(state.material,bundle)
+    if (context.material_context_fingerprint != _material_context_fingerprint(state,bundle)
+            or context.cooperative_hits != float(engine.f.m_hits)
+            or context.burgers_vector_m != float(engine.b)
+            or context.gamma_relative != float(candidate.gamma_rel)):
+        raise RuntimeError("stale physical cleavage material context")
+    return physical_cleavage_resistance(context)
 
 
 def _competition(seed: int) -> DirectionalCompetitionState:
@@ -157,18 +239,21 @@ def execute_event(
     end_xy_m: tuple[float, float],
     *,
     transaction_identity: str,
+    candidate_id: str | None = None,
+    physical_context: PhysicalCleavageEventContext | None = None,
+    event_classification: str | None = None,
     failure_stage: str | None = None,
     operation_log: list[str] | None = None,
 ) -> tuple[LiveFEMTopologyState, dict[str, Any]]:
-    proposal = next(item for item in construct_action_proposals(
-        state.competition.hazard_states, correlation_interval_s=0.0,
-    ) if item.action_type == "one_arm")
-    start = state.crack_network.branch(ROOT_BRANCH_ID).tip
-    length = float(np.linalg.norm(np.asarray(end_xy_m) - np.asarray(start)))
-    arm = TopologyArm(
-        proposal.member_candidate_ids[0], ROOT_BRANCH_ID, start, end_xy_m, length, 0.0,
-    )
+    if physical_context is None and event_classification != "software_forced_geometry":
+        raise RuntimeError(
+            "physical execute_event requires a state-bound cleavage context")
+    if physical_context is not None and event_classification is not None:
+        raise ValueError("physical and software geometry event classifications are exclusive")
+    bound_resistance=(None if physical_context is None else
+                      validate_physical_cleavage_event_context(state,physical_context))
     operations: list[str] = []
+    physical_input_state=state
 
     def inject(stage: str, trial: LiveFEMTopologyState) -> None:
         operations.append(stage)
@@ -177,6 +262,46 @@ def execute_event(
         if stage == failure_stage:
             raise RuntimeError("injected:" + stage)
 
+    # The V12 support certificate requires every active physical tip to be a
+    # mesh node.  Qualifying marginal trials conform this exact endpoint before
+    # constructing their matched unextended/extended pair; production commits
+    # must use the same representation contract.
+    if state.sharp_wake_model_id == V12_MODEL_ID:
+        from .voiding_production_v5 import _conform_bulk_point
+        state = _conform_bulk_point(
+            state, end_xy_m, identity="PRODUCTION_EVENT_ENDPOINT_CONFORMING",
+            failure_injector=inject,
+        )
+        state = equilibrate_fixed_load_with_production_fem(state)
+    proposals = construct_action_proposals(
+        state.competition.hazard_states, correlation_interval_s=0.0)
+    proposal = next(item for item in proposals if item.action_type == "one_arm"
+                    and (candidate_id is None
+                         or candidate_id in item.member_candidate_ids))
+    start = state.crack_network.branch(ROOT_BRANCH_ID).tip
+    length = float(np.linalg.norm(np.asarray(end_xy_m) - np.asarray(start)))
+    selected_candidate = next(
+        item for item in state.competition.candidates
+        if item.candidate_id == proposal.member_candidate_ids[0])
+    if physical_context is None:
+        arm = TopologyArm(
+            proposal.member_candidate_ids[0], ROOT_BRANCH_ID, start, end_xy_m,
+            length, 0.0,
+        )
+    else:
+        if (physical_context.candidate_id != selected_candidate.candidate_id
+                or physical_context.front_id != ROOT_BRANCH_ID):
+            raise RuntimeError("physical cleavage event context ownership mismatch")
+        resistance = bound_resistance
+        direction = np.asarray(selected_candidate.direction_xy, dtype=float)
+        direction /= np.linalg.norm(direction)
+        arm = TopologyArm(
+            proposal.member_candidate_ids[0], ROOT_BRANCH_ID, start, end_xy_m,
+            length, resistance*length,
+            event_classification="physical_cleavage",
+            candidate_direction_xy=tuple(map(float, direction)),
+            first_intersection_xy_m=tuple(map(float, end_xy_m)),
+        )
     if state.sharp_wake_model_id == V12_MODEL_ID:
         geometry = lambda trial, arms: apply_v12_production_trial_geometry(
             trial, arms,
@@ -184,6 +309,7 @@ def execute_event(
             configuration={"entry_point": "v12_production_driver", "model": V12_MODEL_ID},
             transaction_identity=transaction_identity,
             failure_injector=inject,
+            refinement_levels=1,
         )
         realized = True
     else:
@@ -198,7 +324,16 @@ def execute_event(
         failure_injector=inject,
     )
     if not result.accepted:
-        raise RuntimeError("production event rejected: " + str(result.rejection_reason))
+        audit={
+            "outcome":"ENERGY_VETO","published_geometry":False,
+            "rejection_reason":result.rejection_reason,
+            "energy_release_J_per_m":result.energy_release_J_per_m,
+            "hazard_dissipation_J_per_m":result.hazard_dissipation_J_per_m,
+            "energy_margin_J_per_m":result.energy_margin_J_per_m,
+            "physical_context":None if physical_context is None else asdict(physical_context),
+            "operations":operations,
+        }
+        raise PhysicalEnergyVeto(physical_input_state,audit)
     after = _observables(result.state)
     return result.state, {
         "initial": before,
@@ -318,7 +453,9 @@ def run_trajectory(model: str, geometry: str) -> dict[str, Any]:
     }[geometry]
     events = []
     for index, endpoint in enumerate(paths, 1):
-        state, event = execute_event(state, endpoint, transaction_identity=f"{geometry}-{index}")
+        state, event = execute_event(
+            state,endpoint,transaction_identity=f"{geometry}-{index}",
+            event_classification="software_forced_geometry")
         events.append(event)
         if index < len(paths):
             # Complete the next physical candidate clock through the same state owner.

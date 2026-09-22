@@ -15,6 +15,7 @@ from .material_manifest import ExpFloorBarrier, MaterialManifest, TransportBarri
 from .sharp_front import FrontConfig
 from .unified_front import UnifiedMPZFrontEngine
 from .unified_mpz import MPZConfig
+from .vacancy_coupling_v1 import COMMON_VACANCY_ROW_ID, REFERENCE_VACANCY_ROW
 
 SCHEMA = "v5.unified-fracture-material-bundle/1"
 CORE_MODEL_ID = "v13.current-source-qualified-multitip/ca4abfe47765fcdaf0d266bfc0558ecd82d0c64e"
@@ -74,6 +75,7 @@ class UnifiedFractureMaterialBundle:
     elastic_row_id: str
     site_population_row_id: str
     specimen_loading_row_id: str
+    vacancy_row_id: str
     material_class: str
     fracture_row_items: tuple[tuple[str, str], ...]
     front_config_schema_id: str = "v13.sharp-front.FrontConfig/1"
@@ -92,7 +94,8 @@ class UnifiedFractureMaterialBundle:
         identifiers = (
             self.fracture_material_row_id, self.void_kinetics_row_id,
             self.elastic_row_id, self.site_population_row_id,
-            self.specimen_loading_row_id, self.front_config_schema_id,
+            self.specimen_loading_row_id, self.vacancy_row_id,
+            self.front_config_schema_id,
             self.cleavage_barrier_schema_id, self.emission_barrier_schema_id,
             self.process_zone_schema_id, self.r_tip_law_id,
             self.hazard_algorithm_id, self.renewal_policy_id,
@@ -102,6 +105,8 @@ class UnifiedFractureMaterialBundle:
             raise ValueError("every material-bundle row identity must be nonempty")
         if self.fracture_material_row_id == self.void_kinetics_row_id:
             raise ValueError("fracture and void kinetics must have distinct ownership")
+        if self.vacancy_row_id != COMMON_VACANCY_ROW_ID:
+            raise ValueError("all unified material families must share the common vacancy row")
         row = dict(self.fracture_row_items)
         if row.get("candidate_id") != self.fracture_material_row_id:
             raise ValueError("fracture row content and identity disagree")
@@ -143,6 +148,7 @@ def material_bundle(material_class: str) -> UnifiedFractureMaterialBundle:
         elastic_row_id=COMMON_ELASTIC_ROW_ID,
         site_population_row_id=COMMON_SITE_POPULATION_ROW_ID,
         specimen_loading_row_id=COMMON_SPECIMEN_LOADING_ROW_ID,
+        vacancy_row_id=COMMON_VACANCY_ROW_ID,
         material_class=material_class,
         fracture_row_items=tuple((key, str(value)) for key, value in row.items()),
     )
@@ -285,6 +291,9 @@ def identity_record(bundle: UnifiedFractureMaterialBundle, elastic_material: Any
             "rho_source0_m2", "recovery_nu0_s", "recovery_H0_eV",
             "recovery_activation_entropy_kB",
         )}),
+        "vacancy_row_id": bundle.vacancy_row_id,
+        "vacancy_row_fingerprint": REFERENCE_VACANCY_ROW.fingerprint,
+        "vacancy_parameter_status": REFERENCE_VACANCY_ROW.calibration_status,
         "FrontConfig_fingerprint": _sha(vars(fcfg)),
         "cleavage_barrier_fingerprint": _sha(asdict(manifest.cleavage)),
         "emission_barrier_fingerprint": _sha(asdict(manifest.emission)),
@@ -301,7 +310,20 @@ def bind_identity(state: Any, bundle: UnifiedFractureMaterialBundle) -> Any:
     identity = dict(identity_record(bundle, state.material))
     previous = junction.get("unified_model_identity")
     if previous is not None and dict(previous) != identity:
-        raise ValueError("accepted state already belongs to a different material bundle")
+        old_payload = junction.get("unified_material_bundle", {})
+        legacy_vacancy_absent = (
+            "vacancy_row_id" not in previous
+            and "vacancy_row_id" not in old_payload
+        )
+        stable_keys = (
+            "core_model_id", "elasticity_fingerprint", "plasticity_fingerprint",
+            "FrontConfig_fingerprint", "cleavage_barrier_fingerprint",
+            "emission_barrier_fingerprint", "process_zone_fingerprint",
+        )
+        if not legacy_vacancy_absent or any(
+            previous.get(key) != identity.get(key) for key in stable_keys
+        ):
+            raise ValueError("accepted state already belongs to a different material bundle")
     junction["unified_model_identity"] = identity
     junction["unified_material_bundle"] = asdict(bundle)
     return replace(state, junction_process_state=junction)

@@ -246,6 +246,7 @@ def refine_accepted_state(
     state, *, marked_parent_elements: Iterable[int], active_tip_ids: Iterable[str],
     generation: int, operation_index: int, longest_edge_closure: bool = False,
     protected_edges: Iterable[Edge] = (),
+    rebuild_vacancy_transport: bool = True,
 ):
     old = state.mesh
     marked = tuple(sorted(set(int(value) for value in marked_parent_elements)))
@@ -266,6 +267,7 @@ def refine_accepted_state(
 
     ep = np.empty((state.ep_gp.shape[0], mesh.ne), dtype=float)
     rho = np.empty(mesh.ne, dtype=float)
+    vacancy = np.empty(mesh.ne, dtype=float)
     old_element_damage = getattr(old, "element_damage_gp", None)
     if old_element_damage is None:
         old_element_damage = np.mean(np.asarray(state.damage)[old.elems], axis=1)
@@ -273,6 +275,7 @@ def refine_accepted_state(
     for parent, child_ids in parent_map.items():
         ep[:, child_ids] = np.asarray(state.ep_gp)[:, parent, None]
         rho[list(child_ids)] = float(state.rho_gp[parent])
+        vacancy[list(child_ids)] = float(state.vacancy_fraction_gp[parent])
         element_damage[list(child_ids)] = float(old_element_damage[parent])
     mesh = replace(mesh, element_damage_gp=element_damage)
 
@@ -294,7 +297,75 @@ def refine_accepted_state(
         left_bot=int(state.boundary.left_bot), right_bot=int(state.boundary.right_bot),
         notch_nodes=np.asarray(sorted(new_sets["notch"]), dtype=int),
     )
-    result = replace(state, mesh=mesh, boundary=boundary, displacement=u.reshape(-1), damage=damage, ep_gp=ep, rho_gp=rho)
+    junction = dict(state.junction_process_state)
+    old_transport_tags = junction.get("transport_boundary_tags_v2")
+    if old_transport_tags is not None:
+        tag_map = {tuple(sorted(map(int, row["node_ids"]))): row["kind"]
+                   for row in old_transport_tags}
+        rebuilt_tags = []
+        for edge, kind in sorted(tag_map.items()):
+            if edge in midpoint:
+                node = midpoint[edge]
+                rebuilt_tags.extend((
+                    {"node_ids": (edge[0], node), "kind": kind},
+                    {"node_ids": (node, edge[1]), "kind": kind},
+                ))
+            else:
+                rebuilt_tags.append({"node_ids": edge, "kind": kind})
+        junction["transport_boundary_tags_v2"] = tuple(rebuilt_tags)
+    result = replace(
+        state, mesh=mesh, boundary=boundary, displacement=u.reshape(-1), damage=damage,
+        ep_gp=ep, rho_gp=rho, vacancy_fraction_gp=vacancy,
+        junction_process_state=junction,
+    )
+    if state.vacancy_transport_state_v2 is not None and rebuild_vacancy_transport:
+        from .vacancy_transport_phase_field_v2 import build_exact_cut_transport_mesh_for_network
+        old_transport = state.vacancy_transport_state_v2
+        segments = tuple(
+            (first, second, f"{branch.branch_id}:{index}")
+            for branch in result.crack_network.branches
+            for index, (first, second) in enumerate(zip(branch.path, branch.path[1:]))
+        )
+        cut = build_exact_cut_transport_mesh_for_network(
+            mesh, crack_segments=segments,
+            topology_boundary_tags=junction["transport_boundary_tags_v2"],
+        )
+        old_parent = np.asarray(old_transport.parent_mechanics_element_ids, int)
+        old_area = np.asarray(old_transport.transport_mesh.area_e, float)
+        parent_inventory = np.bincount(
+            old_parent, weights=old_area*np.asarray(old_transport.vacancy_fraction_gp),
+            minlength=old.ne,
+        )
+        parent_area = np.bincount(old_parent, weights=old_area, minlength=old.ne)
+        parent_c = parent_inventory/parent_area
+        mechanics_child_c = np.empty(mesh.ne)
+        for parent, child_ids in parent_map.items():
+            mechanics_child_c[list(child_ids)] = parent_c[parent]
+        transport_vacancy = mechanics_child_c[cut.parent_mechanics_element_ids]
+        result = replace(result, vacancy_transport_state_v2=replace(
+            old_transport, vacancy_fraction_gp=transport_vacancy,
+            surface_registry_fingerprint=cut.registry.fingerprint,
+            surface_registry=cut.registry, transport_mesh=cut.mesh,
+            parent_mechanics_element_ids=cut.parent_mechanics_element_ids,
+            last_solver_audit={},
+        ))
+    elif state.vacancy_transport_state_v2 is not None:
+        # Read-only mechanical observations refine the mechanics mesh without
+        # advancing physical time or accepting a topology change.  Their P0
+        # mechanics vacancy field is transferred above and is the only vacancy
+        # quantity consumed by mechanics.  Retain the immutable accepted
+        # transport owner/provenance, but defer its expensive cut-mesh rebuild
+        # until an event is actually committed.
+        junction = dict(result.junction_process_state)
+        junction["virtual_mechanics_transport_transfer"] = {
+            "mode": "DEFERRED_ACCEPTED_OWNER_READ_ONLY",
+            "accepted_surface_registry_fingerprint": (
+                state.vacancy_transport_state_v2.surface_registry_fingerprint
+            ),
+            "physical_time_advanced": False,
+            "transport_solve_performed": False,
+        }
+        result = replace(result, junction_process_state=junction)
     lineage = RefinementLineage(
         mesh_generation=int(generation), parent_mesh_fingerprint=mesh_fingerprint(old),
         current_mesh_fingerprint=mesh_fingerprint(mesh), refinement_operation_index=int(operation_index),

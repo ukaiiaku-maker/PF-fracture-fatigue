@@ -11,6 +11,7 @@ from typing import Any
 
 from .directional_competition_v11 import competition_state_to_dict
 from .topology_transaction_v11 import LiveFEMTopologyState, MODEL_ID
+from .vacancy_transport_phase_field_v2 import _state_payload as _transport_state_payload
 
 
 SCHEMA = "v11.live-fem-branch-checkpoint/1"
@@ -55,6 +56,13 @@ def write_checkpoint(
         "v12_support_state": state.v12_support_state.__dict__ if state.v12_support_state is not None else None,
         "has_production_void_state": state.void_state is not None,
         "checkpoint_generation": state.checkpoint_generation,
+        "vacancy_fraction_gp": state.vacancy_fraction_gp.tolist(),
+        "vacancy_ledgers": dict(state.vacancy_ledgers),
+        "vacancy_temperature_K": state.vacancy_temperature_K,
+        "vacancy_transport_state_v2": (
+            None if state.vacancy_transport_state_v2 is None
+            else _transport_state_payload(state.vacancy_transport_state_v2)
+        ),
         "provider_runtime": (
             provider_runtime.audit_payload() if provider_runtime is not None else None
         ),
@@ -96,6 +104,23 @@ def restore_checkpoint(path: str | Path, *, with_provider_runtime: bool = False)
         provider_runtime = restored.get("provider_runtime")
     if not isinstance(state, LiveFEMTopologyState):
         raise ValueError("v11 checkpoint payload has the wrong state type")
+    # Explicit one-way migration for retained pre-vacancy checkpoints.  Such
+    # artifacts own no nonequilibrium history, so the only non-invented state
+    # is the declared production default: equilibrium at the stored/default
+    # temperature with freshly derived ledgers.
+    if getattr(state, "vacancy_fraction_gp", None) is None:
+        from dataclasses import replace
+        import numpy as np
+        from .vacancy_coupling_v1 import (
+            equilibrium_vacancy_fraction, initial_vacancy_ledgers,
+        )
+        temperature = float(getattr(state, "vacancy_temperature_K", 900.0))
+        vacancy = np.full(state.mesh.ne, equilibrium_vacancy_fraction(temperature))
+        state = replace(
+            state, vacancy_fraction_gp=vacancy,
+            vacancy_ledgers=initial_vacancy_ledgers(vacancy, state.mesh.area_e),
+            vacancy_temperature_K=temperature,
+        )
     if state.crack_network.to_dict() != manifest.get("crack_network"):
         raise ValueError("v11 checkpoint crack network does not match manifest")
     if competition_state_to_dict(state.competition) != manifest.get("directional_competition"):
@@ -112,6 +137,19 @@ def restore_checkpoint(path: str | Path, *, with_provider_runtime: bool = False)
         ))
         if expected_observables != manifest["equilibrium_observables"]:
             raise ValueError("checkpoint equilibrium observations do not match manifest")
+    if "vacancy_fraction_gp" in manifest:
+        if state.vacancy_fraction_gp.tolist() != manifest["vacancy_fraction_gp"]:
+            raise ValueError("checkpoint vacancy field does not match manifest")
+        if dict(state.vacancy_ledgers) != manifest.get("vacancy_ledgers"):
+            raise ValueError("checkpoint vacancy ledgers do not match manifest")
+        if state.vacancy_temperature_K != manifest.get("vacancy_temperature_K"):
+            raise ValueError("checkpoint vacancy temperature does not match manifest")
+    if "vacancy_transport_state_v2" in manifest:
+        actual = (None if state.vacancy_transport_state_v2 is None
+                  else _transport_state_payload(state.vacancy_transport_state_v2))
+        actual = json.loads(json.dumps(actual, sort_keys=True, allow_nan=False))
+        if actual != manifest["vacancy_transport_state_v2"]:
+            raise ValueError("checkpoint V2 vacancy transport state mismatch")
     expected_support=state.v12_support_state.__dict__ if state.v12_support_state is not None else None
     expected_support=json.loads(json.dumps(expected_support,sort_keys=True,allow_nan=False))
     if expected_support != manifest.get("v12_support_state"):

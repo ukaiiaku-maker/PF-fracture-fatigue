@@ -35,6 +35,7 @@ from .unified_fracture_material_v5 import (
     elastic_material, require_bound_identity,
 )
 from .hazard_energy_event_gate_v10230 import hazard_resistance_J_per_m2
+from .causal_sharp_wake_v11 import element_damage
 from .mechanically_separating_sharp_wake_v12 import (
     certification_arcs, independent_intact_path_certificate,
 )
@@ -62,6 +63,633 @@ def _bundle_from_state(state) -> UnifiedFractureMaterialBundle:
     return UnifiedFractureMaterialBundle(
         **dict(state.junction_process_state["unified_material_bundle"])
     )
+
+
+def vacancy_coupled_void_rates(
+    state, config, *, temperature_K, stress_tensor_Pa, center_m,
+    equivalent_plastic_strain_rate_gp, radius_m=None,
+):
+    """Evaluate vacancy-sensitive birth/growth from one accepted FEM state."""
+    from .vacancy_coupling_v1 import (
+        REFERENCE_VACANCY_ROW, deterministic_capture_patch, local_vacancy_fraction,
+        vacancy_attachment_frequency_s, vacancy_growth_rates_m_s,
+    )
+    bundle = _bundle_from_state(state)
+    if bundle.vacancy_row_id != REFERENCE_VACANCY_ROW.row_id:
+        raise RuntimeError("accepted state does not own the common vacancy row")
+    process_length = float(fresh_sharp_front_engine(state.material, bundle).f.L_pz)
+    capture_radius = process_length + (0.0 if radius_m is None else float(radius_m))
+    patch = deterministic_capture_patch(state, center_m, capture_radius)
+    local_c = local_vacancy_fraction(state, patch)
+    plastic = np.asarray(equivalent_plastic_strain_rate_gp, dtype=float)
+    if plastic.shape != (state.mesh.ne,) or np.any(~np.isfinite(plastic)) or np.any(plastic < 0.0):
+        raise ValueError("accepted equivalent plastic rate must be finite P0 data")
+    area = np.asarray(state.mesh.area_e)[patch]
+    local_plastic = float(np.sum(area * plastic[patch]) / np.sum(area))
+    attachment = vacancy_attachment_frequency_s(
+        temperature_K, local_c, state.material.b, REFERENCE_VACANCY_ROW,
+    )
+    growth = None
+    if radius_m is not None:
+        growth = vacancy_growth_rates_m_s(
+            temperature_K=temperature_K, radius_m=radius_m,
+            vacancy_fraction_site=local_c,
+            equivalent_plastic_rate_s=local_plastic,
+            row=REFERENCE_VACANCY_ROW,
+        )
+    rates = arrhenius_rates(
+        config, temperature_K=temperature_K, stress_tensor_Pa=stress_tensor_Pa,
+        vacancy_attachment_frequency_s=attachment, vacancy_growth=growth,
+    )
+    return rates, {
+        "vacancy_row_id": REFERENCE_VACANCY_ROW.row_id,
+        "vacancy_row_fingerprint": REFERENCE_VACANCY_ROW.fingerprint,
+        "capture_patch_element_ids": patch.tolist(),
+        "c_v_site": local_c,
+        "equivalent_plastic_strain_rate_site_s": local_plastic,
+        "vacancy_attachment_frequency_s": attachment,
+        **({} if growth is None else growth),
+    }
+
+
+def advance_site_on_common_vacancy_clock(
+    previous_accepted_state, accepted_mechanical_state, config, *, bundle,
+    duration_s, temperature_K, stress_tensor_Pa,
+):
+    """Advance vacancy and the earliest site clock on one physical interval.
+
+    Mechanics is supplied by the ordinary accepted caller.  This routine does
+    not invoke plasticity; it derives its fixed interval rate from the two
+    accepted mechanical states and advances every owned site clock by the same
+    elapsed time.
+    """
+    from .vacancy_coupling_v1 import (
+        advance_vacancy_with_fixed_rates, deterministic_capture_patch,
+        equilibrium_vacancy_fraction, equivalent_plastic_strain_rate_s,
+        integrated_capture_vacancy_time, local_vacancy_fraction,
+        vacancy_annihilation_rate_s,
+        vacancy_attachment_frequency_s, vacancy_production_rate_s,
+        vacancy_weighted_first_passage_time,
+    )
+    from .unified_fracture_material_v5 import front_config
+
+    duration = float(duration_s)
+    if duration <= 0.0 or not math.isfinite(duration):
+        raise ValueError("common accepted interval must be finite and positive")
+    owned_bundle = _bundle_from_state(accepted_mechanical_state)
+    if owned_bundle.bundle_hash != bundle.bundle_hash:
+        raise RuntimeError("accepted mechanics and vacancy scheduler material identities differ")
+    if _bundle_from_state(previous_accepted_state).bundle_hash != bundle.bundle_hash:
+        raise RuntimeError("previous accepted mechanics has a different material identity")
+    site = accepted_mechanical_state.void_state.sites[0]
+    plastic_rate = equivalent_plastic_strain_rate_s(
+        previous_accepted_state.ep_gp, accepted_mechanical_state.ep_gp, duration,
+    )
+    rho = np.asarray(accepted_mechanical_state.rho_gp, dtype=float)
+    rho_reference = float(bundle.fracture_row["rho_forest_floor_m2"])
+    process_length = float(front_config(bundle).L_pz)
+    production = vacancy_production_rate_s(
+        plastic_rate, rho, rho_reference_m2=rho_reference,
+    )
+    sink = vacancy_annihilation_rate_s(
+        temperature_K, rho, process_zone_length_m=process_length,
+    )
+    equilibrium = equilibrium_vacancy_fraction(temperature_K)
+    patch = deterministic_capture_patch(
+        previous_accepted_state, site.center_m, process_length,
+    )
+    unit_attachment = vacancy_attachment_frequency_s(
+        temperature_K, 1.0, accepted_mechanical_state.material.b,
+    )
+    unit_rates = arrhenius_rates(
+        config, temperature_K=temperature_K, stress_tensor_Pa=stress_tensor_Pa,
+        normal_xy=site.normal_xy, vacancy_attachment_frequency_s=unit_attachment,
+    )
+    event_time = None
+    event_kind = None
+    if site.phase == VoidPhase.AVAILABLE_SITE:
+        remaining_action = max(site.birth.threshold - float(site.birth.action_exact()), 0.0)
+        event_time = vacancy_weighted_first_passage_time(
+            previous_accepted_state, patch, production_rate_s=production,
+            annihilation_rate_s=sink, equilibrium_fraction=equilibrium,
+            rate_per_vacancy_s=unit_rates["birth_s"] * site.candidate_weight,
+            action_remaining=remaining_action, maximum_duration_s=duration,
+        )
+        event_kind = "BIRTH_HIT" if event_time is not None else None
+    elif site.phase == VoidPhase.EMBRYO:
+        stabilization = site.stabilization.crossing_time(unit_rates["stabilization_s"])
+        healing = site.healing.crossing_time(unit_rates["healing_s"])
+        crossing = min(stabilization, healing)
+        if math.isfinite(crossing) and crossing <= duration:
+            event_time = crossing
+            event_kind = "HEALED" if healing <= stabilization else "STABILIZED"
+    elapsed = duration if event_time is None else float(event_time)
+    evolved, vacancy_audit = advance_vacancy_with_fixed_rates(
+        previous_accepted_state, accepted_mechanical_state,
+        duration_s=elapsed, temperature_K=temperature_K,
+        equivalent_plastic_rate_s=plastic_rate, production_rate_s=production,
+        annihilation_rate_s=sink,
+    )
+    integrated_site_c = integrated_capture_vacancy_time(
+        previous_accepted_state, patch, production_rate_s=production,
+        annihilation_rate_s=sink, equilibrium_fraction=equilibrium,
+        duration_s=elapsed,
+    )
+    average_site_c = (
+        integrated_site_c / elapsed if elapsed > 0.0
+        else local_vacancy_fraction(previous_accepted_state, patch)
+    )
+    rates = dict(unit_rates)
+    rates["birth_s"] = unit_rates["birth_s"] * average_site_c
+    void_state, events = advance_site(
+        evolved.void_state, site.site_id, elapsed, rates=rates,
+    )
+    result = _synchronize_legacy_vacancy_observable(
+        replace(evolved, void_state=void_state)
+    )
+    return result, {
+        "material_bundle_id": owned_bundle.bundle_id,
+        "material_bundle_sha256": owned_bundle.bundle_hash,
+        "plasticity_identity": dict(require_bound_identity(accepted_mechanical_state))[
+            "plasticity_fingerprint"
+        ],
+        "elapsed_time_s": elapsed,
+        "scheduled_event": event_kind,
+        "emitted_events": events,
+        "capture_patch_element_ids": patch.tolist(),
+        "integrated_site_vacancy_time_s": integrated_site_c,
+        "average_site_vacancy_fraction": average_site_c,
+        "accepted_equivalent_plastic_rate_s": plastic_rate,
+        "vacancy_production_rate_s": production,
+        "vacancy_annihilation_rate_s": sink,
+        "rates": rates,
+        "vacancy": vacancy_audit,
+    }
+
+
+def advance_production_vacancy_transport_interval(
+    previous_accepted_state, accepted_mechanical_state, *, duration_s,
+    external_event_times_s=None, directional_rate_by_candidate_s=None,
+    failure_injector=None, transport_linear_solver_provider=None,
+):
+    """Advance the state-owned V2 field on one accepted global event clock.
+
+    Mechanics is never invoked here.  The previous/current accepted plastic
+    fields supply the only production increment; ordinary scheduler crossings
+    are previewed by their existing owners and supplied in
+    ``external_event_times_s``.
+    """
+    from .vacancy_coupling_v1 import equivalent_plastic_strain_rate_s
+    from .vacancy_transport_phase_field_v2 import (
+        accepted_elastoplastic_stress_3d, compete_on_common_transport_clock,
+    )
+    transport = previous_accepted_state.vacancy_transport_state_v2
+    if transport is None or transport.parameter_row is None or transport.transport_mesh is None:
+        raise RuntimeError("production accepted state does not own complete V2 vacancy transport")
+    if accepted_mechanical_state.vacancy_transport_state_v2 is not transport:
+        if (accepted_mechanical_state.vacancy_transport_state_v2 is None
+                or accepted_mechanical_state.vacancy_transport_state_v2.parameter_row_fingerprint
+                != transport.parameter_row_fingerprint):
+            raise RuntimeError("accepted mechanical trial changed vacancy transport ownership")
+    duration = float(duration_s)
+    mechanics_rate = equivalent_plastic_strain_rate_s(
+        previous_accepted_state.ep_gp, accepted_mechanical_state.ep_gp, duration,
+    )
+    parent = np.asarray(transport.parent_mechanics_element_ids, int)
+    stress3d = accepted_elastoplastic_stress_3d(accepted_mechanical_state)
+    mean_stress = np.asarray(stress3d["mean_stress_Pa"])[parent]
+    rho = np.asarray(accepted_mechanical_state.rho_gp)[parent]
+    epdot = mechanics_rate[parent]
+    row = transport.parameter_row
+    diffusivity = row.vacancy_diffusivity_prefactor_m2_s*math.exp(
+        -row.vacancy_migration_energy_eV*1.602176634e-19
+        /(1.380649e-23*transport.vacancy_temperature_K)
+    )
+    centers = np.asarray(accepted_mechanical_state.mesh.nodes)[
+        np.asarray(accepted_mechanical_state.mesh.elems)
+    ].mean(axis=1)
+    config = VoidingConfig(enabled=True)
+    updated_sites = []
+    for site in transport.site_states:
+        eid = int(np.argmin(np.linalg.norm(centers-np.asarray(site.center_xy_m), axis=1)))
+        void_sites = (() if accepted_mechanical_state.void_state is None
+                      else accepted_mechanical_state.void_state.sites)
+        void_site = next((item for item in void_sites if item.site_id == site.site_id), None)
+        normal = np.asarray((1.0, 0.0) if void_site is None else void_site.normal_xy, float)
+        normal /= np.linalg.norm(normal)
+        tangent = np.array((-normal[1], normal[0]))
+        tensor = np.array(((stress3d["sigma_xx_Pa"][eid], stress3d["sigma_xy_Pa"][eid]),
+                           (stress3d["sigma_xy_Pa"][eid], stress3d["sigma_yy_Pa"][eid])))
+        hydro = stress3d["mean_stress_Pa"][eid]
+        opening = float(normal@tensor@normal)
+        shear = float(tangent@tensor@normal)
+        work = (
+            config.hydrostatic_work_coefficient*hydro*config.birth_hydrostatic_volume_m3
+            + config.normal_opening_work_coefficient*max(opening, 0.0)
+              * config.birth_normal_area_m2*config.birth_normal_separation_m
+            + config.signed_shear_work_coefficient*shear*config.birth_shear_volume_m3
+        )
+        updated_sites.append(replace(
+            site,
+            capture_rate_area_per_s=row.site_capture_factor*diffusivity,
+            birth_barrier_J=config.birth_barrier_J,
+            birth_stress_work_J=work,
+        ))
+    prepared = replace(transport, site_states=tuple(updated_sites))
+    competition = compete_on_common_transport_clock(
+        prepared, transport.transport_mesh, transport.surface_registry,
+        row=row, maximum_duration_s=duration,
+        accepted_equivalent_plastic_strain_rate_s=epdot,
+        accepted_dislocation_density_m2=rho,
+        accepted_mean_stress_Pa=mean_stress,
+        external_event_times_s=dict(external_event_times_s or {}),
+        failure_injector=failure_injector,
+        linear_solver_provider=transport_linear_solver_provider,
+    )
+    if failure_injector is not None:
+        failure_injector("topology_commit", previous_accepted_state)
+    directional_rates = dict(directional_rate_by_candidate_s or {})
+    directional = accepted_mechanical_state.competition
+    if directional_rates:
+        from .directional_competition_v11 import (
+            commit_directional_interval, preview_directional_interval,
+        )
+        expected = {item.candidate_id for item in directional.hazard_states}
+        if set(directional_rates) != expected:
+            raise RuntimeError("directional losing-clock rates do not match accepted ownership")
+        elapsed = float(competition["elapsed_time_s"])
+        hazards = tuple(commit_directional_interval(
+            hazard,
+            preview_directional_interval(
+                hazard, lambda_per_s=float(directional_rates[hazard.candidate_id]),
+                start_time_s=transport.transport_time_s, duration_s=elapsed,
+                maximum_completed_events=1,
+            ),
+        ) for hazard in directional.hazard_states)
+        directional = replace(directional, hazard_states=hazards)
+    committed = replace(
+        accepted_mechanical_state, competition=directional,
+        vacancy_transport_state_v2=competition["transport_state"],
+    )
+    return committed, {
+        "elapsed_time_s": competition["elapsed_time_s"],
+        "event": competition["event"],
+        "tie_group": competition["tie_group"],
+        "accepted_plastic_increment_rate_max_s": float(np.max(epdot)),
+        "mean_stress_source": stress3d["source"],
+        "all_losing_clocks_advance_s": competition["all_losing_clocks_advance_s"],
+        "directional_losing_clocks_advanced": bool(directional_rates),
+    }
+
+
+def couple_active_cavity_flux_to_geometry(
+    previous_accepted_state, transported_state, hole, *, cavity_id,
+    duration_s, accepted_equivalent_plastic_strain_rate_s,
+    plastic_accommodation_coefficient=1.0,
+    direct_free_volume_rate_area_m2_s=0.0, failure_injector=None,
+):
+    """Commit one-way cavity absorption, boundary motion, remesh and mechanics atomically.
+
+    The V2 surface integral is the sole vacancy supply.  The existing
+    series-limited transport/accommodation law determines boundary speed; any
+    absorbed inventory not yet accommodated remains owned by the cavity.
+    """
+    # This compatibility entry point is now a strict delegate.  It may not
+    # independently update radius, inventories, plasticity, or remesh.
+    from .embryo_growth_v1 import (
+        EmbryoGrowthProcessOwner, source_local_fem_tensors,
+        transport_flux_certificate,
+    )
+    growth = next((x for x in transported_state.void_state.embryo_growth_states
+                   if x.cavity_id == cavity_id), None)
+    if growth is None:
+        raise RuntimeError("active cavity growth requires the authoritative embryo-growth owner")
+    if float(direct_free_volume_rate_area_m2_s) != 0.0:
+        raise RuntimeError("parallel direct-growth scalar is forbidden; commit through the growth owner")
+    if failure_injector is not None:
+        failure_injector("cavity_update", previous_accepted_state)
+    certificate = transport_flux_certificate(
+        previous_accepted_state.vacancy_transport_state_v2,
+        transported_state.vacancy_transport_state_v2,
+        owner_id=cavity_id, owner_kind="ACTIVE_CAVITY")
+    site = next(x for x in transported_state.void_state.sites if x.site_id == growth.site_id)
+    centers = np.asarray(transported_state.mesh.nodes)[np.asarray(transported_state.mesh.elems)].mean(axis=1)
+    eid = int(np.argmin(np.linalg.norm(centers-np.asarray(site.center_m), axis=1)))
+    local_h = math.sqrt(float(transported_state.mesh.area_e[eid]))
+    coefficient = float(plastic_accommodation_coefficient)
+    epdot = float(np.asarray(accepted_equivalent_plastic_strain_rate_s).reshape(-1)[0])
+    bulk_rate = 2.0*math.pi*growth.radius_m**2*coefficient*max(epdot, 0.0)
+
+    def remesh_delegate(mechanical, before_growth, after_growth):
+        crack_path = mechanical.crack_network.branch(ROOT_BRANCH_ID).path
+        moved_hole = _grow_hole_boundary(hole, after_growth.radius_m, crack_path_m=crack_path)
+        return remesh_cavity(
+            mechanical, moved_hole, mechanical.void_state,
+            "authoritative-embryo-growth-cavity-remesh",
+            failure_stage=("transport_cavity_remesh" if failure_injector is not None else None))
+
+    tensors, zz = source_local_fem_tensors(transported_state, growth)
+    def solve_delegated_transport_packet(packet_live, packet_dt):
+        from .vacancy_transport_phase_field_v2 import (
+            accepted_elastoplastic_stress_3d, solve_transport_interval,
+        )
+        packet_before = packet_live.vacancy_transport_state_v2
+        parent = np.asarray(packet_before.parent_mechanics_element_ids, int)
+        stress3d = accepted_elastoplastic_stress_3d(packet_live)
+        packet_after = solve_transport_interval(
+            packet_before, packet_before.transport_mesh,
+            packet_before.surface_registry, row=packet_before.parameter_row,
+            duration_s=packet_dt,
+            accepted_equivalent_plastic_strain_rate_s=np.full(
+                len(parent), max(epdot, 0.0)),
+            accepted_dislocation_density_m2=np.asarray(packet_live.rho_gp)[parent],
+            accepted_mean_stress_Pa=np.asarray(stress3d["mean_stress_Pa"])[parent])
+        return (replace(packet_live, vacancy_transport_state_v2=packet_after),
+                packet_before, packet_after)
+    owner = EmbryoGrowthProcessOwner()
+    committed, audit = owner.advance_continuous_state(
+        transported_state, site_id=growth.site_id, duration_s=float(duration_s),
+        transport_certificate=certificate,
+        transport_before_state=previous_accepted_state.vacancy_transport_state_v2,
+        transport_after_state=transported_state.vacancy_transport_state_v2,
+        bulk_accommodation_area_rate_m2_s=bulk_rate,
+        stress_tensor_Pa=tensors, sigma_zz_Pa=zz,
+        temperature_K=transported_state.vacancy_temperature_K,
+        support_radius_m=max(5.0*local_h, local_h), local_mesh_size_m=local_h,
+        remesh_callback=remesh_delegate, source_tensor_observer=source_local_fem_tensors,
+        transport_packet_solver=solve_delegated_transport_packet,
+        loop_emission_enabled=growth.cavity_emission_state.enabled,
+        failure_injector=failure_injector)
+    growth_after = next(x for x in committed.void_state.embryo_growth_states
+                        if x.site_id == growth.site_id)
+    return committed, {**dict(audit),
+                       "absorbed_inventory_area_m2": certificate.raw_absorbed_area_m2,
+                       "radius_before_m": growth.radius_m,
+                       "radius_after_m": growth_after.radius_m,
+                       "unaccommodated_cavity_inventory_area_m2":
+                           growth_after.captured_unaccommodated_vacancy_area_m2,
+                       "growth_transaction_owner": "EmbryoGrowthProcessOwner",
+                       "legacy_entry_point_strict_delegate": True}
+
+def _synchronize_legacy_vacancy_observable(state):
+    """Legacy global inventory is derived from the authoritative P0 field."""
+    if state.void_state is None:
+        return state
+    from .vacancy_coupling_v1 import vacancy_conservation
+    conservation = vacancy_conservation(state)
+    voids = replace(
+        state.void_state,
+        available_defect_inventory_area_m2=conservation["vacancy_field_inventory_area_m2"],
+        consumed_defect_inventory_area_m2=float(
+            state.vacancy_ledgers["vacancy_consumed_by_void_area_m2"]
+        ),
+    )
+    return replace(state, void_state=voids)
+
+
+def create_subgrid_cavity_from_vacancies(state, site_id, radius_m, *, process_zone_length_m):
+    """Create one cavity only after an exact local field debit."""
+    from .vacancy_coupling_v1 import debit_local_vacancy_inventory, deterministic_capture_patch
+    site = next(item for item in state.void_state.sites if item.site_id == site_id)
+    requested = math.pi * float(radius_m)**2
+    patch = deterministic_capture_patch(state, site.center_m, process_zone_length_m)
+    debited, audit = debit_local_vacancy_inventory(
+        state, requested_area_m2=requested, element_ids=patch,
+    )
+    if audit["growth_inventory_limited"]:
+        raise RuntimeError("local vacancy capture patch cannot supply the cavity seed")
+    # The legacy void-state scalar is not consulted as a source.  It is reset
+    # from the field after the topology-neutral cavity update.
+    generous = replace(
+        debited.void_state,
+        available_defect_inventory_area_m2=max(
+            requested, debited.void_state.available_defect_inventory_area_m2,
+        ),
+    )
+    voids = create_subgrid_cavity(generous, site_id, radius_m)
+    return _synchronize_legacy_vacancy_observable(replace(debited, void_state=voids)), audit
+
+
+def grow_cavity_from_vacancies(
+    state, cavity_id, *, rates, dt_s, process_zone_length_m,
+):
+    """Advance radius at the vacancy/plastic series rate and debit its local patch."""
+    from .vacancy_coupling_v1 import debit_local_vacancy_inventory, deterministic_capture_patch
+    cavity = next(item for item in state.void_state.cavities if item.cavity_id == cavity_id)
+    velocity = max(float(rates.get("Rdot_m_s", 0.0)), 0.0)
+    requested_radius = float(cavity.radius_m) + velocity * max(float(dt_s), 0.0)
+    requested_area = max(math.pi * requested_radius**2 - cavity.area_m2, 0.0)
+    patch = deterministic_capture_patch(
+        state, cavity.center_m, float(cavity.radius_m) + float(process_zone_length_m),
+    )
+    debited, audit = debit_local_vacancy_inventory(
+        state, requested_area_m2=requested_area, element_ids=patch,
+    )
+    actual_area = cavity.area_m2 + float(audit["consumed_vacancy_area_m2"])
+    actual_radius = math.sqrt(actual_area / math.pi)
+    grown = replace(
+        cavity, radius_m=actual_radius, area_m2=actual_area,
+        inventory_area_m2=cavity.inventory_area_m2 + float(audit["consumed_vacancy_area_m2"]),
+        geometry_generation=cavity.geometry_generation + (actual_radius > cavity.radius_m),
+    )
+    result = replace(debited, void_state=replace_cavity(debited.void_state, grown))
+    return _synchronize_legacy_vacancy_observable(result), {
+        **audit, "Rdot_diff_m_s": rates.get("Rdot_diff_m_s", 0.0),
+        "Rdot_plast_m_s": rates.get("Rdot_plast_m_s", 0.0),
+        "Rdot_m_s": velocity, "controlling_branch": rates.get("controlling_branch", "UNAVAILABLE"),
+        "radius_before_m": cavity.radius_m, "radius_after_m": actual_radius,
+    }
+
+
+def integrate_cavity_growth_on_common_clock(
+    state, cavity_id, *, target_radius_m, maximum_duration_s, temperature_K,
+    equivalent_plastic_strain_rate_gp, production_rate_s,
+    annihilation_rate_s, process_zone_length_m,
+):
+    """Integrate R, c_v, sinks, and cavity consumption on one bounded clock."""
+    from scipy.integrate import solve_ivp
+    from .vacancy_coupling_v1 import (
+        conservation_roundoff_budget_m2, deterministic_capture_patch,
+        equilibrium_vacancy_fraction, vacancy_conservation,
+        vacancy_growth_rates_m_s,
+    )
+    cavity = next(item for item in state.void_state.cavities if item.cavity_id == cavity_id)
+    target = float(target_radius_m)
+    maximum = float(maximum_duration_s)
+    if target <= cavity.radius_m or maximum <= 0.0:
+        raise ValueError("growth target and clock horizon must be positive")
+    patch = deterministic_capture_patch(
+        state, cavity.center_m, cavity.radius_m + float(process_zone_length_m),
+    )
+    area = np.asarray(state.mesh.area_e, dtype=float)
+    patch_area = area[patch]
+    plastic = np.asarray(equivalent_plastic_strain_rate_gp, dtype=float)
+    production = np.asarray(production_rate_s, dtype=float)
+    sink = np.asarray(annihilation_rate_s, dtype=float)
+    if any(values.shape != (state.mesh.ne,) for values in (plastic, production, sink)):
+        raise ValueError("growth fields must own one value per element")
+    local_plastic = float(np.sum(patch_area * plastic[patch]) / np.sum(patch_area))
+    equilibrium = equilibrium_vacancy_fraction(temperature_K)
+    ne = state.mesh.ne
+
+    def rhs(_time, owned):
+        concentration = np.maximum(owned[:ne], 0.0)
+        radius = max(float(owned[ne]), 1.0e-30)
+        patch_inventory = float(np.sum(patch_area * concentration[patch]))
+        local_c = patch_inventory / float(np.sum(patch_area))
+        growth = vacancy_growth_rates_m_s(
+            temperature_K=temperature_K, radius_m=radius,
+            vacancy_fraction_site=local_c,
+            equivalent_plastic_rate_s=local_plastic,
+        )
+        rdot = float(growth["Rdot_m_s"])
+        derivative = production - sink * (concentration - equilibrium)
+        area_rate = 2.0 * math.pi * radius * rdot
+        if area_rate > 0.0 and patch_inventory > 0.0:
+            derivative[patch] -= area_rate * concentration[patch] / patch_inventory
+        else:
+            rdot = 0.0
+        annihilation_area_rate = float(np.sum(area * sink * concentration))
+        return np.concatenate((derivative, (rdot, annihilation_area_rate)))
+
+    def target_event(_time, owned):
+        return float(owned[ne]) - target
+    target_event.terminal = True
+    target_event.direction = 1
+    initial = np.concatenate((
+        np.asarray(state.vacancy_fraction_gp, dtype=float),
+        (float(cavity.radius_m), 0.0),
+    ))
+    solution = solve_ivp(
+        rhs, (0.0, maximum), initial, method="BDF", rtol=1.0e-9,
+        atol=np.concatenate((np.full(ne, 1.0e-18), (1.0e-15, 1.0e-24))),
+        events=target_event,
+    )
+    if not solution.success:
+        raise RuntimeError("coupled vacancy/growth integration failed: " + solution.message)
+    final = solution.y[:, -1]
+    elapsed = float(solution.t[-1])
+    field = np.maximum(final[:ne], 0.0)
+    radius = float(final[ne])
+    consumed = math.pi * (radius**2 - cavity.radius_m**2)
+    ledgers = dict(state.vacancy_ledgers)
+    ledgers["vacancy_plastic_production_area_m2"] += float(np.sum(area * production)) * elapsed
+    ledgers["vacancy_thermal_exchange_area_m2"] += float(np.sum(area * sink * equilibrium)) * elapsed
+    ledgers["vacancy_annihilation_area_m2"] += float(final[ne + 1])
+    ledgers["vacancy_consumed_by_void_area_m2"] += consumed
+    grown = replace(
+        cavity, radius_m=radius, area_m2=math.pi * radius**2,
+        inventory_area_m2=cavity.inventory_area_m2 + consumed,
+        geometry_generation=cavity.geometry_generation + int(radius > cavity.radius_m),
+    )
+    updated = replace(
+        state, vacancy_fraction_gp=field, vacancy_ledgers=ledgers,
+        vacancy_temperature_K=float(temperature_K),
+        void_state=replace_cavity(state.void_state, grown),
+    )
+    residual = vacancy_conservation(updated)["vacancy_conservation_residual_m2"]
+    budget = conservation_roundoff_budget_m2(
+        *ledgers.values(), vacancy_conservation(updated)["vacancy_field_inventory_area_m2"],
+    )
+    if abs(residual) > budget:
+        raise RuntimeError("coupled growth conservation exceeds numerical budget")
+    if residual:
+        ledgers = dict(updated.vacancy_ledgers)
+        ledgers["vacancy_annihilation_area_m2"] += residual
+        updated = replace(updated, vacancy_ledgers=ledgers)
+    patch_inventory = float(np.sum(patch_area * field[patch]))
+    final_growth = vacancy_growth_rates_m_s(
+        temperature_K=temperature_K, radius_m=radius,
+        vacancy_fraction_site=patch_inventory / float(np.sum(patch_area)),
+        equivalent_plastic_rate_s=local_plastic,
+    )
+    return _synchronize_legacy_vacancy_observable(updated), {
+        "elapsed_time_s": elapsed,
+        "target_reached": bool(solution.t_events[0].size),
+        "radius_before_m": cavity.radius_m,
+        "radius_after_m": radius,
+        "cavity_consumption_area_m2": consumed,
+        "capture_patch_element_ids": patch.tolist(),
+        "accepted_ledger_roundoff_correction_m2": residual,
+        "conservation_roundoff_budget_m2": budget,
+        **final_growth,
+    }
+
+
+def evolve_accepted_plastic_vacancy_interval(
+    state, *, bundle, temperature_K, duration_s, stress_scale=1.0,
+    plasticity_parameter_overrides=None, test_only=False,
+):
+    """TEST-ONLY Peierls/Taylor perturbation helper.
+
+    Scientific execution must supply ordinary previous/accepted mechanical
+    states to ``advance_site_on_common_vacancy_clock``. This helper deliberately
+    constructs a generic ablation configuration and may only be used by causal
+    perturbation and extreme-reservoir plumbing tests.
+    """
+    from .config import SimulationConfig
+    from .materials import PlasticityModel
+    from .plasticity import update_plasticity
+    from .vacancy_coupling_v1 import (
+        advance_accepted_vacancy_state, equivalent_plastic_strain_rate_s,
+    )
+    from .unified_fracture_material_v5 import front_config
+
+    if not test_only:
+        raise RuntimeError(
+            "fresh default plasticity configuration is forbidden in scientific vacancy execution"
+        )
+
+    _, _, sigma_gp, *_ = assemble_mechanics(
+        state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
+    )
+    config = SimulationConfig()
+    # This repository's common bulk updater retains its additive
+    # Peierls--Taylor implementation.  The accepted ep/rho output—not these
+    # parameters—is the sole input to the vacancy closure.
+    config.dislocations.bulk_kinetics_model = "legacy_additive_flow_stress"
+    config.dislocations.plastic_update_mode = "flow_stress"
+    config.dislocations.thermo_consistency_mode = "off"
+    for name, value in dict(plasticity_parameter_overrides or {}).items():
+        if name not in {
+            "peierls_H0_eV", "peierls_S_kB", "peierls_v0_b3",
+            "taylor_athermal_alpha",
+        }:
+            raise ValueError("unsupported causal Peierls/Taylor test override: " + name)
+        setattr(config.dislocations, name, float(value))
+    ep_gp, rho_gp, _, plasticity_audit = update_plasticity(
+        np.asarray(state.ep_gp, dtype=float).copy(),
+        np.asarray(state.rho_gp, dtype=float).copy(),
+        float(stress_scale) * sigma_gp, state.material, float(temperature_K),
+        float(duration_s), PlasticityModel(config.plasticity_barrier, state.material),
+        config.dislocations, return_info=True,
+    )
+    mechanical = equilibrate_fixed_load_with_production_fem(
+        replace(state, ep_gp=ep_gp, rho_gp=rho_gp)
+    )
+    accepted_rate = equivalent_plastic_strain_rate_s(
+        state.ep_gp, mechanical.ep_gp, duration_s,
+    )
+    evolved, vacancy_audit = advance_accepted_vacancy_state(
+        state, mechanical, duration_s=duration_s, temperature_K=temperature_K,
+        process_zone_length_m=front_config(bundle).L_pz,
+        rho_reference_m2=float(bundle.fracture_row["rho_forest_floor_m2"]),
+    )
+    return evolved, accepted_rate, {
+        "plasticity_material_row_id": bundle.fracture_material_row_id,
+        "plasticity_kinetics_model": config.dislocations.bulk_kinetics_model,
+        "peierls_H0_eV": config.dislocations.peierls_H0_eV,
+        "peierls_activation_entropy_kB": config.dislocations.peierls_S_kB,
+        "peierls_v0_b3": config.dislocations.peierls_v0_b3,
+        "taylor_athermal_alpha": config.dislocations.taylor_athermal_alpha,
+        "accepted_equivalent_plastic_rate_max_s": float(np.max(accepted_rate)),
+        "accepted_equivalent_plastic_rate_integral_m2_s": float(np.sum(
+            state.mesh.area_e * accepted_rate
+        )),
+        "plasticity_update": plasticity_audit,
+        "vacancy_update": vacancy_audit,
+    }
 
 
 def fresh_sharp_front_engine(material, bundle: UnifiedFractureMaterialBundle):
@@ -164,7 +792,9 @@ def advance_disabled_v5_stage2(state, end_m, *, transaction_identity):
     from .v12_production_driver import execute_event
     if state.sharp_wake_model_id != V12_MODEL_ID or state.void_state is not None:
         raise ValueError("disabled V5 requires the unchanged void-free Stage-II V12 state")
-    return execute_event(state, end_m, transaction_identity=transaction_identity)
+    return execute_event(
+        state,end_m,transaction_identity=transaction_identity,
+        event_classification="software_forced_geometry")
 
 
 def _head():
@@ -176,7 +806,9 @@ def _head():
 
 def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0), *, boundary_segments=32,
               radial_layers=12, source_conforming_geometry=False,
-              source_direction_xy=(1.0, 0.0), shape_regular_local_level=None):
+              source_direction_xy=(1.0, 0.0), shape_regular_local_level=None,
+              specimen_width_m=1.0e-3, specimen_height_m=1.0e-3,
+              far_h_m=5.0e-5):
     if center_m[1] < 0.0:
         positive_hole, positive_filled = _geometry(
             radius_m, (center_m[0], -center_m[1]),
@@ -184,6 +816,8 @@ def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0), *, boundary_segments=32,
             source_conforming_geometry=source_conforming_geometry,
             source_direction_xy=(source_direction_xy[0], -source_direction_xy[1]),
             shape_regular_local_level=shape_regular_local_level,
+            specimen_width_m=specimen_width_m,
+            specimen_height_m=specimen_height_m, far_h_m=far_h_m,
         )
         def mirrored(value):
             nodes = np.asarray(value.mesh.nodes).copy(); nodes[:, 1] *= -1.0
@@ -202,7 +836,7 @@ def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0), *, boundary_segments=32,
         if source_conforming_geometry:
             raise ValueError("V4 and V5 cavity geometry contracts are mutually exclusive")
         hole = build_shape_regular_source_patch_hole_mesh(
-            1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5,
+            specimen_width_m, specimen_height_m, center_m, radius_m, far_h_m,
             local_level=shape_regular_local_level,
             polygon_sectors=boundary_segments, base_radial_layers=radial_layers,
             source_direction_xy=source_direction_xy,
@@ -212,7 +846,7 @@ def _geometry(radius_m=5.0e-5, center_m=(7.0e-4, 0.0), *, boundary_segments=32,
                    else build_explicit_hole_mesh)
         builder_kwargs = ({"source_direction_xy": source_direction_xy}
                           if source_conforming_geometry else {})
-        hole = builder(1.0e-3, 1.0e-3, center_m, radius_m, 5.0e-5,
+        hole = builder(specimen_width_m, specimen_height_m, center_m, radius_m, far_h_m,
                        boundary_segments, radial_layers_override=radial_layers,
                        **builder_kwargs)
     return hole, fill_explicit_hole_mesh(hole)
@@ -324,6 +958,34 @@ def _external_free_root_context(mesh, boundary, root):
     },)}
 
 
+def _owned_transport_boundary_tags(mesh, boundary, *, cavity_node_ids=()):
+    """Persist boundary semantics supplied by this geometry constructor."""
+    counts = {}
+    for triangle in np.asarray(mesh.elems, dtype=int):
+        for a, b in ((triangle[0], triangle[1]), (triangle[1], triangle[2]),
+                     (triangle[2], triangle[0])):
+            edge = tuple(sorted((int(a), int(b))))
+            counts[edge] = counts.get(edge, 0) + 1
+    grips = set(map(int, np.asarray(boundary.top_nodes))) | set(
+        map(int, np.asarray(boundary.bot_nodes))
+    )
+    cavity = set(map(int, cavity_node_ids))
+    rows = []
+    for edge, count in sorted(counts.items()):
+        if count != 1:
+            continue
+        if set(edge) <= cavity:
+            kind = "ACTIVE_CAVITY_SURFACE"
+        elif set(edge) <= grips:
+            kind = "CONTACT_OR_GRIP_NO_FLUX"
+        else:
+            # This classification is made once by the known uncoated specimen
+            # geometry owner and persisted; the transport solver never infers it.
+            kind = "EXTERNAL_FREE_SURFACE"
+        rows.append({"node_ids": edge, "kind": kind})
+    return tuple(rows)
+
+
 def _refine_state_around_graph(state, levels):
     from .adaptive_multitip_mesh_v11 import refine_accepted_state
     result = state
@@ -349,18 +1011,37 @@ def _refine_state_around_graph(state, levels):
 
 def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enabled=True, stochastic=False, seed=3621,
                                 cavity_center_m=(7.0e-4, 0.0), crack_path_m=None,
+                                void_site_centers_m=None,
                                 cleavage_theta_deg=0.0, boundary_segments=32, radial_layers=12,
                                 source_conforming_geometry=False,
-                                shape_regular_local_level=None):
+                                shape_regular_local_level=None,
+                                temperature_K=900.0,
+                                initial_vacancy_fraction_gp=None,
+                                vacancy_energy_variant="reference",
+                                direct_interaction_birth_enabled=False,
+                                direct_interaction_parameter_row=None,
+                                cavity_surface_loop_emission_enabled=False,
+                                cavity_emission_parameter_row=None,
+                                interaction_population_partition=None,
+                                bulk_initial_density_m2=None,
+                                initial_plastic_strain_gp=None,
+                                specimen_width_m=1.0e-3,
+                                specimen_height_m=1.0e-3,
+                                far_h_m=5.0e-5,
+                                test_only_extreme_reservoir=False,
+                                cavity_geometry_radius_m=5.0e-5):
     if (boundary_segments, radial_layers) != (32, 12) and crack_path_m is None:
         raise ValueError("production resolution transfer requires an explicit fixed crack path")
     source_direction = (math.cos(math.radians(cleavage_theta_deg)),
                         math.sin(math.radians(cleavage_theta_deg)))
     hole, filled = _geometry(
+        radius_m=float(cavity_geometry_radius_m),
         center_m=cavity_center_m, boundary_segments=boundary_segments,
         radial_layers=radial_layers, source_conforming_geometry=source_conforming_geometry,
         source_direction_xy=source_direction,
         shape_regular_local_level=shape_regular_local_level,
+        specimen_width_m=specimen_width_m,
+        specimen_height_m=specimen_height_m, far_h_m=far_h_m,
     )
     mesh = filled.mesh
     ray = 16
@@ -368,8 +1049,11 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
         path_mesh = mesh
         if source_conforming_geometry or shape_regular_local_level is not None:
             _, retained_filled = _geometry(
+                radius_m=float(cavity_geometry_radius_m),
                 center_m=cavity_center_m, boundary_segments=32, radial_layers=12,
                 source_conforming_geometry=False,
+                specimen_width_m=specimen_width_m,
+                specimen_height_m=specimen_height_m, far_h_m=far_h_m,
             )
             path_mesh = retained_filled.mesh
         start = tuple(map(float, path_mesh.nodes[12 * 32 + ray]))
@@ -390,24 +1074,105 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
             hole = replace(hole, mesh=_insert_point_in_mesh(hole.mesh, point))
         filled = replace(filled, mesh=mesh)
     material = elastic_material(bundle)
+    from .vacancy_transport_phase_field_v2 import (
+        equilibrium_vacancy_fraction as transport_equilibrium_vacancy_fraction,
+        vacancy_energy_study_row,
+    )
+    transport_row = vacancy_energy_study_row(material, vacancy_energy_variant)
+    if interaction_population_partition is not None:
+        mobile, direct, benign = map(float, interaction_population_partition)
+        if min(mobile, direct, benign) < 0.0 or not math.isclose(
+            mobile+direct+benign, 1.0, rel_tol=0.0, abs_tol=1.0e-12
+        ):
+            raise ValueError("interaction population partition must be nonnegative and sum to one")
+        transport_row = replace(
+            transport_row,
+            row_id=transport_row.row_id+":interaction-partition-v1",
+            interaction_mobile_vacancy_fraction=mobile,
+            interaction_direct_cavitation_fraction=direct,
+            interaction_benign_fraction=benign,
+        )
     element_x = np.asarray(mesh.nodes)[np.asarray(mesh.elems)].mean(axis=1)[:, 0]
     u = np.zeros(mesh.ndof)
-    u[2 * np.asarray(filled.boundary.top_nodes) + 1] = 2.0e-7
-    u[2 * np.asarray(filled.boundary.bot_nodes) + 1] = -2.0e-7
+    remote_half_opening = 2.0e-7*float(specimen_height_m)/1.0e-3
+    u[2 * np.asarray(filled.boundary.top_nodes) + 1] = remote_half_opening
+    u[2 * np.asarray(filled.boundary.bot_nodes) + 1] = -remote_half_opening
+    if initial_vacancy_fraction_gp is None:
+        vacancy = np.full(
+            mesh.ne,
+            transport_equilibrium_vacancy_fraction(temperature_K, transport_row),
+            dtype=float,
+        )
+    else:
+        supplied = np.asarray(initial_vacancy_fraction_gp, dtype=float)
+        vacancy = (
+            np.full(mesh.ne, float(supplied), dtype=float)
+            if supplied.ndim == 0 else supplied.copy()
+        )
+        if vacancy.shape != (mesh.ne,) or np.any(~np.isfinite(vacancy)) or np.any(vacancy < 0.0):
+            raise ValueError("explicit initial vacancy field must be finite, nonnegative P0 data")
+        from .vacancy_coupling_v1 import DILUTE_VACANCY_FRACTION_LIMIT
+        if np.max(vacancy) > DILUTE_VACANCY_FRACTION_LIMIT and not test_only_extreme_reservoir:
+            raise ValueError(
+                "non-test vacancy fraction exceeds the declared dilute-model validity range"
+            )
+    vacancy_inventory = float(np.sum(vacancy * np.asarray(mesh.area_e)))
     void_state = None
     if enabled:
         rng = np.random.default_rng(seed)
-        thresholds = tuple(float(rng.exponential()) for _ in range(3)) if stochastic else (0.25, 0.25, 0.35)
-        site = VoidSite(
-            "site-1", tuple(map(float, cavity_center_m)), VoidPhase.AVAILABLE_SITE, 0, 2, 0.8,
-            HazardClock(0.0, thresholds[0]), HazardClock(0.0, thresholds[1]), HazardClock(0.0, thresholds[2]),
+        centers = (cavity_center_m,) if void_site_centers_m is None else tuple(void_site_centers_m)
+        if not centers:
+            raise ValueError("enabled voiding requires at least one predefined site")
+        sites = []
+        for index, center in enumerate(centers, start=1):
+            xy = tuple(map(float, center))
+            if len(xy) != 2 or not all(math.isfinite(value) for value in xy):
+                raise ValueError("void site centers must be finite 2-vectors")
+            thresholds = (tuple(float(rng.exponential()) for _ in range(3))
+                          if stochastic else (0.25, 0.25, 0.35))
+            sites.append(VoidSite(
+                f"site-{index}", xy, VoidPhase.AVAILABLE_SITE, 0, 2, 0.8,
+                HazardClock(0.0, thresholds[0]), HazardClock(0.0, thresholds[1]),
+                HazardClock(0.0, thresholds[2])))
+        void_state = ProductionVoidState(
+            tuple(sites), rng_state=rng.bit_generator.state,
+            available_defect_inventory_area_m2=vacancy_inventory,
         )
-        void_state = ProductionVoidState((site,), rng_state=rng.bit_generator.state)
+        from .dislocation_interaction_voiding_v1 import initialize_dislocation_interaction_state
+        from .embryo_growth_v1 import EmbryoGrowthConfiguration
+        void_state = replace(
+            void_state,
+            embryo_growth_configuration=EmbryoGrowthConfiguration(
+                vacancy_clustering_birth_enabled=True,
+                direct_interaction_birth_enabled=bool(direct_interaction_birth_enabled),
+                cavity_surface_loop_emission_enabled=bool(cavity_surface_loop_emission_enabled),
+                cavity_emission_parameter_row=cavity_emission_parameter_row),
+            dislocation_interaction_state=initialize_dislocation_interaction_state(
+                void_state.sites, stochastic=stochastic, seed=seed+45536,
+                enabled=bool(direct_interaction_birth_enabled), support_radius_m=5.0e-5,
+                parameter_row=direct_interaction_parameter_row,
+            ),
+        )
+    if initial_plastic_strain_gp is None:
+        initial_ep = np.vstack((
+            np.full(mesh.ne, 1.0e-5), np.full(mesh.ne, -0.5e-5),
+            np.full(mesh.ne, 0.25e-5 * (1.0 if cavity_center_m[1] >= 0.0 else -1.0)),
+        ))
+    else:
+        supplied_ep = np.asarray(initial_plastic_strain_gp, dtype=float)
+        initial_ep = np.zeros((3, mesh.ne), dtype=float) if supplied_ep.ndim == 0 and float(supplied_ep) == 0.0 else supplied_ep.copy()
+        if initial_ep.shape != (3, mesh.ne) or np.any(~np.isfinite(initial_ep)):
+            raise ValueError("initial plastic strain must be finite (3, ne) data or scalar zero")
+    initial_rho = (
+        float(bundle.fracture_row["rho_source0_m2"])
+        if bulk_initial_density_m2 is None else float(bulk_initial_density_m2)
+    )
+    if not math.isfinite(initial_rho) or initial_rho <= 0.0:
+        raise ValueError("bulk initial density must be finite and positive")
     state = LiveFEMTopologyState(
         mesh, filled.boundary, np.zeros(mesh.nn), u,
-        np.vstack((np.full(mesh.ne, 1.0e-5), np.full(mesh.ne, -0.5e-5),
-                   np.full(mesh.ne, 0.25e-5 * (1.0 if cavity_center_m[1] >= 0.0 else -1.0)))),
-        np.full(mesh.ne, float(bundle.fracture_row["rho_source0_m2"])),
+        initial_ep,
+        np.full(mesh.ne, initial_rho),
         plane_strain_D(material), material, None,
         CrackNetworkState.one_tip(crack_path, local_state={"front_engine_state_owner": ROOT_BRANCH_ID}), DirectionalCompetitionState.initialize(
             tungsten_cleavage_candidates(theta_deg=cleavage_theta_deg), global_hazard_seed=seed,
@@ -418,10 +1183,13 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
             "source_state": {"density": 3.0, "clock": 0.125},
             "production_mesh_resolution": (int(boundary_segments), int(radial_layers)),
             "boundary_terminal_context": _external_free_root_context(mesh, filled.boundary, start),
+            "transport_boundary_tags_v2": _owned_transport_boundary_tags(mesh, filled.boundary),
         },
         {"emission_work": 1.0}, np.random.default_rng(seed).bit_generator.state,
         {"accepted_steps": 0, "topology_actions": 0, "mesh_generation": 0}, 0.0,
         void_state=void_state,
+        vacancy_fraction_gp=vacancy,
+        vacancy_temperature_K=float(temperature_K),
     )
     if abs(float(cleavage_theta_deg)) > 1.0e-12:
         hole_fields = _project_fields(state, hole.mesh)
@@ -429,6 +1197,9 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
             state, mesh=hole.mesh, boundary=hole.boundary,
             damage=hole_fields["damage"], displacement=hole_fields["displacement"],
             ep_gp=hole_fields["ep_gp"], rho_gp=hole_fields["rho_gp"],
+            vacancy_fraction_gp=hole_fields["vacancy_fraction_gp"],
+            vacancy_ledgers=hole_fields["vacancy_ledgers"],
+            vacancy_temperature_K=hole_fields["vacancy_temperature_K"],
         )
         hole_state = _refine_state_around_graph(hole_state, 2)
         hole = replace(hole, mesh=hole_state.mesh, boundary=hole_state.boundary)
@@ -442,11 +1213,52 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
     state = initialize_mechanically_separating_v12(
         state, source_commit=_head(), configuration={"voiding_enabled": enabled, "model": V12_MODEL_ID},
     )
-    return equilibrate_fixed_load_with_production_fem(state), hole
+    state = equilibrate_fixed_load_with_production_fem(state)
+    from .vacancy_transport_phase_field_v2 import (
+        LocalizedCaptureSite,
+        build_exact_cut_transport_mesh, initial_transport_state,
+    )
+    transport_row = replace(
+        transport_row,
+        row_id=transport_row.row_id + ":rho-ref=" + bundle.fracture_row["rho_forest_floor_m2"],
+        rho_reference_m2=float(bundle.fracture_row["rho_forest_floor_m2"]),
+    )
+    transport_sites = () if state.void_state is None else tuple(
+        LocalizedCaptureSite(
+            site_id=item.site_id, center_xy_m=item.center_m,
+            support_radius_m=5.0e-5,
+            capture_rate_area_per_s=0.0,
+            required_embryo_inventory_area_m2=VoidingConfig().birth_normal_area_m2,
+            hit_count=item.hits, required_hit_count=item.required_hits,
+            birth_action=item.birth.accumulated, threshold=item.birth.threshold,
+            rng_fingerprint=hashlib.sha256(json.dumps(
+                state.void_state.rng_state, sort_keys=True, default=str,
+            ).encode()).hexdigest(),
+        ) for item in state.void_state.sites
+    )
+    # Extreme-reservoir V1 plumbing remains explicitly legacy and cannot be
+    # mislabeled as a bounded V2 scientific state.
+    if not test_only_extreme_reservoir:
+        branch = state.crack_network.branch(ROOT_BRANCH_ID)
+        exact_cut = build_exact_cut_transport_mesh(
+            state.mesh, p0=branch.root, p1=branch.tip,
+            topology_boundary_tags=state.junction_process_state["transport_boundary_tags_v2"],
+            segment_id=f"{ROOT_BRANCH_ID}:0",
+        )
+        transport_state = initial_transport_state(
+            exact_cut.mesh, temperature_K=temperature_K, row=transport_row,
+            registry=exact_cut.registry,
+            vacancy_fraction_gp=state.vacancy_fraction_gp[exact_cut.parent_mechanics_element_ids],
+            parent_mechanics_element_ids=exact_cut.parent_mechanics_element_ids,
+            site_states=transport_sites,
+        )
+        state = replace(state, vacancy_transport_state_v2=transport_state)
+    return state, hole
 
 
 def observables(state, operation):
     from .topology_transaction_v11 import require_equilibrium_observables
+    from .vacancy_coupling_v1 import vacancy_conservation
 
     cavity = None if state.void_state is None or not state.void_state.cavities else state.void_state.cavities[0]
     site = None if state.void_state is None else state.void_state.sites[0]
@@ -460,6 +1272,7 @@ def observables(state, operation):
     active_branches = [branch.branch_id for branch in state.crack_network.branches
                        if branch.status == "active"]
     support_active = [] if state.v12_support_state is None else list(state.v12_support_state.active_tip_identities)
+    vacancy = vacancy_conservation(state)
     return {
         "operation": operation, "fingerprint": complete_accepted_state_fingerprint(state),
         "mesh_nodes": int(state.mesh.nn), "mesh_elements": int(state.mesh.ne),
@@ -486,6 +1299,9 @@ def observables(state, operation):
         "inventory_area_m2": None if cavity is None else cavity.inventory_area_m2,
         "available_defect_inventory_area_m2": None if state.void_state is None else state.void_state.available_defect_inventory_area_m2,
         "consumed_defect_inventory_area_m2": None if state.void_state is None else state.void_state.consumed_defect_inventory_area_m2,
+        "vacancy_fraction_max": float(np.max(state.vacancy_fraction_gp)),
+        "vacancy_ledgers": dict(state.vacancy_ledgers),
+        **vacancy,
         "void_event_history": [] if state.void_state is None else list(state.void_state.event_history),
         "length_ledgers": {} if state.void_state is None else dict(state.void_state.length_ledgers),
         "event_counters": dict(state.event_counters),
@@ -599,11 +1415,27 @@ def _conform_cavity_intersection(state, intersection, *, failure_injector=None):
     return rebuilt, new_node, True
 
 
-def _conform_bulk_point(state, point, *, identity, failure_injector=None):
+def _conform_bulk_point(
+    state, point, *, identity, failure_injector=None,
+    transfer_v2_transport=True,
+):
     mesh = _insert_point_in_mesh(state.mesh, point)
     if mesh is state.mesh:
         return state
-    fields = _project_fields(state, mesh)
+    fields = _project_fields(
+        state, mesh, transfer_v2_transport=bool(transfer_v2_transport),
+    )
+    if not transfer_v2_transport and state.vacancy_transport_state_v2 is not None:
+        junction = dict(state.junction_process_state)
+        junction["virtual_mechanics_transport_transfer"] = {
+            "mode": "DEFERRED_ACCEPTED_OWNER_READ_ONLY",
+            "accepted_surface_registry_fingerprint": (
+                state.vacancy_transport_state_v2.surface_registry_fingerprint
+            ),
+            "physical_time_advanced": False,
+            "transport_solve_performed": False,
+        }
+        state = replace(state, junction_process_state=junction)
     return remesh_mechanically_separating_v12(
         state, mesh=mesh, boundary=state.boundary, transferred_fields=fields,
         source_commit=_head(), configuration={"event": identity},
@@ -775,6 +1607,177 @@ def cavity_source_conforming_recovery_v4(state, *, boundary_node: int | None = N
         material_fingerprints=identity, state_fingerprint=_cavity_resolution_binding(state),
         solid_element_mask=solid,
     )
+
+
+def cavity_boundary_fitted_recovery_v1(state, *, boundary_node: int | None = None):
+    """Recover on the exact accepted polygon without a circle projection."""
+    from .cavity_boundary_fitted_source_v1 import (
+        recover_boundary_fitted_physical_patch_v1,
+    )
+    cavity = state.void_state.cavities[0]
+    position = np.asarray(cavity.connection_exit_m, dtype=float)
+    if boundary_node is None:
+        boundary_node = int(np.argmin(
+            np.linalg.norm(np.asarray(state.mesh.nodes)-position, axis=1)
+        ))
+    node = int(boundary_node)
+    if np.linalg.norm(np.asarray(state.mesh.nodes)[node]-position) > 1.0e-12:
+        raise ValueError("stored connection exit is not an aligned cavity-boundary node")
+    identity = dict(require_bound_identity(state))
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
+    _, _, sigma, *_ = assemble_mechanics(
+        state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
+        state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
+    )
+    damage = getattr(state.mesh, "element_damage_gp", None)
+    solid = None if damage is None else np.asarray(damage, dtype=float) < 0.5
+    return recover_boundary_fitted_physical_patch_v1(
+        nodes=state.mesh.nodes, elements=state.mesh.elems, stress_Pa=sigma,
+        boundary_node=node, cavity_id=cavity.cavity_id,
+        cavity_center_m=cavity.center_m, cavity_radius_m=cavity.radius_m,
+        process_length_m=engine.f.L_pz, poisson_ratio=state.material.nu,
+        owned_boundary_edges=_actual_cavity_boundary_edges(state),
+        material_fingerprints=identity,
+        state_fingerprint=_cavity_resolution_binding(state),
+        solid_element_mask=solid,
+    )
+
+
+def qualified_boundary_fitted_source_observation(state, *, refinement_levels=(1, 2)):
+    """Qualify the polygon-fitted source on isolated nested local refinements."""
+    from .adaptive_multitip_mesh_v11 import refine_accepted_state
+    from .causal_sharp_wake_v11 import rerasterize_refined_topology_damage
+    from .cavity_source_recovery_v3 import (
+        MINIMUM_ELEMENT_QUALITY, TENSOR_RELATIVE_TOLERANCE,
+        TRACTION_RESIDUAL_TOLERANCE,
+    )
+    from .topology_transaction_v11 import (
+        complete_accepted_state_fingerprint,
+        equilibrate_fixed_load_with_production_fem,
+    )
+    levels = tuple(sorted(set(map(int, refinement_levels))))
+    if len(levels) < 2 or levels[0] < 1:
+        raise ValueError("boundary-fitted source qualification requires two refined levels")
+    accepted_before = complete_accepted_state_fingerprint(state)
+    trial = state.isolated_copy()
+    source = np.asarray(trial.void_state.cavities[0].connection_exit_m, float)
+    records = []
+    completed = 0
+    for requested_level in levels:
+        while completed < requested_level:
+            centroids = np.asarray(trial.mesh.nodes)[np.asarray(trial.mesh.elems)].mean(axis=1)
+            marked = np.flatnonzero(np.linalg.norm(
+                centroids-source[None, :], axis=1,
+            ) <= 6.0e-5)
+            if not len(marked):
+                raise RuntimeError("boundary-fitted source refinement has no local support")
+            refined, lineage = refine_accepted_state(
+                trial, marked_parent_elements=tuple(map(int, marked)),
+                active_tip_ids=trial.crack_network.active_tip_ids,
+                generation=int(trial.event_counters.get("mesh_generation", 0))+1,
+                operation_index=int(trial.event_counters.get(
+                    "refinement_operation_index", 0))+1,
+                rebuild_vacancy_transport=False,
+            )
+            trial, _ = rerasterize_refined_topology_damage(
+                trial, refined, lineage.parent_to_child_element_map,
+            )
+            trial = equilibrate_fixed_load_with_production_fem(trial)
+            completed += 1
+        recovery = cavity_boundary_fitted_recovery_v1(trial)
+        records.append({
+            "refinement_level": requested_level,
+            "mesh_nodes": int(trial.mesh.nn), "mesh_elements": int(trial.mesh.ne),
+            "tensor_Pa": recovery["tensor_Pa"],
+            "sigma_tt_Pa": recovery["sigma_tt_Pa"],
+            "minimum_element_quality": recovery["minimum_element_quality"],
+            "traction_residual": recovery["traction_residual"],
+            "sample_count": recovery["sample_count"],
+            "recovery": recovery,
+        })
+    first = np.asarray(records[-2]["tensor_Pa"], float)
+    finest = np.asarray(records[-1]["tensor_Pa"], float)
+    tensor_error = float(np.linalg.norm(finest-first)/max(
+        np.linalg.norm(first), np.linalg.norm(finest), 1.0e-300,
+    ))
+    quality_passed = all(
+        row["minimum_element_quality"] >= MINIMUM_ELEMENT_QUALITY for row in records[-2:]
+    )
+    traction_passed = all(
+        row["traction_residual"] <= TRACTION_RESIDUAL_TOLERANCE for row in records[-2:]
+    )
+    accepted_preserved = complete_accepted_state_fingerprint(state) == accepted_before
+    passed = bool(
+        tensor_error <= TENSOR_RELATIVE_TOLERANCE and quality_passed
+        and traction_passed and accepted_preserved
+    )
+    return {
+        **records[-1]["recovery"],
+        "qualification_schema": "v5.boundary-fitted-source-qualification/1",
+        "qualification_status": "AVAILABLE" if passed else "UNAVAILABLE",
+        "tensor_relative_error": tensor_error,
+        "tensor_relative_limit": TENSOR_RELATIVE_TOLERANCE,
+        "quality_passed": quality_passed, "traction_passed": traction_passed,
+        "accepted_state_preserved": accepted_preserved,
+        "physical_time_advanced": False, "transport_solve_performed": False,
+        "refinement_records": tuple(records),
+    }
+
+
+def _boundary_fitted_source_probe(state, recovery, *, boundary_node: int):
+    """Create a state-bound proof record from the measured nested observation."""
+    from .finalization_v3_schema import canonical_hash
+    from .topology_transaction_v11 import complete_accepted_state_fingerprint
+    proof = {
+        "schema": "v5.boundary-fitted-source-qualification-proof/1",
+        "accepted_state_fingerprint": complete_accepted_state_fingerprint(state),
+        "qualification_status": recovery["qualification_status"],
+        "tensor_Pa": recovery["tensor_Pa"],
+        "tensor_relative_error": recovery["tensor_relative_error"],
+        "tensor_relative_limit": recovery["tensor_relative_limit"],
+        "quality_passed": recovery["quality_passed"],
+        "traction_passed": recovery["traction_passed"],
+        "accepted_state_preserved": recovery["accepted_state_preserved"],
+        "physical_arc_identity_sha256": recovery["physical_arc_identity"]["sha256"],
+        "refinement_levels": [row["refinement_level"]
+                              for row in recovery["refinement_records"]],
+    }
+    proof["sha256"] = canonical_hash(proof)
+    return {
+        "kind": "CAVITY_BOUNDARY_FITTED_PHYSICAL_PATCH_V1",
+        "boundary_node_id": int(boundary_node),
+        "element_ids": list(map(int, recovery["stencil_element_ids"])),
+        "physical_arc_identity": recovery["physical_arc_identity"],
+        "qualification_proof": proof,
+    }
+
+
+def _boundary_fitted_probe_is_qualified(state, tensor, probe) -> bool:
+    """Verify the internally generated nested proof against this exact state/load."""
+    from .finalization_v3_schema import canonical_hash
+    from .topology_transaction_v11 import complete_accepted_state_fingerprint
+    if not isinstance(probe, Mapping) or probe.get("kind") != (
+            "CAVITY_BOUNDARY_FITTED_PHYSICAL_PATCH_V1"):
+        return False
+    proof = probe.get("qualification_proof")
+    if not isinstance(proof, Mapping):
+        return False
+    unsigned = {key: value for key, value in proof.items() if key != "sha256"}
+    checks = (
+        proof.get("schema") == "v5.boundary-fitted-source-qualification-proof/1",
+        proof.get("sha256") == canonical_hash(unsigned),
+        proof.get("accepted_state_fingerprint") == complete_accepted_state_fingerprint(state),
+        proof.get("qualification_status") == "AVAILABLE",
+        bool(proof.get("quality_passed")), bool(proof.get("traction_passed")),
+        bool(proof.get("accepted_state_preserved")),
+        float(proof.get("tensor_relative_error", math.inf))
+            <= float(proof.get("tensor_relative_limit", -math.inf)),
+        tuple(proof.get("refinement_levels", ())) == (1, 2),
+        np.array_equal(np.asarray(proof.get("tensor_Pa"), float), np.asarray(tensor, float)),
+        proof.get("physical_arc_identity_sha256")
+            == probe.get("physical_arc_identity", {}).get("sha256"),
+    )
+    return bool(all(checks))
 
 
 def cavity_free_surface_certificate(state) -> dict[str, Any]:
@@ -990,7 +1993,135 @@ def crack_void_connection_certificate(state, *, branch_id: str, cavity_id: str,
     }
 
 
-def _project_fields(state, mesh):
+def _polygon_area(vertices):
+    polygon = np.asarray(vertices, dtype=float)
+    if len(polygon) < 3:
+        return 0.0
+    return 0.5 * abs(float(np.sum(
+        polygon[:, 0] * np.roll(polygon[:, 1], -1)
+        - polygon[:, 1] * np.roll(polygon[:, 0], -1)
+    )))
+
+
+def _triangle_overlap_area(first, second):
+    """Convex polygon clipping area for two consistently unordered triangles."""
+    def cross2(first_vector, second_vector):
+        return float(first_vector[0] * second_vector[1] - first_vector[1] * second_vector[0])
+    subject = [np.asarray(point, dtype=float) for point in first]
+    clip = np.asarray(second, dtype=float)
+    orientation = np.sign(cross2(clip[1] - clip[0], clip[2] - clip[0])) or 1.0
+    for edge_index in range(3):
+        start = clip[edge_index]; end = clip[(edge_index + 1) % 3]
+        edge = end - start
+        def signed(point):
+            return orientation * cross2(edge, point - start)
+        output = []
+        if not subject:
+            break
+        previous = subject[-1]; previous_value = signed(previous)
+        for current in subject:
+            current_value = signed(current)
+            previous_inside = previous_value >= -1.0e-18
+            current_inside = current_value >= -1.0e-18
+            if current_inside != previous_inside:
+                denominator = previous_value - current_value
+                fraction = 0.0 if denominator == 0.0 else previous_value / denominator
+                output.append(previous + fraction * (current - previous))
+            if current_inside:
+                output.append(current)
+            previous = current; previous_value = current_value
+        subject = output
+    return _polygon_area(subject)
+
+
+def _overlap_conservative_p0(state, mesh, values):
+    """Element-overlap P0 transfer, with bounded local redistribution on domain loss."""
+    old_triangles = np.asarray(state.mesh.nodes)[np.asarray(state.mesh.elems)]
+    new_triangles = np.asarray(mesh.nodes)[np.asarray(mesh.elems)]
+    old_values = np.asarray(values, dtype=float)
+    old_centers = old_triangles.mean(axis=1)
+    old_radii = np.max(np.linalg.norm(old_triangles - old_centers[:, None, :], axis=2), axis=1)
+    tree = cKDTree(old_centers)
+    maximum_old_radius = float(np.max(old_radii))
+    projected = np.zeros(mesh.ne)
+    covered = np.zeros(mesh.ne)
+    for new_index, triangle in enumerate(new_triangles):
+        center = triangle.mean(axis=0)
+        radius = float(np.max(np.linalg.norm(triangle - center, axis=1)))
+        candidates = np.asarray(tree.query_ball_point(
+            center, radius + maximum_old_radius + 1.0e-15), dtype=int)
+        if len(candidates):
+            offsets = old_centers[candidates]-center
+            bounds = radius+old_radii[candidates]+1.0e-15
+            candidates = candidates[np.einsum(
+                "ij,ij->i", offsets, offsets) <= bounds*bounds]
+        integral = 0.0; coverage = 0.0
+        for old_index in candidates:
+            overlap = _triangle_overlap_area(triangle, old_triangles[old_index])
+            if overlap > 0.0:
+                coverage += overlap
+                integral += overlap * old_values[old_index]
+        if coverage <= 0.0:
+            _, nearest = tree.query(center)
+            projected[new_index] = old_values[int(nearest)]
+        else:
+            projected[new_index] = integral / coverage
+        covered[new_index] = coverage
+    old_inventory = math.fsum(
+        float(value * area) for value, area in zip(old_values, state.mesh.area_e)
+    )
+    new_inventory = math.fsum(
+        float(value * area) for value, area in zip(projected, mesh.area_e)
+    )
+    difference = old_inventory - new_inventory
+    # A growing hole can remove old solid elements. Their already-owned
+    # vacancies are redistributed only within the cavity capture shell, never
+    # by a whole-domain multiplier.
+    recipients = np.arange(mesh.ne, dtype=int)
+    if difference > 0.0 and state.void_state is not None and state.void_state.cavities:
+        cavity = state.void_state.cavities[0]
+        center = np.asarray(cavity.center_m)
+        centroids = new_triangles.mean(axis=1)
+        distance = np.linalg.norm(centroids - center, axis=1)
+        process_length = fresh_sharp_front_engine(
+            state.material, _bundle_from_state(state),
+        ).f.L_pz
+        recipients = np.flatnonzero(distance <= cavity.radius_m + process_length)
+        if not len(recipients):
+            recipients = np.asarray((int(np.argmin(abs(distance - cavity.radius_m))),))
+        recipient_area = float(np.sum(np.asarray(mesh.area_e)[recipients]))
+        projected[recipients] += difference / recipient_area
+    elif abs(difference) > 1.0e-24:
+        # Same-domain overlap should close without a global shape-changing
+        # correction. Fail if the geometric projection cannot prove it.
+        from .vacancy_coupling_v1 import conservation_roundoff_budget_m2
+        if abs(difference) > conservation_roundoff_budget_m2(old_inventory, new_inventory):
+            raise RuntimeError("overlap-conservative P0 transfer lost domain inventory")
+    transferred = math.fsum(
+        float(value * area) for value, area in zip(projected, mesh.area_e)
+    )
+    residual = old_inventory - transferred
+    from .vacancy_coupling_v1 import conservation_roundoff_budget_m2
+    budget = conservation_roundoff_budget_m2(old_inventory, transferred)
+    if abs(residual) > budget:
+        raise RuntimeError("overlap-conservative P0 transfer exceeds numerical budget")
+    if residual != 0.0:
+        target = int(recipients[np.argmax(np.asarray(mesh.area_e)[recipients])])
+        projected[target] += residual / float(mesh.area_e[target])
+    return projected, {
+        "method": "ELEMENT_OVERLAP_CONSERVATIVE_P0",
+        "source_inventory_area_m2": old_inventory,
+        "pre_redistribution_inventory_area_m2": new_inventory,
+        "locally_redistributed_area_m2": max(difference, 0.0),
+        "roundoff_correction_m2": residual,
+        "roundoff_budget_m2": budget,
+        "minimum_new_element_overlap_fraction": float(np.min(
+            covered / np.asarray(mesh.area_e)
+        )),
+    }
+
+
+def _project_fields(state, mesh, *, transfer_v2_transport=True):
     old_nodes = np.asarray(state.mesh.nodes); new_nodes = np.asarray(mesh.nodes)
     _, node_parent = cKDTree(old_nodes).query(new_nodes)
     old_centers = old_nodes[state.mesh.elems].mean(axis=1)
@@ -1003,8 +2134,31 @@ def _project_fields(state, mesh):
         projected[missing] = source[node_parent[missing]]
         return projected
 
+    # Transfer non-topological P0 damage, but never turn the old mesh width of
+    # an owned V12 crack representation into permanent material damage.  The
+    # authoritative graph is rebuilt on the destination mesh by the V12
+    # remesh transaction.  Clearing precisely the owned support here preserves
+    # unrelated damage while preventing a coarse node-star halo ahead of a tip
+    # from swallowing a later short event.
+    source_damage_gp = element_damage(state.mesh, state.damage)
+    support = state.v12_support_state
+    if support is not None:
+        from .sharp_wake_backend_v12 import array_fingerprint
+        if (
+            support.mesh_geometry_fingerprint == array_fingerprint(state.mesh.nodes)
+            and support.mesh_connectivity_fingerprint == array_fingerprint(state.mesh.elems)
+        ):
+            source_damage_gp = source_damage_gp.copy()
+            owned = np.asarray(support.selected_support_elements, dtype=int)
+            if np.any(owned < 0) or np.any(owned >= len(source_damage_gp)):
+                raise RuntimeError("V12 remesh ownership contains an invalid source element")
+            source_damage_gp[owned] = 0.0
+    projected_damage_gp = np.asarray(source_damage_gp, dtype=float)[element_parent]
     ep = np.asarray(state.ep_gp, dtype=float)[:, element_parent]
     rho = np.asarray(state.rho_gp, dtype=float)[element_parent]
+    vacancy, vacancy_transfer_audit = _overlap_conservative_p0(
+        state, mesh, state.vacancy_fraction_gp,
+    )
     new_area = np.asarray(mesh.area_e, dtype=float)
     old_area = np.asarray(state.mesh.area_e, dtype=float)
     for component in range(ep.shape[0]):
@@ -1016,14 +2170,49 @@ def _project_fields(state, mesh):
     projected_rho = float(np.sum(rho * new_area))
     if abs(projected_rho) > 1.0e-300:
         rho *= source_rho / projected_rho
-    return {
+    if np.any(vacancy < 0.0):
+        raise RuntimeError("P0 vacancy remesh transfer created a negative fraction")
+    result = {
         "damage": np.clip(p1(np.asarray(state.damage)), 0.0, 1.0),
+        "element_damage_gp": np.clip(projected_damage_gp, 0.0, 1.0),
         "displacement": p1(np.asarray(state.displacement).reshape(-1, 2)).reshape(-1),
         "ep_gp": ep,
         "rho_gp": rho,
+        "vacancy_fraction_gp": vacancy,
+        "vacancy_ledgers": state.vacancy_ledgers,
+        "vacancy_temperature_K": state.vacancy_temperature_K,
+        "vacancy_transfer_audit": vacancy_transfer_audit,
         "tip_process_state": state.tip_process_state,
         "source_state": state.junction_process_state.get("source_state", {}),
     }
+    if transfer_v2_transport and state.vacancy_transport_state_v2 is not None:
+        from .vacancy_transport_phase_field_v2 import (
+            build_exact_cut_transport_mesh_for_network, inherit_topology_boundary_tags,
+            transfer_transport_state_overlap,
+        )
+        inherited_tags = inherit_topology_boundary_tags(state, mesh)
+        junction = dict(state.junction_process_state)
+        junction["transport_boundary_tags_v2"] = inherited_tags
+        segments = tuple(
+            (first, second, f"{branch.branch_id}:{index}")
+            for branch in state.crack_network.branches
+            for index, (first, second) in enumerate(zip(branch.path, branch.path[1:]))
+        )
+        cut = build_exact_cut_transport_mesh_for_network(
+            mesh, crack_segments=segments,
+            topology_boundary_tags=inherited_tags,
+        )
+        transport, transport_audit = transfer_transport_state_overlap(
+            state.vacancy_transport_state_v2,
+            state.vacancy_transport_state_v2.transport_mesh, cut.mesh, cut.registry,
+            new_parent_mechanics_element_ids=cut.parent_mechanics_element_ids,
+        )
+        result.update({
+            "vacancy_transport_state_v2": transport,
+            "transport_boundary_tags_v2": inherited_tags,
+            "vacancy_transport_v2_transfer_audit": transport_audit,
+        })
+    return result
 
 
 def _grow_hole_boundary(hole, radius_m, *, crack_path_m):
@@ -1058,7 +2247,71 @@ def _grow_hole_boundary(hole, radius_m, *, crack_path_m):
 def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure_stage=None):
     operations = operation_log if operation_log is not None else []
     trial = replace(state, void_state=void_state)
-    fields = _project_fields(trial, hole.mesh)
+    fields = _project_fields(trial, hole.mesh, transfer_v2_transport=False)
+    remesh_junction = dict(trial.junction_process_state)
+    remesh_junction["transport_boundary_tags_v2"] = _owned_transport_boundary_tags(
+        hole.mesh, hole.boundary, cavity_node_ids=hole.prescribed_polygon_nodes,
+    )
+    transport_trial = replace(
+        trial, mesh=hole.mesh, boundary=hole.boundary,
+        junction_process_state=remesh_junction,
+        vacancy_fraction_gp=fields["vacancy_fraction_gp"],
+        vacancy_transport_state_v2=None,
+    )
+    if trial.vacancy_transport_state_v2 is not None:
+        from .vacancy_transport_phase_field_v2 import (
+            build_exact_cut_transport_mesh_for_network, transfer_transport_state_overlap,
+        )
+        segments = tuple(
+            (first, second, f"{branch.branch_id}:{index}")
+            for branch in trial.crack_network.branches
+            for index, (first, second) in enumerate(zip(branch.path, branch.path[1:]))
+        )
+        target_cut = build_exact_cut_transport_mesh_for_network(
+            hole.mesh, crack_segments=segments,
+            topology_boundary_tags=remesh_junction["transport_boundary_tags_v2"],
+        )
+        promoted_site_ids = {item.parent_site_id for item in trial.void_state.cavities}
+        transport_source = replace(
+            trial.vacancy_transport_state_v2,
+            site_states=tuple(item for item in trial.vacancy_transport_state_v2.site_states
+                              if item.site_id not in promoted_site_ids),
+        )
+        transferred_transport, transport_transfer_audit = transfer_transport_state_overlap(
+            transport_source,
+            transport_source.transport_mesh,
+            target_cut.mesh, target_cut.registry,
+            domain_change_policy="ACTIVE_CAVITY_ABSORPTION_ONE_WAY",
+            new_parent_mechanics_element_ids=target_cut.parent_mechanics_element_ids,
+        )
+        fields["vacancy_transport_state_v2"] = transferred_transport
+    else:
+        transport_transfer_audit = None
+    vacancy_local_audits = []
+    from .vacancy_coupling_v1 import deterministic_capture_patch
+    capture_length = fresh_sharp_front_engine(
+        trial.material, _bundle_from_state(trial),
+    ).f.L_pz
+    capture_owners = [
+        (site.site_id, site.center_m, capture_length) for site in trial.void_state.sites
+    ] + [
+        (cavity.cavity_id, cavity.center_m, cavity.radius_m + capture_length)
+        for cavity in trial.void_state.cavities
+    ]
+    projected_state = replace(
+        trial, mesh=hole.mesh, vacancy_fraction_gp=fields["vacancy_fraction_gp"],
+    )
+    for owner_id, center, radius in capture_owners:
+        old_patch = deterministic_capture_patch(trial, center, radius)
+        new_patch = deterministic_capture_patch(projected_state, center, radius)
+        old_local = math.fsum(float(trial.mesh.area_e[index] * trial.vacancy_fraction_gp[index]) for index in old_patch)
+        new_local = math.fsum(float(hole.mesh.area_e[index] * fields["vacancy_fraction_gp"][index]) for index in new_patch)
+        vacancy_local_audits.append({
+            "owner_id": owner_id, "capture_radius_m": radius,
+            "source_capture_inventory_area_m2": old_local,
+            "projected_capture_inventory_area_m2": new_local,
+            "capture_inventory_change_area_m2": new_local - old_local,
+        })
     transfer_audit = {
         "source_displacement_l2_m": float(np.linalg.norm(state.displacement)),
         "projected_displacement_l2_m": float(np.linalg.norm(fields["displacement"])),
@@ -1066,6 +2319,12 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
         "projected_plastic_history_l2": float(np.linalg.norm(fields["ep_gp"])),
         "source_density_l2_m2": float(np.linalg.norm(state.rho_gp)),
         "projected_density_l2_m2": float(np.linalg.norm(fields["rho_gp"])),
+        "source_vacancy_inventory_area_m2": float(np.sum(
+            np.asarray(state.vacancy_fraction_gp) * np.asarray(state.mesh.area_e)
+        )),
+        "projected_vacancy_inventory_area_m2": float(np.sum(
+            np.asarray(fields["vacancy_fraction_gp"]) * np.asarray(hole.mesh.area_e)
+        )),
         "plastic_integral_error": float(np.max(np.abs(
             np.sum(fields["ep_gp"] * hole.mesh.area_e[None, :], axis=1)
             - np.sum(state.ep_gp * state.mesh.area_e[None, :], axis=1)
@@ -1078,12 +2337,14 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
             np.linalg.norm(fields["displacement"]) > 0.0 and np.linalg.norm(fields["ep_gp"]) > 0.0
             and np.linalg.norm(fields["rho_gp"]) > 0.0
         ),
+        "vacancy_transfer": fields["vacancy_transfer_audit"],
+        "active_capture_region_inventory": vacancy_local_audits,
+        "vacancy_transport_v2_transfer": transport_transfer_audit,
     }
     def inject(stage, current):
         operations.append(stage)
         if stage == failure_stage: raise RuntimeError("injected:" + stage)
     if identity == "promotion": inject("explicit_cavity_creation", trial)
-    remesh_junction = dict(trial.junction_process_state)
     remesh_junction["boundary_terminal_context"] = _external_free_root_context(
         hole.mesh, hole.boundary, trial.crack_network.branch(ROOT_BRANCH_ID).root,
     )
@@ -1286,6 +2547,11 @@ def _canonical_front_process_owner(state, branch_id):
 def sharp_front_load_provider(
     state, *, branch_id, candidates=None, evaluate_overlap_marginals=False,
     marginal_delta_a_m=(3.0e-5, 2.0e-5), marginal_mesh_levels=(2, 3, 4),
+    finite_increment_mode=False,
+    matched_discretization=False,
+    virtual_mechanical_trial_transport="full",
+    mechanical_refinement_policy="legacy_accumulated_generations",
+    batched_state_validation=False,
 ):
     """Use valid nested local J, else an exact fixed-void marginal G trial."""
     from .hybrid_directional_drive_v5 import hybrid_directional_drive_provider
@@ -1303,6 +2569,17 @@ def sharp_front_load_provider(
         tip_id: inventory if tip_id == branch_id else ()
         for tip_id in state.crack_network.active_tip_ids
     }
+    def refresh_external_root_context(trial):
+        root = trial.crack_network.branches[0].path[0]
+        return replace(trial, junction_process_state={
+            **trial.junction_process_state,
+            "boundary_terminal_context": _external_free_root_context(
+                trial.mesh, trial.boundary, root,
+            ),
+        })
+
+    if virtual_mechanical_trial_transport not in ("full", "deferred_read_only"):
+        raise ValueError("unknown virtual mechanical trial transport mode")
     return hybrid_directional_drive_provider(
         state, candidates_by_tip,
         process_owner_by_tip=process_owner_by_tip,
@@ -1312,10 +2589,26 @@ def sharp_front_load_provider(
         marginal_mesh_levels=marginal_mesh_levels,
         evaluate_overlap_marginals=bool(evaluate_overlap_marginals),
         source_commit=_head(),
-        prepare_support_state=_refresh_downstream_boundary_context,
+        prepare_support_state=(
+            _refresh_downstream_boundary_context
+            if state.void_state is not None and any(
+                cavity.phase in (
+                    VoidPhase.CONNECTED_VOID,
+                    VoidPhase.DOWNSTREAM_FRONT_ACTIVE,
+                )
+                for cavity in state.void_state.cavities
+            )
+            else refresh_external_root_context
+        ),
         conform_trial_endpoint=lambda trial, endpoint: _conform_bulk_point(
             trial, endpoint, identity="HYBRID_MARGINAL_ENDPOINT_CONFORMING",
+            transfer_v2_transport=(virtual_mechanical_trial_transport == "full"),
         ),
+        finite_increment_mode=bool(finite_increment_mode),
+        matched_discretization=bool(matched_discretization),
+        virtual_mechanical_trial_transport=str(virtual_mechanical_trial_transport),
+        mechanical_refinement_policy=str(mechanical_refinement_policy),
+        batched_state_validation=bool(batched_state_validation),
     )
 
 
@@ -1409,10 +2702,16 @@ def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=
 
 def cavity_source_resolution_metrics(
     state, *, geometry_contract=None, final_traction_verification=False,
+    source_position_m=None,
 ):
     """Source-native tensor and geometrical boundary-recovery diagnostics."""
     cavity = state.void_state.cavities[0]
-    position = np.asarray(cavity.connection_exit_m)
+    position = np.asarray(
+        cavity.connection_exit_m if source_position_m is None else source_position_m,
+        dtype=float,
+    )
+    if position.shape != (2,) or not np.isfinite(position).all():
+        raise ValueError("cavity source position must be an explicit finite point")
     node = int(np.argmin(np.linalg.norm(state.mesh.nodes-position, axis=1)))
     if geometry_contract is None:
         recovery = cavity_fixed_physical_arc_patch_recovery_v3(state, boundary_node=node)
@@ -1552,8 +2851,16 @@ def cavity_source_resolution_metrics(
         "constrained_boundary_limit_traction_residual": float(recovery["traction_residual"]),
         "raw_adjacent_element_traction_normalized": raw_traction,
         "incident_cst_boundary_traction_v1": raw_traction,
+        "RAW_CST_BOUNDARY_TRACTION_DIAGNOSTIC": {
+            "classification": "NON_AUTHORITATIVE_DIAGNOSTIC",
+            "normalized_traction": raw_traction,
+        },
         "equilibrated_boundary_traction_recovery_v1": equilibrated,
         **final_records,
+        **({"PIECEWISE_EQUILIBRATED_TRACTION_DIAGNOSTIC": {
+            "classification": "NON_AUTHORITATIVE_DIAGNOSTIC",
+            "result": final_records["piecewise_equilibrated_boundary_stress_v2"],
+        }} if final_traction_verification else {}),
         "assembled_weak_cavity_boundary_residual_normalized": weak_residual,
         "source_tensor_local_nt_Pa": local_tensor.tolist(),
         "source_tensor_global_xy_Pa": tensor.tolist(),
@@ -1596,7 +2903,9 @@ def _cavity_resolution_binding(state):
     return digest.hexdigest()
 
 
-def _qualified_cavity_source(state, tensor, *, temperature_K=900.0):
+def _qualified_cavity_source(state, tensor, *, temperature_K=900.0, return_reason=False):
+    def answer(passed, reason):
+        return (bool(passed), reason) if return_reason else bool(passed)
     from .closure_static_evidence import resolution_screen
     from .finalization_v3_schema import SCIENTIFIC_ACCEPTANCE_TOLERANCES as limits
     from .finalization_v3_schema import canonical_hash
@@ -1606,25 +2915,36 @@ def _qualified_cavity_source(state, tensor, *, temperature_K=900.0):
         or proof.get("current_binding") != _cavity_resolution_binding(state)
         or not isinstance(proof.get("refinement_count"), int)
         or proof["refinement_count"] < 1
-        or not all(key in proof for key in ("current_metrics","previous_metrics","previous_binding"))): return False
+        or not all(key in proof for key in ("current_metrics","previous_metrics","previous_binding"))):
+        return answer(False, "INCOMPLETE_OR_STALE_REFINEMENT_PROOF")
     current = proof["current_metrics"]; reference = proof["previous_metrics"]
     if (current.get("recovery_operator") != "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3"
         or reference.get("recovery_operator") != "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3"
         or not current.get("recovery_record", {}).get("available")
         or not reference.get("recovery_record", {}).get("available")):
-        return False
+        return answer(False, "RECOVERY_OPERATOR_UNAVAILABLE_OR_WRONG")
     capture = proof.get("previous_source_capture")
-    if not capture or "element_damage_gp" not in capture: return False
+    if not capture or "element_damage_gp" not in capture:
+        return answer(False, "PREVIOUS_SOURCE_CAPTURE_MISSING")
     previous_mesh = replace(rebuild_tri_mesh(capture["nodes"], capture["elements"]),
         element_damage_gp=capture["element_damage_gp"])
+    from .topology_transaction_v11 import EquilibriumObservables
+    previous_observables = capture.get("equilibrium_observables")
+    if previous_observables is not None and not isinstance(previous_observables, EquilibriumObservables):
+        previous_observables = EquilibriumObservables(**dict(previous_observables))
     previous_state = replace(state, mesh=previous_mesh,
         boundary=capture["boundary"],
         displacement=capture["displacement"], damage=capture["damage"],
         ep_gp=capture["ep_gp"], rho_gp=capture["rho_gp"],
-        energy_ledgers=capture["energy_ledgers"])
+        vacancy_fraction_gp=capture["vacancy_fraction_gp"],
+        vacancy_ledgers=capture["vacancy_ledgers"],
+        vacancy_temperature_K=capture["vacancy_temperature_K"],
+        energy_ledgers=capture["energy_ledgers"],
+        equilibrium_observables=previous_observables)
     if (_cavity_resolution_binding(previous_state) != proof["previous_binding"]
         or canonical_hash(cavity_source_resolution_metrics(state)) != canonical_hash(current)
-        or canonical_hash(cavity_source_resolution_metrics(previous_state)) != canonical_hash(reference)): return False
+        or canonical_hash(cavity_source_resolution_metrics(previous_state)) != canonical_hash(reference)):
+        return answer(False, "CURRENT_OR_PREVIOUS_METRICS_DO_NOT_RECOMPUTE")
     a = np.asarray(current["tensor_Pa"]); b = np.asarray(reference["tensor_Pa"])
     error = float(np.linalg.norm(a-b)/max(np.linalg.norm(a),1e-300))
     if proof.get("schema") == PROOF_SCHEMA:
@@ -1632,20 +2952,41 @@ def _qualified_cavity_source(state, tensor, *, temperature_K=900.0):
         # A legitimate partial hazard advance must not invalidate the proof
         # merely because a relative waiting-time subtraction rounds differently.
         anchor = proof.get("budget_competition")
-        if anchor is None or anchor.candidates != state.competition.candidates: return False
+        if anchor is None or anchor.candidates != state.competition.candidates:
+            return answer(False, "SOURCE_TRANSFER_COMPETITION_ANCHOR_CHANGED")
         if any((old.candidate_id,old.current_threshold_action,old.threshold_seed) !=
                (new.candidate_id,new.current_threshold_action,new.threshold_seed)
-               for old,new in zip(anchor.hazard_states,state.competition.hazard_states)): return False
+               for old,new in zip(anchor.hazard_states,state.competition.hazard_states)):
+            return answer(False, "SOURCE_TRANSFER_THRESHOLD_IDENTITY_CHANGED")
         anchored_current = replace(state,competition=anchor)
         anchored_previous = replace(previous_state,competition=anchor)
         budget = source_transfer_budget(anchored_current, anchored_previous, a, b)
         if (reference["minimum_quality"] < limits["mesh_minimum_quality"]
             or canonical_hash(budget) != canonical_hash(proof.get("source_transfer_budget"))
             or not source_transfer_budget(state, previous_state, a, b, temperature_K=temperature_K)["passed"]):
-            return False
-    return bool(np.array_equal(a,np.asarray(tensor)) and resolution_screen(current)
-        and current["normalized_traction"] <= limits["cavity_traction_normalized"]
-        and error <= limits["tensor_probe_relative"])
+            return answer(False, "SOURCE_TRANSFER_BUDGET_FAILED")
+    from .cavity_free_boundary_verification import verify_cavity_free_boundary
+    weak_boundary = verify_cavity_free_boundary(state)
+    recorded_boundary = proof.get("weak_boundary_verification", {})
+    if (recorded_boundary.get("geometry_fingerprint") != weak_boundary.geometry_fingerprint
+        or recorded_boundary.get("predicates") != dict(weak_boundary.predicates)):
+        return answer(False, "WEAK_BOUNDARY_PROOF_STALE")
+    recovery = current["recovery_record"]
+    ranks = recovery.get("rank", {})
+    condition = recovery.get("condition", {})
+    checks = {
+        "tensor_identity": np.array_equal(a, np.asarray(tensor)),
+        "resolution_screen": resolution_screen(current),
+        "bounded_fit_rank": set(ranks) == {"sigma_tt", "sigma_nn", "sigma_nt"}
+            and ranks == {"sigma_tt": 6, "sigma_nn": 3, "sigma_nt": 3},
+        "bounded_fit_condition": condition.get("maximum", math.inf) <= condition.get("limit", 1.0e6),
+        "weak_boundary": weak_boundary.passed,
+        "tensor_convergence": error <= limits["tensor_probe_relative"],
+    }
+    passed = bool(all(checks.values()))
+    return answer(passed, "PASS" if passed else "FAILED:" + ",".join(
+        key for key, value in checks.items() if not value
+    ))
 
 
 def _bounded_quality_edge_flips(state):
@@ -1759,7 +3100,16 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
             if flips:
                 fields = _project_fields(refined,quality_mesh)
                 refined = replace(refined,mesh=quality_mesh,damage=fields["damage"],
-                    displacement=fields["displacement"],ep_gp=fields["ep_gp"],rho_gp=fields["rho_gp"])
+                    displacement=fields["displacement"],ep_gp=fields["ep_gp"],rho_gp=fields["rho_gp"],
+                    vacancy_fraction_gp=fields["vacancy_fraction_gp"],
+                    vacancy_ledgers=fields["vacancy_ledgers"],
+                    vacancy_temperature_K=fields["vacancy_temperature_K"],
+                    vacancy_transport_state_v2=fields.get(
+                        "vacancy_transport_state_v2", refined.vacancy_transport_state_v2,
+                    ),
+                    junction_process_state={**dict(refined.junction_process_state),
+                        **({"transport_boundary_tags_v2": fields["transport_boundary_tags_v2"]}
+                           if "transport_boundary_tags_v2" in fields else {})})
         constrained_quality = None
         if quality_improvement == "constrained_v1":
             from .quality_constrained_mesh_v1 import constrained_quality_mesh, production_geometry_constraints
@@ -1768,12 +3118,24 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
                 fixed_nodes=fixed, protected_edges=protected, strategy="flips")
             fields = _project_fields(refined, quality_mesh)
             refined = replace(refined,mesh=quality_mesh,damage=fields["damage"],
-                displacement=fields["displacement"],ep_gp=fields["ep_gp"],rho_gp=fields["rho_gp"])
+                displacement=fields["displacement"],ep_gp=fields["ep_gp"],rho_gp=fields["rho_gp"],
+                vacancy_fraction_gp=fields["vacancy_fraction_gp"],
+                vacancy_ledgers=fields["vacancy_ledgers"],
+                vacancy_temperature_K=fields["vacancy_temperature_K"],
+                vacancy_transport_state_v2=fields.get(
+                    "vacancy_transport_state_v2", refined.vacancy_transport_state_v2,
+                ),
+                junction_process_state={**dict(refined.junction_process_state),
+                    **({"transport_boundary_tags_v2": fields["transport_boundary_tags_v2"]}
+                       if "transport_boundary_tags_v2" in fields else {})})
         inject("downstream_source_refinement", refined)
         refined = _prepare_connected_ligament_support(refined, entry=cavity.connection_entry_m,
             exit_point=cavity.connection_exit_m, direction=cavity.connection_direction_xy,
             new_connection=False)
-        fields = {name: getattr(refined,name) for name in ("damage","displacement","ep_gp","rho_gp","tip_process_state")}
+        fields = {name: getattr(refined,name) for name in (
+            "damage","displacement","ep_gp","rho_gp","vacancy_fraction_gp",
+            "vacancy_ledgers","vacancy_temperature_K","tip_process_state",
+        )}
         fields["source_state"] = refined.junction_process_state.get("source_state",{})
         rebuilt = remesh_mechanically_separating_v12(refined, mesh=refined.mesh,
             boundary=refined.boundary, transferred_fields=fields, source_commit=_head(),
@@ -1794,11 +3156,30 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
             "quality_edge_flips":flips,
             "previous_metrics":previous,"current_metrics":metrics,
             "previous_binding":_cavity_resolution_binding(current),"current_binding":_cavity_resolution_binding(trial)}
+        from .cavity_free_boundary_verification import verify_cavity_free_boundary
+        weak_boundary = verify_cavity_free_boundary(trial)
+        proof["weak_boundary_verification"] = {
+            "schema": weak_boundary.schema,
+            "geometry_fingerprint": weak_boundary.geometry_fingerprint,
+            "accepted_state_fingerprint": weak_boundary.accepted_state_fingerprint,
+            "predicates": dict(weak_boundary.predicates),
+            "passed": weak_boundary.passed,
+            "assembled_boundary_residual_relative": weak_boundary.assembled_boundary_residual_relative,
+            "normalized_virtual_work": dict(weak_boundary.normalized_virtual_work),
+            "total_boundary_resultant_relative": weak_boundary.total_boundary_resultant_relative,
+            "total_boundary_moment_relative": weak_boundary.total_boundary_moment_relative,
+            "global_top_bottom_reaction_balance": weak_boundary.global_top_bottom_reaction_balance,
+            "free_dof_residual_relative": weak_boundary.free_dof_residual_relative,
+        }
         proof["previous_source_capture"] = {"nodes":current.mesh.nodes,"elements":current.mesh.elems,
             "boundary":current.boundary,
             "element_damage_gp":getattr(current.mesh,"element_damage_gp",None),
             "displacement":current.displacement,"damage":current.damage,"ep_gp":current.ep_gp,
-            "rho_gp":current.rho_gp,"energy_ledgers":dict(current.energy_ledgers)}
+            "rho_gp":current.rho_gp,"energy_ledgers":dict(current.energy_ledgers),
+            "vacancy_fraction_gp":current.vacancy_fraction_gp,
+            "vacancy_ledgers":dict(current.vacancy_ledgers),
+            "vacancy_temperature_K":current.vacancy_temperature_K,
+            "equilibrium_observables":current.equilibrium_observables.to_dict()}
         if quality_improvement == "constrained_v1":
             from .source_quality_transaction_v1 import PROOF_SCHEMA, source_transfer_budget
             proof.update({"schema":PROOF_SCHEMA, "quality_preparation":quality_preparation,
@@ -1807,9 +3188,12 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
                 "source_transfer_budget":source_transfer_budget(trial,current,metrics["tensor_Pa"],previous["tensor_Pa"])})
         trial = replace(trial,junction_process_state={**trial.junction_process_state,
             "cavity_source_resolution_proof":proof})
-        passed = _qualified_cavity_source(trial, metrics["tensor_Pa"])
+        passed, qualification_reason = _qualified_cavity_source(
+            trial, metrics["tensor_Pa"], return_reason=True,
+        )
         rows.append({"level":level,"proof":{key:value for key,value in proof.items()
-            if key != "previous_source_capture"},"qualified":passed})
+            if key != "previous_source_capture"},"qualified":passed,
+            "qualification_reason": qualification_reason})
         if passed:
             inject("source_qualification",trial)
             rates = {row["candidate_id"]:row for row in directional_clock_rates(trial,metrics["tensor_Pa"])}
@@ -1866,11 +3250,13 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
     return state,{"status":"SOURCE_TENSOR_UNQUALIFIED","attempts":rows,"operations":operations}
 
 
-def _complete_next_clock(state, stress_tensor_Pa=None, *, source_kind="sharp_front",
+def _complete_next_clock_fused(state, stress_tensor_Pa=None, *, source_kind="sharp_front",
                          source_front_id=None, source_cavity_id=None,
                          source_boundary_site_id=None, source_position_m=None,
                          source_probe_identity=None, temperature_K=900.0,
-                         maximum_advance_duration_s=None, front_load_rows=None):
+                         maximum_advance_duration_s=None, front_load_rows=None,
+                         functional_test_rate_scale=1.0,
+                         test_only_functional_qualification=False):
     """Advance source-owned clocks, never an unqualified cavity first passage."""
     if maximum_advance_duration_s is not None and (
         not math.isfinite(float(maximum_advance_duration_s)) or maximum_advance_duration_s < 0):
@@ -1886,6 +3272,24 @@ def _complete_next_clock(state, stress_tensor_Pa=None, *, source_kind="sharp_fro
             state, front_load_rows, branch_id=source_front_id,
             temperature_K=temperature_K,
         )
+    rate_scale = float(functional_test_rate_scale)
+    if not math.isfinite(rate_scale) or rate_scale <= 0.0:
+        raise ValueError("directional functional-test rate scale must be finite and positive")
+    if rate_scale != 1.0 and not bool(test_only_functional_qualification):
+        raise RuntimeError(
+            "directional rate scaling is restricted to labeled functional qualification")
+    if rate_scale != 1.0:
+        for rate in rates:
+            original_rate = float(rate.get("rate_s", rate["effective_rate_s"]))
+            rate["unscaled_effective_rate_s"] = float(rate["effective_rate_s"])
+            rate["unscaled_crossing_time_s"] = float(rate["crossing_time_s"])
+            rate["effective_rate_s"] = float(rate["effective_rate_s"])*rate_scale
+            rate["rate_s"] = original_rate*rate_scale
+            rate["crossing_time_s"] = (
+                float(rate["crossing_time_s"])/rate_scale
+                if math.isfinite(float(rate["crossing_time_s"])) else math.inf)
+            rate["functional_test_rate_scale"] = rate_scale
+            rate["rate_scale_classification"] = "CONTROLLED_NOT_CALIBRATED_REFERENCE"
     junction = dict(state.junction_process_state)
     start_time = float(junction.get("production_time_s", 0.0))
     from .canonical_kinetic_time_v1 import AcceptedTime
@@ -1906,8 +3310,13 @@ def _complete_next_clock(state, stress_tensor_Pa=None, *, source_kind="sharp_fro
     # Check owned phase/source as well as the argument to prevent source spoofing.
     owned_cavity = (state.junction_process_state.get("active_event_source", {}).get("source_kind") == "cavity_surface"
         or (state.void_state is not None and any(c.phase == VoidPhase.CONNECTED_VOID for c in state.void_state.cavities)))
-    if ((source_kind == "cavity_surface" or owned_cavity) and any(r["effective_rate_s"] > 0 for r in rates)
-        and not _qualified_cavity_source(state, stress, temperature_K=temperature_K)):
+    source_qualified = (
+        _boundary_fitted_probe_is_qualified(state, stress, source_probe_identity)
+        or _qualified_cavity_source(state, stress, temperature_K=temperature_K)
+    ) if source_kind == "cavity_surface" or owned_cavity else True
+    if ((source_kind == "cavity_surface" or owned_cavity)
+        and any(r["effective_rate_s"] > 0 for r in rates)
+        and not source_qualified):
         for rate in rates:
             rate.update({"unqualified_effective_rate_s": rate["effective_rate_s"],
                          "unqualified_crossing_time_s": rate["crossing_time_s"],
@@ -2004,6 +3413,76 @@ def _complete_next_clock(state, stress_tensor_Pa=None, *, source_kind="sharp_fro
                    junction_process_state=junction), rates
 
 
+def preview_directional_first_passage(
+    state, stress_tensor_Pa=None, *, source_kind="sharp_front",
+    source_front_id=None, source_cavity_id=None, source_boundary_site_id=None,
+    source_position_m=None, source_probe_identity=None, temperature_K=900.0,
+    maximum_advance_duration_s=None, front_load_rows=None, failure_injector=None,
+    functional_test_rate_scale=1.0,
+    test_only_functional_qualification=False,
+):
+    """Pure preview of the established directional first-passage transaction.
+
+    The old routine already returns a new immutable accepted-state graph.  This
+    adapter evaluates that exact routine on an isolated state and freezes its
+    result as the commit payload.  No threshold, pending event, RNG state, or
+    accepted time in ``state`` is changed by preview.
+    """
+    from .global_physical_scheduler_v1 import make_directional_preview
+    return make_directional_preview(
+        state, stress_tensor_Pa=stress_tensor_Pa, source_kind=source_kind,
+        source_front_id=source_front_id, source_cavity_id=source_cavity_id,
+        source_boundary_site_id=source_boundary_site_id,
+        source_position_m=source_position_m,
+        source_probe_identity=source_probe_identity,
+        temperature_K=temperature_K,
+        maximum_advance_duration_s=maximum_advance_duration_s,
+        front_load_rows=front_load_rows, failure_injector=failure_injector,
+        functional_test_rate_scale=functional_test_rate_scale,
+        test_only_functional_qualification=test_only_functional_qualification,
+    )
+
+
+def advance_directional_clocks(state, preview, *, failure_injector=None):
+    """Advance all directional owners by the frozen preview interval."""
+    from .global_physical_scheduler_v1 import advance_directional_preview
+    return advance_directional_preview(state, preview, failure_injector=failure_injector)
+
+
+def commit_directional_first_passage(state, preview, *, failure_injector=None):
+    """Validate and expose the event already localized by ``preview``."""
+    from .global_physical_scheduler_v1 import commit_directional_preview
+    return commit_directional_preview(state, preview, failure_injector=failure_injector)
+
+
+def _complete_next_clock(state, stress_tensor_Pa=None, *, source_kind="sharp_front",
+                         source_front_id=None, source_cavity_id=None,
+                         source_boundary_site_id=None, source_position_m=None,
+                         source_probe_identity=None, temperature_K=900.0,
+                         maximum_advance_duration_s=None, front_load_rows=None,
+                         functional_test_rate_scale=1.0,
+                         test_only_functional_qualification=False):
+    """Compatibility wrapper over preview/advance/commit.
+
+    Its accepted state and audit are the exact objects produced by the former
+    fused implementation, so existing event times and ownership are unchanged.
+    """
+    preview = preview_directional_first_passage(
+        state, stress_tensor_Pa, source_kind=source_kind,
+        source_front_id=source_front_id, source_cavity_id=source_cavity_id,
+        source_boundary_site_id=source_boundary_site_id,
+        source_position_m=source_position_m,
+        source_probe_identity=source_probe_identity,
+        temperature_K=temperature_K,
+        maximum_advance_duration_s=maximum_advance_duration_s,
+        front_load_rows=front_load_rows,
+        functional_test_rate_scale=functional_test_rate_scale,
+        test_only_functional_qualification=test_only_functional_qualification,
+    )
+    advanced, audit = advance_directional_clocks(state, preview)
+    return commit_directional_first_passage(advanced, preview), audit
+
+
 def _select_emitted_proposal(state, audit, *, eligible_candidate_ids=None):
     emitted_ids = {event_id for row in audit for event_id in row["emitted_event_ids"]}
     eligible = None if eligible_candidate_ids is None else set(eligible_candidate_ids)
@@ -2082,7 +3561,24 @@ def _refresh_downstream_boundary_context(state):
     new context is independently checked by the existing support verifier.
     """
     from .mechanically_separating_sharp_wake_v12 import classify_graph_vertices
-    cavity = state.void_state.cavities[0]
+    connected = () if state.void_state is None else tuple(
+        cavity for cavity in state.void_state.cavities
+        if cavity.phase in (
+            VoidPhase.CONNECTED_VOID,
+            VoidPhase.DOWNSTREAM_FRONT_ACTIVE,
+        )
+    )
+    if not connected:
+        root = state.crack_network.branch(ROOT_BRANCH_ID)
+        return replace(state, junction_process_state={
+            **state.junction_process_state,
+            'boundary_terminal_context': _external_free_root_context(
+                state.mesh, state.boundary, root.path[0],
+            ),
+        })
+    if len(connected) != 1:
+        raise RuntimeError('downstream support requires exactly one connected cavity')
+    cavity = connected[0]
     root = state.crack_network.branch(ROOT_BRANCH_ID)
     cycle = cavity_free_surface_certificate(state)
     if not cycle['passed']: raise RuntimeError('downstream trial cavity cycle is not certified')
@@ -2105,15 +3601,127 @@ def _refresh_downstream_boundary_context(state):
         'boundary_terminal_context': contexts})
 
 
-def ligament_transaction(state, *, failure_stage=None, operation_log=None):
+def matched_ligament_energy_observation(
+    state, *, branch_id, candidate, refinement_levels=(3, 4),
+):
+    """Observe a finite cavity connection on matched isolated mechanics meshes.
+
+    This is a read-only mechanics observation.  It neither completes a clock
+    nor commits the connection.  Each level constructs the exact polygonal
+    entry/exit geometry, compares unextended and connected states on the same
+    mesh, and retains the production support/cavity certificates.
+    """
+    from .hybrid_directional_drive_v5 import MARGINAL_G_MESH_RELATIVE_LIMIT
+    from .topology_transaction_v11 import (
+        TopologyArm, apply_v12_production_trial_geometry,
+        complete_accepted_state_fingerprint,
+        equilibrate_fixed_load_with_production_fem,
+        remesh_mechanically_separating_v12,
+    )
+
+    levels = tuple(sorted(set(map(int, refinement_levels))))
+    if len(levels) < 2 or any(level < 1 for level in levels):
+        raise ValueError("ligament observation requires two positive refinement levels")
+    before = complete_accepted_state_fingerprint(state)
+    start = state.crack_network.branch(str(branch_id)).tip
+    entry = _first_ray_cavity_intersection(state, start, candidate.direction_xy)
+    if entry is None:
+        raise ValueError("candidate does not intersect the active cavity")
+    ligament_length = math.dist(start, entry)
+    if ligament_length <= 0.0:
+        raise ValueError("ligament observation requires positive solid length")
+    rows = []
+    for level in levels:
+        aligned = state.isolated_copy()
+        aligned, _, _ = _conform_cavity_intersection(aligned, entry)
+        exit_point = _first_ray_cavity_intersection(
+            aligned, entry, candidate.direction_xy,
+        )
+        if exit_point is None:
+            raise RuntimeError("connected cavity has no far-side chord intersection")
+        aligned, exit_node, _ = _conform_cavity_intersection(aligned, exit_point)
+        exit_point = tuple(map(float, aligned.mesh.nodes[exit_node]))
+        arm = TopologyArm(
+            candidate.candidate_id, str(branch_id), start, entry,
+            ligament_length, 0.0, candidate_direction_xy=candidate.direction_xy,
+            first_intersection_xy_m=entry,
+        )
+        extended = apply_v12_production_trial_geometry(
+            aligned, (arm,), source_commit=_head(),
+            configuration={"event": "VIRTUAL_MATCHED_LIGAMENT_ENERGY"},
+            transaction_identity=f"virtual-matched-ligament-L{level}",
+            refinement_levels=level, preserve_cavity_boundary_edges=True,
+            prepare_support_state=lambda refined: _prepare_connected_ligament_support(
+                refined, entry=entry, exit_point=exit_point,
+                direction=candidate.direction_xy,
+            ),
+        )
+        fields = _project_fields(aligned, extended.mesh)
+        base = remesh_mechanically_separating_v12(
+            aligned, mesh=extended.mesh, boundary=extended.boundary,
+            transferred_fields=fields, source_commit=_head(),
+            configuration={"event": "VIRTUAL_MATCHED_LIGAMENT_UNEXTENDED"},
+            transaction_identity=f"virtual-matched-ligament-base-L{level}",
+        )
+        base = equilibrate_fixed_load_with_production_fem(base)
+        extended = equilibrate_fixed_load_with_production_fem(extended)
+        certificate = crack_void_connection_certificate(
+            extended, branch_id=str(branch_id),
+            cavity_id=extended.void_state.cavities[0].cavity_id,
+            intended_intersection=entry,
+        )
+        if not certificate["passed"]:
+            raise RuntimeError("virtual connected ligament certificate failed")
+        rows.append({
+            "refinement_level": level,
+            "mesh_nodes": int(base.mesh.nn),
+            "mesh_elements": int(base.mesh.ne),
+            "Pi_unextended_J_per_m": float(base.stored_energy_J_per_m),
+            "Pi_connected_J_per_m": float(extended.stored_energy_J_per_m),
+            "G_ligament_J_per_m2": (
+                float(base.stored_energy_J_per_m-extended.stored_energy_J_per_m)
+                / ligament_length
+            ),
+            "connection_certificate": certificate,
+        })
+    first, finest = rows[-2], rows[-1]
+    error = abs(
+        finest["G_ligament_J_per_m2"]-first["G_ligament_J_per_m2"]
+    )/max(abs(finest["G_ligament_J_per_m2"]),
+          abs(first["G_ligament_J_per_m2"]), 1.0e-300)
+    if complete_accepted_state_fingerprint(state) != before:
+        raise RuntimeError("ligament energy observation mutated the accepted state")
+    return {
+        "schema": "v5.matched-finite-ligament-energy-observation/1",
+        "status": ("AVAILABLE" if error <= MARGINAL_G_MESH_RELATIVE_LIMIT
+                   else "DIRECTIONAL_DRIVE_UNAVAILABLE"),
+        "candidate_id": candidate.candidate_id,
+        "branch_id": str(branch_id),
+        "entry_m": tuple(map(float, entry)),
+        "ligament_length_m": ligament_length,
+        "G_ligament_J_per_m2": float(finest["G_ligament_J_per_m2"]),
+        "mesh_relative_error": error,
+        "mesh_relative_limit": MARGINAL_G_MESH_RELATIVE_LIMIT,
+        "levels": tuple(rows),
+        "accepted_state_preserved": True,
+        "physical_time_advanced": False,
+        "transport_solve_performed": False,
+    }
+
+
+def ligament_transaction(state, *, failure_stage=None, operation_log=None,
+                         _precompleted_directional=None):
     cavity = state.void_state.cavities[0]
     start = state.crack_network.branch(ROOT_BRANCH_ID).tip
     tensor, source_element = crack_tip_tensor(state, branch_id=ROOT_BRANCH_ID)
-    state, cleavage_audit = _complete_next_clock(
-        state, tensor, source_kind="sharp_front", source_front_id=ROOT_BRANCH_ID,
-        source_position_m=start, source_probe_identity={"kind": "crack_tip_tensor",
-                                                        "element_ids": list(source_element)},
-    )
+    if _precompleted_directional is None:
+        state, cleavage_audit = _complete_next_clock(
+            state, tensor, source_kind="sharp_front", source_front_id=ROOT_BRANCH_ID,
+            source_position_m=start, source_probe_identity={"kind": "crack_tip_tensor",
+                                                            "element_ids": list(source_element)},
+        )
+    else:
+        state, cleavage_audit = _precompleted_directional
     intersections = {candidate.candidate_id: _first_ray_cavity_intersection(state, start, candidate.direction_xy)
                      for candidate in state.competition.candidates}
     eligible_ids = {candidate_id for candidate_id, intersection in intersections.items() if intersection is not None}
@@ -2295,8 +3903,62 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None):
     return transitioned, replace(result, state=transitioned)
 
 
-def downstream_front_transaction(state, *, continuation=False, failure_stage=None, operation_log=None):
+def downstream_source_observation(state, *, continuation=False):
+    """Pure source/endpoint observation shared by preview and transaction."""
     child_id = "void-front-1"
+    cavity = state.void_state.cavities[0]
+    active_source = state.junction_process_state.get("active_event_source", {})
+    if continuation:
+        if state.crack_network.active_tip_ids != (child_id,):
+            raise RuntimeError("continued propagation requires the sole active downstream child")
+        start = state.crack_network.branch(child_id).tip
+        rows = sharp_front_load_provider(state, branch_id=child_id)["directional"]
+        return {
+            "owner_id": child_id, "start_m": start, "tensor_Pa": None,
+            "source_kind": "sharp_front", "source_front_id": child_id,
+            "source_cavity_id": None, "source_boundary_site_id": None,
+            "probe_identity": {
+                "kind": "established_directional_J_K_provider", "branch_id": child_id,
+                "candidate_ids": [row["candidate_id"] for row in rows],
+            },
+            "front_load_rows": rows,
+            "endpoints": dict(active_source.get("next_candidate_endpoints_m", {})),
+        }
+    if cavity.connection_exit_m is None:
+        raise RuntimeError("downstream nucleation requires the stored connection exit")
+    start = tuple(map(float, cavity.connection_exit_m))
+    nodes = np.asarray(state.mesh.nodes)
+    exit_node = int(np.argmin(np.linalg.norm(nodes-np.asarray(start), axis=1)))
+    if np.linalg.norm(nodes[exit_node]-np.asarray(start)) > 1.0e-12:
+        raise RuntimeError("stored connection exit is not an aligned cavity-boundary node")
+    recovery = qualified_boundary_fitted_source_observation(state)
+    if recovery["qualification_status"] != "AVAILABLE":
+        raise RuntimeError("boundary-fitted downstream source did not qualify")
+    probe = _boundary_fitted_source_probe(state, recovery, boundary_node=exit_node)
+    endpoints = dict(active_source.get("next_candidate_endpoints_m", {}))
+    fallback = active_source.get("next_mesh_aligned_endpoint_m")
+    if fallback is not None and len(state.competition.candidates) == 1:
+        endpoints.setdefault(state.competition.candidates[0].candidate_id, fallback)
+    return {
+        "owner_id": cavity.cavity_id, "start_m": start,
+        "tensor_Pa": np.asarray(recovery["tensor_Pa"], dtype=float),
+        "source_kind": "cavity_surface", "source_front_id": None,
+        "source_cavity_id": cavity.cavity_id,
+        "source_boundary_site_id": "connection_exit",
+        "probe_identity": probe,
+        "front_load_rows": None, "endpoints": endpoints,
+    }
+
+
+def downstream_front_transaction(state, *, continuation=False, failure_stage=None,
+                                 operation_log=None, _precompleted_directional=None,
+                                 _precompleted_front_process=None):
+    child_id = "void-front-1"
+    operations = operation_log if operation_log is not None else []
+    def early_inject(stage):
+        operations.append(stage)
+        if stage == failure_stage:
+            raise RuntimeError("injected:" + stage)
     cavity = state.void_state.cavities[0]
     nodes = np.asarray(state.mesh.nodes)
     active_source = state.junction_process_state.get("active_event_source", {})
@@ -2322,33 +3984,38 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         exit_node = int(np.argmin(np.linalg.norm(nodes - np.asarray(start), axis=1)))
         if np.linalg.norm(nodes[exit_node] - np.asarray(start)) > 1.0e-12:
             raise RuntimeError("stored connection exit is not an aligned cavity-boundary node")
-        from .cavity_source_recovery_v3 import CavitySourceRecoveryV3Unavailable
         try:
-            recovery = cavity_fixed_physical_arc_patch_recovery_v3(
-                state, boundary_node=exit_node
-            )
-        except CavitySourceRecoveryV3Unavailable as exc:
+            recovery = qualified_boundary_fitted_source_observation(state)
+            if recovery["qualification_status"] != "AVAILABLE":
+                raise RuntimeError("boundary-fitted downstream source did not qualify")
+        except RuntimeError as exc:
             return state, None, operation_log if operation_log is not None else [], {
                 "status": "UNQUALIFIED_CAVITY_SOURCE_TENSOR",
                 "scientific_unavailability": str(exc),
-                "recovery_operator": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
+                "recovery_operator": "CAVITY_BOUNDARY_FITTED_PHYSICAL_PATCH_V1",
                 "source_kind": "cavity_surface",
                 "source_position_m": list(start),
             }
         tensor = np.asarray(recovery["tensor_Pa"], dtype=float)
         boundary_elements = tuple(map(int, recovery["stencil_element_ids"]))
         source_kind = "cavity_surface"
-        probe_identity = {"kind": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3", "boundary_node_id": exit_node,
-                          "element_ids": list(boundary_elements),
-                          "physical_arc_identity": recovery["physical_arc_identity"]}
-    state, cleavage_audit = _complete_next_clock(
-        state, tensor, source_kind=source_kind,
-        source_front_id=child_id if continuation else None,
-        source_cavity_id=None if continuation else cavity.cavity_id,
-        source_boundary_site_id=None if continuation else "connection_exit",
-        source_position_m=start, source_probe_identity=probe_identity,
-        front_load_rows=front_load_rows,
-    )
+        probe_identity = _boundary_fitted_source_probe(
+            state, recovery, boundary_node=exit_node,
+        )
+    early_inject("source_observation")
+    pre_clock_state = state
+    if _precompleted_directional is None:
+        state, cleavage_audit = _complete_next_clock(
+            state, tensor, source_kind=source_kind,
+            source_front_id=child_id if continuation else None,
+            source_cavity_id=None if continuation else cavity.cavity_id,
+            source_boundary_site_id=None if continuation else "connection_exit",
+            source_position_m=start, source_probe_identity=probe_identity,
+            front_load_rows=front_load_rows,
+        )
+    else:
+        state, cleavage_audit = _precompleted_directional
+    early_inject("source_clock_update")
     if not any(row["winner"] for row in cleavage_audit):
         return state, None, operation_log if operation_log is not None else [], {
             "status": ("UNQUALIFIED_CAVITY_SOURCE_TENSOR" if any(
@@ -2379,7 +4046,7 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         child = CrackBranchState(child_id, ROOT_BRANCH_ID, 1,
                                  int(state.event_counters.get("topology_actions", 0)) + 1,
                                  (start,), (candidate.angle_rad,), local_state={
-                                     "nucleation_source": "CAVITY_FIXED_PHYSICAL_ARC_PATCH_RECOVERY_V3",
+                                     "nucleation_source": "CAVITY_BOUNDARY_FITTED_PHYSICAL_PATCH_V1",
                                      "upstream_lineage_branch_id": ROOT_BRANCH_ID,
                                      "active_source": "established_directional_J_K_provider",
                                      "front_engine_state_owner": child_id,
@@ -2390,6 +4057,34 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
                                branching_enabled=True)
     engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
     winner = next(item for item in cleavage_audit if item["candidate_id"] == candidate.candidate_id)
+    front_process_advance = _precompleted_front_process
+    if continuation and front_process_advance is None:
+        from .legacy_front_process_adapter import LegacyFrontProcessAdapter
+        process_owner_id = _canonical_front_process_owner(pre_clock_state, child_id)
+        payload = pre_clock_state.tip_process_state.get("by_branch", {}).get(process_owner_id)
+        if payload is None:
+            raise RuntimeError("continued child has no canonical legacy process owner")
+        pre_progress = max(
+            (float(item.residual_action) for item in pre_clock_state.competition.hazard_states),
+            default=0.0,
+        )
+        post_progress = max(
+            (float(item.residual_action) for item in state.competition.hazard_states),
+            default=pre_progress,
+        )
+        front_process_advance = LegacyFrontProcessAdapter(
+            state.material, _bundle_from_state(state),
+        ).advance_front_process(
+            payload, float(winner["K_effective_Pa_sqrt_m"]), 900.0,
+            float(winner["common_advance_duration_s"]),
+            topology_owned_cleavage_action_before=pre_progress,
+            topology_owned_cleavage_action_after=post_progress,
+        )
+        tip_state = dict(state.tip_process_state)
+        by_branch = dict(tip_state.get("by_branch", {}))
+        by_branch[process_owner_id] = front_process_advance.advanced_front_state
+        tip_state["by_branch"] = by_branch
+        state = replace(state, tip_process_state=tip_state)
     barrier = winner["hazard_barrier_J"]
     resistance = hazard_resistance_J_per_m2(
         barrier_J=barrier, cooperative_hits=engine.f.m_hits,
@@ -2400,7 +4095,6 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         resistance * math.dist(start, end), event_classification="physical_cleavage",
         candidate_direction_xy=candidate.direction_xy, first_intersection_xy_m=end,
     )
-    operations = operation_log if operation_log is not None else []
     def inject(stage, current):
         operations.append(stage)
         if stage == failure_stage:
@@ -2491,16 +4185,16 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         process_owner_id = _canonical_front_process_owner(accepted, child_id)
         payload = accepted.tip_process_state.get("by_branch", {}).get(process_owner_id)
         child_engine = restore_sharp_front_engine(accepted.material, _bundle_from_state(accepted), payload)
-        # Directional first passage is authoritative, as in the pre-void v11
-        # adapter.  Synchronize the scalar compatibility clock, then let the
-        # unchanged engine perform emission, renewal, and wake retention.
-        child_engine.B = 1.0
-        duration = float(winner["common_advance_duration_s"])
-        step_info = child_engine.step(
-            float(winner["K_effective_Pa_sqrt_m"]), 900.0, duration,
+        # The canonical process interval was already evolved exactly once.
+        # Apply only the topology-owned moving-frame renewal after acceptance.
+        from .tip_directional_observation_v11 import apply_post_interval_event_renewal
+        step_info = dict(front_process_advance.audit["step_info"])
+        step_info["interval_evolved"] = True
+        step_info["da"] = 0.0
+        apply_post_interval_event_renewal(
+            child_engine.mpz, step_info, event_selected=True,
+            event_distance_m=math.dist(start, end),
         )
-        if not step_info["fired"]:
-            raise RuntimeError("accepted child first passage did not renew the established front engine")
         tip_state = dict(accepted.tip_process_state)
         by_branch = dict(tip_state.get("by_branch", {}))
         by_branch[process_owner_id] = {
@@ -2510,7 +4204,11 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         }
         tip_state["by_branch"] = by_branch
         accepted = replace(accepted, tip_process_state=tip_state)
-    if not continuation:
+    # Every accepted child advance changes the source position and geometry
+    # generation.  Rebuild the source-owned candidate endpoints after both
+    # first passage *and* continuation; otherwise a second continuation sees
+    # the already-consumed endpoint at the previous tip.
+    if child_id in accepted.crack_network.active_tip_ids:
         child_load_rows = sharp_front_load_provider(
             accepted, branch_id=child_id,
         )["directional"]
@@ -2552,8 +4250,6 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             })
         child_candidates = tuple(item for item in child_candidates
                                  if item.candidate_id in child_endpoints)
-        if not child_candidates:
-            raise RuntimeError("active child has no geometrically admissible continuation direction")
         child_source = _source_identity(
             accepted, None, source_kind="sharp_front", source_front_id=child_id,
             source_position_m=accepted.crack_network.branch(child_id).tip,
@@ -2562,11 +4258,22 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         )
         child_source["candidate_source_states"] = tuple(child_rows)
         child_source["next_candidate_endpoints_m"] = child_endpoints
+        if not child_candidates:
+            child_source["terminal_geometry_status"] = (
+                "NO_GEOMETRICALLY_ADMISSIBLE_FIXED_INCREMENT")
         accepted = _transition_competition_source(
             accepted, child_source, candidates=child_candidates,
         )
-        result = replace(result, state=accepted)
-    else:
+        if not child_candidates:
+            accepted = replace(accepted, junction_process_state={
+                **accepted.junction_process_state,
+                "downstream_front_terminal_status": {
+                    "reason": "SPECIMEN_BOUNDARY_FIXED_INCREMENT_EXHAUSTED",
+                    "front_id": child_id,
+                    "tip_m": tuple(map(float, child_tip)),
+                    "attempted_increment_m": 7.5e-5,
+                },
+            })
         result = replace(result, state=accepted)
     cavity = accepted.void_state.cavities[0]
     child_process_owner = (
@@ -2596,70 +4303,182 @@ def deterministic_trajectory(*, bundle: UnifiedFractureMaterialBundle, stop_befo
                              state_trace=None, boundary_segments=32, radial_layers=12,
                              qualify_source=False, common_restart_protocol=False,
                              source_conforming_geometry=False,
-                             shape_regular_local_level=None):
+                             shape_regular_local_level=None,
+                             resolved_radius_m=5.5e-5,
+                             sentinel_initial_vacancy_fraction_gp=1.0,
+                             vacancy_coupled=False,
+                             promotion_radius_m=5.0e-5,
+                             subgrid_radius_m=2.5e-5,
+                             bulk_initial_density_m2=None,
+                             initial_plastic_strain_gp=None,
+                             specimen_width_m=1.0e-3,
+                             specimen_height_m=1.0e-3,
+                             far_h_m=5.0e-5):
+    resolved_radius_m = float(resolved_radius_m)
+    if not math.isfinite(resolved_radius_m) or resolved_radius_m < float(promotion_radius_m):
+        raise ValueError("resolved cavity radius must be finite and at least the promotion radius")
     state, hole = build_production_void_state(bundle=bundle, enabled=True, cavity_center_m=cavity_center_m,
                                               crack_path_m=crack_path_m,
                                               cleavage_theta_deg=cleavage_theta_deg,
                                               boundary_segments=boundary_segments, radial_layers=radial_layers,
                                               source_conforming_geometry=source_conforming_geometry,
-                                              shape_regular_local_level=shape_regular_local_level)
-    cfg = VoidingConfig(enabled=True, promotion_radius_m=5.0e-5)
+                                              shape_regular_local_level=shape_regular_local_level,
+                                              temperature_K=900.0,
+                                              initial_vacancy_fraction_gp=sentinel_initial_vacancy_fraction_gp,
+                                              bulk_initial_density_m2=bulk_initial_density_m2,
+                                              initial_plastic_strain_gp=initial_plastic_strain_gp,
+                                              specimen_width_m=specimen_width_m,
+                                              specimen_height_m=specimen_height_m,
+                                              far_h_m=far_h_m,
+                                              test_only_extreme_reservoir=(
+                                                  sentinel_initial_vacancy_fraction_gp is not None
+                                                  and sentinel_initial_vacancy_fraction_gp > 1.0e-2),
+                                              cavity_geometry_radius_m=promotion_radius_m)
+    cfg = VoidingConfig(enabled=True, promotion_radius_m=float(promotion_radius_m))
     rows = [observables(state, "available_site")]
     def capture(label):
         if state_trace is not None: state_trace.append((label,state))
     capture("available_site")
+    accepted_plastic_rate = None
+    if vacancy_coupled:
+        state, accepted_plastic_rate, plastic_vacancy_audit = evolve_accepted_plastic_vacancy_interval(
+            state, bundle=bundle, temperature_K=900.0, duration_s=0.1,
+            test_only=True,
+        )
+        rows.append({
+            **observables(state, "plastic_vacancy_production"),
+            "plastic_vacancy_audit": plastic_vacancy_audit,
+        })
+        capture("plastic_vacancy_production")
     for label in ("multi_hit_1", "multi_hit_2"):
-        tensor = local_site_tensor(state); rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+        tensor = local_site_tensor(state)
+        if vacancy_coupled:
+            rates, rate_audit = vacancy_coupled_void_rates(
+                state, cfg, temperature_K=900.0, stress_tensor_Pa=tensor,
+                center_m=state.void_state.sites[0].center_m,
+                equivalent_plastic_strain_rate_gp=accepted_plastic_rate,
+            )
+        else:
+            rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+            rate_audit = {}
         site = state.void_state.sites[0]
         dt = site.birth.crossing_time_exact(rates["birth_s"] * site.candidate_weight)
         if dt is None: raise RuntimeError('NO_KINETICALLY_ACTIVE_BIRTH_CANDIDATE')
         void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
         state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))
-        rows.append({**observables(state, label), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
+        rows.append({**observables(state, label), "local_tensor_Pa": tensor.tolist(), "rates": rates,
+                     "vacancy_rate_audit": rate_audit, "events": events})
         capture(label)
     tensor = local_site_tensor(state)
-    rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+    if vacancy_coupled:
+        rates, rate_audit = vacancy_coupled_void_rates(
+            state, cfg, temperature_K=900.0, stress_tensor_Pa=tensor,
+            center_m=state.void_state.sites[0].center_m,
+            equivalent_plastic_strain_rate_gp=accepted_plastic_rate,
+        )
+    else:
+        rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+        rate_audit = {}
     site = state.void_state.sites[0]
     dt = site.stabilization.crossing_time_exact(rates["stabilization_s"])
     if dt is None: raise RuntimeError('NO_KINETICALLY_ACTIVE_STABILIZATION_CANDIDATE')
     void_state, events = advance_site(state.void_state, site.site_id, dt, rates=rates)
     state = equilibrate_fixed_load_with_production_fem(replace(state, void_state=void_state))
-    rows.append({**observables(state, "stabilization"), "local_tensor_Pa": tensor.tolist(), "rates": rates, "events": events})
+    rows.append({**observables(state, "stabilization"), "local_tensor_Pa": tensor.tolist(), "rates": rates,
+                 "vacancy_rate_audit": rate_audit, "events": events})
     capture("stabilization")
-    state = replace(state, void_state=create_subgrid_cavity(state.void_state, "site-1", 2.5e-5))
-    state = equilibrate_fixed_load_with_production_fem(state); rows.append(observables(state, "subgrid_void"))
+    if vacancy_coupled:
+        state, debit_audit = create_subgrid_cavity_from_vacancies(
+            state, "site-1", subgrid_radius_m, process_zone_length_m=5.0e-5,
+        )
+    else:
+        state = replace(state, void_state=create_subgrid_cavity(
+            state.void_state, "site-1", subgrid_radius_m,
+        ))
+        debit_audit = {}
+    state = equilibrate_fixed_load_with_production_fem(state)
+    rows.append({**observables(state, "subgrid_void"), "vacancy_debit_audit": debit_audit})
     capture("subgrid_void")
     tensor = local_site_tensor(state)
-    rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
-    growth_dt = growth_time_to_radius_exact(state.void_state,state.void_state.cavities[0].cavity_id,5e-5,
-        rates=rates,radial_growth_scale_m=cfg.radial_growth_scale_m)
+    cavity = state.void_state.cavities[0]
+    if vacancy_coupled:
+        rates, rate_audit = vacancy_coupled_void_rates(
+            state, cfg, temperature_K=900.0, stress_tensor_Pa=tensor,
+            center_m=cavity.center_m, equivalent_plastic_strain_rate_gp=accepted_plastic_rate,
+            radius_m=cavity.radius_m,
+        )
+        promotion_target_m = cfg.promotion_radius_m * (1.0 + 1.0e-12)
+        growth_dt = (promotion_target_m - cavity.radius_m) / rates["Rdot_m_s"] if rates["Rdot_m_s"] > 0.0 else None
+    else:
+        rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+        rate_audit = {}
+        growth_dt = growth_time_to_radius_exact(
+            state.void_state, cavity.cavity_id, promotion_radius_m, rates=rates,
+            radial_growth_scale_m=cfg.radial_growth_scale_m,
+        )
     if growth_dt is None:raise RuntimeError('NO_KINETICALLY_ACTIVE_GROWTH_CHANNEL')
-    state = replace(state, void_state=update_cavity_growth(
-        state.void_state, state.void_state.cavities[0].cavity_id,
-        rates=rates, dt_s=growth_dt, radial_growth_scale_m=cfg.radial_growth_scale_m,
-    ))
+    if vacancy_coupled:
+        state, growth_audit = grow_cavity_from_vacancies(
+            state, cavity.cavity_id, rates=rates, dt_s=growth_dt,
+            process_zone_length_m=5.0e-5,
+        )
+    else:
+        state = replace(state, void_state=update_cavity_growth(
+            state.void_state, cavity.cavity_id, rates=rates, dt_s=growth_dt,
+            radial_growth_scale_m=cfg.radial_growth_scale_m,
+        ))
+        growth_audit = {}
     grown = state.void_state.cavities[0]
     state = equilibrate_fixed_load_with_production_fem(state)
-    rows.append({**observables(state, "subgrid_growth"), "rates": rates, "growth_dt_s": float(growth_dt)})
+    rows.append({**observables(state, "subgrid_growth"), "rates": rates, "growth_dt_s": float(growth_dt),
+                 "vacancy_rate_audit": rate_audit, "growth_audit": growth_audit})
     capture("subgrid_growth")
     promoted = promote_cavity(state.void_state, grown.cavity_id, cfg.promotion_radius_m)
     operations = []
     state = remesh_cavity(state, hole, promoted, "promotion", operations)
     rows.append({**observables(state, "geometric_promotion"), "executed_operations": operations})
     capture("geometric_promotion")
-    grown_hole = _grow_hole_boundary(hole, 5.5e-5,
+    if vacancy_coupled:
+        state, accepted_plastic_rate, resolved_plastic_vacancy_audit = evolve_accepted_plastic_vacancy_interval(
+            state, bundle=bundle, temperature_K=900.0, duration_s=0.1,
+            test_only=True,
+        )
+        rows.append({**observables(state, "resolved_plastic_vacancy_production"),
+                     "plastic_vacancy_audit": resolved_plastic_vacancy_audit})
+        capture("resolved_plastic_vacancy_production")
+    grown_hole = _grow_hole_boundary(hole, resolved_radius_m,
                                     crack_path_m=state.crack_network.branch(ROOT_BRANCH_ID).path)
     tensor = cavity_boundary_tensor(state)[0]
-    rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
-    growth_dt = growth_time_to_radius_exact(state.void_state,state.void_state.cavities[0].cavity_id,5.5e-5,
-        rates=rates,radial_growth_scale_m=cfg.radial_growth_scale_m)
+    cavity = state.void_state.cavities[0]
+    if vacancy_coupled:
+        rates, rate_audit = vacancy_coupled_void_rates(
+            state, cfg, temperature_K=900.0, stress_tensor_Pa=tensor,
+            center_m=cavity.center_m, equivalent_plastic_strain_rate_gp=accepted_plastic_rate,
+            radius_m=cavity.radius_m,
+        )
+        growth_dt = (resolved_radius_m - cavity.radius_m) / rates["Rdot_m_s"] if rates["Rdot_m_s"] > 0.0 else None
+    else:
+        rates = arrhenius_rates(cfg, temperature_K=900.0, stress_tensor_Pa=tensor)
+        rate_audit = {}
+        growth_dt = growth_time_to_radius_exact(
+            state.void_state, cavity.cavity_id, resolved_radius_m, rates=rates,
+            radial_growth_scale_m=cfg.radial_growth_scale_m,
+        )
     if growth_dt is None:raise RuntimeError('NO_KINETICALLY_ACTIVE_GROWTH_CHANNEL')
-    void_state = update_cavity_growth(
-        state.void_state, state.void_state.cavities[0].cavity_id,
-        rates=rates, dt_s=growth_dt, radial_growth_scale_m=cfg.radial_growth_scale_m,
-    )
-    state = remesh_cavity(state, grown_hole, void_state, "resolved-growth")
-    rows.append({**observables(state, "resolved_growth"), "rates": rates, "growth_dt_s": float(growth_dt)})
+    if vacancy_coupled:
+        state, growth_audit = grow_cavity_from_vacancies(
+            state, cavity.cavity_id, rates=rates, dt_s=growth_dt,
+            process_zone_length_m=5.0e-5,
+        )
+    else:
+        state = replace(state, void_state=update_cavity_growth(
+            state.void_state, cavity.cavity_id, rates=rates, dt_s=growth_dt,
+            radial_growth_scale_m=cfg.radial_growth_scale_m,
+        ))
+        growth_audit = {}
+    state = remesh_cavity(state, grown_hole, state.void_state, "resolved-growth")
+    rows.append({**observables(state, "resolved_growth"), "rates": rates, "growth_dt_s": float(growth_dt),
+                 "vacancy_rate_audit": rate_audit, "growth_audit": growth_audit})
     capture("resolved_growth")
     if stop_before_ligament:
         return state, rows
