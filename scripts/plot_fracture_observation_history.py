@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import math
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -14,21 +15,24 @@ from arrhenius_fracture.fracture_observation_history import (
 
 def plot_history(history: ObservationHistory, output: Path, *, front_id: str | None = None,
                  segment_id: str | None = None) -> None:
-    rows = history.filtered(front_id=front_id, segment_id=segment_id, valid_only=True)
+    rows = history.filtered(front_id=front_id, segment_id=segment_id)
     if not rows:
-        raise ValueError("no valid observations selected")
+        raise ValueError("no observations selected")
     figure, axis = plt.subplots(figsize=(5.0, 3.4))
-    groups: dict[tuple[str, str], list] = {}
+    groups: dict[tuple[str, str, str], list] = {}
     for row in rows:
-        groups.setdefault((row.segment_id, row.stage.value), []).append(row)
-    for (segment, stage), selected in groups.items():
+        groups.setdefault((row.segment_id, row.stage.value, row.validity_status.value), []).append(row)
+    for (segment, stage, validity), selected in groups.items():
         axis.plot(
             [row.stage_length_m * 1e6 for row in selected],
-            [row.K_I_Pa_sqrt_m * 1e-6 for row in selected],
-            marker="o", markersize=2.5, linewidth=1.0, label=f"{segment}: {stage}",
+            [(row.K_J_Pa_sqrt_m if math.isfinite(row.K_J_Pa_sqrt_m)
+              else row.K_probe_Pa_sqrt_m if math.isfinite(row.K_probe_Pa_sqrt_m)
+              else row.K_I_Pa_sqrt_m) * 1e-6 for row in selected],
+            marker="o", markersize=2.5, linewidth=1.0,
+            label=f"{segment}: {stage}; {validity}",
         )
     axis.set_xlabel("Crack length or extension (µm)")
-    axis.set_ylabel(r"$K_I$ (MPa $\sqrt{\mathrm{m}}$)")
+    axis.set_ylabel(r"Native $K$ observer (MPa $\sqrt{\mathrm{m}}$)")
     if len(groups) > 1:
         axis.legend(frameon=False, fontsize=7)
     figure.tight_layout()
