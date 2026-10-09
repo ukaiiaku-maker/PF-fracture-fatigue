@@ -74,3 +74,12 @@ def test_generic_launcher_records_stochastic_first_passage_threshold():
     assert 'independent_draw_per_first_passage_interval' in text
     assert 'current_interval_physical_hazard_action' in text
     assert 'current_interval_sampled_threshold' in text
+
+
+def test_generic_launcher_supports_declared_negative_R_validation():
+    generic = _generic_text()
+    low_level = _text()
+    assert "R_RATIO=${R_RATIO:-0.1}" in generic
+    assert "export OUTROOT TARGET_EXT_UM CYCLES_MAX HAZARD_SEED R_RATIO" in generic
+    assert "R_RATIO=${R_RATIO:-0.1}" in low_level
+    assert '--R "$R_RATIO"' in low_level

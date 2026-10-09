@@ -23,6 +23,7 @@ def test_factory_replaces_incoming_kmax_exactly():
     cfg = FixedDeltaKConfig(18.0).validate()
     reset_fixed_deltaK_audit(cfg)
     factory = make_fixed_deltaK_waveform_factory(fatigue_v1.FatigueWaveform, cfg)
+    assert factory._prescribed_fixed_deltaK_control is True
     wave = factory(Kmax=99.0e6, R=0.1, frequency_Hz=1000.0, closure_clip=True)
     assert np.isclose(wave.Kmax, 20.0e6)
     assert np.isclose(wave.DeltaK, 18.0e6)
@@ -53,6 +54,20 @@ def test_invalid_R_is_rejected():
         cfg.target_Kmax_Pa_sqrt_m(1.0)
     with pytest.raises(ValueError):
         cfg.target_Kmax_Pa_sqrt_m(-0.1)
+
+
+def test_reversible_factory_preserves_negative_phase_without_changing_deltaK():
+    factory = make_fixed_deltaK_waveform_factory(
+        fatigue_v1.FatigueWaveform,
+        FixedDeltaKConfig(12.0),
+        allow_negative_R=True,
+    )
+    waveform = factory(Kmax=1.0, R=-0.95, frequency_Hz=1000.0)
+    phases = np.linspace(0.0, 2.0 * np.pi, 48, endpoint=False)
+    values = waveform.K_phase(phases)
+    assert np.min(values) < 0.0
+    assert np.max(values) > 0.0
+    assert waveform.DeltaK == pytest.approx(12.0e6)
 
 
 def test_probe_K_is_not_retained_as_fatigue_toughness(tmp_path):

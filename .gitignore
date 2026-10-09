@@ -2,6 +2,11 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 *.egg-info/
+integration_evidence/new_full_pf_1000um_dbtt_300K/
+integration_evidence/rejected_physics_ablation_no_pz_state/*
+!integration_evidence/rejected_physics_ablation_no_pz_state/REJECTED_RUN.md
+integration_evidence/rejected_pre_final_source_identity/*
+!integration_evidence/rejected_pre_final_source_identity/REJECTED_RUN.md
 build/
 dist/
 runs/

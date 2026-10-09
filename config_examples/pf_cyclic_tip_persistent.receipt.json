@@ -1,0 +1,50 @@
+{
+  "external_pair": null,
+  "options": {
+    "cavity": "disabled",
+    "crack_path": "single_front",
+    "integration": "adaptive_transactional",
+    "kernel_manifest": null,
+    "kinetics": "reversible_signed",
+    "loading": "explicit_cyclic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "publication_restart",
+    "plasticity": "tip_process_only",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "persistent_reusable",
+    "source_location": "tip_surface"
+  },
+  "options_sha256": "e51e24961e2937bc364bd93834050bf38fa7eafab1e81b479e5bad0c1318a1ff",
+  "providers": [
+    {
+      "identity": "v10.2.30_hazard_energy_gated_fatigue",
+      "module": "arrhenius_fracture.sharp_front_v10_2_30_energy_gated_fatigue",
+      "required_attribute": "main",
+      "role": "driver"
+    },
+    {
+      "identity": "v10.2.21_persistent_site_backstress_blunting",
+      "module": "arrhenius_fracture.persistent_site_source_v10221",
+      "required_attribute": "install_persistent_site_source",
+      "role": "source_lifecycle"
+    },
+    {
+      "identity": "v10.2.30_intrinsic_signed_mobile_transport_v1",
+      "module": "arrhenius_fracture.persistent_site_reversible_transport_v10230",
+      "required_attribute": "install_reversible_transport",
+      "role": "kinetics"
+    }
+  ],
+  "schema": "shared-fracture-fatigue-runtime-receipt/1",
+  "units": {
+    "J_G": "J/m^2",
+    "K": "Pa sqrt(m) internally; MPa sqrt(m) only where named",
+    "density": "m^-2",
+    "length": "m",
+    "stress": "Pa",
+    "temperature": "K",
+    "time": "s"
+  }
+}

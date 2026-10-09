@@ -1,8 +1,13 @@
 from types import SimpleNamespace
 
 import numpy as np
+import copy
+import pytest
 
 from arrhenius_fracture import persistent_site_high_cycle_engine_v10230 as high
+from arrhenius_fracture.persistent_site_first_passage_locator_v10230 import (
+    localize_first_passage,
+)
 from arrhenius_fracture.persistent_site_high_cycle_state_v10230 import (
     capture_ledgers,
     capture_stochastic_state,
@@ -169,6 +174,142 @@ class Engine:
         }
 
 
+@pytest.mark.parametrize("threshold", [0.35940039563036524, 0.4332087756327596])
+def test_near_threshold_cycle_locator_matches_exact_and_is_transactional(threshold):
+    """DBTT/Peak B=1-1e-10 states must not enter microscopic marching."""
+    remaining = threshold * 1.0e-10
+    engine = Engine(lambda_per_s=0.25, threshold=threshold)
+    engine.hazard_action_current = threshold - remaining
+    engine.B = engine.hazard_action_current / threshold
+    rng_before = copy.deepcopy(engine._hazard_rng.bit_generator.state)
+    geometry_before = (engine.n_adv, engine.a_adv)
+
+    reference = copy.deepcopy(engine)
+    exact = reference._integrate_coupled(1.0, 300.0, 1.0)
+    reference_cycles = exact["dt_consumed"] * Waveform().frequency_Hz
+
+    result = localize_first_passage(
+        engine, Controller(), Waveform(), 300.0, 2.0
+    )
+    assert result["fired"] is True
+    assert result["coupled_hazard_first_passage_locator"] is True
+    assert result["coupled_hazard_cycles_consumed"] == pytest.approx(
+        reference_cycles, rel=1.0e-12, abs=1.0e-15
+    )
+    assert result["coupled_hazard_locator_bracket_high"] - result[
+        "coupled_hazard_locator_bracket_low"
+    ] <= 1.0
+    assert result["coupled_hazard_locator_trial_evaluations"] < 100
+    assert engine.hazard_event_index == 1
+    assert engine.hazard_threshold_history == [threshold]
+    assert engine._hazard_rng.bit_generator.state == rng_before
+    assert (engine.n_adv, engine.a_adv) == geometry_before
+
+
+def test_locator_reuses_integer_prefix_when_two_cycle_bracket_is_needed():
+    """A [1, 2] bracket must not reintegrate cycle 1 after evaluating cycle 2."""
+    engine = Engine(lambda_per_s=0.25, threshold=0.495)
+    result = localize_first_passage(
+        engine, Controller(), Waveform(), 300.0, 2.0
+    )
+    assert result["fired"] is True
+    assert result["coupled_hazard_locator_bracket_low"] == 1.0
+    assert result["coupled_hazard_locator_bracket_high"] == 2.0
+    assert result["coupled_hazard_locator_prefix_reuses"] == 1
+    assert result["coupled_hazard_locator_trial_evaluations"] == 16
+    assert result["coupled_hazard_cycles_consumed"] == pytest.approx(1.98)
+
+
+def test_locator_allows_only_provisional_event_counter_before_energy_gate():
+    class ProvisionalEngine(Engine):
+        def _integrate_coupled(self, *args, **kwargs):
+            result = super()._integrate_coupled(*args, **kwargs)
+            if result["fired"]:
+                self.n_adv += 1
+            return result
+
+    engine = ProvisionalEngine(lambda_per_s=0.25, threshold=0.5)
+    engine.hazard_action_current = 0.5 * (1.0 - 1.0e-10)
+    engine.B = engine.hazard_action_current / 0.5
+    result = localize_first_passage(
+        engine, Controller(), Waveform(), 300.0, 2.0
+    )
+    assert result["fired"] is True
+    assert engine.n_adv == 1
+    assert engine.a_adv == 0.0
+    assert engine.micro_advance_total_m == 0.0
+    assert engine.checkpoint_advance_total_m == 0.0
+    assert engine.mpz.advance_total_m == 0.0
+
+
+def test_locator_commits_bounded_exact_progress_when_horizon_has_no_bracket():
+    engine = Engine(lambda_per_s=0.25, threshold=1.0)
+    result = localize_first_passage(
+        engine, Controller(), Waveform(), 300.0, 0.5
+    )
+    assert result["fired"] is False
+    assert result["coupled_hazard_cycles_consumed"] == pytest.approx(0.5)
+    assert result["coupled_hazard_locator_failure_reason"] == "no_bracket_within_horizon"
+    assert engine.hazard_action_current == pytest.approx(0.125)
+
+
+def test_locator_requires_executable_private_firing_not_only_reported_action():
+    """A rounded-up action diagnostic must not form a non-firing high bracket."""
+    class RoundedDiagnosticEngine(Engine):
+        def _integrate_coupled(self, *args, **kwargs):
+            result = super()._integrate_coupled(*args, **kwargs)
+            if not result["fired"]:
+                result["physical_hazard_action_step"] += 1.0e-11
+            return result
+
+    engine = RoundedDiagnosticEngine(lambda_per_s=0.25, threshold=0.250000000005)
+    result = localize_first_passage(engine, Controller(), Waveform(), 300.0, 2.0)
+    assert result["fired"] is True
+    assert result["coupled_hazard_locator_bracket_low"] == 1.0
+    assert result["coupled_hazard_locator_bracket_high"] == 2.0
+
+
+def test_locator_commits_low_prefix_with_phase_resolved_path():
+    class BiasedMapEngine(Engine):
+        def _plastic_half_step(self, *args, **kwargs):
+            return super()._plastic_half_step(*args, **kwargs)
+
+    engine = BiasedMapEngine(lambda_per_s=0.25, threshold=0.495)
+    result = localize_first_passage(engine, Controller(), Waveform(), 300.0, 2.0)
+    assert result["fired"] is True
+    assert result["coupled_hazard_cycles_consumed"] == pytest.approx(1.98)
+
+
+def test_locator_exposes_signed_waveform_to_reversible_mobile_transport():
+    class SignedWaveform(Waveform):
+        R = -1.0
+
+        def K_phase(self, phases):
+            return np.where(np.arange(len(phases)) % 2 == 0, 2.0, -2.0)
+
+    class SignedEngine(Engine):
+        def __init__(self):
+            super().__init__(lambda_per_s=0.01, threshold=1.0)
+            self.mpz._reversible_transport_installed = True
+            self.signed_phases_seen = []
+
+        def _integrate_coupled(self, K, T, dt, **kwargs):
+            self.signed_phases_seen.append(
+                self.mpz._reversible_transport_K_signed_Pa_sqrt_m
+            )
+            return super()._integrate_coupled(K, T, dt, **kwargs)
+
+    engine = SignedEngine()
+    result = localize_first_passage(
+        engine, Controller(), SignedWaveform(), 300.0, 1.0
+    )
+    assert result["fired"] is False
+    assert engine.signed_phases_seen == [2.0, -2.0, 2.0, -2.0, 2.0, -2.0, 2.0, -2.0]
+    assert engine.mpz._reversible_tip_radius_m == pytest.approx(engine.r_eff())
+
+
+
+
 class Controller:
     def __init__(self):
         self.cfg = SimpleNamespace(
@@ -265,6 +406,15 @@ def test_first_passage_and_post_event_restart_inside_1e12_request(monkeypatch):
     assert first["fired"] is True
     assert abs(first["coupled_hazard_cycles_consumed"] - 14.0) < 2.0e-5
     assert engine._energy_gate_pending is not None
+    assert any(
+        row["mode"] == "first_passage_cycle_locator"
+        and row.get("entry_reason") == "stationary_tail_event_guard"
+        for row in first["coupled_hazard_modes"]
+    )
+    assert not any(
+        row["mode"] == "event_guard_transient"
+        for row in first["coupled_hazard_modes"]
+    )
 
     engine._energy_gate_pending = None
     engine.n_adv += 1
@@ -282,6 +432,25 @@ def test_first_passage_and_post_event_restart_inside_1e12_request(monkeypatch):
     assert second["fired"] is False
     assert second["coupled_hazard_cycles_consumed"] == 1.0e12
     assert engine._v10230_high_cycle_cache["geometry_signature"][0] == 1
+
+
+def test_near_event_localization_is_independent_of_requested_horizon(monkeypatch):
+    _fast_high_cycle_env(monkeypatch)
+    results = []
+    for horizon in (3.0, 20.0):
+        engine = Engine(lambda_per_s=0.25, threshold=0.075, drift_per_cycle=0.0)
+        result = high.integrate_state_coupled_waveform(
+            engine, Controller(), Waveform(), 300.0, horizon
+        )
+        results.append(result)
+        assert result["fired"] is True
+        assert not any(
+            row["mode"] in {"periodic_search", "projective_rejected", "slow_projective"}
+            for row in result["coupled_hazard_modes"]
+        )
+    assert results[0]["coupled_hazard_cycles_consumed"] == pytest.approx(
+        results[1]["coupled_hazard_cycles_consumed"], rel=0.0, abs=1.0e-14
+    )
 
 
 def test_linear_slow_manifold_reaches_1e12_without_false_stationarity(monkeypatch):
@@ -306,3 +475,17 @@ def test_linear_slow_manifold_reaches_1e12_without_false_stationarity(monkeypatc
     assert any(row["mode"] == "slow_projective" for row in result["coupled_hazard_modes"])
     assert not any(row["mode"] == "stationary_tail" for row in result["coupled_hazard_modes"])
     assert abs(engine.mpz.mobile_count - 1.0e12) / 1.0e12 < 1.0e-10
+
+
+def test_explicit_only_qualification_mode_disables_acceleration(monkeypatch):
+    _fast_high_cycle_env(monkeypatch)
+    monkeypatch.setenv("V10230_HIGH_CYCLE_EXPLICIT_ONLY", "1")
+    engine = Engine(lambda_per_s=1.0e-30, threshold=1.0, drift_per_cycle=1.0)
+    result = high.integrate_state_coupled_waveform(
+        engine, Controller(), Waveform(), 300.0, 20.0
+    )
+    assert result["fired"] is False
+    assert result["coupled_hazard_cycles_consumed"] == 20.0
+    assert {row["mode"] for row in result["coupled_hazard_modes"]} == {
+        "exact_cycle_burst"
+    }

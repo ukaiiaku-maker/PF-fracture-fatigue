@@ -1,0 +1,16 @@
+{
+  "cavity": "disabled",
+  "crack_path": "single_front",
+  "integration": "adaptive_transactional",
+  "kernel_manifest": null,
+  "kinetics": "reversible_signed",
+  "loading": "explicit_cyclic",
+  "material_manifest": null,
+  "mechanics": "spatial_pf",
+  "output": "publication_restart",
+  "plasticity": "tip_process_only",
+  "random_seed": 1733,
+  "schema": "shared-fracture-fatigue-options/1",
+  "source_lifecycle": "persistent_reusable",
+  "source_location": "tip_surface"
+}

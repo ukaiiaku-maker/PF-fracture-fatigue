@@ -145,6 +145,84 @@ def _write_csv(path: Path, rows: list[dict]) -> None:
         writer.writerows(rows)
 
 
+def _json(path: Path, default):
+    if not path.is_file():
+        return default
+    return json.loads(path.read_text())
+
+
+def _enrich_events(root: Path, events: list[dict]) -> dict:
+    """Attach the event transaction and immutable run provenance by event order."""
+    control = _json(root / "v10_2_30_fixed_deltaK_control.json", {})
+    geometry = _json(root / "stochastic_avalanche_geometry_events.json", [])
+    gates = _json(root / "hazard_energy_gated_events_v10_2_30.json", [])
+    kinetic_payload = _json(root / "kinetic_tip_cell_audit_v101.json", {})
+    kinetic = (
+        kinetic_payload.get("records", [])
+        if isinstance(kinetic_payload, dict)
+        else kinetic_payload
+    )
+    manifest = _json(root / "high_cycle_run_manifest.json", {})
+    provenance = {
+        "parameter_option": control.get("parameter_option"),
+        "deltaK_MPa_sqrt_m": control.get("target_deltaK_MPa_sqrt_m"),
+        "Kmax_MPa_sqrt_m": control.get("target_Kmax_MPa_sqrt_m"),
+        "R": control.get("R"),
+        "frequency_Hz": control.get("frequency_Hz"),
+        "hazard_seed": control.get("cleavage_hazard_seed"),
+        "cycles_max": control.get("cycles_max"),
+        "git_head": manifest.get("git_head"),
+        "generic_launcher": manifest.get("generic_launcher"),
+        "environment": manifest.get("environment", {}),
+    }
+    for index, event in enumerate(events):
+        geom = geometry[index] if index < len(geometry) else {}
+        gate = gates[index] if index < len(gates) else {}
+        kinetics = kinetic[index] if index < len(kinetic) else {}
+        modes = kinetics.get("coupled_hazard_modes", [])
+        mode_names = [str(row.get("mode", "")) for row in modes]
+        failures = [str(row.get("failure_reason", "")) for row in modes]
+        trials = gate.get("trial_rows", [])
+        accepted_trial = trials[-1] if trials else {}
+        event.update(
+            {
+                "parameter_option": control.get("parameter_option"),
+                "deltaK_MPa_sqrt_m": control.get("target_deltaK_MPa_sqrt_m"),
+                "hazard_seed": control.get("cleavage_hazard_seed"),
+                "threshold_action": geom.get("threshold_action"),
+                "physical_hazard_action": kinetics.get(
+                    "physical_hazard_action_block"
+                ),
+                "stochastic_proposed_advance_m": geom.get(
+                    "stochastic_proposed_event_length_m"
+                ),
+                "energy_available_J_per_m": accepted_trial.get(
+                    "elastic_release_event_J_per_m"
+                ),
+                "energy_required_J_per_m": accepted_trial.get(
+                    "hazard_dissipation_J_per_m"
+                ),
+                "energy_residual_J_per_m": accepted_trial.get(
+                    "energy_residual_J_per_m"
+                ),
+                "energy_gate_outcome": gate.get("arrest_reason"),
+                "geometry_commit_inserted": bool(gate.get("inserted", False)),
+                "geometry_transaction_mode": geom.get(
+                    "geometry_transaction_mode"
+                ),
+                "acceleration_modes": mode_names,
+                "dmd_event_guard": "dmd_event_guard" in failures,
+                "exact_fallback_entered": "exact_cycle_burst" in mode_names,
+                "transient_localization_entered": (
+                    "event_localization_transient" in mode_names
+                    or "first_passage_cycle_locator" in mode_names
+                ),
+                "private_trials_counted_as_cycles": False,
+            }
+        )
+    return provenance
+
+
 def _plot(events: list[dict], windows: list[dict], root: Path) -> list[str]:
     outputs = []
     if not events:
@@ -217,6 +295,7 @@ def main(argv=None) -> int:
         raise SystemExit(f"missing completed step history: {steps_path}")
     rows = _rows(steps_path)
     events = extract_events(rows, _path_lengths(root, args.temperature_K))
+    provenance = _enrich_events(root, events)
     target_m = args.target_extension_um * 1.0e-6
     development_m = args.development_extension_um * 1.0e-6
     stability_m = args.stability_window_um * 1.0e-6
@@ -274,6 +353,7 @@ def main(argv=None) -> int:
         "moving_windows": windows,
         "plots": outputs,
         "empirical_Paris_law_fit": False,
+        "provenance": provenance,
     }
     (root / "developed_fatigue_growth_summary.json").write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n"

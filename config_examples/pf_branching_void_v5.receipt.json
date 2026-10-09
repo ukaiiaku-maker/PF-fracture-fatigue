@@ -1,0 +1,56 @@
+{
+  "external_pair": null,
+  "options": {
+    "cavity": "full_order_v5",
+    "crack_path": "branching_multifront",
+    "integration": "adaptive_transactional",
+    "kernel_manifest": null,
+    "kinetics": "native_signed",
+    "loading": "monotonic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "publication_restart",
+    "plasticity": "tip_plus_full_field",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "current_source",
+    "source_location": "tip_plus_bulk"
+  },
+  "options_sha256": "df3c515ada89981558e70efce6456ee3ece75a088d6079d0754317d172479b1e",
+  "providers": [
+    {
+      "identity": "unified_2d_event_aware_coupled_interval_v1",
+      "module": "arrhenius_fracture.global_physical_scheduler_v1",
+      "required_attribute": "advance_event_aware_coupled_interval",
+      "role": "driver"
+    },
+    {
+      "identity": "current_source_v12_runtime",
+      "module": "arrhenius_fracture.current_source_runtime_bindings",
+      "required_attribute": null,
+      "role": "source_lifecycle"
+    },
+    {
+      "identity": "tip_plus_full_field",
+      "module": "arrhenius_fracture.bulk_plasticity_v104",
+      "required_attribute": "accepted_bulk_load_step",
+      "role": "bulk_plasticity"
+    },
+    {
+      "identity": "full_order_v5",
+      "module": "arrhenius_fracture.voiding_production_v5",
+      "required_attribute": "build_production_void_state",
+      "role": "cavity"
+    }
+  ],
+  "schema": "shared-fracture-fatigue-runtime-receipt/1",
+  "units": {
+    "J_G": "J/m^2",
+    "K": "Pa sqrt(m) internally; MPa sqrt(m) only where named",
+    "density": "m^-2",
+    "length": "m",
+    "stress": "Pa",
+    "temperature": "K",
+    "time": "s"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "shared-fracture-fatigue-smoke-regression/1",
+  "date": "2026-10-09",
+  "branch": "codex/shared-fracture-fatigue-options-v1",
+  "mechanics_source_commit": "baedb069c912db69032eea8b339cb01b4bf97278",
+  "python": {
+    "executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "version": "3.12.13",
+    "pytest_plugin_autoload": false
+  },
+  "test_groups": [
+    {
+      "id": "pf_options_observers_operator_reversible",
+      "passed": 48,
+      "failed": 0,
+      "seconds": 15.35
+    },
+    {
+      "id": "pf_bulk_branch_provider_restart",
+      "passed": 126,
+      "failed": 0,
+      "seconds": 29.51
+    },
+    {
+      "id": "pf_cyclic_event_fixed_deltaK",
+      "passed": 71,
+      "failed": 0,
+      "seconds": 2.14
+    },
+    {
+      "id": "pf_finite_persistent_kinetic_sources",
+      "passed": 22,
+      "failed": 0,
+      "seconds": 0.41
+    },
+    {
+      "id": "full_fem_czm_pinned_pair",
+      "passed": 16,
+      "failed": 0,
+      "seconds": 3.61,
+      "commit": "293491157063484bb10df6adc479f847a6a08ba6"
+    }
+  ],
+  "selected_tests_total": {
+    "passed": 283,
+    "failed": 0
+  },
+  "static_checks": {
+    "compileall": "passed",
+    "shell_syntax": "passed",
+    "git_diff_check": "passed",
+    "json_validation": "passed"
+  },
+  "long_growth": {
+    "status": "passed",
+    "temperature_K": 300.0,
+    "target_extension_um": 1000.0,
+    "achieved_extension_um": 1002.9028827375072,
+    "accepted_geometry_events": 201,
+    "terminal_step": 2085,
+    "K_queries_um": [100, 500, 1000],
+    "all_query_statuses": "discrete_jump_bracket",
+    "interpolation_performed": false,
+    "evidence": "integration_evidence/new_full_pf_1000um_summary.json"
+  },
+  "protected_history_reanalysis": {
+    "case_count": 12,
+    "events_per_case": 207,
+    "achieved_extension_um": 1000.0106212350875,
+    "targets_um": [100, 500, 1000],
+    "all_query_statuses": "discrete_jump_bracket",
+    "interpolation_performed": false,
+    "evidence": "integration_evidence/protected_1000um_k_at_length.json"
+  },
+  "non_results": [
+    "integration_evidence/rejected_physics_ablation_no_pz_state",
+    "integration_evidence/rejected_pre_final_source_identity"
+  ],
+  "known_runner_constraint": "The system base Python 3.13 pytest process exited with signal 11; release tests use the recorded Python 3.12.13 project environment. Provider families are deliberately tested in isolated interpreter groups to prevent legacy import-time adapter contamination."
+}

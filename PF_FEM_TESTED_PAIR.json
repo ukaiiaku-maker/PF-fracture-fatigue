@@ -1,0 +1,18 @@
+{
+  "schema": "pf-fem-tested-pair/1",
+  "pf": {
+    "base_commit": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "repository": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue.git",
+    "source_commit": "baedb069c912db69032eea8b339cb01b4bf97278",
+    "runtime_receipt_schema": "shared-fracture-fatigue-runtime-receipt/1"
+  },
+  "fem_czm": {
+    "branch": "v10.0.5.18.4.0-theta0-pf-parity",
+    "commit": "293491157063484bb10df6adc479f847a6a08ba6",
+    "configuration": "theta0 full anisotropic adaptive-CZM parity",
+    "repository": "https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ.git"
+  },
+  "relationship": "separate full mechanics backends sharing configuration and observation contracts",
+  "reduced_fem_substitution_allowed": false
+}

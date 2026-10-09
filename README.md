@@ -1,5 +1,19 @@
 # PF-fracture-fatigue: v10 unified sharp-front MPZ
 
+> **Shared fracture--fatigue options branch.** This branch adds a typed,
+> serializable option contract without replacing the original spatial PF or
+> separate full FEM/CZM mechanics. Start with
+> [OPTIONS_AND_COMPATIBILITY.md](OPTIONS_AND_COMPATIBILITY.md), resolve a
+> preset with `python -m scripts.resolve_shared_options`, and use
+> [K_AT_CRACK_LENGTH_CONTRACT.md](K_AT_CRACK_LENGTH_CONTRACT.md) for
+> stage-aware K/J/G reporting. Donor and backend identities are recorded in
+> [SOURCE_PROVENANCE.json](SOURCE_PROVENANCE.json) and
+> [PF_FEM_TESTED_PAIR.json](PF_FEM_TESTED_PAIR.json).
+> The completed qualification and capability map are in
+> [INTEGRATION_RESULT.md](INTEGRATION_RESULT.md),
+> [SMOKE_REGRESSION_RESULTS.md](SMOKE_REGRESSION_RESULTS.md), and
+> [CAPABILITY_PRESERVATION_MATRIX.csv](CAPABILITY_PRESERVATION_MATRIX.csv).
+
 This repository is the clean sharp-front successor to the mixed legacy
 `PF-Fatigue_code` archive. The production fracture path is a discrete,
 event-driven sharp interface. A binary broken-material indicator is retained

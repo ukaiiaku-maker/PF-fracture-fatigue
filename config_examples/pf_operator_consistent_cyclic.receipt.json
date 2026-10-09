@@ -1,0 +1,56 @@
+{
+  "external_pair": null,
+  "options": {
+    "cavity": "disabled",
+    "crack_path": "single_front",
+    "integration": "coupled_full_half",
+    "kernel_manifest": null,
+    "kinetics": "operator_consistent_v3_6",
+    "loading": "explicit_cyclic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "selected_fields",
+    "plasticity": "tip_process_only",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "persistent_reusable",
+    "source_location": "tip_surface"
+  },
+  "options_sha256": "1387e09af8dd0ed5cfe516216ff41abaa4df5139791620141e5ff39c94cd4d3f",
+  "providers": [
+    {
+      "identity": "v10.2.30_hazard_energy_gated_fatigue",
+      "module": "arrhenius_fracture.sharp_front_v10_2_30_energy_gated_fatigue",
+      "required_attribute": "main",
+      "role": "driver"
+    },
+    {
+      "identity": "v10.2.21_persistent_site_backstress_blunting",
+      "module": "arrhenius_fracture.persistent_site_source_v10221",
+      "required_attribute": "install_persistent_site_source",
+      "role": "source_lifecycle"
+    },
+    {
+      "identity": "v3.6_operator_consistent",
+      "module": "arrhenius_fracture.operator_consistent_projection_v10230",
+      "required_attribute": "OperatorConsistentProjection",
+      "role": "mechanics_projection"
+    },
+    {
+      "identity": "v3.6_mechanism_specific",
+      "module": "arrhenius_fracture.mechanism_specific_feedback_v10230",
+      "required_attribute": "MechanismSpecificFeedback",
+      "role": "mechanism_feedback"
+    }
+  ],
+  "schema": "shared-fracture-fatigue-runtime-receipt/1",
+  "units": {
+    "J_G": "J/m^2",
+    "K": "Pa sqrt(m) internally; MPa sqrt(m) only where named",
+    "density": "m^-2",
+    "length": "m",
+    "stress": "Pa",
+    "temperature": "K",
+    "time": "s"
+  }
+}

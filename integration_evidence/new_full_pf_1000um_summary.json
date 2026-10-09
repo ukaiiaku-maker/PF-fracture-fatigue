@@ -1,0 +1,74 @@
+{
+  "schema": "shared-fracture-fatigue-long-growth-regression/1",
+  "status": "passed",
+  "source": {
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "commit": "baedb069c912db69032eea8b339cb01b4bf97278",
+    "provider": "arrhenius_fracture.sharp_front_v10_2_27_audited",
+    "provider_identity": "v10.2.27_full_spatial_pf"
+  },
+  "case": {
+    "material_option": "v913_paper_dbtt01_0202500_persistent_sites",
+    "temperature_K": 300.0,
+    "crystal_theta_deg": 0.0,
+    "hazard_mode": "deterministic",
+    "hazard_seed": 2001733,
+    "target_extension_um": 1000.0,
+    "achieved_extension_um": 1002.9028827375072,
+    "final_absolute_crack_length_mm": 1.5029028827375073,
+    "accepted_geometry_events": 201,
+    "first_event_K_MPa_sqrt_m": 23.59336163006569,
+    "terminal_step": 2085,
+    "terminal_exit_code": 0
+  },
+  "physics_and_output_controls": {
+    "driver": "sharp_front_2d",
+    "spatial_process_zone_state_active": true,
+    "no_pz_spatial_state": false,
+    "save_snapshots": 0,
+    "no_plots_requested": true,
+    "no_mpz_state_output": true,
+    "solver_terminal_plot_emitted": true,
+    "raw_output_logical_bytes": 56064892,
+    "raw_output_disk_kib": 54800,
+    "raw_output_committed": false
+  },
+  "kernel": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/family.json",
+    "sha256": "d41b08f69ae773009f65f4c0094ef5436ba7f0f290a94172e5b894d09a41f7c3"
+  },
+  "queries": {
+    "100_um_extension": {
+      "status": "discrete_jump_bracket",
+      "interpolation_performed": false,
+      "lower_extension_um": 99.85470510132132,
+      "upper_extension_um": 104.85470510132133,
+      "upper_K_I_MPa_sqrt_m": 32.055498524141945,
+      "upper_J_J_per_m2": 2309.743109165305,
+      "event_id": "285",
+      "source_row": 286
+    },
+    "500_um_extension": {
+      "status": "discrete_jump_bracket",
+      "interpolation_performed": false,
+      "lower_extension_um": 498.8446584351979,
+      "upper_extension_um": 503.6972121538338,
+      "upper_K_I_MPa_sqrt_m": 43.56714566788741,
+      "upper_J_J_per_m2": 4266.549856111713,
+      "event_id": "1085",
+      "source_row": 1086
+    },
+    "1000_um_extension": {
+      "status": "discrete_jump_bracket",
+      "interpolation_performed": false,
+      "lower_extension_um": 997.9034615416322,
+      "upper_extension_um": 1002.9028827375072,
+      "upper_K_I_MPa_sqrt_m": 39.54228751361183,
+      "upper_J_J_per_m2": 3514.6508528470863,
+      "event_id": "2085",
+      "source_row": 2086
+    }
+  },
+  "plot": "integration_evidence/new_full_pf_1000um_K_history.png",
+  "rejected_runs_are_evidence": false
+}

@@ -1,0 +1,44 @@
+{
+  "external_pair": null,
+  "options": {
+    "cavity": "disabled",
+    "crack_path": "single_front",
+    "integration": "adaptive_transactional",
+    "kernel_manifest": null,
+    "kinetics": "native_signed",
+    "loading": "monotonic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "compact_smoke",
+    "plasticity": "tip_process_only",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "persistent_reusable",
+    "source_location": "tip_surface"
+  },
+  "options_sha256": "f32ef914bd2ac44df247640ce9ccb98370a94bd9e910eeb20d1c35399003d0f3",
+  "providers": [
+    {
+      "identity": "v10.2.27_full_spatial_pf",
+      "module": "arrhenius_fracture.sharp_front_v10_2_27_audited",
+      "required_attribute": "main",
+      "role": "driver"
+    },
+    {
+      "identity": "v10.2.21_persistent_site_backstress_blunting",
+      "module": "arrhenius_fracture.persistent_site_source_v10221",
+      "required_attribute": "install_persistent_site_source",
+      "role": "source_lifecycle"
+    }
+  ],
+  "schema": "shared-fracture-fatigue-runtime-receipt/1",
+  "units": {
+    "J_G": "J/m^2",
+    "K": "Pa sqrt(m) internally; MPa sqrt(m) only where named",
+    "density": "m^-2",
+    "length": "m",
+    "stress": "Pa",
+    "temperature": "K",
+    "time": "s"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "external_pair": null,
+  "options": {
+    "cavity": "disabled",
+    "crack_path": "branching_multifront",
+    "integration": "adaptive_transactional",
+    "kernel_manifest": null,
+    "kinetics": "native_signed",
+    "loading": "monotonic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "publication_restart",
+    "plasticity": "tip_process_only",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "current_source",
+    "source_location": "tip_surface"
+  },
+  "options_sha256": "6e6ce32a90c307ad1833e82cf787dab7f2fed1d31c047ecfbc35801ac08c606b",
+  "providers": [
+    {
+      "identity": "current_source_multifront_physical_v12",
+      "module": "arrhenius_fracture.sharp_front_current_source_multifront_physical_v12",
+      "required_attribute": "run_v12_2d",
+      "role": "driver"
+    },
+    {
+      "identity": "current_source_v12_runtime",
+      "module": "arrhenius_fracture.current_source_runtime_bindings",
+      "required_attribute": null,
+      "role": "source_lifecycle"
+    }
+  ],
+  "schema": "shared-fracture-fatigue-runtime-receipt/1",
+  "units": {
+    "J_G": "J/m^2",
+    "K": "Pa sqrt(m) internally; MPa sqrt(m) only where named",
+    "density": "m^-2",
+    "length": "m",
+    "stress": "Pa",
+    "temperature": "K",
+    "time": "s"
+  }
+}

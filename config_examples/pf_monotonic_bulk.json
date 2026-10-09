@@ -1,0 +1,16 @@
+{
+  "cavity": "disabled",
+  "crack_path": "single_front",
+  "integration": "adaptive_transactional",
+  "kernel_manifest": null,
+  "kinetics": "native_signed",
+  "loading": "monotonic",
+  "material_manifest": null,
+  "mechanics": "spatial_pf",
+  "output": "selected_fields",
+  "plasticity": "full_field_evolving_rho",
+  "random_seed": 1733,
+  "schema": "shared-fracture-fatigue-options/1",
+  "source_lifecycle": "finite_inventory",
+  "source_location": "bulk_uniform"
+}

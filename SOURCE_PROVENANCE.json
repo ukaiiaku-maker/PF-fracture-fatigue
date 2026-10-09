@@ -1,0 +1,22 @@
+{
+  "schema": "shared-fracture-fatigue-source-provenance/1",
+  "base": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+  "donors": [
+    {
+      "commit": "9e2c43ebfb42d6694c27f01ea9092e79da7e3a06",
+      "scope": "source-only V11/V12/V13 branching, full-field bulk plasticity, V5 voiding, tests and scripts; result archives excluded"
+    },
+    {
+      "commit": "94871be15702e7fb85116b92af62c1226c61be42",
+      "scope": "reversible signed mobile transport, cyclic/fixed-DeltaK driver installation, first-passage location, high-cycle restart state and ledger fields"
+    },
+    {
+      "commit": "0a0e522291882bd13e0d03c7e231fd8a6627aa4f",
+      "scope": "V3.6 operator-consistent projection, swept-slip ledger, mechanism-specific feedback, earliest-root runner and reporting tools with callable dependency closure"
+    }
+  ],
+  "selection_policy": "source and callable tooling were ported; compact current-contract regressions were retained; historical result archives and artifact-bound stale tests were not copied",
+  "out_of_scope": {
+    "stateful_kitagawa": "not inspected, restored, ported, backed up, deleted, or modified"
+  }
+}

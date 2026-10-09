@@ -1,0 +1,467 @@
+{
+  "cases": [
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "DBTT_V2_1200K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            45.85594115189097
+          ],
+          "event_ids": [
+            "1.345000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            41.96980574663132
+          ],
+          "event_ids": [
+            "2.220000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            53.36021201428919
+          ],
+          "event_ids": [
+            "7.060000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/DBTT_V2_1200K_theta0/steps_1200K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "DBTT_V2_300K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            9.224051550493018
+          ],
+          "event_ids": [
+            "2.126000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            6.308994033387512
+          ],
+          "event_ids": [
+            "2.430000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            9.722502365732046
+          ],
+          "event_ids": [
+            "1.031000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/DBTT_V2_300K_theta0/steps_0300K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "DBTT_V2_P40_1200K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            110.82426489684174
+          ],
+          "event_ids": [
+            "2.322000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            101.0748628737313
+          ],
+          "event_ids": [
+            "4.160000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            128.77973821596308
+          ],
+          "event_ids": [
+            "1.222000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/DBTT_V2_P40_1200K_theta0/steps_1200K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "DBTT_V2_P40_300K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            12.18409884370577
+          ],
+          "event_ids": [
+            "2.130000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            9.368872978921484
+          ],
+          "event_ids": [
+            "2.440000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            13.3174843473356
+          ],
+          "event_ids": [
+            "1.033000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/DBTT_V2_P40_300K_theta0/steps_0300K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "ceramic_V2_P25_1200K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            3.5073396526568645
+          ],
+          "event_ids": [
+            "2.119000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            3.199315263257382
+          ],
+          "event_ids": [
+            "2.400000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            4.077764052231039
+          ],
+          "event_ids": [
+            "1.026000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/ceramic_V2_P25_1200K_theta0/steps_1200K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "ceramic_V2_P25_300K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            9.330099745117604
+          ],
+          "event_ids": [
+            "2.128000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            6.51162967173746
+          ],
+          "event_ids": [
+            "2.450000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            9.881761689780127
+          ],
+          "event_ids": [
+            "1.033000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/ceramic_V2_P25_300K_theta0/steps_0300K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "ceramic_V2_P40_1200K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            4.827184708175973
+          ],
+          "event_ids": [
+            "1.635000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            4.416203075719883
+          ],
+          "event_ids": [
+            "2.390000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            5.617130051229893
+          ],
+          "event_ids": [
+            "8.960000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/ceramic_V2_P40_1200K_theta0/steps_1200K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "ceramic_V2_P40_300K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            12.47799478847432
+          ],
+          "event_ids": [
+            "2.132000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            9.82060889153443
+          ],
+          "event_ids": [
+            "2.460000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            13.7244978260836
+          ],
+          "event_ids": [
+            "1.035000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/ceramic_V2_P40_300K_theta0/steps_0300K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "weakT_V2_P25_1200K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            10.77677497742211
+          ],
+          "event_ids": [
+            "2.128000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            9.558102444116361
+          ],
+          "event_ids": [
+            "2.440000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            12.459887744132674
+          ],
+          "event_ids": [
+            "1.031000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/weakT_V2_P25_1200K_theta0/steps_1200K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "weakT_V2_P25_300K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            9.96690567415168
+          ],
+          "event_ids": [
+            "2.131000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            7.563145565549871
+          ],
+          "event_ids": [
+            "2.470000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            10.791281418790565
+          ],
+          "event_ids": [
+            "1.035000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/weakT_V2_P25_300K_theta0/steps_0300K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "weakT_V2_P40_1200K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            15.290839299022853
+          ],
+          "event_ids": [
+            "2.143000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            13.93235891267967
+          ],
+          "event_ids": [
+            "2.490000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            17.78368432886974
+          ],
+          "event_ids": [
+            "1.037000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/weakT_V2_P40_1200K_theta0/steps_1200K.csv"
+    },
+    {
+      "achieved_extension_um": 1000.0106212350875,
+      "case": "weakT_V2_P40_300K_theta0",
+      "event_count": 207,
+      "queries": {
+        "1000_um": {
+          "K_I_MPa_sqrt_m": [
+            13.207991794345416
+          ],
+          "event_ids": [
+            "2.142000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "100_um": {
+          "K_I_MPa_sqrt_m": [
+            10.81192563957883
+          ],
+          "event_ids": [
+            "2.510000000000000000e+02"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        },
+        "500_um": {
+          "K_I_MPa_sqrt_m": [
+            14.704390085454765
+          ],
+          "event_ids": [
+            "1.043000000000000000e+03"
+          ],
+          "interpolation_performed": false,
+          "status": "discrete_jump_bracket"
+        }
+      },
+      "steps_file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um/weakT_V2_P40_300K_theta0/steps_0300K.csv"
+    }
+  ],
+  "schema": "long-growth-observation-reanalysis/1",
+  "source_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_V2_named_single_crack_theta0_300K_1200K_1000um",
+  "targets_um": [
+    100.0,
+    500.0,
+    1000.0
+  ]
+}
