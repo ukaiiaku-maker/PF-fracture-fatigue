@@ -34,4 +34,3 @@ compositions that lack a qualified top-level adapter. Their native modules and
 legacy launchers remain present, their independent roles resolve, and `run`
 fails before execution with a precise pending message. This is an open
 integration boundary, not a claim that the physical capability was removed.
-

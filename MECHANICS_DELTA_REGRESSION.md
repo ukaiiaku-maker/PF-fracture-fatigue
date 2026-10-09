@@ -19,4 +19,3 @@ presented as a base-versus-integration equivalence test. A controlled immutable
 base/current coupled trajectory at matched accepted state remains open; the
 current evidence establishes unchanged fallback behavior and the intended
 local consequences of the two reported mechanics corrections.
-
