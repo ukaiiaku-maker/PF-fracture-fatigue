@@ -1,0 +1,87 @@
+{
+  "schema": "combined-review-test-receipt/1",
+  "date": "2026-10-09",
+  "branch": "codex/shared-fracture-fatigue-options-v1",
+  "tested_commit": "6810590e508726b9a1efe78f4a228367db606a5c",
+  "tested_tree": "78ea3b11c8e865a1ea2f9258d8763344d0461d75",
+  "working_tree_clean_before_execution": true,
+  "pf_environment": {
+    "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "pytest_plugin_autoload": false
+  },
+  "test_executions": [
+    {
+      "scope": "all repository tests in one qualified interpreter",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 MPLCONFIGDIR=/tmp/fracture-mpl <qualified-pf-python> -m pytest -q tests",
+      "collected_unique_test_ids": 740,
+      "passed": 740,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 86.68
+    },
+    {
+      "scope": "pinned external theta0 FEM adapter",
+      "source_commit": "293491157063484bb10df6adc479f847a6a08ba6",
+      "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python",
+      "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 <fem-python> -m pytest -q -p no:cacheprovider tests/test_theta0_pf_parity_v10051840.py",
+      "collected_unique_test_ids": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 4.09
+    }
+  ],
+  "public_execution": {
+    "compact_profile": {
+      "status": "executed",
+      "execution_verified": true,
+      "seed": 1733,
+      "loading_steps": 2,
+      "spatial_process_zone_state_disabled": false,
+      "receipt": "/private/tmp/fracture_shared_execution_final_6810590/shared_runtime_attestation.post.json"
+    },
+    "selected_fields_profile": {
+      "status": "executed",
+      "execution_verified": true,
+      "seed": 1733,
+      "loading_steps": 2,
+      "receipt": "/private/tmp/fracture_shared_execution_selected_6810590/shared_runtime_attestation.post.json"
+    },
+    "physics_equivalence_across_output_profiles": {
+      "steps_csv_byte_identical": true,
+      "steps_sha256": "a7df98a28f26b648420f1a839a7c56a254d12f914057f6d03ea6c11a9af12402",
+      "fronts_csv_byte_identical": true,
+      "fronts_sha256": "3af7558b56323f72cc3016c4a79751b5b0bce400bc29048d7a56638925e9928a",
+      "summary_json_byte_identical": true
+    },
+    "scope_limit": "no event occurred in the two-step public-path smoke; event growth remains evidenced by the retained 1002.903 um full-PF trajectory"
+  },
+  "static_checks": {
+    "compileall_arrhenius_scripts_tests": {"exit_code": 0},
+    "bash_syntax_all_scripts": {"exit_code": 0},
+    "git_diff_check_worktree": {"exit_code": 0},
+    "git_diff_check_base_to_tested_head": {
+      "range": "9e884fb0b0845da621d2612bdf1042e481b8df49..6810590e508726b9a1efe78f4a228367db606a5c",
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  "historical_long_growth": {
+    "source_commit": "baedb069c912db69032eea8b339cb01b4bf97278",
+    "achieved_extension_um": 1002.9028827375072,
+    "events": 201,
+    "raw_rows": 2085,
+    "adapted_rows_with_corrected_reader": 2085,
+    "non_event_rows": 1884
+  },
+  "omitted_external_artifact_tests": {
+    "count": 88,
+    "status": "not_collected_by_fast_suite",
+    "manifest": "integration_evidence/omitted_artifact_tests_manifest.json"
+  },
+  "broad_run_audit": {
+    "first_attempt": "733 passed, 7 failed; failures investigated rather than hidden",
+    "second_attempt": "738 passed, 2 failed; import-time zero-event overlay conflict localized",
+    "final_attempt": "740 passed, 0 failed"
+  }
+}

@@ -1,5 +1,12 @@
 # Smoke and regression results
 
+> Historical receipt note: the 283-test grouping below records the earlier
+> integration delivery. The combined-review final source at `6810590` was
+> subsequently run as one clean 740-test PF collection with 740 passed, plus 4
+> passed tests in the pinned FEM environment. Exact current commands, counts,
+> static checks, output-profile parity hashes, and the disposition of 88
+> external artifact-bound tests are in `COMBINED_REVIEW_TEST_RECEIPT.json`.
+
 Outcome: the option-preserving PF integration passed 267 selected PF tests, the pinned full FEM/CZM pair passed 16 tests, and the committed-mechanics full-PF run reached 1002.903 µm extension. The total selected regression count is 283 passed and 0 failed in the recorded release environment.
 
 ## Test layers

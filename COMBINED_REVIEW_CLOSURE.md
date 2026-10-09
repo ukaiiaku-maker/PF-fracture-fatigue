@@ -22,10 +22,12 @@ top-level composition is not yet qualified.
 
 ## Executed results
 
-- Corrected focused PF suite: 35 passed.
+- Final clean-source PF suite: 740 unique tests passed in one qualified interpreter.
 - External FEM theta0 adapter suite: 4 passed in `arrhenius-fem-czm`.
 - Public shared PF execution: two full spatial 2-D load steps returned normally,
   with spatial process-zone state active and pre/post in-process receipts.
+- Compact and selected-field executions produced byte-identical step, front and
+  summary histories; output retention did not change the tested physics/RNG path.
 - Long history: 2,085/2,085 rows retained; 201 event and 1,884 non-event
   rows; 1,883 repeated committed-length rows; `K_J` finite on every row and
   `K_I` deliberately absent.
