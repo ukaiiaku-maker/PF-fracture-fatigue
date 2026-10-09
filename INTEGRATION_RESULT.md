@@ -8,7 +8,7 @@ The complete option-preserving fracture–fatigue family is integrated on `codex
 - Integrated mechanics/provider source commit: `baedb069c912db69032eea8b339cb01b4bf97278`.
 - Donors: `9e2c43ebfb42d6694c27f01ea9092e79da7e3a06` (bulk, branch, V5 void), `94871be15702e7fb85116b92af62c1226c61be42` (reversible cyclic stack), and `0a0e522291882bd13e0d03c7e231fd8a6627aa4f` (V3.6 operator/feedback/ledger).
 - Full FEM/CZM comparison: `ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ` commit `293491157063484bb10df6adc479f847a6a08ba6`, branch `v10.0.5.18.4.0-theta0-pf-parity`. No FEM source change or companion branch was needed.
-- Final pushed head and remote verification are recorded in `REMOTE_PUSH_RECEIPT.json`.
+- The tested integration/evidence commit and its remote-head verification are recorded in `REMOTE_PUSH_RECEIPT.json`. The receipt-only follow-up commit does not change calculation source or test evidence.
 
 ## Integrated capabilities
 

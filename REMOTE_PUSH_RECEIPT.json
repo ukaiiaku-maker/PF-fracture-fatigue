@@ -1,0 +1,13 @@
+{
+  "schema": "shared-fracture-fatigue-remote-push-receipt/1",
+  "repository": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue.git",
+  "branch": "codex/shared-fracture-fatigue-options-v1",
+  "tested_integration_commit": "4b3152c266068d1b7288d22050f98a5751d3d3cb",
+  "remote_verified_head": "4b3152c266068d1b7288d22050f98a5751d3d3cb",
+  "verification_command": "git ls-remote --heads origin refs/heads/codex/shared-fracture-fatigue-options-v1",
+  "verified": true,
+  "force_push": false,
+  "default_branch_modified": false,
+  "pull_request_created": false,
+  "receipt_follow_up_changes_calculation_source": false
+}
